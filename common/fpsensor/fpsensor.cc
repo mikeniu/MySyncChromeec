@@ -265,7 +265,8 @@ static void fp_process_finger(void)
 #endif /* HAVE_FP_PRIVATE_DRIVER */
 
 static enum ec_error_list encrypt_template(uint16_t fgr);
-static enum ec_status fp_commit_template(std::span<const uint8_t> context);
+static enum ec_host_cmd_status
+fp_commit_template(std::span<const uint8_t> context);
 
 extern "C" void fp_task(void)
 {
@@ -401,8 +402,9 @@ extern "C" void fp_task(void)
 			} else if (mode & FP_MODE_DECRYPT_TEMPLATE) {
 				ScopedFastCpu fast_cpu;
 
-				enum ec_status res = fp_commit_template(
-					global_context.user_id);
+				enum ec_host_cmd_status res =
+					fp_commit_template(
+						global_context.user_id);
 				atomic_set(&global_context
 						    .template_decryption_result,
 					   res);
@@ -485,17 +487,27 @@ extern "C" void fp_task(void)
 #endif /* !HAVE_FP_PRIVATE_DRIVER */
 }
 
-static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_info(struct ec_host_cmd_handler_args *args)
 {
 	struct ec_response_fp_info_v3 *r =
-		static_cast<ec_response_fp_info_v3 *>(args->response);
-	size_t response_size =
-		sizeof(struct ec_response_fp_info_v3) +
-		FP_MAX_CAPTURE_TYPES * sizeof(struct fp_image_frame_params_v2);
+		static_cast<ec_response_fp_info_v3 *>(args->output_buf);
+	size_t response_size;
 
-	if (response_size > args->response_max) {
-		return EC_RES_OVERFLOW;
+	if (args->version == 2) {
+		response_size = sizeof(struct ec_response_fp_info_v2) +
+				FP_MAX_CAPTURE_TYPES *
+					sizeof(struct fp_image_frame_params);
+	} else if (args->version == 3) {
+		response_size = sizeof(struct ec_response_fp_info_v3) +
+				FP_MAX_CAPTURE_TYPES *
+					sizeof(struct fp_image_frame_params_v2);
+	} else {
+		return EC_HOST_CMD_INVALID_VERSION;
 	}
+
+	if (args->output_buf_max < response_size)
+		return EC_HOST_CMD_OVERFLOW;
 
 	/*
 	 * The sensor may have fewer than FP_MAX_CAPTURE_TYPES number of
@@ -507,7 +519,7 @@ static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
 #ifdef HAVE_FP_PRIVATE_DRIVER
 	if (fp_sensor_get_info(r, response_size) < 0)
 #endif
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 
 	r->template_info.template_size = FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE;
 	r->template_info.template_max = FP_MAX_FINGER_COUNT;
@@ -517,7 +529,7 @@ static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
 
 	if (args->version == 2) {
 		struct ec_response_fp_info_v2 *r_v2 =
-			static_cast<ec_response_fp_info_v2 *>(args->response);
+			static_cast<ec_response_fp_info_v2 *>(args->output_buf);
 		/* Convert to v2 format. The formats differ only in the frame
 		 * array, which is located at the end of the structures
 		 *
@@ -542,17 +554,15 @@ static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
 			r_v2->image_frame_params[i].reserved =
 				r->image_frame_params[i].reserved;
 		}
-		response_size = sizeof(struct ec_response_fp_info_v2) +
-				FP_MAX_CAPTURE_TYPES *
-					sizeof(struct fp_image_frame_params);
 	}
 
-	args->response_size = response_size;
+	args->output_buf_size = response_size;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info,
-		     EC_VER_MASK(2) | EC_VER_MASK(3));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_FP_INFO, fp_command_info,
+			      EC_VER_MASK(2) | EC_VER_MASK(3),
+			      struct ec_response_fp_info_v2);
 
 BUILD_ASSERT(FP_CONTEXT_NONCE_BYTES == 12);
 
@@ -688,47 +698,48 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 }
 
 /* TODO(b/471160577): Remove FP_FRAME v0 after migration is completed. */
-static enum ec_status fp_command_frame_v0(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_frame_v0(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params =
-		static_cast<const struct ec_params_fp_frame *>(args->params);
-	void *out = args->response;
+		static_cast<const struct ec_params_fp_frame *>(args->input_buf);
+	void *out = args->output_buf;
 	uint16_t idx = FP_FRAME_GET_BUFFER_INDEX(params->offset);
 	uint32_t offset = params->offset & FP_FRAME_OFFSET_MASK;
 	uint32_t size = params->size;
 	enum ec_error_list ret;
 
-	if (size > args->response_max)
-		return EC_RES_INVALID_PARAM;
+	if (size > args->output_buf_max)
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (idx == FP_FRAME_INDEX_RAW_IMAGE) {
 		/* The host requested a frame. */
 		enum ec_status ret = get_frame(offset, size, (uint8_t *)out);
 		if (ret != EC_RES_SUCCESS) {
-			return ret;
+			return (enum ec_host_cmd_status)ret;
 		}
 
-		args->response_size = size;
-		return EC_RES_SUCCESS;
+		args->output_buf_size = size;
+		return EC_HOST_CMD_SUCCESS;
 	}
 
 	/* The host requested a template. */
 
 	/* Encryption or decryption is in progress. */
 	if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
-		return EC_RES_BUSY;
+		return EC_HOST_CMD_BUSY;
 	}
 
 	/* Templates are numbered from 1 in this host request. */
 	uint16_t fgr = idx - FP_FRAME_INDEX_TEMPLATE;
 
 	if (fgr >= FP_MAX_FINGER_COUNT)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	if (fgr >= global_context.templ_valid)
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 	ret = validate_fp_buffer_offset(sizeof(fp_enc_buffer), offset, size);
 	if (ret != EC_SUCCESS)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (!offset) {
 		/* Host has requested the first chunk, do the encryption. */
@@ -736,19 +747,19 @@ static enum ec_status fp_command_frame_v0(struct host_cmd_handler_args *args)
 
 		/* b/114160734: Not more than 1 encrypted message per second. */
 		if (!timestamp_expired(encryption_deadline, &now))
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 		encryption_deadline.val = now.val + (1 * SECOND);
 
 		ScopedFastCpu fast_cpu;
 
 		if (encrypt_template(fgr) != EC_SUCCESS) {
-			return EC_RES_UNAVAILABLE;
+			return EC_HOST_CMD_UNAVAILABLE;
 		}
 	}
 	memcpy(out, reinterpret_cast<uint8_t *>(&fp_enc_buffer) + offset, size);
-	args->response_size = size;
+	args->output_buf_size = size;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
 /*
@@ -770,29 +781,30 @@ static enum ec_status fp_command_frame_v0(struct host_cmd_handler_args *args)
  * (if possible), posting work to FPSENSOR task and waiting for result, if
  * needed.
  */
-static enum ec_status fp_command_frame_v1(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_frame_v1(struct ec_host_cmd_handler_args *args)
 {
-	const auto *params =
-		static_cast<const struct ec_params_fp_frame_v1 *>(args->params);
-	void *out = args->response;
+	const auto *params = static_cast<const struct ec_params_fp_frame_v1 *>(
+		args->input_buf);
+	void *out = args->output_buf;
 	uint32_t offset = params->offset;
 	uint32_t size = params->size;
 	enum ec_error_list ret;
 	enum ec_status status;
 
-	if (size > args->response_max)
-		return EC_RES_INVALID_PARAM;
+	if (size > args->output_buf_max)
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	switch (params->cmd) {
 	case FP_FRAME_GET_RAW_IMAGE:
 		/* The host requested a frame. */
 		status = get_frame(offset, size, (uint8_t *)out);
 		if (status != EC_RES_SUCCESS) {
-			return status;
+			return (enum ec_host_cmd_status)status;
 		}
 
-		args->response_size = size;
-		return EC_RES_SUCCESS;
+		args->output_buf_size = size;
+		return EC_HOST_CMD_SUCCESS;
 	case FP_FRAME_ENCRYPT_TEMPLATE: {
 		timestamp_t now;
 		uint32_t mode_output;
@@ -802,19 +814,19 @@ static enum ec_status fp_command_frame_v1(struct host_cmd_handler_args *args)
 		 * or decryption is in progress.
 		 */
 		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 		}
 
 		if (params->index >= FP_MAX_FINGER_COUNT)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		if (params->index >= global_context.templ_valid)
-			return EC_RES_UNAVAILABLE;
+			return EC_HOST_CMD_UNAVAILABLE;
 
 		now = get_time();
 
 		/* b/114160734: Not more than 1 encrypted message per second. */
 		if (!timestamp_expired(encryption_deadline, &now))
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 		encryption_deadline.val = now.val + (1 * SECOND);
 
 		global_context.fp_encryption_status &=
@@ -823,14 +835,14 @@ static enum ec_status fp_command_frame_v1(struct host_cmd_handler_args *args)
 		status = fp_set_sensor_mode(FP_MODE_ENCRYPT_TEMPLATE,
 					    &mode_output, std::nullopt);
 		if (status != EC_RES_SUCCESS) {
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 		}
 		break;
 	}
 	case FP_FRAME_GET_ENCRYPTED_TEMPLATE:
 		/* Encryption or decryption is still running */
 		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 		}
 
 		/*
@@ -839,41 +851,49 @@ static enum ec_status fp_command_frame_v1(struct host_cmd_handler_args *args)
 		 */
 		if (!(global_context.fp_encryption_status &
 		      FP_ENCRYPTED_TEMPLATE_READY)) {
-			return EC_RES_UNAVAILABLE;
+			return EC_HOST_CMD_UNAVAILABLE;
 		}
 
 		/* Validate data request */
 		ret = validate_fp_buffer_offset(sizeof(fp_enc_buffer), offset,
 						size);
 		if (ret != EC_SUCCESS)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 
 		/* Encryption succeeded */
 		memcpy(out,
 		       reinterpret_cast<uint8_t *>(&fp_enc_buffer) + offset,
 		       size);
-		args->response_size = size;
+		args->output_buf_size = size;
 
 		break;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-static enum ec_status fp_command_frame(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_frame(struct ec_host_cmd_handler_args *args)
 {
 	if (args->version == 1) {
+		if (args->input_buf_size < sizeof(struct ec_params_fp_frame_v1))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
 		return fp_command_frame_v1(args);
 	}
 
+	if (args->input_buf_size < sizeof(struct ec_params_fp_frame))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
 	return fp_command_frame_v0(args);
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_FRAME, fp_command_frame,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_FRAME, fp_command_frame,
+			     EC_VER_MASK(0) | EC_VER_MASK(1),
+			     struct ec_params_fp_frame);
 
-static enum ec_status fp_command_stats(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_stats(struct ec_host_cmd_handler_args *args)
 {
-	auto *r = static_cast<struct ec_response_fp_stats *>(args->response);
+	auto *r = static_cast<struct ec_response_fp_stats *>(args->output_buf);
 
 	r->capture_time_us = capture_time_us;
 	r->matching_time_us = matching_time_us;
@@ -883,29 +903,31 @@ static enum ec_status fp_command_stats(struct host_cmd_handler_args *args)
 	r->timestamps_invalid = timestamps_invalid;
 	r->template_matched = stats_template_matched;
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_STATS, fp_command_stats, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_FP_STATS, fp_command_stats, EC_VER_MASK(0),
+			      struct ec_response_fp_stats);
 
-static enum ec_status
+static enum ec_host_cmd_status
 validate_template_format(struct ec_fp_template_encryption_metadata *enc_info)
 {
 	if (enc_info->struct_version != FP_TEMPLATE_FORMAT_VERSION) {
 		CPRINTS("Invalid template format %d", enc_info->struct_version);
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-static enum ec_status fp_commit_template(std::span<const uint8_t> context)
+static enum ec_host_cmd_status
+fp_commit_template(std::span<const uint8_t> context)
 {
 	ScopedFastCpu fast_cpu;
 
 	uint16_t idx = global_context.templ_valid;
 
 	if (idx >= FP_MAX_FINGER_COUNT)
-		return EC_RES_OVERFLOW;
+		return EC_HOST_CMD_OVERFLOW;
 
 	/*
 	 * The complete encrypted template has been received, start
@@ -918,10 +940,10 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context)
 	 */
 	struct ec_fp_template_encryption_metadata *enc_info =
 		&fp_enc_buffer.metadata;
-	enum ec_status res = validate_template_format(enc_info);
-	if (res != EC_RES_SUCCESS) {
+	enum ec_host_cmd_status res = validate_template_format(enc_info);
+	if (res != EC_HOST_CMD_SUCCESS) {
 		CPRINTS("fgr%d: Template format not supported", idx);
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	/* Encrypted template is after the metadata. */
@@ -938,7 +960,7 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context)
 				      global_context.tpm_seed);
 	if (ret != EC_SUCCESS) {
 		CPRINTS("fgr%d: Failed to derive key", idx);
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
 	/* Decrypt the secret blob in-place. */
@@ -950,7 +972,7 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context)
 		/* Don't leave partially decrypted data in the buffer! */
 		OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
 		CPRINTS("fgr%d: Failed to decipher template", idx);
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
 	if (bytes_are_trivial(positive_match_salt.data(),
@@ -958,7 +980,7 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context)
 		/* Don't leave decrypted data in the buffer! */
 		OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
 		CPRINTS("fgr%d: Trivial positive match salt.", idx);
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	std::ranges::copy(templ, fp_template[idx]);
@@ -969,13 +991,14 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context)
 	OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
 
 	global_context.templ_valid++;
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-static enum ec_status fp_command_template_v0(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_template_v0(struct ec_host_cmd_handler_args *args)
 {
-	const auto *params =
-		static_cast<const struct ec_params_fp_template *>(args->params);
+	const auto *params = static_cast<const struct ec_params_fp_template *>(
+		args->input_buf);
 	uint32_t size = params->size & ~FP_TEMPLATE_COMMIT;
 	bool xfer_complete = params->size & FP_TEMPLATE_COMMIT;
 	uint32_t offset = params->offset;
@@ -983,20 +1006,20 @@ static enum ec_status fp_command_template_v0(struct host_cmd_handler_args *args)
 
 	/* Can we store one more template ? */
 	if (idx >= FP_MAX_FINGER_COUNT)
-		return EC_RES_OVERFLOW;
+		return EC_HOST_CMD_OVERFLOW;
 
 	/* Encryption or decryption is in progress. */
 	if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
-		return EC_RES_BUSY;
+		return EC_HOST_CMD_BUSY;
 	}
 
-	if (args->params_size !=
+	if (args->input_buf_size !=
 	    size + offsetof(struct ec_params_fp_template, data))
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	enum ec_error_list ret =
 		validate_fp_buffer_offset(sizeof(fp_enc_buffer), offset, size);
 	if (ret != EC_SUCCESS)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	memcpy(reinterpret_cast<uint8_t *>(&fp_enc_buffer) + offset,
 	       params->data, size);
@@ -1005,14 +1028,15 @@ static enum ec_status fp_command_template_v0(struct host_cmd_handler_args *args)
 		return fp_commit_template(global_context.user_id);
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_template_v1(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params =
 		static_cast<const struct ec_params_fp_template_v1 *>(
-			args->params);
+			args->input_buf);
 	enum ec_status status;
 
 	switch (params->cmd) {
@@ -1022,22 +1046,22 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 
 		/* Encryption or decryption is in progress. */
 		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 		}
 
 		/* Can we store one more template ? */
 		if (global_context.templ_valid >= FP_MAX_FINGER_COUNT) {
-			return EC_RES_OVERFLOW;
+			return EC_HOST_CMD_OVERFLOW;
 		}
 
-		if (args->params_size !=
+		if (args->input_buf_size !=
 		    size + offsetof(struct ec_params_fp_template_v1, data)) {
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		}
 		enum ec_error_list ret = validate_fp_buffer_offset(
 			sizeof(fp_enc_buffer), offset, size);
 		if (ret != EC_SUCCESS) {
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		}
 
 		/*
@@ -1052,14 +1076,14 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 		memcpy(reinterpret_cast<uint8_t *>(&fp_enc_buffer) + offset,
 		       params->data, size);
 
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
 	case FP_TEMPLATE_DECRYPT: {
 		uint32_t mode_output;
 
 		/* Encryption or decryption is in progress. */
 		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 		}
 
 		/* Start template decryption. */
@@ -1068,46 +1092,54 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 		if (status != EC_RES_SUCCESS) {
 			atomic_set(&global_context.template_decryption_result,
 				   EC_RES_ERROR);
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 		}
 
 		atomic_set(&global_context.template_decryption_result,
 			   EC_RES_BUSY);
 
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
 	case FP_TEMPLATE_GET_RESULT:
 		/* Decryption is still running */
 		if (global_context.sensor_mode & FP_MODE_DECRYPT_TEMPLATE) {
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 		}
 
 		status = (enum ec_status)atomic_get(
 			&global_context.template_decryption_result);
 
-		return status;
+		return (enum ec_host_cmd_status)status;
 	}
 
-	return EC_RES_INVALID_PARAM;
+	return EC_HOST_CMD_INVALID_PARAM;
 }
 
-static enum ec_status fp_command_template(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_template(struct ec_host_cmd_handler_args *args)
 {
 	if (args->version == 1) {
+		if (args->input_buf_size <
+		    offsetof(struct ec_params_fp_template_v1, data))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
 		return fp_command_template_v1(args);
 	}
 
+	if (args->input_buf_size < offsetof(struct ec_params_fp_template, data))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
 	return fp_command_template_v0(args);
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_TEMPLATE, fp_command_template,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_TEMPLATE, fp_command_template,
+			     EC_VER_MASK(0) | EC_VER_MASK(1),
+			     struct ec_params_fp_template);
 
-static enum ec_status
-fp_command_confirm_template(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_confirm_template(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params =
 		static_cast<const struct ec_params_fp_confirm_template *>(
-			args->params);
+			args->input_buf);
 	std::span<const uint8_t, FP_MAC_LENGTH> mac{ params->mac };
 
 	/*
@@ -1130,17 +1162,18 @@ fp_command_confirm_template(struct host_cmd_handler_args *args)
 	 */
 	if (global_context.template_newly_enrolled !=
 	    global_context.templ_valid) {
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	}
 
 	if (validate_request(context, operation, mac) != EC_SUCCESS) {
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 	}
 
 	/* Add newly enrolled template to valid templates. */
 	global_context.templ_valid++;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_CONFIRM_TEMPLATE, fp_command_confirm_template,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_CONFIRM_TEMPLATE,
+			     fp_command_confirm_template, EC_VER_MASK(0),
+			     struct ec_params_fp_confirm_template);
