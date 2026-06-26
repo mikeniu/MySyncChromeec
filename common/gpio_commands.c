@@ -228,68 +228,92 @@ DECLARE_CONSOLE_COMMAND_FLAGS(gpioset, command_gpio_set,
 /*****************************************************************************/
 /* Host commands */
 
-static enum ec_status gpio_command_get(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+gpio_command_get(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_gpio_get_v1 *p_v1 = args->params;
-	struct ec_response_gpio_get_v1 *r_v1 = args->response;
-	int i, len;
+	const struct ec_params_gpio_get_v1 *p_v1 = args->input_buf;
+	struct ec_response_gpio_get_v1 *r_v1 = args->output_buf;
+	int i;
 
 	if (args->version == 0) {
-		const struct ec_params_gpio_get *p = args->params;
-		struct ec_response_gpio_get *r = args->response;
+		const struct ec_params_gpio_get *p = args->input_buf;
+		struct ec_response_gpio_get *r = args->output_buf;
 
 		i = find_signal_by_name(p->name);
 		if (i == GPIO_COUNT)
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 
 		r->val = gpio_get_level(i);
-		args->response_size = sizeof(struct ec_response_gpio_get);
-		return EC_RES_SUCCESS;
+		args->output_buf_size = sizeof(struct ec_response_gpio_get);
+		return EC_HOST_CMD_SUCCESS;
+	}
+
+	if (p_v1->subcmd == EC_GPIO_GET_BY_NAME) {
+		if (args->input_buf_size < 33)
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
+	} else if (p_v1->subcmd == EC_GPIO_GET_INFO) {
+		if (args->input_buf_size < 2)
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
 	}
 
 	switch (p_v1->subcmd) {
 	case EC_GPIO_GET_BY_NAME:
+		if (args->output_buf_max < sizeof(r_v1->get_value_by_name))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+
 		i = find_signal_by_name(p_v1->get_value_by_name.name);
 		if (i == GPIO_COUNT)
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 
 		r_v1->get_value_by_name.val = gpio_get_level(i);
-		args->response_size = sizeof(r_v1->get_value_by_name);
+		args->output_buf_size = sizeof(r_v1->get_value_by_name);
 		break;
 	case EC_GPIO_GET_COUNT:
+		if (args->output_buf_max < sizeof(r_v1->get_count))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+
 		r_v1->get_count.val = GPIO_COUNT;
-		args->response_size = sizeof(r_v1->get_count);
+		args->output_buf_size = sizeof(r_v1->get_count);
 		break;
 	case EC_GPIO_GET_INFO:
+		if (args->output_buf_max < sizeof(r_v1->get_info))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+
 		if (p_v1->get_info.index >= GPIO_COUNT)
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 
 		i = p_v1->get_info.index;
-		len = strlen(gpio_get_name(i));
-		memcpy(r_v1->get_info.name, gpio_get_name(i), len + 1);
+		strzcpy(r_v1->get_info.name, gpio_get_name(i),
+			sizeof(r_v1->get_info.name));
 		r_v1->get_info.val = gpio_get_level(i);
 		r_v1->get_info.flags = gpio_get_default_flags(i);
-		args->response_size = sizeof(r_v1->get_info);
+		args->output_buf_size = sizeof(r_v1->get_info);
 		break;
 	default:
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GPIO_GET, gpio_command_get,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER(EC_CMD_GPIO_GET, gpio_command_get,
+		    EC_VER_MASK(0) | EC_VER_MASK(1),
+		    SMALLEST_TYPE(struct ec_params_gpio_get,
+				  struct ec_params_gpio_get_v1),
+		    SMALLEST_TYPE(struct ec_response_gpio_get,
+				  struct ec_response_gpio_get_v1));
 
-static enum ec_status gpio_command_set(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+gpio_command_set(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_gpio_set *p = args->params;
+	const struct ec_params_gpio_set *p = args->input_buf;
 
 	if (system_is_locked())
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 
 	if (set(p->name, p->val) != EC_SUCCESS)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GPIO_SET, gpio_command_set, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_GPIO_SET, gpio_command_set, EC_VER_MASK(0),
+			     struct ec_params_gpio_set);

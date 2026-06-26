@@ -407,28 +407,31 @@ void dptf_set_fan_duty_target(int pct)
 /*****************************************************************************/
 /* Host commands */
 
-static enum ec_status
-hc_pwm_get_fan_target_rpm(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_pwm_get_fan_target_rpm(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_pwm_get_fan_rpm *r = args->response;
+	struct ec_response_pwm_get_fan_rpm *r = args->output_buf;
 
 	if (fan_count == 0)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
 	/* TODO(crosbug.com/p/23803) */
 	r->rpm = fan_get_rpm_target(FAN_CH(0));
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PWM_GET_FAN_TARGET_RPM, hc_pwm_get_fan_target_rpm,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_PWM_GET_FAN_TARGET_RPM,
+			      hc_pwm_get_fan_target_rpm, EC_VER_MASK(0),
+			      struct ec_response_pwm_get_fan_rpm);
 
-static enum ec_status
-hc_pwm_set_fan_target_rpm(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_pwm_set_fan_target_rpm(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_pwm_set_fan_target_rpm_v1 *p_v1 = args->params;
-	const struct ec_params_pwm_set_fan_target_rpm_v0 *p_v0 = args->params;
+	const struct ec_params_pwm_set_fan_target_rpm_v1 *p_v1 =
+		args->input_buf;
+	const struct ec_params_pwm_set_fan_target_rpm_v0 *p_v0 =
+		args->input_buf;
 	int fan;
 
 	if (args->version == 0) {
@@ -441,12 +444,16 @@ hc_pwm_set_fan_target_rpm(struct host_cmd_handler_args *args)
 			fan_set_rpm_target(FAN_CH(fan), p_v0->rpm);
 		}
 
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
+
+	if (args->input_buf_size <
+	    sizeof(struct ec_params_pwm_set_fan_target_rpm_v1))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
 
 	fan = p_v1->fan_idx;
 	if (fan >= fan_count)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
 	/* enable the fan if rpm is non-zero */
 	set_enabled(fan, (p_v1->rpm > 0) ? 1 : 0);
@@ -455,58 +462,75 @@ hc_pwm_set_fan_target_rpm(struct host_cmd_handler_args *args)
 	fan_set_rpm_mode(FAN_CH(fan), 1);
 	fan_set_rpm_target(FAN_CH(fan), p_v1->rpm);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PWM_SET_FAN_TARGET_RPM, hc_pwm_set_fan_target_rpm,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_REQ_ONLY(
+	EC_CMD_PWM_SET_FAN_TARGET_RPM, hc_pwm_set_fan_target_rpm,
+	EC_VER_MASK(0) | EC_VER_MASK(1),
+	SMALLEST_TYPE(struct ec_params_pwm_set_fan_target_rpm_v0,
+		      struct ec_params_pwm_set_fan_target_rpm_v1));
 
-static enum ec_status hc_pwm_set_fan_duty(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_pwm_set_fan_duty(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_pwm_set_fan_duty_v1 *p_v1 = args->params;
-	const struct ec_params_pwm_set_fan_duty_v0 *p_v0 = args->params;
+	const struct ec_params_pwm_set_fan_duty_v1 *p_v1 = args->input_buf;
+	const struct ec_params_pwm_set_fan_duty_v0 *p_v0 = args->input_buf;
 	int fan;
 
 	if (args->version == 0) {
 		for (fan = 0; fan < fan_count; fan++)
 			set_duty_cycle(fan, p_v0->percent);
 
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
+
+	if (args->input_buf_size < sizeof(struct ec_params_pwm_set_fan_duty_v1))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
 
 	fan = p_v1->fan_idx;
 	if (fan >= fan_count)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
 	set_duty_cycle(fan, p_v1->percent);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PWM_SET_FAN_DUTY, hc_pwm_set_fan_duty,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_REQ_ONLY(
+	EC_CMD_PWM_SET_FAN_DUTY, hc_pwm_set_fan_duty,
+	EC_VER_MASK(0) | EC_VER_MASK(1),
+	SMALLEST_TYPE(struct ec_params_pwm_set_fan_duty_v0,
+		      struct ec_params_pwm_set_fan_duty_v1));
 
-static enum ec_status
-hc_thermal_auto_fan_ctrl(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_thermal_auto_fan_ctrl(struct ec_host_cmd_handler_args *args)
 {
 	int fan;
-	const struct ec_params_auto_fan_ctrl_v1 *p_v1 = args->params;
+	const struct ec_params_auto_fan_ctrl_v1 *p_v1 = args->input_buf;
+
+	if (args->version == 1) {
+		if (args->input_buf_size <
+		    sizeof(struct ec_params_auto_fan_ctrl_v1))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
+	}
 
 	if (args->version == 0) {
 		for (fan = 0; fan < fan_count; fan++)
 			set_thermal_control_enabled(fan, 1);
 
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
 
 	fan = p_v1->fan_idx;
 	if (fan >= fan_count)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	set_thermal_control_enabled(fan, 1);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_THERMAL_AUTO_FAN_CTRL, hc_thermal_auto_fan_ctrl,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_THERMAL_AUTO_FAN_CTRL,
+			    hc_thermal_auto_fan_ctrl,
+			    EC_VER_MASK(0) | EC_VER_MASK(1));
 
 /*****************************************************************************/
 /* Hooks */
