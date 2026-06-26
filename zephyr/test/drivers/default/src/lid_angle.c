@@ -90,7 +90,8 @@ ZTEST(lid_angle, test_wake_max_large_angle)
 
 int emul_lid_close(void);
 int board_is_lid_angle_tablet_mode(void);
-enum ec_status host_cmd_motion_lid(struct host_cmd_handler_args *args);
+enum ec_host_cmd_status
+host_cmd_motion_lid(struct ec_host_cmd_handler_args *args);
 
 static void set_mock_sensors_angle(double angle_deg)
 {
@@ -331,11 +332,11 @@ ZTEST(lid_angle, test_tablet_mode_threshold_and_host_cmd)
 {
 	struct ec_params_motion_sense params;
 	struct ec_response_motion_sense response;
-	struct host_cmd_handler_args args = {
-		.params = &params,
-		.params_size = sizeof(params),
-		.response = &response,
-		.response_max = sizeof(response),
+	struct ec_host_cmd_handler_args args = {
+		.input_buf = &params,
+		.input_buf_size = sizeof(params),
+		.output_buf = &response,
+		.output_buf_max = sizeof(response),
 		.version = 0,
 	};
 
@@ -344,58 +345,58 @@ ZTEST(lid_angle, test_tablet_mode_threshold_and_host_cmd)
 	params.cmd = MOTIONSENSE_CMD_TABLET_MODE_LID_ANGLE;
 	params.tablet_mode_threshold.lid_angle = EC_MOTION_SENSE_NO_VALUE;
 	params.tablet_mode_threshold.hys_degree = EC_MOTION_SENSE_NO_VALUE;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_SUCCESS);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_SUCCESS);
 
 	params.tablet_mode_threshold.lid_angle = 180;
 	params.tablet_mode_threshold.hys_degree = 20;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_SUCCESS);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_SUCCESS);
 
 	/* Negative values other than EC_MOTION_SENSE_NO_VALUE (-1) are invalid
 	 */
 	params.tablet_mode_threshold.lid_angle = -10;
 	params.tablet_mode_threshold.hys_degree = 20;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_INVALID_PARAM);
 
 	params.tablet_mode_threshold.lid_angle = 180;
 	params.tablet_mode_threshold.hys_degree = -10;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_INVALID_PARAM);
 
 	params.tablet_mode_threshold.lid_angle = 10;
 	params.tablet_mode_threshold.hys_degree = 20;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_INVALID_PARAM);
 
 	params.tablet_mode_threshold.lid_angle = 350;
 	params.tablet_mode_threshold.hys_degree = 20;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_INVALID_PARAM);
 
 	/* 2. Test host_cmd_motion_lid MOTIONSENSE_CMD_KB_WAKE_ANGLE */
 	memset(&params, 0, sizeof(params));
 	params.cmd = MOTIONSENSE_CMD_KB_WAKE_ANGLE;
 	params.kb_wake_angle.data = 60;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_SUCCESS);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_SUCCESS);
 	zassert_equal(response.kb_wake_angle.ret, 60);
 	zassert_equal(lid_angle_get_wake_angle(), 60);
 
 	params.kb_wake_angle.data = EC_MOTION_SENSE_NO_VALUE;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_SUCCESS);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_SUCCESS);
 	zassert_equal(response.kb_wake_angle.ret, 60);
 
 	/* 3. Test host_cmd_motion_lid MOTIONSENSE_CMD_LID_ANGLE */
 	params.cmd = MOTIONSENSE_CMD_LID_ANGLE;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_SUCCESS);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_SUCCESS);
 	zassert_equal(response.lid_angle.value, motion_lid_get_angle());
 
 	/* 4. Test host_cmd_motion_lid MOTIONSENSE_CMD_TABLET_MODE_LID_ANGLE */
 	params.cmd = MOTIONSENSE_CMD_TABLET_MODE_LID_ANGLE;
 	params.tablet_mode_threshold.lid_angle = 190;
 	params.tablet_mode_threshold.hys_degree = 15;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_SUCCESS);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_SUCCESS);
 	zassert_equal(response.tablet_mode_threshold.lid_angle, 190);
 	zassert_equal(response.tablet_mode_threshold.hys_degree, 15);
 
 	/* 5. Test host_cmd_motion_lid invalid command */
 	params.cmd = 0xff;
-	zassert_equal(host_cmd_motion_lid(&args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_cmd_motion_lid(&args), EC_HOST_CMD_INVALID_PARAM);
 }
 
 ZTEST(lid_angle, test_lid_angle_unreliable_in_tablet_mode)
