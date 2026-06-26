@@ -339,10 +339,6 @@ DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, powerbtn_changed, HOOK_PRIO_DEFAULT);
 
 static void power_ac_changed(void)
 {
-	/* Power task only cares when the external power is connected */
-	if (!extpower_is_present())
-		return;
-
 	ac_on = 1;
 
 	task_wake(TASK_ID_CHIPSET);
