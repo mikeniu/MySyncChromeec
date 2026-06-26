@@ -511,15 +511,16 @@ DECLARE_CONSOLE_COMMAND(button, console_command_button, "vup|vdown|rec msec",
 #endif /* CONFIG_CMD_BUTTON */
 
 #ifdef CONFIG_HOSTCMD_BUTTON
-static enum ec_status host_command_button(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_button(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_button *p = args->params;
+	const struct ec_params_button *p = args->input_buf;
 	int idx;
 	uint32_t button_mask = 0;
 
 	/* Only available on unlocked systems */
 	if (system_is_locked())
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 
 	for (idx = 0; idx < KEYBOARD_BUTTON_COUNT; idx++) {
 		if (p->btn_mask & BIT(idx))
@@ -528,9 +529,10 @@ static enum ec_status host_command_button(struct host_cmd_handler_args *args)
 
 	simulate_button(button_mask, p->press_ms);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_BUTTON, host_command_button, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_BUTTON, host_command_button, EC_VER_MASK(0),
+			     struct ec_params_button);
 
 #endif /* CONFIG_HOSTCMD_BUTTON */
 
