@@ -71,13 +71,13 @@ void update_ap_boot_time(enum boot_time_param param)
 
 #ifdef CONFIG_SYSTEM_BOOT_TIME_LOGGING
 /* Returns system boot time data */
-static enum ec_status
-host_command_get_boot_time(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_get_boot_time(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_get_boot_time *boot_time = args->response;
+	struct ec_response_get_boot_time *boot_time = args->output_buf;
 
-	if (args->response_max < sizeof(*boot_time)) {
-		return EC_RES_RESPONSE_TOO_BIG;
+	if (args->output_buf_max < sizeof(*boot_time)) {
+		return EC_HOST_CMD_OVERFLOW;
 	}
 
 	/* update current time */
@@ -86,11 +86,11 @@ host_command_get_boot_time(struct host_cmd_handler_args *args)
 	/* copy data from ap_boot_time struct */
 	memcpy(boot_time, &ap_boot_time, sizeof(*boot_time));
 
-	args->response_size = sizeof(*boot_time);
+	args->output_buf_size = sizeof(*boot_time);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_GET_BOOT_TIME, host_command_get_boot_time,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_BOOT_TIME, host_command_get_boot_time,
+			      EC_VER_MASK(0), struct ec_response_get_boot_time);
 #endif
