@@ -178,10 +178,10 @@ static void keyscan_copy_config(const struct ec_mkbp_config *src,
 	dst->flags = new_flags;
 }
 
-static enum ec_status
-host_command_mkbp_set_config(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_mkbp_set_config(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_mkbp_set_config *req = args->params;
+	const struct ec_params_mkbp_set_config *req = args->input_buf;
 
 	keyscan_copy_config(&req->config, &config,
 			    config.valid_mask & req->config.valid_mask,
@@ -189,15 +189,16 @@ host_command_mkbp_set_config(struct host_cmd_handler_args *args)
 
 	mkbp_fifo_depth_update(config.fifo_max_depth);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_MKBP_SET_CONFIG, host_command_mkbp_set_config,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_MKBP_SET_CONFIG,
+			     host_command_mkbp_set_config, EC_VER_MASK(0),
+			     struct ec_params_mkbp_set_config);
 
-static enum ec_status
-host_command_mkbp_get_config(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_mkbp_get_config(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_mkbp_get_config *resp = args->response;
+	struct ec_response_mkbp_get_config *resp = args->output_buf;
 	struct ec_mkbp_config *dst = &resp->config;
 
 	memcpy(&resp->config, &config, sizeof(config));
@@ -210,9 +211,10 @@ host_command_mkbp_get_config(struct host_cmd_handler_args *args)
 
 	get_keyscan_config(dst);
 
-	args->response_size = sizeof(*resp);
+	args->output_buf_size = sizeof(*resp);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_MKBP_GET_CONFIG, host_command_mkbp_get_config,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_MKBP_GET_CONFIG,
+			      host_command_mkbp_get_config, EC_VER_MASK(0),
+			      struct ec_response_mkbp_get_config);
