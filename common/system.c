@@ -1368,20 +1368,22 @@ static int command_sysinfo(int argc, const char **argv)
 DECLARE_SAFE_CONSOLE_COMMAND(sysinfo, command_sysinfo, NULL,
 			     "Print system info");
 
-static enum ec_status host_command_sysinfo(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_sysinfo(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_sysinfo *r = args->response;
+	struct ec_response_sysinfo *r = args->output_buf;
 
 	if (sysinfo(r) != EC_SUCCESS)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_SYSINFO, host_command_sysinfo,
-		     EC_VER_MASK(EC_VER_SYSINFO));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_SYSINFO, host_command_sysinfo,
+			      EC_VER_MASK(EC_VER_SYSINFO),
+			      struct ec_response_sysinfo);
 #endif
 
 #ifdef CONFIG_CMD_SCRATCHPAD
@@ -1752,10 +1754,10 @@ DECLARE_CONSOLE_COMMAND(rflags, command_rflags, NULL,
 /*****************************************************************************/
 /* Host commands */
 
-static enum ec_status
-host_command_get_version(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_get_version(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_get_version_v1 *r = args->response;
+	struct ec_response_get_version_v1 *r = args->output_buf;
 	enum ec_image active_slot = system_get_active_copy();
 
 	strzcpy(r->version_string_ro, system_get_version(EC_IMAGE_RO),
@@ -1781,8 +1783,8 @@ host_command_get_version(struct host_cmd_handler_args *args)
 	 * to zero uninitialized fields here.
 	 */
 	if (args->version > 0 && IS_ENABLED(CONFIG_CROS_FWID_VERSION)) {
-		if (args->response_max < sizeof(*r))
-			return EC_RES_RESPONSE_TOO_BIG;
+		if (args->output_buf_max < sizeof(*r))
+			return EC_HOST_CMD_OVERFLOW;
 
 		strzcpy(r->cros_fwid_ro, system_get_cros_fwid(EC_IMAGE_RO),
 			sizeof(r->cros_fwid_ro));
@@ -1796,94 +1798,105 @@ host_command_get_version(struct host_cmd_handler_args *args)
 	 * of one field (reserved to cros_fwid_ro) and adds one additional field
 	 * (cros_fwid_rw). So simply adjusting the response size here is safe.
 	 */
-	if (args->version == 0)
-		args->response_size = sizeof(struct ec_response_get_version);
-	else if (args->version == 1)
-		args->response_size = sizeof(struct ec_response_get_version_v1);
-	else
+	if (args->version == 0) {
+		if (args->output_buf_max <
+		    sizeof(struct ec_response_get_version))
+			return EC_HOST_CMD_INVALID_RESPONSE;
+		args->output_buf_size = sizeof(struct ec_response_get_version);
+	} else if (args->version == 1) {
+		if (args->output_buf_max <
+		    sizeof(struct ec_response_get_version_v1))
+			return EC_HOST_CMD_INVALID_RESPONSE;
+		args->output_buf_size =
+			sizeof(struct ec_response_get_version_v1);
+	} else {
 		/* Shouldn't happen because of EC_VER_MASK */
-		return EC_RES_INVALID_VERSION;
+		return EC_HOST_CMD_INVALID_VERSION;
+	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_VERSION, host_command_get_version,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_VERSION, host_command_get_version,
+			      EC_VER_MASK(0) | EC_VER_MASK(1),
+			      struct ec_response_get_version);
 
 #ifdef CONFIG_HOSTCMD_SKUID
-static enum ec_status
-host_command_get_sku_id(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_get_sku_id(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_sku_id_info *r = args->response;
+	struct ec_sku_id_info *r = args->output_buf;
 
 	r->sku_id = system_get_sku_id();
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_SKU_ID, host_command_get_sku_id,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_SKU_ID, host_command_get_sku_id,
+			      EC_VER_MASK(0), struct ec_sku_id_info);
 #endif
 
 #ifdef CONFIG_HOSTCMD_AP_SET_SKUID
-static enum ec_status
-host_command_set_sku_id(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_set_sku_id(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_sku_id_info *p = args->params;
+	const struct ec_sku_id_info *p = args->input_buf;
 
 	ap_sku_id = p->sku_id;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_SET_SKU_ID, host_command_set_sku_id,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_SET_SKU_ID, host_command_set_sku_id,
+			     EC_VER_MASK(0), struct ec_sku_id_info);
 #endif
 
-static enum ec_status
-host_command_build_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_build_info(struct ec_host_cmd_handler_args *args)
 {
-	strzcpy(args->response, system_get_build_info(), args->response_max);
-	args->response_size = strlen(args->response) + 1;
+	strzcpy(args->output_buf, system_get_build_info(),
+		args->output_buf_max);
+	args->output_buf_size = strlen(args->output_buf) + 1;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_BUILD_INFO, host_command_build_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_BUILD_INFO, host_command_build_info,
+			      EC_VER_MASK(0), uint8_t);
 
-static enum ec_status
-host_command_get_chip_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_get_chip_info(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_get_chip_info *r = args->response;
+	struct ec_response_get_chip_info *r = args->output_buf;
 
 	strzcpy(r->vendor, system_get_chip_vendor(), sizeof(r->vendor));
 	strzcpy(r->name, system_get_chip_name(), sizeof(r->name));
 	strzcpy(r->revision, system_get_chip_revision(), sizeof(r->revision));
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_CHIP_INFO, host_command_get_chip_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_CHIP_INFO, host_command_get_chip_info,
+			      EC_VER_MASK(0), struct ec_response_get_chip_info);
 
-static enum ec_status
-host_command_get_board_version(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_get_board_version(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_board_version *r = args->response;
+	struct ec_response_board_version *r = args->output_buf;
 	int board_version;
 
 	board_version = system_get_board_version();
 	if (board_version < 0) {
 		CPRINTS("Failed (%d) getting board version", -board_version);
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	}
 
 	r->board_version = board_version;
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_BOARD_VERSION, host_command_get_board_version,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_BOARD_VERSION,
+			      host_command_get_board_version, EC_VER_MASK(0),
+			      struct ec_response_board_version);
 
 #ifdef HAS_TASK_HOSTCMD
 static int is_full_reboot_command(int cmd)
@@ -1914,7 +1927,8 @@ DECLARE_DEFERRED(deferred_reboot);
 #endif /* HAS_TASK_HOSTCMD*/
 
 STATIC_IF_NOT(CONFIG_ZTEST)
-enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
+enum ec_host_cmd_status
+host_command_reboot(struct ec_host_cmd_handler_args *args)
 {
 	struct ec_params_reboot_ec p;
 
@@ -1922,7 +1936,7 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 	 * Ensure reboot parameters don't get clobbered when the response
 	 * is sent in case data argument points to the host tx/rx buffer.
 	 */
-	memcpy(&p, args->params, sizeof(p));
+	memcpy(&p, args->input_buf, sizeof(p));
 
 	if (p.cmd == EC_REBOOT_CANCEL) {
 		/* Cancel pending reboot */
@@ -1934,7 +1948,7 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 			reboot_scheduled = false;
 		}
 #endif
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
 
 	if (p.flags & EC_REBOOT_FLAG_SWITCH_RW_SLOT) {
@@ -1942,14 +1956,14 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 		if (system_set_active_copy(system_get_update_copy()))
 			CPRINTS("Failed to set active slot");
 #else
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 #endif
 	}
 	if (p.flags & EC_REBOOT_FLAG_ON_AP_SHUTDOWN) {
 		/* Store request for processing at chipset shutdown */
 		p.flags &= ~(EC_REBOOT_FLAG_ON_AP_SHUTDOWN);
 		reboot_at_shutdown = p;
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
 
 	CPRINTS("Executing host reboot command \'%s\'",
@@ -1967,7 +1981,8 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 		status = validate_reboot_command(&p);
 
 		if (status != EC_SUCCESS)
-			return ec_error_to_status(status);
+			return (enum ec_host_cmd_status)ec_error_to_status(
+				status);
 
 		if (!reboot_scheduled) {
 			/* Store the parameters and schedule the reboot */
@@ -1975,7 +1990,7 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 			reboot_scheduled = true;
 			hook_call_deferred(&deferred_reboot_data, 50 * MSEC);
 		}
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 #else
 		/* Clean busy bits on host for commands that won't return */
 		args->result = EC_RES_SUCCESS;
@@ -1984,19 +1999,21 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 	}
 #endif /* HAS_TASK_HOSTCMD */
 
-	return ec_error_to_status(handle_pending_reboot(&p));
+	return (enum ec_host_cmd_status)ec_error_to_status(
+		handle_pending_reboot(&p));
 }
-DECLARE_HOST_COMMAND(EC_CMD_REBOOT_EC, host_command_reboot, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_REBOOT_EC, host_command_reboot,
+			     EC_VER_MASK(0), struct ec_params_reboot_ec);
 
 #ifdef CONFIG_PLATFORM_EC_HOST_COMMAND_ENTER_BOOTLOADER
-static enum ec_status
-host_command_bootloader(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_bootloader(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_enter_bootloader *p = args->params;
+	const struct ec_params_enter_bootloader *p = args->input_buf;
 	uint8_t mode = p->mode;
 
 	if (system_is_locked()) {
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 	}
 
 	/*
@@ -2007,8 +2024,7 @@ host_command_bootloader(struct host_cmd_handler_args *args)
 	args->result = EC_RES_SUCCESS;
 	host_send_response(args);
 #else
-	ec_host_cmd_send_response(EC_HOST_CMD_SUCCESS,
-				  (struct ec_host_cmd_handler_args *)args);
+	ec_host_cmd_send_response(EC_HOST_CMD_SUCCESS, args);
 #endif
 	/*
 	 * Make sure to send response before entering bootloader, which can
@@ -2019,10 +2035,10 @@ host_command_bootloader(struct host_cmd_handler_args *args)
 	chip_enter_bootloader(mode);
 	CPRINTS("Failed to enter bootloader");
 
-	return EC_RES_ERROR;
+	return EC_HOST_CMD_ERROR;
 }
-DECLARE_HOST_COMMAND(EC_CMD_ENTER_BOOTLOADER, host_command_bootloader,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_ENTER_BOOTLOADER, host_command_bootloader,
+			     EC_VER_MASK(0), struct ec_params_enter_bootloader);
 #endif /* CONFIG_PLATFORM_EC_HOST_COMMAND_ENTER_BOOTLOADER */
 
 test_mockable int system_can_boot_ap(void)
