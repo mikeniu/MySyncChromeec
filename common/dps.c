@@ -695,29 +695,32 @@ DECLARE_CONSOLE_COMMAND(dps, command_dps,
 			"\t\t fakepwr [dis|<mV> <mA>]",
 			"Print/set Dynamic PDO Selection state.");
 
-static enum ec_status hc_usb_pd_dps_control(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_usb_pd_dps_control(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_usb_pd_dps_control *p = args->params;
+	const struct ec_params_usb_pd_dps_control *p = args->input_buf;
 
 	dps_enable(p->enable);
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_PD_DPS_CONTROL, hc_usb_pd_dps_control,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_USB_PD_DPS_CONTROL, hc_usb_pd_dps_control,
+			     EC_VER_MASK(0),
+			     struct ec_params_usb_pd_dps_control);
 
-static enum ec_status hc_usb_pd_dps_status(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_usb_pd_dps_status(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_usb_pd_dps_status *r = args->response;
+	struct ec_response_usb_pd_dps_status *r = args->output_buf;
 	int port = charge_manager_get_active_charge_port();
 
 	memset(r, 0, sizeof(*r));
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 	r->is_enabled = is_enabled;
 	r->port = port;
 
 	if (!is_enabled || port == CHARGE_PORT_NONE) {
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
 
 	if (!(flag & DPS_FLAG_NO_SRCCAP)) {
@@ -736,10 +739,11 @@ static enum ec_status hc_usb_pd_dps_status(struct host_cmd_handler_args *args)
 	}
 	r->max_voltage = pd_get_max_voltage();
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_PD_DPS_STATUS, hc_usb_pd_dps_status,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_USB_PD_DPS_STATUS, hc_usb_pd_dps_status,
+			      EC_VER_MASK(0),
+			      struct ec_response_usb_pd_dps_status);
 
 #ifdef TEST_BUILD
 __test_only bool dps_is_fake_enabled(void)
