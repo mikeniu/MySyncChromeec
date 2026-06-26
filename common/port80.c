@@ -198,37 +198,45 @@ static int command_port80(int argc, const char **argv)
 DECLARE_CONSOLE_COMMAND(port80, command_port80, "[scroll | intprint | flush]",
 			"Print port80 writes or toggle port80 scrolling");
 
-enum ec_status port80_last_boot(struct host_cmd_handler_args *args)
+enum ec_host_cmd_status port80_last_boot(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_port80_last_boot *r = args->response;
+	struct ec_response_port80_last_boot *r = args->output_buf;
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 	r->code = last_boot;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-static enum ec_status port80_command_read(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+port80_command_read(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_port80_read *p = args->params;
+	const struct ec_params_port80_read *p = args->input_buf;
 	uint32_t offset = p->read_buffer.offset;
 	uint32_t entries = p->read_buffer.num_entries;
 	int i;
-	struct ec_response_port80_read *rsp = args->response;
+	struct ec_response_port80_read *rsp = args->output_buf;
 
 	if (args->version == 0)
 		return port80_last_boot(args);
 
+	if (args->input_buf_size < sizeof(struct ec_params_port80_read))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
 	if (p->subcmd == EC_PORT80_GET_INFO) {
+		if (args->output_buf_max < sizeof(rsp->get_info))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+
 		rsp->get_info.writes = writes;
 		rsp->get_info.history_size = ARRAY_SIZE(history);
-		args->response_size = sizeof(rsp->get_info);
-		return EC_RES_SUCCESS;
+		rsp->get_info.last_boot = last_boot;
+		args->output_buf_size = sizeof(rsp->get_info);
+		return EC_HOST_CMD_SUCCESS;
 	} else if (p->subcmd == EC_PORT80_READ_BUFFER) {
-		/* do not allow bad offset or size */
+		/* do not allow bad offset or size, prevent integer overflow */
 		if (offset >= ARRAY_SIZE(history) || entries == 0 ||
-		    entries * sizeof(uint16_t) > args->response_max)
-			return EC_RES_INVALID_PARAM;
+		    entries > args->output_buf_max / sizeof(uint16_t))
+			return EC_HOST_CMD_INVALID_PARAM;
 
 		for (i = 0; i < entries; i++) {
 			uint16_t e =
@@ -236,14 +244,16 @@ static enum ec_status port80_command_read(struct host_cmd_handler_args *args)
 			rsp->data.codes[i] = e;
 		}
 
-		args->response_size = entries * sizeof(uint16_t);
-		return EC_RES_SUCCESS;
+		args->output_buf_size = entries * sizeof(uint16_t);
+		return EC_HOST_CMD_SUCCESS;
 	}
 
-	return EC_RES_INVALID_PARAM;
+	return EC_HOST_CMD_INVALID_PARAM;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PORT80_READ, port80_command_read,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_PORT80_READ, port80_command_read,
+			      EC_VER_MASK(0) | EC_VER_MASK(1),
+			      SMALLEST_TYPE(struct ec_response_port80_last_boot,
+					    struct ec_response_port80_read));
 
 static void port80_log_resume(void)
 {
