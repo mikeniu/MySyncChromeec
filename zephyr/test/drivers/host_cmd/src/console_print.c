@@ -112,7 +112,7 @@ ZTEST_USER(host_cmd_console_print, test_no_message)
 		BUILD_HOST_COMMAND_PARAMS(EC_CMD_CONSOLE_PRINT, 0, EMPTY);
 
 	rv = host_command_process(&args);
-	zassert_equal(EC_RES_INVALID_PARAM, rv, "Got %d", rv);
+	zassert_equal(EC_HOST_CMD_INVALID_PARAM, rv, "Got %d", rv);
 }
 
 ZTEST_SUITE(host_cmd_console_print, drivers_predicate_post_main, NULL, NULL,
