@@ -31,14 +31,15 @@ DECLARE_HOOK(HOOK_INIT, poe_init, HOOK_PRIO_DEFAULT);
  * Host command to toggle Power over Ethernet.
  *
  */
-static enum ec_status
-switch_command_enable_poe(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+switch_command_enable_poe(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_switch_enable_poe *p = args->params;
+	const struct ec_params_switch_enable_poe *p = args->input_buf;
 
 	enable_poe(p->enabled);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_SWITCH_ENABLE_POE, switch_command_enable_poe,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_SWITCH_ENABLE_POE,
+			     switch_command_enable_poe, EC_VER_MASK(0),
+			     struct ec_params_switch_enable_poe);

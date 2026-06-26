@@ -62,25 +62,26 @@ __attribute__((weak)) void board_led_auto_control(void)
 }
 /* LCOV_EXCL_STOP */
 
-static enum ec_status led_command_control(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+led_command_control(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_led_control *p = args->params;
-	struct ec_response_led_control *r = args->response;
+	const struct ec_params_led_control *p = args->input_buf;
+	struct ec_response_led_control *r = args->output_buf;
 	int i;
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 	memset(r->brightness_range, 0, sizeof(r->brightness_range));
 
 	if (!led_is_supported(p->led_id))
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	led_get_brightness_range(p->led_id, r->brightness_range);
 	if (p->flags & EC_LED_FLAGS_QUERY)
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 
 	for (i = 0; i < EC_LED_COLOR_COUNT; i++)
 		if (r->brightness_range[i] == 0 && p->brightness[i] != 0)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 
 	if (p->flags & EC_LED_FLAGS_AUTO) {
 		led_auto_control(p->led_id, 1);
@@ -88,13 +89,15 @@ static enum ec_status led_command_control(struct host_cmd_handler_args *args)
 			board_led_auto_control();
 	} else {
 		if (led_set_brightness(p->led_id, p->brightness) != EC_SUCCESS)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		led_auto_control(p->led_id, 0);
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_LED_CONTROL, led_command_control, EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER(EC_CMD_LED_CONTROL, led_command_control, EC_VER_MASK(1),
+		    struct ec_params_led_control,
+		    struct ec_response_led_control);
 
 #ifndef CONFIG_ZEPHYR
 __attribute__((weak)) void led_control(enum ec_led_id led_id,
