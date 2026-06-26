@@ -1109,18 +1109,215 @@ static struct motion_sensor_t *host_sensor_id_to_real_sensor(int host_id)
 	return NULL;
 }
 
-static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status validate_motionsense_request_size(uint8_t cmd,
+								 size_t size)
 {
-	const struct ec_params_motion_sense *in = args->params;
-	struct ec_response_motion_sense *out = args->response;
+	size_t required = 1; /* cmd field */
+
+	switch (cmd) {
+	case MOTIONSENSE_CMD_DUMP:
+		required += sizeof(((struct ec_params_motion_sense *)0)->dump);
+		break;
+	case MOTIONSENSE_CMD_DATA:
+		required += sizeof(((struct ec_params_motion_sense *)0)->data);
+		break;
+	case MOTIONSENSE_CMD_INFO:
+		required += sizeof(((struct ec_params_motion_sense *)0)->info);
+		break;
+	case MOTIONSENSE_CMD_EC_RATE:
+		required +=
+			sizeof(((struct ec_params_motion_sense *)0)->ec_rate);
+		break;
+	case MOTIONSENSE_CMD_SENSOR_ODR:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->sensor_odr);
+		break;
+	case MOTIONSENSE_CMD_SENSOR_RANGE:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->sensor_range);
+		break;
+	case MOTIONSENSE_CMD_SENSOR_OFFSET:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->sensor_offset);
+		break;
+	case MOTIONSENSE_CMD_SENSOR_SCALE:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->sensor_scale);
+		break;
+	case MOTIONSENSE_CMD_PERFORM_CALIB:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->perform_calib);
+		break;
+	case MOTIONSENSE_CMD_FIFO_FLUSH:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->fifo_flush);
+		break;
+	case MOTIONSENSE_CMD_FIFO_INFO:
+		/* no params */
+		break;
+	case MOTIONSENSE_CMD_FIFO_READ:
+		required +=
+			sizeof(((struct ec_params_motion_sense *)0)->fifo_read);
+		break;
+	case MOTIONSENSE_CMD_FIFO_INT_ENABLE:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->fifo_int_enable);
+		break;
+	case MOTIONSENSE_CMD_ONLINE_CALIB_READ:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->online_calib_read);
+		break;
+	case MOTIONSENSE_CMD_LIST_ACTIVITIES:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->list_activities);
+		break;
+	case MOTIONSENSE_CMD_SET_ACTIVITY:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->set_activity);
+		break;
+	case MOTIONSENSE_CMD_GET_ACTIVITY:
+		required += sizeof(
+			((struct ec_params_motion_sense *)0)->get_activity);
+		break;
+	case MOTIONSENSE_CMD_SPOOF:
+		required += sizeof(((struct ec_params_motion_sense *)0)->spoof);
+		break;
+	default:
+		/* For other commands (e.g. board-specific via
+		 * host_cmd_motion_lid) */
+		break;
+	}
+
+	if (size < required)
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
+	return EC_HOST_CMD_SUCCESS;
+}
+
+static enum ec_host_cmd_status
+validate_motionsense_response_max(uint8_t cmd,
+				  const struct ec_params_motion_sense *in,
+				  int version, size_t max_size)
+{
+	size_t required = 0;
+
+	switch (cmd) {
+	case MOTIONSENSE_CMD_DUMP: {
+		int count = min(ALL_MOTION_SENSORS, in->dump.max_sensor_count);
+		required =
+			sizeof(((struct ec_response_motion_sense *)0)->dump) +
+			count * sizeof(struct ec_response_motion_sensor_data);
+		break;
+	}
+	case MOTIONSENSE_CMD_DATA:
+		required = sizeof(((struct ec_response_motion_sense *)0)->data);
+		break;
+	case MOTIONSENSE_CMD_INFO:
+		if (version < 3)
+			required = sizeof(
+				((struct ec_response_motion_sense *)0)->info);
+		else if (version >= 4)
+			required = sizeof(
+				((struct ec_response_motion_sense *)0)->info_4);
+		else
+			required = sizeof(
+				((struct ec_response_motion_sense *)0)->info_3);
+		break;
+	case MOTIONSENSE_CMD_EC_RATE:
+		required =
+			sizeof(((struct ec_response_motion_sense *)0)->ec_rate);
+		break;
+	case MOTIONSENSE_CMD_SENSOR_ODR:
+		required = sizeof(
+			((struct ec_response_motion_sense *)0)->sensor_odr);
+		break;
+	case MOTIONSENSE_CMD_SENSOR_RANGE:
+		required = sizeof(
+			((struct ec_response_motion_sense *)0)->sensor_range);
+		break;
+	case MOTIONSENSE_CMD_SENSOR_OFFSET:
+		required = sizeof(
+			((struct ec_response_motion_sense *)0)->sensor_offset);
+		break;
+	case MOTIONSENSE_CMD_SENSOR_SCALE:
+		required = sizeof(
+			((struct ec_response_motion_sense *)0)->sensor_scale);
+		break;
+	case MOTIONSENSE_CMD_PERFORM_CALIB:
+		required = sizeof(
+			((struct ec_response_motion_sense *)0)->perform_calib);
+		break;
+	case MOTIONSENSE_CMD_FIFO_FLUSH:
+	case MOTIONSENSE_CMD_FIFO_INFO:
+		if (IS_ENABLED(CONFIG_ACCEL_FIFO))
+			required = sizeof(((struct ec_response_motion_sense *)0)
+						  ->fifo_info) +
+				   sizeof(uint16_t) * MAX_MOTION_SENSORS;
+		else
+			required = sizeof(((struct ec_response_motion_sense *)0)
+						  ->fifo_info);
+		break;
+	case MOTIONSENSE_CMD_FIFO_READ:
+		required = sizeof(
+			((struct ec_response_motion_sense *)0)->fifo_read);
+		break;
+	case MOTIONSENSE_CMD_FIFO_INT_ENABLE:
+		required = sizeof(
+			((struct ec_response_motion_sense *)0)->fifo_int_enable);
+		break;
+	case MOTIONSENSE_CMD_LIST_ACTIVITIES:
+		required = sizeof(
+			((struct ec_response_motion_sense *)0)->list_activities);
+		break;
+	case MOTIONSENSE_CMD_SET_ACTIVITY:
+		/* returns 0 bytes */
+		break;
+	case MOTIONSENSE_CMD_GET_ACTIVITY:
+		required = sizeof(
+			((struct ec_response_motion_sense *)0)->get_activity);
+		break;
+	case MOTIONSENSE_CMD_SPOOF:
+		if (in->spoof.spoof_enable == MOTIONSENSE_SPOOF_MODE_QUERY)
+			required = sizeof(
+				((struct ec_response_motion_sense *)0)->spoof);
+		break;
+	default:
+		break;
+	}
+
+	if (max_size < required)
+		return EC_HOST_CMD_RESPONSE_TOO_BIG;
+
+	return EC_HOST_CMD_SUCCESS;
+}
+
+static enum ec_host_cmd_status
+host_cmd_motion_sense(struct ec_host_cmd_handler_args *args)
+{
+	const struct ec_params_motion_sense *in = args->input_buf;
+	struct ec_response_motion_sense *out = args->output_buf;
 	struct motion_sensor_t *sensor;
-	int i, ret = EC_RES_INVALID_PARAM, reported;
+	int i, ret = EC_HOST_CMD_INVALID_PARAM, reported;
 	const void *in_offset;
 	const void *in_scale;
 	void *out_scale;
 	void *out_offset;
 	int16_t out_temp;
 	size_t host_id;
+	enum ec_host_cmd_status status;
+
+	if (args->input_buf_size < 1)
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
+	status = validate_motionsense_request_size(in->cmd,
+						   args->input_buf_size);
+	if (status != EC_HOST_CMD_SUCCESS)
+		return status;
+
+	status = validate_motionsense_response_max(in->cmd, in, args->version,
+						   args->output_buf_max);
+	if (status != EC_HOST_CMD_SUCCESS)
+		return status;
 
 	switch (in->cmd) {
 	case MOTIONSENSE_CMD_DUMP:
@@ -1134,7 +1331,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			out->dump.module_flags = motion_sense_task_status;
 		}
 		out->dump.sensor_count = ALL_MOTION_SENSORS;
-		args->response_size = sizeof(out->dump);
+		args->output_buf_size = sizeof(out->dump);
 		reported = min(ALL_MOTION_SENSORS, in->dump.max_sensor_count);
 		mutex_lock(&g_sensor_mutex);
 		for (i = 0; i < reported; i++) {
@@ -1150,7 +1347,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			}
 		}
 		mutex_unlock(&g_sensor_mutex);
-		args->response_size +=
+		args->output_buf_size +=
 			reported *
 			sizeof(struct ec_response_motion_sensor_data);
 		break;
@@ -1163,7 +1360,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		sensor = host_sensor_id_to_real_sensor(
 			in->sensor_odr.sensor_num);
 		if (sensor == NULL)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 
 		out->data.flags = 0;
 
@@ -1171,7 +1368,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		ec_motion_sensor_fill_values(&out->data, sensor->xyz);
 		mutex_unlock(&g_sensor_mutex);
 
-		args->response_size = sizeof(out->data);
+		args->output_buf_size = sizeof(out->data);
 		break;
 
 	case MOTIONSENSE_CMD_INFO:
@@ -1182,11 +1379,11 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		    (host_id == MOTION_SENSE_ACTIVITY_SENSOR_ID))
 			host_id = __builtin_ctz(CONFIG_GESTURE_DETECTION_MASK);
 		if (host_id >= motion_sensor_count)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		sensor = &motion_sensors[host_id];
 		if (!SENSOR_ACTIVE(sensor)) {
 			/* Sensor is not used in this power state. */
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		}
 		switch (sensor->state) {
 		case SENSOR_READY:
@@ -1194,7 +1391,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			break;
 		case SENSOR_INIT_ERROR:
 			/* Sensor could not be initialized, can not be used. */
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		case SENSOR_NOT_INITIALIZED:
 			/*
 			 * Sensor has not been initialized yet, we are still
@@ -1206,7 +1403,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			 * Sensor is not usable yet, need to try again.
 			 * A transient condition as well.
 			 */
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 		}
 
 		if (IS_ENABLED(CONFIG_GESTURE_HOST_DETECTION) &&
@@ -1221,7 +1418,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		out->info.location = sensor->location;
 		out->info.chip = sensor->chip;
 		if (args->version < 3)
-			args->response_size = sizeof(out->info);
+			args->output_buf_size = sizeof(out->info);
 		if (args->version >= 3) {
 			out->info_3.min_frequency =
 				max(sensor->min_frequency,
@@ -1230,17 +1427,17 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			out->info_3.max_frequency = sensor->max_frequency;
 			out->info_3.fifo_max_event_count =
 				CONFIG_ACCEL_FIFO_SIZE;
-			args->response_size = sizeof(out->info_3);
+			args->output_buf_size = sizeof(out->info_3);
 		}
 		if (args->version >= 4) {
-			args->response_size = sizeof(out->info_4);
+			args->output_buf_size = sizeof(out->info_4);
 		}
 		break;
 
 	case MOTIONSENSE_CMD_EC_RATE:
 		sensor = host_sensor_id_to_real_sensor(in->ec_rate.sensor_num);
 		if (sensor == NULL)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 
 		/*
 		 * Set new sensor sampling rate when AP is on, if the data arg
@@ -1262,7 +1459,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		out->ec_rate.ret =
 			sensor->config[SENSOR_CONFIG_AP].ec_rate / MSEC;
 
-		args->response_size = sizeof(out->ec_rate);
+		args->output_buf_size = sizeof(out->ec_rate);
 		break;
 
 	case MOTIONSENSE_CMD_SENSOR_ODR:
@@ -1270,7 +1467,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		sensor = host_sensor_id_to_real_sensor(
 			in->sensor_odr.sensor_num);
 		if (sensor == NULL)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 
 		/* Set new data rate if the data arg has a value. */
 		if (in->sensor_odr.data != EC_MOTION_SENSE_NO_VALUE) {
@@ -1290,7 +1487,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 
 		out->sensor_odr.ret = sensor->drv->get_data_rate(sensor);
 
-		args->response_size = sizeof(out->sensor_odr);
+		args->output_buf_size = sizeof(out->sensor_odr);
 
 		break;
 
@@ -1299,21 +1496,21 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		sensor = host_sensor_id_to_real_sensor(
 			in->sensor_range.sensor_num);
 		if (sensor == NULL)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		/* Set new range if the data arg has a value. */
 		if (in->sensor_range.data != EC_MOTION_SENSE_NO_VALUE) {
 			if (!sensor->drv->set_range)
-				return EC_RES_INVALID_COMMAND;
+				return EC_HOST_CMD_INVALID_COMMAND;
 
 			if (sensor->drv->set_range(
 				    sensor, in->sensor_range.data,
 				    in->sensor_range.roundup) != EC_SUCCESS) {
-				return EC_RES_INVALID_PARAM;
+				return EC_HOST_CMD_INVALID_PARAM;
 			}
 		}
 
 		out->sensor_range.ret = sensor->current_range;
-		args->response_size = sizeof(out->sensor_range);
+		args->output_buf_size = sizeof(out->sensor_range);
 		break;
 
 	case MOTIONSENSE_CMD_SENSOR_OFFSET:
@@ -1321,29 +1518,29 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		sensor = host_sensor_id_to_real_sensor(
 			in->sensor_offset.sensor_num);
 		if (sensor == NULL)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		/* Set new range if the data arg has a value. */
 		if (in->sensor_offset.flags & MOTION_SENSE_SET_OFFSET) {
 			if (!sensor->drv->set_offset)
-				return EC_RES_INVALID_COMMAND;
+				return EC_HOST_CMD_INVALID_COMMAND;
 
 			in_offset = in->sensor_offset.offset;
 			ret = sensor->drv->set_offset(sensor, in_offset,
 						      in->sensor_offset.temp);
 			if (ret != EC_SUCCESS)
-				return ret;
+				return (enum ec_host_cmd_status)ret;
 		}
 
 		if (!sensor->drv->get_offset)
-			return EC_RES_INVALID_COMMAND;
+			return EC_HOST_CMD_INVALID_COMMAND;
 
 		out_offset = out->sensor_offset.offset;
 		ret = sensor->drv->get_offset(sensor, out_offset, &out_temp);
 		if (ret != EC_SUCCESS)
-			return ret;
+			return (enum ec_host_cmd_status)ret;
 
 		out->sensor_offset.temp = out_temp;
-		args->response_size = sizeof(out->sensor_offset);
+		args->output_buf_size = sizeof(out->sensor_offset);
 		break;
 
 	case MOTIONSENSE_CMD_SENSOR_SCALE:
@@ -1351,29 +1548,29 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		sensor = host_sensor_id_to_real_sensor(
 			in->sensor_scale.sensor_num);
 		if (sensor == NULL)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		/* Set new range if the data arg has a value. */
 		if (in->sensor_scale.flags & MOTION_SENSE_SET_OFFSET) {
 			if (!sensor->drv->set_scale)
-				return EC_RES_INVALID_COMMAND;
+				return EC_HOST_CMD_INVALID_COMMAND;
 
 			in_scale = in->sensor_scale.scale;
 			ret = sensor->drv->set_scale(sensor, in_scale,
 						     in->sensor_scale.temp);
 			if (ret != EC_SUCCESS)
-				return ret;
+				return (enum ec_host_cmd_status)ret;
 		}
 
 		if (!sensor->drv->get_scale)
-			return EC_RES_INVALID_COMMAND;
+			return EC_HOST_CMD_INVALID_COMMAND;
 
 		out_scale = out->sensor_scale.scale;
 		ret = sensor->drv->get_scale(sensor, out_scale, &out_temp);
 		if (ret != EC_SUCCESS)
-			return ret;
+			return (enum ec_host_cmd_status)ret;
 
 		out->sensor_scale.temp = out_temp;
-		args->response_size = sizeof(out->sensor_scale);
+		args->output_buf_size = sizeof(out->sensor_scale);
 		break;
 
 	case MOTIONSENSE_CMD_PERFORM_CALIB:
@@ -1381,22 +1578,22 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		sensor = host_sensor_id_to_real_sensor(
 			in->perform_calib.sensor_num);
 		if (sensor == NULL)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		if (!sensor->drv->perform_calib)
-			return EC_RES_INVALID_COMMAND;
+			return EC_HOST_CMD_INVALID_COMMAND;
 
 		ret = sensor->drv->perform_calib(sensor,
 						 in->perform_calib.enable);
 		if (ret != EC_SUCCESS)
-			return ret;
+			return (enum ec_host_cmd_status)ret;
 
 		out_offset = out->perform_calib.offset;
 		ret = sensor->drv->get_offset(sensor, out_offset, &out_temp);
 		if (ret != EC_SUCCESS)
-			return ret;
+			return (enum ec_host_cmd_status)ret;
 
 		out->perform_calib.temp = out_temp;
-		args->response_size = sizeof(out->perform_calib);
+		args->output_buf_size = sizeof(out->perform_calib);
 		break;
 
 	case MOTIONSENSE_CMD_FIFO_FLUSH:
@@ -1404,12 +1601,12 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
  *   __fallthrough fails in clang as unreachable code.
  */
 #ifndef CONFIG_ACCEL_FIFO
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 #else
 		sensor = host_sensor_id_to_real_sensor(
 			in->sensor_odr.sensor_num);
 		if (sensor == NULL)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 
 		atomic_add(&sensor->flush_pending, 1);
 
@@ -1424,26 +1621,26 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			 * FIFO.
 			 */
 			memset(&out->fifo_info, 0, sizeof(out->fifo_info));
-			args->response_size = sizeof(out->fifo_info);
+			args->output_buf_size = sizeof(out->fifo_info);
 			break;
 		}
 		motion_sense_fifo_get_info(&out->fifo_info, 1);
-		args->response_size = sizeof(out->fifo_info) +
-				      sizeof(uint16_t) * motion_sensor_count;
+		args->output_buf_size = sizeof(out->fifo_info) +
+					sizeof(uint16_t) * motion_sensor_count;
 		break;
 
 	case MOTIONSENSE_CMD_FIFO_READ:
 		if (!IS_ENABLED(CONFIG_ACCEL_FIFO))
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		out->fifo_read.number_data = motion_sense_fifo_read(
-			args->response_max - sizeof(out->fifo_read),
+			args->output_buf_max - sizeof(out->fifo_read),
 			in->fifo_read.max_data_vector, out->fifo_read.data,
-			&(args->response_size));
-		args->response_size += sizeof(out->fifo_read);
+			&(args->output_buf_size));
+		args->output_buf_size += sizeof(out->fifo_read);
 		break;
 	case MOTIONSENSE_CMD_FIFO_INT_ENABLE:
 		if (!IS_ENABLED(CONFIG_ACCEL_FIFO))
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		switch (in->fifo_int_enable.enable) {
 		case 0:
 		case 1:
@@ -1451,23 +1648,23 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			__fallthrough;
 		case EC_MOTION_SENSE_NO_VALUE:
 			out->fifo_int_enable.ret = fifo_int_enabled;
-			args->response_size = sizeof(out->fifo_int_enable);
+			args->output_buf_size = sizeof(out->fifo_int_enable);
 			break;
 		default:
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		}
 		break;
 	case MOTIONSENSE_CMD_ONLINE_CALIB_READ:
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 #ifdef CONFIG_GESTURE_HOST_DETECTION
 	case MOTIONSENSE_CMD_LIST_ACTIVITIES: {
 		uint32_t enabled, disabled, mask, i;
 
 		out->list_activities.enabled = 0;
 		out->list_activities.disabled = 0;
-		ret = EC_RES_SUCCESS;
+		ret = EC_HOST_CMD_SUCCESS;
 		mask = CONFIG_GESTURE_DETECTION_MASK;
-		while (mask && ret == EC_RES_SUCCESS) {
+		while (mask && ret == EC_HOST_CMD_SUCCESS) {
 			i = get_next_bit(&mask);
 			sensor = &motion_sensors[i];
 			ret = sensor->drv->list_activities(sensor, &enabled,
@@ -1486,17 +1683,17 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 					MOTIONSENSE_ACTIVITY_BODY_DETECTION);
 			}
 		}
-		if (ret != EC_RES_SUCCESS)
-			return ret;
-		args->response_size = sizeof(out->list_activities);
+		if (ret != EC_HOST_CMD_SUCCESS)
+			return (enum ec_host_cmd_status)ret;
+		args->output_buf_size = sizeof(out->list_activities);
 		break;
 	}
 	case MOTIONSENSE_CMD_SET_ACTIVITY: {
 		uint32_t enabled, disabled, mask, i;
 
 		mask = CONFIG_GESTURE_DETECTION_MASK;
-		ret = EC_RES_SUCCESS;
-		while (mask && ret == EC_RES_SUCCESS) {
+		ret = EC_HOST_CMD_SUCCESS;
+		while (mask && ret == EC_HOST_CMD_SUCCESS) {
 			i = get_next_bit(&mask);
 			sensor = &motion_sensors[i];
 			sensor->drv->list_activities(sensor, &enabled,
@@ -1512,9 +1709,9 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		    (in->set_activity.activity ==
 		     MOTIONSENSE_ACTIVITY_BODY_DETECTION))
 			body_detect_set_enable(in->set_activity.enable);
-		if (ret != EC_RES_SUCCESS)
-			return ret;
-		args->response_size = 0;
+		if (ret != EC_HOST_CMD_SUCCESS)
+			return (enum ec_host_cmd_status)ret;
+		args->output_buf_size = 0;
 		break;
 	}
 	case MOTIONSENSE_CMD_GET_ACTIVITY: {
@@ -1523,13 +1720,13 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		     MOTIONSENSE_ACTIVITY_BODY_DETECTION)) {
 			out->get_activity.state =
 				(uint8_t)body_detect_get_state();
-			ret = EC_RES_SUCCESS;
+			ret = EC_HOST_CMD_SUCCESS;
 		} else {
-			ret = EC_RES_INVALID_PARAM;
+			ret = EC_HOST_CMD_INVALID_PARAM;
 		}
-		if (ret != EC_RES_SUCCESS)
-			return ret;
-		args->response_size = sizeof(out->get_activity);
+		if (ret != EC_HOST_CMD_SUCCESS)
+			return (enum ec_host_cmd_status)ret;
+		args->output_buf_size = sizeof(out->get_activity);
 		break;
 	}
 #endif /* defined(CONFIG_GESTURE_HOST_DETECTION) */
@@ -1572,16 +1769,16 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 					 */
 					out->spoof.ret =
 						body_detect_get_spoof();
-					args->response_size =
+					args->output_buf_size =
 						sizeof(out->spoof);
 					break;
 				default:
-					return EC_RES_INVALID_PARAM;
+					return EC_HOST_CMD_INVALID_PARAM;
 				}
 				break;
 #endif
 			default:
-				return EC_RES_INVALID_PARAM;
+				return EC_HOST_CMD_INVALID_PARAM;
 			}
 			break;
 		}
@@ -1589,7 +1786,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		/* spoof accel data */
 		sensor = host_sensor_id_to_real_sensor(in->spoof.sensor_id);
 		if (sensor == NULL)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 
 		switch (in->spoof.spoof_enable) {
 		case MOTIONSENSE_SPOOF_MODE_DISABLE:
@@ -1622,11 +1819,11 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			/* Querying the spoof status of the sensor. */
 			out->spoof.ret = !!(sensor->flags &
 					    MOTIONSENSE_FLAG_IN_SPOOF_MODE);
-			args->response_size = sizeof(out->spoof);
+			args->output_buf_size = sizeof(out->spoof);
 			break;
 
 		default:
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		}
 
 		/*
@@ -1642,18 +1839,17 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 	default:
 		/* Call other users of the motion task */
 		if (IS_ENABLED(CONFIG_LID_ANGLE) &&
-		    (ret == EC_RES_INVALID_PARAM) &&
+		    (ret == EC_HOST_CMD_INVALID_PARAM) &&
 		    sensor_board_is_lid_angle_available())
 			ret = host_cmd_motion_lid(args);
-		return ret;
+		return (enum ec_host_cmd_status)ret;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-
-DECLARE_HOST_COMMAND(EC_CMD_MOTION_SENSE_CMD, host_cmd_motion_sense,
-		     EC_VER_MASK(1) | EC_VER_MASK(2) | EC_VER_MASK(3) |
-			     EC_VER_MASK(4));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_MOTION_SENSE_CMD, host_cmd_motion_sense,
+			    EC_VER_MASK(1) | EC_VER_MASK(2) | EC_VER_MASK(3) |
+				    EC_VER_MASK(4));
 
 /*****************************************************************************/
 /* Console commands */
