@@ -357,6 +357,25 @@ int crec_flash_response_fill_banks(struct ec_response_flash_info_2 *r,
 	return res;
 }
 
+int crec_flash_bank_total_count(void)
+{
+	struct ec_flash_bank region;
+	size_t sector_idx = 0;
+	int banks_idx = 0;
+	int res;
+
+	do {
+		res = flash_get_region(sector_idx, &region);
+		if (res != EC_RES_SUCCESS && res != EC_RES_IN_PROGRESS)
+			break;
+
+		sector_idx += region.count;
+		banks_idx++;
+	} while (res == EC_RES_IN_PROGRESS);
+
+	return banks_idx;
+}
+
 int crec_flash_total_banks(void)
 {
 	return flash_get_page_count(flash_ctrl_dev);
