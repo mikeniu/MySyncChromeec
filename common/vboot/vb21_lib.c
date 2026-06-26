@@ -105,16 +105,17 @@ static int command_rwsig_info(int argc, const char **argv)
 DECLARE_CONSOLE_COMMAND(rwsiginfo, command_rwsig_info, NULL,
 			"Display rwsig info on console.");
 
-static enum ec_status
-host_command_rwsig_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_rwsig_info(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_rwsig_info *r = args->response;
+	struct ec_response_rwsig_info *r = args->output_buf;
 
 	read_rwsig_info(r);
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_RWSIG_INFO, host_command_rwsig_info,
-		     EC_VER_MASK(EC_VER_RWSIG_INFO));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_RWSIG_INFO, host_command_rwsig_info,
+			      EC_VER_MASK(EC_VER_RWSIG_INFO),
+			      struct ec_response_rwsig_info);
