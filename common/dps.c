@@ -695,15 +695,17 @@ DECLARE_CONSOLE_COMMAND(dps, command_dps,
 			"\t\t fakepwr [dis|<mV> <mA>]",
 			"Print/set Dynamic PDO Selection state.");
 
-static enum ec_status hc_usb_pd_dps_control(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_usb_pd_dps_control(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_usb_pd_dps_control *p = args->params;
+	const struct ec_params_usb_pd_dps_control *p = args->input_buf;
 
 	dps_enable(p->enable);
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_PD_DPS_CONTROL, hc_usb_pd_dps_control,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_USB_PD_DPS_CONTROL, hc_usb_pd_dps_control,
+			     EC_VER_MASK(0),
+			     struct ec_params_usb_pd_dps_control);
 
 #ifdef TEST_BUILD
 __test_only bool dps_is_fake_enabled(void)
