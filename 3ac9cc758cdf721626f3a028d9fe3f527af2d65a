@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b93ba519_c9a325ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-06-26T23:20:03Z",
+      "side": 1,
+      "message": "Looks like the presubmit is failing:\n\n```\n[FAILED] chromiumos/platform/ec: cros format\n    Hook script \"cros format --check --exclude \"*.xml\" --exclude \"extra/usb_updater/*.json\" --exclude \"third_party/*\" --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      16:11:34: WARNING: common/panic_output.c: needs formatting\n      16:11:34: WARNING: common/usbc/usb_pd_console.c: needs formatting\n      16:11:37: WARNING: include/panic.h: needs formatting\n      16:11:55: WARNING: zephyr/test/drivers/led_driver/src/led_sequence.c: needs formatting\n      16:11:32: WARNING: chip/host/reboot.h: needs formatting\n      16:11:37: WARNING: include/system.h: needs formatting\n      16:11:36: WARNING: include/hwtimer.h: needs formatting\n      16:12:00: NOTICE: You can fix formatting errors by running:\n        cros format chip/host/reboot.h common/panic_output.c common/usbc/usb_pd_console.c include/hwtimer.h include/panic.h include/system.h zephyr/test/drivers/led_driver/src/led_sequence.c\n```\n\nThere must have been a change to format settings in ToT. I guess I can re-format those files as the contents of this commit.",
+      "revId": "3ac9cc758cdf721626f3a028d9fe3f527af2d65a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
