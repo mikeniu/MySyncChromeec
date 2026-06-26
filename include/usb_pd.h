@@ -3706,6 +3706,7 @@ __override_proto int svdm_tbt_compat_attention(int port, uint32_t *payload);
  */
 
 __override_proto enum ec_pd_port_location board_get_pd_port_location(int port);
+__override_proto bool board_pd_port_num_is_valid(int port);
 
 /**
  * Called when EC_CMD_USB_PD_CONTROL host command is received
