@@ -407,9 +407,10 @@ static void power_button_press_deferred(void)
 /**
  * Host command to schedule 2 delayed power button short presses.
  */
-static enum ec_status hc_power_button_press(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_power_button_press(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_power_button_press *p = args->params;
+	const struct ec_params_power_button_press *p = args->input_buf;
 
 	/* Arm the (double) press defaults */
 	pbtn_press.second_press_delay_ms = p->second_press_delay_ms;
@@ -439,16 +440,17 @@ static enum ec_status hc_power_button_press(struct host_cmd_handler_args *args)
 	    (p->second_press_delay_ms <= p->first_press_delay_ms ||
 	     (p->first_press_delay_ms + pbtn_press.first_press_duration_ms >=
 	      p->second_press_delay_ms)))
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	/* Schedule first press */
 	hook_call_deferred(&power_button_press_deferred_data,
 			   p->first_press_delay_ms * MSEC);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_POWER_BUTTON_PRESS, hc_power_button_press,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_POWER_BUTTON_PRESS, hc_power_button_press,
+			     EC_VER_MASK(0),
+			     struct ec_params_power_button_press);
 #endif
 
 #ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
