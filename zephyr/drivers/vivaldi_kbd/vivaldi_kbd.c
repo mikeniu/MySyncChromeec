@@ -127,24 +127,24 @@ static int8_t vivaldi_kbd_active_config_idx = -1;
 static const int8_t vivaldi_kbd_active_config_idx;
 #endif
 
-static enum ec_status
-get_vivaldi_keybd_config(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+get_vivaldi_keybd_config(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_keybd_config *resp = args->response;
+	struct ec_response_keybd_config *resp = args->output_buf;
 
 	if (vivaldi_kbd_active_config_idx < 0) {
 		LOG_ERR("no active keybd config");
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	}
 
 	memcpy(resp, &keybd_configs[vivaldi_kbd_active_config_idx],
 	       sizeof(*resp));
-	args->response_size = sizeof(*resp);
+	args->output_buf_size = sizeof(*resp);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_KEYBD_CONFIG, get_vivaldi_keybd_config,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_KEYBD_CONFIG, get_vivaldi_keybd_config,
+			      EC_VER_MASK(0), struct ec_response_keybd_config);
 
 #define CROS_EC_KEYBOARD_NODE DT_CHOSEN(cros_ec_keyboard)
 
