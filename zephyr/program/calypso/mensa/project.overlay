@@ -21,6 +21,7 @@
 #include "keyboard.dtsi"
 #include "led_pins.dtsi"
 #include "led_policy.dtsi"
+#include "fan.dtsi"
 #include "temp_sensors.dtsi"
 
 /* mensa overrides follow... */
