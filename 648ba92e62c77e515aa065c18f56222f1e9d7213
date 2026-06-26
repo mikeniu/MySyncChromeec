@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98e41703_4ef7858d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-06-26T02:42:05Z",
+      "side": 1,
+      "message": "```suggestion\nDefine the board overridable function for the power fail LED diagnostic callback.\n```",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 72
+      },
+      "revId": "648ba92e62c77e515aa065c18f56222f1e9d7213",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df80b05b_04fa6ac9",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1264,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-06-26T02:42:05Z",
+      "side": 1,
+      "message": "The comment is not necessary since the function name below is self-explanatory.",
+      "range": {
+        "startLine": 1264,
+        "startChar": 3,
+        "endLine": 1264,
+        "endChar": 47
+      },
+      "revId": "648ba92e62c77e515aa065c18f56222f1e9d7213",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
