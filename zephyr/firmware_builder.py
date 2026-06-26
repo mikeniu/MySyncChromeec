@@ -535,12 +535,13 @@ def _run_compress(cmd, cwd=None):
             cmd,
             cwd=cwd,
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
             stdin=subprocess.DEVNULL,
         )
     except subprocess.CalledProcessError as e:
         print(f"Error: Compression failed for command {' '.join(cmd)}: {e}")
+        if e.stdout:
+            print(f"Stdout: {e.stdout.decode('utf-8')}")
         if e.stderr:
             print(f"Stderr: {e.stderr.decode('utf-8')}")
         raise
@@ -655,6 +656,7 @@ def bundle_firmware(opts):
             except Exception as e:
                 # If one fails, the executor will still wait for others to finish
                 # before exiting the block, but we raise immediately to signal failure.
+                executor.shutdown(wait=False, cancel_futures=True)
                 raise RuntimeError(
                     f"Bundle failed during compression: {e}"
                 ) from e
@@ -682,7 +684,14 @@ def test(opts):
 
     # Run tests from Makefile.cq because make knows how to run things
     # in parallel.
-    cmd = ["make", "-f", "Makefile.cq", f"-j{opts.cpus}", "test"]
+    cmd = [
+        "make",
+        "-f",
+        "Makefile.cq",
+        f"-j{opts.cpus}",
+        f"CPUS={opts.cpus}",
+        "test",
+    ]
     env = os.environ.copy()
     env.update(init_toolchain())
     if opts.code_coverage:
@@ -732,7 +741,7 @@ def test(opts):
                 )
 
         # Run lcov in parallel using a ThreadPoolExecutor
-        max_workers = min(len(tasks), opts.cpus or 4)
+        max_workers = opts.cpus or 4
         with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_name = {
                 executor.submit(
