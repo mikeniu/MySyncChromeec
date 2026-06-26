@@ -86,19 +86,36 @@ static void battery_update(enum battery_index i)
 }
 
 #ifdef CONFIG_HOSTCMD_BATTERY_V2
-static enum ec_status
-host_command_battery_get_static(struct host_cmd_handler_args *args)
+
+static void populate_bsi_v2(struct ec_response_battery_static_info_v2 *r,
+			    const struct battery_static_info *bs)
 {
-	const struct ec_params_battery_static_info *p = args->params;
+	r->design_capacity = bs->design_capacity;
+	r->design_voltage = bs->design_voltage;
+	r->cycle_count = bs->cycle_count;
+
+	strzcpy(r->manufacturer, bs->manufacturer_ext, sizeof(r->manufacturer));
+	strzcpy(r->device_name, bs->model_ext, sizeof(r->device_name));
+	strzcpy(r->serial, bs->serial_ext, sizeof(r->serial));
+	strzcpy(r->chemistry, bs->type_ext, sizeof(r->chemistry));
+}
+
+static enum ec_host_cmd_status
+host_command_battery_get_static(struct ec_host_cmd_handler_args *args)
+{
+	const struct ec_params_battery_static_info *p = args->input_buf;
 	const struct battery_static_info *bs;
 
 	if (p->index >= CONFIG_BATTERY_COUNT)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	bs = &battery_static[p->index];
 
 	battery_update(p->index);
 	if (args->version == 0) {
-		struct ec_response_battery_static_info *r = args->response;
+		struct ec_response_battery_static_info *r = args->output_buf;
+
+		if (args->output_buf_max < sizeof(*r))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
 
 		r->design_capacity = bs->design_capacity;
 		r->design_voltage = bs->design_voltage;
@@ -110,9 +127,12 @@ host_command_battery_get_static(struct host_cmd_handler_args *args)
 		strzcpy(r->serial, bs->serial_ext, sizeof(r->serial));
 		strzcpy(r->type, bs->type_ext, sizeof(r->type));
 
-		args->response_size = sizeof(*r);
+		args->output_buf_size = sizeof(*r);
 	} else if (args->version == 1) {
-		struct ec_response_battery_static_info_v1 *r = args->response;
+		struct ec_response_battery_static_info_v1 *r = args->output_buf;
+
+		if (args->output_buf_max < sizeof(*r))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
 
 		r->design_capacity = bs->design_capacity;
 		r->design_voltage = bs->design_voltage;
@@ -124,46 +144,49 @@ host_command_battery_get_static(struct host_cmd_handler_args *args)
 		strzcpy(r->serial_ext, bs->serial_ext, sizeof(r->serial_ext));
 		strzcpy(r->type_ext, bs->type_ext, sizeof(r->type_ext));
 
-		args->response_size = sizeof(*r);
+		args->output_buf_size = sizeof(*r);
 	} else if (args->version == 2) {
-		struct ec_response_battery_static_info_v2 *r = args->response;
+		struct ec_response_battery_static_info_v2 *r = args->output_buf;
 
-		r->design_capacity = bs->design_capacity;
-		r->design_voltage = bs->design_voltage;
-		r->cycle_count = bs->cycle_count;
+		if (args->output_buf_max < sizeof(*r))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
 
-		strzcpy(r->manufacturer, bs->manufacturer_ext,
-			sizeof(r->manufacturer));
-		strzcpy(r->device_name, bs->model_ext, sizeof(r->device_name));
-		strzcpy(r->serial, bs->serial_ext, sizeof(r->serial));
-		strzcpy(r->chemistry, bs->type_ext, sizeof(r->chemistry));
-
-		args->response_size = sizeof(*r);
+		populate_bsi_v2(r, bs);
+		args->output_buf_size = sizeof(*r);
 	} else {
-		return EC_RES_INVALID_VERSION;
+		return EC_HOST_CMD_INVALID_VERSION;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_BATTERY_GET_STATIC, host_command_battery_get_static,
-		     EC_VER_MASK(0) | EC_VER_MASK(1) | EC_VER_MASK(2));
+EC_HOST_CMD_HANDLER(EC_CMD_BATTERY_GET_STATIC, host_command_battery_get_static,
+		    EC_VER_MASK(0) | EC_VER_MASK(1) | EC_VER_MASK(2),
+		    struct ec_params_battery_static_info,
+		    SMALLEST_TYPE(struct ec_response_battery_static_info,
+				  struct ec_response_battery_static_info_v1,
+				  struct ec_response_battery_static_info_v2));
 
-static enum ec_status
-host_command_battery_get_dynamic(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_battery_get_dynamic(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_battery_dynamic_info *p = args->params;
-	struct ec_response_battery_dynamic_info *r = args->response;
+	const struct ec_params_battery_dynamic_info *p = args->input_buf;
+	struct ec_response_battery_dynamic_info *r = args->output_buf;
 
 	if (p->index >= CONFIG_BATTERY_COUNT)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
-	args->response_size = sizeof(*r);
+	if (args->output_buf_max < sizeof(*r))
+		return EC_HOST_CMD_RESPONSE_TOO_BIG;
+
+	args->output_buf_size = sizeof(*r);
 	memcpy(r, &battery_dynamic[p->index], sizeof(*r));
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_BATTERY_GET_DYNAMIC,
-		     host_command_battery_get_dynamic, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_BATTERY_GET_DYNAMIC,
+		    host_command_battery_get_dynamic, EC_VER_MASK(0),
+		    struct ec_params_battery_dynamic_info,
+		    struct ec_response_battery_dynamic_info);
 #endif /* CONFIG_HOSTCMD_BATTERY_V2 */
 
 void battery_memmap_refresh(enum battery_index index)
