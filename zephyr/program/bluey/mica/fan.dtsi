@@ -38,29 +38,29 @@
 			rpm-target = <4500 4500>;
 		};
 		level_2 {
-			temp-on = <55>;
+			temp-on = <54>;
 			temp-off = <48>;
-			rpm-target = <5600 5600>;
+			rpm-target = <5200 5200>;
 		};
 		level_3 {
-			temp-on = <60>;
-			temp-off = <53>;
+			temp-on = <59>;
+			temp-off = <52>;
 			rpm-target = <6000 6000>;
 		};
 		level_4 {
-			temp-on = <65>;
-			temp-off = <58>;
-			rpm-target = <6300 6300>;
+			temp-on = <63>;
+			temp-off = <57>;
+			rpm-target = <6800 6800>;
 		};
 		level_5 {
 			temp-on = <70>;
-			temp-off = <63>;
-			rpm-target = <7000 7000>;
+			temp-off = <61>;
+			rpm-target = <7500 7500>;
 		};
 		level_6 {
 			temp-on = <75>;
 			temp-off = <68>;
-			rpm-target = <7800 7800>;
+			rpm-target = <8000 8000>;
 		};
 		level_7 {
 			temp-on = <99>;
