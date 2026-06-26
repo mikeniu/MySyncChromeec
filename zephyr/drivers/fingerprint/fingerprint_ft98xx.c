@@ -204,6 +204,8 @@ static int ft98xx_init(const struct device *dev)
 		return -EINVAL;
 	}
 
+	ft_sensor_set_mode(FOCAL_SENSOR_MODE_LOW_POWER);
+
 	return 0;
 }
 
