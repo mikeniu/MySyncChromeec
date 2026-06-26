@@ -78,19 +78,20 @@ test_mockable int usb_charge_set_mode(int port_id, enum usb_charge_mode mode,
 	return EC_SUCCESS;
 }
 
-static enum ec_status
-usb_port_command_set_mode(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+usb_port_command_set_mode(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_usb_charge_set_mode *p = args->params;
+	const struct ec_params_usb_charge_set_mode *p = args->input_buf;
 
 	if (usb_charge_set_mode(p->usb_port_id, p->mode, p->inhibit_charge) !=
 	    EC_SUCCESS)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_CHARGE_SET_MODE, usb_port_command_set_mode,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_USB_CHARGE_SET_MODE,
+			     usb_port_command_set_mode, EC_VER_MASK(0),
+			     struct ec_params_usb_charge_set_mode);
 
 /*****************************************************************************/
 /* Console commands */

@@ -3655,7 +3655,7 @@ __override_proto bool board_pd_port_num_is_valid(int port);
  * @param port  The PD port number
  * @return      Information related connected port partner and cable
  */
-uint8_t get_pd_control_flags(int port);
+__override_proto uint8_t get_pd_control_flags(int port);
 
 /* Use interval debugging to time register accesses, state transitions,
  * effective timeouts, etc. within the TCPM.
