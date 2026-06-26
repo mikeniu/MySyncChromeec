@@ -8,11 +8,11 @@
 / {
 	named-adc-channels {
 
-		adc_temp_backcov: backcov {
+		adc_temp_charger1: charger1 {
 			enum-name = "ADC_TEMP_SENSOR_1";
 			io-channels = <&adc0 0>;
 		};
-		adc_temp_keyboard: keyboard {
+		adc_temp_prebuck: prebuck {
 			enum-name = "ADC_TEMP_SENSOR_2";
 			io-channels = <&adc0 1>;
 		};
@@ -20,46 +20,46 @@
 			enum-name = "ADC_TEMP_SENSOR_3";
 			io-channels = <&adc0 2>;
 		};
-		adc_temp_wlan: wlan {
+		adc_temp_charger: charger {
 			enum-name = "ADC_TEMP_SENSOR_4";
 			io-channels = <&adc0 3>;
 		};
 	};
 
-	temp_sensor_backcov: backcov {
+	temp_sensor_charger1: charger1 {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_100K_100K_4250B>;
-		adc = <&adc_temp_backcov>;
+		adc = <&adc_temp_charger1>;
 	};
-	temp_sensor_keyboard: keyboard {
+	temp_sensor_prebuck: prebuck {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_100K_100K_4250B>;
-		adc = <&adc_temp_keyboard>;
+		adc = <&adc_temp_prebuck>;
 	};
 	temp_sensor_cpu: cpu {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_100K_100K_4250B>;
 		adc = <&adc_temp_cpu>;
 	};
-	temp_sensor_wlan: wlan {
+	temp_sensor_charger: charger {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_100K_100K_4250B>;
-		adc = <&adc_temp_wlan>;
+		adc = <&adc_temp_charger>;
 	};
 
 	named-temp-sensors {
 		compatible = "cros-ec,temp-sensors";
-		temp_backcov: backcov {
-			sensor = <&temp_sensor_backcov>;
+		temp_charger1: charger1 {
+			sensor = <&temp_sensor_charger1>;
 		};
-		temp_keyboard: keyboard {
-			sensor = <&temp_sensor_keyboard>;
+		temp_prebuck: prebuck {
+			sensor = <&temp_sensor_prebuck>;
 		};
 		temp_cpu: cpu {
 			sensor = <&temp_sensor_cpu>;
 		};
-		temp_wlan: wlan {
-			sensor = <&temp_sensor_wlan>;
+		temp_charger: charger {
+			sensor = <&temp_sensor_charger>;
 		};
 	};
 };
@@ -72,6 +72,7 @@
 	pinctrl-0 = <&adc0_chan0_gp45
 		&adc0_chan1_gp44
 		&adc0_chan2_gp43
-		&adc0_chan3_gp42>;
+		&adc0_chan3_gp42
+		&adc0_chan11_gpc7>;
 	pinctrl-names = "default";
 };
