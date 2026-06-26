@@ -228,7 +228,8 @@ ZTEST(cbi_flash, test_cbi_flash_host_write_overflow)
 
 	set_args.params_size = 0;
 
-	zassert_equal(host_command_process(&set_args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_command_process(&set_args),
+		      EC_HOST_CMD_REQUEST_TRUNCATED);
 }
 
 static void cbi_flash_before(void *fixture)
