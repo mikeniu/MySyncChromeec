@@ -14,6 +14,10 @@
 
 #include <stdbool.h>
 
+#ifdef CONFIG_EC_HOST_CMD
+#include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -68,6 +72,54 @@ struct host_cmd_handler_args {
 	uint16_t result;
 #endif
 };
+
+#ifndef CONFIG_EC_HOST_CMD
+
+#define ec_host_cmd_handler_args host_cmd_handler_args
+#define ec_host_cmd_status ec_status
+
+#define EC_HOST_CMD_SUCCESS EC_RES_SUCCESS
+#define EC_HOST_CMD_INVALID_COMMAND EC_RES_INVALID_COMMAND
+#define EC_HOST_CMD_ERROR EC_RES_ERROR
+#define EC_HOST_CMD_INVALID_PARAM EC_RES_INVALID_PARAM
+#define EC_HOST_CMD_ACCESS_DENIED EC_RES_ACCESS_DENIED
+#define EC_HOST_CMD_INVALID_RESPONSE EC_RES_INVALID_RESPONSE
+#define EC_HOST_CMD_INVALID_VERSION EC_RES_INVALID_VERSION
+#define EC_HOST_CMD_INVALID_CHECKSUM EC_RES_INVALID_CHECKSUM
+#define EC_HOST_CMD_IN_PROGRESS EC_RES_IN_PROGRESS
+#define EC_HOST_CMD_UNAVAILABLE EC_RES_UNAVAILABLE
+#define EC_HOST_CMD_TIMEOUT EC_RES_TIMEOUT
+#define EC_HOST_CMD_OVERFLOW EC_RES_OVERFLOW
+#define EC_HOST_CMD_INVALID_HEADER EC_RES_INVALID_HEADER
+#define EC_HOST_CMD_REQUEST_TRUNCATED EC_RES_REQUEST_TRUNCATED
+#define EC_HOST_CMD_RESPONSE_TOO_BIG EC_RES_RESPONSE_TOO_BIG
+#define EC_HOST_CMD_BUS_ERROR EC_RES_BUS_ERROR
+#define EC_HOST_CMD_BUSY EC_RES_BUSY
+#define EC_HOST_CMD_INVALID_HEADER_VERSION EC_RES_INVALID_HEADER_VERSION
+#define EC_HOST_CMD_INVALID_HEADER_CRC EC_RES_INVALID_HEADER_CRC
+#define EC_HOST_CMD_INVALID_DATA_CRC EC_RES_INVALID_DATA_CRC
+#define EC_HOST_CMD_DUP_UNAVAILABLE EC_RES_DUP_UNAVAILABLE
+#define EC_HOST_CMD_MAX EC_RES_MAX
+
+#define input_buf params
+#define input_buf_size params_size
+#define output_buf response
+#define output_buf_max response_max
+#define output_buf_size response_size
+
+#define EC_HOST_CMD_HANDLER(id, routine, version_mask, req_type, resp_type) \
+	DECLARE_HOST_COMMAND(id, routine, version_mask)
+
+#define EC_HOST_CMD_HANDLER_UNBOUND(id, routine, version_mask) \
+	DECLARE_HOST_COMMAND(id, routine, version_mask)
+
+#define EC_HOST_CMD_HANDLER_REQ_ONLY(id, routine, version_mask, req_type) \
+	DECLARE_HOST_COMMAND(id, routine, version_mask)
+
+#define EC_HOST_CMD_HANDLER_RESP_ONLY(id, routine, version_mask, resp_type) \
+	DECLARE_HOST_COMMAND(id, routine, version_mask)
+
+#endif /* !CONFIG_EC_HOST_CMD */
 
 /* Args for host packet handler */
 struct host_packet {
