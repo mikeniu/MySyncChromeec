@@ -299,13 +299,14 @@ __maybe_unused static void reset_watchdog_stats(void)
 
 #if defined(CONFIG_PLATFORM_EC_HOSTCMD_WATCHDOG_INFO)
 
-static enum ec_status hostcmd_watchdog_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hostcmd_watchdog_info(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_hostcmd_watchdog_info *p = args->params;
-	struct ec_response_hostcmd_watchdog_info *r = args->response;
+	const struct ec_params_hostcmd_watchdog_info *p = args->input_buf;
+	struct ec_response_hostcmd_watchdog_info *r = args->output_buf;
 
-	if (args->params_size < sizeof(*p))
-		return EC_RES_INVALID_PARAM;
+	if (args->input_buf_size < sizeof(*p))
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	r->watchdog_period_ms = CONFIG_WATCHDOG_PERIOD_MS;
 	r->watchdog_warning_period_ms = CONFIG_AUX_TIMER_PERIOD_MS;
@@ -325,12 +326,13 @@ static enum ec_status hostcmd_watchdog_info(struct host_cmd_handler_args *args)
 		reset_watchdog_stats();
 	}
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_HOSTCMD_WATCHDOG_INFO, hostcmd_watchdog_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_HOSTCMD_WATCHDOG_INFO, hostcmd_watchdog_info,
+		    EC_VER_MASK(0), struct ec_params_hostcmd_watchdog_info,
+		    struct ec_response_hostcmd_watchdog_info);
 
 #endif
 
