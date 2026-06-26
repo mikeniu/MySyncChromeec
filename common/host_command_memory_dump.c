@@ -52,10 +52,10 @@ int clear_memory_dump(void)
 	return EC_SUCCESS;
 }
 
-static enum ec_status
-get_memory_dump_metadata(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+get_memory_dump_metadata(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_memory_dump_get_metadata *r = args->response;
+	struct ec_response_memory_dump_get_metadata *r = args->output_buf;
 
 	mutex_lock(&memory_dump_mutex);
 
@@ -67,24 +67,25 @@ get_memory_dump_metadata(struct host_cmd_handler_args *args)
 
 	mutex_unlock(&memory_dump_mutex);
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_MEMORY_DUMP_GET_METADATA, get_memory_dump_metadata,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_MEMORY_DUMP_GET_METADATA,
+			      get_memory_dump_metadata, EC_VER_MASK(0),
+			      struct ec_response_memory_dump_get_metadata);
 
-static enum ec_status
-memory_dump_get_entry_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+memory_dump_get_entry_info(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_memory_dump_get_entry_info *p = args->params;
-	struct ec_response_memory_dump_get_entry_info *r = args->response;
+	const struct ec_params_memory_dump_get_entry_info *p = args->input_buf;
+	struct ec_response_memory_dump_get_entry_info *r = args->output_buf;
 
 	mutex_lock(&memory_dump_mutex);
 
 	if (p->memory_dump_entry_index >= memory_dump_entry_count) {
 		mutex_unlock(&memory_dump_mutex);
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	r->address = entries[p->memory_dump_entry_index].address;
@@ -92,24 +93,27 @@ memory_dump_get_entry_info(struct host_cmd_handler_args *args)
 
 	mutex_unlock(&memory_dump_mutex);
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_MEMORY_DUMP_GET_ENTRY_INFO,
-		     memory_dump_get_entry_info, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_MEMORY_DUMP_GET_ENTRY_INFO,
+		    memory_dump_get_entry_info, EC_VER_MASK(0),
+		    struct ec_params_memory_dump_get_entry_info,
+		    struct ec_response_memory_dump_get_entry_info);
 
-static enum ec_status read_memory_dump(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+read_memory_dump(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_memory_dump_read_memory *p = args->params;
-	void *r = args->response;
+	const struct ec_params_memory_dump_read_memory *p = args->input_buf;
+	void *r = args->output_buf;
 	struct memory_dump_entry entry;
 
 	mutex_lock(&memory_dump_mutex);
 
 	if (p->memory_dump_entry_index >= memory_dump_entry_count) {
 		mutex_unlock(&memory_dump_mutex);
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	entry = entries[p->memory_dump_entry_index];
@@ -118,18 +122,20 @@ static enum ec_status read_memory_dump(struct host_cmd_handler_args *args)
 	    entry.address + entry.size < p->address + p->size || /* upper */
 	    p->address + p->size < p->address /* wraparound check */) {
 		mutex_unlock(&memory_dump_mutex);
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	/* Must leave room for ec_host_response header */
-	args->response_size = min(
-		p->size, args->response_max - sizeof(struct ec_host_response));
+	args->output_buf_size =
+		min(p->size,
+		    args->output_buf_max - sizeof(struct ec_host_response));
 
-	memcpy(r, (void *)p->address, args->response_size);
+	memcpy(r, (void *)p->address, args->output_buf_size);
 
 	mutex_unlock(&memory_dump_mutex);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_MEMORY_DUMP_READ_MEMORY, read_memory_dump,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_MEMORY_DUMP_READ_MEMORY, read_memory_dump,
+			     EC_VER_MASK(0),
+			     struct ec_params_memory_dump_read_memory);
