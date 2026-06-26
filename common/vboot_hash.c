@@ -460,7 +460,8 @@ static void fill_response(struct ec_response_vboot_hash *r, int request_offset)
  *
  * @return EC_RES_SUCCESS if success, or other result code on error.
  */
-static int host_start_hash(const struct ec_params_vboot_hash *p)
+static enum ec_host_cmd_status
+host_start_hash(const struct ec_params_vboot_hash *p)
 {
 	int offset = p->offset;
 	int size = p->size;
@@ -468,9 +469,9 @@ static int host_start_hash(const struct ec_params_vboot_hash *p)
 
 	/* Validity-check input params */
 	if (p->hash_type != EC_VBOOT_HASH_TYPE_SHA256)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	if (p->nonce_size > sizeof(p->nonce_data))
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	/* Handle special offset values */
 	if (offset == EC_VBOOT_HASH_OFFSET_RO)
@@ -483,19 +484,19 @@ static int host_start_hash(const struct ec_params_vboot_hash *p)
 			      VBOOT_HASH_DEFERRED);
 
 	if (rv == EC_SUCCESS)
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	else if (rv == EC_ERROR_INVAL)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	else
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 }
 
-static enum ec_status
-host_command_vboot_hash(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_vboot_hash(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_vboot_hash *p = args->params;
-	struct ec_response_vboot_hash *r = args->response;
-	int rv;
+	const struct ec_params_vboot_hash *p = args->input_buf;
+	struct ec_response_vboot_hash *r = args->output_buf;
+	enum ec_host_cmd_status rv;
 
 	switch (p->cmd) {
 	case EC_VBOOT_HASH_GET:
@@ -504,17 +505,17 @@ host_command_vboot_hash(struct host_cmd_handler_args *args)
 		else
 			fill_response(r, data_offset);
 
-		args->response_size = sizeof(*r);
-		return EC_RES_SUCCESS;
+		args->output_buf_size = sizeof(*r);
+		return EC_HOST_CMD_SUCCESS;
 
 	case EC_VBOOT_HASH_ABORT:
 		vboot_hash_abort();
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 
 	case EC_VBOOT_HASH_START:
 	case EC_VBOOT_HASH_RECALC:
 		rv = host_start_hash(p);
-		if (rv != EC_RES_SUCCESS)
+		if (rv != EC_HOST_CMD_SUCCESS)
 			return rv;
 
 		/* Wait for hash to finish if command is RECALC */
@@ -523,12 +524,12 @@ host_command_vboot_hash(struct host_cmd_handler_args *args)
 				crec_usleep(1000);
 
 		fill_response(r, p->offset);
-		args->response_size = sizeof(*r);
-		return EC_RES_SUCCESS;
+		args->output_buf_size = sizeof(*r);
+		return EC_HOST_CMD_SUCCESS;
 
 	default:
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 }
-DECLARE_HOST_COMMAND(EC_CMD_VBOOT_HASH, host_command_vboot_hash,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_VBOOT_HASH, host_command_vboot_hash, EC_VER_MASK(0),
+		    struct ec_params_vboot_hash, struct ec_response_vboot_hash);
