@@ -1628,6 +1628,14 @@ static enum ec_status flash_command_read(struct host_cmd_handler_args *args)
 }
 DECLARE_HOST_COMMAND(EC_CMD_FLASH_READ, flash_command_read, EC_VER_MASK(0));
 
+#ifdef CONFIG_EC_HOST_CMD
+BUILD_ASSERT(
+	!((sizeof(struct ec_params_flash_write) +
+	   sizeof(struct ec_host_cmd_request_header) +
+	   CONFIG_EC_HOST_CMD_HANDLER_BUFFER_ALIGN) %
+	  CONFIG_FLASH_WRITE_SIZE),
+	"The buffer aligment for the flash write host command is incorrect");
+#endif /* CONFIG_EC_HOST_CMD */
 /**
  * Flash write command
  *
