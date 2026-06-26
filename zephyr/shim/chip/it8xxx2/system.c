@@ -7,12 +7,16 @@
 #include "system.h"
 
 #include <zephyr/devicetree.h>
+#include <zephyr/drivers/bbram.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/sys/sys_io.h>
 #include <zephyr/sys/util_macro.h>
 
 #include <chip_chipregs.h>
 #include <cpu.h>
 #include <ilm.h>
+
+LOG_MODULE_REGISTER(shim_it8xxx2_system, LOG_LEVEL_ERR);
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(ilm), okay)
 /*
@@ -51,3 +55,38 @@ uintptr_t system_get_fw_reset_vector(uintptr_t base)
 	 */
 	return base;
 }
+
+static void chip_bbram_status_check(void)
+{
+	const struct device *bbram_dev;
+	int res;
+
+	bbram_dev = DEVICE_DT_GET(DT_NODELABEL(bbram));
+	if (!device_is_ready(bbram_dev)) {
+		LOG_ERR_DEVICE_NOT_READY(bbram_dev);
+		return;
+	}
+
+	res = bbram_check_invalid(bbram_dev);
+	if (res != 0 && res != -ENOTSUP) {
+		LOG_INF("VBAT power drop!");
+	}
+}
+
+static int chip_system_init(void)
+{
+	/* Check BBRAM power status. */
+	chip_bbram_status_check();
+
+	return 0;
+}
+
+/*
+ * The priority should be lower than CONFIG_BBRAM_INIT_PRIORITY.
+ */
+#if (CONFIG_CROS_SYSTEM_IT8XXX2_PRE_INIT_PRIORITY <= CONFIG_BBRAM_INIT_PRIORITY)
+#error CONFIG_CROS_SYSTEM_IT8XXX2_PRE_INIT_PRIORITY must greater than \
+	CONFIG_BBRAM_INIT_PRIORITY
+#endif
+SYS_INIT(chip_system_init, PRE_KERNEL_1,
+	 CONFIG_CROS_SYSTEM_IT8XXX2_PRE_INIT_PRIORITY);
