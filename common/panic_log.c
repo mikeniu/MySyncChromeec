@@ -111,14 +111,14 @@ void panic_log_write_str(const char *str, const size_t size)
 
 /* Returns the current state of panic log, before applying any requested changes
  */
-static enum ec_status
-host_command_get_panic_log_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_get_panic_log_info(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_panic_log_info *r = args->response;
-	const struct ec_params_panic_log_info *p = args->params;
+	struct ec_response_panic_log_info *r = args->output_buf;
+	const struct ec_params_panic_log_info *p = args->input_buf;
 
 	if (p->freeze && p->unfreeze)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	/* Freeze before while reading */
 	bool orig_frozen = panic_log_freeze(true);
@@ -127,7 +127,7 @@ host_command_get_panic_log_info(struct host_cmd_handler_args *args)
 	r->capacity = panic_log_capacity();
 	r->valid = panic_log_is_valid();
 	r->length = panic_log_len();
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
 	if (p->reset)
 		panic_log_reset();
@@ -140,30 +140,32 @@ host_command_get_panic_log_info(struct host_cmd_handler_args *args)
 		/* Restore original frozen state if no change requested */
 		panic_log_freeze(orig_frozen);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PANIC_LOG_INFO, host_command_get_panic_log_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_PANIC_LOG_INFO, host_command_get_panic_log_info,
+		    EC_VER_MASK(0), struct ec_params_panic_log_info,
+		    struct ec_response_panic_log_info);
 
-static enum ec_status
-host_command_read_panic_log(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_read_panic_log(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_panic_log_read *p = args->params;
-	char *response = args->response;
+	const struct ec_params_panic_log_read *p = args->input_buf;
+	char *response = args->output_buf;
 	uint32_t offset = p->offset;
 	uint32_t length = panic_log_len();
 
 	if (offset >= length)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
-	while (offset < length && args->response_size < args->response_max) {
-		response[args->response_size++] = panic_log_read(offset++);
+	while (offset < length &&
+	       args->output_buf_size < args->output_buf_max) {
+		response[args->output_buf_size++] = panic_log_read(offset++);
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PANIC_LOG_READ, host_command_read_panic_log,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_PANIC_LOG_READ, host_command_read_panic_log,
+			     EC_VER_MASK(0), struct ec_params_panic_log_read);
 
 #if defined(CONFIG_PANIC_LOG_DEBUG)
 
