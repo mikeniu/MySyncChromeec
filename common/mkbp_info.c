@@ -63,12 +63,16 @@ test_export_static uint32_t get_supported_switches(void)
 	return val;
 }
 
-static enum ec_status mkbp_get_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+mkbp_get_info(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_mkbp_info *p = args->params;
+	const struct ec_params_mkbp_info *p = args->input_buf;
 
-	if (args->params_size == 0 || p->info_type == EC_MKBP_INFO_KBD) {
-		struct ec_response_mkbp_info *r = args->response;
+	if (args->input_buf_size == 0 || p->info_type == EC_MKBP_INFO_KBD) {
+		struct ec_response_mkbp_info *r = args->output_buf;
+
+		if (args->output_buf_max < sizeof(struct ec_response_mkbp_info))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
 
 #ifdef CONFIG_KEYBOARD_PROTOCOL_MKBP
 		/* Version 0 just returns info about the keyboard. */
@@ -82,27 +86,34 @@ static enum ec_status mkbp_get_info(struct host_cmd_handler_args *args)
 		/* This used to be "switches" which was previously 0. */
 		r->reserved = 0;
 
-		args->response_size = sizeof(struct ec_response_mkbp_info);
+		args->output_buf_size = sizeof(struct ec_response_mkbp_info);
 	} else {
-		union ec_response_get_next_data *r = args->response;
+		union ec_response_get_next_data *r = args->output_buf;
+
+		if (args->input_buf_size < sizeof(*p))
+			return EC_HOST_CMD_INVALID_PARAM;
 
 		/* Version 1 (other than EC_MKBP_INFO_KBD) */
 		switch (p->info_type) {
 		case EC_MKBP_INFO_SUPPORTED:
 			switch (p->event_type) {
 			case EC_MKBP_EVENT_BUTTON:
+				if (args->output_buf_max < sizeof(r->buttons))
+					return EC_HOST_CMD_RESPONSE_TOO_BIG;
 				r->buttons = get_supported_buttons();
-				args->response_size = sizeof(r->buttons);
+				args->output_buf_size = sizeof(r->buttons);
 				break;
 
 			case EC_MKBP_EVENT_SWITCH:
+				if (args->output_buf_max < sizeof(r->switches))
+					return EC_HOST_CMD_RESPONSE_TOO_BIG;
 				r->switches = get_supported_switches();
-				args->response_size = sizeof(r->switches);
+				args->output_buf_size = sizeof(r->switches);
 				break;
 
 			default:
 				/* Don't care for now for other types. */
-				return EC_RES_INVALID_PARAM;
+				return EC_HOST_CMD_INVALID_PARAM;
 			}
 			break;
 
@@ -110,46 +121,65 @@ static enum ec_status mkbp_get_info(struct host_cmd_handler_args *args)
 			switch (p->event_type) {
 #ifdef HAS_TASK_KEYSCAN
 			case EC_MKBP_EVENT_KEY_MATRIX:
+				if (args->output_buf_max <
+				    sizeof(r->key_matrix))
+					return EC_HOST_CMD_RESPONSE_TOO_BIG;
 				memcpy(r->key_matrix, keyboard_scan_get_state(),
 				       sizeof(r->key_matrix));
-				args->response_size = sizeof(r->key_matrix);
+				args->output_buf_size = sizeof(r->key_matrix);
 				break;
 #endif
 			case EC_MKBP_EVENT_HOST_EVENT:
+				if (args->output_buf_max <
+				    sizeof(r->host_event))
+					return EC_HOST_CMD_RESPONSE_TOO_BIG;
 				r->host_event = (uint32_t)host_get_events();
-				args->response_size = sizeof(r->host_event);
+				args->output_buf_size = sizeof(r->host_event);
 				break;
 
 			case EC_MKBP_EVENT_HOST_EVENT64:
+				if (args->output_buf_max <
+				    sizeof(r->host_event64))
+					return EC_HOST_CMD_RESPONSE_TOO_BIG;
 				r->host_event64 = host_get_events();
-				args->response_size = sizeof(r->host_event64);
+				args->output_buf_size = sizeof(r->host_event64);
 				break;
 
 #ifdef CONFIG_MKBP_INPUT_DEVICES
 			case EC_MKBP_EVENT_BUTTON:
+				if (args->output_buf_max < sizeof(r->buttons))
+					return EC_HOST_CMD_RESPONSE_TOO_BIG;
 				r->buttons = mkbp_get_button_state();
-				args->response_size = sizeof(r->buttons);
+				args->output_buf_size = sizeof(r->buttons);
 				break;
 
 			case EC_MKBP_EVENT_SWITCH:
+				if (args->output_buf_max < sizeof(r->switches))
+					return EC_HOST_CMD_RESPONSE_TOO_BIG;
 				r->switches = mkbp_get_switch_state();
-				args->response_size = sizeof(r->switches);
+				args->output_buf_size = sizeof(r->switches);
 				break;
 #endif /* CONFIG_MKBP_INPUT_DEVICES */
 
 			default:
 				/* Doesn't make sense for other event types. */
-				return EC_RES_INVALID_PARAM;
+				return EC_HOST_CMD_INVALID_PARAM;
 			}
 			break;
 
 		default:
 			/* Unsupported query. */
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 		}
 	}
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-
-DECLARE_HOST_COMMAND(EC_CMD_MKBP_INFO, mkbp_get_info,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+/*
+ * Version 0 has 0 request bytes and returns 9 bytes.
+ * Version 1 has 2 request bytes and returns 4-13 bytes depending on subcommand.
+ * We use RESP_ONLY so .min_rqt_size is 0 (required to allow v0's 0-byte
+ * request). We specify uint32_t (4 bytes) as response type to set .min_rsp_size
+ * to 4, which is the minimum response size returned by any version/subcommand.
+ */
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_MKBP_INFO, mkbp_get_info,
+			      EC_VER_MASK(0) | EC_VER_MASK(1), uint32_t);
