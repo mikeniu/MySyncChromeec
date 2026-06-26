@@ -10,7 +10,8 @@ This is the entry point for the custom firmware builder workflow recipe.
 """
 
 import collections
-from concurrent import futures
+from concurrent.futures import as_completed
+from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 import pathlib
@@ -645,11 +646,11 @@ def bundle_firmware(opts):
 
     # Run compression tasks in a controlled thread pool
     max_workers = opts.cpus or 4
-    with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_cmd = {
             executor.submit(_run_compress, cmd, cwd): cmd for cmd, cwd in tasks
         }
-        for future in futures.as_completed(future_to_cmd):
+        for future in as_completed(future_to_cmd):
             try:
                 future.result()
             except Exception as e:
@@ -682,7 +683,14 @@ def test(opts):
 
     # Run tests from Makefile.cq because make knows how to run things
     # in parallel.
-    cmd = ["make", "-f", "Makefile.cq", f"-j{opts.cpus}", "test"]
+    cmd = [
+        "make",
+        "-f",
+        "Makefile.cq",
+        f"-j{opts.cpus}",
+        f"CPUS={opts.cpus}",
+        "test",
+    ]
     env = os.environ.copy()
     env.update(init_toolchain())
     if opts.code_coverage:
@@ -733,14 +741,14 @@ def test(opts):
 
         # Run lcov in parallel using a ThreadPoolExecutor
         max_workers = min(len(tasks), opts.cpus or 4)
-        with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_name = {
                 executor.submit(
                     _extract_lcov_summary_worker, name, filename
                 ): name
                 for name, filename in tasks
             }
-            for future in futures.as_completed(future_to_name):
+            for future in as_completed(future_to_name):
                 result = future.result()
                 if result:
                     name, cov, covered, total = result
