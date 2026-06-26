@@ -50,23 +50,25 @@ static int command_adc(int argc, const char **argv)
 }
 DECLARE_CONSOLE_COMMAND(adc, command_adc, "[id]", NULL);
 
-static enum ec_status hc_adc_read(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_adc_read(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_adc_read *params = args->params;
-	struct ec_response_adc_read *resp = args->response;
+	const struct ec_params_adc_read *params = args->input_buf;
+	struct ec_response_adc_read *resp = args->output_buf;
 	enum adc_channel ch = (enum adc_channel)params->adc_channel;
 	int32_t adc_value;
 
 	if (ch >= ADC_CH_COUNT)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	adc_value = adc_read_channel(ch);
 	if (adc_value == ADC_READ_ERROR)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
 	resp->adc_value = adc_value;
-	args->response_size = sizeof(*resp);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*resp);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_ADC_READ, hc_adc_read, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_ADC_READ, hc_adc_read, EC_VER_MASK(0),
+		    struct ec_params_adc_read, struct ec_response_adc_read);
 #endif /* CONFIG_ADC_PROFILE_FAST_CONTINUOUS */
