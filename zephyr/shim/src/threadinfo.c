@@ -98,19 +98,21 @@ static void match_thread_list(const struct k_thread *thread, void *user_data)
 	}
 }
 
-static enum ec_status hc_thread_info_list(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_thread_info_list(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_thread_info_list *r = args->response;
+	struct ec_response_thread_info_list *r = args->output_buf;
 	struct list_data d = { .resp = r, .count = 0 };
 
 	k_thread_foreach_unlocked(match_thread_list, &d);
 	r->thread_count = d.count;
-	args->response_size = sizeof(uint32_t) + d.count * sizeof(uint32_t);
+	args->output_buf_size = sizeof(uint32_t) + d.count * sizeof(uint32_t);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_THREAD_INFO_LIST, hc_thread_info_list,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_THREAD_INFO_LIST, hc_thread_info_list,
+			      EC_VER_MASK(0),
+			      struct ec_response_thread_info_list);
 
 extern struct k_thread z_idle_threads[];
 
@@ -137,16 +139,17 @@ static void match_thread_detail(const struct k_thread *thread, void *user_data)
 	}
 }
 
-static enum ec_status hc_thread_info_detail(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_thread_info_detail(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_thread_info_detail *p = args->params;
-	struct ec_response_thread_info_detail *r = args->response;
+	const struct ec_params_thread_info_detail *p = args->input_buf;
+	struct ec_response_thread_info_detail *r = args->output_buf;
 
 	struct detail_data d = { .target_id = p->thread_id, .found = NULL };
 	k_thread_foreach_unlocked(match_thread_detail, &d);
 
 	if (!d.found) {
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	const struct k_thread *thread = d.found;
@@ -245,11 +248,12 @@ static enum ec_status hc_thread_info_detail(struct host_cmd_handler_args *args)
 		}
 	}
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_THREAD_INFO_DETAIL, hc_thread_info_detail,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_THREAD_INFO_DETAIL, hc_thread_info_detail,
+		    EC_VER_MASK(0), struct ec_params_thread_info_detail,
+		    struct ec_response_thread_info_detail);
 
 #endif

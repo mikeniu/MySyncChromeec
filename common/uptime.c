@@ -9,8 +9,8 @@
 
 #include <stddef.h>
 
-static enum ec_status
-host_command_get_uptime_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_get_uptime_info(struct ec_host_cmd_handler_args *args)
 {
 	/*
 	 * In the current implementation, not all terms are preserved across a
@@ -21,7 +21,7 @@ host_command_get_uptime_info(struct host_cmd_handler_args *args)
 	 * ap_resets_since_ec_boot: Not preserved
 	 * recent_ap_reset[*]:      Not preserved
 	 */
-	struct ec_response_uptime_info *r = args->response;
+	struct ec_response_uptime_info *r = args->output_buf;
 	timestamp_t now = get_time();
 	uint32_t now_ms = (uint32_t)(now.val / MSEC);
 	void *recent_ap_reset = r->recent_ap_reset;
@@ -36,8 +36,9 @@ host_command_get_uptime_info(struct host_cmd_handler_args *args)
 				&ap_resets_since_ec_boot);
 
 	r->ap_resets_since_ec_boot = ap_resets_since_ec_boot;
-	args->response_size = sizeof(*r);
-	return rc == EC_SUCCESS ? EC_RES_SUCCESS : EC_RES_ERROR;
+	args->output_buf_size = sizeof(*r);
+	return rc == EC_SUCCESS ? EC_HOST_CMD_SUCCESS : EC_HOST_CMD_ERROR;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_UPTIME_INFO, host_command_get_uptime_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_UPTIME_INFO,
+			      host_command_get_uptime_info, EC_VER_MASK(0),
+			      struct ec_response_uptime_info);
