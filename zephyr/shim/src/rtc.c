@@ -192,48 +192,52 @@ DECLARE_CONSOLE_COMMAND(rtc_alarm, command_rtc_alarm_test,
 #endif /* CONFIG_PLATFORM_EC_CONSOLE_CMD_RTC */
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_RTC
-static enum ec_status system_rtc_get_value(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+system_rtc_get_value(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_rtc *r = args->response;
+	struct ec_response_rtc *r = args->output_buf;
 
 	r->time = system_get_rtc_sec();
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_RTC_GET_VALUE, system_rtc_get_value,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_RTC_GET_VALUE, system_rtc_get_value,
+			      EC_VER_MASK(0), struct ec_response_rtc);
 
-static enum ec_status system_rtc_set_value(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+system_rtc_set_value(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_rtc *p = args->params;
+	const struct ec_params_rtc *p = args->input_buf;
 
 	system_set_rtc(p->time);
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_RTC_SET_VALUE, system_rtc_set_value,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_RTC_SET_VALUE, system_rtc_set_value,
+			     EC_VER_MASK(0), struct ec_params_rtc);
 
-static enum ec_status system_rtc_set_alarm(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+system_rtc_set_alarm(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_rtc *p = args->params;
+	const struct ec_params_rtc *p = args->input_buf;
 
 	system_set_rtc_alarm(p->time, 0);
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_RTC_SET_ALARM, system_rtc_set_alarm,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_RTC_SET_ALARM, system_rtc_set_alarm,
+			     EC_VER_MASK(0), struct ec_params_rtc);
 
-static enum ec_status system_rtc_get_alarm(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+system_rtc_get_alarm(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_rtc *r = args->response;
+	struct ec_response_rtc *r = args->output_buf;
 
 	r->time = system_get_rtc_alarm();
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_RTC_GET_ALARM, system_rtc_get_alarm,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_RTC_GET_ALARM, system_rtc_get_alarm,
+			      EC_VER_MASK(0), struct ec_response_rtc);
 
 #endif /* CONFIG_PLATFORM_EC_HOSTCMD_RTC */
