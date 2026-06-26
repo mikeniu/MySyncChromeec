@@ -11,25 +11,26 @@
 
 #include <ascp/ascp.h>
 
-static enum ec_status fp_command_ascp_claim(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_ascp_claim(struct ec_host_cmd_handler_args *args)
 {
-	if (sizeof(struct ec_response_fp_ascp_claim) > args->response_max) {
-		return EC_RES_RESPONSE_TOO_BIG;
+	if (sizeof(struct ec_response_fp_ascp_claim) > args->output_buf_max) {
+		return EC_HOST_CMD_RESPONSE_TOO_BIG;
 	}
 
-	struct ec_response_fp_ascp_claim *r = args->response;
-	args->response_size = sizeof(struct ec_response_fp_ascp_claim);
+	struct ec_response_fp_ascp_claim *r = args->output_buf;
+	args->output_buf_size = sizeof(struct ec_response_fp_ascp_claim);
 
 	int ret = ascp_get_claim(r);
 
 	if (ret < 0) {
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_ASCP_CLAIM, fp_command_ascp_claim,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_FP_ASCP_CLAIM, fp_command_ascp_claim,
+			      EC_VER_MASK(0), struct ec_response_fp_ascp_claim);
 
 static void print_bytes(const char *label, const uint8_t *bytes, size_t len)
 {
