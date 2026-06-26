@@ -48,12 +48,12 @@ static void hang_detect_cancel(void)
 /*****************************************************************************/
 /* Host command */
 
-static enum ec_status
-hang_detect_host_command(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hang_detect_host_command(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_hang_detect *p = args->params;
-	struct ec_response_hang_detect *r = args->response;
-	enum ec_status ret = EC_RES_SUCCESS;
+	const struct ec_params_hang_detect *p = args->input_buf;
+	struct ec_response_hang_detect *r = args->output_buf;
+	enum ec_host_cmd_status ret = EC_HOST_CMD_SUCCESS;
 	enum chipset_shutdown_reason ec_reason;
 
 	switch (p->command) {
@@ -62,7 +62,7 @@ hang_detect_host_command(struct host_cmd_handler_args *args)
 		if (reboot_timeout_sec < EC_HANG_DETECT_MIN_TIMEOUT) {
 			CPRINTS("Reboot timeout has to be greater than %ds",
 				EC_HANG_DETECT_MIN_TIMEOUT);
-			ret = EC_RES_INVALID_PARAM;
+			ret = EC_HOST_CMD_INVALID_PARAM;
 			break;
 		}
 		hang_detect_reload();
@@ -79,7 +79,7 @@ hang_detect_host_command(struct host_cmd_handler_args *args)
 		if (p->reboot_timeout_sec < EC_HANG_DETECT_MIN_TIMEOUT) {
 			CPRINTS("Reboot timeout has to be greater than %ds",
 				EC_HANG_DETECT_MIN_TIMEOUT);
-			ret = EC_RES_INVALID_PARAM;
+			ret = EC_HOST_CMD_INVALID_PARAM;
 			break;
 		}
 
@@ -92,7 +92,7 @@ hang_detect_host_command(struct host_cmd_handler_args *args)
 
 	case EC_HANG_DETECT_CMD_GET_STATUS:
 		ec_reason = chipset_get_shutdown_reason();
-		args->response_size = sizeof(*r);
+		args->output_buf_size = sizeof(*r);
 		/**
 		 * chipset_get_shutdown_reason() provides the last reason the EC
 		 * has rebooted AP. It is not aware of any AP-initiated reboot
@@ -123,14 +123,15 @@ hang_detect_host_command(struct host_cmd_handler_args *args)
 
 	default:
 		CPRINTS("Unknown command (%04x)", p->command);
-		ret = EC_RES_INVALID_PARAM;
+		ret = EC_HOST_CMD_INVALID_PARAM;
 		break;
 	}
 
 	return ret;
 }
-DECLARE_HOST_COMMAND(EC_CMD_HANG_DETECT, hang_detect_host_command,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_HANG_DETECT, hang_detect_host_command,
+		    EC_VER_MASK(0), struct ec_params_hang_detect,
+		    struct ec_response_hang_detect);
 
 /*****************************************************************************/
 /* Console command */
