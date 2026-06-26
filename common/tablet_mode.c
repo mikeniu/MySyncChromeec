@@ -371,9 +371,10 @@ void gmr_tablet_switch_disable(void)
 }
 #endif /* CONFIG_GMR_TABLET_MODE */
 
-static enum ec_status tablet_mode_command(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+tablet_mode_command(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_set_tablet_mode *p = args->params;
+	const struct ec_params_set_tablet_mode *p = args->input_buf;
 
 	if (tablet_mode_forced == false)
 		tablet_mode_store = tablet_mode;
@@ -396,15 +397,16 @@ static enum ec_status tablet_mode_command(struct host_cmd_handler_args *args)
 	default:
 		CPRINTS("Invalid EC_CMD_SET_TABLET_MODE parameter: %d",
 			p->tablet_mode);
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	notify_tablet_mode_change();
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_SET_TABLET_MODE, tablet_mode_command,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_SET_TABLET_MODE, tablet_mode_command,
+			     EC_VER_MASK(0) | EC_VER_MASK(1),
+			     struct ec_params_set_tablet_mode);
 
 #ifdef CONFIG_TABLET_MODE
 static int command_settabletmode(int argc, const char **argv)
