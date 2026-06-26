@@ -58,52 +58,53 @@ static bool pwm_is_displight(int type, int index)
 }
 #endif /* CONFIG_PLATFORM_EC_PWM_DISPLIGHT */
 
-static enum ec_status
-host_command_pwm_set_duty(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_pwm_set_duty(struct ec_host_cmd_handler_args *args)
 {
-	__maybe_unused const struct ec_params_pwm_set_duty *p = args->params;
+	__maybe_unused const struct ec_params_pwm_set_duty *p = args->input_buf;
 
 #ifdef CONFIG_PLATFORM_EC_PWM_KBLIGHT
 	if (pwm_is_kblight(p->pwm_type, p->index)) {
 		kblight_set(PWM_RAW_TO_PERCENT(p->duty));
 		kblight_enable(p->duty > 0);
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
 #endif
 #ifdef CONFIG_PLATFORM_EC_PWM_DISPLIGHT
 	if (pwm_is_displight(p->pwm_type, p->index)) {
 		displight_set(PWM_RAW_TO_PERCENT(p->duty));
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
 #endif
 
-	return EC_RES_INVALID_PARAM;
+	return EC_HOST_CMD_INVALID_PARAM;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PWM_SET_DUTY, host_command_pwm_set_duty,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_PWM_SET_DUTY, host_command_pwm_set_duty,
+			     EC_VER_MASK(0), struct ec_params_pwm_set_duty);
 
-static enum ec_status
-host_command_pwm_get_duty(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_pwm_get_duty(struct ec_host_cmd_handler_args *args)
 {
-	__maybe_unused const struct ec_params_pwm_get_duty *p = args->params;
-	__maybe_unused struct ec_response_pwm_get_duty *r = args->response;
+	__maybe_unused const struct ec_params_pwm_get_duty *p = args->input_buf;
+	__maybe_unused struct ec_response_pwm_get_duty *r = args->output_buf;
 
 #ifdef CONFIG_PLATFORM_EC_PWM_KBLIGHT
 	if (pwm_is_kblight(p->pwm_type, p->index)) {
 		r->duty = PWM_PERCENT_TO_RAW(kblight_get());
-		args->response_size = sizeof(*r);
-		return EC_RES_SUCCESS;
+		args->output_buf_size = sizeof(*r);
+		return EC_HOST_CMD_SUCCESS;
 	}
 #endif
 #ifdef CONFIG_PLATFORM_EC_PWM_DISPLIGHT
 	if (pwm_is_displight(p->pwm_type, p->index)) {
 		r->duty = PWM_PERCENT_TO_RAW(displight_get());
-		args->response_size = sizeof(*r);
-		return EC_RES_SUCCESS;
+		args->output_buf_size = sizeof(*r);
+		return EC_HOST_CMD_SUCCESS;
 	}
 #endif
 
-	return EC_RES_INVALID_PARAM;
+	return EC_HOST_CMD_INVALID_PARAM;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PWM_GET_DUTY, host_command_pwm_get_duty,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_PWM_GET_DUTY, host_command_pwm_get_duty,
+		    EC_VER_MASK(0), struct ec_params_pwm_get_duty,
+		    struct ec_response_pwm_get_duty);
