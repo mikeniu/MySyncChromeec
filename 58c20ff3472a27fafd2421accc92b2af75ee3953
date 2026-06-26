@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b35ff60_2d47d50f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-26T12:19:47Z",
+      "side": 1,
+      "message": "Please follow the commit message format.",
+      "revId": "58c20ff3472a27fafd2421accc92b2af75ee3953",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
