@@ -204,6 +204,12 @@ static int ft98xx_init(const struct device *dev)
 		return -EINVAL;
 	}
 
+	rc = ft_sensor_set_mode(FOCAL_SENSOR_MODE_LOW_POWER);
+	if (rc != 0) {
+		LOG_ERR("ft98xx sensor enter low power fail, result:%d", rc);
+		return -EINVAL;
+	}
+
 	return 0;
 }
 
