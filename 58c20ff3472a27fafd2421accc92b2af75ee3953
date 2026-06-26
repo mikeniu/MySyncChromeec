@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "993db279_aa46e1dc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-26T12:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b35ff60_2d47d50f",
+      "revId": "58c20ff3472a27fafd2421accc92b2af75ee3953",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69c162bf_9423600e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-26T12:24:04Z",
       "side": 1,
       "message": "Update `data-\u003eerrors`.",
+      "revId": "58c20ff3472a27fafd2421accc92b2af75ee3953",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bedda57b_d40c2cbf",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-26T12:58:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69c162bf_9423600e",
       "revId": "58c20ff3472a27fafd2421accc92b2af75ee3953",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
