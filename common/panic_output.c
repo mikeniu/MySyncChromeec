@@ -533,35 +533,43 @@ DECLARE_CONSOLE_COMMAND(panicinfo, command_panicinfo, "[clear]",
 /*****************************************************************************/
 /* Host commands */
 
-static enum ec_status
-host_command_panic_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_panic_info(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_get_panic_info_v1 *p = args->params;
+	const struct ec_params_get_panic_info_v1 *p = args->input_buf;
 	uint32_t pdata_size = get_panic_data_size();
 	uintptr_t pdata_start = get_panic_data_start();
 	struct panic_data *pdata = panic_get_data();
 
+	if (args->version == 1) {
+		if (args->input_buf_size <
+		    sizeof(struct ec_params_get_panic_info_v1))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
+	}
+
 	if (pdata_start && pdata_size > 0) {
-		if (pdata_size > args->response_max) {
+		if (pdata_size > args->output_buf_max) {
 			panic_printf("Panic data size %d is too "
 				     "large, truncating to %d\n",
-				     pdata_size, args->response_max);
-			pdata_size = args->response_max;
+				     pdata_size, args->output_buf_max);
+			pdata_size = args->output_buf_max;
 			if (pdata) {
 				pdata->flags |= PANIC_DATA_FLAG_TRUNCATED;
 			}
 		}
-		memcpy(args->response, (void *)pdata_start, pdata_size);
-		args->response_size = pdata_size;
+		memcpy(args->output_buf, (void *)pdata_start, pdata_size);
+		args->output_buf_size = pdata_size;
 
 		if (pdata &&
 		    !(args->version > 0 && p->preserve_old_hostcmd_flag)) {
 			/* Data has now been returned */
 			pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
 		}
+	} else {
+		args->output_buf_size = 0;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_PANIC_INFO, host_command_panic_info,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_GET_PANIC_INFO, host_command_panic_info,
+			    EC_VER_MASK(0) | EC_VER_MASK(1));
