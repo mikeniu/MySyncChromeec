@@ -718,11 +718,13 @@ ZTEST_USER_F(host_cmd_motion_sense, test_calib)
 ZTEST(host_cmd_motion_sense, test_fifo_flush__invalid_sensor_num)
 {
 	int rv;
-	struct ec_response_motion_sense response;
+	uint8_t response_buffer[RESPONSE_SENSOR_FIFO_SIZE(ALL_MOTION_SENSORS)];
+	struct ec_response_motion_sense *response =
+		(struct ec_response_motion_sense *)response_buffer;
 
-	rv = host_cmd_motion_sense_fifo_flush(/*sensor_num=*/0xff, &response,
-					      sizeof(response));
-	zassert_equal(rv, EC_RES_INVALID_PARAM);
+	rv = host_cmd_motion_sense_fifo_flush(/*sensor_num=*/0xff, response,
+					      sizeof(response_buffer));
+	zassert_equal(rv, EC_HOST_CMD_INVALID_PARAM);
 }
 
 ZTEST(host_cmd_motion_sense, test_fifo_flush)
