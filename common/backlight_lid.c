@@ -68,14 +68,15 @@ void backlight_interrupt(enum gpio_signal signal)
  * The requested state will persist until the next lid-switch or request-gpio
  * transition.
  */
-static enum ec_status
-switch_command_enable_backlight(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+switch_command_enable_backlight(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_switch_enable_backlight *p = args->params;
+	const struct ec_params_switch_enable_backlight *p = args->input_buf;
 
 	enable_backlight(p->enabled);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_SWITCH_ENABLE_BKLIGHT,
-		     switch_command_enable_backlight, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_SWITCH_ENABLE_BKLIGHT,
+			     switch_command_enable_backlight, EC_VER_MASK(0),
+			     struct ec_params_switch_enable_backlight);
