@@ -293,7 +293,8 @@ static int ft98xx_acquire_image(const struct device *dev,
 	}
 
 	memset(image_buf, 0, image_buf_size);
-	ret = ft_sensor_acquire_image_with_mode(image_buf, capture_type);
+	ret = ft_sensor_acquire_image_with_mode(image_buf, image_buf_size,
+						capture_type);
 	if (ret < 0) {
 		LOG_ERR("Failed to acquire image with capture_type %d: %d",
 			capture_type, ret);

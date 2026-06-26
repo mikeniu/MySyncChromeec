@@ -139,7 +139,8 @@ int ft_sensor_set_mode(int mode);
  * @retval 0      Success
  * @retval others Failure
  */
-int ft_sensor_acquire_image_with_mode(uint8_t *img, int mode);
+int ft_sensor_acquire_image_with_mode(uint8_t *img, size_t img_buf_size,
+				      int mode);
 
 #define LIBFP_API_VERSION "v5.2.8"
 
