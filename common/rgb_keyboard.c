@@ -489,16 +489,21 @@ void rgbkbd_task(void *u)
 	}
 }
 
-static enum ec_status hc_rgbkbd_set_color(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_rgbkbd_set_color(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_rgbkbd_set_color *p = args->params;
+	const struct ec_params_rgbkbd_set_color *p = args->input_buf;
 	int i;
 
+	if (args->input_buf_size <
+	    sizeof(*p) + p->length * sizeof(struct rgb_s))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
 	if (p->start_key + p->length > EC_RGBKBD_MAX_KEY_COUNT)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (rgbkbd_late_init())
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
 	for (i = 0; i < p->length; i++) {
 		uint8_t j = rgbkbd_table[p->start_key + i];
@@ -515,25 +520,25 @@ static enum ec_status hc_rgbkbd_set_color(struct host_cmd_handler_args *args)
 				break;
 			if (set_color_single(p->color[i], led.coord.x,
 					     led.coord.y))
-				return EC_RES_ERROR;
+				return EC_HOST_CMD_ERROR;
 		} while (led.u8 != RGBKBD_DELM);
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_RGBKBD_SET_COLOR, hc_rgbkbd_set_color,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_RGBKBD_SET_COLOR, hc_rgbkbd_set_color,
+			     EC_VER_MASK(0), struct ec_params_rgbkbd_set_color);
 
-static enum ec_status hc_rgbkbd(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status hc_rgbkbd(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_rgbkbd *p = args->params;
-	struct ec_response_rgbkbd *r = args->response;
-	enum ec_status rv = EC_RES_SUCCESS;
+	const struct ec_params_rgbkbd *p = args->input_buf;
+	struct ec_response_rgbkbd *r = args->output_buf;
+	enum ec_host_cmd_status rv = EC_HOST_CMD_SUCCESS;
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
 	if (rgbkbd_late_init())
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
 	switch (p->subcmd) {
 	case EC_RGBKBD_SUBCMD_CLEAR:
@@ -541,24 +546,25 @@ static enum ec_status hc_rgbkbd(struct host_cmd_handler_args *args)
 		break;
 	case EC_RGBKBD_SUBCMD_DEMO:
 		if (p->demo >= EC_RGBKBD_DEMO_COUNT)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		rgbkbd_demo_set(p->demo);
 		break;
 	case EC_RGBKBD_SUBCMD_SET_SCALE:
 		if (rgbkbd_set_scale(p->set_scale.scale, p->set_scale.key))
-			rv = EC_RES_ERROR;
+			rv = EC_HOST_CMD_ERROR;
 		break;
 	case EC_RGBKBD_SUBCMD_GET_CONFIG:
 		r->rgbkbd_type = rgbkbd_type;
 		break;
 	default:
-		rv = EC_RES_INVALID_PARAM;
+		rv = EC_HOST_CMD_INVALID_PARAM;
 		break;
 	}
 
 	return rv;
 }
-DECLARE_HOST_COMMAND(EC_CMD_RGBKBD, hc_rgbkbd, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_RGBKBD, hc_rgbkbd, EC_VER_MASK(0),
+		    struct ec_params_rgbkbd, struct ec_response_rgbkbd);
 
 static int int_to_rgb(const char *code, struct rgb_s *rgb)
 {
