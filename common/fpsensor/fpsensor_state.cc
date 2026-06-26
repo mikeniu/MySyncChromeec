@@ -142,42 +142,45 @@ int fp_get_next_event(uint8_t *out)
 }
 DECLARE_EVENT_SOURCE(EC_MKBP_EVENT_FINGERPRINT, fp_get_next_event);
 
-static enum ec_status fp_command_tpm_seed(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_tpm_seed(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params =
-		static_cast<const ec_params_fp_seed *>(args->params);
+		static_cast<const ec_params_fp_seed *>(args->input_buf);
 
 	if (params->struct_version != FP_TEMPLATE_FORMAT_VERSION) {
 		CPRINTS("Invalid seed format %d", params->struct_version);
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	if (global_context.fp_encryption_status & FP_ENC_STATUS_SEED_SET) {
 		CPRINTS("Seed has already been set.");
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 	}
 	memcpy(global_context.tpm_seed.data(), params->seed,
 	       sizeof(global_context.tpm_seed));
 	global_context.fp_encryption_status |= FP_ENC_STATUS_SEED_SET;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_SEED, fp_command_tpm_seed, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_SEED, fp_command_tpm_seed,
+			     EC_VER_MASK(0), struct ec_params_fp_seed);
 
-static enum ec_status
-fp_command_encryption_status(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_encryption_status(struct ec_host_cmd_handler_args *args)
 {
-	auto *r =
-		static_cast<ec_response_fp_encryption_status *>(args->response);
+	auto *r = static_cast<ec_response_fp_encryption_status *>(
+		args->output_buf);
 
 	r->valid_flags = FP_ENC_STATUS_SEED_SET;
 	r->status = global_context.fp_encryption_status;
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_ENC_STATUS, fp_command_encryption_status,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_FP_ENC_STATUS,
+			      fp_command_encryption_status, EC_VER_MASK(0),
+			      struct ec_response_fp_encryption_status);
 
 static int validate_fp_mode(const uint32_t mode)
 {
@@ -331,12 +334,13 @@ enum ec_status fp_set_sensor_mode(
 	return EC_RES_SUCCESS;
 }
 
-static enum ec_status fp_command_mode(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_mode(struct ec_host_cmd_handler_args *args)
 {
-	const auto *p = static_cast<const ec_params_fp_mode *>(args->params);
+	const auto *p = static_cast<const ec_params_fp_mode *>(args->input_buf);
 	const auto *p_1 =
-		static_cast<const ec_params_fp_mode_v1 *>(args->params);
-	auto *r = static_cast<ec_response_fp_mode *>(args->response);
+		static_cast<const ec_params_fp_mode_v1 *>(args->input_buf);
+	auto *r = static_cast<ec_response_fp_mode *>(args->output_buf);
 	std::optional<std::span<const uint8_t, FP_MAC_LENGTH> > mac =
 		std::nullopt;
 	uint32_t mode_out;
@@ -350,23 +354,27 @@ static enum ec_status fp_command_mode(struct host_cmd_handler_args *args)
 	r->mode = mode_out;
 
 	if (ret == EC_RES_SUCCESS)
-		args->response_size = sizeof(*r);
+		args->output_buf_size = sizeof(*r);
 
-	return ret;
+	return static_cast<enum ec_host_cmd_status>(ret);
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_MODE, fp_command_mode,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER(EC_CMD_FP_MODE, fp_command_mode,
+		    EC_VER_MASK(0) | EC_VER_MASK(1),
+		    SMALLEST_TYPE(struct ec_params_fp_mode,
+				  struct ec_params_fp_mode_v1),
+		    struct ec_response_fp_mode);
 
-static enum ec_status fp_command_context(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_context(struct ec_host_cmd_handler_args *args)
 {
 	const auto *p =
-		static_cast<const ec_params_fp_context_v1 *>(args->params);
+		static_cast<const ec_params_fp_context_v1 *>(args->input_buf);
 	uint32_t mode_output;
 
 	switch (p->action) {
 	case FP_CONTEXT_ASYNC:
 		if (global_context.sensor_mode & FP_MODE_RESET_SENSOR)
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 
 		/**
 		 * Trigger a call to fp_reset_and_clear_context() by
@@ -374,12 +382,12 @@ static enum ec_status fp_command_context(struct host_cmd_handler_args *args)
 		 * fp_sensor_open(), this must be asynchronous because
 		 * fp_sensor_open() can take ~175 ms. See http://b/137288498.
 		 */
-		return fp_set_sensor_mode(FP_MODE_RESET_SENSOR, &mode_output,
-					  std::nullopt);
+		return static_cast<enum ec_host_cmd_status>(fp_set_sensor_mode(
+			FP_MODE_RESET_SENSOR, &mode_output, std::nullopt));
 
 	case FP_CONTEXT_GET_RESULT:
 		if (global_context.sensor_mode & FP_MODE_RESET_SENSOR)
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 
 		memcpy(global_context.user_id.data(), p->userid,
 		       sizeof(global_context.user_id));
@@ -394,12 +402,13 @@ static enum ec_status fp_command_context(struct host_cmd_handler_args *args)
 			}
 		}
 
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
 
-	return EC_RES_INVALID_PARAM;
+	return EC_HOST_CMD_INVALID_PARAM;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_CONTEXT, fp_command_context, EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_CONTEXT, fp_command_context,
+			     EC_VER_MASK(1), struct ec_params_fp_context_v1);
 
 int fp_enable_positive_match_secret(uint16_t fgr,
 				    struct positive_match_secret_state *state)
@@ -466,36 +475,38 @@ enum ec_status fp_read_match_secret(
 	return EC_RES_SUCCESS;
 }
 
-static enum ec_status
-fp_command_read_match_secret(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_read_match_secret(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params =
 		static_cast<const ec_params_fp_read_match_secret *>(
-			args->params);
-	auto *response =
-		static_cast<ec_response_fp_read_match_secret *>(args->response);
+			args->input_buf);
+	auto *response = static_cast<ec_response_fp_read_match_secret *>(
+		args->output_buf);
 	int8_t fgr = params->fgr;
 
 	ec_status ret =
 		fp_read_match_secret(fgr, response->positive_match_secret);
 
 	if (ret != EC_RES_SUCCESS) {
-		return ret;
+		return static_cast<enum ec_host_cmd_status>(ret);
 	}
 
-	args->response_size = sizeof(*response);
+	args->output_buf_size = sizeof(*response);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_READ_MATCH_SECRET, fp_command_read_match_secret,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_FP_READ_MATCH_SECRET, fp_command_read_match_secret,
+		    EC_VER_MASK(0), struct ec_params_fp_read_match_secret,
+		    struct ec_response_fp_read_match_secret);
 
-static enum ec_status fp_command_sign_match(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_sign_match(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params =
-		static_cast<const ec_params_fp_sign_match *>(args->params);
+		static_cast<const ec_params_fp_sign_match *>(args->input_buf);
 	auto *response =
-		static_cast<ec_response_fp_sign_match *>(args->response);
+		static_cast<ec_response_fp_sign_match *>(args->output_buf);
 
 	/*
 	 * The context for signing/verifying messages is Android user id
@@ -515,7 +526,7 @@ static enum ec_status fp_command_sign_match(struct host_cmd_handler_args *args)
 	std::span<uint8_t, FP_MAC_LENGTH> signature{ response->signature };
 
 	if (!fingerprint_auth_enabled()) {
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 	}
 
 	timestamp_t now = get_time();
@@ -528,22 +539,23 @@ static enum ec_status fp_command_sign_match(struct host_cmd_handler_args *args)
 	if (FP_NO_SUCH_TEMPLATE == state_copy.template_matched ||
 	    !state_copy.readable) {
 		CPRINTS("No match to be signed");
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 	}
 
 	if (timestamp_expired(state_copy.deadline, &now)) {
 		CPRINTS("Deadline has passed");
-		return EC_RES_TIMEOUT;
+		return EC_HOST_CMD_TIMEOUT;
 	}
 
 	if (sign_message(context, operation, challenge, signature)) {
 		CPRINTS("Failed to sign message");
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	}
 
-	args->response_size = sizeof(*response);
+	args->output_buf_size = sizeof(*response);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_SIGN_MATCH, fp_command_sign_match,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_FP_SIGN_MATCH, fp_command_sign_match, EC_VER_MASK(0),
+		    struct ec_params_fp_sign_match,
+		    struct ec_response_fp_sign_match);
