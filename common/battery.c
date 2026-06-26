@@ -560,26 +560,31 @@ static void ac_change(void)
 DECLARE_HOOK(HOOK_AC_CHANGE, ac_change, HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_INIT, ac_change, HOOK_PRIO_DEFAULT);
 
-static enum ec_status battery_command_cutoff(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+battery_command_cutoff(struct ec_host_cmd_handler_args *args)
 {
 	const struct ec_params_battery_cutoff *p;
 
 	if (args->version == 1) {
-		p = args->params;
+		if (args->input_buf_size <
+		    sizeof(struct ec_params_battery_cutoff))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
+		p = args->input_buf;
 		if (p->flags & EC_BATTERY_CUTOFF_FLAG_AT_SHUTDOWN) {
 			battery_cutoff_state = BATTERY_CUTOFF_STATE_SCHEDULED;
 			CUTOFFPRINTS("at-shutdown is scheduled");
-			return EC_RES_SUCCESS;
+			return EC_HOST_CMD_SUCCESS;
 		}
 	}
 
 	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN))
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
-	return battery_cutoff_start();
+	return battery_cutoff_start() == EC_SUCCESS ? EC_HOST_CMD_SUCCESS :
+						      EC_HOST_CMD_ERROR;
 }
-DECLARE_HOST_COMMAND(EC_CMD_BATTERY_CUT_OFF, battery_command_cutoff,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_BATTERY_CUT_OFF, battery_command_cutoff,
+			    EC_VER_MASK(0) | EC_VER_MASK(1));
 
 static void check_pending_cutoff(void)
 {
@@ -696,18 +701,18 @@ DECLARE_CONSOLE_COMMAND(battparam, console_command_battery_vendor_param,
 			"<param> [value]",
 			"Get or set battery vendor parameters");
 
-static enum ec_status
-host_command_battery_vendor_param(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_battery_vendor_param(struct ec_host_cmd_handler_args *args)
 {
 	int rv;
-	const struct ec_params_battery_vendor_param *p = args->params;
-	struct ec_response_battery_vendor_param *r = args->response;
+	const struct ec_params_battery_vendor_param *p = args->input_buf;
+	struct ec_response_battery_vendor_param *r = args->output_buf;
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
 	if (p->mode != BATTERY_VENDOR_PARAM_MODE_GET &&
 	    p->mode != BATTERY_VENDOR_PARAM_MODE_SET)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (p->mode == BATTERY_VENDOR_PARAM_MODE_SET) {
 		rv = battery_set_vendor_param(p->param, p->value);
@@ -716,10 +721,12 @@ host_command_battery_vendor_param(struct host_cmd_handler_args *args)
 	}
 
 	rv = battery_get_vendor_param(p->param, &r->value);
-	return rv;
+	return rv == EC_SUCCESS ? EC_HOST_CMD_SUCCESS : EC_HOST_CMD_ERROR;
 }
-DECLARE_HOST_COMMAND(EC_CMD_BATTERY_VENDOR_PARAM,
-		     host_command_battery_vendor_param, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_BATTERY_VENDOR_PARAM,
+		    host_command_battery_vendor_param, EC_VER_MASK(0),
+		    struct ec_params_battery_vendor_param,
+		    struct ec_response_battery_vendor_param);
 #endif /* CONFIG_BATTERY_VENDOR_PARAM */
 
 void battery_compensate_params(struct batt_params *batt)
@@ -771,18 +778,20 @@ void battery_compensate_params(struct batt_params *batt)
 }
 
 #ifdef CONFIG_CHARGER
-static enum ec_status battery_display_soc(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+battery_display_soc(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_display_soc *r = args->response;
+	struct ec_response_display_soc *r = args->output_buf;
 
 	r->display_soc = charge_get_display_charge();
 	r->full_factor = batt_host_full_factor * 10;
 	r->shutdown_soc = batt_host_shutdown_pct * 10;
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_DISPLAY_SOC, battery_display_soc, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_DISPLAY_SOC, battery_display_soc,
+			      EC_VER_MASK(0), struct ec_response_display_soc);
 #endif
 
 __overridable void board_battery_compensate_params(struct batt_params *batt)
