@@ -503,7 +503,7 @@ enum tbt_compat_rounded_support get_tbt_rounded_support(int port)
  * Bit 3: Active Link Uni-Direction/Bi-Direction
  * Bit 4: Retimer/Rediriver cable
  */
-uint8_t get_pd_control_flags(int port)
+__override uint8_t get_pd_control_flags(int port)
 {
 	uint8_t control_flags = 0;
 
