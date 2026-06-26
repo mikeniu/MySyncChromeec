@@ -38,9 +38,10 @@ BUILD_ASSERT(ARRAY_SIZE(vstore_slots) <= EC_VSTORE_SLOT_MAX);
 /*
  * vstore_info - Get slot count and mask of locked slots.
  */
-static enum ec_status vstore_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+vstore_info(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_vstore_info *r = args->response;
+	struct ec_response_vstore_info *r = args->output_buf;
 	int i;
 
 	r->slot_count = CONFIG_VSTORE_SLOT_COUNT;
@@ -49,53 +50,59 @@ static enum ec_status vstore_info(struct host_cmd_handler_args *args)
 		if (vstore_slots[i].locked)
 			r->slot_locked |= 1 << i;
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_VSTORE_INFO, vstore_info, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_VSTORE_INFO, vstore_info, EC_VER_MASK(0),
+			      struct ec_response_vstore_info);
 
 /*
  * vstore_read - Read slot from temporary secure storage.
  *
  * Response is EC_VSTORE_SLOT_SIZE bytes of data.
  */
-static enum ec_status vstore_read(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+vstore_read(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_vstore_read *p = args->params;
-	struct ec_response_vstore_read *r = args->response;
+	const struct ec_params_vstore_read *p = args->input_buf;
+	struct ec_response_vstore_read *r = args->output_buf;
 
 	if (p->slot >= CONFIG_VSTORE_SLOT_COUNT)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	memcpy(r->data, vstore_slots[p->slot].data, EC_VSTORE_SLOT_SIZE);
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_VSTORE_READ, vstore_read, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_VSTORE_READ, vstore_read, EC_VER_MASK(0),
+		    struct ec_params_vstore_read,
+		    struct ec_response_vstore_read);
 
 /*
  * vstore_write - Write temporary secure storage slot and lock it.
  */
-static enum ec_status vstore_write(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+vstore_write(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_vstore_write *p = args->params;
+	const struct ec_params_vstore_write *p = args->input_buf;
 	struct vstore_slot *slot;
 
 	if (p->slot >= CONFIG_VSTORE_SLOT_COUNT)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	slot = &vstore_slots[p->slot];
 
 	if (slot->locked)
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 	slot->locked = 1;
 	memcpy(slot->data, p->data, EC_VSTORE_SLOT_SIZE);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_VSTORE_WRITE, vstore_write, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_VSTORE_WRITE, vstore_write, EC_VER_MASK(0),
+			     struct ec_params_vstore_write);
 
 test_export_static void vstore_clear_lock(void)
 {
