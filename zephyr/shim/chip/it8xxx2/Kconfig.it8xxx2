@@ -1,0 +1,16 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+if PLATFORM_EC
+
+config CROS_SYSTEM_IT8XXX2_PRE_INIT_PRIORITY
+	int "System pre-initialization priority"
+	default 60
+	depends on SOC_FAMILY_ITE_EC
+	help
+	  This sets the priority of the ITE it8xxx2 chip system initialization.
+	  The chip system initialization verifies the integrity of the BBRAM
+	  must be a lower priority than CONFIG_BBRAM_INIT_PRIORITY and
+
+endif # PLATFORM_EC
