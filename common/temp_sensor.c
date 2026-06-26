@@ -155,22 +155,23 @@ DECLARE_CONSOLE_COMMAND(temps, command_temps, NULL,
 /*****************************************************************************/
 /* Host commands */
 
-static enum ec_status
-temp_sensor_command_get_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+temp_sensor_command_get_info(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_temp_sensor_get_info *p = args->params;
-	struct ec_response_temp_sensor_get_info *r = args->response;
+	const struct ec_params_temp_sensor_get_info *p = args->input_buf;
+	struct ec_response_temp_sensor_get_info *r = args->output_buf;
 	int id = p->id;
 
 	if (id >= TEMP_SENSOR_COUNT)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
 	strzcpy(r->sensor_name, temp_sensors[id].name, sizeof(r->sensor_name));
 	r->sensor_type = temp_sensors[id].type;
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_TEMP_SENSOR_GET_INFO, temp_sensor_command_get_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_TEMP_SENSOR_GET_INFO, temp_sensor_command_get_info,
+		    EC_VER_MASK(0), struct ec_params_temp_sensor_get_info,
+		    struct ec_response_temp_sensor_get_info);
