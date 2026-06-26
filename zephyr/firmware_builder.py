@@ -644,7 +644,14 @@ def test(opts):
 
     # Run tests from Makefile.cq because make knows how to run things
     # in parallel.
-    cmd = ["make", "-f", "Makefile.cq", f"-j{opts.cpus}", "test"]
+    cmd = [
+        "make",
+        "-f",
+        "Makefile.cq",
+        f"-j{opts.cpus}",
+        f"CPUS={opts.cpus}",
+        "test",
+    ]
     env = os.environ.copy()
     env.update(init_toolchain())
     if opts.code_coverage:
