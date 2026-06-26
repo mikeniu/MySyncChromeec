@@ -175,19 +175,20 @@ static int ec_command_pse_status(int port, uint8_t *status)
 	return EC_SUCCESS;
 }
 
-static enum ec_status ec_command_pse(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+ec_command_pse(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_pse *p = args->params;
+	const struct ec_params_pse *p = args->input_buf;
 	int err = 0;
 
 	if (p->port >= LTC4291_PORT_MAX)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	switch (p->cmd) {
 	case EC_PSE_STATUS: {
-		struct ec_response_pse_status *r = args->response;
+		struct ec_response_pse_status *r = args->output_buf;
 
-		args->response_size = sizeof(*r);
+		args->output_buf_size = sizeof(*r);
 		err = ec_command_pse_status(p->port, &r->status);
 		break;
 	}
@@ -198,12 +199,13 @@ static enum ec_status ec_command_pse(struct host_cmd_handler_args *args)
 		err = pse_port_disable(p->port);
 		break;
 	default:
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	if (err)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PSE, ec_command_pse, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_PSE, ec_command_pse, EC_VER_MASK(0),
+		    struct ec_params_pse, struct ec_response_pse_status);
