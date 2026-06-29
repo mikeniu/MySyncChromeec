@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "689fc23a_4736e669",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1528512
+      },
+      "writtenOn": "2026-06-29T02:51:12Z",
+      "side": 1,
+      "message": "Hi Jayvik, We need a verified +1, could we add it based on our verification? Or do you need Compal to help verify for the V+1?\n\nThanks",
+      "revId": "125c5236f13f93793f3f1228f4ac716854b83a90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
