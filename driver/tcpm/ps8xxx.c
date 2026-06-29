@@ -17,6 +17,7 @@
 
 #include "common.h"
 #include "console.h"
+#include "hooks.h"
 #include "ps8xxx.h"
 #include "tcpm/tcpci.h"
 #include "tcpm/tcpm.h"
@@ -87,6 +88,9 @@ static uint8_t ps8xxx_role_control_delay_ms[CONFIG_USB_PD_PORT_MAX_COUNT];
  */
 static bool ps8815_disable_rp_detect[CONFIG_USB_PD_PORT_MAX_COUNT];
 static bool ps8815_disconnected[CONFIG_USB_PD_PORT_MAX_COUNT];
+#ifdef CONFIG_USB_PD_TCPC_LOW_POWER
+static bool ps8815_lpm_active[CONFIG_USB_PD_PORT_MAX_COUNT];
+#endif
 /*
  * timestamp of the next possible toggle to ensure the 2-ms spacing
  * between IRQ_HPD.
@@ -770,8 +774,32 @@ static int ps8xxx_get_chip_info(int port, int live,
 }
 
 #ifdef CONFIG_USB_PD_TCPC_LOW_POWER
+static void ps8815_lpm_workaround(void);
+DECLARE_DEFERRED(ps8815_lpm_workaround);
+
+static void ps8815_lpm_workaround(void)
+{
+	bool any_active = false;
+	int val;
+
+	for (int i = 0; i < board_get_usb_pd_port_count(); i++) {
+		if (ps8815_lpm_active[i]) {
+			any_active = true;
+			tcpc_read(i, PS8XXX_REG_VENDOR_ID_L, &val);
+		}
+	}
+
+	if (any_active)
+		hook_call_deferred(&ps8815_lpm_workaround_data, SECOND);
+}
+
 static int ps8xxx_enter_low_power_mode(int port)
 {
+	if (product_id[port] == PS8815_PRODUCT_ID) {
+		ps8815_lpm_active[port] = true;
+		hook_call_deferred(&ps8815_lpm_workaround_data, SECOND);
+	}
+
 	/*
 	 * PS8751/PS8815/PS8745 has the auto sleep function that enters
 	 * low power mode on its own in ~2 seconds. Other chips
@@ -783,6 +811,12 @@ static int ps8xxx_enter_low_power_mode(int port)
 		return EC_SUCCESS;
 
 	return tcpci_enter_low_power_mode(port);
+}
+
+static void ps8xxx_wake_low_power_mode(int port)
+{
+	if (product_id[port] == PS8815_PRODUCT_ID)
+		ps8815_lpm_active[port] = false;
 }
 #endif
 
@@ -1052,6 +1086,7 @@ const struct tcpm_drv ps8xxx_tcpm_drv = {
 	.set_src_ctrl = tcpci_tcpm_set_src_ctrl,
 #ifdef CONFIG_USB_PD_TCPC_LOW_POWER
 	.enter_low_power_mode = ps8xxx_enter_low_power_mode,
+	.wake_low_power_mode = ps8xxx_wake_low_power_mode,
 #endif
 	.set_bist_test_mode = tcpci_set_bist_test_mode,
 	.get_bist_test_mode = &tcpci_get_bist_test_mode,
