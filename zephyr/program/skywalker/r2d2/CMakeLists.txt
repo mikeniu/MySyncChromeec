@@ -6,3 +6,4 @@
 zephyr_include_directories("include")
 zephyr_library_sources("src/dp_alt_mode.c")
 zephyr_library_sources("src/pen_charge.c")
+zephyr_library_sources("src/battery_policy.c")

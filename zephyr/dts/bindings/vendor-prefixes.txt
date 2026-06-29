@@ -30,5 +30,6 @@ powertech	Battery vendor
 pow-tech	Battery vendor
 smp	Battery vendor
 sunwoda	Battery vendor
+swd	Battery vendor
 sdi	Samsung SDI
 convenientpower	WPC vendor

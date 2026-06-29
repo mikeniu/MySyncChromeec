@@ -645,6 +645,8 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	/* Disable interrupts before jump */
 	interrupt_disable_all();
 
+	chip_pre_system_jump();
+
 #ifdef CONFIG_DMA_CROS
 	/* Disable all DMA channels to avoid memory corruption */
 	dma_disable_all();
@@ -1996,6 +1998,10 @@ __overridable int board_write_poweron_conf(const uint8_t *poweron_conf)
 		return EC_ERROR_UNIMPLEMENTED;
 }
 #endif /* CONFIG_POWERON_CONF_LEN */
+
+__overridable void chip_pre_system_jump(void)
+{
+}
 
 __test_only void system_common_reset_state(void)
 {

@@ -61,6 +61,10 @@ void mkbp_button_update(enum keyboard_button_type button, int is_pressed)
 	case KEYBOARD_BUTTON_POWER:
 		mkbp_button_state &= ~BIT(EC_MKBP_POWER_BUTTON);
 		mkbp_button_state |= (is_pressed << EC_MKBP_POWER_BUTTON);
+		if (!is_pressed && power_button_is_eating_release()) {
+			CPRINTS("MKBP eat PB release");
+			return;
+		}
 		break;
 
 	case KEYBOARD_BUTTON_VOLUME_UP:

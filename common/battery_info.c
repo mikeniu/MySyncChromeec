@@ -324,7 +324,8 @@ bool battery_is_below_threshold(const struct batt_params *batt,
 				enum batt_threshold_type type)
 {
 	/* If the state of charge isn't reliable, assume the level is fine. */
-	if (batt->flags & BATT_FLAG_BAD_STATE_OF_CHARGE) {
+	if ((batt->flags & BATT_FLAG_BAD_STATE_OF_CHARGE) ||
+	    (battery_get_disconnect_state() != BATTERY_NOT_DISCONNECTED)) {
 		return false;
 	}
 

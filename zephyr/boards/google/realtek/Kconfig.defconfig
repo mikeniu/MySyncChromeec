@@ -35,3 +35,7 @@ config PLATFORM_EC_ADC_RESOLUTION
 	default 12
 
 endif # ADC
+
+config KERNEL_ENTRY
+	default "__trampoline" if REALTEK_RTS5912_TRAMPOLINE
+

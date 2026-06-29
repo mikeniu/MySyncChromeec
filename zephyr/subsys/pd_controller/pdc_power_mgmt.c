@@ -2234,7 +2234,7 @@ static void run_src_policies(struct pdc_port_t *port)
 		queue_internal_cmd(port, CMD_PDC_SET_BATTERY_STATUS);
 		return;
 	} else if (atomic_test_and_clear_bit(
-			   port->snk_policy.flags,
+			   port->src_policy.flags,
 			   SRC_POLICY_UPDATE_BATTERY_CAPABILITY)) {
 		/* Update the PDC with the correct battery capabilities. */
 		queue_internal_cmd(port, CMD_PDC_SET_BATTERY_CAPABILITY);
@@ -4246,6 +4246,7 @@ static void init_port_variables(struct pdc_port_t *port,
 	port->last_state = PDC_INIT;
 	port->next_state = PDC_INIT;
 	port->send_cmd_return_state = PDC_INVALID;
+	discovery_info_init(port);
 }
 
 /**
@@ -5870,6 +5871,12 @@ uint8_t pdc_power_mgmt_get_dp_pin_mode(int port)
 
 	/* Make sure port is connected and PD capable */
 	if (!pdc_power_mgmt_is_connected(port)) {
+		return 0;
+	}
+
+	/* Check if Alternate Mode is actually active */
+	if (!(pdc_data[port]->port.connector_status.conn_partner_flags &
+	      CONNECTOR_PARTNER_FLAG_ALTERNATE_MODE)) {
 		return 0;
 	}
 

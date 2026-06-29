@@ -46,6 +46,13 @@ static int s5_inactivity_timeout = 10;
 static const int s5_inactivity_timeout = 10;
 #endif
 
+static int s5_inactivity_timer_enabled = 1;
+
+void power_set_s5_inactivity_timer_enable(int enable)
+{
+	s5_inactivity_timer_enabled = enable;
+}
+
 static const char *const state_names[] = {
 	"G3",	    "S5",	"S4",	  "S3",	    "S0",
 #ifdef CONFIG_POWER_S0IX
@@ -514,7 +521,9 @@ static enum power_state power_common_state(void)
 		power_wait_signals(0);
 
 		/* Wait for inactivity timeout, if desired */
-		if (s5_inactivity_timeout == 0) {
+		if (!s5_inactivity_timer_enabled) {
+			task_wait_event(-1);
+		} else if (s5_inactivity_timeout == 0) {
 			return POWER_S5G3;
 		} else if (s5_inactivity_timeout < 0) {
 			task_wait_event(-1);

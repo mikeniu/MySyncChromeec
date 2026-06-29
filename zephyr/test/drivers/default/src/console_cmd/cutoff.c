@@ -65,7 +65,7 @@ ZTEST_USER(console_cmd_cutoff, test_at_shutdown)
 	zassert_equal(EC_RES_SUCCESS, rv, "Expected %d, but got %d",
 		      EC_RES_SUCCESS, rv);
 	zassert_false(battery_is_cut_off(), NULL);
-	hook_notify(HOOK_CHIPSET_SHUTDOWN);
+	hook_notify(HOOK_CHIPSET_SHUTDOWN_COMPLETE);
 	zassert_true(WAIT_FOR(battery_is_cut_off(), 2105000, k_msleep(250)),
 		     NULL);
 }
@@ -82,7 +82,7 @@ ZTEST_USER(console_cmd_cutoff, test_clear_pending_shutdown)
 	hook_notify(HOOK_AC_CHANGE);
 
 	/* The shutdown will no longer cutoff the battery */
-	hook_notify(HOOK_CHIPSET_SHUTDOWN);
+	hook_notify(HOOK_CHIPSET_SHUTDOWN_COMPLETE);
 	zassert_false(WAIT_FOR(battery_is_cut_off(), 2105000, k_msleep(250)),
 		      NULL);
 }

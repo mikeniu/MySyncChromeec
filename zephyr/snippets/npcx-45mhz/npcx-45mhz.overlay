@@ -1,0 +1,13 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+ &pcc {
+        clock-frequency = <DT_FREQ_M(90)>; /* OFMCLK runs at 90 MHz */
+        core-prescaler = <2>; /* CORE_CLK runs at 45 MHz */
+        apb1-prescaler = <6>; /* APB1_CLK runs at 15 MHz */
+        apb2-prescaler = <2>; /* APB2_CLK runs at 45 MHz */
+        apb3-prescaler = <2>; /* APB3_CLK runs at 45 MHz */
+        apb4-prescaler = <6>; /* APB4_CLK runs at 15 MHz */
+};

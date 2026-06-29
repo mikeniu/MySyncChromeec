@@ -84,7 +84,7 @@ ZTEST(vendor_command, test_usb_pairing)
 {
 	const struct queue *tx_queue = usb_update.consumer.queue;
 	uint8_t resp;
-	struct pair_challenge challenge;
+	struct pair_challenge challenge = { 0 };
 
 	/* fail with no payload */
 	send_vendor_command(UPDATE_EXTRA_CMD_PAIR_CHALLENGE, NULL, 0);

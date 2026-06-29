@@ -10,15 +10,18 @@
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/emul_stub_device.h>
+#include <zephyr/logging/log.h>
+
+LOG_MODULE_REGISTER(emul_rt3645, LOG_LEVEL_INF);
 
 #define DT_DRV_COMPAT richtek_rt3645
 
 #define RT3645_PAGE_MAX 0x0D
-#define RT3645_PAGE_REGS_MAX 0x12
+#define RT3645_PAGE_REGS_MAX 0x13
 
-#define RT3645_CONFIG_MODE_KEY_MAX 4
+#define RT3645_CONFIG_MODE_KEY_MAX 3
 
-#define RT3645_CONFIG_MODE_KEY { 0x24, 0x25, 0x26, 0x27 }
+#define RT3645_CONFIG_MODE_KEY { 0x24, 0x54, 0x02 }
 
 const static uint8_t rt3645_config_mode_key[] = RT3645_CONFIG_MODE_KEY;
 
@@ -40,6 +43,7 @@ struct rt3645_data {
 	uint8_t config_mode_wr_pos;
 	bool in_config_mode;
 	uint8_t config_mode_data[RT3645_CONFIG_MODE_KEY_MAX];
+	uint8_t nvm_stat;
 	struct rt3645_regs regs;
 };
 
@@ -52,6 +56,7 @@ void rt3645_emul_reset_regs(const struct emul *emul)
 	regs->page = 0;
 	data->in_config_mode = false;
 	data->config_mode_wr_pos = 0;
+	data->nvm_stat = 0xE0;
 	memcpy(&regs->page_regs, &stored_page_regs,
 	       sizeof(struct rt3645_page_regs));
 }
@@ -65,6 +70,9 @@ int rt3645_emul_read_reg(const struct emul *emul, int reg, uint8_t *val)
 		return -EINVAL;
 	}
 	switch (reg) {
+	case NVM_STAT_REG:
+		*val = data->nvm_stat;
+		return 0;
 	case PAGE_SET_REG:
 		*val = regs->page;
 		return 0;
@@ -76,6 +84,9 @@ int rt3645_emul_read_reg(const struct emul *emul, int reg, uint8_t *val)
 	}
 
 	if (reg <= RT3645_PAGE_REGS_MAX) {
+		if (reg == 0x13 && regs->page != RT3645_PAGE_D) {
+			return -EINVAL;
+		}
 		*val = regs->page_regs.data[regs->page][reg];
 		return 0;
 	}
@@ -100,9 +111,12 @@ static int rt3645_emul_read(const struct emul *emul, int reg, uint8_t *val,
 	}
 	switch (reg) {
 	case NVM_STAT_REG:
-		break;
+		*val = data->nvm_stat;
+		LOG_INF("Read NVM_STAT_REG val=0x%x", *val);
+		return 0;
 	case PAGE_SET_REG:
 		*val = regs->page;
+		LOG_INF("Read PAGE_SET_REG val=0x%x", *val);
 		return 0;
 	case PRODUCT_ID_REG:
 		*val = regs->product_id;
@@ -112,10 +126,16 @@ static int rt3645_emul_read(const struct emul *emul, int reg, uint8_t *val,
 	}
 
 	if (reg <= RT3645_PAGE_REGS_MAX) {
+		if (reg == 0x13 && regs->page != RT3645_PAGE_D) {
+			return -EINVAL;
+		}
 		*val = regs->page_regs.data[regs->page][reg];
+		LOG_INF("Read page %d reg 0x%x val=0x%x", regs->page, reg,
+			*val);
 		return 0;
 	}
 
+	LOG_ERR("Read invalid reg 0x%x", reg);
 	return -EINVAL;
 }
 
@@ -131,6 +151,7 @@ static int rt3645_emul_write(const struct emul *emul, int reg, uint8_t val,
 	}
 	switch (reg) {
 	case NVM_PRGRM_CTRL_REG:
+		LOG_INF("NVM_PRGRM_CTRL_REG write val=0x%x", val);
 		if (!data->in_config_mode) {
 			return 0;
 		}
@@ -143,7 +164,8 @@ static int rt3645_emul_write(const struct emul *emul, int reg, uint8_t val,
 		}
 		return 0;
 	case PAGE_SET_REG:
-		if (data->in_config_mode && val <= RT3645_PAGE_MAX)
+		LOG_INF("PAGE_SET_REG write val=0x%x", val);
+		if (val <= RT3645_PAGE_MAX)
 			regs->page = val;
 		return 0;
 	case CONFIG_MODE_REG:
@@ -159,6 +181,7 @@ static int rt3645_emul_write(const struct emul *emul, int reg, uint8_t val,
 				    rt3645_config_mode_key,
 				    RT3645_CONFIG_MODE_KEY_MAX) == 0)) {
 				data->in_config_mode = true;
+				LOG_INF("Entered config mode");
 			}
 		}
 		return 0;
@@ -167,14 +190,25 @@ static int rt3645_emul_write(const struct emul *emul, int reg, uint8_t val,
 	}
 
 	if (reg <= RT3645_PAGE_REGS_MAX) {
+		if (reg == 0x13 && regs->page != RT3645_PAGE_D) {
+			LOG_ERR("Write to reg 0x13 failed, not on page D (current=%d)",
+				regs->page);
+			return -EINVAL;
+		}
 		/* Emul needs to be in config mode before modifying paged
 		 * registers */
 		if (data->in_config_mode) {
+			LOG_INF("Write page %d reg 0x%x val=0x%x", regs->page,
+				reg, val);
 			regs->page_regs.data[regs->page][reg] = val;
+		} else {
+			LOG_WRN("Write page %d reg 0x%x val=0x%x ignored (not in config mode)",
+				regs->page, reg, val);
 		}
 		return 0;
 	}
 
+	LOG_ERR("Write invalid reg 0x%x", reg);
 	return -EINVAL;
 }
 
@@ -191,6 +225,21 @@ static int rt3645_emul_init(const struct emul *emul,
 	rt3645_emul_reset_regs(emul);
 
 	return 0;
+}
+
+void rt3645_emul_set_nvm_stat(const struct emul *emul, uint8_t stat)
+{
+	struct rt3645_data *data = emul->data;
+
+	data->nvm_stat = stat;
+}
+
+void rt3645_emul_set_product_id(const struct emul *emul, uint8_t id)
+{
+	struct rt3645_data *data = emul->data;
+	struct rt3645_regs *regs = &data->regs;
+
+	regs->product_id = id;
 }
 
 #define INIT_RT3645_EMUL(n)                                        \

@@ -77,9 +77,10 @@ static void test_uart_hc_read_next(int ver)
 
 	read_args.response_size = 0;
 	zassert_equal(EC_RES_SUCCESS, host_command_process(&read_args));
-	zassert_equal('\0', response[read_args.response_size],
+	zassert_true(read_args.response_size > 0, "No data read");
+	zassert_equal('\0', response[read_args.response_size - 1],
 		      "Last byte of response is not '\\0' (got 0x%x)",
-		      response[read_args.response_size]);
+		      response[read_args.response_size - 1]);
 
 	/*
 	 * Whole buffer until snapshot should be in response, check if it ends
@@ -96,9 +97,10 @@ static void test_uart_hc_read_next(int ver)
 
 	read_args.response_size = 0;
 	zassert_equal(EC_RES_SUCCESS, host_command_process(&read_args));
-	zassert_equal('\0', response[read_args.response_size],
+	zassert_true(read_args.response_size > 0, "No data read");
+	zassert_equal('\0', response[read_args.response_size - 1],
 		      "Last byte of response is not '\\0' (got 0x%x)",
-		      response[read_args.response_size]);
+		      response[read_args.response_size - 1]);
 
 	/*
 	 * Whole buffer should be in response, check if it ends with both
@@ -129,9 +131,10 @@ static void test_uart_hc_read_next(int ver)
 
 	read_args.response_size = 0;
 	zassert_equal(EC_RES_SUCCESS, host_command_process(&read_args));
-	zassert_equal('\0', response[read_args.response_size],
+	zassert_true(read_args.response_size > 0, "No data read");
+	zassert_equal('\0', response[read_args.response_size - 1],
 		      "Last byte of response is not '\\0' (got 0x%x)",
-		      response[read_args.response_size]);
+		      response[read_args.response_size - 1]);
 
 	msg3_start = response + read_args.response_size - 1 - MSG_LEN(msg3);
 	msg2_start = msg3_start - MSG_LEN(msg2);
@@ -171,9 +174,10 @@ ZTEST_USER(uart_hostcmd, test_uart_hc_read_recent_v1)
 	/* Only message 1 which is between two last snapshots should be read */
 	read_args.response_size = 0;
 	zassert_equal(EC_RES_SUCCESS, host_command_process(&read_args));
-	zassert_equal('\0', response[read_args.response_size],
+	zassert_true(read_args.response_size > 0, "No data read");
+	zassert_equal('\0', response[read_args.response_size - 1],
 		      "Last byte of response is not '\\0' (got 0x%x)",
-		      response[read_args.response_size]);
+		      response[read_args.response_size - 1]);
 	/* Account additional NULL char at the end */
 	zassert_equal(MSG_LEN(msg1) + 1, read_args.response_size,
 		      "expected message length %d, got %d", MSG_LEN(msg1) + 1,
@@ -188,9 +192,10 @@ ZTEST_USER(uart_hostcmd, test_uart_hc_read_recent_v1)
 	/* Only message between two last snapshots should be read */
 	read_args.response_size = 0;
 	zassert_equal(EC_RES_SUCCESS, host_command_process(&read_args));
-	zassert_equal('\0', response[read_args.response_size],
+	zassert_true(read_args.response_size > 0, "No data read");
+	zassert_equal('\0', response[read_args.response_size - 1],
 		      "Last byte of response is not '\\0' (got 0x%x)",
-		      response[read_args.response_size]);
+		      response[read_args.response_size - 1]);
 	/* Account additional NULL char at the end */
 	zassert_equal(MSG_LEN(msg2) + 1, read_args.response_size,
 		      "expected message length %d, got %d", MSG_LEN(msg2) + 1,
@@ -215,9 +220,10 @@ ZTEST_USER(uart_hostcmd, test_uart_hc_read_recent_v1)
 	/* This time only third message should be read */
 	read_args.response_size = 0;
 	zassert_equal(EC_RES_SUCCESS, host_command_process(&read_args));
-	zassert_equal('\0', response[read_args.response_size],
+	zassert_true(read_args.response_size > 0, "No data read");
+	zassert_equal('\0', response[read_args.response_size - 1],
 		      "Last byte of response is not '\\0' (got 0x%x)",
-		      response[read_args.response_size]);
+		      response[read_args.response_size - 1]);
 	/* Account additional NULL char at the end */
 	zassert_equal(MSG_LEN(msg3) + 1, read_args.response_size,
 		      "expected message length %d, got %d", MSG_LEN(msg3) + 1,

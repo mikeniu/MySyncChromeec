@@ -11,6 +11,12 @@
 #include "gpio/gpio_int.h"
 #include "hooks.h"
 
+static void disable_pp5000_s5(void)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 0);
+}
+DECLARE_DEFERRED(disable_pp5000_s5);
+
 void board_chipset_startup_quartz(void)
 {
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_haptic_en_ec), 1);
@@ -18,6 +24,7 @@ void board_chipset_startup_quartz(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_bl_off_odl), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_enavdd_oled), 1);
+	hook_call_deferred(&disable_pp5000_s5_data, -1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 1);
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_quartz,
@@ -30,8 +37,8 @@ void board_chipset_shutdown_quartz(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_bl_off_odl), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_enavdd_oled), 0);
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_sys_throttle_mira), 0);
+	hook_call_deferred(&disable_pp5000_s5_data, 4000 * USEC_PER_MSEC);
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_quartz,
 	     HOOK_PRIO_DEFAULT);

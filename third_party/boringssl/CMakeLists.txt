@@ -42,6 +42,18 @@ set(CMAKE_SKIP_INSTALL_RULES YES)
 # We don't use generated assembly for now.
 set(OPENSSL_NO_ASM "1")
 
+# BoringSSL's top-level CMakeLists.txt includes CTest, which defaults
+# BUILD_TESTING to ON. With BUILD_TESTING enabled, BoringSSL configures its
+# test tree, including the bundled third_party/benchmark (Google Benchmark),
+# whose CMakeLists.txt calls find_package(Threads REQUIRED). Zephyr's
+# FindThreads module only reports Threads as found when CONFIG_POSIX_THREADS is
+# set, so on platforms without it (e.g. native_sim for the fingerprint tests)
+# CMake fails with "Could NOT find Threads". We only link the 'crypto' library
+# and never build BoringSSL's tests or benchmarks, so force BUILD_TESTING off
+# before adding BoringSSL. FORCE is required because a prior configure may have
+# cached it as ON.
+set(BUILD_TESTING OFF CACHE BOOL "Build the testing tree." FORCE)
+
 zephyr_include_directories(${BORINGSSL_SOURCES}/include)
 zephyr_include_directories(include)
 

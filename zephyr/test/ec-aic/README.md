@@ -71,6 +71,32 @@ found under the `zephyr/test/ec-aic` directory.
   --flash-command ../dagwood/flash.py --device-flash-timeout 60
 ```
 
+### Running the tests from SRAM
+By default, the dagwood flash.py script reprograms the integrated SPI flash
+with the test binary. On Nuvoton and Realtek platforms, the test binaries can
+be loaded directly into the on-chip SRAM.
+
+This has 2 main benefits:
+
+* Faster test time because the flash erase and write steps are skipped
+* Avoids wearing out the flash prematurely
+
+To run the tests from SRAM, using the same twister command but add the `-r`
+parameter to the `../dagwood/flash.py` script.
+
+```bash
+./twister -ivc -s aic.i2c --toolchain=coreboot-sdk \
+  -p npcx9/npcx9m7f \
+  --device-testing --device-serial /dev/ttyACM1 \
+  --flash-command="../dagwood/flash.py,-r" --device-flash-timeout 60
+```
+
+Note that any test binaries that use `sysjump` or have other dependencies on
+the SPI flash should not use the `-r` option.
+
+The `-r` option is ignored if the EC architecture doesn't support loading
+directly into SRAM.
+
 ## Running tests on multiple Dagwood boards
 
 To run tests on multiple Dagwood boards connected to the host, use the

@@ -74,7 +74,6 @@ DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init, HOOK_PRIO_DEFAULT);
 enum battery_access_type battery_check_access_limit(void)
 {
 	if (!chipset_in_state(CHIPSET_STATE_HARD_OFF)) {
-		LOG_INF("battery access not allowed when chipset on");
 		return BATTERY_ACCESS_NOT_ALLOWED;
 	}
 
@@ -82,12 +81,33 @@ enum battery_access_type battery_check_access_limit(void)
 }
 #endif
 
+#define DISPLAY_SOC_MIN 4
+#define DISPLAY_SOC_MAX 97
+#define DISPLAY_SOC_RANGE (DISPLAY_SOC_MAX - DISPLAY_SOC_MIN)
+
 void board_battery_compensate_params(struct batt_params *batt)
 {
-	/* Update display SOC based on current state_of_charge (multiply by 10)
+	/* Scale state of charge (DISPLAY_SOC_MIN to DISPLAY_SOC_MAX)
+	 * to 0-100% display SOC (0-1000), so DISPLAY_SOC_MIN% state of
+	 * charge displays as 0%.
 	 */
 	if (!(batt->flags & BATT_FLAG_BAD_STATE_OF_CHARGE)) {
-		batt->display_charge = batt->state_of_charge * 10;
+		if (batt->state_of_charge <= DISPLAY_SOC_MIN) {
+			batt->display_charge = 0;
+		} else if (batt->state_of_charge >= DISPLAY_SOC_MAX) {
+			batt->display_charge = 1000;
+		} else {
+			/* Linear scale formula with standard rounding built-in:
+			 * ((true_soc - MIN) * 1000 + (RANGE / 2)) / RANGE
+			 */
+			batt->display_charge =
+				((batt->state_of_charge - DISPLAY_SOC_MIN) *
+					 1000 +
+				 (DISPLAY_SOC_RANGE / 2)) /
+				DISPLAY_SOC_RANGE;
+		}
+
+		/* Final safety clamps to ensure absolute stability */
 		if (batt->display_charge < 0)
 			batt->display_charge = 0;
 		if (batt->display_charge > 1000)

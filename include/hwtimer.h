@@ -40,8 +40,7 @@ void __hw_clock_event_clear(void);
 #ifdef CONFIG_HWTIMER_64BIT
 __override_proto
 #endif
-	uint32_t
-	__hw_clock_source_read(void);
+	uint32_t __hw_clock_source_read(void);
 
 /**
  * Override the lower 32-bits of the hardware counter

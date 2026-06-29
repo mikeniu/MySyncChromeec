@@ -102,6 +102,7 @@ def obtain_config_options_in_use():
             if (
                 dirnames[i] == "build"
                 or dirnames[i] == "private"
+                or dirnames[i] == "docker"
                 or dirnames[i].startswith("twister-out")
             ):
                 del dirnames[i]
