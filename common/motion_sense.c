@@ -1027,6 +1027,12 @@ void motion_sense_task(void *u)
 			      motion_sense_fifo_wake_up_needed()))) {
 				mkbp_send_event(EC_MKBP_EVENT_SENSOR_FIFO);
 			}
+			/* CPRINTS("fifo_reset! bypass = %d, int_need = %d, evt = %x, flush = %d", */
+			/* 	motion_sense_fifo_bypass_needed(), */
+			/* 	motion_sense_fifo_interrupt_needed(), */
+			/* 	(uint32_t)(event & (TASK_EVENT_MOTION_ODR_CHANGE | */
+			/* 		  TASK_EVENT_MOTION_FLUSH_PENDING)), */
+			/* 	motion_sense_fifo_over_thres()); */
 			motion_sense_fifo_reset_needed_flags();
 		}
 
@@ -1286,6 +1292,9 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 				  BIT(sensor - motion_sensors));
 			task_set_event(TASK_ID_MOTIONSENSE,
 				       TASK_EVENT_MOTION_ODR_CHANGE);
+			spread_log_reset(in->sensor_odr.sensor_num);
+		} else {
+			spread_log_dump(in->sensor_odr.sensor_num);
 		}
 
 		out->sensor_odr.ret = sensor->drv->get_data_rate(sensor);

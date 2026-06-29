@@ -87,6 +87,61 @@ static int ap_interrupt_needed;
  */
 uint32_t ts_last_int[MAX_MOTION_SENSORS];
 
+#define SPREAD_LOG_LEN (1 << 5)
+#define SPREAD_LOG_MASK (SPREAD_LOG_LEN - 1)
+
+struct spread_info {
+	uint32_t curr_time;
+	int count;
+	int spreading;
+	int staged_count;
+	int new;
+	int after;
+	uint32_t ts_drv;
+	uint32_t ts_fifo;
+	uint32_t ts_prev;
+	uint32_t ts_next;
+};
+
+static struct spread_info spread_log[SPREAD_LOG_LEN][2];
+int spread_wr[2];
+uint32_t fifo_last_ts[MAX_MOTION_SENSORS];
+static int trigger_dump_count;
+
+void spread_log_reset(int id)
+{
+	int i;
+	struct spread_info *log;
+
+	spread_wr[id] = 0;
+	trigger_dump_count = 0;
+
+	for (i = 0; i < SPREAD_LOG_LEN; i++) {
+		log  = &spread_log[i][id];
+		memset(log, 0, sizeof(struct spread_info));
+	}
+}
+
+void spread_log_dump(int id)
+{
+	int rd;
+	int i;
+	struct spread_info *log;
+
+	rd = spread_wr[id] & SPREAD_LOG_MASK;
+	for (i = 0; i < SPREAD_LOG_LEN; i++) {
+		log = &spread_log[rd][id];
+
+		CPRINTS("[%02d]: %05d   %02d %d %d %d  %010d  %010d  %010d  %010d  %010d",
+			i, log->count, log->staged_count, log->spreading,
+			log->new, log->after,
+			log->ts_drv, log->ts_fifo, log->ts_prev, log->ts_next,
+			log->ts_drv - log->ts_fifo);
+
+		rd = (rd + 1) & SPREAD_LOG_MASK;
+	}
+}
+
 /**
  * Check whether or not a give sensor data entry is a timestamp or not.
  *
@@ -238,6 +293,49 @@ static inline bool is_new_timestamp(uint8_t sensor_num)
 	       !(next_timestamp_initialized & BIT(sensor_num));
 }
 
+
+static void add_log_entry(int id, int after, uint32_t ts_drv,
+			  uint32_t ts_fifo, uint32_t ts_prev,
+			  uint32_t ts_next, uint32_t rate_us) {
+
+	struct spread_info *log;
+	uint32_t ts = get_time().le.lo;
+	int delta;
+	int trigger = 0;
+
+	log = &spread_log[spread_wr[id] & SPREAD_LOG_MASK][id];
+
+	log->curr_time = ts;
+	log->count = spread_wr[id];
+	log->spreading = fifo_staged.requires_spreading;
+	log->staged_count = fifo_staged.sample_count[id];
+	log->new = is_new_timestamp(id);
+	log->after = after;
+	log->ts_drv = ts_drv;
+	log->ts_fifo = ts_fifo;
+	log->ts_prev = ts_prev;
+	log->ts_next = ts_next;
+
+
+	spread_wr[id]++;
+
+	delta = ts_fifo - fifo_last_ts[id];
+	if (delta > (2 * rate_us - rate_us / 5)) {
+		if (log->count > trigger_dump_count + 50) {
+			trigger_dump_count = log->count;
+			trigger = 1;
+		}
+	}
+	if (spread_wr[id] > 2 && ((ts_fifo < fifo_last_ts[id]) | trigger)) {
+		CPRINTS("%s: out of order %010d < %010d", id ? "Base" : "Lid",
+			ts_fifo, fifo_last_ts[id]);
+		spread_log_dump(id);
+	}
+
+	fifo_last_ts[id] = ts_fifo;
+}
+
+
 /**
  * Stage a single data unit to the motion sense fifo. Note that for the AP to
  * see this data, it must be committed.
@@ -271,6 +369,7 @@ fifo_stage_unit(struct ec_response_motion_sensor_data *data,
 		next_timestamp[data->sensor_num].next =
 			next_timestamp[data->sensor_num].prev = data->timestamp;
 		next_timestamp_initialized |= BIT(data->sensor_num);
+		//CPRINTS("sensor[%d]: reset prev and next", data->sensor_num);
 	}
 
 	/* For valid sensors, check if AP really needs this data */
@@ -525,6 +624,9 @@ commit_data_end:
 	 * the timestamp right before it to keep things correct.
 	 */
 	for (i = 0; i < fifo_staged.count; i++) {
+		uint32_t ts_drv;
+		int reset = 0;
+
 		data = peek_fifo_staged(i);
 		if (data->flags & MOTIONSENSE_SENSOR_FLAG_BYPASS_FIFO)
 			bypass_needed = 1;
@@ -551,16 +653,18 @@ commit_data_end:
 			continue;
 		}
 
+		ts_drv = data->timestamp;
 		/*
 		 * If this is the first time we're seeing a timestamp for this
 		 * sensor or the timestamp is after our computed next, skip
-		 * ahead.
+ 		 * ahead.
 		 */
 		if (is_new_timestamp(sensor_num) ||
 		    time_after(data->timestamp,
 			       next_timestamp[sensor_num].next)) {
 			next_timestamp[sensor_num].next = data->timestamp;
 			next_timestamp_initialized |= BIT(sensor_num);
+			reset = 1;
 		}
 
 		/* Spread the timestamp and compute the expected next. */
@@ -569,6 +673,11 @@ commit_data_end:
 			next_timestamp[sensor_num].next;
 		next_timestamp[sensor_num].next +=
 			expected_data_periods[sensor_num];
+
+		add_log_entry(sensor_num, reset, ts_drv, data->timestamp,
+			      next_timestamp[sensor_num].prev,
+			      next_timestamp[sensor_num].next,
+			      expected_data_periods[sensor_num]);
 
 		/* Update online calibration if enabled. */
 		data = peek_fifo_staged(i);
@@ -624,6 +733,10 @@ inline int motion_sense_fifo_over_thres(void)
 
 	mutex_lock(&g_sensor_mutex);
 	result = queue_space(&fifo) < CONFIG_ACCEL_FIFO_THRES;
+	if (result) {
+		CPRINTS("fifo: over threshold! space = %d, THRESHOLD = %d",
+			(int)(queue_space(&fifo)), CONFIG_ACCEL_FIFO_THRES);
+	}
 	mutex_unlock(&g_sensor_mutex);
 
 	return result;
