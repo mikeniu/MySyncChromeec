@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d50c0eff_1da3c709",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-06-29T08:43:27Z",
+      "side": 1,
+      "message": "Changes: use port-index-on-chip property instead of IT5271_CONNECTOR_NUMBER",
+      "revId": "916d5141c92cccc6edeab4d3330127cf21edac23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
