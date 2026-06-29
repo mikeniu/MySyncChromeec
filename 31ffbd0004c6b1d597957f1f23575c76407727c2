@@ -22,6 +22,30 @@
       },
       "revId": "31ffbd0004c6b1d597957f1f23575c76407727c2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cad15723_f84db748",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-06-29T06:55:34Z",
+      "side": 1,
+      "message": "Does this refer to config_pm_device? It seems that the sensor does not have this callback.",
+      "parentUuid": "638678ee_d767483d",
+      "range": {
+        "startLine": 9,
+        "startChar": 39,
+        "endLine": 9,
+        "endChar": 64
+      },
+      "revId": "31ffbd0004c6b1d597957f1f23575c76407727c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
