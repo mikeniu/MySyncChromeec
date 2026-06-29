@@ -87,6 +87,58 @@ static int ap_interrupt_needed;
  */
 uint32_t ts_last_int[MAX_MOTION_SENSORS];
 
+#define SPREAD_LOG_LEN (1 << 5)
+#define SPREAD_LOG_MASK (SPREAD_LOG_LEN - 1)
+
+struct spread_info {
+	uint32_t curr_time;
+	int count;
+	int spreading;
+	int staged_count;
+	int new;
+	int after;
+	uint32_t ts_drv;
+	uint32_t ts_fifo;
+	uint32_t ts_prev;
+	uint32_t ts_next;
+};
+
+static struct spread_info spread_log[SPREAD_LOG_LEN][2];
+int spread_wr[2];
+
+void spread_log_reset(int id)
+{
+	int i;
+	struct spread_info *log;
+
+	spread_wr[id] = 0;
+
+	for (i = 0; i < SPREAD_LOG_LEN; i++) {
+		log  = &spread_log[i][id];
+		memset(log, 0, sizeof(struct spread_info));
+	}
+}
+
+void spread_log_dump(int id)
+{
+	int rd;
+	int i;
+	struct spread_info *log;
+
+	rd = spread_wr[id] & SPREAD_LOG_MASK;
+	for (i = 0; i < SPREAD_LOG_LEN; i++) {
+		log = &spread_log[rd][id];
+
+		CPRINTS("[%02d]: %05d   %02d %d %d %d  %010d  %010d  %010d  %010d  %010d",
+			i, log->count, log->staged_count, log->spreading,
+			log->new, log->after,
+			log->ts_drv, log->ts_fifo, log->ts_prev, log->ts_next,
+			log->ts_drv - log->ts_fifo);
+
+		rd = (rd + 1) & SPREAD_LOG_MASK;
+	}
+}
+
 /**
  * Check whether or not a give sensor data entry is a timestamp or not.
  *
@@ -237,6 +289,31 @@ static inline bool is_new_timestamp(uint8_t sensor_num)
 	return sensor_num < MAX_MOTION_SENSORS &&
 	       !(next_timestamp_initialized & BIT(sensor_num));
 }
+
+
+static void add_log_entry(int id, int after, uint32_t ts_drv,
+			  uint32_t ts_fifo, uint32_t ts_prev,
+			  uint32_t ts_next) {
+
+	struct spread_info *log;
+	uint32_t ts = get_time().le.lo;
+
+	log = &spread_log[spread_wr[id] & SPREAD_LOG_MASK][id];
+
+	log->curr_time = ts;
+	log->count = spread_wr[id];
+	log->spreading = fifo_staged.requires_spreading;
+	log->staged_count = fifo_staged.sample_count[id];
+	log->new = is_new_timestamp(id);
+	log->after = after;
+	log->ts_drv = ts_drv;
+	log->ts_fifo = ts_fifo;
+	log->ts_prev = ts_prev;
+	log->ts_next = ts_next;
+
+	spread_wr[id]++;
+}
+
 
 /**
  * Stage a single data unit to the motion sense fifo. Note that for the AP to
@@ -514,6 +591,9 @@ commit_data_end:
 	 * the timestamp right before it to keep things correct.
 	 */
 	for (i = 0; i < fifo_staged.count; i++) {
+		uint32_t ts_drv;
+		int after = 0;
+
 		data = peek_fifo_staged(i);
 		if (data->flags & MOTIONSENSE_SENSOR_FLAG_BYPASS_FIFO)
 			bypass_needed = 1;
@@ -540,14 +620,18 @@ commit_data_end:
 			continue;
 		}
 
+		ts_drv = data->timestamp;
 		/*
 		 * If this is the first time we're seeing a timestamp for this
 		 * sensor or the timestamp is after our computed next, skip
-		 * ahead.
+ 		 * ahead.
 		 */
 		if (is_new_timestamp(sensor_num) ||
 		    time_after(data->timestamp,
 			       next_timestamp[sensor_num].next)) {
+			if (!is_new_timestamp(sensor_num)) {
+				after = 1;
+			}
 			next_timestamp[sensor_num].next = data->timestamp;
 			next_timestamp_initialized |= BIT(sensor_num);
 		}
@@ -558,6 +642,10 @@ commit_data_end:
 			next_timestamp[sensor_num].next;
 		next_timestamp[sensor_num].next +=
 			expected_data_periods[sensor_num];
+
+		add_log_entry(sensor_num, after, ts_drv, data->timestamp,
+			      next_timestamp[sensor_num].prev,
+			      next_timestamp[sensor_num].next);
 
 		/* Update online calibration if enabled. */
 		data = peek_fifo_staged(i);

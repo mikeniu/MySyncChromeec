@@ -1286,6 +1286,9 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 				  BIT(sensor - motion_sensors));
 			task_set_event(TASK_ID_MOTIONSENSE,
 				       TASK_EVENT_MOTION_ODR_CHANGE);
+			spread_log_reset(in->sensor_odr.sensor_num);
+		} else {
+			spread_log_dump(in->sensor_odr.sensor_num);
 		}
 
 		out->sensor_odr.ret = sensor->drv->get_data_rate(sensor);

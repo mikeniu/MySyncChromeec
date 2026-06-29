@@ -272,6 +272,10 @@ extern unsigned int motion_min_interval;
  */
 #define MOTION_SENSE_HOOK_PRIO HOOK_PRIO_DEFAULT
 
+
+void spread_log_reset(int id);
+void spread_log_dump(int id);
+
 /**
  * Take actions at end of sensor initialization:
  * - print init done status to console,
