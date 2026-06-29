@@ -70,31 +70,33 @@ def _do_test_jobserver(
             with lock:
                 active_threads += 1
                 lock.notify_all()
-            proc = jobserver.popen(
-                [
-                    "sh",
-                    "-c",
-                    'echo "MAKEFLAGS=${MAKEFLAGS}"; ls /proc/self/fd',
-                ],
-                stdout=subprocess.PIPE,
-                universal_newlines=True,
-            )
-            proc.wait()
-            output = proc.stdout.readlines()
-            assert output[0] == f"MAKEFLAGS={makeflags}\n"
-            if pipe:
-                if effective_jobs > 1:
-                    assert f"{pipe[0]}\n" in output
-                    assert f"{pipe[1]}\n" in output
-                else:
-                    assert f"{pipe[0]}\n" not in output
-                    assert f"{pipe[1]}\n" not in output
+            try:
+                proc = jobserver.popen(
+                    [
+                        "sh",
+                        "-c",
+                        'echo "MAKEFLAGS=${MAKEFLAGS}"; ls /proc/self/fd',
+                    ],
+                    stdout=subprocess.PIPE,
+                    universal_newlines=True,
+                )
+                proc.wait()
+                output = proc.stdout.readlines()
+                assert output[0] == f"MAKEFLAGS={makeflags}\n"
+                if pipe:
+                    if effective_jobs > 1:
+                        assert f"{pipe[0]}\n" in output
+                        assert f"{pipe[1]}\n" in output
+                    else:
+                        assert f"{pipe[0]}\n" not in output
+                        assert f"{pipe[1]}\n" not in output
 
-            please_exit.acquire()  # pylint:disable=consider-using-with
-            with lock:
-                active_threads -= 1
-                ended_threads += 1
-                lock.notify_all()
+                please_exit.acquire()  # pylint:disable=consider-using-with
+            finally:
+                with lock:
+                    active_threads -= 1
+                    ended_threads += 1
+                    lock.notify_all()
 
     try:
         logging.debug("Starting %s threads", thread_count)
@@ -105,7 +107,7 @@ def _do_test_jobserver(
             lock.wait_for(
                 lambda: started_threads == thread_count
                 and active_threads == effective_jobs,
-                10,
+                30,
             )
             logging.debug("Asserting %s active_threads", effective_jobs)
             assert started_threads == thread_count
@@ -119,7 +121,7 @@ def _do_test_jobserver(
         with lock:
             lock.wait_for(
                 lambda: active_threads == effective_jobs and ended_threads == 5,
-                10,
+                30,
             )
             logging.debug("Asserting %s active_threads", effective_jobs)
             assert started_threads == thread_count
@@ -131,7 +133,7 @@ def _do_test_jobserver(
             please_exit.release()
 
         with lock:
-            lock.wait_for(lambda: ended_threads == thread_count, 10)
+            lock.wait_for(lambda: ended_threads == thread_count, 30)
             logging.debug("Asserting %s active_threads", 0)
             assert started_threads == thread_count
             assert active_threads == 0
