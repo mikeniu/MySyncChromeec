@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd19aea7_cc5a6be2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-29T05:36:39Z",
+      "side": 1,
+      "message": "The current commit message doesn\u0027t say anything about the change. Please add topic, and sensor type.\n\nSomething like:\n```\nfingerprint: ft98xx: enter low-power mode on initialization\n\nSet the ....., to reduce ...\n```",
+      "revId": "cd8c6e6f3151bce5c1457f838ba4b43a9389a2cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1cca6ef_a04b8ff4",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-29T05:36:39Z",
+      "side": 1,
+      "message": "Use `ft98xx_set_mode(dev, FINGERPRINT_SENSOR_MODE_LOW_POWER)` to keep setting low power mode consistent.",
+      "revId": "cd8c6e6f3151bce5c1457f838ba4b43a9389a2cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
