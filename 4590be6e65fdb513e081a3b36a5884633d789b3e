@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1bf35b2_73964827",
+        "filename": "zephyr/drivers/usbc/common_pdc_fwup.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-06-29T16:42:26Z",
+      "side": 1,
+      "message": "Change to using the shell print functions and pass a pointer to the shell struct in to pdc_common_fwup_parse_start_cli_args",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 52
+      },
+      "revId": "4590be6e65fdb513e081a3b36a5884633d789b3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
