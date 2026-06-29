@@ -16,6 +16,24 @@
       "message": "Why does this change require adjustments of the buffers sizes?",
       "revId": "e94c21f031330e15e0253981c03e71f65498abad",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55eed66e_d17f4082",
+        "filename": "zephyr/test/fingerprint/task/prj.conf",
+        "patchSetId": 9
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-06-29T16:30:33Z",
+      "side": 1,
+      "message": "I meant to delete this, as its increased in `testcase.yaml`. In tests `fingerprint.task.capture` and `fingerprint.task.template` you\u0027ll get these failures\n\n```\n[00:00:00.710,000] \u003cwrn\u003e test_host_command: requested response size 25608 exceeds Host Command TX buffer size 544. Truncating.\nec:~\u003e [00:00:00.710,000] \u003cinf\u003e host_cmd_handler: HC 0x0404\n[00:00:00.710,000] \u003cinf\u003e host_cmd_handler: HC 0x0404\nec:~\u003e [00:00:00.710,000] \u003cinf\u003e host_cmd_handler: HC 0x0404 err 3\n[00:00:00.710,000] \u003cinf\u003e host_cmd_handler: HC 0x0404 err 3\nec:~\u003e \n    Assertion failed at CMAKE_SOURCE_DIR/src/fpsensor_capture.cc:326: fpsensor_capture_test_finger_capture_simple_image_scan_success_get_frame: ec_cmd_fp_frame(NULL, \u0026frame_request, frame_buffer) is non-zero\n```\n\nIncreasing the buffer allows the entire response to be `memcpy` in `pass_args_to_sim` function. Otherwise the test hangs, as memory corruption occurs. This seems only related to `ec_host_cmd_backend_sim_install_send_cb` as it uses the tx_buf defined in the simulator for populating the response.",
+      "parentUuid": "5ae8e1f5_37aa0a30",
+      "revId": "e94c21f031330e15e0253981c03e71f65498abad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
