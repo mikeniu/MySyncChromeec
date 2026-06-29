@@ -874,6 +874,12 @@ static void wpc_hall_handler(void)
 {
 	hall_allows_pchg = !gpio_get_level(GPIO_HALL_CTL_PCHG);
 	pchg_update_state();
+#ifdef CONFIG_HOSTCMD_EVENTS
+	if (!hall_allows_pchg) {
+		CPRINTS("## test stylus hall remove envent ###");
+		host_set_single_event(EC_HOST_EVENT_DEVICE);
+	}
+#endif
 }
 DECLARE_DEFERRED(wpc_hall_handler);
 
