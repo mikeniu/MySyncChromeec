@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ae8e1f5_37aa0a30",
+        "filename": "zephyr/test/fingerprint/task/prj.conf",
+        "patchSetId": 9
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-29T07:04:53Z",
+      "side": 1,
+      "message": "Why does this change require adjustments of the buffers sizes?",
+      "revId": "e94c21f031330e15e0253981c03e71f65498abad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
