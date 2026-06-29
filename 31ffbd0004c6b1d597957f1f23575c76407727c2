@@ -46,6 +46,30 @@
       },
       "revId": "31ffbd0004c6b1d597957f1f23575c76407727c2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f20657b4_c6ce3a64",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-29T07:02:30Z",
+      "side": 1,
+      "message": "Yes, but I think we can not add it, because it would disable IRQ. We don\u0027t want to do that, because the FP sensor is our wake-up source. So please just correct the commit message",
+      "parentUuid": "cad15723_f84db748",
+      "range": {
+        "startLine": 9,
+        "startChar": 39,
+        "endLine": 9,
+        "endChar": 64
+      },
+      "revId": "31ffbd0004c6b1d597957f1f23575c76407727c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
