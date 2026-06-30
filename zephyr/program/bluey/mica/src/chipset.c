@@ -8,6 +8,10 @@
 #include "common.h"
 #include "gpio.h"
 #include "hooks.h"
+#include "led_common.h"
+
+/* 1 while the AP power-on sequence is in progress. */
+static bool power_on_in_progress;
 
 static void disable_pp5000(void)
 {
@@ -22,6 +26,8 @@ void board_chipset_startup_mica(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_3v_s3_en), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_ppvar_oled), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_batt_i2c_en_odl), 1);
+
+	power_on_in_progress = 0;
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_mica,
 	     HOOK_PRIO_DEFAULT);
@@ -41,13 +47,18 @@ static void board_chipset_pre_init_mica(void)
 {
 	hook_call_deferred(&disable_pp5000_data, -1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 1);
+
+	power_on_in_progress = 1;
 }
 DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init_mica,
 	     HOOK_PRIO_DEFAULT);
 
 static void board_chipset_hard_off_mica(void)
 {
-	hook_call_deferred(&disable_pp5000_data, 5000 * USEC_PER_MSEC);
+	if (power_on_in_progress) 
+		board_diag_led_power_fail();
+	else
+		hook_call_deferred(&disable_pp5000_data, 5000 * USEC_PER_MSEC);
 }
 DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_chipset_hard_off_mica,
 	     HOOK_PRIO_DEFAULT);
