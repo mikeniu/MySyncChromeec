@@ -34,6 +34,24 @@
       "parentUuid": "5ae8e1f5_37aa0a30",
       "revId": "e94c21f031330e15e0253981c03e71f65498abad",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3eca95b_3a2b8488",
+        "filename": "zephyr/test/fingerprint/task/prj.conf",
+        "patchSetId": 9
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-06-30T08:14:52Z",
+      "side": 1,
+      "message": "Thanks for the detailed explanation.",
+      "parentUuid": "55eed66e_d17f4082",
+      "revId": "e94c21f031330e15e0253981c03e71f65498abad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
