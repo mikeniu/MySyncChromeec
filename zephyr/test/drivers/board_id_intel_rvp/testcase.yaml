@@ -1,0 +1,7 @@
+common:
+  platform_allow:
+    - native_sim
+tests:
+  drivers.board_id_intel_rvp:
+    extra_dtc_overlay_files:
+      - boards/native_sim.overlay
