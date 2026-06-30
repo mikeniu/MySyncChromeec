@@ -9,13 +9,21 @@
 
 #ifdef CONFIG_CROS_EC_RW
 #define fp_sensor_dev DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor))
-#ifdef CONFIG_FINGERPRINT_SENSOR_FPC1025
-#define FP_SENSOR_HWID_FPC 0x021
+
+#if defined(CONFIG_FINGERPRINT_SENSOR_FPC1025)
+#define FP_SENSOR_HWID_EXPECTED 0x021
+#elif defined(CONFIG_FINGERPRINT_SENSOR_ELAN80SG)
+#define FP_SENSOR_HWID_EXPECTED 0x4f4f
+#elif defined(CONFIG_FINGERPRINT_SENSOR_ELANI80SA)
+#define FP_SENSOR_HWID_EXPECTED 0x5253
+#else
+#define FP_SENSOR_HWID_EXPECTED 0x0000
 #endif /* CONFIG_FINGERPRINT_SENSOR_FPC1025 */
-static const uint32_t fp_sensor_hwid = FP_SENSOR_HWID_FPC;
+
+static const uint32_t fp_sensor_hwid = FP_SENSOR_HWID_EXPECTED;
 #else
 static const uint32_t fp_sensor_hwid = UINT32_MAX;
-#endif
+#endif /* CONFIG_CROS_EC_RW */
 
 int fpc_get_hwid(uint16_t *id);
 
