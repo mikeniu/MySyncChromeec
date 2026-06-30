@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d804880c_39ac99a5",
+        "filename": "zephyr/test/usb_typec_drp_acc_trysrc/src/test_usb_typec_drp_acc_trysrc.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-06-30T15:20:58Z",
+      "side": 1,
+      "message": "AWS means Attached.Wait.SRC",
+      "parentUuid": "e3c25951_4dc0ca6b",
+      "revId": "2b2665686ff2edc48eb7c4af9f6c942a70f01281",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f938564e_925bda4f",
         "filename": "zephyr/test/usb_typec_drp_acc_trysrc/src/test_usb_typec_drp_acc_trysrc.c",
         "patchSetId": 27
