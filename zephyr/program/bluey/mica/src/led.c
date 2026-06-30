@@ -6,6 +6,8 @@
 /* Mica lightbar LED control used to trigger a custom diagnostic sequence. */
 
 #include "common/lightbar_policy_alt.h"
+#include "gpio.h"
+#include "hooks.h"
 #include "lb_policy.h"
 #include "led_lb_host_program.h"
 #include "led_lightbar.h"
@@ -13,6 +15,8 @@
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(mica_led_diag, LOG_LEVEL_ERR);
+
+static int8_t power_fail_flags;
 
 /*
  * AP-triggered Diagnostics
@@ -34,3 +38,31 @@ __override enum ec_status board_lightbar_custom_seq(uint8_t seq)
 		return EC_RES_INVALID_PARAM;
 	}
 }
+
+/*
+ * EC-triggered Diagnostics
+ */
+void board_diag_led_power_fail(void)
+{
+	power_fail_flags = 1;
+	/* Re-enable PP5000 for the lightbar after shutdown. */
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 1);
+	lb_set_diag_policy(LED_ALT_POLICY_DIAG_PWR, 0);
+	LOG_ERR("Power on failed! LED Diag activated");
+}
+
+/*
+ * Clear the power fail diagnostic LED indication once AP
+ * successfully reaches the startup state.
+ *
+ * This prevents the lightbar from remaining in a led diagnostic state
+ * after AP has successfully completed the boot sequence.
+ */
+static void board_clear_diag_led(void)
+{
+	if (power_fail_flags) {
+		power_fail_flags = 0;
+		lb_set_diag_policy(LED_ALT_POLICY_NORMAL, 0);
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_clear_diag_led, HOOK_PRIO_DEFAULT);
