@@ -409,6 +409,17 @@ void motion_sense_fifo_reset_needed_flags(void)
 	bypass_needed = 0;
 }
 
+void motion_sense_fifo_reset_sensor_anchor(int sensor_num)
+{
+	if (sensor_num < 0 || sensor_num >= MAX_MOTION_SENSORS) {
+		return;
+	}
+
+	mutex_lock(&g_sensor_mutex);
+	next_timestamp_initialized &= ~BIT(sensor_num);
+	mutex_unlock(&g_sensor_mutex);
+}
+
 void motion_sense_fifo_insert_async_event(struct motion_sensor_t *sensor,
 					  enum motion_sense_async_event event)
 {

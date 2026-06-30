@@ -65,6 +65,11 @@ int motion_sense_fifo_wake_up_needed(void);
 void motion_sense_fifo_reset_needed_flags(void);
 
 /**
+ * Resets the flag for wake up and bypass needed.
+ */
+void motion_sense_fifo_reset_sensor_anchor(int sensor_num);
+
+/**
  * Insert an async event into the fifo.
  *
  * @param sensor The sensor that generated the async event.

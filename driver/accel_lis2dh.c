@@ -184,6 +184,7 @@ static int lis2dh_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	uint32_t interrupt_timestamp = last_interrupt_timestamp;
 	bool commit_needed = false;
 	int nsamples;
+	int sensor_num = s - motion_sensors;
 
 	if ((!(*event & ACCEL_LIS2DH_INT_EVENT)) ||
 	    motion_sensor_in_forced_mode(s)) {
@@ -201,6 +202,7 @@ static int lis2dh_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	} while (nsamples != 0);
 
 	if (IS_ENABLED(CONFIG_ACCEL_FIFO) && commit_needed) {
+		motion_sense_fifo_reset_sensor_anchor(sensor_num);
 		motion_sense_fifo_commit_data();
 	}
 
