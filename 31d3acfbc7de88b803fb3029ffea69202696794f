@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9c0c4e0_8c0000fa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-30T18:49:51Z",
+      "side": 1,
+      "message": "I\u0027m glad you were able to get this working without making another build. I think some of the naming could be clearer, but in general, this looks good.",
+      "revId": "31d3acfbc7de88b803fb3029ffea69202696794f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a11fd980_bfc5e5c6",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-30T18:49:51Z",
+      "side": 1,
+      "message": "Nit: This identifier should now be something like `DEV_PDC_C0_TI_JBR`.",
+      "revId": "31d3acfbc7de88b803fb3029ffea69202696794f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b030a54_a3e62168",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-30T18:49:51Z",
+      "side": 1,
+      "message": "For the sake of readability here, you might want either an extra comment or `DEV_PDC_C1_TI_HBR` as an alias.",
+      "revId": "31d3acfbc7de88b803fb3029ffea69202696794f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2989b7a_2c64f3c7",
+        "filename": "zephyr/test/atria/src/rvp_usbc_runtime_test.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-06-30T18:49:51Z",
+      "side": 1,
+      "message": "Nit: Now that there is a non-JBR TI variant, perhaps this test name and comment should be more explicit, like `test_three_port_ti_jbr`.",
+      "revId": "31d3acfbc7de88b803fb3029ffea69202696794f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
