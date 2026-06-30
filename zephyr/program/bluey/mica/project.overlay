@@ -148,4 +148,32 @@
 			color-13  { led-color = <&lightbar_off>;    period-ms = <3000>; };
 		};
 	};
+
+	/* Power Rail Failure: 3 Amber, 5 White */
+	lb_state_diag_pwr: lb-state-diag-pwr {
+		board-led-alt-policy-label = <LED_ALT_POLICY_DIAG_PWR>;
+		pattern-0 {
+			transition = "LED_TRANSITION_STEP";
+			led-id = "EC_LED_ID_LIGHTBAR_LED";
+			cycle-count = <0>;
+			/* 3x Amber Flashes */
+			color-0  { led-color = <&lightbar_yellow>; period-ms = <500>; };
+			color-1  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-2  { led-color = <&lightbar_yellow>; period-ms = <500>; };
+			color-3  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-4  { led-color = <&lightbar_yellow>; period-ms = <500>; };
+			color-5  { led-color = <&lightbar_off>;    period-ms = <1500>; };
+			/* 5x White Flashes */
+			color-6  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-7  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-8  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-9  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-10  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-11  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-12  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-13  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-14  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-15  { led-color = <&lightbar_off>;    period-ms = <3000>; };
+		};
+	};
 };
