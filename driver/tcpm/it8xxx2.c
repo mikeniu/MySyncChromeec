@@ -26,15 +26,6 @@
 #include <soc.h>
 #endif
 
-#ifdef CONFIG_USB_PD_TCPMV1
-#if defined(CONFIG_USB_PD_DUAL_ROLE_AUTO_TOGGLE) || \
-	defined(CONFIG_USB_PD_VBUS_DETECT_TCPC) ||  \
-	defined(CONFIG_USB_PD_TCPC_LOW_POWER) ||    \
-	defined(CONFIG_USB_PD_DISCHARGE_TCPC)
-#error "Unsupported config options of IT8xxx2 PD driver"
-#endif
-#endif
-
 #ifdef CONFIG_USB_PD_TCPMV2
 #if defined(CONFIG_USB_PD_VBUS_DETECT_TCPC) || \
 	defined(CONFIG_USB_PD_DISCHARGE_TCPC)
@@ -858,22 +849,6 @@ static void it8xxx2_init(enum usbpd_port port, int role)
 	USBPD_SW_RESET(port);
 	/* Disable Rx decode */
 	it8xxx2_tcpm_set_rx_enable(port, 0);
-	if (IS_ENABLED(CONFIG_USB_PD_TCPMV1)) {
-		uint8_t flags = 0;
-		/*
-		 * If explicit contract is set in bbram when EC boot up, then
-		 * TCPMv1 set soft reset as first state instead of
-		 * unattached.SNK, so we need to enable BMC PHY for tx module.
-		 *
-		 * NOTE: If the platform is without battery and connects to
-		 * adapter, then cold reset EC, our Rd is always asserted on cc,
-		 * so adapter keeps providing 5v and data in BBRAM are still
-		 * alive.
-		 */
-		if ((pd_get_saved_port_flags(port, &flags) == EC_SUCCESS) &&
-		    (flags & PD_BBRMFLG_EXPLICIT_CONTRACT))
-			USBPD_ENABLE_BMC_PHY(port);
-	}
 	/* Disable all interrupts */
 	IT83XX_USBPD_IMR(port) = 0xff;
 	/* W/C status */
@@ -990,7 +965,6 @@ static void it8xxx2_tcpm_hook_connect(void)
 	if (port > (CONFIG_USB_PD_ITE_ACTIVE_PORT_COUNT - 1))
 		return;
 
-#ifdef CONFIG_USB_PD_TCPMV2
 	/*
 	 * There are five cases that hook_connect() be called by TCPMv2:
 	 * 1)AttachWait.SNK -> Attached.SNK: disable detect interrupt.
@@ -1009,7 +983,7 @@ static void it8xxx2_tcpm_hook_connect(void)
 	 * out or the SNK disable detect, so TCPMv1 needn't this.
 	 */
 	it8xxx2_tcpm_switch_plug_out_type(port);
-#endif
+
 	/* Enable PD PHY Tx and Rx module since type-c has connected. */
 	USBPD_ENABLE_BMC_PHY(port);
 	/*

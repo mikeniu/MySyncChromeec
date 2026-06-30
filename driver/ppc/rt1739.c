@@ -361,11 +361,9 @@ int rt1739_init(int port)
 		oc_setting |= RT1739_HV_SINK_OCP_SEL_5_5A;
 	else
 		oc_setting |= RT1739_HV_SINK_OCP_SEL_3_3A;
-#if defined(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT)
-	oc_setting |= rt1739_src_oc(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT);
-#else
+
 	oc_setting |= rt1739_src_oc(CONFIG_USB_PD_PULLUP);
-#endif
+
 	RETURN_ERROR(write_reg(port, RT1739_REG_VBUS_OC_SETTING, oc_setting));
 
 	return EC_SUCCESS;

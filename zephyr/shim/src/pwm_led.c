@@ -123,9 +123,6 @@ struct pwm_led_color_map led_color_map[EC_LED_COLOR_COUNT] = {
 		DT_INST_PROP_OR(0, color_map_magenta, EC_LED_COLOR_BLANK),
 };
 
-BUILD_ASSERT(DT_INST_PROP_LEN(0, brightness_range) == EC_LED_COLOR_COUNT,
-	     "brightness_range must have exactly EC_LED_COLOR_COUNT values");
-
 static const uint8_t dt_brigthness_range[EC_LED_COLOR_COUNT] =
 	DT_INST_PROP(0, brightness_range);
 

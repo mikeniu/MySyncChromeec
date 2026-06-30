@@ -10,6 +10,7 @@ This is the entry point for the custom firmware builder workflow recipe.
 """
 
 import collections
+from concurrent import futures
 import json
 import os
 import pathlib
@@ -24,6 +25,9 @@ from google.protobuf import json_format  # pylint: disable=import-error
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
 from chromite.lib.chromeos_version import VersionInfo
 import scripts.firmware_builder_lib
+from scripts.firmware_builder_lib import find_checkout
+from scripts.firmware_builder_lib import prepare_codebase
+from scripts.firmware_builder_lib import restore_codebase
 
 
 # Add the zmake dir early in the python search path
@@ -130,14 +134,6 @@ def log_cmd(cmd, env=None, cwd=None):
         ]
     print(" ".join(shlex.quote(str(x)) for x in cmd))
     sys.stdout.flush()
-
-
-def find_checkout():
-    """Find the path to the base of the checkout (e.g., ~/chromiumos)."""
-    for path in pathlib.Path(__file__).resolve().parents:
-        if (path / ".repo").is_dir():
-            return path
-    raise FileNotFoundError("Unable to locate the root of the checkout")
 
 
 def get_version():
@@ -652,36 +648,50 @@ def test(opts):
 
     if opts.code_coverage:
         build_dir = platform_ec / "build" / "zephyr"
+
+        # Prepare the list of tasks (name, filename)
+        tasks = []
         if twister_out_dir.exists():
-            _extract_lcov_summary(
-                "EC_ZEPHYR_TESTS", metrics, twister_out_dir / "coverage.info"
-            )
-        _extract_lcov_summary(
-            "EC_ZEPHYR_TESTS_GCC",
-            metrics,
-            twister_out_dir_gcc / "coverage.info",
-        )
-        _extract_lcov_summary(
-            "EC_LEGACY_TESTS", metrics, platform_ec / "build/coverage/lcov.info"
-        )
-        _extract_lcov_summary(
-            "ALL_TESTS", metrics, build_dir / "all_tests.info"
-        )
-        _extract_lcov_summary(
-            "EC_ZEPHYR_MERGED", metrics, build_dir / "zephyr_merged.info"
-        )
-        _extract_lcov_summary("ALL_MERGED", metrics, build_dir / "lcov.info")
-        _extract_lcov_summary(
-            "ALL_FILTERED", metrics, build_dir / "lcov_no_tests.info"
+            tasks.append(("EC_ZEPHYR_TESTS", twister_out_dir / "coverage.info"))
+        tasks.extend(
+            [
+                ("EC_ZEPHYR_TESTS_GCC", twister_out_dir_gcc / "coverage.info"),
+                ("EC_LEGACY_TESTS", platform_ec / "build/coverage/lcov.info"),
+                ("ALL_TESTS", build_dir / "all_tests.info"),
+                ("EC_ZEPHYR_MERGED", build_dir / "zephyr_merged.info"),
+                ("ALL_MERGED", build_dir / "lcov.info"),
+                ("ALL_FILTERED", build_dir / "lcov_no_tests.info"),
+            ]
         )
 
         for project in get_projects():
             if project.config.project_name in SPECIAL_BOARDS:
-                _extract_lcov_summary(
-                    f"BOARD_{project.config.full_name}".upper(),
-                    metrics,
-                    build_dir / (project.config.project_name + "_final.info"),
+                tasks.append(
+                    (
+                        f"BOARD_{project.config.full_name}".upper(),
+                        build_dir
+                        / (project.config.project_name + "_final.info"),
+                    )
                 )
+
+        # Run lcov in parallel using a ThreadPoolExecutor
+        max_workers = min(len(tasks), opts.cpus or 4)
+        with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_name = {
+                executor.submit(
+                    _extract_lcov_summary_worker, name, filename
+                ): name
+                for name, filename in tasks
+            }
+            for future in futures.as_completed(future_to_name):
+                result = future.result()
+                if result:
+                    name, cov, covered, total = result
+                    metric = metrics.value.add()
+                    metric.name = name
+                    metric.coverage_percent = cov
+                    metric.covered_lines = covered
+                    metric.total_lines = total
 
     if opts.metrics:
         with open(opts.metrics, "w", encoding="utf-8") as file:
@@ -809,7 +819,8 @@ COVERAGE_RE = re.compile(
 )
 
 
-def _extract_lcov_summary(name, metrics, filename):
+def _extract_lcov_summary_worker(name, filename):
+    """Worker function to run lcov summary in a thread."""
     cmd = [
         "/usr/bin/lcov",
         "--ignore-errors",
@@ -823,16 +834,21 @@ def _extract_lcov_summary(name, metrics, filename):
         cwd=ZEPHYR_DIR,
         check=True,
         stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         universal_newlines=True,
         stdin=subprocess.DEVNULL,
     ).stdout
     re_match = COVERAGE_RE.search(output)
     if re_match:
-        metric = metrics.value.add()
-        metric.name = name
-        metric.coverage_percent = float(re_match.group(1))
-        metric.covered_lines = int(re_match.group(2))
-        metric.total_lines = int(re_match.group(3))
+        return (
+            name,
+            float(re_match.group(1)),
+            int(re_match.group(2)),
+            int(re_match.group(3)),
+        )
+    raise ValueError(
+        f"Failed to parse LCOV summary output for {name}: {output}"
+    )
 
 
 def main(args):
@@ -861,8 +877,14 @@ def main(args):
         print("Must select a valid sub command!")
         return -1
 
-    # Run selected sub command function
-    return opts.func(opts)
+    applied_patches = []
+    copied_files = []
+    try:
+        prepare_codebase(opts, applied_patches, copied_files)
+        # Run selected sub command function
+        return opts.func(opts)
+    finally:
+        restore_codebase(applied_patches, copied_files)
 
 
 if __name__ == "__main__":

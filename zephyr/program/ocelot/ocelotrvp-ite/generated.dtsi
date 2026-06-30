@@ -54,10 +54,6 @@
 		gpio_cpu_c10_gate_r: cpu_c10_gate_r {
 			gpios = <&gpiob 2 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
 		};
-		gpio_c_ec_pdb_ctrl_r: c_ec_pdb_ctrl_r {
-			gpios = <&gpioh 0 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH |
-						GPIO_OUTPUT_INIT_LOGICAL)>;
-		};
 		gpio_c_ec_snr_alrt1: c_ec_snr_alrt1 {
 			// signal name was manually overriden from "bga_pinc1"
 			gpios = <&gpiof 7 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
