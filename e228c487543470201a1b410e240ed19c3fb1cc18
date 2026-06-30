@@ -16,6 +16,29 @@
       "message": "@chajoseph@google.com Can you try to reproduce the failure with this CL cherry picked and see what happens? Note that this is in platform/EC, because it only touches common code, but you\u0027ll need to cherry pick to platform/ec-legacy to build marasov with it.",
       "revId": "e228c487543470201a1b410e240ed19c3fb1cc18",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0684cfc3_e48f0ab8",
+        "filename": "driver/tcpm/ps8xxx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 3496742
+      },
+      "writtenOn": "2026-06-30T08:10:46Z",
+      "side": 1,
+      "message": "While `PS8XXX_REG_VENDOR_ID_L` is defined for PS8751, it currently causes a compilation error. Would it be better to use `TCPC_REG_VENDOR_ID` instead? I have verified this change by compiling with `TCPC_REG_VENDOR_ID` and running tests.",
+      "range": {
+        "startLine": 788,
+        "startChar": 16,
+        "endLine": 788,
+        "endChar": 38
+      },
+      "revId": "e228c487543470201a1b410e240ed19c3fb1cc18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
