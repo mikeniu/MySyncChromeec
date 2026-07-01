@@ -87,6 +87,10 @@
 	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
 };
 
+&pdc_ti_c0_hbr {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+
 &ulpm {
 	status = "okay";
 	/* BC_ACOK: AC power present, wakes EC on rising edge */
