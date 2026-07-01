@@ -65,17 +65,8 @@ ZTEST_USER(console_cmd_cbi, test_set)
 
 ZTEST_USER(console_cmd_cbi, test_extra)
 {
-	zassert_ok(shell_execute_cmd(get_ec_shell(),
-				     "cbi remove 42 skip_write"),
-		   NULL);
-	zassert_ok(shell_execute_cmd(get_ec_shell(), "cbi remove 42 init"),
-		   NULL);
-	zassert_ok(shell_execute_cmd(get_ec_shell(),
-				     "cbi remove 42 init skip_write"),
-		   NULL);
-	zassert_ok(shell_execute_cmd(get_ec_shell(),
-				     "cbi remove 42 skip_write init"),
-		   NULL);
-	zassert_ok(!shell_execute_cmd(get_ec_shell(), "cbi remove 42 extra"),
-		   NULL);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "cbi remove 42"), NULL);
+	zassert_not_ok(shell_execute_cmd(get_ec_shell(), "cbi remove 42 extra"),
+		       NULL);
+
 }
