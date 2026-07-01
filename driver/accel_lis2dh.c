@@ -131,7 +131,7 @@ static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
 				 * interrupt handler for the 2nd sample.
 				 */
 				read_count++;
-				ts = nsamples > 1 ?
+				ts = nsamples == 2 ?
 					     timestamp - s->collection_rate *
 								 (nsamples -
 								  read_count) :
@@ -185,6 +185,7 @@ static int lis2dh_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	bool commit_needed = false;
 	int nsamples;
 	int sensor_num = s - motion_sensors;
+	int total_samples = 0;
 
 	if ((!(*event & ACCEL_LIS2DH_INT_EVENT)) ||
 	    motion_sensor_in_forced_mode(s)) {
@@ -193,6 +194,7 @@ static int lis2dh_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 
 	do {
 		RETURN_ERROR(lis2dh_get_fifo_samples(s, &nsamples));
+		total_samples += nsamples;
 
 		if (nsamples != 0) {
 			commit_needed = true;
@@ -202,7 +204,9 @@ static int lis2dh_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	} while (nsamples != 0);
 
 	if (IS_ENABLED(CONFIG_ACCEL_FIFO) && commit_needed) {
-		motion_sense_fifo_reset_sensor_anchor(sensor_num);
+		if (total_samples <= 2) {
+			motion_sense_fifo_reset_sensor_anchor(sensor_num);
+		}
 		motion_sense_fifo_commit_data();
 	}
 
@@ -292,6 +296,23 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 
 	mutex_lock(s->mutex);
 
+	/*
+         * FIFO stop collecting events. Restart FIFO in Bypass mode.
+         *
+         * If ODR is changed all samples in FIFO must be discharged because
+         * they were captured at the previous rate and the motion sense FIFO
+         * spreading algorithm would otherwise stage them with timestamps
+         * spaced at the new period. This mirrors what set_range() already
+         * does for full-scale changes, and what accel_lis2dw12.c does in
+         * its set_data_rate().
+         */
+        if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE)) {
+		ret = lis2dh_enable_fifo(s, LIS2DH_FIFO_BYPASS_MODE);
+		if (ret != EC_SUCCESS) {
+			goto unlock_rate;
+		}
+	}
+
 	if (rate == 0) {
 		/* Power Off device */
 		ret = st_write_data_with_mask(s, LIS2DH_CTRL1_ADDR,
@@ -320,6 +341,11 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 				      reg_val);
 	if (ret == EC_SUCCESS)
 		data->base.odr = normalized_rate;
+
+	/* FIFO restart collecting events in Stream mode. */
+	if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE)) {
+		ret = lis2dh_enable_fifo(s, LIS2DH_STREAM_MODE);
+	}
 
 unlock_rate:
 	mutex_unlock(s->mutex);
