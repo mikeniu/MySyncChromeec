@@ -22,6 +22,30 @@
       },
       "revId": "4590be6e65fdb513e081a3b36a5884633d789b3e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1585d3bc_ce3a2aed",
+        "filename": "zephyr/drivers/usbc/common_pdc_fwup.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-07-01T22:16:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1bf35b2_73964827",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 52
+      },
+      "revId": "4590be6e65fdb513e081a3b36a5884633d789b3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
