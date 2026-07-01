@@ -16,6 +16,24 @@
       "message": "Add missing tags: TEST, BUG and LOW_COVERAGE_REASON",
       "revId": "fe81f99e29a46bca22e8b198152e2527eeb63330",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df9f2d12_d364189a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-07-01T12:16:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19bc2b54_c72d38f5",
+      "revId": "fe81f99e29a46bca22e8b198152e2527eeb63330",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
