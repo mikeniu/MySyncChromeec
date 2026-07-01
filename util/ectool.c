@@ -8404,6 +8404,57 @@ static int cmd_cbi_is_string_field(enum cbi_data_tag tag)
 	return tag == CBI_TAG_DRAM_PART_NUM || tag == CBI_TAG_OEM_NAME;
 }
 
+static int cmd_cbi_is_binary_field(enum cbi_data_tag tag)
+{
+	return (CBI_TAG_BATTERY_CONFIG <= tag &&
+		tag <= CBI_TAG_BATTERY_CONFIG_15) ||
+	       tag == CBI_TAG_UFSC;
+}
+
+static const char *get_cbi_tag_type_string(enum cbi_data_tag tag)
+{
+	if (cmd_cbi_is_string_field(tag))
+		return " (string)";
+	if (cmd_cbi_is_binary_field(tag))
+		return " (hex)";
+	return "";
+}
+
+static void cmd_cbi_help(char *cmd)
+{
+	fprintf(stderr,
+		"  Usage: %s get <tag> [get_flag]\n"
+		"  Usage: %s set <tag> <value> <size> [set_flag]\n"
+		"  Usage: %s set <tag> <string/hex> <*> [set_flag]\n"
+		"  Usage: %s remove <tag> [set_flag]\n"
+		"    <tag> is one of:\n",
+		cmd, cmd, cmd, cmd);
+	for (int tag = CBI_TAG_BOARD_VERSION; tag <= CBI_TAG_COMMON_CONTROL;
+	     ++tag) {
+		fprintf(stderr, "      %2d: %s%s\n", tag, cbi_field_name[tag],
+			get_cbi_tag_type_string(
+				static_cast<enum cbi_data_tag>(tag)));
+	}
+	fprintf(stderr, "      [%d:%d]: BATTERY_CONFIG_[0:15] (hex)\n",
+		CBI_TAG_BATTERY_CONFIG, CBI_TAG_BATTERY_CONFIG_15);
+	for (int tag = CBI_TAG_PROVISION_MATRIX_VERSION; tag < CBI_TAG_COUNT;
+	     ++tag) {
+		fprintf(stderr, "      %2d: %s%s\n", tag, cbi_field_name[tag],
+			get_cbi_tag_type_string(
+				static_cast<enum cbi_data_tag>(tag)));
+	}
+	fprintf(stderr,
+		"    <size> is the size of the data in byte. It should be zero for\n"
+		"      string types.\n"
+		"    <value/string> is an integer or a string to be set\n"
+		"    <*> is unused but must be present (e.g. '0')\n"
+		"    <hex> is a hex string\n"
+		"    [get_flag] is combination of:\n"
+		"      01b: Invalidate cache and reload data from EEPROM\n"
+		"    [set_flag] is combination of:\n"
+		"      10b: Set all fields to defaults first\n");
+}
+
 /*
  * Write value to CBI
  *
