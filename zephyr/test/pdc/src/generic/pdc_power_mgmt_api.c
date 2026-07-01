@@ -3150,6 +3150,19 @@ ZTEST_USER(pdc_power_mgmt_api_suspended, test_get_info)
 		      -ENOTCONN, rv);
 }
 
+ZTEST_USER(pdc_power_mgmt_api_suspended, test_wait_for_sync)
+{
+	int rv;
+
+	/* This is expected to time out because the stack is suspended.
+	 * A timeout of -1 indicates the default timeout period of
+	 * PDC_SM_SETTLED_TIMEOUT_MS
+	 */
+	rv = pdc_power_mgmt_wait_for_sync(TEST_PORT, -1);
+	zassert_equal(-ETIMEDOUT, rv, "Expected %d (-ETIMEDOUT) but got %d",
+		      -ETIMEDOUT, rv);
+}
+
 /* TODO(b/345292002): The tests below fail with the TPS6699x emulator/driver. */
 #ifndef CONFIG_TODO_B_345292002
 
