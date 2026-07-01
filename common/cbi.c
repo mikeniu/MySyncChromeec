@@ -273,8 +273,28 @@ DECLARE_HOST_COMMAND(EC_CMD_GET_CROS_BOARD_INFO,
 
 static int hc_cbi_set(struct host_cmd_handler_args *args)
 {
+<<<<<<< HEAD
 	const struct __ec_align4 ec_params_set_cbi *p = args->params;
 	int rv;
+=======
+	uint8_t size = sizeof(*id);
+	return cbi_get_board_info(CBI_TAG_REWORK_ID, (uint8_t *)id, &size);
+}
+
+static bool is_valid_cbi(const uint8_t *cbi);
+
+static enum ec_status
+common_cbi_set(const struct __ec_align4 ec_params_set_cbi *p)
+{
+	/*
+	 * If we ultimately cannot write to the flash, then fail early unless
+	 * we are explicitly trying to write to the in-memory CBI only
+	 */
+	if (cbi_config->drv->is_protected()) {
+		CPRINTS("Failed to write due to WP");
+		return EC_RES_ACCESS_DENIED;
+	}
+>>>>>>> f7eaf2ac7c (cbi: remove "skip_write" support)
 
 	if (p->flag & CBI_SET_INIT) {
 		memset(cbi, 0, sizeof(cbi));
@@ -295,6 +315,7 @@ static int hc_cbi_set(struct host_cmd_handler_args *args)
 	head->minor_version = CBI_VERSION_MINOR;
 	head->crc = cbi_crc8(head);
 
+<<<<<<< HEAD
 	/* Skip write if client asks so. */
 	if (p->flag & CBI_SET_NO_SYNC)
 		return EC_RES_SUCCESS;
@@ -303,6 +324,11 @@ static int hc_cbi_set(struct host_cmd_handler_args *args)
 	if (rv)
 		return (rv == EC_ERROR_ACCESS_DENIED) ?
 				EC_RES_ACCESS_DENIED : EC_RES_ERROR;
+=======
+	/* We already checked write protect failure case. */
+	if (cbi_write())
+		return EC_RES_ERROR;
+>>>>>>> f7eaf2ac7c (cbi: remove "skip_write" support)
 
 	return EC_RES_SUCCESS;
 }
@@ -344,11 +370,203 @@ static int cc_cbi(int argc, char **argv)
 	else
 		ccprintf("UNKNOWN\n");
 
+<<<<<<< HEAD
 	ccprintf("SKU_ID: ");
 	if (cbi_get_sku_id(&val) == EC_SUCCESS)
 		ccprintf("%u (0x%x)\n", val, val);
 	else
 		ccprintf("UNKNOWN\n");
+=======
+/*
+ * Space for the set command (does not include data space) plus maximum
+ * possible console input
+ */
+static uint8_t
+	buf[sizeof(struct ec_params_set_cbi) + CONFIG_CONSOLE_INPUT_LINE_SIZE];
+
+static int cc_cbi(int argc, const char **argv)
+{
+	struct __ec_align4 ec_params_set_cbi *setter =
+		(struct __ec_align4 ec_params_set_cbi *)buf;
+	int last_arg;
+	char *e;
+
+	if (argc == 1) {
+		dump_cbi();
+		if (cbi_get_cache_status() == CBI_CACHE_STATUS_SYNCED)
+			hexdump(cbi, CBI_IMAGE_SIZE);
+		return EC_SUCCESS;
+	}
+
+	if (strcasecmp(argv[1], "set") == 0) {
+		if (argc < 3) {
+			ccprintf("Set requires: <tag> \n");
+			return EC_ERROR_PARAM_COUNT;
+		}
+
+		setter->tag = strtoi(argv[2], &e, 0);
+		if (*e)
+			return EC_ERROR_PARAM2;
+
+		if (setter->tag == CBI_TAG_UFSC) {
+			if (argc < 4) {
+				ccprintf("Set requires: <tag> <hex_string>\n");
+				return EC_ERROR_PARAM_COUNT;
+			}
+		} else {
+			if (argc < 5) {
+				ccprintf(
+					"Set requires: <tag> <value> <size>\n");
+				return EC_ERROR_PARAM_COUNT;
+			}
+		}
+
+		if (setter->tag == CBI_TAG_DRAM_PART_NUM ||
+		    setter->tag == CBI_TAG_OEM_NAME) {
+			setter->size = strlen(argv[3]) + 1;
+			memcpy(setter->data, argv[3], setter->size);
+
+			last_arg = 5;
+
+		} else if (setter->tag == CBI_TAG_UFSC) {
+			const char *val_str = argv[3];
+			int len = strlen(val_str);
+
+			if (len % 2 != 0) {
+				ccprintf("Hex length must be even\n");
+				return EC_ERROR_PARAM3;
+			}
+
+			setter->size = len / 2;
+
+			if (setter->size != sizeof(struct cbi_ufsc)) {
+				ccprintf("Data is not equal to ufsc\n");
+				return EC_ERROR_PARAM3;
+			}
+
+			for (int i = 0; i < setter->size; i++) {
+				char tmp[3] = { val_str[i * 2],
+						val_str[i * 2 + 1], '\0' };
+				char *err;
+				setter->data[i] =
+					(uint8_t)strtoi(tmp, &err, 16);
+				if (*err) {
+					ccprintf("Invalid hex: %s\n", tmp);
+					return EC_ERROR_PARAM3;
+				}
+			}
+
+			last_arg = 4;
+
+		} else {
+			uint64_t val = strtoull(argv[3], &e, 0);
+			if (*e)
+				return EC_ERROR_PARAM3;
+
+			setter->size = strtoi(argv[4], &e, 0);
+			if (*e)
+				return EC_ERROR_PARAM4;
+
+			if (setter->size < 1) {
+				ccprintf("Set size too small\n");
+				return EC_ERROR_PARAM4;
+			} else if ((setter->size > 8) ||
+				   (setter->size > 4 &&
+				    setter->tag != CBI_TAG_REWORK_ID)) {
+				ccprintf("Set size too large\n");
+				return EC_ERROR_PARAM4;
+			}
+
+			memcpy(setter->data, &val, setter->size);
+			last_arg = 5;
+		}
+
+	} else if (strcasecmp(argv[1], "remove") == 0) {
+		if (argc < 3) {
+			ccprintf("Remove requires: <tag>\n");
+			return EC_ERROR_PARAM_COUNT;
+		}
+		setter->tag = strtoi(argv[2], &e, 0);
+		if (*e)
+			return EC_ERROR_PARAM2;
+		setter->size = 0;
+		last_arg = 3;
+	} else {
+		return EC_ERROR_PARAM1;
+	}
+
+	setter->flag = 0;
+	if (argc > last_arg) {
+		int i;
+		for (i = last_arg; i < argc; i++) {
+			if (strcasecmp(argv[i], "init") == 0) {
+				setter->flag |= CBI_SET_INIT;
+			} else {
+				ccprintf("Invalid option: %s\n", argv[i]);
+				return EC_ERROR_PARAM1 + i - 1;
+			}
+		}
+	}
+
+	switch (common_cbi_set(setter)) {
+	case EC_RES_SUCCESS:
+		return EC_SUCCESS;
+	case EC_RES_INVALID_PARAM:
+		return EC_ERROR_INVAL;
+	case EC_RES_ACCESS_DENIED:
+		return EC_ERROR_ACCESS_DENIED;
+	default:
+		return EC_ERROR_UNKNOWN;
+	}
+}
+
+DECLARE_CONSOLE_COMMAND(cbi, cc_cbi,
+			"[set <tag> <value> <size> | "
+			"remove <tag>] [init]",
+			"Print or change Cros Board Info from flash");
+#endif /* CONFIG_CMD_CBI */
+
+int cbi_set_model_id(uint32_t model_id)
+{
+	/* Check write protect status */
+	if (cbi_config->drv->is_protected())
+		return EC_ERROR_ACCESS_DENIED;
+
+	/* Ensure that CBI has been configured */
+	if (cbi_read())
+		cbi_create();
+
+	/* Update the MODEL_ID field */
+	cbi_set_board_info(CBI_TAG_MODEL_ID, (uint8_t *)&model_id, sizeof(int));
+
+	/* Update CRC calculation and write to the storage */
+	head->crc = cbi_crc8(head);
+	if (cbi_write())
+		return EC_ERROR_UNKNOWN;
+
+	return EC_SUCCESS;
+}
+
+#ifndef CONFIG_AP_POWER_CONTROL
+int cbi_set_fw_config(uint32_t fw_config)
+{
+	/* Check write protect status */
+	if (cbi_config->drv->is_protected())
+		return EC_ERROR_ACCESS_DENIED;
+
+	/* Ensure that CBI has been configured */
+	if (cbi_read())
+		cbi_create();
+
+	/* Update the FW_CONFIG field */
+	cbi_set_board_info(CBI_TAG_FW_CONFIG, (uint8_t *)&fw_config,
+			   sizeof(int));
+
+	/* Update CRC calculation and write to the storage */
+	head->crc = cbi_crc8(head);
+	if (cbi_write())
+		return EC_ERROR_UNKNOWN;
+>>>>>>> f7eaf2ac7c (cbi: remove "skip_write" support)
 
 	dump_cbi();
 	return EC_SUCCESS;
