@@ -352,7 +352,7 @@ common_cbi_set(const struct __ec_align4 ec_params_set_cbi *p)
 	 * If we ultimately cannot write to the flash, then fail early unless
 	 * we are explicitly trying to write to the in-memory CBI only
 	 */
-	if (cbi_config->drv->is_protected() && !(p->flag & CBI_SET_NO_SYNC)) {
+	if (cbi_config->drv->is_protected()) {
 		CPRINTS("Failed to write due to WP");
 		return EC_RES_ACCESS_DENIED;
 	}
@@ -388,10 +388,6 @@ common_cbi_set(const struct __ec_align4 ec_params_set_cbi *p)
 	head->minor_version = CBI_VERSION_MINOR;
 	head->crc = cbi_crc8(head);
 	cache_status = CBI_CACHE_STATUS_SYNCED;
-
-	/* Skip write if client asks so. */
-	if (p->flag & CBI_SET_NO_SYNC)
-		return EC_RES_SUCCESS;
 
 	/* We already checked write protect failure case. */
 	if (cbi_write())
@@ -681,8 +677,6 @@ static int cc_cbi(int argc, const char **argv)
 		for (i = last_arg; i < argc; i++) {
 			if (strcasecmp(argv[i], "init") == 0) {
 				setter->flag |= CBI_SET_INIT;
-			} else if (strcasecmp(argv[i], "skip_write") == 0) {
-				setter->flag |= CBI_SET_NO_SYNC;
 			} else {
 				ccprintf("Invalid additional option\n");
 				return EC_ERROR_PARAM1 + i - 1;
@@ -703,7 +697,7 @@ static int cc_cbi(int argc, const char **argv)
 }
 DECLARE_CONSOLE_COMMAND(cbi, cc_cbi,
 			"[set <tag> <value> <size> | "
-			"remove <tag>] [init | skip_write]",
+			"remove <tag>] [init]",
 			"Print or change Cros Board Info from flash");
 #endif /* CONFIG_CMD_CBI */
 
