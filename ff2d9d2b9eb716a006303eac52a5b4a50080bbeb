@@ -16,6 +16,24 @@
       "message": "Hello, for this build failure, what should I do?",
       "revId": "ff2d9d2b9eb716a006303eac52a5b4a50080bbeb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f12bee35_563e6915",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-01T20:22:02Z",
+      "side": 1,
+      "message": "Adding your sensor caused some of the units test to exceed the maximum sensor count of 8.\n\nCL:8031564 corrects some of these issues.  Please rebase on this CL and run \"./twister -ivc -T zephyr/test/drivers\" with your changes.  You will likely need to make additional changes to accommodate the extra sensor to get builds passing.",
+      "parentUuid": "8c8714df_7bb6ab18",
+      "revId": "ff2d9d2b9eb716a006303eac52a5b4a50080bbeb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
