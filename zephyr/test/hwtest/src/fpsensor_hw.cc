@@ -43,9 +43,18 @@ ZTEST(fpsensor_hw, test_fp_check_hwid)
 		zassert_ok(fingerprint_get_info(fp_sensor_dev, &sensor_info,
 						image_frame_params_array,
 						&num_params));
-		/* The lower 4-bits of the sensor hardware id are a
+
+		uint32_t actual_hwid = sensor_info.model_id;
+
+		/* The lower 4-bits of the FPC sensor hardware id are a
 		 * manufacturing ID that is ok to vary.
 		 */
-		zassert_equal(fp_sensor_hwid, sensor_info.model_id >> 4);
+		if (IS_ENABLED(CONFIG_FINGERPRINT_SENSOR_FPC1025)) {
+			actual_hwid >>= 4;
+		}
+
+		zassert_equal(fp_sensor_hwid, actual_hwid,
+			      "Expected HWID 0x%x, got 0x%x", fp_sensor_hwid,
+			      actual_hwid);
 	};
 }
