@@ -645,6 +645,8 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	/* Disable interrupts before jump */
 	interrupt_disable_all();
 
+	chip_pre_system_jump();
+
 #ifdef CONFIG_DMA_CROS
 	/* Disable all DMA channels to avoid memory corruption */
 	dma_disable_all();
@@ -1083,11 +1085,87 @@ const struct ec_params_reboot_ec *system_get_reboot_at_shutdown(void)
 	return &reboot_at_shutdown;
 }
 
+static const char *reboot_cmd_to_str(int cmd)
+{
+	switch (cmd) {
+	case EC_REBOOT_CANCEL:
+		return "CANCEL";
+	case EC_REBOOT_JUMP_RO:
+		return "JUMP_RO";
+	case EC_REBOOT_JUMP_RW:
+		return "JUMP_RW";
+	case EC_REBOOT_COLD:
+		return "COLD";
+	case EC_REBOOT_DISABLE_JUMP:
+		return "DISABLE_JUMP";
+	case EC_REBOOT_HIBERNATE:
+		return "HIBERNATE";
+	case EC_REBOOT_HIBERNATE_CLEAR_AP_OFF:
+		return "HIBERNATE_CLEAR_AP_OFF";
+	case EC_REBOOT_COLD_AP_OFF:
+		return "COLD_AP_OFF";
+	case EC_REBOOT_NO_OP:
+		return "NO_OP";
+	default:
+		return "UNKNOWN";
+	}
+}
+
+static int validate_reboot_command(const struct ec_params_reboot_ec *p)
+{
+	switch (p->cmd) {
+	case EC_REBOOT_JUMP_RO:
+		if (system_is_locked() &&
+		    system_get_image_copy() != EC_IMAGE_RO) {
+			return EC_ERROR_ACCESS_DENIED;
+		}
+		break;
+	case EC_REBOOT_JUMP_RW:
+		if (system_is_locked()) {
+			if (IS_ENABLED(HAS_TASK_RWSIG)) {
+				return EC_ERROR_ACCESS_DENIED;
+			}
+			if (system_get_image_copy() != EC_IMAGE_RO) {
+				return EC_ERROR_ACCESS_DENIED;
+			}
+			if (disable_jump) {
+				return EC_ERROR_ACCESS_DENIED;
+			}
+		}
+		break;
+	case EC_REBOOT_HIBERNATE:
+		if (!IS_ENABLED(CONFIG_HIBERNATE)) {
+			return EC_ERROR_INVAL;
+		}
+		break;
+	default:
+		break;
+	}
+
+	return EC_SUCCESS;
+}
+
+static enum ec_status ec_error_to_status(int err)
+{
+	switch (err) {
+	case EC_SUCCESS:
+		return EC_RES_SUCCESS;
+	case EC_ERROR_INVAL:
+		return EC_RES_INVALID_PARAM;
+	case EC_ERROR_ACCESS_DENIED:
+		return EC_RES_ACCESS_DENIED;
+	default:
+		return EC_RES_ERROR;
+	}
+}
+
 /**
  * Handle a pending reboot command.
  */
 static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 {
+	int status;
+
 	if (IS_ENABLED(CONFIG_POWER_BUTTON_INIT_IDLE) &&
 	    (p->flags & EC_REBOOT_FLAG_CLEAR_AP_IDLE)) {
 		CPRINTS("Clearing AP_IDLE");
@@ -1095,6 +1173,10 @@ static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 				      ~EC_RESET_FLAG_AP_IDLE);
 		p->flags &= ~(EC_REBOOT_FLAG_CLEAR_AP_IDLE);
 	}
+
+	status = validate_reboot_command(p);
+	if (status != EC_SUCCESS)
+		return status;
 
 	switch (p->cmd) {
 	case EC_REBOOT_CANCEL:
@@ -1104,9 +1186,6 @@ static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 		return system_run_image_copy_with_flags(
 			EC_IMAGE_RO, EC_RESET_FLAG_STAY_IN_RO);
 	case EC_REBOOT_JUMP_RW:
-		if (IS_ENABLED(HAS_TASK_RWSIG) && system_is_locked())
-			return EC_ERROR_ACCESS_DENIED;
-
 		return system_run_image_copy(system_get_active_copy());
 	case EC_REBOOT_COLD:
 	case EC_REBOOT_COLD_AP_OFF:
@@ -1149,20 +1228,21 @@ static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 		system_disable_jump();
 		return EC_SUCCESS;
 	case EC_REBOOT_HIBERNATE:
-		if (!IS_ENABLED(CONFIG_HIBERNATE))
-			return EC_ERROR_INVAL;
-
 		/*
 		 * Allow some time for the system to quiesce before entering EC
 		 * hibernate.  Otherwise, some stray signals may cause an
 		 * immediate wake up.
 		 */
-		CPRINTS("Waiting 1s before hibernating...");
-		crec_msleep(1000);
-		CPRINTS("system hibernating");
-		system_hibernate(hibernate_seconds, hibernate_microseconds);
-		/* That shouldn't return... */
-		return EC_ERROR_UNKNOWN;
+		if (IS_ENABLED(CONFIG_HIBERNATE)) {
+			CPRINTS("Waiting 1s before hibernating...");
+			crec_msleep(1000);
+			CPRINTS("system hibernating");
+			system_hibernate(hibernate_seconds,
+					 hibernate_microseconds);
+			/* That shouldn't return... */
+			return EC_ERROR_UNKNOWN;
+		}
+		return EC_ERROR_INVAL;
 	default:
 		return EC_ERROR_INVAL;
 	}
@@ -1805,6 +1885,34 @@ host_command_get_board_version(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_GET_BOARD_VERSION, host_command_get_board_version,
 		     EC_VER_MASK(0));
 
+#ifdef HAS_TASK_HOSTCMD
+static int is_full_reboot_command(int cmd)
+{
+	return cmd == EC_REBOOT_JUMP_RO || cmd == EC_REBOOT_JUMP_RW ||
+	       cmd == EC_REBOOT_COLD || cmd == EC_REBOOT_HIBERNATE ||
+	       cmd == EC_REBOOT_COLD_AP_OFF;
+}
+
+#ifdef CONFIG_EC_HOST_CMD
+static struct ec_params_reboot_ec reboot_params;
+static bool reboot_scheduled;
+
+static void deferred_reboot(void)
+{
+	int rv = handle_pending_reboot(&reboot_params);
+
+	if (rv != EC_SUCCESS) {
+		CPRINTS("Deferred reboot failed, "
+			"command \'%s\', flags 0x%x: %d",
+			reboot_cmd_to_str(reboot_params.cmd),
+			reboot_params.flags, rv);
+	}
+	reboot_scheduled = false;
+}
+DECLARE_DEFERRED(deferred_reboot);
+#endif /* CONFIG_EC_HOST_CMD */
+#endif /* HAS_TASK_HOSTCMD*/
+
 STATIC_IF_NOT(CONFIG_ZTEST)
 enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 {
@@ -1820,6 +1928,12 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 		/* Cancel pending reboot */
 		reboot_at_shutdown.cmd = EC_REBOOT_CANCEL;
 		reboot_at_shutdown.flags = 0;
+#if defined(HAS_TASK_HOSTCMD) && defined(CONFIG_EC_HOST_CMD)
+		if (reboot_scheduled) {
+			hook_call_deferred(&deferred_reboot_data, -1);
+			reboot_scheduled = false;
+		}
+#endif
 		return EC_RES_SUCCESS;
 	}
 
@@ -1838,33 +1952,39 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 		return EC_RES_SUCCESS;
 	}
 
+	CPRINTS("Executing host reboot command \'%s\'",
+		reboot_cmd_to_str(p.cmd));
+
 #ifdef HAS_TASK_HOSTCMD
-	if (p.cmd == EC_REBOOT_JUMP_RO || p.cmd == EC_REBOOT_JUMP_RW ||
-	    p.cmd == EC_REBOOT_COLD || p.cmd == EC_REBOOT_HIBERNATE ||
-	    p.cmd == EC_REBOOT_COLD_AP_OFF) {
+	if (is_full_reboot_command(p.cmd)) {
+#ifdef CONFIG_EC_HOST_CMD
+		int status;
+
+		/*
+		 * Validate the command before deferring. If the check fails,
+		 * we can return the correct error status to the host.
+		 */
+		status = validate_reboot_command(&p);
+
+		if (status != EC_SUCCESS)
+			return ec_error_to_status(status);
+
+		if (!reboot_scheduled) {
+			/* Store the parameters and schedule the reboot */
+			reboot_params = p;
+			reboot_scheduled = true;
+			hook_call_deferred(&deferred_reboot_data, 50 * MSEC);
+		}
+		return EC_RES_SUCCESS;
+#else
 		/* Clean busy bits on host for commands that won't return */
-#ifndef CONFIG_EC_HOST_CMD
 		args->result = EC_RES_SUCCESS;
 		host_send_response(args);
-#else
-		ec_host_cmd_send_response(
-			EC_HOST_CMD_SUCCESS,
-			(struct ec_host_cmd_handler_args *)args);
-#endif
+#endif /* CONFIG_EC_HOST_CMD */
 	}
-#endif
+#endif /* HAS_TASK_HOSTCMD */
 
-	CPRINTS("Executing host reboot command %d", p.cmd);
-	switch (handle_pending_reboot(&p)) {
-	case EC_SUCCESS:
-		return EC_RES_SUCCESS;
-	case EC_ERROR_INVAL:
-		return EC_RES_INVALID_PARAM;
-	case EC_ERROR_ACCESS_DENIED:
-		return EC_RES_ACCESS_DENIED;
-	default:
-		return EC_RES_ERROR;
-	}
+	return ec_error_to_status(handle_pending_reboot(&p));
 }
 DECLARE_HOST_COMMAND(EC_CMD_REBOOT_EC, host_command_reboot, EC_VER_MASK(0));
 
@@ -1996,6 +2116,10 @@ __overridable int board_write_poweron_conf(const uint8_t *poweron_conf)
 		return EC_ERROR_UNIMPLEMENTED;
 }
 #endif /* CONFIG_POWERON_CONF_LEN */
+
+__overridable void chip_pre_system_jump(void)
+{
+}
 
 __test_only void system_common_reset_state(void)
 {

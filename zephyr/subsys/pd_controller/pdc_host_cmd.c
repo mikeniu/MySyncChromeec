@@ -11,8 +11,11 @@
 #include <string.h>
 
 #include <zephyr/device.h>
+#include <zephyr/logging/log.h>
 
 #include <drivers/pdc.h>
+
+LOG_MODULE_REGISTER(pdc_host_cmd, CONFIG_USB_PDC_LOG_LEVEL);
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_PD_CHIP_INFO
 /* EC_CMD_PD_CHIP_INFO implementation when a PDC is used. */
@@ -22,13 +25,26 @@ static enum ec_status hc_remote_pd_chip_info(struct host_cmd_handler_args *args)
 	const struct ec_params_pd_chip_info *p = args->params;
 	struct ec_response_pd_chip_info_v3 resp = { 0 };
 	struct pdc_info_t pdc_info;
+	int ret;
 
 	/* Safety check to make sure the pdc_info_t struct and host command use
 	 * the same project name length.
 	 */
 	BUILD_ASSERT(sizeof(resp.fw_name_str) == sizeof(pdc_info.project_name));
 
-	if (pdc_power_mgmt_get_info(p->port, &pdc_info, p->live)) {
+	ret = pdc_power_mgmt_get_info(p->port, &pdc_info, p->live);
+
+	switch (ret) {
+	case 0:
+		break;
+	case -EAGAIN:
+		/* Signal to AP FW to try again later. This can occur if a non-
+		 * live read is requested but no cached value is available yet.
+		 */
+		LOG_ERR("PD: No cached chip info for C%d", p->port);
+		return EC_RES_BUSY;
+	default:
+		LOG_ERR("PD: Cannot get chip info for C%d: %d", p->port, ret);
 		return EC_RES_ERROR;
 	}
 

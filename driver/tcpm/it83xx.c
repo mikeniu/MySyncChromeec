@@ -21,15 +21,6 @@
 #include "usb_pd_tcpm.h"
 #include "util.h"
 
-#ifdef CONFIG_USB_PD_TCPMV1
-#if defined(CONFIG_USB_PD_DUAL_ROLE_AUTO_TOGGLE) || \
-	defined(CONFIG_USB_PD_VBUS_DETECT_TCPC) ||  \
-	defined(CONFIG_USB_PD_TCPC_LOW_POWER) ||    \
-	defined(CONFIG_USB_PD_DISCHARGE_TCPC)
-#error "Unsupported config options of IT83xx PD driver"
-#endif
-#endif
-
 #ifdef CONFIG_USB_PD_TCPMV2
 #if defined(CONFIG_USB_PD_VBUS_DETECT_TCPC) || \
 	defined(CONFIG_USB_PD_DISCHARGE_TCPC)
@@ -344,22 +335,6 @@ static void it83xx_init(enum usbpd_port port, int role)
 
 	/* Disable Rx decode */
 	it83xx_tcpm_set_rx_enable(port, 0);
-	if (IS_ENABLED(CONFIG_USB_PD_TCPMV1)) {
-		uint8_t flags = 0;
-		/*
-		 * If explicit contract is set in bbram when EC boot up, then
-		 * TCPMv1 set soft reset as first state instead of
-		 * unattached.SNK, so we need to enable BMC PHY for tx module.
-		 *
-		 * NOTE: If the platform is without battery and connects to
-		 * adapter, then cold reset EC, our Rd is always asserted on cc,
-		 * so adapter keeps providing 5v and data in BBRAM are still
-		 * alive.
-		 */
-		if ((pd_get_saved_port_flags(port, &flags) == EC_SUCCESS) &&
-		    (flags & PD_BBRMFLG_EXPLICIT_CONTRACT))
-			USBPD_ENABLE_BMC_PHY(port);
-	}
 	/* W/C status */
 	IT83XX_USBPD_ISR(port) = 0xff;
 	/* enable cc, select cc1 and Rd. */

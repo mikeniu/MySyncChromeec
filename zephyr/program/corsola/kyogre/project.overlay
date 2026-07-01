@@ -200,11 +200,11 @@
 	};
 
 	batteries {
-		default_battery: SIMPLO_CP856931 {
-			compatible = "SIMPLO,CP856931", "battery-smart";
+		default_battery: smp_cp856931 {
+			compatible = "smp,cp856931", "battery-smart";
 		};
-		SIMPLO_CP856932 {
-			compatible = "SIMPLO,CP856932", "battery-smart";
+		smp_cp856932 {
+			compatible = "smp,cp856932", "battery-smart";
 		};
 	};
 

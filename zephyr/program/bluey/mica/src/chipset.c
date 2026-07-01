@@ -32,3 +32,17 @@ void board_chipset_shutdown_mica(void)
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_mica,
 	     HOOK_PRIO_DEFAULT);
+
+void board_chipset_suspend_mica(void)
+{
+	/* Reduces suspend power consumption by disable panel bl power. */
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_ppvar_oled), 0);
+}
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, board_chipset_suspend_mica,
+	     HOOK_PRIO_DEFAULT);
+
+void board_chipset_resume_mica(void)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_ppvar_oled), 1);
+}
+DECLARE_HOOK(HOOK_CHIPSET_RESUME, board_chipset_resume_mica, HOOK_PRIO_DEFAULT);

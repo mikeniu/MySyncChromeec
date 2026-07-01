@@ -66,20 +66,26 @@ static void shi_power_change(struct ap_power_ev_callback *cb,
 	default:
 		return;
 
+	case AP_POWER_STARTUP:
+#if !CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
+	case AP_POWER_RESUME:
+#endif
+		shi_enable();
+		break;
+
+	case AP_POWER_SHUTDOWN:
+#if !CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
+	case AP_POWER_SUSPEND:
+#endif
+		shi_disable();
+		break;
+
 #if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
 	case AP_POWER_RESUME_INIT:
 		shi_enable();
 		break;
 
 	case AP_POWER_SUSPEND_COMPLETE:
-		shi_disable();
-		break;
-#else
-	case AP_POWER_RESUME:
-		shi_enable();
-		break;
-
-	case AP_POWER_SUSPEND:
 		shi_disable();
 		break;
 #endif
@@ -94,11 +100,12 @@ static int shi_init(void)
 #endif
 
 	ap_power_ev_init_callback(&cb, shi_power_change,
+				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN |
 #if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
-				  AP_POWER_RESUME_INIT |
+					  AP_POWER_RESUME_INIT |
 					  AP_POWER_SUSPEND_COMPLETE
 #else
-				  AP_POWER_RESUME | AP_POWER_SUSPEND
+					  AP_POWER_RESUME | AP_POWER_SUSPEND
 #endif
 	);
 	ap_power_ev_add_callback(&cb);

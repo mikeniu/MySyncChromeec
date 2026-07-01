@@ -682,7 +682,8 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_sink_pdo_errors)
 				     &frs_partner_snk_pdo));
 	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
 					    &connector_status));
-	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0,
+						TEST_EXTENDED_TIMEOUT));
 
 	/* FRS should be disabled. */
 	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT0],
@@ -690,7 +691,8 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_sink_pdo_errors)
 	zassert_false(frs_enabled);
 
 	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
-	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0,
+						TEST_EXTENDED_TIMEOUT));
 
 	/* Partner must also advertise FRS before we enable FRS. */
 	frs_partner_snk_pdo = PDO_FIXED(5000, 3000, PDO_FIXED_DUAL_ROLE);
@@ -707,14 +709,16 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_sink_pdo_errors)
 				     &frs_partner_snk_pdo));
 	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
 					    &connector_status));
-	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0,
+						TEST_EXTENDED_TIMEOUT));
 
 	/* FRS should be disabled. */
 	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT0],
 				    &frs_enabled));
 	zassert_false(frs_enabled);
 	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
-	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0,
+						TEST_EXTENDED_TIMEOUT));
 
 	/* Verify FRS enabled if the partner only wants default power */
 	frs_partner_snk_pdo = PDO_FIXED(
@@ -733,7 +737,8 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_sink_pdo_errors)
 				     &frs_partner_snk_pdo));
 	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
 					    &connector_status));
-	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0,
+						TEST_EXTENDED_TIMEOUT));
 
 	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT0],
 				    &frs_enabled));

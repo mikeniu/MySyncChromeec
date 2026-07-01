@@ -126,6 +126,17 @@ void chipset_handle_espi_reset_assert(void);
  */
 void chipset_pre_init_callback(void);
 
+/**
+ * Check if the current wake is an off-mode charging wake.
+ *
+ * This can be used by the power sequence or board specific code to indicate if
+ * the current wake occurs to perform an off-mode charging task which won't be
+ * booting to the OS.
+ *
+ * @return non-zero if the current wake is an off-mode charging wake.
+ */
+int chipset_is_offmode_charging_wake(void);
+
 #else /* !CONFIG_AP_POWER_CONTROL */
 
 #if defined(CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE) || \

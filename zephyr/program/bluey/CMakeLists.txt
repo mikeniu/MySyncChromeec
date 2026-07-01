@@ -26,7 +26,14 @@ if(DEFINED CONFIG_BOARD_MICA)
 	add_subdirectory(mica)
 endif()
 
+if(DEFINED CONFIG_BOARD_MICA)
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_THROTTLE_AP
+					"mica/src/throttle.c")
+else()
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_THROTTLE_AP
+					"src/throttle.c")
+endif()
+
 zephyr_library_sources("src/battery.c")
 zephyr_library_sources("src/switchcap.c")
 zephyr_library_sources("src/chipset.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_THROTTLE_AP "src/throttle.c")

@@ -8,6 +8,7 @@
 
 #include <zephyr/device.h>
 #include <zephyr/fff.h>
+#include <zephyr/kernel.h>
 #include <zephyr/ztest_assert.h>
 #include <zephyr/ztest_test.h>
 
@@ -171,7 +172,9 @@ ZTEST(host_cmd_reboot, test_reboot)
 		{
 			.cmd = EC_REBOOT_COLD,
 			.flags = 0,
-			.expect_return = EC_RES_ERROR,
+			.expect_return = IS_ENABLED(CONFIG_EC_HOST_CMD) ?
+						 EC_RES_SUCCESS :
+						 EC_RES_ERROR,
 			.expect_reboot_at_shutdown = EC_REBOOT_CANCEL,
 			.expect_reset_called = 1,
 			.expect_reset_flags = SYSTEM_RESET_HARD,
@@ -180,7 +183,9 @@ ZTEST(host_cmd_reboot, test_reboot)
 		{
 			.cmd = EC_REBOOT_HIBERNATE,
 			.flags = 0,
-			.expect_return = EC_RES_ERROR,
+			.expect_return = IS_ENABLED(CONFIG_EC_HOST_CMD) ?
+						 EC_RES_SUCCESS :
+						 EC_RES_ERROR,
 			.expect_reboot_at_shutdown = EC_REBOOT_CANCEL,
 			.expect_reset_called = 0,
 			.expect_reset_flags = 0,
@@ -189,7 +194,9 @@ ZTEST(host_cmd_reboot, test_reboot)
 		{
 			.cmd = EC_REBOOT_COLD_AP_OFF,
 			.flags = 0,
-			.expect_return = EC_RES_ERROR,
+			.expect_return = IS_ENABLED(CONFIG_EC_HOST_CMD) ?
+						 EC_RES_SUCCESS :
+						 EC_RES_ERROR,
 			.expect_reboot_at_shutdown = EC_REBOOT_CANCEL,
 			.expect_reset_called = 1,
 			.expect_reset_flags = SYSTEM_RESET_HARD |
@@ -215,6 +222,14 @@ ZTEST(host_cmd_reboot, test_reboot)
 		RESET_FAKE(system_hibernate);
 
 		ret = ec_cmd_reboot_ec(NULL, &p);
+
+		/* Give time for mocked functions to run */
+		if (IS_ENABLED(CONFIG_EC_HOST_CMD) && ret == EC_RES_SUCCESS &&
+		    (p.cmd == EC_REBOOT_COLD ||
+		     p.cmd == EC_REBOOT_COLD_AP_OFF ||
+		     p.cmd == EC_REBOOT_HIBERNATE)) {
+			k_msleep(p.cmd == EC_REBOOT_HIBERNATE ? 2000 : 100);
+		}
 
 		zassert_equal(ret, tests[i].expect_return,
 			      "Unexpected return value (%d): %d", i, ret);

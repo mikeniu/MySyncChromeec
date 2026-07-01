@@ -51,4 +51,7 @@ config CROS_EC_RW_SIZE
 config CROS_EC_RW_MEM_OFF
 	default 0
 
+config MAIN_STACK_SIZE
+	default 1280
+
 endif # SOC_SERIES_RTS5912

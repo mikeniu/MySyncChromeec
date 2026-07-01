@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "fpsensor_test_utils.h"
+
 #include <string.h>
 
 #include <zephyr/autoconf.h>
@@ -128,8 +130,12 @@ ZTEST(fpsensor_get_frame, test_get_frame_cache_size_exceeds_buffer)
 	 * Cache Pollution: Use the test-only setter to override the cache value
 	 * without violating strict aliasing rules.
 	 */
-	global_context.fp_frame_size_cache.set_frame_size(
-		FP_CAPTURE_VENDOR_FORMAT, FP_SENSOR_IMAGE_SIZE + 1);
+	zassert_true(FpFrameSizeCacheTestHelper::set_frame_size(
+			     global_context.fp_frame_size_cache,
+			     FP_CAPTURE_VENDOR_FORMAT,
+			     FP_SENSOR_IMAGE_SIZE + 1),
+		     "Failed to set valid frame size for capture type %d",
+		     FP_CAPTURE_VENDOR_FORMAT);
 
 	enum ec_status status = get_frame(offset, size, output_buffer);
 
@@ -181,6 +187,34 @@ ZTEST(fpsensor_get_frame, test_get_frame_integer_overflow)
 	/* Verify buffer integrity remains intact */
 	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
 			  "Output buffer modified during failure path");
+}
+
+ZTEST(fpsensor_get_frame, test_get_frame_shifted_integer_overflow)
+{
+	uint8_t output_buffer[kMaxReadSize];
+	memset(output_buffer, 0xA5, sizeof(output_buffer));
+
+	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+
+	uint32_t size = kMaxReadSize;
+	uint32_t offset = UINT32_MAX - FP_SENSOR_IMAGE_OFFSET + 1;
+
+	/*
+	 * Verify that the offset + image_offset will definitely overflow 32
+	 * bits
+	 */
+	zassert_true(
+		(uint64_t)offset + FP_SENSOR_IMAGE_OFFSET > UINT32_MAX,
+		"Test setup: Expected overflow condition, but calculation is safe.");
+
+	enum ec_status status = get_frame(offset, size, output_buffer);
+
+	zassert_equal(
+		status, EC_RES_INVALID_PARAM,
+		"Expected rejection of offset causing integer wrap-around");
+
+	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
+			  "Output buffer modified during overflow attack");
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_shifted_layout_success)
@@ -322,8 +356,11 @@ ZTEST(fpsensor_get_frame, test_get_frame_physical_hardware_buffer_overflow)
 	 * Cache Pollution: Use the test-only setter to override the cache value
 	 * without violating strict aliasing rules.
 	 */
-	global_context.fp_frame_size_cache.set_frame_size(
-		FP_CAPTURE_SIMPLE_IMAGE, sizeof(fp_buffer));
+	zassert_true(FpFrameSizeCacheTestHelper::set_frame_size(
+			     global_context.fp_frame_size_cache,
+			     FP_CAPTURE_SIMPLE_IMAGE, sizeof(fp_buffer)),
+		     "Failed to set valid frame size for capture type %d",
+		     FP_CAPTURE_SIMPLE_IMAGE);
 
 	enum ec_status status = get_frame(offset, size, output_buffer);
 

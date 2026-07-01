@@ -168,6 +168,8 @@ child-binding:
           - LED_TRANSITION_EXPONENTIAL
       cycle-count:
         type: int
+        min: 0
+        max: 255
         description: |
           Number of times the sequence repeats before stopping.
           0 (default) implies infinite loop.
@@ -210,3 +212,5 @@ child-binding:
                };
             };
           type: int
+          min: 0
+          max: 65535

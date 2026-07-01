@@ -2721,9 +2721,7 @@
 /* EC supports EC_CMD_TYPEC_DISCOVERY */
 #define CONFIG_HOSTCMD_TYPEC_DISCOVERY
 
-/* EC supports EC_CMD_TYPEC_CONTROL
- * Note: this gets undefined later if TCPMv1 is selected.
- */
+/* EC supports EC_CMD_TYPEC_CONTROL */
 #define CONFIG_HOSTCMD_TYPEC_CONTROL
 
 /* EC supports EC_CMD_TYPEC_STATUS */
@@ -3865,6 +3863,11 @@
  */
 #undef CONFIG_POWER_BUTTON_TO_PCH_CUSTOM
 
+/*
+ * Enable power button press host command.
+ */
+#undef CONFIG_HOSTCMD_POWER_BUTTON_PRESS
+
 /* Compile common code for AP power state machine */
 #undef CONFIG_POWER_COMMON
 
@@ -4688,23 +4691,11 @@
  * Enables USB Power Delivery
  *
  * When this config option is enabled, one of the following must be enabled:
- *	CONFIG_USB_PD_TCPMV1 - legacy power delivery state machine
  *	CONFIG_USB_PD_TCPMV2 - current power delivery state machine
  *	CONFIG_USB_PD_CONTROLLER - power delivery controller state machine
+ * TCPMv1 is not supported in platform/ec (see platform/ec-legacy)
  */
 #undef CONFIG_USB_POWER_DELIVERY
-
-/*
- * Enables the Legacy power delivery state machine.
- * NOTE: Should not be used for new designs.
- */
-#undef CONFIG_USB_PD_TCPMV1
-
-/*
- * Enables PD protocol state names in the TPCMv1 console output.
- * Disable to save ~900 bytes in flash space.
- */
-#define CONFIG_USB_PD_TCPMV1_DEBUG
 
 /*
  * Enables Version 2 of the Power Delivery state machine
@@ -4911,9 +4902,6 @@
 
 /* Enable Displayport 2.1 Capability */
 #undef CONFIG_USB_PD_DP21_MODE
-
-/* Dynamic USB PD source capability */
-#undef CONFIG_USB_PD_DYNAMIC_SRC_CAP
 
 /* Support USB PD flash. */
 #undef CONFIG_USB_PD_FLASH
@@ -5684,29 +5672,12 @@
 
 /* Default pull-up value on the USB-C ports when they are used as source. */
 #define CONFIG_USB_PD_PULLUP TYPEC_RP_1A5
-/*
- * Override the pull-up value when only zero or one port is actively sourcing
- * current and we can advertise more current than what is defined by
- * `CONFIG_USB_PD_PULLUP`.
- * Should be defined with one of the tcpc_rp_value.
- */
-#undef CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT
 
 /*
  * Ignore all non-fixed PDOs received from a src_caps message. Enable this for
  * boards (like servo_v4) which only support FIXED PDO types.
  */
 #undef CONFIG_USB_PD_ONLY_FIXED_PDOS
-
-/*
- * Total current in mA the board can supply to external devices through
- * USB-C ports
- *
- * When a sink device is plugged or unplugged, source current redistribution
- * occurs. If this macro is defined, redistribution occurs in such a way
- * that there is no current drop (e.g. 3A -> 1.5A) on active source ports.
- */
-#undef CONFIG_USB_PD_MAX_TOTAL_SOURCE_CURRENT
 
 /*
  * Maximum number of interrupts in a second. Exceeding this limit
@@ -6207,21 +6178,18 @@
 /******************************************************************************/
 /*
  * If CONFIG_USB_POWER_DELIVERY is enabled, make sure either
- * CONFIG_USB_PD_TCPMV1 or CONFIG_USB_PD_TCPMV2 is enabled but not both. Also
- * make sure CONFIG_USB_PD_DECODE_SOP is enabled with CONFIG_USB_PD_TCPMV2
+ * CONFIG_USB_PD_CONTROLLER or CONFIG_USB_PD_TCPMV2 is enabled but not both.
+ * Also make sure CONFIG_USB_PD_DECODE_SOP is enabled with CONFIG_USB_PD_TCPMV2
  */
 #ifdef CONFIG_USB_POWER_DELIVERY
-#if defined(CONFIG_USB_PD_TCPMV1) && defined(CONFIG_USB_PD_TCPMV2)
-#error Only one version of the USB PD State Machine can be enabled.
+#if defined(CONFIG_USB_PD_TCPMV2) == defined(CONFIG_USB_PD_CONTROLLER)
+#error Enable exactly one of CONFIG_USB_PD_TCPMV2 or CONFIG_USB_PD_CONTROLLER
 #endif
-#if !defined(CONFIG_USB_PD_TCPMV1) && !defined(CONFIG_USB_PD_TCPMV2) && \
-	!defined(CONFIG_USB_PD_CONTROLLER)
-#error Please enable CONFIG_USB_PD_TCPMV1 or CONFIG_USB_PD_TCPMV2 or CONFIG_USB_PD_CONTROLLER.
-#endif
+
 #if defined(CONFIG_USB_PD_TCPMV2) && !defined(CONFIG_USB_PD_DECODE_SOP)
 #error CONFIG_USB_PD_DECODE_SOP must be enabled with the TCPMV2 PD state machine
 #endif
-#endif
+#endif /* CONFIG_USB_POWER_DELIVERY */
 
 /******************************************************************************/
 /*
@@ -6308,10 +6276,6 @@
  * CONFIG_USB_PD_3A_PORTS to 0.
  */
 #ifdef CONFIG_USB_PD_TCPMV2
-#if defined(CONFIG_USB_PD_MAX_TOTAL_SOURCE_CURRENT) || \
-	defined(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT)
-#error Define CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT is limited to TCPMv1
-#endif
 #ifndef CONFIG_USB_PD_3A_PORTS
 #define CONFIG_USB_PD_3A_PORTS 1
 #endif
@@ -7315,14 +7279,6 @@
 	"CONFIG_USB_PD_TCPM_PS8* are intended to support in a board."
 #endif
 #endif /* defined(CONFIG_USB_PD_TCPM_PS8705) + ... */
-
-/*
- * CONFIG_HOSTCMD_TYPEC_CONTROL is not supported for TCPMv1, so disable it in
- * that case.
- */
-#ifdef CONFIG_USB_PD_TCPMV1
-#undef CONFIG_HOSTCMD_TYPEC_CONTROL
-#endif /* CONFIG_USB_PD_TCPMV1 */
 
 /******************************************************************************/
 /* Check body detection setup */

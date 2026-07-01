@@ -125,6 +125,33 @@ utils-host:
 	$(error Building utils-host not supported when BOARD is not "host")
 endif
 
+# Top-level target for host utility unit tests.
+#
+# This target serves as the entry point for running host-side utility unit tests
+# during ebuilds and CQ runs.
+#
+# By default, `utils-test` depends on `utils-host` to ensure all necessary host
+# binaries are compiled, but it does not execute any tests directly.
+#
+# To hook a new utility unit test into this flow, define a custom execution
+# target in your utility's `build.mk` file and add it as a prerequisite
+# dependency to `utils-test`. For example:
+#
+#   .PHONY: run-my_utility_test
+#   run-my_utility_test: $(out)/util/my_utility_test
+#   	@$(out)/util/my_utility_test
+#
+#   utils-test: run-my_utility_test
+.PHONY: utils-test
+ifeq ($(BOARD),host)
+utils-test: utils-host
+	@echo "======= running host utility unit tests"
+else
+utils-test:
+	$(error Running utils-test not supported when BOARD is not "host")
+endif
+
+
 # On board test binaries
 test-targets=$(foreach t,$(test-list-y),test-$(t))
 .PHONY: $(test-targets)
@@ -310,6 +337,7 @@ help:
 	@echo "  test-coverage        - Build and run all host unit tests for code coverage"
 	@echo ""
 	@echo "  BOARD=host utils-host        - Build EC host utilities"
+	@echo "  BOARD=host utils-test        - Build and run EC host utility unit tests"
 	@echo ""
 	@echo "  print-tests     [BOARD=]     - Print on-device test targets"
 	@echo "  print-host-tests             - Print all host unit test targets"
