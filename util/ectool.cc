@@ -8922,20 +8922,8 @@ static void cmd_cbi_help(char *cmd)
 		"    [get_flag] is combination of:\n"
 		"      01b: Invalidate cache and reload data from EEPROM\n"
 		"    [set_flag] is combination of:\n"
-		"      01b: Skip write to EEPROM. Use for back-to-back writes\n"
 		"      10b: Set all fields to defaults first\n",
 		cmd, cmd, cmd, cmd);
-}
-
-static int cmd_cbi_is_string_field(enum cbi_data_tag tag)
-{
-	return tag == CBI_TAG_DRAM_PART_NUM || tag == CBI_TAG_OEM_NAME;
-}
-
-static int cmd_cbi_is_binary_field(enum cbi_data_tag tag)
-{
-	return CBI_TAG_BATTERY_CONFIG <= tag &&
-	       tag <= CBI_TAG_BATTERY_CONFIG_15;
 }
 
 /*
