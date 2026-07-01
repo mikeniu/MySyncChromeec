@@ -23,7 +23,7 @@
 		usbc_p0: port0@0 {
 			compatible = "named-usbc-port";
 			reg = <0>;
-			pdc = <&pdc_rtk_c0 &pdc_ti_c0>;
+			pdc = <&pdc_rtk_c0 &pdc_ti_c0 &pdc_ti_c0_hbr>;
 			chg = <&charger>;
 			policy = <&cros_policy>;
 			zephyr,deferred-init;
@@ -149,6 +149,15 @@
 		compatible = "ti,tps6699-pdc";
 		reg = <0x21>;
 		irq-gpios = <&gpiof 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c0_hbr: tps6699-pdc@22 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x22>;
+		irq-gpios = <&gpiof 3 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 		port-index-on-chip = <0x1>;
 		frs-supported;
 		zephyr,deferred-init;
