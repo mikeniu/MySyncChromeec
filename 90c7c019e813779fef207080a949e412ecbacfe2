@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9e1f537_82995ccf",
+        "filename": "zephyr/program/calypso/mensa/fan.dtsi",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-07-01T05:34:12Z",
+      "side": 1,
+      "message": "```suggestion\n/* Copyright 2026 The ChromiumOS Authors\n```",
+      "range": {
+        "startLine": 1,
+        "startChar": 13,
+        "endLine": 1,
+        "endChar": 17
+      },
+      "revId": "90c7c019e813779fef207080a949e412ecbacfe2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
