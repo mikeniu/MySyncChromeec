@@ -22,6 +22,30 @@
       },
       "revId": "90c7c019e813779fef207080a949e412ecbacfe2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b6afdea_2a94433c",
+        "filename": "zephyr/program/calypso/mensa/fan.dtsi",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1549034
+      },
+      "writtenOn": "2026-07-01T07:46:10Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "e9e1f537_82995ccf",
+      "range": {
+        "startLine": 1,
+        "startChar": 13,
+        "endLine": 1,
+        "endChar": 17
+      },
+      "revId": "90c7c019e813779fef207080a949e412ecbacfe2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
