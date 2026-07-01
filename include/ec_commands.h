@@ -4012,6 +4012,463 @@ struct __ec_align2 ec_response_pd_chip_info {
 	union {
 		uint8_t fw_version_string[8];
 		uint64_t fw_version_number;
+	} __ec_align2;
+} __ec_align2;
+
+struct ec_response_pd_chip_info_v1 {
+	uint16_t vendor_id;
+	uint16_t product_id;
+	uint16_t device_id;
+	union {
+		uint8_t fw_version_string[8];
+		uint64_t fw_version_number;
+	} __ec_align2;
+	union {
+		uint8_t min_req_fw_version_string[8];
+		uint64_t min_req_fw_version_number;
+	} __ec_align2;
+} __ec_align2;
+
+/** Indicates the chip should NOT receive a firmware update, if set. This is
+ *  useful when multiple ports are serviced by a single chip, to avoid
+ *  performing redundant updates. The host command implementation shall ensure
+ *  only one port out of each physical chip has FW updates active.
+ */
+#define USB_PD_CHIP_INFO_FWUP_FLAG_NO_UPDATE BIT(0)
+
+/** Maximum length of a project name embedded in a PDC FW image. This length
+ *  does NOT include a NUL-terminator.
+ */
+#define USB_PD_CHIP_INFO_PROJECT_NAME_LEN 12
+
+struct ec_response_pd_chip_info_v2 {
+	uint16_t vendor_id;
+	uint16_t product_id;
+	uint16_t device_id;
+	union {
+		uint8_t fw_version_string[8];
+		uint64_t fw_version_number;
+	} __ec_align2;
+	union {
+		uint8_t min_req_fw_version_string[8];
+		uint64_t min_req_fw_version_number;
+	} __ec_align2;
+	/** Flag to control the FW update process for this chip. */
+	uint16_t fw_update_flags;
+	/** Project name string associated with the chip's FW. Add an extra
+	 *  byte for a NUL-terminator.
+	 */
+	char fw_name_str[USB_PD_CHIP_INFO_PROJECT_NAME_LEN + 1];
+} __ec_align2;
+
+/** Maximum length of a driver/chip name reported in the pd_chip_info
+ *  response
+ */
+#define USB_PD_CHIP_INFO_DRIVER_NAME_LEN 24
+
+struct ec_response_pd_chip_info_v3 {
+	uint16_t vendor_id;
+	uint16_t product_id;
+	uint16_t device_id;
+	union {
+		uint8_t fw_version_string[8];
+		uint64_t fw_version_number;
+	} __ec_align2;
+	union {
+		uint8_t min_req_fw_version_string[8];
+		uint64_t min_req_fw_version_number;
+	} __ec_align2;
+	/** Flag to control the FW update process for this chip. */
+	uint16_t fw_update_flags;
+	/** Project name string associated with the chip's FW. Add an extra
+	 *  byte for a NUL-terminator.
+	 */
+	char fw_name_str[USB_PD_CHIP_INFO_PROJECT_NAME_LEN + 1];
+	/** Driver/chip string, plus room for a NUL-terminator */
+	char driver_name[USB_PD_CHIP_INFO_DRIVER_NAME_LEN + 1];
+} __ec_align2;
+
+/* Run RW signature verification and get status */
+#define EC_CMD_RWSIG_CHECK_STATUS 0x011C
+
+struct ec_response_rwsig_check_status {
+	uint32_t status;
+} __ec_align4;
+
+/* For controlling RWSIG task */
+#define EC_CMD_RWSIG_ACTION 0x011D
+
+enum rwsig_action {
+	RWSIG_ACTION_ABORT = 0, /* Abort RWSIG and prevent jumping */
+	RWSIG_ACTION_CONTINUE = 1, /* Jump to RW immediately */
+};
+
+struct ec_params_rwsig_action {
+	uint32_t action;
+} __ec_align4;
+
+/* Run verification on a slot */
+#define EC_CMD_EFS_VERIFY 0x011E
+
+struct ec_params_efs_verify {
+	uint8_t region; /* enum ec_flash_region */
+} __ec_align1;
+
+/*
+ * Retrieve info from Cros Board Info store. Response is based on the data
+ * type. Integers return a uint32. Strings return a string, using the response
+ * size to determine how big it is.
+ */
+#define EC_CMD_GET_CROS_BOARD_INFO 0x011F
+/*
+ * Write info into Cros Board Info on EEPROM. Write fails if the board has
+ * hardware write-protect enabled.
+ */
+#define EC_CMD_SET_CROS_BOARD_INFO 0x0120
+
+enum cbi_data_tag {
+	CBI_TAG_BOARD_VERSION = 0, /* uint32_t or smaller */
+	CBI_TAG_OEM_ID = 1, /* uint32_t or smaller */
+	CBI_TAG_SKU_ID = 2, /* uint32_t or smaller */
+	CBI_TAG_DRAM_PART_NUM = 3, /* variable length ascii, nul terminated. */
+	CBI_TAG_OEM_NAME = 4, /* variable length ascii, nul terminated. */
+	CBI_TAG_MODEL_ID = 5, /* uint32_t or smaller */
+	CBI_TAG_FW_CONFIG = 6, /* uint32_t bit field */
+	CBI_TAG_PCB_SUPPLIER = 7, /* uint32_t or smaller */
+	/* Second Source Factory Cache */
+	CBI_TAG_SSFC = 8, /* uint32_t bit field */
+	CBI_TAG_REWORK_ID = 9, /* uint64_t or smaller */
+	CBI_TAG_FACTORY_CALIBRATION_DATA = 10, /* Deprecated */
+	CBI_TAG_COMMON_CONTROL = 11, /* Deprecated */
+	/* struct board_batt_params */
+	CBI_TAG_BATTERY_CONFIG = 12,
+	/* CBI_TAG_BATTERY_CONFIG_1 ~ 15 will use 13 ~ 27. */
+	CBI_TAG_BATTERY_CONFIG_15 = 27,
+
+	/* CBI_TAG_PROVISION_MATRIX_VERSION
+	 * Version of the current provision matrix
+	 */
+	CBI_TAG_PROVISION_MATRIX_VERSION = 28, /* uint32_t bit field */
+
+	/* Unified Firmware and Second-source Config:
+	 * A fixed-size array of 4 uint32_t values.
+	 */
+	CBI_TAG_UFSC = 29,
+
+	/* Last entry */
+	CBI_TAG_COUNT,
+};
+
+#define CBI_UFSC_DATA_COUNT 4
+
+/* Unified Firmware and Second-source Config (UFSC) data structure */
+struct cbi_ufsc {
+	uint32_t data[CBI_UFSC_DATA_COUNT];
+};
+
+/*
+ * Flags to control read operation
+ *
+ * RELOAD:  Invalidate cache and read data from EEPROM. Useful to verify
+ *          write was successful without reboot.
+ */
+#define CBI_GET_RELOAD BIT(0)
+
+struct ec_params_get_cbi {
+	uint32_t tag; /* enum cbi_data_tag */
+	uint32_t flag; /* CBI_GET_* */
+} __ec_align4;
+
+/*
+ * Flags to control write behavior.
+ *
+ * NO_SYNC: Obsolete
+ * INIT:    Need to be set when creating a new CBI from scratch. All fields
+ *          will be initialized to zero first.
+ */
+#define CBI_SET_NO_SYNC BIT(0)
+#define CBI_SET_INIT BIT(1)
+
+struct ec_params_set_cbi {
+	uint32_t tag; /* enum cbi_data_tag */
+	uint32_t flag; /* CBI_SET_* */
+	uint32_t size; /* Data size */
+	uint8_t data[FLEXIBLE_ARRAY_MEMBER_SIZE]; /* For string and raw data */
+} __ec_align1;
+
+/*
+ * Retrieve binary from CrOS Board Info primary memory source.
+ */
+#define EC_CMD_CBI_BIN_READ 0x0504
+/*
+ * Write binary into CrOS Board Info temporary buffer and then commit it to
+ * permanent storage once complete. Write fails if the board has hardware
+ * write-protect enabled.
+ */
+#define EC_CMD_CBI_BIN_WRITE 0x0505
+
+/*
+ * CBI binary read/write flags
+ * The default write behavior is to always append any data to the buffer.
+ * If 'CLEAR' flag is set, buffer is cleared then data is appended.
+ * If 'WRITE' flag is set, data is appended then buffer is written to memory.
+ */
+#define EC_CBI_BIN_BUFFER_CLEAR BIT(0)
+#define EC_CBI_BIN_BUFFER_WRITE BIT(1)
+
+struct ec_params_get_cbi_bin {
+	uint32_t offset; /* Data offset */
+	uint32_t size; /* Data size */
+} __ec_align4;
+
+struct ec_params_set_cbi_bin {
+	uint32_t offset; /* Data offset */
+	uint32_t size; /* Data size */
+	uint8_t flags; /* bit field for EC_CBI_BIN_COMMIT_FLAG_* */
+	uint8_t data[FLEXIBLE_ARRAY_MEMBER_SIZE]; /* For string and raw data */
+} __ec_align1;
+
+/*
+ * Information about resets of the AP by the EC and the EC's own uptime.
+ */
+#define EC_CMD_GET_UPTIME_INFO 0x0121
+
+/* EC reset causes */
+#define EC_RESET_FLAG_OTHER BIT(0) /* Other known reason */
+#define EC_RESET_FLAG_RESET_PIN BIT(1) /* Reset pin asserted */
+#define EC_RESET_FLAG_BROWNOUT BIT(2) /* Brownout */
+#define EC_RESET_FLAG_POWER_ON BIT(3) /* Power-on reset */
+#define EC_RESET_FLAG_WATCHDOG BIT(4) /* Watchdog timer reset */
+#define EC_RESET_FLAG_SOFT BIT(5) /* Soft reset trigger by core */
+#define EC_RESET_FLAG_HIBERNATE BIT(6) /* Wake from hibernate */
+#define EC_RESET_FLAG_RTC_ALARM BIT(7) /* RTC alarm wake */
+#define EC_RESET_FLAG_WAKE_PIN BIT(8) /* Wake pin triggered wake */
+#define EC_RESET_FLAG_LOW_BATTERY BIT(9) /* Low battery triggered wake */
+#define EC_RESET_FLAG_SYSJUMP BIT(10) /* Jumped directly to this image */
+#define EC_RESET_FLAG_HARD BIT(11) /* Hard reset from software */
+#define EC_RESET_FLAG_AP_OFF BIT(12) /* Do not power on AP */
+/* Some reset flags preserved from previous boot */
+#define EC_RESET_FLAG_PRESERVED BIT(13)
+#define EC_RESET_FLAG_USB_RESUME BIT(14) /* USB resume triggered wake */
+#define EC_RESET_FLAG_RDD BIT(15) /* USB Type-C debug cable */
+#define EC_RESET_FLAG_RBOX BIT(16) /* Fixed Reset Functionality */
+#define EC_RESET_FLAG_SECURITY BIT(17) /* Security threat */
+/* AP experienced a watchdog reset */
+#define EC_RESET_FLAG_AP_WATCHDOG BIT(18)
+/* Do not select RW in EFS. This enables PD in RO for Chromebox. */
+#define EC_RESET_FLAG_STAY_IN_RO BIT(19)
+#define EC_RESET_FLAG_EFS BIT(20) /* Jumped to this image by EFS */
+#define EC_RESET_FLAG_AP_IDLE BIT(21) /* Leave alone AP */
+#define EC_RESET_FLAG_INITIAL_PWR BIT(22) /* EC had power, then was reset */
+
+/*
+ * Reason codes used by the AP after a shutdown to figure out why it was reset
+ * by the EC.  These are sent in EC commands.  Therefore, to maintain protocol
+ * compatibility:
+ * - New entries must be inserted prior to the _COUNT field
+ * - If an existing entry is no longer in service, it must be replaced with a
+ *   RESERVED entry instead.
+ * - The semantic meaning of an entry should not change.
+ * - Do not exceed 2^15 - 1 for reset reasons or 2^16 - 1 for shutdown reasons.
+ */
+enum chipset_shutdown_reason {
+	/*
+	 * Beginning of reset reasons.
+	 */
+	CHIPSET_RESET_BEGIN = 0,
+	CHIPSET_RESET_UNKNOWN = CHIPSET_RESET_BEGIN,
+	/* Custom reason defined by a board.c or baseboard.c file */
+	CHIPSET_RESET_BOARD_CUSTOM,
+	/* Believe that the AP has hung */
+	CHIPSET_RESET_HANG_REBOOT,
+	/* Reset by EC console command */
+	CHIPSET_RESET_CONSOLE_CMD,
+	/* Reset by EC host command */
+	CHIPSET_RESET_HOST_CMD,
+	/* Keyboard module reset key combination */
+	CHIPSET_RESET_KB_SYSRESET,
+	/* Keyboard module warm reboot */
+	CHIPSET_RESET_KB_WARM_REBOOT,
+	/* Debug module warm reboot */
+	CHIPSET_RESET_DBG_WARM_REBOOT,
+	/* I cannot self-terminate.  You must lower me into the steel. */
+	CHIPSET_RESET_AP_REQ,
+	/* Reset as side-effect of startup sequence */
+	CHIPSET_RESET_INIT,
+	/* EC detected an AP watchdog event. */
+	CHIPSET_RESET_AP_WATCHDOG,
+
+	CHIPSET_RESET_COUNT, /* End of reset reasons. */
+
+	/*
+	 * Beginning of shutdown reasons.
+	 */
+	CHIPSET_SHUTDOWN_BEGIN = BIT(15),
+	CHIPSET_SHUTDOWN_POWERFAIL = CHIPSET_SHUTDOWN_BEGIN,
+	/* Forcing a shutdown as part of EC initialization */
+	CHIPSET_SHUTDOWN_INIT,
+	/* Custom reason on a per-board basis. */
+	CHIPSET_SHUTDOWN_BOARD_CUSTOM,
+	/* This is a reason to inhibit startup, not cause shut down. */
+	CHIPSET_SHUTDOWN_BATTERY_INHIBIT,
+	/* A power_wait_signal is being asserted */
+	CHIPSET_SHUTDOWN_WAIT,
+	/* Critical battery level. */
+	CHIPSET_SHUTDOWN_BATTERY_CRIT,
+	/* Because you told me to. */
+	CHIPSET_SHUTDOWN_CONSOLE_CMD,
+	/* Forcing a shutdown to effect entry to G3. */
+	CHIPSET_SHUTDOWN_G3,
+	/* Force shutdown due to over-temperature. */
+	CHIPSET_SHUTDOWN_THERMAL,
+	/* Force a chipset shutdown from the power button through EC */
+	CHIPSET_SHUTDOWN_BUTTON,
+	/* Force a chipset shutdown, because the AP wants to. */
+	CHIPSET_SHUTDOWN_HOST_CMD,
+	/* Forcing a shutdown for battery cutoff. */
+	CHIPSET_SHUTDOWN_BATTERY_CUTOFF,
+
+	CHIPSET_SHUTDOWN_COUNT, /* End of shutdown reasons. */
+};
+
+struct ec_response_uptime_info {
+	/*
+	 * Number of milliseconds since the last EC boot. Sysjump resets
+	 * typically do not restart the EC's time_since_boot epoch.
+	 *
+	 * WARNING: The EC's sense of time is much less accurate than the AP's
+	 * sense of time, in both phase and frequency.  This timebase is similar
+	 * to CLOCK_MONOTONIC_RAW, but with 1% or more frequency error.
+	 */
+	uint32_t time_since_ec_boot_ms;
+
+	/*
+	 * Number of times the AP was reset by the EC since the last EC boot.
+	 * Note that the AP may be held in reset by the EC during the initial
+	 * boot sequence, such that the very first AP boot may count as more
+	 * than one here.
+	 */
+	uint32_t ap_resets_since_ec_boot;
+
+	/*
+	 * The set of flags which describe the EC's most recent reset.
+	 * See EC_RESET_FLAG_* for details.
+	 */
+	uint32_t ec_reset_flags;
+
+	/* Empty log entries have both the cause and timestamp set to zero. */
+	struct ap_reset_log_entry {
+		/* See enum chipset_{reset,shutdown}_reason for details. */
+		uint16_t reset_cause;
+
+		/* Reserved for protocol growth. */
+		uint16_t reserved;
+
+		/*
+		 * The time of the reset's assertion, in milliseconds since the
+		 * last EC boot, in the same epoch as time_since_ec_boot_ms.
+		 * Set to zero if the log entry is empty.
+		 */
+		uint32_t reset_time_ms;
+	} recent_ap_reset[4];
+} __ec_align4;
+
+/*
+ * Add entropy to the device secret (stored in the rollback region).
+ *
+ * Depending on the chip, the operation may take a long time (e.g. to erase
+ * flash), so the commands are asynchronous.
+ */
+#define EC_CMD_ADD_ENTROPY 0x0122
+
+enum add_entropy_action {
+	/* Add entropy to the current secret. */
+	ADD_ENTROPY_ASYNC = 0,
+	/*
+	 * Add entropy, and also make sure that the previous secret is erased.
+	 * (this can be implemented by adding entropy multiple times until
+	 * all rolback blocks have been overwritten).
+	 */
+	ADD_ENTROPY_RESET_ASYNC = 1,
+	/* Read back result from the previous operation. */
+	ADD_ENTROPY_GET_RESULT = 2,
+};
+
+struct ec_params_rollback_add_entropy {
+	uint8_t action;
+} __ec_align1;
+
+/*
+ * Perform a single read of a given ADC channel.
+ */
+#define EC_CMD_ADC_READ 0x0123
+
+struct ec_params_adc_read {
+	uint8_t adc_channel;
+} __ec_align1;
+
+struct ec_response_adc_read {
+	int32_t adc_value;
+} __ec_align4;
+
+/*
+ * Read back rollback info
+ */
+#define EC_CMD_ROLLBACK_INFO 0x0124
+
+struct ec_response_rollback_info {
+	int32_t id; /* Incrementing number to indicate which region to use. */
+	int32_t rollback_min_version;
+	int32_t rw_rollback_version;
+} __ec_align4;
+
+struct ec_response_rollback_info_v1 {
+	int32_t id; /* Incrementing number to indicate which region to use. */
+	int32_t rollback_min_version;
+	int32_t rw_rollback_version;
+	uint8_t is_secret_inited;
+	uint8_t reserved[3];
+} __ec_align4;
+
+/* Issue AP reset */
+#define EC_CMD_AP_RESET 0x0125
+
+/*****************************************************************************/
+/* Locate peripheral chips
+ *
+ * Return values:
+ * EC_RES_UNAVAILABLE: The chip type is supported but not found on system.
+ * EC_RES_INVALID_PARAM: The chip type was unrecognized.
+ * EC_RES_OVERFLOW: The index number exceeded the number of chip instances.
+ */
+#define EC_CMD_LOCATE_CHIP 0x0126
+
+enum ec_chip_type {
+	EC_CHIP_TYPE_CBI_EEPROM = 0,
+	EC_CHIP_TYPE_TCPC = 1,
+	EC_CHIP_TYPE_PDC = 2,
+	EC_CHIP_TYPE_COUNT,
+	EC_CHIP_TYPE_MAX = 0xFF,
+};
+
+enum ec_bus_type {
+	EC_BUS_TYPE_I2C = 0,
+	EC_BUS_TYPE_EMBEDDED = 1,
+	EC_BUS_TYPE_COUNT,
+	EC_BUS_TYPE_MAX = 0xFF,
+};
+
+struct ec_i2c_info {
+	uint16_t port; /* Physical port for device */
+	uint16_t addr_flags; /* 7-bit (or 10-bit) address */
+};
+
+struct ec_params_locate_chip {
+	uint8_t type; /* enum ec_chip_type */
+	uint8_t index; /* Specifies one instance of chip type */
+	/* Used for type specific parameters in future */
+	union {
+		uint16_t reserved;
 	};
 };
 
