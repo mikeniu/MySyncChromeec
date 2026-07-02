@@ -16,6 +16,20 @@ if(DEFINED CONFIG_BOARD_ATRIARVP_RTK)
 
 endif()
 
+if(DEFINED CONFIG_BOARD_PENGHU)
+	project(penghu)
+	zephyr_include_directories("penghu/include")
+	zephyr_library_sources("penghu/src/alt_charger.c")
+	zephyr_library_sources("penghu/src/board_power.c")
+	zephyr_library_sources("penghu/src/suspend_resume.c")
+	zephyr_library_sources("penghu/src/thermal.c")
+	zephyr_library_sources("penghu/src/touch_panel.c")
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
+					"penghu/src/keyboard_customization.c")
+	zephyr_library_sources_ifdef(CONFIG_PDC_RUNTIME_PORT_CONFIG
+					"penghu/src/usbc_runtime.c")
+endif()
+
 zephyr_include_directories("include/")
 
 # TODO(b/501105189): Selection of ISH-specific config files happens in BUILD.py.
