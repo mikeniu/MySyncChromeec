@@ -494,6 +494,10 @@ static enum ec_status hc_rgbkbd_set_color(struct host_cmd_handler_args *args)
 	const struct ec_params_rgbkbd_set_color *p = args->params;
 	int i;
 
+	if (args->params_size < sizeof(struct ec_params_rgbkbd_set_color) +
+					p->length * sizeof(struct rgb_s))
+		return EC_RES_INVALID_PARAM;
+
 	if (p->start_key + p->length > EC_RGBKBD_MAX_KEY_COUNT)
 		return EC_RES_INVALID_PARAM;
 
