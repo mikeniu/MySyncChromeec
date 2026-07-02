@@ -9,7 +9,9 @@
 #include <zephyr/drivers/bbram.h>
 #include <zephyr/logging/log.h>
 
-LOG_MODULE_REGISTER(shim_npcx_system, LOG_LEVEL_ERR);
+LOG_MODULE_REGISTER(shim_npcx_system, LOG_LEVEL_INF);
+
+static bool first_power_on;
 
 static void chip_bbram_status_check(void)
 {
@@ -23,16 +25,28 @@ static void chip_bbram_status_check(void)
 	}
 
 	res = bbram_check_invalid(bbram_dev);
-	if (res != 0 && res != -ENOTSUP)
+	if (res != 0 && res != -ENOTSUP) {
 		LOG_INF("VBAT power drop!");
+		first_power_on = true;
+	}
 
 	res = bbram_check_standby_power(bbram_dev);
 	if (res != 0 && res != -ENOTSUP)
 		LOG_INF("VSBY power drop!");
 
 	res = bbram_check_power(bbram_dev);
-	if (res != 0 && res != -ENOTSUP)
+	if (res != 0 && res != -ENOTSUP) {
 		LOG_INF("VCC1 power drop!");
+	}
+}
+
+__override bool chip_is_first_power_on(void)
+{
+	LOG_INF("#### NPCX first_power_on = %d", first_power_on);
+	if (first_power_on)
+		return true;
+
+	return false;
 }
 
 /*

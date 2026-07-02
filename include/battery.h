@@ -617,6 +617,11 @@ int battery_is_full(struct batt_params *batt);
  */
 int battery_outside_charging_temperature(struct batt_params *batt);
 
+/**
+ * board-specific check for first power on and cut off battery if needed.
+ */
+__override_proto bool chip_is_first_power_on(void);
+
 #ifdef CONFIG_BATTERY_ACCESS_LIMIT
 enum battery_access_type battery_check_access_limit(void);
 #endif

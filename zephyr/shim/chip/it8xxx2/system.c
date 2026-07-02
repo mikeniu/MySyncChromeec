@@ -61,6 +61,8 @@ uintptr_t system_get_fw_reset_vector(uintptr_t base)
 	return base;
 }
 
+static bool first_power_on = false;
+
 static void chip_bbram_status_check(void)
 {
 	const struct device *bbram_dev;
@@ -75,7 +77,17 @@ static void chip_bbram_status_check(void)
 	res = bbram_check_invalid(bbram_dev);
 	if (res != 0 && res != -ENOTSUP) {
 		LOG_INF("VBAT power drop!");
+		first_power_on = true;
 	}
+}
+
+__override bool chip_is_first_power_on(void)
+{
+	LOG_INF("#### ITE first_power %d", first_power_on);
+	if (first_power_on)
+		return true;
+
+	return false;
 }
 
 static int chip_system_init(void)
