@@ -948,3 +948,26 @@ int battery_outside_charging_temperature(struct batt_params *batt)
 	}
 	return 0;
 }
+
+__overridable int chip_is_first_power_on(void)
+{
+	CPRINTS("## test first power on check");
+	return EC_ERROR_UNIMPLEMENTED;
+}
+
+static void first_power_on_cutoff(void)
+{
+	uint32_t flags = system_get_reset_flags();
+	int ext_power_present = gpio_get_level(GPIO_AC_PRESENT);
+
+	if (chip_is_first_power_on()) {
+		CPRINTS("##test mode: first power on ");
+		if ((flags & EC_RESET_FLAG_POWER_ON) &&
+		    !(flags & EC_RESET_FLAG_HIBERNATE) &&
+		    (!ext_power_present) && (battery_is_present() == BP_YES)) {
+			CPRINTS("##test mode: cutoff %d", ext_power_present);
+			battery_cutoff_start();
+		}
+	}
+}
+DECLARE_HOOK(HOOK_INIT, first_power_on_cutoff, HOOK_PRIO_DEFAULT);
