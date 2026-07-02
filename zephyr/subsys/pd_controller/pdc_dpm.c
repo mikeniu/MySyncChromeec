@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "drivers/intel_altmode.h"
 #include "usb_pd.h"
 #include "usbc/pdc_power_mgmt.h"
 
@@ -30,6 +31,7 @@ LOG_MODULE_REGISTER(pdc_dpm);
  * them
  */
 static uint32_t max_current_claimed;
+static atomic_t tbt_usb4_3a_reset;
 
 /* Ports with PD sink needing > 1.5 A */
 static atomic_t sink_max_pdo_requested;
@@ -55,6 +57,31 @@ static int count_port_bits(uint32_t bitmask)
 	}
 
 	return total;
+}
+
+static void dpm_check_tbt_usb4_reset(int port)
+{
+	union data_status_reg status;
+	int rv;
+
+	if (atomic_test_bit(&tbt_usb4_3a_reset, port))
+		return;
+
+	rv = pdc_power_mgmt_get_pch_data_status(port, status.raw_value);
+	if (rv) {
+		LOG_ERR("DPM C%d: Failed to get PCH data status (%d)", port,
+			rv);
+		return;
+	}
+
+	if (status.tbt || status.usb4) {
+		LOG_INF("DPM C%d: TBT3/USB4 detected, triggering hard reset",
+			port);
+		atomic_set_bit(&tbt_usb4_3a_reset, port);
+		pdc_power_mgmt_connector_reset(port, PD_HARD_RESET);
+	}
+
+	return;
 }
 
 /**
@@ -104,11 +131,25 @@ static void pdc_dpm_balance_source_ports(struct k_work *work)
 	while (new_ports) {
 		int new_max_port = LOWEST_PORT(new_ports);
 
+		/* If TBT3/USB4 reset occured, the port already has 3A PDOs. */
+		if (atomic_test_bit(&tbt_usb4_3a_reset, new_max_port)) {
+			new_ports &= ~BIT(new_max_port);
+			goto unlock;
+		}
+
 		if (count_port_bits(max_current_claimed) <
 		    pd_get_usb_pd_3a_ports()) {
 			max_current_claimed |= BIT(new_max_port);
+
 			pdc_power_mgmt_set_current_limit(new_max_port,
 							 TC_CURRENT_3_0A);
+
+			/* When allocating 3A, check for TBT3/USB4 operation.
+			 * Many bus powered TBT3/USB4 devices cannot link train
+			 * with 1.5A. Issue a reset for the device to reconnect
+			 * with a 3A initial contract
+			 */
+			dpm_check_tbt_usb4_reset(new_max_port);
 		} else if (non_pd_sink_max_requested & max_current_claimed) {
 			/* Always downgrade non-PD ports first */
 			int rem_non_pd = LOWEST_PORT(non_pd_sink_max_requested &
@@ -252,7 +293,7 @@ void pdc_dpm_eval_sink_fixed_pdo(int port, uint32_t vsafe5v_pdo)
 	}
 
 balance:
-	pdc_dpm_balance_source_ports(&dpm_work.work);
+	k_work_schedule(&dpm_work, K_NO_WAIT);
 }
 
 void pdc_dpm_add_pd_source(int port)
@@ -275,7 +316,7 @@ void pdc_dpm_add_non_pd_sink(int port)
 		return;
 
 	atomic_set_bit(&non_pd_sink_max_requested, port);
-	pdc_dpm_balance_source_ports(&dpm_work.work);
+	k_work_schedule(&dpm_work, K_NO_WAIT);
 }
 
 void pdc_dpm_remove_sink(int port)
@@ -291,11 +332,12 @@ void pdc_dpm_remove_sink(int port)
 
 	atomic_clear_bit(&sink_max_pdo_requested, port);
 	atomic_clear_bit(&non_pd_sink_max_requested, port);
+	atomic_clear_bit(&tbt_usb4_3a_reset, port);
 
 	/* Restore selected default Rp on the port */
 	rp = pdc_power_mgmt_get_default_current_limit(port);
 	pdc_power_mgmt_set_current_limit(port, rp);
-	pdc_dpm_balance_source_ports(&dpm_work.work);
+	k_work_schedule(&dpm_work, K_NO_WAIT);
 }
 
 void pdc_dpm_remove_source(int port)
@@ -319,7 +361,7 @@ void pdc_dpm_remove_source(int port)
 	/* Restore selected default Rp on the port */
 	rp = pdc_power_mgmt_get_default_current_limit(port);
 	pdc_power_mgmt_set_current_limit(port, rp);
-	pdc_dpm_balance_source_ports(&dpm_work.work);
+	k_work_schedule(&dpm_work, K_NO_WAIT);
 }
 
 int pdc_dpm_get_source_current(const int port)
