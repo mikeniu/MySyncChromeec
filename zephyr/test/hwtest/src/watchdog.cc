@@ -7,6 +7,10 @@
 #include "panic.h"
 #include "system.h"
 
+#ifdef CONFIG_SOC_RTS5817
+#include "watchdog.h"
+#endif
+
 #include <stdlib.h>
 
 #include <zephyr/logging/log.h>
@@ -15,6 +19,10 @@ LOG_MODULE_REGISTER(watchdog_hw_test, LOG_LEVEL_INF);
 
 static void test_watchdog(void)
 {
+#ifdef CONFIG_SOC_RTS5817
+	watchdog_init();
+	panic_set_reason(PANIC_SW_WATCHDOG, 0, 0);
+#endif
 	constexpr uint32_t watchdog_period_us =
 		CONFIG_WATCHDOG_PERIOD_MS * USEC_PER_MSEC;
 
