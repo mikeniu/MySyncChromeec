@@ -35,7 +35,7 @@ struct rollback_info rollback_info = {
 	.region_1_offset = 0x30000,
 	.region_size_bytes = 64 * 1024,
 };
-#elif defined(CONFIG_SOC_EGIS_ET171)
+#elif defined(CONFIG_SOC_EGIS_ET171) || defined(CONFIG_SOC_RTS5817)
 struct rollback_info rollback_info = {
 	.region_0_offset = 0x40000,
 	.region_1_offset = 0x41000,

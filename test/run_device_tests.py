@@ -127,6 +127,12 @@ DATA_ACCESS_VIOLATION_64020000_REGEX = re.compile(
 DATA_ACCESS_VIOLATION_64030000_REGEX = re.compile(
     r"(Data access violation, mfar = 64030000\r\n)|(.*MMFAR Address: 0x64030000\r\n)"
 )
+DATA_ACCESS_VIOLATION_1840000_REGEX = re.compile(
+    r"(Data access violation, mfar = 1840000\r\n)|(.*MMFAR Address: 0x1840000\r\n)"
+)
+DATA_ACCESS_VIOLATION_1841000_REGEX = re.compile(
+    r"(Data access violation, mfar = 1841000\r\n)|(.*MMFAR Address: 0x1841000\r\n)"
+)
 DATA_ACCESS_VIOLATION_200B0000_REGEX = re.compile(
     r"Data access violation, mfar = 200b0000\r\n"
 )
@@ -1492,9 +1498,8 @@ REALTEKFP_CONFIG = BoardConfig(
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
     reboot_timeout=8.0,
-    # TODO(b/532643220): configure rollback regex.
-    rollback_region0_regex=NEVER_MATCH_REGEX,
-    rollback_region1_regex=NEVER_MATCH_REGEX,
+    rollback_region0_regex=DATA_ACCESS_VIOLATION_1840000_REGEX,
+    rollback_region1_regex=DATA_ACCESS_VIOLATION_1841000_REGEX,
     # TODO(b/363277530): create Zephyr MPU tests.
     mpu_regex=NEVER_MATCH_REGEX,
     fp_power_supply="pp3300_fp_mw",
