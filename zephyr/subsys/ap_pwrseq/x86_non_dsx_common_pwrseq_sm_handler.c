@@ -4,6 +4,7 @@
  */
 
 #include "ap_reset_log.h"
+#include "system.h"
 #include "system_boot_time.h"
 #include "zephyr_console_shim.h"
 
@@ -801,6 +802,19 @@ SYS_INIT(pwrseq_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 static int x86_non_dsx_g3_entry(void *data)
 {
 	if (!atomic_test_bit(flags, START_FROM_G3)) {
+		/*
+		 * When the AP is powered off while in manual recovery, the EC
+		 * retains the in-RAM manual-recovery state. To guarantee a clean
+		 * subsequent normal boot, perform a hard EC reset with AP off
+		 *
+		 * This mirrors depthcharge (CL:4775107), which handles the
+		 * equivalent shutdown-from-recovery-screen case on the AP side.
+		 */
+		if (system_is_manual_recovery()) {
+			LOG_WRN("Recovery power-off: EC reset, AP left off");
+			system_reset(SYSTEM_RESET_HARD |
+				     SYSTEM_RESET_LEAVE_AP_OFF);
+		}
 		return 0;
 	}
 
