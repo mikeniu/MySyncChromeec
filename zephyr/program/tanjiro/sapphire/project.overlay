@@ -24,6 +24,18 @@
 #include <sapphire/overlay.dtsi>
 
 / {
+	ec-console {
+		compatible = "ec-console";
+		disabled = "events", "lpc", "hostcmd", "pchg", "zephyr_log";
+	};
+
+	named-bbram-regions {
+		board-batt-keep {
+		offset = <0x10>;
+		size = <0x04>;
+		};
+	};
+
 	aliases {
 		bmi3xx-int = &lid_accel;
 		lsm6dsm-int = &lid_accel;

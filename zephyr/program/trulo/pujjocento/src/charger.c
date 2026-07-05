@@ -3,8 +3,11 @@
  * found in the LICENSE file.
  */
 
+#include "bbram.h"
 #include "charger.h"
+#include "chipset.h"
 #include "common.h"
+#include "gpio.h"
 #include "gpio/gpio_int.h"
 #include "gpio_signal.h"
 #include "hooks.h"
@@ -15,6 +18,8 @@
 #include "usbc/pdc_power_mgmt.h"
 
 #include <zephyr/drivers/gpio.h>
+
+LOG_MODULE_REGISTER(charger_settings, LOG_LEVEL_INF);
 
 #ifdef CONFIG_PLATFORM_EC_CHARGER_BQ25720
 #include "driver/charger/bq257x0_regs.h"
@@ -68,3 +73,39 @@ static void batt_pres_en_init(void)
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_batt_pres_en));
 }
 DECLARE_HOOK(HOOK_INIT, batt_pres_en_init, HOOK_PRIO_DEFAULT);
+
+static const struct device *const bbram_dev =
+	COND_CODE_1(DT_HAS_CHOSEN(cros_ec_bbram),
+		    DEVICE_DT_GET(DT_CHOSEN(cros_ec_bbram)), NULL);
+
+static void check_first_boot(void)
+{
+	uint32_t board_batt_keep_val = 0;
+	system_bbram_read(bbram_dev, BBRAM_REGION_OFFSET(board_batt_keep),
+			  BBRAM_REGION_SIZE(board_batt_keep),
+			  (uint8_t *)&board_batt_keep_val);
+
+	if (board_batt_keep_val == 0x00) {
+		board_batt_keep_val = 0xA5A5A5A5;
+		system_bbram_write(bbram_dev,
+				   BBRAM_REGION_OFFSET(board_batt_keep),
+				   BBRAM_REGION_SIZE(board_batt_keep),
+				   (uint8_t *)&board_batt_keep_val);
+		LOG_INF("----first active\n");
+
+		uint32_t flags = system_get_reset_flags();
+		int ext_power_present = gpio_get_level(GPIO_AC_PRESENT);
+		bool allow_cutoff = (flags & EC_RESET_FLAG_POWER_ON) &&
+				    !(flags & EC_RESET_FLAG_HIBERNATE) &&
+				    !(flags & EC_RESET_FLAG_HARD) &&
+				    !(flags & EC_RESET_FLAG_SOFT) &&
+				    !(flags & EC_RESET_FLAG_WATCHDOG);
+
+		if (allow_cutoff && (!ext_power_present) &&
+		    (battery_is_present() == BP_YES)) {
+			LOG_INF("##test mode: cutoff %d", ext_power_present);
+			board_cut_off_battery();
+		}
+	}
+}
+DECLARE_HOOK(HOOK_INIT, check_first_boot, HOOK_PRIO_DEFAULT);

@@ -24,6 +24,14 @@
 /* Trulo overrides follow... */
 
 / {
+
+    named-bbram-regions {
+		board-batt-keep {
+		offset = <0x10>;
+		size = <0x04>;
+		};
+	};
+
     batteries {
 		default_battery: atl_l25n3pg1 {
 			compatible = "atl,l25n3pg1", "battery-smart";
