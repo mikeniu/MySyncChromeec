@@ -78,7 +78,7 @@
 
 	uart4_dev0: uart4_dev0 {
 		status = "okay";
-		chain-length = <4>;
+		chain-length = <8>;
 		reset-delay = <205>;
 		bits-per-symbol = <5>;
 		one-symbol = <BINARY(1,1,1,1,0)>;
