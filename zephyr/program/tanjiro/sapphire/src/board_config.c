@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 #include "accelgyro.h"
+#include "bbram.h"
 #include "charger.h"
 #include "common.h"
 #include "cros_board_info.h"
@@ -10,15 +11,20 @@
 #include "driver/accelgyro_bmi3xx.h"
 #include "driver/accelgyro_lsm6dsm.h"
 #include "driver/charger/bq257x0_regs.h"
+#include "gpio.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
 #include "motion_sense.h"
 #include "motionsense_sensors.h"
 
+#include <zephyr/drivers/bbram.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(board_init, LOG_LEVEL_ERR);
+
+#define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)
+#define CPRINTF(format, args...) cprintf(CC_SYSTEM, format, ##args)
 
 static bool lid_use_alt_sensor;
 void motion_interrupt(enum gpio_signal signal)
@@ -93,3 +99,39 @@ static void board_config_init(void)
 	}
 }
 DECLARE_HOOK(HOOK_INIT, board_config_init, HOOK_PRIO_DEFAULT);
+
+static const struct device *const bbram_dev =
+	COND_CODE_1(DT_HAS_CHOSEN(cros_ec_bbram),
+		    DEVICE_DT_GET(DT_CHOSEN(cros_ec_bbram)), NULL);
+
+static void check_first_boot(void)
+{
+	uint32_t board_batt_keep_val = 0;
+	system_bbram_read(bbram_dev, BBRAM_REGION_OFFSET(board_batt_keep),
+			  BBRAM_REGION_SIZE(board_batt_keep),
+			  (uint8_t *)&board_batt_keep_val);
+
+	if (board_batt_keep_val == 0x00) {
+		board_batt_keep_val = 0xA5A5A5A5;
+		system_bbram_write(bbram_dev,
+				   BBRAM_REGION_OFFSET(board_batt_keep),
+				   BBRAM_REGION_SIZE(board_batt_keep),
+				   (uint8_t *)&board_batt_keep_val);
+		CPRINTS("----first active---");
+
+		uint32_t flags = system_get_reset_flags();
+		int ext_power_present = gpio_get_level(GPIO_AC_PRESENT);
+		bool allow_cutoff = (flags & EC_RESET_FLAG_POWER_ON) &&
+				    !(flags & EC_RESET_FLAG_HIBERNATE) &&
+				    !(flags & EC_RESET_FLAG_HARD) &&
+				    !(flags & EC_RESET_FLAG_SOFT) &&
+				    !(flags & EC_RESET_FLAG_WATCHDOG);
+
+		if (allow_cutoff && (!ext_power_present) &&
+		    (battery_is_present() == BP_YES)) {
+			CPRINTS("##test mode: cutoff %d", ext_power_present);
+			board_cut_off_battery();
+		}
+	}
+}
+DECLARE_HOOK(HOOK_INIT, check_first_boot, HOOK_PRIO_DEFAULT);
