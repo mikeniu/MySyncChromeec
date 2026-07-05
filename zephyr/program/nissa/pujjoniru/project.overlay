@@ -14,3 +14,12 @@
 #include "power_signals.dtsi"
 #include "pwm.dtsi"
 #include "motionsense.dtsi"
+
+/ {
+    named-bbram-regions {
+		board-batt-keep {
+		offset = <0x10>;
+		size = <0x04>;
+		};
+	};
+};
