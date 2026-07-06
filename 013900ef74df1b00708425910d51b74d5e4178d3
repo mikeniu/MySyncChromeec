@@ -22,6 +22,30 @@
       },
       "revId": "013900ef74df1b00708425910d51b74d5e4178d3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45e9be8d_d5ecb1b4",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 1260,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-07-06T11:04:06Z",
+      "side": 1,
+      "message": "Does this mean this logic can\u0027t be added here and should instead be implemented in the board layer? And if the lightbar needs to remain on during shutdown, does PP5500 need to stay enabled?",
+      "parentUuid": "bc04e540_0c890551",
+      "range": {
+        "startLine": 1260,
+        "startChar": 3,
+        "endLine": 1260,
+        "endChar": 28
+      },
+      "revId": "013900ef74df1b00708425910d51b74d5e4178d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
