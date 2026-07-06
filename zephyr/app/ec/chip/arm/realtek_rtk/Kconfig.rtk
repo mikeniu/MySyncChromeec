@@ -51,4 +51,18 @@ config CROS_EC_RW_SIZE
 config CROS_EC_RW_MEM_OFF
 	default 0
 
+<<<<<<< HEAD   (fa6227e73d6cd2191bfaeff501b03c2666e49dda npcx: Add npcx-45mhz snippet)
+||||||| BASE   (a3349603f332f555ef2f857ff4690931451addf0 ucsi: cleanup parameter handling)
+config MAIN_STACK_SIZE
+	default 1280
+
+=======
+config MAIN_STACK_SIZE
+	default 1280
+
+# Preserve ESPI driver data across sysjumps
+config ESPI_RTS5912_PRESERVED_DATA_HOOKS
+	default y if ESPI_RTS5912
+
+>>>>>>> CHANGE (c4e83f9931b1c473cc1a024427aea3d236f76157 rts5912: Preserve ESPI driver state during sysjump)
 endif # SOC_SERIES_RTS5912
