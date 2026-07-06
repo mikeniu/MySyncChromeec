@@ -85,7 +85,7 @@
 			compatible = "cros-ec,lis2de";
 			status = "okay";
 
-			active-mask = "SENSOR_ACTIVE_S0";
+			active-mask = "SENSOR_ACTIVE_S0_S3";
 			location = "MOTIONSENSE_LOC_LID";
 			mutex = <&lid_mutex>;
 			port = <&i2c_ec_i2c_sensor>;
@@ -99,13 +99,17 @@
 				ec-s0 {
 					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
+				ec-s3 {
+					odr = <(10000 | ROUND_UP_FLAG)>;
+					ec-rate = <(100 * USEC_PER_MSEC)>;
+				};
 			};
 		};
 		base_accel: base-accel {
 			compatible = "cros-ec,lis2de";
 			status = "okay";
 
-			active-mask = "SENSOR_ACTIVE_S0";
+			active-mask = "SENSOR_ACTIVE_S0_S3";
 			location = "MOTIONSENSE_LOC_BASE";
 			mutex = <&base_mutex>;
 			port = <&i2c_ec_i2c_sensor>;
@@ -119,6 +123,10 @@
 				ec-s0 {
 					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
+				ec-s3 {
+					odr = <(10000 | ROUND_UP_FLAG)>;
+					ec-rate = <(100 * USEC_PER_MSEC)>;
+				};
 			};
 		};
 	};
@@ -128,7 +136,7 @@
 			compatible = "cros-ec,lis2de";
 			status = "okay";
 
-			active-mask = "SENSOR_ACTIVE_S0";
+			active-mask = "SENSOR_ACTIVE_S0_S3";
 			location = "MOTIONSENSE_LOC_LID";
 			mutex = <&lid_mutex>;
 			port = <&i2c_ec_i2c_sensor>;
@@ -144,6 +152,10 @@
 				ec-s0 {
 					odr = <(10000 | ROUND_UP_FLAG)>;
 				};
+				ec-s3 {
+					odr = <(10000 | ROUND_UP_FLAG)>;
+					ec-rate = <(100 * USEC_PER_MSEC)>;
+				};
 			};
 		};
 
@@ -151,7 +163,7 @@
 			compatible = "cros-ec,lis2dw12";
 			status = "okay";
 
-			active-mask = "SENSOR_ACTIVE_S0";
+			active-mask = "SENSOR_ACTIVE_S0_S3";
 			location = "MOTIONSENSE_LOC_BASE";
 			mutex = <&base_mutex>;
 			port = <&i2c_ec_i2c_sensor>;
@@ -166,6 +178,10 @@
 					"cros-ec,motionsense-sensor-config";
 				ec-s0 {
 					odr = <(10000 | ROUND_UP_FLAG)>;
+				};
+				ec-s3 {
+					odr = <(10000 | ROUND_UP_FLAG)>;
+					ec-rate = <(100 * USEC_PER_MSEC)>;
 				};
 			};
 		};
