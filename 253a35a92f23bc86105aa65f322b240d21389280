@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a87d538_d4932989",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-07-06T09:09:28Z",
+      "side": 1,
+      "message": "Do the other Corsola ITE boards require this fix as well?",
+      "revId": "253a35a92f23bc86105aa65f322b240d21389280",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
