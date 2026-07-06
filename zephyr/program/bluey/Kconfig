@@ -8,6 +8,12 @@ config BOARD_BLUEY
 	  Build Google Bluey reference board.  The board uses Nuvoton
 	  NPCX9 chip as the EC.
 
+config BOARD_BLUEY_ITE
+	bool "Google Bluey ITE variant"
+	help
+	  Build Google Bluey ITE reference board. The board uses ITE
+	  IT82002 EC.
+
 config BOARD_QUENBI
 	bool "Google Quenbi baseboard"
 	help

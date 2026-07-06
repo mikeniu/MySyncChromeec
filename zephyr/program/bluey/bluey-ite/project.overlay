@@ -1,0 +1,76 @@
+/* Copyright 2025 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* bluey program common DTS includes */
+
+#include <cros/integrated_fwid.dtsi>
+
+#include "../ite_common.dtsi"
+#include "../interrupts.dtsi"
+#include "../ite_adc.dtsi"
+#include "../ite_i2c.dtsi"
+#include "../battery.dtsi"
+
+/* bluey project DTS includes */
+
+#include "gpios.dtsi"
+#include "fan.dtsi"
+#include "temp_sensors.dtsi"
+
+/* bluey overrides follow... */
+
+/ {
+	gpio-interrupts {
+		int_spi0_cs: spi0_cs {
+			irq-pin = <&spi0_cs>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "spi_event";
+		};
+	};
+
+	named-usbc-port {
+		usbc_port0: port0 {
+			compatible = "named-usbc-port";
+		};
+		usbc_port1: port1 {
+			compatible = "named-usbc-port";
+		};
+	};
+};
+
+&cros_rtc {
+	status = "okay";
+};
+
+&binman {
+	wp-ro {
+		/*
+		 * Delete the pstate node so that we can force it to be the
+		 * last sub-section. binman doesn't handle sub-sections with
+		 * out of order offsets.
+		 */
+		/delete-node/ pstate;
+
+		ec-ro {
+			fmap {
+				offset = <(0x60000 - (0x1000 * 2) - 0x400)>;
+				/*
+				 * don't specify 'size = <0x400>' here so
+				 * it is auto-assigned to the fmap size.
+				 */
+			};
+		};
+		cbi {
+			offset = <(0x60000 - (0x1000 * 2))>;
+			size = <0x1000>;
+		};
+		pstate {
+			type = "section";
+			offset = <(0x60000 - (0x1000 * 1))>;
+			size = <0x1000>;
+		};
+	};
+};
+

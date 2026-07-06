@@ -11,6 +11,11 @@ if(DEFINED CONFIG_BOARD_BLUEY)
 	add_subdirectory(bluey)
 endif()
 
+if(DEFINED CONFIG_BOARD_BLUEY_ITE)
+	project(bluey-ite)
+	add_subdirectory(bluey-ite)
+endif()
+
 if(DEFINED CONFIG_BOARD_QUENBI)
 	project(quenbi)
 	add_subdirectory(quenbi)

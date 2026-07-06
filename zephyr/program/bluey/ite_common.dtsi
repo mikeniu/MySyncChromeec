@@ -1,0 +1,26 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/cbi_flash.dtsi>
+#include <ite/it8xxx2-pinctrl-map.dtsi>
+
+&cbi_flash {
+	/*
+	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
+	 * EC_RO section. EC_RO section ends at 0x60000 byte which is the offset.
+	 */
+	offset = <0x5E000>;
+	size = <0x1000>;
+};
+
+/* AP interface */
+&shi0 {
+	status = "okay";
+	pinctrl-0 = <&shi_mosi_gpm0_default &shi_miso_gpm1_default
+		     &shi_clk_gpm4_default &shi_cs_gpm5_default>;
+	pinctrl-names = "default";
+	/* unused but needed by dt binding */
+	cs-gpios = <&gpiom 5 GPIO_VOLTAGE_1P8>;
+};
