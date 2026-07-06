@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "18626bc1_8ba1c3c1",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-06T13:20:06Z",
+      "side": 1,
+      "message": "Setting UFP and DFP will be done in separate CL.",
+      "parentUuid": "3d73ea19_25006572",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce0106de_a319ba49",
@@ -35,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c61737dd_5822291c",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-06T13:20:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce0106de_a319ba49",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9df5e63a_93915767",
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-16T19:44:34Z",
       "side": 1,
       "message": "Is there an action that needs to happen the clear the event, or is it already cleared by the time this happens?",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3f897f5_133b9ecd",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 1820,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-06T13:20:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9df5e63a_93915767",
       "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
