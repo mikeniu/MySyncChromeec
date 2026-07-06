@@ -16,6 +16,23 @@
       "message": "Approval should come from Abe on FW Tesam",
       "revId": "447ba1da54505ab6ae1c927d03af2517cbb8d103",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcf34a33_4f4b6277",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-06T17:30:40Z",
+      "side": 1,
+      "message": "@devin.lu@quantatw.com This is a very large CL. For ease of review, can you split it up into a chain of CLs that each build incrementally? I think a reasonable start would be project boilerplate, then GPIOs, then I2C, the CLs for each of the peripheral functional areas, e.g. keyboard, power sequencing. Each one should build cleanly.",
+      "revId": "447ba1da54505ab6ae1c927d03af2517cbb8d103",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
