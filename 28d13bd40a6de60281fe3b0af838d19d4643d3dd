@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8ca90ed_06ddff96",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-06T16:12:17Z",
+      "side": 1,
+      "message": "I have no objection to this from a software POV. I will defer to Charlie about whether this is an adequate solution to the OVP.",
+      "revId": "28d13bd40a6de60281fe3b0af838d19d4643d3dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
