@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "798db7e4_e864599f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-07-06T04:16:34Z",
+      "side": 1,
+      "message": "this patch is not specific to mica, please change to `power: qcom_exp:`",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 5
+      },
+      "revId": "325afd4707589ba5ad793943502abf4920318415",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
