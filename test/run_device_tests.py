@@ -1920,6 +1920,10 @@ def flash_and_run_test(
             )
             return False
 
+    if args.build_only:
+        logging.info("Build complete. Skipping execution due to --build-only.")
+        return True
+
     # Get the console file before flashing to listen ASAP after flashing.
     console_pty = platform.get_console(board_config)
 
@@ -2115,6 +2119,12 @@ def main():
 
     parser.add_argument(
         "--renode", help="Run tests with Renode emulator", action="store_true"
+    )
+
+    parser.add_argument(
+        "--build-only",
+        help="Only build test binaries without flashing or running them",
+        action="store_true",
     )
 
     parser.add_argument(
