@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc04e540_0c890551",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 1260,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-07-06T05:21:53Z",
+      "side": 1,
+      "message": "I wouldn\u0027t suggest keeping this here, Since we are using this flow specifically to turn on certain power-rails. \n\nPlease check this patches to understand further\n\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8013350\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8023202",
+      "range": {
+        "startLine": 1260,
+        "startChar": 3,
+        "endLine": 1260,
+        "endChar": 28
+      },
+      "revId": "013900ef74df1b00708425910d51b74d5e4178d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
