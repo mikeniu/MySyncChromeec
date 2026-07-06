@@ -1697,7 +1697,7 @@ DECLARE_SAFE_CONSOLE_COMMAND(sleepmask, command_sleepmask,
 			     "Display/force sleep mask");
 #endif
 
-#ifdef CONFIG_CMD_JUMPTAGS
+//#ifdef CONFIG_CMD_JUMPTAGS
 static int command_jumptags(int argc, const char **argv)
 {
 	const struct jump_tag *t;
@@ -1712,7 +1712,7 @@ static int command_jumptags(int argc, const char **argv)
 		t = (const struct jump_tag *)(system_usable_ram_end() + used);
 		used += sizeof(struct jump_tag) + ROUNDUP4(t->data_size);
 
-		ccprintf("%08x: 0x%04x %c%c.%d %3d\n", (uintptr_t)t, t->tag,
+		ccprintf("%08lx: 0x%04x %c%c.%d %3d\n", (uintptr_t)t, t->tag,
 			 t->tag >> 8, (uint8_t)t->tag, t->data_version,
 			 t->data_size);
 	}
@@ -1720,7 +1720,7 @@ static int command_jumptags(int argc, const char **argv)
 	return EC_SUCCESS;
 }
 DECLARE_CONSOLE_COMMAND(jumptags, command_jumptags, NULL, "List jump tags");
-#endif /* CONFIG_CMD_JUMPTAGS */
+//#endif /* CONFIG_CMD_JUMPTAGS */
 
 #ifdef CONFIG_EMULATED_SYSRQ
 static int command_sysrq(int argc, const char **argv)

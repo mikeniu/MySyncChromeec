@@ -5,6 +5,7 @@
 cros_ec_library_include_directories(include)
 
 zephyr_library_sources(clock.c)
+zephyr_library_sources(sysjump_espi.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE
         system_external_storage.c
         system_download_from_flash.c)
