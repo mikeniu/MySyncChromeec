@@ -33,6 +33,24 @@
       "message": "@devin.lu@quantatw.com This is a very large CL. For ease of review, can you split it up into a chain of CLs that each build incrementally? I think a reasonable start would be project boilerplate, then GPIOs, then I2C, the CLs for each of the peripheral functional areas, e.g. keyboard, power sequencing. Each one should build cleanly.",
       "revId": "447ba1da54505ab6ae1c927d03af2517cbb8d103",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2abbfc80_149ef8b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-06T17:34:19Z",
+      "side": 1,
+      "message": "It looks like many of those CLs would not contain C code and therefore not have code coverage requirements. I would guess that if you put the .c CLs later in the stack, you\u0027ll have time to add some basic testing setup by the time that I get to them. Barring extraordinary circumstances, I\u0027d like to wait to merge these CLs until they meet coverage requirements.",
+      "parentUuid": "fcf34a33_4f4b6277",
+      "revId": "447ba1da54505ab6ae1c927d03af2517cbb8d103",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
