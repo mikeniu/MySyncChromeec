@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "39e4e25f_0958aef1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-06T13:21:27Z",
+      "side": 1,
+      "message": "Not sure, it could be wrong messages causing problem in PD negotiation or wrong value used in SET_VDO.",
+      "parentUuid": "cc906234_ea07e99c",
+      "revId": "94ea65e39a2b50e77d3087053ce8737c9bf2d397",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9a2c7f54_f9c55ea5",
         "filename": "include/usb_pd_vdo.h",
         "patchSetId": 11
