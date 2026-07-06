@@ -16,6 +16,23 @@
       "message": "Running compare-builds now after changing zmake.py to allow for signer or signers_list, submitting to CQ dry run now while that is in process to see if the CL now passes",
       "revId": "10539a84052ed729f759ee2e3848b582c278c911",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f118e45b_8a601489",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-07-06T20:39:11Z",
+      "side": 1,
+      "message": "Check to see if CQ errors are consistent",
+      "revId": "10539a84052ed729f759ee2e3848b582c278c911",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
