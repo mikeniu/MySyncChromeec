@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38a2d5e3_b58c657c",
+        "filename": "util/renode/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-06T18:40:13Z",
+      "side": 1,
+      "message": "Are there any downstreaming docs? If so, it might be good to add a link to this.",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 55
+      },
+      "revId": "45728908a54451010cd4ed356ac8f68e2368ddb3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d006da5_73a484c9",
+        "filename": "util/renode/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-06T18:40:13Z",
+      "side": 1,
+      "message": "Should we put this in a `.sh` file somewhere to make it easy to run?",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 3
+      },
+      "revId": "45728908a54451010cd4ed356ac8f68e2368ddb3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
