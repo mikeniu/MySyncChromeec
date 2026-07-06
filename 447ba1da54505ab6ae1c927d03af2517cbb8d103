@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ba4c2ae_b4b23529",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-07-06T16:51:39Z",
+      "side": 1,
+      "message": "Approval should come from Abe on FW Tesam",
+      "revId": "447ba1da54505ab6ae1c927d03af2517cbb8d103",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
