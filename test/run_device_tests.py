@@ -1907,6 +1907,9 @@ def flash_and_run_test(
         )
         return False
 
+    if args.build_only:
+        return True
+
     if test.ro_image is not None:
         # Use the RO specified by the test. Replace KEY_RO and EC_RW (which
         # encompasses both RW_FW and SIG_RW) in the RO image. This better
@@ -2115,6 +2118,13 @@ def main():
 
     parser.add_argument(
         "--renode", help="Run tests with Renode emulator", action="store_true"
+    )
+
+    parser.add_argument(
+        "--build_only",
+        "--build-only",
+        help="Only build test binaries without flashing or running them",
+        action="store_true",
     )
 
     parser.add_argument(
