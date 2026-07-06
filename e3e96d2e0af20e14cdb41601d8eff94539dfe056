@@ -145,6 +145,30 @@
       },
       "revId": "e3e96d2e0af20e14cdb41601d8eff94539dfe056",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a8a5243_1d8ed2aa",
+        "filename": "docs/panic_data.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-06T17:38:19Z",
+      "side": 1,
+      "message": "Nit: might be nice to add this panic flag decoding to ectool 😊",
+      "parentUuid": "1f767490_4dbb1f38",
+      "range": {
+        "startLine": 267,
+        "startChar": 56,
+        "endLine": 267,
+        "endChar": 110
+      },
+      "revId": "e3e96d2e0af20e14cdb41601d8eff94539dfe056",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
