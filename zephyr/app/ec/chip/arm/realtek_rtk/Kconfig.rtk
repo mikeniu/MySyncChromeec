@@ -54,4 +54,8 @@ config CROS_EC_RW_MEM_OFF
 config MAIN_STACK_SIZE
 	default 1280
 
+# Preserve ESPI driver data across sysjumps
+config ESPI_RTS5912_PRESERVED_DATA_HOOKS
+	default y if ESPI_RTS5912
+
 endif # SOC_SERIES_RTS5912
