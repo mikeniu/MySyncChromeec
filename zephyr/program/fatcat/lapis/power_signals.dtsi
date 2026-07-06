@@ -63,16 +63,24 @@
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "SLP_S3_L input from PCH";
 		enum-name = "PWR_SLP_S3";
-		gpios = <&gpiog 7 GPIO_ACTIVE_LOW>;
+		gpios = <&gpiog 7 (GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
 		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
 	};
 	pwr-slp-s4 {
 		compatible = "intel,ap-pwrseq-vw";
 		dbg-label = "SLP_S4 virtual wire input from PCH";
 		enum-name = "PWR_SLP_S4";
+<<<<<<< HEAD   (b33ed050606350f5afec1a4c5e9d06887bc3de89 pdc: ti: Don't allow accessing chip info until fully ready)
 		virtual-wire = "ESPI_VWIRE_SIGNAL_SLP_S4";
 		reset-val = <1>;
 		vw-invert;
+||||||| BASE   (4b9e6c57662374dca8bf57b4df3272306c18f013 ocicat: Add Fn and Caps Lock key support)
+		gpios = <&gpiof 1 GPIO_ACTIVE_LOW>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+=======
+		gpios = <&gpiof 1 (GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+>>>>>>> CHANGE (e718486d9db9af6c920dfb97484bce80df47c45a lapis: Add GPIO_VOLTAGE_1P8 for SLP_S3/SLP_S4 signal)
 	};
 	pwr-slp-s5 {
 		compatible = "intel,ap-pwrseq-vw";
