@@ -16,6 +16,24 @@
       "message": "Maybe add a `buf[7] \u003d \u0027\\0\u0027` to be safe.",
       "revId": "c8e0343ebdf9b8bae725f796e79d98f0abf9c418",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4aee5a41_c9ca5b10",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-06T20:41:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0647ff7_1bb38870",
+      "revId": "c8e0343ebdf9b8bae725f796e79d98f0abf9c418",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
