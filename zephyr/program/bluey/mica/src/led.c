@@ -20,6 +20,10 @@ LOG_MODULE_REGISTER(mica_led_diag, LOG_LEVEL_ERR);
 __override enum ec_status board_lightbar_custom_seq(uint8_t seq)
 {
 	switch (seq) {
+	case LIGHTBAR_CMD_SEQ_RAMDUMP: /* Ramdump collection */
+		lb_set_diag_policy(LED_ALT_POLICY_DIAG_RAMDUMP, 90000);
+		return EC_RES_SUCCESS;
+
 	case LIGHTBAR_CMD_SEQ_DIAG_CLEAR: /* Clear diagnostic state */
 		lb_set_diag_policy(LED_ALT_POLICY_NORMAL, 0);
 		return EC_RES_SUCCESS;
