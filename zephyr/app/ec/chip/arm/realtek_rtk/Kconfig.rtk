@@ -54,4 +54,12 @@ config CROS_EC_RW_MEM_OFF
 config MAIN_STACK_SIZE
 	default 1280
 
+<<<<<<< PATCH SET (5df0e23a83c1af42c574ea88420eb46246fce25e rts5912: Preserve ESPI driver state during sysjump)
+# Preserve ESPI driver data across sysjumps
+config ESPI_RTS5912_PRESERVED_DATA_HOOKS
+	default y if ESPI_RTS5912
+
+||||||| BASE      (fa6227e73d6cd2191bfaeff501b03c2666e49dda npcx: Add npcx-45mhz snippet)
+=======
+>>>>>>> BASE      (acf1f7f78f0003e5dd2f3d44385d5980620ab22e rts5912: Increase default main stack size to 1280)
 endif # SOC_SERIES_RTS5912
