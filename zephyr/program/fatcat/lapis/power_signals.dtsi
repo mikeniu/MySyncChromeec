@@ -63,14 +63,14 @@
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "SLP_S3_L input from PCH";
 		enum-name = "PWR_SLP_S3";
-		gpios = <&gpiog 7 GPIO_ACTIVE_LOW>;
+		gpios = <&gpiog 7 (GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
 		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
 	};
 	pwr-slp-s4 {
 		compatible = "intel,ap-pwrseq-gpio";
 		dbg-label = "SLP_S4_L input from PCH";
 		enum-name = "PWR_SLP_S4";
-		gpios = <&gpiof 1 GPIO_ACTIVE_LOW>;
+		gpios = <&gpiof 1 (GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
 		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
 	};
 	pwr-slp-s5 {
