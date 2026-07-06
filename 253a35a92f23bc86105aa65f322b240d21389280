@@ -16,6 +16,24 @@
       "message": "Do the other Corsola ITE boards require this fix as well?",
       "revId": "253a35a92f23bc86105aa65f322b240d21389280",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6702612_a1465c33",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-07-06T09:13:23Z",
+      "side": 1,
+      "message": "I have tested on chinchou and it works normally with the same ec version. My theory is that only boards with CONFIG_RISCV_PMP\u003dy have this issue.",
+      "parentUuid": "7a87d538_d4932989",
+      "revId": "253a35a92f23bc86105aa65f322b240d21389280",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
