@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d3c8126_6f0e55ed",
+        "filename": "common/rgb_keyboard.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-07T20:25:04Z",
+      "side": 1,
+      "message": "I think it\u0027s clearer to use sizeof on the struct directly instead of through a dereference.\n\nBut feel free to leave as is if you\u0027d like.\n\n\n```suggestion\n\tif (args-\u003eparams_size \u003c sizeof(struct ec_params_rgbkbd_set_color) + p-\u003elength * sizeof(struct rgb_s))\n```",
+      "range": {
+        "startLine": 497,
+        "startChar": 0,
+        "endLine": 497,
+        "endChar": 71
+      },
+      "revId": "f3325e39aaaa4efea83f00cc837edc9f36628c9c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
