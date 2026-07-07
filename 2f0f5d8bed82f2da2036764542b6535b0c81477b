@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f15be10_1f977175",
+        "filename": "zephyr/program/fpmcu/ft9001/common.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-07-07T16:23:34Z",
+      "side": 1,
+      "message": "This seems like a workaround and not a real fix. Shouldn\u0027t the EC code be changed to handle the ranges correctly?",
+      "range": {
+        "startLine": 118,
+        "startChar": 5,
+        "endLine": 118,
+        "endChar": 64
+      },
+      "revId": "2f0f5d8bed82f2da2036764542b6535b0c81477b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
