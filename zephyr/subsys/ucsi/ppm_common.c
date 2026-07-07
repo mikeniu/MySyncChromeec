@@ -1064,4 +1064,17 @@ bool ppm_test_is_cmd_pending(struct ucsi_ppm_device *dev)
 	return pending;
 }
 
+bool ppm_wait_for_cmd_to_process(struct ucsi_ppm_device *dev)
+{
+	for (int i = 0; i < 30; ++i) {
+		if (ppm_test_is_cmd_pending(dev)) {
+			k_msleep(1);
+		} else {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 #endif
