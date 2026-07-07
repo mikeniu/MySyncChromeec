@@ -11,6 +11,18 @@
 #include "gpios.dtsi"
 #include "interrupts.dtsi"
 #include "i2c.dtsi"
+#include "usb_typec.dtsi"
+
+/ {
+	batteries {
+		default_battery: atl-ap25aap {
+			compatible = "atl,ap25aap", "battery-smart";
+		};
+		smp-ap25a7p {
+			compatible = "smp,ap25a7p", "battery-smart";
+		};
+	};
+};
 
 /* AP interface */
 &espi0 {
