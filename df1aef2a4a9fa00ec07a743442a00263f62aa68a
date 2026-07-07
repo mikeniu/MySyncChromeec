@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7184871_68a6d8eb",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1344535
+      },
+      "writtenOn": "2026-07-07T14:07:22Z",
+      "side": 1,
+      "message": "Is PD_HARD_RESET happens for self powered devices also ?  is there any possibility of allocating 3A for the power role swap request ?",
+      "range": {
+        "startLine": 77,
+        "startChar": 25,
+        "endLine": 77,
+        "endChar": 26
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b13fb64b_7058f297",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1344535
+      },
+      "writtenOn": "2026-07-07T14:07:22Z",
+      "side": 1,
+      "message": "is it required USB4 check ? I think usb4 SSDs may work at 7.5w also, please confirm",
+      "range": {
+        "startLine": 77,
+        "startChar": 3,
+        "endLine": 77,
+        "endChar": 32
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2271744a_5f6848ed",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1344535
+      },
+      "writtenOn": "2026-07-07T14:07:22Z",
+      "side": 1,
+      "message": "I think atomic_set_bit(\u0026tbt_usb4_3a_reset, port) should only be set after confirming the Hard Reset succeeded. In the current code, if pdc_power_mgmt_connector_reset() fails or the partner doesn\u0027t respond, the flag is still set, incorrectly blocking any subsequent reset attempts on that port.",
+      "range": {
+        "startLine": 81,
+        "startChar": 2,
+        "endLine": 81,
+        "endChar": 54
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
