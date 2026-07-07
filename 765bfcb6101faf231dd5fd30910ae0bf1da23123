@@ -33,6 +33,24 @@
       "message": "This line is worth keeping this CL \"alive\" in my opinion",
       "revId": "765bfcb6101faf231dd5fd30910ae0bf1da23123",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14701431_50102264",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-07T22:34:42Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "719e60ff_94b15f92",
+      "revId": "765bfcb6101faf231dd5fd30910ae0bf1da23123",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
