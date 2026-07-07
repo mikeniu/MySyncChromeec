@@ -34,6 +34,23 @@
       "parentUuid": "7a87d538_d4932989",
       "revId": "253a35a92f23bc86105aa65f322b240d21389280",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0efc5bfa_e5307f2f",
+        "filename": "zephyr/boards/google/it8xxx2/Kconfig.defconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1182824
+      },
+      "writtenOn": "2026-07-07T01:48:15Z",
+      "side": 1,
+      "message": "This seems like a more suitable location for RISC-V-related configurations. While ideally we would have dedicated RISC-V defconfig files, since we lack them for now, starting here is a reasonable approach.",
+      "revId": "253a35a92f23bc86105aa65f322b240d21389280",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
