@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "3b48329181afbef881a26bd8ebd2a1856298da78",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b317134_f95f94a3",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2572,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-07-07T16:18:58Z",
+      "side": 1,
+      "message": "for clarity, i think i would repeat the clamping from above:\n`len \u003d MIN(cmd_data.data[1], sizeof(cmd_data.data) - offset`\nto sanitize the chip data, then clamp it to the available\n size of `data-\u003ecached_pdos`\nto protect the `memcpy`.",
+      "range": {
+        "startLine": 2572,
+        "startChar": 2,
+        "endLine": 2572,
+        "endChar": 5
+      },
+      "revId": "3b48329181afbef881a26bd8ebd2a1856298da78",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
