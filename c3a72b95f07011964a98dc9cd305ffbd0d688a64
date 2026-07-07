@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e0dd506_afe4cda1",
+        "filename": "zephyr/program/atria/penghu/gpios.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-07T16:27:05Z",
+      "side": 1,
+      "message": "Shouldn\u0027t these be in the I2C file?",
+      "revId": "c3a72b95f07011964a98dc9cd305ffbd0d688a64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
