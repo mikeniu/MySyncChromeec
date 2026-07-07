@@ -224,14 +224,14 @@
 			rpm_target = <0>;
 		};
 		level_1 {
-			temp_on = <0 0 55 0>;
+			temp_on = <0 0 52 0>;
 			temp_off = <0 0 0 0>;
-			rpm_target = <2700>;
+			rpm_target = <3100>;
 		};
 		level_2 {
 			temp_on = <0 0 57 0>;
-			temp_off = <0 0 52 0>;
-			rpm_target = <3600>;
+			temp_off = <0 0 48 0>;
+			rpm_target = <3800>;
 		};
 		level_3 {
 			temp_on = <0 0 100 0>;
