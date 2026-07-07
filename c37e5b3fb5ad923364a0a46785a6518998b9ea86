@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9747c477_182c24b8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-07T23:47:30Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Spellchecker: \"harwdare\" is a possible misspelling of \"hardware\".\n\nTo bypass Spellchecker, add...\n\n\"harwdare\" is a possible misspelling of \"hardware\".\n\nTo bypass Spellchecker, add a footer with DISABLE_SPELLCHECKER",
+      "range": {
+        "startLine": 11,
+        "startChar": 19,
+        "endLine": 11,
+        "endChar": 27
+      },
+      "revId": "c37e5b3fb5ad923364a0a46785a6518998b9ea86",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cde094ef_5d93f244",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-07T23:47:30Z",
+      "side": 1,
+      "message": "This will need a CQ depend once the upstream change is available.",
+      "revId": "c37e5b3fb5ad923364a0a46785a6518998b9ea86",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
