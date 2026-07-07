@@ -145,6 +145,11 @@ ZTEST_USER(fpsensor_enroll, test_enroll_configure_detect)
 	/* Confirm that detect mode was disabled. */
 	fingerprint_get_state(fp_sim, &state);
 	zassert_false(state.detect_mode);
+
+	/* Confirm that the enrollment session was properly torn down. */
+	zassert_equal(
+		mock_alg_enroll_finish_fake.call_count, 1,
+		"Algorithm finish should be called when explicitly closing the session");
 }
 
 ZTEST_USER(fpsensor_enroll, test_enroll_step)
@@ -202,6 +207,14 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step)
 	zassert_true(fp_events & EC_MKBP_FP_ENROLL);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), 0);
 	zassert_equal(EC_MKBP_FP_ENROLL_PROGRESS(fp_events), enroll_percent);
+
+	/*
+	 * Confirm that a normal mid-enrollment step does not finish the
+	 * session.
+	 */
+	zassert_equal(
+		mock_alg_enroll_finish_fake.call_count, 0,
+		"Algorithm finish should not be called during an active enrollment step");
 }
 
 ZTEST_USER(fpsensor_enroll, test_enroll_step_failure)
@@ -255,6 +268,14 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_failure)
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_true(response.mode & FP_MODE_ENROLL_SESSION);
+
+	/*
+	 * Confirm that the underlying enrollment session wasn't prematurely
+	 * finished.
+	 */
+	zassert_equal(
+		mock_alg_enroll_finish_fake.call_count, 0,
+		"Algorithm finish should not be called on transient step failure");
 }
 
 ZTEST_USER(fpsensor_enroll, test_enroll_step_low_quality_warning)
@@ -319,6 +340,14 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_low_quality_warning)
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_true(response.mode & FP_MODE_ENROLL_SESSION);
+
+	/*
+	 * Confirm that a low quality warning does not prematurely finish the
+	 * session.
+	 */
+	zassert_equal(
+		mock_alg_enroll_finish_fake.call_count, 0,
+		"Algorithm finish should not be called on a transient quality warning");
 }
 
 ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_failed)
@@ -385,6 +414,13 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_failed)
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_false(response.mode & FP_MODE_ENROLL_SESSION);
+
+	/*
+	 * Confirm that 'enroll_finish' was called after the conversion failure.
+	 */
+	zassert_equal(
+		mock_alg_enroll_finish_fake.call_count, 1,
+		"Algorithm finish should be called to close out the session");
 }
 
 ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_success)
