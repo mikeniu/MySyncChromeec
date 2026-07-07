@@ -87,27 +87,6 @@ static int write_ack_command(bool connector_change_ack,
 	return write_command(&control);
 }
 
-/**
- * Return true if commands are no longer pending.
- */
-static bool wait_for_cmd_to_process(void)
-{
-	/*
-	 * After calling write, the command will be pending and will trigger the
-	 * main loop. Try reading the pending state a few times to see if it
-	 * clears.
-	 */
-	for (int i = 0; i < PDC_WAIT_FOR_ITERATIONS; ++i) {
-		if (ppm_test_is_cmd_pending(ppm_dev)) {
-			k_msleep(1);
-		} else {
-			return true;
-		}
-	}
-
-	return false;
-}
-
 static bool reset_to_idle_notify(void)
 {
 	struct ucsi_control_t ctrl = {};
@@ -119,7 +98,7 @@ static bool reset_to_idle_notify(void)
 		LOG_ERR("Failed to write command");
 		return false;
 	}
-	if (!wait_for_cmd_to_process()) {
+	if (!ppm_wait_for_cmd_to_process(ppm_dev)) {
 		LOG_ERR("Timeout waiting for command process)");
 		return false;
 	}
@@ -129,7 +108,7 @@ static bool reset_to_idle_notify(void)
 		LOG_ERR("Failed to write command");
 		return false;
 	}
-	if (!wait_for_cmd_to_process()) {
+	if (!ppm_wait_for_cmd_to_process(ppm_dev)) {
 		LOG_ERR("Timeout waiting for command process)");
 		return false;
 	}
@@ -139,7 +118,7 @@ static bool reset_to_idle_notify(void)
 		LOG_ERR("Failed to ack command");
 		return false;
 	}
-	if (!wait_for_cmd_to_process()) {
+	if (!ppm_wait_for_cmd_to_process(ppm_dev)) {
 		LOG_ERR("Timeout waiting for command process)");
 		return false;
 	}
@@ -177,7 +156,7 @@ ZTEST(ucsi_ppm, test_invalid_conn)
 	ctrl.command = UCSI_CONNECTOR_RESET;
 	ctrl.command_specific[0] = 0;
 	zassert_ok(write_command(&ctrl));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_cci(&cci));
 	zassert_equal(cci.error, 1);
@@ -185,7 +164,7 @@ ZTEST(ucsi_ppm, test_invalid_conn)
 
 	LOG_INF("Acking CONNECTOR_RESET");
 	zassert_ok(write_ack_command(false, true));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	/*
 	 * Test conn=3 using CONNECTOR_RESET.
@@ -195,7 +174,7 @@ ZTEST(ucsi_ppm, test_invalid_conn)
 	ctrl.command = UCSI_CONNECTOR_RESET;
 	ctrl.command_specific[0] = NUM_PORTS + 1;
 	zassert_ok(write_command(&ctrl));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_cci(&cci));
 	zassert_equal(cci.error, 1);
@@ -203,7 +182,7 @@ ZTEST(ucsi_ppm, test_invalid_conn)
 
 	LOG_INF("Acking CONNECTOR_RESET");
 	zassert_equal(write_ack_command(false, true), 0);
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 }
 
 ZTEST(ucsi_ppm, test_get_connector_capability)
@@ -218,7 +197,7 @@ ZTEST(ucsi_ppm, test_get_connector_capability)
 	ctrl.data_length = 0;
 	ctrl.command_specific[0] = PPM_CONNECTOR_NUM;
 	zassert_equal(write_command(&ctrl), 0);
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_cci(&cci));
 	zassert_equal(cci.command_completed, 1);
@@ -245,7 +224,7 @@ ZTEST(ucsi_ppm, test_get_capability)
 	LOG_INF("Sending GET_CAPABILITY");
 	ctrl.command = UCSI_GET_CAPABILITY;
 	zassert_equal(write_command(&ctrl), 0);
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_cci(&cci));
 	zassert_equal(cci.command_completed, 1);
@@ -254,7 +233,7 @@ ZTEST(ucsi_ppm, test_get_capability)
 
 	LOG_INF("Acking GET_CAPABILITY");
 	zassert_ok(write_ack_command(false, true));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_message_in((uint8_t *)&caps, sizeof(caps)));
 	zassert_equal(caps.bNumConnectors, NUM_PORTS,
@@ -280,7 +259,7 @@ ZTEST(ucsi_ppm, test_get_connector_status)
 	ctrl.command = UCSI_GET_CONNECTOR_STATUS;
 	ctrl.command_specific[0] = PPM_CONNECTOR_NUM;
 	zassert_ok(write_command(&ctrl));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_cci(&cci));
 	zassert_equal(cci.command_completed, 1);
@@ -289,7 +268,7 @@ ZTEST(ucsi_ppm, test_get_connector_status)
 
 	LOG_INF("Acking GET_CONNECTOR_STATUS");
 	zassert_ok(write_ack_command(false, true));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_message_in((uint8_t *)&csts, sizeof(csts)));
 	zassert_equal(csts.connect_status, 0);
@@ -301,11 +280,11 @@ ZTEST(ucsi_ppm, test_get_connector_status)
 
 	LOG_INF("Sending GET_CONNECTOR_STATUS");
 	zassert_ok(write_command(&ctrl));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	LOG_INF("Acking GET_CONNECTOR_STATUS");
 	zassert_ok(write_ack_command(false, true));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_message_in((uint8_t *)&csts, sizeof(csts)));
 	zassert_equal(csts.connect_status, 1);
@@ -332,7 +311,7 @@ ZTEST(ucsi_ppm, test_set_sink_path)
 	sp->connector_number = PPM_CONNECTOR_NUM;
 	sp->sink_path_enable = 1;
 	zassert_ok(write_command(&ctrl));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_cci(&cci));
 	zassert_true(cci.command_completed);
@@ -341,7 +320,7 @@ ZTEST(ucsi_ppm, test_set_sink_path)
 
 	LOG_INF("Acking SET_SINK_PATH");
 	zassert_ok(write_ack_command(false, true));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	/*
 	 * Test SET_SINK_PATH when sink is connected.
@@ -352,7 +331,7 @@ ZTEST(ucsi_ppm, test_set_sink_path)
 
 	LOG_INF("Sending SET_SINK_PATH as a sink");
 	zassert_ok(write_command(&ctrl));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_cci(&cci));
 	zassert_true(cci.command_completed);
@@ -361,7 +340,7 @@ ZTEST(ucsi_ppm, test_set_sink_path)
 
 	LOG_INF("Acking SET_SINK_PATH");
 	zassert_ok(write_ack_command(false, true));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	/*
 	 * Test SET_SINK_PATH when source is connected.
@@ -372,7 +351,7 @@ ZTEST(ucsi_ppm, test_set_sink_path)
 
 	LOG_INF("Sending SET_SINK_PATH to a source");
 	zassert_ok(write_command(&ctrl));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_cci(&cci));
 	zassert_true(cci.command_completed);
@@ -380,7 +359,7 @@ ZTEST(ucsi_ppm, test_set_sink_path)
 
 	LOG_INF("Acking SET_SINK_PATH");
 	zassert_ok(write_ack_command(false, true));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 }
 
 ZTEST(ucsi_ppm, test_pdc_busy)
@@ -411,7 +390,7 @@ ZTEST(ucsi_ppm, test_pdc_busy)
 
 	LOG_INF("Acking GET_CONNECTOR_CAPABILITY");
 	zassert_ok(write_ack_command(false, true));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 }
 
 ZTEST(ucsi_ppm, test_get_alternate_modes_fail)
@@ -434,7 +413,7 @@ ZTEST(ucsi_ppm, test_get_alternate_modes_fail)
 	/* GET_ALTERNATE_MODES takes conn# in the 2nd byte. */
 	ctrl.command_specific[1] = PPM_CONNECTOR_NUM;
 	zassert_ok(write_command(&ctrl));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 
 	zassert_true(read_cci(&cci));
 	zassert_true(cci.command_completed);
@@ -444,5 +423,5 @@ ZTEST(ucsi_ppm, test_get_alternate_modes_fail)
 
 	LOG_INF("Acking GET_ALTERNATE_MODES");
 	zassert_ok(write_ack_command(false, true));
-	zassert_true(wait_for_cmd_to_process());
+	zassert_true(ppm_wait_for_cmd_to_process(ppm_dev));
 }
