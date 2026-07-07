@@ -262,6 +262,17 @@ static enum ec_error_list authenticate_fp_mode(
 		return EC_SUCCESS;
 	}
 
+	/*
+	 * Reject compound mode transitions requesting multiple auth-gated bits.
+	 * A single cryptographic MAC is tied to exactly one operation string
+	 * and cannot authorize multiple mutually exclusive modes evaluated
+	 * sequentially in the ladder below.
+	 */
+	if (__builtin_popcount(flags_enabled & FP_MODES_WITH_AUTHENTICATION) >
+	    1) {
+		return EC_ERROR_ACCESS_DENIED;
+	}
+
 	/* Block if the MAC is not available */
 	if (!mac.has_value()) {
 		return EC_ERROR_ACCESS_DENIED;
