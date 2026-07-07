@@ -2558,11 +2558,23 @@ static enum smf_state_result st_task_wait_run(void *o)
 	case UCSI_GET_ALTERNATE_MODES:
 	case UCSI_GET_ERROR_STATUS:
 		offset = 2;
-		len = cmd_data.data[1];
+		/*
+		 * Data length comes from the PDC chip, clamp it to smaller of
+		 * the source register and the destination
+		 */
+		len = min(cmd_data.data[1], sizeof(cmd_data.data) - offset);
 		break;
 	case UCSI_GET_PDOS: {
-		len = cmd_data.data[1];
 		offset = 2;
+		/*
+		 * Data length comes from the PDC chip, clamp it to smaller of
+		 * the source register and the destination
+		 */
+		len = min(cmd_data.data[1], sizeof(cmd_data.data) - offset);
+
+		/* Ensure we don't overrun the remaining space in cached_pdos */
+		len = min(len, sizeof(data->cached_pdos) -
+				       data->pdo_offset * sizeof(uint32_t));
 		if (data->cmd == CMD_GET_PDOS) {
 			memcpy(data->cached_pdos + data->pdo_offset,
 			       &cmd_data.data[offset], len);
