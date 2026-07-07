@@ -40,6 +40,30 @@
       },
       "revId": "2f0f5d8bed82f2da2036764542b6535b0c81477b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56a9c98e_b9b02566",
+        "filename": "zephyr/program/fpmcu/ft9001/common.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-07T18:18:56Z",
+      "side": 1,
+      "message": "TBH I\u0027m not 100% sure. The ranges property is not obligatory, so IMO it doesn\u0027t look that bad. It\u0027s not like we always need the mapped address. Sometimes, we need to know only an offset within storage device to erase and write there.\n\nOn the other hand, IIRC, there are some macros to check if the `ranges` is used. You are saying that our code should cover both cases?\n\nI\u0027ve been considering the following options, I would like to know your opinion about it:\n- just remove the ranges property (current solution), for other projects the `partitions` node is not created in upstream and the `ranges` is not added in the board files\n- everywhere where the nodes from `partitions` are used, check if the `ranges` property is present or not and proceed accordingly\n- assume the `ranges` is used in all cases, and add it in the missing places.\n- use the DT_PROP_...(node_id, reg,0) macro to get the `reg` property value, which is not influenced by the `ranges`",
+      "parentUuid": "8f15be10_1f977175",
+      "range": {
+        "startLine": 118,
+        "startChar": 5,
+        "endLine": 118,
+        "endChar": 64
+      },
+      "revId": "2f0f5d8bed82f2da2036764542b6535b0c81477b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
