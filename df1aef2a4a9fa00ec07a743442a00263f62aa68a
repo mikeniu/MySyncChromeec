@@ -49,6 +49,54 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "71a02680_9a3f5800",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-07T23:26:02Z",
+      "side": 1,
+      "message": "\u003e Is PD_HARD_RESET happens for self powered devices also ?\n\nNo, `dpm_check_tbt_usb4_reset` is only called in the first while loop of `pdc_dpm_balance_source_ports`. This is when the DPM is processing max current request set by `sink_max_pdo_requested`. This will only be set when the port is a PD source.\n\n\u003e  Is there any possibility of allocating 3A for the power role swap request ?\n\nIf this is referring to FR swap, it will allocate 3A through a different path (setting `source_frs_max_requested`). That caused the second while loop in `pdc_dpm_balance_source_ports` to process the request so there will not be a TBT/USB4 check and hard reset after allocating 3A for FRS.\n\nFor a power role swap, that would cause the PDC power manager to go back through the PD Source States which would cause the PDC DPM to potentially offer 5V/3A triggering a reset. Same as hotplug.",
+      "parentUuid": "a7184871_68a6d8eb",
+      "range": {
+        "startLine": 77,
+        "startChar": 25,
+        "endLine": 77,
+        "endChar": 26
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90748683_04d8b32e",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-07T23:26:02Z",
+      "side": 1,
+      "message": "We have not seen any USB4 devices fail to advertise USB4 support at 7.5W or fail to link train at 7.5W.\n\nWe have seen a pre-production USB4 SSD fail to train at 20 Gb/s when the initial contract is 7.5W. I think it\u0027s an open question whether this justifies resetting bus powered USB4 devices.",
+      "parentUuid": "b13fb64b_7058f297",
+      "range": {
+        "startLine": 77,
+        "startChar": 3,
+        "endLine": 77,
+        "endChar": 32
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2271744a_5f6848ed",
         "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
         "patchSetId": 1
@@ -60,6 +108,30 @@
       "writtenOn": "2026-07-07T14:07:22Z",
       "side": 1,
       "message": "I think atomic_set_bit(\u0026tbt_usb4_3a_reset, port) should only be set after confirming the Hard Reset succeeded. In the current code, if pdc_power_mgmt_connector_reset() fails or the partner doesn\u0027t respond, the flag is still set, incorrectly blocking any subsequent reset attempts on that port.",
+      "range": {
+        "startLine": 81,
+        "startChar": 2,
+        "endLine": 81,
+        "endChar": 54
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00c56542_4b97062e",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-07T23:26:02Z",
+      "side": 1,
+      "message": "Thanks, this is good feedback. I\u0027ll update the CL to conditionally set tbt_usb4_3a_reset",
+      "parentUuid": "2271744a_5f6848ed",
       "range": {
         "startLine": 81,
         "startChar": 2,
