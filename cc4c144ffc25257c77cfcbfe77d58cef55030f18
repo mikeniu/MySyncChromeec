@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "72360d31_7e68f1e2",
+        "filename": "zephyr/test/pdc/src/pdc_policy/src_policy_3a_port.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-07T21:09:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "261c6ad0_51ac9d46",
+      "range": {
+        "startLine": 441,
+        "startChar": 25,
+        "endLine": 441,
+        "endChar": 61
+      },
+      "revId": "cc4c144ffc25257c77cfcbfe77d58cef55030f18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "15be4a01_f1ed5df9",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-07T16:52:00Z",
       "side": 1,
       "message": "```suggestion\n\t * This should downgrade the FRS source current limit.\n```",
+      "range": {
+        "startLine": 483,
+        "startChar": 0,
+        "endLine": 484,
+        "endChar": 31
+      },
+      "revId": "cc4c144ffc25257c77cfcbfe77d58cef55030f18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a015799a_d2c24869",
+        "filename": "zephyr/test/pdc/src/pdc_policy/src_policy_3a_port.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-07T21:09:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "15be4a01_f1ed5df9",
       "range": {
         "startLine": 483,
         "startChar": 0,
