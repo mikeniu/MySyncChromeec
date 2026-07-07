@@ -9,6 +9,7 @@
 /* penghu project DTS includes */
 #include "gpios.dtsi"
 #include "interrupts.dtsi"
+#include "i2c.dtsi"
 
 /* AP interface */
 &espi0 {
