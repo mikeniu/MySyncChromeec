@@ -41,6 +41,14 @@
 			gpios = <&gpioe 6 GPIO_OUTPUT>;
 			enum-name = "GPIO_PACKET_MODE_EN";
 		};
+		gpio_usb_pd1_int_odl: usb_pd_int_odl {
+			gpios = <&gpiof 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			no-auto-init;
+		};
+		gpio_usb_pd2_int_odl: usb_pd2_int_odl {
+			gpios = <&gpiob 2 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			no-auto-init;
+		};
 		/* The legacy system code requires GPIO_ENTERING_RW symbol */
 		ec-entering-rw {
 			enum-name = "GPIO_ENTERING_RW";
