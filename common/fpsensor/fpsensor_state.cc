@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <variant>
 
 /* Last acquired frame (aligned as it is used by arbitrary binary libraries) */
@@ -260,6 +261,16 @@ static enum ec_error_list authenticate_fp_mode(
 	/* Modes that don't require authentication are allowed. */
 	if (!(flags_enabled & FP_MODES_WITH_AUTHENTICATION)) {
 		return EC_SUCCESS;
+	}
+
+	/*
+	 * Reject compound mode transitions requesting multiple auth-gated bits.
+	 * A single cryptographic MAC is tied to exactly one operation string
+	 * and cannot authorize multiple mutually exclusive modes evaluated
+	 * sequentially in the ladder below.
+	 */
+	if (std::popcount(flags_enabled & FP_MODES_WITH_AUTHENTICATION) > 1) {
+		return EC_ERROR_ACCESS_DENIED;
 	}
 
 	/* Block if the MAC is not available */
