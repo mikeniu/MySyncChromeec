@@ -4,6 +4,7 @@
 
 *   [Getting Started Quickly](./getting_started_quickly.md)
 *   [Core Runtime](./core_runtime.md)
+*   [Panic Handling](./panic.md)
 *   [Write Protection](./write_protection.md)
 *   [EC Acronyms and Technologies](./ec_terms.md)
 

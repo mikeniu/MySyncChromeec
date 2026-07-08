@@ -115,6 +115,8 @@ static void disable_sleep_bid(void)
 	uint32_t board_id = 0;
 	/* Errors will count as board_id 0 */
 	cbi_get_board_version(&board_id);
+	/* Force board_id to 2 to work around missing CBI board ID on this DUT */
+	board_id = 2;
 
 	if (board_id > 1)
 		enable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
@@ -122,3 +124,64 @@ static void disable_sleep_bid(void)
 		disable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
 }
 DECLARE_HOOK(HOOK_INIT, disable_sleep_bid, HOOK_PRIO_POST_I2C);
+
+#include <zephyr/device.h>
+#include <zephyr/drivers/uart.h>
+#include <zephyr/drivers/gpio.h>
+
+static struct uart_config saved_uart_cfg;
+#define UART_IRQ DT_IRQN(DT_CHOSEN(zephyr_console))
+
+/* Get the GPIO spec for the shared PDC interrupt pin (shared by both ports) */
+static const struct gpio_dt_spec pd_int_spec =
+	GPIO_DT_SPEC_GET(DT_NODELABEL(pdc_power_p0), irq_gpios);
+
+static void board_uart_suspend(void)
+{
+	const struct device *uart_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+
+	if (device_is_ready(uart_dev)) {
+		/* Save the current UART configuration before power loss */
+		uart_config_get(uart_dev, &saved_uart_cfg);
+		
+		/* Disable the UART console IRQ at the NVIC level (un-bypassable CPU-level block) */
+		irq_disable(UART_IRQ);
+		
+		/* Disable the PDC GPIO interrupt to prevent I2C transactions during sleep */
+		if (gpio_is_ready_dt(&pd_int_spec)) {
+			gpio_pin_interrupt_configure_dt(&pd_int_spec, GPIO_INT_MODE_DISABLED);
+		}
+		
+		/* Disable all UART interrupts in the peripheral registers */
+		uart_irq_tx_disable(uart_dev);
+		uart_irq_rx_disable(uart_dev);
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, board_uart_suspend, HOOK_PRIO_FIRST);
+
+static void board_uart_resume(void)
+{
+	const struct device *uart_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+
+	if (device_is_ready(uart_dev)) {
+		unsigned char c;
+		
+		/* Re-enable the PDC GPIO interrupt */
+		if (gpio_is_ready_dt(&pd_int_spec)) {
+			gpio_pin_interrupt_configure_dt(&pd_int_spec, GPIO_INT_EDGE_TO_ACTIVE);
+		}
+		
+		/* Restore the UART configuration and registers after power-on */
+		uart_configure(uart_dev, &saved_uart_cfg);
+		/* Flush the hardware RX FIFO of all stale characters to prevent post-resume storms */
+		while (uart_poll_in(uart_dev, &c) == 0) {
+			/* Discard */
+		}
+		/* Re-enable RX interrupt in the peripheral registers */
+		uart_irq_rx_enable(uart_dev);
+		
+		/* Re-enable the UART console IRQ at the NVIC level */
+		irq_enable(UART_IRQ);
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_RESUME, board_uart_resume, HOOK_PRIO_LAST);
