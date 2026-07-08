@@ -67,40 +67,6 @@ static void mont_mul_add(const struct rsa_public_key *key, uint32_t *c,
 		sub_mod(key, c);
 }
 
-#ifdef CONFIG_RSA_EXPONENT_3
-/**
- * Montgomery c[] += 0 * b[] / R % mod
- */
-static void mont_mul_add_0(const struct rsa_public_key *key, uint32_t *c,
-			   const uint32_t *b)
-{
-	uint32_t d0 = c[0] * key->n0inv;
-	uint64_t B = mula32(d0, key->n[0], c[0]);
-	uint32_t i;
-
-	for (i = 1; i < RSANUMWORDS; ++i) {
-		B = mulaa32(d0, key->n[i], c[i], B >> 32);
-		c[i - 1] = (uint32_t)B;
-	}
-
-	c[i - 1] = B >> 32;
-}
-
-/* Montgomery c[] = a[] * 1 / R % key. */
-static void mont_mul_1(const struct rsa_public_key *key, uint32_t *c,
-		       const uint32_t *a)
-{
-	int i;
-
-	for (i = 0; i < RSANUMWORDS; ++i)
-		c[i] = 0;
-
-	mont_mul_add(key, c, 1, a);
-	for (i = 1; i < RSANUMWORDS; ++i)
-		mont_mul_add_0(key, c, a);
-}
-#endif
-
 /**
  * Montgomery c[] = a[] * b[] / R % mod
  */
@@ -146,8 +112,7 @@ static void mod_pow(const struct rsa_public_key *key, uint8_t *inout,
 	mont_mul(key, a_r, a, key->rr); /* a_r = a * RR / R mod M */
 #ifdef CONFIG_RSA_EXPONENT_3
 	mont_mul(key, aa_r, a_r, a_r);
-	mont_mul(key, a, aa_r, a_r);
-	mont_mul_1(key, aaa, a);
+	mont_mul(key, aaa, aa_r, a);
 #else
 	/* Exponent 65537 */
 	for (i = 0; i < 16; i += 2) {
