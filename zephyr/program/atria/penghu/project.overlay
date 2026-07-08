@@ -12,6 +12,8 @@
 #include "interrupts.dtsi"
 #include "keyboard.dtsi"
 #include "i2c.dtsi"
+#include "led_pins.dtsi"
+#include "led_policy.dtsi"
 #include "power_signals.dtsi"
 #include "usb_typec.dtsi"
 
