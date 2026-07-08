@@ -22,10 +22,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     cmake \
     ninja-build \
-    python3-yaml \
-    python3-jsonschema \
-    python3-pykwalify \
-    python3-dateutil \
     gcc-multilib \
     libc6-dev-i386 \
     device-tree-compiler \
@@ -86,7 +82,10 @@ RUN mkdir -p /opt/repos/src/third_party/chromiumos-overlay && \
 # Install Zephyr build/run test dependencies
 RUN ZEPHYR_REQS_DIR="/opt/repos/src/third_party/zephyrproject/zephyr/scripts" \
     && if [ -d "$ZEPHYR_REQS_DIR" ]; then \
-        python3 -m pip install --no-cache-dir --break-system-packages \
+        python3 -m pip install \
+            --no-cache-dir \
+            --break-system-packages \
+            --ignore-installed \
             -r "$ZEPHYR_REQS_DIR/requirements.txt"; \
     fi
 
@@ -115,7 +114,7 @@ RUN VPYTHON_FILE="/opt/repos/src/platform/ec/zephyr/zmake/.vpython3" && \
                 "testfixtures") continue ;; \
             esac; \
             python3 -m pip install --no-cache-dir \
-                --break-system-packages "$pkg"; \
+                --break-system-packages --ignore-installed "$pkg"; \
         done; \
     fi
 

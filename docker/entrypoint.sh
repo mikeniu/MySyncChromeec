@@ -129,7 +129,8 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
     ZEPHYR_REQS_DIR="/workspace/src/third_party/zephyrproject/zephyr/scripts"
     if [ -d "${ZEPHYR_REQS_DIR}" ]; then
         echo "Installing Zephyr dependencies..."
-        python3 -m pip install -r "${ZEPHYR_REQS_DIR}/requirements.txt"
+        python3 -m pip install --ignore-installed \
+            -r "${ZEPHYR_REQS_DIR}/requirements.txt"
     fi
 
     # Parse .vpython3 and install dependencies
@@ -158,15 +159,8 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
                 "testfixtures") continue ;;
             esac
             echo "Installing ${pkg}..."
-            python3 -m pip install "${pkg}"
+            python3 -m pip install --ignore-installed "${pkg}"
         done
-    fi
-
-    # Install standard Zephyr dependencies to support twister executions
-    ZEPHYR_REQS_DIR="/workspace/src/third_party/zephyrproject/zephyr/scripts"
-    if [ -d "${ZEPHYR_REQS_DIR}" ]; then
-        echo "Installing Zephyr dependencies..."
-        python3 -m pip install -r "${ZEPHYR_REQS_DIR}/requirements.txt"
     fi
 
     # Export U-Boot binman tools directory to PATH
