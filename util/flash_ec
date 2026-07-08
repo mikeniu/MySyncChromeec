@@ -1616,7 +1616,9 @@ function ite_dfu_mode() {
 		info "Asking CR50 to send the dbgr special waveform to ${CHIP}"
 		sleep 2
 		dut_control_or_die cr50_i2c_ctrl:ite_debugger_mode
-		sleep 3
+		# GSC reboots to perform the sync. We must wait for it to boot
+		# and load CCD capabilities from TPM (takes ~11 seconds).
+		sleep 15
 	elif [[ "${SERVO_TYPE}" == "servo_v2" ]]; then
 		info "Closing servod connection to ftdi_i2c interface"
 		dut_control_or_die ftdii2c_cmd:close
