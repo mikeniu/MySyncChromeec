@@ -50,11 +50,19 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 		}
 	}
 
-	// Encode the tokenized message as Base64.
-	InlineBasicString base64_string =
-		log_tokenized::PrefixedBase64Encode(log_buffer, size_bytes);
+	key = k_spin_lock(&lock);
 
-	if (base64_string.empty()) {
+	// Static buffer guarded by spinlock to prevent stack allocation
+	// (~270B).
+	static pw::InlineString<log_tokenized::kBase64EncodedBufferSizeBytes + 1>
+		base64_string;
+	base64_string.clear();
+	base64_string.push_back(PW_TOKENIZER_NESTED_PREFIX);
+	pw::base64::Encode(pw::as_bytes(pw::span(log_buffer, size_bytes)),
+			   base64_string);
+
+	if (base64_string.size() <= 1) {
+		k_spin_unlock(&lock, key);
 		return;
 	}
 
@@ -69,14 +77,16 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 		console_buf_notify_chars(base64_string.c_str(),
 					 base64_string.size());
 	}
-	base64_string += kEndDelimiter;
+
+	if (base64_string.size() < base64_string.capacity()) {
+		base64_string += kEndDelimiter;
+	}
 
 	// TODO(asemjonovs):
 	// https://github.com/zephyrproject-rtos/zephyr/issues/59454 Zephyr
 	// frontend should protect messages from getting corrupted from multiple
 	// threads.
-	key = k_spin_lock(&lock);
-	LOG_PRINTK("%s", base64_string.c_str());
+	printk("%s", base64_string.c_str());
 	k_spin_unlock(&lock, key);
 }
 
