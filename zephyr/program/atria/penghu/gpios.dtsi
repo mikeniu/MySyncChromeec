@@ -26,6 +26,21 @@
 			gpios = <&gpioc 6 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
 			enum-name = "GPIO_ENABLE_BACKLIGHT";
 		};
+		gpio_en_s5_rails: en_s5_rails {
+			gpios = <&gpioi 7 (GPIO_INPUT)>;
+			enum-name = "GPIO_TEMP_SENSOR_POWER";
+			no-auto-init;
+		};
+		gpio_ec_soc_rtcrst: ec_soc_rtcrst {
+			gpios = <&gpioh 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+		gpio_ec_soc_pwr_btn_odl: ec_soc_pwr_btn_odl {
+			gpios = <&gpioe 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
+			enum-name = "GPIO_PCH_PWRBTN_L";
+		};
+		gpio_ec_forcepr_odl: ec_forcepr_odl {
+			gpios = <&gpioi 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
 		gpio_ec_soc_int_odl: ec_soc_int_odl {
 			gpios = <&gpiom 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
 			enum-name = "GPIO_EC_INT_L";
