@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0b6c92c_2c218299",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T20:45:57Z",
+      "side": 1,
+      "message": "This CL appears to add UFP and DFP VDO responses to the driver. I would not describe it as a refactor.\n\nIf you wanted to change the data structures and update existing usages to use the new data structures as a no-op refactor CL and then follow on with a CL for the driver feature, I would support that.",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a48cf81_273a9701",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T20:45:57Z",
+      "side": 1,
+      "message": "What are these typedefs for? I don\u0027t see where you\u0027re using them.\n\nSame with the macros below.",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c624069c_add8a2c9",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T20:45:57Z",
+      "side": 1,
+      "message": "This was an existing error in the comment, and it\u0027s an annoying bug in the spec, but this field is actually inverted. 0 means VBUS required. That\u0027s worth at least a comment. The nice way to do it would be to make this field an enum type.",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79723109_17dbb90d",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T20:45:57Z",
+      "side": 1,
+      "message": "As with the DFP VDO, I don\u0027t think there\u0027s actually a change in the field sizes here. The new spec just changed the table format. I think you can probably just update the existing struct to be cleaner instead of making a new one.",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9fd4cf7_c811280f",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T20:45:57Z",
+      "side": 1,
+      "message": "I don\u0027t have the PD r3.0 spec immediately at hand. What changed across the SVDM and VDO versions?",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bcf67b8_692cb8fc",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T20:45:57Z",
+      "side": 1,
+      "message": "From the Realtek driver code, it looks like you\u0027re only able to set one value for this VDO, for a particular SVDM version/VDO version, and you\u0027re using version 1.2. That\u0027s not strictly correct from a PD point of view. We\u0027re supposed to downgrade to the SVDM version of the request. However lots of implementations get this wrong, and if the PDC won\u0027t let you do multiple versions, I wouldn\u0027t worry about it.\n\nBut if you can only use a single version of these VDOs, maybe you don\u0027t need to define structs for any other versions. That could make your life a little easier for now.",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "057705f2_f4643ed5",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T20:45:57Z",
+      "side": 1,
+      "message": "These fields aren\u0027t actually different in r3.2 v1.2. The formatting of the table just breaks out the bits into their own top-level fields instead of having three 1-bit fields inside of a 3-bit field.\n\nThe format of the version field should also be the same, so you should be able to use the same data structure.\n\nI think that means you shouldn\u0027t need separate versions of the DFP VDO struct.",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55ea1c64_4c091fa4",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T20:45:57Z",
+      "side": 1,
+      "message": "Why `raw` and `raw_value`?",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
