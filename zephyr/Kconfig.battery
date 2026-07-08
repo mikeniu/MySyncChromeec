@@ -276,6 +276,30 @@ config PLATFORM_EC_BATTERY_REVIVE_DISCONNECT
 	  this state by force-applying a charge current. Once defined,
 	  a battery_get_disconnect_state() function has to be provided.
 
+config PLATFORM_EC_BATTERY_DEADBAND
+	bool "Enable battery discharge deadband filter"
+	help
+	  Filter out nuisance discharge reports when AC is present, battery is
+	  full, and discharging at a trivial amount of current.
+
+config PLATFORM_EC_BATTERY_DEADBAND_MA
+	int "Discharge deadband current threshold in mA"
+	depends on PLATFORM_EC_BATTERY_DEADBAND
+	default 10
+	help
+	  When PLATFORM_EC_BATTERY_DEADBAND is enabled, nuisance discharge reports
+	  are filtered out if the discharge current is less than this threshold
+	  (in mA).
+
+config PLATFORM_EC_BATTERY_DEADBAND_PRINT_INTERVAL_S
+	int "Discharge deadband debug print interval in seconds"
+	depends on PLATFORM_EC_BATTERY_DEADBAND
+	default 60
+	help
+	  When PLATFORM_EC_BATTERY_DEADBAND is enabled, sets the interval (in
+	  seconds) between debug console prints when discharge reporting is
+	  suppressed.
+
 config PLATFORM_EC_BATTERY_MEASURE_IMBALANCE
 	bool "Measure the battery cells imbalance"
 	help

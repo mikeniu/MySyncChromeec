@@ -636,6 +636,21 @@ int update_static_battery_info(void);
 void battery_set_dynamic_info(const struct batt_params *params, bool ac_present,
 			      bool is_charging, bool sustainer_idle);
 
+#ifdef CONFIG_PLATFORM_EC_BATTERY_DEADBAND
+/**
+ * Filter out nuisance discharge reports when AC is present, battery is full,
+ * and discharging at a trivial amount of current.
+ */
+uint8_t batt_deadband_check(uint8_t batt_flags,
+			    const struct batt_params *params);
+#else
+static inline uint8_t batt_deadband_check(uint8_t batt_flags,
+					  const struct batt_params *params)
+{
+	return batt_flags;
+}
+#endif
+
 /**
  * Calculate if battery is full based on whether it is accepting charge.
  *
