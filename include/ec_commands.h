@@ -6879,8 +6879,7 @@ struct ec_params_get_cbi {
 /*
  * Flags to control write behavior.
  *
- * NO_SYNC: Makes EC update data in RAM but skip writing to EEPROM. It's
- *          useful when writing multiple fields in a row.
+ * NO_SYNC: Obsolete
  * INIT:    Need to be set when creating a new CBI from scratch. All fields
  *          will be initialized to zero first.
  */
