@@ -1698,12 +1698,16 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 {
 	const struct pdc_config_t *cfg = dev->config;
 
-	/* ID Header */
-	union id_header_vdo_rev30 idh_vdo = { .raw_value = 0 };
-	vdo_config_t config = { .raw = 0 };
-	uint8_t vdo_type[] = { VDO_INDEX_IDH };
+	/* IDH, UFP, DFP VDOs */
+	union id_header_vdo_rev3 idh_vdo = { .raw_value = 0 };
+	union ufp_vdo_rev3 ufp_vdo = { .raw_value = 0 };
+	union dfp_vdo_rev3 dfp_vdo = { .raw_value = 0 };
 
-	config.fields.num_vdos = 1;
+	uint8_t vdo_types[] = { VDO_INDEX_IDH, VDO_INDEX_PTYPE_DFP_VDO,
+				VDO_INDEX_PTYPE_UFP1_VDO };
+
+	vdo_config_t config = { .raw = 0 };
+	config.fields.num_vdos = 2;
 	config.fields.origin = RTS54XX_PDC_ORIGIN;
 
 	/* ID Header VDO (Discovery Identity response) */
@@ -1712,12 +1716,33 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 	idh_vdo.connector_type = USB_TYPEC_RECEPTACLE;
 	idh_vdo.usb_vendor_id = USB_VID_GOOGLE;
 
+	/* DFP VDO */
+	dfp_vdo.version = DFP_VDO_VERSION_1_2;
+	dfp_vdo.usb4_cap = false;
+	dfp_vdo.usb3_cap = true;
+	dfp_vdo.usb2_cap = true;
+	dfp_vdo.port_num = cfg->connector_number;
+
 	if (cfg->usb_comm_capable_as_device) {
+		config.fields.num_vdos = 3;
 		idh_vdo.usb_device = true;
 		idh_vdo.product_type_ufp = IDH_PTYPE_UFP_PERIPH;
+		/* UFP VDO */
+		ufp_vdo.version = UFP_VDO_VERSION_1_3;
+		ufp_vdo.usb4_cap = false;
+		ufp_vdo.usb3_cap = true;
+		ufp_vdo.usb2_cap = UFP_USB2_CAPABLE;
+		ufp_vdo.vconn = false;
+		ufp_vdo.vbus = UFP_VDO_VBUS_NOT_REQUIRED;
+		ufp_vdo.no_signal_reconfig = false;
+		ufp_vdo.non_tbt3_signal_reconfig = false;
+		ufp_vdo.tbt_support = false;
+		ufp_vdo.speed = USB_R30_SS_U32_U40_GEN1;
 	}
-	uint32_t vdos[] = { idh_vdo.raw_value };
-	return rts54_set_vdo(dev, &config, vdo_type, vdos);
+
+	uint32_t vdos[] = { idh_vdo.raw_value, dfp_vdo.raw_value,
+			    ufp_vdo.raw_value };
+	return rts54_set_vdo(dev, &config, vdo_types, vdos);
 }
 
 /**

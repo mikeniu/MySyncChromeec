@@ -1622,7 +1622,7 @@ static bool pe_should_send_data_reset(const int port)
 	const struct pd_discovery *disc =
 		pd_get_am_discovery(port, TCPCI_MSG_SOP);
 	const enum idh_ptype ufp_ptype = pd_get_product_type(port);
-	const union ufp_vdo_rev30 ufp_vdo = {
+	const union ufp_vdo_rev3 ufp_vdo = {
 		.raw_value = disc->identity_cnt >= VDO_INDEX_PTYPE_UFP1_VDO ?
 				     disc->identity.product_t1.raw_value :
 				     0
@@ -1637,8 +1637,8 @@ static bool pe_should_send_data_reset(const int port)
 		* products to not respond to it at all).
 		*/
 	       (ufp_ptype == IDH_PTYPE_HUB || ufp_ptype == IDH_PTYPE_PERIPH) &&
-	       ((ufp_vdo.device_capability & VDO_UFP1_CAPABILITY_USB4) ||
-		ufp_vdo.alternate_modes);
+	       (ufp_vdo.usb4_cap || ufp_vdo.tbt_support ||
+		ufp_vdo.non_tbt3_signal_reconfig || ufp_vdo.no_signal_reconfig);
 }
 
 /*
