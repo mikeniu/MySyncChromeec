@@ -575,3 +575,44 @@ ZTEST_USER(rts54xx, test_ap_mode_override_off)
 	else
 		zassert_true(caps_out.bmOptionalFeatures.alt_mode_override);
 }
+
+ZTEST_USER(rts54xx, test_dfp_and_ufp_vdo_ack_programming)
+{
+	uint32_t dfp_vdo_raw = 0, ufp_vdo_raw = 0;
+	union get_vdo_t vdo_req;
+
+	vdo_req.raw_value = 0;
+	vdo_req.num_vdos = 1;
+	vdo_req.vdo_origin = 0; /* PDC origin */
+
+	/* 1. Trigger driver init (runs rts54_set_vdo_id_ack) */
+	zassert_ok(pdc_reset(dev));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	/* 2. Retrieve DFP VDO (VDO_INDEX_PTYPE_DFP_VDO = 1) */
+	uint8_t dfp_vdo_type[] = { VDO_INDEX_PTYPE_DFP_VDO };
+	zassert_ok(pdc_get_vdo(dev, vdo_req, dfp_vdo_type, &dfp_vdo_raw));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	union dfp_vdo_rev32 dfp;
+	dfp.raw = dfp_vdo_raw;
+	zassert_equal(dfp.version, DFP_VDO_VERSION_1_2,
+		      "DFP VDO version should be 1.2 (got %d)", dfp.version);
+	zassert_equal(dfp.usb3_cap, 1, "DFP VDO USB3 cap should be 1");
+	zassert_equal(dfp.usb2_cap, 1, "DFP VDO USB2 cap should be 1");
+
+	/* 3. Retrieve UFP VDO (VDO_INDEX_PTYPE_UFP1_VDO = 2) */
+	uint8_t ufp_vdo_type[] = { VDO_INDEX_PTYPE_UFP1_VDO };
+	zassert_ok(pdc_get_vdo(dev, vdo_req, ufp_vdo_type, &ufp_vdo_raw));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	union ufp_vdo_rev32 ufp;
+	ufp.raw = ufp_vdo_raw;
+	zassert_equal(ufp.version, UFP_VDO_VERSION_1_3,
+		      "UFP VDO version should be 1.3 (got %d)", ufp.version);
+	zassert_equal(ufp.usb3_cap, 1, "UFP VDO USB3 cap should be 1");
+	zassert_equal(ufp.usb2_cap, UFP_USB2_CAPABLE,
+		      "UFP VDO USB2 cap should be UFP_USB2_CAPABLE");
+	zassert_equal(ufp.speed, USB_R30_SS_U32_U40_GEN1,
+		      "UFP VDO speed should be USB_R30_SS_U32_U40_GEN1");
+}
