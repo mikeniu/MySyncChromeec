@@ -7,6 +7,7 @@
 #include <cros/integrated_fwid.dtsi>
 
 /* penghu project DTS includes */
+#include "binman.dtsi"
 #include "gpios.dtsi"
 #include "interrupts.dtsi"
 #include "i2c.dtsi"
