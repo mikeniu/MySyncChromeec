@@ -532,6 +532,10 @@ void battery_set_dynamic_info(const struct batt_params *params, bool ac_present,
 	if (battery_is_cut_off())
 		tmp |= EC_BATT_FLAG_CUT_OFF;
 
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_DEADBAND)) {
+		tmp = batt_deadband_check(tmp, params);
+	}
+
 	/* Tell the AP to re-read battery status if charge state changes */
 	if (bd->flags != tmp)
 		send_batt_status_event++;
