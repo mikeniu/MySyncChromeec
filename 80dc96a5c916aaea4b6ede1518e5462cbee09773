@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5dc00a5_2a9f7c74",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-08T22:47:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/62199c84-7670-44e1-8c23-04a748e0c42d)]\n\n### Review Summary\n**Functionality:** \nThe CL successfully addresses the issue of state pollution across test runs by zeroing out the `global_context` in the `fpsensor_before` setup method. This ensures complete test isolation.\n\n**Style \u0026 C++ Best Practices:** \nUsing `memset` to zero out a C++ struct that contains C++ types (like `std::array` and potentially `atomic_t`) is discouraged and can lead to undefined behavior if non-trivial members are added to `fpsensor_context` in the future. A minor suggestion is provided inline to use C++ zero-initialization (`global_context \u003d {};`) instead.\n\n**Security:** \nNo security vulnerabilities were identified in this test-only change.\n\n**Testing:** \nThis change itself is an improvement to the test infrastructure to prevent flaky tests by ensuring a clean context for each test case.",
+      "isAi": true,
+      "revId": "80dc96a5c916aaea4b6ede1518e5462cbee09773",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7805e908_4981f517",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_enroll.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-08T22:47:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While `memset` works here currently, `fpsensor_context` contains C++ types like `std::array` and `atomic_t`. It is safer and more idiomatic in C++ to reset the struct state using assignment: `global_context \u003d {};`. This prevents undefined behavior in the future if a member with a non-trivial constructor, destructor, or virtual methods is added to `fpsensor_context`.",
+      "isAi": true,
+      "revId": "80dc96a5c916aaea4b6ede1518e5462cbee09773",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
