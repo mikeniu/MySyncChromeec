@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3702a3a4_c9df2fbc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:40:15Z",
+      "side": 1,
+      "message": "Note to self: Still need to review the actual signal definitions.",
+      "revId": "38394478d873b76539dd52ceb56f7782e955c40d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "262f51dc_37c7f99b",
+        "filename": "zephyr/program/atria/penghu/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:40:15Z",
+      "side": 1,
+      "message": "In general, you don\u0027t need to put the power signals in `named-gpios`. The power sequencing code doesn\u0027t need that, and other code shouldn\u0027t be able to touch them normally. The ones that have an `enum-name` might be an exception, if something else relies on the name. Try taking them out and then put back in the ones that you need to build.",
+      "revId": "38394478d873b76539dd52ceb56f7782e955c40d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cedb4e9_16542eb1",
+        "filename": "zephyr/program/atria/penghu/include/board.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:40:15Z",
+      "side": 1,
+      "message": "1. I don\u0027t think I like having header files in `include/` with macros defining DTS snippets. These would be nonsense if a .c file included them. If something like this is needed, I guess it should go in a .dtsi file, probably at the level of the project directory, outside `include/`. I can see that some fatcat variants did it, but it\u0027s weird.\n2. From what I can see, the files that include things like this don\u0027t actually use them. I think you can safely get rid of this.",
+      "revId": "38394478d873b76539dd52ceb56f7782e955c40d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b086d32_0b7dcd70",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:40:15Z",
+      "side": 1,
+      "message": "Nit: If you did this to avoid an issue with the vWires, add a comment referencing b/491076382.",
+      "revId": "38394478d873b76539dd52ceb56f7782e955c40d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
