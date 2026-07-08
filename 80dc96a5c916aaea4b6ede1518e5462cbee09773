@@ -35,6 +35,29 @@
       "isAi": true,
       "revId": "80dc96a5c916aaea4b6ede1518e5462cbee09773",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6294f3ea_84c10832",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_enroll.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-08T22:51:39Z",
+      "side": 1,
+      "message": "Actually, we already have functions such as [`fp_reset_and_clear_context`](https://source.corp.google.com/h/chrome-internal/chromeos/superproject/+/main:src/platform/ec/common/fpsensor/fpsensor_state.cc;l\u003d94-132;drc\u003d8db7dff90aa377af656b29a2ef7573f1f5219412) that should do this correctly. Can you try that?",
+      "range": {
+        "startLine": 527,
+        "startChar": 0,
+        "endLine": 529,
+        "endChar": 52
+      },
+      "revId": "80dc96a5c916aaea4b6ede1518e5462cbee09773",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
