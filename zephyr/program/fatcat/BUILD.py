@@ -40,6 +40,8 @@ def register_it8xxx2_project(
     extra_kconfig_files=(),
     extra_modules=(),
     boards=None,
+    snippets=None,
+    **kwargs,
 ):
     """Register an it8xxx2 based variant of fatcat."""
     if boards is None:
@@ -61,6 +63,8 @@ def register_it8xxx2_project(
         ],
         modules=["ec", *extra_modules],
         boards=boards,
+        snippets=snippets,
+        **kwargs,
     )
 
 
@@ -157,6 +161,7 @@ register_it8xxx2_project(
         here / "dsp_comms.conf",
     ],
     extra_modules=["google-private", "pigweed", "nanopb"],
+    snippets=["pw-tokenize"],
 )
 
 register_ish_project(
