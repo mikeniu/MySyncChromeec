@@ -1747,26 +1747,83 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 {
 	const struct pdc_config_t *cfg = dev->config;
 
+<<<<<<< PATCH SET (972a006a04f454aa165bda8c1c263bd219cb3bf0 rtk: Add DFP definition and refactor UFP VDOs for USB PD 3.x)
+	/* IDH, UFP, DFP VDOs */
+	union id_header_vdo_rev3 idh_vdo = { .raw = 0 };
+	union ufp_vdo_rev3 ufp_vdo = { .raw = 0 };
+	union dfp_vdo_rev3 dfp_vdo = { .raw = 0 };
+||||||| BASE      (f93ba4bc230e376ddb0d5d9270e99aa08f3a6788 rtk: Init set IDH VDO adjustment)
+	/* ID Header */
+	union id_header_vdo_rev30 idh_vdo = { .raw = 0 };
+	vdo_config_t config = { .raw = 0 };
+	uint8_t vdo_type[] = { VDO_INDEX_IDH };
+=======
 	/* ID Header */
 	union id_header_vdo_rev30 idh_vdo = { .raw_value = 0 };
 	vdo_config_t config = { .raw = 0 };
 	uint8_t vdo_type[] = { VDO_INDEX_IDH };
+>>>>>>> BASE      (68c6498bc8abafe54be0b9287f8f5049ee806c07 rtk: Init set IDH VDO adjustment)
 
-	config.fields.num_vdos = 1;
+	uint8_t vdo_types[] = { VDO_INDEX_IDH, VDO_INDEX_PTYPE_DFP_VDO,
+				VDO_INDEX_PTYPE_UFP1_VDO };
+
+	vdo_config_t config = { .raw = 0 };
+	config.fields.num_vdos = 2;
 	config.fields.origin = RTS54XX_PDC_ORIGIN;
 
+<<<<<<< PATCH SET (972a006a04f454aa165bda8c1c263bd219cb3bf0 rtk: Add DFP definition and refactor UFP VDOs for USB PD 3.x)
+	idh_vdo.usb_host = 1;
+||||||| BASE      (f93ba4bc230e376ddb0d5d9270e99aa08f3a6788 rtk: Init set IDH VDO adjustment)
+	/* ID Header VDO (Discovery Identity response) */
+	idh_vdo.usb_host = 1;
+=======
 	/* ID Header VDO (Discovery Identity response) */
 	idh_vdo.usb_host = true;
+>>>>>>> BASE      (68c6498bc8abafe54be0b9287f8f5049ee806c07 rtk: Init set IDH VDO adjustment)
 	set_idh_product_type_dfp(&idh_vdo, IDH_PTYPE_DFP_HOST);
 	idh_vdo.connector_type = USB_TYPEC_RECEPTACLE;
 	idh_vdo.usb_vendor_id = USB_VID_GOOGLE;
 
+	/* DFP VDO */
+	dfp_vdo.version = DFP_VDO_VERSION_1_2;
+	dfp_vdo.usb4_cap = 0;
+	dfp_vdo.usb3_cap = 1;
+	dfp_vdo.usb2_cap = 1;
+	dfp_vdo.port_num = cfg->connector_number;
+
 	if (cfg->usb_comm_capable_as_device) {
+<<<<<<< PATCH SET (972a006a04f454aa165bda8c1c263bd219cb3bf0 rtk: Add DFP definition and refactor UFP VDOs for USB PD 3.x)
+		config.fields.num_vdos = 3;
+		idh_vdo.usb_device = 1;
+||||||| BASE      (f93ba4bc230e376ddb0d5d9270e99aa08f3a6788 rtk: Init set IDH VDO adjustment)
+		idh_vdo.usb_device = 1;
+=======
 		idh_vdo.usb_device = true;
+>>>>>>> BASE      (68c6498bc8abafe54be0b9287f8f5049ee806c07 rtk: Init set IDH VDO adjustment)
 		idh_vdo.product_type_ufp = IDH_PTYPE_UFP_PERIPH;
+
+		/* UFP VDO */
+		ufp_vdo.version = UFP_VDO_VERSION_1_3;
+		ufp_vdo.usb4_cap = 0;
+		ufp_vdo.usb3_cap = 1;
+		ufp_vdo.usb2_cap = UFP_USB2_CAPABLE;
+		ufp_vdo.vconn = 0;
+		ufp_vdo.vbus = NOT_REQUIRED;
+		ufp_vdo.no_signal_reconfig = 0;
+		ufp_vdo.non_tbt3_signal_reconfig = 0;
+		ufp_vdo.tbt_support = 0;
+		ufp_vdo.speed = GEN1;
 	}
+<<<<<<< PATCH SET (972a006a04f454aa165bda8c1c263bd219cb3bf0 rtk: Add DFP definition and refactor UFP VDOs for USB PD 3.x)
+	uint32_t vdos[] = { idh_vdo.raw, dfp_vdo.raw, ufp_vdo.raw };
+	return rts54_set_vdo(dev, &config, vdo_types, vdos);
+||||||| BASE      (f93ba4bc230e376ddb0d5d9270e99aa08f3a6788 rtk: Init set IDH VDO adjustment)
+	uint32_t vdos[] = { idh_vdo.raw };
+	return rts54_set_vdo(dev, &config, vdo_type, vdos);
+=======
 	uint32_t vdos[] = { idh_vdo.raw_value };
 	return rts54_set_vdo(dev, &config, vdo_type, vdos);
+>>>>>>> BASE      (68c6498bc8abafe54be0b9287f8f5049ee806c07 rtk: Init set IDH VDO adjustment)
 }
 
 /**
