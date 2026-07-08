@@ -494,6 +494,68 @@ int update_static_battery_info(void)
 	return rv;
 }
 
+/*
+ * Some combinations of charger chip, battery, and charging voltage, can
+ * cause the battery status report to oscialte between not discharging
+ * and discharging at a trivial amount of current. Add a deadband to
+ * filter out nuisance discharge reports. Actual reported current
+ * readings are not changed.
+ */
+
+static uint8_t batt_deadband_check(uint8_t batt_flags,
+				   const struct batt_params *params)
+{
+	const int batt_discharge_deadband_ma = 10;
+	const uint64_t print_interval_us = 60 * SECOND;
+	const uint8_t needed_flags = EC_BATT_FLAG_AC_PRESENT |
+				     EC_BATT_FLAG_BATT_PRESENT |
+				     EC_BATT_FLAG_DISCHARGING;
+
+	if ((batt_flags & needed_flags) != needed_flags) {
+		/*
+		 * Preconditions not met, no override needed.
+		 */
+		return batt_flags;
+	}
+	if (!(params->status & STATUS_FULLY_CHARGED)) {
+		/*
+		 * Only only apply deadband on full battery.
+		 */
+		return batt_flags;
+	}
+
+	const int actual_current_ma = params->current;
+
+	if (actual_current_ma >= 0 ||
+	    ABS(actual_current_ma) >= batt_discharge_deadband_ma) {
+		/*
+		 * Battery is not discharging or discharging below
+		 * deadband threshold.
+		 */
+		return batt_flags;
+	}
+
+	/*
+	 * The battery is reporting that it's FULL and
+	 * discharging/leaking a trivial amount of current
+	 * due to hardware limitations. This can happen
+	 * repeatedly at a fast rate but is not relevant
+	 * at the system level.
+	 */
+
+	static timestamp_t next_print_deadline = { .val = 0 };
+
+	if (timestamp_expired(next_print_deadline, NULL)) {
+		next_print_deadline.val = get_time().val + print_interval_us;
+		CPRINTS("BAT DISCHG %d mA in %d mA deadband",
+			ABS(actual_current_ma), batt_discharge_deadband_ma);
+	}
+
+	batt_flags &= ~EC_BATT_FLAG_DISCHARGING;
+
+	return batt_flags;
+}
+
 void battery_set_dynamic_info(const struct batt_params *params, bool ac_present,
 			      bool is_charging, bool sustainer_idle)
 {
@@ -584,6 +646,8 @@ void battery_set_dynamic_info(const struct batt_params *params, bool ac_present,
 
 	if (battery_is_cut_off())
 		tmp |= EC_BATT_FLAG_CUT_OFF;
+
+	tmp = batt_deadband_check(tmp, params);
 
 	/* Tell the AP to re-read battery status if charge state changes */
 	if (bd->flags != tmp)
