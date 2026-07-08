@@ -1616,7 +1616,9 @@ function ite_dfu_mode() {
 		info "Asking CR50 to send the dbgr special waveform to ${CHIP}"
 		sleep 2
 		dut_control_or_die cr50_i2c_ctrl:ite_debugger_mode
-		sleep 3
+		# GSC reboots to perform the sync. We must wait for it to boot
+		# and load CCD capabilities from TPM (takes ~11 seconds).
+		sleep 15
 	elif [[ "${SERVO_TYPE}" == "servo_v2" ]]; then
 		info "Closing servod connection to ftdi_i2c interface"
 		dut_control_or_die ftdii2c_cmd:close
@@ -1738,6 +1740,17 @@ function flash_it83xx() {
 		dut_control servo_v4p1_uart_cmd:"cc on"
 
 		dut_control cold_reset:off
+	fi
+
+	# Workaround for b/531652222: Force Servo V4p1 to lock 5V VBUS
+	# to prevent power drops when EC enters DFU mode.
+	# Note: These expander overrides are cleared automatically at the
+	# end of this function when the CC lines are toggled, which resets
+	# the Servo state machine and restores default power routing.
+	if [[ "${SERVO_TYPE}" =~ "servo_v4p1" ]] && servo_is_ccd; then
+		info "Locking Servo V4p1 VBUS to 5V..."
+		dut_control servo_v4p1_uart_cmd:"ioexset DUT_CHG_EN 1" >/dev/null
+		dut_control servo_v4p1_uart_cmd:"ioexset HOST_OR_CHG_CTL 0" >/dev/null
 	fi
 
 	ite_dfu_mode
