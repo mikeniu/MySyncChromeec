@@ -233,6 +233,13 @@ def get_argparser():
         help="Compare devicetrees of build outputs",
     )
     compare_builds.add_argument(
+        "-A",
+        "--analyze-diff",
+        action="store_true",
+        dest="analyze_diff",
+        help="Analyze binary differences when comparison fails",
+    )
+    compare_builds.add_argument(
         "-D",
         "--cmake-define",
         action="append",
@@ -280,6 +287,27 @@ def get_argparser():
             "If specified, diff the README with the expected contents instead of "
             "writing out."
         ),
+    )
+
+    analyze_build_diff = sub.add_parser(
+        "analyze-build-diff",
+        help="Analyze binary differences between two EC builds",
+    )
+    analyze_build_diff.add_argument(
+        "target1",
+        type=pathlib.Path,
+        help="First build directory or ec.bin file",
+    )
+    analyze_build_diff.add_argument(
+        "target2",
+        type=pathlib.Path,
+        help="Second build directory or ec.bin file",
+    )
+    analyze_build_diff.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Print all individual contiguous diff ranges and symbol changes",
     )
 
     return parser, sub

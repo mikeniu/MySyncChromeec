@@ -14,6 +14,7 @@ import shutil
 import subprocess
 from typing import List
 
+import zmake.analyze_build_diff
 import zmake.modules
 from zmake.output_packers import packer_registry
 
@@ -421,7 +422,25 @@ class CompareBuilds:
                             dirs_exist_ok=True,
                         )
 
-    def _compare_binaries(self, project):
+    def _analyze_binary_diff(self, project):
+        """Run analyze_build_diff to log details of binary differences."""
+        build_path = (
+            pathlib.Path("ec")
+            / "build"
+            / "zephyr"
+            / pathlib.Path(project.config.project_name)
+        )
+
+        # Use checkouts[1] (ref2, e.g. HEAD~ / base) as target1 and
+        # checkouts[0] (ref1, e.g. HEAD / new) as target2.
+        dir1 = self.checkouts[1].modules_dir / build_path
+        dir2 = self.checkouts[0].modules_dir / build_path
+
+        zmake.analyze_build_diff.analyze_build_diff(
+            dir1, dir2, output_fn=self.logger.info
+        )
+
+    def _compare_binaries(self, project, analyze_diff=False):
         output_path = (
             pathlib.Path("ec")
             / "build"
@@ -471,14 +490,17 @@ class CompareBuilds:
                 stderr=subprocess.DEVNULL,
             )
         except subprocess.CalledProcessError:
+            if analyze_diff:
+                self._analyze_binary_diff(project)
             return False
         return True
 
-    def check_binaries(self, projects):
+    def check_binaries(self, projects, analyze_diff=False):
         """Compare Zephyr EC binaries for two different source trees
 
         Args:
             projects: List of projects to compare the output binaries.
+            analyze_diff: If True, run detailed binary diff analysis on failure.
 
         Returns:
             A list of projects that failed to compare.  An empty list indicates that
@@ -489,7 +511,7 @@ class CompareBuilds:
             return []
 
         failed_projects = _compare_non_test_projects(
-            projects, self._compare_binaries
+            projects, self._compare_binaries, analyze_diff
         )
         return failed_projects
 

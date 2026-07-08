@@ -21,6 +21,7 @@ import tempfile
 from typing import Dict, Optional, Set, Union
 
 from zmake import util
+import zmake.analyze_build_diff
 import zmake.build_config
 import zmake.compare_builds
 import zmake.generate_readme
@@ -446,6 +447,7 @@ class Zmake:
         compare_configs=False,
         compare_binaries_disable=False,
         compare_devicetrees=False,
+        analyze_diff=False,
     ):
         """Compare EC builds at two commits."""
         os.chdir(self.module_paths["ec"])
@@ -521,7 +523,9 @@ class Zmake:
                 )
                 return result
         if not compare_binaries_disable:
-            failed_projects = cmp_builds.check_binaries(projects)
+            failed_projects = cmp_builds.check_binaries(
+                projects, analyze_diff=analyze_diff
+            )
             self.cmp_failed_projects["binary"] = failed_projects
             self.failed_projects.extend(failed_projects)
         if compare_configs:
@@ -1097,3 +1101,10 @@ class Zmake:
 
         output_file.write_text(expected_contents)
         return 0
+
+    def analyze_build_diff(self, target1, target2, verbose=False):
+        """Analyze binary differences between two EC builds."""
+        success = zmake.analyze_build_diff.analyze_build_diff(
+            target1, target2, verbose=verbose, output_fn=self.logger.info
+        )
+        return 0 if success else 1
