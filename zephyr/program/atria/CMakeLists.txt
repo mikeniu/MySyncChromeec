@@ -18,6 +18,9 @@ endif()
 
 if(DEFINED CONFIG_BOARD_PENGHU)
 	project(penghu)
+	# We are using rvp_board_power.c as a starting point. If any modifications
+	# are needed later, we can create a new variant.
+	zephyr_library_sources("src/rvp_board_power.c")
 endif()
 
 zephyr_include_directories("include/")
