@@ -38,6 +38,41 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aec5460f_53e4d635",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T18:52:31Z",
+      "side": 1,
+      "message": "Does this mean that the behavior of this CL is to respond with the IDH with DFP and UFP product types set but not include a DFP or UFP VDO in the response?",
+      "parentUuid": "18626bc1_8ba1c3c1",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65ed2293_1757456d",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T18:52:31Z",
+      "side": 1,
+      "message": "From OOB discussion, the failure to compile `bool` in the coverage run is likely a Clang vs GCC standard library issue. Try including `stdbool.h`.",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ce0106de_a319ba49",
         "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
         "patchSetId": 18
@@ -102,6 +137,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "9df5e63a_93915767",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca1ab4e4_0f84ae19",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 1820,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T18:52:31Z",
+      "side": 1,
+      "message": "It looks like you just got rid of this function. Was this already being handled by `ST_PING_STATUS`?",
+      "parentUuid": "d3f897f5_133b9ecd",
       "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

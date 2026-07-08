@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a22954b_444ff870",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 918,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T18:52:31Z",
+      "side": 1,
+      "message": "This is just debug, right? I\u0027m guessing you don\u0027t intend to submit this. In that case, can you put in in a follower WIP CL? If you do intend to submit it, it seems like it should probably log for all commands in a generic way. It\u0027s weird to have special error logging for a specific command in the generic response handler.",
+      "revId": "f93ba4bc230e376ddb0d5d9270e99aa08f3a6788",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe81d421_b50cafd5",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T18:52:31Z",
+      "side": 1,
+      "message": "Same comment as above",
+      "revId": "f93ba4bc230e376ddb0d5d9270e99aa08f3a6788",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
