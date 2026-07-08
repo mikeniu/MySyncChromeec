@@ -69,6 +69,12 @@
 		ec-entering-rw {
 			enum-name = "GPIO_ENTERING_RW";
 		};
+		gpio_led_1_l: led_1_l {
+			gpios = <&gpioa 2 GPIO_OUTPUT_HIGH>;
+		};
+		gpio_led_2_l: led_2_l {
+			gpios = <&gpioa 3 GPIO_OUTPUT_HIGH>;
+		};
 	};
 };
 
