@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f0fea6f_229d35c8",
+        "filename": "zephyr/test/pdc/src/pdc_policy/src_policy_3a_port.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 934,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-08T21:56:31Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be needed in test code.  If the coverage report shows these lines are not covered, then the test isn\u0027t running.",
+      "range": {
+        "startLine": 934,
+        "startChar": 0,
+        "endLine": 934,
+        "endChar": 21
+      },
+      "revId": "92c4d264b9607bb75c1c810719a14eb11c92d01c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
