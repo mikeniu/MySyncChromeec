@@ -97,7 +97,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake compare-builds
 
-**Usage:** `zmake compare-builds [-h] [--ref1 REF1] [--ref2 REF2] [-k] [-n] [-b] [-d] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name ...)`
+**Usage:** `zmake compare-builds [-h] [--ref1 REF1] [--ref2 REF2] [-k] [-n] [-b] [-d] [-A] [-B] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name ...)`
 
 #### Positional Arguments
 
@@ -116,6 +116,8 @@ Chromium OS's meta-build tool for Zephyr
 | `-n`, `--compare-configs` | Compare configs of build outputs |
 | `-b`, `--compare-binaries-disable` | Don't compare binaries of build outputs |
 | `-d`, `--compare-devicetrees` | Compare devicetrees of build outputs |
+| `-A`, `--analyze-diff` | Analyze binary differences when comparison fails |
+| `-B`, `--exact-bytes` | Show exact byte counts in binary footprint tables |
 | `-D CMAKE_DEFS`, `--cmake-define CMAKE_DEFS` | None |
 | `-t TOOLCHAIN`, `--toolchain TOOLCHAIN` | Name of toolchain to use |
 | `--extra-cflags EXTRA_CFLAGS` | Additional CFLAGS to use for target builds |
@@ -149,3 +151,24 @@ Chromium OS's meta-build tool for Zephyr
 | `-h`, `--help` | show this help message and exit |
 | `-o OUTPUT_FILE`, `--output-file OUTPUT_FILE` | File to write to.  It will only be written if changed. |
 | `--diff` | If specified, diff the README with the expected contents instead of writing out. |
+
+### zmake analyze-build-diff
+
+**Usage:** `zmake analyze-build-diff [-h] target1 target2 [-s] [-S] [-v] [-B]`
+
+#### Positional Arguments
+
+|   |   |
+|---|---|
+| `target1` | First build directory or ec.bin file |
+| `target2` | Second build directory or ec.bin file |
+
+#### Options
+
+|   |   |
+|---|---|
+| `-h`, `--help` | show this help message and exit |
+| `-s`, `--sections` | Print detailed section size comparison and changed sections |
+| `-S`, `--symbols` | Print detailed symbol table comparison (added/removed/changed symbols) |
+| `-v`, `--verbose` | Print all detailed section, symbol, and contiguous diff range details |
+| `-B`, `--exact-bytes` | Show exact byte counts in binary footprint tables |
