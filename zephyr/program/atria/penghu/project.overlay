@@ -10,6 +10,7 @@
 #include "binman.dtsi"
 #include "gpios.dtsi"
 #include "interrupts.dtsi"
+#include "keyboard.dtsi"
 #include "i2c.dtsi"
 #include "power_signals.dtsi"
 #include "usb_typec.dtsi"
