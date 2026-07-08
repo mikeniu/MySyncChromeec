@@ -39,6 +39,30 @@
       },
       "revId": "3b48329181afbef881a26bd8ebd2a1856298da78",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49b9ecce_6979ef1b",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2572,
+      "author": {
+        "id": 3436255
+      },
+      "writtenOn": "2026-07-08T05:59:00Z",
+      "side": 1,
+      "message": "How about PS3?",
+      "parentUuid": "7b317134_f95f94a3",
+      "range": {
+        "startLine": 2572,
+        "startChar": 2,
+        "endLine": 2572,
+        "endChar": 5
+      },
+      "revId": "3b48329181afbef881a26bd8ebd2a1856298da78",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
