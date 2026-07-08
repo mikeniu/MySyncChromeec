@@ -22,6 +22,30 @@
       },
       "revId": "f3325e39aaaa4efea83f00cc837edc9f36628c9c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "286c36bb_545f6265",
+        "filename": "common/rgb_keyboard.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-08T08:59:43Z",
+      "side": 1,
+      "message": "yeah I\u0027m with you in this case, updated",
+      "parentUuid": "6d3c8126_6f0e55ed",
+      "range": {
+        "startLine": 497,
+        "startChar": 0,
+        "endLine": 497,
+        "endChar": 71
+      },
+      "revId": "f3325e39aaaa4efea83f00cc837edc9f36628c9c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
