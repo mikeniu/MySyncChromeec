@@ -474,7 +474,7 @@ ZTEST_USER(fpsensor_enroll, test_enroll_step_finish_success)
 	/*
 	 * Confirm that:
 	 * - MKBP event is FP_ENROLL
-	 * - Internal error was returned
+	 * - No errors
 	 * - Reported enroll progress is correct
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
