@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ba0cc0f_741c7973",
+        "filename": "zephyr/program/atria/penghu/gpios.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:13:37Z",
+      "side": 1,
+      "message": "I don\u0027t think you need these here, since they\u0027re already specified in the tps6699 nodes.",
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "438e869d_3abb1dcd",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:13:37Z",
+      "side": 1,
+      "message": "I don\u0027t think this does anything with `TCPMV2\u003dn`. You should be able to remove this.",
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e01123d_d4c79602",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:13:37Z",
+      "side": 1,
+      "message": "In the device tree, you have `b-num-alt-modes \u003d \u003c2\u003e`. Is this supposed to be y? (It defaults to n, so you can remove this if TBT is not supported.)",
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "010dcd53_9f80b7f9",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:13:37Z",
+      "side": 1,
+      "message": "This defaults to n. You should be able to remove this.",
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c859bb0_2ee28f80",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:13:37Z",
+      "side": 1,
+      "message": "This defaults to y. You should be able to remove this.",
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed429ce4_f7be9b6e",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:13:37Z",
+      "side": 1,
+      "message": "I think `BATTERY_PRESENT_NONE` implicitly disables `BATTERY_PRESENT_GPIO`. You should be able to remove this.",
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f160800b_9da05899",
+        "filename": "zephyr/program/atria/penghu/usb_typec.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-08T23:13:37Z",
+      "side": 1,
+      "message": "On the schematic, this looks like GPIO B2 to me.",
+      "range": {
+        "startLine": 61,
+        "startChar": 16,
+        "endLine": 61,
+        "endChar": 23
+      },
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
