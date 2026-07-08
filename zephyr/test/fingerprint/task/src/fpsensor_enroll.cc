@@ -525,6 +525,9 @@ static void fpsensor_before(void *f)
 	struct ec_response_fp_mode response;
 	uint32_t fp_events;
 
+	/* Reset global context to a clean state. */
+	fp_reset_and_clear_context();
+
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_equal(response.mode, 0);
 
