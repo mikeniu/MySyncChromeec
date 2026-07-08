@@ -168,8 +168,19 @@ void hook_notify(enum hook_type type)
 		/* Call each handler with the located priority */
 		for (const struct zephyr_shim_hook_info *p = start; p != end;
 		     p++) {
-			if (p->priority == prio)
+			if (p->priority == prio) {
+				volatile uint32_t start_cycles = k_cycle_get_32();
 				p->routine();
+				uint32_t delta_cycles = k_cycle_get_32() - start_cycles;
+				if ((int32_t)delta_cycles < 0) {
+					continue;
+				}
+				uint32_t delta_us = k_cyc_to_us_floor32(delta_cycles);
+				if (delta_us > 500) {
+					printk("[HOOK_PROFILE] Type:%d routine:%p prio:%d took %u us (start=%u, delta=%u)\n",
+					       type, p->routine, p->priority, delta_us, start_cycles, delta_cycles);
+				}
+			}
 		}
 	};
 }

@@ -5,6 +5,9 @@
  * Smart battery driver.
  */
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+#endif
 #include "battery.h"
 #include "battery_fuel_gauge.h"
 #include "battery_smart.h"
@@ -489,6 +492,19 @@ void battery_get_params(struct batt_params *batt)
 {
 	struct batt_params batt_new;
 	int v;
+
+#ifdef CONFIG_ZEPHYR
+	{
+		const char *thread_name = k_thread_name_get(k_current_get());
+
+		if (thread_name == NULL || strcmp(thread_name, "CHARGER") != 0) {
+			CPRINTS("battery_get_params called from %s",
+				thread_name ? : "NULL");
+		}
+	}
+#else
+	CPRINTS("battery_get_params called");
+#endif
 
 	/*
 	 * Start with a copy so that only valid fields will be updated. Note

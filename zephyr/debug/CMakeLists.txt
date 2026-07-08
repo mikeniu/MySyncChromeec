@@ -5,3 +5,5 @@
 zephyr_include_directories("${PLATFORM_EC}/zephyr/")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MUTEX_HISTORY mutex_history.c)
+zephyr_library_sources_ifdef(CONFIG_TRACING_USER tracing.c)
+

@@ -505,7 +505,9 @@ __overridable int board_led_alt_policy(void)
  * Update the python script whenever major changes are made to the matching
  * function here.
  */
-static int match_node(const struct policy_group *grp, int node_idx)
+static int match_node(const struct policy_group *grp, int node_idx,
+		      enum led_pwr_state pwr_state,
+		      enum power_state chipset_state)
 {
 	const struct node_prop_t *node = &grp->nodes[node_idx];
 	bool *active = &grp->active[node_idx];
@@ -514,8 +516,6 @@ static int match_node(const struct policy_group *grp, int node_idx)
      IS_ENABLED(CONFIG_PLATFORM_EC_ADSP_CHARGE_MANAGER))
 	/* Check if this node depends on power state */
 	if (node->pwr_state != 0) {
-		enum led_pwr_state pwr_state = led_pwr_get_state();
-
 		if (!(node->pwr_state & BIT(pwr_state))) {
 			*active = false;
 			return -1;
@@ -537,8 +537,6 @@ static int match_node(const struct policy_group *grp, int node_idx)
 
 	/* Check if this node depends on chipset state */
 	if (node->chipset_state != 0) {
-		enum power_state chipset_state = get_chipset_state();
-
 		if (!(node->chipset_state & BIT(chipset_state))) {
 			*active = false;
 			return -1;
@@ -558,9 +556,23 @@ static int match_node(const struct policy_group *grp, int node_idx)
 	/* check if this node depends on battery status */
 	if (node->batt_state_mask != -1) {
 		int batt_state;
+		int rv;
 
-		battery_status(&batt_state);
-		if ((node->batt_state_mask & batt_state) !=
+#if IS_ENABLED(CONFIG_PLATFORM_EC_CHARGER)
+		const struct batt_params *batt = charger_current_battery_params();
+
+		if (batt->is_present != BP_YES ||
+		    !(batt->flags & BATT_FLAG_RESPONSIVE)) {
+			*active = false;
+			return -1;
+		}
+		batt_state = batt->status;
+		rv = EC_SUCCESS;
+#else
+		rv = battery_status(&batt_state);
+#endif
+		if (rv != EC_SUCCESS ||
+		    (node->batt_state_mask & batt_state) !=
 		    (node->batt_state_mask & node->batt_state)) {
 			*active = false;
 			return -1;
@@ -617,6 +629,9 @@ static int match_node(const struct policy_group *grp, int node_idx)
 
 static void led_update_policy_state(void)
 {
+	enum led_pwr_state pwr_state = led_pwr_get_state();
+	enum power_state chipset_state = get_chipset_state();
+
 	/*
 	 * Find all the nodes that match the current state of the system and
 	 * mark them as active. Depending on the policy defined in
@@ -630,7 +645,7 @@ static void led_update_policy_state(void)
 		bool found_node = false;
 
 		for (int j = 0; j < grp->num_nodes; j++) {
-			if (match_node(grp, j) != -1) {
+			if (match_node(grp, j, pwr_state, chipset_state) != -1) {
 				found_node = true;
 			}
 		}

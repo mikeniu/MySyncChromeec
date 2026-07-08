@@ -231,8 +231,10 @@ static void fan_tick_func_rpm(int ch)
 {
 	struct fan_data *data = &fan_data[ch];
 
-	if (!fan_get_enabled(ch))
+	if (!fan_get_enabled(ch)) {
+		data->rpm_actual = 0;
 		return;
+	}
 
 	/* Get actual rpm */
 	data->rpm_actual = fan_rpm(ch);
@@ -252,7 +254,11 @@ static void fan_tick_func_duty(int ch)
 
 	/* Fan in duty mode still want rpm_actual being updated. */
 	if (data->flags & FAN_USE_RPM_MODE) {
-		data->rpm_actual = fan_rpm(ch);
+		if (fan_get_enabled(ch)) {
+			data->rpm_actual = fan_rpm(ch);
+		} else {
+			data->rpm_actual = 0;
+		}
 		if (data->rpm_actual > 0) {
 			data->auto_status = FAN_STATUS_LOCKED;
 		} else {
@@ -321,7 +327,7 @@ int fan_get_rpm_actual(int ch)
 
 int fan_get_enabled(int ch)
 {
-	return fan_data[ch].pwm_enabled;
+	return fan_data[ch].pwm_enabled && fan_get_duty(ch) > 0;
 }
 
 void fan_set_enabled(int ch, int enabled)
