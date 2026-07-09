@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9baa5a77_635f6b1e",
+        "filename": "zephyr/program/atria/penghu/gpios.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-09T19:23:02Z",
+      "side": 1,
+      "message": "Ack. Can you make a follow-up CL to add a comment here that these are just for debugging?",
+      "parentUuid": "f8eafbb3_62935d37",
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "438e869d_3abb1dcd",
@@ -138,6 +156,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "ddc3cc67_08f76f06",
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f45bf1e_e8177549",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-09T19:23:02Z",
+      "side": 1,
+      "message": "AFAIK, this is still used in PDC configs. See [here](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/Kconfig.usbc_common_altmode;l\u003d28;drc\u003d3d451577cde781f05722a66a5aeef87be98b91a3). My first take on the schematic was that TBT was supported, but I wasn\u0027t really raising the accuracy as an issue. Just that if this config is only supposed to support DP and not TBT, then `b-num-alt-modes` should be 1.\n\nBut it\u0027s consistent now.",
+      "parentUuid": "df14b4e3_6dc06be9",
       "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -284,6 +320,30 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "f160800b_9da05899",
+      "range": {
+        "startLine": 61,
+        "startChar": 16,
+        "endLine": 61,
+        "endChar": 23
+      },
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c04b24dd_f1fdf302",
+        "filename": "zephyr/program/atria/penghu/usb_typec.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-09T19:23:02Z",
+      "side": 1,
+      "message": "I mean, if the schematic is wrong, please raise that as an issue.",
+      "parentUuid": "df2312e4_6b743db1",
       "range": {
         "startLine": 61,
         "startChar": 16,
