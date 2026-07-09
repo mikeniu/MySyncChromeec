@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a4a2e9fa_5a8fbbce",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-09T10:02:25Z",
+      "side": 1,
+      "message": "This one also fixes regression for non UFP port see 531593506.",
+      "parentUuid": "89611aa3_d88aad14",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "65ed2293_1757456d",
         "filename": "include/usb_pd_vdo.h",
         "patchSetId": 18
