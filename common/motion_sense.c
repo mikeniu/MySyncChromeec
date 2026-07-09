@@ -306,6 +306,11 @@ int motion_sense_set_data_rate(struct motion_sensor_t *sensor)
 	    (sensor - motion_sensors == CONFIG_BODY_DETECTION_SENSOR))
 		body_detect_reset();
 
+#ifdef CONFIG_MOTION_SENSE_ODR_LOGGER
+	/* Reset logging counter - will log next batch of samples */
+	motion_sense_fifo_reset_odr_log();
+#endif
+
 	return 0;
 }
 
@@ -1235,6 +1240,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		if (args->version >= 4) {
 			args->response_size = sizeof(out->info_4);
 		}
+		odr_log_dump();
 		break;
 
 	case MOTIONSENSE_CMD_EC_RATE:

@@ -8,6 +8,10 @@
 #ifndef __CROS_EC_MOTION_SENSE_H
 #define __CROS_EC_MOTION_SENSE_H
 
+/* Enable ODR logger - logs raw sensor data after ODR changes */
+#define CONFIG_MOTION_SENSE_ODR_LOGGER
+#define CONFIG_MOTION_SENSE_ODR_LOG_SAMPLES 70
+
 #include "accelgyro.h"
 #include "atomic.h"
 #include "body_detection.h"
@@ -308,6 +312,7 @@ void motion_sense_push_raw_xyz(struct motion_sensor_t *s);
  */
 bool motion_sensor_in_forced_mode(const struct motion_sensor_t *s);
 
+void odr_log_dump(void);
 /* A sensor ID set to this value is invalid. */
 #define MOTION_SENSE_INVALID_SENSOR_ID (0xff)
 

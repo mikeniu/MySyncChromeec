@@ -87,6 +87,25 @@ static int ap_interrupt_needed;
  */
 uint32_t ts_last_int[MAX_MOTION_SENSORS];
 
+#ifdef CONFIG_MOTION_SENSE_ODR_LOGGER
+/*
+ * ODR Logger - Logs samples in arrival order across all sensors
+ * Total capacity: CONFIG_MOTION_SENSE_ODR_LOG_SAMPLES samples
+ */
+
+#define ODR_LOG_SIZE (CONFIG_MOTION_SENSE_ODR_LOG_SAMPLES)
+
+/* Single flat array - samples stored in arrival order */
+static struct {
+	struct ec_response_motion_sensor_data samples[ODR_LOG_SIZE];
+	uint16_t write_index;
+	uint16_t total_count;
+	uint16_t remaining;  /* Global counter - samples left to log */
+	uint32_t start_time;
+} odr_log;
+
+#endif /* CONFIG_MOTION_SENSE_ODR_LOGGER */
+
 /**
  * Check whether or not a give sensor data entry is a timestamp or not.
  *
@@ -325,6 +344,24 @@ fifo_stage_unit(struct ec_response_motion_sensor_data *data,
 	 */
 	memcpy(chunk.buffer, data, fifo.unit_bytes);
 	fifo_staged.count++;
+
+#ifdef CONFIG_MOTION_SENSE_ODR_LOGGER
+	/* Log raw data to separate buffer if logging is active */
+	if (odr_log.remaining > 0) {
+		/* First sample - record start time */
+		if (odr_log.write_index == 0) {
+			odr_log.start_time = __hw_clock_source_read();
+		}
+
+		/* Store data as-is in arrival order */
+		if (odr_log.write_index < ODR_LOG_SIZE) {
+			memcpy(&odr_log.samples[odr_log.write_index], data, sizeof(*data));
+			odr_log.write_index++;
+			odr_log.total_count++;
+			odr_log.remaining--;
+		}
+	}
+#endif
 
 	/*
 	 * If we're using tight timestamps, and the current entry isn't a
@@ -696,3 +733,69 @@ static int motion_sense_read_fifo(int argc, char **argv)
 DECLARE_CONSOLE_COMMAND(fiforead, motion_sense_read_fifo, "id",
 			"Read Fifo sensor");
 #endif /* defined(CONFIG_CMD_ACCEL_FIFO) */
+
+#ifdef CONFIG_MOTION_SENSE_ODR_LOGGER
+/*
+ * Reset ODR logger to start logging next batch of samples
+ */
+void motion_sense_fifo_reset_odr_log(void)
+{
+	odr_log.remaining = CONFIG_MOTION_SENSE_ODR_LOG_SAMPLES;
+	odr_log.write_index = 0;
+	odr_log.total_count = 0;
+}
+
+/*
+ * Dump ODR log contents - callable from debugger
+ * Call this function from gdb/debugger to print logged samples
+ */
+void odr_log_dump(void)
+{
+	int i;
+	struct ec_response_motion_sensor_data *s;
+
+	ccprintf("\n=== ODR Log Dump ===\n");
+	ccprintf("Total samples: %d/%d\n", odr_log.total_count, ODR_LOG_SIZE);
+	ccprintf("Write index: %d\n", odr_log.write_index);
+	ccprintf("Start time: 0x%08x\n\n", odr_log.start_time);
+
+	if (odr_log.total_count == 0) {
+		ccprintf("No samples logged.\n\n");
+		return;
+	}
+
+	ccprintf("Idx  Flags Sensor  Data/Info\n");
+	ccprintf("---- ----- ------ ----------------------------------------\n");
+
+	for (i = 0; i < odr_log.total_count; i++) {
+		s = &odr_log.samples[i];
+
+		ccprintf("%-4d 0x%02x  %-6d ", i, s->flags, s->sensor_num);
+
+		/* Decode based on flags */
+		if (s->flags & MOTIONSENSE_SENSOR_FLAG_TIMESTAMP) {
+			ccprintf("TIMESTAMP=0x%08x (%u us)\n",
+				 s->timestamp, s->timestamp);
+		} else if (s->flags & MOTIONSENSE_SENSOR_FLAG_ODR) {
+			ccprintf("ODR_CHANGE odr=%d mHz\n", s->data[0]);
+		} else if (s->flags & MOTIONSENSE_SENSOR_FLAG_FLUSH) {
+			ccprintf("FLUSH\n");
+		} else {
+			/* Regular sensor data */
+			ccprintf("DATA: X=%7d Y=%7d Z=%7d",
+				 s->data[0], s->data[1], s->data[2]);
+
+			/* Show additional flags if present */
+			if (s->flags & MOTIONSENSE_SENSOR_FLAG_WAKEUP)
+				ccprintf(" [WAKEUP]");
+			if (s->flags & MOTIONSENSE_SENSOR_FLAG_TABLET_MODE)
+				ccprintf(" [TABLET_MODE]");
+
+			ccprintf("\n");
+		}
+	}
+	motion_sense_fifo_reset_odr_log();
+
+	ccprintf("\n");
+}
+#endif /* CONFIG_MOTION_SENSE_ODR_LOGGER */

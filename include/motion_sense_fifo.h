@@ -135,6 +135,13 @@ int motion_sense_fifo_read(int capacity_bytes, int max_count, void *out,
  */
 __test_only void motion_sense_fifo_reset(void);
 
+#ifdef CONFIG_MOTION_SENSE_ODR_LOGGER
+/**
+ * Reset ODR logger to start logging next batch of samples.
+ */
+void motion_sense_fifo_reset_odr_log(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
