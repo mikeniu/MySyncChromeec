@@ -135,13 +135,15 @@ ZTEST(watchdog, test_wdt_warning_handler)
 
 	zassert_true(wdt_warning_triggered, "Watchdog timer did not expire.");
 
+	struct panic_data *pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_equal(PANIC_ARCH_WATCHDOG, pdata->arch, NULL);
+	zassert_true(pdata->wd.flags & WATCHDOG_PANIC_FLAG_PRELIMINARY, NULL);
+
 	panic_get_reason(&reason, &info, &exception);
 
-	zassert_equal(PANIC_SW_WATCHDOG_WARN, reason,
+	zassert_equal(PANIC_SW_WATCHDOG, reason,
 		      "Watchdog warning panic reason was not set");
-
-	zassert_equal((uint8_t)(uintptr_t)k_current_get(), exception,
-		      "Panic exception should match current thread id");
 }
 
 /**

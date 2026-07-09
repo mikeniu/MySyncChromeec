@@ -30,6 +30,21 @@ struct panic_test_fixture {
 	struct panic_data saved_pdata;
 };
 
+static void zassert_hard_watchdog_panic(const struct panic_data *pdata)
+{
+	zassert_not_null(pdata, NULL);
+	zassert_equal(pdata->arch, PANIC_ARCH_WATCHDOG,
+		      "Expected arch %d, got %d", PANIC_ARCH_WATCHDOG,
+		      pdata->arch);
+	zassert_equal(pdata->struct_version, 2, NULL);
+	zassert_equal(pdata->magic, PANIC_DATA_MAGIC, NULL);
+	zassert_equal(pdata->wd.struct_version, 1, NULL);
+	zassert_equal(pdata->wd.reason_cm, PANIC_SW_WATCHDOG, NULL);
+	zassert_equal(pdata->wd.reason_x86, PANIC_SW_WATCHDOG, NULL);
+	zassert_equal(pdata->wd.reason_riscv, PANIC_SW_WATCHDOG, NULL);
+	zassert_equal(pdata->wd.flags, 0, NULL);
+}
+
 static struct panic_data hard_watchdog_panic;
 
 static void panic_setup_hard_watchdog_panic(void)
@@ -140,8 +155,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic)
 	panic_data_init();
 
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
-		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
-				  sizeof(hard_watchdog_panic), NULL);
+		zassert_hard_watchdog_panic(panic_get_data());
 	} else {
 		/* In RO, existing panic data should remain unchanged */
 		zassert_mem_equal(panic_get_data(), &original_pdata,
@@ -192,8 +206,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_warn_panic_already_read)
 	panic_data_init();
 
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
-		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
-				  sizeof(hard_watchdog_panic), NULL);
+		zassert_hard_watchdog_panic(panic_get_data());
 	} else {
 		/* In RO, existing panic data should remain unchanged */
 		zassert_mem_equal(panic_get_data(), &original_pdata,
@@ -251,8 +264,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic_already_read)
 
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
 		zassert_true(panic_data_is_new());
-		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
-				  sizeof(hard_watchdog_panic), NULL);
+		zassert_hard_watchdog_panic(panic_get_data());
 	} else {
 		/* In RO, existing panic data should remain unchanged */
 		zassert_false(panic_data_is_new());
@@ -286,8 +298,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_hard_panic_already_read)
 	panic_data_init();
 
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
-		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
-				  sizeof(hard_watchdog_panic), NULL);
+		zassert_hard_watchdog_panic(panic_get_data());
 	} else {
 		/* In RO, existing panic data should remain unchanged */
 		zassert_mem_equal(panic_get_data(), &original_pdata,
@@ -336,8 +347,7 @@ ZTEST(panic, test_panic_data_init__invalid_sw_reason_watchdog)
 	panic_data_init();
 
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
-		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
-				  sizeof(hard_watchdog_panic), NULL);
+		zassert_hard_watchdog_panic(panic_get_data());
 	} else {
 		/* In RO, existing panic data should remain unchanged */
 		zassert_mem_equal(panic_get_data(), &original_pdata,

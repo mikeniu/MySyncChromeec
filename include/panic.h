@@ -150,6 +150,31 @@ void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason);
 bool panic_data_is_new(void);
 
 /**
+ * Record a watchdog warning panic.
+ */
+void panic_record_preliminary_watchdog(uint32_t pc, uint32_t lr);
+
+/**
+ * Record a hard watchdog panic.
+ */
+void panic_record_hard_watchdog(void);
+
+/**
+ * Finalize a watchdog warning panic.
+ */
+void panic_finalize_preliminary_watchdog(void);
+
+/**
+ * Retrieve the legacy reason code.
+ */
+uint32_t panic_get_legacy_reason(void);
+
+/**
+ * Update the legacy reason code.
+ */
+void panic_update_legacy_reason(uint32_t reason);
+
+/**
  * Enable/disable bus fault handler
  *
  * @param ignored	Non-zero if ignoring bus fault
