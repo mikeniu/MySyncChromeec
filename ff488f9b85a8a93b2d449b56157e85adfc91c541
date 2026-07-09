@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a12aaad5_822f21d8",
+        "filename": "zephyr/shim/src/pw_log_zephyr_tokenized.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-07-09T05:02:30Z",
+      "side": 1,
+      "message": "Encode() throws an assertion failure if the encoded string cannot fit into the buffer. Is this okay?",
+      "range": {
+        "startLine": 67,
+        "startChar": 13,
+        "endLine": 67,
+        "endChar": 19
+      },
+      "revId": "ff488f9b85a8a93b2d449b56157e85adfc91c541",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
