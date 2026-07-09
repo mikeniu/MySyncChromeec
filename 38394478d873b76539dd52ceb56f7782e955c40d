@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a40c4443_f0dca9bd",
+        "filename": "zephyr/program/atria/penghu/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-07-09T03:38:43Z",
+      "side": 1,
+      "message": "I\u0027m removing the power signals from `named-gpios` since it won\u0027t affect the power sequencing. We can still use `powerindebug` to monitor the power signals.",
+      "parentUuid": "262f51dc_37c7f99b",
+      "revId": "38394478d873b76539dd52ceb56f7782e955c40d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9cedb4e9_16542eb1",
@@ -52,6 +70,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fe2a700_8abe426c",
+        "filename": "zephyr/program/atria/penghu/include/board.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-07-09T03:38:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9cedb4e9_16542eb1",
+      "revId": "38394478d873b76539dd52ceb56f7782e955c40d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b086d32_0b7dcd70",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-07-08T23:40:15Z",
       "side": 1,
       "message": "Nit: If you did this to avoid an issue with the vWires, add a comment referencing b/491076382.",
+      "revId": "38394478d873b76539dd52ceb56f7782e955c40d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cf0f9ad_c017549a",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-07-09T03:38:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b086d32_0b7dcd70",
       "revId": "38394478d873b76539dd52ceb56f7782e955c40d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
