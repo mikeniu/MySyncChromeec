@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be0e6e76_ae1cedb2",
+        "filename": "zephyr/program/bluey/mica/src/chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-07-09T08:02:38Z",
+      "side": 1,
+      "message": "Use `true`/`false` as the type is `bool`, same as the below assignments.",
+      "range": {
+        "startLine": 13,
+        "startChar": 3,
+        "endLine": 13,
+        "endChar": 4
+      },
+      "revId": "06a98457cb298996f7173de7be59bd8f620cfa32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8eebd32a_1228853d",
+        "filename": "zephyr/program/bluey/mica/src/chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-07-09T08:02:38Z",
+      "side": 1,
+      "message": "The 5V rail will never be disabled if the power-on sequence fails, right?",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 65
+      },
+      "revId": "06a98457cb298996f7173de7be59bd8f620cfa32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0c9fffc_8435e30f",
+        "filename": "zephyr/program/bluey/mica/src/led.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-07-09T08:02:38Z",
+      "side": 1,
+      "message": "It is currently used as `bool`, so make it `bool`. We can extend it to `int8_t` later if needed.",
+      "range": {
+        "startLine": 19,
+        "startChar": 7,
+        "endLine": 19,
+        "endChar": 13
+      },
+      "revId": "06a98457cb298996f7173de7be59bd8f620cfa32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
