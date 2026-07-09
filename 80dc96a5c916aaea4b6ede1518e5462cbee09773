@@ -58,6 +58,48 @@
       },
       "revId": "80dc96a5c916aaea4b6ede1518e5462cbee09773",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a7cb06c_3b77932b",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_enroll.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-09T01:01:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6294f3ea_84c10832",
+      "range": {
+        "startLine": 527,
+        "startChar": 0,
+        "endLine": 529,
+        "endChar": 52
+      },
+      "revId": "80dc96a5c916aaea4b6ede1518e5462cbee09773",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0dada95_ac6bbd19",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_enroll.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-09T01:01:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7805e908_4981f517",
+      "revId": "80dc96a5c916aaea4b6ede1518e5462cbee09773",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
