@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82674093_dc005b33",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-09T23:31:48Z",
+      "side": 1,
+      "message": "This points to the same devicetree node as DEV_PDC_C0_TI_JBR.  Is this intended?",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 64
+      },
+      "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
