@@ -3,6 +3,74 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "60d54f54_13e91b95",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-09T19:46:45Z",
+      "side": 1,
+      "message": "Nit: I\u0027m guessing that either this code won\u0027t sequence correctly, or the schematic is wrong. I\u0027m assuming from this line that you\u0027ve just checked that it builds, and you can\u0027t confirm whether it sequences. If you\u0027ve tested in a way that would clarify that, please mention it here.",
+      "revId": "561406b7dc046042d5058f9fe062c2290e708e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e267999e_6011c5f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-09T19:46:45Z",
+      "side": 1,
+      "message": "I\u0027m OK with submitting this essentially as-is. Please add some to dos and/or clarifying comments, here or in follow-up CLs.",
+      "revId": "561406b7dc046042d5058f9fe062c2290e708e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "430d7fca_1bc958f0",
+        "filename": "zephyr/program/atria/CMakeLists.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-09T19:46:45Z",
+      "side": 1,
+      "message": "I don\u0027t really want to re-use the RVP power sequencing as such in variants. If the circuits are sufficiently similar that we can reuse the code, then we should call it something like common power sequencing. If this is close enough to boot, it\u0027s an OK place to start.\n\nI don\u0027t really want anybody to get the idea that they should copy this, though. Can you add a to do here to clean this up?\n\nFYI @brandon.breitenstein@intel.corp-partner.google.com who might be more familiar with comparing power sequencing setups.",
+      "revId": "561406b7dc046042d5058f9fe062c2290e708e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8d37f35_3ae25307",
+        "filename": "zephyr/program/atria/penghu/power_signals.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-09T19:46:45Z",
+      "side": 1,
+      "message": "This isn\u0027t connected to anything on the schematic, and I can\u0027t tell where this signal is supposed to be. If you know what\u0027s going on, you can update, but it\u0027s also fine to leave a to do here.",
+      "revId": "561406b7dc046042d5058f9fe062c2290e708e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32f68917_3748d031",
         "filename": "zephyr/program/atria/penghu/project.conf",
         "patchSetId": 4
