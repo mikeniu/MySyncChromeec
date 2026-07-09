@@ -416,6 +416,12 @@ static void ppm_ci_cb(const struct device *dev,
 		return;
 	}
 
+	if (chipset_in_state(CHIPSET_STATE_ANY_SUSPEND)) {
+		LOG_DBG("C%d: Suppressing PPM CI during suspend",
+			cci_event.connector_change);
+		return;
+	}
+
 	ucsi_ppm_lpm_alert(data->ppm_dev, cci_event.connector_change);
 }
 
