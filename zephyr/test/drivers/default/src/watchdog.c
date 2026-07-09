@@ -137,11 +137,17 @@ ZTEST(watchdog, test_wdt_warning_handler)
 
 	panic_get_reason(&reason, &info, &exception);
 
-	zassert_equal(PANIC_SW_WATCHDOG_WARN, reason,
+	zassert_equal(PANIC_SW_WATCHDOG, reason,
 		      "Watchdog warning panic reason was not set");
 
 	zassert_equal(task_get_current(), exception,
 		      "Panic exception should match current task id");
+
+	struct panic_data *pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_equal(PANIC_ARCH_WATCHDOG, pdata->arch, NULL);
+	zassert_true(pdata->wd.flags & WATCHDOG_PANIC_FLAG_PRELIMINARY,
+		     "Watchdog panic flags should have PRELIMINARY set");
 }
 
 /**

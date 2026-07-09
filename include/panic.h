@@ -132,7 +132,22 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
  */
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
 
-#ifdef CONFIG_ZEPHYR
+
+/**
+ * Record a watchdog warning panic.
+ */
+void panic_record_preliminary_watchdog(uint32_t pc, uint32_t lr);
+
+/**
+ * Record a hard watchdog panic.
+ */
+void panic_record_hard_watchdog(void);
+
+/**
+ * Finalize a watchdog warning panic.
+ */
+void panic_finalize_preliminary_watchdog(void);
+
 /**
  * Retrieve the legacy reason code.
  */
@@ -142,7 +157,6 @@ uint32_t panic_get_legacy_reason(void);
  * Update the legacy reason code.
  */
 void panic_update_legacy_reason(uint32_t reason);
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * Enable/disable bus fault handler
