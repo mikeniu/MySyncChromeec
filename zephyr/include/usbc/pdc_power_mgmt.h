@@ -798,6 +798,19 @@ bool pdc_power_mgmt_is_pdc_port_valid(int port);
  */
 int pdc_power_mgmt_set_ap_power_state(enum power_state state);
 
+#ifdef CONFIG_USBC_PDC_TBT_SUPPORTED
+/**
+ * @brief Request a TBT3/USB4 hard reset in PDC power manager
+ *
+ * @param port USBC port number
+ */
+void pdc_power_mgmt_request_tbt_reset(int port);
+#else
+static inline void pdc_power_mgmt_request_tbt_reset(int port)
+{
+}
+#endif /* defined(CONFIG_USBC_PDC_TBT_SUPPORTED) */
+
 /**
  * @brief Simulate a power button press from the PDC power manager
  *
