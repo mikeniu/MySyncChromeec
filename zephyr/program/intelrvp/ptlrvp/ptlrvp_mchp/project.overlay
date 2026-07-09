@@ -85,3 +85,7 @@
 &cros_imvp{
 		enable-gpios = <MCHP_GPIO_DECODE_226 GPIO_ACTIVE_HIGH>;
 };
+
+/delete-node/ &int_power_button;
+/delete-node/ &int_vol_up;
+/delete-node/ &int_vol_dn;
