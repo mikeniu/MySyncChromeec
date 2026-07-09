@@ -7,7 +7,9 @@
 #include "common.h"
 #include "panic.h"
 #include "panic_utils.h"
+#include "system.h"
 #include "task.h"
+
 
 #include <zephyr/arch/cpu.h>
 #include <zephyr/cache.h>
@@ -68,13 +70,13 @@
 #define PANIC_REG_REASON(pdata) pdata->cm.regs[3]
 #define PANIC_REG_INFO(pdata) pdata->cm.regs[4]
 #elif defined(CONFIG_RISCV) && !defined(CONFIG_64BIT)
+#define PANIC_ARCH PANIC_ARCH_RISCV_RV32I
 /*
  * Not all registers are passed in the context from Zephyr
  * (see include/zephyr/arch/riscv/exp.h), in particular
  * the mcause register is not saved (mstatus is saved instead).
  * The assignments must match include/panic_defs.h
  */
-#define PANIC_ARCH PANIC_ARCH_RISCV_RV32I
 #define PANIC_REG_LIST(M, M_GPR)  \
 	M(ra, riscv.regs[29], ra) \
 	M(a0, riscv.regs[26], a0) \
@@ -135,12 +137,27 @@ static uint32_t placeholder_info_reg;
 
 void panic_data_print(const struct panic_data *pdata)
 {
-	PANIC_REG_LIST(PANIC_PRINT_REGS, PANIC_PRINT_REGS);
+	if (pdata->arch == PANIC_ARCH_WATCHDOG) {
+		panic_printf("=== WATCHDOG ====== struct version: %d ===\n", pdata->wd.struct_version);
+		panic_printf("  flags:          0x%08X\n", pdata->wd.flags);
+		panic_printf("  thread_id:      0x%08X\n", pdata->wd.thread_id);
+		panic_printf("  pc:             0x%08X\n", pdata->wd.pc);
+		panic_printf("  lr:             0x%08X\n", pdata->wd.lr);
+		panic_printf("  warning_rtc:    %u\n", pdata->wd.warning_rtc);
+		panic_printf("  warning_uptime: %u ms\n", pdata->wd.warning_uptime);
+		panic_printf("  reset_uptime:   %u ms\n", pdata->wd.watchdog_reset_uptime_ms);
+		panic_printf("  version:        %.16s\n", pdata->wd.version);
+		panic_printf("  power_state:    0x%02X\n", pdata->wd.power_state);
+		panic_printf("  power_signals:  0x%08X\n", pdata->wd.power_signals);
+	} else {
+		PANIC_REG_LIST(PANIC_PRINT_REGS, PANIC_PRINT_REGS);
 #if defined(CONFIG_RISCV) && !defined(CONFIG_64BIT)
-	PANIC_PRINT_REGS(NULL, riscv.regs[10], S1);
-	PANIC_PRINT_REGS(NULL, riscv.regs[11], S0);
+		PANIC_PRINT_REGS(NULL, riscv.regs[10], S1);
+		PANIC_PRINT_REGS(NULL, riscv.regs[11], S0);
 #endif
+	}
 }
+
 
 #if !defined(CONFIG_ZTEST_FATAL_HOOK)
 static void copy_esf_to_panic_data(const struct arch_esf *esf,
@@ -270,8 +287,6 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
 	/* Flush the panic data to RAM before potential reboot. */
 	sys_cache_data_flush_range(pdata, sizeof(*pdata));
 
-	/* Allow architecture specific logic */
-	arch_panic_set_reason(reason, info, exception);
 }
 
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
@@ -279,16 +294,117 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 	struct panic_data *const pdata = panic_get_data();
 
 	if (pdata && pdata->struct_version == 2) {
-		*exception = PANIC_REG_EXCEPTION(pdata);
-		*reason = PANIC_REG_REASON(pdata);
-		*info = PANIC_REG_INFO(pdata);
+               if (pdata->arch == PANIC_ARCH_WATCHDOG) {
+                       *reason = pdata->wd.reason_cm;
+                       *info = pdata->wd.pc;
+                       *exception = (uint8_t)pdata->wd.thread_id;
+               } else {
+                       *exception = PANIC_REG_EXCEPTION(pdata);
+                       *reason = PANIC_REG_REASON(pdata);
+                       *info = PANIC_REG_INFO(pdata);
+               }
 	} else {
 		*exception = *reason = *info = 0;
 	}
 }
 
-__overridable void arch_panic_set_reason(uint32_t reason, uint32_t info,
-					 uint8_t exception)
+void panic_record_hard_watchdog(void)
 {
-	/* Default implementation, do nothing. */
+       struct panic_data *const pdata = get_panic_data_write();
+       uint64_t uptime = k_uptime_get();
+       uint32_t rtc_sec = IS_ENABLED(CONFIG_PLATFORM_EC_RTC) ?
+                          system_get_rtc_sec() : 0;
+
+       memset(pdata, 0, sizeof(*pdata));
+       pdata->magic = PANIC_DATA_MAGIC;
+       pdata->struct_size = sizeof(*pdata);
+       pdata->struct_version = 2;
+       pdata->arch = PANIC_ARCH_WATCHDOG;
+       pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
+                                                  PANIC_DATA_FLAG_RO_IMAGE;
+
+       pdata->wd.struct_version = 1;
+       pdata->wd.thread_id = (uint32_t)task_get_current();
+       pdata->wd.pc = 0;
+       pdata->wd.lr = 0;
+
+       pdata->wd.flags = 0;
+       pdata->wd.warning_rtc = rtc_sec;
+       pdata->wd.warning_uptime = (uint32_t)uptime;
+
+       /* Populate all reason fields to satisfy older RO on any architecture */
+       pdata->wd.reason_x86 = PANIC_SW_WATCHDOG;
+       pdata->wd.reason_cm = PANIC_SW_WATCHDOG;
+       pdata->wd.reason_riscv = PANIC_SW_WATCHDOG;
+
+       sys_cache_data_flush_range(pdata, sizeof(*pdata));
+}
+
+void panic_record_preliminary_watchdog(uint32_t pc, uint32_t lr)
+{
+       struct panic_data *const pdata = get_panic_data_write();
+       uint64_t uptime = k_uptime_get();
+       uint32_t rtc_sec = IS_ENABLED(CONFIG_PLATFORM_EC_RTC) ?
+                          system_get_rtc_sec() : 0;
+
+       memset(pdata, 0, sizeof(*pdata));
+       pdata->magic = PANIC_DATA_MAGIC;
+       pdata->struct_size = sizeof(*pdata);
+       pdata->struct_version = 2;
+       pdata->arch = PANIC_ARCH_WATCHDOG;
+       pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
+                                                  PANIC_DATA_FLAG_RO_IMAGE;
+
+       pdata->wd.struct_version = 1;
+       pdata->wd.thread_id = (uint32_t)task_get_current();
+       pdata->wd.pc = pc;
+       pdata->wd.lr = lr;
+
+       pdata->wd.flags = WATCHDOG_PANIC_FLAG_PRELIMINARY;
+       pdata->wd.warning_rtc = rtc_sec;
+       pdata->wd.warning_uptime = (uint32_t)uptime;
+
+       /* Populate all reason fields to satisfy older RO on any architecture */
+       pdata->wd.reason_x86 = PANIC_SW_WATCHDOG;
+       pdata->wd.reason_cm = PANIC_SW_WATCHDOG;
+       pdata->wd.reason_riscv = PANIC_SW_WATCHDOG;
+
+       sys_cache_data_flush_range(pdata, sizeof(*pdata));
+}
+
+void panic_finalize_preliminary_watchdog(void)
+{
+       struct panic_data *const pdata = panic_get_data();
+
+       assert(pdata);
+       assert(pdata->arch == PANIC_ARCH_WATCHDOG);
+       assert(pdata->wd.flags & WATCHDOG_PANIC_FLAG_PRELIMINARY);
+       assert(pdata->wd.struct_version == 1);
+
+       pdata->wd.flags &= ~WATCHDOG_PANIC_FLAG_PRELIMINARY;
+       pdata->wd.watchdog_reset_uptime_ms = (uint32_t)k_uptime_get();
+
+       sys_cache_data_flush_range(pdata, sizeof(*pdata));
+}
+
+uint32_t panic_get_legacy_reason(void)
+{
+       const struct panic_data *const pdata = panic_get_data();
+
+       if (!pdata || pdata->arch != PANIC_ARCH) {
+               return 0;
+       }
+       return PANIC_REG_REASON(pdata);
+}
+
+void panic_update_legacy_reason(uint32_t reason)
+{
+       struct panic_data *const pdata = panic_get_data();
+
+       if (!pdata || pdata->arch != PANIC_ARCH)
+               return;
+
+       PANIC_REG_REASON(pdata) = reason;
+
+       sys_cache_data_flush_range(pdata, sizeof(*pdata));
 }

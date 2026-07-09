@@ -24,6 +24,11 @@ extern "C" {
  */
 int watchdog_init(void);
 
+
+/**
+ */
+void handle_watchdog_reset(void);
+
 /**
  * Display a trace with information about an expired watchdog timer
  *
