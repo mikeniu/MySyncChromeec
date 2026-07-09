@@ -44,9 +44,11 @@ bloonchipper = register_fpmcu_variant(
         here / "bloonchipper" / "prj.conf",
         here / "bloonchipper" / "ec_quirks.conf",
     ],
-    signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
-        here / "bloonchipper" / "dev_key.pem",
-    ),
+    signer=[
+        signers.RwsigSigner(  # pylint: disable=undefined-variable
+            here / "bloonchipper" / "dev_key.pem",
+        )
+    ],
     boards=[
         "brox",
         "brya",
@@ -75,9 +77,11 @@ buccaneer = register_fpmcu_variant(
         here / "helipilot" / "prj.conf",
         here / "helipilot" / "ec_quirks.conf",
     ],
-    signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
-        here / "helipilot" / "buccaneer" / "dev_key.pem",
-    ),
+    signer=[
+        signers.RwsigSigner(  # pylint: disable=undefined-variable
+            here / "helipilot" / "buccaneer" / "dev_key.pem",
+        )
+    ],
     boards=[
         "brox",
         "brya",
@@ -106,9 +110,11 @@ helipilot = register_fpmcu_variant(
         here / "helipilot" / "prj.conf",
         here / "helipilot" / "ec_quirks.conf",
     ],
-    signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
-        here / "helipilot" / "dev_key.pem",
-    ),
+    signer=[
+        signers.RwsigSigner(  # pylint: disable=undefined-variable
+            here / "helipilot" / "dev_key.pem",
+        )
+    ],
     boards=["brya", "fatcat", "rauru", "rex"],
 )
 
@@ -136,9 +142,11 @@ def register_et171_project(
             here / "et171" / "prj.conf",
             here / "et171" / conf_path,
         ],
-        signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
-            here / "et171" / "dev_key.pem",
-        ),
+        signer=[
+            signers.RwsigSigner(  # pylint: disable=undefined-variable
+                here / "et171" / "dev_key.pem",
+            )
+        ],
     )
 
 
@@ -167,9 +175,11 @@ niedzica = register_fpmcu_variant(
     variant_kconfig_files=[
         here / "em32f967" / "prj.conf",
     ],
-    signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
-        here / "em32f967" / "dev_key.pem",
-    ),
+    signer=[
+        signers.RwsigSigner(  # pylint: disable=undefined-variable
+            here / "em32f967" / "dev_key.pem",
+        )
+    ],
 )
 
 # The address of RW_FWID is hardcoded in RO. You need to have REALLY
@@ -198,9 +208,11 @@ def register_ft9001_project(
             here / "ft9001" / "prj.conf",
             here / "ft9001" / conf_path,
         ],
-        signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
-            here / "ft9001" / "dev_key.pem",
-        ),
+        signer=[
+            signers.RwsigSigner(  # pylint: disable=undefined-variable
+                here / "ft9001" / "dev_key.pem",
+            )
+        ],
     )
 
 

@@ -44,6 +44,11 @@ def module_kconfig_overlay_name(modpath, project_name):
     return modpath / "include" / project_name / "project.conf"
 
 
+def default_signer_list_factory():
+    """Returns the list of default signers, initialized with their arguments."""
+    return [signers.NullSigner()]
+
+
 @dataclasses.dataclass
 class ProjectConfig:
     """All the information needed to define a project."""
@@ -66,7 +71,12 @@ class ProjectConfig:
     snippets: "list[str]" = dataclasses.field(default_factory=list)
     project_dir: pathlib.Path = dataclasses.field(default_factory=pathlib.Path)
     boards: typing.Iterable[str] = dataclasses.field(default_factory=list)
-    signer: signers.BaseSigner = signers.NullSigner()
+    signer: list["signers.BaseSigner"] = dataclasses.field(
+        default_factory=default_signer_list_factory,
+        metadata={
+            "help": "A list of signers to add to the project (e.g., for test keys)."
+        },
+    )
     skip_build_all: bool = False
 
     @property
