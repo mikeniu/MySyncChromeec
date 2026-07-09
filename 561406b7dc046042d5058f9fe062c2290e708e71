@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32f68917_3748d031",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-07-09T08:28:26Z",
+      "side": 1,
+      "message": "Assume the bug is found on realtek EC but penghu uses ITE EC. Put the same bug might lead misunderstanding. Could you explain why you prefer not using VW instead ?",
+      "revId": "561406b7dc046042d5058f9fe062c2290e708e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
