@@ -18,6 +18,7 @@
 #include "keyboard_protocol.h"
 #include "keyboard_raw.h"
 #include "lid_switch.h"
+#include "usbc/pdc_power_mgmt.h"
 
 LOG_MODULE_REGISTER(lapis_board, LOG_LEVEL_INF);
 
@@ -122,3 +123,32 @@ static void disable_sleep_bid(void)
 		disable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
 }
 DECLARE_HOOK(HOOK_INIT, disable_sleep_bid, HOOK_PRIO_POST_I2C);
+
+/*
+ * Override the default source current limit.
+ *
+ * When the platform supports 3A sourcing (pd_get_usb_pd_3a_ports > 0):
+ * - Count how many other ports are already in source role.
+ * - If the count has reached pd_get_usb_pd_3a_ports(), the 3A quota is
+ *   exhausted; return 1.5A so this port advertises 1.5A from the start.
+ * - Otherwise, return 3A (there is still 3A quota available).
+ */
+enum usb_typec_current_t pdc_power_mgmt_get_default_current_limit(int port)
+{
+	int max_3a_ports = pd_get_usb_pd_3a_ports();
+	int sourcing_count = 0;
+
+	if (max_3a_ports == 0)
+		return TC_CURRENT_1_5A;
+
+	/* Count how many other ports are already sourcing at 3A. */
+	for (int i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
+		if (i != port &&
+		    pdc_power_mgmt_get_power_role(i) == PD_ROLE_SOURCE) {
+			sourcing_count++;
+		}
+	}
+
+	return (sourcing_count < max_3a_ports) ? TC_CURRENT_3_0A :
+						 TC_CURRENT_1_5A;
+}

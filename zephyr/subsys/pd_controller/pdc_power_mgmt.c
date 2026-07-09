@@ -2312,6 +2312,23 @@ static void pdc_unattached_entry(void *obj)
 		pdc_dpm_remove_sink(port_number);
 		pdc_dpm_remove_source(port_number);
 
+		/*
+		 * When this port detaches, re-evaluate the default current
+		 * limit for all other ports. This is the counterpart of the
+		 * loop in pdc_src_typec_only_entry: when a port enters the
+		 * source role, other ports are lowered; when a port leaves
+		 * the source role, other ports should be re-evaluated (they
+		 * may now be eligible for the 3A source quota).
+		 */
+		for (int i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
+			if (i != port_number &&
+			    pdc_power_mgmt_get_power_role(i) != PD_ROLE_SOURCE)
+				pdc_power_mgmt_set_current_limit(
+					i,
+					pdc_power_mgmt_get_default_current_limit(
+						i));
+		}
+
 		/* Clear all events except for disconnect. */
 		pdc_power_mgmt_clear_event(port_number,
 					   BIT_MASK(PD_STATUS_EVENT_COUNT));
@@ -3664,6 +3681,37 @@ static void pdc_src_typec_only_entry(void *obj)
 				USB_SWITCH_CONNECT,
 				pdc_power_mgmt_pd_get_polarity(port_number));
 		}
+
+		/*
+		 * Re-evaluate the source current limit for this port.
+		 * Board-specific overrides of
+		 * pdc_power_mgmt_get_default_current_limit can use this
+		 * to dynamically set the initial source PDO based on the
+		 * state of other ports (e.g., first port gets 3A,
+		 * subsequent ports get 1.5A).
+		 *
+		 * Also update all other ports: when this port claims the
+		 * 3A source quota, the other ports' default PDOs must be
+		 * lowered so that the next port to attach starts with the
+		 * correct PDO from the beginning.
+		 */
+		pdc_power_mgmt_set_current_limit(
+			port_number,
+			pdc_power_mgmt_get_default_current_limit(port_number));
+
+		for (int i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
+			/*
+			 * Skip the current port (already updated above)
+			 * and ports already in source role (their PDO
+			 * was set when they entered SRC_ATTACHED).
+			 */
+			if (i != port_number &&
+			    pdc_power_mgmt_get_power_role(i) != PD_ROLE_SOURCE)
+				pdc_power_mgmt_set_current_limit(
+					i,
+					pdc_power_mgmt_get_default_current_limit(
+						i));
+		}
 	}
 }
 
@@ -3691,6 +3739,29 @@ static enum smf_state_result pdc_src_typec_only_run(void *obj)
 		LOG_INF("C%d: SRC Type-C send sink PDOs",
 			config->connector_num);
 		pdc_send_sink_pdos(port);
+		return SMF_EVENT_HANDLED;
+	}
+
+	/*
+	 * Process SRC_POLICY_UPDATE_SRC_CAPS early, before the sub-state
+	 * machine. This ensures the PDC receives the correct source PDO
+	 * before USB PD negotiation begins. The flag is set by
+	 * pdc_power_mgmt_set_current_limit called from the entry function.
+	 */
+	if (atomic_test_and_clear_bit(port->src_policy.flags,
+				      SRC_POLICY_UPDATE_SRC_CAPS)) {
+		port->set_pdos = (struct set_pdos_t){
+			.count = 1,
+			.type = SOURCE_PDO,
+			.pdos = { port->src_policy.lpm_src_pdo },
+		};
+		queue_internal_cmd(port, CMD_PDC_SET_PDOS);
+		return SMF_EVENT_HANDLED;
+	}
+
+	if (atomic_test_and_clear_bit(port->src_policy.flags,
+				      SRC_POLICY_SET_RP)) {
+		queue_internal_cmd(port, CMD_PDC_SET_POWER_LEVEL);
 		return SMF_EVENT_HANDLED;
 	}
 
