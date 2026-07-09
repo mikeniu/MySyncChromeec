@@ -22,6 +22,30 @@
       },
       "revId": "ff488f9b85a8a93b2d449b56157e85adfc91c541",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a779cfd_c870f3a7",
+        "filename": "zephyr/shim/src/pw_log_zephyr_tokenized.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-09T15:27:48Z",
+      "side": 1,
+      "message": "`kBase64EncodedBufferSizeBytes` is the calculated from the max capacity of the token log buffer. I don\u0027t expect this to overflow.  In the implementation of `PrefixedBase64Encode` it calls `Encode` which throws the assertion as well and we haven\u0027t observed any failures yet.",
+      "parentUuid": "a12aaad5_822f21d8",
+      "range": {
+        "startLine": 67,
+        "startChar": 13,
+        "endLine": 67,
+        "endChar": 19
+      },
+      "revId": "ff488f9b85a8a93b2d449b56157e85adfc91c541",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
