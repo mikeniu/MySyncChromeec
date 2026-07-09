@@ -718,3 +718,186 @@ ZTEST_USER_F(src_policy, test_src_max_pdp)
 	zassert_equal(MAX_PDP_15W, max_pdp,
 		      "Expected max PDP to be 15W, got %d", max_pdp);
 }
+<<<<<<< HEAD   (c3efdd692bce0df45f582b76bc07164f88e0da48 rts5912: Increase default main stack size to 1280)
+||||||| BASE   (76620c59881e3a51fd93ce9e466eb83619abc694 zephyr: ec-aic: Add flash_erase test)
+
+/* Verify that the sink device does not get a 3A contract
+ * when the 3A budget is 0.
+ */
+ZTEST_USER_F(src_policy, test_src_policy_snk_no_3a_when_budget_zero)
+{
+	union connector_status_t connector_status = { 0 };
+	/* Simulate a connected sink device requesting 3A (3000mA) in its PDO */
+	uint32_t partner_snk_pdo = PDO_FIXED(5000, 3000, 0);
+
+	/* Core step: Simulate an overload condition where 3A port budget is 0
+	 */
+	mock_usb_pd_3a_ports = 0;
+
+	/* Simulate connecting the device to Port 0 */
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+
+	/* Wait for the DPM state machine to finish processing */
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* Assert 1: Verify the configured LPM Source PDO only offers 1.5A */
+	zassert_ok(verify_lpm_source_pdo(fixture, TEST_USBC_PORT0, 5000, 1500,
+					 PDO_PEAK_OCP));
+
+	/* Assert 2: Verify that pdc_dpm_get_source_current() correctly reports
+	 * 1500mA */
+	zassert_equal(pdc_dpm_get_source_current(TEST_USBC_PORT0), 1500);
+}
+=======
+
+/* Verify that the sink device does not get a 3A contract
+ * when the 3A budget is 0.
+ */
+ZTEST_USER_F(src_policy, test_src_policy_snk_no_3a_when_budget_zero)
+{
+	union connector_status_t connector_status = { 0 };
+	/* Simulate a connected sink device requesting 3A (3000mA) in its PDO */
+	uint32_t partner_snk_pdo = PDO_FIXED(5000, 3000, 0);
+
+	/* Core step: Simulate an overload condition where 3A port budget is 0
+	 */
+	mock_usb_pd_3a_ports = 0;
+
+	/* Simulate connecting the device to Port 0 */
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+
+	/* Wait for the DPM state machine to finish processing */
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* Assert 1: Verify the configured LPM Source PDO only offers 1.5A */
+	zassert_ok(verify_lpm_source_pdo(fixture, TEST_USBC_PORT0, 5000, 1500,
+					 PDO_PEAK_OCP));
+
+	/* Assert 2: Verify that pdc_dpm_get_source_current() correctly reports
+	 * 1500mA */
+	zassert_equal(pdc_dpm_get_source_current(TEST_USBC_PORT0), 1500);
+}
+
+/* On systems with TBT support, verify the device issues a reset after
+ */
+ZTEST_USER_F(src_policy, test_src_policy_tbt_reset)
+{
+	union connector_status_t connector_status = { 0 };
+	uint32_t partner_snk_pdo_non_drp = PDO_FIXED(5000, 3000, 0);
+	uint32_t partner_snk_pdo_drp =
+		PDO_FIXED(5000, 3000, PDO_FIXED_DUAL_ROLE);
+	uint32_t partner_snk_pdo_1_5a = PDO_FIXED(5000, 1500, 0);
+	union connector_reset_t reset_cmd;
+
+	if (!IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED)) {
+		ztest_test_skip();
+	}
+
+	/* Non-PD sink should not cause hard reset. */
+	zassert_ok(emul_pdc_reset(fixture->emul_pdc[TEST_USBC_PORT0]));
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	connector_status.power_operation_mode = USB_TC_CURRENT_3A;
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(emul_pdc_get_connector_reset(
+		fixture->emul_pdc[TEST_USBC_PORT0], &reset_cmd));
+	zassert_equal(0, reset_cmd.raw_value, "Non-PD sink triggered reset");
+
+	/* Disconnect non-PD sink */
+	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* DRP sink should not cause hard reset. */
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo_drp));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(emul_pdc_get_connector_reset(
+		fixture->emul_pdc[TEST_USBC_PORT0], &reset_cmd));
+	zassert_equal(0, reset_cmd.raw_value, "DRP partner triggered reset");
+
+	/* Disconnect DRP sink */
+	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* Sink with 1.5A sink caps should not cause hard reset. */
+	zassert_ok(emul_pdc_reset(fixture->emul_pdc[TEST_USBC_PORT0]));
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo_1_5a));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(emul_pdc_get_connector_reset(
+		fixture->emul_pdc[TEST_USBC_PORT0], &reset_cmd));
+	zassert_equal(0, reset_cmd.raw_value,
+		      "1.5A sink-only partner triggered reset");
+
+	/* Disconnect 1.5A sink */
+	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* Sink with 3A sink caps should cause hard reset. */
+	zassert_ok(emul_pdc_reset(fixture->emul_pdc[TEST_USBC_PORT0]));
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo_non_drp));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(emul_pdc_get_connector_reset(
+		fixture->emul_pdc[TEST_USBC_PORT0], &reset_cmd));
+	zassert_equal(PD_HARD_RESET, reset_cmd.reset_type,
+		      "Non-DRP partner did not trigger hard reset");
+
+	/* Verify reset does not clear 3A allocation. */
+	zassert_ok(verify_lpm_source_pdo(fixture, TEST_USBC_PORT0, 5000, 3000,
+					 PDO_PEAK_OCP),
+		   "LPM did not offer 3A");
+
+	/* Sudden disconnect/reconnect (<5s) does not cause another reset. */
+	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(emul_pdc_reset(fixture->emul_pdc[TEST_USBC_PORT0]));
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo_non_drp));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* Verify no reset is sent for the 3A sink only device. */
+	zassert_ok(emul_pdc_get_connector_reset(
+		fixture->emul_pdc[TEST_USBC_PORT0], &reset_cmd));
+	zassert_equal(0, reset_cmd.raw_value,
+		      "Sink only partner triggered reset again within 5s");
+
+	/* Disconnect non-DRP partner */
+	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+}
+>>>>>>> CHANGE (e0b335c4461b5d986d5004279cf414b160dc3c10 pdc: dpm: Hard reset sink-only devices after 15W allocation)
