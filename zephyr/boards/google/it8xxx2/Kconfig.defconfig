@@ -67,6 +67,9 @@ endif # SRAM_SIZE
 if RISCV_PMP
 configdefault PMP_DATA_EXECUTION_PREVENTION
 	default n
+
+configdefault PMP_NO_LOCK_GLOBAL
+	default y
 endif # RISCV_PMP
 
 endif # BOARD_IT8XXX2
