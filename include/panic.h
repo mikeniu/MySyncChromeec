@@ -139,10 +139,11 @@ void panic_data_write_assert(const char *path, unsigned int line);
  * Write panic data for a watchdog warning event.
  *
  * @param pc Program counter where execution was interrupted.
- * @param thread Thread pointer of the interrupted thread.
+ * @param lr Link register at the time of interruption.
+ * @param sp Stack pointer at the time of interruption.
  */
-void panic_data_write_watchdog_warning(uintptr_t pc,
-				       const struct k_thread *thread);
+void panic_data_write_watchdog_warning(uintptr_t pc, uintptr_t lr,
+				       uintptr_t sp);
 
 /**
  * Write panic data for a Zephyr fatal error without an ESF.
