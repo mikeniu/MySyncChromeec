@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ae6e34f_33f95173",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 918,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-09T10:00:02Z",
+      "side": 1,
+      "message": "That\u0027s right, it is not needed.",
+      "parentUuid": "1a22954b_444ff870",
+      "revId": "f93ba4bc230e376ddb0d5d9270e99aa08f3a6788",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe81d421_b50cafd5",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-08T18:52:31Z",
       "side": 1,
       "message": "Same comment as above",
+      "revId": "f93ba4bc230e376ddb0d5d9270e99aa08f3a6788",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b14a580_67cf9b2e",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-09T10:00:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe81d421_b50cafd5",
       "revId": "f93ba4bc230e376ddb0d5d9270e99aa08f3a6788",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

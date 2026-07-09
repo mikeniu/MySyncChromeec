@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "89611aa3_d88aad14",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-09T10:00:02Z",
+      "side": 1,
+      "message": "PDC will respond with DFP and UFP (depends on the version of the FW). Configuration for those will be added in the CL in the chain. Probably we need to add also some configuration mechanism for this, do you think storing this configuration in DT will be fine? The final goal is to send 3 SET_VDO and keep this configuration somewhere outside of the driver.",
+      "parentUuid": "aec5460f_53e4d635",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "65ed2293_1757456d",
         "filename": "include/usb_pd_vdo.h",
         "patchSetId": 18
@@ -67,6 +85,24 @@
       "writtenOn": "2026-07-08T18:52:31Z",
       "side": 1,
       "message": "From OOB discussion, the failure to compile `bool` in the coverage run is likely a Clang vs GCC standard library issue. Try including `stdbool.h`.",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f11fccd2_12d01901",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-09T10:00:02Z",
+      "side": 1,
+      "message": "I will try.",
+      "parentUuid": "65ed2293_1757456d",
       "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -155,6 +191,24 @@
       "side": 1,
       "message": "It looks like you just got rid of this function. Was this already being handled by `ST_PING_STATUS`?",
       "parentUuid": "d3f897f5_133b9ecd",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d987b1ca_c8220e18",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 1820,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-09T10:00:02Z",
+      "side": 1,
+      "message": "Correct. The way I checked it before was wrong, it was checking result of prev operation not mine, current solution looks good.",
+      "parentUuid": "ca1ab4e4_0f84ae19",
       "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
