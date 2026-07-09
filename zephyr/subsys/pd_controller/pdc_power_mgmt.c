@@ -1455,6 +1455,11 @@ static void trigger_ppm_ci(struct pdc_port_t *port)
 	if (!port->ppm_ci_cb)
 		return;
 
+	if (chipset_in_state(CHIPSET_STATE_ANY_SUSPEND)) {
+		LOG_DBG("C%d: Suppressing PPM CI during suspend", port_number);
+		return;
+	}
+
 	cci_event.connector_change = port_number + 1;
 	port->ppm_ci_cb->handler(port->dev, port->ppm_ci_cb, cci_event);
 }
