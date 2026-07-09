@@ -124,6 +124,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df14b4e3_6dc06be9",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-07-09T07:04:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ddc3cc67_08f76f06",
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "010dcd53_9f80b7f9",
