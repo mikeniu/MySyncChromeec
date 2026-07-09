@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "bb7b085b6fd53ee3f15f12d26c46098fe6620b21",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32a2af8c_ee80e6c4",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 2565,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-09T22:39:17Z",
+      "side": 1,
+      "message": "Use the lowercase `min()` instead of `MIN()`.  The lowercase `min()` is the safer version to use.  The uppercase `MIN()` evaluates both parameters twice, which can cause undesired side effects.",
+      "range": {
+        "startLine": 2565,
+        "startChar": 8,
+        "endLine": 2565,
+        "endChar": 11
+      },
+      "revId": "bb7b085b6fd53ee3f15f12d26c46098fe6620b21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
