@@ -16,6 +16,24 @@
       "message": "Assume the bug is found on realtek EC but penghu uses ITE EC. Put the same bug might lead misunderstanding. Could you explain why you prefer not using VW instead ?",
       "revId": "561406b7dc046042d5058f9fe062c2290e708e71",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01c42a6a_b44e41ee",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-09T16:20:13Z",
+      "side": 1,
+      "message": "Oh, I missed this. Good catch, Ivan. The bug I suggested wouldn\u0027t make sense here.",
+      "parentUuid": "32f68917_3748d031",
+      "revId": "561406b7dc046042d5058f9fe062c2290e708e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
