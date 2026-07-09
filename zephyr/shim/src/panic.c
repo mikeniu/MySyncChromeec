@@ -270,8 +270,7 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
 	/* Flush the panic data to RAM before potential reboot. */
 	sys_cache_data_flush_range(pdata, sizeof(*pdata));
 
-	/* Allow architecture specific logic */
-	arch_panic_set_reason(reason, info, exception);
+
 }
 
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
@@ -287,8 +286,24 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 	}
 }
 
-__overridable void arch_panic_set_reason(uint32_t reason, uint32_t info,
-					 uint8_t exception)
+uint32_t panic_get_legacy_reason(void)
 {
-	/* Default implementation, do nothing. */
+	const struct panic_data *const pdata = panic_get_data();
+
+	if (!pdata || pdata->arch != PANIC_ARCH) {
+		return 0;
+	}
+	return PANIC_REG_REASON(pdata);
+}
+
+void panic_update_legacy_reason(uint32_t reason)
+{
+	struct panic_data *const pdata = panic_get_data();
+
+	if (!pdata || pdata->arch != PANIC_ARCH)
+		return;
+
+	PANIC_REG_REASON(pdata) = reason;
+
+	sys_cache_data_flush_range(pdata, sizeof(*pdata));
 }

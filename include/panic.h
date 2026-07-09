@@ -134,11 +134,14 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
 
 #ifdef CONFIG_ZEPHYR
 /**
- * Zephyr utility for architecture specific logic to run when setting panic
- * reason.
+ * Retrieve the legacy reason code.
  */
-__override_proto void arch_panic_set_reason(uint32_t reason, uint32_t info,
-					    uint8_t exception);
+uint32_t panic_get_legacy_reason(void);
+
+/**
+ * Update the legacy reason code.
+ */
+void panic_update_legacy_reason(uint32_t reason);
 #endif /* CONFIG_ZEPHYR */
 
 /**
