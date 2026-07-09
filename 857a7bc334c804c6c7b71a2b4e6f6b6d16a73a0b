@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f302a34_b4741a62",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-09T01:03:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/eb119d0a-dd10-45b1-9bab-89a6057fd397)]\n\n### Review Summary\n**Functionality:** The CL correctly resets the fingerprint state in `fpsensor_before` by using the standard `fp_reset_and_clear_context()` API, which safely prevents state from leaking between test runs. This correctly addresses the test isolation issue.\n**Style:** The updated code adheres to style guidelines and leverages existing functions appropriately.\n**Security:** No security vulnerabilities were identified in this test-only change.\n**Testing:** This change itself is an improvement to the test infrastructure to prevent flaky tests by ensuring a clean context for each test case.",
+      "isAi": true,
+      "revId": "857a7bc334c804c6c7b71a2b4e6f6b6d16a73a0b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
