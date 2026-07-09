@@ -19,6 +19,27 @@
 #include "../power_signals.dtsi"
 #include "../temp_sensor.dts"
 
+/ {
+	cros_buttons: buttons {
+		compatible = "gpio-keys";
+		zephyr,suspend-action = "none";
+		power_button: pwrbtn-ec-in-n {
+			gpios = <MCHP_GPIO_DECODE_106 GPIO_ACTIVE_LOW>;
+			zephyr,code = <BUTTON_POWER>;
+		};
+		vol_up: vol-up-ec {
+			gpios = <MCHP_GPIO_DECODE_242 GPIO_ACTIVE_LOW>;
+			zephyr,code = <BUTTON_VOLUME_UP>;
+		};
+		vol_down: vol-downn-ec {
+			gpios = <MCHP_GPIO_DECODE_246 GPIO_ACTIVE_LOW>;
+			zephyr,code = <BUTTON_VOLUME_DOWN>;
+		};
+	};
+};
+
 &it8801_mfd {
 	irq-gpios = <MCHP_GPIO_DECODE_000 GPIO_ACTIVE_HIGH>;
 };
+
+/delete-node/ &int_power_button;
