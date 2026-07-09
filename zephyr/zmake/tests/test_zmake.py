@@ -42,7 +42,7 @@ class FakeProject:
             supported_toolchains=["host/llvm"],
             output_packer=zmake.output_packers.ElfPacker,
             project_dir=pathlib.Path("FakeProjectDir"),
-            signer=zmake.signers.NullSigner(),
+            signer=[zmake.signers.NullSigner()],
         )
         self.signer = self.config.signer
 
