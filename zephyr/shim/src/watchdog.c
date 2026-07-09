@@ -139,6 +139,48 @@ static int watchdog_init_device(const struct watchdog_info *info)
 	return chan;
 }
 
+void handle_watchdog_reset(void)
+{
+	struct panic_data *pdata;
+	uint32_t legacy_reason;
+
+	/*
+	 * Only update the panic info in RW since RO may have an older panic
+	 * data version and updating the panic reason will cause new fields to
+	 * be overwritten.
+	 */
+	if (!IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT) ||
+	    !IS_ENABLED(SECTION_IS_RW)) {
+		return;
+	}
+
+	pdata = panic_get_data();
+	legacy_reason = panic_get_legacy_reason();
+
+	/* If panic data is non-existent, record a hard watchdog */
+	if (!pdata) {
+		panic_record_hard_watchdog();
+	}
+	/* Finailze preliminary watchdog */
+	else if (pdata->arch == PANIC_ARCH_WATCHDOG &&
+		 pdata->wd.flags & WATCHDOG_PANIC_FLAG_PRELIMINARY) {
+		panic_finalize_preliminary_watchdog();
+	}
+	/* Handle legacy watchdog from RO */
+	else if (!(pdata->flags & PANIC_DATA_FLAG_RW_IMAGE) &&
+		 legacy_reason == PANIC_SW_WATCHDOG_WARN) {
+		panic_update_legacy_reason(PANIC_SW_WATCHDOG);
+	}
+	/* If panic data is stale, record a hard watchdog */
+	else if (pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD) {
+		panic_record_hard_watchdog();
+	}
+	/* Fallback to recording a hard watchdog */
+	else {
+		panic_record_hard_watchdog();
+	}
+}
+
 int watchdog_init(void)
 {
 	int err = EC_SUCCESS;
@@ -151,6 +193,9 @@ int watchdog_init(void)
 		if (wdt_chan[i] < 0 && err == EC_SUCCESS)
 			err = wdt_chan[i];
 	}
+
+	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG)
+		handle_watchdog_reset();
 
 	watchdog_initialized = true;
 	watchdog_reload();
@@ -229,6 +274,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id)
 {
 	uint32_t exception_address = 0;
+	uint32_t lr_address = 0;
 	const char *thread_name;
 	if (IS_ENABLED(CONFIG_THREAD_NAME)) {
 		thread_name = k_thread_name_get(k_current_get());
@@ -252,6 +298,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	       (void *)esf->basic.pc, (void *)esf->basic.lr, task_id,
 	       thread_name);
 	exception_address = esf->basic.pc;
+	lr_address = esf->basic.lr;
 #else
 	/* TODO(b/176523207): watchdog warning message */
 	printk("Watchdog deadline is close! TASK_ID:%d THREAD_NAME:%s\n",
@@ -271,11 +318,10 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	}
 
 	/* Save the current task id in panic info.
-	 * The PANIC_SW_WATCHDOG_WARN reason will be changed to a regular
-	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
-	 * occurs.
+	 * The preliminary flag will be cleared in system_common_pre_init
+	 * if a watchdog reset occurs.
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address, task_id);
+	panic_record_preliminary_watchdog(exception_address, lr_address);
 }
 
 __maybe_unused static void
