@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8114ca2_49004a21",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-07-09T17:18:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a11fd980_bfc5e5c6",
+      "revId": "31d3acfbc7de88b803fb3029ffea69202696794f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b030a54_a3e62168",
@@ -52,6 +70,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21a4a7b6_ed46ceb5",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-07-09T17:18:43Z",
+      "side": 1,
+      "message": "Updated the aliases to be more readable",
+      "parentUuid": "4b030a54_a3e62168",
+      "revId": "31d3acfbc7de88b803fb3029ffea69202696794f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2989b7a_2c64f3c7",
@@ -65,6 +101,24 @@
       "writtenOn": "2026-06-30T18:49:51Z",
       "side": 1,
       "message": "Nit: Now that there is a non-JBR TI variant, perhaps this test name and comment should be more explicit, like `test_three_port_ti_jbr`.",
+      "revId": "31d3acfbc7de88b803fb3029ffea69202696794f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ac7021c_b043b3aa",
+        "filename": "zephyr/test/atria/src/rvp_usbc_runtime_test.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-07-09T17:18:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2989b7a_2c64f3c7",
       "revId": "31d3acfbc7de88b803fb3029ffea69202696794f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
