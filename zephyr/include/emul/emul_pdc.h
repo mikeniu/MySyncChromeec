@@ -723,7 +723,7 @@ emul_pdc_connect_partner(const struct emul *target,
 
 static inline int emul_pdc_disconnect(const struct emul *target)
 {
-	union connector_status_t connector_status;
+	union connector_status_t connector_status = { 0 };
 	uint32_t partner_pdos[PDO_MAX_OBJECTS] = { 0 };
 
 	emul_pdc_set_pdos(target, SOURCE_PDO, PDO_OFFSET_0, PDO_MAX_OBJECTS,

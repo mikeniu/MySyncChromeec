@@ -4,6 +4,7 @@
  */
 
 #include "usb_pd.h"
+#include "usbc/pdc_dpm.h"
 #include "usbc/pdc_power_mgmt.h"
 
 #include <zephyr/device.h>
@@ -109,6 +110,9 @@ static void pdc_dpm_balance_source_ports(struct k_work *work)
 			max_current_claimed |= BIT(new_max_port);
 			pdc_power_mgmt_set_current_limit(new_max_port,
 							 TC_CURRENT_3_0A);
+			if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED))
+				pdc_dpm_tbt_check_reset(new_max_port);
+
 		} else if (non_pd_sink_max_requested & max_current_claimed) {
 			/* Always downgrade non-PD ports first */
 			int rem_non_pd = LOWEST_PORT(non_pd_sink_max_requested &
@@ -212,6 +216,8 @@ void pdc_dpm_eval_sink_fixed_pdo(int port, uint32_t vsafe5v_pdo)
 			return;
 
 		atomic_set_bit(&sink_max_pdo_requested, port);
+		if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED))
+			pdc_dpm_tbt_eval_sink_pdo(port, vsafe5v_pdo);
 	} else {
 		int frs_current = vsafe5v_pdo & PDO_FIXED_FRS_CURR_MASK;
 
@@ -291,6 +297,8 @@ void pdc_dpm_remove_sink(int port)
 
 	atomic_clear_bit(&sink_max_pdo_requested, port);
 	atomic_clear_bit(&non_pd_sink_max_requested, port);
+	if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED))
+		pdc_dpm_tbt_clear_port(port);
 
 	/* Restore selected default Rp on the port */
 	rp = pdc_power_mgmt_get_default_current_limit(port);

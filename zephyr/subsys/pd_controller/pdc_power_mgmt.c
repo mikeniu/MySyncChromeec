@@ -823,6 +823,8 @@ enum policy_src_attached_t {
 	SRC_POLICY_UPDATE_BATTERY_STATUS,
 	/** Update battery capability */
 	SRC_POLICY_UPDATE_BATTERY_CAPABILITY,
+	/** Hard Reset bus powered device */
+	SRC_POLICY_TBT_RESET,
 
 	/** SRC_POLICY_COUNT */
 	SRC_POLICY_COUNT
@@ -2184,6 +2186,14 @@ static void run_src_policies(struct pdc_port_t *port)
 					     SRC_POLICY_GET_RDO)) {
 		/* Get the RDO from the port partner */
 		queue_internal_cmd(port, CMD_PDC_GET_RDO);
+		return;
+	} else if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED) &&
+		   atomic_test_and_clear_bit(port->src_policy.flags,
+					     SRC_POLICY_TBT_RESET)) {
+		pdc_dpm_tbt_set_reset_ongoing(port_num);
+		port->connector_reset.raw_value = 0;
+		port->connector_reset.reset_type = PD_HARD_RESET;
+		queue_internal_cmd(port, CMD_PDC_CONNECTOR_RESET);
 		return;
 	} else if (atomic_test_and_clear_bit(port->src_policy.flags,
 					     SRC_POLICY_GET_SRC_CAPS)) {
@@ -5975,6 +5985,22 @@ pdc_power_mgmt_get_cable_prop(int port, union cable_property_t *cable_prop)
 	*cable_prop = pdc_data[port]->port.cable_prop;
 
 	return 0;
+}
+
+void pdc_power_mgmt_request_tbt_reset(int port_num)
+{
+	struct pdc_port_t *port;
+
+	if (!pdc_power_mgmt_is_pdc_port_valid(port_num)) {
+		return;
+	}
+
+	port = &pdc_data[port_num]->port;
+
+	if (!atomic_test_bit(port->src_policy.flags, SRC_POLICY_TBT_RESET)) {
+		atomic_set_bit(port->src_policy.flags, SRC_POLICY_TBT_RESET);
+		k_event_post(&port->sm_event, PDC_SM_EVENT);
+	}
 }
 
 __overridable enum usb_typec_current_t
