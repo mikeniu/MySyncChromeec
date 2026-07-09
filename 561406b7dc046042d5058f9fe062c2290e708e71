@@ -52,6 +52,23 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69f974d7_4cfff5a7",
+        "filename": "zephyr/program/atria/penghu/power_signals.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-09T19:50:54Z",
+      "side": 1,
+      "message": "If it worked for you to reuse `rvp_board_power.c`, then you should also be able to reuse `atria/power_signals.dtsi`. Note that the RVP code uses this but defines what pins are used under `atriarvp-rtk/`. You\u0027d do the same thing in this file. I\u0027m OK with that being in a follow-up CL.",
+      "revId": "561406b7dc046042d5058f9fe062c2290e708e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8d37f35_3ae25307",
