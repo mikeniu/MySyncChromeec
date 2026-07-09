@@ -333,6 +333,7 @@ _CROS_EC_C0_F_RF(EC_CMD_FLASH_SPI_INFO, flash_spi_info);
 _CROS_EC_C0_F_PF(EC_CMD_FORCE_LID_OPEN, force_lid_open);
 _CROS_EC_C0_F_PF(EC_CMD_FP_SEED, fp_seed);
 _CROS_EC_C0_F_PF_RF(EC_CMD_FP_MODE, fp_mode);
+_CROS_EC_CV_F_P_R(EC_CMD_FP_MODE, 1, fp_mode_v1, fp_mode_v1, fp_mode);
 _CROS_EC_C0_F_PF_RF(EC_CMD_FP_READ_MATCH_SECRET, fp_read_match_secret);
 _CROS_EC_C0_F_RF(EC_CMD_FP_ENC_STATUS, fp_encryption_status);
 _CROS_EC_C0_F_RF(EC_CMD_FP_STATS, fp_stats);
