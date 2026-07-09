@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "066fdff7_fd48d501",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-09T23:33:41Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Spellchecker: \"chek\" is a possible misspelling of \"check\".\n\nTo bypass Spellchecker, add a foot...\n\n\"chek\" is a possible misspelling of \"check\".\n\nTo bypass Spellchecker, add a footer with DISABLE_SPELLCHECKER",
+      "range": {
+        "startLine": 12,
+        "startChar": 5,
+        "endLine": 12,
+        "endChar": 9
+      },
+      "revId": "4453aa1303d376cbd6d3d9833e08e9f430903665",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
