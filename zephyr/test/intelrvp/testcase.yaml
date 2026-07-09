@@ -136,6 +136,7 @@ tests:
       - CONFIG_AP_EVENTS=n
       - CONFIG_TEST_AP_PWRSEQ_PP5500=y
       - CONFIG_EEPROM=y
+      - CONFIG_INPUT=y
 
   intelrvp.ptlrvp.board_id:
     extra_dtc_overlay_files:
@@ -155,6 +156,7 @@ tests:
       - CONFIG_CHIPSET_API_MOCK=y
       - CONFIG_AP_POWER_EVENTS_MOCK=y
       - CONFIG_POWER_SIGNALS_MOCK=y
+      - CONFIG_INPUT=y
 
   intelrvp.ptlrvp_mchp.pd_runtime_no_pdc:
     extra_dtc_overlay_files:
@@ -179,6 +181,7 @@ tests:
       - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
       - CONFIG_EMUL_PDC_RTS54=n
       - CONFIG_EMUL_PDC_TPS6699X=n
+      - CONFIG_INPUT=y
 
   intelrvp.ptlrvp_mchp.pd_runtime_no_runtime_pdc:
     extra_dtc_overlay_files:
@@ -202,6 +205,7 @@ tests:
       - CONFIG_AP_EVENTS=n
       - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
       - CONFIG_EMUL_PDC_RTS54=n
+      - CONFIG_INPUT=y
 
   intelrvp.ptlrvp_mchp.pd_runtime_no_ti_pdc:
     extra_dtc_overlay_files:
@@ -225,3 +229,4 @@ tests:
       - CONFIG_AP_EVENTS=n
       - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
       - CONFIG_EMUL_PDC_TPS6699X=n
+      - CONFIG_INPUT=y
