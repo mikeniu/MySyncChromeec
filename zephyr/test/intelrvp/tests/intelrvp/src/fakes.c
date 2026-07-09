@@ -20,8 +20,6 @@ DEFINE_FAKE_VALUE_FUNC(int, ioex_init, int);
 
 #if defined(CONFIG_TEST_PROJECT_PTLRVP_MCHP)
 DEFINE_FAKE_VALUE_FUNC(int, clock_get_freq);
-DEFINE_FAKE_VOID_FUNC(keyboard_raw_drive_column, int);
-DEFINE_FAKE_VALUE_FUNC(int, keyboard_raw_read_rows);
 
 #if defined(CONFIG_AP_PWRSEQ_S0IX)
 DEFINE_FAKE_VALUE_FUNC(int, x86_non_dsx_mtl_s0ix_run, void *);

@@ -18,7 +18,32 @@
 #include "../keyboard.dtsi"
 #include "../power_signals.dtsi"
 #include "../temp_sensor.dts"
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+	cros_buttons: buttons {
+		compatible = "gpio-keys";
+		zephyr,suspend-action = "none";
+		power_button: pwrbtn-ec-in-n {
+			gpios = <MCHP_GPIO_DECODE_106 GPIO_ACTIVE_LOW>;
+			zephyr,code = <INPUT_KEY_POWER>;
+		};
+		vol_up: vol-up-ec {
+			gpios = <MCHP_GPIO_DECODE_242 GPIO_ACTIVE_LOW>;
+			zephyr,code = <INPUT_KEY_VOLUMEUP>;
+		};
+		vol_down: vol-downn-ec {
+			gpios = <MCHP_GPIO_DECODE_246 GPIO_ACTIVE_LOW>;
+			zephyr,code = <INPUT_KEY_VOLUMEDOWN>;
+		};
+	};
+	cros_kb_raw: kb-raw-emul {
+		compatible = "cros-ec,kb-raw-emul";
+	};
+};
 
 &it8801_mfd {
 	irq-gpios = <MCHP_GPIO_DECODE_000 GPIO_ACTIVE_HIGH>;
 };
+
+/delete-node/ &int_power_button;

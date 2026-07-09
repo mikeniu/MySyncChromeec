@@ -2,8 +2,25 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+#include <zephyr/dt-bindings/input/input-event-codes.h>
 
 / {
+	cros_buttons: buttons {
+		compatible = "gpio-keys";
+		zephyr,suspend-action = "none";
+		power_button: pwrbtn-ec-in-n {
+			gpios = <MCHP_GPIO_DECODE_106 GPIO_ACTIVE_LOW>;
+			zephyr,code = <INPUT_KEY_POWER>;
+		};
+		vol_up: vol-up-ec {
+			gpios = <MCHP_GPIO_DECODE_242 GPIO_ACTIVE_LOW>;
+			zephyr,code = <INPUT_KEY_VOLUMEUP>;
+		};
+		vol_down: vol-downn-ec {
+			gpios = <MCHP_GPIO_DECODE_246 GPIO_ACTIVE_LOW>;
+			zephyr,code = <INPUT_KEY_VOLUMEDOWN>;
+		};
+	};
 	named-gpios {
 		compatible = "named-gpios";
 
@@ -222,24 +239,12 @@
 		cse_early_rec_sw: ec-cse-early-sw {
 			gpios = <MCHP_GPIO_DECODE_064 GPIO_ODR_LOW>;
 		};
-		pwrbtn: pwrbtn-ec-in-n {
-			gpios = <MCHP_GPIO_DECODE_106 GPIO_INPUT>;
-			enum-name = "GPIO_POWER_BUTTON_L";
-		};
 		en_pp3300_a: ec-pg3-r {
 			gpios = <MCHP_GPIO_DECODE_226 GPIO_OUTPUT_LOW>;
 			enum-name = "GPIO_EN_PP3300_A";
 		};
 		pm-pwrbtn-led {
 			gpios = <MCHP_GPIO_DECODE_241 GPIO_INPUT>;
-		};
-		vol_up_ec: vol-up-ec {
-			gpios = <MCHP_GPIO_DECODE_242 GPIO_INPUT>;
-			enum-name = "GPIO_VOLUME_UP_L";
-		};
-		vol_dn_ec: vol-downn-ec {
-			gpios = <MCHP_GPIO_DECODE_246 GPIO_INPUT>;
-			enum-name = "GPIO_VOLUME_DOWN_L";
 		};
 		m2-bt-led2-ec-n {
 			gpios = <MCHP_GPIO_DECODE_175 GPIO_INPUT>;
