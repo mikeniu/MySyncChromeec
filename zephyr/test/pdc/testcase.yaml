@@ -160,6 +160,17 @@ tests:
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
+  pdc.policy.tbt:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_USBC_PDC_TBT_SUPPORTED=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
   pdc.policy.no_3a_port:
     timeout: 300
     extra_configs:
