@@ -120,6 +120,54 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "29192ae4_f1afaf86",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-09T23:25:58Z",
+      "side": 1,
+      "message": "In patchset 2. this will only occur when allocating power to Sink-Only devices. So, there is no risk of resetting a source partners.",
+      "parentUuid": "71a02680_9a3f5800",
+      "range": {
+        "startLine": 77,
+        "startChar": 25,
+        "endLine": 77,
+        "endChar": 26
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f05a7dd9_88222d69",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-09T23:25:58Z",
+      "side": 1,
+      "message": "Hi Amara,  \nI\u0027ve updated the work-around to issue a hard reset after allocating 15A if the partner is Sink-Only. This should resolve the issue with the Lacie SSD.\n\nThere is no condition on cap mismatch, checking a few different SSDs locally it was not consistently being set. This still requires the partner to provide 5V/3A Sink Caps.",
+      "parentUuid": "3be3813b_2af35830",
+      "range": {
+        "startLine": 77,
+        "startChar": 1,
+        "endLine": 77,
+        "endChar": 33
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2271744a_5f6848ed",
         "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
         "patchSetId": 1
@@ -155,6 +203,30 @@
       "side": 1,
       "message": "Thanks, this is good feedback. I\u0027ll update the CL to conditionally set tbt_usb4_3a_reset",
       "parentUuid": "2271744a_5f6848ed",
+      "range": {
+        "startLine": 81,
+        "startChar": 2,
+        "endLine": 81,
+        "endChar": 54
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f081221_f91c7846",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-09T23:25:58Z",
+      "side": 1,
+      "message": "The blocking `pdc_power_mgmt_connector_reset` call is removed in patchset 2.",
+      "parentUuid": "00c56542_4b97062e",
       "range": {
         "startLine": 81,
         "startChar": 2,
