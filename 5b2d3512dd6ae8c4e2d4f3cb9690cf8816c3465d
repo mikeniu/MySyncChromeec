@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ddc3cc67_08f76f06",
+        "filename": "zephyr/program/atria/penghu/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-07-09T02:42:26Z",
+      "side": 1,
+      "message": "I think it is required if the topology is the same as moonstone that it has port with TBT and another port without TBT supported. Use the value returned from PDC is confusing so declare it explicitly.",
+      "parentUuid": "2e939da5_416951c8",
+      "revId": "5b2d3512dd6ae8c4e2d4f3cb9690cf8816c3465d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "010dcd53_9f80b7f9",
         "filename": "zephyr/program/atria/penghu/project.conf",
         "patchSetId": 4
