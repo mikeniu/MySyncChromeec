@@ -323,10 +323,9 @@ static int cros_flash_it8xxx2_erase(const struct device *dev, int offset,
 
 		offset += CONFIG_FLASH_ERASE_SIZE;
 		/*
-		 * If requested erase size is too large at one time on KGD
-		 * flash, we need to reload watchdog to prevent the reset.
+		 * We need to reload watchdog to prevent a reset.
 		 */
-		if (IS_ENABLED(CONFIG_WATCHDOG) && (size > 0x10000))
+		if (IS_ENABLED(CONFIG_WATCHDOG))
 			watchdog_reload();
 	}
 	/* Restore interrupts */
