@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b83ef411_214a8ec1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-10T16:30:21Z",
+      "side": 1,
+      "message": "@devin.lu@quantatw.com The build failed because you enabled the TBT config, but the TBT board functions aren\u0027t there. You should be able to reproduce this locally.\n\nIMO, the easiest way to reland this is to set the TBT config back to n and set `b-num-alt-modes` to 1 to be consistent. Only DPAM will be supported. You can leave a todo to enable TBT later.",
+      "revId": "263c9650b873a140483989d65ee50ccf8d56902b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
