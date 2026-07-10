@@ -26,11 +26,17 @@
 #define SPI_READ_111_FAST 0x0b
 #define SPI_READ_112_FAST 0x3b
 
-#define QSPI_STATUS_DONE (MCHP_QMSPI_STS_DONE | MCHP_QMSPI_STS_DMA_DONE)
+#define STS_DONE BIT(0)
+#define DMA_DONE BIT(1)
+#define STS_TXB_ERR BIT(2)
+#define STS_RXB_ERR BIT(3)
+#define STS_PROG_ERR BIT(4)
+#define STS_LDMA_RX_ERR BIT(5)
 
-#define QSPI_STATUS_ERR                                    \
-	(MCHP_QMSPI_STS_TXB_ERR | MCHP_QMSPI_STS_RXB_ERR | \
-	 MCHP_QMSPI_STS_PROG_ERR | MCHP_QMSPI_STS_LDMA_RX_ERR)
+#define QSPI_STATUS_DONE (STS_DONE | DMA_DONE)
+
+#define QSPI_STATUS_ERR \
+	(STS_TXB_ERR | STS_RXB_ERR | STS_PROG_ERR | STS_LDMA_RX_ERR)
 
 FUNC_NORETURN void __keep __attribute__((section(".code_in_sram2")))
 __start_qspi(uint32_t resetVectAddr)
@@ -41,7 +47,7 @@ __start_qspi(uint32_t resetVectAddr)
 	uint32_t qsts = 0;
 	uint32_t exeAddr = 0;
 
-	qspi->EXE = MCHP_QMSPI_EXE_START;
+	qspi->EXE = BIT(XEC_QSPI_EXE_STOP_POS);
 
 	qsts = qspi->STS;
 	while (!(qsts & QSPI_STATUS_DONE)) {
