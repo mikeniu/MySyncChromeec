@@ -16,6 +16,24 @@
       "message": "@",
       "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5dec1f9_c8d2872b",
+        "filename": "zephyr/shim/chip/mchp/system_download_from_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-10T08:46:29Z",
+      "side": 1,
+      "message": "@scott.worley@microchip.corp-partner.google.com there are missing defines in the [mec_qmspi.h](https://github.com/zephyrproject-rtos/zephyr/blob/main/soc/microchip/mec/common/reg/mec_qmspi.h) file. The [mec172x_qspi.h](https://github.com/zephyrproject-rtos/zephyr/blob/main/soc/microchip/mec/mec172x/reg/mec172x_qspi.h) is never included anymore and probably should be removed as other ones in this [CL](https://chromium-review.git.corp.google.com/c/chromiumos/third_party/zephyrproject/+/8071708/1)",
+      "parentUuid": "ee4a044e_9eef7f05",
+      "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
