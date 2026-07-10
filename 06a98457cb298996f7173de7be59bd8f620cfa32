@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8073cdbe_a080fa61",
+        "filename": "zephyr/program/bluey/mica/src/chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-07-10T09:10:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be0e6e76_ae1cedb2",
+      "range": {
+        "startLine": 13,
+        "startChar": 3,
+        "endLine": 13,
+        "endChar": 4
+      },
+      "revId": "06a98457cb298996f7173de7be59bd8f620cfa32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8eebd32a_1228853d",
@@ -49,6 +73,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "644260d5_b04586ea",
+        "filename": "zephyr/program/bluey/mica/src/chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-07-10T09:10:10Z",
+      "side": 1,
+      "message": "After discussion, the power fail LED diagnostic time is for 10 minutes, so it is modified to disable PP5000 over 10 minutes after hard off.",
+      "parentUuid": "8eebd32a_1228853d",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 61,
+        "endChar": 65
+      },
+      "revId": "06a98457cb298996f7173de7be59bd8f620cfa32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c0c9fffc_8435e30f",
         "filename": "zephyr/program/bluey/mica/src/led.c",
         "patchSetId": 9
@@ -60,6 +108,30 @@
       "writtenOn": "2026-07-09T08:02:38Z",
       "side": 1,
       "message": "It is currently used as `bool`, so make it `bool`. We can extend it to `int8_t` later if needed.",
+      "range": {
+        "startLine": 19,
+        "startChar": 7,
+        "endLine": 19,
+        "endChar": 13
+      },
+      "revId": "06a98457cb298996f7173de7be59bd8f620cfa32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "319f2c64_b49e86ca",
+        "filename": "zephyr/program/bluey/mica/src/led.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-07-10T09:10:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0c9fffc_8435e30f",
       "range": {
         "startLine": 19,
         "startChar": 7,
