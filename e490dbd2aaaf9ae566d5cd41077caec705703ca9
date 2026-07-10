@@ -16,6 +16,29 @@
       "message": "Hi @keithshort@chromium.org/ @honscheid@google.com, Please review the changes and provide feedback.",
       "revId": "e490dbd2aaaf9ae566d5cd41077caec705703ca9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85fb1076_c01e5397",
+        "filename": "zephyr/test/drivers/board_id_intel_rvp/boards/native_sim.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-10T17:24:29Z",
+      "side": 1,
+      "message": "Add a comment that these settings must match test test code.",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 36
+      },
+      "revId": "e490dbd2aaaf9ae566d5cd41077caec705703ca9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
