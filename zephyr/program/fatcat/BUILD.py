@@ -75,6 +75,7 @@ def register_realtek_project(
     extra_kconfig_files=(),
     boards=None,
     extra_modules=(),
+    snippets=None,
 ):
     """Register an realtek_ec based variant of fatcat."""
     if boards is None:
@@ -96,6 +97,7 @@ def register_realtek_project(
         ],
         modules=["cmsis_6", "ec", *extra_modules],
         boards=boards,
+        snippets=snippets,
     )
 
 
@@ -156,6 +158,7 @@ register_realtek_project(
     project_name="lapis",
     extra_kconfig_files=[],
     extra_modules=["google-private", "pigweed", "nanopb"],
+    snippets=["pw-tokenize"],
 )
 
 register_it8xxx2_project(
