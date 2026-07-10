@@ -22,6 +22,30 @@
       },
       "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e72e6b0d_33ba4526",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-07-10T02:46:34Z",
+      "side": 1,
+      "message": "Yes this is intended they share the same i2c address",
+      "parentUuid": "82674093_dc005b33",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 64
+      },
+      "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
