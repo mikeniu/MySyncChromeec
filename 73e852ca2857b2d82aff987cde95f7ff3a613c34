@@ -46,6 +46,30 @@
       },
       "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af134486_086d28a2",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-10T22:27:53Z",
+      "side": 1,
+      "message": "This needs a comment.  It is confusing to follow.  I also recommend that you create a `DEV_PDC_C2_TI_HBR` symbol for clarity.",
+      "parentUuid": "e72e6b0d_33ba4526",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 64
+      },
+      "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
