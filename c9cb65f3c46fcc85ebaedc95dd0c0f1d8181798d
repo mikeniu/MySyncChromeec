@@ -33,6 +33,24 @@
       "message": "[Gerrit AI Review] This is a great improvement for latency metrics. However, if both `FP_MODE_FINGER_DOWN` and `FP_MODE_ANY_CAPTURE` are set, the `EC_MKBP_FP_FINGER_DOWN` event will be sent twice (once at line 406 and once here). While `send_mkbp_event` is technically idempotent for the bitmask, it will trigger two separate MKBP interrupts to the host. Consider checking if it was already sent in this iteration to avoid redundant interrupts.",
       "revId": "c9cb65f3c46fcc85ebaedc95dd0c0f1d8181798d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e27649c8_c9c75578",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-12T02:20:55Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "dc6dfa09_6cdbbd80",
+      "revId": "c9cb65f3c46fcc85ebaedc95dd0c0f1d8181798d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
