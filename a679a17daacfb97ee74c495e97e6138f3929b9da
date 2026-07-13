@@ -187,6 +187,30 @@
       },
       "revId": "a679a17daacfb97ee74c495e97e6138f3929b9da",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "171b061c_76249a68",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-13T23:04:07Z",
+      "side": 1,
+      "message": "Please add a test for this scenario.",
+      "parentUuid": "8a6bef67_a8a85cbe",
+      "range": {
+        "startLine": 513,
+        "startChar": 0,
+        "endLine": 513,
+        "endChar": 50
+      },
+      "revId": "a679a17daacfb97ee74c495e97e6138f3929b9da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
