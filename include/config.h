@@ -599,6 +599,14 @@
 #undef CONFIG_BATTERY_CUT_OFF
 
 /*
+ * Support battery wakeup cut-off as host command and console command.
+ *
+ * Once defined, you have to implement a board_wakeup_cut_off_battery() function
+ * in board/???/battery.c file.
+ */
+#undef CONFIG_BATTERY_WAKEUP_CUT_OFF
+
+/*
  * The default delay is 1 second. Define this if a board prefers
  * different delay.
  */
