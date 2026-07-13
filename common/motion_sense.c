@@ -30,6 +30,9 @@
 #include "system.h"
 #include "tablet_mode.h"
 #include "task.h"
+
+#include <zephyr/kernel.h>
+extern const k_tid_t MOTIONSENSE;
 #include "timer.h"
 #include "util.h"
 
@@ -742,7 +745,7 @@ static int motion_sense_process(struct motion_sensor_t *sensor, uint32_t *event,
 	int has_data_read = 0;
 	int sensor_num = sensor - motion_sensors;
 
-	ASSERT(task_get_current() == TASK_ID_MOTIONSENSE);
+	ASSERT(k_current_get() == MOTIONSENSE);
 
 	if (*event & TASK_EVENT_MOTION_ODR_CHANGE) {
 		const int sensor_bit = 1 << sensor_num;
