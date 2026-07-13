@@ -9,12 +9,10 @@
 # See Makefile for description.
 host-util-bin-cxx-y += ectool
 host-util-bin-cxx-y += ec_parse_panicinfo
-host-util-bin-cxx-y += lbplay
 host-util-bin-cxx-y += stm32mon
 ifneq ($(findstring -fsanitize=,$(HOST_CXXFLAGS)),-fsanitize=)
 host-util-bin-cxx-y += stm32mon_static
 endif
-host-util-bin-cxx-y += lbcc
 host-util-bin-cxx-y += iteflash
 host-util-bin-cxx-y += itecomdbgr
 host-util-bin-cxx-y += cbi-util
