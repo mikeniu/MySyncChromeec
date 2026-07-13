@@ -52,6 +52,24 @@
       "parentUuid": "b83ef411_214a8ec1",
       "revId": "263c9650b873a140483989d65ee50ccf8d56902b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4eed6bbd_81afce2c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-07-13T01:29:55Z",
+      "side": 1,
+      "message": "Hi @alevkoy@chromium.org I\u0027d like to align this configuration with Moonstone for now. If anything turns out to be incorrect, we can address it in follow-up CLs.",
+      "parentUuid": "a914a563_b7bebf16",
+      "revId": "263c9650b873a140483989d65ee50ccf8d56902b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
