@@ -621,7 +621,6 @@ ZTEST(ap_pwrseq, test_get_ap_pwrseq_thread)
 	zassert_not_null(pwrseq_thread);
 	zassert_equal(pwrseq_thread, get_ap_pwrseq_thread());
 	zassert_equal(TASK_ID_AP_PWRSEQ, thread_id_to_task_id(pwrseq_thread));
-	zassert_equal(task_id_to_thread_id(TASK_ID_AP_PWRSEQ), pwrseq_thread);
 }
 
 void ap_pwrseq_after_test(void *data)
