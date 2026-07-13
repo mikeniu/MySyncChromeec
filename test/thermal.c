@@ -478,50 +478,6 @@ static int test_several_limits(void)
 	return EC_SUCCESS;
 }
 
-/* Tests for ncp15wb thermistor ADC-to-temp calculation */
-#define LOW_ADC_TEST_VALUE 887 /* 0 C */
-#define HIGH_ADC_TEST_VALUE 100 /* > 100C */
-
-static int test_ncp15wb_adc_to_temp(void)
-{
-	int i;
-	uint8_t temp;
-	uint8_t new_temp;
-
-	/* ADC value to temperature table, data from datasheet */
-	struct {
-		int adc;
-		int temp;
-	} adc_temp_datapoints[] = {
-		{ 615, 30 }, { 561, 35 }, { 508, 40 },
-		{ 407, 50 }, { 315, 60 }, { 243, 70 },
-		{ 186, 80 }, { 140, 90 }, { 107, 100 },
-	};
-
-	/*
-	 * Verify that calculated temp is decreasing for entire ADC range,
-	 * and that a tick down in ADC value results in no more than 1C
-	 * decrease.
-	 */
-	i = LOW_ADC_TEST_VALUE;
-	temp = ncp15wb_calculate_temp(i);
-
-	while (--i > HIGH_ADC_TEST_VALUE) {
-		new_temp = ncp15wb_calculate_temp(i);
-		TEST_ASSERT(new_temp == temp || new_temp == temp + 1);
-		temp = new_temp;
-	}
-
-	/* Verify several datapoints are within 1C accuracy */
-	for (i = 0; i < ARRAY_SIZE(adc_temp_datapoints); ++i) {
-		temp = ncp15wb_calculate_temp(adc_temp_datapoints[i].adc);
-		ASSERT(temp >= adc_temp_datapoints[i].temp - 1 &&
-		       temp <= adc_temp_datapoints[i].temp + 1);
-	}
-
-	return EC_SUCCESS;
-}
-
 #define THERMISTOR_SCALING_FACTOR 13
 static int test_thermistor_linear_interpolate(void)
 {
@@ -636,7 +592,6 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_one_limit);
 	RUN_TEST(test_several_limits);
 
-	RUN_TEST(test_ncp15wb_adc_to_temp);
 	RUN_TEST(test_thermistor_linear_interpolate);
 	test_print_result();
 }

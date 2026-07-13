@@ -52,17 +52,6 @@ struct thermistor_info {
 int thermistor_linear_interpolate(uint16_t mv,
 				  const struct thermistor_info *info);
 
-#ifdef CONFIG_THERMISTOR_NCP15WB
-/**
- * ncp15wb temperature conversion routine.
- *
- * @param adc	10bit raw data on adc.
- *
- * @return	temperature in C.
- */
-int ncp15wb_calculate_temp(uint16_t adc);
-#endif /* CONFIG_THERMISTOR_NCP15WB */
-
 #ifdef CONFIG_STEINHART_HART_3V3_13K7_47K_4050B
 /**
  * Reads the specified ADC channel and uses a lookup table and interpolation to
