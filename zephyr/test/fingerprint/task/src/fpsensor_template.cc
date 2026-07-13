@@ -64,6 +64,11 @@ static const uint8_t fake_rollback_entropy[] = "some_rollback_entropy";
 	{ 0x5f6d5f69, 0x61665f61, 0x755f656b, 0x5f726573, \
 	  0x755f6469, 0x5f646573, 0x5f726f66, 0x74736574 }
 
+/* Alternate numeric patterns for UserID testing */
+#define FAKE_USER_ID_ALT                                  \
+	{ 0x11111111, 0x22222222, 0x33333333, 0x44444444, \
+	  0x55555555, 0x66666666, 0x77777777, 0x88888888 }
+
 /*
  * How to manually encrypt a template
  *
@@ -1469,6 +1474,49 @@ ZTEST_USER(fpsensor_template,
 
 	/* Rate-limit sleep required between encryption requests. */
 	k_sleep(K_SECONDS(1));
+}
+
+ZTEST_USER(fpsensor_template, test_fp_context_get_result_blocks_swap)
+{
+	struct ec_params_fp_context_v1 fp_context_params = {
+		.action = FP_CONTEXT_GET_RESULT,
+		.userid = FAKE_USER_ID_ALT,
+	};
+
+	/* Prerequisite state: a User ID must already be active and locked. */
+	zassert_true(global_context.fp_encryption_status &
+		     FP_CONTEXT_USER_ID_SET);
+
+	/*
+	 * Verify that changing the active User ID out-of-band triggers a
+	 * security violation enforcement inside fp_command_context() and
+	 * returns EC_RES_ACCESS_DENIED, regardless of session auth status.
+	 */
+	zassert_equal(EC_RES_ACCESS_DENIED,
+		      ec_cmd_fp_context_v1(NULL, &fp_context_params),
+		      "Context modification mid-session should be blocked");
+}
+
+ZTEST_USER(fpsensor_template,
+	   test_fp_context_get_result_allows_idempotent_retry)
+{
+	struct ec_params_fp_context_v1 fp_context_params = {
+		.action = FP_CONTEXT_GET_RESULT,
+		.userid = FAKE_USER_ID, /* Exact same user ID */
+	};
+
+	/* Prerequisite state: a User ID must already be active. */
+	zassert_true(global_context.fp_encryption_status &
+		     FP_CONTEXT_USER_ID_SET);
+
+	/*
+	 * Verify that executing FP_CONTEXT_GET_RESULT with the SAME user ID
+	 * succeeds (idempotent retry), ensuring AP IPC timeouts do not break
+	 * the state machine.
+	 */
+	zassert_equal(EC_RES_SUCCESS,
+		      ec_cmd_fp_context_v1(NULL, &fp_context_params),
+		      "Idempotent context retries should be allowed");
 }
 
 static void *fpsensor_setup(void)
