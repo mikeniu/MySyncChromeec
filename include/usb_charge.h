@@ -90,6 +90,10 @@ int usb_charge_set_mode(int usb_port_id, enum usb_charge_mode mode,
 #define TASK_ID_TO_USB_CHG_PORT(id) 0
 #endif /* HAS_TASK_USB_CHG_P0 */
 
+#include <zephyr/kernel.h>
+int usb_chg_port_from_thread(k_tid_t thread);
+#define CURRENT_USB_CHG_PORT() usb_chg_port_from_thread(k_current_get())
+
 /**
  * Returns true if the passed port is a power source.
  *

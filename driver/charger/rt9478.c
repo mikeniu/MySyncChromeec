@@ -49,10 +49,7 @@
 #define CONFIG_CHARGER_RT9478_IDCHG_TH2 1
 #endif
 
-#if !defined(CONFIG_ZEPHYR) && \
-	!defined(CONFIG_CHARGER_RT9478_PKPWR_TOVLD_DEG_CUSTOM)
-#define CONFIG_CHARGER_RT9478_PKPWR_TOVLD_DEG 0
-#endif
+
 
 #ifndef CONFIG_CHARGER_RT9478_IAICR2_CUSTOM
 /* Reduce IAICR2 from default of 150% to 110% */
@@ -124,12 +121,14 @@
  * performance mode when the AP is in S0. Performance mode is active whenever AC
  * power is connected or when the EN_LPWR bit in ChargeOption0 is clear.
  */
+enum rt9478_requester {
+	R9478_REQ_ADC,
+	R9478_REQ_INIT,
+	R9478_REQ_CHIPSET,
+	R9478_REQ_COUNT
+};
 static uint32_t rt9478_perf_mode_req;
-#ifdef CONFIG_ZEPHYR
-static mutex_t rt9478_perf_mode_mutex;
-#else
 static K_MUTEX_DEFINE(rt9478_perf_mode_mutex);
-#endif /* CONFIG_ZEPHYR */
 
 /*
  * 10mOhm sense resistor, there is 100mA offset at code 0.
@@ -189,7 +188,8 @@ static inline enum ec_error_list raw_write16(int chgnum, int offset, int value)
 			   chg_chips[chgnum].i2c_addr_flags, offset, value);
 }
 
-static int rt9478_set_low_power_mode(int chgnum, bool enable)
+static int rt9478_set_low_power_mode(int chgnum, bool enable,
+				     enum rt9478_requester req)
 {
 	int rv;
 	int reg;
@@ -206,9 +206,9 @@ static int rt9478_set_low_power_mode(int chgnum, bool enable)
 	 * means disabling performance mode and vice versa.
 	 */
 	if (enable)
-		rt9478_perf_mode_req &= ~BIT(task_get_current());
+		rt9478_perf_mode_req &= ~BIT(req);
 	else
-		rt9478_perf_mode_req |= BIT(task_get_current());
+		rt9478_perf_mode_req |= BIT(req);
 	enable = !rt9478_perf_mode_req;
 
 	reg = SET_CO0(EN_LPWR, enable, reg);
@@ -245,7 +245,7 @@ static int rt9478_adc_start(int chgnum, int adc_en_mask)
 		return EC_ERROR_UNKNOWN;
 
 	/* Exit low power mode so ADC conversion takes typical time */
-	if (rt9478_set_low_power_mode(chgnum, false))
+	if (rt9478_set_low_power_mode(chgnum, false, R9478_REQ_ADC))
 		return EC_ERROR_UNKNOWN;
 
 	/*
@@ -271,7 +271,7 @@ static int rt9478_adc_start(int chgnum, int adc_en_mask)
 		 (reg & RT_FIELD_MASK(RT9478, ADC_OPTION, ADC_START)));
 
 	/* ADC reading attempt complete, go back to low power mode */
-	if (rt9478_set_low_power_mode(chgnum, mode))
+	if (rt9478_set_low_power_mode(chgnum, mode, R9478_REQ_ADC))
 		return EC_ERROR_UNKNOWN;
 
 	if (rv)
@@ -521,7 +521,7 @@ static void rt9478_init(int chgnum)
 	 */
 	if (!system_jumped_late() && battery_is_present() == BP_YES &&
 	    (battery_get_disconnect_state() == BATTERY_NOT_DISCONNECTED)) {
-		rv = rt9478_set_low_power_mode(chgnum, false);
+		rv = rt9478_set_low_power_mode(chgnum, false, R9478_REQ_INIT);
 		/* Allow enough time for VDDA to be powered */
 		crec_msleep(RT9478_VDDA_STARTUP_DELAY_MSEC);
 
@@ -544,7 +544,7 @@ static void rt9478_init(int chgnum)
 				    vsys);
 		}
 		/* Reenable low power mode */
-		rt9478_set_low_power_mode(chgnum, true);
+		rt9478_set_low_power_mode(chgnum, true, R9478_REQ_INIT);
 	}
 
 	rt9478_init_charge_option_1(chgnum);
@@ -904,19 +904,11 @@ static int rt9478_ramp_get_current_limit(int chgnum)
 }
 #endif /* CONFIG_CHARGE_RAMP_HW */
 
-#ifdef CONFIG_ZEPHYR
-static void init_mutex(void)
-{
-	k_mutex_init(&rt9478_perf_mode_mutex);
-}
-DECLARE_HOOK(HOOK_INIT, init_mutex, HOOK_PRIO_FIRST);
-#endif
-
 #ifdef CONFIG_CHARGER_RT9478_IDCHG_LIMIT_MA
 /* Called on AP S5 -> S3  and S3/S0iX -> S0 transition */
 static void rt9478_chipset_startup(void)
 {
-	rt9478_set_low_power_mode(CHARGER_SOLO, false);
+	rt9478_set_low_power_mode(CHARGER_SOLO, false, R9478_REQ_CHIPSET);
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, rt9478_chipset_startup, HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, rt9478_chipset_startup, HOOK_PRIO_DEFAULT);
