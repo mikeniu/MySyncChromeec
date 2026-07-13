@@ -975,7 +975,7 @@ void fusb302_tcpc_alert(int port)
 
 	if (interrupt & TCPC_REG_INTERRUPT_BC_LVL) {
 		/* CC Status change */
-		task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_CC);
+		task_set_event(pd_port_to_thread_id(port), PD_EVENT_CC);
 	}
 
 	if (interrupt & TCPC_REG_INTERRUPT_COLLISION) {
@@ -993,7 +993,7 @@ void fusb302_tcpc_alert(int port)
 		if (!fusb302_tcpm_check_vbus_level(port, VBUS_PRESENT))
 			pd_vbus_low(port);
 #endif
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 		hook_notify(HOOK_AC_CHANGE);
 	}
 #endif
@@ -1022,7 +1022,7 @@ void fusb302_tcpc_alert(int port)
 
 		/* bring FUSB302 out of reset */
 		fusb302_pd_reset(port);
-		task_set_event(PD_PORT_TO_TASK_ID(port),
+		task_set_event(pd_port_to_thread_id(port),
 			       PD_EVENT_RX_HARD_RESET);
 	}
 

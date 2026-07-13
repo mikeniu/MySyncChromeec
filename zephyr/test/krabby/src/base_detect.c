@@ -39,7 +39,7 @@ static void set_signal_state(enum power_state state)
 
 	/* reset is_held flag */
 	is_held = false;
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 	k_sleep(K_SECONDS(1));
 }
 

@@ -926,16 +926,16 @@ int pe_is_explicit_contract(int port)
 void pe_message_received(int port)
 {
 	/* This should only be called from the PD task */
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	PE_SET_FLAG(port, PE_FLAGS_MSG_RECEIVED);
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	task_wake(pd_port_to_thread_id(port));
 }
 
 void pe_hard_reset_sent(int port)
 {
 	/* This should only be called from the PD task */
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	PE_CLR_FLAG(port, PE_FLAGS_HARD_RESET_PENDING);
 }
@@ -943,7 +943,7 @@ void pe_hard_reset_sent(int port)
 void pe_got_hard_reset(int port)
 {
 	/* This should only be called from the PD task */
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	/*
 	 * If we're in the middle of an FRS, any error should cause us to follow
@@ -988,7 +988,7 @@ test_mockable void pd_got_frs_signal(int port)
 	else
 		pd_set_error_recovery(port);
 
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	task_wake(pd_port_to_thread_id(port));
 }
 #endif /* CONFIG_USB_PD_REV30 */
 
@@ -1009,7 +1009,7 @@ static void pe_set_frs_enable(int port, int enable)
 
 	/* This should only be called from the PD task */
 	if (!IS_ENABLED(TEST_BUILD))
-		ASSERT_CURRENT_TASK_IS_PD(port);
+		ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	if (!IS_ENABLED(CONFIG_USB_PD_FRS) || !IS_ENABLED(CONFIG_USB_PD_REV30))
 		return;
@@ -1278,7 +1278,7 @@ static bool pe_check_outgoing_discard(int port)
 void pe_report_error(int port, enum pe_error e, enum tcpci_msg_type type)
 {
 	/* This should only be called from the PD task */
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	/*
 	 * If there is a timeout error while waiting for a chunk of a chunked
@@ -1326,7 +1326,7 @@ void pe_report_error(int port, enum pe_error e, enum tcpci_msg_type type)
 	    (pe_in_frs_mode(port) &&
 	     get_state_pe(port) == PE_PRS_SNK_SRC_SEND_SWAP)) {
 		PE_SET_FLAG(port, PE_FLAGS_PROTOCOL_ERROR);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 		return;
 	}
 
@@ -1364,7 +1364,7 @@ void pe_report_error(int port, enum pe_error e, enum tcpci_msg_type type)
 void pe_got_soft_reset(int port)
 {
 	/* This should only be called from the PD task */
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	/*
 	 * The PE_SRC_Soft_Reset state Shall be entered from any state when a
@@ -1443,7 +1443,7 @@ void pd_dpm_request(int port, enum pd_dpm_request req)
 void pe_vconn_swap_complete(int port)
 {
 	/* This should only be called from the PD task */
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	PE_SET_FLAG(port, PE_FLAGS_VCONN_SWAP_COMPLETE);
 }
@@ -1451,7 +1451,7 @@ void pe_vconn_swap_complete(int port)
 void pe_ps_reset_complete(int port)
 {
 	/* This should only be called from the PD task */
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	PE_SET_FLAG(port, PE_FLAGS_PS_RESET_COMPLETE);
 }
@@ -1459,10 +1459,10 @@ void pe_ps_reset_complete(int port)
 void pe_message_sent(int port)
 {
 	/* This should only be called from the PD task */
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	PE_SET_FLAG(port, PE_FLAGS_TX_COMPLETE);
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	task_wake(pd_port_to_thread_id(port));
 }
 
 void pd_send_vdm(int port, uint32_t vid, int cmd, const uint32_t *data,
@@ -1492,7 +1492,7 @@ void pd_send_vdm(int port, uint32_t vid, int cmd, const uint32_t *data,
 	pe[port].tx_type = TCPCI_MSG_SOP;
 	pd_dpm_request(port, DPM_REQUEST_VDM);
 
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	task_wake(pd_port_to_thread_id(port));
 }
 
 #ifdef TEST_BUILD
@@ -3573,7 +3573,7 @@ static void pe_snk_evaluate_capability_entry(int port)
 
 #ifdef HAS_TASK_DPS
 	/* Wake DPS task to evaluate the SrcCaps */
-	task_wake(TASK_ID_DPS);
+	task_wake(DPS);
 #endif
 }
 

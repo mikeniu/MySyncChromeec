@@ -78,16 +78,16 @@ int usb_charge_set_mode(int usb_port_id, enum usb_charge_mode mode,
 #define USB_CHG_EVENT_MUX USB_CHARGER_EVENT_BIT(6)
 
 /*
- * Define USB_CHG_PORT_TO_TASK_ID() and TASK_ID_TO_USB_CHG_PORT() macros to
- * go between USB_CHG port number and task ID. Assume that TASK_ID_USB_CHG_P0,
+ * Define USB_CHG_PORT_TO_TASK_ID() and TO_USB_CHG_PORT() macros to
+ * go between USB_CHG port number and task ID. Assume that USB_CHG_P0,
  * is the lowest task ID and IDs are on a continuous range.
  */
 #ifdef HAS_TASK_USB_CHG_P0
-#define USB_CHG_PORT_TO_TASK_ID(port) (TASK_ID_USB_CHG_P0 + (port))
-#define TASK_ID_TO_USB_CHG_PORT(id) ((id) - TASK_ID_USB_CHG_P0)
+#define USB_CHG_PORT_TO_TASK_ID(port) (USB_CHG_P0 + (port))
+#define TO_USB_CHG_PORT(id) ((id) - USB_CHG_P0)
 #else
 #define USB_CHG_PORT_TO_TASK_ID(port) -1 /* stub task ID */
-#define TASK_ID_TO_USB_CHG_PORT(id) 0
+#define TO_USB_CHG_PORT(id) 0
 #endif /* HAS_TASK_USB_CHG_P0 */
 
 /**

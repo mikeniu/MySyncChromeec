@@ -508,7 +508,7 @@ static void it8801_ioex_event_handler(void)
 	/* Wake the keyboard scan task if KSI interrupts are triggered */
 	if (IS_ENABLED(CONFIG_KEYBOARD_DISCRETE) &&
 	    data & IT8801_REG_MASK_GISR_GKSIIS)
-		task_wake(TASK_ID_KEYSCAN);
+		task_wake(KEYSCAN);
 
 	/*
 	 * Trigger the GPIO callback functions if the GPIO interrupts are
