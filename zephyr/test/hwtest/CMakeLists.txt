@@ -70,5 +70,5 @@ if(${CONFIG_HW_TEST_EXCEPTION})
   set(ZEPHYR_CURRENT_LIBRARY ec_shim)
 endif()
 
-zephyr_library_sources_ifdef(CONFIG_MOCK_ROLLBACK ${PLATFORM_EC}/common/mock/rollback_mock.c)
-zephyr_library_sources_ifdef(CONFIG_MOCK_OTP ${PLATFORM_EC}/common/mock/otpi_mock.c)
+zephyr_library_sources_ifdef(CONFIG_MOCK_ROLLBACK ${PLATFORM_EC}/test/mock/rollback_mock.c)
+zephyr_library_sources_ifdef(CONFIG_MOCK_OTP ${PLATFORM_EC}/test/mock/otpi_mock.c)
