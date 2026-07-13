@@ -410,6 +410,8 @@
 		default_battery: lgc_ac17a8m {
 			compatible = "lgc,ac17a8m", "battery-smart";
 			has_manuf_info;
+			wakeup_ship_mode_reg_addr = <0x00>;
+			wakeup_ship_mode_reg_data = <0x0010 0x0010>;
 		};
 		ap16l5j {
 			compatible = "panasonic,ap16l5j", "battery-smart";

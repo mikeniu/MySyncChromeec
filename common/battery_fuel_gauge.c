@@ -361,6 +361,42 @@ int board_cut_off_battery(void)
 
 	return rv ? EC_RES_ERROR : EC_RES_SUCCESS;
 }
+
+/**
+ * Battery wakeup cut off command via SMBus write word.
+ *
+ * @param wakeup_ship_mode		Battery wakeup ship mode information
+ * @return non-zero if error
+ */
+static int wakeup_cut_off_battery_sb_write(
+	const struct wakeup_ship_mode_info *wakeup_ship_mode)
+{
+	int rv;
+
+	/* wakeup ship mode command requires writing 2 data values */
+	rv = sb_write(wakeup_ship_mode->reg_addr,
+		      wakeup_ship_mode->reg_data[0]);
+	if (rv)
+		return rv;
+
+	return sb_write(wakeup_ship_mode->reg_addr,
+			wakeup_ship_mode->reg_data[1]);
+}
+
+int board_wakeup_cutoff_battery(void)
+{
+	const struct board_batt_params *params = get_batt_params();
+	int rv;
+
+	/* If battery is unknown can't send wakeup ship mode command */
+	if (!params)
+		return EC_RES_ERROR;
+
+	rv = wakeup_cut_off_battery_sb_write(
+		&params->fuel_gauge.wakeup_ship_mode);
+
+	return rv ? EC_RES_ERROR : EC_RES_SUCCESS;
+}
 #endif /* !CONFIG_FUEL_GAUGE */
 
 #ifndef TEST_BATTERY_CONFIG
@@ -445,6 +481,15 @@ test_mockable int battery_is_charge_fet_disabled(void)
  * the battery is able to provide power and thus prevent a brownout when the
  * AP is powered on by the EC.
  */
+/*
+ * Total number of wakeup ship mode commands sent since the battery was
+ * last seen disconnected. This function is called from many places
+ * (charge state machine, PD, charger/PPC drivers, ...), so the wakeup
+ * command is sent at most once per call and the total number of attempts
+ * is capped, instead of looping on every call.
+ */
+static int wakeup_cutoff_attempts;
+
 enum battery_disconnect_state battery_get_disconnect_state(void)
 {
 	const struct board_batt_params *params = get_batt_params();
@@ -465,8 +510,19 @@ enum battery_disconnect_state battery_get_disconnect_state(void)
 			params->fuel_gauge.fet.reg_addr, reg,
 			params->fuel_gauge.fet.reg_mask,
 			params->fuel_gauge.fet.disconnect_val);
+
+		if (IS_ENABLED(CONFIG_BATTERY_WAKEUP_CUT_OFF) &&
+		    wakeup_cutoff_attempts <
+			    CONFIG_BATTERY_WAKEUP_CUT_OFF_COUNT) {
+			wakeup_cutoff_attempts++;
+			board_wakeup_cutoff_battery();
+		}
+
 		return BATTERY_DISCONNECTED;
 	}
+
+	/* Battery is awake again, allow a new set of wakeup attempts */
+	wakeup_cutoff_attempts = 0;
 
 	return BATTERY_NOT_DISCONNECTED;
 }
