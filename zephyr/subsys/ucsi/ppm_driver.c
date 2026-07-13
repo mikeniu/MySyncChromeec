@@ -244,6 +244,7 @@ static int ucsi_ppm_execute_cmd_sync(const struct device *device,
 	case UCSI_GET_PD_MESSAGE:
 	case UCSI_GET_ATTENTION_VDO:
 	case UCSI_GET_CAM_CS:
+	case UCSI_GET_LPM_PPM_INFO:
 	case UCSI_SET_CCOM:
 	case UCSI_SET_UOR:
 	case UCSI_SET_PDR:
