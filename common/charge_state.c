@@ -948,7 +948,7 @@ DECLARE_HOOK(HOOK_INIT, charger_init, HOOK_PRIO_DEFAULT);
 
 void charge_wakeup(void)
 {
-	task_wake(TASK_ID_CHARGER);
+	task_wake(CHARGER);
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, charge_wakeup, HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_AC_CHANGE, charge_wakeup, HOOK_PRIO_DEFAULT);

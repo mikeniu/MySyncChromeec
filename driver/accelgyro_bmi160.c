@@ -507,7 +507,7 @@ void bmi160_interrupt(enum gpio_signal signal)
 {
 	last_interrupt_timestamp = __hw_clock_source_read();
 
-	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ACCELGYRO_BMI160_INT_EVENT);
+	task_set_event(MOTIONSENSE, CONFIG_ACCELGYRO_BMI160_INT_EVENT);
 }
 
 /**
@@ -706,7 +706,7 @@ static int init(struct motion_sensor_t *s)
 		 * Clean interrupt event that may have occurred while the
 		 * BMI160 was in management mode.
 		 */
-		task_set_event(TASK_ID_MOTIONSENSE,
+		task_set_event(MOTIONSENSE,
 			       CONFIG_ACCELGYRO_BMI160_INT_EVENT);
 	}
 #endif

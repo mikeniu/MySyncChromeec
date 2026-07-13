@@ -50,7 +50,7 @@ void test_chipset_on(void)
 	if (chipset_in_state(CHIPSET_STATE_ON))
 		return;
 	power_on_req = 1;
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 }
 
 void test_chipset_off(void)
@@ -58,7 +58,7 @@ void test_chipset_off(void)
 	if (chipset_in_state(CHIPSET_STATE_ANY_OFF))
 		return;
 	power_off_req = 1;
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 }
 
 test_mockable void chipset_task(void)

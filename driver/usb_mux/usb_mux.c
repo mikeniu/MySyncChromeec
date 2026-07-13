@@ -72,7 +72,7 @@ enum mux_config_type {
 
 /* Define a USB mux task ID for the purpose of linking */
 #ifndef HAS_TASK_USB_MUX
-#define TASK_ID_USB_MUX TASK_ID_INVALID
+#define USB_MUX NULL
 #endif
 
 /*
@@ -134,6 +134,7 @@ static int init_mux_mutex(void)
 
 	for (port = 0; port < CONFIG_USB_PD_PORT_MAX_COUNT; port++) {
 		k_mutex_init(&mux_lock[port]);
+		k_sem_init(&ack_sem[port], 0, 1);
 
 		if (IS_ENABLED(HAS_TASK_USB_MUX))
 			k_mutex_init(&queue_lock[port]);
@@ -169,7 +170,7 @@ mux_task_enqueue(int port, int index, enum mux_config_type type,
 	if (queue_add_unit(&mux_queue[port], &new_entry) == 0)
 		CPRINTS("Error: Dropping port %d mux %d", port, type);
 	else
-		task_wake(TASK_ID_USB_MUX);
+		task_wake(USB_MUX);
 
 	mutex_unlock(&queue_lock[port]);
 }
@@ -190,15 +191,6 @@ static void init_queue_structs(void)
 }
 #ifndef CONFIG_PDC_POWER_MGMT_USB_MUX
 DECLARE_HOOK(HOOK_INIT, init_queue_structs, HOOK_PRIO_FIRST);
-static void init_usb_mux_sems(void)
-{
-	int i;
-
-	for (i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
-		k_sem_init(&ack_sem[i], 0, 1);
-	}
-}
-DECLARE_HOOK(HOOK_INIT, init_usb_mux_sems, HOOK_PRIO_FIRST);
 #else
 static int queue_structs_sys_init(void)
 {
@@ -523,7 +515,7 @@ void usb_mux_init(int port)
 		if (queue_add_unit(&mux_queue[port], &new_entry) == 0)
 			CPRINTS("Error: Dropping port %d mux init", port);
 		else
-			task_wake(TASK_ID_USB_MUX);
+			task_wake(USB_MUX);
 
 		mutex_unlock(&queue_lock[port]);
 	} else {

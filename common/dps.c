@@ -90,7 +90,7 @@ test_export_static void dps_enable(bool en)
 	is_enabled = en;
 
 	if (is_enabled && !prev_en) {
-		task_wake(TASK_ID_DPS);
+		task_wake(DPS);
 	}
 
 	if (!is_enabled) {
@@ -560,7 +560,7 @@ void check_battery_present(void)
 
 	if (batt->is_present == BP_YES && (flag & DPS_FLAG_NO_BATTERY)) {
 		atomic_clear_bits(&flag, DPS_FLAG_NO_BATTERY);
-		task_wake(TASK_ID_DPS);
+		task_wake(DPS);
 	}
 }
 DECLARE_HOOK(HOOK_BATTERY_SOC_CHANGE, check_battery_present, HOOK_PRIO_DEFAULT);
