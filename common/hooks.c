@@ -165,7 +165,7 @@ int hook_call_deferred(const struct deferred_data *data, int us)
 
 		/* Wake task so it can re-sleep for the proper time */
 		if (hook_task_started)
-			task_wake(TASK_ID_HOOKS);
+			task_wake(HOOKS);
 	}
 
 	return EC_SUCCESS;

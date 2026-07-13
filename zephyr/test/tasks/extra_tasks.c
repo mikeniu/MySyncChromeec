@@ -4,7 +4,6 @@
  */
 
 #include "host_command.h"
-
 #include "task.h"
 #include "zephyr_console_shim.h"
 
@@ -74,7 +73,6 @@ ZTEST_USER(extra_tasks, test_hostcmd_thread_mapping)
 	zassert_equal(main_thread, get_main_thread());
 	zassert_not_equal(main_thread, hostcmd_thread);
 
-
 #else
 	main_thread = get_main_thread();
 	zassert_not_null(main_thread);
@@ -119,6 +117,5 @@ ZTEST_USER(extra_tasks, test_shell_thread_to_task_mapping)
 	zassert_not_null(shell_thread);
 	zassert_equal(shell_thread, get_shell_thread());
 }
-
 
 ZTEST_SUITE(extra_tasks, NULL, NULL, NULL, NULL, NULL);

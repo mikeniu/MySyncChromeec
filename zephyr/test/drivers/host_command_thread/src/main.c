@@ -44,7 +44,7 @@ static void fake_main_thread(void *a, void *b, void *c)
 K_THREAD_STACK_DEFINE(fake_main_thread_stack, 4000);
 
 /* Override get_hostcmd_thread() from shim/src/tasks.c so
- * task_get_current() returns TASK_ID_HOSTCMD when fake main thread
+ * task_get_current() returns HOSTCMD when fake main thread
  * is running.
  */
 k_tid_t get_hostcmd_thread(void)

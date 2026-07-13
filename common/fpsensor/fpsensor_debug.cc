@@ -283,13 +283,13 @@ static int command_fpenroll(int argc, const char **argv)
 		/* wait for finger release between captures */
 		global_context.sensor_mode = FP_MODE_ENROLL_SESSION |
 					     FP_MODE_FINGER_UP;
-		task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
+		task_set_event(FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
 		while (tries-- &&
 		       global_context.sensor_mode & FP_MODE_FINGER_UP)
 			crec_usleep(20 * MSEC);
 	}
 	global_context.sensor_mode = 0; /* reset FP_MODE_ENROLL_SESSION */
-	task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
+	task_set_event(FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
 
 	return rc;
 }

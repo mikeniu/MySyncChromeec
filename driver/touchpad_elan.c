@@ -825,7 +825,7 @@ void touchpad_interrupt(enum gpio_signal signal)
 {
 	irq_ts = __hw_clock_source_read();
 
-	task_wake(TASK_ID_TOUCHPAD);
+	task_wake(TOUCHPAD);
 }
 
 /* Make a decision on touchpad power, based on USB and tablet mode status. */
@@ -876,7 +876,7 @@ void touchpad_task(void *u)
 #if defined(CONFIG_USB_SUSPEND) || defined(CONFIG_TABLET_MODE)
 static void touchpad_power_change(void)
 {
-	task_set_event(TASK_ID_TOUCHPAD, TASK_EVENT_POWER);
+	task_set_event(TOUCHPAD, TASK_EVENT_POWER);
 }
 #endif
 #ifdef CONFIG_USB_SUSPEND

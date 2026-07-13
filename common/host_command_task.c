@@ -164,7 +164,7 @@ void host_command_received(struct host_cmd_handler_args *args)
 		pending_args = args;
 
 		/* Wake up the task to handle the command */
-		task_set_event(TASK_ID_HOSTCMD, TASK_EVENT_CMD_PENDING);
+		task_set_event(HOSTCMD, TASK_EVENT_CMD_PENDING);
 		return;
 	}
 

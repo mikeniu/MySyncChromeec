@@ -87,7 +87,7 @@ static inline void pm_policy_state_all_lock_put(void)
 /* Interrupt line from the fingerprint sensor */
 extern "C" void fps_event(enum gpio_signal signal)
 {
-	task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_SENSOR_IRQ);
+	task_set_event(FPSENSOR, TASK_EVENT_SENSOR_IRQ);
 }
 
 static void send_mkbp_event(uint32_t event)

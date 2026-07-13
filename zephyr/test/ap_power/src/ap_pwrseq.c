@@ -8,8 +8,6 @@
 #include "ap_power_host_sleep.h"
 #include "chipset.h"
 #include "ec_commands.h"
-
-
 #include "emul/emul_power_signals.h"
 #include "host_command.h"
 #include "lpc.h"

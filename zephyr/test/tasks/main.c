@@ -94,19 +94,19 @@ static void *tasks_setup(void)
 ZTEST(test_task_shim, test_set_event_before_task_start)
 {
 	/* Send event before tasks start */
-	task_set_event(TASK_ID_TASK_1, 0xAAAA);
+	task_set_event(TASK_1, 0xAAAA);
 
 	run_test(set_event_before_task_start1, set_event_before_task_start2);
 }
 
 static void task_get_current1(void)
 {
-	zassert_equal(task_get_current(), TASK_ID_TASK_1, "ID matches");
+	zassert_equal(k_current_get(), TASK_1, "ID matches");
 }
 
 static void task_get_current2(void)
 {
-	zassert_equal(task_get_current(), TASK_ID_TASK_2, "ID matches");
+	zassert_equal(k_current_get(), TASK_2, "ID matches");
 }
 
 ZTEST(test_task_shim, test_task_get_current)
@@ -166,7 +166,7 @@ static void timer_task_1(void)
 	timer_timeout.val = timer_armed_at.val + TASK_SEC(2);
 
 	task3_entry_func = check_timer;
-	zassert_equal(timer_arm(timer_timeout, TASK_ID_TASK_3), EC_SUCCESS,
+	zassert_equal(timer_arm(timer_timeout, TASK_3), EC_SUCCESS,
 		      "Setting timer should succeed");
 }
 
@@ -199,7 +199,7 @@ static void event_delivered2(void)
 {
 	k_sleep(K_SECONDS(5));
 
-	task_set_event(TASK_ID_TASK_1, 0x1234);
+	task_set_event(TASK_1, 0x1234);
 }
 
 ZTEST(test_task_shim, test_event_delivered)
@@ -209,7 +209,7 @@ ZTEST(test_task_shim, test_event_delivered)
 
 static void event_mask_not_delivered1(void)
 {
-	task_set_event(TASK_ID_TASK_2, 0x007F);
+	task_set_event(TASK_2, 0x007F);
 }
 
 static void event_mask_not_delivered2(void)
@@ -235,7 +235,7 @@ static void event_mask_extra1(void)
 {
 	k_sleep(K_SECONDS(1));
 
-	task_set_event(TASK_ID_TASK_2, 0x00FF);
+	task_set_event(TASK_2, 0x00FF);
 }
 
 static void event_mask_extra2(void)
@@ -264,9 +264,9 @@ static void empty_set_mask1(void)
 	 * It is generally invalid to set a 0 event, but this simulates a race
 	 * condition and exercises fallback code in task_wait_event
 	 */
-	task_set_event(TASK_ID_TASK_2, 0);
+	task_set_event(TASK_2, 0);
 	k_sleep(K_SECONDS(1));
-	task_set_event(TASK_ID_TASK_2, 0x1234);
+	task_set_event(TASK_2, 0x1234);
 }
 
 static void empty_set_mask2(void)
@@ -279,7 +279,6 @@ static void empty_set_mask2(void)
 	zassert_within(end_ms - start_ms, 2000, 100, "Timeout for 2 seconds");
 }
 
-
 ZTEST(test_task_shim, test_empty_set_mask)
 {
 	run_test(&empty_set_mask1, &empty_set_mask2);
@@ -290,7 +289,6 @@ static int pre_kernel(void)
 {
 	zassert_false(pre_kernel_ran);
 	zassert_true(k_is_pre_kernel());
-	zassert_equal(TASK_ID_INVALID, task_get_current());
 	zassert_false(in_deferred_context());
 	pre_kernel_ran = true;
 	return 0;
@@ -307,7 +305,7 @@ static int post_kernel(void)
 {
 	zassert_false(post_kernel_ran);
 	zassert_false(k_is_pre_kernel());
-	zassert_equal(TASK_ID_MAIN, task_get_current());
+	zassert_equal(MAIN, k_current_get());
 	post_kernel_ran = true;
 	return 0;
 }

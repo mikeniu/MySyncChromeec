@@ -139,7 +139,7 @@ static void cros_kb_raw_xec_ksi_isr(const void *arg)
 	ARG_UNUSED(arg);
 	kb_raw_xec_clr_src();
 	/* Wake-up keyboard scan task */
-	task_wake(TASK_ID_KEYSCAN);
+	task_wake(KEYSCAN);
 }
 
 void keyboard_raw_init(void)

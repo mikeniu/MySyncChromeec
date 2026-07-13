@@ -22,6 +22,8 @@ LOG_MODULE_REGISTER(task_shim, LOG_LEVEL_INF);
 
 #include <soc.h>
 
+#undef HOSTCMD
+
 #define SAFE_THREAD_NAME(tid)                                           \
 	((tid) && k_thread_name_get((tid)) ? k_thread_name_get((tid)) : \
 					     "(unknown)")
@@ -38,7 +40,6 @@ CROS_EC_TASK_LIST
 #undef CROS_EC_TASK
 #undef TASK_TEST
 
-/* Statically declare all threads here */
 #define CROS_EC_TASK(name, entry, parameter, stack_size, priority, options) \
 	K_THREAD_DEFINE(name, stack_size, entry, parameter, NULL, NULL,     \
 			EC_TASK_PRIORITY(priority), options, SYS_FOREVER_MS);
@@ -52,43 +53,80 @@ struct task_ctx_base_data {
 	struct k_poll_signal new_event;
 	/** The current platform/ec events set for this task/thread */
 	atomic_t event_mask;
+	/** Task timer structure */
+	struct k_timer timer;
 };
 
-/*
- * Create a mapping from the cros-ec task ID to the Zephyr thread.
- */
-#undef CROS_EC_TASK
-#define CROS_EC_TASK(_name, _entry, _parameter, _size, _prio, _options) _name,
-#ifdef TEST_BUILD
-static k_tid_t task_to_k_tid[TASK_ID_COUNT] = {
-#else
-const static k_tid_t task_to_k_tid[TASK_ID_COUNT] = {
-#endif
-	CROS_EC_TASK_LIST
-};
-
-static struct task_ctx_base_data shimmed_tasks_data[TASK_ID_COUNT];
-static struct task_ctx_base_data extra_tasks_data[EXTRA_TASK_COUNT];
-/* Task timer structures. Keep separate from the context ones to avoid memory
- * holes due to int64_t fields in struct _timeout.
- */
-static struct k_timer shimmed_tasks_timers[TASK_ID_COUNT + EXTRA_TASK_COUNT];
-
-static int tasks_started;
+#define CROS_EC_TASK(name, ...) +1
+#define TASK_TEST(name, ...) CROS_EC_TASK(name)
+enum { SHIMMED_TASK_COUNT = 0 CROS_EC_TASK_LIST };
 #undef CROS_EC_TASK
 #undef TASK_TEST
 
-static struct task_ctx_base_data *task_get_base_data(task_id_t cros_task_id)
+#define EXTRA_TASK_IDX(name) EXTRA_TASK_IDX_##name,
+enum { CROS_EC_EXTRA_TASKS(EXTRA_TASK_IDX) EXTRA_TASK_IDX_COUNT };
+#undef EXTRA_TASK_IDX
+
+static struct task_ctx_base_data shimmed_tasks_data[SHIMMED_TASK_COUNT];
+static struct task_ctx_base_data extra_tasks_data[EXTRA_TASK_COUNT];
+
+static const k_tid_t shimmed_task_tids[] = {
+#define CROS_EC_TASK(name, ...) name,
+#define TASK_TEST(name, ...) CROS_EC_TASK(name)
+	CROS_EC_TASK_LIST
+#undef CROS_EC_TASK
+#undef TASK_TEST
+		NULL
+};
+
+static int tasks_started;
+
+test_export_static k_tid_t get_idle_thread(void);
+test_export_static k_tid_t get_sysworkq_thread(void);
+
+#define get_HOSTCMD_thread_local() get_hostcmd_thread()
+#define get_MAIN_thread_local() get_main_thread()
+#define get_SYSWORKQ_thread_local() get_sysworkq_thread()
+#define get_IDLE_thread_local() get_idle_thread()
+#define get_SHELL_thread_local() get_shell_thread()
+#define get_AP_PWRSEQ_thread_local() get_ap_pwrseq_thread()
+
+#ifdef TEST_BUILD
+static struct task_ctx_base_data test_runner_data;
+#endif
+
+static struct task_ctx_base_data *find_extra_base_data(k_tid_t thread)
 {
-	if (cros_task_id >= TASK_ID_COUNT + EXTRA_TASK_COUNT) {
+#define CHECK_EXTRA_TASK(name)                                   \
+	if (get_##name##_thread_local() == thread) {             \
+		return &extra_tasks_data[EXTRA_TASK_IDX_##name]; \
+	}
+	CROS_EC_EXTRA_TASKS(CHECK_EXTRA_TASK)
+#undef CHECK_EXTRA_TASK
+#ifdef TEST_BUILD
+	if (get_test_runner_tid() && get_test_runner_tid() == thread) {
+		return &test_runner_data;
+	}
+#endif
+	return NULL;
+}
+
+static struct task_ctx_base_data *find_base_data_by_search(k_tid_t thread)
+{
+	for (size_t i = 0; i < SHIMMED_TASK_COUNT; ++i) {
+		if (shimmed_task_tids[i] == thread) {
+			return &shimmed_tasks_data[i];
+		}
+	}
+	return find_extra_base_data(thread);
+}
+
+static inline struct task_ctx_base_data *task_get_base_data(k_tid_t thread)
+{
+	if (thread == NULL) {
 		return NULL;
 	}
-
-	if (cros_task_id >= TASK_ID_COUNT) {
-		return &extra_tasks_data[cros_task_id - TASK_ID_COUNT];
-	}
-
-	return &shimmed_tasks_data[cros_task_id];
+	return find_base_data_by_search(thread);
 }
 
 test_export_static k_tid_t get_idle_thread(void)
@@ -122,7 +160,7 @@ test_mockable k_tid_t get_hostcmd_thread(void)
 	return get_main_thread();
 #else
 #ifndef CONFIG_EC_HOST_CMD
-	return task_to_k_tid[TASK_ID_HOSTCMD];
+	return HOSTCMD;
 #else
 	const struct ec_host_cmd *hc = ec_host_cmd_get_hc();
 
@@ -134,73 +172,20 @@ test_mockable k_tid_t get_hostcmd_thread(void)
 	return NULL;
 }
 
-task_id_t thread_id_to_task_id(k_tid_t thread_id)
-{
-	if (thread_id == NULL) {
-		__ASSERT(false, "Invalid thread_id");
-		return TASK_ID_INVALID;
-	}
-
-	if (get_sysworkq_thread() == thread_id) {
-		return TASK_ID_SYSWORKQ;
-	}
-
-#ifdef HAS_TASK_HOSTCMD
-	if (get_hostcmd_thread() == thread_id) {
-		return TASK_ID_HOSTCMD;
-	}
-#endif /* HAS_TASK_HOSTCMD */
-
-#ifdef HAS_TASK_MAIN
-	if (get_main_thread() == thread_id) {
-		return TASK_ID_MAIN;
-	}
-#endif /* HAS_TASK_MAIN */
-
-	if (get_idle_thread() == thread_id) {
-		return TASK_ID_IDLE;
-	}
-
-	if (get_shell_thread() == thread_id) {
-		return TASK_ID_SHELL;
-	}
-
-#ifdef CONFIG_AP_PWRSEQ
-	if (get_ap_pwrseq_thread() == thread_id) {
-		return TASK_ID_AP_PWRSEQ;
-	}
-#endif /* CONFIG_AP_PWRSEQ */
-
-	for (size_t i = 0; i < TASK_ID_COUNT; ++i) {
-		if (task_to_k_tid[i] == thread_id) {
-			return i;
-		}
-	}
-
-	if (thread_id->base.thread_state & _THREAD_DUMMY) {
-		return TASK_ID_INVALID;
-	}
-
-	LOG_ERR("Failed to map thread to task: thread_id=%p, name=%s",
-		thread_id, SAFE_THREAD_NAME(thread_id));
-
-	return TASK_ID_INVALID;
-}
-
-atomic_t *task_get_event_bitmap(task_id_t cros_task_id)
+atomic_t *task_get_event_bitmap(k_tid_t thread)
 {
 	struct task_ctx_base_data *data;
 
-	data = task_get_base_data(cros_task_id);
+	data = task_get_base_data(thread);
 
 	return data == NULL ? NULL : &data->event_mask;
 }
 
-void task_set_event(task_id_t cros_task_id, uint32_t event)
+void task_set_event(k_tid_t thread, uint32_t event)
 {
 	struct task_ctx_base_data *data;
 
-	data = task_get_base_data(cros_task_id);
+	data = task_get_base_data(thread);
 
 	if (data != NULL) {
 		atomic_or(&data->event_mask, event);
@@ -210,9 +195,7 @@ void task_set_event(task_id_t cros_task_id, uint32_t event)
 
 uint32_t task_wait_event(int timeout_us)
 {
-	struct task_ctx_base_data *data;
-
-	data = task_get_base_data(thread_id_to_task_id(k_current_get()));
+	struct task_ctx_base_data *data = task_get_base_data(k_current_get());
 
 	__ASSERT_NO_MSG(data != NULL);
 
@@ -257,9 +240,8 @@ uint32_t task_wait_event(int timeout_us)
 
 uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 {
-	struct task_ctx_base_data *data;
-
-	data = task_get_base_data(thread_id_to_task_id(k_current_get()));
+	struct task_ctx_base_data *data = task_get_base_data(k_current_get());
+	__ASSERT_NO_MSG(data != NULL);
 
 	uint32_t events = 0;
 	const int64_t tick_deadline =
@@ -304,45 +286,60 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
  */
 static void timer_expire(struct k_timer *timer_id)
 {
-	task_id_t cros_ec_task_id = timer_id - shimmed_tasks_timers;
+	struct task_ctx_base_data *data =
+		CONTAINER_OF(timer_id, struct task_ctx_base_data, timer);
 
-	task_set_event(cros_ec_task_id, TASK_EVENT_TIMER);
+	atomic_or(&data->event_mask, TASK_EVENT_TIMER);
+	k_poll_signal_raise(&data->new_event, 0);
 }
 
-int timer_arm(timestamp_t event, task_id_t cros_ec_task_id)
+int timer_arm(timestamp_t event, k_tid_t thread)
 {
-	struct k_timer *timer;
+	struct task_ctx_base_data *data = task_get_base_data(thread);
 	timestamp_t now = get_time();
 
-	timer = &shimmed_tasks_timers[cros_ec_task_id];
+	if (!data)
+		return EC_ERROR_INVAL;
 
 	if (event.val <= now.val) {
 		/* Timer requested for now or in the past, fire right away */
-		task_set_event(cros_ec_task_id, TASK_EVENT_TIMER);
+		atomic_or(&data->event_mask, TASK_EVENT_TIMER);
+		k_poll_signal_raise(&data->new_event, 0);
 		return EC_SUCCESS;
 	}
 
 	/* Check for a running timer */
-	if (k_timer_remaining_get(timer))
+	if (k_timer_remaining_get(&data->timer))
 		return EC_ERROR_BUSY;
 
-	k_timer_start(timer, K_USEC(event.val - now.val), K_NO_WAIT);
+	k_timer_start(&data->timer, K_USEC(event.val - now.val), K_NO_WAIT);
 	return EC_SUCCESS;
 }
 
-void timer_cancel(task_id_t cros_ec_task_id)
+void timer_cancel(k_tid_t thread)
 {
-	struct k_timer *timer;
+	struct task_ctx_base_data *data = task_get_base_data(thread);
 
-	timer = &shimmed_tasks_timers[cros_ec_task_id];
-
-	k_timer_stop(timer);
+	if (data) {
+		k_timer_stop(&data->timer);
+	}
 }
 
 #ifdef TEST_BUILD
+static k_tid_t test_runner_tid;
+
 void set_test_runner_tid(void)
 {
-	task_to_k_tid[TASK_ID_TEST_RUNNER] = k_current_get();
+	k_tid_t current = k_current_get();
+
+	k_poll_signal_init(&test_runner_data.new_event);
+	k_timer_init(&test_runner_data.timer, timer_expire, NULL);
+	test_runner_tid = current;
+}
+
+const k_tid_t get_test_runner_tid(void)
+{
+	return test_runner_tid;
 }
 
 #ifdef CONFIG_TASKS_SET_TEST_RUNNER_TID_RULE
@@ -361,19 +358,11 @@ ZTEST_RULE(set_test_runner_tid, set_test_runner_tid_rule_before, NULL);
 
 void start_ec_tasks(void)
 {
-	for (size_t i = 0; i < TASK_ID_COUNT + EXTRA_TASK_COUNT; ++i) {
-		k_timer_init(&shimmed_tasks_timers[i], timer_expire, NULL);
-	}
-
-	for (size_t i = 0; i < TASK_ID_COUNT; ++i) {
-#ifdef TEST_BUILD
-		/* The test runner thread is automatically started. */
-		if (i == TASK_ID_TEST_RUNNER) {
-			continue;
-		}
-#endif
-		k_thread_start(task_to_k_tid[i]);
-	}
+#define CROS_EC_TASK(name, ...) k_thread_start(name);
+#define TASK_TEST(name, ...) CROS_EC_TASK(name)
+	CROS_EC_TASK_LIST
+#undef CROS_EC_TASK
+#undef TASK_TEST
 
 	tasks_started = 1;
 }
@@ -385,10 +374,14 @@ void start_ec_tasks(void)
  */
 int init_signals(void)
 {
-	for (size_t i = 0; i < TASK_ID_COUNT + EXTRA_TASK_COUNT; ++i) {
-		struct task_ctx_base_data *const data = task_get_base_data(i);
+	for (size_t i = 0; i < SHIMMED_TASK_COUNT; ++i) {
+		k_poll_signal_init(&shimmed_tasks_data[i].new_event);
+		k_timer_init(&shimmed_tasks_data[i].timer, timer_expire, NULL);
+	}
 
-		k_poll_signal_init(&data->new_event);
+	for (size_t i = 0; i < EXTRA_TASK_COUNT; ++i) {
+		k_poll_signal_init(&extra_tasks_data[i].new_event);
+		k_timer_init(&extra_tasks_data[i].timer, timer_expire, NULL);
 	}
 
 	return 0;
@@ -399,14 +392,6 @@ int task_start_called(void)
 {
 	return tasks_started;
 }
-/*
- * TODO(b/190203712): Implement this
- * LCOV_EXCL_START
- */
-void task_disable_task(task_id_t tskid)
-{
-}
-/* LCOV_EXCL_STOP */
 
 /*
  * This function cannot be tested since it is architecture specific.
@@ -448,27 +433,39 @@ inline bool in_deferred_context(void)
 }
 
 #ifdef CONFIG_USB_PD_PORT_MAX_COUNT
+k_tid_t pd_port_to_thread_id(int port)
+{
+	switch (port) {
+#ifdef HAS_TASK_PD_C0
+	case 0:
+		return PD_C0;
+#endif
+#ifdef HAS_TASK_PD_C1
+	case 1:
+		return PD_C1;
+#endif
+#ifdef HAS_TASK_PD_C2
+	case 2:
+		return PD_C2;
+#endif
+#ifdef HAS_TASK_PD_C3
+	case 3:
+		return PD_C3;
+#endif
+	default:
+		return NULL;
+	}
+}
+
 int pd_port_from_thread(k_tid_t thread)
 {
 #ifdef HAS_TASK_PD_C0
 	for (int i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
-		if (task_to_k_tid[PD_PORT_TO_TASK_ID(i)] == thread) {
+		if (pd_port_to_thread_id(i) == thread) {
 			return i;
 		}
 	}
 #endif
 	return -1;
-}
-
-k_tid_t pd_port_to_task_id(int port)
-{
-	if (port < 0 || port >= CONFIG_USB_PD_PORT_MAX_COUNT) {
-		return NULL;
-	}
-#ifdef HAS_TASK_PD_C0
-	return task_to_k_tid[PD_PORT_TO_TASK_ID(port)];
-#else
-	return NULL;
-#endif
 }
 #endif /* CONFIG_USB_PD_PORT_MAX_COUNT */

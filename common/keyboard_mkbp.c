@@ -127,7 +127,7 @@ static void set_keyscan_config(const struct ec_mkbp_config *src,
 	 */
 	if ((new_flags & EC_MKBP_FLAGS_ENABLE) &&
 	    !(dst->flags & EC_MKBP_FLAGS_ENABLE))
-		task_wake(TASK_ID_KEYSCAN);
+		task_wake(KEYSCAN);
 #endif
 }
 

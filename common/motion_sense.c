@@ -226,7 +226,7 @@ motion_sense_handle_interrupt_change(struct motion_sensor_t *sensor,
  * Set the sensor data rate. It is altered when the AP change the data
  * rate or when the power state changes.
  *
- * NOTE: Always run in TASK_ID_MOTIONSENSE task.
+ * NOTE: Always run in MOTIONSENSE task.
  */
 int motion_sense_set_data_rate(struct motion_sensor_t *sensor)
 {
@@ -319,8 +319,7 @@ static inline int motion_sense_init(struct motion_sensor_t *sensor)
 
 	BUILD_ASSERT(SENSOR_COUNT < 32);
 #if defined(HAS_TASK_CONSOLE)
-	ASSERT((in_deferred_context()) ||
-	       (task_get_current() == TASK_ID_CONSOLE));
+	ASSERT((in_deferred_context()) || (task_get_current() == CONSOLE));
 #elif !defined(CONFIG_ZTEST)
 	ASSERT(in_deferred_context());
 #endif /* HAS_TASK_CONSOLE */
@@ -418,8 +417,7 @@ static void motion_sense_switch_sensor_rate(void)
 	}
 	if (sensor_setup_mask) {
 		atomic_or(&odr_event_required, sensor_setup_mask);
-		task_set_event(TASK_ID_MOTIONSENSE,
-			       TASK_EVENT_MOTION_ODR_CHANGE);
+		task_set_event(MOTIONSENSE, TASK_EVENT_MOTION_ODR_CHANGE);
 	}
 
 	/* disable the body detection since AP is suspended */
@@ -1258,7 +1256,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			sensor->config[SENSOR_CONFIG_AP].ec_rate = new_ec_rate;
 
 			/* Force a collection to purge old events.  */
-			task_set_event(TASK_ID_MOTIONSENSE,
+			task_set_event(MOTIONSENSE,
 				       TASK_EVENT_MOTION_ODR_CHANGE);
 		}
 
@@ -1287,7 +1285,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			 */
 			atomic_or(&odr_event_required,
 				  BIT(sensor - motion_sensors));
-			task_set_event(TASK_ID_MOTIONSENSE,
+			task_set_event(MOTIONSENSE,
 				       TASK_EVENT_MOTION_ODR_CHANGE);
 		}
 
@@ -1416,8 +1414,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 
 		atomic_add(&sensor->flush_pending, 1);
 
-		task_set_event(TASK_ID_MOTIONSENSE,
-			       TASK_EVENT_MOTION_FLUSH_PENDING);
+		task_set_event(MOTIONSENSE, TASK_EVENT_MOTION_FLUSH_PENDING);
 		__fallthrough;
 #endif
 	case MOTIONSENSE_CMD_FIFO_INFO:
@@ -1795,8 +1792,7 @@ static int command_accel_data_rate(int argc, const char **argv)
 						(round ? ROUND_UP_FLAG : 0);
 
 		atomic_or(&odr_event_required, 1 << (sensor - motion_sensors));
-		task_set_event(TASK_ID_MOTIONSENSE,
-			       TASK_EVENT_MOTION_ODR_CHANGE);
+		task_set_event(MOTIONSENSE, TASK_EVENT_MOTION_ODR_CHANGE);
 	} else {
 		ccprintf("Data rate for sensor %d: %d\n", id,
 			 sensor->drv->get_data_rate(sensor));
@@ -1872,8 +1868,7 @@ static int command_accel_init(int argc, const char **argv)
 		 * the ODR has been changed.
 		 */
 		atomic_or(&odr_event_required, BIT(id));
-		task_set_event(TASK_ID_MOTIONSENSE,
-			       TASK_EVENT_MOTION_ODR_CHANGE);
+		task_set_event(MOTIONSENSE, TASK_EVENT_MOTION_ODR_CHANGE);
 	}
 
 	ccprintf("%s: state %d - %d\n", sensor->name, sensor->state, ret);

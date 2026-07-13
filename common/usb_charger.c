@@ -27,8 +27,6 @@
 #include "usbc_ppc.h"
 #include "util.h"
 
-#ifdef CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK
-
 /* Hold the event bits for all ports, 1 byte per port. */
 static atomic_t usb_charger_port_events;
 
@@ -44,8 +42,6 @@ BUILD_ASSERT(BIT(0) == TASK_EVENT_CUSTOM_BIT(0));
 BUILD_ASSERT(BIT(1) == TASK_EVENT_CUSTOM_BIT(1));
 BUILD_ASSERT(BIT(2) == TASK_EVENT_CUSTOM_BIT(2));
 BUILD_ASSERT(BIT(3) == TASK_EVENT_CUSTOM_BIT(3));
-
-#endif /* CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK */
 
 static void update_vbus_supplier(int port, int vbus_level)
 {
@@ -94,20 +90,16 @@ void usb_charger_vbus_change(int port, int vbus_level)
 	/* Update VBUS supplier and signal VBUS change to USB_CHG task */
 	update_vbus_supplier(port, vbus_level);
 
-#if defined(HAS_TASK_USB_CHG_P0) || \
-	defined(CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK)
-	/* USB Charger task(s) */
 	usb_charger_task_set_event(port, USB_CHG_EVENT_VBUS);
 
 	/* If we swapped to sourcing, drop any related charge suppliers */
 	if (usb_charger_port_is_sourcing_vbus(port))
 		usb_charger_reset_charge(port);
-#endif
 
 	if ((get_usb_pd_vbus_detect() == USB_PD_VBUS_DETECT_CHARGER) ||
 	    (get_usb_pd_vbus_detect() == USB_PD_VBUS_DETECT_PPC)) {
 		/* USB PD task */
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 	}
 }
 
@@ -125,12 +117,8 @@ void usb_charger_reset_charge(int port)
 
 test_mockable void usb_charger_task_set_event(int port, uint8_t event)
 {
-#ifdef CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK
 	atomic_or(&usb_charger_port_events, PORT_EVENT_PACK(port, event));
-	task_set_event(TASK_ID_USB_CHG, BIT(port));
-#else
-	task_set_event(USB_CHG_PORT_TO_TASK_ID(port), event);
-#endif
+	task_set_event(USB_CHG, BIT(port));
 }
 
 void usb_charger_task_set_event_sync(int port, uint8_t event)
@@ -159,8 +147,7 @@ __overridable bool board_usb_charger_support(void)
 	return true;
 }
 
-#ifdef CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK
-void usb_charger_task_shared(void *u)
+void usb_charger_task(void *u)
 {
 	int port;
 	uint32_t evt;
@@ -196,37 +183,3 @@ void usb_charger_task_shared(void *u)
 		}
 	}
 }
-
-#else /* CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK */
-
-void usb_charger_task(void *u)
-{
-	int port = TASK_ID_TO_USB_CHG_PORT(task_get_current());
-	uint32_t evt;
-	struct bc12_config *bc12_port;
-
-	if (!board_usb_charger_support())
-		return;
-
-	/*
-	 * The actual number of ports may be less than the maximum
-	 * configured, so only run the task if the port exists.
-	 */
-	if (port >= board_get_usb_pd_port_count())
-		return;
-
-	bc12_port = &bc12_ports[port];
-
-	ASSERT(bc12_port->drv->usb_charger_task_init);
-	ASSERT(bc12_port->drv->usb_charger_task_event);
-
-	bc12_port->drv->usb_charger_task_init(port);
-
-	while (1) {
-		evt = task_wait_event(-1);
-
-		usb_charger_task_set_event_sync(port, evt);
-	}
-}
-
-#endif /* CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK */

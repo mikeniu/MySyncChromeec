@@ -308,7 +308,7 @@ enum ec_status fp_set_sensor_mode(
 		}
 
 		global_context.sensor_mode = mode;
-		task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
+		task_set_event(FPSENSOR, TASK_EVENT_UPDATE_CONFIG);
 	}
 
 	*mode_output = global_context.sensor_mode;

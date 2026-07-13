@@ -249,7 +249,7 @@ void keyboard_host_write(int data, int is_cmd)
 	h.type = is_cmd ? HOST_COMMAND : HOST_DATA;
 	h.byte = data;
 	queue_add_unit(&from_host, &h);
-	task_wake(TASK_ID_KEYPROTO);
+	task_wake(KEYPROTO);
 }
 
 /**
@@ -331,7 +331,7 @@ static void i8042_send_to_host(int len, const uint8_t *bytes, uint8_t chan,
 	mutex_unlock(&to_host_mutex);
 
 	/* Wake up the task to move from queue to host */
-	task_wake(TASK_ID_KEYPROTO);
+	task_wake(KEYPROTO);
 }
 
 /* Change to set 1 if the I8042_XLATE flag is set. */
@@ -499,7 +499,7 @@ void keyboard_state_changed_process(int row, int col, int is_pressed,
 	if (is_pressed) {
 		keyboard_wakeup();
 		set_typematic_key(scan_code, len);
-		task_wake(TASK_ID_KEYPROTO);
+		task_wake(KEYPROTO);
 	} else {
 		clear_typematic_key();
 	}
@@ -1137,7 +1137,7 @@ test_mockable void keyboard_update_button(enum keyboard_button_type button,
 		CPRINTS5("KB UPDATE BTN");
 
 		i8042_send_to_host(len, scan_code, CHAN_KBD, 0);
-		task_wake(TASK_ID_KEYPROTO);
+		task_wake(KEYPROTO);
 	}
 }
 

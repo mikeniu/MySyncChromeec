@@ -110,7 +110,7 @@ static enum cr50_comm_err send_to_cr50(const uint8_t *data, size_t size)
 	 */
 #ifndef CONFIG_ZEPHYR
 	if (task_start_called())
-		task_disable_task(TASK_ID_CONSOLE);
+		task_disable_task(CONSOLE);
 #endif /* !CONFIG_ZEPHYR */
 
 	/* Wait for response from Cr50 */
@@ -129,7 +129,7 @@ static enum cr50_comm_err send_to_cr50(const uint8_t *data, size_t size)
 	uart_shell_start();
 #ifndef CONFIG_ZEPHYR
 	if (task_start_called())
-		task_enable_task(TASK_ID_CONSOLE);
+		task_enable_task(CONSOLE);
 #endif /* CONFIG_ZEPHYR */
 
 	/* Exit packet mode */

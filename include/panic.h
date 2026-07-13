@@ -76,13 +76,15 @@ void panic_data_ccprint(const struct panic_data *pdata);
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void panic_assert_fail(const char *fname, int linenum);
+	void
+	panic_assert_fail(const char *fname, int linenum);
 #else
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void panic_assert_fail(const char *msg, const char *func,
-			       const char *fname, int linenum);
+	void
+	panic_assert_fail(const char *msg, const char *func, const char *fname,
+			  int linenum);
 #endif
 
 /**
@@ -93,7 +95,8 @@ __noreturn
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void panic(const char *msg);
+	void
+	panic(const char *msg);
 
 #endif /* !CONFIG_ZEPHYR */
 
@@ -103,7 +106,8 @@ __noreturn
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void panic_reboot(void);
+	void
+	panic_reboot(void);
 
 #if !(defined(CONFIG_ZEPHYR))
 /**
@@ -113,8 +117,11 @@ __noreturn
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void software_panic(uint32_t reason, uint32_t info);
+	void
+	software_panic(uint32_t reason, uint32_t info);
 #endif /* !CONFIG_ZEPHYR */
+
+#define PANIC_EXCEPTION_NONE 0xff
 
 /**
  * Log a panic in the panic log, but don't halt the system. Normally

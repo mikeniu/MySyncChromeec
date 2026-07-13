@@ -678,7 +678,7 @@ void chipset_exit_hard_off(void)
 	 * pressed. For other states here, to wake the chipset task to trigger
 	 * the event for leaving G3 is necessary.
 	 */
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 }
 
 #ifdef CONFIG_ZTEST
@@ -686,7 +686,7 @@ void test_power_common_state(void)
 {
 	enum power_state new_state;
 
-	task_wake(task_get_current());
+	task_wake(k_current_get());
 	new_state = power_common_state();
 	if (new_state != state)
 		power_set_state(new_state);
@@ -803,7 +803,7 @@ DECLARE_HOOK(HOOK_INIT, power_common_init, HOOK_PRIO_INIT_CHIPSET);
 static void power_lid_change(void)
 {
 	/* Wake up the task to update power state */
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, power_lid_change, HOOK_PRIO_DEFAULT);
 
@@ -817,7 +817,7 @@ static void power_ac_change(void)
 
 		if (state == POWER_G3) {
 			last_shutdown_time = get_time().val;
-			task_wake(TASK_ID_CHIPSET);
+			task_wake(CHIPSET);
 		}
 	}
 }
@@ -940,7 +940,7 @@ void power_signal_interrupt(enum gpio_signal signal)
 	power_update_signals();
 
 	/* Wake up the task */
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 }
 
 #ifdef CONFIG_POWER_SHUTDOWN_PAUSE_IN_S5

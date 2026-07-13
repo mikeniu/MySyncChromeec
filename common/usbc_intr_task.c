@@ -32,37 +32,37 @@
 	 (port == 1 && IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_PORT_1_SHARED)) || \
 	 (port == 2 && IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_PORT_2_SHARED)) || \
 	 (port == 3 && IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_PORT_3_SHARED)))
-#define PD_INT_SHARED_ID TASK_ID_PD_INT_SHARED
+#define PD_INT_SHARED_ID PD_INT_SHARED
 #else
 #define IS_PORT_SHARED(port) 0
-#define PD_INT_SHARED_ID TASK_ID_INVALID
+#define PD_INT_SHARED_ID NULL
 #endif
 
 #ifdef HAS_TASK_PD_INT_C0
-#define PD_INT_C0_ID TASK_ID_PD_INT_C0
+#define PD_INT_C0_ID PD_INT_C0
 #else
-#define PD_INT_C0_ID TASK_ID_INVALID
+#define PD_INT_C0_ID NULL
 #endif
 
 #ifdef HAS_TASK_PD_INT_C1
-#define PD_INT_C1_ID TASK_ID_PD_INT_C1
+#define PD_INT_C1_ID PD_INT_C1
 #else
-#define PD_INT_C1_ID TASK_ID_INVALID
+#define PD_INT_C1_ID NULL
 #endif
 
 #ifdef HAS_TASK_PD_INT_C2
-#define PD_INT_C2_ID TASK_ID_PD_INT_C2
+#define PD_INT_C2_ID PD_INT_C2
 #else
-#define PD_INT_C2_ID TASK_ID_INVALID
+#define PD_INT_C2_ID NULL
 #endif
 
 #ifdef HAS_TASK_PD_INT_C3
-#define PD_INT_C3_ID TASK_ID_PD_INT_C3
+#define PD_INT_C3_ID PD_INT_C3
 #else
-#define PD_INT_C3_ID TASK_ID_INVALID
+#define PD_INT_C3_ID NULL
 #endif
 
-#define PD_INT_PORT_TO_TASK_ID(port)               \
+#define PD_INT_PORT_TO_THREAD(port)                \
 	(IS_PORT_SHARED(port) ? PD_INT_SHARED_ID : \
 	 (port) == 0	      ? PD_INT_C0_ID :     \
 	 (port) == 1	      ? PD_INT_C1_ID :     \
@@ -71,9 +71,9 @@
 
 test_mockable void schedule_deferred_pd_interrupt(const int port)
 {
-	task_id_t tid = PD_INT_PORT_TO_TASK_ID(port);
+	k_tid_t tid = PD_INT_PORT_TO_THREAD(port);
 
-	if (tid != TASK_ID_INVALID)
+	if (tid != NULL)
 		task_set_event(tid, PD_PROCESS_INTERRUPT);
 }
 

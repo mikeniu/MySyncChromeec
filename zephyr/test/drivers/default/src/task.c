@@ -58,9 +58,8 @@ ZTEST_F(tasks, test_timer_arm_before_now)
 	fixture->fake_time.val = 15;
 	get_time_mock = &fixture->fake_time;
 
-	zassert_ok(timer_arm(deadline, TASK_ID_MOTIONSENSE));
-	zassert_equal(*task_get_event_bitmap(TASK_ID_MOTIONSENSE) &
-			      TASK_EVENT_TIMER,
+	zassert_ok(timer_arm(deadline, MOTIONSENSE));
+	zassert_equal(*task_get_event_bitmap(MOTIONSENSE) & TASK_EVENT_TIMER,
 		      TASK_EVENT_TIMER);
 }
 
@@ -73,12 +72,11 @@ ZTEST_F(tasks, test_timer_arm_busy)
 	fixture->fake_time.val = 0;
 	get_time_mock = &fixture->fake_time;
 
-	zassert_ok(timer_arm(deadline, TASK_ID_MOTIONSENSE));
-	zassert_equal(EC_ERROR_BUSY, timer_arm(deadline, TASK_ID_MOTIONSENSE));
+	zassert_ok(timer_arm(deadline, MOTIONSENSE));
+	zassert_equal(EC_ERROR_BUSY, timer_arm(deadline, MOTIONSENSE));
 }
 
 ZTEST(tasks, test_get_event_bitmap_invalid_tid)
 {
-	zassert_is_null(
-		task_get_event_bitmap(TASK_ID_COUNT + EXTRA_TASK_COUNT));
+	zassert_is_null(task_get_event_bitmap(NULL));
 }

@@ -8,9 +8,8 @@
 #ifndef __CROS_EC_TASK_ID_H
 #define __CROS_EC_TASK_ID_H
 
-/* For Zephyr builds just used shimmed tasks ids, otherwise use platform/ec's */
 #ifdef CONFIG_ZEPHYR
-#include "shimmed_task_id.h"
+#include "ec_tasks.h"
 #else
 
 #include "config.h"
@@ -67,5 +66,6 @@ enum {
 #ifdef __cplusplus
 }
 #endif
-#endif /* CONFIG_ZEPHYR */
+
+#endif /* !CONFIG_ZEPHYR */
 #endif /* __CROS_EC_TASK_ID_H */

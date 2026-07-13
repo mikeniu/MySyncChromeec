@@ -189,7 +189,7 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 		 */
 		uint8_t flags = pdata->flags;
 		panic_set_reason(PANIC_ZEPHYR_FATAL_ERROR, (uint32_t)reason,
-				 thread_id_to_task_id(k_current_get()));
+				 PANIC_EXCEPTION_NONE);
 		/* Keep panic flags */
 		pdata->flags = flags;
 	}
@@ -214,8 +214,7 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #ifdef CONFIG_ASSERT_NO_FILE_INFO
 __override void assert_post_action(void)
 {
-	panic_set_reason(PANIC_SW_ASSERT, -1,
-			 thread_id_to_task_id(k_current_get()));
+	panic_set_reason(PANIC_SW_ASSERT, -1, PANIC_EXCEPTION_NONE);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
@@ -237,7 +236,7 @@ __override void assert_post_action(const char *path, unsigned int line)
 	panic_set_reason(PANIC_SW_ASSERT,
 			 (filename[0] << 24) | (filename[1] << 16) |
 				 (line & 0xffff),
-			 thread_id_to_task_id(k_current_get()));
+			 PANIC_EXCEPTION_NONE);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
