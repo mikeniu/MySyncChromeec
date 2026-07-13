@@ -4,7 +4,6 @@
  */
 
 #include "common.h"
-#include "ec_tasks.h"
 #include "hooks.h"
 #include "host_command_memory_dump.h"
 #include "string.h"
@@ -13,19 +12,33 @@
 #include <zephyr/kernel.h>
 #include <zephyr/kernel/thread.h>
 
-static bool task_is_excluded_from_memory_dump(task_id_t task_id)
+#ifdef CONFIG_HAS_TASK_KEYSCAN
+extern const k_tid_t KEYSCAN;
+#endif
+#ifdef CONFIG_HAS_TASK_KEYPROTO
+extern const k_tid_t KEYPROTO;
+#endif
+#ifdef CONFIG_HAS_TASK_WOV
+extern const k_tid_t WOV;
+#endif
+
+static bool thread_is_excluded_from_memory_dump(k_tid_t thread)
 {
-	/* List of sensitive threads that must be excluded from memory dump */
-	static const task_id_t memory_dump_exclude_tasks[] = {
-		COND_CODE_1(CONFIG_HAS_TASK_KEYSCAN, (TASK_ID_KEYSCAN), ()),
-		COND_CODE_1(CONFIG_HAS_TASK_KEYPROTO, (TASK_ID_KEYPROTO), ()),
-		COND_CODE_1(CONFIG_HAS_TASK_WOV, (TASK_ID_WOV), ())
-	};
-	for (int i = 0; i < ARRAY_SIZE(memory_dump_exclude_tasks); i++) {
-		if (task_id == memory_dump_exclude_tasks[i]) {
-			return true;
-		}
+#ifdef CONFIG_HAS_TASK_KEYSCAN
+	if (thread == KEYSCAN) {
+		return true;
 	}
+#endif
+#ifdef CONFIG_HAS_TASK_KEYPROTO
+	if (thread == KEYPROTO) {
+		return true;
+	}
+#endif
+#ifdef CONFIG_HAS_TASK_WOV
+	if (thread == WOV) {
+		return true;
+	}
+#endif
 	return false;
 }
 
@@ -36,20 +49,19 @@ test_export_static void register_thread_memory_dump(k_tid_t thread)
 				     thread->stack_info.delta);
 }
 
+static void register_thread_cb(const struct k_thread *thread, void *user_data)
+{
+	ARG_UNUSED(user_data);
+	k_tid_t tid = (k_tid_t)thread;
+
+	if (thread_is_excluded_from_memory_dump(tid)) {
+		return;
+	}
+	register_thread_memory_dump(tid);
+}
+
 test_export_static void register_known_threads_memory_dump(void)
 {
-	k_tid_t thread;
-
-	for (task_id_t task_id = 0; task_id < TASK_ID_COUNT + EXTRA_TASK_COUNT;
-	     task_id++) {
-		if (task_is_excluded_from_memory_dump(task_id)) {
-			continue;
-		}
-		thread = task_id_to_thread_id(task_id);
-		if (thread == NULL) {
-			continue;
-		}
-		register_thread_memory_dump(thread);
-	}
+	k_thread_foreach(register_thread_cb, NULL);
 }
 DECLARE_HOOK(HOOK_INIT, register_known_threads_memory_dump, HOOK_PRIO_FIRST);
