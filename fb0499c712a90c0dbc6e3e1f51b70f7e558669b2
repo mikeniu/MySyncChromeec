@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "995027dc_61174691",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 26
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-13T17:27:08Z",
+      "side": 1,
+      "message": "I think in the current structure, this would go more naturally in the following CL, although it looks like that one has not been rebased on this patchset.",
+      "parentUuid": "ba759dd1_b5ae2648",
+      "range": {
+        "startLine": 248,
+        "startChar": 7,
+        "endLine": 248,
+        "endChar": 20
+      },
+      "revId": "fb0499c712a90c0dbc6e3e1f51b70f7e558669b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f100ec03_001e3229",
         "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
         "patchSetId": 26

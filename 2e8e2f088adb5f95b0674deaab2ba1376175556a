@@ -90,6 +90,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "06177656_326c4e86",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-13T17:27:08Z",
+      "side": 1,
+      "message": "\u003e PDC will respond with DFP and UFP (depends on the version of the FW). Configuration for those will be added in the CL in the chain. Probably we need to add also some configuration mechanism for this, do you think storing this configuration in DT will be fine? The final goal is to send 3 SET_VDO and keep this configuration somewhere outside of the driver.\n\nThe structure of this configuration seems reasonable to me.\n\nMy earlier concern was that this CL would result in an invalid discovery response with the DFP or UFP Product Types set but no Product Type VDOs. It sounds like the PDC sends some sort of default Product Type VDOs in the absence of explicit configuration. I don\u0027t really get how it would know what the contents should be. But if the situation is just that the Product Type VDOs have the wrong contents, and they already did before this CL, I\u0027m not really concerned about this intermediate state.",
+      "parentUuid": "a4a2e9fa_5a8fbbce",
+      "revId": "2e8e2f088adb5f95b0674deaab2ba1376175556a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "65ed2293_1757456d",
