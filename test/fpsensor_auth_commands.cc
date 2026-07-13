@@ -798,6 +798,11 @@ test_static enum ec_error_list test_fp_command_template_decrypted(void)
 	static_assert(metadata_size == sizeof(enc_metadata_data));
 	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
 
+	// The fingerprint auth session should be dropped when loading the
+	// templates.
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
 	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, params.data(),
 				       params.size(), NULL, 0),
 		EC_RES_SUCCESS, "%d");
@@ -888,6 +893,11 @@ test_static enum ec_error_list test_fp_command_commit_v3(void)
 
 	static_assert(metadata_size == sizeof(enc_metadata_data));
 	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
+
+	// The fingerprint auth session should be dropped when loading the
+	// templates.
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
 
 	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, params.data(),
 				       params.size(), NULL, 0),
@@ -984,6 +994,11 @@ test_static enum ec_error_list test_fp_command_commit_trivial_salt(void)
 
 	static_assert(metadata_size == sizeof(enc_metadata_data));
 	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
+
+	// The fingerprint auth session should be dropped when loading the
+	// templates.
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
 
 	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, params.data(),
 				       params.size(), NULL, 0),
