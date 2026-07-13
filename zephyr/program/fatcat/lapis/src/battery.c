@@ -5,6 +5,7 @@
 
 #include "battery.h"
 #include "battery_smart.h"
+#include "timer.h"
 
 enum battery_present battery_is_present(void)
 {
@@ -17,11 +18,19 @@ enum battery_present battery_is_present(void)
 		 */
 		k_msleep(25);
 		if (sb_read(SB_MANUFACTURER_ACCESS, &state)) {
-			if (retry_cnt > 100) {
+			/*
+			 * Limit the 100-retry spoof (2.5s) to the boot phase
+			 * (first 10 seconds) to allow slow-waking batteries to
+			 * respond. During runtime (e.g. S0ix), only allow 2
+			 * retries to prevent I2C timeout cascades from starving
+			 * the watchdog.
+			 */
+			int max_retries =
+				(get_time().val < 10 * USEC_PER_SEC) ? 100 : 2;
+			if (retry_cnt > max_retries) {
 				return BP_NO;
 			} else {
 				retry_cnt++;
-
 				return BP_YES;
 			}
 		}
