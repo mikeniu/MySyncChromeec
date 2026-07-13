@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93d7c4d1_5f6a6c75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-13T23:09:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/2f29c3a8-f231-46d9-a37c-86a8d5d708b9)]\n\n### Review Summary\n\n**Functionality**: \n- Found a potential edge case where AP retries of `FP_CONTEXT_GET_RESULT` might be incorrectly blocked. If the User ID is unchanged, we should consider allowing the command to succeed to ensure robustness against retries. \n- Leftover commented-out state cleanup in the test suite setup breaks test isolation, which could lead to flaky tests or masked failures.\n\n**Security**: \n- The CL successfully enforces user isolation by blocking legacy V0 template updates when FingerGuard is enabled, preventing arbitrary template injection.\n- Mutating the session user context identifier mid-session is also effectively prevented.\n\n**Style \u0026 Readability**: \n- The newly added code contains clear, descriptive comments explaining the security invariants. \n- Please remove or resolve the commented-out setup code in the test suite.\n\n**Testing**: \n- The new tests successfully cover the added security behaviors.\n- The test harness (`fpsensor_before()`) needs adjustments to properly clear session states between tests without relying on commented-out code.",
+      "isAi": true,
+      "revId": "c26f795f847b4adb0029618e731659a69b31413b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59b78d2b_1b316100",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-13T23:09:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] If the AP resends the `FP_CONTEXT_GET_RESULT` command (e.g., due to a communication timeout or retry loop), this strict check will reject it even if `p-\u003euserid` perfectly matches the already loaded `global_context.user_id`.\n\nConsider allowing the command to succeed if the user ID is unchanged:\n```cpp\nif (fingerprint_auth_enabled() \u0026\u0026\n    (global_context.fp_encryption_status \u0026 FP_CONTEXT_USER_ID_SET) \u0026\u0026\n    memcmp(global_context.user_id.data(), p-\u003euserid, sizeof(global_context.user_id)) !\u003d 0) {\n    return EC_RES_ACCESS_DENIED;\n}\n```\nThis preserves the security invariant (preventing cross-user swaps) while making the API more robust to legitimate retries.",
+      "isAi": true,
+      "revId": "c26f795f847b4adb0029618e731659a69b31413b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1a5ad91_4e6953ec",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 1528,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-13T23:09:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Commenting out this state cleanup leaves the test suite fragile. If tests modify `global_context.fp_encryption_status` (like `test_fp_context_get_result_blocks_swap_under_auth` does), they are forced to manually clean it up, otherwise subsequent tests might fail unpredictably.\n\nI understand you likely commented this out because resetting the context or setting status to `0` clears the `tpm_seed` (which is only set once in `fpsensor_setup()`). \n\nInstead of leaving this commented out, consider explicitly clearing only the relevant session flags here:\n```cpp\nglobal_context.fp_encryption_status \u0026\u003d ~(FP_CONTEXT_STATUS_SESSION_ESTABLISHED | FP_CONTEXT_USER_ID_SET);\n```\nAlternatively, move the TPM seed initialization from `fpsensor_setup()` into this `fpsensor_before()` function so you can safely call `fp_reset_and_clear_context()` before every test.",
+      "isAi": true,
+      "revId": "c26f795f847b4adb0029618e731659a69b31413b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
