@@ -23,9 +23,6 @@ host-util-bin-cxx-y += ec_coredump
 host-util-bin-cxx-y += rtkupdate
 build-util-art-y += util/export_taskinfo.so
 
-build-util-bin-$(CHIP_NPCX) += ecst
-host-util-bin-cxx-$(BOARD_NOCTURNE_FP) += ectool_servo
-
 host-util-bin-cxx-y += uartupdatetool
 uartupdatetool-objs=uut/main.o uut/cmd.o uut/opr.o uut/l_com_port.o \
 	uut/lib_crc.o
