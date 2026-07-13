@@ -4385,6 +4385,20 @@ static void process_rma(struct transfer_descriptor *td, const char *authcode,
 			exit(update_error);
 		}
 
+		if (response_size + 1 != sizeof(rma_response)) {
+			fprintf(stderr,
+				"Error in the size of response,"
+				" %zu.\n", response_size);
+			exit(update_error);
+		}
+
+		for (i = 0; i < response_size; i++) {
+			if (!isalnum(((const char *)rma_response)[i])) {
+				fprintf(stderr, "invalid challenge\n");
+				exit(update_error);
+			}
+		}
+
 		if (show_machine_output) {
 			rma_response[response_size] = '\0';
 			print_machine_output("CHALLENGE", "%s", rma_response);
@@ -5251,9 +5265,10 @@ static int print_ti50_device_ids(struct ti50_device_ids_response *ids,
 				 bool show_machine_output)
 {
 	size_t i;
-	/* RMA status added in 1.0 */
+	/* RMA status added in 1.1 */
 	bool supports_rma = ids->header.version > 1 ||
-			    ids->header.version != 0xff;
+			    (ids->header.version_minor != 0xff &&
+			     ids->header.version_minor > 0);
 
 	if (ids->header.version == 0xff) {
 		printf("fields unset");
