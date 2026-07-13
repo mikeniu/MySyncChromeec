@@ -73,9 +73,9 @@ config LTO_SINGLE_THREADED
 config ISR_TABLES_LOCAL_DECLARATION
 	default y
 
+
 config CURRENT_THREAD_USE_TLS
 	default n
-
 config I2C_TRANSFER_TIMEOUT_MS
 	default 100
 

@@ -222,7 +222,7 @@ int cec_rx_queue_pop(struct cec_rx_queue *queue, uint8_t *msg, uint8_t *msg_len)
 void cec_task_set_event(int port, uint32_t event)
 {
 	atomic_or(&cec_task_events[port], event);
-	task_wake(TASK_ID_CEC);
+	task_wake(CEC);
 }
 
 test_export_static void send_mkbp_event(int port, uint32_t event)

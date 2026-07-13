@@ -176,7 +176,7 @@ void power_button_pch_pulse(void)
 	set_pwrbtn_to_pch(0, 0);
 	pwrbtn_state = PWRBTN_STATE_LID_OPEN;
 	tnext_state = get_time().val + PWRBTN_INITIAL_US;
-	task_wake(TASK_ID_POWERBTN);
+	task_wake(POWERBTN);
 }
 
 /**
@@ -506,7 +506,7 @@ static void powerbtn_x86_changed(void)
 	}
 
 	/* Wake the power button task */
-	task_wake(TASK_ID_POWERBTN);
+	task_wake(POWERBTN);
 }
 DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, powerbtn_x86_changed, HOOK_PRIO_DEFAULT);
 
