@@ -361,6 +361,42 @@ int board_cut_off_battery(void)
 
 	return rv ? EC_RES_ERROR : EC_RES_SUCCESS;
 }
+
+/**
+ * Battery wakeup cut off command via SMBus write word.
+ *
+ * @param wakeup_ship_mode		Battery wakeup ship mode information
+ * @return non-zero if error
+ */
+static int wakeup_cut_off_battery_sb_write(
+	const struct wakeup_ship_mode_info *wakeup_ship_mode)
+{
+	int rv;
+
+	/* wakeup ship mode command requires writing 2 data values */
+	rv = sb_write(wakeup_ship_mode->reg_addr,
+		      wakeup_ship_mode->reg_data[0]);
+	if (rv)
+		return rv;
+
+	return sb_write(wakeup_ship_mode->reg_addr,
+			wakeup_ship_mode->reg_data[1]);
+}
+
+int board_wakeup_cutoff_battery(void)
+{
+	const struct board_batt_params *params = get_batt_params();
+	int rv;
+
+	/* If battery is unknown can't send wakeup ship mode command */
+	if (!params)
+		return EC_RES_ERROR;
+
+	rv = wakeup_cut_off_battery_sb_write(
+		&params->fuel_gauge.wakeup_ship_mode);
+
+	return rv ? EC_RES_ERROR : EC_RES_SUCCESS;
+}
 #endif /* !CONFIG_FUEL_GAUGE */
 
 #ifndef TEST_BATTERY_CONFIG
@@ -465,6 +501,12 @@ enum battery_disconnect_state battery_get_disconnect_state(void)
 			params->fuel_gauge.fet.reg_addr, reg,
 			params->fuel_gauge.fet.reg_mask,
 			params->fuel_gauge.fet.disconnect_val);
+
+		if (IS_ENABLED(CONFIG_BATTERY_WAKEUP_CUT_OFF)) {
+			CPRINTS("Batt disconnected: board_wakeup_cutoff_battery() called");
+			board_wakeup_cutoff_battery();
+		}
+
 		return BATTERY_DISCONNECTED;
 	}
 
