@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc53dced_0ea2eca3",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-13T09:08:12Z",
+      "side": 1,
+      "message": "create a macros and use `overload_status ` to override `is_battery_overloaded`",
+      "parentUuid": "9382224c_d32ce4b9",
+      "range": {
+        "startLine": 299,
+        "startChar": 0,
+        "endLine": 299,
+        "endChar": 55
+      },
+      "revId": "a679a17daacfb97ee74c495e97e6138f3929b9da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "33e65fc9_4d88e762",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-10T20:39:57Z",
       "side": 1,
       "message": "This is not used.",
+      "range": {
+        "startLine": 424,
+        "startChar": 0,
+        "endLine": 425,
+        "endChar": 57
+      },
+      "revId": "a679a17daacfb97ee74c495e97e6138f3929b9da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50b369d3_aee07ba2",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-13T09:08:12Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "33e65fc9_4d88e762",
       "range": {
         "startLine": 424,
         "startChar": 0,
@@ -72,6 +120,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7d111514_8bc74202",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-13T09:08:12Z",
+      "side": 1,
+      "message": "remove `DT_FOREACH_STATUS_OKAY`",
+      "parentUuid": "3d513d23_f6cb4ff6",
+      "range": {
+        "startLine": 462,
+        "startChar": 24,
+        "endLine": 462,
+        "endChar": 40
+      },
+      "revId": "a679a17daacfb97ee74c495e97e6138f3929b9da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bc7cbd1d_94c17dbe",
         "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
         "patchSetId": 18
@@ -83,6 +155,30 @@
       "writtenOn": "2026-07-10T20:39:57Z",
       "side": 1,
       "message": "I don\u0027t see any checks in `pdc_dpm_eval_sink_fixed_pdo()` for the battery overload condition.\n\nI think this scenario will stiff offer 3A to a newly connected device:\n1. User a SNK device that only needs 1.5A\n2. Battery power/current exceeds limit due to high CPU load\n3. EC throttles sourcing to 1.5A on all ports\n4. User connects a second SNK device that wants 3A.\n5. DPM runs, sees that no devices are currently sinking 3A, so DPM offers 3A to the new device.",
+      "range": {
+        "startLine": 513,
+        "startChar": 0,
+        "endLine": 513,
+        "endChar": 50
+      },
+      "revId": "a679a17daacfb97ee74c495e97e6138f3929b9da",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a6bef67_a8a85cbe",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-13T09:08:12Z",
+      "side": 1,
+      "message": "Add a check in `pdc_dpm_eval_sink_fixed_pdo`",
+      "parentUuid": "bc7cbd1d_94c17dbe",
       "range": {
         "startLine": 513,
         "startChar": 0,
