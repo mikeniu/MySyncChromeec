@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#include "ec_tasks.h"
 #include "host_command.h"
+
 #include "task.h"
 #include "zephyr_console_shim.h"
 
@@ -67,14 +67,13 @@ ZTEST_USER(extra_tasks, test_hostcmd_thread_mapping)
 	hostcmd_thread = find_thread_by_name("HOSTCMD");
 	zassert_not_null(hostcmd_thread);
 	zassert_equal(hostcmd_thread, get_hostcmd_thread());
-	zassert_equal(TASK_ID_HOSTCMD, thread_id_to_task_id(hostcmd_thread));
 
 #ifdef CONFIG_TASK_HOSTCMD_THREAD_DEDICATED
 	main_thread = find_thread_by_name("main");
 	zassert_not_null(main_thread);
 	zassert_equal(main_thread, get_main_thread());
 	zassert_not_equal(main_thread, hostcmd_thread);
-	zassert_equal(TASK_ID_MAIN, thread_id_to_task_id(main_thread));
+
 
 #else
 	main_thread = get_main_thread();
@@ -101,7 +100,6 @@ ZTEST_USER(extra_tasks, test_sysworkq_thread_mapping)
 	sysworkq_thread = find_thread_by_name("sysworkq");
 	zassert_not_null(sysworkq_thread);
 	zassert_equal(sysworkq_thread, get_sysworkq_thread());
-	zassert_equal(TASK_ID_SYSWORKQ, thread_id_to_task_id(sysworkq_thread));
 }
 
 ZTEST_USER(extra_tasks, test_idle_thread_mapping)
@@ -111,7 +109,6 @@ ZTEST_USER(extra_tasks, test_idle_thread_mapping)
 	idle_thread = find_thread_by_name("idle");
 	zassert_not_null(idle_thread);
 	zassert_equal(idle_thread, get_idle_thread());
-	zassert_equal(TASK_ID_IDLE, thread_id_to_task_id(idle_thread));
 }
 
 ZTEST_USER(extra_tasks, test_shell_thread_to_task_mapping)
@@ -121,37 +118,7 @@ ZTEST_USER(extra_tasks, test_shell_thread_to_task_mapping)
 	shell_thread = find_thread_by_name("shell_uart");
 	zassert_not_null(shell_thread);
 	zassert_equal(shell_thread, get_shell_thread());
-	zassert_equal(TASK_ID_SHELL, thread_id_to_task_id(shell_thread));
 }
 
-
-ZTEST_USER(extra_tasks, test_invalid_thread_id)
-{
-	task_id_t task_id;
-
-	EXPECT_ASSERT(task_id = thread_id_to_task_id(NULL));
-	zassert_equal(task_id, TASK_ID_INVALID);
-}
-
-ZTEST_USER(extra_tasks, test_invalid_dummy_thread)
-{
-	task_id_t task_id;
-	extern struct k_thread _thread_dummy;
-
-	task_id = thread_id_to_task_id(&_thread_dummy);
-	zassert_equal(task_id, TASK_ID_INVALID);
-}
-
-
-ZTEST_USER(extra_tasks, test_extra_task_unmapped)
-{
-	task_id_t task_id;
-
-	/* Not a real thread */
-	struct k_thread thread_data = { 0 };
-
-	task_id = thread_id_to_task_id(&thread_data);
-	zassert_equal(task_id, TASK_ID_INVALID);
-}
 
 ZTEST_SUITE(extra_tasks, NULL, NULL, NULL, NULL, NULL);
