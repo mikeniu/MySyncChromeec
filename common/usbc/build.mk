@@ -21,8 +21,7 @@ endif # CONFIG_USB_PRL_SM
 
 # Policy Engine state machines
 ifneq ($(CONFIG_USB_PE_SM),)
-common-usbc-$(CONFIG_USB_VPD) += usb_pe_ctvpd_sm.o
-common-usbc-$(CONFIG_USB_CTVPD) += usb_pe_ctvpd_sm.o
+
 common-usbc-$(CONFIG_USB_DRP_ACC_TRYSRC) += usbc_pd_policy.o
 common-usbc-$(CONFIG_USB_DRP_ACC_TRYSRC) += usb_pe_drp_sm.o
 common-usbc-$(CONFIG_USB_DRP_ACC_TRYSRC) += usb_pd_dpm.o
