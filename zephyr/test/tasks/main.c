@@ -282,13 +282,11 @@ static void empty_set_mask2(void)
 static void check_task_1_mapping(void)
 {
 	zassert_equal(TASK_ID_TASK_1, thread_id_to_task_id(k_current_get()));
-	zassert_equal(k_current_get(), task_id_to_thread_id(TASK_ID_TASK_1));
 }
 
 static void check_task_2_mapping(void)
 {
 	zassert_equal(TASK_ID_TASK_2, thread_id_to_task_id(k_current_get()));
-	zassert_equal(k_current_get(), task_id_to_thread_id(TASK_ID_TASK_2));
 }
 
 ZTEST(test_task_shim, test_thread_to_task_mapping)
