@@ -1,0 +1,22 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# This snippet configures the resulting zephyr.bin image for loading
+# directly into SRAM.
+#
+# For Nuvoton ECs, this does nothing because the default image configuration
+# is already compatible with loading directly in SRAM.
+#
+# For Realtek ECs, this configures a hard coded entry point as required
+# the bootrom and adds trampoline code at the entry to jump to the
+# regular ARM vector table.
+#
+# ITE ECs don's support loading into SRAM.
+
+name: sram-only
+boards:
+  realtek/rts5912:
+    append:
+      EXTRA_CONF_FILE: realtek-ram-trampoline.conf
+      EXTRA_DTC_OVERLAY_FILE: realtek-ram-trampoline.overlay

@@ -10,7 +10,8 @@
 #include "hooks.h"
 
 /* Define delays for deferred power sequencing */
-#define PP5000_PWR_DISABLE_DELAY (10 * USEC_PER_MSEC)
+#define PP5000_PWR_DISABLE_DELAY (100 * USEC_PER_MSEC)
+#define USBA_PWR_ENABLE_DELAY (10 * USEC_PER_MSEC)
 
 /*
  * Deferred function to deassert gpio_ec_en_pp5000.
@@ -22,15 +23,22 @@ static void pp5000_pwr_disable_deferred(void)
 }
 DECLARE_DEFERRED(pp5000_pwr_disable_deferred);
 
-void board_chipset_startup_mensa(void)
+static void usba_pwr_enable_deferred(void)
 {
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_usba), 1);
+}
+DECLARE_DEFERRED(usba_pwr_enable_deferred);
+
+void board_chipset_startup_mensa(void)
+{
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp3300_s3), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_ppvar_oled), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_pp5000_led_x), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_i2c_ec_adsp_batt), 1);
+	hook_call_deferred(&usba_pwr_enable_deferred_data,
+			   USBA_PWR_ENABLE_DELAY);
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_mensa,
 	     HOOK_PRIO_DEFAULT);

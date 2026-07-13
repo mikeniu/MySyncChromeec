@@ -12,3 +12,5 @@ target_sources(app PRIVATE ../../../chip/host/lpc.c)
 
 target_sources(app PRIVATE src/hostcmd_console.c)
 target_sources(app PRIVATE src/main.c)
+
+add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)

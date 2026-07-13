@@ -1,0 +1,156 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ *
+ * Consolidated native_sim overlay for all rvp_usbc_runtime test configs.
+ *
+ * Defines all three USB-C ports (C0, C1, C2) with both TI and RTK PDC nodes.
+ * Tests use I2C emulator failure injection to simulate different hardware
+ * configurations:
+ *  - TI configurations: control which TI chips respond via I2C ACK/NACK
+ *  - RTK configurations: control which RTK chips respond via I2C ACK/NACK
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <it8xxx2_emul.dts>
+#include <usbc-policy.dtsi>
+
+/ {
+	usbc: usbc-ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		usbc_p0: port0@0 {
+			compatible = "named-usbc-port";
+			reg = <0>;
+			pdc = <&pdc_rtk_c0 &pdc_ti_c0>;
+			chg = <&charger>;
+			policy = <&cros_policy>;
+			zephyr,deferred-init;
+		};
+
+		usbc_p1: port1@1 {
+			compatible = "named-usbc-port";
+			reg = <1>;
+			pdc = <&pdc_rtk_c1 &pdc_ti_c1>;
+			policy = <&cros_policy>;
+			zephyr,deferred-init;
+		};
+
+		usbc_p2: port2@2 {
+			compatible = "named-usbc-port";
+			reg = <2>;
+			pdc = <&pdc_rtk_c2 &pdc_ti_c2>;
+			policy = <&cros_policy>;
+			zephyr,deferred-init;
+		};
+
+		ppm_driver_nodelabel: ppm-driver {
+			compatible = "ucsi-ppm";
+		};
+	};
+
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+		i2c_port_pd: i2c_pd {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_USB_C0_TCPC";
+		};
+		i2c_port_battery: i2c_battery {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_BATTERY";
+		};
+	};
+
+	batteries {
+		default_battery: lgc_ac17a8m {
+			compatible = "lgc,ac17a8m", "battery-smart";
+		};
+	};
+};
+
+&i2c0 {
+	battery: sb@b {
+		compatible = "zephyr,smart-battery-emul";
+		reg = <0xb>;
+		cycle-count = <6>;
+		version = "BATTERY_SPEC_VER_1_1_WITH_PEC";
+		desired-charg-volt = <11250>;
+		desired-charg-cur = <2400>;
+		mf-name = "LGC";
+		dev-name = "AP18C8K";
+	};
+
+	charger: isl9238@9 {
+		compatible = "cros,isl923x-emul";
+		status = "okay";
+		reg = <0x9>;
+		battery = <&battery>;
+	};
+
+	/*
+	 * RTK PDC nodes — always enabled
+	 * i2c failure injection controls state of pdcs
+	 */
+
+
+	/* Required by the rts54-pdc emulator for SMBUS ARA handling */
+	smbus_ara_emul: smbus_ara@c {
+		compatible = "zephyr,smbus-ara-emul";
+		reg = <0xc>;
+	};
+
+	pdc_rtk_c0: rts5453p@30 {
+		compatible = "realtek,rts54-pdc";
+		reg = <0x30>;
+		irq-gpios = <&gpiof 0 GPIO_ACTIVE_LOW>;
+		zephyr,deferred-init;
+	};
+
+	pdc_rtk_c1: rts5453p@34 {
+		compatible = "realtek,rts54-pdc";
+		reg = <0x34>;
+		irq-gpios = <&gpiof 1 GPIO_ACTIVE_LOW>;
+		zephyr,deferred-init;
+	};
+
+	pdc_rtk_c2: rts5453p@31 {
+		compatible = "realtek,rts54-pdc";
+		reg = <0x31>;
+		irq-gpios = <&gpiof 2 GPIO_ACTIVE_LOW>;
+		zephyr,deferred-init;
+	};
+
+	/*
+	 * TI PDC nodes — always enabled
+	 * i2c failure injection controls state of pdcs
+	 */
+
+	pdc_ti_c0: tps6699-pdc@20 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x20>;
+		irq-gpios = <&gpiof 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c1: tps6699-pdc@24 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x24>;
+		irq-gpios = <&gpiof 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x2>;
+		frs-supported;
+		ccd;
+		zephyr,deferred-init;
+	};
+
+	pdc_ti_c2: tps6699-pdc@21 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x21>;
+		irq-gpios = <&gpiof 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+		zephyr,deferred-init;
+	};
+};

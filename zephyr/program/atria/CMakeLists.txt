@@ -16,6 +16,10 @@ if(DEFINED CONFIG_BOARD_ATRIARVP_RTK)
 
 endif()
 
+if(DEFINED CONFIG_BOARD_PENGHU)
+	project(penghu)
+endif()
+
 zephyr_include_directories("include/")
 
 # TODO(b/501105189): Selection of ISH-specific config files happens in BUILD.py.

@@ -10,5 +10,12 @@ third_party {
   version: "5925fa68fe8244651b3f78a88c4af99190a88f0d"
   last_upgrade_date { year: 2020 month: 9 day: 18 }
   license_type: NOTICE
+  # EC repository only imports overflow.h from the Linux kernel.
+  # It does not contain or use the cacheinfo subsystem, which
+  # is the subject of CVE-2023-53254.
+  mitigated_security_patch: "CVE-2023-53254"
+  # EC repository only imports overflow.h from the Linux kernel.
+  # It does not contain or use the nilfs2 file system, which
+  # is the subject of CVE-2023-53311.
+  mitigated_security_patch: "CVE-2023-53311"
 }
-
