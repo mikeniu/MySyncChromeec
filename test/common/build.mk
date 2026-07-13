@@ -12,7 +12,6 @@ test_common-y += test_util.o
 test_common-y += uart_buffering.o
 
 test_common-$(CONFIG_PWM) += pwm.o
-test_common-$(CONFIG_KEYBOARD_VIVALDI) += keyboard_vivaldi.o
 test_common-$(CONFIG_USB_PD_TCPC) += usb_pd_tcpc.o
 
 # C++ files
