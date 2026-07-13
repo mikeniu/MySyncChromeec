@@ -11,6 +11,9 @@
 	named-gpios {
 		compatible = "named-gpios";
 
+		gpio_all_sys_pg: all_sys_pg {
+			gpios = <&gpiod 5 (GPIO_INPUT)>;
+		};
 		gpio_gsc_ec_pwr_btn_odl: gsc_ec_pwr_btn_odl {
 			gpios = <&gpioe 4 (GPIO_INPUT)>;
 			enum-name = "GPIO_POWER_BUTTON_L";
@@ -30,6 +33,9 @@
 			gpios = <&gpioi 7 (GPIO_INPUT)>;
 			enum-name = "GPIO_TEMP_SENSOR_POWER";
 			no-auto-init;
+		};
+		gpio_en_pp5000_fan: en_pp5000_fan {
+			gpios = <&gpioc 4 (GPIO_OUTPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ec_soc_rtcrst: ec_soc_rtcrst {
 			gpios = <&gpioh 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
