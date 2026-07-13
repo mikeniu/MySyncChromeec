@@ -235,12 +235,10 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	} else {
 		thread_name = "unknown";
 	}
-	task_id_t task_id = thread_id_to_task_id(k_current_get());
-
 #ifdef CONFIG_RISCV
 	exception_address = csr_read(mepc);
 	printk("WDT pre-warning MEPC:%p TASK_ID:%d THREAD_NAME:%s\n",
-	       (void *)exception_address, task_id, thread_name);
+	       (void *)exception_address, -1, thread_name);
 #elif CONFIG_CPU_CORTEX_M
 	struct arch_esf *esf;
 	/*
@@ -249,13 +247,12 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 */
 	__asm__ volatile("mrs %0, psp" : "=r"(esf));
 	printk("WDT pre-warning PC:%p LR:%p TASK_ID:%d THREAD_NAME:%s\n",
-	       (void *)esf->basic.pc, (void *)esf->basic.lr, task_id,
-	       thread_name);
+	       (void *)esf->basic.pc, (void *)esf->basic.lr, -1, thread_name);
 	exception_address = esf->basic.pc;
 #else
 	/* TODO(b/176523207): watchdog warning message */
-	printk("Watchdog deadline is close! TASK_ID:%d THREAD_NAME:%s\n",
-	       task_id, thread_name);
+	printk("Watchdog deadline is close! TASK_ID:%d THREAD_NAME:%s\n", -1,
+	       thread_name);
 #endif
 #ifdef TEST_BUILD
 	wdt_warning_triggered = true;
@@ -275,7 +272,8 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
 	 * occurs.
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address, task_id);
+	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address,
+			 PANIC_EXCEPTION_NONE);
 }
 
 __maybe_unused static void

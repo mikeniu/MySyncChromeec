@@ -57,7 +57,7 @@ enum fp_sensor_type fpsensor_detect_get_type(void)
 
 static void fp_sensor_irq(const struct device *dev)
 {
-	task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_SENSOR_IRQ);
+	task_set_event(FPSENSOR, TASK_EVENT_SENSOR_IRQ);
 }
 
 int fp_sensor_init(void)

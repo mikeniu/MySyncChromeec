@@ -25,26 +25,33 @@ extern "C" {
 /* PD Host command timeout */
 #define PD_HOST_COMMAND_TIMEOUT_US SECOND
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+k_tid_t pd_port_to_thread_id(int port);
+int pd_port_from_thread(k_tid_t thread);
+#define PD_PORT_TO_THREAD(port) pd_port_to_thread_id(port)
+#define THREAD_TO_PD_PORT(thread) pd_port_from_thread(thread)
+#define CURRENT_PD_PORT() pd_port_from_thread(k_current_get())
+#define IS_CURRENT_TASK_PD_PORT(port) \
+	(pd_port_to_thread_id(port) == k_current_get())
+#else
 /*
- * Define PD_PORT_TO_TASK_ID() and TASK_ID_TO_PD_PORT() macros to
+ * Define PD_PORT_TO_THREAD() and THREAD_TO_PD_PORT() macros to
  * go between PD port number and task ID. Assume that TASK_ID_PD_C0 is the
  * lowest task ID and IDs are on a continuous range.
  */
 #if defined(HAS_TASK_PD_C0) && defined(CONFIG_USB_PD_PORT_MAX_COUNT)
-#define PD_PORT_TO_TASK_ID(port) (TASK_ID_PD_C0 + (port))
-#define TASK_ID_TO_PD_PORT(id) ((id) - TASK_ID_PD_C0)
+#define PD_PORT_TO_THREAD(port) (TASK_ID_PD_C0 + (port))
+#define THREAD_TO_PD_PORT(id) ((id) - TASK_ID_PD_C0)
 #else
-#define PD_PORT_TO_TASK_ID(port) -1 /* stub task ID */
-#define TASK_ID_TO_PD_PORT(id) 0
+#define PD_PORT_TO_THREAD(port) -1 /* stub task ID */
+#define THREAD_TO_PD_PORT(id) 0
 #endif /* CONFIG_USB_PD_PORT_MAX_COUNT && HAS_TASK_PD_C0 */
+#endif /* CONFIG_ZEPHYR */
 
-#include <zephyr/kernel.h>
-int pd_port_from_thread(k_tid_t thread);
-k_tid_t pd_port_to_task_id(int port);
-#define CURRENT_PD_PORT() pd_port_from_thread(k_current_get())
-#define IS_CURRENT_TASK_PD_PORT(port) \
-	(pd_port_to_task_id(port) == k_current_get())
-#define ASSERT_CURRENT_TASK_IS_PD(port) ASSERT(IS_CURRENT_TASK_PD_PORT(port))
+/* Legacy aliases */
+#define PD_PORT_TO_TASK_ID(port) PD_PORT_TO_THREAD(port)
+#define TASK_ID_TO_PD_PORT(id) THREAD_TO_PD_PORT(id)
 
 enum pd_rx_errors {
 	PD_RX_ERR_INVAL = -1, /* Invalid packet */

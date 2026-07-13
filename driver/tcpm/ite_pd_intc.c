@@ -39,7 +39,7 @@ void chip_pd_irq(enum usbpd_port port)
 		/* clear interrupt */
 		IT83XX_USBPD_ISR(port) = USBPD_REG_MASK_HARD_RESET_DETECT;
 		USBPD_SW_RESET(port);
-		task_set_event(PD_PORT_TO_TASK_ID(port),
+		task_set_event(pd_port_to_thread_id(port),
 			       PD_EVENT_RX_HARD_RESET);
 	}
 
@@ -62,7 +62,7 @@ void chip_pd_irq(enum usbpd_port port)
 		}
 		/* clear TX done interrupt */
 		IT83XX_USBPD_ISR(port) = USBPD_REG_MASK_MSG_TX_DONE;
-		task_set_event(PD_PORT_TO_TASK_ID(port),
+		task_set_event(pd_port_to_thread_id(port),
 			       TASK_EVENT_PHY_TX_DONE);
 	}
 
@@ -88,7 +88,7 @@ void chip_pd_irq(enum usbpd_port port)
 			/* clear type-c device plug in/out detect interrupt */
 			IT83XX_USBPD_TCDCR(port) |=
 				USBPD_REG_PLUG_IN_OUT_DETECT_STAT;
-			task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_CC);
+			task_set_event(pd_port_to_thread_id(port), PD_EVENT_CC);
 		}
 	}
 }

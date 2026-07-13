@@ -8,6 +8,7 @@
 
 #include <zephyr/fff.h>
 #include <zephyr/ztest.h>
+#include "panic.h"
 
 DECLARE_FAKE_VOID_FUNC(system_reset, int);
 DEFINE_FAKE_VOID_FUNC(system_reset, int);
@@ -34,7 +35,7 @@ ZTEST(debug_assert, test_assert_false)
 	} else {
 		zassert_equal(info, -1);
 	}
-	zassert_equal(task_get_current(), exception);
+	zassert_equal(PANIC_EXCEPTION_NONE, exception);
 }
 
 ZTEST(debug_assert, test_assert_true)

@@ -224,7 +224,7 @@ static void cros_kb_raw_ite_ksi_isr(void)
 				 data->ksi_pin_mask);
 
 	/* Wake-up keyboard scan task */
-	task_wake(TASK_ID_KEYSCAN);
+	task_wake(KEYSCAN);
 }
 
 void keyboard_raw_init(void)

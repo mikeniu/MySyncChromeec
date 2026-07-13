@@ -4377,7 +4377,7 @@
  *    - MIA_TASK_FLAG_USE_FPU : bit 0, task uses FPU H/W
  *
  * For USB PD tasks, IDs must be in consecutive order and correspond to
- * the port which they are for. See TASK_ID_TO_PD_PORT() macro.
+ * the port which they are for. See TO_PD_PORT() macro.
  */
 #undef CONFIG_TASK_LIST
 
