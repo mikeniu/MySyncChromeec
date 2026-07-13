@@ -180,7 +180,6 @@ common-$(CONFIG_USB_PD_DISCOVERY)+=usb_pd_discovery.o
 common-$(CONFIG_USB_PD_ALT_MODE_UFP)+=usb_pd_alt_mode_ufp.o
 common-$(CONFIG_USB_PD_DPS)+=dps.o
 common-$(CONFIG_USB_PD_LOGGING)+=event_log.o pd_log.o
-common-$(CONFIG_USB_PD_TCPC)+=usb_pd_tcpc.o
 common-$(CONFIG_USB_UPDATE)+=usb_update.o update_fw.o
 common-$(CONFIG_USBC_OCP)+=usbc_ocp.o
 common-$(CONFIG_USBC_PPC)+=usbc_ppc.o
