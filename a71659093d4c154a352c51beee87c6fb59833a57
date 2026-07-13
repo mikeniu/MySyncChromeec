@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fab13657_b0873f58",
+        "filename": "zephyr/program/atria/penghu/usb_typec.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-13T16:37:37Z",
+      "side": 1,
+      "message": "As noted on the previous CL, in the current configuration, I\u0027m pretty sure this should be 1. You can leave a to do to enable TBT later. A follow-up CL is fine.",
+      "revId": "a71659093d4c154a352c51beee87c6fb59833a57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
