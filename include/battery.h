@@ -489,6 +489,13 @@ int battery_bq4050_imbalance_mv(void);
 int board_cut_off_battery(void);
 
 /**
+ * Call board-specific wakeup  cut-off function.
+ *
+ * @return EC_RES_ERROR if the battery doesn't support.
+ */
+int board_wakeup_cutoff_battery(void);
+
+/**
  * Return if the battery start cut off.
  */
 int battery_cutoff_in_progress(void);

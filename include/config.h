@@ -599,6 +599,12 @@
 #undef CONFIG_BATTERY_CUT_OFF
 
 /*
+ * Wake up a cut-off battery automatically by sending the wakeup ship
+ * mode command to the fuel gauge.
+ */
+#undef CONFIG_BATTERY_WAKEUP_CUT_OFF
+
+/*
  * The default delay is 1 second. Define this if a board prefers
  * different delay.
  */
