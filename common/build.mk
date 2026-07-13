@@ -75,11 +75,7 @@ common-$(CONFIG_IO_EXPANDER)+=ioexpander.o ioexpander_commands.o
 common-$(CONFIG_COMMON_PANIC_OUTPUT)+=panic_output.o
 common-$(CONFIG_COMMON_RUNTIME)+=hooks.o system.o peripheral.o \
 	system_boot_time.o
-ifeq ($(BOARD),host)
 common-$(CONFIG_COMMON_RECURSIVE_MUTEX)+=recursive_mutex.o
-else ifeq ($(USE_BUILTIN_STDLIB), 1)
-common-$(CONFIG_COMMON_RECURSIVE_MUTEX)+=recursive_mutex.o
-endif
 common-$(CONFIG_COMMON_TIMER)+=timer.o
 common-$(CONFIG_CRC8_CROS)+= crc8.o
 common-$(CONFIG_CURVE25519)+=curve25519.o
@@ -220,27 +216,8 @@ ifneq ($(HAVE_PRIVATE_AUDIO_CODEC_WOV_LIBS),y)
 common-$(CONFIG_AUDIO_CODEC_WOV)+=hotword_dsp_api.o
 endif
 
-ifeq ($(USE_BUILTIN_STDLIB), 0)
 common-$(CONFIG_SHARED_MALLOC)+=shmalloc.o
 common-$(call not_cfg,$(CONFIG_SHARED_MALLOC))+=shared_mem_libc.o
-else ifneq ($(CONFIG_COMMON_RUNTIME),)
-ifeq ($(CONFIG_DFU_BOOTMANAGER_MAIN),ro)
-# Ordinary RO is replaced with DFU bootloader stub,
-# CONFIG_SHARED_MALLOC should only affect RW.
-ifeq ($(CONFIG_SHARED_MALLOC),y)
-common-rw+=shmalloc.o
-else ifeq ($(CONFIG_SHARED_MALLOC),rw)
-common-rw+=shmalloc.o
-else
-common-rw+=shared_mem.o
-endif
-else
-# CONFIG_SHARED_MALLOC affects both RO and RW as usual
-# (with shared_mem in case it is disabled.)
-common-$(CONFIG_SHARED_MALLOC)+=shmalloc.o
-common-$(call not_cfg,$(CONFIG_SHARED_MALLOC))+=shared_mem.o
-endif
-endif
 
 common-$(TEST_BUILD)+=test_util.o
 
