@@ -22,6 +22,30 @@
       },
       "revId": "4c0a475b1caa7b337cc74dbd8cc87253240f9c4f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ca710b9_2517c596",
+        "filename": "zephyr/program/atria/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-13T16:49:44Z",
+      "side": 1,
+      "message": "I think there are two possibilities here. One is that the RVP power sequencing code also works for penghu. In that case, I think we should rename the file to something like `common_board_power.c`. The other is that this does not work. In that case, we\u0027ll need to create a new file just for penghu. I\u0027m not clear on which of those is more likely.\n\n@devin.lu@quantatw.com I\u0027d like you to clarify this. Can you add a TODO here?",
+      "parentUuid": "d2e99a91_73b428fb",
+      "range": {
+        "startLine": 23,
+        "startChar": 29,
+        "endLine": 23,
+        "endChar": 32
+      },
+      "revId": "4c0a475b1caa7b337cc74dbd8cc87253240f9c4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
