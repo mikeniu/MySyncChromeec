@@ -175,6 +175,14 @@ config PLATFORM_EC_BATTERY_CUT_OFF
 	  Once defined, a board specific board_cut_off_battery() function
 	  has to be provided.
 
+config PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF
+	bool "Battery wakeup cut-off"
+	help
+	  Turn on the battery D-FET automatically by sending the wakeup ship mode
+	  command to the fuel gauge when the battery disconnect state is detected.
+	  The wakeup ship mode register and data are configured in the battery
+	  device tree.
+
 config PLATFORM_EC_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN
 	bool "Battery cut-off at shutdown"
 	depends on PLATFORM_EC_BATTERY_CUT_OFF

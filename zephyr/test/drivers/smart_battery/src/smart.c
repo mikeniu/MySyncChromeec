@@ -4,6 +4,7 @@
  */
 
 #include "battery.h"
+#include "battery_fuel_gauge.h"
 #include "battery_smart.h"
 #include "common.h"
 #include "console.h"
@@ -22,6 +23,8 @@
 
 FAKE_VALUE_FUNC(int, battery_is_cut_off);
 FAKE_VALUE_FUNC(int, battery_cutoff_in_progress);
+
+extern const struct batt_conf_embed *battery_conf;
 
 /** Test all simple getters */
 ZTEST_USER(smart_battery, test_battery_getters)
@@ -677,6 +680,90 @@ ZTEST_USER(smart_battery, test_battery_access_cutoff)
 	zassert_equal(get_battery_manufacturer_name(str, sizeof(str)),
 		      EC_ERROR_ACCESS_DENIED);
 	zassert_equal(sb_read_sized_block(0, str, 1), EC_ERROR_ACCESS_DENIED);
+}
+
+/** Test board_wakeup_cutoff_battery directly */
+ZTEST_USER(smart_battery, test_board_wakeup_cutoff_battery)
+{
+	struct sbat_emul_bat_data *bat;
+	const struct emul *emul = EMUL_DT_GET(BATTERY_NODE);
+	struct i2c_common_emul_data *common_data =
+		emul_smart_battery_get_i2c_common_data(emul);
+	const struct batt_conf_embed *saved_conf = get_batt_conf();
+	const struct wakeup_ship_mode_info *wakeup_ship_mode;
+
+	bat = sbat_emul_get_bat_data(emul);
+
+	/* Use the default battery configuration (lgc,ac17a8m) */
+	battery_conf = &board_battery_info[0];
+	wakeup_ship_mode =
+		&board_battery_info[0].config.fuel_gauge.wakeup_ship_mode;
+
+	/* Check that i2c error returns EC_RES_ERROR */
+	i2c_common_emul_set_write_fail_reg(common_data,
+					   wakeup_ship_mode->reg_addr);
+	zassert_equal(EC_RES_ERROR, board_wakeup_cutoff_battery(), NULL);
+	i2c_common_emul_set_write_fail_reg(common_data,
+					   I2C_COMMON_EMUL_NO_FAIL_REG);
+
+	/* Check for OK when i2c succeeds */
+	zassert_equal(EC_RES_SUCCESS, board_wakeup_cutoff_battery(), NULL);
+
+	/*
+	 * Wakeup ship mode command requires writing 2 data values to the
+	 * register. The emulator keeps only the last written value of
+	 * SB_MANUFACTURER_ACCESS in mf_access.
+	 */
+	zassert_equal(wakeup_ship_mode->reg_data[1], bat->mf_access,
+		      "0x%x != 0x%x", wakeup_ship_mode->reg_data[1],
+		      bat->mf_access);
+
+	/* Restore battery configuration */
+	battery_conf = saved_conf;
+}
+
+/** Test that wakeup cutoff is triggered when battery is disconnected */
+ZTEST_USER(smart_battery, test_battery_disconnect_state_wakeup_cutoff)
+{
+	struct sbat_emul_bat_data *bat;
+	const struct emul *emul = EMUL_DT_GET(BATTERY_NODE);
+	const struct batt_conf_embed *saved_conf = get_batt_conf();
+	const struct wakeup_ship_mode_info *wakeup_ship_mode;
+
+	if (!IS_ENABLED(CONFIG_BATTERY_WAKEUP_CUT_OFF)) {
+		ztest_test_skip();
+	}
+
+	bat = sbat_emul_get_bat_data(emul);
+
+	/* Use the default battery configuration (lgc,ac17a8m) */
+	battery_conf = &board_battery_info[0];
+	wakeup_ship_mode =
+		&board_battery_info[0].config.fuel_gauge.wakeup_ship_mode;
+
+	/* Battery is not disconnected (FET status doesn't match) */
+	bat->mf_access = 0;
+	zassert_equal(BATTERY_NOT_DISCONNECTED, battery_get_disconnect_state(),
+		      NULL);
+	/* Wakeup cutoff was not executed */
+	zassert_equal(0, bat->mf_access, "0x%x != 0x%x", 0, bat->mf_access);
+
+	/* Battery is disconnected (FET status matches disconnect_val) */
+	bat->mf_access =
+		board_battery_info[0].config.fuel_gauge.fet.disconnect_val;
+	zassert_equal(BATTERY_DISCONNECTED, battery_get_disconnect_state(),
+		      NULL);
+
+	/*
+	 * Wakeup cutoff was executed: the ship mode command wrote 2 data
+	 * values to the register and the emulator keeps the last one.
+	 */
+	zassert_equal(wakeup_ship_mode->reg_data[1], bat->mf_access,
+		      "0x%x != 0x%x", wakeup_ship_mode->reg_data[1],
+		      bat->mf_access);
+
+	/* Restore battery configuration */
+	battery_conf = saved_conf;
 }
 
 static void reset_battfake(void *data)

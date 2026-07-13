@@ -8276,6 +8276,12 @@ struct ship_mode_info {
 	uint16_t reg_data[SHIP_MODE_WRITES];
 } __packed __aligned(2);
 
+struct wakeup_ship_mode_info {
+	uint8_t reg_addr;
+	uint8_t reserved;
+	uint16_t reg_data[SHIP_MODE_WRITES];
+} __packed __aligned(2);
+
 struct sleep_mode_info {
 	uint8_t reg_addr;
 	uint8_t reserved;
@@ -8320,6 +8326,7 @@ struct fuel_gauge_info {
 	struct ship_mode_info ship_mode;
 	struct sleep_mode_info sleep_mode;
 	struct fet_info fet;
+	struct wakeup_ship_mode_info wakeup_ship_mode;
 } __packed __aligned(4);
 
 /* Battery constants */
