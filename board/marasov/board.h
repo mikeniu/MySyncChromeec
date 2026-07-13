@@ -179,7 +179,7 @@ enum temp_sensor_id {
 
 enum ioex_port { IOEX_C0_NCT38XX = 0, IOEX_PORT_COUNT };
 
-enum battery_type { BATTERY_C490, BATTERY_TYPE_COUNT };
+enum battery_type { BATTERY_C490, BATTERY_B140336, BATTERY_TYPE_COUNT };
 
 enum pwm_channel {
 	PWM_CH_KBLIGHT, /* PWM3 */
