@@ -311,7 +311,7 @@ static void bist_timer_completion(void)
 		return;
 
 	pchg_queue_event(ctx, PCHG_EVENT_BIST_DONE);
-	task_wake(TASK_ID_PCHG);
+	task_wake(PCHG);
 }
 DECLARE_DEFERRED(bist_timer_completion);
 
@@ -807,7 +807,7 @@ void pchg_irq(enum gpio_signal signal)
 		ctx = &pchgs[i];
 		if (signal == ctx->cfg->irq_pin) {
 			ctx->irq = 1;
-			task_wake(TASK_ID_PCHG);
+			task_wake(PCHG);
 			return;
 		}
 	}
@@ -846,7 +846,7 @@ void pchg_startup(void)
 	}
 
 	if (active_pchg_count)
-		task_wake(TASK_ID_PCHG);
+		task_wake(PCHG);
 }
 
 void pchg_shutdown(void)
@@ -863,7 +863,7 @@ void pchg_shutdown(void)
 		ctx->battery_percent = 0;
 		pchg_queue_event(ctx, PCHG_EVENT_DEVICE_LOST);
 	}
-	task_wake(TASK_ID_PCHG);
+	task_wake(PCHG);
 }
 
 #ifdef CONFIG_WPC_HALL_ENABLE
@@ -1136,7 +1136,7 @@ static enum ec_status hc_pchg_update(struct host_cmd_handler_args *args)
 		return EC_RES_INVALID_PARAM;
 	}
 
-	task_wake(TASK_ID_PCHG);
+	task_wake(PCHG);
 
 	return EC_RES_SUCCESS;
 }
@@ -1180,7 +1180,7 @@ static int cc_pchg(int argc, const char **argv)
 		return EC_ERROR_PARAM2;
 	}
 
-	task_wake(TASK_ID_PCHG);
+	task_wake(PCHG);
 
 	return EC_SUCCESS;
 }

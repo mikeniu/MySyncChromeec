@@ -13,7 +13,7 @@
 /* Recursive mutex implementation */
 
 /* Make sure atomic_t type is enough to keep waiters bitmask. */
-BUILD_ASSERT(sizeof(atomic_t) * 8 >= TASK_ID_COUNT);
+BUILD_ASSERT(sizeof(atomic_t) * 8 >= COUNT);
 
 void mutex_init_recursive(struct mutex_r *mtx)
 {
@@ -28,7 +28,7 @@ void mutex_init_recursive(struct mutex_r *mtx)
 void mutex_lock_recursive(struct mutex_r *mtx)
 {
 	atomic_val_t state;
-	task_id_t current;
+	k_tid_t current;
 
 	ASSERT(mtx != NULL);
 	ASSERT(!in_interrupt_context());
@@ -76,7 +76,7 @@ void mutex_lock_recursive(struct mutex_r *mtx)
 int mutex_try_lock_recursive(struct mutex_r *mtx)
 {
 	atomic_val_t state;
-	task_id_t current;
+	k_tid_t current;
 
 	ASSERT(mtx != NULL);
 	ASSERT(!in_interrupt_context());

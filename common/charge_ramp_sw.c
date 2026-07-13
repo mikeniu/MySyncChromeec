@@ -113,7 +113,7 @@ void chg_ramp_charge_supplier_change(int port, int supplier, int current,
 				  CHG_RAMP_DISCONNECTED :
 				  CHG_RAMP_CHARGE_DETECT_DELAY;
 		CPRINTS("Ramp reset: st%d", ramp_st);
-		task_wake(TASK_ID_CHG_RAMP);
+		task_wake(CHG_RAMP);
 	}
 }
 

@@ -116,6 +116,8 @@ __noreturn
 	void software_panic(uint32_t reason, uint32_t info);
 #endif /* !CONFIG_ZEPHYR */
 
+#define PANIC_EXCEPTION_NONE 0xff
+
 /**
  * Log a panic in the panic log, but don't halt the system. Normally
  * called on the subsequent reboot after panic detection.
