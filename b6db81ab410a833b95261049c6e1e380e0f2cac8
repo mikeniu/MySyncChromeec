@@ -1,0 +1,42 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb753330_15398a00",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-13T14:36:31Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "b949609d_e2975f74",
+      "isAi": true,
+      "revId": "b6db81ab410a833b95261049c6e1e380e0f2cac8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "397164c8_d5a48b67",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1061,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-13T14:36:31Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "7d194dda_bae855f3",
+      "isAi": true,
+      "revId": "b6db81ab410a833b95261049c6e1e380e0f2cac8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
