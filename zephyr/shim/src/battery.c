@@ -14,6 +14,10 @@
 		.reg_addr = DT_PROP(node, ship_mode_reg_addr), \
 		.reg_data = DT_PROP(node, ship_mode_reg_data), \
 	}, \
+	.wakeup_ship_mode = { \
+		.reg_addr = DT_PROP_OR(node, wakeup_ship_mode_reg_addr, 0), \
+		.reg_data = DT_PROP_OR(node, wakeup_ship_mode_reg_data, {0}), \
+	}, \
 	.sleep_mode = { \
 		.reg_addr = DT_PROP_OR(node, sleep_mode_reg_addr, 0), \
 		.reg_data = DT_PROP_OR(node, sleep_mode_reg_data, 0), \
