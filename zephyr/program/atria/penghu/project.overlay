@@ -9,6 +9,7 @@
 /* penghu project DTS includes */
 #include "binman.dtsi"
 #include "gpios.dtsi"
+#include "hibernate.dtsi"
 #include "interrupts.dtsi"
 #include "keyboard.dtsi"
 #include "i2c.dtsi"
