@@ -22,6 +22,30 @@
       },
       "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c422ea23_665bc3c7",
+        "filename": "zephyr/program/bluey/mica/src/chipset.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-07-13T08:40:09Z",
+      "side": 1,
+      "message": "Is checking if the AC power is present before enabling the diag animation a viable solution?\n`if (power_on_in_progress \u0026\u0026 extpower_is_present())`",
+      "parentUuid": "5f51ca01_82643a5f",
+      "range": {
+        "startLine": 58,
+        "startChar": 1,
+        "endLine": 66,
+        "endChar": 64
+      },
+      "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
