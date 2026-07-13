@@ -9,6 +9,10 @@
 config TIMESLICING
 	default n
 
+config THREAD_MONITOR
+	default y
+
+
 config LOG
 	default y
 	imply LOG_DEFAULT_MINIMAL
