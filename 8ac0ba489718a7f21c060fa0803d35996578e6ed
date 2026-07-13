@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f51ca01_82643a5f",
+        "filename": "zephyr/program/bluey/mica/src/chipset.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-07-13T04:21:35Z",
+      "side": 1,
+      "message": "Won\u0027t this trigger the diagnostic animation when the device is unplugged from AC power while in the G3 state?",
+      "range": {
+        "startLine": 58,
+        "startChar": 1,
+        "endLine": 66,
+        "endChar": 64
+      },
+      "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
