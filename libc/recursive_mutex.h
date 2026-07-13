@@ -19,7 +19,7 @@ struct mutex_r {
 	atomic_t state;
 	atomic_t waiters;
 	int count;
-	task_id_t owner;
+	k_tid_t owner;
 };
 
 /**

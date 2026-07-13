@@ -78,7 +78,7 @@ __overridable const struct svdm_response svdm_rsp = {
 };
 
 /* Tracker for which task is waiting on sysjump prep to finish */
-static volatile task_id_t sysjump_task_waiting = TASK_ID_INVALID;
+static volatile k_tid_t sysjump_task_waiting = NULL;
 
 #define DPM_SET_FLAG(port, flag) atomic_or(&dpm[(port)].flags, (flag))
 #define DPM_CLR_FLAG(port, flag) atomic_clear_bits(&dpm[(port)].flags, (flag))
@@ -175,10 +175,10 @@ void pd_prepare_sysjump(void)
 		if (!pd_alt_mode_capable(i))
 			continue;
 
-		sysjump_task_waiting = task_get_current();
-		task_set_event(PD_PORT_TO_TASK_ID(i), PD_EVENT_SYSJUMP);
+		sysjump_task_waiting = k_current_get();
+		task_set_event(pd_port_to_thread_id(i), PD_EVENT_SYSJUMP);
 		task_wait_event_mask(TASK_EVENT_SYSJUMP_READY, -1);
-		sysjump_task_waiting = TASK_ID_INVALID;
+		sysjump_task_waiting = NULL;
 	}
 #endif /* CONFIG_ZEPHYR */
 }
@@ -189,7 +189,7 @@ void notify_sysjump_ready(void)
 	 * If event was set from pd_prepare_sysjump, wake the
 	 * task waiting on us to complete.
 	 */
-	if (sysjump_task_waiting != TASK_ID_INVALID)
+	if (sysjump_task_waiting != NULL)
 		task_set_event(sysjump_task_waiting, TASK_EVENT_SYSJUMP_READY);
 }
 

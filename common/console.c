@@ -564,7 +564,7 @@ void console_has_input(void)
 #endif
 
 	/* Wake up the console task */
-	task_wake(TASK_ID_CONSOLE);
+	task_wake(CONSOLE);
 }
 
 void console_task(void *u)

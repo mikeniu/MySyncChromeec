@@ -176,7 +176,7 @@ void keyboard_scan_enable(int enable, enum kb_scan_disable_masks mask)
 	/* Using atomic_get() causes build errors on some archs */
 	if (old != disable_scanning_mask) {
 		/* If the mask has changed, let the task figure things out */
-		task_wake(TASK_ID_KEYSCAN);
+		task_wake(KEYSCAN);
 	}
 }
 
@@ -296,7 +296,7 @@ static void simulate_key(int row, int col, int pressed)
 	force_poll = 1;
 
 	/* Wake the task to handle changes in simulated keys */
-	task_wake(TASK_ID_KEYSCAN);
+	task_wake(KEYSCAN);
 
 	/*
 	 * Make sure that the keyboard task sees the key for long enough.
