@@ -174,7 +174,7 @@ def update_symlink(target_path, link_path):
         not link_path.is_symlink()
         or pathlib.Path(os.readlink(link_path)).resolve() != target
     ):
-        if link_path.exists():
+        if link_path.is_symlink() or link_path.exists():
             link_path.unlink()
         link_path.symlink_to(target)
 

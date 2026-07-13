@@ -1577,6 +1577,9 @@ def build_zephyr(
         for config in zephyr_extra_configs:
             f_test_config.write(f"{config}\n")
 
+    with open(test_conf, "r", encoding="utf-8") as f:
+        logging.info("test_conf content:\n%s", f.read())
+
     return cmd
 
 
@@ -1917,6 +1920,10 @@ def flash_and_run_test(
             )
             return False
 
+    if args.build_only:
+        logging.info("Build complete. Skipping execution due to --build-only.")
+        return True
+
     # Get the console file before flashing to listen ASAP after flashing.
     console_pty = platform.get_console(board_config)
 
@@ -2112,6 +2119,12 @@ def main():
 
     parser.add_argument(
         "--renode", help="Run tests with Renode emulator", action="store_true"
+    )
+
+    parser.add_argument(
+        "--build-only",
+        help="Only build test binaries without flashing or running them",
+        action="store_true",
     )
 
     parser.add_argument(

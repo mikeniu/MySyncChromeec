@@ -7,9 +7,17 @@
 
 #include <cros/integrated_fwid.dtsi>
 
+/* Include the standard and OEM schema templates */
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+
+/* Include the generated file that defines the values for this project */
+#include "c1nv_ec_ufsc.dtsi"
+
 #include "../psl.dtsi"
 #include "../adc.dtsi"
 #include "../common.dtsi"
+#include "battery.dtsi"
 
 /* c1nv project DTS includes */
 
@@ -17,6 +25,7 @@
 #include "gpios.dtsi"
 #include "i2c.dtsi"
 #include "interrupts.dtsi"
+#include "keyboard.dtsi"
 #include "temp_sensors.dtsi"
 
 /* c1nv overrides follow... */

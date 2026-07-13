@@ -34,7 +34,7 @@
 			gpios = <&gpio5 0 (GPIO_INPUT)>;
 		};
 		gpio_ec_sys_throttle_mira: ec_sys_throttle_mira {
-			gpios = <&gpio5 2 (GPIO_INPUT | GPIO_PULL_UP)>;
+			gpios = <&gpio5 2 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 			enum-name = "GPIO_CPU_PROCHOT";
 		};
 		gpio_dock_vdm_pwr_on: dock_vdm_pwr_on {
@@ -181,7 +181,7 @@
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 		};
 		gpio_smb2360_b_chg_led_pg_odl: smb2360_b_chg_led_pg_odl {
-			gpios = <&gpioe 0 (GPIO_INPUT)>;
+			gpios = <&gpioe 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ec_kb_bl_en: ec_kb_bl_en {
 			gpios = <&gpioe 2 (GPIO_OUTPUT)>;
@@ -192,7 +192,7 @@
 			enum-name = "GPIO_CCD_MODE_ODL";
 		};
 		gpio_smb2360_a_chg_led_pg_odl: smb2360_a_chg_led_pg_odl {
-			gpios = <&gpiof 0 (GPIO_INPUT)>;
+			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ec_spare_gpiof1: ec_spare_gpiof1 {
 			gpios = <&gpiof 1 (GPIO_INPUT)>;

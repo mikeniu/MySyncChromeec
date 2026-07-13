@@ -11,17 +11,62 @@
 			pwms = <&pwm5 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
 			rpm-min = <3150>;
 			rpm-start = <3150>;
-			rpm-max = <7700>;
+			rpm-max = <8500>;
+			rpm-deviation = <1>;
 			tach = <&tach2>;
 		};
 		fan2: fan_2 {
 			pwms = <&pwm4 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
 			rpm-min = <3150>;
 			rpm-start = <3150>;
-			rpm-max = <7700>;
+			rpm-max = <8500>;
+			rpm-deviation = <1>;
 			tach = <&tach1>;
 		};
+	};
 
+	fan_steps: fan-steps {
+		compatible = "cros-ec,fan-steps";
+		level_0 {
+			temp-on = <45>;
+			temp-off = <99>;
+			rpm-target = <0 0>;
+		};
+		level_1 {
+			temp-on = <50>;
+			temp-off = <43>;
+			rpm-target = <4500 4500>;
+		};
+		level_2 {
+			temp-on = <54>;
+			temp-off = <48>;
+			rpm-target = <5200 5200>;
+		};
+		level_3 {
+			temp-on = <59>;
+			temp-off = <52>;
+			rpm-target = <6000 6000>;
+		};
+		level_4 {
+			temp-on = <63>;
+			temp-off = <57>;
+			rpm-target = <6800 6800>;
+		};
+		level_5 {
+			temp-on = <70>;
+			temp-off = <61>;
+			rpm-target = <7500 7500>;
+		};
+		level_6 {
+			temp-on = <75>;
+			temp-off = <68>;
+			rpm-target = <8000 8000>;
+		};
+		level_7 {
+			temp-on = <99>;
+			temp-off = <73>;
+			rpm-target = <8300 8300>;
+		};
 	};
 };
 

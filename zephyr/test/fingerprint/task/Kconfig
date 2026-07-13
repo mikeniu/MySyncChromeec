@@ -45,6 +45,12 @@ config LINK_TEST_SUITE_FINGERPRINT_SHIM
 	  Link and execute fingerprint subsystem tests that focus
 	  on fpsensor shim.
 
+config LINK_TEST_SUITE_FINGERPRINT_STATE
+	bool "Link fingerprint state tests"
+	help
+	  Link and execute fingerprint subsystem tests that focus
+	  on fpsensor state.
+
 config LINK_TEST_SUITE_FINGERPRINT_TEMPLATE
 	bool "Link fingerprint template tests"
 	help
@@ -80,12 +86,6 @@ config LINK_TEST_SUITE_FINGERPRINT_FRAME_SIZE
 	help
 	  Link and execute fingerprint subsystem tests that focus
 	  on finger frame size.
-
-config LINK_TEST_SUITE_FINGERPRINT_FP_INFO
-	bool "Link fingerprint FP_INFO tests"
-	help
-	  Link and execute fingerprint subsystem tests that focus
-	  on FP_INFO host command.
 
 config LINK_TEST_SUITE_FINGERPRINT_BTN_IGN_OUT
 	bool "Link fingerprint btn ign out tests"

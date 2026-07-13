@@ -215,7 +215,8 @@ static void print_battery_params(void)
 	print_item_name("Charge:");
 	ccprintf("%d %%\n", batt->state_of_charge);
 
-	if (IS_ENABLED(CONFIG_CHARGER)) {
+	if (IS_ENABLED(CONFIG_CHARGER) ||
+	    IS_ENABLED(CONFIG_PLATFORM_EC_ADSP_CHARGE_MANAGER)) {
 		int value;
 
 		print_item_name("  Display:");
@@ -829,8 +830,7 @@ __overridable enum battery_disconnect_state battery_get_disconnect_state(void)
 #error "Voltage limit must be between 5000 and CONFIG_USB_PD_MAX_VOLTAGE_MV"
 #endif
 
-#if !((defined(CONFIG_USB_PD_TCPMV1) && defined(CONFIG_USB_PD_DUAL_ROLE)) || \
-      (defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM)) ||        \
+#if !((defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM)) || \
       defined(CONFIG_USB_PD_CONTROLLER))
 #error "Voltage reducing requires TCPM with Policy Engine or PDC"
 #endif

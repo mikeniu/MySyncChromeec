@@ -29,7 +29,7 @@
 			enum-names = "I2C_PORT_BATTERY";
 		};
 		i2c_i2c_mcu: i2c_mcu {
-			i2c-port = <&i2c5_1>;
+			i2c-port = <&i2c6_1>;
 			enum-names = "I2C_PORT_MCU";
 		};
 		i2c_ec_i2c_spare: ec_i2c_spare{
@@ -69,9 +69,9 @@
 	pinctrl-names = "default";
 };
 
-&i2c5_1 {
+&i2c6_1 {
 	status = "okay";
-	pinctrl-0 = <&i2c5_1_sda_scl_gpf4_f5>;
+	pinctrl-0 = <&i2c6_1_sda_scl_gpe3_e4>;
 	pinctrl-names = "default";
 };
 
@@ -98,6 +98,10 @@
 };
 
 &i2c_ctrl5 {
+	status = "okay";
+};
+
+&i2c_ctrl6 {
 	status = "okay";
 };
 
