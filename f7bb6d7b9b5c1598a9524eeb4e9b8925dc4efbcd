@@ -3,6 +3,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "acc0d65f_938e98e3",
+        "filename": "zephyr/include/usbc/pdc_dpm.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-13T21:05:02Z",
+      "side": 1,
+      "message": "Guard callers with `IS_ENABLED` instead of `#ifdef CONFIG_USBC_PDC_TBT_SUPPORTED` in the header file.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 36
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae6255c6_20ac235b",
+        "filename": "zephyr/include/usbc/pdc_power_mgmt.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 801,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-13T21:05:02Z",
+      "side": 1,
+      "message": "Same here, use `IS_ENABLED` guards at the calling sites.",
+      "range": {
+        "startLine": 801,
+        "startChar": 0,
+        "endLine": 801,
+        "endChar": 36
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1d798a36_2189f2d4",
         "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
         "patchSetId": 3
@@ -43,6 +89,52 @@
         "startChar": 4,
         "endLine": 114,
         "endChar": 27
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "443fd09a_16b450a4",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm_tbt.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-13T21:05:02Z",
+      "side": 1,
+      "message": "Should `reset_ongoing` be set before `reset_pending` is cleared?",
+      "range": {
+        "startLine": 49,
+        "startChar": 1,
+        "endLine": 49,
+        "endChar": 15
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d2f4fa8_4166c206",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm_tbt.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-13T21:05:02Z",
+      "side": 1,
+      "message": "Is this just a failsafe in case the `pdc_dpm_remove_sink()` and `pdc_dpm_tbt_clear_port()` functions are not called?\n\nYou\u0027re unconditionaly clearing all ports here, but you never cancel this work.  I think there is a race condition opportunity with if a 2nd TBT sink is connected about 5 seconds after the 1st TBT sink.",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 1
       },
       "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
