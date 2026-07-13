@@ -384,6 +384,8 @@ static enum ec_status fp_command_context(struct host_cmd_handler_args *args)
 		}
 
 		std::ranges::copy(p->userid, global_context.user_id.begin());
+		memcpy(global_context.user_id.data(), p->userid,
+		       sizeof(global_context.user_id));
 
 		/* Set the FP_CONTEXT_USER_ID_SET bit if the user_id is
 		 * non-zero. */
