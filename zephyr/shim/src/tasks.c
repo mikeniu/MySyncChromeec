@@ -133,7 +133,7 @@ test_mockable k_tid_t get_hostcmd_thread(void)
 	return NULL;
 }
 
-task_id_t thread_id_to_task_id(k_tid_t thread_id)
+static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 {
 	if (thread_id == NULL) {
 		__ASSERT(false, "Invalid thread_id");
