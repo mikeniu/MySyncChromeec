@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd840220_5b23f74a",
+        "filename": "zephyr/shim/include/shimmed_task_id.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-13T20:15:54Z",
+      "side": 1,
+      "message": "thread_id_to_task_id() needs to be deprecated. See b/456237554",
+      "revId": "7bc200628f1c3bde2e8197cebd45991273af5543",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfe8c2aa_551a6a48",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-13T20:15:54Z",
+      "side": 1,
+      "message": "Consider making this an #if #elif #else block so it\u0027s easier to follow the logic.",
+      "revId": "7bc200628f1c3bde2e8197cebd45991273af5543",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
