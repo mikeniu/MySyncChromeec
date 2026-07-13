@@ -204,7 +204,7 @@ static void bc12_power_down(int port)
 
 #if defined(CONFIG_POWER_PP5000_CONTROL) && defined(CONFIG_AP_POWER_CONTROL)
 	/* Indicate PP5000_A rail is not required by USB_CHG task. */
-	power_5v_enable(task_get_current(), 0);
+	power_5v_enable(PUR_BC12_PORT0 + port, 0);
 #endif
 }
 
@@ -214,7 +214,7 @@ static void bc12_power_up(int port)
 	    IS_ENABLED(CONFIG_AP_POWER_CONTROL) &&
 	    !(pi3usb9201_bc12_chips[port].flags & PI3USB9201_ALWAYS_POWERED)) {
 		/* Turn on the 5V rail to allow the chip to be powered. */
-		power_5v_enable(task_get_current(), 1);
+		power_5v_enable(PUR_BC12_PORT0 + port, 1);
 		/*
 		 * Give the pi3usb9201 time so it's ready to receive i2c
 		 * messages

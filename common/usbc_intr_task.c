@@ -26,17 +26,55 @@
 
 #define ALERT_STORM_INTERVAL SECOND
 
-static uint8_t pd_int_task_id[CONFIG_USB_PD_PORT_MAX_COUNT];
+#ifdef CONFIG_HAS_TASK_PD_INT_SHARED
+#define IS_PORT_SHARED(port)                                                   \
+	((port == 0 && IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_PORT_0_SHARED)) || \
+	 (port == 1 && IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_PORT_1_SHARED)) || \
+	 (port == 2 && IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_PORT_2_SHARED)) || \
+	 (port == 3 && IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_PORT_3_SHARED)))
+#define PD_INT_SHARED_ID TASK_ID_PD_INT_SHARED
+#else
+#define IS_PORT_SHARED(port) 0
+#define PD_INT_SHARED_ID TASK_ID_INVALID
+#endif
+
+#ifdef HAS_TASK_PD_INT_C0
+#define PD_INT_C0_ID TASK_ID_PD_INT_C0
+#else
+#define PD_INT_C0_ID TASK_ID_INVALID
+#endif
+
+#ifdef HAS_TASK_PD_INT_C1
+#define PD_INT_C1_ID TASK_ID_PD_INT_C1
+#else
+#define PD_INT_C1_ID TASK_ID_INVALID
+#endif
+
+#ifdef HAS_TASK_PD_INT_C2
+#define PD_INT_C2_ID TASK_ID_PD_INT_C2
+#else
+#define PD_INT_C2_ID TASK_ID_INVALID
+#endif
+
+#ifdef HAS_TASK_PD_INT_C3
+#define PD_INT_C3_ID TASK_ID_PD_INT_C3
+#else
+#define PD_INT_C3_ID TASK_ID_INVALID
+#endif
+
+#define PD_INT_PORT_TO_TASK_ID(port)               \
+	(IS_PORT_SHARED(port) ? PD_INT_SHARED_ID : \
+	 (port) == 0	      ? PD_INT_C0_ID :     \
+	 (port) == 1	      ? PD_INT_C1_ID :     \
+	 (port) == 2	      ? PD_INT_C2_ID :     \
+				PD_INT_C3_ID)
 
 test_mockable void schedule_deferred_pd_interrupt(const int port)
 {
-	/*
-	 * Don't set event to idle task if task id is 0. This happens when
-	 * not all the port have pd int task, the pd_int_task_id of port
-	 * that doesn't have pd int task is 0.
-	 */
-	if (pd_int_task_id[port] != 0)
-		task_set_event(pd_int_task_id[port], PD_PROCESS_INTERRUPT);
+	task_id_t tid = PD_INT_PORT_TO_TASK_ID(port);
+
+	if (tid != TASK_ID_INVALID)
+		task_set_event(tid, PD_PROCESS_INTERRUPT);
 }
 
 static struct {
@@ -95,8 +133,6 @@ void pd_interrupt_handler_task(void *p)
 	if (port >= board_get_usb_pd_port_count())
 		return;
 
-	pd_int_task_id[port] = task_get_current();
-
 	while (1) {
 		bool have_alerts;
 		const int evt = task_wait_event(-1);
@@ -139,7 +175,7 @@ BUILD_ASSERT(PD_STATUS_TCPC_ALERT_3 == (PD_STATUS_TCPC_ALERT_0 << 3));
  * is not.
  */
 
-#if !defined(CONFIG_ZEPHYR) || defined(CONFIG_HAS_TASK_PD_INT_SHARED)
+#ifdef CONFIG_HAS_TASK_PD_INT_SHARED
 void pd_shared_alert_task(void *p)
 {
 	const int sources_mask = (int)((intptr_t)p);
@@ -157,7 +193,6 @@ void pd_shared_alert_task(void *p)
 
 		port_mask = PD_STATUS_TCPC_ALERT_0 << port;
 		want_alerts |= port_mask;
-		pd_int_task_id[port] = task_get_current();
 	}
 
 	if (want_alerts == 0) {
@@ -210,4 +245,4 @@ void pd_shared_alert_task(void *p)
 		} while (have_alerts != 0);
 	}
 }
-#endif /* !CONFIG_ZEPHYR || CONFIG_HAS_TASK_PD_INT_SHARED */
+#endif /* CONFIG_HAS_TASK_PD_INT_SHARED */
