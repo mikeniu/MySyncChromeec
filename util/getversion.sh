@@ -162,7 +162,9 @@ main() {
       if [[ -n "${values[1]}" ]]; then
         # From each modified repo get the most recently modified file.
         most_recent_file="$(git status --porcelain | \
-                                 awk '$1 ~ /[M|A|?]/ {print $2}' | \
+                                 awk '$1 ~ /[MAR?]/ {
+                                   print ($3 == "->") ? $4 : $2
+                                 }' | \
                                  xargs -r ls -t | head -1)"
         if [[ -n "${most_recent_file}" ]]; then
           most_recents+=("$(realpath "${most_recent_file}")")
