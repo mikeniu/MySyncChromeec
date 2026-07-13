@@ -118,6 +118,30 @@
       },
       "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72552dc2_aaaa221c",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-07-13T21:19:14Z",
+      "side": 1,
+      "message": "There is no C2 HBR currently since they share all the same I2C and drivers so there is no reason to have a separate definition. I can definitely add an HBR definition but its just duplicating the existing C2 and tagging it HBR and JBR even though they are are same",
+      "parentUuid": "7ef59816_abbe98fc",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 64
+      },
+      "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
