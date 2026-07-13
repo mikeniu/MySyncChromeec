@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc9433b2_818c3321",
+        "filename": "zephyr/program/atria/penghu/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-13T16:49:11Z",
+      "side": 1,
+      "message": "Nit: Can you add a comment here that these interrupt signals are just here for debugging?",
+      "revId": "a71659093d4c154a352c51beee87c6fb59833a57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "fab13657_b0873f58",
