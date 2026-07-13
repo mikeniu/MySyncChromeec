@@ -16,6 +16,40 @@
       "message": "Bringing this CL back, because it\u0027s a prequisite for cherry-pick cl:8060805, which is needed to fix an assert crash.",
       "revId": "63b829c94d0b9faaa4cd4bc444ec2ef9d666b070",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b949609d_e2975f74",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 1381658
+      },
+      "writtenOn": "2026-07-13T02:35:37Z",
+      "side": 1,
+      "message": "Remove empty line",
+      "revId": "63b829c94d0b9faaa4cd4bc444ec2ef9d666b070",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d194dda_bae855f3",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1061,
+      "author": {
+        "id": 1381658
+      },
+      "writtenOn": "2026-07-13T02:35:37Z",
+      "side": 1,
+      "message": "Remove empty line.",
+      "revId": "63b829c94d0b9faaa4cd4bc444ec2ef9d666b070",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

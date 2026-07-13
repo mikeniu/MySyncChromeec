@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26164f3b_cc67af90",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1033,
+      "author": {
+        "id": 1381658
+      },
+      "writtenOn": "2026-07-13T02:35:37Z",
+      "side": 0,
+      "message": "Keep this empty line.",
+      "revId": "4db5a8bcc7bbd4b707e46ad723736460181f4fb7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
