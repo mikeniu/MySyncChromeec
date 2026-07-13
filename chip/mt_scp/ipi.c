@@ -216,8 +216,15 @@ int ipi_send(int32_t id, const void *buf, uint32_t len, int wait)
 
 static void ipi_handler(void)
 {
-	if (scp_recv_obj->id >= IPI_COUNT) {
-		CPRINTS("#ERR IPI %d", scp_recv_obj->id);
+	/*
+	 * scp_recv_obj is mapped to a memory region in AP.
+	 * Copy the id in case that the memory is changed when
+	 * we reading it the 2nd time.
+	 */
+	const int32_t cached_id = scp_recv_obj->id;
+
+	if (cached_id < 0 || cached_id >= IPI_COUNT) {
+		CPRINTS("#ERR IPI %d", cached_id);
 		return;
 	}
 
@@ -225,15 +232,15 @@ static void ipi_handler(void)
 	 * Only print IPI that is not host command channel, which will
 	 * be printed by host command driver.
 	 */
-	if (scp_recv_obj->id != IPI_HOST_COMMAND)
-		CPRINTS("IPI %d", scp_recv_obj->id);
+	if (cached_id != IPI_HOST_COMMAND)
+		CPRINTS("IPI %d", cached_id);
 
 	/*
 	 * Pass the buffer to handler. Each handler should be in charge of
 	 * the buffer copying/reading before returning from handler.
 	 */
-	ipi_handler_table[scp_recv_obj->id](
-		scp_recv_obj->id, scp_recv_obj->buffer, scp_recv_obj->len);
+	ipi_handler_table[cached_id](cached_id, scp_recv_obj->buffer,
+				     scp_recv_obj->len);
 }
 
 void ipi_inform_ap(void)
