@@ -605,6 +605,15 @@
 #undef CONFIG_BATTERY_WAKEUP_CUT_OFF
 
 /*
+ * Total number of wakeup ship mode commands sent to the fuel gauge while
+ * the battery stays in the disconnect state. battery_get_disconnect_state()
+ * is called from multiple places, so the command is sent at most once per
+ * call and the total number of attempts is capped by this value.
+ * Can be overridden by CONFIG_PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF_COUNT.
+ */
+#define CONFIG_BATTERY_WAKEUP_CUT_OFF_COUNT 20
+
+/*
  * The default delay is 1 second. Define this if a board prefers
  * different delay.
  */

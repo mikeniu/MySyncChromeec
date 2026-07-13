@@ -722,13 +722,39 @@ ZTEST_USER(smart_battery, test_board_wakeup_cutoff_battery)
 	battery_conf = saved_conf;
 }
 
+struct wakeup_write_count {
+	int reg;
+	int count;
+};
+
+static int wakeup_write_count_func(const struct emul *target, int reg,
+				   uint8_t val, int bytes, void *data)
+{
+	struct wakeup_write_count *conf = data;
+
+	/*
+	 * Count completed word writes (reg + 2 data bytes) to the wakeup
+	 * ship mode register.
+	 */
+	if (bytes == 2 && conf->reg == reg)
+		conf->count++;
+
+	/* Continue with the normal emulator handler */
+	return 1;
+}
+
 /** Test that wakeup cutoff is triggered when battery is disconnected */
 ZTEST_USER(smart_battery, test_battery_disconnect_state_wakeup_cutoff)
 {
 	struct sbat_emul_bat_data *bat;
 	const struct emul *emul = EMUL_DT_GET(BATTERY_NODE);
+	struct i2c_common_emul_data *common_data =
+		emul_smart_battery_get_i2c_common_data(emul);
 	const struct batt_conf_embed *saved_conf = get_batt_conf();
 	const struct wakeup_ship_mode_info *wakeup_ship_mode;
+	struct wakeup_write_count write_count;
+	uint16_t disconnect_val;
+	int i;
 
 	if (!IS_ENABLED(CONFIG_BATTERY_WAKEUP_CUT_OFF)) {
 		ztest_test_skip();
@@ -740,19 +766,56 @@ ZTEST_USER(smart_battery, test_battery_disconnect_state_wakeup_cutoff)
 	battery_conf = &board_battery_info[0];
 	wakeup_ship_mode =
 		&board_battery_info[0].config.fuel_gauge.wakeup_ship_mode;
+	disconnect_val = board_battery_info[0].config.fuel_gauge.fet
+				 .disconnect_val;
+
+	/* Count word writes to the wakeup ship mode register */
+	write_count.reg = wakeup_ship_mode->reg_addr;
+	write_count.count = 0;
+	i2c_common_emul_set_write_func(common_data, wakeup_write_count_func,
+				       &write_count);
 
 	/* Battery is not disconnected (FET status doesn't match) */
 	bat->mf_access = 0;
 	zassert_equal(BATTERY_NOT_DISCONNECTED, battery_get_disconnect_state(),
 		      NULL);
 	/* Wakeup cutoff was not executed */
+	zassert_equal(0, write_count.count);
 	zassert_equal(0, bat->mf_access, "0x%x != 0x%x", 0, bat->mf_access);
 
-	/* Battery is disconnected (FET status matches disconnect_val) */
-	bat->mf_access =
-		board_battery_info[0].config.fuel_gauge.fet.disconnect_val;
+	/*
+	 * While the battery stays disconnected, each call to
+	 * battery_get_disconnect_state() issues at most one wakeup command
+	 * (2 word writes), up to a total of
+	 * CONFIG_BATTERY_WAKEUP_CUT_OFF_COUNT commands.
+	 */
+	for (i = 0; i < CONFIG_BATTERY_WAKEUP_CUT_OFF_COUNT; i++) {
+		/* The wakeup writes clobber mf_access, set it again */
+		bat->mf_access = disconnect_val;
+		zassert_equal(BATTERY_DISCONNECTED,
+			      battery_get_disconnect_state(), NULL);
+		zassert_equal(2 * (i + 1), write_count.count,
+			      "%d != %d", 2 * (i + 1), write_count.count);
+	}
+
+	/* The total number of wakeup commands is capped */
+	bat->mf_access = disconnect_val;
 	zassert_equal(BATTERY_DISCONNECTED, battery_get_disconnect_state(),
 		      NULL);
+	zassert_equal(2 * CONFIG_BATTERY_WAKEUP_CUT_OFF_COUNT,
+		      write_count.count);
+
+	/* Battery is awake again, allow a new set of wakeup attempts */
+	bat->mf_access = 0;
+	zassert_equal(BATTERY_NOT_DISCONNECTED, battery_get_disconnect_state(),
+		      NULL);
+
+	/* Wakeup cutoff is executed again after a new disconnect event */
+	bat->mf_access = disconnect_val;
+	zassert_equal(BATTERY_DISCONNECTED, battery_get_disconnect_state(),
+		      NULL);
+	zassert_equal(2 * CONFIG_BATTERY_WAKEUP_CUT_OFF_COUNT + 2,
+		      write_count.count);
 
 	/*
 	 * Wakeup cutoff was executed: the ship mode command wrote 2 data
@@ -761,6 +824,9 @@ ZTEST_USER(smart_battery, test_battery_disconnect_state_wakeup_cutoff)
 	zassert_equal(wakeup_ship_mode->reg_data[1], bat->mf_access,
 		      "0x%x != 0x%x", wakeup_ship_mode->reg_data[1],
 		      bat->mf_access);
+
+	/* Use the default write handler again */
+	i2c_common_emul_set_write_func(common_data, NULL, NULL);
 
 	/* Restore battery configuration */
 	battery_conf = saved_conf;
