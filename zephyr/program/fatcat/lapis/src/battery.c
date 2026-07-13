@@ -5,38 +5,35 @@
 
 #include "battery.h"
 #include "battery_smart.h"
+#include "timer.h"
 
 enum battery_present battery_is_present(void)
 {
-	static int retry_cnt;
 	int state;
 
-	if (sb_read(SB_MANUFACTURER_ACCESS, &state)) {
-		/* Require 2 consecutive failures before declaring the
-		 * battery missing.
-		 */
-		k_msleep(25);
-		if (sb_read(SB_MANUFACTURER_ACCESS, &state)) {
-			if (retry_cnt > 100) {
-				return BP_NO;
-			} else {
-				retry_cnt++;
-
-				return BP_YES;
-			}
+	for (int i = 0; i < 2; i++) {
+		if (sb_read(SB_MANUFACTURER_ACCESS, &state) == 0) {
+			/*
+			 * According to the battery manufacturer's reply:
+			 * To detect a bad battery, read the 0x00 register.
+			 * If the 12th bit (Permanently Failure) is 1, it means
+			 * a bad battery.
+			 */
+			return (state & BIT(12)) ? BP_NO : BP_YES;
+		}
+		if (i == 0) {
+			k_msleep(25);
 		}
 	}
 
-	retry_cnt = 0;
-
 	/*
-	 *  According to the battery manufacturer's reply:
-	 *  To detect a bad battery, need to read the 0x00 register.
-	 *  If the 12th bit(Permanently Failure) is 1, it means a bad battery.
+	 * Read failed twice.
+	 * If we are within 10 seconds of system boot, return BP_YES to give
+	 * the battery time to wake up and prevent the host from shutting down.
 	 */
-	if (state & BIT(12)) {
-		return BP_NO;
+	if (get_time().val < (10 * USEC_PER_SEC)) {
+		return BP_YES;
 	}
 
-	return BP_YES;
+	return BP_NO;
 }
