@@ -179,53 +179,13 @@ void timer_cancel(task_id_t tskid)
  */
 int crec_usleep(unsigned int us)
 {
-	uint32_t evt = 0;
-	uint32_t t0;
-
 	/* If a wait is 0, return immediately. */
 	if (!us) {
 		return 0;
 	}
 
-	if (IS_ENABLED(CONFIG_ZEPHYR)) {
-		while (us) {
-			us = k_usleep(us);
-		}
-		return 0;
-	}
-
-	t0 = __hw_clock_source_read();
-
-	/* If task scheduling has not started, just delay */
-	if (!task_start_called()) {
-		udelay(us);
-		return 0;
-	}
-
-	/* If in interrupt context or interrupts are disabled, use udelay() */
-	if (!is_interrupt_enabled() || in_interrupt_context()) {
-		/* Avoid printing warning too frequently */
-		static timestamp_t next_print_deadline = { .val = 0 };
-
-		if (timestamp_expired(next_print_deadline, NULL)) {
-			next_print_deadline.val =
-				get_time().val + USLEEP_WARNING_INTERVAL_MS;
-			CPRINTS("Sleeping not allowed");
-		}
-
-		udelay(us);
-		return 0;
-	}
-
-	do {
-		evt |= task_wait_event(us);
-	} while (!(evt & TASK_EVENT_TIMER) &&
-		 ((__hw_clock_source_read() - t0) < us));
-
-	/* Re-queue other events which happened in the meanwhile */
-	if (evt) {
-		atomic_or(task_get_event_bitmap(task_get_current()),
-			  evt & ~TASK_EVENT_TIMER);
+	while (us) {
+		us = k_usleep(us);
 	}
 	return 0;
 }
