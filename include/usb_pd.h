@@ -38,6 +38,14 @@ extern "C" {
 #define TASK_ID_TO_PD_PORT(id) 0
 #endif /* CONFIG_USB_PD_PORT_MAX_COUNT && HAS_TASK_PD_C0 */
 
+#include <zephyr/kernel.h>
+int pd_port_from_thread(k_tid_t thread);
+k_tid_t pd_port_to_task_id(int port);
+#define CURRENT_PD_PORT() pd_port_from_thread(k_current_get())
+#define IS_CURRENT_TASK_PD_PORT(port) \
+	(pd_port_to_task_id(port) == k_current_get())
+#define ASSERT_CURRENT_TASK_IS_PD(port) ASSERT(IS_CURRENT_TASK_PD_PORT(port))
+
 enum pd_rx_errors {
 	PD_RX_ERR_INVAL = -1, /* Invalid packet */
 	PD_RX_ERR_HARD_RESET = -2, /* Got a Hard-Reset packet */
@@ -2350,15 +2358,24 @@ bool consume_sop_prime_prime_repeat_msg(int port, uint8_t msg_id);
 void pd_discovery_access_clear(int port, enum tcpci_msg_type type);
 
 /*
- * Validate that this current task is the only one which has retrieved the
- * pointer from pd_get_am_discovery() since last call to
- * pd_discovery_access_clear().
+ * Validate that the discovery data has not changed since we started reading.
+ *
+ * @param port          USB-C port number
+ * @param type          Transmit type (SOP, SOP')
+ * @param start_version Version counter when read started
+ * @return              True - Data has not changed
+ */
+bool pd_discovery_access_validate(int port, enum tcpci_msg_type type,
+				  uint32_t start_version);
+
+/*
+ * Get the current version of the discovery data.
  *
  * @param port USB-C port number
  * @param type Transmit type (SOP, SOP')
- * @return     True - No other tasks have accessed the data
+ * @return     Current version counter
  */
-bool pd_discovery_access_validate(int port, enum tcpci_msg_type type);
+uint32_t pd_discovery_get_version(int port, enum tcpci_msg_type type);
 
 /*
  * Returns the pointer to PD alternate mode discovery results

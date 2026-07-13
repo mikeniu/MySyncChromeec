@@ -167,26 +167,11 @@ static inline void task_wake(task_id_t tskid)
 }
 
 /**
- * Return the identifier of the task currently running.
- */
-task_id_t task_get_current(void);
-
-#ifdef CONFIG_ZEPHYR
-/**
  * Check if this current task is running in deferred context
  */
 bool in_deferred_context(void);
-#else
-/* All ECOS deferred calls run from the HOOKS task */
-static inline bool in_deferred_context(void)
-{
-#ifdef HAS_TASK_HOOKS
-	return (task_get_current() == TASK_ID_HOOKS);
-#else
-	return false;
-#endif /* HAS_TASK_HOOKS */
-}
-#endif /* CONFIG_ZEPHYR */
+struct k_thread;
+task_id_t thread_id_to_task_id(struct k_thread *thread_id);
 
 /**
  * Return a pointer to the bitmap of events of the task.
