@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7337313b_35e38f3e",
+        "filename": "common/battery.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-13T10:39:20Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: By disabling this check when `CONFIG_INPUT_GPIO_KEYS` is defined, you are breaking the \u0027Volume Up at boot\u0027 feature (e.g., for battery cutoff). Since `common/button.c` is not compiled in this mode, `button_get_boot_button()` will not be available. You need to provide a replacement in the Zephyr shim to detect the initial state of the buttons at boot.",
+      "range": {
+        "startLine": 500,
+        "startChar": 0,
+        "endLine": 500,
+        "endChar": 0
+      },
+      "revId": "f08d3c5ad2a75e0326cf2d96b7d970ff6f7257e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8a24682_f8b76e1e",
+        "filename": "zephyr/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 741,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-13T10:39:20Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: This change makes the inclusion of `power_button.c` dependent on `CONFIG_PLATFORM_EC_BUTTON`. Many boards have a power button but no other buttons (so `CONFIG_PLATFORM_EC_BUTTON` is false). These boards will now miss the power button implementation.\n\nYou should keep the inclusion of `power_button.c` tied to `CONFIG_PLATFORM_EC_POWER_BUTTON` or ensure it is correctly handled when `CONFIG_INPUT_GPIO_KEYS` is not set.",
+      "range": {
+        "startLine": 741,
+        "startChar": 0,
+        "endLine": 741,
+        "endChar": 0
+      },
+      "revId": "f08d3c5ad2a75e0326cf2d96b7d970ff6f7257e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c375e61_31827508",
+        "filename": "zephyr/shim/src/buttons/buttons.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-13T10:39:20Z",
+      "side": 1,
+      "message": "this should be `CONFIG_PM_DEVICE_RUNTIME`, PM_DEVICE just add the handler, runtime is the option that makes it start suspended",
+      "revId": "f08d3c5ad2a75e0326cf2d96b7d970ff6f7257e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
