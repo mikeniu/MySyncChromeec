@@ -85,32 +85,7 @@ include core/$(CORE)/toolchain.mk
 
 -include build/Makefile.sdk
 
-CROSS_COMPILE_TARGET_arm:=arm-eabi
-CROSS_COMPILE_TARGET_riscv:=riscv64-elf
-CROSS_COMPILE_TARGET_x86:=i386-elf
-CROSS_COMPILE_TARGET_nds32:=nds32le-elf
 
-CROSS_COMPILE_TOOLCHAIN:=$(CROSS_COMPILE_TARGET_$(COREBOOT_TOOLCHAIN))
-CROSS_COREBOOT:=$(CROSS_COMPILE_TARGET_$(COREBOOT_TOOLCHAIN))
-
-ifeq (riscv,$(COREBOOT_TOOLCHAIN))
-CROSS_COMPILE_TOOLCHAIN:=riscv-elf
-endif
-ifneq (,$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN)))
-CROSS_COMPILE:=$(COREBOOT_SDK_ROOT_$(COREBOOT_TOOLCHAIN))/bin/$(CROSS_COREBOOT)-
-else
-ifneq (,$(USE_COREBOOT_SDK))
-SDK_SCRIPT := util/coreboot_sdk.py
-SDK_FLAGS := --toolchain $(CROSS_COMPILE_TOOLCHAIN)
-SDK_COMMAND := $(SDK_SCRIPT) $(SDK_FLAGS)
-PYTHON_RESULT:=$(shell $(SDK_COMMAND); echo $$?)
-CROSS_COMPILE:=$(word 1,$(PYTHON_RESULT))/bin/$(CROSS_COREBOOT)-
-EXIT_CODE := $(word 2,$(PYTHON_RESULT))
-ifneq ($(EXIT_CODE),0)
-CROSS_COMPILE:=/opt/coreboot-sdk/bin/$(CROSS_COREBOOT)-
-endif
-endif
-endif
 
 # Create uppercase config variants, to avoid mixed case constants.
 # Also translate '-' to '_', so 'cortex-m' turns into 'CORTEX_M'.  This must
@@ -270,13 +245,7 @@ endef
 
 
 include $(BDIR)/build.mk
-ifneq ($(BOARD),host)
-ifeq ($(USE_BUILTIN_STDLIB), 1)
-include builtin/build.mk
-else
-include libc/build.mk
-endif
-endif
+
 include chip/$(CHIP)/build.mk
 include core/build.mk
 include core/$(CORE)/build.mk
@@ -337,10 +306,8 @@ $(eval $(call get_sources,ro))
 # from their optional <util_name>-objs make variable.
 #
 # See commit bc4c1b4 for more context.
-ifeq ($(BOARD),host)
 host-utils := $(call objs_from_dir,$(out)/util,host-util-bin)
 host-utils-cxx := $(call objs_from_dir,$(out)/util,host-util-bin-cxx)
-endif
 # Use the util_name with an added .c AND the special <util_name>-objs variable.
 build-srcs := $(foreach u,$(build-util-bin-y),$(sort $($(u)-objs:%.o=util/%.c) \
                 $(wildcard util/$(u).c)))
