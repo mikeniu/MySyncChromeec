@@ -166,7 +166,7 @@ static void rgbkbd_demo_flow(void)
 	sync_grids();
 
 #ifdef TEST_BUILD
-	task_wake(TASK_ID_TEST_RUNNER);
+	task_wake(TEST_RUNNER);
 #endif
 }
 
@@ -194,7 +194,7 @@ static void rgbkbd_demo_dot(void)
 	set_color_single(color, x, y);
 
 #ifdef TEST_BUILD
-	task_wake(TASK_ID_TEST_RUNNER);
+	task_wake(TEST_RUNNER);
 #endif
 }
 
@@ -444,7 +444,7 @@ static void rgbkbd_demo_set(enum ec_rgbkbd_demo new_demo)
 	demo_interval_ms = default_demo_interval_ms;
 
 	/* start demo */
-	task_wake(TASK_ID_RGBKBD);
+	task_wake(RGBKBD);
 }
 
 static int rgbkbd_kblight_set(int percent)

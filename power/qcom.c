@@ -260,7 +260,7 @@ static char ap_rst_overdriven;
 static void request_cold_reset(void)
 {
 	power_request = POWER_REQ_COLD_RESET;
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 }
 
 void chipset_warm_reset_interrupt(enum gpio_signal signal)
@@ -332,13 +332,13 @@ static void sc7x80_lid_event(void)
 		return;
 
 	lid_opened = 1;
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, sc7x80_lid_event, HOOK_PRIO_DEFAULT);
 
 static void sc7x80_powerbtn_changed(void)
 {
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 }
 DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, sc7x80_powerbtn_changed,
 	     HOOK_PRIO_DEFAULT);
@@ -766,7 +766,7 @@ static uint8_t check_for_power_off_event(void)
 			CPRINTS("power waiting for long press %u",
 				power_off_deadline.le.lo);
 			/* Ensure we will wake up to check the power key */
-			timer_arm(power_off_deadline, TASK_ID_CHIPSET);
+			timer_arm(power_off_deadline, CHIPSET);
 		} else if (timestamp_expired(power_off_deadline, &now)) {
 			power_off_deadline.val = 0;
 			CPRINTS("power off after long press now=%u, %u",
@@ -775,7 +775,7 @@ static uint8_t check_for_power_off_event(void)
 		}
 	} else if (power_button_was_pressed) {
 		CPRINTS("power off cancel");
-		timer_cancel(TASK_ID_CHIPSET);
+		timer_cancel(CHIPSET);
 	}
 
 	power_button_was_pressed = pressed;
@@ -799,7 +799,7 @@ static uint8_t check_for_power_off_event(void)
 static inline void cancel_power_button_timer(void)
 {
 	if (power_button_was_pressed)
-		timer_cancel(TASK_ID_CHIPSET);
+		timer_cancel(CHIPSET);
 }
 
 /*****************************************************************************/
@@ -812,14 +812,14 @@ test_mockable void chipset_force_shutdown(enum chipset_shutdown_reason reason)
 
 	/* Issue a request to initiate a power-off sequence */
 	power_request = POWER_REQ_OFF;
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 }
 
 test_mockable void chipset_power_on(void)
 {
 	if (chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
 		power_request = POWER_REQ_ON;
-		task_wake(TASK_ID_CHIPSET);
+		task_wake(CHIPSET);
 	}
 }
 
@@ -884,7 +884,7 @@ test_mockable void chipset_reset(enum chipset_shutdown_reason reason)
 	report_ap_reset(reason);
 
 	power_request = POWER_REQ_WARM_RESET;
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 }
 
 /* Get system sleep state through GPIOs */
@@ -912,7 +912,7 @@ static void handle_chipset_reset(void)
 	if (chipset_in_state(CHIPSET_STATE_SUSPEND)) {
 		CPRINTS("Chipset reset: exit s3");
 		power_reset_host_sleep_state();
-		task_wake(TASK_ID_CHIPSET);
+		task_wake(CHIPSET);
 	}
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESET, handle_chipset_reset, HOOK_PRIO_FIRST);
@@ -944,7 +944,7 @@ power_chipset_handle_host_sleep_event(enum host_sleep_event state,
 		 * listeners need to be notified of chipset resume.
 		 */
 		sleep_set_notify(SLEEP_NOTIFY_RESUME);
-		task_wake(TASK_ID_CHIPSET);
+		task_wake(CHIPSET);
 		power_signal_disable_interrupt(GPIO_AP_SUSPEND);
 		sleep_complete_resume(ctx);
 
@@ -1185,7 +1185,7 @@ test_mockable_static int command_power(int argc, const char **argv)
 
 	power_request = v ? POWER_REQ_ON : POWER_REQ_OFF;
 	ccprintf("Requesting power %s\n", power_req_name[power_request]);
-	task_wake(TASK_ID_CHIPSET);
+	task_wake(CHIPSET);
 
 	return EC_SUCCESS;
 }

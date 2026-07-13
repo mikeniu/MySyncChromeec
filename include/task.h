@@ -17,6 +17,44 @@ extern "C" {
 #include "compile_time_macros.h"
 #include "task_id.h"
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+#include "ec_tasks.h"
+
+/* Declare externs for shimmed tasks */
+#define CROS_EC_TASK(name, ...) extern const k_tid_t name;
+#define TASK_TEST(name, ...) CROS_EC_TASK(name)
+CROS_EC_TASK_LIST
+#undef CROS_EC_TASK
+#undef TASK_TEST
+
+/* Macros for extra tasks */
+#define SYSWORKQ (&k_sys_work_q.thread)
+#define SHELL get_shell_thread()
+#define MAIN get_main_thread()
+#ifdef TEST_BUILD
+#define TEST_RUNNER get_test_runner_tid()
+const k_tid_t get_test_runner_tid(void);
+#endif
+#ifdef HAS_TASK_HOSTCMD
+#if !defined(HAS_TASK_HOSTCMD_DEDICATED)
+#define HOSTCMD get_hostcmd_thread()
+#endif
+#endif
+#ifdef CONFIG_AP_PWRSEQ
+#define AP_PWRSEQ get_ap_pwrseq_thread()
+#endif
+
+k_tid_t get_main_thread(void);
+k_tid_t get_shell_thread(void);
+k_tid_t get_hostcmd_thread(void);
+k_tid_t get_ap_pwrseq_thread(void);
+
+/* Zephyr task compatibility macros */
+#define TASK_ID_INVALID NULL
+
+#endif /* CONFIG_ZEPHYR */
+
 #include <stdbool.h>
 
 /* Task event bitmasks */
@@ -154,29 +192,42 @@ void set_int_mask(uint32_t val);
  * @param tskid		Task to set event for
  * @param event		Event bitmap to set (TASK_EVENT_*)
  */
+#ifdef CONFIG_ZEPHYR
+void task_set_event(k_tid_t thread, uint32_t event);
+#else
 void task_set_event(task_id_t tskid, uint32_t event);
+#endif
 
 /**
  * Wake a task.  This sends it the TASK_EVENT_WAKE event.
  *
  * @param tskid		Task to wake
  */
+#ifdef CONFIG_ZEPHYR
+static inline void task_wake(k_tid_t thread)
+{
+	task_set_event(thread, TASK_EVENT_WAKE);
+}
+#else
 static inline void task_wake(task_id_t tskid)
 {
 	task_set_event(tskid, TASK_EVENT_WAKE);
 }
+#endif
 
 /**
  * Check if this current task is running in deferred context
  */
 bool in_deferred_context(void);
-struct k_thread;
-task_id_t thread_id_to_task_id(struct k_thread *thread_id);
 
 /**
  * Return a pointer to the bitmap of events of the task.
  */
+#ifdef CONFIG_ZEPHYR
+atomic_t *task_get_event_bitmap(k_tid_t thread);
+#else
 atomic_t *task_get_event_bitmap(task_id_t tskid);
+#endif
 
 /**
  * Wait for the next event.
@@ -218,10 +269,9 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us);
  */
 void task_print_list(void);
 
-/**
- * Returns the name of the task.
- */
+#ifndef CONFIG_ZEPHYR
 const char *task_get_name(task_id_t tskid);
+#endif
 
 #ifdef CONFIG_TASK_PROFILING
 /**
@@ -278,6 +328,7 @@ void task_clear_fp_used(void);
  */
 void task_enable_all_tasks(void);
 
+#ifndef CONFIG_ZEPHYR
 /**
  * Enable a task.
  */
@@ -294,6 +345,7 @@ bool task_enabled(task_id_t tskid);
  * If the task disable itself, this will cause an immediate reschedule.
  */
 void task_disable_task(task_id_t tskid);
+#endif
 
 /**
  * Enable an interrupt.
@@ -345,19 +397,9 @@ void task_disable_resets(void);
  */
 int task_reset_cleanup(void);
 
-/*
- * Resets the specified task, which must not be the current task,
- * to initial state.
- *
- * Returns EC_SUCCESS, or EC_ERROR_INVAL if the specified task does
- * not support resets.
- *
- * If wait is true, blocks until the task has been reset. Otherwise,
- * returns immediately - in this case the task reset may be delayed until
- * that task can be safely reset. The duration of this delay depends on the
- * task implementation.
- */
+#ifndef CONFIG_ZEPHYR
 int task_reset(task_id_t id, int wait);
+#endif
 
 /**
  * Clear a pending interrupt.

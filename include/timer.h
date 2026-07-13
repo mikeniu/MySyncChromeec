@@ -58,12 +58,12 @@ void timer_init(void);
  *
  * @return EC_SUCCESS, or non-zero if error.
  */
-int timer_arm(timestamp_t tstamp, task_id_t tskid);
+int timer_arm(timestamp_t tstamp, k_tid_t tskid);
 
 /**
  * Cancel a running timer for the specified task id.
  */
-void timer_cancel(task_id_t tskid);
+void timer_cancel(k_tid_t tskid);
 
 /**
  * Check if a timestamp has passed / expired

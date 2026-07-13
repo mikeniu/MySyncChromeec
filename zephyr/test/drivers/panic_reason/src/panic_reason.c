@@ -4,7 +4,6 @@
  */
 
 #include "panic.h"
-#include "task.h"
 #include "test/drivers/test_state.h"
 
 #include <zephyr/ztest.h>
@@ -24,7 +23,7 @@ ZTEST(panic_reason, test_panic_reason_zephyr)
 	panic_get_reason(&reason, &info, &exception);
 	zassert_equal(PANIC_ZEPHYR_FATAL_ERROR, reason);
 	zassert_equal(K_ERR_KERNEL_PANIC, info);
-	zassert_equal(task_get_current(), exception);
+	zassert_equal(PANIC_EXCEPTION_NONE, exception);
 }
 
 ZTEST_SUITE(panic_reason, drivers_predicate_post_main, NULL, NULL, NULL, NULL);

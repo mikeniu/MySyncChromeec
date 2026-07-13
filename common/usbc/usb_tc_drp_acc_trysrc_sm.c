@@ -549,7 +549,7 @@ void pd_request_source_voltage(int port, int mv)
 		else
 			pd_dpm_request(port, DPM_REQUEST_PR_SWAP);
 
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 	}
 }
 
@@ -562,7 +562,7 @@ void pd_set_external_voltage_limit(int port, int mv)
 		if (get_state_tc(port) == TC_ATTACHED_SNK)
 			pd_dpm_request(port, DPM_REQUEST_NEW_POWER_LEVEL);
 
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 	}
 }
 
@@ -725,7 +725,7 @@ static inline void pd_set_dual_role_and_event(int port,
 		pd_update_try_source();
 
 	if (event != 0)
-		task_set_event(PD_PORT_TO_TASK_ID(port), event);
+		task_set_event(pd_port_to_thread_id(port), event);
 }
 
 void pd_set_dual_role(int port, enum pd_dual_role_states state)
@@ -753,7 +753,7 @@ void pd_request_data_swap(int port)
 	 */
 	if (IS_ATTACHED_SRC(port) || IS_ATTACHED_SNK(port)) {
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_DR_SWAP);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 	}
 }
 
@@ -899,7 +899,7 @@ void tc_prs_src_snk_assert_rd(int port)
 		 * DebugAccessory.SNK assert Rd
 		 */
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 	}
 }
 
@@ -915,7 +915,7 @@ void tc_prs_snk_src_assert_rp(int port)
 		 * UnorientedDebugAccessory.SRC to assert Rp
 		 */
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 	}
 }
 
@@ -936,7 +936,7 @@ void tc_prs_snk_src_assert_rp(int port)
 void tc_hard_reset_request(int port)
 {
 	TC_SET_FLAG(port, TC_FLAGS_HARD_RESET_REQUESTED);
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	task_wake(pd_port_to_thread_id(port));
 }
 
 void tc_try_src_override(enum try_src_override_t ov)
@@ -1051,7 +1051,7 @@ void pd_set_suspend(int port, int suspend)
 		if (IS_CURRENT_TASK_PD_PORT(port))
 			return;
 
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 
 		/* Sleep this task if we are not suspended */
 		while (pd_is_port_enabled(port)) {
@@ -1064,7 +1064,7 @@ void pd_set_suspend(int port, int suspend)
 		}
 	} else {
 		TC_CLR_FLAG(port, TC_FLAGS_REQUEST_SUSPEND);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 	}
 }
 
@@ -1446,7 +1446,7 @@ static bool tc_perform_snk_hard_reset(int port)
 
 void tc_start_error_recovery(int port)
 {
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	/*
 	 *   The port should transition to the ErrorRecovery state
@@ -1672,7 +1672,7 @@ static void set_ccd_mode(const int port, const bool enable)
 /* Set the TypeC state machine to a new state. */
 static void set_state_tc(const int port, const enum usb_tc_state new_state)
 {
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	set_state(port, &tc[port].ctx, &tc_states[new_state]);
 }
@@ -1929,7 +1929,7 @@ void pd_request_vconn_swap_off(int port)
 	if (get_state_tc(port) == TC_ATTACHED_SRC ||
 	    get_state_tc(port) == TC_ATTACHED_SNK) {
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_VC_SWAP_OFF);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 	}
 }
 
@@ -1938,7 +1938,7 @@ void pd_request_vconn_swap_on(int port)
 	if (get_state_tc(port) == TC_ATTACHED_SRC ||
 	    get_state_tc(port) == TC_ATTACHED_SNK) {
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_VC_SWAP_ON);
-		task_wake(PD_PORT_TO_TASK_ID(port));
+		task_wake(pd_port_to_thread_id(port));
 	}
 }
 #endif
@@ -1958,7 +1958,7 @@ static __maybe_unused int reset_device_and_notify(int port)
 	k_event_set(&tc[port].reset_event, 0);
 
 	/* This should only be called from the PD task */
-	ASSERT_CURRENT_TASK_IS_PD(port);
+	ASSERT(pd_port_to_thread_id(port) == k_current_get());
 
 	TC_SET_FLAG(port, TC_FLAGS_LPM_TRANSITION);
 	rv = tcpm_init(port);
@@ -1979,7 +1979,7 @@ static __maybe_unused int reset_device_and_notify(int port)
 	 * waking the TCPC, but it has also set PD_EVENT_TCPC_RESET again, which
 	 * would result in a second, unnecessary init.
 	 */
-	atomic_clear_bits(task_get_event_bitmap(PD_PORT_TO_TASK_ID(port)),
+	atomic_clear_bits(task_get_event_bitmap(pd_port_to_thread_id(port)),
 			  PD_EVENT_TCPC_RESET);
 
 	k_event_post(&tc[port].reset_event, 1);
@@ -1998,7 +1998,7 @@ void pd_wait_exit_low_power(int port)
 			reset_device_and_notify(port);
 	} else {
 		/* Otherwise, we need to wait for the TCPC reset to complete */
-		task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_TCPC_RESET);
+		task_set_event(pd_port_to_thread_id(port), PD_EVENT_TCPC_RESET);
 		k_event_wait(&tc[port].reset_event, 1, false, K_FOREVER);
 	}
 }
@@ -2012,7 +2012,7 @@ void pd_device_accessed(int port)
 	if (IS_CURRENT_TASK_PD_PORT(port))
 		handle_device_access(port);
 	else
-		task_set_event(PD_PORT_TO_TASK_ID(port),
+		task_set_event(pd_port_to_thread_id(port),
 			       PD_EVENT_DEVICE_ACCESSED);
 }
 
@@ -3992,13 +3992,13 @@ void tc_set_debug_level(enum debug_level debug_level)
 void tc_usb_firmware_fw_update_limited_run(int port)
 {
 	TC_SET_FLAG(port, TC_FLAGS_USB_RETIMER_FW_UPDATE_LTD_RUN);
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	task_wake(pd_port_to_thread_id(port));
 }
 
 void tc_usb_firmware_fw_update_run(int port)
 {
 	TC_SET_FLAG(port, TC_FLAGS_USB_RETIMER_FW_UPDATE_RUN);
-	task_wake(PD_PORT_TO_TASK_ID(port));
+	task_wake(pd_port_to_thread_id(port));
 }
 
 void tc_run(const int port)
@@ -4164,7 +4164,7 @@ static void pd_set_power_change(void)
 	int i;
 
 	for (i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
-		task_set_event(PD_PORT_TO_TASK_ID(i),
+		task_set_event(pd_port_to_thread_id(i),
 			       PD_EVENT_POWER_STATE_CHANGE);
 	}
 }

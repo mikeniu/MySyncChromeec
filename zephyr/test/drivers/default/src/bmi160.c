@@ -2162,7 +2162,7 @@ ZTEST_USER(bmi160, test_bmi_interrupt_handler)
 
 	atomic_t *mask;
 
-	mask = task_get_event_bitmap(TASK_ID_MOTIONSENSE);
+	mask = task_get_event_bitmap(MOTIONSENSE);
 	zassert_true(mask != NULL,
 		     "Got a null pointer when getting event bitmap.");
 	zassert_true((*mask & CONFIG_ACCELGYRO_BMI160_INT_EVENT) == 0,
@@ -2170,7 +2170,7 @@ ZTEST_USER(bmi160, test_bmi_interrupt_handler)
 
 	bmi160_interrupt(0);
 
-	mask = task_get_event_bitmap(TASK_ID_MOTIONSENSE);
+	mask = task_get_event_bitmap(MOTIONSENSE);
 	zassert_true(mask != NULL,
 		     "Got a null pointer when getting event bitmap.");
 	zassert_true(*mask & CONFIG_ACCELGYRO_BMI160_INT_EVENT,

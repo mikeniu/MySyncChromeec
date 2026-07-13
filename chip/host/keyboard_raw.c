@@ -41,6 +41,6 @@ test_mockable void keyboard_raw_enable_interrupt(int enable)
 test_mockable void keyboard_raw_gpio_interrupt(enum gpio_signal signal)
 {
 #ifdef HAS_TASK_KEYSCAN
-	task_wake(TASK_ID_KEYSCAN);
+	task_wake(KEYSCAN);
 #endif
 }
