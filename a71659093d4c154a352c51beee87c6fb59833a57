@@ -16,6 +16,24 @@
       "message": "As noted on the previous CL, in the current configuration, I\u0027m pretty sure this should be 1. You can leave a to do to enable TBT later. A follow-up CL is fine.",
       "revId": "a71659093d4c154a352c51beee87c6fb59833a57",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cb5108b_2e8ed1a6",
+        "filename": "zephyr/program/atria/penghu/usb_typec.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-07-13T16:46:58Z",
+      "side": 1,
+      "message": "Penghu has port1 with TBT, and based on b/498859063 moonstone also has one port supprots TBT so setting it to 2 to align with moonstone until we have better solution to address this.",
+      "parentUuid": "fab13657_b0873f58",
+      "revId": "a71659093d4c154a352c51beee87c6fb59833a57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
