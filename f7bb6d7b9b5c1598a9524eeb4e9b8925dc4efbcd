@@ -22,6 +22,30 @@
       },
       "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9a28c8f_dc8220f0",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-13T19:54:58Z",
+      "side": 1,
+      "message": "This will be enabled for all ports, but only on devices which support TBT.",
+      "parentUuid": "1d798a36_2189f2d4",
+      "range": {
+        "startLine": 114,
+        "startChar": 4,
+        "endLine": 114,
+        "endChar": 27
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
