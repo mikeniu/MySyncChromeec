@@ -97,7 +97,6 @@ driver-$(CONFIG_CEC_IT83XX)+=cec/it83xx.o
 driver-$(CONFIG_DP_REDRIVER_TDP142)+=retimer/tdp142.o
 
 # Fingerprint Sensors
-include $(_driver_cur_dir)fingerprint/build.mk
 
 # I/O expander
 driver-$(CONFIG_IO_EXPANDER_CCGXXF)+=ioexpander/ccgxxf.o
