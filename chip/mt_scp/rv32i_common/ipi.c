@@ -159,15 +159,22 @@ DECLARE_HOOK(HOOK_INIT, ipi_init, HOOK_PRIO_DEFAULT);
 
 static void ipi_handler(void)
 {
-	if (ipi_recv_buf->id >= IPI_COUNT) {
-		CPRINTS("invalid IPI, id=%d", ipi_recv_buf->id);
+	/*
+	 * ipi_recv_buf is mapped to a memory region in AP.
+	 * Copy the id in case that the memory is changed when
+	 * we reading it the 2nd time.
+	 */
+	const int32_t cached_id = ipi_recv_buf->id;
+
+	if (cached_id < 0 || cached_id >= IPI_COUNT) {
+		CPRINTS("invalid IPI, id=%d", cached_id);
 		return;
 	}
 
-	CPRINTS("IPI %d", ipi_recv_buf->id);
+	CPRINTS("IPI %d", cached_id);
 
-	ipi_handler_table[ipi_recv_buf->id](
-		ipi_recv_buf->id, ipi_recv_buf->buffer, ipi_recv_buf->len);
+	ipi_handler_table[cached_id](cached_id, ipi_recv_buf->buffer,
+				     ipi_recv_buf->len);
 }
 
 static void irq_group7_handler(void)
