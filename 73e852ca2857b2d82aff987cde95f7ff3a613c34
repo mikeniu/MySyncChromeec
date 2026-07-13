@@ -94,6 +94,30 @@
       },
       "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ef59816_abbe98fc",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-13T21:10:22Z",
+      "side": 1,
+      "message": "I quick glance at the code below looks like a copy and paste error because port 2 has the `_TI` suffix.  I recommend a `DEV_PDC_C2_TI_HBR` macro with a comment just to make things symmetrical.\n\n\n```\n\tcase RVP_TCSS_THREE_TI_HBR:\n\t\t/* Port 0, 1 and 2 (HBR) */\n\t\tLOG_INF(\"%s: PDC config: [TI-HBR,TI-HBR,TI-HBR]\", __func__);\n\t\tif (port \u003d\u003d 0) {\n\t\t\t*dev \u003d DEV_PDC_C0_TI_HBR;\n\t\t\treturn 0;\n\t\t} else if (port \u003d\u003d 1) {\n\t\t\t*dev \u003d DEV_PDC_C1_TI_HBR;\n\t\t\treturn 0;\n\t\t} else if (port \u003d\u003d 2) {\n\t\t\t*dev \u003d DEV_PDC_C2_TI;\n\t\t\treturn 0;\n\t\t}\n```",
+      "parentUuid": "858a541a_08728924",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 64
+      },
+      "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
