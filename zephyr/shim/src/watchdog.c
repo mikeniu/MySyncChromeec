@@ -235,7 +235,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	} else {
 		thread_name = "unknown";
 	}
-	task_id_t task_id = task_get_current();
+	task_id_t task_id = thread_id_to_task_id(k_current_get());
 
 #ifdef CONFIG_RISCV
 	exception_address = csr_read(mepc);
