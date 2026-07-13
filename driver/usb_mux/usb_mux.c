@@ -18,6 +18,15 @@
 #include "timer.h"
 #include "usb_mux.h"
 #include "usbc_ppc.h"
+
+#include <zephyr/kernel.h>
+#ifdef HAS_TASK_USB_MUX
+extern const k_tid_t USB_MUX;
+#endif
+#ifdef TEST_BUILD
+extern const k_tid_t TEST_RUNNER;
+#endif
+struct k_sem ack_sem[CONFIG_USB_PD_PORT_MAX_COUNT];
 #include "util.h"
 
 #ifdef CONFIG_COMMON_RUNTIME
@@ -44,11 +53,6 @@ static atomic_t flags[CONFIG_USB_PD_PORT_MAX_COUNT];
 
 /* Coordinate mux accesses by-port among the tasks */
 static mutex_t mux_lock[CONFIG_USB_PD_PORT_MAX_COUNT];
-
-/* Coordinate which task requires an ACK event */
-static task_id_t ack_task[CONFIG_USB_PD_PORT_MAX_COUNT] = {
-	[0 ... CONFIG_USB_PD_PORT_MAX_COUNT - 1] = TASK_ID_INVALID
-};
 
 static void perform_mux_init(int port);
 static void perform_mux_set(int port, int index, mux_state_t mux_mode,
@@ -186,6 +190,15 @@ static void init_queue_structs(void)
 }
 #ifndef CONFIG_PDC_POWER_MGMT_USB_MUX
 DECLARE_HOOK(HOOK_INIT, init_queue_structs, HOOK_PRIO_FIRST);
+static void init_usb_mux_sems(void)
+{
+	int i;
+
+	for (i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
+		k_sem_init(&ack_sem[i], 0, 1);
+	}
+}
+DECLARE_HOOK(HOOK_INIT, init_usb_mux_sems, HOOK_PRIO_FIRST);
 #else
 static int queue_structs_sys_init(void)
 {
@@ -409,36 +422,20 @@ static int configure_mux(int port, int index, enum mux_config_type config,
 		mutex_unlock(&mux_lock[port]);
 
 		if (ack_required) {
-			ack_task[port] = task_get_current();
-
-			/*
-			 * This should only be called from the PD task or usb
-			 * mux task
-			 */
 			if (IS_ENABLED(HAS_TASK_USB_MUX)) {
-				assert(task_get_current() == TASK_ID_USB_MUX);
+#ifdef HAS_TASK_USB_MUX
+				assert(k_current_get() == USB_MUX);
+#endif
 			} else {
-#if defined(CONFIG_ZEPHYR) && defined(TEST_BUILD)
-				assert(port == TASK_ID_TO_PD_PORT(
-						       task_get_current()) ||
-				       task_get_current() ==
-					       TASK_ID_TEST_RUNNER);
+#ifdef TEST_BUILD
+				assert(IS_CURRENT_TASK_PD_PORT(port) ||
+				       k_current_get() == TEST_RUNNER);
 #else
-				assert(port ==
-				       TASK_ID_TO_PD_PORT(task_get_current()));
-#endif /* defined(CONFIG_ZEPHYR) && defined(TEST_BUILD) */
+				assert(IS_CURRENT_TASK_PD_PORT(port));
+#endif
 			}
-
-			/*
-			 * Note: This task event could be generalized for more
-			 * purposes beyond host command ACKs.  For now, these
-			 * wait times are tuned for the purposes of the TCSS
-			 * mux, but could be made configurable for other
-			 * purposes.
-			 */
-			task_wait_event_mask(PD_EVENT_AP_MUX_DONE, 100 * MSEC);
-			ack_task[port] = TASK_ID_INVALID;
-
+			k_sem_reset(&ack_sem[port]);
+			k_sem_take(&ack_sem[port], K_MSEC(100));
 			crec_usleep(12.5 * MSEC);
 		}
 	}
@@ -920,8 +917,7 @@ DECLARE_HOST_COMMAND(EC_CMD_USB_PD_MUX_INFO, hc_usb_pd_mux_info,
  */
 void usb_mux_set_ack_complete(int port)
 {
-	if (ack_task[port] != TASK_ID_INVALID)
-		task_set_event(ack_task[port], PD_EVENT_AP_MUX_DONE);
+	k_sem_give(&ack_sem[port]);
 }
 
 static enum ec_status hc_usb_pd_mux_ack(struct host_cmd_handler_args *args)
@@ -933,9 +929,6 @@ static enum ec_status hc_usb_pd_mux_ack(struct host_cmd_handler_args *args)
 
 	if (p->port >= board_get_usb_pd_port_count())
 		return EC_RES_INVALID_PARAM;
-
-	if (ack_task[p->port] != TASK_ID_INVALID)
-		task_set_event(ack_task[p->port], PD_EVENT_AP_MUX_DONE);
 
 	usb_mux_set_ack_complete(p->port);
 
