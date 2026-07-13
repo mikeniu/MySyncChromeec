@@ -46,6 +46,30 @@
       },
       "revId": "4c0a475b1caa7b337cc74dbd8cc87253240f9c4f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5964908f_f1e97500",
+        "filename": "zephyr/program/atria/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1273086
+      },
+      "writtenOn": "2026-07-13T22:29:43Z",
+      "side": 1,
+      "message": "Abe accurately clarified my question.  Should also consider how  your first OEM device would fit into the equation.  EG:  Will we have seperate board_power.c files for each RVP, ORS, and OEM device, or will they all inherit up to one or a few common files.  I could see a world where all penghu devices use the same file.  Sometimes, symbolic links make this easier to understand.\n\nThat being said, I am OK taking this a stepping stone to the final solution.",
+      "parentUuid": "9ca710b9_2517c596",
+      "range": {
+        "startLine": 23,
+        "startChar": 29,
+        "endLine": 23,
+        "endChar": 32
+      },
+      "revId": "4c0a475b1caa7b337cc74dbd8cc87253240f9c4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
