@@ -421,7 +421,16 @@ __override_proto void board_power_5v_enable(int enable);
  * @param tid: The caller's task ID.
  * @param enable: 1 to turn on the rail, 0 to request the rail to be turned off.
  */
-void power_5v_enable(task_id_t tid, int enable);
+enum power_5v_requester {
+	PUR_CHIPSET,
+	PUR_BC12_PORT0,
+	PUR_BC12_PORT1,
+	PUR_BC12_PORT2,
+	PUR_BC12_PORT3,
+	PUR_COUNT
+};
+
+void power_5v_enable(enum power_5v_requester req, int enable);
 
 #ifdef CONFIG_ZTEST
 /**

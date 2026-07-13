@@ -30,6 +30,11 @@
 #include "system.h"
 #include "tablet_mode.h"
 #include "task.h"
+
+#include <zephyr/kernel.h>
+#ifdef HAS_TASK_MOTIONSENSE
+extern const k_tid_t MOTIONSENSE;
+#endif
 #include "timer.h"
 #include "util.h"
 
@@ -56,7 +61,7 @@ STATIC_IF(CONFIG_CMD_ACCEL_INFO) int accel_disp;
 
 #define SENSOR_ACTIVE(_sensor) (sensor_active & (_sensor)->active_mask)
 
-mutex_t g_sensor_mutex;
+K_MUTEX_DEFINE(g_sensor_mutex);
 
 /*
  * Current power level (S0, S3, S5, ...)
@@ -99,15 +104,7 @@ static atomic_t odr_event_required;
 /* Whether or not the FIFO interrupt should be enabled (set from the AP). */
 __maybe_unused static int fifo_int_enabled;
 
-#ifdef CONFIG_ZEPHYR
-static int init_sensor_mutex(void)
-{
-	k_mutex_init(&g_sensor_mutex);
 
-	return 0;
-}
-SYS_INIT(init_sensor_mutex, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef CONFIG_LID_ANGLE
 __attribute__((weak)) int sensor_board_is_lid_angle_available(void)
@@ -742,7 +739,9 @@ static int motion_sense_process(struct motion_sensor_t *sensor, uint32_t *event,
 	int has_data_read = 0;
 	int sensor_num = sensor - motion_sensors;
 
-	ASSERT(task_get_current() == TASK_ID_MOTIONSENSE);
+#ifdef HAS_TASK_MOTIONSENSE
+	ASSERT(k_current_get() == MOTIONSENSE);
+#endif
 
 	if (*event & TASK_EVENT_MOTION_ODR_CHANGE) {
 		const int sensor_bit = 1 << sensor_num;

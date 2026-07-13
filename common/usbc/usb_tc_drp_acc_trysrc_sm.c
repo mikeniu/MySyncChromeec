@@ -28,6 +28,8 @@
 #include "usbc_ppc.h"
 #include "vboot.h"
 
+#include <zephyr/kernel.h>
+
 /*
  * USB Type-C DRP with Accessory and Try.SRC module
  *   See Figure 4-16 in Release 1.4 of USB Type-C Spec.
@@ -440,9 +442,9 @@ static struct type_c {
 	/* The cc state */
 	enum pd_cc_states cc_state;
 	/* Tasks to notify after TCPC has been reset */
-	atomic_t tasks_waiting_on_reset;
+	struct k_event reset_event;
 	/* Tasks preventing TCPC from entering low power mode */
-	atomic_t tasks_preventing_lpm;
+	atomic_t lpm_prevent_refcount;
 	/* Voltage on CC pin */
 	enum tcpc_cc_voltage_status cc_voltage;
 	/* Voltage on CC1 pin */
@@ -515,70 +517,7 @@ __maybe_unused static bool is_try_src_enabled(int port)
  * with tests, and the value of doing so is low.
  * LCOV_EXCL_START
  */
-#if !defined(CONFIG_ZEPHYR) && !defined(CONFIG_USB_PRL_SM)
 
-/*
- * These pd_ functions are implemented in common/usb_prl_sm.c
- */
-
-void pd_transmit_complete(int port, int status, const timestamp_t *ts)
-{
-	/* DO NOTHING */
-}
-
-void pd_execute_hard_reset(int port)
-{
-	/* DO NOTHING */
-}
-
-__overridable void pd_set_vbus_discharge(int port, int enable)
-{
-	/* DO NOTHING */
-}
-
-#endif /* !CONFIG_ZEPHYR && !CONFIG_USB_PRL_SM */
-
-#if !defined(CONFIG_ZEPHYR) && !defined(CONFIG_USB_PE_SM)
-
-/*
- * These pd_ functions are implemented in the PE layer
- */
-const uint32_t *const pd_get_src_caps(int port)
-{
-	return NULL;
-}
-
-uint8_t pd_get_src_cap_cnt(int port)
-{
-	return 0;
-}
-
-const uint32_t *const pd_get_snk_caps(int port)
-{
-	return NULL;
-}
-
-uint8_t pd_get_snk_cap_cnt(int port)
-{
-	return 0;
-}
-
-void pd_set_src_caps(int port, int cnt, uint32_t *src_caps)
-{
-}
-
-int pd_get_rev(int port, enum tcpci_msg_type type)
-{
-	return PD_REV30;
-}
-
-void pd_dpm_request(int port, enum pd_dpm_request req)
-{
-}
-
-/* LCOV_EXCL_STOP */
-
-#endif /* !CONFIG_ZEPHYR && !CONFIG_USB_PRL_SM */
 
 #ifndef CONFIG_AP_POWER_CONTROL
 __overridable enum pd_dual_role_states board_tc_get_initial_drp_mode(int port)
@@ -1109,7 +1048,7 @@ void pd_set_suspend(int port, int suspend)
 		 * Avoid deadlock when running from task
 		 * which we are going to suspend
 		 */
-		if (PD_PORT_TO_TASK_ID(port) == task_get_current())
+		if (IS_CURRENT_TASK_PD_PORT(port))
 			return;
 
 		task_wake(PD_PORT_TO_TASK_ID(port));
@@ -1507,7 +1446,7 @@ static bool tc_perform_snk_hard_reset(int port)
 
 void tc_start_error_recovery(int port)
 {
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	/*
 	 *   The port should transition to the ErrorRecovery state
@@ -1733,7 +1672,7 @@ static void set_ccd_mode(const int port, const bool enable)
 /* Set the TypeC state machine to a new state. */
 static void set_state_tc(const int port, const enum usb_tc_state new_state)
 {
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	set_state(port, &tc[port].ctx, &tc_states[new_state]);
 }
@@ -2015,10 +1954,11 @@ int tc_is_vconn_src(int port)
 static __maybe_unused int reset_device_and_notify(int port)
 {
 	int rv;
-	int task, waiting_tasks;
+
+	k_event_set(&tc[port].reset_event, 0);
 
 	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	TC_SET_FLAG(port, TC_FLAGS_LPM_TRANSITION);
 	rv = tcpm_init(port);
@@ -2039,17 +1979,10 @@ static __maybe_unused int reset_device_and_notify(int port)
 	 * waking the TCPC, but it has also set PD_EVENT_TCPC_RESET again, which
 	 * would result in a second, unnecessary init.
 	 */
-	atomic_clear_bits(task_get_event_bitmap(task_get_current()),
+	atomic_clear_bits(task_get_event_bitmap(PD_PORT_TO_TASK_ID(port)),
 			  PD_EVENT_TCPC_RESET);
 
-	waiting_tasks = atomic_clear(&tc[port].tasks_waiting_on_reset);
-
-	/* Wake up all waiting tasks. */
-	while (waiting_tasks) {
-		task = __fls(waiting_tasks);
-		waiting_tasks &= ~BIT(task);
-		task_set_event(task, TASK_EVENT_PD_AWAKE);
-	}
+	k_event_post(&tc[port].reset_event, 1);
 
 	return rv;
 }
@@ -2060,23 +1993,13 @@ void pd_wait_exit_low_power(int port)
 	if (!TC_CHK_FLAG(port, TC_FLAGS_LPM_ENGAGED))
 		return;
 
-	if (port == TASK_ID_TO_PD_PORT(task_get_current())) {
+	if (IS_CURRENT_TASK_PD_PORT(port)) {
 		if (!TC_CHK_FLAG(port, TC_FLAGS_LPM_TRANSITION))
 			reset_device_and_notify(port);
 	} else {
 		/* Otherwise, we need to wait for the TCPC reset to complete */
-		atomic_or(&tc[port].tasks_waiting_on_reset,
-			  1 << task_get_current());
-		/*
-		 * NOTE: We could be sending the PD task the reset event while
-		 * it is already processing the reset event. If that occurs,
-		 * then we will reset the TCPC multiple times, which is
-		 * undesirable but most likely benign. Empirically, this doesn't
-		 * happen much, but it if starts occurring, we can add a guard
-		 * to prevent/reduce it.
-		 */
 		task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_TCPC_RESET);
-		task_wait_event_mask(TASK_EVENT_PD_AWAKE, -1);
+		k_event_wait(&tc[port].reset_event, 1, false, K_FOREVER);
 	}
 }
 
@@ -2086,7 +2009,7 @@ void pd_wait_exit_low_power(int port)
  */
 void pd_device_accessed(int port)
 {
-	if (port == TASK_ID_TO_PD_PORT(task_get_current()))
+	if (IS_CURRENT_TASK_PD_PORT(port))
 		handle_device_access(port);
 	else
 		task_set_event(PD_PORT_TO_TASK_ID(port),
@@ -2099,13 +2022,13 @@ void pd_device_accessed(int port)
  */
 void pd_prevent_low_power_mode(int port, int prevent)
 {
-	const int current_task_mask = (1 << task_get_current());
-
-	if (prevent)
-		atomic_or(&tc[port].tasks_preventing_lpm, current_task_mask);
-	else
-		atomic_clear_bits(&tc[port].tasks_preventing_lpm,
-				  current_task_mask);
+	if (prevent) {
+		atomic_inc(&tc[port].lpm_prevent_refcount);
+	} else {
+		atomic_dec(&tc[port].lpm_prevent_refcount);
+		__ASSERT(atomic_get(&tc[port].lpm_prevent_refcount) >= 0,
+			 "LPM refcount negative");
+	}
 }
 #endif /* CONFIG_USB_PD_TCPC_LOW_POWER */
 
@@ -3628,7 +3551,7 @@ __maybe_unused static void tc_low_power_mode_run(const int port)
 		return;
 	}
 
-	if (tc[port].tasks_preventing_lpm)
+	if (atomic_get(&tc[port].lpm_prevent_refcount))
 		pd_timer_enable(port, TC_TIMER_LOW_POWER_TIME,
 				PD_LPM_DEBOUNCE_US);
 

@@ -29,7 +29,9 @@ static uint16_t errors;
 
 /* Lock to access the sensor */
 static K_MUTEX_DEFINE(sensor_lock);
-static task_id_t sensor_owner;
+#include <zephyr/kernel.h>
+static k_tid_t sensor_owner = NULL;
+#define SENSOR_OWNER_INVALID NULL
 
 /* FPC specific initialization and de-initialization functions */
 __staticlib int fp_sensor_open(void);
@@ -170,15 +172,15 @@ static uint8_t spi_buf[MAX_CMD_SPI_TRANSFER_SIZE];
 
 void fp_sensor_lock(void)
 {
-	if (sensor_owner != task_get_current()) {
+	if (sensor_owner != k_current_get()) {
 		mutex_lock(&sensor_lock);
-		sensor_owner = task_get_current();
+		sensor_owner = k_current_get();
 	}
 }
 
 void fp_sensor_unlock(void)
 {
-	sensor_owner = 0xFF;
+	sensor_owner = SENSOR_OWNER_INVALID;
 	mutex_unlock(&sensor_lock);
 }
 
