@@ -15,6 +15,8 @@
 #include "timer.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
+
 #define CPRINTS(format, args...) cprints(CC_CHARGER, format, ##args)
 #define BCFGPRT(format, args...) cprints(CC_CHARGER, "BCFG " format, ##args)
 
@@ -361,6 +363,44 @@ int board_cut_off_battery(void)
 
 	return rv ? EC_RES_ERROR : EC_RES_SUCCESS;
 }
+
+#ifdef CONFIG_PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF
+/**
+ * Battery wakeup cut off command via SMBus write word.
+ *
+ * @param wakeup_ship_mode		Battery wakeup ship mode information
+ * @return non-zero if error
+ */
+static int wakeup_cut_off_battery_sb_write(
+	const struct wakeup_ship_mode_info *wakeup_ship_mode)
+{
+	int rv;
+
+	/* wakeup ship mode command requires writing 2 data values */
+	rv = sb_write(wakeup_ship_mode->reg_addr,
+		      wakeup_ship_mode->reg_data[0]);
+	if (rv)
+		return rv;
+
+	return sb_write(wakeup_ship_mode->reg_addr,
+			wakeup_ship_mode->reg_data[1]);
+}
+
+test_export_static int board_wakeup_cutoff_battery(void)
+{
+	const struct board_batt_params *params = get_batt_params();
+	int rv;
+
+	/* If battery is unknown can't send wakeup ship mode command */
+	if (!params)
+		return EC_RES_ERROR;
+
+	rv = wakeup_cut_off_battery_sb_write(
+		&params->fuel_gauge.wakeup_ship_mode);
+
+	return rv ? EC_RES_ERROR : EC_RES_SUCCESS;
+}
+#endif /* CONFIG_PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF */
 #endif /* !CONFIG_FUEL_GAUGE */
 
 #ifndef TEST_BATTERY_CONFIG
@@ -445,6 +485,19 @@ test_mockable int battery_is_charge_fet_disabled(void)
  * the battery is able to provide power and thus prevent a brownout when the
  * AP is powered on by the EC.
  */
+
+#ifdef CONFIG_PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF
+/*
+ * Wakeup commands are sent while the battery stays in the disconnect state.
+ * This function is called from many places (charge state machine, PD,
+ * charger/PPC drivers, ...), so the wakeup command is sent at most once per
+ * call, and only within CONFIG_PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF_TIMEOUT_MSEC
+ * after the disconnect state was first detected.
+ */
+static k_timepoint_t wakeup_cutoff_deadline;
+static bool wakeup_cutoff_active;
+#endif
+
 enum battery_disconnect_state battery_get_disconnect_state(void)
 {
 	const struct board_batt_params *params = get_batt_params();
@@ -465,8 +518,25 @@ enum battery_disconnect_state battery_get_disconnect_state(void)
 			params->fuel_gauge.fet.reg_addr, reg,
 			params->fuel_gauge.fet.reg_mask,
 			params->fuel_gauge.fet.disconnect_val);
+
+#ifdef CONFIG_PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF
+		if (!wakeup_cutoff_active) {
+			/* Disconnect just detected: start window */
+			wakeup_cutoff_active = true;
+			wakeup_cutoff_deadline = sys_timepoint_calc(K_MSEC(
+				CONFIG_PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF_TIMEOUT_MSEC));
+		}
+		if (!sys_timepoint_expired(wakeup_cutoff_deadline))
+			board_wakeup_cutoff_battery();
+#endif
+
 		return BATTERY_DISCONNECTED;
 	}
+
+#ifdef CONFIG_PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF
+	/* Battery is awake again, allow a new wakeup window */
+	wakeup_cutoff_active = false;
+#endif
 
 	return BATTERY_NOT_DISCONNECTED;
 }
