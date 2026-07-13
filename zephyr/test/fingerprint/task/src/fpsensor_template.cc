@@ -63,6 +63,11 @@ static const uint8_t fake_rollback_entropy[] = "some_rollback_entropy";
 	{ 0x5f6d5f69, 0x61665f61, 0x755f656b, 0x5f726573, \
 	  0x755f6469, 0x5f646573, 0x5f726f66, 0x74736574 }
 
+/* Alternate numeric patterns for UserID testing */
+#define FAKE_USER_ID_ALT                                  \
+	{ 0x11111111, 0x22222222, 0x33333333, 0x44444444, \
+	  0x55555555, 0x66666666, 0x77777777, 0x88888888 }
+
 /*
  * How to manually encrypt a template
  *
@@ -1386,6 +1391,102 @@ ZTEST_USER(fpsensor_template, test_fp_template_cleans_buffer_on_failure)
 	zassert_mem_equal(
 		&fp_enc_buffer, &zero_enc_buffer, sizeof(fp_enc_buffer),
 		"fp_enc_buffer should be clean even after failed commit.");
+}
+
+ZTEST_USER(fpsensor_template, test_fp_context_get_result_blocks_swap_under_auth)
+{
+	struct ec_params_fp_context_v1 fp_context_params = {
+		.action = FP_CONTEXT_GET_RESULT,
+		.userid = FAKE_USER_ID_ALT,
+	};
+
+	/* Prerequisite state: a User ID must already be active and locked. */
+	zassert_true(global_context.fp_encryption_status &
+		     FP_CONTEXT_USER_ID_SET);
+
+	/*
+	 * Simulate an active high-security auth session. Under this state,
+	 * changing the active User ID out-of-band must be strictly denied to
+	 * preserve the cryptographic binding between the user and loaded
+	 * templates.
+	 */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	/*
+	 * Verify that executing FP_CONTEXT_GET_RESULT mid-session triggers a
+	 * security violation enforcement inside fp_command_context() and
+	 * returns EC_RES_ACCESS_DENIED.
+	 */
+	zassert_equal(EC_RES_ACCESS_DENIED,
+		      ec_cmd_fp_context_v1(NULL, &fp_context_params),
+		      "Context modification mid-session should be blocked");
+
+	/* Explicitly clear the session flag to isolate test side effects. */
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+}
+
+ZTEST_USER(fpsensor_template, test_fp_template_v0_disabled_under_auth)
+{
+	uint8_t params_buffer[FP_TEMPLATE_PARAMS_BUFFER_SIZE];
+	struct ec_params_fp_template *params =
+		(struct ec_params_fp_template *)params_buffer;
+
+	params->offset = 0;
+	params->size = 8;
+
+	/*
+	 * Note: This test validates that unauthenticated v0 legacy paths are
+	 * blocked entirely when fingerprint auth is enabled.
+	 */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	/*
+	 * Validate security invariant: When fingerprint auth is active,
+	 * unauthenticated legacy template parsing routes (v0) must reject
+	 * commits with ACCESS_DENIED.
+	 */
+	zassert_equal(
+		EC_RES_ACCESS_DENIED,
+		ec_cmd_fp_template(NULL, params,
+				   FP_TEMPLATE_PARAMS_BUFFER_SIZE),
+		"Legacy template loading endpoint must be closed under fingerprint auth");
+
+	/* Explicitly clear the session flag to isolate test side effects. */
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+}
+
+ZTEST_USER(fpsensor_template,
+	   test_fp_context_get_result_allows_idempotent_retry)
+{
+	struct ec_params_fp_context_v1 fp_context_params = {
+		.action = FP_CONTEXT_GET_RESULT,
+		.userid = FAKE_USER_ID, /* Exact same user ID */
+	};
+
+	/* Prerequisite state: a User ID must already be active. */
+	zassert_true(global_context.fp_encryption_status &
+		     FP_CONTEXT_USER_ID_SET);
+
+	/* Simulate an active session so fingerprint_auth_enabled() is true. */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	/*
+	 * Verify that executing FP_CONTEXT_GET_RESULT with the SAME
+	 * user ID succeeds (idempotent retry) even when fingerprint auth is
+	 * active, ensuring AP IPC timeouts do not break the state machine.
+	 */
+	zassert_equal(EC_RES_SUCCESS,
+		      ec_cmd_fp_context_v1(NULL, &fp_context_params),
+		      "Idempotent context retries should be allowed");
+
+	/* Clean up */
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
 }
 
 static void *fpsensor_setup(void)
