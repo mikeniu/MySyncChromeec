@@ -488,6 +488,8 @@ int battery_bq4050_imbalance_mv(void);
  */
 int board_cut_off_battery(void);
 
+int board_wakeup_cutoff_battery(void);
+
 /**
  * Return if the battery start cut off.
  */

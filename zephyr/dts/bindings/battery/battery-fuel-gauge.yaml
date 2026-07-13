@@ -30,6 +30,14 @@ properties:
     description: |
        Values written to register to enable ship mode.
     type: array
+  wakeup_ship_mode_reg_addr:
+    description: |
+       Address of register responsible for enabling wakeup ship mode.
+    type: int
+  wakeup_ship_mode_reg_data:
+    description: |
+       Values written to register to enable wakeup ship mode.
+    type: array
   sleep_mode_reg_addr:
     description: |
        Defines address where command will be sent to go into sleep mode.

@@ -8245,6 +8245,12 @@ struct ship_mode_info {
 	uint16_t reg_data[SHIP_MODE_WRITES];
 } __packed __aligned(2);
 
+struct wakeup_ship_mode_info {
+	uint8_t reg_addr;
+	uint8_t reserved;
+	uint16_t reg_data[SHIP_MODE_WRITES];
+} __packed __aligned(2);
+
 struct sleep_mode_info {
 	uint8_t reg_addr;
 	uint8_t reserved;
@@ -8287,6 +8293,7 @@ struct fuel_gauge_info {
 	uint32_t flags;
 	uint32_t board_flags;
 	struct ship_mode_info ship_mode;
+	struct wakeup_ship_mode_info wakeup_ship_mode;
 	struct sleep_mode_info sleep_mode;
 	struct fet_info fet;
 } __packed __aligned(4);

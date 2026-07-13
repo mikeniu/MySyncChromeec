@@ -175,6 +175,14 @@ config PLATFORM_EC_BATTERY_CUT_OFF
 	  Once defined, a board specific board_cut_off_battery() function
 	  has to be provided.
 
+config PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF
+	bool "Host/Console command: battery wakeup cut-off"
+	help
+	  Enables support for disconnecting the battery using the "wakeup_cutoff"
+	  console command and the EC_CMD_BATTERY_WAKEUP_CUT_OFF host command.
+	  Once defined, a board specific board_wakeup_cut_off_battery() function
+	  has to be provided.
+
 config PLATFORM_EC_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN
 	bool "Battery cut-off at shutdown"
 	depends on PLATFORM_EC_BATTERY_CUT_OFF

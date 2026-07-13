@@ -14,6 +14,10 @@
 		.reg_addr = DT_PROP(node, ship_mode_reg_addr), \
 		.reg_data = DT_PROP(node, ship_mode_reg_data), \
 	}, \
+	.wakeup_ship_mode = { \
+		.reg_addr = DT_PROP_OR(node, wakeup_ship_mode_reg_addr, 0), \
+		.reg_data = DT_PROP_OR(node, wakeup_ship_mode_reg_data, {0}), \
+	}, \
 	.sleep_mode = { \
 		.reg_addr = DT_PROP_OR(node, sleep_mode_reg_addr, 0), \
 		.reg_data = DT_PROP_OR(node, sleep_mode_reg_data, 0), \
@@ -26,8 +30,8 @@
 		.cfet_off_val = DT_PROP_OR(node, fet_cfet_off_val, 0), \
 	}, \
 	COND_CODE_1(UTIL_AND(IS_ENABLED(CONFIG_BATTERY_MEASURE_IMBALANCE), \
-			     DT_NODE_HAS_PROP(node, imbalance_mv)), \
-		(.imbalance_mv = DT_STRING_TOKEN(node, imbalance_mv),), ()) \
+					DT_NODE_HAS_PROP(node, imbalance_mv)), \
+			(.imbalance_mv = DT_STRING_TOKEN(node, imbalance_mv),), ()) \
 },
 
 #define NODE_BATT_INFO(node)                                                 \
