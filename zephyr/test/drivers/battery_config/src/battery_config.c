@@ -77,7 +77,7 @@ static void cbi_set_batt_conf(const struct board_batt_params *conf,
 	void *p = buf;
 	uint8_t size;
 
-	head->struct_version = 0;
+	head->struct_version = EC_BATTERY_CONFIG_STRUCT_VERSION;
 	head->manuf_name_size = strlen(manuf_name);
 	head->device_name_size = strlen(device_name);
 
