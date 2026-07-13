@@ -63,11 +63,13 @@ void print_stack_trace(const struct k_thread *thread)
 
 void get_thread_name(const struct k_thread *thread, char *name, size_t size)
 {
-#ifdef CONFIG_THREAD_NAME
-	snprintf(name, size, "%s", thread->name);
-#else
-	snprintf(name, size, "TASK_%d", thread_id_to_task_id((k_tid_t)thread));
-#endif
+	const char *tname = k_thread_name_get((k_tid_t)thread);
+
+	if (tname && tname[0] != '\0') {
+		snprintf(name, size, "%s", tname);
+	} else {
+		snprintf(name, size, "%p", thread);
+	}
 }
 
 uint32_t get_stack_ptr(const struct k_thread *thread)
