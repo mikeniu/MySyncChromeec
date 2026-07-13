@@ -3,28 +3,28 @@
 This directory holds mock implementations for use in tests.
 
 Each mock is given some friendly build name, like ROLLBACK or FP_SENSOR. This
-name is defined in [common/mock/build.mk](build.mk) and referenced from unit
+name is defined in [test/mock/build.mk](build.mk) and referenced from unit
 tests' `.mocklist` file.
 
 ## Creating a new mock
 
-*   Add the mock source to [common/mock](/common/mock) and the optional header
+*   Add the mock source to [test/mock](/test/mock) and the optional header
     file to [include/mock](/include/mock). Header files are only necessary if
     you want to expose additional [mock control](#mock-controls)
     functions/variables. See the [Design Patterns](#design-patterns) section for
     more detail on design patterns.
-*   Add a new entry in [common/mock/build.mk](build.mk) that is conditioned on
+*   Add a new entry in [test/mock/build.mk](build.mk) that is conditioned on
     your mock's name.
 
 If a unit test requests this mock, the build system will set the
 variable `HAS_MOCK_<BUILD_NAME>` to `y` at build time. This variable is used to
-conditionally include the mock source in [common/mock/build.mk](build.mk).
+conditionally include the mock source in [test/mock/build.mk](build.mk).
 
-Example line from [common/mock/build.mk](build.mk):
+Example line from [test/mock/build.mk](build.mk):
 
 ```make
 # Mocks
-mock-$(HAS_MOCK_ROLLBACK) += mock/rollback_mock.o
+test_mock-$(HAS_MOCK_ROLLBACK) += rollback_mock.o
 ```
 
 ## Using a mock

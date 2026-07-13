@@ -10,7 +10,7 @@
 _common_dir:=$(dir $(lastword $(MAKEFILE_LIST)))
 
 common-y=util.o
-common-y+=version.o printf.o queue.o queue_policies.o irq_locking.o
+common-y+=version.o printf.o queue.o queue_policies.o
 
 common-$(CONFIG_ACCELGYRO_BMI160)+=math_util.o
 common-$(CONFIG_ACCELGYRO_BMI220)+=math_util.o
@@ -75,11 +75,7 @@ common-$(CONFIG_IO_EXPANDER)+=ioexpander.o ioexpander_commands.o
 common-$(CONFIG_COMMON_PANIC_OUTPUT)+=panic_output.o
 common-$(CONFIG_COMMON_RUNTIME)+=hooks.o system.o peripheral.o \
 	system_boot_time.o
-ifeq ($(BOARD),host)
-common-$(CONFIG_COMMON_RECURSIVE_MUTEX)+=recursive_mutex.o
-else ifeq ($(USE_BUILTIN_STDLIB), 1)
-common-$(CONFIG_COMMON_RECURSIVE_MUTEX)+=recursive_mutex.o
-endif
+
 common-$(CONFIG_COMMON_TIMER)+=timer.o
 common-$(CONFIG_CRC8_CROS)+= crc8.o
 common-$(CONFIG_CURVE25519)+=curve25519.o
@@ -201,7 +197,7 @@ common-$(CONFIG_WIRELESS)+=wireless.o
 common-$(HAS_TASK_CHIPSET)+=chipset.o
 common-$(CONFIG_CMD_AP_RESET_LOG)+=ap_reset_log.o
 common-$(HAS_TASK_CONSOLE)+=console.o console_output.o
-common-$(HAS_TASK_CONSOLE)+=uart_buffering.o uart_hostcmd.o uart_printf.o
+common-$(HAS_TASK_CONSOLE)+=uart_hostcmd.o uart_printf.o
 common-$(CONFIG_CMD_MEM)+=memory_commands.o
 common-$(HAS_TASK_HOSTCMD)+=host_command_task.o host_command.o ec_features.o
 common-$(HAS_TASK_PDCMD)+=host_command_pd.o
@@ -238,7 +234,6 @@ common-$(call not_cfg,$(CONFIG_SHARED_MALLOC))+=shared_mem.o
 endif
 endif
 
-common-$(TEST_BUILD)+=test_util.o
 
 ifneq ($(CONFIG_RSA_OPTIMIZED),)
 $(out)/RW/common/rsa.o: CFLAGS+=-O3
@@ -302,7 +297,4 @@ endif
 
 include $(_common_dir)fpsensor/build.mk
 include $(_common_dir)usbc/build.mk
-include $(_common_dir)mock/build.mk
-
 $(eval $(call vars_from_dir,common,usbc,common-usbc))
-$(eval $(call vars_from_dir,common,mock,mock))
