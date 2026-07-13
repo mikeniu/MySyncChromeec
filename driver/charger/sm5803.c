@@ -479,7 +479,6 @@ static void init_status_retrieve(void)
 }
 DECLARE_HOOK(HOOK_INIT, init_status_retrieve, HOOK_PRIO_FIRST);
 
-#ifdef CONFIG_ZEPHYR
 static void init_mutexes(void)
 {
 	int i;
@@ -490,7 +489,6 @@ static void init_mutexes(void)
 	}
 }
 DECLARE_HOOK(HOOK_INIT, init_mutexes, HOOK_PRIO_FIRST);
-#endif
 
 enum ec_error_list sm5803_set_phot_duration(int chgnum,
 					    enum sm5803_phot1_duration duration)
@@ -983,7 +981,7 @@ static void sm5803_disable_runtime_low_power_mode(void)
 {
 	enum ec_error_list rv;
 	int reg;
-	int chgnum = TASK_ID_TO_PD_PORT(task_get_current());
+	int chgnum = CURRENT_PD_PORT();
 
 	CPRINTS("%s %d: disable runtime low power mode", CHARGER_NAME, chgnum);
 	rv = main_read8(chgnum, SM5803_REG_REFERENCE, &reg);
@@ -1063,7 +1061,7 @@ static void sm5803_enable_runtime_low_power_mode(void)
 {
 	enum ec_error_list rv;
 	int reg;
-	int chgnum = TASK_ID_TO_PD_PORT(task_get_current());
+	int chgnum = CURRENT_PD_PORT();
 
 	CPRINTS("%s %d: enable runtime low power mode", CHARGER_NAME, chgnum);
 	rv = main_read8(chgnum, SM5803_REG_REFERENCE, &reg);

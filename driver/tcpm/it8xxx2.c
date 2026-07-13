@@ -22,9 +22,7 @@
 #include "usb_pd_tcpm.h"
 #include "util.h"
 
-#ifdef CONFIG_ZEPHYR
 #include <soc.h>
-#endif
 
 #ifdef CONFIG_USB_PD_TCPMV2
 #if defined(CONFIG_USB_PD_VBUS_DETECT_TCPC) || \
@@ -888,12 +886,10 @@ static void it8xxx2_init(enum usbpd_port port, int role)
 	*usbpd_ctrl_regs[port].cc1 = cc_config;
 	*usbpd_ctrl_regs[port].cc2 = cc_config;
 	task_clear_pending_irq(usbpd_ctrl_regs[port].irq);
-#ifdef CONFIG_ZEPHYR
 	task_disable_irq(usbpd_ctrl_regs[port].irq);
 	irq_connect_dynamic(usbpd_ctrl_regs[port].irq, 0,
 			    (void (*)(const void *))chip_pd_irq, (void *)port,
 			    0);
-#endif
 	task_enable_irq(usbpd_ctrl_regs[port].irq);
 	USBPD_START(port);
 	/*
@@ -953,7 +949,7 @@ __override void tc_update_pd_sleep_mask(int port)
 
 static void it8xxx2_tcpm_hook_connect(void)
 {
-	int port = TASK_ID_TO_PD_PORT(task_get_current());
+	int port = CURRENT_PD_PORT();
 
 	/*
 	 * If it isn't ITE active port, then return.
@@ -1000,7 +996,7 @@ DECLARE_HOOK(HOOK_USB_PD_CONNECT, it8xxx2_tcpm_hook_connect, HOOK_PRIO_DEFAULT);
 
 static void it8xxx2_tcpm_hook_disconnect(void)
 {
-	int port = TASK_ID_TO_PD_PORT(task_get_current());
+	int port = CURRENT_PD_PORT();
 
 	/*
 	 * If it isn't ITE active port, then return.
