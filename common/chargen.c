@@ -52,7 +52,7 @@ static void acquire_console(void)
 	 * steal character reads from chargen.
 	 */
 	if (task_start_called())
-		task_disable_task(TASK_ID_CONSOLE);
+		task_disable_task(CONSOLE);
 #endif /* !CONFIG_ZEPHYR  && !BOARD_HOST */
 }
 
@@ -63,7 +63,7 @@ static void release_console(void)
 #endif
 #if !defined(CONFIG_ZEPHYR) && !defined(BOARD_HOST)
 	if (task_start_called())
-		task_enable_task(TASK_ID_CONSOLE);
+		task_enable_task(CONSOLE);
 #endif /* !CONFIG_ZEPHYR  && !BOARD_HOST */
 }
 

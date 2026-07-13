@@ -303,7 +303,7 @@ int pd_start_tx(int port, int polarity, int bit_len)
 	 * Hand over to test runner. The test runner must wake us after
 	 * processing the packet.
 	 */
-	task_wake(TASK_ID_TEST_RUNNER);
+	task_wake(TEST_RUNNER);
 	task_wait_event(-1);
 
 	return bit_len;
@@ -318,7 +318,7 @@ void pd_rx_start(int port)
 {
 	ASSERT(pd_phy[port].hw_init_done);
 
-	task_wake(TASK_ID_TEST_RUNNER);
+	task_wake(TEST_RUNNER);
 	task_wait_event(-1);
 
 	pd_phy[port].rx_started = 1;

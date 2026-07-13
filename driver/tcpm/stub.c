@@ -137,7 +137,7 @@ void tcpc_alert(int port)
 
 	if (status & TCPC_REG_ALERT_CC_STATUS) {
 		/* CC status changed, wake task */
-		task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_CC);
+		task_set_event(pd_port_to_thread_id(port), PD_EVENT_CC);
 	}
 	if (status & TCPC_REG_ALERT_RX_STATUS) {
 		/*
@@ -148,7 +148,7 @@ void tcpc_alert(int port)
 	}
 	if (status & TCPC_REG_ALERT_RX_HARD_RST) {
 		/* hard reset received */
-		task_set_event(PD_PORT_TO_TASK_ID(port),
+		task_set_event(pd_port_to_thread_id(port),
 			       PD_EVENT_RX_HARD_RESET);
 	}
 	if (status & TCPC_REG_ALERT_TX_COMPLETE) {
