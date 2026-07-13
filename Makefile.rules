@@ -152,31 +152,14 @@ utils-test:
 endif
 
 
-# On board test binaries
-test-targets=$(foreach t,$(test-list-y),test-$(t))
-.PHONY: $(test-targets)
-
-ifeq "$(CONFIG_COMMON_RUNTIME)" "y"
-$(test-targets): test-%:
-	@set -e ; \
-	$(call echo,"  BUILD   $(out)/$*") \
-	$(MAKE) BOARD=$(BOARD) PROJECT=$* \
-	        V=$(V) out=$(out)/$* TEST_BUILD=y; \
-	cp $(out)/$*/$*.bin $(out)/test-$*.bin
-endif
-
-.PHONY: tests
-tests: $(test-targets)
-
-.PHONY: print-tests
-print-tests:
-	$(call cmd_pretty_print_list, \
-		$(sort $(test-targets)))
-
 # Emulator test executables
 host-test-targets=$(foreach t,$(test-list-host),host-$(t))
 run-test-targets=$(foreach t,$(test-list-host),run-$(t))
 .PHONY: $(host-test-targets) $(run-test-targets)
+
+# Host test binaries
+.PHONY: tests
+tests: $(host-test-targets)
 
 $(host-test-targets): host-%: | $(FAILED_BOARDS_DIR)
 	@touch $(FAILED_BOARDS_DIR)/test-$*
