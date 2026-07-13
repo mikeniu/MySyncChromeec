@@ -1388,6 +1388,72 @@ ZTEST_USER(fpsensor_template, test_fp_template_cleans_buffer_on_failure)
 		"fp_enc_buffer should be clean even after failed commit.");
 }
 
+ZTEST_USER(fpsensor_template, test_fp_context_get_result_blocks_swap_under_auth)
+{
+	struct ec_params_fp_context_v1 fp_context_params = {
+		.action = FP_CONTEXT_GET_RESULT,
+		.userid = FAKE_USER_ID,
+	};
+
+	/*
+	 * Clear out the tracking state initialized by fpsensor_before().
+	 * This ensures the test case controls the session initialization
+	 * sequence.
+	 */
+	global_context.fp_encryption_status = 0;
+
+	/* Setup an active auth session state status flags */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	/* Setting user_id the first time should succeed and set the USER_ID_SET
+	 * flag */
+	zassert_ok(ec_cmd_fp_context_v1(NULL, &fp_context_params));
+	zassert_true(global_context.fp_encryption_status &
+		     FP_CONTEXT_USER_ID_SET);
+
+	/* Changing user_id without an ASYNC reset must be denied */
+	uint32_t alternate_user_id[] = { 0x11111111, 0x22222222, 0x33333333,
+					 0x44444444, 0x55555555, 0x66666666,
+					 0x77777777, 0x88888888 };
+	memcpy(fp_context_params.userid, alternate_user_id,
+	       sizeof(fp_context_params.userid));
+
+	zassert_equal(EC_RES_ACCESS_DENIED,
+		      ec_cmd_fp_context_v1(NULL, &fp_context_params),
+		      "Context modification mid-session should be blocked");
+}
+
+ZTEST_USER(fpsensor_template, test_fp_template_v0_disabled_under_auth)
+{
+	uint8_t params_buffer[FP_TEMPLATE_PARAMS_BUFFER_SIZE];
+	struct ec_params_fp_template *params =
+		(struct ec_params_fp_template *)params_buffer;
+
+	params->offset = 0;
+	params->size = 8;
+
+	/*
+	 * Clear out any background context populated by fpsensor_before()
+	 * to ensure a completely deterministic test execution space.
+	 */
+	global_context.fp_encryption_status = 0;
+
+	/* Simulate an established secure session context */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	/*
+	 * Attempting to call the legacy v0 host command wrapper
+	 * should instantly abort with ACCESS_DENIED.
+	 */
+	zassert_equal(
+		EC_RES_ACCESS_DENIED,
+		ec_cmd_fp_template(NULL, params,
+				   FP_TEMPLATE_PARAMS_BUFFER_SIZE),
+		"Legacy template loading endpoint must be closed under FingerGuard");
+}
+
 static void *fpsensor_setup(void)
 {
 	struct ec_params_fp_seed fp_seed_params = {
@@ -1445,6 +1511,15 @@ static void fpsensor_before(void *f)
 		.action = FP_CONTEXT_ASYNC,
 		.userid = FAKE_USER_ID,
 	};
+
+	/* Clear everything to a clean, default state */
+	fp_reset_and_clear_context();
+
+	/*
+	 * Force-clear all secure session flags so standard legacy tests
+	 * do not get blocked by fingerprint_auth_enabled() checks.
+	 */
+	global_context.fp_encryption_status = 0;
 
 	fingerprint_set_state(fp_sim, &state);
 	RESET_FAKE(mkbp_send_event);

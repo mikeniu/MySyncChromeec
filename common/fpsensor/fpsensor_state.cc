@@ -365,6 +365,21 @@ static enum ec_status fp_command_context(struct host_cmd_handler_args *args)
 		if (global_context.sensor_mode & FP_MODE_RESET_SENSOR)
 			return EC_RES_BUSY;
 
+		/*
+		 * When FingerGuard is active, once a user ID has been set,
+		 * mutating the session context identifier out-of-band is
+		 * prohibited. This enforces the security invariant that the
+		 * active user ID remains strictly bound to the currently loaded
+		 * template set. To switch users, the AP must issue an explicit
+		 * FP_CONTEXT_ASYNC command to flush all active cryptographic
+		 * state.
+		 */
+		if (fingerprint_auth_enabled() &&
+		    (global_context.fp_encryption_status &
+		     FP_CONTEXT_USER_ID_SET)) {
+			return EC_RES_ACCESS_DENIED;
+		}
+
 		memcpy(global_context.user_id.data(), p->userid,
 		       sizeof(global_context.user_id));
 
