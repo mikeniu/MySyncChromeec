@@ -8,6 +8,7 @@
 
 /* penghu project DTS includes */
 #include "binman.dtsi"
+#include "fan.dtsi"
 #include "gpios.dtsi"
 #include "interrupts.dtsi"
 #include "keyboard.dtsi"
