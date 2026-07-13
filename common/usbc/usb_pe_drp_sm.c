@@ -926,7 +926,7 @@ int pe_is_explicit_contract(int port)
 void pe_message_received(int port)
 {
 	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	PE_SET_FLAG(port, PE_FLAGS_MSG_RECEIVED);
 	task_wake(PD_PORT_TO_TASK_ID(port));
@@ -935,7 +935,7 @@ void pe_message_received(int port)
 void pe_hard_reset_sent(int port)
 {
 	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	PE_CLR_FLAG(port, PE_FLAGS_HARD_RESET_PENDING);
 }
@@ -943,7 +943,7 @@ void pe_hard_reset_sent(int port)
 void pe_got_hard_reset(int port)
 {
 	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	/*
 	 * If we're in the middle of an FRS, any error should cause us to follow
@@ -1009,7 +1009,7 @@ static void pe_set_frs_enable(int port, int enable)
 
 	/* This should only be called from the PD task */
 	if (!IS_ENABLED(TEST_BUILD))
-		assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+		ASSERT_CURRENT_TASK_IS_PD(port);
 
 	if (!IS_ENABLED(CONFIG_USB_PD_FRS) || !IS_ENABLED(CONFIG_USB_PD_REV30))
 		return;
@@ -1278,7 +1278,7 @@ static bool pe_check_outgoing_discard(int port)
 void pe_report_error(int port, enum pe_error e, enum tcpci_msg_type type)
 {
 	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	/*
 	 * If there is a timeout error while waiting for a chunk of a chunked
@@ -1364,7 +1364,7 @@ void pe_report_error(int port, enum pe_error e, enum tcpci_msg_type type)
 void pe_got_soft_reset(int port)
 {
 	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	/*
 	 * The PE_SRC_Soft_Reset state Shall be entered from any state when a
@@ -1443,7 +1443,7 @@ void pd_dpm_request(int port, enum pd_dpm_request req)
 void pe_vconn_swap_complete(int port)
 {
 	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	PE_SET_FLAG(port, PE_FLAGS_VCONN_SWAP_COMPLETE);
 }
@@ -1451,7 +1451,7 @@ void pe_vconn_swap_complete(int port)
 void pe_ps_reset_complete(int port)
 {
 	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	PE_SET_FLAG(port, PE_FLAGS_PS_RESET_COMPLETE);
 }
@@ -1459,7 +1459,7 @@ void pe_ps_reset_complete(int port)
 void pe_message_sent(int port)
 {
 	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	ASSERT_CURRENT_TASK_IS_PD(port);
 
 	PE_SET_FLAG(port, PE_FLAGS_TX_COMPLETE);
 	task_wake(PD_PORT_TO_TASK_ID(port));
@@ -1583,7 +1583,7 @@ struct rmdo pd_get_partner_rmdo(int port)
 
 static void pe_handle_detach(void)
 {
-	const int port = TASK_ID_TO_PD_PORT(task_get_current());
+	const int port = CURRENT_PD_PORT();
 
 	pe_clear_port_data(port);
 }
@@ -8654,14 +8654,14 @@ uint8_t pd_get_src_cap_cnt(int port)
 	return 0;
 }
 
-/* Track access to the PD discovery structures during HC execution */
-atomic_t task_access[CONFIG_USB_PD_PORT_MAX_COUNT][DISCOVERY_TYPE_COUNT];
+/* Track access version to the PD discovery structures during HC execution */
+static uint32_t discovery_version[CONFIG_USB_PD_PORT_MAX_COUNT]
+				 [DISCOVERY_TYPE_COUNT];
 
 void pd_dfp_discovery_init(int port)
 {
-	atomic_or(&task_access[port][TCPCI_MSG_SOP], BIT(task_get_current()));
-	atomic_or(&task_access[port][TCPCI_MSG_SOP_PRIME],
-		  BIT(task_get_current()));
+	discovery_version[port][TCPCI_MSG_SOP]++;
+	discovery_version[port][TCPCI_MSG_SOP_PRIME]++;
 
 	memset(pe[port].discovery, 0, sizeof(pe[port].discovery));
 }
@@ -8687,25 +8687,32 @@ void pd_dfp_mode_init(int port)
 __maybe_unused void pd_discovery_access_clear(int port,
 					      enum tcpci_msg_type type)
 {
-	if (!IS_ENABLED(CONFIG_USB_PD_ALT_MODE_DFP))
-		assert(0);
-
-	atomic_clear_bits(&task_access[port][type], 0xFFFFFFFF);
+	/* No-op with version-based validation */
 }
 
 __maybe_unused bool pd_discovery_access_validate(int port,
-						 enum tcpci_msg_type type)
+						 enum tcpci_msg_type type,
+						 uint32_t start_version)
 {
 	if (!IS_ENABLED(CONFIG_USB_PD_ALT_MODE_DFP))
 		assert(0);
 
-	return !(task_access[port][type] & ~BIT(task_get_current()));
+	return discovery_version[port][type] == start_version;
+}
+
+__maybe_unused uint32_t pd_discovery_get_version(int port,
+						 enum tcpci_msg_type type)
+{
+	if (!IS_ENABLED(CONFIG_USB_PD_ALT_MODE_DFP))
+		assert(0);
+	ASSERT(type < DISCOVERY_TYPE_COUNT);
+
+	return discovery_version[port][type];
 }
 
 __maybe_unused struct pd_discovery *
 pd_get_am_discovery_and_notify_access(int port, enum tcpci_msg_type type)
 {
-	atomic_or(&task_access[port][type], BIT(task_get_current()));
 	return (struct pd_discovery *)pd_get_am_discovery(port, type);
 }
 

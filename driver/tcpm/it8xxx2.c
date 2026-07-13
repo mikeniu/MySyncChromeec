@@ -953,7 +953,7 @@ __override void tc_update_pd_sleep_mask(int port)
 
 static void it8xxx2_tcpm_hook_connect(void)
 {
-	int port = TASK_ID_TO_PD_PORT(task_get_current());
+	int port = CURRENT_PD_PORT();
 
 	/*
 	 * If it isn't ITE active port, then return.
@@ -1000,7 +1000,7 @@ DECLARE_HOOK(HOOK_USB_PD_CONNECT, it8xxx2_tcpm_hook_connect, HOOK_PRIO_DEFAULT);
 
 static void it8xxx2_tcpm_hook_disconnect(void)
 {
-	int port = TASK_ID_TO_PD_PORT(task_get_current());
+	int port = CURRENT_PD_PORT();
 
 	/*
 	 * If it isn't ITE active port, then return.
