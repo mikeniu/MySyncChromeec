@@ -4,9 +4,18 @@
  */
 
 #include "ec_commands.h"
-#include "ec_tasks.h"
 #include "hooks.h"
 #include "host_command.h"
+
+#ifdef CONFIG_HAS_TASK_KEYSCAN
+extern const k_tid_t KEYSCAN;
+#endif
+#ifdef CONFIG_HAS_TASK_KEYPROTO
+extern const k_tid_t KEYPROTO;
+#endif
+#ifdef CONFIG_HAS_TASK_WOV
+extern const k_tid_t WOV;
+#endif
 #include "host_command_memory_dump.h"
 #include "test/drivers/test_state.h"
 
@@ -371,14 +380,22 @@ ZTEST_USER(memory_dump, test_excluded_threads_not_dumped)
 
 	main_thread = get_main_thread();
 	zassert_not_null(main_thread);
-	keyscan_thread = task_id_to_thread_id(TASK_ID_KEYSCAN);
+#ifdef CONFIG_HAS_TASK_KEYSCAN
+	keyscan_thread = KEYSCAN;
+#else
+	keyscan_thread = NULL;
+#endif
 	zassert_not_null(keyscan_thread);
-	keyproto_thread = task_id_to_thread_id(TASK_ID_KEYPROTO);
+#ifdef CONFIG_HAS_TASK_KEYPROTO
+	keyproto_thread = KEYPROTO;
+#else
+	keyproto_thread = NULL;
+#endif
 	zassert_not_null(keyproto_thread);
-#ifdef HAS_TASK_WOV
-	wov_thread = task_id_to_thread_id(TASK_ID_WOV);
+#ifdef CONFIG_HAS_TASK_WOV
+	wov_thread = WOV;
 	zassert_not_null(wov_thread);
-#endif /* HAS_TASK_WOV */
+#endif /* CONFIG_HAS_TASK_WOV */
 
 	/* Thread memory should be registered after HOOK_INIT */
 	hook_notify(HOOK_INIT);
