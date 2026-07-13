@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13baa5d8_3257cc74",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-13T16:11:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/c470ca41-ede3-40dd-8dcc-5edc63c16bc9)]\n\n### Review Summary\n\n*   **Functionality**: The changes successfully introduce an early `EC_MKBP_FP_FINGER_DOWN` notification before image processing. This helps the host track the start of physical interaction more accurately for latency metrics. The logic correctly triggers the event.\n*   **Style**: The code follows the existing style guidelines and integrates seamlessly into `fp_task`.\n*   **Security**: No security vulnerabilities or data leaks were introduced. The handling of events does not expose sensitive template information.\n*   **Testing**: Test coverage is excellent. The Zephyr tests were comprehensively updated to assert that the expected number of `mkbp_send_event` calls occurred (two) and that both `FINGER_DOWN` and the operation-specific events (`IMAGE_READY`, `ENROLL`, `MATCH`) are present in the final event bitmask.\n\n*(Note: The minor suggestion regarding avoiding redundant MKBP interrupts if both `FP_MODE_FINGER_DOWN` and a capture mode are active has already been acknowledged in a previous review and remains a valid optional consideration.)*",
+      "isAi": true,
+      "revId": "0e7799230eee7004378c6aae99da50db1d0f9ec3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
