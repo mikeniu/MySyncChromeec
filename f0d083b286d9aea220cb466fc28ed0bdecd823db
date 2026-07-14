@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "688d35bc_019ccbdc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T20:13:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fed6b8be_5a0b3296",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 31
+      },
+      "revId": "f0d083b286d9aea220cb466fc28ed0bdecd823db",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7bc01fa_a476a59c",
@@ -42,6 +66,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5e17a70_ae4a44f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T20:13:39Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c7bc01fa_a476a59c",
+      "revId": "f0d083b286d9aea220cb466fc28ed0bdecd823db",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "75627c10_6f2dc8e1",
@@ -55,6 +97,30 @@
       "writtenOn": "2026-07-14T19:52:26Z",
       "side": 1,
       "message": "* **Observation:** The `static_assert` uses `sizeof()` to compare the sizes of `p-\u003euserid` and `global_context.user_id`.\n* **Feedback:** While `sizeof()` is technically correct here (assuming both are arrays of byte-sized types), it evaluates the *byte size* rather than the *element count*. Because `std::ranges::copy` specifically operates on elements, it is more idiomatic and semantically accurate to use `std::size()`. Furthermore, this aligns perfectly with the pre-existing code just a few lines down, which already uses `std::size(global_context.user_id)`.\n* **Suggestion:**\n```cpp\nstatic_assert(std::size(p-\u003euserid) \u003d\u003d std::size(global_context.user_id),\n              \"User ID array sizes must match\");\n\n```\n\n\n*(Note: While the string literal in `static_assert` is optional in C++17 and later, adding one improves error clarity for future maintainers).*",
+      "range": {
+        "startLine": 368,
+        "startChar": 0,
+        "endLine": 369,
+        "endChar": 41
+      },
+      "revId": "f0d083b286d9aea220cb466fc28ed0bdecd823db",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ab315f0_c90daa6a",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T20:13:39Z",
+      "side": 1,
+      "message": "If I use the suggested, I get this error (p-\u003euserid) is not constexpr.\n\nI tried the below as well but did not work. best is to keep the sizeof\n\n```\n  368 |                 static_assert(std::size(p-\u003euserid) \u003d\u003d\nExecution failed (return code\u003d1): /usr/bin/ninja -C /mnt/host/source/src/platform/ec/build/zephyr/srebrna/build-rw\nTraceback (most recent call last):\n  File \"/mnt/host/source/src/platform/ec/zephyr/zmake/zmake/multiproc.py\", line 383, in _run_fn\n    result \u003d func()\n             ^^^^^^\n  File \"/mnt/host/source/src/platform/ec/zephyr/zmake/zmake/zmake.py\", line 952, in _build_one_dir\n    raise OSError(get_process_failure_msg(proc))\nOSError: Execution failed (return code\u003d1): /usr/bin/ninja -C /mnt/host/source/src/platform/ec/build/zephyr/srebrna/build-rw\n\n      |                               ^~~~~~~~~~~~~~~~~~~~~~~\n  369 |                                       std::size(global_context.user_id),\n      |                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/mnt/host/source/src/platform/ec/build/zephyr/srebrna/modules/ec/common/fpsensor/fpsensor_state.cc:368:27: note: read of non-constexpr variable \u0027p\u0027 is not allowed in a constant expression\n  368 |                 static_assert(std::size(p-\u003euserid) \u003d\u003d\n      |                                         ^\n/mnt/host/source/src/platform/ec/build/zephyr/srebrna/modules/ec/common/fpsensor/fpsensor_state.cc:346:14: note: declared here\n  346 |         const auto *p \u003d\n\n```\n```\n\t\tstatic_assert(\n\t\t\tstd::size(\n\t\t\t\tdecltype(ec_params_fp_context_v1::userid){}) \u003d\u003d\n\t\t\t\tstd::size(decltype(global_context.user_id){}),\n\t\t\t\"User ID array sizes must match\")\n```\n```\nec_params_fp_context_v1::userid is defined as:\nuint32_t userid[FP_CONTEXT_USERID_WORDS]; (where FP_CONTEXT_USERID_WORDS is 32 / sizeof(uint32_t), which equals 8 elements of uint32_t).\n\nglobal_context.user_id is defined in struct fpsensor_context as:\nstd::array\u003cuint8_t, FP_CONTEXT_USERID_BYTES\u003e user_id; (which is std::array\u003cuint8_t, 32\u003e containing 32 elements of uint8_t).\n```",
+      "parentUuid": "75627c10_6f2dc8e1",
       "range": {
         "startLine": 368,
         "startChar": 0,
