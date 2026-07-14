@@ -17,6 +17,29 @@
       "isAi": true,
       "revId": "0e7799230eee7004378c6aae99da50db1d0f9ec3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "770ee744_60b95346",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 460,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T17:48:52Z",
+      "side": 1,
+      "message": "Gemini feedback (check for correctness):\n\n-----\n\n\n### 1. Critical Issue: Event Spamming on Image Acquisition Failure\n\nCurrently, the patch sends the `EC_MKBP_FP_FINGER_DOWN` event unconditionally every time the task loop processes an event while the finger is present and the sensor is in capture mode:\n\n```cpp\nif (st \u003d\u003d FINGER_PRESENT \u0026\u0026\n    global_context.sensor_mode \u0026 FP_MODE_ANY_CAPTURE) {\n    send_mkbp_event(EC_MKBP_FP_FINGER_DOWN);\n    fp_process_finger();\n}\n\n```\n\n**The Bug:** If `fp_acquire_image()` inside `fp_process_finger()` fails (e.g., it returns `FINGERPRINT_SENSOR_SCAN_TOO_FAST` or low image quality), the function returns early. Because of this early return, the `FP_MODE_ANY_CAPTURE` flag is *never cleared*.\n\nOn the next iteration of the `while (1)` loop, if the user\u0027s finger is still resting on the sensor, the condition evaluates to true again, sending *another* `EC_MKBP_FP_FINGER_DOWN` event. This will flood the AP with false edge transitions until the user lifts their finger or the capture succeeds.\n\n**The Solution: Edge Detection**\nTo fix this, we need to track the physical state of the finger across loop iterations and only send the event on the *transition* from `FINGER_NONE` to `FINGER_PRESENT`.\n\n1. Declare a tracking variable outside the `while(1)` loop: `enum finger_state prev_st \u003d FINGER_NONE;`\n2. Inside the IRQ/Timer event block, update it:\n```cpp\nbool finger_transition \u003d (st \u003d\u003d FINGER_PRESENT \u0026\u0026 prev_st \u003d\u003d FINGER_NONE);\nprev_st \u003d st;\n\n```\n\n\n3. Consolidate the logic into the existing `FP_MODE_FINGER_DOWN` block so it fires if *either* the host explicitly requested it, *or* a physical transition just occurred while in capture mode:\n```cpp\nif (st \u003d\u003d FINGER_PRESENT \u0026\u0026\n    ((global_context.sensor_mode \u0026 FP_MODE_FINGER_DOWN) ||\n     (finger_transition \u0026\u0026 (global_context.sensor_mode \u0026 FP_MODE_ANY_CAPTURE)))) {\n\n    CPRINTS(\"Finger!\");\n    global_context.sensor_mode \u0026\u003d ~FP_MODE_FINGER_DOWN;\n    send_mkbp_event(EC_MKBP_FP_FINGER_DOWN);\n}\n\n```\n\n\n\n### 2. Testing: Missing Edge-Case Coverage\n\nThe current test suite updates do not catch the event spamming bug.\n\nPlease add a new unit test in `fpsensor_capture.cc` (and/or `fpsensor_finger_presence.cc`) that specifically simulates an acquisition failure while the finger remains on the sensor.\n\n* Set `state.acquire_image_result \u003d FINGERPRINT_SENSOR_SCAN_TOO_FAST;`\n* Keep `state.finger_state \u003d FINGERPRINT_FINGER_STATE_PRESENT;`\n* Ping the fpsensor task multiple times using `fingerprint_run_callback(fp_sim);`\n* Assert that the `EC_MKBP_FP_FINGER_DOWN` event was sent **exactly once**.\n\n### 3. Testing: Brittle Call Count Assertions\n\nIn the updated tests, the assertions check for an exact call count of 2:\n\n```cpp\nzassert_equal(mkbp_send_event_fake.call_count, 2);\n\n```\n\nThis couples the tests too tightly to the assumption that `fp_process_finger()` will *always* succeed and generate exactly one subsequent MKBP event (like `FP_IMAGE_READY` or `FP_ENROLL`). If `fp_process_finger()` fails early (as in the scenario above), the test will unexpectedly fail.\n\n**Suggestion:** Instead of hardcoding the total call count to `2`, verify the specific coalesced event mask payload, or specifically assert that the `FINGER_DOWN` bit was dispatched.\n\n### 4. Style: Console Logs for Debugging\n\nThe original `FP_MODE_FINGER_DOWN` block includes a `CPRINTS(\"Finger!\");` log. Since the goal of this patch is to improve latency tracking, ensuring we emit a timestamped console log exactly when the physical edge is detected will be incredibly helpful for engineers debugging host-side timing issues.\n\nConsolidating the logic as suggested in point #1 will naturally preserve this log for capture-mode touches as well.",
+      "range": {
+        "startLine": 458,
+        "startChar": 3,
+        "endLine": 460,
+        "endChar": 44
+      },
+      "revId": "0e7799230eee7004378c6aae99da50db1d0f9ec3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
