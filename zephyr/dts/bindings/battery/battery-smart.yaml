@@ -23,6 +23,7 @@ properties:
       - "byd,wv3k8"
       - "cdt,c340152"
       - "celxpert,b300049"
+      - "celxpert,b340543"
       - "celxpert,b340442"
       - "celxpert,c235-41"
       - "celxpert,c340152"
