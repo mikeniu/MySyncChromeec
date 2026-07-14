@@ -16,6 +16,24 @@
       "message": "Is this comment about erase size being too large still relevant, or would it be nice to update this comment in light of this change?",
       "revId": "ce5869bd9d05e7158f1b692697e783e5d4d7eec3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "556473a5_052d6ce3",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_it8xxx2.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-14T21:24:23Z",
+      "side": 1,
+      "message": "Good catch.  Done.",
+      "parentUuid": "7e7eb9a9_fcd35556",
+      "revId": "ce5869bd9d05e7158f1b692697e783e5d4d7eec3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
