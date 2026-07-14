@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edbb175f_8ca48df0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T01:01:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/9e272bfc-d004-415d-b3cf-fb61fae71008)]\n\n### Review Summary\n\n**Functionality**:\n- The changes successfully block unauthenticated V0 template uploads when FingerGuard is enabled, closing a potential template injection vector.\n- The changes correctly prevent the User ID from being modified out-of-band once established.\n\n**Security**:\n- The security invariants are implemented effectively, guaranteeing isolation between user templates and enforcing that template loads go through the cryptographically-authenticated V1 channel under FingerGuard.\n\n**Style \u0026 Readability**:\n- The code is well documented with comments explaining the rationale behind the security invariants.\n\n**Testing**:\n- Test coverage has been added to verify these new restrictions.\n- I have left a couple of minor inline suggestions to simplify the new tests by removing redundant session flag manipulation. This will also help avoid fragile manual test state cleanups.",
+      "isAi": true,
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c0d3415_2c7f797b",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 1413,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T01:01:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The production logic in `fpsensor_state.cc` only evaluates `FP_CONTEXT_USER_ID_SET` to enforce this block; it does not check the `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` flag. \n\nTherefore, manually setting (and later clearing) `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` here is unnecessary for the test to pass. Removing this flag manipulation will simplify the test and avoid the need for the manual state cleanup at the end (which, as Tom noted earlier, can lead to test fragility).",
+      "isAi": true,
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cae4cbd4_59106ae5",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 1444,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T01:01:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Similar to the test above, `fp_command_template_v0` unconditionally blocks v0 templates when auth is enabled, regardless of the `SESSION_ESTABLISHED` flag. \n\nYou can remove the manual flag manipulation here as well to simplify the test and avoid needing the manual state cleanup on line 1459.",
+      "isAi": true,
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
