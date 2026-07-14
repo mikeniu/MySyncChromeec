@@ -169,6 +169,7 @@ void __unused plat_sleep_time(unsigned long timeInMs);
 #define TIME_MEASURE_STOP_AND_RESTART(name, x)
 #define TIME_MEASURE_RESET(name)
 #endif
+
 /**
  * @brief Allocates a block of memory of a specified size and number of
  * elements.
@@ -188,10 +189,14 @@ void *__unused sys_alloc(size_t count, size_t size);
  */
 void __unused sys_free(void *data);
 
-static inline void plat_free(void *x)
-{
-	sys_free(x);
-}
+/**
+ * @brief Releases a block of memory previously allocated by plat_alloc() or
+ * plat_calloc().
+ *
+ * @param[in] x Pointer to the memory block to be freed.
+ *
+ */
+void __unused plat_free(void *x);
 
 // TODO (b/373435445): Combine PLAT_FREE and plat_free.
 /**
@@ -200,12 +205,7 @@ static inline void plat_free(void *x)
  * @param[in] x A pointer to a pointer to the memory block to be freed.
  *
  */
-static inline void PLAT_FREE(void **x)
-{
-	assert(x != NULL && *x != NULL);
-	plat_free(*x);
-	*x = NULL;
-}
+void __unused PLAT_FREE(void **x);
 
 /**
  * @brief Allocates a block of memory of the specified size.
@@ -214,10 +214,7 @@ static inline void PLAT_FREE(void **x)
  *
  * @return Pointer to the allocated memory or NULL if the allocation failed.
  */
-static inline void *plat_alloc(size_t size)
-{
-	return sys_alloc(1, size);
-}
+void *__unused plat_alloc(size_t size);
 
 /**
  * @brief Allocates memory for an array of count elements of size bytes each and
@@ -229,13 +226,7 @@ static inline void *plat_alloc(size_t size)
  * @return Pointer to allocated memory initialized to zero, or NULL if
  * allocation failed.
  */
-static inline void *plat_calloc(size_t count, size_t size)
-{
-	void *ptr = sys_alloc(1, count * size);
-	if (ptr)
-		memset(ptr, 0, count * size);
-	return ptr;
-}
+void *__unused plat_calloc(size_t count, size_t size);
 
 /**
  * @brief Reallocates the given memory block to a new size.
@@ -246,14 +237,6 @@ static inline void *plat_calloc(size_t count, size_t size)
  * @return Pointer to the reallocated memory block, or NULL if reallocation
  * failed.
  */
-static inline void *plat_realloc(void *data, size_t size)
-{
-	void *new_ptr = sys_alloc(1, size);
-	if (new_ptr && data) {
-		memcpy(new_ptr, data, size);
-		sys_free(data);
-	}
-	return new_ptr;
-}
+void *__unused plat_realloc(void *data, size_t size);
 
 #endif /* ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_PAL_SENSOR_H_ */

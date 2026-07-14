@@ -13,6 +13,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/cbprintf.h>
+#include <zephyr/sys/sys_heap.h>
 #include <zephyr/sys/util_macro.h>
 #include <zephyr/sys_clock.h>
 
@@ -127,11 +128,10 @@ void __unused output_log(LOG_LEVEL level, const char *tag,
 
 void __unused *sys_alloc(size_t count, size_t size)
 {
-	void *p = k_heap_aligned_alloc(&fp_driver_heap, sizeof(void *), size,
-				       K_NO_WAIT);
+	void *raw = k_heap_calloc(&fp_driver_heap, count, size, K_NO_WAIT);
 
-	if (p == NULL) {
-		LOG_ERR("Error - %s of size %u failed.", __func__, size);
+	if (raw == NULL) {
+		LOG_ERR("Error - %s(%zu,%zu) failed.", __func__, count, size);
 		/* TODO(b/423622893): Prevent Runtime OOM Panics in Zephyr
 		 * Gwendolin via BUILD_ASSERT on the heap size.
 		 */
@@ -139,10 +139,64 @@ void __unused *sys_alloc(size_t count, size_t size)
 		CODE_UNREACHABLE;
 	}
 
-	return p;
+	return raw;
 }
 
 void __unused sys_free(void *data)
 {
+	if (data == NULL) {
+		return;
+	}
 	k_heap_free(&fp_driver_heap, data);
+}
+
+COND_CODE_1(CONFIG_ZTEST, (), (static))
+void __unused *sys_realloc(void *data, size_t size)
+{
+	void *raw = k_heap_realloc(&fp_driver_heap, data, size, K_NO_WAIT);
+
+	if (raw == NULL && size != 0) {
+		LOG_ERR("Error - %s to size %zu failed.", __func__, size);
+		k_oops();
+		CODE_UNREACHABLE;
+	}
+
+	return raw;
+}
+
+COND_CODE_1(CONFIG_ZTEST, (), (static))
+size_t __unused sys_alloc_usable_size(void *data)
+{
+	if (data == NULL) {
+		return 0;
+	}
+
+	return sys_heap_usable_size(&fp_driver_heap.heap, data);
+}
+
+void *__unused plat_calloc(size_t count, size_t size)
+{
+	return sys_alloc(count, size);
+}
+
+void *__unused plat_realloc(void *data, size_t size)
+{
+	return sys_realloc(data, size);
+}
+
+void *__unused plat_alloc(size_t size)
+{
+	return sys_alloc(1, size);
+}
+
+void __unused PLAT_FREE(void **x)
+{
+	assert(x != NULL && *x != NULL);
+	plat_free(*x);
+	*x = NULL;
+}
+
+void __unused plat_free(void *x)
+{
+	sys_free(x);
 }
