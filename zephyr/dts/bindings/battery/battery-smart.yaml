@@ -73,6 +73,7 @@ properties:
       - "cosmx,mvk11"
       - "dynapack,atl_gh02047xl"
       - "dynapack,byd_gg02047xl"
+      - "dynapack,b140336"
       - "dynapack,b140435"
       - "dynapack,b340435"
       - "dynapack,cosmx_gh02047xl"
