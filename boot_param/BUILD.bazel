@@ -34,5 +34,6 @@ cc_library(
     hdrs = [
         ":boot_param_hdrs"
     ],
+    includes = ["."],
     linkstatic = True,
 )
