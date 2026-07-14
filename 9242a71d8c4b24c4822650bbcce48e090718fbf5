@@ -16,6 +16,60 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "9242a71d8c4b24c4822650bbcce48e090718fbf5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e5ce7f4_d6554b7f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T22:20:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/e106ac16-6c64-4f45-b918-9145fd393f7c)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The CL successfully attempts to address multiplication integer overflow issues in `sys_alloc`, but introduces a secondary integer overflow vulnerability when computing the final allocation size (`hdr_size + total`). If `total` is close to `SIZE_MAX`, this addition can wrap around, leading to a much smaller allocation than requested while recording a large size in the chunk header (which results in a heap buffer overflow).\n- `plat_calloc` has inconsistent overflow handling compared to `sys_alloc`. While `sys_alloc` will panic (`k_oops()`) on overflow, `plat_calloc` now returns `NULL`. The overflow logic in `plat_calloc` also duplicates checks already performed in `sys_alloc`.\n\n**Style \u0026 Consistency:**\n- The code changes are clear and adhere to standard project style. Using `sys_alloc` and `sys_alloc_usable_size` directly inside `plat_calloc` will improve consistency and simplify the codebase.\n\n**Testing:**\n- Existing testing configurations appear to be executed, but no new unit tests have been added for the integer overflow edge cases.",
+      "isAi": true,
+      "revId": "9242a71d8c4b24c4822650bbcce48e090718fbf5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e61f675_26fd4fe7",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T22:20:25Z",
+      "side": 1,
+      "message": "There is a potential integer overflow when adding `hdr_size` to `total`. If `total` is very large (e.g., close to `SIZE_MAX`), `hdr_size + total` can wrap around to a small value. This would cause `k_heap_aligned_alloc` to allocate a small buffer, while the header records the large `total` size, leading to a heap buffer overflow when the caller uses the returned buffer.\n\nConsider using `__builtin_add_overflow` to check for overflow before allocating:\n```c\n\tsize_t alloc_size;\n\tif (__builtin_add_overflow(total, hdr_size, \u0026alloc_size)) {\n\t\tLOG_ERR(\"Error - allocation size overflows.\");\n\t\tk_oops();\n\t\tCODE_UNREACHABLE;\n\t}\n\tuint8_t *raw \u003d k_heap_aligned_alloc(\u0026fp_driver_heap, ALIGNMENT,\n\t\t\t\t\t    alloc_size, K_NO_WAIT);\n```",
+      "isAi": true,
+      "revId": "9242a71d8c4b24c4822650bbcce48e090718fbf5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f358c8b_6e629bd9",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T22:20:25Z",
+      "side": 1,
+      "message": "This duplicates the `__builtin_mul_overflow` check that is now already performed inside `sys_alloc`. Furthermore, it introduces an inconsistency: if overflow occurs here, `plat_calloc` returns `NULL`, whereas `sys_alloc` calls `k_oops()`. Callers might not check for `NULL` returns since `sys_alloc` normally panics on error.\n\nYou can simplify this and ensure consistent behavior by just calling `sys_alloc` directly and using `sys_alloc_usable_size` to get the correct memset length:\n```c\nstatic inline void *plat_calloc(size_t count, size_t size)\n{\n\tvoid *ptr \u003d sys_alloc(count, size);\n\tif (ptr) {\n\t\tmemset(ptr, 0, sys_alloc_usable_size(ptr));\n\t}\n\treturn ptr;\n}\n```",
+      "isAi": true,
+      "revId": "9242a71d8c4b24c4822650bbcce48e090718fbf5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
