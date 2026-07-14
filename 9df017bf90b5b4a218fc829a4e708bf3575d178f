@@ -33,6 +33,24 @@
       "message": "I believe that it should be put into the common region rather than defined in project level. Could realtek reserve a custom use field in src/platform/ec/zephyr/include/cros/realtek/realtek.dtsi ?",
       "revId": "9df017bf90b5b4a218fc829a4e708bf3575d178f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e2b92de_d590eba6",
+        "filename": "zephyr/program/fatcat/lapis/project.overlay",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 3513462
+      },
+      "writtenOn": "2026-07-14T13:28:31Z",
+      "side": 1,
+      "message": "I add here,\nhttps://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8090128",
+      "parentUuid": "b26b8828_7084de4b",
+      "revId": "9df017bf90b5b4a218fc829a4e708bf3575d178f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
