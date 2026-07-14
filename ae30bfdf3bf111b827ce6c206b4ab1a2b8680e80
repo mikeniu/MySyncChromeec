@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2897fd52_f6eeb1e4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T19:23:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See review summary below for details. [[trajectory](go/traj/1d0c40be-fd7c-485f-950b-978005f04107)]\n\n### Review Summary\n**Functionality**: The changes add important security enforcement to `fp_command_context` and `fp_command_template_v0` when fingerprint auth is enabled. It correctly prevents modifying the user ID mid-session and blocks legacy v0 template loading. The tests provide excellent coverage for these new flows.\n**Style**: The use of `std::ranges` is idiomatic and correct.\n**Security**: The added `fingerprint_auth_enabled()` checks improve security by enforcing invariants on the active user ID and template loading paths. Thank you for adding the `static_assert` to ensure the sizes match!\n**Consistency**: The commit message fails to describe a significant portion of the changes. The CL subject and description only discuss the `memcpy` replacement, completely omitting the new fingerprint auth security logic (and the tests that validate it). \n\n**Action required**: Please update the commit subject and description to accurately reflect *all* the changes in this patch, particularly the new security invariants. Alternatively, consider splitting this into two separate CLs: one for the `memcpy` refactoring, and one for the fingerprint auth security changes.",
+      "isAi": true,
+      "revId": "ae30bfdf3bf111b827ce6c206b4ab1a2b8680e80",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
