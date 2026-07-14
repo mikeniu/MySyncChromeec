@@ -367,6 +367,8 @@ struct pdc_config_t {
 	/** Whether or not this port is capable of USB communication as a device
 	 */
 	bool usb_comm_capable_as_device;
+	/** Whether or not this port supports USB4 as a host */
+	bool usb4_support_as_host;
 	/** Pointer to the device-specific callback function */
 	gpio_callback_handler_t callback_handler;
 };
@@ -1767,9 +1769,9 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 
 	/* DFP VDO */
 	dfp_vdo.version = DFP_VDO_VERSION_1_2;
-	dfp_vdo.usb4_cap = 0;
-	dfp_vdo.usb3_cap = 1;
-	dfp_vdo.usb2_cap = 1;
+	dfp_vdo.usb4_cap = cfg->usb4_support_as_host;
+	dfp_vdo.usb3_cap = true;
+	dfp_vdo.usb2_cap = true;
 	dfp_vdo.port_num = cfg->connector_number;
 
 	if (cfg->usb_comm_capable_as_device) {
@@ -1778,14 +1780,14 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 		idh_vdo.product_type_ufp = IDH_PTYPE_UFP_PERIPH;
 		/* UFP VDO */
 		ufp_vdo.version = UFP_VDO_VERSION_1_3;
-		ufp_vdo.usb4_cap = 0;
-		ufp_vdo.usb3_cap = 1;
+		ufp_vdo.usb4_cap = false;
+		ufp_vdo.usb3_cap = true;
 		ufp_vdo.usb2_cap = UFP_USB2_CAPABLE;
-		ufp_vdo.vconn = 0;
+		ufp_vdo.vconn = false;
 		ufp_vdo.vbus = UFP_VDO_VBUS_NOT_REQUIRED;
-		ufp_vdo.no_signal_reconfig = 0;
-		ufp_vdo.non_tbt3_signal_reconfig = 0;
-		ufp_vdo.tbt_support = 0;
+		ufp_vdo.no_signal_reconfig = false;
+		ufp_vdo.non_tbt3_signal_reconfig = false;
+		ufp_vdo.tbt_support = false;
 		ufp_vdo.speed = USB_R30_SS_U32_U40_GEN1;
 	}
 
@@ -3353,6 +3355,8 @@ BUILD_ASSERT(
 		.frs_supported = DT_INST_PROP(inst, frs_supported),           \
 		.usb_comm_capable_as_device =                                 \
 			DT_INST_PROP(inst, usb_comm_capable_as_device),       \
+		.usb4_support_as_host =                                       \
+			DT_INST_PROP(inst, usb4_capable_as_host),             \
 		.callback_handler = pdc_interrupt_callback##inst,             \
 	};                                                                    \
                                                                               \
