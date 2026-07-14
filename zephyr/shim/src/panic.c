@@ -225,7 +225,13 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #ifdef CONFIG_ASSERT_NO_FILE_INFO
 __override void assert_post_action(void)
 {
-	panic_set_reason(PANIC_SW_ASSERT, -1, task_get_current(), NULL, 0);
+	const uint32_t extras[] = {
+		(uint32_t)__builtin_return_address(0),
+		k_uptime_get_32(),
+		(uint32_t)k_current_get(),
+	};
+	panic_set_reason(PANIC_SW_ASSERT, 0, (uint8_t)-1, extras,
+			 ARRAY_SIZE(extras));
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
@@ -241,13 +247,14 @@ __override void assert_post_action(const char *path, unsigned int line)
 	/* Extract filename from path */
 	const char *last_slash = strrchr(path, '/');
 	const char *filename = last_slash ? last_slash + 1 : path;
-	/* Top two bytes of info register is first two characters of filename.
-	 * Bottom two bytes of info register is line number.
-	 */
-	panic_set_reason(PANIC_SW_ASSERT,
-			 (filename[0] << 24) | (filename[1] << 16) |
-				 (line & 0xffff),
-			 task_get_current(), NULL, 0);
+	const uint32_t extras[] = {
+		(uint32_t)__builtin_return_address(0),
+		k_uptime_get_32(),
+		(uint32_t)thread,
+		(uint32_t)filename,
+	};
+	panic_set_reason(PANIC_SW_ASSERT, line, (uint8_t)-1, extras,
+			 ARRAY_SIZE(extras));
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
