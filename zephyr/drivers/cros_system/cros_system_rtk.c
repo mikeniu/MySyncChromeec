@@ -199,6 +199,12 @@ static int cros_system_rtk_init(void)
 			    BBRAM_REGION_SIZE(wp_at_boot),
 			    (uint8_t *)&invalid_value);
 
+		/* clear board_batt_keep as 0 */
+		invalid_value = 0;
+		bbram_write(bbram_dev, BBRAM_REGION_OFFSET(board_batt_keep),
+			    BBRAM_REGION_SIZE(board_batt_keep),
+			    (uint8_t *)&invalid_value);
+
 		/* Set key as BBRAM_KEY_VALUE  */
 		key_val = BBRAM_KEY_VALUE;
 		key_rev_val = BBRAM_KEY_REV_VALUE;
