@@ -172,12 +172,13 @@ void __unused plat_sleep_time(unsigned long timeInMs);
 
 /**
  * @brief Allocates a block of memory of a specified size and number of
- * elements.
+ * elements, zero-initializing all bytes.
  *
- * @param[in] count The number of elements to allocate.
- * @param[in] size The size of each element in bytes.
+ * @param[in] count The number of elements to allocate (must be > 0).
+ * @param[in] size The size of each element in bytes (must be > 0).
  *
- * @return Pointer to the allocated memory or NULL if the allocation failed.
+ * @return Pointer to the allocated memory block initialized to zero,
+ * or panic if the allocation failed or if count/size is 0.
  */
 void *sys_alloc(size_t count, size_t size);
 
@@ -208,11 +209,12 @@ void plat_free(void *x);
 void PLAT_FREE(void **x);
 
 /**
- * @brief Allocates a block of memory of the specified size.
+ * @brief Allocates a block of memory of the specified size, zero-initializing
+ * all bytes.
  *
  * @param[in] size The size of the memory block to allocate, in bytes.
  *
- * @return Pointer to the allocated memory or NULL if the allocation failed.
+ * @return Pointer to the allocated memory or panic if the allocation failed.
  */
 void *plat_alloc(size_t size);
 
@@ -220,11 +222,11 @@ void *plat_alloc(size_t size);
  * @brief Allocates memory for an array of count elements of size bytes each and
  * initializes all bytes to zero.
  *
- * @param[in] count Number of elements to allocate.
- * @param[in] size Size of each element.
+ * @param[in] count Number of elements to allocate (must be > 0).
+ * @param[in] size Size of each element (must be > 0).
  *
- * @return Pointer to allocated memory initialized to zero, or NULL if
- * allocation failed.
+ * @return Pointer to allocated memory initialized to zero, or panic if
+ * allocation failed or if count/size is 0.
  */
 void *plat_calloc(size_t count, size_t size);
 
@@ -234,8 +236,8 @@ void *plat_calloc(size_t count, size_t size);
  * @param[in] data Pointer to the previously allocated memory block.
  * @param[in] size New size in bytes for the memory block.
  *
- * @return Pointer to the reallocated memory block, or NULL if reallocation
- * failed.
+ * @return Pointer to the reallocated block, NULL if size is 0, or panic if
+ * reallocation failed.
  */
 void *plat_realloc(void *data, size_t size);
 
