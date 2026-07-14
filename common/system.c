@@ -935,17 +935,21 @@ static void handle_watchdog_reset(void)
 		uint32_t reason;
 		uint32_t info;
 		uint8_t exception;
+		uint32_t extras[PANIC_MAX_EXTRAS];
 		struct panic_data *pdata;
 
-		panic_get_reason(&reason, &info, &exception);
+		panic_get_reason(&reason, &info, &exception, extras,
+				 PANIC_MAX_EXTRAS);
 		pdata = panic_get_data();
 
 		/* If the panic reason is a watchdog warning, then change
 		 * the reason to a regular watchdog reason while preserving
 		 * the info and exception from the watchdog warning.
 		 */
-		if (reason == PANIC_SW_WATCHDOG_WARN)
-			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
+		if (reason == PANIC_SW_WATCHDOG_WARN) {
+			panic_set_reason(PANIC_SW_WATCHDOG, info, exception,
+					 extras, PANIC_MAX_EXTRAS);
+		}
 		/* The watchdog panic info may have already been initialized by
 		 * the watchdog handler, so only set it here if the panic reason
 		 * is not a watchdog or the panic info has already been read,
@@ -954,7 +958,7 @@ static void handle_watchdog_reset(void)
 		else if ((reason != PANIC_SW_WATCHDOG &&
 			  reason != PANIC_SW_WATCHDOG_HARD) ||
 			 !pdata || pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD) {
-			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
+			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0, NULL, 0);
 		}
 	}
 }

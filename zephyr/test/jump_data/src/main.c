@@ -441,7 +441,7 @@ ZTEST(jump_data, test_init_watchdog_reset)
 	 */
 	uint32_t reason, info;
 	uint8_t exception;
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 	if (IS_ENABLED(SECTION_IS_RW)) {
 		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD,
 			      "Panic reason: %d", reason);

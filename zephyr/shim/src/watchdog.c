@@ -275,7 +275,8 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
 	 * occurs.
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address, task_id);
+	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address, task_id,
+			 NULL, 0);
 }
 
 __maybe_unused static void
