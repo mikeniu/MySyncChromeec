@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f1edf0f_8b5e015d",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-14T18:10:17Z",
+      "side": 1,
+      "message": "As with the VBUS enum value names, I think these are too generic for global identifiers. From what I can see, there is only a single usage of any of these. I think it would be better to just use the full names everywhere.",
+      "revId": "972a006a04f454aa165bda8c1c263bd219cb3bf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "622eb6e6_38fb7864",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-14T18:10:17Z",
+      "side": 1,
+      "message": "I think this is too generic for what is effectively a global identifier. You will notice that the other enum values in this file have names like `UFP_VDO_VERSION_1_3`. I\u0027d make it something like `UFP_VDO_VBUS_REQUIRED`.",
+      "revId": "972a006a04f454aa165bda8c1c263bd219cb3bf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

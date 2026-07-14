@@ -261,6 +261,24 @@
       "parentUuid": "55ea1c64_4c091fa4",
       "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09cacefe_5950c2f7",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-14T18:10:17Z",
+      "side": 1,
+      "message": "From what I can see, the only existing use of `raw` is from your previous CL that adds the IDH VDO. All of the other ones use `raw_value`. I\u0027d suggest that the CL(s) previous to this one should leave all of the unions using the same member name, and this CL shouldn\u0027t break that pattern.\n\nIn any event, having two union members with the same type and purpose seems like an anti-pattern. I don\u0027t think we should do it even for the sake of consistency.",
+      "parentUuid": "65e74882_4a7403fc",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
