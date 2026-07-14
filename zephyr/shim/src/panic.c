@@ -297,13 +297,44 @@ __overridable void arch_panic_set_reason(uint32_t reason, uint32_t info,
 
 test_export_static int panic_data_init(void)
 {
+	struct panic_data *pdata;
+	bool is_panic_new;
+	bool is_watchdog_reset;
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+
+	if (!IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT)) {
+		return 0;
+	}
+
+	pdata = panic_get_data();
+	is_panic_new = pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD);
+	is_watchdog_reset =
+		!!(system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG);
+	reason = pdata ? PANIC_REG_REASON(pdata) : 0;
+	info = pdata ? PANIC_REG_INFO(pdata) : 0;
+	exception = pdata ? PANIC_REG_EXCEPTION(pdata) : 0;
+
+	if (is_panic_new) {
+		LOG_WRN("New Panic Detected");
+
+		if (panic_sw_reason_is_valid(reason)) {
+			LOG_INF("Panic reason: %s",
+				panic_sw_reasons[reason - PANIC_SW_BASE]);
+		}
+	}
+
+	if (is_watchdog_reset) {
+		LOG_WRN("Watchdog Reset Detected");
+	}
+
 	/*
 	 * Only update the panic reason in RW since RO may have an older panic
 	 * data version and updating the panic reason will cause new fields to
 	 * be overwritten.
 	 */
-	if (!IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT) ||
-	    !IS_ENABLED(SECTION_IS_RW)) {
+	if (!IS_ENABLED(SECTION_IS_RW)) {
 		return 0;
 	}
 
@@ -313,21 +344,15 @@ test_export_static int panic_data_init(void)
 	 * to ensure we have restored the reset flags passed from the previous
 	 * image.
 	 */
-	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
-		uint32_t reason;
-		uint32_t info;
-		uint8_t exception;
-		struct panic_data *pdata;
-
-		panic_get_reason(&reason, &info, &exception);
-		pdata = panic_get_data();
-
+	if (is_watchdog_reset) {
 		/* If the panic reason is a watchdog warning, then change
 		 * the reason to a regular watchdog reason while preserving
 		 * the info and exception from the watchdog warning.
 		 */
-		if (reason == PANIC_SW_WATCHDOG_WARN)
+		if (reason == PANIC_SW_WATCHDOG_WARN) {
+			LOG_INF("Promoting watchdog warning to watchdog panic");
 			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
+		}
 		/* The watchdog panic info may have already been initialized by
 		 * the watchdog handler, so only set it here if the panic reason
 		 * is not a watchdog or the panic info has already been read,
@@ -335,7 +360,8 @@ test_export_static int panic_data_init(void)
 		 */
 		else if ((reason != PANIC_SW_WATCHDOG &&
 			  reason != PANIC_SW_WATCHDOG_HARD) ||
-			 !pdata || pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD) {
+			 !is_panic_new) {
+			LOG_INF("Setting hard watchdog panic");
 			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
 		}
 	}
