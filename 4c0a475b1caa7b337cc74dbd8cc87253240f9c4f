@@ -70,6 +70,30 @@
       },
       "revId": "4c0a475b1caa7b337cc74dbd8cc87253240f9c4f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38d90dd6_9f3ac127",
+        "filename": "zephyr/program/atria/CMakeLists.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-07-14T01:16:59Z",
+      "side": 1,
+      "message": "Just like what we did on the Kinmen board, we initially copied board_power.c from `intelrvp/ptlrvp/src/` to serve as our own board_power.c. It only required minimal to no modifications.",
+      "parentUuid": "5964908f_f1e97500",
+      "range": {
+        "startLine": 23,
+        "startChar": 29,
+        "endLine": 23,
+        "endChar": 32
+      },
+      "revId": "4c0a475b1caa7b337cc74dbd8cc87253240f9c4f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
