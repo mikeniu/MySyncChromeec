@@ -17,6 +17,7 @@ ZTEST(debug_assert, test_assert_false)
 	uint32_t reason;
 	uint32_t info;
 	uint8_t exception;
+	uint32_t extras[4];
 	int linenum;
 	const char *filename;
 
@@ -25,16 +26,17 @@ ZTEST(debug_assert, test_assert_false)
 	__ASSERT(false, "Test false assert");
 
 	zassert_equal(system_reset_fake.call_count, 1);
-	panic_get_reason(&reason, &info, &exception, NULL, 0);
+	panic_get_reason(&reason, &info, &exception, extras,
+			 ARRAY_SIZE(extras));
 	zassert_equal(PANIC_SW_ASSERT, reason);
 	if (!IS_ENABLED(CONFIG_ASSERT_NO_FILE_INFO)) {
-		zassert_equal(linenum, info & 0xffff);
-		zassert_equal(filename[0], (info >> 24) & 0xff);
-		zassert_equal(filename[1], (info >> 16) & 0xff);
+		zassert_equal(linenum, info);
+		zassert_equal((uint32_t)filename, extras[3]);
 	} else {
-		zassert_equal(info, -1);
+		zassert_equal(info, 0);
 	}
-	zassert_equal(task_get_current(), exception);
+	zassert_equal(255 /* (uint8_t)-1 */, exception);
+	zassert_equal((uint32_t)k_current_get(), extras[2]);
 }
 
 ZTEST(debug_assert, test_assert_true)
