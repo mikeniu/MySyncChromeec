@@ -47,6 +47,7 @@ DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init_mica,
 
 static void board_chipset_hard_off_mica(void)
 {
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 1);
 	hook_call_deferred(&disable_pp5000_data, 5000 * USEC_PER_MSEC);
 }
 DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_chipset_hard_off_mica,
