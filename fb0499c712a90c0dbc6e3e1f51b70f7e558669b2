@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0612687_deee72a9",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 26
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-14T08:28:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "995027dc_61174691",
+      "range": {
+        "startLine": 248,
+        "startChar": 7,
+        "endLine": 248,
+        "endChar": 20
+      },
+      "revId": "fb0499c712a90c0dbc6e3e1f51b70f7e558669b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f100ec03_001e3229",
@@ -61,6 +85,24 @@
       "writtenOn": "2026-07-13T16:39:45Z",
       "side": 1,
       "message": "Something to consider. Our ID Header VDO is pretty consistent. IIUC the PDCs default ID Header is usually correct. We only need to update it when the device is also a UFP.\n\nShould we instead gate this init state on `usb_comm_capable_as_device` so it just gets skipped for most devices? It would lead to fewer commands to the PDC on init.",
+      "revId": "fb0499c712a90c0dbc6e3e1f51b70f7e558669b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23780888_3e5a041e",
+        "filename": "zephyr/drivers/usbc/pdc_rts54xx.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 1758,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-14T08:28:22Z",
+      "side": 1,
+      "message": "Correct, on the other hand I don\u0027t want to branch out during the init. I think current solution is easier to follow and gives control over it for the future. Also in the next CL I am adding setting DFP and UFP, for DFP it is always present but we will be able to modify specific attributes for it, what makes it more consistent.",
+      "parentUuid": "f100ec03_001e3229",
       "revId": "fb0499c712a90c0dbc6e3e1f51b70f7e558669b2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
