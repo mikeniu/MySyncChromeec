@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35932e1a_30b26683",
+        "filename": "zephyr/test/drivers/board_id_intel_rvp/src/board_id_intel_rvp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-07-14T22:39:17Z",
+      "side": 1,
+      "message": "This is duplicated from `zephyr/drivers/board_id/board_id_intel_rvp.c`. Can these be moved to `zephyr/include/drivers/rvp_board_id.h` and shared?",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 22
+      },
+      "revId": "d8e48385d772aff8349041f1a920fdc70cdb1959",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21c78df4_42abb92f",
+        "filename": "zephyr/test/drivers/board_id_intel_rvp/src/board_id_intel_rvp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-07-14T22:39:17Z",
+      "side": 1,
+      "message": "Can this go into the test suite\u0027s setup function?",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 1
+      },
+      "revId": "d8e48385d772aff8349041f1a920fdc70cdb1959",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "407e5ba2_fb0ad917",
+        "filename": "zephyr/test/drivers/board_id_intel_rvp/src/board_id_intel_rvp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-07-14T22:39:17Z",
+      "side": 1,
+      "message": "This is likely sensitive to test execution order and would fail if run after any test calling `ensure_straps_ready()`.\n\nActually most of this suite is sensitive to ordering. ZTest doesn\u0027t have a way to guarantee ordering of suites or tests. The only safe way to do this is to split this into two test sources (one with initialization and one without) and make them separate cases in testcases.yaml so they run independently.",
+      "range": {
+        "startLine": 116,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 1
+      },
+      "revId": "d8e48385d772aff8349041f1a920fdc70cdb1959",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
