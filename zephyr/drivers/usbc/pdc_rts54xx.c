@@ -367,6 +367,8 @@ struct pdc_config_t {
 	/** Whether or not this port is capable of USB communication as a device
 	 */
 	bool usb_comm_capable_as_device;
+	/** Whether or not this port supports USB4 as a host */
+	bool usb4_support_as_host;
 	/** Pointer to the device-specific callback function */
 	gpio_callback_handler_t callback_handler;
 };
@@ -1499,6 +1501,26 @@ static enum smf_state_result st_read_run(void *o)
 
 		break;
 	}
+	case CMD_GET_CONNECTOR_CAPABILITY: {
+		union connector_capability_t *caps =
+			(union connector_capability_t *)data->user_buf;
+
+		memcpy(caps, data->rd_buf + offset, len);
+
+		bool is_usb4 = caps->ext_op_mode_usb4_gen2 |
+			       caps->ext_op_mode_usb4_gen3 |
+			       caps->ext_op_mode_usb4_gen4;
+
+		if (is_usb4 != cfg->usb4_support_as_host) {
+			LOG_ERR("RTK%d: Configuration mismatch. PDC USB4 Support: %s, "
+				"Host Driver USB4 Support: %s",
+				cfg->connector_number,
+				is_usb4 ? "Enabled" : "Disabled",
+				cfg->usb4_support_as_host ? "Enabled" :
+							    "Disabled");
+		}
+		break;
+	}
 #endif /* defined(CONFIG_USBC_PDC_DRIVEN_CCD) */
 	default:
 		/* No preprocessing needed for the user data */
@@ -1767,7 +1789,13 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 
 	/* DFP VDO */
 	dfp_vdo.version = DFP_VDO_VERSION_1_2;
+<<<<<<< PATCH SET (9471002cc3cf9c411236105b8002dbc243642811 rtk: dt: Add support for configuring USB4 in DT)
+	dfp_vdo.usb4_cap = cfg->usb4_support_as_host;
+||||||| BASE      (db3f0a2815683f17d1d7917c2118747d7e925eae rtk: Add DFP definition and refactor UFP VDOs for USB PD 3.x)
+	dfp_vdo.usb4_cap = 0;
+=======
 	dfp_vdo.usb4_cap = false;
+>>>>>>> BASE      (1c9233eae716b03dbf3c34c191db57c4e323785c rtk: Add DFP definition and refactor UFP VDOs for USB PD 3.x)
 	dfp_vdo.usb3_cap = true;
 	dfp_vdo.usb2_cap = true;
 	dfp_vdo.port_num = cfg->connector_number;
@@ -3353,6 +3381,8 @@ BUILD_ASSERT(
 		.frs_supported = DT_INST_PROP(inst, frs_supported),           \
 		.usb_comm_capable_as_device =                                 \
 			DT_INST_PROP(inst, usb_comm_capable_as_device),       \
+		.usb4_support_as_host =                                       \
+			DT_INST_PROP(inst, usb4_capable_as_host),             \
 		.callback_handler = pdc_interrupt_callback##inst,             \
 	};                                                                    \
                                                                               \
