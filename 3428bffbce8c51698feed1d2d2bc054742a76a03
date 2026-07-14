@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1091e70c_30189355",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-14T20:29:59Z",
+      "side": 1,
+      "message": "I think this for loop is no longer needed.  You set `max_current_claimed \u003d \u003d 0` when throttling is active.   The call toe pdc_dpm_balance_source_ports should automatically set the 3A current levels on the boards that are now allocated 3A.\n\nYou may still need to call pdc_power_mgmt_set_new_power_request.",
+      "range": {
+        "startLine": 304,
+        "startChar": 0,
+        "endLine": 315,
+        "endChar": 42
+      },
+      "revId": "3428bffbce8c51698feed1d2d2bc054742a76a03",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
