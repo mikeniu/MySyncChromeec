@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce213305_ada8ef04",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T19:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f684833e_504d9176",
+      "revId": "0e73faf03bad51ee2b0f72cf77eb36e839d9da1b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0498a8fd_d76fa3ac",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] The commit message states that `std::ranges::copy` \"completely eliminat[es] the risk of ... potential buffer overflows\", but this is not entirely accurate. \n\nWhile `std::ranges::copy` safely determines the bound of the *source* range (`p-\u003euserid`), it does not perform any bounds checking on the *destination* iterator (`global_context.user_id.begin()`). \n\nIf `p-\u003euserid` were ever larger than `global_context.user_id`, this would result in a destination buffer overflow. In contrast, the original `memcpy` used `sizeof(global_context.user_id)`, which guaranteed the destination buffer would not be overflowed (though it risked over-reading the source).\n\nTo truly eliminate the risk of size mismatches and ensure safety, I highly recommend adding a `static_assert` to enforce that the sizes match exactly:\n\n```cpp\nstatic_assert(std::size(p-\u003euserid) \u003d\u003d std::size(global_context.user_id));\nstd::ranges::copy(p-\u003euserid, global_context.user_id.begin());\n```",
       "isAi": true,
+      "revId": "0e73faf03bad51ee2b0f72cf77eb36e839d9da1b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b89cb5c_ac27349f",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T19:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0498a8fd_d76fa3ac",
       "revId": "0e73faf03bad51ee2b0f72cf77eb36e839d9da1b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
