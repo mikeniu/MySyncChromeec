@@ -108,6 +108,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c1d1c4f6_37c0f928",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T17:27:37Z",
+      "side": 1,
+      "message": "We should also add a test case for this condition. Gemini suggestion (I haven\u0027t reviewed):\n\n-----\n\nSince `fpsensor_before()` already sets `FAKE_USER_ID` and applies the `FP_CONTEXT_USER_ID_SET` flag, you can add this test directly to `zephyr/test/fingerprint/task/src/fpsensor_template.cc`:\n\n```cpp\nZTEST_USER(fpsensor_template, test_fp_context_get_result_allows_idempotent_retry)\n{\n\tstruct ec_params_fp_context_v1 fp_context_params \u003d {\n\t\t.action \u003d FP_CONTEXT_GET_RESULT,\n\t\t.userid \u003d FAKE_USER_ID, /* Exact same user ID */\n\t};\n\n\t/* Prerequisite state: a User ID must already be active. */\n\tzassert_true(global_context.fp_encryption_status \u0026\n\t\t     FP_CONTEXT_USER_ID_SET);\n\n\t/*\n\t * Verify that executing FP_CONTEXT_GET_RESULT with the SAME\n\t * user ID succeeds (idempotent retry) even when FingerGuard is active,\n\t * ensuring AP IPC timeouts do not break the state machine.\n\t */\n\tzassert_equal(EC_RES_SUCCESS,\n\t\t      ec_cmd_fp_context_v1(NULL, \u0026fp_context_params),\n\t\t      \"Idempotent context retries should be allowed\");\n}\n\n```\n\n*(Note: In alignment with the previous testing feedback, this avoids setting the unused `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` flag, testing the actual invariants checked by the implementation).*",
+      "parentUuid": "15c07a84_99380cc6",
+      "range": {
+        "startLine": 377,
+        "startChar": 0,
+        "endLine": 381,
+        "endChar": 3
+      },
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fd5fa87a_2f593320",
         "filename": "common/fpsensor/fpsensor_state.cc",
         "patchSetId": 6
