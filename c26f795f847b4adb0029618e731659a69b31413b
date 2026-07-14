@@ -53,6 +53,24 @@
       "isAi": true,
       "revId": "c26f795f847b4adb0029618e731659a69b31413b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5703a84f_0338e677",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 1528,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T00:58:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e1a5ad91_4e6953ec",
+      "revId": "c26f795f847b4adb0029618e731659a69b31413b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
