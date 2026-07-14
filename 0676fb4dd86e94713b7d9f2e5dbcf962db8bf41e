@@ -1,0 +1,57 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec5b8796_5162f92d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T22:31:41Z",
+      "side": 1,
+      "message": "Can we add unit tests that cover the modified code and ensure we don\u0027t have a regression in the future?",
+      "revId": "0676fb4dd86e94713b7d9f2e5dbcf962db8bf41e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53dc30ef_e463af53",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T22:31:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/9023b308-2858-452c-b9ad-6935ff7a08b9)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The previous integer overflow vulnerability when adding `hdr_size` to `total` has been correctly resolved by using `__builtin_add_overflow`.\n- The overflow check duplication in `plat_calloc` has been fixed by calling `sys_alloc` directly.\n- The use of `sys_alloc_usable_size()` correctly determines the initialized size in `plat_calloc` and the copied size in `plat_realloc`. The implementation correctly guards against heap buffer overflows.\n\n**Style \u0026 Consistency:**\n- The changes are clear, adhere to standard C style, and properly integrate with the existing codebase.\n- A minor suggestion was made regarding macro safety (adding outermost parentheses to `ALIGN_UP`) to prevent potential future issues with operator precedence.\n\n**Testing:**\n- Existing tests and validations appear to pass. The edge cases for allocation size overflows are now safely checked.\n\nTAG\u003dagy\nCONV\u003dccca071c-0d1a-4d29-aaf5-cc9384f072f6",
+      "isAi": true,
+      "revId": "0676fb4dd86e94713b7d9f2e5dbcf962db8bf41e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca0ee6e6_e7369c94",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T22:31:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor suggestion:** While this macro works fine in its current context, it is missing outermost parentheses. If it were used in a larger expression like `ALIGN_UP(...) * 2`, the multiplication would evaluate before the bitwise AND due to operator precedence (`\u0026` has lower precedence than `*`).\n\nConsider adding outermost parentheses to prevent future bugs:\n```c\n#define ALIGN_UP(val, align) ((((val) + ((align) - 1)) \u0026 ~((align) - 1)))\n```",
+      "isAi": true,
+      "revId": "0676fb4dd86e94713b7d9f2e5dbcf962db8bf41e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
