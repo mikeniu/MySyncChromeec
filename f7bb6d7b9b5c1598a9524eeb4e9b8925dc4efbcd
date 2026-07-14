@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8eb5666_d7b99a01",
+        "filename": "zephyr/include/usbc/pdc_dpm.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-14T00:26:10Z",
+      "side": 1,
+      "message": "I\u0027d put stubs behind the config because I was under the impression we would need to define the functions somewhere and pdc_dpm_tbt.c is only conditionally added in CMakeList.txt. But, I\u0027m not seeing any compilation issues after removing the stubs so I think I just misunderstood the EC compiler here.",
+      "parentUuid": "acc0d65f_938e98e3",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 36
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae6255c6_20ac235b",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-13T21:05:02Z",
       "side": 1,
       "message": "Same here, use `IS_ENABLED` guards at the calling sites.",
+      "range": {
+        "startLine": 801,
+        "startChar": 0,
+        "endLine": 801,
+        "endChar": 36
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "887eabaa_121cd4bd",
+        "filename": "zephyr/include/usbc/pdc_power_mgmt.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 801,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-14T00:26:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae6255c6_20ac235b",
       "range": {
         "startLine": 801,
         "startChar": 0,
@@ -117,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35b19bf5_7e0c12bc",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm_tbt.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-14T00:26:10Z",
+      "side": 1,
+      "message": "Yes, this seems like the safer choice. Switched.",
+      "parentUuid": "443fd09a_16b450a4",
+      "range": {
+        "startLine": 49,
+        "startChar": 1,
+        "endLine": 49,
+        "endChar": 15
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d2f4fa8_4166c206",
@@ -130,6 +202,30 @@
       "writtenOn": "2026-07-13T21:05:02Z",
       "side": 1,
       "message": "Is this just a failsafe in case the `pdc_dpm_remove_sink()` and `pdc_dpm_tbt_clear_port()` functions are not called?\n\nYou\u0027re unconditionaly clearing all ports here, but you never cancel this work.  I think there is a race condition opportunity with if a 2nd TBT sink is connected about 5 seconds after the 1st TBT sink.",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 1
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64c4e26a_8611f3d1",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm_tbt.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-14T00:26:10Z",
+      "side": 1,
+      "message": "Yes there is a race where a pending reset can be cleared on one port if it is queued about 5 seconds after one is issued. There are a couple reasons why I went with this approach.\n\nThe queued work isn\u0027t cancelled on disconnect as a failsafe against looping. Testing this patch, it doesn\u0027t appear like the EC processes the hard reset as a disconnect/reconnect. But if some device we to react poorly to it and fake a disconnect it could cause looping. I figured to be safe, just block all reset-logic on that port for the next 5 seconds\n\nInitially I wanted to only clear bits for the port where the reset was issued. But, we can\u0027t pass port number when scheduling `tbt_usb4_clear_work`. So, this required an array of workers. 1 for each port. If you\u0027re aware of another way to pass data work handlers, let me know.\n\nThis wouldn\u0027t occur just by connecting 2 TBT devices. It would need to be 2 devices which have 15W Sink Caps AND the dpm allocates 15W to. So, this could only happen on a board with multiple 3A ports. From what I can tell we have not supported this on any zephyr devices.\n\nThere is a possibility of this race occurring if the device is connected on the same port about 5 seconds apart, but only clearing the bit for the reset port wouldn\u0027t fix that. \n\nSo, there is some added complexity to remove the race condition which our current devices wouldn\u0027t likely encounter. The trade-off didn\u0027t seem worth it to me. I figured it would be better to just clear the bits after a reset.",
+      "parentUuid": "6d2f4fa8_4166c206",
       "range": {
         "startLine": 59,
         "startChar": 0,
