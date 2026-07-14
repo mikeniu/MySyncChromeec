@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fed6b8be_5a0b3296",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T19:52:26Z",
+      "side": 1,
+      "message": "This should be \"TEST\u003d\"?",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 31
+      },
+      "revId": "f0d083b286d9aea220cb466fc28ed0bdecd823db",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c7bc01fa_a476a59c",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -15,6 +38,29 @@
       "side": 1,
       "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/7251fd78-cd2c-4b75-9523-484895396fa2)]\n\n### Review Summary\n**Functionality**: The `memcpy` replacement with `std::ranges::copy` is functionally correct.\n**Style**: The use of `std::ranges::copy` is an idiomatic modern C++ approach for copying arrays.\n**Security**: The addition of the `static_assert` effectively guarantees that the source and destination sizes match exactly at compile time, eliminating the risk of buffer overflows or over-reads. The code is secure.\n**Consistency**: The code is consistent and ready. As a minor note on the commit message: it still claims that relying on ranges completely eliminates the risk of potential buffer overflows. As discussed in the previous review, `std::ranges::copy` does not bounds-check the destination iterator; the `static_assert` you added is what actually provides the safety guarantee. Consider updating the commit message for accuracy, but the code itself is good to go.\n**Testing**: Existing tests cover this functionality; no test changes were necessary for this localized refactoring.",
       "isAi": true,
+      "revId": "f0d083b286d9aea220cb466fc28ed0bdecd823db",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75627c10_6f2dc8e1",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T19:52:26Z",
+      "side": 1,
+      "message": "* **Observation:** The `static_assert` uses `sizeof()` to compare the sizes of `p-\u003euserid` and `global_context.user_id`.\n* **Feedback:** While `sizeof()` is technically correct here (assuming both are arrays of byte-sized types), it evaluates the *byte size* rather than the *element count*. Because `std::ranges::copy` specifically operates on elements, it is more idiomatic and semantically accurate to use `std::size()`. Furthermore, this aligns perfectly with the pre-existing code just a few lines down, which already uses `std::size(global_context.user_id)`.\n* **Suggestion:**\n```cpp\nstatic_assert(std::size(p-\u003euserid) \u003d\u003d std::size(global_context.user_id),\n              \"User ID array sizes must match\");\n\n```\n\n\n*(Note: While the string literal in `static_assert` is optional in C++17 and later, adding one improves error clarity for future maintainers).*",
+      "range": {
+        "startLine": 368,
+        "startChar": 0,
+        "endLine": 369,
+        "endChar": 41
+      },
       "revId": "f0d083b286d9aea220cb466fc28ed0bdecd823db",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
