@@ -16,6 +16,24 @@
       "message": "Is this just for debug? If so, can you add a comment to that effect?",
       "revId": "627a81c4c3f0e067eaf325c027199259e88011d0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "102f23d3_082b52b8",
+        "filename": "zephyr/program/atria/penghu/gpios.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-07-14T01:18:47Z",
+      "side": 1,
+      "message": "No, it\u0027s a dependency for `pgood-gpio` in fan.dtsi.",
+      "parentUuid": "2d7bd553_bc752191",
+      "revId": "627a81c4c3f0e067eaf325c027199259e88011d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
