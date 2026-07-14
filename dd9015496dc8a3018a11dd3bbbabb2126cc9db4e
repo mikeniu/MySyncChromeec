@@ -39,6 +39,98 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0f151933_513a635c",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 962,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T17:26:36Z",
+      "side": 1,
+      "message": "Let\u0027s remove the references to FingerGuard in this CL. I think we just call it \"fingerprint auth\" in the other parts of the code.",
+      "range": {
+        "startLine": 962,
+        "startChar": 9,
+        "endLine": 962,
+        "endChar": 20
+      },
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "199c73a9_d4c3e871",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T17:26:36Z",
+      "side": 1,
+      "message": "We can remove this part of the comment I think.",
+      "range": {
+        "startLine": 373,
+        "startChar": 19,
+        "endLine": 375,
+        "endChar": 11
+      },
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15c07a84_99380cc6",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T17:26:36Z",
+      "side": 1,
+      "message": "**Issue:**\nIn `fp_command_context()`, the patch correctly prevents malicious mid-session user swaps by returning `EC_RES_ACCESS_DENIED` if a user ID is already set (`FP_CONTEXT_USER_ID_SET`). However, this logic also blocks **legitimate, idempotent retries** from the Application Processor (AP). If the AP\u0027s IPC mechanism times out and it re-transmits the `GET_RESULT` command with the *same* user ID, the EC will deny access, potentially breaking the AP\u0027s state machine.\n\n**Suggestion:**\nAllow idempotent calls by checking if the requested user ID matches the currently active user ID before denying access.\n\nAdditionally, since `global_context.user_id` is a `std::array` and the codebase is utilizing C++20, we can replace the C-style memory operations (`memcpy`) with safer, type-aware `std::ranges` algorithms for both the comparison and the subsequent assignment.\n\nHere is how you can update the logic:\n\n```cpp\n\t\tif (fingerprint_auth_enabled() \u0026\u0026\n\t\t    (global_context.fp_encryption_status \u0026\n\t\t     FP_CONTEXT_USER_ID_SET)) {\n\t\t\t/* Allow idempotent retries from the AP */\n\t\t\tif (std::ranges::equal(global_context.user_id, p-\u003euserid)) {\n\t\t\t\treturn EC_RES_SUCCESS;\n\t\t\t}\n\t\t\treturn EC_RES_ACCESS_DENIED;\n\t\t}\n\n```",
+      "range": {
+        "startLine": 377,
+        "startChar": 0,
+        "endLine": 381,
+        "endChar": 3
+      },
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd5fa87a_2f593320",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T17:26:36Z",
+      "side": 1,
+      "message": "Separate CL, we can replace this (and any other instances) with `std::ranges::copy(p-\u003euserid, global_context.user_id.begin());`.\n\n**Why this is better:**\n\n* **Type Safety:** `memcpy` and `memcmp` operate on `void*` and bypass C++ type checking. `std::ranges` algorithms are type-aware.\n* **Bounds Checking:** By relying on ranges, the compiler determines the size of `global_context.user_id` and `p-\u003euserid` directly from their types, entirely eliminating the risk of `sizeof()` mismatches or buffer overflows.",
+      "range": {
+        "startLine": 383,
+        "startChar": 0,
+        "endLine": 384,
+        "endChar": 41
+      },
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6c0d3415_2c7f797b",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
         "patchSetId": 6
