@@ -912,53 +912,6 @@ system_get_build_info(void)
 {
 	return build_info;
 }
-
-static void handle_watchdog_reset(void)
-{
-	/*
-	 * Only update the panic reason in RW since RO may have an older panic
-	 * data version and updating the panic reason will cause new fields to
-	 * be overwritten.
-	 */
-	if (!IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT) ||
-	    !IS_ENABLED(SECTION_IS_RW)) {
-		return;
-	}
-
-	/*
-	 * Log panic cause if watchdog caused reset and panic cause
-	 * was not already logged. This must happen after parsing jump_data
-	 * to ensure we have restored the reset flags passed from the previous
-	 * image.
-	 */
-	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
-		uint32_t reason;
-		uint32_t info;
-		uint8_t exception;
-		struct panic_data *pdata;
-
-		panic_get_reason(&reason, &info, &exception);
-		pdata = panic_get_data();
-
-		/* If the panic reason is a watchdog warning, then change
-		 * the reason to a regular watchdog reason while preserving
-		 * the info and exception from the watchdog warning.
-		 */
-		if (reason == PANIC_SW_WATCHDOG_WARN)
-			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
-		/* The watchdog panic info may have already been initialized by
-		 * the watchdog handler, so only set it here if the panic reason
-		 * is not a watchdog or the panic info has already been read,
-		 * i.e. an old watchdog panic.
-		 */
-		else if ((reason != PANIC_SW_WATCHDOG &&
-			  reason != PANIC_SW_WATCHDOG_HARD) ||
-			 !pdata || pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD) {
-			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
-		}
-	}
-}
-
 static void init_jump_data(void)
 {
 	/*
@@ -1057,7 +1010,6 @@ clear_jump_data:
 void system_common_pre_init(void)
 {
 	init_jump_data();
-	handle_watchdog_reset();
 }
 
 void system_enter_manual_recovery(void)
