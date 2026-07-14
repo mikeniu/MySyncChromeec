@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d4fbdb6_87813914",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T21:43:28Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0e4b00aa_adfc0883",
+      "revId": "fdd78b4fe23497d9b17da6c44bc2ab3cd85db2e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f50e23da_7fa0734a",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Minor typo here: \"fingerprint auth auth\" has a duplicate \"auth\".\n\nAdditionally, since `fingerprint_auth_enabled()` explicitly checks for `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` (and returns false without it), this block actually *requires* the active session flag to be present to trigger. \n\nThe phrase \"regardless of whether an active session flag is present\" contradicts this and could be confusing to future readers. I suggest removing it.",
       "isAi": true,
+      "revId": "fdd78b4fe23497d9b17da6c44bc2ab3cd85db2e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64a7e243_3c40224b",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 1441,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T21:43:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f50e23da_7fa0734a",
       "revId": "fdd78b4fe23497d9b17da6c44bc2ab3cd85db2e5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
