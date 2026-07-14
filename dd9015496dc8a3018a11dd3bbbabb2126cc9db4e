@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "438a1120_d111b0b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T01:15:52Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "edbb175f_8ca48df0",
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c0d3415_2c7f797b",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84051966_a5523fca",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 1413,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T01:15:52Z",
+      "side": 1,
+      "message": "hallucination. This does not make sense. This condition requires `fingerprint_auth_enabled()` to be true and this is only true if  `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` flag is set",
+      "parentUuid": "6c0d3415_2c7f797b",
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cae4cbd4_59106ae5",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Similar to the test above, `fp_command_template_v0` unconditionally blocks v0 templates when auth is enabled, regardless of the `SESSION_ESTABLISHED` flag. \n\nYou can remove the manual flag manipulation here as well to simplify the test and avoid needing the manual state cleanup on line 1459.",
       "isAi": true,
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc035a0a_4f8c5490",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 1444,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T01:15:52Z",
+      "side": 1,
+      "message": "again does not make sense. see my other comment",
+      "parentUuid": "cae4cbd4_59106ae5",
       "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

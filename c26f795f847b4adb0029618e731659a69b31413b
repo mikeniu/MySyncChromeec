@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3247a8f_c67bbf99",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T01:15:52Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "93d7c4d1_5f6a6c75",
+      "revId": "c26f795f847b4adb0029618e731659a69b31413b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59b78d2b_1b316100",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] If the AP resends the `FP_CONTEXT_GET_RESULT` command (e.g., due to a communication timeout or retry loop), this strict check will reject it even if `p-\u003euserid` perfectly matches the already loaded `global_context.user_id`.\n\nConsider allowing the command to succeed if the user ID is unchanged:\n```cpp\nif (fingerprint_auth_enabled() \u0026\u0026\n    (global_context.fp_encryption_status \u0026 FP_CONTEXT_USER_ID_SET) \u0026\u0026\n    memcmp(global_context.user_id.data(), p-\u003euserid, sizeof(global_context.user_id)) !\u003d 0) {\n    return EC_RES_ACCESS_DENIED;\n}\n```\nThis preserves the security invariant (preventing cross-user swaps) while making the API more robust to legitimate retries.",
       "isAi": true,
+      "revId": "c26f795f847b4adb0029618e731659a69b31413b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63119e8f_10c850ac",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T01:15:52Z",
+      "side": 1,
+      "message": "I do not believe this makes sense",
+      "parentUuid": "59b78d2b_1b316100",
       "revId": "c26f795f847b4adb0029618e731659a69b31413b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
