@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dd667d6_742af3b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T22:28:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6e5ce7f4_d6554b7f",
+      "revId": "9242a71d8c4b24c4822650bbcce48e090718fbf5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e61f675_26fd4fe7",
@@ -54,6 +72,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bb40c29_72b8f691",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T22:28:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e61f675_26fd4fe7",
+      "revId": "9242a71d8c4b24c4822650bbcce48e090718fbf5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f358c8b_6e629bd9",
@@ -68,6 +104,24 @@
       "side": 1,
       "message": "This duplicates the `__builtin_mul_overflow` check that is now already performed inside `sys_alloc`. Furthermore, it introduces an inconsistency: if overflow occurs here, `plat_calloc` returns `NULL`, whereas `sys_alloc` calls `k_oops()`. Callers might not check for `NULL` returns since `sys_alloc` normally panics on error.\n\nYou can simplify this and ensure consistent behavior by just calling `sys_alloc` directly and using `sys_alloc_usable_size` to get the correct memset length:\n```c\nstatic inline void *plat_calloc(size_t count, size_t size)\n{\n\tvoid *ptr \u003d sys_alloc(count, size);\n\tif (ptr) {\n\t\tmemset(ptr, 0, sys_alloc_usable_size(ptr));\n\t}\n\treturn ptr;\n}\n```",
       "isAi": true,
+      "revId": "9242a71d8c4b24c4822650bbcce48e090718fbf5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cda1f147_854624d0",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T22:28:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f358c8b_6e629bd9",
       "revId": "9242a71d8c4b24c4822650bbcce48e090718fbf5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
