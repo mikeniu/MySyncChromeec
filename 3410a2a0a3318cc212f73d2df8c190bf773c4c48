@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23263800_a4c9fdf6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T21:46:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/2575401e-c9dc-48db-9f59-936a621c2680)]\n\n### Review Summary\n\n**Functionality**:\n- The CL correctly prevents out-of-band mutations of the User ID mid-session while gracefully permitting idempotent retries, which adds robustness against AP timeouts without compromising security.\n- The use of `safe_memcmp` for comparing user IDs is a great choice for mitigating timing attacks.\n\n**Security**:\n- The security invariants are implemented effectively, guaranteeing isolation between user templates and enforcing that template operations route through the authenticated V1 channel when fingerprint auth is active.\n\n**Style \u0026 Readability**:\n- The code and tests are clear, concise, and well-commented.\n- I\u0027ve left a minor inline suggestion on a test comment to remove a slightly contradictory sentence.\n\n**Testing**:\n- Test coverage correctly verifies the idempotency retry logic and the legacy template block.",
+      "isAi": true,
+      "revId": "3410a2a0a3318cc212f73d2df8c190bf773c4c48",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80d476d3_f02dfae7",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 13
+      },
+      "lineNbr": 1441,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T21:46:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Minor nit: The phrase \"regardless of whether an active session flag is present\" was left in the comment, but `fingerprint_auth_enabled()` actually requires the active session flag (`FP_CONTEXT_STATUS_SESSION_ESTABLISHED`) to be set in order to return true. \n\nConsider removing that part of the sentence to avoid confusing future readers!",
+      "isAi": true,
+      "revId": "3410a2a0a3318cc212f73d2df8c190bf773c4c48",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
