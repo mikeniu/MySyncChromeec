@@ -172,12 +172,13 @@ void __unused plat_sleep_time(unsigned long timeInMs);
 
 /**
  * @brief Allocates a block of memory of a specified size and number of
- * elements.
+ * elements, zero-initializing all bytes.
  *
  * @param[in] count The number of elements to allocate.
  * @param[in] size The size of each element in bytes.
  *
- * @return Pointer to the allocated memory or NULL if the allocation failed.
+ * @return Pointer to the allocated memory block initialized to zero,
+ * or NULL if the allocation failed.
  */
 void *sys_alloc(size_t count, size_t size);
 
