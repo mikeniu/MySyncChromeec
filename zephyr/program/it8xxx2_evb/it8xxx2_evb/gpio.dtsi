@@ -34,7 +34,7 @@
 			enum-name = "GPIO_SYS_RESET_L";
 		};
 		gpio_ec_pch_wake_odl: pch_wake_l {
-			gpios = <&gpiob 7 GPIO_OUTPUT_HIGH>;
+			#gpios = <&gpiob 7 GPIO_OUTPUT_HIGH>;
 		};
 		spi0_cs: spi0_cs {
 			gpios = <&gpiom 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
