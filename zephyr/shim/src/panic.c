@@ -18,6 +18,8 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
 
+LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
+
 /*
  * Arch-specific configuration
  *
@@ -288,6 +290,29 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 
 test_export_static int panic_data_init(void)
 {
+	bool is_panic_new;
+	bool is_watchdog_reset;
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+
+	is_watchdog_reset =
+		!!(system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG);
+
+	if (is_watchdog_reset) {
+		LOG_WRN("Watchdog Reset Detected");
+	}
+
+	is_panic_new = panic_data_is_new();
+	panic_get_reason(&reason, &info, &exception);
+
+	if (is_panic_new) {
+		LOG_WRN("New Panic Detected: %s",
+			panic_sw_reason_is_valid(reason) ?
+				panic_sw_reasons[reason - PANIC_SW_BASE] :
+				"");
+	}
+
 	/*
 	 * Only update the panic reason in RW since RO may have an older panic
 	 * data version and updating the panic reason will cause new fields to
@@ -303,18 +328,13 @@ test_export_static int panic_data_init(void)
 	 * to ensure we have restored the reset flags passed from the previous
 	 * image.
 	 */
-	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
-		uint32_t reason;
-		uint32_t info;
-		uint8_t exception;
-
-		panic_get_reason(&reason, &info, &exception);
-
+	if (is_watchdog_reset) {
 		/* If the panic reason is a watchdog warning, then change
 		 * the reason to a regular watchdog reason while preserving
 		 * the info and exception from the watchdog warning.
 		 */
 		if (reason == PANIC_SW_WATCHDOG_WARN) {
+			LOG_INF("Promoting watchdog warning to watchdog panic");
 			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
 		} else if ((reason != PANIC_SW_WATCHDOG &&
 			    reason != PANIC_SW_WATCHDOG_HARD) ||
@@ -325,6 +345,7 @@ test_export_static int panic_data_init(void)
 			 * panic info has already been read, i.e. an old
 			 * watchdog panic.
 			 */
+			LOG_INF("Setting hard watchdog panic");
 			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
 		}
 	}
