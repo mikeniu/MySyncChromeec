@@ -155,6 +155,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5d15abac_9a47e4bd",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 1396,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T17:29:05Z",
+      "side": 1,
+      "message": "**Issue:**\nIn both of the newly added tests (`test_fp_context_get_result_blocks_swap_under_auth` and `test_fp_template_v0_disabled_under_auth`), the test setup manually injects an active session flag to simulate a high-security state:\n`global_context.fp_encryption_status |\u003d FP_CONTEXT_STATUS_SESSION_ESTABLISHED;`\n\nHowever, the actual C++ implementation in the patch never checks for this flag. The new enforcement logic relies entirely on `fingerprint_auth_enabled()` and the `FP_CONTEXT_USER_ID_SET` flag.\n\nSetting `SESSION_ESTABLISHED` in the tests is dead code that creates a misleading impression of the underlying security invariants—it implies the lock-out only happens during an active session, rather than anytime FingerGuard is enabled. Furthermore, in `test_fp_template_v0_disabled_under_auth`, the inline comment explicitly states that it validates the block *\"regardless of whether an active session flag is present\"*, but then immediately sets the flag anyway.\n\n**Suggestion:**\nRemove the manipulation and cleanup of `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` in both tests so they accurately reflect the implementation.\n\n* **In `test_fp_context_get_result_blocks_swap_under_auth`:** The prerequisite assertion `zassert_true(global_context.fp_encryption_status \u0026 FP_CONTEXT_USER_ID_SET);` (which is already set up by `fpsensor_before()`) is sufficient to trigger the new blocking logic. You can just rely on that.\n* **In `test_fp_template_v0_disabled_under_auth`:** Simply test the baseline where `fingerprint_auth_enabled()` is true without muddying the context state, perfectly matching your comment\u0027s intent.",
+      "range": {
+        "startLine": 1396,
+        "startChar": 0,
+        "endLine": 1396,
+        "endChar": 80
+      },
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6c0d3415_2c7f797b",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
         "patchSetId": 6
