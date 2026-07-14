@@ -36,6 +36,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6246c885_cdd042f0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T22:58:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "53dc30ef_e463af53",
+      "revId": "0676fb4dd86e94713b7d9f2e5dbcf962db8bf41e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71863c33_0f29eca0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T22:58:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ec5b8796_5162f92d",
+      "revId": "0676fb4dd86e94713b7d9f2e5dbcf962db8bf41e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ca0ee6e6_e7369c94",
@@ -50,6 +86,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Minor suggestion:** While this macro works fine in its current context, it is missing outermost parentheses. If it were used in a larger expression like `ALIGN_UP(...) * 2`, the multiplication would evaluate before the bitwise AND due to operator precedence (`\u0026` has lower precedence than `*`).\n\nConsider adding outermost parentheses to prevent future bugs:\n```c\n#define ALIGN_UP(val, align) ((((val) + ((align) - 1)) \u0026 ~((align) - 1)))\n```",
       "isAi": true,
+      "revId": "0676fb4dd86e94713b7d9f2e5dbcf962db8bf41e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e4e00b4_f523d7eb",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T22:58:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca0ee6e6_e7369c94",
       "revId": "0676fb4dd86e94713b7d9f2e5dbcf962db8bf41e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
