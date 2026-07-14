@@ -15,6 +15,7 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/ztest.h>
 #include <zephyr/ztest_assert.h>
+#include <zephyr/ztest_error_hook.h>
 
 #include <drivers/fingerprint.h>
 #include <emul/emul_egis630.h>
@@ -315,6 +316,97 @@ ZTEST_F(egis630, test_sys_alloc_normal)
 	zassert_equal(*int_ptr, num);
 
 	sys_free(void_ptr);
+}
+
+ZTEST_F(egis630, test_sys_alloc_honors_count)
+{
+	size_t count = 5;
+	size_t size = sizeof(uint32_t);
+
+	void *ptr = sys_alloc(count, size);
+	zassert_not_null(ptr, "sys_alloc failed to allocate block");
+
+	size_t usable_size = sys_alloc_usable_size(ptr);
+	zassert_equal(usable_size, count * size,
+		      "Expected usable size %zu, got %zu", count * size,
+		      usable_size);
+
+	sys_free(ptr);
+}
+
+ZTEST_F(egis630, test_plat_realloc_shrinking_prevents_over_read)
+{
+	size_t old_size = 64;
+	uint8_t *old_ptr = sys_alloc(1, old_size);
+	zassert_not_null(old_ptr);
+	memset(old_ptr, 0xA5, old_size);
+
+	size_t new_size = 16;
+	uint8_t *new_ptr = plat_realloc(old_ptr, new_size);
+	zassert_not_null(new_ptr, "plat_realloc failed to shrink");
+
+	zassert_equal(sys_alloc_usable_size(new_ptr), new_size);
+	for (size_t i = 0; i < new_size; i++) {
+		zassert_equal(new_ptr[i], 0xA5,
+			      "Corrupt data after shrink at byte %zu", i);
+	}
+
+	sys_free(new_ptr);
+}
+
+ZTEST_F(egis630, test_plat_realloc_growing_bounds_copy)
+{
+	size_t old_size = 8;
+	uint8_t *old_ptr = sys_alloc(1, old_size);
+	zassert_not_null(old_ptr);
+	memset(old_ptr, 0x5A, old_size);
+
+	size_t new_size = 32;
+	uint8_t *new_ptr = plat_realloc(old_ptr, new_size);
+	zassert_not_null(new_ptr, "plat_realloc failed to grow");
+
+	zassert_equal(sys_alloc_usable_size(new_ptr), new_size);
+	for (size_t i = 0; i < old_size; i++) {
+		zassert_equal(new_ptr[i], 0x5A, "Corrupt data at byte %zu", i);
+	}
+
+	sys_free(new_ptr);
+}
+
+ZTEST_F(egis630, test_sys_alloc_usable_size_handles_null)
+{
+	zassert_equal(sys_alloc_usable_size(NULL), 0,
+		      "sys_alloc_usable_size should return 0 on NULL input");
+}
+
+ZTEST_F(egis630, test_plat_calloc_initializes_normal)
+{
+	size_t count = 10;
+	size_t size = sizeof(uint16_t);
+
+	uint16_t *ptr = plat_calloc(count, size);
+	zassert_not_null(ptr, "plat_calloc returned NULL");
+
+	size_t usable_size = sys_alloc_usable_size(ptr);
+	zassert_equal(usable_size, count * size,
+		      "Mismatch in calloc usable size");
+
+	for (size_t i = 0; i < count; i++) {
+		zassert_equal(
+			ptr[i], 0,
+			"plat_calloc failed to zero-initialize at index %zu",
+			i);
+	}
+	sys_free(ptr);
+}
+
+ZTEST_F(egis630, test_plat_calloc_overflow_panics)
+{
+	ztest_set_fault_valid(true);
+
+	plat_calloc(SIZE_MAX / 2, 4);
+
+	zassert_unreachable("plat_calloc overflow did not trigger k_oops()");
 }
 
 ZTEST_F(egis630, test_periphery_spi_write_read_success)
