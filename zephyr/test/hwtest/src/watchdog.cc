@@ -36,7 +36,7 @@ static void test_panic_data(void)
 	uint32_t info = 0;
 	uint8_t exception = UINT8_MAX;
 
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 
 	/* TODO(b/302354851): Only "reason" is set for watchdog in Zephyr. */
 	zassert_equal(reason, PANIC_SW_WATCHDOG);
