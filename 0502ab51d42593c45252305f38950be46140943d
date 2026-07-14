@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8eef2dd_7a8d2142",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T23:00:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/adb39565-d8e9-4016-ae19-2d75b806094a)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The changes successfully address the integer overflow vulnerabilities identified during previous reviews. Using `__builtin_add_overflow` to check `total + hdr_size` ensures that `k_heap_aligned_alloc` cannot be bypassed using large values that wrap around.\n- The `plat_calloc` function correctly delegates to `sys_alloc`, ensuring consistency and avoiding redundant overflow logic.\n- The logic across all allocator functions (`sys_alloc`, `sys_free`, `sys_alloc_usable_size`, `plat_realloc`) is robust against buffer over-reads and out-of-bounds writes.\n\n**Style \u0026 Consistency:**\n- The `ALIGN_UP` macro has been safely updated with outermost parentheses to avoid any future operator precedence issues.\n- The overall code style is clean, legible, and consistent with the Zephyr project guidelines.\n\n**Testing:**\n- Comprehensive unit tests (`test_sys_alloc_honors_count`, `test_plat_realloc_shrinking_prevents_over_read`, `test_plat_calloc_overflow_panics`, etc.) have been added to validate the updated allocator behaviors. These tests ensure the correct allocation sizes and assert that integer overflows safely trigger `k_oops()`.\n\nTAG\u003dagy\nCONV\u003d292e6ae1-1d58-4e19-8c04-ae4c112e56ab",
+      "isAi": true,
+      "revId": "0502ab51d42593c45252305f38950be46140943d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
