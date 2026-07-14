@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e4b00aa_adfc0883",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T21:27:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/5bf5f05a-e6ad-4ad9-97e2-091274ffad50)]\n\n### Review Summary\n\n**Functionality**:\n- The changes successfully block unauthenticated V0 template uploads when fingerprint auth is enabled, closing a potential template injection vector.\n- The `FP_CONTEXT_GET_RESULT` command correctly rejects mid-session User ID changes while safely allowing idempotent retries from the AP.\n\n**Security**:\n- Security invariants are implemented effectively, guaranteeing isolation between user templates. Template operations must route through the authenticated V1 channel when fingerprint auth is active.\n\n**Style \u0026 Readability**:\n- The logic is clean and well-commented.\n- I\u0027ve left a minor inline suggestion on a test comment to fix a typo and remove a slightly contradictory sentence.\n\n**Testing**:\n- Comprehensive test coverage has been added to verify the idempotency retry logic and the legacy template block. \n- The tests now correctly isolate their side-effects by cleaning up the active session flag.",
+      "isAi": true,
+      "revId": "fdd78b4fe23497d9b17da6c44bc2ab3cd85db2e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f50e23da_7fa0734a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 1441,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T21:27:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Minor typo here: \"fingerprint auth auth\" has a duplicate \"auth\".\n\nAdditionally, since `fingerprint_auth_enabled()` explicitly checks for `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` (and returns false without it), this block actually *requires* the active session flag to be present to trigger. \n\nThe phrase \"regardless of whether an active session flag is present\" contradicts this and could be confusing to future readers. I suggest removing it.",
+      "isAi": true,
+      "revId": "fdd78b4fe23497d9b17da6c44bc2ab3cd85db2e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
