@@ -269,9 +269,6 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
 
 	/* Flush the panic data to RAM before potential reboot. */
 	sys_cache_data_flush_range(pdata, sizeof(*pdata));
-
-	/* Allow architecture specific logic */
-	arch_panic_set_reason(reason, info, exception);
 }
 
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
@@ -285,10 +282,4 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 	} else {
 		*exception = *reason = *info = 0;
 	}
-}
-
-__overridable void arch_panic_set_reason(uint32_t reason, uint32_t info,
-					 uint8_t exception)
-{
-	/* Default implementation, do nothing. */
 }

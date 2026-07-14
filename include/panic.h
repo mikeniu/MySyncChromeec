@@ -132,15 +132,6 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
  */
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
 
-#ifdef CONFIG_ZEPHYR
-/**
- * Zephyr utility for architecture specific logic to run when setting panic
- * reason.
- */
-__override_proto void arch_panic_set_reason(uint32_t reason, uint32_t info,
-					    uint8_t exception);
-#endif /* CONFIG_ZEPHYR */
-
 /**
  * Enable/disable bus fault handler
  *
