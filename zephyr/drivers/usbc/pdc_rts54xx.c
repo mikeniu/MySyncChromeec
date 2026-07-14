@@ -367,6 +367,8 @@ struct pdc_config_t {
 	/** Whether or not this port is capable of USB communication as a device
 	 */
 	bool usb_comm_capable_as_device;
+	/** Whether or not this port supports USB4 as a host */
+	bool usb4_support_as_host;
 	/** Pointer to the device-specific callback function */
 	gpio_callback_handler_t callback_handler;
 };
@@ -1767,7 +1769,7 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 
 	/* DFP VDO */
 	dfp_vdo.version = DFP_VDO_VERSION_1_2;
-	dfp_vdo.usb4_cap = false;
+	dfp_vdo.usb4_cap = cfg->usb4_support_as_host;
 	dfp_vdo.usb3_cap = true;
 	dfp_vdo.usb2_cap = true;
 	dfp_vdo.port_num = cfg->connector_number;
@@ -3353,6 +3355,8 @@ BUILD_ASSERT(
 		.frs_supported = DT_INST_PROP(inst, frs_supported),           \
 		.usb_comm_capable_as_device =                                 \
 			DT_INST_PROP(inst, usb_comm_capable_as_device),       \
+		.usb4_support_as_host =                                       \
+			DT_INST_PROP(inst, usb4_capable_as_host),             \
 		.callback_handler = pdc_interrupt_callback##inst,             \
 	};                                                                    \
                                                                               \
