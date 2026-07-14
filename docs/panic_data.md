@@ -122,31 +122,30 @@ For software panics (e.g., watchdog resets, stack overflows, assertion failures)
 *   **Reason**: A `PANIC_SW_*` constant (defined in [include/software_panic.h](../include/software_panic.h)), which always begins with `0xDEAD` (e.g., `0xDEAD6664` for `PANIC_SW_WATCHDOG`).
 *   **Info**: Reason-specific context.
 *   **Exception**: Additional context, sometimes the active task ID at the moment of the panic.
+*   **Extras**: A variable array of up to 6 `uint32_t` words used to store un-packed extended metadata (e.g. timestamps, pointers, specific registers).
 
 The register fields used to store these overloaded values are architecture-specific:
 
-| Architecture | Reason | Info | Exception |
-| :--- | :--- | :--- | :--- |
-| **ARM (Cortex-M)** | `R4` (`v1`) | `R5` (`v2`) | `ipsr` |
-| **RISC-V** | `s0`  | `s1` | `mcause` |
-| **x86** | `vector` | `error_code` | `eflags` |
+| Architecture | Reason | Info | Exception | Extras |
+| :--- | :--- | :--- | :--- | :--- |
+| **ARM (Cortex-M)** | `R4` (`v1`) | `R5` (`v2`) | `ipsr` | `R6` and upwards |
+| **RISC-V** | `s0`  | `s1` | `mcause` | `s2` and upwards |
+| **x86** | `vector` | `error_code` | `eflags` | `eax` and upwards |
 
 
 ## Assert Handling
 
-When an assertion fails, the EC logs a software panic with the reason `PANIC_SW_ASSERT` (`0xDEAD6663`) and reboots. To help identify where the assertion occurred, the filename and line number of the assertion are encoded into the `info` field:
+When an assertion fails, the EC logs a software panic with the reason `PANIC_SW_ASSERT` (`0xDEAD6663`) and reboots. To help identify where the assertion occurred, context is captured across multiple fields:
 
-*   **Info Field Encoding**:
-    *   Bits 31–24: ASCII value of the 1st character of the filename.
-    *   Bits 23–16: ASCII value of the 2nd character of the filename.
-    *   Bits 15–0: Line number of the assertion.
+*   **Info Field**: Contains only the line number of the assertion.
+*   **Exception Field**: Usually set to `0xff` (`-1`) indicating it is generally unused.
+*   **Extras Field**: Populated with the unpacked details:
+    *   `extras[0]`: The caller `PC` (retrieved via `__builtin_return_address(0)`).
+    *   `extras[1]`: The uptime timestamp of the crash (in milliseconds).
+    *   `extras[2]`: The 4-byte active thread ID (`k_current_get()`).
+    *   `extras[3]`: A pointer to the `filename` string in memory.
 
-For example, an assertion failure in `charge_state.c` at line `124` would have `info` encoded as:
-`('c' << 24) | ('h' << 16) | (124 & 0xffff)` => `0x6368007c`.
-
-*   **Exception Field**: This field is populated with the thread ID (`k_tid_t` cast to `uint8_t`, which truncates it to 1 byte) of the thread that triggered the assertion.
-
-In Zephyr EC, asserts override Zephyr's `assert_post_action()` (see [zephyr/shim/src/panic.c](../zephyr/shim/src/panic.c#216)). It extracts the basename of the file path before encoding it, calls `panic_set_reason` directly, and then reboots.
+In Zephyr EC, asserts override Zephyr's `assert_post_action()` (see [zephyr/shim/src/panic.c](../zephyr/shim/src/panic.c#216)). It calls `panic_set_reason` directly supplying the populated `extras` array, and then reboots.
 
 ## Watchdog Handling
 
@@ -167,14 +166,17 @@ There are three distinct software panic reasons associated with watchdogs:
 To capture the state of the EC before a watchdog reset occurs, a software watchdog warning timer is configured to fire `WATCHDOG_WARNING_LEADING_TIME_MS` (default 500ms) before the hardware watchdog would expire.
 
 When this warning fires:
-1.  The current task ID (or thread ID) and the Program Counter (PC) of the active task are captured.
-2.  These are stored in the `exception` and `info` fields of the panic data, respectively.
-3.  The panic reason is set to `PANIC_SW_WATCHDOG_WARN`.
+1.  The panic reason is set to `PANIC_SW_WATCHDOG_WARN`.
+2.  The `info` and `exception` fields are updated but technically left blank/unused.
+3.  The `extras` array captures extended metadata:
+    *   `extras[0]`: The `LR` (Link Register) of the interrupted frame.
+    *   `extras[1]`: The uptime timestamp of the warning (in milliseconds).
+    *   `extras[2]`: The 4-byte active thread ID (`k_current_get()`).
 4.  If the hardware watchdog subsequently expires, the system resets with the reset reason flag `EC_RESET_FLAG_WATCHDOG` set.
 
 ### Watchdog Reset Promotion
 During early initialization, if the reset flags indicate a watchdog reset (`EC_RESET_FLAG_WATCHDOG`), the initialization logic checks the existing panic data in RAM:
-*   **If the existing panic reason is `PANIC_SW_WATCHDOG_WARN`**: The reason is "promoted" to `PANIC_SW_WATCHDOG`, preserving the captured `info` (PC) and `exception` (task ID) fields.
+*   **If the existing panic reason is `PANIC_SW_WATCHDOG_WARN`**: The reason is "promoted" to `PANIC_SW_WATCHDOG`, utilizing `panic_update_reason` which perfectly preserves the captured `extras` elements (e.g. `LR`, timestamp, thread ID).
 *   **If the existing panic reason is NOT `PANIC_SW_WATCHDOG_WARN`**: The panic data is overwritten with the reason `PANIC_SW_WATCHDOG_HARD`, and all other registers are left blank.
 
 Before commit [682f4c61f1](https://chromium.googlesource.com/chromiumos/platform/ec/+/682f4c61f142f622091dcf60ccac339a8d5ac8f2) (which restricted promotion to RW), the RO image would perform the watchdog promotion first during pre-init. This caused compatibility issues:
