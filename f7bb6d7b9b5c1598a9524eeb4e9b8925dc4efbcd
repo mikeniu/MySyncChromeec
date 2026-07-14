@@ -142,6 +142,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fd36db2_2e9e5795",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-14T21:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9a28c8f_dc8220f0",
+      "range": {
+        "startLine": 114,
+        "startChar": 4,
+        "endLine": 114,
+        "endChar": 27
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "443fd09a_16b450a4",
@@ -250,6 +274,30 @@
       "side": 1,
       "message": "Ack - handling this race condition adds quite a bit of complexity.  Capture this limitation into a comment for this function.  This is helpful for future devs and or LLM models for troubleshooting.",
       "parentUuid": "64c4e26a_8611f3d1",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 1
+      },
+      "revId": "f7bb6d7b9b5c1598a9524eeb4e9b8925dc4efbcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ff0b5be_f5238010",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm_tbt.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-14T21:26:19Z",
+      "side": 1,
+      "message": "Added comments",
+      "parentUuid": "29bfeeff_dda9fcfd",
       "range": {
         "startLine": 59,
         "startChar": 0,

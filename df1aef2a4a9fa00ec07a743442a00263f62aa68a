@@ -166,6 +166,78 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87a13d3e_2f11ab59",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-14T21:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29192ae4_f1afaf86",
+      "range": {
+        "startLine": 77,
+        "startChar": 25,
+        "endLine": 77,
+        "endChar": 26
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43fe27bc_ee5c1ca5",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-14T21:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "90748683_04d8b32e",
+      "range": {
+        "startLine": 77,
+        "startChar": 3,
+        "endLine": 77,
+        "endChar": 32
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e56c24d2_343cbb44",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-14T21:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f05a7dd9_88222d69",
+      "range": {
+        "startLine": 77,
+        "startChar": 1,
+        "endLine": 77,
+        "endChar": 33
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2271744a_5f6848ed",
@@ -227,6 +299,30 @@
       "side": 1,
       "message": "The blocking `pdc_power_mgmt_connector_reset` call is removed in patchset 2.",
       "parentUuid": "00c56542_4b97062e",
+      "range": {
+        "startLine": 81,
+        "startChar": 2,
+        "endLine": 81,
+        "endChar": 54
+      },
+      "revId": "df1aef2a4a9fa00ec07a743442a00263f62aa68a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "645c469f_b9c27fcc",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-07-14T21:26:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f081221_f91c7846",
       "range": {
         "startLine": 81,
         "startChar": 2,
