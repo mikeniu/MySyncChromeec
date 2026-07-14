@@ -74,6 +74,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4dd54156_da02b65c",
+        "filename": "zephyr/program/bluey/mica/src/chipset.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-07-14T17:37:57Z",
+      "side": 1,
+      "message": "okay, you can do one thing check if the power_on_reason is AC and skip playing the board_diag_led_power_fail().",
+      "parentUuid": "850d90e6_b4438889",
+      "range": {
+        "startLine": 58,
+        "startChar": 1,
+        "endLine": 66,
+        "endChar": 64
+      },
+      "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "45075f48_ebfc950a",
         "filename": "zephyr/program/bluey/mica/src/led.c",
         "patchSetId": 10
