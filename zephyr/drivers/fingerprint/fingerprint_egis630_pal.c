@@ -33,6 +33,9 @@ K_SEM_DEFINE(printf_buffer_lock, 1, 1);
 
 IF_DISABLED(CONFIG_ZTEST, (static)) char printf_buffer[256];
 
+#define ALIGNMENT sizeof(void *)
+#define ALIGN_UP(val, align) (((val) + ((align) - 1)) & ~((align) - 1))
+
 int __unused periphery_spi_write_read(uint8_t *write, uint32_t write_len,
 				      uint8_t *read, uint32_t read_len)
 {
@@ -127,11 +130,21 @@ void __unused output_log(LOG_LEVEL level, const char *tag,
 
 void __unused *sys_alloc(size_t count, size_t size)
 {
-	void *p = k_heap_aligned_alloc(&fp_driver_heap, sizeof(void *), size,
-				       K_NO_WAIT);
+	size_t total;
 
-	if (p == NULL) {
-		LOG_ERR("Error - %s of size %u failed.", __func__, size);
+	if (__builtin_mul_overflow(count, size, &total)) {
+		LOG_ERR("Error - %s(%zu,%zu) overflows.", __func__, count,
+			size);
+		k_oops();
+		CODE_UNREACHABLE;
+	}
+
+	size_t hdr_size = ALIGN_UP(sizeof(size_t), ALIGNMENT);
+	uint8_t *raw = k_heap_aligned_alloc(&fp_driver_heap, ALIGNMENT,
+					    hdr_size + total, K_NO_WAIT);
+
+	if (raw == NULL) {
+		LOG_ERR("Error - %s of size %zu failed.", __func__, total);
 		/* TODO(b/423622893): Prevent Runtime OOM Panics in Zephyr
 		 * Gwendolin via BUILD_ASSERT on the heap size.
 		 */
@@ -139,10 +152,24 @@ void __unused *sys_alloc(size_t count, size_t size)
 		CODE_UNREACHABLE;
 	}
 
-	return p;
+	*(size_t *)raw = total;
+	return raw + hdr_size;
+}
+
+size_t __unused sys_alloc_usable_size(void *data)
+{
+	if (data == NULL) {
+		return 0;
+	}
+	size_t hdr_size = ALIGN_UP(sizeof(size_t), ALIGNMENT);
+	return *(size_t *)((uint8_t *)data - hdr_size);
 }
 
 void __unused sys_free(void *data)
 {
-	k_heap_free(&fp_driver_heap, data);
+	if (data == NULL) {
+		return;
+	}
+	size_t hdr_size = ALIGN_UP(sizeof(size_t), ALIGNMENT);
+	k_heap_free(&fp_driver_heap, (uint8_t *)data - hdr_size);
 }
