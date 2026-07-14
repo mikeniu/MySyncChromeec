@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2a773d7_add41394",
+        "filename": "common/charge_state.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1582,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-07-14T06:04:45Z",
+      "side": 1,
+      "message": "A standalone CL for the common code.",
+      "revId": "9df017bf90b5b4a218fc829a4e708bf3575d178f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b26b8828_7084de4b",
+        "filename": "zephyr/program/fatcat/lapis/project.overlay",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-07-14T06:04:45Z",
+      "side": 1,
+      "message": "I believe that it should be put into the common region rather than defined in project level. Could realtek reserve a custom use field in src/platform/ec/zephyr/include/cros/realtek/realtek.dtsi ?",
+      "revId": "9df017bf90b5b4a218fc829a4e708bf3575d178f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
