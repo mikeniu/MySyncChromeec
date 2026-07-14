@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "850d90e6_b4438889",
+        "filename": "zephyr/program/bluey/mica/src/chipset.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-07-14T10:21:34Z",
+      "side": 1,
+      "message": "Reply to jayvik: Yes, it is.\nReply to Kyle: This action will result in no animation appearing without AC unplugged.",
+      "parentUuid": "c422ea23_665bc3c7",
+      "range": {
+        "startLine": 58,
+        "startChar": 1,
+        "endLine": 66,
+        "endChar": 64
+      },
+      "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "45075f48_ebfc950a",
         "filename": "zephyr/program/bluey/mica/src/led.c",
         "patchSetId": 10
@@ -61,6 +85,24 @@
       "writtenOn": "2026-07-14T03:35:11Z",
       "side": 1,
       "message": "It\u0027s OK to move this line to *lb_policy.h* now since the related change is merged in google-private repo.",
+      "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebb6730f_5c620ab5",
+        "filename": "zephyr/program/bluey/mica/src/led.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-07-14T10:21:34Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "45075f48_ebfc950a",
       "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
