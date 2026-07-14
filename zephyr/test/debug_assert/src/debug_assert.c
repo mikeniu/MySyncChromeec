@@ -25,7 +25,7 @@ ZTEST(debug_assert, test_assert_false)
 	__ASSERT(false, "Test false assert");
 
 	zassert_equal(system_reset_fake.call_count, 1);
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 	zassert_equal(PANIC_SW_ASSERT, reason);
 	if (!IS_ENABLED(CONFIG_ASSERT_NO_FILE_INFO)) {
 		zassert_equal(linenum, info & 0xffff);
@@ -46,7 +46,7 @@ ZTEST(debug_assert, test_assert_true)
 	__ASSERT(true, "Test true assert");
 
 	zassert_equal(system_reset_fake.call_count, 0);
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 	zassert_equal(0, reason);
 	zassert_equal(0, info);
 	zassert_equal(0, exception);

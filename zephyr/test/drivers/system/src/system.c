@@ -103,12 +103,12 @@ ZTEST(system, test_system_common_pre_init__watch_dog_panic)
 	/* Watchdog reset should result in any existing panic data being
 	 * overwritten (if in RW)
 	 */
-	panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+	panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34, NULL, 0);
 
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
 	panic_data_init();
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 
 	if (IS_ENABLED(SECTION_IS_RW)) {
 		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
@@ -130,7 +130,7 @@ ZTEST(system, test_system_common_pre_init__watch_dog_warn_panic)
 	 * to PANIC_SW_WATCHDOG after a watchdog reset (if in RW).
 	 * Info and exception should be preserved.
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
+	panic_set_reason(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34, NULL, 0);
 
 	/* Set RO flag explicitly to test flag preservation */
 	pdata = get_panic_data_write();
@@ -140,7 +140,7 @@ ZTEST(system, test_system_common_pre_init__watch_dog_warn_panic)
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
 	panic_data_init();
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 
 	if (IS_ENABLED(SECTION_IS_RW)) {
 		pdata = panic_get_data();
@@ -166,12 +166,12 @@ ZTEST(system, test_system_common_pre_init__watch_dog_panic_already_initialized)
 	/* Watchdog reset should not overwrite panic info if already filled
 	 * in with watchdog panic info that HAS NOT been read by host
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34);
+	panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34, NULL, 0);
 
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
 	panic_data_init();
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 	zassert_equal(reason, PANIC_SW_WATCHDOG);
 	zassert_equal(info, 0x12);
 	zassert_equal(exception, 0x34);
@@ -187,12 +187,12 @@ ZTEST(system,
 	/* Watchdog reset should not overwrite panic info if already filled
 	 * in with watchdog hard panic info that HAS NOT been read by host
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0x12, 0x34);
+	panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0x12, 0x34, NULL, 0);
 
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
 	panic_data_init();
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 	zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
 	zassert_equal(info, 0x12);
 	zassert_equal(exception, 0x34);
@@ -208,14 +208,14 @@ ZTEST(system, test_system_common_pre_init__watch_dog_panic_already_read)
 	/* Watchdog reset should overwrite panic info if already filled
 	 * in with watchdog panic info that HAS been read by host (if in RW)
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34);
+	panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34, NULL, 0);
 	pdata = get_panic_data_write();
 	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
 
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
 	panic_data_init();
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 
 	if (IS_ENABLED(SECTION_IS_RW)) {
 		struct panic_data *pdata = panic_get_data();
