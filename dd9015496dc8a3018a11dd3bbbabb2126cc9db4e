@@ -296,6 +296,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53d5967b_8ba4f41e",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 1396,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T21:22:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3469561_d00b3efb",
+      "range": {
+        "startLine": 1396,
+        "startChar": 0,
+        "endLine": 1396,
+        "endChar": 80
+      },
+      "revId": "dd9015496dc8a3018a11dd3bbbabb2126cc9db4e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c0d3415_2c7f797b",
