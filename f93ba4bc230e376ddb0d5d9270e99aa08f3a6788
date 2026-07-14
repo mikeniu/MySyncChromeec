@@ -16,6 +16,24 @@
       "message": "Why remove this?",
       "revId": "f93ba4bc230e376ddb0d5d9270e99aa08f3a6788",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbed83d9_70ac343b",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-14T09:05:18Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "1b0b57e3_3e0a29a1",
+      "revId": "f93ba4bc230e376ddb0d5d9270e99aa08f3a6788",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c25bdd2_e90e70d7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-14T09:05:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0b6c92c_2c218299",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a48cf81_273a9701",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-08T20:45:57Z",
       "side": 1,
       "message": "What are these typedefs for? I don\u0027t see where you\u0027re using them.\n\nSame with the macros below.",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37d4947d_2fa55686",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-14T09:05:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a48cf81_273a9701",
       "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -52,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6966af18_646b2265",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-14T09:05:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c624069c_add8a2c9",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79723109_17dbb90d",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-07-08T20:45:57Z",
       "side": 1,
       "message": "As with the DFP VDO, I don\u0027t think there\u0027s actually a change in the field sizes here. The new spec just changed the table format. I think you can probably just update the existing struct to be cleaner instead of making a new one.",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1d228ff_8984c3a7",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-14T09:05:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "79723109_17dbb90d",
       "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -103,6 +175,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b67a0c1a_db3a64bf",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-14T09:05:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bcf67b8_692cb8fc",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "057705f2_f4643ed5",
@@ -120,6 +210,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89f0cfe9_4d0501a9",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-14T09:05:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "057705f2_f4643ed5",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "55ea1c64_4c091fa4",
@@ -133,6 +241,24 @@
       "writtenOn": "2026-07-08T20:45:57Z",
       "side": 1,
       "message": "Why `raw` and `raw_value`?",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65e74882_4a7403fc",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-14T09:05:18Z",
+      "side": 1,
+      "message": "To follow both conventions.",
+      "parentUuid": "55ea1c64_4c091fa4",
       "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
