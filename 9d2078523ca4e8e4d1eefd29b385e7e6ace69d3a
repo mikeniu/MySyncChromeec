@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33cfb199_01e3d7df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T19:32:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/40ba1979-3021-4a0a-8897-0f88aa21cba5)]\n\n### Review Summary\n\n**Functionality**:\n- The idempotency check was successfully added, which correctly allows retries from the AP without compromising the state machine.\n\n**Security**:\n- The security invariants are implemented effectively, guaranteeing isolation between user templates.\n\n**Style \u0026 Readability**:\n- The code is well documented.\n- Minor: There is one remaining reference to \"FingerGuard\" in the newly added test\u0027s comment that should be updated to \"fingerprint auth\".\n\n**Testing**:\n- The `test_fp_context_get_result_allows_idempotent_retry` test is currently bypassing the intended code path because `fingerprint_auth_enabled()` evaluates to false. It needs to set `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` to properly exercise the new idempotent retry logic. (Apologies for the earlier confusion on my part regarding this flag!)",
+      "isAi": true,
+      "revId": "9d2078523ca4e8e4d1eefd29b385e7e6ace69d3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73f560b9_0365df70",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 1474,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-14T19:32:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] My apologies for the previous hallucination regarding `fingerprint_auth_enabled()`. Since you were completely correct that it relies on `FP_CONTEXT_STATUS_SESSION_ESTABLISHED`, this new test actually needs that flag to be set in order to exercise the new code path!\n\nRight now, because `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` is not set here, `fingerprint_auth_enabled()` returns false. This completely bypasses the new `if` block, making the test pass trivially by falling through to the end of the function.\n\nWe need to add the session established flag so it tests the `if (std::ranges::equal(...))` branch. \n\n```cpp\n\t/* Simulate an active session so fingerprint_auth_enabled() is true. */\n\tglobal_context.fp_encryption_status |\u003d\n\t\tFP_CONTEXT_STATUS_SESSION_ESTABLISHED;\n\n\t/*\n\t * Verify that executing FP_CONTEXT_GET_RESULT with the SAME\n\t * user ID succeeds (idempotent retry) even when fingerprint auth is active,\n\t * ensuring AP IPC timeouts do not break the state machine.\n\t */\n\tzassert_equal(EC_RES_SUCCESS,\n\t\t      ec_cmd_fp_context_v1(NULL, \u0026fp_context_params),\n\t\t      \"Idempotent context retries should be allowed\");\n\n\t/* Clean up */\n\tglobal_context.fp_encryption_status \u0026\u003d\n\t\t~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;\n```\n*(Also, note the removal of the term \"FingerGuard\" from the comment to match the other changes!)*",
+      "isAi": true,
+      "revId": "9d2078523ca4e8e4d1eefd29b385e7e6ace69d3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
