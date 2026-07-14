@@ -115,6 +115,8 @@
 		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
+		/* EC codebase assumes the reg property as offset within flash. */
+		/delete-property/ ranges;
 
 		bootloader: partition@0 {
 			label = "bootloader";

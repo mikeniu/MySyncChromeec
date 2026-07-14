@@ -9528,7 +9528,6 @@ static void cmd_cbi_help(char *cmd)
 		"    [get_flag] is combination of:\n"
 		"      01b: Invalidate cache and reload data from EEPROM\n"
 		"    [set_flag] is combination of:\n"
-		"      01b: Skip write to EEPROM. Use for back-to-back writes\n"
 		"      10b: Set all fields to defaults first\n");
 }
 
@@ -11180,6 +11179,48 @@ int cmd_force_lid_open(int argc, char *argv[])
 	}
 
 	rv = ec_command(EC_CMD_FORCE_LID_OPEN, 0, &p, sizeof(p), NULL, 0);
+	if (rv < 0)
+		return rv;
+	printf("Success.\n");
+	return 0;
+}
+
+int cmd_powerbtn_press(int argc, char *argv[])
+{
+	struct ec_params_power_button_press p = { 0 };
+	char *e;
+	int rv;
+
+	if (argc > 1) {
+		p.first_press_delay_ms = strtol(argv[1], &e, 0);
+		if (e && *e) {
+			fprintf(stderr, "Bad value.\n");
+			return -1;
+		}
+	}
+	if (argc > 2) {
+		p.first_press_duration_ms = strtol(argv[2], &e, 0);
+		if (e && *e) {
+			fprintf(stderr, "Bad value.\n");
+			return -1;
+		}
+	}
+	if (argc > 3) {
+		p.second_press_delay_ms = strtol(argv[3], &e, 0);
+		if (e && *e) {
+			fprintf(stderr, "Bad value.\n");
+			return -1;
+		}
+	}
+	if (argc > 4) {
+		p.second_press_duration_ms = strtol(argv[4], &e, 0);
+		if (e && *e) {
+			fprintf(stderr, "Bad value.\n");
+			return -1;
+		}
+	}
+
+	rv = ec_command(EC_CMD_POWER_BUTTON_PRESS, 0, &p, sizeof(p), NULL, 0);
 	if (rv < 0)
 		return rv;
 	printf("Success.\n");
@@ -13203,6 +13244,9 @@ const struct command commands[] = {
 	  "\n\tRapidly write bytes to port 80." },
 	{ "port80read", cmd_port80_read,
 	  "\n\tPrint history of port 80 write." },
+	{ "powerbtn_press", cmd_powerbtn_press,
+	  "[<1st_del_ms>] [<1st_dur_ms>] [<2nd_del_ms>] [<2nd_dur_ms>]\n"
+	  "\tSimulate up to 2 consecutive delayed power button presses." },
 	{ "powerinfo", cmd_power_info,
 	  "\n\tPrints power-related information." },
 	{ "protoinfo", cmd_proto_info,

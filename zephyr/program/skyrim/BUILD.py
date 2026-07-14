@@ -34,13 +34,13 @@ register_skyrim_project(
 
 register_skyrim_project(
     project_name="winterhold",
-    snippets=["npcx-40mhz"],
+    snippets=["npcx-45mhz"],
 )
 
 
 register_skyrim_project(
     project_name="frostflow",
-    snippets=["npcx-40mhz"],
+    snippets=["npcx-45mhz"],
 )
 
 register_skyrim_project(

@@ -41,6 +41,7 @@
 #include <variant>
 
 #ifdef CONFIG_ZEPHYR
+#include <zephyr/pm/policy.h>
 #include <zephyr/shell/shell.h>
 #endif
 
@@ -72,6 +73,17 @@ static int8_t stats_template_matched;
 
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
 
+#ifndef CONFIG_ZEPHYR
+/* Define the PM functions for compatibility with EC-legacy. */
+static inline void pm_policy_state_all_lock_get(void)
+{
+}
+
+static inline void pm_policy_state_all_lock_put(void)
+{
+}
+#endif /* CONFIG_ZEPHYR */
+
 /* Interrupt line from the fingerprint sensor */
 extern "C" void fps_event(enum gpio_signal signal)
 {
@@ -96,6 +108,16 @@ static uint32_t enroll_session;
 static uint32_t fp_process_enroll(void)
 {
 	int percent = 0;
+
+	/* Prevent enrollment if we have reached max capacity. */
+	if (global_context.templ_valid >= FP_MAX_FINGER_COUNT) {
+		CPRINTS("Error: Max templates reached.");
+		fp_enrollment_finish(nullptr);
+		global_context.sensor_mode &= ~FP_MODE_ENROLL_SESSION;
+		enroll_session &= ~FP_MODE_ENROLL_SESSION;
+		return EC_MKBP_FP_ENROLL |
+		       EC_MKBP_FP_ERRCODE(EC_MKBP_FP_ERR_ENROLL_INTERNAL);
+	}
 
 	if (global_context.template_newly_enrolled != FP_NO_SUCH_TEMPLATE)
 		CPRINTS("Warning: previously enrolled template has not been "
@@ -258,7 +280,10 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context);
 extern "C" void fp_task(void)
 {
 	int timeout_us = -1;
+	__maybe_unused bool pm_locked = true;
 
+	/* Lock PM for initialization. */
+	pm_policy_state_all_lock_get();
 	CPRINTS("FP_SENSOR_SEL: %s",
 		fp_sensor_type_to_str(fpsensor_detect_get_type()));
 
@@ -271,8 +296,23 @@ extern "C" void fp_task(void)
 	while (1) {
 		enum finger_state st = FINGER_NONE;
 
+		/* Unlock PM while waiting for an event except for an
+		 * enrollment process.
+		 */
+		if (!(global_context.sensor_mode & FP_MODE_ENROLL_SESSION)) {
+			pm_policy_state_all_lock_put();
+			pm_locked = false;
+		}
 		/* Wait for a sensor IRQ or a new mode configuration */
 		uint32_t evt = task_wait_event(timeout_us);
+
+		/* Lock PM for any FP related actions, especially communication
+		 * with a FP sensor.
+		 */
+		if (!pm_locked) {
+			pm_policy_state_all_lock_get();
+			pm_locked = true;
+		}
 
 		if (evt & TASK_EVENT_UPDATE_CONFIG) {
 			uint32_t mode = global_context.sensor_mode;
@@ -485,44 +525,11 @@ static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
 	r->template_info.template_dirty = global_context.templ_dirty;
 	r->template_info.template_version = FP_TEMPLATE_FORMAT_VERSION;
 
-	if (args->version == 2) {
-		struct ec_response_fp_info_v2 *r_v2 =
-			static_cast<ec_response_fp_info_v2 *>(args->response);
-		/* Convert to v2 format. The formats differ only in the frame
-		 * array, which is located at the end of the structures
-		 *
-		 * SAFETY: 'r->image_frame_params' and r_v2->image_frame_params
-		 * overlap inexactly, but copying data is safe because we copy
-		 * data forward (from the first field of the structure to the
-		 * last).
-		 */
-		for (int i = 0; i < FP_MAX_CAPTURE_TYPES; i++) {
-			r_v2->image_frame_params[i].frame_size =
-				r->image_frame_params[i].frame_size;
-			r_v2->image_frame_params[i].pixel_format =
-				r->image_frame_params[i].pixel_format;
-			r_v2->image_frame_params[i].width =
-				r->image_frame_params[i].width;
-			r_v2->image_frame_params[i].height =
-				r->image_frame_params[i].height;
-			r_v2->image_frame_params[i].bpp =
-				r->image_frame_params[i].bpp;
-			r_v2->image_frame_params[i].fp_capture_type =
-				r->image_frame_params[i].fp_capture_type;
-			r_v2->image_frame_params[i].reserved =
-				r->image_frame_params[i].reserved;
-		}
-		response_size = sizeof(struct ec_response_fp_info_v2) +
-				FP_MAX_CAPTURE_TYPES *
-					sizeof(struct fp_image_frame_params);
-	}
-
 	args->response_size = response_size;
 
 	return EC_RES_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info,
-		     EC_VER_MASK(2) | EC_VER_MASK(3));
+DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info, EC_VER_MASK(3));
 
 BUILD_ASSERT(FP_CONTEXT_NONCE_BYTES == 12);
 

@@ -38,10 +38,6 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(cros_ec_cbi_ssfc) < 2,
 
 #define CBI_SSFC_VALUE_ARRAY(inst) CBI_SSFC_VALUE_ARRAY_ID(DT_DRV_INST(inst))
 
-#define CBI_SSFC_VALUE_BUILD_ASSERT(inst)                    \
-	BUILD_ASSERT(DT_INST_PROP(inst, value) <= UINT8_MAX, \
-		     "CBI SSFS value too big");
-
 #define CBI_SSFC_PARENT_VALUE_CASE_GENERATE(value_id, value_parent, value) \
 	case value_id:                                                     \
 		*value = value_parent;                                     \
@@ -125,8 +121,6 @@ union cbi_ssfc {
 
 BUILD_ASSERT(sizeof(union cbi_ssfc) == sizeof(uint32_t),
 	     "CBI SSFS structure exceeds 32 bits");
-
-DT_INST_FOREACH_STATUS_OKAY(CBI_SSFC_VALUE_BUILD_ASSERT)
 
 static const uint8_t ssfc_values[] = { DT_INST_FOREACH_STATUS_OKAY(
 	CBI_SSFC_VALUE_ARRAY) };

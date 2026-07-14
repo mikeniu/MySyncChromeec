@@ -476,7 +476,8 @@ class Zmake:
 
         for checkout in cmp_builds.checkouts:
             self.logger.info(
-                "Checkout %s: full hash %s", checkout.ref, checkout.full_ref
+                "Checkout %s",
+                checkout,
             )
 
         cmp_builds.do_checkouts(self.zephyr_base, self.module_paths)
@@ -532,11 +533,11 @@ class Zmake:
             self.cmp_failed_projects["devicetree"] = failed_projects
             self.failed_projects.extend(failed_projects)
 
-        self.failed_projects = list(set(self.failed_projects))
+        self.failed_projects = sorted(list(set(self.failed_projects)))
         if len(self.failed_projects) == 0:
             self.logger.info("Zephyr compare builds successful:")
             for checkout in cmp_builds.checkouts:
-                self.logger.info("   %s: %s", checkout.ref, checkout.full_ref)
+                self.logger.info("   %s", checkout)
 
         return len(self.failed_projects)
 

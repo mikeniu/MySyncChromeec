@@ -831,11 +831,8 @@ static int syv682x_init(int port)
 			return rv;
 	}
 
-#ifdef CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT
-	initial_current_limit = CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT;
-#else
 	initial_current_limit = CONFIG_USB_PD_PULLUP;
-#endif
+
 	rv = syv682x_set_vbus_source_current_limit(port, initial_current_limit);
 	if (rv)
 		return rv;

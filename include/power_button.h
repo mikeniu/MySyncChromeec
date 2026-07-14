@@ -80,6 +80,20 @@ void board_pwrbtn_to_pch(int level);
  */
 void power_button_simulate_press(unsigned int duration);
 
+/**
+ * Check if the power button release should be ignored.
+ *
+ * @return 1 if power button release should be ignored, 0 otherwise.
+ */
+#ifdef CONFIG_POWER_BUTTON
+int power_button_is_eating_release(void);
+#else
+static inline int power_button_is_eating_release(void)
+{
+	return 0;
+}
+#endif
+
 #ifdef __cplusplus
 }
 #endif

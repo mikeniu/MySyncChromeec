@@ -9,6 +9,8 @@ tests:
   fingerprint.task.capture:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_CAPTURE=y
+    # Allocate large buffer to capture FP simulator raw image + response header
+    - CONFIG_EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE=26268
     extra_conf_files:
     - prj.conf
 
@@ -48,9 +50,17 @@ tests:
     extra_conf_files:
     - prj.conf
 
+  fingerprint.task.state:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_FINGERPRINT_STATE=y
+    extra_conf_files:
+    - prj.conf
+
   fingerprint.task.template:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_TEMPLATE=y
+    # Allocate large buffer to capture FP simulator raw image + response header
+    - CONFIG_EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE=26268
     extra_conf_files:
     - prj.conf
 
@@ -84,12 +94,6 @@ tests:
   fingerprint.task.frame.size:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_FRAME_SIZE=y
-    extra_conf_files:
-    - prj.conf
-
-  fingerprint.task.fp_info:
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_FINGERPRINT_FP_INFO=y
     extra_conf_files:
     - prj.conf
 

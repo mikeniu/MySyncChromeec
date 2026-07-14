@@ -34,6 +34,12 @@ config LINK_TEST_SUITE_ANX7447
 config LINK_TEST_SUITE_AP_MUX_CONTROL
 	bool "Link and test the ap_mux_control tests"
 
+config LINK_TEST_SUITE_AP_POWER_EVENTS
+	bool "Link and test the ap_power_events driver tests"
+	help
+	  Verifies the AP power events driver which controls GPIOs
+	  based on AP power state transitions.
+
 config LINK_TEST_SUITE_AP_VDM_CONTROL
 	bool "Link and test the ap_vdm_control tests"
 
@@ -151,6 +157,9 @@ config LINK_TEST_SUITE_LOCATE_CHIP_ALTS
 	help
 	  Compile a binary that allows the non herobrine paths of the locate
 	  chip command to execute
+
+config LINK_TEST_SUITE_LIS2DH
+	bool "Link tests for lis2dh driver"
 
 config LINK_TEST_SUITE_LSM6DSM
 	bool "Link tests for lsm6dsm driver"

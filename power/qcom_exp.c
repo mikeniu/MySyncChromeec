@@ -168,7 +168,7 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
  * to avoid race conditions during the power-off/power-on transition.
  * This differs from the 45-minute heartbeat-offmode shutdown window.
  */
-#define EXTPOWER_WAKE_INTERVAL_SEC 5
+#define EXTPOWER_WAKE_INTERVAL_SEC 30
 
 /* Value to indicate an invalid or uninitialized SoC. */
 #define BATTERY_BAD_STATE_OF_CHARGE -1
@@ -177,6 +177,25 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 /* 1 if the power button was pressed last time we checked */
 static char power_button_was_pressed;
 
+#ifdef CONFIG_POWER_BUTTON
+/* 1 if we should ignore the first power button release */
+static char power_button_eat_release;
+#endif
+
+#ifdef CONFIG_POWER_BUTTON
+/**
+ * Check if the power button release should be ignored.
+ */
+int power_button_is_eating_release(void)
+{
+	int ret = power_button_eat_release;
+
+	if (ret)
+		power_button_eat_release = 0;
+
+	return ret;
+}
+#endif
 /* 1 if lid-open event has been detected */
 static char lid_opened;
 
@@ -226,6 +245,12 @@ static enum power_on_event_t power_on_reason;
 enum power_on_event_t chipset_get_power_on_reason(void)
 {
 	return power_on_reason;
+}
+
+int chipset_is_offmode_charging_wake(void)
+{
+	return (power_on_reason == POWER_ON_BY_AC_ON ||
+		power_on_reason == POWER_ON_BY_RTC_ALARM);
 }
 
 /**
@@ -314,10 +339,6 @@ DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, powerbtn_changed, HOOK_PRIO_DEFAULT);
 
 static void power_ac_changed(void)
 {
-	/* Power task only cares when the external power is connected */
-	if (!extpower_is_present())
-		return;
-
 	ac_on = 1;
 
 	task_wake(TASK_ID_CHIPSET);
@@ -797,6 +818,15 @@ enum power_state power_chipset_init(void)
 		CPRINTS("auto_power_on disabled");
 	}
 
+#ifdef CONFIG_POWER_BUTTON
+	/*
+	 * Since we can't detect if a power button was already pressed before
+	 * the EC booted, we assume the first release event should be ignored
+	 * if the button is still pressed when we initialize.
+	 */
+	power_button_eat_release = 1;
+#endif
+
 	return init_power_state;
 }
 
@@ -904,6 +934,9 @@ static uint8_t check_for_power_on_event(void)
 	} else if (auto_power_on) {
 		/* power on requested at EC startup for recovery */
 		ret = POWER_ON_BY_AUTO_POWER_ON;
+	} else if (power_button_is_pressed()) {
+		/* check for power button press */
+		ret = POWER_ON_BY_POWER_BUTTON_PRESSED;
 	} else if (lid_opened) {
 		/* check lid open */
 		ret = POWER_ON_BY_LID_OPEN;
@@ -913,12 +946,17 @@ static uint8_t check_for_power_on_event(void)
 	} else if (rtc_wake) {
 		/* check for RTC alarm wake */
 		ret = POWER_ON_BY_RTC_ALARM;
-	} else if (power_button_is_pressed()) {
-		/* check for power button press */
-		ret = POWER_ON_BY_POWER_BUTTON_PRESSED;
 	} else {
 		ret = POWER_ON_CANCEL;
 	}
+#ifdef CONFIG_POWER_BUTTON
+	/*
+	 * If the power button is not pressed at this point, we can
+	 * stop trying to ignore the next release event.
+	 */
+	if (!power_button_is_pressed())
+		power_button_eat_release = 0;
+#endif
 
 	/* The flags are handled above. Clear them all. */
 	power_request = POWER_REQ_NONE;
@@ -943,6 +981,15 @@ static uint8_t check_for_power_off_event(void)
 {
 	timestamp_t now;
 	int pressed = 0;
+
+#ifdef CONFIG_POWER_BUTTON
+	/*
+	 * If the power button is not pressed at this point, we can
+	 * stop trying to ignore the next release event.
+	 */
+	if (!power_button_is_pressed())
+		power_button_eat_release = 0;
+#endif
 
 	if (power_request == POWER_REQ_OFF) {
 		power_request = POWER_REQ_NONE;
@@ -1202,13 +1249,6 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 	 * is performed during the G3 to S5 transition.
 	 */
 	case POWER_G3S5:
-		/*
-		 * The boot process is delayed until the power button is
-		 * released. This prevents the application processor from
-		 * powering on during a long-hold of the power and volume
-		 * buttons, which is often used to trigger recovery mode.
-		 */
-		power_button_wait_for_release(-1);
 
 		/* Initialize components to ready state before AP is up. */
 		hook_notify(HOOK_CHIPSET_PRE_INIT);
@@ -1228,6 +1268,12 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		 * path to S0 to handle any reset conditions.
 		 */
 		power_reset_host_sleep_state();
+
+		if (chipset_is_offmode_charging_wake()) {
+			power_set_s5_inactivity_timer_enable(0);
+		} else {
+			power_set_s5_inactivity_timer_enable(1);
+		}
 		return POWER_S5;
 
 	case POWER_S5:
@@ -1237,6 +1283,15 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		if (shutdown_from_on) {
 			CPRINTS("power off %d", shutdown_from_on);
 			return POWER_S5G3;
+		}
+
+		/*
+		 * Gate the transition to S3/S0 if we are in off-mode charging,
+		 * maintaining the logical S5 state to avoid running normal S0
+		 * indicators.
+		 */
+		if (chipset_is_offmode_charging_wake()) {
+			break;
 		}
 
 		return POWER_S5S3;
@@ -1336,6 +1391,7 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		return POWER_S5;
 
 	case POWER_S5G3:
+		power_set_s5_inactivity_timer_enable(1);
 		cancel_power_button_timer();
 
 		/* Call hooks before we drop power rails */

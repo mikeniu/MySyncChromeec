@@ -167,7 +167,7 @@ fp_cmd_generate_challenge(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_FP_GENERATE_CHALLENGE, fp_cmd_generate_challenge,
 		     EC_VER_MASK(0));
 
-enum ec_error_list
+test_mockable enum ec_error_list
 validate_request(std::span<const uint8_t> context,
 		 std::span<const uint8_t> operation,
 		 std::span<const uint8_t, SHA256_DIGEST_LENGTH> mac)
