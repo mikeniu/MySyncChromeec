@@ -16,6 +16,24 @@
       "message": "this and the one below can probably be dropped, save some flash, the log line at 97 covers both right?",
       "revId": "d67dedbd6f36de23b5bc3d605b684cd0dcf07144",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48eba6ec_396d1c02",
+        "filename": "zephyr/shim/src/buttons/buttons.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-14T17:05:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "499a3dbd_a1b99067",
+      "revId": "d67dedbd6f36de23b5bc3d605b684cd0dcf07144",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
