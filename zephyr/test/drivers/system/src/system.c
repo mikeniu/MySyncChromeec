@@ -17,6 +17,8 @@
 #include <zephyr/shell/shell_dummy.h>
 #include <zephyr/ztest.h>
 
+int panic_data_init(void);
+
 FAKE_VALUE_FUNC(int, system_run_image_copy_with_flags, enum ec_image, int);
 FAKE_VOID_FUNC(system_disable_jump);
 FAKE_VOID_FUNC(jump_to_image, uintptr_t);
@@ -105,7 +107,7 @@ ZTEST(system, test_system_common_pre_init__watch_dog_panic)
 
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
-	system_common_pre_init();
+	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 
 	if (IS_ENABLED(SECTION_IS_RW)) {
@@ -132,7 +134,7 @@ ZTEST(system, test_system_common_pre_init__watch_dog_warn_panic)
 
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
-	system_common_pre_init();
+	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 
 	if (IS_ENABLED(SECTION_IS_RW)) {
@@ -158,7 +160,7 @@ ZTEST(system, test_system_common_pre_init__watch_dog_panic_already_initialized)
 
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
-	system_common_pre_init();
+	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 	zassert_equal(reason, PANIC_SW_WATCHDOG);
 	zassert_equal(info, 0x12);
@@ -179,7 +181,7 @@ ZTEST(system,
 
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
-	system_common_pre_init();
+	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 	zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
 	zassert_equal(info, 0x12);
@@ -202,7 +204,7 @@ ZTEST(system, test_system_common_pre_init__watch_dog_panic_already_read)
 
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
-	system_common_pre_init();
+	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 
 	if (IS_ENABLED(SECTION_IS_RW)) {
