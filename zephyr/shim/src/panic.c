@@ -7,11 +7,13 @@
 #include "common.h"
 #include "panic.h"
 #include "panic_utils.h"
+#include "system.h"
 #include "task.h"
 
 #include <zephyr/arch/cpu.h>
 #include <zephyr/cache.h>
 #include <zephyr/fatal.h>
+#include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
@@ -283,3 +285,55 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 		*exception = *reason = *info = 0;
 	}
 }
+
+test_export_static int panic_data_init(void)
+{
+	/*
+	 * Only update the panic reason in RW since RO may have an older panic
+	 * data version and updating the panic reason will cause new fields to
+	 * be overwritten.
+	 */
+	if (!IS_ENABLED(SECTION_IS_RW)) {
+		return 0;
+	}
+
+	/*
+	 * Log panic cause if watchdog caused reset and panic cause
+	 * was not already logged. This must happen after parsing jump_data
+	 * to ensure we have restored the reset flags passed from the previous
+	 * image.
+	 */
+	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
+		uint32_t reason;
+		uint32_t info;
+		uint8_t exception;
+		struct panic_data *pdata;
+
+		panic_get_reason(&reason, &info, &exception);
+		pdata = panic_get_data();
+
+		/* If the panic reason is a watchdog warning, then change
+		 * the reason to a regular watchdog reason while preserving
+		 * the info and exception from the watchdog warning.
+		 */
+		if (reason == PANIC_SW_WATCHDOG_WARN) {
+			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
+		} else if ((reason != PANIC_SW_WATCHDOG &&
+			    reason != PANIC_SW_WATCHDOG_HARD) ||
+			   !pdata ||
+			   pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD) {
+			/* The watchdog panic info may have already been
+			 * initialized by the watchdog handler, so only set it
+			 * here if the panic reason is not a watchdog or the
+			 * panic info has already been read, i.e. an old
+			 * watchdog panic.
+			 */
+			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
+		}
+	}
+
+	return 0;
+}
+
+/* Initialize panic data after reset flags and console are ready. */
+SYS_INIT(panic_data_init, PRE_KERNEL_2, 0);
