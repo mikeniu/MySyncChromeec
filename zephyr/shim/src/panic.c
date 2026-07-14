@@ -347,22 +347,31 @@ test_export_static int panic_data_init(void)
 	if (is_watchdog_reset) {
 		/* If the panic reason is a watchdog warning, then change
 		 * the reason to a regular watchdog reason while preserving
-		 * the info and exception from the watchdog warning.
+		 * the reset of the panic_data.
 		 */
 		if (reason == PANIC_SW_WATCHDOG_WARN) {
 			LOG_INF("Promoting watchdog warning to watchdog panic");
-			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
+			PANIC_REG_REASON(pdata) = PANIC_SW_WATCHDOG;
+			sys_cache_data_flush_range(pdata, sizeof(*pdata));
 		}
-		/* The watchdog panic info may have already been initialized by
-		 * the watchdog handler, so only set it here if the panic reason
-		 * is not a watchdog or the panic info has already been read,
-		 * i.e. an old watchdog panic.
+		/* If the panic reason is not watchdog or the panic data is old,
+		 * clear the panic data and set the reason to hard watchdog
+		 * panic. Both RO and RW flag are unset because source image is
+		 * not known.
 		 */
 		else if ((reason != PANIC_SW_WATCHDOG &&
 			  reason != PANIC_SW_WATCHDOG_HARD) ||
 			 !is_panic_new) {
 			LOG_INF("Setting hard watchdog panic");
-			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
+			pdata = get_panic_data_write();
+			memset(pdata, 0, CONFIG_PANIC_DATA_SIZE);
+			pdata->magic = PANIC_DATA_MAGIC;
+			pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
+			pdata->struct_version = 2;
+			pdata->arch = PANIC_ARCH;
+			pdata->flags = 0;
+			PANIC_REG_REASON(pdata) = PANIC_SW_WATCHDOG_HARD;
+			sys_cache_data_flush_range(pdata, sizeof(*pdata));
 		}
 	}
 
