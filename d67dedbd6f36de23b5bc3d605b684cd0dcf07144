@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "499a3dbd_a1b99067",
+        "filename": "zephyr/shim/src/buttons/buttons.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-14T16:35:29Z",
+      "side": 1,
+      "message": "this and the one below can probably be dropped, save some flash, the log line at 97 covers both right?",
+      "revId": "d67dedbd6f36de23b5bc3d605b684cd0dcf07144",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
