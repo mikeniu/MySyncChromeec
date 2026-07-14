@@ -22,9 +22,52 @@
 #include <zephyr/drivers/emul.h>
 #include <zephyr/fff.h>
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log_backend.h>
+#include <zephyr/logging/log_msg.h>
 #include <zephyr/ztest.h>
 
 LOG_MODULE_REGISTER(test_rts54xx, LOG_LEVEL_INF);
+
+static int log_err_count;
+
+static void test_log_process(const struct log_backend *const backend,
+			     union log_msg_generic *msg)
+{
+	if (log_msg_get_level(&msg->log) == LOG_LEVEL_ERR) {
+		log_err_count++;
+	}
+}
+
+static void test_log_panic(const struct log_backend *const backend)
+{
+}
+
+static void test_log_dropped(const struct log_backend *const backend,
+			     uint32_t cnt)
+{
+}
+
+static int test_log_format_set(const struct log_backend *const backend,
+			       uint32_t log_type)
+{
+	return 0;
+}
+
+static void test_log_notify(const struct log_backend *const backend,
+			    enum log_backend_evt event,
+			    union log_backend_evt_arg *arg)
+{
+}
+
+static const struct log_backend_api test_log_backend_api = {
+	.process = test_log_process,
+	.panic = test_log_panic,
+	.dropped = test_log_dropped,
+	.format_set = test_log_format_set,
+	.notify = test_log_notify,
+};
+
+LOG_BACKEND_DEFINE(test_log_backend, test_log_backend_api, true);
 
 #define RTS5453P_NODE DT_NODELABEL(pdc_emul1)
 #define RTS5453P_NODE2 DT_NODELABEL(pdc_emul2)
@@ -483,6 +526,41 @@ ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
 	zassert_ok(emul_pdc_idle_wait(emul2));
 	zassert_equal(idh, expected_idh,
 		      "Port 1 IDH should be unchanged (skipped) (0x%08x)", idh);
+
+	/* Verify port 1 DFP VDO has usb4_cap disabled (0) */
+	uint8_t dfp_vdo_type[] = { VDO_INDEX_PTYPE_DFP_VDO };
+	uint32_t dfp_raw = 0;
+	zassert_ok(pdc_get_vdo(dev2, vdo_req, dfp_vdo_type, &dfp_raw));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+	union dfp_vdo_rev3 dfp_dev2;
+	dfp_dev2.raw_value = dfp_raw;
+	zassert_equal(
+		dfp_dev2.usb4_cap, 0,
+		"Port 1 DFP VDO USB4 cap should be 0 when usb4-capable-as-host is not set");
+}
+
+ZTEST_USER(rts54xx, test_vdo_ack_disabled_usb4_tbt)
+{
+	uint32_t dfp_vdo_raw = 0;
+	union get_vdo_t vdo_req = { .num_vdos = 1, .vdo_origin = 0 };
+	uint8_t dfp_vdo_type[] = { VDO_INDEX_PTYPE_DFP_VDO };
+
+	/* 1. Reset dev2 (where USB4/TBT properties are not set) */
+	zassert_ok(pdc_reset(dev2));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+
+	/* 2. Retrieve DFP VDO */
+	zassert_ok(pdc_get_vdo(dev2, vdo_req, dfp_vdo_type, &dfp_vdo_raw));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+
+	union dfp_vdo_rev3 dfp = { .raw_value = dfp_vdo_raw };
+	zassert_equal(dfp.version, DFP_VDO_VERSION_1_2,
+		      "DFP VDO version should be 1.2");
+	zassert_equal(
+		dfp.usb4_cap, 0,
+		"DFP VDO USB4 cap should be 0 when usb4-capable-as-host is not set");
+	zassert_equal(dfp.usb3_cap, 1, "DFP VDO USB3 cap should be 1");
+	zassert_equal(dfp.usb2_cap, 1, "DFP VDO USB2 cap should be 1");
 }
 
 ZTEST_USER(rts54xx, test_alert_received)
@@ -598,6 +676,7 @@ ZTEST_USER(rts54xx, test_dfp_and_ufp_vdo_ack_programming)
 	dfp.raw_value = dfp_vdo_raw;
 	zassert_equal(dfp.version, DFP_VDO_VERSION_1_2,
 		      "DFP VDO version should be 1.2 (got %d)", dfp.version);
+	zassert_equal(dfp.usb4_cap, 1, "DFP VDO USB4 cap should be 1");
 	zassert_equal(dfp.usb3_cap, 1, "DFP VDO USB3 cap should be 1");
 	zassert_equal(dfp.usb2_cap, 1, "DFP VDO USB2 cap should be 1");
 
@@ -610,9 +689,106 @@ ZTEST_USER(rts54xx, test_dfp_and_ufp_vdo_ack_programming)
 	ufp.raw_value = ufp_vdo_raw;
 	zassert_equal(ufp.version, UFP_VDO_VERSION_1_3,
 		      "UFP VDO version should be 1.3 (got %d)", ufp.version);
+	zassert_equal(ufp.usb4_cap, 0, "UFP VDO USB4 cap should be 0");
 	zassert_equal(ufp.usb3_cap, 1, "UFP VDO USB3 cap should be 1");
 	zassert_equal(ufp.usb2_cap, UFP_USB2_CAPABLE,
 		      "UFP VDO USB2 cap should be UFP_USB2_CAPABLE");
+	zassert_equal(ufp.tbt_support, 0, "UFP VDO TBT support should be 0");
 	zassert_equal(ufp.speed, USB_R30_SS_U32_U40_GEN1,
 		      "UFP VDO speed should be USB_R30_SS_U32_U40_GEN1");
+
+	/* 4. Verify dev2 without USB4 capability */
+	zassert_ok(pdc_reset(dev2));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+
+	dfp_vdo_raw = 0;
+	zassert_ok(pdc_get_vdo(dev2, vdo_req, dfp_vdo_type, &dfp_vdo_raw));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+
+	dfp.raw_value = dfp_vdo_raw;
+	zassert_equal(dfp.usb4_cap, 0, "DFP VDO USB4 cap for dev2 should be 0");
+}
+
+ZTEST_USER(rts54xx, test_get_connector_capability_usb4_config_mismatch)
+{
+	union connector_capability_t caps = { 0 };
+	union connector_capability_t emul_caps = { 0 };
+
+	/* Case 1: PDC has USB4 support enabled in emulator
+	 * (ext_op_mode_usb4_gen2 = 1), but host driver DT config does NOT
+	 * support USB4 (dev2: usb4_support_as_host = false). Expect LOG_ERR
+	 * ("RTK1: Configuration mismatch. PDC USB4 Support: Enabled, Host
+	 * Driver USB4 Support: Disabled").
+	 */
+	emul_caps.op_mode_usb3 = 1;
+	emul_caps.ext_op_mode_usb4_gen2 = 1;
+	zassert_ok(emul_pdc_set_connector_capability(emul2, &emul_caps));
+
+	log_err_count = 0;
+	zassert_ok(pdc_get_connector_capability(dev2, &caps));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+	zassert_true(caps.ext_op_mode_usb4_gen2);
+	zassert_true(
+		log_err_count > 0,
+		"Expected LOG_ERR on USB4 mismatch (PDC enabled, host disabled)");
+
+	/* Case 2: PDC has USB4 support disabled in emulator
+	 * (ext_op_mode_usb4_gen* = 0), but host driver DT config DOES support
+	 * USB4 (dev: usb4_support_as_host = true). Expect LOG_ERR ("RTK0:
+	 * Configuration mismatch. PDC USB4 Support: Disabled, Host Driver USB4
+	 * Support: Enabled").
+	 */
+	memset(&emul_caps, 0, sizeof(emul_caps));
+	emul_caps.op_mode_usb3 = 1;
+	zassert_ok(emul_pdc_set_connector_capability(emul, &emul_caps));
+
+	log_err_count = 0;
+	zassert_ok(pdc_get_connector_capability(dev, &caps));
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_false(caps.ext_op_mode_usb4_gen2);
+	zassert_false(caps.ext_op_mode_usb4_gen3);
+	zassert_false(caps.ext_op_mode_usb4_gen4);
+	zassert_true(
+		log_err_count > 0,
+		"Expected LOG_ERR on USB4 mismatch (PDC disabled, host enabled)");
+}
+
+ZTEST_USER(rts54xx, test_get_connector_capability_usb4_config_match)
+{
+	union connector_capability_t caps = { 0 };
+	union connector_capability_t emul_caps = { 0 };
+
+	/* Case 1: Both PDC in emulator and host driver DT config have USB4
+	 * enabled (dev: usb4_support_as_host = true, emul:
+	 * ext_op_mode_usb4_gen3 = 1). Expect NO LOG_ERR.
+	 */
+	emul_caps.op_mode_usb3 = 1;
+	emul_caps.ext_op_mode_usb4_gen3 = 1;
+	zassert_ok(emul_pdc_set_connector_capability(emul, &emul_caps));
+
+	log_err_count = 0;
+	zassert_ok(pdc_get_connector_capability(dev, &caps));
+	zassert_ok(emul_pdc_idle_wait(emul));
+	zassert_true(caps.ext_op_mode_usb4_gen3);
+	zassert_equal(
+		log_err_count, 0,
+		"Expected NO LOG_ERR on matching USB4 config (both enabled)");
+
+	/* Case 2: Both PDC in emulator and host driver DT config have USB4
+	 * disabled (dev2: usb4_support_as_host = false, emul2:
+	 * ext_op_mode_usb4_gen* = 0). Expect NO LOG_ERR.
+	 */
+	memset(&emul_caps, 0, sizeof(emul_caps));
+	emul_caps.op_mode_usb3 = 1;
+	zassert_ok(emul_pdc_set_connector_capability(emul2, &emul_caps));
+
+	log_err_count = 0;
+	zassert_ok(pdc_get_connector_capability(dev2, &caps));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+	zassert_false(caps.ext_op_mode_usb4_gen2);
+	zassert_false(caps.ext_op_mode_usb4_gen3);
+	zassert_false(caps.ext_op_mode_usb4_gen4);
+	zassert_equal(
+		log_err_count, 0,
+		"Expected NO LOG_ERR on matching USB4 config (both disabled)");
 }
