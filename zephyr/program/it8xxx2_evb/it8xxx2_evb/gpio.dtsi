@@ -34,7 +34,7 @@
 			enum-name = "GPIO_SYS_RESET_L";
 		};
 		gpio_ec_pch_wake_odl: pch_wake_l {
-			gpios = <&gpiob 7 GPIO_OUTPUT_HIGH>;
+			#gpios = <&gpiob 7 GPIO_OUTPUT_HIGH>;
 		};
 		spi0_cs: spi0_cs {
 			gpios = <&gpiom 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
@@ -153,16 +153,12 @@
 			/* gpioj7 */
 			<&gpioj 7 GPIO_OUTPUT_LOW>,
 
-			/* gpiom0 */
-			<&gpiom 0 GPIO_INPUT_PULL_DOWN>,
-			/* gpiom1 */
-			<&gpiom 1 GPIO_INPUT_PULL_DOWN>,
+
 			/* gpiom2 */
 			<&gpiom 2 GPIO_INPUT_PULL_DOWN>,
 			/* gpiom3 */
 			<&gpiom 3 GPIO_INPUT_PULL_DOWN>,
-			/* gpiom4 */
-			<&gpiom 4 GPIO_INPUT_PULL_DOWN>,
+
 			/* gpiom6 */
 			<&gpiom 6 GPIO_INPUT_PULL_DOWN>;
 	};
