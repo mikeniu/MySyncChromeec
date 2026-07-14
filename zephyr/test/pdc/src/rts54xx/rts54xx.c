@@ -483,6 +483,41 @@ ZTEST_USER(rts54xx, test_usb_comm_capable_as_device)
 	zassert_ok(emul_pdc_idle_wait(emul2));
 	zassert_equal(idh, expected_idh,
 		      "Port 1 IDH should be unchanged (skipped) (0x%08x)", idh);
+
+	/* Verify port 1 DFP VDO has usb4_cap disabled (0) */
+	uint8_t dfp_vdo_type[] = { VDO_INDEX_PTYPE_DFP_VDO };
+	uint32_t dfp_raw = 0;
+	zassert_ok(pdc_get_vdo(dev2, vdo_req, dfp_vdo_type, &dfp_raw));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+	union dfp_vdo_rev3 dfp_dev2;
+	dfp_dev2.raw = dfp_raw;
+	zassert_equal(
+		dfp_dev2.usb4_cap, 0,
+		"Port 1 DFP VDO USB4 cap should be 0 when usb4-capable-as-host is not set");
+}
+
+ZTEST_USER(rts54xx, test_vdo_ack_disabled_usb4_tbt)
+{
+	uint32_t dfp_vdo_raw = 0;
+	union get_vdo_t vdo_req = { .num_vdos = 1, .vdo_origin = 0 };
+	uint8_t dfp_vdo_type[] = { VDO_INDEX_PTYPE_DFP_VDO };
+
+	/* 1. Reset dev2 (where USB4/TBT properties are not set) */
+	zassert_ok(pdc_reset(dev2));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+
+	/* 2. Retrieve DFP VDO */
+	zassert_ok(pdc_get_vdo(dev2, vdo_req, dfp_vdo_type, &dfp_vdo_raw));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+
+	union dfp_vdo_rev3 dfp = { .raw = dfp_vdo_raw };
+	zassert_equal(dfp.version, DFP_VDO_VERSION_1_2,
+		      "DFP VDO version should be 1.2");
+	zassert_equal(
+		dfp.usb4_cap, 0,
+		"DFP VDO USB4 cap should be 0 when usb4-capable-as-host is not set");
+	zassert_equal(dfp.usb3_cap, 1, "DFP VDO USB3 cap should be 1");
+	zassert_equal(dfp.usb2_cap, 1, "DFP VDO USB2 cap should be 1");
 }
 
 ZTEST_USER(rts54xx, test_alert_received)
@@ -598,6 +633,7 @@ ZTEST_USER(rts54xx, test_dfp_and_ufp_vdo_ack_programming)
 	dfp.raw_value = dfp_vdo_raw;
 	zassert_equal(dfp.version, DFP_VDO_VERSION_1_2,
 		      "DFP VDO version should be 1.2 (got %d)", dfp.version);
+	zassert_equal(dfp.usb4_cap, 1, "DFP VDO USB4 cap should be 1");
 	zassert_equal(dfp.usb3_cap, 1, "DFP VDO USB3 cap should be 1");
 	zassert_equal(dfp.usb2_cap, 1, "DFP VDO USB2 cap should be 1");
 
@@ -610,9 +646,22 @@ ZTEST_USER(rts54xx, test_dfp_and_ufp_vdo_ack_programming)
 	ufp.raw_value = ufp_vdo_raw;
 	zassert_equal(ufp.version, UFP_VDO_VERSION_1_3,
 		      "UFP VDO version should be 1.3 (got %d)", ufp.version);
+	zassert_equal(ufp.usb4_cap, 0, "UFP VDO USB4 cap should be 0");
 	zassert_equal(ufp.usb3_cap, 1, "UFP VDO USB3 cap should be 1");
 	zassert_equal(ufp.usb2_cap, UFP_USB2_CAPABLE,
 		      "UFP VDO USB2 cap should be UFP_USB2_CAPABLE");
+	zassert_equal(ufp.tbt_support, 0, "UFP VDO TBT support should be 0");
 	zassert_equal(ufp.speed, USB_R30_SS_U32_U40_GEN1,
 		      "UFP VDO speed should be USB_R30_SS_U32_U40_GEN1");
+
+	/* 4. Verify dev2 without USB4 capability */
+	zassert_ok(pdc_reset(dev2));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+
+	dfp_vdo_raw = 0;
+	zassert_ok(pdc_get_vdo(dev2, vdo_req, dfp_vdo_type, &dfp_vdo_raw));
+	zassert_ok(emul_pdc_idle_wait(emul2));
+
+	dfp.raw = dfp_vdo_raw;
+	zassert_equal(dfp.usb4_cap, 0, "DFP VDO USB4 cap for dev2 should be 0");
 }

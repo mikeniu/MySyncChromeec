@@ -367,6 +367,8 @@ struct pdc_config_t {
 	/** Whether or not this port is capable of USB communication as a device
 	 */
 	bool usb_comm_capable_as_device;
+	/** Whether or not this port supports USB4 as a host */
+	bool usb4_support_as_host;
 	/** Pointer to the device-specific callback function */
 	gpio_callback_handler_t callback_handler;
 };
@@ -1767,9 +1769,9 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 
 	/* DFP VDO */
 	dfp_vdo.version = DFP_VDO_VERSION_1_2;
-	dfp_vdo.usb4_cap = 0;
-	dfp_vdo.usb3_cap = 1;
-	dfp_vdo.usb2_cap = 1;
+	dfp_vdo.usb4_cap = cfg->usb4_support_as_host;
+	dfp_vdo.usb3_cap = true;
+	dfp_vdo.usb2_cap = true;
 	dfp_vdo.port_num = cfg->connector_number;
 
 	if (cfg->usb_comm_capable_as_device) {
@@ -1778,15 +1780,31 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 		idh_vdo.product_type_ufp = IDH_PTYPE_UFP_PERIPH;
 		/* UFP VDO */
 		ufp_vdo.version = UFP_VDO_VERSION_1_3;
-		ufp_vdo.usb4_cap = 0;
-		ufp_vdo.usb3_cap = 1;
+		ufp_vdo.usb4_cap = false;
+		ufp_vdo.usb3_cap = true;
 		ufp_vdo.usb2_cap = UFP_USB2_CAPABLE;
+<<<<<<< PATCH SET (1d9a85eed45b2489ecceaf249424d86b6939cba1 rtk: dt: Add support for configuring USB4 in DT)
+		ufp_vdo.vconn = false;
+		ufp_vdo.vbus = NOT_REQUIRED;
+		ufp_vdo.no_signal_reconfig = false;
+		ufp_vdo.non_tbt3_signal_reconfig = false;
+		ufp_vdo.tbt_support = false;
+		ufp_vdo.speed = GEN1;
+||||||| BASE      (972a006a04f454aa165bda8c1c263bd219cb3bf0 rtk: Add DFP definition and refactor UFP VDOs for USB PD 3.x)
+		ufp_vdo.vconn = 0;
+		ufp_vdo.vbus = NOT_REQUIRED;
+		ufp_vdo.no_signal_reconfig = 0;
+		ufp_vdo.non_tbt3_signal_reconfig = 0;
+		ufp_vdo.tbt_support = 0;
+		ufp_vdo.speed = GEN1;
+=======
 		ufp_vdo.vconn = 0;
 		ufp_vdo.vbus = UFP_VDO_VBUS_NOT_REQUIRED;
 		ufp_vdo.no_signal_reconfig = 0;
 		ufp_vdo.non_tbt3_signal_reconfig = 0;
 		ufp_vdo.tbt_support = 0;
 		ufp_vdo.speed = USB_R30_SS_U32_U40_GEN1;
+>>>>>>> BASE      (44dee6ada1d90a37e27185316737b574a1bc360e rtk: Add DFP definition and refactor UFP VDOs for USB PD 3.x)
 	}
 
 	uint32_t vdos[] = { idh_vdo.raw_value, dfp_vdo.raw_value,
@@ -3353,6 +3371,8 @@ BUILD_ASSERT(
 		.frs_supported = DT_INST_PROP(inst, frs_supported),           \
 		.usb_comm_capable_as_device =                                 \
 			DT_INST_PROP(inst, usb_comm_capable_as_device),       \
+		.usb4_support_as_host =                                       \
+			DT_INST_PROP(inst, usb4_capable_as_host),             \
 		.callback_handler = pdc_interrupt_callback##inst,             \
 	};                                                                    \
                                                                               \
