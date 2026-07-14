@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b3e825c0_96d03d52",
+        "filename": "zephyr/program/atria/penghu/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-07-14T01:24:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc9433b2_818c3321",
+      "revId": "a71659093d4c154a352c51beee87c6fb59833a57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "fab13657_b0873f58",
         "filename": "zephyr/program/atria/penghu/usb_typec.dtsi",
         "patchSetId": 3
