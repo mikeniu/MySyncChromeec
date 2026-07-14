@@ -1,0 +1,1377 @@
+diff --git a/zephyr/program/herobrine/BUILD.py b/zephyr/program/herobrine/BUILD.py
+index 302262fc21b5..ab3687163493 100644
+--- a/zephyr/program/herobrine/BUILD.py
++++ b/zephyr/program/herobrine/BUILD.py
+@@ -11,7 +11,7 @@ def register_variant(
+     """Register a variant of herobrine."""
+     register_npcx_project(
+         project_name=project_name,
+-        zephyr_board="npcx9m3f",
++        zephyr_board="npcx9/npcx9m3f",
+         dts_overlays=[
+             here / project_name / "project.overlay",
+         ],
+@@ -48,3 +48,10 @@ register_variant(
+ register_variant(
+     project_name="zombie",
+ )
++
++assert_rw_fwid_DO_NOT_EDIT(project_name="evoker", addr=0x7FFE0)
++assert_rw_fwid_DO_NOT_EDIT(project_name="herobrine", addr=0x7FFE0)
++assert_rw_fwid_DO_NOT_EDIT(project_name="hoglin", addr=0x7FFE0)
++assert_rw_fwid_DO_NOT_EDIT(project_name="villager", addr=0x7FFE0)
++assert_rw_fwid_DO_NOT_EDIT(project_name="zoglin", addr=0x7FFE0)
++assert_rw_fwid_DO_NOT_EDIT(project_name="zombie", addr=0x7FFE0)
+diff --git a/zephyr/program/herobrine/common.dtsi b/zephyr/program/herobrine/common.dtsi
+index 0fbde24a545a..2b5bbaee218d 100644
+--- a/zephyr/program/herobrine/common.dtsi
++++ b/zephyr/program/herobrine/common.dtsi
+@@ -7,7 +7,7 @@
+ 
+ / {
+ 	chosen {
+-		cros,rtc = &pcf85063a;
++		cros,rtc = &mtc;
+ 	};
+ 
+ 	ec-console {
+diff --git a/zephyr/program/herobrine/evoker/led_pins.dtsi b/zephyr/program/herobrine/evoker/led_pins.dtsi
+index 2c79b7c1a509..a4b827e9d0ee 100644
+--- a/zephyr/program/herobrine/evoker/led_pins.dtsi
++++ b/zephyr/program/herobrine/evoker/led_pins.dtsi
+@@ -4,7 +4,7 @@
+  */
+ 
+ / {
+-	gpio-led-pins {
++	led_pins: gpio-led-pins {
+ 		compatible = "cros-ec,gpio-led-pins";
+ 
+ 		power_led: power-led {
+diff --git a/zephyr/program/herobrine/evoker/led_policy.dtsi b/zephyr/program/herobrine/evoker/led_policy.dtsi
+index ecd4affaaf4a..c4af02ca0d5f 100644
+--- a/zephyr/program/herobrine/evoker/led_policy.dtsi
++++ b/zephyr/program/herobrine/evoker/led_policy.dtsi
+@@ -3,36 +3,49 @@
+ / {
+ 	led-colors {
+ 		compatible = "cros-ec,led-policy";
++		led-pins = <&led_pins>;
+ 
+ 		battery-state-charge {
+ 			charge-state = "LED_PWRS_CHARGE";
+ 
+-			color-0 {
+-				led-color = <&color_battery_amber>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_battery_amber>;
++				};
+ 			};
+ 		};
+ 
+ 		battery-state-near-full {
+ 			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
+ 
+-			color-0 {
+-				led-color = <&color_battery_white>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_battery_white>;
++				};
+ 			};
+ 		};
+ 
+ 		battery-state-discharge {
+ 			charge-state = "LED_PWRS_DISCHARGE";
+ 
+-			color-0 {
+-				led-color = <&color_battery_off>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_battery_off>;
++				};
+ 			};
+ 		};
+ 
+ 		battery-state-error {
+ 			charge-state = "LED_PWRS_ERROR";
+ 
+-			color-0 {
+-				led-color = <&color_battery_red>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_battery_red>;
++				};
+ 			};
+ 		};
+ 
+@@ -40,46 +53,69 @@
+ 		battery-state-forced-idle {
+ 			charge-state = "LED_PWRS_FORCED_IDLE";
+ 
+-			/* Red 1 sec, White 1 sec */
+-			color-0 {
+-				led-color = <&color_battery_red>;
+-				period-ms = <1000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				/* Red 1 sec, White 1 sec */
++				color-0 {
++					led-color = <&color_battery_red>;
++					period-ms = <1000>;
++				};
++
++				color-1 {
++					led-color = <&color_battery_white>;
++					period-ms = <1000>;
++				};
+ 			};
++		};
++
++		battery-state-idle {
++			charge-state = "LED_PWRS_IDLE";
+ 
+-			color-1 {
+-				led-color = <&color_battery_white>;
+-				period-ms = <1000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_battery_white>;
++				};
+ 			};
+ 		};
+ 
+ 		pwr-power-state-s0 {
+ 			chipset-state = "POWER_S0";
+ 
+-			color-0 {
+-				led-color = <&color_power_white>;
++			power-led {
++				led-id = "EC_LED_ID_POWER_LED";
++				color-0 {
++					led-color = <&color_power_white>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-s3 {
+ 			chipset-state = "POWER_S3";
+ 
+-			/* white LED - on 1 sec, off 1 sec */
+-			color-0 {
+-				led-color = <&color_power_white>;
+-				period-ms = <1000>;
+-			};
+-
+-			color-1 {
+-				led-color = <&color_power_off>;
+-				period-ms = <1000>;
++			power-led {
++				led-id = "EC_LED_ID_POWER_LED";
++				/* white LED - on 1 sec, off 1 sec */
++				color-0 {
++					led-color = <&color_power_white>;
++					period-ms = <1000>;
++				};
++
++				color-1 {
++					led-color = <&color_power_off>;
++					period-ms = <1000>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-s5 {
+ 			chipset-state = "POWER_S5";
+ 
+-			color-0 {
+-				led-color = <&color_power_off>;
++			power-led {
++				led-id = "EC_LED_ID_POWER_LED";
++				color-0 {
++					led-color = <&color_power_off>;
++				};
+ 			};
+ 		};
+ 	};
+diff --git a/zephyr/program/herobrine/evoker/project.conf b/zephyr/program/herobrine/evoker/project.conf
+index 0e70563c73f1..5e9482b429bc 100644
+--- a/zephyr/program/herobrine/evoker/project.conf
++++ b/zephyr/program/herobrine/evoker/project.conf
+@@ -6,7 +6,7 @@
+ CONFIG_BOARD_EVOKER=y
+ 
+ # Disable type-c port sourcing 3A
+-CONFIG_PLATFORM_EC_CONFIG_USB_PD_3A_PORTS=0
++CONFIG_PLATFORM_EC_USB_PD_3A_PORTS=0
+ 
+ CONFIG_PLATFORM_EC_ACCEL_BMA255=n
+ CONFIG_PLATFORM_EC_ACCEL_BMA4XX=y
+diff --git a/zephyr/program/herobrine/herobrine/led_pins.dtsi b/zephyr/program/herobrine/herobrine/led_pins.dtsi
+index bb66913dd0a4..e9a2bebb4155 100644
+--- a/zephyr/program/herobrine/herobrine/led_pins.dtsi
++++ b/zephyr/program/herobrine/herobrine/led_pins.dtsi
+@@ -4,7 +4,7 @@
+  */
+ 
+ / {
+-	gpio-led-pins {
++	led_pins: gpio-led-pins {
+ 		compatible = "cros-ec,gpio-led-pins";
+ 
+ 		left_led: left-led {
+diff --git a/zephyr/program/herobrine/herobrine/led_policy.dtsi b/zephyr/program/herobrine/herobrine/led_policy.dtsi
+index 01a6cbb9604e..d24efb2df88b 100644
+--- a/zephyr/program/herobrine/herobrine/led_policy.dtsi
++++ b/zephyr/program/herobrine/herobrine/led_policy.dtsi
+@@ -3,18 +3,25 @@
+ / {
+ 	led-colors {
+ 		compatible = "cros-ec,led-policy";
++		led-pins = <&led_pins>;
+ 
+ 		power-state-charge-left {
+ 			charge-state = "LED_PWRS_CHARGE";
+ 			charge-port = <1>; /* Left port */
+ 
+-			/* Turn off the right LED */
+-			color-0 {
+-				led-color = <&color_off_right>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Turn off the right LED */
++				color-0 {
++					led-color = <&color_off_right>;
++				};
+ 			};
+-			/* Left LED to Amber */
+-			color-1 {
+-				led-color = <&color_amber_left>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Left LED to Amber */
++				color-0 {
++					led-color = <&color_amber_left>;
++				};
+ 			};
+ 		};
+ 
+@@ -22,13 +29,19 @@
+ 			charge-state = "LED_PWRS_CHARGE";
+ 			charge-port = <0>; /* Right port */
+ 
+-			/* Turn off the left LED */
+-			color-0 {
+-				led-color = <&color_off_left>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Turn off the left LED */
++				color-0 {
++					led-color = <&color_off_left>;
++				};
+ 			};
+-			/* Right LED to Amber */
+-			color-1 {
+-				led-color = <&color_amber_right>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Right LED to Amber */
++				color-0 {
++					led-color = <&color_amber_right>;
++				};
+ 			};
+ 		};
+ 
+@@ -37,18 +50,24 @@
+ 			/* Battery percent range (>= Empty, <= Low) */
+ 			batt-lvl = <BATTERY_LEVEL_EMPTY BATTERY_LEVEL_LOW>;
+ 
+-			/* Turn off the left LED */
+-			color-0 {
+-				led-color = <&color_off_left>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Turn off the left LED */
++				color-0 {
++					led-color = <&color_off_left>;
++				};
+ 			};
+-			/* Right LED - White 1 sec, off 3 sec */
+-			color-1 {
+-				led-color = <&color_white_right>;
+-				period-ms = <1000>;
+-			};
+-			color-2 {
+-				led-color = <&color_off_right>;
+-				period-ms = <3000>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Right LED - White 1 sec, off 3 sec */
++				color-0 {
++					led-color = <&color_white_right>;
++					period-ms = <1000>;
++				};
++				color-1 {
++					led-color = <&color_off_right>;
++					period-ms = <3000>;
++				};
+ 			};
+ 		};
+ 
+@@ -57,13 +76,19 @@
+ 			/* Battery percent range (> Low, <= Full) */
+ 			batt-lvl = <(BATTERY_LEVEL_LOW + 1) BATTERY_LEVEL_FULL>;
+ 
+-			/* Turn off the left LED */
+-			color-0 {
+-				led-color = <&color_off_left>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Turn off the left LED */
++				color-0 {
++					led-color = <&color_off_left>;
++				};
+ 			};
+-			/* Turn off the right LED */
+-			color-1 {
+-				led-color = <&color_off_right>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Turn off the right LED */
++				color-0 {
++					led-color = <&color_off_right>;
++				};
+ 			};
+ 		};
+ 
+@@ -71,18 +96,24 @@
+ 			charge-state = "LED_PWRS_ERROR";
+ 			charge-port = <1>; /* Left port */
+ 
+-			/* Turn off the right LED */
+-			color-0 {
+-				led-color = <&color_off_right>;
+-			};
+-			/* Left LED - White 2 sec, off 2 sec */
+-			color-1 {
+-				led-color = <&color_white_left>;
+-				period-ms = <2000>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Turn off the right LED */
++				color-0 {
++					led-color = <&color_off_right>;
++				};
+ 			};
+-			color-2 {
+-				led-color = <&color_off_right>;
+-				period-ms = <2000>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Left LED - White 2 sec, off 2 sec */
++				color-0 {
++					led-color = <&color_white_left>;
++					period-ms = <2000>;
++				};
++				color-1 {
++					led-color = <&color_off_left>;
++					period-ms = <2000>;
++				};
+ 			};
+ 		};
+ 
+@@ -90,18 +121,24 @@
+ 			charge-state = "LED_PWRS_ERROR";
+ 			charge-port = <0>; /* Right port */
+ 
+-			/* Turn off the left LED */
+-			color-0 {
+-				led-color = <&color_off_left>;
+-			};
+-			/* Right LED - White 2 sec, off 2 sec */
+-			color-1 {
+-				led-color = <&color_white_right>;
+-				period-ms = <2000>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Turn off the left LED */
++				color-0 {
++					led-color = <&color_off_left>;
++				};
+ 			};
+-			color-2 {
+-				led-color = <&color_off_right>;
+-				period-ms = <2000>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Right LED - White 2 sec, off 2 sec */
++				color-0 {
++					led-color = <&color_white_right>;
++					period-ms = <2000>;
++				};
++				color-1 {
++					led-color = <&color_off_right>;
++					period-ms = <2000>;
++				};
+ 			};
+ 		};
+ 
+@@ -109,13 +146,19 @@
+ 			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
+ 			charge-port = <1>; /* Left port */
+ 
+-			/* Turn off the right LED */
+-			color-0 {
+-				led-color = <&color_off_right>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Turn off the right LED */
++				color-0 {
++					led-color = <&color_off_right>;
++				};
+ 			};
+-			/* Left LED to White */
+-			color-1 {
+-				led-color = <&color_white_left>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Left LED to White */
++				color-0 {
++					led-color = <&color_white_left>;
++				};
+ 			};
+ 		};
+ 
+@@ -123,13 +166,19 @@
+ 			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
+ 			charge-port = <0>; /* Right port */
+ 
+-			/* Turn off the left LED */
+-			color-0 {
+-				led-color = <&color_off_left>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Turn off the left LED */
++				color-0 {
++					led-color = <&color_off_left>;
++				};
+ 			};
+-			/* Right LED to White */
+-			color-1 {
+-				led-color = <&color_white_right>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Right LED to White */
++				color-0 {
++					led-color = <&color_white_right>;
++				};
+ 			};
+ 		};
+ 
+@@ -137,18 +186,24 @@
+ 			charge-state = "LED_PWRS_FORCED_IDLE";
+ 			charge-port = <1>; /* Left port */
+ 
+-			/* Turn off the right LED */
+-			color-0 {
+-				led-color = <&color_off_right>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Turn off the right LED */
++				color-0 {
++					led-color = <&color_off_right>;
++				};
+ 			};
+-			/* Left LED - Amber 3 sec, Off 1 sec */
+-			color-1 {
+-				led-color = <&color_amber_left>;
+-				period-ms = <3000>;
+-			};
+-			color-2 {
+-				led-color = <&color_off_left>;
+-				period-ms = <1000>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Left LED - Amber 3 sec, Off 1 sec */
++				color-0 {
++					led-color = <&color_amber_left>;
++					period-ms = <3000>;
++				};
++				color-1 {
++					led-color = <&color_off_left>;
++					period-ms = <1000>;
++				};
+ 			};
+ 		};
+ 
+@@ -156,18 +211,24 @@
+ 			charge-state = "LED_PWRS_FORCED_IDLE";
+ 			charge-port = <0>; /* Right port */
+ 
+-			/* Turn off the left LED */
+-			color-0 {
+-				led-color = <&color_off_left>;
+-			};
+-			/* Right LED - Amber 3 sec, Off 1 sec */
+-			color-1 {
+-				led-color = <&color_amber_right>;
+-				period-ms = <3000>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Turn off the left LED */
++				color-0 {
++					led-color = <&color_off_left>;
++				};
+ 			};
+-			color-2 {
+-				led-color = <&color_off_right>;
+-				period-ms = <1000>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Right LED - Amber 3 sec, Off 1 sec */
++				color-0 {
++					led-color = <&color_amber_right>;
++					period-ms = <3000>;
++				};
++				color-1 {
++					led-color = <&color_off_right>;
++					period-ms = <1000>;
++				};
+ 			};
+ 		};
+ 
+@@ -175,13 +236,19 @@
+ 			charge-state = "LED_PWRS_IDLE";
+ 			charge-port = <1>; /* Left port */
+ 
+-			/* Turn off the right LED */
+-			color-0 {
+-				led-color = <&color_off_right>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Turn off the right LED */
++				color-0 {
++					led-color = <&color_off_right>;
++				};
+ 			};
+-			/* Left LED to White */
+-			color-1 {
+-				led-color = <&color_white_left>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Left LED to White */
++				color-0 {
++					led-color = <&color_white_left>;
++				};
+ 			};
+ 		};
+ 
+@@ -189,13 +256,19 @@
+ 			charge-state = "LED_PWRS_IDLE";
+ 			charge-port = <0>; /* Right port */
+ 
+-			/* Turn off the left LED */
+-			color-0 {
+-				led-color = <&color_off_left>;
++			left-led {
++				led-id = "EC_LED_ID_LEFT_LED";
++				/* Turn off the left LED */
++				color-0 {
++					led-color = <&color_off_left>;
++				};
+ 			};
+-			/* Right LED to White */
+-			color-1 {
+-				led-color = <&color_white_right>;
++			right-led {
++				led-id = "EC_LED_ID_RIGHT_LED";
++				/* Right LED to White */
++				color-0 {
++					led-color = <&color_white_right>;
++				};
+ 			};
+ 		};
+ 	};
+diff --git a/zephyr/program/herobrine/hoglin/led_pins.dtsi b/zephyr/program/herobrine/hoglin/led_pins.dtsi
+index 4ab2e163a766..cdd63cfd5d4f 100644
+--- a/zephyr/program/herobrine/hoglin/led_pins.dtsi
++++ b/zephyr/program/herobrine/hoglin/led_pins.dtsi
+@@ -4,7 +4,7 @@
+  */
+ 
+ / {
+-	gpio-led-pins {
++	led_pins: gpio-led-pins {
+ 		compatible = "cros-ec,gpio-led-pins";
+ 
+ 		battery_led: battery-led {
+diff --git a/zephyr/program/herobrine/hoglin/led_policy.dtsi b/zephyr/program/herobrine/hoglin/led_policy.dtsi
+index 93edd82fb3d4..345d1646235a 100644
+--- a/zephyr/program/herobrine/hoglin/led_policy.dtsi
++++ b/zephyr/program/herobrine/hoglin/led_policy.dtsi
+@@ -6,12 +6,16 @@
+ / {
+ 	led-colors {
+ 		compatible = "cros-ec,led-policy";
++		led-pins = <&led_pins>;
+ 
+ 		power-state-charge {
+ 			charge-state = "LED_PWRS_CHARGE";
+ 
+-			color-0 {
+-				led-color = <&color_blue>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_blue>;
++				};
+ 			};
+ 		};
+ 
+@@ -19,8 +23,11 @@
+ 			charge-state = "LED_PWRS_DISCHARGE";
+ 			chipset-state = "POWER_S0";
+ 
+-			color-0 {
+-				led-color = <&color_off>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_off>;
++				};
+ 			};
+ 		};
+ 
+@@ -28,14 +35,17 @@
+ 			charge-state = "LED_PWRS_DISCHARGE";
+ 			chipset-state = "POWER_S3";
+ 
+-			/* Blue 1 sec, off 3 sec */
+-			color-0 {
+-				led-color = <&color_blue>;
+-				period-ms = <1000>;
+-			};
+-			color-1 {
+-				led-color = <&color_off>;
+-				period-ms = <3000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				/* Blue 1 sec, off 3 sec */
++				color-0 {
++					led-color = <&color_blue>;
++					period-ms = <1000>;
++				};
++				color-1 {
++					led-color = <&color_off>;
++					period-ms = <3000>;
++				};
+ 			};
+ 		};
+ 
+@@ -43,52 +53,67 @@
+ 			charge-state = "LED_PWRS_DISCHARGE";
+ 			chipset-state = "POWER_S5";
+ 
+-			color-0 {
+-				led-color = <&color_off>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_off>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-error {
+ 			charge-state = "LED_PWRS_ERROR";
+ 
+-			/* Red 1 sec, off 1 sec */
+-			color-0 {
+-				led-color = <&color_red>;
+-				period-ms = <1000>;
+-			};
+-			color-1 {
+-				led-color = <&color_off>;
+-				period-ms = <1000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				/* Red 1 sec, off 1 sec */
++				color-0 {
++					led-color = <&color_red>;
++					period-ms = <1000>;
++				};
++				color-1 {
++					led-color = <&color_off>;
++					period-ms = <1000>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-near-full {
+ 			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
+ 
+-			color-0 {
+-				led-color = <&color_red>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_red>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-forced-idle {
+ 			charge-state = "LED_PWRS_FORCED_IDLE";
+ 
+-			/* Red 2 sec, Blue 2 sec */
+-			color-0 {
+-				led-color = <&color_red>;
+-				period-ms = <2000>;
+-			};
+-			color-1 {
+-				led-color = <&color_blue>;
+-				period-ms = <2000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				/* Red 2 sec, Blue 2 sec */
++				color-0 {
++					led-color = <&color_red>;
++					period-ms = <2000>;
++				};
++				color-1 {
++					led-color = <&color_blue>;
++					period-ms = <2000>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-idle-default {
+ 			charge-state = "LED_PWRS_IDLE";
+ 
+-			color-0 {
+-				led-color = <&color_red>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_red>;
++				};
+ 			};
+ 		};
+ 	};
+diff --git a/zephyr/program/herobrine/hoglin/motionsense.dtsi b/zephyr/program/herobrine/hoglin/motionsense.dtsi
+index c3935178fff2..425a0a760e1c 100644
+--- a/zephyr/program/herobrine/hoglin/motionsense.dtsi
++++ b/zephyr/program/herobrine/hoglin/motionsense.dtsi
+@@ -82,7 +82,7 @@
+ 					als-channel-scale {
+ 						compatible = "cros-ec,accelgyro-als-channel-scale";
+ 						k-channel-scale = <1>;
+-						cover-scale = <1>;
++						cover-scale = "1.0f";
+ 					};
+ 				};
+ 			};
+@@ -101,29 +101,29 @@
+ 
+ 				rgb-cal-x {
+ 					offset = <0>;
+-					coeff = <0 0 0 1>;
++					coeff = "0", "0", "0", "1";
+ 					als-channel-scale {
+ 						compatible = "cros-ec,accelgyro-als-channel-scale";
+ 						k-channel-scale = <1>;
+-						cover-scale = <1>;
++						cover-scale = "1.0f";
+ 					};
+ 				};
+ 				rgb-cal-y {
+ 					offset = <0>;
+-					coeff = <0 0 0 1>;
++					coeff = "0", "0", "0", "1";
+ 					als-channel-scale {
+ 						compatible = "cros-ec,accelgyro-als-channel-scale";
+ 						k-channel-scale = <1>;
+-						cover-scale = <1>;
++						cover-scale = "1.0f";
+ 					};
+ 				};
+ 				rgb-cal-z {
+ 					offset = <0>;
+-					coeff = <0 0 0 1>;
++					coeff = "0", "0", "0", "1";
+ 					als-channel-scale {
+ 						compatible = "cros-ec,accelgyro-als-channel-scale";
+ 						k-channel-scale = <1>;
+-						cover-scale = <1>;
++						cover-scale = "1.0f";
+ 					};
+ 				};
+ 			};
+diff --git a/zephyr/program/herobrine/i2c.dtsi b/zephyr/program/herobrine/i2c.dtsi
+index 30a09fe06432..a1968d2a8d6e 100644
+--- a/zephyr/program/herobrine/i2c.dtsi
++++ b/zephyr/program/herobrine/i2c.dtsi
+@@ -169,9 +169,9 @@
+ 	pinctrl-names = "default";
+ 
+ 	pcf85063a: pcf85063a@51 {
+-		compatible = "nxp,rtc-pcf85063a";
++		compatible = "nxp,pcf85063a";
+ 		reg = <0x51>;
+-		int-pin = <&gpio_rtc_ec_wake_odl>;
++		int1-gpios = <&gpio0 2 GPIO_INPUT>;
+ 	};
+ };
+ 
+diff --git a/zephyr/program/herobrine/motionsense.dtsi b/zephyr/program/herobrine/motionsense.dtsi
+index 1955f43284ae..f945c5f3f70f 100644
+--- a/zephyr/program/herobrine/motionsense.dtsi
++++ b/zephyr/program/herobrine/motionsense.dtsi
+@@ -82,7 +82,7 @@
+ 					als-channel-scale {
+ 						compatible = "cros-ec,accelgyro-als-channel-scale";
+ 						k-channel-scale = <1>;
+-						cover-scale = <1>;
++						cover-scale = "1.0f";
+ 					};
+ 				};
+ 			};
+@@ -101,29 +101,29 @@
+ 
+ 				rgb-cal-x {
+ 					offset = <0>;
+-					coeff = <0 0 0 1>;
++					coeff = "0", "0", "0", "1";
+ 					als-channel-scale {
+ 						compatible = "cros-ec,accelgyro-als-channel-scale";
+ 						k-channel-scale = <1>;
+-						cover-scale = <1>;
++						cover-scale = "1.0f";
+ 					};
+ 				};
+ 				rgb-cal-y {
+ 					offset = <0>;
+-					coeff = <0 0 0 1>;
++					coeff = "0", "0", "0", "1";
+ 					als-channel-scale {
+ 						compatible = "cros-ec,accelgyro-als-channel-scale";
+ 						k-channel-scale = <1>;
+-						cover-scale = <1>;
++						cover-scale = "1.0f";
+ 					};
+ 				};
+ 				rgb-cal-z {
+ 					offset = <0>;
+-					coeff = <0 0 0 1>;
++					coeff = "0", "0", "0", "1";
+ 					als-channel-scale {
+ 						compatible = "cros-ec,accelgyro-als-channel-scale";
+ 						k-channel-scale = <1>;
+-						cover-scale = <1>;
++						cover-scale = "1.0f";
+ 					};
+ 				};
+ 			};
+diff --git a/zephyr/program/herobrine/program.conf b/zephyr/program/herobrine/program.conf
+index d02057076209..112442155f3c 100644
+--- a/zephyr/program/herobrine/program.conf
++++ b/zephyr/program/herobrine/program.conf
+@@ -13,15 +13,20 @@ CONFIG_PLATFORM_EC_POWER_BUTTON=y
+ CONFIG_KERNEL_SHELL=y
+ CONFIG_PLATFORM_EC_BOARD_RESET_AFTER_POWER_ON=y
+ 
++# Optimizations
++CONFIG_SIZE_OPTIMIZATIONS=y
++CONFIG_SHELL_BACKEND_SERIAL_TX_RING_BUFFER_SIZE=128
++CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT=n
++
+ # I2C options
+-CONFIG_PLATFORM_EC_CONSOLE_CMD_I2C_SPEED=y
++CONFIG_PLATFORM_EC_CONSOLE_CMD_I2C_SPEED=n
+ CONFIG_PLATFORM_EC_HOSTCMD_I2C_CONTROL=y
+ 
+ # Shell history and tab autocompletion (for convenience)
+-CONFIG_SHELL_HELP=y
+-CONFIG_SHELL_HISTORY=y
+-CONFIG_SHELL_TAB=y
+-CONFIG_SHELL_TAB_AUTOCOMPLETION=y
++CONFIG_SHELL_HELP=n
++CONFIG_SHELL_HISTORY=n
++CONFIG_SHELL_TAB=n
++CONFIG_SHELL_TAB_AUTOCOMPLETION=n
+ 
+ # Application Processor is Qualcomm SC7280
+ CONFIG_AP_ARM_QUALCOMM_SC7280=y
+@@ -63,15 +68,21 @@ CONFIG_PLATFORM_EC_CHARGER_DISCHARGE_ON_AC=y
+ CONFIG_PLATFORM_EC_CHARGER_DISCHARGE_ON_AC_CHARGER=y
+ CONFIG_PLATFORM_EC_CHARGER_MIN_BAT_PCT_FOR_POWER_ON=2
+ CONFIG_PLATFORM_EC_CHARGER_MIN_POWER_MW_FOR_POWER_ON=12500
+-CONFIG_PLATFORM_EC_CHARGER_MIN_INPUT_CURRENT_LIMIT=512
+ CONFIG_PLATFORM_EC_CHARGER_PROFILE_OVERRIDE=y
+ CONFIG_PLATFORM_EC_CHARGER_PSYS=y
+ CONFIG_PLATFORM_EC_CHARGER_PSYS_READ=y
+ CONFIG_PLATFORM_EC_CHARGER_SENSE_RESISTOR=10
+ CONFIG_PLATFORM_EC_CHARGER_SENSE_RESISTOR_AC=20
+-CONFIG_PLATFORM_EC_CONSOLE_CMD_CHARGER_ADC_AMON_BMON=y
++CONFIG_PLATFORM_EC_CONSOLE_CMD_CHARGER_ADC_AMON_BMON=n
+ 
+ # USB-C
++CONFIG_PLATFORM_EC_USB_POWER_DELIVERY=y
++CONFIG_PLATFORM_EC_USB_PD_TCPMV2=y
++CONFIG_PLATFORM_EC_USBC_PPC=y
++CONFIG_PLATFORM_EC_USBC_PPC_SYV682X=y
++CONFIG_PLATFORM_EC_USB_PD_MAX_VOLTAGE_MV=20000
++CONFIG_PLATFORM_EC_USB_PD_MAX_POWER_MW=60000
++CONFIG_PLATFORM_EC_USB_PD_MAX_CURRENT_MA=3000
+ CONFIG_PLATFORM_EC_USB_PD_FRS=y
+ CONFIG_PLATFORM_EC_USB_PD_USB32_DRD=n
+ CONFIG_PLATFORM_EC_USBC_PPC_SYV682C=y
+@@ -90,7 +101,9 @@ CONFIG_PLATFORM_EC_USB_PD_TCPM_PS8805=y
+ CONFIG_PLATFORM_EC_USB_PD_TCPC_RUNTIME_CONFIG=n
+ CONFIG_PLATFORM_EC_USB_MUX_RUNTIME_CONFIG=n
+ CONFIG_PLATFORM_EC_USB_PD_LOGGING=y
+-CONFIG_PLATFORM_EC_CONFIG_USB_PD_3A_PORTS=2
++CONFIG_PLATFORM_EC_USB_PD_DEBUG_FIXED_LEVEL=y
++CONFIG_PLATFORM_EC_USB_PD_DEBUG_LEVEL=2
++CONFIG_PLATFORM_EC_USB_PD_3A_PORTS=2
+ 
+ # USB ID
+ # This is allocated specifically for Herobrine
+@@ -101,8 +114,8 @@ CONFIG_PLATFORM_EC_USB_PID=0x5055
+ # RTC
+ CONFIG_PLATFORM_EC_RTC=y
+ CONFIG_PLATFORM_EC_HOSTCMD_RTC=y
+-CONFIG_PLATFORM_EC_CONSOLE_CMD_RTC=y
+-CONFIG_PLATFORM_EC_CONSOLE_CMD_RTC_ALARM=y
++CONFIG_PLATFORM_EC_CONSOLE_CMD_RTC=n
++CONFIG_PLATFORM_EC_CONSOLE_CMD_RTC_ALARM=n
+ 
+ # EC software sync
+ CONFIG_PLATFORM_EC_VBOOT_HASH=y
+@@ -110,8 +123,8 @@ CONFIG_PLATFORM_EC_VBOOT_HASH=y
+ # Sensors
+ CONFIG_PLATFORM_EC_ACCEL_FIFO=y
+ CONFIG_PLATFORM_EC_ACCEL_SPOOF_MODE=y
+-CONFIG_PLATFORM_EC_CONSOLE_CMD_ACCELS=y
+-CONFIG_PLATFORM_EC_CONSOLE_CMD_ACCEL_INFO=y
++CONFIG_PLATFORM_EC_CONSOLE_CMD_ACCELS=n
++CONFIG_PLATFORM_EC_CONSOLE_CMD_ACCEL_INFO=n
+ CONFIG_PLATFORM_EC_GMR_TABLET_MODE=y
+ CONFIG_PLATFORM_EC_LID_ANGLE=y
+ CONFIG_PLATFORM_EC_LID_ANGLE_UPDATE=y
+diff --git a/zephyr/program/herobrine/src/board_chipset.c b/zephyr/program/herobrine/src/board_chipset.c
+index c2269a0c7c17..0692969393e1 100644
+--- a/zephyr/program/herobrine/src/board_chipset.c
++++ b/zephyr/program/herobrine/src/board_chipset.c
+@@ -31,7 +31,7 @@
+  * TODO(waihong): Cancel this timer when the PD contract is negotiated.
+  */
+ #define PD_READY_TIMEOUT                                                    \
+-	(PD_T_SINK_WAIT_CAP + PD_T_SENDER_RESPONSE + PD_T_SINK_TRANSITION + \
++	(PD_T_SINK_WAIT_CAP + PD3_T_SENDER_RESPONSE + PD_T_SINK_TRANSITION + \
+ 	 20 * MSEC)
+ 
+ #define PD_READY_POLL_DELAY (10 * MSEC)
+@@ -78,7 +78,7 @@ static void wait_pd_ready(void)
+ 	CPRINTS("Wait PD negotiated VBUS transition %u",
+ 		pd_ready_timeout.le.lo);
+ 	while (pd_ready_timeout.val && get_time().val < pd_ready_timeout.val)
+-		usleep(PD_READY_POLL_DELAY);
++		k_usleep(PD_READY_POLL_DELAY);
+ }
+ 
+ #define PPC_WAIT_5V_DELAY_MS 5
+@@ -107,7 +107,7 @@ static void board_chipset_pre_init(void)
+ 	 * yet. So here rerunning the ppc_init function after the 5V
+ 	 * rail enables to prevent Type-C port no function.
+ 	 */
+-	msleep(PPC_WAIT_5V_DELAY_MS);
++	k_msleep(PPC_WAIT_5V_DELAY_MS);
+ 	for (port = 0; port < CONFIG_USB_PD_PORT_MAX_COUNT; port++) {
+ 		if (pd_get_task_cc_state(port) != PD_CC_NONE)
+ 			continue;
+diff --git a/zephyr/program/herobrine/src/usb_pd_policy.c b/zephyr/program/herobrine/src/usb_pd_policy.c
+index 512bc489f35a..bad7a7a0929f 100644
+--- a/zephyr/program/herobrine/src/usb_pd_policy.c
++++ b/zephyr/program/herobrine/src/usb_pd_policy.c
+@@ -221,12 +221,12 @@ __override int svdm_dp_attention(int port, uint32_t *payload)
+ 		uint64_t now = get_time().val;
+ 		/* Wait for the minimum spacing between IRQ_HPD if needed */
+ 		if (now < svdm_hpd_deadline[port])
+-			usleep(svdm_hpd_deadline[port] - now);
++			k_usleep(svdm_hpd_deadline[port] - now);
+ 
+ 		/* Generate IRQ_HPD pulse */
+ 		CPRINTS("C%d: Recv IRQ. HPD->0", port);
+ 		gpio_pin_set_dt(hpd, 0);
+-		usleep(HPD_DSTREAM_DEBOUNCE_IRQ);
++		k_usleep(HPD_DSTREAM_DEBOUNCE_IRQ);
+ 		gpio_pin_set_dt(hpd, 1);
+ 		CPRINTS("C%d: Recv IRQ. HPD->1", port);
+ 
+diff --git a/zephyr/program/herobrine/src/usbc_config.c b/zephyr/program/herobrine/src/usbc_config.c
+index 4741d1eec27b..1b0bb42c646a 100644
+--- a/zephyr/program/herobrine/src/usbc_config.c
++++ b/zephyr/program/herobrine/src/usbc_config.c
+@@ -23,6 +23,10 @@
+ #include "usb_mux.h"
+ #include "usb_pd.h"
+ #include "usbc/ppc.h"
++
++#ifndef PD_MAX_VOLTAGE_MV
++#define PD_MAX_VOLTAGE_MV 20000
++#endif
+ #include "usbc_ocp.h"
+ #include "usbc_ppc.h"
+ 
+@@ -126,10 +130,10 @@ void board_reset_pd_mcu(void)
+ 
+ 	gpio_pin_set_dt(&tcpc_config[0].rst_gpio, 1);
+ 	gpio_pin_set_dt(&tcpc_config[1].rst_gpio, 1);
+-	msleep(PS8XXX_RESET_DELAY_MS);
++	k_msleep(PS8XXX_RESET_DELAY_MS);
+ 	gpio_pin_set_dt(&tcpc_config[0].rst_gpio, 0);
+ 	gpio_pin_set_dt(&tcpc_config[1].rst_gpio, 0);
+-	msleep(PS8805_FW_INIT_DELAY_MS);
++	k_msleep(PS8805_FW_INIT_DELAY_MS);
+ }
+ 
+ void board_set_tcpc_power_mode(int port, int mode)
+diff --git a/zephyr/program/herobrine/villager/led_pins.dtsi b/zephyr/program/herobrine/villager/led_pins.dtsi
+index 7330cd2e7133..cf4c010ffa93 100644
+--- a/zephyr/program/herobrine/villager/led_pins.dtsi
++++ b/zephyr/program/herobrine/villager/led_pins.dtsi
+@@ -4,7 +4,7 @@
+  */
+ 
+ / {
+-	gpio-led-pins {
++	led_pins: gpio-led-pins {
+ 		compatible = "cros-ec,gpio-led-pins";
+ 
+ 		battery_led: battery-led {
+diff --git a/zephyr/program/herobrine/villager/led_policy.dtsi b/zephyr/program/herobrine/villager/led_policy.dtsi
+index ce9c5a27f37e..096f3652a350 100644
+--- a/zephyr/program/herobrine/villager/led_policy.dtsi
++++ b/zephyr/program/herobrine/villager/led_policy.dtsi
+@@ -6,12 +6,16 @@
+ / {
+ 	led-colors {
+ 		compatible = "cros-ec,led-policy";
++		led-pins = <&led_pins>;
+ 
+ 		power-state-charge {
+ 			charge-state = "LED_PWRS_CHARGE";
+ 
+-			color-0 {
+-				led-color = <&color_amber>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_amber>;
++				};
+ 			};
+ 		};
+ 
+@@ -19,8 +23,11 @@
+ 			charge-state = "LED_PWRS_DISCHARGE";
+ 			chipset-state = "POWER_S0";
+ 
+-			color-0 {
+-				led-color = <&color_blue>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_blue>;
++				};
+ 			};
+ 		};
+ 
+@@ -28,14 +35,17 @@
+ 			charge-state = "LED_PWRS_DISCHARGE";
+ 			chipset-state = "POWER_S3";
+ 
+-			/* Amber 1 sec, off 3 sec */
+-			color-0 {
+-				led-color = <&color_amber>;
+-				period-ms = <1000>;
+-			};
+-			color-1 {
+-				led-color = <&color_off>;
+-				period-ms = <3000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				/* Amber 1 sec, off 3 sec */
++				color-0 {
++					led-color = <&color_amber>;
++					period-ms = <1000>;
++				};
++				color-1 {
++					led-color = <&color_off>;
++					period-ms = <3000>;
++				};
+ 			};
+ 		};
+ 
+@@ -43,52 +53,67 @@
+ 			charge-state = "LED_PWRS_DISCHARGE";
+ 			chipset-state = "POWER_S5";
+ 
+-			color-0 {
+-				led-color = <&color_off>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_off>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-error {
+ 			charge-state = "LED_PWRS_ERROR";
+ 
+-			/* Amber 1 sec, off 1 sec */
+-			color-0 {
+-				led-color = <&color_amber>;
+-				period-ms = <1000>;
+-			};
+-			color-1 {
+-				led-color = <&color_off>;
+-				period-ms = <1000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				/* Amber 1 sec, off 1 sec */
++				color-0 {
++					led-color = <&color_amber>;
++					period-ms = <1000>;
++				};
++				color-1 {
++					led-color = <&color_off>;
++					period-ms = <1000>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-near-full {
+ 			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
+ 
+-			color-0 {
+-				led-color = <&color_blue>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_blue>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-forced-idle {
+ 			charge-state = "LED_PWRS_FORCED_IDLE";
+ 
+-			/* Blue 2 sec, Amber 2 sec */
+-			color-0 {
+-				led-color = <&color_blue>;
+-				period-ms = <2000>;
+-			};
+-			color-1 {
+-				led-color = <&color_amber>;
+-				period-ms = <2000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				/* Blue 2 sec, Amber 2 sec */
++				color-0 {
++					led-color = <&color_blue>;
++					period-ms = <2000>;
++				};
++				color-1 {
++					led-color = <&color_amber>;
++					period-ms = <2000>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-idle {
+ 			charge-state = "LED_PWRS_IDLE";
+ 
+-			color-0 {
+-				led-color = <&color_blue>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_blue>;
++				};
+ 			};
+ 		};
+ 	};
+diff --git a/zephyr/program/herobrine/zombie/led_pins.dtsi b/zephyr/program/herobrine/zombie/led_pins.dtsi
+index 7330cd2e7133..cf4c010ffa93 100644
+--- a/zephyr/program/herobrine/zombie/led_pins.dtsi
++++ b/zephyr/program/herobrine/zombie/led_pins.dtsi
+@@ -4,7 +4,7 @@
+  */
+ 
+ / {
+-	gpio-led-pins {
++	led_pins: gpio-led-pins {
+ 		compatible = "cros-ec,gpio-led-pins";
+ 
+ 		battery_led: battery-led {
+diff --git a/zephyr/program/herobrine/zombie/led_policy.dtsi b/zephyr/program/herobrine/zombie/led_policy.dtsi
+index ce9c5a27f37e..096f3652a350 100644
+--- a/zephyr/program/herobrine/zombie/led_policy.dtsi
++++ b/zephyr/program/herobrine/zombie/led_policy.dtsi
+@@ -6,12 +6,16 @@
+ / {
+ 	led-colors {
+ 		compatible = "cros-ec,led-policy";
++		led-pins = <&led_pins>;
+ 
+ 		power-state-charge {
+ 			charge-state = "LED_PWRS_CHARGE";
+ 
+-			color-0 {
+-				led-color = <&color_amber>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_amber>;
++				};
+ 			};
+ 		};
+ 
+@@ -19,8 +23,11 @@
+ 			charge-state = "LED_PWRS_DISCHARGE";
+ 			chipset-state = "POWER_S0";
+ 
+-			color-0 {
+-				led-color = <&color_blue>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_blue>;
++				};
+ 			};
+ 		};
+ 
+@@ -28,14 +35,17 @@
+ 			charge-state = "LED_PWRS_DISCHARGE";
+ 			chipset-state = "POWER_S3";
+ 
+-			/* Amber 1 sec, off 3 sec */
+-			color-0 {
+-				led-color = <&color_amber>;
+-				period-ms = <1000>;
+-			};
+-			color-1 {
+-				led-color = <&color_off>;
+-				period-ms = <3000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				/* Amber 1 sec, off 3 sec */
++				color-0 {
++					led-color = <&color_amber>;
++					period-ms = <1000>;
++				};
++				color-1 {
++					led-color = <&color_off>;
++					period-ms = <3000>;
++				};
+ 			};
+ 		};
+ 
+@@ -43,52 +53,67 @@
+ 			charge-state = "LED_PWRS_DISCHARGE";
+ 			chipset-state = "POWER_S5";
+ 
+-			color-0 {
+-				led-color = <&color_off>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_off>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-error {
+ 			charge-state = "LED_PWRS_ERROR";
+ 
+-			/* Amber 1 sec, off 1 sec */
+-			color-0 {
+-				led-color = <&color_amber>;
+-				period-ms = <1000>;
+-			};
+-			color-1 {
+-				led-color = <&color_off>;
+-				period-ms = <1000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				/* Amber 1 sec, off 1 sec */
++				color-0 {
++					led-color = <&color_amber>;
++					period-ms = <1000>;
++				};
++				color-1 {
++					led-color = <&color_off>;
++					period-ms = <1000>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-near-full {
+ 			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
+ 
+-			color-0 {
+-				led-color = <&color_blue>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_blue>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-forced-idle {
+ 			charge-state = "LED_PWRS_FORCED_IDLE";
+ 
+-			/* Blue 2 sec, Amber 2 sec */
+-			color-0 {
+-				led-color = <&color_blue>;
+-				period-ms = <2000>;
+-			};
+-			color-1 {
+-				led-color = <&color_amber>;
+-				period-ms = <2000>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				/* Blue 2 sec, Amber 2 sec */
++				color-0 {
++					led-color = <&color_blue>;
++					period-ms = <2000>;
++				};
++				color-1 {
++					led-color = <&color_amber>;
++					period-ms = <2000>;
++				};
+ 			};
+ 		};
+ 
+ 		power-state-idle {
+ 			charge-state = "LED_PWRS_IDLE";
+ 
+-			color-0 {
+-				led-color = <&color_blue>;
++			battery-led {
++				led-id = "EC_LED_ID_BATTERY_LED";
++				color-0 {
++					led-color = <&color_blue>;
++				};
+ 			};
+ 		};
+ 	};

@@ -31,7 +31,7 @@
  * TODO(waihong): Cancel this timer when the PD contract is negotiated.
  */
 #define PD_READY_TIMEOUT                                                    \
-	(PD_T_SINK_WAIT_CAP + PD_T_SENDER_RESPONSE + PD_T_SINK_TRANSITION + \
+	(PD_T_SINK_WAIT_CAP + PD3_T_SENDER_RESPONSE + PD_T_SINK_TRANSITION + \
 	 20 * MSEC)
 
 #define PD_READY_POLL_DELAY (10 * MSEC)
@@ -78,7 +78,7 @@ static void wait_pd_ready(void)
 	CPRINTS("Wait PD negotiated VBUS transition %u",
 		pd_ready_timeout.le.lo);
 	while (pd_ready_timeout.val && get_time().val < pd_ready_timeout.val)
-		usleep(PD_READY_POLL_DELAY);
+		k_usleep(PD_READY_POLL_DELAY);
 }
 
 #define PPC_WAIT_5V_DELAY_MS 5
@@ -107,7 +107,7 @@ static void board_chipset_pre_init(void)
 	 * yet. So here rerunning the ppc_init function after the 5V
 	 * rail enables to prevent Type-C port no function.
 	 */
-	msleep(PPC_WAIT_5V_DELAY_MS);
+	k_msleep(PPC_WAIT_5V_DELAY_MS);
 	for (port = 0; port < CONFIG_USB_PD_PORT_MAX_COUNT; port++) {
 		if (pd_get_task_cc_state(port) != PD_CC_NONE)
 			continue;

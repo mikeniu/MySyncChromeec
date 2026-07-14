@@ -7,7 +7,7 @@
 
 / {
 	chosen {
-		cros,rtc = &pcf85063a;
+		cros,rtc = &mtc;
 	};
 
 	ec-console {

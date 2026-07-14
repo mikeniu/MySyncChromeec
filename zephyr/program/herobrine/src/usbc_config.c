@@ -23,6 +23,10 @@
 #include "usb_mux.h"
 #include "usb_pd.h"
 #include "usbc/ppc.h"
+
+#ifndef PD_MAX_VOLTAGE_MV
+#define PD_MAX_VOLTAGE_MV 20000
+#endif
 #include "usbc_ocp.h"
 #include "usbc_ppc.h"
 
@@ -126,10 +130,10 @@ void board_reset_pd_mcu(void)
 
 	gpio_pin_set_dt(&tcpc_config[0].rst_gpio, 1);
 	gpio_pin_set_dt(&tcpc_config[1].rst_gpio, 1);
-	msleep(PS8XXX_RESET_DELAY_MS);
+	k_msleep(PS8XXX_RESET_DELAY_MS);
 	gpio_pin_set_dt(&tcpc_config[0].rst_gpio, 0);
 	gpio_pin_set_dt(&tcpc_config[1].rst_gpio, 0);
-	msleep(PS8805_FW_INIT_DELAY_MS);
+	k_msleep(PS8805_FW_INIT_DELAY_MS);
 }
 
 void board_set_tcpc_power_mode(int port, int mode)

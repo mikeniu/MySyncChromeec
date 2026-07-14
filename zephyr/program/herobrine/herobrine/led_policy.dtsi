@@ -3,18 +3,25 @@
 / {
 	led-colors {
 		compatible = "cros-ec,led-policy";
+		led-pins = <&led_pins>;
 
 		power-state-charge-left {
 			charge-state = "LED_PWRS_CHARGE";
 			charge-port = <1>; /* Left port */
 
-			/* Turn off the right LED */
-			color-0 {
-				led-color = <&color_off_right>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Turn off the right LED */
+				color-0 {
+					led-color = <&color_off_right>;
+				};
 			};
-			/* Left LED to Amber */
-			color-1 {
-				led-color = <&color_amber_left>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Left LED to Amber */
+				color-0 {
+					led-color = <&color_amber_left>;
+				};
 			};
 		};
 
@@ -22,13 +29,19 @@
 			charge-state = "LED_PWRS_CHARGE";
 			charge-port = <0>; /* Right port */
 
-			/* Turn off the left LED */
-			color-0 {
-				led-color = <&color_off_left>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Turn off the left LED */
+				color-0 {
+					led-color = <&color_off_left>;
+				};
 			};
-			/* Right LED to Amber */
-			color-1 {
-				led-color = <&color_amber_right>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Right LED to Amber */
+				color-0 {
+					led-color = <&color_amber_right>;
+				};
 			};
 		};
 
@@ -37,18 +50,24 @@
 			/* Battery percent range (>= Empty, <= Low) */
 			batt-lvl = <BATTERY_LEVEL_EMPTY BATTERY_LEVEL_LOW>;
 
-			/* Turn off the left LED */
-			color-0 {
-				led-color = <&color_off_left>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Turn off the left LED */
+				color-0 {
+					led-color = <&color_off_left>;
+				};
 			};
-			/* Right LED - White 1 sec, off 3 sec */
-			color-1 {
-				led-color = <&color_white_right>;
-				period-ms = <1000>;
-			};
-			color-2 {
-				led-color = <&color_off_right>;
-				period-ms = <3000>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Right LED - White 1 sec, off 3 sec */
+				color-0 {
+					led-color = <&color_white_right>;
+					period-ms = <1000>;
+				};
+				color-1 {
+					led-color = <&color_off_right>;
+					period-ms = <3000>;
+				};
 			};
 		};
 
@@ -57,13 +76,19 @@
 			/* Battery percent range (> Low, <= Full) */
 			batt-lvl = <(BATTERY_LEVEL_LOW + 1) BATTERY_LEVEL_FULL>;
 
-			/* Turn off the left LED */
-			color-0 {
-				led-color = <&color_off_left>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Turn off the left LED */
+				color-0 {
+					led-color = <&color_off_left>;
+				};
 			};
-			/* Turn off the right LED */
-			color-1 {
-				led-color = <&color_off_right>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Turn off the right LED */
+				color-0 {
+					led-color = <&color_off_right>;
+				};
 			};
 		};
 
@@ -71,18 +96,24 @@
 			charge-state = "LED_PWRS_ERROR";
 			charge-port = <1>; /* Left port */
 
-			/* Turn off the right LED */
-			color-0 {
-				led-color = <&color_off_right>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Turn off the right LED */
+				color-0 {
+					led-color = <&color_off_right>;
+				};
 			};
-			/* Left LED - White 2 sec, off 2 sec */
-			color-1 {
-				led-color = <&color_white_left>;
-				period-ms = <2000>;
-			};
-			color-2 {
-				led-color = <&color_off_right>;
-				period-ms = <2000>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Left LED - White 2 sec, off 2 sec */
+				color-0 {
+					led-color = <&color_white_left>;
+					period-ms = <2000>;
+				};
+				color-1 {
+					led-color = <&color_off_left>;
+					period-ms = <2000>;
+				};
 			};
 		};
 
@@ -90,18 +121,24 @@
 			charge-state = "LED_PWRS_ERROR";
 			charge-port = <0>; /* Right port */
 
-			/* Turn off the left LED */
-			color-0 {
-				led-color = <&color_off_left>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Turn off the left LED */
+				color-0 {
+					led-color = <&color_off_left>;
+				};
 			};
-			/* Right LED - White 2 sec, off 2 sec */
-			color-1 {
-				led-color = <&color_white_right>;
-				period-ms = <2000>;
-			};
-			color-2 {
-				led-color = <&color_off_right>;
-				period-ms = <2000>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Right LED - White 2 sec, off 2 sec */
+				color-0 {
+					led-color = <&color_white_right>;
+					period-ms = <2000>;
+				};
+				color-1 {
+					led-color = <&color_off_right>;
+					period-ms = <2000>;
+				};
 			};
 		};
 
@@ -109,13 +146,19 @@
 			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
 			charge-port = <1>; /* Left port */
 
-			/* Turn off the right LED */
-			color-0 {
-				led-color = <&color_off_right>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Turn off the right LED */
+				color-0 {
+					led-color = <&color_off_right>;
+				};
 			};
-			/* Left LED to White */
-			color-1 {
-				led-color = <&color_white_left>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Left LED to White */
+				color-0 {
+					led-color = <&color_white_left>;
+				};
 			};
 		};
 
@@ -123,13 +166,19 @@
 			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
 			charge-port = <0>; /* Right port */
 
-			/* Turn off the left LED */
-			color-0 {
-				led-color = <&color_off_left>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Turn off the left LED */
+				color-0 {
+					led-color = <&color_off_left>;
+				};
 			};
-			/* Right LED to White */
-			color-1 {
-				led-color = <&color_white_right>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Right LED to White */
+				color-0 {
+					led-color = <&color_white_right>;
+				};
 			};
 		};
 
@@ -137,18 +186,24 @@
 			charge-state = "LED_PWRS_FORCED_IDLE";
 			charge-port = <1>; /* Left port */
 
-			/* Turn off the right LED */
-			color-0 {
-				led-color = <&color_off_right>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Turn off the right LED */
+				color-0 {
+					led-color = <&color_off_right>;
+				};
 			};
-			/* Left LED - Amber 3 sec, Off 1 sec */
-			color-1 {
-				led-color = <&color_amber_left>;
-				period-ms = <3000>;
-			};
-			color-2 {
-				led-color = <&color_off_left>;
-				period-ms = <1000>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Left LED - Amber 3 sec, Off 1 sec */
+				color-0 {
+					led-color = <&color_amber_left>;
+					period-ms = <3000>;
+				};
+				color-1 {
+					led-color = <&color_off_left>;
+					period-ms = <1000>;
+				};
 			};
 		};
 
@@ -156,18 +211,24 @@
 			charge-state = "LED_PWRS_FORCED_IDLE";
 			charge-port = <0>; /* Right port */
 
-			/* Turn off the left LED */
-			color-0 {
-				led-color = <&color_off_left>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Turn off the left LED */
+				color-0 {
+					led-color = <&color_off_left>;
+				};
 			};
-			/* Right LED - Amber 3 sec, Off 1 sec */
-			color-1 {
-				led-color = <&color_amber_right>;
-				period-ms = <3000>;
-			};
-			color-2 {
-				led-color = <&color_off_right>;
-				period-ms = <1000>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Right LED - Amber 3 sec, Off 1 sec */
+				color-0 {
+					led-color = <&color_amber_right>;
+					period-ms = <3000>;
+				};
+				color-1 {
+					led-color = <&color_off_right>;
+					period-ms = <1000>;
+				};
 			};
 		};
 
@@ -175,13 +236,19 @@
 			charge-state = "LED_PWRS_IDLE";
 			charge-port = <1>; /* Left port */
 
-			/* Turn off the right LED */
-			color-0 {
-				led-color = <&color_off_right>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Turn off the right LED */
+				color-0 {
+					led-color = <&color_off_right>;
+				};
 			};
-			/* Left LED to White */
-			color-1 {
-				led-color = <&color_white_left>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Left LED to White */
+				color-0 {
+					led-color = <&color_white_left>;
+				};
 			};
 		};
 
@@ -189,13 +256,19 @@
 			charge-state = "LED_PWRS_IDLE";
 			charge-port = <0>; /* Right port */
 
-			/* Turn off the left LED */
-			color-0 {
-				led-color = <&color_off_left>;
+			left-led {
+				led-id = "EC_LED_ID_LEFT_LED";
+				/* Turn off the left LED */
+				color-0 {
+					led-color = <&color_off_left>;
+				};
 			};
-			/* Right LED to White */
-			color-1 {
-				led-color = <&color_white_right>;
+			right-led {
+				led-id = "EC_LED_ID_RIGHT_LED";
+				/* Right LED to White */
+				color-0 {
+					led-color = <&color_white_right>;
+				};
 			};
 		};
 	};

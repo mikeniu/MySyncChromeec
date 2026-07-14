@@ -169,9 +169,9 @@
 	pinctrl-names = "default";
 
 	pcf85063a: pcf85063a@51 {
-		compatible = "nxp,rtc-pcf85063a";
+		compatible = "nxp,pcf85063a";
 		reg = <0x51>;
-		int-pin = <&gpio_rtc_ec_wake_odl>;
+		int1-gpios = <&gpio0 2 GPIO_INPUT>;
 	};
 };
 

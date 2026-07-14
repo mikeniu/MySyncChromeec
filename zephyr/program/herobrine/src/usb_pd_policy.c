@@ -221,12 +221,12 @@ __override int svdm_dp_attention(int port, uint32_t *payload)
 		uint64_t now = get_time().val;
 		/* Wait for the minimum spacing between IRQ_HPD if needed */
 		if (now < svdm_hpd_deadline[port])
-			usleep(svdm_hpd_deadline[port] - now);
+			k_usleep(svdm_hpd_deadline[port] - now);
 
 		/* Generate IRQ_HPD pulse */
 		CPRINTS("C%d: Recv IRQ. HPD->0", port);
 		gpio_pin_set_dt(hpd, 0);
-		usleep(HPD_DSTREAM_DEBOUNCE_IRQ);
+		k_usleep(HPD_DSTREAM_DEBOUNCE_IRQ);
 		gpio_pin_set_dt(hpd, 1);
 		CPRINTS("C%d: Recv IRQ. HPD->1", port);
 
