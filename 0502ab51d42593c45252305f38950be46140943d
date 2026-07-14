@@ -40,6 +40,30 @@
       },
       "revId": "0502ab51d42593c45252305f38950be46140943d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7ba692a_3e6334f6",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T23:35:31Z",
+      "side": 1,
+      "message": "```\n#include \u003czephyr/sys/util.h\u003e\n\n/* Zephyr definition */\n#define ROUND_UP(x, align) \\\n    ((((unsigned long)(x) + ((unsigned long)(align) - 1)) / (unsigned long)(align)) * \\\n    (unsigned long)(align))\n```\n\nKey Differences \u0026 Compiler Optimization\n\n- Mathematical vs. Bitwise: Your ALIGN_UP macro uses bitwise \u0026 math, which only works if align is a power of 2. Zephyr\u0027s ROUND_UP uses mathematical division and multiplication, allowing it to work with any alignment value.\n\n- Optimization: You don\u0027t have to worry about the performance penalty of division; if align is a power of 2 known at compile-time, modern compilers (like GCC and Clang used in the Zephyr SDK) will automatically optimize ROUND_UP into the exact same bitwise mask operations (\u0026 ~(align - 1)) you wrote.",
+      "parentUuid": "fa7bc83e_bbf4a87a",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 73
+      },
+      "revId": "0502ab51d42593c45252305f38950be46140943d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
