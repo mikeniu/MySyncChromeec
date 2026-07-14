@@ -46,6 +46,23 @@
       },
       "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45075f48_ebfc950a",
+        "filename": "zephyr/program/bluey/mica/src/led.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-07-14T03:35:11Z",
+      "side": 1,
+      "message": "It\u0027s OK to move this line to *lb_policy.h* now since the related change is merged in google-private repo.",
+      "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
