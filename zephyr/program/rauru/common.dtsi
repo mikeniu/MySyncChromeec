@@ -35,7 +35,9 @@
 	status = "okay";
 	pinctrl-0 = <&shi_mosi_gpm0_default &shi_miso_gpm1_default
 		     &shi_clk_gpm4_default &shi_cs_gpm5_default>;
-	pinctrl-names = "default";
+	pinctrl-1 = <&shi_mosi_gpm0_sleep &shi_miso_gpm1_sleep
+			 &shi_clk_gpm4_sleep &shi_cs_gpm5_sleep>;
+	pinctrl-names = "default", "sleep";
 	/* unused but needed by dt binding */
 	cs-gpios = <&gpiom 5 GPIO_VOLTAGE_1P8>;
 };
