@@ -365,8 +365,25 @@ static enum ec_status fp_command_context(struct host_cmd_handler_args *args)
 		if (global_context.sensor_mode & FP_MODE_RESET_SENSOR)
 			return EC_RES_BUSY;
 
-		memcpy(global_context.user_id.data(), p->userid,
-		       sizeof(global_context.user_id));
+		/*
+		 * When fingerprint auth is active, once a user ID has been set,
+		 * mutating the session context identifier out-of-band is
+		 * prohibited. This enforces the security invariant that the
+		 * active user ID remains strictly bound to the currently loaded
+		 * template set.
+		 */
+		if (fingerprint_auth_enabled() &&
+		    (global_context.fp_encryption_status &
+		     FP_CONTEXT_USER_ID_SET)) {
+			/* Allow idempotent retries from the AP. */
+			if (std::ranges::equal(global_context.user_id,
+					       p->userid)) {
+				return EC_RES_SUCCESS;
+			}
+			return EC_RES_ACCESS_DENIED;
+		}
+
+		std::ranges::copy(p->userid, global_context.user_id.begin());
 
 		/* Set the FP_CONTEXT_USER_ID_SET bit if the user_id is
 		 * non-zero. */
