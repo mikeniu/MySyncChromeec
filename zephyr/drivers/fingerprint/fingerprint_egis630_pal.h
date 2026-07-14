@@ -61,6 +61,9 @@ typedef enum {
 		return errorcode;                     \
 	}
 
+#define ALIGNMENT sizeof(void *)
+#define ALIGN_UP(val, align) ((((val) + ((align) - 1)) & ~((align) - 1)))
+
 /**
  * @brief Sets the global debug level, controlling which log messages are
  * output.
@@ -181,6 +184,15 @@ void __unused plat_sleep_time(unsigned long timeInMs);
 void *__unused sys_alloc(size_t count, size_t size);
 
 /**
+ * @brief Returns the usable size of a block previously returned by sys_alloc().
+ *
+ * @param[in] data A pointer to the allocated memory block.
+ *
+ * @return The size of the payload buffer in bytes.
+ */
+size_t __unused sys_alloc_usable_size(void *data);
+
+/**
  * @brief Releases a block of shared memory.
  *
  * @param[in] data A pointer to the memory block to be released.
@@ -231,9 +243,10 @@ static inline void *plat_alloc(size_t size)
  */
 static inline void *plat_calloc(size_t count, size_t size)
 {
-	void *ptr = sys_alloc(1, count * size);
-	if (ptr)
-		memset(ptr, 0, count * size);
+	void *ptr = sys_alloc(count, size);
+	if (ptr) {
+		memset(ptr, 0, sys_alloc_usable_size(ptr));
+	}
 	return ptr;
 }
 
@@ -250,7 +263,8 @@ static inline void *plat_realloc(void *data, size_t size)
 {
 	void *new_ptr = sys_alloc(1, size);
 	if (new_ptr && data) {
-		memcpy(new_ptr, data, size);
+		size_t old_size = sys_alloc_usable_size(data);
+		memcpy(new_ptr, data, old_size < size ? old_size : size);
 		sys_free(data);
 	}
 	return new_ptr;
