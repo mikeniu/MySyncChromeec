@@ -21,7 +21,7 @@ ZTEST(panic_reason, test_panic_reason_zephyr)
 	k_sys_fatal_error_handler(K_ERR_KERNEL_PANIC, NULL);
 
 	/* ESF structure empty, make sure the reason from Zephyr is stored */
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 	zassert_equal(PANIC_ZEPHYR_FATAL_ERROR, reason);
 	zassert_equal(K_ERR_KERNEL_PANIC, info);
 	zassert_equal((uint8_t)(uintptr_t)k_current_get(), exception);

@@ -118,15 +118,17 @@ __noreturn
 #endif /* !CONFIG_ZEPHYR */
 
 /**
- * Log a panic in the panic log, but don't halt the system. Normally
- * called on the subsequent reboot after panic detection.
+ * Replaces old panic state. Memsets 0 first, then packs reason/info/exc + any
+ * extras. Pass extras=NULL, num_extras=0 for standard panics.
  */
-void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
+void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception,
+		      const uint32_t *extras, size_t num_extras);
 
 /**
- * Retrieve the currently stored panic reason + info.
+ * Retrieves reason/info/exc + optionally copies out extras
  */
-void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
+void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception,
+		      uint32_t *extras, size_t max_extras);
 
 /**
  * Get the panic reason field from a panic_data structure for the current

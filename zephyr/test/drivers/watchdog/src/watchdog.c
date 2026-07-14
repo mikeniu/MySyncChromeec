@@ -135,7 +135,7 @@ ZTEST(watchdog, test_wdt_warning_handler)
 
 	zassert_true(wdt_warning_triggered, "Watchdog timer did not expire.");
 
-	panic_get_reason(&reason, &info, &exception);
+	panic_get_reason(&reason, &info, &exception, NULL, 0);
 
 	zassert_equal(PANIC_SW_WATCHDOG_WARN, reason,
 		      "Watchdog warning panic reason was not set");
