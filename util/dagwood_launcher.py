@@ -18,9 +18,9 @@ def main():
         description="Run twister device tests on host/chroot."
     )
     dagwood_test_lib.add_common_args(parser)
-    args = parser.parse_args()
+    args, extra_args = parser.parse_known_args()
 
-    twister_args = dagwood_test_lib.get_twister_args(args)
+    twister_args = dagwood_test_lib.get_twister_args(args, extra_args)
 
     cmd = ["./twister"]
     cmd.extend(twister_args)
