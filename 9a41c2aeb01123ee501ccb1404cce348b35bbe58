@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9ea5670_8bc557d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T21:02:51Z",
+      "side": 1,
+      "message": "@tomhuhes\n\n```\nThe Bug: Type Mismatch \u0026 Partial Range Copy\nWhile static_assert(sizeof(p-\u003euserid) \u003d\u003d sizeof(global_context.user_id)) successfully passes, it masks a severe logical bug when switching to std::ranges::copy.\n\nWhy it happens:\nThe Representation Difference:\n\np-\u003euserid is defined in the host command parameters (ec_params_fp_context_v1) as a 32-bit array: uint32_t userid[8] (8 elements).\n\nglobal_context.user_id is a byte array: std::array\u003cuint8_t, 32\u003e (32 elements).\n\nBoth have a total size of 32 bytes, which is why sizeof matches and the static_assert passes.\n\nHow std::ranges::copy Behaves:\n\nstd::ranges::copy is element-aware, not byte-aware. It determines how many elements to copy based on the source range\u0027s element count.\n\nBecause p-\u003euserid has only 8 elements (of type uint32_t), std::ranges::copy only performs 8 copy operations.\n\nIt implicitly casts those 8 uint32_t elements to uint8_t (truncating them to their lowest byte) and writes them to the first 8 bytes of global_context.user_id.\n\nThe remaining 24 bytes of global_context.user_id are left untouched (remaining as 0).\n\nThis completely corrupts the active user_id in the context, resulting in key-derivation failures during decryption and causing all downstream fingerprint tests to fail with decryption errors.\n```\n\nI believe, we can abort this CL. It is not worth a compicated fix. Please let me know your thoughts. A lot of these tests failed:\n\n(cr) fsammoura@fsammoura2 /mnt/host/source/src/platform/ec $ sudo ./twister -v -i -T zephyr/test/fingerprint/task -c\n```",
+      "revId": "9a41c2aeb01123ee501ccb1404cce348b35bbe58",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
