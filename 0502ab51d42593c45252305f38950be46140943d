@@ -64,6 +64,30 @@
       },
       "revId": "0502ab51d42593c45252305f38950be46140943d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51c416f0_5822dac1",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-14T23:36:25Z",
+      "side": 1,
+      "message": "I am using the zephyr `ROUND_UP`. Seems they are very similar.",
+      "parentUuid": "d7ba692a_3e6334f6",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 73
+      },
+      "revId": "0502ab51d42593c45252305f38950be46140943d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
