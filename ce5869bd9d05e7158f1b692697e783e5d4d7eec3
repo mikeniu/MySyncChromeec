@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e7eb9a9_fcd35556",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_it8xxx2.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 4714689
+      },
+      "writtenOn": "2026-07-14T20:55:31Z",
+      "side": 1,
+      "message": "Is this comment about erase size being too large still relevant, or would it be nice to update this comment in light of this change?",
+      "revId": "ce5869bd9d05e7158f1b692697e783e5d4d7eec3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
