@@ -22,7 +22,7 @@ def register_skyrim_project(
             # Project-specific KConfig customization.
             here / project_name / "project.conf",
         ],
-        inherited_from=["skyrim"],
+        boards=["skyrim"],
         snippets=snippets,
     )
 
