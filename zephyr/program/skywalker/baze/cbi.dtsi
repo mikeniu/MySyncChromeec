@@ -28,6 +28,29 @@
 			};
 		};
 		/*
+		 * FW_CONFIG field to choose charger chip.
+		 */
+		charger-option {
+			enum-name = "FW_CHARGER";
+			start = <3>;
+			size = <2>;
+
+			/*
+			 * 0: bq25720, 1: rt9478
+			 */
+			charger-option-bq25720 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_CHARGER_BQ25720";
+				value = <0>;
+				default;
+			};
+			charger-option-rt9478 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_CHARGER_RT9478";
+				value = <1>;
+			};
+		};
+		/*
 		 * FW_CONFIG field to describe Clamshell/Convertible.
 		 */
 		form_factor {
