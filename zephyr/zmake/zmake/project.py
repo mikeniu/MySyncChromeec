@@ -56,13 +56,6 @@ class ProjectConfig:
     signer: signers.BaseSigner = signers.NullSigner()
     skip_build_all: bool = False
 
-    @property
-    def full_name(self) -> str:
-        """Get the full project name, e.g. baseboard.variant"""
-        boards = [self.boards] if isinstance(self.boards, str) else self.boards
-
-        return ".".join([*boards, self.project_name])
-
 
 class Project:
     """An object encapsulating a project directory."""
