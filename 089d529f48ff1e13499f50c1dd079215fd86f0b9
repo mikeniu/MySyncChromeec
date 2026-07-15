@@ -16,6 +16,42 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "089d529f48ff1e13499f50c1dd079215fd86f0b9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6a74d2a_887e0855",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-15T22:39:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/1e01955a-14d7-46f2-914a-709da0cb8cb2)]\n\n### Review Summary\n\n*   **Functionality**: The changes aim to introduce an early `EC_MKBP_FP_FINGER_DOWN` notification before image processing. However, the implemented `prev_st` edge detection logic has a sync bug when `FP_MODE_ANY_DETECT_FINGER` toggles, and suppresses the required event on capture retries (which contradicts the latency tracking requirement).\n*   **Style**: The code follows the existing style guidelines. Tests correctly use a helper function to simulate finger transitions.\n*   **Security**: No security vulnerabilities or data leaks were introduced.\n*   **Testing**: Test coverage was updated to simulate edge transitions and expect two MKBP events, which matches the current implementation but masks the retry suppression bug.\n\nTAG\u003dagy\nCONV\u003df5205f4a-c0de-40f7-b5a9-349a8a12d040",
+      "isAi": true,
+      "revId": "089d529f48ff1e13499f50c1dd079215fd86f0b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee1aaafc_8a1e1a91",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-15T22:39:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Regarding your earlier observation that the previous state can get out of sync: this happens because `st` is initialized to `FINGER_NONE` at the top of the loop (line 299). If `FP_MODE_ANY_DETECT_FINGER` is cleared during a loop iteration, we skip reading `fp_finger_status()`, so `st` remains `FINGER_NONE`, and `prev_st` is unconditionally set to `FINGER_NONE` at line 479, regardless of the physical finger presence.\n\nWhen `FP_MODE_ANY_DETECT_FINGER` is subsequently re-enabled, reading the sensor will yield `st \u003d FINGER_PRESENT`, creating a false `finger_transition \u003d true` even if the user never lifted their finger.\n\nFurthermore, by gating the event behind `finger_transition` (which requires `prev_st \u003d\u003d FINGER_NONE`), if `fp_process_finger` fails and we retry on the next loop iteration while the finger remains on the sensor, `finger_transition` will be false. Consequently, we will call `fp_process_finger` to attempt another capture *without* sending the `EC_MKBP_FP_FINGER_DOWN` event for that attempt. This contradicts your requirement that the host needs an event per *capture attempt* for latency tracking.\n\nTo fix both the sync issue and the retry suppression, you could either:\n1. Always read `fp_finger_status()` unconditionally to keep `prev_st` physically accurate, or\n2. (Recommended) Move the `FINGER_DOWN` dispatch directly into `fp_process_finger()` (e.g., right before `fp_acquire_image`), which aligns it perfectly with every capture attempt and bypasses the need for state tracking entirely.",
+      "isAi": true,
+      "revId": "089d529f48ff1e13499f50c1dd079215fd86f0b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
