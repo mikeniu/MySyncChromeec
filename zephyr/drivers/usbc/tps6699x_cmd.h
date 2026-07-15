@@ -351,6 +351,18 @@ int tps_rw_thunderbolt_configuration(const struct i2c_dt_spec *i2c,
 				     int flag);
 
 /**
+ * @brief Read or Write Intel VID Status (Offset = 0x59)
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_intel_vid_status(const struct i2c_dt_spec *i2c,
+			    union reg_intel_vid_status *buf, int flag);
+
+/**
  * @brief Read ADC Results
  *
  * @param i2c device pointer to i2c device
