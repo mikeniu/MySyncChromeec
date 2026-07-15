@@ -33,6 +33,24 @@
       "message": "I think this is too generic for what is effectively a global identifier. You will notice that the other enum values in this file have names like `UFP_VDO_VERSION_1_3`. I\u0027d make it something like `UFP_VDO_VBUS_REQUIRED`.",
       "revId": "972a006a04f454aa165bda8c1c263bd219cb3bf0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed8696c7_69c723ec",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-15T12:07:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "622eb6e6_38fb7864",
+      "revId": "972a006a04f454aa165bda8c1c263bd219cb3bf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
