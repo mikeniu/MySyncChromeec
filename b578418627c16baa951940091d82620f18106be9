@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f27c9abc_66904044",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-15T21:22:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "24bfd60e_e60162f9",
+      "revId": "b578418627c16baa951940091d82620f18106be9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b14f37d_c6f25dc8",
@@ -85,6 +103,30 @@
           ]
         }
       ],
+      "revId": "b578418627c16baa951940091d82620f18106be9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bafe3462_015a861e",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-15T21:22:43Z",
+      "side": 1,
+      "message": "I want to copy the logic the same for this commit so that it\u0027s effectively a move. I applied your suggestion in a follow up CL at crrev/c/8102067",
+      "parentUuid": "0b14f37d_c6f25dc8",
+      "range": {
+        "startLine": 338,
+        "startChar": 4,
+        "endLine": 338,
+        "endChar": 56
+      },
       "revId": "b578418627c16baa951940091d82620f18106be9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
