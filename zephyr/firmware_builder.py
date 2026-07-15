@@ -347,14 +347,18 @@ def build(opts):
         env=env,
     )
     if not opts.code_coverage:
+        ec_to_boxter_boards = read_boxter()
+
         for project in projects:
             build_dir = (
                 platform_ec / "build" / "zephyr" / project.config.project_name
             )
+            boards = list(project.config.boards)
+            # Add additional boards from boxter
+            boards.extend(ec_to_boxter_boards[project.config.project_name])
             metric = metric_list.value.add()
-            full_name = project.config.full_name.split(".")
-            metric.target_name = full_name[-1]
-            metric.platform_name = ".".join(full_name[:-1])
+            metric.target_name = project.config.project_name
+            metric.platform_name = boards[0] if boards else ""
             for variant, _ in project.iter_builds():
                 build_log = build_dir / f"build-{variant}" / "build.log"
                 parse_buildlog(
@@ -674,7 +678,7 @@ def test(opts):
             if project.config.project_name in SPECIAL_BOARDS:
                 tasks.append(
                     (
-                        f"BOARD_{project.config.full_name}".upper(),
+                        f"BOARD_{project.config.project_name}".upper(),
                         build_dir
                         / (project.config.project_name + "_final.info"),
                     )
