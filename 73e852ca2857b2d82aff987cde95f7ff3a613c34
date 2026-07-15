@@ -166,6 +166,30 @@
       },
       "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f78e75f_8ef93f6c",
+        "filename": "zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-07-15T17:41:01Z",
+      "side": 1,
+      "message": "Removed C1_TI_HBR added better comments to line 124 block to explain the configurations",
+      "parentUuid": "9f892677_e3d3f357",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 64
+      },
+      "revId": "73e852ca2857b2d82aff987cde95f7ff3a613c34",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
