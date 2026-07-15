@@ -128,6 +128,15 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
 
 /**
+ * Check if stored panic data represents a new panic.
+ *
+ * A panic is considered new if valid panic data is present in RAM and has not
+ * yet been read and acknowledged by the AP via host command (i.e. the
+ * PANIC_DATA_FLAG_OLD_HOSTCMD flag is not set).
+ */
+bool panic_data_is_new(void);
+
+/**
  * Enable/disable bus fault handler
  *
  * @param ignored	Non-zero if ignoring bus fault
