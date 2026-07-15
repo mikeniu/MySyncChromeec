@@ -26,7 +26,7 @@ def register_ite_project(
             here / "ite-aic" / "project.conf",
             *extra_kconfig_files,
         ],
-        inherited_from=["ec-aic"],
+        boards=["ec-aic"],
     )
 
 
@@ -51,7 +51,7 @@ def register_nuvoton_project(
             here / "npcx-aic" / "project.conf",
             *extra_kconfig_files,
         ],
-        inherited_from=["ec-aic"],
+        boards=["ec-aic"],
     )
 
 
@@ -76,7 +76,7 @@ def register_realtek_project(
             here / "rtk-aic" / "project.conf",
             *extra_kconfig_files,
         ],
-        inherited_from=["ec-aic"],
+        boards=["ec-aic"],
     )
 
 
