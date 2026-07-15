@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa878fbe_4d05d544",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-15T01:37:22Z",
+      "side": 1,
+      "message": "Nit: would it be cleaner to initialize the local variables to the defaults then populate them `if (pdata) { ... }`?",
+      "range": {
+        "startLine": 312,
+        "startChar": 0,
+        "endLine": 317,
+        "endChar": 52
+      },
+      "revId": "75a1820bf3029750edd46368f6a4f64ccca80cda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9374e34_67c0877f",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-15T01:37:22Z",
+      "side": 1,
+      "message": "Can we combine this into one log statement? Something like \n```\nLOG_WRN(\"New Panic Detected, reason: %s(0x%x)\",get_panic_reason_str(reason), reason);\n```",
+      "range": {
+        "startLine": 320,
+        "startChar": 2,
+        "endLine": 325,
+        "endChar": 3
+      },
+      "revId": "75a1820bf3029750edd46368f6a4f64ccca80cda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
