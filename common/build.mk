@@ -109,6 +109,10 @@ common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_passthru.o
 common-$(CONFIG_I2C_PERIPHERAL)+=i2c_peripheral.o
 common-$(CONFIG_I2C_VIRTUAL_BATTERY)+=virtual_battery.o
+common-$(CONFIG_I2C_VIRTUAL_BATTERY)+=i2c_battery_parser.o
+ifneq ($(CONFIG_BATTERY),)
+common-$(CONFIG_I2C_PASSTHRU_RESTRICTED)+=i2c_battery_parser.o
+endif
 common-$(CONFIG_KEYBOARD_PROTOCOL_8042)+=keyboard_8042.o \
 	keyboard_8042_sharedlib.o
 common-$(CONFIG_KEYBOARD_PROTOCOL_MKBP)+=keyboard_mkbp.o mkbp_fifo.o \
