@@ -207,6 +207,7 @@ register_ish_project(
 
 register_ish_project(
     project_name="lite-ish",
+    inherited_from=["nissa"],
     zephyr_board="intel_ish_5_4_1",
     dts_overlays=[
         here / "lite-ish" / "project.overlay",

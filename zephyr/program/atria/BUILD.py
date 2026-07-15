@@ -13,6 +13,7 @@ def register_rtk59_project(
     """Register a Realtek-based variant of atria."""
     register_rtk_project(
         project_name=project_name,
+        inherited_from=["atria"],
         zephyr_board="realtek/rts5912",
         dts_overlays=[
             here / project_name / "project.overlay",
@@ -63,6 +64,7 @@ register_it8xxx2_project(
 
 register_ish_project(
     project_name="atriarvp-ish",
+    inherited_from=["atria"],
     zephyr_board="intel_ish_5_8_0",
     dts_overlays=[
         here / "atriarvp-ish" / "project.overlay",
