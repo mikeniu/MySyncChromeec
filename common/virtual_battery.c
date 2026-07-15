@@ -12,6 +12,12 @@
 #include "util.h"
 #include "virtual_battery.h"
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/logging/log.h>
+
+LOG_MODULE_REGISTER(virtual_battery, LOG_LEVEL_INF);
+#endif
+
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_I2C, outstr)
 #define CPRINTS(format, args...) cprints(CC_I2C, format, ##args)
@@ -34,22 +40,47 @@ static uint8_t cache_hit;
 static const uint8_t *batt_cmd_head;
 static int acc_write_len;
 
-int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
-			    int *err_code, int xferflags, int read_len,
-			    int write_len, const uint8_t *out)
+static const int MANUFACTURER_ACCESS_STATUS = 0x0006;
+static const int MANUFACTURER_ACCESS_SLEEP = 0x0011;
+
+static int virtual_battery_allow_i2c_passthru(const uint8_t *batt_cmd_head,
+					      uint8_t *dest, int read_len,
+					      int write_len)
 {
-#if defined(CONFIG_BATTERY_PRESENT_GPIO) || \
-	defined(CONFIG_BATTERY_PRESENT_CUSTOM)
-	/*
-	 * If the battery isn't present, return a NAK (which we
-	 * would have gotten anyways had we attempted to talk to
-	 * the battery.)
-	 */
-	if (battery_is_present() != BP_YES) {
-		resp->i2c_status = EC_I2C_STATUS_NAK;
-		return EC_ERROR_INVAL;
-	}
+#ifdef CONFIG_BATTERY_SMART
+	int val;
 #endif
+
+	// LOG_INF("batt command: %d", *batt_cmd_head);
+	switch (*batt_cmd_head) {
+	case SB_MANUFACTURER_ACCESS:
+#ifdef CONFIG_BATTERY_SMART
+		if (*batt_cmd_head == SB_MANUFACTURER_ACCESS &&
+		    write_len == 3) {
+			val = batt_cmd_head[1] | batt_cmd_head[2] << 8;
+			if (val == MANUFACTURER_ACCESS_STATUS ||
+			    val == MANUFACTURER_ACCESS_SLEEP)
+				return EC_RES_SUCCESS;
+		}
+#endif
+		return EC_RES_ACCESS_DENIED;
+
+	default:
+		return EC_RES_SUCCESS;
+	}
+}
+
+static int virtual_battery_handler_base(struct ec_response_i2c_passthru *resp,
+					int in_len, int *err_code,
+					int xferflags, int read_len,
+					int write_len, const uint8_t *out,
+					bool permission_check)
+{
+	int (*operation)(const uint8_t *, uint8_t *, int, int) =
+		permission_check ? virtual_battery_allow_i2c_passthru :
+				   virtual_battery_operation;
+	int ret;
+
 	switch (sb_cmd_state) {
 	case IDLE:
 		/*
@@ -71,8 +102,7 @@ int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
 			*err_code = 0;
 		} else {
 			sb_cmd_state = READ_VB;
-			*err_code = virtual_battery_operation(batt_cmd_head,
-							      NULL, 0, 0);
+			*err_code = operation(batt_cmd_head, NULL, 0, 0);
 			/*
 			 * If the reg is not handled by virtual battery, we
 			 * do not support it.
@@ -113,17 +143,20 @@ int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
 		/* write to virtual battery */
 		case START:
 		case WRITE_VB:
-			virtual_battery_operation(batt_cmd_head, NULL, 0,
-						  acc_write_len);
+			ret = operation(batt_cmd_head, NULL, 0, acc_write_len);
+			if (permission_check && ret)
+				*err_code = ret;
 			break;
 		/* read from virtual battery */
 		case READ_VB:
 			if (cache_hit) {
 				read_len += in_len;
-				memset(&resp->data[0], 0, read_len);
-				virtual_battery_operation(batt_cmd_head,
-							  &resp->data[0],
-							  read_len, 0);
+				if (!permission_check)
+					memset(&resp->data[0], 0, read_len);
+				ret = operation(batt_cmd_head, &resp->data[0],
+						read_len, 0);
+				if (permission_check && ret)
+					*err_code = ret;
 			}
 			break;
 		/* LCOV_EXCL_START - Unreachable in IDLE state and remaining
@@ -146,6 +179,36 @@ void reset_parse_state(void)
 	sb_cmd_state = IDLE;
 	cache_hit = 0;
 	acc_write_len = 0;
+}
+
+int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
+			    int *err_code, int xferflags, int read_len,
+			    int write_len, const uint8_t *out)
+{
+#if defined(CONFIG_BATTERY_PRESENT_GPIO) || \
+	defined(CONFIG_BATTERY_PRESENT_CUSTOM)
+	/*
+	 * If the battery isn't present, return a NAK (which we
+	 * would have gotten anyways had we attempted to talk to
+	 * the battery.)
+	 */
+	if (battery_is_present() != BP_YES) {
+		resp->i2c_status = EC_I2C_STATUS_NAK;
+		return EC_ERROR_INVAL;
+	}
+#endif
+	return virtual_battery_handler_base(resp, in_len, err_code, xferflags,
+					    read_len, write_len, out, false);
+}
+
+int battery_permission_handler(int in_len, int xferflags, int read_len,
+			       int write_len, const uint8_t *out)
+{
+	struct ec_response_i2c_passthru resp;
+	int rv = EC_RES_SUCCESS;
+	int rv2 = virtual_battery_handler_base(&resp, in_len, &rv, xferflags,
+					       read_len, write_len, out, true);
+	return rv == EC_RES_SUCCESS ? rv2 : rv;
 }
 
 /*
@@ -407,7 +470,7 @@ int virtual_battery_operation(const uint8_t *batt_cmd_head, uint8_t *dest,
 #endif
 	case SB_MANUFACTURER_ACCESS:
 #ifdef CONFIG_BATTERY_SMART
-		if ((write_len >= 2) && (write_len <= 3)) {
+		if (write_len == 3) {
 			val = batt_cmd_head[1] | batt_cmd_head[2] << 8;
 			/* This may cause an i2c transaction */
 			if (!battery_manufacturer_access(val))

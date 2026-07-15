@@ -41,6 +41,19 @@ int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
 			    int *err_code, int xferflags, int read_len,
 			    int write_len, const uint8_t *out);
 
+/**
+ * Check if a battery i2c passthru read/write is allowed.
+ *
+ * @param in_len	Accumulative number of bytes read
+ * @param xferflags	Flags
+ * @param read_len	Number of bytes to read
+ * @param write_len	Number of bytes to write
+ * @param out		Data to send
+ * @return EC_SUCCESS if successful, non-zero if error or not allowed.
+ */
+int battery_permission_handler(int in_len, int xferflags, int read_len,
+			       int write_len, const uint8_t *out);
+
 /* Reset the state machine and static variables. */
 void reset_parse_state(void);
 

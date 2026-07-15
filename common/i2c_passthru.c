@@ -18,6 +18,10 @@
 
 #ifdef CONFIG_ZEPHYR
 #include "i2c/i2c.h"
+
+#include <zephyr/logging/log.h>
+
+LOG_MODULE_REGISTER(i2c_passthru, LOG_LEVEL_INF);
 #endif
 
 #define CPUTS(outstr) cputs(CC_I2C, outstr)
@@ -100,6 +104,21 @@ static void msg_pop_front(struct msg_queue_t *q, const struct msg_value_t *val)
 	q->out += val->write_len;
 }
 
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+static inline int is_i2c_port_virtual_battery(int port)
+{
+#ifdef CONFIG_ZEPHYR
+	/* For Zephyr compare the actual device, which will be used in
+	 * i2c_transfer function.
+	 */
+	return (i2c_get_device_for_port(port) ==
+		i2c_get_device_for_port(I2C_PORT_VIRTUAL_BATTERY));
+#else
+	return (port == I2C_PORT_VIRTUAL_BATTERY);
+#endif
+}
+#endif /* CONFIG_I2C_VIRTUAL_BATTERY */
+
 /**
  * Perform the voluminous checking required for this message
  *
@@ -113,6 +132,12 @@ static int check_i2c_params(const uint8_t port,
 	const struct ec_params_i2c_passthru *params = args->params;
 	struct msg_queue_t msg_queue;
 	unsigned int size;
+	enum ec_status ret = EC_RES_SUCCESS;
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+	bool has_battery_command = false;
+#endif
+#endif
 
 	if (args->params_size < sizeof(*params)) {
 		PTHRUPRINTS("no params, params_size=%d, need at least %d",
@@ -126,6 +151,21 @@ static int check_i2c_params(const uint8_t port,
 			    args->params_size, size);
 		return EC_RES_INVALID_PARAM;
 	}
+
+	// {
+	// 	static int cache_locked = -1;
+	// 	static int cache_locked_cnt = 0;
+	// 	int new_locked = system_is_locked();
+	// 	if(cache_locked != new_locked)
+	// 	{
+	// 		cache_locked = new_locked;
+	// 		LOG_INF("I2C_PORT_VIRTUAL_BATTERY=%d
+	// VIRTUAL_BATTERY_ADDR_FLAGS=%d", I2C_PORT_VIRTUAL_BATTERY,
+	// VIRTUAL_BATTERY_ADDR_FLAGS);
+	// LOG_INF("system_is_locked=%d count=%d", new_locked,
+	// cache_locked_cnt++);
+	// 	}
+	// }
 
 	/* Loop and process messages */;
 	for (msg_queue = msg_create_queue(params);
@@ -143,12 +183,48 @@ static int check_i2c_params(const uint8_t port,
 				.addr_flags = msg_queue.msg->addr_flags,
 				.cmd = val.is_read ? 0xff : *msg_queue.out,
 			};
-			if (!board_allow_i2c_passthru(&cmd_desc))
-				return EC_RES_ACCESS_DENIED;
+			if (!board_allow_i2c_passthru(&cmd_desc)) {
+				ret = EC_RES_ACCESS_DENIED;
+				break;
+			}
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+			// TODO(b/524135420): Guard not only virtual battery but
+			// also direct battery read/write.
+			if (is_i2c_port_virtual_battery(port)) {
+				if (val.addr_flags ==
+				    VIRTUAL_BATTERY_ADDR_FLAGS) {
+					// LOG_INF("port=%d, %s,
+					// addr=0x%x(7-bit), len=%d", port,
+					// 	val.is_read ? "read" : "write",
+					// val.addr_flags,
+					// msg_queue.msg->len);
+					has_battery_command = true;
+					ret = battery_permission_handler(
+						msg_queue.in_len, val.xferflags,
+						val.read_len, val.write_len,
+						msg_queue.out);
+					if (ret != EC_RES_SUCCESS)
+						break;
+				} else {
+					ret = EC_RES_ACCESS_DENIED;
+					break;
+				}
+			}
+#endif
 		}
 #endif
 		msg_pop_front(&msg_queue, &val);
 	}
+
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+	if (has_battery_command)
+		reset_parse_state();
+#endif
+#endif
+
+	if (ret != EC_RES_SUCCESS)
+		return ret;
 
 	/* Check there is room for the data */
 	if (args->response_max <
@@ -165,21 +241,6 @@ static int check_i2c_params(const uint8_t port,
 
 	return EC_RES_SUCCESS;
 }
-
-#ifdef CONFIG_I2C_VIRTUAL_BATTERY
-static inline int is_i2c_port_virtual_battery(int port)
-{
-#ifdef CONFIG_ZEPHYR
-	/* For Zephyr compare the actual device, which will be used in
-	 * i2c_transfer function.
-	 */
-	return (i2c_get_device_for_port(port) ==
-		i2c_get_device_for_port(I2C_PORT_VIRTUAL_BATTERY));
-#else
-	return (port == I2C_PORT_VIRTUAL_BATTERY);
-#endif
-}
-#endif /* CONFIG_I2C_VIRTUAL_BATTERY */
 
 static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 {
