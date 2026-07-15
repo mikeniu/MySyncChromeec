@@ -50,6 +50,9 @@
 		gpio_ec_tchscr_report_en: ec_tchscr_report_en {
 			gpios = <&gpioh 3 GPIO_OUTPUT>;
 		};
+		gpio_charger_option_0: gpio_charger_option_0 {
+			gpios = <&gpiof 4 GPIO_INPUT>;
+		};
 	};
 
 	gpio-interrupts {
@@ -63,7 +66,6 @@
 		unused-gpios =
 			<&gpiof 0 GPIO_INPUT_PULL_DOWN>,
 			<&gpiof 1 GPIO_INPUT_PULL_DOWN>,
-			<&gpiof 4 GPIO_INPUT_PULL_DOWN>,
 			<&gpiog 3 GPIO_OUTPUT_HIGH>,
 			<&gpiog 4 GPIO_OUTPUT_HIGH>,
 			<&gpiog 5 GPIO_OUTPUT_HIGH>,
@@ -186,6 +188,18 @@
 
 &sha0 {
 	status = "okay";
+};
+
+&i2c0 {
+	alt_charger: isl9238@9 {
+		compatible = "intersil,isl923x";
+		status = "okay";
+		reg = <0x9>;
+	};
+};
+
+&usbc_port0 {
+	chg_alt = <&alt_charger>;
 };
 
 /*
