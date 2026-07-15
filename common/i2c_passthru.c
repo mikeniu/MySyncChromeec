@@ -10,6 +10,7 @@
 #include "console.h"
 #include "host_command.h"
 #include "i2c.h"
+#include "i2c_battery_parser.h"
 #include "system.h"
 #include "usb_pd.h"
 #include "usb_pd_tcpm.h"
@@ -100,6 +101,36 @@ static void msg_queue_pop_front(struct msg_queue_t *q,
 	q->out_len += val->write_len;
 }
 
+#ifdef CONFIG_BATTERY
+static inline bool is_i2c_address_battery(uint16_t address)
+{
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+	return address == VIRTUAL_BATTERY_ADDR_FLAGS;
+#else
+	return address == BATTERY_ADDR_FLAGS;
+#endif
+}
+
+static inline bool is_i2c_port_battery(int port)
+{
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+	static const int battery_port = I2C_PORT_VIRTUAL_BATTERY;
+#else
+	static const int battery_port = I2C_PORT_BATTERY;
+#endif
+
+#ifdef CONFIG_ZEPHYR
+	/* For Zephyr compare the actual device, which will be used in
+	 * i2c_transfer function.
+	 */
+	return (i2c_get_device_for_port(port) ==
+		i2c_get_device_for_port(battery_port));
+#else
+	return (port == battery_port);
+#endif
+}
+#endif
+
 /**
  * Perform the voluminous checking required for this message
  *
@@ -113,6 +144,9 @@ static int check_i2c_params(const uint8_t port,
 	const struct ec_params_i2c_passthru *params = args->params;
 	struct msg_queue_t msg_queue;
 	unsigned int size;
+#if defined(CONFIG_I2C_PASSTHRU_RESTRICTED) && defined(CONFIG_BATTERY)
+	struct i2c_battery_parser_state parser_state = { .initialized = 0 };
+#endif
 
 	if (args->params_size < sizeof(*params)) {
 		PTHRUPRINTS("no params, params_size=%d, need at least %d",
@@ -144,6 +178,24 @@ static int check_i2c_params(const uint8_t port,
 			};
 			if (!board_allow_i2c_passthru(&cmd_desc))
 				return EC_RES_ACCESS_DENIED;
+
+#ifdef CONFIG_BATTERY
+			if (is_i2c_port_battery(port)) {
+				if (!is_i2c_address_battery(val.addr_flags))
+					return EC_RES_ACCESS_DENIED;
+
+				/* Lazy initialization. */
+				if (parser_state.initialized == 0)
+					parser_state =
+						i2c_battery_parser_state_create();
+
+				if (battery_permission_handler(
+					    &parser_state, msg_queue.in_len,
+					    val.xferflags, val.read_len,
+					    val.write_len, msg_queue.out))
+					return EC_RES_ACCESS_DENIED;
+			}
+#endif
 		}
 #endif
 		msg_queue_pop_front(&msg_queue, &val);
@@ -164,21 +216,6 @@ static int check_i2c_params(const uint8_t port,
 
 	return EC_RES_SUCCESS;
 }
-
-#ifdef CONFIG_I2C_VIRTUAL_BATTERY
-static inline int is_i2c_port_virtual_battery(int port)
-{
-#ifdef CONFIG_ZEPHYR
-	/* For Zephyr compare the actual device, which will be used in
-	 * i2c_transfer function.
-	 */
-	return (i2c_get_device_for_port(port) ==
-		i2c_get_device_for_port(I2C_PORT_VIRTUAL_BATTERY));
-#else
-	return (port == I2C_PORT_VIRTUAL_BATTERY);
-#endif
-}
-#endif /* CONFIG_I2C_VIRTUAL_BATTERY */
 
 static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 {
@@ -238,8 +275,8 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 		const struct msg_value_t val = msg_queue_front(&msg_queue);
 
 #ifdef CONFIG_I2C_VIRTUAL_BATTERY
-		if (is_i2c_port_virtual_battery(port) &&
-		    val.addr_flags == VIRTUAL_BATTERY_ADDR_FLAGS) {
+		if (is_i2c_port_battery(port) &&
+		    is_i2c_address_battery(val.addr_flags)) {
 			/* Lazy initialization. */
 			if (parser_state.initialized == 0)
 				parser_state =

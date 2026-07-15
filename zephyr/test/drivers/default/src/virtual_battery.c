@@ -9,6 +9,7 @@
 #include "emul/emul_smart_battery.h"
 #include "gpio.h"
 #include "host_command.h"
+#include "i2c_battery_parser.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 #include "virtual_battery.h"
