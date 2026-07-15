@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "002f3016_2465476d",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-15T21:24:28Z",
+      "side": 1,
+      "message": "Using panic_get_reason since it\u0027s cleaner in this case.",
+      "parentUuid": "aa878fbe_4d05d544",
+      "range": {
+        "startLine": 312,
+        "startChar": 0,
+        "endLine": 317,
+        "endChar": 52
+      },
+      "revId": "75a1820bf3029750edd46368f6a4f64ccca80cda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9374e34_67c0877f",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-15T01:37:22Z",
       "side": 1,
       "message": "Can we combine this into one log statement? Something like \n```\nLOG_WRN(\"New Panic Detected, reason: %s(0x%x)\",get_panic_reason_str(reason), reason);\n```",
+      "range": {
+        "startLine": 320,
+        "startChar": 2,
+        "endLine": 325,
+        "endChar": 3
+      },
+      "revId": "75a1820bf3029750edd46368f6a4f64ccca80cda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44cb220e_90207175",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-15T21:24:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9374e34_67c0877f",
       "range": {
         "startLine": 320,
         "startChar": 2,
