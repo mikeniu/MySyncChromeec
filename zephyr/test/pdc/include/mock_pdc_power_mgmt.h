@@ -31,6 +31,8 @@ DECLARE_FAKE_VOID_FUNC(pdc_power_mgmt_request_data_swap, int);
 DECLARE_FAKE_VOID_FUNC(pdc_power_mgmt_request_power_swap, int);
 DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_reset, int);
 DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_comms_state, bool);
+DECLARE_FAKE_VALUE_FUNC(bool, pdc_power_mgmt_is_suspended);
+
 DECLARE_FAKE_VOID_FUNC(pdc_power_mgmt_set_dual_role, int,
 		       enum pd_dual_role_states);
 DECLARE_FAKE_VALUE_FUNC(enum pd_dual_role_states, pdc_power_mgmt_get_dual_role,

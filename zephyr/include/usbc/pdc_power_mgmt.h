@@ -477,6 +477,14 @@ void pdc_power_mgmt_notify_event(int port, atomic_t event_mask);
 int pdc_power_mgmt_set_comms_state(bool run);
 
 /**
+ * @brief Check if the PDC power management subsystem is suspended.
+ *
+ * @retval True if PDC power management is suspended, false otherwise.
+ */
+bool pdc_power_mgmt_is_suspended(void);
+
+
+/**
  * @brief Return the current UCSI connector status on a port
  *
  * @param port USB-C port number

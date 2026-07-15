@@ -21,3 +21,8 @@ properties:
     type: boolean
     description:
       Enables run-time speed configuration.
+  passthru-allowed:
+    type: string
+    description:
+      Name of the function callback that checks if I2C passthru is allowed on this port when protected.
+

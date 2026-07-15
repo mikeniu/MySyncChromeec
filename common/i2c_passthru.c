@@ -35,6 +35,28 @@
 
 static uint8_t port_protected[I2C_PORT_COUNT];
 
+#if defined(CONFIG_ZEPHYR) && defined(CONFIG_PLATFORM_EC_USB_PD_CONTROLLER)
+#include <zephyr/devicetree.h>
+
+#define CHECK_PDC_ADDR_MATCH(node_id, target_addr) \
+	(DT_REG_ADDR(node_id) == (target_addr)) ||
+
+#define IS_PDC_ADDRESS(addr)                                             \
+	(DT_FOREACH_STATUS_OKAY_VARGS(realtek_rts54_pdc,                 \
+				      CHECK_PDC_ADDR_MATCH, addr)        \
+	 DT_FOREACH_STATUS_OKAY_VARGS(ti_tps6699_pdc,                    \
+				      CHECK_PDC_ADDR_MATCH, addr) false)
+#else
+#define IS_PDC_ADDRESS(addr) (false)
+#endif
+
+__overridable bool pdc_power_mgmt_is_suspended(void)
+{
+	return false;
+}
+
+
+
 /**
  * Perform the voluminous checking required for this message
  *
@@ -76,10 +98,18 @@ static int check_i2c_params(const uint8_t port,
 	for (msgnum = 0, msg = params->msg; msgnum < params->num_msgs;
 	     msgnum++, msg++) {
 		unsigned int addr_flags = msg->addr_flags;
+		uint16_t addr = addr_flags & EC_I2C_ADDR_MASK;
+		bool is_pdc = IS_PDC_ADDRESS(addr);
 
-		PTHRUPRINTS("port=%d, %s, addr=0x%x(7-bit), len=%d", port,
-			    addr_flags & EC_I2C_FLAG_READ ? "read" : "write",
-			    addr_flags & EC_I2C_ADDR_MASK, msg->len);
+		if (is_pdc) {
+			cprints(CC_I2C, "I2C_PTHRU_PDC: msg[%d] port=%d, %s, addr=0x%x, len=%d",
+				msgnum, port,
+				addr_flags & EC_I2C_FLAG_READ ? "read" : "write",
+				addr, msg->len);
+			cprints(CC_I2C, "I2C_PTHRU_PDC: port_protected[%d]=%d (%s)",
+				port, port_protected[port],
+				port_protected[port] ? "PROTECTED" : "UNPROTECTED");
+		}
 
 		if (addr_flags & EC_I2C_FLAG_READ) {
 			read_len += msg->len;
@@ -96,8 +126,15 @@ static int check_i2c_params(const uint8_t port,
 				.addr_flags = addr_flags,
 				.cmd = cmd_id,
 			};
-			if (!board_allow_i2c_passthru(&cmd_desc))
+			if (!board_allow_i2c_passthru(&cmd_desc)) {
+				if (is_pdc)
+					cprints(CC_I2C, "I2C_PTHRU_PDC: board_allow_i2c_passthru -> DENIED");
 				return EC_RES_ACCESS_DENIED;
+			}
+			if (is_pdc)
+				cprints(CC_I2C, "I2C_PTHRU_PDC: board_allow_i2c_passthru -> ALLOWED");
+		} else if (is_pdc) {
+			cprints(CC_I2C, "I2C_PTHRU_PDC: system_is_locked=0 (UNLOCKED) -> skipping board_allow_i2c_passthru()");
 		}
 #endif
 	}
@@ -121,38 +158,65 @@ static int check_i2c_params(const uint8_t port,
 enum ec_status i2c_passthru_is_allowed(int port, uint16_t addr_flags)
 {
 	const struct i2c_port_t *i2c_port;
+	uint16_t addr = addr_flags & EC_I2C_ADDR_MASK;
+	bool is_pdc = IS_PDC_ADDRESS(addr);
 
 	i2c_port = get_i2c_port(port);
 	if (!i2c_port)
 		return EC_RES_INVALID_PARAM;
-	ccprintf("PDCFW: Validating i2c passthru policy for PDC FW update");
+
+	if (is_pdc)
+		cprints(CC_I2C, "PDCFW: Validating i2c passthru policy for PDC FW update (addr=0x%x, port=%d, protected=%d)",
+			addr, port, port_protected[port]);
+
 #ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
-	ccprintf("PDCFW: CONFIG_I2C_PASSTHRU_RESTRICTED is defined");
 	if (system_is_locked()) {
-		ccprintf("PDCFW: System is locked");
 		struct i2c_cmd_desc_t cmd_desc;
 		cmd_desc.port = port;
 		cmd_desc.addr_flags = addr_flags;
 		if (!board_allow_i2c_passthru(&cmd_desc)) {
-			ccprintf("PDCFW: board doesn't allow, DENIED");
+			if (is_pdc)
+				cprints(CC_I2C, "PDCFW: board_allow_i2c_passthru -> DENIED");
 			return EC_RES_ACCESS_DENIED;
-		} else {
-			ccprintf("PDCFW: board does allow");
+		} else if (is_pdc) {
+			cprints(CC_I2C, "PDCFW: board_allow_i2c_passthru -> ALLOWED");
 		}
-	} else {
-		ccprintf("PDCFW: System unlocked");
+	} else if (is_pdc) {
+		cprints(CC_I2C, "PDCFW: System unlocked");
 	}
 #endif
 
 	if (port_protected[port]) {
-		if (!i2c_port->passthru_allowed) {
-			ccprintf("PDCFW: passthru not allowed DENIED");
-			return EC_RES_ACCESS_DENIED;
+		if (i2c_port->passthru_allowed) {
+			if (!i2c_port->passthru_allowed(i2c_port, addr_flags)) {
+				if (is_pdc)
+					cprints(CC_I2C, "PDCFW: port_protected set & passthru_allowed -> DENIED");
+				return EC_RES_ACCESS_DENIED;
+			} else if (is_pdc) {
+				cprints(CC_I2C, "PDCFW: port_protected set & passthru_allowed -> ALLOWED");
+			}
 		} else {
-			ccprintf("PDCFW: passthru allowed");
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
+			struct i2c_cmd_desc_t cmd_desc = {
+				.port = port,
+				.addr_flags = addr_flags,
+				.cmd = 0xff,
+			};
+			if (!board_allow_i2c_passthru(&cmd_desc)) {
+				if (is_pdc)
+					cprints(CC_I2C, "PDCFW: port_protected set & board_allow_i2c_passthru -> DENIED");
+				return EC_RES_ACCESS_DENIED;
+			} else if (is_pdc) {
+				cprints(CC_I2C, "PDCFW: port_protected set & board_allow_i2c_passthru -> ALLOWED");
+			}
+#else
+			if (is_pdc)
+				cprints(CC_I2C, "PDCFW: port_protected set & no callback/allowlist -> DENIED");
+			return EC_RES_ACCESS_DENIED;
+#endif
 		}
-	} else {
-		ccprintf("PDCFW: port not protected");
+	} else if (is_pdc) {
+		cprints(CC_I2C, "PDCFW: port not protected (UNPROTECTED)");
 	}
 
 	return EC_RES_SUCCESS;
@@ -197,26 +261,43 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	/*
 	 * Some batteries would wake up after cut-off if we talk to it.
 	 */
-	if (battery_is_cut_off())
+	if (battery_is_cut_off()) {
 		return EC_RES_ACCESS_DENIED;
+	}
 #endif
 
 	i2c_port = get_i2c_port(port);
-	if (!i2c_port)
+	if (!i2c_port) {
 		return EC_RES_INVALID_PARAM;
+	}
 
 	ret = check_i2c_params(port, args);
-	if (ret)
+	if (ret) {
 		return ret;
+	}
 
 	if (port_protected[port]) {
-		if (!i2c_port->passthru_allowed)
+		if (i2c_port->passthru_allowed) {
+			for (i = 0; i < params->num_msgs; i++) {
+				if (!i2c_port->passthru_allowed(
+					    i2c_port, params->msg[i].addr_flags)) {
+					return EC_RES_ACCESS_DENIED;
+				}
+			}
+		} else {
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
+			for (i = 0; i < params->num_msgs; i++) {
+				struct i2c_cmd_desc_t cmd_desc = {
+					.port = port,
+					.addr_flags = params->msg[i].addr_flags,
+					.cmd = 0xff,
+				};
+				if (!board_allow_i2c_passthru(&cmd_desc))
+					return EC_RES_ACCESS_DENIED;
+			}
+#else
 			return EC_RES_ACCESS_DENIED;
-
-		for (i = 0; i < params->num_msgs; i++) {
-			if (!i2c_port->passthru_allowed(
-				    i2c_port, params->msg[i].addr_flags))
-				return EC_RES_ACCESS_DENIED;
+#endif
 		}
 	}
 
@@ -404,7 +485,7 @@ DECLARE_HOST_COMMAND(EC_CMD_I2C_PASSTHRU_PROTECT, i2c_command_passthru_protect,
 /*****************************************************************************/
 /* Console commands */
 
-#ifdef CONFIG_CMD_I2C_PROTECT
+#if 1 /* Enabled i2cprotect console command for testing */
 static int command_i2cprotect(int argc, const char **argv)
 {
 	if (argc == 1) {

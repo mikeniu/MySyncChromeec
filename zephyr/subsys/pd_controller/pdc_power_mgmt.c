@@ -1350,8 +1350,10 @@ test_mockable int pdc_power_mgmt_update_start(int port)
 			physical_port =
 				i2c_get_port_from_device(hw_config.i2c.bus);
 			if (i2c_passthru_is_allowed(physical_port,
-						    hw_config.i2c.addr) !=
+						    hw_config.i2c.addr |
+							    EC_I2C_FLAG_READ) !=
 			    EC_RES_SUCCESS) {
+
 				LOG_ERR("Update START: Passthru denied for port C%d (bus %d addr"
 					" 0x%02x). Aborting suspend.",
 					port, physical_port,
@@ -5918,6 +5920,24 @@ test_mockable int pdc_power_mgmt_set_comms_state(bool enable_comms)
 
 	return ret;
 }
+
+bool pdc_power_mgmt_is_suspended(void)
+{
+	uint8_t port_count = pdc_power_mgmt_get_usb_pd_port_count();
+
+	if (port_count == 0)
+		return false;
+
+	for (int p = 0; p < port_count; p++) {
+		enum pdc_state_t state = get_pdc_state(&pdc_data[p]->port);
+
+		if (state != PDC_SUSPENDED && state != PDC_DISABLED)
+			return false;
+	}
+
+	return true;
+}
+
 
 test_mockable int
 pdc_power_mgmt_get_connector_status(int port,

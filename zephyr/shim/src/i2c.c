@@ -23,11 +23,28 @@
 	COND_CODE_1(DT_PROP(id, dynamic_speed), (I2C_PORT_FLAG_DYNAMIC_SPEED), \
 		    (0))
 
-#define I2C_PORT_INIT(id)                    \
-	{                                    \
-		.port = I2C_PORT(id),        \
-		.flags = I2C_PORT_FLAGS(id), \
+#define I2C_PORT_PASSTHRU_ALLOWED(id)                                          \
+	COND_CODE_1(DT_NODE_HAS_PROP(id, passthru_allowed),                   \
+		    (DT_STRING_TOKEN(id, passthru_allowed)), (NULL))
+
+#define I2C_PORT_INIT(id)                                                      \
+	{                                                                      \
+		.port = I2C_PORT(id),                                          \
+		.passthru_allowed = I2C_PORT_PASSTHRU_ALLOWED(id),             \
+		.flags = I2C_PORT_FLAGS(id),                                   \
 	},
+
+#define DECLARE_PASSTHRU_ALLOWED(id)                                           \
+	COND_CODE_1(                                                           \
+		DT_NODE_HAS_PROP(id, passthru_allowed),                        \
+		(int DT_STRING_TOKEN(id, passthru_allowed)(                    \
+			 const struct i2c_port_t *port, uint16_t addr_flags);), \
+		())
+
+#if DT_HAS_COMPAT_STATUS_OKAY(named_i2c_ports)
+DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, DECLARE_PASSTHRU_ALLOWED)
+#endif
+
 /*
  * Long term we will not need these, for now they're needed to get things to
  * build since these extern symbols are usually defined in
@@ -39,6 +56,7 @@
 const struct i2c_port_t i2c_ports[] = { DT_FOREACH_CHILD_STATUS_OKAY(
 	NAMED_I2C_PORTS_NODE, I2C_PORT_INIT) };
 const unsigned int i2c_ports_used = ARRAY_SIZE(i2c_ports);
+
 static const int i2c_remote_ports[I2C_PORT_COUNT] = {
 	[0 ...(I2C_PORT_COUNT - 1)] = -1, /* default -1 for unnamed ports */
 	DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, INIT_REMOTE_PORTS)

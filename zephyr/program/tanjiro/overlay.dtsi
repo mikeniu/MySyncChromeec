@@ -25,7 +25,14 @@
 		ec_smb_batt_scl_3v3 {
 			remote-port = <7>;
 		};
+		ec_i2c_pdc_sm_scl_3v3 {
+			passthru-allowed = "tanjiro_pdc_passthru_allowed";
+		};
+		ec_i2c_pdc_s_scl_3v3 {
+			passthru-allowed = "tanjiro_pdc_passthru_allowed";
+		};
 	};
+
 
 	named-gpios {
 		/* unimplemented GPIOs */
