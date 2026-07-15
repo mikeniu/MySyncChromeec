@@ -22,6 +22,30 @@
       },
       "revId": "908659735d0fe1ec47ff12a4033bd685d0884477",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7435827d_3678ec57",
+        "filename": "zephyr/program/bluey/quartz/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-07-15T06:37:27Z",
+      "side": 1,
+      "message": "\u003e Won\u0027t this GPIO be already set to 1 in board_chipset_pre_init_quartz?\n\nThe issue occurs when the system enters off-mode and sends a host command to turn off the lightbar, which pulls the associated GPIO low. If an EC shutdown command is issued immediately afterward, we lose the opportunity to turn the GPIO back on, causing the lightbar unplug animation to be missed. While plugging the device back in restores (board_chipset_pre_init_quartz) the GPIO and triggers the plugging animation, the timing window for the unplug animation is too narrow to catch.\n\nSteps to reproduce:\n1. Boot into off-mode.\n2. Issue an EC shutdown command.\n3. Unplug the device.\n\nResult: The lightbar unplug animation is not displayed.",
+      "parentUuid": "6e11d675_8d37103e",
+      "range": {
+        "startLine": 71,
+        "startChar": 1,
+        "endLine": 71,
+        "endChar": 66
+      },
+      "revId": "908659735d0fe1ec47ff12a4033bd685d0884477",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
