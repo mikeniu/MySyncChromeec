@@ -188,6 +188,18 @@
 	status = "okay";
 };
 
+&i2c0 {
+	alt_charger: rt9478@9 {
+		compatible = "richtek,rt9478";
+		status = "okay";
+		reg = <0x9>;
+	};
+};
+
+&usbc_port0 {
+	chg_alt = <&alt_charger>;
+};
+
 /*
  * When CBI in flash is enabled, setup RO flash layout as follows:
  *   RO binary:    0x00000:0x5DFFF
