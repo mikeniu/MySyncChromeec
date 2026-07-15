@@ -389,6 +389,8 @@ static void cmd_get_current_pdo(struct pdc_data_t *data);
 static void cmd_is_vconn_sourcing(struct pdc_data_t *data);
 static void cmd_set_sx_app_config(struct pdc_data_t *data);
 static void cmd_get_attention_vdo(struct pdc_data_t *data);
+static int write_task_cmd(struct pdc_config_t const *cfg,
+			  enum command_task task, union reg_data *cmd_data);
 static void cmd_set_max_pdp(struct pdc_data_t *data);
 static void cmd_set_battery_capability(struct pdc_data_t *data);
 static void cmd_set_battery_status(struct pdc_data_t *data);
@@ -1383,6 +1385,8 @@ static void cmd_update_retimer(struct pdc_data_t *data)
 {
 	struct pdc_config_t const *cfg = data->dev->config;
 	union reg_port_control pdc_port_control;
+	union reg_thunderbolt_configuration pdc_thunderbolt_config;
+	union reg_data cmd_data;
 	int rv;
 
 	/* Read PDC port control */
@@ -1403,13 +1407,40 @@ static void cmd_update_retimer(struct pdc_data_t *data)
 		goto error_recovery;
 	}
 
-	/* Command has completed */
-	data->cci_event.command_completed = 1;
-	/* Inform the system of the event */
-	call_cci_event_cb(data);
+	/* Clear/Set retimer compliance support in Thunderbolt Config (0x52)
+	 * to clear TBT=1 MUX override state on exit.
+	 */
+	rv = tps_rw_thunderbolt_configuration(
+		&cfg->i2c, &pdc_thunderbolt_config, I2C_MSG_READ);
+	if (rv) {
+		LOG_ERR("TI%d: Read thunderbolt config failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
 
-	/* Transition to idle state */
-	set_state(data, ST_IDLE);
+	pdc_thunderbolt_config.retimer_compliance_support =
+		data->retimer_feature_en;
+
+	rv = tps_rw_thunderbolt_configuration(
+		&cfg->i2c, &pdc_thunderbolt_config, I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Write thunderbolt config failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	cmd_data.data[0] = data->retimer_feature_en ? RISING_EDGE :
+						      FALLING_EDGE;
+	cmd_data.data[1] = EVENT_RETIMER_SOC_OVR_FORCE_PWR;
+
+	rv = write_task_cmd(cfg, COMMAND_TASK_TRIG, &cmd_data);
+	if (rv) {
+		LOG_ERR("Failed to write command");
+		goto error_recovery;
+	}
+
+	/* Transition to wait state */
+	set_state(data, ST_TASK_WAIT);
 	return;
 
 error_recovery:
