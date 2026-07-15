@@ -246,7 +246,8 @@ def create_arg_parser(build, bundle, test):
     parser.add_argument(
         "--metrics",
         dest="metrics",
-        required=True,
+        required=False,
+        default="/tmp/metrics.json",
         help="File to write the json-encoded MetricsList proto message.",
     )
 
