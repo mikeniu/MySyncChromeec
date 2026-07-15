@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa7188b7_5690894d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-15T22:42:09Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d6a74d2a_887e0855",
+      "revId": "089d529f48ff1e13499f50c1dd079215fd86f0b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee1aaafc_8a1e1a91",
@@ -50,6 +68,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Regarding your earlier observation that the previous state can get out of sync: this happens because `st` is initialized to `FINGER_NONE` at the top of the loop (line 299). If `FP_MODE_ANY_DETECT_FINGER` is cleared during a loop iteration, we skip reading `fp_finger_status()`, so `st` remains `FINGER_NONE`, and `prev_st` is unconditionally set to `FINGER_NONE` at line 479, regardless of the physical finger presence.\n\nWhen `FP_MODE_ANY_DETECT_FINGER` is subsequently re-enabled, reading the sensor will yield `st \u003d FINGER_PRESENT`, creating a false `finger_transition \u003d true` even if the user never lifted their finger.\n\nFurthermore, by gating the event behind `finger_transition` (which requires `prev_st \u003d\u003d FINGER_NONE`), if `fp_process_finger` fails and we retry on the next loop iteration while the finger remains on the sensor, `finger_transition` will be false. Consequently, we will call `fp_process_finger` to attempt another capture *without* sending the `EC_MKBP_FP_FINGER_DOWN` event for that attempt. This contradicts your requirement that the host needs an event per *capture attempt* for latency tracking.\n\nTo fix both the sync issue and the retry suppression, you could either:\n1. Always read `fp_finger_status()` unconditionally to keep `prev_st` physically accurate, or\n2. (Recommended) Move the `FINGER_DOWN` dispatch directly into `fp_process_finger()` (e.g., right before `fp_acquire_image`), which aligns it perfectly with every capture attempt and bypasses the need for state tracking entirely.",
       "isAi": true,
+      "revId": "089d529f48ff1e13499f50c1dd079215fd86f0b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "051b5b7a_c6457bae",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-15T22:42:09Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ee1aaafc_8a1e1a91",
       "revId": "089d529f48ff1e13499f50c1dd079215fd86f0b9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
