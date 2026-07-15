@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c66e983_7c7a6028",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-15T11:42:16Z",
+      "side": 1,
+      "message": "I will try to rename it the future CL.",
+      "parentUuid": "4fb445b0_9e8af482",
+      "revId": "f93ba4bc230e376ddb0d5d9270e99aa08f3a6788",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a22954b_444ff870",
