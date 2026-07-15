@@ -1,0 +1,92 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24bfd60e_e60162f9",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-15T01:42:49Z",
+      "side": 1,
+      "message": "Nit: I think convention is to always use braces for if statements.",
+      "revId": "b578418627c16baa951940091d82620f18106be9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b14f37d_c6f25dc8",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-15T01:42:49Z",
+      "side": 1,
+      "message": "Move this into a helper function that gets the panic data and returns the appropriate flags.",
+      "range": {
+        "startLine": 338,
+        "startChar": 4,
+        "endLine": 338,
+        "endChar": 56
+      },
+      "fixSuggestions": [
+        {
+          "fixId": "350a6c52_b0b77396",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "zephyr/shim/src/panic.c",
+              "range": {
+                "startLine": 1,
+                "startChar": 0,
+                "endLine": 1,
+                "endChar": 0
+              },
+              "replacement": "static bool is_panic_data_old(void)\n{\n\tstruct panic_data *pdata \u003d panic_get_data();\n\n\treturn !pdata || (pdata-\u003eflags \u0026 PANIC_DATA_FLAG_OLD_HOSTCMD);\n}\n\n"
+            },
+            {
+              "path": "zephyr/shim/src/panic.c",
+              "range": {
+                "startLine": 320,
+                "startChar": 0,
+                "endLine": 321,
+                "endChar": 0
+              },
+              "replacement": ""
+            },
+            {
+              "path": "zephyr/shim/src/panic.c",
+              "range": {
+                "startLine": 323,
+                "startChar": 0,
+                "endLine": 324,
+                "endChar": 0
+              },
+              "replacement": ""
+            },
+            {
+              "path": "zephyr/shim/src/panic.c",
+              "range": {
+                "startLine": 338,
+                "startChar": 0,
+                "endLine": 339,
+                "endChar": 0
+              },
+              "replacement": "\t\t\t is_panic_data_old()) {\n"
+            }
+          ]
+        }
+      ],
+      "revId": "b578418627c16baa951940091d82620f18106be9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
