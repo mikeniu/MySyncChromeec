@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1cdf27b_cf00bc59",
+        "filename": "zephyr/subsys/ucsi/ppm_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-15T18:27:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2112b083_8b05dc6b",
+      "revId": "12e9cae0ba07d0118f04c3ffe02b6acd7e3d4874",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "557158d1_684c5500",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-14T20:24:37Z",
       "side": 1,
       "message": "The tests here seem to overlap with `ppm_state_machine.c` (test_invalid_read_writes). Can you move the tests for the bounds checking in ppm_common to the state machine tests?\n\nI think the new tests have more coverage so I\u0027d be happy to have them replace or extend the current set there.",
+      "revId": "12e9cae0ba07d0118f04c3ffe02b6acd7e3d4874",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "012b3dd0_366ed4cf",
+        "filename": "zephyr/test/pdc/src/generic/ucsi_ppm_host_cmd.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-15T18:27:36Z",
+      "side": 1,
+      "message": "There was only one test here that called into ppm_common directly - `test_ppm_write_is_valid_buf_null`.  This test case was already covered by  `test_invalid_read_writes` so I\u0027ve deleted  `test_ppm_write_is_valid_buf_null`.\n\nThe remaining tests are largely testing `ucsi_ppm_write`, but are done explicitly using host command API.\n\nI\u0027d like to keep these tests since it validates that `EC_CMD_UCSI_PPM_SET` has proper bounds checks.",
+      "parentUuid": "557158d1_684c5500",
       "revId": "12e9cae0ba07d0118f04c3ffe02b6acd7e3d4874",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
