@@ -584,11 +584,11 @@ enum usb_typec_current_t pdc_power_mgmt_get_default_current_limit(int port);
 bool pdc_power_mgmt_get_frs_hw_supported(int port);
 
 /**
- * @brief Enable/Disable PDC TrySRC on a port
+ * @brief Ensure PDC TrySRC is enabled on a port
  *
  * @param port USB-C port number
- * @param enable enable or disable TrySRC on port. True sets DRP_TRY_SRC and
- *        false sets DRP_NORMAL
+ * @param enable request to enable TrySRC on the port. The implementation keeps
+ *        the port in DRP_TRY_SRC and ignores redundant enable requests.
  *
  * @retval 0 if successful
  * @retval -ERANGE if \p port is invalid
