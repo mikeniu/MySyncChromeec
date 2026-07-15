@@ -554,14 +554,23 @@ ZTEST_USER(pdc_power_mgmt_api_connectionless, test_set_trysrc)
 
 	zassert_equal(DRP_TRY_SRC, drp_mode);
 
-	/* Disable TrySrc */
+	/* Repeated enable should be ignored when already in DRP_TRY_SRC */
+	zassert_ok(pdc_power_mgmt_set_trysrc(TEST_PORT, true));
+
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
+
+	zassert_ok(emul_pdc_get_drp_mode(emul, &drp_mode));
+
+	zassert_equal(DRP_TRY_SRC, drp_mode);
+
+	/* Disable requests are ignored and keep the port in DRP_TRY_SRC */
 	zassert_ok(pdc_power_mgmt_set_trysrc(TEST_PORT, false));
 
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
 
 	zassert_ok(emul_pdc_get_drp_mode(emul, &drp_mode));
 
-	zassert_equal(DRP_NORMAL, drp_mode);
+	zassert_equal(DRP_TRY_SRC, drp_mode);
 }
 
 ZTEST_USER(pdc_power_mgmt_api_connectionless, test_get_drp)
