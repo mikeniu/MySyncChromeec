@@ -106,6 +106,7 @@ UNUSED_BOARDS = {
     "npcx9",
     "npcx_monitor",
     "axii",
+    "rtk_flame",
 }
 
 # Unused inherited_from values that are expected to be unused, such as dev boards.

@@ -225,9 +225,9 @@ class ProjectRegistrationHandler:
             Another ProjectRegistrationHandler.
         """
         new_config = dataclasses.asdict(self.base_config)
+        # inherited_from is a bad name, it should be called "boards"
         new_config["inherited_from"] = [
             *self.base_config.inherited_from,
-            self.base_config.project_name,
         ]
 
         for key, value in kwargs.items():
