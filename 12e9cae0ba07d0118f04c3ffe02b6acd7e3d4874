@@ -69,6 +69,24 @@
       "parentUuid": "557158d1_684c5500",
       "revId": "12e9cae0ba07d0118f04c3ffe02b6acd7e3d4874",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dcb5408_a081bec2",
+        "filename": "zephyr/test/pdc/src/generic/ucsi_ppm_host_cmd.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1365249
+      },
+      "writtenOn": "2026-07-15T18:31:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "012b3dd0_366ed4cf",
+      "revId": "12e9cae0ba07d0118f04c3ffe02b6acd7e3d4874",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
