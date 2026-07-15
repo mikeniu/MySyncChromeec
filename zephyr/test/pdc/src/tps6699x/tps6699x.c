@@ -638,3 +638,98 @@ ZTEST_USER(tps6699x, test_usb_comm_capable_as_device_config)
 	k_sleep(K_MSEC(SLEEP_MS));
 	zassert_false(info.usb_comm_capable_as_device);
 }
+
+ZTEST_USER(tps6699x, test_set_battery_capability)
+{
+	struct pdc_callback callback;
+	union battery_capability_t bc = { 0 };
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	emul_pdc_fail_reg_write(emul, REG_TX_BATTERY_CAPABILITIES);
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	pdc_set_battery_capability(dev, &bc);
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(tps6699x, test_set_battery_status)
+{
+	struct pdc_callback callback;
+	union battery_status_t bs = { 0 };
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	emul_pdc_fail_reg_write(emul,
+				REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT);
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	pdc_set_battery_status(dev, &bs);
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+}
+
+ZTEST_USER(tps6699x, test_update_retimer_enable)
+{
+	struct pdc_callback callback;
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	test_cc_cb_called = false;
+	test_cc_cb_cci.raw_value = 0;
+
+	zassert_ok(pdc_update_retimer_fw(dev, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_false(test_cc_cb_cci.error);
+
+	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(tps6699x, test_update_retimer_disable)
+{
+	struct pdc_callback callback;
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	test_cc_cb_called = false;
+	test_cc_cb_cci.raw_value = 0;
+
+	zassert_ok(pdc_update_retimer_fw(dev, false));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_false(test_cc_cb_cci.error);
+
+	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(tps6699x, test_update_retimer_fail)
+{
+	struct pdc_callback callback;
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+
+	emul_pdc_fail_reg_write(emul, REG_COMMAND_FOR_I2C1);
+	test_cc_cb_called = false;
+	test_cc_cb_cci.raw_value = 0;
+
+	zassert_ok(pdc_update_retimer_fw(dev, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+
+	pdc_set_cc_callback(dev, NULL);
+}

@@ -1458,6 +1458,23 @@ union reg_thunderbolt_configuration {
 };
 
 /**
+ * @brief 4.60 Intel VID Status Register (Offset 0x59)
+ */
+union reg_intel_vid_status {
+	struct {
+		uint8_t intel_vid_detected : 1;
+		uint8_t tbt_mode_active : 1;
+		uint8_t forced_tbt_mode : 1;
+		uint8_t reserved0 : 5;
+		uint32_t tbt_attention : 32;
+		uint16_t tbt_enter_mode : 16;
+		uint16_t tbt_mode_rx_sop : 16;
+		uint16_t tbt_mode_rx_sopp : 16;
+	} __packed;
+	uint8_t raw_value[11];
+};
+
+/**
  * @brief 4.62 Data Status Register (Offset 0x5f)
  */
 union reg_data_status {
