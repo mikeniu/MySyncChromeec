@@ -39,6 +39,8 @@
 	named-gpios {
 		/delete-node/ ec_kso_02_inv;
 		/delete-node/ en_pp5000_z1;
+		/delete-node/ ec_voldn_btn_odl;
+		/delete-node/ ec_volup_btn_odl;
 
 		gpio_ec_kso_02: ec_kso_02 {
 			gpios = <&gpioksol 2 (GPIO_OUTPUT | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_LOW)>;
@@ -50,9 +52,15 @@
 		gpio_ec_tchscr_report_en: ec_tchscr_report_en {
 			gpios = <&gpioh 3 GPIO_OUTPUT>;
 		};
+		gpio_charger_option_0: gpio_charger_option_0 {
+			gpios = <&gpioe 3 GPIO_INPUT>;
+		};
 	};
 
 	gpio-interrupts {
+		/delete-node/ volume-up;
+		/delete-node/ volume-down;
+
 		int_imu: ec-imu {
 			handler = "bma4xx_interrupt";
 		};
@@ -61,6 +69,7 @@
 	unused-pins {
 		compatible = "unused-gpios";
 		unused-gpios =
+			<&gpioe 4 GPIO_INPUT_PULL_DOWN>,
 			<&gpiof 0 GPIO_INPUT_PULL_DOWN>,
 			<&gpiof 1 GPIO_INPUT_PULL_DOWN>,
 			<&gpiof 4 GPIO_INPUT_PULL_DOWN>,
@@ -186,6 +195,18 @@
 
 &sha0 {
 	status = "okay";
+};
+
+&i2c0 {
+	alt_charger: isl9238@9 {
+		compatible = "intersil,isl923x";
+		status = "okay";
+		reg = <0x9>;
+	};
+};
+
+&usbc_port0 {
+	chg_alt = <&alt_charger>;
 };
 
 /*
