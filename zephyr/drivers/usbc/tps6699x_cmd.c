@@ -249,6 +249,13 @@ int tps_rw_thunderbolt_configuration(const struct i2c_dt_spec *i2c,
 			    sizeof(union reg_thunderbolt_configuration), flag);
 }
 
+int tps_rw_intel_vid_status(const struct i2c_dt_spec *i2c,
+			    union reg_intel_vid_status *buf, int flag)
+{
+	return tps_xfer_reg(i2c, REG_INTEL_VID_STATUS, buf->raw_value,
+			    sizeof(union reg_intel_vid_status), flag);
+}
+
 int tps_rd_power_path_status(const struct i2c_dt_spec *i2c,
 			     union reg_power_path_status *buf)
 {
