@@ -351,6 +351,70 @@ int tps_rw_thunderbolt_configuration(const struct i2c_dt_spec *i2c,
 				     int flag);
 
 /**
+<<<<<<< HEAD   (f32cc77bcb523beb855705a0040aa118d67aa02d battery: Add kconfig to handle NULLs in manuf name)
+||||||| BASE   (297f78524132ecf73219af328ae836e9918edb0b Bundle firmware based on boxter configs)
+ * @brief Read or Write Tx Battery Capabilities
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_battery_capability(const struct i2c_dt_spec *i2c,
+			      union reg_battery_capability *buf, int flag);
+
+/**
+ * @brief Read or Write Transmitted Battery Status Data Objects
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_battery_status(const struct i2c_dt_spec *i2c,
+			  union reg_battery_status *buf, int flag);
+
+/**
+=======
+ * @brief Read or Write Intel VID Status (Offset = 0x59)
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_intel_vid_status(const struct i2c_dt_spec *i2c,
+			    union reg_intel_vid_status *buf, int flag);
+
+/**
+ * @brief Read or Write Tx Battery Capabilities
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_battery_capability(const struct i2c_dt_spec *i2c,
+			      union reg_battery_capability *buf, int flag);
+
+/**
+ * @brief Read or Write Transmitted Battery Status Data Objects
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_battery_status(const struct i2c_dt_spec *i2c,
+			  union reg_battery_status *buf, int flag);
+
+/**
+>>>>>>> CHANGE (a8db28438cb0cec0e3654afd2ae35e188b9c4efd pdc: tps6699x: Update TBT config and call task_trig for reti)
  * @brief Read ADC Results
  *
  * @param i2c device pointer to i2c device

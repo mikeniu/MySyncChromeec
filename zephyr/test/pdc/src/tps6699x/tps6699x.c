@@ -623,3 +623,166 @@ ZTEST_USER(tps6699x, test_ap_mode_override_off)
 	else
 		zassert_true(caps_out.bmOptionalFeatures.alt_mode_override);
 }
+<<<<<<< HEAD   (f32cc77bcb523beb855705a0040aa118d67aa02d battery: Add kconfig to handle NULLs in manuf name)
+||||||| BASE   (297f78524132ecf73219af328ae836e9918edb0b Bundle firmware based on boxter configs)
+
+ZTEST_USER(tps6699x, test_usb_comm_capable_as_device_config)
+{
+	struct pdc_info_t info;
+
+	/* usb_comm_capable_as_device should be false as it is not supported */
+	zassert_ok(pdc_get_info(dev, &info, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_false(info.usb_comm_capable_as_device);
+
+	zassert_ok(pdc_get_info(dev2, &info, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_false(info.usb_comm_capable_as_device);
+}
+
+ZTEST_USER(tps6699x, test_set_battery_capability)
+{
+	struct pdc_callback callback;
+	union battery_capability_t bc = { 0 };
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	emul_pdc_fail_reg_write(emul, REG_TX_BATTERY_CAPABILITIES);
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	pdc_set_battery_capability(dev, &bc);
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(tps6699x, test_set_battery_status)
+{
+	struct pdc_callback callback;
+	union battery_status_t bs = { 0 };
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	emul_pdc_fail_reg_write(emul,
+				REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT);
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	pdc_set_battery_status(dev, &bs);
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+}
+=======
+
+ZTEST_USER(tps6699x, test_usb_comm_capable_as_device_config)
+{
+	struct pdc_info_t info;
+
+	/* usb_comm_capable_as_device should be false as it is not supported */
+	zassert_ok(pdc_get_info(dev, &info, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_false(info.usb_comm_capable_as_device);
+
+	zassert_ok(pdc_get_info(dev2, &info, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_false(info.usb_comm_capable_as_device);
+}
+
+ZTEST_USER(tps6699x, test_set_battery_capability)
+{
+	struct pdc_callback callback;
+	union battery_capability_t bc = { 0 };
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	emul_pdc_fail_reg_write(emul, REG_TX_BATTERY_CAPABILITIES);
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	pdc_set_battery_capability(dev, &bc);
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(tps6699x, test_set_battery_status)
+{
+	struct pdc_callback callback;
+	union battery_status_t bs = { 0 };
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	emul_pdc_fail_reg_write(emul,
+				REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT);
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	pdc_set_battery_status(dev, &bs);
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+}
+
+ZTEST_USER(tps6699x, test_update_retimer_enable)
+{
+	struct pdc_callback callback;
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	test_cc_cb_called = false;
+	test_cc_cb_cci.raw_value = 0;
+
+	zassert_ok(pdc_update_retimer_fw(dev, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_false(test_cc_cb_cci.error);
+
+	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(tps6699x, test_update_retimer_disable)
+{
+	struct pdc_callback callback;
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	test_cc_cb_called = false;
+	test_cc_cb_cci.raw_value = 0;
+
+	zassert_ok(pdc_update_retimer_fw(dev, false));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_false(test_cc_cb_cci.error);
+
+	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(tps6699x, test_update_retimer_fail)
+{
+	struct pdc_callback callback;
+
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+
+	emul_pdc_fail_reg_write(emul, REG_COMMAND_FOR_I2C1);
+	test_cc_cb_called = false;
+	test_cc_cb_cci.raw_value = 0;
+
+	zassert_ok(pdc_update_retimer_fw(dev, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_true(test_cc_cb_cci.error);
+
+	pdc_set_cc_callback(dev, NULL);
+}
+>>>>>>> CHANGE (a8db28438cb0cec0e3654afd2ae35e188b9c4efd pdc: tps6699x: Update TBT config and call task_trig for reti)

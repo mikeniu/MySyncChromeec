@@ -249,6 +249,47 @@ int tps_rw_thunderbolt_configuration(const struct i2c_dt_spec *i2c,
 			    sizeof(union reg_thunderbolt_configuration), flag);
 }
 
+<<<<<<< HEAD   (f32cc77bcb523beb855705a0040aa118d67aa02d battery: Add kconfig to handle NULLs in manuf name)
+||||||| BASE   (297f78524132ecf73219af328ae836e9918edb0b Bundle firmware based on boxter configs)
+int tps_rw_battery_capability(const struct i2c_dt_spec *i2c,
+			      union reg_battery_capability *buf, int flag)
+{
+	return tps_xfer_reg(i2c, REG_TX_BATTERY_CAPABILITIES, buf->raw_value,
+			    sizeof(union reg_battery_capability), flag);
+}
+
+int tps_rw_battery_status(const struct i2c_dt_spec *i2c,
+			  union reg_battery_status *buf, int flag)
+{
+	return tps_xfer_reg(i2c, REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT,
+			    buf->raw_value, sizeof(union reg_battery_status),
+			    flag);
+}
+
+=======
+int tps_rw_intel_vid_status(const struct i2c_dt_spec *i2c,
+			    union reg_intel_vid_status *buf, int flag)
+{
+	return tps_xfer_reg(i2c, REG_INTEL_VID_STATUS, buf->raw_value,
+			    sizeof(union reg_intel_vid_status), flag);
+}
+
+int tps_rw_battery_capability(const struct i2c_dt_spec *i2c,
+			      union reg_battery_capability *buf, int flag)
+{
+	return tps_xfer_reg(i2c, REG_TX_BATTERY_CAPABILITIES, buf->raw_value,
+			    sizeof(union reg_battery_capability), flag);
+}
+
+int tps_rw_battery_status(const struct i2c_dt_spec *i2c,
+			  union reg_battery_status *buf, int flag)
+{
+	return tps_xfer_reg(i2c, REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT,
+			    buf->raw_value, sizeof(union reg_battery_status),
+			    flag);
+}
+
+>>>>>>> CHANGE (a8db28438cb0cec0e3654afd2ae35e188b9c4efd pdc: tps6699x: Update TBT config and call task_trig for reti)
 int tps_rd_power_path_status(const struct i2c_dt_spec *i2c,
 			     union reg_power_path_status *buf)
 {
