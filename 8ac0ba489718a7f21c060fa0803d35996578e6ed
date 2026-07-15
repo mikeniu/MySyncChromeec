@@ -96,6 +96,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6df13ae_8be838b7",
+        "filename": "zephyr/program/bluey/mica/src/chipset.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-07-15T05:37:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4dd54156_da02b65c",
+      "range": {
+        "startLine": 58,
+        "startChar": 1,
+        "endLine": 66,
+        "endChar": 64
+      },
+      "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45075f48_ebfc950a",
@@ -127,6 +151,24 @@
       "side": 1,
       "message": "OK",
       "parentUuid": "45075f48_ebfc950a",
+      "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b13c1f38_f69e8429",
+        "filename": "zephyr/program/bluey/mica/src/led.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-07-15T05:37:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ebb6730f_5c620ab5",
       "revId": "8ac0ba489718a7f21c060fa0803d35996578e6ed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
