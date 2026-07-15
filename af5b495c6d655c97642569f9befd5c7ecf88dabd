@@ -178,6 +178,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2e5035bd_599560c9",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-15T14:17:54Z",
+      "side": 1,
+      "message": "\u003e 3.1 -\u003e 3.2\n\u003e DFP version: 3.1 011b - Version 1.3 replaced 1.2 from PD3.1 - 010b\n\nI\u0027m looking at r3.2 v1.2, and it still has DFP VDO version 1.2. 011b would be invalid. What spec version are you looking at?",
+      "parentUuid": "22a8033f_8b2d1573",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6bcf67b8_692cb8fc",
         "filename": "include/usb_pd_vdo.h",
         "patchSetId": 1
