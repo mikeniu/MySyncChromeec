@@ -78,6 +78,17 @@ config CROS_EC_HOOK_TICK_INTERVAL
 	  periodically by the HOOKS task. The interval must be shorter than
 	  1 second and is set according the EC chipset's sleep requirements.
 
+config CROS_EC_LIGHTBAR_ANIMATION_HOLD_MS
+	int "Lightbar animation end hold time (ms)"
+	default 50
+	help
+	  Specifies the duration (in milliseconds) to hold the final state
+	  of a one-shot lightbar animation before allowing a transition
+	  to the next state. This helps prevent abrupt visual changes.
+	  The default value is 50ms. Some platforms may require a
+	  longer hold time due to hardware or driver latencies to ensure
+	  animations complete fully.
+
 # When building for the host, we still need values for the various memory
 # sizes, though they aren't actually used, so just set some reasonable-looking
 # values and then ignore them.
