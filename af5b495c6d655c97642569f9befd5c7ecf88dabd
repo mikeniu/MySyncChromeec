@@ -160,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "22a8033f_8b2d1573",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-15T12:57:20Z",
+      "side": 1,
+      "message": "3.0 -\u003e 3.1\nIDH: In 3.1 Connector type took 2 bits (22,21) before in PD3.0 zeros were expected.\nUFP VDO version: 3.0 only 1.0 (000b), 3.1 replaced with 1.3 (011b). \nVConn and Vbus required: New bits in 3.1 bits B7 and B6.\nUSB Highest Speed: Gen4 added in PD3.1 as 100b\nDFP version: 3.0 had Version 1.0 (000b), replaced in 3.1 with Version 1.2 (010b)\n\n3.1 -\u003e 3.2\nDFP version: 3.1 011b - Version 1.3 replaced 1.2 from PD3.1 - 010b",
+      "parentUuid": "b9fd4cf7_c811280f",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6bcf67b8_692cb8fc",
         "filename": "include/usb_pd_vdo.h",
         "patchSetId": 1
