@@ -3256,9 +3256,20 @@ static int send_pdc_cmd(struct pdc_port_t *port)
 		rv = pdc_set_ccom(port->pdc, port->una_policy.cc_mode);
 		break;
 	case CMD_PDC_SET_DRP:
+		if (port->drp_read != DRP_INVALID && port->drp_read == port->drp) {
+			LOG_INF("C%d: DRP already %s; skipping SET_DRP",
+				config->connector_num,
+				get_drp_mode_name(port->drp));
+			rv = 0;
+			break;
+		}
+
 		LOG_INF("C%d: SET_DRP_MODE=%s", config->connector_num,
 			get_drp_mode_name(port->drp));
 		rv = pdc_set_drp_mode(port->pdc, port->drp);
+		if (!rv) {
+			port->drp_read = port->drp;
+		}
 		break;
 	case CMD_PDC_GET_DRP:
 		rv = pdc_get_drp_mode(port->pdc, &port->drp_read);
@@ -3920,7 +3931,7 @@ static void enforce_pd_chipset_suspend_policy_1(int port)
 
 	atomic_clear_bit(pdc_data[port]->port.snk_policy.flags,
 			 SNK_POLICY_EVAL_SWAP_TO_SRC);
-	pdc_power_mgmt_set_dual_role(port, PD_DRP_TOGGLE_OFF);
+	pdc_power_mgmt_set_dual_role(port, PD_DRP_TOGGLE_ON);
 }
 
 /**
@@ -3931,7 +3942,7 @@ static void enforce_pd_chipset_startup_policy_1(int port)
 {
 	LOG_DBG("C%d: Chipset Startup Policy 1", port);
 
-	pdc_power_mgmt_set_dual_role(port, PD_DRP_TOGGLE_OFF);
+	pdc_power_mgmt_set_dual_role(port, PD_DRP_TOGGLE_ON);
 	/* Notify PDC that the AP is starting up to enable retimer */
 	pdc_notify_ap_power_state(port, POWER_S0);
 }
@@ -4246,6 +4257,7 @@ static void init_port_variables(struct pdc_port_t *port,
 	port->last_state = PDC_INIT;
 	port->next_state = PDC_INIT;
 	port->send_cmd_return_state = PDC_INVALID;
+	port->drp_read = DRP_INVALID;
 	discovery_info_init(port);
 }
 
@@ -5027,14 +5039,16 @@ test_mockable void pdc_power_mgmt_set_dual_role(int port,
 		port_data->drp = port_data->una_policy.drp_mode;
 		atomic_set_bit(port_data->una_policy.flags, UNA_POLICY_CC_MODE);
 		break;
-	/* Stay in src until disconnect, then stay in sink forever */
+	/* Stay in DRP mode; never force a disable transition */
 	case PD_DRP_TOGGLE_OFF:
-		/* Allow external power role swap from source to sink, but not
-		 * the reverse */
+		/* Keep the port in DRP mode and preserve the current
+		 * TrySrc/normal configuration rather than forcing it off.
+		 */
 		port_data->src_policy.accept_power_role_swap = true;
-		port_data->snk_policy.accept_power_role_swap = false;
+		port_data->snk_policy.accept_power_role_swap = true;
 
-		port_data->una_policy.cc_mode = CCOM_RD;
+		port_data->una_policy.cc_mode = CCOM_DRP;
+		port_data->drp = port_data->una_policy.drp_mode;
 		atomic_set_bit(port_data->una_policy.flags, UNA_POLICY_CC_MODE);
 		break;
 	/* Stay in current power role, don't switch. No auto-toggle support */
@@ -5116,9 +5130,20 @@ test_mockable int pdc_power_mgmt_set_trysrc(int port, bool enable)
 		return -ERANGE;
 	}
 
+	if (!enable) {
+		LOG_INF("C%d: PD keep TrySrc enabled; ignoring disable request",
+			port);
+		return 0;
+	}
+
+	if (pdc_data[port]->port.drp == DRP_TRY_SRC) {
+		LOG_INF("C%d: PD already in DRP_TRY_SRC; ignoring set", port);
+		return 0;
+	}
+
 	LOG_INF("C%d: PD setting TrySrc=%d", port, enable);
 
-	pdc_data[port]->port.drp = (enable ? DRP_TRY_SRC : DRP_NORMAL);
+	pdc_data[port]->port.drp = DRP_TRY_SRC;
 
 	return public_api_block(port, CMD_PDC_SET_DRP);
 }
