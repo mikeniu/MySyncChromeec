@@ -109,6 +109,69 @@ ZTEST(common_cbi, test_cbi_set_string)
 			  &cbi_data.data);
 }
 
+ZTEST_USER(common_cbi, test_cbi_find_tag_out_of_bounds)
+{
+	struct test_cbi_blob {
+		struct cbi_header cbi_head;
+		struct cbi_data cbi_data;
+	} __packed blob = {
+		.cbi_head = {
+			.magic = { 0x43, 0x42, 0x49 }, /* 'C', 'B', 'I' */
+			.version = 0,
+			.total_size = sizeof(struct test_cbi_blob),
+		},
+		.cbi_data = {
+			.tag = 1,
+			.size = 10, /* Size exceeds bounds limit */
+		},
+	};
+	blob.cbi_head.crc = cbi_crc8(&blob.cbi_head);
+
+	zassert_is_null(cbi_find_tag(&blob, 1), NULL);
+}
+
+ZTEST_USER(common_cbi, test_is_valid_cbi_out_of_bounds)
+{
+	struct test_cbi_blob {
+		struct cbi_header cbi_head;
+		struct cbi_data cbi_data;
+	} __packed blob = {
+		.cbi_head = {
+			.magic = { 0x43, 0x42, 0x49 }, /* 'C', 'B', 'I' */
+			.version = 0,
+			.total_size = sizeof(struct test_cbi_blob),
+		},
+		.cbi_data = {
+			.tag = 1,
+			.size = 10, /* Size exceeds bounds limit */
+		},
+	};
+	blob.cbi_head.crc = cbi_crc8(&blob.cbi_head);
+
+	struct actual_set_params {
+		struct ec_params_set_cbi_bin params;
+		uint8_t actual_data[sizeof(blob)];
+	};
+
+	struct actual_set_params hc_set_params = {
+		.params = {
+		.offset = 0,
+		.size = sizeof(blob),
+		.flags = EC_CBI_BIN_BUFFER_CLEAR | EC_CBI_BIN_BUFFER_WRITE,
+		},
+	};
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_CBI_BIN_WRITE, 0, hc_set_params);
+
+	memcpy(hc_set_params.params.data, &blob, sizeof(blob));
+
+	/* Turn off write-protect so we can actually write */
+	gpio_wp_l_set(1);
+
+	zassert_not_equal(host_command_process(&set_args), EC_RES_SUCCESS,
+			  NULL);
+}
+
 ZTEST_USER(common_cbi, test_hc_cbi_set_then_get)
 {
 	const uint8_t data[] = "I love test coverage! <3";
@@ -230,30 +293,41 @@ ZTEST_USER(common_cbi, test_hc_cbi_set_then_get__with_too_small_response)
 
 ZTEST_USER(common_cbi, test_hc_cbi_bin_write_then_read)
 {
-	/*
-	 * cbi_bin commands will do a validity check on the header.
-	 * This data allows the cbi to pass the validity check.
-	 */
-	const uint8_t data[] = {
-		0x43, 0x42, 0x49, 0x96, 0x00, 0x00, 0x30, 0x00
+	/* Create a valid CBI blob with the header and 1 TLVs. */
+	struct test_cbi_blob {
+		struct cbi_header head;
+		struct cbi_data tag1;
+		uint8_t tag1_data[4];
+	} __packed blob = {
+		.head = {
+			.magic = { 0x43, 0x42, 0x49 }, /* 'C', 'B', 'I' */
+			.version = 0,
+			.total_size = sizeof(struct test_cbi_blob),
+		},
+		.tag1 = {
+			.tag = CBI_TAG_SKU_ID,
+			.size = 4,
+		},
+		.tag1_data = { 0x11, 0x22, 0x33, 0x44 },
 	};
+	blob.head.crc = cbi_crc8(&blob.head);
 
 	struct actual_set_params {
 		struct ec_params_set_cbi_bin params;
-		uint8_t actual_data[ARRAY_SIZE(data)];
+		uint8_t actual_data[sizeof(struct test_cbi_blob)];
 	};
 
 	struct actual_set_params hc_set_params = {
 		.params = {
 		.offset = 0,
-		.size = ARRAY_SIZE(data),
+		.size = sizeof(struct test_cbi_blob),
 		.flags = EC_CBI_BIN_BUFFER_CLEAR | EC_CBI_BIN_BUFFER_WRITE,
 		},
 	};
 	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
 		EC_CMD_CBI_BIN_WRITE, 0, hc_set_params);
 
-	memcpy(hc_set_params.params.data, data, ARRAY_SIZE(data));
+	memcpy(hc_set_params.params.data, &blob, sizeof(struct test_cbi_blob));
 
 	/* Turn off write-protect so we can actually write */
 	gpio_wp_l_set(1);
@@ -262,11 +336,11 @@ ZTEST_USER(common_cbi, test_hc_cbi_bin_write_then_read)
 
 	struct ec_params_get_cbi_bin hc_get_params = {
 		.offset = 0,
-		.size = ARRAY_SIZE(data),
+		.size = sizeof(struct test_cbi_blob),
 	};
 
 	struct test_ec_params_get_cbi_response {
-		uint8_t data[ARRAY_SIZE(data)];
+		uint8_t data[sizeof(struct test_cbi_blob)];
 	};
 	struct test_ec_params_get_cbi_response hc_get_response;
 	struct host_cmd_handler_args get_args = BUILD_HOST_COMMAND(
