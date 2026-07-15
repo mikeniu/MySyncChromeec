@@ -52,22 +52,16 @@ class ProjectConfig:
     )
     snippets: "list[str]" = dataclasses.field(default_factory=list)
     project_dir: pathlib.Path = dataclasses.field(default_factory=pathlib.Path)
-    inherited_from: typing.Iterable[str] = dataclasses.field(
-        default_factory=list
-    )
+    boards: typing.Iterable[str] = dataclasses.field(default_factory=list)
     signer: signers.BaseSigner = signers.NullSigner()
     skip_build_all: bool = False
 
     @property
     def full_name(self) -> str:
         """Get the full project name, e.g. baseboard.variant"""
-        inherited_from = (
-            [self.inherited_from]
-            if isinstance(self.inherited_from, str)
-            else self.inherited_from
-        )
+        boards = [self.boards] if isinstance(self.boards, str) else self.boards
 
-        return ".".join([*inherited_from, self.project_name])
+        return ".".join([*boards, self.project_name])
 
 
 class Project:
@@ -225,9 +219,8 @@ class ProjectRegistrationHandler:
             Another ProjectRegistrationHandler.
         """
         new_config = dataclasses.asdict(self.base_config)
-        # inherited_from is a bad name, it should be called "boards"
-        new_config["inherited_from"] = [
-            *self.base_config.inherited_from,
+        new_config["boards"] = [
+            *self.base_config.boards,
         ]
 
         for key, value in kwargs.items():
