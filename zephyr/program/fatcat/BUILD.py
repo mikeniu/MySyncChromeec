@@ -203,6 +203,7 @@ register_ish_project(
 
 register_ish_project(
     project_name="fatcat-ish-idle",
+    inherited_from=["fatcat"],
     zephyr_board="intel_ish_5_8_0",
     dts_overlays=[
         here / "fatcat-ish-idle" / "project.overlay",

@@ -47,7 +47,15 @@ bloonchipper = register_fpmcu_variant(
     signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
         here / "bloonchipper" / "dev_key.pem",
     ),
-    inherited_from=["brox", "brya", "fatcat", "guybrush", "rex", "skyrim"],
+    inherited_from=[
+        "brox",
+        "brya",
+        "fatcat",
+        "guybrush",
+        "rex",
+        "skyrim",
+        "ocelot",
+    ],
 )
 
 # The address of RW_FWID is hardcoded in RO. You need to have REALLY
@@ -111,12 +119,14 @@ assert_rw_fwid_DO_NOT_EDIT(project_name="helipilot", addr=0x40144)
 
 def register_et171_project(
     project_name,
+    inherited_from=(),
 ):
     """Register an fpmcu variant"""
     dts_path = project_name + ".dts"
     conf_path = project_name + ".conf"
     return register_fpmcu_variant(
         project_name=project_name,
+        inherited_from=inherited_from,
         zephyr_board="egis_et171",
         register_func=register_binman_project,
         variant_modules=["hal_egis", "egis_module"],
@@ -132,17 +142,18 @@ def register_et171_project(
     )
 
 
-sanok = register_et171_project("sanok")
+sanok = register_et171_project("sanok", inherited_from=["fatcat", "atria"])
 assert_rw_fwid_DO_NOT_EDIT(project_name="sanok", addr=0x42104)
 
-srebrna = register_et171_project("srebrna")
+srebrna = register_et171_project("srebrna", inherited_from=["fatcat"])
 assert_rw_fwid_DO_NOT_EDIT(project_name="srebrna", addr=0x42104)
 
-stobnica = register_et171_project("stobnica")
+stobnica = register_et171_project("stobnica", inherited_from=["bluey"])
 assert_rw_fwid_DO_NOT_EDIT(project_name="stobnica", addr=0x42104)
 
 niedzica = register_fpmcu_variant(
     project_name="niedzica",
+    inherited_from=["bluey"],
     zephyr_board="32f967_dv",
     register_func=register_binman_project,
     variant_modules=["cmsis_6", "elan_module"],
@@ -165,12 +176,14 @@ assert_rw_fwid_DO_NOT_EDIT(project_name="niedzica", addr=0x24144)
 
 def register_ft9001_project(
     project_name,
+    inherited_from=(),
 ):
     """Register an fpmcu variant"""
     dts_path = project_name + ".dts"
     conf_path = project_name + ".conf"
     return register_fpmcu_variant(
         project_name=project_name,
+        inherited_from=inherited_from,
         zephyr_board="ft9001_eval",
         register_func=register_binman_project,
         variant_modules=["cmsis_6", "focaltech_module"],
@@ -188,8 +201,8 @@ def register_ft9001_project(
     )
 
 
-chudow = register_ft9001_project("chudow")
+chudow = register_ft9001_project("chudow", inherited_from=["tanjiro"])
 assert_rw_fwid_DO_NOT_EDIT(project_name="chudow", addr=0x82274)
 
-chobienia = register_ft9001_project("chobienia")
+chobienia = register_ft9001_project("chobienia", inherited_from=["fatcat"])
 assert_rw_fwid_DO_NOT_EDIT(project_name="chobienia", addr=0x82274)

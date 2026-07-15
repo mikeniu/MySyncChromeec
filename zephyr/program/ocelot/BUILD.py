@@ -107,6 +107,7 @@ def register_rtk59_project(
     """Register a realtek based variant of ocelot."""
     register_rtk_project(
         project_name=project_name,
+        inherited_from=["ocelot"],
         zephyr_board="realtek/rts5912",
         dts_overlays=[
             here / project_name / "project.overlay",
@@ -153,6 +154,7 @@ register_mec172x_project(
 
 register_ish_project(
     project_name="ocelotrvp-ish",
+    inherited_from=["ocelot"],
     zephyr_board="intel_ish_5_8_0",
     dts_overlays=[
         here / "ocelot-ish" / "ocelotrvp-ish" / "project.overlay",
@@ -189,6 +191,7 @@ matsu.variant(
 
 register_ish_project(
     project_name="matsu-ish",
+    inherited_from=["ocelot"],
     zephyr_board="intel_ish_5_8_0",
     dts_overlays=[
         here / "matsu-ish" / "matsu-ish" / "project.overlay",
@@ -210,6 +213,7 @@ ocicat = register_it8xxx2_project(
 
 register_ish_project(
     project_name="ocicat-ish",
+    inherited_from=["ocelot"],
     zephyr_board="intel_ish_5_8_0",
     dts_overlays=[
         here / "ocicat-ish" / "project.overlay",
