@@ -63,8 +63,14 @@ struct cbi_data *cbi_find_tag(const void *buf, enum cbi_data_tag tag)
 	struct cbi_data *d;
 	const struct cbi_header *h = (struct cbi_header *)buf;
 	const uint8_t *p;
+
 	for (p = h->data; p + sizeof(*d) < (uint8_t *)buf + h->total_size;) {
 		d = (struct cbi_data *)p;
+
+		/* Check that the payload fits within the buffer boundaries */
+		if (p + sizeof(*d) + d->size > (uint8_t *)buf + h->total_size)
+			break;
+
 		if (d->tag == tag)
 			return d;
 		p += sizeof(*d) + d->size;
@@ -424,6 +430,8 @@ DECLARE_HOST_COMMAND(EC_CMD_CBI_BIN_READ, hc_cbi_bin_read, EC_VER_MASK(0));
 static bool is_valid_cbi(const uint8_t *cbi)
 {
 	const struct cbi_header *head = (const struct cbi_header *)cbi;
+	const uint8_t *p;
+	struct cbi_data *d;
 
 	/* Check magic */
 	if (memcmp(head->magic, cbi_magic, sizeof(head->magic))) {
@@ -431,7 +439,7 @@ static bool is_valid_cbi(const uint8_t *cbi)
 		return false;
 	}
 
-	/* check version */
+	/* Check version */
 	if (head->major_version > CBI_VERSION_MAJOR) {
 		CPRINTS("Bad CBI version");
 		return false;
@@ -451,6 +459,16 @@ static bool is_valid_cbi(const uint8_t *cbi)
 	if (cbi_crc8(head) != head->crc) {
 		CPRINTS("Bad CRC");
 		return false;
+	}
+
+	/* Check TLV sizes to prevent caching malformed tags */
+	for (p = head->data; p + sizeof(*d) < cbi + head->total_size;) {
+		d = (struct cbi_data *)p;
+		if (p + sizeof(*d) + d->size > cbi + head->total_size) {
+			CPRINTS("Bad CBI TLV size");
+			return false;
+		}
+		p += sizeof(*d) + d->size;
 	}
 
 	return true;
