@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18b603fa_3e1b7e7f",
+        "filename": "zephyr/program/intelrvp/ptlrvp/ptlrvp_mchp/gpio.dtsi",
+        "patchSetId": 8
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-15T09:44:57Z",
+      "side": 1,
+      "message": "just drop these, no point keeping the commented blocks",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 247,
+        "endChar": 5
+      },
+      "revId": "987aac8b99d90c6948eedbeec7dda6a9eafce576",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
