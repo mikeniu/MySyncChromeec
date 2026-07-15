@@ -17,7 +17,7 @@ def register_tanjiro_project(project_name, extra_modules=()):
             here / project_name / "project.conf",
         ],
         modules=["cmsis_6", "ec", *extra_modules],
-        inherited_from=["tanjiro"],
+        boards=["tanjiro"],
     )
 
 

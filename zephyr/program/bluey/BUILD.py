@@ -9,12 +9,12 @@ def register_npcx9_project(
     project_name,
     zephyr_board="npcx9/npcx9m7f",
     extra_kconfig_files=(),
-    inherited_from=None,
+    boards=None,
     extra_modules=(),
 ):
     """Register an npcx9 based variant of bluey."""
-    if inherited_from is None:
-        inherited_from = ["bluey"]
+    if boards is None:
+        boards = ["bluey"]
 
     register_npcx_project(
         project_name=project_name,
@@ -30,7 +30,7 @@ def register_npcx9_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_files,
         ],
-        inherited_from=inherited_from,
+        boards=boards,
         modules=["cmsis_6", "ec", *extra_modules],
     )
 

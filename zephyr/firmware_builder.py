@@ -95,7 +95,7 @@ BINARY_SIZE_REGIONS = [
 ]
 
 # Unused boards that are expected to be unused, such as dev boards.
-UNUSED_BOARDS = {
+UNUSED_TARGETS = {
     "it8xxx2_evb",
     "it82002_evb",
     "minimal-posix",
@@ -109,8 +109,8 @@ UNUSED_BOARDS = {
     "rtk_flame",
 }
 
-# Unused inherited_from values that are expected to be unused, such as dev boards.
-UNUSED_INHERITED_FROM = {
+# Unused boards that are expected to be unused, such as dev boards.
+UNUSED_BOARDS = {
     "ec-aic",
     "intelrvp",
 }
@@ -510,7 +510,7 @@ def bundle_firmware(opts):
         build_dir = (
             platform_ec / "build" / "zephyr" / project.config.project_name
         )
-        boards = set(project.config.inherited_from)
+        boards = set(project.config.boards)
         # Add additional boards from boxter
         boards.update(ec_to_boxter_boards[project.config.project_name])
 
@@ -755,9 +755,9 @@ def read_boxter():
     return ec_to_boards
 
 
-def check_inherits(_opts):
+def check_boards(_opts):
     """Reads the src/project/*/*/generated/joined.jsonproto files and compares
-    the boards and zephyr_ec targets with the zephyr inherited_from values.
+    the boards and zephyr_ec targets with the zephyr boards.
     """
 
     # Ec target name -> set(boxter boards)
@@ -767,7 +767,7 @@ def check_inherits(_opts):
     ec_to_board = collections.defaultdict(dict)
     for project in get_projects():
         board_dict = {}
-        for board in project.config.inherited_from:
+        for board in project.config.boards:
             board_dict[board] = False
         ec_to_board[project.config.project_name] = board_dict
 
@@ -789,20 +789,20 @@ def check_inherits(_opts):
             ):
                 print(
                     f"ERROR: Target {ec_target} does not have "
-                    f"inherited_from {board_name}"
+                    f"board {board_name}"
                 )
                 retcode = 1
             ec_to_board[ec_target][board_name] = True
     for zephyr_ec, boards in ec_to_board.items():
         for board, found in boards.items():
-            if not found and board not in UNUSED_INHERITED_FROM:
+            if not found and board not in UNUSED_BOARDS:
                 print(
                     f"ERROR: Zephyr target {zephyr_ec} has unexpected "
-                    f"inherited_from of {board}"
+                    f"board of {board}"
                 )
                 retcode = 1
-        if not boards and zephyr_ec not in UNUSED_BOARDS:
-            print(f"ERROR: Zephyr target {zephyr_ec} is not used anywhere")
+        if not boards and zephyr_ec not in UNUSED_TARGETS:
+            print(f"ERROR: Zephyr target {zephyr_ec} is not used in boxter")
             retcode = 1
 
     return retcode
@@ -851,11 +851,11 @@ def main(args):
         build, bundle, test
     )
 
-    check_inherits_cmd = sub_cmds.add_parser(
-        "check_inherits",
-        help="Checks the inherited_from values against Boxster",
+    check_boards_cmd = sub_cmds.add_parser(
+        "check_boards",
+        help="Checks the 'boards' values against Boxster",
     )
-    check_inherits_cmd.set_defaults(func=check_inherits)
+    check_boards_cmd.set_defaults(func=check_boards)
 
     opts = parser.parse_args(args)
 

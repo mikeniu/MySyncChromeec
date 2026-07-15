@@ -30,7 +30,7 @@ def register_brox_project(
             here / project_name / "project.overlay",
         ],
         kconfig_files=kconfig_files,
-        inherited_from=["brox"],
+        boards=["brox"],
     )
 
 
@@ -102,7 +102,7 @@ register_ish_project(
         here / "motionsense.conf",
         here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["brox"],
+    boards=["brox"],
 )
 
 caboc = register_brox_project(

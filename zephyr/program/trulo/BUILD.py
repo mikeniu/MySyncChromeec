@@ -10,15 +10,15 @@ def register_trulo_project(
     chip="npcx9/npcx9m3f",
     zephyr_board=None,
     kconfig_files=None,
-    inherited_from=None,
+    boards=None,
     snippets=None,
     **kwargs,
 ):
     """Register a variant of Trulo."""
     if zephyr_board is None:
         zephyr_board = chip
-    if inherited_from is None:
-        inherited_from = ["nissa"]
+    if boards is None:
+        boards = ["nissa"]
 
     if "it8" in zephyr_board:
         register_binman_project(
@@ -29,7 +29,7 @@ def register_trulo_project(
             ],
             kconfig_files=kconfig_files + [here / "dsp_comms.conf"],
             modules=["cmsis_6", "picolibc", "ec", "pigweed", "nanopb"],
-            inherited_from=inherited_from,
+            boards=boards,
             snippets=snippets,
             **kwargs,
         )
@@ -41,7 +41,7 @@ def register_trulo_project(
                 here / project_name / "project.overlay",
             ],
             kconfig_files=kconfig_files + [here / "dsp_comms.conf"],
-            inherited_from=inherited_from,
+            boards=boards,
             modules=["cmsis_6", "picolibc", "ec", "pigweed", "nanopb"],
             snippets=snippets,
             **kwargs,
@@ -156,7 +156,7 @@ register_ish_project(
         here / "dsp_comms.conf",
         here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["nissa"],
+    boards=["nissa"],
 )
 
 register_ish_project(
@@ -172,7 +172,7 @@ register_ish_project(
         here / "dsp_comms.conf",
         here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["nissa"],
+    boards=["nissa"],
 )
 
 register_ish_project(
@@ -188,7 +188,7 @@ register_ish_project(
         here / "dsp_comms.conf",
         here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["nissa"],
+    boards=["nissa"],
 )
 
 register_ish_project(
@@ -202,12 +202,12 @@ register_ish_project(
         here / "dsp_comms.conf",
         here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["nissa"],
+    boards=["nissa"],
 )
 
 register_ish_project(
     project_name="lite-ish",
-    inherited_from=["nissa"],
+    boards=["nissa"],
     zephyr_board="intel_ish_5_4_1",
     dts_overlays=[
         here / "lite-ish" / "project.overlay",

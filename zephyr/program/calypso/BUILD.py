@@ -12,7 +12,7 @@ def register_npcx9_project(
     """Register an npcx9 based variant of mensa."""
     register_npcx_project(
         project_name=project_name,
-        inherited_from=["calypso"],
+        boards=["calypso"],
         zephyr_board="npcx9/npcx9m7fb",
         dts_overlays=[
             here / project_name / "project.overlay",
