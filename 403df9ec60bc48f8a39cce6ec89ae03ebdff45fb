@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2176e1d2_9ab312f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-15T22:44:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/c419126b-ead6-4272-9694-2aa8141dab88)]\n\n### Review Summary\n\n*   **Functionality**: The changes successfully introduce an early `EC_MKBP_FP_FINGER_DOWN` notification before image processing. By dropping the previously attempted `prev_st` edge-detection logic and returning to a simple state check, the code correctly aligns with the host framework\u0027s requirement to receive a signal on every capture attempt (even on retries).\n*   **Style**: The code integrates cleanly into the existing `fp_task` event loop.\n*   **Security**: No security vulnerabilities or data leaks were introduced.\n*   **Testing**: Test coverage is comprehensive. The updated Zephyr tests verify that the expected `FINGER_DOWN` event is correctly generated and queued prior to the operation-specific events (`IMAGE_READY`, `ENROLL`, or `MATCH`).\n\nTAG\u003dagy\nCONV\u003dc419126b-ead6-4272-9694-2aa8141dab88",
+      "isAi": true,
+      "revId": "403df9ec60bc48f8a39cce6ec89ae03ebdff45fb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
