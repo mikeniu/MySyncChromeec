@@ -308,10 +308,8 @@ test_export_static int panic_data_init(void)
 		uint32_t reason;
 		uint32_t info;
 		uint8_t exception;
-		struct panic_data *pdata;
 
 		panic_get_reason(&reason, &info, &exception);
-		pdata = panic_get_data();
 
 		/* If the panic reason is a watchdog warning, then change
 		 * the reason to a regular watchdog reason while preserving
@@ -327,8 +325,7 @@ test_export_static int panic_data_init(void)
 			 */
 		} else if ((reason != PANIC_SW_WATCHDOG &&
 			    reason != PANIC_SW_WATCHDOG_HARD) ||
-			   !pdata ||
-			   pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD) {
+			   !panic_data_is_new()) {
 			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
 		}
 	}

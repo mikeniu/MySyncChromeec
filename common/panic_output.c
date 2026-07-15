@@ -189,6 +189,13 @@ test_mockable struct panic_data *panic_get_data(void)
 	return pdata_ptr;
 }
 
+bool panic_data_is_new(void)
+{
+	struct panic_data *const pdata = panic_get_data();
+
+	return pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD);
+}
+
 /*
  * Returns pointer to beginning of panic data.
  * Please note that it is not safe to interpret this
