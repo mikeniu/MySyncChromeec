@@ -10,6 +10,10 @@
 	status = "okay";
 };
 
+&bbram {
+	status = "okay";
+};
+
 &timers9 {
 	/*
 	 * The counter has 16 bits. TIMPRE bit in RCC_DCKCFGR is 0 by default.
