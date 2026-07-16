@@ -116,6 +116,30 @@
       },
       "revId": "75a1820bf3029750edd46368f6a4f64ccca80cda",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ada668a_221c54c0",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-16T00:35:47Z",
+      "side": 1,
+      "message": "I was able to remove the CONFIG_COMMON_PANIC_OUTPUT check. Since this code was moved to system to panic.c, this code is now conditional on on CONFIG_PLATFORM_EC_PANIC.",
+      "parentUuid": "5889b886_b7e00310",
+      "range": {
+        "startLine": 354,
+        "startChar": 1,
+        "endLine": 354,
+        "endChar": 56
+      },
+      "revId": "75a1820bf3029750edd46368f6a4f64ccca80cda",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
