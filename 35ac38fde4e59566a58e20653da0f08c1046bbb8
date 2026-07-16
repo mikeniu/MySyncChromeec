@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46d56d1a_94b101d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T02:59:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/350209d3-977d-43ae-b9bf-6dd7dc8e7475)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The CL completely resolves the integer overflow vulnerabilities and heap corruption issues by cleanly delegating to Zephyr\u0027s native `k_heap_calloc` and `k_heap_realloc` functions. This is a much safer approach than manually computing header boundaries and bounding memory copies.\n- `plat_calloc` and `plat_realloc` correctly wrap the new `sys_alloc` and `sys_realloc` implementations, providing a consistent API that properly panics (`k_oops()`) on failure instead of silently failing.\n- Null checks added to `sys_free` and `sys_alloc_usable_size` ensure robustness.\n\n**Style \u0026 Consistency:**\n- The code is very clean, concise, and adheres to standard Zephyr style. Removing the manual memory copy and `memset` logic from the PAL wrappers in favor of standard allocator semantics significantly improves readability.\n\n**Testing:**\n- The `ztest` suite has been comprehensively updated to test the new allocator logic. Tests successfully use `ztest_set_fault_valid(true)` to verify that intentional overflows (such as `SIZE_MAX / 2 + 1 * 2`) and out-of-memory allocations correctly trigger `k_oops()`.\n- The addition of `CONFIG_ZTEST_FATAL_HOOK\u003dy` to the test config correctly enables this robust fatal error testing.\n\nTAG\u003dagy\nCONV\u003dd2b43cb7-cf61-4a67-bd5e-0b97bc834ffc",
+      "isAi": true,
+      "revId": "35ac38fde4e59566a58e20653da0f08c1046bbb8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f83d0b9d_fef432bb",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T02:59:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor suggestion:** Now that `sys_alloc` delegates cleanly to `k_heap_calloc` and no longer computes custom header sizes, there is no addition happening internally. You might consider renaming this test to something like `test_sys_alloc_huge_size_panics` to reflect the new implementation.",
+      "isAi": true,
+      "revId": "35ac38fde4e59566a58e20653da0f08c1046bbb8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
