@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6413e0b0_a8f059fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T23:29:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The changes successfully eliminate heap buffer overflow vulnerabilities by completely delegating memory allocation and reallocation to Zephyr\u0027s native `k_heap_calloc` and `k_heap_realloc` functions. This handles size multiplication safely and prevents bounds issues on memory copies.\n- `plat_calloc` and `plat_realloc` are cleanly implemented as thin wrappers over the new `sys_alloc` and `sys_realloc`. Since `k_heap_calloc` naturally zero-initializes memory, the redundant `memset` has been properly removed.\n- `sys_free` and `sys_alloc_usable_size` correctly handle `NULL` pointer inputs, which improves the overall robustness of the allocator APIs.\n- The use of `k_heap_calloc` safely replaces `k_heap_aligned_alloc` because default heap block allocations are suitably aligned.\n\n**Style \u0026 Consistency:**\n- The code changes are concise, idiomatic, and adhere to Zephyr coding guidelines.\n- The use of `COND_CODE_1(CONFIG_ZTEST, (), (static))` is a clean and standard way to expose internal PAL functions to the test suite without polluting the global namespace in production builds.\n\n**Testing:**\n- The updated `ztest` suite provides comprehensive coverage of the new allocator logic.\n- Using `ztest_set_fault_valid(true)` to verify that intentional zero-sized allocations, integer overflows, and OOM conditions appropriately trigger fatal panics (`k_oops()`) is a rigorous and highly effective testing strategy.\n- Memory shrinking and growing behaviors for `realloc` are thoroughly verified.\n\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "f1462cd7542b05302b3417d37a58ea527c5ac03c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
