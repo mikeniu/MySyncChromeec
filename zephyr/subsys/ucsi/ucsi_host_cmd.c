@@ -80,6 +80,12 @@ static enum ec_status hc_ucsi_ppm_get(struct host_cmd_handler_args *args)
 	if (!ppm_dev)
 		return EC_RES_UNAVAILABLE;
 
+	if (args->params_size < sizeof(*p))
+		return EC_RES_INVALID_PARAM;
+
+	if (p->size > args->response_max)
+		return EC_RES_OVERFLOW;
+
 	len = ucsi_ppm_read(ppm_dev, p->offset, args->response, p->size);
 	if (len < 0)
 		return EC_RES_ERROR;
