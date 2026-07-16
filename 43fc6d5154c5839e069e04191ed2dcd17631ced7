@@ -34,6 +34,24 @@
       "parentUuid": "33f87432_0aa0e51f",
       "revId": "43fc6d5154c5839e069e04191ed2dcd17631ced7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "039e4d25_d587cdcc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-07-16T10:07:36Z",
+      "side": 1,
+      "message": "Is there any other CL related is merged? So, can I abandon this CL now?",
+      "parentUuid": "fdda424f_2b1a2315",
+      "revId": "43fc6d5154c5839e069e04191ed2dcd17631ced7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
