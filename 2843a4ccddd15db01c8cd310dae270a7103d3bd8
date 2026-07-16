@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dffd83a9_8f6432cd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-07-16T17:43:09Z",
+      "side": 1,
+      "message": "Ah. Looks like it\u0027s a bug in upstream https://github.com/zephyrproject-rtos/zephyr/blob/df1fb529e38f34fa45c1fe1cb6aace42802de3db/boards/google/dragonclaw/google_dragonclaw.dts#L90-L92\n\nIt should be `bbram` instead of `backup_regs`. Can we fix it in upstream?",
+      "parentUuid": "51544c6c_ab71f336",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 22
+      },
+      "revId": "2843a4ccddd15db01c8cd310dae270a7103d3bd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "79d8b6cd_2eea8122",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
