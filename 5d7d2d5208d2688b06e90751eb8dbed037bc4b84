@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad99c868_df19647b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T00:03:50Z",
+      "side": 1,
+      "message": "Can you check to see if there is an upstream Zephyr function that will do the \"count, size\" allocation? If so we should probably use that and make an upstream change there if it\u0027s not tracking the count/size correctly.",
+      "range": {
+        "startLine": 132,
+        "startChar": 1,
+        "endLine": 147,
+        "endChar": 32
+      },
+      "revId": "5d7d2d5208d2688b06e90751eb8dbed037bc4b84",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
