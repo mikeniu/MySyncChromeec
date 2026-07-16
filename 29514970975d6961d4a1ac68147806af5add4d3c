@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac15ef09_31f893a5",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-16T06:07:23Z",
+      "side": 1,
+      "message": "Moved to pdc_dpm_balance_source_ports() as suggested",
+      "parentUuid": "f09f018e_81c1b940",
+      "range": {
+        "startLine": 213,
+        "startChar": 0,
+        "endLine": 213,
+        "endChar": 59
+      },
+      "revId": "29514970975d6961d4a1ac68147806af5add4d3c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af95db51_639c7365",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-13T23:04:07Z",
       "side": 1,
       "message": "I don\u0027t think we want this here.  This is called when removing an FRS partner that is currently acting in the SRC role.  So the DUT is not providing any power to this device, so the overload condition has not changed.",
+      "range": {
+        "startLine": 369,
+        "startChar": 0,
+        "endLine": 369,
+        "endChar": 38
+      },
+      "revId": "29514970975d6961d4a1ac68147806af5add4d3c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6052f490_fe0badea",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-16T06:07:23Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "af95db51_639c7365",
       "range": {
         "startLine": 369,
         "startChar": 0,

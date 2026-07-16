@@ -22,6 +22,30 @@
       },
       "revId": "3428bffbce8c51698feed1d2d2bc054742a76a03",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd5e28cd_7bb293e5",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-16T06:07:23Z",
+      "side": 1,
+      "message": "Removed this loop and keep `pdc_power_mgmt_set_new_power_request`",
+      "parentUuid": "1091e70c_30189355",
+      "range": {
+        "startLine": 304,
+        "startChar": 0,
+        "endLine": 315,
+        "endChar": 42
+      },
+      "revId": "3428bffbce8c51698feed1d2d2bc054742a76a03",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
