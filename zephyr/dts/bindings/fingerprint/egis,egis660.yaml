@@ -20,3 +20,14 @@ properties:
     required: true
     description: |
       This property specifies the connection for sensor reset.
+
+  cover-type:
+    type: string
+    required: false
+    default: "glass"
+    enum:
+      - "glass"
+      - "spray-coating"
+    description: |
+      The cover type of the fingerprint sensor. Different cover types
+      require different private libraries.
