@@ -21,6 +21,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "845d9262_bce34917",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T15:50:40Z",
+      "side": 1,
+      "message": "We\u0027re panicking in `sys_realloc`, but not `sys_alloc`. Based on the TODO, it looks like you wanted to remove this. (Separate CL is fine).\n\nComment from Gemini:\n\n----\n\nDenial of Service (DoS) via OOM: I noticed the TODO (b/423622893) regarding the k_oops() usage. Panicking the kernel on an allocation failure inside a peripheral driver can easily become a DoS vector if an attacker manipulates the data length originating from the SPI bus. Propagating the NULL or -ENOMEM up the stack is definitely the right long-term fix, so it\u0027s good that this is tracked.",
+      "range": {
+        "startLine": 149,
+        "startChar": 0,
+        "endLine": 153,
+        "endChar": 2
+      },
+      "revId": "a5b5350164be880d5e77f00fe3bf64cfbf249b8f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "66f1f938_fbf50d00",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
         "patchSetId": 13
@@ -60,6 +83,29 @@
         "startChar": 0,
         "endLine": 158,
         "endChar": 49
+      },
+      "revId": "a5b5350164be880d5e77f00fe3bf64cfbf249b8f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7375e238_e78a69f3",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T15:50:40Z",
+      "side": 1,
+      "message": "Let\u0027s add a test for zero size allocations (for both alloc and realloc).",
+      "range": {
+        "startLine": 329,
+        "startChar": 0,
+        "endLine": 329,
+        "endChar": 45
       },
       "revId": "a5b5350164be880d5e77f00fe3bf64cfbf249b8f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
