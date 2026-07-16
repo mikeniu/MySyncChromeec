@@ -1,0 +1,99 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f15fcff9_dc0c9b4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T23:14:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/81903ca4-3000-4c00-9811-a46cfeb2830b)]\n\n### Review Summary\n*   **Functionality:** The patch correctly moves the memory allocation PAL functions from the header to the source file, which avoids multiple definition issues or excessive inlining. However, moving these functions highlighted some pre-existing bugs (e.g., `sys_alloc` ignoring `count`).\n*   **Style:** An `__unused` attribute was left behind on `plat_free`, which should be removed to match the cleanup done on `sys_alloc` and `sys_free`.\n*   **Security:** `plat_realloc` uses `memcpy(new_ptr, data, size);`. If `size` is larger than the original allocation, this causes a heap out-of-bounds read. This should be addressed or tracked.\n*   **Testing:** Assumed adequate based on the existing tests, but pre-existing logic bugs might be missed by tests if these edge cases aren\u0027t hit.",
+      "isAi": true,
+      "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cb743e5_a1872484",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T23:14:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Pre-existing Bug:** `sys_alloc` takes both `count` and `size`, but ignores `count` and only allocates `size` bytes. If this function is ever called with `count \u003e 1` directly, it will under-allocate memory. `k_heap_aligned_alloc` should probably be called with `count * size`.\n\nAlternatively, if `sys_alloc` is always supposed to be called with `count\u003d1` (as done in `plat_calloc`), its signature and documentation in the header should probably be updated.",
+      "isAi": true,
+      "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eebce6d4_0b8c5099",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T23:14:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Pre-existing Security Issue:** When reallocating to a larger size, `memcpy(new_ptr, data, size)` will read `size` bytes from `data`. If `size` is larger than the original allocation, this results in an out-of-bounds heap read, potentially leading to crashes or leaking heap data.\n\nSince Zephyr\u0027s `k_heap` does not natively support `realloc` or querying block size, you may want to address this either by changing the PAL interface to take the old size, or tracking the sizes internally. If this is out of scope for this CL, consider filing a bug to track it.",
+      "isAi": true,
+      "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41e14eb2_2fe879ee",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T23:14:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] It looks like the `__unused` attribute was accidentally added or left here when moving the function from the header. Since you removed it from `sys_alloc` and `sys_free` per the earlier review feedback, we should probably remove it here as well for consistency.",
+      "isAi": true,
+      "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "753bb295_7435a428",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T23:14:35Z",
+      "side": 1,
+      "message": "Since we\u0027re doing cleanup, can we do this in a separate CL: http://b/373435445?",
+      "range": {
+        "startLine": 201,
+        "startChar": 1,
+        "endLine": 201,
+        "endChar": 55
+      },
+      "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
