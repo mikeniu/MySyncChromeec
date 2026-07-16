@@ -3,8 +3,10 @@
  * found in the LICENSE file.
  */
 
-#include "console_channel.h"
+#include "console.h"
+#include "panic_log.h"
 
+#include <zephyr/kernel.h>
 #include <zephyr/spinlock.h>
 #include <zephyr/sys/printk.h>
 
@@ -12,12 +14,6 @@
 #include <pw_log_tokenized/config.h>
 #include <pw_log_tokenized/handler.h>
 #include <pw_log_tokenized/metadata.h>
-
-extern "C" {
-bool console_channel_is_disabled(int channel);
-void panic_log_write_str(const void *data, size_t size);
-void console_buf_notify_chars(const char *data, size_t size);
-}
 
 #ifndef PW_FLAG_TO_EC_CHANNEL
 #define PW_FLAG_TO_EC_CHANNEL(flag) ((enum console_channel)((flag) - 1))
@@ -91,7 +87,11 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 	// https://github.com/zephyrproject-rtos/zephyr/issues/59454 Zephyr
 	// frontend should protect messages from getting corrupted from multiple
 	// threads.
-	printk("%s", base64_string.c_str());
+	if (k_is_in_isr()) {
+		printk("[ISR]%s", base64_string.c_str());
+	} else {
+		printk("%s", base64_string.c_str());
+	}
 	k_spin_unlock(&lock, key);
 }
 
