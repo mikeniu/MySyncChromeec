@@ -1,0 +1,47 @@
+[
+  {
+    "rule_id": "MUTEX_IN_ISR",
+    "category": "ISR Context Violation",
+    "contexts": ["ISR"],
+    "prohibited_props": ["sleep"],
+    "exemption_props": ["isr_ok"],
+    "path_matchers": ["mutex_lock", "mutex_unlock", "k_mutex", "i2c_lock", "i2c_unlock"],
+    "description": "Acquiring or releasing a mutex (k_mutex_lock/unlock) or I2C bus lock inside an ISR callback causes thread scheduling corruption."
+  },
+  {
+    "rule_id": "SLEEP_IN_ISR",
+    "category": "ISR Context Violation",
+    "contexts": ["ISR"],
+    "prohibited_props": ["sleep"],
+    "exemption_props": ["isr_ok"],
+    "path_matchers": [],
+    "description": "Functions marked @funcprops \\sleep yield threads and cannot be called inside an interrupt handler."
+  },
+  {
+    "rule_id": "NOT_ISR_OK",
+    "category": "ISR Context Violation",
+    "contexts": ["ISR"],
+    "prohibited_props": [],
+    "exemption_props": ["isr_ok"],
+    "path_matchers": [],
+    "description": "Calling an API inside an ISR context that is not explicitly annotated as @funcprops \\isr_ok."
+  },
+  {
+    "rule_id": "MUTEX_IN_PRE_KERNEL",
+    "category": "Pre-Kernel Violation",
+    "contexts": ["PRE_KERNEL"],
+    "prohibited_props": ["sleep"],
+    "exemption_props": ["pre_kernel_ok", "isr_ok"],
+    "path_matchers": ["mutex_lock", "mutex_unlock", "k_mutex", "i2c_lock", "i2c_unlock"],
+    "description": "Acquiring or releasing mutexes during early PRE_KERNEL_1 / PRE_KERNEL_2 boot hooks before the kernel thread scheduler is online."
+  },
+  {
+    "rule_id": "NOT_PRE_KERNEL_OK",
+    "category": "Pre-Kernel Violation",
+    "contexts": ["PRE_KERNEL"],
+    "prohibited_props": ["sleep"],
+    "exemption_props": ["pre_kernel_ok", "isr_ok"],
+    "path_matchers": [],
+    "description": "Calling un-annotated or sleeping functions during early boot initialization hooks before thread scheduling is active."
+  }
+]
