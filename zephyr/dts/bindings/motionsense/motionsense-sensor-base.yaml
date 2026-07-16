@@ -39,6 +39,12 @@ properties:
   default-range:
     type: int
     description: default range of sensor read
+  spreading-threshold:
+    type: int
+    min: 1
+    max: 255
+    description: minimum number of samples in batch to trigger
+      spreading.Default is 1, which enables spreading at > 1 sample.
   drv-data:
     type: phandle
     description: phandle to driver data to be used for the motion sensor.
