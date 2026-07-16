@@ -42,13 +42,31 @@ endif # FINGERPRINT_SENSOR_EGIS630
 menuconfig FINGERPRINT_SENSOR_EGIS660
 	bool "Fingerprint driver for EGIS660"
 	default y
-	depends on DT_HAS_EGIS_EGIS660_ENABLED
+	depends on DT_HAS_EGIS_EGIS660_ENABLED || DT_HAS_EGIS_EGIS660S_ENABLED
 	help
 	  Driver for EGIS660 fingerprint sensor. It requires EGIS private library
 	  to implement cros_fingerprint API. If the library is not available it
 	  only supports checking sensor hardware ID.
 
 if FINGERPRINT_SENSOR_EGIS660
+
+choice FINGERPRINT_SENSOR_EGIS660_COVER
+	prompt "EGIS660 sensor cover"
+	default FINGERPRINT_SENSOR_EGIS660_COVER_GLASS
+	help
+	  Select the EGIS660 sensor cover type.
+
+config FINGERPRINT_SENSOR_EGIS660_COVER_GLASS
+	bool "Glass cover"
+	depends on DT_HAS_EGIS_EGIS660_ENABLED
+
+config FINGERPRINT_SENSOR_EGIS660_COVER_SPRAY_COATING
+	bool "Spray coating"
+	depends on DT_HAS_EGIS_EGIS660S_ENABLED
+	help
+	  Select this option for EGIS660S sensor with spray coating cover.
+
+endchoice
 
 config FINGERPRINT_SENSOR_EGIS660_HEAP_SIZE
 	int "Size of heap for EGIS660 driver"
@@ -60,7 +78,7 @@ config FINGERPRINT_SENSOR_EGIS660_HEAP_SIZE
 
 config FINGERPRINT_SENSOR_EGIS660_PAL
 	bool "Platform Abstraction Layer for EGIS private library"
-	default y if HAVE_EGIS660_PRIVATE_DRIVER
+	default y if HAVE_EGIS660_PRIVATE_DRIVER || HAVE_EGIS660S_PRIVATE_DRIVER
 	help
 	  If enabled, Platform Abstraction Layer for EGIS private library will be
 	  compiled. The PAL is used to interact with the sensor (SPI, GPIO) and
@@ -69,7 +87,8 @@ config FINGERPRINT_SENSOR_EGIS660_PAL
 config FINGERPRINT_SENSOR_EGIS660_APNS
 	bool "EGIS660 APNS storage"
 	default y
-	depends on $(dt_nodelabel_enabled,egis660_apns_data)
+	depends on $(dt_nodelabel_enabled,egis660_apns_data) || \
+		 $(dt_nodelabel_enabled,egis660s_apns_data)
 	help
 	  If enabled, the APNS(Adaptive Pixel Noise Suppression) data generated
 	  during the enroll and match can be stored on APNS storage.
@@ -79,6 +98,13 @@ config HAVE_EGIS660_PRIVATE_DRIVER
 	bool
 	default n
 	help
-	  If enabled, it indicates that the private driver is present.
+	  If enabled, it indicates that the EGIS660 private driver is present.
+
+# Enabled in private driver Kconfig
+config HAVE_EGIS660S_PRIVATE_DRIVER
+	bool
+	default n
+	help
+	  If enabled, it indicates that the EGIS660S private driver is present.
 
 endif # FINGERPRINT_SENSOR_EGIS660
