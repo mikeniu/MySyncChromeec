@@ -68,7 +68,9 @@ DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init_quartz,
 
 static void board_chipset_hard_off_quartz(void)
 {
-	hook_call_deferred(&disable_pp5000_s5_data, 5000 * USEC_PER_MSEC);
+	hook_call_deferred(&disable_pp5000_s5_data,
+			   (5000 + CONFIG_CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
+				   USEC_PER_MSEC);
 }
 DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_chipset_hard_off_quartz,
 	     HOOK_PRIO_DEFAULT);
