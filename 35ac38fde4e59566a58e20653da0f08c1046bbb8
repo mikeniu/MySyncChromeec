@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00ae4e5b_e2d5c284",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T03:01:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "46d56d1a_94b101d9",
+      "revId": "35ac38fde4e59566a58e20653da0f08c1046bbb8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f83d0b9d_fef432bb",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Minor suggestion:** Now that `sys_alloc` delegates cleanly to `k_heap_calloc` and no longer computes custom header sizes, there is no addition happening internally. You might consider renaming this test to something like `test_sys_alloc_huge_size_panics` to reflect the new implementation.",
       "isAi": true,
+      "revId": "35ac38fde4e59566a58e20653da0f08c1046bbb8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c31f5bd_cc370966",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T03:01:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f83d0b9d_fef432bb",
       "revId": "35ac38fde4e59566a58e20653da0f08c1046bbb8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
