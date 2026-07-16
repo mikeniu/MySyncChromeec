@@ -17,6 +17,52 @@
       "isAi": true,
       "revId": "f1462cd7542b05302b3417d37a58ea527c5ac03c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "315b9c54_cbd138ad",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T23:35:28Z",
+      "side": 1,
+      "message": "It\u0027s confusing to have both `sys_` and `plat_` functions since it\u0027s not clear what the difference between the two are. Can we move all the `sys_` function code into the corresponding `plat_` functions? (separate CL).",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 1
+      },
+      "revId": "f1462cd7542b05302b3417d37a58ea527c5ac03c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24b77d9e_dc89f964",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T23:35:28Z",
+      "side": 1,
+      "message": "Unrelated changes?",
+      "range": {
+        "startLine": 615,
+        "startChar": 0,
+        "endLine": 647,
+        "endChar": 1
+      },
+      "revId": "f1462cd7542b05302b3417d37a58ea527c5ac03c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
