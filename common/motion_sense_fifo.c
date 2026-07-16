@@ -185,12 +185,19 @@ static void fifo_pop(void)
 	 * Decrement sample count, if the count was 2 before, we might not need
 	 * to spread anymore. Loop through and check.
 	 */
-	if (--fifo_staged.sample_count[head->sensor_num] < 2) {
+	int thresh =
+		motion_sensors[head->sensor_num].spreading_threshold ?
+			motion_sensors[head->sensor_num].spreading_threshold :
+			1;
+	if (--fifo_staged.sample_count[head->sensor_num] < thresh + 1) {
 		int i;
 
 		fifo_staged.requires_spreading = 0;
 		for (i = 0; i < MAX_MOTION_SENSORS; i++) {
-			if (fifo_staged.sample_count[i] > 1) {
+			int t = motion_sensors[i].spreading_threshold ?
+					motion_sensors[i].spreading_threshold :
+					1;
+			if (fifo_staged.sample_count[i] > t) {
 				fifo_staged.requires_spreading = 1;
 				break;
 			}
@@ -262,17 +269,6 @@ fifo_stage_unit(struct ec_response_motion_sensor_data *data,
 	for (i = 0; i < valid_data; i++)
 		sensor->xyz[i] = data->data[i];
 
-	/*
-	 * For timestamps, update the next value of the sensor's timestamp
-	 * if this timestamp is considered new.
-	 */
-	if (data->flags & MOTIONSENSE_SENSOR_FLAG_TIMESTAMP &&
-	    is_new_timestamp(data->sensor_num)) {
-		next_timestamp[data->sensor_num].next =
-			next_timestamp[data->sensor_num].prev = data->timestamp;
-		next_timestamp_initialized |= BIT(data->sensor_num);
-	}
-
 	/* For valid sensors, check if AP really needs this data */
 	if (valid_data) {
 		int removed = 0;
@@ -332,9 +328,15 @@ fifo_stage_unit(struct ec_response_motion_sensor_data *data,
 	 * If the new per-sensor sample count is greater than 1, we'll need to
 	 * spread.
 	 */
-	if (IS_ENABLED(CONFIG_SENSOR_TIGHT_TIMESTAMPS) && !is_timestamp(data) &&
-	    ++fifo_staged.sample_count[data->sensor_num] > 1)
-		fifo_staged.requires_spreading = 1;
+	if (IS_ENABLED(CONFIG_SENSOR_TIGHT_TIMESTAMPS) && !is_timestamp(data)) {
+		int thresh =
+			motion_sensors[data->sensor_num].spreading_threshold ?
+				motion_sensors[data->sensor_num]
+					.spreading_threshold :
+				1;
+		if (++fifo_staged.sample_count[data->sensor_num] > thresh)
+			fifo_staged.requires_spreading = 1;
+	}
 
 	mutex_unlock(&g_sensor_mutex);
 }
@@ -540,24 +542,62 @@ commit_data_end:
 			continue;
 		}
 
-		/*
-		 * If this is the first time we're seeing a timestamp for this
-		 * sensor or the timestamp is after our computed next, skip
-		 * ahead.
-		 */
-		if (is_new_timestamp(sensor_num) ||
-		    time_after(data->timestamp,
-			       next_timestamp[sensor_num].next)) {
-			next_timestamp[sensor_num].next = data->timestamp;
+		int thresh =
+			motion_sensors[sensor_num].spreading_threshold ?
+				motion_sensors[sensor_num].spreading_threshold :
+				1;
+
+		if (fifo_staged.sample_count[sensor_num] > thresh) {
+			/*
+			 * If this is the first time we're seeing a timestamp
+			 * for this sensor or the timestamp is after our
+			 * computed next, skip ahead.
+			 */
+			if (is_new_timestamp(sensor_num) ||
+			    time_after(data->timestamp,
+				       next_timestamp[sensor_num].next)) {
+				uint32_t ts = data->timestamp;
+
+				if (next_timestamp[sensor_num].prev != 0) {
+					if (time_after(next_timestamp[sensor_num]
+							       .prev,
+						       ts)) {
+						/* Reseed TS is behind! Clamp to
+						 * prev to prevent OOO. */
+						ts = next_timestamp[sensor_num]
+							     .prev;
+					}
+				}
+				next_timestamp[sensor_num].next = ts;
+				next_timestamp_initialized |= BIT(sensor_num);
+			}
+
+			/* Spread the timestamp and compute the expected next.
+			 */
+			data->timestamp = next_timestamp[sensor_num].next;
+			next_timestamp[sensor_num].prev =
+				next_timestamp[sensor_num].next;
+			next_timestamp[sensor_num].next +=
+				expected_data_periods[sensor_num];
+		} else {
+			/* Bypass spreading, use raw timestamp if it is ahead of
+			 * last committed TS */
+			uint32_t ts = data->timestamp;
+
+			if (next_timestamp[sensor_num].prev != 0) {
+				if (time_after(next_timestamp[sensor_num].prev,
+					       ts)) {
+					/* Raw is behind! Clamp to prev to
+					 * prevent OOO. */
+					ts = next_timestamp[sensor_num].prev;
+				}
+			}
+			next_timestamp[sensor_num].next =
+				ts + expected_data_periods[sensor_num];
+			next_timestamp[sensor_num].prev = ts;
+			data->timestamp = ts;
 			next_timestamp_initialized |= BIT(sensor_num);
 		}
-
-		/* Spread the timestamp and compute the expected next. */
-		data->timestamp = next_timestamp[sensor_num].next;
-		next_timestamp[sensor_num].prev =
-			next_timestamp[sensor_num].next;
-		next_timestamp[sensor_num].next +=
-			expected_data_periods[sensor_num];
 
 		/* Update online calibration if enabled. */
 		data = peek_fifo_staged(i);
@@ -642,6 +682,7 @@ void motion_sense_fifo_reset(void)
 		(void *)fifo_info_buffer;
 
 	next_timestamp_initialized = 0;
+	memset(next_timestamp, 0, sizeof(next_timestamp));
 	memset(&fifo_staged, 0, sizeof(fifo_staged));
 	motion_sense_fifo_init();
 	queue_init(&fifo);
@@ -661,6 +702,8 @@ void motion_sense_set_data_period(int sensor_num, uint32_t data_period)
 	 */
 	ts_last_int[sensor_num] = __hw_clock_source_read();
 	next_timestamp_initialized &= ~BIT(sensor_num);
+	memset(&next_timestamp[sensor_num], 0,
+	       sizeof(next_timestamp[sensor_num]));
 }
 
 #ifdef CONFIG_CMD_ACCEL_FIFO
