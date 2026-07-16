@@ -21,6 +21,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5eae388d_9b10c51c",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T23:39:29Z",
+      "side": 1,
+      "message": "We should probably note in the doxygen and commit message that this changes from uninited allocation to a zeroed allocation. It\u0027s ok (defensive), but was it intentional?",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 68
+      },
+      "revId": "f1462cd7542b05302b3417d37a58ea527c5ac03c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "315b9c54_cbd138ad",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
         "patchSetId": 16
