@@ -194,6 +194,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5b85f27_1bd6d77d",
+        "filename": "include/usb_pd_vdo.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-16T10:06:26Z",
+      "side": 1,
+      "message": "My bad, 1.2 is correct for now.",
+      "parentUuid": "2e5035bd_599560c9",
+      "revId": "af5b495c6d655c97642569f9befd5c7ecf88dabd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6bcf67b8_692cb8fc",
