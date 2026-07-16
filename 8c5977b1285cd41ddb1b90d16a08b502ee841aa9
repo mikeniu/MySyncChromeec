@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "db4ff569_a1317e60",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T23:21:33Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f15fcff9_dc0c9b4c",
+      "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0cb743e5_a1872484",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Pre-existing Bug:** `sys_alloc` takes both `count` and `size`, but ignores `count` and only allocates `size` bytes. If this function is ever called with `count \u003e 1` directly, it will under-allocate memory. `k_heap_aligned_alloc` should probably be called with `count * size`.\n\nAlternatively, if `sys_alloc` is always supposed to be called with `count\u003d1` (as done in `plat_calloc`), its signature and documentation in the header should probably be updated.",
       "isAi": true,
+      "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a48bdc9_022d438a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T23:21:33Z",
+      "side": 1,
+      "message": "we are aware of this, we are fixing this in an upcoming CL",
+      "parentUuid": "0cb743e5_a1872484",
       "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d73b1da_67ef018d",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T23:21:33Z",
+      "side": 1,
+      "message": "we are aware of this. We are fixing it in an upcoming CL",
+      "parentUuid": "eebce6d4_0b8c5099",
+      "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "41e14eb2_2fe879ee",
@@ -73,6 +127,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b0f0780_64679b60",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T23:21:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "41e14eb2_2fe879ee",
+      "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "753bb295_7435a428",
@@ -86,6 +158,30 @@
       "writtenOn": "2026-07-16T23:14:35Z",
       "side": 1,
       "message": "Since we\u0027re doing cleanup, can we do this in a separate CL: http://b/373435445?",
+      "range": {
+        "startLine": 201,
+        "startChar": 1,
+        "endLine": 201,
+        "endChar": 55
+      },
+      "revId": "8c5977b1285cd41ddb1b90d16a08b502ee841aa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "708ad400_f7683011",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T23:21:33Z",
+      "side": 1,
+      "message": "This CL was submitted a while ago but never reviewed: https://chrome-internal-review.git.corp.google.com/c/chromeos/vendor/fingerprint/egis/+/7751601\n\nLet me rebased and do the zephyr fix",
+      "parentUuid": "753bb295_7435a428",
       "range": {
         "startLine": 201,
         "startChar": 1,
