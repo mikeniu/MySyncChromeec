@@ -163,6 +163,9 @@ struct motion_sensor_t {
 	mutex_t *mutex;
 	void *drv_data;
 
+	/* Minimum number of samples in batch to trigger spreading */
+	uint8_t spreading_threshold;
+
 	/* i2c port */
 	uint8_t port;
 	/* i2c address or SPI port */
