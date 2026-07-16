@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b06bf5a_83d791a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T23:26:47Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4290a5f1_c84489da",
+      "revId": "d168f4af5a62235665f6001c98a5834b77e65675",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f75a02e9_d6e00eee",
@@ -32,6 +50,30 @@
       "writtenOn": "2026-07-16T21:46:25Z",
       "side": 1,
       "message": "Please split the move from the header to the C file into its own CL before this one to make it easier to review. (It should be a no-op and safe to submit.)",
+      "range": {
+        "startLine": 167,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 1
+      },
+      "revId": "d168f4af5a62235665f6001c98a5834b77e65675",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dfd30b2_63d0d4cd",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T23:26:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f75a02e9_d6e00eee",
       "range": {
         "startLine": 167,
         "startChar": 0,
