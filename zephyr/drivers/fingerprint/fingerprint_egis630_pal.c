@@ -190,14 +190,12 @@ void *plat_alloc(size_t size)
 	return sys_alloc(1, size);
 }
 
-void PLAT_FREE(void **x)
+void plat_free(void **x)
 {
-	assert(x != NULL && *x != NULL);
-	plat_free(*x);
-	*x = NULL;
-}
+	assert(x != NULL);
 
-void plat_free(void *x)
-{
-	sys_free(x);
+	if (*x != NULL) {
+		sys_free(*x);
+		*x = NULL;
+	}
 }
