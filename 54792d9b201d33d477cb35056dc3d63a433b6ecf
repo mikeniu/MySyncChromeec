@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06f803f9_abce191e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-16T17:02:10Z",
+      "side": 1,
+      "message": "Note - the cros_flash driver is a singleton driver model.  I would like to remove this API layer similar https://crrev.com/c/7871348.\nBut this change is fine as a stop-gap.",
+      "revId": "54792d9b201d33d477cb35056dc3d63a433b6ecf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
