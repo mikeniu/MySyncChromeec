@@ -13,7 +13,7 @@
 		cros-ec,flash = &flash0;
 		cros-ec,flash-controller = &fiu0;
 		cros-ec,watchdog = &twd0;
-		cros-ec,keyboard = &ioex_it8801_kbd;
+
 	};
 
 	cros_system: cros-system {

@@ -15,9 +15,9 @@
 
 #define I2C_DEV_NODE        DT_NODELABEL(i2c2)
 
-#define I2C_DEV_TARGET_NODE DT_NODELABEL(i2c1_target)
+#define I2C_DEV_TARGET_NODE DT_NODELABEL(i2c0_target)
 #define TARGET_ADDRESS 0x52
-
+#if 0
 #define I2C_DEV_TARGET2_NODE DT_NODELABEL(i2c1_target_addr2)
 #define TARGET_ADDRESS2 0x62
 
@@ -32,9 +32,9 @@ uint8_t r_datas1[128];
 
 //static uint8_t expected[256];
 //static int start_tick;
-const struct device *const i2c_dev = DEVICE_DT_GET(I2C_DEV_NODE);
+//const struct device *const i2c_dev = DEVICE_DT_GET(I2C_DEV_NODE);
 
-#if 0
+
 static void tick_task(void)
 {
 	(void)memset(&r_datas, 0, sizeof(r_datas));
@@ -63,13 +63,13 @@ static int test_i2c_host(void)
 {
 
 	const struct device *i2c_target_dev = DEVICE_DT_GET(I2C_DEV_TARGET_NODE);
-	uint32_t i2c_cfg_tmp, ret;
+	uint32_t ret;
 
 	ret = i2c_target_driver_register(i2c_target_dev);
 	if (ret) {
 		printf("I2C target register failed\n");
 	}
-
+#if 0
 	if (!device_is_ready(i2c_dev)) {
 		printf("I2C device is not ready\n");
 		return -1;
@@ -91,7 +91,6 @@ static int test_i2c_host(void)
 		return -1;
 	}
 
-#if 0
 	start_tick=1;
 	for(int k=0;k<256;k++) {
 		expected[k]=0xff-k;
@@ -145,7 +144,7 @@ static int test_i2c_host(void)
 		return -1;
 	}
 #endif
-#if 1
+#if 0
 	printf("\n[main]2.===read datas(<=255bytes FIFO mode allowed)===\n");
 
 	if (i2c_read(i2c_dev, r_datas, sizeof(r_datas), TARGET_ADDRESS)) {

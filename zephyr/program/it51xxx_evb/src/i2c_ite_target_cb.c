@@ -107,7 +107,7 @@ static int i2c_ite_target_buf_read_requested(struct i2c_target_config *config, u
 	*len = sizeof(data->r_buffer);
 	*ptr = data->r_buffer;
 
-	LOG_DBG("[target]: r-ptr=%p, len=%d", *ptr,*len);
+	//LOG_DBG("[target]: r-ptr=%p, len=%d", *ptr,*len);
 
 	return 0;
 }
@@ -172,12 +172,30 @@ static int i2c_ite_target_init(const struct device *dev)
 	LOG_DBG("[target]w_buffer=%p",data->w_buffer);
 	LOG_DBG("[target]r_buffer=%p",data->r_buffer);
 
-	for (int i = 0; i < sizeof(data->r_buffer); i++) {
+	/* read word (write cmd: 0x12) */
+	data->r_buffer[0] = 0x20;
+	data->r_buffer[1] = 0x1f;
+	data->r_buffer[2] = 0x4c;
 
-		data->r_buffer[i] = 0xff-i;
+	/* read data byte (write cmd: 0x10) */
+	//data->r_buffer[0] = 0x20;
+	//data->r_buffer[1] = 0xbc;
 
+	/* process call */
+	//data->r_buffer[0] = 0x20;
+	//data->r_buffer[1] = 0x1f;
+	//data->r_buffer[2] = 0xb8;
+#if 0
+	data->r_buffer[0] = 0x5;
+	/* block read cmd */
+	for (int i = 1; i <= 5; i++) {
+		data->r_buffer[i] = 32-i;
 	}
 
+	data->r_buffer[6] = 0xbf;
+	//data->r_buffer[6] = 0x09;
+	//data->r_buffer[33] = 0x59;
+#endif
 	return 0;
 }
 

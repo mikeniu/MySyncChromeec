@@ -9,6 +9,7 @@
 #include "i2c.dtsi"
 #include "adc.dtsi"
 #include "interrupts.dtsi"
+#include "smbus.dtsi"
 
 &uart2 {
 	status = "okay";
