@@ -146,3 +146,38 @@ void __unused sys_free(void *data)
 {
 	k_heap_free(&fp_driver_heap, data);
 }
+
+void __unused *plat_calloc(size_t count, size_t size)
+{
+	void *ptr = sys_alloc(1, count * size);
+	if (ptr)
+		memset(ptr, 0, count * size);
+	return ptr;
+}
+
+void __unused *plat_realloc(void *data, size_t size)
+{
+	void *new_ptr = sys_alloc(1, size);
+	if (new_ptr && data) {
+		memcpy(new_ptr, data, size);
+		sys_free(data);
+	}
+	return new_ptr;
+}
+
+void __unused *plat_alloc(size_t size)
+{
+	return sys_alloc(1, size);
+}
+
+void __unused PLAT_FREE(void **x)
+{
+	assert(x != NULL && *x != NULL);
+	plat_free(*x);
+	*x = NULL;
+}
+
+void __unused plat_free(void *x)
+{
+	sys_free(x);
+}
