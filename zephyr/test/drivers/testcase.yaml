@@ -929,6 +929,16 @@ tests:
     extra_conf_files:
     - prj.conf
     - ./lis2dh/prj.conf
+  drivers.lis2dh_no_int:
+    timeout: 15
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_LIS2DH=y
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./lis2dh/sensor_no_int.dts
+    extra_conf_files:
+    - prj.conf
+    - ./lis2dh/prj.conf
   drivers.lsm6dsm:
     timeout: 15
     extra_configs:
