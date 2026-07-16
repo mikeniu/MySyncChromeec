@@ -58,10 +58,10 @@
 		};
 
 		/* KBD IOEX configuration, IOEX present on GSC AIC */
-		chgr-led-pwm4 {
+		gpio_chgr_led: chgr-led-pwm4 {
 			gpios = <&ioex_it8801_port1 5 GPIO_INPUT>;
 		};
-		chgr-led-pwm3 {
+		gpio_batt_led: batt-led-pwm3 {
 			gpios = <&ioex_it8801_port1 4 GPIO_INPUT>;
 		};
 		plt-config-1 {
