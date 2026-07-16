@@ -509,7 +509,11 @@ static void zephyr_print(const char *buff, size_t size)
 	if (in_isr || shell_stopped || !shell_is_active()) {
 		if (IS_ENABLED(CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT) ||
 		    !in_isr) {
-			printk("!%s", buff);
+			if (in_isr) {
+				printk("[ISR]%s", buff);
+			} else {
+				printk("%s", buff);
+			}
 		}
 		return;
 	}
