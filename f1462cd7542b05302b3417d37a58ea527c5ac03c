@@ -67,6 +67,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4b17cd91_b580e187",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T23:57:42Z",
+      "side": 1,
+      "message": "ok. will do it as a separate CL",
+      "parentUuid": "315b9c54_cbd138ad",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 1
+      },
+      "revId": "f1462cd7542b05302b3417d37a58ea527c5ac03c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "24b77d9e_dc89f964",
         "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
         "patchSetId": 16
@@ -78,6 +102,30 @@
       "writtenOn": "2026-07-16T23:35:28Z",
       "side": 1,
       "message": "Unrelated changes?",
+      "range": {
+        "startLine": 615,
+        "startChar": 0,
+        "endLine": 647,
+        "endChar": 1
+      },
+      "revId": "f1462cd7542b05302b3417d37a58ea527c5ac03c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d0bd0de_1f7e449a",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T23:57:42Z",
+      "side": 1,
+      "message": "yes, I needed to get past the 90% coverage.",
+      "parentUuid": "24b77d9e_dc89f964",
       "range": {
         "startLine": 615,
         "startChar": 0,
