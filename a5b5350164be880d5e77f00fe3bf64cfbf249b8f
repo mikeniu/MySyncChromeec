@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05b59828_3efd6e4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T03:03:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/a833b71f-f9f4-41cf-968e-ddb485f1ab8b)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The changes successfully resolve the heap buffer overflow vulnerabilities by completely delegating memory allocation sizes and boundaries to Zephyr\u0027s native `k_heap_calloc` and `k_heap_realloc`. This is a much safer approach that natively handles count/size multiplication overflow and bounded memory copies without relying on manual buffer manipulation.\n- `plat_calloc` now cleanly wraps `sys_alloc`, removing the need for manual zeroing.\n- The addition of proper `NULL` pointer handling to `sys_alloc_usable_size` and `sys_free` improves robustness.\n\n**Style \u0026 Consistency:**\n- The changes significantly clean up the PAL API implementation. The code is concise and aligns with Zephyr\u0027s idiomatic memory management practices.\n\n**Testing:**\n- The `ztest` suite has been comprehensively updated to test the new allocator logic. Tests correctly use `ztest_set_fault_valid(true)` to verify that intentional integer overflows and OOM conditions appropriately trigger fatal panics (`k_oops()`). Memory shrinking and growing behaviors are also thoroughly verified.\n- Additional test cases for time handling and logging further improve coverage.\n\nTAG\u003dagy\nCONV\u003d2d98aa02-8193-409a-850b-470ef7a94fbf",
+      "isAi": true,
+      "revId": "a5b5350164be880d5e77f00fe3bf64cfbf249b8f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
