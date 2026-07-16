@@ -169,6 +169,7 @@ void __unused plat_sleep_time(unsigned long timeInMs);
 #define TIME_MEASURE_STOP_AND_RESTART(name, x)
 #define TIME_MEASURE_RESET(name)
 #endif
+
 /**
  * @brief Allocates a block of memory of a specified size and number of
  * elements.
