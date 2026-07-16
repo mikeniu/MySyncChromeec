@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4e9aebf_f5883db2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-07-16T17:24:10Z",
+      "side": 1,
+      "message": "I need to do some more testing on this I\u0027m not seeing the LEDs behave as expected I assumed they were working based on the EC log but they are not actually illuminating on the GSC",
+      "revId": "49cb5f0fdeb4c6ffb48a8dc8aa60bd4b6b374c1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
