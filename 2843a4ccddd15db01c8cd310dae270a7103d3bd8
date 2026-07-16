@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "69a8a031_35092d07",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-07-16T18:25:08Z",
+      "side": 1,
+      "message": "\u003e It should be bbram instead of backup_regs.\n\nNope. I took a look at the compiled DTS file `./platform/ec/build/zephyr/bloonchipper/build-ro/zephyr/zephyr.dts` and it looks like bbram is enabled.\n\nEC hash `a3349603f332f555ef2f857ff4690931451addf0`\nZephyr hash `06f5c058bb0aacd79c6d22007c46364ecf1d6d1b`\n\n```\n/* node \u0027/soc/rtc@40002800/backup_regs\u0027 defined in zephyr/dts/arm/st/f4/stm32f4.dtsi:602 */\nbbram: backup_regs {\n        compatible \u003d \"st,stm32-bbram\"; /* in zephyr/dts/arm/st/f4/stm32f4.dtsi:603 */\n        st,backup-regs \u003d \u003c 0x14 \u003e;     /* in zephyr/dts/arm/st/f4/stm32f4.dtsi:604 */\n        status \u003d \"okay\";               /* in zephyr/boards/google/dragonclaw/google_dragonclaw.dts:91 */\n};\n```",
+      "parentUuid": "dffd83a9_8f6432cd",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 22
+      },
+      "revId": "2843a4ccddd15db01c8cd310dae270a7103d3bd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "79d8b6cd_2eea8122",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
