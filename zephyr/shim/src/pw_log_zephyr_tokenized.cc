@@ -17,6 +17,7 @@ extern "C" {
 bool console_channel_is_disabled(int channel);
 void panic_log_write_str(const void *data, size_t size);
 void console_buf_notify_chars(const char *data, size_t size);
+bool k_is_in_isr(void);
 }
 
 #ifndef PW_FLAG_TO_EC_CHANNEL
@@ -91,7 +92,11 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 	// https://github.com/zephyrproject-rtos/zephyr/issues/59454 Zephyr
 	// frontend should protect messages from getting corrupted from multiple
 	// threads.
-	printk("%s", base64_string.c_str());
+	if (k_is_in_isr()) {
+		printk("[ISR]%s", base64_string.c_str());
+	} else {
+		printk("%s", base64_string.c_str());
+	}
 	k_spin_unlock(&lock, key);
 }
 
