@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40129060_393296a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T02:17:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/e6cceb68-2be5-4d16-8ef0-e5e2256a45af)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The changes successfully resolve the heap buffer overflow vulnerabilities identified in earlier patchsets. The use of `__builtin_add_overflow` correctly prevents integer wrap-around when calculating the total allocation size (payload + header).\n- `plat_calloc` is cleanly simplified to use `sys_alloc` directly, eliminating redundant overflow checking and ensuring consistent error handling (triggering `k_oops()` instead of silently failing).\n- `plat_realloc` memory copy boundaries are safely bounded by the source block size via `sys_alloc_usable_size()`, preventing buffer over-reads when shrinking memory.\n- The use of `sys_alloc_usable_size()` to retrieve the accurate, requested size rather than the heap block size is robust and safe.\n\n**Style \u0026 Consistency:**\n- Using `ROUND_UP` from Zephyr cleanly replaces manual alignment macros.\n- The allocator interfaces are now unified and consistent.\n\n**Testing:**\n- The newly added `ztest` cases are excellent. Using `ztest_set_fault_valid(true)` to ensure that panics (like OOM or integer overflows) actually trigger the expected `k_oops()` is exactly the right way to test fatal error handling.\n- Core memory operations (resizing, growing, calloc zero-initialization) are heavily verified, protecting against future regressions.\n\nTAG\u003dagy\nCONV\u003d2f703dfc-9c08-4784-87ec-c4c3aa91cc34",
+      "isAi": true,
+      "revId": "daab6ee32d77b6cabaa6028da9ec0c67e49a75ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
