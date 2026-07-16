@@ -192,21 +192,12 @@ void sys_free(void *data);
 
 /**
  * @brief Releases a block of memory previously allocated by plat_alloc() or
- * plat_calloc().
- *
- * @param[in] x Pointer to the memory block to be freed.
- *
- */
-void plat_free(void *x);
-
-// TODO (b/373435445): Combine PLAT_FREE and plat_free.
-/**
- * @brief Deallocates memory and sets the provided pointer to NULL.
+ * plat_calloc() and sets the provided pointer to NULL.
  *
  * @param[in] x A pointer to a pointer to the memory block to be freed.
  *
  */
-void PLAT_FREE(void **x);
+void plat_free(void **x);
 
 /**
  * @brief Allocates a block of memory of the specified size, zero-initializing
