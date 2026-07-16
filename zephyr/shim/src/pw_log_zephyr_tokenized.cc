@@ -35,7 +35,6 @@ namespace
 	constexpr char kEndDelimiter = '~';
 
 	struct k_spinlock lock;
-	k_spinlock_key_t key;
 } // namespace
 
 extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
@@ -55,7 +54,7 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 		}
 	}
 
-	key = k_spin_lock(&lock);
+	k_spinlock_key_t key = k_spin_lock(&lock);
 
 	// Static buffer guarded by spinlock to prevent stack allocation
 	// (~270B).
