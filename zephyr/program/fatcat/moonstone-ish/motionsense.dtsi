@@ -135,6 +135,7 @@
 			port = <&i2c_ec_i2c_sensor>;
 			rot-standard-ref = <&lid_rot_ref>;
 			default-range = <2>;
+			spreading-threshold = <2>;
 			drv-data = <&lis2dh_lid_data>;
 			i2c-spi-addr-flags = "LIS2DH_ADDR0_FLAGS";
 			alternate-for = <&lid_accel>;
