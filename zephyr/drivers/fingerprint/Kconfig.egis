@@ -79,6 +79,6 @@ config HAVE_EGIS660_PRIVATE_DRIVER
 	bool
 	default n
 	help
-	  If enabled, it indicates that the private driver is present.
+	  If enabled, it indicates that the EGIS660 private driver is present.
 
 endif # FINGERPRINT_SENSOR_EGIS660
