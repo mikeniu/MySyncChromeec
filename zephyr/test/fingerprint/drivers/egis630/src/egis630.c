@@ -712,7 +712,7 @@ ZTEST_F(egis630, test_set_debug_level_success_assert)
 	zassert_equal(printf_buffer[0], '\0');
 }
 
-ZTEST_F(egis630, test_PLAT_FREE_success)
+ZTEST_F(egis630, test_plat_free_success)
 {
 	int num = 1234;
 	int *ptr = (int *)sys_alloc(1, sizeof(int));
@@ -721,8 +721,23 @@ ZTEST_F(egis630, test_PLAT_FREE_success)
 	zassert_not_null(ptr);
 	zassert_equal(*ptr, num);
 
-	PLAT_FREE((void **)&ptr);
+	plat_free((void **)&ptr);
 	zassert_is_null(ptr);
+}
+
+ZTEST_F(egis630, test_plat_free_null)
+{
+	int *ptr = NULL;
+	plat_free((void **)&ptr);
+	zassert_is_null(ptr);
+}
+
+ZTEST_F(egis630, test_plat_free_null_double_pointer)
+{
+	plat_free(NULL);
+	zassert_true(
+		true,
+		"plat_free successfully handled NULL double pointer without crashing");
 }
 
 ZTEST_F(egis630, test_egis630_rbs_check_if_null_error)
