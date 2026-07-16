@@ -14,7 +14,9 @@ properties:
 
   # Fuel gauge
   manuf_name:
-    default: "byd"
+    # CONFIG_PLATFORM_EC_BATTERY_REPLACE_NULLS required. This battery
+    # uses the "Supplier Name" + NULL(0x00) + "YYYY" format.
+    default: "byd_2025"
   device_name:
     default: "L25b4pk5"
   ship_mode_reg_addr:
