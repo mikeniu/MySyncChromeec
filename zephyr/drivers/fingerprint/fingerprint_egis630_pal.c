@@ -125,7 +125,7 @@ void __unused output_log(LOG_LEVEL level, const char *tag,
 	k_sem_give(&printf_buffer_lock);
 }
 
-void __unused *sys_alloc(size_t count, size_t size)
+void *sys_alloc(size_t count, size_t size)
 {
 	void *p = k_heap_aligned_alloc(&fp_driver_heap, sizeof(void *), size,
 				       K_NO_WAIT);
@@ -142,7 +142,42 @@ void __unused *sys_alloc(size_t count, size_t size)
 	return p;
 }
 
-void __unused sys_free(void *data)
+void sys_free(void *data)
 {
 	k_heap_free(&fp_driver_heap, data);
+}
+
+void *plat_calloc(size_t count, size_t size)
+{
+	void *ptr = sys_alloc(1, count * size);
+	if (ptr)
+		memset(ptr, 0, count * size);
+	return ptr;
+}
+
+void *plat_realloc(void *data, size_t size)
+{
+	void *new_ptr = sys_alloc(1, size);
+	if (new_ptr && data) {
+		memcpy(new_ptr, data, size);
+		sys_free(data);
+	}
+	return new_ptr;
+}
+
+void *plat_alloc(size_t size)
+{
+	return sys_alloc(1, size);
+}
+
+void PLAT_FREE(void **x)
+{
+	assert(x != NULL && *x != NULL);
+	plat_free(*x);
+	*x = NULL;
+}
+
+void plat_free(void *x)
+{
+	sys_free(x);
 }
