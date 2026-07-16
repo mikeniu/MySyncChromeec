@@ -190,7 +190,7 @@ void *plat_alloc(size_t size)
 	return sys_alloc(1, size);
 }
 
-void PLAT_FREE(void **x)
+void plat_free(void **x)
 {
 	if (x == NULL) {
 		LOG_ERR("Error - %s called with NULL double pointer.",
@@ -200,9 +200,4 @@ void PLAT_FREE(void **x)
 
 	sys_free(*x);
 	*x = NULL;
-}
-
-void plat_free(void *x)
-{
-	sys_free(x);
 }
