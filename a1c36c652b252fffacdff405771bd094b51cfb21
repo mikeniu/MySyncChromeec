@@ -22,6 +22,30 @@
       },
       "revId": "a1c36c652b252fffacdff405771bd094b51cfb21",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45cf4a3e_daf08271",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-16T23:11:31Z",
+      "side": 1,
+      "message": "I compiles with the private fingerprint egis deleted to similar public zephyr. I was able to generate the firmware without any linker issues when `__unused` was removed. I removed it. I believe this was the reason why it was added to begin with. Maybe it was excessive.",
+      "parentUuid": "d94ae301_d341068c",
+      "range": {
+        "startLine": 180,
+        "startChar": 4,
+        "endLine": 180,
+        "endChar": 13
+      },
+      "revId": "a1c36c652b252fffacdff405771bd094b51cfb21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
