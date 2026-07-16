@@ -81,6 +81,14 @@ static inline int ec_cmd_thermal_get_threshold_v1(
 			       sizeof(*p), r, sizeof(*r));
 }
 
+static inline int ec_cmd_ucsi_ppm_get(CROS_EC_COMMAND_INFO *h,
+				      const struct ec_params_ucsi_ppm_get *p,
+				      uint8_t *r)
+{
+	return CROS_EC_COMMAND(h, EC_CMD_UCSI_PPM_GET, 0, p, sizeof(*p), r,
+			       p->size);
+}
+
 static inline int
 ec_cmd_usb_pd_dev_info(CROS_EC_COMMAND_INFO *h,
 		       const struct ec_params_usb_pd_info_request *p,
@@ -448,6 +456,7 @@ _CROS_EC_C0_F_PF(EC_CMD_USB_PD_RW_HASH_ENTRY, usb_pd_rw_hash_entry);
 _CROS_EC_C0_F_PF_RF(EC_CMD_VBOOT_HASH, vboot_hash);
 _CROS_EC_C0_F_PF_RF(EC_CMD_VSTORE_READ, vstore_read);
 _CROS_EC_C0_F_PF(EC_CMD_VSTORE_WRITE, vstore_write);
+_CROS_EC_C0_F_PF(EC_CMD_UCSI_PPM_SET, ucsi_ppm_set);
 
 #ifdef __cplusplus
 }
