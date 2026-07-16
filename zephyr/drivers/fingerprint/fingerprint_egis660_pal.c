@@ -164,13 +164,19 @@ int __unused egis_sensor_wfi(uint16_t timeout_ms, egis_wfi_check_t enter_wfi,
 	return EGIS_BEP_RESULT_OK;
 }
 
-#ifdef CONFIG_FINGERPRINT_SENSOR_EGIS660_APNS
+#if defined(CONFIG_FINGERPRINT_SENSOR_EGIS660_APNS) || \
+	defined(CONFIG_FINGERPRINT_SENSOR_EGIS660S_APNS)
 
 #define flash_ctrl_dev DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller))
 #define cros_flash_dev DEVICE_DT_GET(DT_CHOSEN(cros_ec_flash_controller))
 
+#ifdef CONFIG_FINGERPRINT_SENSOR_EGIS660S_APNS
+#define APNS_STORAGE_ADDR DT_REG_ADDR(DT_NODELABEL(egis660s_apns_data))
+#define APNS_STORAGE_SIZE DT_REG_SIZE(DT_NODELABEL(egis660s_apns_data))
+#else
 #define APNS_STORAGE_ADDR DT_REG_ADDR(DT_NODELABEL(egis660_apns_data))
 #define APNS_STORAGE_SIZE DT_REG_SIZE(DT_NODELABEL(egis660_apns_data))
+#endif
 
 #ifndef CONFIG_FLASH_WRITE_IDEAL_SIZE
 #error "CONFIG_FLASH_WRITE_IDEAL_SIZE is not defined"
@@ -295,5 +301,5 @@ int __unused egis_apns_data_write(uint32_t offset, const void *data,
 	return 0;
 }
 
-#endif /* CONFIG_FINGERPRINT_SENSOR_EGIS660_APNS */
+#endif /* CONFIG_FINGERPRINT_SENSOR_EGIS660_APNS || CONFIG_FINGERPRINT_SENSOR_EGIS660S_APNS */
 /* LCOV_EXCL_STOP */

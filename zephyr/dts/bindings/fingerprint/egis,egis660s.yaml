@@ -1,0 +1,25 @@
+# Copyright 2026 The Chromium OS Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: EGIS660S fingerprint sensor
+
+compatible: "egis,egis660s"
+
+include: [spi-device.yaml]
+
+properties:
+  irq-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      This property specifies the connection for sensor interrupt.
+
+  reset-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      This property specifies the connection for sensor reset.
+
+# EGIS660S uses the same driver as EGIS660
+# This binding allows the device to be recognized by the egis660 driver
