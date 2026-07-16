@@ -299,3 +299,44 @@ ZTEST(ucsi_ppm, test_ppm_write_is_valid_len_zero)
 	rv = call_set_host_cmd(UCSI_MESSAGE_OUT_OFFSET, NULL, 0);
 	zassert_equal(rv, EC_RES_ERROR, "Expected EC_RES_ERROR, got %d", rv);
 }
+
+ZTEST(ucsi_ppm, test_host_cmd_get_invalid_size)
+{
+	struct ec_params_ucsi_ppm_get ppm_get = {
+		.offset = UCSI_MESSAGE_OUT_OFFSET,
+		.size = 10,
+	};
+	uint8_t resp_buf[10];
+
+	struct host_cmd_handler_args args = {
+		.send_response = stub_send_response_callback,
+		.command = EC_CMD_UCSI_PPM_GET,
+		.version = 0,
+		.params = &ppm_get,
+		.params_size = 0,
+		.response = resp_buf,
+		.response_max = sizeof(resp_buf),
+		.response_size = 0,
+	};
+
+	enum ec_status rv = host_command_process(&args);
+
+	zassert_equal(rv, EC_RES_INVALID_PARAM, "Expected %d, got %d",
+		      EC_RES_INVALID_PARAM, rv);
+
+	args.params_size = sizeof(ppm_get) - 1;
+	rv = host_command_process(&args);
+
+	zassert_equal(rv, EC_RES_INVALID_PARAM, "Expected %d, got %d",
+		      EC_RES_INVALID_PARAM, rv);
+}
+
+ZTEST(ucsi_ppm, test_host_cmd_get_response_too_large)
+{
+	uint8_t read_buf[10];
+	enum ec_status get_rv = call_get_host_cmd(
+		UCSI_MESSAGE_OUT_OFFSET, 20, read_buf, sizeof(read_buf), NULL);
+
+	zassert_equal(get_rv, EC_RES_OVERFLOW, "Expected %d, got %d",
+		      EC_RES_OVERFLOW, get_rv);
+}
