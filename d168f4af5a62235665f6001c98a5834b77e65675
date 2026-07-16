@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4290a5f1_c84489da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T21:34:41Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/0d15361b-5020-47a2-90dc-54080fbbe7b3)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The CL successfully resolves the heap buffer overflow vulnerabilities by delegating memory allocation to Zephyr\u0027s native `k_heap_calloc` and `k_heap_realloc`. This is a safer approach that natively handles `count * size` multiplication and prevents out-of-bounds reads/writes during reallocation.\n- `plat_calloc` now cleanly wraps `sys_alloc`, safely removing redundant zeroing since `k_heap_calloc` already zeroes memory.\n- `sys_free` and `sys_alloc_usable_size` have been made robust with proper `NULL` checks.\n\n**Style \u0026 Consistency:**\n- The changes significantly clean up the PAL API implementation. It aligns closely with Zephyr\u0027s idiomatic memory management practices and reduces custom memory manipulation.\n- Moving the implementations out of the `.h` header and into the `.c` file improves code hygiene and resolves the static linkage complexity.\n\n**Testing:**\n- The `ztest` suite has been comprehensively updated. The tests correctly use `ztest_set_fault_valid(true)` to verify that intentional zero-sized allocations and OOM conditions appropriately trigger fatal panics (`k_oops()`). Memory shrinking and growing behaviors are also thoroughly verified.\n- Additional test cases for `output_log` edge cases (e.g., `NULL` format strings, invalid levels) further improve coverage.\n\nTAG\u003dagy\nCONV\u003dfac2e77b-26a1-4980-a725-ea653c19a3ba",
+      "isAi": true,
+      "revId": "d168f4af5a62235665f6001c98a5834b77e65675",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
