@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51544c6c_ab71f336",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T17:02:44Z",
+      "side": 1,
+      "message": "Is this a new change or something that has existed?",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 22
+      },
+      "revId": "2843a4ccddd15db01c8cd310dae270a7103d3bd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79d8b6cd_2eea8122",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T17:02:44Z",
+      "side": 1,
+      "message": "It deterministically failed, right? (I just want to make sure that we have test coverage for this in the CQ that will reliably catch any regressions.)",
+      "range": {
+        "startLine": 12,
+        "startChar": 55,
+        "endLine": 14,
+        "endChar": 18
+      },
+      "revId": "2843a4ccddd15db01c8cd310dae270a7103d3bd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
