@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "11fcf726_c2cfa80b",
+        "filename": "zephyr/program/intelrvp/ptlrvp/program.conf",
+        "patchSetId": 10
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-16T20:18:42Z",
+      "side": 1,
+      "message": "Agree, this is not required after recent change to `zephyr/CMakeLists.txt`.",
+      "parentUuid": "d3567816_7f1203fd",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 27
+      },
+      "revId": "061cd2dd87b95b0c08a8a8286d31cd2e56ebcfa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b1374bff_2b4b07f0",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-15T21:28:50Z",
       "side": 1,
       "message": "This may need a guard `#ifdef CONFIG_POWER_BUTTON` because power_button.h also defines this stub.",
+      "range": {
+        "startLine": 101,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 54
+      },
+      "revId": "061cd2dd87b95b0c08a8a8286d31cd2e56ebcfa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37e2c58f_43e5690d",
+        "filename": "zephyr/shim/src/buttons/power_button.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-16T20:18:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1374bff_2b4b07f0",
       "range": {
         "startLine": 101,
         "startChar": 0,
