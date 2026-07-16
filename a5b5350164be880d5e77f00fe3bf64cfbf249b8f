@@ -17,6 +17,52 @@
       "isAi": true,
       "revId": "a5b5350164be880d5e77f00fe3bf64cfbf249b8f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66f1f938_fbf50d00",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T15:44:28Z",
+      "side": 1,
+      "message": "Is this only used within this file? In that case we can make it `static`.\n\n---\n\nOh, it looks like it\u0027s called from the `.h` file. The structure is kind of weird. It might be nice to remove `static inline` from those functions and just put the implementation into `fingerprint_egis630_pal.c`. The compiler will optimize anyway.",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 156,
+        "endChar": 1
+      },
+      "revId": "a5b5350164be880d5e77f00fe3bf64cfbf249b8f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43a6afb4_fa7cb26b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-16T15:44:28Z",
+      "side": 1,
+      "message": "Is this only used in tests right now? If that\u0027s the case we should mark it with the \"test\" attribute (I can\u0027t remember what that is offhand).",
+      "range": {
+        "startLine": 158,
+        "startChar": 0,
+        "endLine": 158,
+        "endChar": 49
+      },
+      "revId": "a5b5350164be880d5e77f00fe3bf64cfbf249b8f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
