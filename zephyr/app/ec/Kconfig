@@ -78,6 +78,9 @@ config CROS_EC_HOOK_TICK_INTERVAL
 	  periodically by the HOOKS task. The interval must be shorter than
 	  1 second and is set according the EC chipset's sleep requirements.
 
+<<<<<<< PATCH SET (87abf93c6e7ae94e5c0d26d217d6e0099352949d zephyr/lightbar: Introduce CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_)
+<<<<<<< HEAD   (510479bc20483d82993e70820c10e742b446a472 boards/it82xx2: default disable CONFIG_PMP_DATA_EXECUTION_PR)
+||||||| BASE   (ac88e7ebee6bbc23aa451bc8484ab39caddd1cd4 cros_system: rtk: Cache chip info register values)
 config CROS_EC_LIGHTBAR_ANIMATION_HOLD_MS
 	int "Lightbar animation end hold time (ms)"
 	default 50
@@ -89,6 +92,43 @@ config CROS_EC_LIGHTBAR_ANIMATION_HOLD_MS
 	  longer hold time due to hardware or driver latencies to ensure
 	  animations complete fully.
 
+=======
+config CROS_EC_LIGHTBAR_ANIMATION_HOLD_MS
+	int "Lightbar animation end hold time (ms)"
+	default 50
+	help
+	  Specifies the duration (in milliseconds) to hold the final state
+	  of a one-shot lightbar animation before allowing a transition
+	  to the next state. This helps prevent abrupt visual changes.
+	  The default value is 50ms. Some platforms may require a
+	  longer hold time due to hardware or driver latencies to ensure
+	  animations complete fully.
+
+config CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS
+	int "AC unplug animation start delay (ms)"
+	default 0
+	help
+	  Specifies a configurable delay (in milliseconds) to wait after an AC
+	  unplug event is detected before triggering the unplug animation.
+	  Set to 0 to trigger the animation instantly (default). Increasing this
+	  value provides a platform sync window to prevent the unplug animation
+	  from being cut short or played while the lightbar rails are unpowered.
+
+>>>>>>> CHANGE (f22e15b051d4da4d3b4d38a270ae287b9bc9ee52 zephyr/lightbar: Introduce CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_)
+||||||| BASE      (510479bc20483d82993e70820c10e742b446a472 boards/it82xx2: default disable CONFIG_PMP_DATA_EXECUTION_PR)
+=======
+config CROS_EC_LIGHTBAR_ANIMATION_HOLD_MS
+	int "Lightbar animation end hold time (ms)"
+	default 50
+	help
+	  Specifies the duration (in milliseconds) to hold the final state
+	  of a one-shot lightbar animation before allowing a transition
+	  to the next state. This helps prevent abrupt visual changes.
+	  The default value is 50ms. Some platforms may require a
+	  longer hold time due to hardware or driver latencies to ensure
+	  animations complete fully.
+
+>>>>>>> BASE      (5fcb42b96ebfa8b9a552e836ecfa446cddd00e3b zephyr/lightbar: Introduce CROS_EC_LIGHTBAR_ANIMATION_HOLD_M)
 # When building for the host, we still need values for the various memory
 # sizes, though they aren't actually used, so just set some reasonable-looking
 # values and then ignore them.
