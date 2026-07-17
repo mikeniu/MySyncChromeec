@@ -42,6 +42,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c257df07_832ed99f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T21:57:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5a60baf3_4ce7ce9b",
+      "revId": "296f327686bd891dd73336bb700ffffb487ab635",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b61a807_04bebeee",
@@ -65,6 +83,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "983a3101_78715360",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T21:57:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b61a807_04bebeee",
+      "range": {
+        "startLine": 167,
+        "startChar": 0,
+        "endLine": 167,
+        "endChar": 39
+      },
+      "revId": "296f327686bd891dd73336bb700ffffb487ab635",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "23b97f5c_47df6619",
@@ -78,6 +120,30 @@
       "writtenOn": "2026-07-17T21:26:13Z",
       "side": 1,
       "message": "How about just wrapping this function with `#ifdef CONFIG_ZTEST` since it\u0027s only used in tests code?",
+      "range": {
+        "startLine": 168,
+        "startChar": 7,
+        "endLine": 168,
+        "endChar": 15
+      },
+      "revId": "296f327686bd891dd73336bb700ffffb487ab635",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37d16fc3_426e8228",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T21:57:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23b97f5c_47df6619",
       "range": {
         "startLine": 168,
         "startChar": 7,
