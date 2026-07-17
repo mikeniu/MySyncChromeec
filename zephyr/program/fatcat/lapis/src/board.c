@@ -109,3 +109,5 @@ static void tp_bl_enable(void)
 	}
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, tp_bl_enable, HOOK_PRIO_DEFAULT);
+
+/* TEST TEST TEST */
