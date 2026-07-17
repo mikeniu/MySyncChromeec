@@ -224,6 +224,30 @@
       },
       "revId": "f1462cd7542b05302b3417d37a58ea527c5ac03c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bad6639_ebd959ff",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T15:39:32Z",
+      "side": 1,
+      "message": "Let\u0027s put the unrelated tests in a separate CL before this one then.",
+      "parentUuid": "af71ebc4_11e8ade8",
+      "range": {
+        "startLine": 615,
+        "startChar": 0,
+        "endLine": 647,
+        "endChar": 1
+      },
+      "revId": "f1462cd7542b05302b3417d37a58ea527c5ac03c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
