@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "702244db_ef41097f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T20:39:30Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/f73658fc-375b-4aae-a5d8-d33786f87b89)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The CL successfully resolves all heap buffer overflow and over-read vulnerabilities by fully delegating memory allocation and reallocation boundaries to Zephyr\u0027s native `k_heap_calloc` and `k_heap_realloc` functions. This securely handles `count * size` multiplication and safely bounds memory copies during reallocation.\n- `plat_calloc` and `plat_realloc` are cleanly implemented as wrappers around the new safe allocators.\n- `sys_free` and `sys_alloc_usable_size` correctly handle `NULL` pointers, improving the robustness of the PAL API.\n\n**Style \u0026 Consistency:**\n- The code changes are concise, idiomatic, and adhere perfectly to Zephyr\u0027s coding guidelines.\n- The use of `COND_CODE_1(CONFIG_ZTEST, (), (static))` remains a clean way to expose internal functions to the test suite without polluting the global namespace.\n\n**Testing:**\n- The `ztest` suite provides rigorous and comprehensive coverage of the new allocator logic.\n- Using `ztest_set_fault_valid(true)` to ensure that intentional zero-sized allocations, integer overflows, and OOM conditions successfully trigger fatal panics (`k_oops()`) is an excellent defensive testing strategy.\n- Memory shrinking and growing behaviors for `realloc` are thoroughly verified.\n\nTAG\u003dagy\nCONV\u003df73658fc-375b-4aae-a5d8-d33786f87b89",
+      "isAi": true,
+      "revId": "53c10d7e13c68eda6aba740aefbece26bf88ec7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b641d7a_9f2f907f",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T20:39:30Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor suggestion:** The names of `test_sys_alloc_zero_size` and `test_sys_alloc_zero_elements` appear to be swapped.\n\nThis test passes `0` for `count` and `16` for `size`, so it is testing zero elements. The test below passes `8` for `count` and `0` for `size`, which tests zero size. Consider swapping the function names so they accurately reflect the arguments being tested.",
+      "isAi": true,
+      "revId": "53c10d7e13c68eda6aba740aefbece26bf88ec7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e74a5b12_5ce4a8ac",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T20:39:30Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor suggestion:** Now that `sys_alloc` delegates directly to `k_heap_calloc` and doesn\u0027t do custom header arithmetic, there is no addition happening internally anymore.\n\nConsider updating the assertion message to something like `\"sys_alloc huge size OOM did not trigger k_oops()\"` to reflect that this is testing an out-of-memory panic rather than an addition overflow.",
+      "isAi": true,
+      "revId": "53c10d7e13c68eda6aba740aefbece26bf88ec7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
