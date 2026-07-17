@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "965b3996_b8af26c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T21:18:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "702244db_ef41097f",
+      "revId": "53c10d7e13c68eda6aba740aefbece26bf88ec7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b641d7a_9f2f907f",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4c80e15_0475117b",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T21:18:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b641d7a_9f2f907f",
+      "revId": "53c10d7e13c68eda6aba740aefbece26bf88ec7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e74a5b12_5ce4a8ac",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Minor suggestion:** Now that `sys_alloc` delegates directly to `k_heap_calloc` and doesn\u0027t do custom header arithmetic, there is no addition happening internally anymore.\n\nConsider updating the assertion message to something like `\"sys_alloc huge size OOM did not trigger k_oops()\"` to reflect that this is testing an out-of-memory panic rather than an addition overflow.",
       "isAi": true,
+      "revId": "53c10d7e13c68eda6aba740aefbece26bf88ec7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94aed411_069e1f09",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T21:18:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e74a5b12_5ce4a8ac",
       "revId": "53c10d7e13c68eda6aba740aefbece26bf88ec7c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
