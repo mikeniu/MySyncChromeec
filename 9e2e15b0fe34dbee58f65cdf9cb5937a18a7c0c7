@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cd6e8cf_63a43c2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T22:38:48Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "03f593d5_16b0c21c",
+      "revId": "9e2e15b0fe34dbee58f65cdf9cb5937a18a7c0c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "698a6004_ebdff3d8",
@@ -65,6 +83,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2366debb_aa47a38a",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T22:38:48Z",
+      "side": 1,
+      "message": "I cannot because it uses `fp_driver_heap` which is defined in the source file.",
+      "parentUuid": "a5f9769b_eb57bdad",
+      "range": {
+        "startLine": 168,
+        "startChar": 16,
+        "endLine": 168,
+        "endChar": 49
+      },
+      "revId": "9e2e15b0fe34dbee58f65cdf9cb5937a18a7c0c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36e6a5c4_778a428e",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T22:38:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "698a6004_ebdff3d8",
+      "range": {
+        "startLine": 168,
+        "startChar": 7,
+        "endLine": 168,
+        "endChar": 15
+      },
+      "revId": "9e2e15b0fe34dbee58f65cdf9cb5937a18a7c0c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "759fc92b_7f07d978",
@@ -79,6 +145,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Minor suggestion:** Since `sys_realloc` is now `static` in `fingerprint_egis630_pal.c` and is not called from tests, you can safely remove this unused forward declaration.",
       "isAi": true,
+      "revId": "9e2e15b0fe34dbee58f65cdf9cb5937a18a7c0c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73e03460_52521c89",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T22:38:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "759fc92b_7f07d978",
       "revId": "9e2e15b0fe34dbee58f65cdf9cb5937a18a7c0c7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
