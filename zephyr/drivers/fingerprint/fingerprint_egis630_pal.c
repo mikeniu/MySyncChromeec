@@ -126,7 +126,7 @@ void __unused output_log(LOG_LEVEL level, const char *tag,
 	k_sem_give(&printf_buffer_lock);
 }
 
-void *sys_alloc(size_t count, size_t size)
+void *plat_calloc(size_t count, size_t size)
 {
 	void *p = k_heap_calloc(&fp_driver_heap, count, size, K_NO_WAIT);
 
@@ -142,13 +142,21 @@ void *sys_alloc(size_t count, size_t size)
 	return p;
 }
 
-void sys_free(void *data)
+void *plat_alloc(size_t size)
 {
-	/* k_heap_free handles NULL. */
-	k_heap_free(&fp_driver_heap, data);
+	return plat_calloc(1, size);
 }
 
-static void *sys_realloc(void *data, size_t size)
+void plat_free(void **x)
+{
+	if (x == NULL || *x == NULL) {
+		return;
+	}
+	k_heap_free(&fp_driver_heap, *x);
+	*x = NULL;
+}
+
+void *plat_realloc(void *data, size_t size)
 {
 	void *p = k_heap_realloc(&fp_driver_heap, data, size, K_NO_WAIT);
 
@@ -174,28 +182,3 @@ size_t sys_alloc_usable_size(void *data)
 	return sys_heap_usable_size(&fp_driver_heap.heap, data);
 }
 #endif
-
-void *plat_calloc(size_t count, size_t size)
-{
-	return sys_alloc(count, size);
-}
-
-void *plat_realloc(void *data, size_t size)
-{
-	return sys_realloc(data, size);
-}
-
-void *plat_alloc(size_t size)
-{
-	return sys_alloc(1, size);
-}
-
-void plat_free(void **x)
-{
-	assert(x != NULL);
-
-	if (*x != NULL) {
-		sys_free(*x);
-		*x = NULL;
-	}
-}
