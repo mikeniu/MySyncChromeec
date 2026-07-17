@@ -78,6 +78,7 @@ extern "C" {
  * TODO(crbug.com/549286): Use this enum in i2c_port_t.
  */
 enum i2c_freq {
+	I2C_FREQ_UNIMPLEMENTED = -1,
 	I2C_FREQ_1000KHZ = 0,
 	I2C_FREQ_400KHZ = 1,
 	I2C_FREQ_100KHZ = 2,
