@@ -171,26 +171,6 @@ void __unused plat_sleep_time(unsigned long timeInMs);
 #endif
 
 /**
- * @brief Allocates a block of memory of a specified size and number of
- * elements, zero-initializing all bytes.
- *
- * @param[in] count The number of elements to allocate (must be > 0).
- * @param[in] size The size of each element in bytes (must be > 0).
- *
- * @return Pointer to the allocated memory block initialized to zero,
- * or panic if the allocation failed or if count/size is 0.
- */
-void *sys_alloc(size_t count, size_t size);
-
-/**
- * @brief Releases a block of shared memory.
- *
- * @param[in] data A pointer to the memory block to be released.
- *
- */
-void sys_free(void *data);
-
-/**
  * @brief Deallocates memory and sets the provided pointer to NULL.
  *
  * @param[in] x A pointer to a pointer to the memory block to be freed.
