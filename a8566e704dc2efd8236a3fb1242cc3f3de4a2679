@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7196235_97172ff9",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T16:58:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df7d4df8_7d22bb08",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 2
+      },
+      "revId": "a8566e704dc2efd8236a3fb1242cc3f3de4a2679",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b81698e8_a2393d48",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-17T16:11:52Z",
       "side": 1,
       "message": "Let\u0027s add another `TODO(b/423622893)` here to clean this up like in `sys_alloc`.",
+      "range": {
+        "startLine": 158,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 2
+      },
+      "revId": "a8566e704dc2efd8236a3fb1242cc3f3de4a2679",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1df5d7d1_3b7edeeb",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T16:58:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b81698e8_a2393d48",
       "range": {
         "startLine": 158,
         "startChar": 0,
@@ -72,6 +120,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8505c741_16d4ad8d",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T16:58:33Z",
+      "side": 1,
+      "message": "No, [sys_heap_usable_size](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/lib/heap/heap.c;l\u003d358?q\u003dthird_party%2Fzephyrproject%20sys_heap_usable_size\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d357-,358,-359) does not handle a NULL pointer.\n\n```\nsize_t sys_heap_usable_size(struct sys_heap *heap, void *mem)\n{\n\tstruct z_heap *h \u003d heap-\u003eheap;\n\tchunkid_t c \u003d mem_to_chunkid(h, mem);\n\n\tif (SYS_HEAP_HARDENING_FULL) {\n\t\tverify_chunk_canary(h, c, mem);\n\t}\n\n\treturn chunk_usable_bytes(h, c) - mem_align_gap(h, mem);\n}\n```\n\nIt immediately passes the pointer (mem) to mem_to_chunkid() to calculate a chunk ID using pointer arithmetic without performing any NULL check first:\n\n```\nstatic chunkid_t mem_to_chunkid(struct z_heap *h, void *p)\n{\n\tuint8_t *mem \u003d p, *base \u003d (uint8_t *)chunk_buf(h);\n\treturn (mem - chunk_header_bytes(h) - base) / CHUNK_UNIT;\n}\n```\n\nPassing NULL to this function will cause underflow in the pointer subtraction and calculate an invalid, out-of-bounds chunkid_t, leading to memory corruption, assertions failing, or a kernel panic (especially when hardening is enabled).",
+      "parentUuid": "ea3211cf_0aee1abb",
+      "range": {
+        "startLine": 174,
+        "startChar": 0,
+        "endLine": 174,
+        "endChar": 57
+      },
+      "revId": "a8566e704dc2efd8236a3fb1242cc3f3de4a2679",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "697c6bea_3e1b7eed",
         "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
         "patchSetId": 21
@@ -83,6 +155,30 @@
       "writtenOn": "2026-07-17T16:11:52Z",
       "side": 1,
       "message": "Unrelated test",
+      "range": {
+        "startLine": 273,
+        "startChar": 0,
+        "endLine": 280,
+        "endChar": 0
+      },
+      "revId": "a8566e704dc2efd8236a3fb1242cc3f3de4a2679",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5679438_2dd29142",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T16:58:33Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "697c6bea_3e1b7eed",
       "range": {
         "startLine": 273,
         "startChar": 0,

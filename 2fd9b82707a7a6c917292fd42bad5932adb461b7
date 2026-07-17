@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "62f5175a_1131d879",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T16:58:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25a6961f_86b22b93",
+      "range": {
+        "startLine": 269,
+        "startChar": 10,
+        "endLine": 269,
+        "endChar": 28
+      },
+      "revId": "2fd9b82707a7a6c917292fd42bad5932adb461b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69f8703c_7a3b013c",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-17T16:28:51Z",
       "side": 1,
       "message": "Typo that we can fix in a separate CL",
+      "range": {
+        "startLine": 520,
+        "startChar": 9,
+        "endLine": 520,
+        "endChar": 25
+      },
+      "revId": "2fd9b82707a7a6c917292fd42bad5932adb461b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea78e792_419dd377",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T16:58:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69f8703c_7a3b013c",
       "range": {
         "startLine": 520,
         "startChar": 9,
