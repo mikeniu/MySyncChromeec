@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21ac6a1f_56edce6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-17T17:07:30Z",
+      "side": 1,
+      "message": "As mentioned OOB, I suspect that the header file and PE changes are no-op refactors by themselves and might even pass compare-builds (depends on how well the bit field accesses are optimized). If so, it would probably make it easier to review and test those changes to split them into their own CL that comes before the driver/test changes.\n\nThat said, if the current CL works, and you\u0027ve confirmed it doesn\u0027t regress anything, the code LGTM.",
+      "revId": "1c9233eae716b03dbf3c34c191db57c4e323785c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
