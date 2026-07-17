@@ -122,3 +122,5 @@ static void disable_sleep_bid(void)
 		disable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
 }
 DECLARE_HOOK(HOOK_INIT, disable_sleep_bid, HOOK_PRIO_POST_I2C);
+
+/* TEST TEST TEST */
