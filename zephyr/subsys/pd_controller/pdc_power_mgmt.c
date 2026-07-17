@@ -985,6 +985,12 @@ struct pdc_port_t {
 	uint8_t *public_api_buff;
 	/** Timer to used to verify typec_only vs USB-PD port partner */
 	struct k_timer typec_only_timer;
+	/** Deferred work item used to apply TrySrc DRP updates after a delay */
+	struct k_work_delayable drp_update_work;
+	/** Tracks whether a deferred DRP update is pending */
+	bool drp_update_pending;
+	/** Desired DRP mode to apply once the deferred work runs */
+	enum drp_mode_t drp_to_send;
 	/** Type of PDOs to get: SNK|SRC from PDC or Port Partner */
 	struct get_pdo_t get_pdo;
 	/** Variable used to store/set PDC LPM SRC CAPs */
@@ -4295,6 +4301,9 @@ static int pdc_subsys_init(const struct device *dev)
 
 	/* Initialize typec only timer */
 	k_timer_init(&port->typec_only_timer, NULL, NULL);
+	k_work_init_delayable(&port->drp_update_work, pdc_drp_update_work);
+	port->drp_update_pending = false;
+	port->drp_to_send = port->una_policy.drp_mode;
 
 	/* Initialize platform policy */
 	enforce_pd_chipset_shutdown_policy_1(config->connector_num);
@@ -5089,15 +5098,33 @@ test_mockable enum pd_dual_role_states pdc_power_mgmt_get_dual_role(int port)
 
 test_mockable int pdc_power_mgmt_set_trysrc(int port, bool enable)
 {
+	struct pdc_port_t *port_data;
+
 	if (!pdc_power_mgmt_is_pdc_port_valid(port)) {
 		return -ERANGE;
 	}
 
-	LOG_INF("C%d: PD setting TrySrc=%d", port, enable);
+	port_data = &pdc_data[port]->port;
 
-	pdc_data[port]->port.drp = (enable ? DRP_TRY_SRC : DRP_NORMAL);
+	if (!enable) {
+		LOG_INF("C%d: PD keep TrySrc enabled; ignoring disable request",
+			port);
+		return 0;
+	}
 
-	return public_api_block(port, CMD_PDC_SET_DRP);
+	if (port_data->drp == DRP_TRY_SRC && !port_data->drp_update_pending) {
+		LOG_INF("C%d: PD already in DRP_TRY_SRC; ignoring set", port);
+		return 0;
+	}
+
+	LOG_INF("C%d: PD scheduling TrySrc=%d", port, enable);
+
+	port_data->drp_to_send = DRP_TRY_SRC;
+	port_data->drp_update_pending = true;
+	k_work_schedule(&port_data->drp_update_work,
+			K_USEC(PDC_TRYSRC_UPDATE_DELAY_US));
+
+	return 0;
 }
 
 static void set_hpd_wake_watch(int port)

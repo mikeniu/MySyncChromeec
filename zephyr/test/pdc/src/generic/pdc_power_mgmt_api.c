@@ -15,6 +15,7 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/emul.h>
 #include <zephyr/fff.h>
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys_clock.h>
 #include <zephyr/ztest.h>
@@ -548,6 +549,11 @@ ZTEST_USER(pdc_power_mgmt_api_connectionless, test_set_trysrc)
 	/* Enable TrySrc */
 	zassert_ok(pdc_power_mgmt_set_trysrc(TEST_PORT, true));
 
+	zassert_ok(emul_pdc_get_drp_mode(emul, &drp_mode));
+
+	zassert_equal(DRP_NORMAL, drp_mode);
+
+	k_sleep(K_SECONDS(1));
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
 
 	zassert_ok(emul_pdc_get_drp_mode(emul, &drp_mode));
@@ -557,11 +563,9 @@ ZTEST_USER(pdc_power_mgmt_api_connectionless, test_set_trysrc)
 	/* Disable TrySrc */
 	zassert_ok(pdc_power_mgmt_set_trysrc(TEST_PORT, false));
 
-	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
-
 	zassert_ok(emul_pdc_get_drp_mode(emul, &drp_mode));
 
-	zassert_equal(DRP_NORMAL, drp_mode);
+	zassert_equal(DRP_TRY_SRC, drp_mode);
 }
 
 ZTEST_USER(pdc_power_mgmt_api_connectionless, test_get_drp)
