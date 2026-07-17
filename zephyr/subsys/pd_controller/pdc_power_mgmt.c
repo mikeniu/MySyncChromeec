@@ -5130,6 +5130,12 @@ static void clear_hpd_wake_watch(int port)
 
 static void pd_chipset_resume(void)
 {
+	uint8_t port_count = pdc_power_mgmt_get_usb_pd_port_count();
+
+	for (int i = 0; i < port_count; i++) {
+		pdc_power_mgmt_set_dual_role(i, pd_get_drp_state_in_s0());
+	}
+
 	k_work_reschedule(&pdc_apply_power_state_policy_work,
 			  PDC_POWER_STATE_DEBOUNCE_MS);
 
