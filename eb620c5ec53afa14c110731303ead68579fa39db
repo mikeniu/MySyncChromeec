@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cec8bb4a_72c34111",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T15:53:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The changes successfully eliminate heap buffer overflow and over-read vulnerabilities by fully delegating memory allocation sizes and boundaries to Zephyr\u0027s native `k_heap_calloc` and `k_heap_realloc` functions. This safely handles `count * size` multiplications and bounds memory copies during reallocation.\n- `plat_calloc` and `plat_realloc` are cleanly implemented as thin wrappers over `sys_alloc` and `sys_realloc`. Since `k_heap_calloc` natively zero-initializes memory, the redundant `memset` has been safely removed.\n- `sys_free` and `sys_alloc_usable_size` correctly handle `NULL` pointers, making the allocator APIs robust.\n- Expected panic behavior for `sys_alloc` is retained while safe behaviors for `sys_realloc` with `size \u003d\u003d 0` are properly implemented.\n\n**Style \u0026 Consistency:**\n- The code changes are concise, idiomatic, and adhere perfectly to Zephyr\u0027s coding guidelines.\n- The use of `COND_CODE_1(CONFIG_ZTEST, (), (static))` is the standard and clean way to expose internal functions to the test suite without polluting the global namespace.\n\n**Testing:**\n- The `ztest` suite provides rigorous and comprehensive coverage of the new allocator logic.\n- Using `ztest_set_fault_valid(true)` to ensure that intentional zero-sized allocations, integer overflows, and OOM conditions successfully trigger fatal panics (`k_oops()`) is an excellent testing strategy.\n- Memory shrinking and growing behaviors for `realloc` are thoroughly verified.\n\nTAG\u003dagy\nCONV\u003dbf5aea16-1f18-49a7-9c73-4e0c2f2ac352",
+      "isAi": true,
+      "revId": "eb620c5ec53afa14c110731303ead68579fa39db",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
