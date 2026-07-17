@@ -7,6 +7,7 @@
 
 #include "battery.h"
 #include "battery_smart.h"
+#include "charger.h"
 #include "common.h"
 #include "math_util.h"
 
@@ -22,7 +23,7 @@ uint8_t batt_deadband_check(uint8_t batt_flags,
 			    const struct batt_params *params)
 {
 	const int batt_discharge_deadband_ma =
-		CONFIG_PLATFORM_EC_BATTERY_DEADBAND_MA;
+		chg_chips[CHARGER_SOLO].deadband_ma;
 	const uint8_t needed_flags = EC_BATT_FLAG_AC_PRESENT |
 				     EC_BATT_FLAG_BATT_PRESENT |
 				     EC_BATT_FLAG_DISCHARGING;

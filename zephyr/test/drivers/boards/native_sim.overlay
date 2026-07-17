@@ -1252,6 +1252,7 @@
 		status = "okay";
 		reg = <0x9>;
 		battery = <&battery>;
+		deadband_ma = <10>;
 	};
 };
 

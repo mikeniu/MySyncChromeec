@@ -6,6 +6,7 @@
 #include "driver/charger/isl9241_public.h"
 
 #include <zephyr/devicetree.h>
+#include <zephyr/sys/util.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,12 +14,12 @@ extern "C" {
 
 #define ISL9241_CHG_COMPAT intersil_isl9241
 
-#define CHG_CONFIG_ISL9241(id)                     \
-	{                                          \
-		.i2c_port = I2C_PORT_BY_DEV(id),   \
-		.i2c_addr_flags = DT_REG_ADDR(id), \
-		.drv = &isl9241_drv,               \
-	},
+#define CHG_CONFIG_ISL9241(id)                            \
+	{ .i2c_port = I2C_PORT_BY_DEV(id),                \
+	  .i2c_addr_flags = DT_REG_ADDR(id),              \
+	  .drv = &isl9241_drv,                            \
+	  IF_ENABLED(CONFIG_PLATFORM_EC_BATTERY_DEADBAND, \
+		     (.deadband_ma = DT_PROP_OR(id, deadband_ma, 0), )) },
 
 #ifdef __cplusplus
 }

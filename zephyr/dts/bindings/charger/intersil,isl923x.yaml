@@ -7,3 +7,8 @@ description: Intersil ISL923x Charger IC
 compatible: "intersil,isl923x"
 
 include: chg-chip.yaml
+
+properties:
+  deadband_ma:
+    type: int
+    description: Current deadband in mA for reporting zero current

@@ -15,3 +15,6 @@ properties:
     type: phandle
     description:
       Reference to battery emulator.
+  deadband_ma:
+    type: int
+    description: Current deadband in mA for reporting zero current
