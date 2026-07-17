@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c181e6ea_abd73866",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T17:49:22Z",
+      "side": 0,
+      "message": "Is there a reason why the original code did an aligned allocation? (i.e., egis library needs that alignment?) I\u0027m not sure `k_heap_calloc` is going to preserve that.",
+      "range": {
+        "startLine": 130,
+        "startChar": 11,
+        "endLine": 130,
+        "endChar": 31
+      },
+      "revId": "c8c1c65070772766f1745d1545cf9f7f543ca50c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
