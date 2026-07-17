@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03f593d5_16b0c21c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T22:10:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/ad1abb4b-8daa-403e-abd0-d4ccd618013d)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The changes successfully eliminate heap buffer overflow vulnerabilities by completely delegating memory allocation and reallocation to Zephyr\u0027s native `k_heap_calloc` and `k_heap_realloc` functions. This safely handles `count * size` multiplications and bounds memory copies during reallocation.\n- `plat_calloc` and `plat_realloc` are cleanly implemented as thin wrappers over `sys_alloc` and `sys_realloc`.\n- `sys_free` and `sys_alloc_usable_size` correctly handle `NULL` pointers, making the allocator APIs robust.\n- Expected panic behavior for `sys_alloc` is retained while safe behaviors for `sys_realloc` with `size \u003d\u003d 0` are properly implemented.\n\n**Style \u0026 Consistency:**\n- The code changes are concise, idiomatic, and adhere perfectly to Zephyr\u0027s coding guidelines.\n- The use of `static` for internal functions properly limits their visibility.\n\n**Testing:**\n- The `ztest` suite provides rigorous and comprehensive coverage of the new allocator logic.\n- Using `ztest_set_fault_valid(true)` to ensure that intentional zero-sized allocations, integer overflows, and OOM conditions successfully trigger fatal panics (`k_oops()`) is an excellent testing strategy.\n- Memory shrinking and growing behaviors for `realloc` are thoroughly verified.\n\nTAG\u003dagy\nCONV\u003dad1abb4b-8daa-403e-abd0-d4ccd618013d",
+      "isAi": true,
+      "revId": "9e2e15b0fe34dbee58f65cdf9cb5937a18a7c0c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "759fc92b_7f07d978",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T22:10:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor suggestion:** Since `sys_realloc` is now `static` in `fingerprint_egis630_pal.c` and is not called from tests, you can safely remove this unused forward declaration.",
+      "isAi": true,
+      "revId": "9e2e15b0fe34dbee58f65cdf9cb5937a18a7c0c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
