@@ -417,6 +417,34 @@ ZTEST_F(egis630, test_output_log_format_no_logging_info_greater_than_debug)
 	zassert_equal(printf_buffer[0], '\0');
 }
 
+ZTEST_F(egis630, test_output_log_invalid_level)
+{
+	char expected_printf_buffer[sizeof(printf_buffer)];
+
+	memset(expected_printf_buffer, 0, sizeof(expected_printf_buffer));
+	snprintf(expected_printf_buffer, sizeof(expected_printf_buffer),
+		 "<func:10> invalid level 123");
+
+	/* 9 is above the maximum valid level (LOG_ASSERT = 7). */
+	output_log((LOG_LEVEL)9, "tag", "file", "func", 10, "invalid level %d",
+		   123);
+
+	zassert_mem_equal(printf_buffer, expected_printf_buffer,
+			  sizeof(printf_buffer),
+			  "LOG message did not match expected message");
+}
+
+ZTEST_F(egis630, test_output_log_filtered_below_min)
+{
+	/* 0 is below the minimum valid level (LOG_VERBOSE = 2). */
+	output_log((LOG_LEVEL)0, "tag", "file", "func", 10,
+		   "should be filtered");
+
+	zassert_equal(
+		printf_buffer[0], '\0',
+		"Buffer should remain completely empty when filtered early");
+}
+
 ZTEST_F(egis630, test_set_debug_level_success_verbose)
 {
 	egis630_set_debug_level(LOG_VERBOSE);
