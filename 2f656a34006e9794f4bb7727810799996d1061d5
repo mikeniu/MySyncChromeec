@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bc72a3d_b1a5f07c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T20:27:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/dcbec88d-145c-48a1-af6b-36165c19ec37)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The changes successfully eliminate heap buffer overflow vulnerabilities by completely delegating memory allocation and reallocation sizes to Zephyr\u0027s native `k_heap_calloc` and `k_heap_realloc`.\n- `k_heap_calloc` safely handles `count * size` multiplication internally, and `k_heap_realloc` prevents bounds issues on memory copies.\n- Panic logic correctly applies for OOM and zero-sized allocations, while cleanly returning `NULL` for `size \u003d\u003d 0` on reallocations.\n\n**Style \u0026 Consistency:**\n- The PAL functions are now thin wrappers without manual memory copying or `memset` operations. This is much cleaner and less error-prone.\n- Proper handling of `NULL` in `sys_alloc_usable_size` makes the API robust.\n\n**Testing:**\n- The `ztest` suite thoroughly covers the allocator API and edge cases.\n- The use of `ztest_set_fault_valid(true)` to confirm the allocator triggers a panic (`k_oops()`) on OOM or invalid sizes is a highly effective way to test error paths.\n\nTAG\u003dagy\nCONV\u003d0bc37838-e751-4d38-8c7f-234f39e4d127",
+      "isAi": true,
+      "revId": "2f656a34006e9794f4bb7727810799996d1061d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23c8e0c6_6d654077",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T20:27:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor suggestion:** Since `sys_realloc` is not directly called by the tests (they call `plat_realloc` instead), this function can be fully `static` and does not need the `COND_CODE_1` macro to expose it to `CONFIG_ZTEST`. You can also remove the forward declaration from `egis630.c`.",
+      "isAi": true,
+      "revId": "2f656a34006e9794f4bb7727810799996d1061d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
