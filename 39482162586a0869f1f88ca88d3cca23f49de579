@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c4f6752_901f5e92",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5013575
+      },
+      "writtenOn": "2026-07-17T19:50:55Z",
+      "side": 1,
+      "message": "From 39482162586a0869f1f88ca88d3cca23f49de579 Mon Sep 17 00:00:00 2001\nDate: Fri, 17 Jul 2026 11:33:19 -0700\nSubject: [PATCH] UPSTREAM: ucsi: validate parameters and response max for GET host command\n\nValidate parameter size and response buffer size for the\nEC_CMD_UCSI_PPM_GET command\n\nThis also fixes the ec_cmd_ucsi_ppm_get() helper command which had\ncategorized EC_CMD_UCSI_PPM_GET as not using and response buffer.\n\nBUG\u003db:518009139\nTEST\u003d./twister -ivc -T zephyr/test/pdc -s pdc.ppm\nTEST\u003dBoot to OS on ocelotrvp-ite\n\nChange-Id: I0c7315fda95e13bc9e7abad1c0179221c80cc180\nOriginal-Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8111998\nOriginal-Tested-by: Keith Short \u003ckeithshort@chromium.org\u003e\nOriginal-Reviewed-by: Zeleena Auld \u003czeleena@google.com\u003e\nOriginal-Commit-Queue: Keith Short \u003ckeithshort@chromium.org\u003e\nOriginal-Reviewed-by: Fabio Baltieri \u003cfabiobaltieri@google.com\u003e\nGitOrigin-RevId: b0f5c38569029c628e9604ef663119491f0e83b4\nCr-Build-Id: 8676005923550009313\nCr-Build-Url: https://cr-buildbucket.appspot.com/build/8676005923550009313\nCopybot-Job-Name: fingerprint-ec-legacy-copybot-downstream\nReviewed-on: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8116030\nTested-by: copybot@chops-service-accounts.iam.gserviceaccount.com \u003ccopybot@chops-service-accounts.iam.gserviceaccount.com\u003e\nBot-Commit: copybot@chops-service-accounts.iam.gserviceaccount.com \u003ccopybot@chops-service-accounts.iam.gserviceaccount.com\u003e\nCommit-Queue: copybot@chops-service-accounts.iam.gserviceaccount.com \u003ccopybot@chops-service-accounts.iam.gserviceaccount.com\u003e\n---\n\ndiff --git a/include/ec_cmd_api.h b/include/ec_cmd_api.h\nindex 8401db9..8dc84ef 100644\n--- a/include/ec_cmd_api.h\n+++ b/include/ec_cmd_api.h\n@@ -81,6 +81,14 @@\n \t\t\t       sizeof(*p), r, sizeof(*r));\n }\n \n+static inline int ec_cmd_ucsi_ppm_get(CROS_EC_COMMAND_INFO *h,\n+\t\t\t\t      const struct ec_params_ucsi_ppm_get *p,\n+\t\t\t\t      uint8_t *r)\n+{\n+\treturn CROS_EC_COMMAND(h, EC_CMD_UCSI_PPM_GET, 0, p, sizeof(*p), r,\n+\t\t\t       p-\u003esize);\n+}\n+\n static inline int\n ec_cmd_usb_pd_dev_info(CROS_EC_COMMAND_INFO *h,\n \t\t       const struct ec_params_usb_pd_info_request *p,\n@@ -484,7 +492,6 @@\n _CROS_EC_C0_F_PF_RF(EC_CMD_VSTORE_READ, vstore_read);\n _CROS_EC_C0_F_PF(EC_CMD_VSTORE_WRITE, vstore_write);\n _CROS_EC_C0_F_PF(EC_CMD_UCSI_PPM_SET, ucsi_ppm_set);\n-_CROS_EC_C0_F_PF(EC_CMD_UCSI_PPM_GET, ucsi_ppm_get);\n _CROS_EC_C0_F_PF(EC_CMD_FP_VENDOR, fp_vendor);\n _CROS_EC_C0_F_PF(EC_CMD_ENTER_BOOTLOADER, enter_bootloader);",
+      "revId": "39482162586a0869f1f88ca88d3cca23f49de579",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
