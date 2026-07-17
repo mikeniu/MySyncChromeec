@@ -99,7 +99,7 @@ int chip_i2c_set_freq(int port, enum i2c_freq freq)
 
 enum i2c_freq chip_i2c_get_freq(int port)
 {
-	return I2C_FREQ_COUNT;
+	return I2C_FREQ_UNIMPLEMENTED;
 }
 
 void i2c_init(void)
