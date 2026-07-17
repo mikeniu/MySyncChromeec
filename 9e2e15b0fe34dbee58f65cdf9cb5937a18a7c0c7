@@ -44,6 +44,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a5f9769b_eb57bdad",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T22:12:24Z",
+      "side": 1,
+      "message": "Since this is now behind `CONFIG_ZTEST`, let\u0027s put it into the header (wrappered with `CONFIG_ZTEST`). Then you don\u0027t need the forward declaration in the test file.",
+      "range": {
+        "startLine": 168,
+        "startChar": 16,
+        "endLine": 168,
+        "endChar": 49
+      },
+      "revId": "9e2e15b0fe34dbee58f65cdf9cb5937a18a7c0c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "759fc92b_7f07d978",
         "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
         "patchSetId": 30
