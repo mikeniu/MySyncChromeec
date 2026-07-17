@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "548e4e92_95b53884",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-17T16:41:51Z",
+      "side": 1,
+      "message": "I don\u0027t think the lock is needed here now that this loop only triggers the `pdc_power_mgmt_set_new_power_request`",
+      "range": {
+        "startLine": 310,
+        "startChar": 0,
+        "endLine": 310,
+        "endChar": 51
+      },
+      "revId": "ff59f65db63be4fe716f818256497ceaa10a249c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04aa0c8a_811620f1",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-17T16:41:51Z",
+      "side": 1,
+      "message": "Is this still needed?",
+      "range": {
+        "startLine": 315,
+        "startChar": 0,
+        "endLine": 315,
+        "endChar": 31
+      },
+      "revId": "ff59f65db63be4fe716f818256497ceaa10a249c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0c5888a_9fafe20e",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-17T16:41:51Z",
+      "side": 1,
+      "message": "I think you should unlock the mutex after this line.",
+      "range": {
+        "startLine": 323,
+        "startChar": 0,
+        "endLine": 323,
+        "endChar": 25
+      },
+      "revId": "ff59f65db63be4fe716f818256497ceaa10a249c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd37f358_f285006f",
+        "filename": "zephyr/test/pdc/src/pdc_policy/src_policy_3a_port.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-17T16:41:51Z",
+      "side": 1,
+      "message": "Can you move this to fakes.c and avoid making changes to the tests using #ifndef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING?",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 1
+      },
+      "revId": "ff59f65db63be4fe716f818256497ceaa10a249c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "368a5196_5f802c61",
+        "filename": "zephyr/test/pdc/src/pdc_policy/src_policy_battery_overload.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-17T16:41:51Z",
+      "side": 1,
+      "message": "Verify source current is 3A before creating overload state.",
+      "range": {
+        "startLine": 107,
+        "startChar": 1,
+        "endLine": 107,
+        "endChar": 21
+      },
+      "revId": "ff59f65db63be4fe716f818256497ceaa10a249c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b0e3579_58eda873",
+        "filename": "zephyr/test/pdc/src/pdc_policy/src_policy_battery_overload.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-17T16:41:51Z",
+      "side": 1,
+      "message": "I would also like a test for 2 USB-C ports.\n* Port 0: Connect 1.5A sink, verify source current\n* Port 1: Connect 3A sink, verify source current\n* Trigger current overload, verify port 1 is 1.5 A\n* Remove port 0, verify port 1 is now 3A",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 49
+      },
+      "revId": "ff59f65db63be4fe716f818256497ceaa10a249c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
