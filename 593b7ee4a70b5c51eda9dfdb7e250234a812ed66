@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79c1bb3b_ca6ee497",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T00:00:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/6a293ba4-9314-47d6-981b-feae655d835f)]\n\n### Review Summary\n**Functionality \u0026 Security:**\n- The CL successfully resolves all heap buffer overflow vulnerabilities by delegating memory allocation and reallocation to Zephyr\u0027s native `k_heap_calloc` and `k_heap_realloc`. This securely handles `count * size` multiplication and safely bounds memory copies during reallocation.\n- `plat_calloc` cleanly wraps `sys_alloc`, avoiding redundant manual `memset` overhead since `k_heap_calloc` natively zero-initializes the allocated memory.\n- `sys_free` and `sys_alloc_usable_size` correctly handle `NULL` pointer inputs, which improves the overall robustness of the PAL APIs.\n\n**Style \u0026 Consistency:**\n- The code changes are concise, idiomatic, and adhere perfectly to Zephyr coding guidelines.\n- The use of `COND_CODE_1(CONFIG_ZTEST, (), (static))` is a clean way to expose internal functions to the test suite without polluting the global namespace.\n\n**Testing:**\n- The `ztest` suite provides comprehensive and rigorous coverage of the allocator logic.\n- Using `ztest_set_fault_valid(true)` to verify that intentional zero-sized allocations, integer multiplication overflows, and OOM conditions successfully trigger fatal panics (`k_oops()`) is an excellent defensive testing strategy.\n- Memory shrinking and growing behaviors for `realloc` are thoroughly verified.\n\nTAG\u003dagy\nCONV\u003d6a293ba4-9314-47d6-981b-feae655d835f",
+      "isAi": true,
+      "revId": "593b7ee4a70b5c51eda9dfdb7e250234a812ed66",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
