@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fff6a28_7e066d99",
+        "filename": "zephyr/shim/chip/it8xxx2/shi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-17T22:50:38Z",
+      "side": 1,
+      "message": "Could you do this upstream instead?  This shim driver could then use pm_device_runtime_get() and pm_device_runtime_put().\n\nNote that we\u0027re in the process of switching all projects to use the upstream `CONFIG_EC_HOST_CMD` subsystem.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "10aff1db254fc2710dbebb1b051b39e1f6dee4c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
