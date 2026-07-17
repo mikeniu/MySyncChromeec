@@ -259,8 +259,8 @@ ZTEST_F(egis630, test_acquire_image_wrong_capture_type)
 ZTEST_F(egis630, test_plat_get_time)
 {
 	uint64_t time_msecs = egis630_plat_get_time();
-	uint64_t ecpected_time_mecs = k_uptime_get();
-	zassert_equal(time_msecs, ecpected_time_mecs);
+	uint64_t expected_time_msecs = k_uptime_get();
+	zassert_equal(time_msecs, expected_time_msecs);
 }
 
 ZTEST_F(egis630, test_plat_wait_time)
@@ -321,12 +321,12 @@ ZTEST_F(egis630, test_periphery_spi_write_read_success)
 {
 	uint8_t tx_buf[1] = { 0xFD };
 	uint8_t rx_buf[3] = { 0 };
-	uint8_t expeceted_rx_buf[3] = { 0x1, 0x1E, 0x6 };
+	uint8_t expected_rx_buf[3] = { 0x1, 0x1E, 0x6 };
 
 	zassert_ok(fingerprint_init(fixture->dev));
 	zassert_ok(egis630_periphery_spi_write_read(tx_buf, sizeof(tx_buf),
 						    rx_buf, sizeof(rx_buf)));
-	zassert_mem_equal(rx_buf, expeceted_rx_buf, sizeof(expeceted_rx_buf),
+	zassert_mem_equal(rx_buf, expected_rx_buf, sizeof(expected_rx_buf),
 			  "Received data does not match sent data");
 }
 
