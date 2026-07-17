@@ -16,6 +16,24 @@
       "message": "Do we need to somehow adjust factory tests?",
       "revId": "f3c5e9dd689aac9d1e2c68f7dc99357129064488",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c147ab8d_08ae33dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T15:22:29Z",
+      "side": 1,
+      "message": "A reset test will fail in the factory because it is not supported by the algo. I am not aware if they use the reset test image in the factory for these boards. However, the capture will fail. It now fails for a weird reason. It is better to make it fail for image unsupported.",
+      "parentUuid": "7db701b7_b3774792",
+      "revId": "f3c5e9dd689aac9d1e2c68f7dc99357129064488",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
