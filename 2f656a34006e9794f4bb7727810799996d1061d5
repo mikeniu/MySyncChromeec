@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5682265_5ceda8af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T20:35:42Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7bc72a3d_b1a5f07c",
+      "revId": "2f656a34006e9794f4bb7727810799996d1061d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "23c8e0c6_6d654077",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Minor suggestion:** Since `sys_realloc` is not directly called by the tests (they call `plat_realloc` instead), this function can be fully `static` and does not need the `COND_CODE_1` macro to expose it to `CONFIG_ZTEST`. You can also remove the forward declaration from `egis630.c`.",
       "isAi": true,
+      "revId": "2f656a34006e9794f4bb7727810799996d1061d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4c310b6_f74c5cde",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T20:35:42Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "23c8e0c6_6d654077",
       "revId": "2f656a34006e9794f4bb7727810799996d1061d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
