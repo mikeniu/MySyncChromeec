@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76d31858_a719ed4d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T16:48:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/f35dbdb5-7600-4906-9eb0-b642ab225c12)]\n\n**Review Summary**\n* **Functionality:** The patch correctly fixes typos in variable names without altering the behavior of the tests.\n* **Style:** Great improvement on readability. There is one remaining minor typo in the suffix of a variable name (`mecs` instead of `msecs`).\n* **Security:** No security vulnerabilities.\n* **Testing:** The changes are purely cosmetic within the test suite itself.",
+      "isAi": true,
+      "revId": "9f519e9b1f13f2d60895a3f1334be0e1ffcf30dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85ce2325_4e5fffcd",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T16:48:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While fixing `ecpected`, it looks like `mecs` is still a typo for `msecs`. Consider renaming this to `expected_time_msecs` to match `time_msecs` on the previous line.",
+      "isAi": true,
+      "revId": "9f519e9b1f13f2d60895a3f1334be0e1ffcf30dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
