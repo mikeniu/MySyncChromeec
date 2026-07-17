@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76e35117_31452f9a",
+        "filename": "common/battery_deadband.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-17T18:11:17Z",
+      "side": 1,
+      "message": "Non-blocking nit - current messages are `Battery ... to empty` or `Battery ... to full`.\n\nHow about spelling out `Battery discharging`?",
+      "range": {
+        "startLine": 67,
+        "startChar": 11,
+        "endLine": 67,
+        "endChar": 21
+      },
+      "revId": "3d44b3d8a1033a0e4457ea1119d16b690b7d4728",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

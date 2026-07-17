@@ -72,6 +72,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aac80ef8_846d257e",
+        "filename": "common/battery_deadband.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-17T18:11:17Z",
+      "side": 1,
+      "message": "There is a parent `batteries` node in the tree, but it lacks a compatible string and driver code. The charger drivers are not fully ported to the Zephyr device model, so those aren\u0027t a great place either.\n\nYou can leave as a Kconfig option.",
+      "parentUuid": "f2100f0d_c9384d51",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 68
+      },
+      "revId": "698cd0a1c933f543a02a323c64b14e09a0d397cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8a8d61e4_3a48ae39",
