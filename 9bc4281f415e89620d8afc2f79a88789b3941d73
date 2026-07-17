@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea490ee8_b72809fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T05:37:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/38897a41-c3c7-4d4f-a4c7-0645d012cea4)]\n\n### Review Summary\n\n**Functionality**:\n- The CL successfully blocks legacy, unauthenticated V0 template commits when fingerprint authentication is active, effectively preventing template injection.\n- The updates to `FP_CONTEXT_GET_RESULT` properly reject mid-session User ID mutations while gracefully allowing idempotent retries from the AP via `safe_memcmp`.\n- Returning `EC_RES_SUCCESS` early upon a matching user ID cleanly and correctly bypasses redundant memory writes and state flag operations.\n\n**Security**:\n- The changes accurately enforce security invariants by locking down legacy template modification APIs and context manipulation routes under an authenticated session, successfully binding the user context to the secure channel without interference.\n- The use of `safe_memcmp` ensures resistance to timing attacks when comparing User IDs.\n\n**Style \u0026 Readability**:\n- The implementation is clear and well-documented.\n- Previously identified nitpicks regarding terminology and comments have been fully addressed.\n\n**Testing**:\n- Test coverage appropriately verifies the lockdown of V0 templates and mid-session context mutations under an active authenticated session. \n- The newly added `test_fp_context_get_result_allows_idempotent_retry` correctly verifies the ability of the AP to retry `FP_CONTEXT_GET_RESULT` without breaking the state machine.\n- Previous test state isolation concerns have been addressed.",
+      "isAi": true,
+      "revId": "9bc4281f415e89620d8afc2f79a88789b3941d73",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
