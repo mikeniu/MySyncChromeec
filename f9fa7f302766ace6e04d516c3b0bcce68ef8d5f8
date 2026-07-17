@@ -17,6 +17,29 @@
       "isAi": true,
       "revId": "f9fa7f302766ace6e04d516c3b0bcce68ef8d5f8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49686d88_a86676bb",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T17:46:50Z",
+      "side": 1,
+      "message": "For all functions that can panic instead of returning `NULL`, make sure to update the doxygen comments to match.",
+      "range": {
+        "startLine": 154,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 2
+      },
+      "revId": "f9fa7f302766ace6e04d516c3b0bcce68ef8d5f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
