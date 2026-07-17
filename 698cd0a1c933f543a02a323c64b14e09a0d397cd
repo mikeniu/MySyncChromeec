@@ -47,6 +47,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1d057a1_601e1310",
+        "filename": "common/battery_deadband.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-07-17T01:13:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a8d61e4_3a48ae39",
+      "range": {
+        "startLine": 63,
+        "startChar": 5,
+        "endLine": 63,
+        "endChar": 22
+      },
+      "revId": "698cd0a1c933f543a02a323c64b14e09a0d397cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a19e1dfb_6ad61025",
@@ -70,6 +94,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "77e66609_f61d0501",
+        "filename": "common/battery_info.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 588,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-07-17T01:13:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a19e1dfb_6ad61025",
+      "range": {
+        "startLine": 588,
+        "startChar": 0,
+        "endLine": 588,
+        "endChar": 40
+      },
+      "revId": "698cd0a1c933f543a02a323c64b14e09a0d397cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02d37547_b8690bd0",
@@ -83,6 +131,30 @@
       "writtenOn": "2026-07-16T22:43:31Z",
       "side": 1,
       "message": "Guard at the calling site using `IS_ENABLED` instead of stubbing.",
+      "range": {
+        "startLine": 639,
+        "startChar": 0,
+        "endLine": 639,
+        "endChar": 42
+      },
+      "revId": "698cd0a1c933f543a02a323c64b14e09a0d397cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab2eb54b_ecd2deca",
+        "filename": "include/battery.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 639,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-07-17T01:13:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02d37547_b8690bd0",
       "range": {
         "startLine": 639,
         "startChar": 0,
