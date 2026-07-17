@@ -988,6 +988,12 @@ struct pdc_port_t {
 	uint8_t *public_api_buff;
 	/** Timer to used to verify typec_only vs USB-PD port partner */
 	struct k_timer typec_only_timer;
+	/** Deferred work item used to apply TrySrc DRP updates after a delay */
+	struct k_work_delayable drp_update_work;
+	/** Tracks whether a deferred DRP update is pending */
+	bool drp_update_pending;
+	/** Desired DRP mode to apply once the deferred work runs */
+	enum drp_mode_t drp_to_send;
 	/** Type of PDOs to get: SNK|SRC from PDC or Port Partner */
 	struct get_pdo_t get_pdo;
 	/** Variable used to store/set PDC LPM SRC CAPs */
@@ -1037,6 +1043,7 @@ struct pdc_port_t {
 	k_timepoint_t pb_press_timeout;
 	/* Alert Data Object */
 	uint32_t ado;
+	int port_num;
 };
 
 /**
@@ -1787,6 +1794,8 @@ static bool run_common_policies(struct pdc_port_t *port)
 	return false;
 }
 
+#define PDC_TRYSRC_UPDATE_DELAY_US (1 * SECOND)
+
 static void run_unattached_policies(struct pdc_port_t *port)
 {
 	if (run_common_policies(port)) {
@@ -1795,8 +1804,16 @@ static void run_unattached_policies(struct pdc_port_t *port)
 
 	if (atomic_test_and_clear_bit(port->una_policy.flags,
 				      UNA_POLICY_DRP_MODE)) {
-		/* Set DRP current policy */
-		queue_internal_cmd(port, CMD_PDC_SET_DRP);
+
+		if (port->drp == DRP_TRY_SRC) {
+			LOG_INF("Delay SET_DRP(TRYSRC)");
+
+			k_work_reschedule(&port->drp_update_work,
+				K_USEC(PDC_TRYSRC_UPDATE_DELAY_US));
+		} else {
+			queue_internal_cmd(port, CMD_PDC_SET_DRP);
+		}
+
 		return;
 	} else if (atomic_test_and_clear_bit(port->una_policy.flags,
 					     UNA_POLICY_CC_MODE)) {
@@ -4249,6 +4266,23 @@ static void init_port_variables(struct pdc_port_t *port,
 	discovery_info_init(port);
 }
 
+static void pdc_drp_update_work(struct k_work *work)
+{
+	struct k_work_delayable *dwork =
+		k_work_delayable_from_work(work);
+	struct pdc_port_t *port_data =
+		CONTAINER_OF(dwork, struct pdc_port_t, drp_update_work);
+	int port = port_data->port_num;
+
+	LOG_ERR("C%d: PD applying TrySrc=%d", port,
+		port_data->drp_to_send == DRP_TRY_SRC);
+
+	port_data->drp = port_data->drp_to_send;
+	port_data->drp_update_pending = false;
+
+	queue_internal_cmd(port_data, CMD_PDC_SET_DRP);
+}
+
 /**
  * @brief Initialize the PDC Subsystem
  */
@@ -4320,6 +4354,9 @@ static int pdc_subsys_init(const struct device *dev)
 
 	/* Initialize typec only timer */
 	k_timer_init(&port->typec_only_timer, NULL, NULL);
+	k_work_init_delayable(&port->drp_update_work, pdc_drp_update_work);
+	port->drp_update_pending = false;
+	port->drp_to_send = port->una_policy.drp_mode;
 
 	/* Initialize platform policy */
 	enforce_pd_chipset_shutdown_policy_1(config->connector_num);
