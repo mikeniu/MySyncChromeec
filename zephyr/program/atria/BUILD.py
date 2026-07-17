@@ -38,6 +38,7 @@ def register_it8xxx2_project(
     """Register an it8xxx2 based variant of atria."""
     register_binman_project(
         project_name=project_name,
+        inherited_from=["atria"],
         zephyr_board="it8xxx2/it82002aw",
         dts_overlays=[
             here / project_name / "project.overlay",
