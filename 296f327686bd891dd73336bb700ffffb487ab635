@@ -63,6 +63,29 @@
       },
       "revId": "296f327686bd891dd73336bb700ffffb487ab635",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23b97f5c_47df6619",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T21:26:13Z",
+      "side": 1,
+      "message": "How about just wrapping this function with `#ifdef CONFIG_ZTEST` since it\u0027s only used in tests code?",
+      "range": {
+        "startLine": 168,
+        "startChar": 7,
+        "endLine": 168,
+        "endChar": 15
+      },
+      "revId": "296f327686bd891dd73336bb700ffffb487ab635",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
