@@ -25,9 +25,9 @@ uint32_t z_impl_egis630_plat_get_diff_time(uint64_t begin)
 	return plat_get_diff_time(begin);
 }
 
-void *z_impl_egis630_sys_alloc(size_t count, size_t size)
+void *z_impl_egis630_plat_alloc(size_t size)
 {
-	return sys_alloc(count, size);
+	return plat_alloc(size);
 }
 
 int z_impl_egis630_periphery_spi_write_read(uint8_t *write, uint32_t size,
