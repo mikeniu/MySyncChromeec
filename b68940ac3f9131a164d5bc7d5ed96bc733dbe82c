@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2bc7e79_96c4aeba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T00:28:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/8c7fcc30-beb3-4b4f-9438-2fdadd2307bf)]\n\n### Review Summary\n*   **Functionality:** The consolidation of the allocation APIs is safe and preserves the expected behavior. The driver correctly translates the standard `calloc` / `realloc` / `free` operations into Zephyr heap operations, and the tests successfully verify OOM panics and zero-sized allocations.\n*   **Security:** The memory management is secure. `plat_free` correctly nullifies double-pointers to avoid use-after-free conditions. Out-of-bounds calculations correctly fail-safe via panics.\n*   **Style:** I\u0027ve left a couple of minor suggestions inline. One involves standardizing the remaining `sys_alloc_usable_size` to `plat_alloc_usable_size` for consistency. The other points out some unused test helper wrappers.\n*   **Documentation:** The Doxygen docstrings should be slightly updated, as the implementations trigger Zephyr `k_oops()` upon failure instead of gracefully returning `NULL`. I\u0027ve added a note on this inline.\n\nTAG\u003dagy\nCONV\u003d8c7fcc30-beb3-4b4f-9438-2fdadd2307bf",
+      "isAi": true,
+      "revId": "b68940ac3f9131a164d5bc7d5ed96bc733dbe82c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba5e7c40_c01362ae",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T00:28:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The docstrings for `plat_alloc`, `plat_calloc` (line 197), and `plat_realloc` (line 208) indicate they return `NULL` if the allocation fails. However, the implementation calls `k_oops()` upon failure. You should update the docstrings to reflect that these functions will panic (via `k_oops()`) rather than returning `NULL` on out-of-memory errors.\n\nAdditionally, it might be worth mentioning here that the returned memory is zero-initialized, since `plat_alloc` wraps `plat_calloc`.",
+      "isAi": true,
+      "revId": "b68940ac3f9131a164d5bc7d5ed96bc733dbe82c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fd30a7c_ca923371",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T00:28:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since the `sys_` prefixes were consolidated into `plat_`, consider renaming this function to `plat_alloc_usable_size` (or simply `plat_usable_size`) for consistency with the new naming scheme. Note that its definition in `fingerprint_egis630_pal.c` will also need to be updated.",
+      "isAi": true,
+      "revId": "b68940ac3f9131a164d5bc7d5ed96bc733dbe82c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d902cb94_bcd1c8a8",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630_pal_test_helpers.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T00:28:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] It seems that `egis630_plat_alloc` (and the corresponding `z_impl_egis630_plat_alloc` in the `.c` file) is defined but never actually used in the test code, as the tests directly call `plat_alloc` and `plat_calloc`. If this syscall isn\u0027t needed by userspace tests, you could consider removing it entirely.",
+      "isAi": true,
+      "revId": "b68940ac3f9131a164d5bc7d5ed96bc733dbe82c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
