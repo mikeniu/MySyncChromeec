@@ -46,6 +46,30 @@
       },
       "revId": "c8c1c65070772766f1745d1545cf9f7f543ca50c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "359eb863_2cce48d0",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-17T18:37:43Z",
+      "side": 0,
+      "message": "According to the Zephyr SDK API documentation, both standard allocation and `k_heap_calloc` inherently guarantee that allocated memory is aligned on a multiple of pointer sizes `(sizeof(void *))`",
+      "parentUuid": "40f2eecb_0bc8b6f0",
+      "range": {
+        "startLine": 130,
+        "startChar": 11,
+        "endLine": 130,
+        "endChar": 31
+      },
+      "revId": "c8c1c65070772766f1745d1545cf9f7f543ca50c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
