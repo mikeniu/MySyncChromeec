@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d2b8ff6_69d326fd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T16:03:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/5e980139-66d4-4e97-bbbc-58c7e8d526da)]\n\n**Review Summary**:\n*   **Consistency:** The same `PLAT_FREE` and `plat_free` functions along with the `// TODO (b/373435445)` exist in `driver/fingerprint/egis/platform/inc/plat_mem.h`. You should apply this same refactoring there to keep the codebase consistent and fully resolve the TODO.\n*   **Style:** The docstring for the old `plat_free` was deleted instead of merged. It is recommended to retain the information about what functions the memory was allocated with.\n*   **Functionality:** A strict `assert` on `*x !\u003d NULL` prevents freeing a `NULL` pointer, which might be undesirable depending on the context (e.g., error cleanup where some pointers might not be allocated yet). If this strictness is intentional, feel free to ignore.",
+      "isAi": true,
+      "revId": "1ef9b8b37f96cbcac15044c4b5997355b67eb577",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59ae8ca3_e3b2faa3",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T16:03:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Should we remove `\u0026\u0026 *x !\u003d NULL` from the `assert`? Typically, freeing a `NULL` pointer is a valid no-op (and `sys_free` handles `NULL` correctly). Asserting that `*x !\u003d NULL` will cause a crash if a `NULL` pointer is passed to be freed, which might happen during error-handling cleanup. If this strictness is intentional, feel free to ignore.",
+      "isAi": true,
+      "revId": "1ef9b8b37f96cbcac15044c4b5997355b67eb577",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "342b846a_6ef27f03",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-17T16:03:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] It would be helpful to merge the documentation as well. Consider adding the text \"Releases a block of memory previously allocated by `plat_alloc()` or `plat_calloc()`\" from the old `plat_free` to the new docstring.",
+      "isAi": true,
+      "revId": "1ef9b8b37f96cbcac15044c4b5997355b67eb577",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
