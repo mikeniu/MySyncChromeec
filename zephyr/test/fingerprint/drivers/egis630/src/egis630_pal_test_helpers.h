@@ -14,7 +14,7 @@ __syscall uint64_t egis630_plat_get_time(void);
 __syscall void egis630_plat_wait_time(uint32_t mecs);
 __syscall void egis630_plat_sleep_time(uint32_t timeInMs);
 __syscall uint32_t egis630_plat_get_diff_time(uint64_t begin);
-__syscall void *egis630_sys_alloc(size_t count, size_t size);
+__syscall void *egis630_plat_alloc(size_t size);
 __syscall int egis630_periphery_spi_write_read(uint8_t *write, uint32_t size,
 					       uint8_t *read, uint32_t rx_len);
 __syscall void egis630_set_debug_level(LOG_LEVEL level);
