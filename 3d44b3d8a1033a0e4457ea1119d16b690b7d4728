@@ -22,6 +22,30 @@
       },
       "revId": "3d44b3d8a1033a0e4457ea1119d16b690b7d4728",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d71825fa_52aed621",
+        "filename": "common/battery_deadband.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-07-18T17:42:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76e35117_31452f9a",
+      "range": {
+        "startLine": 67,
+        "startChar": 11,
+        "endLine": 67,
+        "endChar": 21
+      },
+      "revId": "3d44b3d8a1033a0e4457ea1119d16b690b7d4728",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
