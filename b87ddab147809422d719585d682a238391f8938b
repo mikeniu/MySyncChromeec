@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5907c2fb_82e63bbb",
+        "filename": "zephyr/test/drivers/smart_battery/src/deadband.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-18T02:20:57Z",
+      "side": 1,
+      "message": "Nit: can we make these values based off the config? So if the default changes the test adjusts accordingly?",
+      "revId": "b87ddab147809422d719585d682a238391f8938b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
