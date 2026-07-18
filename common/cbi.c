@@ -635,34 +635,32 @@ static int cc_cbi(int argc, const char **argv)
 			last_arg = 5;
 
 		} else if (setter->tag == CBI_TAG_UFSC) {
-			const char *val_str = argv[3];
-			int len = strlen(val_str);
+			int num_words = argc - 3;
 
-			if (len % 2 != 0) {
-				ccprintf("Hex length must be even\n");
-				return EC_ERROR_PARAM3;
+			if (num_words < 1 || num_words > 4) {
+				ccprintf("UFSC requires 1-4 words\n");
+				return EC_ERROR_PARAM_COUNT;
 			}
 
-			setter->size = len / 2;
+			setter->size = sizeof(struct cbi_ufsc);
+			memset(setter->data, 0, setter->size); // Zero-fill
+							       // buffer
 
-			if (setter->size != sizeof(struct cbi_ufsc)) {
-				ccprintf("Data is not equal to ufsc\n");
-				return EC_ERROR_PARAM3;
-			}
-
-			for (int i = 0; i < setter->size; i++) {
-				char tmp[3] = { val_str[i * 2],
-						val_str[i * 2 + 1], '\0' };
+			for (int i = 0; i < num_words; i++) {
 				char *err;
-				setter->data[i] =
-					(uint8_t)strtoi(tmp, &err, 16);
+				uint64_t val = strtoull(argv[3 + i], &err, 0);
 				if (*err) {
-					ccprintf("Invalid hex: %s\n", tmp);
-					return EC_ERROR_PARAM3;
+					ccprintf("Invalid value at arg %d\n",
+						 i);
+					return EC_ERROR_PARAM3 + i;
 				}
+				// Truncate to 32 bits since this is size of
+				// each DWORD
+				memcpy(&setter->data[i * sizeof(uint32_t)],
+				       &val, sizeof(uint32_t));
 			}
 
-			last_arg = 4;
+			last_arg = 3 + num_words;
 
 		} else {
 			uint64_t val = strtoull(argv[3], &e, 0);
@@ -728,6 +726,7 @@ static int cc_cbi(int argc, const char **argv)
 
 DECLARE_CONSOLE_COMMAND(cbi, cc_cbi,
 			"[set <tag> <value> <size> | "
+			"set 29 <dword0> [dword1] [dword2] [dword3] | "
 			"remove <tag>] [init]",
 			"Print or change Cros Board Info from flash");
 #endif /* CONFIG_CMD_CBI */
