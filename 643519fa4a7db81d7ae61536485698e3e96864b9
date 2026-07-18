@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e9d1e6f_09a7d7e7",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-18T00:53:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6ca00c7_e5cdf36f",
+      "range": {
+        "startLine": 230,
+        "startChar": 0,
+        "endLine": 230,
+        "endChar": 45
+      },
+      "revId": "643519fa4a7db81d7ae61536485698e3e96864b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "222d1a33_f9372e02",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-18T00:05:41Z",
       "side": 1,
       "message": "* **Issue:** The updated documentation for `plat_realloc` in `fingerprint_egis630_pal.h` states:\n`@return Pointer to the reallocated memory block, or panic if reallocation failed.`\nHowever, your code correctly allows `plat_realloc(ptr, 0)` to free the block and return `NULL` without panicking (as validated in `test_plat_realloc_zero_size`).\n* **Remediation:** Update the `@return` tag to accurately document the `size \u003d\u003d 0` behavior:\n```c\n * @return Pointer to the reallocated block, NULL if size is 0, or panic if reallocation failed.\n\n```",
+      "range": {
+        "startLine": 241,
+        "startChar": 0,
+        "endLine": 241,
+        "endChar": 44
+      },
+      "revId": "643519fa4a7db81d7ae61536485698e3e96864b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9912ae5_e09b7edb",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-18T00:53:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "222d1a33_f9372e02",
       "range": {
         "startLine": 241,
         "startChar": 0,
