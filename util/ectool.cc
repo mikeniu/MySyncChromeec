@@ -9508,9 +9508,10 @@ static void cmd_cbi_help(char *cmd)
 		"  Usage: %s get <tag> [get_flag]\n"
 		"  Usage: %s set <tag> <value> <size> [set_flag]\n"
 		"  Usage: %s set <tag> <string/hex> <*> [set_flag]\n"
+		"  Usage: %s set 29 <dword0> [dword1] [dword2] [dword3] <*> [set_flag]\n"
 		"  Usage: %s remove <tag> [set_flag]\n"
 		"    <tag> is one of:\n",
-		cmd, cmd, cmd, cmd);
+		cmd, cmd, cmd, cmd, cmd);
 	for (int tag = CBI_TAG_BOARD_VERSION; tag <= CBI_TAG_COMMON_CONTROL;
 	     ++tag) {
 		fprintf(stderr, "      %2d: %s%s\n", tag, cbi_field_name[tag],
@@ -9630,36 +9631,79 @@ static int cmd_cbi(int argc, char *argv[])
 			val_ptr = argv[3];
 			size = strlen((char *)(val_ptr)) + 1;
 		} else if (cmd_cbi_is_binary_field(tag)) {
-			const char *p = argv[3];
+			if (tag == CBI_TAG_UFSC) {
+				// New multi-word UFSC format: up to 4 DWORDs
+				int num_words = argc - 4; // argv[3], argv[4],
+							  // argv[5], argv[6]
 
-			size = strlen(p);
-			if (size % 2) {
-				fprintf(stderr,
-					"\n<hex> length must be even.\n");
-				return -1;
-			}
-
-			size /= 2;
-			buf = (uint8_t *)malloc(size);
-			if (!buf) {
-				fprintf(stderr,
-					"\nFailed to allocate buffer.\n");
-				return -1;
-			}
-			for (i = 0; i < size; i++) {
-				char t[3] = {};
-
-				memcpy(t, p, 2);
-				buf[i] = strtoul(t, &e, 16);
-				if (e && *e) {
-					fprintf(stderr, "\nBad value: '%s'\n",
-						t);
-					free(buf);
+				if (num_words < 1 || num_words > 4) {
+					fprintf(stderr,
+						"UFSC requires 1-4 DWORD values\n");
 					return -1;
 				}
-				p += 2;
+
+				size = sizeof(uint32_t) * 4; // Always 16 bytes
+				buf = (uint8_t *)calloc(1, size); // Zero-filled
+				if (!buf) {
+					fprintf(stderr,
+						"Failed to allocate buffer.\n");
+					return -1;
+				}
+
+				for (i = 0; i < num_words; i++) {
+					uint64_t word_val =
+						strtoull(argv[3 + i], &e, 0);
+					uint32_t word;
+					if ((e && *e) ||
+					    word_val > UINT32_MAX) {
+						fprintf(stderr,
+							"Invalid DWORD at position %d\n",
+							i);
+						free(buf);
+						return -1;
+					}
+					word = (uint32_t)word_val;
+					// Use memcpy for safety (though buf is
+					// aligned from calloc)
+					memcpy(&buf[i * sizeof(uint32_t)],
+					       &word, sizeof(uint32_t));
+				}
+				val_ptr = buf;
+			} else {
+				// Existing binary field handling
+				// (BATTERY_CONFIG, etc.)
+				const char *p = argv[3];
+
+				size = strlen(p);
+				if (size % 2) {
+					fprintf(stderr,
+						"\n<hex> length must be even.\n");
+					return -1;
+				}
+
+				size /= 2;
+				buf = (uint8_t *)malloc(size);
+				if (!buf) {
+					fprintf(stderr,
+						"\nFailed to allocate buffer.\n");
+					return -1;
+				}
+				for (i = 0; i < size; i++) {
+					char t[3] = {};
+
+					memcpy(t, p, 2);
+					buf[i] = strtoul(t, &e, 16);
+					if (e && *e) {
+						fprintf(stderr,
+							"\nBad value: '%s'\n",
+							t);
+						free(buf);
+						return -1;
+					}
+					p += 2;
+				}
+				val_ptr = buf;
 			}
-			val_ptr = buf;
 		} else {
 			val = strtoul(argv[3], &e, 0);
 			/* strtoul sets an errno for invalid input. If the value
