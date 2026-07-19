@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d73e5a0_133e2e3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-19T16:50:27Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7d2b8ff6_69d326fd",
+      "revId": "1ef9b8b37f96cbcac15044c4b5997355b67eb577",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59ae8ca3_e3b2faa3",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e72d1872_87a7898e",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-19T16:50:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59ae8ca3_e3b2faa3",
+      "revId": "1ef9b8b37f96cbcac15044c4b5997355b67eb577",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "342b846a_6ef27f03",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] It would be helpful to merge the documentation as well. Consider adding the text \"Releases a block of memory previously allocated by `plat_alloc()` or `plat_calloc()`\" from the old `plat_free` to the new docstring.",
       "isAi": true,
+      "revId": "1ef9b8b37f96cbcac15044c4b5997355b67eb577",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "544f184d_afa00da3",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-19T16:50:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "342b846a_6ef27f03",
       "revId": "1ef9b8b37f96cbcac15044c4b5997355b67eb577",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
