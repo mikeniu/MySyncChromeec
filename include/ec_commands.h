@@ -1759,7 +1759,7 @@ enum ec_feature_code {
 	 */
 	EC_FEATURE_AMD_STB_DUMP = 50,
 	/*
-	 * The EC supports memory dump commands.
+	 * Deprecated / Unused: The EC supported memory dump commands.
 	 */
 	EC_FEATURE_MEMORY_DUMP = 51,
 	/*
@@ -5947,7 +5947,7 @@ struct ec_params_get_panic_info_v2 {
 #define EC_CMD_VERSION0 0x00DC
 
 /*
- * Memory Dump Commands
+ * DEPRECATED / UNUSED: Memory Dump Commands
  *
  * Since the HOSTCMD response size is limited, depending on the
  * protocol, retrieving a memory dump is split into 3 commands.
