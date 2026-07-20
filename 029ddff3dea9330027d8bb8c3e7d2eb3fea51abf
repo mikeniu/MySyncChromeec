@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e6c08ef_faa16a9d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-20T16:36:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/3e53506d-c60d-493c-b2ed-adb05bd15efc)]\n\n**Review Summary**:\n*   **Functionality:** The changes successfully combine `plat_free` and `PLAT_FREE` into a single function. The implementation correctly handles both freeing memory and preventing double-frees by setting the pointer to `NULL`.\n*   **Style:** The naming convention has been improved to use standard C `snake_case` for functions. The docstring was appropriately merged based on previous feedback.\n*   **Security:** Nullifying the pointer after freeing and checking `*x !\u003d NULL` prior to freeing helps protect against use-after-free and double-free vulnerabilities.\n*   **Testing:** The existing test was updated to reflect the new function name. A minor suggestion is made to add an additional test for the `NULL` pointer case to ensure full coverage of the new implementation logic.\n\nTAG\u003dagy\nCONV\u003d03ac66c8-d7e2-443a-8223-62b768d681ed",
+      "isAi": true,
+      "revId": "029ddff3dea9330027d8bb8c3e7d2eb3fea51abf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b2ccadb_606c5000",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 726,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-20T16:36:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider adding a test case to verify that `plat_free` safely handles a pointer that is already `NULL`, since the implementation explicitly checks for `if (*x !\u003d NULL)`.\n\n```c\nZTEST_F(egis630, test_plat_free_null)\n{\n\tint *ptr \u003d NULL;\n\tplat_free((void **)\u0026ptr);\n\tzassert_is_null(ptr);\n}\n```",
+      "isAi": true,
+      "revId": "029ddff3dea9330027d8bb8c3e7d2eb3fea51abf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
