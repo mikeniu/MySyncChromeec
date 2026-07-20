@@ -21,6 +21,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "94c917d6_8482f422",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-20T18:05:17Z",
+      "side": 1,
+      "message": "You should probably mention in the commit message that you\u0027re changing the behavior from assert to checking for NULL. Or ideally that would be its own CL before this one.",
+      "range": {
+        "startLine": 197,
+        "startChar": 0,
+        "endLine": 200,
+        "endChar": 2
+      },
+      "revId": "029ddff3dea9330027d8bb8c3e7d2eb3fea51abf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3b2ccadb_606c5000",
         "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
         "patchSetId": 28
