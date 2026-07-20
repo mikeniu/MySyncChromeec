@@ -438,8 +438,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_TCA64XXA
                                                 "${PLATFORM_EC}/driver/ioexpander/tca64xxa.c")
 zephyr_library_sources_ifdef(CONFIG_HAS_TASK_KEYSCAN
                                                 "${PLATFORM_EC}/common/keyboard_scan.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RGB_KEYBOARD
-                                                "${PLATFORM_EC}/common/rgb_keyboard.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042
                                                 "${PLATFORM_EC}/common/keyboard_8042.c"
                                                 "${PLATFORM_EC}/common/keyboard_8042_sharedlib.c")
@@ -756,8 +754,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MATH_UTIL
 						"${PLATFORM_EC}/common/math_util.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MAX695X_SEVEN_SEGMENT_DISPLAY
 						"${PLATFORM_EC}/driver/led/max695x.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LED_DRIVER_TLC59116F
-                                                "${PLATFORM_EC}/driver/led/tlc59116f.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP
                                                 "${PLATFORM_EC}/common/host_command_memory_dump.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AP_HANG_DETECT
