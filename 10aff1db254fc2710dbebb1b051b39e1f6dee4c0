@@ -22,6 +22,30 @@
       },
       "revId": "10aff1db254fc2710dbebb1b051b39e1f6dee4c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e042751_5843dfb6",
+        "filename": "zephyr/shim/chip/it8xxx2/shi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1273969
+      },
+      "writtenOn": "2026-07-20T10:45:48Z",
+      "side": 1,
+      "message": "Hi @keithshort@chromium.org,\n\nI\u0027ve created a change for the upstream SHI driver: https://chromium-review.googlesource.com/c/chromiumos/third_party/zephyrproject/+/8117427\n\nHowever, I have one concern. Previously, the shim called `pinctrl_apply_state(cfg-\u003epcfg, PINCTRL_STATE_DEFAULT)` directly on `AP_POWER_PRE_INIT`, so I could guarantee the SHI pins were already switched to alternate function before the host could start sending any command.\n\nWith the new approach, the pin switch only happens inside `shi_ite_pm_cb()` on `PM_DEVICE_ACTION_RESUME`, which is now triggered indirectly via `pm_device_runtime_get()` from the shim. Is there a risk that the host could start a transaction before the pins are actually switched to alternate mode, causing us to miss the data?",
+      "parentUuid": "1fff6a28_7e066d99",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "10aff1db254fc2710dbebb1b051b39e1f6dee4c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
