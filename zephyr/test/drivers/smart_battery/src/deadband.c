@@ -1,4 +1,3 @@
-#include "zephyr/kernel.h"
 /* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
@@ -8,6 +7,7 @@
 #include "battery_smart.h"
 #include "ec_commands.h"
 #include "test/drivers/test_state.h"
+#include "zephyr/kernel.h"
 
 #include <zephyr/ztest.h>
 
