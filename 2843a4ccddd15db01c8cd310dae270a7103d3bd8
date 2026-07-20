@@ -72,6 +72,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c154a75e_1dc5c303",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-20T16:04:15Z",
+      "side": 1,
+      "message": "Thank you for checking the binary. I was confused by the code at  https://chromium.googlesource.com/chromiumos/third_party/zephyrproject/+/06f5c058bb0aacd79c6d22/zephyr/dts/arm/st/f4/stm32f4.dtsi#605. bbram is enabled. abandoning this CL.",
+      "parentUuid": "69a8a031_35092d07",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 22
+      },
+      "revId": "2843a4ccddd15db01c8cd310dae270a7103d3bd8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79d8b6cd_2eea8122",
