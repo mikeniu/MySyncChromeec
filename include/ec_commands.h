@@ -1758,9 +1758,7 @@ enum ec_feature_code {
 	 * The EC supports triggering an STB dump.
 	 */
 	EC_FEATURE_AMD_STB_DUMP = 50,
-	/*
-	 * The EC supports memory dump commands.
-	 */
+	/* Deprecated */
 	EC_FEATURE_MEMORY_DUMP = 51,
 	/*
 	 * The EC supports DP2.1 capability
@@ -5947,7 +5945,7 @@ struct ec_params_get_panic_info_v2 {
 #define EC_CMD_VERSION0 0x00DC
 
 /*
- * Memory Dump Commands
+ * DEPRECATED: Memory Dump Commands
  *
  * Since the HOSTCMD response size is limited, depending on the
  * protocol, retrieving a memory dump is split into 3 commands.
@@ -5965,12 +5963,14 @@ struct ec_params_get_panic_info_v2 {
  * Memory entries may overlap and may be out of order.
  * The host should check for overlaps to optimize transfer rate.
  */
+/* Deprecated */
 #define EC_CMD_MEMORY_DUMP_GET_METADATA 0x00DD
 struct ec_response_memory_dump_get_metadata {
 	uint16_t memory_dump_entry_count;
 	uint32_t memory_dump_total_size;
 } __ec_align4;
 
+/* Deprecated */
 #define EC_CMD_MEMORY_DUMP_GET_ENTRY_INFO 0x00DE
 struct ec_params_memory_dump_get_entry_info {
 	uint16_t memory_dump_entry_index;
@@ -5981,6 +5981,7 @@ struct ec_response_memory_dump_get_entry_info {
 	uint32_t size;
 } __ec_align4;
 
+/* Deprecated */
 #define EC_CMD_MEMORY_DUMP_READ_MEMORY 0x00DF
 
 struct ec_params_memory_dump_read_memory {
