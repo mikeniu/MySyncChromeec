@@ -46,6 +46,30 @@
       },
       "revId": "10aff1db254fc2710dbebb1b051b39e1f6dee4c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aec09715_77afd0da",
+        "filename": "zephyr/shim/chip/it8xxx2/shi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-20T21:17:18Z",
+      "side": 1,
+      "message": "From my understanding `pm_device_runtime_get()` is synchronous.  So the call to `shi_ite_pm_cb()` should complete before `pm_device_runtime_get()` returns.",
+      "parentUuid": "3e042751_5843dfb6",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "10aff1db254fc2710dbebb1b051b39e1f6dee4c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
