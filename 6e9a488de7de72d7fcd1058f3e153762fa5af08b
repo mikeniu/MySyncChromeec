@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a30bca03_6d09e853",
+        "filename": "zephyr/program/ocelot/src/rvp_board_power.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-07-21T17:53:13Z",
+      "side": 1,
+      "message": "that formatting still looks strange.\ncan we still use `test_export_static` or is there a more modern incantation?",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 1
+      },
+      "revId": "6e9a488de7de72d7fcd1058f3e153762fa5af08b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
