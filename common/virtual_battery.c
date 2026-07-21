@@ -18,23 +18,19 @@
 
 #define BATT_MODE_UNINITIALIZED -1
 
-/*
- * The state machine used to parse smart battery command
- * to support virtual battery.
- */
-enum batt_cmd_parse_state {
-	IDLE = 0, /* initial state */
-	START = 1, /* received the register address (command code) */
-	WRITE_VB, /* writing data bytes to the peripheral */
-	READ_VB, /* reading data bytes to the peripheral */
-};
+struct i2c_battery_parser_state i2c_battery_parser_state_create(void)
+{
+	return (struct i2c_battery_parser_state){
+		.batt_cmd_head = NULL,
+		.sb_cmd_state = IDLE,
+		.acc_write_len = 0,
+		.cache_hit = 0,
+		.initialized = 1,
+	};
+}
 
-static enum batt_cmd_parse_state sb_cmd_state;
-static uint8_t cache_hit;
-static const uint8_t *batt_cmd_head;
-static int acc_write_len;
-
-int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
+int virtual_battery_handler(struct i2c_battery_parser_state *state,
+			    struct ec_response_i2c_passthru *resp, int in_len,
 			    int *err_code, int xferflags, int read_len,
 			    int write_len, const uint8_t *out)
 {
@@ -50,7 +46,7 @@ int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
 		return EC_ERROR_INVAL;
 	}
 #endif
-	switch (sb_cmd_state) {
+	switch (state->sb_cmd_state) {
 	case IDLE:
 		/*
 		 * A legal battery command must start
@@ -61,31 +57,30 @@ int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
 			return EC_ERROR_INVAL;
 		}
 		/* Record the head of battery command. */
-		batt_cmd_head = out;
-		sb_cmd_state = START;
+		state->batt_cmd_head = out;
+		state->sb_cmd_state = START;
 		*err_code = 0;
 		break;
 	case START:
 		if (write_len > 0) {
-			sb_cmd_state = WRITE_VB;
+			state->sb_cmd_state = WRITE_VB;
 			*err_code = 0;
 		} else {
-			sb_cmd_state = READ_VB;
-			*err_code = virtual_battery_operation(batt_cmd_head,
-							      NULL, 0, 0);
+			state->sb_cmd_state = READ_VB;
+			*err_code = virtual_battery_operation(
+				state->batt_cmd_head, NULL, 0, 0);
 			/*
 			 * If the reg is not handled by virtual battery, we
 			 * do not support it.
 			 */
 			if (*err_code)
 				return EC_ERROR_INVAL;
-			cache_hit = 1;
+			state->cache_hit = 1;
 		}
 		break;
 	case WRITE_VB:
 		if (write_len == 0) {
 			resp->i2c_status = EC_I2C_STATUS_NAK;
-			reset_parse_state();
 			return EC_ERROR_INVAL;
 		}
 		*err_code = 0;
@@ -93,35 +88,34 @@ int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
 	case READ_VB:
 		if (read_len == 0) {
 			resp->i2c_status = EC_I2C_STATUS_NAK;
-			reset_parse_state();
 			return EC_ERROR_INVAL;
 		}
 		/*
 		 * Do not send the command to battery
 		 * if the reg is cached.
 		 */
-		if (cache_hit)
+		if (state->cache_hit)
 			*err_code = 0;
 		break;
 	}
 
-	acc_write_len += write_len;
+	state->acc_write_len += write_len;
 
 	/* the last message */
 	if (xferflags & I2C_XFER_STOP) {
-		switch (sb_cmd_state) {
+		switch (state->sb_cmd_state) {
 		/* write to virtual battery */
 		case START:
 		case WRITE_VB:
-			virtual_battery_operation(batt_cmd_head, NULL, 0,
-						  acc_write_len);
+			virtual_battery_operation(state->batt_cmd_head, NULL, 0,
+						  state->acc_write_len);
 			break;
 		/* read from virtual battery */
 		case READ_VB:
-			if (cache_hit) {
+			if (state->cache_hit) {
 				read_len += in_len;
 				memset(&resp->data[0], 0, read_len);
-				virtual_battery_operation(batt_cmd_head,
+				virtual_battery_operation(state->batt_cmd_head,
 							  &resp->data[0],
 							  read_len, 0);
 			}
@@ -130,22 +124,11 @@ int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
 		 * states covered above.
 		 */
 		default:
-			reset_parse_state();
 			return EC_ERROR_INVAL;
 		}
 		/* LCOV_EXCL_STOP */
-
-		/* Reset the state in the end of messages */
-		reset_parse_state();
 	}
 	return EC_RES_SUCCESS;
-}
-
-void reset_parse_state(void)
-{
-	sb_cmd_state = IDLE;
-	cache_hit = 0;
-	acc_write_len = 0;
 }
 
 /*
