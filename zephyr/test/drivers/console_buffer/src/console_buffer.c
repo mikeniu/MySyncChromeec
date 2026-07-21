@@ -56,6 +56,61 @@ ZTEST_USER(console, test_buf_notify_null)
 	zassert_equal(write_count, 4, "got %d", write_count);
 }
 
+ZTEST_USER(console, test_buf_dropped_logs)
+{
+	char buffer[200];
+	uint16_t write_count;
+	const char *msg = "1234567890\n";
+	size_t msg_len = strlen(msg);
+	const uint32_t expected_overflow = 5;
+
+	/* Flush console buffer and clear dropped log counters */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	/* Take a snapshot to set previous_snapshot_idx */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	/* Overflow console_buf beyond
+	 * CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_BUF_SIZE */
+	for (size_t i = 0;
+	     i < (CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_BUF_SIZE / msg_len) +
+			 expected_overflow;
+	     i++) {
+		console_buf_notify_chars(msg, msg_len);
+	}
+
+	/* Read recent logs and check for dropped log message header */
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	uint32_t total_drops = 0;
+	uint32_t drops_isr = 0;
+	uint32_t drops_mutex = 0;
+	uint32_t drops_overflow = 0;
+
+	int parsed = sscanf(
+		buffer, "Dropped %u logs (ISR: %u, Mutex: %u, Overflow: %u)",
+		&total_drops, &drops_isr, &drops_mutex, &drops_overflow);
+	zassert_equal(parsed, 4,
+		      "sscanf failed to parse dropped logs header from '%s'",
+		      buffer);
+	zassert_equal(drops_isr, 0, "expected drops_isr == 0, got %u",
+		      drops_isr);
+	zassert_equal(drops_mutex, 0, "expected drops_mutex == 0, got %u",
+		      drops_mutex);
+	zassert_equal(drops_overflow, expected_overflow,
+		      "expected drops_overflow == %u, got %u",
+		      expected_overflow, drops_overflow);
+
+	zassert_equal(total_drops, drops_isr + drops_mutex + drops_overflow,
+		      "total_drops mismatch: %u != %u + %u + %u", total_drops,
+		      drops_isr, drops_mutex, drops_overflow);
+}
+
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
 ZTEST_USER(console, test_buf_notify_event)
 {
