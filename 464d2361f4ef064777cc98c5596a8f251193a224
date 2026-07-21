@@ -17,6 +17,29 @@
       "isAi": true,
       "revId": "464d2361f4ef064777cc98c5596a8f251193a224",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "331b3b9c_60cf5873",
+        "filename": "chip/host/i2c.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-07-21T01:30:21Z",
+      "side": 1,
+      "message": "You can surround these lines with LCOV_EXCL_START and LCOV_EXCL_STOP markers. This is used only as a stub for legacy EC unit tests. You could probably even an existing enum value like `I2C_FREQ_100KHZ` and it wouldn\u0027t matter.",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 1
+      },
+      "revId": "464d2361f4ef064777cc98c5596a8f251193a224",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
