@@ -16,6 +16,24 @@
       "message": "Added more test coverage.",
       "revId": "3831d8cb859eead2608f86b055b938f3e5cdeff5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e9b2334_7805cde8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-21T18:12:41Z",
+      "side": 1,
+      "message": "Moved extra unit tests to https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8127939",
+      "parentUuid": "8c4b3db2_77458b82",
+      "revId": "3831d8cb859eead2608f86b055b938f3e5cdeff5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
