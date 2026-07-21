@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db30a922_f57b67b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-07-21T01:27:35Z",
+      "side": 1,
+      "message": "```\n[FAILED] chromiumos/platform/ec: cros format\n    Hook script \"cros format --check --exclude \"*.xml\" --exclude \"extra/usb_updater/*.json\" --exclude \"third_party/*\" --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      18:10:07: WARNING: zephyr/program/ocelot/src/rvp_board_power.c: needs formatting\n      18:10:21: NOTICE: You can fix formatting errors by running:\n        cros format zephyr/program/ocelot/src/rvp_board_power.c\n```",
+      "revId": "576577e03816ebbfdc63a9fe4a5395c11aba096d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
