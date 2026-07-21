@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vif:VIF xmlns:opt="http://usb.org/VendorInfoFileOptionalContent.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:vif="http://usb.org/VendorInfoFile.xsd">
-  <vif:VIF_Specification>3.36</vif:VIF_Specification>
+  <vif:VIF_Specification>3.37</vif:VIF_Specification>
   <vif:VIF_App>
     <vif:Vendor>USB-IF</vif:Vendor>
     <vif:Name>VIF Editor</vif:Name>
-    <vif:Version>3.14.0.0</vif:Version>
+    <vif:Version>3.15.0.0</vif:Version>
   </vif:VIF_App>
   <vif:Vendor_Name>Google</vif:Vendor_Name>
   <vif:Model_Part_Number>Ocelot</vif:Model_Part_Number>
@@ -15,8 +15,14 @@
   <vif:Product>
     <!--Product Level Content:-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <!--;Product-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:Total_Source_Power_Deliverable value="22500">22500 mW</vif:Total_Source_Power_Deliverable>
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;USB4® Product-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:USB4_DROM_Implemented value="true" />
+    <vif:USB4_DROM_Vendor_ID value="0">0000</vif:USB4_DROM_Vendor_ID>
     <vif:USB4_Num_Internal_Host_Controllers value="3">3 host controllers</vif:USB4_Num_Internal_Host_Controllers>
     <vif:USB4_Num_PCIe_DN_Bridges value="3">3 PCIe DN bridges</vif:USB4_Num_PCIe_DN_Bridges>
     <!--Bundle: USB4RouterList-->
@@ -137,7 +143,6 @@
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;Product Power-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-    <vif:Product_Total_Source_Power_mW value="22500">22500 mW</vif:Product_Total_Source_Power_mW>
     <vif:Port_Source_Power_Type value="1">Shared</vif:Port_Source_Power_Type>
     <vif:Port_Source_Power_Gang>1</vif:Port_Source_Power_Gang>
     <vif:Port_Source_Power_Gang_Max_Power value="22500">22500 mW</vif:Port_Source_Power_Gang_Max_Power>
@@ -155,7 +160,7 @@
     <!--;PD Source-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <vif:PD_Power_As_Source value="15000">15000 mW</vif:PD_Power_As_Source>
-    <vif:PD_Power_As_Source_Guaranteed value="500">500 mW</vif:PD_Power_As_Source_Guaranteed>
+    <vif:PD_Power_As_Source_Guaranteed value="7500">7500 mW</vif:PD_Power_As_Source_Guaranteed>
     <vif:EPR_Supported_As_Src value="false" />
     <vif:USB_Suspend_May_Be_Cleared value="true" />
     <vif:Sends_Pings value="false" />
@@ -216,6 +221,21 @@
       </vif:SnkPDO>
     </vif:SnkPdoList>
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <!--;PD Sink SKEDB-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:Snk_SPR_Minimum_PDP value="15">15000 mW</vif:Snk_SPR_Minimum_PDP>
+    <vif:Snk_SPR_Operational_PDP value="45">45000 mW</vif:Snk_SPR_Operational_PDP>
+    <vif:Snk_SPR_Maximum_PDP value="45">45000 mW</vif:Snk_SPR_Maximum_PDP>
+    <vif:Snk_EPR_Minimum_PDP value="0">0 mW</vif:Snk_EPR_Minimum_PDP>
+    <vif:Snk_EPR_Operational_PDP value="0">0 mW</vif:Snk_EPR_Operational_PDP>
+    <vif:Snk_EPR_Maximum_PDP value="0">0 mW</vif:Snk_EPR_Maximum_PDP>
+    <vif:Snk_PPS_Charging_Supported value="false" />
+    <vif:Snk_VBUS_Powered value="true" />
+    <vif:Snk_AC_Supply_Powered value="false" />
+    <vif:Snk_Battery_Powered value="true" />
+    <vif:Snk_Battery_Essentially_Unlimited value="false" />
+    <vif:Snk_AVS_Supported value="false" />
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;Dual Role-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <vif:Accepts_PR_Swap_As_Src value="true" />
@@ -235,7 +255,7 @@
     <vif:Modal_Operation_Supported_SOP value="false" />
     <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
     <vif:PID_SOP value="20597">5075</vif:PID_SOP>
-    <vif:bcdDevice_SOP value="4880">1310</vif:bcdDevice_SOP>
+    <vif:bcdDevice_SOP value="54">0036</vif:bcdDevice_SOP>
   </vif:Component>
   <vif:Component>
     <!--Component 1: Port 1-->
@@ -327,7 +347,6 @@
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;Product Power-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-    <vif:Product_Total_Source_Power_mW value="22500">22500 mW</vif:Product_Total_Source_Power_mW>
     <vif:Port_Source_Power_Type value="1">Shared</vif:Port_Source_Power_Type>
     <vif:Port_Source_Power_Gang>1</vif:Port_Source_Power_Gang>
     <vif:Port_Source_Power_Gang_Max_Power value="22500">22500 mW</vif:Port_Source_Power_Gang_Max_Power>
@@ -345,7 +364,7 @@
     <!--;PD Source-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <vif:PD_Power_As_Source value="15000">15000 mW</vif:PD_Power_As_Source>
-    <vif:PD_Power_As_Source_Guaranteed value="500">500 mW</vif:PD_Power_As_Source_Guaranteed>
+    <vif:PD_Power_As_Source_Guaranteed value="7500">7500 mW</vif:PD_Power_As_Source_Guaranteed>
     <vif:EPR_Supported_As_Src value="false" />
     <vif:USB_Suspend_May_Be_Cleared value="true" />
     <vif:Sends_Pings value="false" />
@@ -406,6 +425,21 @@
       </vif:SnkPDO>
     </vif:SnkPdoList>
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <!--;PD Sink SKEDB-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:Snk_SPR_Minimum_PDP value="15">15000 mW</vif:Snk_SPR_Minimum_PDP>
+    <vif:Snk_SPR_Operational_PDP value="45">45000 mW</vif:Snk_SPR_Operational_PDP>
+    <vif:Snk_SPR_Maximum_PDP value="45">45000 mW</vif:Snk_SPR_Maximum_PDP>
+    <vif:Snk_EPR_Minimum_PDP value="0">0 mW</vif:Snk_EPR_Minimum_PDP>
+    <vif:Snk_EPR_Operational_PDP value="0">0 mW</vif:Snk_EPR_Operational_PDP>
+    <vif:Snk_EPR_Maximum_PDP value="0">0 mW</vif:Snk_EPR_Maximum_PDP>
+    <vif:Snk_PPS_Charging_Supported value="false" />
+    <vif:Snk_VBUS_Powered value="true" />
+    <vif:Snk_AC_Supply_Powered value="false" />
+    <vif:Snk_Battery_Powered value="true" />
+    <vif:Snk_Battery_Essentially_Unlimited value="false" />
+    <vif:Snk_AVS_Supported value="false" />
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;Dual Role-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <vif:Accepts_PR_Swap_As_Src value="true" />
@@ -425,6 +459,6 @@
     <vif:Modal_Operation_Supported_SOP value="false" />
     <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
     <vif:PID_SOP value="20597">5075</vif:PID_SOP>
-    <vif:bcdDevice_SOP value="4880">1310</vif:bcdDevice_SOP>
+    <vif:bcdDevice_SOP value="54">0036</vif:bcdDevice_SOP>
   </vif:Component>
 </vif:VIF>
