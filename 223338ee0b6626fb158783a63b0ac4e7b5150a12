@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a17a8d2f_a25b4a00",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1552197
+      },
+      "writtenOn": "2026-07-21T10:54:11Z",
+      "side": 1,
+      "message": "This will essentially disables the `battery` command in S0 since we dont have SoCCP now.",
+      "revId": "223338ee0b6626fb158783a63b0ac4e7b5150a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
