@@ -6,7 +6,6 @@ target_sources(app PRIVATE
     src/bmi_common.c
     src/bmi160.c
     src/bmi260.c
-    src/console.c
     src/cros_cbi.c
     src/espi.c
     src/gpio.c
