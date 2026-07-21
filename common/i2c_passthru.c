@@ -192,6 +192,9 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	 */
 	port = i2c_get_port_from_remote_port(params->port);
 #endif
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+	struct i2c_battery_parser_state parser_state = { .initialized = 0 };
+#endif
 	struct ec_response_i2c_passthru *resp = args->response;
 	const struct i2c_port_t *i2c_port;
 	struct msg_queue_t msg_queue;
@@ -237,9 +240,15 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 #ifdef CONFIG_I2C_VIRTUAL_BATTERY
 		if (is_i2c_port_virtual_battery(port) &&
 		    val.addr_flags == VIRTUAL_BATTERY_ADDR_FLAGS) {
+			/* Lazy initialization. */
+			if (parser_state.initialized == 0)
+				parser_state =
+					i2c_battery_parser_state_create();
+
 			if (virtual_battery_handler(
-				    resp, msg_queue.in_len, &rv, val.xferflags,
-				    val.read_len, val.write_len, msg_queue.out))
+				    &parser_state, resp, msg_queue.in_len, &rv,
+				    val.xferflags, val.read_len, val.write_len,
+				    msg_queue.out))
 				break;
 		}
 #endif

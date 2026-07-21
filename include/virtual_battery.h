@@ -11,6 +11,25 @@
 #define VIRTUAL_BATTERY_ADDR_FLAGS BATTERY_ADDR_FLAGS
 #endif
 
+/*
+ * The state machine used to parse smart battery command
+ * to support virtual battery.
+ */
+enum batt_cmd_parse_state {
+	IDLE = 0, /* initial state */
+	START = 1, /* received the register address (command code) */
+	WRITE_VB, /* writing data bytes to the peripheral */
+	READ_VB, /* reading data bytes to the peripheral */
+};
+
+struct i2c_battery_parser_state {
+	const uint8_t *batt_cmd_head;
+	enum batt_cmd_parse_state sb_cmd_state;
+	int acc_write_len;
+	uint8_t cache_hit;
+	uint8_t initialized;
+};
+
 /**
  * Read/write value of battery parameter from charge state.
  *
@@ -37,11 +56,14 @@ int virtual_battery_operation(const uint8_t *batt_cmd_head, uint8_t *dest,
  * @param out		Data to send
  * @return EC_SUCCESS if successful, non-zero if error.
  */
-int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
+int virtual_battery_handler(struct i2c_battery_parser_state *state,
+			    struct ec_response_i2c_passthru *resp, int in_len,
 			    int *err_code, int xferflags, int read_len,
 			    int write_len, const uint8_t *out);
 
-/* Reset the state machine and static variables. */
-void reset_parse_state(void);
+/**
+ * Create a parser state.
+ */
+struct i2c_battery_parser_state i2c_battery_parser_state_create(void);
 
 #endif /* __CROS_EC_VIRTUAL_BATTERY_H */
