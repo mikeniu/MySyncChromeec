@@ -22,18 +22,6 @@ config BOARD_FRANCKA
 	  Build Google Francka board. Francka has Intel PTL SoC
 	  with NPCX993FA0BX EC.
 
-config BOARD_FELINO
-	bool "Google felino"
-	help
-	  Build Google Felino board. Felino has Intel PTL SoC
-	  with it82002aw EC.
-
-config BOARD_FELINO4ES
-	bool "Google felino for ES1"
-	help
-	  Build Google Felino board for ES1. Felino4es has Intel PTL SoC
-	  with it82002aw EC.
-
 config BOARD_KINMEN
 	bool "Google kinmen"
 	help
