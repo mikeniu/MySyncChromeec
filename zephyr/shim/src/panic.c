@@ -146,26 +146,48 @@ void panic_data_print(const struct panic_data *pdata)
 #endif
 }
 
+/**
+ * Prepare a new panic_data structure zeroing memory and initializing header.
+ *
+ * Sets magic, struct size/version, architecture, and default image flags
+ * (PANIC_DATA_FLAG_RW_IMAGE or PANIC_DATA_FLAG_RO_IMAGE).
+ */
+static struct panic_data *prepare_new_panic_data(void)
+{
+	struct panic_data *const pdata = get_panic_data_write();
+
+	memset(pdata, 0, sizeof(*pdata));
+	pdata->magic = PANIC_DATA_MAGIC;
+	pdata->struct_size = sizeof(*pdata);
+	pdata->struct_version = 2;
+	pdata->arch = PANIC_ARCH;
+	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
+						   PANIC_DATA_FLAG_RO_IMAGE;
+
+	return pdata;
+}
+
+static void flush_panic_data(const struct panic_data *pdata)
+{
+	if (pdata) {
+		sys_cache_data_flush_range((void *)pdata, sizeof(*pdata));
+	}
+}
+
 #if !defined(CONFIG_ZTEST_FATAL_HOOK)
 static void copy_esf_to_panic_data(const struct arch_esf *esf,
 				   struct panic_data *pdata)
 {
-	memset(pdata, 0, CONFIG_PANIC_DATA_SIZE);
-	pdata->arch = PANIC_ARCH;
-	pdata->struct_version = 2;
-	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
-						   PANIC_DATA_FLAG_RO_IMAGE;
-	pdata->flags |= (PANIC_ARCH == PANIC_ARCH_CORTEX_M) ?
-				PANIC_DATA_FLAG_FRAME_VALID :
-				0;
-	pdata->reserved = 0;
-	pdata->struct_size = sizeof(*pdata);
-	pdata->magic = PANIC_DATA_MAGIC;
+	pdata = prepare_new_panic_data();
+
+	if (PANIC_ARCH == PANIC_ARCH_CORTEX_M) {
+		pdata->flags |= PANIC_DATA_FLAG_FRAME_VALID;
+	}
 
 	PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
 
 	/* Flush the panic data to RAM before coming reboot. */
-	sys_cache_data_flush_range(pdata, sizeof(*pdata));
+	flush_panic_data(pdata);
 }
 
 void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
@@ -255,16 +277,7 @@ __override void assert_post_action(const char *path, unsigned int line)
 
 void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
 {
-	struct panic_data *const pdata = get_panic_data_write();
-
-	/* Setup panic data structure */
-	memset(pdata, 0, CONFIG_PANIC_DATA_SIZE);
-	pdata->magic = PANIC_DATA_MAGIC;
-	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
-	pdata->struct_version = 2;
-	pdata->arch = PANIC_ARCH;
-	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
-						   PANIC_DATA_FLAG_RO_IMAGE;
+	struct panic_data *const pdata = prepare_new_panic_data();
 
 	/* Log panic cause */
 	PANIC_REG_EXCEPTION(pdata) = exception;
@@ -272,7 +285,7 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
 	PANIC_REG_INFO(pdata) = info;
 
 	/* Flush the panic data to RAM before potential reboot. */
-	sys_cache_data_flush_range(pdata, sizeof(*pdata));
+	flush_panic_data(pdata);
 }
 
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
@@ -290,6 +303,7 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 
 test_export_static int panic_data_init(void)
 {
+	struct panic_data *pdata;
 	bool is_panic_new;
 	bool is_watchdog_reset;
 	uint32_t reason;
@@ -331,22 +345,31 @@ test_export_static int panic_data_init(void)
 	if (is_watchdog_reset) {
 		/* If the panic reason is a watchdog warning, then change
 		 * the reason to a regular watchdog reason while preserving
-		 * the info and exception from the watchdog warning.
+		 * the rest of the panic_data.
 		 */
 		if (reason == PANIC_SW_WATCHDOG_WARN) {
 			LOG_INF("Promoting watchdog warning to watchdog panic");
-			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
+			pdata = panic_get_data();
+			if (pdata) {
+				PANIC_REG_REASON(pdata) = PANIC_SW_WATCHDOG;
+				flush_panic_data(pdata);
+			}
 		} else if ((reason != PANIC_SW_WATCHDOG &&
 			    reason != PANIC_SW_WATCHDOG_HARD) ||
-			   !panic_data_is_new()) {
+			   !is_panic_new) {
 			/* The watchdog panic info may have already been
 			 * initialized by the watchdog handler, so only set it
 			 * here if the panic reason is not a watchdog or the
 			 * panic info has already been read, i.e. an old
-			 * watchdog panic.
+			 * watchdog panic. Both RO and RW flags are unset
+			 * because source image is not known.
 			 */
 			LOG_INF("Setting hard watchdog panic");
-			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
+			pdata = prepare_new_panic_data();
+			pdata->flags &= ~(PANIC_DATA_FLAG_RW_IMAGE |
+					  PANIC_DATA_FLAG_RO_IMAGE);
+			PANIC_REG_REASON(pdata) = PANIC_SW_WATCHDOG_HARD;
+			flush_panic_data(pdata);
 		}
 	}
 

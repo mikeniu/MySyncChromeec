@@ -141,6 +141,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_warn_panic)
 	uint32_t reason;
 	uint32_t info;
 	uint8_t exception;
+	struct panic_data *pdata;
 
 	/* Panic reason PANIC_SW_WATCHDOG_WARN should be switched
 	 * to PANIC_SW_WATCHDOG after a watchdog reset (if in RW).
@@ -148,15 +149,25 @@ ZTEST(panic, test_panic_data_init__watch_dog_warn_panic)
 	 */
 	panic_set_reason(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
 
+	/* Set RO flag explicitly to test flag preservation */
+	pdata = get_panic_data_write();
+	pdata->flags &= ~PANIC_DATA_FLAG_RW_IMAGE;
+	pdata->flags |= PANIC_DATA_FLAG_RO_IMAGE;
+
 	/* Clear all reset flags and set them arbitrarily */
 	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
 	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 
 	if (IS_ENABLED(SECTION_IS_RW)) {
+		pdata = panic_get_data();
 		zassert_equal(reason, PANIC_SW_WATCHDOG);
 		zassert_equal(info, 0x12);
 		zassert_equal(exception, 0x34);
+		zassert_not_null(pdata, NULL);
+		zassert_equal(pdata->flags & PANIC_DATA_FLAG_RO_IMAGE,
+			      PANIC_DATA_FLAG_RO_IMAGE);
+		zassert_equal(pdata->flags & PANIC_DATA_FLAG_RW_IMAGE, 0);
 	} else {
 		/* In RO, existing reason remains */
 		zassert_equal(reason, PANIC_SW_WATCHDOG_WARN);
@@ -223,9 +234,14 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic_already_read)
 	panic_get_reason(&reason, &info, &exception);
 
 	if (IS_ENABLED(SECTION_IS_RW)) {
+		pdata = panic_get_data();
 		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
 		zassert_equal(info, 0);
 		zassert_equal(exception, 0);
+		zassert_not_null(pdata, NULL);
+		zassert_equal(pdata->flags & (PANIC_DATA_FLAG_RO_IMAGE |
+					      PANIC_DATA_FLAG_RW_IMAGE),
+			      0);
 	} else {
 		/* In RO, existing info remains even if already read */
 		zassert_equal(info, 0x12);
