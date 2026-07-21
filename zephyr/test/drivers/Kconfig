@@ -16,6 +16,9 @@ config LINK_TEST_SUITE_DEFAULT
 config LINK_TEST_SUITE_DEFAULT_CONSOLE_CMDS
 	bool "Link and test the default console commands test suite"
 
+config LINK_TEST_SUITE_CONSOLE_BUFFER
+	bool "Link and test the console buffer test suite"
+
 config LINK_TEST_SUITE_CONSOLE_CMD_CRASH
 	bool "Link and test the console command crash test suite"
 
