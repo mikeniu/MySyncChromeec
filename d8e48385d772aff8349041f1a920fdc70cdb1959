@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65269f05_095f39d3",
+        "filename": "zephyr/test/drivers/board_id_intel_rvp/src/board_id_intel_rvp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-07-21T09:08:39Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "35932e1a_30b26683",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 22
+      },
+      "revId": "d8e48385d772aff8349041f1a920fdc70cdb1959",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21c78df4_42abb92f",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9778a423_248f5b53",
+        "filename": "zephyr/test/drivers/board_id_intel_rvp/src/board_id_intel_rvp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-07-21T09:08:39Z",
+      "side": 1,
+      "message": "Moved this to common file and used across different test suites. Each suite now initializes the deferred controller once in its before() hook (board_id_intel_rvp_reset() followed by ensure_straps_ready() in board_id_intel_rvp.c), so the per-test helpers only drive pin values.",
+      "parentUuid": "21c78df4_42abb92f",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 1
+      },
+      "revId": "d8e48385d772aff8349041f1a920fdc70cdb1959",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "407e5ba2_fb0ad917",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-07-14T22:39:17Z",
       "side": 1,
       "message": "This is likely sensitive to test execution order and would fail if run after any test calling `ensure_straps_ready()`.\n\nActually most of this suite is sensitive to ordering. ZTest doesn\u0027t have a way to guarantee ordering of suites or tests. The only safe way to do this is to split this into two test sources (one with initialization and one without) and make them separate cases in testcases.yaml so they run independently.",
+      "range": {
+        "startLine": 116,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 1
+      },
+      "revId": "d8e48385d772aff8349041f1a920fdc70cdb1959",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f57be4f3_303e53b7",
+        "filename": "zephyr/test/drivers/board_id_intel_rvp/src/board_id_intel_rvp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-07-21T09:08:39Z",
+      "side": 1,
+      "message": "Agreed, relying on execution order is fragile. I split the suite into three independent sources, each linked into its own binary and run as a separate test suite. No other test can initialize the controller first because the not-ready and S5-callback cases build separately. So they\u0027re no longer order-dependent.",
+      "parentUuid": "407e5ba2_fb0ad917",
       "range": {
         "startLine": 116,
         "startChar": 0,
