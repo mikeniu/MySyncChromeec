@@ -145,9 +145,8 @@ static int check_i2c_params(const uint8_t port,
 	const struct ec_params_i2c_passthru *params = args->params;
 	struct msg_queue_t msg_queue;
 	unsigned int size;
-	enum ec_status ret = EC_RES_SUCCESS;
 #ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
-	bool has_battery_command = false;
+	struct i2c_battery_parser_state parser_state = { .initialized = 0 };
 #endif
 
 	if (args->params_size < sizeof(*params)) {
@@ -179,39 +178,27 @@ static int check_i2c_params(const uint8_t port,
 				.addr_flags = msg_queue.msg->addr_flags,
 				.cmd = val.is_read ? 0xff : *msg_queue.out,
 			};
-			if (!board_allow_i2c_passthru(&cmd_desc)) {
-				ret = EC_RES_ACCESS_DENIED;
-				break;
-			}
-			if (is_i2c_port_battery(port)) {
-				LOG_DBG("port=%d, %s, addr=0x%x(7-bit), len=%d",
-					port, val.is_read ? "read" : "write",
-					val.addr_flags, msg_queue.msg->len);
-				if (!is_i2c_address_battery(val.addr_flags)) {
-					ret = EC_RES_ACCESS_DENIED;
-					break;
-				}
+			if (!board_allow_i2c_passthru(&cmd_desc))
+				return EC_RES_ACCESS_DENIED;
 
-				has_battery_command = true;
-				ret = battery_permission_handler(
-					msg_queue.in_len, val.xferflags,
-					val.read_len, val.write_len,
-					msg_queue.out);
-				if (ret != EC_RES_SUCCESS)
-					break;
+			if (is_i2c_port_battery(port)) {
+				if (!is_i2c_address_battery(val.addr_flags))
+					return EC_RES_ACCESS_DENIED;
+
+				/* Lazy initialization. */
+				if (parser_state.initialized == 0)
+					parser_state =
+						i2c_battery_parser_state_create();
+
+				return battery_permission_handler(
+					&parser_state, msg_queue.in_len,
+					val.xferflags, val.read_len,
+					val.write_len, msg_queue.out);
 			}
 		}
 #endif
 		msg_pop_front(&msg_queue, &val);
 	}
-
-#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
-	if (has_battery_command)
-		reset_parse_state();
-#endif
-
-	if (ret != EC_RES_SUCCESS)
-		return ret;
 
 	/* Check there is room for the data */
 	if (args->response_max <
@@ -240,6 +227,9 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	 * used in EC.
 	 */
 	port = i2c_get_port_from_remote_port(params->port);
+#endif
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+	struct i2c_battery_parser_state parser_state = { .initialized = 0 };
 #endif
 	struct ec_response_i2c_passthru *resp = args->response;
 	const struct i2c_port_t *i2c_port;
@@ -286,9 +276,15 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 #ifdef CONFIG_I2C_VIRTUAL_BATTERY
 		if (is_i2c_port_battery(port) &&
 		    is_i2c_address_battery(val.addr_flags)) {
+			/* Lazy initialization. */
+			if (parser_state.initialized == 0)
+				parser_state =
+					i2c_battery_parser_state_create();
+
 			if (virtual_battery_handler(
-				    resp, msg_queue.in_len, &rv, val.xferflags,
-				    val.read_len, val.write_len, msg_queue.out))
+				    &parser_state, resp, msg_queue.in_len, &rv,
+				    val.xferflags, val.read_len, val.write_len,
+				    msg_queue.out))
 				break;
 		}
 #endif
