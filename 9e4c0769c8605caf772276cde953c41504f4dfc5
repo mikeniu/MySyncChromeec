@@ -33,6 +33,24 @@
       "message": "Shouldn\u0027t this be 60000 mW?",
       "revId": "9e4c0769c8605caf772276cde953c41504f4dfc5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4849972_32c8d68e",
+        "filename": "zephyr/program/bluey/quartz/quartz_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1003039
+      },
+      "writtenOn": "2026-07-21T23:33:02Z",
+      "side": 1,
+      "message": "Good catch. Fixed.",
+      "parentUuid": "4f6840d4_efa209e7",
+      "revId": "9e4c0769c8605caf772276cde953c41504f4dfc5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
