@@ -70,6 +70,30 @@
       },
       "revId": "10aff1db254fc2710dbebb1b051b39e1f6dee4c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8fe53fb_96dd6f7b",
+        "filename": "zephyr/shim/chip/it8xxx2/shi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1273969
+      },
+      "writtenOn": "2026-07-21T10:52:46Z",
+      "side": 1,
+      "message": "Acknowledged.\nI\u0027ll do final check, and if everything looks good, I\u0027ll submit the PR.",
+      "parentUuid": "aec09715_77afd0da",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "10aff1db254fc2710dbebb1b051b39e1f6dee4c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
