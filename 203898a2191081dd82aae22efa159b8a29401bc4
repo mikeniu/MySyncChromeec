@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "203898a2191081dd82aae22efa159b8a29401bc4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c3cf4b2_ec419364",
+        "filename": "zephyr/program/ocelot/ocelotrvp-npcx/ocelotrvp-npcx_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-21T15:27:04Z",
+      "side": 1,
+      "message": "Can you help to determine if we need to adjust it somehow?",
+      "range": {
+        "startLine": 226,
+        "startChar": 0,
+        "endLine": 237,
+        "endChar": 43
+      },
+      "revId": "203898a2191081dd82aae22efa159b8a29401bc4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
