@@ -22,6 +22,30 @@
       },
       "revId": "6e9a488de7de72d7fcd1058f3e153762fa5af08b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad19f478_a300b3c9",
+        "filename": "zephyr/program/ocelot/src/rvp_board_power.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-21T18:29:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a30bca03_6d09e853",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 1
+      },
+      "revId": "6e9a488de7de72d7fcd1058f3e153762fa5af08b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
