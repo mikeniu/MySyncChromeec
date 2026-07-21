@@ -11,6 +11,7 @@
 #include "common.h"
 #include "ec_tasks.h"
 #include "panic.h"
+#include "system.h"
 #include "test/drivers/stubs.h"
 #include "test/drivers/test_state.h"
 
@@ -18,6 +19,8 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/ztest.h>
+
+int panic_data_init(void);
 
 struct panic_test_fixture {
 	struct panic_data saved_pdata;
@@ -36,6 +39,7 @@ static void panic_before(void *state)
 	struct panic_data *pdata = get_panic_data_write();
 
 	ARG_UNUSED(state);
+	system_clear_reset_flags(-1);
 
 	fixture->saved_pdata = *pdata;
 }
@@ -104,4 +108,224 @@ ZTEST(panic, test_get_panic_data_start)
 
 	pdata->magic = PANIC_DATA_MAGIC;
 	zassert_equal((uintptr_t)pdata, get_panic_data_start(), NULL);
+}
+
+ZTEST(panic, test_panic_data_init__watch_dog_panic)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+
+	/* Watchdog reset should result in any existing panic data being
+	 * overwritten (if in RW)
+	 */
+	panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+
+	/* Clear all reset flags and set them arbitrarily */
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+	panic_get_reason(&reason, &info, &exception);
+
+	if (IS_ENABLED(SECTION_IS_RW)) {
+		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
+		zassert_equal(info, 0);
+		zassert_equal(exception, 0);
+	} else {
+		/* In RO, existing panic reason should remain */
+		zassert_equal(reason, PANIC_SW_DIV_ZERO);
+	}
+}
+
+ZTEST(panic, test_panic_data_init__watch_dog_warn_panic)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+
+	/* Panic reason PANIC_SW_WATCHDOG_WARN should be switched
+	 * to PANIC_SW_WATCHDOG after a watchdog reset (if in RW).
+	 * Info and exception should be preserved.
+	 */
+	panic_set_reason(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
+
+	/* Clear all reset flags and set them arbitrarily */
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+	panic_get_reason(&reason, &info, &exception);
+
+	if (IS_ENABLED(SECTION_IS_RW)) {
+		zassert_equal(reason, PANIC_SW_WATCHDOG);
+		zassert_equal(info, 0x12);
+		zassert_equal(exception, 0x34);
+	} else {
+		/* In RO, existing reason remains */
+		zassert_equal(reason, PANIC_SW_WATCHDOG_WARN);
+	}
+}
+
+ZTEST(panic, test_panic_data_init__watch_dog_panic_already_initialized)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+
+	/* Watchdog reset should not overwrite panic info if already filled
+	 * in with watchdog panic info that HAS NOT been read by host
+	 */
+	panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34);
+
+	/* Clear all reset flags and set them arbitrarily */
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+	panic_get_reason(&reason, &info, &exception);
+	zassert_equal(reason, PANIC_SW_WATCHDOG);
+	zassert_equal(info, 0x12);
+	zassert_equal(exception, 0x34);
+}
+
+ZTEST(panic, test_panic_data_init__watch_dog_hard_panic_already_initialized)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+
+	/* Watchdog reset should not overwrite panic info if already filled
+	 * in with watchdog hard panic info that HAS NOT been read by host
+	 */
+	panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0x12, 0x34);
+
+	/* Clear all reset flags and set them arbitrarily */
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+	panic_get_reason(&reason, &info, &exception);
+	zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
+	zassert_equal(info, 0x12);
+	zassert_equal(exception, 0x34);
+}
+
+ZTEST(panic, test_panic_data_init__watch_dog_panic_already_read)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+	struct panic_data *pdata;
+
+	/* Watchdog reset should overwrite panic info if already filled
+	 * in with watchdog panic info that HAS been read by host (if in RW)
+	 */
+	panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34);
+	pdata = get_panic_data_write();
+	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
+
+	/* Clear all reset flags and set them arbitrarily */
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+	panic_get_reason(&reason, &info, &exception);
+
+	if (IS_ENABLED(SECTION_IS_RW)) {
+		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
+		zassert_equal(info, 0);
+		zassert_equal(exception, 0);
+	} else {
+		/* In RO, existing info remains even if already read */
+		zassert_equal(info, 0x12);
+	}
+}
+
+ZTEST(panic, test_panic_data_init__no_watchdog_reset_flag)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+
+	panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+	system_set_reset_flags(EC_RESET_FLAG_POWER_ON);
+	panic_data_init();
+	panic_get_reason(&reason, &info, &exception);
+
+	zassert_equal(reason, PANIC_SW_DIV_ZERO);
+	zassert_equal(info, 0x12);
+	zassert_equal(exception, 0x34);
+}
+
+ZTEST(panic, test_panic_data_init__watch_dog_hard_panic_already_read)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+	struct panic_data *pdata;
+
+	panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0x12, 0x34);
+	pdata = get_panic_data_write();
+	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
+
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+	panic_get_reason(&reason, &info, &exception);
+
+	if (IS_ENABLED(SECTION_IS_RW)) {
+		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
+		zassert_equal(info, 0);
+		zassert_equal(exception, 0);
+	} else {
+		zassert_equal(info, 0x12);
+	}
+}
+
+ZTEST(panic, test_panic_data_init__invalid_sw_reason)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+
+	panic_set_reason(0, 0x12, 0x34);
+	system_set_reset_flags(EC_RESET_FLAG_POWER_ON);
+	panic_data_init();
+	panic_get_reason(&reason, &info, &exception);
+
+	zassert_equal(reason, 0);
+	zassert_equal(info, 0x12);
+	zassert_equal(exception, 0x34);
+}
+
+ZTEST(panic, test_panic_data_init__old_panic_no_watchdog)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+	struct panic_data *pdata;
+
+	panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+	pdata = get_panic_data_write();
+	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
+
+	system_set_reset_flags(EC_RESET_FLAG_POWER_ON);
+	panic_data_init();
+	panic_get_reason(&reason, &info, &exception);
+
+	zassert_equal(reason, PANIC_SW_DIV_ZERO);
+	zassert_equal(info, 0x12);
+	zassert_equal(exception, 0x34);
+}
+
+ZTEST(panic, test_panic_data_init__invalid_sw_reason_watchdog)
+{
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+
+	panic_set_reason(0, 0x12, 0x34);
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+	panic_get_reason(&reason, &info, &exception);
+
+	if (IS_ENABLED(SECTION_IS_RW)) {
+		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
+		zassert_equal(info, 0);
+		zassert_equal(exception, 0);
+	} else {
+		zassert_equal(reason, 0);
+		zassert_equal(info, 0x12);
+		zassert_equal(exception, 0x34);
+	}
 }
