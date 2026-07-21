@@ -74,6 +74,13 @@ config PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
 	help
 	  Signal new console logs with a host event.
 
+config PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
+	bool "Report dropped console logs"
+	default y
+	help
+	  Report dropped console logs in the console buffer when logs
+	  are dropped due to ISR, mutex timeout, or buffer overflow.
+
 endif # PLATFORM_EC_HOSTCMD_CONSOLE
 
 menuconfig PLATFORM_EC_CONSOLE_DEBUG

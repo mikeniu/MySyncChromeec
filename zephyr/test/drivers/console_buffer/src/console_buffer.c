@@ -56,6 +56,7 @@ ZTEST_USER(console, test_buf_notify_null)
 	zassert_equal(write_count, 4, "got %d", write_count);
 }
 
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
 ZTEST_USER(console, test_buf_dropped_logs)
 {
 	char buffer[200];
@@ -110,6 +111,7 @@ ZTEST_USER(console, test_buf_dropped_logs)
 		      "total_drops mismatch: %u != %u + %u + %u", total_drops,
 		      drops_isr, drops_mutex, drops_overflow);
 }
+#endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS */
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
 ZTEST_USER(console, test_buf_notify_event)
