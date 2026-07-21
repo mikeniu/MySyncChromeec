@@ -537,6 +537,15 @@ tests:
     - prj.conf
     - console_cmd_mfallow/prj.conf
     - ec_host_cmd.conf
+  drivers.console_buffer:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_CONSOLE_BUFFER=y
+    extra_conf_files:
+    - prj.conf
+    - default/prj.conf
+    extra_dtc_overlay_files:
+    - default/boards/native_sim.overlay
+
   drivers.cros_flash:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CROS_FLASH=y
