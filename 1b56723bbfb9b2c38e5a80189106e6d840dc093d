@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90171571_3455c577",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-21T15:45:30Z",
+      "side": 1,
+      "message": "Can is_log_line_start be used here?",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d5efbf6_7c0fddbd",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-21T15:45:30Z",
+      "side": 1,
+      "message": "Is atomic_inc needed if console_write_lock is held?",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a58a3f0_0dc128a5",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-21T15:45:30Z",
+      "side": 1,
+      "message": "What\u0027s the reasoning with the brackets?",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e8c3c68_8152b872",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-21T15:45:30Z",
+      "side": 1,
+      "message": "Does this fail to compile if IS_ENABLED is used instead?",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "394894bc_7f90df7d",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-21T15:45:30Z",
+      "side": 1,
+      "message": "This while loop is similar to the while loop below, consider making it a function.",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8647f98_01463a16",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-21T15:45:30Z",
+      "side": 1,
+      "message": "Why is this changed to a while?",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
