@@ -16,6 +16,24 @@
       "message": "This will essentially disables the `battery` command in S0 since we dont have SoCCP now.",
       "revId": "223338ee0b6626fb158783a63b0ac4e7b5150a12",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3abeca3_9871cc59",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-07-21T10:57:21Z",
+      "side": 1,
+      "message": "That is correct; however, without this change, bus noise could potentially trigger bus errors. Although we have not yet verified this on the hardware side, I believe enabling target mode should mitigate the issue until we have SOCCP loaded.\n\n```\nBus error occurred on i2c i2c@40017000::00!\n```",
+      "parentUuid": "a17a8d2f_a25b4a00",
+      "revId": "223338ee0b6626fb158783a63b0ac4e7b5150a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
