@@ -56,16 +56,16 @@ static int board_ap_power_action_g3_run(void *data)
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		power_signal_set(PWR_EN_PP5000_A, 1);
 
-		/* Indication to soc on recovery boot */
-		if (system_is_manual_recovery()) {
-			gpio_pin_set_dt(
-				GPIO_DT_FROM_NODELABEL(gpio_cse_early_rec_sw),
-				1);
-		} else {
-			gpio_pin_set_dt(
-				GPIO_DT_FROM_NODELABEL(gpio_cse_early_rec_sw),
+		LOG_INF("G3 exit: manual_recovery=%d reset_flags=0x%x jumped_late=%d (cse_early_rec_sw kept low)",
+			system_is_manual_recovery(), system_get_reset_flags(),
+			system_jumped_late());
+
+		/*
+		 * Always keep this deasserted so CSE cannot distinguish a
+		 * recovery boot from a normal boot.
+		 */
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_cse_early_rec_sw),
 				0);
-		}
 
 		update_ap_boot_time(ARAIL);
 	}
