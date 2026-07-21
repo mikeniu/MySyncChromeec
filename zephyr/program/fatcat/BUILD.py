@@ -112,10 +112,6 @@ register_it8xxx2_project(
     ],
 )
 
-register_npcx9_project(
-    project_name="francka",
-    zephyr_board="npcx9/npcx9m7f",
-)
 
 register_npcx9_project(
     project_name="ruby",
@@ -205,7 +201,6 @@ register_ish_project(
 # must not change after the first RO release.
 assert_rw_fwid_DO_NOT_EDIT(project_name="fatcatrvp-npcx", addr=0x80144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="fatcatrvp-ite", addr=0x60098)
-assert_rw_fwid_DO_NOT_EDIT(project_name="francka", addr=0x80144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ruby", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="kinmen", addr=0x60098)
 assert_rw_fwid_DO_NOT_EDIT(project_name="lapis", addr=0x80404)

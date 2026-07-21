@@ -1292,16 +1292,6 @@ config_fatcat() {
 
 
   case "${model}" in
-    (francka)
-      # FPMCU FPS_RST_N(RST_ODL) is on GPP_H17 = 626 + 17
-      readonly GPIO_NRST=17
-
-      # FPMCU FPMCU_FW_UPDATE(BOOT0) is on GPP_F20 = 560 + 20
-      readonly GPIO_BOOT0=20
-
-      # FPMCU_PWREN(FP_PWR_EN) is on GPP_H03 = 626 + 3
-      readonly GPIO_PWREN=3
-      ;;
     *)
       # FPMCU FPS_RST_N(RST_ODL) is on GPP_C15 = 24 + (39 - 24) = 39
       readonly GPIO_NRST=39

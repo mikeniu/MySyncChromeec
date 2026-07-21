@@ -16,19 +16,6 @@ if(DEFINED CONFIG_BOARD_FATCATRVP_ITE)
 	add_subdirectory(fatcatrvp-ite)
 endif()
 
-if(DEFINED CONFIG_BOARD_FRANCKA)
-	project(francka)
-	add_subdirectory(francka)
-	zephyr_include_directories("francka/include")
-	zephyr_library_sources(
-			"francka/src/touch_panel.c"
-			"francka/src/board_power.c"
-			"francka/src/alt_charger.c"
-	)
-	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION
-	"francka/src/keyboard_customization.c"
-	)
-endif()
 
 
 if(DEFINED CONFIG_BOARD_KINMEN)

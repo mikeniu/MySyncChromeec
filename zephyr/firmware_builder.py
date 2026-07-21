@@ -61,7 +61,6 @@ SPECIAL_BOARDS = [
     # Fatcat variants
     "fatcatrvp-npcx",
     "fatcatrvp-ite",
-    "francka",
     # Nissa variants
     "nereid",
     "nivviks",
