@@ -150,8 +150,8 @@ CHIP_MK_INCLUDED_ONCE := 1
 CODESIGNER_PATH := $(abspath ../cr50-utils/software/tools/codesigner)
 
 # Try to find preinstalled or pre-built codesigner
-SIGNER := $(firstword $(wildcard /usr/bin/cr50-codesigner\
-	    $(CODESIGNER_PATH)/codesigner))
+SIGNER := $(firstword $(wildcard $(CODESIGNER_PATH)/codesigner) \
+  /usr/bin/cr50-codesigner)
 
 SANITIZE_MANIFEST := $(abspath \
 		     ../gsc-utils$(BRANCH_EXT)/util/convert_signing_json.sh)
