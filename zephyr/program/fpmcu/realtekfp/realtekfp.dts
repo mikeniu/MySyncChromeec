@@ -189,3 +189,7 @@ zephyr_udc0: &usb {
 &trng {
 	status = "okay";
 };
+
+&ocotp {
+	status = "okay";
+};
