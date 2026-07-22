@@ -536,12 +536,41 @@ static void power_button_pulse_setting_reset(void)
 	power_button_pulse_enabled = 1;
 }
 
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+/*
+ * Handle power button suspend transition for keyboard-matrix power buttons.
+ *
+ * If the power button is physically held during suspend entry, we must
+ * force the PCH power button signal to high (released) to prevent the AP
+ * from seeing a stuck button on resume (which could cause wake loops).
+ *
+ * We check the raw physical state using power_button_signal_asserted()
+ * because the S0 tablet mode suppression logic overrides the debounced
+ * state to 0 (released) to hide the press from the AP, making
+ * power_button_is_pressed() unreliable here.
+ */
+static void power_button_suspend(void)
+{
+	power_button_pulse_setting_reset();
+
+	if (power_button_signal_asserted()) {
+		CPRINTS("PB held during suspend, forcing PCH release");
+		set_pwrbtn_to_pch(1, 0);
+		pwrbtn_state = PWRBTN_STATE_IDLE;
+	}
+}
+#endif /* CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD */
+
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, power_button_pulse_setting_reset,
 	     HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, power_button_pulse_setting_reset,
 	     HOOK_PRIO_DEFAULT);
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, power_button_suspend, HOOK_PRIO_DEFAULT);
+#else
 DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, power_button_pulse_setting_reset,
 	     HOOK_PRIO_DEFAULT);
+#endif /* CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD */
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, power_button_pulse_setting_reset,
 	     HOOK_PRIO_DEFAULT);
 
