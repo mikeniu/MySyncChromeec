@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e20c1347_1f481e7e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-22T03:17:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/4379a5cf-e918-4ba0-ba88-f200b801a7a1)]\n\n**Review Summary**:\n*   **Functionality:** The changes successfully consolidate memory freeing by merging `plat_free` and `PLAT_FREE` into a single function. The implementation safely handles freeing by utilizing `sys_free` and sets the pointer to `NULL`.\n*   **Style:** The function naming conforms to the standard C `snake_case` style, and the documentation in the header file is properly merged and descriptive.\n*   **Security:** By nullifying the pointer after freeing, the code prevents potential use-after-free and double-free vulnerabilities. The `assert(x !\u003d NULL)` correctly guards against null references.\n*   **Testing:** The unit tests in `egis630.c` have been updated for the renamed function, and a new test case verifies the safe handling of `NULL` pointers.\n\nTAG\u003dagy\nCONV\u003de891e369-5f2c-4a62-ae87-a4a61b86dab9",
+      "isAi": true,
+      "revId": "6d2f759680fe79f0d0dfd8c8499d90581ff3cec9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
