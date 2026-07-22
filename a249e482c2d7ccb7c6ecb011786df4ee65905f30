@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba5831f8_e45c7a4a",
+        "filename": "common/build.mk",
+        "patchSetId": 8
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-07-22T10:45:57Z",
+      "side": 1,
+      "message": "Is this necessary? I think I2C_PASSTHRU_RESTRICTED and virtual battery are two independent features and shouldn\u0027t be bound together.",
+      "revId": "a249e482c2d7ccb7c6ecb011786df4ee65905f30",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
