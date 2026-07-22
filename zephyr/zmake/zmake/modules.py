@@ -141,7 +141,9 @@ known_modules = {
     "fpc": lambda name, checkout: (
         checkout / "src" / "platform" / "fingerprint" / "fpc"
     ),
-    "google-private": third_party_module,
+    "google-private": lambda name, checkout: (
+        checkout / "src" / "third_party" / "zephyr" / "google-private"
+    ),
     "hal_egis": lambda name, checkout: (
         checkout
         / "src"
