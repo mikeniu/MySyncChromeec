@@ -91,6 +91,7 @@ int chip_i2c_xfer(const int port, const uint16_t addr_flags, const uint8_t *out,
 	return EC_ERROR_UNKNOWN;
 }
 
+/* LCOV_EXCL_START */
 int chip_i2c_set_freq(int port, enum i2c_freq freq)
 {
 	return EC_ERROR_UNIMPLEMENTED;
@@ -105,3 +106,4 @@ void i2c_init(void)
 {
 	/* We don't actually need to initialize anything here for host tests */
 }
+/* LCOV_EXCL_STOP */
