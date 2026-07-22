@@ -10,6 +10,11 @@
 #include "system.h"
 #include "watchdog.h"
 
+#if defined(SECTION_IS_RO) && defined(SECTION_IS_RW)
+#error "Both SECTION_IS_RO and SECTION_IS_RW are defined!"
+#endif
+
+
 #include <zephyr/device.h>
 #include <zephyr/logging/log.h>
 
