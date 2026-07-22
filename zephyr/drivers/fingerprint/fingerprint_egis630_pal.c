@@ -192,8 +192,13 @@ void *plat_alloc(size_t size)
 
 void PLAT_FREE(void **x)
 {
-	assert(x != NULL && *x != NULL);
-	plat_free(*x);
+	if (x == NULL) {
+		LOG_ERR("Error - %s called with NULL double pointer.",
+			__func__);
+		return;
+	}
+
+	sys_free(*x);
 	*x = NULL;
 }
 
