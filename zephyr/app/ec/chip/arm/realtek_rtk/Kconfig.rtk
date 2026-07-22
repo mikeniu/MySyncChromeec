@@ -56,6 +56,7 @@ config MAIN_STACK_SIZE
 
 # Preserve ESPI driver data across sysjumps
 config ESPI_RTS5912_PRESERVED_DATA_HOOKS
+	bool "Preserve ESPI driver data across sysjumps"
 	default y if ESPI_RTS5912
 
 endif # SOC_SERIES_RTS5912
