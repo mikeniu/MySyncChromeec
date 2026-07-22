@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9fef9da_45dae7a7",
+        "filename": "zephyr/subsys/ap_pwrseq/ap_power_interface.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-22T22:43:50Z",
+      "side": 1,
+      "message": "This CL overall is pretty big.  Can you break it down to separate CLs for each function or function group that logically belongs together?",
+      "range": {
+        "startLine": 165,
+        "startChar": 5,
+        "endLine": 165,
+        "endChar": 28
+      },
+      "revId": "1842666f8edacfe61d6885bce203d3089bea5003",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da2cd3e2_f634c7df",
+        "filename": "zephyr/subsys/ap_pwrseq/ap_power_interface.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-22T22:43:50Z",
+      "side": 1,
+      "message": "This is a functional change.  Can you move this to a separate CL?",
+      "range": {
+        "startLine": 216,
+        "startChar": 5,
+        "endLine": 216,
+        "endChar": 26
+      },
+      "revId": "1842666f8edacfe61d6885bce203d3089bea5003",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec9d89e2_8ee24761",
+        "filename": "zephyr/subsys/ap_pwrseq/ap_power_interface.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-22T22:43:50Z",
+      "side": 1,
+      "message": "Move this and the static variable inside the #ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND block below.\n\nIf there are only a few callers (3 or less), then guard at the calling site with `if (IS_ENABLED(CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND))` and you can avoid the stub implementation.",
+      "range": {
+        "startLine": 228,
+        "startChar": 5,
+        "endLine": 228,
+        "endChar": 27
+      },
+      "revId": "1842666f8edacfe61d6885bce203d3089bea5003",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c5b771f_24963d03",
+        "filename": "zephyr/subsys/ap_pwrseq/ap_power_interface.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-22T22:43:50Z",
+      "side": 1,
+      "message": "As a followup, switch this to the Zephyr shell API.",
+      "range": {
+        "startLine": 259,
+        "startChar": 0,
+        "endLine": 259,
+        "endChar": 23
+      },
+      "revId": "1842666f8edacfe61d6885bce203d3089bea5003",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
