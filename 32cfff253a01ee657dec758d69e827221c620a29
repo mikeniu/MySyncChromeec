@@ -16,6 +16,24 @@
       "message": "Should we also update keyboard_customization.c?",
       "revId": "32cfff253a01ee657dec758d69e827221c620a29",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ae78d91_b98818d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-22T06:56:42Z",
+      "side": 1,
+      "message": "In EC, UK runtime key same as US runtime key, so we don\u0027t need to update keyboard_customization.c",
+      "parentUuid": "a5a7419e_a5366a12",
+      "revId": "32cfff253a01ee657dec758d69e827221c620a29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
