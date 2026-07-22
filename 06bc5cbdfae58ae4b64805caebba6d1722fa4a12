@@ -37,6 +37,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04a23d92_bf3f9eaa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-22T03:13:41Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "62bbbc1d_e45fde53",
+      "revId": "06bc5cbdfae58ae4b64805caebba6d1722fa4a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cbfb87d_75a85855",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-22T03:13:41Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4882bc53_38eb62bf",
+      "revId": "06bc5cbdfae58ae4b64805caebba6d1722fa4a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "971fb22e_8a9c227c",
@@ -69,6 +105,42 @@
       "side": 1,
       "message": "[Gerrit AI Review] Since `sys_free` safely handles `NULL` pointers (as noted in its implementation on line 147), the `if (*x !\u003d NULL)` check is technically redundant. You could simplify this function by unconditionally calling `sys_free(*x);` and `*x \u003d NULL;`.",
       "isAi": true,
+      "revId": "06bc5cbdfae58ae4b64805caebba6d1722fa4a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1aa2826f_31cd05d0",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-22T03:13:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "971fb22e_8a9c227c",
+      "revId": "06bc5cbdfae58ae4b64805caebba6d1722fa4a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c11b6e8b_668c26ed",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-22T03:13:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "81586174_b4c8b913",
       "revId": "06bc5cbdfae58ae4b64805caebba6d1722fa4a12",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
