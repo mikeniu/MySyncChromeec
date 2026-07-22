@@ -1,0 +1,45 @@
+# Copyright 2022 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config PLATFORM_EC_PERIPHERAL_CHARGER
+	bool "Enable peripheral charger task"
+	help
+	  Enable peripheral charger task.
+
+if PLATFORM_EC_PERIPHERAL_CHARGER
+
+config PLATFORM_EC_CPS8100
+	bool "Use CPS8100 driver"
+	help
+	  Use CPS8100 driver. CPS8100 is a Qi wireless power transmitter.
+
+config PLATFORM_EC_CTN730
+	bool "Use CTN730 driver"
+	help
+	  Use CTN730 driver. CTN730 is a nfc wireless power transmitter.
+
+config PLATFORM_EC_WPC_HALL_ENABLE
+	bool "Enable WPC HALL control function"
+	help
+	  Enable support for the WPC HALL controller power on/off function.
+
+config PLATFORM_EC_WPC_HALL_DEBOUNCE_US
+	int "WPC Hall debounce delay (microseconds)"
+	default 30000
+	help
+	  Set the Hall delay used to control WPC power.
+
+config PLATFORM_EC_WPC_AC_S5_CHARGE
+	bool "Enable WPC AC S5 charge feature"
+	help
+	  Enable AC S5 charge feature for the WPC.
+
+config PLATFORM_EC_PERIPHERAL_CHARGER_UPDATE
+	bool "Enable peripheral charger update host command"
+	depends on PLATFORM_EC_SYSTEM_UNLOCKED
+	help
+	  Enable peripheral charger firmware update host command
+	  (EC_CMD_PCHG_UPDATE).
+
+endif # PLATFORM_EC_PERIPHERAL_CHARGER
