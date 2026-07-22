@@ -180,10 +180,10 @@ static void copy_battery_info_string(uint8_t *dst, const uint8_t *src, int len)
 int virtual_battery_operation(const uint8_t *batt_cmd_head, uint8_t *dest,
 			      int read_len, int write_len)
 {
-	int val;
-	int year, month, day;
+	int val = 0;
+	int year = 0, month = 0, day = 0;
 #ifdef CONFIG_BATTERY_SMART
-	char str[32];
+	char str[32] = {};
 #endif
 	/*
 	 * We cache battery operational mode locally for both read and write
