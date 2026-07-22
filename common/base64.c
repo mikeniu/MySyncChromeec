@@ -48,7 +48,7 @@ static void encodeblock(const uint8_t *in, uint8_t *out, size_t len)
 	 * sure partial bit quantities are mapped too in case input is shorter
 	 * than 3 bytes.
 	 */
-	limit = ((len * 8) + 7) / 6;
+	limit = ((len * 8) + 5) / 6;
 	for (i = 0; i < limit; i++) {
 		int index = (input >> (26 - i * 6)) & 0x3f;
 
