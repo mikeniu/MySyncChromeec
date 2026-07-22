@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "6d2f759680fe79f0d0dfd8c8499d90581ff3cec9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce252d90_5b6cd9ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-22T03:18:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/6caf1c72-f3d4-48d4-b9d2-c49249c2bdd6)]\n\n**Review Summary**:\n*   **Functionality:** The changes successfully combine `plat_free` and `PLAT_FREE` into a single `plat_free(void **x)` function. Removing the strict `assert(*x !\u003d NULL)` allows for safely freeing unallocated pointers, which is a standard pattern for error cleanup.\n*   **Style:** The naming convention has correctly adopted standard C `snake_case` for functions. The docstring was properly merged and explicitly describes the new behavior.\n*   **Security:** Automatically nullifying the pointer after freeing it effectively mitigates use-after-free vulnerabilities. Passing an unallocated `NULL` pointer is now also handled securely without triggering crashes.\n*   **Testing:** The existing test case was properly updated, and the new `test_plat_free_null` was added to verify `NULL` pointer handling. The test coverage is comprehensive.\n\nTAG\u003dagy\nCONV\u003d6caf1c72-f3d4-48d4-b9d2-c49249c2bdd6",
+      "isAi": true,
+      "revId": "6d2f759680fe79f0d0dfd8c8499d90581ff3cec9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
