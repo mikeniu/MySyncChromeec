@@ -52,6 +52,24 @@
       "parentUuid": "6ae78d91_b98818d5",
       "revId": "32cfff253a01ee657dec758d69e827221c620a29",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b197c6cd_96037dae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-07-22T08:12:17Z",
+      "side": 1,
+      "message": "If bit 8 is set to 1 (indicating a UK keyboard), bits 6:5 will be 00, which allows the EC to use the default keyboard configuration.",
+      "parentUuid": "cf9de18b_05b25378",
+      "revId": "32cfff253a01ee657dec758d69e827221c620a29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
