@@ -36,6 +36,23 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "046c9534_f13df3d8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1577857
+      },
+      "writtenOn": "2026-07-22T18:15:37Z",
+      "side": 1,
+      "message": "I have captured the new macro as comments.\nCould you help change and give a build?",
+      "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee4a044e_9eef7f05",
@@ -67,6 +84,57 @@
       "side": 1,
       "message": "@scott.worley@microchip.corp-partner.google.com there are missing defines in the [mec_qmspi.h](https://github.com/zephyrproject-rtos/zephyr/blob/main/soc/microchip/mec/common/reg/mec_qmspi.h) file. The [mec172x_qspi.h](https://github.com/zephyrproject-rtos/zephyr/blob/main/soc/microchip/mec/mec172x/reg/mec172x_qspi.h) is never included anymore and probably should be removed as other ones in this [CL](https://chromium-review.git.corp.google.com/c/chromiumos/third_party/zephyrproject/+/8071708/1)",
       "parentUuid": "ee4a044e_9eef7f05",
+      "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e1cec1b_21b41037",
+        "filename": "zephyr/shim/chip/mchp/system_download_from_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1577857
+      },
+      "writtenOn": "2026-07-22T18:15:37Z",
+      "side": 1,
+      "message": "Could you help replace above with new macro?\n\n#define QSPI_STATUS_DONE (BIT(XEC_QSPI_SR_XFR_DONE_POS) | BIT(XEC_QSPI_SR_DMA_DONE_POS))",
+      "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5de26bf9_1fd6bcfe",
+        "filename": "zephyr/shim/chip/mchp/system_download_from_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1577857
+      },
+      "writtenOn": "2026-07-22T18:15:37Z",
+      "side": 1,
+      "message": "#define QSPI_STATUS_ERR \\\n\t(BIT(XEC_QSPI_SR_TXB_ERR_POS) | BIT(XEC_QSPI_SR_RXB_ERR_POS) | \\\n\t BIT(XEC_QSPI_SR_PROG_ERR_POS) | BIT(XEC_QSPI_SR_LDMA_RX_ERR_POS))",
+      "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58dfa913_719c9946",
+        "filename": "zephyr/shim/chip/mchp/system_download_from_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1577857
+      },
+      "writtenOn": "2026-07-22T18:15:37Z",
+      "side": 1,
+      "message": "qspi-\u003eEXE \u003d BIT(XEC_QSPI_EXE_START_POS);",
       "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
