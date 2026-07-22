@@ -3778,6 +3778,11 @@
 #undef CONFIG_PERIPHERAL_CHARGER
 
 /*
+ * Enable peripheral charger firmware update host command
+ */
+#undef CONFIG_PERIPHERAL_CHARGER_UPDATE
+
+/*
  * Enable CTN730 driver
  *
  * CTN730 is NXP's NFC/WLC power transmitter (a.k.a. poller).
