@@ -27,6 +27,16 @@
 #define __THROW
 #endif
 
+#ifndef HOST_TOOLS_BUILD
+#if defined(SECTION_IS_RO) && defined(SECTION_IS_RW)
+#error "Both SECTION_IS_RO and SECTION_IS_RW are defined!"
+#endif
+
+#if !defined(SECTION_IS_RO) && !defined(SECTION_IS_RW)
+#error "Neither SECTION_IS_RO nor SECTION_IS_RW is defined!"
+#endif
+#endif /* !HOST_TOOLS_BUILD */
+
 /*
  * Define a new macro (FIXED_SECTION) to abstract away the linker details
  * between platform/ec builds and Zephyr. Each build has a slightly different
