@@ -1,0 +1,16 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+if PLATFORM_EC
+
+config RTKFP_OTP_KEY
+	bool "Enable Realtek FP OTP Key functionality"
+	depends on BORINGSSL_CRYPTO
+	depends on OTP
+	select OTP_PROGRAM
+	help
+	  Enable support for reading and provisioning the OTP KEY for
+	  Realtek rtkfp SOCs.
+
+endif # PLATFORM_EC
