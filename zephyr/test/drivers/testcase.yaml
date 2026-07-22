@@ -2,8 +2,10 @@ common:
   platform_allow:
   - native_sim
 tests:
-  drivers.default:
+  drivers.default: &drivers_default
     timeout: 360
+    extra_args:
+    - EXTRA_CFLAGS=-DSECTION_IS_RO
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT=y
     - CONFIG_LINK_TEST_SUITE_USB_MALFUNCTION_SINK=y
@@ -19,6 +21,10 @@ tests:
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
     - default/boards/touchpad.dtsi
+  drivers.default.rw:
+    <<: *drivers_default
+    extra_args:
+    - EXTRA_CFLAGS=-DSECTION_IS_RW
   drivers.default.dp21:
     timeout: 360
     extra_configs:
