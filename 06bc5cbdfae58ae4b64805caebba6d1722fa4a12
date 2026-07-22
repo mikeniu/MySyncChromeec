@@ -21,6 +21,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "62bbbc1d_e45fde53",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-22T02:49:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/52fcea3c-7785-4093-ae8f-382b88722a44)]\n\n**Review Summary**\n* **Functionality**: The changes correctly relax the assertion in `PLAT_FREE` to allow safe no-op cleanup when `*x` is NULL. This will prevent assertions during error handling.\n* **Security**: No security vulnerabilities identified. The change improves robustness by safely handling NULL pointers.\n* **Style**: I left a minor inline suggestion to consider removing the redundant `if (*x !\u003d NULL)` check, as `sys_free` already handles NULL natively.\n* **Consistency**: The code remains consistent with the rest of the file. Changing `plat_free` to `sys_free` directly within the PAL is acceptable here.",
+      "isAi": true,
+      "revId": "06bc5cbdfae58ae4b64805caebba6d1722fa4a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "971fb22e_8a9c227c",
         "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
         "patchSetId": 1
@@ -32,6 +50,24 @@
       "writtenOn": "2026-07-22T02:49:44Z",
       "side": 1,
       "message": "[Gerrit AI Review] Since `sys_free` safely handles `NULL` pointers (as noted in its implementation), the `if (*x !\u003d NULL)` check is slightly redundant. It is completely safe either way, but you could simplify this to just:\n\n```c\nsys_free(*x);\n*x \u003d NULL;\n```",
+      "isAi": true,
+      "revId": "06bc5cbdfae58ae4b64805caebba6d1722fa4a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81586174_b4c8b913",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-22T02:49:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `sys_free` safely handles `NULL` pointers (as noted in its implementation on line 147), the `if (*x !\u003d NULL)` check is technically redundant. You could simplify this function by unconditionally calling `sys_free(*x);` and `*x \u003d NULL;`.",
       "isAi": true,
       "revId": "06bc5cbdfae58ae4b64805caebba6d1722fa4a12",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
