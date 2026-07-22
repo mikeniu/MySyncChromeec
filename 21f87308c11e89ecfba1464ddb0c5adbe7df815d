@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7afe08a3_aa8e2834",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx/handlers/x86_non_dsx_adlp_pwrseq_sm.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-22T22:17:58Z",
+      "side": 1,
+      "message": "Should `x86_non_dsx_` be dropped from the basename since this is now in the path?\n\nI\u0027m okay with either approach.",
+      "revId": "21f87308c11e89ecfba1464ddb0c5adbe7df815d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
