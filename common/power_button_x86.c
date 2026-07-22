@@ -536,12 +536,22 @@ static void power_button_pulse_setting_reset(void)
 	power_button_pulse_enabled = 1;
 }
 
+static void power_button_suspend(void)
+{
+	power_button_pulse_setting_reset();
+
+	if (power_button_is_pressed()) {
+		CPRINTS("PB held during suspend, forcing PCH release");
+		set_pwrbtn_to_pch(1, 0);
+		pwrbtn_state = PWRBTN_STATE_EAT_RELEASE;
+	}
+}
+
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, power_button_pulse_setting_reset,
 	     HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, power_button_pulse_setting_reset,
 	     HOOK_PRIO_DEFAULT);
-DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, power_button_pulse_setting_reset,
-	     HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, power_button_suspend, HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, power_button_pulse_setting_reset,
 	     HOOK_PRIO_DEFAULT);
 

@@ -16,6 +16,7 @@
 #include "lid_switch.h"
 #include "power_button.h"
 #include "system.h"
+#include "tablet_mode.h"
 #include "task.h"
 #include "timer.h"
 #include "util.h"
@@ -44,6 +45,7 @@ static volatile struct press_config {
 /* Debounced power button state */
 test_export_static int debounced_power_pressed;
 static int simulate_power_pressed;
+static int power_button_pressed_forwarded;
 static volatile int power_button_is_stable = 1;
 
 static const struct button_config power_button = {
@@ -218,7 +220,23 @@ static void power_button_change_deferred(void);
 DECLARE_DEFERRED(power_button_change_deferred);
 static void power_button_change_deferred(void)
 {
-	const int new_pressed = raw_power_button_pressed();
+	const int raw_pressed = raw_power_button_pressed();
+	int new_pressed = raw_pressed;
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD)) {
+		if (chipset_in_state(CHIPSET_STATE_ON) && tablet_get_mode()) {
+			/* S0 Tablet Mode: Suppress power button unless it was
+			 * already pressed and forwarded.
+			 */
+			if (new_pressed) {
+				new_pressed = 0;
+				CPRINTS("PB press suppressed in S0 tablet mode");
+			} else if (!power_button_pressed_forwarded) {
+				new_pressed = 0;
+				CPRINTS("PB release suppressed in S0 tablet mode");
+			}
+		}
+	}
 
 #ifdef CONFIG_PLATFORM_EC_BTN_IGN_IN
 	int ignore_us = btn_ign_in_get_remaining_time(new_pressed);
@@ -243,6 +261,12 @@ static void power_button_change_deferred(void)
 
 	debounced_power_pressed = new_pressed;
 	power_button_is_stable = 1;
+
+	if (new_pressed) {
+		power_button_pressed_forwarded = 1;
+	} else {
+		power_button_pressed_forwarded = 0;
+	}
 
 	CPRINTS("%s %s", power_button.name,
 		new_pressed ? "pressed" : "released");
