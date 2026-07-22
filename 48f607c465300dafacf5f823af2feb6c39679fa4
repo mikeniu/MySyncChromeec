@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc507b09_907e1895",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3322325
+      },
+      "writtenOn": "2026-07-22T15:50:50Z",
+      "side": 1,
+      "message": "@kamilplucinski@google.com asked to merged it as he is OOO today",
+      "revId": "48f607c465300dafacf5f823af2feb6c39679fa4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
