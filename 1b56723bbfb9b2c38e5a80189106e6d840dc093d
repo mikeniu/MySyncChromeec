@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6682aa25_3052a2ec",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-22T15:28:44Z",
+      "side": 1,
+      "message": "It can get a little confusing using that here, needing to check either the end or start indicies. I refactored a bit and added a comment describing what\u0027s being checked here.\n\nFor plain text logging, we need to check the last character of the log.  For tokenized logging, we check for the start character of a token.  We need to return the `idx` of the start of the next log.",
+      "parentUuid": "90171571_3455c577",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d5efbf6_7c0fddbd",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-21T15:45:30Z",
       "side": 1,
       "message": "Is atomic_inc needed if console_write_lock is held?",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "041d9a31_fb072726",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-22T15:28:44Z",
+      "side": 1,
+      "message": "Not necessarily, but it keeps it consistent with the other drop counters.",
+      "parentUuid": "8d5efbf6_7c0fddbd",
       "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -52,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4297c70_b3916ea9",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-22T15:28:44Z",
+      "side": 1,
+      "message": "So I could tell if my tokenized (non-bracketed) log was working 😊.  Good catch",
+      "parentUuid": "4a58a3f0_0dc128a5",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e8c3c68_8152b872",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-07-21T15:45:30Z",
       "side": 1,
       "message": "Does this fail to compile if IS_ENABLED is used instead?",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15f91aad_59434181",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-22T15:28:44Z",
+      "side": 1,
+      "message": "Yes, as the macro isn\u0027t defined.",
+      "parentUuid": "6e8c3c68_8152b872",
       "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -86,6 +158,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf6cca6e_8c66dcd5",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-22T15:28:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "394894bc_7f90df7d",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8647f98_01463a16",
@@ -99,6 +189,24 @@
       "writtenOn": "2026-07-21T15:45:30Z",
       "side": 1,
       "message": "Why is this changed to a while?",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05dbfd62_d7853840",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-22T15:28:44Z",
+      "side": 1,
+      "message": "Without dropped logs, the above check line 281 bailed us out early.  With dropped log insertion, we can come here after a mid log flushing and there might not be any more to read.",
+      "parentUuid": "a8647f98_01463a16",
       "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
