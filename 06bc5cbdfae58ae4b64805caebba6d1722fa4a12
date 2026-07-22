@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4882bc53_38eb62bf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-22T02:49:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/608a3166-e86d-4d92-b798-46b11629bcb6)]\n\n**Review Summary:**\n* **Functionality:** The change correctly relaxes the assertion, allowing safe cleanup of `NULL` pointers without triggering a crash. The logic behaves safely as intended.\n* **Security:** No security issues are introduced by this patch.\n* **Style:** Code style conforms to expectations. An inline suggestion is provided to remove a slightly redundant check, since `sys_free` safely handles `NULL` pointers natively.\n* **Testing:** The tests are sufficient and the patch enables safe teardown in error paths.",
+      "isAi": true,
+      "revId": "06bc5cbdfae58ae4b64805caebba6d1722fa4a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "971fb22e_8a9c227c",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-22T02:49:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `sys_free` safely handles `NULL` pointers (as noted in its implementation), the `if (*x !\u003d NULL)` check is slightly redundant. It is completely safe either way, but you could simplify this to just:\n\n```c\nsys_free(*x);\n*x \u003d NULL;\n```",
+      "isAi": true,
+      "revId": "06bc5cbdfae58ae4b64805caebba6d1722fa4a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
