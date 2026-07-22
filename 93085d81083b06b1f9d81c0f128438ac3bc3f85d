@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c657f74_29cbf1e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-22T17:06:16Z",
+      "side": 1,
+      "message": "@li1.feng@intel.com This isn\u0027t the real solution to the linking failure, but it should unblock you temporarily. The resulting EC build is superficially stable.",
+      "revId": "93085d81083b06b1f9d81c0f128438ac3bc3f85d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
