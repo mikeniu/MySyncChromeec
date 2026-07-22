@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1db9ed70_bb636ca7",
+        "filename": "zephyr/program/skywalker/jaina/src/keyboard_customization.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-07-22T10:09:20Z",
+      "side": 1,
+      "message": "This could cause issues if you need a 6th locale later on; a better way is to combine bits 5, 6, and 8 into a 3-bit integer, as the kernel does.",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 1
+      },
+      "revId": "53352f3c34ba79ed5d4df2f942f4617d5c3dade1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
