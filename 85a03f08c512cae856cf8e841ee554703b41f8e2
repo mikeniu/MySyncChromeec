@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a6197bd_6a9ca9da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-22T07:15:46Z",
+      "side": 1,
+      "message": "@herman.lin@emc.com.tw please add Verified +1 once verified.",
+      "revId": "85a03f08c512cae856cf8e841ee554703b41f8e2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
