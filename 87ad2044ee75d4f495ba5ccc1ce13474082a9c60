@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "87ad2044ee75d4f495ba5ccc1ce13474082a9c60",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6783ebdb_d48f4b52",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-22T02:52:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/f9f9c46e-eb0a-4db1-b2bf-0f286d02ad86)]\n\n**Review Summary**:\n*   **Functionality:** The changes successfully combine `plat_free` and `PLAT_FREE` into a single `plat_free(void **x)` function. The `NULL` check before freeing is handled properly.\n*   **Style:** The naming convention correctly uses `snake_case`. The docstring in the header file was appropriately merged.\n*   **Security:** Setting the freed pointer to `NULL` mitigates use-after-free vulnerabilities.\n*   **Testing:** The tests in `egis630.c` were properly updated and extended with the `test_plat_free_null` case to verify `NULL` pointer handling.\n\nTAG\u003dagy\nCONV\u003d5b53535f-2223-46c8-8ba6-329ad98cdc55",
+      "isAi": true,
+      "revId": "87ad2044ee75d4f495ba5ccc1ce13474082a9c60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
