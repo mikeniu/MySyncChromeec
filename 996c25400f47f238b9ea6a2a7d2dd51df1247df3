@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a71371ef_344ea8b5",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 4856743
+      },
+      "writtenOn": "2026-07-22T20:33:07Z",
+      "side": 1,
+      "message": "We don\u0027t seem to be using raw_pressed again after the next line.  Is there a reason we need to keep the read-only value?  Or can we just assign to new_pressed directly?",
+      "range": {
+        "startLine": 223,
+        "startChar": 11,
+        "endLine": 223,
+        "endChar": 22
+      },
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8eb54d3d_5feb084e",
+        "filename": "common/power_button_x86.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 531,
+      "author": {
+        "id": 4856743
+      },
+      "writtenOn": "2026-07-22T20:33:07Z",
+      "side": 1,
+      "message": "Does this comment need an update?",
+      "range": {
+        "startLine": 529,
+        "startChar": 14,
+        "endLine": 531,
+        "endChar": 18
+      },
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
