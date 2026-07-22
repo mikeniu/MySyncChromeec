@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98f40044_f83797eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-22T21:01:03Z",
+      "side": 1,
+      "message": "Just minor nits remain.",
+      "revId": "1245103d040cb63623c2eb2be0a6b1f3117bdebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc581b10_e8254324",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-22T21:01:03Z",
+      "side": 1,
+      "message": "\"physical sink removal or connection of AC power\".",
+      "range": {
+        "startLine": 296,
+        "startChar": 36,
+        "endLine": 296,
+        "endChar": 79
+      },
+      "revId": "1245103d040cb63623c2eb2be0a6b1f3117bdebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ca864be_024d33f7",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-22T21:01:03Z",
+      "side": 1,
+      "message": "Guard this call and you can drop the stub implementation above.\n```suggestion\n#ifdef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING\n\tpdc_dpm_clear_battery_overload(port);\n#endif\n```",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 348,
+        "endChar": 38
+      },
+      "revId": "1245103d040cb63623c2eb2be0a6b1f3117bdebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48bdaac3_85634e5b",
+        "filename": "zephyr/test/pdc/src/pdc_policy/src_policy_battery_overload.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-22T21:01:03Z",
+      "side": 1,
+      "message": "Add a build assert that the current limit is 4500 mA and the power limit is 41000 mW because that is assumed by all the tests.",
+      "revId": "1245103d040cb63623c2eb2be0a6b1f3117bdebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
