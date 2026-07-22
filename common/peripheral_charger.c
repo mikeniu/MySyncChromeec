@@ -936,6 +936,7 @@ int pchg_get_next_event(uint8_t *out)
 }
 DECLARE_EVENT_SOURCE(EC_MKBP_EVENT_PCHG, pchg_get_next_event);
 
+#ifdef CONFIG_PLATFORM_EC_PERIPHERAL_CHARGER_UPDATE
 static enum ec_status hc_pchg_update(struct host_cmd_handler_args *args)
 {
 	const struct ec_params_pchg_update *p = args->params;
@@ -1028,6 +1029,7 @@ static enum ec_status hc_pchg_update(struct host_cmd_handler_args *args)
 	return EC_RES_SUCCESS;
 }
 DECLARE_HOST_COMMAND(EC_CMD_PCHG_UPDATE, hc_pchg_update, EC_VER_MASK(0));
+#endif /* CONFIG_PLATFORM_EC_PERIPHERAL_CHARGER_UPDATE */
 
 static int cc_pchg(int argc, const char **argv)
 {
