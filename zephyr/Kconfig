@@ -802,6 +802,14 @@ config PLATFORM_EC_POWER_BUTTON_DEBOUNCE_AP_OFF
 	  Configure the button debounce time in us per project requirement when
 	  the AP is off (S5 and below).
 
+config PLATFORM_EC_POWER_BUTTON_KEYBOARD
+	bool "Power button is on the keyboard matrix"
+	depends on PLATFORM_EC_TABLET_MODE
+	help
+	  Enable this option if the power button is located on the keyboard matrix.
+	  This enables logic to suppress power button events in S0 tablet mode
+	  to prevent accidental activation.
+
 config PLATFORM_EC_PRESERVED_RING_BUF
 	bool "Preserved ring buffer"
 	default n
