@@ -373,15 +373,22 @@ static int rollback_update(int32_t next_min_version, const uint8_t *entropy,
 		goto out;
 	}
 
-	key = unlock_rollback();
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)) {
+		key = unlock_rollback();
+	}
+
 	if (crec_flash_erase(offset, erase_size)) {
 		ret = EC_ERROR_UNKNOWN;
-		lock_rollback(key);
+		if (!IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)) {
+			lock_rollback(key);
+		}
 		goto out;
 	}
 
 	ret = crec_flash_write(offset, sizeof(block), block);
-	lock_rollback(key);
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)) {
+		lock_rollback(key);
+	}
 
 out:
 	clear_rollback(data);
