@@ -15,4 +15,11 @@ config PLATFORM_EC_CPS8100
 	  Use CPS8100 driver. CPS8100 is a Qi wireless power transmitter.
 
 
+config PLATFORM_EC_PERIPHERAL_CHARGER_UPDATE
+	bool "Enable peripheral charger update host command"
+	depends on PLATFORM_EC_SYSTEM_UNLOCKED
+	help
+	  Enable peripheral charger firmware update host command
+	  (EC_CMD_PCHG_UPDATE).
+
 endif # PLATFORM_EC_PERIPHERAL_CHARGER
