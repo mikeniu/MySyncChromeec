@@ -30,7 +30,9 @@ struct cros_flash_data {
 /* Driver convenience defines */
 #define DRV_DATA(dev) ((struct cros_flash_data *)(dev)->data)
 
+#if !defined(FLASH_SIZE)
 #define FLASH_SIZE DT_REG_SIZE(DT_CHOSEN(zephyr_flash))
+#endif
 
 static const struct device *const flash_controller =
 	DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
