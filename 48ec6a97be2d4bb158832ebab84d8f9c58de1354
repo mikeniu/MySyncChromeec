@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bf17a6f_96ed8533",
+        "filename": "util/coreboot_sdk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-07-23T19:25:40Z",
+      "side": 1,
+      "message": "Are you sure you want this to be the default?",
+      "range": {
+        "startLine": 112,
+        "startChar": 20,
+        "endLine": 112,
+        "endChar": 40
+      },
+      "revId": "48ec6a97be2d4bb158832ebab84d8f9c58de1354",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
