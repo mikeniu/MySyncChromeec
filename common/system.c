@@ -1159,12 +1159,36 @@ static enum ec_status ec_error_to_status(int err)
 	}
 }
 
+#if defined(HAS_TASK_HOSTCMD)
+static inline bool is_sysjump_command(int cmd)
+{
+	return cmd == EC_REBOOT_JUMP_RO || cmd == EC_REBOOT_JUMP_RW;
+}
+#endif
+
 /**
  * Handle a pending reboot command.
+ *
+ * For EC_REBOOT_JUMP_RO/RW commands this owns the host-interface IRQ
+ * lifecycle: mask before the sysjump so no new host command is dispatched,
+ * unmask on the failure-fallback return path (a successful sysjump does
+ * not return).
  */
 static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 {
 	int status;
+
+	/*
+	 * Mask the host-interface IRQ before the sysjump so no new host
+	 * command is dispatched between here and jump_to_image().
+	 * Legacy (!CONFIG_EC_HOST_CMD) masks earlier, in host_command_reboot(),
+	 * to preserve the mask-BEFORE-ACK invariant.
+	 */
+#if defined(HAS_TASK_HOSTCMD) && defined(CONFIG_EC_HOST_CMD)
+	if (is_sysjump_command(p->cmd)) {
+		lpc_disable_host_interface_interrupts();
+	}
+#endif
 
 	if (IS_ENABLED(CONFIG_POWER_BUTTON_INIT_IDLE) &&
 	    (p->flags & EC_REBOOT_FLAG_CLEAR_AP_IDLE)) {
@@ -1183,10 +1207,16 @@ static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 	case EC_REBOOT_NO_OP:
 		return EC_SUCCESS;
 	case EC_REBOOT_JUMP_RO:
-		return system_run_image_copy_with_flags(
+		status = system_run_image_copy_with_flags(
 			EC_IMAGE_RO, EC_RESET_FLAG_STAY_IN_RO);
+		/* sysjump failed. Ensure AP-EC interface is up */
+		lpc_enable_host_interface_interrupts();
+		return status;
 	case EC_REBOOT_JUMP_RW:
-		return system_run_image_copy(system_get_active_copy());
+		status = system_run_image_copy(system_get_active_copy());
+		/* sysjump failed. Ensure AP-EC interface is up */
+		lpc_enable_host_interface_interrupts();
+		return status;
 	case EC_REBOOT_COLD:
 	case EC_REBOOT_COLD_AP_OFF:
 		if (IS_ENABLED(CONFIG_AP_X86_INTEL))
@@ -1977,6 +2007,16 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 		}
 		return EC_RES_SUCCESS;
 #else
+		/*
+		 * Quiesce the host-interface IRQ so no new host command is
+		 * dispatched between here and the actual sysjump. The
+		 * failure-fallback in the EC_REBOOT_JUMP_RO/RW cases re-enables
+		 * if the jump doesn't happen.
+		 */
+		if (is_sysjump_command(p.cmd)) {
+			lpc_disable_host_interface_interrupts();
+		}
+
 		/* Clean busy bits on host for commands that won't return */
 		args->result = EC_RES_SUCCESS;
 		host_send_response(args);

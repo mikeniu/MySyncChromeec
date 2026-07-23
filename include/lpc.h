@@ -173,6 +173,24 @@ void lpc_init_mask(void);
  */
 void lpc_s3_resume_clear_masks(void);
 
+/**
+ * Enable / disable the eSPI/LPC host-interface interrupts.
+ *
+ * Used to quiesce the interface across a sysjump so no new host command
+ * is dispatched between the pre-jump ACK and the actual sysjump.
+ */
+#ifdef CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI
+void lpc_enable_host_interface_interrupts(void);
+void lpc_disable_host_interface_interrupts(void);
+#else
+static inline void lpc_enable_host_interface_interrupts(void)
+{
+}
+static inline void lpc_disable_host_interface_interrupts(void)
+{
+}
+#endif /* !CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI */
+
 #ifdef __cplusplus
 }
 #endif
