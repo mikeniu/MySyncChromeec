@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "265e634c_0714cfe9",
+        "filename": "zephyr/subsys/ap_pwrseq/ap_power_interface.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-23T21:58:34Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f9fef9da_45dae7a7",
+      "range": {
+        "startLine": 165,
+        "startChar": 5,
+        "endLine": 165,
+        "endChar": 28
+      },
+      "revId": "1842666f8edacfe61d6885bce203d3089bea5003",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da2cd3e2_f634c7df",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-22T22:43:50Z",
       "side": 1,
       "message": "This is a functional change.  Can you move this to a separate CL?",
+      "range": {
+        "startLine": 216,
+        "startChar": 5,
+        "endLine": 216,
+        "endChar": 26
+      },
+      "revId": "1842666f8edacfe61d6885bce203d3089bea5003",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bc4039a_81198dc7",
+        "filename": "zephyr/subsys/ap_pwrseq/ap_power_interface.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-23T21:58:34Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "da2cd3e2_f634c7df",
       "range": {
         "startLine": 216,
         "startChar": 5,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31764075_a9857440",
+        "filename": "zephyr/subsys/ap_pwrseq/ap_power_interface.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-23T21:58:34Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ec9d89e2_8ee24761",
+      "range": {
+        "startLine": 228,
+        "startChar": 5,
+        "endLine": 228,
+        "endChar": 27
+      },
+      "revId": "1842666f8edacfe61d6885bce203d3089bea5003",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c5b771f_24963d03",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-07-22T22:43:50Z",
       "side": 1,
       "message": "As a followup, switch this to the Zephyr shell API.",
+      "range": {
+        "startLine": 259,
+        "startChar": 0,
+        "endLine": 259,
+        "endChar": 23
+      },
+      "revId": "1842666f8edacfe61d6885bce203d3089bea5003",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f1672c0_8ee68b77",
+        "filename": "zephyr/subsys/ap_pwrseq/ap_power_interface.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-23T21:58:34Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6c5b771f_24963d03",
       "range": {
         "startLine": 259,
         "startChar": 0,
