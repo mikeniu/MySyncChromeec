@@ -136,7 +136,7 @@ DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, handle_chipset_suspend, HOOK_PRIO_LAST);
  *
  * Only runs in RW to de-risk an unrecoverable boot loop in RO.
  */
-#if defined(SECTION_IS_RW) && defined(CONFIG_POWER_SLEEP_FAILURE_DETECTION)
+#if defined(CONFIG_CROS_EC_RW) && defined(CONFIG_POWER_SLEEP_FAILURE_DETECTION)
 
 static uint16_t sleep_signal_timeout;
 /* Non-const because it may be set by sleeptimeout console cmd */
@@ -463,7 +463,7 @@ DECLARE_CONSOLE_COMMAND(sleeptimeout, command_sleep_fail_timeout,
 			" <msec> - custom length in milliseconds\n"
 			" <none> - prints the current setting");
 
-#else /* !SECTION_IS_RW && !CONFIG_POWER_SLEEP_FAILURE_DETECTION */
+#else /* !CONFIG_CROS_EC_RW && !CONFIG_POWER_SLEEP_FAILURE_DETECTION */
 
 /* No action */
 void sleep_suspend_transition(void)
@@ -486,4 +486,4 @@ void sleep_reset_tracking(void)
 {
 }
 
-#endif /* SECTION_IS_RW && CONFIG_POWER_SLEEP_FAILURE_DETECTION */
+#endif /* CONFIG_CROS_EC_RW && CONFIG_POWER_SLEEP_FAILURE_DETECTION */
