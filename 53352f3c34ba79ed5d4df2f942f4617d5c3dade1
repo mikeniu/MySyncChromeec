@@ -22,6 +22,30 @@
       },
       "revId": "53352f3c34ba79ed5d4df2f942f4617d5c3dade1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10275b31_57d3ea52",
+        "filename": "zephyr/program/skywalker/jaina/src/keyboard_customization.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-23T03:32:22Z",
+      "side": 1,
+      "message": "Update patch to use 3-bit integer",
+      "parentUuid": "1db9ed70_bb636ca7",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 1
+      },
+      "revId": "53352f3c34ba79ed5d4df2f942f4617d5c3dade1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
