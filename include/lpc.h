@@ -157,6 +157,13 @@ void lpc_enable_acpi_interrupts(void);
  */
 void lpc_update_host_event_status(void);
 
+/**
+ * Update the eSPI/LPC host-interface interrupts.
+ *
+ * @param enable	Non-zero to enable interrupts, 0 to disable.
+ */
+void lpc_update_host_interface_interrupts(uint32_t enable);
+
 /*
  * This is a weak function defined in host_events_commands.c to override the
  * LPC_HOST_EVENT_ALWAYS_REPORT mask. It can be implemented by boards if there
