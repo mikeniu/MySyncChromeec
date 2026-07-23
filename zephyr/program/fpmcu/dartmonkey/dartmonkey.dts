@@ -1,0 +1,189 @@
+/* Copyright 2023 The ChromiumOS Authors.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "soc.dtsi"
+#include "gpio.dtsi"
+#include "rwsig.dtsi"
+
+#include <cros/integrated_fwid.dtsi>
+#include <cros/integrated_ro_frid.dtsi>
+
+#define FPC1145_COMMON_IMAGE_PROPS \
+	width = <56>; \
+	height = <192>; \
+	bits-per-pixel = <8>; \
+	image-data-offset-bytes = <2340>; \
+	v4l2-pixel-format = "V4L2_PIX_FMT_GREY";
+
+#define FPC1145_RAW_IMAGE_PROPS \
+	FPC1145_COMMON_IMAGE_PROPS \
+	frame-size = <35460>;
+
+#define FPC1145_REAL_IMAGE_PROPS \
+	FPC1145_COMMON_IMAGE_PROPS \
+	frame-size = <10752>;
+
+/ {
+	chosen {
+		cros-fp,fingerprint-sensor = &fp_sensor;
+		cros-fp,fingerprint-memory-template = &sram1;
+		zephyr,host-cmd-spi-backend = &spi1;
+		zephyr,nocache-ram = &sram4;
+	};
+
+	named-bbram-regions {
+		compatible = "named-bbram-regions";
+
+		scratchpad {
+			offset = <0x00>;
+			size = <0x02>;
+		};
+
+		/* When CONFIG_STM32_EXTENDED_RESET_FLAGS is defined, saved-reset-flags
+		 * uses two entries: BKPDATA_INDEX_SAVED_RESET_FLAGS (offset 0x02, 2 bytes)
+		 * and BKPDATA_INDEX_SAVED_RESET_FLAGS_2 (offset 0x04, 2 bytes), totaling
+		 * 4 bytes.
+		 * CONFIG_STM32_EXTENDED_RESET_FLAGS is defined explicitly for Dartmonkey,
+		 * so use 32-bit extended reset flags.
+		 */
+		saved-reset-flags {
+			offset = <0x02>;
+			size = <0x04>;
+		};
+		saved-panic-reason {
+			offset = <0x06>;
+			size = <0x02>;
+		};
+		saved-panic-info {
+			offset = <0x08>;
+			size = <0x02>;
+		};
+		saved-panic-exception {
+			offset = <0x0a>;
+			size = <0x02>;
+		};
+		saved-panic-flags {
+			offset = <0x0c>;
+			size = <0x02>;
+		};
+	};
+
+	binman {
+		/* First 6 sectors (128KB each) used for RO */
+		wp-ro {
+			offset = <0x0>;
+			size = <0xc0000>;
+			ec-ro {
+				size = <0xc0000>;
+				pad-byte = <0xff>;
+				ro-fw {
+					/*
+					 * Clang doesn't emit STT_SECTION symbols (also
+					 * called 'section symbols'), so 'rom_start'
+					 * symbol is not available. Fortunately, Zephyr
+					 * linker scripts provide '__rom_start_address'
+					 * symbol which points to the beginning of
+					 * 'rom_start' section.
+					 */
+					elf-base-sym = "__rom_start_address";
+				};
+			};
+		};
+
+		/* Two sectors used for rollback (128KB each) */
+		rollback0 {
+			offset = <0xc0000>;
+			size = <0x20000>;
+			type = "blob";
+			filename = "../build-rw/rollback_initial_data.bin";
+		};
+
+		rollback1 {
+			offset = <0xe0000>;
+			size = <0x20000>;
+			type = "blob";
+			filename = "../build-rw/rollback_initial_data.bin";
+		};
+
+		/* Remaining 8 sectors (128KB each) used for RW */
+		ec-rw {
+			offset = <0x100000>;
+			size = <0x100000>;
+			rw-fw {
+				/*
+				 * Clang doesn't emit STT_SECTION symbols (also
+				 * called 'section symbols'), so 'rom_start'
+				 * symbol is not available. Fortunately, Zephyr
+				 * linker scripts provide '__rom_start_address'
+				 * symbol which points to the beginning of
+				 * 'rom_start' section.
+				 */
+				zephyr-rw {
+					elf-base-sym = "__rom_start_address";
+				};
+			};
+		};
+		pad-byte = <0xff>;
+	};
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		/* Seventh sector is used as first rollback sector. */
+		rollback0: partition@c0000 {
+			label = "rollback0";
+			reg = <0xc0000 DT_SIZE_K(128)>;
+		};
+
+		/* Eighth sector is used as second rollback sector. */
+		rollback1: partition@e0000 {
+			label = "rollback1";
+			reg = <0xe0000 DT_SIZE_K(128)>;
+		};
+	};
+};
+
+&spi4 {
+	fp_sensor: fpc1145@0 {
+		compatible = "fpc,fpc1145";
+		reg = <0>;
+		spi-max-frequency = <4000000>;
+
+		configs {
+			compatible = "fingerprint-image-frame-params";
+			config0 {
+				FPC1145_RAW_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT";
+			};
+			config1 {
+				FPC1145_REAL_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE";
+			};
+			config2 {
+				FPC1145_REAL_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_PATTERN0";
+			};
+			config3 {
+				FPC1145_REAL_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_PATTERN1";
+			};
+			config4 {
+				FPC1145_RAW_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST";
+			};
+			config5 {
+				FPC1145_REAL_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_RESET_TEST";
+			};
+		};
+
+		irq-gpios = <&gpioa 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
+		reset-gpios = <&gpioe 0 GPIO_ACTIVE_LOW>;
+	};
+};
