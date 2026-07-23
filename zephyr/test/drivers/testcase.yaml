@@ -103,9 +103,8 @@ tests:
     - default/boards/native_sim.overlay
   drivers.default.console_cmds_ro:
     timeout: 360
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RO
     extra_configs:
+    - CONFIG_CROS_EC_RO=y
     - CONFIG_LINK_TEST_SUITE_DEFAULT_CONSOLE_CMDS=y
     - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
     - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=4096
@@ -116,9 +115,8 @@ tests:
     - default/boards/native_sim.overlay
   drivers.default.console_cmds_rw:
     timeout: 360
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RW
     extra_configs:
+    - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_DEFAULT_CONSOLE_CMDS=y
     - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
     - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=4096
@@ -1087,9 +1085,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWERSEQ_S0IX=y
     - CONFIG_PLATFORM_EC_EMULATED_SYSRQ=y
   drivers.power_host_sleep_ro:
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RO
     extra_configs:
+    - CONFIG_CROS_EC_RO=y
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
     # Make tests independent of chipset specific code
     - CONFIG_AP_ARM_QUALCOMM_SC7280=n
@@ -1098,9 +1095,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWERSEQ_HOST_SLEEP=y
     - CONFIG_PLATFORM_EC_POWERSEQ_S0IX=y
   drivers.power_host_sleep_rw:
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RW
     extra_configs:
+    - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
     # Make tests independent of chipset specific code
     - CONFIG_AP_ARM_QUALCOMM_SC7280=n
@@ -1349,10 +1345,9 @@ tests:
     - common
     - system
     extra_configs:
+    - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_SYSTEM=y
     - CONFIG_POWER_SEQUENCE_MOCK=y
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RW
   drivers.system.ec_host_cmd:
     tags:
     - common
