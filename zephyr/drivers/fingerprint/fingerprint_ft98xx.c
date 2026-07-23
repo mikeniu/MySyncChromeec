@@ -299,6 +299,20 @@ static int ft98xx_acquire_image(const struct device *dev,
 		return -ENOTSUP;
 	}
 
+	uint16_t cols = ft_sensor_query_cols();
+	uint16_t rows = ft_sensor_query_rows();
+
+	BUILD_ASSERT(FT_RAW_SIZE <=
+		     SIZE_MAX - (size_t)UINT16_MAX * (size_t)UINT16_MAX);
+	size_t required_size =
+		(size_t)FT_RAW_SIZE + (size_t)cols * (size_t)rows;
+
+	if (required_size > image_buf_size) {
+		LOG_ERR("Runtime frame requirement (%zu) exceeds available buffer (%zu)",
+			required_size, image_buf_size);
+		return -EINVAL;
+	}
+
 	memset(image_buf, 0, image_buf_size);
 	ret = ft_sensor_acquire_image_with_mode(image_buf, image_buf_size,
 						capture_type);
