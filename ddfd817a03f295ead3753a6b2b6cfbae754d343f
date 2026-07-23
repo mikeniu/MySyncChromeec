@@ -34,6 +34,24 @@
       "parentUuid": "6a59d055_775b9d9f",
       "revId": "ddfd817a03f295ead3753a6b2b6cfbae754d343f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "992a4e45_20600126",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-23T14:28:52Z",
+      "side": 1,
+      "message": "Good.",
+      "parentUuid": "8806a0eb_7bb7aa6e",
+      "revId": "ddfd817a03f295ead3753a6b2b6cfbae754d343f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

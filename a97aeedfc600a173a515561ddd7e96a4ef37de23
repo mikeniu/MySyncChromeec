@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4531034a_e6ef0a45",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-23T14:28:52Z",
+      "side": 1,
+      "message": "I think you need to add a choice config identifying (based on dts) the cover type to select a proper library, right?",
+      "revId": "a97aeedfc600a173a515561ddd7e96a4ef37de23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
