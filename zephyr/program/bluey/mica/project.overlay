@@ -51,6 +51,11 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "extpower_interrupt";
 		};
+		int_gpio_pgood_acok_odl: gpio_pgood_acok_odl {
+			irq-pin = <&gpio_pgood_acok_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "extpower_interrupt";
+		};
 	};
 };
 
