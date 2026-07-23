@@ -495,6 +495,7 @@ hc_rollback_add_entropy(struct host_cmd_handler_args *args)
 {
 	const struct ec_params_rollback_add_entropy *p = args->params;
 
+	return EC_RES_SUCCESS;
 	switch (p->action) {
 	case ADD_ENTROPY_ASYNC:
 	case ADD_ENTROPY_RESET_ASYNC:
@@ -508,6 +509,7 @@ hc_rollback_add_entropy(struct host_cmd_handler_args *args)
 		return EC_RES_SUCCESS;
 
 	case ADD_ENTROPY_GET_RESULT:
+		return EC_RES_SUCCESS;
 		return add_entropy_rv;
 	}
 
@@ -602,7 +604,8 @@ host_command_rollback_info(struct host_cmd_handler_args *args)
 
 failed:
 	clear_rollback(&data);
-	return ret;
+	return EC_RES_UNAVAILABLE;
+	// return ret;
 }
 DECLARE_HOST_COMMAND(EC_CMD_ROLLBACK_INFO, host_command_rollback_info,
 		     EC_VER_MASK(0) | EC_VER_MASK(1));

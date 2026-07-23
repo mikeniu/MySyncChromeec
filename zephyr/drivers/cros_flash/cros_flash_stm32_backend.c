@@ -11,74 +11,88 @@
 int flash_change_wp(const struct device *dev, uint32_t disable_mask,
 		    uint32_t enable_mask)
 {
-	int err;
-	struct flash_stm32_ex_op_sector_wp_in wp_request = {
-		.enable_mask = enable_mask,
-		.disable_mask = disable_mask,
-	};
+	// int err;
+	// struct flash_stm32_ex_op_sector_wp_in wp_request = {
+	// 	.enable_mask = enable_mask,
+	// 	.disable_mask = disable_mask,
+	// };
 
-	err = flash_ex_op(dev, FLASH_STM32_EX_OP_SECTOR_WP,
-			  (uintptr_t)&wp_request, NULL);
+	// err = flash_ex_op(dev, FLASH_STM32_EX_OP_SECTOR_WP,
+	// 		  (uintptr_t)&wp_request, NULL);
 
-	return err;
+	// return err;
+	return 0;
 }
 
 int flash_get_wp(const struct device *dev, uint32_t *protected_mask)
 {
-	int err;
-	struct flash_stm32_ex_op_sector_wp_out wp_status;
+	int err = 0;
+	// struct flash_stm32_ex_op_sector_wp_out wp_status;
 
 	if (!protected_mask)
 		return -EINVAL;
 
-	err = flash_ex_op(dev, FLASH_STM32_EX_OP_SECTOR_WP, (uintptr_t)NULL,
-			  &wp_status);
-	*protected_mask = wp_status.protected_mask;
+	// err = flash_ex_op(dev, FLASH_STM32_EX_OP_SECTOR_WP, (uintptr_t)NULL,
+	// 		  &wp_status);
+	// *protected_mask = wp_status.protected_mask;
 
+	*protected_mask = 0;
 	return err;
 }
 
 int flash_change_rdp(const struct device *dev, bool enable, bool permanent)
 {
-	int err;
-	struct flash_stm32_ex_op_rdp rdp_request = {
-		.enable = enable,
-		.permanent = permanent,
-	};
+	// int err;
+	// struct flash_stm32_ex_op_rdp rdp_request = {
+	// 	.enable = enable,
+	// 	.permanent = permanent,
+	// };
 
-	err = flash_ex_op(dev, FLASH_STM32_EX_OP_RDP, (uintptr_t)&rdp_request,
-			  NULL);
+	// err = flash_ex_op(dev, FLASH_STM32_EX_OP_RDP,
+	// (uintptr_t)&rdp_request, 		  NULL);
 
-	return err;
+	// return err;
+
+	return 0;
 }
 
 int flash_get_rdp(const struct device *dev, bool *enable, bool *permanent)
 {
-	int err;
-	struct flash_stm32_ex_op_rdp rdp_status;
+	// int err;
+	// struct flash_stm32_ex_op_rdp rdp_status;
 
-	err = flash_ex_op(dev, FLASH_STM32_EX_OP_RDP, (uintptr_t)NULL,
-			  &rdp_status);
+	// err = flash_ex_op(dev, FLASH_STM32_EX_OP_RDP, (uintptr_t)NULL,
+	// 		  &rdp_status);
+
+	// if (enable)
+	// 	*enable = rdp_status.enable;
+
+	// if (permanent)
+	// 	*permanent = rdp_status.permanent;
+
+	// return err;
 
 	if (enable)
-		*enable = rdp_status.enable;
+		*enable = 0;
 
 	if (permanent)
-		*permanent = rdp_status.permanent;
+		*permanent = 0;
 
-	return err;
+	return 0;
 }
 
 int flash_block_protection_changes(const struct device *dev)
 {
-	return flash_ex_op(dev, FLASH_STM32_EX_OP_BLOCK_OPTION_REG,
-			   (uintptr_t)NULL, NULL);
+	// return flash_ex_op(dev, FLASH_STM32_EX_OP_BLOCK_OPTION_REG,
+	// 		   (uintptr_t)NULL, NULL);
+	return 0;
 }
 
 int flash_block_control_access(const struct device *dev)
 {
-	return flash_ex_op(dev, FLASH_STM32_EX_OP_BLOCK_CONTROL_REG,
-			   (uintptr_t)NULL, NULL);
+	//	return flash_ex_op(dev, FLASH_STM32_EX_OP_BLOCK_CONTROL_REG,
+	//			   (uintptr_t)NULL, NULL);
+	return 0;
 }
 
 #ifdef CONFIG_CROS_FLASH_STM32_EC_JUMP_STRUCTURE
