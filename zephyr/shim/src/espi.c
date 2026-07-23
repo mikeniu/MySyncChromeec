@@ -522,7 +522,6 @@ static void handle_host_write(uint32_t data)
 	lpc_packet.response_size = 0;
 
 	lpc_packet.driver_result = EC_RES_SUCCESS;
-
 	host_packet_receive(&lpc_packet);
 	return;
 }
@@ -808,7 +807,7 @@ uint32_t get_8042_data(uint32_t data)
 	return kbc->data;
 }
 
-static void espi_sysjump(void)
+void lpc_disable_host_interface_interrupts(void)
 {
 	uint32_t enable = 0;
 
@@ -816,4 +815,3 @@ static void espi_sysjump(void)
 	espi_write_lpc_request(espi_dev, ECUSTOM_HOST_SUBS_INTERRUPT_EN,
 			       &enable);
 }
-DECLARE_HOOK(HOOK_SYSJUMP, espi_sysjump, HOOK_PRIO_DEFAULT);
