@@ -566,6 +566,7 @@ class Renode(Platform):
 
     def _skip_test_sanok(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
+            "benchmark",  # TODO(b/537717577)
             "flash_physical",  # TODO(b/468410778)
             "flash_protection",  # TODO(b/487848806)
             "flash_protection_rw",  # TODO(b/487848806)
