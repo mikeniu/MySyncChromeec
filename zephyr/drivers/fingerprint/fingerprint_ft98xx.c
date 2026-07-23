@@ -14,10 +14,12 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/pm/device.h>
 #include <zephyr/sys/byteorder.h>
+#include <zephyr/sys/math_extras.h>
 #include <zephyr/sys/util.h>
 
 #include <drivers/fingerprint.h>
 #include <fingerprint/v4l2_types.h>
+#include <subsys/fingerprint/alg/ft98xx_bio_alg.h>
 
 LOG_MODULE_REGISTER(cros_fingerprint, LOG_LEVEL_INF);
 
@@ -297,6 +299,25 @@ static int ft98xx_acquire_image(const struct device *dev,
 
 	if (!IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)) {
 		return -ENOTSUP;
+	}
+
+	uint16_t cols = ft_sensor_query_cols();
+	uint16_t rows = ft_sensor_query_rows();
+
+	/* Multiplication of uint16_t values cannot overflow size_t */
+	size_t frame_pixels = (size_t)cols * (size_t)rows;
+	size_t required_size;
+
+	if (size_add_overflow((size_t)FT_RAW_SIZE, frame_pixels,
+			      &required_size)) {
+		LOG_ERR("Integer overflow calculating required frame size");
+		return -EOVERFLOW;
+	}
+
+	if (required_size > image_buf_size) {
+		LOG_ERR("Runtime frame requirement (%zu) exceeds available buffer (%zu)",
+			required_size, image_buf_size);
+		return -EINVAL;
 	}
 
 	memset(image_buf, 0, image_buf_size);
