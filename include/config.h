@@ -18,6 +18,13 @@
 #ifndef __CROS_EC_CONFIG_H
 #define __CROS_EC_CONFIG_H
 
+#if defined(SECTION_IS_RO) && !defined(CONFIG_CROS_EC_RO)
+#define CONFIG_CROS_EC_RO 1
+#endif
+#if defined(SECTION_IS_RW) && !defined(CONFIG_CROS_EC_RW)
+#define CONFIG_CROS_EC_RW 1
+#endif
+
 /*
  * When building for Zephyr tests, a shimmed_tasks.h header is defined
  * to create all the HAS_TASK_* definitions.  Since those are used in
@@ -1896,7 +1903,7 @@
  * The section is useful for preserving data across reboots.
  * May not be enabled in RO.
  */
-#ifndef SECTION_IS_RO
+#ifndef CONFIG_CROS_EC_RO
 #define CONFIG_NOINIT_END_OF_RAM_SECTION
 #else
 #undef CONFIG_NOINIT_END_OF_RAM_SECTION
