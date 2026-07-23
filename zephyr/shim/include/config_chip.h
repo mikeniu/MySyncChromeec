@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+
+
 #if DT_NODE_EXISTS(DT_NODELABEL(lid_accel))
 #define LID_ACCEL SENSOR_ID(DT_NODELABEL(lid_accel))
 #else
