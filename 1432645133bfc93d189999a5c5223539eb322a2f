@@ -16,6 +16,251 @@
       "message": "Hi @keithshort@chromium.org @fabiobaltieri@google.com, friendly ping on this! I\u0027ve updated `pwrmon` so it now sends PACs data via MKBP. Could you please take a look when you have a chance?",
       "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d72d2561_aafae1fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 36
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "good stuff, initial pass",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fcfa18d_28e0aa3b",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "I think you can just do `val-\u003eval1 \u003d enable`",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7eca0e62_0dd87dee",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "ouch, I would not blame if you felt like doing the indentation of these ones manually and put a clang-format off block around it",
+      "range": {
+        "startLine": 58,
+        "startChar": 2,
+        "endLine": 64,
+        "endChar": 30
+      },
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebcc22e1_e4f41ae0",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "probably worth making these two a Kconfig option, this stuff tend to change with time or have to be tweaked by platforms, same for the msgq size above (sorry I review top to bottom)",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 33
+      },
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5d4861c_b40ef92a",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "`(void)`",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1868b464_852f2cfb",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "use an intermediate variable for `pwrmon_config.power_monitors[i]`",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b686c4de_16c6e55b",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "use an intermediate variable for `pwrmon_config.channels[i]`",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4222303f_332be780",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "could probably use a smaller variable for the loop? save few bytes of sram, same for other cycles on power monitors count, do you really need more than a uint8_t worth of sensors?",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a67037b4_e832e842",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "you could probably use an intermediate variable for `pwrmon_config.channels[channel_id]`, make the code below a bit more compact",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eab74c1c_4f9dfd8a",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "this is safe because channel_name is 32 bytes right? tempted to suggest to use snprintf and check the return value just in case, up to you really but I tend to get over cautious with sprintf/snprintf etc",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d76b6dde_cb5d5922",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "bit confused by that, does this ever happen? `device_is_ready` should pretty much always return true since the corresponding device has no init function, sure I\u0027m missing something",
+      "range": {
+        "startLine": 379,
+        "startChar": 0,
+        "endLine": 380,
+        "endChar": 33
+      },
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "968c0daf_25d6f117",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "use `/*`, doesn\u0027t the presubmit catch it? odd",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5252e085_8cc2b601",
+        "filename": "zephyr/dts/bindings/pwrmon/pwrmon.yaml",
+        "patchSetId": 36
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:28:17Z",
+      "side": 1,
+      "message": "this sounds pretty vague, guess it\u0027s an i2c mux? something like: gpio used to control the i2c switch between the EC and \u003cwhatever is on the other side\u003e?",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 58
+      },
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
