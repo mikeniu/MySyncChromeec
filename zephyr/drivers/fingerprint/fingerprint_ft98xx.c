@@ -18,6 +18,7 @@
 
 #include <drivers/fingerprint.h>
 #include <fingerprint/v4l2_types.h>
+#include <subsys/fingerprint/alg/ft98xx_bio_alg.h>
 
 LOG_MODULE_REGISTER(cros_fingerprint, LOG_LEVEL_INF);
 
@@ -286,14 +287,45 @@ static int ft98xx_get_frame_size(const struct device *dev,
 	return -EINVAL;
 }
 
+static int
+ft98xx_get_bytes_per_pixel(const struct device *dev,
+			   enum fingerprint_capture_type capture_type)
+{
+	const struct ft98xx_cfg *cfg = dev->config;
+
+	for (int i = 0; i < cfg->sensor_info.num_capture_types; i++) {
+		if (cfg->sensor_image_configs[i].fp_capture_type ==
+		    capture_type)
+			return (cfg->sensor_image_configs[i].bpp + 7) / 8;
+	}
+
+	/*unsupported capture_type, return error*/
+	return -EINVAL;
+}
+
 static int ft98xx_acquire_image(const struct device *dev,
 				enum fingerprint_capture_type capture_type,
 				uint8_t *image_buf, size_t image_buf_size)
 {
 	int ret;
 	int frame_size = ft98xx_get_frame_size(dev, capture_type);
-	if ((frame_size < 0) || (image_buf_size < frame_size))
+	int bytes_per_pixel = ft98xx_get_bytes_per_pixel(dev, capture_type);
+
+	if ((frame_size < 0) || (bytes_per_pixel <= 0) ||
+	    (image_buf_size < (size_t)frame_size)) {
 		return -EINVAL;
+	}
+
+	uint16_t cols = ft_sensor_query_cols();
+	uint16_t rows = ft_sensor_query_rows();
+	size_t required_size = FT_RAW_SIZE + ((size_t)cols * (size_t)rows *
+					      (size_t)bytes_per_pixel);
+
+	if (required_size > image_buf_size) {
+		LOG_ERR("Runtime frame requirement (%zu) exceeds available buffer (%zu)",
+			required_size, image_buf_size);
+		return -EINVAL;
+	}
 
 	if (!IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)) {
 		return -ENOTSUP;
