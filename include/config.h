@@ -1951,9 +1951,6 @@
  */
 #undef CONFIG_GPIO_POWER_DOWN
 
-/* Allow unaligned access */
-#undef CONFIG_ALLOW_UNALIGNED_ACCESS
-
 /*
  * Protect the code RAM section on devices that execute code from RAM. On these
  * devices, this mechanism protects the code from being modified using the MPU.
