@@ -92,7 +92,7 @@ ifneq ($(CONFIG_BOOTBLOCK),)
 build-util-bin-y += gen_emmc_transfer_data
 
 # Bootblock is only packed in RO image.
-$(out)/util/gen_emmc_transfer_data: BUILD_LDFLAGS += -DSECTION_IS_RO=$(EMPTY)
+$(out)/util/gen_emmc_transfer_data: BUILD_LDFLAGS += -DCONFIG_CROS_EC_RO=1
 endif # CONFIG_BOOTBLOCK
 
 ifneq ($(CONFIG_IPI),)
