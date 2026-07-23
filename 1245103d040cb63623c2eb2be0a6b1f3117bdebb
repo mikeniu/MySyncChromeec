@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a74db5f6_f810a9c7",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-23T02:18:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc581b10_e8254324",
+      "range": {
+        "startLine": 296,
+        "startChar": 36,
+        "endLine": 296,
+        "endChar": 79
+      },
+      "revId": "1245103d040cb63623c2eb2be0a6b1f3117bdebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ca864be_024d33f7",
@@ -64,6 +88,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "85159e61_32ce68a0",
+        "filename": "zephyr/subsys/pd_controller/pdc_dpm.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-23T02:18:14Z",
+      "side": 1,
+      "message": "add `#ifdef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING` and removed `#else ... ` above",
+      "parentUuid": "0ca864be_024d33f7",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 348,
+        "endChar": 38
+      },
+      "revId": "1245103d040cb63623c2eb2be0a6b1f3117bdebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "48bdaac3_85634e5b",
@@ -77,6 +125,24 @@
       "writtenOn": "2026-07-22T21:01:03Z",
       "side": 1,
       "message": "Add a build assert that the current limit is 4500 mA and the power limit is 41000 mW because that is assumed by all the tests.",
+      "revId": "1245103d040cb63623c2eb2be0a6b1f3117bdebb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b36dbf21_3dbc0a92",
+        "filename": "zephyr/test/pdc/src/pdc_policy/src_policy_battery_overload.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-07-23T02:18:14Z",
+      "side": 1,
+      "message": "Add BUILD_ASSERT for current limit 4500mA and power limit 41000mW",
+      "parentUuid": "48bdaac3_85634e5b",
       "revId": "1245103d040cb63623c2eb2be0a6b1f3117bdebb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
