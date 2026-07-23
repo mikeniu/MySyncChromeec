@@ -88,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05078d6a_a1b0a7a3",
+        "filename": "zephyr/shim/chip/mchp/system_download_from_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-23T06:48:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5dec1f9_c8d2872b",
+      "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e1cec1b_21b41037",
