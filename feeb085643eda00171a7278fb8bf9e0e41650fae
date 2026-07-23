@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dc5400c_2398bb37",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T20:14:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/8e2665cc-1613-4479-b335-96059407a9f3)]\n\n**Review Summary**\n- **Functionality**: The change correctly disables the flaky `benchmark` test for the `sanok` board on Zephyr in Renode to unblock the CQ.\n- **Security**: No security implications.\n- **Style**: The formatting is correct, including the required comma and TODO comment referencing the tracking bug.\n- **Consistency**: The addition matches the established pattern for skipping tests in this file.",
+      "isAi": true,
+      "revId": "feeb085643eda00171a7278fb8bf9e0e41650fae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
