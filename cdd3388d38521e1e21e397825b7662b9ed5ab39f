@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b358f386_338b2497",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T23:17:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/debd2b4e-e136-4e63-9a6e-29cf16aa71a3)]\n\n### Review Summary\n**Functionality**: The changes correctly resolve the Clang compiler error (`-Wimplicit-enum-conversion`) by adding `I2C_FREQ_UNIMPLEMENTED \u003d -1`. This prevents `EC_ERROR_UNIMPLEMENTED` (value 2) from silently colliding with `I2C_FREQ_100KHZ` (also value 2). `I2C_FREQ_COUNT` safely remains at 3 because `I2C_FREQ_1000KHZ` explicitly resets the count to 0, preventing any unintended side-effects on array sizes or loop bounds that use it.\n**Security**: No security vulnerabilities introduced.\n**Style**: The code adheres to the project coding style.\n**Consistency**: The changes are consistent with the existing `enum i2c_freq` pattern and C enumeration behavior.\n**Testing**: The commit message indicates that the build target was tested and compiles successfully, which is sufficient for fixing a compiler warning.",
+      "isAi": true,
+      "revId": "cdd3388d38521e1e21e397825b7662b9ed5ab39f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
