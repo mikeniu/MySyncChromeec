@@ -32,6 +32,12 @@
 	i2c5_data_gpe2_default: i2c5_data_gpe2_default {
 		gpio-voltage = "1v8";
 	};
+	i2c5_clk_gpe1_sleep: i2c5_clk_gpe1_sleep {
+		pinmuxs = <&pinctrle 1 IT8XXX2_ALT_DEFAULT>;
+	};
+	i2c5_data_gpe2_sleep: i2c5_data_gpe2_sleep {
+		pinmuxs = <&pinctrle 2 IT8XXX2_ALT_DEFAULT>;
+	};
 };
 
 &i2c1 {
@@ -69,8 +75,9 @@
 	sda-gpios = < &gpioe 2 0x0 >;
 	pinctrl-0 = <&i2c5_clk_gpe1_default
 		     &i2c5_data_gpe2_default>;
-	pinctrl-names = "default";
-
+	pinctrl-1 = <&i2c5_clk_gpe1_sleep
+		     &i2c5_data_gpe2_sleep>;
+	pinctrl-names = "default", "sleep";
 	label = "I2C_PORT_SENSOR";
 	clock-frequency = <I2C_BITRATE_FAST>;
 	dsp_service: dsp-service@29 {
