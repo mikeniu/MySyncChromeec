@@ -164,6 +164,21 @@ void lpc_update_host_event_status(void);
  */
 host_event_t lpc_override_always_report_mask(void);
 
+/**
+ * Enable the eSPI/LPC host-interface interrupts.
+ *
+ * Allows the host-interface driver to dispatch host commands.
+ */
+void lpc_enable_host_interface_interrupts(void);
+
+/**
+ * Disable the eSPI/LPC host-interface interrupts.
+ *
+ * Prevents further host commands from being dispatched.
+ * Used to quiesce the interface before a sysjump ACK is sent.
+ */
+void lpc_disable_host_interface_interrupts(void);
+
 /* Initialize LPC masks. */
 void lpc_init_mask(void);
 
