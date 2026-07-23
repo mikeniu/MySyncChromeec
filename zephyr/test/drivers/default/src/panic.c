@@ -126,7 +126,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic)
 	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 
-	if (IS_ENABLED(SECTION_IS_RW)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
 		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
 		zassert_equal(info, 0);
 		zassert_equal(exception, 0);
@@ -153,7 +153,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_warn_panic)
 	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 
-	if (IS_ENABLED(SECTION_IS_RW)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
 		zassert_equal(reason, PANIC_SW_WATCHDOG);
 		zassert_equal(info, 0x12);
 		zassert_equal(exception, 0x34);
@@ -222,7 +222,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic_already_read)
 	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 
-	if (IS_ENABLED(SECTION_IS_RW)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
 		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
 		zassert_equal(info, 0);
 		zassert_equal(exception, 0);
@@ -263,7 +263,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_hard_panic_already_read)
 	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 
-	if (IS_ENABLED(SECTION_IS_RW)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
 		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
 		zassert_equal(info, 0);
 		zassert_equal(exception, 0);
@@ -319,7 +319,7 @@ ZTEST(panic, test_panic_data_init__invalid_sw_reason_watchdog)
 	panic_data_init();
 	panic_get_reason(&reason, &info, &exception);
 
-	if (IS_ENABLED(SECTION_IS_RW)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
 		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD);
 		zassert_equal(info, 0);
 		zassert_equal(exception, 0);

@@ -46,6 +46,7 @@ endchoice
 
 choice
 	prompt "Chromium OS EC firmware section"
+	default CROS_EC_RW
 
 config CROS_EC_RO
 	bool "This build is will be for the RO copy of the EC"

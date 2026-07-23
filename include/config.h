@@ -1896,7 +1896,7 @@
  * The section is useful for preserving data across reboots.
  * May not be enabled in RO.
  */
-#ifndef SECTION_IS_RO
+#ifndef CONFIG_CROS_EC_RO
 #define CONFIG_NOINIT_END_OF_RAM_SECTION
 #else
 #undef CONFIG_NOINIT_END_OF_RAM_SECTION
