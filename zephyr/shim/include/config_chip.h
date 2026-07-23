@@ -13,6 +13,14 @@
 extern "C" {
 #endif
 
+#if defined(CONFIG_CROS_EC_RO) && defined(CONFIG_CROS_EC_RW)
+#error "Both CONFIG_CROS_EC_RO and CONFIG_CROS_EC_RW are defined!"
+#endif
+
+#if !defined(CONFIG_CROS_EC_RO) && !defined(CONFIG_CROS_EC_RW)
+#error "Neither CONFIG_CROS_EC_RO nor CONFIG_CROS_EC_RW is defined!"
+#endif
+
 #if DT_NODE_EXISTS(DT_NODELABEL(lid_accel))
 #define LID_ACCEL SENSOR_ID(DT_NODELABEL(lid_accel))
 #else

@@ -136,7 +136,7 @@ DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, handle_chipset_suspend, HOOK_PRIO_LAST);
  *
  * Only runs in RW to de-risk an unrecoverable boot loop in RO.
  */
-#if defined(SECTION_IS_RW) && defined(CONFIG_POWER_SLEEP_FAILURE_DETECTION)
+#if defined(CONFIG_CROS_EC_RW) && defined(CONFIG_POWER_SLEEP_FAILURE_DETECTION)
 
 static uint16_t sleep_signal_timeout;
 /* Non-const because it may be set by sleeptimeout console cmd */
