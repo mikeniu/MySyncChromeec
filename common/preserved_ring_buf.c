@@ -5,7 +5,7 @@
 
 #include "preserved_ring_buf.h"
 
-#if defined(SECTION_IS_RO) && !defined(ZTEST)
+#if defined(CONFIG_CROS_EC_RO)
 #error Preserved ring buffer should not be enabled in RO images.
 #endif
 
