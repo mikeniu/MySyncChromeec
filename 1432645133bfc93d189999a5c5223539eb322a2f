@@ -225,6 +225,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c57f507f_8a0f3596",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T16:30:48Z",
+      "side": 1,
+      "message": "ok I see now you use this with defer_init in the next commit, if that\u0027s the intent then don\u0027t call `pwrmon_init` directly, declare it as a normal init function on `DEVICE_DT_INST_DEFINE` and then call it with `device_init(pwrmon_dev);`",
+      "parentUuid": "d76b6dde_cb5d5922",
+      "range": {
+        "startLine": 379,
+        "startChar": 0,
+        "endLine": 380,
+        "endChar": 33
+      },
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "968c0daf_25d6f117",
         "filename": "zephyr/drivers/pwrmon/pwrmon.c",
         "patchSetId": 36
