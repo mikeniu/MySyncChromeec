@@ -44,8 +44,9 @@ choice CBPRINTF_IMPLEMENTATION
 
 endchoice
 
-choice
+choice CROS_EC_FIRMWARE_SECTION
 	prompt "Chromium OS EC firmware section"
+	default CROS_EC_RW
 
 config CROS_EC_RO
 	bool "This build is will be for the RO copy of the EC"
