@@ -34,6 +34,42 @@
       "parentUuid": "db37d3e4_700da1e8",
       "revId": "0833e7a33b78049df5768c30a3f1618c72655448",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00879dd5_dfd3daf5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T18:52:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/e718f96e-f11f-4270-a5f2-432aa6182af8)]\n\n**Review Summary:**\n* **Functionality:** Looks good. The change safely attempts to protect the rollback region with one MPU entry and correctly falls back to two if the first one doesn\u0027t cover the entire region.\n* **Style:** Clean and readable. The transition from `mpu_config_region` to `mpu_config_region_greedy` is well executed.\n* **Consistency:** The use of `mpu_config_region_greedy` aligns well with other MPU configurations in the file.\n* **Security:** No security issues introduced; the rollback region remains properly protected.\n* **Testing:** The author has verified on multiple boards (`helipilot`, `bloonchipper`, `dartmonkey`), which covers both the 1-region and 2-region scenarios.\n\nTAG\u003dagy\nCONV\u003d0b4eb252-3d59-4112-a939-ad90acd0e8b3",
+      "isAi": true,
+      "revId": "0833e7a33b78049df5768c30a3f1618c72655448",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a600c1b8_029dda4b",
+        "filename": "core/cortex-m/mpu.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T18:52:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider updating this comment to reflect the new behavior introduced in this CL. Since it is now possible to protect the rollback region with a single MPU entry on some boards (like `helipilot`), we might want to rephrase this to indicate that it *may not* be possible to use a single region (e.g., on `bloonchipper`) and we *may* have to use two.",
+      "isAi": true,
+      "revId": "0833e7a33b78049df5768c30a3f1618c72655448",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
