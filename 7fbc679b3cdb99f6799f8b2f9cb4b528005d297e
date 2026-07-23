@@ -16,6 +16,29 @@
       "message": "I\u0027ll do a thorough review once CQ is passing.  But on first look, this is a good improvement.",
       "revId": "7fbc679b3cdb99f6799f8b2f9cb4b528005d297e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44598ee3_8adc877a",
+        "filename": "docs/fingerprint/library-compiler-flags.md",
+        "patchSetId": 17
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-23T23:42:21Z",
+      "side": 1,
+      "message": "Can the -DSECTION\u003dRW be dropped?  I presume RO builds also use -DESCTION\u003dRO.",
+      "range": {
+        "startLine": 103,
+        "startChar": 1498,
+        "endLine": 103,
+        "endChar": 1510
+      },
+      "revId": "7fbc679b3cdb99f6799f8b2f9cb4b528005d297e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
