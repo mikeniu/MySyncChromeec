@@ -57,6 +57,12 @@ gpio_ec_pch_wake_odl: &gpio_soc_wake_odl {};
 /* AP interface */
 &espi0 {
 	status = "okay";
+
+	peci0: peci {
+        compatible = "intel,espi-peci";
+        peci-addr = <0x07>;
+        status = "okay";
+    };
 };
 
 &sha0 {
