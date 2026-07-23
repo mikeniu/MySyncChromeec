@@ -16,6 +16,41 @@
       "message": "@manimaran.a@microchip.corp-partner.google.com I rebased the downstream [CLs](https://chromium-review.git.corp.google.com/c/chromiumos/third_party/zephyrproject/+/8071713/) and updated this CL but the build issue still occurs:\n```\ngen_isr_tables.py: error: multiple registrations at table_index 15 for irq 15 (0xf)\nExisting section [\u0027.irq.ZEPHYR_BASE/drivers/interrupt_controller/intc_mchp_ecia_xec.c.0\u0027], new section .irq.ZEPHYR_BASE/drivers/espi/espi_mchp_xec_v2.c.44\nHas IRQ_CONNECT or IRQ_DIRECT_CONNECT accidentally been invoked on the same irq multiple times?\n```",
       "revId": "17bf925f2376fb20a1654ea580d9b183768719b8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6276cefd_82a0c41d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1577857
+      },
+      "writtenOn": "2026-07-23T13:38:26Z",
+      "side": 1,
+      "message": "Thanks.\nCould you help delete below node in file zephyr/boards/google/mec172x/mec172x.dtsi\n\n\u0026girq24 {\n\tstatus \u003d \"okay\";\n};\n\u0026girq25 {\n\tstatus \u003d \"okay\";\n};\n\nFYI:\nThe eSPI V2 driver port now connects the VW bank\nIRQs (ht_vw_bank0/1, IRQ 15/16) directly and requires GIRQ24/25 to stay\ndisabled (\"GIRQ24/25 cannot be owned by another driver\").\nThe board\u0027s girq24/25 status \u003d \"okay\" overrides conflict with this, causing a\nduplicate IRQ registration failure in gen_isr_tables.",
+      "parentUuid": "6a598438_0265d425",
+      "revId": "17bf925f2376fb20a1654ea580d9b183768719b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcf1acb3_3e37444a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1577857
+      },
+      "writtenOn": "2026-07-23T13:38:26Z",
+      "side": 1,
+      "message": "Thanks for the help.\n\nI hope with this change, we will come out of the build error.",
+      "revId": "17bf925f2376fb20a1654ea580d9b183768719b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
