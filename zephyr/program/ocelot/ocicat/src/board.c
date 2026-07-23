@@ -14,11 +14,15 @@
 #include "tablet_mode.h"
 
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/pinctrl.h>
 #include <zephyr/logging/log.h>
 
 #include <drivers/vivaldi_kbd.h>
 
 LOG_MODULE_DECLARE(board_init, LOG_LEVEL_INF);
+
+#define I2C5_NODE DT_NODELABEL(i2c5)
+PINCTRL_DT_DEFINE(I2C5_NODE);
 
 int8_t board_vivaldi_keybd_idx(void)
 {
@@ -117,3 +121,31 @@ __override uint32_t board_override_feature_flags0(uint32_t flags0)
 	else
 		return flags0;
 }
+
+static void board_i2c5_ctrl(bool enable)
+{
+	if (DEVICE_DT_GET(
+		    DT_GPIO_CTLR_BY_IDX(DT_NODELABEL(i2c5), scl_gpios, 0)) ==
+	    DEVICE_DT_GET(DT_NODELABEL(gpioe))) {
+		const struct pinctrl_dev_config *pcfg =
+			PINCTRL_DT_DEV_CONFIG_GET(I2C5_NODE);
+
+		if (enable) {
+			pinctrl_apply_state(pcfg, PINCTRL_STATE_DEFAULT);
+		} else {
+			pinctrl_apply_state(pcfg, PINCTRL_STATE_SLEEP);
+		}
+	}
+}
+
+static void board_enable_i2c_alt_pins(void)
+{
+	board_i2c5_ctrl(1);
+}
+DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_enable_i2c_alt_pins, HOOK_PRIO_FIRST);
+
+static void board_disable_i2c_alt_pins(void)
+{
+	board_i2c5_ctrl(0);
+}
+DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_disable_i2c_alt_pins, HOOK_PRIO_LAST);
