@@ -195,7 +195,7 @@ enum {
 				  EC_TASK_RWSIG_PRIO, 0)),                 \
 		    ())                                                    \
 	COND_CODE_1(HAS_TASK_CEC,                                          \
-		    (CROS_EC_TASK(CEC, cec_task, 0,                        \
+		    (CROS_EC_TASK(CEC2, cec_task, 0,                       \
 				  CONFIG_TASK_CEC_STACK_SIZE,              \
 				  EC_TASK_CEC_PRIO, 0)),                   \
 		    ())
