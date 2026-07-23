@@ -14,7 +14,7 @@
 #include "util.h"
 #include "watchdog.h"
 
-#ifndef SECTION_IS_RO
+#ifndef CONFIG_CROS_EC_RO
 
 /**
  * Some unit tests do not have a watchdog enabled and the watchdog

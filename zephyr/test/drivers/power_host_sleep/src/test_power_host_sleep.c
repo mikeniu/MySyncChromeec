@@ -166,7 +166,7 @@ ZTEST(power_host_sleep, test_sleep_start_suspend_custom_timeout)
 	/* Allow timeout to occur */
 	k_sleep(K_MSEC(CONFIG_SLEEP_TIMEOUT_MS * 2));
 
-#if defined(SECTION_IS_RW)
+#if defined(CONFIG_CROS_EC_RW)
 	/* Check timeout handlers fired only *once* after multiple calls */
 	zassert_equal(power_chipset_handle_sleep_hang_fake.call_count, 1);
 	zassert_equal(power_board_handle_sleep_hang_fake.call_count, 1);
@@ -188,7 +188,7 @@ ZTEST(power_host_sleep, test_sleep_start_suspend_default_timeout)
 
 	k_msleep(CONFIG_SLEEP_TIMEOUT_MS * 2);
 
-#if defined(SECTION_IS_RW)
+#if defined(CONFIG_CROS_EC_RW)
 	zassert_equal(power_chipset_handle_sleep_hang_fake.call_count, 1);
 	zassert_equal(power_board_handle_sleep_hang_fake.call_count, 1);
 
@@ -235,7 +235,7 @@ ZTEST(power_host_sleep, test_suspend_then_resume_with_timeout)
 	sleep_resume_transition();
 	k_sleep(K_MSEC(CONFIG_SLEEP_TIMEOUT_MS * 2));
 
-#if defined(SECTION_IS_RW)
+#if defined(CONFIG_CROS_EC_RW)
 	/* Resume state transition timeout hook should've fired */
 	zassert_equal(power_chipset_handle_sleep_hang_fake.call_count, 1);
 	zassert_equal(power_board_handle_sleep_hang_fake.call_count, 1);
@@ -289,7 +289,7 @@ ZTEST(power_host_sleep, test_suspend_then_resume_with_reboot)
 	sleep_resume_transition();
 	k_sleep(K_MSEC(CONFIG_SLEEP_TIMEOUT_MS * 2));
 
-#if defined(SECTION_IS_RW)
+#if defined(CONFIG_CROS_EC_RW)
 	/* Resume state transition timeout hook should've fired */
 	zassert_equal(power_chipset_handle_sleep_hang_fake.call_count, 1);
 	zassert_equal(power_board_handle_sleep_hang_fake.call_count, 1);
@@ -434,7 +434,7 @@ ZTEST(power_host_sleep, test_increment_change_state)
 ZTEST(power_host_sleep, test_sleep_signal_transitions)
 {
 	// The HOST_SLEEP_SIGNAL_TRANSISIONS command is only available in RW.
-	Z_TEST_SKIP_IFNDEF(SECTION_IS_RW);
+	Z_TEST_SKIP_IFNDEF(CONFIG_CROS_EC_RW);
 
 	struct ec_response_host_sleep_signal_transitions rsp;
 	struct host_cmd_handler_args args = BUILD_HOST_COMMAND_RESPONSE(
