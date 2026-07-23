@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "860de285_d76f6b05",
+        "filename": "zephyr/shim/src/console.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-23T15:55:32Z",
+      "side": 1,
+      "message": "```suggestion\n\tif (IS_ENABLED(CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT) \u0026\u0026 in_isr) {\n\t    printk(\"[ISR]\";\n\t    return\n\t}\n\t\n\t\n\tif (shell_stopped || !shell_is_active()) {\n\t\tprintk(\"%s\", buff);\n\t\treturn;\n\t}\n```",
+      "range": {
+        "startLine": 509,
+        "startChar": 0,
+        "endLine": 519,
+        "endChar": 2
+      },
+      "revId": "c085fe40ba22565fc9bb43fe329b635bab57b1b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
