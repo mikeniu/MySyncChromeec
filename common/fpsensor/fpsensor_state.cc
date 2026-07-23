@@ -30,6 +30,22 @@
 #include <bit>
 #include <variant>
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/linker/devicetree_regions.h>
+#if 1
+#undef FP_TEMPLATE_SECTION
+#define FP_TEMPLATE_SECTION         \
+	__attribute__((__section__( \
+		LINKER_DT_NODE_REGION_NAME(DT_NODELABEL(sram1_3)))))
+#endif
+#if 1
+/* This buffer is used to communicate with sensor, which means it can not be
+ * cachable. */
+#undef FP_FRAME_SECTION
+#define FP_FRAME_SECTION __nocache
+#endif
+#endif
+
 /* Last acquired frame (aligned as it is used by arbitrary binary libraries) */
 uint8_t fp_buffer[FP_SENSOR_IMAGE_SIZE] FP_FRAME_SECTION __aligned(4);
 /* Fingers templates for the current user */
