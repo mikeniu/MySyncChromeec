@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8f163e8_dd170ffb",
+        "filename": "zephyr/dts/bindings/fingerprint/egis,egis660s.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-23T08:57:59Z",
+      "side": 1,
+      "message": "A new yaml is not needed. Please just add a new property to existing yaml to set a cover type",
+      "revId": "d325b7a632dc2c64d1ede99d93257d1535a6487e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
