@@ -24,6 +24,9 @@
 			gpios = <&gpio0 1 (GPIO_INPUT)>;
 			enum-name = "GPIO_AC_PRESENT";
 		};
+		gpio_pgood_acok_odl: pgood_acok_odl {
+			gpios = <&gpio0 2 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
 		gpio_led_ec_do_argb_di_ls: led_ec_do_argb_di_ls {
 			gpios = <&gpio3 5 (GPIO_OUTPUT)>;
 		};
