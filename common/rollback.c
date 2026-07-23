@@ -129,10 +129,22 @@ int read_rollback(int region, struct rollback_data *data)
 
 	offset = get_rollback_offset(region);
 
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)) {
+		/*
+		 * Acquire lock BEFORE disabling MPU. Any mutex contention
+		 * will happen while MPU hardware protection is still active.
+		 */
+		crec_flash_lock_mapped_storage(1);
+	}
+
 	key = unlock_rollback();
 	if (crec_flash_read(offset, sizeof(*data), (char *)data))
 		ret = EC_ERROR_UNKNOWN;
 	lock_rollback(key);
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)) {
+		crec_flash_lock_mapped_storage(0);
+	}
 
 	return ret;
 }
