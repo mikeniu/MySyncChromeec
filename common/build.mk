@@ -95,7 +95,7 @@ common-$(CONFIG_EC_EC_COMM_SERVER)+=ec_ec_comm_server.o
 common-$(CONFIG_HOST_INTERFACE_ESPI)+=espi.o
 common-$(CONFIG_EXTPOWER_GPIO)+=extpower_gpio.o
 common-$(CONFIG_EXTPOWER)+=extpower_common.o
-common-$(CONFIG_FANS)+=fan.o pwm.o
+common-$(CONFIG_FANS)+=fan.o
 common-$(CONFIG_FLASH_CROS)+=flash.o
 common-$(CONFIG_FMAP)+=fmap.o
 common-$(CONFIG_GESTURE_SW_DETECTION)+=gesture.o
@@ -118,7 +118,6 @@ common-$(CONFIG_KEYBOARD_PROTOCOL_8042)+=keyboard_8042.o \
 common-$(CONFIG_KEYBOARD_PROTOCOL_MKBP)+=keyboard_mkbp.o mkbp_fifo.o \
 	mkbp_info.o
 common-$(CONFIG_KEYBOARD_TEST)+=keyboard_test.o
-common-$(CONFIG_KEYBOARD_VIVALDI)+=keyboard_vivaldi.o
 common-$(CONFIG_KEYBOARD_STRAUSS)+=keyboard_strauss.o
 common-$(CONFIG_MKBP_INPUT_DEVICES)+=mkbp_input_devices.o mkbp_fifo.o \
 	mkbp_info.o
@@ -140,7 +139,6 @@ common-$(CONFIG_PERIPHERAL_CHARGER)+=peripheral_charger.o
 common-$(CONFIG_POWER_BUTTON)+=power_button.o
 common-$(CONFIG_POWER_BUTTON_X86)+=power_button_x86.o
 common-$(CONFIG_PSTORE)+=pstore_commands.o
-common-$(CONFIG_PWM)+=pwm.o
 common-$(CONFIG_PWM_KBLIGHT)+=pwm_kblight.o
 common-$(CONFIG_KEYBOARD_BACKLIGHT)+=keyboard_backlight.o
 common-$(CONFIG_ROLLBACK)+=rollback.o
