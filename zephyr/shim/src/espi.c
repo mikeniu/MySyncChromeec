@@ -43,7 +43,7 @@
 	CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_DEFAULT_VW_WIDTH_US
 
 LOG_MODULE_REGISTER(espi_shim, CONFIG_ESPI_LOG_LEVEL);
-
+extern void z_log_minimal_printk(const char *fmt, ...);
 /*
  * Some functions are compiled depending on combinations of
  * CONFIG_PLATFORM_EC_POWERSEQ, CONFIG_AP_PWRSEQ and
@@ -501,7 +501,7 @@ static void handle_host_write(uint32_t data)
 		/* TODO:(b/175217186): error response for other versions */
 		return;
 	}
-
+	LOG_ERR("shim/src/handle_host_write---->espi_read_lpc_request");
 	rv = espi_read_lpc_request(espi_dev, ECUSTOM_HOST_CMD_GET_PARAM_MEMORY,
 				   &shm_mem_host_cmd);
 	if (rv) {
@@ -521,7 +521,7 @@ static void handle_host_write(uint32_t data)
 	lpc_packet.response_size = 0;
 
 	lpc_packet.driver_result = EC_RES_SUCCESS;
-
+	LOG_ERR("shim/src/espi_read_lpc_request---->host_packet_receive");
 	host_packet_receive(&lpc_packet);
 	return;
 }
@@ -695,6 +695,7 @@ static void espi_peripheral_handler(const struct device *dev,
 #ifndef CONFIG_EC_HOST_CMD
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_HOSTCMD) &&
 	    event_type == ESPI_PERIPHERAL_EC_HOST_CMD) {
+		LOG_ERR("shim/src/espi_peripheral_handler---->handle_host_write");
 		handle_host_write(event.evt_data);
 	}
 #endif

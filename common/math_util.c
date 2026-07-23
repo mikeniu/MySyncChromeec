@@ -13,7 +13,7 @@
 /* For cosine lookup table, define the increment and the size of the table. */
 #define COSINE_LUT_INCR_DEG 5
 #define COSINE_LUT_SIZE ((180 / COSINE_LUT_INCR_DEG) + 1)
-
+#define ROTATE_DEBUG 0
 /* Lookup table for the value of cosine from 0 degrees to 180 degrees. */
 static const fp_t cos_lut[] = {
 	FLOAT_TO_FP(1.00000),  FLOAT_TO_FP(0.99619),  FLOAT_TO_FP(0.98481),
@@ -224,6 +224,8 @@ void rotate(const intv3_t v, const mat33_fp_t R, intv3_t res)
 	res[0] = FP_TO_INT(t[0]);
 	res[1] = FP_TO_INT(t[1]);
 	res[2] = FP_TO_INT(t[2]);
+	// if (ROTATE_DEBUG)
+	// 	printk("rotate: res X=%d Y=%d Z=%d\n", res[0], res[1], res[2]);
 }
 
 void rotate_inv(const intv3_t v, const mat33_fp_t R, intv3_t res)

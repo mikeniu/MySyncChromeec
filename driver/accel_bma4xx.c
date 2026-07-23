@@ -24,6 +24,10 @@
 
 #include <motion_sense_fifo.h>
 
+#define READ_DEBUG 0
+#define SWIZZLE_DEBUG 0
+#define IRQ_DEBUG 0
+
 #ifdef CONFIG_ACCEL_BMA4XX_INT_EVENT
 #define BMA4XX_USE_INTERRUPTS
 #endif
@@ -508,8 +512,12 @@ static void swizzle_sample_data(const struct motion_sensor_t *s,
 	 */
 	for (int i = X; i <= Z; i++)
 		v[i] = (((int8_t)acc[i * 2 + 1]) << 8) | (acc[i * 2] & 0xf0);
-
+	if (SWIZZLE_DEBUG) {
+		printk("swizzle before rotate: X=%d Y=%d Z=%d\n", v[0], v[1], v[2]);
+	}
 	rotate(v, *s->rot_standard_ref, v);
+	if (SWIZZLE_DEBUG)
+		printk("after rotate: X=%d Y=%d Z=%d\n", v[0], v[1], v[2]);
 }
 
 static int read(const struct motion_sensor_t *s, intv3_t v)
@@ -527,8 +535,14 @@ static int read(const struct motion_sensor_t *s, intv3_t v)
 
 	if (ret)
 		return ret;
-
+	if (READ_DEBUG){
+		printk("loop sensor->name: %s\n", s->name);
+		printk("loop raw acc bytes: %02X %02X %02X %02X %02X %02X\n",
+           acc[0], acc[1], acc[2], acc[3], acc[4], acc[5]);
+	}
 	swizzle_sample_data(s, acc, v);
+	if (READ_DEBUG)
+		printk("final vector: X=%d Y=%d Z=%d\n", v[0], v[1], v[2]);
 
 	return EC_SUCCESS;
 }
@@ -704,13 +718,17 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 			mutex_unlock(s->mutex);
 			if (ret)
 				return ret;
-
+			if (IRQ_DEBUG) {
+				printk("irq sensor->name: %s\n", s->name);
+				printk("irq raw acc bytes: %02X %02X %02X %02X %02X %02X\n",
+					fifo_data[0], fifo_data[1], fifo_data[2], fifo_data[3], fifo_data[4], fifo_data[5]);
+			}
 			process_fifo_data(s, fifo_data, fifo_read,
 					  irq_timestamp);
 			read_any_data = true;
 		}
 	}
-	CPRINTF("BMA4xx: irq 0x%04x stuck\n", interrupt_status_reg);
+	printk("BMA4xx: irq 0x%04x stuck\n", interrupt_status_reg);
 	return EC_ERROR_HW_INTERNAL;
 }
 #endif /* BMA4XX_USE_INTERRUPTS */

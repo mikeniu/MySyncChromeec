@@ -1122,6 +1122,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 	case MOTIONSENSE_CMD_INFO:
 		sensor = host_sensor_id_to_motion_sensor(
 			in->sensor_odr.sensor_num);
+		printk("[MOTIONSENSE_CMD_INFO] = %s\n", sensor->name);
 		if (sensor == NULL)
 			return EC_RES_INVALID_PARAM;
 
@@ -1158,6 +1159,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 
 	case MOTIONSENSE_CMD_EC_RATE:
 		sensor = host_sensor_id_to_real_sensor(in->ec_rate.sensor_num);
+		printk("[MOTIONSENSE_CMD_EC_RATE] = %s\n", sensor->name);
 		if (sensor == NULL)
 			return EC_RES_INVALID_PARAM;
 
@@ -1188,6 +1190,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		/* Verify sensor number is valid. */
 		sensor = host_sensor_id_to_real_sensor(
 			in->sensor_odr.sensor_num);
+		printk("[MOTIONSENSE_CMD_SENSOR_ODR] = %s\n", sensor->name);
 		if (sensor == NULL)
 			return EC_RES_INVALID_PARAM;
 
@@ -1354,6 +1357,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 	case MOTIONSENSE_CMD_FIFO_READ:
 		if (!IS_ENABLED(CONFIG_ACCEL_FIFO))
 			return EC_RES_INVALID_PARAM;
+		printk("[MOTIONSENSE_CMD_FIFO_READ] = %s\n", sensor->name);
 		out->fifo_read.number_data = motion_sense_fifo_read(
 			args->response_max - sizeof(out->fifo_read),
 			in->fifo_read.max_data_vector, out->fifo_read.data,
@@ -1574,6 +1578,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 		if (IS_ENABLED(CONFIG_LID_ANGLE) &&
 		    (ret == EC_RES_INVALID_PARAM) &&
 		    sensor_board_is_lid_angle_available())
+			printk("[default cmd] = %s\n", sensor->name);
 			ret = host_cmd_motion_lid(args);
 		return ret;
 	}

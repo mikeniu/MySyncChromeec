@@ -29,6 +29,8 @@
 #define CPRINTS(format, args...) cprints(CC_MOTION_LID, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_MOTION_LID, format, ##args)
 
+#define LID_DEBUG 0
+
 #ifdef CONFIG_TABLET_MODE
 /* Previous lid_angle. */
 static fp_t last_lid_angle_fp = FLOAT_TO_FP(-1);
@@ -488,10 +490,15 @@ int motion_lid_get_angle(void)
  */
 void motion_lid_calc(void)
 {
+	if (LID_DEBUG) {
+		printk("accel_base->xyz: X=%d Y=%d Z=%d\n", accel_base->xyz[0], accel_base->xyz[1], accel_base->xyz[2]);
+		printk("accel_lid->xyz: X=%d Y=%d Z=%d\n", accel_lid->xyz[0], accel_lid->xyz[1], accel_lid->xyz[2]);
+	}
 	/* Calculate angle of lid accel. */
 	lid_angle_is_reliable = calculate_lid_angle(
 		accel_base->xyz, accel_lid->xyz, &lid_angle_deg);
-
+	if (LID_DEBUG)
+		printk("[lid_angle_deg] = %d\n", lid_angle_deg);
 	if (IS_ENABLED(CONFIG_LID_ANGLE_UPDATE))
 		lid_angle_update(motion_lid_get_angle());
 }
@@ -534,6 +541,7 @@ enum ec_status host_cmd_motion_lid(struct host_cmd_handler_args *args)
 		if (IS_ENABLED(CONFIG_LID_ANGLE)) {
 			out->lid_angle.value = motion_lid_get_angle();
 			args->response_size = sizeof(out->lid_angle);
+			printk("[MOTIONSENSE_CMD_LID_ANGLE] = %d\n", out->lid_angle.value);
 		} else {
 			return EC_RES_INVALID_PARAM;
 		}

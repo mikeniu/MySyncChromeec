@@ -159,7 +159,7 @@ void host_command_received(struct host_cmd_handler_args *args)
 	} else {
 		/* Save the command */
 		pending_args = args;
-
+		printk("[host_command_received--->task_set_event] command=0x%04X\n", pending_args->command);
 		/* Wake up the task to handle the command */
 		task_set_event(TASK_ID_HOSTCMD, TASK_EVENT_CMD_PENDING);
 		return;
@@ -223,6 +223,7 @@ void host_packet_receive(struct host_packet *pkt)
 	int csum = 0;
 	int i;
 
+	printk("host_packet_receive--->enter\n");
 	/* Track the packet we're handling */
 	pkt0 = pkt;
 
@@ -328,6 +329,7 @@ host_packet_bad:
 	 * let the host command task send the response.
 	 */
 	/* Improperly formed packet from host, so send an error response */
+	printk("[host_packet_receive--->host_packet_bad]\n");
 	host_packet_respond(&args0);
 }
 
@@ -392,6 +394,7 @@ void host_command_task(void *u)
 		t0 = get_time();
 
 		/* Process it */
+		printk("[pending_args]=0x%04X\n", pending_args->command);
 		if ((evt & TASK_EVENT_CMD_PENDING) && pending_args) {
 			pending_args->result =
 				host_command_process(pending_args);
