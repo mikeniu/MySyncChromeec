@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c4323ab_0436f1b5",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 9467,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T15:22:59Z",
+      "side": 1,
+      "message": "why bother with the structs? also the naming sounds off, get_... on something that is not a function, but can\u0027t you use the fields directly?",
+      "range": {
+        "startLine": 9457,
+        "startChar": 0,
+        "endLine": 9467,
+        "endChar": 21
+      },
+      "revId": "58127f11d15b9f6fd960f1120a54ecede4b243ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90346b53_94c573ed",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 9506,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T15:22:59Z",
+      "side": 1,
+      "message": "very nitpicky: I\u0027d keep them in the same order as how you defined them above",
+      "range": {
+        "startLine": 9503,
+        "startChar": 0,
+        "endLine": 9506,
+        "endChar": 36
+      },
+      "revId": "58127f11d15b9f6fd960f1120a54ecede4b243ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9899acfd_c26711fc",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 9507,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-23T15:22:59Z",
+      "side": 1,
+      "message": "nit: stray blank line, drop?",
+      "revId": "58127f11d15b9f6fd960f1120a54ecede4b243ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
