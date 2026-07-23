@@ -161,7 +161,7 @@ test_static int test_add_entropy(void)
 	 * Add entropy. The result should end up being written to the unused
 	 * region (region 1).
 	 */
-	if (IS_ENABLED(SECTION_IS_RO)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RO)) {
 		rv = rollback_add_entropy(FAKE_ENTROPY, sizeof(FAKE_ENTROPY));
 		TEST_EQ(rv, EC_SUCCESS, "%d");
 	}
@@ -180,7 +180,7 @@ test_static int test_add_entropy(void)
 	 * Add more entropy. The result should now end up being written to
 	 * region 0.
 	 */
-	if (IS_ENABLED(SECTION_IS_RO)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RO)) {
 		rv = rollback_add_entropy(FAKE_ENTROPY, sizeof(FAKE_ENTROPY));
 		TEST_EQ(rv, EC_SUCCESS, "%d");
 	}
