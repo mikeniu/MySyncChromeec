@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a05e1ade_f32e5742",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-23T07:30:31Z",
+      "side": 1,
+      "message": "is this always 1? This is written from DTS, whereas cols and rows are probed from the sensor.",
+      "range": {
+        "startLine": 322,
+        "startChar": 10,
+        "endLine": 322,
+        "endChar": 34
+      },
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
