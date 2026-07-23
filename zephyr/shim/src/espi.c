@@ -62,6 +62,12 @@ static struct host_packet lpc_packet;
  * This is for input request temp buffer.
  */
 static uint8_t params_copy[EC_LPC_HOST_PACKET_SIZE] __aligned(4);
+/*
+ * Set when a host command has been accepted but its response has not yet been
+ * sent. Used to release the host-command BUSY status if sysjump triggered
+ * mid-command.
+ */
+static bool host_cmd_in_progress;
 #endif
 static bool init_done;
 
@@ -484,6 +490,7 @@ static void lpc_send_response_packet(struct host_packet *pkt)
 
 	/* Write result to the data byte.  This sets the TOH status bit. */
 	data = pkt->driver_result;
+	host_cmd_in_progress = false; /* completed normally */
 	rv = espi_write_lpc_request(espi_dev, ECUSTOM_HOST_CMD_SEND_RESULT,
 				    &data);
 	if (rv) {
@@ -522,7 +529,7 @@ static void handle_host_write(uint32_t data)
 	lpc_packet.response_size = 0;
 
 	lpc_packet.driver_result = EC_RES_SUCCESS;
-
+	host_cmd_in_progress = true; /* command accepted */
 	host_packet_receive(&lpc_packet);
 	return;
 }
@@ -815,5 +822,20 @@ static void espi_sysjump(void)
 	/* Disable host interface interrupts during the sysjump */
 	espi_write_lpc_request(espi_dev, ECUSTOM_HOST_SUBS_INTERRUPT_EN,
 			       &enable);
+
+#ifndef CONFIG_EC_HOST_CMD
+	/*
+	 * If a host command was received but not yet completed, we're about to
+	 * jump images and will never send its response. Release the
+	 * host-command BUSY status with an error so the AP doesn't poll forever
+	 * (b/524783099).
+	 */
+	if (host_cmd_in_progress) {
+		uint32_t result = EC_RES_ERROR;
+		espi_write_lpc_request(espi_dev, ECUSTOM_HOST_CMD_SEND_RESULT,
+				       &result);
+		host_cmd_in_progress = false;
+	}
+#endif
 }
 DECLARE_HOOK(HOOK_SYSJUMP, espi_sysjump, HOOK_PRIO_DEFAULT);
