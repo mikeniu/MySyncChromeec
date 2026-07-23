@@ -69,6 +69,12 @@ enum {
 #define EC_TASK_PRIORITY(prio) K_PRIO_PREEMPT(EC_TASK_PRIO_COUNT - prio - 1)
 
 /*
+ * STM32 CMSIS headers define CEC as ((CEC_TypeDef *) CEC_BASE), which
+ * collides with the task name CEC during token pasting in K_THREAD_DEFINE
+ */
+#undef CEC
+
+/*
  * List of CROS_EC_TASK items. See CONFIG_TASK_LIST in platform/ec's config.h
  * for more information.  For tests that want their own custom tasks, use
  * CONFIG_HAS_TEST_TASKS and not CONFIG_SHIMMED_TASKS.
