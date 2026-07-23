@@ -44,6 +44,45 @@ toolchain_name_map = {
 }
 
 
+def find_local_toolchain(target: str) -> Union[str, None]:
+    """Check for a locally installed toolchain under /opt/coreboot-sdk."""
+    pkg = target.split("-")[0]
+    arch = target[len(pkg) + 1 :] if "-" in target else target
+    if target.startswith("libstdcxx"):
+        candidates = [
+            f"/opt/coreboot-sdk/{pkg}",
+            "/opt/coreboot-sdk",
+        ]
+    else:
+        candidates = [
+            "/opt/coreboot-sdk",
+            f"/opt/coreboot-sdk/{pkg}",
+        ]
+    for cand in candidates:
+        if not os.path.isdir(cand):
+            continue
+        if target.startswith("libstdcxx"):
+            if os.path.exists(os.path.join(cand, arch)) or os.path.exists(
+                os.path.join(cand, target)
+            ):
+                return cand
+        elif target.startswith("picolibc"):
+            if os.path.exists(
+                os.path.join(cand, "picolibc", f"coreboot-{arch}")
+            ) or os.path.exists(
+                os.path.join(cand, "picolibc", f"coreboot-{target}")
+            ):
+                return cand
+        else:
+            if (
+                os.path.exists(os.path.join(cand, "bin", f"{target}-gcc"))
+                or os.path.exists(os.path.join(cand, "lib", "gcc", target))
+                or os.path.exists(os.path.join(cand, target))
+            ):
+                return cand
+    return None
+
+
 def get_toolchains_shell(
     portage_toolchains: Dict[str, Tuple],
     local_filepath: Union[str, "os.PathLike[str]"] = os.path.expanduser(
@@ -70,6 +109,17 @@ def get_toolchains_shell(
     ) in portage_toolchains.items():
         if toolchain and target != toolchain:
             continue
+        local_dir = find_local_toolchain(target)
+        if local_dir:
+            print(
+                f"Using locally built toolchain for {target}: {local_dir}",
+                file=sys.stderr,
+            )
+            result[
+                toolchain_name_map.get(target) or f"COREBOOT_SDK_ROOT_{target}"
+            ] = local_dir
+            continue
+
         output_path = local_filepath + "/" + target
         output_toolchain = output_path + "/" + toolchain_hash
         tempfile.tempdir = output_path
