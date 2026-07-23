@@ -153,8 +153,9 @@ static void copy_esf_to_panic_data(const struct arch_esf *esf,
 	memset(pdata, 0, CONFIG_PANIC_DATA_SIZE);
 	pdata->arch = PANIC_ARCH;
 	pdata->struct_version = 2;
-	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
-						   PANIC_DATA_FLAG_RO_IMAGE;
+	pdata->flags = IS_ENABLED(CONFIG_CROS_EC_RW) ?
+			       PANIC_DATA_FLAG_RW_IMAGE :
+			       PANIC_DATA_FLAG_RO_IMAGE;
 	pdata->flags |= (PANIC_ARCH == PANIC_ARCH_CORTEX_M) ?
 				PANIC_DATA_FLAG_FRAME_VALID :
 				0;
@@ -263,8 +264,9 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
 	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
 	pdata->struct_version = 2;
 	pdata->arch = PANIC_ARCH;
-	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
-						   PANIC_DATA_FLAG_RO_IMAGE;
+	pdata->flags = IS_ENABLED(CONFIG_CROS_EC_RW) ?
+			       PANIC_DATA_FLAG_RW_IMAGE :
+			       PANIC_DATA_FLAG_RO_IMAGE;
 
 	/* Log panic cause */
 	PANIC_REG_EXCEPTION(pdata) = exception;
@@ -318,7 +320,7 @@ test_export_static int panic_data_init(void)
 	 * data version and updating the panic reason will cause new fields to
 	 * be overwritten.
 	 */
-	if (!IS_ENABLED(SECTION_IS_RW)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RO)) {
 		return 0;
 	}
 
