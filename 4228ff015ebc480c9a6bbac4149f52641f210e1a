@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eafc07b1_1d97082b",
+        "filename": "common/peripheral_charger.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1045,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-23T21:14:08Z",
+      "side": 1,
+      "message": "Use `CONFIG_PLATFORM_EC_PERIPHERAL_CHARGER_UPDATE` directly.  We shouldn\u0027t add more options to config.h in the platform/ec branch.",
+      "range": {
+        "startLine": 1045,
+        "startChar": 7,
+        "endLine": 1045,
+        "endChar": 39
+      },
+      "revId": "4228ff015ebc480c9a6bbac4149f52641f210e1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "887f7494_612703eb",
+        "filename": "include/config.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 3784,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-23T21:14:08Z",
+      "side": 1,
+      "message": "Delete.  This can be added to platform/ec-legacy if this CL is backported.",
+      "range": {
+        "startLine": 3781,
+        "startChar": 0,
+        "endLine": 3784,
+        "endChar": 0
+      },
+      "revId": "4228ff015ebc480c9a6bbac4149f52641f210e1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "527e018a_1962900c",
+        "filename": "zephyr/Kconfig.wireless_charger",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-23T21:14:08Z",
+      "side": 1,
+      "message": "Nit - line length",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 79
+      },
+      "revId": "4228ff015ebc480c9a6bbac4149f52641f210e1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97b93537_b54ac78f",
+        "filename": "zephyr/shim/include/config_chip.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 3644,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-23T21:14:08Z",
+      "side": 1,
+      "message": "Delete - not needed in platform/ec for new Kconfigs",
+      "range": {
+        "startLine": 3641,
+        "startChar": 0,
+        "endLine": 3644,
+        "endChar": 6
+      },
+      "revId": "4228ff015ebc480c9a6bbac4149f52641f210e1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
