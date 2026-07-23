@@ -140,9 +140,9 @@ endif
 _tsk_lst_flags+=-I$(BDIR) -DBOARD_$(UC_BOARD)=$(EMPTY) \
 		-D_MAKEFILE=$(EMPTY) -imacros $(_tsk_lst_file)
 
-_tsk_lst_ro:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -DSECTION_IS_RO=$(EMPTY) \
+_tsk_lst_ro:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -DCONFIG_CROS_EC_RO=1 \
 	$(_tsk_lst_flags) include/task_filter.h)
-_tsk_lst_rw:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -DSECTION_IS_RW=$(EMPTY) \
+_tsk_lst_rw:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -DCONFIG_CROS_EC_RW=1 \
 	$(_tsk_lst_flags) include/task_filter.h)
 
 _tsk_cfg_ro:=$(foreach t,$(_tsk_lst_ro) ,HAS_TASK_$(t))
