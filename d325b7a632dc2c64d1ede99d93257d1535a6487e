@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "374df5fb_daf806bf",
+        "filename": "zephyr/dts/bindings/fingerprint/egis,egis660s.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-07-23T13:58:21Z",
+      "side": 1,
+      "message": "Removed new yaml",
+      "parentUuid": "b8f163e8_dd170ffb",
+      "revId": "d325b7a632dc2c64d1ede99d93257d1535a6487e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a3e6c8f_1414e9fa",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-23T08:58:47Z",
       "side": 1,
       "message": "I don\u0027t think any of new tests are needed since the egis660 dirver is not modified.",
+      "revId": "d325b7a632dc2c64d1ede99d93257d1535a6487e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9b85f34_ff461bf4",
+        "filename": "zephyr/emul/emul_egis660s.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-07-23T13:58:21Z",
+      "side": 1,
+      "message": "Removed new tests",
+      "parentUuid": "1a3e6c8f_1414e9fa",
       "revId": "d325b7a632dc2c64d1ede99d93257d1535a6487e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

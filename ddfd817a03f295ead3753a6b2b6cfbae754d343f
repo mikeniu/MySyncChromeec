@@ -16,6 +16,24 @@
       "message": "Can we just reuse the existing yaml and configs with additional chosen config like:\n```\nchoice FINGERPRINT_SENSOR_EGIS660_COVER\n```\nand based on that a proper lib is selected etc.\n\nMaybe even add a property enum to existing yaml?",
       "revId": "ddfd817a03f295ead3753a6b2b6cfbae754d343f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8806a0eb_7bb7aa6e",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-07-23T13:58:21Z",
+      "side": 1,
+      "message": "I have added cover-type property enum in zephyr/dts/bindings/fingerprint/egis,egis660.yaml",
+      "parentUuid": "6a59d055_775b9d9f",
+      "revId": "ddfd817a03f295ead3753a6b2b6cfbae754d343f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
