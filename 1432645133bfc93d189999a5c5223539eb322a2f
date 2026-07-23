@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eaf0d5ac_98537ce0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 36
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-23T13:22:37Z",
+      "side": 1,
+      "message": "Hi @keithshort@chromium.org @fabiobaltieri@google.com, friendly ping on this! I\u0027ve updated `pwrmon` so it now sends PACs data via MKBP. Could you please take a look when you have a chance?",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
