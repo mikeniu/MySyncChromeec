@@ -18,6 +18,7 @@
 
 #include <drivers/fingerprint.h>
 #include <fingerprint/v4l2_types.h>
+#include <subsys/fingerprint/alg/ft98xx_bio_alg.h>
 
 LOG_MODULE_REGISTER(cros_fingerprint, LOG_LEVEL_INF);
 
@@ -294,6 +295,14 @@ static int ft98xx_acquire_image(const struct device *dev,
 	int frame_size = ft98xx_get_frame_size(dev, capture_type);
 	if ((frame_size < 0) || (image_buf_size < frame_size))
 		return -EINVAL;
+
+	uint16_t cols = ft_sensor_query_cols();
+	uint16_t rows = ft_sensor_query_rows();
+	if (FT_RAW_SIZE + ((size_t)cols * rows) > image_buf_size) {
+		LOG_ERR("Runtime frame requirement (%zu) exceeds available buffer (%zu)",
+			FT_RAW_SIZE + ((size_t)cols * rows), image_buf_size);
+		return -EINVAL;
+	}
 
 	if (!IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)) {
 		return -ENOTSUP;
