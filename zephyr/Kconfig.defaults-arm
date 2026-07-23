@@ -4,7 +4,7 @@
 
 # ARM specific Kconfig overrides.
 
-config TRAP_UNALIGNED_ACCESS
+configdefault TRAP_UNALIGNED_ACCESS
 	default y
 
 choice NULL_POINTER_EXCEPTION_DETECTION

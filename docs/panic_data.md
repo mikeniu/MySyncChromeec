@@ -217,7 +217,7 @@ The EC console provides commands to inspect, clear, and simulate crashes for tes
     *   `assert`: Triggers a failed assertion (`ASSERT(0)`).
     *   `divzero` / `udivzero`: Triggers a signed/unsigned integer division by zero.
     *   `stack`: Triggers a stack overflow via infinite recursion.
-    *   `unaligned`: Triggers an unaligned memory access (if `CONFIG_ALLOW_UNALIGNED_ACCESS` is disabled).
+    *   `unaligned`: Triggers an unaligned memory access.
     *   `watchdog`: Enters an infinite loop (with interrupts enabled) to trigger a hardware watchdog reset.
     *   `hang`: Enters an infinite loop with interrupts disabled (`irq_lock()`), simulating a hard lockup.
     *   `null`: Dereferences a null pointer.
