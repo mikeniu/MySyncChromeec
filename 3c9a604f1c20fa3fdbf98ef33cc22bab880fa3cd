@@ -16,6 +16,23 @@
       "message": "Abe to confirm deletion is OK.",
       "revId": "3c9a604f1c20fa3fdbf98ef33cc22bab880fa3cd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "621b7444_d4d0e64a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-23T17:04:13Z",
+      "side": 1,
+      "message": "I have no objection to this in terms of stuff I\u0027ve dealt with recently. `usb_pd_tcpc.c` and `stub.c` were used in boards with generic MCUs as TCPCs, which we haven\u0027t done in quite some time. If none of those are maintained anymore, I think it\u0027s fine to get rid of those files.\n\nThe alternate TC and PE implementations were probably used in some kind of dongles that we designed, and I\u0027m not sure why/when/how we update those firmware images. @bleung@chromium.org @scollyer@chromium.org Do you know what, if anything, we\u0027re doing with VPD dongle firmware these days?",
+      "revId": "3c9a604f1c20fa3fdbf98ef33cc22bab880fa3cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
