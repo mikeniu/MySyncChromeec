@@ -105,6 +105,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "342fcee2_6f0e9283",
+        "filename": "zephyr/shim/chip/mchp/system_download_from_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-23T06:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e1cec1b_21b41037",
+      "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5de26bf9_1fd6bcfe",
@@ -122,6 +140,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d10de20_d50387b2",
+        "filename": "zephyr/shim/chip/mchp/system_download_from_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-23T06:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5de26bf9_1fd6bcfe",
+      "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "58dfa913_719c9946",
@@ -135,6 +171,24 @@
       "writtenOn": "2026-07-22T18:15:37Z",
       "side": 1,
       "message": "qspi-\u003eEXE \u003d BIT(XEC_QSPI_EXE_START_POS);",
+      "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b63a38c7_c4a4ff21",
+        "filename": "zephyr/shim/chip/mchp/system_download_from_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-23T06:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58dfa913_719c9946",
       "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

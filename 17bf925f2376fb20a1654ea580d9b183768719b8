@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a598438_0265d425",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-23T06:48:20Z",
+      "side": 1,
+      "message": "@manimaran.a@microchip.corp-partner.google.com I rebased the downstream [CLs](https://chromium-review.git.corp.google.com/c/chromiumos/third_party/zephyrproject/+/8071713/) and updated this CL but the build issue still occurs:\n```\ngen_isr_tables.py: error: multiple registrations at table_index 15 for irq 15 (0xf)\nExisting section [\u0027.irq.ZEPHYR_BASE/drivers/interrupt_controller/intc_mchp_ecia_xec.c.0\u0027], new section .irq.ZEPHYR_BASE/drivers/espi/espi_mchp_xec_v2.c.44\nHas IRQ_CONNECT or IRQ_DIRECT_CONNECT accidentally been invoked on the same irq multiple times?\n```",
+      "revId": "17bf925f2376fb20a1654ea580d9b183768719b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
