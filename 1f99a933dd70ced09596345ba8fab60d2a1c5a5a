@@ -3,6 +3,96 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "09fc7741_95166b61",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T07:33:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/9cabe8e1-0095-4c02-beff-28fbe20be997)]\n\n**Review Summary:**\n* **Functionality**: The logic to calculate `required_size` based on sensor parameters and validate it against the available buffer size is conceptually correct. However, there is a control flow issue where private driver functions are called before ensuring the driver is actually enabled.\n* **Security**: Enforcing runtime frame size constraints against `image_buf_size` is a solid improvement to prevent potential buffer overflows.\n* **Style**: Code style is clean and mostly consistent with the rest of the driver.\n* **Testing**: Build tested via `zmake` command as described in the commit message.",
+      "isAi": true,
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d288e076_854865e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T07:33:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/78cdd0e6-cfd5-48ce-9db4-71c361281777)]\n\n### Review Summary\n\n*   **Functionality:** **Changes requested.** The patch introduces a potential bug by querying sensor properties (`ft_sensor_query_cols()`, etc.) before verifying that the private driver is enabled. If the driver is disabled, this could cause linker errors or undefined behavior. Moving the `IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)` check earlier in `ft98xx_acquire_image` fixes this. Additionally, there is a risk of size miscalculation if the sensor\u0027s bits-per-pixel dynamically changes, as the code mixes dynamic dimension queries with static Devicetree `bpp` values.\n*   **Style:** **Minor suggestions.** The logic to iterate over the `sensor_image_configs` array to find the correct configuration based on `capture_type` is duplicated across `ft98xx_get_bytes_per_pixel` and `ft98xx_get_frame_size`. Extracting this into a single helper function would improve maintainability.\n*   **Security:** **Good.** The core logic change adds a bounds check for the dynamically sized `image_buf`, correctly mitigating potential buffer overflow risks.\n*   **Testing:** **Good.** The commit message states that the code was compiled for `chudow`, which is appropriate. However, ensure that the build still succeeds for targets where `CONFIG_HAVE_FT98XX_PRIVATE_DRIVER` is disabled.",
+      "isAi": true,
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c4081e0_52460cc5",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T07:33:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Style Suggestion:**\nYou\u0027re duplicating the logic to find the capture configuration in both `ft98xx_get_bytes_per_pixel` and `ft98xx_get_frame_size`.\n\nConsider refactoring this into a single helper function (e.g., `ft98xx_get_image_config`) that takes the `capture_type` and returns a pointer to the matching `fingerprint_image_frame_params` struct. This would allow you to extract both the frame size and the bpp without iterating over the array twice.",
+      "isAi": true,
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cd25d5e_1783fdb9",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T07:33:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The `IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)` check (currently on line 330) should be moved *above* these sensor queries.\n\n`ft_sensor_query_cols()` and `ft_sensor_query_rows()` are part of the private driver API. If the private driver is disabled (`CONFIG_HAVE_FT98XX_PRIVATE_DRIVER\u003dn`), calling these functions before verifying that the driver is enabled could lead to linker errors or undefined behavior. \n\nMoving the `IS_ENABLED` check to the top of the function matches the safe pattern used in `ft98xx_init()`, `ft98xx_set_mode()`, and `ft98xx_finger_status()`.",
+      "isAi": true,
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "053381cc_4a7636e7",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T07:33:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] You are calculating the required size using dynamically probed `cols` and `rows`, but a static `bytes_per_pixel` from the Devicetree configuration. \n\nIf the sensor has the ability to dynamically change its pixel format alongside its dimensions, this could lead to an incorrect calculation. If the sensor API provides a way to query the active bits-per-pixel, it might be safer to use that. If `bpp` is guaranteed to be constant for this sensor across all runtime configurations, this mix of static and dynamic values is fine.",
+      "isAi": true,
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a05e1ade_f32e5742",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
         "patchSetId": 2
@@ -20,6 +110,24 @@
         "endLine": 322,
         "endChar": 34
       },
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0617a17e_c9d3061e",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T07:33:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The `IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)` check should be performed **before** calling `ft_sensor_query_cols()` and `ft_sensor_query_rows()`. \n\nIf the private driver is disabled, calling these functions might cause linker errors (if they aren\u0027t stubbed) or unintended behavior. Moving this check earlier in the function ensures consistency with `ft98xx_set_mode` and `ft98xx_finger_status`, where the check acts as an immediate guard.",
+      "isAi": true,
       "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
