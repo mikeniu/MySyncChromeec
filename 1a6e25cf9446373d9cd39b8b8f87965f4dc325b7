@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce9405c8_c470d7ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-23T06:03:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/40e62ad3-71a3-412b-a75a-e3aad9d94486)]\n\n### Review Summary\n\n*   **Functionality:** The fix is well-reasoned and correctly implemented. Pre-acquiring `crec_flash_lock_mapped_storage` before `unlock_rollback()` (which disables interrupts) ensures that if the mutex is contended, the thread will yield while interrupts are still enabled and the MPU is active, avoiding a kernel panic or unsafe thread suspension.\n*   **Security:** No security issues introduced. The MPU protection window remains appropriately small, and the mapped storage lock is properly released even if the read fails. \n*   **Style:** The changes are clean, easy to read, and consistent with the use of `IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)` seen elsewhere in the file (e.g., in `rollback_update()`). The use of braces for single-line blocks also matches the existing file conventions.\n*   **Consistency:** The added locks mirror the logic found elsewhere for safely interacting with external storage. \n*   **Testing:** The test `zmake -D build helipilot --clobber` ensures it doesn\u0027t break the build for helipilot.\n\nGreat catch and solid fix!",
+      "isAi": true,
+      "revId": "1a6e25cf9446373d9cd39b8b8f87965f4dc325b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
