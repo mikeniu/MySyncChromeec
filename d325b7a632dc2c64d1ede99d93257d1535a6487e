@@ -16,6 +16,23 @@
       "message": "A new yaml is not needed. Please just add a new property to existing yaml to set a cover type",
       "revId": "d325b7a632dc2c64d1ede99d93257d1535a6487e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a3e6c8f_1414e9fa",
+        "filename": "zephyr/emul/emul_egis660s.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-07-23T08:58:47Z",
+      "side": 1,
+      "message": "I don\u0027t think any of new tests are needed since the egis660 dirver is not modified.",
+      "revId": "d325b7a632dc2c64d1ede99d93257d1535a6487e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
