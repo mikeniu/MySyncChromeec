@@ -92,6 +92,28 @@ config USBC_PDC_TRACE_MSG
 	  Messages between the EC and PDC are saved in a pre-allocated
 	  FIFO so they can be retrieved by EC host and console commands.
 
+config USBC_PDC_ANX74XX
+        bool "Analogix ANX74XX Power Delivery Controller driver"
+        default y if DT_HAS_ANALOGIX_ANX74_PDC_ENABLED
+        select SMF
+        select SMF_ANCESTOR_SUPPORT
+        help
+          This option enables the Analogix ANX74XX Power Delivery Controller.
+
+config USBC_PDC_ANX74XX_STACK_SIZE
+        int "Analogix ANX74XX PDC thread stack size"
+        default 1024
+        depends on USBC_PDC_ANX74XX
+        help
+          Stack size of thread created for each instance.
+
+config USBC_PDC_ANX74XX_THREAD_PRIORITY
+        int "Analogix ANX74XX PDC thread priority"
+        default 0
+        depends on USBC_PDC_ANX74XX
+        help
+          Set thread priority of the USB-C PDC
+
 rsource "Kconfig.pdc_trace"
 
 endif # PLATFORM_EC_USBC
