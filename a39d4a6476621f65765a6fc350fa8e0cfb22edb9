@@ -22,6 +22,30 @@
       },
       "revId": "a39d4a6476621f65765a6fc350fa8e0cfb22edb9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f4a5b60_501d9841",
+        "filename": "common/i2c_passthru.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-07-24T11:38:19Z",
+      "side": 1,
+      "message": "Modification in the latest patch:\n\n1. If the address matches VIRTUAL_BATTERY_ADDR_FLAGS, check the permission and then send the command to virtual handler.\n2. If the address matches BATTERY_ADDR_FLAGS,  check the permission and then send the command to i2c_xfer_unlocked directly.",
+      "parentUuid": "08a6e0c3_3ce02b95",
+      "range": {
+        "startLine": 107,
+        "startChar": 0,
+        "endLine": 112,
+        "endChar": 1
+      },
+      "revId": "a39d4a6476621f65765a6fc350fa8e0cfb22edb9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
