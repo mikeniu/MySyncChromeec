@@ -49,6 +49,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "843f80e1_0d8da038",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-24T21:58:19Z",
+      "side": 1,
+      "message": "Nit: This is very conventional flag name. I feel like it should be in the common args, and what it\u0027s verbose about should depend on the command. Having it only available as an option to a sub-command feels weird.",
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "65a3e526_e79097d5",
         "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
         "patchSetId": 3
@@ -60,6 +77,41 @@
       "writtenOn": "2026-07-24T17:48:40Z",
       "side": 1,
       "message": "Can some of the optional arguments be split into a separate CL.  This is a lot of code to review in one go.",
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5cc7059_628c667d",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-24T21:58:19Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "65a3e526_e79097d5",
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65287665_fa86010c",
+        "filename": "zephyr/zmake/zmake/compare_builds.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-24T21:58:19Z",
+      "side": 1,
+      "message": "At a high level, it seems like an awkward pattern to invoke an external binary to compare binaries, then throw if that comparison doesn\u0027t match, then call an internal routine that does, among other things, essentially the same comparison. It seems more natural to me to do something like the Python binary comparison from `analyze_bin_diffs` first and then do the other comparisons based on the return value.\n\nPerhaps the external `cmp` is significantly faster than the Python comparison, and you\u0027d prefer to avoid the internal Python comparison if possible. I could see it going either way. If the Python comparison is much slower, I\u0027m wondering if it\u0027s possible to integrate the external `cmp` or something similar into the different-files code path so that that way can benefit from a faster comparison as well.",
       "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
