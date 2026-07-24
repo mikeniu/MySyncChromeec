@@ -98,6 +98,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0b881e0_c0154190",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ebcc22e1_e4f41ae0",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 33
+      },
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5d4861c_b40ef92a",
@@ -111,6 +135,24 @@
       "writtenOn": "2026-07-23T16:28:17Z",
       "side": 1,
       "message": "`(void)`",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9018ce0_92078a89",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5d4861c_b40ef92a",
       "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -132,6 +174,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6869ee12_e6ee5407",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1868b464_852f2cfb",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b686c4de_16c6e55b",
@@ -145,6 +205,24 @@
       "writtenOn": "2026-07-23T16:28:17Z",
       "side": 1,
       "message": "use an intermediate variable for `pwrmon_config.channels[i]`",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f9c19f1_4bf6822f",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b686c4de_16c6e55b",
       "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -166,6 +244,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00560162_17a0fe79",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4222303f_332be780",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a67037b4_e832e842",
@@ -179,6 +275,24 @@
       "writtenOn": "2026-07-23T16:28:17Z",
       "side": 1,
       "message": "you could probably use an intermediate variable for `pwrmon_config.channels[channel_id]`, make the code below a bit more compact",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52b14411_cfc358ff",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a67037b4_e832e842",
       "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -247,6 +361,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c550730a_88bf2785",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c57f507f_8a0f3596",
+      "range": {
+        "startLine": 379,
+        "startChar": 0,
+        "endLine": 380,
+        "endChar": 33
+      },
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "968c0daf_25d6f117",
@@ -260,6 +398,24 @@
       "writtenOn": "2026-07-23T16:28:17Z",
       "side": 1,
       "message": "use `/*`, doesn\u0027t the presubmit catch it? odd",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db8e24de_ec2eef54",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "968c0daf_25d6f117",
       "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
