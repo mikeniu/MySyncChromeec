@@ -46,6 +46,30 @@
       },
       "revId": "9c7e075c3b90278fd36c22f77c35102d16e2d564",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7234936d_245b2b82",
+        "filename": "zephyr/app/ec/chip/arm/realtek_rtk/Kconfig.rtk",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-07-24T10:29:28Z",
+      "side": 1,
+      "message": "Hi Keith, Tristan, I believe this patch was posted first, still https://crrev.com/c/8127054 later patch was merged. Any better ways to handle these instances?",
+      "parentUuid": "f246c64d_06c60c64",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 5
+      },
+      "revId": "9c7e075c3b90278fd36c22f77c35102d16e2d564",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
