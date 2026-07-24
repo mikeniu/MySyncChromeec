@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cd1e97a_5e925155",
+        "filename": "zephyr/test/drivers/board_id_intel_rvp/src/board_id_not_ready.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-07-24T10:58:33Z",
+      "side": 1,
+      "message": "Acknowledged. Removed the redundant code.",
+      "parentUuid": "ad6d772d_0058537d",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 46
+      },
+      "revId": "cc67e8ce34a62dc25b990529eb6f7b0bb5e1e459",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3beae897_0c63b797",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-21T17:30:36Z",
       "side": 1,
       "message": "Non-blocking NIT - these are only used in the test_common.c file.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 22
+      },
+      "revId": "cc67e8ce34a62dc25b990529eb6f7b0bb5e1e459",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d6ced75_b6aea8cd",
+        "filename": "zephyr/test/drivers/board_id_intel_rvp/src/board_id_test_common.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1537933
+      },
+      "writtenOn": "2026-07-24T10:58:33Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "3beae897_0c63b797",
       "range": {
         "startLine": 19,
         "startChar": 0,
