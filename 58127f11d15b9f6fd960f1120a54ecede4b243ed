@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0da4c93d_b529a3d3",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 9467,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c4323ab_0436f1b5",
+      "range": {
+        "startLine": 9457,
+        "startChar": 0,
+        "endLine": 9467,
+        "endChar": 21
+      },
+      "revId": "58127f11d15b9f6fd960f1120a54ecede4b243ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90346b53_94c573ed",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8350abca_8f7ce2b9",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 9506,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "90346b53_94c573ed",
+      "range": {
+        "startLine": 9503,
+        "startChar": 0,
+        "endLine": 9506,
+        "endChar": 36
+      },
+      "revId": "58127f11d15b9f6fd960f1120a54ecede4b243ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9899acfd_c26711fc",
@@ -60,6 +108,24 @@
       "writtenOn": "2026-07-23T15:22:59Z",
       "side": 1,
       "message": "nit: stray blank line, drop?",
+      "revId": "58127f11d15b9f6fd960f1120a54ecede4b243ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c709d70e_8a710e1e",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 9507,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-24T14:36:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9899acfd_c26711fc",
       "revId": "58127f11d15b9f6fd960f1120a54ecede4b243ed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
