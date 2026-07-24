@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 #include <pthread.h>
-#include <termio.h>
+#include <termios.h>
 #include <unistd.h>
 
 static int stopped = 1;
