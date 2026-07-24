@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a713acd_d6a9ed3c",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-24T21:34:55Z",
+      "side": 1,
+      "message": "I took this from the minimum external power required to boot with a battery installed. (I think, despite the comments, that this limit applies when the battery is not sufficient to boot by itself. It wouldn\u0027t make sense otherwise.) I\u0027m not sure how to interpret this field for a product that is ordinarily battery-powered.",
+      "revId": "129fa268b862662ec5147197ea336992040b689f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
