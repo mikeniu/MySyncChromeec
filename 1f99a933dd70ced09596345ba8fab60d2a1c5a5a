@@ -54,6 +54,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5678c5f_35420cdd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-24T07:36:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d288e076_854865e2",
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ca91034_95e6f387",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-24T07:36:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "09fc7741_95166b61",
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0c4081e0_52460cc5",
@@ -68,6 +104,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Style Suggestion:**\nYou\u0027re duplicating the logic to find the capture configuration in both `ft98xx_get_bytes_per_pixel` and `ft98xx_get_frame_size`.\n\nConsider refactoring this into a single helper function (e.g., `ft98xx_get_image_config`) that takes the `capture_type` and returns a pointer to the matching `fingerprint_image_frame_params` struct. This would allow you to extract both the frame size and the bpp without iterating over the array twice.",
       "isAi": true,
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e7aab30_e1af3d13",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-24T07:36:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0c4081e0_52460cc5",
       "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -90,6 +144,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e28d746f_88abd046",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-24T07:36:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8cd25d5e_1783fdb9",
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "053381cc_4a7636e7",
@@ -104,6 +176,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] You are calculating the required size using dynamically probed `cols` and `rows`, but a static `bytes_per_pixel` from the Devicetree configuration. \n\nIf the sensor has the ability to dynamically change its pixel format alongside its dimensions, this could lead to an incorrect calculation. If the sensor API provides a way to query the active bits-per-pixel, it might be safer to use that. If `bpp` is guaranteed to be constant for this sensor across all runtime configurations, this mix of static and dynamic values is fine.",
       "isAi": true,
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c09e5713_caa5042c",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-24T07:36:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "053381cc_4a7636e7",
       "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -131,6 +221,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2f66e94_385a1c2c",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-24T07:36:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a05e1ade_f32e5742",
+      "range": {
+        "startLine": 322,
+        "startChar": 10,
+        "endLine": 322,
+        "endChar": 34
+      },
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0617a17e_c9d3061e",
@@ -145,6 +259,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] The `IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)` check should be performed **before** calling `ft_sensor_query_cols()` and `ft_sensor_query_rows()`. \n\nIf the private driver is disabled, calling these functions might cause linker errors (if they aren\u0027t stubbed) or unintended behavior. Moving this check earlier in the function ensures consistency with `ft98xx_set_mode` and `ft98xx_finger_status`, where the check acts as an immediate guard.",
       "isAi": true,
+      "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "539ddc66_119deebb",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-24T07:36:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0617a17e_c9d3061e",
       "revId": "1f99a933dd70ced09596345ba8fab60d2a1c5a5a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
