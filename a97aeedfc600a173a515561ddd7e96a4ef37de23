@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fea57b7f_2e337b32",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-07-24T09:45:36Z",
+      "side": 1,
+      "message": "You mean Cq-depend: https://chrome-internal-review.googlesource.com/c/chromeos/vendor/fingerprint/egis/+/9553836 ?\nHow should I add?",
+      "parentUuid": "d1dcadec_65c11b33",
+      "revId": "a97aeedfc600a173a515561ddd7e96a4ef37de23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4531034a_e6ef0a45",
         "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
         "patchSetId": 5
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-23T14:28:52Z",
       "side": 1,
       "message": "I think you need to add a choice config identifying (based on dts) the cover type to select a proper library, right?",
+      "revId": "a97aeedfc600a173a515561ddd7e96a4ef37de23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e002ed8_ca31eee0",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-07-24T09:45:36Z",
+      "side": 1,
+      "message": "Am I doing right now?",
+      "parentUuid": "4531034a_e6ef0a45",
       "revId": "a97aeedfc600a173a515561ddd7e96a4ef37de23",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
