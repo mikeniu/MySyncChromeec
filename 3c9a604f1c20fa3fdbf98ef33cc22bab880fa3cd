@@ -33,6 +33,24 @@
       "message": "I have no objection to this in terms of stuff I\u0027ve dealt with recently. `usb_pd_tcpc.c` and `stub.c` were used in boards with generic MCUs as TCPCs, which we haven\u0027t done in quite some time. If none of those are maintained anymore, I think it\u0027s fine to get rid of those files.\n\nThe alternate TC and PE implementations were probably used in some kind of dongles that we designed, and I\u0027m not sure why/when/how we update those firmware images. @bleung@chromium.org @scollyer@chromium.org Do you know what, if anything, we\u0027re doing with VPD dongle firmware these days?",
       "revId": "3c9a604f1c20fa3fdbf98ef33cc22bab880fa3cd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7362e192_489b2748",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-24T16:35:49Z",
+      "side": 1,
+      "message": "The projects that used the alternate TC and PE implementations are now in the platform/ec-legacy branch.  These projects are legacy EC (non-zehpyr).   Any new firmware releases for those projects should use platfrom/ec-legacy as the upstream landing area for fixes before cherry-picking to the correct firmware branch.\n\nWe don\u0027t have any Zephyr based projects using the VPD/CTVPD state machines, so I believe it\u0027s safe to delete this code from platform/ec.",
+      "parentUuid": "621b7444_d4d0e64a",
+      "revId": "3c9a604f1c20fa3fdbf98ef33cc22bab880fa3cd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
