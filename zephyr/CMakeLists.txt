@@ -174,12 +174,25 @@ endif()
 
 if (ZEPHYR_PIGWEED_MODULE_DIR)
   if (DEFINED CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
-    zephyr_include_directories("${PLATFORM_EC}/zephyr/include/pigweed")
+    zephyr_include_directories(
+      "${PLATFORM_EC}/zephyr/include/pigweed"
+      "${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log/public"
+      "${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/public"
+      "${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/metadata_public_overrides"
+    )
     include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_build/pigweed.cmake")
     add_library(log_tokenized_config INTERFACE)
     target_compile_options(log_tokenized_config INTERFACE -include
                            ${PLATFORM_EC}/zephyr/include/pigweed/pw_zephyr_tokenized_custom_log.h)
     pw_set_module_config(pw_log_tokenized_CONFIG log_tokenized_config)
+    pw_set_module_config(pw_tokenizer_CONFIG log_tokenized_config)
+    zephyr_compile_options(-include
+                           ${PLATFORM_EC}/zephyr/include/pigweed/pw_zephyr_tokenized_custom_log.h)
+
+    include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/backend.cmake")
+    pw_set_backend(pw_log_tokenized.handler platform_ec_log.tokenized_handler)
+    include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log/backend.cmake")
+    pw_set_backend(pw_log pw_log_tokenized)
   endif()
 endif()
 
@@ -279,6 +292,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_DETACHABLE_BASE
                                                 "${PLATFORM_EC}/common/base_state.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY
                                                 "${PLATFORM_EC}/common/battery.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_DEADBAND
+                                                "${PLATFORM_EC}/common/battery_deadband.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_INFO
                                                 "${PLATFORM_EC}/common/battery_info.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_FUEL_GAUGE
@@ -436,8 +451,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_TCA64XXA
                                                 "${PLATFORM_EC}/driver/ioexpander/tca64xxa.c")
 zephyr_library_sources_ifdef(CONFIG_HAS_TASK_KEYSCAN
                                                 "${PLATFORM_EC}/common/keyboard_scan.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RGB_KEYBOARD
-                                                "${PLATFORM_EC}/common/rgb_keyboard.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042
                                                 "${PLATFORM_EC}/common/keyboard_8042.c"
                                                 "${PLATFORM_EC}/common/keyboard_8042_sharedlib.c")
@@ -756,8 +769,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MAX695X_SEVEN_SEGMENT_DISPLAY
 						"${PLATFORM_EC}/driver/led/max695x.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LED_DRIVER_TLC59116F
                                                 "${PLATFORM_EC}/driver/led/tlc59116f.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP
-                                                "${PLATFORM_EC}/common/host_command_memory_dump.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AP_HANG_DETECT
                                                 "${PLATFORM_EC}/common/ap_hang_detect.c")
 
@@ -852,6 +863,7 @@ endif()
 # Lists all targets defined with pw_add_library() and pw_add_test()
 function(ec_add_pw_log_zephyr_deps)
   foreach(lib pw_log_zephyr
+	      platform_ec_log.tokenized_handler
 	      cros.dsp.test
 	      dsp.client
 	      dsp.service

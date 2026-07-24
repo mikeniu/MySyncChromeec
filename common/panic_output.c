@@ -189,6 +189,13 @@ test_mockable struct panic_data *panic_get_data(void)
 	return pdata_ptr;
 }
 
+bool panic_data_is_new(void)
+{
+	struct panic_data *const pdata = panic_get_data();
+
+	return pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD);
+}
+
 /*
  * Returns pointer to beginning of panic data.
  * Please note that it is not safe to interpret this
@@ -446,12 +453,10 @@ static int command_crash(int argc, const char **argv)
 		ccprintf("%08x", one / zero);
 	} else if (!strcasecmp(argv[1], "stack")) {
 		stack_overflow_recurse(1);
-#ifndef CONFIG_ALLOW_UNALIGNED_ACCESS
 	} else if (!strcasecmp(argv[1], "unaligned")) {
 		volatile intptr_t unaligned_ptr = 0xcdef;
 		cflush();
 		ccprintf("%08x", *(volatile int *)unaligned_ptr);
-#endif /* !CONFIG_ALLOW_UNALIGNED_ACCESS */
 	} else if (!strcasecmp(argv[1], "watchdog")) {
 		while (1) {
 /* Yield on native posix to avoid locking up the simulated sys clock */
@@ -494,9 +499,7 @@ static int command_crash(int argc, const char **argv)
 
 DECLARE_CONSOLE_COMMAND(crash, command_crash,
 			"[assert | divzero | udivzero | stack"
-#ifndef CONFIG_ALLOW_UNALIGNED_ACCESS
 			" | unaligned"
-#endif /* !CONFIG_ALLOW_UNALIGNED_ACCESS */
 			" | watchdog | hang | null]",
 			"Crash the system (for testing)."
 #ifndef CONFIG_CMD_CRASH_NESTED

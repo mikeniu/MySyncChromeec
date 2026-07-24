@@ -14,6 +14,7 @@
 #include "software_panic.h"
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -127,14 +128,14 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
  */
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
 
-#ifdef CONFIG_ZEPHYR
 /**
- * Zephyr utility for architecture specific logic to run when setting panic
- * reason.
+ * Check if stored panic data represents a new panic.
+ *
+ * A panic is considered new if valid panic data is present in RAM and has not
+ * yet been read and acknowledged by the AP via host command (i.e. the
+ * PANIC_DATA_FLAG_OLD_HOSTCMD flag is not set).
  */
-__override_proto void arch_panic_set_reason(uint32_t reason, uint32_t info,
-					    uint8_t exception);
-#endif /* CONFIG_ZEPHYR */
+bool panic_data_is_new(void);
 
 /**
  * Enable/disable bus fault handler

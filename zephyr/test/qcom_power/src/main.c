@@ -77,8 +77,6 @@ static void do_chipset_shutdown(void)
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, do_chipset_shutdown, HOOK_PRIO_DEFAULT);
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, system_can_boot_ap);
 FAKE_VALUE_FUNC(int, battery_wait_for_stable);
 int battery_is_present(void)

@@ -13,6 +13,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/cbprintf.h>
+#include <zephyr/sys/sys_heap.h>
 #include <zephyr/sys/util_macro.h>
 #include <zephyr/sys_clock.h>
 
@@ -125,13 +126,12 @@ void __unused output_log(LOG_LEVEL level, const char *tag,
 	k_sem_give(&printf_buffer_lock);
 }
 
-void __unused *sys_alloc(size_t count, size_t size)
+void *sys_alloc(size_t count, size_t size)
 {
-	void *p = k_heap_aligned_alloc(&fp_driver_heap, sizeof(void *), size,
-				       K_NO_WAIT);
+	void *p = k_heap_calloc(&fp_driver_heap, count, size, K_NO_WAIT);
 
 	if (p == NULL) {
-		LOG_ERR("Error - %s of size %u failed.", __func__, size);
+		LOG_ERR("Error - %s(%zu,%zu) failed.", __func__, count, size);
 		/* TODO(b/423622893): Prevent Runtime OOM Panics in Zephyr
 		 * Gwendolin via BUILD_ASSERT on the heap size.
 		 */
@@ -142,7 +142,62 @@ void __unused *sys_alloc(size_t count, size_t size)
 	return p;
 }
 
-void __unused sys_free(void *data)
+void sys_free(void *data)
 {
+	/* k_heap_free handles NULL. */
 	k_heap_free(&fp_driver_heap, data);
+}
+
+static void *sys_realloc(void *data, size_t size)
+{
+	void *p = k_heap_realloc(&fp_driver_heap, data, size, K_NO_WAIT);
+
+	if (p == NULL && size != 0) {
+		LOG_ERR("Error - %s to size %zu failed.", __func__, size);
+		/* TODO(b/423622893): Prevent Runtime OOM Panics in Zephyr
+		 * Gwendolin via BUILD_ASSERT on the heap size.
+		 */
+		k_oops();
+		CODE_UNREACHABLE;
+	}
+
+	return p;
+}
+
+#ifdef CONFIG_ZTEST
+size_t sys_alloc_usable_size(void *data)
+{
+	if (data == NULL) {
+		return 0;
+	}
+
+	return sys_heap_usable_size(&fp_driver_heap.heap, data);
+}
+#endif
+
+void *plat_calloc(size_t count, size_t size)
+{
+	return sys_alloc(count, size);
+}
+
+void *plat_realloc(void *data, size_t size)
+{
+	return sys_realloc(data, size);
+}
+
+void *plat_alloc(size_t size)
+{
+	return sys_alloc(1, size);
+}
+
+void PLAT_FREE(void **x)
+{
+	assert(x != NULL && *x != NULL);
+	plat_free(*x);
+	*x = NULL;
+}
+
+void plat_free(void *x)
+{
+	sys_free(x);
 }

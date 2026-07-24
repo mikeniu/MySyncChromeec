@@ -26,11 +26,11 @@ extern void reset_pdc_discovery_for_test(void);
 /* TI PDC Configuration Tests                                                 */
 /* ========================================================================== */
 
-ZTEST(rvp_usbc_runtime, test_three_port_ti)
+ZTEST(rvp_usbc_runtime, test_three_port_ti_jbr)
 {
 	const struct device *dev;
 
-	/* All three TI emulators respond, all RTK fail */
+	/* All three TI emulators respond, all RTK and HBR fail */
 	i2c_common_emul_set_write_fail_reg(
 		emul_tps6699x_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0))),
@@ -43,6 +43,10 @@ ZTEST(rvp_usbc_runtime, test_three_port_ti)
 		emul_tps6699x_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
 		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
 	i2c_common_emul_set_write_fail_reg(
 		rts5453p_emul_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c0))),
@@ -72,11 +76,11 @@ ZTEST(rvp_usbc_runtime, test_three_port_ti)
 	zassert_is_null(dev);
 }
 
-ZTEST(rvp_usbc_runtime, test_dual_port_ti)
+ZTEST(rvp_usbc_runtime, test_dual_port_ti_jbr)
 {
 	const struct device *dev;
 
-	/* Only C0 and C1 TI respond, C2 fails */
+	/* Only C0 and C1 TI respond, C2 and HBR fail */
 	i2c_common_emul_set_write_fail_reg(
 		emul_tps6699x_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0))),
@@ -88,6 +92,10 @@ ZTEST(rvp_usbc_runtime, test_dual_port_ti)
 	i2c_common_emul_set_write_fail_reg(
 		emul_tps6699x_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
 		I2C_COMMON_EMUL_FAIL_ALL_REG);
 	i2c_common_emul_set_write_fail_reg(
 		rts5453p_emul_get_i2c_common_data(
@@ -133,6 +141,10 @@ ZTEST(rvp_usbc_runtime, test_no_pdcs)
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
 		I2C_COMMON_EMUL_FAIL_ALL_REG);
 	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
 		rts5453p_emul_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c0))),
 		I2C_COMMON_EMUL_FAIL_ALL_REG);
@@ -151,7 +163,7 @@ ZTEST(rvp_usbc_runtime, test_no_pdcs)
 	zassert_is_null(dev);
 }
 
-ZTEST(rvp_usbc_runtime, test_c0_only_ti)
+ZTEST(rvp_usbc_runtime, test_c0_only_ti_jbr)
 {
 	const struct device *dev;
 
@@ -167,6 +179,10 @@ ZTEST(rvp_usbc_runtime, test_c0_only_ti)
 	i2c_common_emul_set_write_fail_reg(
 		emul_tps6699x_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
 		I2C_COMMON_EMUL_FAIL_ALL_REG);
 	i2c_common_emul_set_write_fail_reg(
 		rts5453p_emul_get_i2c_common_data(
@@ -208,6 +224,10 @@ ZTEST(rvp_usbc_runtime, test_unsupported_config)
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
 		I2C_COMMON_EMUL_NO_FAIL_REG);
 	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
 		rts5453p_emul_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c0))),
 		I2C_COMMON_EMUL_FAIL_ALL_REG);
@@ -248,6 +268,10 @@ ZTEST(rvp_usbc_runtime, test_c0_only_rtk)
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
 		I2C_COMMON_EMUL_FAIL_ALL_REG);
 	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
 		rts5453p_emul_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c0))),
 		I2C_COMMON_EMUL_NO_FAIL_REG);
@@ -273,7 +297,7 @@ ZTEST(rvp_usbc_runtime, test_dual_rtk)
 {
 	const struct device *dev;
 
-	/* C0 and C1 RTK respond, all TI fail */
+	/* C0 and C1 RTK respond, all TI and HBR fail */
 	i2c_common_emul_set_write_fail_reg(
 		emul_tps6699x_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0))),
@@ -285,6 +309,10 @@ ZTEST(rvp_usbc_runtime, test_dual_rtk)
 	i2c_common_emul_set_write_fail_reg(
 		emul_tps6699x_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
 		I2C_COMMON_EMUL_FAIL_ALL_REG);
 	i2c_common_emul_set_write_fail_reg(
 		rts5453p_emul_get_i2c_common_data(
@@ -316,7 +344,7 @@ ZTEST(rvp_usbc_runtime, test_three_rtk)
 {
 	const struct device *dev;
 
-	/* All three RTK emulators respond, all TI fail */
+	/* All three RTK emulators respond, all TI and HBR fail */
 	i2c_common_emul_set_write_fail_reg(
 		emul_tps6699x_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0))),
@@ -328,6 +356,10 @@ ZTEST(rvp_usbc_runtime, test_three_rtk)
 	i2c_common_emul_set_write_fail_reg(
 		emul_tps6699x_get_i2c_common_data(
 			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
 		I2C_COMMON_EMUL_FAIL_ALL_REG);
 	i2c_common_emul_set_write_fail_reg(
 		rts5453p_emul_get_i2c_common_data(
@@ -352,6 +384,150 @@ ZTEST(rvp_usbc_runtime, test_three_rtk)
 
 	zassert_ok(board_get_pdc_for_port(2, &dev));
 	zassert_equal(DEVICE_DT_GET(DT_NODELABEL(pdc_rtk_c2)), dev);
+
+	/* Port 3 out of range */
+	zassert_equal(-ENOENT, board_get_pdc_for_port(3, &dev));
+	zassert_is_null(dev);
+}
+
+/* ========================================================================== */
+/* HBR TI PDC Configuration Tests                                             */
+/* ========================================================================== */
+
+ZTEST(rvp_usbc_runtime, test_c0_only_ti_hbr)
+{
+	const struct device *dev;
+
+	/* Only HBR C0 responds (0x22), all others fail */
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c1))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c0))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c1))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c2))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	reset_pdc_discovery_for_test();
+
+	/* C0_TI_HBR detected */
+	zassert_ok(board_get_pdc_for_port(0, &dev));
+	zassert_equal(DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr)), dev);
+
+	zassert_equal(-ENOENT, board_get_pdc_for_port(1, &dev));
+	zassert_is_null(dev);
+}
+
+ZTEST(rvp_usbc_runtime, test_dual_port_ti_hbr)
+{
+	const struct device *dev;
+
+	/* HBR C0 (0x22) and C1 (0x20) respond, all others fail */
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0))),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c1))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c0))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c1))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c2))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	reset_pdc_discovery_for_test();
+
+	/* DUAL_TI_HBR detected: port0=0x22, port1=0x20 */
+	zassert_ok(board_get_pdc_for_port(0, &dev));
+	zassert_equal(DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr)), dev);
+
+	zassert_ok(board_get_pdc_for_port(1, &dev));
+	zassert_equal(DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c0)), dev);
+
+	/* Port 2 out of range in DUAL_TI_HBR */
+	zassert_equal(-ENOENT, board_get_pdc_for_port(2, &dev));
+	zassert_is_null(dev);
+}
+
+ZTEST(rvp_usbc_runtime, test_three_port_ti_hbr)
+{
+	const struct device *dev;
+
+	/* HBR C0 (0x22), C1 (0x20), C2 (0x21) all respond */
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c0))),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c1))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_ti_c2))),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c0))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c1))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(
+			EMUL_DT_GET(DT_NODELABEL(pdc_rtk_c2))),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	reset_pdc_discovery_for_test();
+
+	/* THREE_TI_HBR detected: port0=0x22, port1=0x20, port2=0x21 */
+	zassert_ok(board_get_pdc_for_port(0, &dev));
+	zassert_equal(DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr)), dev);
+
+	zassert_ok(board_get_pdc_for_port(1, &dev));
+	zassert_equal(DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c0)), dev);
+
+	zassert_ok(board_get_pdc_for_port(2, &dev));
+	zassert_equal(DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c2)), dev);
 
 	/* Port 3 out of range */
 	zassert_equal(-ENOENT, board_get_pdc_for_port(3, &dev));
