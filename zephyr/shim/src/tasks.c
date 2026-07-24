@@ -103,7 +103,7 @@ test_export_static k_tid_t get_idle_thread(void)
 
 test_export_static k_tid_t get_sysworkq_thread(void)
 {
-	return &k_sys_work_q.thread;
+	return k_sys_work_q.thread_id;
 }
 
 k_tid_t get_main_thread(void)
@@ -130,46 +130,6 @@ test_mockable k_tid_t get_hostcmd_thread(void)
 #endif /* CONFIG_TASK_HOSTCMD_THREAD_MAIN */
 #endif /* HAS_TASK_HOSTCMD */
 	__ASSERT(false, "HOSTCMD task is not enabled");
-	return NULL;
-}
-
-k_tid_t task_id_to_thread_id(task_id_t task_id)
-{
-	if (task_id < 0) {
-		__ASSERT(false, "Invalid task id %d", task_id);
-		return NULL;
-	}
-	if (task_id < TASK_ID_COUNT) {
-		return task_to_k_tid[task_id];
-	}
-	if (task_id < TASK_ID_COUNT + EXTRA_TASK_COUNT) {
-		switch (task_id) {
-		case TASK_ID_SYSWORKQ:
-			return get_sysworkq_thread();
-
-#ifdef HAS_TASK_HOSTCMD
-		case TASK_ID_HOSTCMD:
-			return get_hostcmd_thread();
-#endif /* HAS_TASK_HOSTCMD */
-
-#ifdef HAS_TASK_MAIN
-		case TASK_ID_MAIN:
-			return get_main_thread();
-#endif /* HAS_TASK_MAIN */
-
-		case TASK_ID_IDLE:
-			return get_idle_thread();
-
-		case TASK_ID_SHELL:
-			return get_shell_thread();
-
-#ifdef CONFIG_AP_PWRSEQ
-		case TASK_ID_AP_PWRSEQ:
-			return get_ap_pwrseq_thread();
-#endif /* CONFIG_AP_PWRSEQ */
-		}
-	}
-	__ASSERT(false, "Failed to map task %d to thread", task_id);
 	return NULL;
 }
 

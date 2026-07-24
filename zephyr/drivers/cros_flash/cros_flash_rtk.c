@@ -524,7 +524,7 @@ static int cros_flash_rtk_init(const struct device *dev)
 }
 
 /* cros ec flash driver registration */
-static const struct cros_flash_driver_api cros_flash_rtk_driver_api = {
+static DEVICE_API(cros_flash, cros_flash_rtk_driver_api) = {
 	.init = cros_flash_rtk_init,
 	.physical_write = cros_flash_rtk_write,
 	.physical_erase = cros_flash_rtk_erase,

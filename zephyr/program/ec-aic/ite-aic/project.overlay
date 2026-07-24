@@ -36,6 +36,18 @@
 			enum-names = "I2C_PORT_PD";
 		};
 	};
+
+	fans {
+		compatible = "cros-ec,fans";
+
+		fan0: fan_0 {
+			pwms = <&pwm5 PWM_CHANNEL_5 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			rpm-min = <2200>;
+			rpm-start = <2200>;
+			rpm-max = <4200>;
+			tach = <&tach0>;
+		};
+	};
 };
 
 &sha0 {
@@ -75,5 +87,20 @@
 	clock-frequency = <I2C_BITRATE_STANDARD>;
 	label = "i2c4";
 	pinctrl-0 = < &i2c4_clk_gpe0_default &i2c4_data_gpe7_default >;
+	pinctrl-names = "default";
+};
+
+&pwm5 {
+	status = "okay";
+	prescaler-cx = <PWM_PRESCALER_C6>;
+	pinctrl-0 = <&pwm5_gpa5_default>;
+	pinctrl-names = "default";
+};
+
+&tach0 {
+	status = "okay";
+	channel = <IT8XXX2_TACH_CHANNEL_A>;
+	pulses-per-round = <2>;
+	pinctrl-0 = <&tach0a_gpd6_default>;
 	pinctrl-names = "default";
 };

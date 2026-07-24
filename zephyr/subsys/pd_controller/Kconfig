@@ -131,6 +131,15 @@ config USB_MUX_SYS_INIT_PRIORITY
 	  PDC power management initialization priority.
 endif
 
+config USBC_PDC_TBT_SUPPORTED
+	bool "TBT support is enabled on PDC-based device"
+	depends on USB_PDC_POWER_MGMT
+	default n
+	help
+	  Set on PDC-based devices with Thunderbolt support. This will
+	  enable features to improve interop with Thunderbolt devices.
+	  (1) Hard reset after 15W allocation to Sinks.
+
 module = USB_PDC
 module-str = USB PDC
 source "subsys/logging/Kconfig.template.log_config"

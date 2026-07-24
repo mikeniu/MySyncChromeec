@@ -116,6 +116,7 @@ endif()
 if (DEFINED CONFIG_TEST_SUITE_PPM)
 	zephyr_include_directories(${PLATFORM_EC}/zephyr/subsys/ucsi)
 	target_sources(app PRIVATE src/generic/ppm.c)
+	target_sources(app PRIVATE src/generic/ucsi_ppm_host_cmd.c)
 	target_sources_ifdef(CONFIG_PDC_RUNTIME_PORT_CONFIG
 		app PRIVATE src/board_runtime_config.c)
 endif()

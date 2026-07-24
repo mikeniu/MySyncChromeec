@@ -42,7 +42,7 @@ static void generate_ec_soc_dsw_pwrok_handler(int delay)
 	}
 }
 
-void board_ap_power_force_shutdown(void)
+static void board_ap_power_shutdown(void)
 {
 	int timeout_ms = X86_NON_DSX_ADLP_NONPWRSEQ_FORCE_SHUTDOWN_TO_MS;
 
@@ -95,6 +95,11 @@ void board_ap_power_force_shutdown(void)
 }
 
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
+void board_ap_power_force_shutdown(void)
+{
+	board_ap_power_shutdown();
+}
+
 void board_ap_power_action_g3_s5(void)
 {
 	power_signal_enable(PWR_DSW_PWROK);
@@ -170,13 +175,18 @@ AP_PWRSEQ_STATE_EXIT_CALLBACK_DEFINE(board_ap_power_cb, AP_POWER_STATE_S0,
 
 static int board_ap_power_g3_entry(void *data)
 {
-	board_ap_power_force_shutdown();
+	board_ap_power_shutdown();
 
 	return 0;
 }
 
 static int board_ap_power_g3_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		board_ap_power_shutdown();
+		return 1;
+	}
+
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		power_signal_enable(PWR_DSW_PWROK);
 		power_signal_enable(PWR_PG_PP1P05);

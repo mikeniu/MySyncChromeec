@@ -4,6 +4,7 @@
  */
 
 #include "usb_pd.h"
+#include "usbc/pdc_dpm.h"
 #include "usbc/pdc_power_mgmt.h"
 
 #include <zephyr/device.h>
@@ -109,6 +110,9 @@ static void pdc_dpm_balance_source_ports(struct k_work *work)
 			max_current_claimed |= BIT(new_max_port);
 			pdc_power_mgmt_set_current_limit(new_max_port,
 							 TC_CURRENT_3_0A);
+			if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED))
+				pdc_dpm_tbt_check_reset(new_max_port);
+
 		} else if (non_pd_sink_max_requested & max_current_claimed) {
 			/* Always downgrade non-PD ports first */
 			int rem_non_pd = LOWEST_PORT(non_pd_sink_max_requested &
@@ -127,7 +131,6 @@ static void pdc_dpm_balance_source_ports(struct k_work *work)
 			int rem_frs = LOWEST_PORT(source_frs_max_requested &
 						  max_current_claimed);
 
-			pdc_power_mgmt_frs_enable(rem_frs, false);
 			rp = pdc_power_mgmt_get_default_current_limit(rem_frs);
 			pdc_power_mgmt_set_current_limit(rem_frs, rp);
 			max_current_claimed &= ~BIT(rem_frs);
@@ -150,8 +153,7 @@ static void pdc_dpm_balance_source_ports(struct k_work *work)
 		if (count_port_bits(max_current_claimed) <
 		    pd_get_usb_pd_3a_ports()) {
 			max_current_claimed |= BIT(new_frs_port);
-			/* Enable FRS for this port */
-			pdc_power_mgmt_frs_enable(new_frs_port, true);
+			/* Allocate 3A for this port */
 			pdc_power_mgmt_set_current_limit(new_frs_port,
 							 TC_CURRENT_3_0A);
 		} else if (non_pd_sink_max_requested & max_current_claimed) {
@@ -212,6 +214,8 @@ void pdc_dpm_eval_sink_fixed_pdo(int port, uint32_t vsafe5v_pdo)
 			return;
 
 		atomic_set_bit(&sink_max_pdo_requested, port);
+		if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED))
+			pdc_dpm_tbt_eval_sink_pdo(port, vsafe5v_pdo);
 	} else {
 		int frs_current = vsafe5v_pdo & PDO_FIXED_FRS_CURR_MASK;
 
@@ -227,17 +231,15 @@ void pdc_dpm_eval_sink_fixed_pdo(int port, uint32_t vsafe5v_pdo)
 		/* FRS is only supported in PD 3.0 and higher */
 		if (pdc_power_mgmt_get_rev(port, TCPCI_MSG_SOP) == PD_REV20) {
 			atomic_clear_bit(&source_frs_max_requested, port);
-			pdc_power_mgmt_frs_enable(port, false);
 			goto balance;
 		}
 
 		if ((vsafe5v_pdo & PDO_FIXED_DUAL_ROLE) && frs_current) {
-			/* Always enable FRS when 3.0 A is not needed */
+			/* Clear FRS request when 3.0 A is not needed */
 			if (frs_current == PDO_FIXED_FRS_CURR_DFLT_USB_POWER ||
 			    frs_current == PDO_FIXED_FRS_CURR_1A5_AT_5V) {
 				atomic_clear_bit(&source_frs_max_requested,
 						 port);
-				pdc_power_mgmt_frs_enable(port, true);
 				goto balance;
 			}
 
@@ -247,25 +249,10 @@ void pdc_dpm_eval_sink_fixed_pdo(int port, uint32_t vsafe5v_pdo)
 			atomic_set_bit(&source_frs_max_requested, port);
 		} else {
 			atomic_clear_bit(&source_frs_max_requested, port);
-			pdc_power_mgmt_frs_enable(port, false);
 		}
 	}
 
 balance:
-	pdc_dpm_balance_source_ports(&dpm_work.work);
-}
-
-void pdc_dpm_add_pd_source(int port)
-{
-	/* The PDC DPM will attempt to enable FRS early while evaluating Snk
-	 * Caps. If 3A is not available, the DPM will not enable FRS until it
-	 * can confirm 3A is not required. It can take longer to enable FRS on
-	 * platforms which don't source 3A.
-	 */
-	if (pd_get_usb_pd_3a_ports() == 0)
-		return;
-
-	atomic_set_bit(&source_frs_max_requested, port);
 	pdc_dpm_balance_source_ports(&dpm_work.work);
 }
 
@@ -291,6 +278,8 @@ void pdc_dpm_remove_sink(int port)
 
 	atomic_clear_bit(&sink_max_pdo_requested, port);
 	atomic_clear_bit(&non_pd_sink_max_requested, port);
+	if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED))
+		pdc_dpm_tbt_clear_port(port);
 
 	/* Restore selected default Rp on the port */
 	rp = pdc_power_mgmt_get_default_current_limit(port);
@@ -313,9 +302,6 @@ void pdc_dpm_remove_source(int port)
 
 	atomic_clear_bit(&source_frs_max_requested, port);
 
-	/* Disable FRS */
-	pdc_power_mgmt_frs_enable(port, false);
-
 	/* Restore selected default Rp on the port */
 	rp = pdc_power_mgmt_get_default_current_limit(port);
 	pdc_power_mgmt_set_current_limit(port, rp);
@@ -326,6 +312,10 @@ int pdc_dpm_get_source_current(const int port)
 {
 	if (pd_get_power_role(port) == PD_ROLE_SINK) {
 		return 0;
+	}
+
+	if (pd_get_usb_pd_3a_ports() == 0) {
+		return 1500;
 	}
 
 	if (max_current_claimed & BIT(port)) {

@@ -38,6 +38,13 @@ BUILD_ASSERT(CONFIG_PLATFORM_EC_USB_PD_3A_PORTS == 1,
 
 static enum chipset_state_mask fake_chipset_state = CHIPSET_STATE_ON;
 
+static int mock_usb_pd_3a_ports = 1;
+
+int pd_get_usb_pd_3a_ports(void)
+{
+	return mock_usb_pd_3a_ports;
+}
+
 static int custom_fake_chipset_in_state(int mask)
 {
 	return !!(fake_chipset_state & mask);
@@ -58,6 +65,8 @@ static void src_policy_before(void *f)
 	struct src_policy_fixture *fixture = f;
 	uint32_t lpm_src_pdo =
 		PDO_FIXED(5000, 1500, PDO_FIXED_PEAK_CURR(PDO_PEAK_OCP));
+
+	mock_usb_pd_3a_ports = 1;
 
 	RESET_FAKE(chipset_in_state);
 
@@ -330,7 +339,6 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_1a5)
 		.op_mode_drp = 1,
 		.partner_pd_revision = PD_REV30,
 	};
-	bool frs_enabled;
 
 	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_USBC_PORT0)) {
 		ztest_test_skip();
@@ -367,15 +375,7 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_1a5)
 					    &frs_partner_connector_status));
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT1, -1));
 
-	/* FRS should be enabled, even while providing 3A on another
-	 * port. */
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT1],
-				    &frs_enabled));
-	zassert_true(frs_enabled);
-
-	/* The source PDO should also be configured for 1.5A prior to
-	 * the swap.
-	 */
+	/* The source PDO should be configured for 1.5A prior to the swap. */
 	zassert_ok(verify_lpm_source_pdo(fixture, TEST_USBC_PORT1, 5000, 1500,
 					 PDO_PEAK_OCP),
 		   "7.5W FRS partner not limited to 7.5W");
@@ -396,15 +396,15 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_3a)
 		.op_mode_drp = 1,
 		.partner_pd_revision = PD_REV30,
 	};
-	bool frs_enabled;
 
 	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_USBC_PORT0)) {
 		ztest_test_skip();
 	}
 
 	/* When FRS partners connect as a source, and the FRS partner
-	 * indicates it needs 3.0A, the EC should enable FRS only if no
-	 * other PD sinks are connected and need 3.0A.
+	 * indicates it needs 3.0A, the EC should allocate 3.0A to the
+	 * FRS partner only if no other PD sinks are connected and
+	 * need 3.0A.
 	 */
 
 	/* Connect a PD sink at 1.5A */
@@ -438,11 +438,6 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_3a)
 					    &frs_partner_connector_status));
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT1, -1));
 
-	/* FRS should be enabled. */
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT1],
-				    &frs_enabled));
-	zassert_true(frs_enabled);
-
 	/* The source PDO should also be configured for 3.0A prior to
 	 * the swap.
 	 */
@@ -452,7 +447,7 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_3a)
 }
 
 /* Verify inserting a PD sink downgrades an FRS partner. */
-ZTEST_USER_F(src_policy, test_src_policy_fsr_downgrade_for_pd)
+ZTEST_USER_F(src_policy, test_src_policy_frs_downgrade_for_pd)
 {
 	union connector_status_t snk_partner_connector_status = { 0 };
 	union connector_status_t frs_partner_connector_status = { 0 };
@@ -466,7 +461,6 @@ ZTEST_USER_F(src_policy, test_src_policy_fsr_downgrade_for_pd)
 		.op_mode_drp = 1,
 		.partner_pd_revision = PD_REV30,
 	};
-	bool frs_enabled;
 
 	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_USBC_PORT0)) {
 		ztest_test_skip();
@@ -487,11 +481,6 @@ ZTEST_USER_F(src_policy, test_src_policy_fsr_downgrade_for_pd)
 					    &frs_partner_connector_status));
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT1, -1));
 
-	/* FRS should be enabled. */
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT1],
-				    &frs_enabled));
-	zassert_true(frs_enabled);
-
 	/* The source PDO should also be configured for 3.0A prior to
 	 * the swap.
 	 */
@@ -500,8 +489,7 @@ ZTEST_USER_F(src_policy, test_src_policy_fsr_downgrade_for_pd)
 		   "15W FRS port not offered 15W");
 
 	/* Connecting a PD sink that needs 3.0A on port 0.
-	 * This should downgrade the FRS source, disabling FRS and
-	 * changing the current limit.
+	 * This should downgrade the FRS source current limit.
 	 */
 	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
 			       &snk_partner_connector_status);
@@ -518,11 +506,6 @@ ZTEST_USER_F(src_policy, test_src_policy_fsr_downgrade_for_pd)
 	/* TODO - validate that the FRS port is degraded before the sink
 	 * port is offered 3.0A.
 	 */
-
-	/* FRS should be disabled. */
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT1],
-				    &frs_enabled));
-	zassert_false(frs_enabled);
 
 	/* LPM source PDO offered should only be 1.5A to the FRS port. */
 	zassert_ok(
@@ -542,11 +525,6 @@ ZTEST_USER_F(src_policy, test_src_policy_fsr_downgrade_for_pd)
 
 	/* Allow for policies to run on port 1. */
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT1, -1));
-
-	/* FRS should be enabled. */
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT1],
-				    &frs_enabled));
-	zassert_true(frs_enabled);
 
 	/* The source PDO should also be configured for 3.0A prior to
 	 * the swap.
@@ -569,7 +547,6 @@ ZTEST_USER_F(src_policy, test_src_policy_non_pd_downgrade_for_frs)
 		.op_mode_drp = 1,
 		.partner_pd_revision = PD_REV30,
 	};
-	bool frs_enabled;
 	enum usb_typec_current_t typec_current;
 
 	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_USBC_PORT0)) {
@@ -608,12 +585,9 @@ ZTEST_USER_F(src_policy, test_src_policy_non_pd_downgrade_for_frs)
 		fixture->emul_pdc[TEST_USBC_PORT0], &typec_current));
 	zassert_equal(typec_current, TC_CURRENT_1_5A);
 
-	/* FRS should be enabled. */
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT1, -1));
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT1],
-				    &frs_enabled));
-	zassert_true(frs_enabled);
 
+	/* FRS Port should have 15W allocation */
 	zassert_ok(
 		verify_lpm_source_pdo(fixture, TEST_USBC_PORT1, 5000, 3000,
 				      PDO_PEAK_OCP),
@@ -658,7 +632,6 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_sink_pdo_errors)
 	union connector_capability_t frs_ccaps = {
 		.op_mode_drp = 1,
 	};
-	bool frs_enabled;
 
 	/* Following code paths require FRS support. */
 	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_USBC_PORT0)) {
@@ -685,10 +658,10 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_sink_pdo_errors)
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0,
 						TEST_EXTENDED_TIMEOUT));
 
-	/* FRS should be disabled. */
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT0],
-				    &frs_enabled));
-	zassert_false(frs_enabled);
+	/* 15W Should not be allocated. */
+	zassert_ok(verify_lpm_source_pdo(fixture, TEST_USBC_PORT0, 5000, 1500,
+					 PDO_PEAK_OCP),
+		   "Port 0 should not be allocated 15W");
 
 	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0,
@@ -712,15 +685,18 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_sink_pdo_errors)
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0,
 						TEST_EXTENDED_TIMEOUT));
 
-	/* FRS should be disabled. */
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT0],
-				    &frs_enabled));
-	zassert_false(frs_enabled);
+	/* 15W Should not be allocated. */
+	zassert_ok(verify_lpm_source_pdo(fixture, TEST_USBC_PORT0, 5000, 1500,
+					 PDO_PEAK_OCP),
+		   "Port 0 should not be allocated 15W");
+
 	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0,
 						TEST_EXTENDED_TIMEOUT));
 
-	/* Verify FRS enabled if the partner only wants default power */
+	/* If the partner only wants default power, FRS will be enabled but
+	 * 15W will not be allocated.
+	 */
 	frs_partner_snk_pdo = PDO_FIXED(
 		5000, 3000,
 		PDO_FIXED_DUAL_ROLE | PDO_FIXED_FRS_CURR_DFLT_USB_POWER);
@@ -740,175 +716,10 @@ ZTEST_USER_F(src_policy, test_src_policy_frs_sink_pdo_errors)
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0,
 						TEST_EXTENDED_TIMEOUT));
 
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT0],
-				    &frs_enabled));
-	zassert_true(frs_enabled);
-}
-
-/* Verify FRS is initially enabled by the PDC power manager when 3A is
- * available.
- */
-ZTEST_USER_F(src_policy, test_src_policy_early_frs_enable)
-{
-	union connector_status_t frs_partner_connector_status = { 0 };
-	uint32_t frs_partner_src_pdo =
-		PDO_FIXED(5000, 3000, PDO_FIXED_DUAL_ROLE);
-	uint32_t frs_partner_snk_pdo =
-		PDO_FIXED(5000, 3000, PDO_FIXED_DUAL_ROLE);
-	union connector_capability_t frs_ccaps = {
-		.op_mode_drp = 1,
-		.partner_pd_revision = PD_REV30,
-	};
-	bool frs_enabled;
-
-	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_USBC_PORT0)) {
-		ztest_test_skip();
-	}
-
-	/* Connect a non-FRS partner to port 0 */
-	zassert_ok(emul_pdc_set_connector_capability(
-		fixture->emul_pdc[TEST_USBC_PORT0], &frs_ccaps));
-	emul_pdc_configure_snk(fixture->emul_pdc[TEST_USBC_PORT0],
-			       &frs_partner_connector_status);
-	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
-				     SOURCE_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
-				     &frs_partner_src_pdo));
-	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
-				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
-				     &frs_partner_snk_pdo));
-	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
-					    &frs_partner_connector_status));
-
-	/* Wait for FRS to be set by the PDC power manager */
-	zassert_true(TEST_WAIT_FOR(
-		emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT0],
-				 &frs_enabled) == 0,
-		1000));
-
-	/* FRS is initially enabled */
-	zassert_true(frs_enabled);
-
-	/* After the DPM has checked partner SNK caps, it disables FRS for the
-	 * non-FRS partner
-	 */
-	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT0],
-				    &frs_enabled));
-	zassert_false(frs_enabled);
-}
-
-/* Verify FRS is initially disable by the PDC power manager when 3A is not
- * available.
- */
-ZTEST_USER_F(src_policy, test_src_policy_early_frs_disable)
-{
-	union connector_status_t snk_partner_connector_status = { 0 };
-	union connector_status_t frs_partner_connector_status = { 0 };
-	uint32_t snk_partner_snk_pdo =
-		PDO_FIXED(5000, 3000, PDO_FIXED_DUAL_ROLE);
-	uint32_t frs_partner_src_pdo =
-		PDO_FIXED(5000, 3000, PDO_FIXED_DUAL_ROLE);
-	uint32_t frs_partner_snk_pdo = PDO_FIXED(
-		5000, 3000, PDO_FIXED_DUAL_ROLE | PDO_FIXED_FRS_CURR_1A5_AT_5V);
-	union connector_capability_t frs_ccaps = {
-		.op_mode_drp = 1,
-		.partner_pd_revision = PD_REV30,
-	};
-	bool frs_enabled;
-
-	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_USBC_PORT0)) {
-		ztest_test_skip();
-	}
-
-	/* Connect a PD sink at 3.0A to Port 0. */
-	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
-			       &snk_partner_connector_status);
-	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
-				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
-				     &snk_partner_snk_pdo));
-	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
-					    &snk_partner_connector_status));
-
-	/* Wait for connection to settle and source policies to run. */
-	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
-
-	/* Connect an FRS source that needs 1.5A to port 1 */
-	zassert_ok(emul_pdc_set_connector_capability(
-		fixture->emul_pdc[TEST_USBC_PORT1], &frs_ccaps));
-	emul_pdc_configure_snk(fixture->emul_pdc[TEST_USBC_PORT1],
-			       &frs_partner_connector_status);
-	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT1],
-				     SOURCE_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
-				     &frs_partner_src_pdo));
-	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT1],
-				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
-				     &frs_partner_snk_pdo));
-	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT1],
-					    &frs_partner_connector_status));
-
-	/* Wait for FRS to be set by the PDC power manager */
-	zassert_true(TEST_WAIT_FOR(
-		emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT1],
-				 &frs_enabled) == 0,
-		1000));
-
-	/* Initially, FRS is disabled */
-	zassert_false(frs_enabled);
-
-	/* After the DPM has checked partner SNK caps, it enables FRS for the
-	 * 1.5 A FRS partner.
-	 */
-	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT1, -1));
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT1],
-				    &frs_enabled));
-	zassert_true(frs_enabled);
-}
-
-/* Verify FRS is initially enabled by the PDC power manager when 3A is
- * available, then disabled if the partner is Src Only.
- */
-ZTEST_USER_F(src_policy, test_src_policy_early_frs_enable_src_only)
-{
-	union connector_status_t partner_connector_status = { 0 };
-	uint32_t partner_src_pdo =
-		PDO_FIXED(5000, 3000, PDO_FIXED_UNCONSTRAINED);
-	union connector_capability_t partner_ccaps = {
-		.op_mode_drp = 0,
-		.partner_pd_revision = PD_REV30,
-	};
-	bool frs_enabled;
-
-	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_USBC_PORT0)) {
-		ztest_test_skip();
-	}
-
-	/* Connect a Src only partner to port 0 */
-	zassert_ok(emul_pdc_set_connector_capability(
-		fixture->emul_pdc[TEST_USBC_PORT0], &partner_ccaps));
-	emul_pdc_configure_snk(fixture->emul_pdc[TEST_USBC_PORT0],
-			       &partner_connector_status);
-	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
-				     SOURCE_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
-				     &partner_src_pdo));
-	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
-					    &partner_connector_status));
-
-	/* Wait for FRS to be set by the PDC power manager */
-	zassert_true(TEST_WAIT_FOR(
-		emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT0],
-				 &frs_enabled) == 0,
-		1000));
-
-	/* FRS is initially enabled */
-	zassert_true(frs_enabled);
-
-	/* After the PDC power manager confirms the partner is Src only, it
-	 * disables FRS.
-	 */
-	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
-	zassert_ok(emul_pdc_get_frs(fixture->emul_pdc[TEST_USBC_PORT0],
-				    &frs_enabled));
-	zassert_false(frs_enabled);
+	/* Port 0 should still only offer 1.5A */
+	zassert_ok(verify_lpm_source_pdo(fixture, TEST_USBC_PORT0, 5000, 1500,
+					 PDO_PEAK_OCP),
+		   "Port 0 should not be allocated 15W");
 }
 
 /* Verify PDC reports 15W Max PDP on boards with 3A ports. */
@@ -920,4 +731,149 @@ ZTEST_USER_F(src_policy, test_src_max_pdp)
 					&max_pdp));
 	zassert_equal(MAX_PDP_15W, max_pdp,
 		      "Expected max PDP to be 15W, got %d", max_pdp);
+}
+
+/* Verify that the sink device does not get a 3A contract
+ * when the 3A budget is 0.
+ */
+ZTEST_USER_F(src_policy, test_src_policy_snk_no_3a_when_budget_zero)
+{
+	union connector_status_t connector_status = { 0 };
+	/* Simulate a connected sink device requesting 3A (3000mA) in its PDO */
+	uint32_t partner_snk_pdo = PDO_FIXED(5000, 3000, 0);
+
+	/* Core step: Simulate an overload condition where 3A port budget is 0
+	 */
+	mock_usb_pd_3a_ports = 0;
+
+	/* Simulate connecting the device to Port 0 */
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+
+	/* Wait for the DPM state machine to finish processing */
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* Assert 1: Verify the configured LPM Source PDO only offers 1.5A */
+	zassert_ok(verify_lpm_source_pdo(fixture, TEST_USBC_PORT0, 5000, 1500,
+					 PDO_PEAK_OCP));
+
+	/* Assert 2: Verify that pdc_dpm_get_source_current() correctly reports
+	 * 1500mA */
+	zassert_equal(pdc_dpm_get_source_current(TEST_USBC_PORT0), 1500);
+}
+
+/* On systems with TBT support, verify the device issues a reset after
+ */
+ZTEST_USER_F(src_policy, test_src_policy_tbt_reset)
+{
+	union connector_status_t connector_status = { 0 };
+	uint32_t partner_snk_pdo_non_drp = PDO_FIXED(5000, 3000, 0);
+	uint32_t partner_snk_pdo_drp =
+		PDO_FIXED(5000, 3000, PDO_FIXED_DUAL_ROLE);
+	uint32_t partner_snk_pdo_1_5a = PDO_FIXED(5000, 1500, 0);
+	union connector_reset_t reset_cmd;
+
+	if (!IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED)) {
+		ztest_test_skip();
+	}
+
+	/* Non-PD sink should not cause hard reset. */
+	zassert_ok(emul_pdc_reset(fixture->emul_pdc[TEST_USBC_PORT0]));
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	connector_status.power_operation_mode = USB_TC_CURRENT_3A;
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(emul_pdc_get_connector_reset(
+		fixture->emul_pdc[TEST_USBC_PORT0], &reset_cmd));
+	zassert_equal(0, reset_cmd.raw_value, "Non-PD sink triggered reset");
+
+	/* Disconnect non-PD sink */
+	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* DRP sink should not cause hard reset. */
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo_drp));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(emul_pdc_get_connector_reset(
+		fixture->emul_pdc[TEST_USBC_PORT0], &reset_cmd));
+	zassert_equal(0, reset_cmd.raw_value, "DRP partner triggered reset");
+
+	/* Disconnect DRP sink */
+	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* Sink with 1.5A sink caps should not cause hard reset. */
+	zassert_ok(emul_pdc_reset(fixture->emul_pdc[TEST_USBC_PORT0]));
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo_1_5a));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(emul_pdc_get_connector_reset(
+		fixture->emul_pdc[TEST_USBC_PORT0], &reset_cmd));
+	zassert_equal(0, reset_cmd.raw_value,
+		      "1.5A sink-only partner triggered reset");
+
+	/* Disconnect 1.5A sink */
+	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* Sink with 3A sink caps should cause hard reset. */
+	zassert_ok(emul_pdc_reset(fixture->emul_pdc[TEST_USBC_PORT0]));
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo_non_drp));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(emul_pdc_get_connector_reset(
+		fixture->emul_pdc[TEST_USBC_PORT0], &reset_cmd));
+	zassert_equal(PD_HARD_RESET, reset_cmd.reset_type,
+		      "Non-DRP partner did not trigger hard reset");
+
+	/* Verify reset does not clear 3A allocation. */
+	zassert_ok(verify_lpm_source_pdo(fixture, TEST_USBC_PORT0, 5000, 3000,
+					 PDO_PEAK_OCP),
+		   "LPM did not offer 3A");
+
+	/* Sudden disconnect/reconnect (<5s) does not cause another reset. */
+	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+	zassert_ok(emul_pdc_reset(fixture->emul_pdc[TEST_USBC_PORT0]));
+	emul_pdc_configure_src(fixture->emul_pdc[TEST_USBC_PORT0],
+			       &connector_status);
+	zassert_ok(emul_pdc_set_pdos(fixture->emul_pdc[TEST_USBC_PORT0],
+				     SINK_PDO, PDO_OFFSET_0, 1, PARTNER_PDO,
+				     &partner_snk_pdo_non_drp));
+	zassert_ok(emul_pdc_connect_partner(fixture->emul_pdc[TEST_USBC_PORT0],
+					    &connector_status));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
+
+	/* Verify no reset is sent for the 3A sink only device. */
+	zassert_ok(emul_pdc_get_connector_reset(
+		fixture->emul_pdc[TEST_USBC_PORT0], &reset_cmd));
+	zassert_equal(0, reset_cmd.raw_value,
+		      "Sink only partner triggered reset again within 5s");
+
+	/* Disconnect non-DRP partner */
+	zassert_ok(emul_pdc_disconnect(fixture->emul_pdc[TEST_USBC_PORT0]));
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
 }
