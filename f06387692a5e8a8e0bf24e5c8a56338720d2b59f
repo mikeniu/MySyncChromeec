@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9834ac2_49ecbf4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-24T07:38:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/9545ece9-dc1a-464c-8792-1568725c6bcb)]\n\n### Review Summary\n\n*   **Functionality:** **Good.** The bounds check correctly uses the dynamically queried sensor dimensions to calculate the required frame size and validates it against the buffer size. The check for the private driver (`IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)`) is now correctly placed before any private API calls, preventing potential linker errors or undefined behavior.\n*   **Style:** **Good.** The code style is clean. The removal of the previously duplicated `bpp` query logic improves maintainability.\n*   **Security:** **Good.** The bounds check `if (required_size \u003e image_buf_size)` correctly prevents potential buffer overflows during image acquisition. The casting of `cols` and `rows` to `size_t` prevents potential integer overflow during the calculation.\n*   **Testing:** **Good.** The author tested with `zmake -D build chudow --clobber`.",
+      "isAi": true,
+      "revId": "f06387692a5e8a8e0bf24e5c8a56338720d2b59f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
