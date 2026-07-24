@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "408067bd_a170ee9c",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-24T17:48:40Z",
+      "side": 1,
+      "message": "Drop the single char options as these are easily confused with the existing options.\n\nWe probably should delete the existing single char options as a follow up to simplify the interface.",
+      "range": {
+        "startLine": 235,
+        "startChar": 19,
+        "endLine": 235,
+        "endChar": 31
+      },
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4b3a06a_944b027b",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-24T17:48:40Z",
+      "side": 1,
+      "message": "Nit - drop the single character options.",
+      "range": {
+        "startLine": 314,
+        "startChar": 0,
+        "endLine": 314,
+        "endChar": 13
+      },
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65a3e526_e79097d5",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-24T17:48:40Z",
+      "side": 1,
+      "message": "Can some of the optional arguments be split into a separate CL.  This is a lot of code to review in one go.",
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
