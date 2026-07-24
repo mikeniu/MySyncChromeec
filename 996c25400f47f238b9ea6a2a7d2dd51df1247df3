@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b981c4a0_f29a575c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4246563
+      },
+      "writtenOn": "2026-07-24T07:39:44Z",
+      "side": 1,
+      "message": "Thanks Scott. Could you tell me how I can manually verify these CLs? If I cherrypick these CLs on the arsp ToT and build a new recovery image from go/abtd, should that work?",
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a71371ef_344ea8b5",
         "filename": "common/power_button.c",
         "patchSetId": 1
@@ -19,6 +36,107 @@
         "startChar": 11,
         "endLine": 223,
         "endChar": 22
+      },
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19353902_5732c7bd",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 4246563
+      },
+      "writtenOn": "2026-07-24T07:39:44Z",
+      "side": 1,
+      "message": "Can we also have a running static counter variable to track how many times the suppression has taken place, and append it to the logs?",
+      "fixSuggestions": [
+        {
+          "fixId": "d3637684_834d2107",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "common/power_button.c",
+              "range": {
+                "startLine": 1,
+                "startChar": 0,
+                "endLine": 1,
+                "endChar": 0
+              },
+              "replacement": "\t\tstatic int suppression_count \u003d 0;\n\n"
+            },
+            {
+              "path": "common/power_button.c",
+              "range": {
+                "startLine": 233,
+                "startChar": 0,
+                "endLine": 234,
+                "endChar": 0
+              },
+              "replacement": "\t\t\t\tsuppression_count++;\n\t\t\t\tCPRINTS(\"PB press suppressed in S0 tablet mode (count: %d)\",\n\t\t\t\t\tsuppression_count);\n"
+            },
+            {
+              "path": "common/power_button.c",
+              "range": {
+                "startLine": 236,
+                "startChar": 0,
+                "endLine": 237,
+                "endChar": 0
+              },
+              "replacement": "\t\t\t\tsuppression_count++;\n\t\t\t\tCPRINTS(\"PB release suppressed in S0 tablet mode (count: %d)\",\n\t\t\t\t\tsuppression_count);\n"
+            }
+          ]
+        }
+      ],
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d124a72e_d763575b",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 4246563
+      },
+      "writtenOn": "2026-07-24T07:39:44Z",
+      "side": 1,
+      "message": "Where would these logs be printed? Are they on the EC console?",
+      "range": {
+        "startLine": 233,
+        "startChar": 4,
+        "endLine": 233,
+        "endChar": 53
+      },
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f28bc7a6_7649c77c",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 4246563
+      },
+      "writtenOn": "2026-07-24T07:39:44Z",
+      "side": 1,
+      "message": "Can we add a comment above this else if block to explain that if the button was pressed in clamshell mode and then the device is rotated into tablet mode, we must not ignore the release. Otherwise, this can trigger an unintended 8s hard-reset",
+      "range": {
+        "startLine": 234,
+        "startChar": 5,
+        "endLine": 234,
+        "endChar": 9
       },
       "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
