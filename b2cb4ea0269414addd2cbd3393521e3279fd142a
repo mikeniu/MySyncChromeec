@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe212ef3_33dfa34c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-24T21:20:04Z",
+      "side": 1,
+      "message": "AFAIK, the prerequisites for this not breaking anything have landed (FAFT version checks, servo chip checks). The servo `ec_chip` fix will not have made it into the release build yet, but it was broken for the previous version string too, so this won\u0027t make things any worse or delay the fix any further.",
+      "revId": "b2cb4ea0269414addd2cbd3393521e3279fd142a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
