@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13ff3b6c_7cd960e3",
+        "filename": "zephyr/program/bluey/mica/i2c.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-07-24T12:44:33Z",
+      "side": 1,
+      "message": "I believe this bus isn\u0027t use for anything, can we remove this entry as well.",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 32
+      },
+      "revId": "f8541ed6334fbaf71ab77dec68c916d2f2ac4660",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
