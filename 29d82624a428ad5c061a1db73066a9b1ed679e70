@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd8ef9de_7ee7e0ec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-07-24T01:53:54Z",
+      "side": 1,
+      "message": "krabby ?",
+      "revId": "29d82624a428ad5c061a1db73066a9b1ed679e70",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8933c68_3f9a21e3",
+        "filename": "zephyr/program/ocelot/ocicat/src/board.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-07-24T01:53:54Z",
+      "side": 1,
+      "message": "rename to board_enable_i2c5_ctrol for better understanding and use true instead of 1.",
+      "revId": "29d82624a428ad5c061a1db73066a9b1ed679e70",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
