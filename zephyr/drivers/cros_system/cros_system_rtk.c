@@ -100,30 +100,49 @@ static uint32_t get_otp_chip_info(void)
 	return chip_info;
 }
 
+union rtk_chip_info_reg {
+	uint32_t raw;
+	struct {
+		uint8_t reserved;
+		uint8_t sub_id;
+		uint16_t main_id;
+	} __packed;
+};
+
+static struct {
+	bool initialized;
+	union rtk_chip_info_reg info;
+} cached_otp;
+
+static void ensure_otp_initialized(void)
+{
+	if (cached_otp.initialized)
+		return;
+
+	cached_otp.info.raw = get_otp_chip_info();
+	cached_otp.initialized = true;
+}
+
 static uint32_t system_get_chip_id(void)
 {
-	/* [31:16] main id */
-	uint32_t raw_id = get_otp_chip_info();
-	uint16_t main_id = (raw_id >> 16) & 0xFFFF;
-
-	return main_id;
+	ensure_otp_initialized();
+	return cached_otp.info.main_id;
 }
 
 static uint8_t system_get_chip_version(void)
 {
-	/* [15:8] chip version */
-	uint32_t raw_id = get_otp_chip_info();
-	uint16_t sub_id = (raw_id >> 8) & 0xFF;
-
-	return sub_id;
+	ensure_otp_initialized();
+	return cached_otp.info.sub_id;
 }
 
 const char *cros_system_chip_name(void)
 {
-	static char buf[8] = { 'r', 't', 's' };
+	static char buf[8];
 	uint32_t chip_id = system_get_chip_id();
 
-	snprintf(buf + 3, sizeof(buf) - 3, "%04x", (uint16_t)chip_id);
+	snprintf(buf, sizeof(buf), "rts%04x", (uint16_t)chip_id);
+	/* Unless snprintf failed in an obscure way, this will be a no-op. */
+	buf[sizeof(buf) - 1] = '\0';
 
 	return buf;
 }

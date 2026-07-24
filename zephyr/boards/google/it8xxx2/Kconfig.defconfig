@@ -65,4 +65,9 @@ config SOC_IT8XXX2_ZEPHYR_IN_RAM
 	default y if !LTO
 endif # SRAM_SIZE
 
+if RISCV_PMP
+config PMP_DATA_EXECUTION_PREVENTION
+	default n
+endif # RISCV_PMP
+
 endif # BOARD_IT8XXX2

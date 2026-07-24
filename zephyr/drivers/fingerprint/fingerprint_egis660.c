@@ -32,8 +32,6 @@ int convert_fp_capture_type_to_egis_capture_type(
 		return EGIS_CAPTURE_PATTERN0;
 	case FINGERPRINT_CAPTURE_TYPE_PATTERN1:
 		return EGIS_CAPTURE_PATTERN1;
-	case FINGERPRINT_CAPTURE_TYPE_RESET_TEST:
-		return EGIS_CAPTURE_RESET_TEST;
 	default:
 		return -EINVAL;
 	}

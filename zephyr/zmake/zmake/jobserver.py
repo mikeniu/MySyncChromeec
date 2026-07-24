@@ -254,6 +254,8 @@ class GNUMakeJobClient(JobClient):
                     write_fd = ready_items[0][0].data
                     try:
                         byte = os.read(read_fd, 1)
+                        if not byte:
+                            raise EOFError("Jobserver pipe closed")
                         return JobHandle(
                             functools.partial(os.write, write_fd, byte)
                         )

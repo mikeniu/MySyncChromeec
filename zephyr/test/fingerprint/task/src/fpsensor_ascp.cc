@@ -26,8 +26,6 @@ extern "C" {
 #include <mkbp_event.h>
 #include <ranges>
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
 extern std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;

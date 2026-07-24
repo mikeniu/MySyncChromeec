@@ -805,9 +805,39 @@ __overridable int battery_get_avg_current(void)
 	return -EC_ERROR_UNIMPLEMENTED;
 }
 
+static void replace_null_with_underscore(char *dest, int size)
+{
+	int i;
+	int last_non_zero = -1;
+
+	for (i = size - 1; i >= 0; i--) {
+		if (dest[i] != '\0') {
+			last_non_zero = i;
+			break;
+		}
+	}
+
+	if (last_non_zero == -1)
+		return;
+
+	for (i = 0; i < last_non_zero; i++) {
+		if (dest[i] == '\0') {
+			dest[i] = '_';
+		}
+	}
+}
+
 test_mockable int battery_manufacturer_name(char *dest, int size)
 {
-	return get_battery_manufacturer_name(dest, size);
+	int rv;
+
+	memset(dest, 0, size);
+	rv = get_battery_manufacturer_name(dest, size);
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_REPLACE_NULLS) &&
+	    rv == EC_SUCCESS)
+		replace_null_with_underscore(dest, size);
+
+	return rv;
 }
 
 #ifdef CONFIG_PLATFORM_EC_BATTERY_MANUF_INFO

@@ -11,5 +11,8 @@
 		byd_l25b4pk5 {
 			compatible = "byd,l25b4pk5", "battery-smart";
 		};
+		atl_l25n4pk5 {
+			compatible = "atl,l25n4pk5", "battery-smart";
+		};
 	};
 };

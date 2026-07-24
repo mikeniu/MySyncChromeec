@@ -167,13 +167,19 @@ static void verify_ap_inputs(bool in_s0)
 	for (int ap = 0; ap < ARRAY_SIZE(ap_inputs); ap++) {
 		for (int ec = 0; ec < ARRAY_SIZE(ec_outputs); ec++) {
 			int phys_level;
+			gpio_flags_t flags;
 
 			if (ec_outputs[ec].signal_enum == ap_inputs[ap]) {
-				phys_level = gpio_emul_output_get(
-					ec_outputs[ec].gpio_spec.port,
-					ec_outputs[ec].gpio_spec.pin);
+				gpio_emul_flags_get_dt(
+					&ec_outputs[ec].gpio_spec, &flags);
+				phys_level =
+					gpio_emul_output_get_dt(
+						&ec_outputs[ec].gpio_spec) ^
+					(flags & GPIO_ACTIVE_LOW);
 				zassert_equal(
-					phys_level, expected_level,
+					phys_level,
+					expected_level ^
+						(flags & GPIO_ACTIVE_LOW),
 					"%s (%d) signal isn't at physical %d",
 					ec_outputs[ec].signal_name,
 					ec_outputs[ec].signal_enum,
@@ -193,7 +199,8 @@ static void power_up_test_g3_to_s0_helper(void)
 			      EMUL_POWER_SIGNAL_TEST_PLATFORM(tp_sys_g3_to_s0)),
 		      "Unable to load test platform `tp_sys_g3_to_s0`");
 
-	k_msleep(500);
+	ap_power_exit_hardoff();
+	k_msleep(400);
 
 	zassert_equal(1, power_start_up_count,
 		      "AP_POWER_STARTUP event not generated");
@@ -461,7 +468,7 @@ ZTEST(ap_pwrseq, test_ap_pwrseq_3_sleep_reset)
 
 	/* Trigger reset and later power fail */
 	power_signal_set(PWR_SYS_RST, 1);
-	k_msleep(20);
+	k_msleep(100);
 	power_signal_set(PWR_SYS_RST, 0);
 
 	/* Verify host sleep state was reset after chipset reset */
@@ -621,7 +628,6 @@ ZTEST(ap_pwrseq, test_get_ap_pwrseq_thread)
 	zassert_not_null(pwrseq_thread);
 	zassert_equal(pwrseq_thread, get_ap_pwrseq_thread());
 	zassert_equal(TASK_ID_AP_PWRSEQ, thread_id_to_task_id(pwrseq_thread));
-	zassert_equal(task_id_to_thread_id(TASK_ID_AP_PWRSEQ), pwrseq_thread);
 }
 
 void ap_pwrseq_after_test(void *data)

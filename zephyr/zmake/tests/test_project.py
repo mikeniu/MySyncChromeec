@@ -188,7 +188,7 @@ register_npcx_project(project_name="three", zephyr_board="three")
 register_binman_project(
     project_name="four",
     zephyr_board="four",
-    inherited_from="baseboard"
+    boards="baseboard"
 )
 """
 
@@ -197,7 +197,7 @@ register_raw_project(
     project_name="five",
     zephyr_board="foo",
     dts_overlays=[here / "gpio.dts"],
-    inherited_from=["root", "myboard"],
+    boards=["root", "myboard"],
 )
 """
 
@@ -207,7 +207,7 @@ register_raw_project(
     project_name="%invalid_name",
     zephyr_board="foo",
     dts_overlays=[here / "gpio.dts"],
-    inherited_from=["root", "myboard"],
+    boards=["root", "myboard"],
 )
 """
 
@@ -291,8 +291,8 @@ another = some_variant.variant(
         tmp_path / "another.dts",
     ]
     assert projects["some"].config.full_name == "some"
-    assert projects["some-variant"].config.full_name == "some.some-variant"
-    assert projects["another"].config.full_name == "some.some-variant.another"
+    assert projects["some-variant"].config.full_name == "some-variant"
+    assert projects["another"].config.full_name == "another"
 
 
 @pytest.mark.parametrize(

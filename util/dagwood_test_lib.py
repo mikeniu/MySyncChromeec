@@ -53,11 +53,14 @@ def add_common_args(parser: argparse.ArgumentParser):
     )
 
 
-def get_twister_args(args: argparse.Namespace) -> list:
+def get_twister_args(
+    args: argparse.Namespace, extra_args: list | None = None
+) -> list:
     """Construct twister arguments from parsed arguments.
 
     Args:
         args: Parsed command-line arguments (Namespace).
+        extra_args: Unparsed extra arguments to pass through to twister.
 
     Returns:
         A list of string arguments to be passed to the twister command.
@@ -87,5 +90,8 @@ def get_twister_args(args: argparse.Namespace) -> list:
     if args.test_scenario:
         for scenario in args.test_scenario:
             twister_args.extend(["-s", scenario])
+
+    if extra_args:
+        twister_args.extend(extra_args)
 
     return twister_args

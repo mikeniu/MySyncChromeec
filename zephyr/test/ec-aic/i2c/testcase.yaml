@@ -4,6 +4,7 @@
 
 common:
   platform_allow:
+  - it8xxx2/it82002aw
   - npcx9/npcx9m7f
   - realtek/rts5912
 tests:
