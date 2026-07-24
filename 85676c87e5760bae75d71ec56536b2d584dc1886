@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5aa30fa1_86af51ed",
+        "filename": "zephyr/shim/src/console.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-24T16:58:28Z",
+      "side": 1,
+      "message": "You need to move the comment from above to this check.",
+      "range": {
+        "startLine": 517,
+        "startChar": 0,
+        "endLine": 517,
+        "endChar": 21
+      },
+      "revId": "85676c87e5760bae75d71ec56536b2d584dc1886",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
