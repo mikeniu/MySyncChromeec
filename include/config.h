@@ -1951,9 +1951,6 @@
  */
 #undef CONFIG_GPIO_POWER_DOWN
 
-/* Allow unaligned access */
-#undef CONFIG_ALLOW_UNALIGNED_ACCESS
-
 /*
  * Protect the code RAM section on devices that execute code from RAM. On these
  * devices, this mechanism protects the code from being modified using the MPU.
@@ -3425,13 +3422,6 @@
 #undef CONFIG_LED_DRIVER_LP5562 /* LP5562, on I2C interface */
 #undef CONFIG_LED_DRIVER_MP3385 /* MPS MP3385, on I2C */
 #undef CONFIG_LED_DRIVER_OZ554 /* O2Micro OZ554, on I2C */
-#undef CONFIG_LED_DRIVER_IS31FL3733B /* Lumissil IS31FL3733B on I2C */
-#undef CONFIG_LED_DRIVER_IS31FL3743B /* Lumissil IS31FL3743B on SPI */
-#undef CONFIG_LED_DRIVER_AW20198 /* Awinic AW20198 on I2C */
-#undef CONFIG_LED_DRIVER_TLC59116F /* TLC59116F on I2C */
-
-/* Enable late init for is31fl3743b. Work around b:232443638. */
-#undef CONFIG_IS31FL3743B_LATE_INIT
 
 /* Offset in flash where little firmware will live. */
 #undef CONFIG_LFW_OFFSET
@@ -3980,29 +3970,6 @@
  * Call keyboard backlight init function during init hook instead of start-up
  */
 #undef CONFIG_KBLIGHT_HOOK_INIT
-
-/*
- * RGB Keyboard
- */
-#undef CONFIG_RGB_KEYBOARD
-
-/*
- * Enable debug messages from a RGB keyboard task.
- */
-#undef CONFIG_RGB_KEYBOARD_DEBUG
-
-/*
- * Enable demo for RGB keyboard to run on reset.
- *
- * FLOW: In each iteration, a new color is placed in (0,0) and the rest of LEDs
- * copy colors from adjacent LEDs.
- *
- * DOT: A red dot is placed on (0,0) and traverses the grid from top to bottom
- * left to right. After the entire matrix is traversed, it's repeated with a
- * new color.
- */
-#undef CONFIG_RGBKBD_DEMO_FLOW
-#undef CONFIG_RGBKBD_DEMO_DOT
 
 #ifndef CONFIG_ZEPHYR
 /* Support Real-Time Clock (RTC) */

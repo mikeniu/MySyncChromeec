@@ -8,9 +8,9 @@ Chromium OS Board Information (CBI) stored in the EC's non-volatile storage
 
 ```text
 cbi
-cbi set <tag> <value> <size> [init | skip_write]
-cbi set <tag> <hex_string> [init | skip_write]  (For UFSC)
-cbi remove <tag> [init | skip_write]
+cbi set <tag> <value> <size> [init]
+cbi set <tag> <hex_string> [init]  (For UFSC)
+cbi remove <tag> [init]
 ```
 
 ## Subcommands and Usage
@@ -135,13 +135,6 @@ Initializes a new CBI structure in memory before applying the change.
 > (CONFIG_SYSTEM_UNLOCKED)](#security-restrictions-config_system_unlocked)
 > below.
 
-### `skip_write`
-Performs the operation only on the in-memory CBI cache and skips writing the
-changes back to the non-volatile storage (EEPROM/Flash).
-*   **When to use:** For testing configuration changes temporarily without
-    committing them to physical storage.
-*   *Example*: `cbi set 6 0x100 4 skip_write`
-
 ---
 
 ## Security Restrictions (CONFIG_SYSTEM_UNLOCKED)
@@ -165,8 +158,7 @@ accidental erasure of board info on production devices.
 
 ### Write Protection (WP)
 Independent of `CONFIG_SYSTEM_UNLOCKED`, if hardware write protection is enabled
-on the flash/EEPROM, any write to physical storage will fail unless `skip_write`
-is specified.
+on the flash/EEPROM, any write to physical storage will fail.
 
 ---
 

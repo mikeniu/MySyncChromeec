@@ -119,54 +119,78 @@ echo "Activating virtual environment..."
 # shellcheck disable=SC1091
 source "${VENV_DIR}/bin/activate"
 
-# Install zmake package in editable mode inside virtualenv
-if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
-    echo "Installing zmake tool in virtualenv..."
-    python3 -m pip install --upgrade pip
-    python3 -m pip install -e /workspace/src/platform/ec/zephyr/zmake
+# Function to compute sha256 hash of python requirement files
+compute_reqs_hash() {
+    local files=()
+    local req_dir="/workspace/src/third_party/zephyrproject/zephyr/scripts"
+    local vpython_file="/workspace/src/platform/ec/zephyr/zmake/.vpython3"
 
-    # Install standard Zephyr dependencies to support twister executions
-    ZEPHYR_REQS_DIR="/workspace/src/third_party/zephyrproject/zephyr/scripts"
-    if [ -d "${ZEPHYR_REQS_DIR}" ]; then
-        echo "Installing Zephyr dependencies..."
-        python3 -m pip install -r "${ZEPHYR_REQS_DIR}/requirements.txt"
-    fi
-
-    # Parse .vpython3 and install dependencies
-    VPYTHON_FILE="/workspace/src/platform/ec/zephyr/zmake/.vpython3"
-    if [ -f "${VPYTHON_FILE}" ]; then
-        echo "Installing dependencies from .vpython3..."
-        packages=$(grep -o 'infra/python/wheels/[a-zA-Z0-9_-]*' \
-            "${VPYTHON_FILE}" | \
-            sed 's|infra/python/wheels/||g' | \
-            sed 's|-py2_py3||g' | \
-            sed 's|-py3||g' | \
-            sort -u)
-        for pkg in ${packages}; do
-            case "${pkg}" in
-                "pyyaml") pkg="PyYAML" ;;
-                "python-dateutil") pkg="python-dateutil" ;;
-                "ruamel_yaml") pkg="ruamel.yaml" ;;
-                # Skip packages already installed by Zephyr's requirements.txt
-                # above that would be downgraded based on the .vpython
-                # requirements
-                "ruamel_yaml_clib") continue ;;
-                "coverage") continue ;;
-                "pytest") continue ;;
-                # Skip packages only used by zmake unit tests
-                "hypothesis") continue ;;
-                "testfixtures") continue ;;
-            esac
-            echo "Installing ${pkg}..."
-            python3 -m pip install "${pkg}"
+    if [ -d "${req_dir}" ]; then
+        for f in "${req_dir}"/requirements*.txt; do
+            [ -f "${f}" ] && files+=("${f}")
         done
     fi
+    [ -f "${vpython_file}" ] && files+=("${vpython_file}")
 
-    # Install standard Zephyr dependencies to support twister executions
-    ZEPHYR_REQS_DIR="/workspace/src/third_party/zephyrproject/zephyr/scripts"
-    if [ -d "${ZEPHYR_REQS_DIR}" ]; then
-        echo "Installing Zephyr dependencies..."
-        python3 -m pip install -r "${ZEPHYR_REQS_DIR}/requirements.txt"
+    if [ ${#files[@]} -gt 0 ]; then
+        sha256sum "${files[@]}" | sha256sum | awk '{print $1}'
+    else
+        echo "none"
+    fi
+}
+
+# Install zmake package in editable mode inside virtualenv
+if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
+    HASH_FILE="${VENV_DIR}/.requirements.hash"
+    CURRENT_HASH="$(compute_reqs_hash)"
+    PAST_HASH=""
+    [ -f "${HASH_FILE}" ] && PAST_HASH="$(cat "${HASH_FILE}")"
+
+    if [ "${CURRENT_HASH}" != "none" ] && \
+       [ "${CURRENT_HASH}" = "${PAST_HASH}" ]; then
+        echo "Python dependencies up to date. Skipping pip install."
+    else
+        echo "Installing zmake tool in virtualenv..."
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -e /workspace/src/platform/ec/zephyr/zmake
+
+        # Install standard Zephyr dependencies to support twister executions
+        ZEPHYR_REQS_DIR="/workspace/src/third_party/zephyrproject/zephyr"
+        ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/scripts"
+        if [ -d "${ZEPHYR_REQS_DIR}" ]; then
+            echo "Installing Zephyr dependencies..."
+            python3 -m pip install --ignore-installed \
+                -r "${ZEPHYR_REQS_DIR}/requirements.txt"
+        fi
+
+        # Parse .vpython3 and install dependencies
+        VPYTHON_FILE="/workspace/src/platform/ec/zephyr/zmake/.vpython3"
+        if [ -f "${VPYTHON_FILE}" ]; then
+            echo "Installing dependencies from .vpython3..."
+            packages=$(grep -o 'infra/python/wheels/[a-zA-Z0-9_-]*' \
+                "${VPYTHON_FILE}" | \
+                sed 's|infra/python/wheels/||g' | \
+                sed 's|-py2_py3||g' | \
+                sed 's|-py3||g' | \
+                sort -u)
+            to_install=""
+            for pkg in ${packages}; do
+                case "${pkg}" in
+                    "pyyaml") pkg="PyYAML" ;;
+                    "python-dateutil") pkg="python-dateutil" ;;
+                    "ruamel_yaml") pkg="ruamel.yaml" ;;
+                    "ruamel_yaml_clib"|"coverage"|"pytest"| \
+                    "hypothesis"|"testfixtures") continue ;;
+                esac
+                to_install="${to_install} ${pkg}"
+            done
+            if [ -n "${to_install}" ]; then
+                # shellcheck disable=SC2086
+                python3 -m pip install --ignore-installed ${to_install}
+            fi
+        fi
+
+        echo "${CURRENT_HASH}" > "${HASH_FILE}"
     fi
 
     # Export U-Boot binman tools directory to PATH

@@ -204,6 +204,13 @@ static int ft98xx_init(const struct device *dev)
 		return -EINVAL;
 	}
 
+	rc = ft98xx_set_mode(dev, FINGERPRINT_SENSOR_MODE_LOW_POWER);
+	if (rc != 0) {
+		LOG_ERR("ft98xx sensor enter low power fail, result:%d", rc);
+		data->errors |= FINGERPRINT_ERROR_INIT_FAIL;
+		return -EINVAL;
+	}
+
 	return 0;
 }
 
@@ -293,7 +300,8 @@ static int ft98xx_acquire_image(const struct device *dev,
 	}
 
 	memset(image_buf, 0, image_buf_size);
-	ret = ft_sensor_acquire_image_with_mode(image_buf, capture_type);
+	ret = ft_sensor_acquire_image_with_mode(image_buf, image_buf_size,
+						capture_type);
 	if (ret < 0) {
 		LOG_ERR("Failed to acquire image with capture_type %d: %d",
 			capture_type, ret);

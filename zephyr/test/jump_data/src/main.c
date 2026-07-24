@@ -15,6 +15,7 @@
 extern char mock_end_of_ram_data[CONFIG_PLATFORM_EC_PRESERVED_END_OF_RAM_SIZE];
 
 struct jump_data *get_jump_data(void);
+int panic_data_init(void);
 
 /**
  * @brief Returns a pointer to an object (such as a struct jump_data) of type
@@ -429,6 +430,7 @@ ZTEST(jump_data, test_init_watchdog_reset)
 	jdata->jump_tag_total = 0;
 
 	system_common_pre_init();
+	panic_data_init();
 
 	/* Verify the watchdog flag was preserved and combined with sysjump */
 	zassert_equal(system_get_reset_flags(),

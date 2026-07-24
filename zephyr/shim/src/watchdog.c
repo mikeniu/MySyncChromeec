@@ -51,7 +51,7 @@ const struct watchdog_info wdt_info[] = {
 #if ((DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog), st_stm32_watchdog)) || \
      (DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog),                        \
 			 realtek_rts5912_watchdog)) ||                       \
-     (DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog), ft_ft90_wdt)))
+     (DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog), focaltech_ft9001_wdt)))
 			.flags = WDT_FLAG_RESET_SOC,
 			.window.min = 0U,
 			.window.max = CONFIG_WATCHDOG_PERIOD_MS,

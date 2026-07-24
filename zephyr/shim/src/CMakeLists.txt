@@ -103,8 +103,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_INTEL_HB
                                                             bb_retimer_usb_mux.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SHA256_HW_ZEPHYR
 	                                                    sha256_hw.c)
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP
-	                                                    register_memory_dump.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_STUB   usbc_stub.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PERIPHERAL_CHARGER   pchg.c)
 
@@ -138,15 +136,12 @@ if(CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
     PUBLIC_DEPS
       pw_log_tokenized.handler
       pw_log_zephyr.tokenized_lib
+      zephyr_interface
   )
-  zephyr_link_libraries(pw_log)
   pw_zephyrize_libraries_ifdef(CONFIG_PIGWEED_LOG_TOKENIZED_LIB
                               platform_ec_log.tokenized_handler
   )
 
-  include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/backend.cmake")
-  pw_set_backend(pw_log_tokenized.handler platform_ec_log.tokenized_handler)
-  include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log/backend.cmake")
-  pw_set_backend(pw_log pw_log_tokenized)
+
 
 endif()

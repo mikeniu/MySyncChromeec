@@ -18,13 +18,6 @@ extern "C" {
 void start_ec_tasks(void);
 
 /**
- * Maps an EC task id to a Zephyr thread id.
- *
- * @returns Thread id OR NULL if mapping fails
- */
-k_tid_t task_id_to_thread_id(task_id_t task_id);
-
-/**
  * Maps a Zephyr thread id to an EC task id.
  *
  * @returns Task id OR TASK_ID_INVALID if mapping fails
