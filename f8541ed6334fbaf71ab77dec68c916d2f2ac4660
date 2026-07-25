@@ -22,6 +22,30 @@
       },
       "revId": "f8541ed6334fbaf71ab77dec68c916d2f2ac4660",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6f76dcb_22951691",
+        "filename": "zephyr/program/bluey/mica/i2c.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4619438
+      },
+      "writtenOn": "2026-07-25T06:21:04Z",
+      "side": 1,
+      "message": "Yes, we can remove this i2c bus.",
+      "parentUuid": "13ff3b6c_7cd960e3",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 32
+      },
+      "revId": "f8541ed6334fbaf71ab77dec68c916d2f2ac4660",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
