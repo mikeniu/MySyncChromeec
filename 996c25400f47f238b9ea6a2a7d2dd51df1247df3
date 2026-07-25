@@ -37,6 +37,42 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ea07e8e8_e1996dfd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-25T21:21:29Z",
+      "side": 1,
+      "message": "It\u0027s much easier to just flash an EC image containing these changes to your DUT and disabled EC firmware sync by ensuring the GBB flags have 0x200 set.",
+      "parentUuid": "b981c4a0_f29a575c",
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60be1143_05ac1c1e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-25T21:21:29Z",
+      "side": 1,
+      "message": "Yes the 3rd corner case in the design doc is implemented in the latest patch set.,",
+      "parentUuid": "6edb8277_8f979f26",
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a71371ef_344ea8b5",
         "filename": "common/power_button.c",
         "patchSetId": 1
@@ -115,6 +151,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "86a81883_9f3ce6c7",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-25T21:21:29Z",
+      "side": 1,
+      "message": "I have made a comment about this in the design doc",
+      "parentUuid": "19353902_5732c7bd",
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d124a72e_d763575b",
         "filename": "common/power_button.c",
         "patchSetId": 1
@@ -138,6 +192,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "12d24ea5_1e07d373",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-25T21:21:29Z",
+      "side": 1,
+      "message": "Yes, the log messages are present in the EC console log.",
+      "parentUuid": "d124a72e_d763575b",
+      "range": {
+        "startLine": 233,
+        "startChar": 4,
+        "endLine": 233,
+        "endChar": 53
+      },
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f28bc7a6_7649c77c",
         "filename": "common/power_button.c",
         "patchSetId": 1
@@ -149,6 +227,30 @@
       "writtenOn": "2026-07-24T07:39:44Z",
       "side": 1,
       "message": "Can we add a comment above this else if block to explain that if the button was pressed in clamshell mode and then the device is rotated into tablet mode, we must not ignore the release. Otherwise, this can trigger an unintended 8s hard-reset",
+      "range": {
+        "startLine": 234,
+        "startChar": 5,
+        "endLine": 234,
+        "endChar": 9
+      },
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c8ba25a_85087b86",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-25T21:21:29Z",
+      "side": 1,
+      "message": "Please review the updated patch set. I have added additional EC log messages and additional comments to give more description of the code changes.",
+      "parentUuid": "f28bc7a6_7649c77c",
       "range": {
         "startLine": 234,
         "startChar": 5,

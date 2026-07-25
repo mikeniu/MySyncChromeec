@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0b7c7d8_87849ef6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-25T21:21:29Z",
+      "side": 1,
+      "message": "I have uploaded a new patch set which adds additional EC console logging as spelled out in the design document and addresses all 4 corner cases and have verified those with manual testing.",
+      "revId": "28a80cc769e4e53dd7b2084e8624df0912a46a5c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
