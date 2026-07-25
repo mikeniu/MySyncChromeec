@@ -206,6 +206,15 @@ static int validate_fp_mode(const uint32_t mode)
 			return EC_ERROR_INVAL;
 	}
 
+	/*
+	 * Do not allow changing or clearing sensor mode while a crypto
+	 * operation is in progress.
+	 */
+	if (cur_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+		CPRINTS("Crypto operation in progress");
+		return EC_ERROR_BUSY;
+	}
+
 	return EC_SUCCESS;
 }
 
