@@ -76,7 +76,7 @@ void chipset_force_shutdown(enum chipset_shutdown_reason reason)
 
 #ifdef CONFIG_POWER_PP5000_CONTROL
 	/* Issue a request to turn off the rail. */
-	power_5v_enable(task_get_current(), 0);
+	power_5v_enable(k_current_get(), 0);
 #else
 	/* Turn off PP5000_A rail */
 	gpio_set_level(GPIO_EN_PP5000_A, 0);
@@ -134,7 +134,7 @@ void chipset_pre_init_callback(void)
 {
 	/* Enable 5.0V and 3.3V rails, and wait for Power Good */
 #ifdef CONFIG_POWER_PP5000_CONTROL
-	power_5v_enable(task_get_current(), 1);
+	power_5v_enable(k_current_get(), 1);
 #else
 	/* Turn on PP5000_A rail */
 	gpio_set_level(GPIO_EN_PP5000_A, 1);

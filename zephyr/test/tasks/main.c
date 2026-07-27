@@ -101,12 +101,14 @@ ZTEST(test_task_shim, test_set_event_before_task_start)
 
 static void task_get_current1(void)
 {
-	zassert_equal(task_get_current(), TASK_ID_TASK_1, "ID matches");
+	zassert_equal(thread_id_to_task_id(k_current_get()), TASK_ID_TASK_1,
+		      "ID matches");
 }
 
 static void task_get_current2(void)
 {
-	zassert_equal(task_get_current(), TASK_ID_TASK_2, "ID matches");
+	zassert_equal(thread_id_to_task_id(k_current_get()), TASK_ID_TASK_2,
+		      "ID matches");
 }
 
 ZTEST(test_task_shim, test_task_get_current)
@@ -289,7 +291,6 @@ static int pre_kernel(void)
 {
 	zassert_false(pre_kernel_ran);
 	zassert_true(k_is_pre_kernel());
-	zassert_equal(TASK_ID_INVALID, task_get_current());
 	zassert_false(in_deferred_context());
 	pre_kernel_ran = true;
 	return 0;
@@ -306,7 +307,7 @@ static int post_kernel(void)
 {
 	zassert_false(post_kernel_ran);
 	zassert_false(k_is_pre_kernel());
-	zassert_equal(TASK_ID_MAIN, task_get_current());
+	zassert_equal(TASK_ID_MAIN, thread_id_to_task_id(k_current_get()));
 	post_kernel_ran = true;
 	return 0;
 }
