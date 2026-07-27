@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a47f66f5_0bd02bda",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-27T19:53:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/e2d72925-46c0-466c-b3fa-74cecdbadd09)]\n\n### Review Summary\n\n*   **Functionality**: Looks good. The change correctly prevents arming the positive match secret post-enrollment in the Fingerprint Auth flow, since it relies on template confirmation (`EC_CMD_FP_CONFIRM_TEMPLATE`) rather than classic-flow match secret readback.\n*   **Security**: Improves correctness and security for the Fingerprint Auth flow by ensuring the positive match secret is not unnecessarily armed for host readback immediately after enrollment.\n*   **Style \u0026 Consistency**: The code follows the existing style and conventions well.\n*   **Testing \u0026 Test Coverage**: The change was tested with a build. An inline comment suggests adding an automated unit test to explicitly verify this branching behavior for the positive match secret.\n*   **CL Size \u0026 Scope**: The size and scope are perfect. It is a single, self-contained logical fix.\n\nTAG\u003dagy\nCONV\u003de2cc17a1-bbf7-49d0-839b-d8c842a05e73",
+      "isAi": true,
+      "revId": "aafc5522b2c4b3a5991a921b6cc7f82575b7853b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4000e6d_d9413cd1",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-27T19:53:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Optional Testing Suggestion:** Since the behavior of `fp_process_enroll` now branches based on `fingerprint_auth_enabled()`, consider adding test coverage to verify this state change. For example, in `zephyr/test/fingerprint/task/src/fpsensor_enroll.cc`, you could add a test simulating the auth flow and asserting that `global_context.positive_match_secret_state.readable` remains `false` after enrollment, ensuring no regression in this logic.",
+      "isAi": true,
+      "revId": "aafc5522b2c4b3a5991a921b6cc7f82575b7853b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
