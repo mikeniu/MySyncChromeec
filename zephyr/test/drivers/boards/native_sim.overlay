@@ -385,6 +385,7 @@
 				"I2C_PORT_EEPROM",
 				"I2C_PORT_ACCEL",
 				"I2C_PORT_VIRTUAL_BATTERY";
+			allow-passthru = "battery_allow_passthru";
 		};
 		named_i2c1: i2c1 {
 			i2c-port = <&i2c1>;
