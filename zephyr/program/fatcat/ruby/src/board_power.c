@@ -3,9 +3,13 @@
  * found in the LICENSE file.
  */
 
+#include "battery.h"
+#include "chipset.h"
+#include "extpower.h"
 #include "gpio/gpio.h"
 #include "gpio_signal.h"
 #include "system_boot_time.h"
+#include "watchdog.h"
 
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/logging/log.h>
@@ -19,6 +23,8 @@
 #include <power_signals.h>
 #include <system.h>
 #include <x86_power_signals.h>
+#define SCRATCHPAD_SHIP_MODE_LOCK BIT(2)
+#define SCRATCHPAD_SHIP_INITIALIZED BIT(3)
 
 LOG_MODULE_DECLARE(ap_pwrseq, LOG_LEVEL_INF);
 
@@ -35,6 +41,33 @@ void board_ap_power_force_shutdown(void)
 
 void board_ap_power_action_g3_s5(void)
 {
+	uint32_t scratchval = 0;
+	system_get_scratchpad(&scratchval);
+	if (!(scratchval & SCRATCHPAD_SHIP_INITIALIZED)) {
+		scratchval |= SCRATCHPAD_SHIP_INITIALIZED |
+			      SCRATCHPAD_SHIP_MODE_LOCK;
+		system_set_scratchpad(scratchval);
+	}
+
+	bool is_cmd_lock = (scratchval & SCRATCHPAD_SHIP_MODE_LOCK) != 0;
+	if (is_cmd_lock) {
+		k_msleep(200);
+		if (!extpower_is_present()) {
+			cflush();
+			chipset_force_shutdown(CHIPSET_SHUTDOWN_BOARD_CUSTOM);
+			k_msleep(50);
+			while (!extpower_is_present()) {
+				watchdog_reload();
+				k_msleep(100);
+			}
+			system_reset(SYSTEM_RESET_HARD);
+		} else {
+			scratchval &= ~SCRATCHPAD_SHIP_MODE_LOCK;
+			system_set_scratchpad(scratchval);
+			LOG_INF("[Factory-Ship] AC Verified Present! Unlocking system.");
+			cflush();
+		}
+	}
 	LOG_DBG("Turning on PWR_EN_PP5000_A and PWR_EN_PP3300_A");
 	power_signal_set(PWR_EN_PP5000_A, 1);
 
