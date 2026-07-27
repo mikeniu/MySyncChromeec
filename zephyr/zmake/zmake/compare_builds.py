@@ -14,6 +14,7 @@ import shutil
 import subprocess
 from typing import List
 
+import zmake.analyze_build_diff
 import zmake.modules
 from zmake.output_packers import packer_registry
 
@@ -478,7 +479,27 @@ class CompareBuilds:
                             dirs_exist_ok=True,
                         )
 
-    def _compare_binaries(self, project):
+    def _analyze_binary_diff(self, project, exact_bytes=False):
+        """Run analyze_build_diff to log details of binary differences."""
+        build_path = (
+            pathlib.Path("ec")
+            / "build"
+            / "zephyr"
+            / pathlib.Path(project.config.project_name)
+        )
+
+        dir1 = self.checkouts[1].modules_dir / build_path
+        dir2 = self.checkouts[0].modules_dir / build_path
+
+        zmake.analyze_build_diff.analyze_build_diff(
+            dir1,
+            dir2,
+            project_name=project.config.project_name,
+            exact_bytes=exact_bytes,
+            output_fn=self.logger.info,
+        )
+
+    def _compare_binaries(self, project, analyze_diff=False, exact_bytes=False):
         output_path = (
             pathlib.Path("ec")
             / "build"
@@ -490,8 +511,6 @@ class CompareBuilds:
         output_dir1 = self.checkouts[0].modules_dir / output_path
         output_dir2 = self.checkouts[1].modules_dir / output_path
 
-        # The rex-ish and similar ish targets create an ish_fw.bin artifact
-        # instead of ec.bin
         if os.path.isfile(output_dir1 / "ish_fw.bin"):
             bin_name = "ish_fw.bin"
         else:
@@ -500,8 +519,6 @@ class CompareBuilds:
         bin_output1 = output_dir1 / bin_name
         bin_output2 = output_dir2 / bin_name
 
-        # ELF executables don't compare due to meta data.  Convert to a binary
-        # for the comparison
         if project.config.output_packer == packer_registry["elf"]:
             create_bin_from_elf(
                 elf_input=output_dir1 / "zephyr.elf", bin_output=bin_output1
@@ -528,14 +545,18 @@ class CompareBuilds:
                 stderr=subprocess.DEVNULL,
             )
         except subprocess.CalledProcessError:
+            if analyze_diff:
+                self._analyze_binary_diff(project, exact_bytes=exact_bytes)
             return False
         return True
 
-    def check_binaries(self, projects):
+    def check_binaries(self, projects, analyze_diff=False, exact_bytes=False):
         """Compare Zephyr EC binaries for two different source trees
 
         Args:
             projects: List of projects to compare the output binaries.
+            analyze_diff: If True, run detailed binary diff analysis on failure.
+            exact_bytes: If True, display exact byte counts in footprint summaries.
 
         Returns:
             A list of projects that failed to compare.  An empty list indicates that
@@ -546,7 +567,7 @@ class CompareBuilds:
             return []
 
         failed_projects = _compare_non_test_projects(
-            projects, self._compare_binaries
+            projects, self._compare_binaries, analyze_diff, exact_bytes
         )
         return failed_projects
 

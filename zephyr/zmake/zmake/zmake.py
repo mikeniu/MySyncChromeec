@@ -448,6 +448,8 @@ class Zmake:
         compare_configs=False,
         compare_binaries_disable=False,
         compare_devicetrees=False,
+        analyze_diff=False,
+        exact_bytes=False,
     ):
         """Compare EC builds at two commits."""
         if module in ("zephyr", "zephyrproject", "zephyr-base"):
@@ -541,7 +543,9 @@ class Zmake:
                 )
                 return result
         if not compare_binaries_disable:
-            failed_projects = cmp_builds.check_binaries(projects)
+            failed_projects = cmp_builds.check_binaries(
+                projects, analyze_diff=analyze_diff, exact_bytes=exact_bytes
+            )
             self.cmp_failed_projects["binary"] = failed_projects
             self.failed_projects.extend(failed_projects)
         if compare_configs:
@@ -1127,12 +1131,16 @@ class Zmake:
         target1,
         target2,
         sections=False,
+        verbose=False,
+        exact_bytes=False,
     ):
         """Analyze binary differences between two EC builds."""
         success = zmake.analyze_build_diff.analyze_build_diff(
             target1,
             target2,
             sections=sections,
+            verbose=verbose,
+            exact_bytes=exact_bytes,
             output_fn=self.logger.info,
         )
         return 0 if success else 1
