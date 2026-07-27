@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "43d50478_574161fe",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 4244,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-27T17:23:27Z",
+      "side": 1,
+      "message": "hey do you need to have this added to the old protocol version? I don\u0027t think it hurts any, but I suspect there\u0027s no reason to, all current devices should be running the latest version of the protocol since apparently the size grew because of the key_matrix thing, may as well just keep it to the latest version? one less thing to check if we ever end up removing these structs",
+      "range": {
+        "startLine": 4238,
+        "startChar": 0,
+        "endLine": 4244,
+        "endChar": 0
+      },
+      "revId": "4a926241ba43f8d967f7d023ce6c25abe7ce90d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ba213f39_32fb7536",
         "filename": "include/ec_commands.h",
         "patchSetId": 12
