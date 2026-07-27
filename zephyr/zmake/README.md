@@ -152,7 +152,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake analyze-build-diff
 
-**Usage:** `zmake analyze-build-diff [-h] target1 target2`
+**Usage:** `zmake analyze-build-diff [-h] target1 target2 [--sections]`
 
 #### Positional Arguments
 
@@ -166,3 +166,4 @@ Chromium OS's meta-build tool for Zephyr
 |   |   |
 |---|---|
 | `-h`, `--help` | show this help message and exit |
+| `--sections` | Print detailed section size comparison and changed sections |
