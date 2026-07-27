@@ -16,7 +16,7 @@ Chromium OS's meta-build tool for Zephyr
 |---|---|
 | `subcommand` | Subcommand to run |
 
-#### Options
+#### Optional Arguments
 
 |   |   |
 |---|---|
@@ -35,7 +35,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake configure
 
-**Usage:** `zmake configure [-h] [--bringup] [--clobber] [-v VERSION] [--static] [--save-temps] [--allow-warnings] [--cmake-trace] [--cmake-graph] [-B BUILD_DIR] [-c] [--delete-intermediates] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name ...)`
+**Usage:** `zmake configure [-h] [--bringup] [--clobber] [-v VERSION] [--static] [--save-temps] [--allow-warnings] [--cmake-trace] [--cmake-graph] [-B BUILD_DIR] [-c] [--delete-intermediates] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name [project_name ...])`
 
 #### Positional Arguments
 
@@ -43,7 +43,7 @@ Chromium OS's meta-build tool for Zephyr
 |---|---|
 | `project_name` | Name(s) of the project(s) to build, Unix-style wildcard expressions to select multiple projects (e.g. brox-*), or program directory names prefixed with '%' (e.g. %nissa) |
 
-#### Options
+#### Optional Arguments
 
 |   |   |
 |---|---|
@@ -66,7 +66,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake build
 
-**Usage:** `zmake build [-h] [--bringup] [--clobber] [-v VERSION] [--static] [--save-temps] [--allow-warnings] [--cmake-trace] [--cmake-graph] [-B BUILD_DIR] [-c] [--delete-intermediates] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name ...)`
+**Usage:** `zmake build [-h] [--bringup] [--clobber] [-v VERSION] [--static] [--save-temps] [--allow-warnings] [--cmake-trace] [--cmake-graph] [-B BUILD_DIR] [-c] [--delete-intermediates] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name [project_name ...])`
 
 #### Positional Arguments
 
@@ -74,7 +74,7 @@ Chromium OS's meta-build tool for Zephyr
 |---|---|
 | `project_name` | Name(s) of the project(s) to build, Unix-style wildcard expressions to select multiple projects (e.g. brox-*), or program directory names prefixed with '%' (e.g. %nissa) |
 
-#### Options
+#### Optional Arguments
 
 |   |   |
 |---|---|
@@ -97,7 +97,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake compare-builds
 
-**Usage:** `zmake compare-builds [-h] [--ref1 REF1] [--ref2 REF2] [-k] [-n] [-b] [-d] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name ...)`
+**Usage:** `zmake compare-builds [-h] [--ref1 REF1] [--ref2 REF2] [-k] [-n] [-b] [-d] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name [project_name ...])`
 
 #### Positional Arguments
 
@@ -105,7 +105,7 @@ Chromium OS's meta-build tool for Zephyr
 |---|---|
 | `project_name` | Name(s) of the project(s) to build, Unix-style wildcard expressions to select multiple projects (e.g. brox-*), or program directory names prefixed with '%' (e.g. %nissa) |
 
-#### Options
+#### Optional Arguments
 
 |   |   |
 |---|---|
@@ -123,7 +123,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake list-projects
 
-**Usage:** `zmake list-projects [-h] [--format FMT] [project_name ...]`
+**Usage:** `zmake list-projects [-h] [--format FMT] [project_name [project_name ...]]`
 
 #### Positional Arguments
 
@@ -131,7 +131,7 @@ Chromium OS's meta-build tool for Zephyr
 |---|---|
 | `project_name` | Name(s) of the project(s) to list, Unix-style wildcard expressions to select multiple projects (e.g. brox-*), or program directory names prefixed with '%' (e.g. %nissa) |
 
-#### Options
+#### Optional Arguments
 
 |   |   |
 |---|---|
@@ -142,10 +142,27 @@ Chromium OS's meta-build tool for Zephyr
 
 **Usage:** `zmake generate-readme [-h] [-o OUTPUT_FILE] [--diff]`
 
-#### Options
+#### Optional Arguments
 
 |   |   |
 |---|---|
 | `-h`, `--help` | show this help message and exit |
 | `-o OUTPUT_FILE`, `--output-file OUTPUT_FILE` | File to write to.  It will only be written if changed. |
 | `--diff` | If specified, diff the README with the expected contents instead of writing out. |
+
+### zmake analyze-build-diff
+
+**Usage:** `zmake analyze-build-diff [-h] target1 target2`
+
+#### Positional Arguments
+
+|   |   |
+|---|---|
+| `target1` | First build directory or ec.bin file |
+| `target2` | Second build directory or ec.bin file |
+
+#### Optional Arguments
+
+|   |   |
+|---|---|
+| `-h`, `--help` | show this help message and exit |
