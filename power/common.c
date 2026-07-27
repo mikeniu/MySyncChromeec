@@ -686,7 +686,7 @@ void test_power_common_state(void)
 {
 	enum power_state new_state;
 
-	task_wake(task_get_current());
+	task_wake(thread_id_to_task_id(k_current_get()));
 	new_state = power_common_state();
 	if (new_state != state)
 		power_set_state(new_state);
@@ -1131,24 +1131,26 @@ __overridable void board_power_5v_enable(int enable)
 		gpio_set_level(GPIO_EN_PP5000, 0);
 }
 
-/* 5V enable request bitmask from various tasks. */
-static uint32_t pwr_5v_en_req;
+/* 5V enable request count from various tasks. */
+static int pwr_5v_en_count;
 static K_MUTEX_DEFINE(pwr_5v_ctl_mtx);
 
-void power_5v_enable(task_id_t tid, int enable)
+void power_5v_enable(k_tid_t thread, int enable)
 {
+	ARG_UNUSED(thread);
+
 	mutex_lock(&pwr_5v_ctl_mtx);
 
-	if (enable) /* Set the bit indicating the request. */
-		pwr_5v_en_req |= 1 << tid;
-	else /* Clear the task's request bit. */
-		pwr_5v_en_req &= ~(1 << tid);
+	if (enable)
+		pwr_5v_en_count++;
+	else if (pwr_5v_en_count > 0)
+		pwr_5v_en_count--;
 
 	/*
 	 * If there are any outstanding requests for the rail to be enabled,
 	 * turn on the rail.  Otherwise, turn it off.
 	 */
-	board_power_5v_enable(pwr_5v_en_req);
+	board_power_5v_enable(pwr_5v_en_count > 0);
 	mutex_unlock(&pwr_5v_ctl_mtx);
 }
 
