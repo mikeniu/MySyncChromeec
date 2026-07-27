@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85060330_6bf099fa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 38
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-27T18:01:10Z",
+      "side": 1,
+      "message": "Thanks for making the switch to MKBP.  Overall this looks much cleaner.",
+      "revId": "359d6d974e6f896cb9a297aa64435bf2943b2a2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9af72ebe_97083ad0",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 38
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-27T18:01:10Z",
+      "side": 1,
+      "message": "Nit - I prefer that you keep all driver data inside `struct pwrmon_data`.",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 31
+      },
+      "revId": "359d6d974e6f896cb9a297aa64435bf2943b2a2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1630b17_02e956be",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 38
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-27T18:01:10Z",
+      "side": 1,
+      "message": "Nit - I prefer static initialization of threads using K_THREAD_DEFINE.  You can block the thread from automatically starting by passing in K_FOREVER as the delay parameter.  During `pwrmon_init()` you only need to call k_thread_start().",
+      "range": {
+        "startLine": 149,
+        "startChar": 0,
+        "endLine": 153,
+        "endChar": 50
+      },
+      "revId": "359d6d974e6f896cb9a297aa64435bf2943b2a2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1baa7d8b_e6accda5",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 38
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-27T18:01:10Z",
+      "side": 1,
+      "message": "You need to add a BUILD_ASSERT that there is only one power monitor devicetree node.",
+      "range": {
+        "startLine": 313,
+        "startChar": 0,
+        "endLine": 313,
+        "endChar": 73
+      },
+      "revId": "359d6d974e6f896cb9a297aa64435bf2943b2a2d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
