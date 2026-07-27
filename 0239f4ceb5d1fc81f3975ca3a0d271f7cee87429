@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e95df4ad_b38d5da6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-07-27T05:00:56Z",
+      "side": 1,
+      "message": "Patchset 13 fixes `make host-coverage-usb_tcpmv2_compliance` failure in CQ.",
+      "revId": "0239f4ceb5d1fc81f3975ca3a0d271f7cee87429",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
