@@ -11,7 +11,10 @@
 #define VIRTUAL_BATTERY_ADDR_FLAGS BATTERY_ADDR_FLAGS
 #endif
 
+#include "i2c_battery_parser.h"
+
 /**
+
  * Handle the battery command virtually.
  *
  * @param resp		Pointer to the data structure to store the i2c messages
