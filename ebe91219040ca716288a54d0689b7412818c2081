@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a90458e4_1d5853c9",
+        "filename": "common/rollback.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-27T16:09:48Z",
+      "side": 1,
+      "message": "Do we have a test that covers this?",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 147,
+        "endChar": 2
+      },
+      "revId": "ebe91219040ca716288a54d0689b7412818c2081",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
