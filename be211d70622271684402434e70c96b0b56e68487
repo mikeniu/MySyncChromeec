@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93decb26_9e94fded",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-27T22:39:59Z",
+      "side": 1,
+      "message": "In order for this to be a no-op change, it should enable the generic VDM response config for rex. In order for that to work, I think this CL needs to come after the dependency relaxation in Kconfig.",
+      "revId": "be211d70622271684402434e70c96b0b56e68487",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
