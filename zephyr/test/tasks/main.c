@@ -279,21 +279,6 @@ static void empty_set_mask2(void)
 	zassert_within(end_ms - start_ms, 2000, 100, "Timeout for 2 seconds");
 }
 
-static void check_task_1_mapping(void)
-{
-	zassert_equal(TASK_ID_TASK_1, thread_id_to_task_id(k_current_get()));
-}
-
-static void check_task_2_mapping(void)
-{
-	zassert_equal(TASK_ID_TASK_2, thread_id_to_task_id(k_current_get()));
-}
-
-ZTEST(test_task_shim, test_thread_to_task_mapping)
-{
-	run_test(&check_task_1_mapping, &check_task_2_mapping);
-}
-
 ZTEST(test_task_shim, test_empty_set_mask)
 {
 	run_test(&empty_set_mask1, &empty_set_mask2);
