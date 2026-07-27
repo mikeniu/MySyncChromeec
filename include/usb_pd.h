@@ -38,6 +38,13 @@ extern "C" {
 #define TASK_ID_TO_PD_PORT(id) 0
 #endif /* CONFIG_USB_PD_PORT_MAX_COUNT && HAS_TASK_PD_C0 */
 
+#if defined(CONFIG_ZEPHYR)
+#define CURRENT_PD_PORT() \
+	TASK_ID_TO_PD_PORT(thread_id_to_task_id(k_current_get()))
+#else
+#define CURRENT_PD_PORT() TASK_ID_TO_PD_PORT(task_get_current())
+#endif
+
 enum pd_rx_errors {
 	PD_RX_ERR_INVAL = -1, /* Invalid packet */
 	PD_RX_ERR_HARD_RESET = -2, /* Got a Hard-Reset packet */
