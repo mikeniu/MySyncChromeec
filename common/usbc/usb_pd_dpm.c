@@ -175,7 +175,7 @@ void pd_prepare_sysjump(void)
 		if (!pd_alt_mode_capable(i))
 			continue;
 
-		sysjump_task_waiting = task_get_current();
+		sysjump_task_waiting = thread_id_to_task_id(k_current_get());
 		task_set_event(PD_PORT_TO_TASK_ID(i), PD_EVENT_SYSJUMP);
 		task_wait_event_mask(TASK_EVENT_SYSJUMP_READY, -1);
 		sysjump_task_waiting = TASK_ID_INVALID;

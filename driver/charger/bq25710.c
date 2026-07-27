@@ -252,9 +252,9 @@ static int bq25710_set_low_power_mode(int chgnum, int enable)
 	 * means disabling performance mode and vice versa.
 	 */
 	if (enable)
-		bq25710_perf_mode_req &= ~(1 << task_get_current());
+		bq25710_perf_mode_req &= ~BIT(0);
 	else
-		bq25710_perf_mode_req |= (1 << task_get_current());
+		bq25710_perf_mode_req |= BIT(0);
 	enable = !bq25710_perf_mode_req;
 #endif
 

@@ -206,9 +206,9 @@ static int rt9478_set_low_power_mode(int chgnum, bool enable)
 	 * means disabling performance mode and vice versa.
 	 */
 	if (enable)
-		rt9478_perf_mode_req &= ~BIT(task_get_current());
+		rt9478_perf_mode_req &= ~BIT(0);
 	else
-		rt9478_perf_mode_req |= BIT(task_get_current());
+		rt9478_perf_mode_req |= BIT(0);
 	enable = !rt9478_perf_mode_req;
 
 	reg = SET_CO0(EN_LPWR, enable, reg);
