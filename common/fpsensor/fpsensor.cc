@@ -140,13 +140,11 @@ static uint32_t fp_process_enroll(void)
 		} else {
 			global_context.template_newly_enrolled =
 				global_context.templ_valid;
-			fp_enable_positive_match_secret(
-				global_context.templ_valid,
-				&global_context.positive_match_secret_state);
 
 			/*
-			 * In the classic flow we immediately use this template
-			 * for matching (templ_valid is incremented).
+			 * In the classic flow, enable the positive match secret
+			 * for host readback and immediately activate this
+			 * template for matching (templ_valid is incremented).
 			 *
 			 * In the Fingerprint Auth flow we must reliably inform
 			 * Trusted Application that the template was enrolled.
@@ -155,6 +153,10 @@ static uint32_t fp_process_enroll(void)
 			 * confirmation.
 			 */
 			if (!fingerprint_auth_enabled()) {
+				fp_enable_positive_match_secret(
+					global_context.templ_valid,
+					&global_context
+						 .positive_match_secret_state);
 				global_context.templ_valid++;
 			}
 		}
