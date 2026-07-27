@@ -26,6 +26,53 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "56f004fd_29a63c89",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 4244,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-27T17:43:21Z",
+      "side": 1,
+      "message": "+1 - no need to support the old version.",
+      "parentUuid": "43d50478_574161fe",
+      "range": {
+        "startLine": 4238,
+        "startChar": 0,
+        "endLine": 4244,
+        "endChar": 0
+      },
+      "revId": "4a926241ba43f8d967f7d023ce6c25abe7ce90d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b0f6f4c_24dc6549",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 4306,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-27T17:43:21Z",
+      "side": 1,
+      "message": "Since you\u0027re packing this structure, it\u0027s likely that `samples` and `value` fields will be unaligned.\n\nI recommend sorting by size - `value`, `samples`, then `channel_id`.",
+      "range": {
+        "startLine": 4306,
+        "startChar": 8,
+        "endLine": 4306,
+        "endChar": 24
+      },
+      "revId": "4a926241ba43f8d967f7d023ce6c25abe7ce90d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ba213f39_32fb7536",
         "filename": "include/ec_commands.h",
         "patchSetId": 12
