@@ -155,7 +155,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake analyze-build-diff
 
-**Usage:** `zmake analyze-build-diff [-h] target1 target2 [--sections] [--verbose] [--exact-bytes]`
+**Usage:** `zmake analyze-build-diff [-h] target1 target2 [--sections] [--symbols] [--verbose] [--exact-bytes]`
 
 #### Positional Arguments
 
@@ -170,5 +170,6 @@ Chromium OS's meta-build tool for Zephyr
 |---|---|
 | `-h`, `--help` | show this help message and exit |
 | `--sections` | Print detailed section size comparison and changed sections |
+| `--symbols` | Print detailed symbol table comparison (added/removed/changed symbols) |
 | `--verbose` | Print all detailed section and contiguous diff range details |
 | `--exact-bytes` | Show exact byte counts in binary footprint tables |

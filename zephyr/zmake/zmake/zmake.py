@@ -1131,6 +1131,7 @@ class Zmake:
         target1,
         target2,
         sections=False,
+        symbols=False,
         verbose=False,
         exact_bytes=False,
     ):
@@ -1139,6 +1140,7 @@ class Zmake:
             target1,
             target2,
             sections=sections,
+            symbols=symbols,
             verbose=verbose,
             exact_bytes=exact_bytes,
             output_fn=self.logger.info,

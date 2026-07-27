@@ -323,6 +323,11 @@ def get_argparser():
         help="Print detailed section size comparison and changed sections",
     )
     analyze_build_diff.add_argument(
+        "--symbols",
+        action="store_true",
+        help="Print detailed symbol table comparison (added/removed/changed symbols)",
+    )
+    analyze_build_diff.add_argument(
         "--verbose",
         action="store_true",
         help="Print all detailed section and contiguous diff range details",
