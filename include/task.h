@@ -166,12 +166,12 @@ static inline void task_wake(task_id_t tskid)
 	task_set_event(tskid, TASK_EVENT_WAKE);
 }
 
-/**
- * Return the identifier of the task currently running.
- */
-task_id_t task_get_current(void);
-
 #ifdef CONFIG_ZEPHYR
+/**
+ * Return the identifier of the specified thread.
+ */
+task_id_t thread_id_to_task_id(k_tid_t thread_id);
+
 /**
  * Check if this current task is running in deferred context
  */
@@ -181,7 +181,7 @@ bool in_deferred_context(void);
 static inline bool in_deferred_context(void)
 {
 #ifdef HAS_TASK_HOOKS
-	return (task_get_current() == TASK_ID_HOOKS);
+	return (thread_id_to_task_id(k_current_get()) == TASK_ID_HOOKS);
 #else
 	return false;
 #endif /* HAS_TASK_HOOKS */

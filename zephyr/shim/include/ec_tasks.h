@@ -17,6 +17,8 @@ extern "C" {
 /** Starts all of the shimmed EC tasks. Requires CONFIG_SHIMMED_TASKS=y. */
 void start_ec_tasks(void);
 
+task_id_t thread_id_to_task_id(k_tid_t thread_id);
+
 #ifdef TEST_BUILD
 /**
  * Set TASK_ID_TEST_RUNNER to current thread tid. Some functions that are tested

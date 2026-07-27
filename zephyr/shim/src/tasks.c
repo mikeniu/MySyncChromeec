@@ -133,7 +133,7 @@ test_mockable k_tid_t get_hostcmd_thread(void)
 	return NULL;
 }
 
-static task_id_t thread_id_to_task_id(k_tid_t thread_id)
+task_id_t thread_id_to_task_id(k_tid_t thread_id)
 {
 	if (thread_id == NULL) {
 		__ASSERT(false, "Invalid thread_id");
@@ -186,16 +186,6 @@ static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 	return TASK_ID_INVALID;
 }
 
-task_id_t task_get_current(void)
-{
-	/* k_current_get() is not valid pre kernel */
-	if (k_is_pre_kernel()) {
-		return TASK_ID_INVALID;
-	}
-
-	return thread_id_to_task_id(k_current_get());
-}
-
 atomic_t *task_get_event_bitmap(task_id_t cros_task_id)
 {
 	struct task_ctx_base_data *data;
@@ -221,7 +211,7 @@ uint32_t task_wait_event(int timeout_us)
 {
 	struct task_ctx_base_data *data;
 
-	data = task_get_base_data(task_get_current());
+	data = task_get_base_data(thread_id_to_task_id(k_current_get()));
 
 	__ASSERT_NO_MSG(data != NULL);
 
@@ -268,7 +258,7 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 {
 	struct task_ctx_base_data *data;
 
-	data = task_get_base_data(task_get_current());
+	data = task_get_base_data(thread_id_to_task_id(k_current_get()));
 
 	uint32_t events = 0;
 	const int64_t tick_deadline =
