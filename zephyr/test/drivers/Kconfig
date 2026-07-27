@@ -252,6 +252,11 @@ config LINK_TEST_SUITE_KTU1125
 config LINK_TEST_SUITE_RT9490
 	bool "Link and test the rt9490 tests"
 
+config LINK_TEST_SUITE_WATCHDOG
+	bool "Link and test the watchdog tests"
+	select PLATFORM_EC_CONSOLE_CMD_WATCHDOG_INFO
+	select PLATFORM_EC_HOSTCMD_WATCHDOG_INFO
+
 config LINK_TEST_SUITE_WATCHDOG_HELPER
 	bool "Link and run watchdog helper tests"
 	help
