@@ -4,6 +4,53 @@
 
 #include "battery_smart.h"
 #include "i2c_battery_parser.h"
+#include "i2c_msg_queue.h"
+
+static bool is_same_i2c_port(int port, int other_port)
+{
+#ifdef CONFIG_ZEPHYR
+	/* For Zephyr compare the actual device, which will be used in
+	 * i2c_transfer function.
+	 */
+	return (i2c_get_device_for_port(port) ==
+		i2c_get_device_for_port(other_port));
+#else
+	return (port == other_port);
+#endif
+}
+
+bool is_i2c_battery(int port, uint16_t address, bool virtual_only)
+{
+	struct i2c_signature {
+		int port;
+		uint16_t address;
+		bool is_virtual;
+	};
+
+	static const struct i2c_signature battery_signatures[] = {
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+		{ .port = I2C_PORT_VIRTUAL_BATTERY,
+		  .address = VIRTUAL_BATTERY_ADDR_FLAGS,
+		  .is_virtual = true },
+#endif
+#ifdef BATTERY_ADDR_FLAGS
+		{ .port = I2C_PORT_BATTERY,
+		  .address = BATTERY_ADDR_FLAGS,
+		  .is_virtual = false },
+#endif
+	};
+
+	for (size_t index = 0; index < ARRAY_SIZE(battery_signatures);
+	     ++index) {
+		if (virtual_only && !battery_signatures[index].is_virtual)
+			continue;
+		if (is_same_i2c_port(port, battery_signatures[index].port) &&
+		    address == battery_signatures[index].address) {
+			return true;
+		}
+	}
+	return false;
+}
 
 struct i2c_battery_parser_state i2c_battery_parser_state_create(void)
 {
@@ -134,3 +181,30 @@ int battery_permission_handler(struct i2c_battery_parser_state *state,
 				     battery_allow_i2c_passthru);
 	return rv == EC_RES_SUCCESS ? rv2 : rv;
 }
+
+#ifdef CONFIG_ZEPHYR
+int battery_allow_passthru(int port,
+			   const struct ec_params_i2c_passthru *params)
+{
+	struct msg_queue_t msg_queue;
+	struct i2c_battery_parser_state parser_state =
+		i2c_battery_parser_state_create();
+
+	for (msg_queue = msg_queue_create(params);
+	     msg_queue.msg < msg_queue.msg_end;) {
+		const struct msg_value_t val = msg_queue_front(&msg_queue);
+
+		if (is_i2c_battery(port, val.addr_flags, false)) {
+			if (battery_permission_handler(
+				    &parser_state, msg_queue.in_len,
+				    val.xferflags, val.read_len, val.write_len,
+				    msg_queue.out))
+				return 0;
+		}
+
+		msg_queue_pop_front(&msg_queue, &val);
+	}
+
+	return 1;
+}
+#endif
