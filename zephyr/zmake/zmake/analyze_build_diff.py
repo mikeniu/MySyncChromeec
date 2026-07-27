@@ -299,6 +299,7 @@ def _compare_single_image(
     map2=None,
     output_fn=print,
     sections=False,
+    verbose=False,
 ):
     """Compare memory and section footprint for a single image."""
     is_metadata_only = True
@@ -309,7 +310,7 @@ def _compare_single_image(
         rom1, rom2, rom_delta = sec_diff["rom"]
         ram1, ram2, ram_delta = sec_diff["ram"]
 
-        if sections:
+        if sections or verbose:
             output_fn(
                 "\n---------------------------------------------------------"
             )
@@ -354,6 +355,8 @@ def analyze_build_diff(
     target2,
     project_name=None,
     sections=False,
+    verbose=False,
+    exact_bytes=False,
     output_fn=print,
 ):
     """Analyze binary differences between two EC builds."""
@@ -409,6 +412,13 @@ def analyze_build_diff(
 
     output_fn(f"Total Contiguous Diff Ranges: {len(diff_info['ranges'])}\n")
 
+    if verbose and diff_info["ranges"]:
+        output_fn("--- Contiguous Diff Byte Ranges ---")
+        for idx, (s, e) in enumerate(diff_info["ranges"], 1):
+            length = e - s + 1
+            len_str = format_bytes(length, show_exact=False)
+            output_fn(f"\n[Range {idx}] Offset: 0x{s:x} .. 0x{e:x} ({len_str})")
+
     mem_deltas = {}
     is_metadata_only = True
     for image_type, elf_key, map_key in [
@@ -428,6 +438,7 @@ def analyze_build_diff(
                 map2=map2,
                 output_fn=output_fn,
                 sections=sections,
+                verbose=verbose,
             )
             if not res["is_metadata_only"]:
                 is_metadata_only = False
@@ -470,8 +481,12 @@ def analyze_build_diff(
             ram_d_str = "-"
             if image_type in mem_deltas:
                 rom_d, ram_d = mem_deltas[image_type]
-                rom_d_str = format_bytes(rom_d, show_exact=False, signed=True)
-                ram_d_str = format_bytes(ram_d, show_exact=False, signed=True)
+                rom_d_str = format_bytes(
+                    rom_d, show_exact=exact_bytes, signed=True
+                )
+                ram_d_str = format_bytes(
+                    ram_d, show_exact=exact_bytes, signed=True
+                )
             output_fn(
                 f"  |  {image_type:<4} | {rom_d_str:>18} | "
                 f"{ram_d_str:>18} |"
@@ -501,12 +516,26 @@ def main():
         action="store_true",
         help="Print detailed section size comparison and changed sections",
     )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Print all detailed section and contiguous diff range details",
+    )
+    parser.add_argument(
+        "-b",
+        "--bytes",
+        action="store_true",
+        help="Show exact byte values in memory summary tables",
+    )
 
     args = parser.parse_args()
     analyze_build_diff(
         args.target1,
         args.target2,
         sections=args.sections,
+        verbose=args.verbose,
+        exact_bytes=args.bytes,
         output_fn=print,
     )
 
