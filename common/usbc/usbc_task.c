@@ -160,9 +160,9 @@ static bool pd_task_loop(int port)
 	return true;
 }
 
-void pd_task(void *u)
+void pd_task(void *p)
 {
-	int port = TASK_ID_TO_PD_PORT(task_get_current());
+	int port = POINTER_TO_UINT(p);
 
 	/*
 	 * If port does not exist, return

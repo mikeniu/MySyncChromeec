@@ -1507,8 +1507,6 @@ static bool tc_perform_snk_hard_reset(int port)
 
 void tc_start_error_recovery(int port)
 {
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
-
 	/*
 	 *   The port should transition to the ErrorRecovery state
 	 *   from any other state when directed.
@@ -1733,8 +1731,6 @@ static void set_ccd_mode(const int port, const bool enable)
 /* Set the TypeC state machine to a new state. */
 static void set_state_tc(const int port, const enum usb_tc_state new_state)
 {
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
-
 	set_state(port, &tc[port].ctx, &tc_states[new_state]);
 }
 
@@ -2016,9 +2012,6 @@ static __maybe_unused int reset_device_and_notify(int port)
 {
 	int rv;
 	int task, waiting_tasks;
-
-	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
 
 	TC_SET_FLAG(port, TC_FLAGS_LPM_TRANSITION);
 	rv = tcpm_init(port);
