@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "708e613a_17b0c724",
+        "filename": "zephyr/test/rex/tests/program/CMakeLists.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-27T22:43:23Z",
+      "side": 0,
+      "message": "This should have been removed in the CL that removed the .c file.",
+      "revId": "3f1afaaf8b063baf36b6ca06e9a9a427b64f4ba7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
