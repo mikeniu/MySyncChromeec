@@ -94,6 +94,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8aae843_135dd658",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-27T19:24:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a71371ef_344ea8b5",
+      "range": {
+        "startLine": 223,
+        "startChar": 11,
+        "endLine": 223,
+        "endChar": 22
+      },
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19353902_5732c7bd",
@@ -214,6 +238,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e737dc5f_dc3ffab4",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-27T19:24:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12d24ea5_1e07d373",
+      "range": {
+        "startLine": 233,
+        "startChar": 4,
+        "endLine": 233,
+        "endChar": 53
+      },
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f28bc7a6_7649c77c",
@@ -274,6 +322,30 @@
       "writtenOn": "2026-07-22T20:33:07Z",
       "side": 1,
       "message": "Does this comment need an update?",
+      "range": {
+        "startLine": 529,
+        "startChar": 14,
+        "endLine": 531,
+        "endChar": 18
+      },
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02e8646d_0681ece3",
+        "filename": "common/power_button_x86.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 531,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-27T19:24:01Z",
+      "side": 1,
+      "message": "The implementation has changed since this comment was made as the previous implementation wasn\u0027t potentially changing behavior for boards that didn\u0027t have CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD set. I have added a comment to describe the CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD specific portion.",
+      "parentUuid": "8eb54d3d_5feb084e",
       "range": {
         "startLine": 529,
         "startChar": 14,
