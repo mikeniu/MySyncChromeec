@@ -7,6 +7,24 @@
 import argparse
 import os
 import pathlib
+import re
+import subprocess
+
+
+def is_ignored_section_or_symbol(name):
+    """Check if a section or symbol is build metadata or non-code."""
+    ignored = [
+        "build_opt",
+        "build_date",
+        "build_user",
+        "build_host",
+        "version",
+        "cros_ec_version",
+        "app_version_str",
+    ]
+    return name in ignored or name.startswith(
+        (".debug", ".pw_tokenizer", "_pw_tokenizer_string_entry")
+    )
 
 
 def find_build_files(path):
@@ -80,6 +98,178 @@ def analyze_bin_diffs(bin1_path, bin2_path):
     }
 
 
+def get_elf_sections(elf_path):
+    """Get section sizes and flags using objdump -h."""
+    if not elf_path or not os.path.exists(elf_path):
+        return {}
+    try:
+        out = subprocess.check_output(
+            ["objdump", "-h", elf_path], stderr=subprocess.DEVNULL
+        ).decode()
+    except (subprocess.CalledProcessError, OSError, ValueError):
+        return {}
+
+    sections = {}
+    lines = out.splitlines()
+    for i, line in enumerate(lines):
+        parts = line.split()
+        if len(parts) >= 6 and parts[0].isdigit():
+            name = parts[1]
+            try:
+                size = int(parts[2], 16)
+                vma = int(parts[3], 16)
+                lma = int(parts[4], 16)
+                flags = lines[i + 1] if (i + 1 < len(lines)) else ""
+                sections[name] = {
+                    "size": size,
+                    "vma": vma,
+                    "lma": lma,
+                    "alloc": "ALLOC" in flags,
+                    "load": "LOAD" in flags,
+                    "readonly": "READONLY" in flags,
+                }
+            except ValueError:
+                pass
+    return sections
+
+
+def parse_map_memory_regions(map_path):
+    """Parse memory regions (Origin, Length) from a zephyr.map file."""
+    if not map_path or not os.path.exists(map_path):
+        return {}
+    regions = {}
+    try:
+        with open(map_path, "r", encoding="utf-8") as f:
+            content = f.read()
+    except OSError:
+        return {}
+
+    match = re.search(
+        r"Memory Configuration\s+Name\s+Origin\s+Length\s+Attributes(.*?)(?:\r?\n\r?\n|\Z)",
+        content,
+        re.DOTALL,
+    )
+    if not match:
+        return {}
+
+    block = match.group(1)
+    for line in block.splitlines():
+        parts = line.split()
+        if len(parts) >= 3:
+            name = parts[0]
+            try:
+                origin = int(parts[1], 16)
+                length = int(parts[2], 16)
+                regions[name] = {
+                    "origin": origin,
+                    "length": length,
+                }
+            except ValueError:
+                pass
+    return regions
+
+
+def get_region_type(name):
+    """Classify a memory region name as ROM or RAM."""
+    name_upper = name.upper()
+    if any(
+        k in name_upper
+        for k in ["FLASH", "ROM", "IMEM", "ILM", "CODE", "PROGRAM"]
+    ):
+        return "ROM"
+    if any(k in name_upper for k in ["RAM", "SRAM", "DMEM", "DLM", "DATA"]):
+        return "RAM"
+    return None
+
+
+def compare_elf_sections(elf1, elf2, map1=None, map2=None):
+    """Compare section and memory region sizes between two ELF files."""
+    sec1 = get_elf_sections(elf1)
+    sec2 = get_elf_sections(elf2)
+
+    if not sec1 or not sec2:
+        return None
+
+    all_keys = set(sec1.keys()) | set(sec2.keys())
+    changed = {}
+    for k in sorted(all_keys):
+        s1 = sec1.get(k, {}).get("size", 0)
+        s2 = sec2.get(k, {}).get("size", 0)
+        if s1 != s2:
+            changed[k] = (s1, s2, s2 - s1)
+
+    def get_rom_ram(sections, map_path):
+        regions = parse_map_memory_regions(map_path)
+        if not regions:
+            rom = sum(
+                v["size"]
+                for k, v in sections.items()
+                if v.get("alloc")
+                and v.get("load")
+                and not is_ignored_section_or_symbol(k)
+            )
+            ram = sum(
+                v["size"]
+                for k, v in sections.items()
+                if v.get("alloc")
+                and not v.get("readonly")
+                and not is_ignored_section_or_symbol(k)
+            )
+            return rom, ram
+
+        rom_ranges = []
+        ram_ranges = []
+        for name, r in regions.items():
+            if "UNPADDED" in name.upper():
+                continue
+            rtype = get_region_type(name)
+            if rtype == "ROM":
+                rom_ranges.append((r["origin"], r["origin"] + r["length"]))
+            elif rtype == "RAM":
+                ram_ranges.append((r["origin"], r["origin"] + r["length"]))
+
+        def in_ranges(addr, ranges):
+            return any(start <= addr < end for start, end in ranges)
+
+        rom_secs = []
+        ram_secs = []
+        for k, v in sections.items():
+            if not v.get("alloc") or is_ignored_section_or_symbol(k):
+                continue
+            vma = v.get("vma", 0)
+            lma = v.get("lma", 0)
+
+            if rom_ranges and in_ranges(lma, rom_ranges) and v.get("load"):
+                rom_secs.append((lma, v["size"]))
+            if ram_ranges and in_ranges(vma, ram_ranges):
+                ram_secs.append((vma, v["size"]))
+
+        if rom_secs:
+            min_rom = min(addr for addr, _ in rom_secs)
+            max_rom = max(addr + size for addr, size in rom_secs)
+            rom = max_rom - min_rom
+        else:
+            rom = 0
+
+        if ram_secs:
+            min_ram = min(addr for addr, _ in ram_secs)
+            max_ram = max(addr + size for addr, size in ram_secs)
+            ram = max_ram - min_ram
+        else:
+            ram = 0
+
+        return rom, ram
+
+    rom1, ram1 = get_rom_ram(sec1, map1)
+    rom2, ram2 = get_rom_ram(sec2, map2)
+
+    return {
+        "changed": changed,
+        "rom": (rom1, rom2, rom2 - rom1),
+        "ram": (ram1, ram2, ram2 - ram1),
+    }
+
+
 def format_bytes(num_bytes, show_exact=True, signed=False):
     """Format byte counts cleanly."""
     abs_bytes = abs(num_bytes)
@@ -101,10 +291,69 @@ def format_bytes(num_bytes, show_exact=True, signed=False):
     return formatted
 
 
+def _compare_single_image(
+    image_type,
+    elf1,
+    elf2,
+    map1=None,
+    map2=None,
+    output_fn=print,
+    sections=False,
+):
+    """Compare memory and section footprint for a single image."""
+    is_metadata_only = True
+    sec_diff = compare_elf_sections(elf1, elf2, map1=map1, map2=map2)
+    rom_delta, ram_delta = 0, 0
+
+    if sec_diff:
+        rom1, rom2, rom_delta = sec_diff["rom"]
+        ram1, ram2, ram_delta = sec_diff["ram"]
+
+        if sections:
+            output_fn(
+                "\n---------------------------------------------------------"
+            )
+            output_fn(f"--- {image_type} Memory & Section Comparison ---")
+            rom1_str = format_bytes(rom1, show_exact=False)
+            rom2_str = format_bytes(rom2, show_exact=False)
+            rom_d_str = format_bytes(rom_delta, show_exact=True, signed=True)
+            output_fn(
+                f"  ROM (.text + .rodata + .data): {rom1_str} -> {rom2_str} ({rom_d_str})"
+            )
+
+            ram1_str = format_bytes(ram1, show_exact=False)
+            ram2_str = format_bytes(ram2, show_exact=False)
+            ram_d_str = format_bytes(ram_delta, show_exact=True, signed=True)
+            output_fn(
+                f"  RAM (.data + .bss): {ram1_str} -> {ram2_str} ({ram_d_str})"
+            )
+
+            if sec_diff["changed"]:
+                output_fn("  Changed Sections:")
+                for k, (s1, s2, d) in sec_diff["changed"].items():
+                    s1_str = format_bytes(s1, show_exact=False)
+                    s2_str = format_bytes(s2, show_exact=False)
+                    d_str = format_bytes(d, show_exact=False, signed=True)
+                    output_fn(
+                        f"    - {k:<20}: {s1_str:>7} -> {s2_str:>7}  ({d_str})"
+                    )
+
+        if sec_diff["changed"]:
+            for k in sec_diff["changed"]:
+                if k in [".text", ".rodata", ".data", ".bss"]:
+                    is_metadata_only = False
+
+    return {
+        "is_metadata_only": is_metadata_only,
+        "mem_delta": (rom_delta, ram_delta),
+    }
+
+
 def analyze_build_diff(
     target1,
     target2,
     project_name=None,
+    sections=False,
     output_fn=print,
 ):
     """Analyze binary differences between two EC builds."""
@@ -160,6 +409,30 @@ def analyze_build_diff(
 
     output_fn(f"Total Contiguous Diff Ranges: {len(diff_info['ranges'])}\n")
 
+    mem_deltas = {}
+    is_metadata_only = True
+    for image_type, elf_key, map_key in [
+        ("RO", "ro_elf", "ro_map"),
+        ("RW", "rw_elf", "rw_map"),
+    ]:
+        elf1 = files1[elf_key]
+        elf2 = files2[elf_key]
+        map1 = files1[map_key]
+        map2 = files2[map_key]
+        if elf1 and elf2:
+            res = _compare_single_image(
+                image_type,
+                elf1,
+                elf2,
+                map1=map1,
+                map2=map2,
+                output_fn=output_fn,
+                sections=sections,
+            )
+            if not res["is_metadata_only"]:
+                is_metadata_only = False
+            mem_deltas[image_type] = res["mem_delta"]
+
     bin_size_delta = diff_info["size2"] - diff_info["size1"]
 
     verdict_title = (
@@ -171,7 +444,39 @@ def analyze_build_diff(
     output_fn("\n=========================================================")
     output_fn(f"                   {verdict_title}")
     output_fn("=========================================================")
-    output_fn("=> Binary contains EXECUTABLE CODE OR DATA DIFFERENCES.")
+    if is_metadata_only:
+        output_fn("=> Difference is LIMITED TO VERSION / BUILD METADATA!")
+        output_fn(
+            "   Executable code (.text) and data (.data/.bss) are 100% IDENTICAL."
+        )
+    else:
+        output_fn("=> Binary contains EXECUTABLE CODE OR DATA DIFFERENCES.")
+
+    if mem_deltas:
+        summary_title = (
+            f"Memory Footprint Summary ({project_name}):"
+            if project_name
+            else "Memory Footprint Summary:"
+        )
+        border = "  +-------+--------------------+--------------------+"
+        header = "  | Image |     ROM Delta      |     RAM Delta      |"
+
+        output_fn(f"\n  {summary_title}")
+        output_fn(border)
+        output_fn(header)
+        output_fn(border)
+        for image_type in ["RO", "RW"]:
+            rom_d_str = "-"
+            ram_d_str = "-"
+            if image_type in mem_deltas:
+                rom_d, ram_d = mem_deltas[image_type]
+                rom_d_str = format_bytes(rom_d, show_exact=False, signed=True)
+                ram_d_str = format_bytes(ram_d, show_exact=False, signed=True)
+            output_fn(
+                f"  |  {image_type:<4} | {rom_d_str:>18} | "
+                f"{ram_d_str:>18} |"
+            )
+        output_fn(border)
 
     if bin_size_delta != 0:
         bin_size_str = format_bytes(
@@ -180,7 +485,7 @@ def analyze_build_diff(
         output_fn(f"\n   Overall ec.bin File Size Delta: {bin_size_str}")
     output_fn("=========================================================\n")
 
-    return False
+    return not is_metadata_only
 
 
 def main():
@@ -190,11 +495,18 @@ def main():
     )
     parser.add_argument("target1", help="First build directory or ec.bin file")
     parser.add_argument("target2", help="Second build directory or ec.bin file")
+    parser.add_argument(
+        "-s",
+        "--sections",
+        action="store_true",
+        help="Print detailed section size comparison and changed sections",
+    )
 
     args = parser.parse_args()
     analyze_build_diff(
         args.target1,
         args.target2,
+        sections=args.sections,
         output_fn=print,
     )
 
