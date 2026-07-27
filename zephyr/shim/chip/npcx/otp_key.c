@@ -28,7 +28,8 @@ void otp_key_init(void)
 #if defined(CONFIG_ZEPHYR)
 		k_oops();
 #else
-		software_panic(PANIC_SW_ASSERT, task_get_current());
+		software_panic(PANIC_SW_ASSERT,
+			       (uint8_t)(uintptr_t)k_current_get());
 #endif
 	}
 }
@@ -105,7 +106,8 @@ enum ec_error_list otp_key_provision(void)
 #if defined(CONFIG_ZEPHYR)
 		k_oops();
 #else
-		software_panic(PANIC_SW_BAD_RNG, task_get_current());
+		software_panic(PANIC_SW_BAD_RNG,
+			       (uint8_t)(uintptr_t)k_current_get());
 #endif
 	}
 
