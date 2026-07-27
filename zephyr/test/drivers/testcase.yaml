@@ -1850,6 +1850,22 @@ tests:
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
+  drivers.watchdog.ro:
+    extra_configs:
+    - CONFIG_CROS_EC_RO=y
+    - CONFIG_LINK_TEST_SUITE_WATCHDOG=y
+    - CONFIG_ZTEST_THREAD_PRIORITY=1
+    extra_conf_files:
+    - prj.conf
+    - watchdog/prj.conf
+  drivers.watchdog.rw:
+    extra_configs:
+    - CONFIG_CROS_EC_RW=y
+    - CONFIG_LINK_TEST_SUITE_WATCHDOG=y
+    - CONFIG_ZTEST_THREAD_PRIORITY=1
+    extra_conf_files:
+    - prj.conf
+    - watchdog/prj.conf
   drivers.one_wire_uart.keyboard:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay

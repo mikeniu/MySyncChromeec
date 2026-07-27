@@ -54,7 +54,6 @@ target_sources(app PRIVATE
     src/vboot_hash.c
     src/virtual_battery.c
     src/vstore.c
-    src/watchdog.c
 )
 
 add_subdirectory(
