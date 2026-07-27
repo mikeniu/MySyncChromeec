@@ -30,3 +30,8 @@ properties:
       - NO_PROTECT
       - PROTECT_IF_SYSTEM_IS_LOCKED
       - NO_PROTECT_UNTIL_ENABLED
+  allow-passthru:
+    type: string
+    description:
+      Function name of the allow-passthru function, which returns false if the
+      i2c sequence is not allowed to passthru.
