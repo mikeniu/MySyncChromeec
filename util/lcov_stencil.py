@@ -13,19 +13,34 @@ https://github.com/linux-test-project/lcov/blob/master/bin/geninfo
 """
 
 import argparse
-from collections import defaultdict
+from collections import OrderedDict
 import logging
 import re
 import sys
-from typing import Dict, Set
+from typing import Dict, Set, Tuple
 
 
-EXTRACT_LINE = re.compile(r"^(FN|DA|BRDA):(\d+),")
-EXTRACT_FN = re.compile(r"^(FN):(\d+),(\S+)")
-EXTRACT_FNDA = re.compile(r"^(FNDA):(\d+),(\S+)")
-EXTRACT_DA = re.compile(r"^(DA):(\d+),(\d+)")
-EXTRACT_BRDA = re.compile(r"^(BRDA):(\d+),(\d+),(\d+),([-\d]+)")
-EXTRACT_COUNT = re.compile(r"^([A-Z]+):(\d+)")
+EXTRACT_FN = re.compile(r"^FN:(\d+),(\S+)")
+EXTRACT_FNDA = re.compile(r"^FNDA:(\d+),(\S+)")
+EXTRACT_DA = re.compile(r"^DA:(\d+),(\d+)")
+EXTRACT_BRDA = re.compile(r"^BRDA:(\d+),(\d+),(\d+),([-\d]+)")
+
+
+class FileRecord:
+    """Stores coverage data for a single source file."""
+
+    def __init__(self, filename: str):
+        self.filename = filename
+        self.tn = ""
+        self.stenciled_lines: Set[int] = set()
+        self.stenciled_functions: Dict[str, int] = {}  # fn_name -> start_line
+        self.stenciled_branches: Set[Tuple[int, int, int]] = (
+            set()
+        )  # (line, block, branch)
+
+        self.line_hits: Dict[int, int] = {}
+        self.function_hits: Dict[str, int] = {}
+        self.branch_hits: Dict[Tuple[int, int, int], str] = {}
 
 
 def parse_args(argv=None):
@@ -60,153 +75,170 @@ def parse_args(argv=None):
     return parser.parse_args(argv)
 
 
-def parse_template_file(filename) -> Dict[str, Set[str]]:
-    """Reads the template file and returns covered lines.
-
-    Reads the lines that indicate covered line numbers (FN, DA, and BRDA)
-    and adds them to the returned data structure.
-
-    Returns
-    -------
-    Dict[str, Set[str]]
-        A dictionary of filename to set of covered line numbers (as strings)
-    """
+def parse_template(filename: str) -> OrderedDict:
+    """Parses the template LCOV file into a dictionary of FileRecords."""
     logging.info("Reading template file %s", filename)
-    with open(filename, "r", encoding="utf-8") as template_file:
-        data_by_path: Dict[str, Set[str]] = defaultdict(set)
-        file_name = None
-        for line in template_file.readlines():
+    records: OrderedDict[str, FileRecord] = OrderedDict()
+    current_rec = None
+
+    with open(filename, "r", encoding="utf-8") as f:
+        for line in f:
             line = line.strip()
             if line == "end_of_record":
-                file_name = None
-            elif (
-                line.startswith(  # pylint:disable=too-many-boolean-expressions
-                    "TN:"
-                )
-                or line.startswith("FNDA:")
-                or line.startswith("FNF:")
-                or line.startswith("FNH:")
-                or line.startswith("BRF:")
-                or line.startswith("BRH:")
-                or line.startswith("LF:")
-                or line.startswith("LH:")
-            ):
-                pass
+                current_rec = None
             elif line.startswith("SF:"):
-                file_name = line
-            else:
-                match = EXTRACT_LINE.match(line)
-                if file_name and match:
-                    data_by_path[file_name].add(match.group(2))
-                else:
-                    raise NotImplementedError(line)
-        return data_by_path
-
-
-def filter_coverage_file(filename, output_file, data_by_path):
-    """Reads a coverage file from filename and writes filtered lines to
-    output_file.
-
-    For each line in filename, if it covers the same lines as the template
-    in data_by_path, then write the line to output_file.
-
-    Directives that act as totals (FNF, FNH, BRF, BRH, LF, LH) are recalculated
-    after filtering, and records that refer to unknown files are omitted.
-    """
-    logging.info("Merging file %s", filename)
-    with open(filename, "r", encoding="utf-8") as input_file:
-
-        def empty_record():
-            return {
-                "text": "",
-                "function_names": set(),
-            }
-
-        record = empty_record()
-        for line in input_file.readlines():
-            line = line.strip()
-            if line == "end_of_record":
-                record["text"] += line + "\n"
-                if record.get("should_write_record", False):
-                    output_file.write(record["text"])
-                else:
-                    logging.debug("Omitting record %s", record["text"])
-                record = empty_record()
-            elif line.startswith("SF:"):
-                record["file_name"] = line
-                record["text"] += line + "\n"
-            elif line.startswith("TN:"):
-                record["text"] += line + "\n"
-            elif line.startswith("FN:"):
-                match = EXTRACT_FN.match(line)
-                if (
-                    match
-                    and match.group(2) in data_by_path[record["file_name"]]
-                ):
-                    record["text"] += line + "\n"
-                    record["functions_found"] = (
-                        record.get("functions_found", 0) + 1
-                    )
-                    record["should_write_record"] = True
-                    record["function_names"].add(match.group(3))
-                else:
-                    logging.debug("Omitting %s", line)
-            elif line.startswith("FNDA:"):
-                match = EXTRACT_FNDA.match(line)
-                if match and match.group(3) in record["function_names"]:
-                    record["text"] += line + "\n"
-                    record["should_write_record"] = True
-                    if match.group(2) != "0":
-                        record["functions_hit"] = (
-                            record.get("functions_hit", 0) + 1
+                sf_path = line[3:]
+                if sf_path not in records:
+                    records[sf_path] = FileRecord(sf_path)
+                current_rec = records[sf_path]
+            elif current_rec:
+                if line.startswith("TN:"):
+                    current_rec.tn = line[3:]
+                elif line.startswith("FN:"):
+                    m = EXTRACT_FN.match(line)
+                    if m:
+                        start_line = int(m.group(1))
+                        fn_name = m.group(2)
+                        current_rec.stenciled_functions[fn_name] = start_line
+                elif line.startswith("FNDA:"):
+                    m = EXTRACT_FNDA.match(line)
+                    if m:
+                        count = int(m.group(1))
+                        fn_name = m.group(2)
+                        current_rec.function_hits[fn_name] = (
+                            current_rec.function_hits.get(fn_name, 0) + count
                         )
-                else:
-                    logging.debug("Omitting %s", line)
-            elif line.startswith("DA:"):
-                match = EXTRACT_DA.match(line)
-                if (
-                    match
-                    and match.group(2) in data_by_path[record["file_name"]]
-                ):
-                    record["text"] += line + "\n"
-                    record["lines_found"] = record.get("lines_found", 0) + 1
-                    record["should_write_record"] = True
-                    if match.group(3) != "0":
-                        record["lines_hit"] = record.get("lines_hit", 0) + 1
-                else:
-                    logging.debug("Omitting %s", line)
-            elif line.startswith("BRDA:"):
-                match = EXTRACT_BRDA.match(line)
-                if (
-                    match
-                    and match.group(2) in data_by_path[record["file_name"]]
-                ):
-                    record["text"] += line + "\n"
-                    record["branches_found"] = (
-                        record.get("branches_found", 0) + 1
-                    )
-                    record["should_write_record"] = True
-                    if match.group(4) != "-" and match.group(4) != "0":
-                        record["branches_hit"] = (
-                            record.get("branches_hit", 0) + 1
+                elif line.startswith("DA:"):
+                    m = EXTRACT_DA.match(line)
+                    if m:
+                        line_num = int(m.group(1))
+                        count = int(m.group(2))
+                        current_rec.stenciled_lines.add(line_num)
+                        current_rec.line_hits[line_num] = max(
+                            current_rec.line_hits.get(line_num, 0), count
                         )
-                else:
-                    logging.debug("Omitting %s", line)
-            elif line.startswith("FNF:"):
-                record["text"] += f"FNF:{record.get('functions_found', 0)}\n"
-            elif line.startswith("FNH:"):
-                record["text"] += f"FNH:{record.get('functions_hit', 0)}\n"
-            elif line.startswith("BRF:"):
-                record["text"] += f"BRF:{record.get('branches_found', 0)}\n"
-            elif line.startswith("BRH:"):
-                record["text"] += f"BRH:{record.get('branches_hit', 0)}\n"
-            elif line.startswith("LF:"):
-                record["text"] += f"LF:{record.get('lines_found', 0)}\n"
-            elif line.startswith("LH:"):
-                record["text"] += f"LH:{record.get('lines_hit', 0)}\n"
-            else:
-                logging.debug("record = %s", record)
-                raise NotImplementedError(line)
+                elif line.startswith("BRDA:"):
+                    m = EXTRACT_BRDA.match(line)
+                    if m:
+                        l_num = int(m.group(1))
+                        blk = int(m.group(2))
+                        br = int(m.group(3))
+                        cnt_str = m.group(4)
+                        br_key = (l_num, blk, br)
+                        current_rec.stenciled_branches.add(br_key)
+                        current_rec.branch_hits[br_key] = cnt_str
+
+    return records
+
+
+def merge_input_files(lcov_inputs: list, records: OrderedDict):
+    """Merges coverage data from input LCOV files into records."""
+    for filename in lcov_inputs:
+        logging.info("Merging file %s", filename)
+        current_rec = None
+        with open(filename, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line == "end_of_record":
+                    current_rec = None
+                elif line.startswith("SF:"):
+                    sf_path = line[3:]
+                    current_rec = records.get(sf_path)
+                elif current_rec:
+                    if line.startswith("FNDA:"):
+                        m = EXTRACT_FNDA.match(line)
+                        if m:
+                            count = int(m.group(1))
+                            fn_name = m.group(2)
+                            if fn_name in current_rec.stenciled_functions:
+                                current_rec.function_hits[fn_name] = (
+                                    current_rec.function_hits.get(fn_name, 0)
+                                    + count
+                                )
+                    elif line.startswith("DA:"):
+                        m = EXTRACT_DA.match(line)
+                        if m:
+                            line_num = int(m.group(1))
+                            count = int(m.group(2))
+                            if line_num in current_rec.stenciled_lines:
+                                current_rec.line_hits[line_num] = (
+                                    current_rec.line_hits.get(line_num, 0)
+                                    + count
+                                )
+                    elif line.startswith("BRDA:"):
+                        m = EXTRACT_BRDA.match(line)
+                        if m:
+                            l_num = int(m.group(1))
+                            blk = int(m.group(2))
+                            br = int(m.group(3))
+                            cnt_str = m.group(4)
+                            br_key = (l_num, blk, br)
+                            if br_key in current_rec.stenciled_branches:
+                                prev = current_rec.branch_hits.get(br_key, "-")
+                                if cnt_str != "-":
+                                    if prev == "-":
+                                        current_rec.branch_hits[br_key] = (
+                                            cnt_str
+                                        )
+                                    else:
+                                        current_rec.branch_hits[br_key] = str(
+                                            int(prev) + int(cnt_str)
+                                        )
+
+
+def write_output(records: OrderedDict, output_file):
+    """Writes the stenciled and merged LCOV records to output_file."""
+    for sf_path, rec in records.items():
+        output_file.write(f"TN:{rec.tn}\n")
+        output_file.write(f"SF:{sf_path}\n")
+
+        # Functions (FN and FNDA)
+        for fn_name, start_line in sorted(
+            rec.stenciled_functions.items(), key=lambda x: x[1]
+        ):
+            output_file.write(f"FN:{start_line},{fn_name}\n")
+        for fn_name in sorted(rec.stenciled_functions.keys()):
+            hits = rec.function_hits.get(fn_name, 0)
+            output_file.write(f"FNDA:{hits},{fn_name}\n")
+
+        fnf = len(rec.stenciled_functions)
+        fnh = sum(
+            1
+            for fn_name in rec.stenciled_functions
+            if rec.function_hits.get(fn_name, 0) > 0
+        )
+        output_file.write(f"FNF:{fnf}\n")
+        output_file.write(f"FNH:{fnh}\n")
+
+        # Lines (DA)
+        sorted_lines = sorted(rec.stenciled_lines)
+        for line_num in sorted_lines:
+            hits = rec.line_hits.get(line_num, 0)
+            output_file.write(f"DA:{line_num},{hits}\n")
+
+        lf = len(sorted_lines)
+        lh = sum(1 for l_num in sorted_lines if rec.line_hits.get(l_num, 0) > 0)
+        output_file.write(f"LF:{lf}\n")
+        output_file.write(f"LH:{lh}\n")
+
+        # Branches (BRDA)
+        sorted_branches = sorted(rec.stenciled_branches)
+        for br_key in sorted_branches:
+            cnt_str = rec.branch_hits.get(br_key, "-")
+            output_file.write(
+                f"BRDA:{br_key[0]},{br_key[1]},{br_key[2]},{cnt_str}\n"
+            )
+
+        brf = len(sorted_branches)
+        brh = sum(
+            1
+            for br_key in sorted_branches
+            if rec.branch_hits.get(br_key, "-") not in ("-", "0")
+        )
+        output_file.write(f"BRF:{brf}\n")
+        output_file.write(f"BRH:{brh}\n")
+
+        output_file.write("end_of_record\n")
 
 
 def main(argv=None):
@@ -221,10 +253,11 @@ def main(argv=None):
             opts.output_file, "w", encoding="utf-8"
         )
 
-    data_by_path = parse_template_file(opts.template_file)
+    records = parse_template(opts.template_file)
+    merge_input_files(opts.lcov_input, records)
+
     with output_file:
-        for lcov_input in [opts.template_file] + opts.lcov_input:
-            filter_coverage_file(lcov_input, output_file, data_by_path)
+        write_output(records, output_file)
 
 
 if __name__ == "__main__":
