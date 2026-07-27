@@ -1109,7 +1109,8 @@ void pd_set_suspend(int port, int suspend)
 		 * Avoid deadlock when running from task
 		 * which we are going to suspend
 		 */
-		if (PD_PORT_TO_TASK_ID(port) == task_get_current())
+		if (PD_PORT_TO_TASK_ID(port) ==
+		    thread_id_to_task_id(k_current_get()))
 			return;
 
 		task_wake(PD_PORT_TO_TASK_ID(port));
@@ -1507,8 +1508,6 @@ static bool tc_perform_snk_hard_reset(int port)
 
 void tc_start_error_recovery(int port)
 {
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
-
 	/*
 	 *   The port should transition to the ErrorRecovery state
 	 *   from any other state when directed.
@@ -1733,8 +1732,6 @@ static void set_ccd_mode(const int port, const bool enable)
 /* Set the TypeC state machine to a new state. */
 static void set_state_tc(const int port, const enum usb_tc_state new_state)
 {
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
-
 	set_state(port, &tc[port].ctx, &tc_states[new_state]);
 }
 
@@ -2017,9 +2014,6 @@ static __maybe_unused int reset_device_and_notify(int port)
 	int rv;
 	int task, waiting_tasks;
 
-	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
-
 	TC_SET_FLAG(port, TC_FLAGS_LPM_TRANSITION);
 	rv = tcpm_init(port);
 	TC_CLR_FLAG(port, TC_FLAGS_LPM_TRANSITION);
@@ -2039,8 +2033,9 @@ static __maybe_unused int reset_device_and_notify(int port)
 	 * waking the TCPC, but it has also set PD_EVENT_TCPC_RESET again, which
 	 * would result in a second, unnecessary init.
 	 */
-	atomic_clear_bits(task_get_event_bitmap(task_get_current()),
-			  PD_EVENT_TCPC_RESET);
+	atomic_clear_bits(
+		task_get_event_bitmap(thread_id_to_task_id(k_current_get())),
+		PD_EVENT_TCPC_RESET);
 
 	waiting_tasks = atomic_clear(&tc[port].tasks_waiting_on_reset);
 
@@ -2066,7 +2061,7 @@ void pd_wait_exit_low_power(int port)
 	} else {
 		/* Otherwise, we need to wait for the TCPC reset to complete */
 		atomic_or(&tc[port].tasks_waiting_on_reset,
-			  1 << task_get_current());
+			  1 << thread_id_to_task_id(k_current_get()));
 		/*
 		 * NOTE: We could be sending the PD task the reset event while
 		 * it is already processing the reset event. If that occurs,
@@ -2099,7 +2094,8 @@ void pd_device_accessed(int port)
  */
 void pd_prevent_low_power_mode(int port, int prevent)
 {
-	const int current_task_mask = (1 << task_get_current());
+	const int current_task_mask =
+		(1 << thread_id_to_task_id(k_current_get()));
 
 	if (prevent)
 		atomic_or(&tc[port].tasks_preventing_lpm, current_task_mask);

@@ -173,8 +173,6 @@ void tc_reset_support_timer(int port)
 
 void tc_start_error_recovery(int port)
 {
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
-
 	/*
 	 *   The port should transition to the ErrorRecovery state
 	 *   from any other state when directed.
