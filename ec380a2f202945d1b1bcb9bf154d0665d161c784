@@ -16,6 +16,23 @@
       "message": "AFAIK, up through this CL, it should be no-op changes, because we haven\u0027t actually enabled the new USB4/TBT responses on a board yet.",
       "revId": "ec380a2f202945d1b1bcb9bf154d0665d161c784",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3442494_b941abd9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-27T22:45:25Z",
+      "side": 1,
+      "message": "Note also that this is the CL that you\u0027ll need to cherry pick to `ec-legacy`, and there will be conflicts.",
+      "revId": "ec380a2f202945d1b1bcb9bf154d0665d161c784",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
