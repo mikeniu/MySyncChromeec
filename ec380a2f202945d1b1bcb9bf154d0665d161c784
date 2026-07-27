@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d866f3c_7df86d1f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-27T22:37:46Z",
+      "side": 1,
+      "message": "AFAIK, up through this CL, it should be no-op changes, because we haven\u0027t actually enabled the new USB4/TBT responses on a board yet.",
+      "revId": "ec380a2f202945d1b1bcb9bf154d0665d161c784",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
