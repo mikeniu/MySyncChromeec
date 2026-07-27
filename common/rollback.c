@@ -81,7 +81,8 @@ static void check_mpu_rv(int rv, const char *func_name)
 #if defined(CONFIG_ZEPHYR)
 		k_panic();
 #else
-		software_panic(PANIC_SW_ASSERT, task_get_current());
+		software_panic(PANIC_SW_ASSERT,
+			       (uint8_t)(uintptr_t)k_current_get());
 #endif
 	}
 }
