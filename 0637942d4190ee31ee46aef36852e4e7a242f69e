@@ -16,6 +16,24 @@
       "message": "What if AP sends another host command before EC disables the interrupt? Shouldn\u0027t the interrupt be disabled before releasing the host-command BUSY status?\n\nAlso I am not sure how AP will handle the error response. Is that studied across all execution environments - Firmware, OS etc.?\n\nAlso in your analysis you mentioned Realtek ESPI driver clears the status bit at init. But we are seeing the issue in Boards with Realtek EC too (infact we are configuring EC_REBOOT_DELAY_MS in depthcharge to avoid this race condition).",
       "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "174f9129_09b1672a",
+        "filename": "zephyr/shim/src/espi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-27T22:58:24Z",
+      "side": 1,
+      "message": "I\u0027m wondering if the cleaner way to do this would be to check the busy bit during init, send a failure result if it\u0027s set, and then clear the bit. That way, this driver doesn\u0027t need to synchronize any internal state or worry about interrupts any more than it already does. Also, an after-the-sysjump change would only need to be an RW change, whereas a before-the-sysjump change would need to be an RO change. Would the AP generally be OK getting a late or out of context error response?\n\nRegarding the existing driver clearing it at init, maybe the negative response is also required to re-synchronize the AP? Just guessing.",
+      "parentUuid": "475fcfde_8692ee7b",
+      "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
