@@ -97,7 +97,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake compare-builds
 
-**Usage:** `zmake compare-builds [-h] [--ref1 REF1] [--ref2 REF2] [-k] [-n] [-b] [-d] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name ...)`
+**Usage:** `zmake compare-builds [-h] [--ref1 REF1] [--ref2 REF2] [-k] [-n] [-b] [-d] [--analyze-diff] [--exact-bytes] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name ...)`
 
 #### Positional Arguments
 
@@ -116,6 +116,8 @@ Chromium OS's meta-build tool for Zephyr
 | `-n`, `--compare-configs` | Compare configs of build outputs |
 | `-b`, `--compare-binaries-disable` | Don't compare binaries of build outputs |
 | `-d`, `--compare-devicetrees` | Compare devicetrees of build outputs |
+| `--analyze-diff` | Analyze binary differences when comparison fails |
+| `--exact-bytes` | Show exact byte counts in binary footprint tables |
 | `-D CMAKE_DEFS`, `--cmake-define CMAKE_DEFS` | None |
 | `-t TOOLCHAIN`, `--toolchain TOOLCHAIN` | Name of toolchain to use |
 | `--extra-cflags EXTRA_CFLAGS` | Additional CFLAGS to use for target builds |
@@ -152,7 +154,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake analyze-build-diff
 
-**Usage:** `zmake analyze-build-diff [-h] target1 target2 [--sections]`
+**Usage:** `zmake analyze-build-diff [-h] target1 target2 [--sections] [--verbose] [--exact-bytes]`
 
 #### Positional Arguments
 
@@ -167,3 +169,5 @@ Chromium OS's meta-build tool for Zephyr
 |---|---|
 | `-h`, `--help` | show this help message and exit |
 | `--sections` | Print detailed section size comparison and changed sections |
+| `--verbose` | Print all detailed section and contiguous diff range details |
+| `--exact-bytes` | Show exact byte counts in binary footprint tables |
