@@ -226,6 +226,22 @@ int i2c_get_port_from_remote_port(int remote_port);
  */
 enum i2c_ports i2c_get_port_from_device(const struct device *i2c_dev);
 
+struct ec_params_i2c_passthru;
+
+/**
+ * @brief Check if I2C passthru is allowed on a port for given parameters.
+ *
+ * This function calls the port-specific allow_passthru callback defined in DTS.
+ *
+ * @param port The EC port number.
+ * @param params I2C passthru parameters.
+ * @return 1 if passthru is allowed, 0 if not allowed or callback not defined.
+ */
+int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params);
+
+int always_allow_passthru(int port,
+			  const struct ec_params_i2c_passthru *params);
+
 #ifdef __cplusplus
 }
 #endif

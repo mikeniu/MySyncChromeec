@@ -44,6 +44,28 @@ static const int i2c_remote_ports[I2C_PORT_COUNT] = {
 	DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, INIT_REMOTE_PORTS)
 };
 
+typedef int (*allow_passthru_cb_t)(int port,
+				   const struct ec_params_i2c_passthru *params);
+
+#define DECLARE_ALLOW_PASSTHRU(id)                                          \
+	COND_CODE_1(DT_NODE_HAS_PROP(id, allow_passthru),                   \
+		    (extern int DT_STRING_TOKEN(id, allow_passthru)(        \
+			     int, const struct ec_params_i2c_passthru *);), \
+		    ())
+
+DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, DECLARE_ALLOW_PASSTHRU)
+
+#define INIT_ALLOW_PASSTHRU(id)                                             \
+	[I2C_PORT(id)] = COND_CODE_1(                                       \
+		DT_NODE_HAS_PROP(id, allow_passthru),                       \
+		((allow_passthru_cb_t)DT_STRING_TOKEN(id, allow_passthru)), \
+		(NULL)),
+
+static const allow_passthru_cb_t i2c_allow_passthru_cb[I2C_PORT_COUNT] = {
+	[0 ...(I2C_PORT_COUNT - 1)] = NULL, /* default NULL for unnamed ports */
+	DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, INIT_ALLOW_PASSTHRU)
+};
+
 static const struct device *i2c_devices[I2C_PORT_COUNT] = { I2C_FOREACH_PORT(
 	INIT_DEV_BINDING) };
 
@@ -69,7 +91,24 @@ int i2c_get_port_from_remote_port(int remote_port)
 	return remote_port;
 }
 
+int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params)
+{
+	if (port < 0 || port >= I2C_PORT_COUNT)
+		return 0;
+
+	if (i2c_allow_passthru_cb[port] == NULL)
+		return 0;
+
+	return i2c_allow_passthru_cb[port](port, params);
+}
+
+int always_allow_passthru(int port, const struct ec_params_i2c_passthru *params)
+{
+	return true;
+}
+
 #ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_I2C_PORTMAP
+
 static int command_i2c_portmap(int argc, const char **argv)
 {
 	int i;
