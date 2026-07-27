@@ -5,10 +5,13 @@
 #ifndef __CROS_EC_I2C_BATTERY_PARSER_H
 #define __CROS_EC_I2C_BATTERY_PARSER_H
 
+#include "ec_commands.h"
 #include "i2c.h"
 
 #include <stdbool.h>
 #include <stdint.h>
+
+bool is_i2c_battery(int port, uint16_t address, bool virtual_only);
 
 /*
  * The state machine used to parse smart battery command
@@ -53,5 +56,17 @@ int battery_permission_handler(struct i2c_battery_parser_state *state,
  * Create a parser state.
  */
 struct i2c_battery_parser_state i2c_battery_parser_state_create(void);
+
+#ifdef CONFIG_ZEPHYR
+/**
+ * Check if a battery I2C passthru command is allowed for Zephyr EC.
+ *
+ * @param params I2C passthru parameters.
+ * @return 1 if allowed, 0 if denied.
+ */
+int battery_allow_passthru(int port,
+			   const struct ec_params_i2c_passthru *params,
+			   bool system_is_locked, bool protect_by_ap);
+#endif
 
 #endif // __CROS_EC_I2C_BATTERY_PARSER_H
