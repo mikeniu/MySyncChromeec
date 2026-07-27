@@ -80,6 +80,30 @@
       },
       "revId": "203898a2191081dd82aae22efa159b8a29401bc4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bedceede_8e8b4571",
+        "filename": "zephyr/program/ocelot/ocelotrvp-npcx/ocelotrvp-npcx_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-07-27T12:47:13Z",
+      "side": 1,
+      "message": "I filled this up, based on SNK section. Let me know if something is wrong. It doesn\u0027t fail tests I run, but I will retest whole suite in the last gate.",
+      "parentUuid": "a9b66af7_47b470a7",
+      "range": {
+        "startLine": 226,
+        "startChar": 0,
+        "endLine": 237,
+        "endChar": 43
+      },
+      "revId": "203898a2191081dd82aae22efa159b8a29401bc4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
