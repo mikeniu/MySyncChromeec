@@ -10,6 +10,7 @@
 #include "chipset_state_check.h"
 #include "common.h"
 #include "system.h"
+#include "watchdog.h"
 
 int chipset_in_state(int state_mask)
 {
@@ -64,6 +65,7 @@ bool board_ap_power_is_startup_ok(void)
 		if (power_ok)
 			return true;
 
+		watchdog_reload();
 		k_msleep(100);
 	}
 	return false;
