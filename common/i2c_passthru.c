@@ -274,7 +274,8 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	     system_is_locked()) ||
 	    (i2c_get_protect_type(port) == NO_PROTECT_UNTIL_ENABLED &&
 	     port_protected[port])) {
-		return EC_RES_ACCESS_DENIED;
+		if (!i2c_allow_passthru(port, params))
+			return EC_RES_ACCESS_DENIED;
 	}
 #endif
 
