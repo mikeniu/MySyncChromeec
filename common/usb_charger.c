@@ -201,7 +201,7 @@ void usb_charger_task_shared(void *u)
 
 void usb_charger_task(void *u)
 {
-	int port = TASK_ID_TO_USB_CHG_PORT(task_get_current());
+	int port = POINTER_TO_UINT(u);
 	uint32_t evt;
 	struct bc12_config *bc12_port;
 
