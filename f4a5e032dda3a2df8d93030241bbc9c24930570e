@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc8e9a45_5a62adf8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 25
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-27T17:10:07Z",
+      "side": 1,
+      "message": "LGTM except for incongruous makefile changes.",
+      "revId": "f4a5e032dda3a2df8d93030241bbc9c24930570e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a99403a_0d993df5",
+        "filename": "Makefile.rules",
+        "patchSetId": 25
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-27T17:10:07Z",
+      "side": 1,
+      "message": "What does this have to do with the TCPM state machines?",
+      "revId": "f4a5e032dda3a2df8d93030241bbc9c24930570e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
