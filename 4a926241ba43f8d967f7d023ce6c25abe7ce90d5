@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba213f39_32fb7536",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 9485,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-27T11:16:58Z",
+      "side": 1,
+      "message": "ok similarly to the previous comment, does this need the struct or could this just be the actual type? like `uint16_t rate` so you won\u0027t have to do `resp-\u003eget_rate.rate`, again the whole field name `get_` sounds weird, it sounds like a function you\u0027d want to do `resp-\u003eget_rate()`.",
+      "range": {
+        "startLine": 9484,
+        "startChar": 0,
+        "endLine": 9485,
+        "endChar": 48
+      },
+      "revId": "4a926241ba43f8d967f7d023ce6c25abe7ce90d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
