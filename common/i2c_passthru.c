@@ -36,55 +36,6 @@
 
 static uint8_t port_protected[I2C_PORT_COUNT];
 
-#if defined(CONFIG_I2C_VIRTUAL_BATTERY) || \
-	(defined(CONFIG_I2C_PASSTHRU_RESTRICTED) && defined(CONFIG_BATTERY))
-static inline bool is_same_i2c_port(int port, int other_port)
-{
-#ifdef CONFIG_ZEPHYR
-	/* For Zephyr compare the actual device, which will be used in
-	 * i2c_transfer function.
-	 */
-	return (i2c_get_device_for_port(port) ==
-		i2c_get_device_for_port(other_port));
-#else
-	return (port == other_port);
-#endif
-}
-
-static inline bool is_i2c_battery(int port, uint16_t address, bool virtual_only)
-{
-	struct i2c_signature {
-		int port;
-		uint16_t address;
-		bool is_virtual;
-	};
-
-	static const struct i2c_signature battery_signatures[] = {
-#ifdef CONFIG_I2C_VIRTUAL_BATTERY
-		{ .port = I2C_PORT_VIRTUAL_BATTERY,
-		  .address = VIRTUAL_BATTERY_ADDR_FLAGS,
-		  .is_virtual = true },
-#endif
-#ifdef BATTERY_ADDR_FLAGS
-		{ .port = I2C_PORT_BATTERY,
-		  .address = BATTERY_ADDR_FLAGS,
-		  .is_virtual = false },
-#endif
-	};
-
-	for (size_t index = 0; index < ARRAY_SIZE(battery_signatures);
-	     ++index) {
-		if (virtual_only && !battery_signatures[index].is_virtual)
-			continue;
-		if (is_same_i2c_port(port, battery_signatures[index].port) &&
-		    address == battery_signatures[index].address) {
-			return true;
-		}
-	}
-	return false;
-}
-#endif
-
 /**
  * Perform the voluminous checking required for this message
  *
