@@ -185,6 +185,9 @@ config LINK_TEST_SUITE_NX20P348X
 	select PLATFORM_EC_CONSOLE_CMD_PPC_DUMP
 	select PLATFORM_EC_USB_PD_LOGGING
 
+config LINK_TEST_SUITE_PANIC
+	bool "Link and test the panic tests"
+
 config LINK_TEST_SUITE_PANIC_OUTPUT
 	bool "Link and test the panic_output tests"
 
