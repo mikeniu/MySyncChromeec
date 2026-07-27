@@ -4,6 +4,7 @@
 
 add_subdirectory(handlers)
 
+zephyr_library_sources(common.c)
 zephyr_library_sources_ifdef(CONFIG_AP_PWRSEQ_S0IX_ERROR_RECOVERY
 	common_pwrseq_host_sleep.c)
 zephyr_library_sources_ifdef(CONFIG_X86_NON_DSX_PWRSEQ_CONSOLE
