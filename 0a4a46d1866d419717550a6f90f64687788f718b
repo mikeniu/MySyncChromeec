@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9061b6b1_adf3ad39",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-27T11:14:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72f2d5e1_c4130327",
+      "range": {
+        "startLine": 6,
+        "startChar": 4,
+        "endLine": 6,
+        "endChar": 22
+      },
+      "revId": "0a4a46d1866d419717550a6f90f64687788f718b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e31cb91_d0d53017",

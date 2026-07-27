@@ -52,6 +52,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "097f0e3b_0d63cca5",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-27T11:14:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7fcfa18d_28e0aa3b",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7eca0e62_0dd87dee",
@@ -65,6 +83,30 @@
       "writtenOn": "2026-07-23T16:28:17Z",
       "side": 1,
       "message": "ouch, I would not blame if you felt like doing the indentation of these ones manually and put a clang-format off block around it",
+      "range": {
+        "startLine": 58,
+        "startChar": 2,
+        "endLine": 64,
+        "endChar": 30
+      },
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "576b016b_c85c10bf",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-27T11:14:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7eca0e62_0dd87dee",
       "range": {
         "startLine": 58,
         "startChar": 2,
@@ -314,6 +356,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7122c134_1f9dc6ae",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 36
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-27T11:14:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eab74c1c_4f9dfd8a",
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d76b6dde_cb5d5922",
@@ -433,6 +493,30 @@
       "writtenOn": "2026-07-23T16:28:17Z",
       "side": 1,
       "message": "this sounds pretty vague, guess it\u0027s an i2c mux? something like: gpio used to control the i2c switch between the EC and \u003cwhatever is on the other side\u003e?",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 58
+      },
+      "revId": "1432645133bfc93d189999a5c5223539eb322a2f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c1dd371_d1389d25",
+        "filename": "zephyr/dts/bindings/pwrmon/pwrmon.yaml",
+        "patchSetId": 36
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-27T11:14:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5252e085_8cc2b601",
       "range": {
         "startLine": 18,
         "startChar": 0,
