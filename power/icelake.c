@@ -124,7 +124,7 @@ void chipset_force_shutdown(enum chipset_shutdown_reason reason)
 
 	/* Turn off PP5000 rail */
 	if (IS_ENABLED(CONFIG_POWER_PP5000_CONTROL))
-		power_5v_enable(task_get_current(), 0);
+		power_5v_enable(k_current_get(), 0);
 	else
 		GPIO_SET_LEVEL(GPIO_EN_PP5000, 0);
 
@@ -169,7 +169,7 @@ enum power_state chipset_force_g3(void)
 static void enable_pp5000_rail(void)
 {
 	if (IS_ENABLED(CONFIG_POWER_PP5000_CONTROL))
-		power_5v_enable(task_get_current(), 1);
+		power_5v_enable(k_current_get(), 1);
 	else
 		GPIO_SET_LEVEL(GPIO_EN_PP5000, 1);
 }
