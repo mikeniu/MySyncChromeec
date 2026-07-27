@@ -58,10 +58,6 @@
 #define CPRINTS_L2(format, args...) CPRINTS_LX(2, format, ##args)
 #define CPRINTS_L3(format, args...) CPRINTS_LX(3, format, ##args)
 
-/*
- * Define DEBUG_PRINT_FLAG_AND_EVENT_NAMES to print flag names when set and
- * cleared, and event names when handled by tc_event_check().
- */
 #undef DEBUG_PRINT_FLAG_AND_EVENT_NAMES
 
 #ifdef DEBUG_PRINT_FLAG_AND_EVENT_NAMES
