@@ -1073,8 +1073,25 @@ tests:
     - CONFIG_LOG_PRINTK=y
     extra_conf_files:
     - prj.conf
-  drivers.panic_output:
+  drivers.panic.ro:
     extra_configs:
+    - CONFIG_CROS_EC_RO=y
+    - CONFIG_LINK_TEST_SUITE_PANIC=y
+  drivers.panic.rw:
+    extra_configs:
+    - CONFIG_CROS_EC_RW=y
+    - CONFIG_LINK_TEST_SUITE_PANIC=y
+  drivers.panic_output.ro:
+    extra_configs:
+    - CONFIG_CROS_EC_RO=y
+    - CONFIG_LINK_TEST_SUITE_PANIC_OUTPUT=y
+    - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH=y
+    - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED=y
+    - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
+    - CONFIG_ZTEST_THREAD_PRIORITY=1
+  drivers.panic_output.rw:
+    extra_configs:
+    - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_PANIC_OUTPUT=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED=y
@@ -1084,6 +1101,7 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_PANIC_OUTPUT=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH=y
+    - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED=y
     - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
     - CONFIG_ZTEST_THREAD_PRIORITY=1
     extra_conf_files:
