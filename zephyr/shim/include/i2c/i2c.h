@@ -240,6 +240,19 @@ enum i2c_protect_type {
  */
 enum i2c_protect_type i2c_get_protect_type(int port);
 
+struct ec_params_i2c_passthru;
+
+/**
+ * @brief Check if I2C passthru is allowed on a port for given parameters.
+ *
+ * This function calls the port-specific allow_passthru callback defined in DTS.
+ *
+ * @param port The EC port number.
+ * @param params I2C passthru parameters.
+ * @return 1 if passthru is allowed, 0 if not allowed or callback not defined.
+ */
+int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params);
+
 #ifdef __cplusplus
 }
 #endif
