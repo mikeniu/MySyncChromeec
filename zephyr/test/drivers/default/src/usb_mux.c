@@ -49,7 +49,7 @@ const struct usb_mux *org_mux[NUM_OF_PROXY];
  */
 static bool task_is_host_command(void)
 {
-	task_id_t id = task_get_current();
+	task_id_t id = thread_id_to_task_id(k_current_get());
 
 #ifdef CONFIG_EC_HOST_CMD
 	return (id == TASK_ID_TEST_RUNNER || id == TASK_ID_HOSTCMD);

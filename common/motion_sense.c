@@ -317,7 +317,7 @@ static inline int motion_sense_init(struct motion_sensor_t *sensor)
 	BUILD_ASSERT(SENSOR_COUNT < 32);
 #if defined(HAS_TASK_CONSOLE)
 	ASSERT((in_deferred_context()) ||
-	       (task_get_current() == TASK_ID_CONSOLE));
+	       (thread_id_to_task_id(k_current_get()) == TASK_ID_CONSOLE));
 #elif !defined(CONFIG_ZTEST)
 	ASSERT(in_deferred_context());
 #endif /* HAS_TASK_CONSOLE */
@@ -742,7 +742,7 @@ static int motion_sense_process(struct motion_sensor_t *sensor, uint32_t *event,
 	int has_data_read = 0;
 	int sensor_num = sensor - motion_sensors;
 
-	ASSERT(task_get_current() == TASK_ID_MOTIONSENSE);
+	ASSERT(thread_id_to_task_id(k_current_get()) == TASK_ID_MOTIONSENSE);
 
 	if (*event & TASK_EVENT_MOTION_ODR_CHANGE) {
 		const int sensor_bit = 1 << sensor_num;

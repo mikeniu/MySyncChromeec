@@ -409,23 +409,22 @@ static int configure_mux(int port, int index, enum mux_config_type config,
 		mutex_unlock(&mux_lock[port]);
 
 		if (ack_required) {
-			ack_task[port] = task_get_current();
+			ack_task[port] = thread_id_to_task_id(k_current_get());
 
 			/*
 			 * This should only be called from the PD task or usb
 			 * mux task
 			 */
 			if (IS_ENABLED(HAS_TASK_USB_MUX)) {
-				assert(task_get_current() == TASK_ID_USB_MUX);
+				assert(thread_id_to_task_id(k_current_get()) ==
+				       TASK_ID_USB_MUX);
 			} else {
 #if defined(CONFIG_ZEPHYR) && defined(TEST_BUILD)
-				assert(port == TASK_ID_TO_PD_PORT(
-						       task_get_current()) ||
-				       task_get_current() ==
+				assert(port == CURRENT_PD_PORT() ||
+				       thread_id_to_task_id(k_current_get()) ==
 					       TASK_ID_TEST_RUNNER);
 #else
-				assert(port ==
-				       TASK_ID_TO_PD_PORT(task_get_current()));
+				assert(port == CURRENT_PD_PORT());
 #endif /* defined(CONFIG_ZEPHYR) && defined(TEST_BUILD) */
 			}
 
