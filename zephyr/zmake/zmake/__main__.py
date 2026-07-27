@@ -233,6 +233,18 @@ def get_argparser():
         help="Compare devicetrees of build outputs",
     )
     compare_builds.add_argument(
+        "--analyze-diff",
+        action="store_true",
+        dest="analyze_diff",
+        help="Analyze binary differences when comparison fails",
+    )
+    compare_builds.add_argument(
+        "--exact-bytes",
+        action="store_true",
+        dest="exact_bytes",
+        help="Show exact byte counts in binary footprint tables",
+    )
+    compare_builds.add_argument(
         "-D",
         "--cmake-define",
         action="append",
@@ -300,6 +312,17 @@ def get_argparser():
         "--sections",
         action="store_true",
         help="Print detailed section size comparison and changed sections",
+    )
+    analyze_build_diff.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print all detailed section and contiguous diff range details",
+    )
+    analyze_build_diff.add_argument(
+        "--exact-bytes",
+        action="store_true",
+        dest="exact_bytes",
+        help="Show exact byte counts in binary footprint tables",
     )
 
     return parser, sub
