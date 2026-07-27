@@ -4,6 +4,11 @@
 
 #include "battery_smart.h"
 #include "i2c_battery_parser.h"
+#include "system.h"
+
+#ifdef CONFIG_ZEPHYR
+#include "i2c/i2c.h"
+#endif
 
 struct i2c_battery_parser_state i2c_battery_parser_state_create(void)
 {
@@ -134,3 +139,30 @@ int battery_permission_handler(struct i2c_battery_parser_state *state,
 				     battery_allow_i2c_passthru);
 	return rv == EC_RES_SUCCESS ? rv2 : rv;
 }
+
+#ifdef CONFIG_ZEPHYR
+int battery_allow_passthru(int port,
+			   const struct ec_params_i2c_passthru *params)
+{
+	struct msg_queue_t msg_queue;
+	struct i2c_battery_parser_state parser_state =
+		i2c_battery_parser_state_create();
+
+	for (msg_queue = msg_queue_create(params);
+	     msg_queue.msg < msg_queue.msg_end;) {
+		const struct msg_value_t val = msg_queue_front(&msg_queue);
+
+		if (is_i2c_battery(port, val.addr_flags, false)) {
+			if (battery_permission_handler(
+				    &parser_state, msg_queue.in_len,
+				    val.xferflags, val.read_len, val.write_len,
+				    msg_queue.out))
+				return 0;
+		}
+
+		msg_queue_pop_front(&msg_queue, &val);
+	}
+
+	return 1;
+}
+#endif
