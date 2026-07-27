@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf5ca8c7_c1c2706d",
+        "filename": "zephyr/test/drivers/console_buffer/src/console_buffer.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-27T20:30:01Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Per Google\u0027s and ChromiumOS\u0027s copyright guidelines, the original copyright year (2022) should not be replaced. You can either revert this change to keep `Copyright 2022`, or update it to a range: `Copyright 2022-2026`.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 0
+      },
+      "revId": "a10245cf168290e56b1dee55d4a39676355af4ba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
