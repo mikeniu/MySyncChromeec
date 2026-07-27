@@ -81,7 +81,8 @@ static void check_mpu_rv(int rv, const char *func_name)
 #if defined(CONFIG_ZEPHYR)
 		k_panic();
 #else
-		software_panic(PANIC_SW_ASSERT, task_get_current());
+		software_panic(PANIC_SW_ASSERT,
+			       thread_id_to_task_id(k_current_get()));
 #endif
 	}
 }
