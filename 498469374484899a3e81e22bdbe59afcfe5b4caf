@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c3cb4ef_4586bda0",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 1001,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-27T16:05:43Z",
+      "side": 1,
+      "message": "These changes look somewhat unrelated? Rather than doing a one-off where we clear a random bit, we should probably call [`fp_reset-and_clear_context`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/fingerprint/task/src/fpsensor_enroll.cc;l\u003d579-580;drc\u003dc6ad19806f0451c1d68f18b4c03fb18bb9a1dec3) in the test setup like we did in the other test. Separate CL.",
+      "range": {
+        "startLine": 998,
+        "startChar": 0,
+        "endLine": 1001,
+        "endChar": 41
+      },
+      "revId": "498469374484899a3e81e22bdbe59afcfe5b4caf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
