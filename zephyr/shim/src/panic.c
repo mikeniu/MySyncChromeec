@@ -190,8 +190,12 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 		 * by Zephyr. It can be caused e.g. by a spurious interrupt.
 		 */
 		uint8_t flags = pdata->flags;
+		task_id_t task_id =
+			k_is_pre_kernel() ?
+				TASK_ID_INVALID :
+				thread_id_to_task_id(k_current_get());
 		panic_set_reason(PANIC_ZEPHYR_FATAL_ERROR, (uint32_t)reason,
-				 task_get_current());
+				 task_id);
 		/* Keep panic flags */
 		pdata->flags = flags;
 	}
@@ -216,7 +220,10 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #ifdef CONFIG_ASSERT_NO_FILE_INFO
 __override void assert_post_action(void)
 {
-	panic_set_reason(PANIC_SW_ASSERT, -1, task_get_current());
+	task_id_t task_id = k_is_pre_kernel() ?
+				    TASK_ID_INVALID :
+				    thread_id_to_task_id(k_current_get());
+	panic_set_reason(PANIC_SW_ASSERT, -1, task_id);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
@@ -227,7 +234,9 @@ __override void assert_post_action(void)
 #else
 __override void assert_post_action(const char *path, unsigned int line)
 {
-	const k_tid_t thread = k_current_get();
+	const k_tid_t thread = k_is_pre_kernel() ? NULL : k_current_get();
+	task_id_t task_id = thread ? thread_id_to_task_id(thread) :
+				     TASK_ID_INVALID;
 
 	/* Extract filename from path */
 	const char *last_slash = strrchr(path, '/');
@@ -238,12 +247,13 @@ __override void assert_post_action(const char *path, unsigned int line)
 	panic_set_reason(PANIC_SW_ASSERT,
 			 (filename[0] << 24) | (filename[1] << 16) |
 				 (line & 0xffff),
-			 task_get_current());
+			 task_id);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
 
-	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT)) {
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT) &&
+	    thread) {
 		print_stack_trace(thread);
 	}
 
