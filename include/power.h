@@ -413,15 +413,12 @@ __override_proto void board_power_5v_enable(int enable);
  * Enable/Disable the PP5000 rail.
  *
  * This function will turn on the 5V rail immediately if requested.  However,
- * the rail will not turn off until all tasks want it off.
+ * the rail will not turn off until all requesters want it off.
  *
- * NOTE: Be careful when calling from deferred functions, as they will all be
- * executed within the same task context! (The HOOKS task).
- *
- * @param tid: The caller's task ID.
+ * @param thread: The calling thread handle.
  * @param enable: 1 to turn on the rail, 0 to request the rail to be turned off.
  */
-void power_5v_enable(task_id_t tid, int enable);
+void power_5v_enable(k_tid_t thread, int enable);
 
 #ifdef CONFIG_ZTEST
 /**
