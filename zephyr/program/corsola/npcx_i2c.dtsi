@@ -16,28 +16,34 @@
 		i2c_sensor: sensor {
 			i2c-port = <&i2c0_0>;
 			enum-names = "I2C_PORT_SENSOR";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_usb_c0: usb-c0 {
 			i2c-port = <&i2c1_0>;
 			remote-port = <7>;
 			enum-names = "I2C_PORT_USB_C0";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_usb_c1: usb-c1 {
 			i2c-port = <&i2c2_0>;
 			enum-names = "I2C_PORT_USB_C1",
 				"I2C_PORT_USB_C1_TCPC",
 				"I2C_PORT_USB_C1_PPC";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_charger: charger {
 			i2c-port = <&i2c3_0>;
 			enum-names = "I2C_PORT_POWER",
 				"I2C_PORT_EEPROM";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		battery {
 			i2c-port = <&i2c5_0>;
 			remote-port = <1>;
 			enum-names = "I2C_PORT_BATTERY",
 				"I2C_PORT_VIRTUAL_BATTERY";
+			allow-passthru = "battery_allow_passthru";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 	};
 };
