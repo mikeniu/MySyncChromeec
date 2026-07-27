@@ -73,9 +73,10 @@ cmd_c_to_s = $(CC) -S $(C_WARN) $(CFLAGS) $(C_WARN-$(CROSS_COMPILE_CC_NAME)) \
 		-MT $(@D)/$(@F) -o $(@D)/$(@F)
 cmd_cxx_to_o = $(CXX) $(CFLAGS) $(CXXFLAGS) -MMD -MP -MF $@.d \
 		      -c $< -MT $(@D)/$(@F) -o $(@D)/$(@F)
-cmd_c_to_host = $(HOSTCC) $(HOST_CFLAGS) -MMD -MF $@.d -MT $@ -o $@ \
+cmd_c_to_host = mkdir -p $(@D) && \
+	$(HOSTCC) $(HOST_CFLAGS) -MMD -MF $@.d -MT $@ -o $@ \
 	         $(sort $(foreach c,$($(*F)-objs),util/$(c:%.o=%.c)) $(wildcard $*.c)) $(HOST_LDFLAGS)
-cmd_cxx_to_host = $(HOSTCXX) $(HOST_CXXFLAGS) \
+cmd_cxx_to_host = mkdir -p $(@D) && $(HOSTCXX) $(HOST_CXXFLAGS) \
 		-MMD -MF $@.d -MT $@ -o $@ \
 		$(sort $(foreach c,$($(*F)-objs),util/$(c:%.o=%.cc)) $(wildcard $*.cc)) $(HOST_LDFLAGS)
 cmd_o_to_a = $(AR) rcs $@ $^
@@ -372,7 +373,9 @@ $(out_cros_ec_commands): include/ec_commands.h util/make_linux_ec_commands_h.sh
 
 .SECONDARY:
 
+ifeq ($(filter clean clobber,$(MAKECMDGOALS)),)
 -include $(deps)
+endif
 
 .PHONY: get_sdk
 get_sdk:
