@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7502f0e_f77cdef9",
+        "filename": "zephyr/program/atria/penghu-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-28T21:54:13Z",
+      "side": 1,
+      "message": "Is this necessary? I don\u0027t see any other projects enabling it explicitly.",
+      "revId": "59350ed64ada836d6ce5dd382fe8c85bb605dca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "663dea75_6ba209d1",
+        "filename": "zephyr/program/atria/penghu-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-28T21:54:13Z",
+      "side": 1,
+      "message": "Is this implicitly enabled by `HECI_INTF_IPM`?",
+      "revId": "59350ed64ada836d6ce5dd382fe8c85bb605dca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bc0c457_17cda35e",
+        "filename": "zephyr/program/atria/penghu-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-28T21:54:13Z",
+      "side": 1,
+      "message": "Does this need to be explicitly disabled?",
+      "revId": "59350ed64ada836d6ce5dd382fe8c85bb605dca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
