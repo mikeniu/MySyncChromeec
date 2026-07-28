@@ -58,6 +58,30 @@
       },
       "revId": "2456379249f2c909da9b82dc6f519937b88a186c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42d5115e_ad845c0a",
+        "filename": "zephyr/test/fingerprint/task/testcase.yaml",
+        "patchSetId": 26
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-28T16:04:41Z",
+      "side": 1,
+      "message": "Yes, previously they implicitly defaulted to `CONFIG_CROS_EC_RO\u003dy` because `config CROS_EC_RO` was the first entry listed under the `choice` prompt in `zephyr/app/ec/Kconfig` (which lacked an explicit `default`).\n\nHowever, fingerprint code is strictly RW-only (`common/fpsensor/fpsensor.cc` raises `#error \"fpsensor code should not be in RO image.\"` under `CONFIG_CROS_EC_RO`). Adding `default CROS_EC_RW` in `zephyr/app/ec/Kconfig` shifts these single-image unit tests to default to `CROS_EC_RW\u003dy`.\n\nSince RW builds default `CONFIG_PLATFORM_EC_ROLLBACK_UPDATE` to `n`, I also enabled `CONFIG_PLATFORM_EC_ROLLBACK_UPDATE\u003dy` in `zephyr/test/fingerprint/task/prj.conf` so `rollback_add_entropy()` remains available test.",
+      "parentUuid": "ed411f9b_924dc6eb",
+      "range": {
+        "startLine": 9,
+        "startChar": 4,
+        "endLine": 9,
+        "endChar": 23
+      },
+      "revId": "2456379249f2c909da9b82dc6f519937b88a186c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
