@@ -21,3 +21,12 @@ properties:
     type: boolean
     description:
       Enables run-time speed configuration.
+  protect-type:
+    type: string
+    default: I2C_PROTECT_TYPE_NONE
+    description:
+      Protection type for the I2C port.
+    enum:
+      - I2C_PROTECT_TYPE_NONE
+      - PROTECT_IF_SYSTEM_IS_LOCKED
+      - NO_PROTECT_UNTIL_ENABLED
