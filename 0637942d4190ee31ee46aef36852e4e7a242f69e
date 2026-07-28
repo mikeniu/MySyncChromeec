@@ -34,6 +34,24 @@
       "parentUuid": "475fcfde_8692ee7b",
       "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1b67469_2c9dfacf",
+        "filename": "zephyr/shim/src/espi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-07-28T04:23:22Z",
+      "side": 1,
+      "message": "Hi Karthik, Thanks for reviewing, below is some observations from experiments done.\n1)\n\u003e\u003e \"What if AP sends another host command before EC disables the interrupt? Shouldn\u0027t the interrupt be disabled before releasing the host-command BUSY status?\"\nThe concern is valid, however in practice this may not be an issue because,\nAP (depthcharge) has a 5ms delay before retrying EC_CMD_HELLO\nThis provides sufficient time for EC to disable the interrupt after releasing the BUSY status\n\ncode reference from depth charge, sending EC_CMD_HELLO to EC for every 5 msec post SYSJUMP command to EC.\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/depthcharge/src/drivers/ec/cros/ec.c;l\u003d493\n2)\n\u003e\u003e Also I am not sure how AP will handle the error response. Is that studied across all execution environments - Firmware, OS etc.?\n\nThis scenario is only applicable during SYSJUMP, therefore i believe only AP firmware (depthcharge) is active at this point — OS environment is not a concern\n\nI have verified below from EC logs (on moonstone device)\nEC sends negative ACK to depthcharge ✅\nEC jumps to RW copy as expected ✅\nDepthcharge retries EC_CMD_HELLO ✅\nEC RW copy receives the command successfully and sends positive ACK ✅\n3)\nAlso in your analysis you mentioned Realtek ESPI driver clears the status bit at init. But we are seeing the issue in Boards with Realtek EC too.\n\nYes this is not expected in Artria unless the eSPI init code(clearing the status bit) is hit post jumping to the RW copy. \n\nIncreasing the timeout in DC would help but this appears to be a race condition in EC that needs to be properly addressed. Not clearing the EC BUSY status bit would lead to severe issues downstream\n\nHi Abe,\n\nThis issue is only specific to handling EC_CMD_HELLO which is posted by depthcharge for every 5 msec post it sends SYSJUMP/REBOOT host command to EC to check if EC is back and interface is functional.\n1)\nRegarding the existing driver clearing it at init, maybe the negative response is also required to re-synchronize the AP? Just guessing.\n\nI checked the Nuvoton eSPI driver code, it clears the EC BUSY bit in host_hcmd_init() post EC jumps from RO-\u003eRW . https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/drivers/espi/host_subs_npcx.c;l\u003d430 \n\nThis indicates AP should be OK with the no response/late response from EC.",
+      "parentUuid": "174f9129_09b1672a",
+      "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
