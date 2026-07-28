@@ -106,12 +106,12 @@ common-$(CONFIG_HOSTCMD_REGULATOR)+=regulator.o
 common-$(CONFIG_HOSTCMD_RTC)+=rtc.o
 common-$(CONFIG_I2C_DEBUG)+=i2c_trace.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller.o
-common-$(CONFIG_I2C_CONTROLLER)+=i2c_passthru.o
+common-$(CONFIG_I2C_CONTROLLER)+=i2c_passthru.o i2c_msg_queue.o
 common-$(CONFIG_I2C_PERIPHERAL)+=i2c_peripheral.o
 common-$(CONFIG_I2C_VIRTUAL_BATTERY)+=virtual_battery.o
-common-$(CONFIG_I2C_VIRTUAL_BATTERY)+=i2c_battery_parser.o
+common-$(CONFIG_I2C_VIRTUAL_BATTERY)+=i2c_battery_parser.o i2c_msg_queue.o
 ifneq ($(CONFIG_BATTERY),)
-common-$(CONFIG_I2C_PASSTHRU_RESTRICTED)+=i2c_battery_parser.o
+common-$(CONFIG_I2C_PASSTHRU_RESTRICTED)+=i2c_battery_parser.o i2c_msg_queue.o
 endif
 common-$(CONFIG_KEYBOARD_PROTOCOL_8042)+=keyboard_8042.o \
 	keyboard_8042_sharedlib.o
