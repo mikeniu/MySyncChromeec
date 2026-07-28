@@ -226,6 +226,20 @@ int i2c_get_port_from_remote_port(int remote_port);
  */
 enum i2c_ports i2c_get_port_from_device(const struct device *i2c_dev);
 
+enum i2c_protect_type {
+	NO_PROTECT = 0,
+	PROTECT_IF_SYSTEM_IS_LOCKED,
+	NO_PROTECT_UNTIL_ENABLED,
+};
+
+/**
+ * @brief Get the protection type for an I2C port from DTS.
+ *
+ * @param port The EC port number.
+ * @return The protect type enum value.
+ */
+enum i2c_protect_type i2c_get_protect_type(int port);
+
 #ifdef __cplusplus
 }
 #endif
