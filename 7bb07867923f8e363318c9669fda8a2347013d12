@@ -216,6 +216,24 @@
       "parentUuid": "65287665_fa86010c",
       "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5e12e5a_08080ea0",
+        "filename": "zephyr/zmake/zmake/compare_builds.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-28T19:27:11Z",
+      "side": 1,
+      "message": "Ack. I wasn\u0027t necessarily concerned that `analyze-build-diff` be made into a first-class `zmake` command. I just noticed some redundancy between `cmp` and `analyze_bin_diffs` (the internal function), and it seemed like the control flow between them could be simplified. It looks like you plan to defer this to a later CL anyway.",
+      "parentUuid": "d517ccef_ee1cf2b7",
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
