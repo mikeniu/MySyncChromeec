@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c67c19a2_eeeb9a4a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-28T05:36:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/b89159eb-5d05-4651-8150-62eff72afe33)]\n\n**Review Summary**\n* **Functionality**: The changes correctly enforce state checks before executing `KEYGEN`, `WRAP`, and `LOAD_PAIRING_KEY` commands.\n* **Security**: Enforces state checks to prevent pairing key operations during active authentication or when the user context is dirty, which is a good security improvement.\n* **Style \u0026 Consistency**: The code is clean and adheres to the surrounding style.\n* **Testing**: ❌ **Needs attention**. The CL is missing test coverage for the newly added access denial paths, which was requested in the previous review.\n* **CL Size**: The CL is small, focused, and well-scoped to a single issue.\n\nCONV\u003db89159eb-5d05-4651-8150-62eff72afe33\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "5daab5dc6faf79d0968d9d052a0c3af7c0893063",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b6e2901_177be762",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-28T05:36:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The tests requested in the previous review are still missing. The new `fingerprint_auth_enabled()` and `check_context_cleared()` checks in `KEYGEN`, `WRAP`, and `LOAD_PAIRING_KEY` should have test coverage (e.g., in `chromium/test/fpsensor_auth_commands.cc`).\n\nPlease add tests verifying that `EC_RES_ACCESS_DENIED` is returned when these conditions are met. For example:\n\n```cpp\ntest_static enum ec_error_list test_fp_command_establish_pairing_key_keygen_denied(void)\n{\n\tenum ec_status rv;\n\tstruct ec_response_fp_establish_pairing_key_keygen keygen_response;\n\n\t// Set state such that fingerprint_auth_enabled() is true \n\t// or check_context_cleared() returns !\u003d EC_SUCCESS\n\n\trv \u003d test_send_host_command(EC_CMD_FP_ESTABLISH_PAIRING_KEY_KEYGEN, 0,\n\t\t\t\t    NULL, 0, \u0026keygen_response,\n\t\t\t\t    sizeof(keygen_response));\n\n\tTEST_EQ(rv, EC_RES_ACCESS_DENIED, \"%d\");\n\n\t// Clean up state\n\treturn EC_SUCCESS;\n}\n```",
+      "isAi": true,
+      "revId": "5daab5dc6faf79d0968d9d052a0c3af7c0893063",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
