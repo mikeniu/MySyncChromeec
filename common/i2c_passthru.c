@@ -232,6 +232,22 @@ static int check_i2c_params(const uint8_t port,
 	return EC_RES_SUCCESS;
 }
 
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED_DTS
+int protect_if_system_locked(int port,
+			     const struct ec_params_i2c_passthru *params,
+			     bool system_is_locked, bool protect_by_ap)
+{
+	return !system_is_locked;
+}
+
+int no_protect_until_enabled(int port,
+			     const struct ec_params_i2c_passthru *params,
+			     bool system_is_locked, bool protect_by_ap)
+{
+	return !protect_by_ap;
+}
+#endif
+
 static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 {
 	/* Force casting (const void *) to (struct ec_params_i2c_passthru *) */
@@ -269,6 +285,13 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	if (ret)
 		return ret;
 
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED_DTS
+	const bool sys_locked = system_is_locked();
+	const bool prot_by_ap = port_protected[port];
+
+	if (!i2c_allow_passthru(port, params, sys_locked, prot_by_ap))
+		return EC_RES_ACCESS_DENIED;
+#else
 	if (port_protected[port]) {
 		if (!i2c_port->passthru_allowed)
 			return EC_RES_ACCESS_DENIED;
@@ -279,6 +302,7 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 				return EC_RES_ACCESS_DENIED;
 		}
 	}
+#endif
 
 	/* Loop and process messages */
 	resp->i2c_status = 0;

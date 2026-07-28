@@ -44,6 +44,32 @@ static const int i2c_remote_ports[I2C_PORT_COUNT] = {
 	DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, INIT_REMOTE_PORTS)
 };
 
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED_DTS
+typedef int (*allow_passthru_cb_t)(int port,
+				   const struct ec_params_i2c_passthru *params,
+				   bool system_is_locked, bool protect_by_ap);
+
+#define DECLARE_ALLOW_PASSTHRU(id)                                             \
+	COND_CODE_1(DT_NODE_HAS_PROP(id, allow_passthru),                      \
+		    (extern int DT_STRING_TOKEN(id, allow_passthru)(           \
+			     int, const struct ec_params_i2c_passthru *, bool, \
+			     bool);),                                          \
+		    ())
+
+DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, DECLARE_ALLOW_PASSTHRU)
+
+#define INIT_ALLOW_PASSTHRU(id)                                             \
+	[I2C_PORT(id)] = COND_CODE_1(                                       \
+		DT_NODE_HAS_PROP(id, allow_passthru),                       \
+		((allow_passthru_cb_t)DT_STRING_TOKEN(id, allow_passthru)), \
+		(protect_if_system_locked)),
+
+static const allow_passthru_cb_t i2c_allow_passthru_cb[I2C_PORT_COUNT] = {
+	[0 ...(I2C_PORT_COUNT - 1)] = protect_if_system_locked,
+	DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, INIT_ALLOW_PASSTHRU)
+};
+#endif
+
 static const struct device *i2c_devices[I2C_PORT_COUNT] = { I2C_FOREACH_PORT(
 	INIT_DEV_BINDING) };
 
@@ -69,7 +95,23 @@ int i2c_get_port_from_remote_port(int remote_port)
 	return remote_port;
 }
 
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED_DTS
+int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params,
+		       bool system_is_locked, bool protect_by_ap)
+{
+	if (port < 0 || port >= I2C_PORT_COUNT)
+		return 0;
+
+	if (i2c_allow_passthru_cb[port] == NULL)
+		return 0;
+
+	return i2c_allow_passthru_cb[port](port, params, system_is_locked,
+					   protect_by_ap);
+}
+#endif
+
 #ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_I2C_PORTMAP
+
 static int command_i2c_portmap(int argc, const char **argv)
 {
 	int i;

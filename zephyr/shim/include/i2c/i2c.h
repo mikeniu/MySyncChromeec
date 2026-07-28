@@ -6,6 +6,8 @@
 #ifndef ZEPHYR_CHROME_I2C_I2C_H
 #define ZEPHYR_CHROME_I2C_I2C_H
 
+#include <stdbool.h>
+
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/toolchain.h>
@@ -225,6 +227,38 @@ int i2c_get_port_from_remote_port(int remote_port);
  * @return i2c_ports enum if match is found, or -1 if not.
  */
 enum i2c_ports i2c_get_port_from_device(const struct device *i2c_dev);
+
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED_DTS
+struct ec_params_i2c_passthru;
+
+/**
+ * @brief Allow-passthru callback: protect if system is locked.
+ */
+int protect_if_system_locked(int port,
+			     const struct ec_params_i2c_passthru *params,
+			     bool system_is_locked, bool protect_by_ap);
+
+/**
+ * @brief Allow-passthru callback: no protect until enabled.
+ */
+int no_protect_until_enabled(int port,
+			     const struct ec_params_i2c_passthru *params,
+			     bool system_is_locked, bool protect_by_ap);
+
+/**
+ * @brief Check if I2C passthru is allowed on a port for given parameters.
+ *
+ * This function calls the port-specific allow_passthru callback defined in DTS.
+ *
+ * @param port The EC port number.
+ * @param params I2C passthru parameters.
+ * @param system_is_locked System locked status.
+ * @param protect_by_ap AP protection status.
+ * @return 1 if passthru is allowed, 0 if not allowed or callback not defined.
+ */
+int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params,
+		       bool system_is_locked, bool protect_by_ap);
+#endif
 
 #ifdef __cplusplus
 }
