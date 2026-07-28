@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a73b058_78ff85ea",
+        "filename": "zephyr/test/drivers/testcase.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 1878,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-28T17:38:10Z",
+      "side": 1,
+      "message": "Can we create a `watchdog/prj.conf`, since its being moved out of default?",
+      "revId": "0ed5986893949501159cee86909cdd53b1722491",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
