@@ -10,6 +10,7 @@
 
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/__assert.h>
+#include <zephyr/toolchain.h>
 
 LOG_MODULE_REGISTER(panic_data, LOG_LEVEL_INF);
 
@@ -32,7 +33,7 @@ static const uint32_t RISCV_PANIC_REG_RA = 29;
 /* Estimated end of the crash function. */
 static const uint32_t crash_end = crash_addr + 0x20;
 
-static void crash_system(void)
+static void __noinline crash_system(void)
 {
 	/* TODO(b/423904871): We should be able to use __ASSERT_NO_MSG when LTO
 	 * is enabled; we should prevent __ASSERT_NO_MSG from being outlined. */
