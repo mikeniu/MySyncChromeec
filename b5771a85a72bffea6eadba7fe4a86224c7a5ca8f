@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d655c46_c0a2d0a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-07-28T18:39:13Z",
+      "side": 1,
+      "message": "This needs an accompanying zephyr upstream change that currently has a PR open at https://github.com/zephyrproject-rtos/zephyr/pull/114717 I want to merge this in the meantime though as there is no effects on the current flows",
+      "revId": "b5771a85a72bffea6eadba7fe4a86224c7a5ca8f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
