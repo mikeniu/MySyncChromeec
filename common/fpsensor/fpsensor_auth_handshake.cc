@@ -44,6 +44,11 @@ fp_command_establish_pairing_key_keygen(struct host_cmd_handler_args *args)
 	auto *r = static_cast<ec_response_fp_establish_pairing_key_keygen *>(
 		args->response);
 
+	if (fingerprint_auth_enabled() ||
+	    check_context_cleared() != EC_SUCCESS) {
+		return EC_RES_ACCESS_DENIED;
+	}
+
 	ScopedFastCpu fast_cpu;
 
 	ecdh_key = generate_elliptic_curve_key();
@@ -121,6 +126,11 @@ fp_command_load_pairing_key(struct host_cmd_handler_args *args)
 {
 	const auto *params = static_cast<const ec_params_fp_load_pairing_key *>(
 		args->params);
+
+	if (fingerprint_auth_enabled() ||
+	    check_context_cleared() != EC_SUCCESS) {
+		return EC_RES_ACCESS_DENIED;
+	}
 
 	ScopedFastCpu fast_cpu;
 
