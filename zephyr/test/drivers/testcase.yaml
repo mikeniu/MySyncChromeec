@@ -205,6 +205,23 @@ tests:
     extra_conf_files:
     - prj.conf
     - acpi_strings_fifo/prj.conf
+  drivers.default.i2c_passthru_dts:
+    timeout: 360
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_DEFAULT=y
+    - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
+    - CONFIG_PLATFORM_EC_LID_ANGLE_UPDATE=y
+    - CONFIG_PLATFORM_EC_USB_PD_DPS=y
+    - CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED=n
+    - CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED_DTS=y
+    - CONFIG_PLATFORM_EC_CONSOLE_CMD_TCPC_DUMP=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT=y
+    extra_conf_files:
+    - prj.conf
+    - default/prj.conf
+    extra_dtc_overlay_files:
+    - default/boards/native_sim.overlay
+    - default/boards/touchpad.dtsi
   drivers.amd_fp6_usb_mux:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
