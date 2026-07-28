@@ -222,6 +222,13 @@ static inline bool charge_prevent_power_on(bool power_button_pressed)
 #endif
 
 /**
+ * Returns 0 to allow power-on, return 1 to prevent power-on.
+ */
+#ifdef CONFIG_PLATFORM_EC_CHARGER_CUSTOM_PREVENT_POWER_ON
+int custom_prevent_power_on(void);
+#endif
+
+/**
  * Get the last polled battery/charger temperature.
  *
  * @param idx		Sensor index to read.

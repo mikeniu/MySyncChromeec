@@ -1579,6 +1579,14 @@ bool charge_prevent_power_on(bool power_button_pressed)
 	struct batt_params params;
 	struct batt_params *current_batt_params = &curr.batt;
 
+#ifdef CONFIG_PLATFORM_EC_CHARGER_CUSTOM_PREVENT_POWER_ON
+	if (!power_button_pressed &&
+	    (charge_manager_get_power_limit_uw() <
+	     CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON)) {
+		prevent_power_on = custom_prevent_power_on();
+	}
+#endif
+
 	/* If battery params seem uninitialized then retrieve them */
 	if (current_batt_params->is_present == BP_NOT_SURE) {
 		battery_get_params(&params);
