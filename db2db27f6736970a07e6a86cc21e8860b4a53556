@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4f9e63a_860a24d1",
+        "filename": "common/charge_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1582,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-28T21:14:54Z",
+      "side": 1,
+      "message": "Disregard.  This is better as an #ifdef.",
+      "parentUuid": "709d5fd4_4ad57081",
+      "range": {
+        "startLine": 1582,
+        "startChar": 7,
+        "endLine": 1582,
+        "endChar": 57
+      },
+      "revId": "db2db27f6736970a07e6a86cc21e8860b4a53556",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4640e573_02af302d",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-28T21:07:37Z",
       "side": 1,
       "message": "This needs a unit test.",
+      "range": {
+        "startLine": 1586,
+        "startChar": 21,
+        "endLine": 1586,
+        "endChar": 44
+      },
+      "revId": "db2db27f6736970a07e6a86cc21e8860b4a53556",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97fc4257_8e134bd7",
+        "filename": "common/charge_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1586,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-28T21:14:54Z",
+      "side": 1,
+      "message": "I recommend creating a fake custom_prevent_power_on() for the generic Test that verifies the followingL\n* custom_prevent_power_on() causes charge_prevent_power_on() to return false.\n* If AC is present, then custom_prevent_power_on() should not be called.\n* If the power button is pressed custom_prevent_power_on() should not be called",
+      "parentUuid": "4640e573_02af302d",
       "range": {
         "startLine": 1586,
         "startChar": 21,
