@@ -88,6 +88,24 @@
       "parentUuid": "9e80c526_af2a7ab6",
       "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2954c29_521b6dc0",
+        "filename": "zephyr/shim/src/espi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-28T20:09:59Z",
+      "side": 1,
+      "message": "\u003e This issue is only specific to handling EC_CMD_HELLO which is posted by depthcharge for every 5 msec post it sends SYSJUMP/REBOOT host command to EC to check if EC is back and interface is functional.\n\n\u003e I further checked the code, for EC CMD HELLO depth charge waits for 100msec for the ec results and then times out. code reference\n\n\u003e If we implement the logic in RW init code, in that case would it be possible to respond within 100msec of time but in any case i see depth charge would send another HELLO command after 5msec of delay.\n\nMy primary concern was that the solution should be independent of the behavior of the AP, e.g. which command it sends at what time. Ideally, the part of the solution that takes place in RW would also be sufficient to avoid this issue on all platforms. At first glance, Al\u0027s idea seems appropriate to avoid this from the RO side. (Perhaps `handle_pending_reboot` could come before `host_send_response` and call into the ESPI driver.) With something like this in place, checking and clearing the busy bit during init would just be an extra protection; without updates to RO, that double check in RW might be critical.\n\nI\u0027m less concerned about whether the change in EC behavior conforms to the AP firmware\u0027s timing expectations. I presume that the command sent during the sysjump is going to end up failing one way or another.",
+      "parentUuid": "fdad0714_4c2a9f05",
+      "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
