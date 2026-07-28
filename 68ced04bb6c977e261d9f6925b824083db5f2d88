@@ -33,6 +33,60 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "68ced04bb6c977e261d9f6925b824083db5f2d88",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39cafd39_b42bfe99",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-28T02:57:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/bae0a2f0-582a-44f4-a462-2b8552caa522)]\n\n**Review Summary**\n* **Functionality**: The changes correctly check `fingerprint_auth_enabled()` and `check_context_cleared()` to reject `KEYGEN` and `LOAD_PAIRING_KEY` commands during active authentication.\n* **Security**: Enforces state checks to prevent pairing key operations during sensitive states, which is a good security improvement. A minor suggestion is provided to also protect `WRAP` for defense-in-depth.\n* **Style \u0026 Consistency**: The code is clean and adheres to the surrounding style.\n* **Testing**: ❌ **Needs attention**. The CL is missing test coverage for the newly added access denial paths.\n* **CL Size**: The CL is small, focused, and well-scoped to a single issue.\n\nCONV\u003dedcba465-b48d-4cba-bdc4-d1a11bbee9d4\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "68ced04bb6c977e261d9f6925b824083db5f2d88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1653d9b_220a4008",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-28T02:57:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing:** The CL doesn\u0027t appear to include test coverage for this new security enforcement. Please add test cases verifying that `EC_CMD_FP_ESTABLISH_PAIRING_KEY_KEYGEN` (and `LOAD_PAIRING_KEY`) return `EC_RES_ACCESS_DENIED` when `fingerprint_auth_enabled()` is true or when the context is not cleared.",
+      "isAi": true,
+      "revId": "68ced04bb6c977e261d9f6925b824083db5f2d88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b1aaafb_38aa7fc1",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-28T02:57:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Should we also enforce the `fingerprint_auth_enabled()` and `check_context_cleared()` checks in `EC_CMD_FP_ESTABLISH_PAIRING_KEY_WRAP`?\n\nEven though the pairing key isn\u0027t loaded into the device state until `EC_CMD_FP_LOAD_PAIRING_KEY`, enforcing this check in `WRAP` for consistency provides defense-in-depth and ensures no computationally expensive operations (like EC math) are performed during an active authentication session.",
+      "isAi": true,
+      "revId": "68ced04bb6c977e261d9f6925b824083db5f2d88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
