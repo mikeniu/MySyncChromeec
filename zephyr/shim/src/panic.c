@@ -116,15 +116,18 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_REASON(pdata) (pdata->x86.vector)
 #define PANIC_REG_INFO(pdata) (pdata->x86.error_code)
 #else
-/* Not implemented for this arch */
+/* Not implemented for this arch (e.g. native_sim). Fall back to using x86
+ * panic_data fields so software panic reason, info, and exception values
+ * can be written to and read from pdata memory directly.
+ */
 #define PANIC_ARCH PANIC_ARCH_UNSUPPORTED
+#if !defined(CONFIG_ZTEST)
+#error "Unsupported architecture for PANIC_ARCH"
+#endif
 #define PANIC_REG_LIST(M, M_GPR)
-static uint8_t placeholder_exception_reg;
-static uint32_t placeholder_reason_reg;
-static uint32_t placeholder_info_reg;
-#define PANIC_REG_EXCEPTION(unused) placeholder_exception_reg
-#define PANIC_REG_REASON(unused) placeholder_reason_reg
-#define PANIC_REG_INFO(unused) placeholder_info_reg
+#define PANIC_REG_EXCEPTION(pdata) (pdata->x86.eflags)
+#define PANIC_REG_REASON(pdata) (pdata->x86.vector)
+#define PANIC_REG_INFO(pdata) (pdata->x86.error_code)
 #endif
 
 /* Macros to be applied to PANIC_REG_LIST as M */
