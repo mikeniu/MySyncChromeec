@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e9ce650_ab49c45d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-28T02:54:01Z",
+      "side": 1,
+      "message": "this CL was reverted:\n\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7606884",
+      "revId": "68ced04bb6c977e261d9f6925b824083db5f2d88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
