@@ -12,6 +12,15 @@ add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
 zephyr_include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 zephyr_include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+if(CONFIG_TEST_AP_POWER_BOOT_STATE)
+# Boot state tests need the power signals preset before ec_app_main(), so
+# exclude the suites that assume the AP starts in G3.
+target_sources(app PRIVATE
+  src/boot_state.c
+  src/test_mocks.c
+  src/main.c
+  ${PLATFORM_EC_PROGRAM_DIR}/ocelot/src/rvp_board_power.c)
+else()
 target_sources(app PRIVATE
   src/ap_pwrseq.c
   src/console_command.c
@@ -43,3 +52,4 @@ target_sources_ifdef(CONFIG_TEST_AP_POWER_ATRIARVP app PRIVATE
 target_sources_ifdef(CONFIG_TEST_AP_POWER_OCELOTRVP app PRIVATE
   ${PLATFORM_EC_PROGRAM_DIR}/ocelot/src/rvp_board_power.c
   src/boards/ocelotrvp.c)
+endif()

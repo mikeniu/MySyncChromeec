@@ -170,6 +170,23 @@
 		nodes = <&en_pp3300_emul &ec_pch_rsmrst_emul>;
 	};
 
+	en_pp3300_no_rsmrst_emul: en-pp3300-no-rsmrst-emul {
+		compatible = "intel,ap-pwr-signal-emul";
+		input-signal = <&en_pp3300>;
+		init-value = <0>;
+		edge = "EDGE_ACTIVE_ON_DEASSERT";
+		/* RSMRST power good never asserts after the rail is enabled */
+		pp3300-rsmrst-emul {
+			output-signal = <&rsmrst>;
+			init-value = <0>;
+		};
+	};
+
+	tp-sys-g3-to-s0-timeout {
+		compatible = "intel,ap-pwr-test-platform";
+		nodes = <&en_pp3300_no_rsmrst_emul>;
+	};
+
 	pch_pwrok_power_fail_emul: pch-pwrok-power-fail-emul {
 		compatible = "intel,ap-pwr-signal-emul";
 		input-signal = <&pch_pwrok>;
@@ -185,6 +202,25 @@
 	tp-sys-s0-power-fail {
 		compatible = "intel,ap-pwr-test-platform";
 		nodes = <&pch_pwrok_power_fail_emul>;
+	};
+
+	all_sys_pwrgd_fail_emul: all-sys-pwrgd-fail-emul {
+		compatible = "intel,ap-pwr-signal-emul";
+		input-signal = <&all_sys_pwrgd>;
+		init-value = <0>;
+		edge = "EDGE_ACTIVE_ON_ASSERT";
+		/* Power good drops again before SYS_PWROK is generated */
+		all-sys-pwrgd-fail-emul {
+			output-signal = <&all_sys_pwrgd>;
+			assert-delay-ms = <10>;
+			invert-value;
+		};
+	};
+
+	tp-sys-g3-to-s0-all-sys-pwrgd-fail {
+		compatible = "intel,ap-pwr-test-platform";
+		nodes = <&en_pp3300_emul &ec_pch_rsmrst_emul
+			      &all_sys_pwrgd_fail_emul>;
 	};
 
 	pch_pwrok_power_down_emul: pch-pwrok-power-down-emul {

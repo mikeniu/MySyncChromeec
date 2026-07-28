@@ -211,9 +211,21 @@
 		nodes = <&en_pp3300_emul &ec_pch_rsmrst_emul>;
 	};
 
+	en_pp3300_no_rsmrst_emul: en-pp3300-no-rsmrst-emul {
+		compatible = "intel,ap-pwr-signal-emul";
+		input-signal = <&pwr_en_pp3300_a>;
+		init-value = <0>;
+		edge = "EDGE_ACTIVE_ON_DEASSERT";
+		/* RSMRST power good never asserts after the rail is enabled */
+		pp3300-rsmrst-emul {
+			output-signal = <&pwr_rsmrst_pwrgd>;
+			init-value = <0>;
+		};
+	};
+
 	tp-sys-g3-to-s0-timeout {
 		compatible = "intel,ap-pwr-test-platform";
-		nodes = <&en_pp3300_emul>;
+		nodes = <&en_pp3300_no_rsmrst_emul>;
 	};
 
 	tp-sys-s0-power-fail {
@@ -255,31 +267,31 @@
  * supported by the GPIO emulator.
  */
 &pwr_en_pp3300_a {
-	gpios = <&gpio0 0 0>;
+	gpios = <&gpio0 6 0>;
 };
 
 &pwr_rsmrst_pwrgd {
-	gpios = <&gpio0 1 0>;
+	gpios = <&gpio0 7 0>;
 };
 
 &pwr_ec_pch_rsmrst {
-	gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
+	gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
 };
 
 &pwr_slp_s0 {
-	gpios = <&gpio0 3 GPIO_ACTIVE_LOW>;
+	gpios = <&gpio0 9 GPIO_ACTIVE_LOW>;
 };
 
 &pwr_pch_pwrok {
-	gpios = <&gpio0 4 0>;
+	gpios = <&gpio0 10 0>;
 };
 
 &pwr_all_sys_pwrgd {
-	gpios = <&gpio0 5 0>;
+	gpios = <&gpio0 11 0>;
 };
 
 &pwr_sys_rst {
-	gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
+	gpios = <&gpio0 12 GPIO_ACTIVE_LOW>;
 };
 
 / {

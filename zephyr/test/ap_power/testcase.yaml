@@ -105,6 +105,7 @@ tests:
     - CONFIG_AP_X86_INTEL_MTL=y
     - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4=y
     - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5=y
+    - CONFIG_X86_NON_DSX_PWRSEQ_CONSOLE=y
     - CONFIG_AP_PWRSEQ_DRIVER=y
   ap_power_drv.meteorlake.rec:
     extra_dtc_overlay_files:
@@ -134,3 +135,83 @@ tests:
     - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4=y
     - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5=y
     - CONFIG_AP_PWRSEQ_DRIVER=y
+  ap_power.ocelotrvp.boot_s0:
+    extra_dtc_overlay_files:
+    - boards/native_sim.overlay
+    - boards/ocelotrvp_native_sim.overlay
+    extra_configs:
+    - CONFIG_TEST_AP_POWER_OCELOTRVP=y
+    - CONFIG_EMUL_POWER_SIGNALS=y
+    - CONFIG_X86_NON_DSX_PWRSEQ_MTL=y
+    - CONFIG_AP_PWRSEQ_S0IX=y
+    - CONFIG_AP_X86_INTEL_MTL=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S3=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5=y
+    - CONFIG_AP_PWRSEQ_DRIVER=y
+    - CONFIG_TEST_AP_POWER_BOOT_STATE=y
+    - CONFIG_TEST_AP_POWER_BOOT_S0=y
+  ap_power.ocelotrvp.boot_s3:
+    extra_dtc_overlay_files:
+    - boards/native_sim.overlay
+    - boards/ocelotrvp_native_sim.overlay
+    extra_configs:
+    - CONFIG_TEST_AP_POWER_OCELOTRVP=y
+    - CONFIG_EMUL_POWER_SIGNALS=y
+    - CONFIG_X86_NON_DSX_PWRSEQ_MTL=y
+    - CONFIG_AP_PWRSEQ_S0IX=y
+    - CONFIG_AP_X86_INTEL_MTL=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S3=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5=y
+    - CONFIG_AP_PWRSEQ_DRIVER=y
+    - CONFIG_TEST_AP_POWER_BOOT_STATE=y
+    - CONFIG_TEST_AP_POWER_BOOT_S3=y
+  ap_power.ocelotrvp.boot_s5:
+    extra_dtc_overlay_files:
+    - boards/native_sim.overlay
+    - boards/ocelotrvp_native_sim.overlay
+    extra_configs:
+    - CONFIG_TEST_AP_POWER_OCELOTRVP=y
+    - CONFIG_EMUL_POWER_SIGNALS=y
+    - CONFIG_X86_NON_DSX_PWRSEQ_MTL=y
+    - CONFIG_AP_PWRSEQ_S0IX=y
+    - CONFIG_AP_X86_INTEL_MTL=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S3=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5=y
+    - CONFIG_AP_PWRSEQ_DRIVER=y
+    - CONFIG_TEST_AP_POWER_BOOT_STATE=y
+    - CONFIG_TEST_AP_POWER_BOOT_S5=y
+  ap_power.ocelotrvp.boot_unknown:
+    extra_dtc_overlay_files:
+    - boards/native_sim.overlay
+    - boards/ocelotrvp_native_sim.overlay
+    extra_configs:
+    - CONFIG_TEST_AP_POWER_OCELOTRVP=y
+    - CONFIG_EMUL_POWER_SIGNALS=y
+    - CONFIG_X86_NON_DSX_PWRSEQ_MTL=y
+    - CONFIG_AP_PWRSEQ_S0IX=y
+    - CONFIG_AP_X86_INTEL_MTL=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S3=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5=y
+    - CONFIG_AP_PWRSEQ_DRIVER=y
+    - CONFIG_TEST_AP_POWER_BOOT_STATE=y
+    - CONFIG_TEST_AP_POWER_BOOT_UNKNOWN=y
+  ap_power.ocelotrvp.boot_rsmrst:
+    extra_dtc_overlay_files:
+    - boards/native_sim.overlay
+    - boards/ocelotrvp_native_sim.overlay
+    extra_configs:
+    - CONFIG_TEST_AP_POWER_OCELOTRVP=y
+    - CONFIG_EMUL_POWER_SIGNALS=y
+    - CONFIG_X86_NON_DSX_PWRSEQ_MTL=y
+    - CONFIG_AP_PWRSEQ_S0IX=y
+    - CONFIG_AP_X86_INTEL_MTL=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S3=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4=y
+    - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5=y
+    - CONFIG_AP_PWRSEQ_DRIVER=y
+    - CONFIG_TEST_AP_POWER_BOOT_STATE=y
+    - CONFIG_TEST_AP_POWER_BOOT_RSMRST=y

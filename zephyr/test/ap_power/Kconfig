@@ -40,4 +40,33 @@ config TEST_AP_POWER_RECOVERY_MODE
 	  Run AP power sequencing tests, but boot into recovery mode and verify
 	  functionality of the CSE early recovery GPIO driver.
 
+config TEST_AP_POWER_BOOT_STATE
+	bool "AP power sequencing tests for EC boot state detection"
+	depends on TEST_AP_POWER_OCELOTRVP
+	help
+	  Build only the boot state detection tests. The power signals are
+	  preset before ec_app_main() so the power sequence starts in the
+	  state detected from the hardware rather than in G3.
+
+choice TEST_AP_POWER_BOOT_STATE_CHOICE
+	prompt "Power state presented to the EC at boot"
+	depends on TEST_AP_POWER_BOOT_STATE
+
+config TEST_AP_POWER_BOOT_S0
+	bool "Boot with the AP in S0"
+
+config TEST_AP_POWER_BOOT_S3
+	bool "Boot with the AP in S3"
+
+config TEST_AP_POWER_BOOT_S5
+	bool "Boot with the AP in S5"
+
+config TEST_AP_POWER_BOOT_UNKNOWN
+	bool "Boot with the AP in an undeterminable state"
+
+config TEST_AP_POWER_BOOT_RSMRST
+	bool "Boot with the rails up but RSMRST not released to the PCH"
+
+endchoice
+
 source "Kconfig.zephyr"
