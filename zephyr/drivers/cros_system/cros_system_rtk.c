@@ -163,7 +163,9 @@ const char *cros_system_chip_name(void)
 
 const char *cros_system_chip_revision(void)
 {
-	static char buf[sizeof("VF1")];
+	/* "VF255" serves as a size template: "V" + 1 char + up to 3 digits
+	 * (255) + '\0' (6 bytes total) */
+	static char buf[sizeof("VF255")];
 	ensure_otp_initialized();
 	uint8_t main_version = cached_otp.version.main_version;
 	uint8_t sub_version = cached_otp.version.sub_version;
