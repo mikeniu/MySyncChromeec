@@ -35,6 +35,13 @@ config PLATFORM_EC_I2C_PASSTHRU_RESTRICTED
 	  Once enabled, board_allow_i2c_passthru function has to be implemented,
 	  which defines the allowed usage of the command.
 
+config PLATFORM_EC_I2C_PASSTHRU_RESTRICTED_DTS
+	bool "Restrict I2C PASSTHRU command by dts definition"
+	help
+	  Enables dts-configured restrictions for the I2C PASSTHRU host command.
+	  Once enabled, allow-passthru in cros-ec-i2c-port-base node is used to
+	  control the allowed usage of the command.
+
 config PLATFORM_EC_I2C_DEBUG_PASSTHRU
 	bool "I2C Passthru Debug"
 	help
