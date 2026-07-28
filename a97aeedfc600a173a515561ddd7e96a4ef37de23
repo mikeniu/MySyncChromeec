@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b2f89ea0_b39880ec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-07-28T14:52:03Z",
+      "side": 1,
+      "message": "Add the following line above `Change-Id`:\n\n```\nCq-Depend: chrome-internal:9553836\n```",
+      "parentUuid": "fea57b7f_2e337b32",
+      "revId": "a97aeedfc600a173a515561ddd7e96a4ef37de23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4531034a_e6ef0a45",
         "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
         "patchSetId": 5
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Am I doing right now?",
       "parentUuid": "4531034a_e6ef0a45",
+      "revId": "a97aeedfc600a173a515561ddd7e96a4ef37de23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ee389ff_4366de5b",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-07-28T14:52:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6e002ed8_ca31eee0",
       "revId": "a97aeedfc600a173a515561ddd7e96a4ef37de23",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
