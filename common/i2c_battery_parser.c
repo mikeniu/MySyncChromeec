@@ -4,6 +4,7 @@
 
 #include "battery_smart.h"
 #include "i2c_battery_parser.h"
+#include "i2c_msg_queue.h"
 
 struct i2c_battery_parser_state i2c_battery_parser_state_create(void)
 {
