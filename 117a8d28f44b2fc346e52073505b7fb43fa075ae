@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a48e7d0_bb53f4c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-28T11:13:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — All checks pass. [[trajectory](go/traj/482932ef-0f08-4ecb-bc13-4270e3d3ab82)]\n\n### Review Summary\n* **Functionality**: The refactoring effectively replaces `SECTION_IS_RO` and `SECTION_IS_RW` with the corresponding Kconfig flags (`CONFIG_CROS_EC_RO` and `CONFIG_CROS_EC_RW`), unifying the build logic under Zephyr’s configuration framework and cleaning up `Makefile.toolchain` and `output_packers.py`.\n* **Security**: No security implications. The changes are strictly build-time macros and flags.\n* **Style \u0026 Consistency**: The macros have been consistently updated across source files, `testcase.yaml` files, and Makefiles. The usage of `IS_ENABLED(CONFIG_CROS_EC_RW)` is correct for both legacy builds and Zephyr builds.\n* **Testing**: `testcase.yaml` configurations across multiple boards and test suites have been successfully migrated to use the new Kconfigs via `extra_configs`. The test instructions in the CL description indicate thorough verification.\n* **CL Size**: While the patch touches many files, it is an atomic refactoring of a single concept, making the scope appropriate.\n\n**Minor Suggestion (Optional)**:\nIn `zephyr/app/ec/Kconfig`, there is a pre-existing grammatical typo in the help text for the `CROS_EC_RO` and `CROS_EC_RW` configs (lines 52 and 58 in the file context): `\"This build is will be for...\"`. Consider fixing it to `\"This build will be for...\"` while you are touching this choice block.\n\nTAG\u003dagy\nCONV\u003ddff4287c-5460-4e39-9d94-6a4be54b0410",
+      "isAi": true,
+      "revId": "117a8d28f44b2fc346e52073505b7fb43fa075ae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
