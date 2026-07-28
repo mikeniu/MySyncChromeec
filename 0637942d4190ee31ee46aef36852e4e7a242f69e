@@ -52,6 +52,24 @@
       "parentUuid": "174f9129_09b1672a",
       "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e80c526_af2a7ab6",
+        "filename": "zephyr/shim/src/espi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-07-28T09:59:14Z",
+      "side": 1,
+      "message": "Hi Abe,\n\nI have updated the sequence now in SYSJUMP handling, first disabling the AP interrupts and then send AP response with ERROR status. This ensures that host would not send any host commands post sending pending ACK from EC.\n\nI further checked the code, for EC CMD HELLO depth charge waits for 100msec for the ec results and then times out. code reference \nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/depthcharge/src/drivers/ec/cros/lpc.c;l\u003d176  \n\nIf we implement the logic in RW init code, in that case would it be possible to respond within 100msec of time but in any case i see depth charge would send another HELLO command after 5msec of delay.\n\nLet me know your thoughts.",
+      "parentUuid": "c1b67469_2c9dfacf",
+      "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
