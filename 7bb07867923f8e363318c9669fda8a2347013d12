@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "43cdf263_638d23cf",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-28T01:47:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "408067bd_a170ee9c",
+      "range": {
+        "startLine": 235,
+        "startChar": 19,
+        "endLine": 235,
+        "endChar": 31
+      },
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a4b3a06a_944b027b",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b453e8c5_068c82dd",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-28T01:47:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4b3a06a_944b027b",
+      "range": {
+        "startLine": 314,
+        "startChar": 0,
+        "endLine": 314,
+        "endChar": 13
+      },
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "843f80e1_0d8da038",
@@ -60,6 +108,24 @@
       "writtenOn": "2026-07-24T21:58:19Z",
       "side": 1,
       "message": "Nit: This is very conventional flag name. I feel like it should be in the common args, and what it\u0027s verbose about should depend on the command. Having it only available as an option to a sub-command feels weird.",
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02f68242_de4779fd",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-28T01:47:50Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "843f80e1_0d8da038",
       "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -99,6 +165,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80f3ddf9_f8d0d8a1",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-28T01:47:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5cc7059_628c667d",
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "65287665_fa86010c",
@@ -112,6 +196,24 @@
       "writtenOn": "2026-07-24T21:58:19Z",
       "side": 1,
       "message": "At a high level, it seems like an awkward pattern to invoke an external binary to compare binaries, then throw if that comparison doesn\u0027t match, then call an internal routine that does, among other things, essentially the same comparison. It seems more natural to me to do something like the Python binary comparison from `analyze_bin_diffs` first and then do the other comparisons based on the return value.\n\nPerhaps the external `cmp` is significantly faster than the Python comparison, and you\u0027d prefer to avoid the internal Python comparison if possible. I could see it going either way. If the Python comparison is much slower, I\u0027m wondering if it\u0027s possible to integrate the external `cmp` or something similar into the different-files code path so that that way can benefit from a faster comparison as well.",
+      "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d517ccef_ee1cf2b7",
+        "filename": "zephyr/zmake/zmake/compare_builds.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-28T01:47:50Z",
+      "side": 1,
+      "message": "My original intent with this change is to be able to answer the question, \"How does this change affect the build size?\" \nTo which I can run \n```\nzmake compare-builds -A --ref1 HEAD --ref2 cros/main\n``` \nleveraging its ability to build at each commit, expecting it to fail/throw, and provide summarized table of ROM/RAM deltas. An example output can be seen in https://crrev.com/c/8135294.  \n\nAs I was verifying this, I didn\u0027t want to keep rebuilding HEAD and cros/main variants, so I kept the temporary output of `compare-builds`  and passed those to `analyze-build-diff` subcommand.  I don\u0027t foresee `analyze-build-diff` subcommand to be used a lot but wanted to provide it just in case.  \n\nMaybe someone\u0027s workflow could be\n```\nzmake build moonstone\nmv build/zephyr/moonstone build/zephyr/moonstone-cros-main\n\u003cadd new feature\u003e\nzmake build moonstone\nzmake analyze-build-diff --target1 build/zephyr/moonstone --target2 build/zephyr/moonstone-cros-main\n```",
+      "parentUuid": "65287665_fa86010c",
       "revId": "7bb07867923f8e363318c9669fda8a2347013d12",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
