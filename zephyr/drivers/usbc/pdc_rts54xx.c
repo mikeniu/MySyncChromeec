@@ -1769,7 +1769,7 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 
 	/* DFP VDO */
 	dfp_vdo.version = DFP_VDO_VERSION_1_2;
-	dfp_vdo.usb4_cap = cfg->usb4_support_as_host;
+	dfp_vdo.usb4_cap = pdc_is_usb4_capable_as_host(dev);
 	dfp_vdo.usb3_cap = true;
 	dfp_vdo.usb2_cap = true;
 	dfp_vdo.port_num = cfg->connector_number;
@@ -2388,6 +2388,14 @@ static bool rts54_get_hw_frs_support(const struct device *dev)
 		(const struct pdc_config_t *)dev->config;
 
 	return cfg->frs_supported;
+}
+
+static bool rts54_is_usb4_capable_as_host(const struct device *dev)
+{
+	const struct pdc_config_t *cfg =
+		(const struct pdc_config_t *)dev->config;
+
+	return cfg->usb4_support_as_host;
 }
 
 static int rts54_get_vbus_voltage(const struct device *dev, uint16_t *voltage)
@@ -3146,6 +3154,7 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.get_info = rts54_get_info,
 	.get_hw_config = rts54_get_hw_config,
 	.get_hw_frs_support = rts54_get_hw_frs_support,
+	.is_usb4_capable_as_host = rts54_is_usb4_capable_as_host,
 	.set_power_level = rts54_set_power_level,
 	.reconnect = rts54_reconnect,
 	.update_retimer = rts54_set_retimer_update_mode,

@@ -626,6 +626,19 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_partner_usb_comm_capable)
 	}
 }
 
+ZTEST_USER(pdc_power_mgmt_api, test_is_usb4_capable_as_host)
+{
+	const struct device *dev = DEVICE_DT_GET(RTS5453P_NODE);
+
+	zassert_false(pdc_power_mgmt_is_usb4_capable_as_host(-1));
+	zassert_false(pdc_power_mgmt_is_usb4_capable_as_host(
+		CONFIG_USB_PD_PORT_MAX_COUNT));
+
+	bool expected = pdc_is_usb4_capable_as_host(dev);
+	zassert_equal(expected,
+		      pdc_power_mgmt_is_usb4_capable_as_host(TEST_PORT));
+}
+
 ZTEST_USER(pdc_power_mgmt_api, test_get_partner_data_swap_capable)
 {
 	int i;

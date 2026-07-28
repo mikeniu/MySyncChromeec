@@ -235,8 +235,19 @@ struct pdc_config_t {
 	bool ccd;
 	/** Whether or not this port supports FRS */
 	bool frs_supported;
+	/** Whether or not this port supports USB4 as a host */
+	bool usb4_support_as_host;
 	/** The index of the port on chip */
 	uint8_t port_index_on_chip;
+};
+
+/**
+ * @brief USB4 host capability evaluation state
+ */
+enum pdc_usb4_host_cap_state {
+	PDC_USB4_HOST_UNKNOWN = 0,
+	PDC_USB4_HOST_NOT_SUPPORTED,
+	PDC_USB4_HOST_SUPPORTED,
 };
 
 /**
@@ -255,6 +266,8 @@ struct pdc_data_t {
 	struct gpio_callback gpio_cb;
 	/** Information about the PDC */
 	struct pdc_info_t info;
+	/** Latched USB4 host capability state */
+	enum pdc_usb4_host_cap_state usb4_host_cap;
 	/** Init done flag */
 	bool init_done;
 	/* Init attempt counter */
@@ -2541,10 +2554,26 @@ static enum smf_state_result st_task_wait_run(void *o)
 #endif
 		len = sizeof(struct capability_t);
 		break;
-	case UCSI_GET_CONNECTOR_CAPABILITY:
+	case UCSI_GET_CONNECTOR_CAPABILITY: {
 		offset = 1;
+		if (data->usb4_host_cap == PDC_USB4_HOST_UNKNOWN) {
+			union connector_capability_t *ccaps =
+				(union connector_capability_t *)&cmd_data
+					.data[offset];
+
+			if (ccaps->ext_op_mode_usb4_gen2 ||
+			    ccaps->ext_op_mode_usb4_gen3 ||
+			    ccaps->ext_op_mode_usb4_gen4) {
+				data->usb4_host_cap = PDC_USB4_HOST_SUPPORTED;
+			} else {
+				data->usb4_host_cap =
+					PDC_USB4_HOST_NOT_SUPPORTED;
+			}
+		}
+
 		len = sizeof(union connector_capability_t);
 		break;
+	}
 	case UCSI_GET_CONNECTOR_STATUS: {
 		offset = 1;
 		union connector_status_t *cs =
@@ -3027,6 +3056,13 @@ static bool tps_get_hw_frs_support(const struct device *dev)
 	return cfg->frs_supported;
 }
 
+static bool tps_is_usb4_capable_as_host(const struct device *dev)
+{
+	struct pdc_data_t *data = dev->data;
+
+	return data->usb4_host_cap == PDC_USB4_HOST_SUPPORTED;
+}
+
 static int tps_get_vbus_voltage(const struct device *dev, uint16_t *voltage)
 {
 	if (voltage == NULL) {
@@ -3342,6 +3378,7 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.get_info = tps_get_info,
 	.get_hw_config = tps_get_hw_config,
 	.get_hw_frs_support = tps_get_hw_frs_support,
+	.is_usb4_capable_as_host = tps_is_usb4_capable_as_host,
 	.set_power_level = tps_set_power_level,
 	.reconnect = tps_reconnect,
 	.get_cable_property = tps_get_cable_property,
@@ -3401,6 +3438,9 @@ static int pdc_init(const struct device *dev)
 	data->cmd = CMD_NONE;
 	data->init_done = false;
 	data->info.fw_version = PDC_FWVER_INVALID;
+	data->usb4_host_cap = cfg->usb4_support_as_host ?
+				      PDC_USB4_HOST_SUPPORTED :
+				      PDC_USB4_HOST_UNKNOWN;
 
 	rv = gpio_pin_configure_dt(&cfg->irq_gpios, GPIO_INPUT);
 	if (rv < 0) {
@@ -3569,6 +3609,8 @@ BUILD_ASSERT(
 		.no_fw_update = DT_INST_PROP(inst, no_fw_update),              \
 		.ccd = DT_INST_PROP(inst, ccd),                                \
 		.frs_supported = DT_INST_PROP(inst, frs_supported),            \
+		.usb4_support_as_host =                                        \
+			DT_INST_PROP_OR(inst, usb4_capable_as_host, false),    \
 		.port_index_on_chip = DT_INST_PROP(inst, port_index_on_chip),  \
 	};                                                                     \
                                                                                \

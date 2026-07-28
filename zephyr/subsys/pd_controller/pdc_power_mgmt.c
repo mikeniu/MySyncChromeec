@@ -4634,6 +4634,15 @@ bool pdc_power_mgmt_get_partner_usb_comm_capable(int port)
 	       pdc_data[port]->port.ccaps.ext_op_mode_usb4_gen4;
 }
 
+bool pdc_power_mgmt_is_usb4_capable_as_host(int port)
+{
+	if (!pdc_power_mgmt_is_pdc_port_valid(port)) {
+		return false;
+	}
+
+	return pdc_is_usb4_capable_as_host(pdc_data[port]->port.pdc);
+}
+
 bool pdc_power_mgmt_get_partner_unconstr_power(int port)
 {
 	/* Make sure port is sink connected */

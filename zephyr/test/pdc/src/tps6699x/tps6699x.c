@@ -733,3 +733,22 @@ ZTEST_USER(tps6699x, test_update_retimer_fail)
 
 	pdc_set_cc_callback(dev, NULL);
 }
+
+ZTEST_USER(tps6699x, test_is_usb4_capable_as_host_dynamic)
+{
+	union connector_capability_t caps = { 0 }, out_caps = { 0 };
+
+	/* Initially, emulator caps has no USB4 bits, so should be false */
+	zassert_false(pdc_is_usb4_capable_as_host(dev));
+
+	/* Set USB4 Gen 2 capability on emulator */
+	caps.ext_op_mode_usb4_gen2 = 1;
+	zassert_ok(emul_pdc_set_connector_capability(emul, &caps));
+
+	/* Run GET_CONNECTOR_CAPABILITY to trigger one-time latching */
+	zassert_ok(pdc_get_connector_capability(dev, &out_caps));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	/* Now pdc_is_usb4_capable_as_host should return true */
+	zassert_true(pdc_is_usb4_capable_as_host(dev));
+}

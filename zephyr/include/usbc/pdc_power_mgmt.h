@@ -85,6 +85,14 @@ void pdc_subsys_start(void);
 bool pdc_power_mgmt_is_connected(int port);
 
 /**
+ * @brief Check if a USB-C port is capable of USB4 as a host.
+ *
+ * @param port USB-C port number
+ * @retval true if the port is USB4-capable as a host, false otherwise.
+ */
+bool pdc_power_mgmt_is_usb4_capable_as_host(int port);
+
+/**
  * @brief Get the number of USB-C ports in the system
  *
  * @retval CONFIG_USB_PD_PORT_MAX_COUNT

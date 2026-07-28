@@ -269,6 +269,7 @@ typedef int (*pdc_get_info_t)(const struct device *dev, struct pdc_info_t *info,
 typedef int (*pdc_get_hw_config_t)(const struct device *dev,
 				   struct pdc_hw_config_t *config);
 typedef bool (*pdc_get_hw_frs_support_t)(const struct device *dev);
+typedef bool (*pdc_is_usb4_capable_as_host_t)(const struct device *dev);
 typedef int (*pdc_get_current_pdo_t)(const struct device *dev, uint32_t *pdo);
 typedef int (*pdc_read_power_level_t)(const struct device *dev);
 typedef int (*pdc_set_power_level_t)(const struct device *dev,
@@ -353,6 +354,7 @@ __subsystem struct pdc_driver_api {
 	pdc_get_info_t get_info;
 	pdc_get_hw_config_t get_hw_config;
 	pdc_get_hw_frs_support_t get_hw_frs_support;
+	pdc_is_usb4_capable_as_host_t is_usb4_capable_as_host;
 	pdc_set_power_level_t set_power_level;
 	pdc_reconnect_t reconnect;
 	pdc_update_retimer_fw_t update_retimer;
@@ -1403,6 +1405,20 @@ static inline bool pdc_get_frs_supported(const struct device *dev)
 		 "GET_FRS_SUPPORTED is not optional");
 
 	return DEVICE_API_GET(pdc, dev)->get_hw_frs_support(dev);
+}
+
+/**
+ * @brief Returns whether the PDC port supports USB4 as a host
+ *
+ * @param dev Pointer to the PDC device instance
+ * @return true if the PDC supports USB4 as a host, false otherwise.
+ */
+static inline bool pdc_is_usb4_capable_as_host(const struct device *dev)
+{
+	__ASSERT(DEVICE_API_GET(pdc, dev)->is_usb4_capable_as_host != NULL,
+		 "IS_USB4_CAPABLE_AS_HOST is not optional");
+
+	return DEVICE_API_GET(pdc, dev)->is_usb4_capable_as_host(dev);
 }
 
 /**

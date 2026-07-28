@@ -630,3 +630,11 @@ ZTEST_USER(rts54xx, test_dfp_and_ufp_vdo_ack_programming)
 	dfp.raw_value = dfp_vdo_raw;
 	zassert_equal(dfp.usb4_cap, 0, "DFP VDO USB4 cap for dev2 should be 0");
 }
+
+ZTEST_USER(rts54xx, test_is_usb4_capable_as_host)
+{
+	zassert_true(pdc_is_usb4_capable_as_host(dev),
+		     "dev should be USB4 capable as host");
+	zassert_false(pdc_is_usb4_capable_as_host(dev2),
+		      "dev2 should NOT be USB4 capable as host");
+}
