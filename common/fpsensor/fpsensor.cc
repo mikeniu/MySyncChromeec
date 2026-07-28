@@ -49,7 +49,7 @@
 #error "fpsensor requires RNG"
 #endif
 
-#if defined(SECTION_IS_RO)
+#if defined(CONFIG_CROS_EC_RO)
 #error "fpsensor code should not be in RO image."
 #endif
 
