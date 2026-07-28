@@ -21,6 +21,16 @@
 extern "C" {
 #endif
 
+#if defined(CONFIG_ARM)
+#define PANIC_ARCH PANIC_ARCH_CORTEX_M
+#elif defined(CONFIG_RISCV) && !defined(CONFIG_64BIT)
+#define PANIC_ARCH PANIC_ARCH_RISCV_RV32I
+#elif defined(CONFIG_X86)
+#define PANIC_ARCH PANIC_ARCH_X86
+#else
+#define PANIC_ARCH PANIC_ARCH_UNSUPPORTED
+#endif
+
 #ifdef CONFIG_RO_PANIC_DATA_SIZE
 BUILD_ASSERT(sizeof(struct panic_data) == CONFIG_RO_PANIC_DATA_SIZE);
 #endif

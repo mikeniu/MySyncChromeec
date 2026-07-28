@@ -20,6 +20,10 @@
 
 LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 
+#if PANIC_ARCH == PANIC_ARCH_UNSUPPORTED && !defined(CONFIG_ZTEST)
+#error "Unsupported architecture for PANIC_ARCH"
+#endif
+
 /*
  * Arch-specific configuration
  *
@@ -35,7 +39,6 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
  */
 
 #if defined(CONFIG_ARM)
-#define PANIC_ARCH PANIC_ARCH_CORTEX_M
 #if defined(CONFIG_EXTRA_EXCEPTION_INFO)
 #define EXTRA_PANIC_REG_LIST(M, M_GPR)                                       \
 	M_GPR(extra_info.callee->v1, cm.regs[CORTEX_PANIC_REGISTER_R4], v1)  \
@@ -78,7 +81,6 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
  * the mcause register is not saved (mstatus is saved instead).
  * The assignments must match include/panic_defs.h
  */
-#define PANIC_ARCH PANIC_ARCH_RISCV_RV32I
 #define PANIC_REG_LIST(M, M_GPR)  \
 	M(ra, riscv.regs[29], ra) \
 	M(a0, riscv.regs[26], a0) \
@@ -102,7 +104,6 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_REASON(pdata) (pdata->riscv.regs[11])
 #define PANIC_REG_INFO(pdata) (pdata->riscv.regs[10])
 #elif defined(CONFIG_X86)
-#define PANIC_ARCH PANIC_ARCH_X86
 #define PANIC_REG_LIST(M, M_GPR) \
 	M(eax, x86.eax, eax)     \
 	M(ebx, x86.ebx, ebx)     \
@@ -116,15 +117,14 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_REASON(pdata) (pdata->x86.vector)
 #define PANIC_REG_INFO(pdata) (pdata->x86.error_code)
 #else
-/* Not implemented for this arch */
-#define PANIC_ARCH PANIC_ARCH_UNSUPPORTED
+/* Not implemented for this arch (e.g. native_sim). Fall back to using x86
+ * panic_data fields so software panic reason, info, and exception values
+ * can be written to and read from pdata memory directly.
+ */
 #define PANIC_REG_LIST(M, M_GPR)
-static uint8_t placeholder_exception_reg;
-static uint32_t placeholder_reason_reg;
-static uint32_t placeholder_info_reg;
-#define PANIC_REG_EXCEPTION(unused) placeholder_exception_reg
-#define PANIC_REG_REASON(unused) placeholder_reason_reg
-#define PANIC_REG_INFO(unused) placeholder_info_reg
+#define PANIC_REG_EXCEPTION(pdata) (pdata->x86.eflags)
+#define PANIC_REG_REASON(pdata) (pdata->x86.vector)
+#define PANIC_REG_INFO(pdata) (pdata->x86.error_code)
 #endif
 
 /* Macros to be applied to PANIC_REG_LIST as M */
