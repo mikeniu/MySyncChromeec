@@ -222,6 +222,18 @@ static inline bool charge_prevent_power_on(bool power_button_pressed)
 #endif
 
 /**
+ * Returns 0 to allow power-on, return 1 to prevent power-on.
+ */
+int custom_prevent_power_on(void);
+
+/**
+ * Return true if the charger can provide sufficient power for power-on.
+ */
+#ifdef CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON
+bool charger_has_sufficient_power_for_power_on(void);
+#endif
+
+/**
  * Get the last polled battery/charger temperature.
  *
  * @param idx		Sensor index to read.
