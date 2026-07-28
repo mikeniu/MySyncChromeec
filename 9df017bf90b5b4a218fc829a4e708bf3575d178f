@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ee045e0_1c71173b",
+        "filename": "common/charge_state.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1582,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-07-28T14:37:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2a773d7_add41394",
+      "revId": "9df017bf90b5b4a218fc829a4e708bf3575d178f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b26b8828_7084de4b",
