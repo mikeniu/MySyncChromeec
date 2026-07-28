@@ -87,6 +87,24 @@
       "isAi": true,
       "revId": "68ced04bb6c977e261d9f6925b824083db5f2d88",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fee84d0_3ef4367b",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-28T05:34:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b1aaafb_38aa7fc1",
+      "revId": "68ced04bb6c977e261d9f6925b824083db5f2d88",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
