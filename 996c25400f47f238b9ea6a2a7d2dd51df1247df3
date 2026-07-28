@@ -71,6 +71,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2570f9a3_68d3807c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4246563
+      },
+      "writtenOn": "2026-07-28T05:25:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "60be1143_05ac1c1e",
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a71371ef_344ea8b5",
@@ -191,6 +209,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1eab384_771f859a",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 4246563
+      },
+      "writtenOn": "2026-07-28T05:25:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "86a81883_9f3ce6c7",
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d124a72e_d763575b",
@@ -299,6 +335,30 @@
       "side": 1,
       "message": "Please review the updated patch set. I have added additional EC log messages and additional comments to give more description of the code changes.",
       "parentUuid": "f28bc7a6_7649c77c",
+      "range": {
+        "startLine": 234,
+        "startChar": 5,
+        "endLine": 234,
+        "endChar": 9
+      },
+      "revId": "996c25400f47f238b9ea6a2a7d2dd51df1247df3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4a860f0_4ec31a0a",
+        "filename": "common/power_button.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 4246563
+      },
+      "writtenOn": "2026-07-28T05:25:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2c8ba25a_85087b86",
       "range": {
         "startLine": 234,
         "startChar": 5,
