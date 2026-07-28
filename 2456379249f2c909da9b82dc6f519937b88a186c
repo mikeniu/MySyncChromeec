@@ -82,6 +82,30 @@
       },
       "revId": "2456379249f2c909da9b82dc6f519937b88a186c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66c1d71d_b918a9fc",
+        "filename": "zephyr/test/fingerprint/task/testcase.yaml",
+        "patchSetId": 26
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-07-28T16:45:02Z",
+      "side": 1,
+      "message": "Thanks for the explanation!",
+      "parentUuid": "42d5115e_ad845c0a",
+      "range": {
+        "startLine": 9,
+        "startChar": 4,
+        "endLine": 9,
+        "endChar": 23
+      },
+      "revId": "2456379249f2c909da9b82dc6f519937b88a186c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
