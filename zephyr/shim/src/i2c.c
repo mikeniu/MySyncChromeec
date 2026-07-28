@@ -44,6 +44,16 @@ static const int i2c_remote_ports[I2C_PORT_COUNT] = {
 	DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, INIT_REMOTE_PORTS)
 };
 
+#define INIT_PROTECT_TYPE(id)                                             \
+	[I2C_PORT(id)] = COND_CODE_1(DT_NODE_HAS_PROP(id, protect_type),  \
+				     (DT_STRING_TOKEN(id, protect_type)), \
+				     (I2C_PROTECT_TYPE_NONE)),
+
+static const enum i2c_protect_type i2c_protect_type_map[I2C_PORT_COUNT] = {
+	[0 ...(I2C_PORT_COUNT - 1)] = I2C_PROTECT_TYPE_NONE,
+	DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, INIT_PROTECT_TYPE)
+};
+
 static const struct device *i2c_devices[I2C_PORT_COUNT] = { I2C_FOREACH_PORT(
 	INIT_DEV_BINDING) };
 
@@ -67,6 +77,14 @@ int i2c_get_port_from_remote_port(int remote_port)
 	 * port number.
 	 */
 	return remote_port;
+}
+
+enum i2c_protect_type i2c_get_protect_type(int port)
+{
+	if (port < 0 || port >= I2C_PORT_COUNT)
+		return I2C_PROTECT_TYPE_NONE;
+
+	return i2c_protect_type_map[port];
 }
 
 #ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_I2C_PORTMAP

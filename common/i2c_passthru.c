@@ -269,6 +269,15 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	if (ret)
 		return ret;
 
+#ifdef CONFIG_ZEPHYR
+	if ((i2c_get_protect_type(port) == PROTECT_IF_SYSTEM_IS_LOCKED &&
+	     system_is_locked()) ||
+	    (i2c_get_protect_type(port) == NO_PROTECT_UNTIL_ENABLED &&
+	     port_protected[port])) {
+		return EC_RES_ACCESS_DENIED;
+	}
+#endif
+
 	if (port_protected[port]) {
 		if (!i2c_port->passthru_allowed)
 			return EC_RES_ACCESS_DENIED;
