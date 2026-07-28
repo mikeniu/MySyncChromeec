@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "126c7fca_d1feccc0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-28T15:13:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/14630597-f5e4-42a0-9bb1-56569ad5e90a)]\n\n### Review Summary\n* **Functionality**: The CL accurately and comprehensively replaces legacy `SECTION_IS_RO` and `SECTION_IS_RW` macros with `CONFIG_CROS_EC_RO` and `CONFIG_CROS_EC_RW` across the codebase. It properly relies on Zephyr\u0027s Kconfig system and cleans up the Makefiles and `zmake` scripts.\n* **Security**: No security concerns. The patch is strictly a structural refactoring of build macros.\n* **Style \u0026 Consistency**: The updates are consistently applied across C source files, header files, test configurations (`testcase.yaml`, `prj.conf`), and build files.\n* **Testing \u0026 Test Coverage**: Test environments have been appropriately updated to define the new variables using `extra_configs` rather than `extra_args` with `EXTRA_CFLAGS`.\n* **CL Size \u0026 Scope**: This is an atomic, self-contained refactoring CL. The large number of modified files is justified given the mechanical nature of replacing these macros globally.\n\nTAG\u003dagy\nCONV\u003d71aef82a-6b7f-458e-b476-7f2b354c0be3",
+      "isAi": true,
+      "revId": "2456379249f2c909da9b82dc6f519937b88a186c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
