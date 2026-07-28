@@ -70,6 +70,24 @@
       "parentUuid": "c1b67469_2c9dfacf",
       "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdad0714_4c2a9f05",
+        "filename": "zephyr/shim/src/espi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-28T16:29:27Z",
+      "side": 1,
+      "message": "Looking over the bug and comments, I just want to chime in here as I have a possible theory on what\u0027s going on\n\nMy understanding is\n 1. AP sends a SYSJUMP host command\n 2. EC ACKs the SYSJUMP host command [early](https://chromium.googlesource.com/chromiumos/platform/ec/+/main/common/system.c#1934) before processing SYSJUMP (this early response is the root of the problem).\n 3. AP sends EC_HELLO host command while EC is processing SYSJUMP\n 4. EC handles SYSJUMP and EC_HELLO response is never processed leaving AP in a busy wait state.\n\nDoes this sound right?\nI think we need a step before item 2, to prepare EC for sysjump(disable ESPI interrupt), then send early response to keep AP happy, and any further host commands from AP are ignored until ESPI interrupt is enabled again.",
+      "parentUuid": "9e80c526_af2a7ab6",
+      "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
