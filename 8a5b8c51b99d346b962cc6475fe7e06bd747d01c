@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "212681b8_1b118c78",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-28T20:23:48Z",
+      "side": 1,
+      "message": "@bleung@google.com @kamilplucinski@google.com This is the CL with which you\u0027ll need to check the discovery responses on a rex.",
+      "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e71712a_3c36bc99",
