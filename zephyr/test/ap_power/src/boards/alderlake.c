@@ -158,11 +158,4 @@ static int board_ap_power_g3_run(void *data)
 
 AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_g3_entry, board_ap_power_g3_run,
 			  NULL);
-
-static int board_ap_power_s0_run(void *data)
-{
-	return board_ap_power_assert_pch_power_ok();
-}
-
-AP_POWER_APP_STATE_DEFINE(S0, NULL, board_ap_power_s0_run, NULL);
 #endif

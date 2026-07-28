@@ -77,9 +77,5 @@ bool chipset_is_all_power_good(void);
  */
 bool ap_power_in_debug_mode(void);
 
-/**
- * @brief Force AP shutdown to G3.
- */
-void apshutdown(void);
 #endif /* PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_NON_DSX_COMMON_PWRSEQ_SM_HANDLER_H_ \
 	*/

@@ -7,6 +7,7 @@
 #include "ap_power/ap_power_interface.h"
 #include "ap_power_host_sleep.h"
 #include "chipset.h"
+#include "console.h"
 #include "ec_commands.h"
 #include "emul/emul_power_signals.h"
 #include "host_command.h"
@@ -22,6 +23,7 @@
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/shell/shell.h>
 #include <zephyr/ztest.h>
 
 #include <ap_power/ap_pwrseq.h>
@@ -75,6 +77,42 @@ struct ec_output {
 static const struct ec_output ec_outputs[] = { DT_FOREACH_STATUS_OKAY(
 	intel_ap_pwrseq_gpio, PWRSEQ_GPIOS) };
 
+#ifdef CONFIG_AP_PWRSEQ_DRIVER
+#define PWRSEQ_INPUT(nodeid)                                  \
+	{                                                     \
+		.signal_enum = PWR_SIGNAL_ENUM(nodeid),       \
+		.signal_name = DT_PROP(nodeid, enum_name),    \
+		.gpio_spec = GPIO_DT_SPEC_GET(nodeid, gpios), \
+	},
+
+#define PWRSEQ_INPUT_GPIOS(nodeid) \
+	COND_CODE_1(DT_PROP(nodeid, output), (), (PWRSEQ_INPUT(nodeid)))
+
+/*
+ * Get a list of power signals that are GPIO inputs.
+ */
+static const struct ec_output ec_inputs[] = { DT_FOREACH_STATUS_OKAY(
+	intel_ap_pwrseq_gpio, PWRSEQ_INPUT_GPIOS) };
+
+/* Drive the logical level of a power signal GPIO input to the EC. */
+static void set_ec_input(enum power_signal signal, int value)
+{
+	for (int i = 0; i < ARRAY_SIZE(ec_inputs); i++) {
+		const struct gpio_dt_spec *spec = &ec_inputs[i].gpio_spec;
+
+		if (ec_inputs[i].signal_enum != signal) {
+			continue;
+		}
+		if (spec->dt_flags & GPIO_ACTIVE_LOW) {
+			value = !value;
+		}
+		zassert_ok(gpio_emul_input_set(spec->port, spec->pin, value));
+		return;
+	}
+	zassert_unreachable("Signal %d is not a GPIO input", signal);
+}
+#endif
+
 /*
  * List of input signals to the AP that are driven by the EC. All signals
  * should start out at physical level 0 while in G3 and should end up at
@@ -88,18 +126,15 @@ static const uint8_t ap_inputs[] = {
 #endif
 
 #ifdef CONFIG_AP_X86_INTEL_ADL
+/* clang-format off */
 static const uint8_t ap_inputs[] = {
 	PWR_EC_SOC_DSW_PWROK,
 	PWR_PCH_PWROK,
 	PWR_EC_PCH_RSMRST,
-#ifndef CONFIG_AP_PWRSEQ_DRIVER
-	/* TODO: b/317918383 - AP_PWRSEQ_DRIVER: ADL chipset needs to support
-	 * PWR_VCCST_PWRGD and PWR_EC_PCH_SYS_PWROK
-	 */
 	PWR_VCCST_PWRGD,
 	PWR_EC_PCH_SYS_PWROK,
-#endif
 };
+/* clang-format on */
 #endif
 
 static void emul_ev_handler(struct ap_power_ev_callback *callback,
@@ -583,6 +618,31 @@ ZTEST(ap_pwrseq, test_ap_pwrseq_6)
 		      "AP_POWER_SHUTDOWN_COMPLETE event not generated");
 }
 
+#if !defined(CONFIG_AP_PWRSEQ_DRIVER)
+ZTEST(ap_pwrseq, test_ap_pwrseq_7_all_sys_pwrgd_fail)
+{
+	zassert_equal(0,
+		      power_signal_emul_load(EMUL_POWER_SIGNAL_TEST_PLATFORM(
+			      tp_sys_g3_to_s0_all_sys_pwrgd_fail)),
+		      "Unable to load test platform "
+		      "`tp_sys_g3_to_s0_all_sys_pwrgd_fail`");
+
+	/* System power fails while waiting to generate SYS_PWROK */
+	ap_power_exit_hardoff();
+	k_msleep(500);
+
+	zassert_equal(0, power_signal_get(PWR_PCH_PWROK),
+		      "PCH_PWROK should be deasserted");
+	zassert_equal(0, power_signal_get(PWR_EC_PCH_SYS_PWROK),
+		      "SYS_PWROK should not be generated");
+
+	ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+	k_msleep(500);
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should be in hard off");
+}
+#endif /* !CONFIG_AP_PWRSEQ_DRIVER */
+
 #if defined(CONFIG_AP_PWRSEQ_DRIVER)
 ZTEST(ap_pwrseq, test_ap_pwrseq_7_force_shutdown)
 {
@@ -597,6 +657,287 @@ ZTEST(ap_pwrseq, test_ap_pwrseq_7_force_shutdown)
 		      "AP_POWER_SHUTDOWN_COMPLETE event not generated");
 	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
 		     "AP should be in hard off after force shutdown");
+}
+
+/* Shut down the AP and leave it in G3 for the next test. */
+static void power_down_to_g3(void)
+{
+	ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+	k_msleep(500);
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should be in hard off");
+}
+
+/*
+ * Power up from G3 to S0. Unlike power_up_test_g3_to_s0_helper(), this does
+ * not check the initial AP input levels as not all test boards restore them
+ * on a direct S0 to G3 transition.
+ */
+static void power_up_to_s0(void)
+{
+	zassert_equal(0,
+		      power_signal_emul_load(
+			      EMUL_POWER_SIGNAL_TEST_PLATFORM(tp_sys_g3_to_s0)),
+		      "Unable to load test platform `tp_sys_g3_to_s0`");
+
+	ap_power_exit_hardoff();
+	k_msleep(400);
+	zassert_equal(1, power_start_up_count,
+		      "AP_POWER_STARTUP event not generated");
+	zassert_true(chipset_in_state(CHIPSET_STATE_ON), "AP should be in S0");
+}
+
+/* Power up from G3 and wait until the AP has powered down to S5. */
+static void power_up_then_down_to_s5(void)
+{
+	zassert_equal(0,
+		      power_signal_emul_load(EMUL_POWER_SIGNAL_TEST_PLATFORM(
+			      tp_sys_g3_to_s0_power_down)),
+		      "Unable to load test platform "
+		      "`tp_sys_g3_to_s0_power_down`");
+
+	ap_power_exit_hardoff();
+	k_msleep(300);
+	zassert_true(chipset_in_state(CHIPSET_STATE_SOFT_OFF),
+		     "AP should be in S5");
+}
+
+ZTEST(ap_pwrseq, test_ap_pwrseq_8_reboot_ap_on_g3)
+{
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_SIMPLE(EC_CMD_REBOOT_AP_ON_G3, 0);
+
+	power_up_to_s0();
+
+	/* The AP requests to be powered back on once it reaches G3 */
+	zassert_ok(host_command_process(&args));
+	ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+	k_msleep(500);
+
+	zassert_equal(1, power_shutdown_complete_count,
+		      "AP_POWER_SHUTDOWN_COMPLETE event not generated");
+	zassert_equal(2, power_start_up_count,
+		      "AP did not restart after reaching G3");
+	zassert_true(chipset_in_state(CHIPSET_STATE_ON),
+		     "AP should be back in S0");
+
+	power_down_to_g3();
+}
+
+ZTEST(ap_pwrseq, test_ap_pwrseq_8_reboot_ap_on_g3_delay)
+{
+	struct ec_params_reboot_ap_on_g3_v1 params = {
+		.reboot_ap_at_g3_delay = 1,
+	};
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_REBOOT_AP_ON_G3, 1, params);
+
+	power_up_to_s0();
+
+	/* The AP requests a reboot 1 second after reaching G3 */
+	zassert_ok(host_command_process(&args));
+	ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+	k_msleep(500);
+
+	zassert_equal(1, power_shutdown_complete_count,
+		      "AP_POWER_SHUTDOWN_COMPLETE event not generated");
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should remain in G3 during the delay");
+
+	/* A power on request while waiting does not cut the delay short */
+	ap_power_exit_hardoff();
+	k_msleep(100);
+	zassert_equal(1, power_start_up_count,
+		      "AP restarted before the G3 delay expired");
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should remain in G3 during the delay");
+
+	k_msleep(1000);
+	zassert_equal(2, power_start_up_count,
+		      "AP did not restart after the G3 delay");
+	zassert_true(chipset_in_state(CHIPSET_STATE_ON),
+		     "AP should be back in S0");
+
+	power_down_to_g3();
+}
+
+static bool wait_for_pwrseq_state(enum ap_pwrseq_state state, int timeout_ms)
+{
+	const struct device *dev = ap_pwrseq_get_instance();
+
+	for (int i = 0; i < timeout_ms; i++) {
+		if (ap_pwrseq_get_current_state(dev) == state) {
+			return true;
+		}
+		k_msleep(1);
+	}
+
+	return false;
+}
+
+/*
+ * Force a shutdown while the AP is passing through the given state on its way
+ * down from S0, and verify it goes straight to G3 without waiting in S5.
+ */
+static void force_shutdown_during_power_down(enum ap_pwrseq_state state)
+{
+	zassert_equal(0,
+		      power_signal_emul_load(EMUL_POWER_SIGNAL_TEST_PLATFORM(
+			      tp_sys_g3_to_s0_power_down)),
+		      "Unable to load test platform "
+		      "`tp_sys_g3_to_s0_power_down`");
+
+	ap_power_exit_hardoff();
+	zassert_true(wait_for_pwrseq_state(state, 500), "AP did not reach %s",
+		     ap_pwrseq_get_state_str(state));
+
+	ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+	k_msleep(100);
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should go to G3 immediately");
+	zassert_equal(1, power_hard_off_count,
+		      "AP_POWER_HARD_OFF event not generated");
+}
+
+/*
+ * TODO: Atria's board G3 handler does not turn the rails off on a shutdown
+ * event while already in G3, so the AP is never shut down.
+ */
+#if defined(CONFIG_AP_X86_INTEL_MTL) && !defined(CONFIG_TEST_AP_POWER_ATRIARVP)
+ZTEST(ap_pwrseq, test_ap_pwrseq_8_rsmrst_pwrgd_timeout)
+{
+	zassert_equal(0,
+		      power_signal_emul_load(EMUL_POWER_SIGNAL_TEST_PLATFORM(
+			      tp_sys_g3_to_s0_timeout)),
+		      "Unable to load test platform `tp_sys_g3_to_s0_timeout`");
+
+	/* RSMRST power good never asserts after the rails are enabled */
+	ap_power_exit_hardoff();
+	k_msleep(AP_PWRSEQ_DT_VALUE(wait_signal_timeout) + 500);
+
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should be shut down when RSMRST is not good");
+	zassert_equal(0, power_start_up_count,
+		      "AP_POWER_STARTUP event generated");
+	zassert_equal(0, power_signal_get(PWR_EN_PP3300_A),
+		      "Rails should be turned off");
+}
+#endif
+
+/* Losing standby power while in S0ix shuts the AP down. */
+ZTEST(ap_pwrseq, test_ap_pwrseq_9_s0ix_power_fail)
+{
+	struct ec_params_host_sleep_event_v1 p = {
+		.sleep_event = HOST_SLEEP_EVENT_S0IX_SUSPEND,
+		.suspend_params = { EC_HOST_SLEEP_TIMEOUT_DEFAULT },
+	};
+	struct ec_response_host_sleep_event_v1 r;
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND(EC_CMD_HOST_SLEEP_EVENT, 1, r, p);
+
+	power_up_to_s0();
+#if DT_NODE_EXISTS(DT_NODELABEL(pwr_pltrst))
+	/* The PCH releases PLTRST# once the AP is running */
+	zassert_ok(emul_espi_host_send_vw(
+		DEVICE_DT_GET_ANY(zephyr_espi_emul_controller),
+		ESPI_VWIRE_SIGNAL_PLTRST, 1));
+#endif
+
+	zassert_ok(host_command_process(&args));
+	power_signal_emul_unload();
+	zassert_equal(0,
+		      power_signal_emul_load(
+			      EMUL_POWER_SIGNAL_TEST_PLATFORM(tp_sys_sleep)),
+		      "Unable to load test platform `tp_sys_sleep`");
+	k_msleep(500);
+	zassert_true(chipset_in_state(CHIPSET_STATE_STANDBY),
+		     "AP should be in S0ix");
+
+#if defined(CONFIG_AP_X86_INTEL_ADL)
+	set_ec_input(PWR_SLP_SUS, 1);
+#else
+	set_ec_input(PWR_RSMRST_PWRGD, 0);
+#endif
+	k_msleep(500);
+
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should be shut down after power failure");
+	zassert_equal(1, power_shutdown_count,
+		      "AP_POWER_SHUTDOWN event not generated");
+	zassert_equal(1, power_hard_off_count,
+		      "AP_POWER_HARD_OFF event not generated");
+
+#if DT_NODE_EXISTS(DT_NODELABEL(pwr_pltrst))
+	zassert_ok(emul_espi_host_send_vw(
+		DEVICE_DT_GET_ANY(zephyr_espi_emul_controller),
+		ESPI_VWIRE_SIGNAL_PLTRST, 0));
+#endif
+}
+
+ZTEST(ap_pwrseq, test_ap_pwrseq_9_s3_force_shutdown)
+{
+	force_shutdown_during_power_down(AP_POWER_STATE_S3);
+}
+
+ZTEST(ap_pwrseq, test_ap_pwrseq_9_s4_force_shutdown)
+{
+	force_shutdown_during_power_down(AP_POWER_STATE_S4);
+}
+
+ZTEST(ap_pwrseq, test_ap_pwrseq_9_s5_debug_mode)
+{
+	power_up_then_down_to_s5();
+
+	/* debug_mode keeps the AP in S5 past the inactivity timeout */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "debug_mode enable"));
+	k_msleep(S5_INACTIVITY_TIMEOUT_MS * 1.5);
+	zassert_true(chipset_in_state(CHIPSET_STATE_SOFT_OFF),
+		     "debug_mode should prevent the transition to G3");
+	zassert_equal(0, power_hard_off_count,
+		      "AP_POWER_HARD_OFF event generated");
+
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "debug_mode disable"));
+	ap_pwrseq_wake();
+	k_msleep(100);
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should go to G3 once debug_mode is disabled");
+}
+
+ZTEST(ap_pwrseq, test_ap_pwrseq_9_s5_exit_hardoff_extends_timeout)
+{
+	power_up_then_down_to_s5();
+
+	/*
+	 * A power on request while in S5 restarts the inactivity timer to
+	 * give the AP more time to respond.
+	 */
+	k_msleep(S5_INACTIVITY_TIMEOUT_MS / 2);
+	ap_power_exit_hardoff();
+	k_msleep(S5_INACTIVITY_TIMEOUT_MS * 3 / 4);
+	zassert_true(chipset_in_state(CHIPSET_STATE_SOFT_OFF),
+		     "S5 inactivity timer was not restarted");
+	zassert_equal(0, power_hard_off_count,
+		      "AP_POWER_HARD_OFF event generated");
+
+	k_msleep(S5_INACTIVITY_TIMEOUT_MS / 2);
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should go to G3 after the S5 inactivity timeout");
+	zassert_equal(1, power_hard_off_count,
+		      "AP_POWER_HARD_OFF event not generated");
+	zassert_equal(1, power_start_up_count, "AP should not restart from S5");
+}
+
+ZTEST(ap_pwrseq, test_ap_pwrseq_9_s5_force_shutdown)
+{
+	power_up_then_down_to_s5();
+
+	/* Force shutdown does not wait for the S5 inactivity timeout */
+	ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+	k_msleep(100);
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should go to G3 immediately");
+	zassert_equal(1, power_hard_off_count,
+		      "AP_POWER_HARD_OFF event not generated");
 }
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
 
