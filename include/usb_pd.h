@@ -25,6 +25,20 @@ extern "C" {
 /* PD Host command timeout */
 #define PD_HOST_COMMAND_TIMEOUT_US SECOND
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+
+extern k_tid_t pd_threads[CONFIG_USB_PD_PORT_MAX_COUNT];
+
+/**
+ * Check if the current thread is the PD task thread for the specified port.
+ */
+static inline bool current_thread_is_pd_thread(int port)
+{
+	return k_current_get() == pd_threads[port];
+}
+#endif
+
 /*
  * Define PD_PORT_TO_TASK_ID() and TASK_ID_TO_PD_PORT() macros to
  * go between PD port number and task ID. Assume that TASK_ID_PD_C0 is the
