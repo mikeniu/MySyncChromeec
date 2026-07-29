@@ -214,26 +214,33 @@
 		i2c_ec_i2c_misc_scl_3v3: ec_i2c_misc_scl_3v3 {
 			i2c-port = <&i2c0>;
 			enum-names = "I2C_PORT_CHARGER", "I2C_PORT_PEN";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_ec_smb_batt_scl_3v3: ec_smb_batt_scl_3v3 {
 			i2c-port = <&i2c1>;
 			enum-names = "I2C_PORT_BATTERY", "I2C_PORT_VIRTUAL_BATTERY";
+			allow-passthru = "battery_allow_passthru";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_ec_i2c_pdc_s_scl_3v3: ec_i2c_pdc_s_scl_3v3 {
 			i2c-port = <&i2c2>;
 			enum-names = "PDC_I2C_S";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c_sensor_scl_1v8: ec_i2c_sensor_scl_1v8 {
 			i2c-port = <&i2c3>;
 			enum-names = "I2C_PORT_SENSOR";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_ec_i2c_pdc_sm_scl_3v3: ec_i2c_pdc_sm_scl_3v3 {
 			i2c-port = <&i2c4>;
 			enum-names = "PDC_I2C_SM";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ap_i2c_ec_scl_1v8: ap_i2c_ec_scl_1v8 {
 			i2c-port = <&i2c5>;
 			enum-names = "I2C_PORT_DETACHABLE_BASE";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 	};
 };

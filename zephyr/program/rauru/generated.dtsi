@@ -201,22 +201,28 @@
 		i2c_ec_i2c_pwr_cbi_scl_3v3: ec_i2c_pwr_cbi_scl_3v3 {
 			i2c-port = <&i2c0>;
 			enum-names = "I2C_PORT_POWER", "I2C_PORT_EEPROM";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_ec_smb_batt_scl_3v3: ec_smb_batt_scl_3v3 {
 			i2c-port = <&i2c1>;
 			enum-names = "I2C_PORT_BATTERY", "I2C_PORT_VIRTUAL_BATTERY";
+			allow-passthru = "battery_allow_passthru";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_ec_i2c_usb_c0_scl_3v3: ec_i2c_usb_c0_scl_3v3 {
 			i2c-port = <&i2c2>;
 			enum-names = "I2C_PORT_USB_C0";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c_sensor_scl_1v8: ec_i2c_sensor_scl_1v8 {
 			i2c-port = <&i2c3>;
 			enum-names = "I2C_PORT_SENSOR";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_ec_i2c_usb_c1_scl_3v3: ec_i2c_usb_c1_scl_3v3 {
 			i2c-port = <&i2c4>;
 			enum-names = "I2C_PORT_USB_C1";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c5: ec_i2c5 {
 			i2c-port = <&i2c5>;

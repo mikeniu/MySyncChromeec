@@ -176,23 +176,29 @@
 		i2c_ec_i2c_sensor_scl_1v8: ec_i2c_sensor_scl_1v8 {
 			i2c-port = <&i2c3>;
 			enum-names = "I2C_PORT_SENSOR";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_ec_i2c_pdc_sm_scl_3v3: ec_i2c_pdc_sm_scl_3v3 {
 			i2c-port = <&i2c2>;
 			enum-names = "I2C_PORT_PDC_SM";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c_pdc_s_scl_3v3: ec_i2c_pdc_s_scl_3v3 {
 			i2c-port = <&i2c4>;
 			enum-names = "I2C_PORT_PDC_S";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c_charger_scl_3v3: ec_i2c_charger_scl_3v3 {
 			i2c-port = <&i2c0>;
 			enum-names = "I2C_PORT_CHARGER";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_ec_smb_batt_scl_3v3: ec_smb_batt_scl_3v3 {
 			i2c-port = <&i2c1>;
 			remote-port = < 0x4 >;
 			enum-names = "I2C_PORT_BATTERY";
+			allow-passthru = "battery_allow_passthru";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 	};
 };

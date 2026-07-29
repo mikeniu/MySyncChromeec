@@ -216,30 +216,38 @@
 		i2c_ec_i2c_usb_c0_tcp: ec_i2c_usb_c0_tcp {
 			i2c-port = <&i2c1_0>;
 			enum-names = "I2C_PORT_USB_C0_TCPC";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c_usb_c0_ppc_b: ec_i2c_usb_c0_ppc_b {
 			i2c-port = <&i2c2_0>;
 			enum-names = "I2C_PORT_PPC0";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c_usb_c0_rt: ec_i2c_usb_c0_rt {
 			i2c-port = <&i2c3_0>;
 			enum-names = "I2C_PORT_USB_C0_RT";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c_usb_c1_tcp: ec_i2c_usb_c1_tcp {
 			i2c-port = <&i2c4_1>;
 			enum-names = "I2C_PORT_USB_C1_TCPC";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c_bat: ec_i2c_bat {
 			i2c-port = <&i2c5_0>;
 			enum-names = "I2C_PORT_BATTERY";
+			allow-passthru = "battery_allow_passthru";
+			protect-type = "PROTECT_IF_SYSTEM_IS_LOCKED";
 		};
 		i2c_ec_i2c_usb_c1_mix: ec_i2c_usb_c1_mix {
 			i2c-port = <&i2c6_1>;
 			enum-names = "I2C_PORT_USB_1_MIX";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c_mi: ec_i2c_mi {
 			i2c-port = <&i2c7_0>;
 			enum-names = "I2C_PORT_EEPROM";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 	};
 };
