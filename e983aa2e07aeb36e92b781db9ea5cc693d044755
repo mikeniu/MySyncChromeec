@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a4f1a8f8_0e041a4f",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-29T16:03:57Z",
+      "side": 1,
+      "message": "`atomic_set(..., 0)` clears the counters. If `format_dropped_logs_msg` fails to write the full message into `dest` (e.g., because `dest_size` is too small), the information about dropped logs is lost because the counters have already been reset.\n\nConsider checking the available space or using a peek/set strategy to ensure the message was successfully formatted before clearing the counters.",
+      "range": {
+        "startLine": 245,
+        "startChar": 0,
+        "endLine": 245,
+        "endChar": 0
+      },
+      "revId": "e983aa2e07aeb36e92b781db9ea5cc693d044755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6542154e_86d5db1e",
         "filename": "zephyr/test/drivers/console_buffer/src/console_buffer.c",
         "patchSetId": 9
