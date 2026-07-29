@@ -270,12 +270,14 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 		k_thread_foreach_unlocked(log_thread_info, NULL);
 	}
 
+	uint8_t thread_id = (uint8_t)(uintptr_t)k_current_get();
+
 	/* Save the current task id in panic info.
 	 * The PANIC_SW_WATCHDOG_WARN reason will be changed to a regular
 	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
 	 * occurs.
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address, task_id);
+	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address, thread_id);
 }
 
 __maybe_unused static void
