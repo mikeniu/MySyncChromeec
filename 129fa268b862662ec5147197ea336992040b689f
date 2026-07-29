@@ -93,6 +93,30 @@
       },
       "revId": "129fa268b862662ec5147197ea336992040b689f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7874d2a8_40cfba02",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-29T20:31:50Z",
+      "side": 1,
+      "message": "I\u0027ve updated the VIF fields to match the observed SKEDB.\n\nNote that the max PDP also appears to be wrong in the SKEDB. At least, the EC config that feeds into the PD behavior is set to 65W.",
+      "parentUuid": "11d5b676_6b46c3c2",
+      "range": {
+        "startLine": 232,
+        "startChar": 0,
+        "endLine": 232,
+        "endChar": 44
+      },
+      "revId": "129fa268b862662ec5147197ea336992040b689f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
