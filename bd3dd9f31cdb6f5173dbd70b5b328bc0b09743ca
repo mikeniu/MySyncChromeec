@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d037eebe_8ccd69e9",
+        "filename": "zephyr/Kconfig.power_button",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-07-29T23:35:42Z",
+      "side": 1,
+      "message": "should we add a `depends on PLATFORM_EC_TABLET_MODE` here?\nthe implementation pretty much assumes this.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 6
+      },
+      "revId": "bd3dd9f31cdb6f5173dbd70b5b328bc0b09743ca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
