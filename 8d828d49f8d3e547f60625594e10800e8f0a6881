@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de12ae30_e0656545",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T16:15:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/393aeddc-6537-44c0-aad5-bf4fa9c6fb83)]\n\n### Review Summary\n*   **Functionality:** The addition of the `ro-frid` node correctly overrides the offset to `0x44` (68 bytes) to account for the 64-byte NPCX header plus the 4-byte version struct offset. This resolves the bootloop issues caused by overwriting the ARM vector table. The solution aligns with the commit message and the issue described.\n*   **Security:** The change resolves a crash by fixing a memory corruption issue during the binman patching phase. No new security vulnerabilities are introduced.\n*   **Style:** The changes are clean and include helpful comments explaining the math behind the `0x44` offset in both `.dts` files, making it highly maintainable.\n*   **Consistency:** Consistent with standard device tree overrides in Zephyr.\n*   **Testing \u0026 Test Coverage:** The author has successfully reproduced the issue on physical devices (Buccaneer/Kanix) and verified the fix, as documented in the commit message and comments. A unit test or Renode test is not feasible since this bug requires host-side SHI_CS pin state changes which are specific to the hardware execution flow. The current manual testing on hardware is sufficient.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped, containing only the exact device tree overrides needed to fix the bug.",
+      "isAi": true,
+      "revId": "8d828d49f8d3e547f60625594e10800e8f0a6881",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
