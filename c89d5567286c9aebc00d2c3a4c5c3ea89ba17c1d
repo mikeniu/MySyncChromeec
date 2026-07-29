@@ -187,6 +187,30 @@
       },
       "revId": "c89d5567286c9aebc00d2c3a4c5c3ea89ba17c1d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee032709_26cb302a",
+        "filename": "zephyr/dts/bindings/fingerprint/egis,egis660.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-07-29T10:58:20Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "93ae2403_1e1aab76",
+      "range": {
+        "startLine": 27,
+        "startChar": 14,
+        "endLine": 27,
+        "endChar": 19
+      },
+      "revId": "c89d5567286c9aebc00d2c3a4c5c3ea89ba17c1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
