@@ -7,7 +7,11 @@ find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 project(fingerprint_algorithm_ft98xx)
 
 FILE(GLOB app_sources src/*.c)
-target_sources(app PRIVATE ${app_sources})
+
+target_sources(app PRIVATE
+    ${app_sources}
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../subsys/fingerprint/alg/ft98xx_bio_alg.c"
+)
 
 zephyr_include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 

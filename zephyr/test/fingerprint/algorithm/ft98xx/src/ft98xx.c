@@ -55,13 +55,15 @@ static int custom_get_finger_detailed_info(int *finger_size, int *subtpl_size,
 	return 0;
 }
 
+/* In ft98xx_bio_alg_test.c */
+extern const struct fingerprint_algorithm ft98xx_algorithm;
+
 static void *ft98xx_alg_setup(void)
 {
 	static struct ft98xx_bio_alg_fixture fixture;
 
-	zassert_true(fingerprint_algorithm_count_get() > 0,
-		     "No FP algorithm registered");
-	fixture.alg = fingerprint_algorithm_get(0);
+	/* Referencing ft98xx_algorithm directly prevents linker stripping */
+	fixture.alg = &ft98xx_algorithm;
 	zassert_not_null(fixture.alg);
 
 	return &fixture;
@@ -69,7 +71,12 @@ static void *ft98xx_alg_setup(void)
 
 static void ft98xx_alg_before(void *f)
 {
-	ARG_UNUSED(f);
+	struct ft98xx_bio_alg_fixture *fixture = f;
+
+	/* Reset algorithm state to prevent state leakage between tests */
+	if (fixture->alg && fixture->alg->data) {
+		memset(fixture->alg->data, 0, sizeof(struct ft_libfp_data));
+	}
 
 	/* Reset individual FFF mocks */
 	RESET_FAKE(ft_sensor_query_rows);

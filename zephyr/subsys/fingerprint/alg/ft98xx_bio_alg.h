@@ -6,6 +6,7 @@
 #ifndef __FT98XX_BIO_ALG_H__
 #define __FT98XX_BIO_ALG_H__
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include <fingerprint/fingerprint_alg.h>

@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h>
 #include <zephyr/logging/log.h>
 
+#include <drivers/fingerprint/fingerprint_ft98xx_private.h>
 #include <fingerprint/fingerprint_alg.h>
 
 LOG_MODULE_REGISTER(ft98xx_bio_alg, LOG_LEVEL_INF);
@@ -138,7 +138,8 @@ static int ft98xx_enroll_step(const struct fingerprint_algorithm *const alg,
 	}
 
 	/* Prevent execution if enrollment session was never initialized. */
-	if (data->remain == 0 || data->remain > data->max_enroll_samples) {
+	if (data->max_enroll_samples == 0 || data->remain == 0 ||
+	    data->remain > data->max_enroll_samples) {
 		LOG_ERR("enroll_step called without valid enroll_start (remain=%d)",
 			data->remain);
 		if (completion) {
