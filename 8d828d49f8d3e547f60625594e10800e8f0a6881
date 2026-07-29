@@ -34,6 +34,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "8d828d49f8d3e547f60625594e10800e8f0a6881",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bf4a471_43d89412",
+        "filename": "zephyr/program/fpmcu/helipilot/buccaneer.dts",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T18:40:14Z",
+      "side": 1,
+      "message": "Can you add this go link to both comments: go/cros-fp-npcx99fp-bootloader",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 66
+      },
+      "revId": "8d828d49f8d3e547f60625594e10800e8f0a6881",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
