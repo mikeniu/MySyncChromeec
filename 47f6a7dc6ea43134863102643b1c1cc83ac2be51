@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca39d75d_80f5b6dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T21:00:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/281cfdf4-a14f-4b2f-930b-5947389ade79)]\n\n### Review Summary\n\n*   **Functionality**: Successfully introduces early `EC_MKBP_FP_FINGER_DOWN` notification when the sensor is in a capture mode. This guarantees the framework receives a latency start signal on every capture attempt, including on retries, successfully meeting the framework latency requirement.\n*   **Style**: The code cleanly integrates into the existing `fp_task` event loop and maintains readability with appropriate comments.\n*   **Testing**: Test coverage is excellent. The newly added assertions in `test_finger_capture_simple_image_scan_too_fast` successfully confirm that `FINGER_DOWN` is sent exactly once per loop evaluation even when image acquisition fails (e.g., `FINGERPRINT_SENSOR_SCAN_TOO_FAST`), directly addressing the previous minor suggestion.\n*   **Security**: No security vulnerabilities or data leaks were identified.\n*   **CL Size \u0026 Scope**: The CL is small, well-scoped, and focuses exactly on its goal without bundling unrelated changes.\n\nTAG\u003dagy\nCONV\u003d840ae2fb-df99-4538-a773-ae3255f8fc26",
+      "isAi": true,
+      "revId": "47f6a7dc6ea43134863102643b1c1cc83ac2be51",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
