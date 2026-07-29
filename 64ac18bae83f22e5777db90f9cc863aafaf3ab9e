@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4884db8a_c1059c22",
+        "filename": "zephyr/program/fpmcu/et171/smolec.dts",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-07-29T11:06:57Z",
+      "side": 1,
+      "message": "@jason.huang@egistec.corp-partner.google.com @wenbin.bao@egistec.corp-partner.google.com I copied these from `stobnica` and added `cover-type \u003d \"spray-coating\"`. Could you please check if these parameters are correct, especially APNS data size?",
+      "revId": "64ac18bae83f22e5777db90f9cc863aafaf3ab9e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
