@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b66c8bc_f4d82832",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T21:42:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/a2b47d68-b852-4c36-99b7-ad205a6a422f)]\n\n### Review Summary\n\n*   **Functionality:** Good. The new tests accurately set up inputs and validate edge cases for `ec_cmd_fp_mode_v1` using the existing context state.\n*   **Style:** Clean and consistent with the codebase.\n*   **Security:** N/A.\n*   **Testing:** Excellent coverage. The tests correctly exercise `validate_fp_mode()` indirectly through the public interface. I\u0027ve left a suggestion to reset `global_context.templ_valid` to avoid state bleeding between test cases, and suggested reverting `validate_fp_mode` to `static` since it\u0027s never called directly by the tests.\n*   **CL Size:** Small, focused, and self-contained.\n*   **Overall:** Great addition of tests to improve coverage.\n\nTAG\u003dagy\nCONV\u003d0e74b1d3-eb79-4f54-9391-8593915ce863",
+      "isAi": true,
+      "revId": "b4e11a540fc9aa001c738241a4c4816c411b319e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1540b5af_360fb7a6",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T21:42:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] None of the new test cases actually call `validate_fp_mode()` directly—they all correctly test it indirectly through the public interface `ec_cmd_fp_mode_v1()` (which is a good practice as it tests actual system behavior).\n\nBecause of this, you don\u0027t need to expose this function. You can safely revert `test_static` back to `static` and remove the forward declaration from the test file.",
+      "isAi": true,
+      "revId": "b4e11a540fc9aa001c738241a4c4816c411b319e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c297e703_ad16bfb7",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T21:42:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since the tests use `ec_cmd_fp_mode_v1` to validate the behavior, this forward declaration is unused and can be safely removed.",
+      "isAi": true,
+      "revId": "b4e11a540fc9aa001c738241a4c4816c411b319e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef267159_ff52edd1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T21:42:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Modifying `global_context.templ_valid` here introduces state pollution for subsequent tests since `fpsensor_state_before()` does not reset it.\n\nConsider adding `global_context.templ_valid \u003d 0;` to `fpsensor_state_before()` (around line 240) to ensure a clean slate for all test cases.",
+      "isAi": true,
+      "revId": "b4e11a540fc9aa001c738241a4c4816c411b319e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
