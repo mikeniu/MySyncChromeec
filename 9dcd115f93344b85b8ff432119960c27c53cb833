@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdb27dad_02ebcf1d",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1003039
+      },
+      "writtenOn": "2026-07-29T20:47:27Z",
+      "side": 1,
+      "message": "Abe, don\u0027t forget to apply the same changes to Port 1.",
+      "range": {
+        "startLine": 457,
+        "startChar": 0,
+        "endLine": 458,
+        "endChar": 52
+      },
+      "revId": "9dcd115f93344b85b8ff432119960c27c53cb833",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
