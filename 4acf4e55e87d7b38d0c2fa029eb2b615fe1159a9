@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a17f7ffb_17460b27",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-07-29T09:19:44Z",
+      "side": 1,
+      "message": "Disabling CONFIG_PLATFORM_EC_CONSOLE_CMD_MMAPINFO frees up ~200 bytes\nDisabling CONFIG_PLATFORM_EC_CONSOLE_CMD_MEM frees up ~960 bytes\nDisabling CONFIG_PLATFORM_EC_CONSOLE_CMD_HASH frees up ~600 bytes",
+      "revId": "4acf4e55e87d7b38d0c2fa029eb2b615fe1159a9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
