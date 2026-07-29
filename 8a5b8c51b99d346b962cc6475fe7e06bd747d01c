@@ -69,6 +69,24 @@
       "parentUuid": "a4e2f2d3_444bddbc",
       "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "421b3e8c_18de31ab",
+        "filename": "zephyr/test/rex/tests/program/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-29T20:43:37Z",
+      "side": 1,
+      "message": "I see that that is the test enabled by this config. The original purpose of this test was to cover rex-specific board code. (I\u0027m not sure why the test is specific to kanix.) A generic test wouldn\u0027t have achieved this, because it wouldn\u0027t have built rex-specific code.\n\nWith this CL, the rex-specific code is gone, and there is generic code that does the same thing. It\u0027s possible that that code is already covered by a generic test, in which case we should probably just delete this rex test. It\u0027s also possible that this rex test is now providing coverage to the generic code. In that case, we should keep the rex test.\n\nThe easiest way to find out is to delete this test and see what happens to coverage of the generic code.\n\nI wouldn\u0027t consider this a blocker for this CL. Having redundant coverage isn\u0027t a huge problem. If it gets complicated to figure out, just open a P3 bug and leave a TODO.",
+      "parentUuid": "09c3cc58_5f983940",
+      "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
