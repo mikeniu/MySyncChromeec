@@ -78,7 +78,6 @@ JTRACE_FLASH_SCRIPT = os.path.join(EC_DIR, "util/flash_jlink.py")
 SERVO_MICRO_FLASH_SCRIPT = os.path.join(EC_DIR, "util/flash_ec")
 ZEPHYR_FPMCU_DIR = os.path.join(EC_DIR, "zephyr/program/fpmcu")
 ZEPHYR_TWISTER = os.path.join(EC_DIR, "twister")
-ZEPHYR_TWISTER_BUILD_DIR = os.path.join(EC_DIR, "build/zephyr/fpmcu-test")
 
 # .* is added to regexes because Zephyr uses VT100 commands at the beginning of
 # a new line.
@@ -415,9 +414,12 @@ class Renode(Platform):
 
     def __init__(self):
         self.process = None
+        # pylint: disable-next=consider-using-with
+        self._temp_dir = tempfile.TemporaryDirectory()
+        self.console_pty = os.path.join(self._temp_dir.name, "renode-uart")
 
     def get_console(self, board_config: BoardConfig) -> Optional[str]:
-        return "/tmp/renode-uart"
+        return self.console_pty
 
     def hw_write_protect(self, enable: bool) -> None:
         pass
@@ -440,6 +442,8 @@ class Renode(Platform):
             "./util/renode-ec-launch",
             "--board",
             board_config.name,
+            "--uart",
+            self.console_pty,
         ]
         if zephyr:
             # We've adopted the convention that we prefix upstream Zephyr test
@@ -462,7 +466,15 @@ class Renode(Platform):
         return True
 
     def cleanup(self) -> None:
-        self.process.kill()
+        if self.process:
+            self.process.kill()
+            self.process.wait()
+            self.process = None
+        if os.path.lexists(self.console_pty):
+            try:
+                os.unlink(self.console_pty)
+            except OSError:
+                pass
 
     def _skip_test_bloonchipper(
         self, test_config: TestConfig, zephyr: bool
@@ -1504,14 +1516,20 @@ def build_ec(
     return cmd
 
 
+def get_board_twister_dir(board_name: str) -> str:
+    """Returns the twister build directory path for a board."""
+    return os.path.join(EC_DIR, f"build/zephyr/fpmcu-test-{board_name}")
+
+
 def build_zephyr_upstream(
     test_name: str, board_name: str, zephyr_extra_configs: list[str]
 ) -> list[str]:
     """Prepare a command to build Zephyr test"""
     # Build only with Zephyr and clobber a previous build
+    board_build_dir = get_board_twister_dir(board_name)
     cmd = [ZEPHYR_TWISTER] + ["-b"] + ["-c"]
     cmd = cmd + ["-p"] + [board_name]
-    cmd = cmd + ["-O"] + [ZEPHYR_TWISTER_BUILD_DIR]
+    cmd = cmd + ["-O"] + [board_build_dir]
     cmd = cmd + ["-s"] + [test_name]
     cmd = cmd + ["--no-upload-cros-rdb"]
     cmd = cmd + ["--force-toolchain"]
@@ -1541,42 +1559,60 @@ def build_zephyr(
         return cmd
 
     # Create tmp file to pass needed configs
-    test_conf = os.path.join(tempfile.gettempdir(), "test.conf")
-    with open(test_conf, "w", encoding="utf-8") as f_test_config:
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        encoding="utf-8",
+        prefix="test-",
+        suffix=".conf",
+        delete=False,
+    ) as f_test_config:
+        test_conf = f_test_config.name
         cmd = cmd + ["-DOVERLAY_CONFIG=" + test_conf]
-        # Get list of supported tests
-        testcase = os.path.join(ZEPHYR_FPMCU_DIR, "testcase.yaml")
-        with open(testcase, encoding="utf-8") as testcase:
-            lines = testcase.read()
-        testcase_data = yaml.load(lines, Loader=yaml.SafeLoader)
-        if "tests" not in testcase_data:
-            raise ValueError(
-                'testcase.yaml file doesn\'t contain "tests" section'
-            )
-        # Make sure the current test is supported
-        if test_name not in testcase_data["tests"]:
-            raise ValueError(test_name + " not present in testcase.yaml")
-        # Add configs needed for a specific test from "extra_conf_files"
-        # and "extra_configs" sections
-        if "extra_conf_files" in testcase_data["tests"][test_name]:
-            for config_file in testcase_data["tests"][test_name][
-                "extra_conf_files"
-            ]:
-                config_file_path = os.path.join(ZEPHYR_FPMCU_DIR, config_file)
-                with open(
-                    config_file_path, "r", encoding="utf-8"
-                ) as f_config_file:
-                    f_test_config.write(f_config_file.read())
-        if "extra_configs" in testcase_data["tests"][test_name]:
-            for config in testcase_data["tests"][test_name]["extra_configs"]:
-                f_test_config.write(config + "\n")
-        # Include tests also in RO part. It is not done by default
-        # because of lack of space
-        if img_type == ImageType.RO:
-            f_test_config.write("CONFIG_HW_TEST_RW_ONLY=n\n")
+        try:
+            # Get list of supported tests
+            testcase_path = os.path.join(ZEPHYR_FPMCU_DIR, "testcase.yaml")
+            with open(testcase_path, encoding="utf-8") as testcase_file:
+                lines = testcase_file.read()
+            testcase_data = yaml.load(lines, Loader=yaml.SafeLoader)
+            if "tests" not in testcase_data:
+                raise ValueError(
+                    'testcase.yaml file doesn\'t contain "tests" section'
+                )
+            # Make sure the current test is supported
+            if test_name not in testcase_data["tests"]:
+                raise ValueError(test_name + " not present in testcase.yaml")
+            # Add configs needed for a specific test from "extra_conf_files"
+            # and "extra_configs" sections
+            if "extra_conf_files" in testcase_data["tests"][test_name]:
+                for config_file in testcase_data["tests"][test_name][
+                    "extra_conf_files"
+                ]:
+                    config_file_path = os.path.join(
+                        ZEPHYR_FPMCU_DIR, config_file
+                    )
+                    with open(
+                        config_file_path, "r", encoding="utf-8"
+                    ) as f_config_file:
+                        f_test_config.write(f_config_file.read())
+            if "extra_configs" in testcase_data["tests"][test_name]:
+                for config in testcase_data["tests"][test_name][
+                    "extra_configs"
+                ]:
+                    f_test_config.write(config + "\n")
+            # Include tests also in RO part. It is not done by default
+            # because of lack of space
+            if img_type == ImageType.RO:
+                f_test_config.write("CONFIG_HW_TEST_RW_ONLY=n\n")
 
-        for config in zephyr_extra_configs:
-            f_test_config.write(f"{config}\n")
+            for config in zephyr_extra_configs:
+                f_test_config.write(f"{config}\n")
+        except Exception:
+            if os.path.lexists(test_conf):
+                try:
+                    os.unlink(test_conf)
+                except OSError:
+                    pass
+            raise
 
     with open(test_conf, "r", encoding="utf-8") as f:
         logging.info("test_conf content:\n%s", f.read())
@@ -1593,6 +1629,7 @@ def build(
     env: Environment,
 ) -> None:
     """Build specified test for specified board."""
+    test_conf = None
     if zephyr:
         zephyr_extra_configs = []
         for e in (Environment.ALL, env):
@@ -1601,13 +1638,23 @@ def build(
             )
 
         cmd = build_zephyr(test, board_name, zephyr_extra_configs)
+        for arg in cmd:
+            if arg.startswith("-DOVERLAY_CONFIG="):
+                test_conf = arg.split("=", 1)[1]
     else:
         cmd = build_ec(
             test.test_name, board_name, compiler, test.apptype_to_use
         )
 
-    logging.debug('Running command: "%s"', " ".join(cmd))
-    subprocess.run(cmd, check=False).check_returncode()
+    try:
+        logging.debug('Running command: "%s"', " ".join(cmd))
+        subprocess.run(cmd, check=False).check_returncode()
+    finally:
+        if test_conf and os.path.lexists(test_conf):
+            try:
+                os.unlink(test_conf)
+            except OSError:
+                pass
 
 
 def _patch_image_with_new_rw(test: TestConfig, image_path: str):
@@ -1828,7 +1875,12 @@ def get_zephyr_image_path(test: TestConfig, build_board: str):
     if test.zephyr_name is not None:
         # The path to binary differs depending on a test name, path and platform,
         # so just find the zephyr.npcx.bin or zephyr.bin in the build dir.
-        twister_out = os.walk(ZEPHYR_TWISTER_BUILD_DIR)
+        board_twister_dir = get_board_twister_dir(build_board)
+        if not os.path.exists(board_twister_dir):
+            raise FileNotFoundError(
+                f"Twister build directory '{board_twister_dir}' not found."
+            )
+        twister_out = os.walk(board_twister_dir)
         image_path = None
         for dirpath, _, filenames in twister_out:
             # b/419617755#comment46: Use version with Nuvoton header if it exists.
