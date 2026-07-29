@@ -1063,10 +1063,12 @@ tests:
     extra_configs:
     - CONFIG_CROS_EC_RO=y
     - CONFIG_LINK_TEST_SUITE_PANIC=y
+    - CONFIG_PLATFORM_EC_PANIC_HOST_EVENT=y
   drivers.panic.rw:
     extra_configs:
     - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_PANIC=y
+    - CONFIG_PLATFORM_EC_PANIC_HOST_EVENT=y
   drivers.panic_output.ro:
     extra_configs:
     - CONFIG_CROS_EC_RO=y

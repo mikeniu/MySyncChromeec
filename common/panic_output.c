@@ -345,21 +345,6 @@ init_pdata:
 	return pdata_ptr;
 }
 
-static void panic_init(void)
-{
-#ifdef CONFIG_HOSTCMD_EVENTS
-	struct panic_data *addr = panic_get_data();
-
-	/* Notify host of new panic event */
-	if (addr && !(addr->flags & PANIC_DATA_FLAG_OLD_HOSTEVENT)) {
-		host_set_single_event(EC_HOST_EVENT_PANIC);
-		addr->flags |= PANIC_DATA_FLAG_OLD_HOSTEVENT;
-	}
-#endif
-}
-DECLARE_HOOK(HOOK_INIT, panic_init, HOOK_PRIO_LAST);
-DECLARE_HOOK(HOOK_CHIPSET_RESET, panic_init, HOOK_PRIO_LAST);
-
 #ifdef CONFIG_CMD_CRASH
 /*
  * Disable infinite recursion warning, since we're intentionally doing that

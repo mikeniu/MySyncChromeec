@@ -5,6 +5,8 @@
 
 #include "builtin/assert.h"
 #include "common.h"
+#include "hooks.h"
+#include "host_command.h"
 #include "panic.h"
 #include "panic_utils.h"
 #include "system.h"
@@ -394,3 +396,16 @@ test_export_static int panic_data_init(void)
 
 /* Initialize panic data after reset flags and console are ready. */
 SYS_INIT(panic_data_init, PRE_KERNEL_2, 0);
+
+#if defined(CONFIG_PLATFORM_EC_PANIC_HOST_EVENT)
+static void panic_host_event_init(void)
+{
+	struct panic_data *pdata = panic_get_data();
+
+	if (pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTEVENT)) {
+		host_set_single_event(EC_HOST_EVENT_PANIC);
+		pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTEVENT;
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, panic_host_event_init, HOOK_PRIO_LAST);
+#endif
