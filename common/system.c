@@ -1913,6 +1913,11 @@ DECLARE_DEFERRED(deferred_reboot);
 #endif /* CONFIG_EC_HOST_CMD */
 #endif /* HAS_TASK_HOSTCMD*/
 
+static int is_sysjump_command(int cmd)
+{
+	return cmd == EC_REBOOT_JUMP_RO || cmd == EC_REBOOT_JUMP_RW;
+}
+
 STATIC_IF_NOT(CONFIG_ZTEST)
 enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 {
@@ -1975,8 +1980,23 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 			reboot_scheduled = true;
 			hook_call_deferred(&deferred_reboot_data, 50 * MSEC);
 		}
+
+		/*
+		 * Disable host-interface IRQ so no new host command is
+		 * dispatched between this early ACK and the sysjump
+		 */
+		if (is_sysjump_command(p.cmd))
+			lpc_disable_host_interface_interrupts();
+
 		return EC_RES_SUCCESS;
 #else
+		/*
+		 * Disable host-interface IRQ so no new host command is
+		 * dispatched between this early ACK and the sysjump
+		 */
+		if (is_sysjump_command(p.cmd))
+			lpc_disable_host_interface_interrupts();
+
 		/* Clean busy bits on host for commands that won't return */
 		args->result = EC_RES_SUCCESS;
 		host_send_response(args);
