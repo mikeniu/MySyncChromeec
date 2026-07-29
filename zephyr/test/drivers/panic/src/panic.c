@@ -10,6 +10,8 @@
 
 #include "common.h"
 #include "ec_tasks.h"
+#include "hooks.h"
+#include "host_command.h"
 #include "panic.h"
 #include "system.h"
 #include "test/drivers/stubs.h"
@@ -328,4 +330,31 @@ ZTEST(panic, test_panic_data_init__invalid_sw_reason_watchdog)
 		zassert_equal(info, 0x12);
 		zassert_equal(exception, 0x34);
 	}
+}
+
+ZTEST(panic, test_panic_host_event)
+{
+#if defined(CONFIG_PLATFORM_EC_PANIC_HOST_EVENT)
+	struct panic_data *pdata;
+
+	host_clear_events(CONFIG_HOST_EVENT_REPORT_MASK);
+	zassert_false(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
+
+	/* Set panic reason */
+	panic_set_reason(PANIC_SW_DIV_ZERO, 0, 0);
+
+	/* Trigger HOOK_CHIPSET_STARTUP */
+	hook_notify(HOOK_CHIPSET_STARTUP);
+
+	/* Verify host event is set and flag is set in panic data */
+	zassert_true(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
+	pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_true(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTEVENT, NULL);
+
+	/* Verify subsequent HOOK_CHIPSET_STARTUP does not re-set host event */
+	host_clear_events(CONFIG_HOST_EVENT_REPORT_MASK);
+	hook_notify(HOOK_CHIPSET_STARTUP);
+	zassert_false(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
+#endif
 }
