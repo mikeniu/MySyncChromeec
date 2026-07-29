@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "06bc21b8_5537344c",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-29T19:39:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4f1a8f8_0e041a4f",
+      "range": {
+        "startLine": 245,
+        "startChar": 0,
+        "endLine": 245,
+        "endChar": 0
+      },
+      "revId": "e983aa2e07aeb36e92b781db9ea5cc693d044755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6542154e_86d5db1e",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-07-29T15:58:56Z",
       "side": 1,
       "message": "Could we test isr and mutex drops too?",
+      "revId": "e983aa2e07aeb36e92b781db9ea5cc693d044755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc26a346_d3f400a6",
+        "filename": "zephyr/test/drivers/console_buffer/src/console_buffer.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-29T19:39:41Z",
+      "side": 1,
+      "message": "I can add this in a follow up CL",
+      "parentUuid": "6542154e_86d5db1e",
       "revId": "e983aa2e07aeb36e92b781db9ea5cc693d044755",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
