@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17a64ee1_027aae8e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T01:48:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/34249f0a-e2fe-42bc-935f-0a69362c0447)]\n\n### Review Summary\n\n* **Functionality**: ❌ The CL correctly updates the rejection logic to prevent mixing enrollment and match modes. However, it misses updating the actual authentication dispatch at the end of the function to route `FP_MODE_ENROLL_IMAGE` to `authenticate_enroll()`. Without this, setting `FP_MODE_ENROLL_IMAGE` alone will fail with `EC_ERROR_UNKNOWN`. See the inline comment.\n* **Security**: ✅ The CL maintains the security guarantee by ensuring that a single cryptographic MAC is not reused for conflicting operations (enroll vs auth).\n* **Style**: ✅ The code adheres to project style guidelines. The use of a `constexpr` mask for enrollment modes is clean and readable.\n* **Testing \u0026 Test Coverage**: ❌ No new automated tests were added. Unit tests should be added to verify the new mode combinations and ensure the correct error codes are returned.\n  * **Suggested Tests**:\n    * Setting `FP_MODE_MATCH` and `FP_MODE_ENROLL_SESSION` fails with `EC_ERROR_INVAL`.\n    * Setting `FP_MODE_MATCH` and `FP_MODE_ENROLL_IMAGE` fails with `EC_ERROR_INVAL`.\n    * Setting `FP_MODE_ENROLL_IMAGE` alone successfully routes to `authenticate_enroll()`.\n* **CL Size \u0026 Scope**: ✅ The CL is small, self-contained, and properly scoped to a single logical change.",
+      "isAi": true,
+      "revId": "74210828136a2774308e32e9769318225dc38530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa7506ce_25ed69e9",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T01:48:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The CL description mentions updating `authenticate_fp_mode` to handle `FP_MODE_ENROLL_IMAGE` authentication requests. However, the dispatch logic at the bottom of this function (around line 283) was not updated.\n\nCurrently, it only checks for `FP_MODE_ENROLL_SESSION`:\n```cpp\n\tif (flags_enabled \u0026 FP_MODE_ENROLL_SESSION) {\n\t\treturn authenticate_enroll(mac.value());\n```\nIf `flags_enabled` contains `FP_MODE_ENROLL_IMAGE` but not `FP_MODE_ENROLL_SESSION`, the function will fall through and return `EC_ERROR_UNKNOWN`.\n\nConsider updating that check to use the newly defined `enroll_modes`:\n```cpp\n\tif (flags_enabled \u0026 enroll_modes) {\n\t\treturn authenticate_enroll(mac.value());\n```",
+      "isAi": true,
+      "revId": "74210828136a2774308e32e9769318225dc38530",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
