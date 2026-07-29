@@ -17,6 +17,52 @@
       "isAi": true,
       "revId": "afdae4bb3d600fc8545b32fd83dd252a62bbcc7f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41bbc882_28b324b1",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T22:38:53Z",
+      "side": 1,
+      "message": "Although this evaluates correctly, it would be best to wrap in parentheses to avoid confusion about precedence with the `\u0026\u0026`:\n\n`(global_context.sensor_mode \u0026 FP_MODE_ANY_CAPTURE)`",
+      "range": {
+        "startLine": 459,
+        "startChar": 7,
+        "endLine": 459,
+        "endChar": 55
+      },
+      "revId": "afdae4bb3d600fc8545b32fd83dd252a62bbcc7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cf4b16c_1056fc8e",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T22:38:53Z",
+      "side": 1,
+      "message": "Can you see whether this Gemini feedback is correct or a hallucination?\n\n---\n\n#### 1. Flawed Logic in `test_finger_capture_held_finger_no_duplicate_events`\n\n**Issue:** You wisely wrote a test to ensure duplicate events aren\u0027t sent while a finger is held. However, the test simulates a `FINGERPRINT_SENSOR_SCAN_GOOD` result. A good scan automatically clears the `FP_MODE_CAPTURE` bit, which implicitly masks the event spamming bug described above.\n\n**Remediation:** To truly test that a persistent capture session handles held fingers correctly, you should simulate a *failed* scan that leaves the mode active.\n\n* Change `state.acquire_image_result \u003d FINGERPRINT_SENSOR_SCAN_GOOD;` to `FINGERPRINT_SENSOR_SCAN_TOO_FAST;`.\n* Run the callback twice.\n* Assert that `FP_MODE_CAPTURE` is **still true**.\n* Assert that `mkbp_send_event_fake.call_count` only registered the `FINGER_DOWN` event once.",
+      "range": {
+        "startLine": 217,
+        "startChar": 4,
+        "endLine": 217,
+        "endChar": 55
+      },
+      "revId": "afdae4bb3d600fc8545b32fd83dd252a62bbcc7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
