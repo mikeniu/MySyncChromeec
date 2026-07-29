@@ -218,6 +218,13 @@
 	named-i2c-ports {
 		compatible = "named-i2c-ports";
 
+		/*
+		 * AP tunneling to I2C is default-forbidden, but allowed for
+		 * type-C and battery ports because these can be used to update TCPC or
+		 * retimer firmware or specific battery access such as get battery
+		 * vendor parameter. AP firmware separately sends a command to block
+		 * tunneling to these ports after it's done updating chips.
+		 */
 		i2c_ec_i2c_eeprom: ec_i2c_eeprom {
 			i2c-port = <&i2c0>;
 			enum-names = "I2C_PORT_EEPROM";
@@ -225,6 +232,7 @@
 		i2c_ec_i2c_batt: ec_i2c_batt {
 			i2c-port = <&i2c1>;
 			enum-names = "I2C_PORT_BATTERY";
+			allow-passthru = "battery_allow_passthru";
 		};
 		i2c_ec_i2c_sensor: ec_i2c_sensor {
 			i2c-port = <&i2c2>;
@@ -233,10 +241,12 @@
 		i2c_ec_i2c_sub_usb_c1: ec_i2c_sub_usb_c1 {
 			i2c-port = <&i2c4>;
 			enum-names = "I2C_PORT_USB_C1_TCPC";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_ec_i2c_usb_c0: ec_i2c_usb_c0 {
 			i2c-port = <&i2c5>;
 			enum-names = "I2C_PORT_USB_C0_TCPC";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 	};
 };
