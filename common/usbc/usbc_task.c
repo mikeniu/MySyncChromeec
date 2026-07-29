@@ -51,6 +51,17 @@ extern int _GPIO_CCD_MODE_ODL;
 
 static uint8_t paused[CONFIG_USB_PD_PORT_MAX_COUNT];
 
+#ifdef CONFIG_ZEPHYR
+static k_tid_t pd_threads[CONFIG_USB_PD_PORT_MAX_COUNT];
+
+k_tid_t pd_get_thread(int port)
+{
+	if (port >= 0 && port < ARRAY_SIZE(pd_threads))
+		return pd_threads[port];
+	return NULL;
+}
+#endif
+
 void tc_pause_event_loop(int port)
 {
 	paused[port] = 1;
@@ -160,9 +171,14 @@ static bool pd_task_loop(int port)
 	return true;
 }
 
-void pd_task(void *u)
+void pd_task(void *p)
 {
-	int port = TASK_ID_TO_PD_PORT(task_get_current());
+	int port = POINTER_TO_UINT(p);
+
+#ifdef CONFIG_ZEPHYR
+	if (port >= 0 && port < ARRAY_SIZE(pd_threads))
+		pd_threads[port] = k_current_get();
+#endif
 
 	/*
 	 * If port does not exist, return
