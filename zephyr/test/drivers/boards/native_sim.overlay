@@ -320,6 +320,10 @@
 		gpio_touchpad_elan_int: gpio_touchpad_elan_int {
 			gpios = <&gpio1 20 GPIO_INPUT>;
 		};
+		gpio_pch_pwrbtn_l: pch_pwrbtn_l {
+			gpios = <&gpio1 21 GPIO_OUTPUT_HIGH>;
+			enum-name = "GPIO_PCH_PWRBTN_L";
+		};
 	};
 
 	gpio1: gpio@101 {
@@ -332,7 +336,7 @@
 		low-level;
 		gpio-controller;
 		#gpio-cells = <2>;
-		ngpios = <21>;
+		ngpios = <22>;
 	};
 
 	gpio-interrupts {
