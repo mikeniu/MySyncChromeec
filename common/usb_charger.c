@@ -199,9 +199,8 @@ void usb_charger_task_shared(void *u)
 
 #else /* CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK */
 
-void usb_charger_task(void *u)
+void usb_charger_task(int port)
 {
-	int port = TASK_ID_TO_USB_CHG_PORT(task_get_current());
 	uint32_t evt;
 	struct bc12_config *bc12_port;
 
@@ -227,6 +226,11 @@ void usb_charger_task(void *u)
 
 		usb_charger_task_set_event_sync(port, evt);
 	}
+}
+
+void usb_charger_task_entry(void *p)
+{
+	usb_charger_task(POINTER_TO_UINT(p));
 }
 
 #endif /* CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK */
