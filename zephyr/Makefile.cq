@@ -147,7 +147,9 @@ $(BUILD)/zephyr/lcov_rpt: $(BUILD)/zephyr/lcov.info
 	--ignore-errors inconsistent,inconsistent --ignore-errors unused \
 	-t 'All boards and tests merged' -s $^
 
-special_boards: $(foreach b, $(SPECIAL_BOARDS), $(BUILD)/zephyr/$(b)_rpt)
+special_boards_info: $(foreach b, $(SPECIAL_BOARDS), $(BUILD)/zephyr/$(b)_final.info)
+special_boards_rpt: $(foreach b, $(SPECIAL_BOARDS), $(BUILD)/zephyr/$(b)_rpt)
+special_boards: special_boards_info special_boards_rpt
 
 $(BUILD)/zephyr/%_merged.info: $(BUILD)/zephyr/%/output/zephyr.info $(BUILD)/zephyr/all_tests.info
 	/usr/bin/lcov -o $@ --rc branch_coverage=1 --rc no_exception_branch=1 \
