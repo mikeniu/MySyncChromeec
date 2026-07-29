@@ -4,6 +4,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+# pylint: disable=too-many-lines
+
 """Build and test all of the Zephyr boards.
 
 This is the entry point for the custom firmware builder workflow recipe.
@@ -145,8 +147,83 @@ def get_version():
     return None
 
 
+def get_changed_files():
+    """Returns list of files modified in current Git commit/branch vs base."""
+    try:
+        platform_ec = ZEPHYR_DIR.parent
+        res = subprocess.run(
+            ["git", "diff", "--name-only", "cros/main...HEAD"],
+            cwd=platform_ec,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if res.returncode == 0 and res.stdout.strip():
+            return [
+                line.strip() for line in res.stdout.splitlines() if line.strip()
+            ]
+        res = subprocess.run(
+            ["git", "diff", "--name-only", "HEAD~1"],
+            cwd=platform_ec,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if res.returncode == 0 and res.stdout.strip():
+            return [
+                line.strip() for line in res.stdout.splitlines() if line.strip()
+            ]
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Warning: Failed to query git diff: {e}")
+    return []
+
+
+def is_project_file(file_path):
+    """Returns True if file_path is localized inside a Zephyr program directory."""
+    return "zephyr/program/" in file_path
+
+
+def get_affected_projects(changed_files, all_projects):
+    """Find projects affected by localized program file changes."""
+    matched_projects = set()
+    for f in changed_files:
+        if "zephyr/program/" in f:
+            parts = f.split("zephyr/program/")[1].split("/")
+            if (
+                len(parts) >= 2
+                and parts[1]
+                and parts[1] not in ("src", "include")
+            ):
+                variant = parts[1]
+                variant_matches = [
+                    p
+                    for p in all_projects
+                    if variant
+                    in (
+                        p.config.project_name,
+                        p.config.project_dir.name,
+                    )
+                ]
+                if variant_matches:
+                    matched_projects.update(variant_matches)
+                    continue
+            if len(parts) > 0:
+                prog_name = parts[0]
+                prog_matches = [
+                    p
+                    for p in all_projects
+                    if prog_name in str(p.config.project_dir)
+                    or prog_name in p.config.boards
+                ]
+                if prog_matches:
+                    matched_projects.update(prog_matches)
+                    continue
+
+    return list(matched_projects)
+
+
 def get_projects():
-    """Get the filtered list of all projects."""
+    """Get the list of all projects."""
     projects = []
     platform_ec = ZEPHYR_DIR.parent
     platform_ec_private = platform_ec.parent / "ec-private"
@@ -170,6 +247,7 @@ def get_projects():
         ):
             continue
         projects.append(project)
+
     return projects
 
 
@@ -343,6 +421,20 @@ def build(opts):
             cmd.extend(["-v", version])
 
     projects = get_projects()
+    changed_files = get_changed_files()
+    if changed_files and all(is_project_file(f) for f in changed_files):
+        affected = get_affected_projects(changed_files, projects)
+        if affected:
+            print(
+                f"Change-based filtering selected {len(affected)} / {len(projects)} projects."
+            )
+            projects = affected
+        else:
+            print("No specific project match found -> building all projects.")
+    else:
+        print(
+            "Non-project files modified or no git diff -> building all projects."
+        )
     for project in projects:
         cmd.append(project.config.project_name)
 
