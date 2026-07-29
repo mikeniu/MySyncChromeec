@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3d2e9d8_ba8a9cd4",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 4244,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-29T11:38:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56f004fd_29a63c89",
+      "range": {
+        "startLine": 4238,
+        "startChar": 0,
+        "endLine": 4244,
+        "endChar": 0
+      },
+      "revId": "4a926241ba43f8d967f7d023ce6c25abe7ce90d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b0f6f4c_24dc6549",
@@ -71,6 +95,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5399219_48546fa9",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 4306,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-29T11:38:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b0f6f4c_24dc6549",
+      "range": {
+        "startLine": 4306,
+        "startChar": 8,
+        "endLine": 4306,
+        "endChar": 24
+      },
+      "revId": "4a926241ba43f8d967f7d023ce6c25abe7ce90d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba213f39_32fb7536",
@@ -84,6 +132,30 @@
       "writtenOn": "2026-07-27T11:16:58Z",
       "side": 1,
       "message": "ok similarly to the previous comment, does this need the struct or could this just be the actual type? like `uint16_t rate` so you won\u0027t have to do `resp-\u003eget_rate.rate`, again the whole field name `get_` sounds weird, it sounds like a function you\u0027d want to do `resp-\u003eget_rate()`.",
+      "range": {
+        "startLine": 9484,
+        "startChar": 0,
+        "endLine": 9485,
+        "endChar": 48
+      },
+      "revId": "4a926241ba43f8d967f7d023ce6c25abe7ce90d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "69880f3a_e200007d",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 9485,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-07-29T11:38:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba213f39_32fb7536",
       "range": {
         "startLine": 9484,
         "startChar": 0,
