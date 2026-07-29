@@ -34,6 +34,24 @@
       "parentUuid": "e6df3584_7bf4d467",
       "revId": "e841e35657df9a74e94b7534298079f30a4215d2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78efd43a_f09f9c3e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T15:45:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/62d04088-6ad8-44c8-bf3d-5e6f08359ee6)]\n\n### Review Summary\n* **Functionality**: The `ro-frid` offset update to `0x44` correctly accounts for the 64-byte NPCX firmware header prepended to the Zephyr RO image. This prevents binman from patching the string at the wrong offset and overwriting the ARM vector table (which previously caused a BusFault). The changes appear correct and functional.\n* **Security**: No security vulnerabilities introduced.\n* **Style**: Code adheres to DTS style guidelines; the added comments explaining the `0x44` offset (4 bytes for version struct + 64 bytes for header) are clear and helpful for future maintainers.\n* **Consistency**: Consistent with other binman structure definitions and hardware configurations.\n* **Testing \u0026 Test Coverage**: Manual testing output on physical hardware demonstrates that the fix correctly identifies the versions and prevents the crash. There is no logic modification requiring unit tests.\n* **CL Size \u0026 Scope**: The CL is very small, targeted at a single specific fix, and easy to review.",
+      "isAi": true,
+      "revId": "e841e35657df9a74e94b7534298079f30a4215d2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
