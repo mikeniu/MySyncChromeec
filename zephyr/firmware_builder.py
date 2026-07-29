@@ -4,6 +4,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+# pylint: disable=too-many-lines
+
 """Build and test all of the Zephyr boards.
 
 This is the entry point for the custom firmware builder workflow recipe.
@@ -145,7 +147,112 @@ def get_version():
     return None
 
 
-def get_projects():
+CORE_PATTERNS = (
+    "include/ec_commands.h",
+    "include/config.h",
+    "zephyr/CMakeLists.txt",
+    "zephyr/Kconfig",
+    "zephyr/firmware_builder.py",
+    "zephyr/Makefile.cq",
+    "zephyr/zmake/",
+    "zephyr/shim/Kconfig",
+    "zephyr/shim/CMakeLists.txt",
+    "common/main.c",
+    "core/",
+)
+
+
+def get_changed_files():
+    """Returns list of files modified in current Git commit/branch vs base."""
+    try:
+        platform_ec = ZEPHYR_DIR.parent
+        res = subprocess.run(
+            ["git", "diff", "--name-only", "cros/main...HEAD"],
+            cwd=platform_ec,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if res.returncode == 0 and res.stdout.strip():
+            return [
+                line.strip() for line in res.stdout.splitlines() if line.strip()
+            ]
+        res = subprocess.run(
+            ["git", "diff", "--name-only", "HEAD~1"],
+            cwd=platform_ec,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if res.returncode == 0 and res.stdout.strip():
+            return [
+                line.strip() for line in res.stdout.splitlines() if line.strip()
+            ]
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Warning: Failed to query git diff: {e}")
+    return []
+
+
+def filter_projects_by_changes(changed_files, all_projects):
+    """Filter projects based on changed files. Returns all projects if core files changed."""
+    if not changed_files:
+        return all_projects
+
+    for f in changed_files:
+        for pattern in CORE_PATTERNS:
+            if pattern in f:
+                print(f"Core file '{f}' modified -> building all projects.")
+                return all_projects
+
+    matched_projects = set()
+    for f in changed_files:
+        if "zephyr/program/" in f:
+            parts = f.split("zephyr/program/")[1].split("/")
+            if (
+                len(parts) >= 2
+                and parts[1]
+                and parts[1] not in ("src", "include")
+            ):
+                variant = parts[1]
+                variant_matches = [
+                    p
+                    for p in all_projects
+                    if variant
+                    in (
+                        p.config.project_name,
+                        p.config.project_dir.name,
+                    )
+                ]
+                if variant_matches:
+                    matched_projects.update(variant_matches)
+                    continue
+            if len(parts) > 0:
+                prog_name = parts[0]
+                for p in all_projects:
+                    if (
+                        prog_name in str(p.config.project_dir)
+                        or prog_name in p.config.boards
+                    ):
+                        matched_projects.add(p)
+        elif "board/" in f:
+            parts = f.split("board/")[1].split("/")
+            if len(parts) > 0:
+                board_name = parts[0]
+                for p in all_projects:
+                    if board_name in p.config.boards:
+                        matched_projects.add(p)
+
+    if not matched_projects:
+        print("No specific project match found -> building all projects.")
+        return all_projects
+
+    print(
+        f"Change-based filtering selected {len(matched_projects)} / {len(all_projects)} projects."
+    )
+    return list(matched_projects)
+
+
+def get_projects(filter_changes=False):
     """Get the filtered list of all projects."""
     projects = []
     platform_ec = ZEPHYR_DIR.parent
@@ -170,6 +277,11 @@ def get_projects():
         ):
             continue
         projects.append(project)
+
+    if filter_changes:
+        changed_files = get_changed_files()
+        projects = filter_projects_by_changes(changed_files, projects)
+
     return projects
 
 
@@ -342,7 +454,7 @@ def build(opts):
         if version:
             cmd.extend(["-v", version])
 
-    projects = get_projects()
+    projects = get_projects(filter_changes=True)
     for project in projects:
         cmd.append(project.config.project_name)
 
