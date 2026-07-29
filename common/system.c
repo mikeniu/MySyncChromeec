@@ -1893,13 +1893,38 @@ static int is_full_reboot_command(int cmd)
 	       cmd == EC_REBOOT_COLD_AP_OFF;
 }
 
+static int is_sysjump_command(int cmd)
+{
+	return cmd == EC_REBOOT_JUMP_RO || cmd == EC_REBOOT_JUMP_RW;
+}
+
 #ifdef CONFIG_EC_HOST_CMD
 static struct ec_params_reboot_ec reboot_params;
 static bool reboot_scheduled;
 
 static void deferred_reboot(void)
 {
-	int rv = handle_pending_reboot(&reboot_params);
+	int rv;
+	/*
+	 * EC to avoid processing any Host commands post receiving SYSJUMP
+	 * request. Hence disables host-interface IRQ so no new host command
+	 * is dispatched for processing.
+	 */
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI) &&
+	    is_sysjump_command(reboot_params.cmd)) {
+		lpc_disable_host_interface_interrupts();
+	}
+
+	rv = handle_pending_reboot(&reboot_params);
+
+	/*
+	 * If control reached here the sysjump did not happen; undo the
+	 * pre-ACK IRQ mask so the host interface stays alive.
+	 */
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI) &&
+	    is_sysjump_command(reboot_params.cmd)) {
+		lpc_enable_host_interface_interrupts();
+	}
 
 	if (rv != EC_SUCCESS) {
 		CPRINTS("Deferred reboot failed, "
@@ -1975,8 +2000,20 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 			reboot_scheduled = true;
 			hook_call_deferred(&deferred_reboot_data, 50 * MSEC);
 		}
+
 		return EC_RES_SUCCESS;
 #else
+		/*
+		 * EC to avoid processing any Host commands post receiving
+		 * SYSJUMP request. Hence disables host-interface IRQ so no new
+		 * host command is dispatched between this early ACK and the
+		 * actual sysjump.
+		 */
+		if (IS_ENABLED(CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI) &&
+		    is_sysjump_command(p.cmd)) {
+			lpc_disable_host_interface_interrupts();
+		}
+
 		/* Clean busy bits on host for commands that won't return */
 		args->result = EC_RES_SUCCESS;
 		host_send_response(args);
@@ -1984,7 +2021,19 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 	}
 #endif /* HAS_TASK_HOSTCMD */
 
-	return ec_error_to_status(handle_pending_reboot(&p));
+	int rv = handle_pending_reboot(&p);
+#ifdef HAS_TASK_HOSTCMD
+	/*
+	 * If control reached here the sysjump did not happen; undo the
+	 * pre-ACK IRQ mask so the host interface stays alive.
+	 */
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI) &&
+	    is_sysjump_command(p.cmd)) {
+		lpc_enable_host_interface_interrupts();
+	}
+#endif /* HAS_TASK_HOSTCMD */
+
+	return ec_error_to_status(rv);
 }
 DECLARE_HOST_COMMAND(EC_CMD_REBOOT_EC, host_command_reboot, EC_VER_MASK(0));
 
