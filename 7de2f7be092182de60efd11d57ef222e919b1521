@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4686ed73_fd8dd9de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T22:43:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/2486d53e-0831-4be6-97f9-d207438fd4e4)]\n\n### Review Summary\n\n*   **Functionality:** Good. The new tests accurately set up inputs and validate edge cases for `ec_cmd_fp_mode_v1` using the existing context state. All test cases look correct and exercise the expected conditions.\n*   **Style:** Clean, consistent with the codebase, and properly adheres to ZTEST structures.\n*   **Security:** N/A.\n*   **Testing:** Excellent coverage. The tests correctly exercise `validate_fp_mode()` indirectly through the public interface. The state reset logic correctly clears `global_context.templ_valid` to avoid state bleeding.\n*   **CL Size:** Small, focused, and self-contained.\n*   **Overall:** Great addition of tests to improve coverage and prevent regressions.\n\nTAG\u003dagy\nCONV\u003d27ed116c-8d7a-47eb-86b1-b70cc162803a",
+      "isAi": true,
+      "revId": "7de2f7be092182de60efd11d57ef222e919b1521",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
