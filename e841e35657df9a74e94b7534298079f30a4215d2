@@ -16,6 +16,24 @@
       "message": "@dawidn@google.com\nI did not test this CL yet. This might be the solution for the buccaneer and helipilot issue per discussion with NPCX.",
       "revId": "e841e35657df9a74e94b7534298079f30a4215d2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e77e1831_bcd18e0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T15:43:46Z",
+      "side": 1,
+      "message": "verified\n\n```\nkanix-rev2 ~ # ectool --name\u003dcros_fp version\nRO version:    buccaneer-0.0.0-3c9cac4\nRW version:    buccaneer-0.0.0-3c9cac4\nFirmware copy: RW\nBuild info:    buccaneer-0.0.0-3c9cac4 2026-07-29 08:36:48 root@fsammoura-glaptop\nTool version:  v2.0.31458-857e6181517 2026-07-13 00:02:48 @fsammoura2.c.googlers.com\nkanix-rev2 ~ # ectool --name\u003dcros_fp flashprotect\nFlash protect flags: 0x00000000\nValid flags:         0x0000083f wp_gpio_asserted ro_at_boot ro_now all_now STUCK INCONSISTENT UNKNOWN_ERROR\nWritable flags:      0x00000001 ro_at_boot\nkanix-rev2 ~ # ectool --name\u003dcros_fp fpencstatus \nFPMCU encryption status: 0x00000001 FPTPM_seed_set\nValid flags:             0x00000001 FPTPM_seed_set\nkanix-rev2 ~ # ectool --name\u003dcros_fp reboot_ec cold\nkanix-rev2 ~ # ectool --name\u003dcros_fp version\nRO version:    buccaneer-0.0.0-3c9cac4\nRW version:    buccaneer-0.0.0-3c9cac4\nFirmware copy: RW\nBuild info:    buccaneer-0.0.0-3c9cac4 2026-07-29 08:36:48 root@fsammoura-glaptop\nTool version:  v2.\n```",
+      "parentUuid": "e6df3584_7bf4d467",
+      "revId": "e841e35657df9a74e94b7534298079f30a4215d2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
