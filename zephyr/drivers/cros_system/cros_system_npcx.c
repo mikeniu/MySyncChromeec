@@ -427,12 +427,17 @@ const char *cros_system_chip_revision(void)
 #define PSL_NODE DT_INST(0, nuvoton_npcx_power_psl)
 #if DT_NODE_HAS_STATUS(PSL_NODE, okay)
 PINCTRL_DT_DEFINE(PSL_NODE);
+__weak int board_configure_psl_in(const struct pinctrl_dev_config *pcfg)
+{
+	return pinctrl_apply_state(pcfg, PINCTRL_STATE_SLEEP);
+}
+
 static int cros_system_npcx_configure_psl_in(void)
 {
 	const struct pinctrl_dev_config *pcfg =
 		PINCTRL_DT_DEV_CONFIG_GET(PSL_NODE);
 
-	return pinctrl_apply_state(pcfg, PINCTRL_STATE_SLEEP);
+	return board_configure_psl_in(pcfg);
 }
 
 static void cros_system_npcx_psl_out_inactive(void)
