@@ -25,6 +25,14 @@ extern "C" {
 /* PD Host command timeout */
 #define PD_HOST_COMMAND_TIMEOUT_US SECOND
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+/**
+ * Return the thread handle for the specified PD port task.
+ */
+k_tid_t pd_get_thread(int port);
+#endif
+
 /*
  * Define PD_PORT_TO_TASK_ID() and TASK_ID_TO_PD_PORT() macros to
  * go between PD port number and task ID. Assume that TASK_ID_PD_C0 is the
