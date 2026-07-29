@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1accc102_2420b227",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T01:44:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "aff4a946_75be94cb",
+      "revId": "eaa8c9082adca451b581546588158dbb9ac17553",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93498785_27cc1703",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Adding `FP_MODE_ENROLL_IMAGE` to this mask introduces regressions in the `fp_set_sensor_mode` validation logic (`chromium/common/fpsensor/fpsensor_state.cc`):\n\n1. **Breaks combined requests**: The host often sends `FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE` together (as seen in `chromium/test/fpsensor_auth_commands.cc`). Because both are now in this mask, `std::popcount(mode \u0026 FP_MODES_WITH_AUTHENTICATION) \u003e 1` will evaluate to `true` and the request will be incorrectly rejected with `EC_ERROR_INVAL`.\n2. **Missing auth handler**: If `FP_MODE_ENROLL_IMAGE` is sent alone, the code will pass the popcount check, but fall through the `if (flags_enabled \u0026 FP_MODE_ENROLL_SESSION)` and `else if (flags_enabled \u0026 FP_MODE_MATCH)` block, ultimately returning `EC_ERROR_UNKNOWN`.\n\nYou must update the validation logic and authentication dispatch block in `fp_set_sensor_mode` to properly handle this new authenticated mode.",
       "isAi": true,
+      "revId": "eaa8c9082adca451b581546588158dbb9ac17553",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "179ff767_42cb889d",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 8577,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T01:44:02Z",
+      "side": 1,
+      "message": "modified this in a previous CL",
+      "parentUuid": "93498785_27cc1703",
       "revId": "eaa8c9082adca451b581546588158dbb9ac17553",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
