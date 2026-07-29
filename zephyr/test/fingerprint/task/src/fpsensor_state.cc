@@ -147,6 +147,109 @@ ZTEST_USER(fpsensor_state, test_two_step_bypass_mitigation)
 		"Expected validate_request to be called to verify the state escalation step");
 }
 
+ZTEST_USER(fpsensor_state, test_validate_fp_mode_invalid_capture_type)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_CAPTURE |
+			(FP_CAPTURE_TYPE_MAX << FP_MODE_CAPTURE_TYPE_SHIFT)
+	};
+	struct ec_response_fp_mode response;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected invalid capture type to return INVALID_PARAM, got %d",
+		rv);
+
+	zassert_equal(
+		validate_request_call_count, 0,
+		"Expected validate_request not to be called for invalid capture type");
+}
+
+ZTEST_USER(fpsensor_state, test_validate_fp_mode_invalid_algo_bits)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = ~FP_VALID_MODES & ~FP_MODE_CAPTURE_TYPE_MASK,
+	};
+	struct ec_response_fp_mode response;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected invalid mode flags to return INVALID_PARAM, got %d",
+		rv);
+
+	zassert_equal(
+		validate_request_call_count, 0,
+		"Expected validate_request not to be called for invalid mode flags");
+}
+
+ZTEST_USER(fpsensor_state, test_validate_fp_mode_max_templates_exceeded)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_ENROLL_SESSION,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.templ_valid = FP_MAX_FINGER_COUNT;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected ENROLL_SESSION with max templates to fail, got %d",
+		rv);
+
+	zassert_equal(
+		validate_request_call_count, 0,
+		"Expected validate_request not to be called when max templates exceeded");
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_reset_sensor_while_active_fails)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_RESET_SENSOR,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_MATCH;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected RESET_SENSOR while active to return INVALID_PARAM, got %d",
+		rv);
+
+	zassert_equal(
+		validate_request_call_count, 0,
+		"Expected validate_request not to be called when resetting active sensor");
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_reset_sensor_while_idle_succeeds)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_RESET_SENSOR,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = 0;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(rv, EC_RES_SUCCESS,
+		      "Expected RESET_SENSOR while idle to succeed, got %d",
+		      rv);
+
+	zassert_equal(
+		validate_request_call_count, 0,
+		"Expected RESET_SENSOR while idle to bypass validate_request");
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */
