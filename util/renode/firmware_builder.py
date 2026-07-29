@@ -10,6 +10,7 @@ gets invoked by chromite/api/controller/firmware.py.
 """
 
 import argparse
+from concurrent import futures
 import getpass
 import json
 import os
@@ -103,7 +104,7 @@ def _run_renode_tests(
     success = True
     results: Dict[BoardName, ResultPath] = {}
 
-    for board in boards:
+    def _run_board(board: BoardName) -> tuple[BoardName, ResultPath, int]:
         result_file = output_dir / f"{board}_results.json"
         proc = run_device_tests(
             board,
@@ -112,9 +113,17 @@ def _run_renode_tests(
             output_file=result_file,
             check=False,
         )
-        if proc.returncode != 0:
-            success = False
-        results[board] = result_file
+        return board, result_file, proc.returncode
+
+    with futures.ThreadPoolExecutor(max_workers=len(boards)) as executor:
+        future_to_board = {
+            executor.submit(_run_board, board): board for board in boards
+        }
+        for future in futures.as_completed(future_to_board):
+            board, result_file, returncode = future.result()
+            if returncode != 0:
+                success = False
+            results[board] = result_file
 
     return RenodeRunResult(success, results)
 
