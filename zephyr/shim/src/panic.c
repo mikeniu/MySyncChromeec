@@ -115,9 +115,18 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_EXCEPTION(pdata) (pdata->x86.eflags)
 #define PANIC_REG_REASON(pdata) (pdata->x86.vector)
 #define PANIC_REG_INFO(pdata) (pdata->x86.error_code)
+#elif defined(CONFIG_ARCH_POSIX)
+#define PANIC_ARCH PANIC_ARCH_POSIX
+#define PANIC_REG_LIST(M, M_GPR) M(dummy, posix.esf_dummy, dummy)
+#define PANIC_REG_EXCEPTION(pdata) (pdata->posix.exception)
+#define PANIC_REG_REASON(pdata) (pdata->posix.reason)
+#define PANIC_REG_INFO(pdata) (pdata->posix.info)
 #else
 /* Not implemented for this arch */
 #define PANIC_ARCH PANIC_ARCH_UNSUPPORTED
+#if !defined(CONFIG_ZTEST)
+#error "Unsupported architecture for PANIC_ARCH"
+#endif
 #define PANIC_REG_LIST(M, M_GPR)
 static uint8_t placeholder_exception_reg;
 static uint32_t placeholder_reason_reg;
