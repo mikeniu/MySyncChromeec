@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c035f18c_586a09a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T20:58:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b54da7c0_47b19453",
+      "revId": "0728d6b0955022faf262b0cfe4cdb598dd4093ac",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "448a4187_db56ebd6",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Now that `EC_MKBP_FP_FINGER_DOWN` is sent unconditionally before the image acquisition step, it would be great to verify that it is still successfully generated even when `fp_acquire_image` fails (such as returning `FINGERPRINT_SENSOR_SCAN_TOO_FAST` here).\n\nConsider adding an assertion to verify that exactly 1 MKBP event was generated and that it is the `FINGER_DOWN` event:\n\n```cpp\n\t/* Confirm MKBP event was sent once (FINGER_DOWN). */\n\tzassert_equal(mkbp_send_event_fake.call_count, 1);\n\tzassert_equal(mkbp_send_event_fake.arg0_history[0],\n\t\t      EC_MKBP_EVENT_FINGERPRINT);\n\t\n\tuint32_t fp_events;\n\tfp_get_next_event((uint8_t *)\u0026fp_events);\n\tzassert_true(fp_events \u0026 EC_MKBP_FP_FINGER_DOWN);\n```",
       "isAi": true,
+      "revId": "0728d6b0955022faf262b0cfe4cdb598dd4093ac",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a14f08e_e52ef717",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
+        "patchSetId": 19
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T20:58:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "448a4187_db56ebd6",
       "revId": "0728d6b0955022faf262b0cfe4cdb598dd4093ac",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
