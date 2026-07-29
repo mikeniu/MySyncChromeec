@@ -34,6 +34,24 @@
       "parentUuid": "4a713acd_d6a9ed3c",
       "revId": "129fa268b862662ec5147197ea336992040b689f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba678345_99b3f92f",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-29T18:24:50Z",
+      "side": 1,
+      "message": "This should be whatever the port actually returns in its SKEDB. Benson to see what it returns during compliance and update the field if needed.",
+      "parentUuid": "b1195924_85942af1",
+      "revId": "129fa268b862662ec5147197ea336992040b689f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
