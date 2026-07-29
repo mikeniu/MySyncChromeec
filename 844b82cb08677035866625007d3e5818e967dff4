@@ -22,6 +22,30 @@
       },
       "revId": "844b82cb08677035866625007d3e5818e967dff4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa770b3a_4d85bba1",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-29T21:13:16Z",
+      "side": 1,
+      "message": "Per OOB conversation, I\u0027d prefer to leave these in unless they actually block the tester from running, so we don\u0027t need to maintain a separate VIF for DPAM testing.",
+      "parentUuid": "ae467cb7_7b552088",
+      "range": {
+        "startLine": 492,
+        "startChar": 6,
+        "endLine": 521,
+        "endChar": 18
+      },
+      "revId": "844b82cb08677035866625007d3e5818e967dff4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
