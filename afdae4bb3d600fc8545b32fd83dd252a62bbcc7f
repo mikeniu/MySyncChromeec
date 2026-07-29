@@ -63,6 +63,30 @@
       },
       "revId": "afdae4bb3d600fc8545b32fd83dd252a62bbcc7f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7256f30_14bd9d04",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T22:46:24Z",
+      "side": 1,
+      "message": "the test will fail if I change `state.acquire_image_result \u003d FINGERPRINT_SENSOR_SCAN_GOOD;` to `FINGERPRINT_SENSOR_SCAN_TOO_FAST`. Per our discussion, if the `fp_acquire_image` call returns a code indicating failure for too fast or partial, the scan will go into a loop and will never process enrollment or match. These are returned from the process match/enroll.",
+      "parentUuid": "9cf4b16c_1056fc8e",
+      "range": {
+        "startLine": 217,
+        "startChar": 4,
+        "endLine": 217,
+        "endChar": 55
+      },
+      "revId": "afdae4bb3d600fc8545b32fd83dd252a62bbcc7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
