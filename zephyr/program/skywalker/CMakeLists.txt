@@ -6,7 +6,6 @@ cmake_minimum_required(VERSION 3.20.5)
 find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 
 target_sources(app PRIVATE
-	${PLATFORM_EC_PROGRAM_DIR}/skywalker/src/i2c.c
 	${PLATFORM_EC_PROGRAM_DIR}/skywalker/src/hibernate.c
 	${PLATFORM_EC_PROGRAM_DIR}/skywalker/src/hooks.c
 	${PLATFORM_EC_PROGRAM_DIR}/skywalker/src/backlight.c)

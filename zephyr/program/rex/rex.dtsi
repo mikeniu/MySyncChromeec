@@ -120,6 +120,10 @@
 	named-i2c-ports {
 		ec_i2c_usb_c1_tcp {
 			dynamic-speed;
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
+		};
+		ec_i2c_usb_c1_mix {
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 	};
 

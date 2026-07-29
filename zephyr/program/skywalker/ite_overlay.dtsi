@@ -33,8 +33,12 @@
 	};
 
 	named-i2c-ports {
+		ec_i2c_pdc_sm_scl_3v3 {
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
+		};
 		ec_smb_batt_scl_3v3 {
 			enum-names = "I2C_PORT_BATTERY", "I2C_PORT_VIRTUAL_BATTERY";
+			allow-passthru = "battery_allow_passthru";
 		};
 	};
 

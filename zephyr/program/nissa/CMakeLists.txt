@@ -79,7 +79,6 @@ endif()
 if(DEFINED CONFIG_BOARD_JOXER)
 	project(joxer)
 	zephyr_library_sources(
-			"joxer/src/board.c"
 			"joxer/src/led.c"
 			"joxer/src/keyboard.c"
 			"joxer/src/form_factor.c"
@@ -119,7 +118,6 @@ if(DEFINED CONFIG_BOARD_YAVISTA)
 	zephyr_library_sources(
 			"yavista/src/led.c"
 			"yavista/src/keyboard.c"
-			"yavista/src/board.c"
 			"yavista/src/sub_board.c"
 			"yavista/src/thermal.c"
 	)

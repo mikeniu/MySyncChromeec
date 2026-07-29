@@ -12,11 +12,13 @@
 			remote-port = <1>;
 			enum-names = "I2C_PORT_BATTERY",
 				"I2C_PORT_VIRTUAL_BATTERY";
+			allow-passthru = "battery_allow_passthru";
 		};
 		i2c_charger: charger {
 			i2c-port = <&i2c0>;
 			enum-names = "I2C_PORT_CHARGER",
 				"I2C_PORT_EEPROM";
+			protect-type = "NO_PROTECT_UNTIL_ENABLED";
 		};
 		i2c_sensor: sensor {
 			i2c-port = <&i2c3>;
