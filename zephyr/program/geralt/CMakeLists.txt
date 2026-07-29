@@ -16,7 +16,6 @@ zephyr_library_sources(
 	"src/hooks.c"
 )
 
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C "src/i2c.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC
 			"src/dp_alt_mode.c"
 			"src/usbc_config.c"

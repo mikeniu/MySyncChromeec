@@ -235,12 +235,17 @@
 	};
 
 	named-i2c-ports {
+		ec_smb_batt_scl_3v3 {
+			remote-port = <7>;
+			allow-passthru = "battery_allow_passthru";
+		};
 		ec_i2c_usb_c0_scl_3v3 {
 			i2c-port = <&i2c2ALT>;
 			remote-port = <8>;
+			allow-passthru = "no_protect_until_enabled";
 		};
-		ec_smb_batt_scl_3v3 {
-			remote-port = <7>;
+		ec_i2c_usb_c1_scl_3v3 {
+			allow-passthru = "no_protect_until_enabled";
 		};
 
 		/delete-node/ ec_i2c5;

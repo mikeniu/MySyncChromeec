@@ -120,6 +120,10 @@
 	named-i2c-ports {
 		ec_i2c_usb_c1_tcp {
 			dynamic-speed;
+			allow-passthru = "no_protect_until_enabled";
+		};
+		ec_i2c_usb_c1_mix {
+			allow-passthru = "no_protect_until_enabled";
 		};
 	};
 

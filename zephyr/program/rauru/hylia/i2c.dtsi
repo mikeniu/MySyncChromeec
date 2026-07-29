@@ -15,11 +15,13 @@
 			i2c-port = <&i2c1>;
 			enum-names = "I2C_PORT_BATTERY", "I2C_PORT_VIRTUAL_BATTERY";
 			remote-port = <7>;
+			allow-passthru = "battery_allow_passthru";
 		};
 		i2c_ec_i2c_usb_c0_scl_3v3: ec_i2c_usb_c0_scl_3v3 {
 			i2c-port = <&i2c2>;
 			enum-names = "I2C_PORT_USB_C0";
 			remote-port = <8>;
+			allow-passthru = "no_protect_until_enabled";
 		};
 		i2c_ec_i2c_sensor_scl_1v8: ec_i2c_sensor_scl_1v8 {
 			i2c-port = <&i2c3>;
@@ -28,6 +30,7 @@
 		i2c_ec_i2c_usb_c1_scl_3v3: ec_i2c_usb_c1_scl_3v3 {
 			i2c-port = <&i2c4>;
 			enum-names = "I2C_PORT_USB_C1";
+			allow-passthru = "no_protect_until_enabled";
 		};
 	};
 };

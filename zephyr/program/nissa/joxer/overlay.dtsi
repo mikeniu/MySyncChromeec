@@ -372,3 +372,17 @@
 &usbpd0 {
 	status = "okay";
 };
+
+/ {
+	named-i2c-ports {
+		ec_i2c_batt {
+			allow-passthru = "battery_allow_passthru";
+		};
+		ec_i2c_sub_usb_c1 {
+			allow-passthru = "no_protect_until_enabled";
+		};
+		ec_i2c_usb_c0 {
+			allow-passthru = "no_protect_until_enabled";
+		};
+	};
+};
