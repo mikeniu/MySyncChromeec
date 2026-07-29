@@ -198,6 +198,16 @@ test_static int validate_fp_mode(const uint32_t mode)
 		return EC_ERROR_INVAL;
 	}
 
+	/*
+	 * Don't allow single-step image enrollment without an active session.
+	 */
+	if ((mode & FP_MODE_ENROLL_IMAGE) &&
+	    !(cur_mode & FP_MODE_ENROLL_SESSION) &&
+	    !(mode & FP_MODE_ENROLL_SESSION)) {
+		CPRINTS("FP_MODE_ENROLL_IMAGE requested outside ENROLL_SESSION");
+		return EC_ERROR_INVAL;
+	}
+
 	/* Don't allow sensor reset if any other mode is
 	 * set (including FP_MODE_RESET_SENSOR itself).
 	 */
