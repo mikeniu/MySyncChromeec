@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae467cb7_7b552088",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1003039
+      },
+      "writtenOn": "2026-07-29T20:55:02Z",
+      "side": 1,
+      "message": "@alevkoy: I think we should strip out the DisplayPort Alt Mode sections (both ports) too. GRL latest software complains if this is there and won\u0027t accept the VIF.",
+      "range": {
+        "startLine": 492,
+        "startChar": 6,
+        "endLine": 521,
+        "endChar": 18
+      },
+      "revId": "844b82cb08677035866625007d3e5818e967dff4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
