@@ -9,3 +9,8 @@ if(DEFINED CONFIG_BOARD_ITE_AIC)
 	project(ite-aic)
 	add_subdirectory(ite-aic)
 endif()
+
+if(DEFINED CONFIG_BOARD_NPCX_AIC)
+	project(npcx-aic)
+	add_subdirectory(npcx-aic)
+endif()
