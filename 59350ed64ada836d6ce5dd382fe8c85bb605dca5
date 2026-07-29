@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c7d94a7b_5cc5e707",
+        "filename": "zephyr/program/atria/penghu-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-07-29T06:10:49Z",
+      "side": 1,
+      "message": "It\u0027s copied from https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/program/atria/atriarvp-ish/project.conf I think.",
+      "parentUuid": "f7502f0e_f77cdef9",
+      "revId": "59350ed64ada836d6ce5dd382fe8c85bb605dca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "663dea75_6ba209d1",
         "filename": "zephyr/program/atria/penghu-ish/project.conf",
         "patchSetId": 1
