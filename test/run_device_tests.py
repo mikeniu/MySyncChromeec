@@ -415,9 +415,12 @@ class Renode(Platform):
 
     def __init__(self):
         self.process = None
+        self.console_pty = os.path.join(
+            tempfile.gettempdir(), f"renode-uart-{os.getpid()}-{id(self)}"
+        )
 
     def get_console(self, board_config: BoardConfig) -> Optional[str]:
-        return "/tmp/renode-uart"
+        return self.console_pty
 
     def hw_write_protect(self, enable: bool) -> None:
         pass
@@ -440,6 +443,8 @@ class Renode(Platform):
             "./util/renode-ec-launch",
             "--board",
             board_config.name,
+            "--uart",
+            self.console_pty,
         ]
         if zephyr:
             # We've adopted the convention that we prefix upstream Zephyr test
@@ -462,7 +467,13 @@ class Renode(Platform):
         return True
 
     def cleanup(self) -> None:
-        self.process.kill()
+        if self.process:
+            self.process.kill()
+        if os.path.lexists(self.console_pty):
+            try:
+                os.unlink(self.console_pty)
+            except OSError:
+                pass
 
     def _skip_test_bloonchipper(
         self, test_config: TestConfig, zephyr: bool
@@ -1509,9 +1520,12 @@ def build_zephyr_upstream(
 ) -> list[str]:
     """Prepare a command to build Zephyr test"""
     # Build only with Zephyr and clobber a previous build
+    board_build_dir = os.path.join(
+        EC_DIR, f"build/zephyr/fpmcu-test-{board_name}"
+    )
     cmd = [ZEPHYR_TWISTER] + ["-b"] + ["-c"]
     cmd = cmd + ["-p"] + [board_name]
-    cmd = cmd + ["-O"] + [ZEPHYR_TWISTER_BUILD_DIR]
+    cmd = cmd + ["-O"] + [board_build_dir]
     cmd = cmd + ["-s"] + [test_name]
     cmd = cmd + ["--no-upload-cros-rdb"]
     cmd = cmd + ["--force-toolchain"]
@@ -1541,7 +1555,9 @@ def build_zephyr(
         return cmd
 
     # Create tmp file to pass needed configs
-    test_conf = os.path.join(tempfile.gettempdir(), "test.conf")
+    test_conf = os.path.join(
+        tempfile.gettempdir(), f"test-{os.getpid()}-{id(test)}.conf"
+    )
     with open(test_conf, "w", encoding="utf-8") as f_test_config:
         cmd = cmd + ["-DOVERLAY_CONFIG=" + test_conf]
         # Get list of supported tests
@@ -1593,6 +1609,7 @@ def build(
     env: Environment,
 ) -> None:
     """Build specified test for specified board."""
+    test_conf = None
     if zephyr:
         zephyr_extra_configs = []
         for e in (Environment.ALL, env):
@@ -1601,13 +1618,23 @@ def build(
             )
 
         cmd = build_zephyr(test, board_name, zephyr_extra_configs)
+        for arg in cmd:
+            if arg.startswith("-DOVERLAY_CONFIG="):
+                test_conf = arg.split("=", 1)[1]
     else:
         cmd = build_ec(
             test.test_name, board_name, compiler, test.apptype_to_use
         )
 
-    logging.debug('Running command: "%s"', " ".join(cmd))
-    subprocess.run(cmd, check=False).check_returncode()
+    try:
+        logging.debug('Running command: "%s"', " ".join(cmd))
+        subprocess.run(cmd, check=False).check_returncode()
+    finally:
+        if test_conf and os.path.exists(test_conf):
+            try:
+                os.unlink(test_conf)
+            except OSError:
+                pass
 
 
 def _patch_image_with_new_rw(test: TestConfig, image_path: str):
@@ -1828,7 +1855,15 @@ def get_zephyr_image_path(test: TestConfig, build_board: str):
     if test.zephyr_name is not None:
         # The path to binary differs depending on a test name, path and platform,
         # so just find the zephyr.npcx.bin or zephyr.bin in the build dir.
-        twister_out = os.walk(ZEPHYR_TWISTER_BUILD_DIR)
+        board_twister_dir = os.path.join(
+            EC_DIR, f"build/zephyr/fpmcu-test-{build_board}"
+        )
+        build_dir = (
+            board_twister_dir
+            if os.path.exists(board_twister_dir)
+            else ZEPHYR_TWISTER_BUILD_DIR
+        )
+        twister_out = os.walk(build_dir)
         image_path = None
         for dirpath, _, filenames in twister_out:
             # b/419617755#comment46: Use version with Nuvoton header if it exists.
