@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9621b57f_8d4a0585",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-07-29T07:38:04Z",
+      "side": 1,
+      "message": "Done, please check",
+      "parentUuid": "b8be52e5_2da5510a",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 47
+      },
+      "revId": "c89d5567286c9aebc00d2c3a4c5c3ea89ba17c1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1872ad1f_7218d31b",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-28T14:52:03Z",
       "side": 1,
       "message": "This is not needed since `EGIS_EGIS660_LIBRARY` sets to `y` by default if `FINGERPRINT_SENSOR_EGIS660` is enabled.",
+      "range": {
+        "startLine": 63,
+        "startChar": 1,
+        "endLine": 63,
+        "endChar": 28
+      },
+      "revId": "c89d5567286c9aebc00d2c3a4c5c3ea89ba17c1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da0551ab_d09013c4",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-07-29T07:38:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1872ad1f_7218d31b",
       "range": {
         "startLine": 63,
         "startChar": 1,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25069b53_4844abdf",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.egis",
+        "patchSetId": 7
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-07-29T07:38:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "126e511b_e0cefcc6",
+      "range": {
+        "startLine": 69,
+        "startChar": 8,
+        "endLine": 69,
+        "endChar": 28
+      },
+      "revId": "c89d5567286c9aebc00d2c3a4c5c3ea89ba17c1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0281b45b_1a0dfc86",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-07-28T14:52:03Z",
       "side": 1,
       "message": "The algorithm on `srebrna` and `stobnica` is for glass, right? I just want to double check.",
+      "range": {
+        "startLine": 27,
+        "startChar": 14,
+        "endLine": 27,
+        "endChar": 19
+      },
+      "revId": "c89d5567286c9aebc00d2c3a4c5c3ea89ba17c1d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93ae2403_1e1aab76",
+        "filename": "zephyr/dts/bindings/fingerprint/egis,egis660.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-07-29T07:38:04Z",
+      "side": 1,
+      "message": "Yes",
+      "parentUuid": "0281b45b_1a0dfc86",
       "range": {
         "startLine": 27,
         "startChar": 14,
