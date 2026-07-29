@@ -273,11 +273,14 @@ static enum ec_error_list authenticate_fp_mode(
 	}
 
 	/*
-	 * Reject requests that would result in multiple auth-gated bits being
-	 * set. A single cryptographic MAC is tied to exactly one operation
-	 * string.
+	 * Reject requests that mix enrollment and match modes in a single
+	 * command. A single cryptographic MAC is tied to exactly one operation
+	 * string
+	 * ("enroll" or "auth").
 	 */
-	if (std::popcount(mode & FP_MODES_WITH_AUTHENTICATION) > 1) {
+	constexpr uint32_t enroll_modes = FP_MODE_ENROLL_SESSION |
+					  FP_MODE_ENROLL_IMAGE;
+	if ((mode & FP_MODE_MATCH) && (mode & enroll_modes)) {
 		return EC_ERROR_INVAL;
 	}
 
