@@ -106,6 +106,24 @@
       "parentUuid": "fdad0714_4c2a9f05",
       "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "989d21e3_556170b6",
+        "filename": "zephyr/shim/src/espi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-07-29T14:44:25Z",
+      "side": 1,
+      "message": "Agree with comments, I have modified the implementation. Kindly review.",
+      "parentUuid": "b2954c29_521b6dc0",
+      "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
