@@ -339,6 +339,74 @@ ZTEST_USER(fpsensor_state,
 		      rv);
 }
 
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_enroll_image_without_session_in_mode_fails)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_ENROLL_IMAGE,
+	};
+	struct ec_response_fp_mode response;
+
+	/*
+	 * Even if cur_mode has FP_MODE_ENROLL_SESSION set, params.mode missing
+	 * FP_MODE_ENROLL_SESSION must be rejected to prevent session clearing.
+	 */
+	global_context.sensor_mode = FP_MODE_ENROLL_SESSION;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(rv, EC_RES_INVALID_PARAM,
+		      "Expected ENROLL_IMAGE without ENROLL_SESSION in mode to "
+		      "return INVALID_PARAM, got %d",
+		      rv);
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_enroll_image_with_active_session_succeeds)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_ENROLL_SESSION;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_SUCCESS,
+		"Expected ENROLL_IMAGE with active session to succeed, got %d",
+		rv);
+	zassert_equal(
+		global_context.sensor_mode & FP_MODE_ENROLL_SESSION,
+		FP_MODE_ENROLL_SESSION,
+		"Expected ENROLL_SESSION bit to remain set in sensor_mode");
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_enroll_image_concurrent_session_succeeds)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = 0;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_SUCCESS,
+		"Expected concurrent ENROLL_IMAGE | ENROLL_SESSION request to "
+		"succeed, got %d",
+		rv);
+	zassert_equal(
+		global_context.sensor_mode,
+		FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
+		"Expected sensor_mode to be ENROLL_IMAGE | ENROLL_SESSION, got 0x%x",
+		global_context.sensor_mode);
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */
