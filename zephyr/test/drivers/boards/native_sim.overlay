@@ -239,6 +239,10 @@
 			gpios = <&gpio0 28 GPIO_INPUT>;
 			enum-name = "GPIO_BATT_PRES_ODL";
 		};
+		gpio_pch_pwrbtn_l: pch_pwrbtn_l {
+			gpios = <&gpio1 21 GPIO_OUTPUT_HIGH>;
+			enum-name = "GPIO_PCH_PWRBTN_L";
+		};
 		gpio_no_init: no_init {
 			gpios = <&gpio0 29 (GPIO_ACTIVE_LOW | GPIO_INPUT)>;
 			no-auto-init;
@@ -331,7 +335,7 @@
 		low-level;
 		gpio-controller;
 		#gpio-cells = <2>;
-		ngpios = <21>;
+		ngpios = <22>;
 	};
 
 	gpio-interrupts {
