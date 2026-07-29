@@ -430,7 +430,8 @@ void usb_mux_set_safe_mode_exit(int port)
 
 void pd_send_hard_reset(int port)
 {
-	task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_SEND_HARD_RESET);
+	if (IS_ENABLED(CONFIG_USB_PE_SM))
+		pd_dpm_request(port, DPM_REQUEST_HARD_RESET);
 }
 
 #ifdef CONFIG_USBC_OCP
