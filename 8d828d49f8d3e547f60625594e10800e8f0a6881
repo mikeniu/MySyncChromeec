@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "72bb8946_3bc2812b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T20:31:25Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "de12ae30_e0656545",
+      "revId": "8d828d49f8d3e547f60625594e10800e8f0a6881",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9bf4a471_43d89412",
@@ -49,6 +67,30 @@
       "writtenOn": "2026-07-29T18:40:14Z",
       "side": 1,
       "message": "Can you add this go link to both comments: go/cros-fp-npcx99fp-bootloader",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 66
+      },
+      "revId": "8d828d49f8d3e547f60625594e10800e8f0a6881",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "370e8b7f_4d0f10dd",
+        "filename": "zephyr/program/fpmcu/helipilot/buccaneer.dts",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T20:31:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9bf4a471_43d89412",
       "range": {
         "startLine": 57,
         "startChar": 0,
