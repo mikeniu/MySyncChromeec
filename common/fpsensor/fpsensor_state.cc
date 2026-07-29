@@ -179,7 +179,7 @@ fp_command_encryption_status(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_FP_ENC_STATUS, fp_command_encryption_status,
 		     EC_VER_MASK(0));
 
-static int validate_fp_mode(const uint32_t mode)
+test_static int validate_fp_mode(const uint32_t mode)
 {
 	uint32_t capture_type = FP_CAPTURE_TYPE(mode);
 	uint32_t algo_mode = mode & ~FP_MODE_CAPTURE_TYPE_MASK;
