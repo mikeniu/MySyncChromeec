@@ -17,6 +17,52 @@
       "isAi": true,
       "revId": "47f6a7dc6ea43134863102643b1c1cc83ac2be51",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5d9e5fb_a854a7dc",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T21:09:13Z",
+      "side": 1,
+      "message": "The last assert argument is strange. What is \"doorbell\"?\n\nHow about something like \"First event must be FINGERPRINT type\" and \"Second event must be FINGERPRINT type\"?\n\nThat said, you aren\u0027t adding these arguments on any of the zasserts in other files. Either add it everywhere or nowhere.",
+      "range": {
+        "startLine": 285,
+        "startChar": 0,
+        "endLine": 288,
+        "endChar": 52
+      },
+      "revId": "47f6a7dc6ea43134863102643b1c1cc83ac2be51",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b63469b3_5e05d649",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T21:09:13Z",
+      "side": 1,
+      "message": "You aren\u0027t adding these arguments on any of the zasserts in other files. Either add it everywhere or nowhere.",
+      "range": {
+        "startLine": 295,
+        "startChar": 0,
+        "endLine": 301,
+        "endChar": 13
+      },
+      "revId": "47f6a7dc6ea43134863102643b1c1cc83ac2be51",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
