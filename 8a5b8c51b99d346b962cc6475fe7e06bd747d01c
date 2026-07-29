@@ -33,6 +33,24 @@
       "message": "It\u0027s possible that this is now a redundant test. It\u0027s also possible that this rex test is the only thing covering some line in the generic implementation now. Maybe try removing this file as well and see what happens to coverage.",
       "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4e2f2d3_444bddbc",
+        "filename": "zephyr/test/rex/tests/program/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-07-29T05:00:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e71712a_3c36bc99",
+      "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
