@@ -36,6 +36,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec0a5dd5_a9ae896c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T22:25:38Z",
+      "side": 1,
+      "message": "added `\t   test_finger_capture_held_finger_no_duplicate_events)`",
+      "parentUuid": "3b4f3377_97aded3b",
+      "revId": "47f6a7dc6ea43134863102643b1c1cc83ac2be51",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ee8c2a6_beb7f4d6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T22:25:38Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ca39d75d_80f5b6dc",
+      "revId": "47f6a7dc6ea43134863102643b1c1cc83ac2be51",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c5d9e5fb_a854a7dc",
@@ -59,6 +95,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a928a6b6_a0ff1743",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T22:25:38Z",
+      "side": 1,
+      "message": "removed it to be consistent.",
+      "parentUuid": "c5d9e5fb_a854a7dc",
+      "range": {
+        "startLine": 285,
+        "startChar": 0,
+        "endLine": 288,
+        "endChar": 52
+      },
+      "revId": "47f6a7dc6ea43134863102643b1c1cc83ac2be51",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b63469b3_5e05d649",
@@ -72,6 +132,30 @@
       "writtenOn": "2026-07-29T21:09:13Z",
       "side": 1,
       "message": "You aren\u0027t adding these arguments on any of the zasserts in other files. Either add it everywhere or nowhere.",
+      "range": {
+        "startLine": 295,
+        "startChar": 0,
+        "endLine": 301,
+        "endChar": 13
+      },
+      "revId": "47f6a7dc6ea43134863102643b1c1cc83ac2be51",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59902ca0_f449641c",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T22:25:38Z",
+      "side": 1,
+      "message": "removed it to be consistent.",
+      "parentUuid": "b63469b3_5e05d649",
       "range": {
         "startLine": 295,
         "startChar": 0,
