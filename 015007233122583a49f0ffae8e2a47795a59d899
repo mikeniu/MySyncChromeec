@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4ecc5a3_dd54961a",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T18:31:57Z",
+      "side": 1,
+      "message": "It looks like we\u0027re already sending a `EC_MKBP_FP_FINGER_DOWN` event here. Is this case mutually exclusive from the one below? If so, can you add a comment explaining the difference?\n\nAlso, do we have test coverage that verifies we get the `EC_MKBP_FP_FINGER_DOWN` event for this case? That would also help make this change clearer and distinguish between the two cases. (Separate CL if we don\u0027t have existing test coverage.)",
+      "range": {
+        "startLine": 437,
+        "startChar": 0,
+        "endLine": 447,
+        "endChar": 5
+      },
+      "revId": "015007233122583a49f0ffae8e2a47795a59d899",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "401648fe_ec1cb524",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 460,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T18:31:57Z",
+      "side": 1,
+      "message": "There\u0027s another `CPRINTS(\"Finger!\");` on line 443 above. We should probably have them log differently to distinguish between the two in logs.",
+      "range": {
+        "startLine": 460,
+        "startChar": 0,
+        "endLine": 460,
+        "endChar": 23
+      },
+      "revId": "015007233122583a49f0ffae8e2a47795a59d899",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
