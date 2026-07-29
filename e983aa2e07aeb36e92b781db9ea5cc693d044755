@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6542154e_86d5db1e",
+        "filename": "zephyr/test/drivers/console_buffer/src/console_buffer.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-29T15:58:56Z",
+      "side": 1,
+      "message": "Could we test isr and mutex drops too?",
+      "revId": "e983aa2e07aeb36e92b781db9ea5cc693d044755",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

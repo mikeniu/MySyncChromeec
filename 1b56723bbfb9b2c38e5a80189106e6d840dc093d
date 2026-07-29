@@ -71,6 +71,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ad503b3_35395f31",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-29T15:58:56Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "041d9a31_fb072726",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a58a3f0_0dc128a5",
@@ -207,6 +225,24 @@
       "side": 1,
       "message": "Without dropped logs, the above check line 281 bailed us out early.  With dropped log insertion, we can come here after a mid log flushing and there might not be any more to read.",
       "parentUuid": "a8647f98_01463a16",
+      "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffce793c_aa1a1003",
+        "filename": "zephyr/shim/src/console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-07-29T15:58:56Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "05dbfd62_d7853840",
       "revId": "1b56723bbfb9b2c38e5a80189106e6d840dc093d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
