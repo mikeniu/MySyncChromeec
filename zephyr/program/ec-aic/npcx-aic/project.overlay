@@ -129,6 +129,7 @@
 
 &i2c_ctrl4 {
 	status = "okay";
+	wakeup-source;
 };
 
 /* First mux (U9) */
