@@ -140,8 +140,8 @@ ZTEST(watchdog, test_wdt_warning_handler)
 	zassert_equal(PANIC_SW_WATCHDOG_WARN, reason,
 		      "Watchdog warning panic reason was not set");
 
-	zassert_equal(task_get_current(), exception,
-		      "Panic exception should match current task id");
+	zassert_equal((uint8_t)(uintptr_t)k_current_get(), exception,
+		      "Panic exception should match current thread id");
 }
 
 /**
