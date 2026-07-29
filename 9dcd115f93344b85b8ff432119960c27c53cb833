@@ -22,6 +22,30 @@
       },
       "revId": "9dcd115f93344b85b8ff432119960c27c53cb833",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c99fa76_2a653ee0",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-29T20:53:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cdb27dad_02ebcf1d",
+      "range": {
+        "startLine": 457,
+        "startChar": 0,
+        "endLine": 458,
+        "endChar": 52
+      },
+      "revId": "9dcd115f93344b85b8ff432119960c27c53cb833",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
