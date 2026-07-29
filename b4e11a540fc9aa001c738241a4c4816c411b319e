@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "44776294_fefb2247",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T22:40:54Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9b66c8bc_f4d82832",
+      "revId": "b4e11a540fc9aa001c738241a4c4816c411b319e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1540b5af_360fb7a6",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] None of the new test cases actually call `validate_fp_mode()` directly—they all correctly test it indirectly through the public interface `ec_cmd_fp_mode_v1()` (which is a good practice as it tests actual system behavior).\n\nBecause of this, you don\u0027t need to expose this function. You can safely revert `test_static` back to `static` and remove the forward declaration from the test file.",
       "isAi": true,
+      "revId": "b4e11a540fc9aa001c738241a4c4816c411b319e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29176f01_2323bdbd",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T22:40:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1540b5af_360fb7a6",
       "revId": "b4e11a540fc9aa001c738241a4c4816c411b319e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "015dfef5_2195f822",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T22:40:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c297e703_ad16bfb7",
+      "revId": "b4e11a540fc9aa001c738241a4c4816c411b319e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef267159_ff52edd1",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Modifying `global_context.templ_valid` here introduces state pollution for subsequent tests since `fpsensor_state_before()` does not reset it.\n\nConsider adding `global_context.templ_valid \u003d 0;` to `fpsensor_state_before()` (around line 240) to ensure a clean slate for all test cases.",
       "isAi": true,
+      "revId": "b4e11a540fc9aa001c738241a4c4816c411b319e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7ff24e0_bd2407b4",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T22:40:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef267159_ff52edd1",
       "revId": "b4e11a540fc9aa001c738241a4c4816c411b319e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
