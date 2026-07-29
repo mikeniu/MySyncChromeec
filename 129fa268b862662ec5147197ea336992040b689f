@@ -52,6 +52,24 @@
       "parentUuid": "b1195924_85942af1",
       "revId": "129fa268b862662ec5147197ea336992040b689f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80eba2dd_2361cb45",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1003039
+      },
+      "writtenOn": "2026-07-29T18:56:54Z",
+      "side": 1,
+      "message": "I took a capture of Sink Capabilities Extended from Lapis.\n\nMinimum PDP \u003d 0W\nSink Operational PDP \u003d 60W\nSink Maximum PDP \u003d 60W\n\nThere\u0027s a probable error here though... Sink Modes, the capture from Lapis has it set to Battery Powered \u003d No.\n\nThat bit is an error that Realtek has to fix. For the purposes of the event, can we just set the VIF to match what comes off of the device though?",
+      "parentUuid": "ba678345_99b3f92f",
+      "revId": "129fa268b862662ec5147197ea336992040b689f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
