@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "158d9a92_517a6366",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1577857
+      },
+      "writtenOn": "2026-07-29T04:27:27Z",
+      "side": 1,
+      "message": "Could you help delete below node from file zephyr/boards/google/mec172x/mec172x.dtsi\n\n\u0026girq24 {\nstatus \u003d \"okay\";\n};\n\u0026girq25 {\nstatus \u003d \"okay\";\n};\n\nFYI:\nThe eSPI V2 driver port now connects the VW bank\nIRQs (ht_vw_bank0/1, IRQ 15/16) directly and requires GIRQ24/25 to stay\ndisabled (\"GIRQ24/25 cannot be owned by another driver\").\nThe board\u0027s girq24/25 status \u003d \"okay\" overrides conflict with this, causing a\nduplicate IRQ registration failure in gen_isr_tables.",
+      "parentUuid": "ec094a3f_a4dc890a",
+      "revId": "3f0db4a5880afa70ca76429bd52384da60a173a2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ee4a044e_9eef7f05",
         "filename": "zephyr/shim/chip/mchp/system_download_from_flash.c",
         "patchSetId": 2
