@@ -16,6 +16,42 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "faca2e477443e7616ad2ab483ee63f8a7710d4f1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80ccceea_01a7ff50",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T01:25:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/c16c2ca7-d293-409e-b975-f7bcee60f475)]\n\n**Review Summary**\n* **Functionality:** The logic correctly prevents `ft98xx_enroll_step` from proceeding if the enrollment session hasn\u0027t been properly initialized. Catching `data-\u003eremain \u003d\u003d 0` fixes the false 100% completion bug, and checking `data-\u003eremain \u003e data-\u003emax_enroll_samples` robustly catches any unexpected underflow behavior for the unsigned 8-bit `remain` variable.\n* **Security:** No security vulnerabilities were introduced. Enforcing the state machine here is a great defensive programming measure that prevents potentially out-of-bounds `enroll_index` calculations from being passed into the vendor library.\n* **Style:** The code conforms nicely to the project\u0027s coding style, and the newly added block includes a clear comment detailing its purpose.\n* **Testing:** No new tests were included. I left an inline suggestion with a code snippet demonstrating how you could add a ZTest to cover this boundary condition and prevent future regressions.\n* **CL Size \u0026 Scope:** Perfect. The CL is a tightly scoped and self-contained bug fix.\n\nTAG\u003dagy\nCONV\u003dbc4ec170-dbe2-445f-b421-102e10b78a89",
+      "isAi": true,
+      "revId": "faca2e477443e7616ad2ab483ee63f8a7710d4f1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cbd46fc_5ea871f1",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T01:25:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The logic here is sound and effectively handles the zero-initialization case (avoiding the false 100% completion calculation) as well as any unexpected underflow since `remain` is an unsigned 8-bit integer.\n\nHowever, to prevent future regressions and follow the test pyramid principles, consider adding a unit test that verifies this specific boundary condition. While there doesn\u0027t appear to be an existing test suite for the `ft98xx_bio_alg` module itself, you could structure a fast in-process ZTest like this if you create one:\n\n```c\nZTEST(ft98xx_bio_alg, test_enroll_step_without_start)\n{\n\tint completion \u003d -1;\n\tuint8_t image[1] \u003d {0}; // Dummy image buffer\n\n\t/* Do not call ft98xx_api.enroll_start() to simulate the bypass */\n\tint ret \u003d ft98xx_api.enroll_step(\u0026ft98xx_algorithm, image, \u0026completion);\n\n\tzassert_equal(ret, FP_ENROLLMENT_RESULT_INTERNAL_ERROR,\n\t\t      \"enroll_step should fail if enroll_start wasn\u0027t called\");\n\tzassert_equal(completion, 0,\n\t\t      \"completion should be safely set to 0\");\n}\n```",
+      "isAi": true,
+      "revId": "faca2e477443e7616ad2ab483ee63f8a7710d4f1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
