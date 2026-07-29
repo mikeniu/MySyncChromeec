@@ -120,11 +120,7 @@ database to use with the following command.
 ```
 start-servod -b ${BOARD} -m ${MODEL} --channel=release --token_db=${EC_PATH}/build/tokens.bin
 ```
-
-Once connected to ec_uart_pty - you can specify the token database using above
-```
-%tokens on /tmp/firmware_to_flash/tokens.bin
-```
+It will be mounted as `/tmp/token_db` and activated.
 
 The docker image should be prepopulated with a token database at
 `/usr/share/cros_ec/tokens/historical.bin`
