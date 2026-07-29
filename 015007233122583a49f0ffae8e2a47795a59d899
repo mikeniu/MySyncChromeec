@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f1d6e282_8f275dae",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T20:48:00Z",
+      "side": 1,
+      "message": "Yes, the two cases are mutually exclusive, determined by the sensor mode setting (sensor_mode):\n\n- Line ~443 (FP_MODE_FINGER_DOWN / standalone detection mode):\nThis handles the mode where the host explicitly requests a hardware interrupt when a finger touches the sensor without triggering image capture or processing immediately (e.g., waking up the host or dedicated finger detection requests). In this path, `send_mkbp_event(EC_MKBP_FP_FINGER_DOWN)` is sent directly, and execution skips heavy capture pipeline processing.\n\n- Line ~459 (FP_MODE_ANY_CAPTURE / Capture \u0026 Auth/Enroll mode):\nThis handles active image capture workflows (Enrollment, Matching/Auth, or Image Capture). In these modes, `FINGER_PRESENT` triggers image acquisition and algorithm processing (`fp_process_finger()`). The addition of `send_mkbp_event(EC_MKBP_FP_FINGER_DOWN)` here fires an immediate \"finger down\" event to lower HAL latency tracking before the heavier image acquisition/processing takes place.\n\nBecause `FP_MODE_FINGER_DOWN` and `FP_MODE_ANY_CAPTURE` represent different operational modes set in `global_context.sensor_mode`, a single IRQ evaluation cycle will not trigger both blocks simultaneously.\n\n\nThe one with Finger Down mode is tested in [test_finger_down_present](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/fingerprint/task/src/fpsensor_finger_presence.cc;l\u003d69?q\u003dplatform%2Fec%2Fzephyr%20EC_MKBP_FP_FINGER_DOWN\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d68-,69,-70).\n\nI added a comment explaining the new event.",
+      "parentUuid": "a4ecc5a3_dd54961a",
+      "range": {
+        "startLine": 437,
+        "startChar": 0,
+        "endLine": 447,
+        "endChar": 5
+      },
+      "revId": "015007233122583a49f0ffae8e2a47795a59d899",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "401648fe_ec1cb524",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 18
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-29T18:31:57Z",
       "side": 1,
       "message": "There\u0027s another `CPRINTS(\"Finger!\");` on line 443 above. We should probably have them log differently to distinguish between the two in logs.",
+      "range": {
+        "startLine": 460,
+        "startChar": 0,
+        "endLine": 460,
+        "endChar": 23
+      },
+      "revId": "015007233122583a49f0ffae8e2a47795a59d899",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d734bfe_aa150f98",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 18
+      },
+      "lineNbr": 460,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T20:48:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "401648fe_ec1cb524",
       "range": {
         "startLine": 460,
         "startChar": 0,
