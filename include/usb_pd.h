@@ -25,6 +25,7 @@ extern "C" {
 /* PD Host command timeout */
 #define PD_HOST_COMMAND_TIMEOUT_US SECOND
 
+#ifndef CONFIG_ZEPHYR
 /*
  * Define PD_PORT_TO_TASK_ID() and TASK_ID_TO_PD_PORT() macros to
  * go between PD port number and task ID. Assume that TASK_ID_PD_C0 is the
@@ -37,6 +38,7 @@ extern "C" {
 #define PD_PORT_TO_TASK_ID(port) -1 /* stub task ID */
 #define TASK_ID_TO_PD_PORT(id) 0
 #endif /* CONFIG_USB_PD_PORT_MAX_COUNT && HAS_TASK_PD_C0 */
+#endif /* !CONFIG_ZEPHYR */
 
 enum pd_rx_errors {
 	PD_RX_ERR_INVAL = -1, /* Invalid packet */
