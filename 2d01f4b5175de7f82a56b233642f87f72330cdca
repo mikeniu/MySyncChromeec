@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2f430a9_04f3eac5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T01:46:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/c2726442-a6e0-446f-9695-bd5eca66a53b)]\n\n**Review Summary:**\n*   **Functionality \u0026 Security**: Adding `FP_MODE_ENROLL_IMAGE` to `FP_MODES_WITH_AUTHENTICATION` is logically correct to ensure MAC verification. However, the auth handler logic in `authenticate_fp_mode` (`fpsensor_state.cc`) still doesn\u0027t properly handle the case where `FP_MODE_ENROLL_IMAGE` is sent without `FP_MODE_ENROLL_SESSION`. It will return `EC_ERROR_UNKNOWN`. See inline comment.\n*   **Style \u0026 Consistency**: The macro update itself is consistent with the project style.\n*   **Testing \u0026 Test Coverage**: Missing test coverage. As noted in the previous review, please add a unit test in `chromium/test/fpsensor_auth_commands.cc` that specifically tests `FP_MODE_ENROLL_IMAGE` (without `FP_MODE_ENROLL_SESSION`) and validates that it correctly returns `EC_RES_ACCESS_DENIED` when the MAC signature is missing or invalid. This should be included in this CL.\n*   **CL Size \u0026 Scope**: The CL is small, but to be truly self-contained, it should include the corresponding validation logic fixes (in `fpsensor_state.cc`) and the unit tests in the same CL.\n\nTAG\u003dagy\nCONV\u003d50f7af51-90e3-481c-be5c-d334b003ec20",
+      "isAi": true,
+      "revId": "2d01f4b5175de7f82a56b233642f87f72330cdca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "267eef77_dfda59a0",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 8577,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T01:46:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While the popcount issue was indeed addressed in a previous CL (by replacing it with `(mode \u0026 FP_MODE_MATCH) \u0026\u0026 (mode \u0026 enroll_modes)`), the second issue remains in `authenticate_fp_mode` (`chromium/common/fpsensor/fpsensor_state.cc`):\n\nIf `FP_MODE_ENROLL_IMAGE` is sent *alone* (without `FP_MODE_ENROLL_SESSION`), `flags_enabled \u0026 FP_MODE_ENROLL_SESSION` will evaluate to false. The logic will fall through the `else if (flags_enabled \u0026 FP_MODE_MATCH)` block and ultimately return `EC_ERROR_UNKNOWN`. \n\nPlease update the `if (flags_enabled \u0026 FP_MODE_ENROLL_SESSION)` check in `authenticate_fp_mode` to handle `FP_MODE_ENROLL_IMAGE` as well (e.g., `if (flags_enabled \u0026 (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE))`), so it correctly calls `authenticate_enroll(mac.value())`.",
+      "isAi": true,
+      "revId": "2d01f4b5175de7f82a56b233642f87f72330cdca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
