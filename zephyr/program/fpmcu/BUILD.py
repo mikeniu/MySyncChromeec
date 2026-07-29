@@ -151,6 +151,9 @@ assert_rw_fwid_DO_NOT_EDIT(project_name="srebrna", addr=0x42104)
 stobnica = register_et171_project("stobnica", boards=["bluey"])
 assert_rw_fwid_DO_NOT_EDIT(project_name="stobnica", addr=0x42104)
 
+smolec = register_et171_project("smolec", boards=["calypso"])
+assert_rw_fwid_DO_NOT_EDIT(project_name="smolec", addr=0x42104)
+
 niedzica = register_fpmcu_variant(
     project_name="niedzica",
     boards=["bluey"],
