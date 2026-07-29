@@ -70,6 +70,29 @@
       "parentUuid": "ba678345_99b3f92f",
       "revId": "129fa268b862662ec5147197ea336992040b689f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11d5b676_6b46c3c2",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1003039
+      },
+      "writtenOn": "2026-07-29T19:10:45Z",
+      "side": 1,
+      "message": "Annoyingly, this doesn\u0027t match the SKEDB from Lapis. They set this to \"no\" according to my analyzer trace.\n\nI think this is an error, but if the goal is to have the VIF match the outputted values from the system, we should set this to false until Realtek fixes this bit.",
+      "range": {
+        "startLine": 232,
+        "startChar": 0,
+        "endLine": 232,
+        "endChar": 44
+      },
+      "revId": "129fa268b862662ec5147197ea336992040b689f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
