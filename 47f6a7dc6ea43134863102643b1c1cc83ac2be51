@@ -21,6 +21,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3b4f3377_97aded3b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T21:11:42Z",
+      "side": 1,
+      "message": "Is it possible to add a test case that verifies the test is not sent multiple times if the finger is held down? For example, start with `test_finger_capture_simple_image_scan_too_fast` and add the following:\n\n```\n/* Ping fpsensor task. */\n\tfingerprint_run_callback(fp_sim);\n\n\t/* Ping fpsensor task a SECOND time to ensure we don\u0027t spam the event */\n\tfingerprint_run_callback(fp_sim);\n\n\t/* Give opportunity for fpsensor task process event. */\n\tk_msleep(1);\n\n\t/* Confirm MKBP event was still only sent once (FINGER_DOWN). */\n\tzassert_equal(mkbp_send_event_fake.call_count, 1, \n                  \"FINGER_DOWN should only trigger on the initial touch edge\");\n```",
+      "revId": "47f6a7dc6ea43134863102643b1c1cc83ac2be51",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c5d9e5fb_a854a7dc",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
         "patchSetId": 20
