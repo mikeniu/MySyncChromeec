@@ -415,9 +415,10 @@ class Renode(Platform):
 
     def __init__(self):
         self.process = None
+        self.console_pty = f"/tmp/renode-uart-{os.getpid()}-{id(self)}"
 
     def get_console(self, board_config: BoardConfig) -> Optional[str]:
-        return "/tmp/renode-uart"
+        return self.console_pty
 
     def hw_write_protect(self, enable: bool) -> None:
         pass
@@ -440,6 +441,8 @@ class Renode(Platform):
             "./util/renode-ec-launch",
             "--board",
             board_config.name,
+            "--uart",
+            self.console_pty,
         ]
         if zephyr:
             # We've adopted the convention that we prefix upstream Zephyr test
@@ -462,7 +465,13 @@ class Renode(Platform):
         return True
 
     def cleanup(self) -> None:
-        self.process.kill()
+        if self.process:
+            self.process.kill()
+        if os.path.exists(self.console_pty):
+            try:
+                os.unlink(self.console_pty)
+            except OSError:
+                pass
 
     def _skip_test_bloonchipper(
         self, test_config: TestConfig, zephyr: bool
@@ -1541,7 +1550,9 @@ def build_zephyr(
         return cmd
 
     # Create tmp file to pass needed configs
-    test_conf = os.path.join(tempfile.gettempdir(), "test.conf")
+    test_conf = os.path.join(
+        tempfile.gettempdir(), f"test-{os.getpid()}-{id(test)}.conf"
+    )
     with open(test_conf, "w", encoding="utf-8") as f_test_config:
         cmd = cmd + ["-DOVERLAY_CONFIG=" + test_conf]
         # Get list of supported tests
