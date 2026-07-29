@@ -27,4 +27,20 @@ ZTEST(panic_reason, test_panic_reason_zephyr)
 	zassert_equal(task_get_current(), exception);
 }
 
+ZTEST(panic_reason, test_panic_reason_zephyr_with_esf)
+{
+	struct arch_esf esf = {
+		.dummy = 0x12345678, /* nocheck */
+	};
+	struct panic_data *pdata;
+
+	k_sys_fatal_error_handler(K_ERR_KERNEL_PANIC, &esf);
+
+	pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_equal(PANIC_ARCH_POSIX, pdata->arch);
+	zassert_equal(0x12345678, pdata->posix.esf_placeholder);
+	zassert_equal(PANIC_DATA_MAGIC, pdata->magic);
+}
+
 ZTEST_SUITE(panic_reason, drivers_predicate_post_main, NULL, NULL, NULL, NULL);
