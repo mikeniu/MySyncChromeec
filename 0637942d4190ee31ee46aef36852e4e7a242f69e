@@ -124,6 +124,24 @@
       "parentUuid": "b2954c29_521b6dc0",
       "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3e2c742_8644c5ed",
+        "filename": "zephyr/shim/src/espi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 836,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-07-29T22:29:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "989d21e3_556170b6",
+      "revId": "0637942d4190ee31ee46aef36852e4e7a242f69e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
