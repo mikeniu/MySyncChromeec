@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5aa72295_2e33a82b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-29T15:59:02Z",
+      "side": 1,
+      "message": "Please add those details to the commit message. i.e., the exact situation where this failed and how to reproduce.",
+      "parentUuid": "ef1403db_0646518a",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 63
+      },
+      "revId": "e841e35657df9a74e94b7534298079f30a4215d2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e6df3584_7bf4d467",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
