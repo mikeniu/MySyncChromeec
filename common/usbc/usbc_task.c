@@ -51,6 +51,14 @@ extern int _GPIO_CCD_MODE_ODL;
 
 static uint8_t paused[CONFIG_USB_PD_PORT_MAX_COUNT];
 
+static k_tid_t pd_threads[CONFIG_USB_PD_PORT_MAX_COUNT];
+
+k_tid_t pd_get_thread(int port)
+{
+	assert(port >= 0 && port < ARRAY_SIZE(pd_threads));
+	return pd_threads[port];
+}
+
 void tc_pause_event_loop(int port)
 {
 	paused[port] = 1;
@@ -160,9 +168,10 @@ static bool pd_task_loop(int port)
 	return true;
 }
 
-void pd_task(void *u)
+void pd_task(int port)
 {
-	int port = TASK_ID_TO_PD_PORT(task_get_current());
+	assert(port >= 0 && port < ARRAY_SIZE(pd_threads));
+	pd_threads[port] = k_current_get();
 
 	/*
 	 * If port does not exist, return
@@ -187,4 +196,9 @@ void pd_task(void *u)
 		while (pd_task_loop(port))
 			continue;
 	}
+}
+
+void pd_task_entry(void *p)
+{
+	pd_task(POINTER_TO_UINT(p));
 }
