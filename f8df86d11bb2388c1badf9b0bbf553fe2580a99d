@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b3dc366_4cae750b",
+        "filename": "common/power_button.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-29T22:22:13Z",
+      "side": 1,
+      "message": "Certainly test coverage was missing. It could be that when I did the first dry run, I didn\u0027t submit the following CL. I have added unit tests for the new code now and will do a dry run with all 3 CLs.",
+      "parentUuid": "36cf5e1b_1bc86860",
+      "revId": "f8df86d11bb2388c1badf9b0bbf553fe2580a99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "17ab48c3_360b321d",
@@ -43,6 +61,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f3e148fa_8ec6ffbc",
+        "filename": "common/power_button.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-29T22:22:13Z",
+      "side": 1,
+      "message": "I agree the comment was somewhat misleading and it also didn\u0027t need to set new_pressed \u003d 0 in both cases. I have redid the comment and have new_pressed \u003d 0 unconditionally now.",
+      "parentUuid": "17ab48c3_360b321d",
+      "range": {
+        "startLine": 248,
+        "startChar": 3,
+        "endLine": 248,
+        "endChar": 19
+      },
+      "revId": "f8df86d11bb2388c1badf9b0bbf553fe2580a99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4d2dc50_81c885e5",
         "filename": "common/power_button.c",
         "patchSetId": 4
@@ -54,6 +96,24 @@
       "writtenOn": "2026-07-29T10:16:22Z",
       "side": 1,
       "message": "nit: use PB instead of PowerButton here as well, for consistency, and it saves few bytes, I would also shorten the strings, they add up, you coul just log \"PB suppress: %d\" and it\u0027d be plenty enough to debug",
+      "revId": "f8df86d11bb2388c1badf9b0bbf553fe2580a99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb5727e1_e0aa446b",
+        "filename": "common/power_button.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 479,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-29T22:22:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4d2dc50_81c885e5",
       "revId": "f8df86d11bb2388c1badf9b0bbf553fe2580a99d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
