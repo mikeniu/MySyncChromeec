@@ -538,6 +538,7 @@ tests:
   drivers.console_buffer:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CONSOLE_BUFFER=y
+    - CONFIG_IRQ_OFFLOAD=y
     extra_conf_files:
     - prj.conf
     - default/prj.conf

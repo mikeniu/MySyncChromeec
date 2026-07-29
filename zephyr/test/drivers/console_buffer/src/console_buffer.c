@@ -12,6 +12,7 @@
 #include "test/drivers/test_state.h"
 #include "uart.h"
 
+#include <zephyr/irq_offload.h>
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell_dummy.h>
 #include <zephyr/ztest.h>
@@ -110,6 +111,134 @@ ZTEST_USER(console, test_buf_dropped_logs)
 	zassert_equal(total_drops, drops_isr + drops_mutex + drops_overflow,
 		      "total_drops mismatch: %u != %u + %u + %u", total_drops,
 		      drops_isr, drops_mutex, drops_overflow);
+}
+
+extern struct k_mutex console_write_lock;
+
+static void isr_notify_wrapper(const void *arg)
+{
+	const char *msg = (const char *)arg;
+
+	console_buf_notify_chars(msg, strlen(msg));
+}
+
+ZTEST(console, test_buf_dropped_logs_isr)
+{
+	char buffer[200];
+	uint16_t write_count;
+	const char *msg = "test_log\n";
+
+	/* Flush console buffer and clear dropped log counters */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	/* Take a snapshot */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	/* Simulate ISR dropped logs */
+	irq_offload(isr_notify_wrapper, (void *)msg);
+	irq_offload(isr_notify_wrapper, (void *)msg);
+
+	/* Read recent logs and check for dropped log message header */
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	uint32_t total_drops = 0;
+	uint32_t drops_isr = 0;
+	uint32_t drops_mutex = 0;
+	uint32_t drops_overflow = 0;
+
+	int parsed = sscanf(
+		buffer, "Dropped %u logs (ISR: %u, Mutex: %u, Overflow: %u)",
+		&total_drops, &drops_isr, &drops_mutex, &drops_overflow);
+	zassert_equal(parsed, 4,
+		      "sscanf failed to parse dropped logs header from '%s'",
+		      buffer);
+	zassert_equal(drops_isr, 2, "expected drops_isr == 2, got %u",
+		      drops_isr);
+	zassert_equal(drops_mutex, 0, "expected drops_mutex == 0, got %u",
+		      drops_mutex);
+	zassert_equal(drops_overflow, 0, "expected drops_overflow == 0, got %u",
+		      drops_overflow);
+	zassert_equal(total_drops, 2, "expected total_drops == 2, got %u",
+		      total_drops);
+}
+
+static K_SEM_DEFINE(mutex_held_sem, 0, 1);
+static K_SEM_DEFINE(release_mutex_sem, 0, 1);
+
+static void lock_holder_thread_fn(void *p1, void *p2, void *p3)
+{
+	k_mutex_lock(&console_write_lock, K_FOREVER);
+	k_sem_give(&mutex_held_sem);
+	k_sem_take(&release_mutex_sem, K_FOREVER);
+	k_mutex_unlock(&console_write_lock);
+}
+
+K_THREAD_STACK_DEFINE(holder_stack, 1024);
+static struct k_thread holder_thread_data;
+
+ZTEST(console, test_buf_dropped_logs_mutex)
+{
+	char buffer[200];
+	uint16_t write_count;
+	const char *msg = "test_log\n";
+
+	/* Flush console buffer and clear dropped log counters */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	/* Take a snapshot */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	/* Start thread that holds console_write_lock */
+	k_thread_create(&holder_thread_data, holder_stack,
+			K_THREAD_STACK_SIZEOF(holder_stack),
+			lock_holder_thread_fn, NULL, NULL, NULL,
+			K_PRIO_PREEMPT(5), 0, K_NO_WAIT);
+
+	/* Wait until helper thread holds console_write_lock */
+	zassert_ok(k_sem_take(&mutex_held_sem, K_MSEC(1000)),
+		   "timed out waiting for helper thread lock");
+
+	/* Call notify from main thread; should fail mutex lock */
+	console_buf_notify_chars(msg, strlen(msg));
+	console_buf_notify_chars(msg, strlen(msg));
+	console_buf_notify_chars(msg, strlen(msg));
+
+	/* Release helper thread */
+	k_sem_give(&release_mutex_sem);
+	k_thread_join(&holder_thread_data, K_MSEC(1000));
+
+	/* Read recent logs and check for dropped log message header */
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	uint32_t total_drops = 0;
+	uint32_t drops_isr = 0;
+	uint32_t drops_mutex = 0;
+	uint32_t drops_overflow = 0;
+
+	int parsed = sscanf(
+		buffer, "Dropped %u logs (ISR: %u, Mutex: %u, Overflow: %u)",
+		&total_drops, &drops_isr, &drops_mutex, &drops_overflow);
+	zassert_equal(parsed, 4,
+		      "sscanf failed to parse dropped logs header from '%s'",
+		      buffer);
+	zassert_equal(drops_isr, 0, "expected drops_isr == 0, got %u",
+		      drops_isr);
+	zassert_equal(drops_mutex, 3, "expected drops_mutex == 3, got %u",
+		      drops_mutex);
+	zassert_equal(drops_overflow, 0, "expected drops_overflow == 0, got %u",
+		      drops_overflow);
+	zassert_equal(total_drops, 3, "expected total_drops == 3, got %u",
+		      total_drops);
 }
 #endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS */
 
