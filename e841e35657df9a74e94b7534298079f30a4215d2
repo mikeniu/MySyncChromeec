@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef1403db_0646518a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-29T15:58:13Z",
+      "side": 1,
+      "message": "this is specific to booting on a device. I did not have issues booting on a dev board",
+      "parentUuid": "2f04dd93_231fa286",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 63
+      },
+      "revId": "e841e35657df9a74e94b7534298079f30a4215d2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e6df3584_7bf4d467",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
