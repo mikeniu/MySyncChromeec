@@ -11,6 +11,7 @@
 #include "include/power_button.h"
 #include "mkbp_fifo.h"
 #include "power.h"
+#include "tablet_mode.h"
 #include "test/drivers/test_state.h"
 #include "timer.h"
 
@@ -45,6 +46,10 @@ static char *button_debug_state_strings[] = {
 			      state, button_debug_state_strings[state]);      \
 	} while (false)
 
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+static int mock_pb_asserted = -1;
+#endif
+
 struct button_fixture {
 	timestamp_t fake_time;
 };
@@ -63,6 +68,10 @@ static void button_before(void *f)
 	((struct button_fixture *)f)->fake_time.val = 0;
 	reset_button_debug_state();
 	button_init();
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+	tablet_reset();
+	hook_notify(HOOK_TABLET_MODE_CHANGE);
+#endif
 	/* Sleep for 30s to flush any pending tasks */
 	k_sleep(K_SECONDS(30));
 	mkbp_clear_fifo();
@@ -70,8 +79,17 @@ static void button_before(void *f)
 	RESET_FAKE(chipset_reset);
 }
 
+static void button_after(void *f)
+{
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+	extern int debounced_power_pressed;
+	mock_pb_asserted = -1;
+	debounced_power_pressed = 0;
+#endif
+}
+
 ZTEST_SUITE(button, drivers_predicate_post_main, button_setup, button_before,
-	    NULL, NULL);
+	    button_after, NULL);
 
 static inline void pass_time(uint64_t duration_ms)
 {
@@ -586,5 +604,145 @@ ZTEST(button, test_hc_power_button_press_invalid_params)
 		EC_CMD_POWER_BUTTON_PRESS, 0, hc_params_4);
 
 	zassert_equal(host_command_process(&hc_press_4), EC_RES_INVALID_PARAM);
+}
+#endif
+
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+#include "gpio.h"
+
+int power_button_signal_asserted(void)
+{
+	if (mock_pb_asserted != -1)
+		return mock_pb_asserted;
+	return gpio_get_level(GPIO_POWER_BUTTON_L) == 0;
+}
+
+static int pb_change_count;
+static void test_pb_change_hook(void)
+{
+	pb_change_count++;
+}
+DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, test_pb_change_hook, HOOK_PRIO_DEFAULT);
+
+ZTEST(button, test_keyboard_pb_suppression_clamshell)
+{
+	tablet_set_mode(0, TABLET_TRIGGER_LID);
+	pb_change_count = 0;
+
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "powerbtn 100"));
+	pass_time(150);
+
+	zassert_true(pb_change_count >= 1,
+		     "Expected power button change hook to be called");
+}
+
+ZTEST(button, test_keyboard_pb_suppression_tablet)
+{
+	tablet_set_mode(1, TABLET_TRIGGER_LID);
+	pb_change_count = 0;
+
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "powerbtn 100"));
+	pass_time(150);
+
+	zassert_equal(pb_change_count, 0,
+		      "Expected power button change to be suppressed");
+}
+
+ZTEST(button, test_keyboard_pb_suppress_inactive_on_suspend)
+{
+	/* Enable tablet mode to activate suppression */
+	tablet_set_mode(1, TABLET_TRIGGER_LID);
+	pb_change_count = 0;
+
+	/* Verify press is suppressed */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "powerbtn 100"));
+	pass_time(150);
+	zassert_equal(pb_change_count, 0,
+		      "Expected power button change to be suppressed");
+
+	/* Trigger suspend, which should deactivate suppression */
+	hook_notify(HOOK_CHIPSET_SUSPEND);
+
+	/* Press again, should NOT be suppressed */
+	pb_change_count = 0;
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "powerbtn 100"));
+	pass_time(150);
+	zassert_true(pb_change_count > 0,
+		     "Expected power button change to NOT be suppressed");
+
+	/* Cleanup */
+	tablet_set_mode(0, TABLET_TRIGGER_LID);
+}
+
+ZTEST(button, test_keyboard_pb_suspend_hold_eat_release)
+{
+	tablet_set_mode(0, TABLET_TRIGGER_LID);
+	pb_change_count = 0;
+	mock_pb_asserted = 1; /* Simulate physical press */
+
+	/* Press and hold for 500ms */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "powerbtn 500"));
+	pass_time(50);
+	zassert_true(power_button_is_pressed(),
+		     "Power button should be pressed");
+
+	/* Trigger suspend */
+	hook_notify(HOOK_CHIPSET_SUSPEND);
+
+	/* Simulate physical release */
+	mock_pb_asserted = 0;
+
+	pass_time(600);
+
+	zassert_false(power_button_is_pressed(),
+		      "Power button should be released");
+	zassert_equal(pb_change_count, 1,
+		      "Expected only press event, release should be eaten");
+
+	/* Reset mock */
+	mock_pb_asserted = -1;
+}
+
+ZTEST(button, test_keyboard_pb_suspend_missed_release)
+{
+	extern int debounced_power_pressed;
+	extern void power_button_change_deferred(void);
+	tablet_set_mode(0, TABLET_TRIGGER_LID);
+	pb_change_count = 0;
+	mock_pb_asserted = 1;
+
+	/* Simulate press synchronously */
+	power_button_change_deferred();
+	zassert_true(power_button_is_pressed(),
+		     "Power button should be pressed");
+	zassert_equal(pb_change_count, 1, "Expected press event");
+
+	/* Trigger suspend */
+	hook_notify(HOOK_CHIPSET_SUSPEND);
+
+	/* Simulate physical release during suspend (interrupt missed) */
+	mock_pb_asserted = 0;
+
+	/* Trigger resume */
+	hook_notify(HOOK_CHIPSET_RESUME);
+
+	/* Verify state is reported as released */
+	zassert_false(power_button_is_pressed(),
+		      "Power button should be reported as released");
+
+	/* Verify the next press works (not ignored) */
+	mock_pb_asserted = 1;
+	power_button_change_deferred();
+
+	zassert_equal(pb_change_count, 2,
+		      "Expected pb_change_count to be 2, but was %d",
+		      pb_change_count);
+
+	/* Simulate release at the end to leave system clean */
+	mock_pb_asserted = 0;
+	power_button_change_deferred();
+
+	/* Reset mock */
+	mock_pb_asserted = -1;
 }
 #endif
