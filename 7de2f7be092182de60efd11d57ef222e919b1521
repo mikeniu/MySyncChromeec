@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "68661d30_d922026f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-30T00:17:04Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4686ed73_fd8dd9de",
+      "revId": "7de2f7be092182de60efd11d57ef222e919b1521",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbdd4476_0e06b0a1",
@@ -32,6 +50,30 @@
       "writtenOn": "2026-07-29T23:18:55Z",
       "side": 1,
       "message": "Rather than trying to reset all of the states, can we use the `fp_reset_and_clear_context` instead? \n\nI haven\u0027t verified that it clears everything for these tests, but ideally we should have something that encapsulates the entire state reset and use it in all the tests rather than one-by-one fields.",
+      "range": {
+        "startLine": 232,
+        "startChar": 0,
+        "endLine": 235,
+        "endChar": 32
+      },
+      "revId": "7de2f7be092182de60efd11d57ef222e919b1521",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fb3cfec_92d3a3c9",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-30T00:17:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbdd4476_0e06b0a1",
       "range": {
         "startLine": 232,
         "startChar": 0,
