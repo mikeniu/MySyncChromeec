@@ -54,6 +54,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b245da11_5ff6865e",
+        "filename": "zephyr/program/atria/penghu-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-30T17:34:24Z",
+      "side": 1,
+      "message": "I do actually see this a bunch of other ISH builds now. I\u0027m not sure what I was looking at before. Nevermind.",
+      "parentUuid": "b3571f45_42d937d1",
+      "revId": "59350ed64ada836d6ce5dd382fe8c85bb605dca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "663dea75_6ba209d1",
@@ -89,6 +107,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fecffae6_356ee12f",
+        "filename": "zephyr/program/atria/penghu-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-30T17:34:24Z",
+      "side": 1,
+      "message": "This is what `atriarvp-ish` is doing, so I think it\u0027s fine for now.",
+      "parentUuid": "3128fd90_59d0545b",
+      "revId": "59350ed64ada836d6ce5dd382fe8c85bb605dca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bc0c457_17cda35e",
@@ -120,6 +156,24 @@
       "side": 1,
       "message": "Sorry, I\u0027m not familliar with ish fw. Maybe need @li1.feng@intel.com to help.",
       "parentUuid": "5bc0c457_17cda35e",
+      "revId": "59350ed64ada836d6ce5dd382fe8c85bb605dca5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1527597d_c538a61f",
+        "filename": "zephyr/program/atria/penghu-ish/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-30T17:34:24Z",
+      "side": 1,
+      "message": "This is what `atriarvp-ish` is doing, so I think it\u0027s fine for now.",
+      "parentUuid": "feafe0b0_8c6339f3",
       "revId": "59350ed64ada836d6ce5dd382fe8c85bb605dca5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
