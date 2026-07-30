@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef742a41_bbd584e8",
+        "filename": "common/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 1177,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-07-30T23:52:17Z",
+      "side": 1,
+      "message": "Copied original comment from other CL:\nIs there a reason not to just do this inside handle_pending_reboot? (Disable on entry, enable if returning.) This would probably require some refactoring to allow handle_pending_reboot to respond to the host command after disabling interrupt or some other reorganization.\n\nTo me that seems more appealing than trying to find all of the cases that require this and handling them separately, each in their own special way.\n\n----------------\n\nDisable IRQ is handled inside handle_pending_reboot() only for the CONFIG_EC_HOST_CMD path and not for legacy !CONFIG_EC_HOST_CMD path. The legacy path would need deeper refactoring and would take time.\n\nEnable IRQ is handled inside handle_pending_reboot() for both the paths.\n\nLet me know if this change looks fine.",
+      "revId": "cfad37a3c93ebaa1e03b09ae980691b83abdfaed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
