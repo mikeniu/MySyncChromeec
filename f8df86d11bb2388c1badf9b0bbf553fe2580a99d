@@ -83,6 +83,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa5e9aa4_b1c91bc0",
+        "filename": "common/power_button.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-30T20:32:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3e148fa_8ec6ffbc",
+      "range": {
+        "startLine": 248,
+        "startChar": 3,
+        "endLine": 248,
+        "endChar": 19
+      },
+      "revId": "f8df86d11bb2388c1badf9b0bbf553fe2580a99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4d2dc50_81c885e5",
