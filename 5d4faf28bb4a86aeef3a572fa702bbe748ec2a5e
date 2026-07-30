@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "211aa926_29722fc3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-30T01:44:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n### Review Summary\n\n*   **Functionality**: Successfully introduces early `EC_MKBP_FP_FINGER_DOWN` notification when the sensor is in a capture mode. By keeping the logic stateless (not tracking the previous edge state), it correctly fulfills the framework requirement to send a latency start signal on every capture attempt, even on retries. The parentheses around the bitwise AND operation improve readability.\n*   **Style**: The code integrates cleanly into the existing `fp_task` event loop and maintains readability with appropriate comments. The log message differentiates between the two `FINGER_DOWN` dispatch paths.\n*   **Testing**: Test coverage is excellent. The newly added `test_finger_capture_held_finger_no_duplicate_events` successfully confirms that `FINGER_DOWN` is sent exactly once per successful capture sequence.\n*   **Security**: No security vulnerabilities or data leaks were identified.\n*   **CL Size \u0026 Scope**: The CL is small, well-scoped, and focuses exactly on its goal without bundling unrelated changes.\n\nTAG\u003dagy\nCONV\u003da86a8440-7990-4a64-a2e2-803e8dec1f4e",
+      "isAi": true,
+      "revId": "5d4faf28bb4a86aeef3a572fa702bbe748ec2a5e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
