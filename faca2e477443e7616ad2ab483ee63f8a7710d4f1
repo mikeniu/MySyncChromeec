@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a572fd7b_8b604a2e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-30T02:21:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80ccceea_01a7ff50",
+      "revId": "faca2e477443e7616ad2ab483ee63f8a7710d4f1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2cbd46fc_5ea871f1",
@@ -50,6 +68,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] The logic here is sound and effectively handles the zero-initialization case (avoiding the false 100% completion calculation) as well as any unexpected underflow since `remain` is an unsigned 8-bit integer.\n\nHowever, to prevent future regressions and follow the test pyramid principles, consider adding a unit test that verifies this specific boundary condition. While there doesn\u0027t appear to be an existing test suite for the `ft98xx_bio_alg` module itself, you could structure a fast in-process ZTest like this if you create one:\n\n```c\nZTEST(ft98xx_bio_alg, test_enroll_step_without_start)\n{\n\tint completion \u003d -1;\n\tuint8_t image[1] \u003d {0}; // Dummy image buffer\n\n\t/* Do not call ft98xx_api.enroll_start() to simulate the bypass */\n\tint ret \u003d ft98xx_api.enroll_step(\u0026ft98xx_algorithm, image, \u0026completion);\n\n\tzassert_equal(ret, FP_ENROLLMENT_RESULT_INTERNAL_ERROR,\n\t\t      \"enroll_step should fail if enroll_start wasn\u0027t called\");\n\tzassert_equal(completion, 0,\n\t\t      \"completion should be safely set to 0\");\n}\n```",
       "isAi": true,
+      "revId": "faca2e477443e7616ad2ab483ee63f8a7710d4f1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b644a10_ebbb482f",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-30T02:21:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2cbd46fc_5ea871f1",
       "revId": "faca2e477443e7616ad2ab483ee63f8a7710d4f1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
