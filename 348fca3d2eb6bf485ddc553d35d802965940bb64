@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fb24d13_b91efdcb",
+        "filename": "zephyr/test/drivers/boards/native_sim.overlay",
+        "patchSetId": 4
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-07-30T20:52:02Z",
+      "side": 1,
+      "message": "this should probably move down to the gpio1 section.\nlooks like we\u0027re keeping this list in gpio order.",
+      "range": {
+        "startLine": 243,
+        "startChar": 13,
+        "endLine": 243,
+        "endChar": 18
+      },
+      "revId": "348fca3d2eb6bf485ddc553d35d802965940bb64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
