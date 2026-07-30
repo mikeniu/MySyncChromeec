@@ -1001,6 +1001,14 @@ fp_command_template_v0(struct ec_host_cmd_handler_args *args)
 		return EC_HOST_CMD_BUSY;
 	}
 
+	/*
+	 * Reject template operations if enrollment session is in
+	 * progress.
+	 */
+	if (global_context.sensor_mode & FP_MODE_ENROLL_SESSION) {
+		return EC_HOST_CMD_BUSY;
+	}
+
 	if (args->input_buf_size !=
 	    size + offsetof(struct ec_params_fp_template, data))
 		return EC_HOST_CMD_INVALID_PARAM;
@@ -1040,6 +1048,14 @@ fp_command_template_v1(struct ec_host_cmd_handler_args *args)
 			return EC_HOST_CMD_BUSY;
 		}
 
+		/*
+		 * Reject template operations if enrollment session is in
+		 * progress.
+		 */
+		if (global_context.sensor_mode & FP_MODE_ENROLL_SESSION) {
+			return EC_HOST_CMD_BUSY;
+		}
+
 		/* Can we store one more template ? */
 		if (global_context.templ_valid >= FP_MAX_FINGER_COUNT) {
 			return EC_HOST_CMD_OVERFLOW;
@@ -1074,6 +1090,14 @@ fp_command_template_v1(struct ec_host_cmd_handler_args *args)
 
 		/* Encryption or decryption is in progress. */
 		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+			return EC_HOST_CMD_BUSY;
+		}
+
+		/*
+		 * Reject template operations if enrollment session is in
+		 * progress.
+		 */
+		if (global_context.sensor_mode & FP_MODE_ENROLL_SESSION) {
 			return EC_HOST_CMD_BUSY;
 		}
 
