@@ -306,7 +306,7 @@ ZTEST_USER(fpsensor_template, test_fp_template_v1_load_template_invalid_tag)
 	zassert_equal(test_info_buffer->template_info.template_valid, 0);
 }
 
-ZTEST_USER(fpsensor_template, test_fp_template_v1_busy)
+ZTEST_USER(fpsensor_template, test_fp_template_v1_busy_crypto)
 {
 	struct ec_params_fp_template_v1 params = {
 		.cmd = FP_TEMPLATE_LOAD,
@@ -325,7 +325,26 @@ ZTEST_USER(fpsensor_template, test_fp_template_v1_busy)
 	global_context.sensor_mode &= ~FP_MODE_ENCRYPT_TEMPLATE;
 }
 
-ZTEST_USER(fpsensor_template, test_fp_template_v0_busy)
+ZTEST_USER(fpsensor_template, test_fp_template_v1_busy_enroll)
+{
+	struct ec_params_fp_template_v1 params = {
+		.cmd = FP_TEMPLATE_LOAD,
+	};
+
+	/* Simulate enrollment session in progress. */
+	global_context.sensor_mode |= FP_MODE_ENROLL_SESSION;
+
+	zassert_equal(EC_RES_BUSY,
+		      ec_cmd_fp_template_v1(NULL, &params, sizeof(params)));
+
+	params.cmd = FP_TEMPLATE_DECRYPT;
+	zassert_equal(EC_RES_BUSY,
+		      ec_cmd_fp_template_v1(NULL, &params, sizeof(params)));
+
+	global_context.sensor_mode &= ~FP_MODE_ENROLL_SESSION;
+}
+
+ZTEST_USER(fpsensor_template, test_fp_template_v0_busy_crypto)
 {
 	struct ec_params_fp_template_v1 params_v1 = {
 		.cmd = FP_TEMPLATE_DECRYPT,
@@ -344,6 +363,27 @@ ZTEST_USER(fpsensor_template, test_fp_template_v0_busy)
 
 	/* Give opportunity for fpsensor task to finish. */
 	k_msleep(1);
+}
+
+ZTEST_USER(fpsensor_template, test_fp_template_v0_busy_enroll)
+{
+	uint8_t params_buffer[FP_TEMPLATE_PARAMS_BUFFER_SIZE] = {};
+	struct ec_params_fp_template *params =
+		(struct ec_params_fp_template *)params_buffer;
+
+	params->offset = 0;
+	params->size = FP_TEMPLATE_PARAMS_BUFFER_SIZE - sizeof(*params);
+
+	/* Simulate active enrollment session in progress. */
+	global_context.sensor_mode |= FP_MODE_ENROLL_SESSION;
+
+	/* v0 command should return BUSY during active enrollment. */
+	zassert_equal(EC_RES_BUSY,
+		      ec_cmd_fp_template(NULL, params,
+					 FP_TEMPLATE_PARAMS_BUFFER_SIZE));
+
+	/* Clean up state. */
+	global_context.sensor_mode &= ~FP_MODE_ENROLL_SESSION;
 }
 
 ZTEST_USER(fpsensor_template, test_fp_frame_v0_busy)
