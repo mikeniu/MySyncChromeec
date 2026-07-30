@@ -3,6 +3,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a7ef3b9b_38260be6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 33
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-30T17:09:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/916f26e9-0851-4c3a-921d-3d0c33bfe065)]\n\n**Review Summary**:\n*   **Functionality:** The patch successfully consolidates `plat_free` and `PLAT_FREE` into a single `plat_free(void **x)` function. The logic correctly frees the memory using `sys_free(*x)` and gracefully handles `NULL` values.\n*   **Security:** By taking a double pointer and setting the original pointer to `NULL` after freeing, this implementation systematically prevents use-after-free and double-free vulnerabilities.\n*   **Style:** The naming convention correctly uses the standard C `snake_case` style. The docstrings in `fingerprint_egis630_pal.h` have been cleanly merged to accurately describe the behavior.\n*   **Testing \u0026 Test Coverage:** The changes are thoroughly tested in `egis630.c`. The test suite comprehensively covers successful allocations, freeing `NULL` pointers, and safely handling `NULL` double pointers.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and tightly scoped to this specific refactoring and its corresponding tests.",
+      "isAi": true,
+      "revId": "57e879b99ace1626c273c25bd69825c56fd396d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bf875512_47908323",
         "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
         "patchSetId": 33
