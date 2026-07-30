@@ -52,6 +52,24 @@
       "parentUuid": "4884db8a_c1059c22",
       "revId": "64ac18bae83f22e5777db90f9cc863aafaf3ab9e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77f2f9be_98fa0791",
+        "filename": "zephyr/program/fpmcu/et171/smolec.dts",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-07-30T08:58:39Z",
+      "side": 1,
+      "message": "Changed APNS partition size to 8K",
+      "parentUuid": "bffbad03_a95a2f7c",
+      "revId": "64ac18bae83f22e5777db90f9cc863aafaf3ab9e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
