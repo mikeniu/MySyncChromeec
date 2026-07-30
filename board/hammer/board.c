@@ -200,7 +200,13 @@ static void board_init(void)
 	spi_enable(CONFIG_SPI_TOUCHPAD_PORT, 0);
 
 	/* Disable SPI passthrough when the system is locked */
+<<<<<<< HEAD   (13a76dc0019e421cf87521fcc3ecda54fe61de0c host_cmd: Add console_print host command)
 	usb_spi_enable(&usb_spi, system_is_locked());
+||||||| BASE   (c662dd27ad1fee5d1580aebab02cc5154ae6b5e4 UPSTREAM: ec: replace SECTION_IS_RO/RW macros with CONFIG_CR)
+	usb_spi_enable(system_is_locked());
+=======
+	usb_spi_enable(!system_is_locked());
+>>>>>>> CHANGE (508637e0c9edff81c0cdab9914c85c74d89c0d7a hammer: Fix inverted polarity in usb_spi_enable)
 
 	/* Set all four SPI pins to high speed */
 	/* pins B3/5, A15 */
