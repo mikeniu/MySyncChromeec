@@ -61,6 +61,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9007c1ca_d74452c4",
+        "filename": "extra/usb_updater/gsctool.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2774,
+      "author": {
+        "id": 4818932
+      },
+      "writtenOn": "2026-07-30T12:43:04Z",
+      "side": 1,
+      "message": "I think it is obscure to simulate function scope for macros. Compiler will throw a redefinition error in worst case.",
+      "parentUuid": "5be6cfd5_9a3d2798",
+      "revId": "7d4579ec2f033758dad010c621d51ef68923c875",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8355d785_fb8899b1",
         "filename": "extra/usb_updater/verify_ro.c",
         "patchSetId": 2
