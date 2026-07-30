@@ -250,6 +250,95 @@ ZTEST_USER(fpsensor_state,
 		"Expected RESET_SENSOR while idle to bypass validate_request");
 }
 
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_reject_mode_clearing_during_crypto)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = 0,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected clearing mode during crypto to be rejected, got %d",
+		rv);
+
+	zassert_equal(
+		global_context.sensor_mode, FP_MODE_ENCRYPT_TEMPLATE,
+		"Expected sensor_mode to retain FP_MODE_ENCRYPT_TEMPLATE, "
+		"got 0x%x",
+		global_context.sensor_mode);
+}
+
+ZTEST_USER(fpsensor_state, test_validate_fp_mode_reject_mode_swap_during_crypto)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_DECRYPT_TEMPLATE,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected swapping crypto mode during crypto to be rejected, "
+		"got %d",
+		rv);
+
+	zassert_equal(
+		global_context.sensor_mode, FP_MODE_ENCRYPT_TEMPLATE,
+		"Expected sensor_mode to remain FP_MODE_ENCRYPT_TEMPLATE, "
+		"got 0x%x",
+		global_context.sensor_mode);
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_allow_dont_change_during_crypto)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_DONT_CHANGE,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_SUCCESS,
+		"Expected FP_MODE_DONT_CHANGE during crypto to be accepted, got %d",
+		rv);
+
+	zassert_equal(
+		global_context.sensor_mode, FP_MODE_ENCRYPT_TEMPLATE,
+		"Expected sensor_mode to retain FP_MODE_ENCRYPT_TEMPLATE, got 0x%x",
+		global_context.sensor_mode);
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_reject_identical_mode_during_crypto)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_ENCRYPT_TEMPLATE,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(rv, EC_RES_INVALID_PARAM,
+		      "Expected submitting mode during crypto to be rejected, "
+		      "got %d",
+		      rv);
+}
+
 static void *fpsensor_setup(void)
 {
 	/* Start shimmed tasks. */
