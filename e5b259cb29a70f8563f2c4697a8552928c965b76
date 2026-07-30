@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28a2ca3f_67f14b5a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-30T16:19:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/269a5e01-9d67-4401-8c34-aaf4b8bea0de)]\n\n**Review Summary:**\n* **Functionality**: The change correctly splits the `special_boards` target to allow building LCOV `.info` files directly. This works as described in the commit message and enables parallel execution during `make -j`.\n* **Security**: No security issues.\n* **Style**: Follows standard Makefile syntax.\n* **Testing**: This is a test coverage infrastructure change itself. The CL includes an appropriate manual test command.\n* **CL Size \u0026 Scope**: Excellent; self-contained and minimal.",
+      "isAi": true,
+      "revId": "e5b259cb29a70f8563f2c4697a8552928c965b76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
