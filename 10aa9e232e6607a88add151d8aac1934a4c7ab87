@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89b207cc_87451568",
+        "filename": "common/cbi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-30T02:15:37Z",
+      "side": 1,
+      "message": "Nit: There\u0027s a lot of pointer arithmetic going on, would be nice to have a helper macros to calculate the next entry address or end of CBI\n`#define NEXT_CBI_ENTRY(p) ( (p) + sizeof(struct cbi_data) + ((struct cbi_data*)p)-\u003esize )`\n`#define CBI_END(h) ( (uint8_t*)h + h-\u003etotal_size )`",
+      "range": {
+        "startLine": 71,
+        "startChar": 6,
+        "endLine": 71,
+        "endChar": 30
+      },
+      "revId": "10aa9e232e6607a88add151d8aac1934a4c7ab87",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
