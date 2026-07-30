@@ -123,6 +123,24 @@
       "parentUuid": "dfc35f03_9911c957",
       "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e508a4a2_4d0502ca",
+        "filename": "zephyr/test/rex/tests/program/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-30T17:10:46Z",
+      "side": 1,
+      "message": "Hypothetically, if it makes sense to delete this rex test, you\u0027d delete that `testcase.yaml` snippet, the file you linked to, and this line in `CMakeLists.txt`. They all go together.\n\nBut I\u0027m just asking you to experiment locally to see if, with the generic implementation, this test covers any lines not covered by other tests. If you don\u0027t want it to take all day, you can just run the generic TBT response tests. I can\u0027t remember which ones those are specifically off the top of my head.",
+      "parentUuid": "5a2444a3_8b0db19c",
+      "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
