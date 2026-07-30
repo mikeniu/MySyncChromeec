@@ -75,7 +75,7 @@ def parse_template_file(filename) -> Dict[str, Set[str]]:
     with open(filename, "r", encoding="utf-8") as template_file:
         data_by_path: Dict[str, Set[str]] = defaultdict(set)
         file_name = None
-        for line in template_file.readlines():
+        for line in template_file:
             line = line.strip()
             if line == "end_of_record":
                 file_name = None
@@ -94,12 +94,20 @@ def parse_template_file(filename) -> Dict[str, Set[str]]:
                 pass
             elif line.startswith("SF:"):
                 file_name = line
-            else:
-                match = EXTRACT_LINE.match(line)
-                if file_name and match:
-                    data_by_path[file_name].add(match.group(2))
+            elif file_name:
+                if line.startswith(("DA:", "FN:", "BRDA:")):
+                    colon_pos = line.find(":")
+                    comma_pos = line.find(",", colon_pos)
+                    if colon_pos != -1 and comma_pos != -1:
+                        data_by_path[file_name].add(
+                            line[colon_pos + 1 : comma_pos]
+                        )
+                    else:
+                        raise NotImplementedError(line)
                 else:
                     raise NotImplementedError(line)
+            else:
+                raise NotImplementedError(line)
         return data_by_path
 
 
@@ -115,97 +123,107 @@ def filter_coverage_file(filename, output_file, data_by_path):
     """
     logging.info("Merging file %s", filename)
     with open(filename, "r", encoding="utf-8") as input_file:
+        lines_buf = []
+        function_names = set()
+        file_name = None
+        should_write = False
+        functions_found = 0
+        functions_hit = 0
+        lines_found = 0
+        lines_hit = 0
+        branches_found = 0
+        branches_hit = 0
 
-        def empty_record():
-            return {
-                "text": "",
-                "function_names": set(),
-            }
-
-        record = empty_record()
-        for line in input_file.readlines():
+        for line in input_file:
             line = line.strip()
             if line == "end_of_record":
-                record["text"] += line + "\n"
-                if record.get("should_write_record", False):
-                    output_file.write(record["text"])
-                else:
-                    logging.debug("Omitting record %s", record["text"])
-                record = empty_record()
+                if should_write:
+                    output_file.write("".join(lines_buf))
+                    output_file.write("end_of_record\n")
+                lines_buf = []
+                function_names = set()
+                file_name = None
+                should_write = False
+                functions_found = functions_hit = lines_found = lines_hit = (
+                    branches_found
+                ) = branches_hit = 0
             elif line.startswith("SF:"):
-                record["file_name"] = line
-                record["text"] += line + "\n"
+                file_name = line
+                lines_buf.append(line + "\n")
             elif line.startswith("TN:"):
-                record["text"] += line + "\n"
+                lines_buf.append(line + "\n")
             elif line.startswith("FN:"):
-                match = EXTRACT_FN.match(line)
-                if (
-                    match
-                    and match.group(2) in data_by_path[record["file_name"]]
-                ):
-                    record["text"] += line + "\n"
-                    record["functions_found"] = (
-                        record.get("functions_found", 0) + 1
-                    )
-                    record["should_write_record"] = True
-                    record["function_names"].add(match.group(3))
+                comma_pos = line.find(",", 3)
+                if comma_pos != -1:
+                    line_num = line[3:comma_pos]
+                    fn_name = line[comma_pos + 1 :]
+                    if file_name and line_num in data_by_path[file_name]:
+                        lines_buf.append(line + "\n")
+                        functions_found += 1
+                        should_write = True
+                        function_names.add(fn_name)
+                    else:
+                        logging.debug("Omitting %s", line)
                 else:
-                    logging.debug("Omitting %s", line)
+                    raise NotImplementedError(line)
             elif line.startswith("FNDA:"):
-                match = EXTRACT_FNDA.match(line)
-                if match and match.group(3) in record["function_names"]:
-                    record["text"] += line + "\n"
-                    record["should_write_record"] = True
-                    if match.group(2) != "0":
-                        record["functions_hit"] = (
-                            record.get("functions_hit", 0) + 1
-                        )
+                comma_pos = line.find(",", 5)
+                if comma_pos != -1:
+                    fn_count = line[5:comma_pos]
+                    fn_name = line[comma_pos + 1 :]
+                    if fn_name in function_names:
+                        lines_buf.append(line + "\n")
+                        should_write = True
+                        if fn_count != "0":
+                            functions_hit += 1
+                    else:
+                        logging.debug("Omitting %s", line)
                 else:
-                    logging.debug("Omitting %s", line)
+                    raise NotImplementedError(line)
             elif line.startswith("DA:"):
-                match = EXTRACT_DA.match(line)
-                if (
-                    match
-                    and match.group(2) in data_by_path[record["file_name"]]
-                ):
-                    record["text"] += line + "\n"
-                    record["lines_found"] = record.get("lines_found", 0) + 1
-                    record["should_write_record"] = True
-                    if match.group(3) != "0":
-                        record["lines_hit"] = record.get("lines_hit", 0) + 1
+                comma_pos = line.find(",", 3)
+                if comma_pos != -1:
+                    line_num = line[3:comma_pos]
+                    line_count = line[comma_pos + 1 :]
+                    if file_name and line_num in data_by_path[file_name]:
+                        lines_buf.append(line + "\n")
+                        lines_found += 1
+                        should_write = True
+                        if line_count != "0":
+                            lines_hit += 1
+                    else:
+                        logging.debug("Omitting %s", line)
                 else:
-                    logging.debug("Omitting %s", line)
+                    raise NotImplementedError(line)
             elif line.startswith("BRDA:"):
-                match = EXTRACT_BRDA.match(line)
-                if (
-                    match
-                    and match.group(2) in data_by_path[record["file_name"]]
-                ):
-                    record["text"] += line + "\n"
-                    record["branches_found"] = (
-                        record.get("branches_found", 0) + 1
-                    )
-                    record["should_write_record"] = True
-                    if match.group(4) != "-" and match.group(4) != "0":
-                        record["branches_hit"] = (
-                            record.get("branches_hit", 0) + 1
-                        )
+                parts = line.split(",")
+                if len(parts) >= 4:
+                    line_num = parts[0][5:]
+                    count = parts[3]
+                    if file_name and line_num in data_by_path[file_name]:
+                        lines_buf.append(line + "\n")
+                        branches_found += 1
+                        should_write = True
+                        if count not in ("-", "0"):
+                            branches_hit += 1
+                    else:
+                        logging.debug("Omitting %s", line)
                 else:
-                    logging.debug("Omitting %s", line)
+                    raise NotImplementedError(line)
             elif line.startswith("FNF:"):
-                record["text"] += f"FNF:{record.get('functions_found', 0)}\n"
+                lines_buf.append(f"FNF:{functions_found}\n")
             elif line.startswith("FNH:"):
-                record["text"] += f"FNH:{record.get('functions_hit', 0)}\n"
+                lines_buf.append(f"FNH:{functions_hit}\n")
             elif line.startswith("BRF:"):
-                record["text"] += f"BRF:{record.get('branches_found', 0)}\n"
+                lines_buf.append(f"BRF:{branches_found}\n")
             elif line.startswith("BRH:"):
-                record["text"] += f"BRH:{record.get('branches_hit', 0)}\n"
+                lines_buf.append(f"BRH:{branches_hit}\n")
             elif line.startswith("LF:"):
-                record["text"] += f"LF:{record.get('lines_found', 0)}\n"
+                lines_buf.append(f"LF:{lines_found}\n")
             elif line.startswith("LH:"):
-                record["text"] += f"LH:{record.get('lines_hit', 0)}\n"
+                lines_buf.append(f"LH:{lines_hit}\n")
             else:
-                logging.debug("record = %s", record)
+                logging.debug("record = %s", line)
                 raise NotImplementedError(line)
 
 
