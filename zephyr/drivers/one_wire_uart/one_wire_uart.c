@@ -141,7 +141,8 @@ test_export_static void process_packet(void)
 	while (k_msgq_get(rx_queue, &msg, K_NO_WAIT) == 0) {
 		int last_msg_id = data->last_received_msg_id;
 
-		if (last_msg_id != msg.header.msg_id && data->msg_received_cb) {
+		if (last_msg_id != msg.header.msg_id &&
+		    msg.header.payload_len >= 1 && data->msg_received_cb) {
 			data->msg_received_cb(msg.payload[0], msg.payload + 1,
 					      msg.header.payload_len - 1);
 		}
@@ -307,7 +308,9 @@ test_export_static void process_rx_fifo(const struct device *dev)
 			      sizeof(struct one_wire_uart_header));
 
 		/* bad length */
-		if (msg.header.payload_len > ONE_WIRE_UART_MAX_PAYLOAD_SIZE) {
+		if (msg.header.payload_len > ONE_WIRE_UART_MAX_PAYLOAD_SIZE ||
+		    (!msg.header.ack && !msg.header.reset &&
+		     msg.header.payload_len < 1)) {
 			ring_buf_get(rx_ring_buf, NULL, 1);
 			continue;
 		}
