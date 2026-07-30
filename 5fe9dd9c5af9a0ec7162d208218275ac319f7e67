@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e922b93c_14b7bcdf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-30T02:23:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/6d7524fd-a6ae-4041-9aa0-42b69e3e4685)]\n\n**Review Summary**\n* **Functionality:** The fix in `ft98xx_enroll_step` works perfectly. It correctly asserts the initialization state by checking `data-\u003eremain` and `data-\u003emax_enroll_samples`, which prevents the fake 100% completion bug.\n* **Security:** No security vulnerabilities introduced. The bounds checks ensure that `enroll_index` does not underflow or exceed the buffer allocations.\n* **Style:** The code follows the style guidelines perfectly.\n* **Testing \u0026 Test Coverage:** Excellent work adding the new `ft98xx` test suite using FFF mocks! The test coverage is comprehensive and properly verifies the state machine, including the specific uninitialized state bug.\n* **CL Size \u0026 Scope:** The CL is appropriately scoped to fixing the bug and providing the corresponding test coverage.\n\nTAG\u003dagy\nCONV\u003d6d7524fd-a6ae-4041-9aa0-42b69e3e4685",
+      "isAi": true,
+      "revId": "5fe9dd9c5af9a0ec7162d208218275ac319f7e67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0208ad0_3f608afa",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-30T02:23:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This test suite is fantastic! Using FFF to mock out the vendor algorithm API is a great approach for testing this layer, and you\u0027ve covered all the critical edge cases (success, early cancellation, initialization failure). This gives us much higher confidence in the `ft98xx_bio_alg` state machine.",
+      "isAi": true,
+      "revId": "5fe9dd9c5af9a0ec7162d208218275ac319f7e67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
