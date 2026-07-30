@@ -16,6 +16,24 @@
       "message": "A bunch of unit tests are failing to build.  cros.dsp.* tests,, drivers.default.console_cmds.*, pw_fsm.state_mach, pw_transport.service, and qcon_power.power_gpio_keys_ro.*",
       "revId": "11f896e226a12ecb28f1273ed5e7a07c6914a4a5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b5d6233_035df8cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-30T21:10:55Z",
+      "side": 1,
+      "message": "Most of the fixes for these errors would require adding multiple conditional directives to `zephyr/shim/src/buttons/power_button.c`.\n\nSince this implementation depends on the `cros_buttons` node, would it make more sense to move it to the `zephyr/drivers/buttons` directory instead?",
+      "parentUuid": "0181af04_6c9c61d7",
+      "revId": "11f896e226a12ecb28f1273ed5e7a07c6914a4a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
