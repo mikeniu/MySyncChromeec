@@ -22,6 +22,30 @@
       },
       "revId": "8cc51667aad06cd77e57cda58a27942ac9449807",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8d32e49_c7856961",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 31
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-30T16:36:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e13b89c6_b0c5a7f3",
+      "range": {
+        "startLine": 727,
+        "startChar": 0,
+        "endLine": 733,
+        "endChar": 1
+      },
+      "revId": "8cc51667aad06cd77e57cda58a27942ac9449807",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
