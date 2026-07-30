@@ -64,6 +64,30 @@
       },
       "revId": "57e879b99ace1626c273c25bd69825c56fd396d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb9e4945_d89ab730",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-30T17:21:37Z",
+      "side": 1,
+      "message": "the suggestion proposed by gemini does not make sense\n\n```\nLOG_ERR() in plat_free() routes through Zephyr\u0027s logging subsystem (LOG_MODULE_REGISTER(egis630_pal, LOG_LEVEL_INF)), not through the custom output_log() hook that writes to printf_buffer.\n```\n\n```\n[00:00:00.240,000] \u003cerr\u003e egis630_pal: Error - plat_free called with NULL double pointer.\nThe message was printed directly by Zephyr\u0027s logger, so printf_buffer remained empty (\\0), causing strstr() to return NULL.\n```",
+      "parentUuid": "08b7ad05_0e8dfc60",
+      "range": {
+        "startLine": 735,
+        "startChar": 0,
+        "endLine": 739,
+        "endChar": 1
+      },
+      "revId": "57e879b99ace1626c273c25bd69825c56fd396d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
