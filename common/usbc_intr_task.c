@@ -95,7 +95,9 @@ void pd_interrupt_handler_task(void *p)
 	if (port >= board_get_usb_pd_port_count())
 		return;
 
-	pd_int_task_id[port] = thread_id_to_task_id(k_current_get());
+#ifdef HAS_TASK_PD_INT_C0
+	pd_int_task_id[port] = TASK_ID_PD_INT_C0 + port;
+#endif
 
 	while (1) {
 		bool have_alerts;
@@ -157,7 +159,9 @@ void pd_shared_alert_task(void *p)
 
 		port_mask = PD_STATUS_TCPC_ALERT_0 << port;
 		want_alerts |= port_mask;
-		pd_int_task_id[port] = thread_id_to_task_id(k_current_get());
+#ifdef CONFIG_HAS_TASK_PD_INT_SHARED
+		pd_int_task_id[port] = TASK_ID_PD_INT_SHARED;
+#endif
 	}
 
 	if (want_alerts == 0) {

@@ -99,23 +99,6 @@ ZTEST(test_task_shim, test_set_event_before_task_start)
 	run_test(set_event_before_task_start1, set_event_before_task_start2);
 }
 
-static void task_get_current1(void)
-{
-	zassert_equal(thread_id_to_task_id(k_current_get()), TASK_ID_TASK_1,
-		      "ID matches");
-}
-
-static void task_get_current2(void)
-{
-	zassert_equal(thread_id_to_task_id(k_current_get()), TASK_ID_TASK_2,
-		      "ID matches");
-}
-
-ZTEST(test_task_shim, test_task_get_current)
-{
-	run_test(&task_get_current1, &task_get_current2);
-}
-
 static void timeout1(void)
 {
 	const uint32_t start_ms = k_uptime_get();
@@ -307,7 +290,7 @@ static int post_kernel(void)
 {
 	zassert_false(post_kernel_ran);
 	zassert_false(k_is_pre_kernel());
-	zassert_equal(TASK_ID_MAIN, thread_id_to_task_id(k_current_get()));
+	zassert_equal(k_current_get(), get_main_thread());
 	post_kernel_ran = true;
 	return 0;
 }

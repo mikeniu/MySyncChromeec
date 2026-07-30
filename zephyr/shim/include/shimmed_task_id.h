@@ -270,9 +270,7 @@ enum {
 #undef TASK_TEST
 
 /*
- * Additional task IDs for features that runs on non shimmed threads,
- * thread_id_to_task_id() and task_id_to_thread_id() need to be updated
- * to identify these tasks.
+ * Additional task IDs for features that runs on non shimmed threads.
  */
 /* clang-format off */
 #define CROS_EC_EXTRA_TASKS(fn)                                         \

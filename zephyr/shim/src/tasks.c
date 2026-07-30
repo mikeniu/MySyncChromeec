@@ -133,57 +133,47 @@ test_mockable k_tid_t get_hostcmd_thread(void)
 	return NULL;
 }
 
-task_id_t thread_id_to_task_id(k_tid_t thread_id)
+static struct task_ctx_base_data *get_current_task_base_data(void)
 {
-	if (thread_id == NULL) {
-		__ASSERT(false, "Invalid thread_id");
-		return TASK_ID_INVALID;
+	const k_tid_t current = k_current_get();
+
+	for (size_t i = 0; i < TASK_ID_COUNT; ++i) {
+		if (task_to_k_tid[i] == current) {
+			return &shimmed_tasks_data[i];
+		}
 	}
 
-	if (get_sysworkq_thread() == thread_id) {
-		return TASK_ID_SYSWORKQ;
+	if (get_sysworkq_thread() == current) {
+		return task_get_base_data(TASK_ID_SYSWORKQ);
 	}
 
 #ifdef HAS_TASK_HOSTCMD
-	if (get_hostcmd_thread() == thread_id) {
-		return TASK_ID_HOSTCMD;
+	if (get_hostcmd_thread() == current) {
+		return task_get_base_data(TASK_ID_HOSTCMD);
 	}
 #endif /* HAS_TASK_HOSTCMD */
 
 #ifdef HAS_TASK_MAIN
-	if (get_main_thread() == thread_id) {
-		return TASK_ID_MAIN;
+	if (get_main_thread() == current) {
+		return task_get_base_data(TASK_ID_MAIN);
 	}
 #endif /* HAS_TASK_MAIN */
 
-	if (get_idle_thread() == thread_id) {
-		return TASK_ID_IDLE;
+	if (get_idle_thread() == current) {
+		return task_get_base_data(TASK_ID_IDLE);
 	}
 
-	if (get_shell_thread() == thread_id) {
-		return TASK_ID_SHELL;
+	if (get_shell_thread() == current) {
+		return task_get_base_data(TASK_ID_SHELL);
 	}
 
 #ifdef CONFIG_AP_PWRSEQ
-	if (get_ap_pwrseq_thread() == thread_id) {
-		return TASK_ID_AP_PWRSEQ;
+	if (get_ap_pwrseq_thread() == current) {
+		return task_get_base_data(TASK_ID_AP_PWRSEQ);
 	}
 #endif /* CONFIG_AP_PWRSEQ */
 
-	for (size_t i = 0; i < TASK_ID_COUNT; ++i) {
-		if (task_to_k_tid[i] == thread_id) {
-			return i;
-		}
-	}
-
-	if (thread_id->base.thread_state & _THREAD_DUMMY) {
-		return TASK_ID_INVALID;
-	}
-
-	LOG_ERR("Failed to map thread to task: thread_id=%p, name=%s",
-		thread_id, SAFE_THREAD_NAME(thread_id));
-
-	return TASK_ID_INVALID;
+	return NULL;
 }
 
 atomic_t *task_get_event_bitmap(task_id_t cros_task_id)
@@ -209,9 +199,7 @@ void task_set_event(task_id_t cros_task_id, uint32_t event)
 
 uint32_t task_wait_event(int timeout_us)
 {
-	struct task_ctx_base_data *data;
-
-	data = task_get_base_data(thread_id_to_task_id(k_current_get()));
+	struct task_ctx_base_data *data = get_current_task_base_data();
 
 	__ASSERT_NO_MSG(data != NULL);
 
@@ -256,9 +244,7 @@ uint32_t task_wait_event(int timeout_us)
 
 uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 {
-	struct task_ctx_base_data *data;
-
-	data = task_get_base_data(thread_id_to_task_id(k_current_get()));
+	struct task_ctx_base_data *data = get_current_task_base_data();
 
 	uint32_t events = 0;
 	const int64_t tick_deadline =
