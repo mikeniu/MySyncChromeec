@@ -9,7 +9,8 @@
 
 # This also assumes that you ran zmake build -a before this in the build stage
 
-TWISTER_COMMAND=cd $(PLATFORM_EC) && ./twister --outdir \
+TWISTER_JOBS ?= 8
+TWISTER_COMMAND=cd $(PLATFORM_EC) && ./twister --jobs $(TWISTER_JOBS) --outdir \
 	twister-out-$(TOOLCHAIN_PATH) -v -i --no-upload-cros-rdb --toolchain \
 	$(TOOLCHAIN)
 ifdef COVERAGE
