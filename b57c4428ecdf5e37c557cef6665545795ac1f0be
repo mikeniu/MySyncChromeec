@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6647ee4_afa13579",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-30T01:54:51Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/2a0b0e89-4d89-4439-8a1d-394a864bb629)]\n\n**Review Summary:**\n* **Functionality**: The change correctly fixes an include path to resolve an issue with standalone unit test builds using Twister.\n* **Security**: No security issues introduced.\n* **Style**: The updated include path is clean and readable.\n* **Consistency**: Consistent with fixing the build configuration context.\n* **Testing**: No new test coverage is required for this build fix. The commit message indicates proper manual build testing (`zmake -D build chudow --clobber`).\n* **CL Size \u0026 Scope**: The CL is appropriately sized and scoped for a single fix.",
+      "isAi": true,
+      "revId": "b57c4428ecdf5e37c557cef6665545795ac1f0be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
