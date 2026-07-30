@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf875512_47908323",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-30T17:03:41Z",
+      "side": 1,
+      "message": "Please use \"Create AI Review Prompt\", select 100 context lines, and paste into Gemini using 3.1 Pro Extended Thinking before sending for review. It gives helpful feedback like the following:\n\n-----\n\n* **Issue:** In `zephyr/test/fingerprint/drivers/egis630/src/egis630.c`, the new test `test_plat_free_null_double_pointer` executes the error path (`x \u003d\u003d NULL`) of `plat_free`. However, the test only relies on not crashing and prints a manual `TC_PRINT` message. It fails to assert that the proper error log was generated.\n* **Recommendation:** The test file already contains the infrastructure to intercept and assert on logs using `printf_buffer` (as seen in `test_egis630_rbs_check_if_null_error`). Use `zassert_mem_equal` to strictly verify that `plat_free` correctly logs the expected error.\n* **Suggested Remediation:**\n```c\nZTEST_F(egis630, test_plat_free_null_double_pointer)\n{\n    char expected_printf_buffer[sizeof(printf_buffer)];\n    memset(expected_printf_buffer, 0, sizeof(expected_printf_buffer));\n\n    /* Adjust the line number according to where LOG_ERR is called in plat_free */\n    snprintf(expected_printf_buffer, sizeof(expected_printf_buffer),\n             \"\u003cplat_free:%d\u003e Error - plat_free called with NULL double pointer.\", LINE_NUMBER);\n\n    plat_free(NULL);\n\n    zassert_mem_equal(printf_buffer, expected_printf_buffer,\n                      sizeof(printf_buffer),\n                      \"LOG message did not match expected message\");\n}\n\n```",
+      "range": {
+        "startLine": 735,
+        "startChar": 0,
+        "endLine": 739,
+        "endChar": 1
+      },
+      "revId": "57e879b99ace1626c273c25bd69825c56fd396d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
