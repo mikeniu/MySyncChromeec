@@ -33,4 +33,11 @@ enum manufacturing_status {
 
 enum manufacturing_status tpm_endorse(void);
 
+#if defined(SECTION_IS_RO) || defined(CR50_USE_FIXED_CERT)
+static inline int verify_ro_certs_hmac(void) { return 1; }
+#else
+int verify_ro_certs_hmac(void);
+#endif
+int board_keymgr_in_prod_mode(void);
+
 #endif	/* __CROS_EC_TPM_MANUFACTURE_H */
