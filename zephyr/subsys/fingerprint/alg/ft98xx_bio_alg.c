@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h>
 #include <zephyr/logging/log.h>
 
+#include <drivers/fingerprint/fingerprint_ft98xx_private.h>
 #include <fingerprint/fingerprint_alg.h>
 
 LOG_MODULE_REGISTER(ft98xx_bio_alg, LOG_LEVEL_INF);
