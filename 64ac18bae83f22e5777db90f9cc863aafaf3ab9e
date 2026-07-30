@@ -16,6 +16,42 @@
       "message": "@jason.huang@egistec.corp-partner.google.com @wenbin.bao@egistec.corp-partner.google.com I copied these from `stobnica` and added `cover-type \u003d \"spray-coating\"`. Could you please check if these parameters are correct, especially APNS data size?",
       "revId": "64ac18bae83f22e5777db90f9cc863aafaf3ab9e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bffbad03_a95a2f7c",
+        "filename": "zephyr/program/fpmcu/et171/smolec.dts",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4333743
+      },
+      "writtenOn": "2026-07-30T08:09:50Z",
+      "side": 1,
+      "message": "APNS data size 8K size for EC660 sensor with spray coating",
+      "parentUuid": "4884db8a_c1059c22",
+      "revId": "64ac18bae83f22e5777db90f9cc863aafaf3ab9e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "953fb019_a11f26f6",
+        "filename": "zephyr/program/fpmcu/et171/smolec.dts",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4333743
+      },
+      "writtenOn": "2026-07-30T08:09:50Z",
+      "side": 1,
+      "message": "APNS 8K",
+      "parentUuid": "4884db8a_c1059c22",
+      "revId": "64ac18bae83f22e5777db90f9cc863aafaf3ab9e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
