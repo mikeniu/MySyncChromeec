@@ -22,6 +22,30 @@
       },
       "revId": "bd3dd9f31cdb6f5173dbd70b5b328bc0b09743ca",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4dc05127_0509d611",
+        "filename": "zephyr/Kconfig.power_button",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-30T01:19:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d037eebe_8ccd69e9",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 6
+      },
+      "revId": "bd3dd9f31cdb6f5173dbd70b5b328bc0b09743ca",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
