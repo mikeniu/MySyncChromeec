@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea578146_a93e8abf",
+        "filename": "zephyr/program/fatcat/moonstone/pwrmon.dtsi",
+        "patchSetId": 24
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-30T11:37:59Z",
+      "side": 1,
+      "message": "indentation is off here, note that dts files should be indented on 8 spaces per tab, I suspect your editor is off, there\u0027s also an automatic indenter tool upstream if you feel like trying it though it uses nodejs unfortunately and we don\u0027t use it anywhere at the moment, I\u0027d just fix this one manually",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 44
+      },
+      "revId": "32ac61e039bfa0b86e8f1abe88f9f80438901b9f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
