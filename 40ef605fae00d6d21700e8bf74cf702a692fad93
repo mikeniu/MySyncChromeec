@@ -71,6 +71,29 @@
       "parentUuid": "0c08757c_f059efef",
       "revId": "40ef605fae00d6d21700e8bf74cf702a692fad93",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15db4726_a88787dd",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-30T16:03:16Z",
+      "side": 1,
+      "message": "I can\u0027t remember if we\u0027re compiling these out for release or not. To be safe, we can just do like we are doing in other functions in this file:\n\n```\nif (x \u003d\u003d NULL) {\n    LOG_ERR(\"Error - %s called with NULL double pointer.\", __func__);\n    return;\n}\n```",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 19
+      },
+      "revId": "40ef605fae00d6d21700e8bf74cf702a692fad93",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
