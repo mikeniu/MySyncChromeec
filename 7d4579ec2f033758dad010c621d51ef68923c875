@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c0bd0df_340a8c3f",
+        "filename": "extra/usb_updater/gsctool.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2640,
+      "author": {
+        "id": 4818932
+      },
+      "writtenOn": "2026-07-30T12:12:28Z",
+      "side": 1,
+      "message": "Defines are all caps by convention. They could be:\n`SLOTS_NUM` and `SECTIONS_PER_SLOT_NUM`.",
+      "range": {
+        "startLine": 2640,
+        "startChar": 8,
+        "endLine": 2640,
+        "endChar": 17
+      },
+      "revId": "7d4579ec2f033758dad010c621d51ef68923c875",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19046986_ca60c870",
+        "filename": "extra/usb_updater/gsctool.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2774,
+      "author": {
+        "id": 4818932
+      },
+      "writtenOn": "2026-07-30T12:12:28Z",
+      "side": 1,
+      "message": "It\u0027s not necessary to undefine.",
+      "revId": "7d4579ec2f033758dad010c621d51ef68923c875",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8355d785_fb8899b1",
+        "filename": "extra/usb_updater/verify_ro.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 4818932
+      },
+      "writtenOn": "2026-07-30T12:12:28Z",
+      "side": 1,
+      "message": "`MAX_TRANSFER`",
+      "revId": "7d4579ec2f033758dad010c621d51ef68923c875",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c5704cd_53057a81",
+        "filename": "extra/usb_updater/verify_ro.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 4818932
+      },
+      "writtenOn": "2026-07-30T12:12:28Z",
+      "side": 1,
+      "message": "drop",
+      "revId": "7d4579ec2f033758dad010c621d51ef68923c875",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
