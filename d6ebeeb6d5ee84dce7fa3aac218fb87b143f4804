@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1af9630_70d9e694",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-07-30T16:53:42Z",
+      "side": 1,
+      "message": "very nitpicky, feel free to ignore: \"Prepare new\" sounds like allocating an additional one, while this function is reusing the existing panic data. I would call this `initialize_panic_data`.",
+      "range": {
+        "startLine": 156,
+        "startChar": 0,
+        "endLine": 156,
+        "endChar": 11
+      },
+      "revId": "d6ebeeb6d5ee84dce7fa3aac218fb87b143f4804",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "069c7db0_3990a0d8",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-07-30T16:53:42Z",
+      "side": 1,
+      "message": "Out of scope of this CL, but do you know why we set this bit only for cortex_m?",
+      "range": {
+        "startLine": 186,
+        "startChar": 0,
+        "endLine": 187,
+        "endChar": 46
+      },
+      "revId": "d6ebeeb6d5ee84dce7fa3aac218fb87b143f4804",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0402132f_fe52adda",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-07-30T16:53:42Z",
+      "side": 1,
+      "message": "Maybe move the call to `flush_panic_data()` here so it would be impossible to forget to flush after setting the reason in the future.",
+      "revId": "d6ebeeb6d5ee84dce7fa3aac218fb87b143f4804",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
