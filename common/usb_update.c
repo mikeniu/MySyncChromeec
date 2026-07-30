@@ -608,6 +608,12 @@ static void update_out_handler(struct consumer const *consumer, size_t count)
 	}
 
 	/* Must be inside block. */
+	if (count > block_size || block_index + count > sizeof(block_buffer)) {
+		CPRINTS("FW update: payload exceeds block bounds");
+		send_error_reset(UPDATE_GEN_ERROR);
+		return;
+	}
+
 	QUEUE_REMOVE_UNITS(consumer->queue, block_buffer + block_index, count);
 	block_index += count;
 	block_size -= count;
