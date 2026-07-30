@@ -22,6 +22,30 @@
       },
       "revId": "86fda4917f560cdc536eda049739993d85d650f3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92f6f149_64abb05c",
+        "filename": "zephyr/program/fatcat/moonstone/project.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-07-30T22:55:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "152d35fb_e370ef04",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 40
+      },
+      "revId": "86fda4917f560cdc536eda049739993d85d650f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
