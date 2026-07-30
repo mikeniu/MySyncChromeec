@@ -195,20 +195,20 @@ static int dump_range(struct transfer_descriptor *td,
 	size_t remaining_size = req->size;
 	size_t response_size;
 	/* Max size of a single shot is 32 bytes. */
-	const size_t max_transfer = 32;
-	uint8_t response[max_transfer];
+#define MAX_TRANSFER 32
+	uint8_t response[MAX_TRANSFER];
 
 	req->subcmd = SPI_HASH_SUBCMD_DUMP;
 	while (remaining_size) {
-		size_t shot_size = max_transfer;
+		size_t shot_size = MAX_TRANSFER;
 		uint8_t alignment;
 		uint32_t rv;
 
 		alignment = req->offset % 16;
 
-		if (alignment && ((alignment + remaining_size) > max_transfer))
+		if (alignment && ((alignment + remaining_size) > MAX_TRANSFER))
 			/* first line should be truncated. */
-			shot_size = max_transfer - alignment;
+			shot_size = MAX_TRANSFER - alignment;
 		else if (shot_size > remaining_size)
 			shot_size = remaining_size;
 

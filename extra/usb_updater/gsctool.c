@@ -1961,7 +1961,9 @@ static void send_boot_svc_msg(struct transfer_descriptor *td,
 	if (st.st_size > (long)sizeof(boot_svc_msg)) {
 		fprintf(stderr,
 			"Unexpected size %zd of %s, expected below %zu\n",
-			st.st_size, file_name, sizeof(boot_svc_msg) + 1);
+			(ssize_t)st.st_size,
+			file_name,
+			sizeof(boot_svc_msg) + 1);
 		exit(1);
 	}
 
@@ -2051,7 +2053,9 @@ static void send_owner_config(struct transfer_descriptor *td,
 		 */
 		fake_addr = td->rw_offset;
 	} else {
-		fprintf(stderr, "Unexpected size %zd of %s\n", st.st_size,
+		fprintf(stderr,
+			"Unexpected size %zd of %s\n",
+			(ssize_t)st.st_size,
 			file_name);
 		exit(1);
 	}
@@ -2637,37 +2641,37 @@ static int show_headers_versions(const struct image *image,
 	 * and RW. The 2 slots should have identical FW versions and board
 	 * IDs.
 	 */
-	const size_t kNumSlots = 2;
-	const size_t kNumSectionsPerSlot = 2;
+#define SLOTS_NUM 2
+#define SECTIONS_PER_SLOT_NUM 2
 	const struct section_t *sections = image->sections;
 
 	/*
 	 * String representation of FW version (<epoch>:<major>:<minor>), one
 	 * string for each FW section.
 	 */
-	char ro_fw_ver[kNumSlots][MAX_FW_VER_LENGTH];
-	uint32_t ro_keyid[kNumSlots];
-	char rw_fw_ver[kNumSlots][MAX_FW_VER_LENGTH];
-	uint32_t rw_keyid[kNumSlots];
+	char ro_fw_ver[SLOTS_NUM][MAX_FW_VER_LENGTH];
+	uint32_t ro_keyid[SLOTS_NUM];
+	char rw_fw_ver[SLOTS_NUM][MAX_FW_VER_LENGTH];
+	uint32_t rw_keyid[SLOTS_NUM];
 
-	uint32_t dev_id0_[kNumSlots];
-	uint32_t dev_id1_[kNumSlots];
+	uint32_t dev_id0_[SLOTS_NUM];
+	uint32_t dev_id1_[SLOTS_NUM];
 	uint32_t print_devid = 0;
 
 	struct board_id {
 		uint32_t id;
 		uint32_t mask;
 		uint32_t flags;
-	} bid[kNumSlots];
+	} bid[SLOTS_NUM];
 
-	char bid_string[kNumSlots][MAX_BOARD_ID_LENGTH];
+	char bid_string[SLOTS_NUM][MAX_BOARD_ID_LENGTH];
 
 	size_t i;
 
 	for (i = 0; i < NUM_SECTIONS; i++) {
 		const struct typed_image_header h =
 			as_header(image, sections[i].offset);
-		const size_t slot_idx = i / kNumSectionsPerSlot;
+		const size_t slot_idx = i / SECTIONS_PER_SLOT_NUM;
 
 		uint32_t cur_bid;
 		size_t j;
