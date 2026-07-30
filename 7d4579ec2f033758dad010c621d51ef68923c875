@@ -43,6 +43,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5be6cfd5_9a3d2798",
+        "filename": "extra/usb_updater/gsctool.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2774,
+      "author": {
+        "id": 4845415
+      },
+      "writtenOn": "2026-07-30T12:36:22Z",
+      "side": 1,
+      "message": "I know. Still better to undefine them to simulate function scope. Alternatively I can put them at the top of the file, but I guess this was not the orginal intention.",
+      "parentUuid": "19046986_ca60c870",
+      "revId": "7d4579ec2f033758dad010c621d51ef68923c875",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8355d785_fb8899b1",
         "filename": "extra/usb_updater/verify_ro.c",
         "patchSetId": 2
