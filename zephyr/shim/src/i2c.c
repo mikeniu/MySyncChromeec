@@ -56,12 +56,14 @@ static const uint8_t i2c_protect_type_map[I2C_PORT_COUNT] = {
 };
 
 typedef int (*allow_passthru_cb_t)(int port,
-				   const struct ec_params_i2c_passthru *params);
+				   const struct ec_params_i2c_passthru *params,
+				   bool system_is_locked, bool protect_by_ap);
 
-#define DECLARE_ALLOW_PASSTHRU(id)                                          \
-	COND_CODE_1(DT_NODE_HAS_PROP(id, allow_passthru),                   \
-		    (extern int DT_STRING_TOKEN(id, allow_passthru)(        \
-			     int, const struct ec_params_i2c_passthru *);), \
+#define DECLARE_ALLOW_PASSTHRU(id)                                             \
+	COND_CODE_1(DT_NODE_HAS_PROP(id, allow_passthru),                      \
+		    (extern int DT_STRING_TOKEN(id, allow_passthru)(           \
+			     int, const struct ec_params_i2c_passthru *, bool, \
+			     bool);),                                          \
 		    ())
 
 DT_FOREACH_CHILD_STATUS_OKAY(NAMED_I2C_PORTS_NODE, DECLARE_ALLOW_PASSTHRU)
@@ -110,7 +112,8 @@ enum i2c_protect_type i2c_get_protect_type(int port)
 	return i2c_protect_type_map[port];
 }
 
-int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params)
+int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params,
+		       bool system_is_locked, bool protect_by_ap)
 {
 	if (port < 0 || port >= I2C_PORT_COUNT)
 		return 0;
@@ -118,7 +121,8 @@ int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params)
 	if (i2c_allow_passthru_cb[port] == NULL)
 		return 0;
 
-	return i2c_allow_passthru_cb[port](port, params);
+	return i2c_allow_passthru_cb[port](port, params, system_is_locked,
+					   protect_by_ap);
 }
 
 #ifdef CONFIG_PLATFORM_EC_CONSOLE_CMD_I2C_PORTMAP

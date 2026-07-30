@@ -270,11 +270,14 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 		return ret;
 
 #ifdef CONFIG_I2C_PASSTHRU_RESTRICTED_DTS
+	const bool sys_locked = system_is_locked();
+	const bool prot_by_ap = port_protected[port];
+
 	if ((i2c_get_protect_type(port) == PROTECT_IF_SYSTEM_IS_LOCKED &&
-	     system_is_locked()) ||
+	     sys_locked) ||
 	    (i2c_get_protect_type(port) == NO_PROTECT_UNTIL_ENABLED &&
-	     port_protected[port])) {
-		if (!i2c_allow_passthru(port, params))
+	     prot_by_ap)) {
+		if (!i2c_allow_passthru(port, params, sys_locked, prot_by_ap))
 			return EC_RES_ACCESS_DENIED;
 	}
 #else

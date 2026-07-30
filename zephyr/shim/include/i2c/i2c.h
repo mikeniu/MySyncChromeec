@@ -6,6 +6,8 @@
 #ifndef ZEPHYR_CHROME_I2C_I2C_H
 #define ZEPHYR_CHROME_I2C_I2C_H
 
+#include <stdbool.h>
+
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/toolchain.h>
@@ -249,9 +251,12 @@ struct ec_params_i2c_passthru;
  *
  * @param port The EC port number.
  * @param params I2C passthru parameters.
+ * @param system_is_locked System locked status.
+ * @param protect_by_ap AP protection status.
  * @return 1 if passthru is allowed, 0 if not allowed or callback not defined.
  */
-int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params);
+int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params,
+		       bool system_is_locked, bool protect_by_ap);
 
 #ifdef __cplusplus
 }
