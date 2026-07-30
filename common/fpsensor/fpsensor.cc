@@ -962,8 +962,8 @@ static enum ec_status fp_command_template_v0(struct host_cmd_handler_args *args)
 	if (idx >= FP_MAX_FINGER_COUNT)
 		return EC_RES_OVERFLOW;
 
-	/* Encryption or decryption is in progress. */
-	if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+	/* Template operation is in progress. */
+	if (global_context.sensor_mode & FP_MODES_TEMPLATE_OPERATION) {
 		return EC_RES_BUSY;
 	}
 
@@ -997,8 +997,8 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 		uint32_t size = params->size;
 		uint32_t offset = params->offset;
 
-		/* Encryption or decryption is in progress. */
-		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+		/* Template operation is in progress. */
+		if (global_context.sensor_mode & FP_MODES_TEMPLATE_OPERATION) {
 			return EC_RES_BUSY;
 		}
 
@@ -1034,8 +1034,8 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 	case FP_TEMPLATE_DECRYPT: {
 		uint32_t mode_output;
 
-		/* Encryption or decryption is in progress. */
-		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+		/* Template operation is in progress. */
+		if (global_context.sensor_mode & FP_MODES_TEMPLATE_OPERATION) {
 			return EC_RES_BUSY;
 		}
 
