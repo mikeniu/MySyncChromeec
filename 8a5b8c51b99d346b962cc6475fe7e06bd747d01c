@@ -105,6 +105,24 @@
       "parentUuid": "421b3e8c_18de31ab",
       "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a2444a3_8b0db19c",
+        "filename": "zephyr/test/rex/tests/program/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-07-30T16:34:12Z",
+      "side": 1,
+      "message": "Or delete https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/rex/tests/program/src/usbc_tbt_compat.c",
+      "parentUuid": "dfc35f03_9911c957",
+      "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
