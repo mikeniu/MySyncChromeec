@@ -195,7 +195,7 @@ static int dump_range(struct transfer_descriptor *td,
 	size_t remaining_size = req->size;
 	size_t response_size;
 	/* Max size of a single shot is 32 bytes. */
-	const size_t max_transfer = 32;
+	enum { max_transfer = 32 };
 	uint8_t response[max_transfer];
 
 	req->subcmd = SPI_HASH_SUBCMD_DUMP;
