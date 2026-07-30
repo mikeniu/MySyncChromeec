@@ -308,10 +308,10 @@ static int write_tp_report(struct usb_hid_touchpad_report *report)
 {
 	int ret = -EBUSY;
 
-	if (touchpad.report_protocol == HID_PROTOCOL_BOOT) {
-		LOG_DBG("%s: protocol error", touchpad.dev->name);
-		return -EPROTO;
-	}
+	// if (touchpad.report_protocol == HID_PROTOCOL_BOOT) {
+	// 	LOG_DBG("%s: protocol error", touchpad.dev->name);
+	// 	return -EPROTO;
+	// }
 
 	if (!atomic_test_bit(&touchpad.state, HID_CLASS_IFACE_READY)) {
 		LOG_ERR("%s iface is not ready", touchpad.dev->name);
@@ -325,7 +325,7 @@ static int write_tp_report(struct usb_hid_touchpad_report *report)
 		}
 	}
 
-	if (!atomic_test_and_set_bit(&touchpad.state, HID_EP_IN_BUSY)) {
+	// if (!atomic_test_and_set_bit(&touchpad.state, HID_EP_IN_BUSY)) {
 		ret = hid_device_submit_report(touchpad.dev, sizeof(*report),
 					       (uint8_t *)report);
 		if (ret) {
@@ -334,7 +334,7 @@ static int write_tp_report(struct usb_hid_touchpad_report *report)
 			atomic_clear_bit(&touchpad.state, HID_EP_IN_BUSY);
 			return ret;
 		}
-	}
+	// }
 	return ret;
 }
 
@@ -454,8 +454,7 @@ static void hid_tp_proc_queue(void)
 
 	k_mutex_lock(&touchpad.report_queue_mutex, K_FOREVER);
 
-	if (!atomic_test_bit(&touchpad.state, HID_CLASS_IFACE_READY) ||
-	    touchpad.report_protocol == HID_PROTOCOL_BOOT) {
+	if (!atomic_test_bit(&touchpad.state, HID_CLASS_IFACE_READY)) {
 		queue_remove_units(&touchpad.report_queue, NULL,
 				   queue_count(&touchpad.report_queue));
 		k_mutex_unlock(&touchpad.report_queue_mutex);

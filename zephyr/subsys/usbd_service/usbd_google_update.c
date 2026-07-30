@@ -228,6 +228,20 @@ static void *usbd_gupdate_get_desc(struct usbd_class_data *const c_data,
 	return NULL;
 }
 
+struct k_work_delayable xfer_work;
+static void xfer_work_handler(struct k_work *work)
+{
+	struct net_buf *buf;
+
+	buf = gupdate_buf_alloc(0x86);
+	if (!buf) {
+		LOG_ERR("usb_update failed to allocate tx buffer");
+	}
+	buf->len=1;
+	buf->data[0] = 0xaa;
+	k_fifo_put(&tx_queue, buf);
+}
+
 static int usbd_gupdate_init(struct usbd_class_data *const c_data)
 {
 	struct google_data *data = usbd_class_get_private(c_data);
@@ -249,7 +263,8 @@ static int usbd_gupdate_init(struct usbd_class_data *const c_data)
 			K_NO_WAIT);
 	k_thread_name_set(&tx_thread_data, "gupdate_tx");
 
-	LOG_DBG("Google class %s init", c_data->name);
+	k_work_init_delayable(&xfer_work, xfer_work_handler);
+	k_work_schedule(&xfer_work, K_MSEC(10000));
 
 	return 0;
 }
