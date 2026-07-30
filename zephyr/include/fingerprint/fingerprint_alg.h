@@ -7,6 +7,7 @@
 #define ZEPHYR_INCLUDE_FINGERPRINT_FINGERPRINT_ALG_H_
 
 #include <errno.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include <zephyr/sys/iterable_sections.h>
