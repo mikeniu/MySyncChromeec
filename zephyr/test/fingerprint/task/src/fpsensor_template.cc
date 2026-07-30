@@ -307,7 +307,7 @@ ZTEST_USER(fpsensor_template, test_fp_template_v1_load_template_invalid_tag)
 	zassert_equal(test_info_buffer->template_info.template_valid, 0);
 }
 
-ZTEST_USER(fpsensor_template, test_fp_template_v1_busy)
+ZTEST_USER(fpsensor_template, test_fp_template_v1_busy_crypto)
 {
 	struct ec_params_fp_template_v1 params = {
 		.cmd = FP_TEMPLATE_LOAD,
@@ -322,11 +322,43 @@ ZTEST_USER(fpsensor_template, test_fp_template_v1_busy)
 	params.cmd = FP_TEMPLATE_DECRYPT;
 	zassert_equal(EC_RES_BUSY,
 		      ec_cmd_fp_template_v1(NULL, &params, sizeof(params)));
-
-	global_context.sensor_mode &= ~FP_MODE_ENCRYPT_TEMPLATE;
 }
 
-ZTEST_USER(fpsensor_template, test_fp_template_v0_busy)
+ZTEST_USER(fpsensor_template, test_fp_template_v1_busy_enroll)
+{
+	struct ec_params_fp_template_v1 params = {
+		.cmd = FP_TEMPLATE_LOAD,
+	};
+
+	/* Simulate enrollment session in progress. */
+	global_context.sensor_mode |= FP_MODE_ENROLL_SESSION;
+
+	zassert_equal(EC_RES_BUSY,
+		      ec_cmd_fp_template_v1(NULL, &params, sizeof(params)));
+
+	params.cmd = FP_TEMPLATE_DECRYPT;
+	zassert_equal(EC_RES_BUSY,
+		      ec_cmd_fp_template_v1(NULL, &params, sizeof(params)));
+}
+
+ZTEST_USER(fpsensor_template, test_fp_template_v1_not_busy_match)
+{
+	struct ec_params_fp_template_v1 params = {
+		.cmd = FP_TEMPLATE_LOAD,
+	};
+
+	/* Simulate match mode being active. */
+	global_context.sensor_mode |= FP_MODE_MATCH;
+
+	zassert_not_equal(EC_RES_BUSY,
+			  ec_cmd_fp_template_v1(NULL, &params, sizeof(params)));
+
+	params.cmd = FP_TEMPLATE_DECRYPT;
+	zassert_not_equal(EC_RES_BUSY,
+			  ec_cmd_fp_template_v1(NULL, &params, sizeof(params)));
+}
+
+ZTEST_USER(fpsensor_template, test_fp_template_v0_busy_crypto)
 {
 	struct ec_params_fp_template_v1 params_v1 = {
 		.cmd = FP_TEMPLATE_DECRYPT,
@@ -345,6 +377,41 @@ ZTEST_USER(fpsensor_template, test_fp_template_v0_busy)
 
 	/* Give opportunity for fpsensor task to finish. */
 	k_msleep(1);
+}
+
+ZTEST_USER(fpsensor_template, test_fp_template_v0_busy_enroll)
+{
+	uint8_t params_buffer[FP_TEMPLATE_PARAMS_BUFFER_SIZE] = {};
+	struct ec_params_fp_template *params =
+		(struct ec_params_fp_template *)params_buffer;
+
+	params->offset = 0;
+	params->size = FP_TEMPLATE_PARAMS_BUFFER_SIZE - sizeof(*params);
+
+	/* Simulate active enrollment session in progress. */
+	global_context.sensor_mode |= FP_MODE_ENROLL_SESSION;
+
+	/* v0 command should return BUSY during active enrollment. */
+	zassert_equal(EC_RES_BUSY,
+		      ec_cmd_fp_template(NULL, params,
+					 FP_TEMPLATE_PARAMS_BUFFER_SIZE));
+}
+
+ZTEST_USER(fpsensor_template, test_fp_template_v0_not_busy_match)
+{
+	uint8_t params_buffer[FP_TEMPLATE_PARAMS_BUFFER_SIZE] = {};
+	struct ec_params_fp_template *params =
+		(struct ec_params_fp_template *)params_buffer;
+
+	params->offset = 0;
+	params->size = FP_TEMPLATE_PARAMS_BUFFER_SIZE - sizeof(*params);
+
+	/* Simulate match mode being active. */
+	global_context.sensor_mode |= FP_MODE_MATCH;
+
+	zassert_not_equal(EC_RES_BUSY,
+			  ec_cmd_fp_template(NULL, params,
+					     FP_TEMPLATE_PARAMS_BUFFER_SIZE));
 }
 
 ZTEST_USER(fpsensor_template, test_fp_frame_v0_busy)
@@ -1539,6 +1606,12 @@ static void fpsensor_before(void *f)
 	RESET_FAKE(mock_alg_enroll_step);
 	RESET_FAKE(mock_alg_enroll_finish);
 	RESET_FAKE(mock_alg_match);
+
+	/* Reset sensor mode state before each test case. */
+	global_context.sensor_mode = 0;
+
+	/* Reset context before each test case. */
+	fp_reset_and_clear_context();
 
 	/* Set context (FP_CONTEXT_ASYNC). */
 	ec_cmd_fp_context_v1(NULL, &fp_context_params);

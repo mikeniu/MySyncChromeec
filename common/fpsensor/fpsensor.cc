@@ -992,6 +992,14 @@ static enum ec_status fp_command_template_v0(struct host_cmd_handler_args *args)
 		return EC_RES_BUSY;
 	}
 
+	/*
+	 * Reject template operations if enrollment session is in
+	 * progress.
+	 */
+	if (global_context.sensor_mode & FP_MODE_ENROLL_SESSION) {
+		return EC_RES_BUSY;
+	}
+
 	if (args->params_size !=
 	    size + offsetof(struct ec_params_fp_template, data))
 		return EC_RES_INVALID_PARAM;
@@ -1024,6 +1032,14 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 
 		/* Encryption or decryption is in progress. */
 		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+			return EC_RES_BUSY;
+		}
+
+		/*
+		 * Reject template operations if enrollment session is in
+		 * progress.
+		 */
+		if (global_context.sensor_mode & FP_MODE_ENROLL_SESSION) {
 			return EC_RES_BUSY;
 		}
 
@@ -1061,6 +1077,14 @@ static enum ec_status fp_command_template_v1(struct host_cmd_handler_args *args)
 
 		/* Encryption or decryption is in progress. */
 		if (global_context.sensor_mode & FP_MODES_CRYPTO_IN_PROGRESS) {
+			return EC_RES_BUSY;
+		}
+
+		/*
+		 * Reject template operations if enrollment session is in
+		 * progress.
+		 */
+		if (global_context.sensor_mode & FP_MODE_ENROLL_SESSION) {
 			return EC_RES_BUSY;
 		}
 
