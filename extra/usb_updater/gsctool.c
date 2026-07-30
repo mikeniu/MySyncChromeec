@@ -1961,7 +1961,7 @@ static void send_boot_svc_msg(struct transfer_descriptor *td,
 	if (st.st_size > (long)sizeof(boot_svc_msg)) {
 		fprintf(stderr,
 			"Unexpected size %zd of %s, expected below %zu\n",
-			st.st_size, file_name, sizeof(boot_svc_msg) + 1);
+			(ssize_t)st.st_size, file_name, sizeof(boot_svc_msg) + 1);
 		exit(1);
 	}
 
@@ -2051,7 +2051,7 @@ static void send_owner_config(struct transfer_descriptor *td,
 		 */
 		fake_addr = td->rw_offset;
 	} else {
-		fprintf(stderr, "Unexpected size %zd of %s\n", st.st_size,
+		fprintf(stderr, "Unexpected size %zd of %s\n", (ssize_t)st.st_size,
 			file_name);
 		exit(1);
 	}
@@ -2637,8 +2637,8 @@ static int show_headers_versions(const struct image *image,
 	 * and RW. The 2 slots should have identical FW versions and board
 	 * IDs.
 	 */
-	const size_t kNumSlots = 2;
-	const size_t kNumSectionsPerSlot = 2;
+#define kNumSlots 2
+#define kNumSectionsPerSlot 2
 	const struct section_t *sections = image->sections;
 
 	/*
@@ -2771,6 +2771,8 @@ static int show_headers_versions(const struct image *image,
 	}
 
 	return 0;
+#undef kNumSlots
+#undef kNumSectionsPerSlot
 }
 
 /*
