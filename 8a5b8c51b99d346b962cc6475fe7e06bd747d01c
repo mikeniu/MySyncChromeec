@@ -87,6 +87,24 @@
       "parentUuid": "09c3cc58_5f983940",
       "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfc35f03_9911c957",
+        "filename": "zephyr/test/rex/tests/program/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-07-30T10:28:29Z",
+      "side": 1,
+      "message": "Delete \n```\nrex.kanix.usbc_tbt_compat:\n    extra_dtc_overlay_files:\n      - boards/kanix/kanix.dtsi\n      - boards/kanix/usbc.dtsi\n    extra_configs:\n      - CONFIG_TEST_PROJECT_KANIX\u003dy\n      - CONFIG_TEST_PROGRAM_USBC_TBT_COMPAT\u003dy\n      - CONFIG_TEST_DISABLE_INLINE_CHIPSET_FUNCTIONS\u003dy\n      - CONFIG_PLATFORM_EC_USBC\u003dy\n      - CONFIG_PLATFORM_EC_USBC_PPC\u003dy\n      - CONFIG_PLATFORM_EC_USBC_PPC_SYV682C\u003dy\n      - CONFIG_PLATFORM_EC_USB_PD_DISCHARGE_PPC\u003dy\n```\nfrom the [testcase.yaml](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/rex/testcase.yaml;l\u003d261?q\u003drex.kanix.usbc_tbt_compat\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fplatform%2Fec%2F)?",
+      "parentUuid": "421b3e8c_18de31ab",
+      "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
