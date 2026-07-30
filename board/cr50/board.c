@@ -40,6 +40,7 @@
 #include "system.h"
 #include "system_chip.h"
 #include "task.h"
+#include "tpm_manufacture.h"
 #include "tpm_registers.h"
 #include "uart_bitbang.h"
 #include "uartn.h"
@@ -97,7 +98,8 @@ const uint32_t nvmem_user_sizes[NVMEM_NUM_USERS] = {
 /*  Board specific configuration settings */
 static uint32_t board_properties; /* Mainly used as a cache for strap config. */
 static uint8_t reboot_request_posted;
-static uint8_t in_prod_mode;
+static bool in_prod_mode;
+static bool keymgr_in_prod_mode;
 static uint32_t metrics_status;
 
 /* Which UARTs we'd like to be able to bitbang. */
@@ -904,8 +906,11 @@ static void board_init(void)
 	 * Need to cache this, because key manager registers are not available
 	 * after run level is lowered.
 	 */
-	in_prod_mode = (GREG32(KEYMGR, HKEY_FWR7) == 0) &&
-		(GREG32(KEYMGR, HKEY_RWR7) == 0xaa66150f);
+	keymgr_in_prod_mode = is_keymgr_prod_mode(GREG32(KEYMGR, HKEY_FWR7),
+						 GREG32(KEYMGR, HKEY_RWR7));
+
+	in_prod_mode = compute_board_in_prod_mode(keymgr_in_prod_mode,
+						  verify_ro_certs_hmac());
 
 	init_runlevel(PERMISSION_MEDIUM);
 
@@ -1961,9 +1966,14 @@ void board_unwedge_i2cp(void)
 	GWRITE(PINMUX, DIOA9_SEL, GC_PINMUX_I2CS0_SCL_SEL);
 }
 
-int board_in_prod_mode(void)
+bool board_in_prod_mode(void)
 {
 	return in_prod_mode;
+}
+
+bool board_keymgr_in_prod_mode(void)
+{
+	return keymgr_in_prod_mode;
 }
 
 /*

@@ -11,6 +11,8 @@
 #ifndef __CROS_EC_TPM_MANUFACTURE_H
 #define __CROS_EC_TPM_MANUFACTURE_H
 
+#include <stdbool.h>
+
 /* Returns non-zero if the TPM manufacture steps have been completed. */
 int tpm_manufactured(void);
 
@@ -32,5 +34,20 @@ enum manufacturing_status {
 };
 
 enum manufacturing_status tpm_endorse(void);
+
+static inline bool is_keymgr_prod_mode(uint32_t fwr7, uint32_t rwr7)
+{
+	return (fwr7 == 0) && (rwr7 == 0xaa66150f);
+}
+
+#define compute_board_in_prod_mode(keymgr_prod, hmac_valid) \
+	((keymgr_prod) && (hmac_valid))
+
+#if defined(SECTION_IS_RO) || defined(CR50_USE_FIXED_CERT)
+static inline bool verify_ro_certs_hmac(void) { return true; }
+#else
+bool verify_ro_certs_hmac(void);
+#endif
+bool board_keymgr_in_prod_mode(void);
 
 #endif	/* __CROS_EC_TPM_MANUFACTURE_H */

@@ -515,7 +515,8 @@ void board_start_ite_sync(void);
  */
 void board_unwedge_i2cp(void);
 
-int board_in_prod_mode(void);
+bool board_in_prod_mode(void);
+bool board_keymgr_in_prod_mode(void);
 
 /* Bit masks for each bit in TPM_BOARD_CFG register */
 enum board_cfg_reg_bitmask {

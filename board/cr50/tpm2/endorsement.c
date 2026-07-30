@@ -30,6 +30,7 @@
 
 #include "dcrypto.h"
 
+#include <stdbool.h>
 #include <endian.h>
 #include <string.h>
 
@@ -487,6 +488,43 @@ static int get_decrypted_eps(uint8_t eps[PRIMARY_SEED_SIZE])
 	return 1;
 }
 
+static bool verify_cert_region_hmac(const uint8_t eps[PRIMARY_SEED_SIZE])
+{
+	const uint8_t *p = (const uint8_t *) RO_CERTS_START_ADDR;
+	struct hmac_sha256_ctx hmac;
+
+	if (DCRYPTO_hw_hmac_sha256_init(&hmac, eps, PRIMARY_SEED_SIZE) !=
+	    DCRYPTO_OK)
+		return false;
+	HMAC_SHA256_update(&hmac, "RSA", 4);
+	if (DCRYPTO_hw_hmac_sha256_init(&hmac, HMAC_SHA256_final(&hmac), 32) !=
+	    DCRYPTO_OK)
+		return false;
+	HMAC_SHA256_update(&hmac, p, RO_CERTS_REGION_SIZE - 32);
+	return DCRYPTO_equals(p + RO_CERTS_REGION_SIZE - 32,
+			      HMAC_SHA256_final(&hmac), 32) == DCRYPTO_OK;
+}
+
+bool verify_ro_certs_hmac(void)
+{
+	const uint32_t *c = (const uint32_t *) RO_CERTS_START_ADDR;
+	uint8_t eps[PRIMARY_SEED_SIZE];
+	bool res;
+
+	flash_cert_region_enable();
+
+	/* First boot, certs not yet installed. */
+	if (*c == 0xFFFFFFFF)
+		return true;
+
+	if (!get_decrypted_eps(eps))
+		return false;
+
+	res = verify_cert_region_hmac(eps);
+	always_memset(eps, 0, sizeof(eps));
+	return res;
+}
+
 static int handle_cert(
 	const struct cros_perso_response_component_info_v0 *cert_info,
 	const struct cros_perso_certificate_response_v0 *cert,
@@ -553,8 +591,6 @@ enum manufacturing_status tpm_endorse(void)
 	const struct ro_cert *ecc_cert;
 	uint8_t eps[PRIMARY_SEED_SIZE];
 
-	struct hmac_sha256_ctx hmac;
-
 	flash_cert_region_enable();
 
 	/* First boot, certs not yet installed. */
@@ -597,20 +633,10 @@ enum manufacturing_status tpm_endorse(void)
 		 *
 		 * This will fail if we are not running w/ expected keyladder.
 		 */
-		if (DCRYPTO_hw_hmac_sha256_init(&hmac, eps, sizeof(eps)) !=
-		    DCRYPTO_OK)
-			return mnf_hmac_mismatch;
-		HMAC_SHA256_update(&hmac, "RSA", 4);
-		if (DCRYPTO_hw_hmac_sha256_init(&hmac, HMAC_SHA256_final(&hmac),
-						32) != DCRYPTO_OK)
-			return mnf_hmac_mismatch;
-		HMAC_SHA256_update(&hmac, p, RO_CERTS_REGION_SIZE - 32);
-		if (DCRYPTO_equals(p + RO_CERTS_REGION_SIZE - 32,
-				   HMAC_SHA256_final(&hmac),
-				   32) != DCRYPTO_OK) {
+		if (!verify_cert_region_hmac(eps)) {
 			CPRINTS("%s: bad cert region hmac;", __func__);
 
-			if (board_in_prod_mode()) {
+			if (board_keymgr_in_prod_mode()) {
 
 				/* TODO(ngm): is this state considered
 				 * endorsement failure?
