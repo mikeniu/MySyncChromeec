@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4729ad04_bb902af3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 32
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-30T16:38:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/decafb88-b8dd-4338-b208-876b5f60456a)]\n\n**Review Summary**:\n*   **Functionality**: The changes successfully combine `plat_free` and `PLAT_FREE` into a single `plat_free(void **x)` function. The null check on the double pointer ensures safety.\n*   **Security**: Explicitly nullifying the pointer after freeing it protects against use-after-free vulnerabilities.\n*   **Style**: Renaming the function to `snake_case` follows standard C conventions, and the docstrings were appropriately merged to describe the new behavior accurately.\n*   **Testing \u0026 Test Coverage**: Excellent test coverage. The updated `egis630.c` includes comprehensive checks for successful allocation, freeing `NULL` pointers, and handling `NULL` double pointers.\n*   **CL Size \u0026 Scope**: The CL is small, well-scoped, and clearly focused on this specific refactor and its tests.\n\nTAG\u003dagy\nCONV\u003d0125e251-a215-494e-8a84-ef865c57b8e9",
+      "isAi": true,
+      "revId": "fe5902ab9d03734e90b7d28d539dd6a7ddf9be5d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
