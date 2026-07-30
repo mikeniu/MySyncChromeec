@@ -22,6 +22,30 @@
       },
       "revId": "57e879b99ace1626c273c25bd69825c56fd396d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08b7ad05_0e8dfc60",
+        "filename": "zephyr/test/fingerprint/drivers/egis630/src/egis630.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-30T17:07:29Z",
+      "side": 1,
+      "message": "well I did and send it 2 times and the analysis was clean. It recommended doing the TC_print. I added the TC_Print.",
+      "parentUuid": "bf875512_47908323",
+      "range": {
+        "startLine": 735,
+        "startChar": 0,
+        "endLine": 739,
+        "endChar": 1
+      },
+      "revId": "57e879b99ace1626c273c25bd69825c56fd396d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
