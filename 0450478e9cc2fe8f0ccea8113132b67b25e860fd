@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6675421e_e945c8e2",
+        "filename": "common/usb_update.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-07-31T07:43:30Z",
+      "side": 1,
+      "message": "Probably generic error that can\u0027t map to other error codes, I don\u0027t know lol",
+      "parentUuid": "2ce71680_85f71e54",
+      "range": {
+        "startLine": 621,
+        "startChar": 19,
+        "endLine": 621,
+        "endChar": 35
+      },
+      "revId": "0450478e9cc2fe8f0ccea8113132b67b25e860fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6a39f030_492968f9",
         "filename": "zephyr/test/usb_updater/src/usb_update_test.c",
         "patchSetId": 2
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-31T05:05:03Z",
       "side": 1,
       "message": "This tests the `count \u003e block_size` condition. Should we also add a test case for the `block_index + count \u003e sizeof(block_buffer)` condition?",
+      "range": {
+        "startLine": 171,
+        "startChar": 4,
+        "endLine": 171,
+        "endChar": 36
+      },
+      "revId": "0450478e9cc2fe8f0ccea8113132b67b25e860fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92d38421_cdb34486",
+        "filename": "zephyr/test/usb_updater/src/usb_update_test.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1141739
+      },
+      "writtenOn": "2026-07-31T07:43:30Z",
+      "side": 1,
+      "message": "(actually I don\u0027t know why the original issue report suggests adding `block_index + count \u003e sizeof(block_buffer)`, it\u0027s always good to add the explicit check but it won\u0027t happen)\n\nSince we guaranteed that the initial `block_size \u003c\u003d sizeof(block_buffer)` at line 600, and `block_index + block_size` never exceeds that initial value, `block_index + count \u003c\u003d sizeof(block_buffer)` is already guaranteed by `count \u003c\u003d block_size` on the left half of line 619.\"",
+      "parentUuid": "6a39f030_492968f9",
       "range": {
         "startLine": 171,
         "startChar": 4,
