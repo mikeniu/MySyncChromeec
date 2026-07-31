@@ -12,6 +12,11 @@ config BOARD_NPCX_AIC
 	help
 	  Build Google AIC image for the NPCX9 chipset.
 
+config BOARD_RTK_AIC
+	bool "Google RTK AIC board"
+	help
+	  Build Google AIC image for the Realtek chipset.
+
 module = EC_AIC
 module-str = EC-AIC board-specific code
 source "subsys/logging/Kconfig.template.log_config"
