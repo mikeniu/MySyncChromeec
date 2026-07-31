@@ -39,6 +39,30 @@
       },
       "revId": "9bd17b81829bbf2b039c567ca1990a0b0d41e58d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfb09d0c_a2e74d77",
+        "filename": "zephyr/program/intelrvp/ptlrvp/ptlrvp_mchp/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-31T16:44:29Z",
+      "side": 1,
+      "message": "I guess this was intended to explain why the feature is disabled for future readers?\n\nIMO, we can just get rid of this entire comment/config block and not leave a comment. I seriously doubt that any will miss this feature or that the flash situation on this board will become sufficiently favorable in the future that we might re-enable it.",
+      "parentUuid": "dd19e876_f54d3f27",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 30
+      },
+      "revId": "9bd17b81829bbf2b039c567ca1990a0b0d41e58d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
