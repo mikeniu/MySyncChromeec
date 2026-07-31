@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d15f32ac_cd82cf59",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-31T21:39:40Z",
+      "side": 1,
+      "message": "I\u0027m planning to update the toolchains to 15.2.0 CL:8183691 after this change merges.",
+      "revId": "2f4ebbdbe08a995b6e52bcc8c9febd4163f88977",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
