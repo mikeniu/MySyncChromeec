@@ -60,6 +60,11 @@ enum led_transition {
 	LED_TRANSITION_COUNT
 };
 
+BUILD_ASSERT(EC_LED_ID_COUNT <= UINT8_MAX,
+	     "EC LED ID count exceeds uint8_t capacity");
+BUILD_ASSERT(LED_TRANSITION_COUNT <= UINT8_MAX,
+	     "LED transition count exceeds uint8_t capacity");
+
 /*
  * Board specific override that allows the board to define its own alt
  * led policies at run time.
@@ -179,16 +184,16 @@ struct led_pins_node_t {
 
 	/* 1-byte members following */
 	/*
-	 * The color ID this node represents. Only used to support
-	 * ectool functionality.
+	 * The color ID this node represents (values from enum led_color).
+	 * Only used to support ectool functionality.
 	 */
 	uint8_t led_color;
 
 	/*
-	 * The logical LED ID this node belongs to. Only used to support
-	 * ectool functionality.
+	 * The logical LED ID this node belongs to (values from enum ec_led_id).
+	 * Only used to support ectool functionality.
 	 */
-	enum ec_led_id led_id;
+	uint8_t led_id;
 
 	/*
 	 * 0-based devicetree child index of the color.
@@ -211,12 +216,12 @@ struct led_pattern_node_t {
 	const struct pattern_color_node_t *pattern_color;
 
 	/* 1-byte members following */
-	enum ec_led_id led_id;
+	uint8_t led_id;
 	uint8_t cur_color;
 	uint8_t pattern_len;
 	uint8_t cycle_limit;
 	uint8_t cycle_curr;
-	enum led_transition transition;
+	uint8_t transition;
 	bool needs_update;
 } __packed;
 
@@ -239,7 +244,7 @@ void led_set_color(enum led_color color, enum ec_led_id led_id,
 struct custom_led_patterns_t {
 	struct led_pattern_node_t *led_patterns;
 	uint8_t num_patterns;
-	enum ec_led_id led_id;
+	uint8_t led_id;
 };
 
 /**

@@ -108,14 +108,14 @@ DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_COLOR_ARRAY_FOR_POLICY)
 DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_NODE_ARRAY_FOR_POLICY)
 
 struct node_prop_t {
-	uint16_t pwr_state;
-	uint16_t chipset_state;
+	struct led_pattern_node_t *led_patterns;
 	int batt_state_mask;
 	int batt_state;
+	uint16_t pwr_state;
+	uint16_t chipset_state;
 	int8_t batt_lvl[2];
 	int8_t charge_port;
 	int8_t board_led_alt_policy_label;
-	struct led_pattern_node_t *led_patterns;
 	uint8_t num_patterns;
 };
 
@@ -134,14 +134,15 @@ struct node_prop_t {
  */
 #define SET_LED_VALUES(state_id, fn)                                          \
 	{                                                                     \
-		.pwr_state = GET_TOKEN_MASK(state_id, charge_state),          \
-		.chipset_state = GET_TOKEN_MASK(state_id, chipset_state),     \
+		.led_patterns = PATTERN_NODE_ARRAY(state_id),                 \
 		.batt_state_mask = COND_CODE_1(                               \
 			DT_NODE_HAS_PROP(state_id, batt_state_mask),          \
 			(DT_PROP(state_id, batt_state_mask)), (-1)),          \
 		.batt_state =                                                 \
 			COND_CODE_1(DT_NODE_HAS_PROP(state_id, batt_state),   \
 				    (DT_PROP(state_id, batt_state)), (-1)),   \
+		.pwr_state = GET_TOKEN_MASK(state_id, charge_state),          \
+		.chipset_state = GET_TOKEN_MASK(state_id, chipset_state),     \
 		.batt_lvl = COND_CODE_1(DT_NODE_HAS_PROP(state_id, batt_lvl), \
 					(DT_PROP(state_id, batt_lvl)),        \
 					({ -1, -1 })),                        \
@@ -153,7 +154,6 @@ struct node_prop_t {
 					 board_led_alt_policy_label),         \
 			(DT_PROP(state_id, board_led_alt_policy_label)),      \
 			(-1)),                                                \
-		.led_patterns = PATTERN_NODE_ARRAY(state_id),                 \
 		.num_patterns = 0 fn(state_id, PLUS_ONE),                     \
 	},
 
