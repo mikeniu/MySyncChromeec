@@ -875,6 +875,10 @@ class AllTests:
             ),
             TestConfig(test_name="panic"),
             TestConfig(
+                test_name="panic_strip_gpr",
+                skip_for_ec_legacy=True,
+            ),
+            TestConfig(
                 config_name="panic_data",
                 test_name="panic_data",
                 fail_regexes=[
