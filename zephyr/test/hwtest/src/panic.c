@@ -18,7 +18,6 @@ struct reg_vals {
 	uint32_t val;
 };
 
-/* TODO(b/342504464): add a version for PANIC_STRIP_GPR=y. */
 static const struct reg_vals expected_regs[] = {
 #if defined(CONFIG_ARM)
 	{ .index = CORTEX_PANIC_REGISTER_R4, .val = 0xecec0004 },
@@ -121,12 +120,18 @@ static void test_panic_data(void)
 
 	LOG_INF("Step 2: Read panic data");
 	for (i = 0; i < ARRAY_SIZE(expected_regs); i++) {
+		uint32_t expected = expected_regs[i].val;
+
+		if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_STRIP_GPR)) {
+			expected = 0;
+		}
+
 		if (IS_ENABLED(CONFIG_ARM)) {
-			zassert_equal(expected_regs[i].val,
+			zassert_equal(expected,
 				      pdata->cm.regs[expected_regs[i].index]);
 		} else if (IS_ENABLED(CONFIG_RISCV)) {
 			zassert_equal(
-				expected_regs[i].val,
+				expected,
 				pdata->riscv.regs[expected_regs[i].index]);
 		}
 	}

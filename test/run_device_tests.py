@@ -544,6 +544,7 @@ class Renode(Platform):
             "null_pointer",  # TODO(b/485624833)
             "panic",  # TODO(b/485668836)
             "panic_data",  # TODO(b/485667679)
+            "panic_strip_gpr",  # TODO(b/485668836)
             "reboot",  # TODO(b/488128262)
             "rollback_entropy",  # TODO(b/485670085)
             "sbrk",  # TODO(b/485669288)
@@ -571,6 +572,7 @@ class Renode(Platform):
             "flash_protection",  # TODO(b/487848806)
             "flash_protection_rw",  # TODO(b/487848806)
             "flash_write_protect",  # TODO(b/406944986)
+            "panic_strip_gpr",  # TODO(b/519342662)
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
@@ -874,6 +876,10 @@ class AllTests:
                 exclude_boards=[BLOONCHIPPER, DARTMONKEY],
             ),
             TestConfig(test_name="panic"),
+            TestConfig(
+                test_name="panic_strip_gpr",
+                skip_for_ec_legacy=True,
+            ),
             TestConfig(
                 config_name="panic_data",
                 test_name="panic_data",
