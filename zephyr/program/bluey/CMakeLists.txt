@@ -31,6 +31,12 @@ if(DEFINED CONFIG_BOARD_ANNITE)
 	add_subdirectory(annite)
 endif()
 
+<<<<<<< PATCH SET (6d3247d9f0af7840085a579d86e866bac4cf3bb7 bluey: Add initial Annite project)
+if(DEFINED CONFIG_BOARD_ANNITE)
+	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_THROTTLE_AP
+					"annite/src/throttle.c")
+||||||| BASE      (6de6ff8287d9bedd635f754381c03aec105d13ae fpsensor: Prevent integer overflow in get_frame buffer acces)
+=======
 if(DEFINED CONFIG_BOARD_PIC)
 	project(pic)
 	add_subdirectory(pic)
@@ -45,6 +51,7 @@ elseif(DEFINED CONFIG_BOARD_ANNITE)
 elseif(DEFINED CONFIG_BOARD_PIC)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_THROTTLE_AP
 					"pic/src/throttle.c")
+>>>>>>> BASE      (1ae1978c83a09edd9050890cacfb96d213f9e08b bluey: add initial pic project)
 else()
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_THROTTLE_AP
 					"src/throttle.c")

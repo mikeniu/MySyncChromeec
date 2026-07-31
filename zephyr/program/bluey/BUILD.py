@@ -60,11 +60,15 @@ register_npcx9_project(
     zephyr_board="npcx9/npcx9m7fb",
 )
 
+<<<<<<< PATCH SET (6d3247d9f0af7840085a579d86e866bac4cf3bb7 bluey: Add initial Annite project)
+||||||| BASE      (6de6ff8287d9bedd635f754381c03aec105d13ae fpsensor: Prevent integer overflow in get_frame buffer acces)
+=======
 register_npcx9_project(
     project_name="pic",
     zephyr_board="npcx9/npcx9m7fb",
 )
 
+>>>>>>> BASE      (1ae1978c83a09edd9050890cacfb96d213f9e08b bluey: add initial pic project)
 # Note for reviews, do not let anyone edit these assertions, the addresses
 # must not change after the first RO release.
 assert_rw_fwid_DO_NOT_EDIT(project_name="bluey", addr=0x80144)
@@ -72,4 +76,8 @@ assert_rw_fwid_DO_NOT_EDIT(project_name="quenbi", addr=0x80144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="quartz", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="mica", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="annite", addr=0x40144)
+<<<<<<< PATCH SET (6d3247d9f0af7840085a579d86e866bac4cf3bb7 bluey: Add initial Annite project)
+||||||| BASE      (6de6ff8287d9bedd635f754381c03aec105d13ae fpsensor: Prevent integer overflow in get_frame buffer acces)
+=======
 assert_rw_fwid_DO_NOT_EDIT(project_name="pic", addr=0x40144)
+>>>>>>> BASE      (1ae1978c83a09edd9050890cacfb96d213f9e08b bluey: add initial pic project)

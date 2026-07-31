@@ -32,12 +32,16 @@ config BOARD_ANNITE
 	  Build Google ANNITE board. The board uses Nuvoton
 	  NPCX9 chip as the EC.
 
+<<<<<<< PATCH SET (6d3247d9f0af7840085a579d86e866bac4cf3bb7 bluey: Add initial Annite project)
+||||||| BASE      (6de6ff8287d9bedd635f754381c03aec105d13ae fpsensor: Prevent integer overflow in get_frame buffer acces)
+=======
 config BOARD_PIC
 	bool "Google PIC baseboard"
 	help
 	  Build Google PIC board. The board uses Nuvoton
 	  NPCX9 chip as the EC.
 
+>>>>>>> BASE      (1ae1978c83a09edd9050890cacfb96d213f9e08b bluey: add initial pic project)
 module = Bluey
 module-str = Bluey board-specific code
 source "subsys/logging/Kconfig.template.log_config"
