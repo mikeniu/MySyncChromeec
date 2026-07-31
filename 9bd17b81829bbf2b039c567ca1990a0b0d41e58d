@@ -16,6 +16,29 @@
       "message": "This will probably conflict with CL:8174184, although both of them seem like good ideas, if this board is that close to the limit.",
       "revId": "9bd17b81829bbf2b039c567ca1990a0b0d41e58d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd19e876_f54d3f27",
+        "filename": "zephyr/program/intelrvp/ptlrvp/ptlrvp_mchp/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-31T16:20:20Z",
+      "side": 1,
+      "message": "This isn\u0027t needed.  Kconfig will automatically supresss this symbol because CONFIG_IMVP_RT3645 is not defined once you disable the devicetree node.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 30
+      },
+      "revId": "9bd17b81829bbf2b039c567ca1990a0b0d41e58d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
