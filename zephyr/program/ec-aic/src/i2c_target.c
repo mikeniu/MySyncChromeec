@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include <zephyr/devicetree.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -13,8 +14,8 @@ static int i2c_target_device_init(const struct device *dev)
 {
 	int ret;
 
-	if (!device_is_ready(dev)) {
-		LOG_ERR("i2c target device %s not ready", dev->name);
+	if (dev == NULL || !device_is_ready(dev)) {
+		LOG_ERR("i2c target device not ready");
 		return -ENODEV;
 	}
 
@@ -31,14 +32,13 @@ static int i2c_target_device_init(const struct device *dev)
 
 static int i2c_target_init(void)
 {
-	int ret;
+	const struct device *dev = DEVICE_DT_GET_OR_NULL(DT_NODELABEL(eeprom0));
 
-	ret = i2c_target_device_init(DEVICE_DT_GET(DT_NODELABEL(eeprom0)));
-	if (ret < 0) {
-		return ret;
+	if (dev == NULL) {
+		return 0;
 	}
 
-	return 0;
+	return i2c_target_device_init(dev);
 }
 
 SYS_INIT(i2c_target_init, APPLICATION, 99);
