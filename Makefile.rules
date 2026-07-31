@@ -678,7 +678,7 @@ clean:
 	# make sure the entire build tree is deleted, not just the board.
 	-rm -rf $(subst $(BOARD),,$(out))
 	-rm -f /dev/shm/EC_persist*
-	-bazel clean
+	-[ -f WORKSPACE ] && bazel clean 2>/dev/null || true
 
 .PHONY: clobber
 clobber:

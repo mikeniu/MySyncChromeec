@@ -181,6 +181,8 @@ def build(opts):
 
 
 def add_size_metrics(metrics, platform_name, mapfile):
+    if not os.path.exists(mapfile):
+        return
     item = metrics.value.add()
     item.target_name = "cr50"
     item.platform_name = platform_name
