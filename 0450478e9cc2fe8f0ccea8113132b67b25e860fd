@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fee89b7_e10aeab1",
+        "filename": "common/usb_update.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-07-31T07:58:10Z",
+      "side": 1,
+      "message": "Got it. A generic error.",
+      "parentUuid": "6675421e_e945c8e2",
+      "range": {
+        "startLine": 621,
+        "startChar": 19,
+        "endLine": 621,
+        "endChar": 35
+      },
+      "revId": "0450478e9cc2fe8f0ccea8113132b67b25e860fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a39f030_492968f9",
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "(actually I don\u0027t know why the original issue report suggests adding `block_index + count \u003e sizeof(block_buffer)`, it\u0027s always good to add the explicit check but it won\u0027t happen)\n\nSince we guaranteed that the initial `block_size \u003c\u003d sizeof(block_buffer)` at line 600, and `block_index + block_size` never exceeds that initial value, `block_index + count \u003c\u003d sizeof(block_buffer)` is already guaranteed by `count \u003c\u003d block_size` on the left half of line 619.\"",
       "parentUuid": "6a39f030_492968f9",
+      "range": {
+        "startLine": 171,
+        "startChar": 4,
+        "endLine": 171,
+        "endChar": 36
+      },
+      "revId": "0450478e9cc2fe8f0ccea8113132b67b25e860fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98040076_73c7c3fe",
+        "filename": "zephyr/test/usb_updater/src/usb_update_test.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-07-31T07:58:10Z",
+      "side": 1,
+      "message": "Got it so it\u0027s currently a condition with no effects and no way to cover it with unit test. I think it\u0027s fine to keep it to remind the code readers that this condition must be met.",
+      "parentUuid": "92d38421_cdb34486",
       "range": {
         "startLine": 171,
         "startChar": 4,
