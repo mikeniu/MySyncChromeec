@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "mock_fingerprint_algorithm.h"
+
 #include <zephyr/fff.h>
 #include <zephyr/ztest.h>
 #include <zephyr/ztest_assert.h>
@@ -145,11 +147,19 @@ ZTEST_USER(fpsensor_state, test_two_step_bypass_mitigation)
 		"Expected validate_request to be called to verify the state escalation step");
 }
 
+static void *fpsensor_setup(void)
+{
+	/* Start shimmed tasks. */
+	start_ec_tasks();
+	k_msleep(100);
+
+	return NULL;
+}
+
 static void fpsensor_state_before(void *f)
 {
 	/* Reset context before each test case. */
-	global_context.fp_encryption_status = 0;
-	global_context.sensor_mode = 0;
+	fp_reset_and_clear_context();
 
 	/* Reset manual mock states. */
 	validate_request_call_count = 0;
@@ -159,4 +169,5 @@ static void fpsensor_state_before(void *f)
 	RESET_FAKE(mkbp_send_event);
 }
 
-ZTEST_SUITE(fpsensor_state, NULL, NULL, fpsensor_state_before, NULL, NULL);
+ZTEST_SUITE(fpsensor_state, NULL, fpsensor_setup, fpsensor_state_before, NULL,
+	    NULL);
