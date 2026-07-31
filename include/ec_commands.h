@@ -8508,6 +8508,13 @@ struct ec_params_switch_enable_poe {
 	uint8_t enabled;
 } __ec_align1;
 
+/* Scheduled AP reset */
+#define EC_CMD_AP_RESET_SCHEDULED 0x0146
+
+struct ec_params_ap_reset_scheduled {
+	uint32_t delay_ms;
+} __ec_align4;
+
 /*****************************************************************************/
 /* The command range 0x200-0x2FF is reserved for Rotor. */
 
