@@ -22,6 +22,30 @@
       },
       "revId": "c9191b54a832ff114edba545da9957b1a209fe43",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0b62634_9e461b69",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-31T21:21:19Z",
+      "side": 1,
+      "message": "yes, when I added `fp_reset_and_clear_context()`, I needed to add `#include \"mock_fingerprint_algorithm.h\"` and this `fpsensor_setup`. Otherwise, the code would not compile. `fp_reset_and_clear_context` calls sensor_init and `fpsensor_setup` is necessary. I believe this is done in other tasks. I can avoid this by calling only `fp_clear_context`, but I believe I need to clear `global_context.sensor_mode` separately,",
+      "parentUuid": "8a7a11c2_55f887eb",
+      "range": {
+        "startLine": 232,
+        "startChar": 1,
+        "endLine": 239,
+        "endChar": 1
+      },
+      "revId": "c9191b54a832ff114edba545da9957b1a209fe43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
