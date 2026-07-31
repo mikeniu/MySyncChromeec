@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9baa041e_073c96ce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-31T22:16:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6176d488_ba766757",
+      "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9cdfa27_ae87a610",
@@ -32,6 +50,30 @@
       "writtenOn": "2026-07-31T21:54:29Z",
       "side": 1,
       "message": "**1. Assert Early Rejection (Consistency \u0026 Security)**\nIn the existing test `test_compound_fp_mode_auth_bypass_rejected`, there is an explicit check:\n`zassert_equal(validate_request_call_count, 0, \"...\");`\nThis is an excellent practice because it verifies that the command is rejected *before* it reaches the cryptoprocessor mock, preventing unnecessary processing or potential bypasses.\n\n* **Recommendation:** Add `zassert_equal(validate_request_call_count, 0, ...)` to the new failure tests to guarantee early parameter validation is working as expected:\n* `test_validate_fp_mode_invalid_capture_type`\n* `test_validate_fp_mode_invalid_algo_bits`\n* `test_validate_fp_mode_max_templates_exceeded`\n* `test_validate_fp_mode_reset_sensor_while_active_fails`",
+      "range": {
+        "startLine": 145,
+        "startChar": 1,
+        "endLine": 147,
+        "endChar": 80
+      },
+      "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f7a0d6b_9a1f40aa",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-31T22:16:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9cdfa27_ae87a610",
       "range": {
         "startLine": 145,
         "startChar": 1,
@@ -65,6 +107,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6976521f_d50ec854",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-31T22:16:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef1d7a81_88d2cad9",
+      "range": {
+        "startLine": 153,
+        "startChar": 9,
+        "endLine": 153,
+        "endChar": 61
+      },
+      "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6dfabe5_ca342c6a",
@@ -88,6 +154,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a601d459_36495ac1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-31T22:16:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6dfabe5_ca342c6a",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 59
+      },
+      "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ac7af943_cc31329f",
@@ -101,6 +191,30 @@
       "writtenOn": "2026-07-31T21:54:29Z",
       "side": 1,
       "message": "I don\u0027t know if we have this constant, but it would be a nice cleanup to add in a followup CL  across the codebase if we don\u0027t:\n\n----\n\n**3. Replace Magic Number with Constant (Readability)**\nIn `test_validate_fp_mode_reset_sensor_while_idle_succeeds`, the idle state is set using a magic number:\n\n```c\nglobal_context.sensor_mode \u003d 0;\n\n```\n\n* **Recommendation:** For better readability and maintainability, replace `0` with the appropriate macro if one exists (e.g., `FP_MODE_NONE`, `FP_MODE_IDLE`, or `0 /* Idle */` if no macro is defined). This keeps the test consistent with others that use explicit macros like `FP_MODE_DEEPSLEEP` or `FP_MODE_MATCH`.",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 223,
+        "endChar": 32
+      },
+      "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9235e7ad_9eba0dcc",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-31T22:16:40Z",
+      "side": 1,
+      "message": "let me add it in a follow up CL\n\n```\n/* Put the sensor in its lowest power mode */\n#define FP_MODE_DEEPSLEEP BIT(0)\n/* Wait to see a finger on the sensor */\n#define FP_MODE_FINGER_DOWN BIT(1)\n/* Poll until the finger has left the sensor */\n#define FP_MODE_FINGER_UP BIT(2)\n/* Capture the current finger image */\n#define FP_MODE_CAPTURE BIT(3)\n/* Finger enrollment session on-going */\n#define FP_MODE_ENROLL_SESSION BIT(4)\n/* Enroll the current finger image */\n#define FP_MODE_ENROLL_IMAGE BIT(5)\n/* Try to match the current finger image */\n#define FP_MODE_MATCH BIT(6)\n/* Reset and re-initialize the sensor. */\n#define FP_MODE_RESET_SENSOR BIT(7)\n/* Sensor maintenance for dead pixels. */\n#define FP_MODE_SENSOR_MAINTENANCE BIT(8)\n/* Encrypt template. */\n#define FP_MODE_ENCRYPT_TEMPLATE BIT(9)\n/* Decrypt template. */\n#define FP_MODE_DECRYPT_TEMPLATE BIT(10)\n/* Disable template update. */\n#define FP_MODE_MATCH_NO_TEMPLATE_UPDATE BIT(11)\n/* special value: don\u0027t change anything just read back current mode */\n#define FP_MODE_DONT_CHANGE BIT(31)\n```\n\nmaybe `FP_MODE_IDLE` would be a better name.",
+      "parentUuid": "ac7af943_cc31329f",
       "range": {
         "startLine": 223,
         "startChar": 0,
