@@ -18,6 +18,23 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19cf5e01_3beebbe0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-31T17:30:08Z",
+      "side": 1,
+      "message": "I noticed in build logs that `emul_rt3645.c` is being compiled. However, linker seems to omit it from final image, could we include the following in this patch:\n```\ndiff --git a/zephyr/emul/Kconfig b/zephyr/emul/Kconfig\nindex b059d5af3861..a0e653ecd678 100644\n--- a/zephyr/emul/Kconfig\n+++ b/zephyr/emul/Kconfig\n@@ -409,7 +409,7 @@ config EMUL_PPM_DRIVER\n config EMUL_RT3645\n        bool \"RT3645 IMVP emulator\"\n        default y\n-       depends on DT_HAS_RICHTEK_RT3645_ENABLED\n+       depends on ZTEST \u0026\u0026 DT_HAS_RICHTEK_RT3645_ENABLED\n        help\n          Enable the RT3645 IMVP emulator. This driver use emulated I2C bus.\n          Emulator API is available in zephyr/include/emul/emul_rt1739.h.\n```",
+      "revId": "9bd17b81829bbf2b039c567ca1990a0b0d41e58d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd19e876_f54d3f27",
