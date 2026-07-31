@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25159882_fa6b63e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T22:18:51Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** Good. All test cases look correct and effectively exercise `ec_cmd_fp_mode_v1` using various mocked states. `fp_reset_and_clear_context` is properly integrated to guarantee context clean up between tests.\n*   **Style:** Clean, consistent with the codebase, and properly adheres to ZTEST structures.\n*   **Security:** N/A.\n*   **Testing:** Excellent coverage. The tests correctly exercise `validate_fp_mode()` indirectly through the public interface, providing solid regression prevention without leaking private APIs.\n*   **CL Size:** Small, focused, and self-contained.\n*   **Overall:** Great addition of tests to improve coverage and prevent regressions.\n\nTAG\u003dagy\nCONV\u003d28713656-fbef-4fa9-848e-ff024bb1893d",
+      "isAi": true,
+      "revId": "410b34f817212bf9b4af4488754e3f38a37de8e6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
