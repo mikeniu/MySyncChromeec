@@ -55,6 +55,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1b1512de_5c5158ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-07-31T17:55:18Z",
+      "side": 1,
+      "message": "we also have\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8174184\nplease comment on which CLs you would like to land",
+      "revId": "9bd17b81829bbf2b039c567ca1990a0b0d41e58d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dd19e876_f54d3f27",
         "filename": "zephyr/program/intelrvp/ptlrvp/ptlrvp_mchp/project.conf",
         "patchSetId": 1
