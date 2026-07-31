@@ -21,6 +21,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b9cdfa27_ae87a610",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T21:54:29Z",
+      "side": 1,
+      "message": "**1. Assert Early Rejection (Consistency \u0026 Security)**\nIn the existing test `test_compound_fp_mode_auth_bypass_rejected`, there is an explicit check:\n`zassert_equal(validate_request_call_count, 0, \"...\");`\nThis is an excellent practice because it verifies that the command is rejected *before* it reaches the cryptoprocessor mock, preventing unnecessary processing or potential bypasses.\n\n* **Recommendation:** Add `zassert_equal(validate_request_call_count, 0, ...)` to the new failure tests to guarantee early parameter validation is working as expected:\n* `test_validate_fp_mode_invalid_capture_type`\n* `test_validate_fp_mode_invalid_algo_bits`\n* `test_validate_fp_mode_max_templates_exceeded`\n* `test_validate_fp_mode_reset_sensor_while_active_fails`",
+      "range": {
+        "startLine": 145,
+        "startChar": 1,
+        "endLine": 147,
+        "endChar": 80
+      },
+      "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ef1d7a81_88d2cad9",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
         "patchSetId": 10
@@ -37,6 +60,52 @@
         "startChar": 9,
         "endLine": 153,
         "endChar": 61
+      },
+      "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6dfabe5_ca342c6a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T21:54:29Z",
+      "side": 1,
+      "message": "**4. Verify Call Count on Success (Completeness)**\nIn `test_validate_fp_mode_reset_sensor_while_idle_succeeds`, the test correctly asserts that `rv \u003d\u003d EC_RES_SUCCESS`.\n\n* **Recommendation:** To make the test fully comprehensive, consider asserting the expected state of `validate_request_call_count` at the end of this test. If a sensor reset requires a validation roundtrip, assert it is `1`. If it bypasses validation due to being a standard state-reset command, assert it is `0`. This locks in the expected interaction with the cryptoprocessor during a reset.",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 59
+      },
+      "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac7af943_cc31329f",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T21:54:29Z",
+      "side": 1,
+      "message": "I don\u0027t know if we have this constant, but it would be a nice cleanup to add in a followup CL  across the codebase if we don\u0027t:\n\n----\n\n**3. Replace Magic Number with Constant (Readability)**\nIn `test_validate_fp_mode_reset_sensor_while_idle_succeeds`, the idle state is set using a magic number:\n\n```c\nglobal_context.sensor_mode \u003d 0;\n\n```\n\n* **Recommendation:** For better readability and maintainability, replace `0` with the appropriate macro if one exists (e.g., `FP_MODE_NONE`, `FP_MODE_IDLE`, or `0 /* Idle */` if no macro is defined). This keeps the test consistent with others that use explicit macros like `FP_MODE_DEEPSLEEP` or `FP_MODE_MATCH`.",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 223,
+        "endChar": 32
       },
       "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
