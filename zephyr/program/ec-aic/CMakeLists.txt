@@ -14,3 +14,5 @@ if(DEFINED CONFIG_BOARD_NPCX_AIC)
 	project(npcx-aic)
 	add_subdirectory(npcx-aic)
 endif()
+
+zephyr_library_sources_ifdef(CONFIG_I2C_TARGET "src/i2c_target.c")
