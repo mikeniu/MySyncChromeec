@@ -243,6 +243,7 @@
 		i2c_ec_i2c_batt: ec_i2c_batt {
 			i2c-port = <&i2c1>;
 			enum-names = "I2C_PORT_BATTERY";
+			allow-passthru = "battery_allow_passthru";
 		};
 		i2c_ec_i2c_sensor: ec_i2c_sensor {
 			i2c-port = <&i2c0>;
@@ -251,10 +252,12 @@
 		i2c_ec_i2c_sub_usb_c1: ec_i2c_sub_usb_c1 {
 			i2c-port = <&i2c4>;
 			enum-names = "I2C_PORT_USB_C1_TCPC";
+			allow-passthru = "no_protect_until_enabled";
 		};
 		i2c_ec_i2c_usb_c0: ec_i2c_usb_c0 {
 			i2c-port = <&i2c5>;
 			enum-names = "I2C_PORT_USB_C0_TCPC";
+			allow-passthru = "no_protect_until_enabled";
 		};
 	};
 };
