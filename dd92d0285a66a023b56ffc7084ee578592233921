@@ -133,6 +133,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c2dd0f01_a01ce429",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T23:36:29Z",
+      "side": 1,
+      "message": "Oh, that\u0027s not quite what I meant. How about:\n\n```\n.mode \u003d FP_MODE_CAPTURE | (FP_CAPTURE_TYPE_MAX \u003c\u003c FP_MODE_CAPTURE_TYPE_SHIFT),\n```",
+      "parentUuid": "6976521f_d50ec854",
+      "range": {
+        "startLine": 153,
+        "startChar": 9,
+        "endLine": 153,
+        "endChar": 61
+      },
+      "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a6dfabe5_ca342c6a",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
         "patchSetId": 10
