@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ce71680_85f71e54",
+        "filename": "common/usb_update.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-07-31T04:57:37Z",
+      "side": 1,
+      "message": "QQ: What is the meaning of UPDATE_GEN_ERROR?",
+      "range": {
+        "startLine": 621,
+        "startChar": 19,
+        "endLine": 621,
+        "endChar": 35
+      },
+      "revId": "0450478e9cc2fe8f0ccea8113132b67b25e860fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
