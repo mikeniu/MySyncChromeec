@@ -16,6 +16,23 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "3dd17cb3cdadccca7449856305c4c04ba168bba2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b80f89b_0c2b7602",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-31T16:39:02Z",
+      "side": 1,
+      "message": "The failure is an existing build failure in ToT with fixes in flight (CL:8174184, CL:8182766). It has nothing to do with this CL.\n\nYou can wait for one of the fixes to land, or you can chump this CL. I don\u0027t think it\u0027s possible to break the build with a VIF, so I wouldn\u0027t judge if you chumped.",
+      "revId": "3dd17cb3cdadccca7449856305c4c04ba168bba2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
