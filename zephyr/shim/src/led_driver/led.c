@@ -108,14 +108,14 @@ DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_COLOR_ARRAY_FOR_POLICY)
 DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_NODE_ARRAY_FOR_POLICY)
 
 struct node_prop_t {
-	uint16_t pwr_state;
-	uint16_t chipset_state;
+	struct led_pattern_node_t *led_patterns;
 	int batt_state_mask;
 	int batt_state;
+	uint16_t pwr_state;
+	uint16_t chipset_state;
 	int8_t batt_lvl[2];
 	int8_t charge_port;
 	int8_t board_led_alt_policy_label;
-	struct led_pattern_node_t *led_patterns;
 	uint8_t num_patterns;
 };
 

@@ -188,7 +188,7 @@ struct led_pins_node_t {
 	 * The logical LED ID this node belongs to. Only used to support
 	 * ectool functionality.
 	 */
-	enum ec_led_id led_id;
+	uint8_t led_id;
 
 	/*
 	 * 0-based devicetree child index of the color.
@@ -211,12 +211,12 @@ struct led_pattern_node_t {
 	const struct pattern_color_node_t *pattern_color;
 
 	/* 1-byte members following */
-	enum ec_led_id led_id;
+	uint8_t led_id;
 	uint8_t cur_color;
 	uint8_t pattern_len;
 	uint8_t cycle_limit;
 	uint8_t cycle_curr;
-	enum led_transition transition;
+	uint8_t transition;
 	bool needs_update;
 } __packed;
 
