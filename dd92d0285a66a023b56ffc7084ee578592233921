@@ -17,6 +17,29 @@
       "isAi": true,
       "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef1d7a81_88d2cad9",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T21:50:43Z",
+      "side": 1,
+      "message": "Can you use `FP_MODE_CAPTURE_TYPE_MASK` here? If not, please add a comment explaining why.",
+      "range": {
+        "startLine": 153,
+        "startChar": 9,
+        "endLine": 153,
+        "endChar": 61
+      },
+      "revId": "dd92d0285a66a023b56ffc7084ee578592233921",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
