@@ -22,6 +22,29 @@
       },
       "revId": "0450478e9cc2fe8f0ccea8113132b67b25e860fd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a39f030_492968f9",
+        "filename": "zephyr/test/usb_updater/src/usb_update_test.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-07-31T05:05:03Z",
+      "side": 1,
+      "message": "This tests the `count \u003e block_size` condition. Should we also add a test case for the `block_index + count \u003e sizeof(block_buffer)` condition?",
+      "range": {
+        "startLine": 171,
+        "startChar": 4,
+        "endLine": 171,
+        "endChar": 36
+      },
+      "revId": "0450478e9cc2fe8f0ccea8113132b67b25e860fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
