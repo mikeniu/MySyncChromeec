@@ -158,10 +158,17 @@ tests:
     - CONFIG_PLATFORM_EC_PANIC_STRIP_GPR=n
     extra_conf_files:
     - prj_hw_tests.conf
+  panic_strip_gpr:
+    extra_configs:
+    - CONFIG_HW_TEST_PANIC_STRIP_GPR=y
+    - CONFIG_PLATFORM_EC_PANIC_STRIP_GPR=y
+    extra_conf_files:
+    - prj_hw_tests.conf
   panic_data:
     extra_configs:
     - CONFIG_HW_TEST_PANIC_DATA=y
     - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
+    - CONFIG_PLATFORM_EC_PANIC_STRIP_GPR=n
     extra_conf_files:
     - prj_hw_tests.conf
   pmp_entries:
