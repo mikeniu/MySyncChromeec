@@ -112,6 +112,12 @@
 	/* it8xxx2 has 1MB of flash. currently, we use 768KB from flash. */
 };
 
+&pinctrl {
+	/delete-property/ #address-cells;
+	/delete-property/ #size-cells;
+};
+
+
 &binman {
 	pad-byte = <0xff>;
 	pad-after = <0x40000>;
