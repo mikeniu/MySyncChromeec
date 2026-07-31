@@ -35,6 +35,24 @@
       "isAi": true,
       "revId": "e0e35cb9d36492c7d06d9cd5fdb4d231a947c350",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba14147c_c2ae995b",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-07-31T21:47:40Z",
+      "side": 1,
+      "message": "this is used in other task tests without any issues\n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/fingerprint/task/src/fpsensor_enroll.cc;l\u003d549#:~:text\u003d548-,549,-550",
+      "parentUuid": "6be67cc7_5d0a812d",
+      "revId": "e0e35cb9d36492c7d06d9cd5fdb4d231a947c350",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
