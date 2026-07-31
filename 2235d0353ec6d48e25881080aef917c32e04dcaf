@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ebe8db5_b01ec811",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 40
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-07-31T17:08:25Z",
+      "side": 1,
+      "message": "I\u0027d convert all of these to `uint8_t`, save a few bytes on the stack",
+      "revId": "2235d0353ec6d48e25881080aef917c32e04dcaf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
