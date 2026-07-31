@@ -31,3 +31,14 @@
 	offset = <0x50000>;
 	size = <0x1000>;
 };
+
+/ {
+	named-i2c-ports {
+		ec_i2c_usb_c1_tcp {
+			allow-passthru = "rex_tcpc_ps8815_allow_pathru";
+		};
+		ec_i2c_usb_c1_mix {
+			allow-passthru = "rex_usb_c1_anx7452_retimer_allow_passthru";
+		};
+	};
+};
