@@ -1138,6 +1138,10 @@ static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 		return system_run_image_copy_with_flags(
 			EC_IMAGE_RO, EC_RESET_FLAG_STAY_IN_RO);
 	case EC_REBOOT_JUMP_RW:
+		if (IS_ENABLED(HAS_TASK_RWSIG) && system_is_locked()) {
+			return EC_ERROR_ACCESS_DENIED;
+		}
+
 		return system_run_image_copy(system_get_active_copy());
 	case EC_REBOOT_COLD:
 	case EC_REBOOT_COLD_AP_OFF:
