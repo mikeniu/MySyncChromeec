@@ -16,6 +16,42 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "5333550a0cb09e421937e30f0b7cc7eeffe3039d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a348217c_db34ddbc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T18:10:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/d15127dd-bd3c-4253-86de-aa5bd67a70ed)]\n\n**Review Summary**\n*   **Functionality:** The patch correctly implements GPR stripping for the RISC-V architecture in the Zephyr panic shim, successfully bringing it to parity with ARM Cortex-M. One minor functional refinement is suggested inline regarding the `ra` register.\n*   **Security:** This change positively impacts security and privacy by avoiding the leak of potentially sensitive data during a panic.\n*   **Style:** Code style is clean and maintains existing macro alignments.\n*   **Testing \u0026 Test Coverage:** Excellent. The addition of the `panic_strip_gpr` hardware test validates the new behavior effectively and adheres to the test pyramid by providing a focused component test.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and self-contained.\n\nTAG\u003dagy CONV\u003d63da6c08-8ce1-4089-af44-19ff90e638e8",
+      "isAi": true,
+      "revId": "5333550a0cb09e421937e30f0b7cc7eeffe3039d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f44b7d17_2165645e",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T18:10:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] On ARM Cortex-M, the Link Register (`lr`) is not stripped (it uses `M` instead of `M_GPR`). Since the RISC-V Return Address (`ra`) serves the same purpose—holding a code pointer which is vital for debugging and generally doesn\u0027t contain sensitive data—consider leaving it unstripped by using `M(ra, riscv.regs[29], ra)` here.\n\nIf you make this change, you will also need to update the test in `zephyr/test/hwtest/src/panic.c` so that it doesn\u0027t expect `ra` to be `0` when `CONFIG_PLATFORM_EC_PANIC_STRIP_GPR` is enabled (e.g. by removing `ra` from `expected_regs` or skipping it in the verification loop).",
+      "isAi": true,
+      "revId": "5333550a0cb09e421937e30f0b7cc7eeffe3039d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
