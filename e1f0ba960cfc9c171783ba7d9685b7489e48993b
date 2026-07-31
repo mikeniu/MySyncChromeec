@@ -16,6 +16,24 @@
       "message": "this is redundant, it\u0027s not overriding anything and the node defaults to okay, got to clean it from dw as well it\u0027s a bad copy paste from the sample",
       "revId": "e1f0ba960cfc9c171783ba7d9685b7489e48993b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a0612dc_a670dbcf",
+        "filename": "zephyr/program/ec-aic/rtk-aic/project.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-31T17:15:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bf7b883_8fe2ec34",
+      "revId": "e1f0ba960cfc9c171783ba7d9685b7489e48993b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
