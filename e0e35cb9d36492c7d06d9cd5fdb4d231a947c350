@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c5aa987_56488389",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T21:46:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/3f613a6f-ea06-4dd0-92db-a6247432a5ed)]\n\n**Review Summary:**\n*   **Functionality:** The changes correctly ensure the full context is initialized by using `fp_reset_and_clear_context()`, and the necessary EC tasks are started. I left a minor suggestion regarding the hardcoded `k_msleep(100)` in the setup function.\n*   **Style \u0026 Consistency:** The code follows standard testing patterns and is readable.\n*   **Security:** No security issues identified.\n*   **Testing:** This is a test file modification and enhances the isolation and proper setup of the test suite.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized, self-contained, and focused.",
+      "isAi": true,
+      "revId": "e0e35cb9d36492c7d06d9cd5fdb4d231a947c350",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6be67cc7_5d0a812d",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T21:46:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Using a hardcoded sleep (`k_msleep(100)`) to wait for task initialization can lead to test flakiness or unnecessary test execution delays. Consider using a deterministic synchronization mechanism (like waiting on an event, semaphore, or checking a specific state flag) to ensure the EC tasks have fully started, if one is available in the testing framework.",
+      "isAi": true,
+      "revId": "e0e35cb9d36492c7d06d9cd5fdb4d231a947c350",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
