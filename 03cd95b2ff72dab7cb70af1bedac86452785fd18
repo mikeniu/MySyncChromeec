@@ -33,6 +33,29 @@
       "message": "Use `{}`",
       "revId": "03cd95b2ff72dab7cb70af1bedac86452785fd18",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b43f4415_74794730",
+        "filename": "common/system.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1977,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-07-31T17:05:56Z",
+      "side": 1,
+      "message": "For `CONFIG_EC_HOST_CMD` the return here will send the response back to the host as it only allows a 1 to 1 request/response. We should be able to `disable_host_interface_interrupts` before we schedule the deferred reboot. So we don\u0027t need duplicate handling in `handle_pending_reboot`.",
+      "range": {
+        "startLine": 1972,
+        "startChar": 0,
+        "endLine": 1977,
+        "endChar": 3
+      },
+      "revId": "03cd95b2ff72dab7cb70af1bedac86452785fd18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
