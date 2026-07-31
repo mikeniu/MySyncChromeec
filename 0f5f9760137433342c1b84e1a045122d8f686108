@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fab9ed93_33afdfc8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-07-31T22:52:57Z",
+      "side": 1,
+      "message": "This depends on https://github.com/zephyrproject-rtos/zephyr/pull/115118 also, so it can\u0027t actually be submitted yet.",
+      "revId": "0f5f9760137433342c1b84e1a045122d8f686108",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
