@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52fb39fa_444591d6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-07-31T20:24:40Z",
+      "side": 1,
+      "message": "These are extreme measures that will likely make this image unusable. https://crrev.com/c/8174184 is a more targeted alternative and has successfully merged.",
+      "revId": "18e9e08cf6b407cda827310b083fa5f4c5377a48",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
