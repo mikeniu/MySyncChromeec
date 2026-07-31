@@ -217,15 +217,15 @@ static void pwm_set_color_with_pattern(void *p)
 
 		if (pattern->transition == LED_TRANSITION_LINEAR &&
 		    duration_ms != 0) {
-			cur_color[i].pulse_ns = (next_color[i].pulse_ns -
-						 prev_color[i].pulse_ns) /
-							duration_ms *
-							pattern->elapsed_ms +
-						prev_color[i].pulse_ns;
-			cur_color[i].pulse_step_ns = (next_color[i].pulse_ns -
-						      prev_color[i].pulse_ns) /
-						     duration_ms *
-						     LED_ANIMATION_TICK_MS;
+			cur_color[i].pulse_ns =
+				(int64_t)(next_color[i].pulse_ns -
+					  prev_color[i].pulse_ns) *
+					pattern->elapsed_ms / duration_ms +
+				prev_color[i].pulse_ns;
+			cur_color[i].pulse_step_ns =
+				(int64_t)(next_color[i].pulse_ns -
+					  prev_color[i].pulse_ns) *
+				LED_ANIMATION_TICK_MS / duration_ms;
 		}
 		/*
 		 * This algorithm first finds the ratio of the starting and end
