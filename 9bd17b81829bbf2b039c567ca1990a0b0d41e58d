@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "70c2db19_b27a88ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-31T18:33:54Z",
+      "side": 1,
+      "message": "There\u0027s no harm in landing both.",
+      "parentUuid": "1b1512de_5c5158ef",
+      "revId": "9bd17b81829bbf2b039c567ca1990a0b0d41e58d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dd19e876_f54d3f27",
         "filename": "zephyr/program/intelrvp/ptlrvp/ptlrvp_mchp/project.conf",
         "patchSetId": 1
