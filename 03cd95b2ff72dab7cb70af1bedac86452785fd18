@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18616b87_ce6afaf2",
+        "filename": "common/system.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1140,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-31T16:34:12Z",
+      "side": 1,
+      "message": "You now have an implementation of this function in the non-`CONFIG_EC_HOST_CMD` scenario, so you shouldn\u0027t need to do the config check here anymore.",
+      "revId": "03cd95b2ff72dab7cb70af1bedac86452785fd18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "becda5af_d9040ebd",
+        "filename": "common/system.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1245,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-07-31T16:34:12Z",
+      "side": 1,
+      "message": "Use `{}`",
+      "revId": "03cd95b2ff72dab7cb70af1bedac86452785fd18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
