@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6779ae2_5f44e396",
+        "filename": "zephyr/shim/src/led_driver/led_pwm.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-31T23:06:14Z",
+      "side": 1,
+      "message": "Add parenthesis to make the order of operations explicit.  Alternately, do the  addition of `prev_color[i].pulse_ns` as a separate step.",
+      "range": {
+        "startLine": 223,
+        "startChar": 0,
+        "endLine": 225,
+        "endChar": 27
+      },
+      "revId": "07308028c01d12d096de60e14a3f931db24cef4b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
