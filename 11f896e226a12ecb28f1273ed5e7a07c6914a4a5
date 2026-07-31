@@ -52,6 +52,24 @@
       "parentUuid": "5b5d6233_035df8cf",
       "revId": "11f896e226a12ecb28f1273ed5e7a07c6914a4a5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7657f61_e0efa7c4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-07-31T21:02:40Z",
+      "side": 1,
+      "message": "Ok I will take care of this, also I will use `ZEPHYR_CMD_REGISTER` for console commands.",
+      "parentUuid": "f028ba0d_73b64203",
+      "revId": "11f896e226a12ecb28f1273ed5e7a07c6914a4a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
