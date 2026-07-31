@@ -15,4 +15,9 @@ if(DEFINED CONFIG_BOARD_NPCX_AIC)
 	add_subdirectory(npcx-aic)
 endif()
 
+if(DEFINED CONFIG_BOARD_RTK_AIC)
+	project(rtk-aic)
+	add_subdirectory(rtk-aic)
+endif()
+
 zephyr_library_sources_ifdef(CONFIG_I2C_TARGET "src/i2c_target.c")
