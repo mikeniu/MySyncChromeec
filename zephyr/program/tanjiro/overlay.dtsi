@@ -24,6 +24,7 @@
 	named-i2c-ports {
 		ec_smb_batt_scl_3v3 {
 			remote-port = <7>;
+			allow-passthru = "battery_allow_passthru";
 		};
 	};
 
