@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cb9d076_3b60ee33",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-31T20:16:52Z",
+      "side": 1,
+      "message": "I also opened b/541328749 and posted some additional analysis there.  Please add this bug number to the commit message.",
+      "revId": "f19089adc49ad78470dc923eb2c25bf7e41cde10",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "801002ba_18618c30",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx/common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-07-31T20:16:52Z",
+      "side": 1,
+      "message": "I don\u0027t like that the handlers are not defined in this file.  You can either have the handler here call an external function or potentially a callback, or it could make sense to leave the timer in `common_pwrseq_sm_handler.c`.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 71
+      },
+      "revId": "f19089adc49ad78470dc923eb2c25bf7e41cde10",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
