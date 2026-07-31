@@ -26,6 +26,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "08dacb12_6e20de2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T21:24:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** Good. All test cases look correct and effectively exercise `ec_cmd_fp_mode_v1` using various mocked states. `fp_reset_and_clear_context` is properly integrated to guarantee context clean up between tests.\n*   **Style:** Clean, consistent with the codebase, and properly adheres to ZTEST structures.\n*   **Security:** N/A.\n*   **Testing:** Excellent coverage. The tests correctly exercise `validate_fp_mode()` indirectly through the public interface, providing solid regression prevention without leaking private APIs.\n*   **CL Size:** Small, focused, and self-contained.\n*   **Overall:** Great addition of tests to improve coverage and prevent regressions.",
+      "isAi": true,
+      "revId": "c9191b54a832ff114edba545da9957b1a209fe43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8a7a11c2_55f887eb",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
         "patchSetId": 8
@@ -61,6 +79,30 @@
       "side": 1,
       "message": "yes, when I added `fp_reset_and_clear_context()`, I needed to add `#include \"mock_fingerprint_algorithm.h\"` and this `fpsensor_setup`. Otherwise, the code would not compile. `fp_reset_and_clear_context` calls sensor_init and `fpsensor_setup` is necessary. I believe this is done in other tasks. I can avoid this by calling only `fp_clear_context`, but I believe I need to clear `global_context.sensor_mode` separately,",
       "parentUuid": "8a7a11c2_55f887eb",
+      "range": {
+        "startLine": 232,
+        "startChar": 1,
+        "endLine": 239,
+        "endChar": 1
+      },
+      "revId": "c9191b54a832ff114edba545da9957b1a209fe43",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2feec192_0a5d8b72",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-07-31T21:24:23Z",
+      "side": 1,
+      "message": "Ok, it would be clearer if you made that change in a separate CL before this one.",
+      "parentUuid": "c0b62634_9e461b69",
       "range": {
         "startLine": 232,
         "startChar": 1,
