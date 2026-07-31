@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "46f62abd_ae4d370d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-07-31T12:52:18Z",
+      "side": 1,
+      "message": "uploaded change 8182766. Now the ptlrvp_mchp project compiles fine",
+      "parentUuid": "8967e729_daadc908",
+      "revId": "cfad37a3c93ebaa1e03b09ae980691b83abdfaed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef742a41_bbd584e8",
