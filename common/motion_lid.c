@@ -452,6 +452,10 @@ static int calculate_lid_angle(const intv3_t base, const intv3_t lid,
 	if ((last_lid_angle_fp >= FLOAT_TO_FP(360) - DEBOUNCE_ANGLE_DELTA) &&
 	    (lid_to_base_fp <= DEBOUNCE_ANGLE_DELTA) && (lid_is_open()))
 		last_lid_angle_fp = FLOAT_TO_FP(360) - lid_to_base_fp;
+	else if ((last_lid_angle_fp <= DEBOUNCE_ANGLE_DELTA) &&
+		 (lid_to_base_fp >= FLOAT_TO_FP(360) - DEBOUNCE_ANGLE_DELTA) &&
+		 (lid_is_open()))
+		last_lid_angle_fp = FLOAT_TO_FP(360) - lid_to_base_fp;
 	else
 		last_lid_angle_fp = lid_to_base_fp;
 
