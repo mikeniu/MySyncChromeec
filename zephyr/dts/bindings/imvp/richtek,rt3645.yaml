@@ -16,10 +16,10 @@ properties:
       Power supply control for RT3645 (zephyr standard GPIO format)
   update-data:
     type: array
-    required: true
+#    required: true
     description: |
       Array of RT3645_UPDATE_ENTRY() entries corresponding to [page, reg, val]
   update-crc:
     type: int
-    required: true
+#    required: true
     description: CRC value for validation of updated data. This value is data dependent.

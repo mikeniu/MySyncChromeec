@@ -13,6 +13,7 @@
 
 		sys-pwrok-delay = <10>;
 		all-sys-pwrgd-timeout = <20>;
+		s5-inactivity-timeout = <300>;
 	};
 
 	pwr-en-pp5000-s5 {

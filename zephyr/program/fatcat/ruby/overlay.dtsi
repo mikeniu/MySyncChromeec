@@ -18,6 +18,12 @@
 &i2c4_1 {
 	label = "I2C_IMVP";
 	clock-frequency = <I2C_BITRATE_FAST>;
+
+	imvp_rt3645: richtek-imvp@21 {
+		compatible = "richtek,rt3645";
+		status = "okay";
+		reg = <0x21>;
+	};
 };
 
 &i2c5_0 {
@@ -77,4 +83,9 @@
  */
 &power_leakage_io {
 	leak-gpios = <&gpio5 7 (GPIO_ODR_HIGH | GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
+};
+
+&imvp_rt3645 {
+	/* enable-gpios = <&gpioa 7 GPIO_ACTIVE_HIGH>;*/
+	enable-gpios = <&gpiob 6 GPIO_ACTIVE_HIGH>;
 };

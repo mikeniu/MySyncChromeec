@@ -28,9 +28,11 @@ LOG_MODULE_REGISTER(imvp_rt3645, LOG_LEVEL_INF);
 BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
 	     "only one 'richtek,rt3645' compatible node may be present");
 
+#if 0
 /* Get raw data from devicetree */
 static const uint32_t raw_data[] = DT_PROP(DT_DRV_INST(0), update_data);
 static const uint8_t expected_crc = DT_PROP(DT_DRV_INST(0), update_crc);
+#endif
 
 struct rt3645_data_t {
 	uint8_t cur_page;
@@ -52,7 +54,9 @@ static const struct rt3645_config_t config0 = {
 	.enable_gpio = GPIO_DT_SPEC_GET(DT_DRV_INST(0), enable_gpios),
 };
 
+#if 0
 static int rt3645_update(const struct device *dev);
+#endif
 
 static int rt3645_init(const struct device *dev)
 {
@@ -66,6 +70,7 @@ DEVICE_DT_INST_DEFINE(0, rt3645_init, NULL, &data0, &config0, POST_KERNEL,
 
 static const struct device *rt3645_dev = DEVICE_DT_GET(DT_DRV_INST(0));
 
+#if 0
 static int rt3645_apply_update_data(const struct device *dev)
 {
 	int rv = 0;
@@ -128,7 +133,9 @@ static int rt3645_crc_check(const struct device *dev)
 	LOG_ERR("CRC value - 0x%0x  not matching!", crc_val);
 	return -EINVAL;
 }
+#endif
 
+#if 0
 static int rt3645_lock_nvm(const struct device *dev)
 {
 	int rv = 0;
@@ -274,8 +281,10 @@ static void rt3645_initiate_update(const struct device *dev)
 	else
 		LOG_ERR("IMVP update Failed! ");
 }
+#endif
 
 #if defined(CONFIG_IMVP_FACTORY_UPDATE)
+no-no-no
 static void imvp_init_cb(const struct device *dev,
 			 const enum ap_pwrseq_state entry,
 			 const enum ap_pwrseq_state exit)
@@ -406,7 +415,11 @@ static int cmd_rt3645_set_page(const struct shell *sh, size_t argc, char **argv)
 		return -EINVAL;
 	}
 
-	return rt3645_set_page(rt3645_dev, arg);
+	int rv = rt3645_set_page(rt3645_dev, arg);
+	if (rv) {
+		shell_error(sh, "set-page-fail %d", rv);
+	}
+	return rv;
 }
 
 static void dump_reg_range(const struct shell *sh, int low, int high)
@@ -493,6 +506,7 @@ static int cmd_rt3645_set_regs(const struct shell *sh, size_t argc, char **argv)
 	return rv;
 }
 
+#if 0
 static int cmd_rt3645_update(const struct shell *sh, size_t argc, char **argv)
 {
 	chipset_force_shutdown(CHIPSET_SHUTDOWN_G3);
@@ -509,6 +523,7 @@ static int cmd_rt3645_update(const struct shell *sh, size_t argc, char **argv)
 
 	return EC_SUCCESS;
 }
+#endif
 
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	sub_imvp_cmds,
@@ -533,7 +548,9 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD(dump_regs, NULL,
 		  "Dump registers, content depends on current page\n",
 		  cmd_rt3645_dump_regs),
+#if 0
 	SHELL_CMD(update, NULL, "Update IMVP controller\n", cmd_rt3645_update),
+#endif
 	SHELL_SUBCMD_SET_END /* Array terminated. */
 );
 
