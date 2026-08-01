@@ -245,8 +245,8 @@
     <vif:SOP_Capable value="true" />
     <vif:SOP_P_Capable value="true" />
     <vif:SOP_PP_Capable value="true" />
-    <vif:SOP_P_Debug_Capable value="true" />
-    <vif:SOP_PP_Debug_Capable value="true" />
+    <vif:SOP_P_Debug_Capable value="false" />
+    <vif:SOP_PP_Debug_Capable value="false" />
     <vif:Manufacturer_Info_Supported_Port value="false" />
     <vif:Chunking_Implemented_SOP value="true" />
     <vif:Unchunked_Extended_Messages_Supported value="false" />
@@ -278,8 +278,8 @@
     <vif:Type_C_Implements_Try_SNK value="false" />
     <vif:Type_C_Supports_Audio_Accessory value="false" />
     <vif:Type_C_Is_VCONN_Powered_Accessory value="false" />
-    <vif:Type_C_Is_Debug_Target_SRC value="false" />
-    <vif:Type_C_Is_Debug_Target_SNK value="false" />
+    <vif:Type_C_Is_Debug_Target_SRC value="true" />
+    <vif:Type_C_Is_Debug_Target_SNK value="true" />
     <vif:RP_Value value="1">1.5A</vif:RP_Value>
     <vif:Type_C_Port_On_Hub value="false" />
     <vif:Type_C_Power_Source value="2">Both</vif:Type_C_Power_Source>
