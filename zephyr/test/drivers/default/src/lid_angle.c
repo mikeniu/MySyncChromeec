@@ -3,15 +3,37 @@
  * found in the LICENSE file.
  */
 
+#include "console.h"
 #include "ec_commands.h"
+#include "hooks.h"
 #include "lid_angle.h"
+#include "motion_lid.h"
+#include "motion_sense.h"
 #include "test/drivers/test_mocks.h"
 #include "test/drivers/test_state.h"
 
+#include <math.h>
+
+#include <zephyr/devicetree.h>
+#include <zephyr/kernel.h>
 #include <zephyr/ztest.h>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 #define LID_ANGLE_MIN_LARGE_ANGLE 0
 #define LID_ANGLE_MAX_LARGE_ANGLE 360
+
+int emul_lid_open(void);
+
+static void lid_angle_before(void *f)
+{
+	ARG_UNUSED(f);
+	console_channel_enable("motionlid");
+	emul_lid_open();
+	k_sleep(K_MSEC(100));
+}
 
 static void lid_angle_after(void *f)
 {
@@ -25,8 +47,8 @@ static void lid_angle_after(void *f)
 	lid_angle_update(LID_ANGLE_UNRELIABLE);
 }
 
-ZTEST_SUITE(lid_angle, drivers_predicate_post_main, NULL, NULL, lid_angle_after,
-	    NULL);
+ZTEST_SUITE(lid_angle, drivers_predicate_post_main, NULL, lid_angle_before,
+	    lid_angle_after, NULL);
 
 ZTEST(lid_angle, test_get_set_wake_angle)
 {
@@ -68,3 +90,49 @@ ZTEST(lid_angle, test_wake_max_large_angle)
 	zassert_equal(1, lid_angle_peripheral_enable_fake.call_count, NULL);
 	zassert_equal(1, lid_angle_peripheral_enable_fake.arg0_val, NULL);
 }
+
+#ifdef CONFIG_TABLET_MODE
+#define ONE_G_16BIT 16384
+
+static void set_mock_sensors_angle(double angle_deg)
+{
+	int base_id = SENSOR_ID(DT_NODELABEL(base_accel));
+	int lid_id = SENSOR_ID(DT_NODELABEL(lid_accel));
+
+	zassert_true(base_id < SENSOR_COUNT, "base_id out of bounds");
+	zassert_true(lid_id < SENSOR_COUNT, "lid_id out of bounds");
+
+	motion_sensors[base_id].current_range = 2;
+	motion_sensors[lid_id].current_range = 2;
+
+	motion_sensors[base_id].xyz[X] = 0;
+	motion_sensors[base_id].xyz[Y] = 0;
+	motion_sensors[base_id].xyz[Z] = ONE_G_16BIT;
+
+	double rad = angle_deg * M_PI / 180.0;
+
+	motion_sensors[lid_id].xyz[X] = 0;
+	motion_sensors[lid_id].xyz[Y] = (int16_t)(ONE_G_16BIT * sin(rad));
+	motion_sensors[lid_id].xyz[Z] = (int16_t)(-ONE_G_16BIT * cos(rad));
+}
+
+ZTEST(lid_angle, test_symmetric_debounce)
+{
+	// Set initial angle to 20 degrees and calculate
+	set_mock_sensors_angle(20.0);
+	motion_lid_calc();
+	zassert_within(motion_lid_get_angle(), 20, 2,
+		       "Initial angle should be ~20, got %d",
+		       motion_lid_get_angle());
+
+	// Inject noisy reading of 335 degrees
+	set_mock_sensors_angle(335.0);
+	motion_lid_calc();
+
+	// With symmetric debounce, it should correct 335 to 25 (360 - 335)
+	zassert_within(motion_lid_get_angle(), 25, 2,
+		       "Noisy 335 should be debounced to ~25, got %d",
+		       motion_lid_get_angle());
+}
+
+#endif
