@@ -62,6 +62,29 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "66d9b67d_9d7d03d0",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T22:04:43Z",
+      "side": 1,
+      "message": "- Issue: In the Renode.__init__ method, self._temp_dir \u003d tempfile.TemporaryDirectory() creates an object whose lifecycle is bound to self. If self or self._temp_dir goes out of scope or is garbage collected while renode-ec-launch is running in an asynchronous subprocess, the temporary directory (and renode-uart PTY symlink/socket inside it) will be deleted immediately, causing test failures.\n\n- Impact: Intermittent or silent test failures due to missing UART PTY path during execution.\n\n- Remediation: Explicitly clean up self._temp_dir in Renode.cleanup() rather than relying solely on object garbage collection:\n\n```\ndef cleanup(self) -\u003e None:\n    if self.process:\n        self.process.kill()\n        self.process.wait()\n        self.process \u003d None\n    if os.path.lexists(self.console_pty):\n        try:\n            os.unlink(self.console_pty)\n        except OSError:\n            pass\n    if hasattr(self, \"_temp_dir\") and self._temp_dir:\n        self._temp_dir.cleanup()\n        ```",
+      "range": {
+        "startLine": 468,
+        "startChar": 0,
+        "endLine": 477,
+        "endChar": 20
+      },
+      "revId": "f8c36f4983c82c1e00e9938ebb67170d5e09d531",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "ef614f05_58e377eb",
