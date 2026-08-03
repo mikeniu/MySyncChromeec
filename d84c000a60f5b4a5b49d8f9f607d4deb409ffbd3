@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1ff5a2d_1d62d80d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T22:21:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/d0891329-a0ab-4e31-bd67-e61c2a4bc19e)]\n\n**Review Summary:**\n*   **Functionality:** The patch correctly adds the suggested `NULL` pointer check for `templ` when `templ_count \u003e 0` in `ft98xx_match`, completing the parameter validation for the function.\n*   **Security:** These changes ensure we do not dereference `NULL` pointers across the algorithm API, preventing potential crashes.\n*   **Style:** The new logic perfectly matches the existing codebase style and logging patterns.\n*   **Consistency:** The new checks are consistent with error handling elsewhere in the file.\n*   **Testing \u0026 Test Coverage:** Excellent unit test coverage was added. The new tests successfully verify the new `templ` pointer validation as requested.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and remains focused entirely on parameter validation and the respective unit tests.\n\nTAG\u003dagy\nCONV\u003dd0891329-a0ab-4e31-bd67-e61c2a4bc19e",
+      "isAi": true,
+      "revId": "d84c000a60f5b4a5b49d8f9f607d4deb409ffbd3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
