@@ -5,17 +5,17 @@
 if SOC_FAMILY_ITE_EC
 
 # Power management options
-config PM
+configdefault PM
 	default y
 
-config PM_DEVICE
+configdefault PM_DEVICE
 	default y
 
 choice PM_POLICY
 	default PM_POLICY_CUSTOM
 endchoice
 
-config ARCH_IRQ_VECTOR_TABLE_ALIGN
+configdefault ARCH_IRQ_VECTOR_TABLE_ALIGN
 	default 4
 
 endif # SOC_FAMILY_ITE_EC

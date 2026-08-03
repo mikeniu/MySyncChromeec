@@ -5,10 +5,10 @@
 if SOC_SERIES_RTS5912
 
 # Power management options
-config PM
+configdefault PM
 	default y
 
-config PM_DEVICE
+configdefault PM_DEVICE
 	default y
 
 choice PM_POLICY
@@ -26,32 +26,32 @@ endchoice
 #		0x6000_0000 - 0x6007_FFFF: RO
 #		0x6008_0000 - 0x600F_FFFF: RW
 
-config CROS_EC_PROGRAM_MEMORY_BASE
+configdefault CROS_EC_PROGRAM_MEMORY_BASE
 	default 0x20000400
 
-config CROS_EC_RAM_BASE
+configdefault CROS_EC_RAM_BASE
 	default 0x20050000
 
 # 64KB data buffer
-config CROS_EC_DATA_RAM_SIZE
+configdefault CROS_EC_DATA_RAM_SIZE
 	default 0x10000
 
-config CROS_EC_RAM_SIZE
+configdefault CROS_EC_RAM_SIZE
 	default 0x10000
 
-config CROS_EC_RO_MEM_OFF
+configdefault CROS_EC_RO_MEM_OFF
 	default 0
 
-config CROS_EC_RO_SIZE
+configdefault CROS_EC_RO_SIZE
 	default 0x4f900
 
-config CROS_EC_RW_SIZE
+configdefault CROS_EC_RW_SIZE
 	default 0x4f900
 
-config CROS_EC_RW_MEM_OFF
+configdefault CROS_EC_RW_MEM_OFF
 	default 0
 
-config MAIN_STACK_SIZE
+configdefault MAIN_STACK_SIZE
 	default 1280
 
 # Preserve ESPI driver data across sysjumps

@@ -9,24 +9,24 @@
 if SOC_FAMILY_MICROCHIP_MEC
 
 # Enable MPU for ARM targets
-config ARM_MPU
+configdefault ARM_MPU
 	default y
 
 # ADC
-config PLATFORM_EC_ADC_RESOLUTION
+configdefault PLATFORM_EC_ADC_RESOLUTION
 	default 10
 
-config PLATFORM_EC_ADC_OVERSAMPLING
+configdefault PLATFORM_EC_ADC_OVERSAMPLING
 	default 0
 
 # Set the system clock
-config SYS_CLOCK_HW_CYCLES_PER_SEC
+configdefault SYS_CLOCK_HW_CYCLES_PER_SEC
 	default 32768
 
 # Initialize the onboard SPI flash earlier than the upstream Zephyr default
 # of 80. This makes the SPI flash available early enough for the CrOS flash
 # and CBI drivers. (b/423808174)
-config SPI_NOR_INIT_PRIORITY
+configdefault SPI_NOR_INIT_PRIORITY
 	default 54
 
 endif # SOC_FAMILY_MICROCHIP_MEC
