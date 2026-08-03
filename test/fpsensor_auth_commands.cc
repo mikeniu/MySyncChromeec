@@ -749,7 +749,7 @@ test_static enum ec_error_list test_fp_command_template_decrypted(void)
 				       NULL, 0),
 		EC_RES_SUCCESS, "%d");
 
-	constexpr size_t head_size = offsetof(ec_params_fp_template, data);
+	constexpr size_t head_size = offsetof(ec_params_fp_template_v1, data);
 	constexpr size_t metadata_size =
 		sizeof(ec_fp_template_encryption_metadata);
 	constexpr size_t template_size = sizeof(fp_template[0]);
@@ -764,9 +764,10 @@ test_static enum ec_error_list test_fp_command_template_decrypted(void)
 	std::span template_data(enc_metadata.end(), template_size);
 	std::span salt_data(template_data.end(), salt_size);
 
-	struct ec_params_fp_template head_data = {
+	struct ec_params_fp_template_v1 head_data = {
 		.offset = 0,
-		.size = FP_TEMPLATE_COMMIT | (params_size - head_size),
+		.size = static_cast<uint32_t>(params_size - head_size),
+		.cmd = FP_TEMPLATE_LOAD,
 	};
 	static_assert(head_size == sizeof(head_data));
 	memcpy(head.data(), &head_data, head.size());
@@ -798,8 +799,15 @@ test_static enum ec_error_list test_fp_command_template_decrypted(void)
 	static_assert(metadata_size == sizeof(enc_metadata_data));
 	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
 
-	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, params.data(),
+	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, params.data(),
 				       params.size(), NULL, 0),
+		EC_RES_SUCCESS, "%d");
+
+	struct ec_params_fp_template_v1 decrypt_params = {
+		.cmd = FP_TEMPLATE_DECRYPT,
+	};
+	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, &decrypt_params,
+				       sizeof(decrypt_params), NULL, 0),
 		EC_RES_SUCCESS, "%d");
 
 	uint32_t status;
@@ -846,7 +854,7 @@ test_static enum ec_error_list test_fp_command_commit_v3(void)
 				       NULL, 0),
 		EC_RES_SUCCESS, "%d");
 
-	constexpr size_t head_size = offsetof(ec_params_fp_template, data);
+	constexpr size_t head_size = offsetof(ec_params_fp_template_v1, data);
 	constexpr size_t metadata_size =
 		sizeof(ec_fp_template_encryption_metadata);
 	constexpr size_t template_size = sizeof(fp_template[0]);
@@ -858,9 +866,10 @@ test_static enum ec_error_list test_fp_command_commit_v3(void)
 	std::span enc_metadata(head.end(), metadata_size);
 	std::span template_data(enc_metadata.end(), template_size);
 
-	struct ec_params_fp_template head_data = {
+	struct ec_params_fp_template_v1 head_data = {
 		.offset = 0,
-		.size = FP_TEMPLATE_COMMIT | (params_size - head_size),
+		.size = static_cast<uint32_t>(params_size - head_size),
+		.cmd = FP_TEMPLATE_LOAD,
 	};
 	static_assert(head_size == sizeof(head_data));
 	memcpy(head.data(), &head_data, head.size());
@@ -889,9 +898,17 @@ test_static enum ec_error_list test_fp_command_commit_v3(void)
 	static_assert(metadata_size == sizeof(enc_metadata_data));
 	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
 
-	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, params.data(),
+	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, params.data(),
 				       params.size(), NULL, 0),
-		EC_RES_INVALID_PARAM, "%d");
+		EC_RES_SUCCESS, "%d");
+
+	struct ec_params_fp_template_v1 decrypt_params = {
+		.cmd = FP_TEMPLATE_DECRYPT,
+	};
+
+	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, &decrypt_params,
+				       sizeof(decrypt_params), NULL, 0),
+		EC_RES_SUCCESS, "%d");
 
 	return EC_SUCCESS;
 }
@@ -937,7 +954,7 @@ test_static enum ec_error_list test_fp_command_commit_trivial_salt(void)
 				       sizeof(ctx_params), NULL, 0),
 		EC_RES_SUCCESS, "%d");
 
-	constexpr size_t head_size = offsetof(ec_params_fp_template, data);
+	constexpr size_t head_size = offsetof(ec_params_fp_template_v1, data);
 	constexpr size_t metadata_size =
 		sizeof(ec_fp_template_encryption_metadata);
 	constexpr size_t template_size = sizeof(fp_template[0]);
@@ -952,9 +969,10 @@ test_static enum ec_error_list test_fp_command_commit_trivial_salt(void)
 	std::span template_data(enc_metadata.end(), template_size);
 	std::span salt_data(template_data.end(), salt_size);
 
-	struct ec_params_fp_template head_data = {
+	struct ec_params_fp_template_v1 head_data = {
 		.offset = 0,
-		.size = FP_TEMPLATE_COMMIT | (params_size - head_size),
+		.size = static_cast<uint32_t>(params_size - head_size),
+		.cmd = FP_TEMPLATE_LOAD,
 	};
 	static_assert(head_size == sizeof(head_data));
 	memcpy(head.data(), &head_data, head.size());
@@ -985,9 +1003,16 @@ test_static enum ec_error_list test_fp_command_commit_trivial_salt(void)
 	static_assert(metadata_size == sizeof(enc_metadata_data));
 	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
 
-	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, params.data(),
+	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, params.data(),
 				       params.size(), NULL, 0),
-		EC_RES_INVALID_PARAM, "%d");
+		EC_RES_SUCCESS, "%d");
+
+	struct ec_params_fp_template_v1 decrypt_params = {
+		.cmd = FP_TEMPLATE_DECRYPT,
+	};
+	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, &decrypt_params,
+				       sizeof(decrypt_params), NULL, 0),
+		EC_RES_SUCCESS, "%d");
 
 	return EC_SUCCESS;
 }
@@ -2187,6 +2212,50 @@ test_static enum ec_error_list test_fp_command_establish_session_busy(void)
 	return EC_SUCCESS;
 }
 
+test_static enum ec_error_list
+test_fp_command_template_v0_disabled_under_auth(void)
+{
+	std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
+	std::array<uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed = {
+		1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5,
+		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
+	};
+
+	fp_reset_and_clear_context();
+	reset_session();
+	global_context.sensor_mode = 0;
+
+	TEST_EQ(initialize_pairing_key(pairing_key), EC_SUCCESS, "%d");
+
+	struct ec_response_fp_generate_nonce nonce_response;
+	struct ec_params_fp_establish_session session_params = {};
+
+	TEST_EQ(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
+				       &nonce_response, sizeof(nonce_response)),
+		EC_RES_SUCCESS, "%d");
+
+	TEST_EQ(generate_valid_establish_session_request(
+			pairing_key, nonce_response.nonce, tpm_seed,
+			&session_params),
+		EC_SUCCESS, "%d");
+
+	TEST_EQ(test_send_host_command(EC_CMD_FP_ESTABLISH_SESSION, 0,
+				       &session_params, sizeof(session_params),
+				       NULL, 0),
+		EC_RES_SUCCESS, "%d");
+
+	struct ec_params_fp_template params = {
+		.offset = 0,
+		.size = 8,
+	};
+
+	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, &params,
+				       sizeof(params), NULL, 0),
+		EC_RES_ACCESS_DENIED, "%d");
+
+	return EC_SUCCESS;
+}
+
 } // namespace
 
 void run_test(int argc, const char **argv)
@@ -2246,5 +2315,6 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_fp_sign_match_fail_deadline_passed);
 	RUN_TEST(test_fp_sign_match_fail_no_session);
 	RUN_TEST(test_fp_reset_does_not_clear_session);
+	RUN_TEST(test_fp_command_template_v0_disabled_under_auth);
 	test_print_result();
 }
