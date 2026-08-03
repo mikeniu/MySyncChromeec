@@ -893,3 +893,24 @@ static void test_common_cbi_before_after(void *test_data)
 
 ZTEST_SUITE(common_cbi, drivers_predicate_post_main, NULL,
 	    test_common_cbi_before_after, test_common_cbi_before_after, NULL);
+
+ZTEST_USER(common_cbi, test_cc_cbi_set_string_tag)
+{
+	const char expected_oem_name[] = "TestOEM";
+	char oem_name_buf[32] = { 0 };
+	uint8_t size = sizeof(oem_name_buf);
+
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+	zassert_ok(cbi_create(), "cbi_create failed");
+
+	zassert_ok(shell_execute_cmd(NULL, "cbi set 4 TestOEM"),
+		   "Failed to set OEM_NAME via console");
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_OEM_NAME, (uint8_t *)oem_name_buf,
+				      &size),
+		   "Failed to get OEM_NAME");
+	zassert_equal(size, sizeof(expected_oem_name), "Size mismatch");
+	zassert_mem_equal(oem_name_buf, expected_oem_name,
+			  sizeof(expected_oem_name), "OEM_NAME value mismatch");
+}
