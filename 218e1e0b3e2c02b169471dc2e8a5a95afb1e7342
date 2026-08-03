@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78f3c0cc_607bba9a",
+        "filename": "zephyr/dts/bindings/i2c/cros-ec-i2c-port-base.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-03T18:02:21Z",
+      "side": 1,
+      "message": "I don\u0027t like adding this here.  This node is used to shim legacy EC I2C interfaces to the Zephyr I2C driver instances.  We have a goal of eliminating all the shim drivers.\n\nI also don\u0027t passing a function name through the devicetree.  This only encourages developers and partners to implement custom routines.\n\nIt would be better approach to write a new I2C passthru driver from scratch that follows the Zephyr device model.  This new driver would implement the EC_CMD_I2C_PASSTHRU host command.  The new passthru driver at a minimum needs to create a mapping of the remote port to the I2C device instance.\n```\n    i2c-passthru {\n        /* Configure the \"reg\" property for the child nodes */\n        #address-cells \u003d \u003c1\u003e;\n        #size-cells \u003d \u003c0\u003e;\n        passthru-port0@0 {\n            compatible \u003d \"cros-ec.i2c-passthru\";\n            reg \u003d \u003c0\u003e;  /* This is the port passed to I2C_PASSTHRU */\n            i2c-dev \u003d \u003c\u0026i2c1\u003e;\n        };\n        passthru-port1@1 {\n            compatible \u003d \"cros-ec.i2c-passthru\";\n            reg \u003d \u003c1\u003e;  /* This is the port passed to I2C_PASSTHRU */\n            i2c-dev \u003d \u003c\u0026i2c4\u003e;\n        };\n        \n```",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 17
+      },
+      "revId": "218e1e0b3e2c02b169471dc2e8a5a95afb1e7342",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
