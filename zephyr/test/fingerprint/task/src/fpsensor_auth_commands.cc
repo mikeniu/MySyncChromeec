@@ -2059,6 +2059,48 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_busy)
 	global_context.sensor_mode = 0;
 }
 
+ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_disabled_under_auth)
+{
+	std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
+	std::array<uint8_t, FP_CONTEXT_TPM_BYTES> tpm_seed = {
+		1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5,
+		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
+	};
+
+	fp_reset_and_clear_context();
+	reset_session();
+	global_context.sensor_mode = 0;
+
+	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
+
+	struct ec_response_fp_generate_nonce nonce_response;
+	struct ec_params_fp_establish_session session_params = {};
+
+	zassert_equal(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL,
+					     0, &nonce_response,
+					     sizeof(nonce_response)),
+		      EC_RES_SUCCESS);
+
+	zassert_equal(generate_valid_establish_session_request(
+			      pairing_key, nonce_response.nonce, tpm_seed,
+			      &session_params),
+		      EC_SUCCESS);
+
+	zassert_equal(test_send_host_command(EC_CMD_FP_ESTABLISH_SESSION, 0,
+					     &session_params,
+					     sizeof(session_params), NULL, 0),
+		      EC_RES_SUCCESS);
+
+	struct ec_params_fp_template params = {
+		.offset = 0,
+		.size = 8,
+	};
+
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, &params,
+					     sizeof(params), NULL, 0),
+		      EC_RES_ACCESS_DENIED);
+}
+
 } // namespace
 
 static void *fpsensor_auth_commands_setup(void)
