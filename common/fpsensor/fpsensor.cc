@@ -985,6 +985,15 @@ fp_commit_template(std::span<const uint8_t> context)
 static enum ec_host_cmd_status
 fp_command_template_v0(struct ec_host_cmd_handler_args *args)
 {
+	/*
+	 * When fingerprint auth is enabled, legacy unauthenticated (un-MAC'ed)
+	 * template modification paths must be disabled. Reject v0 commits
+	 * to prevent arbitrary template injection; high-security contexts
+	 * must route through the v1 secure channel.
+	 */
+	if (fingerprint_auth_enabled())
+		return EC_HOST_CMD_ACCESS_DENIED;
+
 	const auto *params = static_cast<const struct ec_params_fp_template *>(
 		args->input_buf);
 	uint32_t size = params->size & ~FP_TEMPLATE_COMMIT;

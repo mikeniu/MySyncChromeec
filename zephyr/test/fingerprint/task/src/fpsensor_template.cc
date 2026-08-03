@@ -1499,6 +1499,31 @@ ZTEST_USER(fpsensor_template,
 	k_sleep(K_SECONDS(1));
 }
 
+ZTEST_USER(fpsensor_template, test_fp_template_v0_disabled_under_auth)
+{
+	struct ec_params_fp_template params = {
+		.offset = 0,
+		.size = 0,
+	};
+
+	/*
+	 * Note: This test validates that unauthenticated v0 legacy paths are
+	 * blocked entirely when fingerprint auth is enabled.
+	 */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	/*
+	 * Validate security invariant: When fingerprint auth is active,
+	 * unauthenticated legacy template parsing routes (v0) must reject
+	 * commits with ACCESS_DENIED.
+	 */
+	zassert_equal(
+		EC_RES_ACCESS_DENIED,
+		ec_cmd_fp_template(NULL, &params, sizeof(params)),
+		"Legacy template loading endpoint must be closed under fingerprint auth");
+}
+
 static void *fpsensor_setup(void)
 {
 	struct ec_params_fp_seed fp_seed_params = {
@@ -1567,6 +1592,9 @@ static void fpsensor_before(void *f)
 	RESET_FAKE(mock_alg_enroll_step);
 	RESET_FAKE(mock_alg_enroll_finish);
 	RESET_FAKE(mock_alg_match);
+
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
 
 	/* Set context (FP_CONTEXT_ASYNC). */
 	ec_cmd_fp_context_v1(NULL, &fp_context_params);
