@@ -22,6 +22,30 @@
       },
       "revId": "cbe6a89dca5476e5438a2feda1ff4eb2591cae38",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c2a76b2_5476c002",
+        "filename": "board/cr50/board.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1324172
+      },
+      "writtenOn": "2026-08-03T18:06:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "492b4060_f999c0c7",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 28
+      },
+      "revId": "cbe6a89dca5476e5438a2feda1ff4eb2591cae38",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
