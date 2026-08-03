@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38d87b2b_bb3182fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T21:41:03Z",
+      "side": 1,
+      "message": "Done. Added get_board_twister_dir(board_name) helper function in test/run_device_tests.py and updated build_zephyr_upstream() and get_zephyr_image_path() to use it. Confirmed from typing import Optional is present in util/renode_ec_launch.py.",
+      "parentUuid": "9a00f2bf_75134f71",
+      "isAi": true,
+      "revId": "f8c36f4983c82c1e00e9938ebb67170d5e09d531",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58cb259c_5befab36",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T21:41:03Z",
+      "side": 1,
+      "message": "Done. Added self.process.wait() after self.process.kill() in Renode.cleanup(). Also removed explicit self._temp_dir.cleanup() from cleanup(), relying on tempfile.TemporaryDirectory automatic cleanup on process exit so _temp_dir remains active across all test runs on the board.",
+      "parentUuid": "4205dec3_7915a1a5",
+      "range": {
+        "startLine": 412,
+        "startChar": 0,
+        "endLine": 412,
+        "endChar": 23
+      },
+      "isAi": true,
+      "revId": "f8c36f4983c82c1e00e9938ebb67170d5e09d531",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef614f05_58e377eb",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1561,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T21:41:03Z",
+      "side": 1,
+      "message": "Done. Refactored build_zephyr() to write configuration directly into f_test_config within the with tempfile.NamedTemporaryFile(...) as f_test_config: context manager without reopening the file path on disk. Fixed testcase variable shadowing.",
+      "parentUuid": "741df548_ec96156c",
+      "range": {
+        "startLine": 1561,
+        "startChar": 0,
+        "endLine": 1561,
+        "endChar": 37
+      },
+      "isAi": true,
+      "revId": "f8c36f4983c82c1e00e9938ebb67170d5e09d531",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7a64b9c_7d58497f",
+        "filename": "util/renode/firmware_builder.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T21:41:03Z",
+      "side": 1,
+      "message": "Done. Removed KeyboardInterrupt from the except tuple in _run_renode_tests() so Ctrl+C propagates cleanly to the main thread.",
+      "parentUuid": "d995af05_1e3b2ad0",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 55
+      },
+      "isAi": true,
+      "revId": "f8c36f4983c82c1e00e9938ebb67170d5e09d531",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
