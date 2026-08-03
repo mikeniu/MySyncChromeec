@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "941e1ee4_7a421f81",
+        "filename": "common/charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1585,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-03T15:38:21Z",
+      "side": 1,
+      "message": "This check is starting to be used pretty frequently through this function (lines 1584, 1648, 1673, 1700).  Can we create a function for it?  Maybe something like\n\n```\n#ifdef CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON\nbool charger_has_sufficient_power_for_power_on() {\n  return charge_manager_get_power_limit_uw() \u003e\u003d\n\t       CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON * 1000; \n}\n#endif\n```",
+      "range": {
+        "startLine": 1584,
+        "startChar": 5,
+        "endLine": 1585,
+        "endChar": 54
+      },
+      "revId": "05d9a37eb67ae722d870a730c8598f1bb39c628a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
