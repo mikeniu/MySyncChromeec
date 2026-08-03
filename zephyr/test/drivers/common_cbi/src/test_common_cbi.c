@@ -893,3 +893,43 @@ static void test_common_cbi_before_after(void *test_data)
 
 ZTEST_SUITE(common_cbi, drivers_predicate_post_main, NULL,
 	    test_common_cbi_before_after, test_common_cbi_before_after, NULL);
+
+ZTEST_USER(common_cbi, test_cbi_set_board_info__resize_overflow)
+{
+	uint32_t original_sku = 0x12345678;
+	uint32_t read_sku;
+
+	/* Turn off write-protect so we can write. */
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+	zassert_ok(cbi_create(), "cbi_create failed");
+
+	/* Set initial SKU_ID tag (4 bytes payload). */
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (uint8_t *)&original_sku,
+				     sizeof(original_sku)),
+		  "Failed to set initial SKU_ID");
+
+	zassert_ok(cbi_get_sku_id(&read_sku), "Failed to read SKU_ID");
+	zassert_equal(read_sku, original_sku, "SKU_ID value mismatch");
+
+	/* Fill CBI buffer near capacity (256 bytes total). */
+	uint8_t fill_buf[230];
+	memset(fill_buf, 0xAA, sizeof(fill_buf));
+	zassert_ok(cbi_set_board_info(CBI_TAG_DRAM_PART_NUM, fill_buf,
+				     sizeof(fill_buf)),
+		  "Failed to set DRAM part number");
+
+	/* Attempt to resize SKU_ID to 30 bytes (requires 272 bytes > 256 bytes limit). */
+	uint8_t large_buf[30] = { 0 };
+	zassert_equal(cbi_set_board_info(CBI_TAG_SKU_ID, large_buf,
+					 sizeof(large_buf)),
+		      EC_ERROR_OVERFLOW,
+		      "Expected EC_ERROR_OVERFLOW on resize overflow");
+
+	/* Verify original SKU_ID tag was not deleted and cache remains valid. */
+	zassert_ok(cbi_get_sku_id(&read_sku),
+		  "Expected SKU_ID tag to be preserved in cache after overflow");
+	zassert_equal(read_sku, original_sku,
+		      "Preserved SKU_ID value mismatch");
+}
+
