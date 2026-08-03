@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "abe59954_30914e12",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T17:32:54Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e922b93c_14b7bcdf",
+      "revId": "5fe9dd9c5af9a0ec7162d208218275ac319f7e67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f0208ad0_3f608afa",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] This test suite is fantastic! Using FFF to mock out the vendor algorithm API is a great approach for testing this layer, and you\u0027ve covered all the critical edge cases (success, early cancellation, initialization failure). This gives us much higher confidence in the `ft98xx_bio_alg` state machine.",
       "isAi": true,
+      "revId": "5fe9dd9c5af9a0ec7162d208218275ac319f7e67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bf3736a_a06de0e9",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T17:32:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0208ad0_3f608afa",
       "revId": "5fe9dd9c5af9a0ec7162d208218275ac319f7e67",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
