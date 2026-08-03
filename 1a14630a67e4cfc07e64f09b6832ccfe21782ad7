@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a00f2bf_75134f71",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T21:30:31Z",
+      "side": 1,
+      "message": "Duplicate Board Directory Resolution:\nbuild/zephyr/fpmcu-test-{board_name} string formatting is duplicated in build_zephyr() and _patch_image_with_new_rw(). Consider defining a helper function (e.g., get_board_twister_dir(board_name)) to keep directory structure definitions DRY.\n\nExplicit Type Annotation for gdb_port:\nIn util/renode_ec_launch.py:\ngdb_port: Optional[int] \u003d None is added, but ensure from typing import Optional is present in imports at the top of the file.",
+      "revId": "1a14630a67e4cfc07e64f09b6832ccfe21782ad7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4205dec3_7915a1a5",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T21:30:31Z",
+      "side": 1,
+      "message": "````\nclass Renode:\n    def __init__(self):\n        self.process \u003d None\n        # pylint: disable-next\u003dconsider-using-with\n        self._temp_dir \u003d tempfile.TemporaryDirectory()\n        self.console_pty \u003d os.path.join(self._temp_dir.name, \"renode-uart\")\n```\n\nAnd in cleanup():\n\n```\ndef cleanup(self) -\u003e None:\n    if self.process:\n        self.process.kill()\n    if os.path.lexists(self.console_pty):\n        try:\n            os.unlink(self.console_pty)\n        except OSError:\n            pass\n    try:\n        self._temp_dir.cleanup()\n    except (OSError, AttributeError):\n        pass\n```\n\nOrder of operations during process shutdown: self.process.kill() sends SIGKILL, but self.process.wait() isn\u0027t called. If Renode is still running asynchronously or shutting down, deleting _temp_dir immediately can lead to missing file errors in Renode background threads.\n\nMissing wait(): Consider adding self.process.wait() after kill() to prevent zombie processes before cleaning up temporary directories.",
+      "range": {
+        "startLine": 412,
+        "startChar": 0,
+        "endLine": 412,
+        "endChar": 23
+      },
+      "revId": "1a14630a67e4cfc07e64f09b6832ccfe21782ad7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "741df548_ec96156c",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1561,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T21:30:31Z",
+      "side": 1,
+      "message": "NamedTemporaryFile creates the file on disk and holds an open handle.\n\nInside try:, open(test_conf, \"w\") opens the file again while f_test_config from the context manager has closed (or is still closing depending on OS).\n\nMore importantly, using NamedTemporaryFile(delete\u003dFalse) means the file is never unlinked if build_zephyr completes successfully without throwing an exception!\n\nThe except Exception: block unlinks test_conf on failure.\n\nbuild() cleans it up in its finally: block only if build() gets called. But if build_zephyr is called directly or returns normally, the file remains on disk for successful builds.\n\nRemediation:\nKeep NamedTemporaryFile open and write directly into it using its file object rather than reopening it by path, or ensure cleanup occurs reliably in all control paths:\n\n```\nwith tempfile.NamedTemporaryFile(\n    mode\u003d\"w\",\n    encoding\u003d\"utf-8\",\n    prefix\u003d\"test-\",\n    suffix\u003d\".conf\",\n    delete\u003dFalse,\n) as f_test_config:\n    test_conf \u003d f_test_config.name\n    cmd \u003d cmd + [\"-DOVERLAY_CONFIG\u003d\" + test_conf]\n    \n    # Write configuration directly to f_test_config without reopening:\n    testcase_path \u003d os.path.join(ZEPHYR_FPMCU_DIR, \"testcase.yaml\")\n    ...\n    ```",
+      "range": {
+        "startLine": 1561,
+        "startChar": 0,
+        "endLine": 1561,
+        "endChar": 37
+      },
+      "revId": "1a14630a67e4cfc07e64f09b6832ccfe21782ad7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d995af05_1e3b2ad0",
+        "filename": "util/renode/firmware_builder.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T21:30:31Z",
+      "side": 1,
+      "message": "In Python, KeyboardInterrupt raised in the main thread during as_completed() will interrupt the main thread, not individual worker futures.\n\nCatching KeyboardInterrupt inside the for future in futures.as_completed(...) block and continuing the loop will swallow Ctrl+C signals, making it difficult for users to stop the test suite cleanly.\n\n\n```\nexcept Exception as e:\n    print(\n        f\"Board {board} test execution failed with exception: {e}\",\n        file\u003dsys.stderr,\n    )\n    success \u003d False\n    ```",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 55
+      },
+      "revId": "1a14630a67e4cfc07e64f09b6832ccfe21782ad7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
