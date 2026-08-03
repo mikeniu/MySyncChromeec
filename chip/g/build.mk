@@ -174,15 +174,6 @@ RMA_KEY_BASE := board/$(BOARD)/rma_key_blob.$(CURVE)
 RW_SIGNER_EXTRAS += --swap $(RMA_KEY_BASE).test,$(RMA_KEY_BASE).prod
 endif
 
-ifeq ($(H1_DEVIDS),)
-ifneq ($(PROD_BUILD_MODE),)
-CR50_RW_KEY = cr50_RW-prod-2026.04.pem.pub
-RW_SIGNER_EXTRAS += --hashes=$@.hashes
-else
-# Signing with non-secret test key.
-CR50_RW_KEY = loader-testkey-A.pem
-endif
-else
 # Try to build signer from the known location, if it is missing
 ifeq ($(wildcard $(SIGNER)),)
 # If source path is present, build codesigner later as dependency
@@ -196,6 +187,16 @@ else
 $(error cr50-codesigner is not available!)
 endif
 endif
+
+ifeq ($(H1_DEVIDS),)
+ifneq ($(PROD_BUILD_MODE),)
+CR50_RW_KEY = cr50_RW-prod-2026.04.pem.pub
+RW_SIGNER_EXTRAS += --hashes=$@.hashes
+else
+# Signing with non-secret test key.
+CR50_RW_KEY = loader-testkey-A.pem
+endif
+else
 
 ifeq ($(USE_USB_FOB_KEY),)
 # The private key comes from Cloud KMS.
