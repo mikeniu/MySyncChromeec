@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "92d55a0a_be852705",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T16:48:49Z",
+      "side": 1,
+      "message": "Fixed. b/541516849 was mistakenly added because https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8174026 caused skyirm flash to overflow in cq.",
+      "parentUuid": "ef59cd9b_bc3f2881",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 15
+      },
+      "revId": "ac5842b17b176fc91a94454bca536a96ec6decdc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ec48716e_41147245",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
