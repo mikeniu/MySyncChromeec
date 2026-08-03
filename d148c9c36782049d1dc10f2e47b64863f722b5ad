@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c760566_99404e4a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-03T22:20:44Z",
+      "side": 1,
+      "message": "This CQ failure is an upstream RISC-V toolchain relocation bug in the it8xxx2 board code, and is unrelated to the CBI change.",
+      "revId": "d148c9c36782049d1dc10f2e47b64863f722b5ad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
