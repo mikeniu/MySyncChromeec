@@ -6,63 +6,65 @@
 
 # Disable timeslicing, it's compiled in by default and can be enabled at
 # runtime but not used in Zephyr EC.
-config TIMESLICING
+configdefault TIMESLICING
 	default n
 
-config TIMEOUT_64BIT
+configdefault TIMEOUT_64BIT
 	default n
 
-config LOG
+configdefault LOG
 	default y
-	imply LOG_DEFAULT_MINIMAL
 
-config GPIO
+configdefault LOG_DEFAULT_MINIMAL
+	default y if LOG
+
+configdefault GPIO
 	default y if ARCH_POSIX
 
-config THREAD_MAX_NAME_LEN
+configdefault THREAD_MAX_NAME_LEN
 	default 16
 
-config SHELL_PROMPT_UART
+configdefault SHELL_PROMPT_UART
 	default "ec:~> "
 
-config SHELL_VT100_COLORS
+configdefault SHELL_VT100_COLORS
 	default n
 
-config SHELL_THREAD_PRIORITY_OVERRIDE
+configdefault SHELL_THREAD_PRIORITY_OVERRIDE
 	default y
 
-config SHELL_THREAD_PRIORITY
+configdefault SHELL_THREAD_PRIORITY
 	default 28
 
-config EXTRA_EXCEPTION_INFO
+configdefault EXTRA_EXCEPTION_INFO
 	default y if ARCH_HAS_EXTRA_EXCEPTION_INFO
 
-config FLASH_PAGE_LAYOUT
+configdefault FLASH_PAGE_LAYOUT
 	default n
 
-config ESPI_NPCX_PERIPHERAL_DEBUG_PORT_80_MULTI_BYTE
+configdefault ESPI_NPCX_PERIPHERAL_DEBUG_PORT_80_MULTI_BYTE
 	default y
 
 choice INPUT_MODE
 	default INPUT_MODE_SYNCHRONOUS
 endchoice
 
-config INPUT_NPCX_KBD
+configdefault INPUT_NPCX_KBD
 	default n if PLATFORM_EC_KEYBOARD_CROS_EC_RAW_KB
 
-config OUTPUT_DISASSEMBLY
+configdefault OUTPUT_DISASSEMBLY
 	default y
 
-config SHELL_BACKEND_SERIAL_INIT_PRIORITY
+configdefault SHELL_BACKEND_SERIAL_INIT_PRIORITY
 	default 51
 
-config I2C_ALLOW_NO_STOP_TRANSACTIONS
+configdefault I2C_ALLOW_NO_STOP_TRANSACTIONS
 	default y
 
-config COMMON_LIBC_MALLOC
+configdefault COMMON_LIBC_MALLOC
 	default n
 
-config LTO
+configdefault LTO
 	default y if !X86 && !SOC_POSIX
 
 # For clang, this option sets the LTO optimization flag to "-flto=full"
@@ -70,19 +72,22 @@ config LTO
 # For gcc, this option sets the LTO optimization flag to "-flto=1" instead
 # of "-flto=auto".  There is no size difference detected between these
 # settings on gcc.
-config LTO_SINGLE_THREADED
+configdefault LTO_SINGLE_THREADED
 	default y
 
+# Must use config instead of configdefault so ISR_TABLES_LOCAL_DECLARATION can be
+# enabled on RISC-V targets where GEN_IRQ_VECTOR_TABLE is not set, which is
+# required for LTO.
 config ISR_TABLES_LOCAL_DECLARATION
 	default y
 
-config CURRENT_THREAD_USE_TLS
+configdefault CURRENT_THREAD_USE_TLS
 	default n
 
-config I2C_TRANSFER_TIMEOUT_MS
+configdefault I2C_TRANSFER_TIMEOUT_MS
 	default 100
 
-config DEVICE_API_ASSERT
+configdefault DEVICE_API_ASSERT
 	default n
 
 orsource "Kconfig.defaults-$(ARCH)"
