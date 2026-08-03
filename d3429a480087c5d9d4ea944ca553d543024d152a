@@ -39,6 +39,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "de936630_35e26d4f",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 809,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T21:58:55Z",
+      "side": 1,
+      "message": "tried to add \n\n```\n\t/* Poll FP_TEMPLATE_GET_RESULT until decryption finishes. */\n\tstruct ec_params_fp_template_v1 result_params \u003d {\n\t\t.cmd \u003d FP_TEMPLATE_GET_RESULT,\n\t};\n\tenum ec_status res;\n\tint timeout \u003d 50; /* Poll up to 500ms */\n\n\tdo {\n\t\tcrec_msleep(10);\n\t\tres \u003d test_send_host_command(EC_CMD_FP_TEMPLATE, 1,\n\t\t\t\t\t     \u0026result_params,\n\t\t\t\t\t     sizeof(result_params), NULL, 0);\n\t} while (res \u003d\u003d EC_RES_BUSY \u0026\u0026 --timeout \u003e 0);\n\n\tTEST_EQ(res, EC_RES_SUCCESS, \"%d\");\n```\n\nthis is a host test. The get result is happening in the background",
+      "parentUuid": "5a82dd44_a8dfff40",
+      "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "70672bd7_4e30b4fa",
         "filename": "test/fpsensor_auth_commands.cc",
         "patchSetId": 4
