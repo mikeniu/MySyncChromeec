@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "238ab224_0390b468",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T21:28:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/df193688-11f7-457c-bdc5-afbf43f7eab1)]\n\n**Review Summary**\n* **Functionality:** The patch correctly blocks legacy v0 template commits when fingerprint authentication is enabled by returning `EC_RES_ACCESS_DENIED`. This successfully forces the use of the authenticated v1 channel.\n* **Security:** This introduces a solid security invariant that prevents arbitrary template injection via unauthenticated paths when the device is in a secure state.\n* **Style:** The code style is clean, and the inline comment clearly explains the security rationale.\n* **Testing \u0026 Test Coverage:** The new Zephyr test (`test_fp_template_v0_disabled_under_auth`) nicely verifies the v0 blocking behavior. However, the migration of legacy tests (`test_fp_command_commit_v3` and `test_fp_command_commit_trivial_salt`) to `EC_CMD_FP_TEMPLATE` version 1 introduces a testing gap. Because `FP_TEMPLATE_DECRYPT` in v1 operates asynchronously, asserting that it returns `EC_RES_SUCCESS` only verifies that the decryption task was successfully queued, completely missing the actual format validation inside `fp_commit_template`. I have added inline comments with two possible ways to fix this.\n* **CL Size \u0026 Scope:** The CL is appropriately sized and focuses tightly on a single security enhancement.\n* **Conclusion:** The core functional and security changes are excellent, but the test coverage regression needs to be addressed before this can be approved.\n\nTAG\u003dagy\nCONV\u003ddf193688-11f7-457c-bdc5-afbf43f7eab1",
+      "isAi": true,
+      "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a82dd44_a8dfff40",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 809,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T21:28:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] By migrating this test to `EC_CMD_FP_TEMPLATE` version 1, `FP_TEMPLATE_DECRYPT` now initiates decryption asynchronously. It immediately returns `EC_RES_SUCCESS` indicating that the request was successfully queued, but this means the test no longer waits for or verifies the actual decryption result (`fp_commit_template`).\n\nTo actually verify that the template was successfully decrypted and loaded into state, you must process the background task and verify the result:\n```cpp\n\tfp_task_simulate(); // Process the decryption\n\n\tstruct ec_params_fp_template_v1 result_params \u003d {\n\t\t.cmd \u003d FP_TEMPLATE_GET_RESULT,\n\t};\n\tTEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, \u0026result_params,\n\t\t\t\t       sizeof(result_params), NULL, 0),\n\t\tEC_RES_SUCCESS, \"%d\"); // Assert successful decryption\n```",
+      "isAi": true,
+      "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70672bd7_4e30b4fa",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T21:28:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Similar to `test_fp_command_template_decrypted`, `FP_TEMPLATE_DECRYPT` executes asynchronously and returns `EC_RES_SUCCESS` immediately. As a result, this test no longer verifies that the v3 format is actually rejected during `fp_commit_template`.\n\nYou can fix this test in one of two ways:\n1. **(Recommended)** Revert this test to use the synchronous `EC_CMD_FP_TEMPLATE` v0, but remove the code that establishes a session. Without an active session, `fingerprint_auth_enabled()` evaluates to false, allowing the v0 path to execute `fp_commit_template` synchronously and return `EC_RES_INVALID_PARAM` as originally intended.\n2. Continue using v1, but add `fp_task_simulate()` and query the asynchronous result via `FP_TEMPLATE_GET_RESULT` to assert `EC_RES_INVALID_PARAM`.",
+      "isAi": true,
+      "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30f3fdfd_0fc42f0a",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 1013,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T21:28:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] As with the v3 format test above, because `FP_TEMPLATE_DECRYPT` runs asynchronously, this test is no longer verifying that trivial salts are rejected. It just verifies that the decryption task was successfully queued.\n\nPlease apply the same fix here: either revert to the v0 command and remove the session establishment code, or simulate the task and poll for the result via `FP_TEMPLATE_GET_RESULT`.",
+      "isAi": true,
+      "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
