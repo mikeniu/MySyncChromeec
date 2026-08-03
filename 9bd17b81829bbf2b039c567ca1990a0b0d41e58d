@@ -88,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b030fe46_f6519f3d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-08-03T06:52:28Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "70c2db19_b27a88ab",
+      "revId": "9bd17b81829bbf2b039c567ca1990a0b0d41e58d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd19e876_f54d3f27",
@@ -149,6 +167,30 @@
       "side": 1,
       "message": "Yes I agree - the dts change already explains why IMVP is disabled.  So don\u0027t make any changes to the project.conf file.",
       "parentUuid": "cfb09d0c_a2e74d77",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 30
+      },
+      "revId": "9bd17b81829bbf2b039c567ca1990a0b0d41e58d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40436400_5194b533",
+        "filename": "zephyr/program/intelrvp/ptlrvp/ptlrvp_mchp/project.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-08-03T06:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5261daea_2619fd49",
       "range": {
         "startLine": 55,
         "startChar": 0,
