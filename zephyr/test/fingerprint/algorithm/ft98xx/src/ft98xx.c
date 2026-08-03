@@ -295,6 +295,24 @@ ZTEST_F(ft98xx_bio_alg, test_enroll_step_algo_step_failure)
 		"Completion should remain 0% because remain counter was not decremented.");
 }
 
+ZTEST_F(ft98xx_bio_alg, test_enroll_step_null_completion_fails)
+{
+	zassert_ok(fingerprint_algorithm_init(fixture->alg));
+	zassert_ok(fingerprint_enroll_start(fixture->alg));
+
+	int res = fingerprint_enroll_step(fixture->alg, fixture->fake_image,
+					  NULL);
+
+	zassert_equal(res, -EINVAL,
+		      "Expected -EINVAL when completion pointer is NULL.");
+	zassert_equal(
+		focal_algo_get_feature_fake.call_count, 0,
+		"Should not extract features when completion pointer is NULL.");
+	zassert_equal(
+		focal_algo_enroll_step_fake.call_count, 0,
+		"Should not call enroll step when completion pointer is NULL.");
+}
+
 ZTEST_F(ft98xx_bio_alg, test_enroll_step_success_and_progress)
 {
 	int completion = 0;
