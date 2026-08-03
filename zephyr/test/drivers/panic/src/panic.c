@@ -20,7 +20,11 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/ztest.h>
 
+struct panic_data *panic_data_reset(struct panic_data *pdata);
+void panic_data_finalize(struct panic_data *pdata);
 int panic_data_init(void);
+void copy_esf_to_panic_data(const struct arch_esf *esf,
+			    struct panic_data *pdata);
 
 struct panic_test_fixture {
 	struct panic_data saved_pdata;
@@ -328,4 +332,85 @@ ZTEST(panic, test_panic_data_init__invalid_sw_reason_watchdog)
 		zassert_equal(info, 0x12);
 		zassert_equal(exception, 0x34);
 	}
+}
+
+ZTEST(panic, test_copy_esf_to_panic_data)
+{
+	struct arch_esf esf = { 0 };
+	struct panic_data *pdata = get_panic_data_write();
+	uint8_t expected_flags = IS_ENABLED(CONFIG_CROS_EC_RW) ?
+					 PANIC_DATA_FLAG_RW_IMAGE :
+					 PANIC_DATA_FLAG_RO_IMAGE;
+
+	if (IS_ENABLED(CONFIG_ARM)) {
+		expected_flags |= PANIC_DATA_FLAG_FRAME_VALID;
+	}
+
+	copy_esf_to_panic_data(&esf, pdata);
+
+	pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_equal(pdata->magic, PANIC_DATA_MAGIC);
+	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
+	zassert_equal(pdata->flags, expected_flags);
+}
+
+ZTEST(panic, test_panic_data_reset_and_finalize)
+{
+	struct panic_data *pdata = get_panic_data_write();
+
+	/* Pre-populate with old magic to ensure reset clears it */
+	pdata->magic = PANIC_DATA_MAGIC;
+
+	struct panic_data *res = panic_data_reset(pdata);
+	zassert_equal(res, pdata);
+	zassert_equal(pdata->magic, 0, "magic should be 0 after reset, got %x",
+		      pdata->magic);
+	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
+
+	panic_data_finalize(pdata);
+	zassert_equal(pdata->magic, PANIC_DATA_MAGIC,
+		      "magic should be PANIC_DATA_MAGIC after finalize, got %x",
+		      pdata->magic);
+}
+
+ZTEST(panic, test_copy_esf_to_panic_data_null)
+{
+	struct arch_esf esf = { 0 };
+	uint8_t expected_flags = IS_ENABLED(CONFIG_CROS_EC_RW) ?
+					 PANIC_DATA_FLAG_RW_IMAGE :
+					 PANIC_DATA_FLAG_RO_IMAGE;
+
+	if (IS_ENABLED(CONFIG_ARM)) {
+		expected_flags |= PANIC_DATA_FLAG_FRAME_VALID;
+	}
+
+	copy_esf_to_panic_data(&esf, NULL);
+
+	struct panic_data *pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_equal(pdata->magic, PANIC_DATA_MAGIC);
+	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
+	zassert_equal(pdata->flags, expected_flags);
+}
+
+ZTEST(panic, test_panic_data_reset_null)
+{
+	struct panic_data *expected_pdata = get_panic_data_write();
+	expected_pdata->magic = PANIC_DATA_MAGIC;
+
+	struct panic_data *res = panic_data_reset(NULL);
+	zassert_equal(res, expected_pdata);
+	zassert_equal(res->magic, 0, "magic should be 0 after reset, got %x",
+		      res->magic);
+	zassert_equal(res->struct_version, 2);
+	zassert_equal(res->struct_size, CONFIG_PANIC_DATA_SIZE);
+}
+
+ZTEST(panic, test_panic_data_finalize_null)
+{
+	panic_data_finalize(NULL);
 }
