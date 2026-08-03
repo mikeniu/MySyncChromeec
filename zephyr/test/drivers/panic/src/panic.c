@@ -20,7 +20,11 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/ztest.h>
 
+struct panic_data *panic_data_reset(struct panic_data *pdata);
+void panic_data_finalize(struct panic_data *pdata);
 int panic_data_init(void);
+void copy_esf_to_panic_data(const struct arch_esf *esf,
+			    struct panic_data *pdata);
 
 struct panic_test_fixture {
 	struct panic_data saved_pdata;
@@ -328,4 +332,31 @@ ZTEST(panic, test_panic_data_init__invalid_sw_reason_watchdog)
 		zassert_equal(info, 0x12);
 		zassert_equal(exception, 0x34);
 	}
+}
+
+ZTEST(panic, test_copy_esf_to_panic_data)
+{
+	struct arch_esf esf = { 0 };
+	struct panic_data *pdata = get_panic_data_write();
+	uint8_t expected_flags = IS_ENABLED(CONFIG_CROS_EC_RW) ?
+					 PANIC_DATA_FLAG_RW_IMAGE :
+					 PANIC_DATA_FLAG_RO_IMAGE;
+
+	if (IS_ENABLED(CONFIG_ARM)) {
+		expected_flags |= PANIC_DATA_FLAG_FRAME_VALID;
+	}
+
+	copy_esf_to_panic_data(&esf, pdata);
+
+	pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_equal(pdata->magic, PANIC_DATA_MAGIC);
+	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
+	zassert_equal(pdata->flags, expected_flags);
+}
+
+ZTEST(panic, test_panic_data_finalize_null)
+{
+	panic_data_finalize(NULL);
 }
