@@ -22,12 +22,28 @@
 #include <fingerprint_ft98xx_private.h>
 #include <fpsensor_driver.h>
 
+#define FT98XX_CHIP_ID 0x9800
+
 DEFINE_FFF_GLOBALS;
+
+FAKE_VALUE_FUNC(uint16_t, ft_sensor_query_rows);
+FAKE_VALUE_FUNC(uint16_t, ft_sensor_query_cols);
+FAKE_VALUE_FUNC(int, ft_sensor_acquire_image_with_mode, uint8_t *, size_t, int);
+FAKE_VALUE_FUNC(int, ft_sensor_init, sensor_param_t);
+FAKE_VALUE_FUNC(uint16_t, ft_sensor_query_chipid);
+FAKE_VALUE_FUNC(int, ft_sensor_set_mode, int);
+FAKE_VALUE_FUNC(int, ft_sensor_query_finger_status_simple);
 
 struct ft98xx_fixture {
 	const struct device *dev;
 	const struct emul *target;
 };
+
+static void ft98xx_set_irq_pin(const struct device *dev, int val)
+{
+	const struct ft98xx_cfg *cfg = dev->config;
+	gpio_emul_input_set(cfg->interrupt.port, cfg->interrupt.pin, val);
+}
 
 static void *ft98xx_setup(void)
 {
@@ -39,6 +55,40 @@ static void *ft98xx_setup(void)
 	zassert_not_null(fixture.dev);
 	zassert_not_null(fixture.target);
 	return &fixture;
+}
+
+static void ft98xx_before(void *fixture)
+{
+	struct ft98xx_fixture *f = fixture;
+
+	RESET_FAKE(ft_sensor_query_rows);
+	RESET_FAKE(ft_sensor_query_cols);
+	RESET_FAKE(ft_sensor_acquire_image_with_mode);
+	RESET_FAKE(ft_sensor_init);
+	RESET_FAKE(ft_sensor_query_chipid);
+	RESET_FAKE(ft_sensor_set_mode);
+	RESET_FAKE(ft_sensor_query_finger_status_simple);
+
+	ft_sensor_query_cols_fake.return_val =
+		FINGERPRINT_SENSOR_RES_X(0, DT_NODELABEL(ft98xx));
+	ft_sensor_query_rows_fake.return_val =
+		FINGERPRINT_SENSOR_RES_Y(0, DT_NODELABEL(ft98xx));
+
+	ft_sensor_init_fake.return_val = 0;
+	ft_sensor_query_chipid_fake.return_val = FT98XX_CHIP_ID;
+	ft_sensor_set_mode_fake.return_val = 0;
+	ft_sensor_acquire_image_with_mode_fake.return_val = 0;
+
+	/* Set GPIO IRQ pin high so pulse_hw_reset passes */
+	ft98xx_set_irq_pin(f->dev, 1);
+}
+
+static void ft98xx_after(void *fixture)
+{
+	struct ft98xx_fixture *f = fixture;
+
+	/* Reset IRQ pin back to low to prevent state leakage across tests. */
+	ft98xx_set_irq_pin(f->dev, 0);
 }
 
 #define FT98XX_IMAGE_FRAME_PARAM_INITIALIZER(idx, node_id)                  \
@@ -59,7 +109,7 @@ static const struct fingerprint_image_frame_params
 		NUM_IMAGE_CAPTURE_TYPES, FT98XX_IMAGE_FRAME_PARAM_INITIALIZER,
 		(, ), DT_NODELABEL(ft98xx)) };
 
-ZTEST_SUITE(ft98xx, NULL, ft98xx_setup, NULL, NULL, NULL);
+ZTEST_SUITE(ft98xx, NULL, ft98xx_setup, ft98xx_before, ft98xx_after, NULL);
 
 ZTEST_F(ft98xx, test_init_success)
 {
@@ -114,18 +164,54 @@ ZTEST_F(ft98xx, test_maintenance)
 		      0);
 }
 
-ZTEST_F(ft98xx, test_finger_status_not_supported)
+ZTEST_F(ft98xx, test_finger_status_present)
 {
-	zassert_equal(fingerprint_finger_status(fixture->dev), -ENOTSUP);
+	ft_sensor_query_finger_status_simple_fake.return_val = 1;
+	zassert_equal(fingerprint_finger_status(fixture->dev),
+		      FINGERPRINT_FINGER_STATE_PRESENT);
 }
 
-ZTEST_F(ft98xx, test_acquire_image_not_supported)
+ZTEST_F(ft98xx, test_finger_status_none)
+{
+	ft_sensor_query_finger_status_simple_fake.return_val = 0;
+	zassert_equal(fingerprint_finger_status(fixture->dev),
+		      FINGERPRINT_FINGER_STATE_NONE);
+}
+
+ZTEST_F(ft98xx, test_acquire_image_success)
 {
 	uint8_t buffer[FP_SENSOR_IMAGE_SIZE];
 
-	zassert_equal(fingerprint_acquire_image(fixture->dev, 0, buffer,
-						sizeof(buffer)),
-		      -ENOTSUP);
+	ft_sensor_acquire_image_with_mode_fake.return_val = 0;
+
+	zassert_ok(fingerprint_acquire_image(
+		fixture->dev, FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT, buffer,
+		sizeof(buffer)));
+	zassert_equal(ft_sensor_acquire_image_with_mode_fake.call_count, 1);
+}
+
+/* TODO(b/542995373): Unexpected mapping error in ft98xx_acquire_image. */
+ZTEST_F(ft98xx, test_acquire_image_error)
+{
+	uint8_t buffer[FP_SENSOR_IMAGE_SIZE];
+
+	ft_sensor_acquire_image_with_mode_fake.return_val = -EIO;
+
+	zassert_equal(fingerprint_acquire_image(
+			      fixture->dev,
+			      FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT, buffer,
+			      sizeof(buffer)),
+		      -EINVAL);
+}
+
+ZTEST_F(ft98xx, test_acquire_image_invalid_type)
+{
+	uint8_t buffer[FP_SENSOR_IMAGE_SIZE];
+
+	zassert_equal(fingerprint_acquire_image(fixture->dev,
+						FINGERPRINT_CAPTURE_TYPE_MAX,
+						buffer, sizeof(buffer)),
+		      -EINVAL);
 }
 
 ZTEST_F(ft98xx, test_acquire_image_small_buffer_size)
