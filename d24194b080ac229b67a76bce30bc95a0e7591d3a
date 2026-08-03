@@ -16,6 +16,24 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "d24194b080ac229b67a76bce30bc95a0e7591d3a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4d6af55_bef4ace5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T18:20:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/1c9bebc9-2866-469c-9337-40c574e9317c)]\n\n### Review Summary\n\n**Functionality**:\n- The CL successfully introduces an idempotency check for `FP_CONTEXT_GET_RESULT` when a user ID is already set. This makes the code robust against AP IPC retries without compromising the state machine.\n- Returning `EC_RES_SUCCESS` early upon a matching user ID correctly bypasses redundant operations.\n\n**Security**:\n- The changes successfully enforce security invariants by preventing the user ID from being mutated out-of-band once it is set. This securely binds the active user ID to the loaded template set mid-session.\n- Using `safe_memcmp` for comparing user IDs is a strong choice as it provides constant-time comparison, effectively mitigating timing side-channel attacks during the idempotency check.\n\n**Style \u0026 Readability**:\n- The implementation is clear, and the comments added around the idempotency check accurately describe its purpose and security necessity.\n- Removing the unnecessary dependencies on `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` in tests has simplified the test structure and improved its readability.\n\n**Testing**:\n- Test coverage appropriately verifies the mid-session context mutation lock-out via `test_fp_context_get_result_blocks_swap`. \n- The new `test_fp_context_get_result_allows_idempotent_retry` correctly verifies that the AP can safely retry `FP_CONTEXT_GET_RESULT` with an identical user ID.",
+      "isAi": true,
+      "revId": "d24194b080ac229b67a76bce30bc95a0e7591d3a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
