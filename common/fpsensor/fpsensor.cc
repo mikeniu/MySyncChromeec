@@ -992,6 +992,15 @@ fp_command_template_v0(struct ec_host_cmd_handler_args *args)
 	uint32_t offset = params->offset;
 	uint16_t idx = global_context.templ_valid;
 
+	/*
+	 * When fingerprint auth is enabled, legacy unauthenticated (un-MAC'ed)
+	 * template modification paths must be disabled. Reject v0 commits
+	 * to prevent arbitrary template injection; high-security contexts
+	 * must route through the v1 secure channel.
+	 */
+	if (fingerprint_auth_enabled())
+		return EC_HOST_CMD_ACCESS_DENIED;
+
 	/* Can we store one more template ? */
 	if (idx >= FP_MAX_FINGER_COUNT)
 		return EC_HOST_CMD_OVERFLOW;
