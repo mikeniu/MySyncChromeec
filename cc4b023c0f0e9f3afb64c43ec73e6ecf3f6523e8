@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f7799d9_d52a0023",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T18:37:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/837da767-4d52-477e-8c6b-fd9c39673fc6)]\n\n**Review Summary**\n* **Functionality:** The patch correctly blocks legacy v0 template commits when fingerprint authentication is enabled by returning `EC_RES_ACCESS_DENIED`. This successfully forces the use of the authenticated v1 channel.\n* **Security:** This introduces a solid security invariant that prevents arbitrary template injection via unauthenticated paths when the device is in a secure state.\n* **Style:** The code style is clean, and the inline comment clearly explains the security rationale.\n* **Testing \u0026 Test Coverage:** While you correctly added a new Zephyr test (`test_fp_template_v0_disabled_under_auth`) to verify this blocking behavior, modifying the expected results of the existing tests in `fpsensor_auth_commands.cc` to `EC_RES_ACCESS_DENIED` inadvertently breaks their original intent. Those tests are now short-circuiting at the new check and no longer verifying the deeper validation logic (like v3 format rejection and trivial salt detection). See inline comments for details on how to fix this by migrating those tests to v1.\n* **CL Size \u0026 Scope:** The CL is appropriately sized and focuses tightly on a single security enhancement.\n* **Conclusion:** The core functional and security changes are excellent, but the test coverage regression needs to be addressed before this can be approved.",
+      "isAi": true,
+      "revId": "cc4b023c0f0e9f3afb64c43ec73e6ecf3f6523e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1eab046_b13e1553",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 803,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T18:37:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] By changing the expected result of this command from `EC_RES_SUCCESS` to `EC_RES_ACCESS_DENIED`, this test now short-circuits at the new `fingerprint_auth_enabled()` check in `fp_command_template_v0()`. If the goal of this test is to verify successful decryption and subsequent state changes under auth, it should be migrated to use `EC_CMD_FP_TEMPLATE` version 1 rather than just asserting that the legacy v0 path is blocked (which is already covered by your new Zephyr test).",
+      "isAi": true,
+      "revId": "cc4b023c0f0e9f3afb64c43ec73e6ecf3f6523e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "122c9b99_4c65535f",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 894,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T18:37:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `EC_CMD_FP_TEMPLATE` version 0 now fails immediately with `ACCESS_DENIED` under auth, this test no longer verifies its original intent: that the legacy v3 template format is rejected during validation in `fp_commit_template`. To maintain coverage of the v3 format rejection, consider updating this test to use the v1 path, or disable auth during this test so it can reach the format validation logic.",
+      "isAi": true,
+      "revId": "cc4b023c0f0e9f3afb64c43ec73e6ecf3f6523e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed7c2d17_0e0c5656",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 990,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T18:37:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Similar to the v3 test, this test no longer verifies that a trivial positive match salt is detected as an error, because the v0 command now fails earlier with `ACCESS_DENIED`. Please consider migrating this test to use the v1 template command to ensure the trivial salt check remains covered under fingerprint auth.",
+      "isAi": true,
+      "revId": "cc4b023c0f0e9f3afb64c43ec73e6ecf3f6523e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
