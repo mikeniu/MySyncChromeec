@@ -61,46 +61,26 @@
 
 	fan_steps: fan-step {
 		compatible = "cros-ec,fan-steps";
-		status = "disabled";
+
 		level_0 {
-			temp-on = <40 39 39 39 39>;
-			temp-off = <99 99 99 99 99>;
-			rpm-target = <0>;
+			temp-on = <40>;
+			temp-off = <99>;
+			rpm-target = <0 0>;
 		};
 		level_1 {
-			temp-on = <44 43 43 43 43>;
-			temp-off = <37 36 36 36 36>;
-			rpm-target = <2100>;
+			temp-on = <44>;
+			temp-off = <37>;
+			rpm-target = <2100 2100>;
 		};
 		level_2 {
-			temp-on = <48 47 47 47 47>;
+			temp-on = <48>;
 			temp-off = <41 40 40 40 40>;
-			rpm-target = <2500>;
+			rpm-target = <3500 3500>;
 		};
 		level_3 {
-			temp-on = <51 50 50 50 50>;
-			temp-off = <46 45 45 45 45>;
-			rpm-target = <2900>;
-		};
-		level_4 {
-			temp-on = <53 52 52 52 52>;
-			temp-off = <49 48 48 48 48>;
-			rpm-target = <3200>;
-		};
-		level_5 {
-			temp-on = <56 55 55 55 55>;
-			temp-off = <51 50 50 50 50>;
-			rpm-target = <3500>;
-		};
-		level_6 {
-			temp-on = <63 62 62 62 62>;
-			temp-off = <54 53 53 53 53>;
-			rpm-target = <3750>;
-		};
-		level_7 {
 			temp-on = <99 99 99 99 99>;
 			temp-off = <61 60 60 60 60>;
-			rpm-target = <4200>;
+			rpm-target = <4200 4200>;
 		};
 	};
 };

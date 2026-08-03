@@ -17,7 +17,7 @@
 		};
 		fan_1 {
 			pwms = <&pwm3 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
-			tach = <&tach0>; // rts5912.dtsi lack of tach1, so use tach0 as a placeholder
+			tach = <&tach1>;
 			rpm-min = <960>;
 			rpm-start = <1200>;
 			rpm-max = <4800>;
@@ -31,6 +31,13 @@
 &tach0 {
 	status = "okay";
 	pinctrl-0 = <&tacho0_gpio052>;
+	pinctrl-names = "default";
+	pulses-per-round = <2>;
+};
+
+&tach1 {
+	status = "okay";
+	pinctrl-0 = <&tacho1_gpio053>;
 	pinctrl-names = "default";
 	pulses-per-round = <2>;
 };
