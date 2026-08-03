@@ -137,6 +137,11 @@ static int ft98xx_enroll_step(const struct fingerprint_algorithm *const alg,
 		return -EINVAL;
 	}
 
+	if (image == NULL) {
+		LOG_ERR("image pointer cannot be NULL");
+		return -EINVAL;
+	}
+
 	if ((!IS_ENABLED(CONFIG_HAVE_FT_LOCKER_PRIVATE_ALGORITHM)) ||
 	    (data->feature_buf == NULL)) {
 		return -ENOTSUP;
@@ -197,6 +202,27 @@ static int ft98xx_match(const struct fingerprint_algorithm *const alg,
 	int32_t feature_size = 0;
 	uint8_t update_flag = 0;
 	struct ft_libfp_data *data = (struct ft_libfp_data *)alg->data;
+
+	if (image == NULL) {
+		LOG_ERR("image pointer cannot be NULL");
+		return -EINVAL;
+	}
+
+	if (match_index == NULL) {
+		LOG_ERR("match_index pointer cannot be NULL");
+		return -EINVAL;
+	}
+
+	if (template_update && update_bitmap == NULL) {
+		LOG_ERR("update_bitmap pointer cannot be NULL "
+			"when template_update is requested");
+		return -EINVAL;
+	}
+
+	if (templ == NULL && templ_count > 0) {
+		LOG_ERR("templ pointer cannot be NULL when templ_count > 0");
+		return -EINVAL;
+	}
 
 	if ((!IS_ENABLED(CONFIG_HAVE_FT_LOCKER_PRIVATE_ALGORITHM)) ||
 	    (data->feature_buf == NULL)) {
