@@ -298,6 +298,18 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
 	panic_data_finalize(pdata);
 }
 
+uint32_t panic_get_reason_reg(const struct panic_data *pdata)
+{
+	return pdata ? PANIC_REG_REASON(pdata) : 0;
+}
+
+void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason)
+{
+	if (pdata) {
+		PANIC_REG_REASON(pdata) = reason;
+	}
+}
+
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 {
 	struct panic_data *const pdata = panic_get_data();
@@ -315,9 +327,8 @@ test_export_static int panic_data_init(void)
 {
 	bool is_panic_new;
 	bool is_watchdog_reset;
-	uint32_t reason;
-	uint32_t info;
-	uint8_t exception;
+	struct panic_data *pdata = panic_get_data();
+	uint32_t reason = panic_get_reason_reg(pdata);
 
 	is_watchdog_reset =
 		!!(system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG);
@@ -327,7 +338,6 @@ test_export_static int panic_data_init(void)
 	}
 
 	is_panic_new = panic_data_is_new();
-	panic_get_reason(&reason, &info, &exception);
 
 	if (is_panic_new) {
 		LOG_WRN("New Panic Detected: %s",
@@ -356,20 +366,26 @@ test_export_static int panic_data_init(void)
 		 * the reason to a regular watchdog reason while preserving
 		 * the info and exception from the watchdog warning.
 		 */
-		if (reason == PANIC_SW_WATCHDOG_WARN) {
+		if (is_panic_new && reason == PANIC_SW_WATCHDOG_WARN) {
 			LOG_INF("Promoting watchdog warning to watchdog panic");
-			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
+			panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG);
+			panic_data_finalize(pdata);
 		} else if ((reason != PANIC_SW_WATCHDOG &&
 			    reason != PANIC_SW_WATCHDOG_HARD) ||
-			   !panic_data_is_new()) {
+			   !is_panic_new) {
 			/* The watchdog panic info may have already been
 			 * initialized by the watchdog handler, so only set it
 			 * here if the panic reason is not a watchdog or the
 			 * panic info has already been read, i.e. an old
-			 * watchdog panic.
+			 * watchdog panic. Both RO and RW flags are unset
+			 * because source image is not known.
 			 */
 			LOG_INF("Setting hard watchdog panic");
-			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
+			pdata = panic_data_reset(NULL);
+			pdata->flags &= ~(PANIC_DATA_FLAG_RW_IMAGE |
+					  PANIC_DATA_FLAG_RO_IMAGE);
+			panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_HARD);
+			panic_data_finalize(pdata);
 		}
 	}
 
