@@ -59,6 +59,9 @@ config I2C_ALLOW_NO_STOP_TRANSACTIONS
 config COMMON_LIBC_MALLOC
 	default n
 
+config KERNEL_MEM_POOL
+	default n if !POSIX_THREADS && !USB_DEVICE_STACK_NEXT
+
 config LTO
 	default y if !X86 && !SOC_POSIX
 
