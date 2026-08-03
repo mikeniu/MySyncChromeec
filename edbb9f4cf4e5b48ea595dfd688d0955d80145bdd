@@ -16,6 +16,24 @@
       "message": "Nit: You could just make this a single function that takes a `bool enable` argument.",
       "revId": "edbb9f4cf4e5b48ea595dfd688d0955d80145bdd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2630a60e_565d6385",
+        "filename": "zephyr/shim/src/espi.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 811,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-08-03T06:52:53Z",
+      "side": 1,
+      "message": "Intentionally implemented two separate API\u0027s otherwise enable\u003dtrue/enable\u003dfalse should be passed whenever API is invoked. Hope it is fine.",
+      "parentUuid": "058a01c4_92c62e86",
+      "revId": "edbb9f4cf4e5b48ea595dfd688d0955d80145bdd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

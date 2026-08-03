@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "39983183_2adcc5c3",
+        "filename": "common/system.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1140,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-08-03T06:52:53Z",
+      "side": 1,
+      "message": "sorry the one implemented at line 1988 is for non-CONFIG_EC_HOST_CMD and this one here is for CONFIG_EC_HOST_CMD defined. This is needed.",
+      "parentUuid": "18616b87_ce6afaf2",
+      "revId": "03cd95b2ff72dab7cb70af1bedac86452785fd18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "becda5af_d9040ebd",
         "filename": "common/system.c",
         "patchSetId": 12
@@ -31,6 +49,24 @@
       "writtenOn": "2026-07-31T16:34:12Z",
       "side": 1,
       "message": "Use `{}`",
+      "revId": "03cd95b2ff72dab7cb70af1bedac86452785fd18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65ef4bb5_bfe06f7e",
+        "filename": "common/system.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1245,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-08-03T06:52:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "becda5af_d9040ebd",
       "revId": "03cd95b2ff72dab7cb70af1bedac86452785fd18",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -48,6 +84,30 @@
       "writtenOn": "2026-07-31T17:05:56Z",
       "side": 1,
       "message": "For `CONFIG_EC_HOST_CMD` the return here will send the response back to the host as it only allows a 1 to 1 request/response. We should be able to `disable_host_interface_interrupts` before we schedule the deferred reboot. So we don\u0027t need duplicate handling in `handle_pending_reboot`.",
+      "range": {
+        "startLine": 1972,
+        "startChar": 0,
+        "endLine": 1977,
+        "endChar": 3
+      },
+      "revId": "03cd95b2ff72dab7cb70af1bedac86452785fd18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec05249f_3092346a",
+        "filename": "common/system.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1977,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-08-03T06:52:53Z",
+      "side": 1,
+      "message": "CONFIG_EC_HOST_CMD is enabled, it is possible to receive EC_REBOOT_CANCEL within 50msec window and the firmware would cancel the pending reboot. Hence disabling the interrupts would block processing of the EC_REBOOT_CANCEL.\n\nWhen !CONFIG_EC_HOST_CMD, this case host_command_reboot() would process the EC_REBOOT immediately by invoking handle_pending_reboot() hence processing EC_REBOOT_CANCEL has not impact.",
+      "parentUuid": "b43f4415_74794730",
       "range": {
         "startLine": 1972,
         "startChar": 0,

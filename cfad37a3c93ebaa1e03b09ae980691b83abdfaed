@@ -69,6 +69,24 @@
       "parentUuid": "ef742a41_bbd584e8",
       "revId": "cfad37a3c93ebaa1e03b09ae980691b83abdfaed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "972d712c_3e35b9d0",
+        "filename": "common/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 1177,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-08-03T06:52:53Z",
+      "side": 1,
+      "message": "Thanks, i removed the #ifdef CONFIG_EC_HOST_CMD means as it would be no-op for legacy path.\n\nMaking it unconditional would impact other cases — CANCEL, NO_OP, DISABLE_JUMP — so prefer to keep it specific to SYSJUMP. Also, unconditionally re-enabling IRQs at the end of handle_pending_reboot() could cause issues if another thread intentionally disabled them.",
+      "parentUuid": "a2fb269e_7897b11e",
+      "revId": "cfad37a3c93ebaa1e03b09ae980691b83abdfaed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
