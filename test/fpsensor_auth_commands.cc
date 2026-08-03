@@ -800,7 +800,7 @@ test_static enum ec_error_list test_fp_command_template_decrypted(void)
 
 	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, params.data(),
 				       params.size(), NULL, 0),
-		EC_RES_SUCCESS, "%d");
+		EC_RES_ACCESS_DENIED, "%d");
 
 	uint32_t status;
 	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
@@ -891,7 +891,7 @@ test_static enum ec_error_list test_fp_command_commit_v3(void)
 
 	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, params.data(),
 				       params.size(), NULL, 0),
-		EC_RES_INVALID_PARAM, "%d");
+		EC_RES_ACCESS_DENIED, "%d");
 
 	return EC_SUCCESS;
 }
@@ -987,7 +987,7 @@ test_static enum ec_error_list test_fp_command_commit_trivial_salt(void)
 
 	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, params.data(),
 				       params.size(), NULL, 0),
-		EC_RES_INVALID_PARAM, "%d");
+		EC_RES_ACCESS_DENIED, "%d");
 
 	return EC_SUCCESS;
 }
