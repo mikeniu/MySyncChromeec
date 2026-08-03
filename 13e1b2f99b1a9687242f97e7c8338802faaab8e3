@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a5cb989_ac640536",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T16:08:40Z",
+      "side": 1,
+      "message": "Done. Created an instance-isolated temporary directory using tempfile.TemporaryDirectory() in Renode.__init__ and placed the UART PTY inside it. Added safe teardown in Renode.cleanup().",
+      "parentUuid": "c06d22ce_ad751063",
+      "range": {
+        "startLine": 418,
+        "startChar": 4,
+        "endLine": 420,
+        "endChar": 9
+      },
+      "revId": "13e1b2f99b1a9687242f97e7c8338802faaab8e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8353b8a_db92d4c5",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-07-30T23:40:29Z",
       "side": 1,
       "message": "- Issue: In build_zephyr, test_conf is created inside a with open(test_conf, \"w\") block. If an exception occurs inside build_zephyr after opening the file, the file will not be cleaned up because the try...finally block that unlinks test_conf is in _build_test, which only extracts test_conf from the returned command array.\n\n- Remediation: Move the lifecycle management (creation and cleanup) of test_conf into the same context or wrap the whole build step cleanly.",
+      "range": {
+        "startLine": 1558,
+        "startChar": 0,
+        "endLine": 1560,
+        "endChar": 5
+      },
+      "revId": "13e1b2f99b1a9687242f97e7c8338802faaab8e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30ceca9a_7a2a407c",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1560,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T16:08:40Z",
+      "side": 1,
+      "message": "Done. Updated build_zephyr() to use tempfile.NamedTemporaryFile(prefix\u003d\"test-\", suffix\u003d\".conf\", delete\u003dFalse) and wrapped file creation in a try...except block that unlinks test_conf before re-raising on error. Also updated build() to use os.path.lexists() in its finally block.",
+      "parentUuid": "c8353b8a_db92d4c5",
       "range": {
         "startLine": 1558,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2e5ea8c_3936d397",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1866,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T16:08:40Z",
+      "side": 1,
+      "message": "Done. Removed the global ZEPHYR_TWISTER_BUILD_DIR constant and updated get_zephyr_image_path() to raise FileNotFoundError explicitly if the board twister build directory is missing.",
+      "parentUuid": "2a5ea707_06c38b10",
+      "range": {
+        "startLine": 1858,
+        "startChar": 3,
+        "endLine": 1866,
+        "endChar": 40
+      },
+      "revId": "13e1b2f99b1a9687242f97e7c8338802faaab8e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4ae7b77_8a5ab767",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e065b16_54c5cdf5",
+        "filename": "util/renode/firmware_builder.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T16:08:40Z",
+      "side": 1,
+      "message": "Done. Capped max_workers using min(len(boards), os.cpu_count() or 4) to prevent CPU and memory saturation.",
+      "parentUuid": "f4ae7b77_8a5ab767",
+      "range": {
+        "startLine": 121,
+        "startChar": 2,
+        "endLine": 122,
+        "endChar": 39
+      },
+      "revId": "13e1b2f99b1a9687242f97e7c8338802faaab8e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f9b7a87_1c3d651c",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-07-30T23:40:29Z",
       "side": 1,
       "message": "- Issue: Inside futures.as_completed(future_to_board), future.result() is called directly without catching exceptions (e.g., KeyboardInterrupt or unexpected Python exceptions raised inside _run_board).\n\n- Remediation: Wrap future.result() in a try...except block to cleanly handle thread-level exceptions and report failures without breaking the entire runner execution.",
+      "range": {
+        "startLine": 127,
+        "startChar": 1,
+        "endLine": 131,
+        "endChar": 40
+      },
+      "revId": "13e1b2f99b1a9687242f97e7c8338802faaab8e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e3321d4_c4c16e65",
+        "filename": "util/renode/firmware_builder.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T16:08:40Z",
+      "side": 1,
+      "message": "Done. Wrapped future.result() in a try...except (Exception, KeyboardInterrupt) block to log failures and mark success \u003d False without breaking the runner loop.",
+      "parentUuid": "3f9b7a87_1c3d651c",
       "range": {
         "startLine": 127,
         "startChar": 1,
