@@ -45,7 +45,14 @@ if(DEFINED COREBOOT_SDK_ROOT_${TARGET_ARCH})
   set(COREBOOT_SDK_ROOT "${COREBOOT_SDK_ROOT_${TARGET_ARCH}}")
   set(COREBOOT_SDK_ROOT_LIBSTDCXX "${COREBOOT_SDK_ROOT_libstdcxx_${TARGET_ARCH}}")
   set(COREBOOT_SDK_ROOT_PICOLIBC "${COREBOOT_SDK_ROOT_picolibc_${TARGET_ARCH}}")
+elseif(DEFINED ENV{COREBOOT_SDK_ROOT_${TARGET_ARCH}})
+  set(COREBOOT_SDK_ROOT "$ENV{COREBOOT_SDK_ROOT_${TARGET_ARCH}}")
+  set(COREBOOT_SDK_ROOT_LIBSTDCXX "$ENV{COREBOOT_SDK_ROOT_libstdcxx_${TARGET_ARCH}}")
+  set(COREBOOT_SDK_ROOT_PICOLIBC "$ENV{COREBOOT_SDK_ROOT_picolibc_${TARGET_ARCH}}")
 else()
+  file(GLOB SDK_DIRS LIST_DIRECTORIES true "/home/robbarnes/.cache/coreboot-sdk/${CROSS_COMPILE_TARGET}/[0-9a-f]*" "/root/.cache/coreboot-sdk/${CROSS_COMPILE_TARGET}/[0-9a-f]*" "$ENV{HOME}/.cache/coreboot-sdk/${CROSS_COMPILE_TARGET}/[0-9a-f]*")
+  list(SORT SDK_DIRS)
+  list(GET SDK_DIRS -1 COREBOOT_SDK_ROOT)
   set(COREBOOT_SDK_ROOT_LIBSTDCXX "${COREBOOT_SDK_ROOT}")
   set(COREBOOT_SDK_ROOT_PICOLIBC "${COREBOOT_SDK_ROOT}")
 endif()
@@ -65,7 +72,9 @@ set(CMAKE_GCOV       "${TOOLCHAIN_HOME}/${CROSS_COMPILE}gcov")
 
 # Compiler version isn't set yet, infer it from the directory name
 file(GLOB GCC_DIR LIST_DIRECTORIES true "${COREBOOT_SDK_ROOT}/lib/gcc/${CROSS_COMPILE_TARGET}/[0-9][0-9].[0-9].[0-9]")
-get_filename_component(GCC_VERSION ${GCC_DIR} NAME)
+list(SORT GCC_DIR)
+list(GET GCC_DIR -1 GCC_DIR_SINGLE)
+get_filename_component(GCC_VERSION "${GCC_DIR_SINGLE}" NAME)
 
 # Older coreboot-sdk toolchains lacked multilib support for libstd++ and libgcc.
 # Fallback to just using the libraries under thumb/ if the multilib layout
