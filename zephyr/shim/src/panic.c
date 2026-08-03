@@ -146,29 +146,59 @@ void panic_data_print(const struct panic_data *pdata)
 #endif
 }
 
-#if !defined(CONFIG_ZTEST_FATAL_HOOK)
-static void copy_esf_to_panic_data(const struct arch_esf *esf,
-				   struct panic_data *pdata)
+/**
+ * Reset/prepare a panic_data structure for writing.
+ *
+ * Sets struct size/version, architecture, and default image flags
+ * (PANIC_DATA_FLAG_RW_IMAGE or PANIC_DATA_FLAG_RO_IMAGE).
+ * Note: magic is NOT set here; call panic_data_finalize() when writing
+ * completes.
+ */
+test_export_static struct panic_data *panic_data_reset(struct panic_data *pdata)
 {
+	if (!pdata) {
+		pdata = get_panic_data_write();
+	}
+
 	memset(pdata, 0, CONFIG_PANIC_DATA_SIZE);
-	pdata->arch = PANIC_ARCH;
+	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
 	pdata->struct_version = 2;
+	pdata->arch = PANIC_ARCH;
 	pdata->flags = IS_ENABLED(CONFIG_CROS_EC_RW) ?
 			       PANIC_DATA_FLAG_RW_IMAGE :
 			       PANIC_DATA_FLAG_RO_IMAGE;
-	pdata->flags |= (PANIC_ARCH == PANIC_ARCH_CORTEX_M) ?
-				PANIC_DATA_FLAG_FRAME_VALID :
-				0;
-	pdata->reserved = 0;
-	pdata->struct_size = sizeof(*pdata);
-	pdata->magic = PANIC_DATA_MAGIC;
+	/* Note: magic remains 0 (uncommitted) until panic_data_finalize() */
+
+	return pdata;
+}
+
+/**
+ * Finalize panic data by setting the valid magic number and flushing to RAM.
+ */
+test_export_static void panic_data_finalize(struct panic_data *pdata)
+{
+	if (pdata) {
+		pdata->magic = PANIC_DATA_MAGIC;
+		sys_cache_data_flush_range((void *)pdata, pdata->struct_size);
+	}
+}
+
+test_export_static void copy_esf_to_panic_data(const struct arch_esf *esf,
+					       struct panic_data *pdata)
+{
+	pdata = panic_data_reset(pdata);
+
+	if (PANIC_ARCH == PANIC_ARCH_CORTEX_M) {
+		pdata->flags |= PANIC_DATA_FLAG_FRAME_VALID;
+	}
 
 	PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
 
-	/* Flush the panic data to RAM before coming reboot. */
-	sys_cache_data_flush_range(pdata, sizeof(*pdata));
+	/* Finalize and flush the panic data to RAM before reboot. */
+	panic_data_finalize(pdata);
 }
 
+#if !defined(CONFIG_ZTEST_FATAL_HOOK)
 void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 {
 	struct panic_data *pdata = get_panic_data_write();
@@ -257,25 +287,15 @@ __override void assert_post_action(const char *path, unsigned int line)
 
 void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
 {
-	struct panic_data *const pdata = get_panic_data_write();
-
-	/* Setup panic data structure */
-	memset(pdata, 0, CONFIG_PANIC_DATA_SIZE);
-	pdata->magic = PANIC_DATA_MAGIC;
-	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
-	pdata->struct_version = 2;
-	pdata->arch = PANIC_ARCH;
-	pdata->flags = IS_ENABLED(CONFIG_CROS_EC_RW) ?
-			       PANIC_DATA_FLAG_RW_IMAGE :
-			       PANIC_DATA_FLAG_RO_IMAGE;
+	struct panic_data *const pdata = panic_data_reset(NULL);
 
 	/* Log panic cause */
 	PANIC_REG_EXCEPTION(pdata) = exception;
 	PANIC_REG_REASON(pdata) = reason;
 	PANIC_REG_INFO(pdata) = info;
 
-	/* Flush the panic data to RAM before potential reboot. */
-	sys_cache_data_flush_range(pdata, sizeof(*pdata));
+	/* Finalize and flush the panic data to RAM before potential reboot. */
+	panic_data_finalize(pdata);
 }
 
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
