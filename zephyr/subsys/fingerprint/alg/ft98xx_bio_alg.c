@@ -132,6 +132,11 @@ static int ft98xx_enroll_step(const struct fingerprint_algorithm *const alg,
 	int32_t feature_size = 0;
 	uint8_t enroll_index = 0;
 
+	if (completion == NULL) {
+		LOG_ERR("completion pointer cannot be NULL");
+		return -EINVAL;
+	}
+
 	if ((!IS_ENABLED(CONFIG_HAVE_FT_LOCKER_PRIVATE_ALGORITHM)) ||
 	    (data->feature_buf == NULL)) {
 		return -ENOTSUP;
