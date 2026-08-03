@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc215101_1b04395a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T20:53:11Z",
+      "side": 1,
+      "message": "Bypassing CQ because this is blocking CQ, this change is safe, and there\u0027s two independent issues blocking CQ.",
+      "revId": "883424321c97a0720ce6b1f61fd04a4aeac33d1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
