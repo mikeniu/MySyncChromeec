@@ -78,7 +78,66 @@ static enum ec_status host_command_apreset(struct host_cmd_handler_args *args)
 	return EC_RES_SUCCESS;
 }
 DECLARE_HOST_COMMAND(EC_CMD_AP_RESET, host_command_apreset, EC_VER_MASK(0));
+#endif
 
+<<<<<<< HEAD   (f50733f10634bbf1dd069eb9c4f97da195a7f35e i2c_passthru: Restrict the allowed commands for the battery)
+||||||| BASE   (c08685a8b56f6a85dd37bca2d92dbdb9326a6378 hostcmd: Add scheduled AP reset host command)
+static void ap_reset_deferred(void)
+{
+	chipset_reset(CHIPSET_RESET_HOST_CMD);
+}
+DECLARE_DEFERRED(ap_reset_deferred);
+
+static enum ec_status
+host_command_apreset_scheduled(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_ap_reset_scheduled *p = args->params;
+
+	if (p->delay_ms == 0) {
+		/* Reset immediately */
+		chipset_reset(CHIPSET_RESET_HOST_CMD);
+		return EC_RES_SUCCESS;
+	}
+
+	/* Schedule reset */
+	if (hook_call_deferred(&ap_reset_deferred_data, p->delay_ms * MSEC) !=
+	    EC_SUCCESS)
+		return EC_RES_ERROR;
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_AP_RESET_SCHEDULED, host_command_apreset_scheduled,
+		     EC_VER_MASK(0));
+
+=======
+#ifdef CONFIG_HOSTCMD_AP_RESET_SCHEDULED
+static void ap_reset_deferred(void)
+{
+	chipset_reset(CHIPSET_RESET_HOST_CMD);
+}
+DECLARE_DEFERRED(ap_reset_deferred);
+
+static enum ec_status
+host_command_apreset_scheduled(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_ap_reset_scheduled *p = args->params;
+
+	if (p->delay_ms == 0) {
+		/* Reset immediately */
+		chipset_reset(CHIPSET_RESET_HOST_CMD);
+		return EC_RES_SUCCESS;
+	}
+
+	/* Schedule reset */
+	if (hook_call_deferred(&ap_reset_deferred_data, p->delay_ms * MSEC) !=
+	    EC_SUCCESS)
+		return EC_RES_ERROR;
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_AP_RESET_SCHEDULED, host_command_apreset_scheduled,
+		     EC_VER_MASK(0));
+>>>>>>> CHANGE (5544926ad55158444b387e7031b424f4f7221abd hostcmd: Enable scheduled AP reset for Bluey)
 #endif
 
 __attribute__((weak)) int chipset_is_offmode_charging_wake(void)
