@@ -113,4 +113,6 @@ config CORSOLA_BOARD_CHIPSET_CUSTOM
 	  Enable corsola platform customized AP power callbacks.
 	default n
 
+rsource "../Kconfig.pre_zephyr"
+
 source "Kconfig.zephyr"

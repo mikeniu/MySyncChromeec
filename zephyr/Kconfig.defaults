@@ -64,6 +64,7 @@ configdefault I2C_ALLOW_NO_STOP_TRANSACTIONS
 configdefault COMMON_LIBC_MALLOC
 	default n
 
+
 configdefault LTO
 	default y if !X86 && !SOC_POSIX
 

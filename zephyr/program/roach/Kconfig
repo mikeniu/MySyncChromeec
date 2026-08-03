@@ -31,4 +31,6 @@ config BOARD_EIRTAE
 	  Build Google Eirtae board. Eirtae is a variant board of
 	  Roach devices.
 
+rsource "../Kconfig.pre_zephyr"
+
 source "Kconfig.zephyr"

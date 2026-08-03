@@ -59,4 +59,6 @@ choice PLATFORM_EC_BATTERY_PRESENT_MODE
 	default PLATFORM_EC_BATTERY_PRESENT_NONE
 endchoice
 
+rsource "../Kconfig.pre_zephyr"
+
 source "Kconfig.zephyr"

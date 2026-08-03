@@ -82,4 +82,6 @@ module = Fatcat
 module-str = Fatcat board-specific code
 source "subsys/logging/Kconfig.template.log_config"
 
+rsource "../Kconfig.pre_zephyr"
+
 source "Kconfig.zephyr"

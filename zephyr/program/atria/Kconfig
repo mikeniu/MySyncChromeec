@@ -19,4 +19,6 @@ module = Atria
 module-str = Atria board-specific code
 source "subsys/logging/Kconfig.template.log_config"
 
+rsource "../Kconfig.pre_zephyr"
+
 source "Kconfig.zephyr"

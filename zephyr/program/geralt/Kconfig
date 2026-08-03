@@ -23,4 +23,6 @@ config BOARD_CIRI
 
 endchoice
 
+rsource "../Kconfig.pre_zephyr"
+
 source "Kconfig.zephyr"

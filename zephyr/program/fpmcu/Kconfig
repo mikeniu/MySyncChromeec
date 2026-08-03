@@ -140,4 +140,6 @@ config BOARD_FT9001
 	  Build the FPMCU board based on FT9001 chip.
 
 rsource "et171/Kconfig"
+rsource "../Kconfig.pre_zephyr"
+
 source "Kconfig.zephyr"

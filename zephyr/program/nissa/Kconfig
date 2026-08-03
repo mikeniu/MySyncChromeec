@@ -218,4 +218,6 @@ choice PLATFORM_EC_USBC_STACK
 	default PLATFORM_EC_USB_PD_CONTROLLER if BOARD_ORISA
 endchoice
 
+rsource "../Kconfig.pre_zephyr"
+
 source "Kconfig.zephyr"

@@ -74,4 +74,6 @@ choice PLATFORM_EC_USBC_STACK
 		if BOARD_MTLRVP_PD || BOARD_PTLRVP_COMMON
 endchoice
 
+rsource "../Kconfig.pre_zephyr"
+
 source "Kconfig.zephyr"

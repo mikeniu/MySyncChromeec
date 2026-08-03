@@ -1,0 +1,12 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Pre-Kconfig.zephyr default overrides.
+#
+# Symbols defined with an unconditional `default y` in upstream Zephyr must have
+# their default overrides declared before `source "Kconfig.zephyr"` so that the
+# override is evaluated before upstream defaults.
+
+config KERNEL_MEM_POOL
+	default n if !ZTEST && !POSIX_THREADS && !NET_BUF
