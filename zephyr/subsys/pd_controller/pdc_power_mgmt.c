@@ -34,7 +34,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/smf.h>
 #include <zephyr/sys/atomic.h>
-#include <zephyr/sys_clock.h>
+#include <zephyr/sys/clock.h>
 
 #ifdef CONFIG_ZTEST
 #include <zephyr/ztest.h>

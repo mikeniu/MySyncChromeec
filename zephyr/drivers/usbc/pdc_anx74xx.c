@@ -16,7 +16,7 @@
 #include <zephyr/smf.h>
 #include <zephyr/sys/atomic.h>
 #include <zephyr/sys/util.h>
-#include <zephyr/sys_clock.h>
+#include <zephyr/sys/clock.h>
 
 #include "usbc/utils.h"
 
@@ -34,12 +34,12 @@ LOG_MODULE_REGISTER(pdc_anx74, LOG_LEVEL_DBG);
 #define assert(expression) while(!(expression)) { \
     LOG_ERR("ASSERT: %s, %s, %d", #expression, __FILE__, __LINE__); \
     k_sleep(K_SECONDS(10)); \
-} 
+}
 #else
 // note!! TODO !! This version is for debug and not pushed to google source yet
 //#pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wunused-const-variable"
-#define ANX_DEBUG( ...) 
+#define ANX_DEBUG( ...)
 #define ANX_DEBUG_PRINT_HEAD
 #endif
 
@@ -130,8 +130,8 @@ LOG_MODULE_REGISTER(pdc_anx74, LOG_LEVEL_DBG);
 #define ANX_PDC_anx74xx_TOP_REG_FLASH_RAM_CTRL        0x05
 #define ANX_PDC_anx74xx_TOP_REG_FLASH_RAM_CTRL_RELOAD  BIT(1)
 
-#define ANX_PDC_anx74xx_TOP_REG_INTP_SOURCE          0x68   
-#define ANX_PDC_anx74xx_TOP_REG_INTP_SOURCE_UCSI                        BIT(7)    
+#define ANX_PDC_anx74xx_TOP_REG_INTP_SOURCE          0x68
+#define ANX_PDC_anx74xx_TOP_REG_INTP_SOURCE_UCSI                        BIT(7)
 #define ANX_PDC_anx74xx_TOP_REG_INTP_SOURCE_IDLE                        BIT(6)
 #define ANX_PDC_anx74xx_TOP_REG_INTP_SOURCE_PORT1_SYSTEM_STATUS         BIT(5)
 #define ANX_PDC_anx74xx_TOP_REG_INTP_SOURCE_PORT0_SYSTEM_STATUS         BIT(4)
@@ -149,8 +149,8 @@ LOG_MODULE_REGISTER(pdc_anx74, LOG_LEVEL_DBG);
 
 #define ANX_PDC_anx74xx_UCSI_CTRL_REG_UCSI_FLAG_P0             0x10
 #define ANX_PDC_anx74xx_UCSI_CTRL_REG_UCSI_FLAG_P1             0x11
-#define ANX_PDC_anx74xx_UCSI_CTRL_UCSI_CCI_EVT                  BIT(0)  
-#define ANX_PDC_anx74xx_UCSI_CTRL_UCSI_CCI_ALERT                BIT(1)  
+#define ANX_PDC_anx74xx_UCSI_CTRL_UCSI_CCI_EVT                  BIT(0)
+#define ANX_PDC_anx74xx_UCSI_CTRL_UCSI_CCI_ALERT                BIT(1)
 #define ANX_PDC_anx74xx_UCSI_CTRL_UCSI_FLAG_INIT_DONE           BIT(7)
 
 #define ANX_PDC_anx74xx_UCSI_CTRL_UCSI_OCM_DEBUG      0x12
@@ -179,7 +179,7 @@ LOG_MODULE_REGISTER(pdc_anx74, LOG_LEVEL_DBG);
 #define ANX_PDC_anx74xx_INFO_REG_FW_VERSION          0xF8
 #define ANX_PDC_anx74xx_INFO_REG_CSTM_VERSION        0xFB
 
-#define ANX_PDC_anx74xx_EMTB_REG_POLICY_CTRL       0xFC 
+#define ANX_PDC_anx74xx_EMTB_REG_POLICY_CTRL       0xFC
 
 #define ANX_PDC_anx74xx_PCH_REG_DATA_STATUS        0x5f
 
@@ -190,10 +190,10 @@ LOG_MODULE_REGISTER(pdc_anx74, LOG_LEVEL_DBG);
 #define ANX_PDC_anx74xx_EMTB_REG_POLICY_CTRL_SUPPORT_GOTO_MIN_POWER     BIT(4)
 #define ANX_PDC_anx74xx_EMTB_REG_POLICY_CTRL_TRY_SNK_EN                 BIT(3)
 #define ANX_PDC_anx74xx_EMTB_REG_POLICY_CTRL_TRY_SRC_EN                 BIT(2)
-#define ANX_PDC_anx74xx_EMTB_REG_POLICY_CTRL_VPRO_SUPPORT              	BIT(1)   
+#define ANX_PDC_anx74xx_EMTB_REG_POLICY_CTRL_VPRO_SUPPORT              	BIT(1)
 #define ANX_PDC_anx74xx_EMTB_REG_POLICY_CTRL_CC_SBU_SWAP              	BIT(0)
 
-#define ANX_PDC_anx74xx_ADDRESS_COUNT     8 
+#define ANX_PDC_anx74xx_ADDRESS_COUNT     8
 #define ANX_PDC_anx74xx_ADDRESS_MAP_COUNT 6
 #define ANX_PDC_anx74xx_ADDRESS_IND_TCPC         0
 #define ANX_PDC_anx74xx_ADDRESS_IND_TOP          1
@@ -212,12 +212,12 @@ const uint8_t ANX_PDC_anx74xx_ADDRESS_MAP[ANX_PDC_anx74xx_ADDRESS_MAP_COUNT][ANX
     // {0x10, 0x7e, 0x30, 0x32, 0x34, 0x58, 0x12, 0xc0 }, // 8bit display
     // {0x16, 0x6e, 0x36, 0x38, 0x3a, 0x56, 0x18, 0xc2 }, // 8bit display
     // {0x20, 0x64, 0x3c, 0x3e, 0x28, 0x54, 0x22, 0xc4 }, // 8bit display
-    {0x2c, 0x3f, 0x18, 0x19, 0x1a, 0x2c, 0x3d, 0x39 }, 
-    {0x2b, 0x37, 0x1b, 0x1c, 0x1d, 0x2b, 0x3c, 0x3b }, 
-    {0x2a, 0x32, 0x1e, 0x1f, 0x14, 0x2a, 0x34, 0x2e }, 
-    {0x08, 0x3f, 0x18, 0x19, 0x1a, 0x2c, 0x09, 0x60 }, 
-    {0x0b, 0x37, 0x1b, 0x1c, 0x1d, 0x2b, 0x0c, 0x61 }, 
-    {0x10, 0x32, 0x1e, 0x1f, 0x14, 0x2a, 0x11, 0x62 }, 
+    {0x2c, 0x3f, 0x18, 0x19, 0x1a, 0x2c, 0x3d, 0x39 },
+    {0x2b, 0x37, 0x1b, 0x1c, 0x1d, 0x2b, 0x3c, 0x3b },
+    {0x2a, 0x32, 0x1e, 0x1f, 0x14, 0x2a, 0x34, 0x2e },
+    {0x08, 0x3f, 0x18, 0x19, 0x1a, 0x2c, 0x09, 0x60 },
+    {0x0b, 0x37, 0x1b, 0x1c, 0x1d, 0x2b, 0x0c, 0x61 },
+    {0x10, 0x32, 0x1e, 0x1f, 0x14, 0x2a, 0x11, 0x62 },
 };
 
 /**
@@ -396,7 +396,7 @@ static int anx74xx_get_error_status(const struct device *dev,
 
 static int anx74xx_fill_ucsi_bp_st_write_cmd_with_callback(const struct device *dev,
     struct ucsi_control_t ucsi_ctrl,
-    uint8_t* msg_out, 
+    uint8_t* msg_out,
     uint8_t *user_buf,
     uint8_t user_buf_len,
     struct pdc_callback *callback);
@@ -640,7 +640,7 @@ static int anx74xx_ucsi_bypass_cmd_write(const struct device *dev)
     uint8_t addr = data->i2c_address_map[ANX_PDC_anx74xx_ADDRESS_IND_UCSI_MSG_OUT];
     uint8_t reg = (data->internal_ucsi_region_p1)?ANX_PDC_anx74xx_UCSI_MSG_OUT_REG_REGON1:ANX_PDC_anx74xx_UCSI_MSG_OUT_REG_REGON0;
 
-    ANX_DEBUG("Harvey%d: anx74xx_ucsi_bypass_cmd_write addr %x, cmd 0x%x, len %x, ds %02x %02x %02x %02x %02x %02x", cfg->connector_number, addr, 
+    ANX_DEBUG("Harvey%d: anx74xx_ucsi_bypass_cmd_write addr %x, cmd 0x%x, len %x, ds %02x %02x %02x %02x %02x %02x", cfg->connector_number, addr,
                     data->internal_ucsi_region.control.command,
                     data->internal_ucsi_region.control.data_length,
                     data->internal_ucsi_region.control.command_specific[0],
@@ -732,7 +732,7 @@ static int get_cci_status(const struct device *dev)
 //             return rv;
 //         }
 //         addr = data->i2c_address_map[ANX_PDC_anx74xx_ADDRESS_IND_TOP];
-//         uint8_t val=0x80; 
+//         uint8_t val=0x80;
 //         rv = anx74xx_i2c_write(dev,addr,ANX_PDC_anx74xx_TOP_REG_INTP_SOURCE,1,&val);
 //         if(rv<0)
 //         {
@@ -805,7 +805,7 @@ static enum smf_state_result st_init_run(void *o)
     const struct pdc_config_t *cfg = data->dev->config;
     int cnum = cfg->connector_number;
     int rv;
-    
+
     /* Do not start executing commands if suspended */
     if (check_comms_suspended()) {
         set_state(data, ST_SUSPENDED);
@@ -1083,7 +1083,7 @@ static enum smf_state_result st_cci_status_run(void *o)
     struct pdc_data_t *data = (struct pdc_data_t *)o;
     ANX_DEBUG_PRINT_HEAD
     int rv;
-    
+
     if(data->direct_return_cci)
     {
         data->cci_event.raw_value = data->internal_ucsi_region.cci.raw_value;
@@ -1097,7 +1097,7 @@ static enum smf_state_result st_cci_status_run(void *o)
         }
         return SMF_EVENT_HANDLED;
     }
-    
+
     /*
      * Make sure that we've waited sufficient time before re-reading cci
      * status. Otherwise PDC may be starved of time to execute commands.
@@ -1391,7 +1391,7 @@ static const struct smf_state states[] = {
 
 static int anx74xx_fill_ucsi_bp_st_write_cmd_with_callback(const struct device *dev,
                         struct ucsi_control_t ucsi_ctrl,
-                        uint8_t* msg_out, 
+                        uint8_t* msg_out,
                         uint8_t *user_buf,
                         uint8_t user_buf_len,
                         struct pdc_callback *callback)
@@ -1457,7 +1457,7 @@ static int anx74xx_wakeup(const struct device *dev)
     if (get_state(data) != ST_INIT) {
         return -EBUSY;
     }
-    
+
     uint16_t vid = 0;
     uint8_t addr = data->i2c_address_map[ANX_PDC_anx74xx_ADDRESS_IND_TCPC];
     int rv = anx74xx_i2c_read(dev,addr,ANX_PDC_anx74xx_INFO_REG_VID,2,(uint8_t*)&vid);
@@ -2234,7 +2234,7 @@ static int anx74xx_set_pdo(const struct device *dev, enum pdo_type_t type,
     {
         ANX_DEBUG("Harvey%d: anx74xx_set_pdo pdo %d, data %x",cfg->connector_number, i ,pdo[i]);
     }
-    
+
     if (pdo == NULL) {
         return -EINVAL;
     }
@@ -2424,7 +2424,7 @@ static int anx74xx_set_battery_status(const struct device *dev,
 	struct pdc_data_t *data = dev->data;
     ANX_DEBUG_PRINT_HEAD
     ANX_DEBUG("Harvey%d: anx74xx_set_battery_status %x %x %x %x",cfg->connector_number, bstat->battery_present, bstat->battery_state, bstat->flags, bstat->present_capacity);
-	
+
 	if (get_state(data) != ST_IDLE) {
 		return -EBUSY;
 	}
