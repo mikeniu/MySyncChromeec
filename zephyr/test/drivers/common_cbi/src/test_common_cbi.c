@@ -820,3 +820,26 @@ static void test_common_cbi_before_after(void *test_data)
 
 ZTEST_SUITE(common_cbi, drivers_predicate_post_main, NULL,
 	    test_common_cbi_before_after, test_common_cbi_before_after, NULL);
+
+ZTEST_USER(common_cbi, test_cbi_set_board_info__resize_overflow)
+{
+	uint32_t original_sku = 0x12345678;
+	uint32_t read_sku;
+
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+	zassert_ok(cbi_create(), "cbi_create failed");
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (uint8_t *)&original_sku,
+				      sizeof(original_sku)),
+		   "Failed to set initial SKU");
+
+	zassert_equal(cbi_set_board_info(CBI_TAG_SKU_ID,
+					 (uint8_t *)&original_sku, 250),
+		      EC_ERROR_OVERFLOW,
+		      "Expected overflow when resizing SKU to 250 bytes");
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }),
+		   "Failed to read SKU after failed resize");
+	zassert_equal(read_sku, original_sku, "SKU corrupted after overflow");
+}
