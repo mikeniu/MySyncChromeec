@@ -24,10 +24,24 @@
 
 DEFINE_FFF_GLOBALS;
 
+FAKE_VALUE_FUNC(uint16_t, ft_sensor_query_rows);
+FAKE_VALUE_FUNC(uint16_t, ft_sensor_query_cols);
+FAKE_VALUE_FUNC(int, ft_sensor_acquire_image_with_mode, uint8_t *, size_t, int);
+FAKE_VALUE_FUNC(int, ft_sensor_init, sensor_param_t);
+FAKE_VALUE_FUNC(uint16_t, ft_sensor_query_chipid);
+FAKE_VALUE_FUNC(int, ft_sensor_set_mode, int);
+FAKE_VALUE_FUNC(int, ft_sensor_query_finger_status_simple);
+
 struct ft98xx_fixture {
 	const struct device *dev;
 	const struct emul *target;
 };
+
+static void ft98xx_set_irq_pin(const struct device *dev, int val)
+{
+	const struct ft98xx_cfg *cfg = dev->config;
+	gpio_emul_input_set(cfg->interrupt.port, cfg->interrupt.pin, val);
+}
 
 static void *ft98xx_setup(void)
 {
@@ -39,6 +53,31 @@ static void *ft98xx_setup(void)
 	zassert_not_null(fixture.dev);
 	zassert_not_null(fixture.target);
 	return &fixture;
+}
+
+static void ft98xx_before(void *fixture)
+{
+	struct ft98xx_fixture *f = fixture;
+
+	RESET_FAKE(ft_sensor_query_rows);
+	RESET_FAKE(ft_sensor_query_cols);
+	RESET_FAKE(ft_sensor_acquire_image_with_mode);
+	RESET_FAKE(ft_sensor_init);
+	RESET_FAKE(ft_sensor_query_chipid);
+	RESET_FAKE(ft_sensor_set_mode);
+	RESET_FAKE(ft_sensor_query_finger_status_simple);
+
+	/* DTS expects width (cols) = 80 and height (rows) = 128 */
+	ft_sensor_query_cols_fake.return_val = 80;
+	ft_sensor_query_rows_fake.return_val = 128;
+
+	ft_sensor_init_fake.return_val = 0;
+	ft_sensor_query_chipid_fake.return_val = 0x9800;
+	ft_sensor_set_mode_fake.return_val = 0;
+	ft_sensor_acquire_image_with_mode_fake.return_val = 0;
+
+	/* Set GPIO IRQ pin high so pulse_hw_reset passes */
+	ft98xx_set_irq_pin(f->dev, 1);
 }
 
 #define FT98XX_IMAGE_FRAME_PARAM_INITIALIZER(idx, node_id)                  \
@@ -59,7 +98,7 @@ static const struct fingerprint_image_frame_params
 		NUM_IMAGE_CAPTURE_TYPES, FT98XX_IMAGE_FRAME_PARAM_INITIALIZER,
 		(, ), DT_NODELABEL(ft98xx)) };
 
-ZTEST_SUITE(ft98xx, NULL, ft98xx_setup, NULL, NULL, NULL);
+ZTEST_SUITE(ft98xx, NULL, ft98xx_setup, ft98xx_before, NULL, NULL);
 
 ZTEST_F(ft98xx, test_init_success)
 {
@@ -114,18 +153,28 @@ ZTEST_F(ft98xx, test_maintenance)
 		      0);
 }
 
-ZTEST_F(ft98xx, test_finger_status_not_supported)
+ZTEST_F(ft98xx, test_finger_status_present)
 {
-	zassert_equal(fingerprint_finger_status(fixture->dev), -ENOTSUP);
+	ft_sensor_query_finger_status_simple_fake.return_val = 1;
+	zassert_equal(fingerprint_finger_status(fixture->dev),
+		      FINGERPRINT_FINGER_STATE_PRESENT);
+}
+
+ZTEST_F(ft98xx, test_finger_status_none)
+{
+	ft_sensor_query_finger_status_simple_fake.return_val = 0;
+	zassert_equal(fingerprint_finger_status(fixture->dev),
+		      FINGERPRINT_FINGER_STATE_NONE);
 }
 
 ZTEST_F(ft98xx, test_acquire_image_not_supported)
 {
 	uint8_t buffer[FP_SENSOR_IMAGE_SIZE];
 
-	zassert_equal(fingerprint_acquire_image(fixture->dev, 0, buffer,
-						sizeof(buffer)),
-		      -ENOTSUP);
+	zassert_equal(fingerprint_acquire_image(fixture->dev,
+						FINGERPRINT_CAPTURE_TYPE_MAX,
+						buffer, sizeof(buffer)),
+		      -EINVAL);
 }
 
 ZTEST_F(ft98xx, test_acquire_image_small_buffer_size)
@@ -138,6 +187,38 @@ ZTEST_F(ft98xx, test_acquire_image_small_buffer_size)
 	zassert_equal(fingerprint_acquire_image(fixture->dev, capture_type,
 						buffer, image_buf_size),
 		      -EINVAL);
+}
+
+ZTEST_F(ft98xx, test_acquire_image_exceeds_runtime_frame_size)
+{
+	uint8_t buffer[FP_SENSOR_IMAGE_SIZE];
+	enum fingerprint_capture_type capture_type =
+		FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT;
+
+	ft_sensor_query_cols_fake.return_val = 200;
+	ft_sensor_query_rows_fake.return_val = 200;
+
+	zassert_equal(
+		fingerprint_acquire_image(fixture->dev, capture_type, buffer,
+					  sizeof(buffer)),
+		-EINVAL,
+		"Expected -EINVAL when runtime frame size exceeds buffer");
+}
+
+ZTEST_F(ft98xx, test_acquire_image_valid_runtime_frame_size)
+{
+	uint8_t buffer[FP_SENSOR_IMAGE_SIZE];
+	enum fingerprint_capture_type capture_type =
+		FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT;
+
+	ft_sensor_query_cols_fake.return_val = 80;
+	ft_sensor_query_rows_fake.return_val = 128;
+
+	int ret = fingerprint_acquire_image(fixture->dev, capture_type, buffer,
+					    sizeof(buffer));
+	zassert_not_equal(
+		ret, -EINVAL,
+		"Valid runtime frame dimensions should pass size validation");
 }
 
 ZTEST_F(ft98xx, test_periphery_spi_write_read_success)
