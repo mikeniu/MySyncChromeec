@@ -22,6 +22,30 @@
       },
       "revId": "498469374484899a3e81e22bdbe59afcfe5b4caf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e63a940_10323cdf",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 1001,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T18:16:43Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2c3cb4ef_4586bda0",
+      "range": {
+        "startLine": 998,
+        "startChar": 0,
+        "endLine": 1001,
+        "endChar": 41
+      },
+      "revId": "498469374484899a3e81e22bdbe59afcfe5b4caf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
