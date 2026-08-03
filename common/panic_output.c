@@ -330,7 +330,6 @@ test_mockable struct panic_data *get_panic_data_write(void)
 	 */
 init_pdata:
 	memset(pdata_ptr, 0, CONFIG_PANIC_DATA_SIZE);
-	pdata_ptr->magic = PANIC_DATA_MAGIC;
 	pdata_ptr->struct_size = CONFIG_PANIC_DATA_SIZE;
 
 	return pdata_ptr;
