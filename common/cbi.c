@@ -658,6 +658,12 @@ static int cc_cbi(int argc, const char **argv)
 				ccprintf("Set requires: <tag> <hex_string>\n");
 				return EC_ERROR_PARAM_COUNT;
 			}
+		} else if (setter->tag == CBI_TAG_DRAM_PART_NUM ||
+			   setter->tag == CBI_TAG_OEM_NAME) {
+			if (argc < 4) {
+				ccprintf("Set requires: <tag> <string>\n");
+				return EC_ERROR_PARAM_COUNT;
+			}
 		} else {
 			if (argc < 5) {
 				ccprintf(
@@ -669,9 +675,13 @@ static int cc_cbi(int argc, const char **argv)
 		if (setter->tag == CBI_TAG_DRAM_PART_NUM ||
 		    setter->tag == CBI_TAG_OEM_NAME) {
 			setter->size = strlen(argv[3]) + 1;
+			if (setter->size > CONFIG_CONSOLE_INPUT_LINE_SIZE) {
+				ccprintf("String too long\n");
+				return EC_ERROR_PARAM3;
+			}
 			memcpy(setter->data, argv[3], setter->size);
 
-			last_arg = 5;
+			last_arg = 4;
 
 		} else if (setter->tag == CBI_TAG_UFSC) {
 			const char *val_str = argv[3];
