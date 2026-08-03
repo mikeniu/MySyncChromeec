@@ -1,5 +1,23 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cce8fa0_557e596a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-03T15:57:11Z",
+      "side": 1,
+      "message": "The corresponding bug was marked as Won\u0027t Fix. What is the reason behind this change?",
+      "revId": "0f2e2642e4f94abaca81d7808c1dfb44ff1c9331",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ],
   "submitRequirementResults": [
     {
       "submitRequirement": {
