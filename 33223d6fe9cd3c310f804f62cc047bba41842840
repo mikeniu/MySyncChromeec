@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38fd7e1e_98d5416b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T18:08:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/21989337-a319-4786-8864-80df2a79f1db)]\n\n**Review Summary**\n* **Functionality:** The new unit tests look great and provide robust coverage of the `ft98xx` lifecycle using FFF mocks.\n* **Security:** N/A for this test-only CL.\n* **Style:** The CMake configuration should avoid `FILE(GLOB)` for source files to ensure reliable builds when new files are added.\n* **Testing \u0026 Test Coverage:** The test coverage is comprehensive. However, the `test_enroll_step_without_start` test case suggested in a previous review and marked as \"Done\" appears to be missing from the current patchset.\n* **CL Size \u0026 Scope:** The CL is appropriately scoped to introducing the test harness and initial tests.\n\nTAG\u003dagy\nCONV\u003d21989337-a319-4786-8864-80df2a79f1db",
+      "isAi": true,
+      "revId": "33223d6fe9cd3c310f804f62cc047bba41842840",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39429b3c_f20b2542",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/CMakeLists.txt",
+        "patchSetId": 26
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T18:08:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Using `FILE(GLOB ...)` to collect source files is generally discouraged in CMake because if a new file is added, CMake won\u0027t automatically detect the change and regenerate the build files unless `CMakeLists.txt` itself is modified.\n\nConsider explicitly listing the source files:\n```cmake\ntarget_sources(app PRIVATE\n    src/ft98xx.c\n    \"${PLATFORM_EC}/zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c\"\n)\n```",
+      "isAi": true,
+      "revId": "33223d6fe9cd3c310f804f62cc047bba41842840",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2a87ca8_7ab1ea4a",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T18:08:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This test suite setup is fantastic! I see you added comprehensive coverage for the main success and error paths. \n\nHowever, it looks like a test for the uninitialized state (calling `enroll_step` without calling `enroll_start`) was missed. Since that was the original bug that motivated adding this test harness, it would be great to include it to prevent future regressions.\n\nYou could add something like this:\n```c\nZTEST_F(ft98xx_bio_alg, test_enroll_step_without_start)\n{\n\tint completion \u003d -1;\n\n\tzassert_ok(fingerprint_algorithm_init(fixture-\u003ealg));\n\n\t/* Do not call fingerprint_enroll_start to simulate the bypass */\n\tint res \u003d fingerprint_enroll_step(fixture-\u003ealg, fixture-\u003efake_image,\n\t\t\t\t\t  \u0026completion);\n\n\tzassert_equal(res, FP_ENROLLMENT_RESULT_INTERNAL_ERROR,\n\t\t      \"enroll_step should fail if enroll_start wasn\u0027t called\");\n\tzassert_equal(completion, 0,\n\t\t      \"completion should be safely set to 0\");\n}\n```",
+      "isAi": true,
+      "revId": "33223d6fe9cd3c310f804f62cc047bba41842840",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db195efd_e02b4242",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T18:08:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] It looks like the `test_enroll_step_without_start` test case that was marked as \"Done\" in the previous patchset is missing from this file. Was it omitted by accident or perhaps placed in a different CL?",
+      "isAi": true,
+      "revId": "33223d6fe9cd3c310f804f62cc047bba41842840",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
