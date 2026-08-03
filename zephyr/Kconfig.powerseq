@@ -76,6 +76,13 @@ config PLATFORM_EC_HOSTCMD_AP_RESET
 	  Warning: This command skips the normal reset mechanism on the AP and
 	  may leave data unsaved.
 
+config PLATFORM_EC_HOSTCMD_AP_RESET_SCHEDULED
+	bool "Host command: EC_CMD_AP_RESET_SCHEDULED"
+	depends on PLATFORM_EC_HOSTCMD_AP_RESET
+	help
+	  Enable support for EC_CMD_AP_RESET_SCHEDULED, used by the AP to
+	  request that the EC perform a reset of the AP after a delay.
+
 config PLATFORM_EC_HOSTCMD_AP_SHUTDOWN
 	bool "Host command: EC_CMD_AP_RESET"
 	depends on PLATFORM_EC_HOSTCMD
