@@ -105,6 +105,23 @@ static void ft98xx_alg_before(void *f)
 		custom_get_finger_detailed_info;
 }
 
+ZTEST_F(ft98xx_bio_alg, test_enroll_step_uninitialized_session_fails)
+{
+	int completion = -1;
+
+	zassert_ok(fingerprint_algorithm_init(fixture->alg));
+
+	int res = fingerprint_enroll_step(fixture->alg, fixture->fake_image,
+					  &completion);
+
+	zassert_equal(res, FP_ENROLLMENT_RESULT_INTERNAL_ERROR,
+		      "Expected INTERNAL_ERROR when remain == 0");
+	zassert_equal(completion, 0, "Completion should be set to 0 on error");
+	zassert_equal(
+		focal_algo_get_feature_fake.call_count, 0,
+		"Should not extract features if session is uninitialized");
+}
+
 ZTEST_F(ft98xx_bio_alg, test_enroll_step_get_feature_failure)
 {
 	int completion = 0;
