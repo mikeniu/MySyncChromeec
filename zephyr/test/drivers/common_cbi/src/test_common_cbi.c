@@ -893,3 +893,54 @@ static void test_common_cbi_before_after(void *test_data)
 
 ZTEST_SUITE(common_cbi, drivers_predicate_post_main, NULL,
 	    test_common_cbi_before_after, test_common_cbi_before_after, NULL);
+
+ZTEST_USER(common_cbi, test_cc_cbi_set_string_tag)
+{
+	const char expected_oem_name[] = "TestOEM";
+	const char expected_dram_part[] = "DRAM1234";
+	char str_buf[64] = { 0 };
+	uint8_t size = sizeof(str_buf);
+
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+	zassert_ok(cbi_create(), "cbi_create failed");
+
+	/* Test setting OEM_NAME (tag 4) via console command with 4 arguments.
+	 */
+	zassert_ok(shell_execute_cmd(NULL, "cbi set 4 TestOEM"),
+		   "Failed to set OEM_NAME via console");
+
+	/* Verify OEM_NAME tag value. */
+	size = sizeof(str_buf);
+	zassert_ok(cbi_get_board_info(CBI_TAG_OEM_NAME, (uint8_t *)str_buf,
+				      &size),
+		   "Failed to get OEM_NAME");
+	zassert_equal(size, sizeof(expected_oem_name), "Size mismatch");
+	zassert_mem_equal(str_buf, expected_oem_name, sizeof(expected_oem_name),
+			  "OEM_NAME value mismatch");
+
+	/* Test setting DRAM_PART_NUM (tag 3) via console command. */
+	zassert_ok(shell_execute_cmd(NULL, "cbi set 3 DRAM1234"),
+		   "Failed to set DRAM_PART_NUM via console");
+
+	size = sizeof(str_buf);
+	zassert_ok(cbi_get_board_info(CBI_TAG_DRAM_PART_NUM, (uint8_t *)str_buf,
+				      &size),
+		   "Failed to get DRAM_PART_NUM");
+	zassert_equal(size, sizeof(expected_dram_part), "Size mismatch");
+	zassert_mem_equal(str_buf, expected_dram_part,
+			  sizeof(expected_dram_part),
+			  "DRAM_PART_NUM value mismatch");
+
+	/* Test missing required value argument for string tag (argc < 4). */
+	zassert_not_equal(shell_execute_cmd(NULL, "cbi set 4"), 0,
+			  "Expected failure for missing value arg");
+
+	/* Test string length exceeding limit. */
+	char long_cmd[CONFIG_CONSOLE_INPUT_LINE_SIZE + 32];
+	memset(long_cmd, 'A', sizeof(long_cmd) - 1);
+	long_cmd[sizeof(long_cmd) - 1] = '\0';
+	memcpy(long_cmd, "cbi set 4 ", 10);
+	zassert_not_equal(shell_execute_cmd(NULL, long_cmd), 0,
+			  "Expected failure for oversized string");
+}
