@@ -2135,8 +2135,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_busy)
 	global_context.sensor_mode = 0;
 }
 
-<<<<<<< HEAD
-=======
 ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_decrypted)
 {
 	struct test_v0_template_layout params{};
@@ -2184,14 +2182,10 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_disabled_under_auth)
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
-	struct ec_response_fp_generate_nonce nonce_response;
-	struct ec_params_fp_establish_session session_params = {};
+	struct ec_response_fp_generate_nonce nonce_response{};
+	struct ec_params_fp_establish_session session_params{};
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL,
 					     0, &nonce_response,
@@ -2208,17 +2202,13 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_disabled_under_auth)
 					     sizeof(session_params), NULL, 0),
 		      EC_RES_SUCCESS);
 
-	struct ec_params_fp_template params = {
-		.offset = 0,
-		.size = 8,
-	};
+	struct test_v0_template_layout params{};
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, &params,
 					     sizeof(params), NULL, 0),
 		      EC_RES_ACCESS_DENIED);
 }
 
->>>>>>> 2bac3a3af8a (zephyr: test: fingerprint: Add template v0 decryption unit tests)
 } // namespace
 
 static void *fpsensor_auth_commands_setup(void)
