@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82f08b2b_99eedbce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T18:40:53Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "38fd7e1e_98d5416b",
+      "revId": "33223d6fe9cd3c310f804f62cc047bba41842840",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39429b3c_f20b2542",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Using `FILE(GLOB ...)` to collect source files is generally discouraged in CMake because if a new file is added, CMake won\u0027t automatically detect the change and regenerate the build files unless `CMakeLists.txt` itself is modified.\n\nConsider explicitly listing the source files:\n```cmake\ntarget_sources(app PRIVATE\n    src/ft98xx.c\n    \"${PLATFORM_EC}/zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c\"\n)\n```",
       "isAi": true,
+      "revId": "33223d6fe9cd3c310f804f62cc047bba41842840",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48aa8342_82a9de1c",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/CMakeLists.txt",
+        "patchSetId": 26
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T18:40:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39429b3c_f20b2542",
       "revId": "33223d6fe9cd3c310f804f62cc047bba41842840",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac6dbe56_2acbd78c",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T18:40:53Z",
+      "side": 1,
+      "message": "this was included in a dedicated CL: https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8183237\n\nThe purpose of this CL to to create algorithm testing for baseline code.",
+      "parentUuid": "e2a87ca8_7ab1ea4a",
+      "revId": "33223d6fe9cd3c310f804f62cc047bba41842840",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db195efd_e02b4242",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] It looks like the `test_enroll_step_without_start` test case that was marked as \"Done\" in the previous patchset is missing from this file. Was it omitted by accident or perhaps placed in a different CL?",
       "isAi": true,
+      "revId": "33223d6fe9cd3c310f804f62cc047bba41842840",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5532f37_473b19dd",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-03T18:40:53Z",
+      "side": 1,
+      "message": "as I mentioned in my preivous comment, this was added in the next CL",
+      "parentUuid": "db195efd_e02b4242",
       "revId": "33223d6fe9cd3c310f804f62cc047bba41842840",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
