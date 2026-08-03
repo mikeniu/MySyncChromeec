@@ -8,3 +8,10 @@ include("${ZEPHYR_BASE}/cmake/compiler/gcc/compiler_flags.cmake")
 
 # gcc flags for coverage generation
 set_compiler_property(PROPERTY coverage -fprofile-arcs -ftest-coverage -fno-inline)
+
+if("${ARCH}" STREQUAL "riscv")
+  # Force 32-bit long calls for RISC-V baremetal targets under GCC to prevent
+  # cross-section (RAM <-> Flash) relocation truncation errors (R_RISCV_RVC_JUMP).
+  set_property(TARGET compiler APPEND PROPERTY required "-mlong-calls")
+endif()
+
