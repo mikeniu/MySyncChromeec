@@ -56,6 +56,14 @@ class ProjectConfig:
     signer: signers.BaseSigner = signers.NullSigner()
     skip_build_all: bool = False
 
+    @property
+    def inherited_from(self) -> typing.Iterable[str]:
+        """Get the list of boards.
+
+        This is an alias for boards.
+        """
+        return self.boards
+
 
 class Project:
     """An object encapsulating a project directory."""
@@ -239,6 +247,10 @@ def load_config_file(path) -> typing.List[Project]:
         # Project names cannot start with a '%', as this is reserved for passing
         # program names in the CLI interface.
         assert not kwargs["project_name"].startswith("%")
+        if "inherited_from" in kwargs:
+            assert "boards" not in kwargs
+            kwargs["boards"] = kwargs["inherited_from"]
+            del kwargs["inherited_from"]
 
         config = ProjectConfig(**kwargs)
         projects.append(Project(config))
