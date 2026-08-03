@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "754ea9ab_929c9d0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T20:17:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/f90f1c09-681f-483e-9cd0-ca0c8818e2fb)]\n\n**Review Summary:**\n*   **Functionality:** The code correctly adds NULL pointer validations for required arguments in the matching and enrollment steps, preventing potential invalid memory dereferences.\n*   **Security:** These changes improve security and stability by preventing potential crashes due to NULL pointer dereferences.\n*   **Style:** The changes are clean and adhere to the project\u0027s coding style guidelines. Error messages are clear and helpful.\n*   **Consistency:** The new checks are consistent with error handling patterns in the subsystem.\n*   **Testing \u0026 Test Coverage:** Excellent unit test coverage was added. The new tests successfully verify that `-EINVAL` is returned when the checked pointers are NULL. I added a minor suggestion inline about testing/validating the `templ` pointer.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and focused entirely on adding the relevant NULL checks and tests.\n\nTAG\u003dagy\nCONV\u003d12774590-0ad5-4049-a82d-abddf39024c5",
+      "isAi": true,
+      "revId": "9baf283b8e1e4f1eb8d9d8701ec6a670590f444d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d3a38dc_ec630fe9",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T20:17:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since we\u0027re adding pointer validation to this function, consider also verifying that `templ !\u003d NULL` when `templ_count \u003e 0`.\n\n```c\nif (templ \u003d\u003d NULL \u0026\u0026 templ_count \u003e 0) {\n\tLOG_ERR(\"templ pointer cannot be NULL when templ_count \u003e 0\");\n\treturn -EINVAL;\n}\n```\nWhile the calling framework might guarantee this, checking it here ensures consistency with the other pointer checks in this function and guarantees we don\u0027t pass an invalid address (e.g. `NULL + offset`) to `focal_algo_match`.\nIf you decide to add this check, a corresponding unit test like `test_match_null_templ_fails` would be great.",
+      "isAi": true,
+      "revId": "9baf283b8e1e4f1eb8d9d8701ec6a670590f444d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
