@@ -253,6 +253,63 @@ ZTEST_F(ft98xx_bio_alg, test_enroll_start_failure)
 	zassert_equal(res, 0, "Expected 0 when focal_algo_enroll_start fails.");
 }
 
+ZTEST_F(ft98xx_bio_alg, test_enroll_step_uninitialized_session_fails)
+{
+	int completion = -1;
+
+	zassert_ok(fingerprint_algorithm_init(fixture->alg));
+
+	int res = fingerprint_enroll_step(fixture->alg, fixture->fake_image,
+					  &completion);
+
+	zassert_equal(res, FP_ENROLLMENT_RESULT_INTERNAL_ERROR,
+		      "Expected INTERNAL_ERROR when remain == 0.");
+	zassert_equal(completion, 0, "Completion should be set to 0 on error.");
+	zassert_equal(
+		focal_algo_get_feature_fake.call_count, 0,
+		"Should not extract features if session is uninitialized.");
+}
+
+ZTEST_F(ft98xx_bio_alg, test_enroll_step_corrupted_remain_fails)
+{
+	zassert_ok(fingerprint_algorithm_init(fixture->alg));
+
+	struct ft_libfp_data *data = (struct ft_libfp_data *)fixture->alg->data;
+
+	data->max_enroll_samples = 5;
+	data->remain = 10;
+
+	int completion = -1;
+	int res = fingerprint_enroll_step(fixture->alg, fixture->fake_image,
+					  &completion);
+
+	zassert_equal(
+		res, FP_ENROLLMENT_RESULT_INTERNAL_ERROR,
+		"Expected INTERNAL_ERROR when remain > max_enroll_samples.");
+	zassert_equal(completion, 0,
+		      "Completion should be reset to 0 on error.");
+	zassert_equal(focal_algo_get_feature_fake.call_count, 0,
+		      "Should not extract features when remain is invalid.");
+}
+
+ZTEST_F(ft98xx_bio_alg, test_enroll_step_zero_max_samples_fails)
+{
+	zassert_ok(fingerprint_algorithm_init(fixture->alg));
+
+	struct ft_libfp_data *data = (struct ft_libfp_data *)fixture->alg->data;
+	data->max_enroll_samples = 0;
+	data->remain = 0;
+
+	int completion = -1;
+	int res = fingerprint_enroll_step(fixture->alg, fixture->fake_image,
+					  &completion);
+
+	zassert_equal(res, FP_ENROLLMENT_RESULT_INTERNAL_ERROR,
+		      "Expected INTERNAL_ERROR when max_enroll_samples == 0.");
+	zassert_equal(completion, 0,
+		      "Completion should be reset to 0 on error.");
+}
+
 ZTEST_F(ft98xx_bio_alg, test_enroll_step_get_feature_failure)
 {
 	int completion = 0;

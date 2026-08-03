@@ -147,6 +147,14 @@ static int ft98xx_enroll_step(const struct fingerprint_algorithm *const alg,
 		return -ENOTSUP;
 	}
 
+	/* Prevent execution if enrollment session was never initialized. */
+	if (data->remain == 0 || data->remain > data->max_enroll_samples) {
+		LOG_ERR("enroll_step called without valid enroll_start (remain=%d)",
+			data->remain);
+		*completion = 0;
+		return FP_ENROLLMENT_RESULT_INTERNAL_ERROR;
+	}
+
 	enroll_index = data->max_enroll_samples - data->remain;
 
 	memset(data->feature_buf, 0, FT_TPL_SUBTPL_SIZE);
