@@ -87,6 +87,31 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "d6b24113_949a46ae",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-03T22:12:11Z",
+      "side": 1,
+      "message": "We must avoid calling self._temp_dir.cleanup() inside Renode.cleanup(). Renode.cleanup() is called after each individual test in flash_and_run_test(), whereas the Renode platform instance (self) is created once in main() and reused across all tests on that board. In Patch Set 10, calling self._temp_dir.cleanup() inside cleanup() deleted the temporary directory after test #1 finished, causing test #2 to fail with FileNotFoundError: [Errno 2] No such file or directory: \u0027/tmp/tmpXXXXXX/renode-uart\u0027 (which caused the CQ failure). Because self is referenced by main() throughout the run, self._temp_dir stays alive while tests execute, and tempfile.TemporaryDirectory automatically cleans up on process exit.",
+      "parentUuid": "66d9b67d_9d7d03d0",
+      "range": {
+        "startLine": 468,
+        "startChar": 0,
+        "endLine": 477,
+        "endChar": 20
+      },
+      "isAi": true,
+      "revId": "f8c36f4983c82c1e00e9938ebb67170d5e09d531",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ef614f05_58e377eb",
         "filename": "test/run_device_tests.py",
         "patchSetId": 11
