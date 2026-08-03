@@ -62,6 +62,9 @@ config I2C_ALLOW_NO_STOP_TRANSACTIONS
 config COMMON_LIBC_MALLOC
 	default n
 
+config KERNEL_MEM_POOL
+	default n if !ZTEST && !POSIX_THREADS && !NET_BUF
+
 config LTO
 	default y if !X86 && !SOC_POSIX
 
