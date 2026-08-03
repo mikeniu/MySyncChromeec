@@ -23,6 +23,8 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(CBI_UFSC_COMPAT) == 1,
 #define VALIDATE_UFSC_FIELD(id)                                           \
 	BUILD_ASSERT(DT_PROP_LEN(id, start) == DT_PROP_LEN(id, size),     \
 		     "UFSC start and size arrays must have same length"); \
+	BUILD_ASSERT(DT_PROP_BY_IDX(id, size, 0) <= 8,                    \
+		     "UFSC field size must not exceed 8 bits");           \
 	BUILD_ASSERT(                                                     \
 		(DT_PROP_BY_IDX(id, start, 0) / 32) ==                    \
 			((DT_PROP_BY_IDX(id, start, 0) +                  \
