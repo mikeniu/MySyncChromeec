@@ -16,6 +16,24 @@
       "message": "This depends on https://github.com/zephyrproject-rtos/zephyr/pull/115118 also, so it can\u0027t actually be submitted yet.",
       "revId": "0f5f9760137433342c1b84e1a045122d8f686108",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf422ac1_66cc5621",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-03T16:45:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/fe491423-2e86-4550-aab6-515a5143e3e0)]\n\n### Review Summary\n\n*   **Functionality:** The changes correctly promote the `avoid_unnecessary_addr_size` DeviceTree warning to a hard error in both the coreboot-sdk and host toolchains. This will help maintain DeviceTree hygiene across all ChromeOS EC boards. The corresponding fix to the Egis ET171 SoC\u0027s `common.dtsi` correctly adds the missing `reg` property and unit address (`@0`), and updates `spi-frequency` to `spi-max-frequency` to satisfy standard SPI bus bindings.\n*   **Style:** The CMake list appends are cleanly formatted with commented-out flags for future enablement. The `.dtsi` changes conform to standard DeviceTree conventions.\n*   **Security:** No security implications.\n*   **Testing:** Compiling the boards (e.g., `zmake build sanok` as mentioned in the commit message) is the correct and sufficient way to validate these DeviceTree and CMake changes. No additional unit tests are necessary.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized, self-contained, and focuses entirely on enabling the warning and fixing the single resulting violation.",
+      "isAi": true,
+      "revId": "0f5f9760137433342c1b84e1a045122d8f686108",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
