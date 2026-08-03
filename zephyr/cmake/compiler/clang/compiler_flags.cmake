@@ -46,4 +46,7 @@ if("${ARCH}" STREQUAL "riscv")
   # TODO(b/410086538): _GNU_SOURCE needs to be defined for libc++ built with
   # newlib as C library.
   set_property(TARGET compiler-cpp APPEND PROPERTY required "-D_GNU_SOURCE")
+  # Force 32-bit long calls for RISC-V baremetal targets under Clang/LLVM to prevent
+  # cross-section (RAM <-> Flash) relocation truncation errors (R_RISCV_RVC_JUMP).
+  set_property(TARGET compiler APPEND PROPERTY required "-mlong-calls")
 endif()
