@@ -9,6 +9,9 @@
 config TIMESLICING
 	default n
 
+config TIMEOUT_64BIT
+	default n
+
 config LOG
 	default y
 	imply LOG_DEFAULT_MINIMAL
