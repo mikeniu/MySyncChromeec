@@ -1710,6 +1710,18 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_corrupted_tag)
 	zassert_equal(global_context.templ_valid, 0u);
 }
 
+ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_disabled_under_auth)
+{
+	zassert_equal(establish_session(), EC_SUCCESS);
+
+	ec_params_fp_template params{};
+
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, &params,
+					     sizeof(params), nullptr, 0),
+		      EC_RES_ACCESS_DENIED);
+	zassert_equal(global_context.templ_valid, 0u);
+}
+
 } // namespace
 
 static void *fpsensor_auth_commands_setup()

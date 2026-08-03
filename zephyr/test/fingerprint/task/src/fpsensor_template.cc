@@ -44,6 +44,9 @@
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 FAKE_VALUE_FUNC(int, system_is_locked);
 
+/* Function used to cleanup session secrets and flags. */
+void reset_session(void);
+
 #define fp_sim DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor))
 #define IMAGE_SIZE                                                 \
 	MAX_FROM_LIST(LISTIFY(NUM_IMAGE_CAPTURE_TYPES,             \
@@ -1499,13 +1502,33 @@ ZTEST_USER(fpsensor_template,
 	k_sleep(K_SECONDS(1));
 }
 
+ZTEST_USER(fpsensor_template, test_fp_template_v0_disabled_under_auth)
+{
+	struct ec_params_fp_template params = {
+		.offset = 0,
+		.size = 0,
+	};
+
+	/*
+	 * Note: This test validates that unauthenticated v0 legacy paths are
+	 * blocked entirely when fingerprint auth is enabled.
+	 */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	/*
+	 * Validate security invariant: When fingerprint auth is active,
+	 * unauthenticated legacy template parsing routes (v0) must reject
+	 * commits with ACCESS_DENIED.
+	 */
+	zassert_equal(
+		EC_RES_ACCESS_DENIED,
+		ec_cmd_fp_template(NULL, &params, sizeof(params)),
+		"Legacy template loading endpoint must be closed under fingerprint auth");
+}
+
 static void *fpsensor_setup(void)
 {
-	struct ec_params_fp_seed fp_seed_params = {
-		.struct_version = 4,
-		.reserved = 0,
-		.seed = FAKE_TPM_SEED,
-	};
 	const struct rollback_data data = {
 		.id = 0,
 		.rollback_min_version = 0,
@@ -1531,9 +1554,6 @@ static void *fpsensor_setup(void)
 	rollback_add_entropy(fake_rollback_entropy,
 			     sizeof(fake_rollback_entropy) - 1);
 
-	/* Set TPM seed. */
-	ec_cmd_fp_seed(NULL, &fp_seed_params);
-
 	return NULL;
 }
 
@@ -1552,6 +1572,11 @@ static void fpsensor_before(void *f)
 		.acquire_image_result = FINGERPRINT_SENSOR_SCAN_GOOD,
 		.last_acquire_image_mode = -1,
 	};
+	struct ec_params_fp_seed fp_seed_params = {
+		.struct_version = 4,
+		.reserved = 0,
+		.seed = FAKE_TPM_SEED,
+	};
 	struct ec_params_fp_context_v1 fp_context_params = {
 		.action = FP_CONTEXT_ASYNC,
 		.userid = FAKE_USER_ID,
@@ -1567,6 +1592,10 @@ static void fpsensor_before(void *f)
 	RESET_FAKE(mock_alg_enroll_step);
 	RESET_FAKE(mock_alg_enroll_finish);
 	RESET_FAKE(mock_alg_match);
+
+	/* Reset session and set TPM seed before each test case. */
+	reset_session();
+	ec_cmd_fp_seed(NULL, &fp_seed_params);
 
 	/* Set context (FP_CONTEXT_ASYNC). */
 	ec_cmd_fp_context_v1(NULL, &fp_context_params);
