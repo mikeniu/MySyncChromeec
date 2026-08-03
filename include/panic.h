@@ -129,6 +129,18 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
 
 /**
+ * Get the panic reason field from a panic_data structure for the current
+ * architecture.
+ */
+uint32_t panic_get_reason_reg(const struct panic_data *pdata);
+
+/**
+ * Set the panic reason field in a panic_data structure for the current
+ * architecture.
+ */
+void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason);
+
+/**
  * Check if stored panic data represents a new panic.
  *
  * A panic is considered new if valid panic data is present in RAM and has not
