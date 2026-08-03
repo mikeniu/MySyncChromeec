@@ -196,6 +196,25 @@ ZTEST_F(ft98xx_bio_alg, test_enroll_step_null_completion_fails)
 		"Should not call enroll step when completion pointer is NULL.");
 }
 
+ZTEST_F(ft98xx_bio_alg, test_enroll_step_null_image_fails)
+{
+	int completion = 0;
+
+	zassert_ok(fingerprint_algorithm_init(fixture->alg));
+	zassert_ok(fingerprint_enroll_start(fixture->alg));
+
+	int res = fingerprint_enroll_step(fixture->alg, NULL, &completion);
+
+	zassert_equal(res, -EINVAL,
+		      "Expected -EINVAL when image pointer is NULL.");
+	zassert_equal(
+		focal_algo_get_feature_fake.call_count, 0,
+		"Should not extract features when image pointer is NULL.");
+	zassert_equal(
+		focal_algo_enroll_step_fake.call_count, 0,
+		"Should not call enroll step when image pointer is NULL.");
+}
+
 ZTEST_F(ft98xx_bio_alg, test_enroll_step_success_and_progress)
 {
 	int completion = 0;
@@ -256,6 +275,62 @@ ZTEST_F(ft98xx_bio_alg, test_enroll_cancel)
 
 	zassert_ok(fingerprint_enroll_finish(fixture->alg, NULL));
 	zassert_equal(focal_algo_enroll_cancel_fake.call_count, 1);
+}
+
+ZTEST_F(ft98xx_bio_alg, test_match_null_image_fails)
+{
+	int32_t match_index = -1;
+	uint32_t update_bitmap = 0;
+	uint8_t template_buf[1024] = { 0 };
+
+	zassert_ok(fingerprint_algorithm_init(fixture->alg));
+
+	int res = fingerprint_match(fixture->alg, template_buf, 1, NULL, false,
+				    &match_index, &update_bitmap);
+
+	zassert_equal(res, -EINVAL,
+		      "Expected -EINVAL when image pointer is NULL.");
+	zassert_equal(
+		focal_algo_get_feature_fake.call_count, 0,
+		"Should not extract features when image pointer is NULL.");
+}
+
+ZTEST_F(ft98xx_bio_alg, test_match_null_match_index_fails)
+{
+	uint32_t update_bitmap = 0;
+	uint8_t template_buf[1024] = { 0 };
+
+	zassert_ok(fingerprint_algorithm_init(fixture->alg));
+
+	int res = fingerprint_match(fixture->alg, template_buf, 1,
+				    fixture->fake_image, false, NULL,
+				    &update_bitmap);
+
+	zassert_equal(res, -EINVAL,
+		      "Expected -EINVAL when match_index pointer is NULL.");
+	zassert_equal(
+		focal_algo_get_feature_fake.call_count, 0,
+		"Should not extract features when match_index pointer is NULL.");
+}
+
+ZTEST_F(ft98xx_bio_alg,
+	test_match_null_update_bitmap_fails_when_update_requested)
+{
+	int32_t match_index = -1;
+	uint8_t template_buf[1024] = { 0 };
+
+	zassert_ok(fingerprint_algorithm_init(fixture->alg));
+
+	int res = fingerprint_match(fixture->alg, template_buf, 1,
+				    fixture->fake_image, true, &match_index,
+				    NULL);
+
+	zassert_equal(res, -EINVAL,
+		      "Expected -EINVAL when update_bitmap is NULL "
+		      "with template_update=true.");
+	zassert_equal(focal_algo_get_feature_fake.call_count, 0,
+		      "Should not extract features when update_bitmap is NULL "
+		      "with template_update=true.");
 }
 
 ZTEST_F(ft98xx_bio_alg, test_match_get_feature_failure)
