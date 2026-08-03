@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-config CROS_EC_VIVALDI_KBD
+configdefault CROS_EC_VIVALDI_KBD
 	default y
 
 config VIVALDI_KBD_TEST_USE_IDX
