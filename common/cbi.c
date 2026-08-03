@@ -233,6 +233,9 @@ test_mockable int cbi_set_board_info(enum cbi_data_tag tag, const uint8_t *buf,
 				     uint8_t size)
 {
 	struct cbi_data *d;
+	bool is_resize = false;
+	size_t old_entry_size = 0;
+	size_t new_entry_size = 0;
 
 	d = cbi_find_tag(cbi, tag);
 
@@ -247,17 +250,30 @@ test_mockable int cbi_set_board_info(enum cbi_data_tag tag, const uint8_t *buf,
 	}
 #endif
 
-	/* If we found the entry, but the size doesn't match, delete it */
 	if (d && d->size != size) {
+		is_resize = true;
+		old_entry_size = sizeof(*d) + d->size;
+	}
+
+	if (!d || is_resize) {
+		if (size > 0)
+			new_entry_size = sizeof(*d) + size;
+
+		/* Check if new item would fit before making any modifications
+		 */
+		if (sizeof(cbi) <
+		    head->total_size - old_entry_size + new_entry_size)
+			return EC_ERROR_OVERFLOW;
+	}
+
+	/* Delete old entry if we are resizing or removing it */
+	if (is_resize) {
 		cbi_remove_tag(cbi, d);
 		d = NULL;
 	}
 
 	if (!d) {
 		uint8_t *p;
-		/* Not found. Check if new item would fit */
-		if (sizeof(cbi) < head->total_size + sizeof(*d) + size)
-			return EC_ERROR_OVERFLOW;
 		/* Append new item */
 		p = cbi_set_data(&cbi[head->total_size], tag, buf, size);
 		head->total_size = p - cbi;
@@ -642,6 +658,12 @@ static int cc_cbi(int argc, const char **argv)
 				ccprintf("Set requires: <tag> <hex_string>\n");
 				return EC_ERROR_PARAM_COUNT;
 			}
+		} else if (setter->tag == CBI_TAG_DRAM_PART_NUM ||
+			   setter->tag == CBI_TAG_OEM_NAME) {
+			if (argc < 4) {
+				ccprintf("Set requires: <tag> <string>\n");
+				return EC_ERROR_PARAM_COUNT;
+			}
 		} else {
 			if (argc < 5) {
 				ccprintf(
@@ -653,9 +675,13 @@ static int cc_cbi(int argc, const char **argv)
 		if (setter->tag == CBI_TAG_DRAM_PART_NUM ||
 		    setter->tag == CBI_TAG_OEM_NAME) {
 			setter->size = strlen(argv[3]) + 1;
+			if (setter->size > CONFIG_CONSOLE_INPUT_LINE_SIZE) {
+				ccprintf("String too long\n");
+				return EC_ERROR_PARAM3;
+			}
 			memcpy(setter->data, argv[3], setter->size);
 
-			last_arg = 5;
+			last_arg = 4;
 
 		} else if (setter->tag == CBI_TAG_UFSC) {
 			const char *val_str = argv[3];
