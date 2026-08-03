@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5feb3e15_76e244a4",
+        "filename": "zephyr/program/bluey/pic/project.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-03T12:53:51Z",
+      "side": 1,
+      "message": "using pic instead of mica",
+      "range": {
+        "startLine": 16,
+        "startChar": 10,
+        "endLine": 16,
+        "endChar": 14
+      },
+      "revId": "213a2e1d8de6630e299021ef0eb7bc2cfe69b662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e91f31ed_d2cdc184",
+        "filename": "zephyr/program/bluey/pic/project.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-03T12:53:51Z",
+      "side": 1,
+      "message": "using pic instead of mica",
+      "range": {
+        "startLine": 18,
+        "startChar": 3,
+        "endLine": 18,
+        "endChar": 7
+      },
+      "revId": "213a2e1d8de6630e299021ef0eb7bc2cfe69b662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f962c5c_63e4d9ef",
+        "filename": "zephyr/program/bluey/pic/project.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-03T12:53:51Z",
+      "side": 1,
+      "message": "using pic instead of mica",
+      "range": {
+        "startLine": 26,
+        "startChar": 3,
+        "endLine": 26,
+        "endChar": 7
+      },
+      "revId": "213a2e1d8de6630e299021ef0eb7bc2cfe69b662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "293846bd_473f1cfc",
+        "filename": "zephyr/program/bluey/pic/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-03T12:53:51Z",
+      "side": 1,
+      "message": "using pic instead of mica",
+      "range": {
+        "startLine": 12,
+        "startChar": 5,
+        "endLine": 12,
+        "endChar": 31
+      },
+      "revId": "213a2e1d8de6630e299021ef0eb7bc2cfe69b662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43b5a101_6cba55f8",
+        "filename": "zephyr/program/bluey/pic/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-03T12:53:51Z",
+      "side": 1,
+      "message": "using pic instead of mica",
+      "range": {
+        "startLine": 24,
+        "startChar": 5,
+        "endLine": 24,
+        "endChar": 32
+      },
+      "revId": "213a2e1d8de6630e299021ef0eb7bc2cfe69b662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee6a2b0c_9320ed26",
+        "filename": "zephyr/program/bluey/pic/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-03T12:53:51Z",
+      "side": 1,
+      "message": "using pic instead of mica",
+      "range": {
+        "startLine": 33,
+        "startChar": 36,
+        "endLine": 33,
+        "endChar": 63
+      },
+      "revId": "213a2e1d8de6630e299021ef0eb7bc2cfe69b662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7f4c134_091e22ac",
+        "filename": "zephyr/program/bluey/pic/src/fan.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-03T12:53:51Z",
+      "side": 1,
+      "message": "using Pic instead of Mica",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 28
+      },
+      "revId": "213a2e1d8de6630e299021ef0eb7bc2cfe69b662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a1128cc_9616be89",
+        "filename": "zephyr/program/bluey/pic/src/fan.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-03T12:53:51Z",
+      "side": 1,
+      "message": "using Pic instead of Mica",
+      "range": {
+        "startLine": 22,
+        "startChar": 6,
+        "endLine": 22,
+        "endChar": 10
+      },
+      "revId": "213a2e1d8de6630e299021ef0eb7bc2cfe69b662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57fabfaa_c8eb97b6",
+        "filename": "zephyr/program/bluey/pic/src/keyboard_customization.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-03T12:53:51Z",
+      "side": 1,
+      "message": "using pic instead of mica",
+      "range": {
+        "startLine": 18,
+        "startChar": 20,
+        "endLine": 18,
+        "endChar": 33
+      },
+      "revId": "213a2e1d8de6630e299021ef0eb7bc2cfe69b662",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
