@@ -657,9 +657,15 @@ def test(opts):
     """Runs all of the unit tests for Zephyr firmware"""
     metrics = firmware_pb2.FwTestMetricList()  # pylint: disable=no-member
 
+    make_target = "test"
+    if getattr(opts, "toolchain", None) == "gcc":
+        make_target = "test_gcc"
+    elif getattr(opts, "toolchain", None) == "llvm":
+        make_target = "test_llvm"
+
     # Run tests from Makefile.cq because make knows how to run things
     # in parallel.
-    cmd = ["make", "-f", "Makefile.cq", f"-j{opts.cpus}", "test"]
+    cmd = ["make", "-f", "Makefile.cq", f"-j{opts.cpus}", make_target]
     env = os.environ.copy()
     env.update(init_toolchain())
     if opts.code_coverage:
@@ -687,16 +693,21 @@ def test(opts):
         tasks = []
         if twister_out_dir.exists():
             tasks.append(("EC_ZEPHYR_TESTS", twister_out_dir / "coverage.info"))
-        tasks.extend(
-            [
-                ("EC_ZEPHYR_TESTS_GCC", twister_out_dir_gcc / "coverage.info"),
-                ("EC_LEGACY_TESTS", platform_ec / "build/coverage/lcov.info"),
-                ("ALL_TESTS", build_dir / "all_tests.info"),
-                ("EC_ZEPHYR_MERGED", build_dir / "zephyr_merged.info"),
-                ("ALL_MERGED", build_dir / "lcov.info"),
-                ("ALL_FILTERED", build_dir / "lcov_no_tests.info"),
-            ]
-        )
+        if twister_out_dir_gcc.exists():
+            tasks.append(
+                ("EC_ZEPHYR_TESTS_GCC", twister_out_dir_gcc / "coverage.info")
+            )
+
+        potential_tasks = [
+            ("EC_LEGACY_TESTS", platform_ec / "build/coverage/lcov.info"),
+            ("ALL_TESTS", build_dir / "all_tests.info"),
+            ("EC_ZEPHYR_MERGED", build_dir / "zephyr_merged.info"),
+            ("ALL_MERGED", build_dir / "lcov.info"),
+            ("ALL_FILTERED", build_dir / "lcov_no_tests.info"),
+        ]
+        for name, filename in potential_tasks:
+            if filename.exists():
+                tasks.append((name, filename))
 
         for project in get_projects():
             if project.config.project_name in SPECIAL_BOARDS:

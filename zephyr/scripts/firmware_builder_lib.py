@@ -308,6 +308,12 @@ def create_arg_parser(build, bundle, test):
     build_cmd.set_defaults(func=bundle)
 
     test_cmd = sub_cmds.add_parser("test", help="Runs all firmware unit tests")
+    test_cmd.add_argument(
+        "--toolchain",
+        choices=["all", "llvm", "gcc"],
+        default="all",
+        help="Toolchain variant to run unit tests for (all, llvm, or gcc).",
+    )
     test_cmd.set_defaults(func=test)
 
     return parser, sub_cmds
