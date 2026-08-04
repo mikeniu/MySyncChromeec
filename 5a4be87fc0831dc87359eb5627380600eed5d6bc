@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efe433f6_86343690",
+        "filename": "zephyr/include/drivers/led.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-04T23:36:32Z",
+      "side": 1,
+      "message": "Nit: If you\u0027re not going to use `ec_led_id`, can you say in a comment that this field should have `ec_led_id` values?",
+      "revId": "5a4be87fc0831dc87359eb5627380600eed5d6bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03e8b1ab_a791c806",
+        "filename": "zephyr/include/drivers/led.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-04T23:36:32Z",
+      "side": 1,
+      "message": "Do you know why this field ends up as other than a 1-byte object?",
+      "revId": "5a4be87fc0831dc87359eb5627380600eed5d6bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
