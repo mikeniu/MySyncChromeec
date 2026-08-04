@@ -109,6 +109,29 @@
       },
       "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "021cfc8a_1b8624d1",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:42:25Z",
+      "side": 1,
+      "message": "This doesn\u0027t have to be fixed here, but let\u0027s file a bug and add a `TODO(b/123)` to track investigating/fixing it:\n\n-----\n\n**Unexpected Error Mapping (`test_acquire_image_error`)**\n\n* **Issue:** In `test_acquire_image_error`, the mock for `ft_sensor_acquire_image_with_mode` is set to return `-EIO` (Input/Output error), but the test expects `fingerprint_acquire_image` to return `-EINVAL` (Invalid Argument).\n* **Impact:** Returning `-EINVAL` for a hardware/I/O failure masks the root cause of the error. If a user passes valid arguments but the hardware fails, they should receive a hardware-related error code (like `-EIO` or a specific fingerprint sensor error), not an indication that their arguments were invalid.\n* **Recommendation:** Verify the error propagation logic within the `fingerprint_acquire_image` driver implementation. If the driver is deliberately collapsing all errors to `-EINVAL`, the driver should be fixed to propagate `-EIO`. Afterwards, update this test to expect `-EIO` (or the appropriate error mapping).",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 17
+      },
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
