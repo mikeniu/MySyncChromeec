@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "304bc9bf_ea2dbd34",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-04T23:19:15Z",
+      "side": 0,
+      "message": "Please don\u0027t delete the `OptionalContent` sections. We need those for DPAM testing. The USB tests should ignore them.",
+      "revId": "d04a478c5baec88626bbd90568ecbf8c523ac5b1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

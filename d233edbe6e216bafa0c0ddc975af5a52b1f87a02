@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56281d7b_503155ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-04T23:19:15Z",
+      "side": 1,
+      "message": "The bcdDevice and power changes look OK.\n\nI don\u0027t get the AMA changes, including setting `Is_Alt_Mode_Adapter` to true, filling out the AMA fields, and specifying Discover SVIDs/Modes responses for TBT3 and DPAM. At one point, the VIF spec required that a TBT3 DFP (which the DUT is) also specify that it was a TBT3 UFP and therefore AMA (which the DUT is not intended to be). That requirement was removed in VIF spec 3.33. There is no such requirement for DPAM, and I don\u0027t think it\u0027s possible for the port to act as a UFP_D.\n\nIf these VIF updates accurately reflect the behavior during testing, we should probably be talking about the firmware changes instead of the VIF changes.",
+      "revId": "d233edbe6e216bafa0c0ddc975af5a52b1f87a02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9dc7f05_8081f16d",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-04T23:19:15Z",
+      "side": 1,
+      "message": "What does it mean for the port to advertise DPAM? How would the board enter DPAM as a UFP?",
+      "revId": "d233edbe6e216bafa0c0ddc975af5a52b1f87a02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
