@@ -13039,6 +13039,46 @@ int cmd_thread_info(int argc, char *argv[])
 	return 0;
 }
 
+static void cmd_trysrc_help(void)
+{
+	fprintf(stderr, "  Usage: trysrc <port> <enable>\n"
+			"    Sends the trysrc command to the ec\n"
+			"    Warning: trysrc is a global config on\n"
+			"    TCPM boards and <port> will be ignored\n");
+}
+
+int cmd_trysrc_test(int argc, char *argv[])
+{
+	char *e;
+	struct ec_params_usb_pd_trysrc_control p;
+	int rv;
+
+	if (argc != 3) {
+		fprintf(stderr, "Invalid number of params\n");
+		cmd_trysrc_help();
+		return -1;
+	}
+
+	p.port = (uint8_t)strtol(argv[2], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad parameter '%s'.\n", argv[2]);
+		return -1;
+	}
+
+	p.enable = (uint8_t)strtol(argv[3], &e, 0);
+	if (e && *e) {
+		fprintf(stderr, "Bad parameter '%s'.\n", argv[3]);
+		return -1;
+	}
+
+	rv = ec_command(EC_CMD_USB_PD_TRYSRC, 0, &p, sizeof(p), NULL, 0);
+	if (rv < 0) {
+		return rv;
+	}
+
+	return 0;
+}
+
 /* NULL-terminated list of commands. Please keep sorted. */
 const struct command commands[] = {
 	{ "adcread", cmd_adc_read, "<channel>\n\tRead an ADC channel." },
@@ -13373,6 +13413,7 @@ const struct command commands[] = {
 	  "\tGet raw TMP006 data." },
 	{ "tpframeget", cmd_tp_frame_get, "\n\tGet touchpad frame data." },
 	{ "tpselftest", cmd_tp_self_test, "\n\tRun touchpad self test." },
+	{ "trysrc", cmd_trysrc_test, "\n\t Run ec-pd trysrc command." },
 	{ "typeccontrol", cmd_typec_control,
 	  "<port> <command>\n"
 	  "\tControl USB PD policy." },

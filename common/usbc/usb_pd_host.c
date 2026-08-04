@@ -103,6 +103,26 @@ DECLARE_HOST_COMMAND(EC_CMD_TYPEC_DISCOVERY, hc_typec_discovery,
 		     EC_VER_MASK(0));
 #endif /* CONFIG_HOSTCMD_TYPEC_DISCOVERY */
 
+/* Retrieve all discovery results for the given port and transmit type */
+static enum ec_status pd_trysrc(struct host_cmd_handler_args *args)
+
+	const struct ec_params_usb_pd_trysrc_control *p = args -> params;
+
+if (P->enable > TRY_SRC_NO_OVERRIDE)
+	return EC_ERROR_PARAM3;
+
+tc_try_src_override(P->enable);
+
+if (P->enable == TRY_SRC_NO_OVERRIDE)
+	ccprintf("Try.SRC System controlled\n");
+else
+	ccprintf("Try.SRC Forced %s\n", P->enable ? "ON" : "OFF");
+
+return EC_SUCCESS;
+}
+}
+DECLARE_HOST_COMMAND(EC_CMD_USB_PD_TRYSRC, pd_trysrc, EC_VER_MASK(0));
+
 /* Default to feature unavailable, with boards supporting it overriding */
 __overridable enum ec_status
 board_set_tbt_ufp_reply(int port, enum typec_tbt_ufp_reply reply)
