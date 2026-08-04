@@ -63,6 +63,30 @@
       },
       "revId": "f19089adc49ad78470dc923eb2c25bf7e41cde10",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e566aecc_71699aa9",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx/common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-04T20:43:29Z",
+      "side": 1,
+      "message": "Although I can get rid of this file and just use `zephyr/subsys/ap_pwrseq/include/x86_common_pwrseq.h` to declare `static inline`  functions `rsmrst_power_is_good` and `rsmrst_pass_thru_handler`.",
+      "parentUuid": "06afbb07_8ab7e47e",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 71
+      },
+      "revId": "f19089adc49ad78470dc923eb2c25bf7e41cde10",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
