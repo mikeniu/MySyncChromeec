@@ -178,7 +178,7 @@
 };
 
 &i2c3 {
-	transfer-timeout-ms = <200>;
+	zephyr,transfer-timeout-ms = <200>;
 };
 
 &i2c4 {
