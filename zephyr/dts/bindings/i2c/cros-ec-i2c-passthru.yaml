@@ -1,0 +1,55 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: |
+  I2C passthru configuration parent and child node binding.
+
+  Example:
+        i2c-passthru {
+                compatible = "cros-ec,i2c-passthru";
+                #address-cells = <1>;
+                #size-cells = <0>;
+
+                i2c_passthru_c0: port0@0 {
+                        reg = <0>;
+                        i2c-port = <&i2c_c0>;
+                        allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+                };
+        };
+
+compatible: "cros-ec,i2c-passthru"
+
+include: base.yaml
+
+properties:
+  "#address-cells":
+    required: true
+    const: 1
+  "#size-cells":
+    required: true
+    const: 0
+
+child-binding:
+  description: I2C passthru port configuration
+  properties:
+    i2c-port:
+      type: phandle
+      description: |
+        Handle to the named I2C port.
+    allow-type:
+      type: string
+      enum:
+        - "ALLOW_IF_UNPROTECTED_BY_AP"
+        - "ALLOW_IF_SYSTEM_UNLOCKED"
+        - "ALLOW_IF_FW_CONFIG_MATCH_AND_UNPROTECTED_BY_AP"
+      description: |
+        Passthru check type for this port.
+    fw-config-key:
+      type: string
+      description: |
+        CBI FW_CONFIG field name.
+    fw-config-value:
+      type: string
+      description: |
+        CBI FW_CONFIG value name.
