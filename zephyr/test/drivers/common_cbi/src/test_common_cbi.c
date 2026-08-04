@@ -894,3 +894,45 @@ ZTEST_USER(common_cbi, test_cc_cbi_set_string_tag)
 	zassert_not_equal(shell_execute_cmd(NULL, long_cmd), 0,
 			  "Expected failure for oversized string");
 }
+
+extern test_export_static bool cached_ssfc_ready;
+extern test_export_static bool cached_ufsc_ready;
+extern test_export_static bool cached_fw_config_ready;
+
+ZTEST_USER(common_cbi, test_cros_cbi_ssfc__read_before_init)
+{
+	cached_ssfc_ready = false;
+
+	zassert_false(cros_cbi_ssfc_check_match(0),
+		      "Expected false when checking SSFC match before init");
+}
+
+ZTEST_USER(common_cbi, test_cros_cbi_ufsc__read_before_init)
+{
+	cached_ufsc_ready = false;
+
+	zassert_false(cros_cbi_ufsc_check_match(0),
+		      "Expected false when checking UFSC match before init");
+}
+
+ZTEST_USER(common_cbi, test_cros_cbi_fw_config__read_before_init)
+{
+	uint32_t val;
+
+	cached_fw_config_ready = false;
+
+	zassert_equal(cros_cbi_get_fw_config(0, &val), -EINVAL,
+		      "Expected -EINVAL when checking FW config before init");
+}
+
+ZTEST_USER(common_cbi, test_cros_cbi_ssfc_init)
+{
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+
+	cros_cbi_ssfc_init();
+
+	/* Verify invalid SSFC value_id returns false. */
+	zassert_false(cros_cbi_ssfc_check_match((enum cbi_ssfc_value_id)9999),
+		      "Expected false for invalid SSFC value_id");
+}
