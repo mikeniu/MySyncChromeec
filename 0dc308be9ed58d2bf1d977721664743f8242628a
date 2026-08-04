@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b751186_2432a057",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:49:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details.\n\n**Review Summary**\n* **Functionality:** The unit test harness is solid and the FFF mocks correctly simulate the hardware. The previous issues with uninitialized buffers, missing parameters, and unsafe strings were resolved. However, the `is_initialized` state flag introduced to manage teardown is missing in most test cases.\n* **Security:** No security vulnerabilities found. Using `snprintf` instead of `strcpy` for the version mock resolved the previous concern.\n* **Style:** The code correctly follows the project\u0027s coding style, and removing the magic numbers in the padding and calculations improved readability.\n* **Testing \u0026 Test Coverage:** The lifecycle tests are comprehensive. Adding a helper function for initialization could make the test suite more robust against teardown-leak regressions.\n* **CL Size \u0026 Scope:** Well scoped test-only CL. The unrelated file was properly removed.\n\nTAG\u003dagy\nCONV\u003d726de283-8592-45e8-9fb0-3afdeac91a27",
+      "isAi": true,
+      "revId": "0dc308be9ed58d2bf1d977721664743f8242628a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce2c5ab9_d8dae3bd",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 31
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:49:31Z",
+      "side": 1,
+      "message": "It looks like this test (and several others below) is still missing `fixture-\u003eis_initialized \u003d true;` after successfully calling `fingerprint_algorithm_init(fixture-\u003ealg)`.\n\nBecause the flag remains `false`, `ft98xx_alg_after` skips calling `fingerprint_algorithm_exit(fixture-\u003ealg)`, meaning the teardown logic is still being bypassed for this test.\n\nTests missing this flag update include:\n* `test_init_success_and_version_query`\n* `test_enroll_step_get_feature_failure`\n* `test_enroll_step_algo_step_failure`\n* `test_enroll_step_success_and_progress`\n* `test_full_enrollment_lifecycle`\n* `test_enroll_cancel`\n* `test_match_get_feature_failure`\n* `test_match_success_no_update`\n* `test_match_anti_spoofing_failure`\n* `test_match_success_with_template_update`\n* `test_match_template_update_failure`\n\n**Suggestion:** To avoid repeating `fixture-\u003eis_initialized \u003d true;` manually in every test, consider wrapping the init call in a small fixture helper function that updates the flag automatically on success:\n\n```c\nstatic int fixture_alg_init(struct ft98xx_bio_alg_fixture *fixture)\n{\n\tint res \u003d fingerprint_algorithm_init(fixture-\u003ealg);\n\tif (res \u003d\u003d 0) {\n\t\tfixture-\u003eis_initialized \u003d true;\n\t}\n\treturn res;\n}\n```\nThen you can just replace `zassert_ok(fingerprint_algorithm_init(fixture-\u003ealg));` with `zassert_ok(fixture_alg_init(fixture));` across all tests.",
+      "isAi": true,
+      "revId": "0dc308be9ed58d2bf1d977721664743f8242628a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
