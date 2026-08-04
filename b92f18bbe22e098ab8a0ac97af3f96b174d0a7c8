@@ -44,6 +44,75 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "76c31d67_6e6793ef",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:14:41Z",
+      "side": 1,
+      "message": "### 2. Security \u0026 Safety\n\n* **Unsafe String Copy in Mock:**\nIn `custom_focal_algo_version`, the use of `strcpy` is inherently unsafe, even in test code, as it assumes the provided `ver` buffer is large enough.\n```c\nstatic void custom_focal_algo_version(uint8_t *ver)\n{\n    if (ver) {\n        strcpy((char *)ver, \"v1.0.0\");\n    }\n}\n\n```\n\n\n**Recommendation:** Use `strncpy` or `snprintf` with a known safe maximum length (e.g., if the caller is expected to provide a macro-defined buffer size, use it). For example: `strncpy((char *)ver, \"v1.0.0\", EXPECTED_VERSION_MAX_LEN);`.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 32
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97830ca7_1e3f5303",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:14:41Z",
+      "side": 1,
+      "message": "* **Missing FFF Global History Reset:**\nWhile you correctly reset the individual fakes using `RESET_FAKE(...)` in `ft98xx_alg_before`, you are missing a call to reset the FFF global call history. If any future tests rely on the sequence of calls across multiple mocked functions, state will leak between tests.\n**Recommendation:** Add `FFF_RESET_HISTORY();` at the beginning of `ft98xx_alg_before`.",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 141,
+        "endChar": 51
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56614858_7b9b3c7c",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:14:41Z",
+      "side": 1,
+      "message": "* **Double De-initialization in `test_exit_success`:**\nIn `test_exit_success`, you explicitly call `fingerprint_algorithm_exit(fixture-\u003ealg)`. However, the teardown function `ft98xx_alg_after` also unconditionally calls `fingerprint_algorithm_exit(fixture-\u003ealg)`. This will result in a double-exit, which typically leads to memory corruption, double-frees, or assertions in the underlying driver.\n**Recommendation:** Add an `is_initialized` boolean flag to the `ft98xx_bio_alg_fixture` struct. Set it to `true` when `init` succeeds, and `false` when `exit` is called. Update `ft98xx_alg_after` to only call `fingerprint_algorithm_exit()` if `is_initialized \u003d\u003d true`.",
+      "range": {
+        "startLine": 203,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 54
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c92d3395_385155a4",
         "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
         "patchSetId": 29
