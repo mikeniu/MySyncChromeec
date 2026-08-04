@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf065976_1aa8b9f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:41:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/c7d81066-0e8d-4cac-aadc-fadea133e51c)]\n\n**Review Summary**\n* **Functionality:** The author successfully addressed all previous feedback regarding initialization, state management, and mocking. The `ft98xx` test harness is robust and covers the required cases well. However, the teardown logic is currently being bypassed in most test cases due to a missing flag update.\n* **Security:** No issues identified.\n* **Style:** Code style is solid and CMake changes were implemented perfectly.\n* **Testing \u0026 Test Coverage:** Excellent coverage for the `ft98xx` algorithm lifecycle.\n* **CL Size \u0026 Scope:** The CL is generally well-scoped, but an unrelated file (`rollback_external_storage.c`) appears to have been accidentally included in the latest patchset.\n\nTAG\u003dagy\nCONV\u003d89ac26ce-2df7-4afe-85e0-11a315715281",
+      "isAi": true,
+      "revId": "5aca3d0c2482d6099c07092080b6309f27b06b2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bcfb1cd_229fedce",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:41:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While this teardown logic is correct, it is currently being bypassed by most of your tests (e.g., `test_init_success_and_version_query`, `test_enroll_step_get_feature_failure`, `test_match_success_no_update`, etc.) because they do not set `fixture-\u003eis_initialized \u003d true;` after successfully calling `fingerprint_algorithm_init()`.\n\nPlease ensure that you set `fixture-\u003eis_initialized \u003d true;` in every test case that successfully initializes the algorithm so that the teardown executes properly.",
+      "isAi": true,
+      "revId": "5aca3d0c2482d6099c07092080b6309f27b06b2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d3cc37c_4e16f6f1",
+        "filename": "zephyr/test/hwtest/src/rollback_external_storage.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:41:05Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This file appears to be unrelated to the `ft98xx` algorithm test harness. It looks like it might have been accidentally included in this patchset. If so, please remove it or move it to a separate CL to keep this CL focused (per `go/small-cls`).",
+      "isAi": true,
+      "revId": "5aca3d0c2482d6099c07092080b6309f27b06b2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
