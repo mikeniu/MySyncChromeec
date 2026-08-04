@@ -39,6 +39,30 @@
       },
       "revId": "f19089adc49ad78470dc923eb2c25bf7e41cde10",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06afbb07_8ab7e47e",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx/common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-04T18:48:37Z",
+      "side": 1,
+      "message": "Considering this comment, and the impact to current functionality pointed out in b/541328749, I think we should just drop this CL for the moment.\n\nAny thoughts on this?",
+      "parentUuid": "801002ba_18618c30",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 71
+      },
+      "revId": "f19089adc49ad78470dc923eb2c25bf7e41cde10",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
