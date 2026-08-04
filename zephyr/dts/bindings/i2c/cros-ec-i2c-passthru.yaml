@@ -1,0 +1,55 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: |
+  I2C passthru configuration parent and child node binding.
+
+  Example:
+        i2c-passthru {
+                compatible = "cros-ec,i2c-passthru";
+                #address-cells = <1>;
+                #size-cells = <0>;
+
+                i2c_passthru_c0: port0@0 {
+                        reg = <0>;
+                        i2c-port = <&i2c_c0>;
+                        allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+                };
+        };
+
+compatible: "cros-ec,i2c-passthru"
+
+include: base.yaml
+
+properties:
+  "#address-cells":
+    required: true
+    const: 1
+  "#size-cells":
+    required: true
+    const: 0
+
+child-binding:
+  description: I2C passthru port configuration
+  properties:
+    reg:
+      type: int
+      required: true
+      description: |
+        Port number passed to I2C_PASSTHRU. This is the same as the remote-port
+        in legacy EC. You can set reg to a negative value to indicate that the
+        remote-port number and the I2C_PORT_BUS are the same.
+    i2c-port:
+      type: phandle
+      description: |
+        Handle to the I2C port.
+    allow-type:
+      type: string
+      enum:
+        - "ALLOW_IF_UNPROTECTED_BY_AP"
+      description: |
+        Passthru check type for this port. The default is
+        "ALLOW_IF_UNPROTECTED_BY_AP", which protects the port only if
+        system_is_locked() is true and port protection has been enabled by the
+        AP invoking the EC_CMD_I2C_PASSTHRU_PROTECT command.
