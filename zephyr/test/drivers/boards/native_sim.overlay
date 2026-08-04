@@ -406,6 +406,21 @@
 		};
 	};
 
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		usb_c0_passthru {
+			i2c-port = <&i2c2>;
+			allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+		};
+		usb_c1_passthru {
+			i2c-port = <&i2c3>;
+			allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+		};
+	};
+
 	batteries {
 		default_battery: lgc_ac17a8m {
 			compatible = "lgc,ac17a8m", "battery-smart";
