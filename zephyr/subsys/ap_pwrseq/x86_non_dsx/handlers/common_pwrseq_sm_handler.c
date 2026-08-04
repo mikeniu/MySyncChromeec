@@ -19,12 +19,12 @@
 #include "zephyr_console_shim.h"
 #endif
 
+#ifndef CONFIG_AP_PWRSEQ_DRIVER
+LOG_MODULE_REGISTER(ap_pwrseq, CONFIG_AP_PWRSEQ_LOG_LEVEL);
+#endif
+
 /* Delay in ms when starting from G3 */
 static uint32_t start_from_g3_delay_ms;
-
-#ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
-static bool in_debug_mode;
-#endif
 
 /*
  * Flags, may be set/cleared from other threads.
@@ -47,8 +47,6 @@ static struct k_sem pwrseq_sem;
 static void s5_inactive_timer_handler(struct k_timer *timer);
 /* S5 inactive timer*/
 K_TIMER_DEFINE(s5_inactive_timer, s5_inactive_timer_handler, NULL);
-
-LOG_MODULE_REGISTER(ap_pwrseq, CONFIG_AP_PWRSEQ_LOG_LEVEL);
 
 /**
  * @brief power_state names for debug
@@ -83,40 +81,6 @@ K_TIMER_DEFINE(x86_non_dsx_timer, x86_non_dsx_timer_handler, NULL);
 
 LOG_MODULE_DECLARE(ap_pwrseq, CONFIG_AP_PWRSEQ_LOG_LEVEL);
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
-
-/*
- * Returns true if all signals in mask are valid.
- * This is only done for virtual wire signals.
- */
-static inline bool signals_valid(power_signal_mask_t signals)
-{
-#if defined(CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S3)
-	if ((signals & POWER_SIGNAL_MASK(PWR_SLP_S3)) &&
-	    power_signal_get(PWR_SLP_S3) < 0)
-		return false;
-#endif
-#if defined(CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S4)
-	if ((signals & POWER_SIGNAL_MASK(PWR_SLP_S4)) &&
-	    power_signal_get(PWR_SLP_S4) < 0)
-		return false;
-#endif
-#if defined(CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI_VW_SLP_S5)
-	if ((signals & POWER_SIGNAL_MASK(PWR_SLP_S5)) &&
-	    power_signal_get(PWR_SLP_S5) < 0)
-		return false;
-#endif
-	return true;
-}
-
-static inline bool signals_valid_and_on(power_signal_mask_t signals)
-{
-	return signals_valid(signals) && power_signals_on(signals);
-}
-
-static inline bool signals_valid_and_off(power_signal_mask_t signals)
-{
-	return signals_valid(signals) && power_signals_off(signals);
-}
 
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
 enum power_states_ndsx pwr_sm_get_state(void)
@@ -260,91 +224,9 @@ void apshutdown(void)
 }
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
 
-void ap_power_force_shutdown(enum ap_power_shutdown_reason reason)
-{
-#ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
-	/* This prevents force shutdown if debug mode is enabled */
-	if (in_debug_mode) {
-		LOG_WRN("debug_mode is enabled, preventing force shutdown");
-		return;
-	}
-#endif /* CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND */
-
-	report_ap_reset((enum chipset_shutdown_reason)reason);
-#ifdef CONFIG_AP_PWRSEQ_DRIVER
-	ap_pwrseq_post_event(ap_pwrseq_get_instance(),
-			     AP_PWRSEQ_EVENT_POWER_SHUTDOWN);
-#else
-	board_ap_power_force_shutdown();
-#endif
-}
-
 void set_start_from_g3_delay_seconds(uint32_t d_time)
 {
 	start_from_g3_delay_ms = d_time * USEC_PER_MSEC;
-}
-
-void ap_power_reset(enum ap_power_shutdown_reason reason)
-{
-	/*
-	 * Irrespective of cold_reset value, always toggle SYS_RESET_L to
-	 * perform an AP reset. RCIN# which was used earlier to trigger
-	 * a warm reset is known to not work in certain cases where the CPU
-	 * is in a bad state (crbug.com/721853).
-	 *
-	 * The EC cannot control warm vs cold reset of the AP using
-	 * SYS_RESET_L; it's more of a request.
-	 */
-	LOG_DBG("%s: %d", __func__, reason);
-
-	/*
-	 * Toggling SYS_RESET_L will not have any impact when it's already
-	 * low (i,e. AP is in reset state).
-	 */
-	if (power_signal_get(PWR_SYS_RST)) {
-		LOG_DBG("Chipset is in reset state");
-		return;
-	}
-
-	report_ap_reset((enum chipset_shutdown_reason)reason);
-
-	power_signal_set(PWR_SYS_RST, 1);
-	/*
-	 * Debounce time for SYS_RESET_L is 16 ms. Wait twice that period
-	 * to be safe.
-	 */
-	k_msleep(AP_PWRSEQ_DT_VALUE(sys_reset_delay));
-	power_signal_set(PWR_SYS_RST, 0);
-	ap_power_ev_send_callbacks(AP_POWER_RESET);
-}
-
-/* Check RSMRST is fine to move from S5 to higher state */
-int rsmrst_power_is_good(void)
-{
-	/* TODO: Check if this is still intact */
-	return power_signal_get(PWR_RSMRST_PWRGD);
-}
-
-/* Handling RSMRST signal is mostly common across x86 chipsets */
-void rsmrst_pass_thru_handler(void)
-{
-	/* Handle RSMRST passthrough */
-	/* TODO: Add additional conditions for RSMRST handling */
-	if (power_signal_get(PWR_RSMRST_PWRGD)) {
-		if (power_signal_get(PWR_EC_PCH_RSMRST)) {
-			/*
-			 * Delay `PWR_EC_PCH_RSMRST` de-assertion for at least
-			 * `rsmrst_delay` after detecting that power wells are
-			 * stable.
-			 */
-			k_msleep(AP_PWRSEQ_DT_VALUE(rsmrst_delay));
-			LOG_DBG("Deasserting PWR_EC_PCH_RSMRST");
-			power_signal_set(PWR_EC_PCH_RSMRST, 0);
-			update_ap_boot_time(RSMRST);
-		}
-	} else {
-		power_signal_set(PWR_EC_PCH_RSMRST, 1);
-	}
 }
 
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
@@ -409,6 +291,11 @@ static int common_pwr_sm_run(int state)
 				LOG_INF("Clearing request to exit G3");
 				return SYS_POWER_STATE_S5S4;
 			}
+		}
+
+		if (ap_power_in_debug_mode()) {
+			LOG_WRN("debug_mode is enabled, preventing shutdown");
+			break;
 		}
 		/*
 		 * S5 state has an inactivity timer, so moving
@@ -882,7 +769,7 @@ static int x86_non_dsx_s5_run(void *data)
 	}
 #ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
 	/* This prevents force shutdown if debug mode is enabled */
-	if (in_debug_mode) {
+	if (ap_power_in_debug_mode()) {
 		LOG_WRN("debug_mode is enabled, preventing G3 transition");
 		return 0;
 	}
@@ -1000,29 +887,3 @@ static int x86_non_dsx_s0_exit(void *data)
 AP_POWER_ARCH_STATE_DEFINE(S0, x86_non_dsx_s0_entry, x86_non_dsx_s0_run,
 			   x86_non_dsx_s0_exit);
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
-
-#ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
-/*
- * Intel debugger puts SOC in boot halt mode for step debugging,
- * during this time EC may lose Sx lines, Adding this console
- * command to avoid force shutdown.
- */
-static int disable_force_shutdown(int argc, const char **argv)
-{
-	if (argc > 1) {
-		if (!strcmp(argv[1], "enable")) {
-			in_debug_mode = true;
-		} else if (!strcmp(argv[1], "disable")) {
-			in_debug_mode = false;
-		} else {
-			return EC_ERROR_PARAM1;
-		}
-	}
-	LOG_INF("debug_mode = %s", (in_debug_mode ? "enabled" : "disabled"));
-
-	return EC_SUCCESS;
-}
-
-DECLARE_CONSOLE_COMMAND(debug_mode, disable_force_shutdown, "[enable|disable]",
-			"Prevents force shutdown if enabled");
-#endif /* CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND */

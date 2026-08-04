@@ -2,6 +2,7 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+#include "ap_reset_log.h"
 
 #include <ap_power/ap_power_interface.h>
 #include <x86_non_dsx_common_pwrseq_sm_handler.h>
@@ -188,6 +189,92 @@ void ap_pwrseq_task_start(void)
 }
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
 
-void ap_power_init_reset_log(void)
+void ap_power_force_shutdown(enum ap_power_shutdown_reason reason)
 {
+	/* This prevents force shutdown if debug mode is enabled */
+	if (ap_power_in_debug_mode()) {
+		LOG_WRN("debug_mode is enabled, preventing force shutdown");
+		return;
+	}
+
+	report_ap_reset((enum chipset_shutdown_reason)reason);
+#ifdef CONFIG_AP_PWRSEQ_DRIVER
+	ap_pwrseq_post_event(ap_pwrseq_get_instance(),
+			     AP_PWRSEQ_EVENT_POWER_SHUTDOWN);
+#else
+	board_ap_power_force_shutdown();
+#endif
 }
+
+void ap_power_reset(enum ap_power_shutdown_reason reason)
+{
+	/*
+	 * Irrespective of cold_reset value, always toggle SYS_RESET_L to
+	 * perform an AP reset. RCIN# which was used earlier to trigger
+	 * a warm reset is known to not work in certain cases where the CPU
+	 * is in a bad state (crbug.com/721853).
+	 *
+	 * The EC cannot control warm vs cold reset of the AP using
+	 * SYS_RESET_L; it's more of a request.
+	 */
+	LOG_DBG("%s: %d", __func__, reason);
+
+	/*
+	 * Toggling SYS_RESET_L will not have any impact when it's already
+	 * low (i,e. AP is in reset state).
+	 */
+	if (power_signal_get(PWR_SYS_RST)) {
+		LOG_DBG("Chipset is in reset state");
+		return;
+	}
+
+	report_ap_reset((enum chipset_shutdown_reason)reason);
+
+	power_signal_set(PWR_SYS_RST, 1);
+	/*
+	 * Debounce time for SYS_RESET_L is 16 ms. Wait twice that period
+	 * to be safe.
+	 */
+	k_msleep(AP_PWRSEQ_DT_VALUE(sys_reset_delay));
+	power_signal_set(PWR_SYS_RST, 0);
+	ap_power_ev_send_callbacks(AP_POWER_RESET);
+}
+
+#ifdef CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND
+static bool in_debug_mode;
+
+bool ap_power_in_debug_mode(void)
+{
+	return in_debug_mode;
+}
+
+/*
+ * Intel debugger puts SOC in boot halt mode for step debugging,
+ * during this time EC may lose Sx lines, Adding this console
+ * command to avoid force shutdown.
+ */
+static int disable_force_shutdown(const struct shell *sh, size_t argc,
+				  char **argv)
+{
+	if (argc > 1) {
+		if (!strcmp(argv[1], "enable")) {
+			in_debug_mode = true;
+		} else if (!strcmp(argv[1], "disable")) {
+			in_debug_mode = false;
+		} else {
+			return EC_ERROR_PARAM1;
+		}
+	}
+	LOG_INF("debug_mode = %s", (in_debug_mode ? "enabled" : "disabled"));
+
+	return EC_SUCCESS;
+}
+
+SHELL_CMD_REGISTER(debug_mode, NULL, "[enable|disable]",
+		   disable_force_shutdown);
+#else
+bool ap_power_in_debug_mode(void)
+{
+	return false;
+}
+#endif /* CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND */
