@@ -916,3 +916,33 @@ ZTEST_USER(common_cbi, test_cbi_set_board_info__resize_overflow)
 		   "Failed to read SKU after failed resize");
 	zassert_equal(read_sku, original_sku, "SKU corrupted after overflow");
 }
+
+ZTEST_USER(common_cbi,
+	   test_hc_cbi_bin_write__buffer_clear_overflow_preserves_cache)
+{
+	uint32_t original_sku = 0x87654321;
+	uint32_t read_sku;
+	struct ec_params_cbi_bin_write p = { 0 };
+
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+	zassert_ok(cbi_create(), "cbi_create failed");
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (uint8_t *)&original_sku,
+				      sizeof(original_sku)),
+		   "Failed to set initial SKU");
+
+	p.offset = CBI_IMAGE_SIZE + 10;
+	p.size = 4;
+	p.flags = EC_CBI_BIN_BUFFER_CLEAR;
+
+	zassert_equal(
+		host_cmd_cbi_bin_write(&p, sizeof(p)), EC_RES_INVALID_PARAM,
+		"Expected INVALID_PARAM when writing out of bounds with clear flag");
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }),
+		   "Failed to read SKU after invalid bin write");
+	zassert_equal(read_sku, original_sku,
+		      "RAM cache was wiped by invalid bin write");
+}
+}
