@@ -35,6 +35,24 @@
       "isAi": true,
       "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66d35d46_85018f8f",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/include/ft98xx_algo_mocks.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:18:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "26ffa04d_a20e456d",
+      "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
