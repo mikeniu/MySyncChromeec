@@ -89,9 +89,11 @@ BINARY_SIZE_REGIONS = [
     "RO_FLASH",
     "RO_RAM",
     "RO_ROM",
+    "RO_ROM_UNPADDED",
     "RW_FLASH",
     "RW_RAM",
     "RW_ROM",
+    "RW_ROM_UNPADDED",
 ]
 
 # Unused boards that are expected to be unused, such as dev boards.
