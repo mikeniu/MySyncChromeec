@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3f6f9f5_740c4458",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 33
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:42:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "da1be7fc_af8d6201",
+      "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26ffa04d_a20e456d",
@@ -78,6 +96,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6227eb7_9d40bf42",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:42:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ecd9494b_b30300cf",
+      "range": {
+        "startLine": 248,
+        "startChar": 0,
+        "endLine": 248,
+        "endChar": 73
+      },
+      "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a984993_6ee90628",
@@ -101,6 +143,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "696ebb2e_27617fcc",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:42:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a984993_6ee90628",
+      "range": {
+        "startLine": 387,
+        "startChar": 22,
+        "endLine": 387,
+        "endChar": 26
+      },
+      "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0762a075_acaa6dc9",
@@ -114,6 +180,30 @@
       "writtenOn": "2026-08-04T23:23:06Z",
       "side": 1,
       "message": "* **Validate Out-Parameters on Failure Paths:**\nIn `test_match_algo_match_failure`, you correctly assert that `match_index` remains `-1` when the match fails. You should apply this same rigor to the other match failure tests (`test_match_get_feature_failure`, `test_match_anti_spoofing_failure`, and `test_match_template_update_failure`).\n* **Suggestion:** Add `zassert_equal(match_index, -1);` and `zassert_equal(update_bitmap, 0);` to the end of these failure tests to ensure the driver does not mutate out-parameters when an operation is aborted early.",
+      "range": {
+        "startLine": 397,
+        "startChar": 0,
+        "endLine": 397,
+        "endChar": 46
+      },
+      "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a94f8c6_6bce685d",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:42:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0762a075_acaa6dc9",
       "range": {
         "startLine": 397,
         "startChar": 0,
