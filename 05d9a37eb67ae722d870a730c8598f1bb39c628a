@@ -46,6 +46,29 @@
       },
       "revId": "05d9a37eb67ae722d870a730c8598f1bb39c628a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc077442_8aef4444",
+        "filename": "common/charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1588,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-04T15:06:49Z",
+      "side": 1,
+      "message": "Create a helper function to encapsulate this logic as this function is already pretty long and complex.",
+      "range": {
+        "startLine": 1582,
+        "startChar": 0,
+        "endLine": 1588,
+        "endChar": 6
+      },
+      "revId": "05d9a37eb67ae722d870a730c8598f1bb39c628a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
