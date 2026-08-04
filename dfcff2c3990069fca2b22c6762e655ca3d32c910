@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fde1acf4_140d721f",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T23:16:13Z",
+      "side": 1,
+      "message": "In `zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c`, the new test cases invoke the target functions inconsistently.\nMost tests correctly use the subsystem wrapper:\n\n```c\nint res \u003d fingerprint_match(fixture-\u003ealg, template_buf, 1, NULL, false, \u0026match_index, \u0026update_bitmap);\n\n```\n\nHowever, two tests explicitly bypass the wrapper and call the driver API directly:\n\n```c\nZTEST_F(ft98xx_bio_alg, test_match_null_templ_with_count_fails)\n{\n    // ...\n    int res \u003d fixture-\u003ealg-\u003eapi-\u003ematch(fixture-\u003ealg, NULL, 1, ...);\n\n```\n\n* **Recommendation:** Tests should uniformly use `fingerprint_match()` unless there is a specific, documented reason to bypass the subsystem wrapper. If `fingerprint_match()` intercepts the `templ \u003d\u003d NULL` condition before it reaches the driver, then the driver\u0027s internal check may be unreachable (and thus redundant), which is an architectural anti-pattern. Please unify the tests to use `fingerprint_match()`. If bypassing the wrapper is strictly necessary for this specific test, add a comment explaining *why*.",
+      "range": {
+        "startLine": 463,
+        "startChar": 0,
+        "endLine": 465,
+        "endChar": 38
+      },
+      "revId": "dfcff2c3990069fca2b22c6762e655ca3d32c910",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
