@@ -379,6 +379,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5fefc660_3e86a85d",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:09:12Z",
+      "side": 1,
+      "message": "\u003e Added an explanatory comment in ft98xx_alg_before to clarify that memset is safe here.\n\n\nI don\u0027t see that comment.",
+      "parentUuid": "afcae3e5_1feac446",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 62
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e22b5f21_6f94f8fb",
         "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
         "patchSetId": 28
