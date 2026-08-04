@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "13f0408e_60957566",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/CMakeLists.txt",
+        "patchSetId": 28
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "I can update this in a follow up CL.",
+      "parentUuid": "842e3e2e_8fa38ef7",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 38
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "88fd0620_976349d9",
@@ -70,6 +94,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "151c42c8_4bb7cfea",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/CMakeLists.txt",
+        "patchSetId": 28
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "I can modify it in a follow up CL.",
+      "parentUuid": "88fd0620_976349d9",
+      "range": {
+        "startLine": 18,
+        "startChar": 4,
+        "endLine": 18,
+        "endChar": 43
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "099794bf_cf0d972e",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/CMakeLists.txt",
+        "patchSetId": 28
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "this does not make sense. `HAVE_FT_LOCKER_PRIVATE_ALGORITHM` is a hidden config option. \n\n```\nconfig HAVE_FT_LOCKER_PRIVATE_ALGORITHM\n\tbool\n\tdefault n\n\thelp\n\t  If enabled, it indicates that focaltech private algorithm is present.\n```\n\nIt can be only selected when `FT_FT98XX_LIBRARY` is enabled. This enabled the private library.\n\n```\nconfig FT_FT98XX_LIBRARY\n\tbool \"Focaltech FT98XX library\"\n\tdefault y if FINGERPRINT_SENSOR_FT98XX\n\tdefault y if FP_FT98XX_ALGORITHM\n\tdepends on ARM\n\tdepends on !TEST\n\timply HAVE_FT98XX_PRIVATE_DRIVER\n\timply HAVE_FT_LOCKER_PRIVATE_ALGORITHM\n\thelp\n\t  If enabled, the FT98XX library will be linked with firmware.\n```\n\nThe best way to enable it for the test, is to pass it in the `target_compile_definitions`",
+      "parentUuid": "8b10d83c_86eebd9e",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 45
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a41de739_bba581af",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d00fa1b3_4b30f461",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/include/ft98xx_algo_mocks.h",
+        "patchSetId": 28
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "I did a code search and did not find any one using the suggested:\n\nhttps://source.chromium.org/search?q\u003dDECLARE_FAKE_VALUE_FUNC\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fplatform%2Fec%2Fzephyr%2F\n\nAccording to Gemini this does not make sense\n\nIn FFF, every comma inside DECLARE_FAKE_VALUE_FUNC counts as a separate macro argument.\n\nIf you write:\n\n```\n/* INCORRECT */\nDECLARE_FAKE_VALUE_FUNC(int, focal_algo_enroll_step, uint8_t *, image_buffer, uint8_t, current_step);\n```\n\nFFF calculates the number of arguments using a macro like PP_NARG_MINUS2(...).\n\nIt counts 4 argument types instead of 2 argument types.\n\nIt tries to use image_buffer and current_step as C types when declaring fake structure members:\n\n```\n/* FFF expands internally to something like this: */\ntypedef struct {\n    uint8_t * arg0;\n    image_buffer arg1;  /* \u003c--- Compiler Error: unknown type \u0027image_buffer\u0027 */\n    uint8_t arg2;\n    current_step arg3;  /* \u003c--- Compiler Error: unknown type \u0027current_step\u0027 */\n} focal_algo_enroll_step_Fake;\n```",
+      "parentUuid": "a41de739_bba581af",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 14
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ec57c16_2605190e",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-08-04T16:10:50Z",
       "side": 1,
       "message": "**2. Incomplete Coverage of Mocks**\nYou have declared a mock for `focal_algo_version` (`DECLARE_FAKE_VOID_FUNC(focal_algo_version, uint8_t *);`), and properly reset it in `ft98xx_alg_before`, but there doesn\u0027t seem to be a test validating that the driver correctly queries or exposes the algorithm version.\n\n* **Suggestion:** Add a brief test case (e.g., `test_version_query`) to verify this functionality if the version string is exposed via the Zephyr fingerprint subsystem API.",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 53
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb240016_048a17b1",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ec57c16_2605190e",
       "range": {
         "startLine": 28,
         "startChar": 0,
@@ -162,6 +282,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cba964e_cebbef44",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e77da46_d4dc361b",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 39
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8e5fd3c_edb847b8",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b7c2e10_2a62fca1",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 39
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d6ac21a_c0977eef",
@@ -175,6 +343,30 @@
       "writtenOn": "2026-08-04T16:10:50Z",
       "side": 1,
       "message": "**1. Breaking Encapsulation and OS Primitive Safety**\nIn the `ft98xx_alg_before` setup function, you clear the algorithm\u0027s private data using `memset`:\n\n```c\n\tif (fixture-\u003ealg \u0026\u0026 fixture-\u003ealg-\u003edata) {\n\t\tmemset(fixture-\u003ealg-\u003edata, 0, sizeof(struct ft_libfp_data));\n\t}\n\n```\n\n* **Issue:** Bypassing abstraction in a test suite is sometimes necessary, but resetting a state structure strictly via `memset` is risky in Zephyr. If `struct ft_libfp_data` contains any initialized Zephyr OS primitives (like a `k_mutex`, `k_sem`, or `k_work`), zeroing them out will corrupt those objects and cause hardware faults during test execution.\n* **Suggestion:** If possible, rely on `fingerprint_algorithm_exit()` to cleanly reset the internal state. If you absolutely must clear it manually here, ensure (and perhaps document) that `struct ft_libfp_data` is strictly POD (Plain Old Data) with no OS-level synchronization primitives.",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 62
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afcae3e5_1feac446",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done. Confirmed via ft98xx_bio_alg.h that struct ft_libfp_data is strictly POD (containing only scalar dimensions, counts, and buffer pointers, with no embedded Zephyr primitives such as mutexes or semaphores). Added an explanatory comment in ft98xx_alg_before to clarify that memset is safe here.\n\n```\n/* Focal LIBFP algorithm private data. */\nstruct ft_libfp_data {\n\tuint16_t cols;\n\tuint16_t rows;\n\tuint32_t max_enroll_samples;\n\tuint8_t remain; // the left enroll count\n\tuint32_t tpl_finger_size; // tpl_finger_size \u003d tpl_head_size +\n\t\t\t\t  // tpl_subtemplate_size * n\n\tuint32_t tpl_head_size;\n\tuint32_t tpl_subtemplate_size;\n\tuint8_t *algo_buf;\n\tuint8_t *feature_buf;\n};\n```",
+      "parentUuid": "1d6ac21a_c0977eef",
       "range": {
         "startLine": 77,
         "startChar": 0,
@@ -208,6 +400,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "63ba25f3_a81bf75b",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e22b5f21_6f94f8fb",
+      "range": {
+        "startLine": 109,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 66
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2fa16b17_3561778b",
@@ -221,6 +437,30 @@
       "writtenOn": "2026-08-04T16:10:50Z",
       "side": 1,
       "message": "**1. Uninitialized Output Parameters in Custom Mock**\nIn `custom_get_finger_detailed_info_too_large`, you assign a value to `*finger_size` but fail to assign values to `*subtpl_size` and `*head_size`.\n\n```c\nstatic int custom_get_finger_detailed_info_too_large(int *finger_size,\n\t\t\t\t\t\t     int *subtpl_size,\n\t\t\t\t\t\t     int *head_size)\n{\n\tif (finger_size)\n\t\t*finger_size \u003d CONFIG_FP_ALGORITHM_TEMPLATE_SIZE + 1;\n\t// Missing subtpl_size and head_size assignments\n\treturn 0;\n}\n\n```\n\n* **Issue:** When the SUT (System Under Test) calls this function, it likely passes pointers to uninitialized local variables. If it subsequently reads `subtpl_size` or `head_size` to calculate the total required buffer size, it will read garbage memory. This can lead to undefined behavior or flaky test failures depending on what happens to be on the stack.\n* **Suggestion:** Ensure all requested output parameters are populated with safe defaults.\n\n```c\n\tif (subtpl_size) *subtpl_size \u003d 0;\n\tif (head_size) *head_size \u003d 0;\n\n```",
+      "range": {
+        "startLine": 118,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 1
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d68455e5_8ac84715",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2fa16b17_3561778b",
       "range": {
         "startLine": 118,
         "startChar": 0,
@@ -254,6 +494,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2db409c7_760ce1ee",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2456e2e5_24eb3e9e",
+      "range": {
+        "startLine": 134,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 53
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70f53e28_1e9f3f74",
@@ -267,6 +531,30 @@
       "writtenOn": "2026-08-04T16:16:49Z",
       "side": 1,
       "message": "**1. Missing Teardown / Bypassing `exit()**`\nAlmost all tests (e.g., `test_enroll_step_success_and_progress`, `test_match_success_no_update`) call `fingerprint_algorithm_init()` but never call `fingerprint_algorithm_exit()` at the end of the test.\n\n* **Issue:** Relying on the `memset` in `ft98xx_alg_before` to reset state for the next test is highly problematic. If the driver\u0027s `init()` function dynamically allocates memory, creates threads, or locks hardware resources, skipping `exit()` will permanently leak those resources, eventually crashing the test runner.\n* **Suggestion:** Implement a teardown function for the ZTEST fixture (the `after` parameter in `ZTEST_SUITE`) that safely calls `fingerprint_algorithm_exit(fixture-\u003ealg);` to ensure graceful cleanup.",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 54
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3300722_f0922e3e",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70f53e28_1e9f3f74",
       "range": {
         "startLine": 144,
         "startChar": 0,
@@ -300,6 +588,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "548c56a2_b04bf7ff",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f3a9f6c_e884c45e",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 52
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c396d410_66afdafb",
@@ -313,6 +625,30 @@
       "writtenOn": "2026-08-04T16:16:49Z",
       "side": 1,
       "message": "**1. Magic Numbers vs Constants in Math**\nIn `test_enroll_step_success_and_progress`:\n\n```c\nzassert_equal(completion, (1 * 100) / total_samples,\n\t      \"Completion should be ~8%% after 1 step.\");\n\n```\n\n* **Suggestion:** You nicely parameterized `total_samples \u003d SINGLE_FINGER_ENROLL_NUM;`, but hardcoded `12` in your brain to write `~8%%` in the string. If `SINGLE_FINGER_ENROLL_NUM` changes in the driver header, the math still works, but the log message becomes a lie. Keep the string generic (e.g., `\"Completion should correctly reflect 1 out of N steps\"`).",
+      "range": {
+        "startLine": 198,
+        "startChar": 0,
+        "endLine": 208,
+        "endChar": 53
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4abefe1a_c65311c3",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c396d410_66afdafb",
       "range": {
         "startLine": 198,
         "startChar": 0,
@@ -346,6 +682,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ff78921_4ff0268a",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51ea5abb_4c8d098c",
+      "range": {
+        "startLine": 230,
+        "startChar": 0,
+        "endLine": 231,
+        "endChar": 60
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ded4b81_9785ce49",
@@ -369,6 +729,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04948c97_e788a639",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ded4b81_9785ce49",
+      "range": {
+        "startLine": 239,
+        "startChar": 0,
+        "endLine": 239,
+        "endChar": 59
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf86fecb_ccf23a1a",
@@ -382,6 +766,30 @@
       "writtenOn": "2026-08-04T16:22:08Z",
       "side": 1,
       "message": "**1. Unverified Anti-Spoofing Flag (Bypassing Hardware)**\nIn `test_match_success_no_update`, you call `fingerprint_match` with what appears to be a `false` flag for anti-spoofing:\n\n```c\n\tint res \u003d fingerprint_match(fixture-\u003ealg, template_buf, 1,\n\t\t\t\t    fixture-\u003efake_image, false, \u0026match_index,\n\t\t\t\t    \u0026update_bitmap);\n\n```\n\nHowever, you explicitly set up the anti-spoofing mock (`focal_algo_anti_spoofing_fake.return_val \u003d 0;`) but never check its call count.\n\n* **Issue:** The point of passing `false` to the match API is likely to instruct the algorithm to skip a costly hardware anti-spoofing check. If the driver contains a bug where it executes the spoofing check anyway, this test will pass silently, missing the bug.\n* **Suggestion:** Add an assertion to strictly verify that the driver respected the flag and skipped the hardware call:\n\n```c\nzassert_equal(focal_algo_anti_spoofing_fake.call_count, 0, \n              \"Spoofing check must be skipped when flag is false\");\n\n```",
+      "range": {
+        "startLine": 272,
+        "startChar": 29,
+        "endLine": 272,
+        "endChar": 34
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e840cb0_594cc356",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:20:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf86fecb_ccf23a1a",
       "range": {
         "startLine": 272,
         "startChar": 29,
