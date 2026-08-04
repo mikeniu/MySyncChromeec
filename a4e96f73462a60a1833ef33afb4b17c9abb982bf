@@ -22,6 +22,30 @@
       },
       "revId": "a4e96f73462a60a1833ef33afb4b17c9abb982bf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a193a36f_15be2f52",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:18:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c9153d4_4d9553c7",
+      "range": {
+        "startLine": 420,
+        "startChar": 22,
+        "endLine": 420,
+        "endChar": 26
+      },
+      "revId": "a4e96f73462a60a1833ef33afb4b17c9abb982bf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
