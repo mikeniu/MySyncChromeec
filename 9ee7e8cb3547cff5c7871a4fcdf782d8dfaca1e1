@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66ce9df5_ff5e1c3f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:37:11Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c585574e_317c40ea",
+      "revId": "9ee7e8cb3547cff5c7871a4fcdf782d8dfaca1e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef44bc71_28dea902",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Consider adding a test to verify that `fingerprint_acquire_image` correctly propagates errors from the underlying sensor function `ft_sensor_acquire_image_with_mode`.\n\n```c\nZTEST_F(ft98xx, test_acquire_image_error)\n{\n\tuint8_t buffer[FP_SENSOR_IMAGE_SIZE];\n\n\tft_sensor_acquire_image_with_mode_fake.return_val \u003d -EIO;\n\n\tzassert_equal(fingerprint_acquire_image(fixture-\u003edev,\n\t\t\t\t\t\tFINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT,\n\t\t\t\t\t\tbuffer, sizeof(buffer)),\n\t\t      -EIO);\n}\n```",
       "isAi": true,
+      "revId": "9ee7e8cb3547cff5c7871a4fcdf782d8dfaca1e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc5ef5bf_fa44e8e5",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T18:37:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef44bc71_28dea902",
       "revId": "9ee7e8cb3547cff5c7871a4fcdf782d8dfaca1e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
