@@ -26,6 +26,11 @@ if(DEFINED CONFIG_BOARD_MICA)
 	add_subdirectory(mica)
 endif()
 
+if(DEFINED CONFIG_BOARD_PIC)
+        project(pic)
+        add_subdirectory(pic)
+endif()
+
 zephyr_library_sources("src/battery.c")
 zephyr_library_sources("src/switchcap.c")
 zephyr_library_sources("src/chipset.c")
