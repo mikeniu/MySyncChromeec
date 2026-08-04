@@ -6,7 +6,7 @@
 """Merge lcov files, discarding all lines that are not in the template file.
 
 Given 2 or more lcov files, merge the results only for the lines present in
-the template file.
+the template file and omit records matching exclude patterns.
 
 File format reverse engineered from
 https://github.com/linux-test-project/lcov/blob/master/bin/geninfo
@@ -14,10 +14,11 @@ https://github.com/linux-test-project/lcov/blob/master/bin/geninfo
 
 import argparse
 from collections import defaultdict
+import fnmatch
 import logging
 import re
 import sys
-from typing import Dict, Set
+from typing import Dict, List, Pattern, Set
 
 
 EXTRACT_LINE = re.compile(r"^(FN|DA|BRDA):(\d+),")
@@ -49,18 +50,44 @@ def parse_args(argv=None):
         help="destination filename, defaults to stdout",
     )
     parser.add_argument(
+        "--exclude",
+        "-r",
+        action="append",
+        default=[],
+        help="Exclude file patterns matching glob (can be specified multiple times)",
+    )
+    parser.add_argument(
         "template_file",
         help="lcov info file to use as template",
     )
     parser.add_argument(
         "lcov_input",
-        nargs="+",
-        help="lcov info file to merge",
+        nargs="*",
+        default=[],
+        help="lcov info file(s) to merge",
     )
     return parser.parse_args(argv)
 
 
-def parse_template_file(filename) -> Dict[str, Set[str]]:
+def compile_exclude_patterns(patterns: List[str]) -> List[Pattern]:
+    """Compiles glob patterns to regexes for fast matching."""
+    compiled = []
+    for p in patterns:
+        compiled.append(re.compile(fnmatch.translate(p)))
+    return compiled
+
+
+def is_file_excluded(file_path: str, exclude_regexes: List[Pattern]) -> bool:
+    """Returns True if file_path matches any of the exclude patterns."""
+    for regex in exclude_regexes:
+        if regex.match(file_path):
+            return True
+    return False
+
+
+def parse_template_file(
+    filename, exclude_regexes: List[Pattern] = None
+) -> Dict[str, Set[str]]:
     """Reads the template file and returns covered lines.
 
     Reads the lines that indicate covered line numbers (FN, DA, and BRDA)
@@ -75,10 +102,21 @@ def parse_template_file(filename) -> Dict[str, Set[str]]:
     with open(filename, "r", encoding="utf-8") as template_file:
         data_by_path: Dict[str, Set[str]] = defaultdict(set)
         file_name = None
+        is_excluded = False
         for line in template_file.readlines():
             line = line.strip()
             if line == "end_of_record":
                 file_name = None
+                is_excluded = False
+            elif line.startswith("SF:"):
+                file_name = line
+                path_part = line[3:]
+                if exclude_regexes and is_file_excluded(
+                    path_part, exclude_regexes
+                ):
+                    is_excluded = True
+            elif is_excluded:
+                continue
             elif (
                 line.startswith(  # pylint:disable=too-many-boolean-expressions
                     "TN:"
@@ -92,8 +130,6 @@ def parse_template_file(filename) -> Dict[str, Set[str]]:
                 or line.startswith("LH:")
             ):
                 pass
-            elif line.startswith("SF:"):
-                file_name = line
             else:
                 match = EXTRACT_LINE.match(line)
                 if file_name and match:
@@ -103,7 +139,9 @@ def parse_template_file(filename) -> Dict[str, Set[str]]:
         return data_by_path
 
 
-def filter_coverage_file(filename, output_file, data_by_path):
+def filter_coverage_file(
+    filename, output_file, data_by_path, exclude_regexes: List[Pattern] = None
+):
     """Reads a coverage file from filename and writes filtered lines to
     output_file.
 
@@ -123,18 +161,27 @@ def filter_coverage_file(filename, output_file, data_by_path):
             }
 
         record = empty_record()
+        is_excluded = False
         for line in input_file.readlines():
             line = line.strip()
             if line == "end_of_record":
                 record["text"] += line + "\n"
-                if record.get("should_write_record", False):
+                if record.get("should_write_record", False) and not is_excluded:
                     output_file.write(record["text"])
                 else:
                     logging.debug("Omitting record %s", record["text"])
                 record = empty_record()
+                is_excluded = False
             elif line.startswith("SF:"):
                 record["file_name"] = line
                 record["text"] += line + "\n"
+                path_part = line[3:]
+                if exclude_regexes and is_file_excluded(
+                    path_part, exclude_regexes
+                ):
+                    is_excluded = True
+            elif is_excluded:
+                continue
             elif line.startswith("TN:"):
                 record["text"] += line + "\n"
             elif line.startswith("FN:"):
@@ -221,10 +268,22 @@ def main(argv=None):
             opts.output_file, "w", encoding="utf-8"
         )
 
-    data_by_path = parse_template_file(opts.template_file)
+    exclude_patterns = []
+    for arg in opts.exclude:
+        for p in arg.split():
+            exclude_patterns.append(p)
+
+    exclude_regexes = compile_exclude_patterns(exclude_patterns)
+    data_by_path = parse_template_file(opts.template_file, exclude_regexes)
+
     with output_file:
-        for lcov_input in [opts.template_file] + opts.lcov_input:
-            filter_coverage_file(lcov_input, output_file, data_by_path)
+        input_files = [opts.template_file]
+        if opts.lcov_input:
+            input_files.extend(opts.lcov_input)
+        for lcov_input in input_files:
+            filter_coverage_file(
+                lcov_input, output_file, data_by_path, exclude_regexes
+            )
 
 
 if __name__ == "__main__":
