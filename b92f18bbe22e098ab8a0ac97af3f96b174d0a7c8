@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8690cee_e169df76",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:38:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e33c1d5e_6dc6b689",
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4436f4af_c9e1ea85",
@@ -32,6 +50,30 @@
       "writtenOn": "2026-08-04T22:09:40Z",
       "side": 1,
       "message": "Can you create constants for these magic numbers so that they\u0027re self-describing?",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 19
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "770f8596_28b137f2",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:38:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4436f4af_c9e1ea85",
       "range": {
         "startLine": 58,
         "startChar": 0,
@@ -65,6 +107,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f6e9366_8e1100d8",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:38:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76c31d67_6e6793ef",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 32
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a7d30b0b_be5cda71",
@@ -78,6 +144,30 @@
       "writtenOn": "2026-08-04T22:19:10Z",
       "side": 1,
       "message": "In `ft98xx_alg_before`, you forcefully clear the driver\u0027s private data structure:\n\n```c\nif (fixture-\u003ealg \u0026\u0026 fixture-\u003ealg-\u003edata) {\n    memset(fixture-\u003ealg-\u003edata, 0, sizeof(struct ft_libfp_data));\n}\n\n```\n\n**Issue:** This is a severe abstraction leak. A unit test should test the API\u0027s black-box/gray-box behavior, not manually wipe its internal RAM. More importantly, **this hides bugs**. If the driver\u0027s `fingerprint_algorithm_exit()` function has a bug where it fails to properly clear internal state, this manual `memset` sweeps the bug under the rug, and the tests will pass while the real firmware fails.\n**Recommendation:** Remove this `memset`. Rely strictly on `fingerprint_algorithm_exit()` to tear down state. If removing this causes tests to fail, you have just found a bug in the actual driver\u0027s cleanup code.",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 62
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37ebe500_81d9decb",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:38:22Z",
+      "side": 1,
+      "message": "we are not calling the real deinit. we are mocking it\n\n```\nstatic int ft98xx_algorithm_exit(const struct fingerprint_algorithm *const alg)\n{\n\tif (!IS_ENABLED(CONFIG_HAVE_FT_LOCKER_PRIVATE_ALGORITHM)) {\n\t\treturn -ENOTSUP;\n\t}\n\n\tfocal_algo_deinit();\n\n\treturn 0;\n}\n```",
+      "parentUuid": "a7d30b0b_be5cda71",
       "range": {
         "startLine": 120,
         "startChar": 0,
@@ -111,6 +201,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0380fbe9_edc10f99",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:38:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97830ca7_1e3f5303",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 141,
+        "endChar": 51
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "617107f3_226a416a",
@@ -124,6 +238,30 @@
       "writtenOn": "2026-08-04T22:19:10Z",
       "side": 1,
       "message": "You have good coverage for logical failures (e.g., low quality, immobile), but you are missing coverage for fundamental algorithm API errors:\n\n* **`focal_algo_enroll_finish` failure:** What happens if the driver calls `finish` and the mocked focal algorithm returns an error code (e.g., `-1`) instead of `0`? The wrapper should gracefully handle and propagate this error.\n* **`focal_algo_enroll_start` failure:** What if the start command fails?\n* **`focal_algo_match` error:** You cover `FP_MATCH_RESULT_NO_MATCH` via feature extraction failing or spoofing failing, but what if `focal_algo_match` itself returns a generic error code (e.g., `-EINVAL`)?\n**Recommendation:** Add 2-3 brief tests to explicitly cover non-zero return codes from these downstream functions.",
+      "range": {
+        "startLine": 171,
+        "startChar": 0,
+        "endLine": 171,
+        "endChar": 7
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5de4d196_57d1d3dc",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:38:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "617107f3_226a416a",
       "range": {
         "startLine": 171,
         "startChar": 0,
@@ -157,6 +295,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5863435b_8ba31dad",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:38:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56614858_7b9b3c7c",
+      "range": {
+        "startLine": 203,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 54
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c92d3395_385155a4",
@@ -180,6 +342,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e0aebe3_1da8b899",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:38:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c92d3395_385155a4",
+      "range": {
+        "startLine": 251,
+        "startChar": 53,
+        "endLine": 251,
+        "endChar": 61
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50fc3772_7baea4e4",
@@ -193,6 +379,30 @@
       "writtenOn": "2026-08-04T22:11:35Z",
       "side": 1,
       "message": "Can you replace this magic number with a self-describing constant? Is it supposed to be `CONFIG_FP_ALGORITHM_TEMPLATE_SIZE`?",
+      "range": {
+        "startLine": 322,
+        "startChar": 22,
+        "endLine": 322,
+        "endChar": 26
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c692c60_1cb93c75",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:38:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50fc3772_7baea4e4",
       "range": {
         "startLine": 322,
         "startChar": 22,
