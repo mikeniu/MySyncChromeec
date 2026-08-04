@@ -40,6 +40,52 @@
       },
       "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c92d3395_385155a4",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:11:35Z",
+      "side": 1,
+      "message": "This could change, so probably better to remove.",
+      "range": {
+        "startLine": 251,
+        "startChar": 53,
+        "endLine": 251,
+        "endChar": 61
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50fc3772_7baea4e4",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:11:35Z",
+      "side": 1,
+      "message": "Can you replace this magic number with a self-describing constant? Is it supposed to be `CONFIG_FP_ALGORITHM_TEMPLATE_SIZE`?",
+      "range": {
+        "startLine": 322,
+        "startChar": 22,
+        "endLine": 322,
+        "endChar": 26
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
