@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8dc22cbb_08e89a75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-04T17:51:08Z",
+      "side": 1,
+      "message": "The failures on firmware-zephyr-cq are unrelated to this change.  But we hope to have that resolved by the end of the day US time (2026-08-04)\n\nPlease address the open comment from Al and rebase your changes.",
+      "revId": "05d9a37eb67ae722d870a730c8598f1bb39c628a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "941e1ee4_7a421f81",
         "filename": "common/charge_state.c",
         "patchSetId": 3
