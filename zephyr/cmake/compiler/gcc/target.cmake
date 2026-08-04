@@ -12,3 +12,10 @@ include("${ZEPHYR_BASE}/cmake/compiler/gcc/target.cmake")
 if(no_libgcc)
   list(REMOVE_ITEM TOOLCHAIN_LIBS gcc)
 endif()
+
+if("${ARCH}" STREQUAL "riscv")
+  # Force medium-any code model for RISC-V baremetal targets under GCC to generate
+  # auipc + jalr 32-bit call sequences, preventing cross-section (RAM <-> Flash)
+  # relocation truncation errors (R_RISCV_RVC_JUMP).
+  list(APPEND TOOLCHAIN_C_FLAGS -mcmodel=medany)
+endif()
