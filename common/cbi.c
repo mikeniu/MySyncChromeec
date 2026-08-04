@@ -518,20 +518,19 @@ static enum ec_status hc_cbi_bin_write(struct host_cmd_handler_args *args)
 	if ((p->offset + p->size) > CBI_FLASH_SIZE)
 		return EC_RES_INVALID_PARAM;
 
-	if (p->flags & EC_CBI_BIN_BUFFER_CLEAR)
-		memset(cbi, 0xFF, CBI_IMAGE_SIZE);
-
-	if (p->offset < CBI_IMAGE_SIZE) {
-		uint32_t write_size = p->size;
-
-		if ((p->offset + p->size) > CBI_IMAGE_SIZE)
-			write_size = CBI_IMAGE_SIZE - p->offset;
-
-		memcpy(cbi + p->offset, p->data, write_size);
-	} else {
+	if (p->offset >= CBI_IMAGE_SIZE) {
 		CPRINTS("CBI buffer overflow");
 		return EC_RES_ERROR;
 	}
+
+	if (p->flags & EC_CBI_BIN_BUFFER_CLEAR)
+		memset(cbi, 0xFF, CBI_IMAGE_SIZE);
+
+	uint32_t write_size = p->size;
+	if ((p->offset + p->size) > CBI_IMAGE_SIZE)
+		write_size = CBI_IMAGE_SIZE - p->offset;
+
+	memcpy(cbi + p->offset, p->data, write_size);
 	if (p->flags & EC_CBI_BIN_BUFFER_WRITE) {
 		if (is_valid_cbi(cbi)) {
 			if (cbi_config->drv->store(cbi)) {

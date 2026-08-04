@@ -5,6 +5,7 @@
 
 #include "cros_board_info.h"
 #include "cros_cbi.h"
+#include "ec_commands.h"
 #include "host_command.h"
 #include "test/drivers/test_mocks.h"
 #include "test/drivers/test_state.h"
@@ -1008,4 +1009,40 @@ ZTEST_USER(common_cbi, test_cros_cbi_ssfc_init)
 	/* Verify invalid SSFC value_id returns false. */
 	zassert_false(cros_cbi_ssfc_check_match((enum cbi_ssfc_value_id)9999),
 		      "Expected false for invalid SSFC value_id");
+}
+
+ZTEST_USER(common_cbi,
+	   test_hc_cbi_bin_write__buffer_clear_overflow_preserves_cache)
+{
+	uint32_t original_sku = 0x87654321;
+	uint32_t read_sku;
+	struct actual_set_params {
+		struct ec_params_set_cbi_bin params;
+		uint8_t actual_data[4];
+	} hc_set_params = {
+		.params = {
+			.offset = CBI_IMAGE_SIZE + 10,
+			.size = 4,
+			.flags = EC_CBI_BIN_BUFFER_CLEAR,
+		},
+	};
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_CBI_BIN_WRITE, 0, hc_set_params);
+
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+	zassert_ok(cbi_create(), "cbi_create failed");
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (uint8_t *)&original_sku,
+				      sizeof(original_sku)),
+		   "Failed to set initial SKU");
+
+	zassert_equal(
+		host_command_process(&set_args), EC_RES_INVALID_PARAM,
+		"Expected INVALID_PARAM when writing out of bounds with clear flag");
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }),
+		   "Failed to read SKU after invalid bin write");
+	zassert_equal(read_sku, original_sku,
+		      "RAM cache was wiped by invalid bin write");
 }
