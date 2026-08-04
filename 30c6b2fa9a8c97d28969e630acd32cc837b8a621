@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52824ea4_d1e2c1ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-04T20:39:28Z",
+      "side": 1,
+      "message": "Nit: Say that it didn\u0027t decrease coverage.",
+      "revId": "30c6b2fa9a8c97d28969e630acd32cc837b8a621",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fbb93b2_fae3b9bb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-04T20:39:28Z",
+      "side": 1,
+      "message": "Shouldn\u0027t there also be a `CMakeLists.txt` change?",
+      "revId": "30c6b2fa9a8c97d28969e630acd32cc837b8a621",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
