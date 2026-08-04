@@ -68,20 +68,25 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/subsys/emul/**' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/subsys/testsuite/**'
 
-.PHONY: test twister_host twister_llvm test_host_utils
+.PHONY: test test_gcc test_llvm twister_host twister_llvm test_host_utils
 
-test: zmake_unit_tests
-test: test_host_utils
+test_gcc: zmake_unit_tests test_host_utils
+test_llvm: zmake_unit_tests test_host_utils
+
 ifdef COVERAGE
-# List all of the files expected by firmware_builder.py
-test: $(PLATFORM_EC)/twister-out-host/coverage.info # EC_ZEPHYR_TESTS_GCC
-test: $(BUILD)/coverage/lcov.info # EC_LEGACY_TESTS
-test: $(BUILD)/zephyr/all_tests.info # ALL_TESTS
-test: $(BUILD)/zephyr/zephyr_merged.info # EC_ZEPHYR_MERGED
-test: $(BUILD)/zephyr/lcov.info # ALL_MERGED
-test: $(BUILD)/zephyr/lcov_no_tests.info # ALL_FILTERED
-test: special_boards_info # BOARD_ metric info files only
+COVERAGE_TARGETS = $(PLATFORM_EC)/twister-out-host/coverage.info \
+	$(BUILD)/coverage/lcov.info \
+	$(BUILD)/zephyr/all_tests.info \
+	$(BUILD)/zephyr/zephyr_merged.info \
+	$(BUILD)/zephyr/lcov.info \
+	$(BUILD)/zephyr/lcov_no_tests.info \
+	special_boards_info
+
+test_gcc: $(COVERAGE_TARGETS)
+test: $(COVERAGE_TARGETS)
 else
+test_gcc: twister_host twister_coreboot_sdk zephyr_check_compliance_unittest
+test_llvm: twister_llvm twister_coreboot_sdk zephyr_check_compliance_unittest
 test: twister_host twister_llvm twister_coreboot_sdk zephyr_check_compliance_unittest
 endif
 
