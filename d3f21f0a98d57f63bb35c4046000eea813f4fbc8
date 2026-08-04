@@ -72,6 +72,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a41de739_bba581af",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/include/ft98xx_algo_mocks.h",
+        "patchSetId": 28
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:23:53Z",
+      "side": 1,
+      "message": "**3. Missing Variable Names in Mocks**\nIn `ft98xx_algo_mocks.h`:\n\n```c\nDECLARE_FAKE_VALUE_FUNC(int, focal_algo_enroll_step, uint8_t *, uint8_t);\n\n```\n\n* **Issue:** While perfectly legal C, omitting variable names in header files makes the API much harder to read for other developers who want to understand what those parameters do (e.g., is `uint8_t` the step count, a threshold, or a flag?).\n* **Suggestion:** Include the variable names in the macro declarations (e.g., `uint8_t *, image_buffer, uint8_t, current_step`). FFF supports and ignores them perfectly.",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 14
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4ec57c16_2605190e",
         "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
         "patchSetId": 28
