@@ -137,6 +137,98 @@
       },
       "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2456e2e5_24eb3e9e",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:16:49Z",
+      "side": 1,
+      "message": "**2. Testing `exit` out of order in `test_exit_success**`\n\n```c\nZTEST_F(ft98xx_bio_alg, test_exit_success)\n{\n\tzassert_ok(fingerprint_algorithm_exit(fixture-\u003ealg));\n\tzassert_equal(focal_algo_deinit_fake.call_count, 1);\n}\n\n```\n\n* **Issue:** This test calls `exit()` without ever calling `init()`. While it happens to pass here, calling teardown APIs on uninitialized drivers is an unrealistic lifecycle and often triggers null-pointer dereferences or crashes in real implementations.\n* **Suggestion:** Call `fingerprint_algorithm_init(fixture-\u003ealg);` right before the exit call in this test.",
+      "range": {
+        "startLine": 134,
+        "startChar": 0,
+        "endLine": 137,
+        "endChar": 53
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70f53e28_1e9f3f74",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:16:49Z",
+      "side": 1,
+      "message": "**1. Missing Teardown / Bypassing `exit()**`\nAlmost all tests (e.g., `test_enroll_step_success_and_progress`, `test_match_success_no_update`) call `fingerprint_algorithm_init()` but never call `fingerprint_algorithm_exit()` at the end of the test.\n\n* **Issue:** Relying on the `memset` in `ft98xx_alg_before` to reset state for the next test is highly problematic. If the driver\u0027s `init()` function dynamically allocates memory, creates threads, or locks hardware resources, skipping `exit()` will permanently leak those resources, eventually crashing the test runner.\n* **Suggestion:** Implement a teardown function for the ZTEST fixture (the `after` parameter in `ZTEST_SUITE`) that safely calls `fingerprint_algorithm_exit(fixture-\u003ealg);` to ensure graceful cleanup.",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 54
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c396d410_66afdafb",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:16:49Z",
+      "side": 1,
+      "message": "**1. Magic Numbers vs Constants in Math**\nIn `test_enroll_step_success_and_progress`:\n\n```c\nzassert_equal(completion, (1 * 100) / total_samples,\n\t      \"Completion should be ~8%% after 1 step.\");\n\n```\n\n* **Suggestion:** You nicely parameterized `total_samples \u003d SINGLE_FINGER_ENROLL_NUM;`, but hardcoded `12` in your brain to write `~8%%` in the string. If `SINGLE_FINGER_ENROLL_NUM` changes in the driver header, the math still works, but the log message becomes a lie. Keep the string generic (e.g., `\"Completion should correctly reflect 1 out of N steps\"`).",
+      "range": {
+        "startLine": 198,
+        "startChar": 0,
+        "endLine": 208,
+        "endChar": 53
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51ea5abb_4c8d098c",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:16:49Z",
+      "side": 1,
+      "message": "**1. Unpopulated Output in `focal_algo_enroll_finish**`\nIn `test_full_enrollment_lifecycle`, you verify the finish step:\n\n```c\nzassert_ok(fingerprint_enroll_finish(fixture-\u003ealg, template_buf));\nzassert_equal(focal_algo_enroll_finish_fake.call_count, 1);\n\n```\n\n* **Issue:** The signature for this mock is `int focal_algo_enroll_finish(uint8_t *, uint32_t *)`. The second parameter is an output pointer indicating the final template size. Because you rely on the default FFF behavior (which just returns 0 and does nothing to pointers), the test never populates the template size. The driver might then read uninitialized memory from that pointer to process the template.\n* **Suggestion:** Provide a `custom_fake` for `focal_algo_enroll_finish` that writes a valid size (e.g., `1024`) into the `uint32_t *` parameter, ensuring the driver processes a predictable value.",
+      "range": {
+        "startLine": 230,
+        "startChar": 0,
+        "endLine": 231,
+        "endChar": 60
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
