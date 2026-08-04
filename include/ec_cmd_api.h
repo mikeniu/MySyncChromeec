@@ -489,6 +489,7 @@ _CROS_EC_C0_F_PF(EC_CMD_USB_PD_DPS_CONTROL, usb_pd_dps_control);
 _CROS_EC_C0_F_PF(EC_CMD_USB_PD_MUX_ACK, usb_pd_mux_ack);
 _CROS_EC_C0_F_PF_RF(EC_CMD_USB_PD_MUX_INFO, usb_pd_mux_info);
 _CROS_EC_C0_F_RF(EC_CMD_USB_PD_PORTS, usb_pd_ports);
+_CROS_EC_C0_F_PF(EC_CMD_USB_PD_TRYSRC, usb_pd_trysrc);
 _CROS_EC_C0_F_PF_RF(EC_CMD_USB_PD_POWER_INFO, usb_pd_power_info);
 _CROS_EC_C0_F_PF(EC_CMD_USB_PD_RW_HASH_ENTRY, usb_pd_rw_hash_entry);
 _CROS_EC_C0_F_PF_RF(EC_CMD_VBOOT_HASH, vboot_hash);

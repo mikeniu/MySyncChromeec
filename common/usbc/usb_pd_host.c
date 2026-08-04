@@ -12,6 +12,7 @@
 #include "usb_pd.h"
 #include "usb_pd_dpm_sm.h"
 #include "usb_pd_tcpm.h"
+#include "usb_tc_sm.h"
 #include "util.h"
 
 #include <string.h>
@@ -102,6 +103,25 @@ static enum ec_status hc_typec_discovery(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_TYPEC_DISCOVERY, hc_typec_discovery,
 		     EC_VER_MASK(0));
 #endif /* CONFIG_HOSTCMD_TYPEC_DISCOVERY */
+
+/* Retrieve all discovery results for the given port and transmit type */
+static enum ec_status pd_trysrc(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_usb_pd_trysrc *p = args->params;
+
+	if (p->enable > TRY_SRC_NO_OVERRIDE)
+		return EC_ERROR_PARAM3;
+
+	tc_try_src_override(p->enable);
+
+	if (p->enable == TRY_SRC_NO_OVERRIDE)
+		ccprintf("Try.SRC System controlled\n");
+	else
+		ccprintf("Try.SRC Forced %s\n", p->enable ? "ON" : "OFF");
+
+	return EC_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_USB_PD_TRYSRC, pd_trysrc, EC_VER_MASK(0));
 
 /* Default to feature unavailable, with boards supporting it overriding */
 __overridable enum ec_status

@@ -6441,6 +6441,13 @@ struct ec_response_usb_pd_dps_status {
 	int32_t max_voltage;
 } __ec_align4;
 
+#define EC_CMD_USB_PD_TRYSRC 0x0108
+
+struct ec_params_usb_pd_trysrc {
+	uint8_t port;
+	uint8_t enable;
+} __ec_align1;
+
 /* Write USB-PD device FW */
 #define EC_CMD_USB_PD_FW_UPDATE 0x0110
 
