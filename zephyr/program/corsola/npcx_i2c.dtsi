@@ -40,6 +40,25 @@
 				"I2C_PORT_VIRTUAL_BATTERY";
 		};
 	};
+
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		battery {
+			i2c-port = <&i2c5_0>;
+			allow-type = "BATTERY_ALLOW_PASSTHRU";
+		};
+		charger {
+			i2c-port = <&i2c3_0>;
+			allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+		};
+		usb-c0 {
+			i2c-port = <&i2c1_0>;
+			allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+		};
+	};
 };
 
 &i2c0_0 {
