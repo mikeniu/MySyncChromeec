@@ -177,6 +177,24 @@
       "parentUuid": "b08dcc6a_5c575ec7",
       "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74aa75d9_81a4f18a",
+        "filename": "zephyr/test/rex/tests/program/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-08-04T03:52:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fc4fd3f_1e0d8931",
+      "revId": "8a5b8c51b99d346b962cc6475fe7e06bd747d01c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
