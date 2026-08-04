@@ -149,9 +149,9 @@ CHIP_MK_INCLUDED_ONCE := 1
 
 CODESIGNER_PATH := $(abspath ../cr50-utils/software/tools/codesigner)
 
-# Try to find preinstalled or pre-built codesigner
+# Try to find pre-built or preinstalled codesigner
 SIGNER := $(firstword $(wildcard $(CODESIGNER_PATH)/codesigner) \
-  /usr/bin/cr50-codesigner)
+  $(wildcard /usr/bin/cr50-codesigner))
 
 SANITIZE_MANIFEST := $(abspath \
 		     ../gsc-utils$(BRANCH_EXT)/util/convert_signing_json.sh)
@@ -175,7 +175,7 @@ RW_SIGNER_EXTRAS += --swap $(RMA_KEY_BASE).test,$(RMA_KEY_BASE).prod
 endif
 
 # Try to build signer from the known location, if it is missing
-ifeq ($(wildcard $(SIGNER)),)
+ifeq ($(SIGNER),)
 # If source path is present, build codesigner later as dependency
 ifneq ($(wildcard $(CODESIGNER_PATH)),)
 SIGNER := $(CODESIGNER_PATH)/codesigner
@@ -183,8 +183,6 @@ SIGNER := $(CODESIGNER_PATH)/codesigner
 $(SIGNER):
 	CC="$(HOSTCC)" CFLAGS="-O2" CXX="$(HOSTCXX)" \
 	$(MAKE) -C $(CODESIGNER_PATH) codesigner
-else
-$(error cr50-codesigner is not available!)
 endif
 endif
 
@@ -197,6 +195,9 @@ else
 CR50_RW_KEY = loader-testkey-A.pem
 endif
 else
+ifeq ($(SIGNER),)
+$(error cr50-codesigner is not available!)
+endif
 
 ifeq ($(USE_USB_FOB_KEY),)
 # The private key comes from Cloud KMS.
