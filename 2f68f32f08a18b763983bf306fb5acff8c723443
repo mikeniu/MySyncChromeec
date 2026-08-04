@@ -63,6 +63,29 @@
       },
       "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "165a621b_4c1b3cda",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:38:33Z",
+      "side": 1,
+      "message": "Where is pulse_hw_reset being called?",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 53
+      },
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
