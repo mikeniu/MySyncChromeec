@@ -8,6 +8,7 @@ import dataclasses
 import logging
 import os
 import pathlib
+import re
 import typing
 
 from zmake import build_config
@@ -70,6 +71,7 @@ class Project:
 
     def __init__(self, config: ProjectConfig):
         self.config = config
+        self.ro_limit_kb = None
         self.packer: zmake.output_packers.BasePacker = (
             self.config.output_packer(self)
         )
@@ -121,6 +123,24 @@ class Project:
             overlays.append(path.resolve())
 
         if overlays:
+            # Parse non-zero partition offsets (e.g. CBI at 0x3e000) from overlays
+            # to derive the effective RO image size limit in KB (e.g. 248 KB).
+            offsets = []
+            for overlay in overlays:
+                if not overlay.is_file():
+                    continue
+                try:
+                    for match in re.finditer(
+                        r"offset\s*=\s*<(0x[0-9a-fA-F]+|\d+)>",
+                        overlay.read_text(),
+                    ):
+                        val = int(match.group(1), 0)
+                        if val > 0:
+                            offsets.append(val)
+                except OSError:
+                    pass
+            self.ro_limit_kb = min(offsets) // 1024 if offsets else None
+
             return build_config.BuildConfig(
                 cmake_defs={"DTC_OVERLAY_FILE": ";".join(map(str, overlays))}
             )

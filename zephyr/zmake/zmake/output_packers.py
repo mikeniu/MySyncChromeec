@@ -155,8 +155,13 @@ class BinmanPacker(BasePacker):
         super().__init__(project)
 
     def configs(self):
+        ro_cmake_defs = {}
+        if getattr(self.project, "ro_limit_kb", None):
+            ro_cmake_defs["CONFIG_FLASH_SIZE"] = str(self.project.ro_limit_kb)
+
         yield "ro", build_config.BuildConfig(
             kconfig_defs={"CONFIG_CROS_EC_RO": "y"},
+            cmake_defs=ro_cmake_defs,
         )
         yield "rw", build_config.BuildConfig(
             kconfig_defs={"CONFIG_CROS_EC_RW": "y"},
