@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37097389_ad459f8b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T02:27:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/f0fad60f-93b1-4fab-bdc8-0329253829e9)]\n\n### Review Summary\n\n*   **Functionality:** **Good.** The bounds check correctly utilizes the dynamically queried sensor dimensions to calculate the required frame size and validates it against the buffer size. The check for the private driver (`IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)`) is correctly placed before any private API calls, preventing potential linker errors or undefined behavior.\n*   **Security:** **Good.** The bounds check `if (required_size \u003e image_buf_size)` correctly prevents potential buffer overflows during image acquisition. The casting of `cols` and `rows` to `size_t` effectively prevents potential integer overflow during the calculation.\n*   **Style:** **Good.** The code style is clean and consistent. \n*   **Testing:** **Good.** The CL includes appropriate unit tests for both the valid and invalid runtime frame size scenarios.\n*   **CL Size \u0026 Scope:** **Good.** The CL is small, focused, and self-contained.",
+      "isAi": true,
+      "revId": "763a01405a5ca835528713091d6f254bfff9f841",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "840076b5_4b8bd02a",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T02:27:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Optional Suggestion:**\nSince `fingerprint_acquire_image` is expected to succeed completely in this mock environment, consider using `zassert_ok(ret, ...)` or `zassert_equal(ret, 0, ...)` here to assert on the exact success value rather than just checking that it doesn\u0027t fail with `-EINVAL`.",
+      "isAi": true,
+      "revId": "763a01405a5ca835528713091d6f254bfff9f841",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
