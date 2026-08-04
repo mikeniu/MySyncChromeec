@@ -236,29 +236,6 @@ config PLATFORM_EC_KEYBOARD_SCAN_ADC
 	  connected to adc channels to identify key presses by reading adc
 	  voltage.
 
-config PLATFORM_EC_VOLUME_BUTTONS
-	bool "Board has volume-up and volume-down buttons"
-	select PLATFORM_EC_BUTTON
-	help
-	  Enable this if the board has physical buttons for the volume controls.
-	  These are buttons controlled by GPIOs and are not part of the keyboard
-	  matrix.
-
-	  Your board must define GPIO_VOLUME_UP_L and GPIO_VOLUME_DOWN_L as
-	  GPIOs names or as aliases in the GPIO devicetree configuration.
-
-config PLATFORM_EC_BUTTONS_RUNTIME_CONFIG
-	bool "Enable buttons runtime configuration"
-	help
-	  This command allow the runtime configuration of the buttons[]
-	  array.
-
-config PLATFORM_EC_CMD_BUTTON
-	bool "Console command: button"
-	help
-	  This command simulates button press. The buttons are like volume-up,
-	  volume-down, and recovery buttons.
-
 config PLATFORM_EC_CONSOLE_CMD_KEYBOARD
 	bool "Console command: ksstate, kbpress, 8042"
 	default y if PLATFORM_EC_KEYBOARD
