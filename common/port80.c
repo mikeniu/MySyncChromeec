@@ -245,6 +245,18 @@ static enum ec_status port80_command_read(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_PORT80_READ, port80_command_read,
 		     EC_VER_MASK(0) | EC_VER_MASK(1));
 
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_PORT80_WRITE
+static enum ec_status port80_command_write(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_port80_write *p = args->params;
+
+	port_80_write(p->code);
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_PORT80_WRITE, port80_command_write,
+		     EC_VER_MASK(0));
+#endif
+
 static void port80_log_resume(void)
 {
 	/* Store port 80 event so we know where resume happened */

@@ -434,6 +434,13 @@ _CROS_EC_CV_F_R(EC_CMD_PD_HOST_EVENT_STATUS, 0, pd_host_event_status,
 		host_event_status);
 _CROS_EC_C0_F_PF(EC_CMD_PD_WRITE_LOG_ENTRY, pd_write_log_entry);
 _CROS_EC_C0_F_RF(EC_CMD_PORT80_LAST_BOOT, port80_last_boot);
+static inline int ec_cmd_port80_write(CROS_EC_COMMAND_INFO *h, uint32_t code)
+{
+	struct ec_params_port80_write p = {
+		.code = code,
+	};
+	return CROS_EC_COMMAND(h, EC_CMD_PORT80_WRITE, 0, &p, sizeof(p), NULL, 0);
+}
 _CROS_EC_C1_F_RF(EC_CMD_POWER_INFO, power_info);
 _CROS_EC_CV_F_P_R(EC_CMD_PSE, 0, pse, pse, pse_status);
 _CROS_EC_C0_F_RF(EC_CMD_PSTORE_INFO, pstore_info);
