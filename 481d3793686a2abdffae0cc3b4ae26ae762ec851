@@ -16,6 +16,24 @@
       "message": "We should NULL check this before using it or add \n```\nBUILD_ASSERT(DT_HAS_CHOSEN(cros_ec_bbram),\n\t\t     \"cros_ec_bbram chosen node must be defined in devicetree\")\n```\nto make sure a chosen node is defined at compile time.",
       "revId": "481d3793686a2abdffae0cc3b4ae26ae762ec851",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "167525df_e30d5581",
+        "filename": "zephyr/program/fatcat/lapis/src/battery.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-08-04T01:46:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbfbeeea_0d0e169d",
+      "revId": "481d3793686a2abdffae0cc3b4ae26ae762ec851",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
