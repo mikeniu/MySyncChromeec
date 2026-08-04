@@ -11,7 +11,7 @@ config TIMESLICING
 
 config LOG
 	default y
-	imply LOG_DEFAULT_MINIMAL
+#	imply LOG_DEFAULT_MINIMAL
 
 config GPIO
 	default y if ARCH_POSIX
