@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea414a8f_35f62ea7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:47:18Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "cf065976_1aa8b9f3",
+      "revId": "5aca3d0c2482d6099c07092080b6309f27b06b2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bcfb1cd_229fedce",
@@ -51,6 +69,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] This file appears to be unrelated to the `ft98xx` algorithm test harness. It looks like it might have been accidentally included in this patchset. If so, please remove it or move it to a separate CL to keep this CL focused (per `go/small-cls`).",
       "isAi": true,
+      "revId": "5aca3d0c2482d6099c07092080b6309f27b06b2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02544258_6024538b",
+        "filename": "zephyr/test/hwtest/src/rollback_external_storage.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:47:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d3cc37c_4e16f6f1",
       "revId": "5aca3d0c2482d6099c07092080b6309f27b06b2c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
