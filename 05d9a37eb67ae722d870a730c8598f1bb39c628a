@@ -22,6 +22,30 @@
       },
       "revId": "05d9a37eb67ae722d870a730c8598f1bb39c628a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e7467a9_73f19a7d",
+        "filename": "common/charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1585,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-08-04T01:39:09Z",
+      "side": 1,
+      "message": "Thanks for the suggestion. I\u0027ll address it in a separate CL.",
+      "parentUuid": "941e1ee4_7a421f81",
+      "range": {
+        "startLine": 1584,
+        "startChar": 5,
+        "endLine": 1585,
+        "endChar": 54
+      },
+      "revId": "05d9a37eb67ae722d870a730c8598f1bb39c628a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
