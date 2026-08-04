@@ -34,6 +34,22 @@
 		};
 	};
 
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port1@1 {
+			reg = <1>;
+			i2c-port = <&i2c1>;
+			allow-type = "BATTERY_ALLOW_PASSTHRU";
+		};
+
+		port0@0 {
+			reg = <(-1)>;
+			i2c-port = <&i2c0>;
+		};
+	};
 };
 
 &pinctrl {

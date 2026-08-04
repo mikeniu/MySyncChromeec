@@ -40,6 +40,28 @@
 				"I2C_PORT_VIRTUAL_BATTERY";
 		};
 	};
+
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port1@1 {
+			reg = <1>;
+			i2c-port = <&i2c5_0>;
+			allow-type = "BATTERY_ALLOW_PASSTHRU";
+		};
+
+		port3@3 {
+			reg = <(-1)>;
+			i2c-port = <&i2c3_0>;
+		};
+
+		port7@7 {
+			reg = <7>;
+			i2c-port = <&i2c1_0>;
+		};
+	};
 };
 
 &i2c0_0 {
