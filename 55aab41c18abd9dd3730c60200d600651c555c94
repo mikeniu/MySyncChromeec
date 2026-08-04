@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ef744d0_b5087b61",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T23:45:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/8c499c96-dd34-4011-9a33-dc63b17f13ea)]\n\n**Review Summary:**\n*   **Functionality:** The patch correctly adds `NULL` pointer validation for the required arguments (`image`, `match_index`, `update_bitmap`, and `templ`) in `ft98xx_enroll_step` and `ft98xx_match`, returning `-EINVAL` appropriately.\n*   **Security:** These changes ensure we do not dereference `NULL` pointers across the algorithm API, preventing potential crashes and improving system stability.\n*   **Style:** The new logic perfectly matches the existing codebase style and logging patterns. The added comments for bypassing the wrapper in tests are clear, helpful, and address previous feedback.\n*   **Consistency:** The new checks are consistent with error handling elsewhere in the file.\n*   **Testing \u0026 Test Coverage:** Excellent unit test coverage is present. The new tests successfully verify the `NULL` pointer validations for all arguments, and the reasoning for using direct driver API calls in certain tests is now well-documented.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and remains focused entirely on parameter validation and the respective unit tests.\n\nTAG\u003dagy\nCONV\u003da8b0318b-2ba8-426f-9a20-93abb9145037",
+      "isAi": true,
+      "revId": "55aab41c18abd9dd3730c60200d600651c555c94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
