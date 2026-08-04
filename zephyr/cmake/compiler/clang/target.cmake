@@ -25,6 +25,11 @@ if("${ARCH}" STREQUAL "riscv")
     set_linker_property(PROPERTY lib_include_dir "-L${rtlib_dir}")
     set_linker_property(PROPERTY rt_library "-lclang_rt.builtins-riscv32")
   endfunction()
+
+  # Force medium-any code model for RISC-V baremetal targets under Clang/LLVM to generate
+  # auipc + jalr 32-bit call sequences, preventing cross-section (RAM <-> Flash)
+  # relocation truncation errors (R_RISCV_RVC_JUMP).
+  list(APPEND TOOLCHAIN_C_FLAGS -mcmodel=medany)
 endif()
 
 set(CMAKE_C_COMPILER "${CROSS_COMPILE}clang")
