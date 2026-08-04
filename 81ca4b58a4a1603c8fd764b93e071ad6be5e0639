@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f26d23b3_745b96a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T23:14:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n**Review Summary:**\n*   **Functionality:** The tests correctly configure FFF mocks to verify the fingerprint driver\u0027s behavior for both success and error paths. The teardown hook properly isolates the GPIO pin state between tests.\n*   **Security:** No security vulnerabilities were identified in this patch.\n*   **Style:** The code adheres to standard Zephyr testing conventions and uses FFF macros correctly.\n*   **Testing \u0026 Test Coverage:** The patch improves unit test coverage significantly by testing finger presence states and image acquisition paths, including the newly added error and success cases based on previous feedback.\n*   **CL Size \u0026 Scope:** The CL is self-contained and appropriately sized, focusing solely on improving test coverage for the ft98xx driver.\n\nCONV\u003d1732a09a-1371-4594-be0b-ff5045116772\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "81ca4b58a4a1603c8fd764b93e071ad6be5e0639",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
