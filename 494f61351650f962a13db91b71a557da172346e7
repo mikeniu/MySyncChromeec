@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9439cc2_9836ad60",
+        "filename": "zephyr/program/atria/BUILD.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-08-04T10:27:18Z",
+      "side": 1,
+      "message": "Note for me: we should remove inherited_from.",
+      "range": {
+        "startLine": 81,
+        "startChar": 4,
+        "endLine": 81,
+        "endChar": 18
+      },
+      "revId": "494f61351650f962a13db91b71a557da172346e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
