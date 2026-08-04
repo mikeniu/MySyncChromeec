@@ -1,0 +1,16 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# RISC-V specific Kconfig overrides.
+
+# Use medium-any code model to allow 32-bit PC-relative addressing (auipc + jalr)
+# across the Flash/RAM boundary (b/542587447).
+choice RISCV_CMODEL
+	default RISCV_CMODEL_MEDANY
+endchoice
+
+# Disable linker relaxation to prevent cross-section tail calls (RAM to Flash)
+# from being relaxed into 16-bit compressed jumps (c.j) that overflow (b/542587447).
+config LINKER_USE_RELAX
+	default n
