@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "262fd00c_d81706c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-04T01:47:56Z",
+      "side": 1,
+      "message": "The same Cls as https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8184946",
+      "revId": "ce51c2e7539e3f3f1e733047cb5bdb4e0c7cf0c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
