@@ -53,6 +53,24 @@
       "isAi": true,
       "revId": "4a06ca8f4f6cce359dc719b5fa5bad65be5d07bd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "228e55f9_d7c68d5c",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T15:51:55Z",
+      "side": 1,
+      "message": "I think the braces are fine.",
+      "parentUuid": "14ef5c1c_9d315179",
+      "revId": "4a06ca8f4f6cce359dc719b5fa5bad65be5d07bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
