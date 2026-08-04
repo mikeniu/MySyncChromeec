@@ -3699,6 +3699,13 @@ struct ec_response_port80_last_boot {
 	uint16_t code;
 } __ec_align2;
 
+/* Write port80 / post code event */
+#define EC_CMD_PORT80_WRITE 0x004C
+
+struct ec_params_port80_write {
+	uint32_t code;
+} __ec_align4;
+
 /*****************************************************************************/
 /* Temporary secure storage for host verified boot use */
 
