@@ -8,6 +8,7 @@
 #include "battery.h"
 #include "battery_smart.h"
 #include "console.h"
+#include "cros_cbi.h"
 #include "host_command.h"
 #include "i2c.h"
 #include "i2c_battery_parser.h"
@@ -20,6 +21,7 @@
 
 #ifdef CONFIG_ZEPHYR
 #include "i2c/i2c.h"
+#include "i2c/i2c_passthru.h"
 #endif
 
 #define CPUTS(outstr) cputs(CC_I2C, outstr)
@@ -84,6 +86,121 @@ static inline bool is_i2c_battery(int port, uint16_t address, bool virtual_only)
 	return false;
 }
 #endif
+
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED_DTS
+
+#ifdef CONFIG_PLATFORM_EC_CBI
+#define INIT_FW_CONFIG_KEY_NODE(id)                                            \
+	{                                                                      \
+		.port = I2C_PORT_BUS(DT_PHANDLE(id, i2c_port)),                \
+		.allow_type =                                                  \
+			COND_CODE_1(DT_NODE_HAS_PROP(id, allow_type),          \
+				    (DT_STRING_UPPER_TOKEN(id, allow_type)),   \
+				    (ALLOW_IF_SYSTEM_UNLOCKED)),               \
+		.key = COND_CODE_1(DT_NODE_HAS_PROP(id, fw_config_key),        \
+				   (DT_STRING_UPPER_TOKEN(id, fw_config_key)), \
+				   (0)),                                       \
+		.value = COND_CODE_1(                                          \
+			DT_NODE_HAS_PROP(id, fw_config_value),                 \
+			(DT_STRING_UPPER_TOKEN(id, fw_config_value)), (0)),    \
+	},
+#else
+#define INIT_FW_CONFIG_KEY_NODE(id)                                          \
+	{                                                                    \
+		.port = I2C_PORT_BUS(DT_PHANDLE(id, i2c_port)),              \
+		.allow_type =                                                \
+			COND_CODE_1(DT_NODE_HAS_PROP(id, allow_type),        \
+				    (DT_STRING_UPPER_TOKEN(id, allow_type)), \
+				    (ALLOW_IF_SYSTEM_UNLOCKED)),             \
+	},
+#endif
+
+static const struct i2c_passthru_t *find_i2c_passthru_config(int port)
+{
+	static const struct i2c_passthru_t i2c_passthru_config[] = {
+		{
+			.allow_type = ALLOW_IF_SYSTEM_UNLOCKED,
+		},
+#if DT_HAS_COMPAT_STATUS_OKAY(cros_ec_i2c_passthru)
+		DT_FOREACH_CHILD_STATUS_OKAY(
+			DT_COMPAT_GET_ANY_STATUS_OKAY(cros_ec_i2c_passthru),
+			INIT_FW_CONFIG_KEY_NODE)
+#endif
+	};
+
+	size_t index = 1;
+
+	for (; index < ARRAY_SIZE(i2c_passthru_config); ++index) {
+		if (i2c_passthru_config[index].port == port) {
+			return i2c_passthru_config + index;
+		}
+	}
+	// Default config
+	return &i2c_passthru_config[0];
+}
+
+static int allow_if_system_unlocked(const struct i2c_passthru_t *config,
+				    const struct ec_params_i2c_passthru *params,
+				    bool protect_by_ap)
+{
+	return !system_is_locked();
+}
+
+static int
+allow_if_unprotected_by_ap(const struct i2c_passthru_t *config,
+			   const struct ec_params_i2c_passthru *params,
+			   bool protect_by_ap)
+{
+	return !protect_by_ap;
+}
+
+static int allow_if_fw_config_match_and_unprotected_by_ap(
+	const struct i2c_passthru_t *config,
+	const struct ec_params_i2c_passthru *params, bool protect_by_ap)
+{
+#ifdef CONFIG_PLATFORM_EC_CBI
+	uint32_t val;
+#endif
+
+	if (protect_by_ap)
+		return false;
+
+	if (!system_is_locked())
+		return true;
+
+#ifdef CONFIG_PLATFORM_EC_CBI
+	if (cros_cbi_get_fw_config(config->key, &val) != EC_SUCCESS)
+		return false;
+
+	return val == config->value;
+#else
+	return false;
+#endif
+}
+
+int i2c_allow_passthru(int port, const struct ec_params_i2c_passthru *params,
+		       bool protect_by_ap)
+{
+	const struct i2c_passthru_t *config;
+
+	if (port < 0 || port >= I2C_PORT_COUNT)
+		return 0;
+
+	config = find_i2c_passthru_config(port);
+
+	switch (config->allow_type) {
+	case ALLOW_IF_UNPROTECTED_BY_AP:
+		return allow_if_unprotected_by_ap(config, params,
+						  protect_by_ap);
+	case ALLOW_IF_FW_CONFIG_MATCH_AND_UNPROTECTED_BY_AP:
+		return allow_if_fw_config_match_and_unprotected_by_ap(
+			config, params, protect_by_ap);
+	case ALLOW_IF_SYSTEM_UNLOCKED:
+	default:
+		return allow_if_system_unlocked(config, params, protect_by_ap);
+	}
+}
+#endif // CONFIG_I2C_PASSTHRU_RESTRICTED_DTS
 
 /**
  * Perform the voluminous checking required for this message
@@ -204,6 +321,10 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	if (ret)
 		return ret;
 
+#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED_DTS
+	if (!i2c_allow_passthru(port, params, port_protected[port]))
+		return EC_RES_ACCESS_DENIED;
+#else
 	if (port_protected[port]) {
 		if (!i2c_port->passthru_allowed)
 			return EC_RES_ACCESS_DENIED;
@@ -214,6 +335,7 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 				return EC_RES_ACCESS_DENIED;
 		}
 	}
+#endif
 
 	/* Loop and process messages */
 	resp->i2c_status = 0;
