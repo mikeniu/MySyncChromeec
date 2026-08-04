@@ -17,6 +17,29 @@
       "isAi": true,
       "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4436f4af_c9e1ea85",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 29
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T22:09:40Z",
+      "side": 1,
+      "message": "Can you create constants for these magic numbers so that they\u0027re self-describing?",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 19
+      },
+      "revId": "b92f18bbe22e098ab8a0ac97af3f96b174d0a7c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
