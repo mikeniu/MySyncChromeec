@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "842e3e2e_8fa38ef7",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/CMakeLists.txt",
+        "patchSetId": 28
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:10:50Z",
+      "side": 1,
+      "message": "Looks like we have a lot of [different values for this](https://source.chromium.org/search?q\u003dcmake_minimum_required\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fplatform%2Fec%2F\u0026start\u003d1).\n\nSince we\u0027re always going to be using a single cmake version, it would be nice to make a followup CL that uses a version variable so we can just keep track of it in one place.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 38
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88fd0620_976349d9",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/CMakeLists.txt",
+        "patchSetId": 28
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:10:50Z",
+      "side": 1,
+      "message": "Looks like this is the right name, but the `LOCKER` in the name is weird. Maybe we should rename it.",
+      "range": {
+        "startLine": 18,
+        "startChar": 4,
+        "endLine": 18,
+        "endChar": 43
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ec57c16_2605190e",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:10:50Z",
+      "side": 1,
+      "message": "**2. Incomplete Coverage of Mocks**\nYou have declared a mock for `focal_algo_version` (`DECLARE_FAKE_VOID_FUNC(focal_algo_version, uint8_t *);`), and properly reset it in `ft98xx_alg_before`, but there doesn\u0027t seem to be a test validating that the driver correctly queries or exposes the algorithm version.\n\n* **Suggestion:** Add a brief test case (e.g., `test_version_query`) to verify this functionality if the version string is exposed via the Zephyr fingerprint subsystem API.",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 53
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b7c2e10_2a62fca1",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:10:50Z",
+      "side": 1,
+      "message": "**2. Arbitrary Buffer Padding**\nIn the fixture definition, `fake_image` is given an arbitrary 100 bytes of padding:\n\n```c\nuint8_t fake_image[FT_RAW_SIZE + 100];\n\n```\n\n* **Issue:** \"Magic numbers\" like this are a code smell. If the `ft98xx` algorithm requires more buffer space than `FT_RAW_SIZE` and writes out of bounds, that represents a memory corruption bug in the algorithm itself that should be fixed, rather than masked in the test suite. If the padding is legitimately needed for headers or metadata, it should be clearly defined.\n* **Suggestion:** Remove the `+ 100` if it\u0027s unnecessary. If it is necessary, replace `100` with a well-named macro (e.g., `FT_RAW_SIZE + FT_IMAGE_METADATA_SIZE`) so future maintainers understand its purpose.",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 39
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d6ac21a_c0977eef",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:10:50Z",
+      "side": 1,
+      "message": "**1. Breaking Encapsulation and OS Primitive Safety**\nIn the `ft98xx_alg_before` setup function, you clear the algorithm\u0027s private data using `memset`:\n\n```c\n\tif (fixture-\u003ealg \u0026\u0026 fixture-\u003ealg-\u003edata) {\n\t\tmemset(fixture-\u003ealg-\u003edata, 0, sizeof(struct ft_libfp_data));\n\t}\n\n```\n\n* **Issue:** Bypassing abstraction in a test suite is sometimes necessary, but resetting a state structure strictly via `memset` is risky in Zephyr. If `struct ft_libfp_data` contains any initialized Zephyr OS primitives (like a `k_mutex`, `k_sem`, or `k_work`), zeroing them out will corrupt those objects and cause hardware faults during test execution.\n* **Suggestion:** If possible, rely on `fingerprint_algorithm_exit()` to cleanly reset the internal state. If you absolutely must clear it manually here, ensure (and perhaps document) that `struct ft_libfp_data` is strictly POD (Plain Old Data) with no OS-level synchronization primitives.",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 62
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fa16b17_3561778b",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:10:50Z",
+      "side": 1,
+      "message": "**1. Uninitialized Output Parameters in Custom Mock**\nIn `custom_get_finger_detailed_info_too_large`, you assign a value to `*finger_size` but fail to assign values to `*subtpl_size` and `*head_size`.\n\n```c\nstatic int custom_get_finger_detailed_info_too_large(int *finger_size,\n\t\t\t\t\t\t     int *subtpl_size,\n\t\t\t\t\t\t     int *head_size)\n{\n\tif (finger_size)\n\t\t*finger_size \u003d CONFIG_FP_ALGORITHM_TEMPLATE_SIZE + 1;\n\t// Missing subtpl_size and head_size assignments\n\treturn 0;\n}\n\n```\n\n* **Issue:** When the SUT (System Under Test) calls this function, it likely passes pointers to uninitialized local variables. If it subsequently reads `subtpl_size` or `head_size` to calculate the total required buffer size, it will read garbage memory. This can lead to undefined behavior or flaky test failures depending on what happens to be on the stack.\n* **Suggestion:** Ensure all requested output parameters are populated with safe defaults.\n\n```c\n\tif (subtpl_size) *subtpl_size \u003d 0;\n\tif (head_size) *head_size \u003d 0;\n\n```",
+      "range": {
+        "startLine": 118,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 1
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
