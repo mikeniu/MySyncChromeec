@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e92ea48c_8b6f7277",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1364246
+      },
+      "writtenOn": "2026-08-04T02:28:49Z",
+      "side": 1,
+      "message": "The failure in chromeos/all-partners/firmware-zephyr-public-cq seems to also appear in other tests. Let me submit this patch to unblock CQ.",
+      "revId": "81a25c70281bd3236acc3b2c5a0d3cafb71e6535",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
