@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92637c2f_b9d994b8",
+        "filename": "zephyr/cmake/compiler/gcc/compiler_flags.cmake",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-04T15:54:50Z",
+      "side": 1,
+      "message": "Nit - unchanged file.",
+      "revId": "34dee0f2658f4d886220697735bee1e9f9f14911",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
