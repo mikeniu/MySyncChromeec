@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75af8e16_57a1503d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:55:15Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a47f66f5_0bd02bda",
+      "revId": "aafc5522b2c4b3a5991a921b6cc7f82575b7853b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4000e6d_d9413cd1",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Optional Testing Suggestion:** Since the behavior of `fp_process_enroll` now branches based on `fingerprint_auth_enabled()`, consider adding test coverage to verify this state change. For example, in `zephyr/test/fingerprint/task/src/fpsensor_enroll.cc`, you could add a test simulating the auth flow and asserting that `global_context.positive_match_secret_state.readable` remains `false` after enrollment, ensuring no regression in this logic.",
       "isAi": true,
+      "revId": "aafc5522b2c4b3a5991a921b6cc7f82575b7853b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96a097f0_893965c0",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:55:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4000e6d_d9413cd1",
       "revId": "aafc5522b2c4b3a5991a921b6cc7f82575b7853b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
