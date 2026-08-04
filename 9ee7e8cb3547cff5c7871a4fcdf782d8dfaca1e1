@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c585574e_317c40ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:58:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/dfd1d3ed-166e-45ce-9bb0-3fbd848ffd63)]\n\n**Review Summary:**\n*   **Functionality:** The addition of the FFF mocks and the setup hook (`ft98xx_before`) ensures test isolation and proper simulation of hardware scenarios. The logic is sound.\n*   **Security:** No security vulnerabilities were identified in this patch.\n*   **Style:** The code adheres to standard Zephyr testing conventions.\n*   **Testing \u0026 Test Coverage:** The patch improves unit test coverage significantly. I left an inline comment suggesting an additional test case to cover the error propagation path of `fingerprint_acquire_image`.\n*   **CL Size \u0026 Scope:** The CL is self-contained and appropriately sized, focusing solely on improving test coverage for the ft98xx driver.\n\nCONV\u003dd9dc793e-ba30-4d25-aaac-c2093a8c95ab\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "9ee7e8cb3547cff5c7871a4fcdf782d8dfaca1e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef44bc71_28dea902",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:58:24Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider adding a test to verify that `fingerprint_acquire_image` correctly propagates errors from the underlying sensor function `ft_sensor_acquire_image_with_mode`.\n\n```c\nZTEST_F(ft98xx, test_acquire_image_error)\n{\n\tuint8_t buffer[FP_SENSOR_IMAGE_SIZE];\n\n\tft_sensor_acquire_image_with_mode_fake.return_val \u003d -EIO;\n\n\tzassert_equal(fingerprint_acquire_image(fixture-\u003edev,\n\t\t\t\t\t\tFINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT,\n\t\t\t\t\t\tbuffer, sizeof(buffer)),\n\t\t      -EIO);\n}\n```",
+      "isAi": true,
+      "revId": "9ee7e8cb3547cff5c7871a4fcdf782d8dfaca1e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
