@@ -102,15 +102,22 @@ ZTEST_USER(i2c_passthru, test_passthru_invalid_params)
 
 ZTEST_USER(i2c_passthru, test_passthru_protect)
 {
+#ifdef CONFIG_I2C_DTS_PASSTHRU
+	/* A valid port is one of reg in the i2c-passthru list. */
+	const int target_port = 2;
+#else
+	/* A valid port is one of enum i2c_ports_chip. */
+	const int target_port = I2C_PORT_SENSOR;
+#endif
 	struct ec_response_i2c_passthru_protect response;
 	struct ec_params_i2c_passthru_protect status_params = {
-		.port = I2C_PORT_SENSOR,
+		.port = target_port,
 		.subcmd = EC_CMD_I2C_PASSTHRU_PROTECT_STATUS,
 	};
 	struct host_cmd_handler_args status_args = BUILD_HOST_COMMAND(
 		EC_CMD_I2C_PASSTHRU_PROTECT, 0, response, status_params);
 	struct ec_params_i2c_passthru_protect enable_params = {
-		.port = I2C_PORT_SENSOR,
+		.port = target_port,
 		.subcmd = EC_CMD_I2C_PASSTHRU_PROTECT_ENABLE,
 	};
 
@@ -327,8 +334,12 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted)
 
 ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
 {
+	/*
+	 * TODO(b/524135420): Support testing CONFIG_I2C_DTS_PASSTHRU=y.
+	 */
 	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY) ||
-	    !IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_SMART)) {
+	    !IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_SMART) ||
+	    !IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED)) {
 		ztest_test_skip();
 		return;
 	}
