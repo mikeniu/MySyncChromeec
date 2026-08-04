@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9a9f6ae_386debe7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T02:29:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/d322ea7e-a88a-4fc8-9208-714beb4440d1)]\n\n**Review Summary:**\n*   **Functionality:** The addition of the FFF mocks and the setup hook (`ft98xx_before`) ensures test isolation and proper simulation of hardware scenarios. The logic is sound.\n*   **Security:** No security vulnerabilities were identified in this patch.\n*   **Style:** The code adheres to standard Zephyr testing conventions. `FAKE_VALUE_FUNC` and `RESET_FAKE` are used appropriately.\n*   **Testing \u0026 Test Coverage:** The patch improves unit test coverage significantly. I left inline comments suggesting a few additional test cases to cover the success path of `fingerprint_acquire_image` and the error propagation path of `fingerprint_finger_status`, as well as a minor test rename for clarity.\n*   **CL Size \u0026 Scope:** The CL is self-contained and appropriately sized, focusing solely on improving test coverage for the ft98xx driver.",
+      "isAi": true,
+      "revId": "4bbd54f3fa77ad5e8f2b24a9b1330a1cd3bf2154",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "141f4d5b_ccdba0b1",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T02:29:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider adding a test to verify that the driver correctly propagates error codes when `ft_sensor_query_finger_status_simple` fails. For example:\n\n```c\nZTEST_F(ft98xx, test_finger_status_error)\n{\n\tft_sensor_query_finger_status_simple_fake.return_val \u003d -EIO;\n\tzassert_equal(fingerprint_finger_status(fixture-\u003edev), -EIO);\n}\n```",
+      "isAi": true,
+      "revId": "4bbd54f3fa77ad5e8f2b24a9b1330a1cd3bf2154",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12c57c63_29355a16",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T02:29:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since this test now verifies that an invalid capture type (`FINGERPRINT_CAPTURE_TYPE_MAX`) returns `-EINVAL`, consider renaming it from `test_acquire_image_not_supported` to something more descriptive like `test_acquire_image_invalid_type`.",
+      "isAi": true,
+      "revId": "4bbd54f3fa77ad5e8f2b24a9b1330a1cd3bf2154",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db5b126d_c2504e80",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T02:29:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Now that image acquisition appears to be supported and `ft_sensor_acquire_image_with_mode` is mocked, it would be beneficial to add a test for the success path to ensure the driver handles successful acquisitions correctly. For example:\n\n```c\nZTEST_F(ft98xx, test_acquire_image_success)\n{\n\tuint8_t buffer[FP_SENSOR_IMAGE_SIZE];\n\n\tft_sensor_acquire_image_with_mode_fake.return_val \u003d 0;\n\n\tzassert_ok(fingerprint_acquire_image(fixture-\u003edev,\n\t\t\t\t\t     FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT,\n\t\t\t\t\t     buffer, sizeof(buffer)));\n\tzassert_equal(ft_sensor_acquire_image_with_mode_fake.call_count, 1);\n}\n```",
+      "isAi": true,
+      "revId": "4bbd54f3fa77ad5e8f2b24a9b1330a1cd3bf2154",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
