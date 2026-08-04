@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8767c22b_b03a235d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T23:57:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/53140240-fcd1-48c5-ba14-bdccd5eac007)]\n\n### Review Summary\n\n*   **Functionality**: Looks good. The change correctly ensures the positive match secret is not armed, and the template is not immediately marked valid post-enrollment in the Fingerprint Auth flow.\n*   **Security**: Improves correctness and security for the Fingerprint Auth flow by avoiding the arming of the positive match secret when it\u0027s not expected to be read by the AP.\n*   **Style \u0026 Consistency**: The code follows the existing style and correctly encapsulates the logic within the `!fingerprint_auth_enabled()` condition.\n*   **Testing \u0026 Test Coverage**: Excellent. The tests added in `zephyr/test/fingerprint/task/src/fpsensor_enroll.cc` correctly simulate both classic and auth flows and assert the expected state of `positive_match_secret_state.readable`. I added an optional minor suggestion to also verify the state of `templ_valid` in these tests.\n*   **CL Size \u0026 Scope**: The size and scope are perfect. It is a focused and logical fix.\n\nTAG\u003dagy\nCONV\u003d53140240-fcd1-48c5-ba14-bdccd5eac007",
+      "isAi": true,
+      "revId": "918cea5f28fcbf153211fb9a29afca932542d64a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "453435b8_2767261e",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_enroll.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T23:57:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Optional Testing Suggestion:** Since `global_context.templ_valid++` was also moved inside the `if (!fingerprint_auth_enabled())` block in `fp_process_enroll`, you could optionally add `zassert_equal(global_context.templ_valid, 0);` here (and `1` in the classic flow test above) to explicitly verify that the template isn\u0027t activated for matching immediately in the Auth flow.",
+      "isAi": true,
+      "revId": "918cea5f28fcbf153211fb9a29afca932542d64a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
