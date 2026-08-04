@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef531c7f_da5a504e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T16:31:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b9a9f6ae_386debe7",
+      "revId": "4bbd54f3fa77ad5e8f2b24a9b1330a1cd3bf2154",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "141f4d5b_ccdba0b1",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Consider adding a test to verify that the driver correctly propagates error codes when `ft_sensor_query_finger_status_simple` fails. For example:\n\n```c\nZTEST_F(ft98xx, test_finger_status_error)\n{\n\tft_sensor_query_finger_status_simple_fake.return_val \u003d -EIO;\n\tzassert_equal(fingerprint_finger_status(fixture-\u003edev), -EIO);\n}\n```",
       "isAi": true,
+      "revId": "4bbd54f3fa77ad5e8f2b24a9b1330a1cd3bf2154",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29a0cbe7_bc56557d",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T16:31:40Z",
+      "side": 1,
+      "message": "This suggestion does not make sense:\n\nthe driver implementation in `ft98xx.c` only checks whether the return value equaled 1, falling back to `FINGERPRINT_FINGER_STATE_NONE` for all other values (including negative error codes):\n\n```\nstatic int ft98xx_finger_status(const struct device *dev)\n{\n\tif (!IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)) {\n\t\treturn -ENOTSUP;\n\t}\n\n\tif (ft_sensor_query_finger_status_simple() \u003d\u003d 1) {\n\t\tLOG_DBG(\"FINGER_PRESENT\");\n\t\treturn FINGERPRINT_FINGER_STATE_PRESENT;\n\t} else {\n\t\tLOG_DBG(\"FINGER_NONE\");\n\t\treturn FINGERPRINT_FINGER_STATE_NONE; /* Returns 0 instead of -EIO when \u003c 0 */\n\t}\n}\n```",
+      "parentUuid": "141f4d5b_ccdba0b1",
       "revId": "4bbd54f3fa77ad5e8f2b24a9b1330a1cd3bf2154",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aac9953a_65044927",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T16:31:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12c57c63_29355a16",
+      "revId": "4bbd54f3fa77ad5e8f2b24a9b1330a1cd3bf2154",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db5b126d_c2504e80",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Now that image acquisition appears to be supported and `ft_sensor_acquire_image_with_mode` is mocked, it would be beneficial to add a test for the success path to ensure the driver handles successful acquisitions correctly. For example:\n\n```c\nZTEST_F(ft98xx, test_acquire_image_success)\n{\n\tuint8_t buffer[FP_SENSOR_IMAGE_SIZE];\n\n\tft_sensor_acquire_image_with_mode_fake.return_val \u003d 0;\n\n\tzassert_ok(fingerprint_acquire_image(fixture-\u003edev,\n\t\t\t\t\t     FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT,\n\t\t\t\t\t     buffer, sizeof(buffer)));\n\tzassert_equal(ft_sensor_acquire_image_with_mode_fake.call_count, 1);\n}\n```",
       "isAi": true,
+      "revId": "4bbd54f3fa77ad5e8f2b24a9b1330a1cd3bf2154",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf56baa3_10839725",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T16:31:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db5b126d_c2504e80",
       "revId": "4bbd54f3fa77ad5e8f2b24a9b1330a1cd3bf2154",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
