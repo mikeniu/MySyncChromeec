@@ -316,5 +316,34 @@ ZTEST(host_cmd_host_commands, test_thread_info)
 	k_thread_abort(tid);
 }
 
+ZTEST_USER(host_cmd_host_commands, test_trysrc)
+{
+	struct ec_params_usb_pd_trysrc params = {
+		.port = 0,
+		.enable = 0,
+	};
+	int rv;
+
+	rv = ec_cmd_usb_pd_trysrc(NULL, &params);
+
+	zassert_equal(EC_RES_SUCCESS, rv,
+		      "Expected EC_RES_SUCCESS (%d), got %d", EC_RES_SUCCESS,
+		      rv);
+
+	params.enable = 2;
+	rv = ec_cmd_usb_pd_trysrc(NULL, &params);
+
+	zassert_equal(EC_RES_SUCCESS, rv,
+		      "Expected EC_RES_SUCCESS (%d), got %d", EC_RES_SUCCESS,
+		      rv);
+
+	params.enable = 5;
+	rv = ec_cmd_usb_pd_trysrc(NULL, &params);
+
+	zassert_equal(EC_RES_INVALID_PARAM, rv,
+		      "Expected EC_RES_INVALID_PARAM (%d), got %d",
+		      EC_RES_INVALID_PARAM, rv);
+}
+
 ZTEST_SUITE(host_cmd_host_commands, drivers_predicate_post_main, NULL, NULL,
 	    NULL, NULL);
