@@ -55,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1fb37f4_b3f7699e",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T22:53:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5bcfb1cd_229fedce",
+      "revId": "5aca3d0c2482d6099c07092080b6309f27b06b2c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d3cc37c_4e16f6f1",
