@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44043246_ebbceec3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-04T17:59:17Z",
+      "side": 1,
+      "message": "You need to add unit tests for the lapis specific implementation of custom_prevent_power_on().  Unit tests need to cover the cases of pressing power button and connecting AC.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 58
+      },
+      "revId": "add0df6495f436d4a36ed857ab372415de718ec3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdf6b19b_1a3ab194",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-04T17:59:17Z",
+      "side": 1,
+      "message": "Even though there are no tests",
+      "revId": "add0df6495f436d4a36ed857ab372415de718ec3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
