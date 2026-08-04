@@ -158,6 +158,13 @@ DT_FOREACH_STATUS_OKAY(CBI_FW_CONFIG_VALUE_COMPAT, FW_VALUE_BUILD_ASSERT)
 static uint32_t cached_fw_config;
 static bool cached_fw_config_ready;
 
+#ifdef CONFIG_ZTEST
+void test_cros_cbi_fw_config_reset_ready(void)
+{
+	cached_fw_config_ready = false;
+}
+#endif
+
 void cros_cbi_fw_config_init(void)
 {
 	if (cbi_get_fw_config(&cached_fw_config) != EC_SUCCESS) {

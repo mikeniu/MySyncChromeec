@@ -45,6 +45,13 @@ DT_INST_FOREACH_STATUS_OKAY(VALIDATE_UFSC_VALUE)
 static struct cbi_ufsc cached_ufsc;
 static bool cached_ufsc_ready;
 
+#ifdef CONFIG_ZTEST
+void test_cros_cbi_ufsc_reset_ready(void)
+{
+	cached_ufsc_ready = false;
+}
+#endif
+
 #define CBI_UFSC_VALUE_ARRAY_ID(id) \
 	[CBI_UFSC_VALUE_ID(id)] = DT_PROP(id, value),
 #define CBI_UFSC_VALUE_ARRAY(inst) CBI_UFSC_VALUE_ARRAY_ID(DT_DRV_INST(inst))

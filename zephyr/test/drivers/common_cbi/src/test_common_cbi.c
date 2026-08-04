@@ -893,3 +893,21 @@ static void test_common_cbi_before_after(void *test_data)
 
 ZTEST_SUITE(common_cbi, drivers_predicate_post_main, NULL,
 	    test_common_cbi_before_after, test_common_cbi_before_after, NULL);
+
+void test_cros_cbi_ssfc_reset_ready(void);
+
+ZTEST_USER(common_cbi, test_cros_cbi_ssfc__read_before_init)
+{
+	test_cros_cbi_ssfc_reset_ready();
+
+	zassert_false(cros_cbi_ssfc_check_match(0),
+		      "Expected false when checking SSFC match before init");
+}
+
+ZTEST_USER(common_cbi, test_cros_cbi_ssfc_init)
+{
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+
+	cros_cbi_ssfc_init();
+}
