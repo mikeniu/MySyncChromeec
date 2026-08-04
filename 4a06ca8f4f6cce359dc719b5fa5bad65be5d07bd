@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7041418_9c084be1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T01:18:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/b271cc1a-ad1c-44be-9f91-d9349dea1527)]\n\n**Review Summary:**\n* **Functionality:** The logic is functionally identical to the original nested `if` statements. The combined boolean condition correctly evaluates both requirements.\n* **Security:** No security vulnerabilities introduced.\n* **Style:** The code is easier to read and maintain with the simplified conditional, which eliminates unnecessary nesting.\n* **Testing \u0026 Test Coverage:** As this is a pure boolean logic simplification that preserves exact existing behavior, existing unit tests for sensor reset validation are sufficient.\n* **CL Size \u0026 Scope:** The CL is perfectly sized and strictly focused on a single cleanup task, aligning well with go/small-cls.",
+      "isAi": true,
+      "revId": "4a06ca8f4f6cce359dc719b5fa5bad65be5d07bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "830000e5_71d8e8c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T01:18:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/e7170220-301c-480b-ad08-162922852c9e)]\n\n### Review Summary\n*   **Functionality:** The logic works exactly as before. The nested `if` is safely combined into a single conditional statement.\n*   **Security:** No security vulnerabilities introduced.\n*   **Style:** The simplified conditional is cleaner and easier to read. I left a minor inline comment about curly brace consistency.\n*   **Consistency:** The changes fit well with the rest of the function, modulo the minor brace suggestion.\n*   **Testing \u0026 Test Coverage:** The PR description indicates `twister` tests were run. No additional test coverage is needed for this pure refactoring.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and self-contained.\n\nTAG\u003dagy\nCONV\u003d9ad97183-61a6-4e6d-9d98-803b85f20c17",
+      "isAi": true,
+      "revId": "4a06ca8f4f6cce359dc719b5fa5bad65be5d07bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14ef5c1c_9d315179",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T01:18:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Minor style suggestion: Since the condition is now simplified and fits on a single line, you might consider omitting the curly braces around the `return` statement to match the style of earlier checks in this function (e.g., lines 188-192).",
+      "isAi": true,
+      "revId": "4a06ca8f4f6cce359dc719b5fa5bad65be5d07bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
