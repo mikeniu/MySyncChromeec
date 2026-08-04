@@ -246,3 +246,6 @@ tests:
       - boards/rex_ish/ish.dtsi
     extra_configs:
       - CONFIG_TEST_PROJECT_REX_ISH=y
+      - CONFIG_TEST_PROJECT_KANIX=y
+      - CONFIG_TEST_BOARD_FAN_CUSTOM=y
+      - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
