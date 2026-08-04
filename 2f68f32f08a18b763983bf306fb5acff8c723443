@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ce9adfc_fae2bc5c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:07:20Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "73b01355_19500160",
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "467db20f_87f1c7a7",
@@ -32,6 +50,30 @@
       "writtenOn": "2026-08-04T22:36:24Z",
       "side": 1,
       "message": "Let\u0027s add a self-describing constant for these",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 44
+      },
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "663e3973_306db98b",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:07:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "467db20f_87f1c7a7",
       "range": {
         "startLine": 71,
         "startChar": 0,
@@ -65,6 +107,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b4243d8_1bca16e0",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:07:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a5be532_e80bfa4e",
+      "range": {
+        "startLine": 75,
+        "startChar": 42,
+        "endLine": 75,
+        "endChar": 48
+      },
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "165a621b_4c1b3cda",
@@ -78,6 +144,30 @@
       "writtenOn": "2026-08-04T22:38:33Z",
       "side": 1,
       "message": "Where is pulse_hw_reset being called?",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 53
+      },
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85fa2123_b0fa7168",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:07:20Z",
+      "side": 1,
+      "message": "it is called inside the [ft98xx_init](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/fingerprint_ft98xx.c;l\u003d161?q\u003dpulse_hw_reset\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fplatform%2Fec%2Fzephyr%2F#:~:text\u003d160-,161,-162) function.",
+      "parentUuid": "165a621b_4c1b3cda",
       "range": {
         "startLine": 79,
         "startChar": 0,
@@ -111,6 +201,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31786cee_042fb294",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:07:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da05646a_49ec8f71",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 31
+      },
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "021cfc8a_1b8624d1",
@@ -124,6 +238,30 @@
       "writtenOn": "2026-08-04T22:42:25Z",
       "side": 1,
       "message": "This doesn\u0027t have to be fixed here, but let\u0027s file a bug and add a `TODO(b/123)` to track investigating/fixing it:\n\n-----\n\n**Unexpected Error Mapping (`test_acquire_image_error`)**\n\n* **Issue:** In `test_acquire_image_error`, the mock for `ft_sensor_acquire_image_with_mode` is set to return `-EIO` (Input/Output error), but the test expects `fingerprint_acquire_image` to return `-EINVAL` (Invalid Argument).\n* **Impact:** Returning `-EINVAL` for a hardware/I/O failure masks the root cause of the error. If a user passes valid arguments but the hardware fails, they should receive a hardware-related error code (like `-EIO` or a specific fingerprint sensor error), not an indication that their arguments were invalid.\n* **Recommendation:** Verify the error propagation logic within the `fingerprint_acquire_image` driver implementation. If the driver is deliberately collapsing all errors to `-EINVAL`, the driver should be fixed to propagate `-EIO`. Afterwards, update this test to expect `-EIO` (or the appropriate error mapping).",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 17
+      },
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea92afe4_b5c9d028",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-04T23:07:20Z",
+      "side": 1,
+      "message": "this is correct:\n\n```\n/**\n * @brief Acquire image with specified capture mode\n *\n * @param[out] img  Captured image data buffer\n * @param[in]  img_buf_size  Image data buffer size\n * @param[in]  mode Capture type (fingerprint_capture_type)\n *\n * @retval 0      Success\n * @retval others Failure\n */\nint ft_sensor_acquire_image_with_mode(uint8_t *img, size_t img_buf_size,\n\t\t\t\t      int mode);\n```\n\n```\nstatic int ft98xx_acquire_image(const struct device *dev,\n\t\t\t\tenum fingerprint_capture_type capture_type,\n\t\t\t\tuint8_t *image_buf, size_t image_buf_size)\n{\n\tint ret;\n\tint frame_size \u003d ft98xx_get_frame_size(dev, capture_type);\n\tif ((frame_size \u003c 0) || (image_buf_size \u003c frame_size))\n\t\treturn -EINVAL;\n\n\tif (!IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)) {\n\t\treturn -ENOTSUP;\n\t}\n\n\tmemset(image_buf, 0, image_buf_size);\n\tret \u003d ft_sensor_acquire_image_with_mode(image_buf, image_buf_size,\n\t\t\t\t\t\tcapture_type);\n\tif (ret \u003c 0) {\n\t\tLOG_ERR(\"Failed to acquire image with capture_type %d: %d\",\n\t\t\tcapture_type, ret);\n\t\treturn -EINVAL;\n\t}\n\n\treturn 0;\n}\n```",
+      "parentUuid": "021cfc8a_1b8624d1",
       "range": {
         "startLine": 188,
         "startChar": 0,
