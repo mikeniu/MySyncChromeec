@@ -1,0 +1,75 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config PLATFORM_EC_BUTTON
+	bool "Enable button support"
+	help
+	  Enable Chrome EC button library support. It is required for keyboard
+	  and dedicated recovery button support.
+
+config PLATFORM_EC_BUTTON_TRIGGERED_RECOVERY
+	bool "Support entering recovery mode using buttons"
+	select PLATFORM_EC_BUTTON
+	help
+	  Support for entering recovery mode using the volume buttons or a
+	  dedicated recovery button. Note that these are *buttons* and not keys
+	  in the keyboard matrix.
+
+config PLATFORM_EC_VOLUME_BUTTONS
+	bool "Board has volume-up and volume-down buttons"
+	select PLATFORM_EC_BUTTON
+	help
+	  Enable this if the board has physical buttons for the volume controls.
+	  These are buttons controlled by GPIOs and are not part of the keyboard
+	  matrix.
+
+	  Your board must define GPIO_VOLUME_UP_L and GPIO_VOLUME_DOWN_L as
+	  GPIOs names or as aliases in the GPIO devicetree configuration.
+
+config PLATFORM_EC_DEDICATED_RECOVERY_BUTTON
+	bool "Enable dedicated recovery button"
+	select PLATFORM_EC_BUTTON_TRIGGERED_RECOVERY
+	help
+	  Indicates there is a dedicated recovery button.  Note, that if there
+	  are volume buttons, a dedicated recovery button is not needed.
+	  This is intended because if a board has volume buttons, they can do
+	  everything a dedicated recovery button can do.
+
+config PLATFORM_EC_DEDICATED_RECOVERY_BUTTON_ACTIVE_HIGH
+	bool "Recovery button is active high"
+	depends on PLATFORM_EC_DEDICATED_RECOVERY_BUTTON
+	help
+	  Configure recovery button to use high state as active.
+
+config PLATFORM_EC_DEDICATED_RECOVERY_BUTTON_2
+	bool "Enable second dedicated recovery button"
+	select PLATFORM_EC_BUTTON_TRIGGERED_RECOVERY
+	help
+	  Enable use of second dedicated recovery button.
+	  For various reasons, on some platforms there may be multiple
+	  recovery inputs. See b/149967026.
+
+config PLATFORM_EC_DEDICATED_RECOVERY_BUTTON_2_ACTIVE_HIGH
+	bool "Second recovery button is active high"
+	depends on PLATFORM_EC_DEDICATED_RECOVERY_BUTTON_2
+	help
+	  Configure second recovery button to use high state as active.
+
+config PLATFORM_EC_BUTTON_DEBOUNCE
+	int "button debounce in us"
+	default 30000
+	help
+	  Configure the button debounce time in us per project requirement.
+
+config PLATFORM_EC_BUTTONS_RUNTIME_CONFIG
+	bool "Enable buttons runtime configuration"
+	help
+	  This command allow the runtime configuration of the buttons[]
+	  array.
+
+config PLATFORM_EC_CMD_BUTTON
+	bool "Console command: button"
+	help
+	  This command simulates button press. The buttons are like volume-up,
+	  volume-down, and recovery buttons.
