@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73b01355_19500160",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T18:39:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/4c256676-7a26-492a-9692-cad76cb8632b)]\n\n**Review Summary:**\n*   **Functionality:** The addition of the FFF mocks and the setup hook (`ft98xx_before`) ensures test isolation and proper simulation of hardware scenarios. The test additions are sound and verify the newly enabled features.\n*   **Security:** No security vulnerabilities were identified in this patch.\n*   **Style:** The code adheres to standard Zephyr testing conventions.\n*   **Testing \u0026 Test Coverage:** The patch improves unit test coverage significantly by testing finger presence states and image acquisition paths, including the newly added error and success cases based on my previous feedback.\n*   **CL Size \u0026 Scope:** The CL is self-contained and appropriately sized, focusing solely on improving test coverage for the ft98xx driver.\n\nCONV\u003da65591b4-af6c-44a5-a57f-35d34ea548d4\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
