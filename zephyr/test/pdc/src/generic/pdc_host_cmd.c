@@ -407,3 +407,33 @@ ZTEST(host_cmd_pdc, test_ec_cmd_usb_pd_control__swap_data_role)
 	zassert_equal(1, pdc_power_mgmt_request_data_swap_fake.call_count,
 		      "pdc_power_mgmt_request_data_swap not called!");
 }
+
+ZTEST(host_cmd_pdc, test_ec_cmd_usb_pd_control__trysrc)
+{
+	struct ec_params_usb_pd_trysrc params = {
+		.port = 0,
+		.enable = 1,
+	};
+	int rv;
+
+	rv = ec_cmd_usb_pd_trysrc(NULL, &params);
+
+	zassert_equal(EC_RES_SUCCESS, rv,
+		      "Expected EC_RES_SUCCESS (%d), got %d", EC_RES_SUCCESS,
+		      rv);
+
+	params.port = 20;
+	rv = ec_cmd_usb_pd_trysrc(NULL, &params);
+
+	zassert_equal(EC_RES_INVALID_PARAM, rv,
+		      "Expected EC_RES_INVALID_PARAM (%d), got %d",
+		      EC_RES_INVALID_PARAM, rv);
+
+	params.port = 0;
+	params.enable = 20;
+	rv = ec_cmd_usb_pd_trysrc(NULL, &params);
+
+	zassert_equal(EC_RES_INVALID_PARAM, rv,
+		      "Expected EC_RES_INVALID_PARAM (%d), got %d",
+		      EC_RES_INVALID_PARAM, rv);
+}

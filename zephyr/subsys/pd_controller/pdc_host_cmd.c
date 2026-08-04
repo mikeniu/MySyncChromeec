@@ -149,6 +149,27 @@ DECLARE_HOST_COMMAND(EC_CMD_USB_PD_MUX_INFO, hc_usb_pd_mux_info,
 		     EC_VER_MASK(0));
 #endif /* CONFIG_PDC_POWER_MGMT_USB_MUX */
 
+static enum ec_status pdc_trysrc(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_usb_pd_trysrc *p = args->params;
+	int port = p->port, enable = p->enable, rv;
+
+	if (!pdc_power_mgmt_is_pdc_port_valid(port)) {
+		return EC_RES_INVALID_PARAM;
+	}
+
+	if (!(enable == 0 || enable == 1)) {
+		return EC_RES_INVALID_PARAM;
+	}
+
+	rv = pdc_power_mgmt_set_trysrc(port, enable);
+	if (rv) {
+		return rv;
+	}
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_USB_PD_TRYSRC, pdc_trysrc, EC_VER_MASK(0));
+
 #if !defined(CONFIG_USB_PD_ALTMODE_INTEL)
 uint8_t get_pd_control_flags(int port)
 {
