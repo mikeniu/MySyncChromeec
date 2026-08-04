@@ -57,6 +57,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ecd9494b_b30300cf",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T23:23:06Z",
+      "side": 1,
+      "message": "* **Suspicious Return Value in `test_enroll_start_failure`:**\nIn `test_enroll_start_failure`, you mock `focal_algo_enroll_start` to return `-1` (simulating a failure). However, the assertion expects the wrapper function to return `0`:\n```c\nint res \u003d fingerprint_enroll_start(fixture-\u003ealg);\nzassert_equal(res, 0, \"Expected 0 when focal_algo_enroll_start fails.\");\n\n```\n\n\nTypically, Zephyr subsystem drivers bubble up negative POSIX error codes (e.g., `-EINVAL`, `-EIO`) upon failure—which is correctly expected in `test_init_algo_init_failure`. If `fingerprint_enroll_start` truly returns `0` upon an underlying algorithm failure, it is likely swallowing the error, which points to a bug in `ft98xx_bio_alg.c`. If `0` is genuinely the intended behavior by design, please add a comment explaining why this API deviates from standard error handling.",
+      "range": {
+        "startLine": 248,
+        "startChar": 0,
+        "endLine": 248,
+        "endChar": 73
+      },
+      "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1a984993_6ee90628",
         "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
         "patchSetId": 33
@@ -73,6 +96,29 @@
         "startChar": 22,
         "endLine": 387,
         "endChar": 26
+      },
+      "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0762a075_acaa6dc9",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T23:23:06Z",
+      "side": 1,
+      "message": "* **Validate Out-Parameters on Failure Paths:**\nIn `test_match_algo_match_failure`, you correctly assert that `match_index` remains `-1` when the match fails. You should apply this same rigor to the other match failure tests (`test_match_get_feature_failure`, `test_match_anti_spoofing_failure`, and `test_match_template_update_failure`).\n* **Suggestion:** Add `zassert_equal(match_index, -1);` and `zassert_equal(update_bitmap, 0);` to the end of these failure tests to ensure the driver does not mutate out-parameters when an operation is aborted early.",
+      "range": {
+        "startLine": 397,
+        "startChar": 0,
+        "endLine": 397,
+        "endChar": 46
       },
       "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
