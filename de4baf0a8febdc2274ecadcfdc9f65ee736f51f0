@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da1be7fc_af8d6201",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 33
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T23:16:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/ecc0b248-d68a-48d8-96a4-c00d9fc65dda)]\n\n**Review Summary**\n* **Functionality:** The unit test harness is solid and the FFF mocks correctly simulate the hardware. The previous issues regarding initialization tracking have been fully resolved with the `fixture_alg_init` helper and the `is_initialized` state flag, preventing resource leaks and ensuring clean teardown across all tests.\n* **Security:** No security vulnerabilities found. String copies are now using safe constraints (`snprintf`).\n* **Style:** The code correctly follows the project\u0027s coding style. The CMake configuration explicitly lists source files and correctly avoids `FILE(GLOB)`.\n* **Testing \u0026 Test Coverage:** The lifecycle tests are comprehensive. Adding the dedicated teardown state tracking fixed the bypassed test teardowns. The explanation that the `enroll_step_without_start` test is in follow-up CL 8183237 makes perfect sense.\n* **CL Size \u0026 Scope:** The CL is appropriately scoped to introducing the foundational test harness.\n\nTAG\u003dagy\nCONV\u003d6e396a49-4012-4443-99db-35f97a23dfc1",
+      "isAi": true,
+      "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26ffa04d_a20e456d",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/include/ft98xx_algo_mocks.h",
+        "patchSetId": 33
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T23:16:32Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] You are absolutely correct regarding the FFF macro limitations. FFF relies on macro argument counting, which cannot natively parse C types containing spaces or commas as single arguments without breaking the expansion. The original suggestion to include variable names unfortunately doesn\u0027t work with FFF. Thanks for pointing that out!",
+      "isAi": true,
+      "revId": "de4baf0a8febdc2274ecadcfdc9f65ee736f51f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
