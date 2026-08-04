@@ -164,6 +164,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e22b5f21_6f94f8fb",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:22:08Z",
+      "side": 1,
+      "message": "**1. Relying on Transitive Includes for Standard Macros**\nThe tests utilize system macros like `-EINVAL` and `BIT(0)`:\n\n```c\nzassert_equal(fingerprint_algorithm_init(fixture-\u003ealg), -EINVAL);\n// ...\nzassert_equal(update_bitmap, BIT(0));\n\n```\n\n* **Issue:** Neither `\u003cerrno.h\u003e` (for `EINVAL`) nor `\u003czephyr/sys/util.h\u003e` (for `BIT`) are explicitly included in `ft98xx.c`. The code compiles only because these headers happen to be pulled in transitively by `\u003czephyr/ztest.h\u003e`. If the Zephyr project refactors the includes in the ZTEST subsystem in a future release, this test file will suddenly fail to compile.\n* **Suggestion:** Always explicitly include the headers for the macros you use:\n\n```c\n#include \u003cerrno.h\u003e\n#include \u003czephyr/sys/util.h\u003e\n\n```",
+      "range": {
+        "startLine": 109,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 66
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2fa16b17_3561778b",
         "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
         "patchSetId": 28
@@ -233,6 +256,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8f3a9f6c_e884c45e",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:22:08Z",
+      "side": 1,
+      "message": "**3. Implicitly Unmocked Return Values**\nIn several tests, you call APIs that execute sub-routines (e.g., `fingerprint_enroll_start` calling `focal_algo_enroll_start`), but you don\u0027t explicitly set the mock\u0027s return value.\n\n* **Issue:** FFF zero-initializes mock return values upon `RESET_FAKE`, so `focal_algo_enroll_start_fake.return_val` defaults to `0` (Success). While this works, it makes the test logic implicit.\n* **Suggestion:** For readability and strictness, explicitly set the success returns for the mocks in the `ft98xx_alg_before` setup block just like you did for `focal_algo_init_fake.return_val \u003d 0;`. Include `focal_algo_enroll_start_fake`, `focal_algo_match_fake`, etc.",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 52
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c396d410_66afdafb",
         "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
         "patchSetId": 28
@@ -295,6 +341,29 @@
         "startChar": 0,
         "endLine": 239,
         "endChar": 59
+      },
+      "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf86fecb_ccf23a1a",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T16:22:08Z",
+      "side": 1,
+      "message": "**1. Unverified Anti-Spoofing Flag (Bypassing Hardware)**\nIn `test_match_success_no_update`, you call `fingerprint_match` with what appears to be a `false` flag for anti-spoofing:\n\n```c\n\tint res \u003d fingerprint_match(fixture-\u003ealg, template_buf, 1,\n\t\t\t\t    fixture-\u003efake_image, false, \u0026match_index,\n\t\t\t\t    \u0026update_bitmap);\n\n```\n\nHowever, you explicitly set up the anti-spoofing mock (`focal_algo_anti_spoofing_fake.return_val \u003d 0;`) but never check its call count.\n\n* **Issue:** The point of passing `false` to the match API is likely to instruct the algorithm to skip a costly hardware anti-spoofing check. If the driver contains a bug where it executes the spoofing check anyway, this test will pass silently, missing the bug.\n* **Suggestion:** Add an assertion to strictly verify that the driver respected the flag and skipped the hardware call:\n\n```c\nzassert_equal(focal_algo_anti_spoofing_fake.call_count, 0, \n              \"Spoofing check must be skipped when flag is false\");\n\n```",
+      "range": {
+        "startLine": 272,
+        "startChar": 29,
+        "endLine": 272,
+        "endChar": 34
       },
       "revId": "d3f21f0a98d57f63bb35c4046000eea813f4fbc8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
