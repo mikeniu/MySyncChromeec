@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c9153d4_4d9553c7",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-04T23:13:55Z",
+      "side": 1,
+      "message": "Change all instances of these to `CONFIG_FP_ALGORITHM_TEMPLATE_SIZE` like the other CL.",
+      "range": {
+        "startLine": 420,
+        "startChar": 22,
+        "endLine": 420,
+        "endChar": 26
+      },
+      "revId": "a4e96f73462a60a1833ef33afb4b17c9abb982bf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
