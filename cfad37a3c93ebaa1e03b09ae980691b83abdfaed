@@ -87,6 +87,24 @@
       "parentUuid": "a2fb269e_7897b11e",
       "revId": "cfad37a3c93ebaa1e03b09ae980691b83abdfaed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "485679cc_184c8e62",
+        "filename": "common/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 1177,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-08-04T02:01:45Z",
+      "side": 1,
+      "message": "Marking as closed, please reopen if needed. Thanks.",
+      "parentUuid": "972d712c_3e35b9d0",
+      "revId": "cfad37a3c93ebaa1e03b09ae980691b83abdfaed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
