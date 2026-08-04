@@ -45,7 +45,7 @@ DT_INST_FOREACH_STATUS_OKAY(VALIDATE_UFSC_VALUE)
 /* --- Data Structures --- */
 
 static struct cbi_ufsc cached_ufsc;
-static bool cached_ufsc_ready;
+test_export_static bool cached_ufsc_ready;
 
 #define CBI_UFSC_VALUE_ARRAY_ID(id) \
 	[CBI_UFSC_VALUE_ID(id)] = DT_PROP(id, value),
