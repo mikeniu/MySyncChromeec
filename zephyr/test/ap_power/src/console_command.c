@@ -28,5 +28,12 @@ ZTEST_USER(console_cmd_debug_mode, test_debug_mode_enabled)
 		   "failed to enable debug_mode");
 }
 
+ZTEST_USER(console_cmd_debug_mode, test_debug_mode_invalid_param)
+{
+	zassert_equal(EC_ERROR_PARAM1,
+		      shell_execute_cmd(get_ec_shell(), "debug_mode bogus"),
+		      "invalid debug_mode param should fail");
+}
+
 ZTEST_SUITE(console_cmd_debug_mode, ap_power_predicate_post_main, NULL, NULL,
 	    NULL, NULL);

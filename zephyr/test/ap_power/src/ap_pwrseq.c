@@ -585,6 +585,33 @@ ZTEST(ap_pwrseq, test_ap_pwrseq_6)
 		      "AP_POWER_SHUTDOWN_COMPLETE event not generated");
 }
 
+#if defined(CONFIG_AP_PWRSEQ_DRIVER)
+ZTEST(ap_pwrseq, test_ap_pwrseq_7_force_shutdown)
+{
+	power_up_test_g3_to_s0_helper();
+
+	ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+	k_msleep(500);
+
+	zassert_equal(1, power_shutdown_count,
+		      "AP_POWER_SHUTDOWN event not generated");
+	zassert_equal(1, power_shutdown_complete_count,
+		      "AP_POWER_SHUTDOWN_COMPLETE event not generated");
+	zassert_true(chipset_in_state(CHIPSET_STATE_HARD_OFF),
+		     "AP should be in hard off after force shutdown");
+}
+#endif /* CONFIG_AP_PWRSEQ_DRIVER */
+
+ZTEST(ap_pwrseq, test_ap_power_reset_while_in_reset)
+{
+	/* Toggling SYS_RESET_L is skipped when the AP is already in reset */
+	power_signal_set(PWR_SYS_RST, 1);
+	ap_power_reset(AP_POWER_SHUTDOWN_G3);
+	zassert_equal(1, power_signal_get(PWR_SYS_RST),
+		      "SYS_RST should remain asserted");
+	power_signal_set(PWR_SYS_RST, 0);
+}
+
 ZTEST(ap_pwrseq, test_insufficient_power_blocks_s5)
 {
 	zassert_equal(0,

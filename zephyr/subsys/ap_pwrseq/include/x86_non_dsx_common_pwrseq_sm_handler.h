@@ -9,7 +9,6 @@
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/types.h>
-
 #ifdef CONFIG_AP_PWRSEQ_DRIVE
 #include <ap_power/ap_pwrseq.h>
 #else
@@ -18,11 +17,9 @@
 #endif
 #include <ap_power_host_sleep.h>
 #include <x86_common_pwrseq.h>
-
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
 /* The wait time is ~150 msec, allow for safety margin. */
 #define IN_PCH_SLP_SUS_WAIT_TIME_MS 250
-
 enum power_states_ndsx chipset_pwr_sm_run(enum power_states_ndsx curr_state);
 enum power_states_ndsx chipset_pwr_seq_get_state(void);
 enum power_states_ndsx pwr_sm_get_state(void);
@@ -31,9 +28,24 @@ const char *const pwr_sm_get_state_name(enum power_states_ndsx state);
 enum ap_pwrseq_state chipset_pwr_seq_get_state(void);
 const char *const pwr_sm_get_state_name(enum ap_pwrseq_state state);
 #endif
+/**
+ * @brief Request AP to start power on sequence.
+ *
+ */
 void request_start_from_g3(void);
-void apshutdown(void);
+
+/**
+ * @brief Handle reset on chipset level.
+ *
+ */
 void ap_pwrseq_handle_chipset_reset(void);
+
+/**
+ * @brief Set delay to start AP power on sequence.
+ *
+ * @param AP power sequence delay in seconds.
+ *
+ */
 void set_start_from_g3_delay_seconds(uint32_t d_time);
 
 /**
@@ -57,5 +69,17 @@ bool chipset_is_vw_power_good(void);
  * @return true if all AP power rails are good, and false otherwise.
  */
 bool chipset_is_all_power_good(void);
+
+/**
+ * @brief Check if AP power sequencing debug mode is enabled.
+ *
+ * @return true if debug mode is enabled, false otherwise.
+ */
+bool ap_power_in_debug_mode(void);
+
+/**
+ * @brief Force AP shutdown to G3.
+ */
+void apshutdown(void);
 #endif /* PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_NON_DSX_COMMON_PWRSEQ_SM_HANDLER_H_ \
 	*/
