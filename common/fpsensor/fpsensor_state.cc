@@ -197,9 +197,8 @@ static int validate_fp_mode(const uint32_t mode)
 	/* Don't allow sensor reset if any other mode is
 	 * set (including FP_MODE_RESET_SENSOR itself).
 	 */
-	if (mode & FP_MODE_RESET_SENSOR) {
-		if (cur_mode & FP_VALID_MODES)
-			return EC_ERROR_INVAL;
+	if ((mode & FP_MODE_RESET_SENSOR) && (cur_mode & FP_VALID_MODES)) {
+		return EC_ERROR_INVAL;
 	}
 
 	/*
