@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c83a9302_c54509eb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-08-05T06:31:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52824ea4_d1e2c1ee",
+      "revId": "30c6b2fa9a8c97d28969e630acd32cc837b8a621",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3fbb93b2_fae3b9bb",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-04T20:39:28Z",
       "side": 1,
       "message": "Shouldn\u0027t there also be a `CMakeLists.txt` change?",
+      "revId": "30c6b2fa9a8c97d28969e630acd32cc837b8a621",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6e3170e_a9be362e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-08-05T06:31:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fbb93b2_fae3b9bb",
       "revId": "30c6b2fa9a8c97d28969e630acd32cc837b8a621",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
