@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a59ad1fa_adc4062b",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-05T20:02:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "64083386_89444ee1",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c450799_30d7b406",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-05T17:51:30Z",
       "side": 1,
       "message": "Nit: This is a little hard to grok just reading the code. Can you put an example output line in a comment for comparison purposes?",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e911fcbf_2f65a004",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-05T20:02:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c450799_30d7b406",
       "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -52,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8255b89f_ca70225b",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-05T20:02:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9bd2bc0_917e6cc5",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b04c4723_4c22ac73",
@@ -69,6 +123,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ae669c0_ce8e14ef",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-05T20:02:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b04c4723_4c22ac73",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af35871a_843c249d",
@@ -82,6 +154,24 @@
       "writtenOn": "2026-08-05T17:51:30Z",
       "side": 1,
       "message": "This would happen in the case that parsing the map file failed in some way. How expected is that scenario?",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "826e034b_eaa79c13",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-05T20:02:41Z",
+      "side": 1,
+      "message": "This should be rare.",
+      "parentUuid": "af35871a_843c249d",
       "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
