@@ -416,7 +416,9 @@ def find_toolchains():
         None: Modifies the os environment if found
     """
     env = dict(os.environ)
-    if "COREBOOT_SDK_ROOT" not in env:
+    if "COREBOOT_SDK_ROOT" not in env or not any(
+        k.startswith("COREBOOT_SDK_ROOT_") for k in env
+    ):
         # Try to find util relative to this file first (handles running from source/editable)
         ec_util_path = (
             pathlib.Path(__file__).resolve().parent.parent.parent.parent
