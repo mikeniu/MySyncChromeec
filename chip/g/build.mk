@@ -239,16 +239,13 @@ $(SIGNER_MANIFEST): $(MANIFEST)
 	$(Q)mkdir -p $(dir $@)
 # Drop comments to make the manifest acceptable by jq.
 	$(Q)sed 's|\/\/.*||' $< > $@.tmp
-ifneq ($(H1_DEVIDS),)
-ifneq ($(CR50_DEV),)
 # When building a debug image, we don't want rollback protection to be in the
 # way - a debug image, which is guaranteed to be node locked should run on any
 # H1, whatever its info mask state is. The jq script below clears out the
 # info {} section of the manifest.
-	$(Q)jq '.info={}' $@.tmp > $@.tmp1
-	mv $@.tmp1 $@.tmp
-endif
-endif
+	$(Q)if [ -n "$(H1_DEVIDS)" ] && [ -n "$(CR50_DEV)" ]; then \
+		jq '.info={}' $@.tmp > $@.tmp1 && mv $@.tmp1 $@.tmp; \
+	fi
 # Modify the manifest tag field to match the board name. This is necessary for
 # personalization to succeed.
 #
