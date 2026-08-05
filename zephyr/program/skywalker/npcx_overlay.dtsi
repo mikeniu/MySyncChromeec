@@ -38,6 +38,23 @@
 		};
 	};
 
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port5@5 {
+			reg = <5>;
+			i2c-port = <&i2c5_0>;
+			allow-type = "BATTERY_ALLOW_PASSTHRU";
+		};
+
+		port1@1 {
+			reg = <1>;
+			i2c-port = <&i2c1_0>;
+		};
+	};
+
 	unused-pins {
 		compatible = "unused-gpios";
 		unused-gpios =
