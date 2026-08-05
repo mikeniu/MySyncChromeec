@@ -241,9 +241,29 @@
 		};
 		ec_smb_batt_scl_3v3 {
 			remote-port = <7>;
+		/delete-node/ ec_i2c5;
+	};
+
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port1@1 {
+			reg = <1>;
+			i2c-port = <&i2c1>;
+			allow-type = "BATTERY_ALLOW_PASSTHRU";
 		};
 
-		/delete-node/ ec_i2c5;
+		port2@2 {
+			reg = <2>;
+			i2c-port = <&i2c2ALT>;
+		};
+
+		port4@4 {
+			reg = <4>;
+			i2c-port = <&i2c4>;
+		};
 	};
 
 	named-gpios {
