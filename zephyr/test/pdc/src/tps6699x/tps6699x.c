@@ -419,6 +419,54 @@ ZTEST_USER(tps6699x, test_handle_irq)
 	recover_from_st_disable();
 }
 
+ZTEST_USER(tps6699x, test_reinit_restore_sink_pdo)
+{
+	struct i2c_common_emul_data *common_data =
+		emul_tps6699x_get_i2c_common_data(emul);
+	uint32_t pdos[PDO_OFFSET_MAX] = { 0 };
+	uint32_t src_pdo = PDO_FIXED(5000, 1500, 0);
+	uint32_t pdos_in[] = { PDO_FIXED(5000, 3000, 0),
+			       PDO_FIXED(9000, 3000, 0),
+			       PDO_FIXED(15000, 3000, 0),
+			       PDO_FIXED(20000, 3000, 0) };
+
+	/* Make sure we started in an initialized state. */
+	zassert_true(pdc_is_init_done(dev));
+	zassert_ok(pdc_set_pdos(dev, SINK_PDO, pdos_in, ARRAY_SIZE(pdos_in)));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_ok(pdc_set_pdos(dev, SOURCE_PDO, &src_pdo, 1));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Inject one-shot read and write failures on
+	 * REG_TRANSMIT_SINK_CAPABILITES so init retries exercise both error
+	 * paths in pdc_restore_sink_pdos() before succeeding on the 3rd
+	 * attempt.
+	 */
+	emul_pdc_fail_reg_read(emul, REG_TRANSMIT_SINK_CAPABILITES);
+	i2c_common_emul_set_fail_auto_clear(common_data, true);
+	i2c_common_emul_set_write_fail_reg(common_data,
+					   REG_TRANSMIT_SINK_CAPABILITES);
+
+	/* Do a reset which will trigger GAID and restart init. */
+	zassert_ok(pdc_reset(dev));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify GAID reset the emulator's sink PDOs before re-init completes.
+	 */
+	zassert_ok(emul_pdc_get_pdos(emul, SINK_PDO, PDO_OFFSET_0,
+				     PDO_OFFSET_MAX, LPM_PDO, pdos));
+	zassert_not_equal(memcmp(pdos, pdos_in, sizeof(pdos_in)), 0);
+
+	k_sleep(K_MSEC(INIT_SLEEP_MS * 3));
+	i2c_common_emul_set_fail_auto_clear(common_data, false);
+	zassert_true(pdc_is_init_done(dev));
+
+	memset(pdos, 0, sizeof(pdos));
+	zassert_ok(emul_pdc_get_pdos(emul, SINK_PDO, PDO_OFFSET_0,
+				     PDO_OFFSET_MAX, LPM_PDO, pdos));
+	zassert_ok(memcmp(pdos, pdos_in, sizeof(pdos_in)));
+}
+
 ZTEST_USER(tps6699x, test_set_rdo)
 {
 	uint32_t rdo;
