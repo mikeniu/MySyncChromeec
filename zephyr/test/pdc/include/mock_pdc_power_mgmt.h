@@ -33,6 +33,7 @@ DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_reset, int);
 DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_comms_state, bool);
 DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_comms_state_for_chip, int,
 			bool);
+DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_comms_state_for_chip, int);
 DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_chip_for_port, int);
 DECLARE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_chip_count);
 DECLARE_FAKE_VOID_FUNC(pdc_power_mgmt_set_dual_role, int,

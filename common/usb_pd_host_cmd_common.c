@@ -497,10 +497,62 @@ void pd_control_port_enable(int port)
 }
 #endif /* TEST_BUILD */
 
+__overridable int pd_get_chip_count(void)
+{
+	return board_get_usb_pd_port_count();
+}
+
+__overridable int pd_get_chip_for_port(int port)
+{
+	return port;
+}
+
+__overridable int pd_get_comms_state_for_chip(int chip)
+{
+	return pd_comm_is_enabled(chip);
+}
+
 static enum ec_status pd_control(struct host_cmd_handler_args *args)
 {
 	const struct ec_params_pd_control *cmd = args->params;
 	int enable = 0;
+
+	if (cmd->subcmd == PD_STATUS) {
+		struct ec_response_pd_control *resp = args->response;
+		uint8_t num_chips = pd_get_chip_count();
+
+		resp->num_chips = num_chips;
+
+		for (int c = 0; c < num_chips; c++) {
+			struct ec_pd_control_chip_status *chip_status =
+				&resp->chips[c];
+			int state = pd_get_comms_state_for_chip(c);
+
+			chip_status->chip_id = c;
+			chip_status->flags = (state <= 0) ?
+						     PD_CONTROL_STATUS_CHIP_SUSPENDED :
+						     0;
+			chip_status->port_count = 0;
+
+			for (int p = 0; p < board_get_usb_pd_port_count();
+			     p++) {
+				if (pd_get_chip_for_port(p) == c) {
+					if (chip_status->port_count <
+					    PD_CONTROL_MAX_PORTS_PER_CHIP) {
+						chip_status->ports
+							[chip_status->port_count++] =
+							p;
+					}
+				}
+			}
+		}
+
+		args->response_size =
+			sizeof(struct ec_response_pd_control) +
+			num_chips * sizeof(struct ec_pd_control_chip_status);
+
+		return EC_RES_SUCCESS;
+	}
 
 	if (cmd->chip >= board_get_usb_pd_port_count())
 		return EC_RES_INVALID_PARAM;

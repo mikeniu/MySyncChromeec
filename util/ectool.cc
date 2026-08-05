@@ -11740,6 +11740,8 @@ int cmd_pd_control(int argc, char *argv[])
 		p.subcmd = PD_CONTROL_DISABLE;
 	else if (!strcmp(argv[1], "on") || !strcmp(argv[1], "chip_on"))
 		p.subcmd = PD_CHIP_ON;
+	else if (!strcmp(argv[1], "status"))
+		p.subcmd = PD_STATUS;
 	else {
 		fprintf(stderr, "Unknown command: %s\n", argv[1]);
 		return -1;
@@ -11754,6 +11756,40 @@ int cmd_pd_control(int argc, char *argv[])
 			fprintf(stderr, "Bad port number '%s'.\n", argv[2]);
 			return -1;
 		}
+	}
+
+	if (p.subcmd == PD_STATUS) {
+		struct {
+			struct ec_response_pd_control r;
+			struct ec_pd_control_chip_status chips[EC_USB_PD_MAX_PORTS];
+		} __ec_align1 resp_buf;
+
+		rv = ec_command(EC_CMD_PD_CONTROL, 0, &p, sizeof(p),
+				&resp_buf, sizeof(resp_buf));
+		if (rv < 0)
+			return rv;
+
+		int chip_target = (argc > 2) ? p.chip : -1;
+
+		for (int i = 0; i < resp_buf.r.num_chips; i++) {
+			const struct ec_pd_control_chip_status *c =
+				&resp_buf.r.chips[i];
+
+			if (chip_target >= 0 && c->chip_id != chip_target)
+				continue;
+
+			bool is_suspended =
+				!!(c->flags & PD_CONTROL_STATUS_CHIP_SUSPENDED);
+
+			printf("Chip %d: %s (Ports:", c->chip_id,
+			       is_suspended ? "suspended" : "active");
+			for (int j = 0; j < c->port_count; j++) {
+				printf(" %d%s", c->ports[j],
+				       (j < c->port_count - 1) ? "," : "");
+			}
+			printf(")\n");
+		}
+		return 0;
 	}
 
 	rv = ec_command(EC_CMD_PD_CONTROL, 0, &p, sizeof(p), NULL, 0);
@@ -13233,7 +13269,7 @@ const struct command commands[] = {
 	  "<port>\n"
 	  "\tGet PD chip information." },
 	{ "pdcontrol", cmd_pd_control,
-	  "[suspend|resume|reset|disable|on]\n"
+	  "[suspend|resume|reset|disable|on|status] [chip]\n"
 	  "\tControls the PD chip." },
 	{ "pdctrace", cmd_pdc_trace, cmd_pdc_trace_usage },
 	{ "pdgetmode", cmd_pd_get_amode,

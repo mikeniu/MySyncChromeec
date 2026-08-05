@@ -570,6 +570,9 @@ static void pdc_console_get_suspend_or_resume(size_t idx,
 	case 1:
 		entry->syntax = "resume";
 		return;
+	case 2:
+		entry->syntax = "status";
+		return;
 	}
 }
 
@@ -603,6 +606,7 @@ SHELL_DYNAMIC_CMD_CREATE(dsub_sbu_mux_modes, pdc_console_get_normal_or_debug);
 static int cmd_pdc_comms_state(const struct shell *sh, size_t argc, char **argv)
 {
 	bool enable;
+	uint8_t port;
 	int chip = -1;
 	int rv;
 
@@ -611,15 +615,51 @@ static int cmd_pdc_comms_state(const struct shell *sh, size_t argc, char **argv)
 		enable = false;
 	} else if (!strncmp(argv[1], "resume", strlen("resume"))) {
 		enable = true;
+	} else if (!strncmp(argv[1], "status", strlen("status"))) {
+		int num_chips = pdc_power_mgmt_get_chip_count();
+		int chip_target = -1;
+
+		if (argc > 2) {
+			rv = cmd_get_pd_port(sh, argv[2], &port);
+			if (rv)
+				return rv;
+			chip_target = pdc_power_mgmt_get_chip_for_port(port);
+		}
+
+		for (int c = 0; c < num_chips; c++) {
+			if (chip_target >= 0 && c != chip_target) {
+				continue;
+			}
+			int comms_state =
+				pdc_power_mgmt_get_comms_state_for_chip(c);
+
+			shell_fprintf(sh, SHELL_INFO, "Chip %d: %s (Ports:", c,
+				      (comms_state == 0) ? "suspended" :
+							   "active");
+			bool first = true;
+			for (int p = 0;
+			     p < pdc_power_mgmt_get_usb_pd_port_count(); p++) {
+				if (pdc_power_mgmt_get_chip_for_port(p) == c) {
+					shell_fprintf(sh, SHELL_INFO, "%s C%d",
+						      first ? "" : ",", p);
+					first = false;
+				}
+			}
+			shell_fprintf(sh, SHELL_INFO, ")\n");
+		}
+		return EC_SUCCESS;
 	} else {
 		shell_error(sh, "Invalid value");
 		return -EINVAL;
 	}
 
 	if (argc > 2) {
-		chip = strtol(argv[2], NULL, 0);
-		shell_fprintf(sh, SHELL_INFO, "%s chip %d threads\n",
-			      enable ? "Resume" : "Suspend", chip);
+		rv = cmd_get_pd_port(sh, argv[2], &port);
+		if (rv)
+			return rv;
+		chip = pdc_power_mgmt_get_chip_for_port(port);
+		shell_fprintf(sh, SHELL_INFO, "%s port C%d (chip %d) threads\n",
+			      enable ? "Resume" : "Suspend", port, chip);
 		rv = pdc_power_mgmt_set_comms_state_for_chip(chip, enable);
 	} else {
 		shell_fprintf(sh, SHELL_INFO, "%s all port threads\n",
@@ -627,7 +667,12 @@ static int cmd_pdc_comms_state(const struct shell *sh, size_t argc, char **argv)
 		rv = pdc_power_mgmt_set_comms_state(enable);
 	}
 
-	if (rv) {
+	if (rv == -EALREADY) {
+		shell_fprintf(sh, SHELL_INFO, "PDC %s already %s\n",
+			      (argc > 2) ? "chip" : "subsystem",
+			      enable ? "active" : "suspended");
+		return EC_SUCCESS;
+	} else if (rv) {
 		shell_fprintf(sh, SHELL_ERROR, "Could not %s PDC: (%d)\n",
 			      argv[1], rv);
 	}
@@ -980,8 +1025,8 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 				 "<port> [hard|data]"),
 		      cmd_pdc_connector_reset, 3, 0),
 	SHELL_CMD_ARG(comms, &dsub_suspend_or_resume,
-		      SHELL_HELP("Suspend/resume PDC command communication",
-				 "[suspend|resume] [chip]"),
+		      SHELL_HELP("Suspend/resume/get status of PDC command communication",
+				 "[suspend|resume|status] [port]"),
 		      cmd_pdc_comms_state, 2, 1),
 	SHELL_CMD_ARG(connector_status, NULL,
 		      SHELL_HELP("Print the UCSI GET_CONNECTOR_STATUS",

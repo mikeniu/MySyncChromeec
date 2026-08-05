@@ -3147,6 +3147,29 @@ void pd_request_data_swap(int port);
 void pd_comm_enable(int port, int enable);
 
 /**
+ * Return the total number of physical PD chips.
+ *
+ * @return Number of PD chips.
+ */
+int pd_get_chip_count(void);
+
+/**
+ * Return the chip ID associated with the specified USB-C port.
+ *
+ * @param port USB-C port number
+ * @return Chip ID (>=0) if successful or negative error code
+ */
+int pd_get_chip_for_port(int port);
+
+/**
+ * Get whether comms for a given chip is active (enabled) or suspended.
+ *
+ * @param chip Chip ID
+ * @return 1 if comms enabled, 0 if suspended, or negative error code
+ */
+int pd_get_comms_state_for_chip(int chip);
+
+/**
  * Set the PD pings enabled flag. When source has negotiated power over
  * PD successfully, it can optionally send pings periodically based on
  * this enable flag.

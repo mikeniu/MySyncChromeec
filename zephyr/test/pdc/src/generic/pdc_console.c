@@ -287,6 +287,25 @@ ZTEST_USER(console_cmd_pdc, test_comms_state)
 		pdc_power_mgmt_set_comms_state_for_chip_fake.arg1_history[0]);
 
 	RESET_FAKE(pdc_power_mgmt_set_comms_state_for_chip);
+
+	/* Status command tests */
+	pdc_power_mgmt_get_chip_count_fake.return_val = 1;
+	pdc_power_mgmt_get_comms_state_for_chip_fake.return_val = 1;
+	pdc_power_mgmt_get_chip_for_port_fake.return_val = 0;
+
+	shell_backend_dummy_clear_output(get_ec_shell());
+	rv = shell_execute_cmd(get_ec_shell(), "pdc comms status");
+	zassert_equal(rv, EC_SUCCESS, "Expected %d, but got %d", EC_SUCCESS,
+		      rv);
+
+	size_t buffer_size;
+	const char *outbuffer =
+		shell_backend_dummy_get_output(get_ec_shell(), &buffer_size);
+	zassert_not_null(strstr(outbuffer, "Chip 0: active"));
+
+	/* Status for invalid port */
+	rv = shell_execute_cmd(get_ec_shell(), "pdc comms status 99");
+	zassert_equal(rv, -EINVAL, "Expected %d, but got %d", -EINVAL, rv);
 }
 
 ZTEST_USER(console_cmd_pdc, test_conn_reset)

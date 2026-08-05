@@ -169,6 +169,11 @@ ZTEST(pdc_comms_suspend_resume_api, test_suspend_resume_per_chip)
 	/* Test invalid chip index */
 	zassert_equal(-ERANGE,
 		      pdc_power_mgmt_set_comms_state_for_chip(99, false));
+	zassert_equal(-ERANGE,
+		      pdc_power_mgmt_get_comms_state_for_chip(99));
+
+	/* Verify chip 0 is initially active */
+	zassert_equal(1, pdc_power_mgmt_get_comms_state_for_chip(chip0));
 
 	/* Test redundant resume when already active */
 	zassert_equal(-EALREADY,
@@ -176,6 +181,9 @@ ZTEST(pdc_comms_suspend_resume_api, test_suspend_resume_per_chip)
 
 	/* Suspend chip 0 */
 	zassert_ok(pdc_power_mgmt_set_comms_state_for_chip(chip0, false));
+
+	/* Verify chip 0 is reported as suspended */
+	zassert_equal(0, pdc_power_mgmt_get_comms_state_for_chip(chip0));
 
 	/* Test redundant suspend when already suspended */
 	zassert_equal(-EALREADY,
@@ -186,6 +194,9 @@ ZTEST(pdc_comms_suspend_resume_api, test_suspend_resume_per_chip)
 
 	/* Resume chip 0 */
 	zassert_ok(pdc_power_mgmt_set_comms_state_for_chip(chip0, true));
+
+	/* Verify chip 0 is reported as active again */
+	zassert_equal(1, pdc_power_mgmt_get_comms_state_for_chip(chip0));
 
 	/* Verify port 0 resumed */
 	zassert_true(WAIT_FOR(

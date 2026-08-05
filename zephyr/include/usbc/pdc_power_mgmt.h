@@ -478,6 +478,15 @@ void pdc_power_mgmt_notify_event(int port, atomic_t event_mask);
 int pdc_power_mgmt_set_comms_state_for_chip(int chip, bool run);
 
 /**
+ * @brief Get the PDC power mgmt comms active/suspended state for a specific chip.
+ *
+ * @param chip Chip ID (>=0)
+ *
+ * @retval 1 if comms is enabled/active, 0 if suspended, -ERANGE if invalid chip ID
+ */
+int pdc_power_mgmt_get_comms_state_for_chip(int chip);
+
+/**
  * @brief Control if the PDC power mgmt and underlying driver threads are
  *        active across all chips.
  *

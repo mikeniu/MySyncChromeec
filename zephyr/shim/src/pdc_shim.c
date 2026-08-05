@@ -192,6 +192,21 @@ void pd_comm_enable(int port, int enable)
 	(void)pdc_power_mgmt_set_comms_state_for_chip(chip, enable);
 }
 
+int pd_get_chip_count(void)
+{
+	return pdc_power_mgmt_get_chip_count();
+}
+
+int pd_get_chip_for_port(int port)
+{
+	return pdc_power_mgmt_get_chip_for_port(port);
+}
+
+int pd_get_comms_state_for_chip(int chip)
+{
+	return pdc_power_mgmt_get_comms_state_for_chip(chip);
+}
+
 /* No-op on PDC devices. The suspend/enable operation is handled within
  * pd_comm_enable() entirely.
  */

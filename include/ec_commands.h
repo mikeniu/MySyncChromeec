@@ -6657,11 +6657,28 @@ enum ec_pd_control_cmd {
 	PD_RESET, /* Force reset the PD chip */
 	PD_CONTROL_DISABLE, /* Disable further calls to this command */
 	PD_CHIP_ON, /* Power on the PD chip */
+	PD_STATUS, /* Get PD chip status */
 };
 
 struct ec_params_pd_control {
 	uint8_t chip; /* chip id */
 	uint8_t subcmd;
+} __ec_align1;
+
+#define PD_CONTROL_STATUS_CHIP_SUSPENDED BIT(0)
+
+#define PD_CONTROL_MAX_PORTS_PER_CHIP 2
+
+struct ec_pd_control_chip_status {
+	uint8_t chip_id;
+	uint8_t flags;
+	uint8_t port_count;
+	uint8_t ports[PD_CONTROL_MAX_PORTS_PER_CHIP];
+} __ec_align1;
+
+struct ec_response_pd_control {
+	uint8_t num_chips;
+	struct ec_pd_control_chip_status chips[0];
 } __ec_align1;
 
 /* Get info about USB-C SS muxes */
