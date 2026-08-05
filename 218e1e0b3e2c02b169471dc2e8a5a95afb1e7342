@@ -22,6 +22,30 @@
       },
       "revId": "218e1e0b3e2c02b169471dc2e8a5a95afb1e7342",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d311e3a4_079649c0",
+        "filename": "zephyr/dts/bindings/i2c/cros-ec-i2c-port-base.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-08-05T11:02:12Z",
+      "side": 1,
+      "message": "I see the vision of eliminating the shim driver. I make another change (CL:8160864) that\n\n1. defines the passthru rules in `cros-ec,i2c-passthru` node.\n2. Use allow-type to indicate the type of passthru.\n3. Remove the capability to use a custom function.\n\nThe change still use the shim driver but I think it\u0027s a good first step.\n\nIs there any example to follow to add a driver that follows the Zephyr device model?",
+      "parentUuid": "78f3c0cc_607bba9a",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 17
+      },
+      "revId": "218e1e0b3e2c02b169471dc2e8a5a95afb1e7342",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
