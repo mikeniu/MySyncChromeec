@@ -71,8 +71,7 @@
 #undef CONFIG_CONSOLE_HISTORY
 
 #define CONFIG_CUSTOMIZED_RO
-/* TODO: find a way to drop RO build. */
-#define CONFIG_FW_INCLUDE_RO
+#undef CONFIG_FW_INCLUDE_RO
 
 #ifndef CR50_DEV
 /* Enable U2F in non-DBG images */
