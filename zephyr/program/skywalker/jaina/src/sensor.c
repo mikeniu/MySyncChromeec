@@ -18,16 +18,16 @@ static void disable_base_lid_irq(void)
 	uint32_t val;
 
 	cros_cbi_get_fw_config(FORM_FACTOR, &val);
-	if (val == CLAMSHELL) {
+	//if (val == CLAMSHELL) {
 		gpio_disable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_imu));
 		gpio_pin_configure_dt(GPIO_DT_FROM_NODELABEL(gpio_imu_int_ec_l),
-				      GPIO_INPUT | GPIO_PULL_UP);
+				      GPIO_INPUT);
 		gpio_disable_dt_interrupt(
 			GPIO_INT_FROM_NODELABEL(int_lid_accel));
 		gpio_pin_configure_dt(
 			GPIO_DT_FROM_NODELABEL(gpio_lid_accel_int_ec_l),
-			GPIO_INPUT | GPIO_PULL_UP);
-	}
+			GPIO_INPUT);
+	//}
 }
 DECLARE_HOOK(HOOK_INIT, disable_base_lid_irq, HOOK_PRIO_POST_DEFAULT);
 
