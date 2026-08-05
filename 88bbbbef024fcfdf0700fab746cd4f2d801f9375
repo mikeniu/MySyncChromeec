@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24eeba61_43df1d16",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T00:02:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/6e73b658-d89d-4e83-bb88-abeeee8d7142)]\n\n### Review Summary\n\n*   **Functionality**: Looks good. The change correctly prevents arming the positive match secret post-enrollment in the Fingerprint Auth flow and prevents the template from being immediately matched against, since the Fingerprint Auth flow relies on template confirmation (`EC_CMD_FP_CONFIRM_TEMPLATE`) rather than classic-flow match secret readback.\n*   **Security**: Improves correctness and security for the Fingerprint Auth flow by ensuring the positive match secret is not unnecessarily armed for host readback immediately after enrollment.\n*   **Style \u0026 Consistency**: The code follows the existing style and conventions well. The if-statement is placed correctly and is readable.\n*   **Testing \u0026 Test Coverage**: Excellent. The tests added in `zephyr/test/fingerprint/task/src/fpsensor_enroll.cc` (`test_enroll_positive_match_secret_classic_flow` and `test_enroll_positive_match_secret_auth_flow`) correctly verify both the classic flow and auth flow behaviors, asserting on the expected states of `positive_match_secret_state.readable` and `templ_valid`.\n*   **CL Size \u0026 Scope**: The size and scope are perfect. It is a single, self-contained logical fix with the appropriate test coverage.\n\nTAG\u003dagy\nCONV\u003de84dab68-acf8-47ec-b4ed-d738cf054c6b",
+      "isAi": true,
+      "revId": "88bbbbef024fcfdf0700fab746cd4f2d801f9375",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
