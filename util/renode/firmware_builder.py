@@ -10,6 +10,7 @@ gets invoked by chromite/api/controller/firmware.py.
 """
 
 import argparse
+from concurrent import futures
 import getpass
 import json
 import os
@@ -100,10 +101,13 @@ def _run_renode_tests(
     output_dir: Path, working_dir: Path, boards: List[BoardName]
 ) -> RenodeRunResult:
     """Runs Renode tests for all boards."""
+    if not boards:
+        return RenodeRunResult(True, {})
+
     success = True
     results: Dict[BoardName, ResultPath] = {}
 
-    for board in boards:
+    def _run_board(board: BoardName) -> tuple[BoardName, ResultPath, int]:
         result_file = output_dir / f"{board}_results.json"
         proc = run_device_tests(
             board,
@@ -111,9 +115,29 @@ def _run_renode_tests(
             output_file=result_file,
             check=False,
         )
-        if proc.returncode != 0:
-            success = False
-        results[board] = result_file
+        return board, result_file, proc.returncode
+
+    max_workers = min(len(boards), os.cpu_count() or 4)
+    with futures.ThreadPoolExecutor(
+        max_workers=max(1, max_workers)
+    ) as executor:
+        future_to_board = {
+            executor.submit(_run_board, board): board for board in boards
+        }
+        for future in futures.as_completed(future_to_board):
+            board = future_to_board[future]
+            try:
+                _, result_file, returncode = future.result()
+                if returncode != 0:
+                    success = False
+                results[board] = result_file
+            # pylint: disable-next=broad-exception-caught
+            except Exception as e:
+                print(
+                    f"Board {board} test execution failed with exception: {e}",
+                    file=sys.stderr,
+                )
+                success = False
 
     return RenodeRunResult(success, results)
 
