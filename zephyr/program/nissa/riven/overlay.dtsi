@@ -374,3 +374,20 @@
 	leak-gpios = <&gpioa 4 GPIO_OPEN_DRAIN
 		      &gpiof 1 GPIO_OPEN_DRAIN>;
 };
+
+/ {
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		usb_c0 {
+			i2c-port = <&i2c3_0>;
+			allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+		};
+		usb_c1 {
+			i2c-port = <&i2c5_1>;
+			allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+		};
+	};
+};

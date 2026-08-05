@@ -257,4 +257,23 @@
 			enum-names = "I2C_PORT_USB_C0_TCPC";
 		};
 	};
+
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		battery {
+			i2c-port = <&i2c1>;
+			allow-type = "BATTERY_ALLOW_PASSTHRU";
+		};
+		usb_c1 {
+			i2c-port = <&i2c4>;
+			allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+		};
+		usb_c0 {
+			i2c-port = <&i2c5>;
+			allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+		};
+	};
 };
