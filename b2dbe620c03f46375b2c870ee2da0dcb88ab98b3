@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0a27d63_8a840afe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-08-05T16:07:25Z",
+      "side": 1,
+      "message": "Just curious how well it worked or if there will be a follow up CL to commit the diff?",
+      "revId": "b2dbe620c03f46375b2c870ee2da0dcb88ab98b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "677c9e0f_ce2e130d",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-08-05T16:07:25Z",
+      "side": 1,
+      "message": "This is kind of rough, can you address the issues or file a follow up bug?",
+      "revId": "b2dbe620c03f46375b2c870ee2da0dcb88ab98b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53e2c405_9760d4c9",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-08-05T16:07:25Z",
+      "side": 1,
+      "message": "IIRC we use this in other scripts, I wonder if we should file a clean up bug to have a utility to do this",
+      "revId": "b2dbe620c03f46375b2c870ee2da0dcb88ab98b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "945147ee_f2eb0ca6",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-08-05T16:07:25Z",
+      "side": 1,
+      "message": "Is `cros-trees` specific to your workspace?  I\u0027ve never seen this before",
+      "revId": "b2dbe620c03f46375b2c870ee2da0dcb88ab98b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a87730b3_4b26fa8a",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 823,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-08-05T16:07:25Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: It looks like `self._evaluate_cumulative_plan()` is never called, so `cumulative_plan` is never added to the returned dictionary. This means the \"Verified Cumulative Optimization Fragment\" section will not appear in the generated report.\n\nYou probably want to call it and include its return value here:\n```python\n        cumulative_plan \u003d self._evaluate_cumulative_plan()\n\n        return {\n            \"target\": self.target,\n            \"baseline\": {\n                \"flash\": self.baseline_flash,\n                \"ram\": self.baseline_ram,\n            },\n            \"results\": self.results,\n            \"cumulative_plan\": cumulative_plan,\n        }\n```",
+      "range": {
+        "startLine": 823,
+        "startChar": 0,
+        "endLine": 823,
+        "endChar": 0
+      },
+      "revId": "b2dbe620c03f46375b2c870ee2da0dcb88ab98b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
