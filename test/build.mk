@@ -36,7 +36,11 @@ test-list-host += motion_angle_tablet
 test-list-host += motion_lid
 test-list-host += motion_sense_fifo
 test-list-host += power_button
+<<<<<<< HEAD
 test-list-host += queue
+=======
+test-list-host += printf
+>>>>>>> f933a25cb7 (test: Remove legacy queue host test and port flush tests to Zephyr)
 test-list-host += rollback_secret
 test-list-host += rsa3
 test-list-host += rtc
@@ -99,7 +103,6 @@ motion_angle_tablet-y=motion_angle_tablet.o motion_angle_data_literals_tablet.o 
 motion_lid-y=motion_lid.o
 motion_sense_fifo-y=motion_sense_fifo.o
 power_button-y=power_button.o
-queue-y=queue.o
 rollback_secret-y=rollback_secret.o
 rsa3-y=rsa.o
 rtc-y=rtc.o
