@@ -419,6 +419,30 @@ ZTEST_USER(tps6699x, test_handle_irq)
 	recover_from_st_disable();
 }
 
+ZTEST_USER(tps6699x, test_reinit_restore_sink_pdo)
+{
+	uint32_t pdos[PDO_OFFSET_MAX] = { 0 };
+	uint32_t pdos_in[] = { PDO_FIXED(5000, 3000, 0),
+			       PDO_FIXED(9000, 3000, 0),
+			       PDO_FIXED(15000, 3000, 0),
+			       PDO_FIXED(20000, 3000, 0) };
+
+	/* Make sure we started in an initialized state. */
+	zassert_true(pdc_is_init_done(dev));
+	zassert_ok(pdc_set_pdos(dev, SINK_PDO, pdos_in, ARRAY_SIZE(pdos_in)));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Do a reset which will trigger GAID and restart init. */
+	zassert_ok(pdc_reset(dev));
+	k_sleep(K_MSEC(INIT_SLEEP_MS * 2));
+	zassert_true(pdc_is_init_done(dev));
+
+	memset(pdos, 0, sizeof(pdos));
+	zassert_ok(emul_pdc_get_pdos(emul, SINK_PDO, PDO_OFFSET_0,
+				     PDO_OFFSET_MAX, LPM_PDO, pdos));
+	zassert_ok(memcmp(pdos, pdos_in, ARRAY_SIZE(pdos_in)));
+}
+
 ZTEST_USER(tps6699x, test_set_rdo)
 {
 	uint32_t rdo;
