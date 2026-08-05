@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f372f02c_01d0f94b",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T03:12:16Z",
+      "side": 1,
+      "message": "Is it possible for this to overflow if `size_t` is 32-bit. In that case we should use the Zephyr overflow add/multiply (`size_mul_overflow`/`size_add_overflow`?) You could return `-EOVERFLOW` for that case.\n\nAlso add a test case for it.",
+      "range": {
+        "startLine": 305,
+        "startChar": 1,
+        "endLine": 305,
+        "endChar": 68
+      },
+      "revId": "7bd5ad0fb43819bd4644f2b8b4064f59d08ace90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6aecd5d3_61f78541",
         "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
         "patchSetId": 11
