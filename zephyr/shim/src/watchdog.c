@@ -225,6 +225,7 @@ static void log_thread_info(const struct k_thread *thread, void *user_data)
 	}
 }
 
+int check_ii = 0;
 __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id)
 {
@@ -238,6 +239,9 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	struct k_thread *thread = k_current_get();
 	uint8_t thread_id = (uint8_t)(uintptr_t)thread;
 
+	if (check_ii == 0) {
+		check_ii = 1;
+	}
 #ifdef CONFIG_RISCV
 	exception_address = csr_read(mepc);
 	printk("WDT pre-warning MEPC:%p THREAD:%p THREAD_NAME:%s\n",
