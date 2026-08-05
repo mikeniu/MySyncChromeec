@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "265acff8_44addc8e",
+        "filename": "common/charge_state.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1577,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-05T16:06:07Z",
+      "side": 1,
+      "message": "Make this static as its only used in this file.",
+      "revId": "b0cf4cb769dcca7631efee0f24b9e2e7fd5529c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d565b63_60d17b5a",
+        "filename": "include/charge_state.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-05T16:06:07Z",
+      "side": 1,
+      "message": "Since its only used in the .c file, there is no need for this to be public.",
+      "revId": "b0cf4cb769dcca7631efee0f24b9e2e7fd5529c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
