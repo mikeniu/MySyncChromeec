@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3fcb59f_6ed9b9be",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T17:19:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/69274372-4ecd-4ef0-9e05-2f7b66988dd3)]\n\n### Review Summary\n\n*   **Functionality:** **Good.** The patch correctly calculates the required frame size using dynamic sensor dimensions and verifies it against the allocated buffer bounds. The `IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)` check is correctly placed before private API calls to prevent potential linker errors or undefined behavior.\n*   **Security:** **Good.** The use of `size_add_overflow` and explicit bounds checking against `image_buf_size` robustly prevent potential integer and buffer overflows. Casting to `size_t` before multiplication guarantees that 16-bit integer multiplication is safely promoted.\n*   **Style:** **Good.** The code style is clean, appropriately commented, and consistent with Zephyr driver conventions.\n*   **Testing:** **Good.** Unit tests provide excellent coverage of both success (`test_acquire_image_valid_runtime_frame_size`) and failure (`test_acquire_image_exceeds_runtime_frame_size`) branches.\n*   **CL Size \u0026 Scope:** **Good.** The changes are self-contained, appropriately scoped, and concise.",
+      "isAi": true,
+      "revId": "332957a2ebe9defeef3a68dcd9bde8dbaf693ab9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
