@@ -76,12 +76,14 @@ static int ft98xx_algorithm_init(const struct fingerprint_algorithm *const alg)
 	focal_algo_get_finger_detailed_info(&data->tpl_finger_size,
 					    &data->tpl_subtemplate_size,
 					    &data->tpl_head_size);
-	LOG_INF("algo:finger_size = %d, head_size = %d, sub_tpl_size= %d",
+	LOG_INF("algo:finger_size = %u, head_size = %u, sub_tpl_size= %u",
 		data->tpl_finger_size, data->tpl_head_size,
 		data->tpl_subtemplate_size);
 
-	if (data->tpl_finger_size > CONFIG_FP_ALGORITHM_TEMPLATE_SIZE) {
-		LOG_ERR("algorithm template size per finger exceed the CONFIG_FP_ALGORITHM_TEMPLATE_SIZE");
+	if (data->tpl_finger_size == 0 ||
+	    data->tpl_finger_size > CONFIG_FP_ALGORITHM_TEMPLATE_SIZE) {
+		LOG_ERR("invalid algorithm template size per finger (%u)",
+			data->tpl_finger_size);
 		return -EINVAL;
 	}
 
