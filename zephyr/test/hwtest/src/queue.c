@@ -5,7 +5,9 @@
 
 #include "common.h"
 #include "console.h"
+#include "consumer.h"
 #include "queue.h"
+#include "queue_policies.h"
 #include "timer.h"
 #include "util.h"
 
@@ -386,4 +388,83 @@ ZTEST(queue, test_queue8_iterate_next_reset_on_change)
 	queue_advance_head(q, 3);
 	queue_next(q, &it);
 	zassert_equal(it.ptr, NULL);
+}
+
+static int num_consumer_invocations;
+static size_t last_consumer_invocation_count;
+
+static void test_consumer_written(struct consumer const *c, size_t count)
+{
+	num_consumer_invocations++;
+	last_consumer_invocation_count = count;
+}
+
+static struct queue const test_queue_unbuffered;
+static struct queue const test_queue_buffered;
+
+static struct consumer const test_consumer_unbuffered = {
+	.queue = &test_queue_unbuffered,
+	.ops = &((struct consumer_ops const){
+		.written = test_consumer_written,
+	}),
+};
+
+static struct consumer const test_consumer_buffered = {
+	.queue = &test_queue_buffered,
+	.ops = &((struct consumer_ops const){
+		.written = test_consumer_written,
+	}),
+};
+
+static struct queue const test_queue_unbuffered =
+	QUEUE_DIRECT(16, int8_t, null_producer, test_consumer_unbuffered);
+static struct queue const test_queue_buffered =
+	QUEUE_DIRECT(16, int8_t, null_producer, test_consumer_buffered);
+
+ZTEST(queue, test_queue_flush_unbuffered)
+{
+	struct queue const *q = &test_queue_unbuffered;
+	int8_t data[2] = { 17, 42 };
+	num_consumer_invocations = 0;
+
+	queue_init(q);
+	zassert_false(is_queue_buffered(q));
+
+	/* Writing two bytes should result in notifying consumer. */
+	queue_add_units(q, data, 2);
+	zassert_equal(num_consumer_invocations, 1);
+	zassert_equal(last_consumer_invocation_count, (size_t)2);
+
+	/* Writing zero bytes should not notify consumer. */
+	queue_add_units(q, data, 0);
+	zassert_equal(num_consumer_invocations, 1);
+
+	/* Flushing should not notify consumer. */
+	queue_flush(q);
+	zassert_equal(num_consumer_invocations, 1);
+}
+
+ZTEST(queue, test_queue_flush_buffered)
+{
+	struct queue const *q = &test_queue_buffered;
+	int8_t data[2] = { 17, 42 };
+	num_consumer_invocations = 0;
+
+	queue_init(q);
+	queue_enable_buffered_mode(q);
+	zassert_true(is_queue_buffered(q));
+
+	/* Writing two bytes should result in notifying consumer. */
+	queue_add_units(q, data, 2);
+	zassert_equal(num_consumer_invocations, 1);
+	zassert_equal(last_consumer_invocation_count, (size_t)2);
+
+	/* Writing zero bytes should not notify consumer. */
+	queue_add_units(q, data, 0);
+	zassert_equal(num_consumer_invocations, 1);
+
+	/* Flushing should notify consumer of "zero bytes added". */
+	queue_flush(q);
+	zassert_equal(num_consumer_invocations, 2);
+	zassert_equal(last_consumer_invocation_count, (size_t)0);
 }
