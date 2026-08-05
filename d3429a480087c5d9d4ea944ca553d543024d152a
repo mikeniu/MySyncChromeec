@@ -57,6 +57,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "539b72dd_74581522",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 809,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T23:12:36Z",
+      "side": 1,
+      "message": "this works\n\n```\nfsammoura@fsammoura2:~/chromiumos/src/platform/ec$ git diff\ndiff --git a/common/fpsensor/fpsensor.cc b/common/fpsensor/fpsensor.cc\nindex 2d55c05f305..24004edb88c 100644\n--- a/common/fpsensor/fpsensor.cc\n+++ b/common/fpsensor/fpsensor.cc\n@@ -275,7 +275,7 @@ static void fp_process_finger(void)\n #endif /* HAVE_FP_PRIVATE_DRIVER */\n \n static enum ec_error_list encrypt_template(uint16_t fgr);\n-static enum ec_status fp_commit_template(std::span\u003cconst uint8_t\u003e context);\n+enum ec_status fp_commit_template(std::span\u003cconst uint8_t\u003e context);\n \n extern \"C\" void fp_task(void)\n {\n@@ -875,7 +875,7 @@ validate_template_format(struct ec_fp_template_encryption_metadata *enc_info)\n        return EC_RES_SUCCESS;\n }\n \n-static enum ec_status fp_commit_template(std::span\u003cconst uint8_t\u003e context)\n+enum ec_status fp_commit_template(std::span\u003cconst uint8_t\u003e context)\n {\n        ScopedFastCpu fast_cpu;\n \ndiff --git a/test/fpsensor_auth_commands.cc b/test/fpsensor_auth_commands.cc\nindex 5d3501ad252..27ae5846eef 100644\n--- a/test/fpsensor_auth_commands.cc\n+++ b/test/fpsensor_auth_commands.cc\n@@ -3,6 +3,7 @@\n  * found in the LICENSE file.\n  */\n \n+#include \"atomic_bit.h\"\n #include \"common.h\"\n #include \"crypto/elliptic_curve_key.h\"\n #include \"ec_commands.h\"\n@@ -34,6 +35,7 @@ void reset_session(void);\n \n /* Challenge creation time. */\n extern timestamp_t challenge_ctime;\n+extern enum ec_status fp_commit_template(std::span\u003cconst uint8_t\u003e context);\n \n namespace\n {\n@@ -910,6 +912,19 @@ test_static enum ec_error_list test_fp_command_commit_v3(void)\n                                       sizeof(decrypt_params), NULL, 0),\n                EC_RES_SUCCESS, \"%d\");\n \n+       /* Simulate the FPSENSOR task processing the decryption request */\n+       enum ec_status res \u003d fp_commit_template(global_context.user_id);\n+       atomic_set(\u0026global_context.template_decryption_result, res);\n+       global_context.sensor_mode \u0026\u003d ~FP_MODE_DECRYPT_TEMPLATE;\n+\n+       /* Query result via host command */\n+       struct ec_params_fp_template_v1 result_params \u003d {\n+               .cmd \u003d FP_TEMPLATE_GET_RESULT,\n+       };\n+       TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, \u0026result_params,\n+                                      sizeof(result_params), NULL, 0),\n+               EC_RES_INVALID_PARAM, \"%d\");\n+\n        return EC_SUCCESS;\n }\n \n```",
+      "parentUuid": "de936630_35e26d4f",
+      "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "70672bd7_4e30b4fa",
         "filename": "test/fpsensor_auth_commands.cc",
         "patchSetId": 4
