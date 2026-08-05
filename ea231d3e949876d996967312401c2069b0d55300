@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3df68f6d_ca8f4a6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-08-05T11:00:08Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8674349633088162257) is being automatically retried for the following reasons:\n- Some child builders are now retryable:bluey-cq, calypso-cq, guybrush-cq, guybrush-incremental-cq, skyrim-cq,...\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "ea231d3e949876d996967312401c2069b0d55300",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
