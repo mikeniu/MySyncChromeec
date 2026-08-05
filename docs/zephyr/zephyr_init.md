@@ -39,9 +39,6 @@ sequence requirement for initializing:
 
 *   TODO
 
-## PRE_KERNEL_2
-*   TODO
-
 ## POST_KERNEL
 *   TODO
 

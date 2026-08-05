@@ -55,14 +55,14 @@ static int restore_espi_state_after_sysjump(void)
 	return 0;
 }
 
-/* ESPI is initialized in PRE_KERNEL_2. Enforce that
+/* ESPI is also initialized in PRE_KERNEL_1. Enforce that
  * ESPI_PRESERVE_DATA_RESTORE_HOOK_PRIORITY comes before
  * CONFIG_ESPI_INIT_PRIORITY.
  */
 BUILD_ASSERT(ESPI_PRESERVE_DATA_RESTORE_HOOK_PRIORITY <
 	     CONFIG_ESPI_INIT_PRIORITY);
 
-SYS_INIT(restore_espi_state_after_sysjump, PRE_KERNEL_2,
+SYS_INIT(restore_espi_state_after_sysjump, PRE_KERNEL_1,
 	 ESPI_PRESERVE_DATA_RESTORE_HOOK_PRIORITY);
 
 static void preserve_espi_state_before_sysjump(void)

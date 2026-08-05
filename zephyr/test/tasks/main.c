@@ -294,7 +294,7 @@ static int pre_kernel(void)
 	pre_kernel_ran = true;
 	return 0;
 }
-SYS_INIT(pre_kernel, PRE_KERNEL_2, 0);
+SYS_INIT(pre_kernel, PRE_KERNEL_1, 0);
 
 ZTEST(test_task_shim, test_task_get_current_pre_kernel)
 {

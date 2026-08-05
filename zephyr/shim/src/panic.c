@@ -357,4 +357,4 @@ test_export_static int panic_data_init(void)
 }
 
 /* Initialize panic data after reset flags and console are ready. */
-SYS_INIT(panic_data_init, PRE_KERNEL_2, 0);
+SYS_INIT(panic_data_init, PRE_KERNEL_1, 90);
