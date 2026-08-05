@@ -141,6 +141,11 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 /* Timeout to trigger the long warm reset sequence. */
 #define LONG_WARM_RESET_SEQ_TRIGGER_TIMEOUT (20 * MSEC)
 
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_SUPPORT_HARD_RESET
+/* Grace period to distinguish PSCI shutdown from hard reset. */
+#define PSCI_RESET_GRACE_PERIOD (1500 * MSEC)
+#endif
+
 /* The AP_RST_L transition count of a normal AP warm reset */
 #define EXPECTED_AP_RST_TRANSITIONS 3
 
@@ -219,6 +224,11 @@ static char long_warm_reset;
  *  This variable is initialized to 0 i.e. POWER_G3
  */
 static enum power_state power_state_before_warm_reset;
+
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_SUPPORT_HARD_RESET
+static char power_good_is_lost;
+static char grace_period_active;
+#endif
 
 enum power_request_t {
 	POWER_REQ_NONE,
@@ -969,6 +979,18 @@ static uint8_t check_for_power_on_event(void)
 	return ret;
 }
 
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_SUPPORT_HARD_RESET
+static void power_good_lost_expired(void)
+{
+	grace_period_active = 0;
+	if (!power_has_signals(IN_POWER_GOOD)) {
+		power_good_is_lost = 1;
+		task_wake(TASK_ID_CHIPSET);
+	}
+}
+DECLARE_DEFERRED(power_good_lost_expired);
+#endif
+
 /**
  * Check for some event triggering the shutdown.
  *
@@ -1037,11 +1059,36 @@ static uint8_t check_for_power_off_event(void)
 
 	power_button_was_pressed = pressed;
 
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_SUPPORT_HARD_RESET
+	/* POWER_GOOD released by AP : shutdown after grace period */
+	if (!power_has_signals(IN_POWER_GOOD)) {
+		if (power_good_is_lost) {
+			power_good_is_lost = 0;
+			return POWER_OFF_BY_POWER_GOOD_LOST;
+		}
+
+		if (!grace_period_active) {
+			CPRINTS("POWER_GOOD lost, starting grace period");
+			grace_period_active = 1;
+			hook_call_deferred(&power_good_lost_expired_data,
+					   PSCI_RESET_GRACE_PERIOD);
+		}
+		return POWER_OFF_CANCEL;
+	} else {
+		if (grace_period_active) {
+			CPRINTS("POWER_GOOD recovered, canceling grace period");
+			hook_call_deferred(&power_good_lost_expired_data, -1);
+			grace_period_active = 0;
+		}
+		power_good_is_lost = 0;
+	}
+#else
 	/* POWER_GOOD released by AP : shutdown immediately */
 	if (!power_has_signals(IN_POWER_GOOD)) {
 		CPRINTS("POWER_GOOD is lost");
 		return POWER_OFF_BY_POWER_GOOD_LOST;
 	}
+#endif
 
 	return POWER_OFF_CANCEL;
 }

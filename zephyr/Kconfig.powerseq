@@ -363,6 +363,14 @@ config PLATFORM_EC_POWERSEQ_QC_EXP_WARM_RESET
 	  will fall back to cold resets. This is useful if the warm reset
 	  sequence is unreliable on certain platforms.
 
+config PLATFORM_EC_POWERSEQ_SUPPORT_HARD_RESET
+	bool "Power sequence support hard reset"
+	depends on PLATFORM_EC_POWERSEQ_QC_EXP
+	default y
+	help
+	  Enable a grace period (1.5 seconds) when POWER_GOOD is lost to
+	  distinguish between a PSCI shutdown and a hard reset.
+
 config PLATFORM_EC_CONSOLE_CMD_S5_TIMEOUT
 	bool "Console command: s5_timeout"
 	help
