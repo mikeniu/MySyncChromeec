@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f7b6dd1_9df2b40d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-08-05T12:24:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8dc22cbb_08e89a75",
+      "revId": "05d9a37eb67ae722d870a730c8598f1bb39c628a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "941e1ee4_7a421f81",
@@ -78,6 +96,30 @@
       "writtenOn": "2026-08-04T15:06:49Z",
       "side": 1,
       "message": "Create a helper function to encapsulate this logic as this function is already pretty long and complex.",
+      "range": {
+        "startLine": 1582,
+        "startChar": 0,
+        "endLine": 1588,
+        "endChar": 6
+      },
+      "revId": "05d9a37eb67ae722d870a730c8598f1bb39c628a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5532fa6_55284b9b",
+        "filename": "common/charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1588,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-08-05T12:24:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc077442_8aef4444",
       "range": {
         "startLine": 1582,
         "startChar": 0,
