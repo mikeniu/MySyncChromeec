@@ -281,7 +281,7 @@ ZTEST_F(ft98xx, test_focal_malloc)
 	zassert_not_null(void_ptr,
 			 "focal_malloc should return a valid pointer");
 
-	int *int_ptr = (int *)void_ptr;
+	int *int_ptr = void_ptr;
 	int num = 9349;
 	*int_ptr = num;
 	zassert_equal(*int_ptr, num);
