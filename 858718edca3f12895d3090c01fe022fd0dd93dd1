@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd921120_ccec05f2",
+        "filename": "zephyr/test/drivers/fan/src/fan.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-05T23:44:07Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Consider making `temp_fan_table` a `const` array.",
+      "range": {
+        "startLine": 478,
+        "startChar": 0,
+        "endLine": 478,
+        "endChar": 0
+      },
+      "revId": "858718edca3f12895d3090c01fe022fd0dd93dd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
