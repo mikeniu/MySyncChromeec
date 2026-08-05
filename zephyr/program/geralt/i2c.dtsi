@@ -32,6 +32,20 @@
 		};
 	};
 
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		battery {
+			i2c-port = <&i2c1>;
+			allow-type = "BATTERY_ALLOW_PASSTHRU";
+		};
+		charger {
+			i2c-port = <&i2c0>;
+			allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
+		};
+	};
 };
 
 &pinctrl {
