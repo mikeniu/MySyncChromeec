@@ -31,3 +31,21 @@
 	offset = <0x50000>;
 	size = <0x1000>;
 };
+
+/ {
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port4@4 {
+			reg = <4>;
+			i2c-port = <&i2c4_1>;
+		};
+
+		port6@6 {
+			reg = <6>;
+			i2c-port = <&i2c6_1>;
+		};
+	};
+};
