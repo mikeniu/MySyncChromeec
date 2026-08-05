@@ -31,3 +31,24 @@
 	offset = <0x50000>;
 	size = <0x1000>;
 };
+
+/ {
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		usb_c1_tcp {
+			i2c-port = <&i2c4_1>;
+			allow-type = "ALLOW_IF_FW_CONFIG_MATCH_AND_UNPROTECTED_BY_AP";
+			fw-config-key = "FW_USB_DB";
+			fw-config-value = "FW_USB_DB_USB3";
+		};
+		usb_c1_mix {
+			i2c-port = <&i2c6_1>;
+			allow-type = "ALLOW_IF_FW_CONFIG_MATCH_AND_UNPROTECTED_BY_AP";
+			fw-config-key = "FW_USB_DB";
+			fw-config-value = "FW_USB_DB_USB4_ANX7452_V2";
+		};
+	};
+};
