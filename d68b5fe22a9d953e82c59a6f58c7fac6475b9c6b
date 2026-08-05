@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7409011b_9d0380a5",
+        "filename": "zephyr/Makefile.cq",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-05T20:49:56Z",
+      "side": 1,
+      "message": "By replacing `test` with `test_gcc` and `test_llvm` here, the default `make test` target will no longer run `zmake_unit_tests` and `test_host_utils`. Because of this, if you run a default coverage build (`COVERAGE\u003d1`), these two targets won\u0027t run at all since the `test` target doesn\u0027t depend on them anymore.\n\nA clean way to fix this and simplify the Makefile is to just add:\n```make\ntest: test_gcc test_llvm\n```\nIf you add this, `test` will transitively depend on all the necessary targets. This means you could also delete the `test: $(COVERAGE_TARGETS)` line below and the `test: twister_host twister_llvm ...` line in the `else` block.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 0
+      },
+      "revId": "d68b5fe22a9d953e82c59a6f58c7fac6475b9c6b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49aacd0c_1d29741f",
+        "filename": "zephyr/Makefile.cq",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-05T20:49:56Z",
+      "side": 1,
+      "message": "Note that `test_gcc` and `test_llvm` both depend on `twister_coreboot_sdk`, `zephyr_check_compliance_unittest` (and also `zmake_unit_tests` / `test_host_utils` above). This means these tasks will run twice when the CQ splits the jobs.\n\nIf these targets take a non-trivial amount of time, you might want to assign them to only one of the toolchains (e.g., `test_gcc`) to maximize the CQ execution speedup.",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 0
+      },
+      "revId": "d68b5fe22a9d953e82c59a6f58c7fac6475b9c6b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
