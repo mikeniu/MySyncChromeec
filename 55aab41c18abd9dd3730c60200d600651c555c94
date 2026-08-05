@@ -17,6 +17,69 @@
       "isAi": true,
       "revId": "55aab41c18abd9dd3730c60200d600651c555c94",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "583f2b8c_9f062867",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T02:41:37Z",
+      "side": 1,
+      "message": "Can we add tests for these in a followup CL:\n\n----\n\nThe coverage for the \"happy path\" and specific mock failures is great. To make the test suite even more robust, consider adding tests for:\n\n* **Null Pointer Validation:**\nTest how the algorithm handles `NULL` parameters for required arguments in `fingerprint_match` and `fingerprint_enroll_step`. Does the driver gracefully return `-EINVAL`, or does it crash?\n* **Template Size Edge Cases:**\nIn `custom_get_finger_detailed_info_too_large`, you test `CONFIG_FP_ALGORITHM_TEMPLATE_SIZE + 1`. It might also be worth testing if the algorithm gracefully handles `0` size or negative sizes (if the underlying types are signed integers).",
+      "revId": "55aab41c18abd9dd3730c60200d600651c555c94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c41ce7c0_78d96dad",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T02:41:37Z",
+      "side": 1,
+      "message": "Let\u0027s file a bug and add a `TODO(b/123)` in a followup CL:\n\n---\n\n* **Silent Failure on Enrollment Start:**\nIn `test_enroll_start_failure`, the test asserts that `fingerprint_enroll_start` returns `0` (Success) even when the underlying `focal_algo_enroll_start` fails.\n```c\n/* ft98xx_enroll_start always returns 0 even when\n * focal_algo_enroll_start fails. */\nzassert_equal(res, 0, \"Expected 0 when focal_algo_enroll_start fails.\");\n\n```\n\n\n**Recommendation:** The actual driver should be fixed to propagate this error (e.g., returning `-EINVAL` or `-EIO`). The test should then be updated to assert that a failure code is returned. If the driver fix is out of scope for this specific patch, add a `TODO: b/XXX` comment referencing a ticket to fix the driver.",
+      "range": {
+        "startLine": 248,
+        "startChar": 0,
+        "endLine": 250,
+        "endChar": 73
+      },
+      "revId": "55aab41c18abd9dd3730c60200d600651c555c94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d258f168_daaacc11",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T02:41:37Z",
+      "side": 1,
+      "message": "Let\u0027s file a bug and add a `TODO(b/123)` in a followup CL for this:\n\n----\n\n* **Silent Failure on Enrollment Finish:**\nSimilarly, in `test_enroll_finish_failure`, a failure in `focal_algo_enroll_finish` is masked, and the caller receives `FP_ENROLLMENT_RESULT_OK`.\n```c\nint res \u003d fingerprint_enroll_finish(fixture-\u003ealg, template_buf);\nzassert_equal(res, FP_ENROLLMENT_RESULT_OK, ...);\n\n```\n\n\n**Recommendation:** This is dangerous because the caller will assume `template_buf` contains a valid, finalized template when it does not. The driver needs to return an error code (e.g., a generic `FP_ENROLLMENT_RESULT_FAIL` if supported, or a negative error code depending on the API), and this test should be updated to expect that failure.",
+      "range": {
+        "startLine": 400,
+        "startChar": 0,
+        "endLine": 403,
+        "endChar": 61
+      },
+      "revId": "55aab41c18abd9dd3730c60200d600651c555c94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
