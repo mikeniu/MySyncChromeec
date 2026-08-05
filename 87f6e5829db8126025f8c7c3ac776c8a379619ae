@@ -33,6 +33,24 @@
       "message": "@dawidn@google.com\nI believe this fix is needed. I have seen this test fail on sanok.",
       "revId": "87f6e5829db8126025f8c7c3ac776c8a379619ae",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d90869d9_c9bcd814",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-08-05T07:03:19Z",
+      "side": 1,
+      "message": "I have rebased. Please check it.",
+      "parentUuid": "82ced911_9852f467",
+      "revId": "87f6e5829db8126025f8c7c3ac776c8a379619ae",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
