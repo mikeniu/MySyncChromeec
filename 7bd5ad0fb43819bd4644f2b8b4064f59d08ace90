@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "04e62782_8f5d6204",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T17:16:39Z",
+      "side": 1,
+      "message": "the multiplication cannot overflow.\nthe addition can. however, FT_RAW_SIZE has to be a very big number for this to happen.\n\nWhen calculating required_size \u003d FT_RAW_SIZE + frame_pixels:\n\n```\nMax frame_pixels UINT16_MAX * UINT16_MAX \u003d 65,535 * 65,535 \u003d 4,294,836,225\n\n32-bit SIZE_MAX 2^32 - 1 \u003d 4,294,967,295\n\nMaximum safe FT_RAW_SIZE without overflow: 131,070\n```\n\nit is very difficult to create a unit test for this one. I can keep the addition with overflow API for safety",
+      "parentUuid": "f372f02c_01d0f94b",
+      "range": {
+        "startLine": 305,
+        "startChar": 1,
+        "endLine": 305,
+        "endChar": 68
+      },
+      "revId": "7bd5ad0fb43819bd4644f2b8b4064f59d08ace90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6aecd5d3_61f78541",
         "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
         "patchSetId": 11
@@ -37,6 +61,30 @@
       "writtenOn": "2026-08-05T03:06:56Z",
       "side": 1,
       "message": "These are magic numbers. Can you derive them from something (DTS) and then add 1 to be just past the boundary?",
+      "range": {
+        "startLine": 235,
+        "startChar": 0,
+        "endLine": 236,
+        "endChar": 44
+      },
+      "revId": "7bd5ad0fb43819bd4644f2b8b4064f59d08ace90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c02422b_e0769583",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T17:16:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6aecd5d3_61f78541",
       "range": {
         "startLine": 235,
         "startChar": 0,

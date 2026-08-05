@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "511127f8_2b4d888b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T17:16:39Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "37097389_ad459f8b",
+      "revId": "763a01405a5ca835528713091d6f254bfff9f841",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "840076b5_4b8bd02a",
@@ -51,6 +69,24 @@
       "side": 1,
       "message": "Agreed.",
       "parentUuid": "840076b5_4b8bd02a",
+      "revId": "763a01405a5ca835528713091d6f254bfff9f841",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "261ce844_7fc676fb",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T17:16:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "069effa0_b7859612",
       "revId": "763a01405a5ca835528713091d6f254bfff9f841",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
