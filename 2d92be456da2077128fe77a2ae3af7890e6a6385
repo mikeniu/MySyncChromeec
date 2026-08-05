@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64083386_89444ee1",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-05T17:51:30Z",
+      "side": 1,
+      "message": "There are a few places in this CL where you\u0027re catching an exception and returning a benign value, such as this one. This makes the control flow a bit more elaborate and in some cases requires backup methodology when the primary mechanism doesn\u0027t work.\n\nIn some cases, it seems like the original error indicates a fundamental problem with the environment or inputs, and it should be fatal. I would probably put `objdump` missing or an invalid `elf_path` in that category. In these cases, it seems easier and maybe more debuggable to me to just allow the underlying function to raise and the program to exit.",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c450799_30d7b406",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-05T17:51:30Z",
+      "side": 1,
+      "message": "Nit: This is a little hard to grok just reading the code. Can you put an example output line in a comment for comparison purposes?",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9bd2bc0_917e6cc5",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-05T17:51:30Z",
+      "side": 1,
+      "message": "Nit: As above, a prototype line might aid comprehension.",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b04c4723_4c22ac73",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-05T17:51:30Z",
+      "side": 1,
+      "message": "Admittedly, I haven\u0027t totally decoded the above regex. Would this `ValueError` only happen if `origin` or `length` could not be converted to an `int`? If so, would it be possible to modify the regex so that lines that would fail to decode don\u0027t match and avoid this check?",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af35871a_843c249d",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-05T17:51:30Z",
+      "side": 1,
+      "message": "This would happen in the case that parsing the map file failed in some way. How expected is that scenario?",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
