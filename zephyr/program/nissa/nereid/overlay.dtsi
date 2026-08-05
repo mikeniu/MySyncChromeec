@@ -401,3 +401,21 @@
 &usbpd0 {
 	status = "okay";
 };
+
+/ {
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port5@5 {
+			reg = <5>;
+			i2c-port = <&i2c5>;
+		};
+
+		port4@4 {
+			reg = <4>;
+			i2c-port = <&i2c4>;
+		};
+	};
+};
