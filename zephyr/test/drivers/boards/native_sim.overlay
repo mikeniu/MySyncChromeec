@@ -411,10 +411,17 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
+		battery_passthru: port0@0 {
+			reg = <(-1)>;
+			i2c-port = <&i2c0>;
+			allow-type = "BATTERY_ALLOW_PASSTHRU";
+		};
+
 		usb_c0_passthru: port2@2 {
 			reg = <(-1)>;
 			i2c-port = <&i2c2>;
 		};
+
 		usb_c1_passthru: port3@3 {
 			reg = <(-1)>;
 			i2c-port = <&i2c3>;
