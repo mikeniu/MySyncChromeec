@@ -121,6 +121,9 @@ struct pdc_info_t {
 	bool usb_comm_capable_as_device;
 	/** Extra information (optional) */
 	uint16_t extra;
+	/** Index of port on chip (1-based for dual-port chips, or 0 if
+	 * unassigned) */
+	uint8_t port_index_on_chip;
 };
 
 /**

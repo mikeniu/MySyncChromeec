@@ -5656,15 +5656,80 @@ uint8_t pdc_power_mgmt_get_product_type(int port)
 static enum pdc_sbu_mux_mode sbu_mux_mode_at_suspend = PDC_SBU_MUX_MODE_NORMAL;
 #endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
 
-/* TODO(b/323371550): These functions should be adjusted to target individual PD
- * chips rather than all ports at once. It should take a chip ID as a param and
- * track current comms status by chip.
- */
+#define PDC_CHIP_MAX_COUNT CONFIG_USB_PD_PORT_MAX_COUNT
+
+test_mockable int pdc_power_mgmt_get_chip_count(void)
+{
+	uint8_t port_count = pdc_power_mgmt_get_usb_pd_port_count();
+
+	if (port_count == 0) {
+		return 0;
+	}
+
+	return pdc_power_mgmt_get_chip_for_port(port_count - 1) + 1;
+}
+
+test_mockable int pdc_power_mgmt_get_chip_for_port(int target_port)
+{
+	int current_chip = 0;
+
+	if (!pdc_power_mgmt_is_pdc_port_valid(target_port)) {
+		return -ERANGE;
+	}
+
+	for (int p = 0; p <= target_port; p++) {
+		if (p == 0) {
+			current_chip = 0;
+			continue;
+		}
+
+		struct pdc_info_t info;
+		struct pdc_info_t prev_info;
+		int ret = pdc_get_info(pdc_data[p]->port.pdc, &info, false);
+		int prev_ret = pdc_get_info(pdc_data[p - 1]->port.pdc,
+					    &prev_info, false);
+		bool is_same_chip = false;
+
+		if (ret == 0 || ret == -EAGAIN) {
+			if (strstr(info.driver_name, "tps6699") != NULL) {
+				/* TI TPS6699x: Adjacent ports with indices {1,
+				 * 2} or {2, 1} belong to the same dual-port
+				 * chip (sum == 3). Indices {1, 1} or {2, 2}
+				 * indicate a new chip. */
+				if ((prev_ret == 0 || prev_ret == -EAGAIN) &&
+				    (prev_info.port_index_on_chip +
+					     info.port_index_on_chip ==
+				     3)) {
+					is_same_chip = true;
+				}
+			} else if (strstr(info.driver_name, "rts54") != NULL ||
+				   strstr(info.driver_name, "realtek") !=
+					   NULL) {
+				/* Realtek RTS54xx: no_fw_update indicates
+				 * second port on chip */
+				if (info.no_fw_update) {
+					is_same_chip = true;
+				}
+			} else {
+				LOG_WRN_ONCE(
+					"C%d:Unrecognized driver name '%s', assuming single-port chip",
+					p, info.driver_name);
+			}
+		}
+
+		if (!is_same_chip) {
+			current_chip++;
+		}
+	}
+
+	return current_chip;
+}
 
 /**
- * @brief Suspend/disable communication to the PDC
+ * @brief Suspend/disable communication to the PDC for target_chip (or all if <
+ * 0)
  */
-static int suspend_pdc_comms(void)
+static int suspend_pdc_comms(int target_chip)
 {
 	int ret;
 	int status = 0;
@@ -5672,25 +5737,39 @@ static int suspend_pdc_comms(void)
 	uint8_t port_count = pdc_power_mgmt_get_usb_pd_port_count();
 
 #ifdef CONFIG_USBC_PDC_DRIVEN_CCD
-	/* Save current SBU mux override state so we can restore upon
-	 * PDC subsystem resume. */
-	ret = pdc_power_mgmt_get_sbu_mux_mode(&sbu_mux_mode_at_suspend, NULL);
-	if (ret) {
-		LOG_ERR("PD: Cannot read current SBU mux mode: %d", ret);
-	} else {
-		LOG_INF("PD: Save SBU mux mode of %d", sbu_mux_mode_at_suspend);
+	int ccd_port = pdc_power_mgmt_get_ccd_port();
+	if (target_chip < 0 ||
+	    pdc_power_mgmt_get_chip_for_port(ccd_port) == target_chip) {
+		/* Save current SBU mux override state so we can restore upon
+		 * PDC subsystem resume. */
+		ret = pdc_power_mgmt_get_sbu_mux_mode(&sbu_mux_mode_at_suspend,
+						      NULL);
+		if (ret) {
+			LOG_ERR("PD: Cannot read current SBU mux mode: %d",
+				ret);
+		} else {
+			LOG_INF("PD: Save SBU mux mode of %d",
+				sbu_mux_mode_at_suspend);
+		}
 	}
 #endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
 
-	/* Request each port's PDC state machine to enter the suspend
-	 * state.
+	/* Request target port(s) PDC state machine to enter the suspend state
 	 */
 	for (int p = 0; p < port_count; p++) {
+		if (target_chip >= 0 &&
+		    pdc_power_mgmt_get_chip_for_port(p) != target_chip) {
+			continue;
+		}
 		atomic_set(&pdc_data[p]->port.suspend, 1);
 	}
 
-	/* Wait for each PDC state machine to enter suspended state */
+	/* Wait for target port(s) PDC state machine to enter suspended state */
 	for (int p = 0; p < port_count; p++) {
+		if (target_chip >= 0 &&
+		    pdc_power_mgmt_get_chip_for_port(p) != target_chip) {
+			continue;
+		}
 		if (get_pdc_state(&pdc_data[p]->port) == PDC_DISABLED) {
 			/* Ignore disabled ports */
 			continue;
@@ -5707,8 +5786,12 @@ static int suspend_pdc_comms(void)
 		}
 	}
 
-	/* Suspend the driver layer */
+	/* Suspend the driver layer for target port(s) */
 	for (int p = 0; p < port_count; p++) {
+		if (target_chip >= 0 &&
+		    pdc_power_mgmt_get_chip_for_port(p) != target_chip) {
+			continue;
+		}
 		if (get_pdc_state(&pdc_data[p]->port) == PDC_DISABLED) {
 			/* Ignore disabled ports */
 			continue;
@@ -5726,9 +5809,9 @@ static int suspend_pdc_comms(void)
 }
 
 /**
- * @brief Resume/enable communication to the PDC
+ * @brief Resume/enable communication to the PDC for target_chip (or all if < 0)
  */
-static int resume_pdc_comms(void)
+static int resume_pdc_comms(int target_chip)
 {
 	int ret;
 	int status = 0;
@@ -5736,23 +5819,31 @@ static int resume_pdc_comms(void)
 	uint8_t port_count = pdc_power_mgmt_get_usb_pd_port_count();
 
 #ifdef CONFIG_USBC_PDC_DRIVEN_CCD
-	if (sbu_mux_mode_at_suspend == PDC_SBU_MUX_MODE_FORCE_DBG) {
-		/* Set a flag on the CCD port to go back into force-debug mode.
-		 * This cannot be done immediately because the drivers need time
-		 * to re-initialize. If the previous SBU mux mode was normal
-		 * operation, that is the default and no action is necessary.
-		 */
-		int ccd_port = pdc_power_mgmt_get_ccd_port();
-
-		LOG_INF("PD: Restore C%d (CCD) SBU mux to forced-debug mode",
-			ccd_port);
-		atomic_set_bit(pdc_data[ccd_port]->port.common_policy.flags,
-			       COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG);
+	int ccd_port = pdc_power_mgmt_get_ccd_port();
+	if (target_chip < 0 ||
+	    pdc_power_mgmt_get_chip_for_port(ccd_port) == target_chip) {
+		if (sbu_mux_mode_at_suspend == PDC_SBU_MUX_MODE_FORCE_DBG) {
+			/* Set a flag on the CCD port to go back into
+			 * force-debug mode. This cannot be done immediately
+			 * because the drivers need time to re-initialize. If
+			 * the previous SBU mux mode was normal operation, that
+			 * is the default and no action is necessary.
+			 */
+			LOG_INF("PD: Restore C%d (CCD) SBU mux to forced-debug mode",
+				ccd_port);
+			atomic_set_bit(
+				pdc_data[ccd_port]->port.common_policy.flags,
+				COMMON_POLICY_SET_SBU_MUX_TO_FORCED_DEBUG);
+		}
 	}
 #endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
 
-	/* Resume and reset the driver layer */
+	/* Resume and reset the driver layer for target port(s) */
 	for (int p = 0; p < port_count; p++) {
+		if (target_chip >= 0 &&
+		    pdc_power_mgmt_get_chip_for_port(p) != target_chip) {
+			continue;
+		}
 		if (get_pdc_state(&pdc_data[p]->port) == PDC_DISABLED) {
 			/* Ignore disabled ports */
 			continue;
@@ -5765,43 +5856,102 @@ static int resume_pdc_comms(void)
 		}
 	}
 
-	/* Release each PDC state machine. A reset is performed when
+	/* Release target port(s) PDC state machine. A reset is performed when
 	 * exiting the suspended state.
 	 */
 	for (int p = 0; p < port_count; p++) {
+		if (target_chip >= 0 &&
+		    pdc_power_mgmt_get_chip_for_port(p) != target_chip) {
+			continue;
+		}
 		atomic_set(&pdc_data[p]->port.suspend, 0);
 	}
 
 	return status;
 }
 
-test_mockable int pdc_power_mgmt_set_comms_state(bool enable_comms)
+static bool chip_comms_status[PDC_CHIP_MAX_COUNT];
+static bool chip_comms_status_initialized;
+
+static void init_chip_comms_status(void)
+{
+	if (!chip_comms_status_initialized) {
+		for (int i = 0; i < PDC_CHIP_MAX_COUNT; i++) {
+			chip_comms_status[i] = true;
+		}
+		chip_comms_status_initialized = true;
+	}
+}
+
+test_mockable int pdc_power_mgmt_set_comms_state_for_chip(int chip,
+							  bool enable_comms)
 {
 	int ret;
+	int chip_count = pdc_power_mgmt_get_chip_count();
 
-	static bool current_comms_status = true;
+	init_chip_comms_status();
 
-	if (enable_comms == current_comms_status) {
-		LOG_ERR("PD: Unnecessary suspend or resume. "
-			"Current state already %d",
-			current_comms_status);
-		return -EALREADY;
-	}
+	if (chip >= 0) {
+		if (chip >= chip_count) {
+			return -ERANGE;
+		}
+		if (chip_comms_status[chip] == enable_comms) {
+			LOG_ERR("PD: Unnecessary suspend or resume for chip %d. "
+				"Current state already %d",
+				chip, enable_comms);
+			return -EALREADY;
+		}
 
-	if (enable_comms) {
-		LOG_INF("PD: Resume PDC communication");
-		ret = resume_pdc_comms();
+		if (enable_comms) {
+			LOG_INF("PD: Resume PDC communication for chip %d",
+				chip);
+			ret = resume_pdc_comms(chip);
+		} else {
+			LOG_INF("PD: Suspend PDC communication for chip %d",
+				chip);
+			ret = suspend_pdc_comms(chip);
+		}
+
+		if (ret == 0) {
+			chip_comms_status[chip] = enable_comms;
+		}
+		return ret;
 	} else {
-		LOG_INF("PD: Suspend PDC communication");
-		ret = suspend_pdc_comms();
-	}
+		bool all_same = true;
+		for (int c = 0; c < chip_count; c++) {
+			if (chip_comms_status[c] != enable_comms) {
+				all_same = false;
+				break;
+			}
+		}
 
-	if (ret == 0) {
-		/* Successfully changed comms state */
-		current_comms_status = enable_comms;
-	}
+		if (all_same) {
+			LOG_ERR("PD: Unnecessary suspend or resume. "
+				"Current state already %d",
+				enable_comms);
+			return -EALREADY;
+		}
 
-	return ret;
+		if (enable_comms) {
+			LOG_INF("PD: Resume PDC communication for all chips");
+			ret = resume_pdc_comms(-1);
+		} else {
+			LOG_INF("PD: Suspend PDC communication for all chips");
+			ret = suspend_pdc_comms(-1);
+		}
+
+		if (ret == 0) {
+			for (int c = 0; c < chip_count; c++) {
+				chip_comms_status[c] = enable_comms;
+			}
+		}
+		return ret;
+	}
+}
+
+test_mockable int pdc_power_mgmt_set_comms_state(bool enable_comms)
+{
+	return pdc_power_mgmt_set_comms_state_for_chip(-1, enable_comms);
 }
 
 test_mockable int
