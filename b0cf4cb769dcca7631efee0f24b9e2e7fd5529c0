@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f7ad07e_f56c8c5f",
+        "filename": "common/charge_state.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1577,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-05T17:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "265acff8_44addc8e",
+      "revId": "b0cf4cb769dcca7631efee0f24b9e2e7fd5529c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9d565b63_60d17b5a",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-05T16:06:07Z",
       "side": 1,
       "message": "Since its only used in the .c file, there is no need for this to be public.",
+      "revId": "b0cf4cb769dcca7631efee0f24b9e2e7fd5529c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf747412_13ca64d2",
+        "filename": "include/charge_state.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-05T17:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d565b63_60d17b5a",
       "revId": "b0cf4cb769dcca7631efee0f24b9e2e7fd5529c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
