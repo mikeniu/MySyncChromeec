@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "77f56e1f_0b363a52",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-05T20:33:30Z",
+      "side": 1,
+      "message": "The legacy tests are failing:\n```\ncommon/charge_state.c:1577:13: error: \u0027charger_has_sufficient_power_for_power_on\u0027 defined but not used [-Werror\u003dunused-function]\n 1577 | static bool charger_has_sufficient_power_for_power_on(void)\n```\nTo run the tests locally, run `make test-coverage BOARD\u003dhost TEST_COVERAGE\u003dy` from the platform/ec directory",
+      "revId": "e45fad1460b0f0f7d22fce713b7588144be3caf6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a4c5ee2d_e19f6df2",
         "filename": "zephyr/test/fatcat/tests/lapis/src/battery.c",
         "patchSetId": 13
