@@ -257,6 +257,36 @@ ZTEST_USER(console_cmd_pdc, test_comms_state)
 		      "Expected %d, but got %d",
 		      pdc_power_mgmt_set_comms_state_fake.return_val, rv);
 	zassert_equal(1, pdc_power_mgmt_set_comms_state_fake.call_count);
+
+	RESET_FAKE(pdc_power_mgmt_set_comms_state);
+
+	/* Successful suspend for specific chip */
+	rv = shell_execute_cmd(get_ec_shell(), "pdc comms suspend 0");
+	zassert_equal(rv, EC_SUCCESS, "Expected %d, but got %d", EC_SUCCESS,
+		      rv);
+	zassert_equal(1,
+		      pdc_power_mgmt_set_comms_state_for_chip_fake.call_count);
+	zassert_equal(
+		0,
+		pdc_power_mgmt_set_comms_state_for_chip_fake.arg0_history[0]);
+	zassert_false(
+		pdc_power_mgmt_set_comms_state_for_chip_fake.arg1_history[0]);
+
+	RESET_FAKE(pdc_power_mgmt_set_comms_state_for_chip);
+
+	/* Successful resume for specific chip */
+	rv = shell_execute_cmd(get_ec_shell(), "pdc comms resume 0");
+	zassert_equal(rv, EC_SUCCESS, "Expected %d, but got %d", EC_SUCCESS,
+		      rv);
+	zassert_equal(1,
+		      pdc_power_mgmt_set_comms_state_for_chip_fake.call_count);
+	zassert_equal(
+		0,
+		pdc_power_mgmt_set_comms_state_for_chip_fake.arg0_history[0]);
+	zassert_true(
+		pdc_power_mgmt_set_comms_state_for_chip_fake.arg1_history[0]);
+
+	RESET_FAKE(pdc_power_mgmt_set_comms_state_for_chip);
 }
 
 ZTEST_USER(console_cmd_pdc, test_conn_reset)

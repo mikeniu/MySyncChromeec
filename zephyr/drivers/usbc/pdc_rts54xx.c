@@ -443,6 +443,8 @@ struct pdc_data_t {
 	struct k_event driver_event;
 	/* Currently running UCSI command. */
 	enum ucsi_command_t active_ucsi_cmd;
+	/** Atomic flag to suspend sending new commands to chip */
+	atomic_t suspend_comms_flag;
 };
 
 /**
@@ -546,27 +548,20 @@ static void set_state(struct pdc_data_t *data, const enum state_t next_state)
 
 /**
  * Atomic flag to suspend sending new commands to chip
- *
- * This flag is shared across driver instances.
- *
- * TODO(b/323371550) When more than one PDC is supported, this flag will need
- * to be tracked per-chip.
  */
-static atomic_t suspend_comms_flag = ATOMIC_INIT(0);
-
-static void suspend_comms(void)
+static void suspend_comms(struct pdc_data_t *data)
 {
-	atomic_set(&suspend_comms_flag, 1);
+	atomic_set(&data->suspend_comms_flag, 1);
 }
 
-static void enable_comms(void)
+static void enable_comms(struct pdc_data_t *data)
 {
-	atomic_set(&suspend_comms_flag, 0);
+	atomic_set(&data->suspend_comms_flag, 0);
 }
 
-static bool check_comms_suspended(void)
+static bool check_comms_suspended(struct pdc_data_t *data)
 {
-	return atomic_get(&suspend_comms_flag) != 0;
+	return atomic_get(&data->suspend_comms_flag) != 0;
 }
 
 static void print_current_state(struct pdc_data_t *data)
@@ -810,7 +805,7 @@ static enum smf_state_result st_init_run(void *o)
 	int rv;
 
 	/* Do not start executing commands if suspended */
-	if (check_comms_suspended()) {
+	if (check_comms_suspended(data)) {
 		set_state(data, ST_SUSPENDED);
 		return SMF_EVENT_HANDLED;
 	}
@@ -1039,7 +1034,7 @@ static enum smf_state_result st_idle_run(void *o)
 	struct pdc_data_t *data = (struct pdc_data_t *)o;
 
 	/* Do not start executing commands if suspended */
-	if (check_comms_suspended()) {
+	if (check_comms_suspended(data)) {
 		set_state(data, ST_SUSPENDED);
 		return SMF_EVENT_HANDLED;
 	}
@@ -1541,7 +1536,7 @@ static enum smf_state_result st_error_recovery_run(void *o)
 	struct pdc_data_t *data = (struct pdc_data_t *)o;
 
 	/* Don't continue trying if we are suspending communication */
-	if (check_comms_suspended()) {
+	if (check_comms_suspended(data)) {
 		set_state(data, ST_SUSPENDED);
 		return SMF_EVENT_HANDLED;
 	}
@@ -1592,7 +1587,7 @@ static enum smf_state_result st_suspended_run(void *o)
 	struct pdc_data_t *data = (struct pdc_data_t *)o;
 
 	/* Stay here while suspended */
-	if (check_comms_suspended()) {
+	if (check_comms_suspended(data)) {
 		return SMF_EVENT_HANDLED;
 	}
 
@@ -1646,7 +1641,7 @@ static int rts54_post_command_with_callback(const struct device *dev,
 	struct pdc_data_t *data = dev->data;
 
 	/* Return an error if chip communication is suspended */
-	if (check_comms_suspended()) {
+	if (check_comms_suspended(data)) {
 		return -ECONNREFUSED;
 	}
 
@@ -2315,6 +2310,13 @@ static int rts54_get_info(const struct device *dev, struct pdc_info_t *info,
 		return -EINVAL;
 	}
 
+	/* Fill in static devicetree config information */
+	strncpy(info->driver_name, STRINGIFY(DT_DRV_COMPAT),
+		sizeof(info->driver_name));
+	info->driver_name[sizeof(info->driver_name) - 1] = '\0';
+	info->no_fw_update = cfg->no_fw_update;
+	info->frs_supported = cfg->frs_supported;
+
 	/* If caller is OK with a non-live value and we have one, we can
 	 * immediately return a cached value.
 	 */
@@ -2747,13 +2749,13 @@ static int rts54_set_comms_state(const struct device *dev, bool comms_active)
 		 * disabled. (Thus, suspending/resuming comms on a disabled
 		 * PDC driver is a no-op)
 		 */
-		enable_comms();
+		enable_comms(data);
 
 	} else {
 		/* Request communication to be stopped. This allows in-progress
 		 * operations to complete first.
 		 */
-		suspend_comms();
+		suspend_comms(data);
 
 		if (get_state(data) == ST_DISABLE) {
 			/* The driver is already permanently shut down. */
@@ -3282,7 +3284,7 @@ static void rts54xx_thread(void *dev, void *unused1, void *unused2)
 		/* We only handle irq on idle. */
 		if (get_state(data) == ST_IDLE && irq_pending_for_idle) {
 			irq_pending_for_idle = false;
-			if (check_comms_suspended()) {
+			if (check_comms_suspended(data)) {
 				LOG_INF("RTK%d: Ignoring interrupt",
 					cfg->connector_number);
 				continue;

@@ -181,9 +181,15 @@ uint8_t pd_get_product_type(int port)
 
 void pd_comm_enable(int port, int enable)
 {
-	ARG_UNUSED(port);
+	int chip;
 
-	(void)pdc_power_mgmt_set_comms_state(enable);
+	if (port < 0) {
+		chip = -1;
+	} else {
+		chip = pdc_power_mgmt_get_chip_for_port(port);
+	}
+
+	(void)pdc_power_mgmt_set_comms_state_for_chip(chip, enable);
 }
 
 /* No-op on PDC devices. The suspend/enable operation is handled within

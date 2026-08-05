@@ -355,6 +355,8 @@ struct pdc_data_t {
 	union battery_status_t battery_status;
 	/* Battery capability on device */
 	union battery_capability_t battery_capability;
+	/** Atomic flag to suspend sending new commands to chip */
+	atomic_t suspend_comms_flag;
 };
 
 /**
@@ -464,27 +466,20 @@ static void tps_delayed_post(struct k_work *work)
 
 /**
  * Atomic flag to suspend sending new commands to chip
- *
- * This flag is shared across driver instances.
- *
- * TODO(b/323371550) When more than one PDC is supported, this flag will need
- * to be tracked per-chip.
  */
-static atomic_t suspend_comms_flag = ATOMIC_INIT(0);
-
-static void suspend_comms(void)
+static void suspend_comms(struct pdc_data_t *data)
 {
-	atomic_set(&suspend_comms_flag, 1);
+	atomic_set(&data->suspend_comms_flag, 1);
 }
 
-static void enable_comms(void)
+static void enable_comms(struct pdc_data_t *data)
 {
-	atomic_set(&suspend_comms_flag, 0);
+	atomic_set(&data->suspend_comms_flag, 0);
 }
 
-static bool check_comms_suspended(void)
+static bool check_comms_suspended(struct pdc_data_t *data)
 {
-	return atomic_get(&suspend_comms_flag) != 0;
+	return atomic_get(&data->suspend_comms_flag) != 0;
 }
 
 static void print_current_state(struct pdc_data_t *data)
@@ -755,14 +750,14 @@ static enum smf_state_result st_init_run(void *o)
 	int rv;
 
 	/* Do not start executing commands if suspended */
-	if (check_comms_suspended()) {
+	if (check_comms_suspended(data)) {
 		set_state(data, ST_SUSPENDED);
 		return SMF_EVENT_HANDLED;
 	}
 
 	/* If we've attempted init too many times, suspend instead. */
 	if (data->init_attempt > PDC_INIT_RETRY_MAX) {
-		suspend_comms();
+		suspend_comms(data);
 		set_state(data, ST_SUSPENDED);
 		return SMF_EVENT_HANDLED;
 	}
@@ -858,7 +853,7 @@ static enum smf_state_result st_idle_run(void *o)
 	struct pdc_data_t *data = (struct pdc_data_t *)o;
 	uint32_t events = data->events;
 
-	if (check_comms_suspended()) {
+	if (check_comms_suspended(data)) {
 		/* Do not start executing commands or processing IRQs if
 		 * suspended. We don't need to check the event flag, it is
 		 * only needed to wake this thread.
@@ -1038,7 +1033,7 @@ static enum smf_state_result st_error_recovery_run(void *o)
 	struct pdc_data_t *data = (struct pdc_data_t *)o;
 
 	/* Don't continue trying if we are suspending communication */
-	if (check_comms_suspended()) {
+	if (check_comms_suspended(data)) {
 		set_state(data, ST_SUSPENDED);
 		return SMF_EVENT_HANDLED;
 	}
@@ -1079,7 +1074,7 @@ static enum smf_state_result st_suspended_run(void *o)
 	k_event_clear(&data->pdc_event, PDC_ALL_THREAD_WAKE_EVENTS);
 
 	/* Stay here while suspended */
-	if (check_comms_suspended()) {
+	if (check_comms_suspended(data)) {
 		return SMF_EVENT_HANDLED;
 	}
 
@@ -1754,6 +1749,7 @@ static int cmd_get_ic_status_sync_internal(const struct pdc_config_t *cfg,
 	info->no_fw_update = cfg->no_fw_update;
 	info->frs_supported = cfg->frs_supported;
 	info->usb_comm_capable_as_device = false;
+	info->port_index_on_chip = cfg->port_index_on_chip;
 
 	return 0;
 }
@@ -2964,6 +2960,14 @@ static int tps_get_info(const struct device *dev, struct pdc_info_t *info,
 		return -EINVAL;
 	}
 
+	/* Fill in static devicetree config information */
+	strncpy(info->driver_name, STRINGIFY(DT_DRV_COMPAT),
+		sizeof(info->driver_name));
+	info->driver_name[sizeof(info->driver_name) - 1] = '\0';
+	info->no_fw_update = cfg->no_fw_update;
+	info->frs_supported = cfg->frs_supported;
+	info->port_index_on_chip = cfg->port_index_on_chip;
+
 	/* If caller is OK with a non-live value and we have one, we can
 	 * immediately return a cached value. (synchronous)
 	 */
@@ -3143,7 +3147,7 @@ static int tps_set_comms_state(const struct device *dev, bool comms_active)
 		 * disabled. (Thus, suspending/resuming comms on a disabled
 		 * PDC driver is a no-op)
 		 */
-		enable_comms();
+		enable_comms(data);
 		k_event_post(&data->pdc_event, PDC_IRQ_EVENT);
 
 	} else {
@@ -3153,7 +3157,7 @@ static int tps_set_comms_state(const struct device *dev, bool comms_active)
 		/* Request communication to be stopped. This allows in-progress
 		 * operations to complete first.
 		 */
-		suspend_comms();
+		suspend_comms(data);
 
 		/* Signal the driver with the suspend request event in case the
 		 * thread is blocking on an event to process.
@@ -3495,7 +3499,7 @@ static void tps_thread(void *dev, void *unused1, void *unused2)
 		if (data->events & PDC_IRQ_EVENT) {
 			k_event_clear(&data->pdc_event, PDC_IRQ_EVENT);
 
-			if (!check_comms_suspended()) {
+			if (!check_comms_suspended(data)) {
 				irq_pending_for_idle = true;
 			}
 		}

@@ -603,26 +603,29 @@ SHELL_DYNAMIC_CMD_CREATE(dsub_sbu_mux_modes, pdc_console_get_normal_or_debug);
 static int cmd_pdc_comms_state(const struct shell *sh, size_t argc, char **argv)
 {
 	bool enable;
+	int chip = -1;
 	int rv;
 
 	/* Suspend or resume PDC comms */
 	if (!strncmp(argv[1], "suspend", strlen("suspend"))) {
-		shell_fprintf(sh, SHELL_INFO, "Suspend port threads\n");
 		enable = false;
 	} else if (!strncmp(argv[1], "resume", strlen("resume"))) {
-		shell_fprintf(sh, SHELL_INFO, "Resume port threads\n");
 		enable = true;
 	} else {
 		shell_error(sh, "Invalid value");
 		return -EINVAL;
 	}
 
-	/* Apply to all ports
-	 *
-	 * TODO(b/323371550): This command should take a chip argument and
-	 * target only ports serviced by that chip.
-	 */
-	rv = pdc_power_mgmt_set_comms_state(enable);
+	if (argc > 2) {
+		chip = strtol(argv[2], NULL, 0);
+		shell_fprintf(sh, SHELL_INFO, "%s chip %d threads\n",
+			      enable ? "Resume" : "Suspend", chip);
+		rv = pdc_power_mgmt_set_comms_state_for_chip(chip, enable);
+	} else {
+		shell_fprintf(sh, SHELL_INFO, "%s all port threads\n",
+			      enable ? "Resume" : "Suspend");
+		rv = pdc_power_mgmt_set_comms_state(enable);
+	}
 
 	if (rv) {
 		shell_fprintf(sh, SHELL_ERROR, "Could not %s PDC: (%d)\n",
@@ -978,8 +981,8 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 		      cmd_pdc_connector_reset, 3, 0),
 	SHELL_CMD_ARG(comms, &dsub_suspend_or_resume,
 		      SHELL_HELP("Suspend/resume PDC command communication",
-				 "[suspend|resume]"),
-		      cmd_pdc_comms_state, 2, 0),
+				 "[suspend|resume] [chip]"),
+		      cmd_pdc_comms_state, 2, 1),
 	SHELL_CMD_ARG(connector_status, NULL,
 		      SHELL_HELP("Print the UCSI GET_CONNECTOR_STATUS",
 				 "<port>"),
