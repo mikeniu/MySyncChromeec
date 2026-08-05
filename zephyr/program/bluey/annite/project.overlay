@@ -47,13 +47,20 @@
 	};
 };
 
-&cbi_flash {
-	/*
-	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
-	 * EC_RO section.
-	 */
-	offset = <0x3e000>;
-	size = <0x1000>;
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x3e000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 */
+			offset = <0x3e000>;
+			size = <0x1000>;
+		};
+	};
 };
 
 &uart4 {

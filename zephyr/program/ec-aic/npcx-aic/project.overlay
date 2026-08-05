@@ -98,13 +98,22 @@
 	pinctrl-names = "default";
 };
 
-&cbi_flash {
-	/*
-	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
-	 * EC_RO section. EC_RO section ends at 0x50000 byte which is the offset
-	 */
-	offset = <0x50000>;
-	size = <0x1000>;
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x50000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 * EC_RO section ends at 0x50000 byte which
+			 * is the offset.
+			 */
+			offset = <0x50000>;
+			size = <0x1000>;
+		};
+	};
 };
 
 &i2c_ctrl0 {

@@ -64,6 +64,10 @@ configdefault I2C_ALLOW_NO_STOP_TRANSACTIONS
 configdefault COMMON_LIBC_MALLOC
 	default n
 
+config FLASH_LOAD_SIZE
+	default $(dt_node_int_prop_hex,/binman/wp-ro/ec-ro,size) if CROS_EC_RO
+	default $(dt_node_int_prop_hex,/binman/ec-rw,size) if CROS_EC_RW
+
 configdefault LTO
 	default y if !X86 && !SOC_POSIX
 
