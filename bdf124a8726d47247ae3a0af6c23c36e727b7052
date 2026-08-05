@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9cd839d_e1015b32",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T18:08:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/5ff02163-ea42-4aff-a7ea-4d946563876e)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly introduces a validation check against a zero template size (`data-\u003etpl_finger_size \u003d\u003d 0`) during algorithm initialization. This successfully prevents invalid states early in the init process. The format specifiers in the logging statements have also been accurately updated to `%u` to reflect the unsigned nature of the template size fields.\n*   **Testing \u0026 Test Coverage:** Excellent. A new test case `test_init_template_size_zero_fails` and its associated mock `custom_get_finger_detailed_info_zero_size` have been appropriately added to verify the zero-size failure path. The test correctly checks for the `-EINVAL` return code.\n*   **Style:** The code adheres to Zephyr logging conventions and the project style. The modifications are clean and readable.\n*   **Security:** This patch improves system robustness by preventing subsequent operations with an invalid/zero template size, which could otherwise lead to undefined behavior or memory issues.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped, small, and self-contained, handling exactly what is described in the commit message.\n\nTAG\u003dagy\nCONV\u003ddcbb9b05-6e21-43d3-aca0-d70832cec0ba",
+      "isAi": true,
+      "revId": "bdf124a8726d47247ae3a0af6c23c36e727b7052",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20c7fd3f_04b5fb1b",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T18:08:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Optional minor suggestion:** While `tpl_finger_size` is being correctly validated here, you might also want to consider whether `tpl_head_size` and `tpl_subtemplate_size` should be similarly validated (e.g., ensuring they are non-zero if expected, or logically bounded).",
+      "isAi": true,
+      "revId": "bdf124a8726d47247ae3a0af6c23c36e727b7052",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
