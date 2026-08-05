@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "0d1f4128e2e92b0aad09d3d911bac5ecec339096",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7de5a1ac_4e1b2e42",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-05T23:43:21Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Should we call `sys_cache_data_flush_range(pdata, sizeof(*pdata))` after updating `pdata-\u003eflags`? Other functions in this file flush the cache after modifying `pdata` to ensure the update persists across normal EC resets or power loss before the next crash.",
+      "range": {
+        "startLine": 371,
+        "startChar": 0,
+        "endLine": 371,
+        "endChar": 0
+      },
+      "revId": "0d1f4128e2e92b0aad09d3d911bac5ecec339096",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
