@@ -194,6 +194,15 @@ static int validate_fp_mode(const uint32_t mode)
 		return EC_ERROR_INVAL;
 	}
 
+	/*
+	 * FP_MODE_ENROLL_IMAGE requires an active enrollment session flag
+	 * to be set concurrently in the requested mode.
+	 */
+	if ((mode & FP_MODE_ENROLL_IMAGE) && !(mode & FP_MODE_ENROLL_SESSION)) {
+		CPRINTS("FP_MODE_ENROLL_IMAGE requested without FP_MODE_ENROLL_SESSION");
+		return EC_ERROR_INVAL;
+	}
+
 	/* Don't allow sensor reset if any other mode is
 	 * set (including FP_MODE_RESET_SENSOR itself).
 	 */
