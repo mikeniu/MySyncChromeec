@@ -35,6 +35,7 @@
 
 enum i2c_passthru_allow_type {
 	ALLOW_IF_UNPROTECTED_BY_AP,
+	BATTERY_ALLOW_PASSTHRU,
 };
 
 struct i2c_passthru_t {
@@ -128,6 +129,37 @@ allow_if_unprotected_by_ap(const struct i2c_passthru_t *config,
 	return !protect_by_ap;
 }
 
+#ifdef CONFIG_BATTERY
+static int battery_allow_passthru(const struct i2c_passthru_t *config,
+				  const struct ec_params_i2c_passthru *params,
+				  bool protect_by_ap)
+{
+	struct msg_queue_t msg_queue;
+	struct i2c_battery_parser_state parser_state =
+		i2c_battery_parser_state_create();
+
+	if (!protect_by_ap)
+		return 1;
+
+	for (msg_queue = msg_queue_create(params);
+	     msg_queue.msg < msg_queue.msg_end;) {
+		const struct msg_value_t val = msg_queue_front(&msg_queue);
+
+		if (is_i2c_battery(config->port, val.addr_flags, false)) {
+			if (battery_permission_handler(
+				    &parser_state, msg_queue.in_len,
+				    val.xferflags, val.read_len, val.write_len,
+				    msg_queue.out))
+				return 0;
+		}
+
+		msg_queue_pop_front(&msg_queue, &val);
+	}
+
+	return 1;
+}
+#endif
+
 static int i2c_allow_passthru(const struct i2c_passthru_t *config,
 			      const struct ec_params_i2c_passthru *params)
 {
@@ -137,6 +169,10 @@ static int i2c_allow_passthru(const struct i2c_passthru_t *config,
 	case ALLOW_IF_UNPROTECTED_BY_AP:
 		return allow_if_unprotected_by_ap(config, params,
 						  protect_by_ap);
+#ifdef CONFIG_BATTERY
+	case BATTERY_ALLOW_PASSTHRU:
+		return battery_allow_passthru(config, params, protect_by_ap);
+#endif
 
 	default:
 		return 0;

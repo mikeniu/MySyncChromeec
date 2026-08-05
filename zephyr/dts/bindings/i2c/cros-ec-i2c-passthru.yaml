@@ -48,8 +48,12 @@ child-binding:
       type: string
       enum:
         - "ALLOW_IF_UNPROTECTED_BY_AP"
+        - "BATTERY_ALLOW_PASSTHRU"
       description: |
         Passthru check type for this port. The default is
         "ALLOW_IF_UNPROTECTED_BY_AP", which means that the port is unprotected
         even if system_is_locked() is true. The port is protected only after AP
         call the corresponding EC_CMD_I2C_PASSTHRU_PROTECT command.
+        "BATTERY_ALLOW_PASSTHRU" means that some battery command is allowed
+        after AP set the protect flag. The allowed command is defined in the
+        function battery_allow_passthru.
