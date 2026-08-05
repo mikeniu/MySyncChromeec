@@ -467,14 +467,41 @@ void pdc_power_mgmt_clear_event(int port, atomic_t event_mask);
 void pdc_power_mgmt_notify_event(int port, atomic_t event_mask);
 
 /**
+ * @brief Control if the PDC power mgmt and underlying driver threads for a
+ * specific chip (or all chips if chip < 0) are active.
+ *
+ * @param chip Chip ID or negative value for all chips
+ * @param run True to allow comms, false to suspend
+ *
+ * @retval 0 if successful or error code
+ */
+int pdc_power_mgmt_set_comms_state_for_chip(int chip, bool run);
+
+/**
  * @brief Control if the PDC power mgmt and underlying driver threads are
- *        active.
+ *        active across all chips.
  *
  * @param run True to allow comms, false to suspend
  *
  * @retval 0 if successful or error code
  */
 int pdc_power_mgmt_set_comms_state(bool run);
+
+/**
+ * @brief Return the total number of PDC chips in the system.
+ *
+ * @retval Number of chips (>=0)
+ */
+int pdc_power_mgmt_get_chip_count(void);
+
+/**
+ * @brief Return the chip ID associated with the specified USB-C port.
+ *
+ * @param port USB-C port number
+ *
+ * @retval Chip ID (>=0) if successful or negative error code
+ */
+int pdc_power_mgmt_get_chip_for_port(int port);
 
 /**
  * @brief Return the current UCSI connector status on a port

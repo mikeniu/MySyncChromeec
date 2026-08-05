@@ -155,3 +155,40 @@ ZTEST(pdc_comms_suspend_resume_api, test_suspend_resume_sbumux_debug)
 			 2000000, k_msleep(50)),
 		"CCD port did not go back to force-debug mode");
 }
+
+ZTEST(pdc_comms_suspend_resume_api, test_suspend_resume_per_chip)
+{
+	int chip_count = pdc_power_mgmt_get_chip_count();
+	zassert_true(chip_count > 0, "Chip count should be > 0");
+
+	int chip0 = pdc_power_mgmt_get_chip_for_port(0);
+	zassert_true(chip0 >= 0, "Chip for port 0 should be >= 0");
+	zassert_true(chip0 < chip_count,
+		     "Chip for port 0 should be < chip_count");
+
+	/* Test invalid chip index */
+	zassert_equal(-ERANGE,
+		      pdc_power_mgmt_set_comms_state_for_chip(99, false));
+
+	/* Test redundant resume when already active */
+	zassert_equal(-EALREADY,
+		      pdc_power_mgmt_set_comms_state_for_chip(chip0, true));
+
+	/* Suspend chip 0 */
+	zassert_ok(pdc_power_mgmt_set_comms_state_for_chip(chip0, false));
+
+	/* Test redundant suspend when already suspended */
+	zassert_equal(-EALREADY,
+		      pdc_power_mgmt_set_comms_state_for_chip(chip0, false));
+
+	/* Verify port 0 state is suspended */
+	zassert_equal(PDC_SUSPENDED, pdc_power_mgmt_get_task_state(0));
+
+	/* Resume chip 0 */
+	zassert_ok(pdc_power_mgmt_set_comms_state_for_chip(chip0, true));
+
+	/* Verify port 0 resumed */
+	zassert_true(WAIT_FOR(
+		pdc_state_machine_is_resumed(pdc_power_mgmt_get_task_state(0)),
+		500000, k_msleep(10)));
+}

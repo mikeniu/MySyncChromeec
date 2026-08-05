@@ -29,6 +29,9 @@ DEFINE_FAKE_VOID_FUNC(pdc_power_mgmt_request_data_swap, int);
 DEFINE_FAKE_VOID_FUNC(pdc_power_mgmt_request_power_swap, int);
 DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_reset, int);
 DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_comms_state, bool);
+DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_set_comms_state_for_chip, int, bool);
+DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_chip_for_port, int);
+DEFINE_FAKE_VALUE_FUNC(int, pdc_power_mgmt_get_chip_count);
 DEFINE_FAKE_VOID_FUNC(pdc_power_mgmt_set_dual_role, int,
 		      enum pd_dual_role_states);
 DEFINE_FAKE_VALUE_FUNC(enum pd_dual_role_states, pdc_power_mgmt_get_dual_role,
@@ -71,6 +74,9 @@ void helper_reset_pdc_power_mgmt_fakes(void)
 	RESET_FAKE(pdc_power_mgmt_request_power_swap);
 	RESET_FAKE(pdc_power_mgmt_reset);
 	RESET_FAKE(pdc_power_mgmt_set_comms_state);
+	RESET_FAKE(pdc_power_mgmt_set_comms_state_for_chip);
+	RESET_FAKE(pdc_power_mgmt_get_chip_for_port);
+	RESET_FAKE(pdc_power_mgmt_get_chip_count);
 	RESET_FAKE(pdc_power_mgmt_set_dual_role);
 	RESET_FAKE(pdc_power_mgmt_set_trysrc);
 	RESET_FAKE(pdc_power_mgmt_request_source_voltage);
