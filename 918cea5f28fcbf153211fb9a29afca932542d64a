@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "faf32636_e47f7c65",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T00:00:53Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8767c22b_b03a235d",
+      "revId": "918cea5f28fcbf153211fb9a29afca932542d64a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "453435b8_2767261e",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Optional Testing Suggestion:** Since `global_context.templ_valid++` was also moved inside the `if (!fingerprint_auth_enabled())` block in `fp_process_enroll`, you could optionally add `zassert_equal(global_context.templ_valid, 0);` here (and `1` in the classic flow test above) to explicitly verify that the template isn\u0027t activated for matching immediately in the Auth flow.",
       "isAi": true,
+      "revId": "918cea5f28fcbf153211fb9a29afca932542d64a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b8c1ca7_aa2a39aa",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_enroll.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T00:00:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "453435b8_2767261e",
       "revId": "918cea5f28fcbf153211fb9a29afca932542d64a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
