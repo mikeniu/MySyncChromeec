@@ -270,6 +270,30 @@
       },
       "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb5dfa31_10af2f74",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T03:03:50Z",
+      "side": 1,
+      "message": "I understand that the code is returning these values, but the point of the comment is that it\u0027s strange that the `-EIO` value (I/O error) returned by `ft_sensor_acquire_image_with_mode` is converted to `-EINVAL` (invalid parameters). You lose information about exactly what error occurred. We should probably just pass along the underlying error that `ft_sensor_acquire_image_with_mode` returned. Please file a bug and add a `TODO(b/123)` comment.",
+      "parentUuid": "ea92afe4_b5c9d028",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 17
+      },
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

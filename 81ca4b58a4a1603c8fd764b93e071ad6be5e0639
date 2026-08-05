@@ -17,6 +17,52 @@
       "isAi": true,
       "revId": "81ca4b58a4a1603c8fd764b93e071ad6be5e0639",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cd04891_dfdaa2f8",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T03:03:50Z",
+      "side": 1,
+      "message": "We no longer need this comment, right?",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 60
+      },
+      "revId": "81ca4b58a4a1603c8fd764b93e071ad6be5e0639",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8e82f72_1785153d",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T03:03:50Z",
+      "side": 1,
+      "message": "nit: (Separate CL): This cast is not necessary.",
+      "range": {
+        "startLine": 284,
+        "startChar": 16,
+        "endLine": 284,
+        "endChar": 23
+      },
+      "revId": "81ca4b58a4a1603c8fd764b93e071ad6be5e0639",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
