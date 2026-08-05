@@ -293,6 +293,9 @@ struct pdc_data_t {
 	uint8_t num_pdos;
 	/** PDO storage for command processing */
 	uint32_t pdos[PDO_MAX_OBJECTS];
+	/** Sink PDO storage for restoring during re-init */
+	uint8_t num_sink_pdos;
+	uint32_t sink_pdos[PDO_MAX_OBJECTS];
 	/** Port Partner PDO */
 	enum pdo_source_t pdo_source;
 	/** Cached PDOS */
@@ -636,6 +639,37 @@ static int pdc_exit_dead_battery(struct pdc_data_t *data)
 	return 0;
 }
 
+static int pdc_restore_sink_pdos(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	union reg_transmit_sink_capabilities pdc_tx_snk_capabilities;
+	int rv;
+
+	if (data->num_sink_pdos == 0)
+		return 0;
+
+	/* Read PDC Transmit Sink Capabilities */
+	rv = tps_rw_transmit_sink_capabilities(
+		&cfg->i2c, &pdc_tx_snk_capabilities, I2C_MSG_READ);
+	if (rv) {
+		LOG_ERR("Read transmit sink capabilities failed");
+		return -EIO;
+	}
+
+	pdc_tx_snk_capabilities.number_of_valid_pdos = data->num_sink_pdos;
+	memcpy(pdc_tx_snk_capabilities.spr_tx_sink_pdo, data->sink_pdos,
+	       sizeof(uint32_t) * data->num_sink_pdos);
+
+	/* Write PDC Transmit Sink Capabilities */
+	rv = tps_rw_transmit_sink_capabilities(
+		&cfg->i2c, &pdc_tx_snk_capabilities, I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("Write transmit sink capabilities failed");
+		return -EIO;
+	}
+	return 0;
+}
+
 static int handle_irqs(struct pdc_data_t *data)
 {
 	struct pdc_config_t const *cfg = data->dev->config;
@@ -816,6 +850,13 @@ static enum smf_state_result st_init_run(void *o)
 	rv = pdc_exit_dead_battery(data);
 	if (rv < 0) {
 		LOG_ERR("TI%d: Clear dead battery flag failed (%d)",
+			cfg->connector_number, rv);
+		goto error;
+	}
+
+	rv = pdc_restore_sink_pdos(data);
+	if (rv < 0) {
+		LOG_ERR("TI%d: restore sink pdos failed (%d)",
 			cfg->connector_number, rv);
 		goto error;
 	}
@@ -2951,6 +2992,11 @@ static int tps_set_pdos(const struct device *dev, enum pdo_type_t type,
 	data->num_pdos = count;
 	memcpy(data->pdos, pdo, sizeof(uint32_t) * count);
 
+	if (type == SINK_PDO) {
+		data->num_sink_pdos = count;
+		memcpy(data->sink_pdos, pdo, sizeof(uint32_t) * count);
+	}
+
 	return tps_post_command(dev, CMD_SET_PDOS, NULL);
 }
 
@@ -3400,6 +3446,7 @@ static int pdc_init(const struct device *dev)
 
 	data->cmd = CMD_NONE;
 	data->init_done = false;
+	data->num_sink_pdos = 0;
 	data->info.fw_version = PDC_FWVER_INVALID;
 
 	rv = gpio_pin_configure_dt(&cfg->irq_gpios, GPIO_INPUT);

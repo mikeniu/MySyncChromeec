@@ -664,6 +664,16 @@ tps6699x_emul_handle_port_control(struct tps6699x_emul_pdc_data *data,
 	data->port_control = *pc;
 }
 
+static void tps6699x_emul_handle_transmit_sink_capabilities(
+	struct tps6699x_emul_pdc_data *data,
+	const union reg_transmit_sink_capabilities *pdc_tx_snk_capabilities)
+{
+	emul_pdc_pdo_set_direct(&data->pdo, SINK_PDO, 0,
+				pdc_tx_snk_capabilities->number_of_valid_pdos,
+				LPM_PDO,
+				pdc_tx_snk_capabilities->spr_tx_sink_pdo);
+}
+
 static void
 tps6699x_emul_handle_interrupt_clear(struct tps6699x_emul_pdc_data *data)
 {
@@ -702,6 +712,11 @@ static void tps6699x_emul_handle_write(struct tps6699x_emul_pdc_data *data,
 		tps6699x_emul_handle_interrupt_clear(data);
 		gpio_emul_input_set(data->irq_gpios.port, data->irq_gpios.pin,
 				    1);
+		break;
+	case REG_TRANSMIT_SINK_CAPABILITES:
+		tps6699x_emul_handle_transmit_sink_capabilities(
+			data, (const union reg_transmit_sink_capabilities *)data
+				      ->reg_val[REG_TRANSMIT_SINK_CAPABILITES]);
 		break;
 	default:
 		/* No action on write */
@@ -1285,6 +1300,7 @@ static int tps6699x_emul_init(const struct emul *emul,
 	union reg_received_attention_vdm *attention_vdm =
 		(union reg_received_attention_vdm *)
 			data->pdc_data.reg_val[REG_RECEIVED_ATTENTION_VDM];
+	uint32_t snk_pdo[] = { PDO_FIXED(5000, 3000, 0) };
 	LOG_INF("TPS669X emul init");
 
 	data->common.i2c = parent;
@@ -1303,6 +1319,9 @@ static int tps6699x_emul_init(const struct emul *emul,
 
 	/* Init register to APP0 */
 	*((uint32_t *)reg_mode->data) = REG_MODE_APP0;
+
+	emul_pdc_pdo_set_direct(&data->pdc_data.pdo, SINK_PDO, 0, 1, LPM_PDO,
+				snk_pdo);
 
 	/* Init received attention vdm */
 	attention_vdm->number_valid_vdos = 2;
