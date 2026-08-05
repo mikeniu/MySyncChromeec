@@ -36,6 +36,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f7192d9_cc6202e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T18:04:47Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0ef744d0_b5087b61",
+      "revId": "55aab41c18abd9dd3730c60200d600651c555c94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6663064_92a2fa36",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T18:04:47Z",
+      "side": 1,
+      "message": "it cannot have negative size because the value in an unsigned integer:\n\n```\n/* Focal LIBFP algorithm private data. */\nstruct ft_libfp_data {\n\tuint16_t cols;\n\tuint16_t rows;\n\tuint32_t max_enroll_samples;\n\tuint8_t remain; // the left enroll count\n\tuint32_t tpl_finger_size; // tpl_finger_size \u003d tpl_head_size +\n\t\t\t\t  // tpl_subtemplate_size * n\n\tuint32_t tpl_head_size;\n\tuint32_t tpl_subtemplate_size;\n\tuint8_t *algo_buf;\n\tuint8_t *feature_buf;\n};\n```\n\ncreated this CL: https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8201507/1 for the zero case",
+      "parentUuid": "583f2b8c_9f062867",
+      "revId": "55aab41c18abd9dd3730c60200d600651c555c94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c41ce7c0_78d96dad",
@@ -59,6 +95,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1dc8217_f8c6ca67",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T18:04:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c41ce7c0_78d96dad",
+      "range": {
+        "startLine": 248,
+        "startChar": 0,
+        "endLine": 250,
+        "endChar": 73
+      },
+      "revId": "55aab41c18abd9dd3730c60200d600651c555c94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d258f168_daaacc11",
@@ -72,6 +132,30 @@
       "writtenOn": "2026-08-05T02:41:37Z",
       "side": 1,
       "message": "Let\u0027s file a bug and add a `TODO(b/123)` in a followup CL for this:\n\n----\n\n* **Silent Failure on Enrollment Finish:**\nSimilarly, in `test_enroll_finish_failure`, a failure in `focal_algo_enroll_finish` is masked, and the caller receives `FP_ENROLLMENT_RESULT_OK`.\n```c\nint res \u003d fingerprint_enroll_finish(fixture-\u003ealg, template_buf);\nzassert_equal(res, FP_ENROLLMENT_RESULT_OK, ...);\n\n```\n\n\n**Recommendation:** This is dangerous because the caller will assume `template_buf` contains a valid, finalized template when it does not. The driver needs to return an error code (e.g., a generic `FP_ENROLLMENT_RESULT_FAIL` if supported, or a negative error code depending on the API), and this test should be updated to expect that failure.",
+      "range": {
+        "startLine": 400,
+        "startChar": 0,
+        "endLine": 403,
+        "endChar": 61
+      },
+      "revId": "55aab41c18abd9dd3730c60200d600651c555c94",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b19b5435_f3760c36",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T18:04:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d258f168_daaacc11",
       "range": {
         "startLine": 400,
         "startChar": 0,
