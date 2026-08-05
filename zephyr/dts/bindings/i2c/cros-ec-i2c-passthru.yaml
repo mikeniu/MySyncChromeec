@@ -43,6 +43,7 @@ child-binding:
         - "ALLOW_IF_UNPROTECTED_BY_AP"
         - "ALLOW_IF_SYSTEM_UNLOCKED"
         - "ALLOW_IF_FW_CONFIG_MATCH_AND_UNPROTECTED_BY_AP"
+        - "BATTERY_ALLOW_PASSTHRU"
       description: |
         Passthru check type for this port.
     fw-config-key:
