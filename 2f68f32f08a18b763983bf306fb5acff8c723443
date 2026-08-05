@@ -294,6 +294,30 @@
       },
       "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "408c21b2_42dbd70b",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T15:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eb5dfa31_10af2f74",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 17
+      },
+      "revId": "2f68f32f08a18b763983bf306fb5acff8c723443",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

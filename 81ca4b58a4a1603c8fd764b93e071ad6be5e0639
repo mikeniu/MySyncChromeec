@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e704440a_626111cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T15:43:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f26d23b3_745b96a3",
+      "revId": "81ca4b58a4a1603c8fd764b93e071ad6be5e0639",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4cd04891_dfdaa2f8",
@@ -42,6 +60,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a265bcb_14f63911",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T15:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4cd04891_dfdaa2f8",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 60
+      },
+      "revId": "81ca4b58a4a1603c8fd764b93e071ad6be5e0639",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8e82f72_1785153d",
@@ -55,6 +97,30 @@
       "writtenOn": "2026-08-05T03:03:50Z",
       "side": 1,
       "message": "nit: (Separate CL): This cast is not necessary.",
+      "range": {
+        "startLine": 284,
+        "startChar": 16,
+        "endLine": 284,
+        "endChar": 23
+      },
+      "revId": "81ca4b58a4a1603c8fd764b93e071ad6be5e0639",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7e8073c_15ddfecc",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-05T15:43:12Z",
+      "side": 1,
+      "message": "will do in a separate CL",
+      "parentUuid": "b8e82f72_1785153d",
       "range": {
         "startLine": 284,
         "startChar": 16,
