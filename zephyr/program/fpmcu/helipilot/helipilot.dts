@@ -51,6 +51,7 @@
 			offset = <0x0>;
 			size = <0x20000>;
 			ec-ro {
+				size = <0x20000>;
 				pad-byte = <0xff>;
 				ro-fw {
 					/*
