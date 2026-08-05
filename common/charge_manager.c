@@ -163,9 +163,6 @@ static int delayed_override_port = OVERRIDE_OFF;
 static timestamp_t delayed_override_deadline;
 static bool charger_insufficient_adapter_found = false;
 
-/* Source-out Rp values for TCPMv1 */
-__maybe_unused static uint8_t source_port_rp[CONFIG_USB_PD_PORT_MAX_COUNT];
-
 #ifdef CONFIG_USB_PD_MAX_TOTAL_SOURCE_CURRENT
 /* 3A on one port and 1.5A on the rest */
 BUILD_ASSERT(CONFIG_USB_PD_PORT_MAX_COUNT * 1500 + 1500 <=
@@ -306,8 +303,6 @@ static void charge_manager_init(void)
 			charge_ceil[i][j] = CHARGE_CEIL_NONE;
 		if (!is_pd_port(i))
 			dualrole_capability[i] = CAP_DEDICATED;
-		if (is_pd_port(i) && !IS_ENABLED(CONFIG_USB_PD_TCPMV2))
-			source_port_rp[i] = CONFIG_USB_PD_PULLUP;
 	}
 }
 #ifndef CONFIG_USB_PDC_POWER_MGMT
@@ -386,15 +381,7 @@ static int charge_manager_get_source_current(int port)
 		return pdc_dpm_get_source_current(port);
 	}
 
-	switch (source_port_rp[port]) {
-	case TYPEC_RP_3A0:
-		return 3000;
-	case TYPEC_RP_1A5:
-		return 1500;
-	case TYPEC_RP_USB:
-	default:
-		return 500;
-	}
+	return 500;
 }
 
 /*
