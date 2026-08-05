@@ -2468,8 +2468,9 @@ static enum smf_state_result st_task_wait_run(void *o)
 	 *  2) command is set to "!CMD" for unknown command
 	 */
 	if (cmd.command && cmd.command != COMMAND_TASK_NO_COMMAND) {
-		LOG_INF("TI%d: Data not ready, check again in %d ms",
-			cfg->connector_number, PDC_TI_DATA_READY_TIME_MS);
+		LOG_INF("TI%d: Data not ready, check again in %d ms (0x%08x)",
+			cfg->connector_number, PDC_TI_DATA_READY_TIME_MS,
+			cmd.command);
 		k_work_reschedule(&data->data_ready,
 				  K_MSEC(PDC_TI_DATA_READY_TIME_MS));
 		return SMF_EVENT_HANDLED;
@@ -2492,10 +2493,10 @@ static enum smf_state_result st_task_wait_run(void *o)
 	if (cmd.command || cmd_data.data[0] != 0) {
 		/* Command has completed with error */
 		if (cmd.command == COMMAND_TASK_NO_COMMAND) {
-			LOG_DBG("TI%d: Command %d not supported",
+			LOG_ERR("TI%d: Command %d not supported",
 				cfg->connector_number, data->cmd);
 		} else {
-			LOG_DBG("TI%d: Command %d failed. Err : %d",
+			LOG_ERR("TI%d: Command %d failed. Err : %d",
 				cfg->connector_number, data->cmd,
 				cmd_data.data[0]);
 		}
