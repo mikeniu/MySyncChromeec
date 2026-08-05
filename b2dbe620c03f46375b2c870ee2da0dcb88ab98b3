@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "92e0e72b_bb70692d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-05T21:41:52Z",
+      "side": 1,
+      "message": "See https://docs.google.com/spreadsheets/d/1sqd9zUV4RwQ2TMAM4DwntEeQgjSGAOMF791UwBwAjwU for an example",
+      "parentUuid": "f0a27d63_8a840afe",
+      "revId": "b2dbe620c03f46375b2c870ee2da0dcb88ab98b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "677c9e0f_ce2e130d",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-05T16:07:25Z",
       "side": 1,
       "message": "This is kind of rough, can you address the issues or file a follow up bug?",
+      "revId": "b2dbe620c03f46375b2c870ee2da0dcb88ab98b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6632e5ac_594d2157",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-05T21:41:52Z",
+      "side": 1,
+      "message": "cleaned up. some lint exemptions were moved to where needed.",
+      "parentUuid": "677c9e0f_ce2e130d",
       "revId": "b2dbe620c03f46375b2c870ee2da0dcb88ab98b3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -69,6 +105,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4188ad5_e7012ce0",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-05T21:41:52Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be included, removed. (btw, cros-tree is useful, see go/cral-tree)",
+      "parentUuid": "945147ee_f2eb0ca6",
+      "revId": "b2dbe620c03f46375b2c870ee2da0dcb88ab98b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a87730b3_4b26fa8a",
@@ -82,6 +136,30 @@
       "writtenOn": "2026-08-05T16:07:25Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: It looks like `self._evaluate_cumulative_plan()` is never called, so `cumulative_plan` is never added to the returned dictionary. This means the \"Verified Cumulative Optimization Fragment\" section will not appear in the generated report.\n\nYou probably want to call it and include its return value here:\n```python\n        cumulative_plan \u003d self._evaluate_cumulative_plan()\n\n        return {\n            \"target\": self.target,\n            \"baseline\": {\n                \"flash\": self.baseline_flash,\n                \"ram\": self.baseline_ram,\n            },\n            \"results\": self.results,\n            \"cumulative_plan\": cumulative_plan,\n        }\n```",
+      "range": {
+        "startLine": 823,
+        "startChar": 0,
+        "endLine": 823,
+        "endChar": 0
+      },
+      "revId": "b2dbe620c03f46375b2c870ee2da0dcb88ab98b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8d6b95a_9c68a317",
+        "filename": "util/zephyr_kconfig_size_optimizer.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 823,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-05T21:41:52Z",
+      "side": 1,
+      "message": "cumulative_plan was supposed to be removed, I just missed it. Removed.",
+      "parentUuid": "a87730b3_4b26fa8a",
       "range": {
         "startLine": 823,
         "startChar": 0,
