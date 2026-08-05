@@ -16,6 +16,24 @@
       "message": "could you get away with `test_export_static` in `cached_ufsc_ready` reset it directly in the tests? bit less invasive I think. same for the other one",
       "revId": "31c3431cb15cf1d241dffd3548e6396c4fcaa6f5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b04a132a_134b7718",
+        "filename": "zephyr/shim/src/cbi/cros_cbi_ufsc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-05T22:24:53Z",
+      "side": 1,
+      "message": "I forgot `test_export_static`. Now fixed.",
+      "parentUuid": "1273362a_d2c57d49",
+      "revId": "31c3431cb15cf1d241dffd3548e6396c4fcaa6f5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
