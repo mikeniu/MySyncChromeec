@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "080b7469_7aafce5d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T02:29:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n### Review Summary\n\n*   **Functionality**: The changes successfully introduce an early `EC_MKBP_FP_FINGER_DOWN` notification before image processing. By relying on stateless evaluation, the code correctly aligns with the host framework\u0027s requirement to receive a signal on every capture attempt, including retries. The recent addition of parentheses around the bitwise AND operation improves readability.\n*   **Style**: The code integrates cleanly into the existing `fp_task` event loop and maintains readability with appropriate comments.\n*   **Testing**: Test coverage is excellent. The added `test_finger_capture_held_finger_no_duplicate_events` correctly confirms that `FINGER_DOWN` is sent exactly once per successful capture sequence.\n*   **Security**: No security vulnerabilities or data leaks were identified.\n*   **CL Size \u0026 Scope**: The CL is small, well-scoped, and focuses exactly on its intended goal.\n\nTAG\u003dagy\nCONV\u003de329daee-e0a7-402c-a535-8e50b5baea2d",
+      "isAi": true,
+      "revId": "af8426346ee0facc8abf147a56d36385529c28dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
