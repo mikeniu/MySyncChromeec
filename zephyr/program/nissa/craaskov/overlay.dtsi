@@ -357,3 +357,16 @@
 	leak-gpios = <&gpioa 4 GPIO_OPEN_DRAIN
 		      &gpiof 1 GPIO_OPEN_DRAIN>;
 };
+
+/ {
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port3@3 {
+			reg = <3>;
+			i2c-port = <&i2c3_0>;
+		};
+	};
+};
