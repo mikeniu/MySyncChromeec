@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6aecd5d3_61f78541",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-05T03:06:56Z",
+      "side": 1,
+      "message": "These are magic numbers. Can you derive them from something (DTS) and then add 1 to be just past the boundary?",
+      "range": {
+        "startLine": 235,
+        "startChar": 0,
+        "endLine": 236,
+        "endChar": 44
+      },
+      "revId": "7bd5ad0fb43819bd4644f2b8b4064f59d08ace90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
