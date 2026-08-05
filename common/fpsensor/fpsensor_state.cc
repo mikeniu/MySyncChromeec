@@ -202,6 +202,14 @@ static int validate_fp_mode(const uint32_t mode)
 			return EC_ERROR_INVAL;
 	}
 
+	/*
+	 * Reject mode changes while a crypto operation is in progress.
+	 */
+	if (!(mode & FP_MODE_DONT_CHANGE) &&
+	    (cur_mode & FP_MODES_CRYPTO_IN_PROGRESS)) {
+		return EC_ERROR_INVAL;
+	}
+
 	return EC_SUCCESS;
 }
 
