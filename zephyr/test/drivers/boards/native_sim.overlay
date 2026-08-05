@@ -411,6 +411,11 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
+		battery_passthru {
+			i2c-port = <&i2c0>;
+			allow-type = "BATTERY_ALLOW_PASSTHRU";
+		};
+
 		usb_c0_passthru {
 			i2c-port = <&i2c2>;
 			allow-type = "ALLOW_IF_UNPROTECTED_BY_AP";
