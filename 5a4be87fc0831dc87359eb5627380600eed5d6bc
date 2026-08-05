@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9442125_dd53c7c8",
+        "filename": "zephyr/include/drivers/led.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-05T17:22:28Z",
+      "side": 1,
+      "message": "Added the comment.",
+      "parentUuid": "efe433f6_86343690",
+      "revId": "5a4be87fc0831dc87359eb5627380600eed5d6bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "03e8b1ab_a791c806",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-04T23:36:32Z",
       "side": 1,
       "message": "Do you know why this field ends up as other than a 1-byte object?",
+      "revId": "5a4be87fc0831dc87359eb5627380600eed5d6bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c97d980b_9d51c302",
+        "filename": "zephyr/include/drivers/led.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-05T17:22:28Z",
+      "side": 1,
+      "message": "I used to think it was 1-byte; but actually it is not. The following BUILD_ASSERT passes to confirm that. Looks like we don\u0027t pass `-fshort-enums` to the toolchain so it defaults to 4-byte. Now use `uint8_t` to avoid any ambiguity.\n```\nBUILD_ASSERT(sizeof(enum ec_led_id) \u003d\u003d 4);\n```",
+      "parentUuid": "03e8b1ab_a791c806",
       "revId": "5a4be87fc0831dc87359eb5627380600eed5d6bc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
