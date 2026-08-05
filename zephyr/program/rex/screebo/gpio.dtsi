@@ -242,6 +242,17 @@
 			enum-names = "I2C_PORT_EEPROM";
 		};
 	};
+
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port4@4 {
+			reg = <4>;
+			i2c-port = <&i2c4_1>;
+		};
+	};
 };
 
 &adc0 {
