@@ -110,6 +110,19 @@ static int custom_get_finger_detailed_info_too_large(int *finger_size,
 	return 0;
 }
 
+static int custom_get_finger_detailed_info_zero_size(int *finger_size,
+						     int *subtpl_size,
+						     int *head_size)
+{
+	if (finger_size)
+		*finger_size = 0;
+	if (subtpl_size)
+		*subtpl_size = FOCAL_TEMPLATE_SUBTEMPLATE_SIZE;
+	if (head_size)
+		*head_size = FOCAL_TEMPLATE_HEADER_SIZE;
+	return 0;
+}
+
 static int custom_match_update_flag(uint8_t *feature, uint8_t *tpl,
 				    uint8_t *update_flag)
 {
@@ -226,6 +239,14 @@ ZTEST_F(ft98xx_bio_alg, test_init_template_size_exceeded)
 	focal_algo_get_finger_detailed_info_fake.custom_fake =
 		custom_get_finger_detailed_info_too_large;
 	zassert_equal(fingerprint_algorithm_init(fixture->alg), -EINVAL);
+}
+
+ZTEST_F(ft98xx_bio_alg, test_init_template_size_zero_fails)
+{
+	focal_algo_get_finger_detailed_info_fake.custom_fake =
+		custom_get_finger_detailed_info_zero_size;
+	zassert_equal(fingerprint_algorithm_init(fixture->alg), -EINVAL,
+		      "Expected -EINVAL when template size is 0.");
 }
 
 ZTEST_F(ft98xx_bio_alg, test_exit_success)
