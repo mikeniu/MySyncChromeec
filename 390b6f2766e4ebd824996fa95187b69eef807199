@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b66923f_75f2ba03",
+        "filename": "test/build.mk",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-05T23:42:38Z",
+      "side": 1,
+      "message": "Was adding `printf` to `test-list-host` intended? The commit message only mentions removing the `queue` host test. This looks like an accidental replacement, perhaps from a rebase conflict resolution.",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 0
+      },
+      "revId": "390b6f2766e4ebd824996fa95187b69eef807199",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81e3ac86_3d9e7519",
+        "filename": "test/build.mk",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-05T23:42:38Z",
+      "side": 1,
+      "message": "Same as above, replacing `queue` with `printf` here seems unintentional.",
+      "range": {
+        "startLine": 102,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 0
+      },
+      "revId": "390b6f2766e4ebd824996fa95187b69eef807199",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
