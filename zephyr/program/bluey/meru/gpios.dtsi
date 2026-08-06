@@ -212,7 +212,14 @@
 		gpio_en_pp3300_base_x: en_pp3300_base_x {
 			gpios = <&gpiob 6 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
-
+		/* Amber LED */
+		gpio_led_amber: led_amber {
+			gpios = <&gpioc 3 GPIO_OUTPUT_LOW>;
+		};
+		/* White LED */
+		gpio_led_white: led_white {
+			gpios = <&gpioc 2 GPIO_OUTPUT_LOW>;
+		};
 	};
 	unused-pins {
 		compatible = "unused-gpios";
@@ -233,8 +240,6 @@
 			<&gpio8 6 0>,
 			<&gpio9 1 0>,
 			<&gpio9 2 0>,
-			<&gpioc 2 0>,
-			<&gpioc 3 0>,
 			<&gpioc 5 0>,
 			<&gpiod 5 0>,
 			<&gpioe 1 0>,
