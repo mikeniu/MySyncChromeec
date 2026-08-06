@@ -337,6 +337,10 @@ def main():
         "--coverage",
         action="store_true",
     )
+    parser.add_argument(
+        "--coverage-per-test",
+        action="store_true",
+    )
 
     intercepted_args, other_args = parser.parse_known_args()
 
@@ -346,9 +350,19 @@ def main():
 
     # Zephyr upstream defaults to using gcovr, but this isn't
     # available in the chroot.  Force our runs to use lcov.
-    if intercepted_args.coverage:
+    if intercepted_args.coverage or intercepted_args.coverage_per_test:
         twister_cli.append("--coverage")
         twister_cli.extend(["--coverage-tool", "lcov"])
+        twister_cli.extend(["--coverage-formats", "lcov"])
+
+    if intercepted_args.coverage_per_test:
+        twister_cli.append("--coverage-per-test")
+        twister_cli.extend(
+            [
+                "-x=CONFIG_ZTEST_COVERAGE_PER_TEST=y",
+                "-x=CONFIG_ZTEST_COVERAGE_RESET_BEFORE_TESTS=y",
+            ]
+        )
 
     for _ in range(intercepted_args.verbose):
         # Pass verbosity setting through to twister
@@ -386,12 +400,16 @@ def main():
     if intercepted_args.platform:
         # Pass user-provided -p args when present.
         for arg in intercepted_args.platform:
-            twister_cli.extend(["-p", arg])
+            if not (
+                intercepted_args.coverage_per_test and "unit_testing" in arg
+            ):
+                twister_cli.extend(["-p", arg])
     else:
         # native_sim and unit_testing when nothing was requested by user.
         twister_cli.extend(["-p", "native_sim"])
-        twister_cli.extend(["-p", "unit_testing"])
-        twister_cli.extend(["-p", "unit_testing/unit_testing"])
+        if not intercepted_args.coverage_per_test:
+            twister_cli.extend(["-p", "unit_testing"])
+            twister_cli.extend(["-p", "unit_testing/unit_testing"])
 
     twister_cli.extend(["--outdir", intercepted_args.outdir])
 
