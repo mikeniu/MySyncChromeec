@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a9f65e0_ba7c0667",
+        "filename": "zephyr/Kconfig.defaults",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-06T15:22:45Z",
+      "side": 1,
+      "message": "Is this a bug in upstream?  As I understand by using config here, we effectively make the full definition look like:\n```\nconfig ISR_TABLES_LOCAL_DECLARATION\n    bool\n    default y\n    depends on PLATFORM_EC\n```\n\nDependency on PLATFORM_EC occurs because the rsource statement is wrapped by `if PLATFORM_EC`.",
+      "range": {
+        "startLine": 79,
+        "startChar": 34,
+        "endLine": 79,
+        "endChar": 54
+      },
+      "revId": "86f43bc20ff560d061781323e98d84d8efd7514d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
