@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfc88041_b25460c1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-08-06T21:12:18Z",
+      "side": 1,
+      "message": "I think VEML3328 could be safely removed",
+      "range": {
+        "startLine": 13,
+        "startChar": 40,
+        "endLine": 13,
+        "endChar": 52
+      },
+      "revId": "223b33cd3e272933a71eb73bb4637822f16b8cc9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
