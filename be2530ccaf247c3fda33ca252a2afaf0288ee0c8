@@ -1,0 +1,173 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90f28ba6_3908c5ce",
+        "filename": "driver/accelgyro_icm426xx.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T21:09:30Z",
+      "side": 0,
+      "message": "Done. Restored driver/accelgyro_icm426xx.c in PS7.",
+      "parentUuid": "e1f1801d_ddae3dbc",
+      "range": {
+        "startLine": 6,
+        "startChar": 3,
+        "endLine": 7,
+        "endChar": 3
+      },
+      "isAi": true,
+      "revId": "be2530ccaf247c3fda33ca252a2afaf0288ee0c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f21d112f_8424bc5f",
+        "filename": "driver/als_cm32183.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T21:09:30Z",
+      "side": 0,
+      "message": "Done. Preserved driver/als_cm32183.c.",
+      "parentUuid": "65be0726_41c4b148",
+      "range": {
+        "startLine": 5,
+        "startChar": 11,
+        "endLine": 5,
+        "endChar": 18
+      },
+      "isAi": true,
+      "revId": "be2530ccaf247c3fda33ca252a2afaf0288ee0c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea37bf91_1c1971d0",
+        "filename": "driver/als_veml3328.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T21:09:30Z",
+      "side": 0,
+      "message": "Done. Preserved driver/als_veml3328.c.",
+      "parentUuid": "62a4f563_c2e8e8fa",
+      "range": {
+        "startLine": 5,
+        "startChar": 10,
+        "endLine": 5,
+        "endChar": 18
+      },
+      "isAi": true,
+      "revId": "be2530ccaf247c3fda33ca252a2afaf0288ee0c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0bfe2fb_1ec0c93a",
+        "filename": "driver/ioexpander/ioexpander_nct38xx.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T21:09:30Z",
+      "side": 0,
+      "message": "Done. Restored driver/ioexpander/ioexpander_nct38xx.c in PS7.",
+      "parentUuid": "952552dc_42d55cba",
+      "isAi": true,
+      "revId": "be2530ccaf247c3fda33ca252a2afaf0288ee0c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a50ee906_e61f2284",
+        "filename": "driver/ppc/rt1718s.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T21:09:30Z",
+      "side": 0,
+      "message": "Done. Restored driver/ppc/rt1718s.c in PS7.",
+      "parentUuid": "49bd0144_7d6f0fb2",
+      "range": {
+        "startLine": 6,
+        "startChar": 3,
+        "endLine": 6,
+        "endChar": 46
+      },
+      "isAi": true,
+      "revId": "be2530ccaf247c3fda33ca252a2afaf0288ee0c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07813918_d23f2730",
+        "filename": "driver/tcpm/it83xx.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T21:09:30Z",
+      "side": 0,
+      "message": "Done. Restored driver/tcpm/it83xx.c in PS7.",
+      "parentUuid": "fac6ff1f_1ef41819",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 36
+      },
+      "isAi": true,
+      "revId": "be2530ccaf247c3fda33ca252a2afaf0288ee0c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b0b9518_7a8d8212",
+        "filename": "driver/usb_mux/anx7451.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T21:09:30Z",
+      "side": 0,
+      "message": "Done. Restored driver/usb_mux/anx7451.c in PS7.",
+      "parentUuid": "be90d266_46040f14",
+      "range": {
+        "startLine": 5,
+        "startChar": 3,
+        "endLine": 5,
+        "endChar": 28
+      },
+      "isAi": true,
+      "revId": "be2530ccaf247c3fda33ca252a2afaf0288ee0c8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
