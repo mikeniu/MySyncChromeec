@@ -32,6 +32,30 @@
 		};
 	};
 
+	named-adc-channels {
+
+		adc_temp_pmic: pmic {
+			enum-name = "ADC_TEMP_SENSOR_1";
+			io-channels = <&adc0 0>;
+		};
+		adc_temp_ambient: ambient {
+			enum-name = "ADC_TEMP_SENSOR_2";
+			io-channels = <&adc0 1>;
+		};
+		adc_temp_ssd: ssd {
+			enum-name = "ADC_TEMP_SENSOR_3";
+			io-channels = <&adc0 2>;
+		};
+		adc_temp_charger: charger {
+			enum-name = "ADC_TEMP_SENSOR_4";
+			io-channels = <&adc0 3>;
+		};
+		adc_usb_keyboard_det: usb_keyboard_det {
+			enum-name = "ADC_BASE_DET";
+			io-channels = <&adc0 6>;
+		};
+	};
+
 	gpio-interrupts {
 		int_extpower_a: extpower_a {
 			irq-pin = <&gpio_smb2360_a_chg_led_pg_odl>;
@@ -47,6 +71,11 @@
 			irq-pin = <&gpio_gsc_ec_voldn_btn_odl>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "button_interrupt";
+		};
+		int_lid_360: lid_360 {
+			irq-pin = <&gpio_lid_360_l>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "tablet_interrupt";
 		};
 	};
 };
@@ -95,3 +124,12 @@
 	apb4-prescaler = <1>;
 };
 
+&adc0 {
+	pinctrl-0 = <&adc0_chan0_gp45
+		&adc0_chan1_gp44
+		&adc0_chan2_gp43
+		&adc0_chan3_gp42
+		&adc0_chan6_gp34
+		&adc0_chan11_gpc7>;
+	pinctrl-names = "default";
+};

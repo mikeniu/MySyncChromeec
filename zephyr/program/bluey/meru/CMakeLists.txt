@@ -4,3 +4,4 @@
 
 zephyr_library_sources("src/extpower_custom.c")
 zephyr_library_sources("src/chipset.c")
+zephyr_library_sources("src/base_detect.c")
