@@ -275,7 +275,8 @@ static void fp_process_finger(void)
 #endif /* HAVE_FP_PRIVATE_DRIVER */
 
 static enum ec_error_list encrypt_template(uint16_t fgr);
-static enum ec_status fp_commit_template(std::span<const uint8_t> context);
+test_export_static enum ec_status
+fp_commit_template(std::span<const uint8_t> context);
 
 extern "C" void fp_task(void)
 {
@@ -875,7 +876,8 @@ validate_template_format(struct ec_fp_template_encryption_metadata *enc_info)
 	return EC_RES_SUCCESS;
 }
 
-static enum ec_status fp_commit_template(std::span<const uint8_t> context)
+test_export_static enum ec_status
+fp_commit_template(std::span<const uint8_t> context)
 {
 	ScopedFastCpu fast_cpu;
 

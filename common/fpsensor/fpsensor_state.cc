@@ -4,6 +4,7 @@
  */
 
 #include "atomic.h"
+#include "atomic_bit.h"
 #include "common.h"
 #include "compile_time_macros.h"
 #include "ec_commands.h"
@@ -70,6 +71,8 @@ struct fpsensor_context global_context = {
         .template_encrypted_id = FP_NO_SUCH_TEMPLATE,
 };
 
+enum ec_status fp_commit_template(std::span<const uint8_t> context);
+
 int fp_tpm_seed_is_set(void)
 {
 	return global_context.fp_encryption_status & FP_ENC_STATUS_SEED_SET;
@@ -80,8 +83,18 @@ __test_only void fp_task_simulate(void)
 {
 	int timeout_us = -1;
 
-	while (1)
+	while (1) {
 		task_wait_event(timeout_us);
+
+		/* Handle asynchronous template decryption. */
+		if (global_context.sensor_mode & FP_MODE_DECRYPT_TEMPLATE) {
+			enum ec_status res =
+				fp_commit_template(global_context.user_id);
+			atomic_set(&global_context.template_decryption_result,
+				   res);
+			global_context.sensor_mode &= ~FP_MODE_DECRYPT_TEMPLATE;
+		}
+	}
 }
 /* LCOV_EXCL_STOP */
 
