@@ -37,3 +37,5 @@ static void set_bq25710_charge_option(void)
 	}
 }
 DECLARE_HOOK(HOOK_INIT, set_bq25710_charge_option, HOOK_PRIO_DEFAULT);
+
+//test
