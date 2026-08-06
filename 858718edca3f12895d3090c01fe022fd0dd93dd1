@@ -22,6 +22,48 @@
       },
       "revId": "858718edca3f12895d3090c01fe022fd0dd93dd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd56bd83_99aee708",
+        "filename": "zephyr/test/drivers/fan/src/fan.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T00:03:03Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "cd921120_ccec05f2",
+      "range": {
+        "startLine": 478,
+        "startChar": 0,
+        "endLine": 478,
+        "endChar": 0
+      },
+      "fixSuggestions": [
+        {
+          "fixId": "fe9e7543_ef4dc1df",
+          "description": "GET_AI_FIX_FOR_COMMENT prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "zephyr/test/drivers/fan/src/fan.c",
+              "range": {
+                "startLine": 478,
+                "startChar": 0,
+                "endLine": 479,
+                "endChar": 0
+              },
+              "replacement": "static const struct fan_step_1_1 temp_fan_table[] \u003d {\n"
+            }
+          ]
+        }
+      ],
+      "revId": "858718edca3f12895d3090c01fe022fd0dd93dd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
