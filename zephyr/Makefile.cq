@@ -186,6 +186,7 @@ $(BUILD)/zephyr/%_final.info: $(BUILD)/zephyr/%_stenciled.info
 	'$(PLATFORM_EC)/zephyr/include/drivers/fingerprint_sim.h' \
 	'$(PLATFORM_EC)/zephyr/include/drivers/fingerprint.h' \
 	'$(PLATFORM_EC)/zephyr/include/drivers/vivaldi_kbd.h' \
+	'$(PLATFORM_EC)/zephyr/program/ec-aic/**' \
 	'$(PLATFORM_EC)/zephyr/shim/chip/**' \
 	'$(PLATFORM_EC)/zephyr/shim/chip/npcx/npcx_monitor/**' \
 	'$(PLATFORM_EC)/zephyr/shim/core/**' \
