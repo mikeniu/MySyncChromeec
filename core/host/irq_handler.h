@@ -19,10 +19,7 @@
 	static void __keep routine(void);                            \
 	void IRQ_HANDLER(irq)(void)                                  \
 	{                                                            \
-		void *ret = __builtin_return_address(0);             \
-		task_start_irq_handler(ret);                         \
 		routine();                                           \
-		task_resched_if_needed(ret);                         \
 	}                                                            \
 	const struct irq_priority __keep IRQ_PRIORITY(irq)           \
 		__attribute__((section(".rodata.irqprio"))) = { irq, \

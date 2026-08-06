@@ -2039,8 +2039,7 @@ static __maybe_unused int reset_device_and_notify(int port)
 	 * waking the TCPC, but it has also set PD_EVENT_TCPC_RESET again, which
 	 * would result in a second, unnecessary init.
 	 */
-	atomic_clear_bits(task_get_event_bitmap(task_get_current()),
-			  PD_EVENT_TCPC_RESET);
+	task_clear_event(task_get_current(), PD_EVENT_TCPC_RESET);
 
 	waiting_tasks = atomic_clear(&tc[port].tasks_waiting_on_reset);
 

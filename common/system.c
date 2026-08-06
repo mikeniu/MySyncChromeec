@@ -619,9 +619,11 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	 *  check whether PD tasks have started (instead of VBOOT_EFS2, which
 	 *  is static).
 	 */
+#ifndef CONFIG_ZEPHYR
 	if (IS_ENABLED(CONFIG_USB_PD_ALT_MODE_DFP) && task_start_called())
 		/* Note: must be before i2c module is locked down */
 		pd_prepare_sysjump();
+#endif
 
 #ifdef CONFIG_I2C_CONTROLLER
 	/* Prepare I2C module for sysjump */
