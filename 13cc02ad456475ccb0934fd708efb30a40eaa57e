@@ -1,0 +1,29 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e3cc643_fedeabdf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T21:31:13Z",
+      "side": 1,
+      "message": "Kept driver/als_veml3328.c per Keith\u0027s note that VEML3328 is required for AVL compliance.",
+      "parentUuid": "dfc88041_b25460c1",
+      "range": {
+        "startLine": 13,
+        "startChar": 40,
+        "endLine": 13,
+        "endChar": 52
+      },
+      "isAi": true,
+      "revId": "13cc02ad456475ccb0934fd708efb30a40eaa57e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
