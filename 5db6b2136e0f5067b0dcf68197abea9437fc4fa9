@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5665668a_00914bbe",
+        "filename": "zephyr/emul/emul_bma5xy.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-06T22:44:57Z",
+      "side": 1,
+      "message": "Nit - if you change this to a lookup table, it would be cleaner.  It will also remove some lines that are not currently getting used by the tests and generating a false for uncovered lines.",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 25
+      },
+      "revId": "5db6b2136e0f5067b0dcf68197abea9437fc4fa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eca8aedf_d33152f8",
         "filename": "zephyr/test/drivers/icm42607/sensor.dts",
         "patchSetId": 13
