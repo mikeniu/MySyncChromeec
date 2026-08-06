@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ae3c0c9_11b50c78",
+        "filename": "driver/fingerprint/egis/platform/inc/plat_mem.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-08-06T08:50:52Z",
+      "side": 1,
+      "message": "Actually, `plat_free` is just a wrapper for `sys_free`.\nTherefore, its parameter should not be defined as `plat_free(void **)`.\nOn the other hand, `PLAT_FREE()` is designed to check for and prevent double-free errors, which is why it is declared with `void **`.\nIts prototype originally evolved from the macro code below:\n```c\n#define PLAT_FREE(x) \\\ndo {\\\n  assert((x) !\u003d NULL);\\\n  plat_free((x));\\\n  (x) \u003d NULL;\\\n} while(0)\n```\nHowever, since `PLAT_FREE` has now been converted into an actual function, its usage has strictly become `PLAT_FREE(void **)`.\nConsequently, it can no longer be used interchangeably with `plat_free`.",
+      "revId": "f2e1577e3db1ce7e6896f3f25f603b0f3fc3f309",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
