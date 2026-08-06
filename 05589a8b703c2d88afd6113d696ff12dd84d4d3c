@@ -1,0 +1,54 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c58a07a_47664b72",
+        "filename": "zephyr/test/hwtest/src/queue.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T14:54:32Z",
+      "side": 1,
+      "message": "Fixed in Patchset 8 (added queue_init(q)).",
+      "parentUuid": "bf566d5e_86d39b24",
+      "range": {
+        "startLine": 429,
+        "startChar": 0,
+        "endLine": 429,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "05589a8b703c2d88afd6113d696ff12dd84d4d3c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec02074e_2f0eda52",
+        "filename": "zephyr/test/hwtest/src/queue.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T14:54:32Z",
+      "side": 1,
+      "message": "Fixed in Patchset 8 (added queue_init(q)).",
+      "parentUuid": "6b27f4d9_57adce07",
+      "range": {
+        "startLine": 451,
+        "startChar": 0,
+        "endLine": 451,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "05589a8b703c2d88afd6113d696ff12dd84d4d3c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
