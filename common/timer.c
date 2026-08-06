@@ -131,8 +131,10 @@ void force_time(timestamp_t ts)
 			interrupt_enable();
 	}
 
+#ifndef CONFIG_ZEPHYR
 	/* some timers might be already expired : process them */
 	task_trigger_irq(timer_irq);
+#endif
 }
 
 /*
