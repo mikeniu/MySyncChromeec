@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3728ccb7_1a857243",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-06T17:20:27Z",
+      "side": 1,
+      "message": "Can this be simplified by using the `elftools` package?",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 55
+      },
+      "revId": "e84756a8192ed8c335b531c06a809a152a65283a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
