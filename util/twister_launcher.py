@@ -340,6 +340,7 @@ def main():
 
     intercepted_args, other_args = parser.parse_known_args()
 
+    twister_cli.extend(["-x=USE_CCACHE=1"])
     # We allow help to run outside the sandbox.
     if intercepted_args.help:
         twister_cli.append("--help")
