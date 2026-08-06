@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3a4005d4_108f29db",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T17:21:55Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "06612658_20231244",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ca2df655_1e6c592a",
         "filename": "zephyr/drivers/buttons/buttons.c",
         "patchSetId": 16
@@ -31,6 +49,30 @@
       "writtenOn": "2026-08-06T10:33:23Z",
       "side": 1,
       "message": "oh I realize now that these are custom codes, I think we should use codes from `include/zephyr/dt-bindings/input/input-event-codes.h`, just for the dt-\u003einput interface, internally these are fine. Could you handle that as well? sorry for the extra work this seems like the right moment for doing it, `INPUT_KEY_POWER` `INPUT_KEY_VOLUMEDOWN` `INPUT_KEY_VOLUMEUP` are already there, recovery is not maybe let\u0027s keep a custom code for that one at the end of the range (`0xffff`) and drop the others from `zephyr/include/dt-bindings/buttons.h`",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 25
+      },
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99ba77e8_1cb29d07",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T17:21:55Z",
+      "side": 1,
+      "message": "No worries, it is better to use zephyr code as much as possible. I will take care of this.",
+      "parentUuid": "ca2df655_1e6c592a",
       "range": {
         "startLine": 63,
         "startChar": 0,
@@ -60,6 +102,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "35861231_606ddcc5",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T17:21:55Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4ca6b7eb_9ac71809",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "18dba4a9_ade4aca2",
         "filename": "zephyr/drivers/buttons/buttons.c",
         "patchSetId": 16
@@ -71,6 +131,24 @@
       "writtenOn": "2026-08-06T10:33:23Z",
       "side": 1,
       "message": "use `bool`, then you can just do `if (pressed)` and save few bytes on the stack",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "965a6eaa_c0df40ce",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T17:21:55Z",
+      "side": 1,
+      "message": "I could remove this variable and just use `gpio_pin_get_dt` output:\n```\n\tif (gpio_pin_get_dt(\u0026vol_up_gpio) \u003e 0) {\n\t\tboot_button_state |\u003d BIT(BUTTON_VOLUME_UP);\n\t}\n```",
+      "parentUuid": "18dba4a9_ade4aca2",
       "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -94,6 +172,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c8d6e4a_fbc878d5",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T17:21:55Z",
+      "side": 1,
+      "message": "You are right, we can remove this guard.",
+      "parentUuid": "5b9313d8_2b5f2050",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f91dd053_25838467",
         "filename": "zephyr/test/drivers/boards/buttons.dtsi",
         "patchSetId": 16
@@ -105,6 +201,24 @@
       "writtenOn": "2026-08-06T10:33:23Z",
       "side": 1,
       "message": "yeah so see my comment above, this one can just use `zephyr/dt-bindings/input/input-event-codes.h` and the standard codes",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f748086_15d35783",
+        "filename": "zephyr/test/drivers/boards/buttons.dtsi",
+        "patchSetId": 16
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T17:21:55Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f91dd053_25838467",
       "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
