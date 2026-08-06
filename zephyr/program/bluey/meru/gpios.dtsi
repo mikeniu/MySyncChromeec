@@ -204,6 +204,27 @@
 		compatible = "unused-gpios";
 
 		unused-gpios =
+			<&gpio0 3 0>,
+			<&gpio0 4 0>,
+			<&gpio0 5 0>,
+			<&gpio0 6 0>,
+			<&gpio0 7 0>,
+			<&gpio1 0 0>,
+			<&gpio1 1 0>,
+			<&gpio1 2 0>,
+			<&gpio1 3 0>,
+			<&gpio1 4 0>,
+			<&gpio1 5 0>,
+			<&gpio1 6 0>,
+			<&gpio1 7 0>,
+			<&gpio2 0 0>,
+			<&gpio2 1 0>,
+			<&gpio2 2 0>,
+			<&gpio2 3 0>,
+			<&gpio2 4 0>,
+			<&gpio2 5 0>,
+			<&gpio2 6 0>,
+			<&gpio2 7 0>,
 			<&gpio3 0 0>, /* EC_INT_MIPI_N */
 			<&gpio3 1 0>, /* EC_RST_MIPI_N */
 			<&gpio3 2 0>,
@@ -217,12 +238,15 @@
 			<&gpio7 2 0>,
 			<&gpio7 3 0>, /* EN_PP3300_MIPI_X */
 			<&gpio8 1 0>,
+			<&gpio8 2 0>,
+			<&gpio8 3 0>,
 			<&gpio8 6 0>, /* FP_RESET_EC */
 			<&gpio9 1 0>,
 			<&gpio9 2 0>,
 			<&gpio9 5 0>,
 			<&gpioa 3 0>, /* IMU_INT_EC_L */
 			<&gpioa 6 0>,
+			<&gpiob 1 0>,
 			<&gpiob 2 0>, /* I2C_SSC_6_EC_SDA */
 			<&gpiob 3 0>, /* I2C_SSC_6_EC_SCL */
 			<&gpiob 7 0>, /* EN_PP1800_TCHSCR_X */

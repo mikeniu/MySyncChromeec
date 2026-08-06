@@ -17,7 +17,6 @@
 
 #include "gpios.dtsi"
 #include "battery.dtsi"
-#include "keyboard.dtsi"
 #include "temp_sensors.dtsi"
 #include "i2c.dtsi"
 
