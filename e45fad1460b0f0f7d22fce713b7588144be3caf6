@@ -39,6 +39,30 @@
       },
       "revId": "e45fad1460b0f0f7d22fce713b7588144be3caf6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab649d1c_73fd3ed3",
+        "filename": "zephyr/test/fatcat/tests/lapis/src/battery.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-08-06T03:56:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4c5ee2d_e19f6df2",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 31
+      },
+      "revId": "e45fad1460b0f0f7d22fce713b7588144be3caf6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
