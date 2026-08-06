@@ -1,0 +1,216 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f047340b_4130fea0",
+        "filename": "zephyr/program/bluey/pic/CMakeLists.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-06T07:33:42Z",
+      "side": 1,
+      "message": "led.c is not needed.",
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74e1980f_dbea0490",
+        "filename": "zephyr/program/bluey/pic/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-06T07:33:42Z",
+      "side": 1,
+      "message": "These two lines should be removed.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 33
+      },
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a4f7ec6_a42362e6",
+        "filename": "zephyr/program/bluey/pic/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-06T07:33:42Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 30
+      },
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "664d86cb_6bc71e8e",
+        "filename": "zephyr/program/bluey/pic/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-06T07:33:42Z",
+      "side": 1,
+      "message": "Ditto",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 25
+      },
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d777bdc5_709e61c2",
+        "filename": "zephyr/program/bluey/pic/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-06T07:33:42Z",
+      "side": 1,
+      "message": "Remove these lines and keep the *else* case.",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 9
+      },
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4284ff36_0c14f239",
+        "filename": "zephyr/program/bluey/pic/src/extpower_custom.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-06T07:33:42Z",
+      "side": 1,
+      "message": "Do we really need the *is_early_board()* function?",
+      "range": {
+        "startLine": 25,
+        "startChar": 5,
+        "endLine": 25,
+        "endChar": 19
+      },
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10de1c41_3491879e",
+        "filename": "zephyr/program/bluey/pic/src/keyboard_customization.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-06T07:33:42Z",
+      "side": 1,
+      "message": "This hook is not needed.",
+      "range": {
+        "startLine": 96,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 35
+      },
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba327ab8_530a4520",
+        "filename": "zephyr/program/bluey/pic/src/lb_policy.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-06T07:33:42Z",
+      "side": 1,
+      "message": "This file is not needed.",
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b438750b_7e0788d1",
+        "filename": "zephyr/program/bluey/pic/src/led.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-06T07:33:42Z",
+      "side": 1,
+      "message": "This file is not neede.",
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fbfb7f4_f34d8c2b",
+        "filename": "zephyr/program/bluey/pic/src/throttle.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-06T07:33:42Z",
+      "side": 1,
+      "message": "Is this hook needed?",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 58
+      },
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
