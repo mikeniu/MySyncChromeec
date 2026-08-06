@@ -186,6 +186,26 @@ static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 	return TASK_ID_INVALID;
 }
 
+static struct task_ctx_base_data *current_get_base_data(void)
+{
+	if (k_is_pre_kernel()) {
+		return NULL;
+	}
+
+	struct task_ctx_base_data *data = k_thread_custom_data_get();
+
+	if (unlikely(data == NULL)) {
+		task_id_t id = thread_id_to_task_id(k_current_get());
+
+		data = task_get_base_data(id);
+		if (data != NULL) {
+			k_thread_custom_data_set(data);
+		}
+	}
+
+	return data;
+}
+
 task_id_t task_get_current(void)
 {
 	/* k_current_get() is not valid pre kernel */
@@ -219,9 +239,7 @@ void task_set_event(task_id_t cros_task_id, uint32_t event)
 
 uint32_t task_wait_event(int timeout_us)
 {
-	struct task_ctx_base_data *data;
-
-	data = task_get_base_data(task_get_current());
+	struct task_ctx_base_data *data = current_get_base_data();
 
 	__ASSERT_NO_MSG(data != NULL);
 
@@ -266,9 +284,9 @@ uint32_t task_wait_event(int timeout_us)
 
 uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 {
-	struct task_ctx_base_data *data;
+	struct task_ctx_base_data *data = current_get_base_data();
 
-	data = task_get_base_data(task_get_current());
+	__ASSERT_NO_MSG(data != NULL);
 
 	uint32_t events = 0;
 	const int64_t tick_deadline =
@@ -387,6 +405,35 @@ void start_ec_tasks(void)
 	tasks_started = 1;
 }
 
+static k_tid_t task_id_to_thread_id(task_id_t id)
+{
+	if (id < TASK_ID_COUNT) {
+		return task_to_k_tid[id];
+	}
+	switch (id) {
+	case TASK_ID_SYSWORKQ:
+		return get_sysworkq_thread();
+#ifdef HAS_TASK_HOSTCMD
+	case TASK_ID_HOSTCMD:
+		return get_hostcmd_thread();
+#endif
+#ifdef HAS_TASK_MAIN
+	case TASK_ID_MAIN:
+		return get_main_thread();
+#endif
+	case TASK_ID_IDLE:
+		return get_idle_thread();
+	case TASK_ID_SHELL:
+		return get_shell_thread();
+#ifdef CONFIG_AP_PWRSEQ
+	case TASK_ID_AP_PWRSEQ:
+		return get_ap_pwrseq_thread();
+#endif
+	default:
+		return NULL;
+	}
+}
+
 /*
  * Initialize all of the kernel objects before application code starts.
  * This allows us to set events on tasks before they even start, e.g. in
@@ -396,8 +443,12 @@ int init_signals(void)
 {
 	for (size_t i = 0; i < TASK_ID_COUNT + EXTRA_TASK_COUNT; ++i) {
 		struct task_ctx_base_data *const data = task_get_base_data(i);
+		k_tid_t tid = task_id_to_thread_id(i);
 
 		k_poll_signal_init(&data->new_event);
+		if (tid != NULL) {
+			tid->custom_data = data;
+		}
 	}
 
 	return 0;
