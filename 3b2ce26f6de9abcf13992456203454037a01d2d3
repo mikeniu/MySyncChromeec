@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0258f07f_06340981",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-08-06T05:39:12Z",
+      "side": 1,
+      "message": "could you hold off on this cherry pick and submit together with\nthe cherry pick of\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8130125\ni think it\u0027s better if these two go in together.",
+      "revId": "3b2ce26f6de9abcf13992456203454037a01d2d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
