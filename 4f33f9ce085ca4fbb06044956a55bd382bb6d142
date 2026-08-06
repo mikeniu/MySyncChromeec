@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14c24eb4_1a683454",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T22:00:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4005d4_108f29db",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ca2df655_1e6c592a",
@@ -83,6 +101,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "297c1815_15712d52",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T22:00:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99ba77e8_1cb29d07",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 25
+      },
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ca6b7eb_9ac71809",
@@ -114,6 +156,24 @@
       "side": 1,
       "message": "Acknowledged",
       "parentUuid": "4ca6b7eb_9ac71809",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd739221_0ec73e68",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T22:00:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35861231_606ddcc5",
       "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -153,6 +213,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3885205d_e8b86e2b",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T22:00:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "965a6eaa_c0df40ce",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b9313d8_2b5f2050",
@@ -184,6 +262,24 @@
       "side": 1,
       "message": "You are right, we can remove this guard.",
       "parentUuid": "5b9313d8_2b5f2050",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed0ca8f6_3dbefb55",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-06T22:00:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c8d6e4a_fbc878d5",
       "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
