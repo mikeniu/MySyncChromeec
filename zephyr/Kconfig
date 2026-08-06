@@ -33,6 +33,7 @@ if ZTEST
 
 config HAS_TEST_TASKS
 	bool "Whether or not this test includes custom tasks"
+	select THREAD_CUSTOM_DATA
 	help
 	  This enables custom tasks for tests. When set to 'y', the file
 	  "shimmed_test_tasks.h" will be included and is expected to set
