@@ -1,0 +1,39 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+choice TEST_BOARD_VARIANT
+	prompt "Select board variant for tests"
+	help
+	  Board variant to use for tests
+
+	config TEST_BOARD_ATRIA
+		bool "Enable atria-specific tests"
+		help
+		  Enable Atria tests.
+
+	config TEST_BOARD_PENGHU
+		bool "Enable penghu-specific tests"
+		help
+		  Enable Penghu tests.
+
+endchoice # TEST_BOARD_VARIANT
+
+config TEST_BOARD_NAME
+	string "Board name"
+	default "atria" if TEST_BOARD_ATRIA
+	default "penghu" if TEST_BOARD_PENGHU
+
+config TEST_BOARD_PENGHU_KEYBOARD
+	bool "Enable penghu keyboard tests"
+
+config TEST_BOARD_PENGHU_FAN
+	bool "Enable penghu fan tests"
+
+config PLATFORM_EC_KEYBOARD_CUSTOMIZATION
+	bool "Support keyboard customization"
+
+config PLATFORM_EC_KEYBOARD_DEBUG
+	bool "Enable keyboard debug prints"
+
+source "Kconfig.zephyr"

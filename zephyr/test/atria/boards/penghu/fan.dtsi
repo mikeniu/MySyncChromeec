@@ -1,0 +1,92 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <dt-bindings/pwm/pwm.h>
+#include <cros/thermistor/thermistor.dtsi>
+
+#include "../native_sim.overlay"
+
+/ {
+	pwms {
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		pwm6: pwm@6 {
+			compatible = "cros,pwm-mock";
+			reg = <6 2>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+		gpio_en_pp5000_fan: en_pp5000_fan {
+			gpios = <&gpiof 0 1>;
+		};
+		gpio_ec_dsw_pwrok: ec_dsw_pwrok {
+			gpios = <&gpiof 1 1>;
+		};
+	};
+
+
+	tachs {
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		tach1: tach@1 {
+			compatible = "cros,tach-mock";
+			reg = <1 1>;
+			#tach-cells = <3>;
+			status = "okay";
+		};
+	};
+
+	fans {
+		compatible = "cros-ec,fans";
+		fan_0 {
+			pwms = <&pwm6 6
+				PWM_KHZ(25)
+				PWM_POLARITY_NORMAL>;
+			tach = <&tach1>;
+			rpm-min = <2500>;
+			rpm-start = <2500>;
+			rpm-max = <6000>;
+			rpm-deviation = <1>;
+			enable-gpio = <&gpio_en_pp5000_fan>;
+		};
+	};
+
+	named-adc-channels {
+		compatible = "named-adc-channels";
+
+		adc_temp_sensor_1: temp_sensor_1 {
+			enum-name = "ADC_TEMP_SENSOR_MEMORY";
+			io-channels = <&adc0 4>;
+		};
+	};
+
+	temp_memory_thermistor: temp-memory {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_30K9_47K_4050B>;
+		adc = <&adc_temp_sensor_1>;
+	};
+
+	named-temp-sensors {
+		compatible = "cros-ec,temp-sensors";
+		temp_memory: temp-memory {
+			temp-host-high = <75>;
+			temp-host-halt = <85>;
+			temp-host-release-high = <70>;
+			temp-host-release-halt = <80>;
+			power-good-pin = <&gpio_ec_dsw_pwrok>;
+			sensor = <&temp_memory_thermistor>;
+		};
+	};
+};
+
+&thermistor_3V3_30K9_47K_4050B {
+	status = "okay";
+};
