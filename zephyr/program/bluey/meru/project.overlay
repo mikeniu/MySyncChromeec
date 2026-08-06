@@ -39,6 +39,16 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "extpower_interrupt";
 		};
+		int_volume_up: volume-up {
+			irq-pin = <&gpio_gsc_ec_volup_btn_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "button_interrupt";
+		};
+		int_volume_down: volume-down {
+			irq-pin = <&gpio_gsc_ec_voldn_btn_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "button_interrupt";
+		};
 	};
 };
 
