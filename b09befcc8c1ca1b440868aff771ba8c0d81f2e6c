@@ -1,0 +1,54 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "138b6de6_c63fc3ca",
+        "filename": "test/build.mk",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T00:01:30Z",
+      "side": 1,
+      "message": "Fixed in Patchset 6 (removed accidental printf entry).",
+      "parentUuid": "3b66923f_75f2ba03",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "b09befcc8c1ca1b440868aff771ba8c0d81f2e6c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "464a7dd5_19e923d9",
+        "filename": "test/build.mk",
+        "patchSetId": 7
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T00:01:30Z",
+      "side": 1,
+      "message": "Fixed in Patchset 6.",
+      "parentUuid": "81e3ac86_3d9e7519",
+      "range": {
+        "startLine": 102,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "b09befcc8c1ca1b440868aff771ba8c0d81f2e6c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
