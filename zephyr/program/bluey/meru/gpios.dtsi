@@ -55,14 +55,8 @@
 		gpio_pg_pp5000_s5_od: pg_pp5000_s5_od {
 			gpios = <&gpio6 3 (GPIO_INPUT)>;
 		};
-		gpio_ec_enavdd_oled: ec_enavdd_oled {
-			gpios = <&gpio6 7 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
-		};
 		gpio_ec_flash_wp_odl: ec_flash_wp_odl {
 			gpios = <&gpio7 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
-		};
-		gpio_ec_fan_tach_od: ec_fan_tach_od {
-			gpios = <&gpio7 3 (GPIO_INPUT | GPIO_PULL_UP)>;
 		};
 		gpio_ec_soc_int_odl: ec_soc_int_odl {
 			gpios = <&gpio7 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
@@ -80,9 +74,6 @@
 		};
 		gpio_en_edl_boot_l: en_edl_boot_l {
 			gpios = <&gpio9 4 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INACTIVE)>;
-		};
-		gpio_tpad_en: tpad_en {
-			gpios = <&gpio9 5 (GPIO_OUTPUT)>;
 		};
 		gpio_ec_pmk_rst_1v8: ec_pmk_rst_1v8 {
 			gpios = <&gpio9 6 (GPIO_OUTPUT)>;
@@ -109,9 +100,6 @@
 		gpio_ec_wp_en: ec_wp_en {
 			gpios = <&gpioa 5 (GPIO_INPUT)>;
 		};
-		gpio_smbc1_ccd_detect_odl: smbc1_ccd_detect_odl {
-			gpios = <&gpioa 6 (GPIO_INPUT)>;
-		};
 		gpio_plt_rst_odl: plt_rst_odl {
 			gpios = <&gpioa 7 (GPIO_INPUT)>;
 			enum-name = "GPIO_AP_RST_L";
@@ -121,12 +109,6 @@
 		};
 		gpio_en_pp3300_fp_ec: en_pp3300_fp_ec {
 			gpios = <&gpiob 2 (GPIO_OUTPUT)>;
-		};
-		gpio_ec_en_pp5000_fan: ec_en_pp5000_fan {
-			gpios = <&gpiob 3 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
-		};
-		gpio_fs_os_state_l_conn: fs_os_state_l_conn {
-			gpios = <&gpiob 4 (GPIO_INPUT)>;
 		};
 		gpio_fp_apm: fp_apm {
 			gpios = <&gpiob 5 (GPIO_INPUT)>;
@@ -145,18 +127,12 @@
 			gpios = <&gpiod 2 (GPIO_INPUT)>;
 			enum-name = "GPIO_LID_OPEN";
 		};
-		gpio_ec_fan2_tach_od: ec_fan2_tach_od {
-			gpios = <&gpiod 3 (GPIO_INPUT | GPIO_PULL_UP)>;
-		};
 		gpio_ec_gsc_packet_mode_en: ec_gsc_packet_mode_en {
 			gpios = <&gpiod 4 (GPIO_OUTPUT)>;
 			enum-name = "GPIO_PACKET_MODE_EN";
 		};
 		gpio_ec_pmic_lid_open_od: ec_pmic_lid_open_od {
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
-		};
-		gpio_smb2360_b_chg_led_pg_odl: smb2360_b_chg_led_pg_odl {
-			gpios = <&gpioe 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ccd_mode_odl: ccd_mode_odl {
 			gpios = <&gpioe 5 (GPIO_INPUT)>;
@@ -233,19 +209,27 @@
 			<&gpio5 6 0>,
 			<&gpio6 1 0>,
 			<&gpio6 2 0>,
+			<&gpio6 7 0>,
 			<&gpio7 2 0>,
+			<&gpio7 3 0>,
 			<&gpio7 4 0>,
 			<&gpio7 5 0>,
 			<&gpio8 1 0>,
 			<&gpio8 6 0>,
 			<&gpio9 1 0>,
 			<&gpio9 2 0>,
+			<&gpio9 5 0>,
+			<&gpioa 6 0>,
+			<&gpiob 3 0>,
+			<&gpiob 4 0>,
 			<&gpioc 2 0>,
 			<&gpioc 3 0>,
 			<&gpioc 5 0>,
 			<&gpiod 0 0>,
 			<&gpiod 1 0>,
+			<&gpiod 3 0>,
 			<&gpiod 5 0>,
+			<&gpioe 0 0>,
 			<&gpioe 1 0>,
 			<&gpioe 2 0>,
 			<&gpioe 3 0>,
