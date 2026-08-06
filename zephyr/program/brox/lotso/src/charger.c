@@ -36,4 +36,8 @@ static void set_bq25710_charge_option(void)
 			    BQ25710_REG_CHARGE_OPTION_0, reg);
 	}
 }
+<<<<<<< HEAD
 DECLARE_HOOK(HOOK_INIT, set_bq25710_charge_option, HOOK_PRIO_DEFAULT);
+=======
+DECLARE_HOOK(HOOK_INIT, set_bq25710_charge_option, HOOK_PRIO_DEFAULT);
+>>>>>>> parent of b39784ae7d (test)

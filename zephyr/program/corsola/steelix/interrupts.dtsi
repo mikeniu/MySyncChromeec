@@ -9,4 +9,18 @@
 	flags = <GPIO_INT_EDGE_FALLING>;
 	handler = "motion_interrupt";
 };
-
+/{
+	gpio-interrupts {
+		int_power_button: power_button {
+			irq-pin = <&gpio_gsc_ec_pwr_btn_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "power_button_interrupt";
+		};
+		
+		int_power_button_new: power_button_new {
+			irq-pin = <&gpio_gsc_ec_pwr_btn_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "power_new_button_interrupt";
+		};
+	};
+};

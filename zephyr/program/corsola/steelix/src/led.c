@@ -10,9 +10,11 @@
 #include "cros_cbi.h"
 #include "led_common.h"
 #include "led_onoff_states.h"
+#include "power_led.h"
 #include "util.h"
 
 #include <zephyr/drivers/pwm.h>
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(board_led, LOG_LEVEL_ERR);
@@ -195,4 +197,67 @@ __override void led_control(enum ec_led_id led_id, enum ec_led_state state)
 	led_auto_control(EC_LED_ID_BATTERY_LED, 0);
 
 	led_set_color_battery(state ? EC_LED_COLOR_RED : EC_LED_COLOR_INVALID);
+}
+
+/*
+ * Power button LED cycle control.
+ * Three states cycle on each button press:
+ *   0 = off (initial, never pressed)
+ *   1 = solid green
+ *   2 = solid red
+ * Wraps back to green after red.
+ */
+#define POWER_LED_STATE_OFF 0
+#define POWER_LED_STATE_GRN 1
+#define POWER_LED_STATE_RED 2
+#define POWER_LED_STATE_MAX POWER_LED_STATE_RED
+
+static uint8_t power_led_state = POWER_LED_STATE_OFF;
+
+void led_set_power_blink(void)
+{
+	/* Cycle: OFF → GRN → RED → GRN → ... */
+	if (power_led_state >= POWER_LED_STATE_MAX)
+		power_led_state = POWER_LED_STATE_GRN;
+	else
+		power_led_state++;
+
+	/*
+	 * Disable auto control so update_leds() (HOOK_TICK) does not
+	 * overwrite our manual color.
+	 */
+	led_auto_control(EC_LED_ID_BATTERY_LED, 0);
+	led_auto_control(EC_LED_ID_POWER_LED, 0);
+
+	/* Apply the new state via board_led_pwm_set_duty (direct PWM, no AC
+	 * check) */
+	switch (power_led_state) {
+	case POWER_LED_STATE_OFF:
+		/* Turn off both LED channels */
+		board_led_pwm_set_duty(&board_led_battery_red, 0);
+		board_led_pwm_set_duty(&board_led_battery_green, 0);
+		board_led_pwm_set_duty(&board_led_power_white, 0);
+		/* Re-enable auto control to let system reclaim LED management
+		 */
+		led_auto_control(EC_LED_ID_BATTERY_LED, 1);
+		led_auto_control(EC_LED_ID_POWER_LED, 1);
+		break;
+	case POWER_LED_STATE_GRN:
+		board_led_pwm_set_duty(&board_led_battery_red, 0);
+		board_led_pwm_set_duty(&board_led_battery_green, 100);
+		board_led_pwm_set_duty(&board_led_power_white, 100);
+		break;
+	case POWER_LED_STATE_RED:
+		board_led_pwm_set_duty(&board_led_battery_red, 100);
+		board_led_pwm_set_duty(&board_led_battery_green, 0);
+		board_led_pwm_set_duty(&board_led_power_white, 0);
+		break;
+	default:
+		break;
+	}
+}
+
+bool led_get_power_blink_state(void)
+{
+	return power_led_state != POWER_LED_STATE_OFF;
 }

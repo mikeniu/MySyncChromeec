@@ -10,3 +10,4 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC
 
 zephyr_library_sources("src/board.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LED_COMMON "src/led.c")
+zephyr_library_sources("src/power_button_interrupt.c")
