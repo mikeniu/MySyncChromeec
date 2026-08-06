@@ -452,11 +452,12 @@ static int egis660_init_driver(const struct device *dev)
 			FINGERPRINT_SENSOR_FRAME_SIZE(idx, DT_DRV_INST(inst)), \
 		"FP image buffer size smaller than raw image size at index " #idx);
 
-#define EGIS660_ASSERT_FRAME_SIZE_CONSISTENT(idx, inst)                        \
-	BUILD_ASSERT((FINGERPRINT_SENSOR_FRAME_SIZE(idx, DT_DRV_INST(inst)) == \
-		      FINGERPRINT_SENSOR_FRAME_SIZE(0, DT_DRV_INST(inst))),    \
-		     "EGIS660: frame_size of config " #idx                     \
-		     " does not match config 0");
+#define EGIS660_ASSERT_IMAGE_REAL_SIZE_CONSISTENT(idx, inst)                   \
+	BUILD_ASSERT(                                                          \
+		(FINGERPRINT_SENSOR_REAL_IMAGE_SIZE(idx, DT_DRV_INST(inst)) == \
+		 FINGERPRINT_SENSOR_REAL_IMAGE_SIZE(0, DT_DRV_INST(inst))),    \
+		"EGIS660: real_image_size of config " #idx                     \
+		" does not match config 0");
 
 #define EGIS660_DEFINE(inst)                                                         \
 	static struct egis660_data egis660_data_##inst;                              \
@@ -474,7 +475,7 @@ static int egis660_init_driver(const struct device *dev)
 	LISTIFY(FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)),                   \
 		EGIS660_BUILD_ASSERT_IMAGE_SIZE, (;), inst)                          \
 	LISTIFY(FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)),                   \
-		EGIS660_ASSERT_FRAME_SIZE_CONSISTENT, (;), inst)                     \
+		EGIS660_ASSERT_IMAGE_REAL_SIZE_CONSISTENT, (;), inst)                \
 	BUILD_ASSERT(                                                                \
 		FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)) <=                 \
 			NUM_IMAGE_CAPTURE_TYPES,                                     \
