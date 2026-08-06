@@ -186,6 +186,13 @@ static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 	return TASK_ID_INVALID;
 }
 
+static struct task_ctx_base_data *thread_get_base_data(k_tid_t thread_id)
+{
+	task_id_t cros_task_id = thread_id_to_task_id(thread_id);
+
+	return task_get_base_data(cros_task_id);
+}
+
 task_id_t task_get_current(void)
 {
 	/* k_current_get() is not valid pre kernel */
@@ -221,7 +228,7 @@ uint32_t task_wait_event(int timeout_us)
 {
 	struct task_ctx_base_data *data;
 
-	data = task_get_base_data(task_get_current());
+	data = thread_get_base_data(k_current_get());
 
 	__ASSERT_NO_MSG(data != NULL);
 
@@ -268,7 +275,7 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 {
 	struct task_ctx_base_data *data;
 
-	data = task_get_base_data(task_get_current());
+	data = thread_get_base_data(k_current_get());
 
 	uint32_t events = 0;
 	const int64_t tick_deadline =
