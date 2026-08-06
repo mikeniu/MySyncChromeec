@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06612658_20231244",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-06T10:33:23Z",
+      "side": 1,
+      "message": "you can define this as a struct, it should be a bit more clear, something like `static const struct device *const buttons_dev \u003d DEVICE_DT_GET(DT_NODELABEL(cros_buttons));`",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca2df655_1e6c592a",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-06T10:33:23Z",
+      "side": 1,
+      "message": "oh I realize now that these are custom codes, I think we should use codes from `include/zephyr/dt-bindings/input/input-event-codes.h`, just for the dt-\u003einput interface, internally these are fine. Could you handle that as well? sorry for the extra work this seems like the right moment for doing it, `INPUT_KEY_POWER` `INPUT_KEY_VOLUMEDOWN` `INPUT_KEY_VOLUMEUP` are already there, recovery is not maybe let\u0027s keep a custom code for that one at the end of the range (`0xffff`) and drop the others from `zephyr/include/dt-bindings/buttons.h`",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 25
+      },
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ca6b7eb_9ac71809",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-06T10:33:23Z",
+      "side": 1,
+      "message": "this should probably be just a LOG_DBG, there may be other callbacks in the future that handle other buttons so just because this specific one does not recognize the code it should not emit an error message",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18dba4a9_ade4aca2",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-06T10:33:23Z",
+      "side": 1,
+      "message": "use `bool`, then you can just do `if (pressed)` and save few bytes on the stack",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b9313d8_2b5f2050",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-06T10:33:23Z",
+      "side": 1,
+      "message": "IIRC the pm device runtime apis are a noop when `CONFIG_PM_DEVICE_RUNTIME\u003dn` so you should not need the guards around these ones",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f91dd053_25838467",
+        "filename": "zephyr/test/drivers/boards/buttons.dtsi",
+        "patchSetId": 16
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-06T10:33:23Z",
+      "side": 1,
+      "message": "yeah so see my comment above, this one can just use `zephyr/dt-bindings/input/input-event-codes.h` and the standard codes",
+      "revId": "4f33f9ce085ca4fbb06044956a55bd382bb6d142",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
