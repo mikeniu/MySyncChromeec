@@ -7,12 +7,14 @@
 
 import argparse
 import fcntl
+import json
 import os
 import signal
 import socket
 import subprocess
 import sys
 import time
+import urllib.request
 
 
 # Standard SSH options used across commands
@@ -22,6 +24,64 @@ SSH_OPTS = [
     "-o",
     "UserKnownHostsFile=/dev/null",
 ]
+
+
+def get_dut_os_type(dut_hostname):
+    """Determine if DUT OS is Android or CrOS via Swarming."""
+    if not dut_hostname:
+        return "Unknown"
+
+    try:
+        token = subprocess.check_output(
+            ["luci-auth", "token"], text=True, stderr=subprocess.DEVNULL
+        ).strip()
+    except Exception:  # pylint: disable=broad-exception-caught
+        return "Unknown"
+
+    url = (
+        "https://chromeos-swarming.appspot.com/_ah/api/swarming/v1/bots/list"
+        f"?dimensions=dut_name:{dut_hostname}"
+    )
+    req = urllib.request.Request(url)
+    req.add_header("Authorization", f"Bearer {token}")
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode())
+        items = data.get("items", [])
+        if not items:
+            return "Unknown"
+
+        alos_types = {
+            "AL",
+            "ANDROID",
+            "OSR_ANDROID_ONLY",
+            "OS_TYPE_AL",
+            "OS_TYPE_ANDROID",
+        }
+        cros_types = {"CHROMEOS", "CROS", "OS_TYPE_CROS"}
+
+        for bot in items:
+            dims = {d["key"]: d["value"] for d in bot.get("dimensions", [])}
+            os_type_vals = (
+                dims.get("version_info_os_type", [])
+                + dims.get("os_restriction", [])
+                + dims.get("label-os_type", [])
+                + dims.get("os_type", [])
+            )
+            for os_type in os_type_vals:
+                os_type_upper = str(os_type).upper()
+                if os_type_upper in alos_types:
+                    return "Android"
+                if os_type_upper in cros_types:
+                    return "CrOS"
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        print(
+            f"Warning: Failed to query DUT OS type from Swarming for {dut_hostname}: {e}",
+            file=sys.stderr,
+        )
+
+    return "Unknown"
 
 
 def check_gcert():
@@ -98,6 +158,8 @@ def lease_dut(model=None, board=None):
                     f"Reusing active lease {lease['lease_id']} matching "
                     f"board: {board}, model: {model}..."
                 )
+                lease["os_type"] = get_dut_os_type(lease.get("dut_hostname"))
+                print(f"DUT OS type: {lease['os_type']}")
                 return lease
     except Exception as e:  # pylint: disable=broad-exception-caught
         print(
@@ -156,6 +218,8 @@ def lease_dut(model=None, board=None):
     active_leases = get_active_leases()
     for lease in active_leases:
         if lease.get("lease_id") == lease_id:
+            lease["os_type"] = get_dut_os_type(lease.get("dut_hostname"))
+            print(f"DUT OS type: {lease['os_type']}")
             return lease
 
     raise RuntimeError(
@@ -858,6 +922,7 @@ def main():
     print(f"DUT_HOSTNAME={details['dut_hostname']}")
     print(f"MODEL={details['model']}")
     print(f"BOARD={details['board']}")
+    print(f"DUT_OS_TYPE={details.get('os_type', 'Unknown')}")
     print(f"SERVO_HOSTNAME={details['servo_hostname']}")
     print(f"SERVO_PORT={details['servo_port']}")
     print(f"SERVO_SERIAL={details['servo_serial']}")
