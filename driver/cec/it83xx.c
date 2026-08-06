@@ -480,7 +480,7 @@ void cec_interrupt(void)
 	/* Write 1 to clear */
 	IT83XX_CEC_CECSTS = status;
 
-	task_clear_pending_irq(IT83XX_IRQ_CEC);
+	ite_intc_isr_clear(IT83XX_IRQ_CEC);
 }
 
 #if defined(CONFIG_ZEPHYR) && !defined(CONFIG_TEST)
@@ -539,17 +539,17 @@ static int it83xx_cec_set_enable(int port, uint8_t enable)
 		IT83XX_CEC_CECIE |= CEC_ALL_INTERRUPTS;
 
 		/* Enable CEC interrupt */
-		task_clear_pending_irq(IT83XX_IRQ_CEC);
+		ite_intc_isr_clear(IT83XX_IRQ_CEC);
 #if defined(CONFIG_ZEPHYR) && !defined(CONFIG_TEST)
 		IRQ_CONNECT(IT83XX_IRQ_CEC, 0, it83xx_cec_isr, 0, 0);
 #endif
-		task_enable_irq(IT83XX_IRQ_CEC);
+		irq_enable(IT83XX_IRQ_CEC);
 
 		CPRINTS("CEC%d enabled", port);
 	} else {
 		/* Disable CEC interrupt */
-		task_disable_irq(IT83XX_IRQ_CEC);
-		task_clear_pending_irq(IT83XX_IRQ_CEC);
+		irq_disable(IT83XX_IRQ_CEC);
+		ite_intc_isr_clear(IT83XX_IRQ_CEC);
 
 		/* Disable all interrupts in interrupt enable register */
 		IT83XX_CEC_CECIE &= ~CEC_ALL_INTERRUPTS;
