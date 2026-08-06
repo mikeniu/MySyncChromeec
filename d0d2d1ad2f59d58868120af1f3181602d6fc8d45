@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "245cf1b5_e1cd7a7a",
+        "filename": "zephyr/test/drivers/fan/src/fan.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T14:46:25Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: It looks like the 5100 RPM step is skipped during the cool-down hysteresis test.\n\nAt `temp\u003d48`, the code drops from 5400 RPM past 5100 RPM straight down to 4500 RPM (since 48 is not strictly greater than the decreasing threshold of 48 for the 5100 RPM step). \n\nTo ensure full coverage of all RPM levels, consider adding an assertion for `temp\u003d49` right before this line to verify the 5100 RPM step:\n```c\nzassert_equal(temp_to_rpm(49), 5100);\n```",
+      "range": {
+        "startLine": 533,
+        "startChar": 0,
+        "endLine": 533,
+        "endChar": 0
+      },
+      "revId": "d0d2d1ad2f59d58868120af1f3181602d6fc8d45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
