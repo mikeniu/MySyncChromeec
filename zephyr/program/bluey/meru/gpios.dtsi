@@ -140,12 +140,12 @@
 			enum-name = "GPIO_PMIC_KPD_PWR";
 		};
 		/* White LED */
-		gpio_led_white: led_white {
-			gpios = <&gpioc 2 GPIO_OUTPUT_LOW>;
+		gpio_led_amber: led_amber {
+			gpios = <&gpioc 2 (GPIO_OUTPUT | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INACTIVE)>;
 		};
 		/* Amber LED */
-		gpio_led_amber: led_amber {
-			gpios = <&gpioc 3 GPIO_OUTPUT_LOW>;
+		gpio_led_white: led_white {
+			gpios = <&gpioc 3 (GPIO_OUTPUT | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INACTIVE)>;
 		};
 		gpio_gsc_ec_pwr_btn_odl_r: gsc_ec_pwr_btn_odl_r {
 			gpios = <&gpioc 6 (GPIO_INPUT)>;
