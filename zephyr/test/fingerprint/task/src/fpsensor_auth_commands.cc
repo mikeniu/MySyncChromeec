@@ -6,6 +6,7 @@
 #include "common.h"
 #include "crypto/elliptic_curve_key.h"
 #include "ec_commands.h"
+#include "ec_tasks.h"
 #include "flash.h"
 #include "fpsensor/fpsensor.h"
 #include "fpsensor/fpsensor_auth_commands.h"
@@ -145,6 +146,24 @@ static enum ec_error_list get_fp_encryption_status(uint32_t *status)
 	*status = resp.status;
 
 	return EC_SUCCESS;
+}
+
+static enum ec_status wait_for_template_decrypt_result(void)
+{
+	struct ec_params_fp_template_v1 result_params = {
+		.cmd = FP_TEMPLATE_GET_RESULT,
+	};
+	enum ec_status res;
+	int timeout = 50; /* Poll up to 500ms */
+
+	do {
+		k_msleep(10);
+		res = test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
+					     &result_params,
+					     sizeof(result_params), NULL, 0);
+	} while (res == EC_RES_BUSY && --timeout > 0);
+
+	return res;
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_command_establish_pairing_key_keygen)
@@ -776,7 +795,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_decrypted)
 					     sizeof(session_params), NULL, 0),
 		      EC_RES_SUCCESS);
 
-	constexpr size_t head_size = offsetof(ec_params_fp_template, data);
+	constexpr size_t head_size = offsetof(ec_params_fp_template_v1, data);
 	constexpr size_t metadata_size =
 		sizeof(ec_fp_template_encryption_metadata);
 	constexpr size_t template_size = sizeof(fp_template[0]);
@@ -791,9 +810,10 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_decrypted)
 	std::span template_data(enc_metadata.end(), template_size);
 	std::span salt_data(template_data.end(), salt_size);
 
-	struct ec_params_fp_template head_data = {
+	struct ec_params_fp_template_v1 head_data = {
 		.offset = 0,
-		.size = FP_TEMPLATE_COMMIT | (params_size - head_size),
+		.size = static_cast<uint32_t>(params_size - head_size),
+		.cmd = FP_TEMPLATE_LOAD,
 	};
 	static_assert(head_size == sizeof(head_data));
 	memcpy(head.data(), &head_data, head.size());
@@ -825,10 +845,20 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_decrypted)
 	static_assert(metadata_size == sizeof(enc_metadata_data));
 	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
 
-	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0,
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
 					     params.data(), params.size(), NULL,
 					     0),
 		      EC_RES_SUCCESS);
+
+	struct ec_params_fp_template_v1 decrypt_params = {
+		.cmd = FP_TEMPLATE_DECRYPT,
+	};
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
+					     &decrypt_params,
+					     sizeof(decrypt_params), NULL, 0),
+		      EC_RES_SUCCESS);
+
+	zassert_equal(wait_for_template_decrypt_result(), EC_RES_SUCCESS);
 
 	uint32_t status;
 	zassert_equal(get_fp_encryption_status(&status), EC_SUCCESS);
@@ -870,7 +900,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_v3)
 					     sizeof(session_params), NULL, 0),
 		      EC_RES_SUCCESS);
 
-	constexpr size_t head_size = offsetof(ec_params_fp_template, data);
+	constexpr size_t head_size = offsetof(ec_params_fp_template_v1, data);
 	constexpr size_t metadata_size =
 		sizeof(ec_fp_template_encryption_metadata);
 	constexpr size_t template_size = sizeof(fp_template[0]);
@@ -882,9 +912,10 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_v3)
 	std::span enc_metadata(head.end(), metadata_size);
 	std::span template_data(enc_metadata.end(), template_size);
 
-	struct ec_params_fp_template head_data = {
+	struct ec_params_fp_template_v1 head_data = {
 		.offset = 0,
-		.size = FP_TEMPLATE_COMMIT | (params_size - head_size),
+		.size = static_cast<uint32_t>(params_size - head_size),
+		.cmd = FP_TEMPLATE_LOAD,
 	};
 	static_assert(head_size == sizeof(head_data));
 	memcpy(head.data(), &head_data, head.size());
@@ -913,10 +944,21 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_v3)
 	static_assert(metadata_size == sizeof(enc_metadata_data));
 	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
 
-	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0,
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
 					     params.data(), params.size(), NULL,
 					     0),
-		      EC_RES_INVALID_PARAM);
+		      EC_RES_SUCCESS);
+
+	struct ec_params_fp_template_v1 decrypt_params = {
+		.cmd = FP_TEMPLATE_DECRYPT,
+	};
+
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
+					     &decrypt_params,
+					     sizeof(decrypt_params), NULL, 0),
+		      EC_RES_SUCCESS);
+
+	zassert_equal(wait_for_template_decrypt_result(), EC_RES_INVALID_PARAM);
 }
 
 // Test that trivial positive match salt will be detected into an error.
@@ -957,7 +999,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_trivial_salt)
 					     sizeof(ctx_params), NULL, 0),
 		      EC_RES_SUCCESS);
 
-	constexpr size_t head_size = offsetof(ec_params_fp_template, data);
+	constexpr size_t head_size = offsetof(ec_params_fp_template_v1, data);
 	constexpr size_t metadata_size =
 		sizeof(ec_fp_template_encryption_metadata);
 	constexpr size_t template_size = sizeof(fp_template[0]);
@@ -972,9 +1014,10 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_trivial_salt)
 	std::span template_data(enc_metadata.end(), template_size);
 	std::span salt_data(template_data.end(), salt_size);
 
-	struct ec_params_fp_template head_data = {
+	struct ec_params_fp_template_v1 head_data = {
 		.offset = 0,
-		.size = FP_TEMPLATE_COMMIT | (params_size - head_size),
+		.size = static_cast<uint32_t>(params_size - head_size),
+		.cmd = FP_TEMPLATE_LOAD,
 	};
 	static_assert(head_size == sizeof(head_data));
 	memcpy(head.data(), &head_data, head.size());
@@ -1005,10 +1048,20 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_trivial_salt)
 	static_assert(metadata_size == sizeof(enc_metadata_data));
 	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
 
-	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0,
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
 					     params.data(), params.size(), NULL,
 					     0),
-		      EC_RES_INVALID_PARAM);
+		      EC_RES_SUCCESS);
+
+	struct ec_params_fp_template_v1 decrypt_params = {
+		.cmd = FP_TEMPLATE_DECRYPT,
+	};
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
+					     &decrypt_params,
+					     sizeof(decrypt_params), NULL, 0),
+		      EC_RES_SUCCESS);
+
+	zassert_equal(wait_for_template_decrypt_result(), EC_RES_INVALID_PARAM);
 }
 
 ZTEST(fpsensor_auth_commands, test_fp_command_commit_without_seed)
@@ -1022,7 +1075,7 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_without_seed)
 					     sizeof(ctx_params), NULL, 0),
 		      EC_RES_SUCCESS);
 
-	constexpr size_t head_size = offsetof(ec_params_fp_template, data);
+	constexpr size_t head_size = offsetof(ec_params_fp_template_v1, data);
 	constexpr size_t metadata_size =
 		sizeof(ec_fp_template_encryption_metadata);
 	constexpr size_t template_size = sizeof(fp_template[0]);
@@ -1037,9 +1090,10 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_without_seed)
 	std::span template_data(enc_metadata.end(), template_size);
 	std::span salt_data(template_data.end(), salt_size);
 
-	struct ec_params_fp_template head_data = {
+	struct ec_params_fp_template_v1 head_data = {
 		.offset = 0,
-		.size = FP_TEMPLATE_COMMIT | (params_size - head_size),
+		.size = static_cast<uint32_t>(params_size - head_size),
+		.cmd = FP_TEMPLATE_LOAD,
 	};
 	static_assert(head_size == sizeof(head_data));
 	memcpy(head.data(), &head_data, head.size());
@@ -1067,10 +1121,20 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_without_seed)
 	static_assert(metadata_size == sizeof(enc_metadata_data));
 	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
 
-	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0,
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
 					     params.data(), params.size(), NULL,
 					     0),
-		      EC_RES_UNAVAILABLE);
+		      EC_RES_SUCCESS);
+
+	struct ec_params_fp_template_v1 decrypt_params = {
+		.cmd = FP_TEMPLATE_DECRYPT,
+	};
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
+					     &decrypt_params,
+					     sizeof(decrypt_params), NULL, 0),
+		      EC_RES_SUCCESS);
+
+	zassert_equal(wait_for_template_decrypt_result(), EC_RES_UNAVAILABLE);
 }
 
 static enum ec_error_list
@@ -2157,6 +2221,15 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_disabled_under_auth)
 >>>>>>> 2bac3a3af8a (zephyr: test: fingerprint: Add template v0 decryption unit tests)
 } // namespace
 
+static void *fpsensor_auth_commands_setup(void)
+{
+	/* Start shimmed tasks (including FPSENSOR background task) */
+	start_ec_tasks();
+	k_msleep(100);
+
+	return NULL;
+}
+
 static void before_fpsensor_auth_commands(void *fixture)
 {
 	static const uint8_t fake_rollback_entropy[] = "some_rollback_entropy";
@@ -2193,5 +2266,5 @@ static void before_fpsensor_auth_commands(void *fixture)
 	global_context.sensor_mode = 0;
 }
 
-ZTEST_SUITE(fpsensor_auth_commands, NULL, NULL, before_fpsensor_auth_commands,
-	    NULL, NULL);
+ZTEST_SUITE(fpsensor_auth_commands, NULL, fpsensor_auth_commands_setup,
+	    before_fpsensor_auth_commands, NULL, NULL);
