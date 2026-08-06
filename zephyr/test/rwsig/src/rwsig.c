@@ -274,16 +274,17 @@ ZTEST(rwsig, test_hostcmd_rwsig_action)
 	struct ec_params_rwsig_action param = { .action = RWSIG_ACTION_ABORT };
 	struct host_cmd_handler_args args =
 		BUILD_HOST_COMMAND_PARAMS(EC_CMD_RWSIG_ACTION, 0, param);
-	atomic_t *events = task_get_event_bitmap(TASK_ID_RWSIG);
 
-	*events = 0;
+	task_clear_event(TASK_ID_RWSIG, TASK_EVENT_ABORT | TASK_EVENT_CONTINUE);
 	zassert_ok(host_command_process(&args));
-	zassert_equal(*events, TASK_EVENT_ABORT);
+	zassert_equal(task_wait_event_mask(TASK_EVENT_ABORT, 0),
+		      TASK_EVENT_ABORT);
 
-	*events = 0;
+	task_clear_event(TASK_ID_RWSIG, TASK_EVENT_ABORT | TASK_EVENT_CONTINUE);
 	param.action = RWSIG_ACTION_CONTINUE;
 	zassert_ok(host_command_process(&args));
-	zassert_equal(*events, TASK_EVENT_CONTINUE);
+	zassert_equal(task_wait_event_mask(TASK_EVENT_CONTINUE, 0),
+		      TASK_EVENT_CONTINUE);
 
 	param.action = 99;
 	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);

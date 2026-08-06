@@ -189,9 +189,12 @@ static inline bool in_deferred_context(void)
 #endif /* CONFIG_ZEPHYR */
 
 /**
- * Return a pointer to the bitmap of events of the task.
+ * Clear a task event.
+ *
+ * @param tskid		Task to clear event for
+ * @param event		Event bitmap to clear (TASK_EVENT_*)
  */
-atomic_t *task_get_event_bitmap(task_id_t tskid);
+void task_clear_event(task_id_t tskid, uint32_t event);
 
 /**
  * Wait for the next event.
@@ -225,172 +228,6 @@ uint32_t task_wait_event(int timeout_us);
  *			TASK_EVENT_TIMER if the timeout is reached.
  */
 uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us);
-
-/**
- * Prints the list of tasks.
- *
- * Uses the command output channel.  May be called from interrupt level.
- */
-void task_print_list(void);
-
-/**
- * Returns the name of the task.
- */
-const char *task_get_name(task_id_t tskid);
-
-#ifdef CONFIG_TASK_PROFILING
-/**
- * Start tracking an interrupt.
- *
- * This must be called from interrupt context (!) before the interrupt routine
- * is called.
- */
-void task_start_irq_handler(void *excep_return);
-void task_end_irq_handler(void *excep_return);
-#else
-#define task_start_irq_handler(excep_return)
-#endif
-
-/**
- * Change the task scheduled to run after returning from the exception.
- *
- * If task_send_event() has been called and has set need_resched flag,
- * re-computes which task is running and eventually swaps the context
- * saved on the process stack to restore the new one at exception exit.
- *
- * This must be called from interrupt context (!) and is designed to be the
- * last call of the interrupt handler.
- */
-void task_resched_if_needed(void *excep_return);
-
-/**
- * Initialize tasks and interrupt controller.
- */
-void task_pre_init(void);
-
-/**
- * Start task scheduling.  Does not normally return.
- */
-int task_start(void);
-
-/**
- * Return non-zero if task_start() has been called and task scheduling has
- * started.
- */
-int task_start_called(void);
-
-#ifdef CONFIG_FPU
-/**
- * Clear floating-point used flag for currently executing task. This means the
- * FPU regs will not be stored on context switches until the next time floating
- * point is used for currently executing task.
- */
-void task_clear_fp_used(void);
-#endif
-
-/**
- * Mark all tasks as ready to run and reschedule the highest priority task.
- */
-void task_enable_all_tasks(void);
-
-/**
- * Enable a task.
- */
-void task_enable_task(task_id_t tskid);
-
-/**
- * Task is enabled.
- */
-bool task_enabled(task_id_t tskid);
-
-/**
- * Disable a task.
- *
- * If the task disable itself, this will cause an immediate reschedule.
- */
-void task_disable_task(task_id_t tskid);
-
-/**
- * Enable an interrupt.
- */
-void task_enable_irq(int irq);
-
-/**
- * Disable an interrupt.
- */
-void task_disable_irq(int irq);
-
-/**
- * Software-trigger an interrupt.
- */
-void task_trigger_irq(int irq);
-
-/*
- * A task that supports resets may call this to indicate that it may be reset
- * at any point between this call and the next call to task_disable_resets().
- *
- * Calling this function will trigger any resets that were requested while
- * resets were disabled.
- *
- * It is not expected for this to be called if resets are already enabled.
- */
-void task_enable_resets(void);
-
-/*
- * A task that supports resets may call this to indicate that it may not be
- * reset until the next call to task_enable_resets(). Any calls to task_reset()
- * during this time will cause a reset request to be queued, and executed
- * the next time task_enable_resets() is called.
- *
- * Must not be called if resets are already disabled.
- */
-void task_disable_resets(void);
-
-/*
- * If the current task was reset, completes the reset operation.
- *
- * Returns a non-zero value if the task was reset; tasks with state outside
- * of the stack should perform any necessary cleanup immediately after calling
- * this function.
- *
- * Tasks that support reset must call this function once at startup before
- * doing anything else.
- *
- * Must only be called once at task startup.
- */
-int task_reset_cleanup(void);
-
-/*
- * Resets the specified task, which must not be the current task,
- * to initial state.
- *
- * Returns EC_SUCCESS, or EC_ERROR_INVAL if the specified task does
- * not support resets.
- *
- * If wait is true, blocks until the task has been reset. Otherwise,
- * returns immediately - in this case the task reset may be delayed until
- * that task can be safely reset. The duration of this delay depends on the
- * task implementation.
- */
-int task_reset(task_id_t id, int wait);
-
-/**
- * Clear a pending interrupt.
- *
- * Note that most interrupts can be removed from the pending state simply by
- * handling whatever caused the interrupt in the first place.  This only needs
- * to be called if an interrupt handler disables itself without clearing the
- * reason for the interrupt, and then the interrupt is re-enabled from a
- * different context.
- */
-void task_clear_pending_irq(int irq);
-
-/**
- * Check if irq is pending.
- *
- * Returns true if interrupt with given number is pending, false otherwise.
- */
-bool task_is_irq_pending(int irq);
 
 #ifdef CONFIG_ZEPHYR
 typedef struct k_mutex mutex_t;

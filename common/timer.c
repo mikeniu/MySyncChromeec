@@ -130,9 +130,6 @@ void force_time(timestamp_t ts)
 		if (interrupt_enabled)
 			interrupt_enable();
 	}
-
-	/* some timers might be already expired : process them */
-	task_trigger_irq(timer_irq);
 }
 
 /*
