@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "66b024a8_9a449eab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-06T17:55:18Z",
+      "side": 1,
+      "message": "I believe this was the case in the VIF spec until version 3.33, released in December 2024. If you\u0027re setting `Is_Alt_Mode_Adapter` because of the VIF spec, you don\u0027t have to anymore. That also means that you don\u0027t need to set the other AMA fields or have the DUT respond to Discovery with Modal Operation\u003d1/Intel SVID/TBT mode.\n\nAre you setting it to satisfy the VIF spec or because of some requirement of TBT cert outside of the VIF spec?",
+      "parentUuid": "9a3f41cf_0fd7fc91",
+      "revId": "d233edbe6e216bafa0c0ddc975af5a52b1f87a02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d9dc7f05_8081f16d",
         "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
         "patchSetId": 1
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "VIF did not declare DPAM, so I am very sorry, I do not quite understand your question.",
       "parentUuid": "d9dc7f05_8081f16d",
+      "revId": "d233edbe6e216bafa0c0ddc975af5a52b1f87a02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01f9eaf8_0566a8c1",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-06T17:55:18Z",
+      "side": 1,
+      "message": "This tag is saying that the DUT will advertise 0xFF01, the DisplayPort SVID, in Discover SVIDs ACK, just like line 514 is saying that the DUT will advertise the Intel SVID. (See other comment for my thoughts about Intel SVID/TBT.)\n\nJust recently, I have seen the port give a Discover SVIDs ACK that matches this behavior, so I guess the VIF is consistent with the PDC firmware.\n\nIt doesn\u0027t make sense to me that the DUT would respond with 0xFF01. Why does it do this?",
+      "parentUuid": "e89ee209_73fbda6b",
       "revId": "d233edbe6e216bafa0c0ddc975af5a52b1f87a02",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
