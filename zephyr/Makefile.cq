@@ -55,6 +55,7 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 	'$(PLATFORM_EC)/zephyr/include/emul/**' \
 	'$(PLATFORM_EC)/zephyr/mock/**' \
 	'$(PLATFORM_EC)/zephyr/program/dev/**' \
+	'$(PLATFORM_EC)/zephyr/program/ec-aic/**' \
 	'$(PLATFORM_EC)/zephyr/shim/src/test_util.c' \
 	'$(PLATFORM_EC)/zephyr/shim/src/ztest_system.c' \
 	'$(PLATFORM_EC)/zephyr/test/**' \
