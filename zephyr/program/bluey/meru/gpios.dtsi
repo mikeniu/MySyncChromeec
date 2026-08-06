@@ -145,6 +145,10 @@
 			gpios = <&gpiod 2 (GPIO_INPUT)>;
 			enum-name = "GPIO_LID_OPEN";
 		};
+		gpio_lid_360_l: lid_360_l {
+			gpios = <&gpioe 4 (GPIO_INPUT)>;
+			enum-name = "GPIO_TABLET_MODE_L";
+		};
 		gpio_ec_fan2_tach_od: ec_fan2_tach_od {
 			gpios = <&gpiod 3 (GPIO_INPUT | GPIO_PULL_UP)>;
 		};
@@ -206,6 +210,13 @@
 			gpios = <&gpiof 5 (GPIO_INPUT)>;
 			enum-name = "GPIO_VOLUME_UP_L";
 		};
+		gpio_ec_keyboard_det_cntl: ec_keyboard_det_cntl {
+			gpios = <&gpiod 5 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_en_pp3300_base_x: en_pp3300_base_x {
+			gpios = <&gpiob 6 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
+
 	};
 	unused-pins {
 		compatible = "unused-gpios";
@@ -229,7 +240,6 @@
 			<&gpioc 2 0>,
 			<&gpioc 3 0>,
 			<&gpioc 5 0>,
-			<&gpiod 5 0>,
 			<&gpioe 1 0>,
 			<&gpioe 2 0>,
 			<&gpioe 3 0>,
