@@ -1,0 +1,29 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0630c42a_ff762b90",
+        "filename": "zephyr/test/drivers/fan/src/fan.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T14:52:15Z",
+      "side": 1,
+      "message": "Done. Added temp\u003d49 cool-down step in PS4.",
+      "parentUuid": "245cf1b5_e1cd7a7a",
+      "range": {
+        "startLine": 533,
+        "startChar": 0,
+        "endLine": 533,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "528585fe145a974c424c50107d4e8bf3274e278d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
