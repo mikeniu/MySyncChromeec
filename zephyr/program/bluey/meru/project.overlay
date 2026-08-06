@@ -52,6 +52,16 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "extpower_interrupt";
 		};
+		int_wpc: wpc{
+			irq-pin = <&gpio_pen_int_odl>;
+			flags = <GPIO_INT_EDGE_RISING>;
+			handler = "pchg_irq";
+		};
+		wpc_lid_irq: wpc_lid_irq{
+			irq-pin = <&gpio_pen_eject_od>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "wpc_hall_interrupt";
+		};
 	};
 };
 
@@ -97,6 +107,16 @@
 	apb2-prescaler = <4>;
 	apb3-prescaler = <4>;
 	apb4-prescaler = <1>;
+};
+
+&i2c3_0 {
+	ctn730@28 {
+		compatible = "nxp,ctn730";
+		reg = <0x28>;
+		irq-gpios=<&gpio7 5 GPIO_INPUT>;
+		rf-charge-msec = <1000>;
+		full-percent = <100>;
+	};
 };
 
 // &{/lb-led-colors} {
