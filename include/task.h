@@ -288,6 +288,7 @@ int task_start_called(void);
 void task_clear_fp_used(void);
 #endif
 
+#ifndef CONFIG_ZEPHYR
 /**
  * Mark all tasks as ready to run and reschedule the highest priority task.
  */
@@ -309,6 +310,7 @@ bool task_enabled(task_id_t tskid);
  * If the task disable itself, this will cause an immediate reschedule.
  */
 void task_disable_task(task_id_t tskid);
+#endif /* !CONFIG_ZEPHYR */
 
 /**
  * Enable an interrupt.

@@ -358,15 +358,6 @@ int task_start_called(void)
 	return tasks_started;
 }
 /*
- * TODO(b/190203712): Implement this
- * LCOV_EXCL_START
- */
-void task_disable_task(task_id_t tskid)
-{
-}
-/* LCOV_EXCL_STOP */
-
-/*
  * This function cannot be tested since it is architecture specific.
  * LCOV_EXCL_START
  */
