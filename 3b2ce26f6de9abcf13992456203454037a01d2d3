@@ -16,6 +16,24 @@
       "message": "could you hold off on this cherry pick and submit together with\nthe cherry pick of\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8130125\ni think it\u0027s better if these two go in together.",
       "revId": "3b2ce26f6de9abcf13992456203454037a01d2d3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90198ce0_ebc42dcc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-06T05:49:43Z",
+      "side": 1,
+      "message": "The CL https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8130125 is identical to the original tree so the cherry pick may need to happen after this one merged.",
+      "parentUuid": "0258f07f_06340981",
+      "revId": "3b2ce26f6de9abcf13992456203454037a01d2d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
