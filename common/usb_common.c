@@ -170,13 +170,8 @@ __overridable int pd_board_check_request(uint32_t rdo, int pdo_cnt)
 
 int pd_get_source_pdo(const uint32_t **src_pdo_p, const int port)
 {
-#if defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM)
 	const uint32_t *src_pdo;
 	const int pdo_cnt = dpm_get_source_pdo(&src_pdo, port);
-#else
-	const uint32_t *src_pdo = pd_src_pdo;
-	const int pdo_cnt = pd_src_pdo_cnt;
-#endif
 
 	*src_pdo_p = src_pdo;
 	return pdo_cnt;
@@ -430,7 +425,11 @@ void usb_mux_set_safe_mode_exit(int port)
 
 void pd_send_hard_reset(int port)
 {
-	task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_SEND_HARD_RESET);
+	if (IS_ENABLED(CONFIG_USB_PE_SM))
+		pd_dpm_request(port, DPM_REQUEST_HARD_RESET_SEND);
+	else
+		task_set_event(PD_PORT_TO_TASK_ID(port),
+			       PD_EVENT_SEND_HARD_RESET);
 }
 
 #ifdef CONFIG_USBC_OCP
