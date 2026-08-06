@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aee1f689_e27ed138",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-08-06T17:27:52Z",
+      "side": 1,
+      "message": "I am still unclear on what your plan is for the timing and sequencing of these updates. Can you update your design doc with this? Depending on that, it might not even be necessary to suspend individual chips.",
+      "range": {
+        "startLine": 9,
+        "startChar": 34,
+        "endLine": 10,
+        "endChar": 35
+      },
+      "revId": "9a43852616cdbc3d1d5858aebebbc6b4d598b56d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bf24e05_37868c31",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-08-06T17:27:52Z",
+      "side": 1,
+      "message": "This really ought to be encoded into the devicetree explicitly, ideally by nesting PDC port nodes within a new PDC chip node. `port_index_on_chip` and `no_fw_update` are tech debt; if we\u0027re designing a new PDC FWUP mechanism we should go all in instead of trying to shoehorn into the existing interfaces. I can point you to past design docs / ideas on this because it is something we\u0027ve wanted for a while.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 76
+      },
+      "revId": "9a43852616cdbc3d1d5858aebebbc6b4d598b56d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
