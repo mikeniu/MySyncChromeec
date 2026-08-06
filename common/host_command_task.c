@@ -27,6 +27,12 @@
 
 #define TASK_EVENT_CMD_PENDING TASK_EVENT_CUSTOM_BIT(0)
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+
+K_EVENT_DEFINE(hostcmd_event);
+#endif
+
 /* Maximum delay to skip printing repeated host command debug output */
 #define HCDEBUG_MAX_REPEAT_DELAY (50 * MSEC)
 
@@ -164,7 +170,11 @@ void host_command_received(struct host_cmd_handler_args *args)
 		pending_args = args;
 
 		/* Wake up the task to handle the command */
+#ifdef CONFIG_ZEPHYR
+		hostcmd_set_event(TASK_EVENT_CMD_PENDING);
+#else
 		task_set_event(TASK_ID_HOSTCMD, TASK_EVENT_CMD_PENDING);
+#endif
 		return;
 	}
 
@@ -386,7 +396,11 @@ void host_command_task(void *u)
 
 	while (1) {
 		/* Wait for the next command event */
+#ifdef CONFIG_ZEPHYR
+		int evt = hostcmd_wait_event(-1);
+#else
 		int evt = task_wait_event(-1);
+#endif
 
 		t0 = get_time();
 

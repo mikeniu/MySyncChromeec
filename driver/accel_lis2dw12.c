@@ -161,7 +161,11 @@ test_mockable void lis2dw12_interrupt(enum gpio_signal signal)
 {
 	last_interrupt_timestamp = __hw_clock_source_read();
 
+#ifdef CONFIG_ZEPHYR
+	motion_sense_set_event(CONFIG_ACCEL_LIS2DW12_INT_EVENT);
+#else
 	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ACCEL_LIS2DW12_INT_EVENT);
+#endif
 }
 
 /**

@@ -35,6 +35,10 @@
 
 #ifdef CONFIG_ZEPHYR
 #include "drivers/one_wire_uart.h"
+
+#include <zephyr/kernel.h>
+
+K_EVENT_DEFINE(keyscan_event);
 #endif
 
 /* Console output macros */
@@ -176,7 +180,11 @@ void keyboard_scan_enable(int enable, enum kb_scan_disable_masks mask)
 	/* Using atomic_get() causes build errors on some archs */
 	if (old != disable_scanning_mask) {
 		/* If the mask has changed, let the task figure things out */
+#ifdef CONFIG_ZEPHYR
+		keyscan_set_event(TASK_EVENT_WAKE);
+#else
 		task_wake(TASK_ID_KEYSCAN);
+#endif
 	}
 }
 
@@ -296,7 +304,11 @@ static void simulate_key(int row, int col, int pressed)
 	force_poll = 1;
 
 	/* Wake the task to handle changes in simulated keys */
+#ifdef CONFIG_ZEPHYR
+	keyscan_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_KEYSCAN);
+#endif
 
 	/*
 	 * Make sure that the keyboard task sees the key for long enough.
@@ -1172,7 +1184,11 @@ void keyboard_scan_task(void *u)
 				 */
 				boot_key_value &= BIT(BOOT_KEY_POWER);
 #endif /* CONFIG_KEYBOARD_BOOT_KEYS */
+#ifdef CONFIG_ZEPHYR
+				keyscan_wait_event(-1);
+#else
 				task_wait_event(-1);
+#endif
 			}
 		}
 

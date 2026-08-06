@@ -121,8 +121,13 @@ int power_button_wait_for_release(int timeout_us)
 		 * that the power button is debounced but not changed, or the
 		 * power button has not been debounced.
 		 */
+#ifdef CONFIG_ZEPHYR
+		powerbtn_wait_event(
+			min(power_button.debounce_us, deadline.val - now.val));
+#else
 		task_wait_event(
 			min(power_button.debounce_us, deadline.val - now.val));
+#endif
 	}
 
 	CPRINTS("%s released in time", power_button.name);

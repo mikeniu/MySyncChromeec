@@ -332,13 +332,21 @@ static void sc7x80_lid_event(void)
 		return;
 
 	lid_opened = 1;
+#ifdef CONFIG_ZEPHYR
+	chipset_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_CHIPSET);
+#endif
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, sc7x80_lid_event, HOOK_PRIO_DEFAULT);
 
 static void sc7x80_powerbtn_changed(void)
 {
+#ifdef CONFIG_ZEPHYR
+	chipset_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_CHIPSET);
+#endif
 }
 DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, sc7x80_powerbtn_changed,
 	     HOOK_PRIO_DEFAULT);

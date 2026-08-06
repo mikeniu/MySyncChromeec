@@ -30,14 +30,7 @@
 #ifdef CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK
 
 /* Hold the event bits for all ports, 1 byte per port. */
-static atomic_t usb_charger_port_events;
-
-/* Convert event bits for port so it can be stored in a 32 bit value. */
-#define PORT_EVENT_PACK(port, event) ((event & 0xff) << (8 * port))
-
-/* Extract the event bits for port from a 32 bit value. */
-#define PORT_EVENT_UNPACK(port, event_packed) \
-	((event_packed >> (8 * port)) & 0xff)
+atomic_t usb_charger_port_events;
 
 /* Ensure port event bits are valid. */
 BUILD_ASSERT(BIT(0) == TASK_EVENT_CUSTOM_BIT(0));
@@ -107,7 +100,11 @@ void usb_charger_vbus_change(int port, int vbus_level)
 	if ((get_usb_pd_vbus_detect() == USB_PD_VBUS_DETECT_CHARGER) ||
 	    (get_usb_pd_vbus_detect() == USB_PD_VBUS_DETECT_PPC)) {
 		/* USB PD task */
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 	}
 }
 
@@ -123,13 +120,40 @@ void usb_charger_reset_charge(int port)
 #endif
 }
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+
+#ifdef CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK
+K_EVENT_DEFINE(usb_chg_single_event);
+#else
+struct k_event usb_chg_events[USB_CHARGER_PORT_COUNT] = {
+#if USB_CHARGER_PORT_COUNT > 0
+	Z_EVENT_INITIALIZER(usb_chg_events[0]),
+#endif
+#if USB_CHARGER_PORT_COUNT > 1
+	Z_EVENT_INITIALIZER(usb_chg_events[1]),
+#endif
+#if USB_CHARGER_PORT_COUNT > 2
+	Z_EVENT_INITIALIZER(usb_chg_events[2]),
+#endif
+#if USB_CHARGER_PORT_COUNT > 3
+	Z_EVENT_INITIALIZER(usb_chg_events[3]),
+#endif
+};
+#endif
+#endif
+
 test_mockable void usb_charger_task_set_event(int port, uint8_t event)
 {
+#ifdef CONFIG_ZEPHYR
+	usb_charger_set_event(port, event);
+#else
 #ifdef CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK
 	atomic_or(&usb_charger_port_events, PORT_EVENT_PACK(port, event));
 	task_set_event(TASK_ID_USB_CHG, BIT(port));
 #else
 	task_set_event(USB_CHG_PORT_TO_TASK_ID(port), event);
+#endif
 #endif
 }
 
@@ -180,7 +204,11 @@ void usb_charger_task_shared(void *u)
 	}
 
 	while (1) {
+#ifdef CONFIG_ZEPHYR
+		evt = usb_charger_wait_event(-1);
+#else
 		evt = task_wait_event(-1);
+#endif
 
 		for (port = 0; port < board_get_usb_pd_port_count(); port++) {
 			if (!(evt & BIT(port))) {
@@ -223,7 +251,11 @@ void usb_charger_task(void *u)
 	bc12_port->drv->usb_charger_task_init(port);
 
 	while (1) {
+#ifdef CONFIG_ZEPHYR
+		evt = usb_charger_wait_event(port, -1);
+#else
 		evt = task_wait_event(-1);
+#endif
 
 		usb_charger_task_set_event_sync(port, evt);
 	}

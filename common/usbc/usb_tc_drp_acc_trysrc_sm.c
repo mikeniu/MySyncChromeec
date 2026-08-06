@@ -610,7 +610,11 @@ void pd_request_source_voltage(int port, int mv)
 		else
 			pd_dpm_request(port, DPM_REQUEST_PR_SWAP);
 
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 	}
 }
 
@@ -623,7 +627,11 @@ void pd_set_external_voltage_limit(int port, int mv)
 		if (get_state_tc(port) == TC_ATTACHED_SNK)
 			pd_dpm_request(port, DPM_REQUEST_NEW_POWER_LEVEL);
 
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 	}
 }
 
@@ -785,8 +793,13 @@ static inline void pd_set_dual_role_and_event(int port,
 	if (IS_ENABLED(CONFIG_USB_PD_TRY_SRC))
 		pd_update_try_source();
 
+#ifdef CONFIG_ZEPHYR
+	if (event != 0)
+		pd_set_event(port, event);
+#else
 	if (event != 0)
 		task_set_event(PD_PORT_TO_TASK_ID(port), event);
+#endif
 }
 
 void pd_set_dual_role(int port, enum pd_dual_role_states state)
@@ -814,7 +827,11 @@ void pd_request_data_swap(int port)
 	 */
 	if (IS_ATTACHED_SRC(port) || IS_ATTACHED_SNK(port)) {
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_DR_SWAP);
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 	}
 }
 
@@ -960,7 +977,11 @@ void tc_prs_src_snk_assert_rd(int port)
 		 * DebugAccessory.SNK assert Rd
 		 */
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP);
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 	}
 }
 
@@ -976,7 +997,11 @@ void tc_prs_snk_src_assert_rp(int port)
 		 * UnorientedDebugAccessory.SRC to assert Rp
 		 */
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP);
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 	}
 }
 
@@ -997,7 +1022,11 @@ void tc_prs_snk_src_assert_rp(int port)
 void tc_hard_reset_request(int port)
 {
 	TC_SET_FLAG(port, TC_FLAGS_HARD_RESET_REQUESTED);
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 void tc_try_src_override(enum try_src_override_t ov)
@@ -1112,7 +1141,11 @@ void pd_set_suspend(int port, int suspend)
 		if (PD_PORT_TO_TASK_ID(port) == task_get_current())
 			return;
 
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 
 		/* Sleep this task if we are not suspended */
 		while (pd_is_port_enabled(port)) {
@@ -1125,7 +1158,11 @@ void pd_set_suspend(int port, int suspend)
 		}
 	} else {
 		TC_CLR_FLAG(port, TC_FLAGS_REQUEST_SUSPEND);
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 	}
 }
 
@@ -1990,7 +2027,11 @@ void pd_request_vconn_swap_off(int port)
 	if (get_state_tc(port) == TC_ATTACHED_SRC ||
 	    get_state_tc(port) == TC_ATTACHED_SNK) {
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_VC_SWAP_OFF);
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 	}
 }
 
@@ -1999,7 +2040,11 @@ void pd_request_vconn_swap_on(int port)
 	if (get_state_tc(port) == TC_ATTACHED_SRC ||
 	    get_state_tc(port) == TC_ATTACHED_SNK) {
 		TC_SET_FLAG(port, TC_FLAGS_REQUEST_VC_SWAP_ON);
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 	}
 }
 #endif
@@ -2039,8 +2084,12 @@ static __maybe_unused int reset_device_and_notify(int port)
 	 * waking the TCPC, but it has also set PD_EVENT_TCPC_RESET again, which
 	 * would result in a second, unnecessary init.
 	 */
+#ifdef CONFIG_ZEPHYR
+	pd_clear_event(port, PD_EVENT_TCPC_RESET);
+#else
 	atomic_clear_bits(task_get_event_bitmap(task_get_current()),
 			  PD_EVENT_TCPC_RESET);
+#endif
 
 	waiting_tasks = atomic_clear(&tc[port].tasks_waiting_on_reset);
 
@@ -2048,7 +2097,11 @@ static __maybe_unused int reset_device_and_notify(int port)
 	while (waiting_tasks) {
 		task = __fls(waiting_tasks);
 		waiting_tasks &= ~BIT(task);
+#ifdef CONFIG_ZEPHYR
+		pd_set_event(port, TASK_EVENT_PD_AWAKE);
+#else
 		task_set_event(task, TASK_EVENT_PD_AWAKE);
+#endif
 	}
 
 	return rv;
@@ -2075,8 +2128,13 @@ void pd_wait_exit_low_power(int port)
 		 * happen much, but it if starts occurring, we can add a guard
 		 * to prevent/reduce it.
 		 */
+#ifdef CONFIG_ZEPHYR
+		pd_set_event(port, PD_EVENT_TCPC_RESET);
+		pd_wait_event(port, TASK_EVENT_PD_AWAKE, -1);
+#else
 		task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_TCPC_RESET);
 		task_wait_event_mask(TASK_EVENT_PD_AWAKE, -1);
+#endif
 	}
 }
 
@@ -2089,8 +2147,12 @@ void pd_device_accessed(int port)
 	if (port == TASK_ID_TO_PD_PORT(task_get_current()))
 		handle_device_access(port);
 	else
+#ifdef CONFIG_ZEPHYR
+		pd_set_event(port, PD_EVENT_DEVICE_ACCESSED);
+#else
 		task_set_event(PD_PORT_TO_TASK_ID(port),
 			       PD_EVENT_DEVICE_ACCESSED);
+#endif
 }
 
 /*
@@ -4069,13 +4131,21 @@ void tc_set_debug_level(enum debug_level debug_level)
 void tc_usb_firmware_fw_update_limited_run(int port)
 {
 	TC_SET_FLAG(port, TC_FLAGS_USB_RETIMER_FW_UPDATE_LTD_RUN);
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 void tc_usb_firmware_fw_update_run(int port)
 {
 	TC_SET_FLAG(port, TC_FLAGS_USB_RETIMER_FW_UPDATE_RUN);
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 void tc_run(const int port)
@@ -4241,8 +4311,12 @@ static void pd_set_power_change(void)
 	int i;
 
 	for (i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
+#ifdef CONFIG_ZEPHYR
+		pd_set_event(i, PD_EVENT_POWER_STATE_CHANGE);
+#else
 		task_set_event(PD_PORT_TO_TASK_ID(i),
 			       PD_EVENT_POWER_STATE_CHANGE);
+#endif
 	}
 }
 DECLARE_DEFERRED(pd_set_power_change);

@@ -126,8 +126,13 @@ static void set_keyscan_config(const struct ec_mkbp_config *src,
 	 * fall out of the task_wait_event() in keyboard_scan_task().
 	 */
 	if ((new_flags & EC_MKBP_FLAGS_ENABLE) &&
-	    !(dst->flags & EC_MKBP_FLAGS_ENABLE))
+	    !(dst->flags & EC_MKBP_FLAGS_ENABLE)) {
+#ifdef CONFIG_ZEPHYR
+		keyscan_set_event(TASK_EVENT_WAKE);
+#else
 		task_wake(TASK_ID_KEYSCAN);
+#endif
+	}
 #endif
 }
 

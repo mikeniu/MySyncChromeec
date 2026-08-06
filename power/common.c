@@ -28,6 +28,10 @@
 
 #include <string.h>
 
+#ifdef CONFIG_ZEPHYR
+K_EVENT_DEFINE(chipset_event);
+#endif
+
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_CHIPSET, outstr)
 #define CPRINTS(format, args...) cprints(CC_CHIPSET, format, ##args)
@@ -223,7 +227,11 @@ int power_wait_mask_signals_timeout(uint32_t want, uint32_t mask, int timeout)
 		return EC_SUCCESS;
 
 	while ((in_signals & mask) != in_want) {
+#ifdef CONFIG_ZEPHYR
+		if (chipset_wait_event(timeout) == TASK_EVENT_TIMER) {
+#else
 		if (task_wait_event(timeout) == TASK_EVENT_TIMER) {
+#endif
 			power_update_signals();
 			return EC_ERROR_TIMEOUT;
 		}
@@ -678,7 +686,11 @@ void chipset_exit_hard_off(void)
 	 * pressed. For other states here, to wake the chipset task to trigger
 	 * the event for leaving G3 is necessary.
 	 */
+#ifdef CONFIG_ZEPHYR
+	chipset_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_CHIPSET);
+#endif
 }
 
 #ifdef CONFIG_ZTEST

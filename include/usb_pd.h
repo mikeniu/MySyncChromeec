@@ -80,6 +80,34 @@ enum pd_rx_errors {
 	(PD_EVENT_CC | PD_EVENT_UPDATE_DUAL_ROLE | \
 	 PD_EVENT_POWER_STATE_CHANGE | PD_EVENT_TCPC_RESET)
 
+#ifdef CONFIG_ZEPHYR
+#include "task.h"
+
+#include <zephyr/kernel.h>
+
+extern struct k_event pd_event[CONFIG_USB_PD_PORT_MAX_COUNT];
+
+static inline void pd_set_event(int port, uint32_t events)
+{
+	k_event_post(&pd_event[port], events);
+}
+
+static inline void pd_wake(int port)
+{
+	pd_set_event(port, TASK_EVENT_WAKE);
+}
+
+static inline uint32_t pd_wait_event(int port, uint32_t mask, int timeout_us)
+{
+	return cros_ec_event_wait_safe(&pd_event[port], mask, timeout_us);
+}
+
+static inline void pd_clear_event(int port, uint32_t mask)
+{
+	k_event_clear(&pd_event[port], mask);
+}
+#endif
+
 /* --- PD data message helpers --- */
 #ifdef CONFIG_USB_PD_EPR
 #define PDO_MAX_OBJECTS 11

@@ -109,7 +109,11 @@ test_mockable void bmi3xx_interrupt(enum gpio_signal signal)
 {
 	last_interrupt_timestamp = __hw_clock_source_read();
 
+#ifdef CONFIG_ZEPHYR
+	motion_sense_set_event(CONFIG_ACCELGYRO_BMI3XX_INT_EVENT);
+#else
 	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ACCELGYRO_BMI3XX_INT_EVENT);
+#endif
 }
 
 static int enable_fifo(const struct motion_sensor_t *s, int enable)

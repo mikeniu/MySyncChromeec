@@ -143,6 +143,7 @@ uint32_t read_clear_int_mask(void);
  */
 void set_int_mask(uint32_t val);
 
+#ifndef CONFIG_ZEPHYR
 /**
  * Set a task event.
  *
@@ -165,6 +166,7 @@ static inline void task_wake(task_id_t tskid)
 {
 	task_set_event(tskid, TASK_EVENT_WAKE);
 }
+#endif /* !CONFIG_ZEPHYR */
 
 /**
  * Return the identifier of the task currently running.
@@ -172,6 +174,14 @@ static inline void task_wake(task_id_t tskid)
 task_id_t task_get_current(void);
 
 #ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+
+/**
+ * Helper to wait for event(s) safely with ChromeOS EC timeout handling
+ */
+uint32_t cros_ec_event_wait_safe(struct k_event *event, uint32_t events,
+				 int timeout_us);
+
 /**
  * Check if this current task is running in deferred context
  */
@@ -188,6 +198,7 @@ static inline bool in_deferred_context(void)
 }
 #endif /* CONFIG_ZEPHYR */
 
+#ifndef CONFIG_ZEPHYR
 /**
  * Return a pointer to the bitmap of events of the task.
  */
@@ -225,6 +236,7 @@ uint32_t task_wait_event(int timeout_us);
  *			TASK_EVENT_TIMER if the timeout is reached.
  */
 uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us);
+#endif /* !CONFIG_ZEPHYR */
 
 /**
  * Prints the list of tasks.

@@ -975,7 +975,11 @@ void fusb302_tcpc_alert(int port)
 
 	if (interrupt & TCPC_REG_INTERRUPT_BC_LVL) {
 		/* CC Status change */
+#ifdef CONFIG_ZEPHYR
+		pd_set_event(port, PD_EVENT_CC);
+#else
 		task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_CC);
+#endif
 	}
 
 	if (interrupt & TCPC_REG_INTERRUPT_COLLISION) {
@@ -993,7 +997,11 @@ void fusb302_tcpc_alert(int port)
 		if (!fusb302_tcpm_check_vbus_level(port, VBUS_PRESENT))
 			pd_vbus_low(port);
 #endif
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 		hook_notify(HOOK_AC_CHANGE);
 	}
 #endif
@@ -1022,8 +1030,12 @@ void fusb302_tcpc_alert(int port)
 
 		/* bring FUSB302 out of reset */
 		fusb302_pd_reset(port);
+#ifdef CONFIG_ZEPHYR
+		pd_set_event(port, PD_EVENT_RX_HARD_RESET);
+#else
 		task_set_event(PD_PORT_TO_TASK_ID(port),
 			       PD_EVENT_RX_HARD_RESET);
+#endif
 	}
 
 	if (interruptb & TCPC_REG_INTERRUPTB_GCRCSENT) {

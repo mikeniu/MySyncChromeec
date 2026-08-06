@@ -65,6 +65,9 @@ int usb_charge_set_mode(int usb_port_id, enum usb_charge_mode mode,
  * atomic, make sure we don't define more than 8 event bits per port.
  */
 #define USB_CHARGER_EVENT_BIT(x) BUILD_CHECK_INLINE(BIT(x), BIT(x) & 0xff)
+#define PORT_EVENT_PACK(port, event) (((event) & 0xff) << (8 * (port)))
+#define PORT_EVENT_UNPACK(port, packed_event) \
+	(((packed_event) >> (8 * (port))) & 0xff)
 #else
 #define USB_CHARGER_EVENT_BIT(x) TASK_EVENT_CUSTOM_BIT(x)
 #endif
@@ -89,6 +92,36 @@ int usb_charge_set_mode(int usb_port_id, enum usb_charge_mode mode,
 #define USB_CHG_PORT_TO_TASK_ID(port) -1 /* stub task ID */
 #define TASK_ID_TO_USB_CHG_PORT(id) 0
 #endif /* HAS_TASK_USB_CHG_P0 */
+
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+
+#ifdef CONFIG_PLATFORM_EC_USB_CHARGER_SINGLE_TASK
+extern struct k_event usb_chg_single_event;
+extern atomic_t usb_charger_port_events;
+static inline void usb_charger_set_event(int port, uint32_t event)
+{
+	atomic_or(&usb_charger_port_events, PORT_EVENT_PACK(port, event));
+	k_event_post(&usb_chg_single_event, BIT(port));
+}
+static inline uint32_t usb_charger_wait_event(int timeout_us)
+{
+	return cros_ec_event_wait_safe(&usb_chg_single_event, UINT32_MAX,
+				       timeout_us);
+}
+#else
+extern struct k_event usb_chg_events[USB_CHARGER_PORT_COUNT];
+static inline void usb_charger_set_event(int port, uint32_t event)
+{
+	k_event_post(&usb_chg_events[port], event);
+}
+static inline uint32_t usb_charger_wait_event(int port, int timeout_us)
+{
+	return cros_ec_event_wait_safe(&usb_chg_events[port], UINT32_MAX,
+				       timeout_us);
+}
+#endif
+#endif
 
 /**
  * Returns true if the passed port is a power source.

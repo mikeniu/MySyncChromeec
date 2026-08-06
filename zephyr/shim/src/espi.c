@@ -659,7 +659,11 @@ static void kbc_ibf_obe_handler(uint32_t data)
 			LOG_ERR("ESPI write failed: E8042_CLEAR_FLAG = %d", rv);
 		}
 	}
+#ifdef CONFIG_ZEPHYR
+	keyproto_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_KEYPROTO);
+#endif
 #endif
 }
 

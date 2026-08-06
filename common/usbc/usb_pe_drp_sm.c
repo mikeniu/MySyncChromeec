@@ -929,7 +929,11 @@ void pe_message_received(int port)
 	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
 
 	PE_SET_FLAG(port, PE_FLAGS_MSG_RECEIVED);
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 void pe_hard_reset_sent(int port)
@@ -988,7 +992,11 @@ test_mockable void pd_got_frs_signal(int port)
 	else
 		pd_set_error_recovery(port);
 
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 #endif /* CONFIG_USB_PD_REV30 */
 
@@ -1326,7 +1334,11 @@ void pe_report_error(int port, enum pe_error e, enum tcpci_msg_type type)
 	    (pe_in_frs_mode(port) &&
 	     get_state_pe(port) == PE_PRS_SNK_SRC_SEND_SWAP)) {
 		PE_SET_FLAG(port, PE_FLAGS_PROTOCOL_ERROR);
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 		return;
 	}
 
@@ -1462,7 +1474,11 @@ void pe_message_sent(int port)
 	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
 
 	PE_SET_FLAG(port, PE_FLAGS_TX_COMPLETE);
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 void pd_send_vdm(int port, uint32_t vid, int cmd, const uint32_t *data,
@@ -1492,7 +1508,11 @@ void pd_send_vdm(int port, uint32_t vid, int cmd, const uint32_t *data,
 	pe[port].tx_type = TCPCI_MSG_SOP;
 	pd_dpm_request(port, DPM_REQUEST_VDM);
 
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 #ifdef TEST_BUILD
@@ -3573,7 +3593,11 @@ static void pe_snk_evaluate_capability_entry(int port)
 
 #ifdef HAS_TASK_DPS
 	/* Wake DPS task to evaluate the SrcCaps */
+#ifdef CONFIG_ZEPHYR
+	dps_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_DPS);
+#endif
 #endif
 }
 

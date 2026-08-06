@@ -11,6 +11,24 @@
 #include "button.h"
 #include "common.h"
 
+#ifdef CONFIG_ZEPHYR
+#include "task.h"
+
+#include <zephyr/kernel.h>
+
+extern struct k_event keyproto_event;
+
+static inline void keyproto_set_event(uint32_t events)
+{
+	k_event_post(&keyproto_event, events);
+}
+
+static inline uint32_t keyproto_wait_event(int timeout_us)
+{
+	return cros_ec_event_wait_safe(&keyproto_event, UINT32_MAX, timeout_us);
+}
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

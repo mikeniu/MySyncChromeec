@@ -36,7 +36,11 @@ test_mockable void schedule_deferred_pd_interrupt(const int port)
 	 * that doesn't have pd int task is 0.
 	 */
 	if (pd_int_task_id[port] != 0)
+#ifdef CONFIG_ZEPHYR
+		pd_set_event(port, PD_PROCESS_INTERRUPT);
+#else
 		task_set_event(pd_int_task_id[port], PD_PROCESS_INTERRUPT);
+#endif
 }
 
 static struct {
@@ -99,7 +103,11 @@ void pd_interrupt_handler_task(void *p)
 
 	while (1) {
 		bool have_alerts;
+#ifdef CONFIG_ZEPHYR
+		const int evt = pd_wait_event(port, PD_PROCESS_INTERRUPT, -1);
+#else
 		const int evt = task_wait_event(-1);
+#endif
 
 		if ((evt & PD_PROCESS_INTERRUPT) == 0)
 			continue;

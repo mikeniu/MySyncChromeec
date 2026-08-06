@@ -83,6 +83,10 @@ bool dps_is_enabled(void)
 	return is_enabled;
 }
 
+#ifdef CONFIG_ZEPHYR
+K_EVENT_DEFINE(dps_event);
+#endif
+
 test_export_static void dps_enable(bool en)
 {
 	bool prev_en = is_enabled;
@@ -90,7 +94,11 @@ test_export_static void dps_enable(bool en)
 	is_enabled = en;
 
 	if (is_enabled && !prev_en) {
+#ifdef CONFIG_ZEPHYR
+		dps_set_event(TASK_EVENT_WAKE);
+#else
 		task_wake(TASK_ID_DPS);
+#endif
 	}
 
 	if (!is_enabled) {
@@ -498,14 +506,22 @@ void dps_task(void *u)
 		now = get_time();
 		if (flag & DPS_FLAG_STOP_EVENTS) {
 			dps_reset();
+#ifdef CONFIG_ZEPHYR
+			dps_wait_event(-1);
+#else
 			task_wait_event(-1);
+#endif
 			/* clear flags after wake up. */
 			atomic_clear(&flag);
 			update_timeout(dps_config.t_check);
 			continue;
 		} else if (now.val < timeout.val) {
 			atomic_or(&flag, DPS_FLAG_WAITING);
+#ifdef CONFIG_ZEPHYR
+			dps_wait_event(timeout.val - now.val);
+#else
 			task_wait_event(timeout.val - now.val);
+#endif
 			atomic_clear_bits(&flag, DPS_FLAG_WAITING);
 			continue;
 		}

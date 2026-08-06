@@ -821,11 +821,20 @@ void elan_tp_read_report_retry(void)
 	elan_tp_init();
 }
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+K_EVENT_DEFINE(touchpad_event);
+#endif
+
 void touchpad_interrupt(enum gpio_signal signal)
 {
 	irq_ts = __hw_clock_source_read();
 
+#ifdef CONFIG_ZEPHYR
+	k_event_post(&touchpad_event, TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_TOUCHPAD);
+#endif
 }
 
 /* Make a decision on touchpad power, based on USB and tablet mode status. */
@@ -859,7 +868,12 @@ void touchpad_task(void *u)
 	touchpad_power_control();
 
 	while (1) {
+#ifdef CONFIG_ZEPHYR
+		event = cros_ec_event_wait_safe(&touchpad_event, UINT32_MAX,
+						-1);
+#else
 		event = task_wait_event(-1);
+#endif
 
 		if (event & TASK_EVENT_WAKE)
 			elan_tp_read_report_retry();
@@ -876,7 +890,11 @@ void touchpad_task(void *u)
 #if defined(CONFIG_USB_SUSPEND) || defined(CONFIG_TABLET_MODE)
 static void touchpad_power_change(void)
 {
+#ifdef CONFIG_ZEPHYR
+	k_event_post(&touchpad_event, TASK_EVENT_POWER);
+#else
 	task_set_event(TASK_ID_TOUCHPAD, TASK_EVENT_POWER);
+#endif
 }
 #endif
 #ifdef CONFIG_USB_SUSPEND
