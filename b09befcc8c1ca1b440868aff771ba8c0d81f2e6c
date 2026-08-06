@@ -49,6 +49,52 @@
       "isAi": true,
       "revId": "b09befcc8c1ca1b440868aff771ba8c0d81f2e6c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf566d5e_86d39b24",
+        "filename": "zephyr/test/hwtest/src/queue.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T14:49:14Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: It might be a good practice to call `queue_init(q);` here to explicitly reset the queue state. This ensures the test remains deterministic if it\u0027s run multiple times in the same invocation.",
+      "range": {
+        "startLine": 429,
+        "startChar": 0,
+        "endLine": 429,
+        "endChar": 0
+      },
+      "revId": "b09befcc8c1ca1b440868aff771ba8c0d81f2e6c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b27f4d9_57adce07",
+        "filename": "zephyr/test/hwtest/src/queue.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T14:49:14Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Similar to the unbuffered test, calling `queue_init(q);` here would make the test robust against repeated runs. This is especially relevant here because `queue_enable_buffered_mode(q)` persistently alters the state flags of this static queue instance.",
+      "range": {
+        "startLine": 451,
+        "startChar": 0,
+        "endLine": 451,
+        "endChar": 0
+      },
+      "revId": "b09befcc8c1ca1b440868aff771ba8c0d81f2e6c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
