@@ -16,6 +16,23 @@
       "message": "Fix the legacy test build failures",
       "revId": "626cbf4daa456c385b095ab33069acb1b9b9d684",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4909a3d_762103c4",
+        "filename": "common/charge_state.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 1576,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-06T14:51:58Z",
+      "side": 1,
+      "message": "`#if defined(CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON) \u0026\u0026 defined(CONFIG_CHARGE_MANAGER)`",
+      "revId": "626cbf4daa456c385b095ab33069acb1b9b9d684",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
