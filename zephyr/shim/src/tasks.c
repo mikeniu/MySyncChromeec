@@ -186,6 +186,30 @@ static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 	return TASK_ID_INVALID;
 }
 
+static inline struct task_ctx_base_data *current_get_base_data(void)
+{
+#ifdef TEST_BUILD
+	if (k_is_pre_kernel()) {
+		return NULL;
+	}
+
+	struct task_ctx_base_data *data = k_thread_custom_data_get();
+
+	if (unlikely(data == NULL)) {
+		task_id_t id = thread_id_to_task_id(k_current_get());
+
+		data = task_get_base_data(id);
+		if (data != NULL) {
+			k_thread_custom_data_set(data);
+		}
+	}
+
+	return data;
+#else
+	return k_thread_custom_data_get();
+#endif
+}
+
 task_id_t task_get_current(void)
 {
 	/* k_current_get() is not valid pre kernel */
@@ -219,9 +243,7 @@ void task_set_event(task_id_t cros_task_id, uint32_t event)
 
 uint32_t task_wait_event(int timeout_us)
 {
-	struct task_ctx_base_data *data;
-
-	data = task_get_base_data(task_get_current());
+	struct task_ctx_base_data *data = current_get_base_data();
 
 	__ASSERT_NO_MSG(data != NULL);
 
@@ -266,9 +288,9 @@ uint32_t task_wait_event(int timeout_us)
 
 uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 {
-	struct task_ctx_base_data *data;
+	struct task_ctx_base_data *data = current_get_base_data();
 
-	data = task_get_base_data(task_get_current());
+	__ASSERT_NO_MSG(data != NULL);
 
 	uint32_t events = 0;
 	const int64_t tick_deadline =
@@ -351,7 +373,10 @@ void timer_cancel(task_id_t cros_ec_task_id)
 #ifdef TEST_BUILD
 void set_test_runner_tid(void)
 {
-	task_to_k_tid[TASK_ID_TEST_RUNNER] = k_current_get();
+	k_tid_t tid = k_current_get();
+
+	task_to_k_tid[TASK_ID_TEST_RUNNER] = tid;
+	tid->custom_data = &shimmed_tasks_data[TASK_ID_TEST_RUNNER];
 }
 
 #ifdef CONFIG_TASKS_SET_TEST_RUNNER_TID_RULE
@@ -382,6 +407,7 @@ void start_ec_tasks(void)
 		}
 #endif
 		k_thread_start(task_to_k_tid[i]);
+		task_to_k_tid[i]->custom_data = &shimmed_tasks_data[i];
 	}
 
 	tasks_started = 1;

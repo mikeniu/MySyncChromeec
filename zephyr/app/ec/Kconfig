@@ -169,6 +169,7 @@ config CROS_EC_FIRMWARE_LOAD_OFF
 # By default, a unit test doesn't need shimmed tasks.
 config SHIMMED_TASKS
 	bool "Add support for shimming in platform/ec tasks as Zephyr threads"
+	select THREAD_CUSTOM_DATA
 	default n if ARCH_POSIX
 	default y if PLATFORM_EC_USB_CHARGER
 	default y if HAS_TASK_CEC
