@@ -87,6 +87,16 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "tablet_interrupt";
 		};
+		int_wpc: wpc{
+			irq-pin = <&gpio_pen_int_odl>;
+			flags = <GPIO_INT_EDGE_RISING>;
+			handler = "pchg_irq";
+		};
+		wpc_lid_irq: wpc_lid_irq{
+			irq-pin = <&gpio_pen_eject_od>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "wpc_hall_interrupt";
+		};
 	};
 };
 
@@ -144,4 +154,14 @@
 		&adc0_chan7_gpe1
 		&adc0_chan11_gpc7>;
 	pinctrl-names = "default";
+};
+
+&i2c3_0 {
+	ctn730@28 {
+		compatible = "nxp,ctn730";
+		reg = <0x28>;
+		irq-gpios=<&gpio7 5 GPIO_INPUT>;
+		rf-charge-msec = <1000>;
+		full-percent = <100>;
+	};
 };
