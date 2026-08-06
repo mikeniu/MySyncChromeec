@@ -9,6 +9,12 @@
 		compatible = "cros-ec,led-policy";
 		led-pins = <&led_pins>;
 
+		sysrq-alias = "EC_LED_ID_BATTERY_LED";
+		sysrq-led-control-color = "LED_WHITE";
+
+		recovery-hw-reinit-alias = "EC_LED_ID_BATTERY_LED";
+		recovery-hw-reinit-led-control-color = "LED_AMBER";
+
 		power-state-charge-1 {
 			charge-state = "LED_PWRS_CHARGE";
 			/* Battery display percent range (>= Empty, <= 94%) */
