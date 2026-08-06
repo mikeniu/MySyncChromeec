@@ -94,6 +94,30 @@
       },
       "revId": "10aff1db254fc2710dbebb1b051b39e1f6dee4c0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c032988c_96347805",
+        "filename": "zephyr/shim/chip/it8xxx2/shi.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1273969
+      },
+      "writtenOn": "2026-08-06T00:16:15Z",
+      "side": 1,
+      "message": "The downstream PR: https://chromium-review.googlesource.com/c/chromiumos/third_party/zephyrproject/+/8181279 has been merged, and this CL can be reviewed.",
+      "parentUuid": "f8fe53fb_96dd6f7b",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 40
+      },
+      "revId": "10aff1db254fc2710dbebb1b051b39e1f6dee4c0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
