@@ -50,6 +50,24 @@ static enum ec_error_list get_fp_encryption_status(uint32_t *status)
 	return EC_SUCCESS;
 }
 
+static enum ec_status wait_for_template_decrypt_result(void)
+{
+	struct ec_params_fp_template_v1 result_params = {
+		.cmd = FP_TEMPLATE_GET_RESULT,
+	};
+	enum ec_status res;
+	int timeout = 50; /* Poll up to 500ms */
+
+	do {
+		crec_msleep(10);
+		res = test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
+					     &result_params,
+					     sizeof(result_params), NULL, 0);
+	} while (res == EC_RES_BUSY && --timeout > 0);
+
+	return res;
+}
+
 test_static enum ec_error_list
 test_fp_command_establish_pairing_key_keygen(void)
 {
@@ -810,6 +828,8 @@ test_static enum ec_error_list test_fp_command_template_decrypted(void)
 				       sizeof(decrypt_params), NULL, 0),
 		EC_RES_SUCCESS, "%d");
 
+	TEST_EQ(wait_for_template_decrypt_result(), EC_RES_SUCCESS, "%d");
+
 	uint32_t status;
 	TEST_EQ(get_fp_encryption_status(&status), EC_SUCCESS, "%d");
 
@@ -909,6 +929,8 @@ test_static enum ec_error_list test_fp_command_commit_v3(void)
 	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, &decrypt_params,
 				       sizeof(decrypt_params), NULL, 0),
 		EC_RES_SUCCESS, "%d");
+
+	TEST_EQ(wait_for_template_decrypt_result(), EC_RES_INVALID_PARAM, "%d");
 
 	return EC_SUCCESS;
 }
@@ -1013,6 +1035,8 @@ test_static enum ec_error_list test_fp_command_commit_trivial_salt(void)
 	TEST_EQ(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, &decrypt_params,
 				       sizeof(decrypt_params), NULL, 0),
 		EC_RES_SUCCESS, "%d");
+
+	TEST_EQ(wait_for_template_decrypt_result(), EC_RES_INVALID_PARAM, "%d");
 
 	return EC_SUCCESS;
 }
