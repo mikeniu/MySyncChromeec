@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88525e4c_3b75853e",
+        "filename": "zephyr/Makefile.cq",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T14:53:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7409011b_9d0380a5",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 0
+      },
+      "revId": "d68b5fe22a9d953e82c59a6f58c7fac6475b9c6b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "49aacd0c_1d29741f",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-08-05T20:49:56Z",
       "side": 1,
       "message": "Note that `test_gcc` and `test_llvm` both depend on `twister_coreboot_sdk`, `zephyr_check_compliance_unittest` (and also `zmake_unit_tests` / `test_host_utils` above). This means these tasks will run twice when the CQ splits the jobs.\n\nIf these targets take a non-trivial amount of time, you might want to assign them to only one of the toolchains (e.g., `test_gcc`) to maximize the CQ execution speedup.",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 0
+      },
+      "revId": "d68b5fe22a9d953e82c59a6f58c7fac6475b9c6b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "552883c7_7cb3fd10",
+        "filename": "zephyr/Makefile.cq",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T14:53:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49aacd0c_1d29741f",
       "range": {
         "startLine": 88,
         "startChar": 0,
