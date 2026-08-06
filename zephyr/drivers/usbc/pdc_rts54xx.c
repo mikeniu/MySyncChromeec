@@ -1781,7 +1781,9 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 		/* UFP VDO */
 		ufp_vdo.version = UFP_VDO_VERSION_1_3;
 		ufp_vdo.usb4_cap = false;
-		ufp_vdo.usb3_cap = true;
+		/* TODO(b/543357136): Make usb3_cap configurable for device mode
+		 */
+		ufp_vdo.usb3_cap = false;
 		ufp_vdo.usb2_cap = UFP_USB2_CAPABLE;
 		ufp_vdo.vconn = false;
 		ufp_vdo.vbus = UFP_VDO_VBUS_NOT_REQUIRED;
