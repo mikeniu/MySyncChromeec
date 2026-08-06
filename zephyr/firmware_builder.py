@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=too-many-lines
 # Copyright 2021 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
@@ -739,14 +740,25 @@ def test(opts):
         f"-j{opts.cpus}",
         f"CPUS={opts.cpus}",
         f"LCOV_CPUS={max_lcov_workers}",
-        "test",
     ]
     env = os.environ.copy()
     env.update(init_toolchain())
     if opts.code_coverage:
         cmd.append("COVERAGE=1")
-    if SPECIAL_BOARDS:
-        cmd.append(f"SPECIAL_BOARDS={' '.join(SPECIAL_BOARDS)}")
+
+    # If firmware_targets contains a '/', it's a shard (e.g. 1/3)
+    # Otherwise it's a specific board or comma-separated list of boards
+    boards = SPECIAL_BOARDS.copy() if SPECIAL_BOARDS else []
+    if opts.firmware_targets:
+        if "/" in opts.firmware_targets:
+            cmd.append(f"TWISTER_SUBSET={opts.firmware_targets}")
+        else:
+            boards.extend(opts.firmware_targets.split(","))
+
+    if boards:
+        cmd.append(f"SPECIAL_BOARDS={' '.join(boards)}")
+
+    cmd.append("test")
     log_cmd(cmd)
     subprocess.run(
         cmd,

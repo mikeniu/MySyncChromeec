@@ -295,6 +295,13 @@ def create_arg_parser(build, bundle, test):
         help="Path to the directory for source file overrides",
     )
 
+    parser.add_argument(
+        "--firmware-targets",
+        required=False,
+        default="",
+        help="Comma-separated list of build/test target shards",
+    )
+
     # Would make this required=True, but not available until 3.7
     sub_cmds = parser.add_subparsers()
 

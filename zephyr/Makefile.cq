@@ -15,6 +15,9 @@ TWISTER_COMMAND=cd $(PLATFORM_EC) && ./twister --outdir \
 ifdef COVERAGE
 TWISTER_COMMAND+=--coverage --coverage-formats=lcov
 endif
+ifneq ($(TWISTER_SUBSET),)
+TWISTER_COMMAND+=--subset $(TWISTER_SUBSET)
+endif
 
 PLATFORM_EC=$(abspath ..)
 PLATFORM=$(abspath ../..)
