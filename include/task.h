@@ -327,6 +327,7 @@ void task_disable_irq(int irq);
  */
 void task_trigger_irq(int irq);
 
+#ifndef CONFIG_ZEPHYR
 /*
  * A task that supports resets may call this to indicate that it may be reset
  * at any point between this call and the next call to task_disable_resets().
@@ -375,6 +376,7 @@ int task_reset_cleanup(void);
  * task implementation.
  */
 int task_reset(task_id_t id, int wait);
+#endif /* !CONFIG_ZEPHYR */
 
 /**
  * Clear a pending interrupt.
