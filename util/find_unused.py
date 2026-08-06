@@ -17,6 +17,8 @@ Limitations:
 
 import argparse
 from concurrent.futures import ProcessPoolExecutor
+import functools
+import json
 import os
 from pathlib import Path
 import re
@@ -27,7 +29,78 @@ from elftools.elf.elffile import ELFFile  # pylint: disable=import-error
 
 
 MAX_WORKERS = os.cpu_count() or 4
-print(f"Using {MAX_WORKERS} workers")
+
+C_KEYWORDS = {
+    "ARRAY_SIZE",
+    "BIT",
+    "BUILD_ASSERT",
+    "CONFIG_IS_ENABLED",
+    "GENMASK",
+    "IS_ENABLED",
+    "LOG_DBG",
+    "LOG_ERR",
+    "LOG_INF",
+    "LOG_WRN",
+    "STATIC_ASSERT",
+    "alignof",
+    "case",
+    "do",
+    "else",
+    "enum",
+    "for",
+    "goto",
+    "if",
+    "return",
+    "sizeof",
+    "struct",
+    "switch",
+    "typedef",
+    "typeof",
+    "union",
+    "while",
+}
+
+FUNC_DEF_PATTERN = re.compile(
+    r"(?:^|\n)\s*"
+    r"(?:[a-zA-Z_]\w*[\s*]+)+"
+    r"([a-zA-Z_]\w*)"
+    r"\s*\([^;{}]*?\)"
+    r"(?:\s*__attribute__\s*\(\([^)]*\)\))*"
+    r"\s*\{",
+    re.DOTALL,
+)
+
+
+@functools.lru_cache(maxsize=16384)
+def normalize_path(
+    ec_root: Path | None, zephyr_root: Path | None, path: Path
+) -> Path:
+    """Normalize path to be relative to ec_root and handle cros_sdk mounts."""
+    path_str = str(path)
+
+    if "/mnt/host/source/src/platform/ec/" in path_str:
+        path_str = path_str.split("/mnt/host/source/src/platform/ec/")[1]
+    elif "/mnt/host/source/src/platform/ec-legacy/" in path_str:
+        path_str = path_str.split("/mnt/host/source/src/platform/ec-legacy/")[1]
+    elif "/mnt/host/source/src/third_party/zephyr/main/" in path_str:
+        path_str = (
+            "zephyr-main/"
+            + path_str.split("/mnt/host/source/src/third_party/zephyr/main/")[1]
+        )
+
+    res_path = Path(path_str)
+
+    if res_path.is_absolute():
+        if ec_root and res_path.is_relative_to(ec_root):
+            res_path = res_path.relative_to(ec_root)
+        elif zephyr_root and res_path.is_relative_to(zephyr_root):
+            res_path = Path("zephyr-base") / res_path.relative_to(zephyr_root)
+
+    path_str = str(res_path)
+    path_str = re.sub(r"^build/zephyr/[\w-]+/modules/ec/", "", path_str)
+    path_str = re.sub(r"^build/zephyr/[\w-]+/build-r[ow]/", "", path_str)
+
+    return Path(path_str)
 
 
 def find_files(paths, patterns):
@@ -53,62 +126,18 @@ def find_files(paths, patterns):
     return sources
 
 
-def sources_from_elf(elf_path) -> list:
-    """Find sources used in elf using pyelftools."""
+def extract_elf_info(args_tuple) -> tuple[set, set, list]:
+    """Extract sources, headers, and functions from an ELF file in a single pass."""
+    elf_path, ec_root, zephyr_root = args_tuple
     sources = set()
-    try:
-        with open(elf_path, "rb") as f:
-            elffile = ELFFile(f)
-            if not elffile.has_dwarf_info():
-                return []
-
-            dwarfinfo = elffile.get_dwarf_info()
-            for cu in dwarfinfo.iter_CUs():
-                line_program = dwarfinfo.line_program_for_CU(cu)
-                if not line_program:
-                    continue
-
-                for file_entry in line_program["file_entry"]:
-                    name = file_entry.name.decode("utf-8")
-                    dir_index = file_entry.dir_index
-
-                    if dir_index > 0:
-                        # dir_index is 1-based, include_directory is 0-based
-                        dir_path = line_program["include_directory"][
-                            dir_index - 1
-                        ].decode("utf-8")
-                        full_path = Path(dir_path) / name
-                    else:
-                        # dir_index 0 typically implies the comp_dir of the CU
-                        top_die = cu.get_top_DIE()
-                        comp_dir_attr = top_die.attributes.get("DW_AT_comp_dir")
-                        if comp_dir_attr and not Path(name).is_absolute():
-                            comp_dir = comp_dir_attr.value.decode("utf-8")
-                            full_path = Path(comp_dir) / name
-                        else:
-                            full_path = Path(name)
-
-                    # Filter out artificial sources like <built-in>
-                    if not (
-                        full_path.name.startswith("<")
-                        and full_path.name.endswith(">")
-                    ):
-                        sources.add(full_path)
-    except Exception:  # pylint: disable=broad-exception-caught
-        # Silently fail if ELF parsing fails
-        pass
-
-    return list(sources)
-
-
-def find_functions_in_elf(elf_path) -> list:
-    """Find functions used in elf using pyelftools."""
+    headers = set()
     functions = []
+
     try:
         with open(elf_path, "rb") as f:
             elffile = ELFFile(f)
             if not elffile.has_dwarf_info():
-                return []
+                return sources, headers, functions
 
             dwarfinfo = elffile.get_dwarf_info()
             for cu in dwarfinfo.iter_CUs():
@@ -124,21 +153,81 @@ def find_functions_in_elf(elf_path) -> list:
                     if comp_dir_attr:
                         comp_dir = comp_dir_attr.value.decode("utf-8")
 
+                line_program = dwarfinfo.line_program_for_CU(cu)
+                if line_program:
+                    for file_entry in line_program["file_entry"]:
+                        name = file_entry.name.decode("utf-8")
+                        dir_index = file_entry.dir_index
+
+                        if dir_index > 0:
+                            dir_path = line_program["include_directory"][
+                                dir_index - 1
+                            ].decode("utf-8")
+                            full_path = Path(dir_path) / name
+                        else:
+                            if comp_dir and not Path(name).is_absolute():
+                                full_path = Path(comp_dir) / name
+                            else:
+                                full_path = Path(name)
+
+                        if not (
+                            full_path.name.startswith("<")
+                            and full_path.name.endswith(">")
+                        ):
+                            norm = normalize_path(
+                                ec_root, zephyr_root, full_path
+                            )
+                            if norm.suffix in [".h", ".inc", ".hpp"]:
+                                headers.add(norm)
+                            else:
+                                sources.add(norm)
+
                 for die in cu.iter_DIEs():
                     if die.tag == "DW_TAG_subprogram":
                         name_attr = die.attributes.get("DW_AT_name")
                         if name_attr:
                             func_name = name_attr.value.decode("utf-8")
-
                             if cu_name:
                                 if not Path(cu_name).is_absolute() and comp_dir:
                                     full_path = Path(comp_dir) / cu_name
                                 else:
                                     full_path = Path(cu_name)
-                                functions.append((full_path, func_name))
+                                norm = normalize_path(
+                                    ec_root, zephyr_root, full_path
+                                )
+                                functions.append((norm, func_name))
     except Exception:  # pylint: disable=broad-exception-caught
         pass
 
+    return sources, headers, functions
+
+
+def find_functions_in_file(path):
+    """Find all defined functions in a C file."""
+    try:
+        content = path.read_text(errors="ignore", encoding="utf-8")
+    except Exception:  # pylint: disable=broad-exception-caught
+        return []
+
+    text = re.sub(r"/\*.*?\*/", "", content, flags=re.DOTALL)
+    text = re.sub(r"//.*$", "", text, flags=re.MULTILINE)
+
+    matches = FUNC_DEF_PATTERN.findall(text)
+    functions = []
+    for match in matches:
+        if match not in C_KEYWORDS and len(match) > 1:
+            functions.append((path, match))
+    return functions
+
+
+def find_all_defined_functions(paths) -> set:
+    """Find all defined functions in all source paths."""
+    functions = set()
+    sources = find_files(
+        paths=paths, patterns=["*.c", "*.h", "*.cc", "*.S", "*.inc"]
+    )
+    for source in sources:
+        functions.update(find_functions_in_file(source))
     return functions
 
 
@@ -146,6 +235,7 @@ def find_configs(paths) -> set:
     """Find all configs referenced in the source code."""
     configs = set()
     config_pattern = "CONFIG_[A-Z0-9_]*[A-Z0-9]"
+    ignored = {"CONFIG_IS_ENABLED", "CONFIG_H", "CONFIG_DIR", "CONFIG_FILE"}
     for path in paths:
         cmd = [
             "grep",
@@ -163,227 +253,81 @@ def find_configs(paths) -> set:
             text=True,
             check=False,
         )
-        configs.update(result.stdout.splitlines())
+        for c in result.stdout.splitlines():
+            if c not in ignored:
+                configs.add(c)
     return configs
 
 
-def find_set_configs(paths) -> set:
-    """Find all enabled configs in .config build artifacts."""
+def find_set_configs(source_paths, build_paths) -> set:
+    """Find all enabled or defined configs in build artifacts and sources."""
     configs = set()
-    config_set_pattern = "^CONFIG_[A-Z0-9_]*[A-Z0-9]+=.*"
-    for path in paths:
-        cmd = [
-            "grep",
-            "--recursive",
-            "--no-filename",
-            "--binary-files=without-match",
-            "--extended-regexp",
-            "--include=ec.config",
-            "--include=.config",
-            config_set_pattern,
-            str(path),
-        ]
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        configs.update({c.split("=")[0] for c in result.stdout.splitlines()})
+
+    # 1. .config files in build artifacts
+    for path in build_paths:
+        if not path.exists():
+            continue
+        for cf in path.rglob("*.config"):
+            try:
+                for line in cf.read_text(errors="ignore").splitlines():
+                    line = line.strip()
+                    if line.startswith("CONFIG_") and "=" in line:
+                        k, v = line.split("=", 1)
+                        if v != "n":
+                            configs.add(k)
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+
+    # 2. autoconf.h / kconfig.h / generated headers in build artifacts
+    for path in build_paths:
+        if not path.exists():
+            continue
+        for hf in path.rglob("*.h"):
+            try:
+                for line in hf.read_text(errors="ignore").splitlines():
+                    m = re.match(r"^\s*#\s*define\s+(CONFIG_[A-Z0-9_]+)", line)
+                    if m:
+                        configs.add(m.group(1))
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+
+    # 3. Kconfig definitions in source paths
+    for path in source_paths:
+        if not path.exists():
+            continue
+        for kf in path.rglob("Kconfig*"):
+            try:
+                for line in kf.read_text(errors="ignore").splitlines():
+                    m = re.match(r"^\s*(?:menu)?config\s+([A-Z0-9_]+)", line)
+                    if m:
+                        configs.add("CONFIG_" + m.group(1))
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+
+    # 4. #define CONFIG_ in source headers
+    for path in source_paths:
+        if not path.exists():
+            continue
+        for hf in path.rglob("*.h"):
+            try:
+                for line in hf.read_text(errors="ignore").splitlines():
+                    m = re.match(r"^\s*#\s*define\s+(CONFIG_[A-Z0-9_]+)", line)
+                    if m:
+                        configs.add(m.group(1))
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+
     return configs
 
 
-def find_functions_in_file(path):
-    """Find all defined functions in a file."""
-    functions = []
-    try:
-        with open(path, "r", errors="ignore", encoding="utf-8") as f:
-            content = f.read()
-    except Exception:  # pylint: disable=broad-exception-caught
-        return []
-    matches = re.findall(
-        r"^(\w+[\w:*\s]+\s\**([\w.:]+)\([\w\s,*]*\))\s*{", content, re.MULTILINE
-    )
-    for match in matches:
-        functions.append((path, match[1]))
-    return functions
+def find_includes(paths) -> tuple[set, set]:
+    """Find all #include directives in source paths."""
+    full_includes = set()
+    base_includes = set()
 
-
-def find_all_defined_functions(paths) -> set:
-    """Find all defined functions in all source paths."""
-    functions = set()
-    sources = find_files(
-        paths=paths, patterns=["*.c", "*.h", "*.cc", "*.S", "*.inc"]
-    )
-    for source in sources:
-        functions.update(find_functions_in_file(source))
-    return functions
-
-
-def normalize_path(ec_root, zephyr_root, path):
-    """Normalize path to be relative to ec_root and handle cros_sdk mounts."""
-    path = Path(path)
-
-    try:
-        path = path.resolve()
-    except Exception:  # pylint: disable=broad-exception-caught
-        pass
-
-    path_str = str(path)
-
-    if "/mnt/host/source/src/platform/ec/" in path_str:
-        path = Path(path_str.split("/mnt/host/source/src/platform/ec/")[1])
-    elif "/mnt/host/source/src/platform/ec-legacy/" in path_str:
-        path = Path(
-            path_str.split("/mnt/host/source/src/platform/ec-legacy/")[1]
-        )
-    elif "/mnt/host/source/src/third_party/zephyr/main/" in path_str:
-        path = (
-            Path("zephyr-main")
-            / path_str.split("/mnt/host/source/src/third_party/zephyr/main/")[1]
-        )
-    elif path.is_absolute():
-        if ec_root and path.is_relative_to(ec_root):
-            path = path.relative_to(ec_root)
-        elif zephyr_root and path.is_relative_to(zephyr_root):
-            path = Path("zephyr-base") / path.relative_to(zephyr_root)
-
-    path_str = str(path)
-    path_str = re.sub(r"build/zephyr/[\w-]+/modules/ec/", "", path_str)
-    path_str = re.sub(r"build/zephyr/[\w-]+/build-r[ow]/", "", path_str)
-
-    return Path(path_str)
-
-
-def find_unused_functions(ec_root, zephyr_root, source_paths, build_paths):
-    """Find functions that are defined but never appear in ELFs."""
-    print(f"Finding all defined functions in {len(source_paths)} paths...")
-    all_functions = find_all_defined_functions(paths=source_paths)
-    all_functions = {
-        (normalize_path(ec_root, zephyr_root, f[0]), f[1])
-        for f in all_functions
-    }
-    print(f"* Found {len(all_functions)} defined functions")
-
-    print(f"Finding elf files in {len(build_paths)} paths...")
-    all_elfs = list(find_files(paths=build_paths, patterns=["*.elf", "*.exe"]))
-    print(f"* Found {len(all_elfs)} elf files")
-
-    print("Extracting functions from elf files...")
-    used_functions = set()
-    count = 0
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = [
-            executor.submit(find_functions_in_elf, elf) for elf in all_elfs
-        ]
-        for future in futures:
-            count += 1
-            elf_functions = future.result()
-            used_functions.update(
-                {
-                    (normalize_path(ec_root, zephyr_root, f[0]), f[1])
-                    for f in elf_functions
-                }
-            )
-            print(f"{count}/{len(all_elfs)}", end="\r")
-    print(f"\n* Extracted {len(used_functions)} unique functions from elfs")
-
-    unused_functions = all_functions - used_functions
-    print(f"\nUNUSED FUNCTIONS({len(unused_functions)}):\n")
-    for path, function_name in sorted(list(unused_functions)):
-        print(f"{str(path)}: {function_name}")
-
-
-def find_unused_configs(source_paths, build_paths):
-    """Find configs that are referenced in source but never set in builds."""
-    print("Finding all referenced configs...")
-    all_configs = find_configs(source_paths)
-    print(f"* Found {len(all_configs)} configs")
-
-    print("Finding all set configs...")
-    set_configs = find_set_configs(build_paths)
-    print(f"* Found {len(set_configs)} set configs")
-
-    never_set_configs = all_configs - set_configs
-    print(f"\nNEVER SET CONFIGS({len(never_set_configs)}):\n")
-    for config in sorted(list(never_set_configs)):
-        print(config)
-
-
-def find_unused_sources(ec_root, zephyr_root, source_paths, build_paths):
-    """Find source files that are never compiled into any ELF."""
-    print(f"Finding all source files in {len(source_paths)} paths...")
-    all_sources = find_files(
-        paths=source_paths, patterns=["*.c", "*.h", "*.cc", "*.S", "*.inc"]
-    )
-    all_sources = {normalize_path(ec_root, zephyr_root, s) for s in all_sources}
-    print(f"* Found {len(all_sources)} source files")
-
-    print(f"Finding elf files in {len(build_paths)} paths...")
-    all_elfs = find_files(paths=build_paths, patterns=["*.elf", "*.exe"])
-    print(f"* Found {len(all_elfs)} elf files")
-
-    print("Extracting sources from elf files...")
-    used_sources = set()
-    count = 0
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = [executor.submit(sources_from_elf, elf) for elf in all_elfs]
-        for future in futures:
-            count += 1
-            elf_sources = future.result()
-            used_sources.update(
-                {normalize_path(ec_root, zephyr_root, s) for s in elf_sources}
-            )
-            print(f"{count}/{len(all_elfs)}", end="\r")
-
-    print(f"\n* Extracted {len(used_sources)} unique source files from elfs")
-
-    unused_sources = []
-    for source in sorted(list(all_sources)):
-        # Can't reliably detect unused header files using this method
-        if source.suffix in [".h"]:
+    for path in paths:
+        if not path.exists():
             continue
-        if source not in used_sources:
-            unused_sources.append(source)
-
-    print(f"\nUNUSED SOURCES({len(unused_sources)}):\n")
-    for source in unused_sources:
-        print(source)
-
-
-def find_unused_headers(ec_root, zephyr_root, source_paths, build_paths):
-    """Find header files that are never included anywhere."""
-    print(f"Finding all header files in {len(source_paths)} paths...")
-    all_headers = find_files(paths=source_paths, patterns=["*.h", "*.inc"])
-    all_headers = {normalize_path(ec_root, zephyr_root, s) for s in all_headers}
-    print(f"* Found {len(all_headers)} header files")
-
-    print(f"Finding elf files in {len(build_paths)} paths...")
-    all_elfs = find_files(paths=build_paths, patterns=["*.elf", "*.exe"])
-    print(f"* Found {len(all_elfs)} elf files")
-
-    print("Extracting headers from elf files (DWARF heuristic)...")
-    used_headers_dwarf = set()
-    count = 0
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = [executor.submit(sources_from_elf, elf) for elf in all_elfs]
-        for future in futures:
-            count += 1
-            elf_sources = future.result()
-            used_headers_dwarf.update(
-                {
-                    normalize_path(ec_root, zephyr_root, s)
-                    for s in elf_sources
-                    if s.suffix in [".h", ".inc"]
-                }
-            )
-            print(f"{count}/{len(all_elfs)}", end="\r")
-
-    print(f"\n* DWARF info reported {len(used_headers_dwarf)} headers as used")
-
-    print("Searching for #include directives (Grep heuristic)...")
-    used_headers_grep = set()
-    for path in source_paths:
         cmd = [
             "grep",
             "--recursive",
@@ -403,35 +347,82 @@ def find_unused_headers(ec_root, zephyr_root, source_paths, build_paths):
         for line in result.stdout.splitlines():
             match = re.search(r'[<"]([^>"]+)[>"]', line)
             if match:
-                include_path = match.group(1)
-                used_headers_grep.add(Path(include_path).name)
+                inc_str = match.group(1).strip()
+                full_includes.add(inc_str)
+                base_includes.add(Path(inc_str).name)
 
-    print(f"* Found {len(used_headers_grep)} unique filenames in includes")
+    return full_includes, base_includes
 
-    unused_headers = []
-    for header in sorted(list(all_headers)):
-        if header in used_headers_dwarf:
-            continue
-        if header.name in used_headers_grep:
-            continue
-        unused_headers.append(header)
 
-    print(f"\nUNUSED HEADERS({len(unused_headers)}):\n")
-    for header in unused_headers:
-        print(header)
+def is_header_included(
+    header: Path, full_includes: set, base_includes: set
+) -> bool:
+    """Check if header is referenced in includes."""
+    h_name = header.name
+    if h_name not in base_includes:
+        return False
+
+    h_str = str(header)
+    has_plain_basename = False
+
+    for inc in full_includes:
+        if Path(inc).name == h_name:
+            if "/" in inc:
+                if h_str.endswith(inc):
+                    return True
+            else:
+                has_plain_basename = True
+
+    return has_plain_basename
+
+
+def scan_elfs(all_elfs, ec_root, zephyr_root):
+    """Scan all ELF files in parallel and extract sources, headers, and functions."""
+    used_sources = set()
+    used_headers_dwarf = set()
+    used_functions = set()
+
+    count = 0
+    tasks = [(elf, ec_root, zephyr_root) for elf in all_elfs]
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = [executor.submit(extract_elf_info, t) for t in tasks]
+        for future in futures:
+            count += 1
+            elf_srcs, elf_hdrs, elf_funcs = future.result()
+            used_sources.update(elf_srcs)
+            used_headers_dwarf.update(elf_hdrs)
+            used_functions.update(elf_funcs)
+            if sys.stdout.isatty():
+                print(f"{count}/{len(all_elfs)}", end="\r", flush=True)
+
+    if sys.stdout.isatty():
+        print()
+
+    return used_sources, used_headers_dwarf, used_functions
 
 
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "command", choices=["sources", "configs", "functions", "headers"]
+        "command", choices=["sources", "configs", "functions", "headers", "all"]
     )
     parser.add_argument("--ec-root", type=Path, help="Path to EC root")
     parser.add_argument("--zephyr-root", type=Path, help="Path to Zephyr root")
     parser.add_argument("--board", help="Filter by board name (e.g. 'taniks')")
     parser.add_argument(
         "--include-tests", action="store_true", help="Include test directories"
+    )
+    parser.add_argument(
+        "--json", action="store_true", help="Output results in JSON format"
+    )
+    parser.add_argument(
+        "--output", "-o", type=Path, help="Write output to specified file"
+    )
+    parser.add_argument(
+        "--summary",
+        action="store_true",
+        help="Print summary metrics and statistics",
     )
     args = parser.parse_args()
 
@@ -440,11 +431,9 @@ def main():
     else:
         ec_root = Path(__file__).resolve().parent.parent
 
-    # Try to find zephyr root if not provided
     if args.zephyr_root:
         zephyr_root = args.zephyr_root.resolve()
     else:
-        # Heuristic for Zephyr root in chromiumos tree
         zephyr_root = (
             ec_root.parent / "third_party" / "zephyrproject" / "zephyr"
         )
@@ -492,27 +481,147 @@ def main():
     source_paths = [p for p in source_paths if p.exists()]
 
     if args.board:
-        build_paths = [ec_root / "build" / args.board]
+        build_paths = [
+            ec_root / "build" / args.board,
+            ec_root / "build" / "zephyr" / args.board,
+        ]
     else:
         build_paths = [ec_root / "build"]
 
     build_paths = [p for p in build_paths if p.exists()]
 
     if not source_paths:
-        print(f"Error: No source paths found in {ec_root}")
+        print(f"Error: No source paths found in {ec_root}", file=sys.stderr)
         sys.exit(1)
 
-    match args.command:
-        case "sources":
-            find_unused_sources(ec_root, zephyr_root, source_paths, build_paths)
-        case "configs":
-            find_unused_configs(source_paths, build_paths)
-        case "functions":
-            find_unused_functions(
-                ec_root, zephyr_root, source_paths, build_paths
+    results = {}
+    summary = {}
+
+    need_elfs = args.command in ["sources", "functions", "headers", "all"]
+    all_elfs = []
+    used_sources = set()
+    used_headers_dwarf = set()
+    used_functions = set()
+
+    if need_elfs:
+        all_elfs = list(
+            find_files(paths=build_paths, patterns=["*.elf", "*.exe"])
+        )
+        if not args.json:
+            print(f"Finding elf files in {len(build_paths)} paths...")
+            print(f"* Found {len(all_elfs)} elf files")
+            print("Extracting info from elf files (sources, headers, DWARF)...")
+        used_sources, used_headers_dwarf, used_functions = scan_elfs(
+            all_elfs, ec_root, zephyr_root
+        )
+
+    # 1. SOURCES
+    if args.command in ["sources", "all"]:
+        all_sources = find_files(
+            paths=source_paths, patterns=["*.c", "*.h", "*.cc", "*.S", "*.inc"]
+        )
+        all_sources = {
+            normalize_path(ec_root, zephyr_root, s) for s in all_sources
+        }
+        unused_sources = [
+            str(s)
+            for s in sorted(list(all_sources))
+            if s.suffix not in [".h"] and s not in used_sources
+        ]
+        results["unused_sources"] = unused_sources
+        summary["total_sources"] = len(all_sources)
+        summary["unused_sources"] = len(unused_sources)
+
+    # 2. HEADERS
+    if args.command in ["headers", "all"]:
+        all_headers = find_files(paths=source_paths, patterns=["*.h", "*.inc"])
+        all_headers = {
+            normalize_path(ec_root, zephyr_root, s) for s in all_headers
+        }
+        full_inc, base_inc = find_includes(source_paths)
+        unused_headers = []
+        for h in sorted(list(all_headers)):
+            if h in used_headers_dwarf:
+                continue
+            if is_header_included(h, full_inc, base_inc):
+                continue
+            unused_headers.append(str(h))
+        results["unused_headers"] = unused_headers
+        summary["total_headers"] = len(all_headers)
+        summary["unused_headers"] = len(unused_headers)
+
+    # 3. FUNCTIONS
+    if args.command in ["functions", "all"]:
+        all_functions = find_all_defined_functions(paths=source_paths)
+        all_functions = {
+            (normalize_path(ec_root, zephyr_root, f[0]), f[1])
+            for f in all_functions
+        }
+        unused_functions = [
+            {"path": str(p), "name": name}
+            for p, name in sorted(list(all_functions - used_functions))
+        ]
+        results["unused_functions"] = unused_functions
+        summary["total_functions"] = len(all_functions)
+        summary["unused_functions"] = len(unused_functions)
+
+    # 4. CONFIGS
+    if args.command in ["configs", "all"]:
+        all_configs = find_configs(source_paths)
+        set_configs = find_set_configs(source_paths, build_paths)
+        never_set = sorted(list(all_configs - set_configs))
+        results["never_set_configs"] = never_set
+        summary["total_configs"] = len(all_configs)
+        summary["never_set_configs"] = len(never_set)
+
+    # OUTPUT FORMATTING
+    output_str = ""
+    if args.json:
+        out_obj = {"command": args.command, "summary": summary, **results}
+        output_str = json.dumps(out_obj, indent=2)
+    else:
+        out_lines = []
+        if args.summary or args.command == "all":
+            out_lines.append("=== SUMMARY METRICS ===")
+            for k, v in summary.items():
+                out_lines.append(f"  {k}: {v}")
+            out_lines.append("")
+
+        if "unused_sources" in results:
+            out_lines.append(f"UNUSED SOURCES({summary['unused_sources']}):\n")
+            for s in results["unused_sources"]:
+                out_lines.append(s)
+            out_lines.append("")
+
+        if "unused_headers" in results:
+            out_lines.append(f"UNUSED HEADERS({summary['unused_headers']}):\n")
+            for h in results["unused_headers"]:
+                out_lines.append(h)
+            out_lines.append("")
+
+        if "unused_functions" in results:
+            out_lines.append(
+                f"UNUSED FUNCTIONS({summary['unused_functions']}):\n"
             )
-        case "headers":
-            find_unused_headers(ec_root, zephyr_root, source_paths, build_paths)
+            for f in results["unused_functions"]:
+                out_lines.append(f"{f['path']}: {f['name']}")
+            out_lines.append("")
+
+        if "never_set_configs" in results:
+            out_lines.append(
+                f"NEVER SET CONFIGS({summary['never_set_configs']}):\n"
+            )
+            for c in results["never_set_configs"]:
+                out_lines.append(c)
+            out_lines.append("")
+
+        output_str = "\n".join(out_lines).strip()
+
+    if args.output:
+        args.output.write_text(output_str + "\n", encoding="utf-8")
+        print(f"Results written to {args.output}")
+    else:
+        print(output_str)
 
 
 if __name__ == "__main__":
