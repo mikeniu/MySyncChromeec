@@ -226,18 +226,6 @@ uint32_t task_wait_event(int timeout_us);
  */
 uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us);
 
-/**
- * Prints the list of tasks.
- *
- * Uses the command output channel.  May be called from interrupt level.
- */
-void task_print_list(void);
-
-/**
- * Returns the name of the task.
- */
-const char *task_get_name(task_id_t tskid);
-
 #ifdef CONFIG_TASK_PROFILING
 /**
  * Start tracking an interrupt.
@@ -287,110 +275,6 @@ int task_start_called(void);
  */
 void task_clear_fp_used(void);
 #endif
-
-/**
- * Mark all tasks as ready to run and reschedule the highest priority task.
- */
-void task_enable_all_tasks(void);
-
-/**
- * Enable a task.
- */
-void task_enable_task(task_id_t tskid);
-
-/**
- * Task is enabled.
- */
-bool task_enabled(task_id_t tskid);
-
-/**
- * Disable a task.
- *
- * If the task disable itself, this will cause an immediate reschedule.
- */
-void task_disable_task(task_id_t tskid);
-
-/**
- * Enable an interrupt.
- */
-void task_enable_irq(int irq);
-
-/**
- * Disable an interrupt.
- */
-void task_disable_irq(int irq);
-
-/**
- * Software-trigger an interrupt.
- */
-void task_trigger_irq(int irq);
-
-/*
- * A task that supports resets may call this to indicate that it may be reset
- * at any point between this call and the next call to task_disable_resets().
- *
- * Calling this function will trigger any resets that were requested while
- * resets were disabled.
- *
- * It is not expected for this to be called if resets are already enabled.
- */
-void task_enable_resets(void);
-
-/*
- * A task that supports resets may call this to indicate that it may not be
- * reset until the next call to task_enable_resets(). Any calls to task_reset()
- * during this time will cause a reset request to be queued, and executed
- * the next time task_enable_resets() is called.
- *
- * Must not be called if resets are already disabled.
- */
-void task_disable_resets(void);
-
-/*
- * If the current task was reset, completes the reset operation.
- *
- * Returns a non-zero value if the task was reset; tasks with state outside
- * of the stack should perform any necessary cleanup immediately after calling
- * this function.
- *
- * Tasks that support reset must call this function once at startup before
- * doing anything else.
- *
- * Must only be called once at task startup.
- */
-int task_reset_cleanup(void);
-
-/*
- * Resets the specified task, which must not be the current task,
- * to initial state.
- *
- * Returns EC_SUCCESS, or EC_ERROR_INVAL if the specified task does
- * not support resets.
- *
- * If wait is true, blocks until the task has been reset. Otherwise,
- * returns immediately - in this case the task reset may be delayed until
- * that task can be safely reset. The duration of this delay depends on the
- * task implementation.
- */
-int task_reset(task_id_t id, int wait);
-
-/**
- * Clear a pending interrupt.
- *
- * Note that most interrupts can be removed from the pending state simply by
- * handling whatever caused the interrupt in the first place.  This only needs
- * to be called if an interrupt handler disables itself without clearing the
- * reason for the interrupt, and then the interrupt is re-enabled from a
- * different context.
- */
-void task_clear_pending_irq(int irq);
-
-/**
- * Check if irq is pending.
- *
- * Returns true if interrupt with given number is pending, false otherwise.
- */
-bool task_is_irq_pending(int irq);
 
 #ifdef CONFIG_ZEPHYR
 typedef struct k_mutex mutex_t;
