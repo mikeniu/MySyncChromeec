@@ -367,8 +367,8 @@ static void it83xx_init(enum usbpd_port port, int role)
 	/* enable cc1/cc2 */
 	*usbpd_ctrl_regs[port].cc1 = IT83XX_USBPD_CC_PIN_CONFIG;
 	*usbpd_ctrl_regs[port].cc2 = IT83XX_USBPD_CC_PIN_CONFIG;
-	task_clear_pending_irq(usbpd_ctrl_regs[port].irq);
-	task_enable_irq(usbpd_ctrl_regs[port].irq);
+	ite_intc_isr_clear(usbpd_ctrl_regs[port].irq);
+	irq_enable(usbpd_ctrl_regs[port].irq);
 	USBPD_START(port);
 	/*
 	 * Disconnect CCs Rd_DB from GND

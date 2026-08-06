@@ -347,28 +347,6 @@ void task_disable_task(task_id_t tskid)
 }
 /* LCOV_EXCL_STOP */
 
-/*
- * This function cannot be tested since it is architecture specific.
- * LCOV_EXCL_START
- */
-void task_clear_pending_irq(int irq)
-{
-#if CONFIG_HAS_ITE_INTC
-	ite_intc_isr_clear(irq);
-#endif
-}
-/* LCOV_EXCL_STOP */
-
-void task_enable_irq(int irq)
-{
-	arch_irq_enable(irq);
-}
-
-void task_disable_irq(int irq)
-{
-	arch_irq_disable(irq);
-}
-
 inline bool in_interrupt_context(void)
 {
 	return k_is_in_isr();
