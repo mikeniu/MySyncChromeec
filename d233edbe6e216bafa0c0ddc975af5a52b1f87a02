@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9a3f41cf_0fd7fc91",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3685612
+      },
+      "writtenOn": "2026-08-06T07:19:05Z",
+      "side": 1,
+      "message": "Our understanding is that supporting TBT requires setting the `Is_Alt_Mode_Adapter` flag. Once `Is_Alt_Mode_Adapter` is enabled, the tool mandates the configuration of the AMA-related fields.",
+      "parentUuid": "56281d7b_503155ef",
+      "revId": "d233edbe6e216bafa0c0ddc975af5a52b1f87a02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d9dc7f05_8081f16d",
         "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
         "patchSetId": 1
