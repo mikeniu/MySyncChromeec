@@ -19,6 +19,8 @@
 #include "battery.dtsi"
 #include "temp_sensors.dtsi"
 #include "i2c.dtsi"
+#include "led_pins.dtsi"
+#include "led_policy.dtsi"
 
 /* meru overrides follow... */
 &int_ac_present {
