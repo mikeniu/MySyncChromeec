@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eca8aedf_d33152f8",
+        "filename": "zephyr/test/drivers/icm42607/sensor.dts",
+        "patchSetId": 13
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-06T22:32:02Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by Trailing Whitespace: Please remove the trailing whitespace.\n\nMake sure you run pre-submit checks locally.  `~/chromiumos/src/repohooks/pre-upload.py` or use `repo upload . --cbr`",
+      "range": {
+        "startLine": 66,
+        "startChar": 69,
+        "endLine": 66,
+        "endChar": 70
+      },
+      "revId": "5db6b2136e0f5067b0dcf68197abea9437fc4fa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
