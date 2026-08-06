@@ -75,13 +75,17 @@ const struct i2c_port_t *get_i2c_port(const int port)
 	 * board level and will again switch back to event based I2C upon task
 	 * initialization.
 	 */
+#ifndef CONFIG_ZEPHYR
 	if (task_start_called()) {
+#endif
 		/* Find the matching port in i2c_ports[] table. */
 		for (i = 0; i < i2c_ports_used; i++) {
 			if (i2c_ports[i].port == port)
 				return &i2c_ports[i];
 		}
+#ifndef CONFIG_ZEPHYR
 	}
+#endif
 
 	return NULL;
 }

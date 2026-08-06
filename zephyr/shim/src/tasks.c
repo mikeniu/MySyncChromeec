@@ -68,7 +68,6 @@ const static k_tid_t task_to_k_tid[TASK_ID_COUNT] = {
 
 static struct task_ctx_base_data shimmed_tasks_data[TASK_ID_COUNT];
 static struct task_ctx_base_data extra_tasks_data[EXTRA_TASK_COUNT];
-static int tasks_started;
 #undef CROS_EC_TASK
 #undef TASK_TEST
 
@@ -191,13 +190,15 @@ task_id_t task_get_current(void)
 	return thread_id_to_task_id(k_current_get());
 }
 
-atomic_t *task_get_event_bitmap(task_id_t cros_task_id)
+void task_clear_event(task_id_t cros_task_id, uint32_t event)
 {
 	struct task_ctx_base_data *data;
 
 	data = task_get_base_data(cros_task_id);
 
-	return data == NULL ? NULL : &data->event_mask;
+	if (data != NULL) {
+		atomic_and(&data->event_mask, ~event);
+	}
 }
 
 void task_set_event(task_id_t cros_task_id, uint32_t event)
@@ -313,8 +314,6 @@ void start_ec_tasks(void)
 #endif
 		k_thread_start(task_to_k_tid[i]);
 	}
-
-	tasks_started = 1;
 }
 
 /*
@@ -333,41 +332,6 @@ int init_signals(void)
 	return 0;
 }
 SYS_INIT(init_signals, POST_KERNEL, 50);
-
-int task_start_called(void)
-{
-	return tasks_started;
-}
-/*
- * TODO(b/190203712): Implement this
- * LCOV_EXCL_START
- */
-void task_disable_task(task_id_t tskid)
-{
-}
-/* LCOV_EXCL_STOP */
-
-/*
- * This function cannot be tested since it is architecture specific.
- * LCOV_EXCL_START
- */
-void task_clear_pending_irq(int irq)
-{
-#if CONFIG_HAS_ITE_INTC
-	ite_intc_isr_clear(irq);
-#endif
-}
-/* LCOV_EXCL_STOP */
-
-void task_enable_irq(int irq)
-{
-	arch_irq_enable(irq);
-}
-
-void task_disable_irq(int irq)
-{
-	arch_irq_disable(irq);
-}
 
 inline bool in_interrupt_context(void)
 {
