@@ -26,7 +26,7 @@ extern void reset_pdc_discovery_for_test(void);
 /* TI PDC Configuration Tests                                                 */
 /* ========================================================================== */
 
-ZTEST(rvp_usbc_runtime, test_three_port_ti_jbr)
+ZTEST(atriarvp_rtk, test_three_port_ti_jbr)
 {
 	const struct device *dev;
 
@@ -76,7 +76,7 @@ ZTEST(rvp_usbc_runtime, test_three_port_ti_jbr)
 	zassert_is_null(dev);
 }
 
-ZTEST(rvp_usbc_runtime, test_dual_port_ti_jbr)
+ZTEST(atriarvp_rtk, test_dual_port_ti_jbr)
 {
 	const struct device *dev;
 
@@ -123,7 +123,7 @@ ZTEST(rvp_usbc_runtime, test_dual_port_ti_jbr)
 	zassert_is_null(dev);
 }
 
-ZTEST(rvp_usbc_runtime, test_no_pdcs)
+ZTEST(atriarvp_rtk, test_no_pdcs)
 {
 	const struct device *dev;
 
@@ -163,7 +163,7 @@ ZTEST(rvp_usbc_runtime, test_no_pdcs)
 	zassert_is_null(dev);
 }
 
-ZTEST(rvp_usbc_runtime, test_c0_only_ti_jbr)
+ZTEST(atriarvp_rtk, test_c0_only_ti_jbr)
 {
 	const struct device *dev;
 
@@ -206,7 +206,7 @@ ZTEST(rvp_usbc_runtime, test_c0_only_ti_jbr)
 	zassert_is_null(dev);
 }
 
-ZTEST(rvp_usbc_runtime, test_unsupported_config)
+ZTEST(atriarvp_rtk, test_unsupported_config)
 {
 	const struct device *dev;
 
@@ -250,7 +250,7 @@ ZTEST(rvp_usbc_runtime, test_unsupported_config)
 /* RTK PDC Configuration Tests                                                */
 /* ========================================================================== */
 
-ZTEST(rvp_usbc_runtime, test_c0_only_rtk)
+ZTEST(atriarvp_rtk, test_c0_only_rtk)
 {
 	const struct device *dev;
 
@@ -293,7 +293,7 @@ ZTEST(rvp_usbc_runtime, test_c0_only_rtk)
 	zassert_is_null(dev);
 }
 
-ZTEST(rvp_usbc_runtime, test_dual_rtk)
+ZTEST(atriarvp_rtk, test_dual_rtk)
 {
 	const struct device *dev;
 
@@ -340,7 +340,7 @@ ZTEST(rvp_usbc_runtime, test_dual_rtk)
 	zassert_is_null(dev);
 }
 
-ZTEST(rvp_usbc_runtime, test_three_rtk)
+ZTEST(atriarvp_rtk, test_three_rtk)
 {
 	const struct device *dev;
 
@@ -394,7 +394,7 @@ ZTEST(rvp_usbc_runtime, test_three_rtk)
 /* HBR TI PDC Configuration Tests                                             */
 /* ========================================================================== */
 
-ZTEST(rvp_usbc_runtime, test_c0_only_ti_hbr)
+ZTEST(atriarvp_rtk, test_c0_only_ti_hbr)
 {
 	const struct device *dev;
 
@@ -437,7 +437,7 @@ ZTEST(rvp_usbc_runtime, test_c0_only_ti_hbr)
 	zassert_is_null(dev);
 }
 
-ZTEST(rvp_usbc_runtime, test_dual_port_ti_hbr)
+ZTEST(atriarvp_rtk, test_dual_port_ti_hbr)
 {
 	const struct device *dev;
 
@@ -484,7 +484,7 @@ ZTEST(rvp_usbc_runtime, test_dual_port_ti_hbr)
 	zassert_is_null(dev);
 }
 
-ZTEST(rvp_usbc_runtime, test_three_port_ti_hbr)
+ZTEST(atriarvp_rtk, test_three_port_ti_hbr)
 {
 	const struct device *dev;
 

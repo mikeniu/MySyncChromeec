@@ -9,8 +9,6 @@ project(atria)
 # Include FFF fakes
 add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
 
-target_sources(app PRIVATE
-	src/stubs.c
-	src/rvp_usbc_runtime_test.c
-	${PLATFORM_EC}/zephyr/program/atria/atriarvp-rtk/src/rvp_usbc_runtime.c
-)
+add_subdirectory(tests/atriarvp-rtk)
+
+add_subdirectory_ifdef(CONFIG_TEST_BOARD_PENGHU tests/penghu)

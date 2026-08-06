@@ -6,8 +6,29 @@ common:
   platform_allow:
     - native_sim
 tests:
-  atria.rvp_usbc_runtime:
+  atria.atriarvp-rtk:
     extra_configs:
       - CONFIG_PDC_RUNTIME_PORT_CONFIG=y
     extra_dtc_overlay_files:
       - "boards/native_sim.overlay"
+  atria.penghu.keyboard:
+    extra_configs:
+      - CONFIG_TEST_BOARD_PENGHU=y
+      - CONFIG_TEST_BOARD_PENGHU_KEYBOARD=y
+      - CONFIG_PLATFORM_EC_KEYBOARD_CUSTOMIZATION=y
+      - CONFIG_PLATFORM_EC_KEYBOARD_DEBUG=y
+      - CONFIG_POSIX_ARCH_CONSOLE_INIT_PRIORITY=98
+      - CONFIG_PLATFORM_EC_CONSOLE_INIT_PRIORITY=99
+      - CONFIG_LOG=y
+      - CONFIG_LOG_MODE_MINIMAL=y
+    extra_dtc_overlay_files:
+      - "boards/penghu/keyboard.dtsi"
+  atria.penghu.fan:
+    extra_configs:
+      - CONFIG_TEST_BOARD_PENGHU=y
+      - CONFIG_TEST_BOARD_PENGHU_FAN=y
+      - CONFIG_PLATFORM_EC_CUSTOM_FAN_CONTROL=y
+      - CONFIG_POSIX_ARCH_CONSOLE_INIT_PRIORITY=98
+      - CONFIG_PLATFORM_EC_CONSOLE_INIT_PRIORITY=99
+    extra_dtc_overlay_files:
+      - "boards/penghu/fan.dtsi"
