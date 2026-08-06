@@ -206,6 +206,13 @@
 			gpios = <&gpiof 5 (GPIO_INPUT)>;
 			enum-name = "GPIO_VOLUME_UP_L";
 		};
+		gpio_ec_keyboard_det_cntl: ec_keyboard_det_cntl {
+			gpios = <&gpiod 5 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_en_pp3300_base_x: en_pp3300_base_x {
+			gpios = <&gpiob 6 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
+
 	};
 	unused-pins {
 		compatible = "unused-gpios";

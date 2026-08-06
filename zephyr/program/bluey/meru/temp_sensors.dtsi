@@ -24,6 +24,10 @@
 			enum-name = "ADC_TEMP_SENSOR_4";
 			io-channels = <&adc0 3>;
 		};
+		adc_usb_keybaord_det: usb_keybaord_det {
+			enum-name = "ADC_BASE_DET";
+			io-channels = <&adc0 6>;
+		};
 	};
 
 	temp_sensor_pmic: pmic {
@@ -73,6 +77,7 @@
 		&adc0_chan1_gp44
 		&adc0_chan2_gp43
 		&adc0_chan3_gp42
+		&adc0_chan6_gp34
 		&adc0_chan11_gpc7>;
 	pinctrl-names = "default";
 };
