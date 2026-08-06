@@ -333,12 +333,22 @@ def main():
         action="store_true",
     )
     parser.add_argument(
+        "-j",
+        "--jobs",
+        nargs="?",
+        const=os.cpu_count(),
+        type=int,
+    )
+    parser.add_argument(
         "-C",
         "--coverage",
         action="store_true",
     )
 
     intercepted_args, other_args = parser.parse_known_args()
+
+    if intercepted_args.jobs:
+        twister_cli.extend(["-j", str(intercepted_args.jobs)])
 
     # We allow help to run outside the sandbox.
     if intercepted_args.help:

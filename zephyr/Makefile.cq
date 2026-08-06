@@ -9,9 +9,11 @@
 
 # This also assumes that you ran zmake build -a before this in the build stage
 
+cpus ?= $(shell nproc)
+
 TWISTER_COMMAND=cd $(PLATFORM_EC) && ./twister --outdir \
 	twister-out-$(TOOLCHAIN_PATH) -v -i --no-upload-cros-rdb --toolchain \
-	$(TOOLCHAIN)
+	$(TOOLCHAIN) -j $(cpus)
 ifdef COVERAGE
 TWISTER_COMMAND+=--coverage --coverage-formats=lcov
 endif
