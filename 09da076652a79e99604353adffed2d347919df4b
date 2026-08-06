@@ -1,0 +1,29 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6df1fa44_427d2607",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-06T15:57:46Z",
+      "side": 1,
+      "message": "Done. Added sys_cache_data_flush_range(pdata, sizeof(*pdata)). Note: panic_get_data() already validates pdata-\u003emagic \u003d\u003d PANIC_DATA_MAGIC.",
+      "parentUuid": "7de5a1ac_4e1b2e42",
+      "range": {
+        "startLine": 371,
+        "startChar": 0,
+        "endLine": 371,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "09da076652a79e99604353adffed2d347919df4b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
