@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ca17cbc_99ecd052",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-08-06T07:57:06Z",
+      "side": 1,
+      "message": "Fix the legacy test build failures",
+      "revId": "626cbf4daa456c385b095ab33069acb1b9b9d684",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
