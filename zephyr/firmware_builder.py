@@ -151,7 +151,7 @@ def get_version():
     return None
 
 
-def get_projects():
+def get_projects(opts=None):
     """Get the filtered list of all projects."""
     projects = []
     platform_ec = ZEPHYR_DIR.parent
@@ -176,6 +176,15 @@ def get_projects():
         ):
             continue
         projects.append(project)
+
+    projects = sorted(projects, key=lambda p: p.config.project_name)
+
+    if opts and opts.shard_count and opts.shard_index:
+        import math  # pylint: disable=import-outside-toplevel
+        chunk_size = math.ceil(len(projects) / opts.shard_count)
+        start = (opts.shard_index - 1) * chunk_size
+        projects = projects[start:start + chunk_size]
+
     return projects
 
 
@@ -348,7 +357,7 @@ def build(opts):
         if version:
             cmd.extend(["-v", version])
 
-    projects = get_projects()
+    projects = get_projects(_opts)
     for project in projects:
         cmd.append(project.config.project_name)
 
@@ -559,7 +568,7 @@ def bundle_firmware(opts):
     tasks = []
     ec_to_boxter_boards = read_boxter()
     per_board_targets = collections.defaultdict(list)
-    for project in get_projects():
+    for project in get_projects(opts):
         build_dir = (
             platform_ec / "build" / "zephyr" / project.config.project_name
         )
@@ -749,11 +758,11 @@ def test(opts):
     # If firmware_targets contains a '/', it's a shard (e.g. 1/3)
     # Otherwise it's a specific board or comma-separated list of boards
     boards = SPECIAL_BOARDS.copy() if SPECIAL_BOARDS else []
+    if opts.shard_count and opts.shard_index:
+        cmd.append(f"TWISTER_SUBSET={opts.shard_index}/{opts.shard_count}")
+
     if opts.firmware_targets:
-        if "/" in opts.firmware_targets:
-            cmd.append(f"TWISTER_SUBSET={opts.firmware_targets}")
-        else:
-            boards.extend(opts.firmware_targets.split(","))
+        boards.extend(opts.firmware_targets.split(","))
 
     if boards:
         cmd.append(f"SPECIAL_BOARDS={' '.join(boards)}")
@@ -791,7 +800,7 @@ def test(opts):
             ]
         )
 
-        for project in get_projects():
+        for project in get_projects(opts):
             if project.config.project_name in SPECIAL_BOARDS:
                 tasks.append(
                     (
@@ -886,7 +895,7 @@ def check_boards(_opts):
 
     # Ec target name -> board name -> boolean if seen in Boxster
     ec_to_board = collections.defaultdict(dict)
-    for project in get_projects():
+    for project in get_projects(_opts):
         board_dict = {}
         for board in project.config.boards:
             board_dict[board] = False
@@ -966,10 +975,58 @@ def _extract_lcov_summary_worker(name, filename):
     )
 
 
+
+def merge_shards(opts):
+    """Wait for, unpack, and merge multiple coverage tarballs."""
+    import glob  # pylint: disable=import-outside-toplevel
+    import tarfile  # pylint: disable=import-outside-toplevel
+    import tempfile  # pylint: disable=import-outside-toplevel
+
+    merge_dir = pathlib.Path(opts.merge_dir)
+    platform_ec = ZEPHYR_DIR.parent
+    out_dir = platform_ec / "build" / "zephyr"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    merged_info = out_dir / "lcov_merged_shards.info"
+
+    cmd = ["/usr/bin/lcov", "-o", str(merged_info), "--rc", "branch_coverage=1"]
+
+    found_info = False
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = pathlib.Path(tmp_dir)
+        # 1. Unpack any tbz2 artifacts in the directory
+        for tbz_path in merge_dir.glob("*.tbz2"):
+            with tarfile.open(tbz_path, "r:bz2") as tar:
+                tar.extractall(path=tmp_path)
+
+        # 2. Grab all extracted .info files (and any raw ones passed directly)
+        for info_file in list(tmp_path.rglob("*.info")) + list(merge_dir.rglob("*.info")):
+            cmd.extend(["-a", str(info_file)])
+            found_info = True
+
+        if not found_info:
+            print(f"No .info files found in shards at {merge_dir}")
+            return -1
+
+        subprocess.run(cmd, check=True)
+
+    html_dir = get_bundle_dir(opts) / "html"
+    subprocess.run([
+        "/usr/bin/genhtml", "--branch-coverage", "-q", "-o", str(html_dir),
+        "--ignore-errors", "inconsistent,inconsistent", "--ignore-errors", "unused",
+        "-t", "All Shards Merged", str(merged_info)
+    ], check=True)
+
+    # Repackage the final HTML and LCOV into the standard coverage.tbz2 bundle
+    # to maintain exactly identical behavior for downstream readers.
+    cmd = ["tar", "cvfj", get_bundle_dir(opts) / "coverage.tbz2", "lcov.info", "html/"]
+    subprocess.run(cmd, cwd=out_dir, check=True, stdin=subprocess.DEVNULL)
+
+    return 0
+
 def main(args):
     """Builds and tests all of the Zephyr targets and reports build metrics"""
     parser, sub_cmds = scripts.firmware_builder_lib.create_arg_parser(
-        build, bundle, test
+        build, bundle, test, merge_shards
     )
 
     check_boards_cmd = sub_cmds.add_parser(

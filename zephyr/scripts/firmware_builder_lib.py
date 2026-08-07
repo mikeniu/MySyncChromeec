@@ -233,7 +233,7 @@ def restore_codebase(applied_patches, copied_files):
     revert_patches(applied_patches)
 
 
-def create_arg_parser(build, bundle, test):
+def create_arg_parser(build, bundle, test, merge_shards):
     """Parse all command line args and return opts dict."""
     parser = argparse.ArgumentParser(description=__doc__)
 
@@ -296,14 +296,27 @@ def create_arg_parser(build, bundle, test):
     )
 
     parser.add_argument(
-        "--firmware-targets",
+        "--shard-count",
+        type=int,
         required=False,
-        default="",
-        help="Comma-separated list of build/test target shards",
+        default=0,
+        help="Total number of orchestrated shards across which builds will be bucketed",
+    )
+
+    parser.add_argument(
+        "--shard-index",
+        type=int,
+        required=False,
+        default=0,
+        help="The 1-indexed shard assignment (e.g. 1 out of 5)",
     )
 
     # Would make this required=True, but not available until 3.7
     sub_cmds = parser.add_subparsers()
+
+    merge_cmd = sub_cmds.add_parser("merge-shards", help="Merge trace files from shards in --merge-dir")
+    merge_cmd.add_argument("--merge-dir", required=True, help="Directory containing extracted lcov.info shards")
+    merge_cmd.set_defaults(func=merge_shards)
 
     build_cmd = sub_cmds.add_parser("build", help="Builds all firmware targets")
     build_cmd.set_defaults(func=build)
