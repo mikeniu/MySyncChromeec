@@ -21,6 +21,7 @@
 #include <ec_tasks.h>
 #include <fingerprint/fingerprint_alg.h>
 #include <flash.h>
+#include <fpsensor/fpsensor_crypto.h>
 #include <fpsensor/fpsensor_state.h>
 #include <host_command.h>
 #include <rollback.h>
@@ -67,55 +68,87 @@ static const uint8_t example_template[CONFIG_FP_ALGORITHM_TEMPLATE_SIZE] = {
 	0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
 };
 
-static const uint8_t
-	example_positive_match_secret[FP_POSITIVE_MATCH_SECRET_BYTES] = {
-		0xc8, 0x3a, 0x56, 0x56, 0xe7, 0x96, 0x06, 0xc3,
-		0xb3, 0xed, 0x47, 0x20, 0x7e, 0x60, 0xbd, 0x5e,
-		0xef, 0x6c, 0xa8, 0x84, 0xf2, 0x71, 0x86, 0x1a,
-		0xf2, 0xa3, 0x6b, 0xa8, 0x1a, 0x82, 0x59, 0x45
-	};
+static const uint8_t nonce[FP_CONTEXT_NONCE_BYTES] = { 0x94, 0x1e, 0xe3, 0x47,
+						       0x31, 0x0b, 0x89, 0x73,
+						       0x1a, 0xeb, 0xa4, 0x45 };
+
+static const uint8_t salt[FP_CONTEXT_ENCRYPTION_SALT_BYTES] = {
+	0x2b, 0x2e, 0x90, 0x58, 0xfa, 0x25, 0x3e, 0x3b,
+	0x21, 0x35, 0x9a, 0x25, 0x79, 0x20, 0xba, 0x60
+};
+
+static const uint8_t pos_match_salt[FP_POSITIVE_MATCH_SALT_BYTES] = {
+	0x0f, 0x8d, 0xe0, 0x47, 0x69, 0x0f, 0xda, 0xea,
+	0xbc, 0xdc, 0x96, 0x7d, 0x69, 0x19, 0xac, 0xe7
+};
 
 /*
- * Encrypted template with metadata and positive match salt, for more
- * information please check comment in fpsensor_template.c
+ * Buffer for encrypted template generated dynamically during test setup.
  */
-static const uint8_t
-	example_template_encrypted[sizeof(struct ec_params_fp_template) +
-				   FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE] = {
-		/*
-		 * FP_TEMPLATE params.
-		 *
-		 * offset - 4 bytes
-		 * size - 4 bytes
-		 */
-		0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x00, 0x80,
-		/*
-		 * Encryption metadata.
-		 *
-		 * struct_version - 2 bytes
-		 * reserved - 2 bytes
-		 * nonce - 12 bytes
-		 * encryption_salt - 16 bytes
-		 * tag - 16 bytes
-		 */
-		0x04, 0x00, 0x00, 0x00, 0x94, 0x1e, 0xe3, 0x47, 0x31, 0x0b,
-		0x89, 0x73, 0x1a, 0xeb, 0xa4, 0x45, 0x2b, 0x2e, 0x90, 0x58,
-		0xfa, 0x25, 0x3e, 0x3b, 0x21, 0x35, 0x9a, 0x25, 0x79, 0x20,
-		0xba, 0x60, 0x6b, 0x73, 0xb8, 0xac, 0x86, 0x6f, 0xe1, 0xbc,
-		0x86, 0xca, 0xf6, 0x42, 0x25, 0x1f, 0xd1, 0x22,
-		/* Encrypted template. */
-		0xed, 0x2f, 0xb5, 0xf3, 0x9a, 0x7a, 0xfe, 0x09, 0x82, 0x69,
-		0x9a, 0xd0, 0xa0, 0x60, 0x35, 0x15, 0x87, 0xdf, 0xea, 0xf7,
-		0x8f, 0x4f, 0xdf, 0x5d, 0x7a, 0x93, 0xcf, 0x61, 0xad, 0xe6,
-		0xc2, 0x3a,
-		/* Encrypted positive match salt. */
-		0x0f, 0x8d, 0xe0, 0x47, 0x69, 0x0f, 0xda, 0xea, 0xbc, 0xdc,
-		0x96, 0x7d, 0x69, 0x19, 0xac, 0xe7
-	};
+static uint8_t example_template_encrypted[sizeof(struct ec_params_fp_template) +
+					  FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE];
+
+/*
+ * Buffer for positive match secret generated dynamically.
+ */
+static uint8_t example_positive_match_secret[FP_POSITIVE_MATCH_SECRET_BYTES];
 
 static int match_result;
 static int32_t finger_index;
 static uint32_t finger_updated_bitmap;
+
+/**
+ * @brief Dynamically encrypts example_template using current key derivation
+ * rules.
+ */
+static void setup_example_template_encrypted(void)
+{
+	struct ec_params_fp_template *params =
+		(struct ec_params_fp_template *)example_template_encrypted;
+	struct ec_fp_template_encryption_metadata *meta =
+		(struct ec_fp_template_encryption_metadata
+			 *)(example_template_encrypted +
+			    sizeof(struct ec_params_fp_template));
+	uint8_t *payload = (uint8_t *)(meta + 1);
+
+	params->offset = 0;
+	params->size = FP_TEMPLATE_COMMIT |
+		       FP_ALGORITHM_ENCRYPTED_TEMPLATE_SIZE;
+
+	meta->struct_version = FP_TEMPLATE_FORMAT_VERSION;
+
+	memcpy(meta->nonce, nonce, sizeof(nonce));
+	memcpy(meta->encryption_salt, salt, sizeof(salt));
+
+	/* Copy template payload + positive match salt. */
+	memcpy(payload, example_template, sizeof(example_template));
+	memcpy(payload + sizeof(example_template), pos_match_salt,
+	       sizeof(pos_match_salt));
+
+	/* Derive the expected positive match secret for this salt. */
+	zassert_equal(derive_positive_match_secret(
+			      example_positive_match_secret, pos_match_salt,
+			      global_context.user_id, global_context.tpm_seed),
+		      EC_SUCCESS);
+
+	/* Derive key and encrypt payload in-place. */
+	FpEncryptionKey key;
+	zassert_equal(derive_encryption_key(key, meta->encryption_salt,
+					    global_context.user_id,
+					    global_context.tpm_seed),
+		      EC_SUCCESS);
+
+	zassert_equal(aes_128_gcm_encrypt(
+			      key,
+			      std::span<const uint8_t>{
+				      payload, sizeof(example_template) +
+						       sizeof(pos_match_salt) },
+			      std::span<uint8_t>{
+				      payload, sizeof(example_template) +
+						       sizeof(pos_match_salt) },
+			      meta->nonce, meta->tag),
+		      EC_SUCCESS);
+}
 
 /**
  * @brief Helper to set the FP mode and simulate a finger touch to trigger a
@@ -865,6 +898,10 @@ static void fpsensor_before(void *f)
 	/* Get context setting result. */
 	fp_context_params.action = FP_CONTEXT_GET_RESULT;
 	ec_cmd_fp_context_v1(NULL, &fp_context_params);
+
+	/* Dynamically re-generate example_template_encrypted using current key
+	 * derivation. */
+	setup_example_template_encrypted();
 
 	/* Clear MKBP events from previous tests. */
 	fp_get_next_event((uint8_t *)&fp_events);
