@@ -34,6 +34,24 @@
       "parentUuid": "32e2de8f_33c4ffeb",
       "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5f4b214_185bd3b5",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-07T19:54:42Z",
+      "side": 1,
+      "message": "Done, I omitted mixing `buttons.h` with `input-event-codes.h` unless you think this is a good idea.",
+      "parentUuid": "e47142a6_55b01a55",
+      "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
