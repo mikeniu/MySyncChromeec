@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d97f828_2ef5d6e8",
+        "filename": "zephyr/emul/emul_bma5xy.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 4495208
+      },
+      "writtenOn": "2026-08-07T05:23:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5665668a_00914bbe",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 25
+      },
+      "revId": "5db6b2136e0f5067b0dcf68197abea9437fc4fa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eca8aedf_d33152f8",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-08-06T22:32:02Z",
       "side": 1,
       "message": "Please fix this WARNING reported by Trailing Whitespace: Please remove the trailing whitespace.\n\nMake sure you run pre-submit checks locally.  `~/chromiumos/src/repohooks/pre-upload.py` or use `repo upload . --cbr`",
+      "range": {
+        "startLine": 66,
+        "startChar": 69,
+        "endLine": 66,
+        "endChar": 70
+      },
+      "revId": "5db6b2136e0f5067b0dcf68197abea9437fc4fa9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bbe592d_57fe57ac",
+        "filename": "zephyr/test/drivers/icm42607/sensor.dts",
+        "patchSetId": 13
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4495208
+      },
+      "writtenOn": "2026-08-07T05:23:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eca8aedf_d33152f8",
       "range": {
         "startLine": 66,
         "startChar": 69,
