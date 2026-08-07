@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8c4163f3_1f6f621e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-08-07T14:43:10Z",
+      "side": 1,
+      "message": "I will try to make it clear in the doc. I am targeting first deliver EC changes, need to update this anyway cause suspending chips was my goal initially but to make it backward compatible the code now works like \n\u0027pdc comms suspend 0\u0027 -\u003e suspends chip 0 ports 0 and 1\n\u0027pdc comms suspend 1\u0027 -\u003e suspends chip 0 ports 0 and 1 \n\u0027pdc comms suspend 2\u0027 -\u003e suspends chip 1 port 2",
+      "parentUuid": "aee1f689_e27ed138",
+      "range": {
+        "startLine": 9,
+        "startChar": 34,
+        "endLine": 10,
+        "endChar": 35
+      },
+      "revId": "9a43852616cdbc3d1d5858aebebbc6b4d598b56d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0bf24e05_37868c31",
         "filename": "/COMMIT_MSG",
         "patchSetId": 4
@@ -37,6 +61,30 @@
       "writtenOn": "2026-08-06T17:27:52Z",
       "side": 1,
       "message": "This really ought to be encoded into the devicetree explicitly, ideally by nesting PDC port nodes within a new PDC chip node. `port_index_on_chip` and `no_fw_update` are tech debt; if we\u0027re designing a new PDC FWUP mechanism we should go all in instead of trying to shoehorn into the existing interfaces. I can point you to past design docs / ideas on this because it is something we\u0027ve wanted for a while.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 76
+      },
+      "revId": "9a43852616cdbc3d1d5858aebebbc6b4d598b56d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b49cf6c_fc9b63a8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-08-07T14:43:10Z",
+      "side": 1,
+      "message": "I see, go ahead. Let\u0027s if I will be able to squish it into the feature.",
+      "parentUuid": "0bf24e05_37868c31",
       "range": {
         "startLine": 12,
         "startChar": 0,
