@@ -22,6 +22,30 @@
       },
       "revId": "88f8ec3bf363f4fb6fd3aaa3a33ffd9c6d67a862",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cac95589_84ac69c0",
+        "filename": "zephyr/program/bluey/pic/src/keyboard_customization.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-08-07T11:54:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e0d83340_b05f56f1",
+      "range": {
+        "startLine": 18,
+        "startChar": 20,
+        "endLine": 18,
+        "endChar": 33
+      },
+      "revId": "88f8ec3bf363f4fb6fd3aaa3a33ffd9c6d67a862",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
