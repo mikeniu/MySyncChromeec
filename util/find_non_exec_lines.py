@@ -15,17 +15,13 @@ import re
 import sys
 
 
-BAD_COVERAGE = re.compile(
-    r"^$|"  # Blank line
-    r"\*/\s*$|"  # End of multiline comment
-    r"^\s*\}\s*;?\s*$"  # Standalone closing brace
-)
+BAD_COVERAGE = re.compile(r"^$|\*/\s*$")
 
 
-def main(argv: list[str]) -> int:
+def main() -> int:
     """Read lcov files, and find lines that are probably not executable."""
     exit_code = 0
-    for input_file in argv:
+    for input_file in sys.argv:
         with open(input_file, encoding="utf-8") as lcov:
             active_file = None
             active_line = 0
@@ -83,4 +79,4 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))  # next section explains the use of sys.exit
+    sys.exit(main())  # next section explains the use of sys.exit
