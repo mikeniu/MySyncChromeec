@@ -35,6 +35,7 @@ test-list-y=\
        exception \
        exit \
        flash_physical \
+       flash_pre_init_protect \
        flash_write_protect \
        fp_transport \
        fpsensor_auth_crypto_stateful \

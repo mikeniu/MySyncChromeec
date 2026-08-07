@@ -795,6 +795,12 @@ class AllTests:
                 skip_for_ec_legacy=True,
             ),
             TestConfig(
+                test_name="flash_pre_init_protect",
+                imagetype_to_use=ImageType.RO,
+                toggle_power=True,
+                enable_hw_write_protect=True,
+            ),
+            TestConfig(
                 test_name="flash_write_protect",
                 imagetype_to_use=ImageType.RO,
                 toggle_power=True,
