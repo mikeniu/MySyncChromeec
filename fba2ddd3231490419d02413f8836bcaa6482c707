@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32e2de8f_33c4ffeb",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-07T10:47:51Z",
+      "side": 1,
+      "message": "I think `BUTTON_RECOVERY` was ok here but the code it had was not, so could you please: restore this to `BUTTON_RECOVERY` but also in `zephyr/include/dt-bindings/buttons.h` change its value to 0xffff so it does not collide with the standard INPUT_KEY codes, and also drop the others from `zephyr/include/dt-bindings/buttons.h`",
+      "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
