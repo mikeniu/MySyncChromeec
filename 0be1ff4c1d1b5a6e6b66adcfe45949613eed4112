@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56e506eb_ecf53a08",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_egis630_pal.c",
+        "patchSetId": 35
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 3698372
+      },
+      "writtenOn": "2026-08-07T05:15:01Z",
+      "side": 1,
+      "message": "I don\u0027t really recommend directly replacing `PLAT_FREE` with `plat_free`.\nInstead, maybe you can consider renaming it to `plat_safe_free`.\n```c\nvoid plat_free_ptr(void **ptr)\n{\n\tif (x \u003d\u003d NULL) {\n\t\tLOG_ERR(\"Error - %s called with NULL double pointer.\",\n\t\t\t__func__);\n\t\treturn;\n\t}\n\n\tsys_free(*ptr);\n\t*ptr \u003d NULL;\n}\n```",
+      "revId": "0be1ff4c1d1b5a6e6b66adcfe45949613eed4112",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
