@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a13465f6_e3758813",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-07T08:10:22Z",
+      "side": 1,
+      "message": "Merge Conflict.  Please reslove it.",
+      "revId": "79aaef1492deadb71943f25db05d58d88be04ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
