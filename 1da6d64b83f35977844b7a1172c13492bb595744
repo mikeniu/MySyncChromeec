@@ -22,6 +22,30 @@
       },
       "revId": "1da6d64b83f35977844b7a1172c13492bb595744",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5a82429_6ade5ec8",
+        "filename": "util/lease_and_test_ec.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-07T18:34:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f66fd6f_b865feb9",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 32
+      },
+      "revId": "1da6d64b83f35977844b7a1172c13492bb595744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
