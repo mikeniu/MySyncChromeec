@@ -33,6 +33,24 @@
       "message": "Should we add below line between #44 and #45 ? \ndefault;",
       "revId": "59559f6b2cb4eb7b31bce831f3ea315af16bf348",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04adc6e7_218ae521",
+        "filename": "zephyr/program/skywalker/baze/cbi.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1293891
+      },
+      "writtenOn": "2026-08-07T09:07:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "003fba6b_dfded9c5",
+      "revId": "59559f6b2cb4eb7b31bce831f3ea315af16bf348",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
