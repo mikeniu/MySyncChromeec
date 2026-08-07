@@ -4,6 +4,8 @@
  */
 
 #include "crypto/cleanse_wrapper.h"
+#include "ec_commands.h"
+#include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "openssl/aead.h"
@@ -18,7 +20,10 @@
 
 #include <stdbool.h>
 
+#include <algorithm>
+#include <cstring>
 #include <span>
+#include <string_view>
 
 #if !defined(CONFIG_BORINGSSL_CRYPTO) || !defined(CONFIG_ROLLBACK_SECRET_SIZE)
 #error "fpsensor requires CONFIG_BORINGSSL_CRYPTO and ROLLBACK_SECRET_SIZE"
@@ -229,7 +234,25 @@ derive_encryption_key(std::span<uint8_t> out_key, std::span<const uint8_t> salt,
 		return EC_ERROR_INVAL;
 	}
 
-	return derive_key(out_key, salt, tpm_seed, info);
+	constexpr std::string_view kFgPrefix = "fingerguard_template:";
+	constexpr std::string_view kClassicPrefix = "classic_template:";
+
+	const std::string_view prefix =
+		fingerprint_auth_enabled() ? kFgPrefix : kClassicPrefix;
+
+	constexpr size_t kMaxPrefixLen =
+		std::max(kFgPrefix.size(), kClassicPrefix.size());
+	constexpr size_t kMaxDomainInfoLen =
+		kMaxPrefixLen + SHA256_DIGEST_LENGTH;
+
+	uint8_t domain_info[kMaxDomainInfoLen];
+	const size_t domain_info_len = prefix.size() + SHA256_DIGEST_LENGTH;
+
+	memcpy(domain_info, prefix.data(), prefix.size());
+	memcpy(domain_info + prefix.size(), info.data(), info.size());
+
+	return derive_key(out_key, salt, tpm_seed,
+			  std::span{ domain_info, domain_info_len });
 }
 
 enum ec_error_list

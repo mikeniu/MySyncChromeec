@@ -27,6 +27,7 @@
 #include <ec_commands.h>
 #include <ec_tasks.h>
 #include <flash.h>
+#include <fpsensor/fpsensor_crypto.h>
 #include <fpsensor/fpsensor_state.h>
 #include <host_command.h>
 #include <mkbp_event.h>
@@ -63,76 +64,29 @@ static const uint8_t fake_rollback_entropy[] = "some_rollback_entropy";
 	{ 0x5f6d5f69, 0x61665f61, 0x755f656b, 0x5f726573, \
 	  0x755f6469, 0x5f646573, 0x5f726f66, 0x74736574 }
 
-/*
- * How to manually encrypt a template
- *
- * After adding "some_rollback_entropy" entropy to empty rollback secret
- * (32 bytes of 0x00), the secret stored in rollback region is
- * 3ce9c8011d3f98d96fa741da4f10f2f410d80372ebba98ff726b521338e6cfd9
- *
- * The IKM (input key material) is a concatenation of the rollback secret and
- * the TPM seed, so it's
- * 3ce9c8011d3f98d96fa741da4f10f2f410d80372ebba98ff726b521338e6cfd9
- * 766572795f7365637265745f33325f62797465735f6f665f74706d5f73656564
- *
- * UserID is 695f6d5f615f66616b655f757365725f69645f757365645f666f725f74657374
- *
- * To encrypt the template we also need nonce and encryption salt.
- * We get these values from entropy source. In the test environment
- * our entropy source is random(), which is initialized using
- * srandom(0xdeadc0de) in fpsensor_before(), so:
- *
- * The nonce is 941ee3310b891aeba42b2e90
- * Encryption salt is fa253e21359a7920ba1a9868cc26a88f
- *
- * The key used for encryption is HKDF-SHA256(encryption_salt, ikm, user_id)
- * 1a5146988b7e7423fc11c99b5edd6c22
- *
- * The template is appended with positive match salt which is obtained from TRNG
- * in our case it is 64c55d3ee3b3a45ef85bce1ed5caf1e0
- *
- * Finally, we can encrypt (template || positive match salt) with AES-GCM which
- * will give 020dc692bb286c1001e35f17c368053c15c07cd88bf640c897986ddbde23390059
- * ea827f4fee49955c38f0caeb69730e with tag a1ba7aa11e61194bdf7627a72f25d2f8
- */
-
 static const uint8_t example_template[CONFIG_FP_ALGORITHM_TEMPLATE_SIZE] = {
 	0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
 	0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
 	0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20
 };
 
-static const struct ec_fp_template_encryption_metadata expected_enc_info = {
+static const uint8_t pos_match_salt[FP_POSITIVE_MATCH_SALT_BYTES] = {
+	0x64, 0xc5, 0x5d, 0x3e, 0xe3, 0xb3, 0xa4, 0x5e,
+	0xf8, 0x5b, 0xce, 0x1e, 0xd5, 0xca, 0xf1, 0xe0
+};
+
+static struct ec_fp_template_encryption_metadata expected_enc_info = {
 	.struct_version = 4,
 	.nonce = { 0x94, 0x1e, 0xe3, 0x31, 0x0b, 0x89, 0x1a, 0xeb, 0xa4, 0x2b,
 		   0x2e, 0x90 },
 	.encryption_salt = { 0xfa, 0x25, 0x3e, 0x21, 0x35, 0x9a, 0x79, 0x20,
 			     0xba, 0x1a, 0x98, 0x68, 0xcc, 0x26, 0xa8, 0x8f },
-	.tag = { 0xa1, 0xba, 0x7a, 0xa1, 0x1e, 0x61, 0x19, 0x4b, 0xdf, 0x76,
-		 0x27, 0xa7, 0x2f, 0x25, 0xd2, 0xf8 },
+	.tag = { 0 },
 };
 
-static const uint8_t
-	example_template_encrypted[CONFIG_FP_ALGORITHM_TEMPLATE_SIZE +
-				   FP_POSITIVE_MATCH_SALT_BYTES] = {
-		0x02, 0x0d, 0xc6, 0x92, 0xbb, 0x28, 0x6c, 0x10, 0x01, 0xe3,
-		0x5f, 0x17, 0xc3, 0x68, 0x05, 0x3c, 0x15, 0xc0, 0x7c, 0xd8,
-		0x8b, 0xf6, 0x40, 0xc8, 0x97, 0x98, 0x6d, 0xdb, 0xde, 0x23,
-		0x39, 0x00, 0x59, 0xea, 0x82, 0x7f, 0x4f, 0xee, 0x49, 0x95,
-		0x5c, 0x38, 0xf0, 0xca, 0xeb, 0x69, 0x73, 0x0e
-	};
+static uint8_t example_template_encrypted[CONFIG_FP_ALGORITHM_TEMPLATE_SIZE +
+					  FP_POSITIVE_MATCH_SALT_BYTES];
 
-/*
- * Positive match secret is a HKDF-SHA256(positive_match_salt, ikm, message)
- *
- * The message is a concatenation of string "positive_match_secret for user "
- * and userid. In our case it's 706f7369746976655f6d617463685f7365637265742066
- * 6f72207573657220695f6d5f615f66616b655f757365725f69645f757365645f666f725f74
- * 657374
- *
- * The positive match secret is: 69af2f7a35a249d6584bda3ba9f99f872aa560cce9c4
- * 1f832bf2cdd26e29a76b
- */
 static const uint8_t
 	example_positive_match_secret[FP_POSITIVE_MATCH_SECRET_BYTES] = {
 		0x69, 0xaf, 0x2f, 0x7a, 0x35, 0xa2, 0x49, 0xd6,
@@ -178,6 +132,30 @@ BUILD_ASSERT(FP_TEMPLATE_PARAMS_BUFFER_SIZE >
 #define FP_TEMPLATE_V1_PARAMS_BUFFER_SIZE 32
 BUILD_ASSERT(FP_TEMPLATE_V1_PARAMS_BUFFER_SIZE >
 	     sizeof(struct ec_params_fp_template_v1));
+
+static void setup_example_template_encrypted(void)
+{
+	uint8_t payload[CONFIG_FP_ALGORITHM_TEMPLATE_SIZE +
+			FP_POSITIVE_MATCH_SALT_BYTES];
+	memcpy(payload, example_template, sizeof(example_template));
+	memcpy(payload + sizeof(example_template), pos_match_salt,
+	       sizeof(pos_match_salt));
+
+	FpEncryptionKey key;
+	zassert_equal(derive_encryption_key(
+			      key, expected_enc_info.encryption_salt,
+			      global_context.user_id, global_context.tpm_seed),
+		      EC_SUCCESS);
+
+	zassert_equal(
+		aes_128_gcm_encrypt(
+			key,
+			std::span<const uint8_t>{ payload, sizeof(payload) },
+			std::span<uint8_t>{ example_template_encrypted,
+					    sizeof(example_template_encrypted) },
+			expected_enc_info.nonce, expected_enc_info.tag),
+		EC_SUCCESS);
+}
 
 ZTEST_USER(fpsensor_template, test_fp_template_v1_load_template_success)
 {
@@ -1106,7 +1084,7 @@ ZTEST_USER(fpsensor_template, test_fp_template_load_template_invalid_tag)
 		expected_enc_info;
 
 	/* Corrupt the tag. We expect that the template will be rejected. */
-	enc_info_with_invalid_tag.tag[0] = 0x00;
+	enc_info_with_invalid_tag.tag[0] = expected_enc_info.tag[0] ^ 0xFF;
 
 	memcpy(encrypted_template, &enc_info_with_invalid_tag,
 	       sizeof(struct ec_fp_template_encryption_metadata));
@@ -1469,6 +1447,10 @@ static void fpsensor_before(void *f)
 
 	/* Reset seed for random() */
 	srandom(0xdeadc0de);
+
+	/* Dynamically re-generate example_template_encrypted using current key
+	 * derivation. */
+	setup_example_template_encrypted();
 }
 
 ZTEST_SUITE(fpsensor_template, NULL, fpsensor_setup, fpsensor_before, NULL,

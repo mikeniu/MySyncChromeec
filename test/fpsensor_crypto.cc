@@ -32,6 +32,11 @@ enum ec_error_list rollback_get_secret(uint8_t *secret)
 	TEST_ASSERT(false);
 }
 
+bool fingerprint_auth_enabled(void)
+{
+	return true;
+}
+
 test_static int test_hmac_sha256(void)
 {
 	/* Test vectors from

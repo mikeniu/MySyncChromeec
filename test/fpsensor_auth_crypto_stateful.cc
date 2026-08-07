@@ -25,6 +25,11 @@ BUILD_ASSERT(IS_ENABLED(CONFIG_OTP_KEY),
 	     "OTP_KEY should be enabled for Helipilot baseboard.");
 #endif
 
+bool fingerprint_auth_enabled(void)
+{
+	return true;
+}
+
 namespace
 {
 
