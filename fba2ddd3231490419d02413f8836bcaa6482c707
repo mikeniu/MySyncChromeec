@@ -16,6 +16,24 @@
       "message": "I think `BUTTON_RECOVERY` was ok here but the code it had was not, so could you please: restore this to `BUTTON_RECOVERY` but also in `zephyr/include/dt-bindings/buttons.h` change its value to 0xffff so it does not collide with the standard INPUT_KEY codes, and also drop the others from `zephyr/include/dt-bindings/buttons.h`",
       "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e47142a6_55b01a55",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-07T17:13:32Z",
+      "side": 1,
+      "message": "It makes sense. However, `BUTTON_RECOVERY` value is used to set bit mask for button simulation functions.\n\nSo I suggest that we keep its original value and declare new input key following `zephyr/dt-bindings/input/input-event-codes.h` format by naming the key as  `INPUT_KEY_RECOVERY \u003d 0xFFFF`.\n\nAlso we could include `zephyr/dt-bindings/input/input-event-codes.h` into `zephyr/include/dt-bindings/buttons.h` and use `zephyr/include/dt-bindings/buttons.h` only.\n\nHow about this approach?",
+      "parentUuid": "32e2de8f_33c4ffeb",
+      "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
