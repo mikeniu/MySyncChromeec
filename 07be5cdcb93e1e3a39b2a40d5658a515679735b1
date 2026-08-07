@@ -16,6 +16,24 @@
       "message": "Presubmit failure:\nRun `cros format zephyr/shim/chip/it8xxx2/shi.c` to fix\n\nMake sure you are using `repo upload` to run the presubmit checks automatically, or run the checks manually using `~/chromiumos/src/repohooks/pre-upload.py` (outside the chroot).",
       "revId": "07be5cdcb93e1e3a39b2a40d5658a515679735b1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc7401b8_44c42c34",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1273969
+      },
+      "writtenOn": "2026-08-07T08:22:14Z",
+      "side": 1,
+      "message": "Thanks for the explanation. I\u0027ve fixed it.",
+      "parentUuid": "1b905d2b_6687105b",
+      "revId": "07be5cdcb93e1e3a39b2a40d5658a515679735b1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
