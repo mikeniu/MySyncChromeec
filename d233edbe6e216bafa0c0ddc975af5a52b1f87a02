@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4a618231_bd96739b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3685612
+      },
+      "writtenOn": "2026-08-07T03:49:16Z",
+      "side": 1,
+      "message": "It’s not that I’m insisting on configuring it, the tool forces me to. If I don’t, it throws an error.",
+      "parentUuid": "66b024a8_9a449eab",
+      "revId": "d233edbe6e216bafa0c0ddc975af5a52b1f87a02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d9dc7f05_8081f16d",
         "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
         "patchSetId": 1
@@ -103,6 +121,24 @@
       "side": 1,
       "message": "This tag is saying that the DUT will advertise 0xFF01, the DisplayPort SVID, in Discover SVIDs ACK, just like line 514 is saying that the DUT will advertise the Intel SVID. (See other comment for my thoughts about Intel SVID/TBT.)\n\nJust recently, I have seen the port give a Discover SVIDs ACK that matches this behavior, so I guess the VIF is consistent with the PDC firmware.\n\nIt doesn\u0027t make sense to me that the DUT would respond with 0xFF01. Why does it do this?",
       "parentUuid": "e89ee209_73fbda6b",
+      "revId": "d233edbe6e216bafa0c0ddc975af5a52b1f87a02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ec0b7b1_4f5a7b98",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 3685612
+      },
+      "writtenOn": "2026-08-07T03:49:16Z",
+      "side": 1,
+      "message": "If the 0xFF01 SVID is not reported, the DPAM test will fail, because the DPAM will test the UFP enter mode.",
+      "parentUuid": "01f9eaf8_0566a8c1",
       "revId": "d233edbe6e216bafa0c0ddc975af5a52b1f87a02",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
