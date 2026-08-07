@@ -114,6 +114,7 @@
         status = "okay";
         scl-gpios = <&gpiof 14 GPIO_ACTIVE_HIGH>;
         sda-gpios = <&gpiof 15 GPIO_ACTIVE_HIGH>;
+        wakeup-source;
 };
 
 &i2c_1_wrapper {
@@ -138,6 +139,7 @@
         status = "okay";
         scl-gpios = <RTS5912_GPIO017 GPIO_ACTIVE_HIGH>;
         sda-gpios = <RTS5912_GPIO018 GPIO_ACTIVE_HIGH>;
+        wakeup-source;
 };
 
 &i2c_5_wrapper {
