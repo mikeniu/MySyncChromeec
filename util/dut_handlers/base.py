@@ -168,3 +168,6 @@ class DutHandler(ABC):
     @abstractmethod
     def execute_test_flow(self) -> None:
         """Execute the test flow for the target OS."""
+
+    def cleanup(self) -> None:
+        """Perform any handler-specific cleanup at the end of execution."""
