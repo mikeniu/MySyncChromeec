@@ -584,6 +584,12 @@ int crec_flash_pre_init(void)
 		return EC_SUCCESS;
 
 	if (prot_flags & EC_FLASH_PROTECT_GPIO_ASSERTED) {
+		if (prot_flags & EC_FLASH_PROTECT_RO_NOW) {
+			/*
+			 * Enable physical protection for RO (false means RO).
+			 */
+			crec_flash_physical_protect_now(false);
+		}
 		/*
 		 * Write protect is asserted.  If we want RO flash protected,
 		 * protect it now.

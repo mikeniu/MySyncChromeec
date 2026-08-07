@@ -211,6 +211,7 @@ exit-y=exit.o
 fan-y=fan.o
 flash-y=flash.o
 flash_physical-y=flash_physical.o
+flash_pre_init_protect-y=flash_pre_init_protect.o
 flash_write_protect-y=flash_write_protect.o
 fp_transport-y=fp_transport.o
 fpsensor_auth_commands-y=fpsensor_auth_commands.o
