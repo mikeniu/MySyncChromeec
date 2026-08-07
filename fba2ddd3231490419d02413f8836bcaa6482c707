@@ -52,6 +52,24 @@
       "parentUuid": "e47142a6_55b01a55",
       "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13784161_9bf10c34",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-07T22:37:06Z",
+      "side": 1,
+      "message": "Oh hadn\u0027t thought about it -- yes `INPUT_KEY_RECOVERY` sounds right, you should still be able to drop the other defines though? and then in the code pick them from `include/button.h` instead, so that we keep the internal code ones and dt ones separate, could you try that? for the include I think I would explicitly include both where needed, though either works",
+      "parentUuid": "b5f4b214_185bd3b5",
+      "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
