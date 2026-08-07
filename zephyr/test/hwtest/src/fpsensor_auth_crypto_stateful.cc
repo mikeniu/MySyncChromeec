@@ -5,7 +5,10 @@
 
 #include "common.h"
 #include "ec_commands.h"
+#include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_auth_crypto.h"
+#include "fpsensor/fpsensor_crypto.h"
+#include "fpsensor/fpsensor_state.h"
 #include "mock/otpi_mock.h"
 #include "openssl/bn.h"
 #include "openssl/ec.h"
@@ -165,4 +168,109 @@ ZTEST(fpsensor_auth_crypto_stateful, test_fp_encrypt_decrypt_pairing_key)
 	zassert_equal(decrypt_pairing_key(info, enc_data, output), EC_SUCCESS);
 
 	zassert_mem_equal(input.data(), output.data(), sizeof(input));
+}
+
+ZTEST(fpsensor_auth_crypto_stateful,
+      test_derive_encryption_key_domain_separation)
+{
+	FpEncryptionKey classic_key{};
+	FpEncryptionKey fg_key{};
+	constexpr std::array<uint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES> salt = {
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+	};
+
+	/* Encrypt under Classic flow. */
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+	zassert_false(fingerprint_auth_enabled());
+	zassert_equal(derive_encryption_key(classic_key, salt, kFakeUserId,
+					    kFakeTpmSeed),
+		      EC_SUCCESS);
+
+	/* Encrypt under Fingerprint Auth flow. */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+	zassert_true(fingerprint_auth_enabled());
+
+	zassert_equal(derive_encryption_key(fg_key, salt, kFakeUserId,
+					    kFakeTpmSeed),
+		      EC_SUCCESS);
+
+	/* Verify keys differ despite identical salt, user_id, and tpm_seed. */
+	zassert_false(memcmp(classic_key.data(), fg_key.data(),
+			     sizeof(classic_key)) == 0);
+
+	/* Clean up state. */
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+}
+
+ZTEST(fpsensor_auth_crypto_stateful,
+      test_fp_decrypt_classic_in_fingerprint_auth_flow_fails)
+{
+	struct fp_auth_command_encryption_metadata info{};
+	const std::array<uint8_t, 32> input = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+						1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
+						2, 3, 4, 5, 6, 7, 8, 9, 1, 2 };
+	uint16_t version = 1;
+	std::array<uint8_t, 32> enc_data{};
+	std::array<uint8_t, 32> output{};
+
+	/* Encrypt under Classic flow. */
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+	zassert_equal(encrypt_data(version, info, kFakeUserId, kFakeTpmSeed,
+				   input, enc_data),
+		      EC_SUCCESS);
+
+	/* Decryption under Classic flow should succeed. */
+	zassert_equal(decrypt_data(info, kFakeUserId, kFakeTpmSeed, enc_data,
+				   output),
+		      EC_SUCCESS);
+
+	/* Switch to Fingerprint Auth flow. */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	/* Decryption under Fingerprint Auth flow should fail. */
+	zassert_not_equal(decrypt_data(info, kFakeUserId, kFakeTpmSeed,
+				       enc_data, output),
+			  EC_SUCCESS);
+
+	/* Clean up state. */
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+}
+
+ZTEST(fpsensor_auth_crypto_stateful,
+      test_fp_decrypt_fingerprint_auth_in_classic_flow_fails)
+{
+	struct fp_auth_command_encryption_metadata info{};
+	const std::array<uint8_t, 32> input = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+						1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
+						2, 3, 4, 5, 6, 7, 8, 9, 1, 2 };
+	uint16_t version = 1;
+	std::array<uint8_t, 32> enc_data{};
+	std::array<uint8_t, 32> output{};
+
+	/* Encrypt under Fingerprint Auth flow. */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+	zassert_equal(encrypt_data(version, info, kFakeUserId, kFakeTpmSeed,
+				   input, enc_data),
+		      EC_SUCCESS);
+
+	/* Decryption under Fingerprint Auth flow should succeed. */
+	zassert_equal(decrypt_data(info, kFakeUserId, kFakeTpmSeed, enc_data,
+				   output),
+		      EC_SUCCESS);
+
+	/* Switch to Classic flow. */
+	global_context.fp_encryption_status &=
+		~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	/* Decryption under Classic flow must fail. */
+	zassert_not_equal(decrypt_data(info, kFakeUserId, kFakeTpmSeed,
+				       enc_data, output),
+			  EC_SUCCESS);
 }
