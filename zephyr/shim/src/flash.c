@@ -47,8 +47,7 @@ test_mockable int crec_flash_physical_write(int offset, int size,
 	int rv;
 
 	/* Fail if offset, size, and data aren't at least word-aligned */
-	if ((offset | size | (uint32_t)(uintptr_t)data) &
-	    (CONFIG_FLASH_WRITE_SIZE - 1))
+	if ((offset | size | (uint32_t)(uintptr_t)data) & (sizeof(long) - 1))
 		return EC_ERROR_INVAL;
 
 	/*
