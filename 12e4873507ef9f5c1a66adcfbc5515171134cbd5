@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc436da4_78a345ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-08-07T15:16:12Z",
+      "side": 1,
+      "message": "I don\u0027t know what you were using find_non_exec_lines for, but with your change it no longer meets my purpose.",
+      "revId": "12e4873507ef9f5c1a66adcfbc5515171134cbd5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
