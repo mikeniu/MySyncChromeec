@@ -4,6 +4,8 @@
  */
 
 #include "crypto/cleanse_wrapper.h"
+#include "ec_commands.h"
+#include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "openssl/aead.h"
@@ -18,7 +20,10 @@
 
 #include <stdbool.h>
 
+#include <algorithm>
+#include <cstring>
 #include <span>
+#include <string_view>
 
 #if !defined(CONFIG_BORINGSSL_CRYPTO) || !defined(CONFIG_ROLLBACK_SECRET_SIZE)
 #error "fpsensor requires CONFIG_BORINGSSL_CRYPTO and ROLLBACK_SECRET_SIZE"
@@ -227,6 +232,21 @@ derive_encryption_key(std::span<uint8_t> out_key, std::span<const uint8_t> salt,
 	if (info.size() != SHA256_DIGEST_LENGTH) {
 		CPRINTS("Invalid info size: %zu", info.size());
 		return EC_ERROR_INVAL;
+	}
+
+	if (fingerprint_auth_enabled()) {
+		constexpr std::string_view kFgPrefix =
+			"fingerprint_auth_template:";
+		constexpr size_t kFgDomainInfoLen =
+			kFgPrefix.size() + SHA256_DIGEST_LENGTH;
+		std::array<uint8_t, kFgDomainInfoLen> domain_info;
+
+		auto it = std::copy(kFgPrefix.begin(), kFgPrefix.end(),
+				    domain_info.begin());
+		std::copy(info.begin(), info.end(), it);
+
+		return derive_key(out_key, salt, tpm_seed,
+				  std::span{ domain_info });
 	}
 
 	return derive_key(out_key, salt, tpm_seed, info);
