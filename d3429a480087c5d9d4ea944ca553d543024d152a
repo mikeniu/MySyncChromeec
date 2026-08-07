@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fff4ec6c_89f4d90f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-07T17:34:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "238ab224_0390b468",
+      "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a82dd44_a8dfff40",
@@ -73,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa4a314e_3b7f3b31",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 809,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-07T17:34:45Z",
+      "side": 1,
+      "message": "Done. created a separate CL before this CL: https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8209859/7",
+      "parentUuid": "539b72dd_74581522",
+      "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70672bd7_4e30b4fa",
@@ -91,6 +127,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ddd861a_ed60b97f",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-07T17:34:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70672bd7_4e30b4fa",
+      "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "30f3fdfd_0fc42f0a",
@@ -105,6 +159,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] As with the v3 format test above, because `FP_TEMPLATE_DECRYPT` runs asynchronously, this test is no longer verifying that trivial salts are rejected. It just verifies that the decryption task was successfully queued.\n\nPlease apply the same fix here: either revert to the v0 command and remove the session establishment code, or simulate the task and poll for the result via `FP_TEMPLATE_GET_RESULT`.",
       "isAi": true,
+      "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "503006f8_8e243f9b",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 1013,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-07T17:34:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30f3fdfd_0fc42f0a",
       "revId": "d3429a480087c5d9d4ea944ca553d543024d152a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
