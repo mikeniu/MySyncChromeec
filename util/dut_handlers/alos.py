@@ -80,7 +80,7 @@ class AlosHandler(DutHandler):
                 text=True,
             )
             for line in res.stdout.splitlines():
-                if dut_hostname in line and "\tdevice" in line:
+                if dut_hostname in line:
                     return True
         except subprocess.CalledProcessError:
             pass
@@ -134,28 +134,236 @@ class AlosHandler(DutHandler):
         return test_targets
 
     def configure_gbb(self) -> None:
-        """Configure dev-mode GBB flags (stubbed for ALOS)."""
-        print("Skipping ALOS GBB configuration (stubbed)")
+        """Configure dev-mode GBB flags locally on the ALOS DUT via ADB shell.
+
+        The flag value 0x39 is a bitmask enabling:
+          - 0x0001 (GBB_FLAG_DEV_SCREEN_SHORT_DELAY): Shortens the dev screen warning.
+          - 0x0008 (GBB_FLAG_FORCE_DEV_SWITCH_ON): Forces developer mode active.
+          - 0x0010 (GBB_FLAG_FORCE_DEV_BOOT_USB): Allows booting from USB drives.
+          - 0x0020 (GBB_FLAG_DISABLE_ROLLBACK_CHECK): Bypasses version rollback checks.
+        """
+        self._ensure_adb_connected()
+        print(
+            f"Configuring GBB flags on ALOS DUT via ADB ({self.adb_target})..."
+        )
+        cmd = [
+            "adb",
+            "-s",
+            self.adb_target,
+            "shell",
+            "futility gbb -s --flash --flags +0x39",
+        ]
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            print(
+                f"Warning: Failed to set GBB flags on ALOS DUT via ADB: {e}. "
+                "Continuing execution...",
+                file=sys.stderr,
+            )
+
+    def _copy_ec_rw_bin_to_dut(self, ec_rw_bin_path: str) -> None:
+        """Copy the local EC RW binary to the target DUT's /data/local/tmp directory via ADB."""
+        if not os.path.exists(ec_rw_bin_path):
+            raise FileNotFoundError(
+                f"ec.bin not found at {ec_rw_bin_path}. Did you build the project?"
+            )
+
+        self._ensure_adb_connected()
+        model = self.details["model"]
+        destination = f"/data/local/tmp/ec_rw_{model}.bin"
+        print(
+            f"Pushing {ec_rw_bin_path} to ALOS DUT via ADB ({self.adb_target}:{destination})..."
+        )
+        try:
+            subprocess.run(
+                [
+                    "adb",
+                    "-s",
+                    self.adb_target,
+                    "push",
+                    ec_rw_bin_path,
+                    destination,
+                ],
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"Failed to copy ec.bin to ALOS DUT via ADB: {e}"
+            ) from e
+
+    def _swap_ec_rw_on_dut(self, ap_path: str, ec_rw_path: str) -> None:
+        """Replace EC RW in AP image on DUT using swap_ec_rw script."""
+        tmp_dir = "/data/local/tmp"
+        swap_script_host = os.path.join(
+            self.android_dir,
+            "external",
+            "vboot_reference",
+            "scripts",
+            "image_signing",
+            "swap_ec_rw",
+        )
+        if not os.path.exists(swap_script_host):
+            raise FileNotFoundError(
+                f"swap_ec_rw script not found at {swap_script_host}."
+            )
+
+        print("Pushing host swap_ec_rw script to ALOS DUT...")
+        subprocess.run(
+            [
+                "adb",
+                "-s",
+                self.adb_target,
+                "push",
+                swap_script_host,
+                f"{tmp_dir}/swap_ec_rw",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                "adb",
+                "-s",
+                self.adb_target,
+                "shell",
+                f"chmod +x {tmp_dir}/swap_ec_rw && "
+                f"{tmp_dir}/swap_ec_rw -i {ap_path} -e {ec_rw_path}",
+            ],
+            check=True,
+        )
 
     def flash_ec_rw(self, ec_rw_bin_path: Optional[str]) -> None:
-        """Flash the EC RW section (stubbed for ALOS)."""
+        """Flash the EC RW section on the ALOS DUT using futility via ADB shell."""
         if not ec_rw_bin_path:
             return
-        print(f"Skipping ALOS EC RW flashing (stubbed): {ec_rw_bin_path}")
+
+        self._ensure_adb_connected()
+        model = self.details["model"]
+        self._copy_ec_rw_bin_to_dut(ec_rw_bin_path)
+
+        print(f"Flashing EC RW on ALOS DUT via ADB ({self.adb_target})...")
+        try:
+            print("Reading AP firmware image on ALOS DUT via ADB...")
+            subprocess.run(
+                [
+                    "adb",
+                    "-s",
+                    self.adb_target,
+                    "shell",
+                    f"futility read /data/local/tmp/ap_{model}.bin",
+                ],
+                check=True,
+            )
+
+            print("Swapping EC RW section in AP firmware image on ALOS DUT...")
+            self._swap_ec_rw_on_dut(
+                f"/data/local/tmp/ap_{model}.bin",
+                f"/data/local/tmp/ec_rw_{model}.bin",
+            )
+
+            print("Updating AP firmware with new EC RW image via futility...")
+            subprocess.run(
+                [
+                    "adb",
+                    "-s",
+                    self.adb_target,
+                    "shell",
+                    f"futility update --fast -i /data/local/tmp/ap_{model}.bin",
+                ],
+                check=True,
+            )
+
+            print(f"Rebooting ALOS DUT via ADB ({self.adb_target})...")
+            subprocess.run(
+                ["adb", "-s", self.adb_target, "shell", "reboot"],
+                check=False,
+            )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"Flashing EC RW on ALOS DUT failed via ADB futility: {e}"
+            ) from e
+        finally:
+            subprocess.run(
+                [
+                    "adb",
+                    "-s",
+                    self.adb_target,
+                    "shell",
+                    f"rm -f /data/local/tmp/ap_{model}.bin /data/local/tmp/ec_rw_{model}.bin",
+                ],
+                check=False,
+            )
 
     def flash_ec_ro(self, ec_ro_bin_path: Optional[str]) -> None:
-        """Flash the EC RO section (stubbed for ALOS)."""
+        """Flash the EC RO section on the ALOS DUT using futility via ADB shell."""
         if not ec_ro_bin_path:
             return
-        print(f"Skipping ALOS EC RO flashing (stubbed): {ec_ro_bin_path}")
+
+        self._ensure_adb_connected()
+        model = self.details["model"]
+        destination = f"/data/local/tmp/ec_ro_{model}.bin"
+        print(
+            f"Pushing EC RO binary {ec_ro_bin_path} to ALOS DUT via ADB ({self.adb_target})..."
+        )
+        try:
+            subprocess.run(
+                [
+                    "adb",
+                    "-s",
+                    self.adb_target,
+                    "push",
+                    ec_ro_bin_path,
+                    destination,
+                ],
+                check=True,
+            )
+            print(
+                f"Flashing EC RO on ALOS DUT using futility via ADB ({self.adb_target})..."
+            )
+            subprocess.run(
+                [
+                    "adb",
+                    "-s",
+                    self.adb_target,
+                    "shell",
+                    f"futility update --ec_image {destination} || "
+                    f"flashrom -p ec -w {destination}",
+                ],
+                check=True,
+            )
+            subprocess.run(
+                ["adb", "-s", self.adb_target, "shell", "ectool reboot_ec"],
+                check=False,
+            )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"Flashing EC RO on ALOS DUT failed via ADB: {e}"
+            ) from e
+        finally:
+            subprocess.run(
+                ["adb", "-s", self.adb_target, "shell", f"rm -f {destination}"],
+                check=False,
+            )
 
     def verify_ap_up(self, timeout_secs: int = 300) -> None:
         """Wait for the ALOS DUT AP to boot up and reply to ADB commands."""
         print(f"Verifying ALOS DUT AP is up on {self.adb_target} via ADB...")
+        self._ensure_adb_connected()
+
+        print(f"Waiting for ADB device {self.adb_target} to be ready...")
+        try:
+            subprocess.run(
+                ["adb", "-s", self.adb_target, "wait-for-device"],
+                check=True,
+                timeout=timeout_secs,
+            )
+        except subprocess.TimeoutExpired as e:
+            raise RuntimeError(
+                f"Timed out waiting for ALOS DUT ADB device {self.adb_target}"
+            ) from e
+
         interval = 5
         max_attempts = max(1, timeout_secs // interval)
-
-        self._ensure_adb_connected()
 
         for attempt in range(1, max_attempts + 1):
             try:
@@ -196,10 +404,9 @@ class AlosHandler(DutHandler):
                 return
             except subprocess.CalledProcessError:
                 print(
-                    f"Attempt {attempt}/{max_attempts}: ALOS DUT AP not reachable via ADB yet. "
+                    f"Attempt {attempt}/{max_attempts}: ALOS DUT AP boot not complete yet. "
                     f"Retrying in {interval} seconds..."
                 )
-                self._ensure_adb_connected()
                 time.sleep(interval)
 
         raise RuntimeError(
