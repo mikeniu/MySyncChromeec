@@ -451,7 +451,8 @@ def main():
 
     try:
         handler = create_dut_handler(details, args, ec_dir)
-    except NotImplementedError as e:
+        handler.get_test_targets()
+    except (NotImplementedError, RuntimeError) as e:
         print(f"Error: {e}", file=sys.stderr)
         release_lease_lock(lock_file, lock_file_path)
         if not args.keep_lease:
