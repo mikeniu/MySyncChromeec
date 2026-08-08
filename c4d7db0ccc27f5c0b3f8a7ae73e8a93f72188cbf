@@ -16,6 +16,24 @@
       "message": "LGTM - review agent flagged this:\n```\nIf Swarming DUT OS detection returns \"Unknown\" (e.g. luci-auth token unavailable, network/API timeout, or missing bot dimensions in Swarming), the script unconditionally aborts instead of defaulting to CrOS testing as it did previously.\n```\n\nIf that is intended change in behavior, update the commit message.  Otherwise fix to fall back to CrOS testing.",
       "revId": "c4d7db0ccc27f5c0b3f8a7ae73e8a93f72188cbf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e84db25_483f9c56",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-08T01:43:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9340212c_b7f10cb0",
+      "revId": "c4d7db0ccc27f5c0b3f8a7ae73e8a93f72188cbf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
