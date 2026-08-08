@@ -10,6 +10,7 @@
 
 #include "console.h"
 #include "ec_commands.h"
+#include "hooks.h"
 #include "host_command.h"
 #include "port80.h"
 #include "test/drivers/test_state.h"
@@ -121,6 +122,57 @@ ZTEST(port80, test_port80_special)
 	CHECK_ARGS_RESULT(args)
 	zassert_equal(args.response_size, sizeof(response), NULL);
 	zassert_equal(response.code, 0xAA, NULL);
+}
+
+/**
+ * @brief TestPurpose: Verify repeated chipset resume events only record a
+ * single port 80 resume marker.
+ *
+ * @details
+ * The HOOK_CHIPSET_RESUME handler skips writing a PORT_80_EVENT_RESUME marker
+ * when the most recent history entry is already a resume marker. This prevents
+ * S0ix churn (repeated S3->S0 transitions) from flooding the port 80 history
+ * with redundant markers. An intervening non-resume write breaks the run, so
+ * the following resume is recorded again.
+ *
+ * Expected Results
+ *  - Repeated HOOK_CHIPSET_RESUME notifications record a single write.
+ *  - A resume after an intervening port 80 write records a new write.
+ */
+ZTEST(port80, test_port80_resume_dedup)
+{
+	struct ec_response_port80_read response;
+	struct ec_params_port80_read params;
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND(EC_CMD_PORT80_READ, 1, response, params);
+
+	port80_flush();
+
+	/* Simulate S0ix churn: many chipset resume notifications in a row. Only
+	 * the first should record a PORT_80_EVENT_RESUME marker; the rest are
+	 * skipped because the last history entry is already a resume.
+	 */
+	for (int i = 0; i < 5; i++) {
+		hook_notify(HOOK_CHIPSET_RESUME);
+	}
+	params.subcmd = EC_PORT80_GET_INFO;
+	zassert_ok(host_command_process(&args), NULL);
+	CHECK_ARGS_RESULT(args)
+	zassert_equal(response.get_info.writes, 1,
+		      "Repeated resume events should record a single marker");
+
+	/* A normal port 80 write breaks the run, so the following resume is
+	 * recorded again: 1 resume + 1 code + 1 resume == 3 writes.
+	 */
+	port_80_write(0x42);
+	hook_notify(HOOK_CHIPSET_RESUME);
+	hook_notify(HOOK_CHIPSET_RESUME);
+	params.subcmd = EC_PORT80_GET_INFO;
+	zassert_ok(host_command_process(&args), NULL);
+	CHECK_ARGS_RESULT(args)
+	zassert_equal(
+		response.get_info.writes, 3,
+		"A resume after an intervening write should record a marker");
 }
 
 /**
