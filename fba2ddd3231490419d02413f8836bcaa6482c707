@@ -70,6 +70,24 @@
       "parentUuid": "b5f4b214_185bd3b5",
       "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a9a443c_55b7789f",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-08T00:05:52Z",
+      "side": 1,
+      "message": "\u003e and then in the code pick them from include/button.h instead, so that we keep the internal code ones and dt ones separate, could you try that?\n\nOK, I would need to remove definitions from `zephyr/include/dt-bindings/buttons.h` otherwise there will be conflict with `enum button`.\n```\n-#define BUTTON_POWER 1\n-#define BUTTON_VOLUME_DOWN 2\n-#define BUTTON_VOLUME_UP 3\n-#define BUTTON_RECOVERY 4\n```",
+      "parentUuid": "13784161_9bf10c34",
+      "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
