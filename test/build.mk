@@ -12,7 +12,6 @@ test-list-host=$(TEST_LIST_HOST)
 else
 test-list-host =
 test-list-host += battery_config
-test-list-host += bklight_passthru
 test-list-host += boringssl_crypto
 test-list-host += cbi
 test-list-host += charge_ramp
@@ -72,7 +71,6 @@ rw-test = ro
 endif
 
 battery_config-y=battery_config.o
-bklight_passthru-y=bklight_passthru.o
 boringssl_crypto-y=boringssl_crypto.o
 cbi-y=cbi.o
 charge_ramp-y+=charge_ramp.o
