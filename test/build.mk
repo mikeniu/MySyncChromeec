@@ -14,7 +14,6 @@ test-list-host =
 test-list-host += battery_config
 test-list-host += bklight_passthru
 test-list-host += boringssl_crypto
-test-list-host += cbi
 test-list-host += charge_ramp
 test-list-host += console_edit
 test-list-host += crc
@@ -74,7 +73,6 @@ endif
 battery_config-y=battery_config.o
 bklight_passthru-y=bklight_passthru.o
 boringssl_crypto-y=boringssl_crypto.o
-cbi-y=cbi.o
 charge_ramp-y+=charge_ramp.o
 console_edit-y=console_edit.o
 crc-y=crc.o
