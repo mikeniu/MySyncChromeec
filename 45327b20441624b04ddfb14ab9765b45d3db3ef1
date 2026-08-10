@@ -320,6 +320,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a540eaf6_0dcdfca1",
+        "filename": "zephyr/program/bluey/pic/src/keyboard_customization.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-10T06:35:30Z",
+      "side": 1,
+      "message": "The actual key masks are defined in devicetree at compile time. Run-time dynamic configuration is not necessary unless there\u0027s a reason. My suggestion is removing *keyboard_customization.c* file in the initial commit.",
+      "parentUuid": "be835e85_d947335a",
+      "range": {
+        "startLine": 96,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 35
+      },
+      "revId": "45327b20441624b04ddfb14ab9765b45d3db3ef1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ba327ab8_530a4520",
         "filename": "zephyr/program/bluey/pic/src/lb_policy.h",
         "patchSetId": 1
