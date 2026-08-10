@@ -23,7 +23,7 @@ test-list-host += fpsensor_crypto
 test-list-host += fpsensor_crypto_with_mock
 test-list-host += fpsensor_crypto_with_mock_otp
 test-list-host += fpsensor_state
-test-list-host += host_command
+
 test-list-host += math_util
 test-list-host += rollback_secret
 test-list-host += sbs_charging
@@ -67,7 +67,7 @@ fpsensor_crypto-y=fpsensor_crypto.o
 fpsensor_crypto_with_mock-y=fpsensor_crypto_with_mock.o
 fpsensor_crypto_with_mock_otp-y=fpsensor_crypto_with_mock_otp.o
 fpsensor_state-y=fpsensor_state.o
-host_command-y=host_command.o
+
 math_util-y=math_util.o
 rollback_secret-y=rollback_secret.o
 sbs_charging-y=sbs_charging.o
