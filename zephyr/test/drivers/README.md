@@ -40,10 +40,4 @@ Example of running gdb on the `drivers.default` test binary:
 # Set breakpoints, run, etc.
 ```
 
-Another of running gdb now on the `drivers.chargesplash` test binary:
-
-```
-(chroot) ec $ gdb twister-out/native_sim/drivers.chargesplash/zephyr/zephyr.exe
-```
-
 [EC code coverage]: ../../../docs/code_coverage.md#zephyr-ztest-code-coverage
