@@ -146,11 +146,6 @@ int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 		ret = i2c_transfer(i2c_get_device_for_port(port), msg, num_msgs,
 				   I2C_STRIP_FLAGS(no_pec_af));
 
-		if (IS_ENABLED(CONFIG_I2C_DEBUG)) {
-			i2c_trace_notify(port, addr_flags, out, out_size, in,
-					 in_size, ret);
-		}
-
 		switch (ret) {
 		case 0:
 			return EC_SUCCESS;
@@ -168,11 +163,6 @@ int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 
 		ret = chip_i2c_xfer(port, no_pec_af, out, out_size, in, in_size,
 				    flags);
-
-		if (IS_ENABLED(CONFIG_I2C_DEBUG)) {
-			i2c_trace_notify(port, addr_flags, out, out_size, in,
-					 in_size, ret);
-		}
 #endif /* !CONFIG_ZEPHYR */
 		if (ret != EC_ERROR_BUSY)
 			break;
