@@ -99,6 +99,12 @@ config LINK_TEST_SUITE_FINGERPRINT_LED
 	  Link and execute fingerprint subsystem tests that focus
 	  on led.
 
+config LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS
+	bool "Link fingerprint auth commands tests"
+	help
+	  Link and execute fingerprint subsystem tests that focus
+	  on fingerprint auth commands.
+
 config EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE
 	int "HC TX buffer size"
 	default 544
