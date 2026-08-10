@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4302f0aa_a207a337",
+        "filename": "util/dut_handlers/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-10T16:15:17Z",
+      "side": 1,
+      "message": "As a follow up, adding some actual logging of the steps performed and the EC output captured could be helpful.",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 67
+      },
+      "revId": "bf9671a024853da1212393afdb9ffad3ba5af8f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "831340d5_0fdee7b0",
+        "filename": "util/dut_handlers/cros.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-10T16:15:17Z",
+      "side": 1,
+      "message": "Duplicated form base.py",
+      "revId": "bf9671a024853da1212393afdb9ffad3ba5af8f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a445443_53b779ce",
+        "filename": "util/dut_handlers/cros.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-10T16:15:17Z",
+      "side": 1,
+      "message": "This probably can be common to CrOS and ALOS.",
+      "range": {
+        "startLine": 53,
+        "startChar": 8,
+        "endLine": 53,
+        "endChar": 21
+      },
+      "revId": "bf9671a024853da1212393afdb9ffad3ba5af8f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
