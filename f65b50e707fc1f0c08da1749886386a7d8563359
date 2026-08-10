@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a733507d_b9fd9c27",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-08-10T08:16:37Z",
+      "side": 1,
+      "message": "Add configuration to enable building the new variant (cherry-picked from main) on the bluey firmware branch.",
+      "revId": "f65b50e707fc1f0c08da1749886386a7d8563359",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
