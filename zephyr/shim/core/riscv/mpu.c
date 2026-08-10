@@ -17,6 +17,9 @@ LOG_MODULE_REGISTER(riscv_mpu, LOG_LEVEL_ERR);
 
 static void prepare_for_sysjump_to_ec(void)
 {
+	/* Permanently disable interrupts before turning off MPU. */
+	interrupt_disable_all();
+
 	/*
 	 * Clear all Physical Memory Protection (PMP) entries before jumping to
 	 * the new image. When CONFIG_HW_STACK_PROTECTION is enabled, the
