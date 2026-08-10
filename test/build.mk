@@ -13,8 +13,6 @@ else
 test-list-host =
 test-list-host += battery_config
 test-list-host += bklight_passthru
-test-list-host += boringssl_crypto
-test-list-host += charge_ramp
 test-list-host += crc
 test-list-host += fpsensor_auth_commands
 test-list-host += fpsensor_auth_commands_otp
@@ -61,7 +59,6 @@ endif
 battery_config-y=battery_config.o
 bklight_passthru-y=bklight_passthru.o
 boringssl_crypto-y=boringssl_crypto.o
-charge_ramp-y+=charge_ramp.o
 crc-y=crc.o
 fpsensor_auth_commands-y=fpsensor_auth_commands.o
 fpsensor_auth_commands_otp-$(rw-test)=fpsensor_auth_commands_otp.o
