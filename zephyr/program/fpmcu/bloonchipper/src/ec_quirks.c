@@ -28,6 +28,8 @@ static void prepare_for_sysjump_to_ec(void)
 	DT_FOREACH_STATUS_OKAY(st_stm32_timers, RESET_PERIPHERAL);
 	DT_FOREACH_STATUS_OKAY(st_stm32_uart, RESET_PERIPHERAL);
 
+	unsigned int key = irq_lock();
+
 	/*
 	 * When HW_STACK_PROTECTION is enabled on ARMv7-M microcontroller then
 	 * the last 64 bytes of the stack is protected to detect stack
@@ -47,6 +49,8 @@ static void prepare_for_sysjump_to_ec(void)
 	 * unused in EC.
 	 */
 	sys_clock_disable();
+
+	irq_unlock(key);
 }
 DECLARE_HOOK(HOOK_SYSJUMP, prepare_for_sysjump_to_ec, HOOK_PRIO_LAST);
 
