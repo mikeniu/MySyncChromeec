@@ -32,7 +32,7 @@ test-list-host += motion_angle_tablet
 test-list-host += motion_lid
 test-list-host += motion_sense_fifo
 test-list-host += power_button
-test-list-host += rollback_secret
+
 test-list-host += rsa3
 test-list-host += rtc
 test-list-host += sbs_charging
@@ -89,7 +89,7 @@ motion_angle_tablet-y=motion_angle_tablet.o motion_angle_data_literals_tablet.o 
 motion_lid-y=motion_lid.o
 motion_sense_fifo-y=motion_sense_fifo.o
 power_button-y=power_button.o
-rollback_secret-y=rollback_secret.o
+
 rsa3-y=rsa.o
 rtc-y=rtc.o
 sbs_charging-y=sbs_charging.o
