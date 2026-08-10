@@ -11,7 +11,6 @@ ifneq ($(TEST_LIST_HOST),)
 test-list-host=$(TEST_LIST_HOST)
 else
 test-list-host =
-test-list-host += charge_ramp
 test-list-host += fpsensor_auth_commands
 test-list-host += fpsensor_auth_commands_otp
 
@@ -41,7 +40,6 @@ ifeq ($(and $(BOARD_HOST),$(TEST_BUILD)),y)
 rw-test = ro
 endif
 
-charge_ramp-y+=charge_ramp.o
 fpsensor_auth_commands-y=fpsensor_auth_commands.o
 fpsensor_auth_commands_otp-$(rw-test)=fpsensor_auth_commands_otp.o
 
