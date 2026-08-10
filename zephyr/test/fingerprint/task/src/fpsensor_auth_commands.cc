@@ -6,6 +6,8 @@
 #include "common.h"
 #include "crypto/elliptic_curve_key.h"
 #include "ec_commands.h"
+#include "flash.h"
+#include "fpsensor/fpsensor.h"
 #include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_auth_crypto.h"
 #include "fpsensor/fpsensor_state.h"
@@ -16,12 +18,22 @@
 #include "openssl/ec.h"
 #include "openssl/evp.h"
 #include "openssl/obj_mac.h"
+#include "rollback.h"
+#include "rollback_private.h"
 #include "sha256.h"
-#include "test_util.h"
+
+#define ROLLBACK0_ADDR DT_REG_ADDR(DT_NODELABEL(rollback0))
+#define ROLLBACK0_SIZE DT_REG_SIZE(DT_NODELABEL(rollback0))
+
+#define ROLLBACK1_ADDR DT_REG_ADDR(DT_NODELABEL(rollback1))
+#define ROLLBACK1_SIZE DT_REG_SIZE(DT_NODELABEL(rollback1))
 #include "util.h"
 
 #include <stdbool.h>
 #include <stddef.h>
+
+#include <zephyr/fff.h>
+#include <zephyr/ztest.h>
 
 #include <algorithm>
 #include <array>
@@ -29,11 +41,43 @@
 #include <span>
 #include <variant>
 
+FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
+
+#define TEST_EQ(actual, expected, fmt, ...) \
+	zassert_equal(actual, expected, fmt, ##__VA_ARGS__)
+#define TEST_NE(actual, expected, fmt, ...) \
+	zassert_not_equal(actual, expected, fmt, ##__VA_ARGS__)
+#define TEST_GE(actual, expected, fmt, ...) \
+	zassert_true((actual) >= (expected), fmt, ##__VA_ARGS__)
+#define TEST_LE(actual, expected, fmt, ...) \
+	zassert_true((actual) <= (expected), fmt, ##__VA_ARGS__)
+#define TEST_ASSERT(cond) zassert_true(cond)
+#define TEST_BITS_SET(val, mask) zassert_true(((val) & (mask)) == (mask))
+#define TEST_BITS_CLEARED(val, mask) zassert_true(((val) & (mask)) == 0)
+
 /* Function used to cleanup session secrets and flags. */
 void reset_session(void);
 
 /* Challenge creation time. */
 extern timestamp_t challenge_ctime;
+
+extern "C" enum ec_status test_send_host_command(int command, int version,
+						 const void *params,
+						 int params_size, void *resp,
+						 int resp_size)
+{
+	struct host_cmd_handler_args args;
+
+	args.command = command;
+	args.version = version;
+	args.params = params;
+	args.params_size = params_size;
+	args.response = resp;
+	args.response_max = resp_size;
+	args.response_size = 0;
+
+	return (enum ec_status)host_command_process(&args);
+}
 
 namespace
 {
@@ -1259,7 +1303,11 @@ test_static enum ec_error_list test_fp_validate_request_fail_timeout(void)
 				       sizeof(challenge_response)),
 		EC_RES_SUCCESS, "%d");
 
-	challenge_ctime.val -= 6 * SECOND;
+	if (challenge_ctime.val >= 6 * USEC_PER_SEC) {
+		challenge_ctime.val -= 6 * USEC_PER_SEC;
+	} else {
+		k_sleep(K_SECONDS(6));
+	}
 
 	TEST_EQ(compute_message_signature(session_key, user_id, sender,
 					  operation,
@@ -1795,7 +1843,7 @@ test_static enum ec_error_list test_fp_sign_match_success(void)
 	global_context.positive_match_secret_state.template_matched = 0;
 	global_context.positive_match_secret_state.readable = true;
 	global_context.positive_match_secret_state.deadline.val =
-		get_time().val + 5 * SECOND;
+		get_time().val + 5 * USEC_PER_SEC;
 
 	TEST_EQ(test_send_host_command(EC_CMD_FP_SIGN_MATCH, 0, &params,
 				       sizeof(params), &response,
@@ -1926,7 +1974,7 @@ test_static enum ec_error_list test_fp_reset_does_not_clear_session(void)
 	global_context.positive_match_secret_state.template_matched = 0;
 	global_context.positive_match_secret_state.readable = true;
 	global_context.positive_match_secret_state.deadline.val =
-		get_time().val + 5 * SECOND;
+		get_time().val + 5 * USEC_PER_SEC;
 
 	TEST_EQ(test_send_host_command(EC_CMD_FP_SIGN_MATCH, 0, &params,
 				       sizeof(params), &response,
@@ -2189,10 +2237,31 @@ test_static enum ec_error_list test_fp_command_establish_session_busy(void)
 
 } // namespace
 
-void run_test(int argc, const char **argv)
+ZTEST(fpsensor_auth_commands, test_auth_commands)
 {
-	RUN_TEST(test_fp_command_generate_nonce);
-	RUN_TEST(test_fp_command_commit_without_seed);
+	static const uint8_t fake_rollback_entropy[] = "some_rollback_entropy";
+	const struct rollback_data data = {
+		.rollback_min_version = 0,
+#ifdef CONFIG_PLATFORM_EC_ROLLBACK_SECRET_SIZE
+		.secret = { 0 },
+#endif
+		.cookie = CROS_EC_ROLLBACK_COOKIE,
+	};
+
+	zassert_ok(crec_flash_erase(ROLLBACK0_ADDR, ROLLBACK0_SIZE));
+	zassert_ok(crec_flash_write(ROLLBACK0_ADDR, sizeof(data),
+				    (const char *)&data));
+
+	zassert_ok(crec_flash_erase(ROLLBACK1_ADDR, ROLLBACK1_SIZE));
+	zassert_ok(crec_flash_write(ROLLBACK1_ADDR, sizeof(data),
+				    (const char *)&data));
+
+	zassert_ok(fp_sensor_init());
+	rollback_add_entropy(fake_rollback_entropy,
+			     sizeof(fake_rollback_entropy) - 1);
+
+	zassert_ok(test_fp_command_generate_nonce());
+	zassert_ok(test_fp_command_commit_without_seed());
 
 	/*
 	 * Set the OTP key here since the following tests require it.
@@ -2202,49 +2271,50 @@ void run_test(int argc, const char **argv)
 				  mock_otp.otp_key_buffer);
 	}
 
-	RUN_TEST(test_fp_command_establish_pairing_key_fail);
-	RUN_TEST(test_fp_command_establish_pairing_key_keygen);
-	RUN_TEST(test_fp_command_establish_and_load_pairing_key);
-	RUN_TEST(test_fp_command_load_pairing_key_invalid);
-	RUN_TEST(test_fp_command_establish_session);
-	RUN_TEST(test_fp_command_establish_session_busy);
-	RUN_TEST(test_fp_command_establish_session_clears_context);
-	RUN_TEST(test_fp_command_establish_session_corrupted_seed);
-	RUN_TEST(test_fp_command_reestablish_session_corrupted_seed);
-	RUN_TEST(test_fp_command_establish_session_fail_different_pk);
-	RUN_TEST(test_fp_command_establish_session_deny);
-	RUN_TEST(
-		test_fp_command_establish_session_limit_without_generated_nonce);
-	RUN_TEST(test_fp_command_establish_session_limit_normal_context);
-	RUN_TEST(test_fp_command_establish_session_limit_twice_1);
-	RUN_TEST(test_fp_command_establish_session_limit_twice_2);
-	RUN_TEST(test_fp_command_establish_session_load_pk);
-	RUN_TEST(test_fp_command_template_decrypted);
-	RUN_TEST(test_fp_command_commit_v3);
-	RUN_TEST(test_fp_command_commit_trivial_salt);
-	RUN_TEST(test_fp_command_generate_challenge);
-	RUN_TEST(test_fp_command_generate_challenge_fail_no_session);
-	RUN_TEST(test_fp_validate_request);
-	RUN_TEST(test_fp_validate_request_fail_no_challenge);
-	RUN_TEST(test_fp_validate_request_fail_invalid_signature);
-	RUN_TEST(test_fp_validate_request_fail_timeout);
-	RUN_TEST(test_fp_sign_message);
-	RUN_TEST(test_fp_sign_message_fail_no_session);
-	RUN_TEST(test_fp_mode_match_correct_signature);
-	RUN_TEST(test_fp_mode_disable_match_no_signature);
-	RUN_TEST(test_fp_mode_match_invalid_signature);
-	RUN_TEST(test_fp_mode_match_fail_version_0);
-	RUN_TEST(test_fp_mode_enroll_correct_signature);
-	RUN_TEST(test_fp_mode_disable_enroll_no_signature);
-	RUN_TEST(test_fp_mode_enroll_invalid_signature);
-	RUN_TEST(test_fp_mode_enroll_session_transitions);
-	RUN_TEST(test_fp_confirm_template_success);
-	RUN_TEST(test_fp_confirm_template_fail_invalid_signature);
-	RUN_TEST(test_fp_confirm_template_fail_state_mismatch);
-	RUN_TEST(test_fp_sign_match_success);
-	RUN_TEST(test_fp_sign_match_fail_no_match);
-	RUN_TEST(test_fp_sign_match_fail_deadline_passed);
-	RUN_TEST(test_fp_sign_match_fail_no_session);
-	RUN_TEST(test_fp_reset_does_not_clear_session);
-	test_print_result();
+	zassert_ok(test_fp_command_establish_pairing_key_fail());
+	zassert_ok(test_fp_command_establish_pairing_key_keygen());
+	zassert_ok(test_fp_command_establish_and_load_pairing_key());
+	zassert_ok(test_fp_command_load_pairing_key_invalid());
+	zassert_ok(test_fp_command_establish_session());
+	zassert_ok(test_fp_command_establish_session_busy());
+	zassert_ok(test_fp_command_establish_session_clears_context());
+	zassert_ok(test_fp_command_establish_session_corrupted_seed());
+	zassert_ok(test_fp_command_reestablish_session_corrupted_seed());
+	zassert_ok(test_fp_command_establish_session_fail_different_pk());
+	zassert_ok(test_fp_command_establish_session_deny());
+	zassert_ok(
+		test_fp_command_establish_session_limit_without_generated_nonce());
+	zassert_ok(test_fp_command_establish_session_limit_normal_context());
+	zassert_ok(test_fp_command_establish_session_limit_twice_1());
+	zassert_ok(test_fp_command_establish_session_limit_twice_2());
+	zassert_ok(test_fp_command_establish_session_load_pk());
+	zassert_ok(test_fp_command_template_decrypted());
+	zassert_ok(test_fp_command_commit_v3());
+	zassert_ok(test_fp_command_commit_trivial_salt());
+	zassert_ok(test_fp_command_generate_challenge());
+	zassert_ok(test_fp_command_generate_challenge_fail_no_session());
+	zassert_ok(test_fp_validate_request());
+	zassert_ok(test_fp_validate_request_fail_no_challenge());
+	zassert_ok(test_fp_validate_request_fail_invalid_signature());
+	zassert_ok(test_fp_validate_request_fail_timeout());
+	zassert_ok(test_fp_sign_message());
+	zassert_ok(test_fp_sign_message_fail_no_session());
+	zassert_ok(test_fp_mode_match_correct_signature());
+	zassert_ok(test_fp_mode_disable_match_no_signature());
+	zassert_ok(test_fp_mode_match_invalid_signature());
+	zassert_ok(test_fp_mode_match_fail_version_0());
+	zassert_ok(test_fp_mode_enroll_correct_signature());
+	zassert_ok(test_fp_mode_disable_enroll_no_signature());
+	zassert_ok(test_fp_mode_enroll_invalid_signature());
+	zassert_ok(test_fp_mode_enroll_session_transitions());
+	zassert_ok(test_fp_confirm_template_success());
+	zassert_ok(test_fp_confirm_template_fail_invalid_signature());
+	zassert_ok(test_fp_confirm_template_fail_state_mismatch());
+	zassert_ok(test_fp_sign_match_success());
+	zassert_ok(test_fp_sign_match_fail_no_match());
+	zassert_ok(test_fp_sign_match_fail_deadline_passed());
+	zassert_ok(test_fp_sign_match_fail_no_session());
+	zassert_ok(test_fp_reset_does_not_clear_session());
 }
+
+ZTEST_SUITE(fpsensor_auth_commands, NULL, NULL, NULL, NULL, NULL);

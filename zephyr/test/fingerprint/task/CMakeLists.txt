@@ -42,5 +42,7 @@ target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_BTN_IGN_OUT app PRIVATE
 	src/fpsensor_btn_ign_out.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_LED app PRIVATE
 	src/fpsensor_led.cc)
+target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS app PRIVATE
+	src/fpsensor_auth_commands.cc)
 
 add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
