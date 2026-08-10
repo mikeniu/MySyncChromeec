@@ -33,6 +33,24 @@
       "message": "I recommend also testing this change out on a sample of boards.  You can use the util/lease_and_test_dut.py script to automate this testing.",
       "revId": "d3b5055fee9df3bae846a1a375d82be8e876b8b8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db7dfb4b_4b25b53c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-10T20:43:46Z",
+      "side": 1,
+      "message": "Thanks for the suggestion.\n\nI tested this CL on the following boards using `util/lease_and_test_ec.py`:\n  • brox (Intel + ITE IT82102): firmware.ECSize [ PASS ]\n  • rex (Intel + Nuvoton NPCX9): firmware.ECSize [ PASS ]\n  • geralt (MTK + ITE IT82202): firmware.ECSize [ PASS ]",
+      "parentUuid": "9d23d909_92c83b75",
+      "revId": "d3b5055fee9df3bae846a1a375d82be8e876b8b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
