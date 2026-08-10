@@ -639,11 +639,30 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	jdata->jump_tag_total = 0; /* Reset tags */
 	jdata->struct_size = sizeof(struct jump_data);
 
-	/* Call other hooks; these may add tags */
-	hook_notify(HOOK_SYSJUMP);
-
-	/* Disable interrupts before jump */
+	/*
+	 * Disable interrupts before running sysjump hooks. This guarantees
+	 * that all teardown hooks (e.g., MPU disabling or peripheral resets)
+	 * execute atomically in a non-preemptible context to prevent race
+	 * conditions during image transition.
+	 *
+	 * Note: HOOK_SYSJUMP handlers run with interrupts disabled and must
+	 * not depend on interrupt-driven driver I/O or kernel sleeps.
+	 */
 	interrupt_disable_all();
+
+	/* Call other hooks; these may add tags
+	 *
+	 * Note: HOOK_SYSJUMP handlers run with interrupts disabled and in a
+	 * non-preemptible context. Handlers MUST NOT:
+	 *   - Sleep or yield thread execution (e.g., k_msleep, crec_msleep,
+	 *     task_wait_event). Use busy-waits (k_busy_wait / udelay) instead.
+	 *   - Perform interrupt-driven driver I/O (e.g., blocking I2C/SPI
+	 *     transactions expecting IRQ completion).
+	 *   - Acquire mutexes or block on synchronization primitives
+	 *     (e.g., mutex_lock, k_mutex_lock, k_sem_take).
+	 *   - Rely on deferred functions or timer interrupts.
+	 */
+	hook_notify(HOOK_SYSJUMP);
 
 	chip_pre_system_jump();
 
