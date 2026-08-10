@@ -13,7 +13,6 @@ else
 test-list-host =
 test-list-host += battery_config
 test-list-host += bklight_passthru
-test-list-host += boringssl_crypto
 test-list-host += cbi
 test-list-host += charge_ramp
 test-list-host += console_edit
@@ -26,9 +25,7 @@ test-list-host += fpsensor_crypto
 test-list-host += fpsensor_crypto_with_mock
 test-list-host += fpsensor_crypto_with_mock_otp
 test-list-host += fpsensor_state
-test-list-host += host_command
 test-list-host += kb_8042
-test-list-host += math_util
 test-list-host += motion_angle
 test-list-host += motion_angle_tablet
 test-list-host += motion_lid
@@ -73,7 +70,6 @@ endif
 
 battery_config-y=battery_config.o
 bklight_passthru-y=bklight_passthru.o
-boringssl_crypto-y=boringssl_crypto.o
 cbi-y=cbi.o
 charge_ramp-y+=charge_ramp.o
 console_edit-y=console_edit.o
@@ -86,9 +82,7 @@ fpsensor_crypto-y=fpsensor_crypto.o
 fpsensor_crypto_with_mock-y=fpsensor_crypto_with_mock.o
 fpsensor_crypto_with_mock_otp-y=fpsensor_crypto_with_mock_otp.o
 fpsensor_state-y=fpsensor_state.o
-host_command-y=host_command.o
 kb_8042-y=kb_8042.o
-math_util-y=math_util.o
 motion_angle-y=motion_angle.o motion_angle_data_literals.o motion_common.o
 motion_angle_tablet-y=motion_angle_tablet.o motion_angle_data_literals_tablet.o motion_common.o
 motion_lid-y=motion_lid.o
