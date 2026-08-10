@@ -33,7 +33,6 @@ common-$(CONFIG_BODY_DETECTION)+=math_util.o
 common-$(CONFIG_TEMP_SENSOR_TMP112)+=math_util.o
 common-$(CONFIG_TEMP_SENSOR_PCT2075)+=math_util.o
 common-$(CONFIG_CMD_ADC)+=adc.o
-common-$(CONFIG_AP_HANG_DETECT)+=ap_hang_detect.o
 common-$(CONFIG_AUDIO_CODEC)+=audio_codec.o
 common-$(CONFIG_AUDIO_CODEC_DMIC)+=audio_codec_dmic.o
 common-$(CONFIG_AUDIO_CODEC_I2S_RX)+=audio_codec_i2s_rx.o
@@ -204,7 +203,6 @@ common-$(HAS_TASK_PDCMD)+=host_command_pd.o
 common-$(HAS_TASK_KEYSCAN)+=keyboard_scan.o
 common-$(HAS_TASK_LIGHTBAR)+=lb_common.o lightbar.o
 common-$(HAS_TASK_MOTIONSENSE)+=motion_sense.o
-common-$(CONFIG_HOST_COMMAND_MEMORY_DUMP)+=host_command_memory_dump.o
 common-$(CONFIG_PRESERVED_RING_BUF)+=preserved_ring_buf.o
 common-$(CONFIG_PANIC_LOG)+=panic_log.o
 
