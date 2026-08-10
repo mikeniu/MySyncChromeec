@@ -346,6 +346,11 @@ tests:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./button/detachable_led.overlay
+  drivers.battery_config:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_BATTERY_CONFIG=y
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
   drivers.cbi_flash:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CBI_FLASH=y

@@ -52,6 +52,11 @@ config LINK_TEST_SUITE_BMI3XX
 	  Include the BMI3XX driver test suite in the
 	  binary.
 
+config LINK_TEST_SUITE_BATTERY_CONFIG
+	bool "Link and run battery_config CBI tests"
+	help
+	  Include tests for battery info in CBI.
+
 config LINK_TEST_SUITE_BUTTON
 	bool "Link tests for common/button.c"
 
