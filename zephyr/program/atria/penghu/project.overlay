@@ -20,6 +20,10 @@
 #include "pwm.dtsi"
 #include "usb_typec.dtsi"
 
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+#include "penghu_ec_ufsc.dtsi"
+
 / {
 	batteries {
 		default_battery: atl-ap25aap {
