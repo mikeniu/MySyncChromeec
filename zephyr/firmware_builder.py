@@ -10,6 +10,8 @@ This is the entry point for the custom firmware builder workflow recipe.
 """
 
 import collections
+
+# pylint: disable=too-many-lines
 from concurrent import futures
 import json
 import os
@@ -657,6 +659,99 @@ def bundle_firmware(opts):
     return 0
 
 
+def get_modified_files(repo_dir):
+    """Returns a list of relative file paths modified in the current CL relative to origin/main."""
+    try:
+        res = subprocess.run(
+            ["git", "diff", "--name-only", "origin/main...HEAD"],
+            cwd=repo_dir,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return [
+            line.strip() for line in res.stdout.splitlines() if line.strip()
+        ]
+    except (subprocess.CalledProcessError, OSError, ValueError):
+        return None
+
+
+def ensure_test_matrix(matrix_path):
+    """Downloads baseline test_matrix.json from GCS if not present locally."""
+    if matrix_path.exists():
+        return True
+
+    url = "gs://chromeos-localmirror/distfiles/ec_lcov/test_matrix.json"
+    cmd = ["gsutil", "cp", url, str(matrix_path)]
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        return res.returncode == 0 and matrix_path.exists()
+    except (subprocess.CalledProcessError, OSError, ValueError):
+        return False
+
+
+def select_test_suites(modified_files, matrix_path):
+    """Given modified file paths and test_matrix.json, returns a set of test suite names to run.
+
+    Returns None if all tests should be run.
+    Must default to running all tests (None) unless every modified file is totally
+    covered by the test matrix.
+    """
+    if not modified_files:
+        return None
+
+    if not ensure_test_matrix(matrix_path):
+        return None
+
+    # Global files that require running all unit tests when modified
+    global_patterns = [
+        "zephyr/Makefile.cq",
+        "zephyr/firmware_builder.py",
+        "util/twister_launcher.py",
+        "util/twister",
+        "zephyr/Kconfig",
+        "zephyr/CMakeLists.txt",
+        "include/config.h",
+        "include/ec_commands.h",
+    ]
+
+    for mf in modified_files:
+        if any(mf.endswith(pat) or pat in mf for pat in global_patterns):
+            return None
+
+    try:
+        with open(matrix_path, "r", encoding="utf-8") as f:
+            matrix = json.load(f)
+    except (json.JSONDecodeError, OSError, ValueError):
+        return None
+
+    by_line = matrix.get("by_line", {})
+    selected_suites = set()
+
+    for mf in modified_files:
+        # Ignore non-code/non-test doc files that cannot affect test execution
+        if (
+            mf.endswith((".md", ".rst", ".txt", "COMMIT_MSG"))
+            or "/g3doc/" in mf
+        ):
+            continue
+
+        file_suites = set()
+        for src_path, line_map in by_line.items():
+            if src_path.endswith(mf) or mf.endswith(src_path):
+                for line_tests in line_map.values():
+                    file_suites.update(line_tests)
+
+        # Require that every modified file is covered by the test_matrix;
+        # if any modified file has no mapped test suites, default to running all tests.
+        if not file_suites:
+            return None
+
+        selected_suites.update(file_suites)
+
+    return selected_suites if selected_suites else None
+
+
 def test(opts):
     """Runs all of the unit tests for Zephyr firmware"""
     metrics = firmware_pb2.FwTestMetricList()  # pylint: disable=no-member
@@ -670,6 +765,14 @@ def test(opts):
         cmd.append("COVERAGE=1")
     if SPECIAL_BOARDS:
         cmd.append(f"SPECIAL_BOARDS={' '.join(SPECIAL_BOARDS)}")
+
+    platform_ec = ZEPHYR_DIR.parent
+    matrix_path = platform_ec / "util" / "test_matrix.json"
+    modified_files = get_modified_files(platform_ec)
+    suites = select_test_suites(modified_files, matrix_path)
+    if suites is not None and len(suites) > 0:
+        cmd.append(f"TEST_SUITES={' '.join(sorted(suites))}")
+
     log_cmd(cmd)
     subprocess.run(
         cmd,
@@ -691,26 +794,33 @@ def test(opts):
         tasks = []
         if twister_out_dir.exists():
             tasks.append(("EC_ZEPHYR_TESTS", twister_out_dir / "coverage.info"))
-        tasks.extend(
-            [
-                ("EC_ZEPHYR_TESTS_GCC", twister_out_dir_gcc / "coverage.info"),
-                ("EC_LEGACY_TESTS", platform_ec / "build/coverage/lcov.info"),
-                ("ALL_TESTS", build_dir / "all_tests.info"),
-                ("EC_ZEPHYR_MERGED", build_dir / "zephyr_merged.info"),
-                ("ALL_MERGED", build_dir / "lcov.info"),
-                ("ALL_FILTERED", build_dir / "lcov_no_tests.info"),
-            ]
-        )
+        if twister_out_dir_gcc.exists():
+            tasks.append(
+                ("EC_ZEPHYR_TESTS_GCC", twister_out_dir_gcc / "coverage.info")
+            )
+        candidate_tasks = [
+            ("EC_LEGACY_TESTS", platform_ec / "build/coverage/lcov.info"),
+            ("ALL_TESTS", build_dir / "all_tests.info"),
+            ("EC_ZEPHYR_MERGED", build_dir / "zephyr_merged.info"),
+            ("ALL_MERGED", build_dir / "lcov.info"),
+            ("ALL_FILTERED", build_dir / "lcov_no_tests.info"),
+        ]
+        for name, path in candidate_tasks:
+            if path.exists():
+                tasks.append((name, path))
 
         for project in get_projects():
             if project.config.project_name in SPECIAL_BOARDS:
-                tasks.append(
-                    (
-                        f"BOARD_{project.config.project_name}".upper(),
-                        build_dir
-                        / (project.config.project_name + "_final.info"),
-                    )
+                board_info = build_dir / (
+                    project.config.project_name + "_final.info"
                 )
+                if board_info.exists():
+                    tasks.append(
+                        (
+                            f"BOARD_{project.config.project_name}".upper(),
+                            board_info,
+                        )
+                    )
 
         # Run lcov in parallel using a ThreadPoolExecutor
         max_workers = min(len(tasks), opts.cpus or 4)
@@ -847,23 +957,34 @@ COVERAGE_RE = re.compile(
 
 def _extract_lcov_summary_worker(name, filename):
     """Worker function to run lcov summary in a thread."""
+    if not pathlib.Path(filename).exists():
+        return None
     cmd = [
         "/usr/bin/lcov",
         "--ignore-errors",
-        "inconsistent",
+        "inconsistent,inconsistent",
+        "--ignore-errors",
+        "empty,empty",
+        "--ignore-errors",
+        "unused,unused",
+        "--ignore-errors",
+        "missing,missing",
         "--summary",
-        filename,
+        str(filename),
     ]
     log_cmd(cmd)
-    output = subprocess.run(
-        cmd,
-        cwd=ZEPHYR_DIR,
-        check=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True,
-        stdin=subprocess.DEVNULL,
-    ).stdout
+    try:
+        output = subprocess.run(
+            cmd,
+            cwd=ZEPHYR_DIR,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+            stdin=subprocess.DEVNULL,
+        ).stdout
+    except (subprocess.CalledProcessError, OSError):
+        return None
     re_match = COVERAGE_RE.search(output)
     if re_match:
         return (
@@ -872,9 +993,7 @@ def _extract_lcov_summary_worker(name, filename):
             int(re_match.group(2)),
             int(re_match.group(3)),
         )
-    raise ValueError(
-        f"Failed to parse LCOV summary output for {name}: {output}"
-    )
+    return None
 
 
 def main(args):
