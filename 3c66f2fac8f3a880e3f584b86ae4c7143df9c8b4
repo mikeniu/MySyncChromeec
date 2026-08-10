@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29fe755a_976e23a4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-10T18:09:53Z",
+      "side": 1,
+      "message": "The nissa board unit tests are failing with this change.\n\n```\n./twister -ivc -T zephyr/test/nissa\n```",
+      "revId": "3c66f2fac8f3a880e3f584b86ae4c7143df9c8b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
