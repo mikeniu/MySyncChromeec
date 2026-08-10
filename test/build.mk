@@ -11,7 +11,6 @@ ifneq ($(TEST_LIST_HOST),)
 test-list-host=$(TEST_LIST_HOST)
 else
 test-list-host =
-test-list-host += battery_config
 test-list-host += bklight_passthru
 test-list-host += boringssl_crypto
 test-list-host += cbi
@@ -71,7 +70,6 @@ ifeq ($(and $(BOARD_HOST),$(TEST_BUILD)),y)
 rw-test = ro
 endif
 
-battery_config-y=battery_config.o
 bklight_passthru-y=bklight_passthru.o
 boringssl_crypto-y=boringssl_crypto.o
 cbi-y=cbi.o

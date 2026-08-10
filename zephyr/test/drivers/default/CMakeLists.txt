@@ -1,5 +1,6 @@
 target_sources(app PRIVATE
     src/battery.c
+    src/battery_config.c
     src/bb_retimer.c
     src/bma2x2.c
     src/bma4xx.c
