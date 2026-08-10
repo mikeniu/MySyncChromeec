@@ -280,7 +280,7 @@ static uint32_t cros_flash_andes_xip_get_protect_flags(const struct device *dev)
 
 	/* Check if ranges fully overlap. This logic assumes a certain flash
 	 * layout: RO -> ROLLBACKS -> RW. */
-	if (prot_end >= (CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE)) {
+	if (prot_end >= CONFIG_FLASH_SIZE_BYTES) {
 		flags |= EC_FLASH_PROTECT_ALL_AT_BOOT |
 			 EC_FLASH_PROTECT_RO_AT_BOOT;
 #ifdef CONFIG_ROLLBACK
@@ -384,7 +384,7 @@ static int cros_flash_andes_xip_protect_at_boot(const struct device *dev,
 	/* There is no independent protection of each section. Protection of WP
 	 * is within protection ranges of Rollbacks */
 	if (new_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
-		new_prot_end = CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE;
+		new_prot_end = CONFIG_FLASH_SIZE_BYTES;
 	} else if (new_flags & EC_FLASH_PROTECT_ROLLBACK_AT_BOOT) {
 		new_prot_end = CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE;
 	} else if (new_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
