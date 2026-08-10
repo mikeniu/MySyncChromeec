@@ -23,6 +23,9 @@
 #ifdef CONFIG_FW_INCLUDE_RO
 .section .image.RO, "ax"
 .incbin FW_IMAGE(RO,)
+#else
+.section .image.RO, "a"
+.space CONFIG_RO_SIZE, 0xff
 #endif
 
 #ifdef CONFIG_RWSIG_TYPE_RWSIG
