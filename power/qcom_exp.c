@@ -220,6 +220,11 @@ static char long_warm_reset;
  */
 static enum power_state power_state_before_warm_reset;
 
+#ifdef CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET
+/* Deadline to check if POWER_GOOD is lost or just transient drop */
+static timestamp_t power_good_lost_deadline;
+#endif
+
 enum power_request_t {
 	POWER_REQ_NONE,
 	POWER_REQ_OFF,
@@ -558,6 +563,14 @@ static void sys_rst_timer_expired(void)
 }
 DECLARE_DEFERRED(sys_rst_timer_expired);
 
+#ifdef CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET
+static void power_good_lost_expired(void)
+{
+	task_wake(TASK_ID_CHIPSET);
+}
+DECLARE_DEFERRED(power_good_lost_expired);
+#endif
+
 void chipset_sys_rst_interrupt(enum gpio_signal signal)
 {
 	/*
@@ -875,6 +888,11 @@ static void power_off_seq(uint8_t shutdown_event)
 
 	lid_opened = 0;
 	ac_on = 0;
+
+#ifdef CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET
+	power_good_lost_deadline.val = 0;
+	hook_call_deferred(&power_good_lost_expired_data, -1);
+#endif
 }
 
 /**
@@ -1037,11 +1055,36 @@ static uint8_t check_for_power_off_event(void)
 
 	power_button_was_pressed = pressed;
 
+#ifdef CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET
+	/*
+	 * POWER_GOOD released by AP: wait 200ms to distinguish between
+	 * a PSCI shutdown and a PSCI hard reset.
+	 */
+	if (!power_has_signals(IN_POWER_GOOD)) {
+		if (power_good_lost_deadline.val == 0) {
+			power_good_lost_deadline.val = now.val + 200 * MSEC;
+			CPRINTS("POWER_GOOD lost, waiting 200ms");
+			hook_call_deferred(&power_good_lost_expired_data,
+					   200 * MSEC);
+		} else if (timestamp_expired(power_good_lost_deadline, &now)) {
+			power_good_lost_deadline.val = 0;
+			CPRINTS("POWER_GOOD is lost (timeout)");
+			return POWER_OFF_BY_POWER_GOOD_LOST;
+		}
+	} else {
+		if (power_good_lost_deadline.val != 0) {
+			CPRINTS("POWER_GOOD recovered");
+			power_good_lost_deadline.val = 0;
+			hook_call_deferred(&power_good_lost_expired_data, -1);
+		}
+	}
+#else
 	/* POWER_GOOD released by AP : shutdown immediately */
 	if (!power_has_signals(IN_POWER_GOOD)) {
 		CPRINTS("POWER_GOOD is lost");
 		return POWER_OFF_BY_POWER_GOOD_LOST;
 	}
+#endif
 
 	return POWER_OFF_CANCEL;
 }
