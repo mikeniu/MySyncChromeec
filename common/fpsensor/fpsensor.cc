@@ -560,10 +560,18 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	struct ec_fp_template_encryption_metadata *enc_info =
 		&fp_enc_buffer.metadata;
 	enc_info->struct_version = FP_TEMPLATE_FORMAT_VERSION;
+
+	/*
+	 * Use local stack buffers for the nonce, encryption salt, and tag
+	 * during key derivation and encryption.
+	 */
+	uint8_t nonce[FP_CONTEXT_NONCE_BYTES];
+	uint8_t encryption_salt[FP_CONTEXT_ENCRYPTION_SALT_BYTES];
+	uint8_t tag[FP_CONTEXT_TAG_BYTES];
+
 	trng_init();
-	trng_rand_bytes(enc_info->nonce, FP_CONTEXT_NONCE_BYTES);
-	trng_rand_bytes(enc_info->encryption_salt,
-			FP_CONTEXT_ENCRYPTION_SALT_BYTES);
+	trng_rand_bytes(nonce, FP_CONTEXT_NONCE_BYTES);
+	trng_rand_bytes(encryption_salt, FP_CONTEXT_ENCRYPTION_SALT_BYTES);
 	trng_exit();
 
 	if (fgr == global_context.template_newly_enrolled) {
@@ -580,7 +588,7 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	}
 
 	FpEncryptionKey key;
-	ret = derive_encryption_key(key, enc_info->encryption_salt,
+	ret = derive_encryption_key(key, encryption_salt,
 				    global_context.user_id,
 				    global_context.tpm_seed);
 	if (ret != EC_SUCCESS) {
@@ -600,12 +608,19 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	ret = aes_128_gcm_encrypt(key,
 				  encrypted_template_and_positive_match_salt,
 				  encrypted_template_and_positive_match_salt,
-				  enc_info->nonce, enc_info->tag);
+				  nonce, tag);
 	if (ret != EC_SUCCESS) {
 		OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
 		CPRINTS("fgr%d: Failed to encrypt template", fgr);
 		return EC_ERROR_UNAVAILABLE;
 	}
+
+	/*
+	 * Populate output metadata once encryption succeeds.
+	 */
+	std::ranges::copy(nonce, enc_info->nonce);
+	std::ranges::copy(encryption_salt, enc_info->encryption_salt);
+	std::ranges::copy(tag, enc_info->tag);
 
 	global_context.templ_dirty &= ~BIT(fgr);
 
