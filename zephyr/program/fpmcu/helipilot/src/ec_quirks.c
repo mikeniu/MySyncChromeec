@@ -15,6 +15,9 @@ extern void arm_core_mpu_disable(void);
 /* TODO(b/394346384): De-duplicate with bloonchipper code */
 static void prepare_for_sysjump_to_ec(void)
 {
+	/* Permanently disable interrupts before turning off MPU. */
+	interrupt_disable_all();
+
 	/*
 	 * When HW_STACK_PROTECTION is enabled on ARMv7-M microcontroller then
 	 * the last 64 bytes of the stack is protected to detect stack
