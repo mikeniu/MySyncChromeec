@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87a9a777_88bfb2d9",
+        "filename": "zephyr/test/bklight_passthru/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-10T23:37:20Z",
+      "side": 1,
+      "message": "Consider asserting that the host command succeeds here, e.g., `zassert_ok(send_bklight_hostcmd(0));`.",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 0
+      },
+      "revId": "5e8ef68c538076edf76b10b2f2538881aa2255df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71b06c7d_fbe68ff2",
+        "filename": "zephyr/test/bklight_passthru/main.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-10T23:37:20Z",
+      "side": 1,
+      "message": "Consider asserting on the result here too: `zassert_ok(send_bklight_hostcmd(1));`.",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 91,
+        "endChar": 0
+      },
+      "revId": "5e8ef68c538076edf76b10b2f2538881aa2255df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
