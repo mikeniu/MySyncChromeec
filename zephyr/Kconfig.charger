@@ -91,12 +91,6 @@ config PLATFORM_EC_CMD_PWR_AVG
 	  Enables the console command which prints out the current (past 1
 	  minute) power average.
 
-config PLATFORM_EC_CHARGESPLASH
-	bool "Charging splashscreen support"
-	help
-	  Enable visual charging indicator to display on-screen when
-	  AC is initially connected.
-
 config PLATFORM_EC_CHARGER_ILIM_PIN_DISABLED
 	bool "Disable external ILIM pin"
 	help
