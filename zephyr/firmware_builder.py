@@ -657,6 +657,89 @@ def bundle_firmware(opts):
     return 0
 
 
+def get_modified_files(repo_dir):
+    """Returns a list of relative file paths modified in the current CL relative to origin/main."""
+    try:
+        res = subprocess.run(
+            ["git", "diff", "--name-only", "origin/main...HEAD"],
+            cwd=repo_dir,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return [
+            line.strip() for line in res.stdout.splitlines() if line.strip()
+        ]
+    except Exception:
+        return None
+
+
+def ensure_test_matrix(matrix_path):
+    """Downloads baseline test_matrix.json from GCS if not present locally."""
+    if matrix_path.exists():
+        return True
+
+    url = "gs://chromeos-localmirror/distfiles/ec_lcov/test_matrix.json"
+    cmd = ["gsutil", "cp", url, str(matrix_path)]
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        return res.returncode == 0 and matrix_path.exists()
+    except Exception:
+        return False
+
+
+def select_test_suites(modified_files, matrix_path):
+    """Given modified file paths and test_matrix.json, returns a set of test suite names to run.
+
+    Returns None if all tests should be run.
+    """
+    if modified_files is None:
+        return None
+
+    if not ensure_test_matrix(matrix_path):
+        return None
+
+    # Global files that require running all unit tests when modified
+    global_patterns = [
+        "zephyr/Makefile.cq",
+        "zephyr/firmware_builder.py",
+        "util/twister_launcher.py",
+        "util/twister",
+        "zephyr/Kconfig",
+        "zephyr/CMakeLists.txt",
+        "include/config.h",
+        "include/ec_commands.h",
+    ]
+
+    for mf in modified_files:
+        if any(mf.endswith(pat) or pat in mf for pat in global_patterns):
+            return None
+
+    try:
+        with open(matrix_path, "r", encoding="utf-8") as f:
+            matrix = json.load(f)
+    except Exception:
+        return None
+
+    by_line = matrix.get("by_line", {})
+    selected_suites = set()
+
+    for mf in modified_files:
+        matching_suites = set()
+        for src_path, line_map in by_line.items():
+            if src_path.endswith(mf):
+                for line_tests in line_map.values():
+                    matching_suites.update(line_tests)
+
+        if matching_suites:
+            selected_suites.update(matching_suites)
+        else:
+            if mf.endswith((".c", ".cc", ".cpp", ".h")):
+                return None
+
+    return selected_suites
+
+
 def test(opts):
     """Runs all of the unit tests for Zephyr firmware"""
     metrics = firmware_pb2.FwTestMetricList()  # pylint: disable=no-member
@@ -670,6 +753,14 @@ def test(opts):
         cmd.append("COVERAGE=1")
     if SPECIAL_BOARDS:
         cmd.append(f"SPECIAL_BOARDS={' '.join(SPECIAL_BOARDS)}")
+
+    platform_ec = ZEPHYR_DIR.parent
+    matrix_path = platform_ec / "util" / "test_matrix.json"
+    modified_files = get_modified_files(platform_ec)
+    suites = select_test_suites(modified_files, matrix_path)
+    if suites is not None and len(suites) > 0:
+        cmd.append(f"TEST_SUITES={' '.join(sorted(suites))}")
+
     log_cmd(cmd)
     subprocess.run(
         cmd,
