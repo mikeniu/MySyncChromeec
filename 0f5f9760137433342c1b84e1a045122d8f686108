@@ -52,6 +52,24 @@
       "parentUuid": "cf422ac1_66cc5621",
       "revId": "0f5f9760137433342c1b84e1a045122d8f686108",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fce26505_07c056ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-08-10T21:40:21Z",
+      "side": 1,
+      "message": "Merged in https://crrev.com/c/8229769",
+      "parentUuid": "fab9ed93_33afdfc8",
+      "revId": "0f5f9760137433342c1b84e1a045122d8f686108",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
