@@ -38,7 +38,6 @@ test-list-host += sbs_charging
 # toolchain's C standard library, so these tests are actually testing the
 # toolchain's C standard library.
 test-list-host += thermal
-test-list-host += usb_pd_timer
 test-list-host += usb_sm_framework_h3
 test-list-host += usb_typec_drp_acc_trysrc
 test-list-host += usb_tcpmv2_compliance
@@ -86,7 +85,8 @@ rollback_secret-y=rollback_secret.o
 rtc-y=rtc.o
 sbs_charging-y=sbs_charging.o
 thermal-y=thermal.o
-usb_pd_timer-y=usb_pd_timer.o
+sha256-y=sha256.o
+sha256_unrolled-y=sha256.o
 usb_sm_framework_h3-y=usb_sm_framework_h3.o
 usb_typec_vpd-y=usb_typec_ctvpd.o vpd_api.o usb_sm_checks.o fake_usbc.o
 usb_typec_ctvpd-y=usb_typec_ctvpd.o vpd_api.o usb_sm_checks.o fake_usbc.o
