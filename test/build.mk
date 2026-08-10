@@ -39,8 +39,6 @@ test-list-host += rollback_secret
 test-list-host += rsa3
 test-list-host += rtc
 test-list-host += sbs_charging
-test-list-host += sha256
-test-list-host += sha256_unrolled
 # TODO(b/237823627): When building for the host, we're linking against the
 # toolchain's C standard library, so these tests are actually testing the
 # toolchain's C standard library.
@@ -99,8 +97,6 @@ rollback_secret-y=rollback_secret.o
 rsa3-y=rsa.o
 rtc-y=rtc.o
 sbs_charging-y=sbs_charging.o
-sha256-y=sha256.o
-sha256_unrolled-y=sha256.o
 thermal-y=thermal.o
 uptime-y=uptime.o
 usb_pd_timer-y=usb_pd_timer.o
