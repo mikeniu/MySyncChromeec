@@ -8,6 +8,9 @@
 
 #include <setjmp.h>
 
+/* Tracked by macro interrupt_disable_all() under CONFIG_ZTEST */
+int ztest_interrupts_disabled;
+
 static enum ec_image shrspi_image_copy = EC_IMAGE_RO;
 
 /* setjmp environment to use for reboot (NULL if none) */
