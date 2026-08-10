@@ -6,3 +6,7 @@ tests:
     extra_configs:
     - CONFIG_TEST_SHA256=y
     - CONFIG_PLATFORM_EC_SHA256_SW=y
+  crypto.x25519:
+    extra_configs:
+    - CONFIG_TEST_X25519=y
+    - CONFIG_PLATFORM_EC_CURVE25519=y

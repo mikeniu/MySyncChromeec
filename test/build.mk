@@ -53,8 +53,6 @@ test-list-host += usb_tcpmv2_compliance
 test-list-host += usb_prl
 test-list-host += usb_pe_drp
 test-list-host += usb_pe_drp_noextended
-test-list-host += vboot
-test-list-host += x25519
 endif
 
 # Build up the list of coverage test targets based on test-list-host, but
@@ -133,5 +131,3 @@ usb_tcpmv2_compliance-y=usb_tcpmv2_compliance.o usb_tcpmv2_compliance_common.o \
 	usb_tcpmv2_td_pd_vndi3_e3.o \
 	usb_tcpmv2_td_pd_other.o \
 	test_battery_mock.o
-vboot-y=vboot.o
-x25519-y=x25519.o
