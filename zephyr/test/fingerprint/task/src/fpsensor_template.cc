@@ -179,6 +179,32 @@ BUILD_ASSERT(FP_TEMPLATE_PARAMS_BUFFER_SIZE >
 BUILD_ASSERT(FP_TEMPLATE_V1_PARAMS_BUFFER_SIZE >
 	     sizeof(struct ec_params_fp_template_v1));
 
+/*
+ * Forward declaration of hkdf_sha256_impl from fpsensor_crypto.cc so our
+ * strong definition of hkdf_sha256 can delegate to it by default.
+ */
+bool hkdf_sha256_impl(std::span<uint8_t> out_key,
+		      std::span<const std::span<const uint8_t> > ikms,
+		      std::span<const uint8_t> salt,
+		      std::span<const uint8_t> info);
+
+/*
+ * Mock override for hkdf_sha256 to simulate key derivation failure.
+ * hkdf_sha256 is defined with weak linkage (test_mockable) in
+ * fpsensor_crypto.cc.
+ */
+static bool hkdf_sha256_fail = false;
+
+bool hkdf_sha256(std::span<uint8_t> out_key,
+		 std::span<const std::span<const uint8_t> > ikms,
+		 std::span<const uint8_t> salt, std::span<const uint8_t> info)
+{
+	if (hkdf_sha256_fail) {
+		return false;
+	}
+	return hkdf_sha256_impl(out_key, ikms, salt, info);
+}
+
 ZTEST_USER(fpsensor_template, test_fp_template_v1_load_template_success)
 {
 	uint8_t params_buffer[FP_TEMPLATE_V1_PARAMS_BUFFER_SIZE];
@@ -1388,6 +1414,90 @@ ZTEST_USER(fpsensor_template, test_fp_template_cleans_buffer_on_failure)
 		"fp_enc_buffer should be clean even after failed commit.");
 }
 
+ZTEST_USER(fpsensor_template,
+	   test_fp_frame_v1_encrypt_template_key_derivation_failure)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+	struct ec_params_fp_frame_v1 encrypt_request = {
+		.cmd = FP_FRAME_ENCRYPT_TEMPLATE,
+		.index = 0,
+	};
+	struct ec_params_fp_frame_v1 get_request = {
+		.cmd = FP_FRAME_GET_ENCRYPTED_TEMPLATE,
+		.offset = 0,
+		.size = sizeof(encrypted_template),
+	};
+
+	/* Switch mode to enroll. */
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	zassert_true(response.mode &
+		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
+
+	k_msleep(1);
+
+	/* Put finger on the sensor. */
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	fingerprint_set_state(fp_sim, &state);
+
+	enroll_percent = 100;
+	mock_alg_enroll_step_fake.custom_fake = custom_enroll_step;
+	mock_alg_enroll_finish_fake.custom_fake = custom_enroll_finish;
+
+	fingerprint_run_callback(fp_sim);
+	k_msleep(1);
+
+	/* Inject key derivation failure. */
+	hkdf_sha256_fail = true;
+
+	/*
+	 * Scheduling the encryption command succeeds (returns EC_RES_SUCCESS),
+	 * but the underlying task will fail during key derivation.
+	 */
+	zassert_ok(ec_cmd_fp_frame_v1(NULL, &encrypt_request, NULL));
+
+	/* Allow fpsensor task to process the encryption request. */
+	k_msleep(1);
+
+	/* Reset mock flag so it doesn't affect cleanup or subsequent tasks. */
+	hkdf_sha256_fail = false;
+
+	/*
+	 * Verify metadata in global fp_enc_buffer remains uninitialized.
+	 */
+	static const uint8_t zero_nonce[FP_CONTEXT_NONCE_BYTES] = { 0 };
+	static const uint8_t zero_salt[FP_CONTEXT_ENCRYPTION_SALT_BYTES] = { 0 };
+	static const uint8_t zero_tag[FP_CONTEXT_TAG_BYTES] = { 0 };
+
+	zassert_equal(
+		fp_enc_buffer.metadata.struct_version, 0,
+		"struct_version should remain 0 on key derivation failure");
+	zassert_mem_equal(
+		fp_enc_buffer.metadata.nonce, zero_nonce, sizeof(zero_nonce),
+		"Nonce should remain zeroed on key derivation failure");
+	zassert_mem_equal(
+		fp_enc_buffer.metadata.encryption_salt, zero_salt,
+		sizeof(zero_salt),
+		"Encryption salt should remain zeroed on key derivation failure");
+	zassert_mem_equal(fp_enc_buffer.metadata.tag, zero_tag,
+			  sizeof(zero_tag),
+			  "Tag should remain zeroed on key derivation failure");
+
+	/*
+	 * Confirm that getting encrypted template returns EC_RES_UNAVAILABLE.
+	 */
+	zassert_equal(EC_RES_UNAVAILABLE,
+		      ec_cmd_fp_frame_v1(NULL, &get_request,
+					 encrypted_template));
+
+	/* Rate-limit sleep required between encryption requests. */
+	k_sleep(K_SECONDS(1));
+}
+
 static void *fpsensor_setup(void)
 {
 	struct ec_params_fp_seed fp_seed_params = {
@@ -1469,6 +1579,9 @@ static void fpsensor_before(void *f)
 
 	/* Reset seed for random() */
 	srandom(0xdeadc0de);
+
+	/* Reset mock error flags. */
+	hkdf_sha256_fail = false;
 }
 
 ZTEST_SUITE(fpsensor_template, NULL, fpsensor_setup, fpsensor_before, NULL,
