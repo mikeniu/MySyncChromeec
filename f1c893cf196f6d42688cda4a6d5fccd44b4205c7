@@ -16,6 +16,24 @@
       "message": "Please add \"LOW_COVERAGE_REASON\u003db:540335775 tracking test code\" in the comment message. (refer to https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7545238)",
       "revId": "f1c893cf196f6d42688cda4a6d5fccd44b4205c7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb0f3e33_407cf18f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-08-10T12:36:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a513f77e_f16e6ce1",
+      "revId": "f1c893cf196f6d42688cda4a6d5fccd44b4205c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
