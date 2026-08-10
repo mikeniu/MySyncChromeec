@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cec6c80a_b6ee541f",
+        "filename": "zephyr/program/bluey/pic/project.overlay",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-10T06:31:10Z",
+      "side": 1,
+      "message": "[pic:ro] In file included from \u003cbuilt-in\u003e:2:\n[pic:ro] /mnt/host/source/src/platform/ec/zephyr/program/bluey/pic/project.overlay:15:10: fatal error: \u0027pic/overlay.dtsi\u0027 file not found\n[pic:ro]    15 | #include \u003cpic/overlay.dtsi\u003e\n[pic:ro]       |          ^~~~~~~~~~~~~~~~~~\n[pic:ro] 1 error generated.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 27
+      },
+      "revId": "2f3e3761970dd0d7aa6a0148e080ecf8618b3fe5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
