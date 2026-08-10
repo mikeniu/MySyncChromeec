@@ -16,6 +16,24 @@
       "message": "As far as I know, Pic should only have one fan.",
       "revId": "984a2819b5f1fcc8a85c15acdc4df8af22bed15f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8e1e69d_9181c3dd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-08-10T03:04:21Z",
+      "side": 1,
+      "message": "Hi Cherish,\nI think this commit will just solve the build issues in Pic. We will push all the others changes after this commit, such as GPIOs, fans, battery and so on.",
+      "parentUuid": "8364a9af_2706f60c",
+      "revId": "984a2819b5f1fcc8a85c15acdc4df8af22bed15f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
