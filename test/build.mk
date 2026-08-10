@@ -19,12 +19,10 @@ test-list-host += fpsensor_auth_commands
 test-list-host += fpsensor_auth_commands_otp
 test-list-host += fpsensor_auth_crypto_stateful
 test-list-host += fpsensor_auth_crypto_stateless
-test-list-host += fpsensor_crypto
 test-list-host += fpsensor_crypto_with_mock
+test-list-host += fpsensor_crypto
 test-list-host += fpsensor_crypto_with_mock_otp
 test-list-host += fpsensor_state
-
-test-list-host += math_util
 # TODO(b/237823627): When building for the host, we're linking against the
 # toolchain's C standard library, so these tests are actually testing the
 # toolchain's C standard library.
@@ -61,11 +59,17 @@ fpsensor_auth_commands_otp-$(rw-test)=fpsensor_auth_commands_otp.o
 fpsensor_auth_crypto_stateful-y=fpsensor_auth_crypto_stateful.o
 fpsensor_auth_crypto_stateless-y=fpsensor_auth_crypto_stateless.o
 fpsensor_crypto-y=fpsensor_crypto.o
-fpsensor_crypto_with_mock-y=fpsensor_crypto_with_mock.o
 fpsensor_crypto_with_mock_otp-y=fpsensor_crypto_with_mock_otp.o
 fpsensor_state-y=fpsensor_state.o
+<<<<<<< HEAD
 
 math_util-y=math_util.o
+=======
+host_command-y=host_command.o
+rollback_secret-y=rollback_secret.o
+sbs_charging-y=sbs_charging.o
+thermal-y=thermal.o
+>>>>>>> 55b1d7a3a6 (test: Remove math_util host test)
 usb_pd_timer-y=usb_pd_timer.o
 usb_sm_framework_h3-y=usb_sm_framework_h3.o
 usb_typec_vpd-y=usb_typec_ctvpd.o vpd_api.o usb_sm_checks.o fake_usbc.o
