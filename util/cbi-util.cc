@@ -26,6 +26,29 @@
 #define ARGS_MASK_SIZE BIT(2)
 #define ARGS_MASK_SKU_ID BIT(3)
 
+extern "C" uint8_t cros_crc8_arg(const uint8_t *data, int len,
+				 uint8_t previous_crc)
+{
+	unsigned int crc = previous_crc << 8;
+	int i, j;
+
+	for (j = len; j; j--, data++) {
+		crc ^= (*data << 8);
+		for (i = 8; i; i--) {
+			if (crc & 0x8000)
+				crc ^= (0x1070 << 3);
+			crc <<= 1;
+		}
+	}
+
+	return (uint8_t)(crc >> 8);
+}
+
+extern "C" uint8_t cros_crc8(const uint8_t *data, int len)
+{
+	return cros_crc8_arg(data, len, 0);
+}
+
 /* TODO: Set it by macro */
 const char cmd_name[] = "cbi-util";
 
