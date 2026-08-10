@@ -22,6 +22,30 @@
       },
       "revId": "4f1e910283bb56931bd792e0dd96f3c63daba2b7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6d7d847_b115cc26",
+        "filename": "zephyr/program/fpmcu/et171/srebrna.dts",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-10T15:59:45Z",
+      "side": 1,
+      "message": "yes, it will get 96*100 bytes from the image offset starting at byte 172.",
+      "parentUuid": "b62bafbc_45be934d",
+      "range": {
+        "startLine": 22,
+        "startChar": 18,
+        "endLine": 22,
+        "endChar": 22
+      },
+      "revId": "4f1e910283bb56931bd792e0dd96f3c63daba2b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
