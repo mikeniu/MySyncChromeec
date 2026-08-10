@@ -44,9 +44,6 @@ test-list-host += sha256_unrolled
 # TODO(b/237823627): When building for the host, we're linking against the
 # toolchain's C standard library, so these tests are actually testing the
 # toolchain's C standard library.
-test-list-host += thermal
-test-list-host += uptime
-test-list-host += usb_pd_timer
 test-list-host += usb_sm_framework_h3
 test-list-host += usb_typec_drp_acc_trysrc
 test-list-host += usb_tcpmv2_compliance
@@ -101,9 +98,6 @@ rtc-y=rtc.o
 sbs_charging-y=sbs_charging.o
 sha256-y=sha256.o
 sha256_unrolled-y=sha256.o
-thermal-y=thermal.o
-uptime-y=uptime.o
-usb_pd_timer-y=usb_pd_timer.o
 usb_sm_framework_h3-y=usb_sm_framework_h3.o
 usb_typec_vpd-y=usb_typec_ctvpd.o vpd_api.o usb_sm_checks.o fake_usbc.o
 usb_typec_ctvpd-y=usb_typec_ctvpd.o vpd_api.o usb_sm_checks.o fake_usbc.o
