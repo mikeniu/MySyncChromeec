@@ -1,0 +1,29 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bcd9a3f_21cfbd8d",
+        "filename": "zephyr/test/crypto/src/x25519.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-10T23:56:06Z",
+      "side": 1,
+      "message": "Done. Explicitly added 0x00 as the 32nd byte.",
+      "parentUuid": "75364313_9071e99c",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "74e3ea2090d3288f3425d42afd93f784a107c4c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
