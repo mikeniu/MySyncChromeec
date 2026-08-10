@@ -11,6 +11,18 @@
 #include <setjmp.h>
 
 /**
+ * @brief Reset the fake interrupt disabled state.
+ */
+void system_fake_reset_interrupt_disabled(void);
+
+/**
+ * @brief Check whether interrupts have been disabled in the fake.
+ *
+ * @return true if interrupts are disabled, false otherwise.
+ */
+bool system_fake_is_interrupt_disabled(void);
+
+/**
  * @brief Set the current image copy.
  */
 void system_set_shrspi_image_copy(enum ec_image new_image_copy);

@@ -61,6 +61,10 @@ static int bbram_lookup(enum system_bbram_idx idx, int *offset_out,
 	return EC_SUCCESS;
 }
 
+test_mockable void ztest_interrupt_disable_all(void)
+{
+}
+
 int system_get_bbram(enum system_bbram_idx idx, uint8_t *value)
 {
 	int offset, size, rc;
