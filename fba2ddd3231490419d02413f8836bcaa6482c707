@@ -88,6 +88,24 @@
       "parentUuid": "13784161_9bf10c34",
       "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "685f4b52_a26fc96d",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-10T14:13:02Z",
+      "side": 1,
+      "message": "yes thanks, I don\u0027t think they are needed anyway? the code should use the ones from include and they should not be used by devicetree",
+      "parentUuid": "7a9a443c_55b7789f",
+      "revId": "fba2ddd3231490419d02413f8836bcaa6482c707",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
