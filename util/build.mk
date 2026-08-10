@@ -102,4 +102,4 @@ $(out)/ipi_table_gen.inc: $(out)/util/gen_ipi_table
 	$(call quiet,ipi_table,IPITBL )
 endif
 
-cbi-util-objs=../common/crc8.o ../common/cbi.o
+cbi-util-objs=../common/cbi.o
