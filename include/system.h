@@ -30,7 +30,8 @@ extern "C" {
  */
 #define interrupt_disable_all() __asm__ volatile("cpsid i" ::: "memory")
 #elif CONFIG_ZTEST
-#define interrupt_disable_all()
+void ztest_interrupt_disable_all(void);
+#define interrupt_disable_all() ztest_interrupt_disable_all()
 #else /* !CONFIG_CPU_CORTEX_M */
 #define interrupt_disable_all() irq_lock()
 #endif
