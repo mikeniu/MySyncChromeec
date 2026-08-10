@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75364313_9071e99c",
+        "filename": "zephyr/test/crypto/src/x25519.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-10T23:51:46Z",
+      "side": 1,
+      "message": "This array only has 31 explicitly listed elements (the 4th line only has 7 elements). The compiler will implicitly zero-initialize the 32nd byte, so the test will still work since the expected last byte is `0x00`. However, for clarity and to prevent confusion about whether a byte was accidentally missed, consider explicitly adding `0x00` at the end of the array.",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 0
+      },
+      "revId": "28bf572c1bd99fe73dfcb563bfd8fb421f8a47ec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
