@@ -13,8 +13,7 @@ else
 test-list-host =
 test-list-host += bklight_passthru
 test-list-host += charge_ramp
-test-list-host += fpsensor_auth_commands
-test-list-host += fpsensor_auth_commands_otp
+
 test-list-host += fpsensor_auth_crypto_stateful
 test-list-host += fpsensor_auth_crypto_stateless
 test-list-host += fpsensor_crypto
@@ -51,8 +50,7 @@ endif
 
 bklight_passthru-y=bklight_passthru.o
 charge_ramp-y+=charge_ramp.o
-fpsensor_auth_commands-y=fpsensor_auth_commands.o
-fpsensor_auth_commands_otp-$(rw-test)=fpsensor_auth_commands_otp.o
+
 fpsensor_auth_crypto_stateful-y=fpsensor_auth_crypto_stateful.o
 fpsensor_auth_crypto_stateless-y=fpsensor_auth_crypto_stateless.o
 fpsensor_crypto-y=fpsensor_crypto.o
