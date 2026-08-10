@@ -73,6 +73,7 @@ tests:
       - CONFIG_SYSTEM_FAKE=y
       - CONFIG_PLATFORM_EC_CHARGE_RAMP_SW=y
       - CONFIG_TEST_BOARD_NATIVE_SIM=y
+      - CONFIG_SHIMMED_TASKS=y
 
   charge.state:
     extra_dtc_overlay_files:
