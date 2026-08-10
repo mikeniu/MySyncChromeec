@@ -46,6 +46,30 @@
       },
       "revId": "2f3e3761970dd0d7aa6a0148e080ecf8618b3fe5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9ed81c7_669cd3d1",
+        "filename": "zephyr/program/bluey/pic/project.overlay",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-08-10T08:15:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "776f5da3_b0e48c60",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 27
+      },
+      "revId": "2f3e3761970dd0d7aa6a0148e080ecf8618b3fe5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
