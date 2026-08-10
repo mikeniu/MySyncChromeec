@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "936b6075_02c70347",
+        "filename": "zephyr/test/charger/charge/src/charge_ramp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-10T20:39:36Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: The original copyright year shouldn\u0027t be replaced when a file is modified. Please revert this back to `2023`.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 0
+      },
+      "revId": "35fc09c19a62cfdf6ab5788c211cfb38c91036ff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
