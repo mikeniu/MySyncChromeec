@@ -392,9 +392,6 @@
 /* Define which ALS sensor is used for dimming the lightbar when dark */
 #undef CONFIG_ALS_LIGHTBAR_DIMMING
 
-/* Support AP hang detection host command and state machine */
-#undef CONFIG_AP_HANG_DETECT
-
 /* Support AP Warm reset Interrupt. */
 #undef CONFIG_AP_WARM_RESET_INTERRUPT
 
@@ -6733,7 +6730,6 @@
  */
 
 #ifndef HAS_TASK_CHIPSET
-#undef CONFIG_AP_HANG_DETECT
 #undef CONFIG_CHIPSET_ALDERLAKE
 #ifndef CONFIG_ZEPHYR
 #undef CONFIG_CHIPSET_ALDERLAKE_SLG4BD44540

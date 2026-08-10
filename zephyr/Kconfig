@@ -113,7 +113,6 @@ rsource "Kconfig.usba"
 rsource "Kconfig.usbc"
 rsource "Kconfig.watchdog"
 rsource "Kconfig.wireless_charger"
-rsource "Kconfig.ap_hang_detect"
 rsource "Kconfig.poe"
 rsource "debug/Kconfig"
 
