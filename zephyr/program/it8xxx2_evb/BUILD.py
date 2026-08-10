@@ -7,7 +7,9 @@
 
 def register_it8xxx2_evb_project(project_name, zephyr_board):
     """Register a variant of the it8xxx2_evb"""
-    register_raw_project(
+    register_func = register_binman_project
+
+    register_func(
         project_name=project_name,
         zephyr_board=zephyr_board,
         # Project-specific devicetree overlay
@@ -42,3 +44,6 @@ register_it8xxx2_evb_project(
 register_it8xxx2_evb_project(
     project_name="it82002_evb", zephyr_board="it8xxx2/it82002aw"
 )
+
+assert_rw_fwid_DO_NOT_EDIT(project_name="it8xxx2_evb", addr=0xBFFE0)
+assert_rw_fwid_DO_NOT_EDIT(project_name="it82002_evb", addr=0xBFFE0)
