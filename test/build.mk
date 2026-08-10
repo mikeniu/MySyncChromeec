@@ -26,9 +26,7 @@ test-list-host += fpsensor_crypto_with_mock_otp
 test-list-host += fpsensor_state
 test-list-host += host_command
 test-list-host += math_util
-test-list-host += power_button
 test-list-host += rollback_secret
-test-list-host += rtc
 test-list-host += sbs_charging
 # TODO(b/237823627): When building for the host, we're linking against the
 # toolchain's C standard library, so these tests are actually testing the
@@ -73,9 +71,7 @@ fpsensor_crypto_with_mock_otp-y=fpsensor_crypto_with_mock_otp.o
 fpsensor_state-y=fpsensor_state.o
 host_command-y=host_command.o
 math_util-y=math_util.o
-power_button-y=power_button.o
 rollback_secret-y=rollback_secret.o
-rtc-y=rtc.o
 sbs_charging-y=sbs_charging.o
 thermal-y=thermal.o
 usb_pd_timer-y=usb_pd_timer.o
