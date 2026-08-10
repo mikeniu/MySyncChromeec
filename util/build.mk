@@ -103,7 +103,7 @@ $(out)/ipi_table_gen.inc: $(out)/util/gen_ipi_table
 	$(call quiet,ipi_table,IPITBL )
 endif
 
-cbi-util-objs=../common/crc8.o ../common/cbi.o
+cbi-util-objs=../common/cbi.o
 
 $(out)/util/export_taskinfo.so: $(out)/util/export_taskinfo_ro.o \
 			$(out)/util/export_taskinfo_rw.o
