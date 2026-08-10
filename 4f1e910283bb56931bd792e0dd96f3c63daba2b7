@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b62bafbc_45be934d",
+        "filename": "zephyr/program/fpmcu/et171/srebrna.dts",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-08-10T13:19:38Z",
+      "side": 1,
+      "message": "The fpbuffer is 9980 bytes size. So it will get 9600 image frame data from image offset?",
+      "range": {
+        "startLine": 22,
+        "startChar": 18,
+        "endLine": 22,
+        "endChar": 22
+      },
+      "revId": "4f1e910283bb56931bd792e0dd96f3c63daba2b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
