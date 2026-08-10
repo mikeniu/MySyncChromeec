@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3650a5f_0d1694fd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-08-10T03:46:34Z",
+      "side": 1,
+      "message": "Could you please check your local environment?\n\n1. zephyr/CMakeLists.txt  \n2. driver/charger/rt9478.c\n\nDoes above exist? \n\nReference CL: https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7629916 that remove rt9478 driver",
+      "revId": "608b9eff34473e65156e53e37e375099b43e26e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
