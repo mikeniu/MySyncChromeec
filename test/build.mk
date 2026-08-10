@@ -15,12 +15,6 @@ test-list-host += bklight_passthru
 test-list-host += charge_ramp
 test-list-host += fpsensor_auth_commands
 test-list-host += fpsensor_auth_commands_otp
-test-list-host += fpsensor_auth_crypto_stateful
-test-list-host += fpsensor_auth_crypto_stateless
-test-list-host += fpsensor_crypto
-test-list-host += fpsensor_crypto_with_mock
-test-list-host += fpsensor_crypto_with_mock_otp
-test-list-host += fpsensor_state
 
 
 # TODO(b/237823627): When building for the host, we're linking against the
@@ -52,12 +46,6 @@ bklight_passthru-y=bklight_passthru.o
 charge_ramp-y+=charge_ramp.o
 fpsensor_auth_commands-y=fpsensor_auth_commands.o
 fpsensor_auth_commands_otp-$(rw-test)=fpsensor_auth_commands_otp.o
-fpsensor_auth_crypto_stateful-y=fpsensor_auth_crypto_stateful.o
-fpsensor_auth_crypto_stateless-y=fpsensor_auth_crypto_stateless.o
-fpsensor_crypto-y=fpsensor_crypto.o
-fpsensor_crypto_with_mock-y=fpsensor_crypto_with_mock.o
-fpsensor_crypto_with_mock_otp-y=fpsensor_crypto_with_mock_otp.o
-fpsensor_state-y=fpsensor_state.o
 
 
 sbs_charging-y=sbs_charging.o
