@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 /* CRC-32 implementation with USB constants */
+/* Test change for targeted unit test selection */
 
 #include "common.h"
 
