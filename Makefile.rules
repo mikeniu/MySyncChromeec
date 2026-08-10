@@ -215,9 +215,9 @@ cmd_lcov=lcov --rc branch_coverage=1 --gcov-tool \
 	--exclude '*/ec/include/test_util.h' --exclude '*_test.c' \
 	--exclude '*_test.cc' --exclude '*_test.h' \
 	--ignore-errors gcov,inconsistent,empty,mismatch,unused,negative,count
-cmd_merge_cov=lcov --ignore-errors missing,empty \
+cmd_merge_cov=$(if $^,lcov --ignore-errors missing --ignore-errors empty \
 	--rc branch_coverage=1 -o build/coverage/lcov.info \
-	$(foreach info,$^,-a ${info})
+	$(foreach info,$^,-a ${info}),mkdir -p build/coverage && touch build/coverage/lcov.info)
 
 .DELETE_ON_ERROR: build/coverage/%.info
 build/coverage/%.info: run-coverage-%
