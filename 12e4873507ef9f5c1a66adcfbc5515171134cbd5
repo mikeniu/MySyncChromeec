@@ -39,6 +39,30 @@
       },
       "revId": "12e4873507ef9f5c1a66adcfbc5515171134cbd5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "450923ba_d3bdfa2e",
+        "filename": "util/find_non_exec_lines.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-08-10T19:31:14Z",
+      "side": 1,
+      "message": "This is a revert. It might be wrong, but it is a clean revert.",
+      "parentUuid": "5e439fd3_9efa4cb2",
+      "range": {
+        "startLine": 24,
+        "startChar": 4,
+        "endLine": 24,
+        "endChar": 31
+      },
+      "revId": "12e4873507ef9f5c1a66adcfbc5515171134cbd5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
