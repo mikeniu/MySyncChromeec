@@ -51,6 +51,24 @@
       "message": "Please help resovle presubmit fail issue.",
       "revId": "984a2819b5f1fcc8a85c15acdc4df8af22bed15f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee8d3e61_0b50eef1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-10T03:20:39Z",
+      "side": 1,
+      "message": "[FAILED] chromiumos/platform/ec: cros format\n    Hook script \"cros format --check --exclude \"*.xml\" --exclude \"extra/usb_updater/*.json\" --exclude \"third_party/*\" --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      19:50:38: WARNING: zephyr/program/bluey/pic/src/keyboard_customization.c: needs formatting\n      19:50:39: WARNING: zephyr/program/bluey/pic/src/chipset.c: needs formatting\n      19:50:38: WARNING: zephyr/program/bluey/pic/src/extpower_custom.c: needs formatting\n      19:50:58: NOTICE: You can fix formatting errors by running:\n        cros format zephyr/program/bluey/pic/src/chipset.c zephyr/program/bluey/pic/src/extpower_custom.c zephyr/program/bluey/pic/src/keyboard_customization.c",
+      "parentUuid": "2417a316_8267acda",
+      "revId": "984a2819b5f1fcc8a85c15acdc4df8af22bed15f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
