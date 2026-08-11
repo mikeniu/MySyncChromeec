@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7b613eb_882db014",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 1345,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2026-08-11T00:00:22Z",
+      "side": 1,
+      "message": "Why is this removed? The following line will then use an uninitialized value for `vbus_mv` if this path continues after error.",
+      "revId": "71b9c6a05b9784695b5df58aa0ad27d8fb372929",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
