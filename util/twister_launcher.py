@@ -46,6 +46,11 @@ ZEPHYR_TEST_PATHS = [
     Path("tests/subsys/shell"),
 ]
 
+DAGWOOD_TEST_PATHS = [
+    Path("tests/kernel/sys_timer"),
+    Path("tests/kernel/tickless"),
+]
+
 # List of modules to use from the src/third_party/zephyrproject/modules directory
 THIRD_PARTY_MODULES = [
     "hal/cmsis_6",
@@ -338,6 +343,9 @@ def main():
         action="store_true",
     )
 
+    def is_coreboot_sdk():
+        return in_cros_sdk() or intercepted_args.toolchain == "coreboot-sdk"
+
     intercepted_args, other_args = parser.parse_known_args()
 
     # We allow help to run outside the sandbox.
@@ -370,6 +378,12 @@ def main():
         for path in ZEPHYR_TEST_PATHS:
             twister_cli.extend(["-T", str(zephyr_base / path)])
 
+        # Assume we're doing on-device testing with dagwood when using
+        # the coreboot-sdk cros-compiler.
+        if is_coreboot_sdk():
+            for path in DAGWOOD_TEST_PATHS:
+                twister_cli.extend(["-T", str(zephyr_base / path)])
+
     if intercepted_args.quarantine_list:
         # Pass user-provided arg when present
         for arg in intercepted_args.quarantine_list:
@@ -397,9 +411,6 @@ def main():
 
     # Look for board yaml files in the EC zephyr/boards directory
     twister_cli.extend(["--board-root", str(ec_base / "zephyr" / "boards")])
-
-    def is_coreboot_sdk():
-        return in_cros_sdk() or intercepted_args.toolchain == "coreboot-sdk"
 
     if is_coreboot_sdk():
         twister_cli.extend(get_coreboot_toolchain_flags(ec_base))
