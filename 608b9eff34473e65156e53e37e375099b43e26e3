@@ -34,6 +34,24 @@
       "parentUuid": "e3650a5f_0d1694fd",
       "revId": "608b9eff34473e65156e53e37e375099b43e26e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2390a96e_f8c3c1b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-08-11T01:28:00Z",
+      "side": 1,
+      "message": "Rob did this, and CL landed. https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8231981",
+      "parentUuid": "460244f7_db7a8b6f",
+      "revId": "608b9eff34473e65156e53e37e375099b43e26e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
