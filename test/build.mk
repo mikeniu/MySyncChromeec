@@ -72,8 +72,6 @@ math_util-y=math_util.o
 sbs_charging-y=sbs_charging.o
 usb_pd_timer-y=usb_pd_timer.o
 usb_sm_framework_h3-y=usb_sm_framework_h3.o
-usb_typec_vpd-y=usb_typec_ctvpd.o vpd_api.o usb_sm_checks.o fake_usbc.o
-usb_typec_ctvpd-y=usb_typec_ctvpd.o vpd_api.o usb_sm_checks.o fake_usbc.o
 usb_typec_drp_acc_trysrc-y=usb_typec_drp_acc_trysrc.o vpd_api.o \
 	usb_sm_checks.o
 usb_prl_old-y=usb_prl_old.o usb_sm_checks.o fake_usbc.o
