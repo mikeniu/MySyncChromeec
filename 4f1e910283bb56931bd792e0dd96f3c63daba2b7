@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f701ed2f_9d716edd",
+        "filename": "zephyr/program/fpmcu/et171/srebrna.dts",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-08-11T02:42:09Z",
+      "side": 1,
+      "message": "Use tabs for indentation?",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 24
+      },
+      "revId": "4f1e910283bb56931bd792e0dd96f3c63daba2b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b62bafbc_45be934d",
         "filename": "zephyr/program/fpmcu/et171/srebrna.dts",
         "patchSetId": 5
@@ -38,6 +61,53 @@
       "side": 1,
       "message": "yes, it will get 96*100 bytes from the image offset starting at byte 172.",
       "parentUuid": "b62bafbc_45be934d",
+      "range": {
+        "startLine": 22,
+        "startChar": 18,
+        "endLine": 22,
+        "endChar": 22
+      },
+      "revId": "4f1e910283bb56931bd792e0dd96f3c63daba2b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be8cd9fb_7ab231b5",
+        "filename": "zephyr/program/fpmcu/et171/srebrna.dts",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-08-11T02:42:09Z",
+      "side": 1,
+      "message": "Use tabs for indentation?",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 24
+      },
+      "revId": "4f1e910283bb56931bd792e0dd96f3c63daba2b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62dd11d0_a82b3277",
+        "filename": "zephyr/program/fpmcu/et171/srebrna.dts",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-08-11T02:42:09Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e6d7d847_b115cc26",
       "range": {
         "startLine": 22,
         "startChar": 18,
