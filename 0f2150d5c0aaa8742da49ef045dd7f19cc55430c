@@ -22,6 +22,30 @@
       },
       "revId": "0f2150d5c0aaa8742da49ef045dd7f19cc55430c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48498cac_383b2e56",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 6
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-08-11T22:23:45Z",
+      "side": 1,
+      "message": "This is to fix the CQ failure:\n\n```\n/mnt/host/source/src/platform/ec/twister-out-host/native_sim_native/host_gnu/platform/ec/zephyr/test/fingerprint/drivers/egis660/fingerprint.drivers.egis660/zephyr/zephyr.dts:536.47-539.5: ERROR (avoid_default_addr_size): /soc/egis660-apns-data@100000: Relying on default #address-cells value\n/mnt/host/source/src/platform/ec/twister-out-host/native_sim_native/host_gnu/platform/ec/zephyr/test/fingerprint/drivers/egis660/fingerprint.drivers.egis660/zephyr/zephyr.dts:536.47-539.5: ERROR (avoid_default_addr_size): /soc/egis660-apns-data@100000: Relying on default #size-cells value\n```\n\nI don\u0027t know why the avoid_default_addr_size warning is an error with -Eavoid_unnecessary_addr_size, unless avoid_default_addr_size is an error by default and not a warning?\n\nAnyway, this is changed to match srebrna, smolec, and stobnica, even though there is probably a smaller change that could also make the test pass. \n\nOr alternatively, the test passed because my local checkout is out of date, and this will still fail in the CQ.",
+      "parentUuid": "eddd3412_71939717",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 39
+      },
+      "revId": "0f2150d5c0aaa8742da49ef045dd7f19cc55430c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
