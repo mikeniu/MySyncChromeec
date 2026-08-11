@@ -34,6 +34,24 @@
       "parentUuid": "304bc9bf_ea2dbd34",
       "revId": "d04a478c5baec88626bbd90568ecbf8c523ac5b1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83bb448e_76b91168",
+        "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-11T00:08:41Z",
+      "side": 0,
+      "message": "There is an optional content tab for each port. This entire section should just go in there verbatim. I think if you open the original file in the editor, it should already be in that tab, but the editor is kind of buggy, so maybe not.",
+      "parentUuid": "cb1e7268_13d2a71d",
+      "revId": "d04a478c5baec88626bbd90568ecbf8c523ac5b1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
