@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b02ebfd_f0164ece",
+        "filename": "common/charge_manager.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T15:21:27Z",
+      "side": 1,
+      "message": "Is `CONFIG_TEST_BUILD` a typo for `TEST_BUILD`? \n\nThe standard macro for legacy EC test builds is `TEST_BUILD`. If this is meant to allow other legacy tests to continue using these test suppliers, it should probably be `TEST_BUILD`. Alternatively, if these test suppliers are now only used by `CONFIG_TEST_CHARGE_RAMP`, you could just simplify this to `#if defined(CONFIG_TEST_CHARGE_RAMP)`.",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 0
+      },
+      "revId": "1d932585f7f26463df7bfafdf17a229f79490f65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1aace0fc_4fbf001b",
+        "filename": "include/charge_manager.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T15:21:27Z",
+      "side": 1,
+      "message": "Is `CONFIG_TEST_BUILD` a typo for `TEST_BUILD`? The standard legacy host testing macro is `TEST_BUILD`. Same comment as in `common/charge_manager.c`.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 0
+      },
+      "revId": "1d932585f7f26463df7bfafdf17a229f79490f65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00eacf60_98dd430d",
+        "filename": "zephyr/test/charger/charge/src/charge_ramp.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T15:21:27Z",
+      "side": 1,
+      "message": "Are you sure this shouldn\u0027t be `20 * USEC_PER_MSEC` (20 milliseconds)? \n\nIf the original legacy test was using `msleep(20)`, it would translate to 20ms, not 20 seconds. \n\nAlso, in Zephyr it is often more readable to use `k_msleep(20)` or `k_sleep(K_SECONDS(20))` rather than `k_usleep` with large multiplication.",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 0
+      },
+      "revId": "1d932585f7f26463df7bfafdf17a229f79490f65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "755eada7_ad0e84c9",
+        "filename": "zephyr/test/charger/charge/src/charge_ramp.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T15:21:27Z",
+      "side": 1,
+      "message": "Same here. Should this be 20ms instead of 20s, especially given the test is named `test_fast_switch`? If it was `msleep(20)` in the legacy test, it should be translated to 20ms.",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 0
+      },
+      "revId": "1d932585f7f26463df7bfafdf17a229f79490f65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
