@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b512b86_43bc814d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-11T14:40:37Z",
+      "side": 1,
+      "message": "Ok couple things in CI unfortunately, looks like some files were relying on the definition from dt file instead of the include one\n\n```\n/mnt/host/source/src/platform/ec/zephyr/program/nissa/pujjo/src/form_factor.c:73:23: error: use of undeclared identifier \u0027BUTTON_VOLUME_UP\u0027\n   73 |                 button_disable_gpio(BUTTON_VOLUME_UP);\n      |                                     ^~~~~~~~~~~~~~~~\n/mnt/host/source/src/platform/ec/zephyr/program/nissa/pujjo/src/form_factor.c:74:23: error: use of undeclared identifier \u0027BUTTON_VOLUME_DOWN\u0027\n   74 |                 button_disable_gpio(BUTTON_VOLUME_DOWN);\n      |                                     ^~~~~~~~~~~~~~~~~~\n```\n\nand\n\n```\n/mnt/host/source/src/platform/ec/zephyr/drivers/buttons/buttons.c:86:29: error: use of undeclared identifier \u0027BUTTON_VOLUME_UP\u0027\n   86 |                         boot_button_state |\u003d BIT(BUTTON_VOLUME_UP);\n      |                                                  ^~~~~~~~~~~~~~~~\n/mnt/host/source/src/platform/ec/zephyr/drivers/buttons/buttons.c:94:29: error: use of undeclared identifier \u0027BUTTON_VOLUME_DOWN\u0027\n   94 |                         boot_button_state |\u003d BIT(BUTTON_VOLUME_DOWN);\n      |                                                  ^~~~~~~~~~~~~~~~~~\n```\n\nboth should use the definition from `include/button.h`, right now they are mixing up dt and non dt defines, could you clean that up as well? thanks for your patience on this",
+      "revId": "6ebe01fb037baec79044b2df018f949a93b69474",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3089b05e_13466192",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-11T14:40:37Z",
+      "side": 1,
+      "message": "this file needs to include `dt-bindings/buttons.h` for this to be available right?",
+      "revId": "6ebe01fb037baec79044b2df018f949a93b69474",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
