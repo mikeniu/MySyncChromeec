@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35ab87ac_9684296b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-11T18:06:58Z",
+      "side": 1,
+      "message": "How about just making CONFIG_PLATFORM_EC_HOSTCMD_THREAD_INFO depend on !PLATFORM_EC_SYSTEM_UNLOCKED.  This will save flash space.",
+      "revId": "cdef0437c02281237282264167ac71fafc21eda9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
