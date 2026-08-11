@@ -41,11 +41,3 @@
 	/* RST_PUSH_N net */
         gpios = <RTS5912_GPIO102 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
 };
-
-&pwr_slp_s4 {
-	gpios = <RTS5912_GPIO089 GPIO_ACTIVE_LOW>;
-};
-
-&pwr_slp_s3 {
-	gpios = <RTS5912_GPIO079 GPIO_ACTIVE_LOW>;
-};
