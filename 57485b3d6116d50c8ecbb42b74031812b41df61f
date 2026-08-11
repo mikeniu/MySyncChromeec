@@ -1,0 +1,29 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1c56bb6_b52f695a",
+        "filename": "test/build.mk",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T17:31:30Z",
+      "side": 1,
+      "message": "Fixed and rebased cleanly onto main; removed the errant boringssl_crypto entry.",
+      "parentUuid": "664593f3_3c37120a",
+      "range": {
+        "startLine": 15,
+        "startChar": 18,
+        "endLine": 15,
+        "endChar": 34
+      },
+      "isAi": true,
+      "revId": "57485b3d6116d50c8ecbb42b74031812b41df61f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
