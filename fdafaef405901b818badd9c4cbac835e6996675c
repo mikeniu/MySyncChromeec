@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66599407_c4b1c2b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-11T07:43:34Z",
+      "side": 1,
+      "message": "The Bluey EC firmware branch is *firmware-R150-16700.2.B-main*. Please cherry-pick to it.",
+      "revId": "fdafaef405901b818badd9c4cbac835e6996675c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
