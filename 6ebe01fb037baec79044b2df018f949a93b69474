@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8dfa066a_b5d9e228",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-11T22:37:31Z",
+      "side": 1,
+      "message": "Done, added DT nodes to fix these test cases.",
+      "parentUuid": "6b512b86_43bc814d",
+      "revId": "6ebe01fb037baec79044b2df018f949a93b69474",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3089b05e_13466192",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-11T14:40:37Z",
       "side": 1,
       "message": "this file needs to include `dt-bindings/buttons.h` for this to be available right?",
+      "revId": "6ebe01fb037baec79044b2df018f949a93b69474",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc487720_057e7de7",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-11T22:37:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3089b05e_13466192",
       "revId": "6ebe01fb037baec79044b2df018f949a93b69474",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
