@@ -16,6 +16,52 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "ffa50180f7c1aa2c90a8178a0b2955add17e46a0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59941192_bb42d9d9",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T20:43:14Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: `TEST_EQ(a, b, \"%d\")` in legacy EC tests automatically passed the compared values as arguments to the format string. Zephyr\u0027s `zassert_equal(a, b, \"%d\")` does not pass any additional arguments for `%d`, which will cause `printf` to read a garbage value from the stack.\n\nYou should either remove the format string (as `zassert_equal` prints the evaluated expressions automatically on failure in recent Zephyr versions), or explicitly provide the argument, e.g. `zassert_equal(..., ..., \"Failed with %d\", rv)`.\n\nPlease apply this fix to all similar occurrences of `zassert_*` in this file.",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 0
+      },
+      "revId": "ffa50180f7c1aa2c90a8178a0b2955add17e46a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cea13cfe_3cc6c6ed",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 2196,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T20:43:14Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: In `testcase.yaml`, the OTP test variant enables `CONFIG_NPCX_OTP_KEY\u003dy`, but this condition checks `CONFIG_OTP_KEY`. Unless `CONFIG_NPCX_OTP_KEY` selects `CONFIG_OTP_KEY` in Kconfig, this condition will evaluate to false and the mock OTP key buffer won\u0027t be initialized. Should this be `IS_ENABLED(CONFIG_NPCX_OTP_KEY)`?",
+      "range": {
+        "startLine": 2196,
+        "startChar": 0,
+        "endLine": 2196,
+        "endChar": 0
+      },
+      "revId": "ffa50180f7c1aa2c90a8178a0b2955add17e46a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

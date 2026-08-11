@@ -22,6 +22,30 @@
       },
       "revId": "00528bdaa956240b762826460a68c79de68f23a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea4765e3_fed37afe",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 2351,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T20:43:14Z",
+      "side": 1,
+      "message": "Good call. Refactored all 45 test helper functions into independent ZTEST(fpsensor_auth_commands, \u003ctest_name\u003e) cases, paired with a ZTEST_SUITE before() fixture callback (before_fpsensor_auth_commands) that automatically executes the rollback flash reset, entropy initialization, fp_sensor_init(), and OTP key mock setup before every individual test case.",
+      "parentUuid": "d8bacbf0_e0bb2480",
+      "range": {
+        "startLine": 2307,
+        "startChar": 0,
+        "endLine": 2351,
+        "endChar": 1
+      },
+      "revId": "00528bdaa956240b762826460a68c79de68f23a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
