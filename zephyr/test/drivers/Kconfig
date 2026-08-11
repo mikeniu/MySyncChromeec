@@ -350,6 +350,12 @@ config LINK_TEST_SUITE_USBC_TCPC
 	  Include the USBC TCPC test suite in the
 	  binary.
 
+config LINK_TEST_SUITE_USBC_SM
+	bool "Link tests for common USBC state machine code"
+	help
+	  Include the USBC SM test suite in the
+	  binary.
+
 config LINK_TEST_SUITE_USBC_SVDM_DFP_ONLY
 	bool "Link and test the usbc_svdm_dfp_only tests"
 
