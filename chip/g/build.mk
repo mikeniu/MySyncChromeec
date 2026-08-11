@@ -252,12 +252,16 @@ $(SIGNER_MANIFEST): $(MANIFEST)
 # Personalization infrastructure uses hslt_XXX board names with the underscore
 # replaced with a space and the part after underscore (if any), capitalized.
 # Edit the board name and express it in hex:
-	$(Q)HEX_NAME=$$(printf "$(BOARD)" | /usr/bin/awk -F_ ' \
-		 {if (NF == 2) \
-		     { printf($$1" "toupper($$2)) } \
-		   else \
-		     { printf($$0) } \
-		  }' | hexdump -ve '1/1 "%.2x"') && \
+# TODO(b/534175454): use correct tag
+#      $(Q)HEX_NAME=$$(printf "$(BOARD)" | /usr/bin/awk -F_ ' \
+#               {if (NF == 2) \
+#                   { printf($$1" "toupper($$2)) } \
+#                 else \
+#                   { printf($$0) } \
+#                }' | hexdump -ve '1/1 "%.2x"') && \
+#      HEX_LEN=$$(printf $$HEX_NAME | wc -c) && \
+#      sed "s/tag\": \"0\{$$HEX_LEN\}/tag\": \"$$HEX_NAME/" $@.tmp > $@
+	$(Q)HEX_NAME="" && \
 	HEX_LEN=$$(printf $$HEX_NAME | wc -c) && \
 	sed "s/tag\": \"0\{$$HEX_LEN\}/tag\": \"$$HEX_NAME/" $@.tmp > $@
 
