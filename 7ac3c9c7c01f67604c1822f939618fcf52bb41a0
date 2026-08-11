@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cedfbd24_82a861f1",
+        "filename": "common/flash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1634,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-08-11T10:32:43Z",
+      "side": 1,
+      "message": "Wouldn\u0027t be `sizeof(void *)` better?",
+      "revId": "7ac3c9c7c01f67604c1822f939618fcf52bb41a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
