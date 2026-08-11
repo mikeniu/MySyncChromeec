@@ -606,3 +606,18 @@ void battery_set_dynamic_info(const struct batt_params *params, bool ac_present,
 		host_set_single_event(EC_HOST_EVENT_BATTERY_STATUS);
 #endif
 }
+
+#ifdef HAS_TASK_HOSTCMD
+static void force_power_status_update_on_ac_change(void)
+{
+	/*
+	 * Update the dynamic battery & AC info cache instantly when AC presence
+	 * changes, instead of waiting up to 1 second for the periodic tick.
+	 * This ensures S0 wake routines (like Android's HealthHAL) receive
+	 * the AC attached status without delay to acquire wakelocks.
+	 */
+	battery_poll_dynamic_info();
+}
+DECLARE_HOOK(HOOK_AC_CHANGE, force_power_status_update_on_ac_change,
+	     HOOK_PRIO_DEFAULT);
+#endif
