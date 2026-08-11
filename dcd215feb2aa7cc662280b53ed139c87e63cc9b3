@@ -33,6 +33,24 @@
       "message": "This is fingerprint related, yes?",
       "revId": "dcd215feb2aa7cc662280b53ed139c87e63cc9b3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9545b039_0ffa428d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T04:48:25Z",
+      "side": 1,
+      "message": "Adding fingerprint reviewer.",
+      "parentUuid": "37b2b973_4dc6a5a9",
+      "revId": "dcd215feb2aa7cc662280b53ed139c87e63cc9b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
