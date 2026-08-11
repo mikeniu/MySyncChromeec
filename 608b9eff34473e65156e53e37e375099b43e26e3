@@ -16,6 +16,24 @@
       "message": "Could you please check your local environment?\n\n1. zephyr/CMakeLists.txt  \n2. driver/charger/rt9478.c\n\nDoes above exist? \n\nReference CL: https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7629916 that remove rt9478 driver",
       "revId": "608b9eff34473e65156e53e37e375099b43e26e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "460244f7_db7a8b6f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293891
+      },
+      "writtenOn": "2026-08-11T01:12:31Z",
+      "side": 1,
+      "message": "The rt9478.c is removed after git rebase. I re-uploaded it in the other CL:8236851.",
+      "parentUuid": "e3650a5f_0d1694fd",
+      "revId": "608b9eff34473e65156e53e37e375099b43e26e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
