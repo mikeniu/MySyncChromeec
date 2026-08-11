@@ -9,6 +9,5 @@ common:
   - realtek/rts5912
 tests:
   aic.i2c:
-    extra_args: SNIPPET="sram-only"
     depends_on:
       - i2c
