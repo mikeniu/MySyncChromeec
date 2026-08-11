@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8bacbf0_e0bb2480",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 2351,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-11T16:41:04Z",
+      "side": 1,
+      "message": "why we are doing it this way? not following the ZTEST way.",
+      "range": {
+        "startLine": 2307,
+        "startChar": 0,
+        "endLine": 2351,
+        "endChar": 1
+      },
+      "revId": "00528bdaa956240b762826460a68c79de68f23a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
