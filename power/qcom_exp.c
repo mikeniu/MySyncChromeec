@@ -26,6 +26,7 @@
 #include "builtin/assert.h"
 #include "chipset.h"
 #include "common.h"
+#include "ec_commands.h"
 #include "extpower.h"
 #include "gpio.h"
 #include "hooks.h"
@@ -1451,6 +1452,39 @@ static const char *const state_name[] = {
 	"off",
 	"on",
 };
+
+#ifdef CONFIG_HOSTCMD_AP_RESET_SCHEDULED
+static void ap_reset_deferred(void)
+{
+	CPRINTS("Scheduled AP reset: cold reset");
+	power_request = POWER_REQ_COLD_RESET;
+	task_wake(TASK_ID_CHIPSET);
+}
+DECLARE_DEFERRED(ap_reset_deferred);
+
+static enum ec_status
+host_command_apreset_scheduled(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_ap_reset_scheduled *p = args->params;
+
+	if (p->delay_ms == 0) {
+		/* Reset immediately */
+		CPRINTS("AP reset immediate: cold reset");
+		power_request = POWER_REQ_COLD_RESET;
+		task_wake(TASK_ID_CHIPSET);
+		return EC_RES_SUCCESS;
+	}
+
+	/* Schedule reset */
+	if (hook_call_deferred(&ap_reset_deferred_data, p->delay_ms * MSEC) !=
+	    EC_SUCCESS)
+		return EC_RES_ERROR;
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_AP_RESET_SCHEDULED, host_command_apreset_scheduled,
+		     EC_VER_MASK(0));
+#endif
 
 test_mockable_static int command_power(int argc, const char **argv)
 {
