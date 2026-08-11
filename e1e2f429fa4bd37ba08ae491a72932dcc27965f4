@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9bce6ac_bf4ec2f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-08-11T05:25:53Z",
+      "side": 1,
+      "message": "I don\u0027t think the new CQ failure is RT9478 related.\n\n```\nDEBUG:\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J*** Booting Zephyr OS build 4e57eaa52754 ***\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J\nDEBUG:--- UART initialized after reboot ---\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[Image: RO, bloonchipper-0.0.0-61c487a 2026-08-10 19:39:11 chrome-bot@chromeos-c3d-cq-us-central1-b-x30-lssd-60-tkq3]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[Reset cause: fpmcu:~$ \u001b[9D\u001b[Jpower-onfpmcu:~$ \u001b[9D\u001b[J]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.001000 event set 0x0000000000002000]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.001100 hostcmd init 0x0000000000002000]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.001300 Inits done]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.001400 Verifying RW image...]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.209900 RW verify OK]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[1.001200 MKBP not cleared within threshold, toggling.]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[1.210300 Jumping to image RW (0x00000008)]\nDEBUG:fpmcu:~$\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J*** Booting Zephyr OS build 4e57eaa52754 ***\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.000500 UART initialized after sysjump]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[Image: RW, bloonchipper-0.0.0-61c487a 2026-08-10 19:39:11 chrome-bot@chromeos-c3d-cq-us-central1-b-x30-lssd-60-tkq3]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[Reset cause: fpmcu:~$ \u001b[9D\u001b[Jpower-onfpmcu:~$ \u001b[9D\u001b[J fpmcu:~$ \u001b[9D\u001b[Jsysjumpfpmcu:~$ \u001b[9D\u001b[J]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.001200 event set 0x0000000000002000]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.001300 hostcmd init 0x0000000000002000]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.001400 Inits done]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.001700 FP_SENSOR_SEL: ELAN]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[0.001000] \u003cerr\u003e cros_fingerprint: FPC unknown silicon 0x0000\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[1.001400 MKBP not cleared within threshold, toggling.]\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J[2.001600 MKBP: The AP is failing to respond because it is sleeping or off]\nDEBUG:fpmcu:~$\nDEBUG:fpmcu:~$\nDEBUG:fpmcu:~$\nDEBUG:fpmcu:~$\nDEBUG:fpmcu:~$\nDEBUG:fpmcu:~$\nDEBUG:fpmcu:~$\nDEBUG:fpmcu:~$ ztest run-all\nDEBUG:Running TESTSUITE restricted_console\nDEBUG:\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:START - test_command_mem_dump\nDEBUG:\nDEBUG:\nDEBUG:20014F50: 1badd00d\nDEBUG:\nDEBUG:Command returned error: 7\nDEBUG:dump memory values, optionally specifying the format\nDEBUG:Usage: md [.b|.h|.s] addr [count]\nDEBUG:\u001b[9D\u001b[J PASS - test_command_mem_dump in 0.011 seconds\nDEBUG:fpmcu:~$ \u001b[9D\u001b[J\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\nDEBUG:fpmcu:~$ \u001b[9D\u001b[JSTART - test_command_read_write_word\nDEBUG:fpmcu:~$\nDEBUG:write 0x20014f48 \u003d 0x05\nDEBUG:\nDEBUG:Command returned error: 7\n```",
+      "revId": "e1e2f429fa4bd37ba08ae491a72932dcc27965f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
