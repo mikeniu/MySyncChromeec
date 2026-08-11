@@ -665,15 +665,21 @@ SECTIONS
 #ifdef CONFIG_CHIP_MEMORY_REGIONS
 #define REGION(name, attr, start, size) \
 	.name(NOLOAD) : { \
+		. = ALIGN(4); \
 		__##name##_start = .; \
 		KEEP(*(SORT(.name.keep.*))) \
 		*(SORT(.name.*)) \
+		. = ALIGN(4); \
+		__##name##_end = .; \
 	} > name
 #define REGION_LOAD(name, attr, start, size) \
 	.name : { \
+		. = ALIGN(4); \
 		__##name##_start = .; \
 		KEEP(*(SORT(.name.keep.*))) \
 		*(SORT(.name.*)) \
+		. = ALIGN(4); \
+		__##name##_end = .; \
 	} > name
 #include "memory_regions.inc"
 #undef REGION
