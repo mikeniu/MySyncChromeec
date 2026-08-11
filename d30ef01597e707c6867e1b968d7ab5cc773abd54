@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9900bc0_91542174",
+        "filename": "zephyr/test/charger/charge/src/charge_ramp.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-08-11T21:38:55Z",
+      "side": 1,
+      "message": "Don\u0027t need this comment.",
+      "range": {
+        "startLine": 136,
+        "startChar": 0,
+        "endLine": 136,
+        "endChar": 20
+      },
+      "revId": "d30ef01597e707c6867e1b968d7ab5cc773abd54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ebab643_f69d7bcb",
+        "filename": "zephyr/test/charger/charge/src/charge_ramp.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-08-11T21:38:55Z",
+      "side": 1,
+      "message": "Probably don\u0027t need this either.",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 164,
+        "endChar": 42
+      },
+      "revId": "d30ef01597e707c6867e1b968d7ab5cc773abd54",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
