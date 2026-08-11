@@ -1171,9 +1171,14 @@ static void isl9241_init(int chgnum)
 	/*
 	 * Set control4 register to
 	 * [13]: Slew rate control enable (sets VSYS ramp to 8mV/us)
+	 * [11]: Rsense (Rs1:Rs2) ratio for PSYS (1 = 1:1) if Rs1 == Rs2
 	 */
 	if (isl9241_update(chgnum, ISL9241_REG_CONTROL4,
-			   ISL9241_CONTROL4_SLEW_RATE_CTRL, MASK_SET))
+			   ISL9241_CONTROL4_SLEW_RATE_CTRL |
+				   ((BOARD_RS1 == BOARD_RS2) ?
+					    ISL9241_CONTROL4_PSYS_RSENSE_RATIO :
+					    0),
+			   MASK_SET))
 		goto init_fail;
 
 #ifndef CONFIG_CHARGE_RAMP_HW
