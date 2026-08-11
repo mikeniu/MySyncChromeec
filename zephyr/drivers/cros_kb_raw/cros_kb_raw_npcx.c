@@ -153,7 +153,11 @@ static void cros_kb_raw_npcx_ksi_isr(const struct device *dev,
 
 	LOG_DBG("%s: KSI%d is changed", __func__, wui->bit);
 	/* Wake-up keyboard scan task */
+#ifdef CONFIG_ZEPHYR
+	keyscan_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_KEYSCAN);
+#endif
 }
 
 void keyboard_raw_init(void)

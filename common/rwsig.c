@@ -257,6 +257,12 @@ out:
 #define TASK_EVENT_ABORT TASK_EVENT_CUSTOM_BIT(0)
 #define TASK_EVENT_CONTINUE TASK_EVENT_CUSTOM_BIT(1)
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+
+K_EVENT_DEFINE(rwsig_event);
+#endif
+
 static enum rwsig_status rwsig_status;
 
 test_mockable enum rwsig_status rwsig_get_status(void)
@@ -266,12 +272,20 @@ test_mockable enum rwsig_status rwsig_get_status(void)
 
 void rwsig_abort(void)
 {
+#ifdef CONFIG_ZEPHYR
+	rwsig_set_event(TASK_EVENT_ABORT);
+#else
 	task_set_event(TASK_ID_RWSIG, TASK_EVENT_ABORT);
+#endif
 }
 
 void rwsig_continue(void)
 {
+#ifdef CONFIG_ZEPHYR
+	rwsig_set_event(TASK_EVENT_CONTINUE);
+#else
 	task_set_event(TASK_ID_RWSIG, TASK_EVENT_CONTINUE);
+#endif
 }
 
 void rwsig_task(void *u)
@@ -295,7 +309,11 @@ void rwsig_task(void *u)
 	rwsig_status = RWSIG_VALID;
 
 	/* Jump to RW after a timeout */
+#ifdef CONFIG_ZEPHYR
+	evt = rwsig_wait_event(CONFIG_RWSIG_JUMP_TIMEOUT);
+#else
 	evt = task_wait_event(CONFIG_RWSIG_JUMP_TIMEOUT);
+#endif
 
 	/* Jump now if we timed out, or were told to continue. */
 	if (evt == TASK_EVENT_TIMER || evt == TASK_EVENT_CONTINUE)
@@ -306,7 +324,11 @@ void rwsig_task(void *u)
 exit:
 	/* We're done, yield forever. */
 	while (1)
+#ifdef CONFIG_ZEPHYR
+		rwsig_wait_event(-1);
+#else
 		task_wait_event(-1);
+#endif
 }
 
 static enum ec_status rwsig_cmd_action(struct host_cmd_handler_args *args)

@@ -614,7 +614,11 @@ out:
 test_mockable void bma4xx_interrupt(enum gpio_signal signal)
 {
 	last_irq_timestamp = __hw_clock_source_read();
+#ifdef CONFIG_ZEPHYR
+	motion_sense_set_event(CONFIG_ACCEL_BMA4XX_INT_EVENT);
+#else
 	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ACCEL_BMA4XX_INT_EVENT);
+#endif
 }
 
 /* Process FIFO data read from accel and push data to host */

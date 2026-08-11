@@ -25,6 +25,12 @@
 #define CPUTS(outstr) cputs(CC_SWITCH, outstr)
 #define CPRINTS(format, args...) cprints(CC_SWITCH, format, ##args)
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+
+K_EVENT_DEFINE(powerbtn_event);
+#endif
+
 /*
  * x86 chipsets have a hardware timer on the power button input which causes
  * them to reset when the button is pressed for more than 4 seconds.  This is
@@ -176,7 +182,11 @@ void power_button_pch_pulse(void)
 	set_pwrbtn_to_pch(0, 0);
 	pwrbtn_state = PWRBTN_STATE_LID_OPEN;
 	tnext_state = get_time().val + PWRBTN_INITIAL_US;
+#ifdef CONFIG_ZEPHYR
+	powerbtn_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_POWERBTN);
+#endif
 }
 
 /**
@@ -437,7 +447,11 @@ void power_button_task(void *u)
 			 */
 			CPRINTS("PB task %d = %s, wait %d", pwrbtn_state,
 				state_names[pwrbtn_state], d);
+#ifdef CONFIG_ZEPHYR
+			powerbtn_wait_event(d);
+#else
 			task_wait_event(d);
+#endif
 		}
 	}
 }
@@ -506,7 +520,11 @@ static void powerbtn_x86_changed(void)
 	}
 
 	/* Wake the power button task */
+#ifdef CONFIG_ZEPHYR
+	powerbtn_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_POWERBTN);
+#endif
 }
 DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, powerbtn_x86_changed, HOOK_PRIO_DEFAULT);
 

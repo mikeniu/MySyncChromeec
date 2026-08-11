@@ -30,6 +30,20 @@
 
 static int enable_debug_prints;
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/init.h>
+#include <zephyr/kernel.h>
+
+struct k_event usb_mux_event;
+
+static int init_usb_mux_events(void)
+{
+	k_event_init(&usb_mux_event);
+	return 0;
+}
+SYS_INIT(init_usb_mux_events, POST_KERNEL, 50);
+#endif
+
 /*
  * Flags will reset to 0 after sysjump; This works for current flags as LPM will
  * get reset in the init method which is called during PD task startup.
@@ -165,7 +179,11 @@ mux_task_enqueue(int port, int index, enum mux_config_type type,
 	if (queue_add_unit(&mux_queue[port], &new_entry) == 0)
 		CPRINTS("Error: Dropping port %d mux %d", port, type);
 	else
+#ifdef CONFIG_ZEPHYR
+		usb_mux_set_event(TASK_EVENT_WAKE);
+#else
 		task_wake(TASK_ID_USB_MUX);
+#endif
 
 	mutex_unlock(&queue_lock[port]);
 }
@@ -210,7 +228,11 @@ __maybe_unused void usb_mux_task(void *u)
 
 		/* Wait if we had no queue items to service */
 		if (!items_waiting)
+#ifdef CONFIG_ZEPHYR
+			usb_mux_wait_event(-1);
+#else
 			task_wait_event(-1);
+#endif
 
 		items_waiting = false;
 
@@ -436,7 +458,11 @@ static int configure_mux(int port, int index, enum mux_config_type config,
 			 * mux, but could be made configurable for other
 			 * purposes.
 			 */
+#ifdef CONFIG_ZEPHYR
+			pd_wait_event(port, PD_EVENT_AP_MUX_DONE, 100 * MSEC);
+#else
 			task_wait_event_mask(PD_EVENT_AP_MUX_DONE, 100 * MSEC);
+#endif
 			ack_task[port] = TASK_ID_INVALID;
 
 			crec_usleep(12.5 * MSEC);
@@ -526,7 +552,11 @@ void usb_mux_init(int port)
 		if (queue_add_unit(&mux_queue[port], &new_entry) == 0)
 			CPRINTS("Error: Dropping port %d mux init", port);
 		else
+#ifdef CONFIG_ZEPHYR
+			usb_mux_set_event(TASK_EVENT_WAKE);
+#else
 			task_wake(TASK_ID_USB_MUX);
+#endif
 
 		mutex_unlock(&queue_lock[port]);
 	} else {
@@ -921,7 +951,11 @@ DECLARE_HOST_COMMAND(EC_CMD_USB_PD_MUX_INFO, hc_usb_pd_mux_info,
 void usb_mux_set_ack_complete(int port)
 {
 	if (ack_task[port] != TASK_ID_INVALID)
+#ifdef CONFIG_ZEPHYR
+		pd_set_event(port, PD_EVENT_AP_MUX_DONE);
+#else
 		task_set_event(ack_task[port], PD_EVENT_AP_MUX_DONE);
+#endif
 }
 
 static enum ec_status hc_usb_pd_mux_ack(struct host_cmd_handler_args *args)
@@ -935,7 +969,11 @@ static enum ec_status hc_usb_pd_mux_ack(struct host_cmd_handler_args *args)
 		return EC_RES_INVALID_PARAM;
 
 	if (ack_task[p->port] != TASK_ID_INVALID)
+#ifdef CONFIG_ZEPHYR
+		pd_set_event(p->port, PD_EVENT_AP_MUX_DONE);
+#else
 		task_set_event(ack_task[p->port], PD_EVENT_AP_MUX_DONE);
+#endif
 
 	usb_mux_set_ack_complete(p->port);
 

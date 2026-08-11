@@ -82,12 +82,22 @@ static inline void pm_policy_state_all_lock_get(void)
 static inline void pm_policy_state_all_lock_put(void)
 {
 }
-#endif /* CONFIG_ZEPHYR */
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+
+extern "C" {
+K_EVENT_DEFINE(fpsensor_event);
+}
+#endif
 
 /* Interrupt line from the fingerprint sensor */
 extern "C" void fps_event(enum gpio_signal signal)
 {
+#ifdef CONFIG_ZEPHYR
+	fpsensor_set_event(TASK_EVENT_SENSOR_IRQ);
+#else
 	task_set_event(TASK_ID_FPSENSOR, TASK_EVENT_SENSOR_IRQ);
+#endif
 }
 
 static void send_mkbp_event(uint32_t event)

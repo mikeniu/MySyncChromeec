@@ -166,8 +166,13 @@ void set_state(const int port, struct sm_ctx *const ctx,
 	 * next state's run method as soon as we can to ensure that we don't
 	 * delay important processing until the next task interval.
 	 */
+#ifdef CONFIG_ZEPHYR
+	if (IS_ENABLED(HAS_TASK_PD_C0))
+		pd_wake(port);
+#else
 	if (IS_ENABLED(HAS_TASK_PD_C0))
 		task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 /*

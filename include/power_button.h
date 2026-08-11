@@ -10,6 +10,24 @@
 
 #include "common.h"
 
+#ifdef CONFIG_ZEPHYR
+#include "task.h"
+
+#include <zephyr/kernel.h>
+
+extern struct k_event powerbtn_event;
+
+static inline void powerbtn_set_event(uint32_t events)
+{
+	k_event_post(&powerbtn_event, events);
+}
+
+static inline uint32_t powerbtn_wait_event(int timeout_us)
+{
+	return cros_ec_event_wait_safe(&powerbtn_event, UINT32_MAX, timeout_us);
+}
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

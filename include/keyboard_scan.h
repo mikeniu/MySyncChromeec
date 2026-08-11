@@ -12,6 +12,24 @@
 #include "compile_time_macros.h"
 #include "keyboard_config.h"
 
+#ifdef CONFIG_ZEPHYR
+#include "task.h"
+
+#include <zephyr/kernel.h>
+
+extern struct k_event keyscan_event;
+
+static inline void keyscan_set_event(uint32_t events)
+{
+	k_event_post(&keyscan_event, events);
+}
+
+static inline uint32_t keyscan_wait_event(int timeout_us)
+{
+	return cros_ec_event_wait_safe(&keyscan_event, UINT32_MAX, timeout_us);
+}
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

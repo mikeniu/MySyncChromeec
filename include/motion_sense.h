@@ -21,6 +21,22 @@
 #include "timer.h"
 #include "util.h"
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+extern struct k_event motion_sense_event;
+
+static inline void motion_sense_set_event(uint32_t events)
+{
+	k_event_post(&motion_sense_event, events);
+}
+
+static inline uint32_t motion_sense_wait_event(int timeout_us)
+{
+	return cros_ec_event_wait_safe(&motion_sense_event, UINT32_MAX,
+				       timeout_us);
+}
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

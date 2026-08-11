@@ -21,6 +21,21 @@
 #ifdef CONFIG_ZEPHYR
 
 #include "dt-bindings/usbc_mux.h"
+#include "task.h"
+
+#include <zephyr/kernel.h>
+
+extern struct k_event usb_mux_event;
+
+static inline void usb_mux_set_event(uint32_t events)
+{
+	k_event_post(&usb_mux_event, events);
+}
+
+static inline uint32_t usb_mux_wait_event(int timeout_us)
+{
+	return cros_ec_event_wait_safe(&usb_mux_event, UINT32_MAX, timeout_us);
+}
 
 #else /* !CONFIG_ZEPHYR */
 

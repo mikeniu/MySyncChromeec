@@ -553,7 +553,11 @@ void pd_execute_hard_reset(int port)
 
 	PRL_HR_SET_FLAG(port, PRL_FLAGS_PORT_PARTNER_HARD_RESET);
 	set_state_prl_hr(port, PRL_HR_RESET_LAYER);
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 void prl_execute_hard_reset(int port)
@@ -564,7 +568,11 @@ void prl_execute_hard_reset(int port)
 
 	PRL_HR_SET_FLAG(port, PRL_FLAGS_PE_HARD_RESET);
 	set_state_prl_hr(port, PRL_HR_RESET_LAYER);
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 void prl_set_data_role_check(int port, bool enable)
@@ -646,7 +654,11 @@ void prl_set_debug_level(enum debug_level debug_level)
 void prl_hard_reset_complete(int port)
 {
 	PRL_HR_SET_FLAG(port, PRL_FLAGS_HARD_RESET_COMPLETE);
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 void prl_send_ctrl_msg(int port, enum tcpci_msg_type type,
@@ -665,7 +677,11 @@ void prl_send_ctrl_msg(int port, enum tcpci_msg_type type,
 	PRL_TX_SET_FLAG(port, PRL_FLAGS_MSG_XMIT);
 #endif /* CONFIG_USB_PD_EXTENDED_MESSAGES */
 
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 void prl_send_data_msg(int port, enum tcpci_msg_type type,
@@ -683,7 +699,11 @@ void prl_send_data_msg(int port, enum tcpci_msg_type type,
 	PRL_TX_SET_FLAG(port, PRL_FLAGS_MSG_XMIT);
 #endif /* CONFIG_USB_PD_EXTENDED_MESSAGES */
 
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 #ifdef CONFIG_USB_PD_EXTENDED_MESSAGES
@@ -695,7 +715,11 @@ void prl_send_ext_data_msg(int port, enum tcpci_msg_type type,
 	pdmsg[port].ext = 1;
 
 	TCH_SET_FLAG(port, PRL_FLAGS_MSG_XMIT);
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 #endif /* CONFIG_USB_PD_EXTENDED_MESSAGES */
 
@@ -719,7 +743,11 @@ void prl_reset_soft(int port)
 	local_state[port] = SM_INIT;
 
 	/* Ensure we process the reset quickly */
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 void prl_run(int port, int evt, int en)
@@ -1677,7 +1705,11 @@ static void rch_requesting_chunk_entry(const int port)
 	pdmsg[port].ext = 1;
 	pdmsg[port].xmit_type = prl_rx[port].sop;
 	PRL_TX_SET_FLAG(port, PRL_FLAGS_MSG_XMIT);
+#ifdef CONFIG_ZEPHYR
+	pd_set_event(port, PD_EVENT_TX);
+#else
 	task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_TX);
+#endif
 }
 
 static void rch_requesting_chunk_run(const int port)
@@ -2333,7 +2365,11 @@ static void prl_rx_wait_for_phy_message(const int port, int evt)
 		pe_message_received(port);
 	}
 
+#ifdef CONFIG_ZEPHYR
+	pd_wake(port);
+#else
 	task_wake(PD_PORT_TO_TASK_ID(port));
+#endif
 }
 
 /* All necessary Protocol Transmit States (Section 6.11.2.2) */

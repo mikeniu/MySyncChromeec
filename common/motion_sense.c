@@ -38,6 +38,12 @@
 #define CPRINTS(format, args...) cprints(CC_MOTION_SENSE, format, ##args)
 #define CPRINTF(format, args...) cprintf(CC_MOTION_SENSE, format, ##args)
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+
+K_EVENT_DEFINE(motion_sense_event);
+#endif
+
 /* Number of times we ran motion_sense_task; for stats printing */
 static atomic_t motion_sense_task_loops;
 
@@ -415,8 +421,12 @@ static void motion_sense_switch_sensor_rate(void)
 	}
 	if (sensor_setup_mask) {
 		atomic_or(&odr_event_required, sensor_setup_mask);
+#ifdef CONFIG_ZEPHYR
+		motion_sense_set_event(TASK_EVENT_MOTION_ODR_CHANGE);
+#else
 		task_set_event(TASK_ID_MOTIONSENSE,
 			       TASK_EVENT_MOTION_ODR_CHANGE);
+#endif
 	}
 
 	/* disable the body detection since AP is suspended */
@@ -1081,7 +1091,11 @@ void motion_sense_task(void *u)
 						    fastest_collection_rate)) {
 			pm_policy_state_lock_get_all();
 		}
+#ifdef CONFIG_ZEPHYR
+		event = motion_sense_wait_event(wait_us);
+#else
 		event = task_wait_event(wait_us);
+#endif
 		if (DISABLE_PM_POLICY_WHILE_WAITING(wait_us,
 						    fastest_collection_rate)) {
 			pm_policy_state_lock_put_all();
@@ -1255,8 +1269,12 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			sensor->config[SENSOR_CONFIG_AP].ec_rate = new_ec_rate;
 
 			/* Force a collection to purge old events.  */
+#ifdef CONFIG_ZEPHYR
+			motion_sense_set_event(TASK_EVENT_MOTION_ODR_CHANGE);
+#else
 			task_set_event(TASK_ID_MOTIONSENSE,
 				       TASK_EVENT_MOTION_ODR_CHANGE);
+#endif
 		}
 
 		out->ec_rate.ret =
@@ -1284,8 +1302,12 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 			 */
 			atomic_or(&odr_event_required,
 				  BIT(sensor - motion_sensors));
+#ifdef CONFIG_ZEPHYR
+			motion_sense_set_event(TASK_EVENT_MOTION_ODR_CHANGE);
+#else
 			task_set_event(TASK_ID_MOTIONSENSE,
 				       TASK_EVENT_MOTION_ODR_CHANGE);
+#endif
 		}
 
 		out->sensor_odr.ret = sensor->drv->get_data_rate(sensor);
@@ -1413,8 +1435,12 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 
 		atomic_add(&sensor->flush_pending, 1);
 
+#ifdef CONFIG_ZEPHYR
+		motion_sense_set_event(TASK_EVENT_MOTION_FLUSH_PENDING);
+#else
 		task_set_event(TASK_ID_MOTIONSENSE,
 			       TASK_EVENT_MOTION_FLUSH_PENDING);
+#endif
 		__fallthrough;
 #endif
 	case MOTIONSENSE_CMD_FIFO_INFO:
@@ -1792,8 +1818,12 @@ static int command_accel_data_rate(int argc, const char **argv)
 						(round ? ROUND_UP_FLAG : 0);
 
 		atomic_or(&odr_event_required, 1 << (sensor - motion_sensors));
+#ifdef CONFIG_ZEPHYR
+		motion_sense_set_event(TASK_EVENT_MOTION_ODR_CHANGE);
+#else
 		task_set_event(TASK_ID_MOTIONSENSE,
 			       TASK_EVENT_MOTION_ODR_CHANGE);
+#endif
 	} else {
 		ccprintf("Data rate for sensor %d: %d\n", id,
 			 sensor->drv->get_data_rate(sensor));
@@ -1837,7 +1867,11 @@ static int command_accel_read_xyz(int argc, const char **argv)
 			ccprintf("vector not ready\n");
 		ccprintf("Last calib. data %d: %-5d %-5d %-5d\n", id,
 			 sensor->xyz[X], sensor->xyz[Y], sensor->xyz[Z]);
+#ifdef CONFIG_ZEPHYR
+		motion_sense_wait_event(motion_min_interval);
+#else
 		task_wait_event(motion_min_interval);
+#endif
 	}
 	return EC_SUCCESS;
 }
@@ -1869,8 +1903,12 @@ static int command_accel_init(int argc, const char **argv)
 		 * the ODR has been changed.
 		 */
 		atomic_or(&odr_event_required, BIT(id));
+#ifdef CONFIG_ZEPHYR
+		motion_sense_set_event(TASK_EVENT_MOTION_ODR_CHANGE);
+#else
 		task_set_event(TASK_ID_MOTIONSENSE,
 			       TASK_EVENT_MOTION_ODR_CHANGE);
+#endif
 	}
 
 	ccprintf("%s: state %d - %d\n", sensor->name, sensor->state, ret);

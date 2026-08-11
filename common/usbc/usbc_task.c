@@ -61,6 +61,23 @@ bool tc_event_loop_is_paused(int port)
 	return paused[port];
 }
 
+#ifdef CONFIG_ZEPHYR
+struct k_event pd_event[CONFIG_USB_PD_PORT_MAX_COUNT] = {
+#if CONFIG_USB_PD_PORT_MAX_COUNT > 0
+	Z_EVENT_INITIALIZER(pd_event[0]),
+#endif
+#if CONFIG_USB_PD_PORT_MAX_COUNT > 1
+	Z_EVENT_INITIALIZER(pd_event[1]),
+#endif
+#if CONFIG_USB_PD_PORT_MAX_COUNT > 2
+	Z_EVENT_INITIALIZER(pd_event[2]),
+#endif
+#if CONFIG_USB_PD_PORT_MAX_COUNT > 3
+	Z_EVENT_INITIALIZER(pd_event[3]),
+#endif
+};
+#endif
+
 void tc_start_event_loop(int port)
 {
 	/*
@@ -69,7 +86,11 @@ void tc_start_event_loop(int port)
 	 */
 	if (paused[port]) {
 		paused[port] = 0;
+#ifdef CONFIG_ZEPHYR
+		pd_wake(port);
+#else
 		task_set_event(PD_PORT_TO_TASK_ID(port), TASK_EVENT_WAKE);
+#endif
 	}
 }
 
@@ -117,7 +138,12 @@ static int pd_task_timeout(int port)
 static bool pd_task_loop(int port)
 {
 	/* wait for next event/packet or timeout expiration */
+#ifdef CONFIG_ZEPHYR
+	const uint32_t evt =
+		pd_wait_event(port, UINT32_MAX, pd_task_timeout(port));
+#else
 	const uint32_t evt = task_wait_event(pd_task_timeout(port));
+#endif
 
 	/* Manage expired PD Timers on timeouts */
 	if (evt & TASK_EVENT_TIMER)

@@ -185,12 +185,14 @@ void pd_prepare_sysjump(void)
 
 void notify_sysjump_ready(void)
 {
+#ifndef CONFIG_ZEPHYR
 	/*
 	 * If event was set from pd_prepare_sysjump, wake the
 	 * task waiting on us to complete.
 	 */
 	if (sysjump_task_waiting != TASK_ID_INVALID)
 		task_set_event(sysjump_task_waiting, TASK_EVENT_SYSJUMP_READY);
+#endif
 }
 
 /*

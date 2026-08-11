@@ -16,6 +16,24 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef CONFIG_ZEPHYR
+#include "task.h"
+
+#include <zephyr/kernel.h>
+
+extern struct k_event fpsensor_event;
+
+static inline void fpsensor_set_event(uint32_t events)
+{
+	k_event_post(&fpsensor_event, events);
+}
+
+static inline uint32_t fpsensor_wait_event(int timeout_us)
+{
+	return cros_ec_event_wait_safe(&fpsensor_event, UINT32_MAX, timeout_us);
+}
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

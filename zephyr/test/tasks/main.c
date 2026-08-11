@@ -63,40 +63,9 @@ static void (*task3_entry_func)(uint32_t event_mask);
 
 void task3_entry(void *p)
 {
-	uint32_t events = 0;
-
 	for (;;) {
-		if (task3_entry_func)
-			task3_entry_func(events);
-		events = task_wait_event(-1);
+		k_sleep(K_FOREVER);
 	}
-}
-
-static void set_event_before_task_start1(void)
-{
-	const uint32_t events = task_wait_event(TASK_SEC(2));
-
-	zassert_equal(events, 0xAAAA, "Should have 0xAAAA events");
-}
-
-static void set_event_before_task_start2(void)
-{
-	/* Do nothing */
-}
-
-static void *tasks_setup(void)
-{
-	start_ec_tasks();
-
-	return NULL;
-}
-
-ZTEST(test_task_shim, test_set_event_before_task_start)
-{
-	/* Send event before tasks start */
-	task_set_event(TASK_ID_TASK_1, 0xAAAA);
-
-	run_test(set_event_before_task_start1, set_event_before_task_start2);
 }
 
 static void task_get_current1(void)
@@ -114,123 +83,50 @@ ZTEST(test_task_shim, test_task_get_current)
 	run_test(&task_get_current1, &task_get_current2);
 }
 
-static void timeout1(void)
+K_EVENT_DEFINE(test_domain_event);
+
+static void test_wait_safe1(void)
 {
 	const uint32_t start_ms = k_uptime_get();
-	const uint32_t events = task_wait_event(TASK_SEC(2));
+	const uint32_t events =
+		cros_ec_event_wait_safe(&test_domain_event, 0x1234, -1);
 	const uint32_t end_ms = k_uptime_get();
 
-	zassert_equal(events, TASK_EVENT_TIMER, "Should have timeout event");
-	zassert_within(end_ms - start_ms, 2000, 100, "Timeout for 2 seconds");
+	zassert_equal(events, 0x1234, "Verify event bits");
+	zassert_within(end_ms - start_ms, 100, 50, "Waited for event");
 }
 
-static void timeout2(void)
+static void test_wait_safe2(void)
+{
+	k_sleep(K_MSEC(100));
+	k_event_post(&test_domain_event, 0x1234);
+}
+
+ZTEST(test_task_shim, test_cros_ec_event_wait_safe)
+{
+	run_test(&test_wait_safe1, &test_wait_safe2);
+}
+
+static void test_timeout1(void)
+{
+	const uint32_t start_ms = k_uptime_get();
+	const uint32_t events =
+		cros_ec_event_wait_safe(&test_domain_event, 0x1, 500000);
+	const uint32_t end_ms = k_uptime_get();
+
+	zassert_equal(events, TASK_EVENT_TIMER,
+		      "Should return TIMER on timeout");
+	zassert_within(end_ms - start_ms, 500, 100, "Timeout after 500ms");
+}
+
+static void test_timeout2(void)
 {
 	/* Do nothing */
 }
 
-ZTEST(test_task_shim, test_timeout)
+ZTEST(test_task_shim, test_cros_ec_event_wait_safe_timeout)
 {
-	run_test(&timeout1, &timeout2);
-}
-
-static void event_delivered1(void)
-{
-	const uint32_t start_ms = k_uptime_get();
-	const uint32_t events = task_wait_event(-1);
-	const uint32_t end_ms = k_uptime_get();
-
-	zassert_equal(events, 0x1234, "Verify event bits");
-	zassert_within(end_ms - start_ms, 5000, 100, "Waited for 5 seconds");
-}
-
-static void event_delivered2(void)
-{
-	k_sleep(K_SECONDS(5));
-
-	task_set_event(TASK_ID_TASK_1, 0x1234);
-}
-
-ZTEST(test_task_shim, test_event_delivered)
-{
-	run_test(&event_delivered1, &event_delivered2);
-}
-
-static void event_mask_not_delivered1(void)
-{
-	task_set_event(TASK_ID_TASK_2, 0x007F);
-}
-
-static void event_mask_not_delivered2(void)
-{
-	const uint32_t start_ms = k_uptime_get();
-	const uint32_t events = task_wait_event_mask(0x0080, TASK_SEC(7));
-	const uint32_t end_ms = k_uptime_get();
-
-	zassert_equal(events, TASK_EVENT_TIMER, "Should have timeout event");
-	zassert_within(end_ms - start_ms, 7000, 100, "Timeout for 7 seconds");
-
-	const uint32_t leftover_events = task_wait_event(0);
-
-	zassert_equal(leftover_events, 0x007F, "All events should be waiting");
-}
-
-ZTEST(test_task_shim, test_event_mask_not_delivered)
-{
-	run_test(&event_mask_not_delivered1, &event_mask_not_delivered2);
-}
-
-static void event_mask_extra1(void)
-{
-	k_sleep(K_SECONDS(1));
-
-	task_set_event(TASK_ID_TASK_2, 0x00FF);
-}
-
-static void event_mask_extra2(void)
-{
-	const uint32_t start_ms = k_uptime_get();
-	const uint32_t events = task_wait_event_mask(0x0001, TASK_SEC(10));
-	const uint32_t end_ms = k_uptime_get();
-
-	zassert_equal(events, 0x0001, "Verify only waited for event");
-	zassert_within(end_ms - start_ms, 1000, 100, "Timeout for 1 second");
-
-	const uint32_t leftover_events = task_wait_event(0);
-
-	zassert_equal(leftover_events, 0x00FE, "All events should be waiting");
-}
-
-ZTEST(test_task_shim, test_event_mask_extra)
-{
-	run_test(&event_mask_extra1, &event_mask_extra2);
-}
-
-static void empty_set_mask1(void)
-{
-	k_sleep(K_SECONDS(1));
-	/*
-	 * It is generally invalid to set a 0 event, but this simulates a race
-	 * condition and exercises fallback code in task_wait_event
-	 */
-	task_set_event(TASK_ID_TASK_2, 0);
-	k_sleep(K_SECONDS(1));
-	task_set_event(TASK_ID_TASK_2, 0x1234);
-}
-
-static void empty_set_mask2(void)
-{
-	const uint32_t start_ms = k_uptime_get();
-	const uint32_t events = task_wait_event_mask(0x1234, TASK_SEC(10));
-	const uint32_t end_ms = k_uptime_get();
-
-	zassert_equal(events, 0x1234, "Verify only waited for event");
-	zassert_within(end_ms - start_ms, 2000, 100, "Timeout for 2 seconds");
-}
-
-ZTEST(test_task_shim, test_empty_set_mask)
-{
-	run_test(&empty_set_mask1, &empty_set_mask2);
+	run_test(&test_timeout1, &test_timeout2);
 }
 
 static bool pre_kernel_ran = false;
@@ -260,6 +156,13 @@ static int post_kernel(void)
 	return 0;
 }
 SYS_INIT(post_kernel, POST_KERNEL, 0);
+
+static void *tasks_setup(void)
+{
+	start_ec_tasks();
+
+	return NULL;
+}
 
 ZTEST(test_task_shim, test_task_get_current_post_kernel)
 {

@@ -14,6 +14,24 @@
 
 #include <stdbool.h>
 
+#ifdef CONFIG_ZEPHYR
+#include "task.h"
+
+#include <zephyr/kernel.h>
+
+extern struct k_event hostcmd_event;
+
+static inline void hostcmd_set_event(uint32_t events)
+{
+	k_event_post(&hostcmd_event, events);
+}
+
+static inline uint32_t hostcmd_wait_event(int timeout_us)
+{
+	return cros_ec_event_wait_safe(&hostcmd_event, UINT32_MAX, timeout_us);
+}
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

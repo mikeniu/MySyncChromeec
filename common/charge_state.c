@@ -30,6 +30,7 @@
 #include "task.h"
 #include "throttle_ap.h"
 #include "timer.h"
+#include "usb_charge.h"
 #include "usb_common.h"
 #include "usb_pd.h"
 #include "util.h"
@@ -948,7 +949,11 @@ DECLARE_HOOK(HOOK_INIT, charger_init, HOOK_PRIO_DEFAULT);
 
 void charge_wakeup(void)
 {
+#ifdef CONFIG_ZEPHYR
+	usb_charger_set_event(0, TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_CHARGER);
+#endif
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, charge_wakeup, HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_AC_CHANGE, charge_wakeup, HOOK_PRIO_DEFAULT);
@@ -1555,7 +1560,11 @@ void charger_task(void *u)
 		local_state.is_full = is_full;
 
 		sleep_usec = calculate_sleep_dur(battery_critical, sleep_usec);
+#ifdef CONFIG_ZEPHYR
+		usb_charger_wait_event(sleep_usec);
+#else
 		task_wait_event(sleep_usec);
+#endif
 	}
 }
 

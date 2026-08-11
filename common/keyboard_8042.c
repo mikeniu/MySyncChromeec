@@ -41,6 +41,12 @@
 #define CPRINTS5(format, args...)
 #endif
 
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/kernel.h>
+
+K_EVENT_DEFINE(keyproto_event);
+#endif
+
 /*
  * This command needs malloc to work. Could we use this instead?
  *
@@ -249,7 +255,11 @@ void keyboard_host_write(int data, int is_cmd)
 	h.type = is_cmd ? HOST_COMMAND : HOST_DATA;
 	h.byte = data;
 	queue_add_unit(&from_host, &h);
+#ifdef CONFIG_ZEPHYR
+	keyproto_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_KEYPROTO);
+#endif
 }
 
 /**
@@ -331,7 +341,11 @@ static void i8042_send_to_host(int len, const uint8_t *bytes, uint8_t chan,
 	mutex_unlock(&to_host_mutex);
 
 	/* Wake up the task to move from queue to host */
+#ifdef CONFIG_ZEPHYR
+	keyproto_set_event(TASK_EVENT_WAKE);
+#else
 	task_wake(TASK_ID_KEYPROTO);
+#endif
 }
 
 /* Change to set 1 if the I8042_XLATE flag is set. */
@@ -499,7 +513,11 @@ void keyboard_state_changed_process(int row, int col, int is_pressed,
 	if (is_pressed) {
 		keyboard_wakeup();
 		set_typematic_key(scan_code, len);
+#ifdef CONFIG_ZEPHYR
+		keyproto_set_event(TASK_EVENT_WAKE);
+#else
 		task_wake(TASK_ID_KEYPROTO);
+#endif
 	} else {
 		clear_typematic_key();
 	}
@@ -943,7 +961,11 @@ void keyboard_protocol_task(void *u)
 
 	while (1) {
 		/* Wait for next host read/write */
+#ifdef CONFIG_ZEPHYR
+		keyproto_wait_event(wait);
+#else
 		task_wait_event(wait);
+#endif
 
 		while (1) {
 			timestamp_t t = get_time();
@@ -1137,7 +1159,11 @@ test_mockable void keyboard_update_button(enum keyboard_button_type button,
 		CPRINTS5("KB UPDATE BTN");
 
 		i8042_send_to_host(len, scan_code, CHAN_KBD, 0);
+#ifdef CONFIG_ZEPHYR
+		keyproto_set_event(TASK_EVENT_WAKE);
+#else
 		task_wake(TASK_ID_KEYPROTO);
+#endif
 	}
 }
 

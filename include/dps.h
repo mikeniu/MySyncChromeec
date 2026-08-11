@@ -14,6 +14,24 @@
 extern "C" {
 #endif
 
+#ifdef CONFIG_ZEPHYR
+#include "task.h"
+
+#include <zephyr/kernel.h>
+
+extern struct k_event dps_event;
+
+static inline void dps_set_event(uint32_t events)
+{
+	k_event_post(&dps_event, events);
+}
+
+static inline uint32_t dps_wait_event(int timeout_us)
+{
+	return cros_ec_event_wait_safe(&dps_event, UINT32_MAX, timeout_us);
+}
+#endif
+
 #define DPS_FLAG_DISABLED BIT(0)
 #define DPS_FLAG_NO_SRCCAP BIT(1)
 #define DPS_FLAG_WAITING BIT(2)

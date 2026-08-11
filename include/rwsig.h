@@ -17,6 +17,24 @@ extern "C" {
 #ifdef HAS_TASK_RWSIG
 /* The functions below only make sense if RWSIG task is defined. */
 
+#ifdef CONFIG_ZEPHYR
+#include "task.h"
+
+#include <zephyr/kernel.h>
+
+extern struct k_event rwsig_event;
+
+static inline void rwsig_set_event(uint32_t events)
+{
+	k_event_post(&rwsig_event, events);
+}
+
+static inline uint32_t rwsig_wait_event(int timeout_us)
+{
+	return cros_ec_event_wait_safe(&rwsig_event, UINT32_MAX, timeout_us);
+}
+#endif
+
 /* Current status of RW signature verification */
 enum rwsig_status {
 	RWSIG_UNKNOWN = 0, /* Unknown/not started */

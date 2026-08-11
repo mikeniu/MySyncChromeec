@@ -288,7 +288,12 @@ static int check_cc_rp_timeout(int port, int timeout)
 	tcpm_get_cc(port, &cc1, &cc2);
 
 	while (((cc_is_rp(cc1)) || (cc_is_rp(cc2))) != true) {
+#ifdef CONFIG_ZEPHYR
+		if (pd_wait_event(port, TASK_EVENT_TIMER, timeout) ==
+		    TASK_EVENT_TIMER) {
+#else
 		if (task_wait_event(timeout) == TASK_EVENT_TIMER) {
+#endif
 			return EC_ERROR_TIMEOUT;
 		}
 		tcpm_get_cc(port, &cc1, &cc2);
