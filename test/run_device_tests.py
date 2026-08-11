@@ -801,6 +801,9 @@ class AllTests:
                 enable_hw_write_protect=True,
             ),
             TestConfig(
+                test_name="fp_buffer_clear",
+            ),
+            TestConfig(
                 config_name="fp_transport_spi_ro",
                 test_name="fp_transport",
                 imagetype_to_use=ImageType.RO,
