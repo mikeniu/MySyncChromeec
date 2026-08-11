@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68bebc39_4dcb1238",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-11T15:15:39Z",
+      "side": 1,
+      "message": "Please run the pre-submit checks using `repo upload` or calling `~/chromiumos/src/repohooks/pre-upload.py` directly.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 45
+      },
+      "revId": "500f74b1a587da4d6448911e1bb495b8f20e8244",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
