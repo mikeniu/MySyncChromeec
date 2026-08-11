@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3627a43f_021ed6c7",
+        "filename": "zephyr/program/bluey/annite/project.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-08-11T11:04:40Z",
+      "side": 1,
+      "message": "remove these configs since they are not available in the bluey firmware branch.",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 0
+      },
+      "revId": "3218516bb6244c64720e03cecffd91cf0bb4b8c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ace9128e_18844187",
+        "filename": "zephyr/program/bluey/annite/src/chipset.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-08-11T11:04:40Z",
+      "side": 1,
+      "message": "5000 * USEC_PER_MSEC",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 1
+      },
+      "revId": "3218516bb6244c64720e03cecffd91cf0bb4b8c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
