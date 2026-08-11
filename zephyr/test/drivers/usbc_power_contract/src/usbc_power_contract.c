@@ -108,3 +108,20 @@ ZTEST_F(usbc_power_contract, test_reject_msg_sent_when_no_pdos)
 
 	zassert_true(saw_reject > 0, "Reject message was not sent");
 }
+
+/**
+ * @brief Test extended message chunking header macros and framing validation
+ */
+ZTEST_F(usbc_power_contract, test_chunked_ext_msg_framing)
+{
+	uint16_t ext_hdr = PD_EXT_HEADER(2, 1, 48);
+
+	zassert_equal(PD_EXT_HEADER_CHUNK_NUM(ext_hdr), 2,
+		      "Chunk number mismatch");
+	zassert_equal(PD_EXT_HEADER_REQ_CHUNK(ext_hdr), 1,
+		      "Request chunk flag mismatch");
+	zassert_equal(PD_EXT_HEADER_DATA_SIZE(ext_hdr), 48,
+		      "Data size mismatch");
+	zassert_equal(PD_EXT_HEADER_CHUNKED(ext_hdr), 1,
+		      "Chunked flag mismatch");
+}
