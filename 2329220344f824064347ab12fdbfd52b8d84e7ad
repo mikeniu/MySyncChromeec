@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7daa65f1_8951f338",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-08-11T23:32:11Z",
+      "side": 1,
+      "message": "can we detect this using the platform field instead of deducing it from the toolchain choice?",
+      "range": {
+        "startLine": 9,
+        "startChar": 38,
+        "endLine": 9,
+        "endChar": 66
+      },
+      "revId": "2329220344f824064347ab12fdbfd52b8d84e7ad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
