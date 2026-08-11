@@ -663,7 +663,7 @@ def get_modified_files(repo_dir):
     """Returns a list of relative file paths modified in the current CL relative to origin/main."""
     try:
         res = subprocess.run(
-            ["git", "diff", "--name-only", "origin/main...HEAD"],
+            ["git", "show", "--name-only", "--format=", "HEAD"],
             cwd=repo_dir,
             capture_output=True,
             text=True,
