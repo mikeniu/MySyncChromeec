@@ -1,0 +1,54 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <dt-bindings/gpio_defines.h>
+
+/ {
+	chosen {
+		cros-ec,flash = &flash0;
+	};
+
+	aliases {
+		gpio-wp = &gpio_wp_l;
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_wp_l: wp_l {
+			gpios = <&gpio0 0 GPIO_ACTIVE_LOW>;
+		};
+
+		gpio_lid_open_ec: lid_open_ec {
+			gpios = <&gpio0 1 (GPIO_INPUT | GPIO_PULL_UP)>;
+			enum-name = "GPIO_LID_OPEN";
+		};
+
+		gpio_enable_backlight: enable_backlight {
+			gpios = <&gpio0 2 GPIO_OUTPUT>;
+			enum-name = "GPIO_ENABLE_BACKLIGHT";
+		};
+
+		gpio_ec_pwr_btn_odl: ec_pwr_btn_odl {
+			gpios = <&gpio0 3 (GPIO_ACTIVE_LOW | GPIO_INPUT | GPIO_PULL_UP)>;
+			enum-name = "GPIO_POWER_BUTTON_L";
+		};
+	};
+
+	gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_lid_open_ec: lid_open_ec {
+			irq-pin = <&gpio_lid_open_ec>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "lid_interrupt";
+		};
+	};
+};
+
+&gpio0 {
+	ngpios = <10>;
+};
