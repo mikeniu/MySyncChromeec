@@ -1,0 +1,104 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfb4a449_1119ac39",
+        "filename": "common/charge_manager.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T15:27:54Z",
+      "side": 1,
+      "message": "Simplified to #if defined(CONFIG_TEST_CHARGE_RAMP) in Patchset 5.",
+      "parentUuid": "6b02ebfd_f0164ece",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "844f0a071e45e6fab1a39830ce1c180a99b10e45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03694f75_a53f081a",
+        "filename": "include/charge_manager.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T15:27:54Z",
+      "side": 1,
+      "message": "Simplified to #if defined(CONFIG_TEST_CHARGE_RAMP) in Patchset 5.",
+      "parentUuid": "1aace0fc_4fbf001b",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "844f0a071e45e6fab1a39830ce1c180a99b10e45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f35f1fa_042ac45c",
+        "filename": "zephyr/test/charger/charge/src/charge_ramp.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T15:27:54Z",
+      "side": 1,
+      "message": "Verified against legacy test/charge_ramp.c: legacy test used crec_usleep(SECOND * 20) (SECOND \u003d 1s) to allow ramping while plugged in before switching outlets. Updated sleep macro to idiomatic Zephyr k_sleep(K_SECONDS(20)) in Patchset 5.",
+      "parentUuid": "00eacf60_98dd430d",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "844f0a071e45e6fab1a39830ce1c180a99b10e45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "036a5c12_cbc3312a",
+        "filename": "zephyr/test/charger/charge/src/charge_ramp.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-11T15:27:54Z",
+      "side": 1,
+      "message": "Same as above; legacy test used crec_usleep(SECOND * 20) for the plugged-in ramp duration, while \u0027fast switch\u0027 referred to the short unplug period (600 * MSEC). Updated sleep macro to k_sleep(K_SECONDS(20)) in Patchset 5.",
+      "parentUuid": "755eada7_ad0e84c9",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "844f0a071e45e6fab1a39830ce1c180a99b10e45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
