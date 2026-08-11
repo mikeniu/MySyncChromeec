@@ -60,7 +60,6 @@ ectool-objs+=ectool_i2c.o
 ectool-objs+=ectool_pdc_trace.o
 ectool-objs+=ectool_pdc_pcap.o
 ectool-objs+=../common/crc.o
-ectool_servo-objs=$(ectool-objs) comm-servo-spi.o
 lbplay-objs=lbplay.o $(comm-objs)
 $(out)/util/lbplay: HOST_LDFLAGS+=$(LIBFTDIUSB_HOST_LDLIBS)
 
@@ -104,15 +103,3 @@ $(out)/ipi_table_gen.inc: $(out)/util/gen_ipi_table
 endif
 
 cbi-util-objs=../common/crc8.o ../common/cbi.o
-
-$(out)/util/export_taskinfo.so: $(out)/util/export_taskinfo_ro.o \
-			$(out)/util/export_taskinfo_rw.o
-	$(call quiet,link_taskinfo,BUILDLD)
-
-$(out)/util/export_taskinfo_ro.o: util/export_taskinfo.c
-	$(call quiet,c_to_taskinfo,BUILDCC,RO)
-
-$(out)/util/export_taskinfo_rw.o: util/export_taskinfo.c
-	$(call quiet,c_to_taskinfo,BUILDCC,RW)
-
-deps-y += $(out)/util/export_taskinfo_ro.o.d $(out)/util/export_taskinfo_rw.o.d
