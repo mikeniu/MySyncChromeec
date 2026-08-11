@@ -668,12 +668,14 @@ SECTIONS
 		__##name##_start = .; \
 		KEEP(*(SORT(.name.keep.*))) \
 		*(SORT(.name.*)) \
+		__##name##_end = .; \
 	} > name
 #define REGION_LOAD(name, attr, start, size) \
 	.name : { \
 		__##name##_start = .; \
 		KEEP(*(SORT(.name.keep.*))) \
 		*(SORT(.name.*)) \
+		__##name##_end = .; \
 	} > name
 #include "memory_regions.inc"
 #undef REGION

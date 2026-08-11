@@ -41,6 +41,16 @@ bss_loop:
 	strlt r0, [r1], #4
 	blt bss_loop
 
+	/* Clear AHB4 (NOLOAD SRAM region) to purge stale data across resets */
+	mov r0, #0
+	ldr r1, _ahb4_start
+	ldr r2, _ahb4_end
+ahb4_loop:
+	cmp r1, r2
+	it lt
+	strlt r0, [r1], #4
+	blt ahb4_loop
+
 	/* Copy initialized data to Internal RAM */
 	ldr r0,_data_lma_start
 
@@ -118,6 +128,10 @@ _bss_start:
 .long __bss_start
 _bss_end:
 .long __bss_end
+_ahb4_start:
+.long __ahb4_start
+_ahb4_end:
+.long __ahb4_end
 _data_start:
 .long __data_start
 _data_end:
