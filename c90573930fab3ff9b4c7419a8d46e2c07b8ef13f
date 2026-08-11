@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdadc61e_227e369b",
+        "filename": "common/build.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-11T21:58:50Z",
+      "side": 0,
+      "message": "You should also delete CONFIG_AP_HANG_DETECT from config.h",
+      "range": {
+        "startLine": 36,
+        "startChar": 9,
+        "endLine": 36,
+        "endChar": 30
+      },
+      "revId": "c90573930fab3ff9b4c7419a8d46e2c07b8ef13f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

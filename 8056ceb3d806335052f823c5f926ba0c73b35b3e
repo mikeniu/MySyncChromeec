@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd1559a3_81addf04",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-11T21:58:50Z",
+      "side": 1,
+      "message": "Lukasz - is it safe to delete the AP hang detect code?\n\nIf this is safe to delete, all references to CONFIG_AP_HANG_DETECT should be removed.  The EC_CMD_HANG_DETECT host command should be marked as obsolete in ec_commands.h",
+      "revId": "8056ceb3d806335052f823c5f926ba0c73b35b3e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
