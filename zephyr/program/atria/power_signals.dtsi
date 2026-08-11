@@ -65,16 +65,20 @@
 		enum-name = "PWR_EC_PCH_SYS_PWROK";
 	};
 	pwr_slp_s3: pwr-slp-s3 {
-		compatible = "intel,ap-pwrseq-gpio";
+		compatible = "intel,ap-pwrseq-vw";
 		dbg-label = "SLP_S3 input from PCH";
 		enum-name = "PWR_SLP_S3";
-		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+		virtual-wire = "ESPI_VWIRE_SIGNAL_SLP_S3";
+		reset-val = <1>;
+		vw-invert;
 	};
 	pwr_slp_s4: pwr-slp-s4 {
-		compatible = "intel,ap-pwrseq-gpio";
+		compatible = "intel,ap-pwrseq-vw";
 		dbg-label = "SLP_S4 input from PCH";
 		enum-name = "PWR_SLP_S4";
-		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+		virtual-wire = "ESPI_VWIRE_SIGNAL_SLP_S4";
+		reset-val = <1>;
+		vw-invert;
 	};
 	pwr-slp-s5 {
 		compatible = "intel,ap-pwrseq-vw";
