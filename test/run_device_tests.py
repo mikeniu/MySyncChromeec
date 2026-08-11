@@ -801,6 +801,9 @@ class AllTests:
                 enable_hw_write_protect=True,
             ),
             TestConfig(
+                test_name="fp_buffer_clear",
+            ),
+            TestConfig(
                 config_name="fp_transport_spi_ro",
                 test_name="fp_transport",
                 imagetype_to_use=ImageType.RO,
@@ -1376,7 +1379,7 @@ def find_section_offset_size(section: str, image: bytes) -> tuple[int, int]:
 
 def write_section(data: bytes, image: bytearray, section: str):
     """Replace the specified section in image with the contents of data"""
-    (section_start, section_size) = find_section_offset_size(section, image)
+    section_start, section_size = find_section_offset_size(section, image)
 
     if section_size < len(data):
         raise ValueError(section + " section size is not enough to store data")
@@ -1389,8 +1392,8 @@ def write_section(data: bytes, image: bytearray, section: str):
 
 def copy_section(src: bytes, dst: bytearray, section: str):
     """Copy section from src image to dst image"""
-    (src_start, src_size) = find_section_offset_size(section, src)
-    (dst_start, dst_size) = find_section_offset_size(section, dst)
+    src_start, src_size = find_section_offset_size(section, src)
+    dst_start, dst_size = find_section_offset_size(section, dst)
 
     if dst_size < src_size:
         raise ValueError(

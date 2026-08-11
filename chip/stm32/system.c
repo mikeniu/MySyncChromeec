@@ -21,6 +21,13 @@
 #include "util.h"
 #include "watchdog.h"
 
+#include <string.h>
+
+#if defined(CHIP_FAMILY_STM32H7)
+__attribute__((weak)) extern uint32_t __ahb4_start[];
+__attribute__((weak)) extern uint32_t __ahb4_end[];
+#endif
+
 #ifdef CONFIG_STM32_CLOCK_LSE
 #define BDCR_SRC BDCR_SRC_LSE
 #define BDCR_RDY STM32_RCC_BDCR_LSERDY
@@ -295,6 +302,15 @@ void system_pre_init(void)
 #endif
 	/* Delay 1 APB clock cycle after the clock is enabled */
 	clock_wait_bus_cycles(BUS_APB, 1);
+
+#if defined(CHIP_FAMILY_STM32H7)
+	/* Clear AHB4 (NOLOAD SRAM region) to purge stale data across resets. */
+	if ((uintptr_t)__ahb4_end > (uintptr_t)__ahb4_start) {
+		memset(__ahb4_start, 0,
+		       (uintptr_t)__ahb4_end - (uintptr_t)__ahb4_start);
+	}
+#endif
+
 	/* Enable access to RCC CSR register and RTC backup registers */
 	STM32_PWR_CR |= BIT(8);
 #ifdef CHIP_VARIANT_STM32L476
