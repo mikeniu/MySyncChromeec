@@ -82,7 +82,8 @@ static enum ec_status host_command_apreset(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_AP_RESET, host_command_apreset, EC_VER_MASK(0));
 #endif
 
-#ifdef CONFIG_HOSTCMD_AP_RESET_SCHEDULED
+#if defined(CONFIG_HOSTCMD_AP_RESET_SCHEDULED) && \
+	!defined(CONFIG_CHIPSET_QC_EXP)
 static void ap_reset_deferred(void)
 {
 	chipset_reset(CHIPSET_RESET_HOST_CMD);
