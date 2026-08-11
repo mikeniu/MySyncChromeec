@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "474451a6_fe263216",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-11T00:21:51Z",
+      "side": 1,
+      "message": "As far as VIF Editor goes, I think you should be able to set TBT DFP without setting TBT UFP in the most recent version. If you don\u0027t set TBT UFP, I don\u0027t think you should need to set the AMA fields. If you do set TBT UFP, then maybe you do need to set the AMA fields.\n\nI think this extends beyond the VIF contents, so I moved discussion to the TBT testing bug. To my mind, the larger question is whether lapis should be a TBT or DP UFP.",
+      "parentUuid": "4a618231_bd96739b",
+      "revId": "d233edbe6e216bafa0c0ddc975af5a52b1f87a02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d9dc7f05_8081f16d",
         "filename": "zephyr/program/fatcat/lapis/lapis_vif.xml",
         "patchSetId": 1
