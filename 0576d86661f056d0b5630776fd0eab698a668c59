@@ -35,6 +35,24 @@
       "isAi": true,
       "revId": "0576d86661f056d0b5630776fd0eab698a668c59",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a6490e2_257c9e7b",
+        "filename": "common/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-12T22:16:56Z",
+      "side": 1,
+      "message": "A quick scan of HOOK_SYSJUMP registrations, indicates that this is likely safe.  But a detailed audit is warranted.\n\nFor instance, if interrupts are disabled, the mutex lock done by [this hook](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/HEAD:src/platform/ec/power/common.c;l\u003d1172) is no longer needed.",
+      "parentUuid": "ed12d487_f0138e22",
+      "revId": "0576d86661f056d0b5630776fd0eab698a668c59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
