@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6da53155_5cc5ff67",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T23:37:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n### Review Summary\n* **Functionality**: The change correctly addresses a race condition by disabling interrupts before `HOOK_SYSJUMP` handlers run. The relocation of the test state variable to `system_fake.c` properly resolves the previous linkage and production-code inclusion concerns.\n* **Security**: No vulnerabilities introduced. This improves system robustness and security by preventing preemption while system protection mechanisms are inactive.\n* **Style**: Code style is clean and well-documented.\n* **Testing**: Manual testing was performed. A mock-based unit test is now included to enforce the calling order programmatically.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and perfectly scoped to this single fix.\n\nTAG\u003dagy\nCONV\u003d3c250644-aad1-4575-9562-7a4ea1781625",
+      "isAi": true,
+      "revId": "a9c0bb91c153f7a974c2d66ceeda6dd1af2626d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
