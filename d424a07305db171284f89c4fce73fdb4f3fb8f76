@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b270114f_0affff9f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T19:33:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1d8a4261_c169a8f3",
+      "revId": "d424a07305db171284f89c4fce73fdb4f3fb8f76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c1fe0e33_6c8fa1ee",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02cf550b_74d13407",
+        "filename": "core/cortex-m/ec.lds.S",
+        "patchSetId": 2
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T19:33:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1fe0e33_6c8fa1ee",
+      "revId": "d424a07305db171284f89c4fce73fdb4f3fb8f76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e281c4cb_6f281992",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] ❌ **Consistency / Architecture:** While using `.weak` symbols fixes the build error for other boards, hardcoding a chip-specific memory region (`ahb4`) into the generic `core/cortex-m/init.S` is still an anti-pattern. \n\nThe generic core initialization should not need to know about specific SRAM banks of individual microcontrollers (like STM32H7\u0027s AHB4). If every chip added its own custom memory regions here, this file would become very messy.\n\n**Remediation:**\nInstead of modifying `init.S`, you should zero out this region in C code during the chip\u0027s early initialization hook. For example, in `chip/stm32/system.c` (or the specific variant\u0027s `system.c`), you can do this inside `system_pre_init()` or `board_pre_init()`:\n\n```c\nextern uint32_t __ahb4_start[];\nextern uint32_t __ahb4_end[];\n\n/* In system_pre_init or similar early init function: */\nmemset(__ahb4_start, 0, (uintptr_t)__ahb4_end - (uintptr_t)__ahb4_start);\n```\nSince it\u0027s a NOLOAD region, clearing it in C before it\u0027s actively used by tasks is perfectly safe and keeps the architecture layers clean.",
       "isAi": true,
+      "revId": "d424a07305db171284f89c4fce73fdb4f3fb8f76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cd30aac_648237a1",
+        "filename": "core/cortex-m/init.S",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T19:33:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e281c4cb_6f281992",
       "revId": "d424a07305db171284f89c4fce73fdb4f3fb8f76",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
