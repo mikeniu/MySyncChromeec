@@ -321,6 +321,18 @@ tests:
     - CONFIG_LINK_TEST_SUITE_BATTERY_CONFIG=y
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
+  drivers.button.input_gpio_keys:
+    timeout: 360
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_BUTTON=y
+    - CONFIG_PLATFORM_EC_CMD_BUTTON=y
+    - CONFIG_PLATFORM_EC_VOLUME_BUTTONS=y
+    - CONFIG_PLATFORM_EC_EMULATED_SYSRQ=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_POWER_BUTTON_PRESS=y
+    - CONFIG_INPUT=y
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./boards/buttons.dtsi
   drivers.cbi_flash:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CBI_FLASH=y

@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+add_subdirectory(buttons)
 add_subdirectory(board_id)
 add_subdirectory(cec_counter)
 add_subdirectory(cros_displight)
