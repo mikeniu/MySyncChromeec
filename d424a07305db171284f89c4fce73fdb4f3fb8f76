@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d8a4261_c169a8f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T18:35:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/0697a294-1a8c-426e-bb14-833b192fcb43)]\n\n**Review Summary:**\n*   **Functionality:** ❌ The new region boundary symbols (`__##name##_end`) lack 4-byte alignment in the linker script. The 32-bit clearing loop in `init.S` requires word alignment, meaning unaligned regions will cause the loop to overshoot and corrupt memory, or trigger a hardware alignment fault.\n*   **Security:** ✅ No security vulnerabilities introduced.\n*   **Style:** ✅ Assembly code formatting is correct.\n*   **Consistency:** ❌ While the weak symbols prevent build failures on other chips, hardcoding the chip-specific `ahb4` memory region in the generic `core/cortex-m/init.S` violates architectural boundaries. This logic should be moved to chip-specific C code (e.g., in `system_pre_init()`).\n*   **Testing:** ❌ Testing did not account for unaligned memory region boundaries.\n*   **CL Size \u0026 Scope:** ✅ The CL is small and focused on a single issue.\n\nTAG\u003dagy\nCONV\u003dfeb89cbc-d6ea-41ef-aef6-dc366a973772",
+      "isAi": true,
+      "revId": "d424a07305db171284f89c4fce73fdb4f3fb8f76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1fe0e33_6c8fa1ee",
+        "filename": "core/cortex-m/ec.lds.S",
+        "patchSetId": 2
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T18:35:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Bug / Alignment:** `__##name##_end` and `__##name##_start` are not guaranteed to be 4-byte aligned here. \n\nBecause the zero-fill loop in `init.S` uses a 32-bit store instruction (`strlt r0, [r1], #4`), it expects the start and end addresses to be 4-byte aligned. If the objects placed in this region have a total size that is not a multiple of 4, `__##name##_end` will be unaligned. The loop will then write past the end of the defined objects, potentially corrupting adjacent memory, and unaligned start addresses could trigger hardware alignment faults.\n\n**Remediation:**\nAdd `. \u003d ALIGN(4);` before the start and end symbols to ensure word alignment:\n```assembly\n\t.name(NOLOAD) : { \\\n\t\t. \u003d ALIGN(4); \\\n\t\t__##name##_start \u003d .; \\\n\t\tKEEP(*(SORT(.name.keep.*))) \\\n\t\t*(SORT(.name.*)) \\\n\t\t. \u003d ALIGN(4); \\\n\t\t__##name##_end \u003d .; \\\n\t} \u003e name\n```\n(Apply the same fix to `REGION_LOAD` below).",
+      "isAi": true,
+      "revId": "d424a07305db171284f89c4fce73fdb4f3fb8f76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e281c4cb_6f281992",
+        "filename": "core/cortex-m/init.S",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T18:35:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Consistency / Architecture:** While using `.weak` symbols fixes the build error for other boards, hardcoding a chip-specific memory region (`ahb4`) into the generic `core/cortex-m/init.S` is still an anti-pattern. \n\nThe generic core initialization should not need to know about specific SRAM banks of individual microcontrollers (like STM32H7\u0027s AHB4). If every chip added its own custom memory regions here, this file would become very messy.\n\n**Remediation:**\nInstead of modifying `init.S`, you should zero out this region in C code during the chip\u0027s early initialization hook. For example, in `chip/stm32/system.c` (or the specific variant\u0027s `system.c`), you can do this inside `system_pre_init()` or `board_pre_init()`:\n\n```c\nextern uint32_t __ahb4_start[];\nextern uint32_t __ahb4_end[];\n\n/* In system_pre_init or similar early init function: */\nmemset(__ahb4_start, 0, (uintptr_t)__ahb4_end - (uintptr_t)__ahb4_start);\n```\nSince it\u0027s a NOLOAD region, clearing it in C before it\u0027s actively used by tasks is perfectly safe and keeps the architecture layers clean.",
+      "isAi": true,
+      "revId": "d424a07305db171284f89c4fce73fdb4f3fb8f76",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
