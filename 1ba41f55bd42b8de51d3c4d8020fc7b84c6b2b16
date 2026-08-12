@@ -22,6 +22,30 @@
       },
       "revId": "1ba41f55bd42b8de51d3c4d8020fc7b84c6b2b16",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c4df9be_9978234c",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-12T18:43:52Z",
+      "side": 1,
+      "message": "Just fixed build error with ptlrvp.\n\nRegarding splitting this CL, I can give it try, I will have one to focus on the `zephyr/drivers/buttons/power_button.c` relocation and another focused on removing repeated definitions from `zephyr/include/dt-bindings/buttons.h`.",
+      "parentUuid": "81237105_a508991c",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 8
+      },
+      "revId": "1ba41f55bd42b8de51d3c4d8020fc7b84c6b2b16",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
