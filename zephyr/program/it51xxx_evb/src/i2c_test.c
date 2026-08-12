@@ -62,13 +62,13 @@ static void tick_task(void)
 static int test_i2c_host(void)
 {
 
-	const struct device *i2c_target_dev = DEVICE_DT_GET(I2C_DEV_TARGET_NODE);
-	uint32_t ret;
+	//const struct device *i2c_target_dev = DEVICE_DT_GET(I2C_DEV_TARGET_NODE);
+	//uint32_t ret;
 
-	ret = i2c_target_driver_register(i2c_target_dev);
-	if (ret) {
-		printf("I2C target register failed\n");
-	}
+	//ret = i2c_target_driver_register(i2c_target_dev);
+	//if (ret) {
+	//	printf("I2C target register failed\n");
+	//}
 #if 0
 	if (!device_is_ready(i2c_dev)) {
 		printf("I2C device is not ready\n");
