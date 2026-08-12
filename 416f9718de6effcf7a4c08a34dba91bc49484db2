@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "911e4dd1_4e401c76",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T16:54:33Z",
+      "side": 1,
+      "message": "based on the commit message, `show` should be on the next line.",
+      "range": {
+        "startLine": 16,
+        "startChar": 69,
+        "endLine": 17,
+        "endChar": 20
+      },
+      "revId": "416f9718de6effcf7a4c08a34dba91bc49484db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "69dd9efd_cb0fdc50",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
