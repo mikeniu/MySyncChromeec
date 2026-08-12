@@ -12,17 +12,4 @@
 	aliases {
 		gpio-wp = &ec_wp_od;
 	};
-
-	named-gpios {
-		compatible = "named-gpios";
-
-		ec_wp_od: ec_wp_odl {
-			/* Physical High = Software True (Protected) */
-			gpios = <&gpiob 5 GPIO_ACTIVE_HIGH>;
-		};
-		/* unimplemented GPIOs */
-		entering-rw {
-			enum-name = "GPIO_ENTERING_RW";
-		};
-	};
 };
