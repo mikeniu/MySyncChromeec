@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1a4d40d_7eb3f188",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T17:15:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/913b53de-50ca-416b-b06c-a5f5118b2c46)]\n\n### Review Summary\n\n*   **Functionality \u0026 Consistency:** The change successfully ensures that `EC_FLASH_PROTECT_ALL_AT_BOOT` encompasses the entire SPI NOR flash capacity, fixing the issue where space beyond the RW region was unprotected. I left one inline comment regarding the read logic in `cros_flash_andes_xip_get_protect_flags()` to ensure the behavior there aligns with your intentions (especially regarding backward compatibility).\n*   **Security:** This patch improves security by completely locking the flash when requested, reducing the attack surface on the unused upper segments of the chip.\n*   **Style:** The code change is clean and straightforward.\n*   **Testing \u0026 Test Coverage:** The manual tests described (SWWP enable/disable, enrolling fingerprints) validate the hardware integration properly. If there are any emulator or unit tests covering this flash driver\u0027s bounds, consider updating them to assert `CONFIG_FLASH_SIZE_BYTES` instead of the RW region boundary.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped, small, and self-contained.",
+      "isAi": true,
+      "revId": "1d51b4eb22d03c6d5f2e1c6594a57d65d4f651e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "befae2ed_2186cd37",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_andestech_xip.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T17:15:50Z",
+      "side": 1,
+      "message": "Since `EC_FLASH_PROTECT_ALL_AT_BOOT` now extends the protection range to `CONFIG_FLASH_SIZE_BYTES`, should `cros_flash_andes_xip_get_protect_flags()` also be updated to check `prot_end \u003e\u003d CONFIG_FLASH_SIZE_BYTES` (around line 283)?\n\nCurrently, `cros_flash_andes_xip_get_protect_flags()` considers `EC_FLASH_PROTECT_ALL_AT_BOOT` to be asserted as long as `prot_end \u003e\u003d (CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE)`. If keeping the current behavior is intentional for backward compatibility with devices running older firmware, please consider adding a brief comment there to clarify.",
+      "isAi": true,
+      "revId": "1d51b4eb22d03c6d5f2e1c6594a57d65d4f651e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
