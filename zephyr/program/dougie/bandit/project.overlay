@@ -6,8 +6,8 @@
 #include "binman.dtsi"
 
 /* Dougie program common DTS includes */
-#include "../dougie.dtsi"
 #include "../generated.dtsi"
+#include "../dougie.dtsi"
 
 /* Bandit project DTS includes*/
 
