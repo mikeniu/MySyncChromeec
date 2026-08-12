@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b8f85c2_e841abe5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T23:32:28Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "493abc55_250f848c",
+      "revId": "31b3ddaa0466a06e31981c6ba7a9fa4fe81a9678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "765d599d_905fcaf9",
@@ -51,6 +69,24 @@
       "side": 1,
       "message": "Please don\u0027t add test-only code into files compiled into production images.  Test helpers and mocks should live in the zephyr/test directory.",
       "parentUuid": "765d599d_905fcaf9",
+      "revId": "31b3ddaa0466a06e31981c6ba7a9fa4fe81a9678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4292cf36_e0ef1332",
+        "filename": "zephyr/test/jump_tags/src/jump_tags.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T23:32:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42b6901f_25aac9c0",
       "revId": "31b3ddaa0466a06e31981c6ba7a9fa4fe81a9678",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
