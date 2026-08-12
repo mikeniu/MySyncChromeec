@@ -16,6 +16,24 @@
       "message": "Where there any changes on the upstream side?",
       "revId": "416f9718de6effcf7a4c08a34dba91bc49484db2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f24bc45_53d02937",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1177449
+      },
+      "writtenOn": "2026-08-12T01:41:03Z",
+      "side": 1,
+      "message": "This is the commit mesage on upstream side.\n\n```\nfix(hwinfo): use POR as default reset cause\n\nRemove brownout and reset-pin causes from the supported mask because\nEM32 cannot report either source reliably.\n\nReturn POR when software, watchdog, and low-power wake indicators are\nall clear. Document that this result is inferred by exclusion.\n```",
+      "parentUuid": "69dd9efd_cb0fdc50",
+      "revId": "416f9718de6effcf7a4c08a34dba91bc49484db2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
