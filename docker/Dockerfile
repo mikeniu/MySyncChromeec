@@ -125,6 +125,12 @@ RUN g++ -O2 -Wall -o /usr/bin/rtkupdate \
     /opt/repos/src/platform/ec/util/uart_utils.cc \
     -I/opt/repos/src/platform/ec/util
 
+# Build and install itecomdbgr host utility
+RUN g++ -O2 -Wall -o /usr/bin/itecomdbgr \
+    /opt/repos/src/platform/ec/util/itecomdbgr.cc \
+    /opt/repos/src/platform/ec/util/uart_utils.cc \
+    -I/opt/repos/src/platform/ec/util
+
 # Build and install uartupdatetool host utility
 RUN g++ -O2 -Wall -o /usr/bin/uartupdatetool \
     /opt/repos/src/platform/ec/util/uut/main.cc \
