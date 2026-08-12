@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b29062ff_f25fff42",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T21:45:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/7f3ed8a8-69e2-4352-8ed1-d147ae731187)]\n\n### Review Summary\n* **Functionality**: The change correctly addresses a race condition by disabling interrupts before `HOOK_SYSJUMP` handlers run, ensuring teardown operations (like disabling the MPU) execute atomically in a non-preemptible context. There is a slight risk if any existing handlers rely on interrupts, which should be audited.\n* **Security**: No vulnerabilities introduced. This change improves system robustness and security by preventing preemption while system protection mechanisms are inactive.\n* **Style**: Code style is correct. The added comment clearly documents the new constraint on `HOOK_SYSJUMP` handlers.\n* **Testing**: Manual testing was performed. An inline comment suggests adding a mock-based unit test to enforce the calling order of `interrupt_disable_all()` and `hook_notify(HOOK_SYSJUMP)` programmatically.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and perfectly scoped to this single fix.\n\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "0576d86661f056d0b5630776fd0eab698a668c59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed12d487_f0138e22",
+        "filename": "common/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T21:45:36Z",
+      "side": 1,
+      "message": "With this change, any existing `HOOK_SYSJUMP` handler that performs I/O waiting for an interrupt (e.g., an I2C transaction that sleeps, or a timer timeout) will now deadlock or fail since interrupts are disabled.\n\nIt is highly recommended to audit existing `HOOK_SYSJUMP` usages across the codebase to ensure none of them rely on interrupts being enabled.\n\nAdditionally, to prevent future regressions, consider adding a unit test that verifies `interrupt_disable_all()` is invoked *before* `hook_notify(HOOK_SYSJUMP)` during a system jump. You could achieve this by tracking the execution order in a test environment:\n\n```c\nstatic int interrupt_disable_called;\n\n/* Mock or wrap interrupt_disable_all */\nvoid interrupt_disable_all(void)\n{\n    interrupt_disable_called \u003d 1;\n    // original implementation or mock...\n}\n\n/* Mock or intercept hook_notify */\nvoid hook_notify(enum hook_type type)\n{\n    if (type \u003d\u003d HOOK_SYSJUMP) {\n        zassert_true(interrupt_disable_called,\n                     \"Interrupts must be disabled before sysjump hooks\");\n    }\n    // ...\n}\n```",
+      "isAi": true,
+      "revId": "0576d86661f056d0b5630776fd0eab698a668c59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
