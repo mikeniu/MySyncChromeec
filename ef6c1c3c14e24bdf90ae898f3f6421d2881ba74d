@@ -16,6 +16,23 @@
       "message": "The Fizz base devices uses it for sure and some later Meet, but I wasn\u0027t working with it for a long time. Adding Marek who was enabling this on Ambassador devices.",
       "revId": "ef6c1c3c14e24bdf90ae898f3f6421d2881ba74d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "751c42d8_d86b211a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1442602
+      },
+      "writtenOn": "2026-08-12T12:36:33Z",
+      "side": 1,
+      "message": "also technically any new board could leverage this mechanism, as it is also supported by the upstream kernel driver.",
+      "revId": "ef6c1c3c14e24bdf90ae898f3f6421d2881ba74d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
