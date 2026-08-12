@@ -53,6 +53,24 @@
       "parentUuid": "ed12d487_f0138e22",
       "revId": "0576d86661f056d0b5630776fd0eab698a668c59",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89406734_4f355083",
+        "filename": "common/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T22:25:46Z",
+      "side": 1,
+      "message": "I added a unit test. Many of them are complient.\n```\npwm_fan_preserve_state complies\nespi_sysjump complies\nvstore_preserve_state complies\nlpc_disable_host_interface_interrupts complies\ntimer_sysjump complies\nap_sku_id_preserve_state complies\nit8xxx2_i2c_swap_default complies\nkeyboard_preserve_state complies\npower_button_pulse_setting_preserve_state complies\ninit_status_preserve complies\n...\n```\n\nSome might not be:\n\n```\npreserve_enable_5v_state\nflash_shared_enable_ec_access\n...\n```",
+      "parentUuid": "ed12d487_f0138e22",
+      "revId": "0576d86661f056d0b5630776fd0eab698a668c59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
