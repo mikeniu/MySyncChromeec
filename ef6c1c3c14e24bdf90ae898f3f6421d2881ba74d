@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60a8ea97_60683259",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1442602
+      },
+      "writtenOn": "2026-08-12T12:34:36Z",
+      "side": 1,
+      "message": "The Fizz base devices uses it for sure and some later Meet, but I wasn\u0027t working with it for a long time. Adding Marek who was enabling this on Ambassador devices.",
+      "revId": "ef6c1c3c14e24bdf90ae898f3f6421d2881ba74d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
