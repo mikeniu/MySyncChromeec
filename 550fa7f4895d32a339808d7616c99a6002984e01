@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e664e67_c7d19c49",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T16:54:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/7944fcbd-faef-4b47-9312-4d6573c427ae)]\n\n**Review Summary**\n* **Functionality**: The CL correctly adds asynchronous template decryption to the test mock task `fp_task_simulate` and migrates several test cases from `EC_CMD_FP_TEMPLATE` v0 to v1. However, one test was missed in the migration.\n* **Security**: No security vulnerabilities introduced. The crypto abstractions and authentication mechanisms are maintained correctly.\n* **Style**: Code style is consistent with the project guidelines.\n* **Testing \u0026 Test Coverage**: The CL updates existing auth tests, but `test_fp_command_commit_without_seed` remains on template v0 and needs to be updated.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and properly scoped to updating auth tests for template v1.",
+      "isAi": true,
+      "revId": "550fa7f4895d32a339808d7616c99a6002984e01",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e06bdc68_e33747d1",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 1044,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T16:54:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] It looks like this test was missed during the migration to template v1. `test_fp_command_commit_without_seed` still uses `ec_params_fp_template` (v0) and the `FP_TEMPLATE_COMMIT` flag.\n\nPlease update this test to use `FP_TEMPLATE_LOAD` (which should succeed) and `FP_TEMPLATE_DECRYPT` (which should fail and return `EC_RES_UNAVAILABLE` through `wait_for_template_decrypt_result()`), similar to the other migrated tests.",
+      "isAi": true,
+      "revId": "550fa7f4895d32a339808d7616c99a6002984e01",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
