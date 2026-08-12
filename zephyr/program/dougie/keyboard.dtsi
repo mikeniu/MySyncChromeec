@@ -1,0 +1,10 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* Drop default kso16/kso17 gpio properties from the kbd node to avoid confusing named_gpios script */
+&kbd {
+	/delete-property/ kso16-gpios;
+	/delete-property/ kso17-gpios;
+};
