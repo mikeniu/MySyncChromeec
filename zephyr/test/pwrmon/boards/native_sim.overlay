@@ -1,0 +1,51 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+
+/ {
+	stub_pwrmon_sensor: stub-sensor {
+		compatible = "cros,stub-pwrmon-sensor";
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		channel@1 {
+			reg = <0x01>;
+			friendly-name = "VDD_CORE";
+		};
+		channel@2 {
+			reg = <0x02>;
+			/* Omitted friendly-name to test string fallback */
+		};
+	};
+
+	test_gpio: test-gpio@300 {
+		compatible = "zephyr,gpio-emul";
+		reg = <0x300 0x4>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		ngpios = <1>;
+		status = "okay";
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_ap_ec_int_l: ap_ec_int_l {
+			gpios = <&gpio0 2 GPIO_OUTPUT_HIGH>;
+			enum-name = "GPIO_EC_INT_L";
+		};
+	};
+
+	pwrmon: pwrmon {
+		compatible = "cros,pwrmon";
+		status = "okay";
+		gpios = <&test_gpio 0 0>;
+		power-monitors = <&stub_pwrmon_sensor>;
+		sample-rate = <1000>;
+		zephyr,deferred-init;
+	};
+};
