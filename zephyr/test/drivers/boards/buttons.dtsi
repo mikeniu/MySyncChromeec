@@ -1,0 +1,41 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <dt-bindings/buttons.h>
+
+/ {
+	cros_buttons: buttons {
+		compatible = "gpio-keys";
+		zephyr,suspend-action = "none";
+
+		power_button: pwrbtn-ec-in-n {
+			gpios = <&gpio0 25 GPIO_ACTIVE_LOW>;
+			zephyr,code = <BUTTON_POWER>;
+		};
+
+		vol_up: vol-up-ec {
+			gpios = <&gpio1 4 GPIO_ACTIVE_LOW>;
+			zephyr,code = <BUTTON_VOLUME_UP>;
+		};
+
+		vol_down: vol-down-ec {
+			gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
+			zephyr,code = <BUTTON_VOLUME_DOWN>;
+		};
+	};
+};
+
+/* Remove legacy GPIO definitions since they're now part of cros_buttons */
+&gpio_ec_pwr_btn_odl {
+	/delete-property/ enum-name;
+};
+
+&gpio_ec_volup_btn_odl {
+	/delete-property/ enum-name;
+};
+
+&gpio_ec_voldn_btn_odl {
+	/delete-property/ enum-name;
+};
