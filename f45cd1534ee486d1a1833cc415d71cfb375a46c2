@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e700cb46_c75efc4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T16:44:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/05a542e6-c3d3-45c9-892b-754cc24308a1)]\n\n**Review Summary**\n* **Functionality:** The domain separation for key derivation between classic and fingerguard flows is implemented correctly. Dynamic generation of encrypted templates in tests ensures that test expectations accurately track the key derivation state.\n* **Security:** Positive security improvement. Prefixing the info parameter properly segregates the HKDF domains, preventing a template enrolled under one flow from being successfully decrypted or matched under another, mitigating cross-protocol attacks. Uninitialized stack buffer bytes are appropriately bounded by spans and are not leaked.\n* **Style:** Code adheres to C++ standards and project style. `std::string_view` and `std::span` are effectively utilized for memory safety.\n* **Testing \u0026 Test Coverage:** Strong. Existing tests were updated effectively to generate test data dynamically rather than hardcoding ciphertexts. Dedicated negative tests were added to explicitly verify that cross-flow decryption fails as intended.\n* **CL Size \u0026 Scope:** The CL is well-scoped, appropriately sized, and focuses solely on adding the requested domain separation.\n\nTAG\u003dagy\nCONV\u003d0feca915-1161-42dd-801e-c3f27e011522",
+      "isAi": true,
+      "revId": "f45cd1534ee486d1a1833cc415d71cfb375a46c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8fe27c4_b1aa399e",
+        "filename": "common/fpsensor/fpsensor_crypto.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T16:44:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Optional suggestion: Consider zero-initializing the `domain_info` array (`uint8_t domain_info[kMaxDomainInfoLen] \u003d {0};`) to avoid leaving uninitialized bytes on the stack. Even though the trailing uninitialized bytes are safely excluded by the `span` bounds, zero-initialization adds defense-in-depth against accidental out-of-bounds reads if the span calculation is ever modified in the future.",
+      "isAi": true,
+      "revId": "f45cd1534ee486d1a1833cc415d71cfb375a46c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab173a98_a103ccef",
+        "filename": "common/fpsensor/fpsensor_crypto.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T16:44:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Optional nit: Since `info` is a `std::span` and its size is already explicitly verified to be `SHA256_DIGEST_LENGTH` on line 232, consider using `info.size()` here instead of the constant. It makes the length calculation slightly more intuitive by directly mapping to the data source.",
+      "isAi": true,
+      "revId": "f45cd1534ee486d1a1833cc415d71cfb375a46c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
