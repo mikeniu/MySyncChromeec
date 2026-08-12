@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0979a09f_51e38804",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T21:30:17Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "651c3fe5_d99def7c",
+      "revId": "88c3e131c9ad412a6249aa23db7b1278282848cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc477233_50a20d12",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "This change correctly prevents the `nonce` and `encryption_salt` from being prematurely persisted in the global `fp_enc_buffer` if `derive_encryption_key` fails later on (since `fp_enc_buffer` is zero-initialized at the start of this function).\n\nTo ensure this behavior doesn\u0027t regress, please consider adding a unit test to cover this failure path. For example, a test could mock `derive_encryption_key` to return an error (e.g., `EC_ERROR_UNAVAILABLE`), call `encrypt_template()`, and assert that the `nonce` and `encryption_salt` fields in `fp_enc_buffer.metadata` remain zero-initialized.",
       "isAi": true,
+      "revId": "88c3e131c9ad412a6249aa23db7b1278282848cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "812f82d2_fd8b2253",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T21:30:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc477233_50a20d12",
       "revId": "88c3e131c9ad412a6249aa23db7b1278282848cc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
