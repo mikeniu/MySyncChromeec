@@ -697,7 +697,7 @@ config PLATFORM_EC_PORT80
 
 config PLATFORM_EC_POWER_BUTTON
 	bool "Power-button support"
-	depends on PLATFORM_EC_HOSTCMD && !INPUT_GPIO_KEYS
+	depends on PLATFORM_EC_HOSTCMD
 	help
 	  Enable shimming the power button implementation and related
 	  commands in platform/ec.  This is used to implement the Chromium OS
