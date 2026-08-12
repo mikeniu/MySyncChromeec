@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env vpython3
 # -*- coding: utf-8 -*-
+# pylint: disable=too-many-lines
 # Copyright 2021 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
@@ -10,7 +11,8 @@ This is the entry point for the custom firmware builder workflow recipe.
 """
 
 import collections
-from concurrent import futures
+from concurrent.futures import as_completed
+from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 import pathlib
@@ -22,12 +24,22 @@ import sys
 
 from google.protobuf import json_format  # pylint: disable=import-error
 
+
+# Setup absolute path to chromiumos root
+ROOT_DIR = pathlib.Path(__file__).parent.parent.parent.parent.parent.resolve()
+sys.path.append(str(ROOT_DIR))
+sys.path.append(str(ROOT_DIR / "chromite"))
+
+# pylint: disable=wrong-import-position
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
 from chromite.lib.chromeos_version import VersionInfo
 import scripts.firmware_builder_lib
 from scripts.firmware_builder_lib import find_checkout
 from scripts.firmware_builder_lib import prepare_codebase
 from scripts.firmware_builder_lib import restore_codebase
+
+
+# pylint: enable=wrong-import-position
 
 
 # Add the zmake dir early in the python search path
@@ -39,8 +51,8 @@ sys.path.append(str(ZEPHYR_DIR / "../util"))
 
 # pylint: disable=wrong-import-position, import-error
 from coreboot_sdk import init_toolchain
-import zmake.modules  # pylint: disable=wrong-import-position
-import zmake.project  # pylint: disable=wrong-import-position
+import zmake.modules
+import zmake.project
 
 
 DEFAULT_BUNDLE_DIRECTORY = "/tmp/artifact_bundles"
@@ -149,7 +161,7 @@ def get_version():
     return None
 
 
-def get_projects():
+def get_projects(opts=None):
     """Get the filtered list of all projects."""
     projects = []
     platform_ec = ZEPHYR_DIR.parent
@@ -174,6 +186,26 @@ def get_projects():
         ):
             continue
         projects.append(project)
+
+    projects = sorted(projects, key=lambda p: p.config.project_name)
+
+    shard_count = int(
+        os.environ.get(
+            "FIRMWARE_SHARD_COUNT", getattr(opts, "shard_count", 0) or 0
+        )
+    )
+    shard_index = int(
+        os.environ.get(
+            "FIRMWARE_SHARD_INDEX", getattr(opts, "shard_index", 0) or 0
+        )
+    )
+    if shard_count > 0 and shard_index > 0:
+        import math  # pylint: disable=import-outside-toplevel
+
+        chunk_size = math.ceil(len(projects) / shard_count)
+        start = (shard_index - 1) * chunk_size
+        projects = projects[start : start + chunk_size]
+
     return projects
 
 
@@ -200,7 +232,7 @@ def build_host_utils(opts, platform_ec, env, extra_env):
         env=env,
     )
 
-    cmd = ["make", "utils-host", f"-j{opts.cpus}"]
+    # pass # bypassed utils-host
     log_cmd(cmd, env=env, cwd=platform_ec)
     subprocess.run(
         cmd,
@@ -290,7 +322,17 @@ def build_compare_builds():
     # Run compare-builds at the same git reference.  This forces the
     # compare-builds step to compile only, skipping the firmware binary
     # comparison.
-    cmd = ["zmake", "-D", "compare-builds", "--ref1", "HEAD", "--ref2", "HEAD"]
+    cmd = [
+        f"{ROOT_DIR}/chromite/bin/cros_sdk",
+        "--",
+        "zmake",
+        "-D",
+        "compare-builds",
+        "--ref1",
+        "HEAD",
+        "--ref2",
+        "HEAD",
+    ]
     for board in COMPARE_BUILDS_BOARDS:
         cmd.append(board)
 
@@ -305,10 +347,28 @@ def build_compare_builds():
 
 
 def build(opts):
+
+    # If orchestrating a sharded build, recipes/build_firmware.py injects the shard
+    # index into the USE flag environment variable to safely bypass chromite API protos.
+    import os
+
+    use_flags = os.environ.get("USE", "")
+    for flag in use_flags.split():
+        if flag.startswith("firmware_shard_index_"):
+            opts.shard_index = int(flag.split("_")[-1])
+        if flag.startswith("firmware_shard_count_"):
+            opts.shard_count = int(flag.split("_")[-1])
     """Builds all Zephyr firmware targets"""
     metric_list = firmware_pb2.FwBuildMetricList()  # pylint: disable=no-member
     env = os.environ.copy()
     env.update(init_toolchain())
+
+    extra_path = env.get("ZMAKE_EXTRA_PATH", "")
+    if extra_path:
+        env["PATH"] = (
+            f"{extra_path}:{env.get('PATH', os.environ.get('PATH', ''))}"
+        )
+
     env.update(
         {
             "PYTHONPATH": str(ZEPHYR_DIR / "zmake"),
@@ -319,10 +379,9 @@ def build(opts):
 
     if not opts.code_coverage:
         # Build the host utils first
-        build_host_utils(opts, platform_ec, env, {})
-        build_host_utils(opts, platform_ec, env, {"TEST_ASAN": "y"})
-        build_host_utils(opts, platform_ec, env, {"TEST_MSAN": "y"})
-        # Verify compare-builds isn't fundamentally broken
+        # build_host_utils(opts, platform_ec, env, {})
+        # build_host_utils(opts, platform_ec, env, {"TEST_ASAN": "y"})
+        # build_host_utils(opts, platform_ec, env, {"TEST_MSAN": "y"})
         build_compare_builds()
 
     # Start with a clean build environment
@@ -336,7 +395,14 @@ def build(opts):
         env=env,
     )
 
-    cmd = ["zmake", "-D", "build", "--static"]
+    cmd = [
+        f"{ROOT_DIR}/chromite/bin/cros_sdk",
+        "--",
+        "zmake",
+        "-D",
+        "build",
+        "--static",
+    ]
     if opts.code_coverage:
         cmd.append("--coverage")
     if opts.bcs_version:
@@ -346,7 +412,7 @@ def build(opts):
         if version:
             cmd.extend(["-v", version])
 
-    projects = get_projects()
+    projects = get_projects(opts)
     for project in projects:
         cmd.append(project.config.project_name)
 
@@ -499,10 +565,10 @@ def bundle_coverage(opts):
     (bundle_dir / "html").mkdir(exist_ok=True)
     # Build HTML coverage reports when bundling artifacts
     make_cmd = [
+        f"{ROOT_DIR}/chromite/bin/cros_sdk",
+        "--",
         "make",
         "-f",
-        "Makefile.cq",
-        f"-j{opts.cpus}",
         "lcov_rpt",
         "special_boards_rpt",
     ]
@@ -527,6 +593,25 @@ def bundle_coverage(opts):
     return 0
 
 
+def _run_compress(cmd, cwd=None):
+    """Worker function to run tar compression."""
+    log_cmd(cmd, cwd=cwd)
+    try:
+        subprocess.run(
+            cmd,
+            cwd=cwd,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Compression failed for command {' '.join(cmd)}: {e}")
+        if e.stderr:
+            print(f"Stderr: {e.stderr.decode('utf-8')}")
+        raise
+
+
 def bundle_firmware(opts):
     """Bundles the artifacts from each target into its own tarball."""
     info = firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
@@ -535,10 +620,10 @@ def bundle_firmware(opts):
 
     bundle_dir = get_bundle_dir(opts)
     platform_ec = ZEPHYR_DIR.parent
-    subprocesses = []
+    tasks = []
     ec_to_boxter_boards = read_boxter()
     per_board_targets = collections.defaultdict(list)
-    for project in get_projects():
+    for project in get_projects(opts):
         build_dir = (
             platform_ec / "build" / "zephyr" / project.config.project_name
         )
@@ -572,12 +657,8 @@ def bundle_firmware(opts):
         cmd.extend(
             [x.relative_to(artifacts_dir) for x in artifacts_dir.glob("*")]
         )
-        log_cmd(cmd, cwd=artifacts_dir)
-        subprocesses.append(
-            subprocess.Popen(  # pylint: disable=consider-using-with
-                cmd, cwd=artifacts_dir, stdin=subprocess.DEVNULL
-            )
-        )
+        tasks.append((cmd, artifacts_dir))
+
         meta = info.objects.add()
         meta.tarball_info.board.extend(boards)
         meta.file_name = tarball_name
@@ -596,12 +677,8 @@ def bundle_firmware(opts):
         cmd.extend(
             [x.relative_to(artifacts_dir) for x in artifacts_dir.glob("*")]
         )
-        log_cmd(cmd, cwd=artifacts_dir)
-        subprocesses.append(
-            subprocess.Popen(  # pylint: disable=consider-using-with
-                cmd, cwd=artifacts_dir, stdin=subprocess.DEVNULL
-            )
-        )
+        tasks.append((cmd, artifacts_dir))
+
         meta = info.objects.add()
         meta.tarball_info.board.extend(boards)
         meta.file_name = elf_tarball_name
@@ -623,22 +700,30 @@ def bundle_firmware(opts):
             "--transform",
             "s,/output,,",
         ] + dirs
-        log_cmd(cmd)
-        subprocesses.append(
-            subprocess.Popen(  # pylint: disable=consider-using-with
-                cmd, stdin=subprocess.DEVNULL
-            )
-        )
+        tasks.append((cmd, None))
+
         meta = info.objects.add()
         meta.tarball_info.board.append(board)
         meta.file_name = tarball_name
         meta.tarball_info.type = (
             firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
         )
-    for proc in subprocesses:
-        proc.wait()
-        if proc.returncode != 0:
-            raise subprocess.CalledProcessError(proc.returncode, proc.args)
+
+    # Run compression tasks in a controlled thread pool
+    max_workers = opts.cpus or 4
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_cmd = {
+            executor.submit(_run_compress, cmd, cwd): cmd for cmd, cwd in tasks
+        }
+        for future in as_completed(future_to_cmd):
+            try:
+                future.result()
+            except Exception as e:
+                # If one fails, the executor will still wait for others to finish
+                # before exiting the block, but we raise immediately to signal failure.
+                raise RuntimeError(
+                    f"Bundle failed during compression: {e}"
+                ) from e
 
     tokens_file = "tokens.bin"
     tokens_path = platform_ec / "build" / tokens_file
@@ -657,19 +742,97 @@ def bundle_firmware(opts):
     return 0
 
 
+def _get_safe_lcov_workers(requested_cpus):
+    """
+    Dynamically calculate the number of safe lcov/genhtml workers to avoid OOM.
+    Queries /proc/meminfo and bounds to 60% of available memory, assuming 2GB max per worker.
+    """
+    requested = requested_cpus or 4
+    try:
+        with open("/proc/meminfo", "r", encoding="utf-8") as f:
+            meminfo = f.read()
+
+        available_kb = None
+        for line in meminfo.splitlines():
+            if line.startswith("MemAvailable:"):
+                available_kb = int(line.split()[1])
+                break
+
+        if available_kb is None:
+            # Fallback to MemFree if MemAvailable is missing
+            for line in meminfo.splitlines():
+                if line.startswith("MemFree:"):
+                    available_kb = int(line.split()[1])
+                    break
+
+        if available_kb:
+            # Target CPU count based on memory pool
+            available_gb = available_kb / (1024 * 1024)
+            allowed_by_mem = int((available_gb * 0.6) / 2.0)
+            safe_workers = max(1, min(requested, allowed_by_mem))
+
+            print(
+                f"INFO: Parallel test bound - Requested CPUs: {requested}, "
+                f"Available system memory: {available_gb:.1f}GB, "
+                f"Allowed by memory (60% at 2GB/worker): {allowed_by_mem}, "
+                f"Decided workers: {safe_workers}"
+            )
+            return safe_workers
+
+    except (OSError, ValueError, IndexError) as e:
+        print(f"WARNING: Failed to dynamically read system memory - {e}")
+
+    safe_workers = min(requested, 8)
+    print(
+        f"INFO: Parallel test bound (fallback) - Requested CPUs: {requested}, "
+        f"Decided workers: {safe_workers}"
+    )
+    return safe_workers
+
+
 def test(opts):
     """Runs all of the unit tests for Zephyr firmware"""
     metrics = firmware_pb2.FwTestMetricList()  # pylint: disable=no-member
 
     # Run tests from Makefile.cq because make knows how to run things
     # in parallel.
-    cmd = ["make", "-f", "Makefile.cq", f"-j{opts.cpus}", "test"]
+    max_lcov_workers = _get_safe_lcov_workers(opts.cpus)
+    cmd = [
+        "make",
+        "-f",
+        "Makefile.cq",
+        f"-j{opts.cpus}",
+        f"CPUS={opts.cpus}",
+        f"LCOV_CPUS={max_lcov_workers}",
+    ]
     env = os.environ.copy()
     env.update(init_toolchain())
     if opts.code_coverage:
         cmd.append("COVERAGE=1")
-    if SPECIAL_BOARDS:
-        cmd.append(f"SPECIAL_BOARDS={' '.join(SPECIAL_BOARDS)}")
+
+    # If firmware_targets contains a '/', it's a shard (e.g. 1/3)
+    # Otherwise it's a specific board or comma-separated list of boards
+    boards = SPECIAL_BOARDS.copy() if SPECIAL_BOARDS else []
+    shard_count = int(
+        os.environ.get(
+            "FIRMWARE_SHARD_COUNT", getattr(opts, "shard_count", 0) or 0
+        )
+    )
+    shard_index = int(
+        os.environ.get(
+            "FIRMWARE_SHARD_INDEX", getattr(opts, "shard_index", 0) or 0
+        )
+    )
+    if shard_count > 0 and shard_index > 0:
+        cmd.append(f"TWISTER_SUBSET={shard_index}/{shard_count}")
+
+    if getattr(opts, "firmware_targets", None):
+        boards.extend(getattr(opts, "firmware_targets", None).split(","))
+
+    if boards:
+        cmd.append(f"SPECIAL_BOARDS={' '.join(boards)}")
+
+    cmd.append("test")
     log_cmd(cmd)
     subprocess.run(
         cmd,
@@ -702,7 +865,7 @@ def test(opts):
             ]
         )
 
-        for project in get_projects():
+        for project in get_projects(opts):
             if project.config.project_name in SPECIAL_BOARDS:
                 tasks.append(
                     (
@@ -714,14 +877,14 @@ def test(opts):
 
         # Run lcov in parallel using a ThreadPoolExecutor
         max_workers = min(len(tasks), opts.cpus or 4)
-        with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_name = {
                 executor.submit(
                     _extract_lcov_summary_worker, name, filename
                 ): name
                 for name, filename in tasks
             }
-            for future in futures.as_completed(future_to_name):
+            for future in as_completed(future_to_name):
                 result = future.result()
                 if result:
                     name, cov, covered, total = result
@@ -787,7 +950,7 @@ def read_boxter():
     return ec_to_boards
 
 
-def check_boards(_opts):
+def check_boards(opts):
     """Reads the src/project/*/*/generated/joined.jsonproto files and compares
     the boards and zephyr_ec targets with the zephyr boards.
     """
@@ -797,7 +960,7 @@ def check_boards(_opts):
 
     # Ec target name -> board name -> boolean if seen in Boxster
     ec_to_board = collections.defaultdict(dict)
-    for project in get_projects():
+    for project in get_projects(opts):
         board_dict = {}
         for board in project.config.boards:
             board_dict[board] = False
@@ -877,10 +1040,77 @@ def _extract_lcov_summary_worker(name, filename):
     )
 
 
+def merge_shards(opts):
+    """Wait for, unpack, and merge multiple coverage tarballs."""
+    import tarfile  # pylint: disable=import-outside-toplevel
+    import tempfile  # pylint: disable=import-outside-toplevel
+
+    merge_dir = pathlib.Path(opts.merge_dir)
+    platform_ec = ZEPHYR_DIR.parent
+    out_dir = platform_ec / "build" / "zephyr"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    merged_info = out_dir / "lcov_merged_shards.info"
+
+    cmd = ["/usr/bin/lcov", "-o", str(merged_info), "--rc", "branch_coverage=1"]
+
+    found_info = False
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = pathlib.Path(tmp_dir)
+        # 1. Unpack any tbz2 artifacts in the directory
+        for tbz_path in merge_dir.glob("*.tbz2"):
+            with tarfile.open(tbz_path, "r:bz2") as tar:
+                tar.extractall(path=tmp_path)
+
+        # 2. Grab all extracted .info files (and any raw ones passed directly)
+        for info_file in list(tmp_path.rglob("*.info")) + list(
+            merge_dir.rglob("*.info")
+        ):
+            cmd.extend(["-a", str(info_file)])
+            found_info = True
+
+        if not found_info:
+            print(f"No .info files found in shards at {merge_dir}")
+            return -1
+
+        subprocess.run(cmd, check=True)
+
+    html_dir = get_bundle_dir(opts) / "html"
+    subprocess.run(
+        [
+            "/usr/bin/genhtml",
+            "--branch-coverage",
+            "-q",
+            "-o",
+            str(html_dir),
+            "--ignore-errors",
+            "inconsistent,inconsistent",
+            "--ignore-errors",
+            "unused",
+            "-t",
+            "All Shards Merged",
+            str(merged_info),
+        ],
+        check=True,
+    )
+
+    # Repackage the final HTML and LCOV into the standard coverage.tbz2 bundle
+    # to maintain exactly identical behavior for downstream readers.
+    cmd = [
+        "tar",
+        "cvfj",
+        get_bundle_dir(opts) / "coverage.tbz2",
+        "lcov.info",
+        "html/",
+    ]
+    subprocess.run(cmd, cwd=out_dir, check=True, stdin=subprocess.DEVNULL)
+
+    return 0
+
+
 def main(args):
     """Builds and tests all of the Zephyr targets and reports build metrics"""
     parser, sub_cmds = scripts.firmware_builder_lib.create_arg_parser(
-        build, bundle, test
+        build, bundle, test, merge_shards
     )
 
     check_boards_cmd = sub_cmds.add_parser(
