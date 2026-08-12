@@ -1879,17 +1879,51 @@ fp_download_frame(struct ec_response_fp_info *info, int index)
 {
 	int rv = 0;
 	size_t size;
-	int cmdver = ec_cmd_version_supported(EC_CMD_FP_INFO, 1) ? 1 : 0;
-	int rsize = cmdver == 1 ? sizeof(*info) :
-				  sizeof(struct ec_response_fp_info_v0);
 
-	/* templates not supported in command v0 */
-	if (index > 0 && cmdver == 0)
-		return NULL;
+	/*
+	 * Try FP_INFO v3 first (new firmware only supports v3),
+	 * fall back to v1/v0 for old firmware.
+	 */
+	if (ec_cmd_version_supported(EC_CMD_FP_INFO, 3)) {
+		/* v3 response: fixed header (36 bytes) + at least 1 image_frame_params_v2 (20 bytes) */
+		uint8_t buf[256] = {};
+		rv = ec_command(EC_CMD_FP_INFO, 3, NULL, 0, buf, sizeof(buf));
+		if (rv < 0)
+			return NULL;
 
-	rv = ec_command(EC_CMD_FP_INFO, cmdver, NULL, 0, info, rsize);
-	if (rv < 0)
-		return NULL;
+		struct ec_response_fp_info_v3 *v3 =
+			(struct ec_response_fp_info_v3 *)buf;
+
+		/* Copy the fields we need into the old v1 struct */
+		memset(info, 0, sizeof(*info));
+		info->vendor_id = v3->sensor_info.vendor_id;
+		info->product_id = v3->sensor_info.product_id;
+		info->model_id = v3->sensor_info.model_id;
+		info->version = v3->sensor_info.version;
+		info->frame_size = v3->image_frame_params[0].frame_size;
+		info->pixel_format = v3->image_frame_params[0].pixel_format;
+		info->width = v3->image_frame_params[0].width;
+		info->height = v3->image_frame_params[0].height;
+		info->bpp = v3->image_frame_params[0].bpp;
+		info->errors = v3->sensor_info.errors;
+		info->template_size = v3->template_info.template_size;
+		info->template_max = v3->template_info.template_max;
+		info->template_valid = v3->template_info.template_valid;
+		info->template_dirty = v3->template_info.template_dirty;
+		info->template_version = v3->template_info.template_version;
+	} else {
+		/* Old firmware: use v1 or v0 as before */
+		int cmdver = ec_cmd_version_supported(EC_CMD_FP_INFO, 1) ? 1 : 0;
+		int rsize = cmdver == 1 ? sizeof(*info) :
+					  sizeof(struct ec_response_fp_info_v0);
+
+		if (index > 0 && cmdver == 0)
+			return NULL;
+
+		rv = ec_command(EC_CMD_FP_INFO, cmdver, NULL, 0, info, rsize);
+		if (rv < 0)
+			return NULL;
+	}
 
 	if (index == FP_FRAME_INDEX_SIMPLE_IMAGE) {
 		size = (size_t)info->width * info->bpp / 8 * info->height;
@@ -1901,21 +1935,10 @@ fp_download_frame(struct ec_response_fp_info *info, int index)
 	}
 
 	auto frame_cmd = ec::FpFrameCommand::Create(index, size, ec_max_insize);
-	if (!frame_cmd) {
-		fprintf(stderr, "Fp Frame command given invalid params\n");
-		return nullptr;
-	}
-	if (!frame_cmd->Run(comm_get_fd())) {
-		const char *error_str = strerror(errno);
-		if (frame_cmd->Result() != ec::kEcCommandUninitializedResult) {
-			error_str = frame_cmd->ResultString().c_str();
-		}
-		fprintf(stderr, "Fp Frame command failed with error: %s\n",
-			error_str);
-		return nullptr;
-	}
+	if (!frame_cmd || !frame_cmd->Run(comm_get_fd()))
+		return NULL;
 
-	return frame_cmd->frame();
+	return std::make_unique<std::vector<uint8_t> >(*frame_cmd->frame());
 }
 
 int cmd_fp_mode(int argc, char *argv[])
@@ -2046,35 +2069,73 @@ int cmd_fp_info(int argc, char *argv[])
 {
 	struct ec_response_fp_info r;
 	int rv;
-	int cmdver = ec_cmd_version_supported(EC_CMD_FP_INFO, 1) ? 1 : 0;
-	int rsize = cmdver == 1 ? sizeof(r) :
-				  sizeof(struct ec_response_fp_info_v0);
 	uint16_t dead;
 
-	rv = ec_command(EC_CMD_FP_INFO, cmdver, NULL, 0, &r, rsize);
-	if (rv < 0)
-		return rv;
+	if (ec_cmd_version_supported(EC_CMD_FP_INFO, 3)) {
+		uint8_t buf[256] = {};
+		rv = ec_command(EC_CMD_FP_INFO, 3, NULL, 0, buf, sizeof(buf));
+		if (rv < 0)
+			return rv;
 
-	printf("Fingerprint sensor: vendor %x product %x model %x version %x\n",
-	       r.vendor_id, r.product_id, r.model_id, r.version);
-	printf("Image: size %dx%d %d bpp\n", r.width, r.height, r.bpp);
-	printf("Error flags: %s%s%s%s\n",
-	       r.errors & FP_ERROR_NO_IRQ ? "NO_IRQ " : "",
-	       r.errors & FP_ERROR_SPI_COMM ? "SPI_COMM " : "",
-	       r.errors & FP_ERROR_BAD_HWID ? "BAD_HWID " : "",
-	       r.errors & FP_ERROR_INIT_FAIL ? "INIT_FAIL " : "");
-	dead = FP_ERROR_DEAD_PIXELS(r.errors);
-	if (dead == FP_ERROR_DEAD_PIXELS_UNKNOWN) {
-		printf("Dead pixels: UNKNOWN\n");
-	} else {
-		printf("Dead pixels: %u\n", dead);
-	}
+		struct ec_response_fp_info_v3 *v3 =
+			(struct ec_response_fp_info_v3 *)buf;
 
-	if (cmdver == 1) {
+		printf("Fingerprint sensor: vendor %x product %x model %x version %x\n",
+		       v3->sensor_info.vendor_id, v3->sensor_info.product_id,
+		       v3->sensor_info.model_id, v3->sensor_info.version);
+		printf("Image: size %dx%d %d bpp\n",
+		       v3->image_frame_params[0].width,
+		       v3->image_frame_params[0].height,
+		       v3->image_frame_params[0].bpp);
+		dead = FP_ERROR_DEAD_PIXELS(v3->sensor_info.errors);
+		printf("Error flags: %s%s%s%s\n",
+		       v3->sensor_info.errors & FP_ERROR_NO_IRQ ? "NO_IRQ " : "",
+		       v3->sensor_info.errors & FP_ERROR_SPI_COMM ? "SPI_COMM " : "",
+		       v3->sensor_info.errors & FP_ERROR_BAD_HWID ? "BAD_HWID " : "",
+		       v3->sensor_info.errors & FP_ERROR_INIT_FAIL ? "INIT_FAIL " : "");
+		if (dead == FP_ERROR_DEAD_PIXELS_UNKNOWN) {
+			printf("Dead pixels: UNKNOWN\n");
+		} else {
+			printf("Dead pixels: %u\n", dead);
+		}
 		printf("Templates: version %d size %d count %d/%d"
 		       " dirty bitmap %x\n",
-		       r.template_version, r.template_size, r.template_valid,
-		       r.template_max, r.template_dirty);
+		       v3->template_info.template_version,
+		       v3->template_info.template_size,
+		       v3->template_info.template_valid,
+		       v3->template_info.template_max,
+		       v3->template_info.template_dirty);
+	} else {
+		int cmdver = ec_cmd_version_supported(EC_CMD_FP_INFO, 1) ? 1 : 0;
+		int rsize = cmdver == 1 ? sizeof(r) :
+					  sizeof(struct ec_response_fp_info_v0);
+
+		rv = ec_command(EC_CMD_FP_INFO, cmdver, NULL, 0, &r, rsize);
+		if (rv < 0)
+			return rv;
+
+		printf("Fingerprint sensor: vendor %x product %x model %x version %x\n",
+		       r.vendor_id, r.product_id, r.model_id, r.version);
+		printf("Image: size %dx%d %d bpp\n", r.width, r.height, r.bpp);
+		printf("Error flags: %s%s%s%s\n",
+		       r.errors & FP_ERROR_NO_IRQ ? "NO_IRQ " : "",
+		       r.errors & FP_ERROR_SPI_COMM ? "SPI_COMM " : "",
+		       r.errors & FP_ERROR_BAD_HWID ? "BAD_HWID " : "",
+		       r.errors & FP_ERROR_INIT_FAIL ? "INIT_FAIL " : "");
+		dead = FP_ERROR_DEAD_PIXELS(r.errors);
+		if (dead == FP_ERROR_DEAD_PIXELS_UNKNOWN) {
+			printf("Dead pixels: UNKNOWN\n");
+		} else {
+			printf("Dead pixels: %u\n", dead);
+		}
+
+		if (cmdver == 1) {
+			printf("Templates: version %d size %d count %d/%d"
+			       " dirty bitmap %x\n",
+			       r.template_version, r.template_size,
+			       r.template_valid, r.template_max,
+			       r.template_dirty);
+		}
 	}
 
 	return 0;

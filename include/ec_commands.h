@@ -8276,6 +8276,40 @@ struct ec_response_fp_info_v0 {
 	uint16_t bpp;
 	uint16_t errors; /* see FP_ERROR_ flags above */
 } __ec_align4;
+struct fp_sensor_info {
+	uint32_t vendor_id;
+	uint32_t product_id;
+	uint32_t model_id;
+	uint32_t version;
+	uint16_t num_capture_types;
+	uint16_t errors;
+} __ec_align4;
+
+struct fp_template_info {
+	uint32_t template_size;
+	uint16_t template_max;
+	uint16_t template_valid;
+	uint32_t template_dirty;
+	uint32_t template_version;
+} __ec_align4;
+
+struct fp_image_frame_params_v2 {
+	uint32_t frame_size;
+	uint32_t image_data_offset_bytes;
+	uint32_t pixel_format;
+	uint16_t width;
+	uint16_t height;
+	uint16_t bpp;
+	uint8_t fp_capture_type;
+	uint8_t reserved;
+} __ec_align4;
+
+struct ec_response_fp_info_v3 {
+	struct fp_sensor_info sensor_info;
+	struct fp_template_info template_info;
+	struct fp_image_frame_params_v2
+		image_frame_params[FLEXIBLE_ARRAY_MEMBER_SIZE];
+} __ec_align4;
 
 struct ec_response_fp_info {
 	/* Sensor identification */
