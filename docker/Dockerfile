@@ -56,9 +56,21 @@ RUN git clone --depth 1 \
 RUN git clone --depth 1 \
     ${REPO_BASE}/platform/dagwood \
     /opt/repos/src/platform/dagwood
-RUN git clone --depth 1 \
-    ${REPO_BASE}/third_party/zephyrproject \
-    /opt/repos/src/third_party/zephyrproject
+# Sparse checkout for zephyrproject
+RUN mkdir -p /opt/repos/src/third_party/zephyrproject && \
+    cd /opt/repos/src/third_party/zephyrproject && \
+    git init && \
+    git remote add origin \
+        ${REPO_BASE}/third_party/zephyrproject && \
+    git config core.sparseCheckout true && \
+    echo "/zephyr/" >> .git/info/sparse-checkout && \
+    echo "/modules/hal/cmsis_6/" >> .git/info/sparse-checkout && \
+    echo "/modules/lib/picolibc/" >> .git/info/sparse-checkout && \
+    echo "/modules/lib/nanopb/" >> .git/info/sparse-checkout && \
+    git pull --depth=1 origin main && \
+    (git branch --set-upstream-to=origin/main master || \
+     git branch --set-upstream-to=origin/main main || \
+     true)
 RUN git clone --depth 1 \
     ${REPO_BASE}/third_party/pigweed/pigweed \
     /opt/repos/src/third_party/pigweed
@@ -73,7 +85,8 @@ RUN mkdir -p /opt/repos/src/third_party/chromiumos-overlay && \
     git remote add origin \
         ${REPO_BASE}/overlays/chromiumos-overlay && \
     git config core.sparseCheckout true && \
-    echo "eclass/" >> .git/info/sparse-checkout && \
+    echo "/eclass/coreboot-sdk-ec-dependencies.eclass" \
+        >> .git/info/sparse-checkout && \
     git pull --depth=1 origin main && \
     (git branch --set-upstream-to=origin/main master || \
      git branch --set-upstream-to=origin/main main || \

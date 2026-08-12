@@ -275,10 +275,12 @@ def main():
     # Add all third_pary modules
     for module_name in THIRD_PARTY_MODULES:
         module_path = zephyr_modules_dir / module_name
-        zephyr_modules.append(module_path.resolve())
+        if module_path.exists():
+            zephyr_modules.append(module_path.resolve())
     for module_name in THIRD_PARTY_PRIVATE_MODULES:
         module_path = zephyr_modules_private_dir / module_name
-        zephyr_modules.append(module_path.resolve())
+        if module_path.exists():
+            zephyr_modules.append(module_path.resolve())
 
     # Add the EC dir as a module if not already included (resolve all paths to
     # account for symlinked or relative paths)
