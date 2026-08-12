@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "493abc55_250f848c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T22:28:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/da7ba08d-b90b-484a-8536-773063098365)]\n\n### Review Summary\n* **Functionality**: The change correctly ensures teardown hooks run atomically. However, as you noted in the previous comments, there are existing `HOOK_SYSJUMP` handlers that may rely on interrupts (e.g., `preserve_enable_5v_state`). These must be fixed *before* or *in* this CL to prevent runtime deadlocks during sysjump on affected boards.\n* **Security**: No vulnerabilities introduced. This improves system resilience during image transitions.\n* **Style**: Code style is clean and well documented.\n* **Testing**: Thank you for adding the test mock to enforce the calling order. There is a minor linkage risk with how the test state variable is defined (see inline comment).\n* **CL Size \u0026 Scope**: The CL is small and perfectly scoped.\n\n**Action items:**\n1. Relocate the definition of `ztest_interrupts_disabled` to avoid breaking the build for other ztests.\n2. Ensure non-compliant `HOOK_SYSJUMP` handlers are addressed before landing this.\n\nTAG\u003dagy\nCONV\u003dda7ba08d-b90b-484a-8536-773063098365",
+      "isAi": true,
+      "revId": "31b3ddaa0466a06e31981c6ba7a9fa4fe81a9678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "765d599d_905fcaf9",
+        "filename": "zephyr/test/jump_tags/src/jump_tags.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T22:28:28Z",
+      "side": 1,
+      "message": "Defining `ztest_interrupts_disabled` here in a specific test file might cause linker errors for other ztests. Since `common/system.c` calls `interrupt_disable_all()` (and thus references this variable when `CONFIG_ZTEST` is enabled), any other test suite that links `common/system.c` will now require a definition for `ztest_interrupts_disabled`.\n\nConsider moving this definition to `common/system.c` (wrapped in `#ifdef CONFIG_ZTEST`) so it is globally available to all tests.",
+      "isAi": true,
+      "revId": "31b3ddaa0466a06e31981c6ba7a9fa4fe81a9678",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
