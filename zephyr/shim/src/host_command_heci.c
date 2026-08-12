@@ -11,6 +11,7 @@
 #include <zephyr/device.h>
 #include <zephyr/init.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/atomic.h>
 
 #include <heci.h>
 
@@ -77,6 +78,8 @@ static struct k_thread cros_ec_ishtp_thread;
 static K_SEM_DEFINE(cros_ec_ishtp_event_sem, 0, 1);
 static uint32_t cros_ec_ishtp_event;
 static uint32_t heci_cros_ec_conn_id;
+static atomic_t disconnect_pending;
+static atomic_t hostcmd_in_flight;
 
 int heci_send_mkbp_event(uint32_t *timestamp)
 {
@@ -110,7 +113,16 @@ static void heci_send_hostcmd_response(struct host_packet *pkt)
 		LOG_ERR("HC response failed");
 	}
 
-	heci_send_flow_control(heci_cros_ec_conn_id);
+	if (!atomic_get(&disconnect_pending))
+		heci_send_flow_control(heci_cros_ec_conn_id);
+
+	/*
+	 * Keep hostcmd_in_flight set until all connection operations from the
+	 * response path are finished. This prevents concurrent disconnect.
+	 */
+	atomic_clear(&hostcmd_in_flight);
+	if (atomic_cas(&disconnect_pending, 1, 0))
+		heci_complete_disconnect(heci_cros_ec_conn_id);
 }
 
 static void cros_ec_ishtp_process_msg(uint8_t *msg, const size_t msg_size)
@@ -138,8 +150,10 @@ static void cros_ec_ishtp_process_msg(uint8_t *msg, const size_t msg_size)
 	heci_packet.response_size = 0;
 
 	heci_packet.driver_result = EC_RES_SUCCESS;
-	if (IS_ENABLED(HAS_TASK_HOSTCMD))
+	if (IS_ENABLED(HAS_TASK_HOSTCMD)) {
+		atomic_set(&hostcmd_in_flight, 1);
 		host_packet_receive(&heci_packet);
+	}
 }
 
 /**
@@ -164,6 +178,8 @@ DECLARE_HOST_COMMAND(EC_CMD_GET_PROTOCOL_INFO, heci_get_protocol_info,
 static void cros_ec_ishtp_event_callback(uint32_t event, void *arg)
 {
 	ARG_UNUSED(arg);
+	if (event == HECI_EVENT_DISCONN)
+		atomic_set(&disconnect_pending, 1);
 	cros_ec_ishtp_event = event;
 	k_sem_give(&cros_ec_ishtp_event_sem);
 }
@@ -204,7 +220,9 @@ static void cros_ec_ishtp_task(void *p1, void *p2, void *p3)
 		case HECI_EVENT_DISCONN:
 			LOG_DBG("cros ec disconnect request conn %d",
 				heci_cros_ec_conn_id);
-			heci_complete_disconnect(heci_cros_ec_conn_id);
+			if (!atomic_get(&hostcmd_in_flight) &&
+			    atomic_cas(&disconnect_pending, 1, 0))
+				heci_complete_disconnect(heci_cros_ec_conn_id);
 			break;
 
 		default:
