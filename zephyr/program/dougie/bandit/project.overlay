@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "binman.dtsi"
+
 /* Dougie program common DTS includes */
 #include "../dougie_stub.dts"
 
