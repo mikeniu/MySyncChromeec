@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b72b5a59_e1f3b9ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T21:32:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/c716577d-16cb-410b-970b-199438afb71b)]\n\n**Review Summary:**\n* **Functionality:** The changes successfully move the nonce, encryption salt, and auth tag generation to local stack buffers. This prevents them from being prematurely populated into `fp_enc_buffer` in the event that key derivation or encryption fails.\n* **Security:** No security vulnerabilities introduced. Using `CleanseWrapper` for the stack variables ensures that they are zeroed upon exit, which is an excellent defense-in-depth measure.\n* **Style:** The code correctly utilizes `CleanseWrapper` and `std::ranges::copy`, which aligns with modern C++ guidelines.\n* **Testing \u0026 Test Coverage:** The added unit test (`test_fp_frame_v1_encrypt_template_key_derivation_failure`) properly mocks `hkdf_sha256` to simulate a failure and asserts that the metadata buffer remains zero-initialized, thoroughly covering the failure path.\n* **CL Size \u0026 Scope:** The CL is focused and appropriately sized.",
+      "isAi": true,
+      "revId": "e89574237f8d8fa315627761729055b702178037",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
