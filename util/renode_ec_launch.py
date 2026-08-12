@@ -67,7 +67,6 @@ def launch(
     zephyr_bin: str,
     ec_project: str,
     uart: str,
-    gdb_port: Optional[int] = None,
 ) -> int:
     """Launches an EC image in Renode.
 
@@ -137,8 +136,9 @@ def launch(
     # Change logLevel from WARNING to ERROR, since the console is flooded
     # with WARNINGs.
     renode_execute.append("logLevel 3;")
-    if gdb_port:
-        renode_execute.append(f"machine StartGdbServer {gdb_port};")
+    # https://renode.readthedocs.io/en/latest/debugging/gdb.html
+    # (gdb) target remote :3333
+    renode_execute.append("machine StartGdbServer 3333;")
 
     if board in GPIO_WP_MAP:
         wp_state = GPIO_WP_ENABLE if enable_write_protect else GPIO_WP_DISABLE
@@ -234,13 +234,6 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         help="Target path for the UART PTY symlink.",
     )
 
-    parser.add_argument(
-        "--gdb-port",
-        type=int,
-        default=None,
-        help="Port number to start GDB server on (disabled if not set).",
-    )
-
     opts = parser.parse_args(argv)
     return launch(
         board=opts.board,
@@ -249,7 +242,6 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         zephyr_bin=opts.zephyr_bin,
         ec_project=opts.ec,
         uart=opts.uart,
-        gdb_port=opts.gdb_port,
     )
 
 
