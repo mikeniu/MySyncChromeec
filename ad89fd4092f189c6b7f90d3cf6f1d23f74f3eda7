@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27ec2c37_ecfab874",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-12T17:14:19Z",
+      "side": 1,
+      "message": "Content LGTM. It looks like this same bug/lack of feature was already fixed in the ISL9238 driver, and there\u0027s substantial opportunity for consolidation if we wanted to pursue it. But that\u0027s out of scope here.\n\nCan you split the driver change and board change into separate CLs?",
+      "revId": "ad89fd4092f189c6b7f90d3cf6f1d23f74f3eda7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11dcc6ea_f48646dc",
+        "filename": "driver/charger/isl9241.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1177,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-12T17:14:19Z",
+      "side": 1,
+      "message": "Nit: The nesting here is pretty deep. It wouldn\u0027t hurt to add a `control4_mask` variable.",
+      "revId": "ad89fd4092f189c6b7f90d3cf6f1d23f74f3eda7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "805a07be_17490fe9",
+        "filename": "driver/charger/isl9241.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1178,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-12T17:14:19Z",
+      "side": 1,
+      "message": "Nit: I\u0027d slightly prefer it if you used `CONFIG_CHARGER_SENSE_RESISTOR` and `CONFIG_CHARGER_SENSE_RESISTOR_AC`. That would make it more obvious that these are config-specified parameters. These shorter aliases aren\u0027t used very much, and now that I see them, I kind of want to get rid of them where they are used.",
+      "revId": "ad89fd4092f189c6b7f90d3cf6f1d23f74f3eda7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
