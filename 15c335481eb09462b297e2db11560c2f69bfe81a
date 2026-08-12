@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5aa1d3f9_bb0eebf1",
+        "filename": "zephyr/test/drivers/panic/src/panic.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-08-12T08:02:18Z",
+      "side": 1,
+      "message": "I recommend to use ztest_test_skip for a skipped test so this test is marked as SKIP in the handler.log.\n\n```\nif(!IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_HOST_EVENT))\n\t\tztest_test_skip();\n```",
+      "range": {
+        "startLine": 337,
+        "startChar": 0,
+        "endLine": 337,
+        "endChar": 48
+      },
+      "revId": "15c335481eb09462b297e2db11560c2f69bfe81a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
