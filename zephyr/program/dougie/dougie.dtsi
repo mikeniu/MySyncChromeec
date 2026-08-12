@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include <zephyr/dt-bindings/pwm/it8xxx2_pwm.h>
+
 /* Project-specific overrides */
 &sha0 {
 	status = "okay";
@@ -10,6 +12,77 @@
 
 / {
 	aliases {
-		gpio-wp = &ec_wp_od;
+		gpio-wp = &gpio_ec_wp_od;
 	};
+
+	named-gpios {
+		/* The legacy system code requires GPIO_ENTERING_RW symbol */
+		gpio_ec_entering_rw: ec_entering_rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+	};
+};
+
+&adc_charger_pmon_q {
+	enum-name = "ADC_PMON";
+};
+
+&adc_charger_amon_q {
+	enum-name = "ADC_TEMP_SENSOR_1";
+};
+
+&adc_ec_soc_thrm_alert {
+	enum-name = "ADC_TEMP_SENSOR_SOC";
+};
+
+&adc_ec_chgr_thrm_alert {
+	enum-name = "ADC_TEMP_SENSOR_CHARGER";
+};
+
+&adc_ec_cpu_vr_thrm_alert {
+	enum-name = "ADC_TEMP_SENSOR_2";
+};
+
+&adc_ec_ddr_thrm_alert {
+	enum-name = "ADC_TEMP_SENSOR_3";
+};
+
+&adc_ec_5v_thrm_alert {
+	enum-name = "ADC_TEMP_SENSOR_4";
+};
+
+&adc_ec_vph_pwr_det {
+	enum-name = "ADC_VPH_PWR";
+};
+
+&pwm2 {
+	prescaler-cx = <PWM_PRESCALER_C6>;
+};
+
+&pwm3 {
+	prescaler-cx = <PWM_PRESCALER_C6>;
+};
+
+&pwm4 {
+	prescaler-cx = <PWM_PRESCALER_C6>;
+};
+
+&i2c_ec_bat_chg_vr_smb {
+	enum-names = "I2C_PORT_CHARGER";
+};
+
+&i2c_ec_smb_batt_scl_3v3 {
+	enum-names = "I2C_PORT_BATTERY";
+};
+
+&i2c_ec_i2c_dbg_scl_3v3 {
+	enum-names = "I2C_PORT_DBG";
+};
+
+&i2c_ec_i2c_pdc_sm_scl_3v3 {
+	enum-names = "I2C_PORT_SUB_C0";
+};
+
+&i2c_ec_i2c_sensor_scl_1v8 {
+	enum-names = "I2C_PORT_SENSORS";
 };
