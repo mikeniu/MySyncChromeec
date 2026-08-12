@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d1171f5_33335907",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T18:39:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/0b9c8526-16ba-437b-8ae9-7c42d1f81d48)]\n\n### Review Summary\n*   **Functionality \u0026 Consistency:** The patch correctly extends the `EC_FLASH_PROTECT_ALL_AT_BOOT` protection range to `CONFIG_FLASH_SIZE_BYTES` in both the setting and getting logic, ensuring consistency between `cros_flash_andes_xip_protect_at_boot()` and `cros_flash_andes_xip_get_protect_flags()`. This successfully addresses the previous feedback.\n*   **Security:** This change ensures that the full SPI NOR flash capacity is locked when requested, mitigating potential attacks that could target unprotected upper segments of the flash.\n*   **Style:** The code modifications are minimal, clean, and seamlessly fit the existing style conventions.\n*   **Testing \u0026 Test Coverage:** Manual tests were successfully performed on a device (srebrna) to validate SWWP operations, fingerprint enrollment, and matching. Given the hardware-specific nature of this logic, the manual verification steps described in the commit message are excellent.\n*   **CL Size \u0026 Scope:** The CL is appropriately scoped, concise, and effectively addresses the identified bugs.",
+      "isAi": true,
+      "revId": "caa3cbe22fb437b9bf54c6043db0883b60938f91",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
