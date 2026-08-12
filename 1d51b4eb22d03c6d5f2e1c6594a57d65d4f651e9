@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6fb1a23_05d7581b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T18:37:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6bde54_c36ae892",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 15
+      },
+      "revId": "1d51b4eb22d03c6d5f2e1c6594a57d65d4f651e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1a4d40d_7eb3f188",
@@ -42,6 +66,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a76d8738_1f8ea532",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T18:37:38Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f1a4d40d_7eb3f188",
+      "revId": "1d51b4eb22d03c6d5f2e1c6594a57d65d4f651e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "befae2ed_2186cd37",
@@ -56,6 +98,24 @@
       "side": 1,
       "message": "Since `EC_FLASH_PROTECT_ALL_AT_BOOT` now extends the protection range to `CONFIG_FLASH_SIZE_BYTES`, should `cros_flash_andes_xip_get_protect_flags()` also be updated to check `prot_end \u003e\u003d CONFIG_FLASH_SIZE_BYTES` (around line 283)?\n\nCurrently, `cros_flash_andes_xip_get_protect_flags()` considers `EC_FLASH_PROTECT_ALL_AT_BOOT` to be asserted as long as `prot_end \u003e\u003d (CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE)`. If keeping the current behavior is intentional for backward compatibility with devices running older firmware, please consider adding a brief comment there to clarify.",
       "isAi": true,
+      "revId": "1d51b4eb22d03c6d5f2e1c6594a57d65d4f651e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87fb306d_4b4b60e4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_andestech_xip.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-12T18:37:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "befae2ed_2186cd37",
       "revId": "1d51b4eb22d03c6d5f2e1c6594a57d65d4f651e9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
