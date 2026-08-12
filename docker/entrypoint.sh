@@ -77,7 +77,8 @@ clone_overlay_sparse() {
             git config core.sparseCheckout true
 
             # Define directories to include
-            echo "eclass/" >> .git/info/sparse-checkout
+            echo "/eclass/coreboot-sdk-ec-dependencies.eclass" \
+                >> .git/info/sparse-checkout
 
             git pull --depth=1 origin main
             # Set up branch tracking so git pull works without arguments
@@ -99,8 +100,49 @@ clone_or_update "${REPO_BASE}/platform/ec" \
     "/workspace/src/platform/ec" "EC firmware"
 clone_or_update "${REPO_BASE}/platform/dagwood" \
     "/workspace/src/platform/dagwood" "Dagwood"
-clone_or_update "${REPO_BASE}/third_party/zephyrproject" \
-    "/workspace/src/third_party/zephyrproject" "Zephyr Project"
+# Specialized clone/update function for zephyrproject (sparse checkout)
+clone_zephyrproject_sparse() {
+    local repo_url="${REPO_BASE}/third_party/zephyrproject"
+    local target_dir="/workspace/src/third_party/zephyrproject"
+    local cached_dir="${CACHE_BASE}/src/third_party/zephyrproject"
+
+    if [ ! -d "${target_dir}" ]; then
+        if [ -d "${cached_dir}" ]; then
+            echo "Populating Zephyr Project from build-time cache..."
+            mkdir -p "$(dirname "${target_dir}")"
+            cp -a "${cached_dir}" "${target_dir}"
+            update_repo "${target_dir}" "Zephyr Project" "origin" "main"
+        else
+            echo "Performing sparse checkout of Zephyr Project..."
+            mkdir -p "${target_dir}"
+            cd "${target_dir}" || exit 1
+            git init
+            git remote add origin "${repo_url}"
+            git config core.sparseCheckout true
+
+            # Define directories to include
+            {
+                echo "/zephyr/"
+                echo "/modules/hal/cmsis_6/"
+                echo "/modules/lib/picolibc/"
+            } >> .git/info/sparse-checkout
+
+            git pull --depth=1 origin main
+            # Set up branch tracking so git pull works without arguments
+            # next time
+            git branch --set-upstream-to=origin/main master || \
+                git branch --set-upstream-to=origin/main main || \
+                true
+            cd - > /dev/null
+        fi
+    else
+        echo "Zephyr Project directory already exists." \
+             "Checking for updates..."
+        update_repo "${target_dir}" "Zephyr Project" "origin" "main"
+    fi
+}
+
+clone_zephyrproject_sparse
 clone_or_update "${REPO_BASE}/third_party/pigweed/pigweed" \
     "/workspace/src/third_party/pigweed" "Pigweed"
 clone_or_update "${REPO_BASE}/third_party/u-boot" \
