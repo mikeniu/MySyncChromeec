@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a6231b9_9ed5d972",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T19:35:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/a0cc4ef3-5082-4af2-9500-5c99c0b5934c)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The memory clearing logic is now correctly placed in the chip-specific C initialization sequence (`system_pre_init`), safely calculating the size using `uintptr_t` arithmetic. The linker script modifications now enforce 4-byte alignment, resolving the unaligned memory access concerns.\n*   **Security:** ✅ No security vulnerabilities introduced. Purging stale memory across resets is a good defense-in-depth practice against data leakage.\n*   **Style:** ✅ The C code matches the existing style and conventions.\n*   **Consistency:** ✅ By moving the initialization logic out of the generic architecture `init.S` and into `chip/stm32/system.c`, the CL now properly respects the abstraction boundaries between architecture-level and chip-specific code.\n*   **Testing:** ✅ Verified manually on `dartmonkey`. Since this is a very low-level hardware initialization routine, standard unit tests aren\u0027t applicable, and hardware verification is sufficient.\n*   **CL Size \u0026 Scope:** ✅ The CL remains small, self-contained, and focused on this single issue.\n\nTAG\u003dagy\nCONV\u003da0cc4ef3-5082-4af2-9500-5c99c0b5934c",
+      "isAi": true,
+      "revId": "948c96c4a1cd9ce508bc6a15e4cd3d30691f6dea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
