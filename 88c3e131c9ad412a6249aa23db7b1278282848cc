@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "651c3fe5_d99def7c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T16:40:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/5ba0c0aa-e942-48db-ab3b-1b21c38a818c)]\n\n**Review Summary:**\n* **Functionality:** The changes successfully move the nonce and salt generation to local stack buffers. This prevents them from being prematurely populated into `fp_enc_buffer` in the event that `derive_encryption_key` fails.\n* **Security:** No security vulnerabilities introduced. The nonce and salt are public metadata, so leaving them on the stack after the function returns does not pose a security risk.\n* **Style:** The code correctly utilizes `std::ranges::copy` which aligns with modern C++ guidelines. I\u0027ve left a minor consistency suggestion regarding the authentication tag.\n* **Testing \u0026 Test Coverage:** The CL seems to rely on existing test coverage. I\u0027ve added an inline comment suggesting a specific unit test to explicitly cover the failure path being fixed.\n* **CL Size \u0026 Scope:** The CL is appropriately sized, focused solely on the single objective of fixing the metadata buffer initialization.",
+      "isAi": true,
+      "revId": "88c3e131c9ad412a6249aa23db7b1278282848cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc477233_50a20d12",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T16:40:16Z",
+      "side": 1,
+      "message": "This change correctly prevents the `nonce` and `encryption_salt` from being prematurely persisted in the global `fp_enc_buffer` if `derive_encryption_key` fails later on (since `fp_enc_buffer` is zero-initialized at the start of this function).\n\nTo ensure this behavior doesn\u0027t regress, please consider adding a unit test to cover this failure path. For example, a test could mock `derive_encryption_key` to return an error (e.g., `EC_ERROR_UNAVAILABLE`), call `encrypt_template()`, and assert that the `nonce` and `encryption_salt` fields in `fp_enc_buffer.metadata` remain zero-initialized.",
+      "isAi": true,
+      "revId": "88c3e131c9ad412a6249aa23db7b1278282848cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a74cf331_c726aef0",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 610,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T16:40:16Z",
+      "side": 1,
+      "message": "Since the objective of this CL is to use local stack buffers during the encryption process and only populate the output metadata upon success, consider also using a stack local for the auth tag instead of writing directly to `enc_info-\u003etag` here.\n\nWhile `fp_enc_buffer` is cleanly wiped upon an encryption failure (line 612), making the tag a local stack variable and copying it over on success alongside `nonce` and `encryption_salt` would make the code completely consistent with the stated intent.",
+      "isAi": true,
+      "revId": "88c3e131c9ad412a6249aa23db7b1278282848cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
