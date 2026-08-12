@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81237105_a508991c",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-12T14:06:11Z",
+      "side": 1,
+      "message": "Ok few more tweaks, the ptlrvp build fails because `BUTTON_VOLUME_DOWN` is only defiend if `CONFIG_PLATFORM_EC_POWER_BUTTON_DEBOUNCE` is enabled, so I guess the same check belong to here? that is only handle these two cases if `CONFIG_PLATFORM_EC_POWER_BUTTON_DEBOUNCE` is enabled\n\n\nhey one more thing, this CL is getting fairly big, would it be possible to split the `zephyr/include/dt-bindings/buttons.h` and related changes to its own CL? I know it\u0027s tedious but it\u0027d be way better in the off case that it happens to brake something and someone lands on it in a bisection",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 8
+      },
+      "revId": "1ba41f55bd42b8de51d3c4d8020fc7b84c6b2b16",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
