@@ -1,0 +1,19 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: Stub sensor for pwrmon tests
+
+compatible: "cros,stub-pwrmon-sensor"
+
+include: sensor-device.yaml
+
+child-binding:
+  description: Stub sensor channel
+  properties:
+    reg:
+      type: int
+      required: true
+
+    friendly-name:
+      type: string
