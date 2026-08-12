@@ -1,0 +1,11 @@
+common:
+  platform_allow:
+    - native_sim
+tests:
+  pwrmon.default:
+    extra_configs:
+      - CONFIG_PWRMON_POWER_MONITOR_COMMON=y
+
+  pwrmon.pac194x:
+    extra_configs:
+      - CONFIG_PWRMON_POWER_MONITOR_PAC194X=y
