@@ -79,6 +79,11 @@ if(DEFINED CONFIG_BOARD_MOONSTONE_ISH)
 	add_subdirectory(moonstone-ish)
 endif()
 
+if(DEFINED CONFIG_BOARD_RUBY_ISH)
+	project(ruby-ish)
+	add_subdirectory(ruby-ish)
+endif()
+
 if(DEFINED CONFIG_BOARD_RUBY)
 	project(ruby)
 	add_subdirectory(ruby)
