@@ -22,6 +22,30 @@
       },
       "revId": "2329220344f824064347ab12fdbfd52b8d84e7ad",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4e33b74_15b7729b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-12T16:48:55Z",
+      "side": 1,
+      "message": "Done - switched to using the platform field to decide when twister is running on-device dagwood tests.",
+      "parentUuid": "7daa65f1_8951f338",
+      "range": {
+        "startLine": 9,
+        "startChar": 38,
+        "endLine": 9,
+        "endChar": 66
+      },
+      "revId": "2329220344f824064347ab12fdbfd52b8d84e7ad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
