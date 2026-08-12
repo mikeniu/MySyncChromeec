@@ -3,7 +3,6 @@
 # Copyright 2021 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-
 """Build and test all of the Zephyr boards.
 
 This is the entry point for the custom firmware builder workflow recipe.
@@ -29,7 +28,6 @@ from scripts.firmware_builder_lib import find_checkout
 from scripts.firmware_builder_lib import prepare_codebase
 from scripts.firmware_builder_lib import restore_codebase
 
-
 # Add the zmake dir early in the python search path
 ZEPHYR_DIR = pathlib.Path(__file__).parent.resolve()
 sys.path.insert(1, str(ZEPHYR_DIR / "zmake"))
@@ -41,7 +39,6 @@ sys.path.append(str(ZEPHYR_DIR / "../util"))
 from coreboot_sdk import init_toolchain
 import zmake.modules  # pylint: disable=wrong-import-position
 import zmake.project  # pylint: disable=wrong-import-position
-
 
 DEFAULT_BUNDLE_DIRECTORY = "/tmp/artifact_bundles"
 DEFAULT_BUNDLE_METADATA_FILE = "/tmp/artifact_bundle_metadata"
@@ -159,9 +156,7 @@ def get_projects():
     for project in zmake.project.find_projects(projects_path).values():
         # Skip some projects if ec-private dir is missing until the builders
         # are fixed correctly.
-        if (
-            project.config.project_name
-            in [
+        if (project.config.project_name in [
                 "lapis",
                 "moonstone",
                 "ruby",
@@ -169,9 +164,7 @@ def get_projects():
                 "quartz",
                 "mica",
                 "mensa",
-            ]
-            and not platform_ec_private.exists()
-        ):
+        ] and not platform_ec_private.exists()):
             continue
         projects.append(project)
     return projects
@@ -181,13 +174,11 @@ def build_host_utils(opts, platform_ec, env, extra_env):
     """Build the utilities that ec-utils, ec-devutils, and ec-utils-test need"""
 
     env = env.copy()
-    env.update(
-        {
-            "BOARD": "host",
-            "CROSS_COMPILE_CC_NAME": "clang",
-            "V": "1",
-        }
-    )
+    env.update({
+        "BOARD": "host",
+        "CROSS_COMPILE_CC_NAME": "clang",
+        "V": "1",
+    })
     env.update(extra_env)
     # Start with a clean build environment
     cmd = ["make", "clobber"]
@@ -281,11 +272,9 @@ def build_compare_builds():
     """Runs compare-builds a select set of targets"""
     env = os.environ.copy()
     env.update(init_toolchain())
-    env.update(
-        {
-            "PYTHONPATH": str(ZEPHYR_DIR / "zmake"),
-        }
-    )
+    env.update({
+        "PYTHONPATH": str(ZEPHYR_DIR / "zmake"),
+    })
 
     # Run compare-builds at the same git reference.  This forces the
     # compare-builds step to compile only, skipping the firmware binary
@@ -309,11 +298,9 @@ def build(opts):
     metric_list = firmware_pb2.FwBuildMetricList()  # pylint: disable=no-member
     env = os.environ.copy()
     env.update(init_toolchain())
-    env.update(
-        {
-            "PYTHONPATH": str(ZEPHYR_DIR / "zmake"),
-        }
-    )
+    env.update({
+        "PYTHONPATH": str(ZEPHYR_DIR / "zmake"),
+    })
 
     platform_ec = ZEPHYR_DIR.parent
 
@@ -362,9 +349,8 @@ def build(opts):
         ec_to_boxter_boards = read_boxter()
 
         for project in projects:
-            build_dir = (
-                platform_ec / "build" / "zephyr" / project.config.project_name
-            )
+            build_dir = (platform_ec / "build" / "zephyr" /
+                         project.config.project_name)
             boards = list(project.config.boards)
             # Add additional boards from boxter
             boards.extend(ec_to_boxter_boards[project.config.project_name])
@@ -472,9 +458,8 @@ def get_bundle_dir(opts):
 
 def write_metadata(opts, info):
     """Write the metadata about the bundle."""
-    bundle_metadata_file = (
-        opts.metadata if opts.metadata else DEFAULT_BUNDLE_METADATA_FILE
-    )
+    bundle_metadata_file = (opts.metadata
+                            if opts.metadata else DEFAULT_BUNDLE_METADATA_FILE)
     with open(bundle_metadata_file, "w", encoding="utf-8") as file:
         file.write(json_format.MessageToJson(info))
 
@@ -509,9 +494,10 @@ def bundle_coverage(opts):
     if SPECIAL_BOARDS:
         make_cmd.append(f"SPECIAL_BOARDS={' '.join(SPECIAL_BOARDS)}")
     log_cmd(make_cmd)
-    subprocess.run(
-        make_cmd, check=True, cwd=ZEPHYR_DIR, stdin=subprocess.DEVNULL
-    )
+    subprocess.run(make_cmd,
+                   check=True,
+                   cwd=ZEPHYR_DIR,
+                   stdin=subprocess.DEVNULL)
 
     cmd = ["mv", "lcov_rpt"]
     for board in SPECIAL_BOARDS:
@@ -539,9 +525,8 @@ def bundle_firmware(opts):
     ec_to_boxter_boards = read_boxter()
     per_board_targets = collections.defaultdict(list)
     for project in get_projects():
-        build_dir = (
-            platform_ec / "build" / "zephyr" / project.config.project_name
-        )
+        build_dir = (platform_ec / "build" / "zephyr" /
+                     project.config.project_name)
         boards = set(project.config.boards)
         # Add additional boards from boxter
         boards.update(ec_to_boxter_boards[project.config.project_name])
@@ -551,15 +536,13 @@ def bundle_firmware(opts):
         if version:
             tarball_name = f"{project.config.project_name}.EC.{version}.tar.bz2"
             elf_tarball_name = (
-                f"{project.config.project_name}.EC_elf.{version}.tar.bz2"
-            )
+                f"{project.config.project_name}.EC_elf.{version}.tar.bz2")
         else:
             tarball_name = f"{project.config.project_name}.EC.tar.bz2"
             elf_tarball_name = f"{project.config.project_name}.EC_elf.tar.bz2"
         for board in boards:
             per_board_targets[board].append(
-                f"{project.config.project_name}/output"
-            )
+                f"{project.config.project_name}/output")
         # Package the bin file
         tarball_path = bundle_dir.joinpath(tarball_name)
         cmd = [
@@ -570,14 +553,13 @@ def bundle_firmware(opts):
             tarball_path,
         ]
         cmd.extend(
-            [x.relative_to(artifacts_dir) for x in artifacts_dir.glob("*")]
-        )
+            [x.relative_to(artifacts_dir) for x in artifacts_dir.glob("*")])
         log_cmd(cmd, cwd=artifacts_dir)
         subprocesses.append(
             subprocess.Popen(  # pylint: disable=consider-using-with
-                cmd, cwd=artifacts_dir, stdin=subprocess.DEVNULL
-            )
-        )
+                cmd,
+                cwd=artifacts_dir,
+                stdin=subprocess.DEVNULL))
         meta = info.objects.add()
         meta.tarball_info.board.extend(boards)
         meta.file_name = tarball_name
@@ -594,14 +576,13 @@ def bundle_firmware(opts):
             elf_tarball_path,
         ]
         cmd.extend(
-            [x.relative_to(artifacts_dir) for x in artifacts_dir.glob("*")]
-        )
+            [x.relative_to(artifacts_dir) for x in artifacts_dir.glob("*")])
         log_cmd(cmd, cwd=artifacts_dir)
         subprocesses.append(
             subprocess.Popen(  # pylint: disable=consider-using-with
-                cmd, cwd=artifacts_dir, stdin=subprocess.DEVNULL
-            )
-        )
+                cmd,
+                cwd=artifacts_dir,
+                stdin=subprocess.DEVNULL))
         meta = info.objects.add()
         meta.tarball_info.board.extend(boards)
         meta.file_name = elf_tarball_name
@@ -626,9 +607,8 @@ def bundle_firmware(opts):
         log_cmd(cmd)
         subprocesses.append(
             subprocess.Popen(  # pylint: disable=consider-using-with
-                cmd, stdin=subprocess.DEVNULL
-            )
-        )
+                cmd,
+                stdin=subprocess.DEVNULL))
         meta = info.objects.add()
         meta.tarball_info.board.append(board)
         meta.file_name = tarball_name
@@ -650,7 +630,8 @@ def bundle_firmware(opts):
         meta = info.objects.add()
         meta.file_name = tokens_file
         meta.token_info.type = (
-            firmware_pb2.FirmwareArtifactInfo.TokenDatabaseInfo.TokenDatabaseType.EC  # pylint: disable=no-member
+            firmware_pb2.FirmwareArtifactInfo.TokenDatabaseInfo.
+            TokenDatabaseType.EC  # pylint: disable=no-member
         )
 
     write_metadata(opts, info)
@@ -690,35 +671,30 @@ def test(opts):
         # Prepare the list of tasks (name, filename)
         tasks = []
         if twister_out_dir.exists():
-            tasks.append(("EC_ZEPHYR_TESTS", twister_out_dir / "coverage.info"))
-        tasks.extend(
-            [
-                ("EC_ZEPHYR_TESTS_GCC", twister_out_dir_gcc / "coverage.info"),
-                ("EC_LEGACY_TESTS", platform_ec / "build/coverage/lcov.info"),
-                ("ALL_TESTS", build_dir / "all_tests.info"),
-                ("EC_ZEPHYR_MERGED", build_dir / "zephyr_merged.info"),
-                ("ALL_MERGED", build_dir / "lcov.info"),
-                ("ALL_FILTERED", build_dir / "lcov_no_tests.info"),
-            ]
-        )
+            tasks.append(
+                ("EC_ZEPHYR_TESTS", twister_out_dir / "coverage.info"))
+        tasks.extend([
+            ("EC_ZEPHYR_TESTS_GCC", twister_out_dir_gcc / "coverage.info"),
+            ("EC_LEGACY_TESTS", platform_ec / "build/coverage/lcov.info"),
+            ("ALL_TESTS", build_dir / "all_tests.info"),
+            ("EC_ZEPHYR_MERGED", build_dir / "zephyr_merged.info"),
+            ("ALL_MERGED", build_dir / "lcov.info"),
+            ("ALL_FILTERED", build_dir / "lcov_no_tests.info"),
+        ])
 
         for project in get_projects():
             if project.config.project_name in SPECIAL_BOARDS:
-                tasks.append(
-                    (
-                        f"BOARD_{project.config.project_name}".upper(),
-                        build_dir
-                        / (project.config.project_name + "_final.info"),
-                    )
-                )
+                tasks.append((
+                    f"BOARD_{project.config.project_name}".upper(),
+                    build_dir / (project.config.project_name + "_final.info"),
+                ))
 
         # Run lcov in parallel using a ThreadPoolExecutor
         max_workers = min(len(tasks), opts.cpus or 4)
         with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_name = {
-                executor.submit(
-                    _extract_lcov_summary_worker, name, filename
-                ): name
+                executor.submit(_extract_lcov_summary_worker, name, filename):
+                name
                 for name, filename in tasks
             }
             for future in futures.as_completed(future_to_name):
@@ -755,33 +731,24 @@ def read_boxter():
             with open(cfg_path, "r", encoding="utf-8") as file:
                 cfg = json.load(file)
 
-                for software_config in cfg.get("chromeos", {}).get(
-                    "configs", []
-                ):
-                    zephyr_ec = (
-                        software_config.get("firmware", {})
-                        .get("build-targets", {})
-                        .get("zephyr-ec", None)
-                    )
+                for software_config in cfg.get("chromeos",
+                                               {}).get("configs", []):
+                    zephyr_ec = (software_config.get("firmware", {}).get(
+                        "build-targets", {}).get("zephyr-ec", None))
                     if zephyr_ec:
                         ec_to_boards[zephyr_ec].add(board_name)
-                    zephyr_kb = (
-                        software_config.get("firmware", {})
-                        .get("build-targets", {})
-                        .get("zephyr-detachable-base", None)
-                    )
+                    zephyr_kb = (software_config.get("firmware", {}).get(
+                        "build-targets", {}).get("zephyr-detachable-base",
+                                                 None))
                     if zephyr_kb:
                         ec_to_boards[zephyr_kb].add(board_name)
-                    ish = (
-                        software_config.get("firmware", {})
-                        .get("build-targets", {})
-                        .get("ish", None)
-                    )
+                    ish = (software_config.get("firmware",
+                                               {}).get("build-targets",
+                                                       {}).get("ish", None))
                     if ish:
                         ec_to_boards[ish].add(board_name)
-                    fp = software_config.get("fingerprint", {}).get(
-                        "board", None
-                    )
+                    fp = software_config.get("fingerprint",
+                                             {}).get("board", None)
                     if fp:
                         ec_to_boards[fp].add(board_name)
     return ec_to_boards
@@ -808,30 +775,22 @@ def check_boards(_opts):
         if ec_target in LEGACY_TARGETS:
             continue
         if ec_target not in ec_to_board:
-            print(
-                f"ERROR: Unknown target {ec_target} used by boxter configs: "
-                f"{boards}"
-            )
+            print(f"ERROR: Unknown target {ec_target} used by boxter configs: "
+                  f"{boards}")
             retcode = 1
             continue
         for board_name in boards:
-            if (
-                board_name not in ec_to_board[ec_target]
-                and board_name not in LEGACY_TARGETS
-            ):
-                print(
-                    f"ERROR: Target {ec_target} does not have "
-                    f"board {board_name}"
-                )
+            if (board_name not in ec_to_board[ec_target]
+                    and board_name not in LEGACY_TARGETS):
+                print(f"ERROR: Target {ec_target} does not have "
+                      f"board {board_name}")
                 retcode = 1
             ec_to_board[ec_target][board_name] = True
     for zephyr_ec, boards in ec_to_board.items():
         for board, found in boards.items():
             if not found and board not in UNUSED_BOARDS:
-                print(
-                    f"ERROR: Zephyr target {zephyr_ec} has unexpected "
-                    f"board of {board}"
-                )
+                print(f"ERROR: Zephyr target {zephyr_ec} has unexpected "
+                      f"board of {board}")
                 retcode = 1
         if not boards and zephyr_ec not in UNUSED_TARGETS:
             print(f"ERROR: Zephyr target {zephyr_ec} is not used in boxter")
@@ -841,8 +800,7 @@ def check_boards(_opts):
 
 
 COVERAGE_RE = re.compile(
-    r"lines\.*: *([0-9\.]+)% \(([0-9]+) of ([0-9]+) lines\)"
-)
+    r"lines\.*: *([0-9\.]+)% \(([0-9]+) of ([0-9]+) lines\)")
 
 
 def _extract_lcov_summary_worker(name, filename):
@@ -873,15 +831,13 @@ def _extract_lcov_summary_worker(name, filename):
             int(re_match.group(3)),
         )
     raise ValueError(
-        f"Failed to parse LCOV summary output for {name}: {output}"
-    )
+        f"Failed to parse LCOV summary output for {name}: {output}")
 
 
 def main(args):
     """Builds and tests all of the Zephyr targets and reports build metrics"""
     parser, sub_cmds = scripts.firmware_builder_lib.create_arg_parser(
-        build, bundle, test
-    )
+        build, bundle, test)
 
     check_boards_cmd = sub_cmds.add_parser(
         "check_boards",
@@ -894,8 +850,7 @@ def main(args):
     # Convert the full version strings (R130-16032.8.0-1) to the short form (16032.8.0).
     if opts.bcs_version:
         match = re.compile(r"R\d+-(\d+\.\d+\.\d+)(-\d+)?").fullmatch(
-            opts.bcs_version
-        )
+            opts.bcs_version)
         if match:
             opts.bcs_version = match[1]
 
