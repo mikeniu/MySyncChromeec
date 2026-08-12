@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f691040b_687c08cb",
+        "filename": "zephyr/program/bluey/CMakeLists.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1544342
+      },
+      "writtenOn": "2026-08-12T04:07:54Z",
+      "side": 1,
+      "message": "Please update this section for bluey firmware branch. mica/src/throttle.c does not exist.",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 7
+      },
+      "revId": "4706811650b20faec010d930c89e7d526038c280",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
