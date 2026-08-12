@@ -33,6 +33,23 @@
       "message": "also technically any new board could leverage this mechanism, as it is also supported by the upstream kernel driver.",
       "revId": "ef6c1c3c14e24bdf90ae898f3f6421d2881ba74d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1e8221d_16f93ebf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1508185
+      },
+      "writtenOn": "2026-08-12T12:54:18Z",
+      "side": 1,
+      "message": "Recently there was an effort on enable this feature on the Ambassador\u0027s (CFM) board on the (brya?) firmware branch, that Jon was also involved, so I don\u0027t think it should be consider as unused code.",
+      "revId": "ef6c1c3c14e24bdf90ae898f3f6421d2881ba74d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
