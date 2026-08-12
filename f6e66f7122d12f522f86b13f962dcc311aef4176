@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9324080_ee1e1fbb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-12T16:48:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/ee5c4c97-46fe-42dd-9883-f35fd7dd17bd)]\n\n**Review Summary:**\n* **Functionality**: The logic correctly ensures that physical flash protection (option bytes) is re-applied during `flash_pre_init` if the RO region is already protected (`EC_FLASH_PROTECT_RO_NOW`) and hardware write protect is asserted. This successfully addresses the gap where option bytes could be left unlocked after a reset.\n* **Security**: This is a positive security improvement, ensuring the flash option bytes are correctly locked down during early initialization.\n* **Style**: Code adheres to the existing project coding style.\n* **Consistency**: Aligns the `stm32h7` implementation with other STM32 variants (such as `flash-f.c`).\n* **Testing \u0026 Test Coverage**: Given this interacts directly with hardware registers and the lack of existing mock unit tests for this file, the manual board testing (`TEST\u003dmake BOARD\u003ddartmonkey -j10`) noted in the commit message is appropriate.\n* **CL Size \u0026 Scope**: The CL is very well scoped, containing a small and self-contained fix.",
+      "isAi": true,
+      "revId": "f6e66f7122d12f522f86b13f962dcc311aef4176",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
