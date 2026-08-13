@@ -22,6 +22,30 @@
       },
       "revId": "baed890fa69e68321483d9146ad5cf9c0becdb7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33e41b08_9b7f31ed",
+        "filename": "zephyr/program/fatcat/ruby-ish/src/sensor.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-13T17:14:59Z",
+      "side": 1,
+      "message": "At first I was thinking of a generic fix. \nThis requires a new driver quiesce op plus active-\u003einactive transition handling in sensor driver.\n\nA generic teardown placed in the deferred inactive branch of `motion_sense_switch_sensor_rate()` would race with an in-flight tcs3400_read() (no per-chip mutex serializes them).\nA race-free fix must run in the motion_sense task context, I think added here an \"else\" branch for inactive case. https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/common/motion_sense.c;drc\u003d14fbd2b99aca1d92cc15f3e9bfbbb520bb4d0460;l\u003d965.\n\nThis approach means more framework change. This issue happens to ISH while not EC. There are a few projects using EC ALS sensor. Current board-level fix only affects Ruby, however new project use inactive in S3 sensor have to implement the same in board level.\nI can propose a generic fix if we want this direction.",
+      "parentUuid": "227aa619_eef49ef9",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 26
+      },
+      "revId": "baed890fa69e68321483d9146ad5cf9c0becdb7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
