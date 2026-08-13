@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e32c861_cfef5172",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-13T21:06:13Z",
+      "side": 1,
+      "message": "The default value here is 100 ms, which is probably way longer than it needs to be. Theoretically, if enough doomed I2C transactions stack up in the work queue, they could cascade into a watchdog failure. Reducing the timeout would clear the queue faster.\n\nAt this point, this is a hypothetical failure mode, but if you can still reproduce watchdog resets, this might be something to try.",
+      "revId": "6af0d3fce7ea6f8817956cdee9d553e78ba55a79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
