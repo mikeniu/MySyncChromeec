@@ -1297,7 +1297,7 @@ SANOK_CONFIG = BoardConfig(
     architecture=Architecture.RISCV,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
-    reboot_timeout=1.0,
+    reboot_timeout=3.0,
     # TODO(b/468406461): configure rollback regex.
     rollback_region0_regex=NEVER_MATCH_REGEX,
     rollback_region1_regex=NEVER_MATCH_REGEX,
