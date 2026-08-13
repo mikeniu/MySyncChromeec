@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "399c3f20_6437f7ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-13T23:05:01Z",
+      "side": 1,
+      "message": "Thanks for catching this. BTW, if you set V+1 CQ+1, it will let you run CQ tentatively before review.",
+      "revId": "877b3d8f781d33dd93d5844305bc66820686869c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
