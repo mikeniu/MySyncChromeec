@@ -111,6 +111,11 @@
 		wkup-pin-mode = "vin";
 		wkup-pin-pol = "falling";
 	};
+	/* SMC_LID: Lid open, wakes EC on rising edge */
+	wkup-pin@5 {
+		wkup-pin-mode = "vin";
+		wkup-pin-pol = "rising";
+	};
 };
 
 /* Map temp sensor power good */
