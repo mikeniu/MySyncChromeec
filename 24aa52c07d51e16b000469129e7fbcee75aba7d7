@@ -34,6 +34,24 @@
       "message": "Can you also update the documentation: https://source.chromium.org/chromiumos/chromiumos/codesearch/+/HEAD:src/platform/ec/docs/cbi_console_command.md;l\u003d1",
       "revId": "24aa52c07d51e16b000469129e7fbcee75aba7d7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d8c9deb_586b5b27",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-13T20:30:42Z",
+      "side": 1,
+      "message": "Totally forgot this doc. Filed a CL to fix this: https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8252966",
+      "parentUuid": "25177c8f_1eadec3a",
+      "revId": "24aa52c07d51e16b000469129e7fbcee75aba7d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
