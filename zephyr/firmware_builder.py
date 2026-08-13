@@ -523,6 +523,18 @@ def bundle_coverage(opts):
     meta.file_name = "html"
     meta.coverage_html.SetInParent()
 
+    matrix_file = (
+        platform_ec / "twister-out-host" / "coverage" / "test_matrix.json"
+    )
+    if matrix_file.is_file():
+        cmd = [
+            "shutil.copyfile",
+            str(matrix_file),
+            str(bundle_dir / "test_matrix.json"),
+        ]
+        log_cmd(cmd)
+        shutil.copyfile(matrix_file, bundle_dir / "test_matrix.json")
+
     write_metadata(opts, info)
     return 0
 
