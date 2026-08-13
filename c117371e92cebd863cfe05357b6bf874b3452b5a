@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8daec54_8f2da0a8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-13T23:05:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/b9612df5-f10f-4eca-b04f-c1932e2d7845)]\n\n**Review Summary**\n* **Functionality:** The domain separation logic correctly isolates keys generated under the fingerprint auth flow from the classic flow, effectively preventing cross-protocol mismatches.\n* **Security:** Prefixing the HKDF info parameter ensures domain isolation. The keys derived in one context cannot be utilized in another, which is a strong security enhancement. The changes properly safeguard stack arrays utilizing spans.\n* **Style:** The code modifications are cleanly written and appropriately utilize C++ library features like `std::string_view` and `std::span`.\n* **Testing \u0026 Test Coverage:** Test coverage is thorough. The new test cases explicitly verify that cross-flow decryption correctly fails. An inline comment offers a minor suggestion to improve the robustness of the test state cleanup using RAII.\n* **CL Size \u0026 Scope:** The CL is perfectly scoped, small, and focuses exclusively on the required security enhancement.\n\nTAG\u003dagy\nCONV\u003de2dea4d8-7978-403c-9db3-647d2b3ce9cf",
+      "isAi": true,
+      "revId": "c117371e92cebd863cfe05357b6bf874b3452b5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2254e0f9_0a3c70cd",
+        "filename": "zephyr/test/hwtest/src/fpsensor_auth_crypto_stateful.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-13T23:05:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Optional suggestion: Since `zassert_*` macros can exit the function immediately on failure, the manual cleanup at the end of this test might not execute if an assertion fails. This could leave `global_context.fp_encryption_status` in an unexpected state for subsequent tests. Consider using a simple C++ RAII helper struct (which cleans up the state in its destructor) or ZTEST\u0027s `before`/`after` suite hooks to ensure the global state is reliably restored regardless of assertion failures.",
+      "isAi": true,
+      "revId": "c117371e92cebd863cfe05357b6bf874b3452b5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
