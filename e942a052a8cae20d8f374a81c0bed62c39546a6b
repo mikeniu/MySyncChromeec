@@ -35,6 +35,24 @@
       "isAi": true,
       "revId": "e942a052a8cae20d8f374a81c0bed62c39546a6b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ab0be47_f5b0b6d9",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-13T23:20:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d1eba2c_ae1c79f0",
+      "revId": "e942a052a8cae20d8f374a81c0bed62c39546a6b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
