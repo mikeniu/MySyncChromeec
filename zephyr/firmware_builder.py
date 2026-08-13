@@ -488,7 +488,22 @@ def bundle_coverage(opts):
     build_dir = platform_ec / "build" / "zephyr"
     tarball_name = "coverage.tbz2"
     tarball_path = bundle_dir / tarball_name
-    cmd = ["tar", "cvfj", tarball_path, "lcov.info"]
+    tar_files = ["lcov.info"]
+
+    # TODO(b/8257952): Temporary workaround to package test_matrix.json into
+    # coverage.tbz2 so that it is published to GCS during CQ dry runs and
+    # postsubmit builds via the FIRMWARE_LCOV channel until Chromite adds
+    # dedicated artifact upload support for standalone test_matrix.json.
+    matrix_file = (
+        platform_ec / "twister-out-host" / "coverage" / "test_matrix.json"
+    )
+    if matrix_file.is_file():
+        shutil.copyfile(matrix_file, build_dir / "test_matrix.json")
+        tar_files.append("test_matrix.json")
+        # Also copy to bundle_dir for forward compatibility
+        shutil.copyfile(matrix_file, bundle_dir / "test_matrix.json")
+
+    cmd = ["tar", "cvfj", tarball_path] + tar_files
     log_cmd(cmd)
     subprocess.run(cmd, cwd=build_dir, check=True, stdin=subprocess.DEVNULL)
     meta = info.objects.add()
