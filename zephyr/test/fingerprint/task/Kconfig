@@ -106,6 +106,25 @@ config LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS
 	  Link and execute fingerprint subsystem tests that focus
 	  on fingerprint auth commands.
 
+config LINK_TEST_SUITE_FINGERPRINT_CRYPTO
+	bool "Link fingerprint crypto tests"
+	help
+	  Link and execute fingerprint subsystem crypto tests.
+
+config LINK_TEST_SUITE_FINGERPRINT_AUTH_CRYPTO_STATEFUL
+	bool "Link fingerprint stateful auth crypto tests"
+	help
+	  Link and execute fingerprint stateful auth crypto tests.
+
+config LINK_TEST_SUITE_FINGERPRINT_AUTH_CRYPTO_STATELESS
+	bool "Link fingerprint stateless auth crypto tests"
+	help
+	  Link and execute fingerprint stateless auth crypto tests.
+
+config OTP_KEY
+	bool "Enable OTP key mock support"
+	default n
+
 config EC_HOST_CMD_HANDLER_TX_BUFFER_SIZE
 	int "HC TX buffer size"
 	default 544
