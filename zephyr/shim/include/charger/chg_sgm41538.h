@@ -4,7 +4,7 @@
  */
 
 #include <zephyr/devicetree.h>
-#include "driver/charger/sgm41538.h"
+//#include "driver/charger/sgm41538.h"
 
 #ifdef __cplusplus
 extern "C" {
