@@ -48,7 +48,7 @@ ZEPHYR_TEST_PATHS = [
 
 # Set of "-p" platform types that indicates this twister run is targeting
 # a dagwood platform for on-device testing.
-DAGWOOD_PLATFORMS = {"it8xxx2/id82002aw", "npcx9/npcx9m7f", "realtek/rts5912"}
+DAGWOOD_PLATFORMS = {"it8xxx2/it82002aw", "npcx9/npcx9m7f", "realtek/rts5912"}
 
 # Additional upstream test paths that we want to run on dagwood.
 DAGWOOD_TEST_PATHS = [
