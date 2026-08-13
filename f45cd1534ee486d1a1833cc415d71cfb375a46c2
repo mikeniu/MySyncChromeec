@@ -37,6 +37,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "605ab0dc_9222c7a0",
+        "filename": "common/fpsensor/fpsensor_crypto.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-13T21:31:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8fe27c4_b1aa399e",
+      "revId": "f45cd1534ee486d1a1833cc415d71cfb375a46c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab173a98_a103ccef",
@@ -51,6 +69,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Optional nit: Since `info` is a `std::span` and its size is already explicitly verified to be `SHA256_DIGEST_LENGTH` on line 232, consider using `info.size()` here instead of the constant. It makes the length calculation slightly more intuitive by directly mapping to the data source.",
       "isAi": true,
+      "revId": "f45cd1534ee486d1a1833cc415d71cfb375a46c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76999af6_eefda06a",
+        "filename": "common/fpsensor/fpsensor_crypto.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-13T21:31:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab173a98_a103ccef",
       "revId": "f45cd1534ee486d1a1833cc415d71cfb375a46c2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
