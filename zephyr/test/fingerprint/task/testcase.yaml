@@ -138,3 +138,22 @@ tests:
     extra_conf_files:
     - prj.conf
 
+  fingerprint.task.crypto:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_FINGERPRINT_CRYPTO=y
+    extra_conf_files:
+    - prj.conf
+
+  fingerprint.task.auth_crypto_stateful:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_CRYPTO_STATEFUL=y
+    - CONFIG_OTP_KEY=y
+    extra_conf_files:
+    - prj.conf
+
+  fingerprint.task.auth_crypto_stateless:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_CRYPTO_STATELESS=y
+    extra_conf_files:
+    - prj.conf
+

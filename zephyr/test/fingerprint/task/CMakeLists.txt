@@ -48,5 +48,13 @@ target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS app PRIVAT
 target_sources_ifdef(CONFIG_NPCX_OTP_KEY app PRIVATE
 	${PLATFORM_EC}/chip/host/otp_key.c
 	${PLATFORM_EC}/test/mock/otpi_mock.c)
+target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_CRYPTO app PRIVATE
+	src/fpsensor_crypto.cc)
+target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_CRYPTO_STATEFUL app PRIVATE
+	src/fpsensor_auth_crypto_stateful.cc
+	${PLATFORM_EC}/test/mock/otpi_mock.c
+	${PLATFORM_EC}/test/mock/rollback_mock.c)
+target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_CRYPTO_STATELESS app PRIVATE
+	src/fpsensor_auth_crypto_stateless.cc)
 
 add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
