@@ -254,6 +254,7 @@ static int ucsi_ppm_execute_cmd_sync(const struct device *device,
 	case UCSI_SET_PDOS:
 	case UCSI_SET_NEW_CAM:
 	case UCSI_SET_USB:
+	case UCSI_VENDOR_DEFINED_COMMAND:
 		conn = UCSI_7BIT_PORTMASK(control->command_specific[0]);
 		break;
 	case UCSI_GET_ALTERNATE_MODES:
