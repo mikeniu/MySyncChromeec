@@ -14,6 +14,9 @@
 		gpio-en-rails-odl = &gpio_sb_1;
 		gpio-en-sub-s5-rails = &gpio_sb_2;
     };
+	cros_kb_raw: kb-raw-emul {
+		compatible = "cros-ec,kb-raw-emul";
+	};
 	gpio-interrupts {
 		compatible = "cros-ec,gpio-interrupts";
 

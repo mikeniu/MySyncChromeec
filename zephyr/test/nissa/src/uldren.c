@@ -89,6 +89,16 @@ static int get_gpio_output(const struct gpio_dt_spec *const spec)
 	return gpio_emul_output_get(spec->port, spec->pin);
 }
 
+/* Normally implemented in zephyr/shim/src/espi.c */
+void lpc_keyboard_resume_irq(void)
+{
+}
+
+int clock_get_freq(void)
+{
+	return 16000000;
+}
+
 void board_usb_pd_count_init(void);
 static uint32_t fw_config_value;
 

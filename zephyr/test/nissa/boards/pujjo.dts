@@ -9,7 +9,25 @@
 #include "../program/nissa/pujjo/motionsense.dtsi"
 
 / {
+	cros_kb_raw: kb-raw-emul {
+		compatible = "cros-ec,kb-raw-emul";
+	};
+
 	named-gpios {
+		gpio_voldn_btn_odl: voldn_btn_odl {
+			gpios = <&gpio9 3 GPIO_INPUT_PULL_UP>;
+			enum-name = "GPIO_VOLUME_DOWN_L";
+			no-auto-init;
+		};
+		gpio_volup_btn_odl: volup_btn_odl {
+			gpios = <&gpioa 2 GPIO_INPUT_PULL_UP>;
+			enum-name = "GPIO_VOLUME_UP_L";
+			no-auto-init;
+		};
+		gpio_lid_open: lid_open {
+			gpios = <&gpiod 2 GPIO_INPUT>;
+			enum-name = "GPIO_LID_OPEN";
+		};
 		gpio_fan_enable: fan-enable {
 			gpios = <&gpio6 3 GPIO_OUTPUT>;
 			no-auto-init;

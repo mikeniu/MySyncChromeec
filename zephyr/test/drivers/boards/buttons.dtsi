@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include <dt-bindings/buttons.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
 
 / {
 	cros_buttons: buttons {
@@ -12,17 +12,17 @@
 
 		power_button: pwrbtn-ec-in-n {
 			gpios = <&gpio0 25 GPIO_ACTIVE_LOW>;
-			zephyr,code = <BUTTON_POWER>;
+			zephyr,code = <INPUT_KEY_POWER>;
 		};
 
 		vol_up: vol-up-ec {
 			gpios = <&gpio1 4 GPIO_ACTIVE_LOW>;
-			zephyr,code = <BUTTON_VOLUME_UP>;
+			zephyr,code = <INPUT_KEY_VOLUMEUP>;
 		};
 
 		vol_down: vol-down-ec {
 			gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
-			zephyr,code = <BUTTON_VOLUME_DOWN>;
+			zephyr,code = <INPUT_KEY_VOLUMEDOWN>;
 		};
 	};
 };

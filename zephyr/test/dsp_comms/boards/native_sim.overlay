@@ -6,7 +6,6 @@
 #include <board-overlays/native_sim.dts>
 #include <cros/binman.dtsi>
 #include <cros/cbi_flash.dtsi>
-#include <dt-bindings/buttons.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 
  / {
@@ -91,8 +90,7 @@
       debounce-interval-ms = <30>;
       power_button: power_button {
         gpios = <&gpio0 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-        /* TODO: use an INPUT_KEY code here. */
-        zephyr,code = <BUTTON_POWER>;
+        zephyr,code = <INPUT_KEY_POWER>;
       };
     };
 };
