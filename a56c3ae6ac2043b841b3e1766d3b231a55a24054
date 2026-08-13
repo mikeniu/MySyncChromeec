@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f748d85a_1577734d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-08-13T04:43:42Z",
+      "side": 1,
+      "message": "We can not extend the protection outside RW, because it is used for APNS data. See https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/program/fpmcu/et171/srebrna.dts;l\u003d57",
+      "revId": "a56c3ae6ac2043b841b3e1766d3b231a55a24054",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
