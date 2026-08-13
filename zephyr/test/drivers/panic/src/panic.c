@@ -91,7 +91,7 @@ ZTEST(panic, test_panic_reason)
 
 	pdata = panic_get_data();
 	zassert_not_null(pdata, NULL);
-	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->magic, PANIC_DATA_MAGIC);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
 
@@ -351,7 +351,7 @@ ZTEST(panic, test_copy_esf_to_panic_data)
 	pdata = panic_get_data();
 	zassert_not_null(pdata, NULL);
 	zassert_equal(pdata->magic, PANIC_DATA_MAGIC);
-	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
 	zassert_equal(pdata->flags, expected_flags);
 }
@@ -367,7 +367,7 @@ ZTEST(panic, test_panic_data_reset_and_finalize)
 	zassert_equal(res, pdata);
 	zassert_equal(pdata->magic, 0, "magic should be 0 after reset, got %x",
 		      pdata->magic);
-	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
 
 	panic_data_finalize(pdata);
@@ -392,7 +392,7 @@ ZTEST(panic, test_copy_esf_to_panic_data_null)
 	struct panic_data *pdata = panic_get_data();
 	zassert_not_null(pdata, NULL);
 	zassert_equal(pdata->magic, PANIC_DATA_MAGIC);
-	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
 	zassert_equal(pdata->flags, expected_flags);
 }
@@ -406,7 +406,7 @@ ZTEST(panic, test_panic_data_reset_null)
 	zassert_equal(res, expected_pdata);
 	zassert_equal(res->magic, 0, "magic should be 0 after reset, got %x",
 		      res->magic);
-	zassert_equal(res->struct_version, 2);
+	zassert_equal(res->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(res->struct_size, CONFIG_PANIC_DATA_SIZE);
 }
 

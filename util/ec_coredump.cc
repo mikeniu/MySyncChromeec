@@ -279,7 +279,8 @@ static int get_panic_info(struct panic_data &pdata)
 
 	memcpy(&pdata, ec_inbuf, bytes_read);
 
-	if (pdata.struct_version > 2 || pdata.struct_version == 0) {
+	if (pdata.struct_version > PANIC_DATA_VERSION ||
+	    pdata.struct_version == 0) {
 		std::cerr << "Error: Unexpected struct version: "
 			  << pdata.struct_version << std::endl;
 		return -1;
