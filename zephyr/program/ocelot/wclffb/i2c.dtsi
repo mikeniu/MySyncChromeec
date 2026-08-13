@@ -28,7 +28,7 @@
 	clock-frequency = <I2C_BITRATE_STANDARD>;
 
 	charger: sgm41538@9 {
-		compatible = "sgm,41538";
+		compatible = "sgm,41580";
 		status = "okay";
 		reg = <0x9>;
 	};
