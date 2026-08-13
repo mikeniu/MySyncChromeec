@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c889d5d8_ed6d5c00",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-13T05:16:08Z",
+      "side": 1,
+      "message": "Verified sensor and mode change notification ISH -\u003e EC.\nThis patch is ready.",
+      "revId": "8a406a29cc0ae30cb2a434b0cf2220b45783d3fb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
