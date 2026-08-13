@@ -188,6 +188,11 @@ enum { X, Y, Z, W };
 fp_t arc_cos(fp_t x);
 
 /**
+ * Calculate the magnitude of a 3D vector.
+ */
+int vector_magnitude(const intv3_t v);
+
+/**
  * Calculate the dot product of 2 vectors.
  */
 fp_inter_t dot_product(const intv3_t v1, const intv3_t v2);
