@@ -11,6 +11,7 @@
 #include "charger/chg_rt9478.h"
 #include "charger/chg_rt9490.h"
 #include "charger/chg_sgm41538.h"
+#include "charger/chg_sgm41580.h"
 #include "charger/chg_sm5803.h"
 #include "usbc/utils.h"
 
@@ -34,6 +35,7 @@
 	CHECK_COMPAT(RT9490_CHG_COMPAT, usbc_id, chg_id, CHG_CONFIG_RT9490)    \
 	CHECK_COMPAT(RT9490_EMUL_COMPAT, usbc_id, chg_id, CHG_CONFIG_RT9490)   \
 	CHECK_COMPAT(SGM41538_CHG_COMPAT, usbc_id, chg_id, CHG_CONFIG_SGM41538)  \
+	CHECK_COMPAT(SGM41580_CHG_COMPAT, usbc_id, chg_id, CHG_CONFIG_SGM41580)\
 	CHECK_COMPAT(SM5803_CHG_COMPAT, usbc_id, chg_id, CHG_CONFIG_SM5803)
 
 #define CHG_CHIP(usbc_id)                           \

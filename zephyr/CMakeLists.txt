@@ -317,6 +317,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_SM5803
                                                 "${PLATFORM_EC}/driver/charger/sm5803.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_SGM41538
                                                 "${PLATFORM_EC}/driver/charger/sgm41538.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_SGM41580
+                                                "${PLATFORM_EC}/driver/charger/sgm41580.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGESPLASH
                                                 "${PLATFORM_EC}/common/chargesplash.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER

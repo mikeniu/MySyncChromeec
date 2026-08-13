@@ -285,6 +285,14 @@ config PLATFORM_EC_CHARGER_SGM41538
 	  Enables the driver for the SGM41538 battery charger
 	  controller.
 
+config PLATFORM_EC_CHARGER_SGM41580
+	bool "Use the SGM41580 charger"
+	depends on PLATFORM_EC_I2C
+	select PLATFORM_EC_CHARGER_NARROW_VDC
+	help
+	  Enables the driver for the SGM41580 battery charger
+	  controller.
+
 if PLATFORM_EC_OCPC
 
 config PLATFORM_EC_OCPC_DEF_RBATT_MOHMS
