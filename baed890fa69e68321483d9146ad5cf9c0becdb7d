@@ -46,6 +46,30 @@
       },
       "revId": "baed890fa69e68321483d9146ad5cf9c0becdb7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87aa442b_8aa4e28c",
+        "filename": "zephyr/program/fatcat/ruby-ish/src/sensor.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-13T23:17:44Z",
+      "side": 1,
+      "message": "I think this same bug could affect the EC.  If the sensor generates an interrupt that is never serviced, the EC won\u0027t ever enter it\u0027s sleep mode while the overall system will stay in S0ix.  This can cause the EC power consumption to increase, but likely by a smaller amount than the ISH blocking S0i2.0 residency.\n\nI\u0027d like to see a proposal for how this could be incorporated in the motionse_sense task.  I\u0027m thinking a new devicetree property could be used to mark sensors that need some special handling regarding their interrupt.\n\nThe proposal doesn\u0027t need to be a working implementation, just an outline of how it might work.",
+      "parentUuid": "33e41b08_9b7f31ed",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 26
+      },
+      "revId": "baed890fa69e68321483d9146ad5cf9c0becdb7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
