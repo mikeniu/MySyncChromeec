@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "26bc94a3_5f4692b7",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 1052,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2026-08-13T23:44:57Z",
+      "side": 1,
+      "message": "I don\u0027t even see a number like this in the datasheet (referring to a document marked Rev 0.15); where did you get 244 us from?\n\nThe only GPADC timing information I see is GPADC_{MEAS_OFF} which kind of implies typical acquistition time might be 146 us (although what it means when describing \u0027slots\u0027 isn\u0027t clear).",
+      "parentUuid": "f4bf82b5_a3c32e1e",
+      "revId": "3c174ef7c37e76e7c5fd6642a441cc31a6ce54f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a051c5c2_ec0a2ff4",
         "filename": "driver/charger/sm5803.c",
         "patchSetId": 20
