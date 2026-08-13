@@ -260,6 +260,10 @@ static int try_vendor_command(struct consumer const *consumer, size_t count)
 			/* Unreachable, unless something bad happens. */
 			response = EC_RES_ERROR;
 			break;
+		case UPDATE_EXTRA_CMD_JUMP_TO_RO:
+			system_run_image_copy_with_flags(EC_IMAGE_RO, EC_RESET_FLAG_STAY_IN_RO);
+			response = EC_RES_SUCCESS;
+			break;
 		case UPDATE_EXTRA_CMD_JUMP_TO_RW:
 #ifdef CONFIG_RWSIG
 			/*

@@ -667,7 +667,7 @@ int system_is_in_rw(void)
 	return is_rw_image(system_get_image_copy());
 }
 
-test_mockable_static int
+test_mockable int
 system_run_image_copy_with_flags(enum ec_image copy, uint32_t add_reset_flags)
 {
 	uintptr_t base;
