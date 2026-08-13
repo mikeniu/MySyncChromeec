@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4bf82b5_a3c32e1e",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 1052,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-13T18:33:52Z",
+      "side": 1,
+      "message": "1. Right now, this fails silently. It should probably feed into `rv` like the rest of the calls in this funciton.\n2. If the datasheet says 244 us, then maybe just wait 400 us once and attempt the call once. If that works, there\u0027s probably no reason to loop.",
+      "revId": "3c174ef7c37e76e7c5fd6642a441cc31a6ce54f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a051c5c2_ec0a2ff4",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 1374,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-13T18:33:52Z",
+      "side": 1,
+      "message": "In an earlier patchset, this code would return early on failure, which is fairly consistent with the rest of this function. If you did that here, it would allow you to reduce the level of nesting and place error handling closer to the code that induced the error while still avoiding the use of an uninitialized `vbus_mv`.",
+      "revId": "3c174ef7c37e76e7c5fd6642a441cc31a6ce54f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

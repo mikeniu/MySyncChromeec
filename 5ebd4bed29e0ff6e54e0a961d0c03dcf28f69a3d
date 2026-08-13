@@ -51,6 +51,24 @@
       "parentUuid": "3a585a8b_3c2d37ca",
       "revId": "5ebd4bed29e0ff6e54e0a961d0c03dcf28f69a3d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df8f083f_40667221",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-13T18:33:52Z",
+      "side": 1,
+      "message": "I think the version in patchset 20 that directly tracks whether the ADC is ready should obviate this concern.",
+      "parentUuid": "dee3148e_267b053e",
+      "revId": "5ebd4bed29e0ff6e54e0a961d0c03dcf28f69a3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
