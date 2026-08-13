@@ -368,7 +368,8 @@ test_mockable int system_jumped_late(void)
 	return !(reset_flags & EC_RESET_FLAG_EFS) && jumped_to_image;
 }
 
-int system_add_jump_tag(uint16_t tag, int version, int size, const void *data)
+test_mockable int system_add_jump_tag(uint16_t tag, int version, int size,
+				      const void *data)
 {
 	struct jump_tag *t;
 	size_t new_entry_size;
