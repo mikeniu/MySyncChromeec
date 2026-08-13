@@ -89,6 +89,24 @@
       "parentUuid": "ed12d487_f0138e22",
       "revId": "0576d86661f056d0b5630776fd0eab698a668c59",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7204297f_fe77c31f",
+        "filename": "common/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-13T03:25:54Z",
+      "side": 1,
+      "message": "full assessment:\n\nhttps://b.corp.google.com/issues/519694070#comment11",
+      "parentUuid": "89406734_4f355083",
+      "revId": "0576d86661f056d0b5630776fd0eab698a668c59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
