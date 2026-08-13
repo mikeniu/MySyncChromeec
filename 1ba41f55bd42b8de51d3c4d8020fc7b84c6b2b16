@@ -46,6 +46,30 @@
       },
       "revId": "1ba41f55bd42b8de51d3c4d8020fc7b84c6b2b16",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b5ad678_b51ec71a",
+        "filename": "zephyr/drivers/buttons/buttons.c",
+        "patchSetId": 23
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-13T00:15:16Z",
+      "side": 1,
+      "message": "Done, following with a CL that remove buttons redefinition from `zephyr/include/dt-bindings/buttons.h` and consolidate into `include/buttons.h`",
+      "parentUuid": "7c4df9be_9978234c",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 8
+      },
+      "revId": "1ba41f55bd42b8de51d3c4d8020fc7b84c6b2b16",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
