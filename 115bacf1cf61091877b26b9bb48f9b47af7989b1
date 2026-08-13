@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68ea60cc_87cc227b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-13T23:22:30Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/97549d86-13fe-48c6-982e-ede4b29decd9)]\n\n### Review Summary\n* **Functionality**: The change correctly ensures teardown hooks run atomically. The updates to `preserve_enable_5v_state` and `flash_shared_enable_ec_access` successfully remove blocking operations (mutexes, sleeps) to comply with the new interrupt-disabled context.\n* **Security**: No vulnerabilities introduced. This improves system resilience during image transitions by removing race conditions.\n* **Style**: Code style is clean and well-documented. The stray semicolon in `flash.c` has been cleaned up.\n* **Testing**: The unit test properly verifies the calling order using a mock variable. Relocating `ztest_interrupts_disabled` to `system_fake.c` correctly addresses the previous test linkage concerns.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and appropriately scoped to this single fix.\n\nTAG\u003dagy\nCONV\u003dc5acdda0-6a62-43db-b32e-9713638a3f2f",
+      "isAi": true,
+      "revId": "115bacf1cf61091877b26b9bb48f9b47af7989b1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
