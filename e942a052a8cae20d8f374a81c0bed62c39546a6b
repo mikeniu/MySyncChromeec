@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72ccd190_3111768b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-13T23:19:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n* **Functionality**: The change correctly ensures teardown hooks run atomically. The updates to `preserve_enable_5v_state` and `flash_shared_enable_ec_access` correctly remove blocking operations (mutexes, sleeps) to comply with the new interrupt-disabled context.\n* **Security**: No vulnerabilities introduced. This improves system resilience during image transitions by removing race conditions.\n* **Style**: Code style is clean and well-documented. There is a minor stray semicolon left in `zephyr/shim/src/flash.c` that can be cleaned up.\n* **Testing**: The unit test properly verifies the calling order using a mock variable. Relocating `ztest_interrupts_disabled` to `system_fake.c` addresses the previous linkage concern.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and perfectly scoped to this single fix.\n\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "e942a052a8cae20d8f374a81c0bed62c39546a6b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d1eba2c_ae1c79f0",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-13T23:19:14Z",
+      "side": 1,
+      "message": "Looks like a stray semicolon was left here.",
+      "isAi": true,
+      "revId": "e942a052a8cae20d8f374a81c0bed62c39546a6b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
