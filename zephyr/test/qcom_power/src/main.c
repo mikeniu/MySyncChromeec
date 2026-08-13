@@ -21,6 +21,7 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/gpio/gpio_emul.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
 #include <zephyr/fff.h>
 #include <zephyr/input/input.h>
 #include <zephyr/kernel.h>
@@ -373,16 +374,16 @@ ZTEST(qcom_power, test_power_button_input_event)
 
 	zassert_equal(power_button_is_pressed(), 0);
 
-	input_report_key(dev, BUTTON_POWER, 1, true, K_FOREVER);
+	input_report_key(dev, INPUT_KEY_POWER, 1, true, K_FOREVER);
 	zassert_equal(power_button_is_pressed(), 1);
 
-	input_report_key(dev, BUTTON_RECOVERY, 1, true, K_FOREVER);
+	input_report_key(dev, INPUT_KEY_RECOVERY, 1, true, K_FOREVER);
 	zassert_equal(power_button_is_pressed(), 1);
 
 	input_report_abs(dev, INPUT_ABS_X, 1, true, K_FOREVER);
 	zassert_equal(power_button_is_pressed(), 1);
 
-	input_report_key(dev, BUTTON_POWER, 0, true, K_FOREVER);
+	input_report_key(dev, INPUT_KEY_POWER, 0, true, K_FOREVER);
 	zassert_equal(power_button_is_pressed(), 0);
 }
 
