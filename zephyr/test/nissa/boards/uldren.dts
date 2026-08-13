@@ -14,6 +14,9 @@
 		gpio-en-rails-odl = &gpio_sb_1;
 		gpio-en-sub-s5-rails = &gpio_sb_2;
     };
+	cros_kb_raw: kb-raw-emul {
+		compatible = "cros-ec,kb-raw-emul";
+	};
 	gpio-interrupts {
 		compatible = "cros-ec,gpio-interrupts";
 
@@ -43,6 +46,16 @@
 
 		/delete-node/ hdmi_sel;
 
+		gpio_voldn_btn_odl: voldn_btn_odl {
+			gpios = <&gpio9 3 GPIO_INPUT_PULL_UP>;
+			enum-name = "GPIO_VOLUME_DOWN_L";
+			no-auto-init;
+		};
+		gpio_volup_btn_odl: volup_btn_odl {
+			gpios = <&gpioa 2 GPIO_INPUT_PULL_UP>;
+			enum-name = "GPIO_VOLUME_UP_L";
+			no-auto-init;
+		};
 		gpio_subboard_detect_l: subboard_detect_l {
 			gpios = <&gpioc 6 GPIO_INPUT_PULL_UP>;
 		};

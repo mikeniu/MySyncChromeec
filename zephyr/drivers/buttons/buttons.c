@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "button.h"
 #include "keyboard_protocol.h"
 #include "mkbp_input_devices.h"
 #include "power_button.h"
@@ -55,17 +56,17 @@ static void buttons_cb_handler(struct input_event *evt, void *user_data)
 		evt->value);
 
 	switch (evt->code) {
-	case BUTTON_POWER:
+	case INPUT_KEY_POWER:
 		handle_power_button(evt->value);
 		break;
-	case BUTTON_VOLUME_UP:
+	case INPUT_KEY_VOLUMEUP:
 		handle_volume_button(KEYBOARD_BUTTON_VOLUME_UP, evt->value);
 		break;
-	case BUTTON_VOLUME_DOWN:
+	case INPUT_KEY_VOLUMEDOWN:
 		handle_volume_button(KEYBOARD_BUTTON_VOLUME_DOWN, evt->value);
 		break;
 #ifdef CONFIG_PLATFORM_EC_DEDICATED_RECOVERY_BUTTON
-	case BUTTON_RECOVERY:
+	case INPUT_KEY_RECOVERY:
 		handle_volume_button(KEYBOARD_BUTTON_RECOVERY, evt->value);
 		break;
 #endif
@@ -132,16 +133,16 @@ static void simulate_button_release(struct k_work *work)
 
 	/* Release all simulated buttons */
 	if (simulated_button_mask & BIT(BUTTON_VOLUME_UP)) {
-		input_report_key(buttons_dev, BUTTON_VOLUME_UP, 0, true,
+		input_report_key(buttons_dev, INPUT_KEY_VOLUMEUP, 0, true,
 				 K_FOREVER);
 	}
 	if (simulated_button_mask & BIT(BUTTON_VOLUME_DOWN)) {
-		input_report_key(buttons_dev, BUTTON_VOLUME_DOWN, 0, true,
+		input_report_key(buttons_dev, INPUT_KEY_VOLUMEDOWN, 0, true,
 				 K_FOREVER);
 	}
 #ifdef CONFIG_PLATFORM_EC_DEDICATED_RECOVERY_BUTTON
 	if (simulated_button_mask & BIT(BUTTON_RECOVERY)) {
-		input_report_key(buttons_dev, BUTTON_RECOVERY, 0, true,
+		input_report_key(buttons_dev, INPUT_KEY_RECOVERY, 0, true,
 				 K_FOREVER);
 	}
 #endif
@@ -162,18 +163,18 @@ static void simulate_button(uint32_t button_mask, int press_ms)
 
 	/* Press the buttons */
 	if (button_mask & BIT(BUTTON_VOLUME_UP)) {
-		input_report_key(buttons_dev, BUTTON_VOLUME_UP, 1, true,
+		input_report_key(buttons_dev, INPUT_KEY_VOLUMEUP, 1, true,
 				 K_FOREVER);
 		LOG_DBG("Volume Up pressed");
 	}
 	if (button_mask & BIT(BUTTON_VOLUME_DOWN)) {
-		input_report_key(buttons_dev, BUTTON_VOLUME_DOWN, 1, true,
+		input_report_key(buttons_dev, INPUT_KEY_VOLUMEDOWN, 1, true,
 				 K_FOREVER);
 		LOG_DBG("Volume Down pressed");
 	}
 #ifdef CONFIG_PLATFORM_EC_DEDICATED_RECOVERY_BUTTON
 	if (button_mask & BIT(BUTTON_RECOVERY)) {
-		input_report_key(buttons_dev, BUTTON_RECOVERY, 1, true,
+		input_report_key(buttons_dev, INPUT_KEY_RECOVERY, 1, true,
 				 K_FOREVER);
 		LOG_DBG("Recovery pressed");
 	}

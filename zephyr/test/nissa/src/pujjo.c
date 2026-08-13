@@ -28,9 +28,14 @@ FAKE_VALUE_FUNC(enum battery_present, battery_is_present);
 FAKE_VOID_FUNC(board_set_active_charge_port, int);
 FAKE_VOID_FUNC(usb_interrupt_c1, enum gpio_signal);
 
-int button_disable_gpio(enum button button_type)
+/* Normally implemented in zephyr/shim/src/espi.c */
+void lpc_keyboard_resume_irq(void)
 {
-	return EC_SUCCESS;
+}
+
+int clock_get_freq(void)
+{
+	return 16000000;
 }
 
 static void pujjo_test_before(void *fixture)
