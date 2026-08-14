@@ -81,6 +81,24 @@
       "isAi": true,
       "revId": "68f9c9a6b976057dfba201b7623b1197972622e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75453056_704cd896",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:28:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/e0f6575d-b8cc-491a-ba7b-2fd0dfd6ab32)]\n\n**Review Summary**\n* **Functionality:** Domain separation correctly leverages the HKDF info parameter by prefixing `fingerprint_auth_template:` during key derivation when fingerprint auth is enabled. The `std::array` exactly sizes the buffer for the prefix and original info, guaranteeing no uninitialized trailing bytes.\n* **Security:** Excellent domain isolation between classic and fingerprint auth flows. The implementation safely bounds memory operations using `std::array` and `std::span`. Since the info lengths differ (32 vs 58 bytes), there is no possibility of cross-protocol collisions.\n* **Style:** The code cleanly adheres to C++ standards, appropriately utilizing `std::string_view`, `std::array`, and `std::copy`.\n* **Testing \u0026 Test Coverage:** Comprehensive test suite. The new `ZTEST` cases effectively validate that templates encrypted under one flow explicitly fail to decrypt under the other, alongside checking invalid info size boundaries.\n* **CL Size \u0026 Scope:** The CL is appropriately scoped and cleanly focuses on the required cryptographic domain separation.\n\nTAG\u003dagy\nCONV\u003de0f6575d-b8cc-491a-ba7b-2fd0dfd6ab32",
+      "isAi": true,
+      "revId": "68f9c9a6b976057dfba201b7623b1197972622e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
