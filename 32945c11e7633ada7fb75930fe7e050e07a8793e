@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c1eea0f1_ded9df74",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:19:23Z",
+      "side": 1,
+      "message": "The test isn\u0027t actually checking the ordering of the flash lock and the MPU lock. It\u0027s just checking lock and unlock.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 38
+      },
+      "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c765a90e_93e53ddf",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
