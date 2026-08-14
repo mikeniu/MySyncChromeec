@@ -16,6 +16,23 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "d1a0281529679e90295bcd975914d9857a79c6d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0844a2b_f7ff92ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-08-14T05:21:34Z",
+      "side": 1,
+      "message": "we plan to enable tokenization soon:\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8135295",
+      "revId": "d1a0281529679e90295bcd975914d9857a79c6d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
