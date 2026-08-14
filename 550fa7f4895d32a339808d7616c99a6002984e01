@@ -21,6 +21,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9f32578a_01d9efae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:24:22Z",
+      "side": 1,
+      "message": "We discussed this is in person. Since we\u0027re still using v0 in `biod` we\u0027ll need to have working v0 versions of the tests as a first step.",
+      "revId": "550fa7f4895d32a339808d7616c99a6002984e01",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e06bdc68_e33747d1",
         "filename": "test/fpsensor_auth_commands.cc",
         "patchSetId": 8
