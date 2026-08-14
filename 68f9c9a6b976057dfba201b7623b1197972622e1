@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "928a467c_5a1e9d7d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T18:25:21Z",
+      "side": 1,
+      "message": "I had a discussion with Zi yesterday. Zi added a comment in the bug:\n\nhttps://b.corp.google.com/issues/518787339#comment10",
+      "parentUuid": "469f9f7c_da694ed6",
+      "range": {
+        "startLine": 11,
+        "startChar": 28,
+        "endLine": 13,
+        "endChar": 55
+      },
+      "revId": "68f9c9a6b976057dfba201b7623b1197972622e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "4de0dd27_8b9a702d",
