@@ -215,6 +215,14 @@ config HW_TEST_ROLLBACK
 	help
 	  The test verifies rollback regions functionality.
 
+config HW_TEST_ROLLBACK_LOCK
+	bool "Rollback mapped storage lock test"
+	select ZTEST
+	depends on BOARD_FINGERPRINT
+	help
+	  Verifies that unlock_rollback() and lock_rollback() correctly acquire
+	  and release the external mapped storage lock.
+
 config HW_TEST_ROLLBACK_MINIMAL_VERSION
 	bool "Rollback minimal version test"
 	select ZTEST

@@ -32,7 +32,7 @@ LOG_MODULE_REGISTER(shim_flash, LOG_LEVEL_ERR);
 K_MUTEX_DEFINE(flash_lock);
 
 #ifdef CONFIG_EXTERNAL_STORAGE
-void crec_flash_lock_mapped_storage(int lock)
+test_mockable void crec_flash_lock_mapped_storage(int lock)
 {
 	if (lock)
 		mutex_lock(&flash_lock);
