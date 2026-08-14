@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c0260c6_b262d3ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T21:30:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/84c59c63-65cd-46f9-97ab-b7a4641bb241)]\n\n### Review Summary\n* **Functionality**: The change correctly addresses a race condition by disabling interrupts before `HOOK_SYSJUMP` handlers run. The updates to `preserve_enable_5v_state` and `flash_shared_enable_ec_access` successfully remove blocking operations (mutexes, sleeps) to comply with the new interrupt-disabled context. The addition of the default `test_mockable` implementation in `zephyr/shim/src/system.c` nicely resolves test linkage issues for test suites that do not include `system_fake.c`.\n* **Security**: No vulnerabilities introduced. This improves system robustness and security by preventing preemption while system protection mechanisms are inactive during image transitions.\n* **Style**: Code style is clean and well-documented.\n* **Testing**: Manual testing was performed. A mock-based unit test properly enforces the calling order programmatically. The test dependencies are managed correctly across the `zephyr/shim` and `zephyr/fake` directories.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and perfectly scoped to this single fix.\n\nTAG\u003dagy\nCONV\u003d84c59c63-65cd-46f9-97ab-b7a4641bb241",
+      "isAi": true,
+      "revId": "e1c7736065c175d22a2666dad4e90360b21533d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
