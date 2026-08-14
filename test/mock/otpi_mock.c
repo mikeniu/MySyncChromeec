@@ -9,6 +9,11 @@
  */
 #include "mock/otpi_mock.h"
 
+#if defined(CONFIG_ZEPHYR)
+#include <zephyr/arch/cpu.h>
+#include <zephyr/ztest.h>
+#endif /* CONFIG_ZEPHYR */
+
 #ifndef TEST_BUILD
 #error "Mocks should only be in the test build."
 #endif
@@ -49,6 +54,15 @@ enum API_RETURN_STATUS_T otpi_write(uint32_t address, uint8_t data)
 {
 	if (!mock_otp.powered_on)
 		return API_RET_OTP_STATUS_FAIL;
+
+#if defined(CONFIG_ZEPHYR)
+	/*
+	 * Validate that interrupts are locked during key programming to prevent
+	 * interrupted writes.
+	 */
+	zassert_false(arch_cpu_irqs_are_enabled(),
+		      "otpi_write called with interrupts enabled!");
+#endif /* CONFIG_ZEPHYR */
 
 	mock_otp.otp_key_buffer[address - OTP_KEY_ADDR] |= data;
 	return API_RET_OTP_STATUS_OK;
