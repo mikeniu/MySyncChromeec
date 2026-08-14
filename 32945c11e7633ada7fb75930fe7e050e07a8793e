@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c2e472d9_0f968f4e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:18:21Z",
+      "side": 1,
+      "message": "Are we calling `crec_flash_lock_mapped_storage` anywhere else when locking/unlocking rollback? The commit message is focused on the order of flash lock and mpu lock, but it\u0027s not clear if it\u0027s also *adding* the flash lock.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 23
+      },
+      "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c765a90e_93e53ddf",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -15,6 +38,121 @@
       "side": 1,
       "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/5b2221d3-0364-42a0-a9bd-9687ec52676a)]\n\n### Review Summary\n\n*   **Functionality:** The patch accurately implements the lock ordering for `mapped_storage` around the MPU protection window. Acquiring the lock before disabling the MPU and releasing it after enabling the MPU successfully avoids pending while MPU hardware protection is disabled.\n*   **Style \u0026 Consistency:** The use of `IS_ENABLED(CONFIG_EXTERNAL_STORAGE)` is an elegant and robust choice over `#ifdef`. It is compatible with both Zephyr and legacy EC builds and ensures the code blocks are syntax-checked even when the config is disabled.\n*   **Security:** Reduces the attack surface by ensuring that any mutex contention occurs while MPU protection remains active, preventing unintended accesses to rollback regions during thread sleeping.\n*   **Testing \u0026 Coverage:** The addition of the `rollback_lock` hardware test is excellent. It explicitly validates the lock acquisition and release ordering and confirms that `crec_flash_lock_mapped_storage` is called correctly during `unlock_rollback` and `lock_rollback`.\n*   **CL Size \u0026 Scope:** The CL is appropriately scoped to this fix and is easy to review.\n\nTAG\u003dagy\nCONV\u003d5b2221d3-0364-42a0-a9bd-9687ec52676a",
       "isAi": true,
+      "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30c1228b_400fe720",
+        "filename": "common/rollback.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:18:21Z",
+      "side": 1,
+      "message": "How about something like:\n\n```\n/*\n\t * SOFTWARE UNLOCK: Release the flash mutex AFTER locking the hardware MPU.\n\t * We are safely hardware-protected again, so other threads can proceed.\n\t */\n\t ```",
+      "range": {
+        "startLine": 102,
+        "startChar": 2,
+        "endLine": 105,
+        "endChar": 5
+      },
+      "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a144ddbd_7e8ef8ee",
+        "filename": "common/rollback.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:18:21Z",
+      "side": 1,
+      "message": "We can add two small static inline functions at the top of `rollback.c` to completely abstract the `1` and `0` and make the call sites read like plain English:\n\n```c\nstatic inline void acquire_software_flash_lock(void) {\n#if IS_ENABLED(CONFIG_EXTERNAL_STORAGE)\n\tcrec_flash_lock_mapped_storage(1);\n#endif\n}\n\nstatic inline void release_software_flash_lock(void) {\n#if IS_ENABLED(CONFIG_EXTERNAL_STORAGE)\n\tcrec_flash_lock_mapped_storage(0);\n#endif\n}\n\n```\n\nThen, inside `unlock_rollback()`, you simply call `acquire_software_flash_lock();`. This entirely removes the need for `#ifdef` logic scattered throughout the functions and isolates the \"inverted\" concept.",
+      "range": {
+        "startLine": 101,
+        "startChar": 1,
+        "endLine": 106,
+        "endChar": 36
+      },
+      "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3354ae30_4edf55c6",
+        "filename": "common/rollback.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:18:21Z",
+      "side": 1,
+      "message": "Does it compile if you use `false` here?",
+      "range": {
+        "startLine": 106,
+        "startChar": 33,
+        "endLine": 106,
+        "endChar": 34
+      },
+      "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9997412a_459124f8",
+        "filename": "common/rollback.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:18:21Z",
+      "side": 1,
+      "message": "How about something like:\n\n```\n/*\n\t * SOFTWARE LOCK: Acquire the flash mutex BEFORE unlocking the hardware MPU.\n\t * This ensures that if thread contention occurs, it happens while the \n\t * rollback region is still hardware-protected.\n\t */\n\t ```",
+      "range": {
+        "startLine": 116,
+        "startChar": 2,
+        "endLine": 119,
+        "endChar": 5
+      },
+      "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40301dd9_2f5b7334",
+        "filename": "common/rollback.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:18:21Z",
+      "side": 1,
+      "message": "Does it compile if you use `true` here?",
+      "range": {
+        "startLine": 120,
+        "startChar": 33,
+        "endLine": 120,
+        "endChar": 34
+      },
       "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
