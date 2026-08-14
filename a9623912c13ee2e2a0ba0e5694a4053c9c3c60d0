@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4161c427_ce33ee4a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T02:30:46Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8dd5c85b_df266df8",
+      "revId": "a9623912c13ee2e2a0ba0e5694a4053c9c3c60d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6edb0a0c_b1a7d5ed",
@@ -54,6 +72,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1d5dc6d_aaf97cf9",
+        "filename": "common/rollback.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T02:30:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6edb0a0c_b1a7d5ed",
+      "revId": "a9623912c13ee2e2a0ba0e5694a4053c9c3c60d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c2d3050_2665396f",
@@ -68,6 +104,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Same here, please use `#ifdef CONFIG_EXTERNAL_STORAGE` instead of `IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)` for consistency and legacy EC compatibility.",
       "isAi": true,
+      "revId": "a9623912c13ee2e2a0ba0e5694a4053c9c3c60d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd993ea8_22d725c6",
+        "filename": "common/rollback.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T02:30:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c2d3050_2665396f",
       "revId": "a9623912c13ee2e2a0ba0e5694a4053c9c3c60d0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
