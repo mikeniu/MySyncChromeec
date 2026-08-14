@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a025a74_0b9cfc18",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T23:00:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/614252b2-0f27-42bc-a737-b667a0de7ecf)]\n\n**Review Summary:**\n* **Functionality:** The changes correctly lock interrupts around the OTP key programming loop, preventing potential interruptions that could cause timing issues or write failures. The implementation uses `irq_lock()` and `irq_unlock()` appropriately and handles error paths correctly.\n* **Security:** No security vulnerabilities introduced. Enforcing uninterrupted writes during sensitive operations like key provisioning is a strong practice.\n* **Style \u0026 Consistency:** The code adheres to standard conventions. The addition of mock-level assertions is an effective way to test the locking behavior.\n* **Testing \u0026 Test Coverage:** Test coverage is solid. By modifying the mock `otpi_write` to assert `irqs_are_locked()`, the test accurately validates that the lock is held. The `hwtest` also ensures interrupts are not leaked. Un-skipping the test in `run_device_tests.py` successfully enables it in the CI pipeline.\n* **CL Size \u0026 Scope:** The CL is perfectly sized, addressing a single specific issue with appropriate test modifications.",
+      "isAi": true,
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59d6be6e_205859f8",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T23:00:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] If this mock file is shared with legacy EC tests (non-Zephyr builds), including `\u003czephyr/ztest.h\u003e` unconditionally will break compilation.\n\nConsider wrapping Zephyr-specific includes and code in `#ifdef CONFIG_ZEPHYR`, or use a cross-environment macro if this mock is consumed by both test runners.",
+      "isAi": true,
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7e9d14a_265aaa4f",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T23:00:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Design Note**: Placing this assertion in the generic `otpi_write` mock will strictly enforce that *any* test invoking this mock must perform OTP writes with interrupts locked.\n\nIf there are other callers of `otpi_write` in the codebase that do not have this uninterrupted timing requirement, this assertion could lead to false-positive test failures. If this is the intended system-wide behavior for all OTP writes, this is perfectly fine. Otherwise, consider if this assertion should be scoped specifically to the `otp_key_write` context.",
+      "isAi": true,
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
