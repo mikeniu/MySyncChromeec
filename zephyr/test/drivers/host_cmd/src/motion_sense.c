@@ -6,6 +6,7 @@
 #include "atomic.h"
 #include "console.h"
 #include "driver/accel_bma2x2.h"
+#include "hooks.h"
 #include "lid_angle.h"
 #include "motion_lid.h"
 #include "motion_sense.h"
@@ -13,6 +14,7 @@
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 
+#include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/fff.h>
 #include <zephyr/shell/shell.h>
 #include <zephyr/ztest.h>
@@ -367,6 +369,43 @@ ZTEST_USER(host_cmd_motion_sense, test_odr_set)
 		      response.sensor_odr.ret, "Expected %d, but got %d",
 		      BMA2x2_REG_TO_BW(BMA2x2_BW_7_81HZ),
 		      response.sensor_odr.ret);
+}
+
+ZTEST_USER(host_cmd_motion_sense,
+	   test_switch_sensor_rate_int_disable_on_inactive)
+{
+	int i;
+	gpio_flags_t flags;
+	/* Access the TCS interrupt pin directly from DTS */
+	static const struct gpio_dt_spec tcs_int =
+		GPIO_DT_SPEC_GET(DT_NODELABEL(gpio_tcs3400_int), gpios);
+
+	/* Find a sensor with int-disable-on-inactive */
+	for (i = 0; i < motion_sensor_count; i++) {
+		if (motion_sensors[i].flags &
+		    MOTIONSENSE_FLAG_INT_DISABLE_ON_INACTIVE)
+			break;
+	}
+	zassert_true(i < motion_sensor_count,
+		     "No sensor has INT_DISABLE_ON_INACTIVE set");
+
+	/* Disable path: suspend makes SENSOR_ACTIVE_S0 sensor inactive in S3 */
+	hook_notify(HOOK_CHIPSET_SUSPEND);
+	k_sleep(K_SECONDS(2));
+	zassert_equal(SENSOR_NOT_INITIALIZED, motion_sensors[i].state);
+	gpio_emul_flags_get(tcs_int.port, tcs_int.pin, &flags);
+	zassert_false(flags & GPIO_INT_EDGE_FALLING,
+		      "Interrupt should be disabled after suspend");
+
+	/* Enable path: resume makes sensor active, interrupt re-armed */
+	hook_notify(HOOK_CHIPSET_RESUME);
+	k_sleep(K_SECONDS(2));
+	zassert_true(motion_sensors[i].state == SENSOR_INITIALIZED ||
+			     motion_sensors[i].state == SENSOR_READY,
+		     "Expected sensor initialized or ready after resume");
+	gpio_emul_flags_get(tcs_int.port, tcs_int.pin, &flags);
+	zassert_true(flags & GPIO_INT_EDGE_FALLING,
+		     "Interrupt should be enabled after resume");
 }
 
 ZTEST_USER(host_cmd_motion_sense, test_range_invalid_sensor_num)

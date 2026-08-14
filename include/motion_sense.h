@@ -150,6 +150,13 @@ struct motion_data_t {
 #define MOTIONSENSE_FLAG_IN_SPOOF_MODE BIT(1)
 /* When set the sensor is in forced (polled) mode for sample collection */
 #define MOTIONSENSE_FLAG_IN_FORCED_MODE BIT(2)
+/*
+ * When set, mask the sensor's interrupt while it is inactive in the current
+ * power state.
+ */
+#define MOTIONSENSE_FLAG_INT_DISABLE_ON_INACTIVE BIT(3)
+
+struct gpio_int_config;
 
 struct motion_sensor_t {
 	/* RO fields */
@@ -175,6 +182,9 @@ struct motion_sensor_t {
 	 * Various flags, see MOTIONSENSE_FLAG_*
 	 */
 	uint32_t flags;
+
+	/* Interrupt config used to enable/disable the sensor's IRQ. */
+	const struct gpio_int_config *int_config;
 
 	const mat33_fp_t *rot_standard_ref;
 

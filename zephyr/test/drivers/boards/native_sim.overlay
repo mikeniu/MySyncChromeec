@@ -235,6 +235,9 @@
 			gpios = <&gpio0 27 (GPIO_INPUT | GPIO_OUTPUT)>;
 			enum-name = "GPIO_TEST";
 		};
+		gpio_tcs3400_int: tcs3400_int {
+			gpios = <&gpio1 22 GPIO_INPUT>;
+		};
 		ec_batt_pres_odl {
 			gpios = <&gpio0 28 GPIO_INPUT>;
 			enum-name = "GPIO_BATT_PRES_ODL";
@@ -335,7 +338,7 @@
 		low-level;
 		gpio-controller;
 		#gpio-cells = <2>;
-		ngpios = <22>;
+		ngpios = <23>;
 	};
 
 	gpio-interrupts {
@@ -375,6 +378,11 @@
 			irq-pin = <&gpio_usb_c1_bc12_int_l>;
 			flags = <GPIO_INT_EDGE_FALLING>;
 			handler = "usb1_evt";
+		};
+		int_tcs3400_clear: tcs3400_clear_int {
+			irq-pin = <&gpio_tcs3400_int>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "gpio_test_interrupt";
 		};
 	};
 
@@ -851,7 +859,10 @@
 			compatible = "cros-ec,tcs3400-clear";
 			status = "okay";
 
+			active-mask = "SENSOR_ACTIVE_S0";
 			location = "MOTIONSENSE_LOC_BASE";
+			int-disable-on-inactive;
+			legacy-irq = <&int_tcs3400_clear>;
 			port = <&named_i2c1>;
 			default-range = <0x10000>;
 			drv-data = <&tcs_clear_data>;
