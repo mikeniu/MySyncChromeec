@@ -21,6 +21,41 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a47c8874_a4db688d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T23:01:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/5e4b3da1-79a3-497d-a1d2-ed3c386d8f62)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly addresses the bug by wrapping the byte-by-byte OTP key programming sequence with `irq_lock()` and `irq_unlock()`. This ensures the loop wont",
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62b0e769_c3031982",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T23:01:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/5e4b3da1-79a3-497d-a1d2-ed3c386d8f62)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly addresses the bug by wrapping the byte-by-byte OTP key programming sequence with `irq_lock()` and `irq_unlock()`. This ensures the loop won\u0027t be interrupted, resolving the likely cause of flakiness.\n*   **Security:** No security vulnerabilities are introduced. The use of interrupt locking during sensitive timing-critical cryptographic operations is a standard and secure practice.\n*   **Style:** The code follows Zephyr and EC coding conventions.\n*   **Consistency:** There\u0027s a minor inconsistency with placing Zephyr-specific headers in the shared EC `test/mock/` directory (see inline comment).\n*   **Testing \u0026 Test Coverage:** Excellent. The author added the necessary mock assertions to verify that `otpi_write` is only called with interrupts locked. The hardware test for Helipilot was also re-enabled, and the test suite verifies that IRQs are restored properly after `otp_key_provision()` completes.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and self-contained. It strictly focuses on the bug fix and its corresponding test changes.\n\nTAG\u003dagy\nCONV\u003da24e5e37-b79d-4209-8927-5a5265af04ba",
+      "isAi": true,
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "59d6be6e_205859f8",
         "filename": "test/mock/otpi_mock.c",
         "patchSetId": 4
@@ -32,6 +67,24 @@
       "writtenOn": "2026-08-14T23:00:06Z",
       "side": 1,
       "message": "[Gerrit AI Review] If this mock file is shared with legacy EC tests (non-Zephyr builds), including `\u003czephyr/ztest.h\u003e` unconditionally will break compilation.\n\nConsider wrapping Zephyr-specific includes and code in `#ifdef CONFIG_ZEPHYR`, or use a cross-environment macro if this mock is consumed by both test runners.",
+      "isAi": true,
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7619856_c3458857",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T23:01:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This file is located in the shared `test/mock/` directory, which is also used by the legacy EC test framework. Unconditionally including `\u003czephyr/ztest.h\u003e` and using `zassert_true` (line 69) will break the legacy EC test build if a legacy test ever enables `CONFIG_MOCK_OTP` (via `HAS_MOCK_OTPI` in `test/mock/build.mk`).\n\nConsider wrapping Zephyr-specific headers and assertions with `#ifdef CONFIG_ZEPHYR`. For legacy EC compatibility, you could either use `#else` to provide a fallback assertion (e.g. `TEST_ASSERT`) or simply skip the assertion.",
       "isAi": true,
       "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
