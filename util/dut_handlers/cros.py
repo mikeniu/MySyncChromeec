@@ -41,8 +41,10 @@ class CrosHandler(DutHandler):
             test_targets.insert(0, "firmware.ECSize")
         return test_targets
 
-    def _copy_ec_rw_bin_to_dut(self, ec_rw_bin_path: str) -> None:
-        """Copy the local EC RW binary to the target DUT's /tmp directory."""
+    def _copy_ec_rw_bin_to_dut(
+        self, ec_rw_bin_path: str, timeout_secs: int = 180
+    ) -> None:
+        """Copy the local EC RW binary to the DUT's /tmp directory (with retry)."""
         if not os.path.exists(ec_rw_bin_path):
             raise FileNotFoundError(
                 f"ec.bin not found at {ec_rw_bin_path}. Did you build the project?"
@@ -53,10 +55,21 @@ class CrosHandler(DutHandler):
         print(
             f"Copying {ec_rw_bin_path} to root@{dut_hostname}:/tmp/ec_rw_{model}.bin..."
         )
-        try:
-            self._dut_scp(ec_rw_bin_path, f"/tmp/ec_rw_{model}.bin")
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Failed to copy ec.bin to DUT: {e}") from e
+        start_time = time.time()
+        while True:
+            try:
+                self._dut_scp(ec_rw_bin_path, f"/tmp/ec_rw_{model}.bin")
+                return
+            except subprocess.CalledProcessError as e:
+                if time.time() - start_time > timeout_secs:
+                    raise RuntimeError(
+                        f"Failed to copy ec.bin to DUT {dut_hostname} after {timeout_secs}s: {e}"
+                    ) from e
+                print(
+                    f"DUT {dut_hostname} SSH not reachable yet (DUT may be rebooting). "
+                    "Retrying in 5 seconds..."
+                )
+                time.sleep(5)
 
     def _delete_ec_rw_bin_from_dut(self) -> None:
         """Delete the temporary EC RW binary file from the DUT."""
@@ -120,8 +133,10 @@ class CrosHandler(DutHandler):
         finally:
             self._delete_ec_rw_bin_from_dut()
 
-    def _copy_ec_ro_bin_to_dut(self, ec_ro_bin_path: str) -> None:
-        """Copy the local EC RO binary to the target DUT's /tmp directory."""
+    def _copy_ec_ro_bin_to_dut(
+        self, ec_ro_bin_path: str, timeout_secs: int = 180
+    ) -> None:
+        """Copy the local EC RO binary to the DUT's /tmp directory (with retry)."""
         if not os.path.exists(ec_ro_bin_path):
             raise FileNotFoundError(
                 f"EC RO binary not found at {ec_ro_bin_path}"
@@ -132,10 +147,21 @@ class CrosHandler(DutHandler):
         print(
             f"Copying RO binary {ec_ro_bin_path} to root@{dut_hostname}:/tmp/ec_ro_{model}.bin..."
         )
-        try:
-            self._dut_scp(ec_ro_bin_path, f"/tmp/ec_ro_{model}.bin")
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Failed to copy EC RO bin to DUT: {e}") from e
+        start_time = time.time()
+        while True:
+            try:
+                self._dut_scp(ec_ro_bin_path, f"/tmp/ec_ro_{model}.bin")
+                return
+            except subprocess.CalledProcessError as e:
+                if time.time() - start_time > timeout_secs:
+                    raise RuntimeError(
+                        f"Failed to copy EC RO bin to DUT {dut_hostname} after {timeout_secs}s: {e}"
+                    ) from e
+                print(
+                    f"DUT {dut_hostname} SSH not reachable yet (DUT may be rebooting). "
+                    "Retrying in 5 seconds..."
+                )
+                time.sleep(5)
 
     def _delete_ec_ro_bin_from_dut(self) -> None:
         """Delete the temporary EC RO binary file from the DUT."""
