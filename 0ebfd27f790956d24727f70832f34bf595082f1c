@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "0ebfd27f790956d24727f70832f34bf595082f1c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68926b09_18bea057",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T16:28:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/73d40b62-1fa6-4da7-b91b-0e9210967e08)]\n\n### Review Summary\n* **Functionality**: The change correctly ensures teardown hooks run atomically. The updates to `preserve_enable_5v_state` and `flash_shared_enable_ec_access` successfully remove blocking operations (mutexes, sleeps) to comply with the new interrupt-disabled context. The addition of the default `test_mockable` implementation in `zephyr/shim/src/system.c` nicely resolves the test linkage issues for test suites that do not include `system_fake.c`.\n* **Security**: No vulnerabilities introduced. This improves system resilience during image transitions by removing race conditions.\n* **Style**: Code style is clean and well-documented.\n* **Testing**: The unit test properly verifies the calling order using a mock variable. The test framework changes are appropriately implemented and safely contained using `test_mockable`.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and appropriately scoped to this single fix.\n\nTAG\u003dagy\nCONV\u003d73d40b62-1fa6-4da7-b91b-0e9210967e08",
+      "isAi": true,
+      "revId": "0ebfd27f790956d24727f70832f34bf595082f1c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
