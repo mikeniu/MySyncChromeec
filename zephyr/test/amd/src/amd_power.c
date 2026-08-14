@@ -500,7 +500,7 @@ ZTEST(amd_power, test_power_suspend_shut_down)
 }
 
 /* Sleep failure detection is only performed in RW */
-#if defined(SECTION_IS_RW)
+#if defined(CONFIG_CROS_EC_RW)
 ZTEST(amd_power, test_power_suspend_hang)
 {
 	struct ec_params_host_sleep_event_v1 host_sleep_ev_p = {
@@ -638,7 +638,7 @@ ZTEST(amd_power, test_power_handle_resume_hang)
 	zassert_equal(hook_counts.reset_count, 0);
 	zassert_equal(power_get_state(), POWER_S0);
 }
-#endif /* SECTION_IS_RW */
+#endif /* CONFIG_CROS_EC_RW */
 
 ZTEST(amd_power, test_power_forced_shutdown)
 {

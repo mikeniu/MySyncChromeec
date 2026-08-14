@@ -13,7 +13,7 @@ endchoice
 # run on Cortex-M4 MCU with enabled FPU. It means that even with '-mfpu=none'
 # option the floating point instructions will be used (because they are used in
 # compiler-rt). Let's enable FPU always when compiling for ARMv7-M with FPU.
-config FPU
+configdefault FPU
 	default y if ARMV7_M_ARMV8_M_FP
 
 # LLVM toolchains for ARM and RISC-V use newlib as libc, indicate that it's

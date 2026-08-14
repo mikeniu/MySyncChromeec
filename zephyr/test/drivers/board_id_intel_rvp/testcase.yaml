@@ -1,0 +1,21 @@
+common:
+  platform_allow:
+    - native_sim
+tests:
+  drivers.board_id_intel_rvp:
+    extra_dtc_overlay_files:
+      - boards/native_sim.overlay
+    extra_configs:
+      - CONFIG_LINK_TEST_SUITE_BOARD_ID_INTEL_RVP=y
+
+  drivers.board_id_intel_rvp.not_ready:
+    extra_dtc_overlay_files:
+      - boards/native_sim.overlay
+    extra_configs:
+      - CONFIG_LINK_TEST_SUITE_BOARD_ID_INTEL_RVP_NOT_READY=y
+
+  drivers.board_id_intel_rvp.s5_callback:
+    extra_dtc_overlay_files:
+      - boards/native_sim.overlay
+    extra_configs:
+      - CONFIG_LINK_TEST_SUITE_BOARD_ID_INTEL_RVP_S5_CALLBACK=y

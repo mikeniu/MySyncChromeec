@@ -441,6 +441,8 @@ static int cros_flash_rtk_protect_at_boot(const struct device *dev,
 	}
 
 	if (new_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
+		ret = flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
+					   CONFIG_WP_STORAGE_SIZE, 1);
 		lock_flags |= EC_FLASH_PROTECT_RO_AT_BOOT;
 	}
 
@@ -524,7 +526,7 @@ static int cros_flash_rtk_init(const struct device *dev)
 }
 
 /* cros ec flash driver registration */
-static const struct cros_flash_driver_api cros_flash_rtk_driver_api = {
+static DEVICE_API(cros_flash, cros_flash_rtk_driver_api) = {
 	.init = cros_flash_rtk_init,
 	.physical_write = cros_flash_rtk_write,
 	.physical_erase = cros_flash_rtk_erase,

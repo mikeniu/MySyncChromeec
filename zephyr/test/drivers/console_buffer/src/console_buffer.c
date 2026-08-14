@@ -1,0 +1,474 @@
+/* Copyright 2022 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "builtin/stdio.h"
+#include "console.h"
+#include "ec_commands.h"
+#include "host_command.h"
+#include "lpc.h"
+#include "power.h"
+#include "test/drivers/test_state.h"
+#include "uart.h"
+
+#include <zephyr/irq_offload.h>
+#include <zephyr/kernel.h>
+#include <zephyr/shell/shell_dummy.h>
+#include <zephyr/ztest.h>
+
+ZTEST_USER(console, test_printf_overflow)
+{
+	char buffer[10];
+
+	zassert_equal(-EC_ERROR_OVERFLOW,
+		      crec_snprintf(buffer, 4, "1234567890"), NULL);
+	zassert_equal(0, strcmp(buffer, "123"), "got '%s'", buffer);
+	zassert_equal(-EC_ERROR_OVERFLOW,
+		      crec_snprintf(buffer, 4, "%%%%%%%%%%"), NULL);
+	zassert_equal(0, strcmp(buffer, "%%%"), "got '%s'", buffer);
+}
+
+/* This test is identical to test_buf_notify_null in
+ * test/console_edit.c. Please keep them in sync to verify that
+ * uart_console_read_buffer works identically in legacy EC and zephyr.
+ */
+ZTEST_USER(console, test_buf_notify_null)
+{
+	char buffer[100];
+	uint16_t write_count;
+	size_t consumed_count;
+
+	/* Flush the console buffer before we start. */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	/* Write a nul char to the buffer. */
+	consumed_count = console_buf_notify_chars("ab\0c", 4);
+
+	/* Check if all bytes were consumed by console buffer */
+	zassert_equal(consumed_count, 4, "got %d", consumed_count);
+
+	/* Check if the nul is present in the buffer. */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+	zassert_equal(0, strncmp(buffer, "abc", 4), "got '%s'", buffer);
+	zassert_equal(write_count, 4, "got %d", write_count);
+}
+
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
+ZTEST_USER(console, test_buf_dropped_logs)
+{
+	char buffer[200];
+	uint16_t write_count;
+	const char *msg = "1234567890\n";
+	size_t msg_len = strlen(msg);
+	const uint32_t expected_overflow = 5;
+
+	/* Flush console buffer and clear dropped log counters */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	/* Take a snapshot to set previous_snapshot_idx */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	/* Overflow console_buf beyond
+	 * CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_BUF_SIZE */
+	for (size_t i = 0;
+	     i < (CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_BUF_SIZE / msg_len) +
+			 expected_overflow;
+	     i++) {
+		console_buf_notify_chars(msg, msg_len);
+	}
+
+	/* Read recent logs and check for dropped log message header */
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	uint32_t total_drops = 0;
+	uint32_t drops_isr = 0;
+	uint32_t drops_mutex = 0;
+	uint32_t drops_overflow = 0;
+
+	int parsed = sscanf(
+		buffer, "Dropped %u logs (ISR: %u, Mutex: %u, Overflow: %u)",
+		&total_drops, &drops_isr, &drops_mutex, &drops_overflow);
+	zassert_equal(parsed, 4,
+		      "sscanf failed to parse dropped logs header from '%s'",
+		      buffer);
+	zassert_equal(drops_isr, 0, "expected drops_isr == 0, got %u",
+		      drops_isr);
+	zassert_equal(drops_mutex, 0, "expected drops_mutex == 0, got %u",
+		      drops_mutex);
+	zassert_equal(drops_overflow, expected_overflow,
+		      "expected drops_overflow == %u, got %u",
+		      expected_overflow, drops_overflow);
+
+	zassert_equal(total_drops, drops_isr + drops_mutex + drops_overflow,
+		      "total_drops mismatch: %u != %u + %u + %u", total_drops,
+		      drops_isr, drops_mutex, drops_overflow);
+}
+
+extern struct k_mutex console_write_lock;
+
+static void isr_notify_wrapper(const void *arg)
+{
+	const char *msg = (const char *)arg;
+
+	console_buf_notify_chars(msg, strlen(msg));
+}
+
+ZTEST(console, test_buf_dropped_logs_isr)
+{
+	char buffer[200];
+	uint16_t write_count;
+	const char *msg = "test_log\n";
+
+	/* Flush console buffer and clear dropped log counters */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	/* Take a snapshot */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	/* Simulate ISR dropped logs */
+	irq_offload(isr_notify_wrapper, (void *)msg);
+	irq_offload(isr_notify_wrapper, (void *)msg);
+
+	/* Read recent logs and check for dropped log message header */
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	uint32_t total_drops = 0;
+	uint32_t drops_isr = 0;
+	uint32_t drops_mutex = 0;
+	uint32_t drops_overflow = 0;
+
+	int parsed = sscanf(
+		buffer, "Dropped %u logs (ISR: %u, Mutex: %u, Overflow: %u)",
+		&total_drops, &drops_isr, &drops_mutex, &drops_overflow);
+	zassert_equal(parsed, 4,
+		      "sscanf failed to parse dropped logs header from '%s'",
+		      buffer);
+	zassert_equal(drops_isr, 2, "expected drops_isr == 2, got %u",
+		      drops_isr);
+	zassert_equal(drops_mutex, 0, "expected drops_mutex == 0, got %u",
+		      drops_mutex);
+	zassert_equal(drops_overflow, 0, "expected drops_overflow == 0, got %u",
+		      drops_overflow);
+	zassert_equal(total_drops, 2, "expected total_drops == 2, got %u",
+		      total_drops);
+}
+
+static K_SEM_DEFINE(mutex_held_sem, 0, 1);
+static K_SEM_DEFINE(release_mutex_sem, 0, 1);
+
+static void lock_holder_thread_fn(void *p1, void *p2, void *p3)
+{
+	k_mutex_lock(&console_write_lock, K_FOREVER);
+	k_sem_give(&mutex_held_sem);
+	k_sem_take(&release_mutex_sem, K_FOREVER);
+	k_mutex_unlock(&console_write_lock);
+}
+
+K_THREAD_STACK_DEFINE(holder_stack, 1024);
+static struct k_thread holder_thread_data;
+
+ZTEST(console, test_buf_dropped_logs_mutex)
+{
+	char buffer[200];
+	uint16_t write_count;
+	const char *msg = "test_log\n";
+
+	/* Flush console buffer and clear dropped log counters */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	/* Take a snapshot */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	/* Start thread that holds console_write_lock */
+	k_thread_create(&holder_thread_data, holder_stack,
+			K_THREAD_STACK_SIZEOF(holder_stack),
+			lock_holder_thread_fn, NULL, NULL, NULL,
+			K_PRIO_PREEMPT(5), 0, K_NO_WAIT);
+
+	/* Wait until helper thread holds console_write_lock */
+	zassert_ok(k_sem_take(&mutex_held_sem, K_MSEC(1000)),
+		   "timed out waiting for helper thread lock");
+
+	/* Call notify from main thread; should fail mutex lock */
+	console_buf_notify_chars(msg, strlen(msg));
+	console_buf_notify_chars(msg, strlen(msg));
+	console_buf_notify_chars(msg, strlen(msg));
+
+	/* Release helper thread */
+	k_sem_give(&release_mutex_sem);
+	k_thread_join(&holder_thread_data, K_MSEC(1000));
+
+	/* Read recent logs and check for dropped log message header */
+	zassert_ok(uart_console_read_buffer(CONSOLE_READ_RECENT, buffer,
+					    sizeof(buffer), &write_count),
+		   NULL);
+
+	uint32_t total_drops = 0;
+	uint32_t drops_isr = 0;
+	uint32_t drops_mutex = 0;
+	uint32_t drops_overflow = 0;
+
+	int parsed = sscanf(
+		buffer, "Dropped %u logs (ISR: %u, Mutex: %u, Overflow: %u)",
+		&total_drops, &drops_isr, &drops_mutex, &drops_overflow);
+	zassert_equal(parsed, 4,
+		      "sscanf failed to parse dropped logs header from '%s'",
+		      buffer);
+	zassert_equal(drops_isr, 0, "expected drops_isr == 0, got %u",
+		      drops_isr);
+	zassert_equal(drops_mutex, 3, "expected drops_mutex == 3, got %u",
+		      drops_mutex);
+	zassert_equal(drops_overflow, 0, "expected drops_overflow == 0, got %u",
+		      drops_overflow);
+	zassert_equal(total_drops, 3, "expected total_drops == 3, got %u",
+		      total_drops);
+}
+#endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS */
+
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
+ZTEST_USER(console, test_buf_notify_event)
+{
+	size_t consumed_count;
+	uint32_t feature1 = get_feature_flags1();
+
+#ifdef CONFIG_HOSTCMD_X86
+	lpc_set_host_event_mask(
+		LPC_HOST_EVENT_ALWAYS_REPORT,
+		lpc_override_always_report_mask() |
+			EC_HOST_EVENT_MASK(EC_HOST_EVENT_CONSOLE_LOGS));
+#endif
+
+#ifdef CONFIG_AP_POWER_CONTROL
+	/* Force power state S0 */
+	power_set_state(POWER_S0);
+	test_power_common_state();
+	zassert_equal(POWER_S0, power_get_state());
+#endif /* CONFIG_AP_POWER_CONTROL */
+
+	/* Make sure the console feature is supported. */
+	zassert_true(feature1 &
+		     EC_FEATURE_MASK_1(EC_FEATURE_CONSOLE_LOG_EVENT));
+
+	/* Flush the console buffer before we start. */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	/* Make sure console event is cleared. */
+	zassert_false(host_is_event_set(EC_HOST_EVENT_CONSOLE_LOGS));
+
+	/* Write a testing string to the buffer. */
+	consumed_count = console_buf_notify_chars("test\n", 5);
+
+	/* Check if all bytes were consumed by console buffer */
+	zassert_equal(consumed_count, 5, "got %d", consumed_count);
+
+	/* Make sure console event is set. */
+	zassert_true(host_is_event_set(EC_HOST_EVENT_CONSOLE_LOGS));
+	/* Reinit once again. */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+	/* Make sure console event is cleared. */
+	zassert_false(host_is_event_set(EC_HOST_EVENT_CONSOLE_LOGS));
+}
+#endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT */
+
+ZTEST_USER(console, test_console_read_buffer_invalid_type)
+{
+	char buffer[100];
+	uint16_t write_count;
+	uint8_t invalid_type = CONSOLE_READ_RECENT + 1;
+
+	/* Flush the console buffer before we start. */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	zassert_equal(EC_RES_INVALID_PARAM,
+		      uart_console_read_buffer(invalid_type, buffer,
+					       sizeof(buffer), &write_count),
+		      NULL);
+}
+
+ZTEST_USER(console, test_console_read_buffer_size_zero)
+{
+	char buffer[100];
+	uint16_t write_count;
+
+	/* Flush the console buffer before we start. */
+	zassert_ok(uart_console_read_buffer_init(), NULL);
+
+	zassert_equal(EC_RES_INVALID_PARAM,
+		      uart_console_read_buffer(CONSOLE_READ_RECENT, buffer, 0,
+					       &write_count),
+		      NULL);
+}
+
+ZTEST_USER(console, test_uart_buffer_full)
+{
+	zassert_false(uart_buffer_full(), NULL);
+}
+
+static const char *large_string =
+	"This is a very long string, it will cause a buffer flush at "
+	"some point while printing to the shell. Long long text. Blah "
+	"blah. Long long text. Blah blah. Long long text. Blah blah.";
+ZTEST_USER(console, test_shell_fprintf_full)
+{
+	const struct shell *shell_zephyr = get_ec_shell();
+	const char *outbuffer;
+	size_t buffer_size;
+
+	zassert_true(strlen(large_string) >=
+			     shell_zephyr->fprintf_ctx->buffer_size,
+		     "large_string is too short, fix test.");
+
+	shell_backend_dummy_clear_output(shell_zephyr);
+	shell_fprintf(shell_zephyr, SHELL_NORMAL, "%s", large_string);
+
+	outbuffer = shell_backend_dummy_get_output(shell_zephyr, &buffer_size);
+	zassert_true(strncmp(outbuffer, large_string, strlen(large_string)) ==
+			     0,
+		     "Invalid console output %s", outbuffer);
+}
+
+ZTEST_USER(console, test_cprint_too_big)
+{
+	zassert_true(strlen(large_string) >= CONFIG_SHELL_PRINTF_BUFF_SIZE,
+		     "buffer is too short, fix test.");
+
+	zassert_equal(cprintf(CC_COMMAND, "%s", large_string),
+		      -EC_ERROR_OVERFLOW, NULL);
+}
+
+ZTEST_USER(console, test_cmd_chan_invalid_mask)
+{
+	zassert_equal(EC_ERROR_PARAM1,
+		      shell_execute_cmd(get_ec_shell(), "chan foobar"));
+}
+
+ZTEST_USER(console, test_cmd_chan_set)
+{
+	char cmd[100];
+
+	zassert_true(crec_snprintf(cmd, sizeof(cmd), "chan %d",
+				   CC_MASK(CC_ACCEL)) > 0);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), cmd));
+
+	zassert_false(console_channel_is_disabled(CC_COMMAND));
+	zassert_false(console_channel_is_disabled(CC_ACCEL));
+	zassert_true(console_channel_is_disabled(CC_CHARGER));
+}
+
+ZTEST_USER(console, test_cmd_chan_by_name)
+{
+	const char name[] = "charger";
+	char cmd[100];
+
+	console_channel_enable(name);
+
+	/* Toggle 'charger' off */
+	zassert_true(crec_snprintf(cmd, sizeof(cmd), "chan %s", name) > 0,
+		     "Failed to compose chan %s command.", name);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), cmd),
+		   "Failed to execute chan %s command.", name);
+	zassert_true(console_channel_is_disabled(CC_CHARGER),
+		     "Failed to enable %s channel.", name);
+
+	/* Toggle 'charger' on */
+	zassert_true(crec_snprintf(cmd, sizeof(cmd), "chan %s", name) > 0,
+		     "Failed to compose chan %s command.", name);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), cmd),
+		   "Failed to execute chan %s command.", name);
+	zassert_false(console_channel_is_disabled(CC_CHARGER),
+		      "Failed to disable %s channel.", name);
+}
+
+ZTEST_USER(console, test_cmd_chan_show)
+{
+	const struct shell *shell_zephyr = get_ec_shell();
+	const char *outbuffer;
+	size_t buffer_size;
+	char cmd[100];
+
+	zassert_true(crec_snprintf(cmd, sizeof(cmd), "chan %d",
+				   CC_MASK(CC_ACCEL)) > 0);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), cmd));
+	shell_backend_dummy_clear_output(shell_zephyr);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "chan"));
+	outbuffer = shell_backend_dummy_get_output(shell_zephyr, &buffer_size);
+
+	zassert_true(
+		strstr(outbuffer,
+		       "\r\n # Mask     E Channel\r\n 0 00000001 * command\r\n"
+		       " 1 00000002 * accel\r\n 2 00000004   charger\r\n") !=
+			NULL,
+		"Invalid console output %s", outbuffer);
+}
+
+ZTEST_USER(console, test_cmd_chan_save_restore)
+{
+	char cmd[100];
+
+	zassert_true(crec_snprintf(cmd, sizeof(cmd), "chan %d",
+				   CC_MASK(CC_ACCEL)) > 0);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), cmd));
+
+	zassert_false(console_channel_is_disabled(CC_COMMAND));
+	zassert_false(console_channel_is_disabled(CC_ACCEL));
+	zassert_true(console_channel_is_disabled(CC_CHARGER));
+
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "chan save"));
+	zassert_true(crec_snprintf(cmd, sizeof(cmd), "chan %d",
+				   CC_MASK(CC_ACCEL) | CC_MASK(CC_CHARGER)) >
+		     0);
+	zassert_ok(shell_execute_cmd(get_ec_shell(), cmd));
+
+	zassert_false(console_channel_is_disabled(CC_COMMAND));
+	zassert_false(console_channel_is_disabled(CC_ACCEL));
+	zassert_false(console_channel_is_disabled(CC_CHARGER));
+
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "chan restore"));
+
+	zassert_false(console_channel_is_disabled(CC_COMMAND));
+	zassert_false(console_channel_is_disabled(CC_ACCEL));
+	zassert_true(console_channel_is_disabled(CC_CHARGER));
+}
+
+ZTEST_SUITE(console, drivers_predicate_post_main, NULL, NULL, NULL, NULL);
+
+ZTEST_USER(console_pre, test_cmd_chan_save_restore)
+{
+	/* These are not mentioned in ec-console in native_sim.overlay. */
+	zassert_false(console_channel_is_disabled(CC_COMMAND));
+	zassert_false(console_channel_is_disabled(CC_ACCEL));
+	zassert_false(console_channel_is_disabled(CC_CHARGER));
+	/* These are disabled in ec-console in native_sim.overlay. */
+	zassert_true(console_channel_is_disabled(CC_EVENTS));
+	zassert_true(console_channel_is_disabled(CC_LPC));
+	zassert_true(console_channel_is_disabled(CC_HOSTCMD));
+
+	/* Disable an invalid channel, and verify nothing changed. */
+	console_channel_disable("not_a_valid_channel");
+
+	zassert_false(console_channel_is_disabled(CC_COMMAND));
+	zassert_false(console_channel_is_disabled(CC_ACCEL));
+	zassert_false(console_channel_is_disabled(CC_CHARGER));
+	zassert_true(console_channel_is_disabled(CC_EVENTS));
+	zassert_true(console_channel_is_disabled(CC_LPC));
+	zassert_true(console_channel_is_disabled(CC_HOSTCMD));
+}
+
+ZTEST_SUITE(console_pre, drivers_predicate_pre_main, NULL, NULL, NULL, NULL);

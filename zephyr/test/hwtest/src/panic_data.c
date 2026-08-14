@@ -48,7 +48,7 @@ static void check_panic_data(void)
 	uint32_t lr = 0;
 	uint32_t expected_flags = PANIC_DATA_FLAG_OLD_HOSTEVENT;
 
-	if (IS_ENABLED(SECTION_IS_RW)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
 		expected_flags |= PANIC_DATA_FLAG_RW_IMAGE;
 	} else {
 		expected_flags |= PANIC_DATA_FLAG_RO_IMAGE;

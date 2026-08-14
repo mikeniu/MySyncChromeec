@@ -21,6 +21,8 @@
 #include "usb_console.h"
 #include "util.h"
 
+#include <stdalign.h>
+
 /*
  * For host tests, use a static area for panic and jump data.
  */
@@ -181,12 +183,27 @@ void panic(const char *msg)
 test_mockable struct panic_data *panic_get_data(void)
 {
 	BUILD_ASSERT(sizeof(struct panic_data) <= CONFIG_PANIC_DATA_SIZE);
+	BUILD_ASSERT(alignof(struct panic_data) == 4,
+		     "struct panic_data must be 4-byte aligned");
+#if !defined(CONFIG_BOARD_NATIVE_POSIX) && !defined(CONFIG_BOARD_NATIVE_SIM)
+	BUILD_ASSERT((CONFIG_PANIC_DATA_BASE % 4) == 0,
+		     "CONFIG_PANIC_DATA_BASE must be 4-byte aligned");
+	BUILD_ASSERT(CONFIG_PANIC_DATA_BASE >= CONFIG_RAM_BASE,
+		     "CONFIG_PANIC_DATA_BASE underflows RAM base address");
+#endif
 
 	if (pdata_ptr->magic != PANIC_DATA_MAGIC ||
 	    pdata_ptr->struct_size != CONFIG_PANIC_DATA_SIZE)
 		return NULL;
 
 	return pdata_ptr;
+}
+
+bool panic_data_is_new(void)
+{
+	struct panic_data *const pdata = panic_get_data();
+
+	return pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD);
 }
 
 /*
@@ -323,7 +340,6 @@ test_mockable struct panic_data *get_panic_data_write(void)
 	 */
 init_pdata:
 	memset(pdata_ptr, 0, CONFIG_PANIC_DATA_SIZE);
-	pdata_ptr->magic = PANIC_DATA_MAGIC;
 	pdata_ptr->struct_size = CONFIG_PANIC_DATA_SIZE;
 
 	return pdata_ptr;
@@ -446,12 +462,10 @@ static int command_crash(int argc, const char **argv)
 		ccprintf("%08x", one / zero);
 	} else if (!strcasecmp(argv[1], "stack")) {
 		stack_overflow_recurse(1);
-#ifndef CONFIG_ALLOW_UNALIGNED_ACCESS
 	} else if (!strcasecmp(argv[1], "unaligned")) {
 		volatile intptr_t unaligned_ptr = 0xcdef;
 		cflush();
 		ccprintf("%08x", *(volatile int *)unaligned_ptr);
-#endif /* !CONFIG_ALLOW_UNALIGNED_ACCESS */
 	} else if (!strcasecmp(argv[1], "watchdog")) {
 		while (1) {
 /* Yield on native posix to avoid locking up the simulated sys clock */
@@ -494,9 +508,7 @@ static int command_crash(int argc, const char **argv)
 
 DECLARE_CONSOLE_COMMAND(crash, command_crash,
 			"[assert | divzero | udivzero | stack"
-#ifndef CONFIG_ALLOW_UNALIGNED_ACCESS
 			" | unaligned"
-#endif /* !CONFIG_ALLOW_UNALIGNED_ACCESS */
 			" | watchdog | hang | null]",
 			"Crash the system (for testing)."
 #ifndef CONFIG_CMD_CRASH_NESTED

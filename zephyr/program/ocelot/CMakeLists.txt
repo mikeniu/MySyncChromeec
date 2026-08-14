@@ -38,6 +38,13 @@ if(DEFINED CONFIG_BOARD_KODKOD)
 	zephyr_library_sources("kodkod/src/suspend_resume.c")
 endif()
 
+if(DEFINED CONFIG_BOARD_HEKLA)
+	project(hekla)
+	zephyr_library_sources("hekla/src/battery.c")
+	zephyr_library_sources("hekla/src/board_power.c")
+	zephyr_library_sources("hekla/src/board.c")
+endif()
+
 if(DEFINED CONFIG_BOARD_MATSU)
 	project(matsu)
 	zephyr_library_sources("matsu/src/board_power.c")

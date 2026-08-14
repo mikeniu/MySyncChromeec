@@ -50,6 +50,28 @@ menuconfig FINGERPRINT_SENSOR_EGIS660
 
 if FINGERPRINT_SENSOR_EGIS660
 
+choice FINGERPRINT_SENSOR_EGIS660_COVER
+	prompt "EGIS660 sensor cover type"
+	default FINGERPRINT_SENSOR_EGIS660_COVER_SPRAY_COATING if $(dt_compat_all_has_prop,$(DT_COMPAT_EGIS_EGIS660),cover-type,spray-coating)
+	default FINGERPRINT_SENSOR_EGIS660_COVER_GLASS if $(dt_compat_all_has_prop,$(DT_COMPAT_EGIS_EGIS660),cover-type,glass)
+	default FINGERPRINT_SENSOR_EGIS660_COVER_GLASS if $(dt_compat_any_not_has_prop,$(DT_COMPAT_EGIS_EGIS660),cover-type)
+	help
+	  Select the cover type of the EGIS660 sensor to use the appropriate
+	  private library. This should match the cover-type property in the
+	  device tree.
+
+config FINGERPRINT_SENSOR_EGIS660_COVER_GLASS
+	bool "Glass cover"
+	help
+	  Select this option for EGIS660 sensor with glass cover.
+
+config FINGERPRINT_SENSOR_EGIS660_COVER_SPRAY_COATING
+	bool "Spray coating"
+	help
+	  Select this option for EGIS660 sensor with spray coating cover.
+
+endchoice
+
 config FINGERPRINT_SENSOR_EGIS660_HEAP_SIZE
 	int "Size of heap for EGIS660 driver"
 	default 153600
@@ -79,6 +101,6 @@ config HAVE_EGIS660_PRIVATE_DRIVER
 	bool
 	default n
 	help
-	  If enabled, it indicates that the private driver is present.
+	  If enabled, it indicates that the EGIS660 private driver is present.
 
 endif # FINGERPRINT_SENSOR_EGIS660

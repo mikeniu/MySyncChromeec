@@ -1573,11 +1573,28 @@ int charge_want_shutdown(void)
 test_export_static int charge_prevent_power_on_automatic_power_on = 1;
 #endif
 
+#if defined(CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON) && \
+	defined(CONFIG_CHARGE_MANAGER)
+static bool charger_has_sufficient_power_for_power_on(void)
+{
+	return charge_manager_get_power_limit_uw() >=
+	       CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON * 1000;
+}
+#endif
+
 bool charge_prevent_power_on(bool power_button_pressed)
 {
 	int prevent_power_on = 0;
 	struct batt_params params;
 	struct batt_params *current_batt_params = &curr.batt;
+
+#if defined(CONFIG_PLATFORM_EC_CHARGER_CUSTOM_PREVENT_POWER_ON) && \
+	defined(CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON) &&       \
+	defined(CONFIG_CHARGE_MANAGER)
+	if (!power_button_pressed &&
+	    !charger_has_sufficient_power_for_power_on())
+		prevent_power_on = custom_prevent_power_on();
+#endif
 
 	/* If battery params seem uninitialized then retrieve them */
 	if (current_batt_params->is_present == BP_NOT_SURE) {
@@ -1637,8 +1654,7 @@ bool charge_prevent_power_on(bool power_button_pressed)
 	defined(CONFIG_CHARGE_MANAGER)
 	/* However, we can power on if a sufficient charger is present. */
 	if (prevent_power_on) {
-		if (charge_manager_get_power_limit_uw() >=
-		    CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON * 1000)
+		if (charger_has_sufficient_power_for_power_on())
 			prevent_power_on = 0;
 #if defined(CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON_WITH_BATT) && \
 	defined(CONFIG_CHARGER_MIN_BAT_PCT_FOR_POWER_ON_WITH_AC)
@@ -1662,8 +1678,7 @@ bool charge_prevent_power_on(bool power_button_pressed)
 	 */
 
 	if (!current_batt_params->is_present &&
-	    charge_manager_get_power_limit_uw() <
-		    CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON * 1000)
+	    !charger_has_sufficient_power_for_power_on())
 		prevent_power_on = 1;
 
 #endif /* CONFIG_CHARGE_MANAGER && CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON */
@@ -1689,8 +1704,7 @@ bool charge_prevent_power_on(bool power_button_pressed)
 	 */
 	if (extpower_is_present() && battery_hw_present() == BP_NO
 #ifdef CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON
-	    && charge_manager_get_power_limit_uw() <
-		       CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON * 1000
+	    && !charger_has_sufficient_power_for_power_on()
 #endif /* CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON */
 	)
 		prevent_power_on = 1;

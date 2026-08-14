@@ -7,11 +7,13 @@
  * TI TPS6699X PDC FW update code
  */
 
+#include "common_pdc_fwup.h"
 #include "drivers/pdc.h"
 #include "tps6699x_cmd.h"
 #include "tps6699x_reg.h"
 #include "usbc/pdc_power_mgmt.h"
 
+#include <stdbool.h>
 #include <string.h>
 
 #include <zephyr/devicetree.h>
@@ -31,7 +33,7 @@ LOG_MODULE_DECLARE(tps6699x, CONFIG_USBC_LOG_LEVEL);
 
 /* LCOV_EXCL_START - non-shipping code */
 static struct {
-	const struct device *pdc_dev;
+	bool session_started;
 	struct i2c_dt_spec pdc_i2c;
 	size_t bytes_streamed;
 } ctx;
@@ -283,12 +285,16 @@ static int tfus_run(const struct i2c_dt_spec *i2c)
 	}
 }
 
-static int pdc_tps6699x_fwup_start(const struct device *dev)
+static int pdc_tps6699x_fwup_start(const struct i2c_dt_spec *i2c)
 {
-	struct pdc_hw_config_t hw_config;
 	int rv;
 
-	if (ctx.pdc_dev) {
+	if (i2c == NULL) {
+		return -EINVAL;
+	}
+	ctx.pdc_i2c = *i2c;
+
+	if (ctx.session_started) {
 		LOG_ERR("FWUP session already in progress");
 		return -EBUSY;
 	}
@@ -302,15 +308,6 @@ static int pdc_tps6699x_fwup_start(const struct device *dev)
 		return rv;
 	}
 
-	/* Get I2C info */
-	rv = pdc_get_hw_config(dev, &hw_config);
-	if (rv) {
-		LOG_ERR("Cannot get PDC I2C info: %d", rv);
-		return rv;
-	}
-
-	ctx.pdc_i2c = hw_config.i2c;
-
 	/* Enter bootloader mode */
 	rv = tfus_run(&ctx.pdc_i2c);
 	if (rv) {
@@ -319,7 +316,7 @@ static int pdc_tps6699x_fwup_start(const struct device *dev)
 	}
 
 	/* Ready for FW transfer */
-	ctx.pdc_dev = dev;
+	ctx.session_started = true;
 	ctx.bytes_streamed = 0;
 
 	return 0;
@@ -331,7 +328,7 @@ static int pdc_tps6699x_fwup_send_initiate(uint8_t *buffer, size_t buffer_len)
 	union reg_data rbuf;
 	int rv;
 
-	if (ctx.pdc_dev == NULL) {
+	if (!ctx.session_started) {
 		LOG_ERR("No FWUP session in progress");
 		return -ENODEV;
 	}
@@ -362,7 +359,7 @@ static int pdc_tps6699x_fwup_send_block(uint8_t *buffer, size_t buffer_len)
 	union reg_data rbuf;
 	int rv;
 
-	if (ctx.pdc_dev == NULL) {
+	if (!ctx.session_started) {
 		LOG_ERR("No FWUP session in progress");
 		return -ENODEV;
 	}
@@ -391,7 +388,7 @@ static int pdc_tps6699x_fwup_stream(uint8_t *buffer, size_t buffer_len)
 {
 	int rv;
 
-	if (ctx.pdc_dev == NULL) {
+	if (!ctx.session_started) {
 		LOG_ERR("No FWUP session in progress");
 		return -ENODEV;
 	}
@@ -439,7 +436,7 @@ static int pdc_tps6699x_fwup_abort(void)
 	int rv;
 	union reg_data data;
 
-	if (ctx.pdc_dev) {
+	if (ctx.session_started) {
 		LOG_INF("TFU in progress - run TFUe to reset to normal firmware.");
 
 		rv = run_task_sync(&ctx.pdc_i2c, COMMAND_TASK_TFUE, NULL,
@@ -481,7 +478,7 @@ static int pdc_tps6699x_fwup_complete(void)
 	union reg_data rbuf;
 	int rv;
 
-	if (ctx.pdc_dev == NULL) {
+	if (!ctx.session_started) {
 		/* Need to start a FWUP session first */
 		LOG_ERR("No FWUP session in progress");
 		return -ENODEV;
@@ -535,27 +532,19 @@ static int pdc_tps6699x_fwup_complete(void)
 static int cmd_pdc_tps_fwup_start(const struct shell *sh, size_t argc,
 				  char **argv)
 {
+	struct i2c_dt_spec i2c;
 	int rv;
-	uint8_t port;
-	const struct device *dev;
-	char *e;
 
-	/* Get PD port number */
-	port = strtoul(argv[1], &e, 0);
-	if (*e || port >= pdc_power_mgmt_get_usb_pd_port_count()) {
-		shell_error(sh, "TPS_FWUP: Invalid port");
-		return -EINVAL;
+	rv = pdc_common_fwup_parse_start_cli_args(sh, argc, argv, &i2c);
+	if (rv) {
+		shell_error(sh, "RTK_FWUP: Failed to parse CLI args");
+		return rv;
 	}
 
-	dev = pdc_power_mgmt_get_port_pdc_driver(port);
-	if (dev == NULL) {
-		shell_error(sh,
-			    "TI_FWUP: Cannot locate PDC driver for port C%u",
-			    port);
-		return -ENOENT;
-	}
+	shell_info(sh, "TPS_FWUP: Accessing PDC chip at %s:%02x",
+		   i2c.bus->name ? i2c.bus->name : "(unnamed bus)", i2c.addr);
 
-	rv = pdc_tps6699x_fwup_start(dev);
+	rv = pdc_tps6699x_fwup_start(&i2c);
 	if (rv) {
 		shell_error(sh, "TPS_FWUP: Cannot start: %d", rv);
 		return rv;
@@ -664,9 +653,11 @@ static int cmd_pdc_tps_fwup_abort(const struct shell *sh, size_t argc,
 SHELL_STATIC_SUBCMD_SET_CREATE(
 	sub_pdc_tps_fwup_cmds,
 	SHELL_CMD_ARG(start, NULL,
-		      SHELL_HELP("Prepare the PDC for firmware download",
-				 "<port>"),
-		      cmd_pdc_tps_fwup_start, 2, 0),
+		      SHELL_HELP("Prepare the PDC for a firmware download",
+				 "<port>\n"
+				 "<device> <addr>\n"
+				 "(`device` is an I2C bus, likely I2C_PORT_PD)"),
+		      cmd_pdc_tps_fwup_start, 2, 1),
 	SHELL_CMD_ARG(
 		send_initiate, NULL,
 		SHELL_HELP("Send TFUi command with data to initiate update",

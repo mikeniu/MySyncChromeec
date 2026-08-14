@@ -25,7 +25,7 @@
 		compatible = "cros-ec,temp-sensors";
 		memory {
 			temp-fan-off = <34>;
-			temp-fan-max = <52>;
+			temp-fan-max = <54>;
 			power-good-pin = <&gpio_pg_pp1250_soc_s5_od>;
 			sensor = <&temp_cpu>;
 		};

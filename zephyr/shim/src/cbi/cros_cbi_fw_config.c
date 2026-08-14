@@ -156,7 +156,7 @@ DT_FOREACH_STATUS_OKAY(CBI_FW_CONFIG_VALUE_COMPAT, FW_VALUE_BUILD_ASSERT)
 	DT_FOREACH_CHILD_STATUS_OKAY_VARGS(inst, FW_FIELD_CASE, cached, value)
 
 static uint32_t cached_fw_config;
-static bool cached_fw_config_ready;
+test_export_static bool cached_fw_config_ready;
 
 void cros_cbi_fw_config_init(void)
 {

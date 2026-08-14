@@ -118,4 +118,12 @@ ZTEST(usbc_ppc, test_ppc_set_frs_enable__bad_args)
 	zassert_equal(ppc_set_frs_enable(-1, -1), EC_ERROR_INVAL);
 }
 
+#if defined(CONFIG_USB_PD_VBUS_DETECT_PPC) || \
+	defined(CONFIG_PLATFORM_EC_USB_PD_VBUS_DETECT_PPC)
+ZTEST(usbc_ppc, test_ppc_is_vbus_present__bad_args)
+{
+	zassert_false(ppc_is_vbus_present(-1));
+}
+#endif
+
 ZTEST_SUITE(usbc_ppc, drivers_predicate_post_main, NULL, NULL, NULL, NULL);

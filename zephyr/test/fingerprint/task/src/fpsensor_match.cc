@@ -32,8 +32,6 @@
 #define ROLLBACK1_ADDR DT_REG_ADDR(DT_NODELABEL(rollback1))
 #define ROLLBACK1_SIZE DT_REG_SIZE(DT_NODELABEL(rollback1))
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
 #define fp_sim DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor))

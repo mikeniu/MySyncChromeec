@@ -26,14 +26,20 @@
 
 /* Trulo overrides follow... */
 
-&cbi_flash {
-	/*
-	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
-	 * EC_RO section. WP_RO section size is 0x40000 bytes, EC_RO will be
-	 * trimmed down to 0x3e000 and CBI will be added at 0x3e000.
-	 */
-	offset = <0x3e000>;
-	size = <0x1000>;
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x3e000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 */
+			offset = <0x3e000>;
+			size = <0x1000>;
+		};
+	};
 };
 
 &adc_ec_vsense_pp3300_s5 {

@@ -103,10 +103,10 @@ const char help_create[] =
 	"Required ARGS are:\n"
 	"  --file <file>              Path to output file\n"
 	"  --board_version <value>    Board version\n"
-	"  --sku_id <value>           SKU ID\n"
 	"  --size <size>              Size of output file in bytes\n"
 	"\n"
 	"Optional ARGS are:\n"
+	"  --sku_id <value>           SKU ID\n"
 	"  --dram_part_num <string>   DRAM PART NUM\n"
 	"  --oem_id <value>           OEM ID\n"
 	"  --oem_name <string>        OEM NAME\n"
@@ -460,7 +460,6 @@ static int cmd_create(int argc, char **argv)
 		case OPT_SKU_ID:
 			if (parse_integer_field(optarg, &bi.sku))
 				return -1;
-			set_mask |= ARGS_MASK_SKU_ID;
 			break;
 		case OPT_DRAM_PART_NUM:
 			bi.dram_part_num = optarg;
@@ -514,8 +513,8 @@ static int cmd_create(int argc, char **argv)
 		}
 	}
 
-	if (set_mask != (ARGS_MASK_BOARD_VERSION | ARGS_MASK_FILENAME |
-			 ARGS_MASK_SIZE | ARGS_MASK_SKU_ID)) {
+	if (set_mask !=
+	    (ARGS_MASK_BOARD_VERSION | ARGS_MASK_FILENAME | ARGS_MASK_SIZE)) {
 		fprintf(stderr, "Missing required arguments\n");
 		print_help_create();
 		return -1;

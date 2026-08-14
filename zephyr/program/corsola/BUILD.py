@@ -10,7 +10,7 @@
 def register_corsola_project(
     project_name,
     chip="it8xxx2/it81202bx",
-    inherited_from=None,
+    boards=None,
 ):
     """Register a variant of corsola."""
     register_func = register_binman_project
@@ -18,8 +18,8 @@ def register_corsola_project(
         register_func = register_npcx_project
 
     chip_kconfig = {"it8xxx2/it81202bx": "ite", "npcx9/npcx9m3f": "npcx"}[chip]
-    if inherited_from is None:
-        inherited_from = ["corsola"]
+    if boards is None:
+        boards = ["corsola"]
 
     register_func(
         project_name=project_name,
@@ -30,7 +30,7 @@ def register_corsola_project(
             here / f"{chip_kconfig}_program.conf",
             here / project_name / "project.conf",
         ],
-        inherited_from=inherited_from,
+        boards=boards,
     )
 
 
@@ -68,7 +68,7 @@ register_corsola_project(
 
 register_corsola_project(
     project_name="starmie",
-    inherited_from=["staryu"],
+    boards=["staryu"],
 )
 
 register_corsola_project("tentacruel")
@@ -88,7 +88,7 @@ register_corsola_project(
 register_corsola_project("chinchou")
 register_corsola_project(
     project_name="wugtrio",
-    inherited_from=["staryu"],
+    boards=["staryu"],
 )
 register_corsola_project("skitty")
 register_corsola_project("veluza")
@@ -105,7 +105,7 @@ register_corsola_project(
 
 register_corsola_project(
     project_name="wyrdeer",
-    inherited_from=["staryu"],
+    boards=["staryu"],
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses

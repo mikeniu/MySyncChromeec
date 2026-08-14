@@ -35,4 +35,11 @@ config PLATFORM_EC_WPC_AC_S5_CHARGE
 	help
 	  Enable AC S5 charge feature for the WPC.
 
+config PLATFORM_EC_PERIPHERAL_CHARGER_UPDATE
+	bool "Enable peripheral charger update host command"
+	depends on PLATFORM_EC_SYSTEM_UNLOCKED
+	help
+	  Enable peripheral charger firmware update host command
+	  (EC_CMD_PCHG_UPDATE).
+
 endif # PLATFORM_EC_PERIPHERAL_CHARGER

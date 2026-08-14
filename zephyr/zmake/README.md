@@ -149,3 +149,20 @@ Chromium OS's meta-build tool for Zephyr
 | `-h`, `--help` | show this help message and exit |
 | `-o OUTPUT_FILE`, `--output-file OUTPUT_FILE` | File to write to.  It will only be written if changed. |
 | `--diff` | If specified, diff the README with the expected contents instead of writing out. |
+
+### zmake analyze-build-diff
+
+**Usage:** `zmake analyze-build-diff [-h] target1 target2`
+
+#### Positional Arguments
+
+|   |   |
+|---|---|
+| `target1` | First build directory or ec.bin file |
+| `target2` | Second build directory or ec.bin file |
+
+#### Options
+
+|   |   |
+|---|---|
+| `-h`, `--help` | show this help message and exit |

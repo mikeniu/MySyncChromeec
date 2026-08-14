@@ -1,0 +1,92 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* bluey program common DTS includes */
+
+#include <cros/integrated_fwid.dtsi>
+#include <dt-bindings/macros.h>
+
+#include "../interrupts.dtsi"
+#include "../adc.dtsi"
+#include "../common.dtsi"
+#include "../psl.dtsi"
+
+/* annite project DTS includes */
+
+#include "gpios.dtsi"
+#include "fan.dtsi"
+#include "i2c.dtsi"
+#include "keyboard.dtsi"
+#include "temp_sensors.dtsi"
+#include "battery.dtsi"
+
+/* annite overrides follow... */
+
+&int_ac_present {
+	status = "disabled";
+};
+
+/ {
+	named-usbc-port {
+		usbc_port0: port0 {
+			compatible = "named-usbc-port";
+		};
+		usbc_port1: port1 {
+			compatible = "named-usbc-port";
+		};
+	};
+
+	gpio-interrupts {
+		int_gpio_pgood_acok_odl: gpio_pgood_acok_odl {
+			irq-pin = <&gpio_pgood_acok_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "extpower_interrupt";
+		};
+	};
+};
+
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x3e000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 */
+			offset = <0x3e000>;
+			size = <0x1000>;
+		};
+	};
+};
+
+&uart4 {
+	status = "okay";
+
+	current-speed = <4166667>;
+	pinctrl-0 = <&uart4_sout_gp35>;
+	pinctrl-names = "default";
+	data-bits = <8>;
+	tx-invert;
+
+	uart4_dev0: uart4_dev0 {
+		status = "okay";
+		chain-length = <8>;
+		reset-delay = <205>;
+		bits-per-symbol = <5>;
+		one-symbol = <BINARY(1,1,1,1,0)>;
+		zero-symbol = <BINARY(1,0,0,0,0)>;
+	};
+};
+
+&pcc {
+	clock-frequency = <DT_FREQ_M(100)>;
+	core-prescaler = <1>;
+	apb1-prescaler = <4>;
+	apb2-prescaler = <4>;
+	apb3-prescaler = <4>;
+	apb4-prescaler = <1>;
+};

@@ -5,15 +5,15 @@
 # Adjusted to the account for the build_info[] string (about 160 bytes) plus
 # the image type (about 16 bytes).
 # printed by the banner.
-config SHELL_PRINTF_BUFF_SIZE
+configdefault SHELL_PRINTF_BUFF_SIZE
 	default 180
 
 # Some boards may need to increase the size, depending on the amount of output
-config SHELL_BACKEND_SERIAL_TX_RING_BUFFER_SIZE
+configdefault SHELL_BACKEND_SERIAL_TX_RING_BUFFER_SIZE
 	default 1024
 
 # For FAFT, need a larger RX ring
-config SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
+configdefault SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
 	default 192
 
 config PLATFORM_EC_CONSOLE_INIT_PRIORITY
@@ -73,6 +73,13 @@ config PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
 	depends on PLATFORM_EC_HOSTCMD
 	help
 	  Signal new console logs with a host event.
+
+config PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
+	bool "Report dropped console logs"
+	default y
+	help
+	  Report dropped console logs in the console buffer when logs
+	  are dropped due to ISR, mutex timeout, or buffer overflow.
 
 endif # PLATFORM_EC_HOSTCMD_CONSOLE
 

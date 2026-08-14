@@ -214,6 +214,9 @@ static int x86_non_dsx_adlp_g3_run(void *data)
 		return 0;
 	}
 
+	ap_pwrseq_post_event(ap_pwrseq_get_instance(),
+			     AP_PWRSEQ_EVENT_POWER_SHUTDOWN);
+
 	return 1;
 }
 
@@ -230,13 +233,6 @@ static int x86_non_dsx_adlp_s4_run(void *data)
 
 AP_POWER_CHIPSET_STATE_DEFINE(S4, NULL, x86_non_dsx_adlp_s4_run, NULL);
 
-static int x86_non_dsx_adlp_s3_entry(void *data)
-{
-	ap_off();
-
-	return 0;
-}
-
 static int x86_non_dsx_adlp_s3_run(void *data)
 {
 	if (!power_signal_get(PWR_DSW_PWROK) || power_signal_get(PWR_SLP_SUS)) {
@@ -246,8 +242,17 @@ static int x86_non_dsx_adlp_s3_run(void *data)
 	return 0;
 }
 
-AP_POWER_CHIPSET_STATE_DEFINE(S3, x86_non_dsx_adlp_s3_entry,
-			      x86_non_dsx_adlp_s3_run, NULL);
+static int x86_non_dsx_adlp_s3_exit(void *data)
+{
+	if (ap_pwrseq_sm_get_entry_state(data) < AP_POWER_STATE_S3) {
+		ap_off();
+	}
+
+	return 0;
+}
+
+AP_POWER_CHIPSET_STATE_DEFINE(S3, NULL, x86_non_dsx_adlp_s3_run,
+			      x86_non_dsx_adlp_s3_exit);
 
 static int x86_non_dsx_adlp_s0_run(void *data)
 {
