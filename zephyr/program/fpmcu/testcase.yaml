@@ -227,6 +227,11 @@ tests:
     - CONFIG_PM=n
     extra_conf_files:
     - prj_hw_tests.conf
+  rollback_lock:
+    extra_configs:
+    - CONFIG_HW_TEST_ROLLBACK_LOCK=y
+    extra_conf_files:
+    - prj_hw_tests.conf
   rollback_lock_panic:
     extra_configs:
     - CONFIG_HW_TEST_ROLLBACK_LOCK_PANIC=y

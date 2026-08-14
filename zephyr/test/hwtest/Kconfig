@@ -242,6 +242,14 @@ config HW_TEST_ROLLBACK_ENTROPY
 	help
 	  The test verifies rollback entropy functionality.
 
+config HW_TEST_ROLLBACK_LOCK
+	bool "Rollback mapped storage lock test"
+	depends on ZTEST
+	depends on BOARD_FINGERPRINT
+	help
+	  Verifies that unlock_rollback() and lock_rollback() correctly acquire
+	  and release the external mapped storage lock.
+
 config HW_TEST_ROLLBACK_LOCK_PANIC
 	bool "Rollback lock panic test"
 	depends on ZTEST
