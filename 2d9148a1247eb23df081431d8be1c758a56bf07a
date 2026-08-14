@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "2d9148a1247eb23df081431d8be1c758a56bf07a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2bcf3c3_4e9c887d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:22:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/5a856d34-3c71-4760-be8c-288f1cc7c477)]\n\n**Review Summary:**\n* **Functionality:** The patch accurately defers the writing of encryption metadata (`nonce`, `encryption_salt`, `tag`) to the global `fp_enc_buffer.metadata` by utilizing local stack buffers. The metadata is only copied to the global buffer after key derivation and encryption succeed, ensuring that intermediate failures do not leave partially initialized state in the buffer.\n* **Security:** Using `CleanseWrapper` for the stack buffers provides an extra layer of defense-in-depth by ensuring the temporary metadata variables are zeroed out upon exiting the scope. No security vulnerabilities are introduced.\n* **Style:** The code follows modern C++ guidelines and elegantly uses `std::ranges::copy` to transfer buffer contents. The use of the shared mock `mock_ctrl_fpsensor_crypto` correctly avoids duplicating mock logic.\n* **Testing \u0026 Test Coverage:** Excellent test coverage was added. The Zephyr test `test_fp_frame_v1_encrypt_template_key_derivation_failure` specifically exercises the failure path and verifies that the `fp_enc_buffer` metadata fields remain strictly zero-initialized upon key derivation failure.\n* **CL Size \u0026 Scope:** The CL is appropriately sized and tightly scoped to fixing the metadata initialization issue without bundling unrelated changes.",
+      "isAi": true,
+      "revId": "2d9148a1247eb23df081431d8be1c758a56bf07a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
