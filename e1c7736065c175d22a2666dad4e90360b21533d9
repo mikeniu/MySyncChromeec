@@ -37,6 +37,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6db8346d_99976184",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T21:35:06Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6c0260c6_b262d3ba",
+      "revId": "e1c7736065c175d22a2666dad4e90360b21533d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88e85173_0afeb210",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T21:35:06Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f2f5e679_8f99a35a",
+      "revId": "e1c7736065c175d22a2666dad4e90360b21533d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "191e205f_2bd4a858",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Since `ztest_interrupt_disable_all()` is only ever called when `CONFIG_ZTEST` is defined (via `include/system.h`), placing this definition in a production file like `system.c` violates the guideline to keep test-only code out of production images (as noted by Keith previously).\n\nSince you already provided a weak fallback in `zephyr/shim/src/ztest_system.c`, this definition in `system.c` is redundant. If you encounter linkage issues when removing this, please wrap it in `#ifdef CONFIG_ZTEST` so it is safely omitted from production builds.",
       "isAi": true,
+      "revId": "e1c7736065c175d22a2666dad4e90360b21533d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e862f61_4bca99a3",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T21:35:06Z",
+      "side": 1,
+      "message": "this is not correct, it will break the renode build.",
+      "parentUuid": "191e205f_2bd4a858",
       "revId": "e1c7736065c175d22a2666dad4e90360b21533d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
