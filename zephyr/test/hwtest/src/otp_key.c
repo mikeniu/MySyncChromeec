@@ -6,8 +6,8 @@
 #include "system.h"
 #include "util.h"
 
+#include <zephyr/arch/cpu.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/sys/__assert.h>
 #include <zephyr/ztest.h>
 
 LOG_MODULE_REGISTER(otp_key, LOG_LEVEL_INF);
@@ -22,8 +22,11 @@ void log_key_buffer(uint8_t *key_buff)
 	LOG_INF("\n");
 }
 
-ZTEST(otp_key, test_read)
+ZTEST(otp_key, test_otp_key_provision)
 {
+	zassert_true(arch_cpu_irqs_are_enabled(),
+		     "IRQs should be enabled before test");
+
 	otp_key_init();
 
 	uint32_t status = otp_key_provision();
@@ -38,4 +41,7 @@ ZTEST(otp_key, test_read)
 	log_key_buffer(otp_key_buffer);
 
 	otp_key_exit();
+
+	zassert_true(arch_cpu_irqs_are_enabled(),
+		     "IRQs were left disabled after otp_key_provision");
 }
