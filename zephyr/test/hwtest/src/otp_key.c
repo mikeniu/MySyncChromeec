@@ -7,12 +7,18 @@
 #include "util.h"
 
 #include <zephyr/logging/log.h>
-#include <zephyr/sys/__assert.h>
 #include <zephyr/ztest.h>
+
+#include <cmsis_core.h>
 
 LOG_MODULE_REGISTER(otp_key, LOG_LEVEL_INF);
 
 ZTEST_SUITE(otp_key, NULL, NULL, NULL, NULL, NULL);
+
+static inline bool irqs_are_enabled(void)
+{
+	return (__get_PRIMASK() == 0) && (__get_BASEPRI() == 0);
+}
 
 void log_key_buffer(uint8_t *key_buff)
 {
@@ -24,6 +30,8 @@ void log_key_buffer(uint8_t *key_buff)
 
 ZTEST(otp_key, test_read)
 {
+	zassert_true(irqs_are_enabled(), "IRQs should be enabled before test");
+
 	otp_key_init();
 
 	uint32_t status = otp_key_provision();
@@ -38,4 +46,7 @@ ZTEST(otp_key, test_read)
 	log_key_buffer(otp_key_buffer);
 
 	otp_key_exit();
+
+	zassert_true(irqs_are_enabled(),
+		     "IRQs were left locked after otp_key_provision");
 }
