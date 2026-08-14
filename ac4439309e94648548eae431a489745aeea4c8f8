@@ -70,6 +70,30 @@
       },
       "revId": "ac4439309e94648548eae431a489745aeea4c8f8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d4cf798_615d9ceb",
+        "filename": "zephyr/program/fatcat/dsp_comms.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-08-14T23:41:13Z",
+      "side": 1,
+      "message": "That\u0027s a good catch. Maybe that\u0027s why CONFIG_PLATFORM_EC_DSP_REMOTE_LID_ANGLE got set to \u003dn because if it\u0027s set to \u003dy then it would generate the warning. I changed this to add the changes to the project.conf files for moonstone and moonstone-ish",
+      "parentUuid": "ee2df9bd_2d747184",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 0
+      },
+      "revId": "ac4439309e94648548eae431a489745aeea4c8f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
