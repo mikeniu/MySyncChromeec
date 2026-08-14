@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf9603cb_fc9c372b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T23:08:43Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f2d75ea6_7eb0bc97",
+      "revId": "501b1af0e6becaa25f87c3161a54c005398d6812",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9bfb2f89_8e9be401",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] This include is still unconditional, which will break legacy EC test builds if they compile this mock. Please wrap this `#include \u003czephyr/ztest.h\u003e` (and potentially the `cmsis_core.h` include block below it) in `#ifdef CONFIG_ZEPHYR`.",
       "isAi": true,
+      "revId": "501b1af0e6becaa25f87c3161a54c005398d6812",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a15d394_89f83dc1",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T23:08:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9bfb2f89_8e9be401",
       "revId": "501b1af0e6becaa25f87c3161a54c005398d6812",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
