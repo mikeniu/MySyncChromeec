@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "803b966d_2fdeffc9",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 1052,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-08-14T07:14:40Z",
+      "side": 1,
+      "message": "https://drive.google.com/file/d/1hRLAP2oDZSpaXxJhPmYu7UMkhV6NOGz3/view?usp\u003ddrive_link\u0026resourcekey\u003d0-J1gXfI7YYTNvlAOrScpixw ref to doc page 14 same GPADCMEAS_OFF Step size shows Min-244us",
+      "parentUuid": "26bc94a3_5f4692b7",
+      "revId": "3c174ef7c37e76e7c5fd6642a441cc31a6ce54f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a051c5c2_ec0a2ff4",
         "filename": "driver/charger/sm5803.c",
         "patchSetId": 20
@@ -49,6 +67,24 @@
       "writtenOn": "2026-08-13T18:33:52Z",
       "side": 1,
       "message": "In an earlier patchset, this code would return early on failure, which is fairly consistent with the rest of this function. If you did that here, it would allow you to reduce the level of nesting and place error handling closer to the code that induced the error while still avoiding the use of an uninitialized `vbus_mv`.",
+      "revId": "3c174ef7c37e76e7c5fd6642a441cc31a6ce54f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e642cdb2_90ef9383",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 1374,
+      "author": {
+        "id": 3923218
+      },
+      "writtenOn": "2026-08-14T07:14:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a051c5c2_ec0a2ff4",
       "revId": "3c174ef7c37e76e7c5fd6642a441cc31a6ce54f7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
