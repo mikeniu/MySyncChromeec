@@ -63,6 +63,24 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "68f9c9a6b976057dfba201b7623b1197972622e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35957bfc_62d27411",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:27:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/16369105-5c3a-49b7-b883-78d6051206ba)]\n\n**Review Summary**\n* **Functionality:** The domain separation logic is correctly implemented, safely utilizing flow-specific prefixes to isolate keys between classic and fingerguard flows.\n* **Security:** This effectively mitigates potential cross-protocol attacks by ensuring keys derived in one context cannot be used in another. The stack buffers are appropriately sized and bounds are enforced using `std::span`. HKDF parameters are correctly isolated.\n* **Style:** The code modifications are cleanly written and effectively leverage C++ standard library features like `std::string_view` and `std::span` for memory safety.\n* **Testing \u0026 Test Coverage:** Test coverage is thorough. The newly added test cases successfully verify that keys differ across flows and that cross-flow decryption correctly fails. Negative testing for invalid info sizes is also included.\n* **CL Size \u0026 Scope:** The CL is perfectly scoped, small, and focuses exclusively on the required security enhancement.\n\nTAG\u003dagy\nCONV\u003d16369105-5c3a-49b7-b883-78d6051206ba",
+      "isAi": true,
+      "revId": "68f9c9a6b976057dfba201b7623b1197972622e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
