@@ -45,6 +45,29 @@
       },
       "revId": "8a59c784841b135189ce6f41594f3945254d3e71",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44caad42_32feb68e",
+        "filename": "core/cortex-m/ec.lds.S",
+        "patchSetId": 7
+      },
+      "lineNbr": 672,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:59:25Z",
+      "side": 1,
+      "message": "I think adding the alignment is good. I\u0027m wondering if there are any other regions that may have been accidentally unaligned. Can you put the alignment change in its own commit and use the `compare-builds` tool to verify that no boards change (or document which ones do so we know)?",
+      "range": {
+        "startLine": 667,
+        "startChar": 0,
+        "endLine": 672,
+        "endChar": 17
+      },
+      "revId": "8a59c784841b135189ce6f41594f3945254d3e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
