@@ -17,6 +17,7 @@
 			pdc = <&pdc_power_p0>;
 			pd-retimer;
 			policy = <&cros_policy>;
+			zephyr,deferred-init;
 		};
 		usbc_port1: port1@1 {
 			compatible = "named-usbc-port";
@@ -24,6 +25,7 @@
 			pdc = <&pdc_power_p1>;
 			pd-retimer;
 			policy = <&cros_policy>;
+			zephyr,deferred-init;
 		};
 		ppm-driver {
 			compatible = "ucsi-ppm";
@@ -47,6 +49,7 @@
 		port-index-on-chip = <0x1>;
 		frs-supported;
 		ccd;
+		zephyr,deferred-init;
 	};
 	pdc_power_p1: tps6699-pdc@21 {
 		compatible = "ti,tps6699-pdc";
@@ -54,5 +57,6 @@
 		irq-gpios = <RTS5912_GPIO083 GPIO_ACTIVE_LOW>;
 		port-index-on-chip = <0x1>;
 		frs-supported;
+		zephyr,deferred-init;
 	};
 };
