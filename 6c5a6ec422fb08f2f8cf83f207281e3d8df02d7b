@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "6c5a6ec422fb08f2f8cf83f207281e3d8df02d7b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f731df5e_93e96f34",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:50:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/fa060f09-849e-4972-9e9b-bbd0e4a7d172)]\n\n**Review Summary:**\n* **Functionality:** The patch accurately implements the deferral of writing to the global `fp_enc_buffer.metadata` by using stack-allocated buffers for the `nonce`, `encryption_salt`, and `tag`. The data is copied to the global state only after the key derivation and encryption process completes successfully, effectively preventing premature state mutation on intermediate failures.\n* **Security:** The security posture is robust. Generating encryption metadata into stack buffers wrapped with `CleanseWrapper` ensures these values are securely zeroed out upon exiting the scope. Additionally, the existing logic of zero-initializing `fp_enc_buffer` and cleansing it on encryption failure maintains strong defenses against memory exposure.\n* **Style:** The code follows modern C++ guidelines, correctly utilizing `std::ranges::copy` for clean and readable buffer transfers.\n* **Testing \u0026 Test Coverage:** The included Zephyr test (`test_fp_frame_v1_encrypt_template_key_derivation_failure`) thoroughly covers the failure path. By mocking `hkdf_sha256` to simulate a key derivation failure, it explicitly asserts that the `fp_enc_buffer.metadata` fields remain strictly zero-initialized.\n* **CL Size \u0026 Scope:** The CL is appropriately sized and self-contained. It focuses tightly on fixing the metadata buffer initialization without introducing unrelated refactoring.",
+      "isAi": true,
+      "revId": "6c5a6ec422fb08f2f8cf83f207281e3d8df02d7b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
