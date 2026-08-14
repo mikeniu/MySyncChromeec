@@ -178,6 +178,29 @@
       },
       "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2acd722_270ba718",
+        "filename": "zephyr/test/hwtest/src/rollback_lock.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:22:02Z",
+      "side": 1,
+      "message": "Could this be simplified as follows?\n\n----\n\n\nZephyr includes the Fake Function Framework (FFF). Because `fff.c` is already included in your `CMakeLists.txt` for `hwtest`, you can delete the manual interceptor entirely and let FFF track the calls and arguments.\n\n```c\n#include \u003czephyr/ztest.h\u003e\n#include \u003czephyr/fff.h\u003e\n\nDEFINE_FFF_GLOBALS;\n\n/* Automatically generates the mock and tracking variables */\nFAKE_VOID_FUNC(crec_flash_lock_mapped_storage, int);\n\nZTEST_SUITE(rollback_lock, NULL, NULL, NULL, NULL, NULL);\n\nZTEST(rollback_lock, test_lock_matching)\n{\n#if IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)\n\tRESET_FAKE(crec_flash_lock_mapped_storage);\n\n\tuint32_t key \u003d unlock_rollback();\n\tlock_rollback(key);\n\n\t/* Ensure the function was called exactly twice */\n\tzassert_equal(crec_flash_lock_mapped_storage_fake.call_count, 2,\n\t\t      \"Expected exactly 2 mapped storage lock transitions\");\n\n\t/* Ensure the first call was lock(1) and the second was unlock(0) */\n\tzassert_equal(crec_flash_lock_mapped_storage_fake.arg0_history[0], 1,\n\t\t      \"First transition should be an acquire (1)\");\n\tzassert_equal(crec_flash_lock_mapped_storage_fake.arg0_history[1], 0,\n\t\t      \"Second transition should be a release (0)\");\n#else\n\tztest_test_skip();\n#endif\n}\n\n```\n\n*Why this is better:* It removes 15 lines of custom mock boilerplate, completely isolates the test from standard code logic, and strictly verifies the sequence of arguments passed to the function using `arg0_history`.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 0
+      },
+      "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
