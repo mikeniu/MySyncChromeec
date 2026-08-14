@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f888da7c_97ac2a8e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T16:27:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/448f0bc2-7464-497f-b321-ae815ab05103)]\n\n### Review Summary\n* **Functionality**: The change correctly addresses a race condition by disabling interrupts before `HOOK_SYSJUMP` handlers run. The relocation of the test state variable to `system_fake.c` and addition of an empty mock in `system.c` successfully resolves test linkage concerns without polluting production images with test-only code.\n* **Security**: No vulnerabilities introduced. This improves system robustness and security by preventing preemption while system protection mechanisms are inactive.\n* **Style**: Code style is clean and well-documented.\n* **Testing**: Manual testing was performed. A mock-based unit test properly enforces the calling order programmatically. The test dependencies are managed correctly across the `zephyr/shim` and `zephyr/fake` directories.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and perfectly scoped to this single fix.\n\nTAG\u003dagy\nCONV\u003da628d531-ff46-4d81-8575-2e7a1cae883b",
+      "isAi": true,
+      "revId": "0ebfd27f790956d24727f70832f34bf595082f1c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
