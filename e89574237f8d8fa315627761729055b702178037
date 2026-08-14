@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "858c9f98_94a6bfb6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T19:19:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b72b5a59_e1f3b9ad",
+      "revId": "e89574237f8d8fa315627761729055b702178037",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "261c74f1_cad7dd5e",
@@ -173,6 +191,30 @@
       "writtenOn": "2026-08-14T18:47:18Z",
       "side": 1,
       "message": "We already have a [mock `hkdf_sha256`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/test/mock/fpsensor_crypto_mock.cc;l\u003d40;drc\u003dea5999978dd58770868c0710159485027ca63582). Can we use that instead of reimplementing it?",
+      "range": {
+        "startLine": 182,
+        "startChar": 0,
+        "endLine": 206,
+        "endChar": 1
+      },
+      "revId": "e89574237f8d8fa315627761729055b702178037",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8f3b870_04675307",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T19:19:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c6675f7_88920e6f",
       "range": {
         "startLine": 182,
         "startChar": 0,

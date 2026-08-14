@@ -52,6 +52,42 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "6c5a6ec422fb08f2f8cf83f207281e3d8df02d7b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12b3ad27_efdcf66b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T19:19:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4e75aa51_4344e024",
+      "revId": "6c5a6ec422fb08f2f8cf83f207281e3d8df02d7b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f32bfbc_81ba5d36",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T19:19:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f731df5e_93e96f34",
+      "revId": "6c5a6ec422fb08f2f8cf83f207281e3d8df02d7b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
