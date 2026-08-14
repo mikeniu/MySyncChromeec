@@ -70,6 +70,30 @@
       },
       "revId": "baed890fa69e68321483d9146ad5cf9c0becdb7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e583a339_adb97ee5",
+        "filename": "zephyr/program/fatcat/ruby-ish/src/sensor.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-14T22:29:32Z",
+      "side": 1,
+      "message": "dts is a good idea. The change would be:\n1. Add new property: devicetree boolean `int-disable-on-inactive`\n\n2. project\u0027s motion sensor node which need to disable int pin during inactive, add properties:\n`int-disable-on-inactive`\n`int-signal`\n(this is existing property, seems not used in any project)\n\n3. In `motion_sense_switch_sensor_rate()` which is called by suspend/resume hook in motion_sense.c: \non the inactive branch call `gpio_disable_interrupt(int_signal); `\non the active branch (after `motion_sense_init`) call `gpio_enable_interrupt(int_signal)`.",
+      "parentUuid": "87aa442b_8aa4e28c",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 26
+      },
+      "revId": "baed890fa69e68321483d9146ad5cf9c0becdb7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
