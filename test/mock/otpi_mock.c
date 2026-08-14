@@ -9,6 +9,21 @@
  */
 #include "mock/otpi_mock.h"
 
+#include <zephyr/ztest.h>
+
+#if defined(CONFIG_CPU_CORTEX_M) || defined(__arm__)
+#include <cmsis_core.h>
+
+static inline bool irqs_are_locked(void)
+{
+#if defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE)
+	return __get_PRIMASK() != 0;
+#else
+	return (__get_PRIMASK() != 0) || (__get_BASEPRI() != 0);
+#endif
+}
+#endif
+
 #ifndef TEST_BUILD
 #error "Mocks should only be in the test build."
 #endif
@@ -49,6 +64,13 @@ enum API_RETURN_STATUS_T otpi_write(uint32_t address, uint8_t data)
 {
 	if (!mock_otp.powered_on)
 		return API_RET_OTP_STATUS_FAIL;
+
+#ifdef CONFIG_ZEPHYR
+#if defined(CONFIG_CPU_CORTEX_M) || defined(__arm__)
+	zassert_true(irqs_are_locked(),
+		     "otpi_write called with interrupts unlocked!");
+#endif
+#endif /* CONFIG_ZEPHYR */
 
 	mock_otp.otp_key_buffer[address - OTP_KEY_ADDR] |= data;
 	return API_RET_OTP_STATUS_OK;

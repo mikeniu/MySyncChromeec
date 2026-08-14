@@ -7,8 +7,25 @@
 #include "util.h"
 
 #include <zephyr/logging/log.h>
-#include <zephyr/sys/__assert.h>
 #include <zephyr/ztest.h>
+
+#if defined(CONFIG_CPU_CORTEX_M) || defined(__arm__)
+#include <cmsis_core.h>
+
+static inline bool irqs_are_enabled(void)
+{
+#if defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE)
+	return __get_PRIMASK() == 0;
+#else
+	return (__get_PRIMASK() == 0) && (__get_BASEPRI() == 0);
+#endif
+}
+#else
+static inline bool irqs_are_enabled(void)
+{
+	return true;
+}
+#endif
 
 LOG_MODULE_REGISTER(otp_key, LOG_LEVEL_INF);
 
@@ -22,8 +39,10 @@ void log_key_buffer(uint8_t *key_buff)
 	LOG_INF("\n");
 }
 
-ZTEST(otp_key, test_read)
+ZTEST(otp_key, test_otp_key_provision)
 {
+	zassert_true(irqs_are_enabled(), "IRQs should be enabled before test");
+
 	otp_key_init();
 
 	uint32_t status = otp_key_provision();
@@ -38,4 +57,7 @@ ZTEST(otp_key, test_read)
 	log_key_buffer(otp_key_buffer);
 
 	otp_key_exit();
+
+	zassert_true(irqs_are_enabled(),
+		     "IRQs were left locked after otp_key_provision");
 }
