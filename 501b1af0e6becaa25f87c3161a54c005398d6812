@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2d75ea6_7eb0bc97",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T23:06:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/fa52ab36-3dda-4289-94fd-b786f7a61bd0)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly addresses the bug by wrapping the byte-by-byte OTP key programming sequence with `irq_lock()` and `irq_unlock()`. This ensures the loop won\u0027t be interrupted.\n*   **Security:** No security vulnerabilities are introduced. The use of interrupt locking during sensitive operations is a standard practice.\n*   **Style:** The code follows Zephyr and EC coding conventions.\n*   **Consistency:** An issue remains where Zephyr-specific headers are included unconditionally in a shared test mock, which can break legacy EC builds. See inline comment.\n*   **Testing \u0026 Test Coverage:** Excellent. The author added the necessary mock assertions to verify that `otpi_write` is only called with interrupts locked. The hardware test was also updated and re-enabled.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and self-contained.\n\nTAG\u003dagy\nCONV\u003d0f3069fc-7542-48fb-9611-d073cbc62b12",
+      "isAi": true,
+      "revId": "501b1af0e6becaa25f87c3161a54c005398d6812",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bfb2f89_8e9be401",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T23:06:48Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This include is still unconditional, which will break legacy EC test builds if they compile this mock. Please wrap this `#include \u003czephyr/ztest.h\u003e` (and potentially the `cmsis_core.h` include block below it) in `#ifdef CONFIG_ZEPHYR`.",
+      "isAi": true,
+      "revId": "501b1af0e6becaa25f87c3161a54c005398d6812",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
