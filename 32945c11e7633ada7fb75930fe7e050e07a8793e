@@ -201,6 +201,30 @@
       },
       "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b930dbd9_4fcbfb1d",
+        "filename": "zephyr/test/hwtest/src/rollback_lock.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:23:01Z",
+      "side": 1,
+      "message": "Also, can you write it as?\n\n```\n\nif (!IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)) {\n  ztest_test_skip();\n  return;\n}\n\n// remaining logic here\n```",
+      "parentUuid": "e2acd722_270ba718",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 0
+      },
+      "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
