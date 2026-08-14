@@ -17,6 +17,42 @@
       "isAi": true,
       "revId": "e1c7736065c175d22a2666dad4e90360b21533d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2f5e679_8f99a35a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T21:30:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/7b375042-4cb3-41df-9bf6-11f3ad03c460)]\n\n### Review Summary\n* **Functionality**: The change correctly ensures teardown hooks run atomically. The updates to `preserve_enable_5v_state` and `flash_shared_enable_ec_access` successfully remove blocking operations to comply with the new interrupt-disabled context.\n* **Security**: No vulnerabilities introduced. This improves system resilience during image transitions by removing race conditions.\n* **Style**: Code style is clean and well-documented.\n* **Testing**: The unit test properly verifies the calling order using a mock variable. However, a test-only function was added to a production file unconditionally, which violates the principle of keeping test-only code out of production images. This needs to be addressed before landing.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and appropriately scoped to this single fix.\n\nTAG\u003dagy\nCONV\u003d7b375042-4cb3-41df-9bf6-11f3ad03c460",
+      "isAi": true,
+      "revId": "e1c7736065c175d22a2666dad4e90360b21533d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "191e205f_2bd4a858",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T21:30:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `ztest_interrupt_disable_all()` is only ever called when `CONFIG_ZTEST` is defined (via `include/system.h`), placing this definition in a production file like `system.c` violates the guideline to keep test-only code out of production images (as noted by Keith previously).\n\nSince you already provided a weak fallback in `zephyr/shim/src/ztest_system.c`, this definition in `system.c` is redundant. If you encounter linkage issues when removing this, please wrap it in `#ifdef CONFIG_ZTEST` so it is safely omitted from production builds.",
+      "isAi": true,
+      "revId": "e1c7736065c175d22a2666dad4e90360b21533d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
