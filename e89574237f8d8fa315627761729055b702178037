@@ -17,6 +17,75 @@
       "isAi": true,
       "revId": "e89574237f8d8fa315627761729055b702178037",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "261c74f1_cad7dd5e",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:42:11Z",
+      "side": 1,
+      "message": "This comment is just re-stating what the code does: https://google.github.io/styleguide/cppguide.html#Implementation_Comment_Donts",
+      "range": {
+        "startLine": 563,
+        "startChar": 0,
+        "endLine": 566,
+        "endChar": 4
+      },
+      "revId": "e89574237f8d8fa315627761729055b702178037",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "559ba73b_7c5187ee",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:42:11Z",
+      "side": 1,
+      "message": "The extra space is not needed in modern C++. same before other usages of `CleanseWrapper` below.",
+      "range": {
+        "startLine": 567,
+        "startChar": 59,
+        "endLine": 567,
+        "endChar": 60
+      },
+      "revId": "e89574237f8d8fa315627761729055b702178037",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cb6d566_275ad40f",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 620,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:42:11Z",
+      "side": 1,
+      "message": "This comment is just re-stating what the code does: https://google.github.io/styleguide/cppguide.html#Implementation_Comment_Donts",
+      "range": {
+        "startLine": 618,
+        "startChar": 0,
+        "endLine": 620,
+        "endChar": 4
+      },
+      "revId": "e89574237f8d8fa315627761729055b702178037",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
