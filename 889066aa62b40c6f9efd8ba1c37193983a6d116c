@@ -17,6 +17,29 @@
       "isAi": true,
       "revId": "889066aa62b40c6f9efd8ba1c37193983a6d116c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fdbd904_6e2b17ff",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:29:26Z",
+      "side": 1,
+      "message": "Can you file a bug and add a `TODO(b/123)` comment here?",
+      "range": {
+        "startLine": 248,
+        "startChar": 0,
+        "endLine": 250,
+        "endChar": 73
+      },
+      "revId": "889066aa62b40c6f9efd8ba1c37193983a6d116c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
