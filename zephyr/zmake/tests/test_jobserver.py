@@ -54,6 +54,7 @@ def _do_test_jobserver(
     active_threads = 0
     please_exit = threading.Semaphore(0)
     thread_count = jobs + 5
+    threads = []
     if commandline_jobs:
         effective_jobs = commandline_jobs
 
@@ -101,7 +102,9 @@ def _do_test_jobserver(
     try:
         logging.debug("Starting %s threads", thread_count)
         for _ in range(thread_count):
-            threading.Thread(target=_my_thread, daemon=True).start()
+            t = threading.Thread(target=_my_thread, daemon=True)
+            t.start()
+            threads.append(t)
 
         with lock:
             lock.wait_for(
@@ -139,6 +142,10 @@ def _do_test_jobserver(
             assert active_threads == 0
             assert ended_threads == thread_count
     finally:
+        for _ in range(thread_count):
+            please_exit.release()
+        for t in threads:
+            t.join(timeout=5)
         if use_client and pipe and open_pipe:
             os.close(pipe[0])
             os.close(pipe[1])

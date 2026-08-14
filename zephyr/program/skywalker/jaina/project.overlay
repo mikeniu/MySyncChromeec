@@ -124,7 +124,7 @@
 			0xff	/* C4 */
 			0xff	/* C5 */
 			0xff	/* C6 */
-			0xa0	/* C7 */
+			0xa4	/* C7 */
 			0xff	/* C8 */
 			0xff	/* C9 */
 			0x54	/* C10 */
@@ -178,7 +178,7 @@
 };
 
 &i2c3 {
-	transfer-timeout-ms = <200>;
+	zephyr,transfer-timeout-ms = <200>;
 };
 
 &i2c4 {
@@ -206,6 +206,7 @@
 		 /delete-node/ pstate;
 
 		 ec-ro {
+			size = <(0x60000 - (0x1000 * 2))>;
 			fmap {
 				offset =  <(0x60000 - (0x1000 * 2) - 0x400)>;
 				/*
@@ -224,4 +225,9 @@
 			size = <0x1000>;
 		};
 	};
+};
+
+&cros_policy {
+	max-discharge-current-ma = <4500>;
+	max-discharge-power-mw = <41000>;
 };

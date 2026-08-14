@@ -26,6 +26,7 @@
 #include "builtin/assert.h"
 #include "chipset.h"
 #include "common.h"
+#include "ec_commands.h"
 #include "extpower.h"
 #include "gpio.h"
 #include "hooks.h"
@@ -207,6 +208,12 @@ static char rtc_wake;
 
 /* Time where we will power off, if power button still held down */
 static timestamp_t power_off_deadline;
+
+static void power_button_timer_deferred(void)
+{
+	task_wake(TASK_ID_CHIPSET);
+}
+DECLARE_DEFERRED(power_button_timer_deferred);
 
 /* Force AP power on (used for recovery keypress) */
 static int auto_power_on;
@@ -1023,7 +1030,8 @@ static uint8_t check_for_power_off_event(void)
 			CPRINTS("power waiting for long press %u",
 				power_off_deadline.le.lo);
 			/* Ensure we will wake up to check the power key */
-			timer_arm(power_off_deadline, TASK_ID_CHIPSET);
+			hook_call_deferred(&power_button_timer_deferred_data,
+					   DELAY_FORCE_SHUTDOWN);
 		} else if (timestamp_expired(power_off_deadline, &now)) {
 			power_off_deadline.val = 0;
 			CPRINTS("power off after long press now=%u, %u",
@@ -1032,7 +1040,7 @@ static uint8_t check_for_power_off_event(void)
 		}
 	} else if (power_button_was_pressed) {
 		CPRINTS("power off cancel");
-		timer_cancel(TASK_ID_CHIPSET);
+		hook_call_deferred(&power_button_timer_deferred_data, -1);
 	}
 
 	power_button_was_pressed = pressed;
@@ -1056,7 +1064,7 @@ static uint8_t check_for_power_off_event(void)
 static inline void cancel_power_button_timer(void)
 {
 	if (power_button_was_pressed)
-		timer_cancel(TASK_ID_CHIPSET);
+		hook_call_deferred(&power_button_timer_deferred_data, -1);
 }
 
 /*****************************************************************************/
@@ -1444,6 +1452,39 @@ static const char *const state_name[] = {
 	"off",
 	"on",
 };
+
+#ifdef CONFIG_HOSTCMD_AP_RESET_SCHEDULED
+static void ap_reset_deferred(void)
+{
+	CPRINTS("Scheduled AP reset: cold reset");
+	power_request = POWER_REQ_COLD_RESET;
+	task_wake(TASK_ID_CHIPSET);
+}
+DECLARE_DEFERRED(ap_reset_deferred);
+
+static enum ec_status
+host_command_apreset_scheduled(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_ap_reset_scheduled *p = args->params;
+
+	if (p->delay_ms == 0) {
+		/* Reset immediately */
+		CPRINTS("AP reset immediate: cold reset");
+		power_request = POWER_REQ_COLD_RESET;
+		task_wake(TASK_ID_CHIPSET);
+		return EC_RES_SUCCESS;
+	}
+
+	/* Schedule reset */
+	if (hook_call_deferred(&ap_reset_deferred_data, p->delay_ms * MSEC) !=
+	    EC_SUCCESS)
+		return EC_RES_ERROR;
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_AP_RESET_SCHEDULED, host_command_apreset_scheduled,
+		     EC_VER_MASK(0));
+#endif
 
 test_mockable_static int command_power(int argc, const char **argv)
 {

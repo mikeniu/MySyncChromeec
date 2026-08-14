@@ -8,7 +8,7 @@
 		compatible = "cros-ec,gpio-interrupts";
 
 		int_ac_present: ac_present {
-			irq-pin = <&gpio_ec_ac_present_odl>;
+			irq-pin = <&gpio_acok_r_od>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "extpower_interrupt";
 		};

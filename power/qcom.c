@@ -161,6 +161,12 @@ static char lid_opened;
 /* Time where we will power off, if power button still held down */
 static timestamp_t power_off_deadline;
 
+static void power_button_timer_deferred(void)
+{
+	task_wake(TASK_ID_CHIPSET);
+}
+DECLARE_DEFERRED(power_button_timer_deferred);
+
 /* Force AP power on (used for recovery keypress) */
 static int auto_power_on;
 
@@ -766,7 +772,8 @@ static uint8_t check_for_power_off_event(void)
 			CPRINTS("power waiting for long press %u",
 				power_off_deadline.le.lo);
 			/* Ensure we will wake up to check the power key */
-			timer_arm(power_off_deadline, TASK_ID_CHIPSET);
+			hook_call_deferred(&power_button_timer_deferred_data,
+					   DELAY_FORCE_SHUTDOWN);
 		} else if (timestamp_expired(power_off_deadline, &now)) {
 			power_off_deadline.val = 0;
 			CPRINTS("power off after long press now=%u, %u",
@@ -775,7 +782,7 @@ static uint8_t check_for_power_off_event(void)
 		}
 	} else if (power_button_was_pressed) {
 		CPRINTS("power off cancel");
-		timer_cancel(TASK_ID_CHIPSET);
+		hook_call_deferred(&power_button_timer_deferred_data, -1);
 	}
 
 	power_button_was_pressed = pressed;
@@ -799,7 +806,7 @@ static uint8_t check_for_power_off_event(void)
 static inline void cancel_power_button_timer(void)
 {
 	if (power_button_was_pressed)
-		timer_cancel(TASK_ID_CHIPSET);
+		hook_call_deferred(&power_button_timer_deferred_data, -1);
 }
 
 /*****************************************************************************/

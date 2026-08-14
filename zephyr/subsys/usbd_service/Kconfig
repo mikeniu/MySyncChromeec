@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-config COMMON_LIBC_MALLOC_ARENA_SIZE
+configdefault COMMON_LIBC_MALLOC_ARENA_SIZE
 	default 1024 if USB_DEVICE_STACK_NEXT
 
 choice USBD_LOG_LEVEL_CHOICE
@@ -137,7 +137,7 @@ config USB_DEVICE_MAX_POWER
 
 if CROS_EC_RW
 
-config USBD_HID_SUPPORT
+configdefault USBD_HID_SUPPORT
 	default y if USBD_HID_KEYBOARD || USBD_HID_TOUCHPAD
 	default n
 
@@ -145,7 +145,7 @@ endif # CROS_EC_RW
 
 if CROS_EC_RO
 
-config USBD_HID_SUPPORT
+configdefault USBD_HID_SUPPORT
 	default n
 
 endif # CROS_EC_RO

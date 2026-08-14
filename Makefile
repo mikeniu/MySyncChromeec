@@ -140,9 +140,9 @@ endif
 _tsk_lst_flags+=-I$(BDIR) -DBOARD_$(UC_BOARD)=$(EMPTY) \
 		-D_MAKEFILE=$(EMPTY) -imacros $(_tsk_lst_file)
 
-_tsk_lst_ro:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -DSECTION_IS_RO=$(EMPTY) \
+_tsk_lst_ro:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -DCONFIG_CROS_EC_RO=1 \
 	$(_tsk_lst_flags) include/task_filter.h)
-_tsk_lst_rw:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -DSECTION_IS_RW=$(EMPTY) \
+_tsk_lst_rw:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -DCONFIG_CROS_EC_RW=1 \
 	$(_tsk_lst_flags) include/task_filter.h)
 
 _tsk_cfg_ro:=$(foreach t,$(_tsk_lst_ro) ,HAS_TASK_$(t))
@@ -284,6 +284,9 @@ include common/build.mk
 include driver/build.mk
 include power/build.mk
 include test/build.mk
+include test/common/build.mk
+include test/mock/build.mk
+$(eval $(call vars_from_dir,test_mock_objs,mock,test_mock))
 include third_party/build.mk
 include util/build.mk
 include util/lock/build.mk
@@ -315,6 +318,10 @@ endif
 all-obj-$(1)+=$(call objs_from_dir_p,driver,driver,$(1))
 all-obj-$(1)+=$(call objs_from_dir_p,power,power,$(1))
 all-obj-$(1)+=$(call objs_from_dir_p,test,$(PROJECT),$(1))
+ifeq ($(TEST_BUILD),y)
+all-obj-$(1)+=$(call objs_from_dir_p,test/common,test_common,$(1))
+all-obj-$(1)+=$(call objs_from_dir_p,test,test_mock_objs,$(1))
+endif
 ifeq ($(CONFIG_BORINGSSL_CRYPTO), y)
 all-obj-$(1)+= \
     $(call objs_from_dir_p,third_party/boringssl/common,boringssl,$(1))
@@ -352,6 +359,10 @@ host-srcs-cxx := $(foreach u,$(host-util-bin-cxx-y), \
 dirs=core/$(CORE) chip/$(CHIP) $(BDIR) common power test
 dirs+=$(shell find common -type d)
 dirs+=$(shell find driver -type d)
+ifeq ($(TEST_BUILD),y)
+dirs+=test/common
+dirs+=test/mock
+endif
 ifeq ($(USE_BUILTIN_STDLIB), 1)
 dirs+=builtin
 else

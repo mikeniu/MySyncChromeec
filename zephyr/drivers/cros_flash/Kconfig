@@ -177,7 +177,7 @@ config CROS_FLASH_ANDES_XIP
 if CROS_FLASH_ANDES_XIP
 
 # Initialize the Andes flash driver before the cros-flash driver
-config FLASH_ANDES_QSPI_INIT_PRIORITY
+configdefault FLASH_ANDES_QSPI_INIT_PRIORITY
 	default 50
 
 endif

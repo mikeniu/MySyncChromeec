@@ -1,0 +1,36 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	fans {
+		compatible = "cros-ec,fans";
+		fan_0 {
+			pwms = <&pwm2 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			tach = <&tach0>;
+			rpm-min = <960>;
+			rpm-start = <1200>;
+			rpm-max = <4800>;
+			rpm-deviation = <1>;
+			pgood-gpio = <&gpio_all_sys_pwrgd>;
+		};
+		fan_1 {
+			pwms = <&pwm3 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			tach = <&tach0>; // rts5912.dtsi lack of tach1, so use tach0 as a placeholder
+			rpm-min = <960>;
+			rpm-start = <1200>;
+			rpm-max = <4800>;
+			rpm-deviation = <1>;
+			pgood-gpio = <&gpio_all_sys_pwrgd>;
+		};
+	};
+};
+
+/* Fan tachometer sensor */
+&tach0 {
+	status = "okay";
+	pinctrl-0 = <&tacho0_gpio052>;
+	pinctrl-names = "default";
+	pulses-per-round = <2>;
+};

@@ -126,6 +126,15 @@ struct x86_panic_data {
 	uint8_t task_id;
 };
 
+/* POSIX architecture panic data */
+struct posix_panic_data {
+	uint32_t esf_placeholder;
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+	uint8_t reserved[3];
+};
+
 /* Data saved across reboots */
 struct panic_data {
 	uint8_t arch; /* Architecture (PANIC_ARCH_*) */
@@ -142,6 +151,7 @@ struct panic_data {
 #ifndef CONFIG_DO_NOT_INCLUDE_RV32I_PANIC_DATA
 		struct rv32i_panic_data riscv; /* RISC-V RV32I */
 #endif
+		struct posix_panic_data posix; /* POSIX (native_sim) */
 	};
 
 	/*
@@ -161,6 +171,7 @@ enum panic_arch {
 #ifndef CONFIG_DO_NOT_INCLUDE_RV32I_PANIC_DATA
 	PANIC_ARCH_RISCV_RV32I = 4, /* RISC-V RV32I */
 #endif
+	PANIC_ARCH_POSIX = 5, /* POSIX (native_sim) */
 };
 
 #define PANIC_ZEPHYR_FATAL_ERROR 0xDEAD6800

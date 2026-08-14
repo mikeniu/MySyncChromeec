@@ -52,22 +52,17 @@ class ProjectConfig:
     )
     snippets: "list[str]" = dataclasses.field(default_factory=list)
     project_dir: pathlib.Path = dataclasses.field(default_factory=pathlib.Path)
-    inherited_from: typing.Iterable[str] = dataclasses.field(
-        default_factory=list
-    )
+    boards: typing.Iterable[str] = dataclasses.field(default_factory=list)
     signer: signers.BaseSigner = signers.NullSigner()
     skip_build_all: bool = False
 
     @property
-    def full_name(self) -> str:
-        """Get the full project name, e.g. baseboard.variant"""
-        inherited_from = (
-            [self.inherited_from]
-            if isinstance(self.inherited_from, str)
-            else self.inherited_from
-        )
+    def inherited_from(self) -> typing.Iterable[str]:
+        """Get the list of boards.
 
-        return ".".join([*inherited_from, self.project_name])
+        This is an alias for boards.
+        """
+        return self.boards
 
 
 class Project:
@@ -225,9 +220,8 @@ class ProjectRegistrationHandler:
             Another ProjectRegistrationHandler.
         """
         new_config = dataclasses.asdict(self.base_config)
-        new_config["inherited_from"] = [
-            *self.base_config.inherited_from,
-            self.base_config.project_name,
+        new_config["boards"] = [
+            *self.base_config.boards,
         ]
 
         for key, value in kwargs.items():
@@ -253,6 +247,10 @@ def load_config_file(path) -> typing.List[Project]:
         # Project names cannot start with a '%', as this is reserved for passing
         # program names in the CLI interface.
         assert not kwargs["project_name"].startswith("%")
+        if "inherited_from" in kwargs:
+            assert "boards" not in kwargs
+            kwargs["boards"] = kwargs["inherited_from"]
+            del kwargs["inherited_from"]
 
         config = ProjectConfig(**kwargs)
         projects.append(Project(config))

@@ -15,9 +15,8 @@ tests:
     extra_dtc_overlay_files:
     - krabby.default.overlay
   krabby.default_ro:
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RO
     extra_configs:
+    - CONFIG_CROS_EC_RO=y
     - CONFIG_TEST_KRABBY=y
     - CONFIG_AP_ARM_MTK_MT8186=y
     - CONFIG_MUX_INIT_ADC=y
@@ -29,9 +28,8 @@ tests:
     extra_dtc_overlay_files:
     - krabby.default.overlay
   krabby.default_rw:
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RW
     extra_configs:
+    - CONFIG_CROS_EC_RW=y
     - CONFIG_TEST_KRABBY=y
     - CONFIG_AP_ARM_MTK_MT8186=y
     - CONFIG_MUX_INIT_ADC=y

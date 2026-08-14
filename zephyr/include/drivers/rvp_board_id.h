@@ -11,6 +11,19 @@
 #define ZEPHYR_INCLUDE_DRIVERS_RVP_BOARD_ID_H_
 
 /**
+ * @brief Number of GPIO straps encoding each RVP identifier.
+ */
+#define BOARD_GPIOS_COUNT 6
+#define FAB_GPIOS_COUNT 2
+#define BOM_GPIOS_COUNT 3
+
+/** @brief Bit position of the FAB ID within the CBI model id. */
+#define FAB_ID_SHIFT 8
+
+/** @brief Mask selecting the board-id portion of the CBI model id. */
+#define BOARD_ID_MASK (BIT(BOARD_GPIOS_COUNT) - 1)
+
+/**
  * @brief RVP board identification types
  */
 enum rvp_id_type {

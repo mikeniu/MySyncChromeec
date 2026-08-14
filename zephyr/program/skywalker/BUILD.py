@@ -15,12 +15,17 @@ def register_skywalker_npcx_project(project_name):
             here / "program.conf",
             here / project_name / "project.conf",
         ],
-        inherited_from=["skywalker"],
+        boards=["skywalker"],
     )
 
 
-def register_skywalker_ite_project(project_name):
+def register_skywalker_ite_project(
+    project_name,
+    boards=None,
+):
     """Register a variant of skywalker using ITE EC."""
+    if not boards:
+        boards = ["skywalker"]
     return register_binman_project(
         project_name=project_name,
         zephyr_board="it8xxx2/it82002aw",
@@ -30,7 +35,7 @@ def register_skywalker_ite_project(project_name):
             here / "ite_program.conf",
             here / project_name / "project.conf",
         ],
-        inherited_from=["skywalker"],
+        boards=boards,
     )
 
 
@@ -42,7 +47,7 @@ register_skywalker_npcx_project(project_name="yoda")
 register_skywalker_ite_project(project_name="anakin")
 register_skywalker_ite_project(project_name="baze")
 register_skywalker_ite_project(project_name="tarkin")
-register_skywalker_ite_project(project_name="padme")
+register_skywalker_ite_project(project_name="padme", boards=["jedi"])
 register_skywalker_ite_project(project_name="grogu")
 register_skywalker_ite_project(project_name="dooku")
 register_skywalker_npcx_project(project_name="vader")

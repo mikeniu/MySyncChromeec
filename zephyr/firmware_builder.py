@@ -88,14 +88,18 @@ COMPARE_BUILDS_BOARDS = [
 BINARY_SIZE_REGIONS = [
     "RO_FLASH",
     "RO_RAM",
+    "RO_RAM_UNPADDED",
     "RO_ROM",
+    "RO_ROM_UNPADDED",
     "RW_FLASH",
     "RW_RAM",
+    "RW_RAM_UNPADDED",
     "RW_ROM",
+    "RW_ROM_UNPADDED",
 ]
 
 # Unused boards that are expected to be unused, such as dev boards.
-UNUSED_BOARDS = {
+UNUSED_TARGETS = {
     "it8xxx2_evb",
     "it82002_evb",
     "minimal-posix",
@@ -106,10 +110,11 @@ UNUSED_BOARDS = {
     "npcx9",
     "npcx_monitor",
     "axii",
+    "rtk_flame",
 }
 
-# Unused inherited_from values that are expected to be unused, such as dev boards.
-UNUSED_INHERITED_FROM = {
+# Unused boards that are expected to be unused, such as dev boards.
+UNUSED_BOARDS = {
     "ec-aic",
     "intelrvp",
 }
@@ -156,7 +161,15 @@ def get_projects():
         # are fixed correctly.
         if (
             project.config.project_name
-            in ["lapis", "moonstone", "ruby", "sapphire", "quartz", "mica"]
+            in [
+                "lapis",
+                "moonstone",
+                "ruby",
+                "sapphire",
+                "quartz",
+                "mica",
+                "mensa",
+            ]
             and not platform_ec_private.exists()
         ):
             continue
@@ -346,14 +359,18 @@ def build(opts):
         env=env,
     )
     if not opts.code_coverage:
+        ec_to_boxter_boards = read_boxter()
+
         for project in projects:
             build_dir = (
                 platform_ec / "build" / "zephyr" / project.config.project_name
             )
+            boards = list(project.config.boards)
+            # Add additional boards from boxter
+            boards.extend(ec_to_boxter_boards[project.config.project_name])
             metric = metric_list.value.add()
-            full_name = project.config.full_name.split(".")
-            metric.target_name = full_name[-1]
-            metric.platform_name = ".".join(full_name[:-1])
+            metric.target_name = project.config.project_name
+            metric.platform_name = boards[0] if boards else ""
             for variant, _ in project.iter_builds():
                 build_log = build_dir / f"build-{variant}" / "build.log"
                 parse_buildlog(
@@ -480,6 +497,22 @@ def bundle_coverage(opts):
         firmware_pb2.FirmwareArtifactInfo.LcovTarballInfo.LcovType.LCOV  # pylint: disable=no-member
     )
     (bundle_dir / "html").mkdir(exist_ok=True)
+    # Build HTML coverage reports when bundling artifacts
+    make_cmd = [
+        "make",
+        "-f",
+        "Makefile.cq",
+        f"-j{opts.cpus}",
+        "lcov_rpt",
+        "special_boards_rpt",
+    ]
+    if SPECIAL_BOARDS:
+        make_cmd.append(f"SPECIAL_BOARDS={' '.join(SPECIAL_BOARDS)}")
+    log_cmd(make_cmd)
+    subprocess.run(
+        make_cmd, check=True, cwd=ZEPHYR_DIR, stdin=subprocess.DEVNULL
+    )
+
     cmd = ["mv", "lcov_rpt"]
     for board in SPECIAL_BOARDS:
         cmd.append(board + "_rpt")
@@ -503,11 +536,16 @@ def bundle_firmware(opts):
     bundle_dir = get_bundle_dir(opts)
     platform_ec = ZEPHYR_DIR.parent
     subprocesses = []
+    ec_to_boxter_boards = read_boxter()
     per_board_targets = collections.defaultdict(list)
     for project in get_projects():
         build_dir = (
             platform_ec / "build" / "zephyr" / project.config.project_name
         )
+        boards = set(project.config.boards)
+        # Add additional boards from boxter
+        boards.update(ec_to_boxter_boards[project.config.project_name])
+
         artifacts_dir = build_dir / "output"
         # karis.EC.15709.192.0.tar.bz2
         if version:
@@ -518,7 +556,7 @@ def bundle_firmware(opts):
         else:
             tarball_name = f"{project.config.project_name}.EC.tar.bz2"
             elf_tarball_name = f"{project.config.project_name}.EC_elf.tar.bz2"
-        for board in set(project.config.inherited_from):
+        for board in boards:
             per_board_targets[board].append(
                 f"{project.config.project_name}/output"
             )
@@ -541,7 +579,7 @@ def bundle_firmware(opts):
             )
         )
         meta = info.objects.add()
-        meta.tarball_info.board.extend(set(project.config.inherited_from))
+        meta.tarball_info.board.extend(boards)
         meta.file_name = tarball_name
         meta.tarball_info.type = (
             firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
@@ -565,7 +603,7 @@ def bundle_firmware(opts):
             )
         )
         meta = info.objects.add()
-        meta.tarball_info.board.extend(set(project.config.inherited_from))
+        meta.tarball_info.board.extend(boards)
         meta.file_name = elf_tarball_name
         meta.tarball_info.type = (
             firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
@@ -668,7 +706,7 @@ def test(opts):
             if project.config.project_name in SPECIAL_BOARDS:
                 tasks.append(
                     (
-                        f"BOARD_{project.config.full_name}".upper(),
+                        f"BOARD_{project.config.project_name}".upper(),
                         build_dir
                         / (project.config.project_name + "_final.info"),
                     )
@@ -699,20 +737,14 @@ def test(opts):
     return 0
 
 
-def check_inherits(_opts):
-    """Reads the src/project/*/*/generated/joined.jsonproto files and compares
-    the boards and zephyr_ec targets with the zephyr inherited_from values.
+def read_boxter():
+    """Reads the src/project/*/*/generated/joined.jsonproto files.
+
+    Returns:
+        A dict of ec_target to set of boxter boards.
     """
 
-    # Ec target name -> board name -> boolean if seen in Boxster
-    ec_to_board = collections.defaultdict(dict)
-    for project in get_projects():
-        board_dict = {}
-        for board in project.config.inherited_from:
-            board_dict[board] = False
-        ec_to_board[project.config.project_name] = board_dict
-
-    retcode = 0
+    ec_to_boards = collections.defaultdict(set)
     board_dirs = (find_checkout() / "src" / "project").glob("*")
     for board_dir in board_dirs:
         board_name = board_dir.name
@@ -732,83 +764,77 @@ def check_inherits(_opts):
                         .get("zephyr-ec", None)
                     )
                     if zephyr_ec:
-                        if zephyr_ec not in ec_to_board:
-                            print(
-                                f"ERROR: Unknown Zephyr target {zephyr_ec} in {cfg_path}"
-                            )
-                            retcode = 1
-                        elif board_name not in ec_to_board[zephyr_ec]:
-                            print(
-                                f"ERROR: Zephyr target {zephyr_ec} does not have "
-                                f"inherited_from {board_name}"
-                            )
-                            retcode = 1
-                        ec_to_board[zephyr_ec][board_name] = True
+                        ec_to_boards[zephyr_ec].add(board_name)
                     zephyr_kb = (
                         software_config.get("firmware", {})
                         .get("build-targets", {})
                         .get("zephyr-detachable-base", None)
                     )
                     if zephyr_kb:
-                        if zephyr_kb not in ec_to_board:
-                            print(
-                                f"ERROR: Unknown Zephyr KB {zephyr_kb} in {cfg_path}"
-                            )
-                            retcode = 1
-                        elif board_name not in ec_to_board[zephyr_kb]:
-                            print(
-                                f"ERROR: Zephyr KB target {zephyr_kb} does not have "
-                                f"inherited_from {board_name}"
-                            )
-                            retcode = 1
-                        ec_to_board[zephyr_kb][board_name] = True
+                        ec_to_boards[zephyr_kb].add(board_name)
                     ish = (
                         software_config.get("firmware", {})
                         .get("build-targets", {})
                         .get("ish", None)
                     )
                     if ish:
-                        if ish not in ec_to_board:
-                            print(
-                                f"ERROR: Unknown ISH target {ish} in {cfg_path}"
-                            )
-                            retcode = 1
-                        elif board_name not in ec_to_board[ish]:
-                            print(
-                                f"ERROR: ISH target {ish} does not have "
-                                f"inherited_from {board_name}"
-                            )
-                            retcode = 1
-                        ec_to_board[ish][board_name] = True
+                        ec_to_boards[ish].add(board_name)
                     fp = software_config.get("fingerprint", {}).get(
                         "board", None
                     )
-                    if fp and fp not in LEGACY_TARGETS:
-                        if fp not in ec_to_board:
-                            print(
-                                f"ERROR: Unknown fingerprint target {fp} in {cfg_path}"
-                            )
-                            retcode = 1
-                        elif (
-                            board_name not in ec_to_board[fp]
-                            and board_name not in LEGACY_TARGETS
-                        ):
-                            print(
-                                f"ERROR: Fingerprint target {fp} does not have "
-                                f"inherited_from {board_name}"
-                            )
-                            retcode = 1
-                        ec_to_board[fp][board_name] = True
-    for zephyr_ec, boards in ec_to_board.items():
-        for board, found in boards.items():
-            if not found and board not in UNUSED_INHERITED_FROM:
+                    if fp:
+                        ec_to_boards[fp].add(board_name)
+    return ec_to_boards
+
+
+def check_boards(_opts):
+    """Reads the src/project/*/*/generated/joined.jsonproto files and compares
+    the boards and zephyr_ec targets with the zephyr boards.
+    """
+
+    # Ec target name -> set(boxter boards)
+    ec_to_boxter_boards = read_boxter()
+
+    # Ec target name -> board name -> boolean if seen in Boxster
+    ec_to_board = collections.defaultdict(dict)
+    for project in get_projects():
+        board_dict = {}
+        for board in project.config.boards:
+            board_dict[board] = False
+        ec_to_board[project.config.project_name] = board_dict
+
+    retcode = 0
+    for ec_target, boards in ec_to_boxter_boards.items():
+        if ec_target in LEGACY_TARGETS:
+            continue
+        if ec_target not in ec_to_board:
+            print(
+                f"ERROR: Unknown target {ec_target} used by boxter configs: "
+                f"{boards}"
+            )
+            retcode = 1
+            continue
+        for board_name in boards:
+            if (
+                board_name not in ec_to_board[ec_target]
+                and board_name not in LEGACY_TARGETS
+            ):
                 print(
-                    f"ERROR: Zephyr target {zephyr_ec} has unexpected "
-                    f"inherited_from of {board}"
+                    f"ERROR: Target {ec_target} does not have "
+                    f"board {board_name}"
                 )
                 retcode = 1
-        if not boards and zephyr_ec not in UNUSED_BOARDS:
-            print(f"ERROR: Zephyr target {zephyr_ec} is not used anywhere")
+            ec_to_board[ec_target][board_name] = True
+    for zephyr_ec, boards in ec_to_board.items():
+        for board, found in boards.items():
+            if not found and board not in UNUSED_BOARDS:
+                print(
+                    f"ERROR: Zephyr target {zephyr_ec} has unexpected "
+                    f"board of {board}"
+                )
+                retcode = 1
+        if not boards and zephyr_ec not in UNUSED_TARGETS:
+            print(f"ERROR: Zephyr target {zephyr_ec} is not used in boxter")
             retcode = 1
 
     return retcode
@@ -857,11 +883,11 @@ def main(args):
         build, bundle, test
     )
 
-    check_inherits_cmd = sub_cmds.add_parser(
-        "check_inherits",
-        help="Checks the inherited_from values against Boxster",
+    check_boards_cmd = sub_cmds.add_parser(
+        "check_boards",
+        help="Checks the 'boards' values against Boxster",
     )
-    check_inherits_cmd.set_defaults(func=check_inherits)
+    check_boards_cmd.set_defaults(func=check_boards)
 
     opts = parser.parse_args(args)
 

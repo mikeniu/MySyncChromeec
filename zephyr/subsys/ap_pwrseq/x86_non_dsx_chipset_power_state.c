@@ -236,12 +236,11 @@ enum ap_pwrseq_state chipset_pwr_seq_get_state(void)
 	}
 	/*
 	 * Not enough power rails up to read VW signals.
-	 * Force a shutdown.
+	 * Let xxx_g3_entry handler functions take care of shutting down
 	 */
 	if (!chipset_is_vw_power_good()) {
-		LOG_ERR("Not enough power signals on (%#x), forcing shutdown",
+		LOG_ERR("Not enough power signals on (%#x), shutting down",
 			(unsigned int)power_get_signals());
-		ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
 		return AP_POWER_STATE_G3;
 	}
 
@@ -293,10 +292,11 @@ enum ap_pwrseq_state chipset_pwr_seq_get_state(void)
 	}
 	/*
 	 * Unable to determine state, force to G3.
+	 * Let xxx_g3_entry handler functions to shut down
 	 */
-	LOG_INF("Unable to determine CPU state (%#x), forcing shutdown",
+	LOG_INF("Unable to determine CPU state (%#x), shutting down",
 		(unsigned int)power_get_signals());
-	ap_power_force_shutdown(AP_POWER_SHUTDOWN_G3);
+
 	return AP_POWER_STATE_G3;
 }
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */

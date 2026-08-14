@@ -282,6 +282,21 @@ def get_argparser():
         ),
     )
 
+    analyze_build_diff = sub.add_parser(
+        "analyze-build-diff",
+        help="Analyze binary differences between two EC builds",
+    )
+    analyze_build_diff.add_argument(
+        "target1",
+        type=pathlib.Path,
+        help="First build directory or ec.bin file",
+    )
+    analyze_build_diff.add_argument(
+        "target2",
+        type=pathlib.Path,
+        help="Second build directory or ec.bin file",
+    )
+
     return parser, sub
 
 

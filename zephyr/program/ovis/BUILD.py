@@ -25,7 +25,7 @@ def register_ovis_project(
             here / project_name / "project.overlay",
         ],
         kconfig_files=kconfig_files,
-        inherited_from=["ovis"],
+        boards=["ovis"],
     )
 
 

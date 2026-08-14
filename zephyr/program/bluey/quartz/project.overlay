@@ -7,6 +7,7 @@
 
 #include <cros/integrated_fwid.dtsi>
 #include <dt-bindings/macros.h>
+#include "src/lb_policy.h"
 
 #include "../interrupts.dtsi"
 #include "../adc.dtsi"
@@ -58,13 +59,20 @@
 	};
 };
 
-&cbi_flash {
-	/*
-	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
-	 * EC_RO section.
-	 */
-	offset = <0x3e000>;
-	size = <0x1000>;
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x3e000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 */
+			offset = <0x3e000>;
+			size = <0x1000>;
+		};
+	};
 };
 
 &uart4 {
@@ -93,4 +101,37 @@
 	apb2-prescaler = <4>;
 	apb3-prescaler = <4>;
 	apb4-prescaler = <1>;
+};
+
+&{/lb-led-colors} {
+	/* RAMDUMP Collection: 10 Red */
+	lb_state_ramdump_lcd: lb_state_ramdump_lcd {
+		board-led-alt-policy-label = <LED_ALT_POLICY_DIAG_RAMDUMP>;
+		pattern-0 {
+			transition = "LED_TRANSITION_STEP";
+			led-id = "EC_LED_ID_LIGHTBAR_LED";
+			cycle-count = <0>;
+			/* 4x Amber Flashes (0.5s ON, 0.5s OFF) */
+			color-0  { led-color = <&lightbar_red>; period-ms = <500>; };
+			color-1  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-2  { led-color = <&lightbar_red>; period-ms = <500>; };
+			color-3  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-4  { led-color = <&lightbar_red>; period-ms = <500>; };
+			color-5  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-6  { led-color = <&lightbar_red>; period-ms = <500>; };
+			color-7  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-8  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-9  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-10  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-11  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-12  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-13  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-14  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-15  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-16  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-17  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-18  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-19  { led-color = <&lightbar_off>;    period-ms = <500>; };
+		};
+	};
 };

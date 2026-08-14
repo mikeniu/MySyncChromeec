@@ -21,7 +21,7 @@ PLATFORM=$(abspath ../..)
 THIRD_PARTY=$(abspath ../../../third_party)
 BUILD=$(PLATFORM_EC)/build
 
-# common/mock is not a generator or system path. However, listing it here
+# test/mock is not a generator or system path. However, listing it here
 # removes it from consideration in CQ coverage math, which is the intent.
 GENERATED_AND_SYSTEM_PATTERNS='**/.cache/**' \
 	'**/lib/gcc/**' \
@@ -30,7 +30,7 @@ GENERATED_AND_SYSTEM_PATTERNS='**/.cache/**' \
 	'/usr/include/**' \
 	'/usr/lib/**' \
 	'$(PLATFORM_EC)/build/**' \
-	'$(PLATFORM_EC)/common/mock/**' \
+	'$(PLATFORM_EC)/test/mock/**' \
 	'$(PLATFORM_EC)/twister-out*/**' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/arch/x86/**'
 TEST_PATTERNS='**/*_benchmark.cc' \
@@ -42,8 +42,8 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 	'**/*_test.h' \
 	'$(PLATFORM_EC)/board/host/**' \
 	'$(PLATFORM_EC)/chip/host/**' \
-	'$(PLATFORM_EC)/common/mock/**' \
-	'$(PLATFORM_EC)/common/test_util.c' \
+	'$(PLATFORM_EC)/test/mock/**' \
+	'$(PLATFORM_EC)/test/common/test_util.c' \
 	'$(PLATFORM_EC)/core/host/**' \
 	'$(PLATFORM_EC)/include/mock/**' \
 	'$(PLATFORM_EC)/include/test_util.h' \
@@ -55,6 +55,7 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 	'$(PLATFORM_EC)/zephyr/include/emul/**' \
 	'$(PLATFORM_EC)/zephyr/mock/**' \
 	'$(PLATFORM_EC)/zephyr/program/dev/**' \
+	'$(PLATFORM_EC)/zephyr/program/ec-aic/**' \
 	'$(PLATFORM_EC)/zephyr/shim/src/test_util.c' \
 	'$(PLATFORM_EC)/zephyr/shim/src/ztest_system.c' \
 	'$(PLATFORM_EC)/zephyr/test/**' \
@@ -80,8 +81,7 @@ test: $(BUILD)/zephyr/all_tests.info # ALL_TESTS
 test: $(BUILD)/zephyr/zephyr_merged.info # EC_ZEPHYR_MERGED
 test: $(BUILD)/zephyr/lcov.info # ALL_MERGED
 test: $(BUILD)/zephyr/lcov_no_tests.info # ALL_FILTERED
-test: $(BUILD)/zephyr/lcov_rpt # html artifact
-test: special_boards # BOARD_ metric and html artifact
+test: special_boards_info # BOARD_ metric info files only
 else
 test: twister_host twister_llvm twister_coreboot_sdk zephyr_check_compliance_unittest
 endif
@@ -147,7 +147,10 @@ $(BUILD)/zephyr/lcov_rpt: $(BUILD)/zephyr/lcov.info
 	--ignore-errors inconsistent,inconsistent --ignore-errors unused \
 	-t 'All boards and tests merged' -s $^
 
-special_boards: $(foreach b, $(SPECIAL_BOARDS), $(BUILD)/zephyr/$(b)_rpt)
+lcov_rpt: $(BUILD)/zephyr/lcov_rpt
+special_boards_info: $(foreach b, $(SPECIAL_BOARDS), $(BUILD)/zephyr/$(b)_final.info)
+special_boards_rpt: $(foreach b, $(SPECIAL_BOARDS), $(BUILD)/zephyr/$(b)_rpt)
+special_boards: special_boards_info special_boards_rpt
 
 $(BUILD)/zephyr/%_merged.info: $(BUILD)/zephyr/%/output/zephyr.info $(BUILD)/zephyr/all_tests.info
 	/usr/bin/lcov -o $@ --rc branch_coverage=1 --rc no_exception_branch=1 \

@@ -26,3 +26,5 @@ void set_battery_remaining_capacity(int capacity);
 void set_battery_status(int status);
 void set_battery_design_capacity(int design_capacity);
 void set_battery_full_charge_capacity(int full_charge_capacity);
+
+extern int mock_usb_pd_3a_ports;

@@ -6,7 +6,6 @@ target_sources(app PRIVATE
     src/bmi_common.c
     src/bmi160.c
     src/bmi260.c
-    src/console.c
     src/cros_cbi.c
     src/espi.c
     src/gpio.c
@@ -22,6 +21,7 @@ target_sources(app PRIVATE
     src/integration/usbc/usb_pd_bist_shared.c
     src/integration/usbc/usb_pd_ctrl_msg.c
     src/integration/usbc/usb_pd_rev3.c
+    src/integration/usbc/usb_pd_timer.c
     src/i2c.c
     src/i2c_passthru.c
     src/isl923x.c
@@ -33,8 +33,6 @@ target_sources(app PRIVATE
     src/locate_chip.c
     src/logging.c
     src/motion_sense/motion_sense.c
-    src/panic.c
-    src/panic_output.c
     src/port80.c
     src/power_common.c
     src/ppc_sn5s330.c
@@ -55,13 +53,8 @@ target_sources(app PRIVATE
     src/vboot_hash.c
     src/virtual_battery.c
     src/vstore.c
-    src/watchdog.c
 )
 
-add_subdirectory(
-    ${PLATFORM_EC}/zephyr/test/drivers/mock_panic_output
-    mock_panic_output
-)
 
 # This test does not work when power functions are mocked, so only run it for
 # the plain `drivers.default` test case.

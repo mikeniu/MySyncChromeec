@@ -51,7 +51,7 @@ const struct watchdog_info wdt_info[] = {
 #if ((DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog), st_stm32_watchdog)) || \
      (DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog),                        \
 			 realtek_rts5912_watchdog)) ||                       \
-     (DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog), ft_ft90_wdt)))
+     (DT_NODE_HAS_COMPAT(DT_CHOSEN(cros_ec_watchdog), focaltech_ft9001_wdt)))
 			.flags = WDT_FLAG_RESET_SOC,
 			.window.min = 0U,
 			.window.max = CONFIG_WATCHDOG_PERIOD_MS,
@@ -235,12 +235,13 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	} else {
 		thread_name = "unknown";
 	}
-	task_id_t task_id = task_get_current();
+	struct k_thread *thread = k_current_get();
+	uint8_t thread_id = (uint8_t)(uintptr_t)thread;
 
 #ifdef CONFIG_RISCV
 	exception_address = csr_read(mepc);
-	printk("WDT pre-warning MEPC:%p TASK_ID:%d THREAD_NAME:%s\n",
-	       (void *)exception_address, task_id, thread_name);
+	printk("WDT pre-warning MEPC:%p THREAD:%p THREAD_NAME:%s\n",
+	       (void *)exception_address, (void *)thread, thread_name);
 #elif CONFIG_CPU_CORTEX_M
 	struct arch_esf *esf;
 	/*
@@ -248,14 +249,14 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 * context, thus PSP will point to esf.
 	 */
 	__asm__ volatile("mrs %0, psp" : "=r"(esf));
-	printk("WDT pre-warning PC:%p LR:%p TASK_ID:%d THREAD_NAME:%s\n",
-	       (void *)esf->basic.pc, (void *)esf->basic.lr, task_id,
+	printk("WDT pre-warning PC:%p LR:%p THREAD:%p THREAD_NAME:%s\n",
+	       (void *)esf->basic.pc, (void *)esf->basic.lr, (void *)thread,
 	       thread_name);
 	exception_address = esf->basic.pc;
 #else
 	/* TODO(b/176523207): watchdog warning message */
-	printk("Watchdog deadline is close! TASK_ID:%d THREAD_NAME:%s\n",
-	       task_id, thread_name);
+	printk("Watchdog deadline is close! THREAD:%p THREAD_NAME:%s\n",
+	       (void *)thread, thread_name);
 #endif
 #ifdef TEST_BUILD
 	wdt_warning_triggered = true;
@@ -275,7 +276,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
 	 * occurs.
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address, task_id);
+	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address, thread_id);
 }
 
 __maybe_unused static void

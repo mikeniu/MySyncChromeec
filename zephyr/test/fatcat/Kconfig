@@ -1,0 +1,32 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+choice TEST_PROJECT_TYPE
+	prompt "Select board variant for tests"
+	help
+	  Board variant to use for tests
+
+	config TEST_PROJECT_LAPIS
+		bool "Enable lapis-specific tests"
+		help
+		Enable tests for lapis variant.
+
+endchoice # TEST_PROJECT_TYPE
+
+config TEST_PROJECT_NAME
+	string "Board name"
+	default "lapis" if TEST_PROJECT_LAPIS
+
+config TEST_PROJECT_BATTERY
+	bool "Run the tests intended for battery.c"
+	select AP_POWER_CONTROL
+	help
+	  Include project specific battery.c into the binary and test
+	  their functions.
+
+module = FATCAT
+module-str = Fatcat board-specific code
+source "subsys/logging/Kconfig.template.log_config"
+
+source "Kconfig.zephyr"

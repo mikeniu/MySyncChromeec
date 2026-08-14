@@ -290,11 +290,31 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 
 	mutex_lock(s->mutex);
 
+	/*
+	 * FIFO stop collecting events. Set FIFO to bypass mode to flush the
+	 * lis2dh FIFO.
+	 *
+	 * If ODR is changed all samples in FIFO must be discharged because
+	 * they were captured at the previous rate and the motion sense FIFO
+	 * spreading algorithm would otherwise stage them with timestamps
+	 * spaced at the new period. This mirrors what set_range() already
+	 * does for full-scale changes, and what accel_lis2dw12.c does in
+	 * its set_data_rate().
+	 */
+	if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE)) {
+		ret = lis2dh_enable_fifo(s, LIS2DH_FIFO_BYPASS_MODE);
+		if (ret != EC_SUCCESS) {
+			goto unlock_rate;
+		}
+	}
+
 	if (rate == 0) {
 		/* Power Off device */
 		ret = st_write_data_with_mask(s, LIS2DH_CTRL1_ADDR,
 					      LIS2DH_ACC_ODR_MASK,
 					      LIS2DH_ODR_0HZ_VAL);
+		if (ret == EC_SUCCESS)
+			data->base.odr = 0;
 		goto unlock_rate;
 	}
 
@@ -318,6 +338,11 @@ static int set_data_rate(const struct motion_sensor_t *s, int rate, int rnd)
 				      reg_val);
 	if (ret == EC_SUCCESS)
 		data->base.odr = normalized_rate;
+
+	/* FIFO restart collecting events in Stream mode. */
+	if (IS_ENABLED(ACCEL_LIS2DH_INT_ENABLE)) {
+		ret = lis2dh_enable_fifo(s, LIS2DH_STREAM_MODE);
+	}
 
 unlock_rate:
 	mutex_unlock(s->mutex);

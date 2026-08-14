@@ -55,6 +55,17 @@ config PLATFORM_EC_CHARGE_MANAGER_EXTERNAL_POWER_LIMIT
 	  input current and voltage limit. Enabling this config will allow the
 	  EC to accept host command EC_CMD_EXTERNAL_POWER_LIMIT.
 
+config PLATFORM_EC_CONFIG_CHARGE_MANAGER_DRP_CHARGING
+	bool "Charge from any DRP partner, regardless of wattage"
+	help
+	  Normal behavior is to refuse charging from DRP port partners that
+	  offer less than 27W (PD_DRP_CHARGE_POWER_MIN). This is intended to
+	  prevent charging off of "weak sources" like phones and small power
+	  banks unless the user opts-in in the system OS UI.
+
+	  Enabling this setting configures charge manager to charge from any DRP
+	  port partner automatically.
+
 config PLATFORM_EC_CHARGE_STATE_DEBUG
 	bool "Debug information about the charge state"
 	depends on PLATFORM_EC_CHARGE_MANAGER

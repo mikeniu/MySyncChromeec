@@ -21,6 +21,7 @@ import tempfile
 from typing import Dict, Optional, Set, Union
 
 from zmake import util
+import zmake.analyze_build_diff
 import zmake.build_config
 import zmake.compare_builds
 import zmake.generate_readme
@@ -1097,3 +1098,16 @@ class Zmake:
 
         output_file.write_text(expected_contents)
         return 0
+
+    def analyze_build_diff(
+        self,
+        target1,
+        target2,
+    ):
+        """Analyze binary differences between two EC builds."""
+        success = zmake.analyze_build_diff.analyze_build_diff(
+            target1,
+            target2,
+            output_fn=self.logger.info,
+        )
+        return 0 if success else 1
