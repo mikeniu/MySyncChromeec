@@ -215,6 +215,14 @@ config HW_TEST_ROLLBACK
 	help
 	  The test verifies rollback regions functionality.
 
+config HW_TEST_ROLLBACK_LOCK
+	bool "Rollback lock ordering test"
+	select ZTEST
+	depends on BOARD_FINGERPRINT
+	help
+	  Verifies proper lock ordering between MPU protection state transitions
+	  (unlock_rollback / lock_rollback) and external mapped storage mutexes.
+
 config HW_TEST_ROLLBACK_MINIMAL_VERSION
 	bool "Rollback minimal version test"
 	select ZTEST
