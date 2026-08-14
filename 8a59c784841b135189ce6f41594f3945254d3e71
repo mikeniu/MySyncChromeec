@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "550a1468_0784c31e",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:51:39Z",
+      "side": 1,
+      "message": "Do any other chips have AHB4? Is there a better config we can use to check for the existence of AHB4 (e.g., CONFIG_HAS_AHB4 or something)?",
+      "range": {
+        "startLine": 306,
+        "startChar": 12,
+        "endLine": 306,
+        "endChar": 31
+      },
+      "revId": "8a59c784841b135189ce6f41594f3945254d3e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "78653ced_5e0dcdba",
         "filename": "chip/stm32/system.c",
         "patchSetId": 7
