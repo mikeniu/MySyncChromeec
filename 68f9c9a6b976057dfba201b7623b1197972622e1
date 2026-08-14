@@ -72,6 +72,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e4c26f1_fccacd6c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1505078
+      },
+      "writtenOn": "2026-08-14T18:45:37Z",
+      "side": 1,
+      "message": "Migration would be a re-encryption of existing templates when loading the templates. \n1. Aiming for 100% migration. We need to force the users with older releases to upgrade to the version with re-encryption migration first, reboot and login, and then upgrade to the version with the new encryption key.\n2. Opportunistic migration. We don\u0027t force the two step releases. Any user that happens to upgrade to the version with migration code will be fine. But we still need to stop re-encryption at some point and we just ask the dogfooders to re-enroll fingerprints if they find out the fingerprint doesn\u0027t work.\n3. No migration. We need to send out notifications to dogfooders to re-enroll their fingerprints.\n\nIf we can do 1 without too much user friction or eng resource, we should do that. And if we have to choose between 2 and 3. I would rather just do 3 no-migration and I can provide the tech support for the next month in the AL eng chat for the FP related questions.",
+      "parentUuid": "928a467c_5a1e9d7d",
+      "range": {
+        "startLine": 11,
+        "startChar": 28,
+        "endLine": 13,
+        "endChar": 55
+      },
+      "revId": "68f9c9a6b976057dfba201b7623b1197972622e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "4de0dd27_8b9a702d",
