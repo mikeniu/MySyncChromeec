@@ -304,14 +304,10 @@ struct send_cmd_t {
 enum snk_attached_local_state_t {
 	/** SNK_ATTACHED_GET_CONNECTOR_CAPABILITY */
 	SNK_ATTACHED_GET_CONNECTOR_CAPABILITY,
-	/** SNK_ATTACHED_ADD_PD_SRC */
-	SNK_ATTACHED_ADD_PD_SRC,
 	/** SNK_ATTACHED_SET_DR_SWAP_POLICY */
 	SNK_ATTACHED_SET_DR_SWAP_POLICY,
 	/** SNK_ATTACHED_SET_PR_SWAP_POLICY */
 	SNK_ATTACHED_SET_PR_SWAP_POLICY,
-	/** SNK_ATTACHED_SET_FRS */
-	SNK_ATTACHED_SET_FRS,
 	/** SNK_ATTACHED_GET_PDOS */
 	SNK_ATTACHED_GET_PDOS,
 	/** SNK_ATTACHED_GET_VDO */
@@ -340,10 +336,8 @@ enum snk_attached_local_state_t {
 /* Names of the Sink-attached substates. */
 const static char *snk_attached_local_state_names[] = {
 	[SNK_ATTACHED_GET_CONNECTOR_CAPABILITY] = "GET_CONN_CAP",
-	[SNK_ATTACHED_ADD_PD_SRC] = "ADD_PD_SRC",
 	[SNK_ATTACHED_SET_DR_SWAP_POLICY] = "SET_DR_SWAP_POLICY",
 	[SNK_ATTACHED_SET_PR_SWAP_POLICY] = "SET_PR_SWAP_POLICY",
-	[SNK_ATTACHED_SET_FRS] = "SET_FRS",
 	[SNK_ATTACHED_GET_PDOS] = "GET_PDOS",
 	[SNK_ATTACHED_GET_VDO] = "GET_VDO",
 	[SNK_ATTACHED_WAIT_FOR_CONTRACT] = "WAIT_FOR_CNRCT",
@@ -512,6 +506,10 @@ enum init_local_state_t {
 	 *  initialization.
 	 */
 	INIT_SET_SRC_PDOS,
+	/** INIT_FRS - Enable or disable FRS on the device during
+	 *  initialization.
+	 */
+	INIT_SET_FRS,
 	/**
 	 * INIT_SET_MAX_PDP - Set the device's max PDP during init based on
 	 * number of 3A ports.
@@ -532,6 +530,7 @@ const static char *init_local_state_names[] = {
 	[INIT_WAIT_FOR_READY] = "WAIT_FOR_READY",
 	[INIT_SET_SINK_PDOS] = "SET_SINK_PDOS",
 	[INIT_SET_SRC_PDOS] = "SET_SRC_PDOS",
+	[INIT_SET_FRS] = "SET_FRS",
 	[INIT_SET_MAX_PDP] = "SET_MAX_PDP",
 	[INIT_GET_CONNECTOR_STATUS] = "GET_CONN_STATUS",
 };
@@ -646,6 +645,8 @@ BUILD_ASSERT(ARRAY_SIZE(pdc_state_names) == PDC_STATE_COUNT,
 enum policy_common_t {
 	/** COMMON_POLICY_SET_POWER_STATE */
 	COMMON_POLICY_SET_POWER_STATE,
+	/** COMMON_POLICY_SET_RP */
+	COMMON_POLICY_SET_RP,
 	/** COMMON_POLICY_GET_ALERT */
 	COMMON_POLICY_GET_ALERT,
 	/** When set, run CMD_PDC_SET_SBU_MUX_MODE to set the port's SBU mux
@@ -718,8 +719,6 @@ enum policy_snk_attached_t {
 	SNK_POLICY_UPDATE_SRC_CAPS,
 	/** Evaluates sink PDOs from DRP partner. */
 	SNK_POLICY_EVAL_SNK_FIXED_PDO,
-	/** Enables/disables FRS on the LPM. */
-	SNK_POLICY_UPDATE_FRS,
 	/** TypeC sink only */
 	SNK_POLICY_UPDATE_TYPEC_CURRENT,
 	/** Update battery status */
@@ -809,8 +808,6 @@ enum policy_src_attached_t {
 	SRC_POLICY_SWAP_TO_SNK,
 	/** Forces sink-only operation, even if it requires a disconnect */
 	SRC_POLICY_FORCE_SNK,
-	/** Triggers sending CMD_SET_POWER_LEVEL to set Rp value */
-	SRC_POLICY_SET_RP,
 	/** Trigger a call into DPM source current balancing policy */
 	SRC_POLICY_EVAL_SNK_FIXED_PDO,
 	/** Triggers a Get_Sink_Cap message to the partner. */
@@ -832,6 +829,8 @@ enum policy_src_attached_t {
 	SRC_POLICY_UPDATE_BATTERY_STATUS,
 	/** Update battery capability */
 	SRC_POLICY_UPDATE_BATTERY_CAPABILITY,
+	/** Hard Reset bus powered device */
+	SRC_POLICY_TBT_RESET,
 
 	/** SRC_POLICY_COUNT */
 	SRC_POLICY_COUNT
@@ -1775,6 +1774,13 @@ static bool run_common_policies(struct pdc_port_t *port)
 	}
 
 	if (atomic_test_and_clear_bit(port->common_policy.flags,
+				      COMMON_POLICY_SET_RP)) {
+		/* Check if Rp value needs to be adjusted */
+		queue_internal_cmd(port, CMD_PDC_SET_POWER_LEVEL);
+		return true;
+	}
+
+	if (atomic_test_and_clear_bit(port->common_policy.flags,
 				      COMMON_POLICY_GET_ALERT)) {
 		/* Read latest ADO */
 		queue_internal_cmd(port, CMD_PDC_GET_ALERT);
@@ -2041,14 +2047,6 @@ static void run_snk_policies(struct pdc_port_t *port)
 					->pdos[0];
 			pdc_dpm_eval_sink_fixed_pdo(port_num, sink_fixed_pdo);
 			return;
-		} else if (atomic_test_and_clear_bit(port->snk_policy.flags,
-						     SNK_POLICY_UPDATE_FRS)) {
-			/* Port is currently a SNK, but we need enable or
-			 * disable fast role swap to comply with the Chromebook
-			 * source policy.
-			 */
-			queue_internal_cmd(port, CMD_PDC_SET_FRS);
-			return;
 		}
 	}
 
@@ -2194,6 +2192,14 @@ static void run_src_policies(struct pdc_port_t *port)
 		/* Get the RDO from the port partner */
 		queue_internal_cmd(port, CMD_PDC_GET_RDO);
 		return;
+	} else if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED) &&
+		   atomic_test_and_clear_bit(port->src_policy.flags,
+					     SRC_POLICY_TBT_RESET)) {
+		pdc_dpm_tbt_set_reset_ongoing(port_num);
+		port->connector_reset.raw_value = 0;
+		port->connector_reset.reset_type = PD_HARD_RESET;
+		queue_internal_cmd(port, CMD_PDC_CONNECTOR_RESET);
+		return;
 	} else if (atomic_test_and_clear_bit(port->src_policy.flags,
 					     SRC_POLICY_GET_SRC_CAPS)) {
 		/*
@@ -2250,12 +2256,8 @@ static void run_typec_src_policies(struct pdc_port_t *port)
 		return;
 	}
 
-	/* Check if Rp value needs to be adjusted */
 	if (atomic_test_and_clear_bit(port->src_policy.flags,
-				      SRC_POLICY_SET_RP)) {
-		queue_internal_cmd(port, CMD_PDC_SET_POWER_LEVEL);
-	} else if (atomic_test_and_clear_bit(port->src_policy.flags,
-					     SRC_POLICY_FORCE_SNK)) {
+				      SRC_POLICY_FORCE_SNK)) {
 		queue_internal_cmd(port, CMD_PDC_SET_CCOM);
 	} else if (atomic_test_and_clear_bit(port->src_policy.flags,
 					     SRC_POLICY_UPDATE_SRC_CAPS)) {
@@ -2966,24 +2968,9 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 
 	switch (port->snk_attached_local_state) {
 	case SNK_ATTACHED_GET_CONNECTOR_CAPABILITY:
-		if (pdc_power_mgmt_get_frs_hw_supported(
-			    config->connector_num)) {
-			port->snk_attached_local_state =
-				SNK_ATTACHED_ADD_PD_SRC;
-		} else {
-			port->snk_attached_local_state =
-				SNK_ATTACHED_SET_DR_SWAP_POLICY;
-		}
-		queue_internal_cmd(port, CMD_PDC_GET_CONNECTOR_CAPABILITY);
-		return SMF_EVENT_HANDLED;
-	case SNK_ATTACHED_ADD_PD_SRC:
 		port->snk_attached_local_state =
 			SNK_ATTACHED_SET_DR_SWAP_POLICY;
-		/* If FRS is supported, add PD source to max current request.
-		 * The DPM will remove the max current request if it is not
-		 * required for FRS when the partner Sink Caps are evaluated.
-		 */
-		pdc_dpm_add_pd_source(config->connector_num);
+		queue_internal_cmd(port, CMD_PDC_GET_CONNECTOR_CAPABILITY);
 		return SMF_EVENT_HANDLED;
 	case SNK_ATTACHED_SET_DR_SWAP_POLICY:
 		port->snk_attached_local_state =
@@ -2995,24 +2982,13 @@ static enum smf_state_result pdc_snk_attached_run(void *obj)
 		queue_internal_cmd(port, CMD_PDC_SET_UOR);
 		return SMF_EVENT_HANDLED;
 	case SNK_ATTACHED_SET_PR_SWAP_POLICY:
-		port->snk_attached_local_state = SNK_ATTACHED_SET_FRS;
+		port->snk_attached_local_state = SNK_ATTACHED_GET_VDO;
 		/* TODO: read from DT */
 		port->pdr_policy = PDC_POWER_POLICY_SINK(
 			port->snk_policy.accept_power_role_swap);
 		queue_internal_cmd(port, CMD_PDC_SET_PDR);
 		atomic_clear_bit(port->snk_policy.flags,
 				 SNK_POLICY_UPDATE_ALLOW_PR_SWAP);
-		return SMF_EVENT_HANDLED;
-	case SNK_ATTACHED_SET_FRS:
-		port->snk_attached_local_state = SNK_ATTACHED_GET_VDO;
-		/* Use FRS policy from DPM if it has been updated. Otherwise
-		 * default to FRS disabled.
-		 */
-		if (!atomic_test_and_clear_bit(port->snk_policy.flags,
-					       SNK_POLICY_UPDATE_FRS)) {
-			port->frs_enable = false;
-		}
-		queue_internal_cmd(port, CMD_PDC_SET_FRS);
 		return SMF_EVENT_HANDLED;
 	case SNK_ATTACHED_GET_VDO:
 		port->snk_attached_local_state = SNK_ATTACHED_GET_PDOS;
@@ -4070,7 +4046,7 @@ static enum smf_state_result pdc_init_run(void *obj)
 		break;
 
 	case INIT_SET_SRC_PDOS:
-		port->init_local_state = INIT_SET_MAX_PDP;
+		port->init_local_state = INIT_SET_FRS;
 		port->attached_state = INIT_STATE;
 
 		pdc_power_mgmt_set_current_limit(
@@ -4085,7 +4061,16 @@ static enum smf_state_result pdc_init_run(void *obj)
 		};
 		queue_internal_cmd(port, CMD_PDC_SET_PDOS);
 		break;
-
+	case INIT_SET_FRS:
+		port->init_local_state = INIT_SET_MAX_PDP;
+		if (pdc_power_mgmt_get_frs_hw_supported(
+			    config->connector_num)) {
+			port->frs_enable = true;
+		} else {
+			port->frs_enable = false;
+		}
+		queue_internal_cmd(port, CMD_PDC_SET_FRS);
+		break;
 	case INIT_SET_MAX_PDP:
 		port->init_local_state = INIT_GET_CONNECTOR_STATUS;
 		queue_internal_cmd(port, CMD_PDC_SET_MAX_PDP);
@@ -4387,6 +4372,8 @@ static bool is_connectionless_cmd(enum pdc_cmd_t pdc_cmd)
 	case CMD_PDC_SET_BBR_CTS:
 		__fallthrough;
 	case CMD_PDC_SET_SBU_MUX_MODE:
+		__fallthrough;
+	case CMD_PDC_SET_FRS:
 		return true;
 	default:
 		return false;
@@ -6003,6 +5990,22 @@ pdc_power_mgmt_get_cable_prop(int port, union cable_property_t *cable_prop)
 	return 0;
 }
 
+void pdc_power_mgmt_request_tbt_reset(int port_num)
+{
+	struct pdc_port_t *port;
+
+	if (!pdc_power_mgmt_is_pdc_port_valid(port_num)) {
+		return;
+	}
+
+	port = &pdc_data[port_num]->port;
+
+	if (!atomic_test_bit(port->src_policy.flags, SRC_POLICY_TBT_RESET)) {
+		atomic_set_bit(port->src_policy.flags, SRC_POLICY_TBT_RESET);
+		k_event_post(&port->sm_event, PDC_SM_EVENT);
+	}
+}
+
 __overridable enum usb_typec_current_t
 pdc_power_mgmt_get_default_current_limit(int port)
 {
@@ -6043,7 +6046,7 @@ int pdc_power_mgmt_set_current_limit(int port_num,
 		 * Active TypeC only SRC connection. Because the connection is
 		 * active and not a PD connection, apply the new Rp value now.
 		 */
-		atomic_set_bit(pdc->src_policy.flags, SRC_POLICY_SET_RP);
+		atomic_set_bit(pdc->common_policy.flags, COMMON_POLICY_SET_RP);
 		__fallthrough;
 	case SRC_ATTACHED_STATE:
 		/*
@@ -6057,6 +6060,11 @@ int pdc_power_mgmt_set_current_limit(int port_num,
 			       SRC_POLICY_UPDATE_SRC_CAPS);
 		break;
 	case SNK_ATTACHED_STATE:
+		/*
+		 * Src policy can be set in a Snk connection to support an FRS
+		 * partner. Update RP accordingly.
+		 */
+		atomic_set_bit(pdc->common_policy.flags, COMMON_POLICY_SET_RP);
 		__fallthrough;
 	case SNK_ATTACHED_TYPEC_ONLY_STATE:
 		/* Even when operating as a SNK, update the SRC caps
@@ -6086,25 +6094,6 @@ bool pdc_power_mgmt_get_frs_hw_supported(int port)
 		return false;
 	}
 	return pdc_get_frs_supported(pdc_data[port]->port.pdc);
-}
-
-int pdc_power_mgmt_frs_enable(int port_num, bool enable)
-{
-	struct pdc_port_t *pdc;
-
-	if (!pdc_power_mgmt_is_pdc_port_valid(port_num)) {
-		return -ERANGE;
-	}
-
-	pdc = &pdc_data[port_num]->port;
-
-	pdc->frs_enable = enable;
-
-	LOG_INF("C%d, set FRS %d", port_num, enable);
-
-	atomic_set_bit(pdc->snk_policy.flags, SNK_POLICY_UPDATE_FRS);
-
-	return EC_SUCCESS;
 }
 
 test_mockable int pdc_power_mgmt_get_pch_data_status(int port, uint8_t *status)

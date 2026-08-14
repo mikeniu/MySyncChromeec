@@ -41,7 +41,7 @@ def register_nissa_project(
         zephyr_board=chip,
         dts_overlays=[here / project_name / "project.overlay"],
         kconfig_files=kconfig_files,
-        inherited_from=["nissa"],
+        boards=["nissa"],
         supported_toolchains=["coreboot-sdk", "zephyr"],
         snippets=snippets,
         **kwargs,

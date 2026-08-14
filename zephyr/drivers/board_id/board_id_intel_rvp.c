@@ -14,13 +14,6 @@
 
 #define DT_DRV_COMPAT intel_rvp_board_id
 
-#define BOM_GPIOS_COUNT 3
-#define FAB_GPIOS_COUNT 2
-#define BOARD_GPIOS_COUNT 6
-
-#define FAB_ID_SHIFT 8
-#define BOARD_ID_MASK (BIT(BOARD_GPIOS_COUNT) - 1)
-
 LOG_MODULE_DECLARE(rvp_model_id, LOG_LEVEL_DBG);
 
 static int rvp_model_id = -1;

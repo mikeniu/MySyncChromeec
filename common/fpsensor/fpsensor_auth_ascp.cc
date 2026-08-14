@@ -7,7 +7,9 @@
 #include "crypto/cleanse_wrapper.h"
 #include "ec_commands.h"
 #include "fpsensor/fpsensor.h"
+#include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_auth_crypto.h"
+#include "fpsensor/fpsensor_console.h"
 #include "host_command.h"
 
 #include <array>
@@ -21,6 +23,13 @@ static ec_status fp_command_ascp_establish(struct host_cmd_handler_args *args)
 {
 	const auto *params =
 		static_cast<const ec_params_fp_ascp_establish *>(args->params);
+
+	/* Prevent overwriting pairing_key if session is already established. */
+	if (fingerprint_auth_enabled()) {
+		CPRINTS("ASCP establish blocked: session active");
+		return EC_RES_ACCESS_DENIED;
+	}
+
 	if (params->pk_g[0] != 0x04) {
 		return EC_RES_INVALID_PARAM;
 	}

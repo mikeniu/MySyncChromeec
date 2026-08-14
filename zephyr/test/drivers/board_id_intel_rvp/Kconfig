@@ -1,0 +1,23 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config LINK_TEST_SUITE_BOARD_ID_INTEL_RVP
+	bool "Link the board_id_intel_rvp test suite"
+	help
+	  Test suite that exercises the RVP board-id driver with the
+	  strap GPIO controller initialized.
+
+config LINK_TEST_SUITE_BOARD_ID_INTEL_RVP_NOT_READY
+	bool "Link the board_id_intel_rvp not-ready test suite"
+	help
+	  Test suite that exercises the RVP board-id driver while the
+	  deferred strap GPIO controller is intentionally left uninitialized.
+
+config LINK_TEST_SUITE_BOARD_ID_INTEL_RVP_S5_CALLBACK
+	bool "Link the board_id_intel_rvp S5-callback test suite"
+	help
+	  Test suite that verifies the driver's S5-exit callback
+	  initializes the deferred strap GPIO controller.
+
+source "Kconfig.zephyr"

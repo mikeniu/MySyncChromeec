@@ -24,6 +24,8 @@ target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_MATCH app PRIVATE
 	src/fpsensor_match.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_SHIM app PRIVATE
 	src/fpsensor_shim.cc)
+target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_STATE app PRIVATE
+	src/fpsensor_state.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_TEMPLATE app PRIVATE
 	src/fpsensor_template.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_UTILS app PRIVATE
@@ -36,9 +38,14 @@ target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_ASCP app PRIVATE
 	src/fpsensor_ascp.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_FRAME_SIZE app PRIVATE
 	src/fpsensor_frame_size.cc)
-target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_FP_INFO app PRIVATE
-	src/fpsensor_fp_info.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_BTN_IGN_OUT app PRIVATE
 	src/fpsensor_btn_ign_out.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_LED app PRIVATE
 	src/fpsensor_led.cc)
+target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS app PRIVATE
+	src/fpsensor_auth_commands.cc)
+target_sources_ifdef(CONFIG_NPCX_OTP_KEY app PRIVATE
+	${PLATFORM_EC}/chip/host/otp_key.c
+	${PLATFORM_EC}/test/mock/otpi_mock.c)
+
+add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)

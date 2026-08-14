@@ -12,20 +12,7 @@
 #endif
 
 /**
- * Read/write value of battery parameter from charge state.
- *
- * @param batt_cmd_head	The beginning of the smart battery command
- * @param dest		Destination buffer for data
- * @param read_len	Number of bytes to read to the buffer
- * @param write_len	Number of bytes to write
- * @return EC_SUCCESS if successful, non-zero if error.
- *
- */
-int virtual_battery_operation(const uint8_t *batt_cmd_head, uint8_t *dest,
-			      int read_len, int write_len);
-
-/**
- * Parse a command for virtual battery function.
+ * Handle the battery command virtually.
  *
  * @param resp		Pointer to the data structure to store the i2c messages
  * @param in_len	Accumulative number of bytes read
@@ -37,11 +24,9 @@ int virtual_battery_operation(const uint8_t *batt_cmd_head, uint8_t *dest,
  * @param out		Data to send
  * @return EC_SUCCESS if successful, non-zero if error.
  */
-int virtual_battery_handler(struct ec_response_i2c_passthru *resp, int in_len,
+int virtual_battery_handler(struct i2c_battery_parser_state *state,
+			    struct ec_response_i2c_passthru *resp, int in_len,
 			    int *err_code, int xferflags, int read_len,
 			    int write_len, const uint8_t *out);
-
-/* Reset the state machine and static variables. */
-void reset_parse_state(void);
 
 #endif /* __CROS_EC_VIRTUAL_BATTERY_H */

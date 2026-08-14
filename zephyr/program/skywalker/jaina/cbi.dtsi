@@ -86,10 +86,47 @@
 				enum-name = "JP";
 				value = <1>;
 			};
+			US2 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "US2";
+				value = <2>;
+			};
+			US3 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "US3";
+				value = <3>;
+			};
+		};
+		thermal-table {
+			enum-name = "THERMAL_TABLE";
+			start = <7>;
+			size = <1>;
+
+			thermal-table-11 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "THERMAL_TABLE_11";
+				value = <0>;
+			};
+			thermal-table-14 {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "THERMAL_TABLE_14";
+				value = <1>;
+			};
+		};
+		kb-matrix2 {
+			enum-name = "KB_MATRIX2";
+			start = <8>;
+			size = <1>;
+
+			unused{
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "UNUSED";
+				value = <0>;
+			};
 			UK {
 				compatible = "cros-ec,cbi-fw-config-value";
 				enum-name = "UK";
-				value = <2>;
+				value = <1>;
 			};
 		};
 		codec {

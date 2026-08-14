@@ -14,7 +14,7 @@ if NAMED_ADC_CHANNELS
 # Chromium EC provides it's own "adc" command.  Disable the Zephyr
 # built-in ADC shell command.
 # TODO(b:188434233) Investigate moving to zephyr adc shell
-config ADC_SHELL
+configdefault ADC_SHELL
 	default n
 
 config PLATFORM_EC_ADC_CMD

@@ -80,7 +80,17 @@ int battery_is_present(void)
 	return bp_val;
 }
 
+int test_extpower_present = 0;
 int extpower_is_present(void)
 {
-	return 0;
+	return test_extpower_present;
+}
+
+#ifndef CONFIG_PLATFORM_EC_USB_PD_3A_PORTS
+#define CONFIG_PLATFORM_EC_USB_PD_3A_PORTS 0
+#endif
+int mock_usb_pd_3a_ports = CONFIG_PLATFORM_EC_USB_PD_3A_PORTS;
+int pd_get_usb_pd_3a_ports(void)
+{
+	return mock_usb_pd_3a_ports;
 }

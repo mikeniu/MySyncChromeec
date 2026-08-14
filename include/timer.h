@@ -49,23 +49,6 @@ typedef union {
 void timer_init(void);
 
 /**
- * Launch a one-shot timer for a task.
- *
- * Note that each task can have only a single active timer.
- *
- * @param tstamp	Expiration timestamp for timer
- * @param tskid		Task to set timer for
- *
- * @return EC_SUCCESS, or non-zero if error.
- */
-int timer_arm(timestamp_t tstamp, task_id_t tskid);
-
-/**
- * Cancel a running timer for the specified task id.
- */
-void timer_cancel(task_id_t tskid);
-
-/**
  * Check if a timestamp has passed / expired
  *
  * @param deadline	deadline timer value to check

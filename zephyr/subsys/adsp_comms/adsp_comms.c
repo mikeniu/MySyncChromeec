@@ -177,6 +177,9 @@ ADSP_COMMS_REGISTER_CB(ADSP_FEATURE_OEM_CUSTOM,
 static void adsp_comms_shutdown_reset(void)
 {
 	battery_set_fake_soc(-1);
+	active_charge_port = CHARGE_PORT_NONE;
+	active_charge_state = LED_PWRS_IDLE;
+	active_battery_status = 0;
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN_COMPLETE, adsp_comms_shutdown_reset,
 	     HOOK_PRIO_DEFAULT);

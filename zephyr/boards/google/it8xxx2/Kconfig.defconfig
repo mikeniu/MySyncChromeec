@@ -4,47 +4,46 @@
 
 if BOARD_IT8XXX2
 
-config CROS_EC_HOOK_TICK_INTERVAL
+configdefault CROS_EC_HOOK_TICK_INTERVAL
 	default 500000
 
-config SYS_CLOCK_HW_CYCLES_PER_SEC
+configdefault SYS_CLOCK_HW_CYCLES_PER_SEC
 	default 32768
 
-config SYS_CLOCK_TICKS_PER_SEC
+configdefault SYS_CLOCK_TICKS_PER_SEC
 	default 32768
 
 if ADC
-config PLATFORM_EC_ADC_RESOLUTION
+configdefault PLATFORM_EC_ADC_RESOLUTION
 	default 10
 endif # ADC
 
 if CONSOLE
-config UART_CONSOLE
+configdefault UART_CONSOLE
 	default y
-	depends on SERIAL
 endif # CONSOLE
 
 if FLASH
-config PLATFORM_EC_CONSOLE_CMD_FLASH
+configdefault PLATFORM_EC_CONSOLE_CMD_FLASH
 	default y
 endif # FLASH
 
 if SERIAL
-config UART_INTERRUPT_DRIVEN
+configdefault UART_INTERRUPT_DRIVEN
 	default y
 endif # SERIAL
 
 if WATCHDOG
-config PLATFORM_EC_WATCHDOG_PERIOD_MS
+configdefault PLATFORM_EC_WATCHDOG_PERIOD_MS
 	default 2500
-config WDT_ITE_WARNING_LEADING_TIME_MS
+configdefault WDT_ITE_WARNING_LEADING_TIME_MS
 	default 500
-config WDT_ITE_REDUCE_WARNING_LEADING_TIME
+configdefault WDT_ITE_REDUCE_WARNING_LEADING_TIME
 	default y
 endif # WATCHDOG
 
 if PLATFORM_EC_VBOOT_HASH
-config SOC_IT8XXX2_SHA256_HW_ACCELERATE
+configdefault SOC_IT8XXX2_SHA256_HW_ACCELERATE
 	default y
 choice PLATFORM_EC_SHA256_MODE
 	default PLATFORM_EC_SHA256_HW_ACCELERATE if SOC_IT8XXX2_SHA256_HW_ACCELERATE
@@ -52,17 +51,25 @@ endchoice
 endif # PLATFORM_EC_VBOOT_HASH
 
 if SRAM_SIZE >= 128
-config LTO
+configdefault LTO
 	default n
 
-config SOC_IT8XXX2_SERIAL_IN_RAM
+configdefault SOC_IT8XXX2_SERIAL_IN_RAM
 	default y if !LTO
 
-config SOC_IT8XXX2_KERNEL_IN_RAM
+configdefault SOC_IT8XXX2_KERNEL_IN_RAM
 	default y if !LTO
 
-config SOC_IT8XXX2_ZEPHYR_IN_RAM
+configdefault SOC_IT8XXX2_ZEPHYR_IN_RAM
 	default y if !LTO
 endif # SRAM_SIZE
+
+if RISCV_PMP
+configdefault PMP_DATA_EXECUTION_PREVENTION
+	default n
+
+configdefault PMP_NO_LOCK_GLOBAL
+	default y
+endif # RISCV_PMP
 
 endif # BOARD_IT8XXX2

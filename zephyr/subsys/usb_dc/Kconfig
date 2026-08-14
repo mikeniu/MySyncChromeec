@@ -106,21 +106,21 @@ config USB_DC_TOUCHPAD_HID_NUM
 
 if CROS_EC_RW
 
-config USB_HID_DEVICE_COUNT
+configdefault USB_HID_DEVICE_COUNT
 	default 0 if !USB_DC_HID_KEYBOARD && !USB_DC_HID_TOUCHPAD
 	default 2 if USB_DC_HID_KEYBOARD && USB_DC_HID_TOUCHPAD
 	default 1
 
-config USB_DEVICE_HID
+configdefault USB_DEVICE_HID
 	default y if USB_DC_HID_KEYBOARD || USB_DC_HID_TOUCHPAD
 
-config USB_HID_BOOT_PROTOCOL
+configdefault USB_HID_BOOT_PROTOCOL
 	default y
 
-config HID_INTERRUPT_EP_MPS
+configdefault HID_INTERRUPT_EP_MPS
 	default 64
 
-config USB_HID_POLL_INTERVAL_MS
+configdefault USB_HID_POLL_INTERVAL_MS
 	default 1
 
 endif # CROS_EC_RW

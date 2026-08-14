@@ -70,6 +70,10 @@
 			offset = <0x84>;
 			size = <0x04>;
 		};
+		board-batt-keep {
+			offset = <0x88>;
+			size = <0x04>;
+		};
 	};
 };
 

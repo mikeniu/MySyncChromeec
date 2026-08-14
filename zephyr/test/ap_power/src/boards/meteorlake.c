@@ -16,25 +16,40 @@
 #include <ap_power/ap_pwrseq_sm.h>
 #endif
 
-void board_ap_power_force_shutdown(void)
+static void board_ap_power_shutdown(void)
 {
 	/* Turn off PCH_RMSRST to meet tPCH12 */
-	power_signal_set(PWR_EC_PCH_RSMRST, 0);
+	power_signal_set(PWR_EC_PCH_RSMRST, 1);
 
 	/* Turn off PRIM load switch. */
 	power_signal_set(PWR_EN_PP3300_A, 0);
 }
 
 #if defined(CONFIG_AP_PWRSEQ_DRIVER)
-static int board_ap_power_g3_run(void *data)
+static int board_ap_power_action_g3_entry(void *data)
 {
-	/* Turn on the PP3300_PRIM rail. */
-	power_signal_set(PWR_EN_PP3300_A, 1);
+	board_ap_power_shutdown();
 
 	return 0;
 }
 
-AP_POWER_APP_STATE_DEFINE(G3, NULL, board_ap_power_g3_run, NULL);
+static int board_ap_power_g3_run(void *data)
+{
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		board_ap_power_shutdown();
+		return 1;
+	}
+
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
+		/* Turn on the PP3300_PRIM rail. */
+		power_signal_set(PWR_EN_PP3300_A, 1);
+	}
+
+	return !power_signal_get(PWR_EN_PP3300_A);
+}
+
+AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_action_g3_entry,
+			  board_ap_power_g3_run, NULL);
 
 static int board_ap_power_s0_run(void *data)
 {
@@ -45,6 +60,11 @@ static int board_ap_power_s0_run(void *data)
 
 AP_POWER_APP_STATE_DEFINE(S0, NULL, board_ap_power_s0_run, NULL);
 #else
+void board_ap_power_force_shutdown(void)
+{
+	board_ap_power_shutdown();
+}
+
 void board_ap_power_action_g3_s5(void)
 {
 	/* Turn on the PP3300_PRIM rail. */

@@ -26,7 +26,7 @@ def register_rex_project(
             here / project_name / "project.overlay",
         ],
         kconfig_files=kconfig_files,
-        inherited_from=["rex"],
+        boards=["rex"],
         snippets=snippets,
     )
 
@@ -68,7 +68,7 @@ register_ish_project(
         here / "rex-ish" / "prj.conf",
         here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["rex"],
+    boards=["rex"],
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vif:VIF xmlns:opt="http://usb.org/VendorInfoFileOptionalContent.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:vif="http://usb.org/VendorInfoFile.xsd">
-  <vif:VIF_Specification>3.36</vif:VIF_Specification>
+  <vif:VIF_Specification>3.37</vif:VIF_Specification>
   <vif:VIF_App>
     <vif:Vendor>USB-IF</vif:Vendor>
     <vif:Name>VIF Editor</vif:Name>
-    <vif:Version>3.14.0.0</vif:Version>
+    <vif:Version>3.15.0.0</vif:Version>
   </vif:VIF_App>
   <vif:Vendor_Name>Google</vif:Vendor_Name>
   <vif:Model_Part_Number>Quartz</vif:Model_Part_Number>
@@ -14,6 +14,10 @@
   <vif:Certification_Type value="0">End Product</vif:Certification_Type>
   <vif:Product>
     <!--Product Level Content:-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <!--;Product-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:Total_Source_Power_Deliverable value="30000">30000 mW</vif:Total_Source_Power_Deliverable>
   </vif:Product>
   <vif:Component>
     <!--Component 0: Port 0-->
@@ -84,7 +88,6 @@
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;Product Power-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-    <vif:Product_Total_Source_Power_mW value="30000">30000 mW</vif:Product_Total_Source_Power_mW>
     <vif:Port_Source_Power_Type value="1">Shared</vif:Port_Source_Power_Type>
     <vif:Port_Source_Power_Gang>0</vif:Port_Source_Power_Gang>
     <vif:Port_Source_Power_Gang_Max_Power value="30000">30000 mW</vif:Port_Source_Power_Gang_Max_Power>
@@ -181,6 +184,21 @@
       </vif:SnkPDO>
     </vif:SnkPdoList>
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <!--;PD Sink SKEDB-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:Snk_SPR_Minimum_PDP value="0">0 mW</vif:Snk_SPR_Minimum_PDP>
+    <vif:Snk_SPR_Operational_PDP value="60000">60000 mW</vif:Snk_SPR_Operational_PDP>
+    <vif:Snk_SPR_Maximum_PDP value="65000">65000 mW</vif:Snk_SPR_Maximum_PDP>
+    <vif:Snk_EPR_Minimum_PDP value="0">0 mW</vif:Snk_EPR_Minimum_PDP>
+    <vif:Snk_EPR_Operational_PDP value="0">0 mW</vif:Snk_EPR_Operational_PDP>
+    <vif:Snk_EPR_Maximum_PDP value="0">0 mW</vif:Snk_EPR_Maximum_PDP>
+    <vif:Snk_PPS_Charging_Supported value="false" />
+    <vif:Snk_VBUS_Powered value="true" />
+    <vif:Snk_AC_Supply_Powered value="false" />
+    <vif:Snk_Battery_Powered value="true" />
+    <vif:Snk_Battery_Essentially_Unlimited value="false" />
+    <vif:Snk_AVS_Supported value="false" />
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;Dual Role-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <vif:Accepts_PR_Swap_As_Src value="true" />
@@ -271,7 +289,6 @@
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;Product Power-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-    <vif:Product_Total_Source_Power_mW value="30000">30000 mW</vif:Product_Total_Source_Power_mW>
     <vif:Port_Source_Power_Type value="1">Shared</vif:Port_Source_Power_Type>
     <vif:Port_Source_Power_Gang>0</vif:Port_Source_Power_Gang>
     <vif:Port_Source_Power_Gang_Max_Power value="30000">30000 mW</vif:Port_Source_Power_Gang_Max_Power>
@@ -367,6 +384,21 @@
         <vif:Snk_PDO_Op_Current value="325">3250 mA (Factor = 10)</vif:Snk_PDO_Op_Current>
       </vif:SnkPDO>
     </vif:SnkPdoList>
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <!--;PD Sink SKEDB-->
+    <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
+    <vif:Snk_SPR_Minimum_PDP value="0">0 mW</vif:Snk_SPR_Minimum_PDP>
+    <vif:Snk_SPR_Operational_PDP value="60000">60000 mW</vif:Snk_SPR_Operational_PDP>
+    <vif:Snk_SPR_Maximum_PDP value="65000">65000 mW</vif:Snk_SPR_Maximum_PDP>
+    <vif:Snk_EPR_Minimum_PDP value="0">0 mW</vif:Snk_EPR_Minimum_PDP>
+    <vif:Snk_EPR_Operational_PDP value="0">0 mW</vif:Snk_EPR_Operational_PDP>
+    <vif:Snk_EPR_Maximum_PDP value="0">0 mW</vif:Snk_EPR_Maximum_PDP>
+    <vif:Snk_PPS_Charging_Supported value="false" />
+    <vif:Snk_VBUS_Powered value="true" />
+    <vif:Snk_AC_Supply_Powered value="false" />
+    <vif:Snk_Battery_Powered value="true" />
+    <vif:Snk_Battery_Essentially_Unlimited value="false" />
+    <vif:Snk_AVS_Supported value="false" />
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;Dual Role-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->

@@ -9,22 +9,22 @@
 	cbi_ufsc: cbi-ufsc {
 		compatible = "cros-ec,cbi-ufsc";
 
-		oem-3bit-field-0 {
+		ufsc_ec_oem_3bit_field0: oem-3bit-field-0 {
 			status = "disabled";
 			start = <UFSC_BIT(3, 24)>;
 			size = <3>;
 		};
-		oem-2bit-field-0 {
+		ufsc_ec_oem_2bit_field0: oem-2bit-field-0 {
 			status = "disabled";
 			start = <UFSC_BIT(3, 27)>;
 			size = <2>;
 		};
-		oem-2bit-field-1 {
+		ufsc_ec_oem_2bit_field1: oem-2bit-field-1 {
 			status = "disabled";
 			start = <UFSC_BIT(3, 29)>;
 			size = <2>;
 		};
-		oem-1bit-field-0 {
+		ufsc_ec_oem_1bit_field0: oem-1bit-field-0 {
 			status = "disabled";
 			start = <UFSC_BIT(3, 31)>;
 			size = <1>;

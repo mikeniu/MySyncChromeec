@@ -11,7 +11,7 @@
 #include <zephyr/shell/shell.h>
 #include <zephyr/ztest.h>
 
-#if defined(SECTION_IS_RW)
+#if defined(CONFIG_CROS_EC_RW)
 
 ZTEST_USER(console_cmd_sleeptimeout, test_no_params)
 {
@@ -45,4 +45,4 @@ ZTEST_USER(console_cmd_sleeptimeout, test_bad_params)
 
 ZTEST_SUITE(console_cmd_sleeptimeout, NULL, NULL, NULL, NULL, NULL);
 
-#endif /* SECTION_IS_RW */
+#endif /* CONFIG_CROS_EC_RW */

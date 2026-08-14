@@ -7,6 +7,13 @@
 
 #include <cros/integrated_fwid.dtsi>
 
+/* Include the standard and OEM schema templates */
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+
+/* Include the generated file that defines the values for this project */
+#include "c1nv_ec_ufsc.dtsi"
+
 #include "../psl.dtsi"
 #include "../adc.dtsi"
 #include "../common.dtsi"
@@ -23,11 +30,18 @@
 
 /* c1nv overrides follow... */
 
-&cbi_flash {
-	/*
-	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
-	 * EC_RO section.
-	 */
-	offset = <0x3e000>;
-	size = <0x1000>;
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x3e000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 */
+			offset = <0x3e000>;
+			size = <0x1000>;
+		};
+	};
 };

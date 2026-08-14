@@ -14,6 +14,7 @@
 #include <zephyr/ztest.h>
 
 #include <algorithm>
+#include <fpsensor/fpsensor_state.h>
 extern "C" {
 #include <ascp/ascp.h>
 }
@@ -25,8 +26,6 @@ extern "C" {
 #include <host_command.h>
 #include <mkbp_event.h>
 #include <ranges>
-
-DEFINE_FFF_GLOBALS;
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
@@ -152,12 +151,32 @@ ZTEST(hc_fp_ascp, test_fp_ascp_establish_sk_f_not_ok)
 	zassert_equal(EC_RES_ERROR, ret);
 }
 
+ZTEST(hc_fp_ascp, test_fp_ascp_establish_blocked_when_session_active)
+{
+	int ret;
+	ec_params_fp_ascp_establish params;
+	std::ranges::copy(pk_g, std::begin(params.pk_g));
+
+	/* Simulate active fingerprint auth session. */
+	global_context.fp_encryption_status |=
+		FP_CONTEXT_STATUS_SESSION_ESTABLISHED;
+
+	ret = ec_cmd_fp_ascp_establish(nullptr, &params);
+	zassert_equal(EC_RES_ACCESS_DENIED, ret);
+}
+
 static void reset(void *data)
 {
 	ARG_UNUSED(data);
 
 	ascp_get_sk_f_custom_ret = 0;
 	std::ranges::copy(sk_f, std::begin(ascp_get_sk_f_custom_sk_f));
+
+	/* Reset context before each test case. */
+	fp_reset_context();
+
+	/* Clear encryption status bit before each test case. */
+	global_context.fp_encryption_status = 0;
 }
 
 ZTEST_SUITE(hc_fp_ascp, nullptr, nullptr, reset, reset, nullptr);
