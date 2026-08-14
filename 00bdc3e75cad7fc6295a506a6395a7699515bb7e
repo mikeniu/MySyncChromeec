@@ -17,6 +17,52 @@
       "isAi": true,
       "revId": "00bdc3e75cad7fc6295a506a6395a7699515bb7e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82968b05_56389d25",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:37:03Z",
+      "side": 1,
+      "message": "Double-check this. The check below without changing any formatting is fine, so you can split it into two separate CLs:\n\n-----\n\n**2. Type Safety \u0026 Signatures (Potential Issue)**\n\n* **Pointer Sign Mismatch:** The commit message explicitly states: *\"fix printf specifiers for unsigned template size fields\"*, and you correctly changed `%d` to `%u`. This implies the fields in `struct ft_libfp_data` are `unsigned int` or `uint32_t`.\n* However, looking at the mock in the test file: `DEFINE_FAKE_VALUE_FUNC(int, focal_algo_get_finger_detailed_info, int *, int *, int *);`, the third-party API expects pointers to signed `int`.\n* *Actionable feedback:* Passing a pointer to an `unsigned int` into a function expecting an `int *` violates strict aliasing and can cause compiler warnings (e.g., `-Wpointer-sign`) or unexpected behavior on certain architectures. If `focal_algo_get_finger_detailed_info` strictly requires `int *`, you should fetch the values into local `int` variables first, validate them, and then cast/assign them to the unsigned struct fields.",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 67
+      },
+      "revId": "00bdc3e75cad7fc6295a506a6395a7699515bb7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86609dd8_31f8c242",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:37:03Z",
+      "side": 1,
+      "message": "This seems like a good check to add. Followup CL is fine:\n\n-----\n\n\n* **Incomplete Validation (Suggestion):** The function `focal_algo_get_finger_detailed_info` retrieves three sizes: `tpl_finger_size`, `tpl_subtemplate_size`, and `tpl_head_size`. Currently, only `tpl_finger_size` is validated.\n* *Actionable feedback:* Consider whether `tpl_subtemplate_size` and `tpl_head_size` should also be validated against `0` or bounded to a maximum size. If a sub-template size of `0` is returned by the algorithm, it could potentially cause issues later in the enrollment/matching process.",
+      "range": {
+        "startLine": 83,
+        "startChar": 1,
+        "endLine": 83,
+        "endChar": 31
+      },
+      "revId": "00bdc3e75cad7fc6295a506a6395a7699515bb7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
