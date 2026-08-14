@@ -24,10 +24,29 @@ class DutOsType(str, Enum):
 
 # Standard SSH options used across commands
 SSH_OPTS = [
+    # Disable host key verification prompts for automated lab connections.
     "-o",
     "StrictHostKeyChecking=no",
+    # Avoid polluting or checking local ~/.ssh/known_hosts for lab hosts.
     "-o",
     "UserKnownHostsFile=/dev/null",
+    # Automatically enable connection sharing (multiplexing) for SSH.
+    "-o",
+    "ControlMaster=auto",
+    # Path template for the shared master SSH control socket file.
+    "-o",
+    "ControlPath=/tmp/ssh_mux_%h_%p_%r",
+    # Keep the master SSH connection alive in the background for 10 minutes.
+    "-o",
+    "ControlPersist=10m",
+    # Fast-fail connection attempts if labstation banner exchange stalls.
+    "-o",
+    "ConnectTimeout=10",
+    # Keepalive options to prevent labstation socket timeouts.
+    "-o",
+    "ServerAliveInterval=15",
+    "-o",
+    "ServerAliveCountMax=3",
 ]
 
 
@@ -41,6 +60,72 @@ class DutHandler(ABC):
         self.args = args
         self.ec_dir = ec_dir
 
+    def _servo_ssh(
+        self,
+        cmd: str,
+        check: bool = True,
+        capture_output: bool = False,
+        stdout: Optional[int] = None,
+        stderr: Optional[int] = None,
+    ) -> subprocess.CompletedProcess:
+        """Execute a command over SSH on the servo host."""
+        servo_hostname = self.details["servo_hostname"]
+        ssh_cmd = [
+            "ssh",
+            *SSH_OPTS,
+            f"root@{servo_hostname}",
+            cmd,
+        ]
+        return subprocess.run(
+            ssh_cmd,
+            check=check,
+            capture_output=capture_output,
+            text=capture_output,
+            stdout=stdout,
+            stderr=stderr,
+        )
+
+    def _dut_ssh(
+        self,
+        cmd: str,
+        check: bool = True,
+        capture_output: bool = False,
+        stdout: Optional[int] = None,
+        stderr: Optional[int] = None,
+        connect_timeout: Optional[int] = None,
+    ) -> subprocess.CompletedProcess:
+        """Execute a command over SSH on the target DUT host."""
+        dut_hostname = self.details["dut_hostname"]
+        ssh_cmd = ["ssh", *SSH_OPTS]
+        if connect_timeout is not None:
+            ssh_cmd.extend(["-o", f"ConnectTimeout={connect_timeout}"])
+        ssh_cmd.extend([f"root@{dut_hostname}", cmd])
+        return subprocess.run(
+            ssh_cmd,
+            check=check,
+            capture_output=capture_output,
+            text=capture_output,
+            stdout=stdout,
+            stderr=stderr,
+        )
+
+    def _dut_scp(
+        self,
+        local_path: str,
+        remote_path: str,
+        check: bool = True,
+    ) -> subprocess.CompletedProcess:
+        """Copy a file to the target DUT host via SCP."""
+        dut_hostname = self.details["dut_hostname"]
+        destination = f"root@{dut_hostname}:{remote_path}"
+        scp_cmd = [
+            "scp",
+            *SSH_OPTS,
+            local_path,
+            destination,
+        ]
+        return subprocess.run(scp_cmd, check=check)
+
     def ensure_servod_running(self) -> None:
         """Ensure servod is restarted cleanly with correct model configuration."""
         servo_hostname = self.details["servo_hostname"]
@@ -50,43 +135,30 @@ class DutHandler(ABC):
         servo_serial = self.details["servo_serial"]
 
         # 1. Stop any existing servod instance on this port first to ensure clean configuration
-        stop_cmd = [
-            "ssh",
-            *SSH_OPTS,
-            f"root@{servo_hostname}",
-            f"sudo stop servod PORT={servo_port}",
-        ]
         print(
             f"Stopping any existing servod on {servo_hostname} (port {servo_port})..."
         )
-        subprocess.run(
-            stop_cmd,
+        self._servo_ssh(
+            f"sudo stop servod PORT={servo_port}",
             check=False,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
 
         # 2. Start servod with correct configuration parameters
-        start_cmd = [
-            "ssh",
-            *SSH_OPTS,
-            f"root@{servo_hostname}",
+        print(f"Starting servod on {servo_hostname} (port {servo_port})...")
+        self._servo_ssh(
             f"sudo start servod PORT={servo_port} BOARD={board} "
             f"MODEL={model} SERIALNAME={servo_serial}",
-        ]
-        print(f"Starting servod on {servo_hostname} (port {servo_port})...")
-        subprocess.run(start_cmd, check=False)
+            check=False,
+        )
 
         # 3. Wait for active
-        wait_cmd = [
-            "ssh",
-            *SSH_OPTS,
-            f"root@{servo_hostname}",
-            f"servodtool instance wait-for-active --port {servo_port} --timeout 60",
-        ]
         print(f"Waiting for servod on port {servo_port} to become active...")
         try:
-            subprocess.run(wait_cmd, check=True)
+            self._servo_ssh(
+                f"servodtool instance wait-for-active --port {servo_port} --timeout 60"
+            )
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
                 f"servod failed to become active on {servo_hostname} "
@@ -97,19 +169,14 @@ class DutHandler(ABC):
         """Query the EC console via servo to verify the EC is up and responsive."""
         servo_hostname = self.details["servo_hostname"]
         servo_port = self.details["servo_port"]
-        ssh_cmd = [
-            "ssh",
-            *SSH_OPTS,
-            f"root@{servo_hostname}",
-            f"dut-control -p {servo_port} ec_board",
-        ]
         print(
             f"Verifying EC is up and responsive on {servo_hostname} (port {servo_port})..."
         )
         for attempt in range(1, 6):
             try:
-                result = subprocess.run(
-                    ssh_cmd, capture_output=True, text=True, check=True
+                result = self._servo_ssh(
+                    f"dut-control -p {servo_port} ec_board",
+                    capture_output=True,
                 )
                 print(f"EC is responsive: {result.stdout.strip()}")
                 return
@@ -139,15 +206,11 @@ class DutHandler(ABC):
         """
         servo_hostname = self.details["servo_hostname"]
         servo_port = self.details["servo_port"]
-        ssh_cmd = [
-            "ssh",
-            *SSH_OPTS,
-            f"root@{servo_hostname}",
-            f"futility gbb -s --flash --flags +0x39 --servo_port {servo_port}",
-        ]
         print(f"Running GBB configuration on {servo_hostname}...")
         try:
-            subprocess.run(ssh_cmd, check=True)
+            self._servo_ssh(
+                f"futility gbb -s --flash --flags +0x39 --servo_port {servo_port}"
+            )
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
                 f"Failed to set GBB flags on {servo_hostname}: {e}"
