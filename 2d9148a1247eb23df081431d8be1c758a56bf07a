@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a3e4d04_b8a07658",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T19:22:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/2a8173d0-5a85-4a3d-ac47-8f97cab01d40)]\n\n**Review Summary:**\n* **Functionality:** The patch correctly defers writing the encryption metadata (`nonce`, `encryption_salt`, and `tag`) to the global `fp_enc_buffer` until after key derivation and encryption succeed. It effectively prevents premature exposure of metadata in case of an intermediate failure.\n* **Security:** The security posture is improved. The temporary stack buffers for `nonce`, `encryption_salt`, and `tag` are correctly wrapped with `CleanseWrapper`, ensuring they are securely zeroed out upon exiting the scope.\n* **Style:** The code correctly utilizes `std::ranges::copy`, aligning with modern C++ guidelines. The removal of redundant comments improves readability.\n* **Consistency:** The changes consistently apply the stack-buffer approach to all metadata fields, including the auth tag as suggested in prior reviews. Reusing the existing mock `hkdf_sha256` instead of reimplementing it is a great improvement.\n* **Testing \u0026 Test Coverage:** The added unit test `test_fp_frame_v1_encrypt_template_key_derivation_failure` explicitly covers the failure path. By simulating a failure in `hkdf_sha256`, it asserts that `fp_enc_buffer.metadata` remains zero-initialized, preventing regressions.\n* **CL Size \u0026 Scope:** The CL is appropriately sized and focused entirely on the single objective of fixing the metadata buffer initialization.",
+      "isAi": true,
+      "revId": "2d9148a1247eb23df081431d8be1c758a56bf07a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
