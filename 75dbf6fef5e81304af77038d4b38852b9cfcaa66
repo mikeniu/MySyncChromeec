@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c965947_defab437",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T23:11:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/c27a502e-5fc8-4b4d-b1be-cb3bdd7c9419)]\n\n### Review Summary\n\n*   **Functionality:** The patch addresses the issue successfully by wrapping the byte-by-byte OTP key write operation with `irq_lock()` and `irq_unlock()`, preventing interrupts from disrupting the write loop. The lock/unlock pairing is correctly handled, even on error paths.\n*   **Security:** Enforcing a continuous, uninterrupted write for cryptographic OTP keys prevents timing anomalies and ensures the integrity of the provisioned key. This follows best practices.\n*   **Style:** The code conforms nicely to standard EC/Zephyr coding conventions.\n*   **Consistency:** The previous feedback regarding conditional inclusion of Zephyr-specific headers and assertions (`zephyr/ztest.h`, `zassert_true`) in the shared mock (`test/mock/otpi_mock.c`) has been fully addressed and is now safe for legacy EC test builds.\n*   **Testing \u0026 Test Coverage:** The test coverage is excellent. The mock verifies that interrupts are actually locked when `otpi_write` is invoked, and the hardware test confirms that interrupts are properly restored upon function exit.\n*   **CL Size \u0026 Scope:** The CL is appropriately scoped to this bug fix and includes all necessary testing infrastructure.\n\nTAG\u003dagy\nCONV\u003d10bb0d1b-5f9f-4a1c-838d-24d64a3076a1",
+      "isAi": true,
+      "revId": "75dbf6fef5e81304af77038d4b38852b9cfcaa66",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
