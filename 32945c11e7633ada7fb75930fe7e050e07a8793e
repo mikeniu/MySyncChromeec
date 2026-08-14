@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c765a90e_93e53ddf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T02:37:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/5b2221d3-0364-42a0-a9bd-9687ec52676a)]\n\n### Review Summary\n\n*   **Functionality:** The patch accurately implements the lock ordering for `mapped_storage` around the MPU protection window. Acquiring the lock before disabling the MPU and releasing it after enabling the MPU successfully avoids pending while MPU hardware protection is disabled.\n*   **Style \u0026 Consistency:** The use of `IS_ENABLED(CONFIG_EXTERNAL_STORAGE)` is an elegant and robust choice over `#ifdef`. It is compatible with both Zephyr and legacy EC builds and ensures the code blocks are syntax-checked even when the config is disabled.\n*   **Security:** Reduces the attack surface by ensuring that any mutex contention occurs while MPU protection remains active, preventing unintended accesses to rollback regions during thread sleeping.\n*   **Testing \u0026 Coverage:** The addition of the `rollback_lock` hardware test is excellent. It explicitly validates the lock acquisition and release ordering and confirms that `crec_flash_lock_mapped_storage` is called correctly during `unlock_rollback` and `lock_rollback`.\n*   **CL Size \u0026 Scope:** The CL is appropriately scoped to this fix and is easy to review.\n\nTAG\u003dagy\nCONV\u003d5b2221d3-0364-42a0-a9bd-9687ec52676a",
+      "isAi": true,
+      "revId": "32945c11e7633ada7fb75930fe7e050e07a8793e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
