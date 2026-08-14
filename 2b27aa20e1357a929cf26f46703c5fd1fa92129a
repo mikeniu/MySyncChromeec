@@ -54,6 +54,60 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd6ea7b2_37cb34e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T23:04:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a025a74_0b9cfc18",
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "941d5586_b89b07d6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T23:04:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a47c8874_a4db688d",
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92136264_310643cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T23:04:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62b0e769_c3031982",
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59d6be6e_205859f8",
@@ -90,6 +144,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c90b984_eb4b343d",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T23:04:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59d6be6e_205859f8",
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "186b2ff3_f0e22ee0",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T23:04:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7619856_c3458857",
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d7e9d14a_265aaa4f",
@@ -104,6 +194,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Design Note**: Placing this assertion in the generic `otpi_write` mock will strictly enforce that *any* test invoking this mock must perform OTP writes with interrupts locked.\n\nIf there are other callers of `otpi_write` in the codebase that do not have this uninterrupted timing requirement, this assertion could lead to false-positive test failures. If this is the intended system-wide behavior for all OTP writes, this is perfectly fine. Otherwise, consider if this assertion should be scoped specifically to the `otp_key_write` context.",
       "isAi": true,
+      "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13af9196_4cddba6c",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T23:04:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7e9d14a_265aaa4f",
       "revId": "2b27aa20e1357a929cf26f46703c5fd1fa92129a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
