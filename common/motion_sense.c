@@ -13,6 +13,9 @@
 #include "common.h"
 #include "console.h"
 #include "gesture.h"
+#ifdef CONFIG_ZEPHYR
+#include "gpio/gpio_int.h"
+#endif
 #include "hooks.h"
 #include "host_command.h"
 #include "hwtimer.h"
@@ -402,6 +405,16 @@ static void motion_sense_switch_sensor_rate(void)
 				     i == CONFIG_LID_ANGLE_SENSOR_LID))
 					tablet_set_mode(0, TABLET_TRIGGER_LID);
 			}
+#ifdef CONFIG_ZEPHYR
+			/*
+			 * Re-arm the interrupt now that the sensor is
+			 * initialized.
+			 */
+			if ((sensor->flags &
+			     MOTIONSENSE_FLAG_INT_DISABLE_ON_INACTIVE) &&
+			    sensor->int_config)
+				gpio_enable_dt_interrupt(sensor->int_config);
+#endif
 		} else {
 			/*
 			 * Use mutex to be sure we are not changing the
@@ -411,6 +424,13 @@ static void motion_sense_switch_sensor_rate(void)
 			sensor->collection_rate = 0;
 			mutex_unlock(&g_sensor_mutex);
 			sensor->state = SENSOR_NOT_INITIALIZED;
+#ifdef CONFIG_ZEPHYR
+			/* Mask the interrupt when the sensor is inactive. */
+			if ((sensor->flags &
+			     MOTIONSENSE_FLAG_INT_DISABLE_ON_INACTIVE) &&
+			    sensor->int_config)
+				gpio_disable_dt_interrupt(sensor->int_config);
+#endif
 		}
 	}
 	if (sensor_setup_mask) {

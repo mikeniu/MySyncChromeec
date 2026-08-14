@@ -137,6 +137,13 @@ DT_FOREACH_STATUS_OKAY(cros_ec_motionsense_bodydetect,
 		   (.mutex = &SENSOR_MUTEX_NAME(DT_PHANDLE(id, mutex)), ))
 
 /*
+ * Set flags based on values defined in the node.
+ */
+#define SENSOR_FLAGS(id)                                            \
+	.flags = 0 IF_ENABLED(DT_PROP(id, int_disable_on_inactive), \
+			      (| MOTIONSENSE_FLAG_INT_DISABLE_ON_INACTIVE)),
+
+/*
  * Get I2C port number which is referred by phandle.
  * See motionsense-sensor-base.yaml for DT example and details.
  */
@@ -365,6 +372,48 @@ const struct motion_sensor_t *motion_als_sensors[] = { LISTIFY(
 	DT_PROP_LEN(SENSOR_INFO_NODE, als_sensors), ALS_SENSOR_ENTRY_WITH_COMMA,
 	(), SENSOR_INFO_NODE) };
 BUILD_ASSERT(ARRAY_SIZE(motion_als_sensors) == ALS_COUNT);
+#endif
+
+/*
+ * GPIO_INT_FROM_NODE() is not a constant initializer, so populate each
+ * sensor's interrupt config at runtime from its "irq" phandle.
+ */
+#define SENSOR_SET_INT_CONFIG(id)                              \
+	IF_ENABLED(DT_NODE_HAS_PROP(id, irq),                  \
+		   (motion_sensors[SENSOR_ID(id)].int_config = \
+			    GPIO_INT_FROM_NODE(DT_PHANDLE(id, irq));))
+#define SENSOR_SET_ALT_INT_CONFIG(id)                                         \
+	IF_ENABLED(DT_NODE_HAS_PROP(id, irq),                                 \
+		   (motion_sensors_alt[SENSOR_ID(id)].int_config =            \
+			    GPIO_INT_FROM_NODE(DT_PHANDLE(                    \
+				    id, irq)); /* If the alt was swapped in,  \
+						* propagate its int_config.   \
+						* drv equality is the runtime \
+						* signal the swap happened.   \
+						*/                            \
+		    if (motion_sensors[SENSOR_ID(id)].drv ==                  \
+			motion_sensors_alt[SENSOR_ID(id)].drv)                \
+			    motion_sensors[SENSOR_ID(id)]                     \
+				    .int_config =                             \
+			    motion_sensors_alt[SENSOR_ID(id)].int_config;))
+#if DT_NODE_EXISTS(SENSOR_NODE)
+/*
+ * A sensor with "irq" manages its own interrupt enable/disable lifecycle.
+ * Mixing it with the global "sensor-irqs" list on the same interrupt would
+ * double-enable at boot and leave the interrupt unmanaged on suspend.
+ */
+#define ASSERT_NO_IRQ_CONFLICT(id)                                            \
+	IF_ENABLED(DT_NODE_HAS_PROP(id, irq),                                 \
+		   (BUILD_ASSERT(                                             \
+			    !DT_NODE_HAS_PROP(SENSOR_INFO_NODE, sensor_irqs), \
+			    "sensor with irq must not use sensor-irqs");))
+DT_FOREACH_CHILD(SENSOR_NODE, ASSERT_NO_IRQ_CONFLICT)
+static void motionsense_set_int_configs(void){
+	DT_FOREACH_CHILD(SENSOR_NODE, SENSOR_SET_INT_CONFIG)
+#if DT_NODE_EXISTS(SENSOR_ALT_NODE)
+		DT_FOREACH_CHILD(SENSOR_ALT_NODE, SENSOR_SET_ALT_INT_CONFIG)
+#endif
+} DECLARE_HOOK(HOOK_INIT, motionsense_set_int_configs, HOOK_PRIO_DEFAULT);
 #endif
 
 /*

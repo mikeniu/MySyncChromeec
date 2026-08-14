@@ -63,6 +63,19 @@ properties:
     type: phandle
     description: phandle to CBI UFSC value indicating that the sensor
       should be used
+  irq:
+    type: phandle
+    description: >
+      Interrupt for this sensor, referencing a child node of
+      cros-ec,gpio-interrupts. The motion_sense task enables it when the
+      sensor becomes active and disables it when the sensor is inactive.
+  int-disable-on-inactive:
+    type: boolean
+    description: >
+      When set, the motion_sense task masks this sensor's interrupt
+      (int-signal) while the sensor is inactive in the current power state,
+      and re-enables it once the sensor is re-initialized. Use on platforms
+      where the sensor rail stays powered across suspend.
 
 #
 # examples:

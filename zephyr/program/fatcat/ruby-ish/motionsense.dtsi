@@ -93,6 +93,8 @@
 			default-range = <0x10000>;
 			drv-data = <&tcs_clear_data>;
 			i2c-spi-addr-flags = "TCS3400_I2C_ADDR_FLAGS";
+			irq = <&int_als_rgb>;
+			int-disable-on-inactive;
 			configs {
 				compatible =
 					"cros-ec,motionsense-sensor-config";
@@ -119,11 +121,6 @@
 
 		/* list of entries for motion_als_sensors */
 		als-sensors = <&als_clear>;
-		/*
-		 * list of GPIO interrupts that have to
-		 * be enabled at initial stage
-		 */
-		sensor-irqs = <&int_als_rgb>;
 		/* list of sensors in force mode */
 		accel-force-mode-sensors = <&als_clear>;
 	};
