@@ -34,7 +34,7 @@
 		};
 		level_1 {
 			temp-on = <47>;
-			temp-off = <44>;
+			temp-off = <42>;
 			rpm-target = <4500 4500>;
 		};
 		level_2 {
