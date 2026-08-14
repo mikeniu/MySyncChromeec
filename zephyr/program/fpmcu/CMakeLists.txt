@@ -36,6 +36,8 @@ if (DEFINED CONFIG_BOARD_ET171)
 endif()
 
 if (DEFINED CONFIG_BOARD_EM32F967)
+	# Expected rollback version is 2 on em32f967 projects.
+	set(EXPECTED_ROLLBACK_VERSION 2)
 	add_subdirectory(em32f967)
 	project(em32f967)
 endif()
