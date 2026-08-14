@@ -87,6 +87,20 @@ static void check_mpu_rv(int rv, const char *func_name)
 }
 #endif /* CONFIG_ROLLBACK_MPU_PROTECT */
 
+static inline void acquire_software_flash_lock(void)
+{
+#if IS_ENABLED(CONFIG_EXTERNAL_STORAGE)
+	crec_flash_lock_mapped_storage(true);
+#endif
+}
+
+static inline void release_software_flash_lock(void)
+{
+#if IS_ENABLED(CONFIG_EXTERNAL_STORAGE)
+	crec_flash_lock_mapped_storage(false);
+#endif
+}
+
 /*
  * When MPU is available, read rollback with interrupts disabled, to minimize
  * time protection is left open.
@@ -97,12 +111,25 @@ test_export_static void lock_rollback(uint32_t key)
 	int rv = mpu_lock_rollback(true);
 	check_mpu_rv(rv, __func__);
 	irq_unlock(key);
+
+	/*
+	 * Release the flash mapped storage lock AFTER re-enabling MPU
+	 * protection.
+	 */
+	release_software_flash_lock();
 #endif
 }
 
 test_export_static uint32_t unlock_rollback(void)
 {
 #ifdef CONFIG_ROLLBACK_MPU_PROTECT
+	/*
+	 * Acquire the flash mapped storage lock BEFORE disabling MPU
+	 * protection. Any lock contention occurs while MPU protection is
+	 * active.
+	 */
+	acquire_software_flash_lock();
+
 	uint32_t key;
 
 	key = irq_lock();
