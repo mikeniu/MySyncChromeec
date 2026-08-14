@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "775ebca6_30649ac8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 34
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T19:28:55Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c44b070f_9c76596e",
+      "revId": "889066aa62b40c6f9efd8ba1c37193983a6d116c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8fdbd904_6e2b17ff",
@@ -32,6 +50,30 @@
       "writtenOn": "2026-08-14T18:29:26Z",
       "side": 1,
       "message": "Can you file a bug and add a `TODO(b/123)` comment here?",
+      "range": {
+        "startLine": 248,
+        "startChar": 0,
+        "endLine": 250,
+        "endChar": 73
+      },
+      "revId": "889066aa62b40c6f9efd8ba1c37193983a6d116c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4aebec7_3a633203",
+        "filename": "zephyr/test/fingerprint/algorithm/ft98xx/src/ft98xx.c",
+        "patchSetId": 34
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T19:28:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8fdbd904_6e2b17ff",
       "range": {
         "startLine": 248,
         "startChar": 0,
