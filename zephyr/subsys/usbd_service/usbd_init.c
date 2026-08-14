@@ -5,13 +5,13 @@
 
 #include "ec_commands.h"
 #include "ec_version.h"
+#include "gupdate_msosv2.h"
 #include "usbd_init.h"
 
 #include <zephyr/device.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/iterable_sections.h>
 #include <zephyr/usb/usbd.h>
-
 LOG_MODULE_DECLARE(usbd_init, LOG_LEVEL_INF);
 
 USBD_DEVICE_DEFINE(usb_device, DEVICE_DT_GET(DT_NODELABEL(zephyr_udc0)),
@@ -161,6 +161,11 @@ static int usb_device_init(void)
 		sys_cpu_to_le16(USB_SRN_1_1);
 #endif
 
+#if CONFIG_USBD_GOOGLE_UPDATE_SUPPORT
+	((struct usb_device_descriptor *)(usb_device.fs_desc))->bcdUSB =
+		sys_cpu_to_le16(USB_SRN_2_0_1);
+#endif /* CONFIG_USBD_GOOGLE_UPDATE_SUPPORT */
+
 	err = usbd_add_descriptor(&usb_device, &lang);
 	if (err) {
 		LOG_ERR("failed to initialize language descriptor (%d)", err);
@@ -185,6 +190,15 @@ static int usb_device_init(void)
 		LOG_ERR("failed to initialize SN descriptor (%d)", err);
 		goto error;
 	}
+
+#if CONFIG_USBD_GOOGLE_UPDATE_SUPPORT
+	err = usbd_add_descriptor(&usb_device, &google_update_msos);
+	if (err) {
+		LOG_ERR("failed to add Google Update MS OS descriptor: %d",
+			err);
+		return err;
+	}
+#endif /* CONFIG_USBD_GOOGLE_UPDATE_SUPPORT */
 
 	enum usbd_speed speed = usbd_caps_speed(&usb_device);
 
