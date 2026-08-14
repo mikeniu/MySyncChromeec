@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78653ced_5e0dcdba",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T18:50:32Z",
+      "side": 1,
+      "message": "Can you add a unit test that checks that this range is all zero? (both RO and RW)\n\nI think we only store the template or frame there, so I think it should be all zero at boot.",
+      "range": {
+        "startLine": 307,
+        "startChar": 0,
+        "endLine": 311,
+        "endChar": 2
+      },
+      "revId": "8a59c784841b135189ce6f41594f3945254d3e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
