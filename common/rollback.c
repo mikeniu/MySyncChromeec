@@ -97,12 +97,29 @@ test_export_static void lock_rollback(uint32_t key)
 	int rv = mpu_lock_rollback(true);
 	check_mpu_rv(rv, __func__);
 	irq_unlock(key);
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)) {
+		/*
+		 * Release lock AFTER enabling MPU. Any mutex contention
+		 * will happen while MPU hardware protection is still active.
+		 */
+		crec_flash_lock_mapped_storage(0);
+	}
 #endif
 }
 
 test_export_static uint32_t unlock_rollback(void)
 {
 #ifdef CONFIG_ROLLBACK_MPU_PROTECT
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)) {
+		/*
+		 * Acquire lock BEFORE disabling MPU. Any mutex contention
+		 * will happen while MPU hardware protection is still active.
+		 */
+		crec_flash_lock_mapped_storage(1);
+	}
+
 	uint32_t key;
 
 	key = irq_lock();
