@@ -42,6 +42,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d39218bf_0d21b90d",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T18:48:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "261c74f1_cad7dd5e",
+      "range": {
+        "startLine": 563,
+        "startChar": 0,
+        "endLine": 566,
+        "endChar": 4
+      },
+      "revId": "e89574237f8d8fa315627761729055b702178037",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "559ba73b_7c5187ee",
@@ -65,6 +89,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d886cae_b7b0db1b",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T18:48:23Z",
+      "side": 1,
+      "message": "If I remove them and run cros format, they will appear again.",
+      "parentUuid": "559ba73b_7c5187ee",
+      "range": {
+        "startLine": 567,
+        "startChar": 59,
+        "endLine": 567,
+        "endChar": 60
+      },
+      "revId": "e89574237f8d8fa315627761729055b702178037",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9cb6d566_275ad40f",
@@ -78,6 +126,30 @@
       "writtenOn": "2026-08-14T18:42:11Z",
       "side": 1,
       "message": "This comment is just re-stating what the code does: https://google.github.io/styleguide/cppguide.html#Implementation_Comment_Donts",
+      "range": {
+        "startLine": 618,
+        "startChar": 0,
+        "endLine": 620,
+        "endChar": 4
+      },
+      "revId": "e89574237f8d8fa315627761729055b702178037",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7c86b72_00442415",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 620,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-14T18:48:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9cb6d566_275ad40f",
       "range": {
         "startLine": 618,
         "startChar": 0,
