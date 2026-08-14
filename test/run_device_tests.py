@@ -1006,6 +1006,7 @@ class AllTests:
             ),
             TestConfig(test_name="restricted_console"),
             TestConfig(test_name="rng_benchmark"),
+            TestConfig(test_name="rollback_lock"),
             TestConfig(
                 config_name="rollback_region0",
                 test_name="rollback",
