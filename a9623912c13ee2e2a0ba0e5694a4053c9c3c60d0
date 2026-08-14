@@ -16,6 +16,60 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "a9623912c13ee2e2a0ba0e5694a4053c9c3c60d0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dd5c85b_df266df8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T02:28:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/0da73ffc-ae20-4abe-8f15-02674ebf73d7)]\n\n### Review Summary\n\n*   **Functionality:** The approach of acquiring the mapped storage lock before disabling the MPU protection effectively resolves the mutex contention issue while the MPU is disabled.\n*   **Style \u0026 Consistency:** I have left inline comments recommending `#ifdef CONFIG_EXTERNAL_STORAGE` instead of `IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)` in `common/rollback.c` to maintain consistency with the rest of the file and ensure compatibility with legacy EC builds.\n*   **Security:** This patch improves the security posture by minimizing the window where MPU hardware protection is disabled, ensuring that any waiting on mutexes happens while protection is active.\n*   **Testing \u0026 Coverage:** Excellent job adding a dedicated hardware test (`rollback_lock.c`) to explicitly verify the lock/unlock ordering and intercepting the function to validate the behavior. The test correctly handles both external and internal storage platforms. \n*   **CL Size \u0026 Scope:** The CL is appropriately scoped to this specific bug fix and is easy to reason about.\n\nTAG\u003dagy\nCONV\u003d9c42ef96-fd17-4138-bb44-418eb7eb260e",
+      "isAi": true,
+      "revId": "a9623912c13ee2e2a0ba0e5694a4053c9c3c60d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6edb0a0c_b1a7d5ed",
+        "filename": "common/rollback.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T02:28:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This should use `#ifdef CONFIG_EXTERNAL_STORAGE` instead of `IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)`.\n\n`common/rollback.c` is compiled for both Zephyr and legacy EC builds. In legacy EC builds, Zephyr-specific Kconfig prefixes like `CONFIG_PLATFORM_EC_` do not exist, so `IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)` will unconditionally evaluate to false. \n\nUsing `#ifdef CONFIG_EXTERNAL_STORAGE` is compatible with both build systems (Zephyr\u0027s EC shim maps the Zephyr config to `CONFIG_EXTERNAL_STORAGE` in `config_zephyr.h`, and legacy EC uses it natively), and matches the existing `#ifdef` usage in `zephyr/shim/src/flash.c`.",
+      "isAi": true,
+      "revId": "a9623912c13ee2e2a0ba0e5694a4053c9c3c60d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c2d3050_2665396f",
+        "filename": "common/rollback.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-14T02:28:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Same here, please use `#ifdef CONFIG_EXTERNAL_STORAGE` instead of `IS_ENABLED(CONFIG_PLATFORM_EC_EXTERNAL_STORAGE)` for consistency and legacy EC compatibility.",
+      "isAi": true,
+      "revId": "a9623912c13ee2e2a0ba0e5694a4053c9c3c60d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
