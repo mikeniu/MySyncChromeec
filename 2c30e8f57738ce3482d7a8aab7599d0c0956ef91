@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d861ea85_15e8540c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-08-15T01:08:12Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8673463907413383377) is being automatically retried for the following reasons:\n- Some child builders are now retryable:betty-msan-fuzzer-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "2c30e8f57738ce3482d7a8aab7599d0c0956ef91",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
