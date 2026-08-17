@@ -21,6 +21,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "add94fe5_0930ac88",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:42:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/f62a15fb-b73f-4acf-9897-5e495dab6ee2)]\n\n### Review Summary\n\n*   **Functionality:** The changes successfully add a zero-size check for `data-\u003etpl_finger_size` during algorithm initialization. By rejecting invalid templates upfront, it prevents potentially undefined behavior downstream. The formatting for `LOG_INF` was also appropriately corrected from `%d` to `%u`.\n*   **Security:** Rejecting 0-sized templates enhances robustness, guarding against memory access issues or logic flaws that could arise from an empty template array.\n*   **Style:** The changes are straightforward and maintain consistency with the existing code style and error-handling patterns.\n*   **Testing \u0026 Test Coverage:** The patch adds a comprehensive unit test (`test_init_template_size_zero_fails`) using a new FFF mock (`custom_get_finger_detailed_info_zero_size`) which correctly verifies that `-EINVAL` is returned when a zero-size template is encountered. This provides solid coverage for the new branch.\n*   **CL Size \u0026 Scope:** The CL is appropriately scoped, addressing only the template size validation and its corresponding test.\n\nTAG\u003dagy\nCONV\u003df62a15fb-b73f-4acf-9897-5e495dab6ee2",
+      "isAi": true,
+      "revId": "898c2ea80bfc125acd2d66616711f922e841b1bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c4b34fd4_c77d4ca4",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
         "patchSetId": 4
