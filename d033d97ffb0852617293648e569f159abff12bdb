@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86c18d0b_3dcbd43a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:37:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/4669293f-bc38-4913-b09b-c3cc308b47eb)]\n\n### Review Summary\n*   **Functionality:** Centralizing test cleanup logic into the `before_fpsensor_auth_commands` fixture correctly applies the DRY principle and ensures every test begins in a known clean state.\n*   **Style \u0026 Consistency:** The fixture hook is implemented consistently with Zephyr\u0027s ZTEST framework standards.\n*   **Security:** N/A (Test code refactoring).\n*   **Testing \u0026 Test Coverage:** The refactoring maintains existing test coverage while significantly improving maintainability. Furthermore, the removal of the mid-test reset in `test_fp_command_establish_session_deny` inherently strengthens that test by validating state resilience after a denied command.\n*   **CL Size \u0026 Scope:** The CL is small, self-contained, and focused solely on the single objective of test fixture refactoring.\n\nTAG\u003dagy\nCONV\u003d78c4223f-7aea-453d-8600-c55148e98bb0",
+      "isAi": true,
+      "revId": "d033d97ffb0852617293648e569f159abff12bdb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02f531ba_3ca96d40",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:37:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Good catch removing the mid-test `fp_reset_and_clear_context()` here. This makes the test more realistic by verifying that a denied `EC_CMD_FP_ESTABLISH_SESSION` attempt doesn\u0027t corrupt the state, and that a subsequent valid sequence (`GENERATE_NONCE` followed by `ESTABLISH_SESSION`) can still succeed natively without an artificial state reset.",
+      "isAi": true,
+      "revId": "d033d97ffb0852617293648e569f159abff12bdb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
