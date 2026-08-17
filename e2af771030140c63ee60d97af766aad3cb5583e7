@@ -278,6 +278,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48601c88_aeb25621",
+        "filename": "zephyr/subsys/pwrmon/pwrmon.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-08-17T07:21:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd2c492b_fc0c5fd7",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 61
+      },
+      "revId": "e2af771030140c63ee60d97af766aad3cb5583e7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "265f9cd2_e0722cec",
