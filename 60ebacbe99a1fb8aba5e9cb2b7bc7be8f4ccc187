@@ -1,0 +1,79 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fedfbbe5_0036aeeb",
+        "filename": "zephyr/test/drivers/default/src/lid_angle.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:57:54Z",
+      "side": 1,
+      "message": "Done. Initialized params_size and version in host_cmd_handler_args.",
+      "parentUuid": "278eee55_ca0cef31",
+      "range": {
+        "startLine": 334,
+        "startChar": 0,
+        "endLine": 334,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "60ebacbe99a1fb8aba5e9cb2b7bc7be8f4ccc187",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4318a1b_f48792cd",
+        "filename": "zephyr/test/drivers/default/src/motion_sense/motion_sense.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:57:54Z",
+      "side": 1,
+      "message": "Done. Zero-initialized data array.",
+      "parentUuid": "b2a053b4_6f694955",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 176,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "60ebacbe99a1fb8aba5e9cb2b7bc7be8f4ccc187",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ca5e0a7_99349ae5",
+        "filename": "zephyr/test/drivers/default/src/motion_sense/motion_sense.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:57:54Z",
+      "side": 1,
+      "message": "Done. Zero-initialized data array.",
+      "parentUuid": "07a85633_ba46a06d",
+      "range": {
+        "startLine": 212,
+        "startChar": 0,
+        "endLine": 212,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "60ebacbe99a1fb8aba5e9cb2b7bc7be8f4ccc187",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
