@@ -21,4 +21,10 @@ config I2C_PASSTHRU_MAX_MSGS
 	  We use a buffer to store the intermediates for i2c_transfer.
 	  This config defines the buffer size.
 
+config CMD_I2C_DTS_PROTECT
+	bool "The EC console command to controll i2c protection"
+	default y
+	help
+	  Enable EC console command to controll i2c protection.
+
 endif # I2C_DTS_PASSTHRU

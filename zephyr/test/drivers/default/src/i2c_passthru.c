@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "console.h"
 #include "driver/ln9310.h"
 #include "ec_commands.h"
 #include "host_command.h"
@@ -12,6 +13,7 @@
 #include "test/drivers/utils.h"
 
 #include <zephyr/kernel.h>
+#include <zephyr/shell/shell.h>
 #include <zephyr/ztest.h>
 
 #ifdef CONFIG_I2C_PASSTHRU_MAX_MSGS
@@ -112,20 +114,17 @@ ZTEST_USER(i2c_passthru, test_passthru_invalid_params)
 
 ZTEST_USER(i2c_passthru, test_passthru_protect)
 {
-	/* TODO Support the test for CONFIG_I2C_DTS_PASSTHRU=y */
-	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED)) {
-		ztest_test_skip();
-		return;
-	}
 	struct ec_response_i2c_passthru_protect response;
+	int test_port = IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU) ? I2C_PORT_USB_C0 :
+							      I2C_PORT_SENSOR;
 	struct ec_params_i2c_passthru_protect status_params = {
-		.port = I2C_PORT_SENSOR,
+		.port = test_port,
 		.subcmd = EC_CMD_I2C_PASSTHRU_PROTECT_STATUS,
 	};
 	struct host_cmd_handler_args status_args = BUILD_HOST_COMMAND(
 		EC_CMD_I2C_PASSTHRU_PROTECT, 0, response, status_params);
 	struct ec_params_i2c_passthru_protect enable_params = {
-		.port = I2C_PORT_SENSOR,
+		.port = test_port,
 		.subcmd = EC_CMD_I2C_PASSTHRU_PROTECT_ENABLE,
 	};
 
@@ -161,7 +160,7 @@ ZTEST_USER(i2c_passthru, test_passthru_protect)
 	zassert_equal(ec_cmd_i2c_passthru_protect(NULL, &status_params,
 						  &response),
 		      EC_RES_INVALID_PARAM, NULL);
-	status_params.port = I2C_PORT_SENSOR;
+	status_params.port = test_port;
 
 	/* Error case: response size not enough */
 	status_args.response_max = 0;
@@ -177,6 +176,38 @@ ZTEST_USER(i2c_passthru, test_passthru_protect)
 	zassert_equal(host_command_process(&status_args),
 		      EC_HOST_CMD_REQUEST_TRUNCATED, NULL);
 	status_args.params_size = sizeof(status_params);
+}
+
+ZTEST_USER(i2c_passthru, test_command_i2cprotect)
+{
+	if (!IS_ENABLED(CONFIG_CMD_I2C_DTS_PROTECT)) {
+		ztest_test_skip();
+		return;
+	}
+
+	/* Show status when unprotected */
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect"),
+		      EC_SUCCESS);
+
+	/* Protect a valid remote_port (0) */
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect 0"),
+		      EC_SUCCESS);
+
+	/* Show status when protected */
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect"),
+		      EC_SUCCESS);
+
+	/* Non-numeric argument returns EC_ERROR_PARAM1 */
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect abc"),
+		      EC_ERROR_PARAM1);
+
+	/* Invalid remote port returns EC_ERROR_PARAM1 */
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect 99"),
+		      EC_ERROR_PARAM1);
+
+	/* Too many arguments returns EC_ERROR_PARAM_COUNT */
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect 0 1"),
+		      EC_ERROR_PARAM_COUNT);
 }
 
 ZTEST_USER(i2c_passthru, test_passthru_protect_tcpcs)
@@ -239,6 +270,66 @@ ZTEST_USER(i2c_passthru, test_passthru_protect_tcpcs)
 	zassert_ok(ec_cmd_i2c_passthru_protect(NULL, &enable_params,
 					       &enable_response),
 		   NULL);
+
+	zassert_equal(host_command_process(&passthru_args),
+		      EC_RES_ACCESS_DENIED);
+}
+
+ZTEST_USER(i2c_passthru, test_passthru_protect_all)
+{
+	if (!IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
+		ztest_test_skip();
+		return;
+	}
+
+	struct ec_params_i2c_passthru_protect enable_params = {
+		.subcmd = EC_CMD_I2C_PASSTHRU_PROTECT_ENABLE_ALL,
+	};
+	struct ec_response_i2c_passthru_protect enable_response;
+	uint16_t tcpc_addr = DT_REG_ADDR(DT_NODELABEL(tcpci_emul));
+	uint8_t *out_data;
+	uint8_t param_buf[sizeof(struct ec_params_i2c_passthru) +
+			  2 * sizeof(struct ec_params_i2c_passthru_msg) + 1];
+	uint8_t response_buf[sizeof(struct ec_response_i2c_passthru) + 2];
+	struct ec_params_i2c_passthru *passthru_params =
+		(struct ec_params_i2c_passthru *)&param_buf;
+	struct ec_response_i2c_passthru *passthru_response =
+		(struct ec_response_i2c_passthru *)&response_buf;
+	struct host_cmd_handler_args passthru_args =
+		BUILD_HOST_COMMAND_SIMPLE(EC_CMD_I2C_PASSTHRU, 0);
+
+	passthru_params->port = I2C_PORT_USB_C0;
+	passthru_params->num_msgs = 2;
+	passthru_params->msg[0].addr_flags = tcpc_addr;
+	passthru_params->msg[0].len = 1;
+	passthru_params->msg[1].addr_flags = tcpc_addr | EC_I2C_FLAG_READ;
+	passthru_params->msg[1].len = 2; /* 2 byte vendor ID */
+
+	/* Write data follows the passthru messages */
+	out_data = (uint8_t *)&passthru_params->msg[2];
+	out_data[0] = 0; /* TCPC_REG_VENDOR_ID 0x0 */
+
+	passthru_args.params = &param_buf;
+	passthru_args.params_size = sizeof(param_buf);
+	passthru_args.response = &response_buf;
+	passthru_args.response_max = sizeof(response_buf);
+
+	/* Protect all I2C buses */
+	zassert_ok(ec_cmd_i2c_passthru_protect(NULL, &enable_params,
+					       &enable_response),
+		   NULL);
+
+	/* If the system is unlocked, passthru is allowed */
+	system_is_locked_fake.return_val = false;
+
+	zassert_ok(host_command_process(&passthru_args));
+	CHECK_ARGS_RESULT(args)
+	zassert_ok(passthru_response->i2c_status);
+	zassert_equal(passthru_args.response_size,
+		      sizeof(struct ec_response_i2c_passthru) + 2, NULL);
+
+	/* After protection on, passthru while the system is locked is denied */
+	system_is_locked_fake.return_val = true;
 
 	zassert_equal(host_command_process(&passthru_args),
 		      EC_RES_ACCESS_DENIED);
