@@ -8,6 +8,7 @@
 def register_skyrim_project(
     project_name,
     snippets=None,
+    extra_modules=(),
 ):
     """Register a variant of skyrim."""
     register_npcx_project(
@@ -24,6 +25,7 @@ def register_skyrim_project(
         ],
         boards=["skyrim"],
         snippets=snippets,
+        modules=["cmsis_6", *extra_modules, "ec"],
     )
 
 
@@ -35,6 +37,7 @@ register_skyrim_project(
 register_skyrim_project(
     project_name="winterhold",
     snippets=["npcx-45mhz"],
+    extra_modules=["pigweed"],
 )
 
 
