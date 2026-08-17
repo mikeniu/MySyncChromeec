@@ -1,0 +1,54 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e5f4e8f_3175d39f",
+        "filename": "zephyr/test/queue/src/main.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:23:49Z",
+      "side": 1,
+      "message": "Done. Updated buf1 and buf2 to int16_t to match test_queue2 element type.",
+      "parentUuid": "719e18fe_b1846426",
+      "range": {
+        "startLine": 134,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "7b74276fb970c9e0345189d583718efc15b5b23a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "765eace4_1b3ecde6",
+        "filename": "zephyr/test/queue/src/main.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:23:49Z",
+      "side": 1,
+      "message": "Done. Updated zassert_mem_equal byte size parameter to 2 * sizeof(int16_t).",
+      "parentUuid": "6278b152_49fdacad",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "7b74276fb970c9e0345189d583718efc15b5b23a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
