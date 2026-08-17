@@ -14,4 +14,10 @@ module = I2C_DTS_PASSTHRU
 module-str = i2c_dts_passthru
 source "subsys/logging/Kconfig.template.log_config"
 
+config CMD_I2C_DTS_PROTECT
+	bool "The EC console command to controll i2c protection"
+	default y
+	help
+	  Enable EC console command to controll i2c protection.
+
 endif # I2C_DTS_PASSTHRU
