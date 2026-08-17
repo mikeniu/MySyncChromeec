@@ -22,6 +22,31 @@
       },
       "revId": "a178a55292142e174d7632b4102c1c7c5ae60bcd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b90550fa_f0986a5e",
+        "filename": "zephyr/test/math/src/vector.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T21:00:11Z",
+      "side": 1,
+      "message": "Done. Updated comment to clarify row-vector multiplication behavior.",
+      "parentUuid": "2410635d_40d0be59",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "a178a55292142e174d7632b4102c1c7c5ae60bcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
