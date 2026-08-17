@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef816f6b_940f34bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-08-17T23:08:42Z",
+      "side": 1,
+      "message": "kinmen doesn\u0027t build with this patch.\ni doubt anyone cares about kinmen - should be OK to set it back\nto the original config to get it to compile.",
+      "revId": "7151ed629818ab026965c675a92697c4ecfcc93b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
