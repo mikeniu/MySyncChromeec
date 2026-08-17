@@ -1,0 +1,54 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a435784e_7af0d415",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_crypto_stateful.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:59:25Z",
+      "side": 1,
+      "message": "Fixed: replaced 0x010/0x012 with 0x10/0x12.",
+      "parentUuid": "594d2cac_195e55ed",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "444b287e8fdbff2074fdcea62dc72c37d4377b7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12b190fd_14900aef",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_crypto.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:59:25Z",
+      "side": 1,
+      "message": "Fixed: removed stray semicolon.",
+      "parentUuid": "4c69957b_a661a298",
+      "range": {
+        "startLine": 532,
+        "startChar": 0,
+        "endLine": 532,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "444b287e8fdbff2074fdcea62dc72c37d4377b7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
