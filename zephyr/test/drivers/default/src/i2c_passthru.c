@@ -14,6 +14,12 @@
 #include <zephyr/kernel.h>
 #include <zephyr/ztest.h>
 
+#ifdef CONFIG_I2C_PASSTHRU_MAX_MSGS
+#define I2C_PASSTHRU_MAX_MSGS CONFIG_I2C_PASSTHRU_MAX_MSGS
+#else
+#define I2C_PASSTHRU_MAX_MSGS 2
+#endif
+
 FAKE_VALUE_FUNC(int, board_allow_i2c_passthru, const struct i2c_cmd_desc_t *);
 
 int board_allow_i2c_passthru_custom_fake(const struct i2c_cmd_desc_t *cmd_desc)
@@ -34,8 +40,11 @@ ZTEST_USER(i2c_passthru, test_read_without_write)
 		(struct ec_response_i2c_passthru *)&response_buf;
 	struct host_cmd_handler_args args =
 		BUILD_HOST_COMMAND_SIMPLE(EC_CMD_I2C_PASSTHRU, 0);
+	/* Remote port is defined in the i2c-passthru in native_sim.overlay */
+	uint8_t test_port =
+		IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU) ? 5 : I2C_PORT_POWER;
 
-	params->port = I2C_PORT_POWER;
+	params->port = test_port;
 	params->num_msgs = 1;
 	params->msg[0].addr_flags = LN9310_I2C_ADDR_0_FLAGS | EC_I2C_FLAG_READ;
 	params->msg[0].len = 1;
@@ -103,6 +112,11 @@ ZTEST_USER(i2c_passthru, test_passthru_invalid_params)
 
 ZTEST_USER(i2c_passthru, test_passthru_protect)
 {
+	/* TODO Support the test for CONFIG_I2C_DTS_PASSTHRU=y */
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED)) {
+		ztest_test_skip();
+		return;
+	}
 	struct ec_response_i2c_passthru_protect response;
 	struct ec_params_i2c_passthru_protect status_params = {
 		.port = I2C_PORT_SENSOR,
@@ -167,6 +181,10 @@ ZTEST_USER(i2c_passthru, test_passthru_protect)
 
 ZTEST_USER(i2c_passthru, test_passthru_protect_tcpcs)
 {
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED)) {
+		ztest_test_skip();
+		return;
+	}
 	struct ec_params_i2c_passthru_protect enable_params = {
 		.port = I2C_PORT_SENSOR,
 		.subcmd = EC_CMD_I2C_PASSTHRU_PROTECT_ENABLE_TCPCS,
@@ -253,7 +271,8 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted)
 	struct host_cmd_handler_args ps8xxx_args =
 		BUILD_HOST_COMMAND_SIMPLE(EC_CMD_I2C_PASSTHRU, 0);
 
-	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED)) {
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED) &&
+	    !IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
 		ztest_test_skip();
 		return;
 	}
@@ -326,7 +345,27 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted)
 	zassert_equal(tcpc_args.response_size,
 		      sizeof(struct ec_response_i2c_passthru) + 2, NULL);
 
-	zassert_equal(host_command_process(&ps8xxx_args), EC_RES_ACCESS_DENIED);
+	if (IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
+		/* board_allow_i2c_passthru_custom_fake is ignored in
+		 * CONFIG_I2C_DTS_PASSTHRU mode. */
+		zassert_ok(host_command_process(&ps8xxx_args));
+	} else {
+		/* board_allow_i2c_passthru_custom_fake rejects the access in
+		 * CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED mode */
+		zassert_equal(host_command_process(&ps8xxx_args),
+			      EC_RES_ACCESS_DENIED);
+	}
+
+	if (IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
+		/* Use an address that is not in the dts allow list. */
+		uint16_t invalid_tcpc_addr = tcpc_addr ^ 0xFF;
+		tcpc_params->msg[0].addr_flags = invalid_tcpc_addr;
+		tcpc_params->msg[1].addr_flags = invalid_tcpc_addr |
+						 EC_I2C_FLAG_READ;
+
+		zassert_equal(host_command_process(&tcpc_args),
+			      EC_RES_ACCESS_DENIED);
+	}
 }
 
 ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
@@ -336,7 +375,11 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
 		ztest_test_skip();
 		return;
 	}
+#ifdef CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY
 	uint16_t vb_addr = VIRTUAL_BATTERY_ADDR_FLAGS;
+#else
+	uint16_t vb_addr = 0xB;
+#endif
 	uint8_t *out_data;
 	uint8_t vb_param_buf[sizeof(struct ec_params_i2c_passthru) +
 			     2 * sizeof(struct ec_params_i2c_passthru_msg) +
@@ -403,6 +446,77 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
 	zassert_ok(vb_response->i2c_status);
 	zassert_equal(vb_args.response_size,
 		      sizeof(struct ec_response_i2c_passthru) + 2, NULL);
+}
+
+ZTEST_USER(i2c_passthru, test_passthru_zephyr_i2c_xfer_i2c_message_queue)
+{
+	if (!IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
+		ztest_test_skip();
+		return;
+	}
+
+	uint16_t ps8xxx_addr = DT_REG_ADDR(DT_NODELABEL(ps8xxx_emul));
+	uint8_t ps8xxx_param_buf[sizeof(struct ec_params_i2c_passthru) +
+				 (I2C_PASSTHRU_MAX_MSGS +
+				  1) * sizeof(struct ec_params_i2c_passthru_msg) +
+				 1] = { 0 };
+	uint8_t ps8xxx_rsp_buf[sizeof(struct ec_response_i2c_passthru) +
+			       2 * I2C_PASSTHRU_MAX_MSGS] = { 0 };
+	struct ec_params_i2c_passthru *ps8xxx_params =
+		(struct ec_params_i2c_passthru *)&ps8xxx_param_buf;
+	struct ec_response_i2c_passthru *ps8xxx_response =
+		(struct ec_response_i2c_passthru *)&ps8xxx_rsp_buf;
+	struct host_cmd_handler_args ps8xxx_args =
+		BUILD_HOST_COMMAND_SIMPLE(EC_CMD_I2C_PASSTHRU, 0);
+	uint8_t *out_data;
+	uint8_t another_addr = ps8xxx_addr ^ 0xFF;
+
+	ps8xxx_args.params = &ps8xxx_param_buf;
+	ps8xxx_args.params_size = sizeof(ps8xxx_param_buf);
+	ps8xxx_args.response = &ps8xxx_rsp_buf;
+	ps8xxx_args.response_max = sizeof(ps8xxx_rsp_buf);
+
+	ps8xxx_params->port = I2C_PORT_USB_C1;
+	ps8xxx_params->num_msgs = 2;
+	ps8xxx_params->msg[0].addr_flags = ps8xxx_addr;
+	ps8xxx_params->msg[0].len = 1;
+	ps8xxx_params->msg[1].addr_flags = ps8xxx_addr | EC_I2C_FLAG_READ;
+	ps8xxx_params->msg[1].len = 2; /* 2 byte vendor ID */
+
+	out_data = (uint8_t *)&ps8xxx_params->msg[2];
+	out_data[0] = 0; /* TCPC_REG_VENDOR_ID 0x0 */
+
+	system_is_locked_fake.return_val = true;
+
+	/* Verify that basic access is good */
+	zassert_equal(host_command_process(&ps8xxx_args), EC_RES_SUCCESS);
+	zassert_ok(ps8xxx_response->i2c_status);
+
+	/* Test that zephyr_i2c_xfer_i2c_message_queue rejects multiple
+	 * addresses */
+	ps8xxx_params->msg[0].addr_flags = another_addr;
+	ps8xxx_params->msg[1].addr_flags = ps8xxx_addr | EC_I2C_FLAG_READ;
+
+	zassert_true(another_addr != ps8xxx_addr);
+	zassert_equal(host_command_process(&ps8xxx_args), EC_RES_SUCCESS);
+	zassert_equal(ps8xxx_response->i2c_status, EC_I2C_STATUS_NAK);
+
+	/* Test that zephyr_i2c_xfer_i2c_message_queue rejects commands which
+	 * contain more than CONFIG_I2C_PASSTHRU_MAX_MSGS messages */
+	ps8xxx_params->msg[0].addr_flags = ps8xxx_addr;
+	ps8xxx_params->msg[0].len = 1;
+	for (int i = 1; i < I2C_PASSTHRU_MAX_MSGS + 1; i++) {
+		ps8xxx_params->msg[i].addr_flags = ps8xxx_addr |
+						   EC_I2C_FLAG_READ;
+		ps8xxx_params->msg[i].len = 2;
+	}
+	ps8xxx_params->num_msgs = I2C_PASSTHRU_MAX_MSGS + 1;
+
+	out_data = (uint8_t *)&ps8xxx_params->msg[ps8xxx_params->num_msgs];
+	out_data[0] = 0; /* TCPC_REG_VENDOR_ID 0x0 */
+
+	zassert_equal(host_command_process(&ps8xxx_args), EC_RES_SUCCESS);
+	zassert_equal(ps8xxx_response->i2c_status, EC_I2C_STATUS_NAK);
 }
 
 static void i2c_passthru_before(void *state)

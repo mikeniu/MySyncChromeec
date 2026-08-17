@@ -414,6 +414,30 @@
 		};
 	};
 
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		battery_passthru: port0@0 {
+			reg = <0>;
+			i2c-port = <&i2c0>;
+		};
+		power_passthru: port5@5 {
+			reg = <5>;
+			i2c-port = <&i2c0>;
+		};
+		usb_c0_passthru: port2@2 {
+			reg = <2>;
+			i2c-port = <&i2c2>;
+			devices = [82];
+		};
+		usb_c1_passthru: port3@3 {
+			reg = <3>;
+			i2c-port = <&i2c3>;
+		};
+	};
+
 	batteries {
 		default_battery: lgc_ac17a8m {
 			compatible = "lgc,ac17a8m", "battery-smart";

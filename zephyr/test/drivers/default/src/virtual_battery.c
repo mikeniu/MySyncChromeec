@@ -78,8 +78,13 @@ static void i2c_passthru_xfer(uint8_t port, uint8_t addr, uint8_t *write_buf,
 static inline void virtual_battery_xfer(uint8_t *write_buf, int write_len,
 					uint8_t **read_buf, int read_len)
 {
-	i2c_passthru_xfer(I2C_PORT_VIRTUAL_BATTERY, VIRTUAL_BATTERY_ADDR_FLAGS,
-			  write_buf, write_len, read_buf, read_len);
+#ifdef CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY
+	uint16_t vb_addr = VIRTUAL_BATTERY_ADDR_FLAGS;
+#else
+	uint16_t vb_addr = 0xB;
+#endif
+	i2c_passthru_xfer(I2C_PORT_VIRTUAL_BATTERY, vb_addr, write_buf,
+			  write_len, read_buf, read_len);
 }
 
 static uint16_t virtual_battery_read16(uint8_t command)
@@ -129,6 +134,11 @@ static void virtual_battery_read_data(uint8_t command, char **read_buf,
 
 ZTEST_USER(virtual_battery, test_read_regs)
 {
+	/* TODO Support the test for CONFIG_I2C_DTS_PASSTHRU=y */
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED)) {
+		ztest_test_skip();
+		return;
+	}
 	const struct emul *emul = EMUL_DT_GET(BATTERY_NODE);
 	struct sbat_emul_bat_data *bat = sbat_emul_get_bat_data(emul);
 	int16_t int16;
@@ -292,6 +302,11 @@ ZTEST(virtual_battery, test_read_data_from_host_memmap)
 
 ZTEST(virtual_battery, test_read_status_critical_charge)
 {
+	/* TODO Support the test for CONFIG_I2C_DTS_PASSTHRU=y */
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED)) {
+		ztest_test_skip();
+		return;
+	}
 	struct ec_response_battery_dynamic_info_v1 *const bd =
 		&battery_dynamic[BATT_IDX_MAIN];
 
