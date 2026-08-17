@@ -33,6 +33,23 @@
       "message": "I\u0027m pretty confident that the watchdog was due to the TICK macro having the wrong divider. I have not been able to see the watchdog since adding that fix into my image",
       "revId": "6af0d3fce7ea6f8817956cdee9d553e78ba55a79",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f2d5e40_31aaccf2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T22:03:51Z",
+      "side": 1,
+      "message": "@keithshort@chromium.org I haven\u0027t yet observed this CL to mitigate a watchdog independently of the I2C fixes, and I\u0027d still like to.\n\nBut do you think this is theoretically sound? Should the default value for this config be changed more broadly than this program?",
+      "revId": "6af0d3fce7ea6f8817956cdee9d553e78ba55a79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
