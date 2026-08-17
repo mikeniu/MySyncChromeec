@@ -35,6 +35,29 @@
       "isAi": true,
       "revId": "2d9148a1247eb23df081431d8be1c758a56bf07a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2424b5d4_23f4fe1d",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T16:54:45Z",
+      "side": 1,
+      "message": "Let\u0027s go ahead and zero initialize these: \n\n```\nCleanseWrapper\u003cstd::array\u003cuint8_t, FP_CONTEXT_NONCE_BYTES\u003e\u003e nonce{};\nCleanseWrapper\u003cstd::array\u003cuint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES\u003e\u003e encryption_salt{};\nCleanseWrapper\u003cstd::array\u003cuint8_t, FP_CONTEXT_TAG_BYTES\u003e\u003e tag{};\n```",
+      "range": {
+        "startLine": 563,
+        "startChar": 0,
+        "endLine": 566,
+        "endChar": 64
+      },
+      "revId": "2d9148a1247eb23df081431d8be1c758a56bf07a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
