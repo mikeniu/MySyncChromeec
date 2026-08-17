@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2410635d_40d0be59",
+        "filename": "zephyr/test/math/src/vector.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:23:03Z",
+      "side": 1,
+      "message": "The matrix `R` defined here is mathematically a **+90 degree** rotation matrix (assuming standard column vectors). However, because `rotate()` multiplies the vector as a row vector (`v^T * R`), it effectively applies the transpose of the matrix, resulting in a **-90 degree** rotation. This is why the expected rotated vector on line 85 has `-10` for the Y axis instead of `10`.\\n\\nYou might want to update this comment to clarify this behavior, e.g., `/* +90 degree rotation matrix (results in -90 deg rotation due to row-vector multiplication in rotate()) */` to prevent any confusion for future readers.",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 66,
+        "endChar": 0
+      },
+      "revId": "a178a55292142e174d7632b4102c1c7c5ae60bcd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
