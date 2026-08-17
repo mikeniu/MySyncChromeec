@@ -124,6 +124,29 @@
       "isAi": true,
       "revId": "673af06dccb02523f4a28680c1d3efca4d8e7553",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7eb0648_0e3632c5",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:24:21Z",
+      "side": 1,
+      "message": "This appears to be a tautology since `curr-\u003ebatt.flags` is being compared to the value it was just assigned to in the previous line. \n\nDid you intend to test a getter function here (e.g. `charge_get_battery_flags()`)?",
+      "range": {
+        "startLine": 409,
+        "startChar": 0,
+        "endLine": 409,
+        "endChar": 0
+      },
+      "revId": "673af06dccb02523f4a28680c1d3efca4d8e7553",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
