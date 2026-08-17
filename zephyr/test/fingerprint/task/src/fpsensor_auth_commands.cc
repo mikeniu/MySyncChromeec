@@ -2070,6 +2070,142 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_busy)
 	global_context.sensor_mode = 0;
 }
 
+ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_decrypted)
+{
+	struct ec_params_fp_seed seed_params = {
+		.struct_version = FP_TEMPLATE_FORMAT_VERSION,
+		.reserved = 0,
+		.seed = { 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5,
+			  6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1 },
+	};
+	zassert_equal(test_send_host_command(EC_CMD_FP_SEED, 0, &seed_params,
+					     sizeof(seed_params), NULL, 0),
+		      EC_RES_SUCCESS);
+
+	struct ec_params_fp_context_v1 ctx_params = {
+		.action = FP_CONTEXT_GET_RESULT,
+		.userid = { 0, 1, 2, 3, 4, 5, 6, 7 },
+	};
+	zassert_equal(test_send_host_command(EC_CMD_FP_CONTEXT, 1, &ctx_params,
+					     sizeof(ctx_params), NULL, 0),
+		      EC_RES_SUCCESS);
+
+	constexpr size_t head_size = offsetof(ec_params_fp_template, data);
+	constexpr size_t metadata_size =
+		sizeof(ec_fp_template_encryption_metadata);
+	constexpr size_t template_size = sizeof(fp_template[0]);
+	constexpr size_t salt_size =
+		sizeof(global_context.fp_positive_match_salt[0]);
+	constexpr size_t params_size =
+		head_size + metadata_size + template_size + salt_size;
+
+	std::array<uint8_t, params_size> params = {};
+	std::span head(params.begin(), head_size);
+	std::span enc_metadata(head.end(), metadata_size);
+	std::span template_data(enc_metadata.end(), template_size);
+	std::span salt_data(template_data.end(), salt_size);
+
+	struct ec_params_fp_template head_data = {
+		.offset = 0,
+		.size = static_cast<uint32_t>(FP_TEMPLATE_COMMIT |
+					      (params_size - head_size)),
+	};
+	static_assert(head_size == sizeof(head_data));
+	memcpy(head.data(), &head_data, head.size());
+
+	std::ranges::fill(template_data, 0xc4);
+	std::ranges::fill(salt_data, 0xab);
+
+	struct fp_auth_command_encryption_metadata info;
+	encrypt_data_in_place(1, info, global_context.user_id,
+			      global_context.tpm_seed,
+			      { template_data.data(),
+				template_data.size() + salt_data.size() });
+
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
+		.struct_version = 4
+	};
+	std::ranges::copy(info.nonce, enc_metadata_data.nonce);
+	std::ranges::copy(info.encryption_salt,
+			  enc_metadata_data.encryption_salt);
+	std::ranges::copy(info.tag, enc_metadata_data.tag);
+	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
+
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0,
+					     params.data(), params.size(), NULL,
+					     0),
+		      EC_RES_SUCCESS);
+
+	zassert_equal(global_context.templ_valid, 1u);
+}
+
+ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_trivial_salt)
+{
+	struct ec_params_fp_seed seed_params = {
+		.struct_version = FP_TEMPLATE_FORMAT_VERSION,
+		.reserved = 0,
+		.seed = { 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5,
+			  6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1 },
+	};
+	zassert_equal(test_send_host_command(EC_CMD_FP_SEED, 0, &seed_params,
+					     sizeof(seed_params), NULL, 0),
+		      EC_RES_SUCCESS);
+
+	struct ec_params_fp_context_v1 ctx_params = {
+		.action = FP_CONTEXT_GET_RESULT,
+		.userid = { 0, 1, 2, 3, 4, 5, 6, 7 },
+	};
+	zassert_equal(test_send_host_command(EC_CMD_FP_CONTEXT, 1, &ctx_params,
+					     sizeof(ctx_params), NULL, 0),
+		      EC_RES_SUCCESS);
+
+	constexpr size_t head_size = offsetof(ec_params_fp_template, data);
+	constexpr size_t metadata_size =
+		sizeof(ec_fp_template_encryption_metadata);
+	constexpr size_t template_size = sizeof(fp_template[0]);
+	constexpr size_t salt_size =
+		sizeof(global_context.fp_positive_match_salt[0]);
+	constexpr size_t params_size =
+		head_size + metadata_size + template_size + salt_size;
+
+	std::array<uint8_t, params_size> params = {};
+	std::span head(params.begin(), head_size);
+	std::span enc_metadata(head.end(), metadata_size);
+	std::span template_data(enc_metadata.end(), template_size);
+	std::span salt_data(template_data.end(), salt_size);
+
+	struct ec_params_fp_template head_data = {
+		.offset = 0,
+		.size = static_cast<uint32_t>(FP_TEMPLATE_COMMIT |
+					      (params_size - head_size)),
+	};
+	static_assert(head_size == sizeof(head_data));
+	memcpy(head.data(), &head_data, head.size());
+
+	std::ranges::fill(template_data, 0xc4);
+	std::ranges::fill(salt_data, 0x00); /* All zeros salt. */
+
+	struct fp_auth_command_encryption_metadata info;
+	encrypt_data_in_place(1, info, global_context.user_id,
+			      global_context.tpm_seed,
+			      { template_data.data(),
+				template_data.size() + salt_data.size() });
+
+	struct ec_fp_template_encryption_metadata enc_metadata_data{
+		.struct_version = 4
+	};
+	std::ranges::copy(info.nonce, enc_metadata_data.nonce);
+	std::ranges::copy(info.encryption_salt,
+			  enc_metadata_data.encryption_salt);
+	std::ranges::copy(info.tag, enc_metadata_data.tag);
+	memcpy(enc_metadata.data(), &enc_metadata_data, enc_metadata.size());
+
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0,
+					     params.data(), params.size(), NULL,
+					     0),
+		      EC_RES_INVALID_PARAM);
+}
+
 ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_disabled_under_auth)
 {
 	std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
