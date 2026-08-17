@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11364534_abdcfae4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:41:51Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n*   **Functionality:** The CL correctly adds a zero-size check for `tpl_finger_size` during algorithm initialization, preventing initialization from succeeding with an invalid template size.\n*   **Security:** Rejecting an invalid size early helps mitigate memory-related vulnerabilities that might result from operating on an empty array or size calculation underflows.\n*   **Style:** The patch correctly updates the format specifiers (`%u`) for logging unsigned integers.\n*   **Testing \u0026 Test Coverage:** Excellent coverage. The author provided a dedicated FFF mock (`custom_get_finger_detailed_info_zero_size`) and a clear unit test (`test_init_template_size_zero_fails`) asserting the expected `-EINVAL` error.\n*   **CL Size \u0026 Scope:** The CL is well-scoped, small, and atomic.\n\nTAG\u003dagy\nCONV\u003ddf79f607-3bf6-4883-b95c-708ce19edeca",
+      "isAi": true,
+      "revId": "898c2ea80bfc125acd2d66616711f922e841b1bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4b34fd4_c77d4ca4",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:41:51Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Optional suggestion:** The return value of `focal_algo_get_finger_detailed_info` is not being checked. Since you are adding validation for the populated `tpl_finger_size` below, it might also be a good idea to check if this function succeeds before using the variables it populates. If it returns an error code, it\u0027s safer to propagate the error immediately rather than relying on the subsequent size checks.",
+      "isAi": true,
+      "revId": "898c2ea80bfc125acd2d66616711f922e841b1bc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
