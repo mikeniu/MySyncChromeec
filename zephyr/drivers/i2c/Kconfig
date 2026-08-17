@@ -5,6 +5,7 @@
 config I2C_DTS_PASSTHRU
 	bool "I2C Passthru DTS Restrictions Driver"
 	depends on !PLATFORM_EC_I2C_PASSTHRU_RESTRICTED
+	depends on !PLATFORM_EC_I2C_VIRTUAL_BATTERY
 	help
 	  Enable the I2C Passthru DTS restrictions driver.
 

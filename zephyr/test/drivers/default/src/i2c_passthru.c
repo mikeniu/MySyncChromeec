@@ -457,7 +457,8 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted)
 
 ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
 {
-	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY) ||
+	if ((!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY) &&
+	     !IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) ||
 	    !IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_SMART)) {
 		ztest_test_skip();
 		return;
@@ -533,6 +534,24 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
 	zassert_ok(vb_response->i2c_status);
 	zassert_equal(vb_args.response_size,
 		      sizeof(struct ec_response_i2c_passthru) + 2, NULL);
+
+	/* Allowed but not implemented SB_OPTIONAL_MFG_FUNC4 command */
+	vb_params->num_msgs = 2;
+	vb_params->msg[0].addr_flags = vb_addr;
+	vb_params->msg[0].len = 1;
+	vb_params->msg[1].addr_flags = vb_addr | EC_I2C_FLAG_READ;
+	vb_params->msg[1].len = 2;
+
+	out_data = (uint8_t *)&vb_params->msg[vb_params->num_msgs];
+	out_data[0] = 0x3f; /* SB_OPTIONAL_MFG_FUNC4 0x3f */
+
+	zassert_equal(host_command_process(&vb_args), EC_RES_SUCCESS);
+	if (IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
+		zassert_equal(vb_response->i2c_status, EC_I2C_STATUS_NAK);
+	} else {
+		/* TODO: Make a fix for legacy i2c passthru. */
+		zassert_ok(vb_response->i2c_status);
+	}
 }
 
 ZTEST_USER(i2c_passthru, test_passthru_zephyr_i2c_xfer_i2c_message_queue)
