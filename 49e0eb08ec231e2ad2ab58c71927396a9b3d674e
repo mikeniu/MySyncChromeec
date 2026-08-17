@@ -24,6 +24,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20d437e6_ca15288c",
+        "filename": "zephyr/test/rwsig/src/rwsig.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T21:25:22Z",
+      "side": 1,
+      "message": "Done. Added __aligned(4) to data array.",
+      "parentUuid": "be332946_1b776963",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 281,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "49e0eb08ec231e2ad2ab58c71927396a9b3d674e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "99c744c6_84a358bc",
@@ -43,6 +68,31 @@
         "endLine": 312,
         "endChar": 0
       },
+      "revId": "49e0eb08ec231e2ad2ab58c71927396a9b3d674e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0bf6c2b_7197a36e",
+        "filename": "zephyr/test/rwsig/src/rwsig.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T21:25:22Z",
+      "side": 1,
+      "message": "Done. Chunked SHA256_update into 128-byte zero blocks.",
+      "parentUuid": "99c744c6_84a358bc",
+      "range": {
+        "startLine": 312,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 0
+      },
+      "isAi": true,
       "revId": "49e0eb08ec231e2ad2ab58c71927396a9b3d674e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
