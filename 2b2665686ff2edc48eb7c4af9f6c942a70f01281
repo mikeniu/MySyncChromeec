@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "944ea10d_151c7b54",
+        "filename": "zephyr/test/usb_typec_drp_acc_trysrc/src/test_usb_typec_drp_acc_trysrc.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d804880c_39ac99a5",
+      "revId": "2b2665686ff2edc48eb7c4af9f6c942a70f01281",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f938564e_925bda4f",
@@ -49,6 +67,24 @@
       "writtenOn": "2026-06-30T14:54:06Z",
       "side": 1,
       "message": "I think the set of cases here make sense. Structurally, I think the tests should be different.\n\nInstead of directly calling one of the TC run functions, they should set up a fake partner with its CC lines set in a certain way. In the cases where it doesn\u0027t make it to PD, that might be as simple as TCPC emulator call to set CC_STATUS.\n\nOnce we\u0027ve gotten the TC into the appropriate state, the check should be that the port is or is not sourcing VBUS. There shouldn\u0027t be a need to reach in and check the arguments passed to `set_state_tc`.\n\nAs a beneficial side effect, I think that would avoid the need for most of the fakes currently in use.",
+      "revId": "2b2665686ff2edc48eb7c4af9f6c942a70f01281",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "008bcf50_d50e5758",
+        "filename": "zephyr/test/usb_typec_drp_acc_trysrc/src/test_usb_typec_drp_acc_trysrc.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "This file is no longer part of this CL, and these concerns have been addressed.",
+      "parentUuid": "f938564e_925bda4f",
       "revId": "2b2665686ff2edc48eb7c4af9f6c942a70f01281",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +106,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08c59b0a_9d24e8b3",
+        "filename": "zephyr/test/usb_typec_drp_acc_trysrc/src/usb_typec_drp_acc_trysrc_shim.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "This is no longer present.",
+      "parentUuid": "89852c1a_641f94fb",
+      "revId": "2b2665686ff2edc48eb7c4af9f6c942a70f01281",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "400aa645_95f97043",
@@ -83,6 +137,24 @@
       "writtenOn": "2026-06-30T14:54:06Z",
       "side": 1,
       "message": "I don\u0027t think it\u0027s appropriate to re-implement these enums or fake most of these functions for a test. The test should be running the actual TC, and the actual TC should be using its ordinary internals.",
+      "revId": "2b2665686ff2edc48eb7c4af9f6c942a70f01281",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fc20052_c29b4c5d",
+        "filename": "zephyr/test/usb_typec_drp_acc_trysrc/src/usb_typec_drp_acc_trysrc_shim.h",
+        "patchSetId": 27
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "This is no longer present.",
+      "parentUuid": "400aa645_95f97043",
       "revId": "2b2665686ff2edc48eb7c4af9f6c942a70f01281",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

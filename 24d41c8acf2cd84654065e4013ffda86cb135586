@@ -1,0 +1,135 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "219b000b_ac9712cf",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "Nit: It would be more consistent with real-life usage to define two ports for the test, one DTS and one regular. Then run the non-DTS case on the non-DTS port and the DTS case on the DTS port. Then you wouldn\u0027t need to override the DTS port check. But if that would be pointlessly tedious to implement, then this is fine.",
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9ca2e82_eb86b794",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "Should this be `__override`?",
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0943e114_f649ad7c",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "Could this and the sink extension init be in `_setup`? It seems weird to not initialize anything in `_setup`.",
+      "range": {
+        "startLine": 59,
+        "startChar": 1,
+        "endLine": 60,
+        "endChar": 55
+      },
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c859edcc_312920b4",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "I\u0027m not sure whether it makes more sense to disconnect in `_before` or `_after`, but it seems weird to need to do it in both.",
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc22250a_5ed31339",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "What does this do?",
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6eb5105_1daea3b3",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "Is this stuff redundant with `_before`? What do you get by doing this twice per test?",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 23
+      },
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa94b300_ff41e229",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "If everything is piped through correctly, this should cause `cc_is_snk_dbg_acc` to return `true`. The coverage report suggests that that\u0027s not happening.\n\nIt looks like you don\u0027t have a test case here for debug accessory/no DTS port/DRP toggle staying in AttachWait.SRC, which was the new behavior added in this CL. In addition to verifying the intended behavior, such a test case is probably also the easiest way to make sure these tests are working as intended. All of the tests you have so far should get the same result without this CL. It will be easier to check that the coverage results make sense with this additional positive behavior test.",
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

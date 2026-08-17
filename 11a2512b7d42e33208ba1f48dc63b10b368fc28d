@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7aab1273_82cf5bc4",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 3059,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "The results reported in Gerrit here are essentially the same as before, but now I would expect the tests to cover all of these lines. I note that the `lcov` HTML output for this run shows line 3059 as uncovered. That would imply that `cc_is_snk_dbg_acc` never evaluated to `true`, and it\u0027s consistent with no lines from 3059 to 3075 being covered.\n\nIt\u0027s possible that the included tests aren\u0027t working as intended and still passing, but that doesn\u0027t explain the Gerrit behavior.\n\n@jbettis@chromium.org Do you know why the line breakdown here would not match the HTML report? Do you know why the coverage checker is passing with this (suspicious) low incremental coverage? Is it confusing incremental and absolute coverage?",
+      "parentUuid": "56c1ca23_f0e7e0b7",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c076fb74_58918ff8",
         "filename": "test/usb_typec_drp_acc_trysrc.c",
         "patchSetId": 17
@@ -31,6 +49,24 @@
       "writtenOn": "2026-06-15T20:02:17Z",
       "side": 1,
       "message": "For new tests, Zephyr tests are strongly preferred over legacy EC tests.",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "debd9069_4b8ee8c9",
+        "filename": "test/usb_typec_drp_acc_trysrc.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "This file is no longer part of this CL.",
+      "parentUuid": "c076fb74_58918ff8",
       "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -48,6 +84,24 @@
       "writtenOn": "2026-06-15T20:02:17Z",
       "side": 1,
       "message": "I don\u0027t understand the need for this policy change. If the default condition is DRP on, and the TCPC only shows Rd, then the TCPM should end up in AttachWait.SRC without setting the DRP policy to force source.",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f0bfaf7_a3375477",
+        "filename": "test/usb_typec_drp_acc_trysrc.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-17T21:34:12Z",
+      "side": 1,
+      "message": "This file is no longer part of this CL.",
+      "parentUuid": "0863e9e5_2dc5d7af",
       "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
