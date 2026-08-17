@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48ab8160_7c4b5c86",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-17T18:07:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d8daec54_8f2da0a8",
+      "revId": "c117371e92cebd863cfe05357b6bf874b3452b5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2254e0f9_0a3c70cd",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Optional suggestion: Since `zassert_*` macros can exit the function immediately on failure, the manual cleanup at the end of this test might not execute if an assertion fails. This could leave `global_context.fp_encryption_status` in an unexpected state for subsequent tests. Consider using a simple C++ RAII helper struct (which cleans up the state in its destructor) or ZTEST\u0027s `before`/`after` suite hooks to ensure the global state is reliably restored regardless of assertion failures.",
       "isAi": true,
+      "revId": "c117371e92cebd863cfe05357b6bf874b3452b5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "359b8b2d_6c1dbd99",
+        "filename": "zephyr/test/hwtest/src/fpsensor_auth_crypto_stateful.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-17T18:07:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2254e0f9_0a3c70cd",
       "revId": "c117371e92cebd863cfe05357b6bf874b3452b5a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
