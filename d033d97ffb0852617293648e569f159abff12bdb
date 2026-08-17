@@ -21,6 +21,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "11532529_41024ab4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:37:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/7ef62661-d65b-4d79-9589-d1ce86861a69)]\n\n### Review Summary\n*   **Functionality:** ✅ Looks great. Moving the cleanup code into the `before_fpsensor_auth_commands` hook effectively guarantees a clean initial state for every test case.\n*   **Style \u0026 Readability:** ✅ Excellent improvement. Centralizing the setup logic inside the ZTEST fixture removes significant boilerplate from individual tests, adhering well to Zephyr testing best practices.\n*   **Security:** ✅ N/A (Test code refactoring).\n*   **Testing \u0026 Test Coverage:** ✅ Test coverage remains the same, but the tests are cleaner.\n*   **CL Size \u0026 Scope:** ✅ Perfectly scoped refactoring.\n\nTAG\u003dagy\nCONV\u003d7ef62661-d65b-4d79-9589-d1ce86861a69",
+      "isAi": true,
+      "revId": "d033d97ffb0852617293648e569f159abff12bdb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "02f531ba_3ca96d40",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
         "patchSetId": 2
@@ -32,6 +50,24 @@
       "writtenOn": "2026-08-17T23:37:22Z",
       "side": 1,
       "message": "[Gerrit AI Review] Good catch removing the mid-test `fp_reset_and_clear_context()` here. This makes the test more realistic by verifying that a denied `EC_CMD_FP_ESTABLISH_SESSION` attempt doesn\u0027t corrupt the state, and that a subsequent valid sequence (`GENERATE_NONCE` followed by `ESTABLISH_SESSION`) can still succeed natively without an artificial state reset.",
+      "isAi": true,
+      "revId": "d033d97ffb0852617293648e569f159abff12bdb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ccf4c30a_4e4bf13e",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:37:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Note: Removing the context reset from the middle of this test actually strengthens it! It now verifies that a failed session establishment attempt (`EC_RES_ACCESS_DENIED`) does not corrupt the context for a subsequent valid attempt. \n\nThis is a good, subtle improvement, but I just wanted to call it out to ensure it was intentional since the commit message only mentions moving \"initial state\" setups.",
       "isAi": true,
       "revId": "d033d97ffb0852617293648e569f159abff12bdb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
