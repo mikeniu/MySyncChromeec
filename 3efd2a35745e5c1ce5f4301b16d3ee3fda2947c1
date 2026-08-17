@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "594d2cac_195e55ed",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_crypto_stateful.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:18:01Z",
+      "side": 1,
+      "message": "Typo? Did you mean `0x10` and `0x12` instead of `0x010` and `0x012`?",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 0
+      },
+      "revId": "3efd2a35745e5c1ce5f4301b16d3ee3fda2947c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c69957b_a661a298",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_crypto.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:18:01Z",
+      "side": 1,
+      "message": "Stray semicolon.",
+      "range": {
+        "startLine": 532,
+        "startChar": 0,
+        "endLine": 532,
+        "endChar": 0
+      },
+      "revId": "3efd2a35745e5c1ce5f4301b16d3ee3fda2947c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
