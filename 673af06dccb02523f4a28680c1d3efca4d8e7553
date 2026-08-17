@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67955d82_eafae404",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T16:26:36Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "b71e5de4_afa05231",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "673af06dccb02523f4a28680c1d3efca4d8e7553",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14f52cac_f26000b6",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T16:26:36Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "448ef427_ee33be9a",
+      "range": {
+        "startLine": 171,
+        "startChar": 0,
+        "endLine": 171,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "673af06dccb02523f4a28680c1d3efca4d8e7553",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33f4e7c5_d4fdd8ea",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T16:26:36Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "f1105014_89fce6fb",
+      "range": {
+        "startLine": 181,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "673af06dccb02523f4a28680c1d3efca4d8e7553",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33b70ee2_a9e9f1e5",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T16:26:36Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "a6386759_29e96aa5",
+      "range": {
+        "startLine": 275,
+        "startChar": 0,
+        "endLine": 275,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "673af06dccb02523f4a28680c1d3efca4d8e7553",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88c2890f_69f24de2",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T16:26:36Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "d473029d_2bdb3347",
+      "range": {
+        "startLine": 317,
+        "startChar": 0,
+        "endLine": 317,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "673af06dccb02523f4a28680c1d3efca4d8e7553",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
