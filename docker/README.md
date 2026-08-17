@@ -61,6 +61,16 @@ docker run -it --rm \
   ec-builder
 ```
 
+Or using the helper script:
+```bash
+./run_docker.sh
+```
+
+> **Fast Startup**: Pass `--fast` (or set `SKIP_UPDATE=1`) to bypass remote repository git checks for sub-second container launch:
+> ```bash
+> ./run_docker.sh --fast
+> ```
+
 ---
 
 ## Using the Tools (Inside the Container)
@@ -132,6 +142,10 @@ To run all EC-AIC tests on `npcx9/npcx9m7f`:
 ##### Customizing the Run
 You can override the defaults using the script options:
 
+*   **Build tests only (without running on hardware)**:
+    ```bash
+    ./run_dagwood_tests.py -p realtek/rts5912 -b
+    ```
 *   **Specify one or more test directories**:
     ```bash
     ./run_dagwood_tests.py -p realtek/rts5912 -T zephyr/test/ec-aic -T zephyr/test/another-test

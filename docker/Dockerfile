@@ -5,8 +5,10 @@
 # Use a suitable base image, e.g., Ubuntu
 FROM ubuntu:24.04
 
-# Prevent interactive prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
+# Prevent interactive prompts during package installation and allow pip
+# break system packages
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Install necessary dependencies for building EC firmware
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -102,34 +104,37 @@ RUN ZEPHYR_REQS_DIR="/opt/repos/src/third_party/zephyrproject/zephyr/scripts" \
             -r "$ZEPHYR_REQS_DIR/requirements.txt"; \
     fi
 
-# Install zmake dependencies from .vpython3
+# Install zmake dependencies from .vpython3 in a single batch
 RUN VPYTHON_FILE="/opt/repos/src/platform/ec/zephyr/zmake/.vpython3" && \
     if [ -f "$VPYTHON_FILE" ]; then \
         packages=$(grep -o 'infra/python/wheels/[a-zA-Z0-9_-]*' \
             "$VPYTHON_FILE" | \
-            sed 's|infra/python/wheels/||g' | \
-            sed 's|-py2_py3||g' | \
-            sed 's|-py3||g' | \
+            sed 's|infra/python/wheels/||g; s|-py2_py3||g; s|-py3||g' | \
             sort -u); \
+        to_install=""; \
         for pkg in $packages; do \
             case "$pkg" in \
                 "pyyaml") pkg="PyYAML" ;; \
                 "python-dateutil") pkg="python-dateutil" ;; \
                 "ruamel_yaml") pkg="ruamel.yaml" ;; \
-                # Skip packages already installed by Zephyr's requirements.txt
-                # above that would be downgraded based on the .vpython
-                # requirements
-                "ruamel_yaml_clib") continue ;; \
-                "coverage") continue ;; \
-                "pytest") continue ;; \
-                # Skip packages only used by zmake unit tests
-                "hypothesis") continue ;; \
-                "testfixtures") continue ;; \
+                "ruamel_yaml_clib"|"coverage"|"pytest"| \
+                "hypothesis"|"testfixtures") continue ;; \
             esac; \
-            python3 -m pip install --no-cache-dir \
-                --break-system-packages --ignore-installed "$pkg"; \
+            to_install="${to_install} ${pkg}"; \
         done; \
+        if [ -n "${to_install}" ]; then \
+            python3 -m pip install --no-cache-dir \
+                --break-system-packages --ignore-installed ${to_install}; \
+        fi; \
     fi
+
+# Install zmake in system Python
+RUN python3 -m pip install --no-cache-dir --no-deps \
+    -e /opt/repos/src/platform/ec/zephyr/zmake
+
+# Set PATH for binman and host tools
+ENV PATH="/opt/repos/src/third_party/u-boot/tools/binman:${PATH}"
+ENV PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
 
 # Build and install rtkupdate host utility
 RUN g++ -O2 -Wall -o /usr/bin/rtkupdate \
