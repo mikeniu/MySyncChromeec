@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "278eee55_ca0cef31",
+        "filename": "zephyr/test/drivers/default/src/lid_angle.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:23:30Z",
+      "side": 1,
+      "message": "Consider initializing `params_size` and `version` to ensure safety in case the host command handler later decides to rely on or validate these fields.\n\n```c\n\tstruct host_cmd_handler_args args \u003d {\n\t\t.params \u003d \u0026params,\n\t\t.params_size \u003d sizeof(params),\n\t\t.response \u003d \u0026response,\n\t\t.response_max \u003d sizeof(response),\n\t\t.version \u003d 0,\n\t};\n```",
+      "range": {
+        "startLine": 334,
+        "startChar": 0,
+        "endLine": 334,
+        "endChar": 0
+      },
+      "revId": "d6fcc9fc05c974fa63524641a2f5fe8e893819c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2a053b4_6f694955",
+        "filename": "zephyr/test/drivers/default/src/motion_sense/motion_sense.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:23:30Z",
+      "side": 1,
+      "message": "Consider zero-initializing this array to prevent uninitialized memory (like `data[0].data[1]` and `data[0].data[2]`) from being staged into the FIFO and then evaluated.\n\n```c\n\tstruct ec_response_motion_sensor_data data[4] \u003d {0};\n```",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 176,
+        "endChar": 0
+      },
+      "revId": "d6fcc9fc05c974fa63524641a2f5fe8e893819c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07a85633_ba46a06d",
+        "filename": "zephyr/test/drivers/default/src/motion_sense/motion_sense.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:23:30Z",
+      "side": 1,
+      "message": "Consider zero-initializing this array as well to ensure uninitialized bytes are not staged into the mock FIFO.\n\n```c\n\tstruct ec_response_motion_sensor_data data[CONFIG_ACCEL_FIFO_SIZE] \u003d {0};\n```",
+      "range": {
+        "startLine": 212,
+        "startChar": 0,
+        "endLine": 212,
+        "endChar": 0
+      },
+      "revId": "d6fcc9fc05c974fa63524641a2f5fe8e893819c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
