@@ -95,6 +95,31 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "eafc235d_7dc6c0d1",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:29:57Z",
+      "side": 1,
+      "message": "Done. Verified CS_PARAM_DEBUG_MANUAL_VOLTAGE.",
+      "parentUuid": "a0efa587_5de11f70",
+      "range": {
+        "startLine": 427,
+        "startChar": 0,
+        "endLine": 427,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "346a681a4e30a782e92576e167e72e21816ff4d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "8e1832dd_48b6ecce",
         "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
         "patchSetId": 4
@@ -107,6 +132,31 @@
       "side": 1,
       "message": "Done. Updated to assert exact value (2000).",
       "parentUuid": "54ee7ab3_66b58f96",
+      "range": {
+        "startLine": 437,
+        "startChar": 0,
+        "endLine": 437,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "346a681a4e30a782e92576e167e72e21816ff4d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77d62b15_b47b70a9",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:29:57Z",
+      "side": 1,
+      "message": "Done. Updated to assert exact value (2000).",
+      "parentUuid": "07c8be6c_94c3f805",
       "range": {
         "startLine": 437,
         "startChar": 0,
