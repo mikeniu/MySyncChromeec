@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "55cbd9fa_07309c01",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3487009
+      },
+      "writtenOn": "2026-08-17T20:28:14Z",
+      "side": 1,
+      "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
+      "revId": "346a681a4e30a782e92576e167e72e21816ff4d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "7cfa6554_64e375d3",
         "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
         "patchSetId": 4
