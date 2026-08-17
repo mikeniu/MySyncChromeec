@@ -211,6 +211,10 @@ void pe_clear_ado(int port);
  * @param port USB-C port number
  */
 void pe_clear_port_data(int port);
+void pe_set_fn(int port, int fn);
+void pe_clr_fn(int port, int fn);
+int pe_chk_fn(int port, int fn);
+void pe_clr_dpm_requests(int port);
 #endif /* TEST_BUILD */
 
 /**
