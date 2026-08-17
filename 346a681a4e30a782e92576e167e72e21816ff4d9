@@ -1,0 +1,104 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cfa6554_64e375d3",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:23:08Z",
+      "side": 1,
+      "message": "Done. Replaced with valid getter tests.",
+      "parentUuid": "d7eb0648_0e3632c5",
+      "range": {
+        "startLine": 409,
+        "startChar": 0,
+        "endLine": 409,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "346a681a4e30a782e92576e167e72e21816ff4d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95df6c86_dccd6c8f",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:23:08Z",
+      "side": 1,
+      "message": "Fixed. Replaced tautological assignment/assertion with real tests for charge_get_battery_temp() error handling, charge_get_state(), and state-dependent charge_want_shutdown().",
+      "parentUuid": "1d5cfbdd_daf5ced5",
+      "range": {
+        "startLine": 409,
+        "startChar": 0,
+        "endLine": 409,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "346a681a4e30a782e92576e167e72e21816ff4d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d36c536f_969e8697",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:23:08Z",
+      "side": 1,
+      "message": "Done. Added verification for CS_PARAM_DEBUG_MANUAL_VOLTAGE and reset manual settings during teardown.",
+      "parentUuid": "67d072e3_585dbb97",
+      "range": {
+        "startLine": 427,
+        "startChar": 0,
+        "endLine": 427,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "346a681a4e30a782e92576e167e72e21816ff4d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e1832dd_48b6ecce",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:23:08Z",
+      "side": 1,
+      "message": "Done. Updated to assert exact value (2000).",
+      "parentUuid": "54ee7ab3_66b58f96",
+      "range": {
+        "startLine": 437,
+        "startChar": 0,
+        "endLine": 437,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "346a681a4e30a782e92576e167e72e21816ff4d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
