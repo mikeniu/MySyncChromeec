@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "719e18fe_b1846426",
+        "filename": "zephyr/test/queue/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:23:58Z",
+      "side": 1,
+      "message": "`test_queue2` is initialized with `QUEUE_NULL(2, int16_t)` on line 17. Although both are 2 bytes, consider using `int16_t` for `buf1` and `buf2` here to match the queue\u0027s exact element type.",
+      "range": {
+        "startLine": 134,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 0
+      },
+      "revId": "681dbf58e70bfb7d7af9e5c50035347aba4d971c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6278b152_49fdacad",
+        "filename": "zephyr/test/queue/src/main.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:23:58Z",
+      "side": 1,
+      "message": "`zassert_mem_equal` expects the size in **bytes**, not elements. Since `buf1` and `buf2` are arrays of `uint16_t` (2 bytes each), passing `2` as the size only compares the first 2 bytes (i.e. just the first element `buf1[0]`). \n\nIt should be `2 * sizeof(uint16_t)`.",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 0
+      },
+      "revId": "681dbf58e70bfb7d7af9e5c50035347aba4d971c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
