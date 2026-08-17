@@ -414,6 +414,8 @@
 		battery_passthru: port0@0 {
 			reg = <0>;
 			i2c-port = <&i2c0>;
+			allow-type = "VIRTUAL_BATTERY";
+			devices = [0B];
 		};
 		power_passthru: port5@5 {
 			reg = <5>;
