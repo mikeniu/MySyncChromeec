@@ -16,6 +16,24 @@
       "message": "Moonstone build is failing the CQ.",
       "revId": "8c6613bdcc347eba0c99f6fe297a2daea2d15e74",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca536567_a8868e9c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 41
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3692199
+      },
+      "writtenOn": "2026-08-17T21:27:49Z",
+      "side": 1,
+      "message": "Albert, here\u0027s the format-truncation error:\n```\n[moonstone:ro] /mnt/host/source/src/platform/ec/zephyr/drivers/pwrmon/pwrmon.c:352:67: error: \u0027snprintf\u0027 output may be truncated before the last format character [-Werror\u003dformat-truncation\u003d]\n[moonstone:ro]   352 |                         snprintf(r-\u003edump_info.channel_name, 3, \"%d\",\n[moonstone:ro]       |                                                                   ^\n[moonstone:ro] /mnt/host/source/src/platform/ec/zephyr/drivers/pwrmon/pwrmon.c:352:25: note: \u0027snprintf\u0027 output between 2 and 4 bytes into a destination of size 3\n[moonstone:ro]   352 |                         snprintf(r-\u003edump_info.channel_name, 3, \"%d\",\n[moonstone:ro]       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n[moonstone:ro]   353 |                                  channel_id);\n```",
+      "parentUuid": "4515c2a8_be7c75a2",
+      "revId": "8c6613bdcc347eba0c99f6fe297a2daea2d15e74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
