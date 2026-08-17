@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bd2ca51_62803d46",
+        "filename": "zephyr/test/drivers/keyboard_8042/src/keyboard_8042.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T15:32:57Z",
+      "side": 1,
+      "message": "By removing the expected values (e.g., `\u003d0`) from these strings, the assertion becomes less strict and will pass regardless of the actual internal state. If `test_keyboard_8042_reset()` reliably clears the state, it would be better to keep the exact string checks to ensure the default state is as expected.",
+      "range": {
+        "startLine": 193,
+        "startChar": 0,
+        "endLine": 193,
+        "endChar": 0
+      },
+      "revId": "dde28d95d1717ee44478669e089fa71a2991b7c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "263adb55_c3be6270",
+        "filename": "zephyr/test/drivers/keyboard_8042/src/keyboard_8042.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 837,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T15:32:57Z",
+      "side": 1,
+      "message": "This triggers the preservation hook, but the test doesn\u0027t assert that the correct state was saved (e.g., by checking the arguments passed to `system_add_jump_tag_fake`). It primarily tests the restore phase by manually populating `fake_saved_kb_state`. Consider verifying the preserved state if possible.",
+      "range": {
+        "startLine": 837,
+        "startChar": 0,
+        "endLine": 837,
+        "endChar": 0
+      },
+      "revId": "dde28d95d1717ee44478669e089fa71a2991b7c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93cdd4a7_0491950d",
+        "filename": "zephyr/test/drivers/keyboard_8042/src/keyboard_8042.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 887,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T15:32:57Z",
+      "side": 1,
+      "message": "To properly test that the boundary check updated to the new `cols` value (which is 1), it would be more effective to test `get_scancode_set2(0, 1)`. Checking `default_cols + 1` tests an index that was likely already out of bounds for the original matrix, so it doesn\u0027t strictly prove the boundary shrunk.",
+      "range": {
+        "startLine": 887,
+        "startChar": 0,
+        "endLine": 887,
+        "endChar": 0
+      },
+      "revId": "dde28d95d1717ee44478669e089fa71a2991b7c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
