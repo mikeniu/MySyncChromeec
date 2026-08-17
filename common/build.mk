@@ -98,7 +98,6 @@ common-$(CONFIG_GESTURE_SW_DETECTION)+=gesture.o
 common-$(CONFIG_HOSTCMD_EVENTS)+=host_event_commands.o
 common-$(CONFIG_HOSTCMD_GET_UPTIME_INFO)+=uptime.o
 common-$(CONFIG_HOSTCMD_PD)+=host_command_controller.o
-common-$(CONFIG_HOSTCMD_RTC)+=rtc.o
 common-$(CONFIG_I2C_DEBUG)+=i2c_trace.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_passthru.o
