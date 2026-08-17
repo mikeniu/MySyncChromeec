@@ -33,6 +33,24 @@
       "message": "Hi @keithshort@chromium.org,\n\nIt\u0027s been a while since the last review. I\u0027m currently planning to break these two CLs down into smaller pieces as you initially suggested (emulator and unit tests are being coded).\n\nSince you\u0027ve already spent time reviewing the current code, I want to check if creating a new chain of smaller CLs would cause you any inconvenience or lose your review context? Please let me know what works best for you. Thanks~",
       "revId": "916d5141c92cccc6edeab4d3330127cf21edac23",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dbb5ce1_ac057e59",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-17T19:20:22Z",
+      "side": 1,
+      "message": "Yes, please break this up into smaller CLs. I recommend stubbing out as much as possible in the early CLs.\n1. Kconfig, yaml file, pdc_it52xx.c file should mostly be empty.\n  - DT_INST_FOREACH_STATUS_OKAY()\n  - pdc_init() routine\n  - stubs for all PDC APIs marked as required\n  - You could create a new pdc.driver.it52xx test with a `build_only: true` property in the [testcase.yaml](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/pdc/testcase.yaml) file.  This will validate that each change compiles and allow us to merge the driver in pieces\n 2. Subsequent changes can implement a few PDC APIs each.  Try to keep the total line count in each CL too less than 300 lines.\n 3. Once you have an emulator, you can then remove the `build_only: true` property/",
+      "parentUuid": "5bca1246_2b6bc472",
+      "revId": "916d5141c92cccc6edeab4d3330127cf21edac23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
