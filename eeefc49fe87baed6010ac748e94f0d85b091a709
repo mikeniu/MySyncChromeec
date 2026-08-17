@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc37a5bc_0d05f3af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-17T23:18:37Z",
+      "side": 1,
+      "message": "I believe this is the test for this change.",
+      "parentUuid": "d70a70f4_78065923",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 45
+      },
+      "revId": "eeefc49fe87baed6010ac748e94f0d85b091a709",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a93aa99d_2d02569b",
@@ -55,6 +79,30 @@
       "writtenOn": "2026-08-14T19:02:39Z",
       "side": 1,
       "message": "Why?",
+      "range": {
+        "startLine": 880,
+        "startChar": 0,
+        "endLine": 880,
+        "endChar": 40
+      },
+      "revId": "eeefc49fe87baed6010ac748e94f0d85b091a709",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c5b447b_472b5d7e",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 880,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-17T23:18:37Z",
+      "side": 1,
+      "message": "there is no test in ec-legacy to verify this. The panic test was migrated.",
+      "parentUuid": "70cd1a42_829f9632",
       "range": {
         "startLine": 880,
         "startChar": 0,
