@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9a52d36c_5045d853",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 20
+      },
+      "lineNbr": 1052,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2026-08-17T01:19:30Z",
+      "side": 1,
+      "message": "That\u0027s an older version of the datasheet than what I was looking at, dated May 2020 vs January 2021: https://drive.google.com/file/d/1stFlFimfBwgzvA-tejVKOU43rkG1h5hb/view?usp\u003dsharing\n\nVersion 0.15 says 146us min for GPADC_{MEAS_OFF}.",
+      "parentUuid": "803b966d_2fdeffc9",
+      "revId": "3c174ef7c37e76e7c5fd6642a441cc31a6ce54f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a051c5c2_ec0a2ff4",
         "filename": "driver/charger/sm5803.c",
         "patchSetId": 20
