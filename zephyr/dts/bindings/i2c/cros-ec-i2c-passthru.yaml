@@ -45,3 +45,13 @@ child-binding:
       description: |
         List of permissible 7-bit I2C device addresses for passthru on this port.
         If empty or omitted, all addresses on this port are allowed.
+    allow-type:
+      type: string
+      enum:
+        - "ALLOW_IF_UNPROTECTED_BY_AP"
+        - "VIRTUAL_BATTERY"
+      description: |
+        Passthru check type for this port. The default is
+        "ALLOW_IF_UNPROTECTED_BY_AP", which protects the port only if
+        system_is_locked() is true and port protection has been enabled by the
+        AP invoking the EC_CMD_I2C_PASSTHRU_PROTECT command.

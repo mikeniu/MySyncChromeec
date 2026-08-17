@@ -186,7 +186,7 @@ ZTEST_USER(i2c_passthru, test_command_i2cprotect)
 		      EC_SUCCESS);
 
 	/* Protect a valid remote_port (0) */
-	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect 0"),
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect 5"),
 		      EC_SUCCESS);
 
 	/* Show status when protected */
@@ -202,7 +202,7 @@ ZTEST_USER(i2c_passthru, test_command_i2cprotect)
 		      EC_ERROR_PARAM1);
 
 	/* Too many arguments returns EC_ERROR_PARAM_COUNT */
-	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect 0 1"),
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect 5 1"),
 		      EC_ERROR_PARAM_COUNT);
 }
 
@@ -457,15 +457,18 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted)
 
 ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
 {
-	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY) ||
+	if ((!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY) &&
+	     !IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) ||
 	    !IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_SMART)) {
 		ztest_test_skip();
 		return;
 	}
 #ifdef CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY
 	uint16_t vb_addr = VIRTUAL_BATTERY_ADDR_FLAGS;
+	uint8_t vb_port = I2C_PORT_VIRTUAL_BATTERY;
 #else
 	uint16_t vb_addr = 0xB;
+	uint8_t vb_port = 1;
 #endif
 	uint8_t *out_data;
 	uint8_t vb_param_buf[sizeof(struct ec_params_i2c_passthru) +
@@ -482,7 +485,7 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
 	 * Setup passthru command to the TCPCI emulator - which is always
 	 * permitted by our board_allow_i2c_passthru() fake.
 	 */
-	vb_params->port = I2C_PORT_VIRTUAL_BATTERY;
+	vb_params->port = vb_port;
 	vb_params->num_msgs = 1;
 	vb_params->msg[0].addr_flags = vb_addr;
 	vb_params->msg[0].len = 3;
@@ -533,6 +536,24 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
 	zassert_ok(vb_response->i2c_status);
 	zassert_equal(vb_args.response_size,
 		      sizeof(struct ec_response_i2c_passthru) + 2, NULL);
+
+	/* Allowed but not implemented SB_OPTIONAL_MFG_FUNC4 command */
+	vb_params->num_msgs = 2;
+	vb_params->msg[0].addr_flags = vb_addr;
+	vb_params->msg[0].len = 1;
+	vb_params->msg[1].addr_flags = vb_addr | EC_I2C_FLAG_READ;
+	vb_params->msg[1].len = 2;
+
+	out_data = (uint8_t *)&vb_params->msg[vb_params->num_msgs];
+	out_data[0] = 0x3f; /* SB_OPTIONAL_MFG_FUNC4 0x3f */
+
+	zassert_equal(host_command_process(&vb_args), EC_RES_SUCCESS);
+	if (IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
+		zassert_equal(vb_response->i2c_status, EC_I2C_STATUS_NAK);
+	} else {
+		/* TODO: Make a fix for legacy i2c passthru. */
+		zassert_ok(vb_response->i2c_status);
+	}
 }
 
 ZTEST_USER(i2c_passthru, test_passthru_zephyr_i2c_xfer_i2c_message_queue)
