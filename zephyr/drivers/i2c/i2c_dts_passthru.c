@@ -8,14 +8,17 @@
 #define DT_DRV_COMPAT cros_ec_i2c_passthru
 
 #include "battery.h"
+#include "console.h"
 #include "host_command.h"
 #include "i2c.h"
 #include "i2c_msg_queue.h"
 #include "system.h"
+#include "util.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -28,11 +31,16 @@ LOG_MODULE_REGISTER(i2c_dts_passthru, CONFIG_I2C_DTS_PASSTHRU_LOG_LEVEL);
 	COND_CODE_1(DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT), \
 		    (DEVICE_DT_GET_OR_NULL(DT_DRV_INST(0))), (NULL))
 
+struct i2c_passthru_port_data {
+	bool port_protected;
+};
+
 struct i2c_passthru_port_config {
 	int remote_port;
 	const struct device *i2c_dev;
 	const uint8_t *devices;
 	size_t num_devices;
+	struct i2c_passthru_port_data *data;
 };
 
 struct i2c_passthru_config {
@@ -63,6 +71,9 @@ static int i2c_allow_passthru(const struct device *dev,
 		return 1;
 
 	if (!dev || !port_cfg)
+		return 0;
+
+	if (port_cfg->data->port_protected)
 		return 0;
 
 	if (port_cfg->num_devices > 0) {
@@ -193,7 +204,141 @@ EC_HOST_CMD_HANDLER(EC_CMD_I2C_PASSTHRU, i2c_command_passthru, EC_VER_MASK(0),
 
 __test_only void i2c_passthru_protect_reset(void)
 {
+	const struct device *dev = I2C_PASSTHRU_DEV;
+
+	if (!dev)
+		return;
+
+	const struct i2c_passthru_config *cfg = dev->config;
+
+	for (size_t i = 0; i < cfg->num_ports; i++) {
+		cfg->ports[i].data->port_protected = false;
+	}
 }
+
+static void i2c_passthru_protect_all_ports(const struct device *dev)
+{
+	if (!dev)
+		return;
+
+	const struct i2c_passthru_config *cfg = dev->config;
+
+	for (size_t i = 0; i < cfg->num_ports; i++) {
+		cfg->ports[i].data->port_protected = true;
+	}
+}
+
+static enum ec_host_cmd_status
+i2c_passthru_protect_port(const struct device *dev, int remote_port)
+{
+	const struct i2c_passthru_port_config *port_cfg =
+		find_i2c_passthru_port_config(dev, remote_port);
+
+	if (port_cfg != NULL) {
+		port_cfg->data->port_protected = true;
+		return EC_HOST_CMD_SUCCESS;
+	} else {
+		LOG_DBG("Invalid I2C port %d to be protected", remote_port);
+		return EC_HOST_CMD_INVALID_PARAM;
+	}
+}
+
+static enum ec_host_cmd_status
+i2c_command_passthru_protect(struct ec_host_cmd_handler_args *args)
+{
+	const struct ec_params_i2c_passthru_protect *params =
+		(const struct ec_params_i2c_passthru_protect *)args->input_buf;
+	const uint8_t remote_port = params->port;
+	struct ec_response_i2c_passthru_protect *resp = args->output_buf;
+	const struct device *dev = I2C_PASSTHRU_DEV;
+
+	if (args->input_buf_size < sizeof(*params)) {
+		LOG_DBG("protect no params, params_size=%d",
+			args->input_buf_size);
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+	}
+
+	switch (params->subcmd) {
+	case EC_CMD_I2C_PASSTHRU_PROTECT_ENABLE_ALL:
+		i2c_passthru_protect_all_ports(dev);
+		return EC_HOST_CMD_SUCCESS;
+
+	case EC_CMD_I2C_PASSTHRU_PROTECT_ENABLE:
+		return i2c_passthru_protect_port(dev, remote_port);
+
+	case EC_CMD_I2C_PASSTHRU_PROTECT_STATUS: {
+		if (args->output_buf_max < sizeof(*resp)) {
+			LOG_DBG("protect no response, "
+				"response_max=%d, need at least %d",
+				args->output_buf_max, sizeof(*resp));
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+		}
+
+		const struct i2c_passthru_port_config *port_cfg =
+			find_i2c_passthru_port_config(dev, remote_port);
+		if (port_cfg == NULL) {
+			LOG_DBG("remote port invalid %d", remote_port);
+			return EC_HOST_CMD_INVALID_PARAM;
+		}
+
+		resp->status = port_cfg->data->port_protected;
+		args->output_buf_size = sizeof(*resp);
+		return EC_HOST_CMD_SUCCESS;
+	}
+
+	default:
+		return EC_HOST_CMD_INVALID_COMMAND;
+	}
+}
+EC_HOST_CMD_HANDLER(EC_CMD_I2C_PASSTHRU_PROTECT, i2c_command_passthru_protect,
+		    EC_VER_MASK(0), struct ec_params_i2c_passthru_protect,
+		    struct ec_response_i2c_passthru_protect);
+
+#ifdef CONFIG_CMD_I2C_DTS_PROTECT
+static int command_i2cprotect(int argc, const char **argv)
+{
+	const struct device *dev = I2C_PASSTHRU_DEV;
+
+	if (!dev) {
+		ccprintf("I2C passthru device not found\n");
+		return EC_ERROR_UNKNOWN;
+	}
+
+	const struct i2c_passthru_config *cfg = dev->config;
+
+	if (argc == 1) {
+		for (size_t index = 0; index < cfg->num_ports; index++) {
+			const struct i2c_passthru_port_config *port_cfg =
+				&cfg->ports[index];
+			ccprintf("Remote Port %d Port %p: %sprotected\n",
+				 port_cfg->remote_port, port_cfg->i2c_dev,
+				 port_cfg->data->port_protected ? "" : "un");
+		}
+		return EC_SUCCESS;
+	} else if (argc == 2) {
+		enum ec_host_cmd_status ret;
+		int remote_port;
+		char *e;
+
+		remote_port = strtoi(argv[1], &e, 0);
+		if (*e)
+			return EC_ERROR_PARAM1;
+
+		ret = i2c_passthru_protect_port(dev, remote_port);
+		if (ret != 0) {
+			ccprintf(
+				"i2c passthru protect invalid remote_port %d\n",
+				remote_port);
+			return EC_ERROR_PARAM1;
+		}
+		return EC_SUCCESS;
+	} else {
+		return EC_ERROR_PARAM_COUNT;
+	}
+}
+DECLARE_CONSOLE_COMMAND(i2cprotect, command_i2cprotect, "[remote_port]",
+			"Protect I2C bus");
+#endif
 
 #if DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT)
 
@@ -202,6 +347,9 @@ __test_only void i2c_passthru_protect_reset(void)
 		    (static const uint8_t devices_##node_id[] = \
 			     DT_PROP(node_id, devices);),       \
 		    ())
+
+#define PASSTHRU_CHILD_PORT_DATA(node_id) \
+	static struct i2c_passthru_port_data port_data_##node_id;
 
 #define PASSTHRU_CHILD_PORT_CONFIG(node_id)                                    \
 	{                                                                      \
@@ -213,10 +361,12 @@ __test_only void i2c_passthru_protect_reset(void)
 		.num_devices = COND_CODE_1(DT_NODE_HAS_PROP(node_id, devices), \
 					   (DT_PROP_LEN(node_id, devices)),    \
 					   (0)),                               \
+		.data = &port_data_##node_id,                                  \
 	},
 
 #define I2C_DTS_PASSTHRU_INST_DEFINE(inst)                                  \
 	DT_INST_FOREACH_CHILD_STATUS_OKAY(inst, PASSTHRU_CHILD_DEVICES)     \
+	DT_INST_FOREACH_CHILD_STATUS_OKAY(inst, PASSTHRU_CHILD_PORT_DATA)   \
 	static const struct i2c_passthru_port_config                        \
 		i2c_passthru_ports_##inst[] = {                             \
 			DT_INST_FOREACH_CHILD_STATUS_OKAY(                  \
