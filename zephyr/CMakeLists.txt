@@ -546,12 +546,8 @@ if (NOT DEFINED CONFIG_PLATFORM_EC_SHA256_HW_ZEPHYR)
 	zephyr_library_sources_ifdef(CONFIG_SOC_IT8XXX2_SHA256_HW_ACCELERATE
                                                 "${PLATFORM_EC}/driver/sha256/sha256_it8xxx2.c")
 endif()
-if (CONFIG_PLATFORM_EC_SHARED_MEM_LIBC)
-  zephyr_library_sources("${PLATFORM_EC}/common/shared_mem_libc.c")
-else()
-  zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC
                                                 "${PLATFORM_EC}/common/shared_mem.c")
-endif()
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SWITCH
                                                 "${PLATFORM_EC}/common/switch.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SWITCHCAP_LN9310
