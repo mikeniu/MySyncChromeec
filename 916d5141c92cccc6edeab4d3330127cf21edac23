@@ -16,6 +16,23 @@
       "message": "Changes: use port-index-on-chip property instead of IT5271_CONNECTOR_NUMBER",
       "revId": "916d5141c92cccc6edeab4d3330127cf21edac23",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bca1246_2b6bc472",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1288462
+      },
+      "writtenOn": "2026-08-17T08:47:53Z",
+      "side": 1,
+      "message": "Hi @keithshort@chromium.org,\n\nIt\u0027s been a while since the last review. I\u0027m currently planning to break these two CLs down into smaller pieces as you initially suggested (emulator and unit tests are being coded).\n\nSince you\u0027ve already spent time reviewing the current code, I want to check if creating a new chain of smaller CLs would cause you any inconvenience or lose your review context? Please let me know what works best for you. Thanks~",
+      "revId": "916d5141c92cccc6edeab4d3330127cf21edac23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
