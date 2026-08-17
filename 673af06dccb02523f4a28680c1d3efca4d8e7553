@@ -197,6 +197,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a0efa587_5de11f70",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:25:34Z",
+      "side": 1,
+      "message": "You set `manual_voltage` here, but it isn\u0027t verified via a host command like `manual_current` is. Consider adding a check for `CS_PARAM_DEBUG_MANUAL_VOLTAGE` to ensure it is being correctly fetched as well.",
+      "range": {
+        "startLine": 427,
+        "startChar": 0,
+        "endLine": 427,
+        "endChar": 0
+      },
+      "revId": "673af06dccb02523f4a28680c1d3efca4d8e7553",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "54ee7ab3_66b58f96",
         "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
         "patchSetId": 3
@@ -208,6 +231,29 @@
       "writtenOn": "2026-08-17T19:18:21Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: Consider asserting the exact value here (e.g., `zassert_equal(2000, resp.get_param.value);`) instead of just `\u003e 0` to ensure the manual current is accurately returned.",
+      "range": {
+        "startLine": 437,
+        "startChar": 0,
+        "endLine": 437,
+        "endChar": 0
+      },
+      "revId": "673af06dccb02523f4a28680c1d3efca4d8e7553",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07c8be6c_94c3f805",
+        "filename": "zephyr/test/drivers/common_charger/src/test_charge_state.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T20:25:34Z",
+      "side": 1,
+      "message": "Consider asserting the exact value here (e.g., `zassert_equal(2000, resp.get_param.value);`) instead of just `\u003e 0` to ensure the manual current is accurately returned.",
       "range": {
         "startLine": 437,
         "startChar": 0,
