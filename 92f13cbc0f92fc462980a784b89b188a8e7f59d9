@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23721a89_d7e12078",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:30:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/511ebad6-87d3-471c-a36d-2b5a2ac5b790)]\n\n**Review Summary:**\n*   **Functionality:** The newly added tests correctly set up the environment and test the legacy `EC_CMD_FP_TEMPLATE` v0 command for both successful decryption and the trivial salt rejection case.\n*   **Security:** N/A (test only changes).\n*   **Style:** The code cleanly integrates with the existing test structure and correctly utilizes C++20 standard algorithms and spans.\n*   **Testing:** The tests adequately cover the v0 template logic. As a minor suggestion, I left an inline comment about adding a test for corrupted MACs to ensure robust rejection of invalid legacy templates.\n*   **CL Size:** Small, self-contained, and focused on tests.",
+      "isAi": true,
+      "revId": "92f13cbc0f92fc462980a784b89b188a8e7f59d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a45ece80_3b21a53e",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 2141,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:30:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider adding an additional test case to verify that an `EC_CMD_FP_TEMPLATE` v0 command fails gracefully if the template encryption tag (MAC) is corrupted. This would help ensure robustness against tampered or corrupted legacy templates.\n\nFor example:\n```cpp\nZTEST(fpsensor_auth_commands, test_fp_command_template_v0_corrupted_mac)\n{\n\t// ... [setup similar to test_fp_command_template_v0_decrypted] ...\n\n\t// Corrupt the authentication tag\n\tenc_metadata_data.tag[0] ^\u003d 1;\n\tmemcpy(enc_metadata.data(), \u0026enc_metadata_data, enc_metadata.size());\n\n\tzassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0,\n\t\t\t\t\t     params.data(), params.size(), NULL,\n\t\t\t\t\t     0),\n\t\t      EC_RES_INVALID_PARAM); // or the expected error code\n}\n```",
+      "isAi": true,
+      "revId": "92f13cbc0f92fc462980a784b89b188a8e7f59d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
