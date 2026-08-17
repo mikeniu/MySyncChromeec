@@ -5432,6 +5432,7 @@ enum ec_i2c_passthru_protect_subcmd {
 	EC_CMD_I2C_PASSTHRU_PROTECT_STATUS = 0,
 	EC_CMD_I2C_PASSTHRU_PROTECT_ENABLE = 1,
 	EC_CMD_I2C_PASSTHRU_PROTECT_ENABLE_TCPCS = 2,
+	EC_CMD_I2C_PASSTHRU_PROTECT_ENABLE_ALL = 3,
 };
 
 struct ec_params_i2c_passthru_protect {
