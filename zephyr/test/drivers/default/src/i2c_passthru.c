@@ -452,7 +452,8 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted)
 
 ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
 {
-	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY) ||
+	if ((!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY) &&
+	     !IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) ||
 	    !IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_SMART)) {
 		ztest_test_skip();
 		return;

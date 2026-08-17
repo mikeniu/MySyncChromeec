@@ -11,9 +11,11 @@
 #include "console.h"
 #include "host_command.h"
 #include "i2c.h"
+#include "i2c_battery_parser.h"
 #include "i2c_msg_queue.h"
 #include "system.h"
 #include "util.h"
+#include "virtual_battery.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -29,6 +31,19 @@ LOG_MODULE_REGISTER(i2c_dts_passthru, CONFIG_I2C_DTS_PASSTHRU_LOG_LEVEL);
 
 #define I2C_PASSTHRU_MAX_MSGS 16
 
+enum i2c_passthru_allow_type {
+	ALLOW_IF_UNPROTECTED_BY_AP,
+	VIRTUAL_BATTERY,
+};
+
+#define CHILD_HAS_VIRTUAL_BATTERY_OR(node_id)                        \
+	|| COND_CODE_1(DT_NODE_HAS_PROP(node_id, allow_type),        \
+		       (VIRTUAL_BATTERY ==                           \
+			DT_STRING_UPPER_TOKEN(node_id, allow_type)), \
+		       (0))
+
+#define HAS_VIRTUAL_BATTERY \
+	(0 DT_INST_FOREACH_CHILD_STATUS_OKAY(0, CHILD_HAS_VIRTUAL_BATTERY_OR))
 #define I2C_PASSTHRU_DEV                                      \
 	COND_CODE_1(DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT), \
 		    (DEVICE_DT_GET_OR_NULL(DT_DRV_INST(0))), (NULL))
@@ -42,6 +57,7 @@ struct i2c_passthru_port_config {
 	const struct device *i2c_dev;
 	const uint8_t *devices;
 	size_t num_devices;
+	enum i2c_passthru_allow_type allow_type;
 	struct i2c_passthru_port_data *data;
 };
 
@@ -75,8 +91,36 @@ static int i2c_allow_passthru(const struct device *dev,
 	if (!dev || !port_cfg)
 		return 0;
 
-	if (port_cfg->data->port_protected)
+	switch (port_cfg->allow_type) {
+	case ALLOW_IF_UNPROTECTED_BY_AP:
+		if (port_cfg->data->port_protected)
+			return 0;
+		break;
+#if HAS_VIRTUAL_BATTERY
+	case VIRTUAL_BATTERY: {
+		struct i2c_battery_parser_state parser_state =
+			i2c_battery_parser_state_create();
+		struct msg_queue_t msg_queue;
+
+		for (msg_queue = msg_queue_create(params);
+		     msg_queue.msg < msg_queue.msg_end;) {
+			const struct msg_value_t val =
+				msg_queue_front(&msg_queue);
+
+			if (battery_permission_handler(
+				    &parser_state, msg_queue.in_len,
+				    val.xferflags, val.read_len, val.write_len,
+				    msg_queue.out))
+				return 0;
+
+			msg_queue_pop_front(&msg_queue, &val);
+		}
+		break;
+	}
+#endif
+	default:
 		return 0;
+	}
 
 	if (port_cfg->num_devices > 0) {
 		for (int i = 0; i < params->num_msgs; i++) {
@@ -150,7 +194,6 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	const struct device *i2c_dev = NULL;
 	struct ec_response_i2c_passthru *resp = args->response;
 	struct msg_queue_t msg_queue;
-	struct i2c_msg msgs[I2C_PASSTHRU_MAX_MSGS];
 	int ret;
 
 	if (port_cfg != NULL) {
@@ -182,20 +225,52 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 
 	msg_queue = msg_queue_create(params);
 
-	ret = zephyr_i2c_xfer_i2c_message_queue(i2c_dev, &msg_queue, msgs,
-						ARRAY_SIZE(msgs), resp->data);
-	switch (ret) {
-	case EC_SUCCESS:
-		resp->num_msgs = params->num_msgs;
-		break;
-	case EC_ERROR_TIMEOUT:
-		msg_queue.in_len = 0;
-		resp->i2c_status = EC_I2C_STATUS_TIMEOUT;
-		break;
-	default:
-		msg_queue.in_len = 0;
-		resp->i2c_status = EC_I2C_STATUS_NAK;
-		break;
+	if (HAS_VIRTUAL_BATTERY && port_cfg &&
+	    port_cfg->allow_type == VIRTUAL_BATTERY) {
+		struct i2c_battery_parser_state parser_state =
+			i2c_battery_parser_state_create();
+
+		for (; msg_queue.msg < msg_queue.msg_end; resp->num_msgs++) {
+			const struct msg_value_t val =
+				msg_queue_front(&msg_queue);
+			ret = 1;
+			if (virtual_battery_handler(
+				    &parser_state, resp, msg_queue.in_len, &ret,
+				    val.xferflags, val.read_len, val.write_len,
+				    msg_queue.out))
+				break;
+
+			if (ret) {
+				/* Driver will have sent a stop bit here */
+				if (ret == EC_ERROR_TIMEOUT)
+					resp->i2c_status =
+						EC_I2C_STATUS_TIMEOUT;
+				else
+					resp->i2c_status = EC_I2C_STATUS_NAK;
+				break;
+			}
+
+			msg_queue_pop_front(&msg_queue, &val);
+		}
+	} else {
+		struct i2c_msg msgs[I2C_PASSTHRU_MAX_MSGS];
+
+		ret = zephyr_i2c_xfer_i2c_message_queue(i2c_dev, &msg_queue,
+							msgs, ARRAY_SIZE(msgs),
+							resp->data);
+		switch (ret) {
+		case EC_SUCCESS:
+			resp->num_msgs = params->num_msgs;
+			break;
+		case EC_ERROR_TIMEOUT:
+			msg_queue.in_len = 0;
+			resp->i2c_status = EC_I2C_STATUS_TIMEOUT;
+			break;
+		default:
+			msg_queue.in_len = 0;
+			resp->i2c_status = EC_I2C_STATUS_NAK;
+			break;
+		}
 	}
 
 	args->response_size = sizeof(*resp) + msg_queue.in_len;
@@ -364,6 +439,10 @@ DECLARE_CONSOLE_COMMAND(i2cprotect, command_i2cprotect, "[remote_port]",
 		.num_devices = COND_CODE_1(DT_NODE_HAS_PROP(node_id, devices), \
 					   (DT_PROP_LEN(node_id, devices)),    \
 					   (0)),                               \
+		.allow_type = COND_CODE_1(                                     \
+			DT_NODE_HAS_PROP(node_id, allow_type),                 \
+			(DT_STRING_UPPER_TOKEN(node_id, allow_type)),          \
+			(ALLOW_IF_UNPROTECTED_BY_AP)),                         \
 		.data = &port_data_##node_id,                                  \
 	},
 
