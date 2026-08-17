@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be332946_1b776963",
+        "filename": "zephyr/test/rwsig/src/rwsig.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T21:13:41Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Since `vboot_is_padding_valid` appears to validate padding alignment (e.g., returning `EC_ERROR_INVAL` for unaligned indices), it likely casts this pointer internally to a larger type (like `uint32_t*` or `uint64_t*`). \n\nBecause local `uint8_t` arrays aren\u0027t guaranteed to be word-aligned on the stack, this could potentially cause an unaligned access fault on some architectures. \n\nConsider aligning it explicitly (e.g. `uint8_t data[64] __aligned(4);`) or using `uint32_t data[64 / sizeof(uint32_t)];` and casting it.",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 281,
+        "endChar": 0
+      },
+      "revId": "49e0eb08ec231e2ad2ab58c71927396a9b3d674e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99c744c6_84a358bc",
+        "filename": "zephyr/test/rwsig/src/rwsig.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T21:13:41Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Calling `SHA256_update` 4096 times for a single byte is inefficient and adds unnecessary execution time to the test suite. \n\nConsider processing this in larger chunks, for example:\n\n```c\n\tuint8_t zeroes[128] \u003d {0};\n\tfor (int i \u003d 0; i \u003c 4096 / sizeof(zeroes); i++) {\n\t\tSHA256_update(\u0026ctx, zeroes, sizeof(zeroes));\n\t}\n```",
+      "range": {
+        "startLine": 312,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 0
+      },
+      "revId": "49e0eb08ec231e2ad2ab58c71927396a9b3d674e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
