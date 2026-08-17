@@ -71,6 +71,52 @@
       },
       "revId": "4faa17eb6e837604e358caa2a5e3a811d6efef64",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "080ddce8_c37209d6",
+        "filename": "zephyr/test/drivers/body_detection/src/body_detection.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T21:23:31Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: For Algorithm V1, the test only asserts that these scaled values are `\u003e 0`. Consider asserting against the actual expected scaled value (e.g. `2900 * scale`) to ensure the parameters are correctly applied, similar to the `zassert_equal` for V2.",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 0
+      },
+      "revId": "4faa17eb6e837604e358caa2a5e3a811d6efef64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "053f0f7a_15110456",
+        "filename": "zephyr/test/drivers/body_detection/src/body_detection.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T21:23:31Z",
+      "side": 1,
+      "message": "For Algorithm V1, the test only asserts that these scaled values are `\u003e 0`. Consider asserting against the actual expected scaled value (e.g. `2900 * scale`) to ensure the parameters are correctly applied, similar to the `zassert_equal` for V2.",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 0
+      },
+      "revId": "4faa17eb6e837604e358caa2a5e3a811d6efef64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
