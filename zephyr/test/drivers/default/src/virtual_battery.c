@@ -80,11 +80,13 @@ static inline void virtual_battery_xfer(uint8_t *write_buf, int write_len,
 {
 #ifdef CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY
 	uint16_t vb_addr = VIRTUAL_BATTERY_ADDR_FLAGS;
+	int port = I2C_PORT_VIRTUAL_BATTERY;
 #else
 	uint16_t vb_addr = 0xB;
+	int port = 1;
 #endif
-	i2c_passthru_xfer(I2C_PORT_VIRTUAL_BATTERY, vb_addr, write_buf,
-			  write_len, read_buf, read_len);
+	i2c_passthru_xfer(port, vb_addr, write_buf, write_len, read_buf,
+			  read_len);
 }
 
 static uint16_t virtual_battery_read16(uint8_t command)
