@@ -1,0 +1,24 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config I2C_DTS_PASSTHRU
+	bool "I2C Passthru DTS Restrictions Driver"
+	depends on !PLATFORM_EC_I2C_PASSTHRU_RESTRICTED
+	help
+	  Enable the I2C Passthru DTS restrictions driver.
+
+if I2C_DTS_PASSTHRU
+
+module = I2C_DTS_PASSTHRU
+module-str = i2c_dts_passthru
+source "subsys/logging/Kconfig.template.log_config"
+
+config I2C_PASSTHRU_MAX_MSGS
+	int "The maximum number of messages in a passthru command"
+	default 16
+	help
+	  We use a buffer to store the intermediates for i2c_transfer.
+	  This config defines the buffer size.
+
+endif # I2C_DTS_PASSTHRU

@@ -18,6 +18,7 @@
 
 #ifdef CONFIG_ZEPHYR
 #include "i2c/i2c.h"
+#include "i2c_msg_queue.h"
 
 #include <zephyr/drivers/i2c.h>
 #endif /* CONFIG_ZEPHYR */
@@ -85,6 +86,86 @@ const struct i2c_port_t *get_i2c_port(const int port)
 
 	return NULL;
 }
+
+#ifdef CONFIG_ZEPHYR
+int zephyr_i2c_xfer_i2c_message_queue(const struct device *i2c_device,
+				      struct msg_queue_t *msg_queue,
+				      struct i2c_msg *msg_buffer,
+				      size_t msg_buffer_size, uint8_t *in)
+{
+	int ret = EC_ERROR_INVAL;
+	size_t num_msgs = 0;
+	uint16_t addr = 0;
+	uint8_t *in_ptr = in;
+
+	if (!msg_queue || !msg_buffer)
+		return EC_ERROR_INVAL;
+
+	while (msg_queue->msg < msg_queue->msg_end &&
+	       num_msgs < msg_buffer_size) {
+		struct msg_value_t val = msg_queue_front(msg_queue);
+		uint16_t next_addr = val.addr_flags;
+		uint8_t flags = val.is_read ? I2C_MSG_READ : I2C_MSG_WRITE;
+
+		/* To aggregate the command into a single i2c_transfer, we check
+		 * if all addr are the same. */
+		if (num_msgs == 0)
+			addr = next_addr;
+		else if (addr != next_addr)
+			return EC_ERROR_INVAL;
+
+		if (val.xferflags & I2C_XFER_RESTART)
+			flags |= I2C_MSG_RESTART;
+		if (val.xferflags & I2C_XFER_STOP)
+			flags |= I2C_MSG_STOP;
+
+		if (val.is_read) {
+			if (!in_ptr && val.read_len > 0)
+				return EC_ERROR_INVAL;
+			msg_buffer[num_msgs].buf = in_ptr;
+			msg_buffer[num_msgs].len = val.read_len;
+			in_ptr += val.read_len;
+		} else {
+			msg_buffer[num_msgs].buf = (uint8_t *)msg_queue->out;
+			msg_buffer[num_msgs].len = val.write_len;
+		}
+		msg_buffer[num_msgs].flags = flags;
+
+		num_msgs++;
+		msg_queue_pop_front(msg_queue, &val);
+	}
+
+	if (msg_queue->msg < msg_queue->msg_end)
+		return EC_ERROR_INVAL;
+
+	zephyr_i2c_lock(i2c_device, 1);
+
+	for (int i = 0; i <= CONFIG_I2C_NACK_RETRY_COUNT; i++) {
+		ret = i2c_transfer(i2c_device, msg_buffer, num_msgs, addr);
+
+		switch (ret) {
+		case 0:
+			ret = EC_SUCCESS;
+			break;
+		case -EIO:
+			ret = EC_ERROR_INVAL;
+			continue;
+		default:
+			ret = EC_ERROR_UNKNOWN;
+			break;
+		}
+	}
+
+	zephyr_i2c_lock(i2c_device, 0);
+
+	return ret;
+}
+
+void zephyr_i2c_lock(const struct device *i2c_device, int lock)
+{
+	i2c_lock(i2c_get_port_from_device(i2c_device), lock);
+}
+#endif
 
 int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
 		      const uint8_t *out, int out_size, uint8_t *in,
