@@ -34,6 +34,24 @@
       "isAi": true,
       "revId": "c2b44a79097a2af5d6eebb985a4609ecdbee1534",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c3d39ea_9e438853",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:39:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/031192d3-a089-46b7-8b16-c97492cbf2be)]\n\n**Review Summary**\n* **Functionality:** The domain separation logic is correctly implemented. By prefixing the HKDF info string for fingerprint auth, it successfully isolates cryptographic keys between modes.\n* **Security:** Excellent domain isolation. Prefixing the info string ensures keys derived under fingerprint auth cannot be used for classic flows, and vice-versa, mitigating cross-protocol attacks. Stack buffers are exactly sized and correctly bounded with `std::span`.\n* **Style:** The code follows modern C++ conventions, making effective use of `std::array`, `std::string_view`, and `std::span`.\n* **Testing \u0026 Test Coverage:** Test coverage is thorough and accurately validates the changes. The test suite correctly verifies that cross-flow decryption fails, and properly manages test state using the `ZTEST_SUITE` `after` hook to reset `fp_encryption_status`.\n* **CL Size \u0026 Scope:** The CL is perfectly scoped to this security enhancement and is easy to follow.\n\nTAG\u003dagy\nCONV\u003dc80a67a3-4319-46a1-adbc-6d5c1bcf95db",
+      "isAi": true,
+      "revId": "c2b44a79097a2af5d6eebb985a4609ecdbee1534",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
