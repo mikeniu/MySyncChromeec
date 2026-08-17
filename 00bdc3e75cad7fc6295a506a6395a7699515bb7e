@@ -44,6 +44,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "90e36efb_a86d07ed",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-17T18:04:51Z",
+      "side": 1,
+      "message": "[focal_algo_get_finger_detailed_info](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/drivers/fingerprint/fingerprint_ft98xx_private.h?q\u003dfocal_algo_get_finger_detailed_info\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d399-,400,-401)\n\nint focal_algo_get_finger_detailed_info(int *finger_size, int *sub_tpl_size,\n\t\t\t\t\tint *header_size);\n\n[struct ft_libfp_data](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.h;l\u003d30?q\u003dplatform%2Fec%20struct%20ft_libfp_data\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch#:~:text\u003d29-,30,-31):\n\n```\n/* Focal LIBFP algorithm private data. */\nstruct ft_libfp_data {\n\tuint16_t cols;\n\tuint16_t rows;\n\tuint32_t max_enroll_samples;\n\tuint8_t remain; // the left enroll count\n\tuint32_t tpl_finger_size; // tpl_finger_size \u003d tpl_head_size +\n\t\t\t\t  // tpl_subtemplate_size * n\n\tuint32_t tpl_head_size;\n\tuint32_t tpl_subtemplate_size;\n\tuint8_t *algo_buf;\n\tuint8_t *feature_buf;\n};\n```\n\nThis means that there is a problem with the focaltech code?",
+      "parentUuid": "82968b05_56389d25",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 67
+      },
+      "revId": "00bdc3e75cad7fc6295a506a6395a7699515bb7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "86609dd8_31f8c242",
         "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
         "patchSetId": 2
@@ -55,6 +79,30 @@
       "writtenOn": "2026-08-14T18:37:03Z",
       "side": 1,
       "message": "This seems like a good check to add. Followup CL is fine:\n\n-----\n\n\n* **Incomplete Validation (Suggestion):** The function `focal_algo_get_finger_detailed_info` retrieves three sizes: `tpl_finger_size`, `tpl_subtemplate_size`, and `tpl_head_size`. Currently, only `tpl_finger_size` is validated.\n* *Actionable feedback:* Consider whether `tpl_subtemplate_size` and `tpl_head_size` should also be validated against `0` or bounded to a maximum size. If a sub-template size of `0` is returned by the algorithm, it could potentially cause issues later in the enrollment/matching process.",
+      "range": {
+        "startLine": 83,
+        "startChar": 1,
+        "endLine": 83,
+        "endChar": 31
+      },
+      "revId": "00bdc3e75cad7fc6295a506a6395a7699515bb7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3754343f_d4aabf33",
+        "filename": "zephyr/subsys/fingerprint/alg/ft98xx_bio_alg.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-17T18:04:51Z",
+      "side": 1,
+      "message": "I am checking with focaltech whether this is might be zero or bound to a maximum",
+      "parentUuid": "86609dd8_31f8c242",
       "range": {
         "startLine": 83,
         "startChar": 1,
