@@ -207,19 +207,12 @@
 /* Which sensor body_detection use */
 #undef CONFIG_BODY_DETECTION_SENSOR
 
-/* The max number of sampling data for 1 second */
-#undef CONFIG_BODY_DETECTION_MAX_WINDOW_SIZE
-
 /* The threshold of acceleration variance */
 #undef CONFIG_BODY_DETECTION_VAR_THRESHOLD
 #undef CONFIG_BODY_DETECTION_CONFIDENCE_DELTA
 
-/* How much noise affect threshold of variance */
-#undef CONFIG_BODY_DETECTION_VAR_NOISE_FACTOR
-
-/* The confidence limit of on_body/off_body */
+/* The confidence limit of on_body */
 #undef CONFIG_BODY_DETECTION_ON_BODY_CON
-#undef CONFIG_BODY_DETECTION_OFF_BODY_CON
 
 /* The threshold duration to change to off_body */
 #undef CONFIG_BODY_DETECTION_STATIONARY_DURATION
@@ -7239,33 +7232,14 @@
 #error CONFIG_BODY_DETECTION_SENSOR must be defined to use body detection
 #endif /* ifndef(CONFIG_BODY_DETECTION_SENSOR) */
 
-/* Non-zephyr only support V1 version of the body detection algorithm. */
-#ifndef CONFIG_ZEPHYR
-#ifdef CONFIG_BODY_DETECTION_ALOGIRTHM_V2
-#error "Only V1 algo for body detection is supported."
-#endif
-#ifndef CONFIG_BODY_DETECTION_ALOGIRTHM_V1
-#define CONFIG_BODY_DETECTION_ALOGIRTHM_V1
-#endif
-#endif /* ifndef CONFIG_ZEPHYR */
-
-#ifndef CONFIG_BODY_DETECTION_MAX_WINDOW_SIZE
-#define CONFIG_BODY_DETECTION_MAX_WINDOW_SIZE 250 /* max sensor odr (Hz) */
-#endif
 #ifndef CONFIG_BODY_DETECTION_VAR_THRESHOLD
-#define CONFIG_BODY_DETECTION_VAR_THRESHOLD 550 /* (mm/s^2)^2 */
+#define CONFIG_BODY_DETECTION_VAR_THRESHOLD 4000
 #endif
 #ifndef CONFIG_BODY_DETECTION_CONFIDENCE_DELTA
-#define CONFIG_BODY_DETECTION_CONFIDENCE_DELTA 525 /* (mm/s^2)^2 */
-#endif
-#ifndef CONFIG_BODY_DETECTION_VAR_NOISE_FACTOR
-#define CONFIG_BODY_DETECTION_VAR_NOISE_FACTOR 120 /* % */
+#define CONFIG_BODY_DETECTION_CONFIDENCE_DELTA 3000
 #endif
 #ifndef CONFIG_BODY_DETECTION_ON_BODY_CON
-#define CONFIG_BODY_DETECTION_ON_BODY_CON 50 /* % */
-#endif
-#ifndef CONFIG_BODY_DETECTION_OFF_BODY_CON
-#define CONFIG_BODY_DETECTION_OFF_BODY_CON 10 /* % */
+#define CONFIG_BODY_DETECTION_ON_BODY_CON 90 /* % */
 #endif
 #ifndef CONFIG_BODY_DETECTION_STATIONARY_DURATION
 #define CONFIG_BODY_DETECTION_STATIONARY_DURATION 15 /* second */
