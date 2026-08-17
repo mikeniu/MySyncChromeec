@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5eb8b718_a5565775",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:32:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/73c5ecad-ec87-42a4-bebf-8269b10cfe4e)]\n\n**Review Summary**\n* **Functionality**: The CL correctly adds asynchronous template decryption to the test mock task `fp_task_simulate` and successfully migrates all test cases from `EC_CMD_FP_TEMPLATE` v0 to v1.\n* **Security**: No security vulnerabilities introduced. The crypto abstractions and authentication mechanisms are maintained correctly.\n* **Style**: Code style is consistent with the project guidelines.\n* **Testing \u0026 Test Coverage**: The CL properly updates existing auth tests to template v1, including the previously missed `test_fp_command_commit_without_seed`.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and properly scoped to updating auth tests for template v1.",
+      "isAi": true,
+      "revId": "b173b9195e6c66f266bb349518732f3e45ce5a1f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
