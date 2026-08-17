@@ -39,6 +39,30 @@
       },
       "revId": "00ebec67c10f4099b6e7ae3d2dee2338fe5e0a0f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2b10b39_c5b427e0",
+        "filename": "zephyr/program/fatcat/kinmen/i2c_pac.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-08-17T07:21:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22670ebc_268d5925",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 1
+      },
+      "revId": "00ebec67c10f4099b6e7ae3d2dee2338fe5e0a0f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
