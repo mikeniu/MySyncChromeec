@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "b173b9195e6c66f266bb349518732f3e45ce5a1f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4916d6bb_bcaef13c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:35:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/5b04a17a-ed95-4ea3-810d-29656c21f0d1)]\n\n**Review Summary**\n* **Functionality**: The CL properly migrates all authentication unit tests to use version 1 host commands (`EC_CMD_FP_TEMPLATE`, v1), including the previously missed test case `test_fp_command_commit_without_seed`. The template decryption behavior accurately simulates asynchronous execution and polling.\n* **Security**: No security vulnerabilities introduced. The cryptographic testing logic validates correctly using the updated struct versions.\n* **Style**: Code style is consistent and maintains standard guidelines.\n* **Testing \u0026 Test Coverage**: Test coverage is adequate; the tests successfully validate the template decryption and loading pathways under the new protocol version.\n* **CL Size \u0026 Scope**: The CL size is appropriate and scoped directly to the migration of the auth tests.",
+      "isAi": true,
+      "revId": "b173b9195e6c66f266bb349518732f3e45ce5a1f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
