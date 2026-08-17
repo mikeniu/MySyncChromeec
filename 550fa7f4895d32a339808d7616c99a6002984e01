@@ -36,6 +36,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2463c33_f691d43b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-17T23:09:28Z",
+      "side": 1,
+      "message": "done in https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8258616/1",
+      "parentUuid": "9f32578a_01d9efae",
+      "revId": "550fa7f4895d32a339808d7616c99a6002984e01",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b5428f9_7c1b6b91",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-17T23:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e664e67_c7d19c49",
+      "revId": "550fa7f4895d32a339808d7616c99a6002984e01",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e06bdc68_e33747d1",
@@ -50,6 +86,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] It looks like this test was missed during the migration to template v1. `test_fp_command_commit_without_seed` still uses `ec_params_fp_template` (v0) and the `FP_TEMPLATE_COMMIT` flag.\n\nPlease update this test to use `FP_TEMPLATE_LOAD` (which should succeed) and `FP_TEMPLATE_DECRYPT` (which should fail and return `EC_RES_UNAVAILABLE` through `wait_for_template_decrypt_result()`), similar to the other migrated tests.",
       "isAi": true,
+      "revId": "550fa7f4895d32a339808d7616c99a6002984e01",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8250c70_2c3164b5",
+        "filename": "test/fpsensor_auth_commands.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 1044,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-17T23:09:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e06bdc68_e33747d1",
       "revId": "550fa7f4895d32a339808d7616c99a6002984e01",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
