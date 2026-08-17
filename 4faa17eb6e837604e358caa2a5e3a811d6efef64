@@ -117,6 +117,56 @@
       },
       "revId": "4faa17eb6e837604e358caa2a5e3a811d6efef64",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5ffdfe0_505e7da3",
+        "filename": "zephyr/test/drivers/body_detection/src/body_detection.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T21:38:41Z",
+      "side": 1,
+      "message": "Done. Added helper functions calculate_expected_confidence_delta and calculate_expected_var_threshold to assert exact expected scaled values for Algorithm V1.",
+      "parentUuid": "080ddce8_c37209d6",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "4faa17eb6e837604e358caa2a5e3a811d6efef64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c04a12b_3bf48abf",
+        "filename": "zephyr/test/drivers/body_detection/src/body_detection.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T21:38:41Z",
+      "side": 1,
+      "message": "Done. Added helper functions calculate_expected_confidence_delta and calculate_expected_var_threshold to assert exact expected scaled values for Algorithm V1.",
+      "parentUuid": "053f0f7a_15110456",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "4faa17eb6e837604e358caa2a5e3a811d6efef64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
