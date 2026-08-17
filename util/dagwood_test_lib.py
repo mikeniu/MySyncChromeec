@@ -51,6 +51,15 @@ def add_common_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Run tests from SRAM (adds -r to flash command).",
     )
+    parser.add_argument(
+        "-b",
+        "--build-only",
+        action="store_true",
+        help=(
+            "Only build the test binaries; do not execute on hardware "
+            "or flash."
+        ),
+    )
 
 
 def get_twister_args(
@@ -74,14 +83,22 @@ def get_twister_args(
         "--toolchain=coreboot-sdk",
         "-p",
         args.platform,
-        "--device-testing",
-        "--device-serial",
-        args.device_serial,
-        "--flash-command",
-        flash_cmd,
-        "--device-flash-timeout",
-        "60",
     ]
+
+    if args.build_only:
+        twister_args.append("-b")
+    else:
+        twister_args.extend(
+            [
+                "--device-testing",
+                "--device-serial",
+                args.device_serial,
+                "--flash-command",
+                flash_cmd,
+                "--device-flash-timeout",
+                "60",
+            ]
+        )
 
     if args.sram:
         twister_args.append("-x=SNIPPET=sram-only")
