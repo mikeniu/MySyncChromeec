@@ -428,11 +428,15 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_GET_UPTIME_INFO
                                                 "${PLATFORM_EC}/common/uptime.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C
                                                 "${PLATFORM_EC}/common/i2c_controller.c"
-                                                "${PLATFORM_EC}/common/i2c_passthru.c"
                                                 "${PLATFORM_EC}/common/i2c_msg_queue.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED
+                                                "${PLATFORM_EC}/common/i2c_passthru.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C_DEBUG
                                                 "${PLATFORM_EC}/common/i2c_trace.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY
+                                                "${PLATFORM_EC}/common/i2c_battery_parser.c"
+                                                "${PLATFORM_EC}/common/virtual_battery.c")
+zephyr_library_sources_ifdef(CONFIG_I2C_DTS_PASSTHRU
                                                 "${PLATFORM_EC}/common/i2c_battery_parser.c"
                                                 "${PLATFORM_EC}/common/virtual_battery.c")
 if (DEFINED CONFIG_PLATFORM_EC_BATTERY)

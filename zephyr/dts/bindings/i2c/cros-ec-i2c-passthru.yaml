@@ -1,0 +1,47 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: |
+  I2C passthru configuration parent and child node binding.
+
+  Example:
+        i2c-passthru {
+                compatible = "cros-ec,i2c-passthru";
+                #address-cells = <1>;
+                #size-cells = <0>;
+
+                i2c_passthru_c0: port0@0 {
+                        reg = <0>;
+                        i2c-port = <&i2c_c0>;
+                };
+        };
+
+compatible: "cros-ec,i2c-passthru"
+
+include: base.yaml
+
+properties:
+  "#address-cells":
+    required: true
+    const: 1
+  "#size-cells":
+    required: true
+    const: 0
+
+child-binding:
+  description: I2C passthru port configuration
+  include:
+    - name: base.yaml
+      property-allowlist:
+        - reg
+  properties:
+    i2c-port:
+      type: phandle
+      description: |
+        Handle to the I2C port.
+    devices:
+      type: uint8-array
+      description: |
+        List of permissible 7-bit I2C device addresses for passthru on this port.
+        If empty or omitted, all addresses on this port are allowed.

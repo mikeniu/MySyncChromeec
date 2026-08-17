@@ -13,6 +13,13 @@
 #include "host_command.h"
 #include "stddef.h"
 
+#ifdef CONFIG_ZEPHYR
+#include "i2c_msg_queue.h"
+
+#include <zephyr/device.h>
+#include <zephyr/drivers/i2c.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -196,6 +203,31 @@ int i2c_xfer_unlocked(const int port, const uint16_t addr_flags,
  * @param lock		1 to lock, 0 to unlock
  */
 void i2c_lock(int port, int lock);
+
+#ifdef CONFIG_ZEPHYR
+/**
+ * Lock / unlock an I2C device.
+ * @param i2c_device	Device to lock
+ * @param lock		1 to lock, 0 to unlock
+ */
+void zephyr_i2c_lock(const struct device *i2c_device, int lock);
+
+/**
+ * Same as i2c_xfer, but accepts a msg_queue and asserts that the queue operates
+ * on a single address.
+ *
+ * @param i2c_device		The i2c device.
+ * @param msg_queue		The messages.
+ * @param msg_buffer		The space to store the intermediates.
+ * @param msg_buffer_size 	The size of msg_buffer.
+ * @param in			The buffer to receive the input from the i2c
+ * device.
+ */
+int zephyr_i2c_xfer_i2c_message_queue(const struct device *i2c_device,
+				      struct msg_queue_t *msg_queue,
+				      struct i2c_msg *msg_buffer,
+				      size_t msg_buffer_size, uint8_t *in);
+#endif
 
 /* Default maximum time we allow for an I2C transfer */
 #define I2C_TIMEOUT_DEFAULT_US (100 * MSEC)
