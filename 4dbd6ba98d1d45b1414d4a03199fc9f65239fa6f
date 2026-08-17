@@ -16,6 +16,75 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "4dbd6ba98d1d45b1414d4a03199fc9f65239fa6f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "391857e5_b80ffa29",
+        "filename": "zephyr/test/drivers/usbc_console_pd/src/usbc_console_pd.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:18:46Z",
+      "side": 1,
+      "message": "To adhere to the standard Zephyr coding style and avoid potential warnings/errors if `-Wdeclaration-after-statement` is enabled, please move these variable declarations above the `if` block.",
+      "range": {
+        "startLine": 232,
+        "startChar": 0,
+        "endLine": 232,
+        "endChar": 0
+      },
+      "revId": "4dbd6ba98d1d45b1414d4a03199fc9f65239fa6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51f0c8e9_8ddce21d",
+        "filename": "zephyr/test/drivers/usbc_console_pd/src/usbc_console_pd.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:18:46Z",
+      "side": 1,
+      "message": "Same here, please move the variable declarations to the top of the function.",
+      "range": {
+        "startLine": 296,
+        "startChar": 0,
+        "endLine": 296,
+        "endChar": 0
+      },
+      "revId": "4dbd6ba98d1d45b1414d4a03199fc9f65239fa6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce67fec7_6ea89f27",
+        "filename": "zephyr/test/drivers/usbc_console_pd/src/usbc_console_pd.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-17T17:18:46Z",
+      "side": 1,
+      "message": "Same here, please move the variable declarations to the top of the function.",
+      "range": {
+        "startLine": 369,
+        "startChar": 0,
+        "endLine": 369,
+        "endChar": 0
+      },
+      "revId": "4dbd6ba98d1d45b1414d4a03199fc9f65239fa6f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
