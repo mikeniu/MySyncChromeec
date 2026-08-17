@@ -11,7 +11,7 @@
 
 #include <zephyr/sys/__assert.h>
 #include <zephyr/sys/printk.h>
-#include <zephyr/sys_clock.h>
+#include <zephyr/sys/clock.h>
 #include <zephyr/toolchain.h>
 
 #include <timer.h>

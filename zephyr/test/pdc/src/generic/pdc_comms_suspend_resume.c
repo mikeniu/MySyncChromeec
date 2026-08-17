@@ -16,7 +16,7 @@
 #include <zephyr/drivers/emul.h>
 #include <zephyr/fff.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/sys_clock.h>
+#include <zephyr/sys/clock.h>
 #include <zephyr/ztest.h>
 
 LOG_MODULE_REGISTER(pdc_comms_suspend_resume, LOG_LEVEL_INF);
