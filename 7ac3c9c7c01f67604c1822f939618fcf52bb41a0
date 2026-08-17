@@ -16,6 +16,24 @@
       "message": "Wouldn\u0027t be `sizeof(void *)` better?",
       "revId": "7ac3c9c7c01f67604c1822f939618fcf52bb41a0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2dedc29_314d66f5",
+        "filename": "common/flash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1634,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-08-17T12:37:28Z",
+      "side": 1,
+      "message": "Good suggestion, thanks. I pushed an update to address this",
+      "parentUuid": "cedfbd24_82a861f1",
+      "revId": "7ac3c9c7c01f67604c1822f939618fcf52bb41a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
