@@ -34,8 +34,11 @@ ZTEST_USER(i2c_passthru, test_read_without_write)
 		(struct ec_response_i2c_passthru *)&response_buf;
 	struct host_cmd_handler_args args =
 		BUILD_HOST_COMMAND_SIMPLE(EC_CMD_I2C_PASSTHRU, 0);
+	/* Remote port is defined in the i2c-passthru in native_sim.overlay */
+	uint8_t test_port =
+		IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU) ? 5 : I2C_PORT_POWER;
 
-	params->port = I2C_PORT_POWER;
+	params->port = test_port;
 	params->num_msgs = 1;
 	params->msg[0].addr_flags = LN9310_I2C_ADDR_0_FLAGS | EC_I2C_FLAG_READ;
 	params->msg[0].len = 1;
@@ -102,6 +105,11 @@ ZTEST_USER(i2c_passthru, test_passthru_invalid_params)
 
 ZTEST_USER(i2c_passthru, test_passthru_protect)
 {
+	/* TODO Support the test for CONFIG_I2C_DTS_PASSTHRU=y */
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED)) {
+		ztest_test_skip();
+		return;
+	}
 	struct ec_response_i2c_passthru_protect response;
 	struct ec_params_i2c_passthru_protect status_params = {
 		.port = I2C_PORT_SENSOR,
@@ -163,6 +171,10 @@ ZTEST_USER(i2c_passthru, test_passthru_protect)
 
 ZTEST_USER(i2c_passthru, test_passthru_protect_tcpcs)
 {
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED)) {
+		ztest_test_skip();
+		return;
+	}
 	struct ec_params_i2c_passthru_protect enable_params = {
 		.port = I2C_PORT_SENSOR,
 		.subcmd = EC_CMD_I2C_PASSTHRU_PROTECT_ENABLE_TCPCS,
@@ -249,7 +261,8 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted)
 	struct host_cmd_handler_args ps8xxx_args =
 		BUILD_HOST_COMMAND_SIMPLE(EC_CMD_I2C_PASSTHRU, 0);
 
-	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED)) {
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED) &&
+	    !IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
 		ztest_test_skip();
 		return;
 	}
@@ -303,7 +316,8 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted)
 
 	zassert_ok(host_command_process(&tcpc_args));
 	CHECK_ARGS_RESULT(tcpc_args)
-	zassert_ok(tcpc_response->i2c_status);
+	zassert_ok(tcpc_response->i2c_status, "tcpc_response->i2c_status=%d",
+		   tcpc_response->i2c_status);
 	zassert_equal(tcpc_args.response_size,
 		      sizeof(struct ec_response_i2c_passthru) + 2, NULL);
 
@@ -322,7 +336,27 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted)
 	zassert_equal(tcpc_args.response_size,
 		      sizeof(struct ec_response_i2c_passthru) + 2, NULL);
 
-	zassert_equal(host_command_process(&ps8xxx_args), EC_RES_ACCESS_DENIED);
+	if (IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
+		/* board_allow_i2c_passthru_custom_fake is ignored in
+		 * CONFIG_I2C_DTS_PASSTHRU mode. */
+		zassert_ok(host_command_process(&ps8xxx_args));
+	} else {
+		/* board_allow_i2c_passthru_custom_fake rejects the access in
+		 * CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED mode */
+		zassert_equal(host_command_process(&ps8xxx_args),
+			      EC_RES_ACCESS_DENIED);
+	}
+
+	if (IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
+		/* Use an address that is not in the dts allow list. */
+		uint16_t invalid_tcpc_addr = tcpc_addr ^ 0xFF;
+		tcpc_params->msg[0].addr_flags = invalid_tcpc_addr;
+		tcpc_params->msg[1].addr_flags = invalid_tcpc_addr |
+						 EC_I2C_FLAG_READ;
+
+		zassert_equal(host_command_process(&tcpc_args),
+			      EC_RES_ACCESS_DENIED);
+	}
 }
 
 ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
@@ -332,7 +366,11 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
 		ztest_test_skip();
 		return;
 	}
+#ifdef CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY
 	uint16_t vb_addr = VIRTUAL_BATTERY_ADDR_FLAGS;
+#else
+	uint16_t vb_addr = 0xB;
+#endif
 	uint8_t *out_data;
 	uint8_t vb_param_buf[sizeof(struct ec_params_i2c_passthru) +
 			     2 * sizeof(struct ec_params_i2c_passthru_msg) +
