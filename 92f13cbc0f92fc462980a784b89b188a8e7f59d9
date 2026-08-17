@@ -21,6 +21,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "15c66523_a35b9e53",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:32:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/72681b32-d2ca-4c99-a1fd-0da063b53949)]\n\n**Review Summary:**\n* **Functionality:** The patch adds tests for legacy template v0 handling (`EC_CMD_FP_TEMPLATE`), properly covering successful decryption and the trivial positive match salt rejection. The tests correctly construct the encryption metadata and verify the command responses.\n* **Security:** N/A (test only changes).\n* **Style:** The code follows C++20 conventions, effectively using `std::span` and `std::ranges` for clear buffer manipulation.\n* **Testing:** The added tests provide good coverage for the v0 template commit logic. I left a minor suggestion to assert that `global_context.templ_valid` remains `0` after a failed commit.\n* **CL Size \u0026 Scope:** The CL is appropriately sized and focused specifically on testing template v0 decryption.",
+      "isAi": true,
+      "revId": "92f13cbc0f92fc462980a784b89b188a8e7f59d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a45ece80_3b21a53e",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
         "patchSetId": 1
@@ -32,6 +50,24 @@
       "writtenOn": "2026-08-17T23:30:50Z",
       "side": 1,
       "message": "[Gerrit AI Review] Consider adding an additional test case to verify that an `EC_CMD_FP_TEMPLATE` v0 command fails gracefully if the template encryption tag (MAC) is corrupted. This would help ensure robustness against tampered or corrupted legacy templates.\n\nFor example:\n```cpp\nZTEST(fpsensor_auth_commands, test_fp_command_template_v0_corrupted_mac)\n{\n\t// ... [setup similar to test_fp_command_template_v0_decrypted] ...\n\n\t// Corrupt the authentication tag\n\tenc_metadata_data.tag[0] ^\u003d 1;\n\tmemcpy(enc_metadata.data(), \u0026enc_metadata_data, enc_metadata.size());\n\n\tzassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0,\n\t\t\t\t\t     params.data(), params.size(), NULL,\n\t\t\t\t\t     0),\n\t\t      EC_RES_INVALID_PARAM); // or the expected error code\n}\n```",
+      "isAi": true,
+      "revId": "92f13cbc0f92fc462980a784b89b188a8e7f59d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be333104_b7503ba7",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 2206,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-17T23:32:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider asserting `zassert_equal(global_context.templ_valid, 0u);` here at the end of the test. This provides symmetry with the success case and ensures that a rejected template commit does not accidentally leave the template marked as valid in the global context.",
       "isAi": true,
       "revId": "92f13cbc0f92fc462980a784b89b188a8e7f59d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
