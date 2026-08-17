@@ -1839,6 +1839,15 @@ tests:
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
+  drivers.body_detection_v1:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_BODY_DETECTION=y
+    - CONFIG_PLATFORM_EC_BODY_DETECTION=y
+    - CONFIG_BODY_DETECTION_ALOGIRTHM_V1=y
+    - CONFIG_PLATFORM_EC_BODY_DETECTION_DYNAMIC_INDEX=y
+    - CONFIG_PLATFORM_EC_BODY_DETECTION_ALWAYS_ENABLE_IN_S0=y
+    - CONFIG_PLATFORM_EC_BODY_DETECTION_NOTIFY_MODE_CHANGE=y
+    - CONFIG_PLATFORM_EC_GESTURE_HOST_DETECTION=y
   drivers.watchdog_helper:
     extra_configs:
     - CONFIG_PLATFORM_EC_WATCHDOG_HELPER=y
