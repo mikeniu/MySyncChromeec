@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45b1a021_b3f6e222",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-18T15:13:37Z",
+      "side": 1,
+      "message": "/: 69918/171471 -\u003e 70017/171471 (+99/+0) [40.78% -\u003e 40.83% (+0.06%)]\n\n  common/: 0/95 -\u003e 93/95 (+93/+0) [0.0% -\u003e 97.9% (+97.9%)]\n    common/body_detection.c: 0/95 -\u003e 93/95 (+93/+0) [0.0% -\u003e 97.9% (+97.9%)]\n\n  driver/: 119/220 -\u003e 123/220 (+4/+0) [54.1% -\u003e 55.9% (+1.8%)]\n    driver/accel_lis2dw12.c: 119/220 -\u003e 123/220 (+4/+0) [54.1% -\u003e 55.9% (+1.8%)]\n\n  zephyr/lib/vsensor/body_detection/: 91/99 -\u003e 92/99 (+1/+0) [91.9% -\u003e 92.9% (+1.0%)]\n    zephyr/lib/vsensor/body_detection/body_detection.c: 91/99 -\u003e 92/99 (+1/+0) [91.9% -\u003e 92.9% (+1.0%)]\n\n  zephyr/program/nissa/meliks/src/: 222/229 -\u003e 223/229 (+1/+0) [96.9% -\u003e 97.4% (+0.4%)]\n    zephyr/program/nissa/meliks/src/battery.c: 222/229 -\u003e 223/229 (+1/+0) [96.9% -\u003e 97.4% (+0.4%)]",
+      "revId": "291fc0e1645e0bae2213a042bfa8dbef589ea883",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
