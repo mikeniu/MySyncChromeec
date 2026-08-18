@@ -71,6 +71,10 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 #define IT52XX_VDM_VDC_GET_VDO_PARTNER 2
 #define IT52XX_VDM_VDC_GET_VDO_CABLE 3
 
+/** Vendor-defined command values used to set and get an RDO. */
+#define IT52XX_VDM_VDC_SET_RDO 4
+#define IT52XX_VDM_VDC_GET_RDO 5
+
 /** SET_PDO command layout. */
 #define IT52XX_SET_PDO_MAX_PDO_COUNT 7
 #define IT52XX_SET_PDO_CMD_BASE_LENGTH 12
@@ -219,21 +223,19 @@ static const struct smbus_cmd_t GET_VDO = { 0x81, IT52XX_CONTROL_BYTE_CNT,
 					    UCSI_VENDOR_DEFINED_COMMAND };
 static const struct smbus_cmd_t GET_PDOS = { 0x81, IT52XX_CONTROL_BYTE_CNT,
 					     UCSI_GET_PDOS };
-static const struct smbus_cmd_t __unused SET_RDO = {
-	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_VENDOR_DEFINED_COMMAND
-};
-static const struct smbus_cmd_t __unused GET_CABLE_PROPERTY = {
+static const struct smbus_cmd_t SET_RDO = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+					    UCSI_VENDOR_DEFINED_COMMAND };
+static const struct smbus_cmd_t GET_CABLE_PROPERTY = {
 	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_GET_CABLE_PROPERTY
 };
-static const struct smbus_cmd_t __unused GET_RDO = {
-	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_VENDOR_DEFINED_COMMAND
-};
-static const struct smbus_cmd_t __unused SET_CONNECTOR_RESET = {
-	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_CONNECTOR_RESET
-};
-static const struct smbus_cmd_t __unused GET_CAPABILITY = {
-	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_GET_CAPABILITY
-};
+static const struct smbus_cmd_t GET_RDO = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+					    UCSI_VENDOR_DEFINED_COMMAND };
+static const struct smbus_cmd_t SET_CONNECTOR_RESET = { 0x81,
+							IT52XX_CONTROL_BYTE_CNT,
+							UCSI_CONNECTOR_RESET };
+static const struct smbus_cmd_t GET_CAPABILITY = { 0x81,
+						   IT52XX_CONTROL_BYTE_CNT,
+						   UCSI_GET_CAPABILITY };
 static const struct smbus_cmd_t __unused GET_LPM_PPM_INFO = {
 	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_GET_LPM_PPM_INFO
 };
@@ -2654,35 +2656,227 @@ static int it52xx_get_pdos(const struct device *dev, enum pdo_type_t pdo_type,
 
 static int it52xx_set_rdo(const struct device *dev, uint32_t rdo)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5, byte6 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	/* Support by [CONTROL] VDM */
+	/* bit[16:23]: connector num 7'b, vdc_cmd 1'b */
+	/* bit[24:31]: vdc_cmd 4'b, IT52XX_VDM_VDC_VER 4'b */
+	byte5 = (conn_num & 0x7f) | ((IT52XX_VDM_VDC_SET_RDO & BIT(0)) << 7);
+	byte6 = ((IT52XX_VDM_VDC_SET_RDO >> 1) & 0xf) |
+		((IT52XX_VDM_VDC_VER & 0xf) << 4);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = SET_RDO.cmd,
+		.len = SET_RDO.len,
+		.control = {
+			.command = SET_RDO.sub,
+			.data_length = 0x00,
+			/* Data Length -->
+			 set to 0x00 */
+			.command_specific = {
+				byte5,
+				byte6,
+				IT52XX_BYTE0(rdo),
+				IT52XX_BYTE1(rdo),
+				IT52XX_BYTE2(rdo),
+				IT52XX_BYTE3(rdo),
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_SET_RDO, (const uint8_t *)&payload,
+				   sizeof(payload), NULL);
 }
 
 static int it52xx_get_cable_property(const struct device *dev,
 				     union cable_property_t *cp)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (cp == NULL) {
+		return -EINVAL;
+	}
+
+	/* bit[16:23]: connector num 7'b, reserved 1'b */
+	byte5 = (conn_num & 0x7f);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_CABLE_PROPERTY.cmd,
+		.len = GET_CABLE_PROPERTY.len,
+		.control = {
+			.command = GET_CABLE_PROPERTY.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_GET_CABLE_PROPERTY,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   (uint8_t *)cp);
 }
 
 static int it52xx_get_rdo(const struct device *dev, uint32_t *rdo)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5, byte6 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (rdo == NULL) {
+		return -EINVAL;
+	}
+
+	/* Support by [CONTROL] VDM */
+	/* bit[16:23]: connector num 7'b, vdc_cmd 1'b */
+	/* bit[24:31]: vdc_cmd 4'b, IT52XX_VDM_VDC_VER 4'b */
+	byte5 = (conn_num & 0x7f) | ((IT52XX_VDM_VDC_GET_RDO & BIT(0)) << 7);
+	byte6 = ((IT52XX_VDM_VDC_GET_RDO >> 1) & 0xf) |
+		((IT52XX_VDM_VDC_VER & 0xf) << 4);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_RDO.cmd,
+		.len = GET_RDO.len,
+		.control = {
+			.command = GET_RDO.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+				byte6,
+				IT52XX_VDM_VID_L,
+				IT52XX_VDM_VID_H,
+				0x00,
+				/* EC_PID_L --> it52xx don't care */
+				0x00,
+				/* EC_PID_H --> it52xx don't care */
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_GET_RDO, (const uint8_t *)&payload,
+				   sizeof(payload), (uint8_t *)rdo);
 }
 
 static int it52xx_connector_reset(const struct device *dev,
 				  union connector_reset_t reset)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	reset.connector_number = conn_num;
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = SET_CONNECTOR_RESET.cmd,
+		.len = SET_CONNECTOR_RESET.len,
+		.control = {
+			.command = SET_CONNECTOR_RESET.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				reset.raw_value,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_CONNECTOR_RESET,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   NULL);
 }
 
 static int it52xx_get_capability(const struct device *dev,
 				 struct capability_t *caps)
 {
-	return -ENOSYS;
+	struct pdc_data_t *data = dev->data;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (caps == NULL) {
+		return -EINVAL;
+	}
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_CAPABILITY.cmd,
+		.len = GET_CAPABILITY.len,
+		.control = {
+			.command = GET_CAPABILITY.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_GET_CAPABILITY,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   (uint8_t *)caps);
 }
 
 static int it52xx_get_vbus_voltage(const struct device *dev, uint16_t *voltage)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (voltage == NULL) {
+		return -EINVAL;
+	}
+
+	/* bit[16:23]: connector num 7'b, reserved 1'b */
+	byte5 = (conn_num & 0x7f);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_CONNECTOR_STATUS.cmd,
+		.len = GET_CONNECTOR_STATUS.len,
+		.control = {
+			.command = GET_CONNECTOR_STATUS.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_GET_VBUS_VOLTAGE,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   (uint8_t *)voltage);
 }
 
 static int it52xx_get_ucsi_version(const struct device *dev, uint16_t *version)
