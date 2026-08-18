@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "a019b3ffbe19ad1dcfbc48490bf08072ed90f945",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cf56d06_e6baffb4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-18T20:24:42Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/4367cae9-3a55-48a6-b1a2-be639b014e6b)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The memory clearing logic correctly uses `memset` with safe `uintptr_t` arithmetic. The weak symbols for `__ahb4_start` and `__ahb4_end` are well-applied to prevent linker errors on chips that do not define the `.ahb4` memory region.\n*   **Security:** ✅ No vulnerabilities introduced. Purging stale memory across resets is an excellent defense-in-depth measure against data leakage.\n*   **Style:** ✅ The C code matches the existing style and conventions. The minor python tuple unpacking cleanups in the test script are also appreciated.\n*   **Consistency:** ✅ By placing the chip-specific SRAM clearing logic in `chip/stm32/system.c`, the abstraction boundaries are cleanly respected (compared to putting it in the generic architecture startup).\n*   **Testing:** ✅ The `fp_buffer_clear` multistep test is implemented properly to verify the buffer is zeroed out across resets, ensuring future regressions are caught.\n*   **CL Size \u0026 Scope:** ✅ The CL remains small, self-contained, and focused on a single issue.\n\nTAG\u003dagy\nCONV\u003d4367cae9-3a55-48a6-b1a2-be639b014e6b",
+      "isAi": true,
+      "revId": "a019b3ffbe19ad1dcfbc48490bf08072ed90f945",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
