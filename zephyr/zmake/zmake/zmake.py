@@ -439,6 +439,7 @@ class Zmake:
         ref1,
         ref2,
         project_names,
+        module="ec",
         toolchain=None,
         all_projects=False,
         extra_cflags=None,
@@ -449,6 +450,18 @@ class Zmake:
         compare_devicetrees=False,
     ):
         """Compare EC builds at two commits."""
+        if module in ("zephyr", "zephyrproject", "zephyr-base"):
+            target_module_path = (
+                self.zephyr_base.parent
+                if "zephyrproject" in self.zephyr_base.parts
+                else self.zephyr_base
+            )
+        elif module in self.module_paths:
+            target_module_path = self.module_paths[module]
+        else:
+            raise KeyError(
+                f"Module '{module}' is not known or not found in checkout."
+            )
         os.chdir(self.module_paths["ec"])
         temp_dir = tempfile.mkdtemp(prefix="zcompare-")
         if not keep_temps:
@@ -472,7 +485,13 @@ class Zmake:
         self.logger.info("Compare zephyr builds")
 
         cmp_builds = zmake.compare_builds.CompareBuilds(
-            temp_dir, ref1, ref2, self.executor, self._sequential
+            temp_dir=temp_dir,
+            ref1=ref1,
+            ref2=ref2,
+            executor=self.executor,
+            sequential=self._sequential,
+            target_module=module,
+            target_module_path=target_module_path,
         )
 
         for checkout in cmp_builds.checkouts:
