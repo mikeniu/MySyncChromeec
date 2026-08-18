@@ -16,6 +16,69 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "5fc77873b1dcc9441cb9dec732d67ffceb118098",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d1f36f1_caea9bf0",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T22:21:45Z",
+      "side": 1,
+      "message": "You need to rebuild the zmake help markdown.",
+      "range": {
+        "startLine": 198,
+        "startChar": 0,
+        "endLine": 198,
+        "endChar": 13
+      },
+      "revId": "5fc77873b1dcc9441cb9dec732d67ffceb118098",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84fa5e92_bcc6f859",
+        "filename": "zephyr/zmake/zmake/compare_builds.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T22:21:45Z",
+      "side": 1,
+      "message": "Can you make this a required parameter?  Update the calling tree to always specify both `target_module` and `target_module_path`.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 16
+      },
+      "revId": "5fc77873b1dcc9441cb9dec732d67ffceb118098",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69a407db_0897b84a",
+        "filename": "zephyr/zmake/zmake/compare_builds.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T22:21:45Z",
+      "side": 1,
+      "message": "Nit - update all parameters to use named arguments for consistency.",
+      "revId": "5fc77873b1dcc9441cb9dec732d67ffceb118098",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
