@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c6699ed_b74b0b9d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-18T04:22:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/1d9ff5db-599a-4175-bde7-10f19d303fbe)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The memory clearing logic uses C-style `memset` with safe `uintptr_t` arithmetic. The linker script enforces 4-byte alignment, resolving the unaligned memory access concerns. The test verifies behavior correctly across soft resets.\n*   **Security:** ✅ No vulnerabilities introduced. Purging stale memory across resets is a good defense-in-depth practice against data leakage.\n*   **Style:** ✅ The C code matches the existing style and conventions.\n*   **Consistency:** ✅ By moving the initialization logic out of the generic architecture `init.S` and into `chip/stm32/system.c`, the CL now properly respects the abstraction boundaries between architecture-level and chip-specific code.\n*   **Testing:** ✅ An on-device test `fp_buffer_clear` was added and integrated into the test runner.\n*   **CL Size \u0026 Scope:** ✅ The CL remains small, self-contained, and focused.\n\nTAG\u003dagy\nCONV\u003d92db822b-176d-4223-b33e-f96db80b5efb",
+      "isAi": true,
+      "revId": "c9075c8bfb556f106ef2039a8dc4a2aedcbebe9c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "deabb17d_e06d138d",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-18T04:22:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] 💡 **Minor Suggestion:** Consider adding `__attribute__((weak))` to these `extern` declarations:\n\n```c\n__attribute__((weak)) extern uint32_t __ahb4_start[];\n__attribute__((weak)) extern uint32_t __ahb4_end[];\n```\n\nWhile this currently works for all existing STM32H7 boards that define the `.ahb4` region, making these symbols weak prevents linker errors if a new STM32H7 board is added in the future that does *not* define `.ahb4` in its `memory_regions.inc`. If undefined, weak symbols resolve to `0`, and your `if ((uintptr_t)__ahb4_end \u003e (uintptr_t)__ahb4_start)` check on line 308 will safely evaluate to false and skip the `memset`.",
+      "isAi": true,
+      "revId": "c9075c8bfb556f106ef2039a8dc4a2aedcbebe9c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
