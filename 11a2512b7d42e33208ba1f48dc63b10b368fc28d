@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9b2222e1_d874d87b",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 3059,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-08-18T18:25:40Z",
+      "side": 1,
+      "message": "The coverage here does match the html report for me. https://screenshot-v2.corp.google.com/34ug4brv6cnag",
+      "parentUuid": "4eca4b85_cd08d785",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c076fb74_58918ff8",
         "filename": "test/usb_typec_drp_acc_trysrc.c",
         "patchSetId": 17
