@@ -51,6 +51,11 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 /** UCSI status bit in the IT52XX interrupt status register. */
 #define IT52XX_INT_UCSI_STATUS BIT(1)
 
+/** Transition back to init or idle and finish handling the SMF event. */
+#define TRANSITION_TO_INIT_OR_IDLE_STATE(data)  \
+	transition_to_init_or_idle_state(data); \
+	return SMF_EVENT_HANDLED
+
 /** IT52XX SMBus command descriptor. */
 struct smbus_cmd_t {
 	/* Command ex. [CONTROL], [MSGOUT], [CCI], [MSGIN] */
@@ -347,6 +352,8 @@ struct pdc_data_t {
 	union error_status_t error_status;
 	/** CCI Event for PPM */
 	union cci_event_t cci_event;
+	/** CCI event for an initialization command (except ACK_CC_CI) */
+	union cci_event_t init_cci_event;
 	/** Callback to handle commands complete indicator in interrupt */
 	struct pdc_callback *cc_cb;
 	/** One-time callback to handle commands complete indicator in interrupt
@@ -514,6 +521,15 @@ static void call_cci_event_cb(struct pdc_data_t *data)
 	const union cci_event_t cci = data->cci_event;
 
 	if (!data->init_done) {
+		/*
+		 * Preserve the initialization command result (except ACK_CC_CI)
+		 * while the driver completes the internal ACK_CC_CI
+		 * transaction.
+		 */
+		if (data->init_local_state == INIT_PDC_CMD_WAIT &&
+		    data->cmd != CMD_ACK_CC_CI) {
+			data->init_cci_event = cci;
+		}
 		return;
 	}
 
@@ -737,6 +753,7 @@ static void st_init_entry(void *o)
 static void init_write_cmd_and_change_state(struct pdc_data_t *data,
 					    enum init_state_t next)
 {
+	data->init_cci_event.raw_value = 0;
 	data->init_local_current_state = data->init_local_state;
 	data->init_local_next_state = next;
 	data->init_local_state = INIT_PDC_CMD_WAIT;
@@ -747,7 +764,7 @@ static bool init_command_tx_complete(struct pdc_data_t *data)
 {
 	/* If PDC_RESET was sent, check the reset_completed flag */
 	if (data->init_local_current_state == INIT_PDC_SET_PPM_RESET) {
-		return data->cci_event.reset_completed;
+		return data->init_cci_event.reset_completed;
 	}
 
 	return data->cci_event.command_completed;
@@ -792,7 +809,7 @@ static enum smf_state_result init_handle_command_result(struct pdc_data_t *data)
 	const struct pdc_config_t *cfg = data->dev->config;
 
 	/* [CCI] raise error indicator */
-	if (data->cci_event.error) {
+	if (data->init_cci_event.error) {
 		/* I2C read Error. No way to recover, so disable the PDC
 		 */
 		if (data->error_status.i2c_read_error) {
@@ -1144,6 +1161,260 @@ static enum smf_state_result st_task_wait_run(void *o)
 	 */
 	return SMF_EVENT_HANDLED;
 }
+
+static void st_get_cci_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+
+	/* This state can only be entered from the Task Wait or Idle state */
+	assert(data->last_state == ST_TASK_WAIT || data->last_state == ST_IDLE);
+
+	/* Clear I2C Transaction Retry Counter */
+	data->i2c_transaction_retry_counter = 0;
+	/* Clear [CCI] Message */
+	data->cci_byte_cnt = 0;
+	data->cci_message.raw_value = 0;
+	/* Clear the CCI Event */
+	data->cci_event.raw_value = 0;
+}
+
+static enum smf_state_result st_get_cci_run(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+	const struct pdc_config_t *cfg = data->dev->config;
+	union conn_status_change_bits_t ci = { 0 };
+	const bool cc = true;
+	int rv;
+
+	/* Read the [CCI] message */
+	rv = get_cci_message(data->dev);
+
+	if (rv < 0) {
+		if (max_i2c_retry_reached(data, I2C_MSG_READ)) {
+			set_state(data, ST_ERROR_RECOVERY);
+		}
+		return SMF_EVENT_HANDLED;
+	}
+
+	if (data->cci_message.data_len == 0) {
+		/*
+		 * If there is no [MSGIN], then clear UCSI interrupt event
+		 * after get [CCI] message, and this also clear it52xx
+		 * CCI message memory.
+		 */
+		rv = it52xx_clr_alert_status(data->dev, IT52XX_INT_UCSI_STATUS);
+
+		if (rv < 0) {
+			if (max_i2c_retry_reached(data, I2C_MSG_WRITE)) {
+				set_state(data, ST_ERROR_RECOVERY);
+			}
+			return SMF_EVENT_HANDLED;
+		}
+	}
+
+	/*
+	 * If we comes from change indicator interrupt (asynchronous event),
+	 * then just read [CCI] and needn't send ACK_CC_CI to it5271, then PPM
+	 * would trigger a CMD_GET_CONNECTOR_STATUS immediately.
+	 */
+	if (data->ci_interrupt) {
+		data->ci_interrupt = 0;
+		data->ack_ci = 1;
+		LOG_INF("ITE%d: CI INT [CCI] = { 0x%x, 0x%x, 0x%x, 0x%x, 0x%x }",
+			cfg->connector_number, data->cci_byte_cnt,
+			IT52XX_BYTE0(data->cci_message.raw_value),
+			IT52XX_BYTE1(data->cci_message.raw_value),
+			IT52XX_BYTE2(data->cci_message.raw_value),
+			IT52XX_BYTE3(data->cci_message.raw_value));
+		TRANSITION_TO_INIT_OR_IDLE_STATE(data);
+	}
+
+	const uint8_t cmd_sts = IT52XX_BYTE3(data->cci_message.raw_value);
+
+	switch (cmd_sts) {
+	case IT52XX_CMD_BUSY:
+		LOG_ERR("ITE%d: [CCI] Busy indicator", cfg->connector_number);
+		/*
+		 * If Busy, then set this cci_event.busy to a 1b and all other
+		 * fields to zero.
+		 */
+		data->cci_event.busy = 1;
+		/* Notify system of status change */
+		call_cci_event_cb(data);
+		/*
+		 * Once it52xx processes the [CONTROL] commands, it will trigger
+		 * interrupt again.
+		 */
+		set_state(data, ST_TASK_WAIT);
+		break;
+	case IT52XX_CMD_RESET_COMPLETE:
+	case IT52XX_CMD_ACK_COMPLETE:
+	case IT52XX_CMD_DONE:
+		/* Clear busy event */
+		data->cci_event.busy = 0;
+
+		/* If execute ppm reset command */
+		if (data->cmd == CMD_PPM_RESET) {
+			/* Set cci_event.reset_completed to 1b */
+			data->cci_event.reset_completed = 1;
+			/* Notify system of status change */
+			call_cci_event_cb(data);
+			LOG_INF("ITE%d: [CCI] PPM reset PDC complete",
+				cfg->connector_number);
+			/* All done, return to Init or Idle state */
+			TRANSITION_TO_INIT_OR_IDLE_STATE(data);
+		}
+
+		LOG_INF("ITE%d: [CCI] = { 0x%x, 0x%x, 0x%x, 0x%x, 0x%x }",
+			cfg->connector_number, data->cci_byte_cnt,
+			IT52XX_BYTE0(data->cci_message.raw_value),
+			IT52XX_BYTE1(data->cci_message.raw_value),
+			IT52XX_BYTE2(data->cci_message.raw_value),
+			IT52XX_BYTE3(data->cci_message.raw_value));
+
+		/*
+		 * The command completed successfully,
+		 * so set cci_event.command_completed to 1b.
+		 */
+		data->cci_event.command_completed = 1;
+
+		/* If there are [MSGIN] messages that need to be read */
+		if (data->cci_message.data_len > 0) {
+			set_state(data, ST_READ);
+			return SMF_EVENT_HANDLED;
+		}
+
+		/* Inform the system of the event */
+		call_cci_event_cb(data);
+
+		if (data->cmd != CMD_ACK_CC_CI) {
+			/*
+			 * It needs to write ACK_CC_CI following [CONTROL]
+			 * command to it52xx (except CMD_PPM_RESET).
+			 */
+			data->cmd = CMD_NONE;
+			ci.connect_change = 0;
+			rv = it52xx_ack_cc_ci(data->dev, ci, cc, 0);
+			if (rv) {
+				LOG_ERR("ITE%d: Put ACK_CC_CI to buffer fail",
+					cfg->connector_number);
+				set_state(data, ST_ERROR_RECOVERY);
+				return SMF_EVENT_HANDLED;
+			}
+			set_state(data, ST_WRITE_ACK);
+		} else {
+			/*
+			 * Already send ACK_CC_CI, return to Idle or Init state
+			 */
+			TRANSITION_TO_INIT_OR_IDLE_STATE(data);
+		}
+
+		return SMF_EVENT_HANDLED;
+	case IT52XX_CMD_ERROR:
+	case IT52XX_CMD_NOT_SUPPORTED:
+	case IT52XX_CMD_NOT_SUPPORTED_ERROR:
+		if (cmd_sts == IT52XX_CMD_NOT_SUPPORTED) {
+			data->cci_event.not_supported = 1;
+			data->cci_event.error = 0;
+			LOG_ERR("ITE%d: [CCI] Not-supported indicator",
+				cfg->connector_number);
+		} else if (cmd_sts == IT52XX_CMD_ERROR) {
+			data->cci_event.not_supported = 0;
+			data->cci_event.error = 1;
+			LOG_ERR("ITE%d: [CCI] Error indicator",
+				cfg->connector_number);
+		} else {
+			data->cci_event.not_supported = 1;
+			data->cci_event.error = 1;
+			LOG_ERR("ITE%d: [CCI] Unrecognized command",
+				cfg->connector_number);
+		}
+		/* Command completed */
+		data->cci_event.command_completed = 1;
+		/* Clear busy event */
+		data->cci_event.busy = 0;
+		/* Notify system of status change */
+		call_cci_event_cb(data);
+
+		/*
+		 * If the error indicator is set, the subsystem should read the
+		 * status register to determine the cause.
+		 *
+		 * PPM_RESET is always handled by IT5271 firmware and
+		 * [CCI] reports IT52XX_CMD_RESET_COMPLETE, as required by UCSI.
+		 */
+		if (data->cmd != CMD_PPM_RESET) {
+			/*
+			 * It needs to write ACK_CC_CI following
+			 * [CONTROL] command to it52xx (except CMD_PPM_RESET).
+			 * [CCI] of ACK_CC_CI can't fill up error indicator,
+			 * so [CCI] of ACK_CC_CI never goes to here.
+			 */
+			data->cmd = CMD_NONE;
+			ci.connect_change = 0;
+			rv = it52xx_ack_cc_ci(data->dev, ci, cc, 0);
+			if (rv) {
+				LOG_ERR("ITE%d: Put ACK_CC_CI to buffer fail",
+					cfg->connector_number);
+				set_state(data, ST_ERROR_RECOVERY);
+				return SMF_EVENT_HANDLED;
+			}
+			set_state(data, ST_WRITE_ACK);
+		}
+		break;
+	default:
+		/* Receive an unknown [CCI] status */
+		LOG_ERR("ITE%d: unknown [CCI] = { 0x%x, 0x%x, 0x%x, 0x%x, 0x%x }",
+			cfg->connector_number, data->cci_byte_cnt,
+			IT52XX_BYTE0(data->cci_message.raw_value),
+			IT52XX_BYTE1(data->cci_message.raw_value),
+			IT52XX_BYTE2(data->cci_message.raw_value),
+			IT52XX_BYTE3(data->cci_message.raw_value));
+		/* An error occurred, try to recover */
+		set_state(data, ST_ERROR_RECOVERY);
+		return SMF_EVENT_HANDLED;
+	}
+
+	return SMF_EVENT_HANDLED;
+}
+
+static void st_read_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+
+	/* This state can only be entered from the Get [CCI] state */
+	assert(data->last_state == ST_GET_CCI);
+
+	/* Clear the CCI Event */
+	data->cci_event.raw_value = 0;
+	/* Clear I2C Transaction Retry Counter */
+	data->i2c_transaction_retry_counter = 0;
+	/* Set the port the CCI Event occurred on */
+}
+
+/* Populate commands state table */
+static const struct smf_state states[] = {
+	[ST_INIT] =
+		SMF_CREATE_STATE(st_init_entry, st_init_run, NULL, NULL, NULL),
+	[ST_IDLE] =
+		SMF_CREATE_STATE(st_idle_entry, st_idle_run, NULL, NULL, NULL),
+	[ST_WRITE] = SMF_CREATE_STATE(st_write_entry, st_write_run, NULL, NULL,
+				      NULL),
+	[ST_WRITE_ACK] = SMF_CREATE_STATE(st_write_ack_entry, st_write_ack_run,
+					  NULL, NULL, NULL),
+	[ST_TASK_WAIT] = SMF_CREATE_STATE(st_task_wait_entry, st_task_wait_run,
+					  NULL, NULL, NULL),
+	[ST_GET_CCI] = SMF_CREATE_STATE(st_get_cci_entry, st_get_cci_run, NULL,
+					NULL, NULL),
+	[ST_READ] = SMF_CREATE_STATE(st_read_entry, NULL, NULL, NULL, NULL),
+	[ST_ERROR_RECOVERY] = SMF_CREATE_STATE(NULL, NULL, NULL, NULL, NULL),
+	[ST_DISABLE] = SMF_CREATE_STATE(NULL, NULL, NULL, NULL, NULL),
+	[ST_SUSPENDED] = SMF_CREATE_STATE(NULL, NULL, NULL, NULL, NULL),
+};
 
 static int it52xx_get_alert_status(const struct device *dev)
 {
