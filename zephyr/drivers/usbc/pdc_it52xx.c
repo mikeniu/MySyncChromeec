@@ -5,6 +5,8 @@
 
 /* ITE IT52XX Power Delivery Controller driver. */
 
+#include "pdc_it52xx.h"
+
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 
