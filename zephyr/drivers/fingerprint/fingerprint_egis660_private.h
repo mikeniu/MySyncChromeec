@@ -18,6 +18,7 @@ enum egis_capture_type {
 	EGIS_CAPTURE_PATTERN1 = 3,
 	EGIS_CAPTURE_QUALITY_TEST = 4,
 	EGIS_CAPTURE_RESET_TEST = 5,
+	EGIS_CAPTURE_PATTERN2 = 6,
 };
 
 /** @brief Common results returned by BEP functions.

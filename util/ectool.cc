@@ -2054,6 +2054,8 @@ int cmd_fp_mode(int argc, char *argv[])
 			capture_type = FP_CAPTURE_ABNORMAL_TEST;
 		else if (!strncmp(argv[i], "test_noise", 10))
 			capture_type = FP_CAPTURE_NOISE_TEST;
+		else if (!strncmp(argv[i], "pattern2", 8))
+			capture_type = FP_CAPTURE_PATTERN2;
 	}
 	if (mode & FP_MODE_CAPTURE)
 		mode |= capture_type << FP_MODE_CAPTURE_TYPE_SHIFT;

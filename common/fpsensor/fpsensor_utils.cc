@@ -44,7 +44,8 @@ bool is_finger_needed(uint32_t mode)
 		  capture_type == FP_CAPTURE_NOISE_TEST ||
 		  capture_type == FP_CAPTURE_PATTERN0 ||
 		  capture_type == FP_CAPTURE_PATTERN1 ||
-		  capture_type == FP_CAPTURE_RESET_TEST));
+		  capture_type == FP_CAPTURE_RESET_TEST ||
+		  capture_type == FP_CAPTURE_PATTERN2));
 }
 
 bool skip_image_offset(enum fp_capture_type capture_type)
