@@ -5,8 +5,10 @@
 # Use a suitable base image, e.g., Ubuntu
 FROM ubuntu:24.04
 
-# Prevent interactive prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
+# Prevent interactive prompts during package installation and allow pip
+# break system packages
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Install necessary dependencies for building EC firmware
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -130,6 +132,14 @@ RUN VPYTHON_FILE="/opt/repos/src/platform/ec/zephyr/zmake/.vpython3" && \
                 --break-system-packages --ignore-installed "$pkg"; \
         done; \
     fi
+
+# Install zmake in system Python
+RUN python3 -m pip install --no-cache-dir --no-deps \
+    -e /opt/repos/src/platform/ec/zephyr/zmake
+
+# Set PATH for binman and host tools
+ENV PATH="/opt/repos/src/third_party/u-boot/tools/binman:${PATH}"
+ENV PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
 
 # Build and install rtkupdate host utility
 RUN g++ -O2 -Wall -o /usr/bin/rtkupdate \
