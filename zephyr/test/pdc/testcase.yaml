@@ -321,6 +321,7 @@ tests:
     - "./boards/rts5453p.overlay"
 
   pdc.tps6699x:
+    timeout: 300
     extra_configs:
     - CONFIG_TEST_SUITE_PDC_TPS6699X=y
     - CONFIG_TEST_PDC_MESSAGE_TRACING=y
@@ -328,6 +329,25 @@ tests:
     extra_dtc_overlay_files:
     - "./boards/tps6699x.overlay"
 
+<<<<<<< HEAD   (556efd651224f6bd44d1c4ae1709618e4d3a5b3e cbi: Check GPIO_EC_CBI_WP in legacy eeprom_is_write_protecte)
+||||||| BASE   (831c1c5fd379dd51cec46fb79cc8310fe442f427 meru: enable stylus wireless charging function)
+  pdc.tps6699x.ap_mode_override_off:
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_TPS6699X=y
+    - CONFIG_USBC_PDC_DISABLE_AP_MODE_ENTRY=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"
+
+=======
+  pdc.tps6699x.ap_mode_override_off:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_TPS6699X=y
+    - CONFIG_USBC_PDC_DISABLE_AP_MODE_ENTRY=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"
+
+>>>>>>> CHANGE (84c47010cb51efa974512a83e015688ae07c4d5f tps6699x: Add ST_DISABLE state for port fault isolation)
   pdc.retimer_fw_update:
     extra_configs:
     - CONFIG_TEST_SUITE_PDC_RETIMER_FW_UPDATE=y
