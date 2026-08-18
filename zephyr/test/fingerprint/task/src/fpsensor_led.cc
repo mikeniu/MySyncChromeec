@@ -11,6 +11,7 @@ extern "C" {
 #include <zephyr/kernel.h>
 #include <zephyr/ztest.h>
 
+#include "hooks.h"
 #include <fpsensor/fpsensor_led.h>
 #include <mkbp_event.h>
 
@@ -100,6 +101,28 @@ ZTEST(fp_led, test_off_do_not_disturb)
 	k_sleep(K_SECONDS(2));
 	zassert_equal(fp_led_get(), BRIGHTNESS_OFF,
 		      "Led off 2s after match OK");
+}
+
+ZTEST(fp_led, test_suspend)
+{
+	fp_led::update_match(true);
+	k_sleep(K_MSEC(500));
+	zassert_equal(fp_led_get(), BRIGHTNESS_MATCH_OK,
+		      "Led %d%% after match OK", BRIGHTNESS_MATCH_OK);
+	hook_notify(HOOK_CHIPSET_SUSPEND);
+	zassert_equal(fp_led_get(), BRIGHTNESS_OFF,
+		      "Led off immediately on suspend");
+}
+
+ZTEST(fp_led, test_shutdown)
+{
+	fp_led::update_match(true);
+	k_sleep(K_MSEC(500));
+	zassert_equal(fp_led_get(), BRIGHTNESS_MATCH_OK,
+		      "Led %d%% after match OK", BRIGHTNESS_MATCH_OK);
+	hook_notify(HOOK_CHIPSET_SHUTDOWN);
+	zassert_equal(fp_led_get(), BRIGHTNESS_OFF,
+		      "Led off immediately on shutdown");
 }
 
 ZTEST_SUITE(fp_led, NULL, NULL, test_fp_led_init, NULL, NULL);
