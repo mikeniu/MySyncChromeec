@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f4952c4_efcb2623",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-18T16:14:53Z",
+      "side": 1,
+      "message": "common/charge_state.c: 695/988 -\u003e 804/988 (+109/+0) [70.3% -\u003e 81.4% (+11.0%)]",
+      "revId": "0ab59a8d803d00aea61ae0405f3bdf4cf1f47490",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
