@@ -20,6 +20,7 @@
 #include <zephyr/smf.h>
 #include <zephyr/sys/atomic.h>
 #include <zephyr/sys/byteorder.h>
+#include <zephyr/sys/clock.h>
 #include <zephyr/sys/slist.h>
 #include <zephyr/sys/util.h>
 
@@ -81,6 +82,9 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 
 /** Maximum SMBus block payload length. */
 #define IT52XX_SMBUS_MAX_BLOCK_SIZE 32
+
+/** Maximum time to wait for the driver to suspend communication. */
+#define SUSPEND_TIMEOUT_USEC (3 * USEC_PER_SEC)
 
 /** SET_PDO command layout. */
 #define IT52XX_SET_PDO_MAX_PDO_COUNT 7
@@ -1806,7 +1810,8 @@ static const struct smf_state states[] = {
  * @param user_buf Pointer to buffer where response data will be written.
  * @return 0 on success
  * @return -EBUSY if command is already pending.
- * @return -ECONNREFUSED if chip communication is suspended.
+ * @return -ECONNREFUSED if chip communication is suspended and @p cmd is not
+ *         @ref CMD_ACK_CC_CI.
  */
 static int it52xx_post_command_with_callback(const struct device *dev,
 					     enum cmd_t cmd, const uint8_t *buf,
@@ -1815,8 +1820,11 @@ static int it52xx_post_command_with_callback(const struct device *dev,
 {
 	struct pdc_data_t *data = dev->data;
 
-	/* Return an error if chip communication is suspended */
-	if (check_comms_suspended()) {
+	/*
+	 * ACK_CC_CI completes an in-progress transaction, so allow it after
+	 * communication suspension has been requested.
+	 */
+	if (check_comms_suspended() && cmd != CMD_ACK_CC_CI) {
 		return -ECONNREFUSED;
 	}
 
@@ -3165,33 +3173,98 @@ static int it52xx_get_ucsi_version(const struct device *dev, uint16_t *version)
 static int it52xx_get_hw_config(const struct device *dev,
 				struct pdc_hw_config_t *config)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg =
+		(const struct pdc_config_t *)dev->config;
+
+	if (config == NULL) {
+		return -EINVAL;
+	}
+
+	config->bus_type = PDC_BUS_TYPE_I2C;
+	config->i2c = cfg->i2c;
+	config->ccd = cfg->ccd;
+
+	return 0;
 }
 
 static bool it52xx_get_hw_frs_support(const struct device *dev)
 {
-	return false;
+	const struct pdc_config_t *cfg =
+		(const struct pdc_config_t *)dev->config;
+
+	return cfg->frs_supported;
 }
 
 static int it52xx_set_comms_state(const struct device *dev, bool comms_active)
 {
-	return -ENOSYS;
+	struct pdc_data_t *data = dev->data;
+
+	if (comms_active) {
+		/* Re-enable communications. Clearing the suspend flag will
+		 * trigger a reset. Note: if the driver is in the disabled
+		 * state due to a previous comms failure, it will remain
+		 * disabled. (Thus, suspending/resuming comms on a disabled
+		 * PDC driver is a no-op)
+		 */
+		enable_comms();
+
+	} else {
+		/* Request communication to be stopped. This allows in-progress
+		 * operations to complete first.
+		 */
+		suspend_comms();
+
+		if (get_state(data) == ST_DISABLE) {
+			/* The driver is already permanently shut down. */
+			return 0;
+		}
+
+		/* Wait for driver to enter the suspended state */
+		if (!WAIT_FOR((get_state(data) == ST_SUSPENDED),
+			      SUSPEND_TIMEOUT_USEC,
+			      k_sleep(K_MSEC(T_TASK_TIMEOUT_EVENT)))) {
+			return -ETIMEDOUT;
+		}
+	}
+
+	return 0;
 }
 
 static int it52xx_set_handler_cb(const struct device *dev,
 				 struct pdc_callback *callback)
 {
-	return -ENOSYS;
+	struct pdc_data_t *data = dev->data;
+
+	/* Register the PDC management callback pdc_cc_handler_cb(). */
+	data->cc_cb = callback;
+
+	return 0;
+}
+
+static int it52xx_manage_callback(const struct device *dev,
+				  struct pdc_callback *callback, bool set)
+{
+	struct pdc_data_t *const data = dev->data;
+
+	/* Register or unregister the PDC management callback
+	 * pdc_ci_handler_cb(). */
+	return pdc_manage_callbacks(&data->ci_cb_list, callback, set);
 }
 
 static void it52xx_start_thread(const struct device *dev)
 {
+	struct pdc_data_t *data = dev->data;
+
+	k_thread_start(data->thread);
 }
 
 static enum pdc_driver_init_state_t
 it52xx_is_init_done(const struct device *dev)
 {
-	return PDC_DRIVER_INIT_STATE_WAIT;
+	struct pdc_data_t *data = dev->data;
+
+	return data->init_done ? PDC_DRIVER_INIT_STATE_SUCCESS :
+				 PDC_DRIVER_INIT_STATE_WAIT;
 }
 
 static DEVICE_API(pdc, pdc_driver_api) = {
@@ -3223,6 +3296,7 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.set_comms_state = it52xx_set_comms_state,
 	.set_pdos = it52xx_set_pdo,
 	.execute_ucsi_cmd = it52xx_execute_ucsi_cmd,
+	.manage_callback = it52xx_manage_callback,
 	.ack_cc_ci = NULL, /* The IT52XX driver sends ACK_CC_CI internally. */
 	.get_lpm_ppm_info = it52xx_get_lpm_ppm_info,
 	.get_attention_vdo = it52xx_get_attention_vdo,
