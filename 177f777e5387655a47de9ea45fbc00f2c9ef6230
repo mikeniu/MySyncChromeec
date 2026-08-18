@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a9fdb9c_f50f6231",
+        "filename": "common/port80.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T22:10:04Z",
+      "side": 1,
+      "message": "Line length.",
+      "range": {
+        "startLine": 250,
+        "startChar": 0,
+        "endLine": 250,
+        "endChar": 75
+      },
+      "revId": "177f777e5387655a47de9ea45fbc00f2c9ef6230",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23ad322d_bb77e0e7",
+        "filename": "common/port80.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T22:10:04Z",
+      "side": 1,
+      "message": "`writes \u003e 0` is a safer check.",
+      "range": {
+        "startLine": 251,
+        "startChar": 5,
+        "endLine": 251,
+        "endChar": 11
+      },
+      "revId": "177f777e5387655a47de9ea45fbc00f2c9ef6230",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f87b292_22ece153",
+        "filename": "common/port80.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T22:10:04Z",
+      "side": 1,
+      "message": "Nit - always use {} around conditionals.",
+      "range": {
+        "startLine": 253,
+        "startChar": 2,
+        "endLine": 253,
+        "endChar": 8
+      },
+      "revId": "177f777e5387655a47de9ea45fbc00f2c9ef6230",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
