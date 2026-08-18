@@ -138,18 +138,44 @@ clone_zephyrproject_sparse() {
     fi
 }
 
+# Function to populate a repository from build-time cache if it doesn't exist
+populate_if_missing() {
+    local target_dir="${1}"
+    local repo_name="${2}"
+    if [ ! -d "${target_dir}" ]; then
+        local cached_dir="${target_dir//\/workspace/${CACHE_BASE}}"
+        if [ -d "${cached_dir}" ]; then
+            echo "Populating ${repo_name} from build-time cache..."
+            mkdir -p "$(dirname "${target_dir}")"
+            cp -a "${cached_dir}" "${target_dir}"
+        fi
+    fi
+}
+
 # Clone or update repositories (parallelized for speed)
-clone_or_update "${REPO_BASE}/platform/ec" \
-    "/workspace/src/platform/ec" "EC firmware" &
-clone_or_update "${REPO_BASE}/platform/dagwood" \
-    "/workspace/src/platform/dagwood" "Dagwood" &
-clone_zephyrproject_sparse &
-clone_or_update "${REPO_BASE}/third_party/pigweed/pigweed" \
-    "/workspace/src/third_party/pigweed" "Pigweed" &
-clone_or_update "${REPO_BASE}/third_party/u-boot" \
-    "/workspace/src/third_party/u-boot" "U-Boot" &
-clone_overlay_sparse &
-wait
+if [ -n "${SKIP_UPDATE}" ]; then
+    echo "Skipping repository updates (fast startup enabled)..."
+    populate_if_missing "/workspace/src/platform/ec" "EC firmware"
+    populate_if_missing "/workspace/src/platform/dagwood" "Dagwood"
+    populate_if_missing \
+        "/workspace/src/third_party/zephyrproject" "Zephyr Project"
+    populate_if_missing "/workspace/src/third_party/pigweed" "Pigweed"
+    populate_if_missing "/workspace/src/third_party/u-boot" "U-Boot"
+    populate_if_missing \
+        "/workspace/src/third_party/chromiumos-overlay" "ChromiumOS Overlay"
+else
+    clone_or_update "${REPO_BASE}/platform/ec" \
+        "/workspace/src/platform/ec" "EC firmware" &
+    clone_or_update "${REPO_BASE}/platform/dagwood" \
+        "/workspace/src/platform/dagwood" "Dagwood" &
+    clone_zephyrproject_sparse &
+    clone_or_update "${REPO_BASE}/third_party/pigweed/pigweed" \
+        "/workspace/src/third_party/pigweed" "Pigweed" &
+    clone_or_update "${REPO_BASE}/third_party/u-boot" \
+        "/workspace/src/third_party/u-boot" "U-Boot" &
+    clone_overlay_sparse &
+    wait
+fi
 
 # Set up python virtual environment if it doesn't exist
 VENV_DIR="/workspace/.venv"
@@ -198,38 +224,40 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
         python3 -m pip install --no-deps \
             -e /workspace/src/platform/ec/zephyr/zmake
 
-        # Install standard Zephyr dependencies to support twister executions
-        ZEPHYR_REQS_DIR="/workspace/src/third_party"
-        ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/zephyrproject/zephyr/scripts"
-        if [ -d "${ZEPHYR_REQS_DIR}" ]; then
-            echo "Installing Zephyr dependencies..."
-            python3 -m pip install --no-cache-dir \
-                -r "${ZEPHYR_REQS_DIR}/requirements.txt"
-        fi
+        if [ -z "${SKIP_UPDATE}" ]; then
+            # Install standard Zephyr dependencies to support twister executions
+            ZEPHYR_REQS_DIR="/workspace/src/third_party"
+            ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/zephyrproject/zephyr/scripts"
+            if [ -d "${ZEPHYR_REQS_DIR}" ]; then
+                echo "Installing Zephyr dependencies..."
+                python3 -m pip install --no-cache-dir \
+                    -r "${ZEPHYR_REQS_DIR}/requirements.txt"
+            fi
 
-        # Parse .vpython3 and install dependencies
-        VPYTHON_FILE="/workspace/src/platform/ec/zephyr/zmake/.vpython3"
-        if [ -f "${VPYTHON_FILE}" ]; then
-            packages=$(grep -o \
-                'infra/python/wheels/[a-zA-Z0-9_-]*' \
-                "${VPYTHON_FILE}" | \
-                sed 's|infra/python/wheels/||g' | \
-                sed 's|-py2_py3||g; s|-py3||g' | \
-                sort -u)
-            to_install=""
-            for pkg in ${packages}; do
-                case "${pkg}" in
-                    "pyyaml") pkg="PyYAML" ;;
-                    "python-dateutil") pkg="python-dateutil" ;;
-                    "ruamel_yaml") pkg="ruamel.yaml" ;;
-                    "ruamel_yaml_clib"|"coverage"|"pytest"| \
-                    "hypothesis"|"testfixtures") continue ;;
-                esac
-                to_install="${to_install} ${pkg}"
-            done
-            if [ -n "${to_install}" ]; then
-                # shellcheck disable=SC2086
-                python3 -m pip install --no-cache-dir ${to_install}
+            # Parse .vpython3 and install dependencies
+            VPYTHON_FILE="/workspace/src/platform/ec/zephyr/zmake/.vpython3"
+            if [ -f "${VPYTHON_FILE}" ]; then
+                packages=$(grep -o \
+                    'infra/python/wheels/[a-zA-Z0-9_-]*' \
+                    "${VPYTHON_FILE}" | \
+                    sed 's|infra/python/wheels/||g' | \
+                    sed 's|-py2_py3||g; s|-py3||g' | \
+                    sort -u)
+                to_install=""
+                for pkg in ${packages}; do
+                    case "${pkg}" in
+                        "pyyaml") pkg="PyYAML" ;;
+                        "python-dateutil") pkg="python-dateutil" ;;
+                        "ruamel_yaml") pkg="ruamel.yaml" ;;
+                        "ruamel_yaml_clib"|"coverage"|"pytest"| \
+                        "hypothesis"|"testfixtures") continue ;;
+                    esac
+                    to_install="${to_install} ${pkg}"
+                done
+                if [ -n "${to_install}" ]; then
+                    # shellcheck disable=SC2086
+                    python3 -m pip install --no-cache-dir ${to_install}
+                fi
             fi
         fi
 
@@ -253,7 +281,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
             echo "Copying pre-installed Realtek monitor binary to cache..."
             mkdir -p "$(dirname "${MONITOR_CACHE}")"
             cp "${MONITOR_DEST}" "${MONITOR_CACHE}"
-        else
+        elif [ -z "${SKIP_UPDATE}" ]; then
             echo "Monitor binary not found in cache. Building rtk_flame..."
             if zmake --checkout /workspace build rtk_flame; then
                 echo "Caching monitor binary..."
@@ -285,7 +313,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
             echo "Copying pre-installed NPCX monitor binary to cache..."
             mkdir -p "$(dirname "${NPCX_MONITOR_CACHE}")"
             cp "${NPCX_MONITOR_DEST}" "${NPCX_MONITOR_CACHE}"
-        else
+        elif [ -z "${SKIP_UPDATE}" ]; then
             echo "Monitor binary not found in cache. Building npcx_monitor..."
             if zmake --checkout /workspace build npcx_monitor; then
                 echo "Caching monitor binary..."
