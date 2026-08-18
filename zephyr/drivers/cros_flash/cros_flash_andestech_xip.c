@@ -60,6 +60,11 @@ LOG_MODULE_REGISTER(cros_flash, LOG_LEVEL_ERR);
  * scheme for RO -> [RB ->] -> RW protection.
  */
 #define FLASH_PROTECTION_START 0
+#define WP_END (CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE)
+#ifdef CONFIG_ROLLBACK
+#define RB_END (CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE)
+#endif /* CONFIG_ROLLBACK */
+#define ALL_END (CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE)
 
 struct cros_flash_andestech_xip_data {
 	const struct device *flash_dev;
@@ -280,17 +285,16 @@ static uint32_t cros_flash_andes_xip_get_protect_flags(const struct device *dev)
 
 	/* Check if ranges fully overlap. This logic assumes a certain flash
 	 * layout: RO -> ROLLBACKS -> RW. */
-	if (prot_end >= (CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE)) {
+	if (prot_end >= ALL_END) {
 		flags |= EC_FLASH_PROTECT_ALL_AT_BOOT |
 			 EC_FLASH_PROTECT_RO_AT_BOOT;
 #ifdef CONFIG_ROLLBACK
 		flags |= EC_FLASH_PROTECT_ROLLBACK_AT_BOOT;
-	} else if (prot_end >= (CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE)) {
+	} else if (prot_end >= RB_END) {
 		flags |= EC_FLASH_PROTECT_RO_AT_BOOT |
 			 EC_FLASH_PROTECT_ROLLBACK_AT_BOOT;
 #endif /* CONFIG_ROLLBACK */
-	} else if (prot_end >=
-		   (CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE)) {
+	} else if (prot_end >= WP_END) {
 		flags |= EC_FLASH_PROTECT_RO_AT_BOOT;
 	}
 
@@ -384,11 +388,11 @@ static int cros_flash_andes_xip_protect_at_boot(const struct device *dev,
 	/* There is no independent protection of each section. Protection of WP
 	 * is within protection ranges of Rollbacks */
 	if (new_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
-		new_prot_end = CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE;
+		new_prot_end = ALL_END;
 	} else if (new_flags & EC_FLASH_PROTECT_ROLLBACK_AT_BOOT) {
-		new_prot_end = CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE;
+		new_prot_end = RB_END;
 	} else if (new_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
-		new_prot_end = CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE;
+		new_prot_end = WP_END;
 	} else {
 		/* Disable protection of WP section, but do not disable
 		 * protection of the flash header. */
