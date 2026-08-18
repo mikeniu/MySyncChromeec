@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "070360b0_b16cb22a",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-18T22:55:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d1f36f1_caea9bf0",
+      "range": {
+        "startLine": 198,
+        "startChar": 0,
+        "endLine": 198,
+        "endChar": 13
+      },
+      "revId": "5fc77873b1dcc9441cb9dec732d67ffceb118098",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84fa5e92_bcc6f859",
@@ -64,6 +88,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aab90d86_728fc361",
+        "filename": "zephyr/zmake/zmake/compare_builds.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-18T22:55:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84fa5e92_bcc6f859",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 16
+      },
+      "revId": "5fc77873b1dcc9441cb9dec732d67ffceb118098",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69a407db_0897b84a",
@@ -77,6 +125,24 @@
       "writtenOn": "2026-08-18T22:21:45Z",
       "side": 1,
       "message": "Nit - update all parameters to use named arguments for consistency.",
+      "revId": "5fc77873b1dcc9441cb9dec732d67ffceb118098",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8790c13_8645b62e",
+        "filename": "zephyr/zmake/zmake/compare_builds.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-18T22:55:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69a407db_0897b84a",
       "revId": "5fc77873b1dcc9441cb9dec732d67ffceb118098",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
