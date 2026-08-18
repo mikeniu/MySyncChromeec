@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecc0ed18_c33aa339",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-18T20:24:48Z",
+      "side": 1,
+      "message": "common/: 1302/2084 -\u003e 1564/2089 (+262/+5) [62.5% -\u003e 74.9% (+12.4%)]\n    common/keyboard_8042.c: 258/624 -\u003e 503/629 (+245/+5) [41.3% -\u003e 80.0% (+38.6%)]\n    common/keyboard_8042_sharedlib.c: 7/24 -\u003e 20/24 (+13/+0) [29.2% -\u003e 83.3% (+54.2%)]\n    common/keyboard_scan.c: 342/448 -\u003e 345/448 (+3/+0) [76.3% -\u003e 77.0% (+0.7%)]\n    common/charge_state.c: 695/988 -\u003e 696/988 (+1/+0) [70.3% -\u003e 70.4% (+0.1%)]",
+      "revId": "7e536156c0ff2dc90f35a2f729aab9e9dab58b22",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
