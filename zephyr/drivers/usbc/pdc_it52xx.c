@@ -8,6 +8,8 @@
 #include "drivers/ucsi_v3.h"
 #include "pdc_it52xx.h"
 
+#include <stddef.h>
+
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
@@ -15,6 +17,8 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/smf.h>
+#include <zephyr/sys/atomic.h>
+#include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/slist.h>
 #include <zephyr/sys/util.h>
 
@@ -77,8 +81,8 @@ static const struct smbus_cmd_t __unused GET_ALERT_STATUS = { 0xBD, 0x01 };
 static const struct smbus_cmd_t __unused CLR_ALERT_STATUS = { 0xBC };
 static const struct smbus_cmd_t __unused SET_CONTROL = { 0x81 };
 static const struct smbus_cmd_t __unused SET_MSGOUT = { 0x83 };
-static const struct smbus_cmd_t __unused GET_CCI = { 0x80 };
-static const struct smbus_cmd_t __unused GET_MSGIN = { 0x82 };
+static const struct smbus_cmd_t GET_CCI = { 0x80 };
+static const struct smbus_cmd_t GET_MSGIN = { 0x82 };
 
 /**
  * @brief States of the main state machine
@@ -229,10 +233,26 @@ struct pdc_data_t {
 	struct smf_ctx ctx;
 	/** Init's local state variable */
 	enum init_state_t init_local_state;
+	/** Init's current state */
+	enum init_state_t init_local_current_state;
+	/** Init's next state */
+	enum init_state_t init_local_next_state;
 	/** PDC device structure */
 	const struct device *dev;
 	/** PDC command */
 	enum cmd_t cmd;
+	/** [CCI] message from PDC */
+	union cci_event_t cci_message;
+	/** [CCI] byte count. */
+	uint8_t cci_byte_cnt;
+	/** PDC write buffer */
+	uint8_t wr_buf[PDC_MAX_DATA_LENGTH];
+	/** Length of bytes in the write buffer */
+	uint8_t wr_buf_len;
+	/** PDC read buffer */
+	uint8_t rd_buf[PDC_MAX_DATA_LENGTH];
+	/** Length of bytes in the read buffer */
+	uint8_t rd_buf_len;
 	/** Error status */
 	union error_status_t error_status;
 	/** CCI Event for PPM */
@@ -242,12 +262,18 @@ struct pdc_data_t {
 	/** Callbacks to handle connect change & vendor indicator in interrupt
 	 */
 	sys_slist_t ci_cb_list;
+	/** Information about the PDC */
+	struct pdc_info_t info;
 	/** Init done flag */
 	bool init_done;
 	/** Error recovery counter */
 	uint16_t error_recovery_counter;
+	/** Error Status used during initialization */
+	union error_status_t es;
 	/* Events used to wake the driver thread. */
 	struct k_event events;
+	/** Communication suspension state for this device. */
+	atomic_t comms_suspended;
 	/* Currently running UCSI command */
 	enum ucsi_command_t active_ucsi_cmd;
 };
@@ -309,6 +335,13 @@ static const char *const state_names[] = {
 BUILD_ASSERT(ARRAY_SIZE(state_names) == ST_COUNT);
 
 static const struct smf_state states[ST_COUNT];
+static int it52xx_ppm_reset(const struct device *dev);
+static int it52xx_set_notification_enable(const struct device *dev,
+					  union notification_enable_t bits);
+static int it52xx_get_info(const struct device *dev, struct pdc_info_t *info,
+			   bool live);
+static int it52xx_get_error_status(const struct device *dev,
+				   union error_status_t *es);
 
 static enum state_t get_state(struct pdc_data_t *data)
 {
@@ -321,7 +354,12 @@ static void set_state(struct pdc_data_t *data, const enum state_t next_state)
 	k_event_post(&data->events, IT52XX_NEXT_STATE_READY);
 }
 
-static __unused void print_current_state(struct pdc_data_t *data)
+static bool check_comms_suspended(const struct pdc_data_t *data)
+{
+	return atomic_get(&data->comms_suspended) != 0;
+}
+
+static void print_current_state(struct pdc_data_t *data)
 {
 	const struct pdc_config_t *cfg = data->dev->config;
 	int st = get_state(data);
@@ -397,7 +435,347 @@ static __unused void transition_to_init_or_idle_state(struct pdc_data_t *data)
 	}
 }
 
+/** Perform one I2C transfer and log the failed phase without retrying it. */
+static int it52xx_i2c_transfer(const struct device *dev, struct i2c_msg *msgs,
+			       uint8_t num_msgs, const char *phase)
+{
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	int rv = i2c_transfer_dt(&cfg->i2c, msgs, num_msgs);
+
+	if (rv < 0) {
+		const char *command =
+			data->cmd == CMD_RAW_UCSI ?
+				get_ucsi_command_name(data->active_ucsi_cmd) :
+				cmd_names[data->cmd];
+
+		LOG_ERR("ITE%d: I2C addr=0x%x rv=%d cmd=%s state=%s phase=%s",
+			cfg->connector_number, cfg->i2c.addr, rv, command,
+			state_names[get_state(data)], phase);
+	}
+
+	return rv;
+}
+
+/**
+ * @brief Get [CCI] message
+ */
+static __unused int get_cci_message(const struct device *dev)
+{
+	struct pdc_data_t *data = dev->data;
+	struct i2c_msg msg[2];
+	uint8_t cmd = GET_CCI.cmd;
+	struct it52xx_cci_response response;
+	int rv;
+
+	msg[0].buf = &cmd;
+	msg[0].len = 1;
+	msg[0].flags = I2C_MSG_WRITE;
+
+	msg[1].buf = (uint8_t *)&response;
+	/* W [CCI] - R [04 xx xx xx xx] => length = [5] */
+	msg[1].len = sizeof(response);
+	msg[1].flags = I2C_MSG_RESTART | I2C_MSG_READ | I2C_MSG_STOP;
+
+	rv = it52xx_i2c_transfer(dev, msg, 2, "CCI");
+	if (rv < 0) {
+		return rv;
+	}
+
+	data->cci_byte_cnt = response.byte_count;
+	/* Save [CCI] data except [CCI] byte count field. */
+	data->cci_message.raw_value =
+		sys_get_le32((const uint8_t *)&response +
+			     offsetof(struct it52xx_cci_response, cci));
+
+	return rv;
+}
+
+/**
+ * @brief Get [MSGIN] message
+ */
+static __unused int it52xx_i2c_read(const struct device *dev)
+{
+	struct pdc_data_t *data = dev->data;
+	const struct pdc_config_t *cfg = dev->config;
+	struct i2c_msg msg[2];
+	uint8_t cmd = GET_MSGIN.cmd;
+	int rv;
+
+	msg[0].buf = &cmd;
+	msg[0].len = 1;
+	msg[0].flags = I2C_MSG_WRITE;
+
+	msg[1].buf = data->rd_buf;
+	/*
+	 * [MSGIN] byte count field is equal to [CCI] data length field.
+	 * (+ 1 for byte count field)
+	 */
+	msg[1].len = data->cci_message.data_len + 1;
+	msg[1].flags = I2C_MSG_RESTART | I2C_MSG_READ | I2C_MSG_STOP;
+
+	rv = it52xx_i2c_transfer(dev, msg, 2, "MSGIN");
+	if (rv < 0) {
+		return rv;
+	}
+
+	/* Not include byte count field */
+	data->rd_buf_len = data->cci_message.data_len;
+
+	if (IS_ENABLED(CONFIG_USBC_PDC_TRACE_MSG)) {
+		pdc_trace_msg_resp(cfg->connector_number,
+				   PDC_TRACE_CHIP_TYPE_IT52XX, data->rd_buf,
+				   data->cci_message.data_len + 1);
+	}
+
+	return rv;
+}
+
+/**
+ * @brief Set [CONTROL] or [MSGOUT] + [CONTROL] message
+ */
+static __unused int it52xx_i2c_write(const struct device *dev)
+{
+	struct pdc_data_t *data = dev->data;
+
+	/* Transmit [MSGOUT] data + [CONTROL] commands */
+	if (data->cmd == CMD_SET_PDO) {
+		struct i2c_msg msg[2];
+		const size_t control_len = sizeof(struct it52xx_control_cmd);
+		int rv;
+
+		/* IT52XX follows UCSI v3: [MSGOUT] -> [CONTROL]. */
+		msg[1].buf = &data->wr_buf[control_len];
+		/* [MSGOUT] length = total length - [CONTROL] command length */
+		msg[1].len = data->wr_buf_len - control_len;
+		msg[1].flags = I2C_MSG_WRITE | I2C_MSG_STOP;
+
+		rv = it52xx_i2c_transfer(dev, &msg[1], 1, "MSGOUT");
+		if (rv < 0) {
+			return rv;
+		}
+
+		msg[0].buf = data->wr_buf;
+		/**
+		 * CONTROL command length: one command byte, one byte count, and
+		 * eight data bytes.
+		 */
+		msg[0].len = control_len;
+		msg[0].flags = I2C_MSG_WRITE | I2C_MSG_STOP;
+
+		return it52xx_i2c_transfer(dev, &msg[0], 1, "CONTROL");
+	} else {
+		struct i2c_msg msg;
+
+		msg.buf = data->wr_buf;
+		msg.len = data->wr_buf_len;
+		msg.flags = I2C_MSG_WRITE | I2C_MSG_STOP;
+
+		return it52xx_i2c_transfer(dev, &msg, 1, "CONTROL");
+	}
+}
+
+static __unused void st_init_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+
+	data->init_done = false;
+	/* pdc_init_failed is cleared when init process is complete */
+	data->es.pdc_init_failed = 1;
+	data->cmd = CMD_NONE;
+}
+
+static void init_write_cmd_and_change_state(struct pdc_data_t *data,
+					    enum init_state_t next)
+{
+	data->init_local_current_state = data->init_local_state;
+	data->init_local_next_state = next;
+	data->init_local_state = INIT_PDC_CMD_WAIT;
+	set_state(data, ST_WRITE);
+}
+
+static bool init_command_tx_complete(struct pdc_data_t *data)
+{
+	/* If PDC_RESET was sent, check the reset_completed flag */
+	if (data->init_local_current_state == INIT_PDC_SET_PPM_RESET) {
+		return data->cci_event.reset_completed;
+	}
+
+	return data->cci_event.command_completed;
+}
+
+static void init_display_error_status(struct pdc_data_t *data)
+{
+	const struct pdc_config_t *cfg = data->dev->config;
+	int cnum = cfg->connector_number;
+
+	if (data->es.unrecognized_command) {
+		LOG_ERR("ITE%d: Unrecognized Command", cnum);
+	}
+
+	if (data->es.non_existent_connector_number) {
+		LOG_ERR("ITE%d: Invalid Connector Number", cnum);
+	}
+
+	if (data->es.invalid_command_specific_param) {
+		LOG_ERR("ITE%d: Invalid Param", cnum);
+	}
+
+	if (data->es.incompatible_connector_partner) {
+		LOG_ERR("ITE%d: Invalid Connector Partner", cnum);
+	}
+
+	if (data->es.cc_communication_error) {
+		LOG_ERR("ITE%d: CC Comm Error", cnum);
+	}
+
+	if (data->es.cmd_unsuccessful_dead_batt) {
+		LOG_ERR("ITE%d: Dead Batt Error", cnum);
+	}
+
+	if (data->es.contract_negotiation_failed) {
+		LOG_ERR("ITE%d: Contract Negotiation Failed", cnum);
+	}
+}
+
+static enum smf_state_result init_handle_command_result(struct pdc_data_t *data)
+{
+	const struct pdc_config_t *cfg = data->dev->config;
+
+	/* [CCI] raise error indicator */
+	if (data->cci_event.error) {
+		/* I2C read Error. No way to recover, so disable the PDC
+		 */
+		if (data->error_status.i2c_read_error) {
+			LOG_INF("ITE%d: PDC I2C problem",
+				cfg->connector_number);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
+
+		/* PDC not responding to Get [CCI]. Try error recovery
+		 */
+		if (data->error_status.pdc_internal_error) {
+			LOG_INF("ITE%d: PDC not responding",
+				cfg->connector_number);
+			set_state(data, ST_ERROR_RECOVERY);
+			return SMF_EVENT_HANDLED;
+		}
+
+		/* PDC not responding to Error Status reads. Try error
+		 * recovery */
+		if (data->init_local_current_state == INIT_ERROR) {
+			LOG_INF("ITE%d: PDC error status read fail",
+				cfg->connector_number);
+			set_state(data, ST_ERROR_RECOVERY);
+			return SMF_EVENT_HANDLED;
+		}
+
+		/* PDC returned an error */
+		data->init_local_state = INIT_ERROR;
+	} else {
+		/* [CCI] raise complete indicator */
+
+		/* GET_ERROR_STATUS completed after initialization failed. */
+		if (data->init_local_current_state == INIT_ERROR) {
+			init_display_error_status(data);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
+
+		data->init_local_state = data->init_local_next_state;
+	}
+
+	return SMF_EVENT_HANDLED;
+}
+
+static __unused enum smf_state_result st_init_run(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+	const struct pdc_config_t *cfg = data->dev->config;
+	int cnum = cfg->connector_number;
+	int rv;
+
+	/* Do not start executing commands if suspended */
+	if (check_comms_suspended(data)) {
+		set_state(data, ST_SUSPENDED);
+		return SMF_EVENT_HANDLED;
+	}
+
+	switch (data->init_local_state) {
+	case INIT_PDC_SET_PPM_RESET:
+		/*
+		 * it52xx ignores commands which before ppm_reset, so at init,
+		 * it needs to ppm_reset first, then set_notification.
+		 */
+		rv = it52xx_ppm_reset(data->dev);
+		if (rv) {
+			LOG_ERR("ITE%d: Internal(INIT_PDC_SET_PPM_RESET)",
+				cnum);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
+		init_write_cmd_and_change_state(
+			data, INIT_PDC_SET_NOTIFICATION_ENABLE);
+		return SMF_EVENT_HANDLED;
+	case INIT_PDC_SET_NOTIFICATION_ENABLE:
+		rv = it52xx_set_notification_enable(data->dev, cfg->bits);
+		if (rv) {
+			LOG_ERR("ITE%d: Internal(INIT_PDC_SET_NOTIFICATION_ENABLE)",
+				cnum);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
+		init_write_cmd_and_change_state(data,
+						INIT_PDC_GET_VDM_IC_STATUS);
+		return SMF_EVENT_HANDLED;
+	case INIT_PDC_GET_VDM_IC_STATUS:
+		/* it52xx supports IC status by UCSI VDM command */
+		rv = it52xx_get_info(data->dev, &data->info, true);
+		if (rv) {
+			LOG_ERR("ITE%d: Internal(INIT_PDC_GET_VDM_IC_STATUS)",
+				cnum);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
+		init_write_cmd_and_change_state(data, INIT_PDC_COMPLETE);
+		return SMF_EVENT_HANDLED;
+	case INIT_PDC_COMPLETE:
+		data->es.pdc_init_failed = 0;
+		/* Init is complete, so transition to Idle state */
+		set_state(data, ST_IDLE);
+		data->init_done = true;
+		return SMF_EVENT_HANDLED;
+	case INIT_ERROR:
+		/* Read the error status before disabling the port. */
+		it52xx_get_error_status(data->dev, &data->es);
+		init_write_cmd_and_change_state(data, INIT_ERROR);
+		return SMF_EVENT_HANDLED;
+	case INIT_PDC_CMD_WAIT:
+		if (!init_command_tx_complete(data)) {
+			return SMF_EVENT_HANDLED;
+		}
+
+		return init_handle_command_result(data);
+	}
+
+	return SMF_EVENT_HANDLED;
+}
+
 static int it52xx_pdc_reset(const struct device *dev)
+{
+	return -ENOSYS;
+}
+
+static int it52xx_ppm_reset(const struct device *dev)
+{
+	return -ENOSYS;
+}
+
+static int it52xx_set_notification_enable(const struct device *dev,
+					  union notification_enable_t bits)
 {
 	return -ENOSYS;
 }
