@@ -21,6 +21,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3a0e29cb_e985ab09",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-18T04:23:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/ba31b293-b3ac-4db4-98a7-8d4e0a39950c)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The memory clearing logic is correctly placed in the chip-specific initialization sequence (`system_pre_init`) and uses safe `uintptr_t` arithmetic. The `.ahb4` memory region boundary symbols now enforce 4-byte alignment in the linker script, preventing unaligned memory access.\n*   **Security:** ✅ No security vulnerabilities introduced. Purging stale memory across resets is a good defense-in-depth practice.\n*   **Style:** ✅ Code matches existing style conventions.\n*   **Consistency:** ✅ By placing the chip-specific SRAM clearing logic in `chip/stm32/system.c` instead of the generic architecture startup (`init.S`), the code respects proper abstraction layers.\n*   **Testing:** ✅ A new `fp_buffer_clear` test was added to verify the buffer is correctly zeroed out across resets, ensuring the regression is caught.\n*   **CL Size \u0026 Scope:** ✅ The CL is small, self-contained, and focused on this single issue.\n\nTAG\u003dagy\nCONV\u003dba31b293-b3ac-4db4-98a7-8d4e0a39950c",
+      "isAi": true,
+      "revId": "c9075c8bfb556f106ef2039a8dc4a2aedcbebe9c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "deabb17d_e06d138d",
         "filename": "chip/stm32/system.c",
         "patchSetId": 8
