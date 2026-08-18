@@ -21,9 +21,9 @@ update_repo() {
     if (cd "${repo_dir}" && git diff --quiet && git diff --cached --quiet); then
         echo "Updating ${repo_name} (fetching deltas)..."
         if [ -z "${branch}" ]; then
-            (cd "${repo_dir}" && git pull "${remote}")
+            (cd "${repo_dir}" && git pull --quiet "${remote}")
         else
-            (cd "${repo_dir}" && git pull "${remote}" "${branch}")
+            (cd "${repo_dir}" && git pull --quiet "${remote}" "${branch}")
         fi
     else
         echo "Warning: ${repo_name} has local changes." \
@@ -48,7 +48,7 @@ clone_or_update() {
             update_repo "${target_dir}" "${repo_name}"
         else
             echo "Downloading the latest ${repo_name}..."
-            git clone "${repo_url}" "${target_dir}"
+            git clone --quiet "${repo_url}" "${target_dir}"
         fi
     else
         echo "${repo_name} directory already exists. Checking for updates..."
@@ -71,7 +71,7 @@ clone_overlay_sparse() {
         else
             echo "Performing sparse checkout of ChromiumOS Overlay..."
             cd "${target_dir}" || exit 1
-            git init -b main
+            git init -b main -q
             git remote add origin "${repo_url}"
             git config core.sparseCheckout true
 
@@ -79,7 +79,7 @@ clone_overlay_sparse() {
             echo "/eclass/coreboot-sdk-ec-dependencies.eclass" \
                 >> .git/info/sparse-checkout
 
-            git pull --depth=1 origin main
+            git pull --depth=1 --quiet origin main
             # Set up branch tracking so git pull works without arguments
             # next time
             git branch --set-upstream-to=origin/main main
@@ -108,7 +108,7 @@ clone_zephyrproject_sparse() {
             echo "Performing sparse checkout of Zephyr Project..."
             mkdir -p "${target_dir}"
             cd "${target_dir}" || exit 1
-            git init -b main
+            git init -b main -q
             git remote add origin "${repo_url}"
             git config core.sparseCheckout true
 
@@ -120,7 +120,7 @@ clone_zephyrproject_sparse() {
                 echo "/modules/lib/nanopb/"
             } >> .git/info/sparse-checkout
 
-            git pull --depth=1 origin main
+            git pull --depth=1 --quiet origin main
             # Set up branch tracking so git pull works without arguments
             # next time
             git branch --set-upstream-to=origin/main main
@@ -216,7 +216,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
         echo "Python dependencies up to date. Skipping pip install."
     else
         echo "Configuring zmake tool in virtualenv..."
-        python3 -m pip install --no-deps \
+        python3 -m pip install -q --no-deps \
             -e /workspace/src/platform/ec/zephyr/zmake
 
         if [ -z "${SKIP_UPDATE}" ]; then
@@ -224,8 +224,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
             ZEPHYR_REQS_DIR="/workspace/src/third_party"
             ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/zephyrproject/zephyr/scripts"
             if [ -d "${ZEPHYR_REQS_DIR}" ]; then
-                echo "Installing Zephyr dependencies..."
-                python3 -m pip install --no-cache-dir \
+                python3 -m pip install -q --no-cache-dir \
                     -r "${ZEPHYR_REQS_DIR}/requirements.txt"
             fi
 
@@ -251,7 +250,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
                 done
                 if [ -n "${to_install}" ]; then
                     # shellcheck disable=SC2086
-                    python3 -m pip install --no-cache-dir ${to_install}
+                    python3 -m pip install -q --no-cache-dir ${to_install}
                 fi
             fi
         fi
