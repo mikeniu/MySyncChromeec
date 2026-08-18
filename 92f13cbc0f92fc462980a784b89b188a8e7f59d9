@@ -37,6 +37,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e57c1329_3ee0cfdb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T18:44:41Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "15c66523_a35b9e53",
+      "revId": "92f13cbc0f92fc462980a784b89b188a8e7f59d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df6d5a70_57ca6983",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T18:44:41Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "23721a89_d7e12078",
+      "revId": "92f13cbc0f92fc462980a784b89b188a8e7f59d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a45ece80_3b21a53e",
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "101342db_e1ae5f28",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 2141,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T18:44:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a45ece80_3b21a53e",
+      "revId": "92f13cbc0f92fc462980a784b89b188a8e7f59d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "be333104_b7503ba7",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Consider asserting `zassert_equal(global_context.templ_valid, 0u);` here at the end of the test. This provides symmetry with the success case and ensures that a rejected template commit does not accidentally leave the template marked as valid in the global context.",
       "isAi": true,
+      "revId": "92f13cbc0f92fc462980a784b89b188a8e7f59d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87ed156a_90caab47",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 2206,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T18:44:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be333104_b7503ba7",
       "revId": "92f13cbc0f92fc462980a784b89b188a8e7f59d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
