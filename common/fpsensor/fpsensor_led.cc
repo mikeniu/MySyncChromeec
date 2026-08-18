@@ -11,6 +11,8 @@
 #include <zephyr/pm/device.h>
 #include <zephyr/sys/clock.h>
 
+#include "hooks.h"
+
 #include <fpsensor/fpsensor_led.h>
 #include <limits>
 
@@ -207,6 +209,18 @@ void off()
 
 	LOG_INF("Fingerprint led off.");
 }
+
+void suspend()
+{
+	k_sem_take(&led_lock, K_FOREVER);
+	set_led(BRIGHTNESS_OFF);
+	led_mode = Mode::OFF;
+	k_sem_give(&led_lock);
+
+	LOG_INF("Fingerprint led suspend.");
+}
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, suspend, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, suspend, HOOK_PRIO_DEFAULT);
 
 } /* namespace */
 
