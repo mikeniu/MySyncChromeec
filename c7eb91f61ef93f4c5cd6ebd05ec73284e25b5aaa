@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "376af507_73ce4a69",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T22:24:27Z",
+      "side": 1,
+      "message": "Build error is fixed with:\n```\ncros format zephyr/shim/src/host_command_heci.c\n```\n\nPlease run the pre-submit checks by always using \"repo upload . --cbr\" instead of \"git push\"\n\nhttps://www.chromium.org/chromium-os/developer-library/guides/development/contributing/#upload-changes",
+      "revId": "c7eb91f61ef93f4c5cd6ebd05ec73284e25b5aaa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
