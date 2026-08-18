@@ -179,7 +179,7 @@ static int check_prot_reg(const struct device *dev, unsigned int offset,
 }
 
 static int set_status_for_prot(const struct device *dev, uint8_t reg1,
-			       uint8_t reg2)
+			       uint8_t reg2, bool volatile_write)
 {
 	int ret;
 	struct ft_xip_ex_ops_set_in op_in;
@@ -193,6 +193,7 @@ static int set_status_for_prot(const struct device *dev, uint8_t reg1,
 	op_in.regs[0] = reg1;
 	op_in.regs[1] = reg2;
 
+	op_in.volatile_write = volatile_write;
 	/* Update only protection related bits */
 	ret = flash_ft_xip_set_status_regs(dev, &op_in);
 
@@ -200,7 +201,7 @@ static int set_status_for_prot(const struct device *dev, uint8_t reg1,
 }
 
 static int set_flash_prot(const struct device *dev, uint32_t offset,
-			  uint32_t bytes)
+			  uint32_t bytes, bool volatile_write)
 {
 	int rv;
 	uint8_t sr1, sr2;
@@ -217,7 +218,7 @@ static int set_flash_prot(const struct device *dev, uint32_t offset,
 		return rv;
 	}
 
-	return set_status_for_prot(dev, sr1, sr2);
+	return set_status_for_prot(dev, sr1, sr2, volatile_write);
 }
 
 static uint32_t cros_flash_ft_xip_get_protect_flags(const struct device *dev)
@@ -368,6 +369,8 @@ static int cros_flash_ft_xip_protect_at_boot(const struct device *dev,
 	uint32_t new_prot_end;
 	uint32_t curr_prot_start;
 	uint32_t curr_prot_end;
+	bool volatile_write = true;
+	const uint32_t wp_end = CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE;
 
 	k_mutex_lock(&data->flash_lock, K_FOREVER);
 
@@ -385,7 +388,7 @@ static int cros_flash_ft_xip_protect_at_boot(const struct device *dev,
 		new_prot_end = CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE;
 #endif /* CONFIG_ROLLBACK */
 	} else if (new_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
-		new_prot_end = CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE;
+		new_prot_end = wp_end;
 	} else {
 		/* Disable protection of WP section, but do not disable
 		 * protection of the flash header. */
@@ -420,8 +423,18 @@ static int cros_flash_ft_xip_protect_at_boot(const struct device *dev,
 		ret = flash_ft_xip_lock_status(dev, false);
 	}
 
+	/* If the change imacts the WP region, make it non-volatile. */
+	if (((curr_prot_end >= wp_end) && (new_prot_end < wp_end)) ||
+	    ((curr_prot_end < wp_end) && (new_prot_end >= wp_end))) {
+		printk("DN non volatile write\n");
+		volatile_write = false;
+	} else {
+		printk("DN volatile write\n");
+	}
+
 	if (!ret) {
-		ret = set_flash_prot(dev, FLASH_PROTECTION_START, new_prot_end);
+		ret = set_flash_prot(dev, FLASH_PROTECTION_START, new_prot_end,
+				     volatile_write);
 	}
 
 	/* Always lock the status register if it was locked before. */
@@ -580,11 +593,14 @@ static int cros_flash_ft_xip_init(const struct device *dev)
 		 * volatile status register write can be used or not.
 		 */
 		if (flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
+			printk("DN all protected\n");
 			ret = cros_flash_ft_xip_protect_at_boot(
 				dev, EC_FLASH_PROTECT_RO_AT_BOOT);
 			if (ret) {
 				goto unlock_flash;
 			}
+		} else {
+			printk("DN not all protected\n");
 		}
 	}
 
