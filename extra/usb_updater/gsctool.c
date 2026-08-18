@@ -840,6 +840,14 @@ static int tpm_send_pkt(struct transfer_descriptor *td, unsigned int digest,
 		header_size = offsetof(struct upgrade_pkt, command.data);
 	}
 
+	/* Add bounds check to prevent buffer overflow. */
+	if ((size + header_size) > sizeof(outbuf)) {
+		fprintf(stderr,
+			"Error: payload size (%zd) exceeds buffer capacity (%zu)\n",
+			size + header_size, sizeof(outbuf));
+		return -1;
+	}
+
 	payload = outbuf + header_size;
 	len = size + header_size;
 
