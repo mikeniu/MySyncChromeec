@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3774b4a1_b3c7f1c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-18T15:37:01Z",
+      "side": 1,
+      "message": "Adds no actual coverage.\n\n/: 69910/171500 -\u003e 69910/171500 (+0/+0) [40.76% -\u003e 40.76% (+0.00%)]\n\n  common/: 117/136 -\u003e 118/136 (+1/+0) [86.0% -\u003e 86.8% (+0.7%)]\n    common/math_util.c: 117/136 -\u003e 118/136 (+1/+0) [86.0% -\u003e 86.8% (+0.7%)]\n\n  include/: 8/8 -\u003e 8/8 (+0/+0) [100.0% -\u003e 100.0% (+0.0%)]\n    include/math_util.h: 8/8 -\u003e 8/8 (+0/+0) [100.0% -\u003e 100.0% (+0.0%)]  [CL]",
+      "revId": "9ab5863e0a24649258ae91c9a7d0678c80156938",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
