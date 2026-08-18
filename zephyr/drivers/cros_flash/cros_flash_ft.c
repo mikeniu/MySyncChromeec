@@ -370,7 +370,6 @@ static int cros_flash_ft_xip_protect_at_boot(const struct device *dev,
 	uint32_t curr_prot_start;
 	uint32_t curr_prot_end;
 	bool volatile_write = true;
-	const uint32_t wp_end = CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE;
 
 	k_mutex_lock(&data->flash_lock, K_FOREVER);
 
@@ -388,7 +387,7 @@ static int cros_flash_ft_xip_protect_at_boot(const struct device *dev,
 		new_prot_end = CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE;
 #endif /* CONFIG_ROLLBACK */
 	} else if (new_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
-		new_prot_end = wp_end;
+		new_prot_end = CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE;
 	} else {
 		/* Disable protection of WP section, but do not disable
 		 * protection of the flash header. */
@@ -423,13 +422,9 @@ static int cros_flash_ft_xip_protect_at_boot(const struct device *dev,
 		ret = flash_ft_xip_lock_status(dev, false);
 	}
 
-	/* If the change imacts the WP region, make it non-volatile. */
-	if (((curr_prot_end >= wp_end) && (new_prot_end < wp_end)) ||
-	    ((curr_prot_end < wp_end) && (new_prot_end >= wp_end))) {
-		printk("DN non volatile write\n");
+	/* If the change impacts the WP region, make it non-volatile. */
+	if ((curr_prot_end >= WP_END) != (new_prot_end >= WP_END)) {
 		volatile_write = false;
-	} else {
-		printk("DN volatile write\n");
 	}
 
 	if (!ret) {
@@ -593,14 +588,11 @@ static int cros_flash_ft_xip_init(const struct device *dev)
 		 * volatile status register write can be used or not.
 		 */
 		if (flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
-			printk("DN all protected\n");
 			ret = cros_flash_ft_xip_protect_at_boot(
 				dev, EC_FLASH_PROTECT_RO_AT_BOOT);
 			if (ret) {
 				goto unlock_flash;
 			}
-		} else {
-			printk("DN not all protected\n");
 		}
 	}
 
