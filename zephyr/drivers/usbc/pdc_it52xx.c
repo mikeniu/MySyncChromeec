@@ -66,6 +66,11 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 #define IT52XX_VDM_VID_L 0x8d
 #define IT52XX_VDM_VID_H 0x04
 
+/** Vendor-defined command values selecting the VDO origin. */
+#define IT52XX_VDM_VDC_GET_VDO_PDC 1
+#define IT52XX_VDM_VDC_GET_VDO_PARTNER 2
+#define IT52XX_VDM_VDC_GET_VDO_CABLE 3
+
 /** SET_PDO command layout. */
 #define IT52XX_SET_PDO_MAX_PDO_COUNT 7
 #define IT52XX_SET_PDO_CMD_BASE_LENGTH 12
@@ -196,29 +201,24 @@ static const struct smbus_cmd_t GET_CONNECTOR_STATUS = {
 };
 static const struct smbus_cmd_t SET_SINK_PATH = { 0x81, IT52XX_CONTROL_BYTE_CNT,
 						  UCSI_SET_SINK_PATH };
-static const struct smbus_cmd_t __unused SET_CCOM = { 0x81,
-						      IT52XX_CONTROL_BYTE_CNT,
-						      UCSI_SET_CCOM };
+static const struct smbus_cmd_t SET_CCOM = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+					     UCSI_SET_CCOM };
 static const struct smbus_cmd_t SET_TPC_RP = { 0x81, IT52XX_CONTROL_BYTE_CNT,
 					       UCSI_SET_POWER_LEVEL };
 static const struct smbus_cmd_t READ_POWER_LEVEL = { 0x81,
 						     IT52XX_CONTROL_BYTE_CNT,
 						     UCSI_READ_POWER_LEVEL };
-static const struct smbus_cmd_t __unused GET_CONNECTOR_CAPABILITY = {
+static const struct smbus_cmd_t GET_CONNECTOR_CAPABILITY = {
 	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_GET_CONNECTOR_CAPABILITY
 };
-static const struct smbus_cmd_t __unused SET_UOR = { 0x81,
-						     IT52XX_CONTROL_BYTE_CNT,
-						     UCSI_SET_UOR };
-static const struct smbus_cmd_t __unused SET_PDR = { 0x81,
-						     IT52XX_CONTROL_BYTE_CNT,
-						     UCSI_SET_PDR };
-static const struct smbus_cmd_t __unused GET_VDO = {
-	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_VENDOR_DEFINED_COMMAND
-};
-static const struct smbus_cmd_t __unused GET_PDOS = { 0x81,
-						      IT52XX_CONTROL_BYTE_CNT,
-						      UCSI_GET_PDOS };
+static const struct smbus_cmd_t SET_UOR = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+					    UCSI_SET_UOR };
+static const struct smbus_cmd_t SET_PDR = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+					    UCSI_SET_PDR };
+static const struct smbus_cmd_t GET_VDO = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+					    UCSI_VENDOR_DEFINED_COMMAND };
+static const struct smbus_cmd_t GET_PDOS = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+					     UCSI_GET_PDOS };
 static const struct smbus_cmd_t __unused SET_RDO = {
 	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_VENDOR_DEFINED_COMMAND
 };
@@ -2358,26 +2358,298 @@ static int it52xx_read_power_level(const struct device *dev)
 				   NULL);
 }
 
+static int it52xx_set_ccom(const struct device *dev, enum ccom_t ccom)
+{
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint16_t conn_opmode = 0;
+	const uint8_t opmode_offset = 7;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	/*
+	 * bit[16:23]: connector num 7'b, CC operation mode 1'b.
+	 * bit[24:31]: CC operation mode 3'b, reserved 5'b.
+	 */
+	switch (ccom) {
+	case CCOM_RP:
+		conn_opmode = 1 << (opmode_offset + 0);
+		break;
+	case CCOM_RD:
+		conn_opmode = 1 << (opmode_offset + 1);
+		break;
+	case CCOM_DRP: /* it52xx default is TrySRC DRP, and can't be selected at
+			  run-time. */
+		conn_opmode = 1 << (opmode_offset + 2);
+		break;
+	}
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = SET_CCOM.cmd,
+		.len = SET_CCOM.len,
+		.control = {
+			.command = SET_CCOM.sub,
+			.data_length = 0x00,
+			/* data length --> set to 0x00 */
+			.command_specific = {
+				((conn_num & 0x7f) | (conn_opmode & 0xff)),
+				(conn_opmode >> 8) & 0xff,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_SET_CCOM, (const uint8_t *)&payload,
+				   sizeof(payload), NULL);
+}
+
 static int it52xx_get_connector_capability(const struct device *dev,
 					   union connector_capability_t *caps)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (caps == NULL) {
+		return -EINVAL;
+	}
+
+	/* bit[16:23]: connector num 7'b, reserved 1'b */
+	byte5 = (conn_num & 0x7f);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_CONNECTOR_CAPABILITY.cmd,
+		.len = GET_CONNECTOR_CAPABILITY.len,
+		.control = {
+			.command = GET_CONNECTOR_CAPABILITY.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_GET_CONNECTOR_CAPABILITY,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   (uint8_t *)caps);
 }
 
 static int it52xx_set_uor(const struct device *dev, union uor_t uor)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	/* bit[16:23]: connector num 7'b, DRS to DFP 1'b */
+	/* bit[24:31]: DRS to UFP 1'b, Accept/Reject DRS 1'b, reserved 6'b */
+	uor.connector_number = conn_num;
+	/*
+	 * Set accept DR_Swap, it527x only accepts DR_Swap when UFP -> DFP
+	 * (match VIF declare), also fix CTS TEST.PD.PROT.SNK.10: UUT send
+	 * reject DR_Swap UFP -> DFP.
+	 */
+	uor.accept_dr_swap = 1;
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = SET_UOR.cmd,
+		.len = SET_UOR.len,
+		.control = {
+			.command = SET_UOR.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				uor.raw_value & 0xff,
+				(uor.raw_value >> 8) & 0xff,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_SET_UOR, (const uint8_t *)&payload,
+				   sizeof(payload), NULL);
 }
 
 static int it52xx_set_pdr(const struct device *dev, union pdr_t pdr)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	/* bit[16:23]: connector num 7'b, PRS to SRC 1'b */
+	/* bit[24:31]: PRS to SNK 1'b, Enable/Disable PRS 1'b, reserved 6'b */
+	pdr.connector_number = conn_num;
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = SET_PDR.cmd,
+		.len = SET_PDR.len,
+		.control = {
+			.command = SET_PDR.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				pdr.raw_value & 0xff,
+				(pdr.raw_value >> 8) & 0xff,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_SET_PDR, (const uint8_t *)&payload,
+				   sizeof(payload), NULL);
 }
 
 static int it52xx_get_vdo(const struct device *dev, union get_vdo_t vdo_req,
 			  uint8_t *vdo_req_list, uint32_t *vdo)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint16_t vdo_type = 0;
+	uint8_t vdc_cmd, byte5, byte6 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (vdo == NULL || vdo_req_list == NULL) {
+		return -EINVAL;
+	}
+
+	switch (vdo_req.vdo_origin) {
+	case VDO_ORIGIN_PORT:
+		vdc_cmd = IT52XX_VDM_VDC_GET_VDO_PDC;
+		break;
+	case VDO_ORIGIN_SOP:
+		vdc_cmd = IT52XX_VDM_VDC_GET_VDO_PARTNER;
+		break;
+	case VDO_ORIGIN_SOP_PRIME:
+	case VDO_ORIGIN_SOP_PRIME_PRIME:
+		vdc_cmd = IT52XX_VDM_VDC_GET_VDO_CABLE;
+		break;
+	default:
+		LOG_ERR("Unsupported VDO origin");
+		return -EINVAL;
+	}
+
+	/* Support by [CONTROL] VDM */
+	/* bit[16:23]: connector num 7'b, vdc_cmd 1'b */
+	/* bit[24:31]: vdc_cmd 4'b, IT52XX_VDM_VDC_VER 4'b */
+	byte5 = (conn_num & 0x7f) | ((vdc_cmd & BIT(0)) << 7);
+	byte6 = ((vdc_cmd >> 1) & 0xf) | ((IT52XX_VDM_VDC_VER & 0xf) << 4);
+
+	/*
+	 * IT52XX uses a bitmap and returns VDOs in increasing type order.
+	 * Require the request list to use the same order.
+	 */
+	for (int i = 0; i < vdo_req.num_vdos; i++) {
+		if (vdo_req_list[i] < VDO_ID_HEADER ||
+		    vdo_req_list[i] > VDO_PD_DP_CFG) {
+			return -EINVAL;
+		}
+
+		if (i > 0 && vdo_req_list[i] <= vdo_req_list[i - 1]) {
+			return -EINVAL;
+		}
+
+		vdo_type |= BIT(vdo_req_list[i]);
+		LOG_DBG("vdo_req_list %d", vdo_req_list[i]);
+	}
+
+	/* Post a command and perform a chip operation */
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_VDO.cmd,
+		.len = GET_VDO.len,
+		.control = {
+			.command = GET_VDO.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+				byte6,
+				IT52XX_VDM_VID_L,
+				IT52XX_VDM_VID_H,
+				vdo_type & 0xff,
+				/* bit map to enum vdo_type_t */
+				(vdo_type >> 8) & 0xff,
+				/* bit map to enum vdo_type_t */
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_GET_VDO, (const uint8_t *)&payload,
+				   sizeof(payload), (uint8_t *)vdo);
+}
+
+static int it52xx_get_pdos(const struct device *dev, enum pdo_type_t pdo_type,
+			   enum pdo_offset_t pdo_offset, uint8_t num_pdos,
+			   enum pdo_source_t source, uint32_t *pdos)
+{
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	union get_pdos_t *get_pdo;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (pdos == NULL) {
+		return -EINVAL;
+	}
+
+	/* The vendor specific GET_PDO command fails to generate
+	 * the appropriate PD message if the requested PDO type has not
+	 * been received.
+	 *
+	 * Use the UCSI version which has the correct behavior.
+	 */
+	memset((uint8_t *)pdos, 0, sizeof(uint32_t) * num_pdos);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_PDOS.cmd,
+		.len = GET_PDOS.len,
+		.control = {
+			.command = GET_PDOS.sub,
+			.data_length = 0x00,
+			/* Data Length
+								   --> set to
+								   0x00 */
+		},
+	};
+
+	BUILD_ASSERT(sizeof(payload) == IT52XX_CONTROL_CMD_BASE_LENGTH);
+
+	get_pdo = (union get_pdos_t *)payload.control.command_specific;
+	get_pdo->connector_number = conn_num;
+	get_pdo->pdo_source = source;
+	get_pdo->pdo_offset = pdo_offset;
+	get_pdo->number_of_pdos = num_pdos - 1;
+	get_pdo->pdo_type = pdo_type;
+	get_pdo->source_caps = CURRENT_SUPPORTED_SOURCE_CAPS;
+	get_pdo->range = SPR_RANGE;
+
+	return it52xx_post_command(dev, CMD_GET_PDOS, (const uint8_t *)&payload,
+				   sizeof(payload), (uint8_t *)pdos);
 }
 
 static int it52xx_set_rdo(const struct device *dev, uint32_t rdo)
@@ -2458,10 +2730,12 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.connector_reset = it52xx_connector_reset,
 	.get_capability = it52xx_get_capability,
 	.get_connector_capability = it52xx_get_connector_capability,
+	.set_ccom = it52xx_set_ccom,
 	.set_uor = it52xx_set_uor,
 	.set_pdr = it52xx_set_pdr,
 	.set_sink_path = it52xx_set_sink_path,
 	.get_connector_status = it52xx_get_connector_status,
+	.get_pdos = it52xx_get_pdos,
 	.get_rdo = it52xx_get_rdo,
 	.set_rdo = it52xx_set_rdo,
 	.get_error_status = it52xx_get_error_status,
