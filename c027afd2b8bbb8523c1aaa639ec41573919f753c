@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "159a3625_07e0f53a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-18T15:33:55Z",
+      "side": 1,
+      "message": "common/vboot/: 3/88 -\u003e 35/88 (+32/+0) [3.4% -\u003e 39.8% (+36.4%)]\n    common/vboot/vb21_lib.c: 3/60 -\u003e 25/60 (+22/+0) [5.0% -\u003e 41.7% (+36.7%)]\n    common/vboot/common.c: 0/28 -\u003e 10/28 (+10/+0) [0.0% -\u003e 35.7% (+35.7%)]",
+      "revId": "c027afd2b8bbb8523c1aaa639ec41573919f753c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
