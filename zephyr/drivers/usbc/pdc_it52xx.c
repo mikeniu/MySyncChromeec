@@ -9,6 +9,7 @@
 #include "pdc_it52xx.h"
 
 #include <assert.h>
+#include <string.h>
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -50,6 +51,15 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 
 /** UCSI status bit in the IT52XX interrupt status register. */
 #define IT52XX_INT_UCSI_STATUS BIT(1)
+
+/** State-machine task timeout, in milliseconds. */
+#define T_TASK_TIMEOUT_EVENT 20
+
+/** Number of task timeouts in the 60 ms error-recovery delay. */
+#define N_ERROR_RECOVERY_DELAY_COUNT (60 / T_TASK_TIMEOUT_EVENT)
+
+/** Maximum number of error-recovery attempts. */
+#define N_MAX_ERROR_RECOVERY_COUNT 4
 
 /** Transition back to init or idle and finish handling the SMF event. */
 #define TRANSITION_TO_INIT_OR_IDLE_STATE(data)  \
@@ -1396,6 +1406,184 @@ static void st_read_entry(void *o)
 	/* Set the port the CCI Event occurred on */
 }
 
+static enum smf_state_result st_read_run(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+	const struct pdc_config_t *cfg = data->dev->config;
+	uint8_t offset;
+	uint8_t len;
+	union conn_status_change_bits_t ci = { 0 };
+	const bool cc = true;
+	int rv;
+
+	/* Read [MSGIN] */
+	rv = it52xx_i2c_read(data->dev);
+	if (rv < 0) {
+		if (max_i2c_retry_reached(data, I2C_MSG_READ)) {
+			set_state(data, ST_ERROR_RECOVERY);
+		}
+		return SMF_EVENT_HANDLED;
+	}
+
+	/*
+	 * Clear UCSI interrupt event after read [MSGIN],
+	 * and this also clear it52xx CCI message memory.
+	 */
+	rv = it52xx_clr_alert_status(data->dev, IT52XX_INT_UCSI_STATUS);
+
+	if (rv < 0) {
+		if (max_i2c_retry_reached(data, I2C_MSG_WRITE)) {
+			set_state(data, ST_ERROR_RECOVERY);
+		}
+		return SMF_EVENT_HANDLED;
+	}
+
+	/* Get length of data returned */
+	len = data->rd_buf[0];
+
+	/* Skip over length byte */
+	offset = 1;
+
+	/*
+	 * The data->user_buf is checked for NULL before a command is queued.
+	 * The check here guards against an erroneous cci_message indicating
+	 * data is available for a command that doesn't send data.
+	 */
+	if (!data->user_buf) {
+		LOG_ERR("ITE%d: NULL response buffer for %s",
+			cfg->connector_number, cmd_names[data->cmd]);
+		data->cci_event.error = 1;
+		data->cci_event.data_len = 0;
+	} else {
+		/* Copy the received data to the user's buffer */
+		switch (data->cmd) {
+		case CMD_GET_IDENTITY_DISCOVERY: {
+			/* TODO */
+			break;
+		}
+		case CMD_GET_IS_VCONN_SOURCING: {
+			/* TODO */
+			break;
+		}
+		case CMD_GET_DRP_MODE: {
+			/* TODO */
+			break;
+		}
+		default:
+			/* No preprocessing needed for the user data */
+			memcpy(data->user_buf, data->rd_buf + offset, len);
+		}
+
+		/*
+		 * Set cci_event.data_len. This will be zero if no
+		 * data is available.
+		 */
+		data->cci_event.data_len = len;
+	}
+
+	/* Clear the read buffer */
+	memset(data->rd_buf, 0, sizeof(data->rd_buf));
+
+	/* Command has completed */
+	data->cci_event.command_completed = 1;
+	/* Inform the system of the event */
+	call_cci_event_cb(data);
+
+	/*
+	 * It needs to write ACK_CC_CI following
+	 * [CONTROL] command to it52xx (except CMD_PPM_RESET).
+	 */
+	data->cmd = CMD_NONE;
+	ci.connect_change = data->ack_ci;
+	data->ack_ci = 0;
+	rv = it52xx_ack_cc_ci(data->dev, ci, cc, 0);
+	if (rv) {
+		LOG_ERR("ITE%d: Put ACK_CC_CI to buffer fail",
+			cfg->connector_number);
+		set_state(data, ST_ERROR_RECOVERY);
+		return SMF_EVENT_HANDLED;
+	}
+	set_state(data, ST_WRITE_ACK);
+
+	return SMF_EVENT_HANDLED;
+}
+
+static void st_error_recovery_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+	data->error_recovery_counter++;
+	data->error_recovery_delay_counter = 0;
+}
+
+static enum smf_state_result st_error_recovery_run(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	/* Don't continue trying if we are suspending communication */
+	if (check_comms_suspended()) {
+		set_state(data, ST_SUSPENDED);
+		return SMF_EVENT_HANDLED;
+	}
+
+	if (data->error_recovery_counter >= N_MAX_ERROR_RECOVERY_COUNT) {
+		set_state(data, ST_DISABLE);
+		return SMF_EVENT_HANDLED;
+	}
+
+	/* Current recovery is just delaying and performing a PDC init */
+	if (data->error_recovery_delay_counter < N_ERROR_RECOVERY_DELAY_COUNT) {
+		data->error_recovery_delay_counter++;
+		return SMF_EVENT_HANDLED;
+	}
+
+	/* Perform PDC Init */
+	perform_pdc_init(data);
+	return SMF_EVENT_HANDLED;
+}
+
+static void st_disable_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+	/* If entering from ST_INIT state */
+	data->init_done = true;
+	data->error_status.port_disabled = 1;
+}
+
+static enum smf_state_result st_disable_run(void *o)
+{
+	/* Stay here until reset */
+	return SMF_EVENT_HANDLED;
+}
+
+static void st_suspended_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+}
+
+static enum smf_state_result st_suspended_run(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	/* Stay here while suspended */
+	if (check_comms_suspended()) {
+		return SMF_EVENT_HANDLED;
+	}
+
+	/* Otherwise, return back to init state...
+	 *
+	 * Start the driver initialization routine to put everything
+	 * back into a known state (This includes a driver + PDC reset)
+	 */
+	perform_pdc_init(data);
+	return SMF_EVENT_HANDLED;
+}
+
 /* Populate commands state table */
 static const struct smf_state states[] = {
 	[ST_INIT] =
@@ -1410,10 +1598,15 @@ static const struct smf_state states[] = {
 					  NULL, NULL, NULL),
 	[ST_GET_CCI] = SMF_CREATE_STATE(st_get_cci_entry, st_get_cci_run, NULL,
 					NULL, NULL),
-	[ST_READ] = SMF_CREATE_STATE(st_read_entry, NULL, NULL, NULL, NULL),
-	[ST_ERROR_RECOVERY] = SMF_CREATE_STATE(NULL, NULL, NULL, NULL, NULL),
-	[ST_DISABLE] = SMF_CREATE_STATE(NULL, NULL, NULL, NULL, NULL),
-	[ST_SUSPENDED] = SMF_CREATE_STATE(NULL, NULL, NULL, NULL, NULL),
+	[ST_READ] =
+		SMF_CREATE_STATE(st_read_entry, st_read_run, NULL, NULL, NULL),
+	[ST_ERROR_RECOVERY] = SMF_CREATE_STATE(st_error_recovery_entry,
+					       st_error_recovery_run, NULL,
+					       NULL, NULL),
+	[ST_DISABLE] = SMF_CREATE_STATE(st_disable_entry, st_disable_run, NULL,
+					NULL, NULL),
+	[ST_SUSPENDED] = SMF_CREATE_STATE(st_suspended_entry, st_suspended_run,
+					  NULL, NULL, NULL),
 };
 
 static int it52xx_get_alert_status(const struct device *dev)
