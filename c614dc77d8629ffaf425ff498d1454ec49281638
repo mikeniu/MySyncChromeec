@@ -17,6 +17,52 @@
       "isAi": true,
       "revId": "c614dc77d8629ffaf425ff498d1454ec49281638",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22f727e2_88302864",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 2073,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-18T23:03:42Z",
+      "side": 1,
+      "message": "**2. Eliminate Manual Buffer Construction with a Packed Struct**\nRight now, the patch uses pointer arithmetic, manual `offsetof` calculations, multiple `std::span` instantiations, and `memcpy` to build the payload buffer.\n\nYou can completely eliminate all of this by defining a packed struct that represents the exact wire format of the command payload. Placing this at the top of the file makes the memory layout instantly clear:\n\n```cpp\n/* Defines the exact wire format of the v0 template payload */\nstruct __attribute__((__packed__)) test_v0_template_layout {\n\tuint32_t offset;\n\tuint32_t size;\n\tstruct ec_fp_template_encryption_metadata metadata;\n\tuint8_t template_data[sizeof(fp_template[0])];\n\tuint8_t salt[sizeof(global_context.fp_positive_match_salt[0])];\n};\n\n```\n\n**3. Consolidate Duplicate Setup Logic (DRY)**\nCombined with the struct above, you can extract the ~40 lines of duplicated setup code across your three new tests into a single helper function. This makes interacting with the struct members type-safe and removes the need for `memcpy` entirely:\n\n```cpp\nstatic void setup_and_encrypt_v0_template(struct test_v0_template_layout\u0026 params, \n                                          uint8_t salt_fill, bool corrupt_tag)\n{\n\t/* 1. Setup seed and context (copied from your original test) */\n\tstruct ec_params_fp_seed seed_params \u003d { ... };\n\tzassert_equal(test_send_host_command(EC_CMD_FP_SEED, 0, ...), EC_RES_SUCCESS);\n\n\tstruct ec_params_fp_context_v1 ctx_params \u003d { ... };\n\tzassert_equal(test_send_host_command(EC_CMD_FP_CONTEXT, 1, ...), EC_RES_SUCCESS);\n\n\t/* 2. Populate header and metadata directly */\n\tparams.offset \u003d 0;\n\tparams.size \u003d FP_TEMPLATE_COMMIT | (sizeof(params) - offsetof(test_v0_template_layout, metadata));\n\tparams.metadata.struct_version \u003d 4; /* See note below about magic numbers */\n\t\n\t/* 3. Fill template and salt */\n\tstd::ranges::fill(params.template_data, 0xc4);\n\tstd::ranges::fill(params.salt, salt_fill);\n\n\t/* 4. Encrypt */\n\tstruct fp_auth_command_encryption_metadata info;\n\tuint8_t* payload_start \u003d reinterpret_cast\u003cuint8_t*\u003e(\u0026params.template_data);\n\tsize_t payload_size \u003d sizeof(params.template_data) + sizeof(params.salt);\n\n\tencrypt_data_in_place(1, info, global_context.user_id,\n\t\t\t      global_context.tpm_seed,\n\t\t\t      { payload_start, payload_size });\n\n\t/* 5. Copy tags and apply corruption */\n\tstd::ranges::copy(info.nonce, params.metadata.nonce);\n\tstd::ranges::copy(info.encryption_salt, params.metadata.encryption_salt);\n\tstd::ranges::copy(info.tag, params.metadata.tag);\n\n\tif (corrupt_tag) {\n\t\tparams.metadata.tag[0] ^\u003d 0x01;\n\t}\n}\n\n```\n\nBy doing this, your actual test cases shrink down to just their core logic and assertions, making them incredibly clean. For example, the trivial salt test becomes:\n\n```cpp\nZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_trivial_salt)\n{\n\t/* Static allocation prevents thread stack overflow */\n\tstatic struct test_v0_template_layout params;\n\tmemset(\u0026params, 0, sizeof(params));\n\n\t/* Pass 0x00 for salt_fill, false for corrupt_tag */\n\tsetup_and_encrypt_v0_template(params, 0x00, false); \n\n\tzassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0,\n\t\t\t\t\t     \u0026params, sizeof(params), NULL, 0),\n\t\t      EC_RES_INVALID_PARAM);\n\n\tzassert_equal(global_context.templ_valid, 0u);\n}\n\n```",
+      "range": {
+        "startLine": 2073,
+        "startChar": 0,
+        "endLine": 2073,
+        "endChar": 68
+      },
+      "revId": "c614dc77d8629ffaf425ff498d1454ec49281638",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dbd7628_51f60de6",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 2264,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-18T23:03:42Z",
+      "side": 1,
+      "message": "Do we have a constant/macro somewhere that we can use for this?",
+      "range": {
+        "startLine": 2264,
+        "startChar": 0,
+        "endLine": 2264,
+        "endChar": 21
+      },
+      "revId": "c614dc77d8629ffaf425ff498d1454ec49281638",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
