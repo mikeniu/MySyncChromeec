@@ -16,6 +16,12 @@ config USBC_INTEL_ALTMODE
 	  chip and EC for configuring the USB-C alternate mode muxes inside
 	  Intel AP.
 
+config USBC_PDC_IT52XX
+	bool "ITE IT52XX Power Delivery Controller driver"
+	default y if DT_HAS_ITE_IT52XX_PDC_ENABLED
+	help
+	  This option enables the ITE IT52XX Power Delivery Controller.
+
 config USBC_PDC_TPS6699X
 	bool "TI TPS6699X Power Deleivery Controller driver"
 	default y if DT_HAS_TI_TPS6699_PDC_ENABLED
