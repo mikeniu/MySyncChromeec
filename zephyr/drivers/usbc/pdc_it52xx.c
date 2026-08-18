@@ -52,6 +52,9 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 /** UCSI status bit in the IT52XX interrupt status register. */
 #define IT52XX_INT_UCSI_STATUS BIT(1)
 
+/** Number of bytes in the IT52XX interrupt-status response. */
+#define IT52XX_INT_READ_STATUS_LENGTH 1
+
 /** State-machine task timeout, in milliseconds. */
 #define T_TASK_TIMEOUT_EVENT 20
 
@@ -89,8 +92,8 @@ struct it52xx_control_cmd {
 } __packed;
 
 /** ITE SMBus commands. */
-static const struct smbus_cmd_t __unused GET_ALERT_STATUS = { 0xBD, 0x01 };
-static const struct smbus_cmd_t __unused CLR_ALERT_STATUS = { 0xBC };
+static const struct smbus_cmd_t GET_ALERT_STATUS = { 0xBD, 0x01 };
+static const struct smbus_cmd_t CLR_ALERT_STATUS = { 0xBC };
 static const struct smbus_cmd_t __unused SET_CONTROL = { 0x81 };
 static const struct smbus_cmd_t __unused SET_MSGOUT = { 0x83 };
 static const struct smbus_cmd_t GET_CCI = { 0x80 };
@@ -1609,14 +1612,110 @@ static const struct smf_state states[] = {
 					  NULL, NULL, NULL),
 };
 
+/**
+ * @brief Helper method for setting up a command call.
+ * @param dev PDC device pointer
+ * @param cmd Command to execute
+ * @param buf Command payload to copy into write buffer
+ * @param len Length of payload buffer
+ * @param user_buf Pointer to buffer where response data will be written.
+ * @return 0 on success
+ * @return -EBUSY if command is already pending.
+ * @return -ECONNREFUSED if chip communication is suspended.
+ */
+static int it52xx_post_command_with_callback(const struct device *dev,
+					     enum cmd_t cmd, const uint8_t *buf,
+					     uint8_t len, uint8_t *user_buf,
+					     struct pdc_callback *callback)
+{
+	struct pdc_data_t *data = dev->data;
+
+	/* Return an error if chip communication is suspended */
+	if (check_comms_suspended()) {
+		return -ECONNREFUSED;
+	}
+
+	k_mutex_lock(&data->mtx, K_FOREVER);
+
+	if (data->cmd != CMD_NONE) {
+		k_mutex_unlock(&data->mtx);
+		return -EBUSY;
+	}
+
+	if (buf) {
+		assert(len <= sizeof(data->wr_buf));
+		memcpy(data->wr_buf, buf, len);
+	}
+
+	data->wr_buf_len = len;
+	data->user_buf = user_buf;
+	data->cmd = cmd;
+	data->cc_cb_tmp = callback;
+
+	/* If sending a raw UCSI command, byte[2] is the actual UCSI command
+	 * being executed.
+	 */
+	if (cmd == CMD_RAW_UCSI && buf) {
+		data->active_ucsi_cmd = data->wr_buf[2];
+	}
+
+	if (IS_ENABLED(CONFIG_USBC_PDC_TRACE_MSG)) {
+		const struct pdc_config_t *cfg = dev->config;
+
+		pdc_trace_msg_req(cfg->connector_number,
+				  PDC_TRACE_CHIP_TYPE_IT52XX, data->wr_buf,
+				  data->wr_buf_len);
+	}
+
+	k_mutex_unlock(&data->mtx);
+	/* Posting the event reduces latency to start executing the command. */
+	k_event_post(&data->driver_event, IT52XX_NEXT_STATE_READY);
+
+	return 0;
+}
+
+static int it52xx_post_command(const struct device *dev, enum cmd_t cmd,
+			       const uint8_t *buf, uint8_t len,
+			       uint8_t *user_buf)
+{
+	return it52xx_post_command_with_callback(dev, cmd, buf, len, user_buf,
+						 NULL);
+}
+
 static int it52xx_get_alert_status(const struct device *dev)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	struct i2c_msg msg[2];
+	uint8_t cmd = GET_ALERT_STATUS.cmd;
+	uint8_t len = GET_ALERT_STATUS.len;
+
+	msg[0].buf = &cmd;
+	msg[0].len = len;
+	msg[0].flags = I2C_MSG_WRITE;
+
+	msg[1].buf = data->rd_buf;
+	msg[1].len = IT52XX_INT_READ_STATUS_LENGTH;
+	msg[1].flags = I2C_MSG_RESTART | I2C_MSG_READ | I2C_MSG_STOP;
+
+	return i2c_transfer_dt(&cfg->i2c, msg, 2);
 }
 
 static int it52xx_clr_alert_status(const struct device *dev, uint8_t status)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct i2c_msg msg;
+
+	uint8_t payload[] = {
+		CLR_ALERT_STATUS.cmd,
+		status,
+	};
+
+	msg.buf = payload;
+	msg.len = ARRAY_SIZE(payload);
+	msg.flags = I2C_MSG_WRITE | I2C_MSG_STOP;
+
+	return i2c_transfer_dt(&cfg->i2c, &msg, 1);
 }
 
 static int it52xx_pdc_reset(const struct device *dev)
