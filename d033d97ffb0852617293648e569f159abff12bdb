@@ -37,6 +37,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b752ae43_67168c9d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T17:55:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "11532529_41024ab4",
+      "revId": "d033d97ffb0852617293648e569f159abff12bdb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "962b6ea3_89520855",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T17:55:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "86c18d0b_3dcbd43a",
+      "revId": "d033d97ffb0852617293648e569f159abff12bdb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02f531ba_3ca96d40",
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "41069e5e_da380140",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T17:55:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "02f531ba_3ca96d40",
+      "revId": "d033d97ffb0852617293648e569f159abff12bdb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ccf4c30a_4e4bf13e",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Note: Removing the context reset from the middle of this test actually strengthens it! It now verifies that a failed session establishment attempt (`EC_RES_ACCESS_DENIED`) does not corrupt the context for a subsequent valid attempt. \n\nThis is a good, subtle improvement, but I just wanted to call it out to ensure it was intentional since the commit message only mentions moving \"initial state\" setups.",
       "isAi": true,
+      "revId": "d033d97ffb0852617293648e569f159abff12bdb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fffc2bd_9f2c251e",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T17:55:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ccf4c30a_4e4bf13e",
       "revId": "d033d97ffb0852617293648e569f159abff12bdb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
