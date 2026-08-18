@@ -31,6 +31,8 @@ if (DEFINED CONFIG_BASEBOARD_HELIPILOT)
 endif()
 
 if (DEFINED CONFIG_BOARD_ET171)
+	# Expected rollback version is 2 on et171 projects.
+	set(EXPECTED_ROLLBACK_VERSION 2)
 	add_subdirectory(et171)
 	project(et171)
 endif()
