@@ -54,7 +54,7 @@ config PLATFORM_EC_PANIC_LOG
 	bool "Enable EC panic log"
 	default y
 	select PLATFORM_EC_PRESERVED_RING_BUF
-	depends on !CROS_EC_RO || ZTEST
+	depends on PLATFORM_EC_NOINIT_END_OF_RAM_SECTION
 	help
 	  When enabled, a copy of the console log is kept in
 	  preserved uninitialized ram. The log can be dumped

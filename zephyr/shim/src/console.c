@@ -498,19 +498,23 @@ static void zephyr_print(const char *buff, size_t size)
 		panic_log_write_str(buff, size);
 	}
 
-	/*
-	 * shell_* functions can not be used in ISRs so optionally use
-	 * printk instead.
-	 * If the shell is about to be (or is) stopped, use printk, since the
-	 * output may be stalled and the shell mutex held.
-	 */
 	bool in_isr = k_is_in_isr();
 
-	if (in_isr || shell_stopped || !shell_is_active()) {
-		if (IS_ENABLED(CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT) ||
-		    !in_isr) {
-			printk("!%s", buff);
+	/* shell_* functions can not be used in ISRs so optionally use
+	 * printk instead.
+	 */
+	if (in_isr) {
+		if (IS_ENABLED(CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT)) {
+			printk("[ISR]%s", buff);
 		}
+		return;
+	}
+
+	/* If the shell is about to be (or is) stopped, use printk, since the
+	 * output may be stalled and the shell mutex held.
+	 */
+	if (shell_stopped || !shell_is_active()) {
+		printk("%s", buff);
 		return;
 	}
 

@@ -134,6 +134,7 @@ config PLATFORM_EC_HOSTCMD_THREAD_INFO
 	bool "Host command: EC_CMD_THREAD_INFO"
 	depends on THREAD_MONITOR
 	depends on PLATFORM_EC_HOSTCMD
+	depends on PLATFORM_EC_SYSTEM_UNLOCKED
 	default y
 	help
 	  Enable host commands for retrieving thread information.

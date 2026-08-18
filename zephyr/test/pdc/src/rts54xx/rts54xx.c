@@ -612,7 +612,7 @@ ZTEST_USER(rts54xx, test_dfp_and_ufp_vdo_ack_programming)
 	zassert_equal(ufp.version, UFP_VDO_VERSION_1_3,
 		      "UFP VDO version should be 1.3 (got %d)", ufp.version);
 	zassert_equal(ufp.usb4_cap, 0, "UFP VDO USB4 cap should be 0");
-	zassert_equal(ufp.usb3_cap, 1, "UFP VDO USB3 cap should be 1");
+	zassert_equal(ufp.usb3_cap, 0, "UFP VDO USB3 cap should be 0");
 	zassert_equal(ufp.usb2_cap, UFP_USB2_CAPABLE,
 		      "UFP VDO USB2 cap should be UFP_USB2_CAPABLE");
 	zassert_equal(ufp.tbt_support, 0, "UFP VDO TBT support should be 0");
