@@ -2,6 +2,11 @@ common:
   platform_allow:
   - native_sim
 tests:
+  pdc.driver.it52xx:
+    build_only: true
+    extra_dtc_overlay_files:
+    - "./boards/it52xx.overlay"
+
   pdc.driver.rts545x:
     timeout: 500
     extra_configs:

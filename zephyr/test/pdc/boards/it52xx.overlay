@@ -1,0 +1,19 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "native_sim.overlay"
+
+&i2c0 {
+	pdc_emul1: it52xx-pdc@26 {
+		compatible = "ite,it52xx-pdc";
+		reg = <0x26>;
+		ccd;
+	};
+
+	pdc_emul2: it52xx-pdc@27 {
+		compatible = "ite,it52xx-pdc";
+		reg = <0x27>;
+	};
+};
