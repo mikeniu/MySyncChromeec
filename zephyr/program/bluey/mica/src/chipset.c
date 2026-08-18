@@ -10,12 +10,15 @@
 #include "hooks.h"
 #include "led_common.h"
 #include "power/qcom.h"
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(mica_chipset,LOG_LEVEL_INF);
 
 /* true while the AP power-on sequence is in progress. */
 static bool power_on_in_progress;
 
 static void disable_pp5000(void)
 {
+	LOG_INF("xie: disable_pp5000() -> pulling EC_EN_PP5000 LOW");
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 0);
 }
 DECLARE_DEFERRED(disable_pp5000);
@@ -49,8 +52,10 @@ DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_mica,
 
 static void board_chipset_pre_init_mica(void)
 {
+	LOG_INF("xie: board_chipset_pre_init_mica() ENTER -> about to pull EC_EN_PP5000 HIGH");
 	hook_call_deferred(&disable_pp5000_data, -1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 1);
+	LOG_INF("xie: EC_EN_PP5000 set to 1 (HIGH), power_on_in_progress=true");
 
 	power_on_in_progress = true;
 }
@@ -62,7 +67,10 @@ static void board_chipset_hard_off_mica(void)
 	enum power_on_event_t power_on_reason;
 
 	power_on_reason = chipset_get_power_on_reason();
+	LOG_INF("xie: board_chipset_hard_off_mica() ENTER, power_on_in_progress=%d, power_on_reason=%d",
+		power_on_in_progress, power_on_reason);
 	if (power_on_in_progress && power_on_reason != POWER_ON_BY_AC_ON) {
+		LOG_INF("xie: power failure detected, scheduling disable_pp5000 in 10min (600000ms) for diag LED");
 		board_diag_led_power_fail();
 		/* Keep the PP5000 power rail enabled for 10 minutes after
 		 * lightbar diagnostic for a power failure.
@@ -70,6 +78,8 @@ static void board_chipset_hard_off_mica(void)
 		hook_call_deferred(&disable_pp5000_data,
 				   600000 * USEC_PER_MSEC);
 	} else {
+		LOG_INF("xie: normal hard off, scheduling disable_pp5000 in %dms",
+			5000 + CONFIG_CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS);
 		hook_call_deferred(
 			&disable_pp5000_data,
 			(5000 + CONFIG_CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *

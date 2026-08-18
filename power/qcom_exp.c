@@ -110,7 +110,7 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 #define CAN_BOOT_AP_CHECK_WAIT (200 * MSEC)
 
 /* The timeout of the check if the switchcap outputs good voltage */
-#define SWITCHCAP_PG_CHECK_TIMEOUT (800 * MSEC)
+#define SWITCHCAP_PG_CHECK_TIMEOUT (8000 * MSEC)
 
 /* Wait for polling if the switchcap outputs good voltage */
 #define SWITCHCAP_PG_CHECK_WAIT (6 * MSEC)
@@ -674,9 +674,11 @@ static int set_system_power(int enable)
 	int ret;
 
 	CPRINTS("%s(%d)", __func__, enable);
+	CPRINTS("xie: set_system_power(%d) -> board_set_switchcap_power() to control EC_EN_VPH_PWR_1A", enable);
 	set_system_power_no_check(enable);
 
 	ret = wait_switchcap_power_good(enable);
+	CPRINTS("xie: wait_switchcap_power_good(%d) returned %d", enable, ret);
 
 	if (!enable) {
 		/* Ensure POWER_GOOD drop to low if it is a forced shutdown */
@@ -752,12 +754,17 @@ enum power_state power_chipset_init(void)
 	int init_power_state;
 	uint32_t reset_flags = system_get_reset_flags();
 
+	CPRINTS("xie: ========================================");
+	CPRINTS("xie: power_chipset_init() START, reset_flags=0x%x", reset_flags);
+	CPRINTS("xie: ========================================");
+
 	/*
 	 * Properly initialize the switchcap power unless we are doing SYSJUMP.
 	 * This ensures the switchcap is in a known reset state, preventing
 	 * the AP from being in an inconsistent state.
 	 */
 	if (!(reset_flags & EC_RESET_FLAG_SYSJUMP)) {
+		CPRINTS("xie: NOT sysjump -> forcing system shutdown (VPH_PWR=0), init_state=POWER_G3");
 		CPRINTS("not sysjump; forcing system shutdown");
 		system_reset_switchcap_power();
 		init_power_state = POWER_G3;
@@ -765,6 +772,7 @@ enum power_state power_chipset_init(void)
 		/* In the SYSJUMP case, we check if the AP is on */
 		if (power_get_signals() & IN_POWER_GOOD) {
 			CPRINTS("SOC ON");
+			CPRINTS("xie: SYSJUMP and POWER_GOOD detected -> init_state=POWER_S0, AP already running (PRE_INIT won't be called)");
 			init_power_state = POWER_S0;
 
 			/*
@@ -778,6 +786,7 @@ enum power_state power_chipset_init(void)
 			disable_sleep(SLEEP_MASK_AP_RUN);
 		} else {
 			CPRINTS("SOC OFF");
+			CPRINTS("xie: SYSJUMP but SOC OFF -> init_state=POWER_G3");
 			init_power_state = POWER_G3;
 		}
 	}
@@ -791,11 +800,14 @@ enum power_state power_chipset_init(void)
 	 * shutdown from recovery screen
 	 */
 	if (IS_ENABLED(CONFIG_BRINGUP)) {
+		CPRINTS("xie: CONFIG_BRINGUP is enabled -> disabling auto_power_on");
 		auto_power_on = 0;
 	} else if (reset_flags & EC_RESET_FLAG_AP_OFF) {
+		CPRINTS("xie: EC_RESET_FLAG_AP_OFF set -> disabling auto_power_on");
 		auto_power_on = 0;
 	} else if (!(reset_flags & EC_RESET_FLAG_EFS) &&
 		   (reset_flags & EC_RESET_FLAG_SYSJUMP)) {
+		CPRINTS("xie: SYSJUMP without EFS -> disabling auto_power_on");
 		auto_power_on = 0;
 	} else if ((reset_flags & EC_RESET_FLAG_HIBERNATE)) {
 		/*
@@ -821,8 +833,10 @@ enum power_state power_chipset_init(void)
 
 	if (auto_power_on) {
 		CPRINTS("auto_power_on set due to reset flags");
+		CPRINTS("xie: auto_power_on ENABLED -> will auto-boot on startup");
 	} else {
 		CPRINTS("auto_power_on disabled");
+		CPRINTS("xie: auto_power_on DISABLED -> need manual power on (power button, `power on` cmd, etc.)");
 	}
 
 #ifdef CONFIG_POWER_BUTTON
@@ -893,26 +907,35 @@ static int power_on_seq(uint8_t poweron_event)
 {
 	int ret;
 
+	CPRINTS("xie: power_on_seq(event=%d) START", poweron_event);
+
 	/* Reset all the Passthru signal to the PMIC.
 	 * This ensures that the AP powers on with the
 	 * intended flow.
 	 */
 	reset_all_passthru_pmic_signal();
 
+	CPRINTS("xie: power_on_seq -> calling set_system_power(1) [EC_EN_VPH_PWR_1A]");
 	ret = set_system_power(1);
-	if (ret != EC_SUCCESS)
+	if (ret != EC_SUCCESS) {
+		CPRINTS("xie: set_system_power(1) FAILED! ret=%d, aborting power on", ret);
 		return ret;
+	}
+	CPRINTS("xie: set_system_power(1) OK, VPH_PWR is good, enabling AP_RST interrupt");
 
 	/* Enable signal interrupts */
 	power_signal_enable_interrupt(GPIO_AP_RST_L);
 
+	CPRINTS("xie: power_on_seq -> calling set_pmic_pwron(1) to wake PMIC");
 	ret = set_pmic_pwron(1, poweron_event);
 	if (ret != EC_SUCCESS) {
 		CPRINTS("POWER_GOOD not seen in time");
+		CPRINTS("xie: set_pmic_pwron(1) FAILED! ret=%d, PMIC not responding", ret);
 		return ret;
 	}
 
 	CPRINTS("POWER_GOOD seen");
+	CPRINTS("xie: PMIC POWER_GOOD received, AP power on complete!");
 	/* if power-on is a success passthru the signals again */
 	passthru_ac_on_to_pmic();
 	passthru_lid_open_to_pmic();
@@ -934,25 +957,33 @@ static uint8_t check_for_power_on_event(void)
 
 	if (power_request == POWER_REQ_ON) {
 		ret = POWER_ON_BY_POWER_REQ_ON;
+		CPRINTS("xie: power on event: POWER_REQ_ON (shell command/API)");
 	} else if (power_request == POWER_REQ_ON_LONG_WARM_RESET) {
 		ret = POWER_ON_BY_LONG_WARM_RESET;
+		CPRINTS("xie: power on event: POWER_REQ_ON_LONG_WARM_RESET");
 	} else if (power_request == POWER_REQ_COLD_RESET) {
 		ret = POWER_ON_BY_POWER_REQ_RESET;
+		CPRINTS("xie: power on event: POWER_REQ_COLD_RESET");
 	} else if (auto_power_on) {
 		/* power on requested at EC startup for recovery */
 		ret = POWER_ON_BY_AUTO_POWER_ON;
+		CPRINTS("xie: power on event: AUTO_POWER_ON (EC auto-boot at startup)");
 	} else if (power_button_is_pressed()) {
 		/* check for power button press */
 		ret = POWER_ON_BY_POWER_BUTTON_PRESSED;
+		CPRINTS("xie: power on event: POWER_BUTTON_PRESSED");
 	} else if (lid_opened) {
 		/* check lid open */
 		ret = POWER_ON_BY_LID_OPEN;
+		CPRINTS("xie: power on event: LID_OPEN");
 	} else if (ac_on) {
 		/* check if external power is connected */
 		ret = POWER_ON_BY_AC_ON;
+		CPRINTS("xie: power on event: AC_ON (adapter inserted)");
 	} else if (rtc_wake) {
 		/* check for RTC alarm wake */
 		ret = POWER_ON_BY_RTC_ALARM;
+		CPRINTS("xie: power on event: RTC_ALARM");
 	} else {
 		ret = POWER_ON_CANCEL;
 	}
@@ -1247,6 +1278,7 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		boot_from_off = check_for_power_on_event();
 		if (boot_from_off) {
 			CPRINTS("power on %d", boot_from_off);
+			CPRINTS("xie: POWER_G3 -> POWER_G3S5 (power on triggered, reason=%d)", boot_from_off);
 			return POWER_G3S5;
 		}
 		break;
@@ -1259,14 +1291,18 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 	case POWER_G3S5:
 
 		/* Initialize components to ready state before AP is up. */
+		CPRINTS("xie: state=POWER_G3S5 -> about to notify HOOK_CHIPSET_PRE_INIT (this pulls EC_EN_PP5000 HIGH!)");
 		hook_notify(HOOK_CHIPSET_PRE_INIT);
+		CPRINTS("xie: HOOK_CHIPSET_PRE_INIT done, calling power_on_seq()...");
 
 		if (power_on_seq(boot_from_off) != EC_SUCCESS) {
+			CPRINTS("xie: power_on_seq FAILED! calling power_off_seq(), going back to POWER_G3");
 			power_off_seq(shutdown_from_on);
 			boot_from_off = 0;
 			return POWER_G3;
 		}
 		CPRINTS("AP running ...");
+		CPRINTS("xie: AP power on SUCCESS -> notifying HOOK_CHIPSET_STARTUP");
 
 		/* Call hooks now that AP is running */
 		hook_notify(HOOK_CHIPSET_STARTUP);

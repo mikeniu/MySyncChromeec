@@ -5,8 +5,8 @@
 
 / {
 	batteries {
-		default_battery: pow-tech_sg20 {
-			compatible = "pow-tech,sg20", "battery-smart";
+		default_battery: smp_l26d4pk3 {
+			compatible = "sunwoda,l26d4pk3", "battery-smart";
 		};
 	};
 };

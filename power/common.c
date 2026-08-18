@@ -239,6 +239,8 @@ int power_wait_mask_signals_timeout(uint32_t want, uint32_t mask, int timeout)
 
 void power_set_state(enum power_state new_state)
 {
+	CPRINTS("xie: power_set_state: %d -> %d", state, new_state);
+
 	/* Record the time we go into G3 */
 	if (new_state == POWER_G3)
 		last_shutdown_time = get_time().val;
@@ -724,6 +726,10 @@ void chipset_task(void *u)
 	uint32_t this_in_signals;
 	static uint32_t last_in_signals;
 
+	CPRINTS("xie: ========================================");
+	CPRINTS("xie: chipset_task STARTED, initial state=POWER_G3");
+	CPRINTS("xie: ========================================");
+
 #ifdef CONFIG_BATTERY
 	/*
 	 * (crosbug.com/p/28289): Wait battery stable.
@@ -765,8 +771,10 @@ void chipset_task(void *u)
 			power_set_active_wake_mask();
 
 			/* Call hooks before we enter G3 */
-			if (new_state == POWER_G3)
+			if (new_state == POWER_G3) {
+				CPRINTS("xie: entering POWER_G3 -> notifying HOOK_CHIPSET_HARD_OFF (this schedules PP5000 disable)");
 				hook_notify(HOOK_CHIPSET_HARD_OFF);
+			}
 		}
 	}
 }

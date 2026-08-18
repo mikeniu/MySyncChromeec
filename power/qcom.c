@@ -476,9 +476,11 @@ static int set_system_power(int enable)
 	int ret;
 
 	CPRINTS("%s(%d)", __func__, enable);
+	CPRINTS("xie: set_system_power(%d) -> board_set_switchcap_power() to control EC_EN_VPH_PWR_1A", enable);
 	set_system_power_no_check(enable);
 
 	ret = wait_switchcap_power_good(enable);
+	CPRINTS("xie: wait_switchcap_power_good(%d) returned %d", enable, ret);
 
 	if (!enable) {
 		/* Ensure POWER_GOOD drop to low if it is a forced shutdown */
@@ -658,6 +660,9 @@ static int power_is_enough(void)
 	poll_deadline = get_time();
 	poll_deadline.val += CAN_BOOT_AP_CHECK_TIMEOUT;
 
+	CPRINTS("xie: power_is_enough() checking, system_can_boot_ap=%d, charge_want_shutdown=%d",
+		system_can_boot_ap(), charge_want_shutdown());
+
 	/*
 	 * Wait for PD negotiation. If a system with drained battery, don't
 	 * waste the time and exit the loop.
@@ -679,13 +684,18 @@ static int power_on_seq(void)
 {
 	int ret;
 
+	CPRINTS("xie: power_on_seq() -> calling set_system_power(1)");
 	ret = set_system_power(1);
-	if (ret != EC_SUCCESS)
+	if (ret != EC_SUCCESS) {
+		CPRINTS("xie: set_system_power(1) FAILED, ret=%d", ret);
 		return ret;
+	}
+	CPRINTS("xie: set_system_power(1) OK, enabling AP_RST interrupt");
 
 	/* Enable signal interrupts */
 	power_signal_enable_interrupt(GPIO_AP_RST_L);
 
+	CPRINTS("xie: calling set_pmic_pwron(1)");
 	ret = set_pmic_pwron(1);
 	if (ret != EC_SUCCESS) {
 		CPRINTS("POWER_GOOD not seen in time");
@@ -710,17 +720,22 @@ static uint8_t check_for_power_on_event(void)
 
 	if (power_request == POWER_REQ_ON) {
 		ret = POWER_ON_BY_POWER_REQ_ON;
+		CPRINTS("xie: power on event: POWER_REQ_ON");
 	} else if (power_request == POWER_REQ_COLD_RESET) {
 		ret = POWER_ON_BY_POWER_REQ_RESET;
+		CPRINTS("xie: power on event: POWER_REQ_COLD_RESET");
 	} else if (auto_power_on) {
 		/* power on requested at EC startup for recovery */
 		ret = POWER_ON_BY_AUTO_POWER_ON;
+		CPRINTS("xie: power on event: AUTO_POWER_ON (recovery)");
 	} else if (lid_opened) {
 		/* check lid open */
 		ret = POWER_ON_BY_LID_OPEN;
+		CPRINTS("xie: power on event: LID_OPEN");
 	} else if (power_button_is_pressed()) {
 		/* check for power button press */
 		ret = POWER_ON_BY_POWER_BUTTON_PRESSED;
+		CPRINTS("xie: power on event: POWER_BUTTON_PRESSED");
 	} else {
 		ret = POWER_OFF_CANCEL;
 	}
@@ -972,12 +987,16 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 
 	switch (state) {
 	case POWER_G3:
+		CPRINTS("xie: state=POWER_G3, checking for power on event...");
 		boot_from_off = check_for_power_on_event();
-		if (boot_from_off)
+		if (boot_from_off) {
+			CPRINTS("xie: POWER_G3 -> POWER_G3S5 (power on detected, reason=%d)", boot_from_off);
 			return POWER_G3S5;
+		}
 		break;
 
 	case POWER_G3S5:
+		CPRINTS("xie: state=POWER_G3S5 -> POWER_S5");
 		return POWER_S5;
 
 	case POWER_S5:
@@ -985,12 +1004,13 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 			boot_from_off = check_for_power_on_event();
 
 		if (boot_from_off) {
-			CPRINTS("power on %d", boot_from_off);
+			CPRINTS("xie: state=POWER_S5, power on reason=%d -> POWER_S5S3", boot_from_off);
 			return POWER_S5S3;
 		}
 		break;
 
 	case POWER_S5S3:
+		CPRINTS("xie: state=POWER_S5S3, waiting for power button release...");
 		/*
 		 * Wait for power button release before actually boot AP.
 		 * It may be a long-hold power button with volume buttons
@@ -998,17 +1018,22 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		 * during the long-hold.
 		 */
 		power_button_wait_for_release(-1);
+		CPRINTS("xie: power button released, checking if power is enough...");
 
 		/* If no enough power, return back to S5. */
 		if (!power_is_enough()) {
+			CPRINTS("xie: power NOT enough! Aborting power on, back to POWER_S5");
 			boot_from_off = 0;
 			return POWER_S5;
 		}
 
 		/* Initialize components to ready state before AP is up. */
+		CPRINTS("xie: power OK! About to notify HOOK_CHIPSET_PRE_INIT (this should pull EC_EN_PP5000 HIGH)");
 		hook_notify(HOOK_CHIPSET_PRE_INIT);
+		CPRINTS("xie: HOOK_CHIPSET_PRE_INIT done, starting power_on_seq()...");
 
 		if (power_on_seq() != EC_SUCCESS) {
+			CPRINTS("xie: power_on_seq FAILED! power off seq, back to POWER_S5");
 			power_off_seq(shutdown_from_on);
 			boot_from_off = 0;
 			return POWER_S5;

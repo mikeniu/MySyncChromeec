@@ -23,24 +23,24 @@ static const struct device *const kbd_dev =
 	DEVICE_DT_GET(CROS_EC_KEYBOARD_NODE);
 
 static const uint8_t kb_proto_mask[] = {
-	0xff, /* C0 */
-	0xff, /* C1 */
-	0x7f, /* C2 */
-	0x7f, /* C3 */
-	0x20, /* C4 */
-	0x10, /* C5 */
-	0x42, /* C6 */
-	0x48, /* C7 */
-	0x81, /* C8 */
-	0xa9, /* C9 */
-	0xa0, /* C10 */
-	0xa0, /* C11 */
-	0xff, /* C12 */
-	0xff, /* C13 */
-	0xff, /* C14 */
-	0xff, /* C15 */
-	0xff, /* C16 */
-	0x00, /* C17 */
+	0x08,	/* C0 */
+	0xff,	/* C1 */
+	0xff,	/* C2 */
+	0xff,	/* C3 */
+	0xff,	/* C4 */
+	0xff,	/* C5 */
+	0xfe,	/* C6 */
+	0xa0,	/* C7 */
+	0xff,	/* C8 */
+	0xf2,	/* C9 */
+	0x01,	/* C10 */
+	0xff,	/* C11 */
+	0xc0,	/* C12 */
+	0x40,	/* C13 */
+	0x0a,	/* C14 */
+	0x40,	/* C15 */
+	0x01,	/* C16 */
+	0x00,	/* C17 */
 };
 
 static void input_kbd_actual_key_mask_replace(void)

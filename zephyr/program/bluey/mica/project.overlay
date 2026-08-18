@@ -23,6 +23,7 @@
 #include "keyboard.dtsi"
 #include "temp_sensors.dtsi"
 #include "battery.dtsi"
+#include "led.dtsi"
 
 /* mica overrides follow... */
 
