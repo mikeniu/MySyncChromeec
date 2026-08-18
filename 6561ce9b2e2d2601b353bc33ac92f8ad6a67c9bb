@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22e094fe_92d07781",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 42
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T15:03:21Z",
+      "side": 1,
+      "message": "The test coverage indicates that `device_is_ready(power_monitor)` always returns false.  Something is not right with the power monitor stub/mock setup in the test.\n\nI suggest running the test in the GDB debugger to step through your test to figure out what is happening.",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 172,
+        "endChar": 35
+      },
+      "revId": "6561ce9b2e2d2601b353bc33ac92f8ad6a67c9bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34a40819_24db1c24",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 42
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T15:03:21Z",
+      "side": 1,
+      "message": "Test coverage shows that this code isn\u0027t run during the test.  You need fix the test so this code is executes.",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 62
+      },
+      "revId": "6561ce9b2e2d2601b353bc33ac92f8ad6a67c9bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ffd90c5_7ebe391a",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 42
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T15:03:21Z",
+      "side": 1,
+      "message": "Same here - this branch isn\u0027t covered by tests.",
+      "revId": "6561ce9b2e2d2601b353bc33ac92f8ad6a67c9bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
