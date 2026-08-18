@@ -212,6 +212,7 @@ fan-y=fan.o
 flash-y=flash.o
 flash_physical-y=flash_physical.o
 flash_write_protect-y=flash_write_protect.o
+flash_write_protect_ro-y=flash_write_protect_ro.o
 fp_transport-y=fp_transport.o
 fpsensor_auth_commands-y=fpsensor_auth_commands.o
 fpsensor_auth_commands_otp-$(rw-test)=fpsensor_auth_commands_otp.o

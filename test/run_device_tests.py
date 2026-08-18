@@ -70,7 +70,6 @@ import colorama  # type: ignore[import]
 import fmap
 import yaml
 
-
 # pylint: enable=import-error
 
 EC_DIR = Path(os.path.dirname(os.path.realpath(__file__))).parent
@@ -802,6 +801,12 @@ class AllTests:
                 skip_for_ec_legacy=True,
             ),
             TestConfig(
+                test_name="flash_write_protect_ro",
+                imagetype_to_use=ImageType.RO,
+                toggle_power=True,
+                enable_hw_write_protect=True,
+            ),
+            TestConfig(
                 test_name="flash_protection_rw",
                 enable_hw_write_protect=True,
                 skip_for_ec_legacy=True,
@@ -1388,7 +1393,7 @@ def find_section_offset_size(section: str, image: bytes) -> tuple[int, int]:
 
 def write_section(data: bytes, image: bytearray, section: str):
     """Replace the specified section in image with the contents of data"""
-    (section_start, section_size) = find_section_offset_size(section, image)
+    section_start, section_size = find_section_offset_size(section, image)
 
     if section_size < len(data):
         raise ValueError(section + " section size is not enough to store data")
@@ -1401,8 +1406,8 @@ def write_section(data: bytes, image: bytearray, section: str):
 
 def copy_section(src: bytes, dst: bytearray, section: str):
     """Copy section from src image to dst image"""
-    (src_start, src_size) = find_section_offset_size(section, src)
-    (dst_start, dst_size) = find_section_offset_size(section, dst)
+    src_start, src_size = find_section_offset_size(section, src)
+    dst_start, dst_size = find_section_offset_size(section, dst)
 
     if dst_size < src_size:
         raise ValueError(
