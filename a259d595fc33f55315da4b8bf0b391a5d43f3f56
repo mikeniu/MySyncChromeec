@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49cf9679_df00c31d",
+        "filename": "util/dut_handlers/alos.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T20:37:49Z",
+      "side": 1,
+      "message": "Create a helper routine for running adb commands on the DUT.",
+      "range": {
+        "startLine": 136,
+        "startChar": 8,
+        "endLine": 137,
+        "endChar": 42
+      },
+      "revId": "a259d595fc33f55315da4b8bf0b391a5d43f3f56",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
