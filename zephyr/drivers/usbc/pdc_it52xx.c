@@ -75,6 +75,13 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 #define IT52XX_VDM_VDC_SET_RDO 4
 #define IT52XX_VDM_VDC_GET_RDO 5
 
+/** Vendor-defined command values used to set and get the SBU mux mode. */
+#define IT52XX_VDM_VDC_SET_SBU_MUX_MODE 6
+#define IT52XX_VDM_VDC_GET_SBU_MUX_MODE 7
+
+/** Maximum SMBus block payload length. */
+#define IT52XX_SMBUS_MAX_BLOCK_SIZE 32
+
 /** SET_PDO command layout. */
 #define IT52XX_SET_PDO_MAX_PDO_COUNT 7
 #define IT52XX_SET_PDO_CMD_BASE_LENGTH 12
@@ -183,7 +190,7 @@ struct it52xx_control_cmd {
 /** ITE SMBus commands. */
 static const struct smbus_cmd_t GET_ALERT_STATUS = { 0xBD, 0x01 };
 static const struct smbus_cmd_t CLR_ALERT_STATUS = { 0xBC };
-static const struct smbus_cmd_t __unused SET_CONTROL = { 0x81 };
+static const struct smbus_cmd_t SET_CONTROL = { 0x81 };
 static const struct smbus_cmd_t SET_MSGOUT = { 0x83 };
 static const struct smbus_cmd_t GET_CCI = { 0x80 };
 static const struct smbus_cmd_t GET_MSGIN = { 0x82 };
@@ -236,16 +243,16 @@ static const struct smbus_cmd_t SET_CONNECTOR_RESET = { 0x81,
 static const struct smbus_cmd_t GET_CAPABILITY = { 0x81,
 						   IT52XX_CONTROL_BYTE_CNT,
 						   UCSI_GET_CAPABILITY };
-static const struct smbus_cmd_t __unused GET_LPM_PPM_INFO = {
-	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_GET_LPM_PPM_INFO
-};
-static const struct smbus_cmd_t __unused GET_ATTENTION_VDO = {
-	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_GET_ATTENTION_VDO
-};
-static const struct smbus_cmd_t __unused SET_SBU_MUX_MODE = {
+static const struct smbus_cmd_t GET_LPM_PPM_INFO = { 0x81,
+						     IT52XX_CONTROL_BYTE_CNT,
+						     UCSI_GET_LPM_PPM_INFO };
+static const struct smbus_cmd_t GET_ATTENTION_VDO = { 0x81,
+						      IT52XX_CONTROL_BYTE_CNT,
+						      UCSI_GET_ATTENTION_VDO };
+static const struct smbus_cmd_t SET_SBU_MUX_MODE = {
 	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_VENDOR_DEFINED_COMMAND
 };
-static const struct smbus_cmd_t __unused GET_SBU_MUX_MODE = {
+static const struct smbus_cmd_t GET_SBU_MUX_MODE = {
 	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_VENDOR_DEFINED_COMMAND
 };
 
@@ -1628,6 +1635,28 @@ static enum smf_state_result st_read_run(void *o)
 			/* TODO */
 			break;
 		}
+#ifdef CONFIG_USBC_PDC_DRIVEN_CCD
+		case CMD_GET_SBU_MUX_MODE: {
+			enum pdc_sbu_mux_mode *mode =
+				(enum pdc_sbu_mux_mode *)data->user_buf;
+			uint8_t raw_mode = data->rd_buf[offset];
+
+			switch (raw_mode) {
+			case 0:
+				*mode = PDC_SBU_MUX_MODE_NORMAL;
+				break;
+			case 1:
+				*mode = PDC_SBU_MUX_MODE_FORCE_DBG;
+				break;
+			default:
+				*mode = PDC_SBU_MUX_MODE_INVALID;
+				LOG_ERR("ITE%d: Unknown raw SBU mux value: 0x%02x",
+					cfg->connector_number, raw_mode);
+				break;
+			}
+			break;
+		}
+#endif /* defined(CONFIG_USBC_PDC_DRIVEN_CCD) */
 		default:
 			/* No preprocessing needed for the user data */
 			memcpy(data->user_buf, data->rd_buf + offset, len);
@@ -2879,9 +2908,258 @@ static int it52xx_get_vbus_voltage(const struct device *dev, uint16_t *voltage)
 				   (uint8_t *)voltage);
 }
 
+static int it52xx_get_lpm_ppm_info(const struct device *dev,
+				   struct lpm_ppm_info_t *info)
+{
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (info == NULL) {
+		return -EINVAL;
+	}
+
+	/* bit[16:23]: connector num 7'b, reserved 1'b */
+	byte5 = (conn_num & 0x7f);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_LPM_PPM_INFO.cmd,
+		.len = GET_LPM_PPM_INFO.len,
+		.control = {
+			.command = GET_LPM_PPM_INFO.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_GET_LPM_PPM_INFO,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   (uint8_t *)info);
+}
+
+static int it52xx_get_attention_vdo(const struct device *dev,
+				    union get_attention_vdo_t *vdo)
+{
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (vdo == NULL) {
+		return -EINVAL;
+	}
+
+	/* bit[16:23]: connector num 7'b, reserved 1'b */
+	byte5 = (conn_num & 0x7f);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_ATTENTION_VDO.cmd,
+		.len = GET_ATTENTION_VDO.len,
+		.control = {
+			.command = GET_ATTENTION_VDO.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_GET_ATTENTION_VDO,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   (uint8_t *)vdo);
+}
+
+/* PPM directly call standard UCSI cmd to LPM (not through mgmt) */
+static int it52xx_execute_ucsi_cmd(const struct device *dev,
+				   uint8_t ucsi_command, uint8_t data_size,
+				   uint8_t *command_specific,
+				   uint8_t *lpm_data_out,
+				   struct pdc_callback *callback)
+{
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t cmd_buffer[IT52XX_SMBUS_MAX_BLOCK_SIZE];
+	uint8_t conn_num = cfg->port_index_on_chip;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	cmd_buffer[0] = SET_CONTROL.cmd;
+	cmd_buffer[1] = data_size + 2;
+	cmd_buffer[2] = ucsi_command; /* sub-cmd */
+	cmd_buffer[3] = 0; /* data length of sub-cmd */
+	memcpy(&cmd_buffer[4], command_specific, data_size);
+
+	/* Convert port number of standard UCSI sub-command to specific value */
+	switch (ucsi_command) {
+	case UCSI_CONNECTOR_RESET:
+	case UCSI_GET_CONNECTOR_CAPABILITY:
+	case UCSI_GET_CAM_SUPPORTED:
+	case UCSI_GET_CURRENT_CAM:
+	case UCSI_GET_PDOS:
+	case UCSI_GET_CABLE_PROPERTY:
+	case UCSI_GET_CONNECTOR_STATUS:
+	case UCSI_GET_ERROR_STATUS:
+	case UCSI_GET_PD_MESSAGE:
+	case UCSI_GET_ATTENTION_VDO:
+	case UCSI_GET_LPM_PPM_INFO:
+	case UCSI_GET_CAM_CS:
+	case UCSI_SET_CCOM:
+	case UCSI_SET_UOR:
+	case UCSI_SET_PDR:
+	case UCSI_SET_POWER_LEVEL:
+	case UCSI_SET_RETIMER_MODE:
+	case UCSI_SET_SINK_PATH:
+	case UCSI_SET_PDOS:
+	case UCSI_SET_NEW_CAM:
+	case UCSI_SET_USB:
+		cmd_buffer[4] &= ~0x7f;
+		cmd_buffer[4] |= (conn_num & 0x7f);
+		break;
+	case UCSI_GET_ALTERNATE_MODES:
+		cmd_buffer[5] &= ~0x7f;
+		cmd_buffer[5] |= (conn_num & 0x7f);
+		break;
+	default:
+		LOG_INF("ITE%d: needn't assign port number ucsi sub-command",
+			cfg->connector_number);
+	}
+
+	return it52xx_post_command_with_callback(dev, CMD_RAW_UCSI, cmd_buffer,
+						 data_size + 4, lpm_data_out,
+						 callback);
+}
+
+#ifdef CONFIG_USBC_PDC_DRIVEN_CCD
+static int it52xx_get_sbu_mux_mode(const struct device *dev,
+				   enum pdc_sbu_mux_mode *mode)
+{
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5, byte6 = 0;
+
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (mode == NULL) {
+		return -EINVAL;
+	}
+
+	/* Support by [CONTROL] VDM */
+	/* bit[16:23]: connector num 7'b, vdc_cmd 1'b */
+	/* bit[24:31]: vdc_cmd 4'b, IT52XX_VDM_VDC_VER 4'b */
+	byte5 = (conn_num & 0x7f) |
+		((IT52XX_VDM_VDC_GET_SBU_MUX_MODE & BIT(0)) << 7);
+	byte6 = ((IT52XX_VDM_VDC_GET_SBU_MUX_MODE >> 1) & 0xf) |
+		((IT52XX_VDM_VDC_VER & 0xf) << 4);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_SBU_MUX_MODE.cmd,
+		.len = GET_SBU_MUX_MODE.len,
+		.control = {
+			.command = GET_SBU_MUX_MODE.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+				byte6,
+				IT52XX_VDM_VID_L,
+				IT52XX_VDM_VID_H,
+				0x00,
+				/* EC_PID_L --> it52xx don't care */
+				0x00,
+				/* EC_PID_H --> it52xx don't care */
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_GET_SBU_MUX_MODE,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   (uint8_t *)mode);
+}
+
+static int it52xx_set_sbu_mux_mode(const struct device *dev,
+				   enum pdc_sbu_mux_mode mode)
+{
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t setting, byte5, byte6 = 0;
+
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	switch (mode) {
+	case PDC_SBU_MUX_MODE_NORMAL:
+		setting = 0;
+		break;
+	case PDC_SBU_MUX_MODE_FORCE_DBG:
+		setting = 1;
+		break;
+	default:
+		return -ERANGE;
+	}
+
+	/* Support by [CONTROL] VDM */
+	/* bit[16:23]: connector num 7'b, vdc_cmd 1'b */
+	/* bit[24:31]: vdc_cmd 4'b, IT52XX_VDM_VDC_VER 4'b */
+	byte5 = (conn_num & 0x7f) |
+		((IT52XX_VDM_VDC_SET_SBU_MUX_MODE & BIT(0)) << 7);
+	byte6 = ((IT52XX_VDM_VDC_SET_SBU_MUX_MODE >> 1) & 0xf) |
+		((IT52XX_VDM_VDC_VER & 0xf) << 4);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = SET_SBU_MUX_MODE.cmd,
+		.len = SET_SBU_MUX_MODE.len,
+		.control = {
+			.command = SET_SBU_MUX_MODE.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+				byte6,
+				IT52XX_VDM_VID_L,
+				IT52XX_VDM_VID_H,
+				setting,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_SET_SBU_MUX_MODE,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   NULL);
+}
+#endif /* defined(CONFIG_USBC_PDC_DRIVEN_CCD) */
+
 static int it52xx_get_ucsi_version(const struct device *dev, uint16_t *version)
 {
-	return -ENOSYS;
+	if (version == NULL) {
+		return -EINVAL;
+	}
+
+	*version = UCSI_VERSION;
+
+	return 0;
 }
 
 static int it52xx_get_hw_config(const struct device *dev,
@@ -2944,7 +3222,14 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.get_vdo = it52xx_get_vdo,
 	.set_comms_state = it52xx_set_comms_state,
 	.set_pdos = it52xx_set_pdo,
+	.execute_ucsi_cmd = it52xx_execute_ucsi_cmd,
 	.ack_cc_ci = NULL, /* The IT52XX driver sends ACK_CC_CI internally. */
+	.get_lpm_ppm_info = it52xx_get_lpm_ppm_info,
+	.get_attention_vdo = it52xx_get_attention_vdo,
+#ifdef CONFIG_USBC_PDC_DRIVEN_CCD
+	.get_sbu_mux_mode = it52xx_get_sbu_mux_mode,
+	.set_sbu_mux_mode = it52xx_set_sbu_mux_mode,
+#endif /* define(CONFIG_USBC_PDC_DRIVEN_CCD) */
 };
 
 static int pdc_init(const struct device *dev)
