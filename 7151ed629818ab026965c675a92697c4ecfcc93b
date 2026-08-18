@@ -34,6 +34,24 @@
       "parentUuid": "ef816f6b_940f34bd",
       "revId": "7151ed629818ab026965c675a92697c4ecfcc93b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcda36a1_f5c0cf9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-08-18T00:41:17Z",
+      "side": 1,
+      "message": "Added a kconfig  depends on PLATFORM_EC_TABLET_MODE for PLATFORM_EC_DSP_REMOTE_LID_ANGLE which fixes the kinmen build",
+      "parentUuid": "1fa27e9d_af02c223",
+      "revId": "7151ed629818ab026965c675a92697c4ecfcc93b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
