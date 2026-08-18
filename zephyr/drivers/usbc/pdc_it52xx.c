@@ -13,10 +13,14 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/smf.h>
 #include <zephyr/sys/slist.h>
+#include <zephyr/sys/util.h>
 
 #include <drivers/pdc.h>
+
+LOG_MODULE_REGISTER(pdc_it52xx, CONFIG_USBC_LOG_LEVEL);
 
 #define DT_DRV_COMPAT ite_it52xx_pdc
 
@@ -24,6 +28,12 @@
 #define IT52XX_CONTROL_BYTE_CNT sizeof(struct ucsi_control_t)
 
 BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
+
+/** Events used to wake the driver thread. */
+enum it52xx_event {
+	/** Run the next state-machine step. */
+	IT52XX_NEXT_STATE_READY = BIT(1),
+};
 
 /** IT52XX SMBus command descriptor. */
 struct smbus_cmd_t {
@@ -210,6 +220,169 @@ struct pdc_config_t {
 	/** The index of port number on chip (start from 1) */
 	uint8_t port_index_on_chip;
 };
+
+/**
+ * @brief PDC Data object
+ */
+struct pdc_data_t {
+	/** State machine context */
+	struct smf_ctx ctx;
+	/** Init's local state variable */
+	enum init_state_t init_local_state;
+	/** PDC device structure */
+	const struct device *dev;
+	/** PDC command */
+	enum cmd_t cmd;
+	/** Error status */
+	union error_status_t error_status;
+	/** CCI Event for PPM */
+	union cci_event_t cci_event;
+	/** Callback to handle commands complete indicator in interrupt */
+	struct pdc_callback *cc_cb;
+	/** Callbacks to handle connect change & vendor indicator in interrupt
+	 */
+	sys_slist_t ci_cb_list;
+	/** Init done flag */
+	bool init_done;
+	/** Error recovery counter */
+	uint16_t error_recovery_counter;
+	/* Events used to wake the driver thread. */
+	struct k_event events;
+	/* Currently running UCSI command */
+	enum ucsi_command_t active_ucsi_cmd;
+};
+
+/**
+ * @brief Name of the command, used for debugging
+ */
+static const char *const cmd_names[] = {
+	[CMD_NONE] = "",
+	[CMD_TRIGGER_PDC_RESET] = "TRIGGER_PDC_RESET",
+	[CMD_PPM_RESET] = "PPM_RESET",
+	[CMD_SET_NOTIFICATION_ENABLE] = "SET_NOTIFICATION_ENABLE",
+	[CMD_CONNECTOR_RESET] = "CONNECTOR_RESET",
+	[CMD_GET_CAPABILITY] = "GET_CAPABILITY",
+	[CMD_GET_CONNECTOR_CAPABILITY] = "GET_CONNECTOR_CAPABILITY",
+	[CMD_SET_UOR] = "SET_UOR",
+	[CMD_SET_PDR] = "SET_PDR",
+	[CMD_GET_PDOS] = "GET_PDOS",
+	[CMD_GET_CONNECTOR_STATUS] = "GET_CONNECTOR_STATUS",
+	[CMD_GET_ERROR_STATUS] = "GET_ERROR_STATUS",
+	[CMD_GET_VBUS_VOLTAGE] = "GET_VBUS_VOLTAGE",
+	[CMD_GET_IC_STATUS] = "GET_IC_STATUS",
+	[CMD_SET_CCOM] = "SET_CCOM",
+	[CMD_GET_DRP_MODE] = "GET_DRP_MODE",
+	[CMD_SET_SINK_PATH] = "SET_SINK_PATH",
+	[CMD_READ_POWER_LEVEL] = "READ_POWER_LEVEL",
+	[CMD_GET_RDO] = "GET_RDO",
+	[CMD_SET_TPC_RP] = "SET_TPC_RP",
+	[CMD_SET_RDO] = "SET_RDO",
+	[CMD_GET_CABLE_PROPERTY] = "GET_CABLE_PROPERTY",
+	[CMD_GET_VDO] = "GET_VDO",
+	[CMD_GET_IDENTITY_DISCOVERY] = "CMD_GET_IDENTITY_DISCOVERY",
+	[CMD_GET_IS_VCONN_SOURCING] = "CMD_GET_IS_VCONN_SOURCING",
+	[CMD_SET_PDO] = "CMD_SET_PDO",
+	[CMD_ACK_CC_CI] = "CMD_ACK_CC_CI",
+	[CMD_RAW_UCSI] = "CMD_RAW_UCSI",
+	[CMD_GET_LPM_PPM_INFO] = "CMD_GET_LPM_PPM_INFO",
+	[CMD_GET_ATTENTION_VDO] = "CMD_GET_ATTENTION_VDO",
+	[CMD_SET_SBU_MUX_MODE] = "CMD_SET_SBU_MUX_MODE",
+	[CMD_GET_SBU_MUX_MODE] = "CMD_GET_SBU_MUX_MODE",
+};
+
+/**
+ * @brief List of human readable state names for console debugging
+ */
+static const char *const state_names[] = {
+	[ST_INIT] = "INIT",
+	[ST_IDLE] = "IDLE",
+	[ST_WRITE] = "WRITE",
+	[ST_WRITE_ACK] = "WRITE_ACK",
+	[ST_TASK_WAIT] = "TASK_WAIT",
+	[ST_GET_CCI] = "GET_CCI",
+	[ST_READ] = "READ",
+	[ST_ERROR_RECOVERY] = "ERROR_RECOVERY",
+	[ST_DISABLE] = "PDC_DISABLED",
+	[ST_SUSPENDED] = "PDC_SUSPENDED",
+};
+
+BUILD_ASSERT(ARRAY_SIZE(state_names) == ST_COUNT);
+
+static const struct smf_state states[ST_COUNT];
+
+static enum state_t get_state(struct pdc_data_t *data)
+{
+	return data->ctx.current - &states[0];
+}
+
+static void set_state(struct pdc_data_t *data, const enum state_t next_state)
+{
+	smf_set_state(SMF_CTX(data), &states[next_state]);
+	k_event_post(&data->events, IT52XX_NEXT_STATE_READY);
+}
+
+static __unused void print_current_state(struct pdc_data_t *data)
+{
+	const struct pdc_config_t *cfg = data->dev->config;
+	int st = get_state(data);
+
+	if ((st == ST_WRITE) || (st == ST_WRITE_ACK)) {
+		if (data->cmd == CMD_RAW_UCSI) {
+			LOG_INF("ITE%d: %s RAW:%s", cfg->connector_number,
+				state_names[st],
+				get_ucsi_command_name(data->active_ucsi_cmd));
+		} else {
+			LOG_INF("ITE%d: %s %s", cfg->connector_number,
+				state_names[st], cmd_names[data->cmd]);
+		}
+	} else if (st == ST_ERROR_RECOVERY) {
+		LOG_INF("ITE%d: %s %s %d", cfg->connector_number,
+			state_names[st], cmd_names[data->cmd],
+			data->error_recovery_counter);
+	} else {
+		LOG_INF("ITE%d: %s", cfg->connector_number,
+			state_names[get_state(data)]);
+	}
+}
+
+static __unused void call_cci_event_cb(struct pdc_data_t *data)
+{
+	const struct pdc_config_t *cfg = data->dev->config;
+	const union cci_event_t cci = data->cci_event;
+
+	if (!data->init_done) {
+		return;
+	}
+
+	/*
+	 * Report CCI event to PPM, this value may not be the same as [CCI] of
+	 * LPM replied. ex. ACK_CC_CI
+	 */
+	LOG_INF("ITE%d: CCI event to PPM=0x%x", cfg->connector_number,
+		cci.raw_value);
+
+	/*
+	 * CC and CI events are separately reported. So, we need to call only
+	 * one callback or the other.
+	 */
+	if (cci.connector_change) {
+		/* callback to pdc_ci_handler_cb() */
+		pdc_fire_callbacks(&data->ci_cb_list, data->dev, cci);
+	} else if (data->cc_cb) {
+		/* callback to pdc_cc_handler_cb() */
+		data->cc_cb->handler(data->dev, data->cc_cb, cci);
+	}
+
+	data->cci_event.raw_value = 0;
+}
+
+static __unused void perform_pdc_init(struct pdc_data_t *data)
+{
+	data->error_status.raw_value = 0;
+	/* Set initial local state of Init */
+	data->init_local_state = INIT_PDC_SET_PPM_RESET;
+	set_state(data, ST_INIT);
+}
 
 static int it52xx_pdc_reset(const struct device *dev)
 {
