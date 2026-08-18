@@ -44,6 +44,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "82abbaf3_00ff042a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 2073,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-18T23:04:30Z",
+      "side": 1,
+      "message": "Also, instead of using `__attribute__((__packed__))` directly, use the macro we have for it. (I forget what it is.)",
+      "parentUuid": "22f727e2_88302864",
+      "range": {
+        "startLine": 2073,
+        "startChar": 0,
+        "endLine": 2073,
+        "endChar": 68
+      },
+      "revId": "c614dc77d8629ffaf425ff498d1454ec49281638",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4dbd7628_51f60de6",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
         "patchSetId": 2
