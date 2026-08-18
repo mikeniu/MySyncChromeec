@@ -847,6 +847,9 @@ COVERAGE_RE = re.compile(
 
 def _extract_lcov_summary_worker(name, filename):
     """Worker function to run lcov summary in a thread."""
+    if not filename.exists() or filename.stat().st_size == 0:
+        return (name, 0.0, 0, 0)
+
     cmd = [
         "/usr/bin/lcov",
         "--ignore-errors",
