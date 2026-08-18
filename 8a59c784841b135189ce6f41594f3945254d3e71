@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bd08d6a_a07eafb5",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T17:44:02Z",
+      "side": 1,
+      "message": "Within STM32, the AHB4 bus domain (and specifically AHB4-connected SRAM4) is unique to multi-domain architectures like the STM32H7",
+      "parentUuid": "550a1468_0784c31e",
+      "range": {
+        "startLine": 306,
+        "startChar": 12,
+        "endLine": 306,
+        "endChar": 31
+      },
+      "revId": "8a59c784841b135189ce6f41594f3945254d3e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "78653ced_5e0dcdba",
@@ -84,6 +108,30 @@
       "writtenOn": "2026-08-14T18:59:25Z",
       "side": 1,
       "message": "I think adding the alignment is good. I\u0027m wondering if there are any other regions that may have been accidentally unaligned. Can you put the alignment change in its own commit and use the `compare-builds` tool to verify that no boards change (or document which ones do so we know)?",
+      "range": {
+        "startLine": 667,
+        "startChar": 0,
+        "endLine": 672,
+        "endChar": 17
+      },
+      "revId": "8a59c784841b135189ce6f41594f3945254d3e71",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e3252fa_170d85aa",
+        "filename": "core/cortex-m/ec.lds.S",
+        "patchSetId": 7
+      },
+      "lineNbr": 672,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T17:44:02Z",
+      "side": 1,
+      "message": "will add it into a separate CL\n\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8263903/1",
+      "parentUuid": "44caad42_32feb68e",
       "range": {
         "startLine": 667,
         "startChar": 0,

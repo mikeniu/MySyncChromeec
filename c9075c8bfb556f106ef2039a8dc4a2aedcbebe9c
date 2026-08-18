@@ -37,6 +37,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "be65f511_6bd7570f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T17:44:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1c6699ed_b74b0b9d",
+      "revId": "c9075c8bfb556f106ef2039a8dc4a2aedcbebe9c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fd0636b_fa598880",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T17:44:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3a0e29cb_e985ab09",
+      "revId": "c9075c8bfb556f106ef2039a8dc4a2aedcbebe9c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "deabb17d_e06d138d",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] 💡 **Minor Suggestion:** Consider adding `__attribute__((weak))` to these `extern` declarations:\n\n```c\n__attribute__((weak)) extern uint32_t __ahb4_start[];\n__attribute__((weak)) extern uint32_t __ahb4_end[];\n```\n\nWhile this currently works for all existing STM32H7 boards that define the `.ahb4` region, making these symbols weak prevents linker errors if a new STM32H7 board is added in the future that does *not* define `.ahb4` in its `memory_regions.inc`. If undefined, weak symbols resolve to `0`, and your `if ((uintptr_t)__ahb4_end \u003e (uintptr_t)__ahb4_start)` check on line 308 will safely evaluate to false and skip the `memset`.",
       "isAi": true,
+      "revId": "c9075c8bfb556f106ef2039a8dc4a2aedcbebe9c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "feb48906_96349f75",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-18T17:44:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "deabb17d_e06d138d",
       "revId": "c9075c8bfb556f106ef2039a8dc4a2aedcbebe9c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
