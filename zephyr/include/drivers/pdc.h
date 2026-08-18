@@ -1202,6 +1202,7 @@ static inline int pdc_ack_cc_ci(const struct device *dev,
  */
 enum pdc_trace_chip_type {
 	PDC_TRACE_CHIP_TYPE_UNSPEC = 0,
+	PDC_TRACE_CHIP_TYPE_IT52XX = 0x52,
 	PDC_TRACE_CHIP_TYPE_RTS54XX = 0x54,
 };
 
