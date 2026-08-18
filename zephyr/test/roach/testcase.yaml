@@ -1,6 +1,8 @@
 common:
   platform_allow:
   - native_sim
+  extra_configs:
+  - CONFIG_CROS_EC_RO=y
 tests:
   roach.axii:
     extra_configs:

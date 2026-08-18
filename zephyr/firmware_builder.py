@@ -88,10 +88,14 @@ COMPARE_BUILDS_BOARDS = [
 BINARY_SIZE_REGIONS = [
     "RO_FLASH",
     "RO_RAM",
+    "RO_RAM_UNPADDED",
     "RO_ROM",
+    "RO_ROM_UNPADDED",
     "RW_FLASH",
     "RW_RAM",
+    "RW_RAM_UNPADDED",
     "RW_ROM",
+    "RW_ROM_UNPADDED",
 ]
 
 # Unused boards that are expected to be unused, such as dev boards.
@@ -157,7 +161,16 @@ def get_projects():
         # are fixed correctly.
         if (
             project.config.project_name
-            in ["lapis", "moonstone", "ruby", "sapphire", "quartz", "mica"]
+            in [
+                "lapis",
+                "moonstone",
+                "ruby",
+                "sapphire",
+                "quartz",
+                "mica",
+                "mensa",
+                "annite",
+            ]
             and not platform_ec_private.exists()
         ):
             continue
@@ -347,14 +360,18 @@ def build(opts):
         env=env,
     )
     if not opts.code_coverage:
+        ec_to_boxter_boards = read_boxter()
+
         for project in projects:
             build_dir = (
                 platform_ec / "build" / "zephyr" / project.config.project_name
             )
+            boards = list(project.config.boards)
+            # Add additional boards from boxter
+            boards.extend(ec_to_boxter_boards[project.config.project_name])
             metric = metric_list.value.add()
-            full_name = project.config.full_name.split(".")
-            metric.target_name = full_name[-1]
-            metric.platform_name = ".".join(full_name[:-1])
+            metric.target_name = project.config.project_name
+            metric.platform_name = boards[0] if boards else ""
             for variant, _ in project.iter_builds():
                 build_log = build_dir / f"build-{variant}" / "build.log"
                 parse_buildlog(
@@ -481,6 +498,22 @@ def bundle_coverage(opts):
         firmware_pb2.FirmwareArtifactInfo.LcovTarballInfo.LcovType.LCOV  # pylint: disable=no-member
     )
     (bundle_dir / "html").mkdir(exist_ok=True)
+    # Build HTML coverage reports when bundling artifacts
+    make_cmd = [
+        "make",
+        "-f",
+        "Makefile.cq",
+        f"-j{opts.cpus}",
+        "lcov_rpt",
+        "special_boards_rpt",
+    ]
+    if SPECIAL_BOARDS:
+        make_cmd.append(f"SPECIAL_BOARDS={' '.join(SPECIAL_BOARDS)}")
+    log_cmd(make_cmd)
+    subprocess.run(
+        make_cmd, check=True, cwd=ZEPHYR_DIR, stdin=subprocess.DEVNULL
+    )
+
     cmd = ["mv", "lcov_rpt"]
     for board in SPECIAL_BOARDS:
         cmd.append(board + "_rpt")
@@ -674,7 +707,7 @@ def test(opts):
             if project.config.project_name in SPECIAL_BOARDS:
                 tasks.append(
                     (
-                        f"BOARD_{project.config.full_name}".upper(),
+                        f"BOARD_{project.config.project_name}".upper(),
                         build_dir
                         / (project.config.project_name + "_final.info"),
                     )

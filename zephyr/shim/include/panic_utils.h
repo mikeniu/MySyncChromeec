@@ -21,7 +21,7 @@ void print_stack_trace(const struct k_thread *thread);
  * @brief Format the thread name for printing.  This is safe to call
  * regardless of the CONFIG_THREAD_NAME setting.
  *
- * If CONFIG_THREAD_NAME=n, this formats the thread name as a TASK_<id>.
+ * If CONFIG_THREAD_NAME=n, this formats the thread name as a pointer address.
  *
  * @param thread Kernel thread to format the name.
  * @param name Output buffer where this function writes the formatted named.

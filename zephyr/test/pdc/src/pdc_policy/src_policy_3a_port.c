@@ -38,12 +38,7 @@ BUILD_ASSERT(CONFIG_PLATFORM_EC_USB_PD_3A_PORTS == 1,
 
 static enum chipset_state_mask fake_chipset_state = CHIPSET_STATE_ON;
 
-static int mock_usb_pd_3a_ports = 1;
-
-int pd_get_usb_pd_3a_ports(void)
-{
-	return mock_usb_pd_3a_ports;
-}
+extern int mock_usb_pd_3a_ports;
 
 static int custom_fake_chipset_in_state(int mask)
 {

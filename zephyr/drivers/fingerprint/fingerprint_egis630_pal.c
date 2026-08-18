@@ -13,9 +13,9 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/cbprintf.h>
+#include <zephyr/sys/clock.h>
 #include <zephyr/sys/sys_heap.h>
 #include <zephyr/sys/util_macro.h>
-#include <zephyr/sys_clock.h>
 
 #include <drivers/fingerprint.h>
 
@@ -192,8 +192,13 @@ void *plat_alloc(size_t size)
 
 void PLAT_FREE(void **x)
 {
-	assert(x != NULL && *x != NULL);
-	plat_free(*x);
+	if (x == NULL) {
+		LOG_ERR("Error - %s called with NULL double pointer.",
+			__func__);
+		return;
+	}
+
+	sys_free(*x);
 	*x = NULL;
 }
 

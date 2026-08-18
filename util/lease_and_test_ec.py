@@ -7,12 +7,16 @@
 
 import argparse
 import fcntl
+import json
 import os
-import signal
-import socket
 import subprocess
 import sys
 import time
+from typing import Optional
+import urllib.request
+
+from dut_handlers import create_dut_handler
+from dut_handlers import DutOsType
 
 
 # Standard SSH options used across commands
@@ -22,6 +26,85 @@ SSH_OPTS = [
     "-o",
     "UserKnownHostsFile=/dev/null",
 ]
+
+
+def get_dut_os_type(dut_hostname: str) -> DutOsType:
+    """Determine if DUT OS is Android or CrOS via Swarming, defaulting to CrOS with warning."""
+    res_type: Optional[DutOsType] = None
+
+    if not dut_hostname:
+        print(
+            "Warning: No DUT hostname provided. Falling back to CrOS.",
+            file=sys.stderr,
+        )
+        return DutOsType.CROS
+
+    try:
+        token = subprocess.check_output(
+            ["luci-auth", "token"], text=True, stderr=subprocess.DEVNULL
+        ).strip()
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        print(
+            f"Warning: Failed to obtain luci-auth token ({e}). "
+            f"Falling back to CrOS for {dut_hostname}.",
+            file=sys.stderr,
+        )
+        return DutOsType.CROS
+
+    url = (
+        "https://chromeos-swarming.appspot.com/_ah/api/swarming/v1/bots/list"
+        f"?dimensions=dut_name:{dut_hostname}"
+    )
+    req = urllib.request.Request(url)
+    req.add_header("Authorization", f"Bearer {token}")
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode())
+        items = data.get("items", [])
+
+        alos_types = {
+            "AL",
+            "ANDROID",
+            "OSR_ANDROID_ONLY",
+            "OS_TYPE_AL",
+            "OS_TYPE_ANDROID",
+        }
+        cros_types = {"CHROMEOS", "CROS", "OS_TYPE_CROS"}
+
+        for bot in items:
+            dims = {d["key"]: d["value"] for d in bot.get("dimensions", [])}
+            os_type_vals = (
+                dims.get("version_info_os_type", [])
+                + dims.get("os_restriction", [])
+                + dims.get("label-os_type", [])
+                + dims.get("os_type", [])
+            )
+            for os_type in os_type_vals:
+                os_type_upper = str(os_type).upper()
+                if os_type_upper in alos_types:
+                    res_type = DutOsType.ANDROID
+                    break
+                if os_type_upper in cros_types:
+                    res_type = DutOsType.CROS
+                    break
+            if res_type:
+                break
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        print(
+            f"Warning: Failed to query DUT OS type from Swarming for {dut_hostname}: {e}.",
+            file=sys.stderr,
+        )
+
+    if not res_type:
+        print(
+            f"Warning: Could not determine DUT OS type for {dut_hostname} from Swarming. "
+            "Falling back to CrOS.",
+            file=sys.stderr,
+        )
+        res_type = DutOsType.CROS
+
+    return res_type
 
 
 def check_gcert():
@@ -98,6 +181,8 @@ def lease_dut(model=None, board=None):
                     f"Reusing active lease {lease['lease_id']} matching "
                     f"board: {board}, model: {model}..."
                 )
+                lease["os_type"] = get_dut_os_type(lease.get("dut_hostname"))
+                print(f"DUT OS type: {lease['os_type']}")
                 return lease
     except Exception as e:  # pylint: disable=broad-exception-caught
         print(
@@ -156,6 +241,8 @@ def lease_dut(model=None, board=None):
     active_leases = get_active_leases()
     for lease in active_leases:
         if lease.get("lease_id") == lease_id:
+            lease["os_type"] = get_dut_os_type(lease.get("dut_hostname"))
+            print(f"DUT OS type: {lease['os_type']}")
             return lease
 
     raise RuntimeError(
@@ -219,389 +306,6 @@ def release_lease_lock(lock_file, lock_file_path):
             pass
 
 
-def get_test_targets(args):
-    """Determine the list of test targets based on command line options."""
-    if args.all:
-        return ["(firmware_ec)"]
-
-    test_targets = []
-    if args.test:
-        test_targets.append(args.test)
-    if args.stress:
-        test_targets.extend(
-            [
-                "firmware.EcStress.flash",
-                "firmware.EcStress.keyscan",
-                "firmware.EcStress.pd",
-                "firmware.EcStress.sensors",
-                "firmware.EcStress.suspend",
-            ]
-        )
-    if args.smoke or not test_targets:
-        test_targets.insert(0, "firmware.ECSize")
-    return test_targets
-
-
-def copy_ec_rw_bin_to_dut(ec_rw_bin_path, dut_hostname, model):
-    """Copy the local EC RW binary to the target DUT's /tmp directory."""
-    if not os.path.exists(ec_rw_bin_path):
-        raise FileNotFoundError(
-            f"ec.bin not found at {ec_rw_bin_path}. Did you build the project?"
-        )
-
-    destination = f"root@{dut_hostname}:/tmp/ec_rw_{model}.bin"
-    print(f"Copying {ec_rw_bin_path} to {destination}...")
-    try:
-        subprocess.run(
-            [
-                "scp",
-                *SSH_OPTS,
-                ec_rw_bin_path,
-                destination,
-            ],
-            check=True,
-        )
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Failed to copy ec.bin to DUT: {e}") from e
-
-
-def configure_gbb_flags(servo_hostname, servo_port):
-    """Configure dev-mode GBB flags via servo.
-
-    The flag value 0x39 is a bitmask enabling:
-      - 0x0001 (GBB_FLAG_DEV_SCREEN_SHORT_DELAY): Shortens the dev screen warning.
-      - 0x0008 (GBB_FLAG_FORCE_DEV_SWITCH_ON): Forces developer mode active.
-      - 0x0010 (GBB_FLAG_FORCE_DEV_BOOT_USB): Allows booting from USB drives.
-      - 0x0020 (GBB_FLAG_DISABLE_ROLLBACK_CHECK): Bypasses version rollback checks.
-    """
-    ssh_cmd = [
-        "ssh",
-        *SSH_OPTS,
-        f"root@{servo_hostname}",
-        f"futility gbb -s --flash --flags +0x39 --servo_port {servo_port}",
-    ]
-    print(f"Running GBB configuration on {servo_hostname}...")
-    try:
-        subprocess.run(ssh_cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(
-            f"Failed to set GBB flags on {servo_hostname}: {e}"
-        ) from e
-
-
-def flash_dut(dut_hostname):
-    """Perform a recovery flash on the DUT using the fflash utility."""
-    platform_dir = get_platform_dir()
-    fflash_path = os.path.join(
-        platform_dir, "dev", "contrib", "fflash", "fflash"
-    )
-    if not os.path.exists(fflash_path):
-        raise FileNotFoundError(f"fflash tool not found at {fflash_path}")
-
-    print(f"Flashing DUT {dut_hostname} using fflash...")
-    try:
-        subprocess.run([fflash_path, dut_hostname], check=True)
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Failed to flash DUT using fflash: {e}") from e
-
-
-def flash_ec_rw_locally_on_dut(dut_hostname, model, ec_rw_bin_path):
-    """Flash the EC RW by reading, swapping, and updating the AP firmware locally on the DUT."""
-    copy_ec_rw_bin_to_dut(ec_rw_bin_path, dut_hostname, model)
-    try:
-        # 1. Read current AP firmware image locally on the DUT
-        print(f"Reading AP firmware image locally on DUT {dut_hostname}...")
-        subprocess.run(
-            [
-                "ssh",
-                *SSH_OPTS,
-                f"root@{dut_hostname}",
-                f"futility read /tmp/ap_{model}.bin",
-            ],
-            check=True,
-        )
-
-        # 2. Swap the custom EC binary into the AP firmware image using swap_ec_rw locally
-        print(
-            "Populating AP firmware image with custom EC binary using swap_ec_rw locally on DUT..."
-        )
-        subprocess.run(
-            [
-                "ssh",
-                *SSH_OPTS,
-                f"root@{dut_hostname}",
-                (
-                    f"/usr/share/vboot/bin/swap_ec_rw "
-                    f"-i /tmp/ap_{model}.bin -e /tmp/ec_rw_{model}.bin"
-                ),
-            ],
-            check=True,
-        )
-
-        # 3. Write the modified AP firmware image back using futility update locally on the DUT
-        print(
-            f"Writing modified AP firmware image back locally on DUT {dut_hostname}..."
-        )
-        subprocess.run(
-            [
-                "ssh",
-                *SSH_OPTS,
-                f"root@{dut_hostname}",
-                f"futility update --fast -i /tmp/ap_{model}.bin",
-            ],
-            check=True,
-        )
-
-        # 4. Clean up temporary AP image on the DUT
-        subprocess.run(
-            [
-                "ssh",
-                *SSH_OPTS,
-                f"root@{dut_hostname}",
-                f"rm -f /tmp/ap_{model}.bin",
-            ],
-            check=False,
-        )
-
-        # 5. Reboot DUT to trigger Software Sync
-        reboot_dut(dut_hostname)
-
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Local DUT flashing failed: {e}") from e
-    finally:
-        delete_ec_rw_bin_from_dut(dut_hostname, model)
-
-
-def delete_ec_rw_bin_from_dut(dut_hostname, model):
-    """Delete the temporary EC RW binary file from the DUT."""
-    ssh_cmd = [
-        "ssh",
-        *SSH_OPTS,
-        f"root@{dut_hostname}",
-        f"rm -f /tmp/ec_rw_{model}.bin",
-    ]
-    print(f"Cleaning up /tmp/ec_rw_{model}.bin from DUT {dut_hostname}...")
-    try:
-        subprocess.run(ssh_cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        print(
-            f"Warning: Failed to delete /tmp/ec_rw_{model}.bin on DUT: {e}",
-            file=sys.stderr,
-        )
-
-
-def copy_ec_ro_bin_to_dut(ec_ro_bin_path, dut_hostname, model):
-    """Copy the local EC RO binary to the target DUT's /tmp directory."""
-    if not os.path.exists(ec_ro_bin_path):
-        raise FileNotFoundError(f"EC RO binary not found at {ec_ro_bin_path}")
-
-    destination = f"root@{dut_hostname}:/tmp/ec_ro_{model}.bin"
-    print(f"Copying RO binary {ec_ro_bin_path} to {destination}...")
-    try:
-        subprocess.run(
-            [
-                "scp",
-                *SSH_OPTS,
-                ec_ro_bin_path,
-                destination,
-            ],
-            check=True,
-        )
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Failed to copy EC RO bin to DUT: {e}") from e
-
-
-def flash_ec_ro_locally_on_dut(dut_hostname, model, ec_ro_bin_path):
-    """Flash the EC RO section locally on the DUT using flashrom."""
-    copy_ec_ro_bin_to_dut(ec_ro_bin_path, dut_hostname, model)
-    try:
-        print(
-            f"Flashing EC RO (or combined image) locally on DUT {dut_hostname} "
-            "using flashrom..."
-        )
-        subprocess.run(
-            [
-                "ssh",
-                *SSH_OPTS,
-                f"root@{dut_hostname}",
-                f"flashrom -p ec -w /tmp/ec_ro_{model}.bin",
-            ],
-            check=True,
-        )
-        # Reboot EC to ensure the new RO/RW image is loaded
-        print(f"Rebooting EC on DUT {dut_hostname}...")
-        subprocess.run(
-            [
-                "ssh",
-                *SSH_OPTS,
-                f"root@{dut_hostname}",
-                "ectool reboot_ec",
-            ],
-            check=False,
-        )
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Local DUT EC RO flashing failed: {e}") from e
-    finally:
-        delete_ec_ro_bin_from_dut(dut_hostname, model)
-
-
-def delete_ec_ro_bin_from_dut(dut_hostname, model):
-    """Delete the temporary EC RO binary file from the DUT."""
-    ssh_cmd = [
-        "ssh",
-        *SSH_OPTS,
-        f"root@{dut_hostname}",
-        f"rm -f /tmp/ec_ro_{model}.bin",
-    ]
-    print(f"Cleaning up /tmp/ec_ro_{model}.bin from DUT {dut_hostname}...")
-    try:
-        subprocess.run(ssh_cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        print(
-            f"Warning: Failed to delete /tmp/ec_ro_{model}.bin on DUT: {e}",
-            file=sys.stderr,
-        )
-
-
-def verify_ec_up(servo_hostname, servo_port):
-    """Query the EC console to verify it is up and responsive."""
-    ssh_cmd = [
-        "ssh",
-        *SSH_OPTS,
-        f"root@{servo_hostname}",
-        f"dut-control -p {servo_port} ec_board",
-    ]
-    print(
-        f"Verifying EC is up and responsive on {servo_hostname} (port {servo_port})..."
-    )
-    for attempt in range(1, 6):
-        try:
-            result = subprocess.run(
-                ssh_cmd, capture_output=True, text=True, check=True
-            )
-            print(f"EC is responsive: {result.stdout.strip()}")
-            return
-        except subprocess.CalledProcessError as e:
-            err_msg = e.stderr.strip() if e.stderr else str(e)
-            print(
-                f"Attempt {attempt}/5: EC not responsive yet (error: "
-                f"{err_msg}). Retrying in 2 seconds..."
-            )
-            time.sleep(2)
-    raise RuntimeError(
-        f"EC failed to become responsive after flashing on {servo_hostname}"
-    )
-
-
-def reboot_dut(dut_hostname):
-    """Reboot the DUT to trigger Software Sync update of the EC."""
-    print(f"Rebooting DUT {dut_hostname} to trigger Software Sync...")
-    try:
-        subprocess.run(
-            ["ssh", *SSH_OPTS, f"root@{dut_hostname}", "reboot"],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-        time.sleep(5)  # Give it a moment to begin rebooting
-    except subprocess.CalledProcessError:
-        # Sometimes reboot disconnects SSH immediately, causing exit code 255.
-        pass
-
-
-def verify_ap_up(dut_hostname, timeout_secs=300):
-    """Wait for the DUT AP to boot up and reply to SSH commands."""
-    ssh_cmd = [
-        "ssh",
-        *SSH_OPTS,
-        "-o",
-        "ConnectTimeout=5",
-        f"root@{dut_hostname}",
-        "ectool version",
-    ]
-    print(f"Verifying DUT AP is up and SSH is responsive on {dut_hostname}...")
-    interval = 5
-    max_attempts = max(1, timeout_secs // interval)
-    for attempt in range(1, max_attempts + 1):
-        try:
-            result = subprocess.run(
-                ssh_cmd, check=True, capture_output=True, text=True
-            )
-            print("DUT AP is up and responsive!")
-            print(f"EC version:\n{result.stdout.strip()}")
-            return
-        except subprocess.CalledProcessError:
-            print(
-                f"Attempt {attempt}/{max_attempts}: DUT AP not reachable "
-                f"yet. Retrying in {interval} seconds..."
-            )
-            time.sleep(interval)
-    raise RuntimeError(f"DUT AP failed to become responsive on {dut_hostname}")
-
-
-def ensure_servod_running(
-    servo_hostname, servo_port, board, model, servo_serial
-):
-    """Ensure servod is restarted cleanly with correct model configuration."""
-    # 1. Stop any existing servod instance on this port first to ensure clean configuration
-    stop_cmd = [
-        "ssh",
-        *SSH_OPTS,
-        f"root@{servo_hostname}",
-        f"sudo stop servod PORT={servo_port}",
-    ]
-    print(
-        f"Stopping any existing servod on {servo_hostname} (port {servo_port})..."
-    )
-    subprocess.run(
-        stop_cmd,
-        check=False,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-
-    # 2. Start servod with correct configuration parameters
-    start_cmd = [
-        "ssh",
-        *SSH_OPTS,
-        f"root@{servo_hostname}",
-        f"sudo start servod PORT={servo_port} BOARD={board} "
-        f"MODEL={model} SERIALNAME={servo_serial}",
-    ]
-    print(f"Starting servod on {servo_hostname} (port {servo_port})...")
-    subprocess.run(start_cmd, check=False)
-
-    # 3. Wait for active
-    wait_cmd = [
-        "ssh",
-        *SSH_OPTS,
-        f"root@{servo_hostname}",
-        f"servodtool instance wait-for-active --port {servo_port} --timeout 60",
-    ]
-    print(f"Waiting for servod on port {servo_port} to become active...")
-    try:
-        subprocess.run(wait_cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(
-            f"servod failed to become active on {servo_hostname} "
-            f"(port {servo_port}): {e}"
-        ) from e
-
-
-def get_free_port():
-    """Allocate a random free local TCP port."""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("", 0))
-        return s.getsockname()[1]
-
-
-def release_ports(dut_port, servo_port):
-    """Release/kill any processes using the specified ports."""
-    print(f"Releasing ports {dut_port} and {servo_port}...")
-    subprocess.run(["fuser", "-k", f"{dut_port}/tcp"], check=False)
-    subprocess.run(["fuser", "-k", f"{servo_port}/tcp"], check=False)
-
-
 def resolve_ec_rw_bin_path(args, details, ec_dir):
     """Resolve the path to the EC RW binary to flash, validating its existence."""
     if args.skip_flash_ec:
@@ -635,129 +339,6 @@ def resolve_ec_ro_bin_path(args):
         return None
 
     return ec_ro_bin_path
-
-
-def setup_tunnels_sshwatcher(
-    dut_hostname, servo_hostname, local_dut_port, local_servo_port
-):
-    """Start the sshwatcher background process to tunnel SSH connections."""
-    platform_dir = get_platform_dir()
-    sshwatcher_path = os.path.join(
-        platform_dir, "dev", "contrib", "sshwatcher", "sshwatcher.go"
-    )
-    if not os.path.exists(sshwatcher_path):
-        raise FileNotFoundError(f"sshwatcher.go not found at {sshwatcher_path}")
-
-    cmd = [
-        "go",
-        "run",
-        sshwatcher_path,
-        dut_hostname,
-        str(local_dut_port),
-        servo_hostname,
-        str(local_servo_port),
-    ]
-    print(
-        f"Starting sshwatcher tunnels (DUT: {local_dut_port}, Servo: {local_servo_port})...."
-    )
-    try:
-        # pylint: disable=consider-using-with, subprocess-popen-preexec-fn
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            preexec_fn=os.setsid,
-        )
-        # Give sshwatcher a moment to initialize the tunnels
-        time.sleep(2)
-        return process
-    except Exception as e:
-        raise RuntimeError(f"Failed to start sshwatcher: {e}") from e
-
-
-def stop_sshwatcher(process):
-    """Stop the sshwatcher process and clean up its process group."""
-    if not process:
-        return
-    print("Stopping sshwatcher tunnels...")
-    try:
-        os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-        process.wait(timeout=5)
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        print(
-            f"Warning: Failed to stop sshwatcher process group: {e}",
-            file=sys.stderr,
-        )
-
-
-def run_tast_tests(test_targets, servo_port, local_dut_port, local_servo_port):
-    """Execute Tast tests using the tunneled local port settings."""
-    if len(test_targets) > 1:
-        pattern = "(" + " || ".join(f'"name:{t}"' for t in test_targets) + ")"
-    else:
-        pattern = test_targets[0]
-
-    tast_cmd = [
-        "cros_sdk",
-        "tast",
-        "run",
-        f"-var=servo=localhost:{servo_port}:ssh:{local_servo_port}",
-        f"localhost:{local_dut_port}",
-        pattern,
-    ]
-    print(
-        f"Running TAST tests ({pattern}) using local ports "
-        f"(DUT: {local_dut_port}, Servo: {local_servo_port})..."
-    )
-
-    has_provisioning_error = False
-    # pylint: disable=consider-using-with
-    process = subprocess.Popen(
-        tast_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
-    )
-
-    for line in process.stdout:
-        print(line, end="")
-        if "please check if the DUT is provisioned with a test image" in line:
-            has_provisioning_error = True
-
-    process.wait()
-
-    if has_provisioning_error:
-        raise ValueError("DUT is not provisioned with a test image")
-
-    if process.returncode != 0:
-        raise RuntimeError(
-            f"TAST tests failed with exit code {process.returncode}"
-        )
-
-
-def execute_test_flow(test_targets, details, local_dut_port, local_servo_port):
-    """Execute the Tast test flow, recovering with an fflash if required."""
-    try:
-        run_tast_tests(
-            test_targets,
-            details["servo_port"],
-            local_dut_port,
-            local_servo_port,
-        )
-    except ValueError as e:
-        if "DUT is not provisioned with a test image" in str(e):
-            print(
-                "Tast failed because DUT is not provisioned with a test image. "
-                "Attempting to flash DUT first..."
-            )
-            flash_dut(details["dut_hostname"])
-            verify_ap_up(details["dut_hostname"])
-            print("Retrying TAST tests...")
-            run_tast_tests(
-                test_targets,
-                details["servo_port"],
-                local_dut_port,
-                local_servo_port,
-            )
-        else:
-            raise
 
 
 def main():
@@ -813,9 +394,6 @@ def main():
     start_time = time.time()
     platform_dir = get_platform_dir()
     ec_dir = os.path.join(platform_dir, "ec")
-
-    test_targets = get_test_targets(args)
-
     # 1. Pre-verify the EC binary file if we can determine the path early
     try:
         if not args.skip_flash_ec and (args.ec_rw_bin or args.model):
@@ -858,48 +436,30 @@ def main():
     print(f"DUT_HOSTNAME={details['dut_hostname']}")
     print(f"MODEL={details['model']}")
     print(f"BOARD={details['board']}")
+    print(f"DUT_OS_TYPE={details.get('os_type', 'Unknown')}")
     print(f"SERVO_HOSTNAME={details['servo_hostname']}")
     print(f"SERVO_PORT={details['servo_port']}")
     print(f"SERVO_SERIAL={details['servo_serial']}")
 
-    local_dut_port = get_free_port()
-    local_servo_port = get_free_port()
-    sshwatcher_process = None
+    try:
+        handler = create_dut_handler(details, args, ec_dir)
+    except NotImplementedError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        release_lease_lock(lock_file, lock_file_path)
+        if not args.keep_lease:
+            abandon_lease(details["lease_id"])
+        sys.exit(1)
 
     try:
-        ensure_servod_running(
-            details["servo_hostname"],
-            details["servo_port"],
-            details["board"],
-            details["model"],
-            details["servo_serial"],
-        )
+        handler.ensure_servod_running()
         if not args.skip_flash_ec:
-            configure_gbb_flags(
-                details["servo_hostname"], details["servo_port"]
-            )
+            handler.configure_gbb()
             if ec_ro_bin_path:
-                flash_ec_ro_locally_on_dut(
-                    details["dut_hostname"],
-                    details["model"],
-                    ec_ro_bin_path,
-                )
-            flash_ec_rw_locally_on_dut(
-                details["dut_hostname"],
-                details["model"],
-                ec_rw_bin_path,
-            )
-            verify_ec_up(details["servo_hostname"], details["servo_port"])
-        verify_ap_up(details["dut_hostname"])
-        sshwatcher_process = setup_tunnels_sshwatcher(
-            details["dut_hostname"],
-            details["servo_hostname"],
-            local_dut_port,
-            local_servo_port,
-        )
-        execute_test_flow(
-            test_targets, details, local_dut_port, local_servo_port
-        )
+                handler.flash_ec_ro(ec_ro_bin_path)
+            handler.flash_ec_rw(ec_rw_bin_path)
+            handler.verify_ec_up()
+        handler.verify_ap_up()
+        handler.execute_test_flow()
     except KeyboardInterrupt:
         print("\nInterrupted by user. Cleaning up...", file=sys.stderr)
         sys.exit(1)
@@ -907,8 +467,6 @@ def main():
         print(e, file=sys.stderr)
         sys.exit(1)
     finally:
-        stop_sshwatcher(sshwatcher_process)
-        release_ports(local_dut_port, local_servo_port)
         if "details" in locals():
             release_lease_lock(lock_file, lock_file_path)
             if details.get("lease_id") and not args.keep_lease:

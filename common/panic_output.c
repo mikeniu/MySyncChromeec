@@ -21,6 +21,8 @@
 #include "usb_console.h"
 #include "util.h"
 
+#include <stdalign.h>
+
 /*
  * For host tests, use a static area for panic and jump data.
  */
@@ -181,6 +183,14 @@ void panic(const char *msg)
 test_mockable struct panic_data *panic_get_data(void)
 {
 	BUILD_ASSERT(sizeof(struct panic_data) <= CONFIG_PANIC_DATA_SIZE);
+	BUILD_ASSERT(alignof(struct panic_data) == 4,
+		     "struct panic_data must be 4-byte aligned");
+#if !defined(CONFIG_BOARD_NATIVE_POSIX) && !defined(CONFIG_BOARD_NATIVE_SIM)
+	BUILD_ASSERT((CONFIG_PANIC_DATA_BASE % 4) == 0,
+		     "CONFIG_PANIC_DATA_BASE must be 4-byte aligned");
+	BUILD_ASSERT(CONFIG_PANIC_DATA_BASE >= CONFIG_RAM_BASE,
+		     "CONFIG_PANIC_DATA_BASE underflows RAM base address");
+#endif
 
 	if (pdata_ptr->magic != PANIC_DATA_MAGIC ||
 	    pdata_ptr->struct_size != CONFIG_PANIC_DATA_SIZE)
@@ -330,7 +340,6 @@ test_mockable struct panic_data *get_panic_data_write(void)
 	 */
 init_pdata:
 	memset(pdata_ptr, 0, CONFIG_PANIC_DATA_SIZE);
-	pdata_ptr->magic = PANIC_DATA_MAGIC;
 	pdata_ptr->struct_size = CONFIG_PANIC_DATA_SIZE;
 
 	return pdata_ptr;

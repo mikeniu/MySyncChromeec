@@ -198,12 +198,28 @@ static int validate_fp_mode(const uint32_t mode)
 		return EC_ERROR_INVAL;
 	}
 
+	/*
+	 * FP_MODE_ENROLL_IMAGE requires an active enrollment session flag
+	 * to be set concurrently in the requested mode.
+	 */
+	if ((mode & FP_MODE_ENROLL_IMAGE) && !(mode & FP_MODE_ENROLL_SESSION)) {
+		CPRINTS("FP_MODE_ENROLL_IMAGE requested without FP_MODE_ENROLL_SESSION");
+		return EC_ERROR_INVAL;
+	}
+
 	/* Don't allow sensor reset if any other mode is
 	 * set (including FP_MODE_RESET_SENSOR itself).
 	 */
-	if (mode & FP_MODE_RESET_SENSOR) {
-		if (cur_mode & FP_VALID_MODES)
-			return EC_ERROR_INVAL;
+	if ((mode & FP_MODE_RESET_SENSOR) && (cur_mode & FP_VALID_MODES)) {
+		return EC_ERROR_INVAL;
+	}
+
+	/*
+	 * Reject mode changes while a crypto operation is in progress.
+	 */
+	if (!(mode & FP_MODE_DONT_CHANGE) &&
+	    (cur_mode & FP_MODES_CRYPTO_IN_PROGRESS)) {
+		return EC_ERROR_INVAL;
 	}
 
 	return EC_SUCCESS;

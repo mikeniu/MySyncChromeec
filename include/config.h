@@ -1887,8 +1887,8 @@
  */
 #undef CONFIG_PANIC_LOG_DEBUG
 
-/* Enable generic SVDM DFP identity response */
-#undef CONFIG_SVDM_RSP_DFP_ONLY
+/* Enable generic SVDM response support */
+#undef CONFIG_SVDM_RSP
 
 /*
  * noinit_end_of_ram is a memory section placed at the very end
@@ -1896,7 +1896,7 @@
  * The section is useful for preserving data across reboots.
  * May not be enabled in RO.
  */
-#ifndef SECTION_IS_RO
+#ifndef CONFIG_CROS_EC_RO
 #define CONFIG_NOINIT_END_OF_RAM_SECTION
 #else
 #undef CONFIG_NOINIT_END_OF_RAM_SECTION
@@ -4099,21 +4099,6 @@
 
 /* Size of the poweron config field if needed. */
 #undef CONFIG_POWERON_CONF_LEN
-
-/****************************************************************************/
-/* Shared objects library. */
-
-/* Support shared objects library between RO and RW. */
-#undef CONFIG_SHAREDLIB
-
-/* Size of shared objects library. */
-#undef CONFIG_SHAREDLIB_SIZE
-
-/* Program memory offset of shared objects library. */
-#undef CONFIG_SHAREDLIB_MEM_OFF
-
-/* Storage  offset of sharedobjects library. */
-#undef CONFIG_SHAREDLIB_STORAGE_OFF
 
 /* Allow the board to use a GPIO for the SCI# signal. */
 #undef CONFIG_SCI_GPIO

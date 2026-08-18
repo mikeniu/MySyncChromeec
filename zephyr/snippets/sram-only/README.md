@@ -5,16 +5,22 @@ from SRAM.
 
 This snippet can be enabled a few different ways.
 
-1. **Downstream on-device tests**.  Configure on device tests defined in the
-`platform/ec` repository for SRAM only operation by adding the `SNIPPET`
-to the `extra_args` property.
+1. **Downstream on-device tests**. When running downstream device tests using
+the `dagwood` wrapper script, you can use the `--sram` flag, which will
+automatically add this snippet to the underlying `twister` command.
+
+    ```bash
+    ./dagwood -p realtek/rts5912 -s aic.i2c --sram
+    ```
+
+    Alternatively, if a test should *only* ever be run from SRAM and never from
+    flash, you can configure it explicitly by adding the `SNIPPET` to the
+    `extra_args` property in the `testcase.yaml`:
 
     ```yaml
     tests:
-      aic.i2c:
+      my.sram.test:
         extra_args: SNIPPET="sram-only"
-        depends_on:
-          - i2c
     ```
 
 1. **Upstream on-device tests**. You can configure an upstream on device test

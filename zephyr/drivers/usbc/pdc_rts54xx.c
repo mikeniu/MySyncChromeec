@@ -20,8 +20,8 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/smf.h>
 #include <zephyr/sys/atomic.h>
+#include <zephyr/sys/clock.h>
 #include <zephyr/sys/util.h>
-#include <zephyr/sys_clock.h>
 LOG_MODULE_REGISTER(pdc_rts54, CONFIG_USBC_LOG_LEVEL);
 #include "usbc/pdc_power_mgmt.h"
 #include "usbc/pdc_utils.h"
@@ -1781,7 +1781,9 @@ static int rts54_set_vdo_id_ack(const struct device *dev)
 		/* UFP VDO */
 		ufp_vdo.version = UFP_VDO_VERSION_1_3;
 		ufp_vdo.usb4_cap = false;
-		ufp_vdo.usb3_cap = true;
+		/* TODO(b/543357136): Make usb3_cap configurable for device mode
+		 */
+		ufp_vdo.usb3_cap = false;
 		ufp_vdo.usb2_cap = UFP_USB2_CAPABLE;
 		ufp_vdo.vconn = false;
 		ufp_vdo.vbus = UFP_VDO_VBUS_NOT_REQUIRED;

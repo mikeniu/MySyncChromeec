@@ -76,6 +76,18 @@ register_ish_project(
     ],
 )
 
+register_ish_project(
+    project_name="penghu-ish",
+    boards=["atria"],
+    zephyr_board="intel_ish_5_8_0",
+    dts_overlays=[
+        here / "penghu-ish" / "project.overlay",
+    ],
+    kconfig_files=[
+        here / "penghu-ish" / "project.conf",
+        here / ".." / ".." / "ish.conf",
+    ],
+)
 
 # Note for reviews, do not let anyone edit these assertions, the addresses
 # must not change after the first RO release.

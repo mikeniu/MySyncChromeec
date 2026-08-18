@@ -16,6 +16,8 @@ extern char mock_end_of_ram_data[CONFIG_PLATFORM_EC_PRESERVED_END_OF_RAM_SIZE];
 
 struct jump_data *get_jump_data(void);
 int panic_data_init(void);
+struct panic_data *panic_data_reset(struct panic_data *pdata);
+void panic_data_finalize(struct panic_data *pdata);
 
 /**
  * @brief Returns a pointer to an object (such as a struct jump_data) of type
@@ -358,7 +360,8 @@ ZTEST(jump_data, test_init_jump_data_out_of_space)
 
 ZTEST(jump_data, test_init_with_panic_data)
 {
-	struct panic_data *pdata = get_panic_data_write();
+	struct panic_data *pdata = panic_data_reset(NULL);
+	panic_data_finalize(pdata);
 
 	struct jump_data *expected_jdata =
 		(struct jump_data *)((uintptr_t)pdata -
@@ -444,7 +447,7 @@ ZTEST(jump_data, test_init_watchdog_reset)
 	uint32_t reason, info;
 	uint8_t exception;
 	panic_get_reason(&reason, &info, &exception);
-	if (IS_ENABLED(SECTION_IS_RW)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
 		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD,
 			      "Panic reason: %d", reason);
 	} else {

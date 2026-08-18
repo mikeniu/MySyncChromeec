@@ -10,6 +10,7 @@
 #include "console.h"
 #include "host_command.h"
 #include "i2c.h"
+#include "i2c_battery_parser.h"
 #include "system.h"
 #include "usb_pd.h"
 #include "usb_pd_tcpm.h"
@@ -34,6 +35,121 @@
 
 static uint8_t port_protected[I2C_PORT_COUNT];
 
+struct msg_queue_t {
+	const struct ec_params_i2c_passthru_msg *msg_start;
+	const struct ec_params_i2c_passthru_msg *msg_end;
+	const struct ec_params_i2c_passthru_msg *msg;
+	const uint8_t *out;
+	int in_len;
+	int out_len;
+};
+
+struct msg_value_t {
+	int xferflags;
+	int read_len;
+	int write_len;
+	uint16_t addr_flags;
+	bool is_read;
+};
+
+static struct msg_queue_t
+msg_queue_create(const struct ec_params_i2c_passthru *params)
+{
+	return (struct msg_queue_t){
+		.msg_start = params->msg,
+		.msg_end = params->msg + params->num_msgs,
+		.msg = params->msg,
+		.out = (const uint8_t *)params + sizeof(*params) +
+		       params->num_msgs * sizeof(*params->msg),
+		.in_len = 0,
+		.out_len = 0,
+	};
+}
+
+static struct msg_value_t msg_queue_front(const struct msg_queue_t *q)
+{
+	const struct ec_params_i2c_passthru_msg *msg = q->msg;
+	struct msg_value_t val = {
+		.xferflags = I2C_XFER_START,
+		.read_len = 0,
+		.write_len = 0,
+		/* Have to remove the EC flags from the address flags */
+		.addr_flags = msg->addr_flags & EC_I2C_ADDR_MASK,
+		.is_read = msg->addr_flags & EC_I2C_FLAG_READ,
+	};
+	if (val.is_read)
+		val.read_len = msg->len;
+	else
+		val.write_len = msg->len;
+
+	/* Set stop bit for last message */
+	if (msg == q->msg_end - 1)
+		val.xferflags |= I2C_XFER_STOP;
+
+	/* More than one transactions, do a restart */
+	if (msg > q->msg_start)
+		val.xferflags |= I2C_XFER_RESTART;
+	return val;
+}
+
+static void msg_queue_pop_front(struct msg_queue_t *q,
+				const struct msg_value_t *val)
+{
+	++q->msg;
+	q->in_len += val->read_len;
+	q->out += val->write_len;
+	q->out_len += val->write_len;
+}
+
+#if defined(CONFIG_I2C_VIRTUAL_BATTERY) || \
+	(defined(CONFIG_I2C_PASSTHRU_RESTRICTED) && defined(CONFIG_BATTERY))
+static inline bool is_same_i2c_port(int port, int other_port)
+{
+#ifdef CONFIG_ZEPHYR
+	/* For Zephyr compare the actual device, which will be used in
+	 * i2c_transfer function.
+	 */
+	return (i2c_get_device_for_port(port) ==
+		i2c_get_device_for_port(other_port));
+#else
+	return (port == other_port);
+#endif
+}
+
+static inline bool is_i2c_battery(int port, uint16_t address, bool virtual_only)
+{
+	struct i2c_signature {
+		int port;
+		uint16_t address;
+		bool is_virtual;
+	};
+
+	static const struct i2c_signature battery_signatures[] = {
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+		{ .port = I2C_PORT_VIRTUAL_BATTERY,
+		  .address = VIRTUAL_BATTERY_ADDR_FLAGS,
+		  .is_virtual = true },
+#endif
+#ifdef BATTERY_ADDR_FLAGS
+		{ .port = I2C_PORT_BATTERY,
+		  .address = BATTERY_ADDR_FLAGS,
+		  .is_virtual = false },
+#endif
+	};
+
+	for (size_t index = 0; index < ARRAY_SIZE(battery_signatures);
+	     ++index) {
+		if (virtual_only && !battery_signatures[index].is_virtual)
+			continue;
+		if (is_same_i2c_port(port, battery_signatures[index].port) &&
+		    address == battery_signatures[index].address) {
+			return true;
+		}
+	}
+	return false;
+}
+#endif
+
 /**
  * Perform the voluminous checking required for this message
  *
@@ -45,14 +161,10 @@ static int check_i2c_params(const uint8_t port,
 			    const struct host_cmd_handler_args *args)
 {
 	const struct ec_params_i2c_passthru *params = args->params;
-	const struct ec_params_i2c_passthru_msg *msg;
-	int read_len = 0, write_len = 0;
+	struct msg_queue_t msg_queue;
 	unsigned int size;
-	int msgnum;
-
-#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
-	uint8_t cmd_id = 0xff;
-	const uint8_t *out;
+#if defined(CONFIG_I2C_PASSTHRU_RESTRICTED) && defined(CONFIG_BATTERY)
+	struct i2c_battery_parser_state parser_state = { .initialized = 0 };
 #endif
 
 	if (args->params_size < sizeof(*params)) {
@@ -60,77 +172,65 @@ static int check_i2c_params(const uint8_t port,
 			    args->params_size, sizeof(*params));
 		return EC_RES_INVALID_PARAM;
 	}
-	size = sizeof(*params) + params->num_msgs * sizeof(*msg);
+	size = sizeof(*params) + params->num_msgs * sizeof(*params->msg);
 	if (args->params_size < size) {
 		PTHRUPRINTS("params_size=%d, need at least %d",
 			    args->params_size, size);
 		return EC_RES_INVALID_PARAM;
 	}
 
-#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
-	out = (uint8_t *)args->params + size;
-#endif
-
 	/* Loop and process messages */;
-	for (msgnum = 0, msg = params->msg; msgnum < params->num_msgs;
-	     msgnum++, msg++) {
-		unsigned int addr_flags = msg->addr_flags;
+	for (msg_queue = msg_queue_create(params);
+	     msg_queue.msg < msg_queue.msg_end;) {
+		const struct msg_value_t val = msg_queue_front(&msg_queue);
 
 		PTHRUPRINTS("port=%d, %s, addr=0x%x(7-bit), len=%d", port,
-			    addr_flags & EC_I2C_FLAG_READ ? "read" : "write",
-			    addr_flags & EC_I2C_ADDR_MASK, msg->len);
+			    val.is_read ? "read" : "write", val.addr_flags,
+			    msg_queue.msg->len);
 
-		if (addr_flags & EC_I2C_FLAG_READ) {
-			read_len += msg->len;
-		} else {
-#ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
-			cmd_id = out[write_len];
-#endif
-			write_len += msg->len;
-		}
 #ifdef CONFIG_I2C_PASSTHRU_RESTRICTED
 		if (system_is_locked()) {
 			const struct i2c_cmd_desc_t cmd_desc = {
 				.port = port,
-				.addr_flags = addr_flags,
-				.cmd = cmd_id,
+				.addr_flags = msg_queue.msg->addr_flags,
+				.cmd = val.is_read ? 0xff : *msg_queue.out,
 			};
 			if (!board_allow_i2c_passthru(&cmd_desc))
 				return EC_RES_ACCESS_DENIED;
+
+#ifdef CONFIG_BATTERY
+			if (is_i2c_battery(port, val.addr_flags, false)) {
+				if (parser_state.initialized == 0)
+					parser_state =
+						i2c_battery_parser_state_create();
+
+				if (battery_permission_handler(
+					    &parser_state, msg_queue.in_len,
+					    val.xferflags, val.read_len,
+					    val.write_len, msg_queue.out))
+					return EC_RES_ACCESS_DENIED;
+			}
+#endif
 		}
 #endif
+		msg_queue_pop_front(&msg_queue, &val);
 	}
 
 	/* Check there is room for the data */
 	if (args->response_max <
-	    sizeof(struct ec_response_i2c_passthru) + read_len) {
+	    sizeof(struct ec_response_i2c_passthru) + msg_queue.in_len) {
 		PTHRUPRINTS("overflow1");
 		return EC_RES_INVALID_PARAM;
 	}
 
 	/* Must have bytes to write */
-	if (args->params_size < size + write_len) {
+	if (args->params_size < size + msg_queue.out_len) {
 		PTHRUPRINTS("overflow2");
 		return EC_RES_INVALID_PARAM;
 	}
 
 	return EC_RES_SUCCESS;
 }
-
-#ifdef CONFIG_I2C_VIRTUAL_BATTERY
-static inline int is_i2c_port_virtual_battery(int port)
-{
-#ifdef CONFIG_ZEPHYR
-	/* For Zephyr compare the actual device, which will be used in
-	 * i2c_transfer function.
-	 */
-	return (i2c_get_device_for_port(port) ==
-		i2c_get_device_for_port(I2C_PORT_VIRTUAL_BATTERY));
-#else
-	return (port == I2C_PORT_VIRTUAL_BATTERY);
-#endif
-}
-#endif /* CONFIG_I2C_VIRTUAL_BATTERY */
 
 static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 {
@@ -144,11 +244,12 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 	 */
 	port = i2c_get_port_from_remote_port(params->port);
 #endif
-	const struct ec_params_i2c_passthru_msg *msg;
+#ifdef CONFIG_I2C_VIRTUAL_BATTERY
+	struct i2c_battery_parser_state parser_state = { .initialized = 0 };
+#endif
 	struct ec_response_i2c_passthru *resp = args->response;
 	const struct i2c_port_t *i2c_port;
-	const uint8_t *out;
-	int in_len;
+	struct msg_queue_t msg_queue;
 	int ret, i;
 	int port_is_locked = 0;
 
@@ -181,56 +282,43 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 
 	/* Loop and process messages */
 	resp->i2c_status = 0;
-	out = (uint8_t *)args->params + sizeof(*params) +
-	      params->num_msgs * sizeof(*msg);
-	in_len = 0;
+	resp->num_msgs = 0;
 
-	for (resp->num_msgs = 0, msg = params->msg;
-	     resp->num_msgs < params->num_msgs; resp->num_msgs++, msg++) {
-		int xferflags = I2C_XFER_START;
-		int read_len = 0, write_len = 0;
+	for (msg_queue = msg_queue_create(params);
+	     msg_queue.msg < msg_queue.msg_end; resp->num_msgs++) {
 		int rv = 1;
-
-		/* Have to remove the EC flags from the address flags */
-		uint16_t addr_flags = msg->addr_flags & EC_I2C_ADDR_MASK;
-
-		if (msg->addr_flags & EC_I2C_FLAG_READ)
-			read_len = msg->len;
-		else
-			write_len = msg->len;
-
-		/* Set stop bit for last message */
-		if (resp->num_msgs == params->num_msgs - 1)
-			xferflags |= I2C_XFER_STOP;
-
-		/* More than one transactions, do a restart */
-		if (resp->num_msgs > 0)
-			xferflags |= I2C_XFER_RESTART;
+		const struct msg_value_t val = msg_queue_front(&msg_queue);
 
 #ifdef CONFIG_I2C_VIRTUAL_BATTERY
-		if (is_i2c_port_virtual_battery(port) &&
-		    addr_flags == VIRTUAL_BATTERY_ADDR_FLAGS) {
-			if (virtual_battery_handler(resp, in_len, &rv,
-						    xferflags, read_len,
-						    write_len, out))
+		if (is_i2c_battery(port, val.addr_flags, true)) {
+			/* Lazy initialization. */
+			if (parser_state.initialized == 0)
+				parser_state =
+					i2c_battery_parser_state_create();
+
+			if (virtual_battery_handler(
+				    &parser_state, resp, msg_queue.in_len, &rv,
+				    val.xferflags, val.read_len, val.write_len,
+				    msg_queue.out))
 				break;
 		}
 #endif
 		/* Transfer next message */
 		PTHRUPRINTS("xfer port=%x addr=0x%x rlen=%d flags=0x%x", port,
-			    addr_flags, read_len, xferflags);
-		if (write_len) {
+			    val.addr_flags, val.read_len, val.xferflags);
+		if (val.write_len) {
 			PTHRUPRINTF("  out:");
-			for (i = 0; i < write_len; i++)
-				PTHRUPRINTF(" 0x%02x", out[i]);
+			for (i = 0; i < val.write_len; i++)
+				PTHRUPRINTF(" 0x%02x", msg_queue.out[i]);
 			PTHRUPRINTF("\n");
 		}
 		if (rv) {
 			if (!port_is_locked)
 				i2c_lock(port, (port_is_locked = 1));
-			rv = i2c_xfer_unlocked(port, addr_flags, out, write_len,
-					       &resp->data[in_len], read_len,
-					       xferflags);
+			rv = i2c_xfer_unlocked(port, val.addr_flags,
+					       msg_queue.out, val.write_len,
+					       &resp->data[msg_queue.in_len],
+					       val.read_len, val.xferflags);
 		}
 
 		if (rv) {
@@ -242,10 +330,9 @@ static enum ec_status i2c_command_passthru(struct host_cmd_handler_args *args)
 			break;
 		}
 
-		in_len += read_len;
-		out += write_len;
+		msg_queue_pop_front(&msg_queue, &val);
 	}
-	args->response_size = sizeof(*resp) + in_len;
+	args->response_size = sizeof(*resp) + msg_queue.in_len;
 
 	/* Unlock port */
 	if (port_is_locked)

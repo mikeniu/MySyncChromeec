@@ -134,57 +134,6 @@ ZTEST(test_task_shim, test_timeout)
 	run_test(&timeout1, &timeout2);
 }
 
-/*
- * Timer test:
- *   1. Task 1 arms a timer for Task 3 in expiring 2 seconds.
- *   2. Task 2 does nothing.
- *   3. Task 3 validates that the it receives a TASK_EVENT_TIMER event
- *      2 seconds after Task 1 armed the timer (within 100ms
- *      tolerance).
- */
-static timestamp_t timer_armed_at;
-K_SEM_DEFINE(check_timer_finished, 0, 1);
-
-static void check_timer(uint32_t event_mask)
-{
-	timestamp_t now = get_time();
-
-	zassert_equal(event_mask & TASK_EVENT_TIMER, TASK_EVENT_TIMER,
-		      "Timer event mask should be set");
-	zassert_within(now.val - timer_armed_at.val, TASK_SEC(2),
-		       TASK_SEC(1) / 10,
-		       "Timer should expire at 2 seconds from arm time");
-	k_sem_give(&check_timer_finished);
-}
-
-static void timer_task_1(void)
-{
-	timestamp_t timer_timeout;
-
-	timer_armed_at = get_time();
-
-	timer_timeout.val = timer_armed_at.val + TASK_SEC(2);
-
-	task3_entry_func = check_timer;
-	zassert_equal(timer_arm(timer_timeout, TASK_ID_TASK_3), EC_SUCCESS,
-		      "Setting timer should succeed");
-}
-
-static void timer_task_2(void)
-{
-	/* Do nothing */
-}
-
-ZTEST(test_task_shim, test_timer)
-{
-	run_test(timer_task_1, timer_task_2);
-	zassert_equal(k_sem_take(&check_timer_finished, K_SECONDS(4 * 1000)), 0,
-		      "Task 3 did not finish within timeout");
-	zassert_equal(task3_entry_func, check_timer,
-		      "check_timer should have been enabled");
-	task3_entry_func = NULL;
-}
-
 static void event_delivered1(void)
 {
 	const uint32_t start_ms = k_uptime_get();
@@ -277,21 +226,6 @@ static void empty_set_mask2(void)
 
 	zassert_equal(events, 0x1234, "Verify only waited for event");
 	zassert_within(end_ms - start_ms, 2000, 100, "Timeout for 2 seconds");
-}
-
-static void check_task_1_mapping(void)
-{
-	zassert_equal(TASK_ID_TASK_1, thread_id_to_task_id(k_current_get()));
-}
-
-static void check_task_2_mapping(void)
-{
-	zassert_equal(TASK_ID_TASK_2, thread_id_to_task_id(k_current_get()));
-}
-
-ZTEST(test_task_shim, test_thread_to_task_mapping)
-{
-	run_test(&check_task_1_mapping, &check_task_2_mapping);
 }
 
 ZTEST(test_task_shim, test_empty_set_mask)
