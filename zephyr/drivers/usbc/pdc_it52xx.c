@@ -29,6 +29,11 @@ LOG_MODULE_REGISTER(pdc_it52xx, CONFIG_USBC_LOG_LEVEL);
 
 #define DT_DRV_COMPAT ite_it52xx_pdc
 
+#define IT52XX_BYTE0(n) ((n) & 0xff)
+#define IT52XX_BYTE1(n) (((n) >> 8) & 0xff)
+#define IT52XX_BYTE2(n) (((n) >> 16) & 0xff)
+#define IT52XX_BYTE3(n) (((n) >> 24) & 0xff)
+
 /** Number of retries after the initial I2C transaction. */
 #define N_I2C_TRANSACTION_COUNT 10
 
@@ -99,10 +104,9 @@ static const struct smbus_cmd_t __unused SET_MSGOUT = { 0x83 };
 static const struct smbus_cmd_t GET_CCI = { 0x80 };
 static const struct smbus_cmd_t GET_MSGIN = { 0x82 };
 
-static const struct smbus_cmd_t __unused SET_PPM_RESET = {
-	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_PPM_RESET
-};
-static const struct smbus_cmd_t __unused SET_NOTIFICATION_ENABLE = {
+static const struct smbus_cmd_t SET_PPM_RESET = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+						  UCSI_PPM_RESET };
+static const struct smbus_cmd_t SET_NOTIFICATION_ENABLE = {
 	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_SET_NOTIFICATION_ENABLE
 };
 static const struct smbus_cmd_t __unused GET_IC_STATUS = {
@@ -172,9 +176,8 @@ static const struct smbus_cmd_t __unused GET_SBU_MUX_MODE = {
 	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_VENDOR_DEFINED_COMMAND
 };
 
-static const struct smbus_cmd_t __unused ACK_CC_CI = { 0x81,
-						       IT52XX_CONTROL_BYTE_CNT,
-						       UCSI_ACK_CC_CI };
+static const struct smbus_cmd_t ACK_CC_CI = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+					      UCSI_ACK_CC_CI };
 
 /**
  * @brief States of the main state machine
@@ -1720,25 +1723,108 @@ static int it52xx_clr_alert_status(const struct device *dev, uint8_t status)
 
 static int it52xx_pdc_reset(const struct device *dev)
 {
-	return -ENOSYS;
+	struct pdc_data_t *data = dev->data;
+
+	if (get_state(data) == ST_DISABLE) {
+		perform_pdc_init(data);
+		return 0;
+	}
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	/*
+	 * Not UCSI command, it5271 doesn't support, this only sets unused data,
+	 * doesn't go to write state. Later, ppm may go to unattached state.
+	 * (If needs to support reboot it52xx, then PPM must init it52xx again)
+	 */
+	return it52xx_post_command(dev, CMD_TRIGGER_PDC_RESET, NULL, 0, NULL);
 }
 
 static int it52xx_ppm_reset(const struct device *dev)
 {
-	return -ENOSYS;
+	struct pdc_data_t *data = dev->data;
+
+	/* Can only be called from Init State */
+	if (get_state(data) != ST_INIT) {
+		return -EBUSY;
+	}
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = SET_PPM_RESET.cmd,
+		.len = SET_PPM_RESET.len,
+		.control = {
+			.command = SET_PPM_RESET.sub,
+			.data_length = 0x00,
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_PPM_RESET,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   NULL);
 }
 
 static int it52xx_set_notification_enable(const struct device *dev,
 					  union notification_enable_t bits)
 {
-	return -ENOSYS;
+	struct pdc_data_t *data = dev->data;
+
+	/* Can only be called from Init State */
+	if (get_state(data) != ST_INIT) {
+		return -EBUSY;
+	}
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = SET_NOTIFICATION_ENABLE.cmd,
+		.len = SET_NOTIFICATION_ENABLE.len,
+		.control = {
+			.command = SET_NOTIFICATION_ENABLE.sub,
+			.data_length = 0x00,
+			.command_specific = {
+				IT52XX_BYTE0(bits.raw_value),
+				IT52XX_BYTE1(bits.raw_value),
+				IT52XX_BYTE2(bits.raw_value),
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_SET_NOTIFICATION_ENABLE,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   NULL);
 }
 
 static int it52xx_ack_cc_ci(const struct device *dev,
 			    union conn_status_change_bits_t ci, bool cc,
 			    uint16_t vendor_defined)
 {
-	return -ENOSYS;
+	struct pdc_data_t *data = dev->data;
+
+	if ((get_state(data) != ST_IDLE) && (get_state(data) != ST_INIT) &&
+	    (get_state(data) != ST_GET_CCI) && (get_state(data) != ST_READ)) {
+		return -EBUSY;
+	}
+
+	union ack_cc_ci_t request = {
+		.connector_change_ack = ci.connect_change,
+		.command_complete_ack = cc,
+	};
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = ACK_CC_CI.cmd,
+		.len = ACK_CC_CI.len,
+		.control = {
+			.command = ACK_CC_CI.sub,
+			.data_length = 0x00,
+			.command_specific = {
+				request.raw_value[0],
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_ACK_CC_CI,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   NULL);
 }
 
 static int it52xx_get_info(const struct device *dev, struct pdc_info_t *info,
@@ -1885,6 +1971,7 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.get_cable_property = it52xx_get_cable_property,
 	.get_vdo = it52xx_get_vdo,
 	.set_comms_state = it52xx_set_comms_state,
+	.ack_cc_ci = NULL, /* The IT52XX driver sends ACK_CC_CI internally. */
 };
 
 static int pdc_init(const struct device *dev)
