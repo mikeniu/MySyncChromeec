@@ -21,9 +21,9 @@ update_repo() {
     if (cd "${repo_dir}" && git diff --quiet && git diff --cached --quiet); then
         echo "Updating ${repo_name} (fetching deltas)..."
         if [ -z "${branch}" ]; then
-            (cd "${repo_dir}" && git pull "${remote}")
+            (cd "${repo_dir}" && git pull --quiet "${remote}")
         else
-            (cd "${repo_dir}" && git pull "${remote}" "${branch}")
+            (cd "${repo_dir}" && git pull --quiet "${remote}" "${branch}")
         fi
     else
         echo "Warning: ${repo_name} has local changes." \
@@ -48,7 +48,7 @@ clone_or_update() {
             update_repo "${target_dir}" "${repo_name}"
         else
             echo "Downloading the latest ${repo_name}..."
-            git clone "${repo_url}" "${target_dir}"
+            git clone --quiet "${repo_url}" "${target_dir}"
         fi
     else
         echo "${repo_name} directory already exists. Checking for updates..."
@@ -71,7 +71,7 @@ clone_overlay_sparse() {
         else
             echo "Performing sparse checkout of ChromiumOS Overlay..."
             cd "${target_dir}" || exit 1
-            git init -b main
+            git init -b main -q
             git remote add origin "${repo_url}"
             git config core.sparseCheckout true
 
@@ -79,7 +79,7 @@ clone_overlay_sparse() {
             echo "/eclass/coreboot-sdk-ec-dependencies.eclass" \
                 >> .git/info/sparse-checkout
 
-            git pull --depth=1 origin main
+            git pull --depth=1 --quiet origin main
             # Set up branch tracking so git pull works without arguments
             # next time
             git branch --set-upstream-to=origin/main main
@@ -108,7 +108,7 @@ clone_zephyrproject_sparse() {
             echo "Performing sparse checkout of Zephyr Project..."
             mkdir -p "${target_dir}"
             cd "${target_dir}"
-            git init -b main
+            git init -b main -q
             git remote add origin "${repo_url}"
             git config core.sparseCheckout true
 
@@ -120,7 +120,7 @@ clone_zephyrproject_sparse() {
                 echo "/modules/lib/nanopb/"
             } >> .git/info/sparse-checkout
 
-            git pull --depth=1 origin main
+            git pull --depth=1 --quiet origin main
             # Set up branch tracking so git pull works without arguments
             # next time
             git branch --set-upstream-to=origin/main main
@@ -133,18 +133,44 @@ clone_zephyrproject_sparse() {
     fi
 }
 
+# Function to populate a repository from build-time cache if it doesn't exist
+populate_if_missing() {
+    local target_dir="${1}"
+    local repo_name="${2}"
+    if [ ! -d "${target_dir}" ]; then
+        local cached_dir="${target_dir//\/workspace/${CACHE_BASE}}"
+        if [ -d "${cached_dir}" ]; then
+            echo "Populating ${repo_name} from build-time cache..."
+            mkdir -p "$(dirname "${target_dir}")"
+            cp -a "${cached_dir}" "${target_dir}"
+        fi
+    fi
+}
+
 # Clone or update repositories (parallelized for speed)
-clone_or_update "${REPO_BASE}/platform/ec" \
-    "/workspace/src/platform/ec" "EC firmware" &
-clone_or_update "${REPO_BASE}/platform/dagwood" \
-    "/workspace/src/platform/dagwood" "Dagwood" &
-clone_zephyrproject_sparse &
-clone_or_update "${REPO_BASE}/third_party/pigweed/pigweed" \
-    "/workspace/src/third_party/pigweed" "Pigweed" &
-clone_or_update "${REPO_BASE}/third_party/u-boot" \
-    "/workspace/src/third_party/u-boot" "U-Boot" &
-clone_overlay_sparse &
-wait
+if [ -n "${SKIP_UPDATE}" ]; then
+    echo "Skipping repository updates (fast startup enabled)..."
+    populate_if_missing "/workspace/src/platform/ec" "EC firmware"
+    populate_if_missing "/workspace/src/platform/dagwood" "Dagwood"
+    populate_if_missing \
+        "/workspace/src/third_party/zephyrproject" "Zephyr Project"
+    populate_if_missing "/workspace/src/third_party/pigweed" "Pigweed"
+    populate_if_missing "/workspace/src/third_party/u-boot" "U-Boot"
+    populate_if_missing \
+        "/workspace/src/third_party/chromiumos-overlay" "ChromiumOS Overlay"
+else
+    clone_or_update "${REPO_BASE}/platform/ec" \
+        "/workspace/src/platform/ec" "EC firmware" &
+    clone_or_update "${REPO_BASE}/platform/dagwood" \
+        "/workspace/src/platform/dagwood" "Dagwood" &
+    clone_zephyrproject_sparse &
+    clone_or_update "${REPO_BASE}/third_party/pigweed/pigweed" \
+        "/workspace/src/third_party/pigweed" "Pigweed" &
+    clone_or_update "${REPO_BASE}/third_party/u-boot" \
+        "/workspace/src/third_party/u-boot" "U-Boot" &
+    clone_overlay_sparse &
+    wait
+fi
 
 # Set up python virtual environment if it doesn't exist
 VENV_DIR="/workspace/.venv"
@@ -190,41 +216,42 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
         echo "Python dependencies up to date. Skipping pip install."
     else
         echo "Configuring zmake tool in virtualenv..."
-        python3 -m pip install --no-deps \
+        python3 -m pip install -q --no-deps \
             -e /workspace/src/platform/ec/zephyr/zmake
 
-        # Install standard Zephyr dependencies to support twister executions
-        ZEPHYR_REQS_DIR="/workspace/src/third_party"
-        ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/zephyrproject/zephyr/scripts"
-        if [ -d "${ZEPHYR_REQS_DIR}" ]; then
-            echo "Installing Zephyr dependencies..."
-            python3 -m pip install --no-cache-dir \
-                -r "${ZEPHYR_REQS_DIR}/requirements.txt"
-        fi
+        if [ -z "${SKIP_UPDATE}" ]; then
+            # Install standard Zephyr dependencies to support twister executions
+            ZEPHYR_REQS_DIR="/workspace/src/third_party"
+            ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/zephyrproject/zephyr/scripts"
+            if [ -d "${ZEPHYR_REQS_DIR}" ]; then
+                python3 -m pip install -q --no-cache-dir \
+                    -r "${ZEPHYR_REQS_DIR}/requirements.txt"
+            fi
 
-        # Parse .vpython3 and install dependencies
-        VPYTHON_FILE="/workspace/src/platform/ec/zephyr/zmake/.vpython3"
-        if [ -f "${VPYTHON_FILE}" ]; then
-            packages=$(grep -o \
-                'infra/python/wheels/[a-zA-Z0-9_-]*' \
-                "${VPYTHON_FILE}" | \
-                sed 's|infra/python/wheels/||g' | \
-                sed 's|-py2_py3||g; s|-py3||g' | \
-                sort -u)
-            to_install=""
-            for pkg in ${packages}; do
-                case "${pkg}" in
-                    "pyyaml") pkg="PyYAML" ;;
-                    "python-dateutil") pkg="python-dateutil" ;;
-                    "ruamel_yaml") pkg="ruamel.yaml" ;;
-                    "ruamel_yaml_clib"|"coverage"|"pytest"| \
-                    "hypothesis"|"testfixtures") continue ;;
-                esac
-                to_install="${to_install} ${pkg}"
-            done
-            if [ -n "${to_install}" ]; then
-                # shellcheck disable=SC2086
-                python3 -m pip install --no-cache-dir ${to_install}
+            # Parse .vpython3 and install dependencies
+            VPYTHON_FILE="/workspace/src/platform/ec/zephyr/zmake/.vpython3"
+            if [ -f "${VPYTHON_FILE}" ]; then
+                packages=$(grep -o \
+                    'infra/python/wheels/[a-zA-Z0-9_-]*' \
+                    "${VPYTHON_FILE}" | \
+                    sed 's|infra/python/wheels/||g' | \
+                    sed 's|-py2_py3||g; s|-py3||g' | \
+                    sort -u)
+                to_install=""
+                for pkg in ${packages}; do
+                    case "${pkg}" in
+                        "pyyaml") pkg="PyYAML" ;;
+                        "python-dateutil") pkg="python-dateutil" ;;
+                        "ruamel_yaml") pkg="ruamel.yaml" ;;
+                        "ruamel_yaml_clib"|"coverage"|"pytest"| \
+                        "hypothesis"|"testfixtures") continue ;;
+                    esac
+                    to_install="${to_install} ${pkg}"
+                done
+                if [ -n "${to_install}" ]; then
+                    # shellcheck disable=SC2086
+                    python3 -m pip install -q --no-cache-dir ${to_install}
+                fi
             fi
         fi
 
@@ -249,7 +276,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
             echo "Copying pre-installed Realtek monitor binary to cache..."
             mkdir -p "$(dirname "${MONITOR_CACHE}")"
             cp "${MONITOR_DEST}" "${MONITOR_CACHE}"
-        else
+        elif [ -z "${SKIP_UPDATE}" ]; then
             echo "Monitor binary not found in cache. Building rtk_flame..."
             if zmake --checkout /workspace build rtk_flame; then
                 echo "Caching monitor binary..."
@@ -281,7 +308,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
             echo "Copying pre-installed NPCX monitor binary to cache..."
             mkdir -p "$(dirname "${NPCX_MONITOR_CACHE}")"
             cp "${NPCX_MONITOR_DEST}" "${NPCX_MONITOR_CACHE}"
-        else
+        elif [ -z "${SKIP_UPDATE}" ]; then
             echo "Monitor binary not found in cache. Building npcx_monitor..."
             if zmake --checkout /workspace build npcx_monitor; then
                 echo "Caching monitor binary..."
