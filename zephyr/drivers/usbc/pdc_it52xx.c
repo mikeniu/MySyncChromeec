@@ -66,6 +66,17 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 #define IT52XX_VDM_VID_L 0x8d
 #define IT52XX_VDM_VID_H 0x04
 
+/** SET_PDO command layout. */
+#define IT52XX_SET_PDO_MAX_PDO_COUNT 7
+#define IT52XX_SET_PDO_CMD_BASE_LENGTH 12
+#define IT52XX_SET_PDO_CMD_MAX_LENGTH     \
+	(IT52XX_SET_PDO_CMD_BASE_LENGTH + \
+	 sizeof(uint32_t) * IT52XX_SET_PDO_MAX_PDO_COUNT)
+#define IT52XX_END_OF_MESSAGE 1
+
+/** SET_POWER_LEVEL value selecting source power. */
+#define IT52XX_SET_SRC_PWR_LVL 1
+
 /** State-machine task timeout, in milliseconds. */
 #define T_TASK_TIMEOUT_EVENT 20
 
@@ -74,6 +85,9 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 
 /** Maximum number of error-recovery attempts. */
 #define N_MAX_ERROR_RECOVERY_COUNT 4
+
+/** Connector-status VBUS voltage scale factor, in millivolts. */
+#define VOLTAGE_SCALE_FACTOR 5
 
 /** Transition back to init or idle and finish handling the SMF event. */
 #define TRANSITION_TO_INIT_OR_IDLE_STATE(data)  \
@@ -161,7 +175,7 @@ struct it52xx_control_cmd {
 static const struct smbus_cmd_t GET_ALERT_STATUS = { 0xBD, 0x01 };
 static const struct smbus_cmd_t CLR_ALERT_STATUS = { 0xBC };
 static const struct smbus_cmd_t __unused SET_CONTROL = { 0x81 };
-static const struct smbus_cmd_t __unused SET_MSGOUT = { 0x83 };
+static const struct smbus_cmd_t SET_MSGOUT = { 0x83 };
 static const struct smbus_cmd_t GET_CCI = { 0x80 };
 static const struct smbus_cmd_t GET_MSGIN = { 0x82 };
 
@@ -175,24 +189,21 @@ static const struct smbus_cmd_t GET_IC_STATUS = { 0x81, IT52XX_CONTROL_BYTE_CNT,
 static const struct smbus_cmd_t GET_ERROR_STATUS = { 0x81,
 						     IT52XX_CONTROL_BYTE_CNT,
 						     UCSI_GET_ERROR_STATUS };
-static const struct smbus_cmd_t __unused SET_PDO = { 0x81,
-						     IT52XX_CONTROL_BYTE_CNT,
-						     UCSI_SET_PDOS };
-static const struct smbus_cmd_t __unused GET_CONNECTOR_STATUS = {
+static const struct smbus_cmd_t SET_PDO = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+					    UCSI_SET_PDOS };
+static const struct smbus_cmd_t GET_CONNECTOR_STATUS = {
 	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_GET_CONNECTOR_STATUS
 };
-static const struct smbus_cmd_t __unused SET_SINK_PATH = {
-	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_SET_SINK_PATH
-};
+static const struct smbus_cmd_t SET_SINK_PATH = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+						  UCSI_SET_SINK_PATH };
 static const struct smbus_cmd_t __unused SET_CCOM = { 0x81,
 						      IT52XX_CONTROL_BYTE_CNT,
 						      UCSI_SET_CCOM };
-static const struct smbus_cmd_t __unused SET_TPC_RP = { 0x81,
-							IT52XX_CONTROL_BYTE_CNT,
-							UCSI_SET_POWER_LEVEL };
-static const struct smbus_cmd_t __unused READ_POWER_LEVEL = {
-	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_READ_POWER_LEVEL
-};
+static const struct smbus_cmd_t SET_TPC_RP = { 0x81, IT52XX_CONTROL_BYTE_CNT,
+					       UCSI_SET_POWER_LEVEL };
+static const struct smbus_cmd_t READ_POWER_LEVEL = { 0x81,
+						     IT52XX_CONTROL_BYTE_CNT,
+						     UCSI_READ_POWER_LEVEL };
 static const struct smbus_cmd_t __unused GET_CONNECTOR_CAPABILITY = {
 	0x81, IT52XX_CONTROL_BYTE_CNT, UCSI_GET_CONNECTOR_CAPABILITY
 };
@@ -1573,6 +1584,23 @@ static enum smf_state_result st_read_run(void *o)
 
 			break;
 		}
+		case CMD_GET_CONNECTOR_STATUS: {
+			memcpy(data->user_buf, data->rd_buf + offset, len);
+			union connector_status_t *status =
+				(union connector_status_t *)(data->rd_buf +
+							     offset);
+			data->cached_conn_status = *status;
+			break;
+		}
+		case CMD_GET_VBUS_VOLTAGE: {
+			union connector_status_t *status =
+				(union connector_status_t *)(data->rd_buf +
+							     offset);
+			*(uint16_t *)data->user_buf = status->voltage_reading *
+						      status->voltage_scale *
+						      VOLTAGE_SCALE_FACTOR;
+			break;
+		}
 		case CMD_GET_ERROR_STATUS: {
 			union error_status_t *es =
 				(union error_status_t *)data->user_buf;
@@ -2079,20 +2107,255 @@ static int it52xx_get_error_status(const struct device *dev,
 				   (uint8_t *)es);
 }
 
+static int it52xx_set_pdo(const struct device *dev, enum pdo_type_t type,
+			  uint32_t *pdo, int count)
+{
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+
+	if (pdo == NULL) {
+		return -EINVAL;
+	}
+
+	if (count < 1 || count > IT52XX_SET_PDO_MAX_PDO_COUNT) {
+		/* Count == 0 is reserved */
+		return -ERANGE;
+	}
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	/* bit[16:23]: connector num 7'b, reserved 1'b */
+	/* bit[24:31]: reserved 2'b, SRC or SNK PDO 1'b, num of pdo 4'b, data
+	 * index 1'b */
+	/* bit[32:39]: data index 6'b, end of message 1'b, reserved 1'b */
+	union ucsi_set_pdos_t request = {
+		.connector_number = conn_num,
+		.pdo_type = type,
+		.number_of_pdos = count,
+		.end_of_message = IT52XX_END_OF_MESSAGE,
+	};
+
+	/* CONTROL followed by the MSGOUT header and PDO data. */
+	struct {
+		struct it52xx_control_cmd ctrl;
+		uint8_t msgout_cmd;
+		uint8_t msgout_len;
+		uint8_t pdos[sizeof(uint32_t) * IT52XX_SET_PDO_MAX_PDO_COUNT];
+	} __packed payload = {
+		.ctrl = {
+			.ctrl_cmd = SET_PDO.cmd,
+			.len = SET_PDO.len,
+			.control = {
+				.command = SET_PDO.sub,
+				.data_length = sizeof(uint32_t) * count,
+			},
+		},
+		.msgout_cmd = SET_MSGOUT.cmd,
+		.msgout_len = sizeof(uint32_t) * count,
+	};
+
+	memcpy(payload.ctrl.control.command_specific, request.raw_value,
+	       sizeof(request.raw_value));
+
+	/* Compute actual length given number of PDOs being set */
+	uint8_t payload_len =
+		IT52XX_SET_PDO_CMD_BASE_LENGTH + sizeof(uint32_t) * count;
+
+	/* Copy PDOs into payload buffer */
+	memcpy(payload.pdos, pdo, sizeof(uint32_t) * count);
+
+	return it52xx_post_command(dev, CMD_SET_PDO, (const uint8_t *)&payload,
+				   payload_len, NULL);
+}
+
 static int it52xx_get_connector_status(const struct device *dev,
 				       union connector_status_t *cs)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	if (cs == NULL) {
+		return -EINVAL;
+	}
+
+	/* bit[16:23]: connector num 7'b, reserved 1'b */
+	byte5 = (conn_num & 0x7f);
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = GET_CONNECTOR_STATUS.cmd,
+		.len = GET_CONNECTOR_STATUS.len,
+		.control = {
+			.command = GET_CONNECTOR_STATUS.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_GET_CONNECTOR_STATUS,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   (uint8_t *)cs);
 }
 
 static int it52xx_set_sink_path(const struct device *dev, bool en)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	/* bit[16:23]: connector num 7'b, sink path enable/disable 1'b */
+	union set_sink_path_t request = {
+		.connector_number = conn_num,
+		.sink_path_enable = en,
+	};
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = SET_SINK_PATH.cmd,
+		.len = SET_SINK_PATH.len,
+		.control = {
+			.command = SET_SINK_PATH.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				request.raw_value,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_SET_SINK_PATH,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   NULL);
+}
+
+/*
+ * This api isn't compliant with the UCSI spec, ppm/mgmt only set Rp value
+ * through this command.
+ */
+static int it52xx_set_power_level(const struct device *dev,
+				  enum usb_typec_current_t tcc)
+{
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5, byte7 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	/* bit[16:23]: connector num 7'b, source or sink 1'b */
+	byte5 = ((conn_num & 0x7f) | (IT52XX_SET_SRC_PWR_LVL << 7));
+	switch (tcc) {
+	case TC_CURRENT_3_0A:
+	case TC_CURRENT_1_5A:
+	case TC_CURRENT_USB_DEFAULT:
+		/* bit[32:34]: usb type-c current 3'b */
+		byte7 = tcc;
+		break;
+	case TC_CURRENT_PPM_DEFINED:
+	default:
+		return -EINVAL;
+	}
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = SET_TPC_RP.cmd,
+		.len = SET_TPC_RP.len,
+		.control = {
+			.command = SET_TPC_RP.sub,
+			.data_length = 0x00,
+			/* data
+									 length
+									 --> set
+									 to 0x00
+								       */
+			.command_specific = {
+				byte5,
+				0x00,
+				byte7,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_SET_TPC_RP,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   NULL);
 }
 
 static int it52xx_read_power_level(const struct device *dev)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5, byte6, byte7 = 0;
+
+	/* Can only be called from Idle State */
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	/*
+	 * UCSI v3.0 spec: READ_POWER_LEVEL command is used by the OPM to read
+	 * a port’s peak power and average power levels from the LPM that is in
+	 * the sourcing mode (SRC role). So if we're not SRC, return not
+	 * support.
+	 */
+	if (!data->cached_conn_status.power_direction) {
+		return -ENOSYS;
+	}
+
+	/* bit[16:23]: connector num 7'b, time to read power 1'b */
+	/* bit[24:31]: time to read power 4'b, reserved 3'b, time interval 1'b
+	 */
+	/* bit[32]: time interval 1'b */
+	byte5 = (conn_num & 0x7f);
+	/*
+	 * TODO: Input parameter of it52xx_read_power_level() doesn't have these
+	 * values, so temporarily give a fix value for 100ms to read power &
+	 * 10ms time interval.
+	 *
+	 *       b/435301650, it52xx only support voltage measurement (not
+	 * current), and so far it's okay for PPM.
+	 */
+	byte6 = 0x0;
+	byte7 = 0x1;
+
+	struct it52xx_control_cmd payload = {
+		.ctrl_cmd = READ_POWER_LEVEL.cmd,
+		.len = READ_POWER_LEVEL.len,
+		.control = {
+			.command = READ_POWER_LEVEL.sub,
+			.data_length = 0x00,
+			/* Data Length --> set to 0x00 */
+			.command_specific = {
+				byte5,
+				byte6,
+				byte7,
+			},
+		},
+	};
+
+	return it52xx_post_command(dev, CMD_READ_POWER_LEVEL,
+				   (const uint8_t *)&payload, sizeof(payload),
+				   NULL);
 }
 
 static int it52xx_get_connector_capability(const struct device *dev,
@@ -2208,9 +2471,11 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.get_info = it52xx_get_info,
 	.get_hw_config = it52xx_get_hw_config,
 	.get_hw_frs_support = it52xx_get_hw_frs_support,
+	.set_power_level = it52xx_set_power_level,
 	.get_cable_property = it52xx_get_cable_property,
 	.get_vdo = it52xx_get_vdo,
 	.set_comms_state = it52xx_set_comms_state,
+	.set_pdos = it52xx_set_pdo,
 	.ack_cc_ci = NULL, /* The IT52XX driver sends ACK_CC_CI internally. */
 };
 
