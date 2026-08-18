@@ -8,6 +8,8 @@
 #include "drivers/ucsi_v3.h"
 #include "pdc_it52xx.h"
 
+#include <assert.h>
+
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
@@ -45,6 +47,9 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 
 /** Event posted to run the next state-machine step. */
 #define IT52XX_NEXT_STATE_READY BIT(1)
+
+/** UCSI status bit in the IT52XX interrupt status register. */
+#define IT52XX_INT_UCSI_STATUS BIT(1)
 
 /** IT52XX SMBus command descriptor. */
 struct smbus_cmd_t {
@@ -911,6 +916,232 @@ static enum smf_state_result st_init_run(void *o)
 		return init_handle_command_result(data);
 	}
 
+	return SMF_EVENT_HANDLED;
+}
+
+static void set_cci_error_event(struct pdc_data_t *data, int type)
+{
+	/* Clear the CCI Event */
+	data->cci_event.raw_value = 0;
+	/*
+	 * The command was not successfully completed,
+	 * so set cci_event.error to 1b.
+	 */
+	data->cci_event.error = 1;
+	/* Command has completed */
+	data->cci_event.command_completed = 1;
+	/* Clear busy event */
+	data->cci_event.busy = 0;
+
+	if (type & I2C_MSG_READ) {
+		data->error_status.i2c_read_error = 1;
+	} else {
+		data->error_status.i2c_write_error = 1;
+	}
+	/* Notify system of status change */
+	call_cci_event_cb(data);
+}
+
+/**
+ * @brief Called from the driver thread to handle interrupts
+ */
+static void handle_irqs(struct pdc_data_t *data)
+{
+	const struct pdc_config_t *cfg = data->dev->config;
+	uint8_t interrupt_status;
+	int rv;
+
+	if (!device_is_ready(data->dev)) {
+		/* This PDC instance is not ready. Ignore the interrupt. */
+		return;
+	}
+
+	/* Read interrupt status register */
+	rv = it52xx_get_alert_status(data->dev);
+	if (rv) {
+		LOG_ERR("ITE%d: IRQ Get interrupt status failed",
+			cfg->connector_number);
+		set_cci_error_event(data, I2C_MSG_READ);
+		set_state(data, ST_ERROR_RECOVERY);
+		return;
+	}
+	interrupt_status = data->rd_buf[0];
+
+	/* We only handle UCSI interrupt events */
+	if (interrupt_status & IT52XX_INT_UCSI_STATUS) {
+		if (get_state(data) == ST_TASK_WAIT) {
+			/* We're waiting [CCI] message in ST_TASK_WAIT state */
+			LOG_INF("ITE%d: IRQ-CC", cfg->connector_number);
+			set_state(data, ST_GET_CCI);
+			return;
+		} else {
+			LOG_INF("ITE%d: IRQ-CI", cfg->connector_number);
+			/* Inform subsystem of the ci interrupt */
+			data->ci_interrupt = 1;
+			/* Clear the CCI Event */
+			data->cci_event.raw_value = 0;
+			/* Set the port the CCI Event occurred on */
+			data->cci_event.connector_change =
+				cfg->connector_number + 1;
+			/*
+			 * Set CCI EVENT for vendor defined indicator (informs
+			 * subsystem that an interrupt occurred)
+			 */
+			data->cci_event.vendor_defined_indicator = 1;
+
+			/* Notify system of status change */
+			call_cci_event_cb(data);
+			set_state(data, ST_GET_CCI);
+			return;
+		}
+	} else {
+		LOG_INF("ITE%d: IRQ-unknown event", cfg->connector_number);
+		/* Just clear status, we don't handle non-UCSI events. */
+		rv = it52xx_clr_alert_status(data->dev, interrupt_status);
+		if (rv) {
+			LOG_ERR("ITE%d: Clear interrupt status failed",
+				cfg->connector_number);
+			set_cci_error_event(data, I2C_MSG_WRITE);
+			set_state(data, ST_ERROR_RECOVERY);
+			return;
+		}
+	}
+}
+
+static void st_idle_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+
+	data->cmd = CMD_NONE;
+	data->active_ucsi_cmd = 0;
+}
+
+static enum smf_state_result st_idle_run(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	/* Do not start executing commands if suspended */
+	if (check_comms_suspended()) {
+		set_state(data, ST_SUSPENDED);
+		return SMF_EVENT_HANDLED;
+	}
+
+	/*
+	 * Priority of events:
+	 *  1: CMD_TRIGGER_PDC_RESET
+	 *  2: Non-Reset command
+	 */
+	if (data->cmd == CMD_TRIGGER_PDC_RESET) {
+		perform_pdc_init(data);
+	} else if (data->cmd != CMD_NONE) {
+		set_state(data, ST_WRITE);
+	}
+
+	return SMF_EVENT_HANDLED;
+}
+
+static void st_write_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+
+	/* This state can only be entered from the Init and Idle states */
+	assert(data->last_state == ST_INIT || data->last_state == ST_IDLE);
+
+	/* Clear I2C transaction retry counter */
+	data->i2c_transaction_retry_counter = 0;
+	/* Only clear Error Status if the subsystem isn't going to read it */
+	if (data->cmd != CMD_GET_ERROR_STATUS) {
+		/* Clear the Error Status */
+		data->error_status.raw_value = 0;
+	}
+	/* Clear the CCI Event */
+	data->cci_event.raw_value = 0;
+}
+
+static enum smf_state_result st_write_run(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+	int rv;
+
+	/* Write the [CONTROL] or [MSGOUT] + [CONTROL] command */
+	rv = it52xx_i2c_write(data->dev);
+	if (rv < 0) {
+		if (max_i2c_retry_reached(data, I2C_MSG_WRITE)) {
+			set_state(data, ST_ERROR_RECOVERY);
+		}
+		return SMF_EVENT_HANDLED;
+	}
+
+	/*
+	 * I2C transaction succeeded. Next, wait for an interrupt, then
+	 * get [CCI] message.
+	 */
+	set_state(data, ST_TASK_WAIT);
+
+	return SMF_EVENT_HANDLED;
+}
+
+static void st_write_ack_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+
+	/* This state can only be entered from the Get CCI and Read states */
+	assert(data->last_state == ST_GET_CCI || data->last_state == ST_READ);
+
+	/* Clear I2C transaction retry counter */
+	data->i2c_transaction_retry_counter = 0;
+	/* Only clear Error Status if the subsystem isn't going to read it */
+	if (data->cmd != CMD_GET_ERROR_STATUS) {
+		/* Clear the Error Status */
+		data->error_status.raw_value = 0;
+	}
+	/* Clear the CCI Event */
+	data->cci_event.raw_value = 0;
+}
+
+static enum smf_state_result st_write_ack_run(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+	int rv;
+
+	/* Write the [CONTROL] ACK_CC_CI command */
+	rv = it52xx_i2c_write(data->dev);
+	if (rv < 0) {
+		if (max_i2c_retry_reached(data, I2C_MSG_WRITE)) {
+			set_state(data, ST_ERROR_RECOVERY);
+		}
+		return SMF_EVENT_HANDLED;
+	}
+
+	set_state(data, ST_TASK_WAIT);
+
+	return SMF_EVENT_HANDLED;
+}
+
+static void st_task_wait_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+
+	/* Entered only from ST_WRITE, ST_WRITE_ACK, or ST_GET_CCI. */
+	assert(data->last_state == ST_WRITE ||
+	       data->last_state == ST_WRITE_ACK ||
+	       data->last_state == ST_GET_CCI);
+}
+
+static enum smf_state_result st_task_wait_run(void *o)
+{
+	/*
+	 * IT5271 firmware guarantees a UCSI interrupt for every command
+	 * response. The IRQ handler advances the state to ST_GET_CCI.
+	 */
 	return SMF_EVENT_HANDLED;
 }
 
