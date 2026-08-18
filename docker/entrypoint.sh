@@ -245,21 +245,27 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
     MONITOR_DEST="${MONITOR_DEST_DIR}/rts5915_flash_upload.bin"
 
     if [ ! -f "${MONITOR_CACHE}" ]; then
-        echo "Monitor binary not found in cache. Building rtk_flame..."
-        if zmake --checkout /workspace build rtk_flame; then
-            echo "Caching monitor binary..."
+        if [ -f "${MONITOR_DEST}" ]; then
+            echo "Copying pre-installed Realtek monitor binary to cache..."
             mkdir -p "$(dirname "${MONITOR_CACHE}")"
-            build_bin="/workspace/src/platform/ec/build/zephyr"
-            build_bin="${build_bin}/rtk_flame/build-singleimage"
-            build_bin="${build_bin}/rts5915_flash_upload.bin"
-            cp "${build_bin}" "${MONITOR_CACHE}"
+            cp "${MONITOR_DEST}" "${MONITOR_CACHE}"
         else
-            echo "Warning: Failed to build rtk_flame." \
-                 "Realtek flashing may not work."
+            echo "Monitor binary not found in cache. Building rtk_flame..."
+            if zmake --checkout /workspace build rtk_flame; then
+                echo "Caching monitor binary..."
+                mkdir -p "$(dirname "${MONITOR_CACHE}")"
+                build_bin="/workspace/src/platform/ec/build/zephyr"
+                build_bin="${build_bin}/rtk_flame/build-singleimage"
+                build_bin="${build_bin}/rts5915_flash_upload.bin"
+                cp "${build_bin}" "${MONITOR_CACHE}"
+            else
+                echo "Warning: Failed to build rtk_flame." \
+                     "Realtek flashing may not work."
+            fi
         fi
     fi
 
-    if [ -f "${MONITOR_CACHE}" ]; then
+    if [ -f "${MONITOR_CACHE}" ] && [ ! -f "${MONITOR_DEST}" ]; then
         echo "Installing monitor binary to ${MONITOR_DEST}..."
         mkdir -p "${MONITOR_DEST_DIR}"
         cp "${MONITOR_CACHE}" "${MONITOR_DEST}"
@@ -271,21 +277,27 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
     NPCX_MONITOR_DEST="${NPCX_MONITOR_DEST_DIR}/npcx_monitor.bin"
 
     if [ ! -f "${NPCX_MONITOR_CACHE}" ]; then
-        echo "Monitor binary not found in cache. Building npcx_monitor..."
-        if zmake --checkout /workspace build npcx_monitor; then
-            echo "Caching monitor binary..."
+        if [ -f "${NPCX_MONITOR_DEST}" ]; then
+            echo "Copying pre-installed NPCX monitor binary to cache..."
             mkdir -p "$(dirname "${NPCX_MONITOR_CACHE}")"
-            build_bin="/workspace/src/platform/ec/build/zephyr"
-            build_bin="${build_bin}/npcx_monitor/build-singleimage"
-            build_bin="${build_bin}/npcx_monitor.bin"
-            cp "${build_bin}" "${NPCX_MONITOR_CACHE}"
+            cp "${NPCX_MONITOR_DEST}" "${NPCX_MONITOR_CACHE}"
         else
-            echo "Warning: Failed to build npcx_monitor." \
-                 "NPCX flashing may not work."
+            echo "Monitor binary not found in cache. Building npcx_monitor..."
+            if zmake --checkout /workspace build npcx_monitor; then
+                echo "Caching monitor binary..."
+                mkdir -p "$(dirname "${NPCX_MONITOR_CACHE}")"
+                build_bin="/workspace/src/platform/ec/build/zephyr"
+                build_bin="${build_bin}/npcx_monitor/build-singleimage"
+                build_bin="${build_bin}/npcx_monitor.bin"
+                cp "${build_bin}" "${NPCX_MONITOR_CACHE}"
+            else
+                echo "Warning: Failed to build npcx_monitor." \
+                     "NPCX flashing may not work."
+            fi
         fi
     fi
 
-    if [ -f "${NPCX_MONITOR_CACHE}" ]; then
+    if [ -f "${NPCX_MONITOR_CACHE}" ] && [ ! -f "${NPCX_MONITOR_DEST}" ]; then
         echo "Installing monitor binary to ${NPCX_MONITOR_DEST}..."
         mkdir -p "${NPCX_MONITOR_DEST_DIR}"
         cp "${NPCX_MONITOR_CACHE}" "${NPCX_MONITOR_DEST}"
