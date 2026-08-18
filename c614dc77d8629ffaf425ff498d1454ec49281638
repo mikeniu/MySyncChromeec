@@ -21,6 +21,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dbd6a1a6_c50a4bb5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-18T23:05:01Z",
+      "side": 1,
+      "message": "Let\u0027s put this change before the changes to v1, since we can go ahead and submit.",
+      "revId": "c614dc77d8629ffaf425ff498d1454ec49281638",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "22f727e2_88302864",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
         "patchSetId": 2
