@@ -189,16 +189,16 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
        [ "${CURRENT_HASH}" = "${PAST_HASH}" ]; then
         echo "Python dependencies up to date. Skipping pip install."
     else
-        echo "Installing zmake tool in virtualenv..."
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -e /workspace/src/platform/ec/zephyr/zmake
+        echo "Configuring zmake tool in virtualenv..."
+        python3 -m pip install --no-deps \
+            -e /workspace/src/platform/ec/zephyr/zmake
 
         # Install standard Zephyr dependencies to support twister executions
-        ZEPHYR_REQS_DIR="/workspace/src/third_party/zephyrproject/zephyr"
-        ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/scripts"
+        ZEPHYR_REQS_DIR="/workspace/src/third_party"
+        ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/zephyrproject/zephyr/scripts"
         if [ -d "${ZEPHYR_REQS_DIR}" ]; then
             echo "Installing Zephyr dependencies..."
-            python3 -m pip install --ignore-installed \
+            python3 -m pip install --no-cache-dir \
                 -r "${ZEPHYR_REQS_DIR}/requirements.txt"
         fi
 
@@ -225,17 +225,19 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
             done
             if [ -n "${to_install}" ]; then
                 # shellcheck disable=SC2086
-                python3 -m pip install --ignore-installed ${to_install}
+                python3 -m pip install --no-cache-dir ${to_install}
             fi
         fi
 
         echo "${CURRENT_HASH}" > "${HASH_FILE}"
     fi
 
-    # Export U-Boot binman tools directory to PATH
+    # Export U-Boot binman tools directory to PATH, preferring mounted workspace
+    # over build-time cache
     if [ -d "/workspace/src/third_party/u-boot/tools/binman" ]; then
-        echo "Adding binman to PATH..."
         export PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
+    elif [ -d "/opt/repos/src/third_party/u-boot/tools/binman" ]; then
+        export PATH="/opt/repos/src/third_party/u-boot/tools/binman:${PATH}"
     fi
 
     # Set up Realtek monitor binary (rtk_flame)
