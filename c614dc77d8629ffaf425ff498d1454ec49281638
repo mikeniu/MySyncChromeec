@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1c4d921_4b9114dd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-18T20:25:30Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/8f4d6217-863a-4550-8635-aab8018b6cfb)]\n\n**Review Summary:**\n*   **Functionality:** The newly added tests correctly set up the environment and test the legacy `EC_CMD_FP_TEMPLATE` v0 command for successful decryption, the trivial salt rejection case, and the corrupted MAC case.\n*   **Security:** N/A (test only changes).\n*   **Style:** The code cleanly integrates with the existing test structure and correctly utilizes C++20 standard algorithms and spans.\n*   **Testing:** Excellent test coverage for the v0 template logic. Thank you for implementing the previous suggestions by adding the corrupted tag test case and asserting `global_context.templ_valid` in failure paths!\n*   **CL Size \u0026 Scope:** Small, self-contained, and focused strictly on test coverage.",
+      "isAi": true,
+      "revId": "c614dc77d8629ffaf425ff498d1454ec49281638",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
