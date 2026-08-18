@@ -205,12 +205,11 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
         # Parse .vpython3 and install dependencies
         VPYTHON_FILE="/workspace/src/platform/ec/zephyr/zmake/.vpython3"
         if [ -f "${VPYTHON_FILE}" ]; then
-            echo "Installing dependencies from .vpython3..."
-            packages=$(grep -o 'infra/python/wheels/[a-zA-Z0-9_-]*' \
+            packages=$(grep -o \
+                'infra/python/wheels/[a-zA-Z0-9_-]*' \
                 "${VPYTHON_FILE}" | \
                 sed 's|infra/python/wheels/||g' | \
-                sed 's|-py2_py3||g' | \
-                sed 's|-py3||g' | \
+                sed 's|-py2_py3||g; s|-py3||g' | \
                 sort -u)
             to_install=""
             for pkg in ${packages}; do
