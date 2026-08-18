@@ -92,11 +92,6 @@ clone_overlay_sparse() {
     fi
 }
 
-# Clone or update the required repositories
-clone_or_update "${REPO_BASE}/platform/ec" \
-    "/workspace/src/platform/ec" "EC firmware"
-clone_or_update "${REPO_BASE}/platform/dagwood" \
-    "/workspace/src/platform/dagwood" "Dagwood"
 # Specialized clone/update function for zephyrproject (sparse checkout)
 clone_zephyrproject_sparse() {
     local repo_url="${REPO_BASE}/third_party/zephyrproject"
@@ -138,12 +133,18 @@ clone_zephyrproject_sparse() {
     fi
 }
 
-clone_zephyrproject_sparse
+# Clone or update repositories (parallelized for speed)
+clone_or_update "${REPO_BASE}/platform/ec" \
+    "/workspace/src/platform/ec" "EC firmware" &
+clone_or_update "${REPO_BASE}/platform/dagwood" \
+    "/workspace/src/platform/dagwood" "Dagwood" &
+clone_zephyrproject_sparse &
 clone_or_update "${REPO_BASE}/third_party/pigweed/pigweed" \
-    "/workspace/src/third_party/pigweed" "Pigweed"
+    "/workspace/src/third_party/pigweed" "Pigweed" &
 clone_or_update "${REPO_BASE}/third_party/u-boot" \
-    "/workspace/src/third_party/u-boot" "U-Boot"
-clone_overlay_sparse
+    "/workspace/src/third_party/u-boot" "U-Boot" &
+clone_overlay_sparse &
+wait
 
 # Set up python virtual environment if it doesn't exist
 VENV_DIR="/workspace/.venv"
