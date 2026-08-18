@@ -54,6 +54,12 @@ LOG_MODULE_REGISTER(pdc_it52xx, CONFIG_USBC_LOG_LEVEL);
 /** Number of bytes in the IT52XX interrupt-status response. */
 #define IT52XX_INT_READ_STATUS_LENGTH 1
 
+/** IT52XX vendor-defined command fields used to query PDC information. */
+#define IT52XX_VDM_VDC_GET_PDC_INFO 0
+#define IT52XX_VDM_VDC_VER 1
+#define IT52XX_VDM_VID_L 0x8d
+#define IT52XX_VDM_VID_H 0x04
+
 /** State-machine task timeout, in milliseconds. */
 #define T_TASK_TIMEOUT_EVENT 20
 
@@ -67,6 +73,61 @@ LOG_MODULE_REGISTER(pdc_it52xx, CONFIG_USBC_LOG_LEVEL);
 #define TRANSITION_TO_INIT_OR_IDLE_STATE(data)  \
 	transition_to_init_or_idle_state(data); \
 	return SMF_EVENT_HANDLED
+
+/**
+ * Offsets of data fields in the GET_IC_STATUS response, based on the ITE FW
+ * guide version 0.7. Data byte 0 follows the byte-count field at rd_buf[1].
+ */
+#define IT52XX_GET_IC_STATUS_VID_L 1
+#define IT52XX_GET_IC_STATUS_VID_H 2
+#define IT52XX_GET_IC_STATUS_PID_L 3
+#define IT52XX_GET_IC_STATUS_PID_H 4
+#define IT52XX_GET_IC_STATUS_FWVER_MINOR_INDEX 5
+#define IT52XX_GET_IC_STATUS_FWVER_MAJOR_INDEX 6
+#define IT52XX_GET_IC_STATUS_PD_REV_MINOR_INDEX 9
+#define IT52XX_GET_IC_STATUS_PD_REV_MAJOR_INDEX 10
+#define IT52XX_GET_IC_STATUS_PD_VER_MINOR_INDEX 11
+#define IT52XX_GET_IC_STATUS_PD_VER_MAJOR_INDEX 12
+/* UCSI is only supported by IT5271 flash code, so this value is always 1. */
+#define IT52XX_GET_IC_STATUS_RUNNING_FLASH_CODE_INDEX 13
+/* The running flash bank is either bank 1 or bank 2. */
+#define IT52XX_GET_IC_STATUS_RUNNING_FLASH_BANK_INDEX 14
+#define IT52XX_GET_IC_STATUS_PROG_NAME_STR_INDEX 15
+
+static void it52xx_unpack_get_ic_status_response(const uint8_t *rx_buf,
+						 struct pdc_info_t *info)
+{
+	/* ITE VID: Data Byte0..1 (little-endian) */
+	info->vid = rx_buf[IT52XX_GET_IC_STATUS_VID_H] << 8 |
+		    rx_buf[IT52XX_GET_IC_STATUS_VID_L];
+
+	/* ITE PID: Data Byte2..3 (little-endian) */
+	info->pid = rx_buf[IT52XX_GET_IC_STATUS_PID_H] << 8 |
+		    rx_buf[IT52XX_GET_IC_STATUS_PID_L];
+
+	/* ITE FW version: Data Byte4..5 (little-endian) */
+	info->fw_version = rx_buf[IT52XX_GET_IC_STATUS_FWVER_MAJOR_INDEX]
+				   << 16 |
+			   rx_buf[IT52XX_GET_IC_STATUS_FWVER_MINOR_INDEX] << 8;
+
+	/* ITE PD Revision: Data Byte8..9 (little-endian) */
+	info->pd_revision = rx_buf[IT52XX_GET_IC_STATUS_PD_REV_MAJOR_INDEX]
+				    << 8 |
+			    rx_buf[IT52XX_GET_IC_STATUS_PD_REV_MINOR_INDEX];
+
+	/* ITE PD Version: Data Byte10..11 (little-endian) */
+	info->pd_version = rx_buf[IT52XX_GET_IC_STATUS_PD_VER_MAJOR_INDEX]
+				   << 8 |
+			   rx_buf[IT52XX_GET_IC_STATUS_PD_VER_MINOR_INDEX];
+
+	/* ITE is running flash code: Data Byte12 */
+	info->is_running_flash_code =
+		rx_buf[IT52XX_GET_IC_STATUS_RUNNING_FLASH_CODE_INDEX];
+
+	/* ITE running flash bank offset: Data Byte13 */
+	info->running_in_flash_bank =
+		rx_buf[IT52XX_GET_IC_STATUS_RUNNING_FLASH_BANK_INDEX];
+}
 
 /** IT52XX SMBus command descriptor. */
 struct smbus_cmd_t {
@@ -1362,6 +1423,62 @@ static enum smf_state_result st_read_run(void *o)
 	} else {
 		/* Copy the received data to the user's buffer */
 		switch (data->cmd) {
+		case CMD_GET_IC_STATUS: {
+			struct pdc_info_t *info =
+				(struct pdc_info_t *)data->user_buf;
+
+			it52xx_unpack_get_ic_status_response(data->rd_buf,
+							     info);
+
+			/* Project name string is supported on version >= 0.3.x
+			 */
+			memcpy(info->project_name,
+			       &data->rd_buf
+					[IT52XX_GET_IC_STATUS_PROG_NAME_STR_INDEX],
+			       USB_PD_CHIP_INFO_PROJECT_NAME_LEN);
+			info->project_name[USB_PD_CHIP_INFO_PROJECT_NAME_LEN] =
+				'\0';
+
+			/* Only print this log on init */
+			if (data->init_local_state != INIT_PDC_COMPLETE) {
+				LOG_INF("ITE%d: FW Version %u.%u.%u (%s)",
+					cfg->connector_number,
+					PDC_FWVER_GET_MAJOR(info->fw_version),
+					PDC_FWVER_GET_MINOR(info->fw_version),
+					PDC_FWVER_GET_PATCH(info->fw_version),
+					info->project_name);
+				LOG_INF("ITE%d: PD Rev %04x Version %04x",
+					cfg->connector_number,
+					info->pd_revision, info->pd_version);
+			}
+
+			/* Fill in the chip type (driver compat string) */
+			strncpy(info->driver_name, STRINGIFY(DT_DRV_COMPAT),
+				sizeof(info->driver_name));
+			info->driver_name[sizeof(info->driver_name) - 1] = '\0';
+
+			info->no_fw_update = cfg->no_fw_update;
+			info->frs_supported = cfg->frs_supported;
+			info->usb_comm_capable_as_device = false;
+
+			/* Retain a cached copy of this data */
+			data->info = *info;
+
+			break;
+		}
+		case CMD_GET_ERROR_STATUS: {
+			union error_status_t *es =
+				(union error_status_t *)data->user_buf;
+
+			/*
+			 * ITE GET_ERROR_STATUS bits are the same as UCSI spec
+			 * defined (vendor-defined field of ITE, so far not
+			 * defined).
+			 */
+			es->raw_value =
+				((data->rd_buf[2] << 8) | data->rd_buf[1]);
+			break;
+		}
 		case CMD_GET_IDENTITY_DISCOVERY: {
 			/* TODO */
 			break;
@@ -1719,13 +1836,119 @@ static int it52xx_ack_cc_ci(const struct device *dev,
 static int it52xx_get_info(const struct device *dev, struct pdc_info_t *info,
 			   bool live)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5, byte6 = 0;
+
+	if (info == NULL) {
+		return -EINVAL;
+	}
+
+	/* If caller is OK with a non-live value and we have one, we can
+	 * immediately return a cached value.
+	 */
+	if (!live) {
+		k_mutex_lock(&data->mtx, K_FOREVER);
+
+		/* Check FW ver and VID/PID fields for valid values to ensure
+		 * we have a resident value.
+		 */
+		if (data->info.fw_version == PDC_FWVER_INVALID ||
+		    data->info.vid == PDC_VID_INVALID ||
+		    data->info.pid == PDC_PID_INVALID) {
+			k_mutex_unlock(&data->mtx);
+
+			/* No cached value. Caller should request a live read */
+			return -EAGAIN;
+		}
+
+		*info = data->info;
+		k_mutex_unlock(&data->mtx);
+
+		LOG_DBG("ITE%d: Use cached chip info (%u.%u.%u)",
+			cfg->connector_number,
+			PDC_FWVER_GET_MAJOR(data->info.fw_version),
+			PDC_FWVER_GET_MINOR(data->info.fw_version),
+			PDC_FWVER_GET_PATCH(data->info.fw_version));
+		return 0;
+	}
+
+	/* Handle a live read */
+
+	if ((get_state(data) != ST_IDLE) && (get_state(data) != ST_INIT)) {
+		return -EBUSY;
+	}
+
+	/* Support by [CONTROL] VDM */
+	/* bit[16:23]: connector num 7'b, IT52XX_VDM_VDC_GET_PDC_INFO 1'b */
+	/* bit[24:31]: IT52XX_VDM_VDC_GET_PDC_INFO 4'b, IT52XX_VDM_VDC_VER 4'b
+	 */
+	byte5 = (conn_num & 0x7f) |
+		((IT52XX_VDM_VDC_GET_PDC_INFO & BIT(0)) << 7);
+	byte6 = ((IT52XX_VDM_VDC_GET_PDC_INFO >> 1) & 0xf) |
+		((IT52XX_VDM_VDC_VER & 0xf) << 4);
+
+	/* Post a command and perform a chip operation */
+	uint8_t payload[] = {
+		GET_IC_STATUS.cmd,
+		GET_IC_STATUS.len,
+		GET_IC_STATUS.sub,
+		0x00, /* Data Length --> set to 0x00 */
+		byte5,
+		byte6,
+		IT52XX_VDM_VID_L,
+		IT52XX_VDM_VID_H,
+		0x00, /* EC_PID_L --> it52xx don't care */
+		0x00, /* EC_PID_H --> it52xx don't care */
+	};
+
+	LOG_DBG("ITE%d: Get live chip info", cfg->connector_number);
+
+	return it52xx_post_command(dev, CMD_GET_IC_STATUS, payload,
+				   ARRAY_SIZE(payload), (uint8_t *)info);
 }
 
 static int it52xx_get_error_status(const struct device *dev,
 				   union error_status_t *es)
 {
-	return -ENOSYS;
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	uint8_t conn_num = cfg->port_index_on_chip;
+	uint8_t byte5 = 0;
+
+	if (es == NULL) {
+		return -EINVAL;
+	}
+
+	/* Port is disabled. Return the last read error_status. */
+	if (get_state(data) == ST_DISABLE) {
+		es->raw_value = data->error_status.raw_value;
+		return 0;
+	}
+
+	if ((get_state(data) != ST_IDLE) && (get_state(data) != ST_INIT)) {
+		return -EBUSY;
+	}
+
+	/* bit[16:23]: connector num 7'b, reserved 1'b */
+	byte5 = (conn_num & 0x7f);
+
+	uint8_t payload[] = {
+		GET_ERROR_STATUS.cmd,
+		GET_ERROR_STATUS.len,
+		GET_ERROR_STATUS.sub,
+		0x00, /* Data Length --> set to 0x00 */
+		byte5,
+		0x00,
+		0x00,
+		0x00,
+		0x00,
+		0x00,
+	};
+
+	return it52xx_post_command(dev, CMD_GET_ERROR_STATUS, payload,
+				   ARRAY_SIZE(payload), (uint8_t *)es);
 }
 
 static int it52xx_get_connector_status(const struct device *dev,
