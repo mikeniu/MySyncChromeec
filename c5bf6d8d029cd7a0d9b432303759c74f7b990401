@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3cc1760_92241b23",
+        "filename": "util/dut_handlers/alos.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T20:44:15Z",
+      "side": 1,
+      "message": "This is essentially duplication of the logic from swap_ecrw, correct?\nnon-blocking, but can you investigate if there is a common place to share that script between ChromeOS and Android?",
+      "range": {
+        "startLine": 266,
+        "startChar": 0,
+        "endLine": 266,
+        "endChar": 12
+      },
+      "revId": "c5bf6d8d029cd7a0d9b432303759c74f7b990401",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
