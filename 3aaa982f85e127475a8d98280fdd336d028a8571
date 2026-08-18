@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66af41ca_1004d3a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-18T20:27:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/95b36a48-e092-4b25-9182-cef465f589e6)]\n\n### Review Summary\n*   **Functionality:** Centralizing test cleanup logic into the `before_fpsensor_auth_commands` fixture applies the DRY principle and ensures every test begins in a known clean state. Some tests that previously lacked explicit setup calls will now reliably run with a clean state.\n*   **Style \u0026 Consistency:** The fixture hook is implemented consistently with Zephyr testing framework (`ZTEST`) standards.\n*   **Security:** N/A (Test code refactoring).\n*   **Testing \u0026 Test Coverage:** The refactoring maintains existing test coverage while improving maintainability. The removal of the mid-test reset in `test_fp_command_establish_session_deny` validates state resilience after a denied command, strengthening the test.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped, well-contained, and focused solely on the single objective of test fixture refactoring.\n\nTAG\u003dagy\nCONV\u003d95b36a48-e092-4b25-9182-cef465f589e6",
+      "isAi": true,
+      "revId": "3aaa982f85e127475a8d98280fdd336d028a8571",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
