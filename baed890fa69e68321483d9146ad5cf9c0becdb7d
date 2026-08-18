@@ -94,6 +94,30 @@
       },
       "revId": "baed890fa69e68321483d9146ad5cf9c0becdb7d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17702977_705b019d",
+        "filename": "zephyr/program/fatcat/ruby-ish/src/sensor.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-18T13:49:39Z",
+      "side": 1,
+      "message": "I agree that int-signal is not used.  All the handling regarding that property is dead code.  If you assigned `int-signal` on a board, I expect you would get a compile error.\nSpecifying both the `int-disable-on-inactive` and the interrupt in the devicetree is a good approach.  But you should call the interrupt signal `irq-gpios` to follow the Zephyr convention, and pass this directly to `gpio_disable_dt_interrupt` and `gpio_enable_dt_interrupt` in the switch sensor rate code.\n\nThis approach will allow us to also deprecate the [`sensor-irqs`](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/dts/bindings/motionsense/cros-ec,motionsense-sensor-info.yaml;drc\u003dd7bf18325e3424fe98bbb454c3f25b741b920ca1) property.  We can then migrate platforms to the `irq-gpios` property and then eventually delete all the [sensor-irqs support code](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/shim/src/motionsense_sensors.c;l\u003d401;drc\u003d9c051f850d2de02f78451f525c44ec74215f4b36).\n\nIn the short term, you can add some build assert checks to verify that both `sensor-base-\u003eirq-gpios` and `sensor-info-\u003esensor-irqs` are not enabled at the same time.",
+      "parentUuid": "e583a339_adb97ee5",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 26
+      },
+      "revId": "baed890fa69e68321483d9146ad5cf9c0becdb7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
