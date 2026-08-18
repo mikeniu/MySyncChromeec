@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae4caead_8ccf60db",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 771,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-18T07:37:55Z",
+      "side": 1,
+      "message": "remove line 770, 771 and set_state(data,ST_DISABLE) here.",
+      "revId": "9b152a31a395f95c7f7f4e23a3ad02cff1dee12a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bc08c84_bd24cf2f",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 843,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-18T07:37:55Z",
+      "side": 1,
+      "message": "ST_DISABLE shouldn\u0027t be called with other states.",
+      "revId": "9b152a31a395f95c7f7f4e23a3ad02cff1dee12a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db81550b_473b7d59",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2669,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-18T07:37:55Z",
+      "side": 1,
+      "message": "It shouldn\u0027t be disabled in this case.",
+      "revId": "9b152a31a395f95c7f7f4e23a3ad02cff1dee12a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab66edf9_ab43acbc",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2694,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-18T07:37:55Z",
+      "side": 1,
+      "message": "ST_DISABLE should not be set with ST_ERROR_RECOVERY.",
+      "revId": "9b152a31a395f95c7f7f4e23a3ad02cff1dee12a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
