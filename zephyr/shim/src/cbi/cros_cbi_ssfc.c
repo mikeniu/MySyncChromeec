@@ -126,6 +126,7 @@ static const uint8_t ssfc_values[] = { DT_INST_FOREACH_STATUS_OKAY(
 	CBI_SSFC_VALUE_ARRAY) };
 
 static union cbi_ssfc cached_ssfc;
+test_export_static bool cached_ssfc_ready;
 
 void cros_cbi_ssfc_init(void)
 {
@@ -133,6 +134,7 @@ void cros_cbi_ssfc_init(void)
 		DT_INST_FOREACH_STATUS_OKAY_VARGS(CBI_SSFC_INIT_DEFAULT,
 						  cached_ssfc)
 	}
+	cached_ssfc_ready = true;
 
 	LOG_INF("Read CBI SSFC : 0x%08X\n", cached_ssfc.raw_value);
 }
@@ -156,6 +158,11 @@ test_mockable bool cros_cbi_ssfc_check_match(enum cbi_ssfc_value_id value_id)
 {
 	int rc;
 	uint32_t value;
+
+	if (!cached_ssfc_ready) {
+		LOG_ERR("CBI SSFC read before init");
+		return false;
+	}
 
 	rc = cros_cbi_ssfc_get_parent_field_value(cached_ssfc, value_id,
 						  &value);

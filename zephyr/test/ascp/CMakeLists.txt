@@ -7,3 +7,5 @@ find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 project(ascp_test)
 
 target_sources(app PRIVATE src/ascp_claim_test.cc)
+
+add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)

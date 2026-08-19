@@ -136,3 +136,55 @@ ZTEST(charge_state_prevent_power_on, test_no_battery_insufficient_charger)
 	zassert_true(charge_prevent_power_on(true));
 	zassert_true(charge_prevent_power_on(false));
 }
+
+#ifdef CONFIG_PLATFORM_EC_CHARGER_CUSTOM_PREVENT_POWER_ON
+static int custom_prevent_power_on_return_val;
+
+int custom_prevent_power_on(void)
+{
+	return custom_prevent_power_on_return_val;
+}
+
+ZTEST(charge_state_prevent_power_on, test_custom_prevent_power_on_allows)
+{
+	struct batt_params *params = &charge_get_status()->batt;
+
+	params->is_present = BP_YES;
+	params->state_of_charge =
+		CONFIG_PLATFORM_EC_CHARGER_MIN_BAT_PCT_FOR_POWER_ON;
+
+	/* When custom_prevent_power_on returns 0, automatic power-on is allowed
+	 */
+	custom_prevent_power_on_return_val = 0;
+	zassert_false(charge_prevent_power_on(false));
+}
+
+ZTEST(charge_state_prevent_power_on, test_custom_prevent_power_on_prevents)
+{
+	struct batt_params *params = &charge_get_status()->batt;
+
+	params->is_present = BP_YES;
+	params->state_of_charge =
+		CONFIG_PLATFORM_EC_CHARGER_MIN_BAT_PCT_FOR_POWER_ON;
+
+	/* When custom_prevent_power_on returns 1, automatic power-on is
+	 * prevented */
+	custom_prevent_power_on_return_val = 1;
+	zassert_true(charge_prevent_power_on(false));
+}
+
+ZTEST(charge_state_prevent_power_on,
+      test_custom_prevent_power_on_user_pressed_power_button)
+{
+	struct batt_params *params = &charge_get_status()->batt;
+
+	params->is_present = BP_YES;
+	params->state_of_charge =
+		CONFIG_PLATFORM_EC_CHARGER_MIN_BAT_PCT_FOR_POWER_ON;
+
+	/* When power button is pressed, custom_prevent_power_on is not used to
+	 * block boot */
+	custom_prevent_power_on_return_val = 1;
+	zassert_false(charge_prevent_power_on(true));
+}
+#endif

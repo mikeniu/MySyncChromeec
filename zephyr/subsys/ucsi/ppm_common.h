@@ -25,6 +25,10 @@ bool ppm_test_is_async_pending(struct ucsi_ppm_device *device);
 /* Checks whether a command is pending in the state machine. */
 bool ppm_test_is_cmd_pending(struct ucsi_ppm_device *device);
 
+/* Wait for a pending command to finish processing. Returns true if cleared,
+ * false if timeout. */
+bool ppm_wait_for_cmd_to_process(struct ucsi_ppm_device *device);
+
 #endif
 
 /**

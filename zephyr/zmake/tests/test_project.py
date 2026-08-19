@@ -188,7 +188,7 @@ register_npcx_project(project_name="three", zephyr_board="three")
 register_binman_project(
     project_name="four",
     zephyr_board="four",
-    inherited_from="baseboard"
+    boards="baseboard"
 )
 """
 
@@ -197,7 +197,7 @@ register_raw_project(
     project_name="five",
     zephyr_board="foo",
     dts_overlays=[here / "gpio.dts"],
-    inherited_from=["root", "myboard"],
+    boards=["root", "myboard"],
 )
 """
 
@@ -207,7 +207,7 @@ register_raw_project(
     project_name="%invalid_name",
     zephyr_board="foo",
     dts_overlays=[here / "gpio.dts"],
-    inherited_from=["root", "myboard"],
+    boards=["root", "myboard"],
 )
 """
 
@@ -236,11 +236,9 @@ def test_find_projects(tmp_path):
 
     assert projects["four"].config.project_dir == cf1_dir
     assert projects["four"].config.zephyr_board == "four"
-    assert projects["four"].config.full_name == "baseboard.four"
 
     assert projects["five"].config.project_dir == cf2_dir
     assert projects["five"].config.zephyr_board == "foo"
-    assert projects["five"].config.full_name == "root.myboard.five"
 
 
 def test_find_projects_name_conflict(tmp_path):
@@ -290,9 +288,6 @@ another = some_variant.variant(
         tmp_path / "gpio.dts",
         tmp_path / "another.dts",
     ]
-    assert projects["some"].config.full_name == "some"
-    assert projects["some-variant"].config.full_name == "some.some-variant"
-    assert projects["another"].config.full_name == "some.some-variant.another"
 
 
 @pytest.mark.parametrize(

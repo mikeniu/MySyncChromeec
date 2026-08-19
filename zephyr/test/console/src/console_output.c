@@ -381,8 +381,20 @@ ZTEST_F(console_output, test_isr_output)
 					 sizeof(tx_content));
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT)) {
+		/*
+		 * Verify that "[ISR]" prefix appears before the message
+		 * payload. Note: Channel names/timestamps may be inserted
+		 * between
+		 * "[ISR]" and the payload, so compare pointer positions
+		 * rather than checking for a contiguous substring.
+		 */
+		char *isr_prefix = strstr((char *)tx_content, "[ISR]");
+		char *msg_ptr = strstr((char *)tx_content, isr_cputs);
+
 		zassert_true(tx_bytes >= strlen(isr_cputs));
-		zassert_not_null(strstr((char *)tx_content, isr_cputs));
+		zassert_not_null(isr_prefix);
+		zassert_not_null(msg_ptr);
+		zassert_true(isr_prefix < msg_ptr);
 	} else {
 		zassert_true(tx_bytes == 0);
 	}
@@ -396,8 +408,13 @@ ZTEST_F(console_output, test_isr_output)
 					 sizeof(tx_content));
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT)) {
+		char *isr_prefix = strstr((char *)tx_content, "[ISR]");
+		char *msg_ptr = strstr((char *)tx_content, isr_cprints);
+
 		zassert_true(tx_bytes >= strlen(isr_cprints));
-		zassert_not_null(strstr((char *)tx_content, isr_cprints));
+		zassert_not_null(isr_prefix);
+		zassert_not_null(msg_ptr);
+		zassert_true(isr_prefix < msg_ptr);
 	} else {
 		zassert_true(tx_bytes == 0);
 	}
@@ -411,8 +428,13 @@ ZTEST_F(console_output, test_isr_output)
 					 sizeof(tx_content));
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_ISR_CONSOLE_OUTPUT)) {
+		char *isr_prefix = strstr((char *)tx_content, "[ISR]");
+		char *msg_ptr = strstr((char *)tx_content, isr_cprintf);
+
 		zassert_true(tx_bytes >= strlen(isr_cprintf));
-		zassert_not_null(strstr((char *)tx_content, isr_cprintf));
+		zassert_not_null(isr_prefix);
+		zassert_not_null(msg_ptr);
+		zassert_true(isr_prefix < msg_ptr);
 	} else {
 		zassert_true(tx_bytes == 0);
 	}
