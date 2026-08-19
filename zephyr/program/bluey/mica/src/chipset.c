@@ -11,6 +11,10 @@
 #include "led_common.h"
 #include "power/qcom.h"
 
+#ifndef CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS
+#define CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS 0
+#endif
+
 /* true while the AP power-on sequence is in progress. */
 static bool power_on_in_progress;
 
@@ -72,7 +76,8 @@ static void board_chipset_hard_off_mica(void)
 	} else {
 		hook_call_deferred(
 			&disable_pp5000_data,
-			(5000 + CONFIG_CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
+			(5000 +
+			 CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
 				USEC_PER_MSEC);
 	}
 }
