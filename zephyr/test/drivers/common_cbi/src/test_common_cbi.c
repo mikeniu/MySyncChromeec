@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "cbi_config.h"
 #include "cros_board_info.h"
 #include "cros_cbi.h"
 #include "ec_commands.h"
@@ -1045,4 +1046,27 @@ ZTEST_USER(common_cbi,
 		   "Failed to read SKU after invalid bin write");
 	zassert_equal(read_sku, original_sku,
 		      "RAM cache was wiped by invalid bin write");
+}
+
+ZTEST_USER(common_cbi, test_cbi_eeprom_storage_driver)
+{
+#if defined(CONFIG_PLATFORM_EC_CBI_EEPROM)
+	uint8_t buf[sizeof(struct cbi_header)] = { 0 };
+	struct cbi_header *h = (struct cbi_header *)buf;
+	uint8_t read_buf[sizeof(struct cbi_header)] = { 0 };
+
+	memcpy(h->magic, cbi_magic, sizeof(cbi_magic));
+	h->total_size = sizeof(buf);
+
+	/* Verify write protection query */
+	gpio_wp_l_set(0);
+	zassert_equal(eeprom_cbi_config.drv->is_protected(), 0);
+
+	/* Verify store to EEPROM */
+	zassert_ok(eeprom_cbi_config.drv->store(buf));
+
+	/* Verify load from EEPROM */
+	zassert_ok(eeprom_cbi_config.drv->load(0, read_buf, sizeof(read_buf)));
+	zassert_mem_equal(read_buf, buf, sizeof(buf));
+#endif
 }

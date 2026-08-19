@@ -12,15 +12,15 @@
 extern "C" {
 #endif
 
-#if defined(CONFIG_CBI_FLASH)
+#if defined(CONFIG_CBI_FLASH) || defined(CONFIG_PLATFORM_EC_CBI_FLASH)
 extern const struct cbi_storage_config_t flash_cbi_config;
 #endif
 
-#if defined(CONFIG_CBI_EEPROM)
+#if defined(CONFIG_CBI_EEPROM) || defined(CONFIG_PLATFORM_EC_CBI_EEPROM)
 extern const struct cbi_storage_config_t eeprom_cbi_config;
 #endif
 
-#if defined(CONFIG_CBI_GPIO)
+#if defined(CONFIG_CBI_GPIO) || defined(CONFIG_PLATFORM_EC_CBI_GPIO)
 extern const struct cbi_storage_config_t gpio_cbi_config;
 #endif
 
