@@ -54,6 +54,7 @@ def _do_test_jobserver(
     active_threads = 0
     please_exit = threading.Semaphore(0)
     thread_count = jobs + 5
+    threads = []
     if commandline_jobs:
         effective_jobs = commandline_jobs
 
@@ -70,70 +71,84 @@ def _do_test_jobserver(
             with lock:
                 active_threads += 1
                 lock.notify_all()
-            proc = jobserver.popen(
-                [
-                    "sh",
-                    "-c",
-                    'echo "MAKEFLAGS=${MAKEFLAGS}"; ls /proc/self/fd',
-                ],
-                stdout=subprocess.PIPE,
-                universal_newlines=True,
+            try:
+                proc = jobserver.popen(
+                    [
+                        "sh",
+                        "-c",
+                        'echo "MAKEFLAGS=${MAKEFLAGS}"; ls /proc/self/fd',
+                    ],
+                    stdout=subprocess.PIPE,
+                    universal_newlines=True,
+                )
+                proc.wait()
+                output = proc.stdout.readlines()
+                assert output[0] == f"MAKEFLAGS={makeflags}\n"
+                if pipe:
+                    if effective_jobs > 1:
+                        assert f"{pipe[0]}\n" in output
+                        assert f"{pipe[1]}\n" in output
+                    else:
+                        assert f"{pipe[0]}\n" not in output
+                        assert f"{pipe[1]}\n" not in output
+
+                please_exit.acquire()  # pylint:disable=consider-using-with
+            finally:
+                with lock:
+                    active_threads -= 1
+                    ended_threads += 1
+                    lock.notify_all()
+
+    try:
+        logging.debug("Starting %s threads", thread_count)
+        for _ in range(thread_count):
+            t = threading.Thread(target=_my_thread, daemon=True)
+            t.start()
+            threads.append(t)
+
+        with lock:
+            lock.wait_for(
+                lambda: started_threads == thread_count
+                and active_threads == effective_jobs,
+                30,
             )
-            proc.wait()
-            output = proc.stdout.readlines()
-            assert output[0] == f"MAKEFLAGS={makeflags}\n"
-            if pipe:
-                if effective_jobs > 1:
-                    assert f"{pipe[0]}\n" in output
-                    assert f"{pipe[1]}\n" in output
-                else:
-                    assert f"{pipe[0]}\n" not in output
-                    assert f"{pipe[1]}\n" not in output
+            logging.debug("Asserting %s active_threads", effective_jobs)
+            assert started_threads == thread_count
+            assert active_threads == effective_jobs
+            assert ended_threads == 0
 
-            please_exit.acquire()  # pylint:disable=consider-using-with
-            with lock:
-                active_threads -= 1
-                ended_threads += 1
-                lock.notify_all()
+        logging.debug("Ending %s threads", 5)
+        for _ in range(5):
+            please_exit.release()
 
-    logging.debug("Starting %s threads", thread_count)
-    for _ in range(thread_count):
-        threading.Thread(target=_my_thread, daemon=True).start()
+        with lock:
+            lock.wait_for(
+                lambda: active_threads == effective_jobs and ended_threads == 5,
+                30,
+            )
+            logging.debug("Asserting %s active_threads", effective_jobs)
+            assert started_threads == thread_count
+            assert active_threads == effective_jobs
+            assert ended_threads == 5
 
-    with lock:
-        lock.wait_for(
-            lambda: started_threads == thread_count
-            and active_threads == effective_jobs,
-            10,
-        )
-        logging.debug("Asserting %s active_threads", effective_jobs)
-        assert started_threads == thread_count
-        assert active_threads == effective_jobs
-        assert ended_threads == 0
+        logging.debug("Ending %s threads", thread_count - 5)
+        for _ in range(thread_count - 5):
+            please_exit.release()
 
-    logging.debug("Ending %s threads", 5)
-    for _ in range(5):
-        please_exit.release()
-
-    with lock:
-        lock.wait_for(
-            lambda: active_threads == effective_jobs and ended_threads == 5, 10
-        )
-        logging.debug("Asserting %s active_threads", effective_jobs)
-        assert started_threads == thread_count
-        assert active_threads == effective_jobs
-        assert ended_threads == 5
-
-    logging.debug("Ending %s threads", thread_count - 5)
-    for _ in range(thread_count - 5):
-        please_exit.release()
-
-    with lock:
-        lock.wait_for(lambda: ended_threads == thread_count, 10)
-        logging.debug("Asserting %s active_threads", 0)
-        assert started_threads == thread_count
-        assert active_threads == 0
-        assert ended_threads == thread_count
+        with lock:
+            lock.wait_for(lambda: ended_threads == thread_count, 30)
+            logging.debug("Asserting %s active_threads", 0)
+            assert started_threads == thread_count
+            assert active_threads == 0
+            assert ended_threads == thread_count
+    finally:
+        for _ in range(thread_count):
+            please_exit.release()
+        for t in threads:
+            t.join(timeout=5)
+        if use_client and pipe and open_pipe:
+            os.close(pipe[0])
+            os.close(pipe[1])
 
 
 def test_jobserver_10():

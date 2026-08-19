@@ -1,0 +1,56 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	aliases {
+		gpio-wp = &ec_wp_l;
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		ec_wp_l: write-protect {
+			gpios = <&gpioa 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+		/* unimplemented GPIOs */
+		entering-rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+	};
+};
+
+&binman {
+	wp_ro: wp-ro {
+		ec-ro {
+			/* Flash block for testing RO protection. Located
+			 * 2 erase blocks from the end of the ec-ro section to
+			 * avoid the fmap located in the 0x400 bytes of ec-ro.
+			 */
+			ro_flash_block: ro-flash-block {
+				compatible = "cros-ec,flash-layout";
+				offset = <(0x50000 - 0x2000)>;
+				type = "fill";
+				fill-byte = [ FF ];
+				size = < 0x1000 >;
+			};
+		};
+	};
+
+	ec_rw: ec-rw {
+		rw-fw {
+			/* Flash block for testing RW protection. Also located
+			 * 2 erase blocks from the end to avoid overlap of the
+			 * rw-fwid.
+			 */
+			rw_flash_block: rw-flash-block {
+				compatible = "cros-ec,flash-layout";
+				offset = <(0x50000 - 0x2000)>;
+				type = "fill";
+				fill-byte = [ FF ];
+				size = < 0x1000 >;
+			};
+		};
+	};
+};

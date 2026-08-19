@@ -8,8 +8,10 @@ in the Dagwood firmware, and consumed by twister running on the host system.
 
 ## Building and running tests
 
-Zephyr's test runner [Twister] is used to identify the tests that can be flashed
-and run on the EC AICs.
+A wrapper script `./dagwood` is provided in the `platform/ec` root directory. It
+simplifies testing by automatically configuring the required toolchain, device
+testing parameters, and flash commands for running on a single Dagwood board
+connected to `/dev/ttyACM1`.
 
 This is currently only supported in the chroot environment, and you must also
 have the dagwood repository available.
@@ -35,41 +37,53 @@ the chroot.
     ```
 
 ### Building the tests only
-Use Twister's  `-b` option to build the tests only.
+Use Twister's `-b` option to build the tests only. All unknown arguments are
+passed directly to Twister.
 
 ```bash
-./twister -ivc -T zephyr/test/ec-aic --toolchain=coreboot-sdk \
-  -p realtek/rts5912 \
-  -b
+./dagwood -T zephyr/test/ec-aic -p realtek/rts5912 -b
 ```
 
 ### Building and running all the Dagwood tests
 
 Use the `-T zephyr/test/ec-aic` option to run all tests targeting EC AIC boards.
 
-Flashing the EC and running the tests requires the `--device-testing` and the
-`--device-serial /dev/ttyACM1` options.
-
 This assumes you only have one Dagwood board connected to your host machine.
 
 ```bash
-./twister -ivc -T zephyr/test/ec-aic --toolchain=coreboot-sdk \
-  -p realtek/rts5912 \
-  --device-testing --device-serial /dev/ttyACM1 \
-  --flash-command ../dagwood/flash.py --device-flash-timeout 60
+./dagwood -T zephyr/test/ec-aic -p realtek/rts5912
 ```
 
 ### Running a single test
-You can run just a single test by replacing the `-T` option with
-`-s <test_name>`. Valid test names are found in the `testcase.yaml` files
-found under the `zephyr/test/ec-aic` directory.
+You can run just a single test by using the `-s <test_name>` option. Valid test
+names are found in the `testcase.yaml` files under the `zephyr/test/ec-aic`
+directory.
 
 ```bash
-./twister -ivc -s aic.i2c --toolchain=coreboot-sdk \
-  -p realtek/rts5912 \
-  --device-testing --device-serial /dev/ttyACM1 \
-  --flash-command ../dagwood/flash.py --device-flash-timeout 60
+./dagwood -s aic.i2c -p realtek/rts5912
 ```
+
+### Running the tests from SRAM
+By default, the dagwood script reprograms the integrated SPI flash
+with the test binary. On Nuvoton and Realtek platforms, the test binaries can
+be loaded directly into the on-chip SRAM.
+
+This has 2 main benefits:
+
+* Faster test time because the flash erase and write steps are skipped
+* Avoids wearing out the flash prematurely
+
+To run the tests from SRAM, append the `--sram` flag.
+
+```bash
+./dagwood -s aic.i2c -p npcx9/npcx9m7f --sram
+```
+
+Note that any test binaries that use `sysjump` or have other dependencies on
+the SPI flash should not use the `--sram` option.
+
+The `--sram` option is ignored if the EC architecture doesn't support loading
+directly into SRAM.
 
 ## Running tests on multiple Dagwood boards
 
@@ -88,6 +102,44 @@ parameter with the `--hardware-map` option.
   -p realtek/rts5912 -p npcx9/npcx9m7f \
   --device-testing --hardware-map zephyr/test/ec-aic/dagwood-hwmap \
   --flash-command ../dagwood/flash.py --device-flash-timeout 60
+```
+
+## Advanced usage: Running Twister directly
+
+If you prefer to invoke `twister` manually instead of using `./dagwood`, you
+must explicitly provide all device testing and runtime arguments.
+
+### Building and running all the Dagwood tests
+Flashing the EC and running the tests requires the `--device-testing` and the
+`--device-serial /dev/ttyACM1` options.
+
+```bash
+./twister -ivc -T zephyr/test/ec-aic --toolchain=coreboot-sdk \
+  -p realtek/rts5912 \
+  --device-testing --device-serial /dev/ttyACM1 \
+  --flash-command ../dagwood/flash.py --device-flash-timeout 60
+```
+
+### Running a single test
+```bash
+./twister -ivc -s aic.i2c --toolchain=coreboot-sdk \
+  -p realtek/rts5912 \
+  --device-testing --device-serial /dev/ttyACM1 \
+  --flash-command ../dagwood/flash.py --device-flash-timeout 60
+```
+
+### Running the tests from SRAM
+To run the tests from SRAM manually, use the same twister command but add the
+`-r` parameter to the `../dagwood/flash.py` script and apply the SRAM
+configuration snippet. This snippet parameter is automatically ignored if the
+platform doesn't support the snippet.
+
+```bash
+./twister -ivc -s aic.i2c --toolchain=coreboot-sdk \
+  -x=SNIPPET=sram-only \
+  -p npcx9/npcx9m7f \
+  --device-testing --device-serial /dev/ttyACM1 \
+  --flash-command="../dagwood/flash.py,-r" --device-flash-timeout 60
 ```
 
 [Twister]: https://docs.zephyrproject.org/latest/develop/test/twister.html

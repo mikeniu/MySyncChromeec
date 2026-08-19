@@ -3,6 +3,11 @@
  * found in the LICENSE file.
  */
 
+/**
+ * @file
+ * @brief Emulator for Richtek RT3645 IMVP9.1 PWM Controller
+ */
+
 #ifndef EMUL_RT3645_H
 #define EMUL_RT3645_H
 
@@ -39,5 +44,24 @@ void rt3645_emul_reset_regs(const struct emul *emul);
  * @return true If emulator is in config mode, false otherwise.
  */
 bool rt3645_emul_in_config_mode(const struct emul *emul);
+
+/**
+ * @brief Set the NVM status register value in the rt3645 emulator.
+ *        Used by tests to simulate NVM programming/reload success or failures.
+ *
+ * @param emul Pointer to I2C rt3645 emulator
+ * @param stat The status value to set (e.g. 0xE0 for success, 0xA0 for prog
+ * fail)
+ */
+void rt3645_emul_set_nvm_stat(const struct emul *emul, uint8_t stat);
+
+/**
+ * @brief Set the product ID register value in the rt3645 emulator.
+ *        Used by tests to simulate incorrect product ID failures.
+ *
+ * @param emul Pointer to I2C rt3645 emulator
+ * @param id The product ID value to set (expected is 0x45)
+ */
+void rt3645_emul_set_product_id(const struct emul *emul, uint8_t id);
 
 #endif /* EMUL_RT3645_H */

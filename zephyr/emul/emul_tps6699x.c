@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "builtin/endian.h"
 #include "drivers/ucsi_v3.h"
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_pdc.h"
@@ -32,6 +33,7 @@ LOG_MODULE_REGISTER(tps6699x_emul);
 
 /* TODO(b/349609367): Do not rely on this test-only driver function. */
 bool pdc_tps6699x_test_idle_wait(void);
+void pdc_tps6699x_test_invalidate_chip_info(const struct device *dev);
 
 /* TODO(b/345292002): Implement this emulator to the point where
  * pdc.generic.tps6699x passes.
@@ -644,9 +646,8 @@ static void
 tps6699x_emul_handle_port_control(struct tps6699x_emul_pdc_data *data,
 				  const union reg_port_control *pc)
 {
-	if (data->port_control.fr_swap_enabled != pc->fr_swap_enabled) {
-		data->frs_configured = true;
-	}
+	/* Any access to this register sets the FRS bit */
+	data->frs_configured = true;
 
 	/*
 	 * The tps6699x driver doesn't send the UCSI_SET_UOR cmd to control data
@@ -1080,6 +1081,16 @@ static int emul_tps6699x_set_info(const struct emul *target,
 {
 	struct tps6699x_emul_pdc_data *data =
 		tps6699x_emul_get_pdc_data(target);
+
+	if (info == NULL) {
+		LOG_INF("%s: info is NULL. "
+			"Invalidate driver's chip info cache.",
+			__func__);
+
+		pdc_tps6699x_test_invalidate_chip_info(target->dev);
+
+		return 0;
+	}
 
 	union reg_version *reg_version =
 		(union reg_version *)data->reg_val[REG_VERSION];
@@ -1594,6 +1605,41 @@ static int emul_tps6699x_get_max_pdp(const struct emul *target,
 	return 0;
 }
 
+static int
+emul_tps6699x_get_battery_capability(const struct emul *target,
+				     union battery_capability_t *bcap)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	union battery_capability_t *_bcap =
+		(union battery_capability_t *)
+			data->reg_val[REG_TX_BATTERY_CAPABILITIES];
+
+	bcap->vid = be16toh(_bcap->vid);
+	bcap->pid = be16toh(_bcap->pid);
+	bcap->design_capacity = be16toh(_bcap->design_capacity);
+	bcap->last_full_charge_capacity =
+		be16toh(_bcap->last_full_charge_capacity);
+
+	return 0;
+}
+
+static int emul_tps6699x_get_battery_status(const struct emul *target,
+					    union battery_status_t *bstat)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	union battery_status_t *_bstat =
+		(union battery_status_t *)data
+			->reg_val[REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT];
+
+	bstat->reserved = _bstat->reserved;
+	bstat->flags = _bstat->flags;
+	bstat->present_capacity = be16toh(_bstat->present_capacity);
+
+	return 0;
+}
+
 static DEVICE_API(emul_pdc, emul_tps6699x_api) = {
 	.reset = emul_tps6699x_reset,
 	.set_response_delay = emul_tps6699x_set_response_delay,
@@ -1634,7 +1680,16 @@ static DEVICE_API(emul_pdc, emul_tps6699x_api) = {
 	.set_current_cam = emul_tps6699x_set_current_cam,
 	.get_sbu_mux_mode = emul_tps6699x_get_sbu_mux_mode,
 	.get_max_pdp = emul_tps6699x_get_max_pdp,
+	.get_battery_capability = emul_tps6699x_get_battery_capability,
+	.get_battery_status = emul_tps6699x_get_battery_status,
 };
+
+struct i2c_common_emul_data *
+emul_tps6699x_get_i2c_common_data(const struct emul *emul)
+{
+	struct tps6699x_emul_data *data = emul->data;
+	return &data->common;
+}
 
 /* clang-format off */
 #define TPS6699X_EMUL_DEFINE(n) \

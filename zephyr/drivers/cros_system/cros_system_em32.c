@@ -217,10 +217,8 @@ static int cros_system_em32_init(void)
 	} else if (reset_cause & RESET_SOFTWARE) {
 		/* Use DEBUG_RST because it maps to EC_RESET_FLAG_SOFT. */
 		data->reset = DEBUG_RST;
-	} else if (reset_cause & RESET_BROWNOUT) {
+	} else if (reset_cause & RESET_POR) {
 		data->reset = POWERUP;
-	} else if (reset_cause & RESET_PIN) {
-		data->reset = VCC1_RST_PIN;
 	} else if (reset_cause & RESET_LOW_POWER_WAKE) {
 		/* Use DEBUG_RST because it maps to RESET_LOW_POWER_WAKE. */
 		data->reset = DEBUG_RST;

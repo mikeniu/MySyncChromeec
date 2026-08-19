@@ -80,13 +80,13 @@ static int cros_system_ft_init(void)
 	reset_cause_val = UNKNOWN_RST;
 	hwinfo_get_reset_cause(&hwinfo_reset_cause);
 
-	if (hwinfo_reset_cause & RESET_WATCHDOG) {
-		reset_cause_val = WATCHDOG_RST;
+	if (hwinfo_reset_cause & RESET_POR) {
+		reset_cause_val = POWERUP;
 	} else if (hwinfo_reset_cause & RESET_SOFTWARE) {
 		/* Use DEBUG_RST because it maps to EC_RESET_FLAG_SOFT. */
 		reset_cause_val = DEBUG_RST;
-	} else if (hwinfo_reset_cause & RESET_POR) {
-		reset_cause_val = POWERUP;
+	} else if (hwinfo_reset_cause & RESET_WATCHDOG) {
+		reset_cause_val = WATCHDOG_RST;
 	} else if (hwinfo_reset_cause & RESET_PIN) {
 		reset_cause_val = VCC1_RST_PIN;
 	}

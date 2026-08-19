@@ -1458,6 +1458,23 @@ union reg_thunderbolt_configuration {
 };
 
 /**
+ * @brief 4.60 Intel VID Status Register (Offset 0x59)
+ */
+union reg_intel_vid_status {
+	struct {
+		uint8_t intel_vid_detected : 1;
+		uint8_t tbt_mode_active : 1;
+		uint8_t forced_tbt_mode : 1;
+		uint8_t reserved0 : 5;
+		uint32_t tbt_attention : 32;
+		uint16_t tbt_enter_mode : 16;
+		uint16_t tbt_mode_rx_sop : 16;
+		uint16_t tbt_mode_rx_sopp : 16;
+	} __packed;
+	uint8_t raw_value[11];
+};
+
+/**
  * @brief 4.62 Data Status Register (Offset 0x5f)
  */
 union reg_data_status {
@@ -1569,6 +1586,36 @@ union reg_source_info {
 		uint32_t port_type : 1;
 	} __packed;
 	uint8_t raw_value[8];
+};
+
+/**
+ * @brief 4.81 Transmitted Battery Status Data Objects Register (Offset = 0x7B)
+ */
+union reg_battery_status {
+	struct {
+		/* Support one fixed battery on chrome devices */
+		uint32_t reserved0 : 8;
+		uint32_t fixed_battery0_battery_info : 8;
+		uint32_t fixed_battery0_present_capacity : 16;
+		uint32_t reserved1[3];
+	} __packed;
+	uint8_t raw_value[16];
+};
+
+/**
+ * @brief 4.82 Tx Battery Capabilities Register (Offset = 0x7D)
+ */
+union reg_battery_capability {
+	struct {
+		/* Support one fixed battery on chrome devices */
+		uint16_t vid_0;
+		uint16_t pid_0;
+		uint16_t battery_design_capacity_0;
+		uint16_t battery_last_full_charge_capacity_0;
+		uint8_t battery_type_0;
+		uint8_t reserved[27];
+	} __packed;
+	uint8_t raw_value[36];
 };
 
 /**

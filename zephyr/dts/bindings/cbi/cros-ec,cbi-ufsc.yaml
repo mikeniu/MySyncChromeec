@@ -25,6 +25,10 @@ child-binding:
         Name of the field used to generate a C enum for access.
     start:
       type: array
+      min: 0
+      max: 159
+      max-len: 1
+      min-len: 1
       required: true
       description: |
         Array of starting bit positions for each segment of the field.
@@ -32,6 +36,7 @@ child-binding:
         (valid range: 0-159).
     size:
       type: array
+      max: 8
       required: true
       description: |
         Array of sizes in bits for each corresponding segment in the 'start'

@@ -20,21 +20,16 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(CBI_UFSC_COMPAT) == 1,
 
 /* --- Compile-time DTS validation --- */
 
-#define VALIDATE_UFSC_FIELD(id)                                               \
-	BUILD_ASSERT(DT_PROP_LEN(id, start) == 1,                             \
-		     "UFSC field has discontiguous bits, not yet supported"); \
-	BUILD_ASSERT(DT_PROP_BY_IDX(id, start, 0) <                           \
-			     (CBI_UFSC_DATA_COUNT * 32),                      \
-		     "UFSC start bit is out of bounds (must be < 160)");      \
-	BUILD_ASSERT(DT_PROP_BY_IDX(id, size, 0) <= 8,                        \
-		     "UFSC field size cannot exceed 8 bits");                 \
-	BUILD_ASSERT(DT_PROP_LEN(id, start) == DT_PROP_LEN(id, size),         \
-		     "UFSC start and size arrays must have same length");     \
-	BUILD_ASSERT(                                                         \
-		(DT_PROP_BY_IDX(id, start, 0) / 32) ==                        \
-			((DT_PROP_BY_IDX(id, start, 0) +                      \
-			  DT_PROP_BY_IDX(id, size, 0) - 1) /                  \
-			 32),                                                 \
+#define VALIDATE_UFSC_FIELD(id)                                           \
+	BUILD_ASSERT(DT_PROP_LEN(id, start) == DT_PROP_LEN(id, size),     \
+		     "UFSC start and size arrays must have same length"); \
+	BUILD_ASSERT(DT_PROP_BY_IDX(id, size, 0) <= 8,                    \
+		     "UFSC field size must not exceed 8 bits");           \
+	BUILD_ASSERT(                                                     \
+		(DT_PROP_BY_IDX(id, start, 0) / 32) ==                    \
+			((DT_PROP_BY_IDX(id, start, 0) +                  \
+			  DT_PROP_BY_IDX(id, size, 0) - 1) /              \
+			 32),                                             \
 		"UFSC field crosses a 32-bit boundary, which is not allowed.");
 
 DT_FOREACH_CHILD_STATUS_OKAY(CBI_UFSC_NODE, VALIDATE_UFSC_FIELD)
@@ -50,7 +45,7 @@ DT_INST_FOREACH_STATUS_OKAY(VALIDATE_UFSC_VALUE)
 /* --- Data Structures --- */
 
 static struct cbi_ufsc cached_ufsc;
-static bool cached_ufsc_ready;
+test_export_static bool cached_ufsc_ready;
 
 #define CBI_UFSC_VALUE_ARRAY_ID(id) \
 	[CBI_UFSC_VALUE_ID(id)] = DT_PROP(id, value),

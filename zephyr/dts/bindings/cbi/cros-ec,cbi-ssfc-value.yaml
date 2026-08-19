@@ -11,6 +11,8 @@ compatible: "cros-ec,cbi-ssfc-value"
 properties:
   value:
     type: int
+    min: 0
+    max: 255
     required: true
     description:
       Unique value of CBI SSFC field

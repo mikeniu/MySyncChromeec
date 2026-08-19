@@ -19,9 +19,10 @@ LOG_MODULE_REGISTER(rvp_usbc, LOG_LEVEL_INF);
 /* Ports supported by dual PDC chip in AIC */
 #define DEV_PDC_C0_RTK DEVICE_DT_GET(DT_NODELABEL(pdc_rtk_c0))
 #define DEV_PDC_C0_TI DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c0))
+#define DEV_PDC_C0_TI_HBR DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c0_hbr))
 
 #define DEV_PDC_C1_RTK DEVICE_DT_GET(DT_NODELABEL(pdc_rtk_c1))
-#define DEV_PDC_C1_TI DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c1))
+#define DEV_PDC_C1_TI_JBR DEVICE_DT_GET(DT_NODELABEL(pdc_ti_c1))
 
 #if CONFIG_USB_PD_PORT_MAX_COUNT > 2
 /* Port in modular TCSS AIC */
@@ -44,13 +45,18 @@ enum rvp_tcss_modules {
 	RVP_TCSS_C0_RTK = BIT(0),
 	RVP_TCSS_C1_RTK = BIT(1),
 	RVP_TCSS_C2_RTK = BIT(2),
-	RVP_TCSS_C0_TI = BIT(3),
-	RVP_TCSS_C1_TI = BIT(4),
-	RVP_TCSS_C2_TI = BIT(5),
-	RVP_TCSS_DUAL_TI = BIT(3) | BIT(4),
+	RVP_TCSS_C0_TI_JBR = BIT(3),
+	RVP_TCSS_C1_TI_JBR = BIT(4),
+	RVP_TCSS_C2_TI_JBR = BIT(5),
+	RVP_TCSS_C0_TI_HBR = BIT(6),
+	RVP_TCSS_C1_TI_HBR = BIT(7),
+	RVP_TCSS_C2_TI_HBR = BIT(8),
+	RVP_TCSS_DUAL_TI_JBR = BIT(3) | BIT(4),
 	RVP_TCSS_DUAL_RTK = BIT(0) | BIT(1),
-	RVP_TCSS_THREE_TI = BIT(3) | BIT(4) | BIT(5),
+	RVP_TCSS_THREE_TI_JBR = BIT(3) | BIT(4) | BIT(5),
 	RVP_TCSS_THREE_RTK = BIT(0) | BIT(1) | BIT(2),
+	RVP_TCSS_DUAL_TI_HBR = BIT(6) | BIT(7),
+	RVP_TCSS_THREE_TI_HBR = BIT(6) | BIT(7) | BIT(8),
 };
 
 static struct {
@@ -64,15 +70,22 @@ static bool probe_pdc_chip(const struct device *dev)
 	int rv;
 
 	if (dev == NULL) {
+		/* LCOV_EXCL_START Unlikely to be NULL since these should be
+		 * defined in the device tree for supported boards, but check to
+		 * be safe */
 		LOG_ERR("%s: Invalid pointer", __func__);
 		return false;
+		/* LCOV_EXCL_STOP */
 	}
 
 	rv = pdc_get_hw_config(dev, &config);
 	if (rv) {
+		/* LCOV_EXCL_START Unlikely that the device tree is
+		 * misconfigured for a known board */
 		LOG_ERR("%s: Cannot get bus info for PDC %s: %d", __func__,
 			dev->name ? dev->name : "unnamed", rv);
 		return false;
+		/* LCOV_EXCL_STOP */
 	}
 
 	struct i2c_msg msgs[1];
@@ -106,14 +119,33 @@ static void discover_tcss_modules()
 	if (probe_pdc_chip(DEV_PDC_C2_RTK)) {
 		ctx.detected_cards |= RVP_TCSS_C2_RTK;
 	}
-	if (probe_pdc_chip(DEV_PDC_C0_TI)) {
-		ctx.detected_cards |= RVP_TCSS_C0_TI;
-	}
-	if (probe_pdc_chip(DEV_PDC_C1_TI)) {
-		ctx.detected_cards |= RVP_TCSS_C1_TI;
-	}
-	if (probe_pdc_chip(DEV_PDC_C2_TI)) {
-		ctx.detected_cards |= RVP_TCSS_C2_TI;
+
+	/* Probe HBR C0(0x22) first as it uniquely identifies the HBR TI set.
+	 * If present, use HBR addresses.
+	 * Otherwise fall back to original TI addresses.
+	 * C0 address will be 0x22 for HBR and 0x20 for JBR
+	 * C1 address will be 0x20 for HBR and 0x24 for JBR
+	 * C2 uses the same address for both HBR and JBR
+	 */
+	if (probe_pdc_chip(DEV_PDC_C0_TI_HBR)) {
+		ctx.detected_cards |= RVP_TCSS_C0_TI_HBR;
+		/* HBR C1 shares the same I2C address as JBR c0 */
+		if (probe_pdc_chip(DEV_PDC_C0_TI)) {
+			ctx.detected_cards |= RVP_TCSS_C1_TI_HBR;
+		}
+		if (probe_pdc_chip(DEV_PDC_C2_TI)) {
+			ctx.detected_cards |= RVP_TCSS_C2_TI_HBR;
+		}
+	} else {
+		if (probe_pdc_chip(DEV_PDC_C0_TI)) {
+			ctx.detected_cards |= RVP_TCSS_C0_TI_JBR;
+		}
+		if (probe_pdc_chip(DEV_PDC_C1_TI_JBR)) {
+			ctx.detected_cards |= RVP_TCSS_C1_TI_JBR;
+		}
+		if (probe_pdc_chip(DEV_PDC_C2_TI)) {
+			ctx.detected_cards |= RVP_TCSS_C2_TI_JBR;
+		}
 	}
 
 	LOG_INF("%s: TCSS detection result: 0x%02x", __func__,
@@ -170,7 +202,7 @@ int board_get_pdc_for_port(int port, const struct device **dev)
 			return 0;
 		}
 		break;
-	case RVP_TCSS_C0_TI:
+	case RVP_TCSS_C0_TI_JBR:
 		/* Only Port 0 */
 		LOG_INF("%s: PDC config: [TI,---,---]", __func__);
 		if (port == 0) {
@@ -178,25 +210,58 @@ int board_get_pdc_for_port(int port, const struct device **dev)
 			return 0;
 		}
 		break;
-	case RVP_TCSS_DUAL_TI:
+	case RVP_TCSS_DUAL_TI_JBR:
 		/* Port 0 and 1 */
 		LOG_INF("%s: PDC config: [TI,TI,---]", __func__);
 		if (port == 0) {
 			*dev = DEV_PDC_C0_TI;
 			return 0;
 		} else if (port == 1) {
-			*dev = DEV_PDC_C1_TI;
+			*dev = DEV_PDC_C1_TI_JBR;
 			return 0;
 		}
 		break;
-	case RVP_TCSS_THREE_TI:
+	case RVP_TCSS_THREE_TI_JBR:
 		/* Port 0, 1 and 2 */
 		LOG_INF("%s: PDC config: [TI,TI,TI]", __func__);
 		if (port == 0) {
 			*dev = DEV_PDC_C0_TI;
 			return 0;
 		} else if (port == 1) {
-			*dev = DEV_PDC_C1_TI;
+			*dev = DEV_PDC_C1_TI_JBR;
+			return 0;
+		} else if (port == 2) {
+			*dev = DEV_PDC_C2_TI;
+			return 0;
+		}
+		break;
+	case RVP_TCSS_C0_TI_HBR:
+		/* Only Port 0 (HBR) */
+		LOG_INF("%s: PDC config: [TI-HBR,---,---]", __func__);
+		if (port == 0) {
+			*dev = DEV_PDC_C0_TI_HBR;
+			return 0;
+		}
+		break;
+	case RVP_TCSS_DUAL_TI_HBR:
+		/* Port 0 and 1 (HBR) */
+		LOG_INF("%s: PDC config: [TI-HBR,TI-HBR,---]", __func__);
+		if (port == 0) {
+			*dev = DEV_PDC_C0_TI_HBR;
+			return 0;
+		} else if (port == 1) {
+			*dev = DEV_PDC_C0_TI;
+			return 0;
+		}
+		break;
+	case RVP_TCSS_THREE_TI_HBR:
+		/* Port 0, 1 and 2 (HBR) */
+		LOG_INF("%s: PDC config: [TI-HBR,TI-HBR,TI-HBR]", __func__);
+		if (port == 0) {
+			*dev = DEV_PDC_C0_TI_HBR;
+			return 0;
+		} else if (port == 1) {
+			*dev = DEV_PDC_C0_TI;
 			return 0;
 		} else if (port == 2) {
 			*dev = DEV_PDC_C2_TI;
@@ -213,3 +278,13 @@ int board_get_pdc_for_port(int port, const struct device **dev)
 	*dev = NULL;
 	return -ENOENT;
 }
+
+#ifdef CONFIG_ZTEST
+/* Test-only function to reset discovery state for i2c failure injection tests
+ */
+void reset_pdc_discovery_for_test(void)
+{
+	ctx.initialized = false;
+	ctx.detected_cards = RVP_TCSS_NONE;
+}
+#endif

@@ -11,7 +11,6 @@
 #include "host_command.h"
 #include "keyboard_backlight.h"
 #include "lid_switch.h"
-#include "rgb_keyboard.h"
 #include "timer.h"
 #include "util.h"
 
@@ -108,8 +107,6 @@ static void keyboard_backlight_init(void)
 	/* Uses PWM by default. Can be customized by board_kblight_init */
 	if (IS_ENABLED(CONFIG_PWM_KBLIGHT))
 		kblight_register(&kblight_pwm);
-	else if (IS_ENABLED(CONFIG_RGB_KEYBOARD))
-		kblight_register(&kblight_rgbkbd);
 
 	board_kblight_init();
 	if (kblight_init())
