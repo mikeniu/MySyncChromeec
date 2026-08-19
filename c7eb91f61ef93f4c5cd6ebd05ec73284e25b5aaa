@@ -1,6 +1,46 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff2d692d_4ee84809",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T15:59:22Z",
+      "side": 1,
+      "message": "You can add `LOW_COVERAGE_REASON\u003db/370072796 No test coverage for memory mapped devices` to bypass the test coverage requirement for this change.",
+      "revId": "c7eb91f61ef93f4c5cd6ebd05ec73284e25b5aaa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8f60b69_28a14fb3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T15:59:22Z",
+      "side": 1,
+      "message": "This repo doesn\u0027t use the signed off tag.  Running the pre-submit checks locally will flag this.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 69
+      },
+      "revId": "c7eb91f61ef93f4c5cd6ebd05ec73284e25b5aaa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "376af507_73ce4a69",
