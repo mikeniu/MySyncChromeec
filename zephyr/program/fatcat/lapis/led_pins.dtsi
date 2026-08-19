@@ -4,27 +4,60 @@
  */
 
 / {
-	led_pins: gpio-led-pins {
+	amber_led_pin: gpio-led-pins {
 		compatible = "cros-ec,gpio-led-pins";
 
 		battery_led: battery-led {
 			led-id = "EC_LED_ID_BATTERY_LED";
-			led-pins = <&gpio_led_amber &gpio_led_white>;
+			led-pins = <&gpio_led_amber>;
 
 			battery_led_off: color-off {
 				led-color = "LED_OFF";
-				led-values = <0 0>;
+				led-values = <0>;
 			};
 
 			battery_led_amber: color-amber {
 				led-color = "LED_AMBER";
-				led-values = <1 0>;
-			};
-
-			battery_led_white: color-white {
-				led-color = "LED_WHITE";
-				led-values = <0 1>;
+				led-values = <1>;
 			};
 		};
 	};
+
+	pwmleds {
+		compatible = "pwm-leds";
+		pwm_led_white: pwm_led_white {
+			pwms = <&pwm1 0 PWM_HZ(324) PWM_POLARITY_NORMAL>;
+		};
+	};
+
+	white_led_pins: pwm-led-pins {
+		compatible = "cros-ec,pwm-led-pins";
+
+		power_led: power-led {
+			led-id = "EC_LED_ID_POWER_LED";
+			led-pwms = <&pwm_led_white>;
+
+			power_led_off: color-off {
+				led-color = "LED_OFF";
+				led-values = <0>;
+			};
+
+			power_led_white: color-white {
+				led-color = "LED_WHITE";
+				led-values = <100>;
+			};
+
+			power_led_white_s3: color-white-s3 {
+				led-color = "LED_WHITE";
+				led-values = <30>;
+			};
+		};
+	};
+};
+
+/* White LED */
+&pwm1 {
+	status = "okay";
+	pinctrl-0 = <&pwm1_gpio023>;
+	pinctrl-names = "default";
 };

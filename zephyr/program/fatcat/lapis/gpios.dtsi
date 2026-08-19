@@ -191,10 +191,6 @@
 		gpio_led_amber: led_amber {
 			gpios = <&gpioa 15 GPIO_OUTPUT_LOW>;
 		};
-		/* White LED */
-		gpio_led_white: led_white {
-			gpios = <&gpiob 7 GPIO_OUTPUT_LOW>;
-		};
 		/* CAP_LED */
 		gpio_cap_led: cap_led {
 			gpios = <&gpiob 14 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;

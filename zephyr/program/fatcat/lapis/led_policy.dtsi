@@ -5,9 +5,9 @@
 #include <dt-bindings/battery.h>
 
 / {
-	led-colors {
+	gpio-led-colors {
 		compatible = "cros-ec,led-policy";
-		led-pins = <&led_pins>;
+		led-pins = <&amber_led_pin>;
 
 		power-state-charge-1 {
 			charge-state = "LED_PWRS_CHARGE";
@@ -31,7 +31,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = <&battery_led_white>;
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -43,7 +43,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = <&battery_led_white>;
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -58,7 +58,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = <&battery_led_white>;
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -89,14 +89,8 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 
-				/* White 1 sec, off 3 sec */
 				color-0 {
-					led-color = <&battery_led_white>;
-					period-ms = <1000>;
-				};
-				color-1 {
 					led-color = <&battery_led_off>;
-					period-ms = <3000>;
 				};
 			};
 		};
@@ -138,14 +132,8 @@
 			batter-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 
-				/* White 1 sec, off 3 sec */
 				color-0 {
-					led-color = <&battery_led_white>;
-					period-ms = <1000>;
-				};
-				color-1 {
 					led-color = <&battery_led_off>;
-					period-ms = <3000>;
 				};
 			};
 		};
@@ -174,7 +162,7 @@
 					period-ms = <2000>;
 				};
 				color-1 {
-					led-color = <&battery_led_white>;
+					led-color = <&battery_led_off>;
 					period-ms = <2000>;
 				};
 			};
@@ -200,7 +188,7 @@
 				led-id = "EC_LED_ID_BATTERY_LED";
 
 				color-0 {
-					led-color = <&battery_led_white>;
+					led-color = <&battery_led_off>;
 				};
 			};
 		};
@@ -211,13 +199,214 @@
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 
-				/* White 1 sec on, 3 sec off */
 				color-0 {
-					led-color = <&battery_led_white>;
+					led-color = <&battery_led_off>;
+				};
+			};
+		};
+	};
+
+	pwm-led-colors {
+		compatible = "cros-ec,led-policy";
+		led-pins = <&white_led_pins>;
+
+		power-state-charge-1 {
+			charge-state = "LED_PWRS_CHARGE";
+			/* Battery display percent range (>= Empty, <= 94%) */
+			batt-lvl = <BATTERY_LEVEL_EMPTY 94>;
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				color-0 {
+					led-color = <&power_led_off>;
+				};
+			};
+		};
+		power-state-charge-2 {
+			charge-state = "LED_PWRS_CHARGE";
+			/* Battery display percent range (>= Empty, <= 94%) */
+			batt-lvl = <95 100>;
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				color-0 {
+					led-color = <&power_led_white>;
+				};
+			};
+		};
+
+		power-state-charge-near-full {
+			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				color-0 {
+					led-color = <&power_led_white>;
+				};
+			};
+		};
+
+		power-state-discharge-s0 {
+			charge-state = "LED_PWRS_DISCHARGE";
+			chipset-state = "POWER_S0";
+			/* Battery percent range (> Low, <= Full) */
+			batt-lvl = <(BATTERY_LEVEL_LOW + 1) BATTERY_LEVEL_FULL>;
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				color-0 {
+					led-color = <&power_led_white>;
+				};
+			};
+		};
+		power-state-discharge-s0-batt-low {
+			charge-state = "LED_PWRS_DISCHARGE";
+			chipset-state = "POWER_S0";
+			/* Battery percent range (>= Empty, <= Low) */
+			batt-lvl = <BATTERY_LEVEL_EMPTY BATTERY_LEVEL_LOW>;
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				color-0 {
+					led-color = <&power_led_off>;
+				};
+			};
+		};
+		power-state-discharge-s3 {
+			charge-state = "LED_PWRS_DISCHARGE";
+			chipset-state = "POWER_S3";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				/* White 1 sec, off 3 sec */
+				color-0 {
+					led-color = <&power_led_white_s3>;
 					period-ms = <1000>;
 				};
 				color-1 {
-					led-color = <&battery_led_off>;
+					led-color = <&power_led_off>;
+					period-ms = <3000>;
+				};
+			};
+		};
+		power-state-discharge-s5 {
+			charge-state = "LED_PWRS_DISCHARGE";
+			chipset-state = "POWER_S5";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				color-0 {
+					led-color = <&power_led_off>;
+				};
+			};
+		};
+
+		power-state-error-s0 {
+			charge-state = "LED_PWRS_ERROR";
+			chipset-state = "POWER_S0";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				color-0 {
+					led-color = <&power_led_off>;
+				};
+			};
+		};
+		power-state-error-s3 {
+			charge-state = "LED_PWRS_ERROR";
+			chipset-state = "POWER_S3";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				/* White 1 sec, off 3 sec */
+				color-0 {
+					led-color = <&power_led_white_s3>;
+					period-ms = <1000>;
+				};
+				color-1 {
+					led-color = <&power_led_off>;
+					period-ms = <3000>;
+				};
+			};
+		};
+		power-state-error-s5 {
+			charge-state = "LED_PWRS_ERROR";
+			chipset-state = "POWER_S5";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				color-0 {
+					led-color = <&power_led_off>;
+				};
+			};
+		};
+
+		power-state-forced-idle {
+			charge-state = "LED_PWRS_FORCED_IDLE";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				/* Amber 2 sec, White 2 sec */
+				color-0 {
+					led-color = <&power_led_off>;
+					period-ms = <2000>;
+				};
+				color-1 {
+					led-color = <&power_led_white>;
+					period-ms = <2000>;
+				};
+			};
+		};
+
+		power-state-idle-s5 {
+			charge-state = "LED_PWRS_IDLE";
+			chipset-state = "POWER_S5";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+				/* LED off when S5, others do not change */
+				color-0 {
+					led-color = <&power_led_off>;
+				};
+			};
+		};
+		power-state-idle-s0 {
+			charge-state = "LED_PWRS_IDLE";
+			chipset-state = "POWER_S0";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				color-0 {
+					led-color = <&power_led_white>;
+				};
+			};
+		};
+		power-state-idle-s3 {
+			charge-state = "LED_PWRS_IDLE";
+			chipset-state = "POWER_S3";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+
+				/* White 1 sec on, 3 sec off */
+				color-0 {
+					led-color = <&power_led_white_s3>;
+					period-ms = <1000>;
+				};
+				color-1 {
+					led-color = <&power_led_off>;
 					period-ms = <3000>;
 				};
 			};
