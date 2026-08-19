@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d0c97c0_a72cd362",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T04:18:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/f5ba6b5e-1954-433e-a111-377601baa549)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The memory clearing logic correctly uses `memset` with safe `uintptr_t` arithmetic. The weak symbols for `__ahb4_start` and `__ahb4_end` are well-applied to prevent linker errors on chips that do not define the `.ahb4` memory region.\n*   **Security:** ✅ No vulnerabilities introduced. Purging stale memory across resets is an excellent defense-in-depth measure against data leakage.\n*   **Style:** ✅ The C code matches the existing style and conventions.\n*   **Consistency:** ✅ By placing the chip-specific SRAM clearing logic in `chip/stm32/system.c`, the abstraction boundaries are cleanly respected (compared to putting it in the generic architecture startup).\n*   **Testing:** ✅ The `fp_buffer_clear` multistep test is implemented properly to verify the buffer is zeroed out across resets, ensuring future regressions are caught.\n*   **CL Size \u0026 Scope:** ✅ The CL remains small, self-contained, and focused on a single issue.\n\nTAG\u003dagy\nCONV\u003df5ba6b5e-1954-433e-a111-377601baa549",
+      "isAi": true,
+      "revId": "b3537c8912b045da4413566ca82f662cc88f5711",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9e5a871_9c613a62",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T04:18:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n**Review Summary:**\n*   **Functionality:** ✅ The memory clearing logic correctly uses `memset` with safe `uintptr_t` arithmetic. The weak symbols for `__ahb4_start` and `__ahb4_end` are well-applied to prevent linker errors on chips that do not define the `.ahb4` memory region.\n*   **Security:** ✅ No vulnerabilities introduced. Purging stale memory across resets is an excellent defense-in-depth measure against data leakage.\n*   **Style:** ✅ The C and assembly code match existing style and conventions.\n*   **Consistency:** ✅ By placing the chip-specific SRAM clearing logic in `chip/stm32/system.c`, the abstraction boundaries are cleanly respected (compared to putting it in the generic architecture startup).\n*   **Testing:** ✅ The `fp_buffer_clear` multistep test is implemented properly to verify the buffer is zeroed out across resets, ensuring future regressions are caught.\n*   **CL Size \u0026 Scope:** ✅ The CL remains small, self-contained, and focused on a single issue.\n\nTAG\u003dagy\nCONV\u003d8de04272-38fa-4c35-9b27-55dd881c50f1",
+      "isAi": true,
+      "revId": "b3537c8912b045da4413566ca82f662cc88f5711",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
