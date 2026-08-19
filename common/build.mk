@@ -77,7 +77,6 @@ common-$(CONFIG_COMMON_RUNTIME)+=hooks.o system.o peripheral.o \
 	system_boot_time.o
 
 common-$(CONFIG_COMMON_TIMER)+=timer.o
-common-$(CONFIG_CRC8_CROS)+= crc8.o
 common-$(CONFIG_CURVE25519)+=curve25519.o
 ifneq ($(CORE),cortex-m0)
 common-$(CONFIG_CURVE25519)+=curve25519-generic.o
@@ -151,7 +150,6 @@ common-$(CONFIG_SPI_FLASH)+=spi_flash.o spi_flash_reg.o
 common-$(CONFIG_SPI_FLASH_REGS)+=spi_flash_reg.o
 common-$(CONFIG_SPI_NOR)+=spi_nor.o
 common-$(CONFIG_SWITCH)+=switch.o
-common-$(CONFIG_SW_CRC)+=crc.o
 common-$(CONFIG_TABLET_MODE)+=tablet_mode.o
 common-$(CONFIG_TEMP_SENSOR)+=temp_sensor.o
 common-$(CONFIG_THROTTLE_AP)+=thermal.o throttle_ap.o
