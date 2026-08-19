@@ -236,7 +236,6 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 		thread_name = "unknown";
 	}
 	struct k_thread *thread = k_current_get();
-	uint8_t thread_id = (uint8_t)(uintptr_t)thread;
 
 #ifdef CONFIG_RISCV
 	exception_address = csr_read(mepc);
@@ -276,7 +275,13 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
 	 * occurs.
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, exception_address, thread_id);
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
+	panic_set_info_reg(pdata, exception_address);
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+
+	panic_data_finalize(pdata);
 }
 
 __maybe_unused static void
