@@ -22,6 +22,30 @@
       },
       "revId": "c5bf6d8d029cd7a0d9b432303759c74f7b990401",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2ef9bc1_377f86ee",
+        "filename": "util/dut_handlers/alos.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-19T02:51:22Z",
+      "side": 1,
+      "message": "Yeah, it currently lives under android [here](https://source.corp.google.com/h/arsp/platform/superproject/+/main:external/vboot_reference/scripts/image_signing/swap_ec_rw).  I tried adb pushing this to the DUT and running it, but ran into missing dependency and tooling issues. I also found out that `adb shell` uses `sh` instead of `bash`.\n\nI created http://b/548782452 to track this effort.",
+      "parentUuid": "b3cc1760_92241b23",
+      "range": {
+        "startLine": 266,
+        "startChar": 0,
+        "endLine": 266,
+        "endChar": 12
+      },
+      "revId": "c5bf6d8d029cd7a0d9b432303759c74f7b990401",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
