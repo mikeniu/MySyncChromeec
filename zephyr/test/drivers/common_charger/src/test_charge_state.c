@@ -22,6 +22,14 @@ int calculate_sleep_dur(int battery_critical, int sleep_usec);
 int charge_request(bool use_curr, bool is_full);
 void check_battery_change_soc(bool is_full, bool prev_full);
 const struct shell *get_ec_shell(void);
+void set_debugging(int enable);
+void reset_prev_disp_charge(void);
+void charge_wakeup(void);
+int board_should_charger_bypass(void);
+void trigger_ocpc_reset(void);
+#ifdef CONFIG_CHARGER_OTG
+int charge_set_output_current_limit(int chgnum, int ma, int mv);
+#endif
 
 struct charge_state_fixture {
 	struct charge_state_data charge_state_data;
@@ -735,4 +743,80 @@ ZTEST(charge_state, test_console_cmd_chgstate)
 	zassert_not_ok(shell_execute_cmd(shell, "chgstate sustain 20 bad"));
 	zassert_not_ok(shell_execute_cmd(shell, "chgstate sustain 80 20"));
 	zassert_not_ok(shell_execute_cmd(shell, "chgstate invalid_subcommand"));
+}
+
+ZTEST(charge_state, test_led_flags)
+{
+	struct charge_state_data *curr = charge_get_status();
+
+	curr->batt.flags = 0;
+	curr->ac = 1;
+	zassert_equal(CHARGE_LED_FLAG_EXTERNAL_POWER, charge_get_led_flags());
+
+	curr->batt.flags = BATT_FLAG_RESPONSIVE;
+	zassert_equal(CHARGE_LED_FLAG_EXTERNAL_POWER |
+			      CHARGE_LED_FLAG_BATT_RESPONSIVE,
+		      charge_get_led_flags());
+}
+
+ZTEST(charge_state, test_percent_and_temperature)
+{
+	struct charge_state_data *curr = charge_get_status();
+	int temp = 0;
+
+	/* Normal battery percent */
+	curr->batt.state_of_charge = 65;
+	zassert_equal(65, charge_get_percent());
+
+	/* Normal temperature */
+	curr->batt.flags = 0;
+	curr->batt.temperature = CELSIUS_TO_DECI_KELVIN(25);
+	zassert_ok(charge_get_battery_temp(0, &temp));
+	zassert_equal(CELSIUS_TO_DECI_KELVIN(25) / 10, temp);
+
+	/* Bad temperature flag */
+	curr->batt.flags = BATT_FLAG_BAD_TEMPERATURE;
+	zassert_equal(EC_ERROR_UNKNOWN, charge_get_battery_temp(0, &temp));
+	curr->batt.flags = 0;
+}
+
+ZTEST(charge_state, test_limits_chips_and_misc)
+{
+#if defined(CONFIG_CHARGER_OTG)
+	struct charge_state_data *curr = charge_get_status();
+
+	/* Output current limit */
+	curr->output_current = 0;
+	charge_set_output_current_limit(0, 3000, 5000);
+	zassert_equal(3000, curr->output_current);
+#endif
+
+	/* Input current limit */
+	zassert_ok(charge_set_input_current_limit(1000, 5000));
+	zassert_true(charge_is_consuming_full_input_current());
+
+	/* Active charger chip */
+	zassert_equal(0, charge_get_active_chg_chip());
+
+#ifdef CONFIG_OCPC
+	/* Trigger OCPC reset */
+	trigger_ocpc_reset();
+#endif
+
+	/* Charger bypass */
+	zassert_false(board_should_charger_bypass());
+
+	/* Debugging and wakeup */
+	set_debugging(1);
+	set_debugging(0);
+	reset_prev_disp_charge();
+	charge_wakeup();
+}
+
+ZTEST(charge_state, test_console_cmd_pwr_avg)
+{
+	const struct shell *shell = get_ec_shell();
+
+	zassert_ok(shell_execute_cmd(shell, "pwr_avg"));
+	zassert_not_ok(shell_execute_cmd(shell, "pwr_avg invalid_arg"));
 }
