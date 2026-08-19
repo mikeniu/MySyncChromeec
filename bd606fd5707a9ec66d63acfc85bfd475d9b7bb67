@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a31f72f6_5e171768",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-19T16:38:50Z",
+      "side": 1,
+      "message": "The comment is \"Name the property irq-gpios (Zephyr GPIO convention)\nPass it to `gpio_disable_dt_interrupt` / `gpio_enable_dt_interrupt`\"\nThere are some incompatible:\nirq-gpios: Zephyr\u0027s named_gpios.py expects a real GPIO-cell array \u003c\u0026gpio0 6 GPIO_INT_EDGE_FALLING\u003e → would give a gpio_dt_spec, used with `gpio_pin_interrupt_configure_dt()`\n`gpio_enable/disable_dt_interrupt()` takes a const struct gpio_int_config *, which comes from a cros-ec,gpio-interrupts node phandle via GPIO_INT_FROM_NODE — a completely different structure\".  I used irq (plain phandle) to avoid the conflict while using the gpio_*_dt_interrupt.\nTo fully use irq-gpios as a real Zephyr GPIO spec, we\u0027d switch to `gpio_pin_interrupt_configure_dt()` and rework handler registration separately. This will require large change.",
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
