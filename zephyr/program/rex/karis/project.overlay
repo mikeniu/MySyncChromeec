@@ -179,13 +179,22 @@
 	rpm-max = <6000>;
 };
 
-&cbi_flash {
-	/*
-	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
-	 * EC_RO section. EC_RO section ends at 0x50000 byte which is the offset
-	 */
-	offset = <0x50000>;
-	size = <0x1000>;
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x50000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 * EC_RO section ends at 0x50000 byte which
+			 * is the offset.
+			 */
+			offset = <0x50000>;
+			size = <0x1000>;
+		};
+	};
 };
 
 &cros_kb_raw {
@@ -214,13 +223,4 @@
 		&kso14_gpio_gp82
 	>;
 	pinctrl-names = "default", "sleep";
-};
-
-&pcc {
-	clock-frequency = <DT_FREQ_M(80)>; /* OFMCLK runs at 80 MHz */
-	core-prescaler = <2>; /* CORE_CLK runs at 40 MHz */
-	apb1-prescaler = <4>; /* APB1_CLK runs at 20 MHz */
-	apb2-prescaler = <2>; /* APB2_CLK runs at 40 MHz */
-	apb3-prescaler = <2>; /* APB3_CLK runs at 40 MHz */
-	apb4-prescaler = <4>; /* APB4_CLK runs at 20 MHz */
 };

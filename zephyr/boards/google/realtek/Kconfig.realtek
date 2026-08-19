@@ -6,3 +6,12 @@ config BOARD_REALTEK
 	# Allow generating initial 0 line coverage.
 	select HAS_COVERAGE_SUPPORT
 	select SOC_RTS5912
+
+config REALTEK_RTS5912_TRAMPOLINE
+	bool "Add trampoline at start of flash"
+	default n
+	help
+	  Add a trampoline function at the start of flash to jump to the
+	  actual entry point (vector table). This option is used when
+	  loading images directly into RAM using the rtkupdate utility.
+

@@ -145,6 +145,37 @@ ZTEST(usb_update, test_bad_block)
 	zassert_equal(resp, UPDATE_GEN_ERROR);
 }
 
+ZTEST(usb_update, test_oversized_block_chunk)
+{
+	const struct queue *rx_queue = usb_update.producer.queue;
+	const struct queue *tx_queue = usb_update.consumer.queue;
+	struct first_response_pdu first_response_pdu;
+	uint8_t resp;
+	uint8_t chunk[64] = {};
+
+	/* send first pdu */
+	send_pdu(0, 0, 0);
+	zassert_equal(queue_count(tx_queue), sizeof(first_response_pdu));
+	queue_remove_units(tx_queue, &first_response_pdu,
+			   sizeof(first_response_pdu));
+	zassert_equal(first_response_pdu.return_value, 0);
+
+	/*
+	 * send block start with small payload size
+	 * (13 total block size -> 5 remaining after header)
+	 */
+	send_pdu(1, 0, CONFIG_RW_MEM_OFF);
+
+	/*
+	 * expect UPDATE_GEN_ERROR if we send a chunk
+	 * larger than remaining block_size
+	 */
+	queue_add_units(rx_queue, chunk, sizeof(chunk));
+	zassert_equal(queue_count(tx_queue), 1);
+	queue_remove_units(tx_queue, &resp, 1);
+	zassert_equal(resp, UPDATE_GEN_ERROR);
+}
+
 ZTEST(usb_update, test_bad_digest)
 {
 	const struct queue *rx_queue = usb_update.producer.queue;

@@ -81,7 +81,11 @@ properties:
     type: array
     description: |
       A list of brigthness range value for all supported channels in order,
-      Red, Green, Blue, Yellow, White, Amber (0 to 255).
+      Red, Green, Blue, Yellow, White, Amber and Magenta (0 to 255).
+    min: 0
+    max: 255
+    min-len: 7
+    max-len: 7
 
 child-binding:
   description: |

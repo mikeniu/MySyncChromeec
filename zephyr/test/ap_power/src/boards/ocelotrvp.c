@@ -26,7 +26,7 @@
 /* Declared in rvp_board_power.c and compiled into the test binary when
  * CONFIG_TEST_AP_POWER_OCELOTRVP=y.
  */
-extern void board_ap_power_force_shutdown(void);
+extern void board_ap_power_shutdown(void);
 extern int board_power_signal_get(enum power_signal signal);
 
 /**
@@ -54,7 +54,7 @@ ZTEST(ap_pwrseq_ocelotrvp_board, test_board_ap_power_force_shutdown)
 	 * 4. Wait for PWR_RSMRST_PWRGD to go low with timeout
 	 * 5. Wait the minimum power down delay
 	 */
-	board_ap_power_force_shutdown();
+	board_ap_power_shutdown();
 
 	/* Verify final state */
 	zassert_equal(0, power_signal_get(PWR_PCH_PWROK),
@@ -96,7 +96,7 @@ ZTEST(ap_pwrseq_ocelotrvp_board, test_force_shutdown_rsmrst_timeout)
 	 * X86_NON_DSX_FORCE_SHUTDOWN_TO_MS (50) ms, emit LOG_WRN, then wait
 	 * the BOARD_OCELOT_MINIMUM_POWER_DOWN_DELAY_MS (30) ms rail-off delay.
 	 */
-	board_ap_power_force_shutdown();
+	board_ap_power_shutdown();
 
 	/* Restore RSMRST to de-asserted state for subsequent tests. */
 	gpio_emul_input_set(rsmrst.port, rsmrst.pin, 0);

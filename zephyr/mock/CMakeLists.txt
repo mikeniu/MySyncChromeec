@@ -8,6 +8,10 @@ zephyr_library_sources_ifdef(CONFIG_POWER_SIGNALS_MOCK power_signals.c)
 zephyr_library_sources_ifdef(CONFIG_CHIPSET_API_MOCK chipset_api.c)
 zephyr_library_sources_ifdef(CONFIG_ISL923X_MOCK isl923x.c)
 
+if(CONFIG_PLATFORM_EC AND NOT CONFIG_USBC_SS_MUX)
+  zephyr_library_sources(usb_mux.c)
+endif()
+
 cros_ec_library_include_directories(include)
 
 if(DEFINED CONFIG_POWER_SIGNALS_MOCK)

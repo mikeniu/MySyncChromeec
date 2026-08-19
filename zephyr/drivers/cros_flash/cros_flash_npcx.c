@@ -836,7 +836,14 @@ static int cros_flash_npcx_protect_now(const struct device *dev, bool all)
 		 */
 		flash_uma_lock(dev, 1);
 	} else {
-		/* TODO: Implement RO "now" protection */
+		int ret;
+
+		ret = flash_write_prot_reg(dev, CONFIG_WP_STORAGE_OFF,
+					   CONFIG_WP_STORAGE_SIZE, 1);
+		if (ret) {
+			return ret;
+		}
+		flash_protect_int_flash(dev, true);
 	}
 
 	return EC_SUCCESS;

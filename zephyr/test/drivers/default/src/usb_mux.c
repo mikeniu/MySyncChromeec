@@ -932,6 +932,7 @@ ZTEST(usb_init_mux, test_usb_mux_hc_mux_info)
 	params.port = USBC_PORT_C1;
 
 	/* Test error on getting mux mode */
+	reset_proxy_fakes();
 	set_proxy_get_mux_state_seq(USB_PD_MUX_USB_ENABLED);
 	proxy_get_fake.return_val = EC_ERROR_UNKNOWN;
 	zassert_equal(EC_RES_ERROR,

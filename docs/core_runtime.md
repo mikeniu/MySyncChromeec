@@ -262,12 +262,6 @@ the closest deadline and programs it in the hardware to get an interrupt. At the
 same time, it sets the TASK_EVENT_TIMER event in all tasks whose timer deadline
 has expired. The next deadline is computed in interrupt context.
 
-Note: given each task has a **single** timer which is also used to wake up the
-task when `task_wait_event()` is called with a timeout, one needs to be careful
-when using directly the `timer_arm()` function because there is an eventuality
-that this timer is still running on the next `task_wait_event()` call, the call
-will fail due to the lack of available timer.
-
 ## Memory
 
 ### Single Address Space

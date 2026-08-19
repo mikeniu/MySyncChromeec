@@ -7,7 +7,17 @@
 
 import argparse
 import os
+from pathlib import Path
 import sys
+
+
+# Add EC root to path to allow importing util.dagwood_test_lib
+SCRIPT_DIR = Path(__file__).resolve().parent
+EC_ROOT = SCRIPT_DIR.parent
+sys.path.append(str(EC_ROOT))
+
+# pylint: disable=import-error, wrong-import-position
+from util import dagwood_test_lib
 
 
 def main():
@@ -15,61 +25,12 @@ def main():
     parser = argparse.ArgumentParser(
         description="Run Dagwood device tests inside the Docker container."
     )
-    parser.add_argument(
-        "-p",
-        "--platform",
-        required=True,
-        help="Platform type (e.g., realtek/rts5912)",
-    )
-    parser.add_argument(
-        "-T",
-        "--test-dir",
-        action="append",
-        help=(
-            "Test directory to search (e.g., zephyr/test/ec-aic). "
-            "Can be specified multiple times."
-        ),
-    )
-    parser.add_argument(
-        "-s",
-        "--test-scenario",
-        action="append",
-        help="Specific test scenario to run. Can be specified multiple times.",
-    )
-    parser.add_argument(
-        "-d",
-        "--device-serial",
-        default="/dev/ttyACM1",
-        help="Device serial port (default: /dev/ttyACM1)",
-    )
+    dagwood_test_lib.add_common_args(parser)
+    args, extra_args = parser.parse_known_args()
 
-    args = parser.parse_args()
+    twister_args = dagwood_test_lib.get_twister_args(args, extra_args)
 
-    # Construct the twister command
-    twister_args = [
-        "-ivc",
-        "--toolchain=coreboot-sdk",
-        "-p",
-        args.platform,
-        "--device-testing",
-        "--device-serial",
-        args.device_serial,
-        "--flash-command",
-        "../dagwood/flash.py",
-        "--device-flash-timeout",
-        "60",
-    ]
-
-    if args.test_dir:
-        for t_dir in args.test_dir:
-            twister_args.extend(["-T", t_dir])
-
-    if args.test_scenario:
-        for scenario in args.test_scenario:
-            twister_args.extend(["-s", scenario])
-
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    run_docker_sh = os.path.join(script_dir, "run_docker.sh")
+    run_docker_sh = str(SCRIPT_DIR / "run_docker.sh")
 
     # Join twister args into a space-separated string for bash -c
     twister_cmd = " ".join(twister_args)

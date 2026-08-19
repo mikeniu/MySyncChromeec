@@ -187,8 +187,7 @@ static int i2c_common_emul_write_byte(const struct emul *target,
 		reg = data->cur_reg + data->msg_byte - 1;
 	}
 
-	if (data->write_fail_reg == reg ||
-	    data->write_fail_reg == I2C_COMMON_EMUL_FAIL_ALL_REG) {
+	if (data->write_fail_reg == reg) {
 		if (data->fail_auto_clear) {
 			data->write_fail_reg = I2C_COMMON_EMUL_NO_FAIL_REG;
 		}
@@ -247,8 +246,7 @@ static int i2c_common_emul_read_byte(const struct emul *target,
 		reg = data->cur_reg + data->msg_byte;
 	}
 
-	if (data->read_fail_reg == reg ||
-	    data->read_fail_reg == I2C_COMMON_EMUL_FAIL_ALL_REG) {
+	if (data->read_fail_reg == reg) {
 		if (data->fail_auto_clear) {
 			data->read_fail_reg = I2C_COMMON_EMUL_NO_FAIL_REG;
 		}
@@ -302,6 +300,26 @@ int i2c_common_emul_transfer_workhorse(const struct emul *target,
 		read = msgs->flags & I2C_MSG_READ;
 		stop = msgs->flags & I2C_MSG_STOP;
 
+		/* Early FAIL_ALL check for both reads and writes */
+		if ((read &&
+		     data->read_fail_reg == I2C_COMMON_EMUL_FAIL_ALL_REG) ||
+		    (!read &&
+		     data->write_fail_reg == I2C_COMMON_EMUL_FAIL_ALL_REG)) {
+			/* Reset state machine on early failure */
+			data->msg_state = I2C_COMMON_EMUL_NONE_MSG;
+
+			if (data->fail_auto_clear) {
+				if (read) {
+					data->read_fail_reg =
+						I2C_COMMON_EMUL_NO_FAIL_REG;
+				} else {
+					data->write_fail_reg =
+						I2C_COMMON_EMUL_NO_FAIL_REG;
+				}
+			}
+			return -EIO;
+		}
+
 		switch (data->msg_state) {
 		case I2C_COMMON_EMUL_IN_WRITE:
 			if (read) {
@@ -324,7 +342,7 @@ int i2c_common_emul_transfer_workhorse(const struct emul *target,
 				if (ret) {
 					return ret;
 				}
-				/* Wait for write message with acctual data */
+				/* Wait for write message with actual data */
 				if (msgs->len == 0) {
 					continue;
 				}
@@ -343,7 +361,7 @@ int i2c_common_emul_transfer_workhorse(const struct emul *target,
 					return ret;
 				}
 			} else {
-				/* Wait for write message with acctual data */
+				/* Wait for write message with actual data */
 				if (msgs->len == 0) {
 					continue;
 				}

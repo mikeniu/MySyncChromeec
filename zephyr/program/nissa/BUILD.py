@@ -41,7 +41,7 @@ def register_nissa_project(
         zephyr_board=chip,
         dts_overlays=[here / project_name / "project.overlay"],
         kconfig_files=kconfig_files,
-        inherited_from=["nissa"],
+        boards=["nissa"],
         supported_toolchains=["coreboot-sdk", "zephyr"],
         snippets=snippets,
         **kwargs,
@@ -96,7 +96,7 @@ pujjo = register_nissa_project(
 pujjoga = register_nissa_project(
     project_name="pujjoga",
     chip="npcx9/npcx9m3f",
-    snippets=["npcx-40mhz"],
+    snippets=["npcx-45mhz"],
 )
 
 pujjogatwin = register_nissa_project(

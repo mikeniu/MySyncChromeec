@@ -8,6 +8,7 @@
 def register_rex_project(
     project_name,
     kconfig_files=None,
+    snippets=None,
 ):
     """Register a variant of Rex."""
     if kconfig_files is None:
@@ -25,7 +26,8 @@ def register_rex_project(
             here / project_name / "project.overlay",
         ],
         kconfig_files=kconfig_files,
-        inherited_from=["rex"],
+        boards=["rex"],
+        snippets=snippets,
     )
 
 
@@ -53,6 +55,7 @@ register_rex_project(
 )
 register_rex_project(
     project_name="karis",
+    snippets=["npcx-45mhz"],
 )
 
 register_ish_project(
@@ -65,7 +68,7 @@ register_ish_project(
         here / "rex-ish" / "prj.conf",
         here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["rex"],
+    boards=["rex"],
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses

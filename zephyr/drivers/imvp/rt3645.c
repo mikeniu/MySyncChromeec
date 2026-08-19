@@ -72,10 +72,6 @@ static int rt3645_apply_update_data(const struct device *dev)
 	int prev_page = -1;
 	struct rt3645_info update_entries;
 
-	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
-		return -EINVAL;
-	}
-
 	/* Apply each register update from the raw_data array */
 	for (size_t i = 0; i < ARRAY_SIZE(raw_data); i++) {
 		/* Unpack each entry */
@@ -113,10 +109,6 @@ static int rt3645_crc_check(const struct device *dev)
 {
 	uint8_t crc_val;
 
-	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
-		return -EINVAL;
-	}
-
 	rt3645_set_page(dev, RT3645_PAGE_D);
 	rt3645_read_reg(dev, CRC_REG, &crc_val);
 
@@ -132,10 +124,6 @@ static int rt3645_crc_check(const struct device *dev)
 static int rt3645_lock_nvm(const struct device *dev)
 {
 	int rv = 0;
-	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
-		return -EINVAL;
-	}
-
 	rt3645_set_page(dev, RT3645_PAGE_GLOBAL);
 
 	rv = rt3645_write_reg(dev, CONFIG_MODE_REG, LOCK_CODE1);
@@ -212,6 +200,7 @@ static int rt3645_update(const struct device *dev)
 	}
 	if (reg_val != PRODUCT_ID) {
 		LOG_ERR("Wrong Product Id");
+		rv = -EINVAL;
 		goto lock_imvp;
 	}
 	/* Delay of 1ms after reading product id */

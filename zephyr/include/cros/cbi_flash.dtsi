@@ -5,6 +5,9 @@
 
 &binman {
 	wp-ro {
+		ec-ro {
+			size = <0x40000>;
+		};
 		cbi_flash: cbi {
 			compatible = "cros-ec,flash-layout";
 			type = "fill";

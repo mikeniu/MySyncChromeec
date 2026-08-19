@@ -14,7 +14,7 @@ import zmake.zmake as zm
 
 
 hypothesis.settings.register_profile(
-    "cq", suppress_health_check=hypothesis.HealthCheck.all()
+    "cq", suppress_health_check=list(hypothesis.HealthCheck)
 )
 hypothesis.settings.load_profile("cq")
 

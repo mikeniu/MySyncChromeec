@@ -15,6 +15,12 @@
 #include "task.h"
 #include "util.h"
 
+#ifdef CONFIG_SOC_IT8XXX2
+#include <ilm.h>
+#else
+#define __soc_ram_code
+#endif
+
 #define CPRINTF(format, args...) cprintf(CC_CEC, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_CEC, format, ##args)
 
@@ -43,7 +49,7 @@ static atomic_t cec_mkbp_events[CEC_PORT_COUNT];
 /* Task events for each port (CEC_TASK_EVENT_*) */
 static atomic_t cec_task_events[CEC_PORT_COUNT];
 
-int cec_transfer_get_bit(const struct cec_msg_transfer *transfer)
+__soc_ram_code int cec_transfer_get_bit(const struct cec_msg_transfer *transfer)
 {
 	if (transfer->byte >= MAX_CEC_MSG_LEN)
 		return 0;
@@ -51,7 +57,8 @@ int cec_transfer_get_bit(const struct cec_msg_transfer *transfer)
 	return transfer->buf[transfer->byte] & (0x80 >> transfer->bit);
 }
 
-void cec_transfer_set_bit(struct cec_msg_transfer *transfer, int val)
+__soc_ram_code void cec_transfer_set_bit(struct cec_msg_transfer *transfer,
+					 int val)
 {
 	uint8_t bit_flag;
 
@@ -63,7 +70,7 @@ void cec_transfer_set_bit(struct cec_msg_transfer *transfer, int val)
 		transfer->buf[transfer->byte] |= bit_flag;
 }
 
-void cec_transfer_inc_bit(struct cec_msg_transfer *transfer)
+__soc_ram_code void cec_transfer_inc_bit(struct cec_msg_transfer *transfer)
 {
 	if (++(transfer->bit) == 8) {
 		if (transfer->byte >= MAX_CEC_MSG_LEN)
@@ -73,7 +80,8 @@ void cec_transfer_inc_bit(struct cec_msg_transfer *transfer)
 	}
 }
 
-int cec_transfer_is_eom(const struct cec_msg_transfer *transfer, int len)
+__soc_ram_code int cec_transfer_is_eom(const struct cec_msg_transfer *transfer,
+				       int len)
 {
 	if (transfer->bit)
 		return 0;

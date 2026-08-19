@@ -195,6 +195,15 @@ def get_argparser():
         "compare-builds", help="Compare output binaries from two commits"
     )
     compare_builds.add_argument(
+        "-m",
+        "--module",
+        default="ec",
+        help=(
+            "Name of the module repository to compare (e.g. 'ec', 'google-private'), "
+            "default='ec'"
+        ),
+    )
+    compare_builds.add_argument(
         "--ref1",
         default="HEAD",
         help="1st git reference (commit, branch, etc), default=HEAD",
@@ -280,6 +289,21 @@ def get_argparser():
             "If specified, diff the README with the expected contents instead of "
             "writing out."
         ),
+    )
+
+    analyze_build_diff = sub.add_parser(
+        "analyze-build-diff",
+        help="Analyze binary differences between two EC builds",
+    )
+    analyze_build_diff.add_argument(
+        "target1",
+        type=pathlib.Path,
+        help="First build directory or ec.bin file",
+    )
+    analyze_build_diff.add_argument(
+        "target2",
+        type=pathlib.Path,
+        help="Second build directory or ec.bin file",
     )
 
     return parser, sub
@@ -478,11 +502,12 @@ def main(argv=None):
                 logging.error(
                     "Failed projects by diff in %s: %s",
                     file,
-                    ", ".join(failed_projects),
+                    ", ".join(sorted(failed_projects)),
                 )
         if zmake.failed_projects:
             logging.error(
-                "All failed projects: %s", " ".join(zmake.failed_projects)
+                "All failed projects: %s",
+                " ".join(sorted(zmake.failed_projects)),
             )
 
 
