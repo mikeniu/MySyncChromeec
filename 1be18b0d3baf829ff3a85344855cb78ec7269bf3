@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae973655_381a8e66",
+        "filename": "docker/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-19T01:52:23Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Typo in comment: \"allow pip break\" -\u003e \"allow pip to break\".",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 0
+      },
+      "revId": "1be18b0d3baf829ff3a85344855cb78ec7269bf3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb2e9108_fdecd154",
+        "filename": "docker/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-19T01:52:23Z",
+      "side": 1,
+      "message": "Why do we need the `-e` flag here? Do we expect zmake to be changed in docker image?",
+      "range": {
+        "startLine": 139,
+        "startChar": 4,
+        "endLine": 139,
+        "endChar": 6
+      },
+      "revId": "1be18b0d3baf829ff3a85344855cb78ec7269bf3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7638b757_922f4536",
+        "filename": "docker/entrypoint.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-19T01:52:23Z",
+      "side": 1,
+      "message": "Would this duplicate the path as its already done in the `Dockerfile`?",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 76
+      },
+      "revId": "1be18b0d3baf829ff3a85344855cb78ec7269bf3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
