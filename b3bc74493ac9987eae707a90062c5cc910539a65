@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c3f3270_94ca27bb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T22:12:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/e177d10a-1e0b-476f-8730-8a913a8a0101)]\n\n**Review Summary:**\n* **Functionality**: The logic correctly ensures that physical flash protection (option bytes) is re-applied during `crec_flash_pre_init` if the RO region is already protected (`EC_FLASH_PROTECT_RO_NOW`) and hardware write protect is asserted. This successfully addresses the gap where option bytes could be left unlocked after a reset. The implementation fix requested in the previous review is now present.\n* **Security**: This is a positive security improvement, ensuring the flash option bytes are correctly locked down during early initialization.\n* **Style**: Code adheres to the existing project coding style. Previous typos have been fixed.\n* **Consistency**: Aligns the `stm32h7` implementation with other STM32 variants (such as `flash-f.c`). Copyright years have been updated appropriately.\n* **Testing \u0026 Test Coverage**: Test additions look good. The missing `entropy.o` from `test/build.mk` has been restored, and the test has been updated to successfully catch the issue.\n* **CL Size \u0026 Scope**: The CL is very well scoped, containing a small and self-contained fix.\n\nTAG\u003dagy\nCONV\u003d47a2a475-1945-4261-9052-0b39759b39b6",
+      "isAi": true,
+      "revId": "b3bc74493ac9987eae707a90062c5cc910539a65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
