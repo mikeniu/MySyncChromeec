@@ -17,6 +17,74 @@
       "isAi": true,
       "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4426731d_e6027de2",
+        "filename": "zephyr/test/drivers/usbc_power_contract/src/usbc_power_contract.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-19T21:43:23Z",
+      "side": 1,
+      "message": "Nit: I don\u0027t object to a test of this form, but it seems more natural to test a macro statically. Does this add any counted coverage?",
+      "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bef3796b_2575edeb",
+        "filename": "zephyr/test/drivers/usbc_sm/src/usbc_sm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-19T21:43:23Z",
+      "side": 1,
+      "message": "Nit: You only have one port. You might as well put that in the function body.",
+      "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90b75118_00007032",
+        "filename": "zephyr/test/drivers/usbc_sm/src/usbc_sm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-19T21:43:23Z",
+      "side": 1,
+      "message": "I think I get the structure of these tests, but they\u0027re pretty hard to verify by inspection. I got lost halfway through the state machine. I don\u0027t have a great alternative off the top of my head, though.",
+      "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6faa68e1_5ca45cba",
+        "filename": "zephyr/test/drivers/usbc_tcpc/src/tcpc_shim.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-19T21:43:23Z",
+      "side": 1,
+      "message": "Nit: IDK what the coverage goals were here, but symmetry would suggest checks for `cc_is_snk_dbg_acc` as well.",
+      "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
