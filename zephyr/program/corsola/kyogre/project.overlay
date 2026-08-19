@@ -513,3 +513,7 @@
 &i2c2_0 {
 	clock-frequency = <I2C_BITRATE_FAST>;
 };
+
+&battery_passthru {
+	devices = [0f];
+};

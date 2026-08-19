@@ -583,3 +583,7 @@
 &thermistor_1V8_100K_100K_4250B{
 	status = "okay";
 };
+
+&battery_passthru {
+	devices = [0f];
+};
