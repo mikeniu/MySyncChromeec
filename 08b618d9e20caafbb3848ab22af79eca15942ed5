@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d605b614_58341c2c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T22:06:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/8dc08abc-7dd4-4b6a-a721-470f411eb952)]\n\n**Review Summary:**\n* **Functionality**: The CL description indicates this patch ensures option byte locking is applied in `crec_flash_pre_init()`, but the actual implementation changes (e.g., in `chip/stm32/`) are missing from this patchset. Currently, the CL only contains the test additions. Please include the implementation fix.\n* **Security**: N/A (Implementation missing).\n* **Style**: Found a minor typo in the test console output.\n* **Consistency**: Copyright year on the new `.tasklist` file should be updated.\n* **Testing \u0026 Test Coverage**: Test additions look good, but it appears `entropy-y\u003dentropy.o` was accidentally removed from `test/build.mk`.\n* **CL Size \u0026 Scope**: Good size, but missing the main implementation changes.\n\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "08b618d9e20caafbb3848ab22af79eca15942ed5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "946c7252_bdc35d6a",
+        "filename": "test/build.mk",
+        "patchSetId": 7
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T22:06:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] It looks like `entropy-y\u003dentropy.o` was accidentally deleted right above this line.",
+      "isAi": true,
+      "revId": "08b618d9e20caafbb3848ab22af79eca15942ed5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e12ca7c_ce059fd2",
+        "filename": "test/flash_pre_init_protect.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T22:06:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Typo: `is only works` -\u003e `only works`.",
+      "isAi": true,
+      "revId": "08b618d9e20caafbb3848ab22af79eca15942ed5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b281696_df4e48a7",
+        "filename": "test/flash_pre_init_protect.tasklist",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T22:06:15Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider updating the copyright year to 2026 for this new file.",
+      "isAi": true,
+      "revId": "08b618d9e20caafbb3848ab22af79eca15942ed5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
