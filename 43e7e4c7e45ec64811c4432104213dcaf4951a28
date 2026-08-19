@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "43e7e4c7e45ec64811c4432104213dcaf4951a28",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08a9235c_aa2fd438",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T04:14:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/ad7d4b35-e2f7-4ebe-a843-c29f2b1be469)]\n\n### Review Summary\n* **Functionality**: The change correctly ensures teardown hooks run atomically. The updates to `preserve_enable_5v_state` and `flash_shared_enable_ec_access` successfully replace blocking operations (mutexes, sleeps) with atomic reads and busy waits to comply with the new interrupt-disabled context.\n* **Security**: No vulnerabilities introduced. This improves system resilience during image transitions by removing race conditions while hardware protection mechanisms are deactivated.\n* **Style**: Code style is clean and well-documented. The stray semicolon in `flash.c` has been cleaned up.\n* **Testing**: The unit test properly verifies the calling order using a mock variable. Relocating test variables to `system_fake.c` and using `CONFIG_ARCH_POSIX` cleanly separates test-only logic from production builds.\n* **CL Size \u0026 Scope**: The CL is perfectly scoped, small, and self-contained to this specific race condition.\n\nTAG\u003dagy\nCONV\u003dec772c6e-27df-4d53-9698-cda702b5eb98",
+      "isAi": true,
+      "revId": "43e7e4c7e45ec64811c4432104213dcaf4951a28",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
