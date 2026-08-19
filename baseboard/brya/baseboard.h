@@ -223,7 +223,7 @@
 #define CONFIG_USB_BCD_DEV 0x0000
 
 #define CONFIG_USB_PD_XID 0
-#define CONFIG_SVDM_RSP_DFP_ONLY
+#define CONFIG_SVDM_RSP
 
 /*
  * These stack sizes were determined using "make analyzestack" for brya
