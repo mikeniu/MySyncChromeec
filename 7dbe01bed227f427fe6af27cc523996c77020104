@@ -71,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d28c9bbd_9af99267",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-08-19T09:46:46Z",
+      "side": 1,
+      "message": "Booted to OS on skywalker yoda",
+      "parentUuid": "22af6eb7_787c44f6",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 4
+      },
+      "revId": "7dbe01bed227f427fe6af27cc523996c77020104",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdcfd285_573ea830",
