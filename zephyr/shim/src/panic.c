@@ -81,24 +81,24 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
  * The assignments must match include/panic_defs.h
  */
 #define PANIC_ARCH PANIC_ARCH_RISCV_RV32I
-#define PANIC_REG_LIST(M, M_GPR)  \
-	M(ra, riscv.regs[29], ra) \
-	M(a0, riscv.regs[26], a0) \
-	M(a1, riscv.regs[25], a1) \
-	M(a2, riscv.regs[24], a2) \
-	M(a3, riscv.regs[23], a3) \
-	M(a4, riscv.regs[22], a4) \
-	M(a5, riscv.regs[21], a5) \
-	M(a6, riscv.regs[20], a6) \
-	M(a7, riscv.regs[19], a7) \
-	M(t0, riscv.regs[18], t0) \
-	M(t1, riscv.regs[17], t1) \
-	M(t2, riscv.regs[16], t2) \
-	M(t3, riscv.regs[15], t3) \
-	M(t4, riscv.regs[14], t4) \
-	M(t5, riscv.regs[13], t5) \
-	M(t6, riscv.regs[12], t6) \
-	M(mepc, riscv.mepc, mepc) \
+#define PANIC_REG_LIST(M, M_GPR)      \
+	M(ra, riscv.regs[29], ra)     \
+	M_GPR(a0, riscv.regs[26], a0) \
+	M_GPR(a1, riscv.regs[25], a1) \
+	M_GPR(a2, riscv.regs[24], a2) \
+	M_GPR(a3, riscv.regs[23], a3) \
+	M_GPR(a4, riscv.regs[22], a4) \
+	M_GPR(a5, riscv.regs[21], a5) \
+	M_GPR(a6, riscv.regs[20], a6) \
+	M_GPR(a7, riscv.regs[19], a7) \
+	M_GPR(t0, riscv.regs[18], t0) \
+	M_GPR(t1, riscv.regs[17], t1) \
+	M_GPR(t2, riscv.regs[16], t2) \
+	M_GPR(t3, riscv.regs[15], t3) \
+	M_GPR(t4, riscv.regs[14], t4) \
+	M_GPR(t5, riscv.regs[13], t5) \
+	M_GPR(t6, riscv.regs[12], t6) \
+	M(mepc, riscv.mepc, mepc)     \
 	M(mstatus, riscv.mcause, mstatus)
 #define PANIC_REG_EXCEPTION(pdata) (pdata->riscv.mcause)
 #define PANIC_REG_REASON(pdata) (pdata->riscv.regs[11])

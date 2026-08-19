@@ -572,7 +572,6 @@ class Renode(Platform):
             "flash_protection",  # TODO(b/487848806)
             "flash_protection_rw",  # TODO(b/487848806)
             "flash_write_protect",  # TODO(b/406944986)
-            "panic_strip_gpr",  # TODO(b/519342662)
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
