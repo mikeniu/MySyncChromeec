@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64f9b04a_2f567123",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T04:13:51Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n### Review Summary\n* **Functionality**: The change correctly ensures teardown hooks run atomically. The updates to `preserve_enable_5v_state` and `flash_shared_enable_ec_access` successfully remove blocking operations to comply with the new interrupt-disabled context. The fix correctly uses `k_busy_wait` in place of `k_msleep`.\n* **Security**: No vulnerabilities introduced. This improves system resilience during image transitions by removing race conditions and preventing preemption while system protection mechanisms are inactive.\n* **Style**: Code style is clean and well-documented. The comments added are very helpful.\n* **Testing**: The unit test properly verifies the calling order using a mock variable. The weak definition of `ztest_interrupt_disable_all` in `ztest_system.c` successfully avoids test linkage issues while keeping test-only code out of production images.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and perfectly scoped to this single fix.\n\nTAG\u003dagy\nCONV\u003dcc14f4b3-3009-4c20-a128-88d25aa22476",
+      "isAi": true,
+      "revId": "43e7e4c7e45ec64811c4432104213dcaf4951a28",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
