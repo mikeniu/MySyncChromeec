@@ -4,6 +4,23 @@
  */
 
 / {
+	i2c-passthru {
+		compatible = "cros-ec,i2c-passthru";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		eeprom_passthru: port0@0 {
+			reg = <0>;
+			i2c-port = <&i2c0>;
+		};
+		battery_passthru: port1@1 {
+			reg = <1>;
+			i2c-port = <&i2c1>;
+			allow-type = "VIRTUAL_BATTERY";
+			devices = [0b];
+		};
+	};
+
 	named-i2c-ports {
 		compatible = "named-i2c-ports";
 
