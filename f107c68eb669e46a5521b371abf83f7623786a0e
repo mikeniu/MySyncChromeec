@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09d19a17_0a80e74f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T22:42:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/ba7c47f4-1193-41c2-b52a-36cbe1205f6c)]\n\n### Review Summary\n\n*   **Functionality:** The change correctly updates the `PANIC_REG_LIST` macro for RISC-V to use `M_GPR` instead of `M` for all general-purpose registers (`ra`, `a0-a7`, `t0-t6`). This ensures that `CONFIG_PLATFORM_EC_PANIC_STRIP_GPR` properly zeroes these registers during a panic on RISC-V platforms, matching the behavior of Cortex-M.\n*   **Security:** This is a positive security improvement as it prevents potential leakage of sensitive data residing in GPRs in panic dumps on RISC-V devices.\n*   **Style:** The code style aligns with standard Zephyr C macros and the existing patterns in the codebase.\n*   **Testing \u0026 Test Coverage:** The `panic_strip_gpr` test case has been successfully re-enabled for the `sanok` (RISC-V) board in `test/run_device_tests.py`, ensuring this new behavior is verified by CI. The commit message also lists local test runs which passed.\n*   **CL Size \u0026 Scope:** The CL is small, focused, and well-contained.\n*   **Overall Quality:** Excellent. The fix is straightforward, correctly implemented, and backed by automated testing.",
+      "isAi": true,
+      "revId": "f107c68eb669e46a5521b371abf83f7623786a0e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
