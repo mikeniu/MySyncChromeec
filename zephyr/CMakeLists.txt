@@ -199,6 +199,10 @@ endif()
 add_subdirectory("lib")
 add_subdirectory("subsys")
 
+if(CONFIG_ZTEST OR CONFIG_BOARD_NATIVE_SIM)
+  zephyr_compile_options(-ftrivial-auto-var-init=pattern)
+endif()
+
 # CONFIG_PLATFORM_EC files that don't relate to something below should be
 # included here, sorted by filename. This is common functionality which is
 # supported by all boards and emulators (including unit tests) using the shim
