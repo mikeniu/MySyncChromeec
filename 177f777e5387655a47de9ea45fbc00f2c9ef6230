@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3585fd62_efa2c233",
+        "filename": "common/port80.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-08-19T16:50:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a9fdb9c_f50f6231",
+      "range": {
+        "startLine": 250,
+        "startChar": 0,
+        "endLine": 250,
+        "endChar": 75
+      },
+      "revId": "177f777e5387655a47de9ea45fbc00f2c9ef6230",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "23ad322d_bb77e0e7",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b41b26e4_c14b1317",
+        "filename": "common/port80.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-08-19T16:50:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23ad322d_bb77e0e7",
+      "range": {
+        "startLine": 251,
+        "startChar": 5,
+        "endLine": 251,
+        "endChar": 11
+      },
+      "revId": "177f777e5387655a47de9ea45fbc00f2c9ef6230",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f87b292_22ece153",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-08-18T22:10:04Z",
       "side": 1,
       "message": "Nit - always use {} around conditionals.",
+      "range": {
+        "startLine": 253,
+        "startChar": 2,
+        "endLine": 253,
+        "endChar": 8
+      },
+      "revId": "177f777e5387655a47de9ea45fbc00f2c9ef6230",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc83fda0_83917d27",
+        "filename": "common/port80.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-08-19T16:50:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f87b292_22ece153",
       "range": {
         "startLine": 253,
         "startChar": 2,
