@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b9d66ff_2d543b8a",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-08-19T07:05:07Z",
+      "side": 0,
+      "message": "@keithshort@google.com do you know any background of this check? It validates alignment of the data in RAM. It expects the same alignment of address for data in RAM and flash, which doesn\u0027t seem correct.",
+      "revId": "7ee6861f4491a22b80b30c90b3fa11f2bcd06c52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
