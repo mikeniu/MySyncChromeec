@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e4a225c_6d3778f7",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 771,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-08-19T07:39:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae4caead_8ccf60db",
+      "revId": "9b152a31a395f95c7f7f4e23a3ad02cff1dee12a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bc08c84_bd24cf2f",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-18T07:37:55Z",
       "side": 1,
       "message": "ST_DISABLE shouldn\u0027t be called with other states.",
+      "revId": "9b152a31a395f95c7f7f4e23a3ad02cff1dee12a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16d94301_8e13d0b2",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 843,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-08-19T07:39:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5bc08c84_bd24cf2f",
       "revId": "9b152a31a395f95c7f7f4e23a3ad02cff1dee12a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -52,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73062505_e180244d",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2669,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-08-19T07:39:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db81550b_473b7d59",
+      "revId": "9b152a31a395f95c7f7f4e23a3ad02cff1dee12a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab66edf9_ab43acbc",
@@ -65,6 +119,24 @@
       "writtenOn": "2026-08-18T07:37:55Z",
       "side": 1,
       "message": "ST_DISABLE should not be set with ST_ERROR_RECOVERY.",
+      "revId": "9b152a31a395f95c7f7f4e23a3ad02cff1dee12a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bfce967_ed8876a6",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 2694,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-08-19T07:39:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab66edf9_ab43acbc",
       "revId": "9b152a31a395f95c7f7f4e23a3ad02cff1dee12a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
