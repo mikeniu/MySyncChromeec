@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46050dcb_242e08a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T22:40:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/4283a171-b15d-478f-9bc7-d0d6a4cbd236)]\n\n**Review Summary**\n*   **Functionality:** The patch correctly configures and introduces the `panic_strip_gpr` test for verifying GPR stripping behavior on panics. It successfully enables the relevant configurations for the test and explicitly disables GPR stripping for the baseline `panic_data` test to allow RA/register validation.\n*   **Security:** N/A (this is purely a test-related patch).\n*   **Style:** Code style is clean.\n*   **Testing \u0026 Test Coverage:** Excellent. The addition of a targeted `panic_strip_gpr` hardware test effectively verifies the GPR stripping behavior in a dedicated environment. Extracting the test into its own patch is a great practice.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and well-scoped.\n\nTAG\u003dagy CONV\u003d4283a171-b15d-478f-9bc7-d0d6a4cbd236",
+      "isAi": true,
+      "revId": "f866328541c490ff22f0b6c5f5bff803b1eedf53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "642156c0_9429a9ca",
+        "filename": "zephyr/test/hwtest/src/panic.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T22:40:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Following up on the discussion from the previous patchset regarding the `ra` register on RISC-V: since `ra` serves as the Link Register and shouldn\u0027t be stripped, this test will fail on RISC-V if it expects `ra` (which is in `expected_regs` at index 29) to be `0` when `CONFIG_PLATFORM_EC_PANIC_STRIP_GPR` is enabled.\n\nConsider updating this logic to leave `expected` unchanged for `ra` on RISC-V. This will usefully verify that `ra` is *not* stripped while the other GPRs are:\n\n```c\n\t\tif (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_STRIP_GPR)) {\n#if defined(CONFIG_RISCV)\n\t\t\t/* The return address (ra) is a code pointer and is intentionally not stripped. */\n\t\t\tif (expected_regs[i].index !\u003d 29 /* ra */)\n#endif\n\t\t\t{\n\t\t\t\texpected \u003d 0;\n\t\t\t}\n\t\t}\n```",
+      "isAi": true,
+      "revId": "f866328541c490ff22f0b6c5f5bff803b1eedf53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
