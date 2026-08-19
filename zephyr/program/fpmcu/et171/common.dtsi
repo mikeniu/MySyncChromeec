@@ -121,8 +121,10 @@
 };
 
 &spi0 {
-	p25q16: qspi-nor-flash {
+	p25q16: qspi-nor-flash@0 {
 		compatible = "andestech,qspi-nor", "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <50000000>;
 		size = <DT_SIZE_K(2048)>;
 		spi-frequency = <50000000>;
 		status = "okay";

@@ -25,8 +25,6 @@ static uint8_t expected_canary[kMaxReadSize];
 /* Forward declaration. */
 enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output);
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, system_is_locked);
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 

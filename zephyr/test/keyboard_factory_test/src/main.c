@@ -20,8 +20,6 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/ztest.h>
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, vnd_keyboard_pm_action, const struct device *,
 		enum pm_device_action);
 FAKE_VALUE_FUNC(int, pinctrl_configure_pins, const pinctrl_soc_pin_t *, uint8_t,

@@ -29,6 +29,7 @@
 		size = <0x80000>;
 		image-size = <0x50000>;
 		ec-ro {
+			size = <0x50000>;
 			fmap {
 				offset = <(0x50000 - 0x400)>;
 				/*

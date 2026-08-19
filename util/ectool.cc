@@ -992,6 +992,7 @@ int cmd_reboot_ec(int argc, char *argv[])
 		 * That reboots the AP as well, so unlikely we'll be around
 		 * to see a return code from this...
 		 */
+		sync();
 		rv = ec_command(EC_CMD_REBOOT, 0, NULL, 0, NULL, 0);
 		return (rv < 0 ? rv : 0);
 	}
@@ -1034,6 +1035,9 @@ int cmd_reboot_ec(int argc, char *argv[])
 			return -1;
 		}
 	}
+
+	if (p.cmd != EC_REBOOT_CANCEL)
+		sync();
 
 	rv = ec_command(EC_CMD_REBOOT_EC, 0, &p, sizeof(p), NULL, 0);
 	return (rv < 0 ? rv : 0);
@@ -1913,6 +1917,7 @@ int cmd_rollback_info(int argc, char *argv[])
 
 int cmd_apreset(int argc, char *argv[])
 {
+	sync();
 	return ec_command(EC_CMD_AP_RESET, 0, NULL, 0, NULL, 0);
 }
 
@@ -2893,6 +2898,7 @@ int cmd_stress_test(int argc, char *argv[])
 	if (reboot) {
 		printf("Issuing ec reboot. Expect a few early failed"
 		       " ioctl messages.\n");
+		sync();
 		ec_command(EC_CMD_REBOOT, 0, NULL, 0, NULL, 0);
 		sleep(2);
 	}
@@ -9528,7 +9534,6 @@ static void cmd_cbi_help(char *cmd)
 		"    [get_flag] is combination of:\n"
 		"      01b: Invalidate cache and reload data from EEPROM\n"
 		"    [set_flag] is combination of:\n"
-		"      01b: Skip write to EEPROM. Use for back-to-back writes\n"
 		"      10b: Set all fields to defaults first\n");
 }
 
