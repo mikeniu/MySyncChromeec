@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "542c682d_ddfc8988",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-08-19T09:08:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9cbef835_11646f5a",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 8
+      },
+      "revId": "7dbe01bed227f427fe6af27cc523996c77020104",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "22af6eb7_787c44f6",
@@ -60,6 +84,30 @@
       "writtenOn": "2026-08-19T02:55:02Z",
       "side": 1,
       "message": "These doesn\u0027t exist on the Skywalker branch. Remove these.",
+      "range": {
+        "startLine": 462,
+        "startChar": 0,
+        "endLine": 465,
+        "endChar": 60
+      },
+      "revId": "7dbe01bed227f427fe6af27cc523996c77020104",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "656b85c4_5f36ee58",
+        "filename": "include/ec_cmd_api.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-08-19T09:08:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cdcfd285_573ea830",
       "range": {
         "startLine": 462,
         "startChar": 0,
