@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35f9c7ea_8815024b",
+        "filename": "common/port80.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T23:08:53Z",
+      "side": 1,
+      "message": "This needs a unit test. The tests can call `hook_notify(HOOK_CHIPSET_RESUME);` to trigger this function.\n\nI suggest you add this to the [port80 console command tests](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/drivers/default/src/console_cmd/port80.c)",
+      "range": {
+        "startLine": 251,
+        "startChar": 0,
+        "endLine": 251,
+        "endChar": 67
+      },
+      "revId": "740ca262d5e71614f9cf3875f723c6813ea03e1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
