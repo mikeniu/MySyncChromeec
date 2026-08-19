@@ -95,6 +95,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "51c4dd97_efce8a66",
+        "filename": "docker/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T21:45:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7455d1d2_b70e1001",
+      "range": {
+        "startLine": 139,
+        "startChar": 4,
+        "endLine": 139,
+        "endChar": 6
+      },
+      "revId": "1be18b0d3baf829ff3a85344855cb78ec7269bf3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7638b757_922f4536",
@@ -132,6 +156,30 @@
       "side": 1,
       "message": "The paths set in `Dockerfile` are only used by the docker builder.  This sets the paths for the runtime environment inside the built docker image.\n\nAdded some comments as to why binman is searched in 2 locations.",
       "parentUuid": "7638b757_922f4536",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 76
+      },
+      "revId": "1be18b0d3baf829ff3a85344855cb78ec7269bf3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfb4d6a1_4c923e3e",
+        "filename": "docker/entrypoint.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T21:45:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "31917657_25e539bf",
       "range": {
         "startLine": 242,
         "startChar": 0,
