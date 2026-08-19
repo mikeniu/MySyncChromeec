@@ -144,6 +144,8 @@ When an assertion fails, the EC logs a software panic with the reason `PANIC_SW_
 For example, an assertion failure in `charge_state.c` at line `124` would have `info` encoded as:
 `('c' << 24) | ('h' << 16) | (124 & 0xffff)` => `0x6368007c`.
 
+*   **Extras Fields**: When extra registers are supported (`PANIC_MAX_EXTRAS`), `extra[0]` stores the full 32-bit line number, and `extra[1..5]` store up to 20 ASCII characters of the assertion filename packed 4 bytes per word.
+
 *   **Exception Field**: This field is populated with the thread ID (`k_tid_t` cast to `uint8_t`, which truncates it to 1 byte) of the thread that triggered the assertion.
 
 In Zephyr EC, asserts override Zephyr's `assert_post_action()` (see [zephyr/shim/src/panic.c](../zephyr/shim/src/panic.c#216)). It extracts the basename of the file path before encoding it, writes the panic data, and then reboots.
