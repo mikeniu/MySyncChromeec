@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "2bac3a3af8aecc1f6e603d356f2e53c44beff203",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64678091_e810bb1d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T04:46:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/8e7a3374-3484-4abb-99a2-e205f72849c5)]\n\n**Review Summary:**\n*   **Functionality:** The patch correctly implements the legacy `EC_CMD_FP_TEMPLATE` v0 tests, verifying decryption success, trivial positive match salt rejection, and graceful failure for corrupted tags.\n*   **Security:** N/A (test only changes).\n*   **Style:** Code style follows C++ conventions. The use of the `test_v0_template_layout` packed struct and `std::ranges` cleanly avoids manual pointer arithmetic and ensures clear buffer layout.\n*   **Testing:** Test coverage is excellent. The tests encompass the core success path and edge cases. All previous suggestions have been successfully implemented.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and tightly focused on the legacy template testing logic.",
+      "isAi": true,
+      "revId": "2bac3a3af8aecc1f6e603d356f2e53c44beff203",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
