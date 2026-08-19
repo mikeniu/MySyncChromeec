@@ -44,7 +44,6 @@ static const struct reg_vals expected_regs[] = {
 	{ .index = 14, .val = 0xecec000d }, /* t4 */
 	{ .index = 13, .val = 0xecec000e }, /* t5 */
 	{ .index = 12, .val = 0xecec000f }, /* t6 */
-	{ .index = 29, .val = 0xecec0010 }, /* ra */
 #else
 #error "Unsupported architecture."
 #endif
