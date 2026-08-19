@@ -117,16 +117,35 @@ __noreturn
 	void software_panic(uint32_t reason, uint32_t info);
 #endif /* !CONFIG_ZEPHYR */
 
-/**
- * Log a panic in the panic log, but don't halt the system. Normally
- * called on the subsequent reboot after panic detection.
- */
-void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
+struct arch_esf;
+struct k_thread;
 
 /**
- * Retrieve the currently stored panic reason + info.
+ * Capture ESF frame registers and hardware fault status to persistent panic
+ * data.
  */
-void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
+void panic_data_write_esf(const struct arch_esf *esf);
+
+/**
+ * Record an assertion failure into persistent panic data.
+ */
+void panic_data_write_assert(const char *path, unsigned int line);
+
+/**
+ * Record a watchdog warning snapshot into persistent panic data.
+ */
+void panic_data_write_watchdog_warning(uintptr_t pc,
+				       const struct k_thread *thread);
+
+/**
+ * Record a Zephyr fatal error when no architectural ESF is present.
+ */
+void panic_data_write_fatal(unsigned int reason, const struct k_thread *thread);
+
+/**
+ * Record a generic software panic into persistent panic data.
+ */
+void panic_data_write_sw(uint32_t reason, uint32_t info, uint8_t exception);
 
 /**
  * Get the panic reason field from a panic_data structure for the current
@@ -139,6 +158,30 @@ uint32_t panic_get_reason_reg(const struct panic_data *pdata);
  * architecture.
  */
 void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason);
+
+/**
+ * Get the panic info field from a panic_data structure for the current
+ * architecture.
+ */
+uint32_t panic_get_info_reg(const struct panic_data *pdata);
+
+/**
+ * Set the panic info field in a panic_data structure for the current
+ * architecture.
+ */
+void panic_set_info_reg(struct panic_data *pdata, uint32_t info);
+
+/**
+ * Get the panic exception/thread field from a panic_data structure for the
+ * current architecture.
+ */
+uint8_t panic_get_exception_reg(const struct panic_data *pdata);
+
+/**
+ * Set the panic exception/thread field in a panic_data structure for the
+ * current architecture.
+ */
+void panic_set_exception_reg(struct panic_data *pdata, uint8_t exception);
 
 /**
  * Check if stored panic data represents a new panic.

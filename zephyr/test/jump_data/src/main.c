@@ -444,14 +444,15 @@ ZTEST(jump_data, test_init_watchdog_reset)
 	 * Verify that a watchdog panic was logged if in RW, or NOT logged
 	 * if in RO.
 	 */
-	uint32_t reason, info;
-	uint8_t exception;
-	panic_get_reason(&reason, &info, &exception);
+	struct panic_data *pdata = panic_get_data();
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
-		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD,
-			      "Panic reason: %d", reason);
+		zassert_not_null(pdata);
+		zassert_equal(panic_get_reason_reg(pdata),
+			      PANIC_SW_WATCHDOG_HARD, "Panic reason: %d",
+			      panic_get_reason_reg(pdata));
 	} else {
-		zassert_not_equal(reason, PANIC_SW_WATCHDOG_HARD,
+		zassert_not_equal(panic_get_reason_reg(pdata),
+				  PANIC_SW_WATCHDOG_HARD,
 				  "Panic reason should not be set in RO");
 	}
 }
