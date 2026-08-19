@@ -59,7 +59,7 @@ ectool-objs=ectool.o ectool_keyscan.o ec_flash.o $(comm-objs)
 ectool-objs+=ectool_i2c.o
 ectool-objs+=ectool_pdc_trace.o
 ectool-objs+=ectool_pdc_pcap.o
-ectool-objs+=../common/crc.o
+ectool-objs+=crc.o
 lbplay-objs=lbplay.o $(comm-objs)
 $(out)/util/lbplay: HOST_LDFLAGS+=$(LIBFTDIUSB_HOST_LDLIBS)
 
@@ -102,4 +102,4 @@ $(out)/ipi_table_gen.inc: $(out)/util/gen_ipi_table
 	$(call quiet,ipi_table,IPITBL )
 endif
 
-cbi-util-objs=../common/crc8.o ../common/cbi.o
+cbi-util-objs=crc8.o ../common/cbi.o
