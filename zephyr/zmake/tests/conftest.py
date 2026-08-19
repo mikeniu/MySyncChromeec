@@ -6,8 +6,14 @@
 
 import os
 import pathlib
+import sys
 
-# pylint: disable=import-error
+
+# Ensure local zmake source tree is used during testing instead of any
+# pre-installed package in the chroot.
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+
+# pylint: disable=import-error,wrong-import-position
 import hypothesis
 import pytest
 import zmake.zmake as zm
