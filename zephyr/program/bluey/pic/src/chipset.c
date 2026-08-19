@@ -44,9 +44,10 @@ DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_pic,
 
 static void board_chipset_hard_off_pic(void)
 {
-	hook_call_deferred(&disable_pp5000_data,
-			   (5000 + CONFIG_CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
-				   USEC_PER_MSEC);
+	hook_call_deferred(
+		&disable_pp5000_data,
+		(5000 + CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
+			USEC_PER_MSEC);
 }
 DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_chipset_hard_off_pic,
 	     HOOK_PRIO_DEFAULT);
