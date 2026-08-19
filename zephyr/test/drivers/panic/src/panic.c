@@ -472,6 +472,13 @@ ZTEST(panic, test_panic_data_write_assert)
 	zassert_equal(panic_get_info_reg(pdata), expected_info);
 	zassert_equal(panic_get_exception_reg(pdata),
 		      (uint8_t)(uintptr_t)k_current_get());
+	zassert_equal(panic_get_extra_reg(pdata, 0), 124);
+	uint32_t chunk1 = ('c' << 0) | ('h' << 8) | ('a' << 16) | ('r' << 24);
+	uint32_t chunk2 = ('g' << 0) | ('e' << 8) | ('.' << 16) | ('c' << 24);
+
+	zassert_equal(panic_get_extra_reg(pdata, 1), chunk1);
+	zassert_equal(panic_get_extra_reg(pdata, 2), chunk2);
+	zassert_equal(panic_get_extra_reg(pdata, 3), 0);
 }
 
 ZTEST(panic, test_panic_data_write_assert_no_file)
@@ -511,6 +518,7 @@ ZTEST(panic, test_panic_data_write_fatal)
 	zassert_equal(panic_get_info_reg(pdata), 42);
 	zassert_equal(panic_get_exception_reg(pdata),
 		      (uint8_t)(uintptr_t)k_current_get());
+	zassert_true(panic_get_extra_reg(pdata, 0) >= 0);
 }
 
 ZTEST(panic, test_panic_host_event)

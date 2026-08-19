@@ -150,6 +150,13 @@ void panic_data_print(const struct panic_data *pdata)
 	PANIC_PRINT_REGS(NULL, riscv.regs[10], S1);
 	PANIC_PRINT_REGS(NULL, riscv.regs[11], S0);
 #endif
+	for (size_t i = 0; i < PANIC_MAX_EXTRAS; ++i) {
+		uint32_t extra = panic_get_extra_reg(pdata, i);
+
+		if (extra != 0) {
+			panic_printf("  extra[%zu] = 0x%08X\n", i, extra);
+		}
+	}
 }
 
 /**
@@ -285,6 +292,18 @@ void panic_data_write_assert(const char *path, unsigned int line)
 
 		info = (filename[0] << 24) | (filename[1] << 16) |
 		       (line & 0xffff);
+
+		panic_set_extra_reg(pdata, 0, line);
+		for (size_t i = 1; i < PANIC_MAX_EXTRAS; ++i) {
+			uint32_t chunk = 0;
+
+			for (size_t b = 0; b < sizeof(uint32_t); ++b) {
+				char ch = *filename ? *filename++ : 0;
+
+				chunk |= ((uint32_t)(uint8_t)ch) << (b * 8);
+			}
+			panic_set_extra_reg(pdata, i, chunk);
+		}
 	} else {
 		info = (uint32_t)-1;
 	}
@@ -316,6 +335,7 @@ void panic_data_write_fatal(unsigned int reason, const struct k_thread *thread)
 	panic_set_reason_reg(pdata, PANIC_ZEPHYR_FATAL_ERROR);
 	panic_set_info_reg(pdata, (uint32_t)reason);
 	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+	panic_set_extra_reg(pdata, 0, k_uptime_get_32());
 
 	panic_data_finalize(pdata);
 }
