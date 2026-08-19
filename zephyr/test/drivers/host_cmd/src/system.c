@@ -33,4 +33,14 @@ ZTEST(hc_system, test_reboot_ec)
 		      "Unexpected flags %x", system_reset_fake.arg0_history[0]);
 }
 
+ZTEST(hc_system, test_uptime_info)
+{
+	struct ec_response_uptime_info resp = { 0 };
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_RESPONSE(EC_CMD_GET_UPTIME_INFO, 0, resp);
+
+	zassert_ok(host_command_process(&args));
+	zassert_equal(sizeof(resp), args.response_size);
+}
+
 ZTEST_SUITE(hc_system, drivers_predicate_post_main, NULL, NULL, NULL, NULL);

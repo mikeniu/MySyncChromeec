@@ -28,6 +28,12 @@
 		smp_c31n2313 {
 			compatible = "smp,c31n2313","battery-smart";
 		};
+		celxpert_b340543 {
+			compatible = "celxpert,b340543","battery-smart";
+		};
+		dynapack_b140336 {
+			compatible = "dynapack,b140336","battery-smart";
+		};
 	};
 
 	gpio-interrupts {
@@ -218,6 +224,7 @@
 		 /delete-node/ pstate;
 
 		 ec-ro {
+			size = <(0x60000 - (0x1000 * 2))>;
 			fmap {
 				offset =  <(0x60000 - (0x1000 * 2) - 0x400)>;
 				/*

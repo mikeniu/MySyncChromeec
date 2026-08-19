@@ -103,9 +103,8 @@ tests:
     - default/boards/native_sim.overlay
   drivers.default.console_cmds_ro:
     timeout: 360
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RO
     extra_configs:
+    - CONFIG_CROS_EC_RO=y
     - CONFIG_LINK_TEST_SUITE_DEFAULT_CONSOLE_CMDS=y
     - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
     - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=4096
@@ -116,9 +115,8 @@ tests:
     - default/boards/native_sim.overlay
   drivers.default.console_cmds_rw:
     timeout: 360
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RW
     extra_configs:
+    - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_DEFAULT_CONSOLE_CMDS=y
     - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
     - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=4096
@@ -252,21 +250,6 @@ tests:
     - prj.conf
     - ap_mux_control/prj.conf
     - ec_host_cmd.conf
-  drivers.ap_vdm_control:
-    timeout: 360
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_AP_VDM_CONTROL=y
-    extra_conf_files:
-    - prj.conf
-    - ap_vdm_control/prj.conf
-  drivers.ap_vdm_control.ec_host_cmd:
-    timeout: 360
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_AP_VDM_CONTROL=y
-    extra_conf_files:
-    - prj.conf
-    - ap_vdm_control/prj.conf
-    - ec_host_cmd.conf
   drivers.usbc_dp_mode:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_DP_MODE=y
@@ -275,21 +258,6 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_DP_MODE=y
     - CONFIG_PLATFORM_EC_USB_PD_DP21_MODE=y
-  drivers.ap_vdm_control_disabled:
-    extra_configs:
-    - CONFIG_PLATFORM_EC_USB_PD_VDM_AP_CONTROL=n
-    - CONFIG_LINK_TEST_SUITE_AP_VDM_CONTROL=y
-    extra_conf_files:
-    - prj.conf
-    - ap_vdm_control/prj.conf
-  drivers.ap_vdm_control_disabled.ec_host_cmd:
-    extra_configs:
-    - CONFIG_PLATFORM_EC_USB_PD_VDM_AP_CONTROL=n
-    - CONFIG_LINK_TEST_SUITE_AP_VDM_CONTROL=y
-    extra_conf_files:
-    - prj.conf
-    - ap_vdm_control/prj.conf
-    - ec_host_cmd.conf
   drivers.bmi3xx:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_BMI3XX=y
@@ -317,6 +285,16 @@ tests:
     - CONFIG_PLATFORM_EC_VOLUME_BUTTONS=y
     - CONFIG_PLATFORM_EC_EMULATED_SYSRQ=y
     - CONFIG_PLATFORM_EC_HOSTCMD_POWER_BUTTON_PRESS=y
+  drivers.button.keyboard_pb:
+    timeout: 360
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_BUTTON=y
+    - CONFIG_PLATFORM_EC_CMD_BUTTON=y
+    - CONFIG_PLATFORM_EC_VOLUME_BUTTONS=y
+    - CONFIG_PLATFORM_EC_EMULATED_SYSRQ=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_POWER_BUTTON_PRESS=y
+    - CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD=y
+    - CONFIG_PLATFORM_EC_POWER_BUTTON_X86=y
   drivers.button.ec_host_cmd:
     timeout: 360
     extra_configs:
@@ -338,6 +316,11 @@ tests:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./button/detachable_led.overlay
+  drivers.battery_config:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_BATTERY_CONFIG=y
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
   drivers.cbi_flash:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CBI_FLASH=y
@@ -537,6 +520,16 @@ tests:
     - prj.conf
     - console_cmd_mfallow/prj.conf
     - ec_host_cmd.conf
+  drivers.console_buffer:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_CONSOLE_BUFFER=y
+    - CONFIG_IRQ_OFFLOAD=y
+    extra_conf_files:
+    - prj.conf
+    - default/prj.conf
+    extra_dtc_overlay_files:
+    - default/boards/native_sim.overlay
+
   drivers.cros_flash:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CROS_FLASH=y
@@ -949,6 +942,16 @@ tests:
     extra_conf_files:
     - prj.conf
     - ./lis2dh/prj.conf
+  drivers.lis2dh_no_int:
+    timeout: 15
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_LIS2DH=y
+    extra_dtc_overlay_files:
+    - ./boards/native_sim.overlay
+    - ./lis2dh/sensor_no_int.dts
+    extra_conf_files:
+    - prj.conf
+    - ./lis2dh/prj.conf
   drivers.lsm6dsm:
     timeout: 15
     extra_configs:
@@ -1056,8 +1059,27 @@ tests:
     - CONFIG_LOG_PRINTK=y
     extra_conf_files:
     - prj.conf
-  drivers.panic_output:
+  drivers.panic.ro:
     extra_configs:
+    - CONFIG_CROS_EC_RO=y
+    - CONFIG_LINK_TEST_SUITE_PANIC=y
+    - CONFIG_PLATFORM_EC_PANIC_HOST_EVENT=y
+  drivers.panic.rw:
+    extra_configs:
+    - CONFIG_CROS_EC_RW=y
+    - CONFIG_LINK_TEST_SUITE_PANIC=y
+    - CONFIG_PLATFORM_EC_PANIC_HOST_EVENT=y
+  drivers.panic_output.ro:
+    extra_configs:
+    - CONFIG_CROS_EC_RO=y
+    - CONFIG_LINK_TEST_SUITE_PANIC_OUTPUT=y
+    - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH=y
+    - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED=y
+    - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
+    - CONFIG_ZTEST_THREAD_PRIORITY=1
+  drivers.panic_output.rw:
+    extra_configs:
+    - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_PANIC_OUTPUT=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED=y
@@ -1067,6 +1089,7 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_PANIC_OUTPUT=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH=y
+    - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED=y
     - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
     - CONFIG_ZTEST_THREAD_PRIORITY=1
     extra_conf_files:
@@ -1087,9 +1110,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWERSEQ_S0IX=y
     - CONFIG_PLATFORM_EC_EMULATED_SYSRQ=y
   drivers.power_host_sleep_ro:
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RO
     extra_configs:
+    - CONFIG_CROS_EC_RO=y
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
     # Make tests independent of chipset specific code
     - CONFIG_AP_ARM_QUALCOMM_SC7280=n
@@ -1098,9 +1120,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWERSEQ_HOST_SLEEP=y
     - CONFIG_PLATFORM_EC_POWERSEQ_S0IX=y
   drivers.power_host_sleep_rw:
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RW
     extra_configs:
+    - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
     # Make tests independent of chipset specific code
     - CONFIG_AP_ARM_QUALCOMM_SC7280=n
@@ -1349,10 +1370,9 @@ tests:
     - common
     - system
     extra_configs:
+    - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_SYSTEM=y
     - CONFIG_POWER_SEQUENCE_MOCK=y
-    extra_args:
-    - EXTRA_CFLAGS=-DSECTION_IS_RW
   drivers.system.ec_host_cmd:
     tags:
     - common
@@ -1611,12 +1631,14 @@ tests:
   drivers.usbc_ppc:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_PPC=y
+    - CONFIG_PLATFORM_EC_USB_PD_VBUS_DETECT_PPC=y
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
     - ./usbc_ppc/ppc_alts.dts
   drivers.usbc_ppc.ec_host_cmd:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_PPC=y
+    - CONFIG_PLATFORM_EC_USB_PD_VBUS_DETECT_PPC=y
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
     - ./usbc_ppc/ppc_alts.dts
@@ -1746,19 +1768,6 @@ tests:
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
-  drivers.host_command_memory_dump:
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_HOST_COMMAND_MEMORY_DUMP=y
-    - CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP=y
-    - CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042=y
-  drivers.host_command_memory_dump.ec_host_cmd:
-    extra_configs:
-    - CONFIG_LINK_TEST_SUITE_HOST_COMMAND_MEMORY_DUMP=y
-    - CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP=y
-    - CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042=y
-    extra_conf_files:
-    - prj.conf
-    - ec_host_cmd.conf
   drivers.anx7452:
     extra_conf_files:
     - prj.conf
@@ -1832,6 +1841,15 @@ tests:
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
+  drivers.body_detection_v1:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_BODY_DETECTION=y
+    - CONFIG_PLATFORM_EC_BODY_DETECTION=y
+    - CONFIG_BODY_DETECTION_ALOGIRTHM_V1=y
+    - CONFIG_PLATFORM_EC_BODY_DETECTION_DYNAMIC_INDEX=y
+    - CONFIG_PLATFORM_EC_BODY_DETECTION_ALWAYS_ENABLE_IN_S0=y
+    - CONFIG_PLATFORM_EC_BODY_DETECTION_NOTIFY_MODE_CHANGE=y
+    - CONFIG_PLATFORM_EC_GESTURE_HOST_DETECTION=y
   drivers.watchdog_helper:
     extra_configs:
     - CONFIG_PLATFORM_EC_WATCHDOG_HELPER=y
@@ -1849,6 +1867,22 @@ tests:
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
+  drivers.watchdog.ro:
+    extra_configs:
+    - CONFIG_CROS_EC_RO=y
+    - CONFIG_LINK_TEST_SUITE_WATCHDOG=y
+    - CONFIG_ZTEST_THREAD_PRIORITY=1
+    extra_conf_files:
+    - prj.conf
+    - watchdog/prj.conf
+  drivers.watchdog.rw:
+    extra_configs:
+    - CONFIG_CROS_EC_RW=y
+    - CONFIG_LINK_TEST_SUITE_WATCHDOG=y
+    - CONFIG_ZTEST_THREAD_PRIORITY=1
+    extra_conf_files:
+    - prj.conf
+    - watchdog/prj.conf
   drivers.one_wire_uart.keyboard:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
@@ -1876,11 +1910,31 @@ tests:
     - default/prj.conf
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
+  drivers.smart_battery.replace_nulls:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_SMART_BATTERY=y
+    - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
+    - CONFIG_PLATFORM_EC_BATTERY_REPLACE_NULLS=y
+    extra_conf_files:
+    - prj.conf
+    - default/prj.conf
+    extra_dtc_overlay_files:
+    - default/boards/native_sim.overlay
   drivers.smart_battery.present:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SMART_BATTERY_PRESENT=y
     - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
     - CONFIG_PLATFORM_EC_BATTERY_PRESENT_NONE=y
+    extra_conf_files:
+    - prj.conf
+    - default/prj.conf
+    extra_dtc_overlay_files:
+    - default/boards/native_sim.overlay
+  drivers.smart_battery.deadband:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_SMART_BATTERY_DEADBAND=y
+    - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
+    - CONFIG_PLATFORM_EC_BATTERY_DEADBAND=y
     extra_conf_files:
     - prj.conf
     - default/prj.conf

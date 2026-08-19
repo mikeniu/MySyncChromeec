@@ -16,6 +16,14 @@ if(DEFINED CONFIG_BOARD_ATRIARVP_RTK)
 
 endif()
 
+if(DEFINED CONFIG_BOARD_PENGHU)
+	project(penghu)
+	# TODO: We are using rvp_board_power.c as a starting point. If any modifications
+	# are needed later, we can create a new variant. Otherwise, if no changes are
+	# required, rvp_board_power.c should be renamed to common_board_power.c.
+	zephyr_library_sources("src/rvp_board_power.c")
+endif()
+
 zephyr_include_directories("include/")
 
 # TODO(b/501105189): Selection of ISH-specific config files happens in BUILD.py.

@@ -169,16 +169,18 @@ void __unused plat_sleep_time(unsigned long timeInMs);
 #define TIME_MEASURE_STOP_AND_RESTART(name, x)
 #define TIME_MEASURE_RESET(name)
 #endif
+
 /**
  * @brief Allocates a block of memory of a specified size and number of
- * elements.
+ * elements, zero-initializing all bytes.
  *
- * @param[in] count The number of elements to allocate.
- * @param[in] size The size of each element in bytes.
+ * @param[in] count The number of elements to allocate (must be > 0).
+ * @param[in] size The size of each element in bytes (must be > 0).
  *
- * @return Pointer to the allocated memory or NULL if the allocation failed.
+ * @return Pointer to the allocated memory block initialized to zero,
+ * or panic if the allocation failed or if count/size is 0.
  */
-void *__unused sys_alloc(size_t count, size_t size);
+void *sys_alloc(size_t count, size_t size);
 
 /**
  * @brief Releases a block of shared memory.
@@ -186,12 +188,16 @@ void *__unused sys_alloc(size_t count, size_t size);
  * @param[in] data A pointer to the memory block to be released.
  *
  */
-void __unused sys_free(void *data);
+void sys_free(void *data);
 
-static inline void plat_free(void *x)
-{
-	sys_free(x);
-}
+/**
+ * @brief Releases a block of memory previously allocated by plat_alloc() or
+ * plat_calloc().
+ *
+ * @param[in] x Pointer to the memory block to be freed.
+ *
+ */
+void plat_free(void *x);
 
 // TODO (b/373435445): Combine PLAT_FREE and plat_free.
 /**
@@ -200,42 +206,29 @@ static inline void plat_free(void *x)
  * @param[in] x A pointer to a pointer to the memory block to be freed.
  *
  */
-static inline void PLAT_FREE(void **x)
-{
-	assert(x != NULL && *x != NULL);
-	plat_free(*x);
-	*x = NULL;
-}
+void PLAT_FREE(void **x);
 
 /**
- * @brief Allocates a block of memory of the specified size.
+ * @brief Allocates a block of memory of the specified size, zero-initializing
+ * all bytes.
  *
  * @param[in] size The size of the memory block to allocate, in bytes.
  *
- * @return Pointer to the allocated memory or NULL if the allocation failed.
+ * @return Pointer to the allocated memory or panic if the allocation failed.
  */
-static inline void *plat_alloc(size_t size)
-{
-	return sys_alloc(1, size);
-}
+void *plat_alloc(size_t size);
 
 /**
  * @brief Allocates memory for an array of count elements of size bytes each and
  * initializes all bytes to zero.
  *
- * @param[in] count Number of elements to allocate.
- * @param[in] size Size of each element.
+ * @param[in] count Number of elements to allocate (must be > 0).
+ * @param[in] size Size of each element (must be > 0).
  *
- * @return Pointer to allocated memory initialized to zero, or NULL if
- * allocation failed.
+ * @return Pointer to allocated memory initialized to zero, or panic if
+ * allocation failed or if count/size is 0.
  */
-static inline void *plat_calloc(size_t count, size_t size)
-{
-	void *ptr = sys_alloc(1, count * size);
-	if (ptr)
-		memset(ptr, 0, count * size);
-	return ptr;
-}
+void *plat_calloc(size_t count, size_t size);
 
 /**
  * @brief Reallocates the given memory block to a new size.
@@ -243,17 +236,9 @@ static inline void *plat_calloc(size_t count, size_t size)
  * @param[in] data Pointer to the previously allocated memory block.
  * @param[in] size New size in bytes for the memory block.
  *
- * @return Pointer to the reallocated memory block, or NULL if reallocation
- * failed.
+ * @return Pointer to the reallocated block, NULL if size is 0, or panic if
+ * reallocation failed.
  */
-static inline void *plat_realloc(void *data, size_t size)
-{
-	void *new_ptr = sys_alloc(1, size);
-	if (new_ptr && data) {
-		memcpy(new_ptr, data, size);
-		sys_free(data);
-	}
-	return new_ptr;
-}
+void *plat_realloc(void *data, size_t size);
 
 #endif /* ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_PAL_SENSOR_H_ */

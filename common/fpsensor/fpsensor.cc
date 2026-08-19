@@ -49,7 +49,7 @@
 #error "fpsensor requires RNG"
 #endif
 
-#if defined(SECTION_IS_RO)
+#if defined(CONFIG_CROS_EC_RO)
 #error "fpsensor code should not be in RO image."
 #endif
 
@@ -108,6 +108,16 @@ static uint32_t enroll_session;
 static uint32_t fp_process_enroll(void)
 {
 	int percent = 0;
+
+	/* Prevent enrollment if we have reached max capacity. */
+	if (global_context.templ_valid >= FP_MAX_FINGER_COUNT) {
+		CPRINTS("Error: Max templates reached.");
+		fp_enrollment_finish(nullptr);
+		global_context.sensor_mode &= ~FP_MODE_ENROLL_SESSION;
+		enroll_session &= ~FP_MODE_ENROLL_SESSION;
+		return EC_MKBP_FP_ENROLL |
+		       EC_MKBP_FP_ERRCODE(EC_MKBP_FP_ERR_ENROLL_INTERNAL);
+	}
 
 	if (global_context.template_newly_enrolled != FP_NO_SUCH_TEMPLATE)
 		CPRINTS("Warning: previously enrolled template has not been "
@@ -515,44 +525,11 @@ static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
 	r->template_info.template_dirty = global_context.templ_dirty;
 	r->template_info.template_version = FP_TEMPLATE_FORMAT_VERSION;
 
-	if (args->version == 2) {
-		struct ec_response_fp_info_v2 *r_v2 =
-			static_cast<ec_response_fp_info_v2 *>(args->response);
-		/* Convert to v2 format. The formats differ only in the frame
-		 * array, which is located at the end of the structures
-		 *
-		 * SAFETY: 'r->image_frame_params' and r_v2->image_frame_params
-		 * overlap inexactly, but copying data is safe because we copy
-		 * data forward (from the first field of the structure to the
-		 * last).
-		 */
-		for (int i = 0; i < FP_MAX_CAPTURE_TYPES; i++) {
-			r_v2->image_frame_params[i].frame_size =
-				r->image_frame_params[i].frame_size;
-			r_v2->image_frame_params[i].pixel_format =
-				r->image_frame_params[i].pixel_format;
-			r_v2->image_frame_params[i].width =
-				r->image_frame_params[i].width;
-			r_v2->image_frame_params[i].height =
-				r->image_frame_params[i].height;
-			r_v2->image_frame_params[i].bpp =
-				r->image_frame_params[i].bpp;
-			r_v2->image_frame_params[i].fp_capture_type =
-				r->image_frame_params[i].fp_capture_type;
-			r_v2->image_frame_params[i].reserved =
-				r->image_frame_params[i].reserved;
-		}
-		response_size = sizeof(struct ec_response_fp_info_v2) +
-				FP_MAX_CAPTURE_TYPES *
-					sizeof(struct fp_image_frame_params);
-	}
-
 	args->response_size = response_size;
 
 	return EC_RES_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info,
-		     EC_VER_MASK(2) | EC_VER_MASK(3));
+DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info, EC_VER_MASK(3));
 
 BUILD_ASSERT(FP_CONTEXT_NONCE_BYTES == 12);
 
@@ -582,11 +559,15 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	 */
 	struct ec_fp_template_encryption_metadata *enc_info =
 		&fp_enc_buffer.metadata;
-	enc_info->struct_version = FP_TEMPLATE_FORMAT_VERSION;
+
+	CleanseWrapper<std::array<uint8_t, FP_CONTEXT_NONCE_BYTES> > nonce{};
+	CleanseWrapper<std::array<uint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES> >
+		encryption_salt{};
+	CleanseWrapper<std::array<uint8_t, FP_CONTEXT_TAG_BYTES> > tag{};
+
 	trng_init();
-	trng_rand_bytes(enc_info->nonce, FP_CONTEXT_NONCE_BYTES);
-	trng_rand_bytes(enc_info->encryption_salt,
-			FP_CONTEXT_ENCRYPTION_SALT_BYTES);
+	trng_rand_bytes(nonce.data(), nonce.size());
+	trng_rand_bytes(encryption_salt.data(), encryption_salt.size());
 	trng_exit();
 
 	if (fgr == global_context.template_newly_enrolled) {
@@ -603,7 +584,7 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	}
 
 	FpEncryptionKey key;
-	ret = derive_encryption_key(key, enc_info->encryption_salt,
+	ret = derive_encryption_key(key, encryption_salt,
 				    global_context.user_id,
 				    global_context.tpm_seed);
 	if (ret != EC_SUCCESS) {
@@ -623,12 +604,17 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	ret = aes_128_gcm_encrypt(key,
 				  encrypted_template_and_positive_match_salt,
 				  encrypted_template_and_positive_match_salt,
-				  enc_info->nonce, enc_info->tag);
+				  nonce, tag);
 	if (ret != EC_SUCCESS) {
 		OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
 		CPRINTS("fgr%d: Failed to encrypt template", fgr);
 		return EC_ERROR_UNAVAILABLE;
 	}
+
+	enc_info->struct_version = FP_TEMPLATE_FORMAT_VERSION;
+	std::ranges::copy(nonce, enc_info->nonce);
+	std::ranges::copy(encryption_salt, enc_info->encryption_salt);
+	std::ranges::copy(tag, enc_info->tag);
 
 	global_context.templ_dirty &= ~BIT(fgr);
 
