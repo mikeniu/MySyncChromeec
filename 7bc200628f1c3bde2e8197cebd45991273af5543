@@ -33,6 +33,24 @@
       "message": "Consider making this an #if #elif #else block so it\u0027s easier to follow the logic.",
       "revId": "7bc200628f1c3bde2e8197cebd45991273af5543",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c30c861_6841833c",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-19T19:25:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfe8c2aa_551a6a48",
+      "revId": "7bc200628f1c3bde2e8197cebd45991273af5543",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

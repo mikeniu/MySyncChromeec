@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcb0d1fe_8ba4c74e",
+        "filename": "zephyr/shim/src/host_command.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-19T19:25:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09b55af1_cebec322",
+      "range": {
+        "startLine": 16,
+        "startChar": 13,
+        "endLine": 16,
+        "endChar": 44
+      },
+      "revId": "a605bddb3bcec390d9a354f888865cca0af180d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a30065f8_e3c7c654",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-06-30T23:21:18Z",
       "side": 1,
       "message": "Isn\u0027t this guaranteed to be false?  Is it possible to define both CONFIG_EC_HOST_CMD and CONFIG_PLATFROM_EC_HOST_CMD?",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 26
+      },
+      "revId": "a605bddb3bcec390d9a354f888865cca0af180d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "787a95ac_9453338a",
+        "filename": "zephyr/shim/src/host_command_legacy.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-19T19:25:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a30065f8_e3c7c654",
       "range": {
         "startLine": 23,
         "startChar": 0,
