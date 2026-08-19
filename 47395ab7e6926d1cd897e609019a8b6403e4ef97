@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2d399ac_d1dc769e",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-19T20:20:18Z",
+      "side": 1,
+      "message": "remove",
+      "range": {
+        "startLine": 230,
+        "startChar": 0,
+        "endLine": 230,
+        "endChar": 50
+      },
+      "revId": "47395ab7e6926d1cd897e609019a8b6403e4ef97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
