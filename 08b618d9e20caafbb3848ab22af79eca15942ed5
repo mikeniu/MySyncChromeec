@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dd632ab_db5fc9fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-19T22:10:26Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d605b614_58341c2c",
+      "revId": "08b618d9e20caafbb3848ab22af79eca15942ed5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "946c7252_bdc35d6a",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] It looks like `entropy-y\u003dentropy.o` was accidentally deleted right above this line.",
       "isAi": true,
+      "revId": "08b618d9e20caafbb3848ab22af79eca15942ed5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "69a7b2a4_db1a79de",
+        "filename": "test/build.mk",
+        "patchSetId": 7
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-19T22:10:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "946c7252_bdc35d6a",
       "revId": "08b618d9e20caafbb3848ab22af79eca15942ed5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b310ac0_78cf2dd2",
+        "filename": "test/flash_pre_init_protect.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-19T22:10:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e12ca7c_ce059fd2",
+      "revId": "08b618d9e20caafbb3848ab22af79eca15942ed5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b281696_df4e48a7",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Consider updating the copyright year to 2026 for this new file.",
       "isAi": true,
+      "revId": "08b618d9e20caafbb3848ab22af79eca15942ed5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cab7522_d3948ba8",
+        "filename": "test/flash_pre_init_protect.tasklist",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-19T22:10:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b281696_df4e48a7",
       "revId": "08b618d9e20caafbb3848ab22af79eca15942ed5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
