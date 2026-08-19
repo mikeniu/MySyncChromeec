@@ -77,7 +77,7 @@ DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, DT_FOREACH_CHILD, GEN_PINS_NODES)
  * Array of pointers to each pin node
  */
 #define PINS_NODE_PTR(id) &PINS_NODE(id),
-const struct led_pins_node_t *pins_node[] = {
+static const struct led_pins_node_t *pins_node[] = {
 	DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, DT_FOREACH_CHILD,
 						PINS_NODE_PTR)
 };
@@ -86,7 +86,7 @@ const struct led_pins_node_t *pins_node[] = {
  * Set all the GPIO pins defined in the node to the defined value,
  * to enable the color.
  */
-void led_set_color_with_node(const struct led_pins_node_t *pins_node)
+static void led_set_color_with_node(const struct led_pins_node_t *pins_node)
 {
 	struct gpio_pin_t *gpio_pins = (struct gpio_pin_t *)pins_node->pins;
 
@@ -176,7 +176,7 @@ static int gpio_set_brightness(enum ec_led_id led_id, const uint8_t *brightness)
 	return EC_SUCCESS;
 }
 
-int gpio_is_supported(enum ec_led_id led_id)
+static int gpio_is_supported(enum ec_led_id led_id)
 {
 	static int supported_leds = -1;
 
