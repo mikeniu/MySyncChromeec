@@ -62,6 +62,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cd697ab9_9a291be3",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-19T04:18:06Z",
+      "side": 1,
+      "message": "I can create an equivalent test in `zephyr/test/hwtest`. However, I see that al tests are still defined for `bloonchipper` and `helipilot` in the `ec-legacy` branch",
+      "parentUuid": "1888d425_e024494a",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 45
+      },
+      "revId": "a019b3ffbe19ad1dcfbc48490bf08072ed90f945",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6b04a8f4_46a9dd55",
         "filename": "test/run_device_tests.py",
         "patchSetId": 9
