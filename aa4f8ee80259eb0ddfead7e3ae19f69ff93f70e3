@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0befbc6_3eaebec8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-19T18:29:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/a7a97553-8473-4b77-9478-403c0e3f25f5)]\n\n### Review Summary\n*   **Functionality:** Centralizing test cleanup logic into the `before_fpsensor_auth_commands` fixture applies the DRY principle and ensures every test begins in a known clean state. The test suite is now robust against lingering side-effects from prior test cases.\n*   **Style \u0026 Consistency:** The implementation relies on Zephyr\u0027s standard ZTEST framework setup/before hooks cleanly and consistently. The changes adhere well to the established testing patterns.\n*   **Security:** N/A (Test code refactoring).\n*   **Testing \u0026 Test Coverage:** The refactoring correctly maintains existing test coverage. As noted in earlier reviews, removing the mid-test reset in `test_fp_command_establish_session_deny` also strengthens the verification logic by validating the system\u0027s resilience after a denied command.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped, well-contained, and focused solely on a single, clear objective of test fixture refactoring.\n\nTAG\u003dagy\nCONV\u003dd4e86096-344f-4767-af2f-5eee3873ee46",
+      "isAi": true,
+      "revId": "aa4f8ee80259eb0ddfead7e3ae19f69ff93f70e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
