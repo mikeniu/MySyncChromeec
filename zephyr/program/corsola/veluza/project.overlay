@@ -380,3 +380,7 @@
 	enable-pins = <&en_pp5000_usb_a0_vbus
 		       &en_pp5000_usb_a1_vbus_x>;
 };
+
+&battery_passthru {
+	devices = [0f];
+};
