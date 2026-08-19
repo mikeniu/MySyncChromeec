@@ -16,8 +16,6 @@ extern char mock_end_of_ram_data[CONFIG_PLATFORM_EC_PRESERVED_END_OF_RAM_SIZE];
 
 struct jump_data *get_jump_data(void);
 int panic_data_init(void);
-struct panic_data *panic_data_reset(struct panic_data *pdata);
-void panic_data_finalize(struct panic_data *pdata);
 
 /**
  * @brief Returns a pointer to an object (such as a struct jump_data) of type
@@ -444,13 +442,17 @@ ZTEST(jump_data, test_init_watchdog_reset)
 	 * Verify that a watchdog panic was logged if in RW, or NOT logged
 	 * if in RO.
 	 */
-	uint32_t reason, info;
-	uint8_t exception;
-	panic_get_reason(&reason, &info, &exception);
+	struct panic_data *pdata = panic_get_data();
+
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
+		zassert_not_null(pdata, "Panic data missing in RW");
+		uint32_t reason = panic_get_reason_reg(pdata);
+
 		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD,
 			      "Panic reason: %d", reason);
 	} else {
+		uint32_t reason = panic_get_reason_reg(pdata);
+
 		zassert_not_equal(reason, PANIC_SW_WATCHDOG_HARD,
 				  "Panic reason should not be set in RO");
 	}

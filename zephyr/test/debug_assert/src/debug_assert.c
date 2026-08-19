@@ -14,9 +14,7 @@ DEFINE_FAKE_VOID_FUNC(system_reset, int);
 
 ZTEST(debug_assert, test_assert_false)
 {
-	uint32_t reason;
-	uint32_t info;
-	uint8_t exception;
+	struct panic_data *pdata;
 	int linenum;
 	const char *filename;
 
@@ -25,31 +23,28 @@ ZTEST(debug_assert, test_assert_false)
 	__ASSERT(false, "Test false assert");
 
 	zassert_equal(system_reset_fake.call_count, 1);
-	panic_get_reason(&reason, &info, &exception);
-	zassert_equal(PANIC_SW_ASSERT, reason);
+	pdata = panic_get_data();
+	zassert_not_null(pdata);
+	zassert_equal(PANIC_SW_ASSERT, panic_get_reason_reg(pdata));
 	if (!IS_ENABLED(CONFIG_ASSERT_NO_FILE_INFO)) {
+		uint32_t info = panic_get_info_reg(pdata);
+
 		zassert_equal(linenum, info & 0xffff);
 		zassert_equal(filename[0], (info >> 24) & 0xff);
 		zassert_equal(filename[1], (info >> 16) & 0xff);
 	} else {
-		zassert_equal(info, -1);
+		zassert_equal(panic_get_info_reg(pdata), -1);
 	}
-	zassert_equal((uint8_t)(uintptr_t)k_current_get(), exception);
+	zassert_equal((uint8_t)(uintptr_t)k_current_get(),
+		      panic_get_exception_reg(pdata));
 }
 
 ZTEST(debug_assert, test_assert_true)
 {
-	uint32_t reason;
-	uint32_t info;
-	uint8_t exception;
-
 	__ASSERT(true, "Test true assert");
 
 	zassert_equal(system_reset_fake.call_count, 0);
-	panic_get_reason(&reason, &info, &exception);
-	zassert_equal(0, reason);
-	zassert_equal(0, info);
-	zassert_equal(0, exception);
+	zassert_is_null(panic_get_data());
 }
 
 static void reset(void *data)
