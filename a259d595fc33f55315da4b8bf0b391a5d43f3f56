@@ -46,6 +46,30 @@
       },
       "revId": "a259d595fc33f55315da4b8bf0b391a5d43f3f56",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b18cc79e_8829e2f5",
+        "filename": "util/dut_handlers/alos.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-19T02:36:52Z",
+      "side": 1,
+      "message": "`_adb_shell` is a wrapper for running \n```\nadb -s \u003ctarget\u003e shell \u003ccommand\u003e\n```\nWhile this has the syntax\n```\nadb -s \u003ctarget\u003e wait-for-device\n```\nI can create a helper function for adb commands so that it handles the `adb -s \u003ctarget\u003e` portion.",
+      "parentUuid": "3a726236_dfbb0046",
+      "range": {
+        "startLine": 136,
+        "startChar": 8,
+        "endLine": 137,
+        "endChar": 42
+      },
+      "revId": "a259d595fc33f55315da4b8bf0b391a5d43f3f56",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
