@@ -66,10 +66,25 @@ static int bat_drop_voltage = 0;
 
 static enum battery_type board_battery_type = BATTERY_TYPE_COUNT;
 static enum battery_present batt_pres_prev = BP_NOT_SURE;
+static int prev_temp;
+
+#ifdef CONFIG_ZTEST
+void test_meliks_battery_reset(void)
+{
+	temp_zone = NORMAL_TEMP;
+	prev_temp = 0;
+	board_battery_type = BATTERY_TYPE_COUNT;
+	batt_pres_prev = BP_NOT_SURE;
+	bat_drop_voltage = 0;
+	bat_cell_over_volt_flag = 0;
+	bat_cell_ovp_volt = 0;
+	design_capacity = 0;
+	charging_data = NULL;
+}
+#endif
 
 void find_battery_thermal_zone(int bat_temp)
 {
-	static int prev_temp;
 	int i;
 
 	if (bat_temp < prev_temp) {

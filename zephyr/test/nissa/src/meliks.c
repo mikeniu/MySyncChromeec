@@ -54,6 +54,8 @@ static int drop_step_fake_count = 0;
 
 static void meliks_test_before(void *fixture)
 {
+	test_meliks_battery_reset();
+
 	RESET_FAKE(raa489000_enable_asgate);
 	RESET_FAKE(raa489000_set_output_current);
 	RESET_FAKE(raa489000_hibernate);

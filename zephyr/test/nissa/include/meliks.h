@@ -13,5 +13,6 @@ void meliks_callback_init(void);
 void power_handler(struct ap_power_ev_callback *cb,
 		   struct ap_power_ev_data data);
 void board_init_battery_type(void);
+void test_meliks_battery_reset(void);
 
 #endif /* ZEPHYR_TEST_NISSA_INCLUDE_MELIKS_H_ */
