@@ -83,6 +83,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a2c6dc8_5ac0aecc",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 2073,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-19T04:42:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82abbaf3_00ff042a",
+      "range": {
+        "startLine": 2073,
+        "startChar": 0,
+        "endLine": 2073,
+        "endChar": 68
+      },
+      "revId": "c614dc77d8629ffaf425ff498d1454ec49281638",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4dbd7628_51f60de6",
@@ -96,6 +120,30 @@
       "writtenOn": "2026-08-18T23:03:42Z",
       "side": 1,
       "message": "Do we have a constant/macro somewhere that we can use for this?",
+      "range": {
+        "startLine": 2264,
+        "startChar": 0,
+        "endLine": 2264,
+        "endChar": 21
+      },
+      "revId": "c614dc77d8629ffaf425ff498d1454ec49281638",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1b6133c_c3108642",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 2264,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-19T04:42:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4dbd7628_51f60de6",
       "range": {
         "startLine": 2264,
         "startChar": 0,
