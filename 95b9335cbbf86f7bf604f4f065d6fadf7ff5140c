@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f2f0d1e_6c6111ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-19T11:05:16Z",
+      "side": 1,
+      "message": "did a full ./twister run as well it passed",
+      "revId": "95b9335cbbf86f7bf604f4f065d6fadf7ff5140c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
