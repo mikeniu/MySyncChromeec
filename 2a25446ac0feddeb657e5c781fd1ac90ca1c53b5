@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34b877e5_44cd3d51",
+        "filename": "docker/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-08-19T00:57:46Z",
+      "side": 1,
+      "message": "should we check `main` before `master`?\nwhich is the common case moving forward?",
+      "range": {
+        "startLine": 71,
+        "startChar": 46,
+        "endLine": 71,
+        "endChar": 52
+      },
+      "revId": "2a25446ac0feddeb657e5c781fd1ac90ca1c53b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05787f33_b40778c4",
+        "filename": "docker/entrypoint.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-08-19T00:57:46Z",
+      "side": 1,
+      "message": "you\u0027re already running with `set -e`, is this needed?",
+      "range": {
+        "startLine": 118,
+        "startChar": 30,
+        "endLine": 118,
+        "endChar": 40
+      },
+      "revId": "2a25446ac0feddeb657e5c781fd1ac90ca1c53b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef3d455a_55d3c8b1",
+        "filename": "docker/entrypoint.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-08-19T00:57:46Z",
+      "side": 1,
+      "message": "since this is bash, how about using `pushd`, `popd`?",
+      "range": {
+        "startLine": 137,
+        "startChar": 12,
+        "endLine": 137,
+        "endChar": 16
+      },
+      "revId": "2a25446ac0feddeb657e5c781fd1ac90ca1c53b5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
