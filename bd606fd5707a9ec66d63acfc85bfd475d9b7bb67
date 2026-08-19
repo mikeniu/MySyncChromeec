@@ -16,6 +16,213 @@
       "message": "The comment is \"Name the property irq-gpios (Zephyr GPIO convention)\nPass it to `gpio_disable_dt_interrupt` / `gpio_enable_dt_interrupt`\"\nThere are some incompatible:\nirq-gpios: Zephyr\u0027s named_gpios.py expects a real GPIO-cell array \u003c\u0026gpio0 6 GPIO_INT_EDGE_FALLING\u003e → would give a gpio_dt_spec, used with `gpio_pin_interrupt_configure_dt()`\n`gpio_enable/disable_dt_interrupt()` takes a const struct gpio_int_config *, which comes from a cros-ec,gpio-interrupts node phandle via GPIO_INT_FROM_NODE — a completely different structure\".  I used irq (plain phandle) to avoid the conflict while using the gpio_*_dt_interrupt.\nTo fully use irq-gpios as a real Zephyr GPIO spec, we\u0027d switch to `gpio_pin_interrupt_configure_dt()` and rework handler registration separately. This will require large change.",
       "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80abfee8_6210dc32",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T17:25:32Z",
+      "side": 1,
+      "message": "I think this can be verified at build time.  If `int-disable-on-inactive` is enabled, then the build should fail if `legacy-irq` is not specified.\n\nAlso use braces on all conditionals.",
+      "range": {
+        "startLine": 415,
+        "startChar": 7,
+        "endLine": 415,
+        "endChar": 25
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b1fad18_9f11e7ce",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T17:25:32Z",
+      "side": 1,
+      "message": "This path (and the enable path) need some unit tests.",
+      "range": {
+        "startLine": 429,
+        "startChar": 0,
+        "endLine": 429,
+        "endChar": 23
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a0460f5_97493ce8",
+        "filename": "include/motion_sense.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T17:25:32Z",
+      "side": 1,
+      "message": "Checks for CONFIG_ZEPHYR are no longer needed. The platform/ec repo only supports Zephyr projects.",
+      "range": {
+        "startLine": 159,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 20
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2a557fb_73f020b8",
+        "filename": "zephyr/dts/bindings/motionsense/motionsense-sensor-base.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T17:25:32Z",
+      "side": 1,
+      "message": "Call this `legacy-irq` so it\u0027s clearer how this is used.",
+      "range": {
+        "startLine": 66,
+        "startChar": 2,
+        "endLine": 66,
+        "endChar": 5
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0f032d9_83c63c43",
+        "filename": "zephyr/program/fatcat/ruby-ish/motionsense.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T17:25:32Z",
+      "side": 1,
+      "message": "But program specific changes into a separate CL.",
+      "range": {
+        "startLine": 97,
+        "startChar": 7,
+        "endLine": 97,
+        "endChar": 14
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a76c79f2_2ccdd7b3",
+        "filename": "zephyr/shim/src/motionsense_sensors.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T17:25:32Z",
+      "side": 1,
+      "message": "This isn\u0027t referenced anywhere.  Probably got dropped when you rebased on my change to delete `int_signal`.",
+      "range": {
+        "startLine": 142,
+        "startChar": 8,
+        "endLine": 142,
+        "endChar": 20
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b758a8ea_d5a8c76d",
+        "filename": "zephyr/shim/src/motionsense_sensors.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T17:25:32Z",
+      "side": 1,
+      "message": "Add a build check that `legacy-irq` is present if `int-disable-on-inactive` is true.",
+      "range": {
+        "startLine": 410,
+        "startChar": 0,
+        "endLine": 410,
+        "endChar": 16
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e63e843a_2d5ac188",
+        "filename": "zephyr/shim/src/motionsense_sensors.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T17:25:32Z",
+      "side": 1,
+      "message": "Nit - opening brace on new line.",
+      "range": {
+        "startLine": 411,
+        "startChar": 0,
+        "endLine": 411,
+        "endChar": 46
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83f43da5_7b7c8fea",
+        "filename": "zephyr/shim/src/motionsense_sensors.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T17:25:32Z",
+      "side": 1,
+      "message": "Nit - indentation is wrong.",
+      "range": {
+        "startLine": 414,
+        "startChar": 1,
+        "endLine": 414,
+        "endChar": 2
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
