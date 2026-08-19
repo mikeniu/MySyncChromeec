@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "mock_fingerprint_algorithm.h"
+
 #include <zephyr/fff.h>
 #include <zephyr/ztest.h>
 #include <zephyr/ztest_assert.h>
@@ -145,11 +147,279 @@ ZTEST_USER(fpsensor_state, test_two_step_bypass_mitigation)
 		"Expected validate_request to be called to verify the state escalation step");
 }
 
+ZTEST_USER(fpsensor_state, test_validate_fp_mode_invalid_capture_type)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_CAPTURE |
+			(FP_CAPTURE_TYPE_MAX << FP_MODE_CAPTURE_TYPE_SHIFT)
+	};
+	struct ec_response_fp_mode response;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected invalid capture type to return INVALID_PARAM, got %d",
+		rv);
+
+	zassert_equal(
+		validate_request_call_count, 0,
+		"Expected validate_request not to be called for invalid capture type");
+}
+
+ZTEST_USER(fpsensor_state, test_validate_fp_mode_invalid_algo_bits)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = ~FP_VALID_MODES & ~FP_MODE_CAPTURE_TYPE_MASK,
+	};
+	struct ec_response_fp_mode response;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected invalid mode flags to return INVALID_PARAM, got %d",
+		rv);
+
+	zassert_equal(
+		validate_request_call_count, 0,
+		"Expected validate_request not to be called for invalid mode flags");
+}
+
+ZTEST_USER(fpsensor_state, test_validate_fp_mode_max_templates_exceeded)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_ENROLL_SESSION,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.templ_valid = FP_MAX_FINGER_COUNT;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected ENROLL_SESSION with max templates to fail, got %d",
+		rv);
+
+	zassert_equal(
+		validate_request_call_count, 0,
+		"Expected validate_request not to be called when max templates exceeded");
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_reset_sensor_while_active_fails)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_RESET_SENSOR,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_MATCH;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected RESET_SENSOR while active to return INVALID_PARAM, got %d",
+		rv);
+
+	zassert_equal(
+		validate_request_call_count, 0,
+		"Expected validate_request not to be called when resetting active sensor");
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_reset_sensor_while_idle_succeeds)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_RESET_SENSOR,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = 0;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(rv, EC_RES_SUCCESS,
+		      "Expected RESET_SENSOR while idle to succeed, got %d",
+		      rv);
+
+	zassert_equal(
+		validate_request_call_count, 0,
+		"Expected RESET_SENSOR while idle to bypass validate_request");
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_reject_mode_clearing_during_crypto)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = 0,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected clearing mode during crypto to be rejected, got %d",
+		rv);
+
+	zassert_equal(
+		global_context.sensor_mode, FP_MODE_ENCRYPT_TEMPLATE,
+		"Expected sensor_mode to retain FP_MODE_ENCRYPT_TEMPLATE, "
+		"got 0x%x",
+		global_context.sensor_mode);
+}
+
+ZTEST_USER(fpsensor_state, test_validate_fp_mode_reject_mode_swap_during_crypto)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_DECRYPT_TEMPLATE,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_INVALID_PARAM,
+		"Expected swapping crypto mode during crypto to be rejected, "
+		"got %d",
+		rv);
+
+	zassert_equal(
+		global_context.sensor_mode, FP_MODE_ENCRYPT_TEMPLATE,
+		"Expected sensor_mode to remain FP_MODE_ENCRYPT_TEMPLATE, "
+		"got 0x%x",
+		global_context.sensor_mode);
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_allow_dont_change_during_crypto)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_DONT_CHANGE,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_SUCCESS,
+		"Expected FP_MODE_DONT_CHANGE during crypto to be accepted, got %d",
+		rv);
+
+	zassert_equal(
+		global_context.sensor_mode, FP_MODE_ENCRYPT_TEMPLATE,
+		"Expected sensor_mode to retain FP_MODE_ENCRYPT_TEMPLATE, got 0x%x",
+		global_context.sensor_mode);
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_reject_identical_mode_during_crypto)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_ENCRYPT_TEMPLATE,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_ENCRYPT_TEMPLATE;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(rv, EC_RES_INVALID_PARAM,
+		      "Expected submitting mode during crypto to be rejected, "
+		      "got %d",
+		      rv);
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_enroll_image_without_session_in_mode_fails)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_ENROLL_IMAGE,
+	};
+	struct ec_response_fp_mode response;
+
+	/*
+	 * Even if cur_mode has FP_MODE_ENROLL_SESSION set, params.mode missing
+	 * FP_MODE_ENROLL_SESSION must be rejected to prevent session clearing.
+	 */
+	global_context.sensor_mode = FP_MODE_ENROLL_SESSION;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(rv, EC_RES_INVALID_PARAM,
+		      "Expected ENROLL_IMAGE without ENROLL_SESSION in mode to "
+		      "return INVALID_PARAM, got %d",
+		      rv);
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_enroll_image_with_active_session_succeeds)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = FP_MODE_ENROLL_SESSION;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_SUCCESS,
+		"Expected ENROLL_IMAGE with active session to succeed, got %d",
+		rv);
+	zassert_equal(
+		global_context.sensor_mode & FP_MODE_ENROLL_SESSION,
+		FP_MODE_ENROLL_SESSION,
+		"Expected ENROLL_SESSION bit to remain set in sensor_mode");
+}
+
+ZTEST_USER(fpsensor_state,
+	   test_validate_fp_mode_enroll_image_concurrent_session_succeeds)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
+	};
+	struct ec_response_fp_mode response;
+
+	global_context.sensor_mode = 0;
+
+	int rv = ec_cmd_fp_mode_v1(NULL, &params, &response);
+
+	zassert_equal(
+		rv, EC_RES_SUCCESS,
+		"Expected concurrent ENROLL_IMAGE | ENROLL_SESSION request to "
+		"succeed, got %d",
+		rv);
+	zassert_equal(
+		global_context.sensor_mode,
+		FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
+		"Expected sensor_mode to be ENROLL_IMAGE | ENROLL_SESSION, got 0x%x",
+		global_context.sensor_mode);
+}
+
+static void *fpsensor_setup(void)
+{
+	/* Start shimmed tasks. */
+	start_ec_tasks();
+	k_msleep(100);
+
+	return NULL;
+}
+
 static void fpsensor_state_before(void *f)
 {
 	/* Reset context before each test case. */
-	global_context.fp_encryption_status = 0;
-	global_context.sensor_mode = 0;
+	fp_reset_and_clear_context();
 
 	/* Reset manual mock states. */
 	validate_request_call_count = 0;
@@ -159,4 +429,5 @@ static void fpsensor_state_before(void *f)
 	RESET_FAKE(mkbp_send_event);
 }
 
-ZTEST_SUITE(fpsensor_state, NULL, NULL, fpsensor_state_before, NULL, NULL);
+ZTEST_SUITE(fpsensor_state, NULL, fpsensor_setup, fpsensor_state_before, NULL,
+	    NULL);

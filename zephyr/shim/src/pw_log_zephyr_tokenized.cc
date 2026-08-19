@@ -3,8 +3,10 @@
  * found in the LICENSE file.
  */
 
-#include "console_channel.h"
+#include "console.h"
+#include "panic_log.h"
 
+#include <zephyr/kernel.h>
 #include <zephyr/spinlock.h>
 #include <zephyr/sys/printk.h>
 
@@ -12,12 +14,8 @@
 #include <pw_log_tokenized/config.h>
 #include <pw_log_tokenized/handler.h>
 #include <pw_log_tokenized/metadata.h>
-
-extern "C" {
-bool console_channel_is_disabled(int channel);
-void panic_log_write_str(const void *data, size_t size);
-void console_buf_notify_chars(const char *data, size_t size);
-}
+#include <pw_tokenizer/base64.h>
+#include <pw_tokenizer/tokenize.h>
 
 #ifndef PW_FLAG_TO_EC_CHANNEL
 #define PW_FLAG_TO_EC_CHANNEL(flag) ((enum console_channel)((flag) - 1))
@@ -36,7 +34,47 @@ namespace
 	constexpr char kEndDelimiter = '~';
 
 	struct k_spinlock lock;
+
+	// Static buffer guarded by spinlock to prevent stack allocation
+	// (~270B).
+	pw::InlineString<log_tokenized::kBase64EncodedBufferSizeBytes + 1>
+		base64_string;
 } // namespace
+} // namespace pw::log_zephyr
+
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS
+extern "C" {
+int format_dropped_logs_msg(char *dest, size_t dest_size, uint32_t drops_isr,
+			    uint32_t drops_mutex, uint32_t drops_overflow)
+{
+	uint32_t total_drops = drops_isr + drops_mutex + drops_overflow;
+	uint8_t token_buf[32];
+	size_t token_size = sizeof(token_buf);
+
+	PW_TOKENIZE_TO_BUFFER(
+		token_buf, &token_size,
+		"Dropped %u logs (ISR: %u, Mutex: %u, Overflow: %u)\n",
+		total_drops, drops_isr, drops_mutex, drops_overflow);
+
+	k_spinlock_key_t key = k_spin_lock(&pw::log_zephyr::lock);
+
+	pw::log_zephyr::base64_string.clear();
+	pw::log_zephyr::base64_string.push_back(PW_TOKENIZER_NESTED_PREFIX);
+	pw::base64::Encode(pw::as_bytes(pw::span(token_buf, token_size)),
+			   pw::log_zephyr::base64_string);
+
+	int len = snprintf(dest, dest_size, "%s",
+			   pw::log_zephyr::base64_string.c_str());
+
+	k_spin_unlock(&pw::log_zephyr::lock, key);
+
+	return len;
+}
+}
+#endif /* CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_DROPPED_LOGS */
+
+namespace pw::log_zephyr
+{
 
 extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 					   const uint8_t log_buffer[],
@@ -57,10 +95,6 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 
 	k_spinlock_key_t key = k_spin_lock(&lock);
 
-	// Static buffer guarded by spinlock to prevent stack allocation
-	// (~270B).
-	static pw::InlineString<log_tokenized::kBase64EncodedBufferSizeBytes + 1>
-		base64_string;
 	base64_string.clear();
 	base64_string.push_back(PW_TOKENIZER_NESTED_PREFIX);
 	pw::base64::Encode(pw::as_bytes(pw::span(log_buffer, size_bytes)),
@@ -91,7 +125,11 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 	// https://github.com/zephyrproject-rtos/zephyr/issues/59454 Zephyr
 	// frontend should protect messages from getting corrupted from multiple
 	// threads.
-	printk("%s", base64_string.c_str());
+	if (k_is_in_isr()) {
+		printk("[ISR]%s", base64_string.c_str());
+	} else {
+		printk("%s", base64_string.c_str());
+	}
 	k_spin_unlock(&lock, key);
 }
 

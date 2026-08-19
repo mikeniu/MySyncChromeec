@@ -8,7 +8,6 @@
 #include "ap_power_host_sleep.h"
 #include "chipset.h"
 #include "ec_commands.h"
-#include "ec_tasks.h"
 #include "emul/emul_power_signals.h"
 #include "host_command.h"
 #include "lpc.h"
@@ -627,7 +626,6 @@ ZTEST(ap_pwrseq, test_get_ap_pwrseq_thread)
 	pwrseq_thread = find_thread_by_name(pwrseq_name);
 	zassert_not_null(pwrseq_thread);
 	zassert_equal(pwrseq_thread, get_ap_pwrseq_thread());
-	zassert_equal(TASK_ID_AP_PWRSEQ, thread_id_to_task_id(pwrseq_thread));
 }
 
 void ap_pwrseq_after_test(void *data)

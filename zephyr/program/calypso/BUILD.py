@@ -8,6 +8,7 @@
 def register_npcx9_project(
     project_name,
     extra_kconfig_files=(),
+    extra_modules=(),
 ):
     """Register an npcx9 based variant of mensa."""
     register_npcx_project(
@@ -25,11 +26,13 @@ def register_npcx9_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_files,
         ],
+        modules=["cmsis_6", "ec", *extra_modules],
     )
 
 
 register_npcx9_project(
     project_name="mensa",
+    extra_modules=["google-private", "nanopb", "pigweed"],
 )
 
 register_npcx9_project(

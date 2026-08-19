@@ -83,6 +83,9 @@ def get_twister_args(
         "60",
     ]
 
+    if args.sram:
+        twister_args.append("-x=SNIPPET=sram-only")
+
     if args.test_dir:
         for t_dir in args.test_dir:
             twister_args.extend(["-T", t_dir])
