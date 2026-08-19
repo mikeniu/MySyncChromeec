@@ -34,6 +34,24 @@
       "parentUuid": "7b9d66ff_2d543b8a",
       "revId": "7ee6861f4491a22b80b30c90b3fa11f2bcd06c52",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e88c948d_a6179694",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T19:35:38Z",
+      "side": 0,
+      "message": "I also left a more detailed analysis on the bug which confirmed my analysis.",
+      "parentUuid": "1aef2f76_8f4f324e",
+      "revId": "7ee6861f4491a22b80b30c90b3fa11f2bcd06c52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
