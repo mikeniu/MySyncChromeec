@@ -6,7 +6,7 @@
 /*
  * Filter mocklists for makefile relevant items.
  * A mocklist is the .mocklist file in test/ directory
- * See common/mock/README.md for more information.
+ * See test/mock/README.md for more information.
  */
 
 #ifndef __CROS_EC_MOCK_FILTER_H

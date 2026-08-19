@@ -26,9 +26,9 @@ def main():
         description="Run Dagwood device tests inside the Docker container."
     )
     dagwood_test_lib.add_common_args(parser)
-    args = parser.parse_args()
+    args, extra_args = parser.parse_known_args()
 
-    twister_args = dagwood_test_lib.get_twister_args(args)
+    twister_args = dagwood_test_lib.get_twister_args(args, extra_args)
 
     run_docker_sh = str(SCRIPT_DIR / "run_docker.sh")
 

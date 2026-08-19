@@ -4,12 +4,12 @@
 
 if FLASH
 
-config PLATFORM_EC_CONSOLE_CMD_FLASH
+configdefault PLATFORM_EC_CONSOLE_CMD_FLASH
 	default y
 
 endif # FLASH
 
-config NPCX_HEADER
+configdefault NPCX_HEADER
 	default y
 
 choice NPCX_HEADER_SPI_MAX_CLOCK_CHOICE
