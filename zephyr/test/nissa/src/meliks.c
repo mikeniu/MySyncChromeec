@@ -425,6 +425,12 @@ ZTEST(meliks, test_charger_profile_override)
 	data.batt.temperature = 3241;
 	charger_profile_override(&data);
 
+	/* Test out-of-range thermal zone bounds (extreme cold and hot) */
+	data.batt.temperature = 1000;
+	charger_profile_override(&data);
+	data.batt.temperature = 8000;
+	charger_profile_override(&data);
+
 	data.batt.is_present = BP_NO;
 	charger_profile_override(&data);
 
