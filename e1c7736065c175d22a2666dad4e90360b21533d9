@@ -125,6 +125,24 @@
       "parentUuid": "8e862f61_4bca99a3",
       "revId": "e1c7736065c175d22a2666dad4e90360b21533d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16dce9c6_b77c47f6",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-19T04:11:03Z",
+      "side": 1,
+      "message": "I believe the original implementation in system.h was not optimal. I modified it and with that change, I do not need to define anything extra in the shim source file.",
+      "parentUuid": "2ab03e67_43006732",
+      "revId": "e1c7736065c175d22a2666dad4e90360b21533d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
