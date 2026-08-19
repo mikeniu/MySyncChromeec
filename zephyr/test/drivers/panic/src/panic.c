@@ -34,6 +34,18 @@ struct panic_test_fixture {
 
 static struct panic_data hard_watchdog_panic;
 
+static void test_panic_set_reason(uint32_t reason, uint32_t info,
+				  uint8_t exception)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, reason);
+	panic_set_info_reg(pdata, info);
+	panic_set_exception_reg(pdata, exception);
+
+	panic_data_finalize(pdata);
+}
+
 static void panic_setup_hard_watchdog_panic(void)
 {
 	panic_data_reset(&hard_watchdog_panic);
@@ -90,22 +102,17 @@ ZTEST_SUITE(panic, drivers_predicate_post_main, panic_test_setup, panic_before,
  */
 ZTEST(panic, test_panic_reason)
 {
-	uint32_t reason;
-	uint32_t info;
-	uint8_t exception;
 	struct panic_data *pdata = panic_get_data();
 
 	zassert_is_null(pdata, NULL);
-	panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34);
-
-	panic_get_reason(&reason, &info, &exception);
-
-	zassert_equal(PANIC_SW_WATCHDOG, reason);
-	zassert_equal(0x12, info);
-	zassert_equal(0x34, exception);
+	test_panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34);
 
 	pdata = panic_get_data();
 	zassert_not_null(pdata, NULL);
+	zassert_equal(PANIC_SW_WATCHDOG, panic_get_reason_reg(pdata));
+	zassert_equal(0x12, panic_get_info_reg(pdata));
+	zassert_equal(0x34, panic_get_exception_reg(pdata));
+
 	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->magic, PANIC_DATA_MAGIC);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
@@ -134,7 +141,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic)
 	/* Watchdog reset should result in any existing panic data being
 	 * overwritten (if in RW)
 	 */
-	panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+	test_panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34);
 	const struct panic_data original_pdata = *panic_get_data();
 
 	/* Simulate a watchdog reset cause */
@@ -157,7 +164,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_warn_panic)
 	 * to PANIC_SW_WATCHDOG after a watchdog reset (if in RW).
 	 * Info and exception should be preserved.
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
+	test_panic_set_reason(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
 
 	/* Set RO flag explicitly to test flag preservation */
 	struct panic_data *pdata = get_panic_data_write();
@@ -184,7 +191,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_warn_panic)
 
 ZTEST(panic, test_panic_data_init__watch_dog_warn_panic_already_read)
 {
-	panic_set_reason(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
+	test_panic_set_reason(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
 	struct panic_data *pdata = get_panic_data_write();
 	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
 	const struct panic_data original_pdata = *pdata;
@@ -208,7 +215,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic_already_initialized)
 	/* Watchdog reset should not overwrite panic info if already filled
 	 * in with watchdog panic info that HAS NOT been read by host
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34);
+	test_panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34);
 	const struct panic_data original_pdata = *panic_get_data();
 
 	/* Simulate a watchdog reset cause */
@@ -224,7 +231,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_hard_panic_already_initialized)
 	/* Watchdog reset should not overwrite panic info if already filled
 	 * in with watchdog hard panic info that HAS NOT been read by host
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0x12, 0x34);
+	test_panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0x12, 0x34);
 	const struct panic_data original_pdata = *panic_get_data();
 
 	/* Simulate a watchdog reset cause */
@@ -240,7 +247,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic_already_read)
 	/* Watchdog reset should overwrite panic info if already filled
 	 * in with watchdog panic info that HAS been read by host (if in RW)
 	 */
-	panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34);
+	test_panic_set_reason(PANIC_SW_WATCHDOG, 0x12, 0x34);
 	struct panic_data *pdata = get_panic_data_write();
 	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
 	const struct panic_data original_pdata = *pdata;
@@ -265,7 +272,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic_already_read)
 
 ZTEST(panic, test_panic_data_init__no_watchdog_reset_flag)
 {
-	panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+	test_panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34);
 	const struct panic_data original_pdata = *panic_get_data();
 
 	/* Simulate a power-on reset cause */
@@ -278,7 +285,7 @@ ZTEST(panic, test_panic_data_init__no_watchdog_reset_flag)
 
 ZTEST(panic, test_panic_data_init__watch_dog_hard_panic_already_read)
 {
-	panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0x12, 0x34);
+	test_panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0x12, 0x34);
 	struct panic_data *pdata = get_panic_data_write();
 	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
 	const struct panic_data original_pdata = *pdata;
@@ -299,7 +306,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_hard_panic_already_read)
 
 ZTEST(panic, test_panic_data_init__invalid_sw_reason)
 {
-	panic_set_reason(0, 0x12, 0x34);
+	test_panic_set_reason(0, 0x12, 0x34);
 	const struct panic_data original_pdata = *panic_get_data();
 
 	/* Simulate a power-on reset cause */
@@ -312,7 +319,7 @@ ZTEST(panic, test_panic_data_init__invalid_sw_reason)
 
 ZTEST(panic, test_panic_data_init__old_panic_no_watchdog)
 {
-	panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34);
+	test_panic_set_reason(PANIC_SW_DIV_ZERO, 0x12, 0x34);
 	struct panic_data *pdata = get_panic_data_write();
 	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
 	const struct panic_data original_pdata = *pdata;
@@ -330,7 +337,7 @@ ZTEST(panic, test_panic_data_init__old_panic_no_watchdog)
 
 ZTEST(panic, test_panic_data_init__invalid_sw_reason_watchdog)
 {
-	panic_set_reason(0, 0x12, 0x34);
+	test_panic_set_reason(0, 0x12, 0x34);
 	const struct panic_data original_pdata = *panic_get_data();
 
 	/* Simulate a watchdog reset cause */
@@ -443,6 +450,21 @@ ZTEST(panic, test_panic_reason_reg)
 	zassert_equal(panic_get_reason_reg(&test_pdata), PANIC_SW_WATCHDOG);
 }
 
+ZTEST(panic, test_panic_field_accessors)
+{
+	struct panic_data test_pdata = { 0 };
+
+	zassert_equal(panic_get_info_reg(NULL), 0);
+	panic_set_info_reg(NULL, 0x1234);
+	panic_set_info_reg(&test_pdata, 0x12345678);
+	zassert_equal(panic_get_info_reg(&test_pdata), 0x12345678);
+
+	zassert_equal(panic_get_exception_reg(NULL), 0);
+	panic_set_exception_reg(NULL, 0x5a);
+	panic_set_exception_reg(&test_pdata, 0x5a);
+	zassert_equal(panic_get_exception_reg(&test_pdata), 0x5a);
+}
+
 ZTEST(panic, test_panic_host_event)
 {
 	struct panic_data *pdata;
@@ -455,7 +477,7 @@ ZTEST(panic, test_panic_host_event)
 	zassert_false(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
 
 	/* Set panic reason */
-	panic_set_reason(PANIC_SW_DIV_ZERO, 0, 0);
+	test_panic_set_reason(PANIC_SW_DIV_ZERO, 0, 0);
 
 	/* Trigger HOOK_CHIPSET_STARTUP */
 	hook_notify(HOOK_CHIPSET_STARTUP);
