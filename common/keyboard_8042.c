@@ -1437,7 +1437,7 @@ void test_keyboard_8042_reset(void)
 {
 	/* Initialize controller ram */
 	memset(controller_ram, 0, sizeof(controller_ram));
-	controller_ram[0] = I8042_XLATE | I8042_AUX_DIS | I8042_KBD_DIS;
+	update_ctl_ram(0, I8042_XLATE | I8042_AUX_DIS | I8042_KBD_DIS);
 
 	/* Typematic state reset */
 	reset_rate_and_delay();
@@ -1448,7 +1448,12 @@ void test_keyboard_8042_reset(void)
 
 	/* Keyboard not enabled (matches I8042_KBD_DIS bit being set) */
 	keyboard_enabled = false;
+	i8042_keyboard_irq_enabled = 0;
+	i8042_aux_irq_enabled = 0;
+	keystroke_enabled = false;
+	aux_chan_enabled = false;
 
 	A20_status = 0;
+	controller_ram_address = 0;
 }
 #endif /* TEST_BUILD */

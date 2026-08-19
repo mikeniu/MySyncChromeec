@@ -106,11 +106,6 @@ enum battery_type {
 #define CONFIG_ACCEL_FIFO_THRES 10
 #endif
 
-#ifdef TEST_RGB_KEYBOARD
-#define CONFIG_RGB_KEYBOARD
-#define CONFIG_RGBKBD_DEMO_DOT
-#endif
-
 #if defined(TEST_BODY_DETECTION) || defined(TEST_MOTION_ANGLE) ||        \
 	defined(TEST_MOTION_ANGLE_TABLET) || defined(TEST_MOTION_LID) || \
 	defined(TEST_MOTION_SENSE_FIFO)
@@ -234,8 +229,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #undef CONFIG_USB_PD_HOST_CMD
 #undef CONFIG_USB_DPM_SM
 #define CONFIG_USB_PRL_SM
-#define CONFIG_USB_PD_TCPC
-#define CONFIG_USB_PD_TCPM_STUB
 #define CONFIG_USB_POWER_DELIVERY
 #define CONFIG_SHA256_SW
 #define CONFIG_SW_CRC
@@ -334,8 +327,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_USB_PE_SM
 #define CONFIG_USB_PRL_SM
 #define CONFIG_USB_TYPEC_SM
-#define CONFIG_USB_PD_TCPC
-#define CONFIG_USB_PD_TCPM_STUB
 #define CONFIG_USB_POWER_DELIVERY
 #define CONFIG_SW_CRC
 #undef CONFIG_USB_PD_HOST_CMD

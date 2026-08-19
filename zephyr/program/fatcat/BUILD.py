@@ -9,12 +9,12 @@ def register_npcx9_project(
     project_name,
     zephyr_board,
     extra_kconfig_files=(),
-    inherited_from=None,
+    boards=None,
     extra_modules=(),
 ):
     """Register an npcx9 based variant of fatcat."""
-    if inherited_from is None:
-        inherited_from = ["fatcat"]
+    if boards is None:
+        boards = ["fatcat"]
 
     register_npcx_project(
         project_name=project_name,
@@ -31,7 +31,7 @@ def register_npcx9_project(
             *extra_kconfig_files,
         ],
         modules=["cmsis_6", "ec", *extra_modules],
-        inherited_from=inherited_from,
+        boards=boards,
     )
 
 
@@ -39,11 +39,11 @@ def register_it8xxx2_project(
     project_name,
     extra_kconfig_files=(),
     extra_modules=(),
-    inherited_from=None,
+    boards=None,
 ):
     """Register an it8xxx2 based variant of fatcat."""
-    if inherited_from is None:
-        inherited_from = ["fatcat"]
+    if boards is None:
+        boards = ["fatcat"]
 
     register_binman_project(
         project_name=project_name,
@@ -60,19 +60,19 @@ def register_it8xxx2_project(
             *extra_kconfig_files,
         ],
         modules=["ec", *extra_modules],
-        inherited_from=inherited_from,
+        boards=boards,
     )
 
 
 def register_realtek_project(
     project_name,
     extra_kconfig_files=(),
-    inherited_from=None,
+    boards=None,
     extra_modules=(),
 ):
     """Register an realtek_ec based variant of fatcat."""
-    if inherited_from is None:
-        inherited_from = ["fatcat"]
+    if boards is None:
+        boards = ["fatcat"]
 
     register_rtk_project(
         project_name=project_name,
@@ -89,7 +89,7 @@ def register_realtek_project(
             *extra_kconfig_files,
         ],
         modules=["cmsis_6", "ec", *extra_modules],
-        inherited_from=inherited_from,
+        boards=boards,
     )
 
 
@@ -170,7 +170,7 @@ register_ish_project(
         here / "kinmen-ish" / "project.conf",
         here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["fatcat"],
+    boards=["fatcat"],
 )
 
 register_ish_project(
@@ -184,7 +184,7 @@ register_ish_project(
         here / "ruby-ish" / "project.conf",
         here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["fatcat"],
+    boards=["fatcat"],
 )
 
 register_ish_project(
@@ -198,11 +198,12 @@ register_ish_project(
         here / "moonstone-ish" / "project.conf",
         here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["fatcat"],
+    boards=["fatcat"],
 )
 
 register_ish_project(
     project_name="fatcat-ish-idle",
+    boards=["fatcat"],
     zephyr_board="intel_ish_5_8_0",
     dts_overlays=[
         here / "fatcat-ish-idle" / "project.overlay",

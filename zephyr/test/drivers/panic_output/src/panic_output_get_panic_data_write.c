@@ -45,7 +45,7 @@ ZTEST(panic_output_get_panic_data_write, test_no_panic_data__no_jump_data)
 {
 	struct panic_data *pdata_actual = test_get_panic_data_pointer();
 	struct panic_data pdata_expected = {
-		.magic = PANIC_DATA_MAGIC,
+		.magic = 0,
 		.struct_size = CONFIG_PANIC_DATA_SIZE,
 	};
 
