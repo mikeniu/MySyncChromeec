@@ -444,6 +444,15 @@ ZTEST(panic, test_panic_field_accessors)
 	panic_set_exception_reg(NULL, 0x5a);
 	panic_set_exception_reg(&test_pdata, 0x5a);
 	zassert_equal(panic_get_exception_reg(&test_pdata), 0x5a);
+
+	zassert_equal(panic_get_extra_reg(NULL, 0), 0);
+	zassert_equal(panic_get_extra_reg(&test_pdata, PANIC_MAX_EXTRAS), 0);
+	panic_set_extra_reg(NULL, 0, 0xabcd);
+	panic_set_extra_reg(&test_pdata, PANIC_MAX_EXTRAS, 0xabcd);
+	panic_set_extra_reg(&test_pdata, 0, 0x11223344);
+	panic_set_extra_reg(&test_pdata, 5, 0x55667788);
+	zassert_equal(panic_get_extra_reg(&test_pdata, 0), 0x11223344);
+	zassert_equal(panic_get_extra_reg(&test_pdata, 5), 0x55667788);
 }
 
 ZTEST(panic, test_panic_data_write_assert)
@@ -474,7 +483,8 @@ ZTEST(panic, test_panic_data_write_assert_no_file)
 
 ZTEST(panic, test_panic_data_write_watchdog_warning)
 {
-	panic_data_write_watchdog_warning(0x10080000, k_current_get());
+	panic_data_write_watchdog_warning(0x10080000, 0x10080120,
+					  k_current_get());
 
 	struct panic_data *pdata = panic_get_data();
 
@@ -483,6 +493,7 @@ ZTEST(panic, test_panic_data_write_watchdog_warning)
 	zassert_equal(panic_get_info_reg(pdata), 0x10080000);
 	zassert_equal(panic_get_exception_reg(pdata),
 		      (uint8_t)(uintptr_t)k_current_get());
+	zassert_equal(panic_get_extra_reg(pdata, 0), 0x10080120);
 }
 
 ZTEST(panic, test_panic_data_write_fatal)

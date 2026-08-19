@@ -126,6 +126,8 @@ struct x86_panic_data {
 	uint8_t task_id;
 };
 
+#define PANIC_MAX_EXTRAS 6
+
 /* POSIX architecture panic data */
 struct posix_panic_data {
 	uint32_t esf_placeholder;
@@ -133,6 +135,7 @@ struct posix_panic_data {
 	uint32_t info;
 	uint8_t exception;
 	uint8_t reserved[3];
+	uint32_t extras[PANIC_MAX_EXTRAS];
 };
 
 /* Data saved across reboots */

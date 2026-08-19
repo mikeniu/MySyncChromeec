@@ -229,6 +229,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id)
 {
 	uint32_t exception_address = 0;
+	uint32_t lr = 0;
 	const char *thread_name;
 	if (IS_ENABLED(CONFIG_THREAD_NAME)) {
 		thread_name = k_thread_name_get(k_current_get());
@@ -252,6 +253,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	       (void *)esf->basic.pc, (void *)esf->basic.lr, (void *)thread,
 	       thread_name);
 	exception_address = esf->basic.pc;
+	lr = esf->basic.lr;
 #else
 	/* TODO(b/176523207): watchdog warning message */
 	printk("Watchdog deadline is close! THREAD:%p THREAD_NAME:%s\n",
@@ -275,7 +277,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
 	 * occurs.
 	 */
-	panic_data_write_watchdog_warning(exception_address, thread);
+	panic_data_write_watchdog_warning(exception_address, lr, thread);
 }
 
 __maybe_unused static void
