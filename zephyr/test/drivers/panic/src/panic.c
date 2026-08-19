@@ -27,7 +27,7 @@ void panic_data_finalize(struct panic_data *pdata);
 int panic_data_init(void);
 void panic_data_write_esf(const struct arch_esf *esf);
 void panic_data_write_assert(const char *path, unsigned int line);
-void panic_data_write_watchdog_warning(uintptr_t pc,
+void panic_data_write_watchdog_warning(uintptr_t pc, uintptr_t lr,
 				       const struct k_thread *thread);
 void panic_data_write_fatal(unsigned int reason, const struct k_thread *thread);
 void panic_data_write_sw(uint32_t reason, uint32_t info, uint8_t exception);
@@ -452,6 +452,16 @@ ZTEST(panic, test_panic_field_accessors)
 	panic_set_exception_reg(NULL, 0x5a);
 	panic_set_exception_reg(&test_pdata, 0x5a);
 	zassert_equal(panic_get_exception_reg(&test_pdata), 0x5a);
+
+	zassert_equal(panic_get_extra_reg(NULL, 0), 0);
+	panic_set_extra_reg(NULL, 0, 0x1111);
+	for (size_t i = 0; i < PANIC_MAX_EXTRAS; i++) {
+		panic_set_extra_reg(&test_pdata, i, 0x1000 + i);
+		zassert_equal(panic_get_extra_reg(&test_pdata, i), 0x1000 + i);
+	}
+	/* Out-of-bounds extra access should return 0 / be a no-op */
+	zassert_equal(panic_get_extra_reg(&test_pdata, PANIC_MAX_EXTRAS), 0);
+	panic_set_extra_reg(&test_pdata, PANIC_MAX_EXTRAS, 0x9999);
 }
 
 ZTEST(panic, test_panic_data_write_assert)
@@ -479,7 +489,8 @@ ZTEST(panic, test_panic_data_write_assert_no_file)
 
 ZTEST(panic, test_panic_data_write_watchdog_warning)
 {
-	panic_data_write_watchdog_warning(0x10080000, k_current_get());
+	panic_data_write_watchdog_warning(0x10080000, 0x10080120,
+					  k_current_get());
 
 	struct panic_data *pdata = panic_get_data();
 	zassert_not_null(pdata);
@@ -487,6 +498,7 @@ ZTEST(panic, test_panic_data_write_watchdog_warning)
 	zassert_equal(panic_get_info_reg(pdata), 0x10080000);
 	zassert_equal(panic_get_exception_reg(pdata),
 		      (uint8_t)(uintptr_t)k_current_get());
+	zassert_equal(panic_get_extra_reg(pdata, 0), 0x10080120);
 }
 
 ZTEST(panic, test_panic_data_write_fatal)

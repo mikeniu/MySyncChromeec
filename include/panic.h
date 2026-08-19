@@ -134,7 +134,7 @@ void panic_data_write_assert(const char *path, unsigned int line);
 /**
  * Record a watchdog warning snapshot into persistent panic data.
  */
-void panic_data_write_watchdog_warning(uintptr_t pc,
+void panic_data_write_watchdog_warning(uintptr_t pc, uintptr_t lr,
 				       const struct k_thread *thread);
 
 /**
@@ -182,6 +182,18 @@ uint8_t panic_get_exception_reg(const struct panic_data *pdata);
  * current architecture.
  */
 void panic_set_exception_reg(struct panic_data *pdata, uint8_t exception);
+
+/**
+ * Get an extra register field from a panic_data structure for the current
+ * architecture.
+ */
+uint32_t panic_get_extra_reg(const struct panic_data *pdata, size_t idx);
+
+/**
+ * Set an extra register field in a panic_data structure for the current
+ * architecture.
+ */
+void panic_set_extra_reg(struct panic_data *pdata, size_t idx, uint32_t val);
 
 /**
  * Check if stored panic data represents a new panic.

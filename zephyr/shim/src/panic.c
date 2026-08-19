@@ -73,6 +73,7 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_EXCEPTION(pdata) (pdata)->cm.regs[1]
 #define PANIC_REG_REASON(pdata) (pdata)->cm.regs[3]
 #define PANIC_REG_INFO(pdata) (pdata)->cm.regs[4]
+#define PANIC_REG_EXTRAS_BASE(pdata) (&(pdata)->cm.regs[5])
 #elif defined(CONFIG_RISCV) && !defined(CONFIG_64BIT)
 /*
  * Not all registers are passed in the context from Zephyr
@@ -103,6 +104,7 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_EXCEPTION(pdata) ((pdata)->riscv.mcause)
 #define PANIC_REG_REASON(pdata) ((pdata)->riscv.regs[11])
 #define PANIC_REG_INFO(pdata) ((pdata)->riscv.regs[10])
+#define PANIC_REG_EXTRAS_BASE(pdata) (&(pdata)->riscv.regs[12])
 #elif defined(CONFIG_X86)
 #define PANIC_ARCH PANIC_ARCH_X86
 #define PANIC_REG_LIST(M, M_GPR) \
@@ -117,6 +119,7 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_EXCEPTION(pdata) ((pdata)->x86.eflags)
 #define PANIC_REG_REASON(pdata) ((pdata)->x86.vector)
 #define PANIC_REG_INFO(pdata) ((pdata)->x86.error_code)
+#define PANIC_REG_EXTRAS_BASE(pdata) (&(pdata)->x86.eax)
 #elif defined(CONFIG_ARCH_POSIX)
 #define PANIC_ARCH PANIC_ARCH_POSIX
 #define PANIC_REG_LIST(M, M_GPR) \
@@ -124,6 +127,7 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_EXCEPTION(pdata) ((pdata)->posix.exception)
 #define PANIC_REG_REASON(pdata) ((pdata)->posix.reason)
 #define PANIC_REG_INFO(pdata) ((pdata)->posix.info)
+#define PANIC_REG_EXTRAS_BASE(pdata) ((pdata)->posix.extras)
 #else
 /* Not implemented for this arch */
 #error "Unsupported architecture for PANIC_ARCH"
@@ -292,7 +296,7 @@ void panic_data_write_assert(const char *path, unsigned int line)
 	panic_data_finalize(pdata);
 }
 
-void panic_data_write_watchdog_warning(uintptr_t pc,
+void panic_data_write_watchdog_warning(uintptr_t pc, uintptr_t lr,
 				       const struct k_thread *thread)
 {
 	struct panic_data *const pdata = panic_data_reset(NULL);
@@ -300,6 +304,7 @@ void panic_data_write_watchdog_warning(uintptr_t pc,
 	panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
 	panic_set_info_reg(pdata, (uint32_t)pc);
 	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+	panic_set_extra_reg(pdata, 0, (uint32_t)lr);
 
 	panic_data_finalize(pdata);
 }
@@ -359,6 +364,21 @@ void panic_set_exception_reg(struct panic_data *pdata, uint8_t exception)
 {
 	if (pdata) {
 		PANIC_REG_EXCEPTION(pdata) = exception;
+	}
+}
+
+uint32_t panic_get_extra_reg(const struct panic_data *pdata, size_t idx)
+{
+	if (pdata && idx < PANIC_MAX_EXTRAS) {
+		return (PANIC_REG_EXTRAS_BASE(pdata))[idx];
+	}
+	return 0;
+}
+
+void panic_set_extra_reg(struct panic_data *pdata, size_t idx, uint32_t val)
+{
+	if (pdata && idx < PANIC_MAX_EXTRAS) {
+		(PANIC_REG_EXTRAS_BASE(pdata))[idx] = val;
 	}
 }
 
