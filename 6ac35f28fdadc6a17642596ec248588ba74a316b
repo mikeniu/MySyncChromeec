@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1aec6aba_dfd77146",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-19T18:57:24Z",
+      "side": 1,
+      "message": "common/: 977/1294 -\u003e 1038/1294 (+61/+0 | +61) [75.5% -\u003e 80.2% (+4.7%)]\n    common/motion_sense_fifo.c: 181/230 -\u003e 206/230 (+25/+0 | +25) [78.7% -\u003e 89.6% (+10.9%)]\n    common/motion_sense.c: 684/919 -\u003e 704/919 (+20/+0 | +20) [74.4% -\u003e 76.6% (+2.2%)]\n    common/motion_lid.c: 112/145 -\u003e 128/145 (+16/+0 | +16) [77.2% -\u003e 88.3% (+11.0%)]",
+      "revId": "6ac35f28fdadc6a17642596ec248588ba74a316b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
