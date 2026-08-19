@@ -45,6 +45,29 @@
       },
       "revId": "7dbe01bed227f427fe6af27cc523996c77020104",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdcfd285_573ea830",
+        "filename": "include/ec_cmd_api.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-08-19T02:55:02Z",
+      "side": 1,
+      "message": "These doesn\u0027t exist on the Skywalker branch. Remove these.",
+      "range": {
+        "startLine": 462,
+        "startChar": 0,
+        "endLine": 465,
+        "endChar": 60
+      },
+      "revId": "7dbe01bed227f427fe6af27cc523996c77020104",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
