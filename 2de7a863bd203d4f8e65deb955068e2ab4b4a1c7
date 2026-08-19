@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee2d1d70_0cbdf14f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-19T16:44:24Z",
+      "side": 1,
+      "message": "### CQ Failure Triage (Patchset 1)\n\n#### Builder: [firmware-zephyr-cov-cq](http://cr-buildbucket.appspot.com/build/8673099231275330081)\n\n**Step:** `test firmware|call build API script`\n**Traceback:**\n```\nFile \"/mnt/host/source/src/platform/ec/zephyr/firmware_builder.py\", line 675, in test\nsubprocess.run(\nFile \"/usr/lib/python3.11/subprocess.py\", line 571, in run\nraise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command \u0027[\u0027make\u0027, \u0027-f\u0027, \u0027Makefile.cq\u0027, \u0027-j30\u0027, \u0027test\u0027, \u0027COVERAGE\u003d1\u0027, \u0027SPECIAL_BOARDS\u003dkrabby kingler rex geralt roach ovis brox brox-sku4 rauru fatcatrvp-npcx fatcatrvp-ite felino francka nereid nivviks kaladin uldrenite uldrenite-ish ocelotrvp-npcx ocelotrvp-ite\u0027]\u0027 returned non-zero exit status 2.\n16:38:43.113: WARNING: Metrics data empty.\n16:38:43.285: INFO: Endpoint execution completed, return code: 3\n16:38:43.363: INFO: Endpoint execution completed, return code: 3\n```\n\n#### Builder: [firmware-zephyr-cov-cq](http://cr-buildbucket.appspot.com/build/8673113667976898705)\n\n**Step:** `test firmware|call build API script`\n**Traceback:**\n```\nFile \"/mnt/host/source/src/platform/ec/zephyr/firmware_builder.py\", line 675, in test\nsubprocess.run(\nFile \"/usr/lib/python3.11/subprocess.py\", line 571, in run\nraise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command \u0027[\u0027make\u0027, \u0027-f\u0027, \u0027Makefile.cq\u0027, \u0027-j30\u0027, \u0027test\u0027, \u0027COVERAGE\u003d1\u0027, \u0027SPECIAL_BOARDS\u003dkrabby kingler rex geralt roach ovis brox brox-sku4 rauru fatcatrvp-npcx fatcatrvp-ite felino francka nereid nivviks kaladin uldrenite uldrenite-ish ocelotrvp-npcx ocelotrvp-ite\u0027]\u0027 returned non-zero exit status 2.\n12:48:11.949: WARNING: Metrics data empty.\n12:48:12.129: INFO: Endpoint execution completed, return code: 3\n12:48:12.204: INFO: Endpoint execution completed, return code: 3\n```",
+      "isAi": true,
+      "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
