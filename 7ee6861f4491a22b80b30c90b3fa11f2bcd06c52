@@ -16,6 +16,24 @@
       "message": "@keithshort@google.com do you know any background of this check? It validates alignment of the data in RAM. It expects the same alignment of address for data in RAM and flash, which doesn\u0027t seem correct.",
       "revId": "7ee6861f4491a22b80b30c90b3fa11f2bcd06c52",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1aef2f76_8f4f324e",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T19:33:14Z",
+      "side": 0,
+      "message": "I think the stems from an STM32 requirement:\n\nAlignment check added to legacy stm32l flash driver: https://crrev.com/c/56627\n\nThe legacy [NPCX driver](https://crrev.com/c/233742) copied this check.\n\nThe legacy NPCX driver looks like it writes the data bytes one at time during program operations, so I don\u0027t see valid reason to restrict the source pointer to word alignment.\n\n```\n\tflash_execute_cmd(CMD_FLASH_PROGRAM, MASK_CMD_WR_ADR);\n\tfor (i \u003d 0; i \u003c bytes; i++) {\n\t\tflash_execute_cmd(*data, MASK_CMD_WR_ONLY);\n\t\tdata++;\n\t}\n```\n\nNuvoton helped create the original Zephyr shim driver and copied the check here.",
+      "parentUuid": "7b9d66ff_2d543b8a",
+      "revId": "7ee6861f4491a22b80b30c90b3fa11f2bcd06c52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

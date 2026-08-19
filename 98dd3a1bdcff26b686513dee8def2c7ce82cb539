@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92a11af4_d731acb7",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-19T19:33:14Z",
+      "side": 1,
+      "message": "I think it is still reasonable to fail if the flash offset and size are not aligned to CONFIG_FLASH_WRITE_SIZE.",
+      "range": {
+        "startLine": 50,
+        "startChar": 6,
+        "endLine": 50,
+        "endChar": 12
+      },
+      "revId": "98dd3a1bdcff26b686513dee8def2c7ce82cb539",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
