@@ -80,19 +80,13 @@ void find_battery_thermal_zone(int bat_temp)
 				break;
 		}
 	} else if (bat_temp > prev_temp) {
-		for (i = temp_zone; i < ARRAY_SIZE(bat_temp_table); i++) {
+		for (i = temp_zone; i < ARRAY_SIZE(bat_temp_table) - 1; i++) {
 			if (bat_temp >= bat_temp_table[i].high)
 				temp_zone = i + 1;
 			else
 				break;
 		}
 	}
-
-	if (temp_zone < 0)
-		temp_zone = 0;
-
-	if (temp_zone >= ARRAY_SIZE(bat_temp_table))
-		temp_zone = ARRAY_SIZE(bat_temp_table) - 1;
 
 	prev_temp = bat_temp;
 }
