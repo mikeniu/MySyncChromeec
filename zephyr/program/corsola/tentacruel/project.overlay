@@ -465,3 +465,7 @@
 		board-init = "ps8743_eq_c1_setting";
 	};
 };
+
+&battery_passthru {
+	devices = [0f];
+};
