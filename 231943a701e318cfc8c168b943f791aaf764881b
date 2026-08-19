@@ -22,6 +22,30 @@
       },
       "revId": "231943a701e318cfc8c168b943f791aaf764881b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7597fdc3_a4f9cf30",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 2504,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-08-19T02:50:24Z",
+      "side": 1,
+      "message": "FYI: The change that change the cases [CL:7080810](https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/7080810).",
+      "parentUuid": "e142a114_720d0d5d",
+      "range": {
+        "startLine": 2504,
+        "startChar": 8,
+        "endLine": 2504,
+        "endChar": 11
+      },
+      "revId": "231943a701e318cfc8c168b943f791aaf764881b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
