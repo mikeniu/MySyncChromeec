@@ -52,6 +52,24 @@
       "parentUuid": "e3abeca3_9871cc59",
       "revId": "223338ee0b6626fb158783a63b0ac4e7b5150a12",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ca410f8_910ea6ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-08-20T20:38:40Z",
+      "side": 1,
+      "message": "Since this issue hasn\u0027t been consistently reproducible, I\u0027m marking it as resolved for now; please feel free to reopen it if needed.",
+      "parentUuid": "a5ff5759_c346c3e7",
+      "revId": "223338ee0b6626fb158783a63b0ac4e7b5150a12",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
