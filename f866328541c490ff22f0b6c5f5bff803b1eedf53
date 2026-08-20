@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aefe3280_e8633b2a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T00:52:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "46050dcb_242e08a9",
+      "revId": "f866328541c490ff22f0b6c5f5bff803b1eedf53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "642156c0_9429a9ca",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Following up on the discussion from the previous patchset regarding the `ra` register on RISC-V: since `ra` serves as the Link Register and shouldn\u0027t be stripped, this test will fail on RISC-V if it expects `ra` (which is in `expected_regs` at index 29) to be `0` when `CONFIG_PLATFORM_EC_PANIC_STRIP_GPR` is enabled.\n\nConsider updating this logic to leave `expected` unchanged for `ra` on RISC-V. This will usefully verify that `ra` is *not* stripped while the other GPRs are:\n\n```c\n\t\tif (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_STRIP_GPR)) {\n#if defined(CONFIG_RISCV)\n\t\t\t/* The return address (ra) is a code pointer and is intentionally not stripped. */\n\t\t\tif (expected_regs[i].index !\u003d 29 /* ra */)\n#endif\n\t\t\t{\n\t\t\t\texpected \u003d 0;\n\t\t\t}\n\t\t}\n```",
       "isAi": true,
+      "revId": "f866328541c490ff22f0b6c5f5bff803b1eedf53",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b6e0f1e_07524c92",
+        "filename": "zephyr/test/hwtest/src/panic.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T00:52:19Z",
+      "side": 1,
+      "message": "I fixed this in the follow up CL\n\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8271581",
+      "parentUuid": "642156c0_9429a9ca",
       "revId": "f866328541c490ff22f0b6c5f5bff803b1eedf53",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
