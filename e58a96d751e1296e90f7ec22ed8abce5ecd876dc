@@ -17,6 +17,29 @@
       "isAi": true,
       "revId": "e58a96d751e1296e90f7ec22ed8abce5ecd876dc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0538f9c3_ac5a46c5",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 776,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T19:57:08Z",
+      "side": 1,
+      "message": "Could we use the same `__packed` strategy like we did in v0 (follow-up CL): https://crrev.com/c/8258616?",
+      "range": {
+        "startLine": 776,
+        "startChar": 0,
+        "endLine": 776,
+        "endChar": 66
+      },
+      "revId": "e58a96d751e1296e90f7ec22ed8abce5ecd876dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
