@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b583be6f_236a7525",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:28:42Z",
+      "side": 1,
+      "message": "**Issue:** In `test_finger_capture_simple_image_scan_good`, you added the following comment and assertion:\n\n```cpp\n/* Assert no secondary FINGER_DOWN event was dispatched. */\nzassert_equal(\n    mkbp_send_event_fake.call_count, 2,\n    \"FINGER_DOWN should only trigger on the initial edge, not while held\");\n\n```\n\nBecause the implementation uses level-triggering (`st \u003d\u003d FINGER_PRESENT`) rather than edge-triggering, this comment is factually incorrect regarding the underlying behavior. The only reason a secondary `FINGER_DOWN` isn\u0027t dispatched in this specific test is because a `SCAN_GOOD` result immediately deactivates capture mode. In `test_finger_capture_simple_image_scan_too_fast`, capture mode remains active, and your test correctly expects the event to be spammed (verifying the continuous triggering).\n\n**Remediation:** Remove or rewrite the comment in `test_finger_capture_simple_image_scan_good` so it does not falsely claim the code is edge-triggered. It should instead clarify that no secondary event is dispatched because the capture session ended.",
+      "range": {
+        "startLine": 288,
+        "startChar": 0,
+        "endLine": 291,
+        "endChar": 73
+      },
+      "revId": "8ad0c64314f7f86810d1b4599eb0f37d2fb140d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
