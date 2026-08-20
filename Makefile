@@ -126,16 +126,10 @@ UC_PROJECT:=$(call uppercase,$(PROJECT))
 # Transform the configuration into make variables.  This must be done after
 # the board/project/chip/core variables are defined, since some of
 # the configs are dependent on particular configurations.
-includes=include core/$(CORE)/include include/driver $(dirs) $(out) test \
+includes=include core/$(CORE)/include include/driver $(dirs) $(out) \
 	third_party
-ifeq "$(TEST_BUILD)" "y"
-	_tsk_lst_file:=ec.tasklist
-	_tsk_lst_flags:=-Itest -DTEST_BUILD=$(EMPTY) \
-			-imacros $(PROJECT).tasklist
-else
-	_tsk_lst_file:=$(PROJECT).tasklist
-	_tsk_lst_flags:=
-endif
+_tsk_lst_file:=$(PROJECT).tasklist
+_tsk_lst_flags:=
 
 _tsk_lst_flags+=-I$(BDIR) -DBOARD_$(UC_BOARD)=$(EMPTY) \
 		-D_MAKEFILE=$(EMPTY) -imacros $(_tsk_lst_file)
@@ -178,28 +172,6 @@ _flag_cfg_rw:= $(filter-out $(_flag_cfg), $(_flag_cfg_rw))
 $(foreach c,$(_tsk_cfg_rw) $(_flag_cfg_rw),$(eval $(c)=rw))
 $(foreach c,$(_tsk_cfg_ro) $(_flag_cfg_ro),$(eval $(c)=ro))
 $(foreach c,$(_tsk_cfg) $(_flag_cfg),$(eval $(c)=y))
-
-# Fetch list of mocks from .mocklist files for tests.
-# The following will transform the the list of mocks into
-# HAS_MOCK_<NAME> for use in the build systems and CPP,
-# similar to task definitions.
-_mock_lst_flags := -Itest -DTEST_BUILD=$(EMPTY) \
-	-imacros $(PROJECT).mocklist \
-	-I$(BDIR) -DBOARD_$(UC_BOARD)=$(EMPTY) \
-	-D_MAKEFILE=$(EMPTY)
-_mock_file := test/$(PROJECT).mocklist
-
-# If test build and mockfile exists, source the list of
-# mocks from mockfile.
-_mock_lst :=
-ifneq ($(and $(TEST_BUILD),$(wildcard $(_mock_file))),)
-	_mock_lst += $(call shell_echo,$(CPP) $(CPPFLAGS) -P $(_mock_lst_flags) \
-		include/mock_filter.h)
-endif
-
-_mock_cfg := $(foreach t,$(_mock_lst) ,HAS_MOCK_$(t))
-CPPFLAGS += $(foreach t,$(_mock_cfg),-D$(t)=$(EMPTY))
-$(foreach c,$(_mock_cfg),$(eval $(c)=y))
 
 ifneq ($(CONFIG_COMMON_RUNTIME),y)
 ifneq ($(CONFIG_DFU_BOOTMANAGER_MAIN),ro)
@@ -283,10 +255,6 @@ include core/$(CORE)/build.mk
 include common/build.mk
 include driver/build.mk
 include power/build.mk
-include test/build.mk
-include test/common/build.mk
-include test/mock/build.mk
-$(eval $(call vars_from_dir,test_mock_objs,mock,test_mock))
 include third_party/build.mk
 include util/build.mk
 include util/lock/build.mk
@@ -317,11 +285,6 @@ all-obj-$(1)+=$(call objs_from_dir_p,libc,libc,$(1))
 endif
 all-obj-$(1)+=$(call objs_from_dir_p,driver,driver,$(1))
 all-obj-$(1)+=$(call objs_from_dir_p,power,power,$(1))
-all-obj-$(1)+=$(call objs_from_dir_p,test,$(PROJECT),$(1))
-ifeq ($(TEST_BUILD),y)
-all-obj-$(1)+=$(call objs_from_dir_p,test/common,test_common,$(1))
-all-obj-$(1)+=$(call objs_from_dir_p,test,test_mock_objs,$(1))
-endif
 ifeq ($(CONFIG_BORINGSSL_CRYPTO), y)
 all-obj-$(1)+= \
     $(call objs_from_dir_p,third_party/boringssl/common,boringssl,$(1))
@@ -356,13 +319,9 @@ host-srcs := $(foreach u,$(host-util-bin-y),$(sort $($(u)-objs:%.o=util/%.c) \
 host-srcs-cxx := $(foreach u,$(host-util-bin-cxx-y), \
 	$(sort $($(u)-objs:%.o=util/%.cc) $(wildcard util/$(u).cc)))
 
-dirs=core/$(CORE) chip/$(CHIP) $(BDIR) common power test
+dirs=core/$(CORE) chip/$(CHIP) $(BDIR) common power
 dirs+=$(shell find common -type d)
 dirs+=$(shell find driver -type d)
-ifeq ($(TEST_BUILD),y)
-dirs+=test/common
-dirs+=test/mock
-endif
 ifeq ($(USE_BUILTIN_STDLIB), 1)
 dirs+=builtin
 else
