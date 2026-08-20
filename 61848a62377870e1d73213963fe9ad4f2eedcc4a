@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "268b06bb_1e213837",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1562212
+      },
+      "writtenOn": "2026-08-20T07:25:48Z",
+      "side": 1,
+      "message": "https://crrev.com/i/9698920 should unblock CQ failure.",
+      "revId": "61848a62377870e1d73213963fe9ad4f2eedcc4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
