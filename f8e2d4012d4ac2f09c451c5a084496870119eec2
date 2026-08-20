@@ -16,6 +16,24 @@
       "message": "Please add LOW_COVERAGE_REASON",
       "revId": "f8e2d4012d4ac2f09c451c5a084496870119eec2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "972c0f3d_d976b581",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4286605
+      },
+      "writtenOn": "2026-08-20T11:17:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4867dd7_53e2c051",
+      "revId": "f8e2d4012d4ac2f09c451c5a084496870119eec2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
