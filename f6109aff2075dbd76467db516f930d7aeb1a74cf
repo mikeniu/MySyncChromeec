@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16efc471_7ea47fdc",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:49:37Z",
+      "side": 1,
+      "message": "Extra set of parentheses here",
+      "range": {
+        "startLine": 390,
+        "startChar": 6,
+        "endLine": 390,
+        "endChar": 7
+      },
+      "revId": "f6109aff2075dbd76467db516f930d7aeb1a74cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cecbea7_6f6f4f77",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:49:37Z",
+      "side": 1,
+      "message": "For consistency with the new code you\u0027re adding, can you change `sizeof` to global_context.user_id.size() in a follow-up CL?",
+      "range": {
+        "startLine": 401,
+        "startChar": 2,
+        "endLine": 402,
+        "endChar": 41
+      },
+      "revId": "f6109aff2075dbd76467db516f930d7aeb1a74cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fb483eb_a0438f51",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 1479,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:49:37Z",
+      "side": 1,
+      "message": "**1. Test Coverage for Partial Matches (`fpsensor_template.cc`)**\nWhile the code is secure, the test suite could still benefit from a \"partial match\" test case. `FAKE_USER_ID_ALT` differs from `FAKE_USER_ID` at the very first byte.\n\n* **Recommendation**: Adding a test where the AP attempts to authenticate with a user ID that matches the first 16 bytes but differs in the last 16 bytes would explicitly validate the full-length behavior of `safe_memcmp` in your test suite, guarding against future regressions.",
+      "range": {
+        "startLine": 1479,
+        "startChar": 0,
+        "endLine": 1479,
+        "endChar": 69
+      },
+      "revId": "f6109aff2075dbd76467db516f930d7aeb1a74cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
