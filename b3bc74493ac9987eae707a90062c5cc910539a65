@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3b4db5c3_f094c717",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T19:16:06Z",
+      "side": 1,
+      "message": "Did you confirm the test fails without this change. If so, can you add a comment?",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 22
+      },
+      "revId": "b3bc74493ac9987eae707a90062c5cc910539a65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4c3f3270_94ca27bb",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 9
@@ -32,6 +55,29 @@
       "writtenOn": "2026-08-20T19:13:16Z",
       "side": 1,
       "message": "We\u0027ll need to check whether the same thing applies in the Zephyr version. Can you file a bug to track and paste here?",
+      "revId": "b3bc74493ac9987eae707a90062c5cc910539a65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "412feed5_fd1ce3dd",
+        "filename": "test/flash_pre_init_protect.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T19:16:06Z",
+      "side": 1,
+      "message": "I don\u0027t think the FPMCU uses this. Have you tested this path? If not, we should probably remove it.",
+      "range": {
+        "startLine": 102,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 27
+      },
       "revId": "b3bc74493ac9987eae707a90062c5cc910539a65",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
