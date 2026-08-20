@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdaec46a_2974b109",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-20T22:58:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80abfee8_6210dc32",
+      "range": {
+        "startLine": 415,
+        "startChar": 7,
+        "endLine": 415,
+        "endChar": 25
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1b1fad18_9f11e7ce",
@@ -54,6 +78,30 @@
       "writtenOn": "2026-08-19T17:25:32Z",
       "side": 1,
       "message": "This path (and the enable path) need some unit tests.",
+      "range": {
+        "startLine": 429,
+        "startChar": 0,
+        "endLine": 429,
+        "endChar": 23
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56a61c07_31f52dff",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-20T22:58:14Z",
+      "side": 1,
+      "message": "Unit test added and coverage shows those are tested.",
+      "parentUuid": "1b1fad18_9f11e7ce",
       "range": {
         "startLine": 429,
         "startChar": 0,
@@ -87,6 +135,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa04131c_ccc22537",
+        "filename": "include/motion_sense.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-20T22:58:14Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "5a0460f5_97493ce8",
+      "range": {
+        "startLine": 159,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 20
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2a557fb_73f020b8",
@@ -100,6 +172,30 @@
       "writtenOn": "2026-08-19T17:25:32Z",
       "side": 1,
       "message": "Call this `legacy-irq` so it\u0027s clearer how this is used.",
+      "range": {
+        "startLine": 66,
+        "startChar": 2,
+        "endLine": 66,
+        "endChar": 5
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b113ca2_ccc4ff62",
+        "filename": "zephyr/dts/bindings/motionsense/motionsense-sensor-base.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-20T22:58:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2a557fb_73f020b8",
       "range": {
         "startLine": 66,
         "startChar": 2,
@@ -133,6 +229,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "afa3e251_27d2b389",
+        "filename": "zephyr/program/fatcat/ruby-ish/motionsense.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-20T22:58:14Z",
+      "side": 1,
+      "message": "CL:8274395 submmited",
+      "parentUuid": "e0f032d9_83c63c43",
+      "range": {
+        "startLine": 97,
+        "startChar": 7,
+        "endLine": 97,
+        "endChar": 14
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a76c79f2_2ccdd7b3",
@@ -146,6 +266,30 @@
       "writtenOn": "2026-08-19T17:25:32Z",
       "side": 1,
       "message": "This isn\u0027t referenced anywhere.  Probably got dropped when you rebased on my change to delete `int_signal`.",
+      "range": {
+        "startLine": 142,
+        "startChar": 8,
+        "endLine": 142,
+        "endChar": 20
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "686d7fdf_e0fd51dd",
+        "filename": "zephyr/shim/src/motionsense_sensors.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-20T22:58:14Z",
+      "side": 1,
+      "message": "Added back to SENSOR_BASIC_INFO",
+      "parentUuid": "a76c79f2_2ccdd7b3",
       "range": {
         "startLine": 142,
         "startChar": 8,
@@ -179,6 +323,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80458621_72041624",
+        "filename": "zephyr/shim/src/motionsense_sensors.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-20T22:58:14Z",
+      "side": 1,
+      "message": "Added the check.",
+      "parentUuid": "b758a8ea_d5a8c76d",
+      "range": {
+        "startLine": 410,
+        "startChar": 0,
+        "endLine": 410,
+        "endChar": 16
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e63e843a_2d5ac188",
@@ -202,6 +370,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bea978c_33526524",
+        "filename": "zephyr/shim/src/motionsense_sensors.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-20T22:58:14Z",
+      "side": 1,
+      "message": "Moved to new line.",
+      "parentUuid": "e63e843a_2d5ac188",
+      "range": {
+        "startLine": 411,
+        "startChar": 0,
+        "endLine": 411,
+        "endChar": 46
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "83f43da5_7b7c8fea",
@@ -215,6 +407,30 @@
       "writtenOn": "2026-08-19T17:25:32Z",
       "side": 1,
       "message": "Nit - indentation is wrong.",
+      "range": {
+        "startLine": 414,
+        "startChar": 1,
+        "endLine": 414,
+        "endChar": 2
+      },
+      "revId": "bd606fd5707a9ec66d63acfc85bfd475d9b7bb67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e623e324_6eba7b79",
+        "filename": "zephyr/shim/src/motionsense_sensors.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-20T22:58:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83f43da5_7b7c8fea",
       "range": {
         "startLine": 414,
         "startChar": 1,
