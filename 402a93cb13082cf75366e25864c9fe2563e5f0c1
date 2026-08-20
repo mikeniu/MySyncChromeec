@@ -16,6 +16,23 @@
       "message": "Hi @tristan, @caveh@chromium.org, could you please review and help change merge?",
       "revId": "402a93cb13082cf75366e25864c9fe2563e5f0c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d102253_daa82fa7",
+        "filename": "zephyr/program/ocelot/hekla/project.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-20T06:18:54Z",
+      "side": 1,
+      "message": "Hekla does not support TBT so we don\u0027t need to enable it.",
+      "revId": "402a93cb13082cf75366e25864c9fe2563e5f0c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
