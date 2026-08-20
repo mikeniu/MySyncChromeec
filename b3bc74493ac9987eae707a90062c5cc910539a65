@@ -61,6 +61,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d9c8941a_b079abf8",
+        "filename": "chip/stm32/flash-stm32h7.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T19:17:25Z",
+      "side": 1,
+      "message": "For consistency with the comment you should probably use `0` here.",
+      "range": {
+        "startLine": 589,
+        "startChar": 35,
+        "endLine": 589,
+        "endChar": 40
+      },
+      "revId": "b3bc74493ac9987eae707a90062c5cc910539a65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "412feed5_fd1ce3dd",
         "filename": "test/flash_pre_init_protect.c",
         "patchSetId": 9
