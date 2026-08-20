@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52fdf758_c3881350",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:23:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/1f3fca6c-45c4-4b8b-ae92-232427423823)]\n\n**Review Summary**\n* **Functionality**: The code correctly integrates the Zephyr OTP driver for the Realtek FP to read and provision the OTP key. I left a couple of minor inline suggestions for device readiness and NULL checks.\n* **Security**: Proper use of `trng_rand_bytes` and `OPENSSL_cleanse` to handle and erase sensitive key data.\n* **Style**: Code adheres well to the project conventions and formatting.\n* **Testing**: Good leverage of the existing `otp_key` device tests (`TEST\u003d./test/run_device_tests.py -b realtekfp -t otp_key --zephyr`). The implementation logic is fairly straightforward and appears well-covered.\n* **CL Size**: The CL is small, self-contained, and appropriately scoped.\n\nTAG\u003dagy\nCONV\u003d701dbf06-ef06-4ae8-b9a2-c02c5c3e7cb1",
+      "isAi": true,
+      "revId": "6f435eb9ba9076efc9cef01439309e4d38424a27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ccbf707_653f0776",
+        "filename": "zephyr/shim/chip/rtkfp/otp_key.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:23:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider checking if the OTP device is ready during initialization to catch any binding or hardware initialization issues early:\n\n```c\nvoid otp_key_init(void)\n{\n\tif (!device_is_ready(otp_dev)) {\n\t\tLOG_ERR(\"OTP device not ready\");\n\t}\n}\n```",
+      "isAi": true,
+      "revId": "6f435eb9ba9076efc9cef01439309e4d38424a27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c5b3f77_ac2ca956",
+        "filename": "zephyr/shim/chip/rtkfp/otp_key.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:23:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] It might be a good idea to add a NULL check for `key_buffer` before passing it to `otp_read` to prevent potential null pointer dereferences if called improperly:\n\n```c\n\tif (!key_buffer) {\n\t\treturn EC_ERROR_INVAL;\n\t}\n```",
+      "isAi": true,
+      "revId": "6f435eb9ba9076efc9cef01439309e4d38424a27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
