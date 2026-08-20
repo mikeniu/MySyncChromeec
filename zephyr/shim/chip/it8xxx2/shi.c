@@ -10,6 +10,9 @@
 
 #include <errno.h>
 
+#include <zephyr/pm/device.h>
+#include <zephyr/pm/device_runtime.h>
+
 #include <ap_power/ap_power.h>
 
 #define SPI_RX_MAX_FIFO_SIZE 256
@@ -23,6 +26,8 @@
 #define SPI_MAX_RESPONSE_SIZE \
 	(SPI_TX_MAX_FIFO_SIZE - EC_SPI_PREAMBLE_LENGTH - EC_SPI_PAST_END_LENGTH)
 
+#define SHI_NODE DT_NODELABEL(shi0)
+
 static void shi_disable(void)
 {
 	/* Enable sleep mask of SHI to enter deep sleep of power plicy. */
@@ -32,10 +37,18 @@ static void shi_disable(void)
 static void shi_power_shutdown_handler(struct ap_power_ev_callback *cb,
 				       struct ap_power_ev_data data)
 {
+	const struct device *shi_dev = DEVICE_DT_GET(SHI_NODE);
+
 	switch (data.event) {
+	case AP_POWER_PRE_INIT:
+		pm_device_runtime_get(shi_dev);
+		break;
 	case AP_POWER_SHUTDOWN_COMPLETE:
 		/* Disable SHI bus */
 		shi_disable();
+		break;
+	case AP_POWER_HARD_OFF:
+		pm_device_runtime_put(shi_dev);
 		break;
 	default:
 		__ASSERT(false, "%s: unhandled event: %d", __func__,
@@ -50,7 +63,9 @@ static void install_power_change_handler(void)
 
 	/* Add a callback of power shutdown complete to enable sleep mask. */
 	ap_power_ev_init_callback(&cb, shi_power_shutdown_handler,
-				  AP_POWER_SHUTDOWN_COMPLETE);
+				  AP_POWER_SHUTDOWN_COMPLETE |
+					  AP_POWER_PRE_INIT |
+					  AP_POWER_HARD_OFF);
 	ap_power_ev_add_callback(&cb);
 }
 /* Call hook after chipset sets initial power state */

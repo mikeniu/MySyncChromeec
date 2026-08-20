@@ -78,6 +78,68 @@ def test_find_dts_overlays(modules):
     setup_modules_and_dispatch(modules, testcase)
 
 
+project_names = st.text(
+    alphabet=set(string.ascii_lowercase) | {"_"}, min_size=1
+)
+sets_of_project_names = st.lists(st.lists(project_names, unique=True))
+
+
+@hypothesis.given(sets_of_project_names)
+@hypothesis.settings(deadline=None)
+def test_find_kconfig_overlays(modules):
+    """Test the functionality of find_kconfig_overlays with multiple
+    modules, each with sets of project names."""
+
+    # Recursive function to wind up all the temporary directories and
+    # call the actual test.
+    def setup_modules_and_dispatch(modules, test_fn, module_list=()):
+        if modules:
+            projects = modules[0]
+            with tempfile.TemporaryDirectory() as modpath:
+                modpath = pathlib.Path(modpath)
+                for prj in projects:
+                    kconf_path = zmake.project.module_kconfig_overlay_name(
+                        modpath, prj
+                    )
+                    kconf_path.parent.mkdir(parents=True, exist_ok=True)
+                    kconf_path.touch()
+                setup_modules_and_dispatch(
+                    modules[1:], test_fn, module_list=module_list + (modpath,)
+                )
+        else:
+            test_fn(module_list)
+
+    # The actual test case, once temp modules have been setup.
+    def testcase(module_paths):
+        project_file_mapping = {}
+        for modpath, project_list in zip(module_paths, modules):
+            for prj in project_list:
+                file_name = zmake.project.module_kconfig_overlay_name(
+                    modpath, prj
+                )
+                files = project_file_mapping.get(prj, set())
+                project_file_mapping[prj] = files | {file_name}
+
+        for prj, expected_kconf_files in project_file_mapping.items():
+            project = zmake.project.Project(
+                zmake.project.ProjectConfig(
+                    project_name=prj,
+                    zephyr_board="fakeboard",
+                    output_packer=zmake.output_packers.ElfPacker,
+                    supported_toolchains=["host/llvm"],
+                    project_dir=pathlib.Path("/fakebuild"),
+                )
+            )
+            config = project.find_kconfig_overlays(
+                dict(enumerate(module_paths))
+            )
+            actual_kconf_files = set(config.kconfig_files)
+
+            assert actual_kconf_files == set(expected_kconf_files)
+
+    setup_modules_and_dispatch(modules, testcase)
+
+
 module_lists = st.lists(
     st.one_of(*map(st.just, zmake.modules.known_modules)), unique=True
 )
@@ -188,7 +250,7 @@ register_npcx_project(project_name="three", zephyr_board="three")
 register_binman_project(
     project_name="four",
     zephyr_board="four",
-    inherited_from="baseboard"
+    boards="baseboard"
 )
 """
 
@@ -197,7 +259,7 @@ register_raw_project(
     project_name="five",
     zephyr_board="foo",
     dts_overlays=[here / "gpio.dts"],
-    inherited_from=["root", "myboard"],
+    boards=["root", "myboard"],
 )
 """
 
@@ -207,7 +269,7 @@ register_raw_project(
     project_name="%invalid_name",
     zephyr_board="foo",
     dts_overlays=[here / "gpio.dts"],
-    inherited_from=["root", "myboard"],
+    boards=["root", "myboard"],
 )
 """
 
@@ -236,11 +298,9 @@ def test_find_projects(tmp_path):
 
     assert projects["four"].config.project_dir == cf1_dir
     assert projects["four"].config.zephyr_board == "four"
-    assert projects["four"].config.full_name == "baseboard.four"
 
     assert projects["five"].config.project_dir == cf2_dir
     assert projects["five"].config.zephyr_board == "foo"
-    assert projects["five"].config.full_name == "root.myboard.five"
 
 
 def test_find_projects_name_conflict(tmp_path):
@@ -290,9 +350,6 @@ another = some_variant.variant(
         tmp_path / "gpio.dts",
         tmp_path / "another.dts",
     ]
-    assert projects["some"].config.full_name == "some"
-    assert projects["some-variant"].config.full_name == "some.some-variant"
-    assert projects["another"].config.full_name == "some.some-variant.another"
 
 
 @pytest.mark.parametrize(

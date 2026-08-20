@@ -6,27 +6,27 @@ if BOARD_MEC172X
 
 # Zephyr internal stack sizes
 
-config IDLE_STACK_SIZE
+configdefault IDLE_STACK_SIZE
 	default 400
 
-config SYSTEM_WORKQUEUE_STACK_SIZE
+configdefault SYSTEM_WORKQUEUE_STACK_SIZE
 	default 1024
 
 # Chromium EC stack sizes
 
-config TASK_CHARGER_STACK_SIZE
+configdefault TASK_CHARGER_STACK_SIZE
 	default 1056
 
-config TASK_KEYSCAN_STACK_SIZE
+configdefault TASK_KEYSCAN_STACK_SIZE
 	default 1024
 
-config TASK_PD_STACK_SIZE
+configdefault TASK_PD_STACK_SIZE
 	default 1184
 
-config TASK_PD_INT_STACK_SIZE
+configdefault TASK_PD_INT_STACK_SIZE
 	default 1024
 
-config TASK_USB_CHG_STACK_SIZE
+configdefault TASK_USB_CHG_STACK_SIZE
 	default 1024
 
 endif # BOARD_MEC172X

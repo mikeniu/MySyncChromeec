@@ -189,7 +189,6 @@ ZTEST_USER(vstore, test_vstore_state)
 	struct ec_response_vstore_info info_response;
 	struct host_cmd_handler_args info_args = BUILD_HOST_COMMAND_RESPONSE(
 		EC_CMD_VSTORE_INFO, 0, info_response);
-	jmp_buf env;
 	int i;
 
 	shell_backend_dummy_clear_output(get_ec_shell());
@@ -201,19 +200,29 @@ ZTEST_USER(vstore, test_vstore_state)
 	/* Write to a slot */
 	zassert_ok(ec_cmd_vstore_write(NULL, &write_params), NULL);
 
+#ifndef CONFIG_EC_HOST_CMD
+	jmp_buf env;
 	/* Set up so we get back to this test on a reboot */
 	if (!setjmp(env)) {
 		system_fake_setenv(&env);
 
-#ifndef CONFIG_EC_HOST_CMD
 		/* Reboot to RW  */
 		zassert_ok(host_command_process(&reboot_args), NULL);
-#else
-		host_command_reboot(&reboot_args);
-#endif
+
 		/* Does not return unless something went wrong */
 		zassert_unreachable("Failed to reboot");
 	}
+#else
+	/* In upstream host commands, reboot is deferred and executes in the
+	 * supervisor work queue thread. To avoid cross-thread longjmp stack
+	 * corruption, we do not register the fake setenv jump target. Instead,
+	 * we let the deferred task execute and then manually trigger system
+	 * pre-init to simulate reboot recovery.
+	 */
+	zassert_ok(host_command_process(&reboot_args), NULL);
+	k_msleep(200);
+	system_common_pre_init();
+#endif
 
 	/* the reboot should end up here: check the slot is still locked */
 	zassert_ok(host_command_process(&info_args), NULL);

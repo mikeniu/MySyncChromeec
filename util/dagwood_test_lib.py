@@ -51,13 +51,25 @@ def add_common_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Run tests from SRAM (adds -r to flash command).",
     )
+    parser.add_argument(
+        "-b",
+        "--build-only",
+        action="store_true",
+        help=(
+            "Only build the test binaries; do not execute on hardware "
+            "or flash."
+        ),
+    )
 
 
-def get_twister_args(args: argparse.Namespace) -> list:
+def get_twister_args(
+    args: argparse.Namespace, extra_args: list | None = None
+) -> list:
     """Construct twister arguments from parsed arguments.
 
     Args:
         args: Parsed command-line arguments (Namespace).
+        extra_args: Unparsed extra arguments to pass through to twister.
 
     Returns:
         A list of string arguments to be passed to the twister command.
@@ -71,14 +83,25 @@ def get_twister_args(args: argparse.Namespace) -> list:
         "--toolchain=coreboot-sdk",
         "-p",
         args.platform,
-        "--device-testing",
-        "--device-serial",
-        args.device_serial,
-        "--flash-command",
-        flash_cmd,
-        "--device-flash-timeout",
-        "60",
     ]
+
+    if args.build_only:
+        twister_args.append("-b")
+    else:
+        twister_args.extend(
+            [
+                "--device-testing",
+                "--device-serial",
+                args.device_serial,
+                "--flash-command",
+                flash_cmd,
+                "--device-flash-timeout",
+                "60",
+            ]
+        )
+
+    if args.sram:
+        twister_args.append("-x=SNIPPET=sram-only")
 
     if args.test_dir:
         for t_dir in args.test_dir:
@@ -87,5 +110,8 @@ def get_twister_args(args: argparse.Namespace) -> list:
     if args.test_scenario:
         for scenario in args.test_scenario:
             twister_args.extend(["-s", scenario])
+
+    if extra_args:
+        twister_args.extend(extra_args)
 
     return twister_args

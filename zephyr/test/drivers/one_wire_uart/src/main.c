@@ -251,6 +251,30 @@ ZTEST(one_wire_uart_driver, test_bad_packet_length)
 	zassert_equal(ring_buf_size_get(data->rx_ring_buf), 0);
 }
 
+ZTEST(one_wire_uart_driver, test_bad_packet_length_zero)
+{
+	struct one_wire_uart_data *data = dev->data;
+	struct one_wire_uart_message msg;
+
+	memset(&msg, 0, sizeof(msg));
+	msg.header.magic = HEADER_MAGIC;
+	msg.header.payload_len = 0;
+	msg.header.sender = 1;
+	msg.header.ack = 0;
+	msg.header.reset = 0;
+	msg.header.msg_id = 11;
+	msg.header.checksum = 0;
+	ring_buf_put(data->rx_ring_buf, (uint8_t *)&msg, sizeof(msg.header));
+
+	one_wire_uart_set_callback(dev, on_message_received);
+
+	process_rx_fifo(dev);
+	process_packet();
+
+	zassert_equal(on_message_received_fake.call_count, 0);
+	zassert_equal(ring_buf_size_get(data->rx_ring_buf), 0);
+}
+
 ZTEST(one_wire_uart_driver, test_reset)
 {
 	struct one_wire_uart_data *data = dev->data;

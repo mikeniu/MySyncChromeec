@@ -20,5 +20,8 @@
 		lgc_ap19b8m: lgc-ap19b8m {
 			compatible = "lgc,ap19b8m", "battery-smart";
 		};
+		atl-ap24cal {
+			compatible = "atl,ap24cal", "battery-smart";
+		};
 	};
 };

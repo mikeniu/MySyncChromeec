@@ -135,7 +135,7 @@ ZTEST_USER(host_cmd_get_panic_info, test_get_panic_info_v2_multi_part)
 	args.params_size = sizeof(params);
 
 	pdata->arch = 1;
-	pdata->struct_version = 2;
+	pdata->struct_version = PANIC_DATA_VERSION;
 	pdata->flags = 0;
 	pdata->reserved = 0;
 	pdata->struct_size = sizeof(struct panic_data);

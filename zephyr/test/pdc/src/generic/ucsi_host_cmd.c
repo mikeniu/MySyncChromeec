@@ -59,6 +59,7 @@ ZTEST_USER(ucsi_host_cmd, test_get_error)
 		.offset = 1,
 		.size = 1,
 	};
+	uint8_t data[1];
 	enum ec_status rv;
 	struct ucsi_ppm_device fake_ppm_device;
 
@@ -66,7 +67,7 @@ ZTEST_USER(ucsi_host_cmd, test_get_error)
 	eppm_init();
 
 	ucsi_ppm_read_fake.return_val = -1;
-	rv = ec_cmd_ucsi_ppm_get(NULL, &params);
+	rv = ec_cmd_ucsi_ppm_get(NULL, &params, data);
 	zassert_equal(rv, EC_RES_ERROR);
 	zassert_equal(ucsi_ppm_read_fake.call_count, 1);
 	zassert_equal(ucsi_ppm_read_fake.arg0_val, &fake_ppm_device);
@@ -79,6 +80,7 @@ ZTEST_USER(ucsi_host_cmd, test_get_success)
 		.offset = 1,
 		.size = 1,
 	};
+	uint8_t data[1];
 	enum ec_status rv;
 	struct ucsi_ppm_device fake_ppm_device;
 
@@ -86,7 +88,7 @@ ZTEST_USER(ucsi_host_cmd, test_get_success)
 	eppm_init();
 
 	ucsi_ppm_read_fake.return_val = 0;
-	rv = ec_cmd_ucsi_ppm_get(NULL, &params);
+	rv = ec_cmd_ucsi_ppm_get(NULL, &params, data);
 	zassert_equal(rv, EC_RES_SUCCESS);
 	zassert_equal(ucsi_ppm_read_fake.call_count, 1);
 	zassert_equal(ucsi_ppm_read_fake.arg0_val, &fake_ppm_device);
@@ -99,9 +101,10 @@ ZTEST_USER(ucsi_host_cmd, test_get_unavailable)
 		.offset = 1,
 		.size = 1,
 	};
+	uint8_t data[1];
 	enum ec_status rv;
 
-	rv = ec_cmd_ucsi_ppm_get(NULL, &params);
+	rv = ec_cmd_ucsi_ppm_get(NULL, &params, data);
 	zassert_equal(rv, EC_RES_UNAVAILABLE);
 	zassert_equal(ucsi_ppm_read_fake.call_count, 0);
 }

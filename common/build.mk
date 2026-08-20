@@ -10,7 +10,7 @@
 _common_dir:=$(dir $(lastword $(MAKEFILE_LIST)))
 
 common-y=util.o
-common-y+=version.o printf.o queue.o queue_policies.o irq_locking.o
+common-y+=version.o printf.o queue.o queue_policies.o
 
 common-$(CONFIG_ACCELGYRO_BMI160)+=math_util.o
 common-$(CONFIG_ACCELGYRO_BMI220)+=math_util.o
@@ -75,11 +75,7 @@ common-$(CONFIG_IO_EXPANDER)+=ioexpander.o ioexpander_commands.o
 common-$(CONFIG_COMMON_PANIC_OUTPUT)+=panic_output.o
 common-$(CONFIG_COMMON_RUNTIME)+=hooks.o system.o peripheral.o \
 	system_boot_time.o
-ifeq ($(BOARD),host)
-common-$(CONFIG_COMMON_RECURSIVE_MUTEX)+=recursive_mutex.o
-else ifeq ($(USE_BUILTIN_STDLIB), 1)
-common-$(CONFIG_COMMON_RECURSIVE_MUTEX)+=recursive_mutex.o
-endif
+
 common-$(CONFIG_COMMON_TIMER)+=timer.o
 common-$(CONFIG_CRC8_CROS)+= crc8.o
 common-$(CONFIG_CURVE25519)+=curve25519.o
@@ -95,26 +91,27 @@ common-$(CONFIG_EC_EC_COMM_SERVER)+=ec_ec_comm_server.o
 common-$(CONFIG_HOST_INTERFACE_ESPI)+=espi.o
 common-$(CONFIG_EXTPOWER_GPIO)+=extpower_gpio.o
 common-$(CONFIG_EXTPOWER)+=extpower_common.o
-common-$(CONFIG_FANS)+=fan.o pwm.o
+common-$(CONFIG_FANS)+=fan.o
 common-$(CONFIG_FLASH_CROS)+=flash.o
 common-$(CONFIG_FMAP)+=fmap.o
 common-$(CONFIG_GESTURE_SW_DETECTION)+=gesture.o
 common-$(CONFIG_HOSTCMD_EVENTS)+=host_event_commands.o
 common-$(CONFIG_HOSTCMD_GET_UPTIME_INFO)+=uptime.o
 common-$(CONFIG_HOSTCMD_PD)+=host_command_controller.o
-common-$(CONFIG_HOSTCMD_REGULATOR)+=regulator.o
-common-$(CONFIG_HOSTCMD_RTC)+=rtc.o
 common-$(CONFIG_I2C_DEBUG)+=i2c_trace.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_passthru.o
 common-$(CONFIG_I2C_PERIPHERAL)+=i2c_peripheral.o
 common-$(CONFIG_I2C_VIRTUAL_BATTERY)+=virtual_battery.o
+common-$(CONFIG_I2C_VIRTUAL_BATTERY)+=i2c_battery_parser.o
+ifneq ($(CONFIG_BATTERY),)
+common-$(CONFIG_I2C_PASSTHRU_RESTRICTED)+=i2c_battery_parser.o
+endif
 common-$(CONFIG_KEYBOARD_PROTOCOL_8042)+=keyboard_8042.o \
 	keyboard_8042_sharedlib.o
 common-$(CONFIG_KEYBOARD_PROTOCOL_MKBP)+=keyboard_mkbp.o mkbp_fifo.o \
 	mkbp_info.o
 common-$(CONFIG_KEYBOARD_TEST)+=keyboard_test.o
-common-$(CONFIG_KEYBOARD_VIVALDI)+=keyboard_vivaldi.o
 common-$(CONFIG_KEYBOARD_STRAUSS)+=keyboard_strauss.o
 common-$(CONFIG_MKBP_INPUT_DEVICES)+=mkbp_input_devices.o mkbp_fifo.o \
 	mkbp_info.o
@@ -136,10 +133,8 @@ common-$(CONFIG_PERIPHERAL_CHARGER)+=peripheral_charger.o
 common-$(CONFIG_POWER_BUTTON)+=power_button.o
 common-$(CONFIG_POWER_BUTTON_X86)+=power_button_x86.o
 common-$(CONFIG_PSTORE)+=pstore_commands.o
-common-$(CONFIG_PWM)+=pwm.o
 common-$(CONFIG_PWM_KBLIGHT)+=pwm_kblight.o
 common-$(CONFIG_KEYBOARD_BACKLIGHT)+=keyboard_backlight.o
-common-$(CONFIG_RGB_KEYBOARD)+=rgb_keyboard.o
 common-$(CONFIG_ROLLBACK)+=rollback.o
 common-$(CONFIG_RSA)+=rsa.o
 common-$(CONFIG_RWSIG)+=rwsig.o vboot/common.o
@@ -180,7 +175,6 @@ common-$(CONFIG_USB_PD_DISCOVERY)+=usb_pd_discovery.o
 common-$(CONFIG_USB_PD_ALT_MODE_UFP)+=usb_pd_alt_mode_ufp.o
 common-$(CONFIG_USB_PD_DPS)+=dps.o
 common-$(CONFIG_USB_PD_LOGGING)+=event_log.o pd_log.o
-common-$(CONFIG_USB_PD_TCPC)+=usb_pd_tcpc.o
 common-$(CONFIG_USB_UPDATE)+=usb_update.o update_fw.o
 common-$(CONFIG_USBC_OCP)+=usbc_ocp.o
 common-$(CONFIG_USBC_PPC)+=usbc_ppc.o
@@ -200,15 +194,14 @@ common-$(CONFIG_WEBUSB_URL)+=webusb_desc.o
 common-$(CONFIG_WIRELESS)+=wireless.o
 common-$(HAS_TASK_CHIPSET)+=chipset.o
 common-$(CONFIG_CMD_AP_RESET_LOG)+=ap_reset_log.o
-common-$(HAS_TASK_CONSOLE)+=console.o console_output.o
-common-$(HAS_TASK_CONSOLE)+=uart_buffering.o uart_hostcmd.o uart_printf.o
+common-$(HAS_TASK_CONSOLE)+=console_output.o
+common-$(HAS_TASK_CONSOLE)+=uart_hostcmd.o uart_printf.o
 common-$(CONFIG_CMD_MEM)+=memory_commands.o
 common-$(HAS_TASK_HOSTCMD)+=host_command_task.o host_command.o ec_features.o
 common-$(HAS_TASK_PDCMD)+=host_command_pd.o
 common-$(HAS_TASK_KEYSCAN)+=keyboard_scan.o
 common-$(HAS_TASK_LIGHTBAR)+=lb_common.o lightbar.o
 common-$(HAS_TASK_MOTIONSENSE)+=motion_sense.o
-common-$(CONFIG_HOST_COMMAND_MEMORY_DUMP)+=host_command_memory_dump.o
 common-$(CONFIG_PRESERVED_RING_BUF)+=preserved_ring_buf.o
 common-$(CONFIG_PANIC_LOG)+=panic_log.o
 
@@ -238,7 +231,6 @@ common-$(call not_cfg,$(CONFIG_SHARED_MALLOC))+=shared_mem.o
 endif
 endif
 
-common-$(TEST_BUILD)+=test_util.o
 
 ifneq ($(CONFIG_RSA_OPTIMIZED),)
 $(out)/RW/common/rsa.o: CFLAGS+=-O3
@@ -302,7 +294,4 @@ endif
 
 include $(_common_dir)fpsensor/build.mk
 include $(_common_dir)usbc/build.mk
-include $(_common_dir)mock/build.mk
-
 $(eval $(call vars_from_dir,common,usbc,common-usbc))
-$(eval $(call vars_from_dir,common,mock,mock))

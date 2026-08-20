@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "hooks.h"
 #include "multistep_test.h"
 #include "panic.h"
 #include "system.h"
@@ -46,9 +47,14 @@ static void check_panic_data(void)
 {
 	struct panic_data *pdata = panic_get_data();
 	uint32_t lr = 0;
-	uint32_t expected_flags = PANIC_DATA_FLAG_OLD_HOSTEVENT;
+	uint32_t expected_flags = 0;
 
-	if (IS_ENABLED(SECTION_IS_RW)) {
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_HOST_EVENT)) {
+		hook_notify(HOOK_CHIPSET_STARTUP);
+		expected_flags |= PANIC_DATA_FLAG_OLD_HOSTEVENT;
+	}
+
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
 		expected_flags |= PANIC_DATA_FLAG_RW_IMAGE;
 	} else {
 		expected_flags |= PANIC_DATA_FLAG_RO_IMAGE;
