@@ -51,6 +51,7 @@
 			offset = <0x0>;
 			size = <0x20000>;
 			ec-ro {
+				size = <0x20000>;
 				pad-byte = <0xff>;
 				ro-fw {
 					/*
@@ -62,6 +63,16 @@
 					 * 'rom_start' section.
 					 */
 					elf-base-sym = "__rom_start_address";
+				};
+
+				/*
+				 * Override ro-frid offset to account for the 64-byte (0x40)
+				 * NPCX firmware header prepended to the Zephyr RO image.
+				 * 4 (version struct offset) + 0x40 (header) = 0x44 (68 bytes)
+				 * go/cros-fp-npcx99fp-bootloader
+				 */
+				ro-frid {
+					offset-from-elf = <&zephyr_ro>, "current_image_data", <0x44>;
 				};
 			};
 		};

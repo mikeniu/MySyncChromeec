@@ -327,11 +327,11 @@ ZTEST(qcom_power, test_request_sleep_timeout)
 	k_sleep(K_SECONDS(16));
 	zassert_equal(power_get_state(), POWER_S0);
 	buffer = shell_backend_dummy_get_output(get_ec_shell(), &buffer_size);
-#if defined(SECTION_IS_RW)
+#if defined(CONFIG_CROS_EC_RW)
 	zassert_true(strstr(buffer, "Detected sleep hang!") != NULL,
 		     "Invalid console output %s", buffer);
 	zassert_true(host_is_event_set(EC_HOST_EVENT_HANG_DETECT));
-#endif /* SECTION_IS_RW */
+#endif /* CONFIG_CROS_EC_RW */
 }
 
 ZTEST(qcom_power, test_chipset_force_shutdown)

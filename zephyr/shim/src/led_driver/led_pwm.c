@@ -96,7 +96,7 @@ DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, DT_FOREACH_CHILD, GEN_PINS_NODES)
  */
 #define PINS_NODE_PTR(id) &PINS_NODE(id),
 
-const struct led_pins_node_t *pins_node[] = {
+static const struct led_pins_node_t *pins_node[] = {
 	DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, DT_FOREACH_CHILD,
 						PINS_NODE_PTR)
 };
@@ -106,8 +106,8 @@ const struct led_pins_node_t *pins_node[] = {
  * to enable the color. Defined value is duty cycle in percentage
  * converted to duty cycle in ns (pulse_ns)
  */
-void led_set_color_with_pins(const struct pwm_pin_t *pwm_pins,
-			     uint8_t pins_count, uint8_t brightness)
+static void led_set_color_with_pins(const struct pwm_pin_t *pwm_pins,
+				    uint8_t pins_count, uint8_t brightness)
 {
 	for (int j = 0; j < pins_count; j++) {
 		pwm_pins[j].pwm->pulse_ns =
@@ -217,15 +217,16 @@ static void pwm_set_color_with_pattern(void *p)
 
 		if (pattern->transition == LED_TRANSITION_LINEAR &&
 		    duration_ms != 0) {
-			cur_color[i].pulse_ns = (next_color[i].pulse_ns -
-						 prev_color[i].pulse_ns) /
-							duration_ms *
-							pattern->elapsed_ms +
-						prev_color[i].pulse_ns;
-			cur_color[i].pulse_step_ns = (next_color[i].pulse_ns -
-						      prev_color[i].pulse_ns) /
-						     duration_ms *
-						     LED_ANIMATION_TICK_MS;
+			int64_t pulse_diff = (int64_t)next_color[i].pulse_ns -
+					     prev_color[i].pulse_ns;
+
+			cur_color[i].pulse_ns =
+				((pulse_diff * pattern->elapsed_ms) /
+				 duration_ms) +
+				prev_color[i].pulse_ns;
+			cur_color[i].pulse_step_ns = pulse_diff *
+						     LED_ANIMATION_TICK_MS /
+						     duration_ms;
 		}
 		/*
 		 * This algorithm first finds the ratio of the starting and end

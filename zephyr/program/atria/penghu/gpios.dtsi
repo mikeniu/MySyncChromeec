@@ -11,6 +11,9 @@
 	named-gpios {
 		compatible = "named-gpios";
 
+		gpio_all_sys_pg: all_sys_pg {
+			gpios = <&gpiod 5 (GPIO_INPUT)>;
+		};
 		gpio_gsc_ec_pwr_btn_odl: gsc_ec_pwr_btn_odl {
 			gpios = <&gpioe 4 (GPIO_INPUT)>;
 			enum-name = "GPIO_POWER_BUTTON_L";
@@ -25,6 +28,24 @@
 		gpio_ec_en_edp_bl: ec_en_edp_bl {
 			gpios = <&gpioc 6 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
 			enum-name = "GPIO_ENABLE_BACKLIGHT";
+		};
+		gpio_en_s5_rails: en_s5_rails {
+			gpios = <&gpioi 7 (GPIO_INPUT)>;
+			enum-name = "GPIO_TEMP_SENSOR_POWER";
+			no-auto-init;
+		};
+		gpio_en_pp5000_fan: en_pp5000_fan {
+			gpios = <&gpioc 4 (GPIO_OUTPUT | GPIO_ACTIVE_LOW)>;
+		};
+		gpio_ec_soc_rtcrst: ec_soc_rtcrst {
+			gpios = <&gpioh 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+		gpio_ec_soc_pwr_btn_odl: ec_soc_pwr_btn_odl {
+			gpios = <&gpioe 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
+			enum-name = "GPIO_PCH_PWRBTN_L";
+		};
+		gpio_ec_forcepr_odl: ec_forcepr_odl {
+			gpios = <&gpioi 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ec_soc_int_odl: ec_soc_int_odl {
 			gpios = <&gpiom 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
@@ -41,9 +62,24 @@
 			gpios = <&gpioe 6 GPIO_OUTPUT>;
 			enum-name = "GPIO_PACKET_MODE_EN";
 		};
+		/* Retain these GPIO declarations for debugging pdc purposes. */
+		gpio_usb_pd1_int_odl: usb_pd_int_odl {
+			gpios = <&gpiof 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			no-auto-init;
+		};
+		gpio_usb_pd2_int_odl: usb_pd2_int_odl {
+			gpios = <&gpiob 2 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			no-auto-init;
+		};
 		/* The legacy system code requires GPIO_ENTERING_RW symbol */
 		ec-entering-rw {
 			enum-name = "GPIO_ENTERING_RW";
+		};
+		gpio_led_1_l: led_1_l {
+			gpios = <&gpioa 2 GPIO_OUTPUT_HIGH>;
+		};
+		gpio_led_2_l: led_2_l {
+			gpios = <&gpioa 3 GPIO_OUTPUT_HIGH>;
 		};
 	};
 };

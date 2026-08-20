@@ -38,3 +38,7 @@ properties:
       - "DRP_TRY_SRC"
       - "DRP_TRY_SNK"
     required: true
+  max-discharge-current-ma:
+    type: int
+  max-discharge-power-mw:
+    type: int

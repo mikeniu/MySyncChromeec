@@ -637,6 +637,21 @@ void battery_set_dynamic_info(const struct batt_params *params, bool ac_present,
 			      bool is_charging, bool sustainer_idle);
 
 /**
+ * @brief Filters battery status with discharge current deadband
+ *
+ * Filter out nuisance discharge state transitions when specific
+ * conditions are met.
+ *
+ * @param batt_flags latest computed flags (EC_BATT_FLAG_*).
+ * @param params latest observed battery parameters.
+ *
+ * @return filtered batt_flags.
+ *
+ */
+uint8_t batt_deadband_check(uint8_t batt_flags,
+			    const struct batt_params *params);
+
+/**
  * Calculate if battery is full based on whether it is accepting charge.
  *
  * @param batt Battery parameters.
