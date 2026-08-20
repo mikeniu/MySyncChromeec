@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "061f7415_9ff158eb",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:52:10Z",
+      "side": 1,
+      "message": "We could simplify the logic with something like:\n\n```\nif (safe_memcmp(global_context.user_id.data(), p-\u003euserid,\n                global_context.user_id.size()) \u003d\u003d 0) {\n    return EC_RES_SUCCESS;\n}\n\nif (global_context.fp_encryption_status \u0026 FP_CONTEXT_USER_ID_SET) {\n    return EC_RES_ACCESS_DENIED;\n}\n\nmemcpy(global_context.user_id.data(), p-\u003euserid, global_context.user_id.size());\n```",
+      "range": {
+        "startLine": 384,
+        "startChar": 1,
+        "endLine": 399,
+        "endChar": 3
+      },
+      "revId": "f6109aff2075dbd76467db516f930d7aeb1a74cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5cecbea7_6f6f4f77",
         "filename": "common/fpsensor/fpsensor_state.cc",
         "patchSetId": 31
