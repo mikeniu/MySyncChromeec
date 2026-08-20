@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcaf0b0b_15a3be50",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T01:27:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/69e896c2-9135-4be0-ab49-5ae00f1c5f5f)]\n\n### Review Summary\n\n*   **Functionality:** Excellent. The refactoring carefully preserves the original test logic and structure while significantly reducing boilerplate. As an added benefit, the explicit initialization in `load_v1_template` correctly fixes an uninitialized memory read that was previously present in `test_fp_command_commit_without_seed`.\n*   **Style:** Very strong. The changes make excellent use of modern C++20 features (e.g., `std::span`, `std::ranges`, `constexpr std::array`, designated initializers) to produce safer and more expressive code.\n*   **Security:** N/A (Test refactoring only).\n*   **Testing \u0026 Test Coverage:** The CL successfully streamlines existing unit tests without removing coverage.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized and well-scoped exclusively to refactoring unit test constants and setup routines.\n\nGreat cleanup!",
+      "isAi": true,
+      "revId": "e58a96d751e1296e90f7ec22ed8abce5ecd876dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
