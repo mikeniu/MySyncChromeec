@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dea29bef_9862e6f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:02:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/f557ff85-beef-4a5f-8300-e0e5a81164bf)]\n\n### Review Summary\n*   **Functionality:** The logic to run RTS5817 after a power cycle introduces a `run_realtekfp` helper that does not fully implement support for remote JLink servers (the `remote` argument is unused in the helper and hardcoded to an empty string at the call site).\n*   **Security:** No security concerns identified.\n*   **Style:** Minor Python style issue with the temporary file creation not using a context manager, relying on garbage collection for cleanup.\n*   **Testing \u0026 Test Coverage:** The patch adds support for a new board to the test runner infrastructure. No additional tests are needed.\n*   **CL Size \u0026 Scope:** The CL is small, well-contained, and focused on a single logical change.\n\nTAG\u003dagy\nCONV\u003df557ff85-beef-4a5f-8300-e0e5a81164bf",
+      "isAi": true,
+      "revId": "d5b28f2cb694c4d1114d4170a355823b25aba388",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35cb10d2_99aeb17e",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:02:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The `remote` parameter is defined in the function signature but is never used in the function body. If remote execution is needed, you should add `cmd.extend([\"-ip\", remote])` when `remote` is not empty, similar to how it is handled in `util/flash_jlink.py`.",
+      "isAi": true,
+      "revId": "d5b28f2cb694c4d1114d4170a355823b25aba388",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2af53a9b_62488335",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:02:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider using a context manager (`with tempfile.NamedTemporaryFile() as tmp:`) to ensure the temporary file is explicitly closed and deleted when the block exits, rather than relying on the garbage collector.",
+      "isAi": true,
+      "revId": "d5b28f2cb694c4d1114d4170a355823b25aba388",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "743172ab_999d8d1b",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2036,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:02:21Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `remote` is hardcoded to `\"\"` here. If this script is run with the `--remote` flag (which populates `args.remote` and `args.jlink_port`), `JLinkExe` will attempt to connect to a local USB J-Link instead of the remote one. Consider passing the remote IP and port here if they are set. For example: `remote\u003df\"{args.remote}:{args.jlink_port}\" if args.remote else \"\"`",
+      "isAi": true,
+      "revId": "d5b28f2cb694c4d1114d4170a355823b25aba388",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
