@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74e40c72_eacc85da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-20T22:11:18Z",
+      "side": 1,
+      "message": "Landing this now, while working on the generic feature in paralle.",
+      "revId": "baed890fa69e68321483d9146ad5cf9c0becdb7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "227aa619_eef49ef9",
@@ -134,6 +151,30 @@
       "side": 1,
       "message": "I\u0027m  testing out a change to strip out all the `int-signal` support to verify it is unused.  I\u0027ll cc you on the change it passes tests.",
       "parentUuid": "17702977_705b019d",
+      "range": {
+        "startLine": 20,
+        "startChar": 1,
+        "endLine": 20,
+        "endChar": 26
+      },
+      "revId": "baed890fa69e68321483d9146ad5cf9c0becdb7d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f36fd642_7f3bab4d",
+        "filename": "zephyr/program/fatcat/ruby-ish/src/sensor.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-20T22:11:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f2dfd7f_3b31edaf",
       "range": {
         "startLine": 20,
         "startChar": 1,
