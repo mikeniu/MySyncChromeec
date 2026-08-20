@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7097b23_b4e460fa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:05:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/d744fef3-9499-4f20-baf2-9151d9683b93)]\n\n### Review Summary\n**Functionality:** ❌ The regex expressions for `DATA_ACCESS_VIOLATION_1840000_REGEX` and `DATA_ACCESS_VIOLATION_1841000_REGEX` are incorrectly defined and will match any data access violation, ignoring the `mfar` address.\n**Style:** ❌ There is an obsolete TODO comment that needs to be removed.\n**Security:** ✅ No security vulnerabilities introduced.\n**Testing:** ✅ The CL configures the necessary testing parameters.\n**CL Size:** ✅ The CL is small and focused.",
+      "isAi": true,
+      "revId": "bc02076ecf8232eef05840dcb61a0398044ba99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9f83cc0_f1950a1d",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:05:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The first part of this alternation (`Data access violation\\r\\n`) will match *any* data access violation, meaning it won\u0027t distinguish between region 0 and region 1 violations.\n\nConsider adding the `mfar` address like in the other regexes, e.g., `Data access violation, mfar \u003d 1840000\\r\\n`.",
+      "isAi": true,
+      "revId": "bc02076ecf8232eef05840dcb61a0398044ba99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d076965_82ec258d",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:05:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Similarly, this should probably check the specific address in the first part of the alternation, e.g., `Data access violation, mfar \u003d 1841000\\r\\n`.",
+      "isAi": true,
+      "revId": "bc02076ecf8232eef05840dcb61a0398044ba99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e06b3b31_36de3221",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:05:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since this CL resolves `b/532643220` by configuring the rollback regexes, you should remove this TODO.",
+      "isAi": true,
+      "revId": "bc02076ecf8232eef05840dcb61a0398044ba99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
