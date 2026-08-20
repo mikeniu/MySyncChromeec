@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb3ecbf1_6df29588",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:56:23Z",
+      "side": 0,
+      "message": "This seems kind of unrelated to the change in this CL. Looks like this was fixed in http://b/385216796#comment5, so let\u0027s create a CL before this that re-enables the test.",
+      "range": {
+        "startLine": 527,
+        "startChar": 0,
+        "endLine": 527,
+        "endChar": 43
+      },
+      "revId": "0b77fde1c8824ad7a70000af59634407e624d77c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
