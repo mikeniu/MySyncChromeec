@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f0c6fff_32921810",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:09:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/a4a7dbb5-5886-49ae-9ee4-6b4759fd13eb)]\n\n**Review Summary**:\n* **Functionality**: The change correctly adds `__attribute__((noinline))` to `crash_system()`. This prevents the compiler (especially with LTO enabled) from inlining the function into `test_crash()`. This ensures that when the CPU traps (e.g., from `__ASSERT_UNREACHABLE`), the Link Register remains reliably pointing to the return address inside `test_crash()`, correctly satisfying the `crash_addr \u003c\u003d lr \u0026\u0026 crash_end \u003e\u003d lr` check.\n* **Security**: No security implications.\n* **Style**: Code style is consistent.\n* **Testing / Test Coverage**: This change directly fixes a test failure for the `realtekfp` board.\n* **CL Size \u0026 Scope**: The CL is small, self-contained, and perfectly scoped.",
+      "isAi": true,
+      "revId": "ec8eb43014aae20dad3f358db2a83ca92d7097d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
