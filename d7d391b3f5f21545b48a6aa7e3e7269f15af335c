@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce8999a1_d770f226",
+        "filename": "zephyr/test/drivers/host_cmd/src/battery_cut_off.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-20T22:32:52Z",
+      "side": 1,
+      "message": "This looks like an unintended change, as it doesn\u0027t seem related to `chargesplash`.",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 0
+      },
+      "revId": "d7d391b3f5f21545b48a6aa7e3e7269f15af335c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
