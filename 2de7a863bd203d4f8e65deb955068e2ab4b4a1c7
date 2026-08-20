@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e25a1875_fadb2263",
+        "filename": "zephyr/test/drivers/usbc_power_contract/src/usbc_power_contract.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-20T01:04:42Z",
+      "side": 1,
+      "message": "No, they don\u0027t actually add coverage. Removed.",
+      "parentUuid": "4426731d_e6027de2",
+      "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bef3796b_2575edeb",
@@ -49,6 +67,24 @@
       "writtenOn": "2026-08-19T21:43:23Z",
       "side": 1,
       "message": "Nit: You only have one port. You might as well put that in the function body.",
+      "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb16523d_e4f9618d",
+        "filename": "zephyr/test/drivers/usbc_sm/src/usbc_sm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-20T01:04:42Z",
+      "side": 1,
+      "message": "Done. Removed the port parameter and hardcoded PORT0 inside the helper.",
+      "parentUuid": "bef3796b_2575edeb",
       "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +106,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7db4710_3bce98ae",
+        "filename": "zephyr/test/drivers/usbc_sm/src/usbc_sm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-20T01:04:42Z",
+      "side": 1,
+      "message": "Added a diagram, comments and a helper macro to reduce the boilerplate in the tests.\n\nI don\u0027t claim to understand these sequences, but the LLM is confident that they match what was in the legacy test.",
+      "parentUuid": "90b75118_00007032",
+      "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6faa68e1_5ca45cba",
@@ -83,6 +137,24 @@
       "writtenOn": "2026-08-19T21:43:23Z",
       "side": 1,
       "message": "Nit: IDK what the coverage goals were here, but symmetry would suggest checks for `cc_is_snk_dbg_acc` as well.",
+      "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3796d2b_0761bb3b",
+        "filename": "zephyr/test/drivers/usbc_tcpc/src/tcpc_shim.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-20T01:04:42Z",
+      "side": 1,
+      "message": "Done. Added test cases verifying cc_is_snk_dbg_acc for (Rd, Rd), (Rp, Rp), and (Rd, Ra).",
+      "parentUuid": "6faa68e1_5ca45cba",
       "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
