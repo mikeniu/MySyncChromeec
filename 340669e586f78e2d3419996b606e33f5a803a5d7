@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07d70ce9_894f1e99",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T15:57:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/01a6c811-2549-48e8-9565-b96eae92ce35)]\n\n### Review Summary\n\n*   **Functionality:** The addition of `realtek_rts5817_watchdog` to the initialization condition in `zephyr/shim/src/watchdog.c` is correct. However, the hardware test for the watchdog (`zephyr/test/hwtest/src/watchdog.cc`) introduces SoC-specific logic to manually initialize the watchdog and fake the panic reason. This bypasses the actual test flow and indicates that proper initialization and panic handling may be missing in the SoC-specific driver.\n*   **Style:** Using SoC-specific `#ifdef` blocks in generic test files is an anti-pattern that makes the test suite difficult to maintain.\n*   **Security:** No security issues identified.\n*   **Testing \u0026 Test Coverage:** The hardware test is being bypassed/faked for this SoC. The underlying driver initialization and panic handling should be fixed so it can pass the generic test without SoC-specific workarounds.\n*   **CL Size \u0026 Scope:** The CL is appropriately small and targeted.",
+      "isAi": true,
+      "revId": "340669e586f78e2d3419996b606e33f5a803a5d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9da03473_1b52f4bc",
+        "filename": "zephyr/test/hwtest/src/watchdog.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T15:57:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Avoid adding SOC-specific `#ifdef` blocks to generic test files. If the SoC-specific logic in `test_watchdog` is removed, this include can also be removed.",
+      "isAi": true,
+      "revId": "340669e586f78e2d3419996b606e33f5a803a5d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07ac93d3_71f7bb93",
+        "filename": "zephyr/test/hwtest/src/watchdog.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T15:57:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Adding SOC-specific `#ifdef` blocks to generic hardware tests is an anti-pattern that makes the test suite difficult to maintain.\n\n1. `watchdog_init()`: If the watchdog isn\u0027t initialized before the test runs, this should be fixed in the SoC\u0027s initialization sequence (e.g., using `SYS_INIT` or board-level init), not worked around in the test.\n2. `panic_set_reason(...)`: If the RTS5817 watchdog hardware resets the chip without properly saving the panic reason via a pre-warning interrupt, this limitation should be handled in the SoC-specific watchdog driver or panic management code, rather than \"faking\" the reason here.",
+      "isAi": true,
+      "revId": "340669e586f78e2d3419996b606e33f5a803a5d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
