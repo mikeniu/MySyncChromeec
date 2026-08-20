@@ -52,6 +52,24 @@
       "parentUuid": "1aef2f76_8f4f324e",
       "revId": "7ee6861f4491a22b80b30c90b3fa11f2bcd06c52",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2af5e259_eefd40e2",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-08-20T05:39:18Z",
+      "side": 0,
+      "message": "\u003e I also left a more detailed analysis on the bug which confirmed my analysis.\n\nThanks!\n\n\u003e Alignment check added to legacy stm32l flash driver: https://crrev.com/c/56627\n\nThe check in STM verifies RAM address alignment to word size, which I think is reasonable. I believe checking the alignment for FLASH_WRITE_SIZE is just a bug.",
+      "parentUuid": "e88c948d_a6179694",
+      "revId": "7ee6861f4491a22b80b30c90b3fa11f2bcd06c52",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
