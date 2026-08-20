@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dafb4de_a1137614",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:29:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/487f5ca5-a726-4108-ade2-d83df54e4407)]\n\n### Review Summary\n\n**Functionality \u0026 Robustness**\n*   **Dead Code:** The CRC32 implementation and `dfu_suffix` struct are unused. If the intent is to validate firmware before flashing, the logic needs to be fully implemented. Otherwise, the dead code should be removed.\n*   **Driver Detachment:** The tool unconditionally detaches the kernel driver from interface `0` instead of the discovered DFU interface, which could cause issues on composite devices.\n*   **Re-enumeration:** Using a fixed `sleep(3)` when waiting for the device to re-enumerate is a potential source of flakiness. A polling approach with a timeout would be much more robust.\n\n**Testing**\n*   As a hardware-interacting host tool, full test coverage might be challenging, but if the CRC32 and argument parsing logic are retained, they should ideally be extracted into testable functions with accompanying unit tests to verify behavior (e.g., ensuring CRC mismatches reject bad firmwares).\n\n**CL Size \u0026 Scope**\n*   The CL is appropriately sized and self-contained.",
+      "isAi": true,
+      "revId": "172d58934bd69bb5e9673522cffa3e187d072b65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac2558da_94c937ce",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:29:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This CRC32 implementation (`crc32_table`, `init_crc32_table`, `crc32_hash`) and the `dfu_suffix` struct are defined but never used in the tool. The `firmware` vector is passed directly to `dfu_download` without any validation or suffix parsing.\n\nIf the intention is to validate the firmware binary before flashing, you should add logic to read the last 16 bytes of the file, parse the `dfu_suffix`, and compare the computed CRC against `dwCRC`. \n\nOtherwise, to keep the code clean and prevent confusion, please remove this unused dead code.",
+      "isAi": true,
+      "revId": "172d58934bd69bb5e9673522cffa3e187d072b65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "020c6d99_e133b642",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:29:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Unconditionally detaching the kernel driver from interface `0` might cause unintended side effects, especially if the device is a composite device and the DFU interface is not interface `0`.\n\nIt would be more robust to remove this from `init()` and instead detach the kernel driver from the *actual* DFU interface (`dfu_interface_`) after it has been discovered by `find_dfu_interface()`, just before calling `libusb_claim_interface()` in `dfu_download()`.\n\nFor example, in `dfu_download()`:\n```cpp\nif (libusb_kernel_driver_active(dev_handle_, dfu_interface_) \u003d\u003d 1) {\n    libusb_detach_kernel_driver(dev_handle_, dfu_interface_);\n}\nint ret \u003d libusb_claim_interface(dev_handle_, dfu_interface_);\n```",
+      "isAi": true,
+      "revId": "172d58934bd69bb5e9673522cffa3e187d072b65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f0e480b_aafbbd12",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:29:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Hardcoding a 3-second sleep for USB re-enumeration is prone to races (if the host OS takes longer to enumerate the device) and slows down the happy path.\n\nConsider polling for the device in a loop with a smaller sleep interval (e.g., 100ms) and a timeout (e.g., up to 5-10 seconds). This allows the tool to proceed immediately once the device re-enumerates. \n\n(Note: If you do this, you may want to extract the `libusb_open_device_with_vid_pid` call into a silent polling helper so it does not spam `fprintf` errors during the loop).",
+      "isAi": true,
+      "revId": "172d58934bd69bb5e9673522cffa3e187d072b65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
