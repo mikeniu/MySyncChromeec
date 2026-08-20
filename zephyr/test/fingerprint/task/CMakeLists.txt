@@ -27,7 +27,8 @@ target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_SHIM app PRIVATE
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_STATE app PRIVATE
 	src/fpsensor_state.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_TEMPLATE app PRIVATE
-	src/fpsensor_template.cc)
+	src/fpsensor_template.cc
+	${PLATFORM_EC}/test/mock/fpsensor_crypto_mock.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_UTILS app PRIVATE
 	src/fpsensor_utils.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_DEBUG app PRIVATE

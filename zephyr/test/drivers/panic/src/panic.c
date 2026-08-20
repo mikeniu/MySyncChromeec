@@ -10,6 +10,8 @@
 
 #include "common.h"
 #include "ec_tasks.h"
+#include "hooks.h"
+#include "host_command.h"
 #include "panic.h"
 #include "system.h"
 #include "test/drivers/stubs.h"
@@ -104,7 +106,7 @@ ZTEST(panic, test_panic_reason)
 
 	pdata = panic_get_data();
 	zassert_not_null(pdata, NULL);
-	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->magic, PANIC_DATA_MAGIC);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
 
@@ -362,7 +364,7 @@ ZTEST(panic, test_copy_esf_to_panic_data)
 	pdata = panic_get_data();
 	zassert_not_null(pdata, NULL);
 	zassert_equal(pdata->magic, PANIC_DATA_MAGIC);
-	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
 	zassert_equal(pdata->flags, expected_flags);
 }
@@ -378,7 +380,7 @@ ZTEST(panic, test_panic_data_reset_and_finalize)
 	zassert_equal(res, pdata);
 	zassert_equal(pdata->magic, 0, "magic should be 0 after reset, got %x",
 		      pdata->magic);
-	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
 
 	panic_data_finalize(pdata);
@@ -403,7 +405,7 @@ ZTEST(panic, test_copy_esf_to_panic_data_null)
 	struct panic_data *pdata = panic_get_data();
 	zassert_not_null(pdata, NULL);
 	zassert_equal(pdata->magic, PANIC_DATA_MAGIC);
-	zassert_equal(pdata->struct_version, 2);
+	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
 	zassert_equal(pdata->flags, expected_flags);
 }
@@ -417,7 +419,7 @@ ZTEST(panic, test_panic_data_reset_null)
 	zassert_equal(res, expected_pdata);
 	zassert_equal(res->magic, 0, "magic should be 0 after reset, got %x",
 		      res->magic);
-	zassert_equal(res->struct_version, 2);
+	zassert_equal(res->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(res->struct_size, CONFIG_PANIC_DATA_SIZE);
 }
 
@@ -439,4 +441,33 @@ ZTEST(panic, test_panic_reason_reg)
 
 	panic_set_reason_reg(&test_pdata, PANIC_SW_WATCHDOG);
 	zassert_equal(panic_get_reason_reg(&test_pdata), PANIC_SW_WATCHDOG);
+}
+
+ZTEST(panic, test_panic_host_event)
+{
+	struct panic_data *pdata;
+
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_HOST_EVENT)) {
+		ztest_test_skip();
+	}
+
+	host_clear_events(CONFIG_HOST_EVENT_REPORT_MASK);
+	zassert_false(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
+
+	/* Set panic reason */
+	panic_set_reason(PANIC_SW_DIV_ZERO, 0, 0);
+
+	/* Trigger HOOK_CHIPSET_STARTUP */
+	hook_notify(HOOK_CHIPSET_STARTUP);
+
+	/* Verify host event is set and flag is set in panic data */
+	zassert_true(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
+	pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_true(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTEVENT, NULL);
+
+	/* Verify subsequent HOOK_CHIPSET_STARTUP does not re-set host event */
+	host_clear_events(CONFIG_HOST_EVENT_REPORT_MASK);
+	hook_notify(HOOK_CHIPSET_STARTUP);
+	zassert_false(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
 }

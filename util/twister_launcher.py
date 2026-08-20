@@ -48,7 +48,7 @@ ZEPHYR_TEST_PATHS = [
 
 # Set of "-p" platform types that indicates this twister run is targeting
 # a dagwood platform for on-device testing.
-DAGWOOD_PLATFORMS = {"it8xxx2/id82002aw", "npcx9/npcx9m7f", "realtek/rts5912"}
+DAGWOOD_PLATFORMS = {"it8xxx2/it82002aw", "npcx9/npcx9m7f", "realtek/rts5912"}
 
 # Additional upstream test paths that we want to run on dagwood.
 DAGWOOD_TEST_PATHS = [
@@ -275,10 +275,12 @@ def main():
     # Add all third_pary modules
     for module_name in THIRD_PARTY_MODULES:
         module_path = zephyr_modules_dir / module_name
-        zephyr_modules.append(module_path.resolve())
+        if module_path.exists():
+            zephyr_modules.append(module_path.resolve())
     for module_name in THIRD_PARTY_PRIVATE_MODULES:
         module_path = zephyr_modules_private_dir / module_name
-        zephyr_modules.append(module_path.resolve())
+        if module_path.exists():
+            zephyr_modules.append(module_path.resolve())
 
     # Add the EC dir as a module if not already included (resolve all paths to
     # account for symlinked or relative paths)

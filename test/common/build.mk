@@ -5,8 +5,8 @@
 
 # Test-only common files
 
+test_common-y += console.o
 test_common-y += irq_locking.o
 test_common-y += recursive_mutex.o
 test_common-y += test_util.o
 test_common-y += uart_buffering.o
-

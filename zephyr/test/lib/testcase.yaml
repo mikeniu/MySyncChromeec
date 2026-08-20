@@ -3,6 +3,7 @@ common:
   - native_sim
 tests:
   lib.exit:
+    ignore_faults: true
     extra_configs:
     - CONFIG_LIBC_EXIT=y
     - CONFIG_TEST_LIB_EXIT=y

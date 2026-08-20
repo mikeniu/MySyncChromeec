@@ -377,7 +377,7 @@ static void flash_shared_enable_ec_access(void)
 	/* EC to get access to SPI flash  */
 	gpio_pin_set_dt(&spi_oe, 0);
 	/* delay before EC access the external SPI flash */
-	k_msleep(10);
+	k_busy_wait(10 * USEC_PER_MSEC);
 }
 DECLARE_HOOK(HOOK_SYSJUMP, flash_shared_enable_ec_access, HOOK_PRIO_FIRST);
 

@@ -14,7 +14,6 @@ import time
 from typing import Iterator, List, Optional, Tuple
 
 from .base import DutHandler
-from .base import SSH_OPTS
 
 
 class CrosHandler(DutHandler):
@@ -42,8 +41,10 @@ class CrosHandler(DutHandler):
             test_targets.insert(0, "firmware.ECSize")
         return test_targets
 
-    def _copy_ec_rw_bin_to_dut(self, ec_rw_bin_path: str) -> None:
-        """Copy the local EC RW binary to the target DUT's /tmp directory."""
+    def _copy_ec_rw_bin_to_dut(
+        self, ec_rw_bin_path: str, timeout_secs: int = 180
+    ) -> None:
+        """Copy the local EC RW binary to the DUT's /tmp directory (with retry)."""
         if not os.path.exists(ec_rw_bin_path):
             raise FileNotFoundError(
                 f"ec.bin not found at {ec_rw_bin_path}. Did you build the project?"
@@ -51,34 +52,32 @@ class CrosHandler(DutHandler):
 
         dut_hostname = self.details["dut_hostname"]
         model = self.details["model"]
-        destination = f"root@{dut_hostname}:/tmp/ec_rw_{model}.bin"
-        print(f"Copying {ec_rw_bin_path} to {destination}...")
-        try:
-            subprocess.run(
-                [
-                    "scp",
-                    *SSH_OPTS,
-                    ec_rw_bin_path,
-                    destination,
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Failed to copy ec.bin to DUT: {e}") from e
+        print(
+            f"Copying {ec_rw_bin_path} to root@{dut_hostname}:/tmp/ec_rw_{model}.bin..."
+        )
+        start_time = time.time()
+        while True:
+            try:
+                self._dut_scp(ec_rw_bin_path, f"/tmp/ec_rw_{model}.bin")
+                return
+            except subprocess.CalledProcessError as e:
+                if time.time() - start_time > timeout_secs:
+                    raise RuntimeError(
+                        f"Failed to copy ec.bin to DUT {dut_hostname} after {timeout_secs}s: {e}"
+                    ) from e
+                print(
+                    f"DUT {dut_hostname} SSH not reachable yet (DUT may be rebooting). "
+                    "Retrying in 5 seconds..."
+                )
+                time.sleep(5)
 
     def _delete_ec_rw_bin_from_dut(self) -> None:
         """Delete the temporary EC RW binary file from the DUT."""
         dut_hostname = self.details["dut_hostname"]
         model = self.details["model"]
-        ssh_cmd = [
-            "ssh",
-            *SSH_OPTS,
-            f"root@{dut_hostname}",
-            f"rm -f /tmp/ec_rw_{model}.bin",
-        ]
         print(f"Cleaning up /tmp/ec_rw_{model}.bin from DUT {dut_hostname}...")
         try:
-            subprocess.run(ssh_cmd, check=True)
+            self._dut_ssh(f"rm -f /tmp/ec_rw_{model}.bin")
         except subprocess.CalledProcessError as e:
             print(
                 f"Warning: Failed to delete /tmp/ec_rw_{model}.bin on DUT: {e}",
@@ -90,9 +89,8 @@ class CrosHandler(DutHandler):
         dut_hostname = self.details["dut_hostname"]
         print(f"Rebooting DUT {dut_hostname} to trigger Software Sync...")
         try:
-            subprocess.run(
-                ["ssh", *SSH_OPTS, f"root@{dut_hostname}", "reboot"],
-                check=True,
+            self._dut_ssh(
+                "reboot",
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
@@ -110,55 +108,23 @@ class CrosHandler(DutHandler):
         self._copy_ec_rw_bin_to_dut(ec_rw_bin_path)
         try:
             print(f"Reading AP firmware image locally on DUT {dut_hostname}...")
-            subprocess.run(
-                [
-                    "ssh",
-                    *SSH_OPTS,
-                    f"root@{dut_hostname}",
-                    f"futility read /tmp/ap_{model}.bin",
-                ],
-                check=True,
-            )
+            self._dut_ssh(f"futility read /tmp/ap_{model}.bin")
 
             print(
                 "Populating AP firmware image with custom EC binary using "
                 "swap_ec_rw locally on DUT..."
             )
-            subprocess.run(
-                [
-                    "ssh",
-                    *SSH_OPTS,
-                    f"root@{dut_hostname}",
-                    (
-                        f"/usr/share/vboot/bin/swap_ec_rw "
-                        f"-i /tmp/ap_{model}.bin -e /tmp/ec_rw_{model}.bin"
-                    ),
-                ],
-                check=True,
+            self._dut_ssh(
+                f"/usr/share/vboot/bin/swap_ec_rw "
+                f"-i /tmp/ap_{model}.bin -e /tmp/ec_rw_{model}.bin"
             )
 
             print(
                 f"Writing modified AP firmware image back locally on DUT {dut_hostname}..."
             )
-            subprocess.run(
-                [
-                    "ssh",
-                    *SSH_OPTS,
-                    f"root@{dut_hostname}",
-                    f"futility update --fast -i /tmp/ap_{model}.bin",
-                ],
-                check=True,
-            )
+            self._dut_ssh(f"futility update --fast -i /tmp/ap_{model}.bin")
 
-            subprocess.run(
-                [
-                    "ssh",
-                    *SSH_OPTS,
-                    f"root@{dut_hostname}",
-                    f"rm -f /tmp/ap_{model}.bin",
-                ],
-                check=False,
-            )
+            self._dut_ssh(f"rm -f /tmp/ap_{model}.bin", check=False)
 
             self._reboot_dut()
 
@@ -167,8 +133,10 @@ class CrosHandler(DutHandler):
         finally:
             self._delete_ec_rw_bin_from_dut()
 
-    def _copy_ec_ro_bin_to_dut(self, ec_ro_bin_path: str) -> None:
-        """Copy the local EC RO binary to the target DUT's /tmp directory."""
+    def _copy_ec_ro_bin_to_dut(
+        self, ec_ro_bin_path: str, timeout_secs: int = 180
+    ) -> None:
+        """Copy the local EC RO binary to the DUT's /tmp directory (with retry)."""
         if not os.path.exists(ec_ro_bin_path):
             raise FileNotFoundError(
                 f"EC RO binary not found at {ec_ro_bin_path}"
@@ -176,34 +144,32 @@ class CrosHandler(DutHandler):
 
         dut_hostname = self.details["dut_hostname"]
         model = self.details["model"]
-        destination = f"root@{dut_hostname}:/tmp/ec_ro_{model}.bin"
-        print(f"Copying RO binary {ec_ro_bin_path} to {destination}...")
-        try:
-            subprocess.run(
-                [
-                    "scp",
-                    *SSH_OPTS,
-                    ec_ro_bin_path,
-                    destination,
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Failed to copy EC RO bin to DUT: {e}") from e
+        print(
+            f"Copying RO binary {ec_ro_bin_path} to root@{dut_hostname}:/tmp/ec_ro_{model}.bin..."
+        )
+        start_time = time.time()
+        while True:
+            try:
+                self._dut_scp(ec_ro_bin_path, f"/tmp/ec_ro_{model}.bin")
+                return
+            except subprocess.CalledProcessError as e:
+                if time.time() - start_time > timeout_secs:
+                    raise RuntimeError(
+                        f"Failed to copy EC RO bin to DUT {dut_hostname} after {timeout_secs}s: {e}"
+                    ) from e
+                print(
+                    f"DUT {dut_hostname} SSH not reachable yet (DUT may be rebooting). "
+                    "Retrying in 5 seconds..."
+                )
+                time.sleep(5)
 
     def _delete_ec_ro_bin_from_dut(self) -> None:
         """Delete the temporary EC RO binary file from the DUT."""
         dut_hostname = self.details["dut_hostname"]
         model = self.details["model"]
-        ssh_cmd = [
-            "ssh",
-            *SSH_OPTS,
-            f"root@{dut_hostname}",
-            f"rm -f /tmp/ec_ro_{model}.bin",
-        ]
         print(f"Cleaning up /tmp/ec_ro_{model}.bin from DUT {dut_hostname}...")
         try:
-            subprocess.run(ssh_cmd, check=True)
+            self._dut_ssh(f"rm -f /tmp/ec_ro_{model}.bin")
         except subprocess.CalledProcessError as e:
             print(
                 f"Warning: Failed to delete /tmp/ec_ro_{model}.bin on DUT: {e}",
@@ -223,25 +189,9 @@ class CrosHandler(DutHandler):
                 f"Flashing EC RO (or combined image) locally on DUT {dut_hostname} "
                 "using flashrom..."
             )
-            subprocess.run(
-                [
-                    "ssh",
-                    *SSH_OPTS,
-                    f"root@{dut_hostname}",
-                    f"flashrom -p ec -w /tmp/ec_ro_{model}.bin",
-                ],
-                check=True,
-            )
+            self._dut_ssh(f"flashrom -p ec -w /tmp/ec_ro_{model}.bin")
             print(f"Rebooting EC on DUT {dut_hostname}...")
-            subprocess.run(
-                [
-                    "ssh",
-                    *SSH_OPTS,
-                    f"root@{dut_hostname}",
-                    "ectool reboot_ec",
-                ],
-                check=False,
-            )
+            self._dut_ssh("ectool reboot_ec", check=False)
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Local DUT EC RO flashing failed: {e}") from e
         finally:
@@ -250,14 +200,6 @@ class CrosHandler(DutHandler):
     def verify_ap_up(self, timeout_secs: int = 300) -> None:
         """Wait for the DUT AP to boot up and reply to SSH commands."""
         dut_hostname = self.details["dut_hostname"]
-        ssh_cmd = [
-            "ssh",
-            *SSH_OPTS,
-            "-o",
-            "ConnectTimeout=5",
-            f"root@{dut_hostname}",
-            "ectool version",
-        ]
         print(
             f"Verifying DUT AP is up and SSH is responsive on {dut_hostname}..."
         )
@@ -265,8 +207,8 @@ class CrosHandler(DutHandler):
         max_attempts = max(1, timeout_secs // interval)
         for attempt in range(1, max_attempts + 1):
             try:
-                result = subprocess.run(
-                    ssh_cmd, check=True, capture_output=True, text=True
+                result = self._dut_ssh(
+                    "ectool version", connect_timeout=5, capture_output=True
                 )
                 print("DUT AP is up and responsive!")
                 print(f"EC version:\n{result.stdout.strip()}")

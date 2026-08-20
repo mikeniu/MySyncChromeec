@@ -123,7 +123,7 @@ void queue_init(struct queue const *q);
 void queue_enable_buffered_mode(struct queue const *q);
 
 /* Query whether this queue makes use of `queue_flush()`. */
-inline bool is_queue_buffered(struct queue const *q)
+static inline bool is_queue_buffered(struct queue const *q)
 {
 	return q->state->flags & QUEUE_BUFFERED_MODE;
 }

@@ -123,8 +123,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_and_load_pairing_key)
 	ec_response_fp_establish_pairing_key_wrap wrap_response;
 	ec_params_fp_load_pairing_key load_params;
 
-	fp_reset_and_clear_context();
-
 	rv = test_send_host_command(EC_CMD_FP_ESTABLISH_PAIRING_KEY_KEYGEN, 0,
 				    NULL, 0, &keygen_response,
 				    sizeof(keygen_response));
@@ -201,8 +199,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_load_pairing_key_invalid)
 	};
 	ec_response_fp_establish_pairing_key_wrap wrap_response;
 	ec_params_fp_load_pairing_key load_params;
-
-	fp_reset_and_clear_context();
 
 	rv = test_send_host_command(EC_CMD_FP_ESTABLISH_PAIRING_KEY_KEYGEN, 0,
 				    NULL, 0, &keygen_response,
@@ -361,10 +357,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session)
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
 	zassert_equal(get_fp_encryption_status(&status), EC_SUCCESS);
@@ -410,10 +402,6 @@ ZTEST(fpsensor_auth_commands,
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
 	rv = test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
@@ -450,10 +438,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_deny)
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
 	// Establish session without generate nonce should fail.
@@ -462,8 +446,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_deny)
 				    NULL, 0);
 
 	zassert_equal(rv, EC_RES_ACCESS_DENIED);
-
-	fp_reset_and_clear_context();
 
 	rv = test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
 				    &nonce_response, sizeof(nonce_response));
@@ -489,10 +471,6 @@ ZTEST(fpsensor_auth_commands,
 	struct ec_params_fp_establish_session session_params;
 	std::array<uint8_t, FP_PAIRING_KEY_LEN> pairing_key;
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
 	/* Call nonce context without generated nonce should fail. */
@@ -517,10 +495,6 @@ ZTEST(fpsensor_auth_commands,
 		1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5,
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
@@ -560,10 +534,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_limit_twice_1)
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
 	rv = test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL, 0,
@@ -600,10 +570,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_limit_twice_2)
 		1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5,
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
@@ -667,10 +633,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_load_pk)
 	ec_response_fp_establish_pairing_key_wrap wrap_response;
 	ec_params_fp_load_pairing_key load_params;
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
 	rv = test_send_host_command(EC_CMD_FP_ESTABLISH_PAIRING_KEY_KEYGEN, 0,
@@ -728,10 +690,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_decrypted)
 		1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5,
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
@@ -827,10 +785,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_v3)
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
 	struct ec_response_fp_generate_nonce nonce_response;
@@ -908,10 +862,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_trivial_salt)
 		1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5,
 		6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
 	};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
@@ -998,8 +948,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_commit_trivial_salt)
 
 ZTEST(fpsensor_auth_commands, test_fp_command_commit_without_seed)
 {
-	fp_reset_and_clear_context();
-
 	// Templates will only be decrypted in active context.
 	struct ec_params_fp_context_v1 ctx_params = {
 		.action = FP_CONTEXT_GET_RESULT,
@@ -1111,10 +1059,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_generate_challenge)
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
 	uint32_t status;
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
 	zassert_equal(get_fp_encryption_status(&status), EC_SUCCESS);
@@ -1134,9 +1078,6 @@ ZTEST(fpsensor_auth_commands,
       test_fp_command_generate_challenge_fail_no_session)
 {
 	struct ec_response_fp_generate_challenge challenge_response{};
-
-	fp_reset_and_clear_context();
-	reset_session();
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_GENERATE_CHALLENGE, 0,
 					     nullptr, 0, &challenge_response,
@@ -1158,10 +1099,6 @@ ZTEST(fpsensor_auth_commands, test_fp_validate_request)
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> mac{};
 	struct ec_response_fp_generate_challenge challenge_response{};
 	uint32_t status;
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
@@ -1194,10 +1131,6 @@ ZTEST(fpsensor_auth_commands, test_fp_validate_request_fail_no_challenge)
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> mac = { 0 };
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
 	zassert_equal(validate_request(user_id, operation, mac),
@@ -1213,10 +1146,6 @@ ZTEST(fpsensor_auth_commands, test_fp_validate_request_fail_invalid_signature)
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> mac = { 0 };
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
 	struct ec_response_fp_generate_challenge challenge_response{};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
@@ -1242,10 +1171,6 @@ ZTEST(fpsensor_auth_commands, test_fp_validate_request_fail_timeout)
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> mac{};
 	struct ec_response_fp_generate_challenge challenge_response{};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
@@ -1286,10 +1211,6 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_message)
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> mac{};
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> expected_mac{};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
 	zassert_equal(sign_message(user_id, operation, challenge, mac),
@@ -1312,10 +1233,6 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_message_fail_no_session)
 							     'o', 'l', 'l' };
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> mac{};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(sign_message(user_id, operation, challenge, mac),
 		      EC_ERROR_ACCESS_DENIED);
 }
@@ -1333,10 +1250,6 @@ ZTEST(fpsensor_auth_commands, test_fp_mode_match_correct_signature)
 	struct ec_response_fp_generate_challenge challenge_response{};
 	struct ec_params_fp_mode_v1 params = { .mode = FP_MODE_MATCH };
 	struct ec_response_fp_mode response{};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
@@ -1373,10 +1286,6 @@ ZTEST(fpsensor_auth_commands, test_fp_mode_disable_match_no_signature)
 	struct ec_response_fp_mode response{};
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
 	global_context.sensor_mode = FP_MODE_MATCH;
@@ -1395,10 +1304,6 @@ ZTEST(fpsensor_auth_commands, test_fp_mode_match_invalid_signature)
 	struct ec_response_fp_generate_challenge challenge_response{};
 	struct ec_params_fp_mode_v1 params = { .mode = FP_MODE_MATCH };
 	struct ec_response_fp_mode response{};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
@@ -1437,10 +1342,6 @@ ZTEST(fpsensor_auth_commands, test_fp_mode_enroll_correct_signature)
 						       FP_MODE_ENROLL_IMAGE };
 	struct ec_response_fp_mode response{};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
 	struct ec_params_fp_context_v1 context_params = {
@@ -1477,10 +1378,6 @@ ZTEST(fpsensor_auth_commands, test_fp_mode_disable_enroll_no_signature)
 	struct ec_response_fp_mode response{};
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
 	global_context.sensor_mode = FP_MODE_ENROLL_SESSION;
@@ -1500,10 +1397,6 @@ ZTEST(fpsensor_auth_commands, test_fp_mode_enroll_invalid_signature)
 	struct ec_params_fp_mode_v1 params = { .mode = FP_MODE_ENROLL_SESSION |
 						       FP_MODE_ENROLL_IMAGE };
 	struct ec_response_fp_mode response{};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
@@ -1541,10 +1434,6 @@ ZTEST(fpsensor_auth_commands, test_fp_mode_enroll_session_transitions)
 	struct ec_params_fp_mode_v1 params = { .mode = FP_MODE_ENROLL_SESSION |
 						       FP_MODE_ENROLL_IMAGE };
 	struct ec_response_fp_mode response{};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
@@ -1605,10 +1494,6 @@ ZTEST(fpsensor_auth_commands, test_fp_mode_match_fail_version_0)
 	struct ec_params_fp_mode params = { .mode = FP_MODE_MATCH };
 	struct ec_response_fp_mode response{};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
 	struct ec_params_fp_context_v1 context_params = {
@@ -1639,10 +1524,6 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_success)
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
 	struct ec_response_fp_generate_challenge challenge_response{};
 	struct ec_params_fp_confirm_template params = { 0 };
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
@@ -1682,10 +1563,6 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_fail_invalid_signature)
 	struct ec_response_fp_generate_challenge challenge_response{};
 	struct ec_params_fp_confirm_template params = { 0 };
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
 	struct ec_params_fp_context_v1 context_params = {
@@ -1717,10 +1594,6 @@ ZTEST(fpsensor_auth_commands, test_fp_confirm_template_fail_state_mismatch)
 {
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
 	struct ec_params_fp_confirm_template params = { 0 };
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
@@ -1760,10 +1633,6 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_success)
 	struct ec_response_fp_sign_match response{};
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> expected_signature{};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
 	struct ec_params_fp_context_v1 context_params = {
@@ -1800,10 +1669,6 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_fail_no_match)
 	struct ec_params_fp_sign_match params = { 0 };
 	struct ec_response_fp_sign_match response{};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
 	struct ec_params_fp_context_v1 context_params = {
@@ -1829,10 +1694,6 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_fail_deadline_passed)
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> session_key{};
 	struct ec_params_fp_sign_match params = { 0 };
 	struct ec_response_fp_sign_match response{};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 
@@ -1861,9 +1722,6 @@ ZTEST(fpsensor_auth_commands, test_fp_sign_match_fail_no_session)
 	struct ec_params_fp_sign_match params = { 0 };
 	struct ec_response_fp_sign_match response{};
 
-	fp_reset_and_clear_context();
-	reset_session();
-
 	zassert_equal(test_send_host_command(EC_CMD_FP_SIGN_MATCH, 0, &params,
 					     sizeof(params), &response,
 					     sizeof(response)),
@@ -1885,10 +1743,6 @@ ZTEST(fpsensor_auth_commands, test_fp_reset_does_not_clear_session)
 	};
 	struct ec_response_fp_sign_match response{};
 	std::array<uint8_t, SHA256_DIGEST_LENGTH> expected_signature{};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(establish_session(session_key), EC_SUCCESS);
 	zassert_true((((int)global_context.fp_encryption_status) &
@@ -1936,10 +1790,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_clears_context)
 		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
@@ -2026,10 +1876,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_corrupted_seed)
 		7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2,
 	};
 
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
-
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
 	zassert_equal(test_send_host_command(EC_CMD_FP_GENERATE_NONCE, 0, NULL,
@@ -2075,10 +1921,6 @@ ZTEST(fpsensor_auth_commands,
 		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 		2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	};
-
-	fp_reset_and_clear_context();
-	reset_session();
-	global_context.sensor_mode = 0;
 
 	zassert_equal(initialize_pairing_key(pairing_key), EC_SUCCESS);
 
@@ -2147,9 +1989,6 @@ ZTEST(fpsensor_auth_commands, test_fp_command_establish_session_busy)
 		FP_MODE_DECRYPT_TEMPLATE,
 	};
 
-	fp_reset_and_clear_context();
-	reset_session();
-
 	/* Pretend that the session nonce was generated. */
 	global_context.fp_encryption_status |= FP_CONTEXT_SESSION_NONCE_SET;
 
@@ -2195,6 +2034,14 @@ static void before_fpsensor_auth_commands(void *fixture)
 #ifdef CONFIG_OTP_KEY
 	std::ranges::copy(default_fake_otp_key, mock_otp.otp_key_buffer);
 #endif
+
+	/*
+	 * Reset fingerprint context, session secrets, and sensor mode for a
+	 * clean state.
+	 */
+	fp_reset_and_clear_context();
+	reset_session();
+	global_context.sensor_mode = 0;
 }
 
 ZTEST_SUITE(fpsensor_auth_commands, NULL, NULL, before_fpsensor_auth_commands,

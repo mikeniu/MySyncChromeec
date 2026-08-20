@@ -163,6 +163,7 @@ struct panic_data {
 };
 
 #define PANIC_DATA_MAGIC 0x21636e50 /* "Pnc!" */
+#define PANIC_DATA_VERSION 2
 enum panic_arch {
 	PANIC_ARCH_UNSUPPORTED = 0,
 	PANIC_ARCH_CORTEX_M = 1, /* Cortex-M architecture */

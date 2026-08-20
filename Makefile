@@ -389,11 +389,6 @@ rw-common-objs := $(sort $(foreach obj, $(all-obj-y), $(out)/RW/$(obj)))
 rw-only-objs := $(sort $(foreach obj, $(all-obj-rw), $(out)/RW/$(obj)))
 rw-objs := $(sort $(rw-common-objs) $(rw-only-objs))
 
-# Don't include the shared objects in the RO/RW image if we're enabling
-# the shared objects library.
-ifeq ($(CONFIG_SHAREDLIB),y)
-ro-objs := $(filter-out %_sharedlib.o, $(ro-objs))
-endif
 ro-deps := $(addsuffix .d, $(ro-objs))
 rw-deps := $(addsuffix .d, $(rw-objs))
 
@@ -406,24 +401,10 @@ $(config): $(out)/$(PROJECT).bin
 compile-only: $(ro-objs) $(rw-objs)
 
 ro: override BLD:=RO
-ro: $(libsharedobjs_elf-y) $(out)/RO/$(PROJECT).RO.flat
+ro: $(out)/RO/$(PROJECT).RO.flat
 
 rw: override BLD:=RW
-rw: $(libsharedobjs_elf-y) $(out)/RW/$(PROJECT).RW.flat
-
-# Shared objects library
-SHOBJLIB := libsharedobjs
-sharedlib-objs := $(filter %_sharedlib.o, $(all-obj-y))
-sharedlib-objs := $(foreach obj, $(sharedlib-objs), $(out)/$(SHOBJLIB)/$(obj))
-sharedlib-deps := $(sharedlib-objs:%.o=%.o.d)
-deps += $(sharedlib-deps)
-def_libsharedobjs_deps := $(sharedlib-objs)
-libsharedobjs_deps ?= $(def_libsharedobjs_deps)
-
-libsharedobjs-$(CONFIG_SHAREDLIB) := $(out)/$(SHOBJLIB)/$(SHOBJLIB).flat
-libsharedobjs_elf-$(CONFIG_SHAREDLIB) := \
-	$(libsharedobjs-$(CONFIG_SHAREDLIB):%.flat=%.elf)
-libsharedobjs: $(libsharedobjs-y)
+rw: $(out)/RW/$(PROJECT).RW.flat
 
 include Makefile.rules
 export CROSS_COMPILE CFLAGS CC CPP LD NM AR OBJCOPY OBJDUMP
