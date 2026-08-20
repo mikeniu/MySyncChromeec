@@ -397,8 +397,7 @@ const char *system_get_build_info(void);
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	system_reset(int flags);
+	void system_reset(int flags);
 
 /**
  * Set a scratchpad register to the specified value.
@@ -780,6 +779,24 @@ enum ec_image system_get_shrspi_image_copy(void);
  * @return The address of the reset vector for RO/RW firmware image jump.
  */
 uintptr_t system_get_fw_reset_vector(uintptr_t base);
+
+/**
+ * Chip-specific pre-system jump configuration.
+ *
+ * This callback is invoked during a system jump (e.g., from RO to RW or
+ * vice versa) immediately after interrupts have been globally disabled
+ * in jump_to_image().
+ *
+ * It allows the chip-specific shim to perform critical hardware cleanup or
+ * configurations (such as disabling memory mappings or caching) that must
+ * execute in a strictly synchronous, interrupt-free context just before
+ * the actual jump.
+ *
+ * Since interrupts are guaranteed to be disabled when this is called,
+ * implementations must not attempt to lock/unlock interrupts or rely on
+ * any asynchronous operations.
+ */
+void chip_pre_system_jump(void);
 
 /**
  * Check if the EC is warm booting.
