@@ -87,6 +87,6 @@
 };
 
 &clock {
-	ahb-divide = <2>;
+	ahb-divide = <1>;
 	apb-divide = <1>;
 };
