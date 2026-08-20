@@ -35,6 +35,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21698bbf_93cb8ca8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-20T20:24:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27ec2c37_ecfab874",
+      "revId": "ad89fd4092f189c6b7f90d3cf6f1d23f74f3eda7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11dcc6ea_f48646dc",
@@ -65,6 +83,24 @@
       "writtenOn": "2026-08-12T17:14:19Z",
       "side": 1,
       "message": "Nit: I\u0027d slightly prefer it if you used `CONFIG_CHARGER_SENSE_RESISTOR` and `CONFIG_CHARGER_SENSE_RESISTOR_AC`. That would make it more obvious that these are config-specified parameters. These shorter aliases aren\u0027t used very much, and now that I see them, I kind of want to get rid of them where they are used.",
+      "revId": "ad89fd4092f189c6b7f90d3cf6f1d23f74f3eda7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e13f96d3_5c88698e",
+        "filename": "driver/charger/isl9241.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1178,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-20T20:24:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "805a07be_17490fe9",
       "revId": "ad89fd4092f189c6b7f90d3cf6f1d23f74f3eda7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
