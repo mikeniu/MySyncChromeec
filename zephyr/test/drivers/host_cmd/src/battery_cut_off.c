@@ -123,6 +123,7 @@ ZTEST_USER(host_cmd_battery_cut_off, test_cutoff_at_shutdown)
 		.flags = EC_BATTERY_CUTOFF_FLAG_AT_SHUTDOWN,
 	};
 
+	test_set_chipset_to_s0();
 	rv = ec_cmd_battery_cut_off_v1(NULL, &params);
 	zassert_equal(EC_RES_SUCCESS, rv, "Expected 0, but got %d", rv);
 	zassert_false(battery_is_cut_off(), NULL);
