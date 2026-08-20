@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5642b22b_c28cd412",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T00:54:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/a7ac2075-bb1d-4eac-ae77-5c926b4e2132)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly updates the `PANIC_REG_LIST` macro for RISC-V to use `M_GPR` instead of `M` for general-purpose registers (`a0-a7`, `t0-t6`). It appropriately preserves `ra` by continuing to use `M`. This ensures `CONFIG_PLATFORM_EC_PANIC_STRIP_GPR` behaves correctly as it does on Cortex-M.\n*   **Security:** This improves privacy/security on RISC-V devices by stripping potentially sensitive data from GPRs when `CONFIG_PLATFORM_EC_PANIC_STRIP_GPR` is enabled.\n*   **Style:** The changes align perfectly with the existing patterns in the codebase for panic register definitions.\n*   **Testing \u0026 Test Coverage:** The patch modifies `zephyr/test/hwtest/src/panic.c` to remove `ra` from `expected_regs` so the test does not incorrectly fail when GPR stripping is enabled. However, this entirely removes test coverage for `ra`. I have left an inline comment suggesting a way to explicitly verify that `ra` retains its value and is not accidentally stripped.\n*   **CL Size \u0026 Scope:** The CL is appropriately scoped to this specific bug fix and test enablement.\n*   **Overall Quality:** Excellent, simple, and straightforward fix for a clear issue.\n\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "6bd6e25c775f5e98ccbd9c765d56499c41c371fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0839b6a_29ec4255",
+        "filename": "zephyr/test/hwtest/src/panic.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T00:54:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] By removing `ra` from `expected_regs`, we are no longer verifying that `ra` is correctly saved during a panic. More importantly, we lose the test coverage to ensure that `ra` is *preserved* (not stripped) when `CONFIG_PLATFORM_EC_PANIC_STRIP_GPR` is enabled.\n\nSince `ra` uses `M` instead of `M_GPR` (which is correct), it should retain its original value. Consider adding an explicit assertion for `ra` outside of the `expected_regs` loop in `test_panic_data()` to maintain this coverage:\n\n```c\n\tif (IS_ENABLED(CONFIG_RISCV)) {\n\t\t/* ra should never be stripped */\n\t\tzassert_equal(0xecec0010, pdata-\u003eriscv.regs[29]);\n\t}\n```",
+      "isAi": true,
+      "revId": "6bd6e25c775f5e98ccbd9c765d56499c41c371fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
