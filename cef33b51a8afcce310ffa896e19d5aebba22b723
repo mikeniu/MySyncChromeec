@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9fd7ab3_ebe22e53",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:25:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/99e58c00-07dd-4ed8-b03b-1229f7162340)]\n\n**Review Summary:**\n*   **Functionality \u0026 Security:** Identified a critical bug in `mpu_lock_rollback` for Cortex-M33 where the locking logic is inverted, which would fail to apply the MPU protection when locking the rollback region.\n*   **Style:** Found a typo in a macro name (`REGION_FLASH_EC_EW_SIZE`), and suggested adding a comment to the empty `mpu_enable` function for clarity.\n*   **CL Size \u0026 Scope:** The CL is well-scoped and correctly targets the addition of Cortex-M33 MPU support.\n*   **Testing:** Given the hardware-dependent nature of MPU configuration, manual validation or hardware-in-the-loop tests are expected, but no new unit tests are strictly necessary for this specific shim code.",
+      "isAi": true,
+      "revId": "cef33b51a8afcce310ffa896e19d5aebba22b723",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35125156_6550c0af",
+        "filename": "zephyr/shim/chip/rtkfp/mpu_regions.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:25:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Typo: `REGION_FLASH_EC_EW_SIZE` should probably be `REGION_FLASH_EC_RW_SIZE`.",
+      "isAi": true,
+      "revId": "cef33b51a8afcce310ffa896e19d5aebba22b723",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0129066_51d94715",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:25:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This function is left empty. If Zephyr handles MPU initialization internally for ARMv8-M and this function intentionally does nothing, please add a brief comment explaining why.",
+      "isAi": true,
+      "revId": "cef33b51a8afcce310ffa896e19d5aebba22b723",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d8fdfee_61d2d9ff",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:25:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The logic here appears to be inverted. For ARMv8-M, enabling the MPU region (via `MPU_RLAR_EN_Msk`) applies its access permissions (which typically enforce the lock). Disabling the region removes those restrictions and falls back to the default memory map.\n\nWhen `lock` is true, you likely want to **enable** the region (`MPU-\u003eRLAR |\u003d MPU_RLAR_EN_Msk;`), and when false, you want to **disable** it. This would match the behavior of the non-Cortex-M33 logic below.",
+      "isAi": true,
+      "revId": "cef33b51a8afcce310ffa896e19d5aebba22b723",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
