@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33ef5eac_6fecf861",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:19:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/c3157731-ab57-41dd-abac-2a7e0ed2aa9c)]\n\n### Review Summary\n\n*   **Functionality**: Basic skeleton implementation looks mostly functional for early board bring-up. However, there is a typo in the `CROS_SYSTEM` initialization `#if` check (`CONFIG_CROS_SYSTEM_REALTEK_INIT_PRIORITY` vs `CONFIG_CROS_SYSTEM_REALTEKFP_INIT_PRIORITY`) that will cause the priority check to silently fail if configured incorrectly. Additionally, a DTS node name (`partition@32000`) mismatches its unit address (`0x42000`).\n*   **Security**: No obvious security vulnerabilities introduced.\n*   **Style**: Several comments in `realtekfp.dts` appear to be copied from another board and are inaccurate for the RTS5817 configuration (e.g., sizes for RO, rollback, and RW sectors do not match the actual DTS node sizes).\n*   **Consistency**: The skeleton structure is consistent with other Zephyr FPMCU board implementations.\n*   **Testing \u0026 Test Coverage**: This CL introduces a new hardware variant. While lacking test coverage is typical for initial skeleton boards, consider adding basic unit tests as non-stub logic is implemented for this MCU.\n*   **CL Size \u0026 Scope**: The size of the CL is appropriate and self-contained for adding a new board variant.",
+      "isAi": true,
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "042b6eec_cfe9b322",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtkfp.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:19:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] There seems to be a typo here. The Kconfig defines `CONFIG_CROS_SYSTEM_REALTEKFP_INIT_PRIORITY` (with `FP`), but here you are checking `CONFIG_CROS_SYSTEM_REALTEK_INIT_PRIORITY`. Because the checked macro is undefined, this `#if` condition will evaluate to 0 and fail to catch priority configuration errors.",
+      "isAi": true,
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a91170c_c757f31a",
+        "filename": "zephyr/program/fpmcu/realtekfp/realtekfp.dts",
+        "patchSetId": 8
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:19:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The comment states the size is `4 x 16KB, 1 x 64KB` (which totals 128KB or `0x20000`), but the actual `size` configured below is `\u003c0x40000\u003e` (256KB). Please update the comment to match the actual configuration to prevent future confusion.",
+      "isAi": true,
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd9a71d9_04430507",
+        "filename": "zephyr/program/fpmcu/realtekfp/realtekfp.dts",
+        "patchSetId": 8
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:19:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The comment mentions 128KB sectors, but the sizes for `rollback0` and `rollback1` are both `\u003c0x1000\u003e` (4KB). Please correct the comment to reflect the actual size.",
+      "isAi": true,
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b22f428c_157a3166",
+        "filename": "zephyr/program/fpmcu/realtekfp/realtekfp.dts",
+        "patchSetId": 8
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:19:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The comment states `5 sectors (128KB each)` (totaling 640KB), but the `ec-rw` size is `\u003c0xf0000\u003e` (960KB). Please update the comment so it aligns with the actual size.",
+      "isAi": true,
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "553ef6cd_c31a6f95",
+        "filename": "zephyr/program/fpmcu/realtekfp/realtekfp.dts",
+        "patchSetId": 8
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:19:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The unit-address in the node name (`@32000`) does not match the first address specified in the `reg` property (`0x42000`). It should be renamed to `partition@42000` to comply with DeviceTree specifications.",
+      "isAi": true,
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
