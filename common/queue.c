@@ -243,13 +243,16 @@ size_t queue_peek_memcpy(struct queue const *q, void *dest, size_t i,
 			 void *(*memcpy)(void *dest, const void *src, size_t n))
 {
 	size_t available = queue_count(q);
-	size_t transfer = min(count, available - i);
+	size_t transfer;
+	size_t head;
 
-	if (i < available) {
-		size_t head = (q->state->head + i) & q->buffer_units_mask;
+	if (i >= available)
+		return 0;
 
-		queue_read_safe(q, dest, head, transfer, memcpy);
-	}
+	transfer = min(count, available - i);
+	head = (q->state->head + i) & q->buffer_units_mask;
+
+	queue_read_safe(q, dest, head, transfer, memcpy);
 
 	return transfer;
 }

@@ -121,7 +121,7 @@ For software panics (e.g., watchdog resets, stack overflows, assertion failures)
 
 *   **Reason**: A `PANIC_SW_*` constant (defined in [include/software_panic.h](../include/software_panic.h)), which always begins with `0xDEAD` (e.g., `0xDEAD6664` for `PANIC_SW_WATCHDOG`).
 *   **Info**: Reason-specific context.
-*   **Exception**: Additional context, sometimes the active task ID at the moment of the panic.
+*   **Exception**: Additional context, such as the active task ID or truncated thread ID in Zephyr EC.
 
 The register fields used to store these overloaded values are architecture-specific:
 
@@ -155,11 +155,11 @@ Watchdog resets require special coordination between the watchdog timer, the pan
 There are three distinct software panic reasons associated with watchdogs:
 
 1.  **`PANIC_SW_WATCHDOG_WARN`** (`0xDEAD6668`, introduced in commit [a58ecc0d44](https://chromium.googlesource.com/chromiumos/platform/ec/+/a58ecc0d441eeb5613af383e8de757f5d79879b2) (introduced warning)):
-    Set when the software watchdog warning timer fires. It captures the active task ID and the Program Counter (PC) where the execution was interrupted. This indicates a watchdog event was detected, but the hardware reset has not occurred yet.
+    Set when the software watchdog warning timer fires. It captures the active thread context (the truncated thread ID in `exception`) and the Program Counter (PC) where execution was interrupted.
 2.  **`PANIC_SW_WATCHDOG`** (`0xDEAD6664`):
-    The "promoted" watchdog reason. During boot, if the reset flags indicate a watchdog reset and the existing panic reason in RAM is `PANIC_SW_WATCHDOG_WARN`, the reason is promoted to `PANIC_SW_WATCHDOG`. This preserves the captured PC (info) and task ID (exception) from the warning.
+    The "promoted" watchdog reason. During boot, if the reset flags indicate a watchdog reset and the existing panic reason in RAM is `PANIC_SW_WATCHDOG_WARN`, the reason is promoted to `PANIC_SW_WATCHDOG`. This preserves the captured PC (info) and thread ID (exception) from the warning.
 3.  **`PANIC_SW_WATCHDOG_HARD`** (`0xDEAD666A`, introduced in commit [60c5c62f4c](https://chromium.googlesource.com/chromiumos/platform/ec/+/60c5c62f4c193b25cc3fc9f43adce9b3e1d1b6e9) (introduced hard watchdog)):
-    Set when a hardware watchdog reset occurs, but there was no prior `PANIC_SW_WATCHDOG_WARN` recorded. This typically happens during a hard lockup where interrupts are disabled (e.g., inside an interrupt handler or critical section), preventing the watchdog warning interrupt from firing. A `PANIC_SW_WATCHDOG_HARD` panic will always have blank or missing PC and task ID fields.
+    Set when a hardware watchdog reset occurs, but there was no prior `PANIC_SW_WATCHDOG_WARN` recorded. This typically happens during a hard lockup where interrupts are disabled (e.g., inside an interrupt handler or critical section), preventing the watchdog warning interrupt from firing. A `PANIC_SW_WATCHDOG_HARD` panic will always have blank or missing PC and task/thread ID fields.
 
 *(Note: Prior to the introduction of `PANIC_SW_WATCHDOG_WARN` and `PANIC_SW_WATCHDOG_HARD`, all watchdog resets appeared simply as `PANIC_SW_WATCHDOG`).*
 
@@ -167,7 +167,7 @@ There are three distinct software panic reasons associated with watchdogs:
 To capture the state of the EC before a watchdog reset occurs, a software watchdog warning timer is configured to fire `WATCHDOG_WARNING_LEADING_TIME_MS` (default 500ms) before the hardware watchdog would expire.
 
 When this warning fires:
-1.  The current task ID (or thread ID) and the Program Counter (PC) of the active task are captured.
+1.  The truncated thread ID and the Program Counter (PC) of the active thread are captured into `exception` and `info`. (Console `printk` statements output the full un-truncated thread pointer address via `%p`).
 2.  These are stored in the `exception` and `info` fields of the panic data, respectively.
 3.  The panic reason is set to `PANIC_SW_WATCHDOG_WARN`.
 4.  If the hardware watchdog subsequently expires, the system resets with the reset reason flag `EC_RESET_FLAG_WATCHDOG` set.
@@ -217,7 +217,7 @@ The EC console provides commands to inspect, clear, and simulate crashes for tes
     *   `assert`: Triggers a failed assertion (`ASSERT(0)`).
     *   `divzero` / `udivzero`: Triggers a signed/unsigned integer division by zero.
     *   `stack`: Triggers a stack overflow via infinite recursion.
-    *   `unaligned`: Triggers an unaligned memory access (if `CONFIG_ALLOW_UNALIGNED_ACCESS` is disabled).
+    *   `unaligned`: Triggers an unaligned memory access.
     *   `watchdog`: Enters an infinite loop (with interrupts enabled) to trigger a hardware watchdog reset.
     *   `hang`: Enters an infinite loop with interrupts disabled (`irq_lock()`), simulating a hard lockup.
     *   `null`: Dereferences a null pointer.

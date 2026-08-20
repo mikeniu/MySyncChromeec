@@ -389,6 +389,8 @@ static void cmd_get_current_pdo(struct pdc_data_t *data);
 static void cmd_is_vconn_sourcing(struct pdc_data_t *data);
 static void cmd_set_sx_app_config(struct pdc_data_t *data);
 static void cmd_get_attention_vdo(struct pdc_data_t *data);
+static int write_task_cmd(struct pdc_config_t const *cfg,
+			  enum command_task task, union reg_data *cmd_data);
 static void cmd_set_max_pdp(struct pdc_data_t *data);
 static void cmd_set_battery_capability(struct pdc_data_t *data);
 static void cmd_set_battery_status(struct pdc_data_t *data);
@@ -1383,19 +1385,32 @@ static void cmd_update_retimer(struct pdc_data_t *data)
 {
 	struct pdc_config_t const *cfg = data->dev->config;
 	union reg_port_control pdc_port_control;
+	union reg_intel_vid_status pdc_intel_vid_status;
+	union reg_data cmd_data;
 	int rv;
 
-	/* Read PDC port control */
+	memset(cmd_data.data, 0, sizeof(cmd_data.data));
+	cmd_data.data[0] = data->retimer_feature_en ? RISING_EDGE :
+						      FALLING_EDGE;
+	cmd_data.data[1] = EVENT_RETIMER_SOC_OVR_FORCE_PWR;
+
+	rv = write_task_cmd(cfg, COMMAND_TASK_TRIG, &cmd_data);
+	if (rv) {
+		LOG_ERR("TI%d: Failed to write COMMAND_TASK_TRIG (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	/* Wait 100ms for retimers */
+	k_msleep(100);
+
 	rv = tps_rw_port_control(&cfg->i2c, &pdc_port_control, I2C_MSG_READ);
 	if (rv) {
 		LOG_ERR("TI%d: Read port control failed (%d)",
 			cfg->connector_number, rv);
 		goto error_recovery;
 	}
-
-	pdc_port_control.retimer_fw_update = data->retimer_feature_en;
-
-	/* Write PDC port control */
+	pdc_port_control.retimer_fw_update = data->retimer_feature_en ? 1 : 0;
 	rv = tps_rw_port_control(&cfg->i2c, &pdc_port_control, I2C_MSG_WRITE);
 	if (rv) {
 		LOG_ERR("TI%d: Write port control failed (%d)",
@@ -1403,13 +1418,24 @@ static void cmd_update_retimer(struct pdc_data_t *data)
 		goto error_recovery;
 	}
 
-	/* Command has completed */
-	data->cci_event.command_completed = 1;
-	/* Inform the system of the event */
-	call_cci_event_cb(data);
+	rv = tps_rw_intel_vid_status(&cfg->i2c, &pdc_intel_vid_status,
+				     I2C_MSG_READ);
+	if (rv) {
+		LOG_ERR("TI%d: Read Intel VID status failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+	pdc_intel_vid_status.forced_tbt_mode = data->retimer_feature_en ? 1 : 0;
+	rv = tps_rw_intel_vid_status(&cfg->i2c, &pdc_intel_vid_status,
+				     I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Write Intel VID status failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
 
-	/* Transition to idle state */
-	set_state(data, ST_IDLE);
+	/* Transition to wait state */
+	set_state(data, ST_TASK_WAIT);
 	return;
 
 error_recovery:
@@ -2067,6 +2093,7 @@ static void task_trig(struct pdc_data_t *data)
 	union reg_data cmd_data;
 	int rv;
 
+	memset(cmd_data.data, 0, sizeof(cmd_data.data));
 	rv = tps_rw_thunderbolt_configuration(
 		&cfg->i2c, &pdc_thunderbolt_config, I2C_MSG_READ);
 	if (rv) {
@@ -2441,8 +2468,9 @@ static enum smf_state_result st_task_wait_run(void *o)
 	 *  2) command is set to "!CMD" for unknown command
 	 */
 	if (cmd.command && cmd.command != COMMAND_TASK_NO_COMMAND) {
-		LOG_INF("TI%d: Data not ready, check again in %d ms",
-			cfg->connector_number, PDC_TI_DATA_READY_TIME_MS);
+		LOG_INF("TI%d: Data not ready, check again in %d ms (0x%08x)",
+			cfg->connector_number, PDC_TI_DATA_READY_TIME_MS,
+			cmd.command);
 		k_work_reschedule(&data->data_ready,
 				  K_MSEC(PDC_TI_DATA_READY_TIME_MS));
 		return SMF_EVENT_HANDLED;
@@ -2465,10 +2493,10 @@ static enum smf_state_result st_task_wait_run(void *o)
 	if (cmd.command || cmd_data.data[0] != 0) {
 		/* Command has completed with error */
 		if (cmd.command == COMMAND_TASK_NO_COMMAND) {
-			LOG_DBG("TI%d: Command %d not supported",
+			LOG_ERR("TI%d: Command %d not supported",
 				cfg->connector_number, data->cmd);
 		} else {
-			LOG_DBG("TI%d: Command %d failed. Err : %d",
+			LOG_ERR("TI%d: Command %d failed. Err : %d",
 				cfg->connector_number, data->cmd,
 				cmd_data.data[0]);
 		}

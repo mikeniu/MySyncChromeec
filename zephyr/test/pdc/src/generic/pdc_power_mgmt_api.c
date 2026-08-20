@@ -16,7 +16,7 @@
 #include <zephyr/drivers/emul.h>
 #include <zephyr/fff.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/sys_clock.h>
+#include <zephyr/sys/clock.h>
 #include <zephyr/ztest.h>
 
 LOG_MODULE_REGISTER(pdc_power_mgmt_api, LOG_LEVEL_INF);

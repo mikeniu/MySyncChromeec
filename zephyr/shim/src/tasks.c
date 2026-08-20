@@ -68,11 +68,6 @@ const static k_tid_t task_to_k_tid[TASK_ID_COUNT] = {
 
 static struct task_ctx_base_data shimmed_tasks_data[TASK_ID_COUNT];
 static struct task_ctx_base_data extra_tasks_data[EXTRA_TASK_COUNT];
-/* Task timer structures. Keep separate from the context ones to avoid memory
- * holes due to int64_t fields in struct _timeout.
- */
-static struct k_timer shimmed_tasks_timers[TASK_ID_COUNT + EXTRA_TASK_COUNT];
-
 static int tasks_started;
 #undef CROS_EC_TASK
 #undef TASK_TEST
@@ -133,47 +128,7 @@ test_mockable k_tid_t get_hostcmd_thread(void)
 	return NULL;
 }
 
-k_tid_t task_id_to_thread_id(task_id_t task_id)
-{
-	if (task_id < 0) {
-		__ASSERT(false, "Invalid task id %d", task_id);
-		return NULL;
-	}
-	if (task_id < TASK_ID_COUNT) {
-		return task_to_k_tid[task_id];
-	}
-	if (task_id < TASK_ID_COUNT + EXTRA_TASK_COUNT) {
-		switch (task_id) {
-		case TASK_ID_SYSWORKQ:
-			return get_sysworkq_thread();
-
-#ifdef HAS_TASK_HOSTCMD
-		case TASK_ID_HOSTCMD:
-			return get_hostcmd_thread();
-#endif /* HAS_TASK_HOSTCMD */
-
-#ifdef HAS_TASK_MAIN
-		case TASK_ID_MAIN:
-			return get_main_thread();
-#endif /* HAS_TASK_MAIN */
-
-		case TASK_ID_IDLE:
-			return get_idle_thread();
-
-		case TASK_ID_SHELL:
-			return get_shell_thread();
-
-#ifdef CONFIG_AP_PWRSEQ
-		case TASK_ID_AP_PWRSEQ:
-			return get_ap_pwrseq_thread();
-#endif /* CONFIG_AP_PWRSEQ */
-		}
-	}
-	__ASSERT(false, "Failed to map task %d to thread", task_id);
-	return NULL;
-}
-
-task_id_t thread_id_to_task_id(k_tid_t thread_id)
+static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 {
 	if (thread_id == NULL) {
 		__ASSERT(false, "Invalid thread_id");
@@ -346,48 +301,6 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 
 	return events & event_mask;
 }
-
-/*
- * Callback function to use with k_timer_start to set the
- * TASK_EVENT_TIMER event on a task.
- */
-static void timer_expire(struct k_timer *timer_id)
-{
-	task_id_t cros_ec_task_id = timer_id - shimmed_tasks_timers;
-
-	task_set_event(cros_ec_task_id, TASK_EVENT_TIMER);
-}
-
-int timer_arm(timestamp_t event, task_id_t cros_ec_task_id)
-{
-	struct k_timer *timer;
-	timestamp_t now = get_time();
-
-	timer = &shimmed_tasks_timers[cros_ec_task_id];
-
-	if (event.val <= now.val) {
-		/* Timer requested for now or in the past, fire right away */
-		task_set_event(cros_ec_task_id, TASK_EVENT_TIMER);
-		return EC_SUCCESS;
-	}
-
-	/* Check for a running timer */
-	if (k_timer_remaining_get(timer))
-		return EC_ERROR_BUSY;
-
-	k_timer_start(timer, K_USEC(event.val - now.val), K_NO_WAIT);
-	return EC_SUCCESS;
-}
-
-void timer_cancel(task_id_t cros_ec_task_id)
-{
-	struct k_timer *timer;
-
-	timer = &shimmed_tasks_timers[cros_ec_task_id];
-
-	k_timer_stop(timer);
-}
-
 #ifdef TEST_BUILD
 void set_test_runner_tid(void)
 {
@@ -410,10 +323,6 @@ ZTEST_RULE(set_test_runner_tid, set_test_runner_tid_rule_before, NULL);
 
 void start_ec_tasks(void)
 {
-	for (size_t i = 0; i < TASK_ID_COUNT + EXTRA_TASK_COUNT; ++i) {
-		k_timer_init(&shimmed_tasks_timers[i], timer_expire, NULL);
-	}
-
 	for (size_t i = 0; i < TASK_ID_COUNT; ++i) {
 #ifdef TEST_BUILD
 		/* The test runner thread is automatically started. */

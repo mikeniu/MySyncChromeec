@@ -7,6 +7,7 @@
 #include "battery_smart.h"
 #include "chipset.h"
 #include "common.h"
+#include "console.h"
 #include "ec_tasks.h"
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_smart_battery.h"
@@ -821,13 +822,13 @@ ZTEST(power_common_hibernation, test_power_cmd_hibernation_delay)
 static void siglog_before(void *state)
 {
 	/* enable chipset channel */
-	zassert_ok(shell_execute_cmd(get_ec_shell(), "chan chipset"));
+	console_channel_enable("chipset");
 }
 
 static void siglog_after(void *state)
 {
 	/* disable chipset channel */
-	zassert_ok(shell_execute_cmd(get_ec_shell(), "chan chipset"));
+	console_channel_disable("chipset");
 }
 
 #ifdef CONFIG_PLATFORM_EC_BRINGUP

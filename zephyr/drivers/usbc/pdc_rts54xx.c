@@ -20,8 +20,8 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/smf.h>
 #include <zephyr/sys/atomic.h>
+#include <zephyr/sys/clock.h>
 #include <zephyr/sys/util.h>
-#include <zephyr/sys_clock.h>
 LOG_MODULE_REGISTER(pdc_rts54, CONFIG_USBC_LOG_LEVEL);
 #include "usbc/pdc_power_mgmt.h"
 #include "usbc/pdc_utils.h"
@@ -232,7 +232,7 @@ enum init_state_t {
 	/** Set the PDC Notifications */
 	INIT_PDC_SET_NOTIFICATION_ENABLE,
 	/** Set VDOs on the PDC */
-	INIT_PDC_SET_VDO,
+	INIT_PDC_SET_VDO_ACK,
 	/** Reset the PDC */
 	INIT_PDC_RESET,
 	/** Initialization complete */
@@ -367,6 +367,8 @@ struct pdc_config_t {
 	/** Whether or not this port is capable of USB communication as a device
 	 */
 	bool usb_comm_capable_as_device;
+	/** Whether or not this port supports USB4 as a host */
+	bool usb4_support_as_host;
 	/** Pointer to the device-specific callback function */
 	gpio_callback_handler_t callback_handler;
 };
@@ -523,7 +525,7 @@ static int rts54_get_info(const struct device *dev, struct pdc_info_t *info,
 			  bool live);
 static int rts54_get_error_status(const struct device *dev,
 				  union error_status_t *es);
-static int rts54_set_vdo_idh(const struct device *dev);
+static int rts54_set_vdo_id_ack(const struct device *dev);
 
 /**
  * @brief PDC port data used in interrupt handler
@@ -845,21 +847,21 @@ static enum smf_state_result st_init_run(void *o)
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
-		init_write_cmd_and_change_state(data, INIT_PDC_SET_VDO);
-		return SMF_EVENT_HANDLED;
-	case INIT_PDC_SET_VDO:
-		rv = rts54_set_vdo_idh(data->dev);
-		if (rv) {
-			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_VDO)", cnum);
-			set_state(data, ST_DISABLE);
-			return SMF_EVENT_HANDLED;
-		}
 		init_write_cmd_and_change_state(data, INIT_PDC_RESET);
 		return SMF_EVENT_HANDLED;
 	case INIT_PDC_RESET:
 		rv = rts54_reset(data->dev);
 		if (rv) {
 			LOG_ERR("RTK%d:, Internal(INIT_PDC_RESET)", cnum);
+			set_state(data, ST_DISABLE);
+			return SMF_EVENT_HANDLED;
+		}
+		init_write_cmd_and_change_state(data, INIT_PDC_SET_VDO_ACK);
+		return SMF_EVENT_HANDLED;
+	case INIT_PDC_SET_VDO_ACK:
+		rv = rts54_set_vdo_id_ack(data->dev);
+		if (rv) {
+			LOG_ERR("RTK%d:, Internal(INIT_PDC_SET_VDO_ACK)", cnum);
 			set_state(data, ST_DISABLE);
 			return SMF_EVENT_HANDLED;
 		}
@@ -914,7 +916,6 @@ static enum smf_state_result st_init_run(void *o)
 				return SMF_EVENT_HANDLED;
 			}
 
-			/* PDC returned an error */
 			data->init_local_state = INIT_ERROR;
 		} else {
 			/* PDC Error status was read */
@@ -1744,26 +1745,57 @@ static int rts54_set_vdo(const struct device *dev, const vdo_config_t *config,
 	return rts54_post_command(dev, CMD_SET_VDO, payload, total_size, NULL);
 }
 
-static int rts54_set_vdo_idh(const struct device *dev)
+static int rts54_set_vdo_id_ack(const struct device *dev)
 {
-	struct pdc_data_t *data = dev->data;
 	const struct pdc_config_t *cfg = dev->config;
-	uint32_t idh[1];
+
+	/* IDH, UFP, DFP VDOs */
+	union id_header_vdo_rev3 idh_vdo = { .raw_value = 0 };
+	union ufp_vdo_rev3 ufp_vdo = { .raw_value = 0 };
+	union dfp_vdo_rev3 dfp_vdo = { .raw_value = 0 };
+
+	uint8_t vdo_types[] = { VDO_INDEX_IDH, VDO_INDEX_PTYPE_DFP_VDO,
+				VDO_INDEX_PTYPE_UFP1_VDO };
+
 	vdo_config_t config = { .raw = 0 };
-	uint8_t vdo_type[] = { VDO_INDEX_IDH };
-
-	/* ID Header VDO (Discovery Identity response)
-	 * Bit 31: USB Host capable
-	 * Bit 30: USB Device capable
-	 * We assume the port is Host capable.
-	 */
-	idh[0] = VDO_IDH(1, cfg->usb_comm_capable_as_device ? 1 : 0,
-			 IDH_PTYPE_UNDEF, 0, data->info.vid);
-
-	config.fields.num_vdos = 1;
+	config.fields.num_vdos = 2;
 	config.fields.origin = RTS54XX_PDC_ORIGIN;
 
-	return rts54_set_vdo(dev, &config, vdo_type, idh);
+	/* ID Header VDO (Discovery Identity response) */
+	idh_vdo.usb_host = true;
+	set_idh_product_type_dfp(&idh_vdo, IDH_PTYPE_DFP_HOST);
+	idh_vdo.connector_type = USB_TYPEC_RECEPTACLE;
+	idh_vdo.usb_vendor_id = USB_VID_GOOGLE;
+
+	/* DFP VDO */
+	dfp_vdo.version = DFP_VDO_VERSION_1_2;
+	dfp_vdo.usb4_cap = cfg->usb4_support_as_host;
+	dfp_vdo.usb3_cap = true;
+	dfp_vdo.usb2_cap = true;
+	dfp_vdo.port_num = cfg->connector_number;
+
+	if (cfg->usb_comm_capable_as_device) {
+		config.fields.num_vdos = 3;
+		idh_vdo.usb_device = true;
+		idh_vdo.product_type_ufp = IDH_PTYPE_UFP_PERIPH;
+		/* UFP VDO */
+		ufp_vdo.version = UFP_VDO_VERSION_1_3;
+		ufp_vdo.usb4_cap = false;
+		/* TODO(b/543357136): Make usb3_cap configurable for device mode
+		 */
+		ufp_vdo.usb3_cap = false;
+		ufp_vdo.usb2_cap = UFP_USB2_CAPABLE;
+		ufp_vdo.vconn = false;
+		ufp_vdo.vbus = UFP_VDO_VBUS_NOT_REQUIRED;
+		ufp_vdo.no_signal_reconfig = false;
+		ufp_vdo.non_tbt3_signal_reconfig = false;
+		ufp_vdo.tbt_support = false;
+		ufp_vdo.speed = USB_R30_SS_U32_U40_GEN1;
+	}
+
+	uint32_t vdos[] = { idh_vdo.raw_value, dfp_vdo.raw_value,
+			    ufp_vdo.raw_value };
+	return rts54_set_vdo(dev, &config, vdo_types, vdos);
 }
 
 /**
@@ -3325,6 +3357,8 @@ BUILD_ASSERT(
 		.frs_supported = DT_INST_PROP(inst, frs_supported),           \
 		.usb_comm_capable_as_device =                                 \
 			DT_INST_PROP(inst, usb_comm_capable_as_device),       \
+		.usb4_support_as_host =                                       \
+			DT_INST_PROP(inst, usb4_capable_as_host),             \
 		.callback_handler = pdc_interrupt_callback##inst,             \
 	};                                                                    \
                                                                               \

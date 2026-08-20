@@ -81,6 +81,14 @@ static inline int ec_cmd_thermal_get_threshold_v1(
 			       sizeof(*p), r, sizeof(*r));
 }
 
+static inline int ec_cmd_ucsi_ppm_get(CROS_EC_COMMAND_INFO *h,
+				      const struct ec_params_ucsi_ppm_get *p,
+				      uint8_t *r)
+{
+	return CROS_EC_COMMAND(h, EC_CMD_UCSI_PPM_GET, 0, p, sizeof(*p), r,
+			       p->size);
+}
+
 static inline int
 ec_cmd_usb_pd_dev_info(CROS_EC_COMMAND_INFO *h,
 		       const struct ec_params_usb_pd_info_request *p,
@@ -290,6 +298,7 @@ _CROS_EC_C0_F_PF_RF(EC_CMD_ADC_READ, adc_read);
 _CROS_EC_CV_F_P(EC_CMD_ADD_ENTROPY, 0, add_entropy, rollback_add_entropy);
 _CROS_EC_C0_F_PF(EC_CMD_AP_FW_STATE, ap_fw_state);
 _CROS_EC_C0_F(EC_CMD_AP_RESET, ap_reset);
+_CROS_EC_C0_F_PF(EC_CMD_AP_RESET_SCHEDULED, ap_reset_scheduled);
 _CROS_EC_C0_F(EC_CMD_AP_SHUTDOWN, ap_shutdown);
 _CROS_EC_CV_F_P(EC_CMD_BATTERY_CUT_OFF, 1, battery_cut_off_v1, battery_cutoff);
 _CROS_EC_C0_F(EC_CMD_BATTERY_CUT_OFF, battery_cut_off);
@@ -443,7 +452,6 @@ _CROS_EC_C0_F_PF(EC_CMD_REGULATOR_ENABLE, regulator_enable);
 _CROS_EC_C0_F_PF_RF(EC_CMD_REGULATOR_GET_VOLTAGE, regulator_get_voltage);
 _CROS_EC_C0_F_PF_RF(EC_CMD_REGULATOR_IS_ENABLED, regulator_is_enabled);
 _CROS_EC_C0_F_PF(EC_CMD_REGULATOR_SET_VOLTAGE, regulator_set_voltage);
-_CROS_EC_C0_F_PF_RF(EC_CMD_RGBKBD, rgbkbd);
 _CROS_EC_C0_F_RF(EC_CMD_ROLLBACK_INFO, rollback_info);
 _CROS_EC_C1_F_RF(EC_CMD_ROLLBACK_INFO, rollback_info);
 _CROS_EC_CV_F_R(EC_CMD_RTC_GET_ALARM, 0, rtc_get_alarm, rtc);
@@ -488,7 +496,6 @@ _CROS_EC_C0_F_PF_RF(EC_CMD_VBOOT_HASH, vboot_hash);
 _CROS_EC_C0_F_PF_RF(EC_CMD_VSTORE_READ, vstore_read);
 _CROS_EC_C0_F_PF(EC_CMD_VSTORE_WRITE, vstore_write);
 _CROS_EC_C0_F_PF(EC_CMD_UCSI_PPM_SET, ucsi_ppm_set);
-_CROS_EC_C0_F_PF(EC_CMD_UCSI_PPM_GET, ucsi_ppm_get);
 _CROS_EC_C0_F_PF(EC_CMD_FP_VENDOR, fp_vendor);
 _CROS_EC_C0_F_RF(EC_CMD_FP_ASCP_CLAIM, fp_ascp_claim);
 _CROS_EC_C0_F_PF(EC_CMD_FP_ASCP_ESTABLISH, fp_ascp_establish);
