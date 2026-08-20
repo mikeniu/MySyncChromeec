@@ -61,6 +61,17 @@ docker run -it --rm \
   ec-builder
 ```
 
+Or using the helper script:
+```bash
+./run_docker.sh
+```
+
+> **Fast Startup**: Pass `--fast` (or set `SKIP_UPDATE=1`) to bypass remote
+> repository git checks for sub-second container launch:
+> ```bash
+> ./run_docker.sh --fast
+> ```
+
 ---
 
 ## Using the Tools (Inside the Container)

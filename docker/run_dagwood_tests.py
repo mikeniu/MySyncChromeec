@@ -26,9 +26,20 @@ def main():
         description="Run Dagwood device tests inside the Docker container."
     )
     dagwood_test_lib.add_common_args(parser)
+    parser.add_argument(
+        "--update",
+        action="store_true",
+        help=(
+            "Update repositories inside container before running tests "
+            "(default: skip updates for fast execution)."
+        ),
+    )
     args, extra_args = parser.parse_known_args()
 
     twister_args = dagwood_test_lib.get_twister_args(args, extra_args)
+
+    if not args.update:
+        os.environ["SKIP_UPDATE"] = "1"
 
     run_docker_sh = str(SCRIPT_DIR / "run_docker.sh")
 

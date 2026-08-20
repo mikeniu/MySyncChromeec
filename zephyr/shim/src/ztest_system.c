@@ -13,6 +13,13 @@
 
 char mock_end_of_ram_data[CONFIG_PLATFORM_EC_PRESERVED_END_OF_RAM_SIZE];
 
+__attribute__((weak)) void ztest_interrupt_disable_all(void)
+{
+	/*
+	 * Default no-op for tests not explicitly verifying interrupt disabling.
+	 */
+}
+
 __attribute__((weak)) void system_reset(int flags)
 {
 	__builtin_unreachable();

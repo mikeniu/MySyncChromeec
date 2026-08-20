@@ -96,7 +96,7 @@ DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, DT_FOREACH_CHILD, GEN_PINS_NODES)
  */
 #define PINS_NODE_PTR(id) &PINS_NODE(id),
 
-const struct led_pins_node_t *pins_node[] = {
+static const struct led_pins_node_t *pins_node[] = {
 	DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(0, DT_FOREACH_CHILD,
 						PINS_NODE_PTR)
 };
@@ -106,8 +106,8 @@ const struct led_pins_node_t *pins_node[] = {
  * to enable the color. Defined value is duty cycle in percentage
  * converted to duty cycle in ns (pulse_ns)
  */
-void led_set_color_with_pins(const struct pwm_pin_t *pwm_pins,
-			     uint8_t pins_count, uint8_t brightness)
+static void led_set_color_with_pins(const struct pwm_pin_t *pwm_pins,
+				    uint8_t pins_count, uint8_t brightness)
 {
 	for (int j = 0; j < pins_count; j++) {
 		pwm_pins[j].pwm->pulse_ns =

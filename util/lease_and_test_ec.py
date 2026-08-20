@@ -384,6 +384,14 @@ def main():
         action="store_true",
         help="Keep the leased DUT active after tests finish",
     )
+    parser.add_argument(
+        "--android-dir",
+        default=os.environ.get(
+            "ANDROID_BUILD_TOP",
+            os.path.expanduser("~/alos"),
+        ),
+        help="Path to Android environment directory (default: $ANDROID_BUILD_TOP or ~/alos)",
+    )
     args = parser.parse_args()
 
     if not args.model and not args.board:
@@ -443,7 +451,8 @@ def main():
 
     try:
         handler = create_dut_handler(details, args, ec_dir)
-    except NotImplementedError as e:
+        handler.get_test_targets()
+    except (NotImplementedError, RuntimeError) as e:
         print(f"Error: {e}", file=sys.stderr)
         release_lease_lock(lock_file, lock_file_path)
         if not args.keep_lease:
@@ -467,6 +476,8 @@ def main():
         print(e, file=sys.stderr)
         sys.exit(1)
     finally:
+        if "handler" in locals():
+            handler.cleanup()
         if "details" in locals():
             release_lease_lock(lock_file, lock_file_path)
             if details.get("lease_id") and not args.keep_lease:

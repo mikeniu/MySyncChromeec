@@ -13,9 +13,9 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/cbprintf.h>
+#include <zephyr/sys/clock.h>
 #include <zephyr/sys/sys_heap.h>
 #include <zephyr/sys/util_macro.h>
-#include <zephyr/sys_clock.h>
 
 #include <drivers/fingerprint.h>
 

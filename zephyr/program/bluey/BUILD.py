@@ -58,6 +58,7 @@ register_npcx9_project(
 register_npcx9_project(
     project_name="annite",
     zephyr_board="npcx9/npcx9m7fb",
+    extra_modules=["google-private", "nanopb", "pigweed"],
 )
 
 register_npcx9_project(
