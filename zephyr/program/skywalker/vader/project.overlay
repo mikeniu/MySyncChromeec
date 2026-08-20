@@ -176,6 +176,11 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "pmic_ec_resetb_interrupt";
 		};
+		int_edp_bl_en_1v8: edp-bl-en-1v8 {
+			irq-pin = <&gpio_edp_bl_en_1v8>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "edp_bl_en_1v8";
+		};
 	};
 
 	named-gpios {
@@ -200,6 +205,9 @@
 		//CCD_MODE_L
 		gpio_ccd_mode_l: ccd_mode_l {
 			gpios = <&gpioe 5 (GPIO_INPUT)>;
+		};
+		gpio_edp_bl_en_1v8: edp_bl_en_1v8 {
+			gpios = <&gpiob 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
 		};
 	};
 
