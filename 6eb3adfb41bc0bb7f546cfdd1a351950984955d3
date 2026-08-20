@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4b984fe_afe4c930",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-20T14:27:46Z",
+      "side": 1,
+      "message": "I don\u0027t think this is necessary.  But if you want to keep this use the IS_ALIGNED macro.  `IS_ALIGNED(data, sizeof(void *))`.",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 54
+      },
+      "revId": "6eb3adfb41bc0bb7f546cfdd1a351950984955d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
