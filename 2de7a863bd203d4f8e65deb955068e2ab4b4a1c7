@@ -124,6 +124,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a15dce8_2808adad",
+        "filename": "zephyr/test/drivers/usbc_sm/src/usbc_sm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-20T20:31:50Z",
+      "side": 1,
+      "message": "LGTM. Since this is abstract state machine code, I guess it makes sense to test it with an abstract state machine, and that will necessarily be hard to intuit. This is probably as good as it gets.",
+      "parentUuid": "f7db4710_3bce98ae",
+      "revId": "2de7a863bd203d4f8e65deb955068e2ab4b4a1c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6faa68e1_5ca45cba",
