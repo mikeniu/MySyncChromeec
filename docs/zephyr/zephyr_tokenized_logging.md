@@ -82,15 +82,42 @@ while rebuilding an EC image/token database.
 
 Upon startup, tokenization is defaulted on or off by the servod overlay
 configuration file. You can change the default by modifying the
-`use_cros_ec_tokens` control name.
+`uses_cros_ec_tokens` control name.
 Example: https://crrev.com/c/5202485.
-```
+```xml
   <control>
     <name>uses_cros_ec_tokens</name>
     <doc>CrOS EC logging is tokenized</doc>
     <params drv="echo" value="always" interface="servo"/>
   </control>
 ```
+
+### Controlling Tokenization via `dut-control`
+
+You can dynamically inspect and control EC3PO detokenization at runtime without
+restarting servod using the `ec_token_db` control:
+
+* **Query tokenization status and active database**:
+  ```bash
+  dut-control ec_token_db
+  ```
+  Returns the active database file path (e.g. `/usr/share/cros_ec/tokens/historical.bin`)
+  if tokenization is enabled, or `off` if disabled.
+
+* **Set a custom token database path**:
+  ```bash
+  dut-control ec_token_db:/path/to/tokens.bin
+  ```
+
+* **Disable detokenization on the fly**:
+  ```bash
+  dut-control ec_token_db:off
+  ```
+
+* **Re-enable detokenization (with last used database)**:
+  ```bash
+  dut-control ec_token_db:on
+  ```
 
 ### Inside Chroot
 You can launch servod within chroot with the following command specifying the
