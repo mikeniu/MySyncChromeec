@@ -133,6 +133,42 @@ clone_zephyrproject_sparse() {
     fi
 }
 
+# Specialized clone/update function for u-boot (sparse checkout)
+clone_uboot_sparse() {
+    local repo_url="${REPO_BASE}/third_party/u-boot"
+    local target_dir="/workspace/src/third_party/u-boot"
+    local cached_dir="${CACHE_BASE}/src/third_party/u-boot"
+
+    if [ ! -d "${target_dir}" ]; then
+        if [ -d "${cached_dir}" ]; then
+            echo "Populating U-Boot from build-time cache..."
+            mkdir -p "$(dirname "${target_dir}")"
+            cp -a "${cached_dir}" "${target_dir}"
+            update_repo "${target_dir}" "U-Boot"
+        else
+            echo "Performing sparse checkout of U-Boot..."
+            mkdir -p "${target_dir}"
+            cd "${target_dir}" || exit 1
+            git clone --depth 1 --no-checkout --quiet "${repo_url}" .
+            git config core.sparseCheckout true
+
+            # Define directories to include
+            {
+                echo "/tools/binman/"
+                echo "/tools/dtoc/"
+                echo "/tools/patman/"
+                echo "/tools/buildman/"
+            } >> .git/info/sparse-checkout
+
+            git checkout --quiet
+            cd - > /dev/null
+        fi
+    else
+        echo "U-Boot directory already exists. Checking for updates..."
+        update_repo "${target_dir}" "U-Boot"
+    fi
+}
+
 # Function to populate a repository from build-time cache if it doesn't exist
 populate_if_missing() {
     local target_dir="${1}"
@@ -166,8 +202,7 @@ else
     clone_zephyrproject_sparse &
     clone_or_update "${REPO_BASE}/third_party/pigweed/pigweed" \
         "/workspace/src/third_party/pigweed" "Pigweed" &
-    clone_or_update "${REPO_BASE}/third_party/u-boot" \
-        "/workspace/src/third_party/u-boot" "U-Boot" &
+    clone_uboot_sparse &
     clone_overlay_sparse &
     wait
 fi

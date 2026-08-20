@@ -74,9 +74,18 @@ RUN mkdir -p /opt/repos/src/third_party/zephyrproject && \
 RUN git clone --depth 1 \
     ${REPO_BASE}/third_party/pigweed/pigweed \
     /opt/repos/src/third_party/pigweed
-RUN git clone --depth 1 \
-    ${REPO_BASE}/third_party/u-boot \
-    /opt/repos/src/third_party/u-boot
+# Sparse checkout for u-boot
+RUN mkdir -p /opt/repos/src/third_party/u-boot && \
+    cd /opt/repos/src/third_party/u-boot && \
+    git clone --depth 1 --no-checkout \
+        ${REPO_BASE}/third_party/u-boot \
+        . && \
+    git config core.sparseCheckout true && \
+    echo "/tools/binman/" >> .git/info/sparse-checkout && \
+    echo "/tools/dtoc/" >> .git/info/sparse-checkout && \
+    echo "/tools/patman/" >> .git/info/sparse-checkout && \
+    echo "/tools/buildman/" >> .git/info/sparse-checkout && \
+    git checkout
 
 # Sparse checkout for chromiumos-overlay
 RUN mkdir -p /opt/repos/src/third_party/chromiumos-overlay && \
