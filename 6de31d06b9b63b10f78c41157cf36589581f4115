@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "434f4edf_71914130",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T19:20:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/3389d3a1-95a7-4137-b2bd-1d1b05dd7d62)]\n\n### Review Summary\n\n*   **Functionality:** The patch addresses the bug correctly by wrapping the byte-by-byte OTP key programming sequence with `irq_lock()` and `irq_unlock()`. This correctly ensures the loop won\u0027t be interrupted, resolving the likely cause of flakiness.\n*   **Security:** No security vulnerabilities are introduced. The use of interrupt locking during sensitive timing-critical cryptographic operations is a standard and secure practice.\n*   **Style:** The code conforms nicely to standard EC/Zephyr coding conventions.\n*   **Consistency:** The addition of `#ifdef CONFIG_ZEPHYR` guards around Zephyr-specific headers and assertions in the shared `test/mock/otpi_mock.c` mock fully addresses previous feedback, maintaining compatibility with legacy EC builds.\n*   **Testing \u0026 Test Coverage:** Excellent. The mock `otpi_write` asserts that interrupts are locked, validating the fix directly. Furthermore, the hardware test validates that the interrupt state is properly restored after `otp_key_provision()` completes.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped, addressing a single specific issue with appropriate test modifications.\n\nTAG\u003dagy\nCONV\u003d59a0a612-3450-4923-962b-50c4125b34ab",
+      "isAi": true,
+      "revId": "6de31d06b9b63b10f78c41157cf36589581f4115",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
