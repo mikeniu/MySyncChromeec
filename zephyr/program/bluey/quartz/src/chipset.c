@@ -24,8 +24,6 @@ void board_chipset_startup_quartz(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_bl_off_odl), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_enavdd_oled), 1);
-	hook_call_deferred(&disable_pp5000_s5_data, -1);
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 1);
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_quartz,
 	     HOOK_PRIO_DEFAULT);
@@ -38,7 +36,6 @@ void board_chipset_shutdown_quartz(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_enavdd_oled), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_sys_throttle_mira), 0);
-	hook_call_deferred(&disable_pp5000_s5_data, 4000 * USEC_PER_MSEC);
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_quartz,
 	     HOOK_PRIO_DEFAULT);
@@ -56,11 +53,24 @@ static void enable_s3_interrupt(void)
 }
 DECLARE_HOOK(HOOK_INIT, enable_s3_interrupt, HOOK_PRIO_DEFAULT);
 
-static void control_prochot_startup(void)
+static void board_chipset_pre_init_quartz(void)
 {
+	hook_call_deferred(&disable_pp5000_s5_data, -1);
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 1);
+
 	if (battery_is_present() != BP_YES) {
 		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_sys_throttle_mira),
 				1);
 	}
 }
-DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, control_prochot_startup, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init_quartz,
+	     HOOK_PRIO_DEFAULT);
+
+static void board_chipset_hard_off_quartz(void)
+{
+	hook_call_deferred(&disable_pp5000_s5_data,
+			   (5000 + CONFIG_CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
+				   USEC_PER_MSEC);
+}
+DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_chipset_hard_off_quartz,
+	     HOOK_PRIO_DEFAULT);

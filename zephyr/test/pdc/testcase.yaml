@@ -160,6 +160,17 @@ tests:
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
+  pdc.policy.tbt:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_USBC_PDC_TBT_SUPPORTED=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"
+
   pdc.policy.no_3a_port:
     timeout: 300
     extra_configs:
@@ -207,6 +218,16 @@ tests:
     - CONFIG_TEST_SNIFF_POWER_MGMT_PDC_APIS=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
+
+  pdc.tps6699x.battery_status:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_BATTERY_STATUS=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_TEST_SNIFF_POWER_MGMT_PDC_APIS=y
+    extra_dtc_overlay_files:
+    - "./boards/tps6699x.overlay"
 
   pdc.policy.dead_battery.two_chargers:
     timeout: 300
@@ -424,6 +445,7 @@ tests:
     extra_configs:
     - CONFIG_TEST_SUITE_PPM_DRIVER=y
     - CONFIG_EMUL_PPM_DRIVER=n
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
     extra_dtc_overlay_files:
     - "./boards/rts5453p.overlay"
 
@@ -506,3 +528,14 @@ tests:
     - CONFIG_TEST_SUITE_PDC_COMMS_SUSPEND_RESUME=y
     extra_dtc_overlay_files:
     - "./boards/tps6699x.overlay"
+
+  pdc.policy.battery_overload:
+    timeout: 300
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_POLICY=y
+    - CONFIG_USBC_PDC_TRACE_MSG=y
+    - CONFIG_USB_PDC_LOG_LEVEL_DBG=y
+    - CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE=y
+    - CONFIG_PDC_POWER_MGMT_SRC_THROTTLING=y
+    extra_dtc_overlay_files:
+    - "./boards/rts5453p.overlay"

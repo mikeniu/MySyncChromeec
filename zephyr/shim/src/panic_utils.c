@@ -66,7 +66,7 @@ void get_thread_name(const struct k_thread *thread, char *name, size_t size)
 #ifdef CONFIG_THREAD_NAME
 	snprintf(name, size, "%s", thread->name);
 #else
-	snprintf(name, size, "TASK_%d", thread_id_to_task_id((k_tid_t)thread));
+	snprintf(name, size, "%p", thread);
 #endif
 }
 

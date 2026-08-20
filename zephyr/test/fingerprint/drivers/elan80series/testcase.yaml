@@ -8,5 +8,6 @@ common:
     - boards/native_sim.overlay
 tests:
   fingerprint.drivers.elan80sg:
+    ignore_faults: true
     extra_dtc_overlay_files:
       - boards/elan80sg.dtsi

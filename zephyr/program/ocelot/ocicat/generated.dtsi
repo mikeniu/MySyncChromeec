@@ -185,7 +185,6 @@
         /* GPJ6: TS_WOT                 */
 		gpio_sys_rst_odl: sys_rst_odl {
 			gpios = <&gpioj 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
-			enum-name = "GPIO_SYS_RST_ODL";
 			no-auto-init;
 		};
 

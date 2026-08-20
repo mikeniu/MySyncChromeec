@@ -35,8 +35,9 @@ LOG_MODULE_REGISTER(cros_system, LOG_LEVEL_ERR);
 #define STRUCT_TIMER4_REG_BASE_ADDR \
 	((struct btmr_regs *)(DT_REG_ADDR(DT_NODELABEL(timer4))))
 
-#define STRUCT_ESPI_REG_BASE_ADDR \
-	((struct espi_iom_regs *)(DT_REG_ADDR(DT_NODELABEL(espi0))))
+#define STRUCT_ESPI_REG_BASE_ADDR                                            \
+	((struct xec_espi_ioc_cfg_regs *)(DT_REG_ADDR(DT_NODELABEL(espi0)) + \
+					  MCHP_ESPI_IO_CFG_OFS))
 
 #define STRUCT_KBD_REG_BASE_ADDR \
 	((struct kscan_regs *)(DT_REG_ADDR(DT_NODELABEL(cros_kb_raw))))
@@ -470,7 +471,7 @@ static void system_xec_hibernate_by_dsleep(uint32_t seconds,
 #endif
 	struct ecs_regs *ecs = STRUCT_ECS_REG_BASE_ADDR;
 	struct btmr_regs *btmr4 = STRUCT_TIMER4_REG_BASE_ADDR;
-	struct espi_iom_regs *espi0 = STRUCT_ESPI_REG_BASE_ADDR;
+	struct xec_espi_ioc_cfg_regs *espi0 = STRUCT_ESPI_REG_BASE_ADDR;
 #ifdef CONFIG_CROS_KB_RAW_XEC
 	struct kscan_regs *kbd = STRUCT_KBD_REG_BASE_ADDR;
 #endif
