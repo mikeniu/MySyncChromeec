@@ -22,6 +22,30 @@
       },
       "revId": "4d887f205261a7de4da9a9aa5d85dd5693c61f1f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88dc0631_fe050a2d",
+        "filename": "util/dut_handlers/alos.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-20T03:06:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a76bb95_2cbb5969",
+      "range": {
+        "startLine": 226,
+        "startChar": 0,
+        "endLine": 226,
+        "endChar": 55
+      },
+      "revId": "4d887f205261a7de4da9a9aa5d85dd5693c61f1f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
