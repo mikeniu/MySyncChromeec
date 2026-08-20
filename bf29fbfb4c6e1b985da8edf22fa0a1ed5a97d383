@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b203b01_e24cc3b9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T18:42:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "871d5e98_191c3831",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 0
+      },
+      "revId": "bf29fbfb4c6e1b985da8edf22fa0a1ed5a97d383",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7e751bc9_ce6b3bdf",
@@ -38,6 +62,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/2b5b3cc5-b082-47ee-844d-ec22119377a3)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly updates the `PANIC_REG_LIST` macro for RISC-V to use `M_GPR` instead of `M` for general-purpose registers (`a0-a7`, `t0-t6`), while properly preserving `ra` using `M`. The test logic in `zephyr/test/hwtest/src/panic.c` has been cleanly updated in this patchset to introduce `is_gpr` to the `reg_vals` struct, properly distinguishing between registers that should be zeroed (GPRs) and those that shouldn\u0027t (`ra`). This successfully addresses the prior review feedback!\n*   **Security:** This patch is a solid security/privacy improvement as it prevents potential leakage of sensitive data residing in GPRs in panic dumps on RISC-V devices.\n*   **Style:** The code style aligns with standard Zephyr C macros and existing patterns. The addition of `.is_gpr` is a clean and extensible way to handle register types in the test loop.\n*   **Testing \u0026 Test Coverage:** The `panic_strip_gpr` test case has been successfully re-enabled for the `sanok` (RISC-V) board in `test/run_device_tests.py`, ensuring this new behavior is verified by CI. The test assertions have been perfectly updated to verify that `ra` retains its value and is not stripped.\n*   **CL Size \u0026 Scope:** The CL is appropriately scoped, focused, and well-contained.\n*   **Overall Quality:** Excellent. The fix is complete, testing is thorough, and the prior feedback was handled nicely.\n\nTAG\u003dagy\nCONV\u003d2b5b3cc5-b082-47ee-844d-ec22119377a3",
       "isAi": true,
+      "revId": "bf29fbfb4c6e1b985da8edf22fa0a1ed5a97d383",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fa7d456_5d07843c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T18:42:44Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7e751bc9_ce6b3bdf",
       "revId": "bf29fbfb4c6e1b985da8edf22fa0a1ed5a97d383",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
