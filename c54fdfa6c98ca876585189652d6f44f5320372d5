@@ -22,6 +22,30 @@
       },
       "revId": "c54fdfa6c98ca876585189652d6f44f5320372d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55be9dc2_3a0026a3",
+        "filename": "zephyr/program/bluey/pic/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-08-20T10:33:32Z",
+      "side": 1,
+      "message": "Removed it. I\u0027ll add it if needed.",
+      "parentUuid": "b6223d31_2d7858cd",
+      "range": {
+        "startLine": 46,
+        "startChar": 2,
+        "endLine": 48,
+        "endChar": 4
+      },
+      "revId": "c54fdfa6c98ca876585189652d6f44f5320372d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
