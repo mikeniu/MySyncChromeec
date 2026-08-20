@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6223d31_2d7858cd",
+        "filename": "zephyr/program/bluey/pic/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-20T07:12:53Z",
+      "side": 1,
+      "message": "Is it OK to delete this and add gpio56 to unused pins?",
+      "range": {
+        "startLine": 46,
+        "startChar": 2,
+        "endLine": 48,
+        "endChar": 4
+      },
+      "revId": "c54fdfa6c98ca876585189652d6f44f5320372d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
