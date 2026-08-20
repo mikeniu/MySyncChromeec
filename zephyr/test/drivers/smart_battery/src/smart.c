@@ -48,8 +48,7 @@ ZTEST_USER(smart_battery, test_battery_getters)
 	zassert_equal(bat->design_mv, word, "%d != %d", bat->design_mv, word);
 	zassert_equal(EC_SUCCESS, battery_serial_number(&word));
 	zassert_equal(bat->sn, word, "%d != %d", bat->sn, word);
-	zassert_equal(EC_SUCCESS, get_battery_manufacturer_name(block, 32),
-		      NULL);
+	zassert_equal(EC_SUCCESS, battery_manufacturer_name(block, 32), NULL);
 	zassert_mem_equal(block, bat->mf_name, bat->mf_name_len, "%s != %s",
 			  block, bat->mf_name);
 	zassert_equal(EC_SUCCESS, get_battery_manufacture_info(block, 32),
@@ -81,6 +80,35 @@ ZTEST_USER(smart_battery, test_battery_getters)
 	expected = bat->cap * 60 / (-bat->avg_cur);
 	zassert_equal(EC_SUCCESS, battery_time_to_empty(&word));
 	zassert_equal(expected, word, "%d != %d", expected, word);
+}
+
+ZTEST_USER(smart_battery, test_battery_manufacturer_name_nulls)
+{
+	struct sbat_emul_bat_data *bat;
+	const struct emul *emul = EMUL_DT_GET(BATTERY_NODE);
+	char block[32];
+
+	bat = sbat_emul_get_bat_data(emul);
+
+	/* Set manufacturer name with embedded nulls */
+	memcpy(bat->mf_name, "A\0B\0C", 5);
+	bat->mf_name_len = 5;
+
+	zassert_equal(EC_SUCCESS,
+		      battery_manufacturer_name(block, sizeof(block)), NULL);
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_REPLACE_NULLS)) {
+		/* We expect "A_B_C" */
+		zassert_mem_equal(block, "A_B_C", 5, "%s != A_B_C", block);
+		zassert_equal(block[5], '\0');
+	} else {
+		/* We expect "A" (stops at first null) */
+		zassert_equal(strcmp(block, "A"), 0, "%s != A", block);
+	}
+
+	/* Restore default for other tests */
+	memcpy(bat->mf_name, "LGC", 3);
+	bat->mf_name_len = 3;
 }
 
 /** Test getting capacity. These functions should force mAh mode */

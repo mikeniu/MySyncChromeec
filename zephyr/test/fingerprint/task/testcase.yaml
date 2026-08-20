@@ -5,6 +5,8 @@
 common:
   platform_allow:
   - native_sim
+  extra_configs:
+  - CONFIG_CROS_EC_RW=y
 tests:
   fingerprint.task.capture:
     extra_configs:
@@ -100,7 +102,6 @@ tests:
   fingerprint.task.btn_ign_out:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_BTN_IGN_OUT=y
-    - CONFIG_CROS_EC_RW=y
     extra_conf_files:
     - prj.conf
     extra_dtc_overlay_files:
@@ -109,7 +110,6 @@ tests:
   fingerprint.task.led:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_LED=y
-    - CONFIG_CROS_EC_RW=y
     - CONFIG_PLATFORM_EC_FP_LED=y
     - CONFIG_LED=y
     - CONFIG_LED_PWM=y
@@ -118,3 +118,23 @@ tests:
     - prj.conf
     extra_dtc_overlay_files:
     - fp_led.dtsi
+
+  fingerprint.task.auth_commands:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS=y
+    - CONFIG_EC_HOST_CMD=y
+    - CONFIG_EC_HOST_CMD_DEDICATED_THREAD=y
+    - CONFIG_EC_HOST_CMD_BACKEND_SIMULATOR=y
+    extra_conf_files:
+    - prj.conf
+
+  fingerprint.task.auth_commands_otp:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS=y
+    - CONFIG_NPCX_OTP_KEY=y
+    - CONFIG_EC_HOST_CMD=y
+    - CONFIG_EC_HOST_CMD_DEDICATED_THREAD=y
+    - CONFIG_EC_HOST_CMD_BACKEND_SIMULATOR=y
+    extra_conf_files:
+    - prj.conf
+

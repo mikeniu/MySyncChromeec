@@ -869,12 +869,6 @@ static int ppm_common_handle_control_message(struct ucsi_ppm_device *dev,
 	uint8_t prev_cmd;
 	uint8_t busy = 0;
 
-	if (length > sizeof(struct ucsi_control_t)) {
-		LOG_ERR("Tried to send control message with invalid size (%d)",
-			(int)length);
-		return -EINVAL;
-	}
-
 	/* If we're currently sending a command, we should immediately discard
 	 * this call. The exception is if this is a cancel command, which should
 	 * replace the current command.
@@ -924,6 +918,39 @@ static int ppm_common_handle_control_message(struct ucsi_ppm_device *dev,
 	return 0;
 }
 
+static bool ppm_write_is_valid(unsigned int offset, const void *buf,
+			       size_t length)
+{
+	if (buf == NULL) {
+		return false;
+	}
+
+	if (length == 0) {
+		return false;
+	}
+
+	if (offset == UCSI_CONTROL_OFFSET) {
+		/* Writes to control offset are limited to 8 bytes. */
+		if (length > sizeof(struct ucsi_control_t)) {
+			return false;
+		}
+		return true;
+	}
+
+	if (offset < UCSI_MESSAGE_OUT_OFFSET ||
+	    offset >= UCSI_MESSAGE_OUT_OFFSET + MESSAGE_OUT_SIZE) {
+		/* offset out of bounds for message_out area */
+		return false;
+	}
+
+	if (offset + length > UCSI_MESSAGE_OUT_OFFSET + MESSAGE_OUT_SIZE) {
+		/* Length + offset out of bounds */
+		return false;
+	}
+
+	return true;
+}
+
 /*
  * Only allow writes into two regions:
  * - Control (to send commands)
@@ -941,35 +968,15 @@ static int ppm_common_handle_control_message(struct ucsi_ppm_device *dev,
 int ucsi_ppm_write(struct ucsi_ppm_device *dev, unsigned int offset,
 		   const void *buf, size_t length)
 {
-	bool valid_fixed_offset;
-
-	if (!buf || length == 0) {
-		LOG_ERR("Invalid buffer (%p) or length (%x)", buf, length);
-		return -EINVAL;
-	}
-
-	/* OPM can only write to CONTROL and MESSAGE_OUT. */
-	valid_fixed_offset = (offset == UCSI_CONTROL_OFFSET);
-	if (!valid_fixed_offset &&
-	    !(offset >= UCSI_MESSAGE_OUT_OFFSET &&
-	      offset < UCSI_MESSAGE_OUT_OFFSET + MESSAGE_OUT_SIZE)) {
-		LOG_ERR("UCSI can't write to invalid offset: 0x%x", offset);
+	if (!ppm_write_is_valid(offset, buf, length)) {
+		LOG_ERR("UCSI Write: invalid buffer (%p) or length (%x) or offset (%x)",
+			buf, length, offset);
 		return -EINVAL;
 	}
 
 	/* Handle control messages */
 	if (offset == UCSI_CONTROL_OFFSET) {
 		return ppm_common_handle_control_message(dev, buf, length);
-	}
-
-	if (offset >= UCSI_MESSAGE_OUT_OFFSET &&
-	    offset + length > UCSI_MESSAGE_OUT_OFFSET + MESSAGE_OUT_SIZE) {
-		LOG_ERR("UCSI write [0x%x ~ 0x%x] exceeds the "
-			"MESSAGE_OUT range [0x%x ~ 0x%x]",
-			offset, offset + length - 1, UCSI_MESSAGE_OUT_OFFSET,
-			UCSI_MESSAGE_OUT_OFFSET + MESSAGE_OUT_SIZE - 1);
-
-		return -EINVAL;
 	}
 
 	/* Copy from input buffer to offset within MESSAGE_OUT. */

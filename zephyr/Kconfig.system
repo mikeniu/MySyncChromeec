@@ -117,14 +117,6 @@ config PLATFORM_EC_FW_RESET_VECTOR
 	  needs to be provided is system_get_fw_reset_vector that
 	  will return the address of the reset vector.
 
-config PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP
-	bool "Enable Memory Dump Host Commands"
-	select THREAD_STACK_INFO
-	help
-	  Enables fetching a memory dump using host commands. This is useful when
-	  debugging panics. May not dump all memory, e.g. sensitive memory will
-	  not be dumped.
-
 config PLATFORM_EC_HOST_COMMAND_ENTER_BOOTLOADER
 	bool "Enable Enter Bootloader Host Command"
 	help

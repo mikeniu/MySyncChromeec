@@ -639,11 +639,30 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	jdata->jump_tag_total = 0; /* Reset tags */
 	jdata->struct_size = sizeof(struct jump_data);
 
-	/* Call other hooks; these may add tags */
-	hook_notify(HOOK_SYSJUMP);
-
-	/* Disable interrupts before jump */
+	/*
+	 * Disable interrupts before running sysjump hooks. This guarantees
+	 * that all teardown hooks (e.g., MPU disabling or peripheral resets)
+	 * execute atomically in a non-preemptible context to prevent race
+	 * conditions during image transition.
+	 *
+	 * Note: HOOK_SYSJUMP handlers run with interrupts disabled and must
+	 * not depend on interrupt-driven driver I/O or kernel sleeps.
+	 */
 	interrupt_disable_all();
+
+	/* Call other hooks; these may add tags
+	 *
+	 * Note: HOOK_SYSJUMP handlers run with interrupts disabled and in a
+	 * non-preemptible context. Handlers MUST NOT:
+	 *   - Sleep or yield thread execution (e.g., k_msleep, crec_msleep,
+	 *     task_wait_event). Use busy-waits (k_busy_wait / udelay) instead.
+	 *   - Perform interrupt-driven driver I/O (e.g., blocking I2C/SPI
+	 *     transactions expecting IRQ completion).
+	 *   - Acquire mutexes or block on synchronization primitives
+	 *     (e.g., mutex_lock, k_mutex_lock, k_sem_take).
+	 *   - Rely on deferred functions or timer interrupts.
+	 */
+	hook_notify(HOOK_SYSJUMP);
 
 	chip_pre_system_jump();
 
@@ -912,53 +931,6 @@ system_get_build_info(void)
 {
 	return build_info;
 }
-
-static void handle_watchdog_reset(void)
-{
-	/*
-	 * Only update the panic reason in RW since RO may have an older panic
-	 * data version and updating the panic reason will cause new fields to
-	 * be overwritten.
-	 */
-	if (!IS_ENABLED(CONFIG_COMMON_PANIC_OUTPUT) ||
-	    !IS_ENABLED(SECTION_IS_RW)) {
-		return;
-	}
-
-	/*
-	 * Log panic cause if watchdog caused reset and panic cause
-	 * was not already logged. This must happen after parsing jump_data
-	 * to ensure we have restored the reset flags passed from the previous
-	 * image.
-	 */
-	if (system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG) {
-		uint32_t reason;
-		uint32_t info;
-		uint8_t exception;
-		struct panic_data *pdata;
-
-		panic_get_reason(&reason, &info, &exception);
-		pdata = panic_get_data();
-
-		/* If the panic reason is a watchdog warning, then change
-		 * the reason to a regular watchdog reason while preserving
-		 * the info and exception from the watchdog warning.
-		 */
-		if (reason == PANIC_SW_WATCHDOG_WARN)
-			panic_set_reason(PANIC_SW_WATCHDOG, info, exception);
-		/* The watchdog panic info may have already been initialized by
-		 * the watchdog handler, so only set it here if the panic reason
-		 * is not a watchdog or the panic info has already been read,
-		 * i.e. an old watchdog panic.
-		 */
-		else if ((reason != PANIC_SW_WATCHDOG &&
-			  reason != PANIC_SW_WATCHDOG_HARD) ||
-			 !pdata || pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD) {
-			panic_set_reason(PANIC_SW_WATCHDOG_HARD, 0, 0);
-		}
-	}
-}
-
 static void init_jump_data(void)
 {
 	/*
@@ -1057,7 +1029,6 @@ clear_jump_data:
 void system_common_pre_init(void)
 {
 	init_jump_data();
-	handle_watchdog_reset();
 }
 
 void system_enter_manual_recovery(void)
@@ -1159,12 +1130,34 @@ static enum ec_status ec_error_to_status(int err)
 	}
 }
 
+__maybe_unused static inline bool is_sysjump_command(int cmd)
+{
+	return cmd == EC_REBOOT_JUMP_RO || cmd == EC_REBOOT_JUMP_RW;
+}
+
 /**
  * Handle a pending reboot command.
+ *
+ * For EC_REBOOT_JUMP_RO/RW commands this owns the host-interface IRQ
+ * lifecycle: mask before the sysjump so no new host command is dispatched,
+ * unmask on the failure-fallback return path (a successful sysjump does
+ * not return).
  */
 static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 {
 	int status;
+	bool host_irq_disabled = false;
+
+	/*
+	 * Mask the host-interface IRQ before the sysjump so no new host
+	 * command is dispatched between here and jump_to_image().
+	 * Legacy (!CONFIG_EC_HOST_CMD) masks earlier, in host_command_reboot(),
+	 * to preserve the mask-BEFORE-ACK invariant.
+	 */
+	if (is_sysjump_command(p->cmd)) {
+		lpc_disable_host_interface_interrupts();
+		host_irq_disabled = true;
+	}
 
 	if (IS_ENABLED(CONFIG_POWER_BUTTON_INIT_IDLE) &&
 	    (p->flags & EC_REBOOT_FLAG_CLEAR_AP_IDLE)) {
@@ -1176,17 +1169,22 @@ static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 
 	status = validate_reboot_command(p);
 	if (status != EC_SUCCESS)
-		return status;
+		goto out;
 
 	switch (p->cmd) {
 	case EC_REBOOT_CANCEL:
 	case EC_REBOOT_NO_OP:
-		return EC_SUCCESS;
+		status = EC_SUCCESS;
+		break;
 	case EC_REBOOT_JUMP_RO:
-		return system_run_image_copy_with_flags(
+		/* Only returns on failure; success does not return. */
+		status = system_run_image_copy_with_flags(
 			EC_IMAGE_RO, EC_RESET_FLAG_STAY_IN_RO);
+		break;
 	case EC_REBOOT_JUMP_RW:
-		return system_run_image_copy(system_get_active_copy());
+		/* Only returns on failure; success does not return. */
+		status = system_run_image_copy(system_get_active_copy());
+		break;
 	case EC_REBOOT_COLD:
 	case EC_REBOOT_COLD_AP_OFF:
 		if (IS_ENABLED(CONFIG_AP_X86_INTEL))
@@ -1223,10 +1221,12 @@ static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 		else
 			system_reset(SYSTEM_RESET_HARD);
 		/* That shouldn't return... */
-		return EC_ERROR_UNKNOWN;
+		status = EC_ERROR_UNKNOWN;
+		break;
 	case EC_REBOOT_DISABLE_JUMP:
 		system_disable_jump();
-		return EC_SUCCESS;
+		status = EC_SUCCESS;
+		break;
 	case EC_REBOOT_HIBERNATE:
 		/*
 		 * Allow some time for the system to quiesce before entering EC
@@ -1240,12 +1240,26 @@ static int handle_pending_reboot(struct ec_params_reboot_ec *p)
 			system_hibernate(hibernate_seconds,
 					 hibernate_microseconds);
 			/* That shouldn't return... */
-			return EC_ERROR_UNKNOWN;
+			status = EC_ERROR_UNKNOWN;
+		} else {
+			status = EC_ERROR_INVAL;
 		}
-		return EC_ERROR_INVAL;
+		break;
 	default:
-		return EC_ERROR_INVAL;
+		status = EC_ERROR_INVAL;
+		break;
 	}
+out:
+	/*
+	 * If the host-interface IRQ was disabled on entry to this function
+	 * (either here, or by the caller), enable the IRQ so the AP-EC
+	 * channel is active.
+	 */
+	if (host_irq_disabled) {
+		lpc_enable_host_interface_interrupts();
+	}
+
+	return status;
 }
 
 test_mockable void system_enter_hibernate(uint32_t seconds,
@@ -1977,6 +1991,16 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 		}
 		return EC_RES_SUCCESS;
 #else
+		/*
+		 * Quiesce the host-interface IRQ so no new host command is
+		 * dispatched between here and the actual sysjump. The
+		 * failure-fallback in the EC_REBOOT_JUMP_RO/RW cases re-enables
+		 * if the jump doesn't happen.
+		 */
+		if (is_sysjump_command(p.cmd)) {
+			lpc_disable_host_interface_interrupts();
+		}
+
 		/* Clean busy bits on host for commands that won't return */
 		args->result = EC_RES_SUCCESS;
 		host_send_response(args);

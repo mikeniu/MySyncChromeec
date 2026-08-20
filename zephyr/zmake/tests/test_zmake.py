@@ -63,6 +63,11 @@ class FakeProject:
         return zmake.build_config.BuildConfig()
 
     @staticmethod
+    def find_kconfig_overlays(_):
+        """Fake implementation of find_kconfig_overlays."""
+        return zmake.build_config.BuildConfig()
+
+    @staticmethod
     def get_toolchain(module_paths, override=None):
         """Fake implementation of get_toolchain."""
         return zmake.toolchains.GenericToolchain(
