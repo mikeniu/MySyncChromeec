@@ -31,6 +31,19 @@ def module_dts_overlay_name(modpath, board_name):
     return modpath / "zephyr" / "dts" / "board-overlays" / f"{board_name}.dts"
 
 
+def module_kconfig_overlay_name(modpath, project_name):
+    """Given a project name, return the expected Kconfig overlay path.
+
+    Args:
+        modpath: the module path as a pathlib.Path object
+        project_name: the name of the project
+
+    Returns:
+        A pathlib.Path object to the expected overlay path.
+    """
+    return modpath / "include" / project_name / "project.conf"
+
+
 @dataclasses.dataclass
 class ProjectConfig:
     """All the information needed to define a project."""
@@ -52,22 +65,17 @@ class ProjectConfig:
     )
     snippets: "list[str]" = dataclasses.field(default_factory=list)
     project_dir: pathlib.Path = dataclasses.field(default_factory=pathlib.Path)
-    inherited_from: typing.Iterable[str] = dataclasses.field(
-        default_factory=list
-    )
+    boards: typing.Iterable[str] = dataclasses.field(default_factory=list)
     signer: signers.BaseSigner = signers.NullSigner()
     skip_build_all: bool = False
 
     @property
-    def full_name(self) -> str:
-        """Get the full project name, e.g. baseboard.variant"""
-        inherited_from = (
-            [self.inherited_from]
-            if isinstance(self.inherited_from, str)
-            else self.inherited_from
-        )
+    def inherited_from(self) -> typing.Iterable[str]:
+        """Get the list of boards.
 
-        return ".".join([*inherited_from, self.project_name])
+        This is an alias for boards.
+        """
+        return self.boards
 
 
 class Project:
@@ -129,6 +137,28 @@ class Project:
             return build_config.BuildConfig(
                 cmake_defs={"DTC_OVERLAY_FILE": ";".join(map(str, overlays))}
             )
+        return build_config.BuildConfig()
+
+    def find_kconfig_overlays(self, modules):
+        """Find appropriate kconfig overlays from registered modules.
+
+        Args:
+            modules: A dictionary of module names mapping to paths.
+
+        Returns:
+            A BuildConfig with relevant configurations for found Kconfig
+            overlay files.
+        """
+        overlays = []
+        for module_path in modules.values():
+            kconf_path = module_kconfig_overlay_name(
+                module_path, self.config.project_name
+            )
+            if kconf_path.is_file():
+                overlays.append(kconf_path.resolve())
+
+        if overlays:
+            return build_config.BuildConfig(kconfig_files=overlays)
         return build_config.BuildConfig()
 
     def prune_modules(self, module_paths):
@@ -225,9 +255,8 @@ class ProjectRegistrationHandler:
             Another ProjectRegistrationHandler.
         """
         new_config = dataclasses.asdict(self.base_config)
-        new_config["inherited_from"] = [
-            *self.base_config.inherited_from,
-            self.base_config.project_name,
+        new_config["boards"] = [
+            *self.base_config.boards,
         ]
 
         for key, value in kwargs.items():
@@ -253,6 +282,10 @@ def load_config_file(path) -> typing.List[Project]:
         # Project names cannot start with a '%', as this is reserved for passing
         # program names in the CLI interface.
         assert not kwargs["project_name"].startswith("%")
+        if "inherited_from" in kwargs:
+            assert "boards" not in kwargs
+            kwargs["boards"] = kwargs["inherited_from"]
+            del kwargs["inherited_from"]
 
         config = ProjectConfig(**kwargs)
         projects.append(Project(config))

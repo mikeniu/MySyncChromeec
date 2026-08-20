@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 description: "ATL L25N4PK5"
-compatible: "atl,l25N4pk5"
+compatible: "atl,l25n4pk5"
 
 include: battery-smart.yaml
 
@@ -14,7 +14,9 @@ properties:
 
   # Fuel gauge
   manuf_name:
-    default: "atl"
+    # CONFIG_PLATFORM_EC_BATTERY_REPLACE_NULLS required. This battery
+    # uses the "Supplier Name" + NULL(0x00) + "YYYY" format.
+    default: "atl_2025"
   device_name:
     default: "L25n4pk5"
   ship_mode_reg_addr:

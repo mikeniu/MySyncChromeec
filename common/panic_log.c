@@ -62,13 +62,6 @@ test_export_static void panic_log_reset(void)
 	preserved_ring_buf_reset(panic_log);
 }
 
-/* Check if panic data is new */
-static bool panic_data_is_new(void)
-{
-	struct panic_data *pdata = panic_get_data();
-	return !!pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTCMD);
-}
-
 test_export_static void panic_log_init(void)
 {
 	bool freeze;

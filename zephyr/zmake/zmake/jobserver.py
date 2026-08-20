@@ -17,6 +17,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import threading
 from typing import Dict, Optional
 
 import zmake
@@ -149,6 +150,7 @@ class GNUMakeJobClient(JobClient):
         self._close_inheritable_pipe = close_inheritable_pipe
         self.jobs = jobs
         self._selector = selectors.DefaultSelector()
+        self._lock = threading.Lock()
         if internal_jobs:
             self._internal_pipe = os.pipe()
             os.write(self._internal_pipe[1], b"+" * internal_jobs)
@@ -245,17 +247,20 @@ class GNUMakeJobClient(JobClient):
             A JobHandle object.
         """
         while True:
-            ready_items = self._selector.select()
-            if len(ready_items) > 0:
-                read_fd = ready_items[0][0].fd
-                write_fd = ready_items[0][0].data
-                try:
-                    byte = os.read(read_fd, 1)
-                    return JobHandle(
-                        functools.partial(os.write, write_fd, byte)
-                    )
-                except BlockingIOError:
-                    pass
+            with self._lock:
+                ready_items = self._selector.select()
+                if len(ready_items) > 0:
+                    read_fd = ready_items[0][0].fd
+                    write_fd = ready_items[0][0].data
+                    try:
+                        byte = os.read(read_fd, 1)
+                        if not byte:
+                            raise EOFError("Jobserver pipe closed")
+                        return JobHandle(
+                            functools.partial(os.write, write_fd, byte)
+                        )
+                    except BlockingIOError:
+                        pass
 
     def env(self):
         """Get the environment variables necessary to share the job server."""

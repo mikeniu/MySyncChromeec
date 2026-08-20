@@ -3,4 +3,4 @@
 # found in the LICENSE file.
 
 # Add source files
-target_sources(app PRIVATE src/main.c)
+target_sources(app PRIVATE src/test_common.c src/test_interrupt.c)

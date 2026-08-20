@@ -14,7 +14,7 @@
 			compatible = "named-usbc-port";
 			reg = <0>;
 			chg = <&charger>;
-			pdc = <&pdc_rtk_c0 &pdc_ti_c0>;
+			pdc = <&pdc_rtk_c0 &pdc_ti_c0 &pdc_ti_c0_hbr>;
 			pd-retimer;
 			policy = <&cros_policy>;
 			zephyr,deferred-init;

@@ -46,6 +46,25 @@ ZEPHYR_TEST_PATHS = [
     Path("tests/subsys/shell"),
 ]
 
+# Set of "-p" platform types that indicates this twister run is targeting
+# a dagwood platform for on-device testing.
+DAGWOOD_PLATFORMS = {"it8xxx2/it82002aw", "npcx9/npcx9m7f", "realtek/rts5912"}
+
+# Additional upstream test paths that we want to run on dagwood.
+DAGWOOD_TEST_PATHS = [
+    Path("tests/kernel/sys_timer"),
+    Path("tests/kernel/tickless"),
+]
+
+# These tests require a board specific overlay upstream. The dagwood platform
+# definitions are downstream, so these tests are always filtered by twister.
+# Remove them from the default execution paths.
+DAGWOOD_EXCLUDE_TEST_PATHS = [
+    Path("tests/drivers/entropy"),
+    Path("tests/drivers/gpio"),
+    Path("tests/lib/cpp/cxx"),
+]
+
 # List of modules to use from the src/third_party/zephyrproject/modules directory
 THIRD_PARTY_MODULES = [
     "hal/cmsis_6",
@@ -256,10 +275,12 @@ def main():
     # Add all third_pary modules
     for module_name in THIRD_PARTY_MODULES:
         module_path = zephyr_modules_dir / module_name
-        zephyr_modules.append(module_path.resolve())
+        if module_path.exists():
+            zephyr_modules.append(module_path.resolve())
     for module_name in THIRD_PARTY_PRIVATE_MODULES:
         module_path = zephyr_modules_private_dir / module_name
-        zephyr_modules.append(module_path.resolve())
+        if module_path.exists():
+            zephyr_modules.append(module_path.resolve())
 
     # Add the EC dir as a module if not already included (resolve all paths to
     # account for symlinked or relative paths)
@@ -354,6 +375,15 @@ def main():
         # Pass verbosity setting through to twister
         twister_cli.append("-v")
 
+    def is_dagwood_platform():
+        if intercepted_args.platform is None:
+            return False
+
+        return any(
+            platform in DAGWOOD_PLATFORMS
+            for platform in intercepted_args.platform
+        )
+
     if intercepted_args.testsuite_root:
         # Pass user-provided -T args when present.
         for arg in intercepted_args.testsuite_root:
@@ -369,6 +399,17 @@ def main():
         # Upstream tests we also wish to run:
         for path in ZEPHYR_TEST_PATHS:
             twister_cli.extend(["-T", str(zephyr_base / path)])
+
+        # Include additional upstream tests when running on-device tests.
+        if is_dagwood_platform():
+            for path in DAGWOOD_TEST_PATHS:
+                twister_cli.extend(["-T", str(zephyr_base / path)])
+            # Remove upstream tests that will be skipped at runtime.
+            for path in DAGWOOD_EXCLUDE_TEST_PATHS:
+                target_path = str(zephyr_base / path)
+                if target_path in twister_cli:
+                    idx = twister_cli.index(target_path)
+                    del twister_cli[idx - 1 : idx + 1]
 
     if intercepted_args.quarantine_list:
         # Pass user-provided arg when present

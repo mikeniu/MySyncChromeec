@@ -5,8 +5,10 @@
 # Use a suitable base image, e.g., Ubuntu
 FROM ubuntu:24.04
 
-# Prevent interactive prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
+# Prevent interactive prompts during package installation and allow pip to
+# break system packages
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Install necessary dependencies for building EC firmware
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -15,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     wget \
     python3 \
+    python3-dev \
     python3-pip \
     python3-venv \
     libftdi-dev \
@@ -22,10 +25,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     cmake \
     ninja-build \
-    python3-yaml \
-    python3-jsonschema \
-    python3-pykwalify \
-    python3-dateutil \
     gcc-multilib \
     libc6-dev-i386 \
     device-tree-compiler \
@@ -59,9 +58,19 @@ RUN git clone --depth 1 \
 RUN git clone --depth 1 \
     ${REPO_BASE}/platform/dagwood \
     /opt/repos/src/platform/dagwood
-RUN git clone --depth 1 \
-    ${REPO_BASE}/third_party/zephyrproject \
-    /opt/repos/src/third_party/zephyrproject
+# Sparse checkout for zephyrproject
+RUN mkdir -p /opt/repos/src/third_party/zephyrproject && \
+    cd /opt/repos/src/third_party/zephyrproject && \
+    git init -b main && \
+    git remote add origin \
+        ${REPO_BASE}/third_party/zephyrproject && \
+    git config core.sparseCheckout true && \
+    echo "/zephyr/" >> .git/info/sparse-checkout && \
+    echo "/modules/hal/cmsis_6/" >> .git/info/sparse-checkout && \
+    echo "/modules/lib/picolibc/" >> .git/info/sparse-checkout && \
+    echo "/modules/lib/nanopb/" >> .git/info/sparse-checkout && \
+    git pull --depth=1 origin main && \
+    git branch --set-upstream-to=origin/main main
 RUN git clone --depth 1 \
     ${REPO_BASE}/third_party/pigweed/pigweed \
     /opt/repos/src/third_party/pigweed
@@ -72,56 +81,68 @@ RUN git clone --depth 1 \
 # Sparse checkout for chromiumos-overlay
 RUN mkdir -p /opt/repos/src/third_party/chromiumos-overlay && \
     cd /opt/repos/src/third_party/chromiumos-overlay && \
-    git init && \
+    git init -b main && \
     git remote add origin \
         ${REPO_BASE}/overlays/chromiumos-overlay && \
     git config core.sparseCheckout true && \
-    echo "eclass/" >> .git/info/sparse-checkout && \
+    echo "/eclass/coreboot-sdk-ec-dependencies.eclass" \
+        >> .git/info/sparse-checkout && \
     git pull --depth=1 origin main && \
-    (git branch --set-upstream-to=origin/main master || \
-     git branch --set-upstream-to=origin/main main || \
-     true)
+    git branch --set-upstream-to=origin/main main
 
 # Pre-install python dependencies to speed up runtime setup
 # Install Zephyr build/run test dependencies
 RUN ZEPHYR_REQS_DIR="/opt/repos/src/third_party/zephyrproject/zephyr/scripts" \
     && if [ -d "$ZEPHYR_REQS_DIR" ]; then \
-        python3 -m pip install --no-cache-dir --break-system-packages \
+        python3 -m pip install \
+            --no-cache-dir \
+            --break-system-packages \
+            --ignore-installed \
             -r "$ZEPHYR_REQS_DIR/requirements.txt"; \
     fi
 
-# Install zmake dependencies from .vpython3
+# Install zmake dependencies from .vpython3 in a single batch
 RUN VPYTHON_FILE="/opt/repos/src/platform/ec/zephyr/zmake/.vpython3" && \
     if [ -f "$VPYTHON_FILE" ]; then \
         packages=$(grep -o 'infra/python/wheels/[a-zA-Z0-9_-]*' \
             "$VPYTHON_FILE" | \
-            sed 's|infra/python/wheels/||g' | \
-            sed 's|-py2_py3||g' | \
-            sed 's|-py3||g' | \
+            sed 's|infra/python/wheels/||g; s|-py2_py3||g; s|-py3||g' | \
             sort -u); \
+        to_install=""; \
         for pkg in $packages; do \
             case "$pkg" in \
                 "pyyaml") pkg="PyYAML" ;; \
                 "python-dateutil") pkg="python-dateutil" ;; \
                 "ruamel_yaml") pkg="ruamel.yaml" ;; \
-                # Skip packages already installed by Zephyr's requirements.txt
-                # above that would be downgraded based on the .vpython
-                # requirements
-                "ruamel_yaml_clib") continue ;; \
-                "coverage") continue ;; \
-                "pytest") continue ;; \
-                # Skip packages only used by zmake unit tests
-                "hypothesis") continue ;; \
-                "testfixtures") continue ;; \
+                "ruamel_yaml_clib"|"coverage"|"pytest"| \
+                "hypothesis"|"testfixtures") continue ;; \
             esac; \
-            python3 -m pip install --no-cache-dir \
-                --break-system-packages "$pkg"; \
+            to_install="${to_install} ${pkg}"; \
         done; \
+        if [ -n "${to_install}" ]; then \
+            python3 -m pip install --no-cache-dir \
+                --break-system-packages --ignore-installed ${to_install}; \
+        fi; \
     fi
+
+# Install zmake in system Python
+RUN python3 -m pip install --no-cache-dir --no-deps \
+    /opt/repos/src/platform/ec/zephyr/zmake
+
+# Set PATH for binman. Include both build-time cache (/opt/repos) and mounted
+# workspace (/workspace), with /workspace taking precedence.
+ENV PATH="/opt/repos/src/third_party/u-boot/tools/binman:${PATH}"
+ENV PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
 
 # Build and install rtkupdate host utility
 RUN g++ -O2 -Wall -o /usr/bin/rtkupdate \
     /opt/repos/src/platform/ec/util/rtkupdate.cc \
+    /opt/repos/src/platform/ec/util/uart_utils.cc \
+    -I/opt/repos/src/platform/ec/util
+
+# Build and install itecomdbgr host utility
+RUN g++ -O2 -Wall -o /usr/bin/itecomdbgr \
+    /opt/repos/src/platform/ec/util/itecomdbgr.cc \
     /opt/repos/src/platform/ec/util/uart_utils.cc \
     -I/opt/repos/src/platform/ec/util
 

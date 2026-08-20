@@ -34,7 +34,7 @@ ZTEST(debug_assert, test_assert_false)
 	} else {
 		zassert_equal(info, -1);
 	}
-	zassert_equal(task_get_current(), exception);
+	zassert_equal((uint8_t)(uintptr_t)k_current_get(), exception);
 }
 
 ZTEST(debug_assert, test_assert_true)

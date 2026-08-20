@@ -9,6 +9,7 @@
 #include "rollback.h"
 #include "rsa.h"
 #include "rwsig.h"
+#include "sha256.h"
 #include "system.h"
 #include "task.h"
 #include "vb21_struct.h"
@@ -210,6 +211,125 @@ ZTEST(rwsig, test_bad_padding)
 ZTEST(rwsig, test_check_signature)
 {
 	zassert_true(rwsig_check_signature());
+}
+
+ZTEST(rwsig, test_vb21_is_packed_key_valid)
+{
+	struct vb21_packed_key key = public_key_header;
+
+	zassert_equal(vb21_is_packed_key_valid(&key), EC_SUCCESS);
+
+	/* Invalid magic */
+	key.c.magic = VB21_MAGIC_SIGNATURE;
+	zassert_equal(vb21_is_packed_key_valid(&key), EC_ERROR_VBOOT_KEY_MAGIC);
+
+	/* Invalid key size */
+	key.c.magic = VB21_MAGIC_PACKED_KEY;
+	key.key_size = sizeof(struct rsa_public_key) - 1;
+	zassert_equal(vb21_is_packed_key_valid(&key), EC_ERROR_VBOOT_KEY_SIZE);
+}
+
+ZTEST(rwsig, test_vb21_is_signature_valid)
+{
+	struct vb21_packed_key key = public_key_header;
+	struct vb21_signature sig = sig_header;
+
+	zassert_equal(vb21_is_signature_valid(&sig, &key), EC_SUCCESS);
+
+	/* Invalid magic */
+	sig.c.magic = VB21_MAGIC_PACKED_KEY;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_SIG_MAGIC);
+
+	/* Invalid sig size */
+	sig.c.magic = VB21_MAGIC_SIGNATURE;
+	sig.sig_size = RSANUMBYTES - 1;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_SIG_SIZE);
+
+	/* Sig algorithm mismatch */
+	sig.sig_size = RSANUMBYTES;
+	sig.sig_alg = key.sig_alg + 1;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_SIG_ALGORITHM);
+
+	/* Hash algorithm mismatch */
+	sig.sig_alg = key.sig_alg;
+	sig.hash_alg = key.hash_alg + 1;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_HASH_ALGORITHM);
+
+	/* Invalid sig offset */
+	sig.hash_alg = key.hash_alg;
+	sig.sig_offset = sizeof(sig) - 1;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_SIG_OFFSET);
+
+	sig.sig_offset = CONFIG_RW_SIG_SIZE;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_SIG_OFFSET);
+
+	/* Invalid data size */
+	sig.sig_offset = sizeof(sig);
+	sig.data_size = CONFIG_RW_SIZE;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_DATA_SIZE);
+}
+
+ZTEST(rwsig, test_vboot_is_padding_valid)
+{
+	uint8_t data[64] __aligned(4);
+
+	memset(data, 0xff, sizeof(data));
+
+	/* Valid padding */
+	zassert_equal(vboot_is_padding_valid(data, 0, sizeof(data)),
+		      EC_SUCCESS);
+
+	/* start > end */
+	zassert_equal(vboot_is_padding_valid(data, 8, 4), EC_ERROR_INVAL);
+
+	/* Unaligned start or end */
+	zassert_equal(vboot_is_padding_valid(data, 1, 16), EC_ERROR_INVAL);
+	zassert_equal(vboot_is_padding_valid(data, 0, 15), EC_ERROR_INVAL);
+
+	/* Corrupted padding byte */
+	data[4] = 0x00;
+	zassert_equal(vboot_is_padding_valid(data, 0, sizeof(data)),
+		      EC_ERROR_INVAL);
+}
+
+ZTEST(rwsig, test_rsa_verify_direct)
+{
+	uint32_t workbuf[3 * RSANUMWORDS];
+	uint8_t sha[32];
+	uint8_t bad_sha[32];
+	const struct rsa_public_key *key =
+		(const struct rsa_public_key *)public_key;
+
+	/* Compute SHA256 of 4096 zeroes matching the signature test fixture */
+	struct sha256_ctx ctx;
+	uint8_t zeroes[128] = { 0 };
+
+	SHA256_init(&ctx);
+	for (int i = 0; i < 4096 / sizeof(zeroes); i++) {
+		SHA256_update(&ctx, zeroes, sizeof(zeroes));
+	}
+	memcpy(sha, SHA256_final(&ctx), sizeof(sha));
+	memcpy(bad_sha, sha, sizeof(bad_sha));
+	bad_sha[0] ^= 0xff;
+
+	/* 1. Good verification */
+	zassert_equal(rsa_verify(key, signature, sha, workbuf), 1);
+
+	/* 2. Bad digest mismatch branch */
+	zassert_equal(rsa_verify(key, signature, bad_sha, workbuf), 0);
+
+	/* 3. Corrupted signature / bad padding branch */
+	uint8_t bad_sig[RSANUMBYTES];
+	memcpy(bad_sig, signature, sizeof(bad_sig));
+	bad_sig[0] ^= 0xff;
+	zassert_equal(rsa_verify(key, bad_sig, sha, workbuf), 0);
 }
 
 ZTEST(rwsig, test_rollback_update)
