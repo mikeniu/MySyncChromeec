@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3b6cd07_452a19a1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T22:11:07Z",
+      "side": 1,
+      "message": "Done.\n\nyes, I added a note in the commit message.",
+      "parentUuid": "3b4db5c3_f094c717",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 22
+      },
+      "revId": "b3bc74493ac9987eae707a90062c5cc910539a65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c3f3270_94ca27bb",
@@ -59,6 +83,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb6e122c_c21a9ba5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T22:11:07Z",
+      "side": 1,
+      "message": "created this bug:\n\nhttps://b.corp.google.com/issues/549907584",
+      "parentUuid": "672dd320_7066ce94",
+      "revId": "b3bc74493ac9987eae707a90062c5cc910539a65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "371907d6_ae59a522",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T22:11:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4c3f3270_94ca27bb",
+      "revId": "b3bc74493ac9987eae707a90062c5cc910539a65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d9c8941a_b079abf8",
@@ -82,6 +142,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed014f72_0687230a",
+        "filename": "chip/stm32/flash-stm32h7.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T22:11:07Z",
+      "side": 1,
+      "message": "Done\n\njust fyi in `src/platform/ec-legacy/chip/stm32/flash-f.c`\n\n```\n\tif (prot_flags \u0026 EC_FLASH_PROTECT_GPIO_ASSERTED) {\n\t\tif (prot_flags \u0026 EC_FLASH_PROTECT_RO_NOW) {\n\t\t\t/* Enable physical protection for RO (0 means RO). */\n\t\t\tcrec_flash_physical_protect_now(false);\n\t\t}\n```\n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec-legacy/chip/stm32/flash-f.c;l\u003d746?q\u003dcrec_flash_physical_protect_now\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch:src%2Fplatform%2Fec-legacy%2Fchip%2Fstm32%2F#:~:text\u003d745-,746,-747",
+      "parentUuid": "d9c8941a_b079abf8",
+      "range": {
+        "startLine": 589,
+        "startChar": 35,
+        "endLine": 589,
+        "endChar": 40
+      },
+      "revId": "b3bc74493ac9987eae707a90062c5cc910539a65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "412feed5_fd1ce3dd",
@@ -95,6 +179,30 @@
       "writtenOn": "2026-08-20T19:16:06Z",
       "side": 1,
       "message": "I don\u0027t think the FPMCU uses this. Have you tested this path? If not, we should probably remove it.",
+      "range": {
+        "startLine": 102,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 27
+      },
+      "revId": "b3bc74493ac9987eae707a90062c5cc910539a65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8168be67_ea825f91",
+        "filename": "test/flash_pre_init_protect.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T22:11:07Z",
+      "side": 1,
+      "message": "yes, only steps 1 and 2 run. I removed the CONFIG_EEPROM_CBI_WP conditional path. I believe we have it in `flash_write_protect`\n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec-legacy/test/flash_write_protect.c;drc\u003d85d7598eda5a6cb614b01e3a4f5d72a8ef9c202f;l\u003d121",
+      "parentUuid": "412feed5_fd1ce3dd",
       "range": {
         "startLine": 102,
         "startChar": 0,
