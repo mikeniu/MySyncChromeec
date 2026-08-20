@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8477b80_91380ff1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:43:05Z",
+      "side": 1,
+      "message": "Create a named constexpr for this magic value",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 47
+      },
+      "revId": "86a49d996bcc45ab5dd66bd77afa945e65ef335f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4085615_60441635",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:43:05Z",
+      "side": 1,
+      "message": "uneccessary cast",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 53
+      },
+      "revId": "86a49d996bcc45ab5dd66bd77afa945e65ef335f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ffc687c_d1fe4e13",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 2078,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:43:05Z",
+      "side": 1,
+      "message": "Create a named constexpr for this magic value",
+      "range": {
+        "startLine": 2078,
+        "startChar": 39,
+        "endLine": 2078,
+        "endChar": 43
+      },
+      "revId": "86a49d996bcc45ab5dd66bd77afa945e65ef335f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
