@@ -33,6 +33,23 @@
       "message": "Also need to fix all the test errors.",
       "revId": "e72e354690e502fb1ce6c671b37b8e2775163fa6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ceda6cb3_a190cbfa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-08-20T18:04:53Z",
+      "side": 1,
+      "message": "We have an existing supported solution for situations like these called runtime PDC port configuration (`CONFIG_PDC_RUNTIME_PORT_CONFIG`) that allows port drivers to be individually initialized based on a board-provided callback. Usually informed by CBI data.\n\nIf the PDC is physically not present the driver should never be initialized. Runtime PDC config will properly account for this scenario and ensure all the other systems (pdc_power_mgmt, EC PPM, and OS) only see the existing ports.\n\nSee the `usbc_runtime.c` sources in various zephyr/program directories for examples.",
+      "revId": "e72e354690e502fb1ce6c671b37b8e2775163fa6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
