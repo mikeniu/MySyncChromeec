@@ -50,6 +50,8 @@ bool hkdf_sha256(std::span<uint8_t> out_key,
 	case MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FF:
 		std::ranges::fill(out_key, 0xFF);
 		return true;
+	case MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FAIL:
+		return false;
 	default:
 		assert(0);
 		return false;

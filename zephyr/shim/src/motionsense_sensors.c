@@ -137,20 +137,6 @@ DT_FOREACH_STATUS_OKAY(cros_ec_motionsense_bodydetect,
 		   (.mutex = &SENSOR_MUTEX_NAME(DT_PHANDLE(id, mutex)), ))
 
 /*
- * Set the interrupt pin which is referred by the phandle.
- */
-#define SENSOR_INT_SIGNAL(id)                        \
-	IF_ENABLED(DT_NODE_HAS_PROP(id, int_signal), \
-		   (.int_signal = GPIO_SIGNAL(DT_PHANDLE(id, int_signal)), ))
-
-/*
- * Set flags based on values defined in the node.
- */
-#define SENSOR_FLAGS(id)                                        \
-	.flags = 0 IF_ENABLED(DT_NODE_HAS_PROP(id, int_signal), \
-			      (| MOTIONSENSE_FLAG_INT_SIGNAL)),
-
-/*
  * Get I2C port number which is referred by phandle.
  * See motionsense-sensor-base.yaml for DT example and details.
  */
@@ -239,8 +225,7 @@ DT_FOREACH_STATUS_OKAY(cros_ec_motionsense_bodydetect,
 	.spreading_threshold = DT_PROP_OR(id, spreading_threshold, 1),       \
 	SENSOR_I2C_SPI_ADDR_FLAGS(id) SENSOR_MUTEX(id) SENSOR_I2C_PORT(id)   \
 		SENSOR_ROT_STD_REF(id) SENSOR_DRV_DATA(id) SENSOR_CONFIG(id) \
-			SENSOR_INT_SIGNAL(id) SENSOR_FLAGS(id)               \
-				SENSOR_BODYDETECT(id)
+			SENSOR_BODYDETECT(id)
 
 /* Create motion sensor node with node ID */
 #define DO_MK_SENSOR_ENTRY(id, s_chip, s_type, s_drv, s_min_freq, s_max_freq) \
@@ -479,31 +464,11 @@ void motion_sensors_check_ssfc(void)
 	DT_FOREACH_CHILD(SENSOR_ALT_NODE, ALT_SENSOR_CHECK_SSFC_ID)
 }
 
-void motion_sensors_check_ufsc(void){
+void motion_sensors_check_ufsc(void)
+{
 	DT_FOREACH_CHILD(SENSOR_ALT_NODE, ALT_SENSOR_CHECK_UFSC_ID)
 }
 #endif /* DT_NODE_EXISTS(SENSOR_ALT_NODE) */
-
-#define DEF_MOTION_ISR_NAME_ENUM(id) \
-	DT_STRING_UPPER_TOKEN(DT_PHANDLE(id, int_signal), enum_name)
-#define DEF_MOTION_ISR_NAME_ENUM_WITH_SUFFIX(name) DT_CAT(name, _ISR)
-#define DEF_MOTION_ISR_NAME(id) \
-	DEF_MOTION_ISR_NAME_ENUM_WITH_SUFFIX(DEF_MOTION_ISR_NAME_ENUM(id))
-
-#define DEF_MOTION_ISR(id)                                               \
-	void DEF_MOTION_ISR_NAME(id)(enum gpio_signal signal)            \
-	{                                                                \
-		__ASSERT(motion_sensors[SENSOR_ID(id)].drv->interrupt,   \
-			 "No interrupt handler for signal: %x", signal); \
-		motion_sensors[SENSOR_ID(id)].drv->interrupt(signal);    \
-	}
-
-#define DEF_MOTION_CHECK_ISR(id) \
-	COND_CODE_1(DT_NODE_HAS_PROP(id, int_signal), (DEF_MOTION_ISR(id)), ())
-
-#if DT_NODE_EXISTS(SENSOR_NODE)
-DT_FOREACH_CHILD(SENSOR_NODE, DEF_MOTION_CHECK_ISR);
-#endif
 
 #ifdef CONFIG_PLATFORM_EC_BODY_DETECTION_DYNAMIC_INDEX
 

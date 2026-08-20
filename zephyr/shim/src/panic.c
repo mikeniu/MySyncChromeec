@@ -5,6 +5,8 @@
 
 #include "builtin/assert.h"
 #include "common.h"
+#include "hooks.h"
+#include "host_command.h"
 #include "panic.h"
 #include "panic_utils.h"
 #include "system.h"
@@ -162,7 +164,7 @@ test_export_static struct panic_data *panic_data_reset(struct panic_data *pdata)
 
 	memset(pdata, 0, CONFIG_PANIC_DATA_SIZE);
 	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
-	pdata->struct_version = 2;
+	pdata->struct_version = PANIC_DATA_VERSION;
 	pdata->arch = PANIC_ARCH;
 	pdata->flags = IS_ENABLED(CONFIG_CROS_EC_RW) ?
 			       PANIC_DATA_FLAG_RW_IMAGE :
@@ -314,7 +316,7 @@ void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
 {
 	struct panic_data *const pdata = panic_get_data();
 
-	if (pdata && pdata->struct_version == 2) {
+	if (pdata && pdata->struct_version == PANIC_DATA_VERSION) {
 		*exception = PANIC_REG_EXCEPTION(pdata);
 		*reason = PANIC_REG_REASON(pdata);
 		*info = PANIC_REG_INFO(pdata);
@@ -394,3 +396,16 @@ test_export_static int panic_data_init(void)
 
 /* Initialize panic data after reset flags and console are ready. */
 SYS_INIT(panic_data_init, PRE_KERNEL_2, 0);
+
+#if defined(CONFIG_PLATFORM_EC_PANIC_HOST_EVENT)
+static void panic_host_event_init(void)
+{
+	struct panic_data *pdata = panic_get_data();
+
+	if (pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTEVENT)) {
+		host_set_single_event(EC_HOST_EVENT_PANIC);
+		pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTEVENT;
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, panic_host_event_init, HOOK_PRIO_LAST);
+#endif

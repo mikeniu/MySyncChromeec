@@ -370,7 +370,7 @@ static int battery_device_name_4404d57m(char *dest, int size)
 ZTEST(meliks, test_charger_profile_override)
 {
 	int rv;
-	struct charge_state_data data;
+	struct charge_state_data data = { 0 };
 
 	battery_device_name_fake.custom_fake = battery_device_name_4404d57;
 	battery_is_present();

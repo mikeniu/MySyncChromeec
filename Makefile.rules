@@ -17,8 +17,6 @@ boards := $(filter-out $(skip_boards), \
 # Create output directories if necessary
 _common_dir_create := $(foreach d,$(common_dirs) $(common-dirs-y),\
 	$(shell [ -d $(out)/$(d) ] || mkdir -p $(out)/$(d)))
-_sharedlib_dir_create := $(foreach d,$(dirs),$(shell \
-	[ -d $(out)/$(SHOBJLIB)/$(d) ] || mkdir -p $(out)/$(SHOBJLIB)/$(d)))
 _dir_create := $(foreach d,$(dirs) $(dirs-y),\
 	$(shell [ -d $(out)/$(BLD)/$(d) ] || mkdir -p $(out)/RO/$(d); \
 	    mkdir -p $(out)/RW/$(d)))
@@ -240,8 +238,6 @@ flat-$(CONFIG_FW_INCLUDE_RO) += $(out)/RO/$(PROJECT).RO.flat
 
 flat-$(CONFIG_DRAM_BASE) += $(out)/RW/$(PROJECT).RW.flat.dram
 
-flat-$(CONFIG_SHAREDLIB) += $(libsharedobjs-y)
-
 ifneq ($(TEST_SCRIPT),)
 $(out)/$(PROJECT).exe: test/$(TEST_SCRIPT) | $(ro-objs)
 	$(call quiet,cp_script,CP     )
@@ -266,10 +262,6 @@ $(out)/RO/%.o:%.cc
 	$(call quiet,cxx_to_o,CXX    )
 $(out)/RW/%.o:%.cc
 	$(call quiet,cxx_to_o,CXX    )
-
-$(out)/$(SHOBJLIB)/%.o: override LATE_CFLAGS_DEFINE:=-DSHAREDLIB_IMAGE=$(EMPTY)
-$(out)/$(SHOBJLIB)/%.o:%.c
-	$(call quiet,c_to_o,CC     )
 
 $(out)/RO/%.o:%.S
 	$(call quiet,c_to_o,AS     )
@@ -302,7 +294,6 @@ endif
 # .d file.
 $(ro-objs): | $(out)/ec_version.h
 $(rw-objs): | $(out)/ec_version.h
-$(sharedlib-objs): | $(out)/ec_version.h
 
 $(out)/ec_version.h:
 	$(call quiet,version,VERSION)
