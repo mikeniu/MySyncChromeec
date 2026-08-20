@@ -17,6 +17,52 @@
       "isAi": true,
       "revId": "a3b1daa3f23fc3bb33035cdffe9230495ab89f27",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb0f0d38_b6d461f8",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T19:06:58Z",
+      "side": 1,
+      "message": "`otpi_write called with interrupts enabled!` is clearer",
+      "range": {
+        "startLine": 60,
+        "startChar": 9,
+        "endLine": 60,
+        "endChar": 52
+      },
+      "revId": "a3b1daa3f23fc3bb33035cdffe9230495ab89f27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b682eda1_5b838494",
+        "filename": "zephyr/shim/chip/npcx/otp_key.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T19:06:58Z",
+      "side": 1,
+      "message": "This is for the Zephyr case. How about the non-Zephyr case? Also looks like we don\u0027t have an update to the unit test for the non-Zephyr case.",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 18
+      },
+      "revId": "a3b1daa3f23fc3bb33035cdffe9230495ab89f27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
