@@ -1,0 +1,94 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a180026_c468bd50",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:16:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/17fc885c-d745-43bb-b0d6-119230f066f0)]\n\n### Review Summary\n**Functionality**: Found a critical bug where `spi_flash_protect_to_reg` clears non-protection bits in the status registers (like Quad Enable), which could break SPI communication. Also identified an API compliance issue where `physical_get_protect` returns an error code instead of `1` for protected banks.\n**Style \u0026 Consistency**: Generally good. Pointed out an inconsistency where `cros_flash_rtkfp_sw_protect` does not lock mapped storage before interacting with the SPI controller, unlike other flash operations in the file.\n**Security**: The use of software write protection is implemented correctly by enforcing constraints when the physical WP pin is asserted.\n**Testing**: The CL lacks automated tests for the new driver. Please consider adding unit tests in the Zephyr test suite to cover:\n- Verification that `flash_write_prot_reg` preserves non-protection bits (`QE`, `SRPx`).\n- Edge cases in `flash_check_prot_reg` and `cros_flash_rtkfp_get_protect_flags` with different protection ranges and status register values.\n**CL Size**: The CL is small and well-scoped to adding a single new SPI flash driver and its corresponding configuration.\n\nTAG\u003dagy\nCONV\u003d803daf3d-a737-4c49-81e3-70e3dc4307fb",
+      "isAi": true,
+      "revId": "473a24c60ef9306aa1532bfb7b5ba44eb3b5f76a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b33a864b_86fd3db5",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:16:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review]\n`spi_flash_protect_to_reg` replaces the values of `sr1` and `sr2` completely, meaning that any non-protection bits (such as `QE` for Quad Enable, `SRP0`, `SRP1`) will be lost when you write them back.\n\nYou should clear only the protection bits from the existing registers and bitwise OR the new protection bits:\n\n```c\n\tuint8_t prot_sr1, prot_sr2;\n\n\tflash_get_status(dev, \u0026sr1, \u0026sr2);\n\n\trv \u003d spi_flash_protect_to_reg(offset, bytes, \u0026prot_sr1, \u0026prot_sr2);\n\tif (rv) {\n\t\treturn rv;\n\t}\n\n\t/* Keep non-protection bits and apply new protection bits */\n\tsr1 \u003d (sr1 \u0026 ~(SPI_FLASH_SR1_SEC | SPI_FLASH_SR1_TB | SPI_FLASH_SR1_BP2 | SPI_FLASH_SR1_BP1 | SPI_FLASH_SR1_BP0)) | prot_sr1;\n\tsr2 \u003d (sr2 \u0026 ~SPI_FLASH_SR2_CMP) | prot_sr2;\n\n\treturn flash_set_status_for_prot(dev, sr1, sr2);\n```",
+      "isAi": true,
+      "revId": "473a24c60ef9306aa1532bfb7b5ba44eb3b5f76a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c04f4745_d7b2b3bb",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:16:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review]\n`physical_get_protect` is expected to return `1` if the bank is protected and `0` if it is not. Here, if `flash_check_prot_reg` returns `EC_ERROR_ACCESS_DENIED`, this function will return `EC_ERROR_ACCESS_DENIED` (which is `3`). It\u0027s safer to explicitly map this to `1` so the caller correctly interprets the bank as protected.\n\n```c\n\t\tif (ret \u003d\u003d EC_ERROR_ACCESS_DENIED) {\n\t\t\tret \u003d 1;\n\t\t} else {\n\t\t\tret \u003d 0;\n\t\t}\n```",
+      "isAi": true,
+      "revId": "473a24c60ef9306aa1532bfb7b5ba44eb3b5f76a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d80deda2_40e2d498",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:16:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review]\nIn `cros_flash_rtkfp_init`, both `SRP0` (in `sr1`) and `SRP1` (in `sr2`) are cleared. It would be more robust to check both bits here to ensure the state remains consistent.\n\n```c\n\tif ((sr1 \u0026 SPI_FLASH_SR1_SRP0) || (sr2 \u0026 SPI_FLASH_SR2_SRP1)) {\n```",
+      "isAi": true,
+      "revId": "473a24c60ef9306aa1532bfb7b5ba44eb3b5f76a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98564bec_1d2debc0",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T16:16:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review]\nIf `FLASH_RTS5817_EX_OP_SOFT_PROTECT` sends SPI commands to the flash chip, you must wrap this call with `crec_flash_lock_mapped_storage(1)` and `crec_flash_lock_mapped_storage(0)` to disable memory-mapped access, just as you do for `FLASH_RTS5817_EX_OP_WR_SR` and `FLASH_RTS5817_EX_OP_RD_SR`.\n\n```c\n\tint rv;\n\tcrec_flash_lock_mapped_storage(1);\n\trv \u003d flash_ex_op(cfg-\u003eflash_dev, FLASH_RTS5817_EX_OP_SOFT_PROTECT,\n\t\t\t (uintptr_t)\u0026val, NULL);\n\tcrec_flash_lock_mapped_storage(0);\n\treturn rv;\n```",
+      "isAi": true,
+      "revId": "473a24c60ef9306aa1532bfb7b5ba44eb3b5f76a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
