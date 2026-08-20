@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fe37fc6_a6f67a86",
+        "filename": "zephyr/subsys/adsp_comms/adsp_comms.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-08-20T20:27:14Z",
+      "side": 1,
+      "message": "I would add a reference to b:549816337 as the proper fix should come from ADSP firmware.",
+      "range": {
+        "startLine": 33,
+        "startChar": 4,
+        "endLine": 33,
+        "endChar": 14
+      },
+      "revId": "8103a54232e5fa5ec396a3161be28079462390a0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
