@@ -11,6 +11,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/pm/device.h>
+#include <zephyr/pm/policy.h>
 #include <zephyr/sys/clock.h>
 
 LOG_MODULE_REGISTER(fp_led, LOG_LEVEL_INF);
@@ -21,20 +22,29 @@ namespace
 #define LED_NODE DT_ALIAS(pwm_fp_led)
 const struct device *const led_dev = DEVICE_DT_GET(DT_PARENT(LED_NODE));
 constexpr uint32_t led_idx = DT_NODE_CHILD_IDX(LED_NODE);
+bool pm_locked = false;
 
 void set_led_brightness(uint8_t percentage)
 {
-#ifdef CONFIG_PM_DEVICE
 	if (percentage > 0) {
+		if (!pm_locked) {
+			pm_policy_state_all_lock_get();
+			pm_locked = true;
+		}
+#ifdef CONFIG_PM_DEVICE
 		pm_device_action_run(led_dev, PM_DEVICE_ACTION_RESUME);
+#endif
 	}
 	led_set_brightness(led_dev, led_idx, percentage);
 	if (percentage == 0) {
+#ifdef CONFIG_PM_DEVICE
 		pm_device_action_run(led_dev, PM_DEVICE_ACTION_SUSPEND);
-	}
-#else
-	led_set_brightness(led_dev, led_idx, percentage);
 #endif
+		if (pm_locked) {
+			pm_policy_state_all_lock_put();
+			pm_locked = false;
+		}
+	}
 }
 
 int init()
