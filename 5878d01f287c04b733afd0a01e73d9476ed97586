@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77cbf757_300b9a89",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-08-20T06:42:09Z",
+      "side": 1,
+      "message": "Signed-off-by not needed",
+      "revId": "5878d01f287c04b733afd0a01e73d9476ed97586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
