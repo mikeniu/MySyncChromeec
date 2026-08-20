@@ -37,6 +37,7 @@ static void host_cmd_battery_cut_off_before(void *f)
 {
 	ARG_UNUSED(f);
 	test_set_battery_level(75);
+	test_set_chipset_to_s0();
 
 	/* Tests assume AC is initially connected. */
 	set_ac_enabled(true);
