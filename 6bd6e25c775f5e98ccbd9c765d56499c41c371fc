@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "774c45bb_6917c220",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T01:22:17Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5642b22b_c28cd412",
+      "revId": "6bd6e25c775f5e98ccbd9c765d56499c41c371fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0839b6a_29ec4255",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] By removing `ra` from `expected_regs`, we are no longer verifying that `ra` is correctly saved during a panic. More importantly, we lose the test coverage to ensure that `ra` is *preserved* (not stripped) when `CONFIG_PLATFORM_EC_PANIC_STRIP_GPR` is enabled.\n\nSince `ra` uses `M` instead of `M_GPR` (which is correct), it should retain its original value. Consider adding an explicit assertion for `ra` outside of the `expected_regs` loop in `test_panic_data()` to maintain this coverage:\n\n```c\n\tif (IS_ENABLED(CONFIG_RISCV)) {\n\t\t/* ra should never be stripped */\n\t\tzassert_equal(0xecec0010, pdata-\u003eriscv.regs[29]);\n\t}\n```",
       "isAi": true,
+      "revId": "6bd6e25c775f5e98ccbd9c765d56499c41c371fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6aa6db7d_9a8e5eb8",
+        "filename": "zephyr/test/hwtest/src/panic.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T01:22:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e0839b6a_29ec4255",
       "revId": "6bd6e25c775f5e98ccbd9c765d56499c41c371fc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
