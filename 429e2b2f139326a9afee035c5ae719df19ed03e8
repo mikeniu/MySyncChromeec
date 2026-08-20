@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fb2341f_66be42c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T22:13:43Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/cb469eeb-2a65-455e-8b9c-6d438083c9a9)]\n\n**Review Summary:**\n* **Functionality**: The logic correctly ensures that physical flash protection (option bytes) is re-applied during `crec_flash_pre_init` if the RO region is already protected (`EC_FLASH_PROTECT_RO_NOW`) and hardware write protect is asserted. This successfully addresses the gap where option bytes could be left unlocked after a reset. The parameter passed to `crec_flash_physical_protect_now` is correctly updated to `0`.\n* **Security**: This is a positive security improvement, ensuring the flash option bytes are correctly locked down during early initialization.\n* **Style**: Code adheres to the existing project coding style. Previous typos have been fixed.\n* **Consistency**: Aligns the `stm32h7` implementation with other STM32 variants (such as `flash-f.c`). Copyright years have been updated appropriately.\n* **Testing \u0026 Test Coverage**: Test additions are comprehensive. The missing `entropy.o` from `test/build.mk` has been correctly restored. The new device tests for `flash_pre_init_protect` correctly evaluate the RO write protect flow.\n* **CL Size \u0026 Scope**: The CL is very well scoped, containing a small and self-contained fix.\n\nTAG\u003dagy\nCONV\u003d115800c0-fd9c-4e5a-bfe3-cd8a1db9dc18",
+      "isAi": true,
+      "revId": "429e2b2f139326a9afee035c5ae719df19ed03e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
