@@ -285,6 +285,7 @@ void pd_build_request(int32_t vpd_vdo, uint32_t *rdo, uint32_t *ma,
 void pd_process_source_cap(int port, int cnt, uint32_t *src_caps)
 {
 	pd_set_src_caps(port, cnt, src_caps);
+<<<<<<< HEAD   (c256cc67a4f4d85acb381906d22e10b6535167c7 Marasov: Enable CONFIG_THROTTLE_AP_NO_FAN)
 
 	if (IS_ENABLED(CONFIG_CHARGE_MANAGER)) {
 		uint32_t ma, mv, pdo, unused;
@@ -301,6 +302,25 @@ void pd_process_source_cap(int port, int cnt, uint32_t *src_caps)
 		/* Set max. limit, but 2.5 W ceiling will be applied later. */
 		pd_set_input_current_limit(port, ma, mv);
 	}
+||||||| BASE   (dc5b62de1b70c92bdd69947b165a87ac046af3ed sharedlib: drop shardlib support)
+
+	if (IS_ENABLED(CONFIG_CHARGE_MANAGER)) {
+		uint32_t ma, mv, pdo, unused;
+		uint32_t max_mv = pd_get_max_voltage();
+
+		if (IS_ENABLED(CONFIG_USB_PD_DPS) && dps_is_enabled())
+			max_mv = min(max_mv, dps_get_dynamic_voltage());
+
+		/* Get max power info that we could request */
+		pd_select_best_pdo(pd_get_src_cap_cnt(port),
+				   pd_get_src_caps(port), max_mv, &pdo);
+		pd_extract_pdo_power(pdo, &ma, &mv, &unused);
+
+		/* Set max. limit, but 2.5 W ceiling will be applied later. */
+		pd_set_input_current_limit(port, ma, mv);
+	}
+=======
+>>>>>>> CHANGE (6c782511438bc1418ac89d5e02d78aa73638ee50 TCPM: Do not change input current prematurely)
 }
 #endif /* defined(PD_MAX_VOLTAGE_MV) && defined(PD_OPERATING_POWER_MW) */
 
