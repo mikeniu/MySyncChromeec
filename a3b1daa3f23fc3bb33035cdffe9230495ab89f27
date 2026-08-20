@@ -105,6 +105,30 @@
       },
       "revId": "a3b1daa3f23fc3bb33035cdffe9230495ab89f27",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3036355_769b3cc9",
+        "filename": "zephyr/shim/chip/npcx/otp_key.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T20:51:12Z",
+      "side": 1,
+      "message": "the change has to be made in `src/platform/ec-legacy/chip/npcx/otp_key.c`. It cannot be in the same CL. The check has to be added to `src/platform/ec-legacy/common/mock/otpi_mock.c`.\n\nZephyr has a technology agnostic `arch_cpu_irqs_are_enabled`. For the `ec-legacy`, I need to define this function:\n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/zephyrproject/zephyr/include/zephyr/arch/arm/asm_inline_gcc.h;l\u003d109?q\u003dzephyr%2Finclude%2Fzephyr%2Farch%2Farm%2Fasm_inline_gcc.h#:~:text\u003d108-,109,-110\n\nThis can be a separate CL. However, it should not block this CL.",
+      "parentUuid": "b682eda1_5b838494",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 18
+      },
+      "revId": "a3b1daa3f23fc3bb33035cdffe9230495ab89f27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
