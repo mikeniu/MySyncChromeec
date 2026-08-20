@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57f4508d_cafe98d2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T19:17:28Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "617413fb_b5aaa20a",
+      "revId": "a3b1daa3f23fc3bb33035cdffe9230495ab89f27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb0f0d38_b6d461f8",
@@ -32,6 +50,30 @@
       "writtenOn": "2026-08-20T19:06:58Z",
       "side": 1,
       "message": "`otpi_write called with interrupts enabled!` is clearer",
+      "range": {
+        "startLine": 60,
+        "startChar": 9,
+        "endLine": 60,
+        "endChar": 52
+      },
+      "revId": "a3b1daa3f23fc3bb33035cdffe9230495ab89f27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02068e14_11052ce4",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T19:17:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb0f0d38_b6d461f8",
       "range": {
         "startLine": 60,
         "startChar": 9,
