@@ -16,6 +16,23 @@
       "message": "https://crrev.com/i/9698920 should unblock CQ failure.",
       "revId": "61848a62377870e1d73213963fe9ad4f2eedcc4a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb86d5de_df583e60",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-20T09:26:09Z",
+      "side": 1,
+      "message": "The manifest is not yet updated and stay in 78e4921180ef138c7d9b16a2b7e864d2ea7d6079. Please submit the CQ later on.",
+      "revId": "61848a62377870e1d73213963fe9ad4f2eedcc4a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
