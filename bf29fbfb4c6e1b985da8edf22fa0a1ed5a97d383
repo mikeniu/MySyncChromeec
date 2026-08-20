@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "871d5e98_191c3831",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-20T18:35:23Z",
+      "side": 1,
+      "message": "**Summary:**\n\n\n* **Issue:** The commit message explicitly states: *\"use M_GPR for general-purpose registers (ra, a0-a7, t0-t6).\"* However, in `zephyr/shim/src/panic.c`, the macro for `ra` remains unchanged, using `M(ra, riscv.regs[29], ra)`. Furthermore, in the test code (`zephyr/test/hwtest/src/panic.c`), `ra` is explicitly flagged with `.is_gpr \u003d false`.\n* **Analysis:** The code implementation itself is correct and preferred. Retaining the Return Address (`ra`) register rather than zeroing it out is crucial for identifying the source of the panic during crash analysis. It is only the commit message that is flawed.\n* **Remediation:** Amend the commit message to accurately reflect the code. Remove `ra` from the list of registers being stripped.\n* *Suggested wording:* \"Update the RISC-V PANIC_REG_LIST macro in the Zephyr panic shim to use M_GPR for general-purpose registers (a0-a7, t0-t6). The return address (ra) remains unstripped (using M) to preserve traceback capabilities.\"",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 0
+      },
+      "revId": "bf29fbfb4c6e1b985da8edf22fa0a1ed5a97d383",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7e751bc9_ce6b3bdf",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
