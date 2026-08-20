@@ -29,6 +29,13 @@ int charge_manager_get_active_charge_port(void)
 
 enum led_pwr_state led_pwr_get_state(void)
 {
+	if (!extpower_is_present()) {
+		if (active_charge_state == LED_PWRS_ERROR) {
+			return LED_PWRS_ERROR;
+		}
+		return LED_PWRS_DISCHARGE;
+	}
+
 	return active_charge_state;
 }
 
