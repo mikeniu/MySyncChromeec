@@ -22,6 +22,30 @@
       },
       "revId": "8ad0c64314f7f86810d1b4599eb0f37d2fb140d7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34dd8238_341ae0d8",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_capture.cc",
+        "patchSetId": 25
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-20T18:35:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b583be6f_236a7525",
+      "range": {
+        "startLine": 288,
+        "startChar": 0,
+        "endLine": 291,
+        "endChar": 73
+      },
+      "revId": "8ad0c64314f7f86810d1b4599eb0f37d2fb140d7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
