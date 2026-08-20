@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c01b3935_ef1170b6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-20T20:24:35Z",
+      "side": 1,
+      "message": "I\u0027m going out on a limb and assuming that these CLs still worked after refactoring.",
+      "revId": "9ec6ac5a1b47166336bfa9fdb691b59efe2669f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
