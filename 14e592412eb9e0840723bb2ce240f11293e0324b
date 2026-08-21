@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "715ca9cc_65fd52c5",
+        "filename": "zephyr/shim/src/host_command_legacy.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-21T17:31:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d342dd96_dd8dab22",
+      "revId": "14e592412eb9e0840723bb2ce240f11293e0324b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b56bd5f_0cc8fa26",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-08-19T22:55:39Z",
       "side": 1,
       "message": "Would it make sense to update `ec_host_cmd_task()` to initialize `hc-\u003ethread`?  You could then simplify as:\n```\nif CONFIG_EC_HOST_CMD\n    return hc-\u003ethread;\nelif CONFIG_TASK_HOSTCMD_THREAD_MAIN\n    return get_main_thread();\nelse\n    return task_to_k_tid[];\nendif\n```\n\nThis could be done as follow up.",
+      "range": {
+        "startLine": 119,
+        "startChar": 32,
+        "endLine": 119,
+        "endChar": 50
+      },
+      "revId": "14e592412eb9e0840723bb2ce240f11293e0324b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fbbc883_a96dcb0c",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-21T17:31:14Z",
+      "side": 1,
+      "message": "Good point, that would clean up the `#if` logic. I can create a follow-up CL after upstream Zephyr ec_host_cmd changes are merged.",
+      "parentUuid": "2b56bd5f_0cc8fa26",
       "range": {
         "startLine": 119,
         "startChar": 32,
