@@ -160,8 +160,10 @@ test_mockable void power_signal_interrupt(enum power_signal signal, int value)
 
 		pwrdg = power_signal_get(PWR_ALL_SYS_PWRGD);
 		LOG_ERR("=== PWR_ALL_SYS_PWRGD -> %d ===", pwrdg);
-		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_all_sys_pwrgd_out),
-			power_signal_get(PWR_ALL_SYS_PWRGD));
+		if (pwrdg == 0) {
+			gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_all_sys_pwrgd_out), 0);
+				//power_signal_get(PWR_ALL_SYS_PWRGD));
+		}
 	}
 
 	if (!IS_ENABLED(CONFIG_EMUL_AP_PWRSEQ_DRIVER)) {
