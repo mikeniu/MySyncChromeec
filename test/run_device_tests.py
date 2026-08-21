@@ -539,6 +539,7 @@ class Renode(Platform):
             "flash_protection",  # TODO(b/485668014)
             "flash_protection_rw",  # TODO(b/485668836)
             "flash_write_protect",  # TODO(b/485668014)
+            "fp_buffer_clear",  # TODO(b/485669018)
             "fp_transport",  # TODO(b/485668240)
             "malloc",  # TODO(b/485669070)
             "null_pointer",  # TODO(b/485624833)
@@ -800,6 +801,9 @@ class AllTests:
                 imagetype_to_use=ImageType.RO,
                 toggle_power=True,
                 enable_hw_write_protect=True,
+            ),
+            TestConfig(
+                test_name="fp_buffer_clear",
             ),
             TestConfig(
                 config_name="fp_transport_spi_ro",
