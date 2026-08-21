@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "395741be_e7b93923",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T02:09:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "16efc471_7ea47fdc",
+      "range": {
+        "startLine": 390,
+        "startChar": 6,
+        "endLine": 390,
+        "endChar": 7
+      },
+      "revId": "f6109aff2075dbd76467db516f930d7aeb1a74cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "061f7415_9ff158eb",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-08-20T18:52:10Z",
       "side": 1,
       "message": "We could simplify the logic with something like:\n\n```\nif (safe_memcmp(global_context.user_id.data(), p-\u003euserid,\n                global_context.user_id.size()) \u003d\u003d 0) {\n    return EC_RES_SUCCESS;\n}\n\nif (global_context.fp_encryption_status \u0026 FP_CONTEXT_USER_ID_SET) {\n    return EC_RES_ACCESS_DENIED;\n}\n\nmemcpy(global_context.user_id.data(), p-\u003euserid, global_context.user_id.size());\n```",
+      "range": {
+        "startLine": 384,
+        "startChar": 1,
+        "endLine": 399,
+        "endChar": 3
+      },
+      "revId": "f6109aff2075dbd76467db516f930d7aeb1a74cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e08f48c_823db07d",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T02:09:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "061f7415_9ff158eb",
       "range": {
         "startLine": 384,
         "startChar": 1,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75dfe090_9e9e19cd",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T02:09:55Z",
+      "side": 1,
+      "message": "done\n\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8274633/1",
+      "parentUuid": "5cecbea7_6f6f4f77",
+      "range": {
+        "startLine": 401,
+        "startChar": 2,
+        "endLine": 402,
+        "endChar": 41
+      },
+      "revId": "f6109aff2075dbd76467db516f930d7aeb1a74cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5fb483eb_a0438f51",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-08-20T18:49:37Z",
       "side": 1,
       "message": "**1. Test Coverage for Partial Matches (`fpsensor_template.cc`)**\nWhile the code is secure, the test suite could still benefit from a \"partial match\" test case. `FAKE_USER_ID_ALT` differs from `FAKE_USER_ID` at the very first byte.\n\n* **Recommendation**: Adding a test where the AP attempts to authenticate with a user ID that matches the first 16 bytes but differs in the last 16 bytes would explicitly validate the full-length behavior of `safe_memcmp` in your test suite, guarding against future regressions.",
+      "range": {
+        "startLine": 1479,
+        "startChar": 0,
+        "endLine": 1479,
+        "endChar": 69
+      },
+      "revId": "f6109aff2075dbd76467db516f930d7aeb1a74cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1aafe0ab_6a95cd57",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 1479,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T02:09:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fb483eb_a0438f51",
       "range": {
         "startLine": 1479,
         "startChar": 0,
