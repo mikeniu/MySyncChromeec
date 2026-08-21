@@ -27,6 +27,7 @@ config FINGERPRINT_SENSOR_IMAGE_SIZE
 	default 9980 if FINGERPRINT_SENSOR_EGIS660
 	default 12800 if FINGERPRINT_SENSOR_ELAN80SG
 	default 12800 if FINGERPRINT_SENSOR_ELANI80SA
+	default 15600 if FINGERPRINT_SENSOR_ELANHV515RC
 	help
 	  This is a size of fingerprint image with an additional metadata.
 	  This size must be at least a size of raw image. For FPC1025,
