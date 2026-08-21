@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a04abf8_7980580c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1127214
+      },
+      "writtenOn": "2026-08-21T00:42:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff2d692d_4ee84809",
+      "revId": "c7eb91f61ef93f4c5cd6ebd05ec73284e25b5aaa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8f60b69_28a14fb3",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-08-19T15:59:22Z",
       "side": 1,
       "message": "This repo doesn\u0027t use the signed off tag.  Running the pre-submit checks locally will flag this.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 69
+      },
+      "revId": "c7eb91f61ef93f4c5cd6ebd05ec73284e25b5aaa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "940409a1_8c808d19",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1127214
+      },
+      "writtenOn": "2026-08-21T00:42:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8f60b69_28a14fb3",
       "range": {
         "startLine": 19,
         "startChar": 0,
