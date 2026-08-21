@@ -23,8 +23,11 @@
 	};
 };
 
+/* TODO(b/546190664): Override min-residency-us for Realtek suspend-to-idle.
+ * This should ultimately be configured in upstream Zephyr dts/arm/realtek/ec/rts5912.dtsi.
+ */
 &idle {
-	min-residency-us = <500>;
+	min-residency-us = <5000>;
 };
 
 &uart0 {
