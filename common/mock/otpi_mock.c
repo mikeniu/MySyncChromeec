@@ -7,7 +7,9 @@
  * @file
  * @brief Mock OTPI library
  */
+#include "builtin/assert.h"
 #include "mock/otpi_mock.h"
+#include "task.h"
 
 #ifndef TEST_BUILD
 #error "Mocks should only be in the test build."
@@ -49,6 +51,12 @@ enum API_RETURN_STATUS_T otpi_write(uint32_t address, uint8_t data)
 {
 	if (!mock_otp.powered_on)
 		return API_RET_OTP_STATUS_FAIL;
+
+	/*
+	 * Validate that interrupts are locked during key programming to prevent
+	 * interrupted writes.
+	 */
+	ASSERT(!is_interrupt_enabled());
 
 	mock_otp.otp_key_buffer[address - OTP_KEY_ADDR] |= data;
 	return API_RET_OTP_STATUS_OK;
