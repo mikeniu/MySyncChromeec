@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bf83fb0_3cd4f343",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-08-21T17:49:30Z",
+      "side": 1,
+      "message": "In what cases does the PDC driver detect a reset but not pdc_power_mgmt? For FW update, resuming the drivers should re-run the pdc_power_mgmt init state.",
+      "range": {
+        "startLine": 10,
+        "startChar": 59,
+        "endLine": 12,
+        "endChar": 18
+      },
+      "revId": "6787b0f07506a7d860cf999c0d4925cc37b2e192",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1d3bc10_dff5126f",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-08-21T17:49:30Z",
+      "side": 1,
+      "message": "Include `rv` in the log message and then return `rv` (and below)",
+      "range": {
+        "startLine": 655,
+        "startChar": 2,
+        "endLine": 656,
+        "endChar": 14
+      },
+      "revId": "6787b0f07506a7d860cf999c0d4925cc37b2e192",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
