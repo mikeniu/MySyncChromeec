@@ -4,6 +4,9 @@
  */
 
 #include "rom_chip.h"
+#include "cpu.h"
+#include "builtin/assert.h"
+#include "console.h"
 
 static const volatile uint32_t *ADDR_DOWNLOAD_FROM_FLASH = (uint32_t *)0x40;
 static const volatile uint32_t *ADDR_OTPI_POWER = (uint32_t *)0x4C;
@@ -39,6 +42,9 @@ test_mockable enum API_RETURN_STATUS_T otpi_read(uint32_t address,
 test_mockable enum API_RETURN_STATUS_T otpi_write(uint32_t address,
 						  uint8_t data)
 {
+	ccprints("I am in otpi_write");
+	ASSERT(arch_cpu_irqs_are_enabled());
+
 	return ((otpi_write_ptr)*ADDR_OTPI_WRITE)(address, data);
 }
 
