@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52c57df6_04db69fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T21:08:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/21928003-f051-4292-931f-7ebc97c3109d)]\n\n### Review Summary\n*   **Functionality:** The logic works as intended. The assertion checking that interrupts are disabled before calling the ROM write function is now correct (`ASSERT(!arch_cpu_irqs_are_enabled())`). The contradiction from the previous iteration has been resolved.\n*   **Security:** Protecting the OTP key write sequence from interruption is a good practice to prevent partial or corrupted writes.\n*   **Style \u0026 Consistency:** The code adheres to the project guidelines. The use of `irq_lock` and `irq_unlock` is idiomatic.\n*   **Testing:** The CL re-enables the `otp_key` device test for `helipilot`, which is great and shows that the fix allows the test to pass reliably.\n*   **CL Size \u0026 Scope:** The CL is well-scoped, focused on a single bug fix, and appropriately sized.\n\nTAG\u003dagy\nCONV\u003da95b41e5-c142-4994-a11c-4d3376c43197",
+      "isAi": true,
+      "revId": "2415d232521c0f74486844332ce073125adb4470",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
