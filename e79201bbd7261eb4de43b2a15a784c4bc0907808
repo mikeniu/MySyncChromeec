@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "457a1669_03a5f405",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 35
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T02:12:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/8e8dda88-e0e0-4d52-a129-0db2062ab397)]\n\n### Review Summary\n\n**Functionality**:\n- The CL successfully blocks mid-session User ID mutations by checking `FP_CONTEXT_USER_ID_SET`.\n- The idempotency check for `FP_CONTEXT_GET_RESULT` was added safely via `safe_memcmp`, allowing identical requests from the AP to succeed and improving robustness against IPC timeouts.\n- The check now applies globally (regardless of session auth status), which simplifies the logic and improves the baseline security invariants of the state machine.\n\n**Security**:\n- The use of `safe_memcmp` is excellent, ensuring constant-time comparison that prevents timing side-channel attacks when verifying the User ID.\n- By locking down the session context identifier out-of-band, it strictly enforces that the active User ID is bound to the loaded templates, effectively thwarting cross-user swap vulnerabilities.\n\n**Style \u0026 Readability**:\n- The implementation is concise, and the descriptive comments accurately reflect the security requirements and intent.\n- C++ abstractions like `.data()` and `.size()` are utilized well to prevent sizing errors.\n\n**Testing**:\n- Robust test coverage has been added. The `test_fp_context_get_result_blocks_partial_match` correctly validates that partial match edge-cases are rejected, fully exercising `safe_memcmp`.\n- `test_fp_context_get_result_allows_idempotent_retry` reliably verifies the idempotent retry behavior.\n- Assertions in the tests accurately reflect the new invariant that these rules apply regardless of auth session status.\n\n**CL Size**:\n- The CL is small, focused, and self-contained, fitting comfortably within size guidelines.\n\nTAG\u003dagy",
+      "isAi": true,
+      "revId": "e79201bbd7261eb4de43b2a15a784c4bc0907808",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
