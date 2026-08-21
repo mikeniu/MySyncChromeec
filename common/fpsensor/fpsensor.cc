@@ -292,6 +292,7 @@ extern "C" void fp_task(void)
 	fp_sensor_init();
 
 	global_context.fp_frame_size_cache.populate_cache(sizeof(fp_buffer));
+	global_context.fp_image_offset_cache.populate_cache(sizeof(fp_buffer));
 
 	while (1) {
 		enum finger_state st = FINGER_NONE;
