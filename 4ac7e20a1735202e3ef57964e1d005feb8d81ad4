@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "423596f5_ae5c5827",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T02:19:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "cab6d862_7f6300d1",
+      "revId": "4ac7e20a1735202e3ef57964e1d005feb8d81ad4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5e03427_c964cbc0",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2119c32d_d5521c6a",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T02:19:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5e03427_c964cbc0",
+      "revId": "4ac7e20a1735202e3ef57964e1d005feb8d81ad4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f6b803c_83671e0e",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Since `tpm_seed` is also a `std::array`, consider using `global_context.tpm_seed.size()` here for consistency with the C++ container usage you are applying to `user_id`.",
       "isAi": true,
+      "revId": "4ac7e20a1735202e3ef57964e1d005feb8d81ad4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c51c5acd_900c5bf9",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T02:19:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f6b803c_83671e0e",
       "revId": "4ac7e20a1735202e3ef57964e1d005feb8d81ad4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
