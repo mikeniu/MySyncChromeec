@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c709ee80_69283278",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T17:23:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass.\n\n**Review Summary:**\n* **Functionality:** Looks good. The test writes canary data to `fp_buffer` and correctly validates that the buffer is zeroed across a hard reset.\n* **Style:** The code is clean and adheres to project guidelines. The previous feedback regarding redundant declarations and `static` functions has been correctly addressed.\n* **Security:** No security issues introduced. This test ensures sensitive fingerprint data is properly wiped across reboots, reinforcing the security posture.\n* **Testing:** The CL adds a comprehensive multi-step hardware test. It fits well within the Zephyr test framework and the Kconfig dependencies are correct.\n* **CL Size \u0026 Scope:** The CL is appropriately sized and self-contained.\n* **Overall Quality:** Excellent. The test logic is robust and all previous comments were addressed.\n\n[[trajectory](go/traj/fc59d633-7b76-42c9-9e4e-cfc1242fc48f)]",
+      "isAi": true,
+      "revId": "07bff9d6a651f37644d95ee361441480be518b0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
