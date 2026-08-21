@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "529c7f82_286aa369",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-21T23:30:47Z",
+      "side": 1,
+      "message": "@brandon.breitenstein@intel.com I don\u0027t know what the correct value for this ought to be. I briefly experimented with increasing it to 50 ms. That reduced but did not eliminate the incidence of S0ix watchdogs in the absence of CL:8220610. Perhaps there is some higher value that would be sufficient.\n\nI\u0027m not exactly sure what that would prove other than that the watchdog timeouts are merely the result of excessive delay and not some deeper misconfiguration with deep sleep.",
+      "revId": "0f8c865f3fc8620fb6833afdedf2107b0336c204",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
