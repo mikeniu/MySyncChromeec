@@ -327,6 +327,15 @@ int cros_system_hibernate(uint32_t seconds, uint32_t microseconds)
 	return 0;
 }
 
+#ifdef CONFIG_PM
+extern uint64_t rts5912_clock_get_sleep_ticks(void);
+
+uint64_t cros_system_deep_sleep_ticks(void)
+{
+	return rts5912_clock_get_sleep_ticks();
+}
+#endif
+
 SYS_INIT(cros_system_rtk_init, PRE_KERNEL_1, CONFIG_CROS_SYSTEM_INIT_PRIORITY);
 
 #if CONFIG_CROS_SYSTEM_INIT_PRIORITY >= \
