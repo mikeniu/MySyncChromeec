@@ -39,6 +39,30 @@
       },
       "revId": "52853622e27e58eafff0e016e515c2b2717209e5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbd9585b_402dcf4e",
+        "filename": "docs/lease_and_test_ec.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-21T19:40:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "402cea32_94679f61",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 109
+      },
+      "revId": "52853622e27e58eafff0e016e515c2b2717209e5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
