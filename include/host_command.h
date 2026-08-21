@@ -16,8 +16,12 @@
 
 #ifdef CONFIG_EC_HOST_CMD
 #include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
-#endif
+#ifdef CONFIG_ZTEST
 #include "host_command_legacy.h"
+#endif
+#else
+#include "host_command_legacy.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,16 +50,6 @@ void host_command_init(void);
  */
 uint8_t *host_get_memmap(int offset);
 
-/**
- * Process a host command and return its response
- *
- * @param args	        Command handler args
- * @return resulting status. Note that while this returns an ec_status enum, we
- * are intentionally specifying the return type as a uint16_t, to prevent issues
- * related to compiler optimizations affecting the range of values returnable
- * from this function.
- */
-uint16_t host_command_process(struct host_cmd_handler_args *args);
 
 /**
  * Set a single host event.
@@ -117,21 +111,6 @@ int get_lazy_wake_mask(enum power_state state, host_event_t *mask);
 uint8_t lpc_is_active_wm_set_by_host(void);
 #endif
 
-/**
- * Check if a Host Command that sent EC_HOST_CMD_IN_PROGRESS status has ended.
- *
- * @return True if the command has ended, False if not.
- */
-bool host_command_in_process_ended(void);
-
-/**
- * Get saved result of the command that has sent IN_PROGRESS status.
- *
- * This routine returns the save result and clears it.
- *
- * @return Save result.
- */
-uint8_t host_command_get_saved_result(void);
 
 #if defined(CONFIG_ZEPHYR)
 #include "zephyr_host_command.h"

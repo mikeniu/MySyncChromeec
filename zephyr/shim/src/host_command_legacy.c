@@ -4,6 +4,7 @@
  */
 
 #include "host_command.h"
+#include "host_command_legacy.h"
 #include "task.h"
 
 #include <zephyr/kernel.h>
@@ -15,6 +16,7 @@
 	"the main thread. Please enable CONFIG_TASK_HOSTCMD_THREAD_MAIN."
 #endif
 #endif /* !CONFIG_ZTEST */
+
 
 struct host_command *zephyr_find_host_command(int command)
 {

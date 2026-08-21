@@ -26,25 +26,13 @@ __maybe_unused static uint16_t suppressed_cmds[] = {
 BUILD_ASSERT(ARRAY_SIZE(suppressed_cmds) <=
 		     CONFIG_EC_HOST_CMD_LOG_SUPPRESSED_NUMBER,
 	     "Increase number of the maximum number.");
+#endif /* CONFIG_SUPPRESSED_HOST_COMMANDS */
 
-BUILD_ASSERT(sizeof(struct host_cmd_handler_args) ==
-		     sizeof(struct ec_host_cmd_handler_args),
-	     "Incompatible structure.");
-BUILD_ASSERT(offsetof(struct host_cmd_handler_args, command) ==
-	     offsetof(struct ec_host_cmd_handler_args, command));
-BUILD_ASSERT(offsetof(struct host_cmd_handler_args, version) ==
-	     offsetof(struct ec_host_cmd_handler_args, version));
-BUILD_ASSERT(offsetof(struct host_cmd_handler_args, params) ==
-	     offsetof(struct ec_host_cmd_handler_args, input_buf));
-BUILD_ASSERT(offsetof(struct host_cmd_handler_args, params_size) ==
-	     offsetof(struct ec_host_cmd_handler_args, input_buf_size));
-BUILD_ASSERT(offsetof(struct host_cmd_handler_args, response) ==
-	     offsetof(struct ec_host_cmd_handler_args, output_buf));
-BUILD_ASSERT(offsetof(struct host_cmd_handler_args, response_max) ==
-	     offsetof(struct ec_host_cmd_handler_args, output_buf_max));
-BUILD_ASSERT(offsetof(struct host_cmd_handler_args, response_size) ==
-	     offsetof(struct ec_host_cmd_handler_args, output_buf_size));
-
+/* The struct ec_host_cmd_request_header used in the upstream is the same as */
+/* ec_host_request, but with different struct name. We use struct
+ * ec_host_request in the shim for code simplicity. These checks ensure that
+ * the two structures are really identical.
+ */
 BUILD_ASSERT(sizeof(struct ec_host_request) ==
 		     sizeof(struct ec_host_cmd_request_header),
 	     "Incompatible structure.");
@@ -74,7 +62,6 @@ BUILD_ASSERT(offsetof(struct ec_host_response, data_len) ==
 	     offsetof(struct ec_host_cmd_response_header, data_len));
 BUILD_ASSERT(offsetof(struct ec_host_response, reserved) ==
 	     offsetof(struct ec_host_cmd_response_header, reserved));
-#endif /* CONFIG_SUPPRESSED_HOST_COMMANDS */
 
 static void ec_host_cmd_user_cb(const struct ec_host_cmd_rx_ctx *rx_ctx,
 				void *user_data)
