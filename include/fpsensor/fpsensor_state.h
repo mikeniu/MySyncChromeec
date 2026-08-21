@@ -13,6 +13,7 @@
 #include "ec_commands.h"
 #include "fpsensor_driver.h"
 #include "fpsensor_frame_size.h"
+#include "fpsensor_image_offset.h"
 #include "fpsensor_matcher.h"
 #include "fpsensor_state_driver.h"
 #include "link_defs.h"
@@ -100,6 +101,8 @@ struct fpsensor_context {
 	enum fp_capture_type current_capture_type;
 	/** Map of the capture type to frame size. */
 	FpFrameSizeCache fp_frame_size_cache;
+	/** Map of the capture type to image offset. */
+	FpImageOffsetCache fp_image_offset_cache;
 	/** Part of the IKM used to derive encryption keys received from the
 	 * TPM.
 	 */

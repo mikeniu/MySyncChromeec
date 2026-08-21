@@ -12,6 +12,7 @@
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "fpsensor/fpsensor_frame_size.h"
+#include "fpsensor/fpsensor_image_offset.h"
 #include "fpsensor/fpsensor_state.h"
 #include "fpsensor_driver.h"
 #include "fpsensor_matcher.h"
@@ -58,6 +59,7 @@ struct fpsensor_context global_context = {
 	.sensor_mode = 0,
 	.current_capture_type = FP_CAPTURE_TYPE_INVALID,
 	.fp_frame_size_cache = {},
+	.fp_image_offset_cache = {},
 	.tpm_seed = { 0 },
 	.user_id = { 0 },
 	.positive_match_secret_state = {

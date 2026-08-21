@@ -292,6 +292,7 @@ extern "C" void fp_task(void)
 	fp_sensor_init();
 
 	global_context.fp_frame_size_cache.populate_cache(sizeof(fp_buffer));
+	global_context.fp_image_offset_cache.populate_cache(sizeof(fp_buffer));
 
 	while (1) {
 		enum finger_state st = FINGER_NONE;
@@ -646,7 +647,15 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 		global_context.fp_frame_size_cache.get_frame_size(
 			global_context.current_capture_type);
 
+	uint32_t current_image_offset =
+		global_context.fp_image_offset_cache.get_image_offset(
+			global_context.current_capture_type);
+
 	if (current_frame_size > sizeof(fp_buffer)) {
+		return EC_RES_INVALID_PARAM;
+	}
+
+	if (current_image_offset > sizeof(fp_buffer)) {
 		return EC_RES_INVALID_PARAM;
 	}
 
@@ -662,10 +671,8 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 	if (skip_image_offset(global_context.current_capture_type)) {
 		uint32_t adjusted_offset;
 
-		if (check_add_overflow(
-			    offset,
-			    static_cast<uint32_t>(FP_SENSOR_IMAGE_OFFSET),
-			    &adjusted_offset)) {
+		if (check_add_overflow(offset, current_image_offset,
+				       &adjusted_offset)) {
 			return EC_RES_INVALID_PARAM;
 		}
 
