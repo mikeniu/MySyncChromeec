@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "109157fb_c93f104b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T17:13:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/99692769-c3bd-423f-a67f-8ca2f90740e8)]\n\n**Review Summary:**\n* **Functionality:** Looks good. The test effectively verifies that the fingerprint buffer is cleared across system reboots.\n* **Style:** Very clean. I left a couple of minor suggestions: removing a redundant `extern` declaration and making the local test functions `static`.\n* **Security:** No new security vulnerabilities introduced. The test helps verify secure behavior by ensuring data clearing.\n* **Testing:** This patch is a test and is self-contained. It correctly hooks into the multistep test framework. I suggested adding `depends on BOARD_FINGERPRINT` to `HW_TEST_FP_BUFFER_CLEAR` in Kconfig.\n* **CL Size \u0026 Scope:** Small, focused, and well-scoped CL.\n* **Overall Quality:** Excellent. The test logic is sound.",
+      "isAi": true,
+      "revId": "9a952269e3224320d1745e56db3e5ecd2ddf969a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1d2e066_4e036e1e",
+        "filename": "zephyr/test/hwtest/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T17:13:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider adding `depends on BOARD_FINGERPRINT` here to be consistent with other fingerprint-specific hardware tests (e.g., `HW_TEST_CORTEXM_FPU`, `HW_TEST_ROLLBACK`, etc.) and to prevent this test from being accidentally enabled on non-fingerprint boards.",
+      "isAi": true,
+      "revId": "9a952269e3224320d1745e56db3e5ecd2ddf969a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "115c94c7_efa73b53",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T17:13:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This declaration is redundant. `fp_buffer` is already declared with the exact same signature in `fpsensor/fpsensor_state_driver.h`, which is included on line 20.",
+      "isAi": true,
+      "revId": "9a952269e3224320d1745e56db3e5ecd2ddf969a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1366a3e1_30934e92",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T17:13:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider making `test_fp_buffer_before_reboot` and `test_fp_buffer_after_reboot` `static` since they are only used locally within this file\u0027s `test_steps` array.",
+      "isAi": true,
+      "revId": "9a952269e3224320d1745e56db3e5ecd2ddf969a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
