@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76b077d7_d1f7320c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T20:39:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/37a6df4f-45bf-4591-acce-f21bdcebdbec)]\n\n### Review Summary\n*   **Functionality:** I found a critical contradiction. The CL adds `irq_lock()` in `otp_key_write` to disable interrupts during the write sequence. However, the new assertion in `otpi_write` (`ASSERT(arch_cpu_irqs_are_enabled());`) checks that interrupts are *enabled*. This will cause an immediate panic when the OTP key is written. You likely meant to assert `!arch_cpu_irqs_are_enabled()`.\n*   **Security:** Protecting the OTP key write sequence from interruption is a good practice to prevent partial or corrupted writes. No negative security impact.\n*   **Style \u0026 Consistency:** The code adheres to the project guidelines.\n*   **Testing:** The CL re-enables the `otp_key` device test for `helipilot`, which is great. The existing tests should be sufficient to verify this behavior once the assertion logic is fixed.\n*   **CL Size \u0026 Scope:** The CL is well-scoped and appropriately small.",
+      "isAi": true,
+      "revId": "cb727efa1897c6f0b7176358fb05fe861ee759ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0eac6473_51510e62",
+        "filename": "chip/npcx/rom_chip.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T20:39:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] There is a contradiction here. In `otp_key.c`, you wrap the calls to `otpi_write` with `irq_lock()`, which disables interrupts. However, this assertion checks that interrupts are *enabled* (`arch_cpu_irqs_are_enabled()`). This will cause an immediate assertion failure/panic when `otp_key_write` executes.\n\nIf the ROM function requires interrupts to be disabled, this should be `ASSERT(!arch_cpu_irqs_are_enabled());`. If the ROM function requires interrupts to be enabled, then the `irq_lock()` in `otp_key.c` cannot be used.",
+      "isAi": true,
+      "revId": "cb727efa1897c6f0b7176358fb05fe861ee759ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
