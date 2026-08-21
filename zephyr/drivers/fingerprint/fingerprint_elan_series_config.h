@@ -15,6 +15,8 @@
 #include "fingerprint_elan80sg_config.h"
 #elif defined(CONFIG_FINGERPRINT_SENSOR_ELANI80SA)
 #include "fingerprint_elani80sa_config.h"
+#elif defined(CONFIG_FINGERPRINT_SENSOR_ELANHV515RC)
+#include "fingerprint_elanhv515rc_config.h"
 #else
 #error "No valid configuration for fingerprint sensor."
 #endif
