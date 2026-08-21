@@ -16,6 +16,75 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "e1ebcb3faae8912415c5484522020ab8fdbb2527",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d17fe58_59f8a8e4",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T17:05:46Z",
+      "side": 1,
+      "message": "cflush() is typically declared in console.h. It is better to include it explicitly rather than relying on common.h.",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 0
+      },
+      "revId": "e1ebcb3faae8912415c5484522020ab8fdbb2527",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59608dd8_8d608937",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T17:05:46Z",
+      "side": 1,
+      "message": "Using zassert_equal in a loop for every byte can be very slow if there are many failures (due to serial logging overhead). For large buffers, it might be more efficient to check a few specific indices and then use memcmp against a known zero buffer, or just check the whole buffer and assert once at the end if a failure was found.\n\nHowever, since zassert usually stops the test on the first failure, this is likely fine for now as long as the buffer size isn\u0027t so large that it triggers a watchdog or timeout during a passing run.",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 0
+      },
+      "revId": "e1ebcb3faae8912415c5484522020ab8fdbb2527",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03b31201_60d7c22a",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T17:05:46Z",
+      "side": 1,
+      "message": "Consider adding cflush() here to ensure the \"Poisoning\" log message is fully printed before the system resets. Hard resets can happen faster than the UART can drain the buffer.",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 0
+      },
+      "revId": "e1ebcb3faae8912415c5484522020ab8fdbb2527",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
