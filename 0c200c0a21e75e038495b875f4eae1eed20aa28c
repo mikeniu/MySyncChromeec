@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3ffea03_e9b15fdc",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 43
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-21T15:31:19Z",
+      "side": 1,
+      "message": "Why are you casting the return value to `int` when the return type is `enum sensor_attribute`?\n\nMarking this as resolved to not block merging.  But this needs a follow up fix.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 41
+      },
+      "revId": "0c200c0a21e75e038495b875f4eae1eed20aa28c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
