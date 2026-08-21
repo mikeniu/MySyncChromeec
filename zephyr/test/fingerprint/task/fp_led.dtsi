@@ -22,6 +22,15 @@
 		};
 	};
 
+	power-states {
+		suspend_to_idle: suspend_to_idle {
+			compatible = "zephyr,power-state";
+			power-state-name = "suspend-to-idle";
+			substate-id = <0>;
+			min-residency-us = <500>;
+		};
+	};
+
 	aliases {
 		pwm-fp-led = &fp_led;
 	};
