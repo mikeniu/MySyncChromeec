@@ -129,6 +129,30 @@
       },
       "revId": "a3b1daa3f23fc3bb33035cdffe9230495ab89f27",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60735ab2_e0140172",
+        "filename": "zephyr/shim/chip/npcx/otp_key.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T22:55:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3036355_769b3cc9",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 18
+      },
+      "revId": "a3b1daa3f23fc3bb33035cdffe9230495ab89f27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
