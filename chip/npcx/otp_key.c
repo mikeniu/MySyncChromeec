@@ -59,15 +59,20 @@ static enum ec_error_list otp_key_write(const uint8_t *key_buffer)
 {
 	enum API_RETURN_STATUS_T status = API_RET_OTP_STATUS_FAIL;
 	uint8_t i;
+	unsigned int key;
 
 	if (key_buffer == NULL)
 		return EC_ERROR_INVAL;
 
+	key = irq_lock();
 	for (i = 0; i < OTP_KEY_SIZE_BYTES; i++) {
 		status = otpi_write(OTP_KEY_ADDR + i, key_buffer[i]);
-		if (status != API_RET_OTP_STATUS_OK)
+		if (status != API_RET_OTP_STATUS_OK) {
+			irq_unlock(key);
 			return EC_ERROR_UNKNOWN;
+		}
 	}
+	irq_unlock(key);
 
 	return EC_SUCCESS;
 }
