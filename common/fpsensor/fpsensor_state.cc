@@ -103,7 +103,7 @@ void fp_reset_context()
 	OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
 	global_context.template_encrypted_id = FP_NO_SUCH_TEMPLATE;
 	OPENSSL_cleanse(global_context.user_id.data(),
-			sizeof(global_context.user_id));
+			global_context.user_id.size());
 	fp_disable_positive_match_secret(
 		&global_context.positive_match_secret_state);
 	for (uint16_t idx = 0; idx < FP_MAX_FINGER_COUNT; idx++)
@@ -157,7 +157,7 @@ static enum ec_status fp_command_tpm_seed(struct host_cmd_handler_args *args)
 		return EC_RES_ACCESS_DENIED;
 	}
 	memcpy(global_context.tpm_seed.data(), params->seed,
-	       sizeof(global_context.tpm_seed));
+	       global_context.tpm_seed.size());
 	global_context.fp_encryption_status |= FP_ENC_STATUS_SEED_SET;
 
 	return EC_RES_SUCCESS;
@@ -399,7 +399,7 @@ static enum ec_status fp_command_context(struct host_cmd_handler_args *args)
 		}
 
 		memcpy(global_context.user_id.data(), p->userid,
-		       sizeof(global_context.user_id));
+		       global_context.user_id.size());
 
 		/* Set the FP_CONTEXT_USER_ID_SET bit if the user_id is
 		 * non-zero. */
