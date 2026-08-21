@@ -4,6 +4,7 @@
  */
 
 #include "otp_key.h"
+#include "task.h"
 #include "test_util.h"
 #include "util.h"
 
@@ -19,6 +20,8 @@ void print_key_buffer(uint8_t *key_buff)
 
 test_static int test_otp_key(void)
 {
+	TEST_ASSERT(is_interrupt_enabled());
+
 	otp_key_init();
 
 	uint32_t status = otp_key_provision();
@@ -33,6 +36,8 @@ test_static int test_otp_key(void)
 	print_key_buffer(otp_key_buffer);
 
 	otp_key_exit();
+
+	TEST_ASSERT(is_interrupt_enabled());
 
 	return EC_SUCCESS;
 }

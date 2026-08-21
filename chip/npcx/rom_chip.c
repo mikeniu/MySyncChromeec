@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "builtin/assert.h"
+#include "cpu.h"
 #include "rom_chip.h"
 
 static const volatile uint32_t *ADDR_DOWNLOAD_FROM_FLASH = (uint32_t *)0x40;
@@ -39,6 +41,8 @@ test_mockable enum API_RETURN_STATUS_T otpi_read(uint32_t address,
 test_mockable enum API_RETURN_STATUS_T otpi_write(uint32_t address,
 						  uint8_t data)
 {
+	ASSERT(!arch_cpu_irqs_are_enabled());
+
 	return ((otpi_write_ptr)*ADDR_OTPI_WRITE)(address, data);
 }
 
