@@ -24,6 +24,10 @@ static void wclffb_power_event_handler(struct ap_power_ev_callback *callback,
 		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_amp_mute_odl), 1);
 		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pwrbtn_led), 1);
 		break;
+	case AP_POWER_SHUTDOWN:
+		/* SLP_S4# de-assert. And turn it down by S5 entry. */
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_vdd2_vr_en_s4_ec), 0);
+		break;
 	case AP_POWER_HARD_OFF:
 		/* Assert AMP_MUTE_ODL when powered off. */
 		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_amp_mute_odl), 0);
@@ -48,7 +52,7 @@ static int init_suspend_resume(void)
 
 	ap_power_ev_init_callback(&cb, wclffb_power_event_handler,
 				  AP_POWER_PRE_INIT | AP_POWER_STARTUP |
-					  AP_POWER_HARD_OFF);
+				  AP_POWER_SHUTDOWN | AP_POWER_HARD_OFF);
 	ap_power_ev_add_callback(&cb);
 
 	return 0;
