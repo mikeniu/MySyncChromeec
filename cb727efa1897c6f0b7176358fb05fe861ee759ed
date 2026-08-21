@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75248c59_1df8095e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T21:01:04Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "76b077d7_d1f7320c",
+      "revId": "cb727efa1897c6f0b7176358fb05fe861ee759ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0eac6473_51510e62",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] There is a contradiction here. In `otp_key.c`, you wrap the calls to `otpi_write` with `irq_lock()`, which disables interrupts. However, this assertion checks that interrupts are *enabled* (`arch_cpu_irqs_are_enabled()`). This will cause an immediate assertion failure/panic when `otp_key_write` executes.\n\nIf the ROM function requires interrupts to be disabled, this should be `ASSERT(!arch_cpu_irqs_are_enabled());`. If the ROM function requires interrupts to be enabled, then the `irq_lock()` in `otp_key.c` cannot be used.",
       "isAi": true,
+      "revId": "cb727efa1897c6f0b7176358fb05fe861ee759ed",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9371d347_bb50e2a3",
+        "filename": "chip/npcx/rom_chip.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T21:01:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0eac6473_51510e62",
       "revId": "cb727efa1897c6f0b7176358fb05fe861ee759ed",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
