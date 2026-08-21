@@ -46,6 +46,30 @@
       },
       "revId": "0c200c0a21e75e038495b875f4eae1eed20aa28c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f2b3715_29d4ebc5",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 43
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-21T16:01:32Z",
+      "side": 1,
+      "message": "The tests compile using the host toolchain, both GCC and clang.\n\nAre you running into `-Wenu-conversion` errors with clang?\n\nNote that due to operator precedence, the addition operation can trigger the conversion warning.  Try this:\n\n```\nenum sensor_channel power_monitor_sensor_channel(int channel_id)\n{\n     return (enum sensor_channel)(PAC194X_CHAN_ACC1_AVG + channel_id);\n}   \n```\n\nIf still gives you problems at a minimum the return should do one final cast back to the enum type.\n\n```\nenum sensor_channel power_monitor_sensor_channel(int channel_id)\n{\n        return (enum sensor_channel)((int)PAC194X_CHAN_ACC1_AVG + channel_id);\n}   \n```",
+      "parentUuid": "e6e4250b_459c542a",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 41
+      },
+      "revId": "0c200c0a21e75e038495b875f4eae1eed20aa28c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
