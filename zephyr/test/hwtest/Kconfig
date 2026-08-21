@@ -76,6 +76,12 @@ config HW_TEST_FLASH_WRITE_PROTECT
 	select ZTEST
 	depends on PLATFORM_EC_FLASH_CROS
 
+config HW_TEST_FP_BUFFER_CLEAR
+	bool "fp_buffer clear test"
+	select ZTEST
+	help
+	  The test verifies if the fp_buffer is cleared after reboot.
+
 config HW_TEST_FP_TRANSPORT
 	bool "FP transport layer test"
 	select ZTEST

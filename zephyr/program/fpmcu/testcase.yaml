@@ -78,6 +78,11 @@ tests:
     - CONFIG_PM=n
     extra_conf_files:
     - prj_hw_tests.conf
+  fp_buffer_clear:
+    extra_configs:
+    - CONFIG_HW_TEST_FP_BUFFER_CLEAR=y
+    extra_conf_files:
+    - prj_hw_tests.conf
   fp_transport:
     extra_configs:
     - CONFIG_HW_TEST_FP_TRANSPORT=y
