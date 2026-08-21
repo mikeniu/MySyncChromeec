@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58bf6c46_bee5e605",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T17:20:52Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "109157fb_c93f104b",
+      "revId": "9a952269e3224320d1745e56db3e5ecd2ddf969a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a1d2e066_4e036e1e",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Consider adding `depends on BOARD_FINGERPRINT` here to be consistent with other fingerprint-specific hardware tests (e.g., `HW_TEST_CORTEXM_FPU`, `HW_TEST_ROLLBACK`, etc.) and to prevent this test from being accidentally enabled on non-fingerprint boards.",
       "isAi": true,
+      "revId": "9a952269e3224320d1745e56db3e5ecd2ddf969a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64437ac8_c6318ccf",
+        "filename": "zephyr/test/hwtest/Kconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T17:20:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1d2e066_4e036e1e",
       "revId": "9a952269e3224320d1745e56db3e5ecd2ddf969a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d64e8e94_bc9b697a",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T17:20:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "115c94c7_efa73b53",
+      "revId": "9a952269e3224320d1745e56db3e5ecd2ddf969a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1366a3e1_30934e92",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Consider making `test_fp_buffer_before_reboot` and `test_fp_buffer_after_reboot` `static` since they are only used locally within this file\u0027s `test_steps` array.",
       "isAi": true,
+      "revId": "9a952269e3224320d1745e56db3e5ecd2ddf969a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3d7b35a_76a32650",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T17:20:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1366a3e1_30934e92",
       "revId": "9a952269e3224320d1745e56db3e5ecd2ddf969a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
