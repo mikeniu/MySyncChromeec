@@ -22,6 +22,30 @@
       },
       "revId": "0c200c0a21e75e038495b875f4eae1eed20aa28c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6e4250b_459c542a",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 43
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-08-21T15:36:36Z",
+      "side": 1,
+      "message": "To test `latch_attr` and `channel_enable` attribute I added tests for PAC194X (basically I run same tests with `POWER_MONITOR_COMMON` and `POWER_MONITOR_PAC194X`). However for some unknown reason I could\u0027t get test compiled due to casting private attributes to sensor_attribute, thus why I cast private attributes and channels to int.",
+      "parentUuid": "b3ffea03_e9b15fdc",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 41
+      },
+      "revId": "0c200c0a21e75e038495b875f4eae1eed20aa28c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
