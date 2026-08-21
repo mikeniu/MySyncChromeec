@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69a33a37_fb49d473",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 42
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-08-21T07:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22e094fe_92d07781",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 172,
+        "endChar": 35
+      },
+      "revId": "6561ce9b2e2d2601b353bc33ac92f8ad6a67c9bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34a40819_24db1c24",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb03fd93_bb99248f",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 42
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-08-21T07:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34a40819_24db1c24",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 62
+      },
+      "revId": "6561ce9b2e2d2601b353bc33ac92f8ad6a67c9bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ffd90c5_7ebe391a",
@@ -60,6 +108,24 @@
       "writtenOn": "2026-08-18T15:03:21Z",
       "side": 1,
       "message": "Same here - this branch isn\u0027t covered by tests.",
+      "revId": "6561ce9b2e2d2601b353bc33ac92f8ad6a67c9bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c708c9aa_cc0aa380",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 42
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-08-21T07:19:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ffd90c5_7ebe391a",
       "revId": "6561ce9b2e2d2601b353bc33ac92f8ad6a67c9bb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
