@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "72137ac4_f48fcc78",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T17:06:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d17fe58_59f8a8e4",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 0
+      },
+      "revId": "e1ebcb3faae8912415c5484522020ab8fdbb2527",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59608dd8_8d608937",
@@ -64,6 +88,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bf20237_d46ee474",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T17:06:52Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "59608dd8_8d608937",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 0
+      },
+      "revId": "e1ebcb3faae8912415c5484522020ab8fdbb2527",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "03b31201_60d7c22a",
@@ -77,6 +125,30 @@
       "writtenOn": "2026-08-21T17:05:46Z",
       "side": 1,
       "message": "Consider adding cflush() here to ensure the \"Poisoning\" log message is fully printed before the system resets. Hard resets can happen faster than the UART can drain the buffer.",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 0
+      },
+      "revId": "e1ebcb3faae8912415c5484522020ab8fdbb2527",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b28051a_5556582f",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-08-21T17:06:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03b31201_60d7c22a",
       "range": {
         "startLine": 45,
         "startChar": 0,
