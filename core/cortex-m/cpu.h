@@ -11,6 +11,7 @@
 #include "compile_time_macros.h"
 #include "debug.h"
 
+#include <stdbool.h>
 #include <stdint.h>
 
 /* Macro to access 32-bit registers */
@@ -131,6 +132,28 @@ void cpu_clean_invalidate_dcache_range(uintptr_t base, unsigned int length);
 void cpu_return_from_exception_msp(void (*func)(void));
 /* Return to specified function from exception handler using process stack. */
 void cpu_return_from_exception_psp(void (*func)(void));
+
+/* Check if CPU interrupts are currently enabled */
+static inline bool arch_cpu_irqs_are_enabled(void)
+{
+#if defined(__ARM_ARCH_6M__) || defined(CONFIG_ARMV6_M_ARMV8_M_BASELINE)
+	uint32_t primask;
+
+	asm volatile("mrs %0, primask" : "=r"(primask));
+	return primask == 0;
+#elif defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) || \
+	defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
+	uint32_t basepri;
+
+	asm volatile("mrs %0, basepri" : "=r"(basepri));
+	return basepri == 0;
+#else
+	uint32_t primask;
+
+	asm volatile("mrs %0, primask" : "=r"(primask));
+	return primask == 0;
+#endif
+}
 
 /* Set the priority of the given IRQ in the NVIC (0 is highest). */
 static inline void cpu_set_interrupt_priority(uint8_t irq, uint8_t priority)
