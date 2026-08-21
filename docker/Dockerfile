@@ -129,10 +129,9 @@ RUN VPYTHON_FILE="/opt/repos/src/platform/ec/zephyr/zmake/.vpython3" && \
 RUN python3 -m pip install --no-cache-dir --no-deps \
     /opt/repos/src/platform/ec/zephyr/zmake
 
-# Set PATH for binman. Include both build-time cache (/opt/repos) and mounted
-# workspace (/workspace), with /workspace taking precedence.
-ENV PATH="/opt/repos/src/third_party/u-boot/tools/binman:${PATH}"
-ENV PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
+# Set PATH for binman tools.
+ENV PATH="${PATH}:/opt/repos/src/third_party/u-boot/tools/binman"
+ENV PATH="${PATH}:/workspace/src/third_party/u-boot/tools/binman"
 
 # Build and install rtkupdate host utility
 RUN g++ -O2 -Wall -o /usr/bin/rtkupdate \
