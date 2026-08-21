@@ -26,6 +26,7 @@ config FINGERPRINT_SENSOR_ELAN_SERIES_HEAP_SIZE
 	int
 	default 36864 if FINGERPRINT_SENSOR_ELAN80SG
 	default 67568 if FINGERPRINT_SENSOR_ELANI80SA
+	default 67568 if FINGERPRINT_SENSOR_ELANHV515RC
 	help
 	  Size of heap to be used by ELAN private library. The heap must have
 	  enough space to facilitate the generation of the finger templates
@@ -36,6 +37,7 @@ choice FINGERPRINT_SENSOR_ELAN_SERIES_READ_MODE
     prompt "ELAN series read mode"
 	default FINGERPRINT_SENSOR_ELAN_SERIES_READ_MODE_FULL if FINGERPRINT_SENSOR_ELAN80SG
 	default FINGERPRINT_SENSOR_ELAN_SERIES_READ_MODE_LINEWISE if FINGERPRINT_SENSOR_ELANI80SA
+	default FINGERPRINT_SENSOR_ELAN_SERIES_READ_MODE_LINEWISE if FINGERPRINT_SENSOR_ELANHV515RC
     help
       Select the data read mode for the ELAN series sensors.
 
@@ -68,5 +70,15 @@ menuconfig FINGERPRINT_SENSOR_ELANI80SA
 	select FINGERPRINT_SENSOR_ELAN_SERIES
 	help
 	  Driver for ELANI80SA fingerprint sensor. It requires ELAN private library
+	  to implement cros_fingerprint API. If the library is not available it
+	  only supports checking sensor hardware ID.
+
+menuconfig FINGERPRINT_SENSOR_ELANHV515RC
+	bool "Fingerprint driver for ELANHV515RC"
+	default y
+	depends on DT_HAS_ELAN_ELANHV515RC_ENABLED
+	select FINGERPRINT_SENSOR_ELAN_SERIES
+	help
+	  Driver for ELANHV515RC fingerprint sensor. It requires ELAN private library
 	  to implement cros_fingerprint API. If the library is not available it
 	  only supports checking sensor hardware ID.
