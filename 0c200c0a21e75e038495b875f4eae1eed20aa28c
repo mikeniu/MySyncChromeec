@@ -70,6 +70,30 @@
       },
       "revId": "0c200c0a21e75e038495b875f4eae1eed20aa28c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d149aa6_c38d7295",
+        "filename": "zephyr/drivers/pwrmon/power_monitor_pac194x.c",
+        "patchSetId": 43
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1588887
+      },
+      "writtenOn": "2026-08-21T18:23:31Z",
+      "side": 1,
+      "message": "I\u0027m running into `-Wimplicit-enum-enum-cast`. I\u0027m fixing this now, thanks for pointing this out.",
+      "parentUuid": "2f2b3715_29d4ebc5",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 41
+      },
+      "revId": "0c200c0a21e75e038495b875f4eae1eed20aa28c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
