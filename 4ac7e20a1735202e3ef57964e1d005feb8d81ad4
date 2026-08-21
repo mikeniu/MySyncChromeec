@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cab6d862_7f6300d1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T02:04:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/f9613ec0-650e-4c66-820c-3a3d05baea2e)]\n\n### Review Summary\n* **Functionality**: The change maintains identical logic and behavior, safely migrating from a `sizeof()` operator to a C++ container `.size()` method.\n* **Security**: No security issues introduced. Both `sizeof()` and `.size()` on a `std::array\u003cuint8_t, ...\u003e` evaluate to the same byte count, ensuring `memcpy` operates with the correct length.\n* **Style \u0026 Consistency**: The change aligns with C++ container member usage patterns. I have left a couple of minor inline suggestions pointing out other instances (such as line 106 and 160) where `.size()` could be used instead of `sizeof()` to apply this uniformly across the file.\n* **Testing \u0026 Test Coverage**: No additional tests required as this is a minor syntax refactor.\n* **CL Size \u0026 Scope**: The size is very small and perfectly scoped to this specific refactor.",
+      "isAi": true,
+      "revId": "4ac7e20a1735202e3ef57964e1d005feb8d81ad4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5e03427_c964cbc0",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T02:04:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider changing `sizeof(global_context.user_id)` to `global_context.user_id.size()` here as well to maintain consistency with the change below.",
+      "isAi": true,
+      "revId": "4ac7e20a1735202e3ef57964e1d005feb8d81ad4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f6b803c_83671e0e",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-08-21T02:04:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `tpm_seed` is also a `std::array`, consider using `global_context.tpm_seed.size()` here for consistency with the C++ container usage you are applying to `user_id`.",
+      "isAi": true,
+      "revId": "4ac7e20a1735202e3ef57964e1d005feb8d81ad4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
