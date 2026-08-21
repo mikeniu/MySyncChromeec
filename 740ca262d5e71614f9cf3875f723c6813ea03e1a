@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbd65eff_57d1ee6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-21T20:49:58Z",
+      "side": 1,
+      "message": "Although this was primarily intended as a convenience, I\u0027m seeing locally that it significantly reduces watchdogs in S0ix on atria while deep sleep is enabled. From OOB conversations with Brandon, Intel has seen at least one instance where Atria still had a watchdog reset despite this CL.",
+      "revId": "740ca262d5e71614f9cf3875f723c6813ea03e1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35f9c7ea_8815024b",
