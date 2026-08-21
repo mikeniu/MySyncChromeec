@@ -16,19 +16,25 @@ const struct pm_state_info *pm_policy_next_state(uint8_t cpu, int32_t ticks)
 {
 	ARG_UNUSED(cpu);
 
-	const struct pm_state_info *ret = NULL;
 	const struct pm_state_info *cpu_state_list;
 	uint8_t num_cpu_states = pm_state_cpu_get_all(cpu, &cpu_state_list);
 
 	if (DEEP_SLEEP_ALLOWED) {
-		for (int i = 0; i < num_cpu_states; i++) {
+		for (int i = num_cpu_states - 1; i >= 0; i--) {
 			if (pm_policy_state_lock_is_active(
 				    cpu_state_list[i].state,
 				    PM_ALL_SUBSTATES)) {
-				break;
+				continue;
 			}
-			ret = &cpu_state_list[i];
+
+			/* Find suitable power state by residency time */
+			if (ticks == K_TICKS_FOREVER ||
+			    ticks >= k_us_to_ticks_ceil32(
+					     cpu_state_list[i]
+						     .min_residency_us)) {
+				return &cpu_state_list[i];
+			}
 		}
 	}
-	return ret;
+	return NULL;
 }
