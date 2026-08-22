@@ -153,6 +153,14 @@ config HW_TEST_PANIC
 	help
 	  The test verifies panic data.
 
+config HW_TEST_PANIC_STRIP_GPR
+	bool "Panic strip GPR test"
+	select ZTEST
+	depends on ARM || RISCV
+	help
+	  The test verifies that general purpose registers are
+	  stripped during panic.
+
 config HW_TEST_PANIC_DATA
 	bool "Panic data test"
 	select ZTEST

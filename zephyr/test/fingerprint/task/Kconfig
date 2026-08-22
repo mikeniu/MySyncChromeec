@@ -95,6 +95,7 @@ config LINK_TEST_SUITE_FINGERPRINT_BTN_IGN_OUT
 
 config LINK_TEST_SUITE_FINGERPRINT_LED
 	bool "Link fingerprint led tests"
+	select HAS_PM
 	help
 	  Link and execute fingerprint subsystem tests that focus
 	  on led.

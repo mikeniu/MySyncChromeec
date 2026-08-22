@@ -114,6 +114,7 @@ tests:
     - CONFIG_LED=y
     - CONFIG_LED_PWM=y
     - CONFIG_PWM=y
+    - CONFIG_PM=y
     extra_conf_files:
     - prj.conf
     extra_dtc_overlay_files:
