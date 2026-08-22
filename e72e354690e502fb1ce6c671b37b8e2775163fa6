@@ -50,6 +50,24 @@
       "message": "We have an existing supported solution for situations like these called runtime PDC port configuration (`CONFIG_PDC_RUNTIME_PORT_CONFIG`) that allows port drivers to be individually initialized based on a board-provided callback. Usually informed by CBI data.\n\nIf the PDC is physically not present the driver should never be initialized. Runtime PDC config will properly account for this scenario and ensure all the other systems (pdc_power_mgmt, EC PPM, and OS) only see the existing ports.\n\nSee the `usbc_runtime.c` sources in various zephyr/program directories for examples.",
       "revId": "e72e354690e502fb1ce6c671b37b8e2775163fa6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bf86130_381fa957",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-08-22T09:38:21Z",
+      "side": 1,
+      "message": "Yes, I have tried this approach. With the Type-C port swap and runtime PDC configuration, we can work around the issue successfully.BIOS and EC may need to be reconfigured. At the same time, CCD will be on Port 1.",
+      "parentUuid": "ceda6cb3_a190cbfa",
+      "revId": "e72e354690e502fb1ce6c671b37b8e2775163fa6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
