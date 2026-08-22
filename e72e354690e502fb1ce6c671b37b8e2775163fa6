@@ -68,6 +68,24 @@
       "parentUuid": "ceda6cb3_a190cbfa",
       "revId": "e72e354690e502fb1ce6c671b37b8e2775163fa6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8245298_41b98cd3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-22T09:39:44Z",
+      "side": 1,
+      "message": "If the port id is not start from the MB, or if the chip is somehow malfunction after assembly, the ST_DISABLE state might be more rubust to avoid DUT not boot based on the update b/545903144#comment7.",
+      "parentUuid": "ceda6cb3_a190cbfa",
+      "revId": "e72e354690e502fb1ce6c671b37b8e2775163fa6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
