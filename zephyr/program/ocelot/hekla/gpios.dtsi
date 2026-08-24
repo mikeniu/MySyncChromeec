@@ -5,7 +5,7 @@
 
 / {
 	aliases {
-		gpio-wp = &gpio_gsc_wp_odl;
+		gpio-wp = &gpio_gsc_wp_od;
 		gpio-btn-ign-in = &gpio_ec_fp_atc;
 	};
 
@@ -22,9 +22,9 @@
 			gpios = <RTS5912_GPIO117 GPIO_INPUT>;
 			enum-name = "GPIO_AC_PRESENT";
 		};
-		/* EC_A10 GSC_WP_ODL */
-		gpio_gsc_wp_odl: gsc_wp_odl {
-			gpios = <RTS5912_GPIO089 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		/* EC_A10 GSC_WP_OD */
+		gpio_gsc_wp_od: gsc_wp_od {
+			gpios = <RTS5912_GPIO089 (GPIO_INPUT | GPIO_ACTIVE_HIGH)>;
 		};
 		/* EC_B13 EC_GSC_PACKET_MODE */
 		gpio_ec_gsc_packet_mode: ec_gsc_packet_mode {
