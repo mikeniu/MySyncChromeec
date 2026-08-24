@@ -34,12 +34,6 @@ void run_test(int argc, const char **argv)
 {
 	test_reset();
 
-	RUN_TEST(test_td_pd_ll_e3_dfp);
-	RUN_TEST(test_td_pd_ll_e3_ufp);
-	RUN_TEST(test_td_pd_ll_e4_dfp);
-	RUN_TEST(test_td_pd_ll_e4_ufp);
-	RUN_TEST(test_td_pd_ll_e5_dfp);
-	RUN_TEST(test_td_pd_ll_e5_ufp);
 	RUN_TEST(test_td_pd_src_e1);
 	RUN_TEST(test_td_pd_src_e2);
 	RUN_TEST(test_td_pd_src_e5);

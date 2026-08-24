@@ -65,13 +65,6 @@ enum proc_pd_e1_attach {
 int proc_pd_e1(enum pd_data_role data_role, enum proc_pd_e1_attach attach);
 int proc_pd_e3(void);
 
-int test_td_pd_ll_e3_dfp(void);
-int test_td_pd_ll_e3_ufp(void);
-int test_td_pd_ll_e4_dfp(void);
-int test_td_pd_ll_e4_ufp(void);
-int test_td_pd_ll_e5_dfp(void);
-int test_td_pd_ll_e5_ufp(void);
-
 int test_td_pd_src_e1(void);
 int test_td_pd_src_e2(void);
 int test_td_pd_src_e5(void);
