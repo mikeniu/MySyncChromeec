@@ -127,7 +127,7 @@ def get_twister_args(
         )
 
         if board_id:
-            twister_args.extend(["--pytest-args", f"--board-id={board_id}"])
+            twister_args.append(f"--pytest-args=--board-id={board_id}")
 
     if args.sram:
         twister_args.append("-x=SNIPPET=sram-only")
