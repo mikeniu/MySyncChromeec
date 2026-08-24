@@ -4034,7 +4034,7 @@ static void pe_snk_ready_run(int port)
 				set_state_pe(port, PE_ALERT_RECEIVED);
 				return;
 #ifdef CONFIG_USB_PD_EPR
-			case PD_DATA_EPR_MODE:
+			case PD_DATA_EPR_MODE: {
 				struct eprmdo *mdo = (void *)payload;
 
 				if (mdo->action == PD_EPRMDO_ACTION_EXIT) {
@@ -4043,6 +4043,7 @@ static void pe_snk_ready_run(int port)
 						PE_SNK_EPR_MODE_EXIT_RECEIVED);
 				}
 				return;
+			}
 #endif /* CONFIG_USB_PD_EPR */
 #endif /* CONFIG_USB_PD_REV30 */
 			default:

@@ -17,6 +17,8 @@
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 #include "usb_pd.h"
+#include "usb_pe_private.h"
+#include "usb_pe_sm.h"
 
 #include <stdint.h>
 
@@ -174,6 +176,15 @@ ZTEST_F(usbc_console_pd, test_pd_srccaps)
 	zassert_not_null(strstr(cmd_output, "Role:"));
 	zassert_not_null(strstr(cmd_output, "TC State:"));
 
+	/* Also verify state command in EPR mode */
+	pe_set_fn(TEST_PORT, PE_FLAGS_IN_EPR_FN);
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 state"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, " EPR"));
+	pe_clr_fn(TEST_PORT, PE_FLAGS_IN_EPR_FN);
+
 	/* Exercise power negotiation, swaps, resets, and controls with partner
 	 * connected */
 	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dev 5"));
@@ -186,6 +197,16 @@ ZTEST_F(usbc_console_pd, test_pd_srccaps)
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_USBC_VCONN_SWAP)) {
 		zassert_ok(
 			shell_execute_cmd(get_ec_shell(), "pd 0 swap vconn"));
+	}
+	/* Test EPR subcommands while in Sink role */
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_EPR)) {
+		zassert_equal(EC_ERROR_PARAM_COUNT,
+			      shell_execute_cmd(get_ec_shell(), "pd 0 epr"));
+		zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 epr enter"));
+		zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 epr exit"));
+		zassert_equal(EC_ERROR_PARAM3,
+			      shell_execute_cmd(get_ec_shell(),
+						"pd 0 epr invalid"));
 	}
 	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 soft"));
 	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 hard"));
@@ -465,6 +486,21 @@ ZTEST_F(usbc_console_pd, test_pd_state_and_info)
 	cmd_output =
 		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
 	zassert_not_null(strstr(cmd_output, "Port C0 CC"));
+}
+
+ZTEST_F(usbc_console_pd, test_pd_epr)
+{
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_EPR)) {
+		ztest_test_skip();
+	}
+
+	/* Insufficient argument count */
+	zassert_equal(EC_ERROR_PARAM_COUNT,
+		      shell_execute_cmd(get_ec_shell(), "pd 0 epr"));
+
+	/* Non-sink role rejection (returns EC_SUCCESS without executing
+	 * command) */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 epr enter"));
 }
 
 ZTEST_F(usbc_console_pd, test_prllog)
