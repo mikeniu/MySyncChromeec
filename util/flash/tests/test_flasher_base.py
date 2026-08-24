@@ -1,0 +1,61 @@
+import unittest
+from unittest.mock import MagicMock, patch
+
+from util.flash.flasher_base import BaseEcFlasher
+from util.flash.servo_utils import ServoDriver
+
+class DummyFlasher(BaseEcFlasher):
+    def prepare_dut(self):
+        pass
+
+    def execute_flash(self):
+        pass
+
+    def cleanup_dut(self):
+        pass
+
+class TestBaseEcFlasher(unittest.TestCase):
+    def setUp(self):
+        self.servo = MagicMock(spec=ServoDriver)
+        self.args = MagicMock()
+        self.args.board = "testboard"
+        self.args.verify = False
+        self.args.try_apshutdown = False
+        self.args.try_apshutdown_count = 16
+        
+        self.flasher = DummyFlasher(self.servo, self.args)
+
+    @patch("time.sleep")
+    def test_run_with_apshutdown(self, mock_sleep):
+        self.args.try_apshutdown = True
+        self.args.try_apshutdown_count = 3
+        
+        self.flasher.run()
+        
+        self.servo.set.assert_any_call("ec_uart_regexp", "None")
+        
+        self.assertEqual(self.servo.set.call_args_list.count((("ec_uart_cmd", "apshutdown"),)), 3)
+        self.assertEqual(mock_sleep.call_count, 3)
+
+    @patch("time.sleep")
+    def test_run_without_apshutdown(self, mock_sleep):
+        self.flasher.run()
+        
+        # Verify it wasn't called
+        calls = [c for c in self.servo.set.call_args_list if c[0][0] == "ec_uart_cmd" and c[0][1] == "apshutdown"]
+        self.assertEqual(len(calls), 0)
+        self.assertEqual(mock_sleep.call_count, 0)
+
+    @patch("time.sleep")
+    def test_run_with_apshutdown_on_failure(self, mock_sleep):
+        self.args.try_apshutdown = True
+        self.args.try_apshutdown_count = 3
+        
+        self.flasher.execute_flash = MagicMock(side_effect=RuntimeError("Flash error"))
+        
+        with self.assertRaises(RuntimeError):
+            self.flasher.run()
+            
+        self.servo.set.assert_any_call("ec_uart_regexp", "None")
+        self.assertEqual(self.servo.set.call_args_list.count((("ec_uart_cmd", "apshutdown"),)), 3)
+        self.assertEqual(mock_sleep.call_count, 3)
