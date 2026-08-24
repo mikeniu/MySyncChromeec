@@ -159,6 +159,12 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
  */
 #define AC_IRQ_DISABLE_DURATION (2000 * MSEC)
 
+/*
+ * Delay after POWER_GOOD drops during a PSCI hard reset to allow POWER_GOOD
+ * to recover before treating it as a PSCI shutdown.
+ */
+#define HARD_RESET_POWER_GOOD_LOST_DELAY (200 * MSEC)
+
 /* Heartbeat wake interval (45 minutes) */
 #define HEARTBEAT_WAKE_INTERVAL_SEC (45 * 60)
 
@@ -226,6 +232,11 @@ static char long_warm_reset;
  *  This variable is initialized to 0 i.e. POWER_G3
  */
 static enum power_state power_state_before_warm_reset;
+
+#ifdef CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET
+/* Deadline to check if POWER_GOOD is lost or just transient drop */
+static timestamp_t power_good_lost_deadline;
+#endif
 
 enum power_request_t {
 	POWER_REQ_NONE,
@@ -565,6 +576,14 @@ static void sys_rst_timer_expired(void)
 }
 DECLARE_DEFERRED(sys_rst_timer_expired);
 
+#ifdef CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET
+static void power_good_lost_expired(void)
+{
+	task_wake(TASK_ID_CHIPSET);
+}
+DECLARE_DEFERRED(power_good_lost_expired);
+#endif
+
 void chipset_sys_rst_interrupt(enum gpio_signal signal)
 {
 	/*
@@ -733,8 +752,24 @@ static int set_pmic_pwron(int enable, uint8_t event)
 
 	if (enable &&
 	    (event == POWER_ON_BY_AC_ON || event == POWER_ON_BY_RTC_ALARM)) {
+#if defined(CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET) && \
+	defined(CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS)
+		/* Pass AC_OK (CBL_PWRN) as a temporary PON trigger to PMIC */
 		passthru_ac_on_to_pmic();
+#endif
 		ret = wait_pmic_pwron(enable, PMIC_POWER_AP_RESPONSE_TIMEOUT);
+#if defined(CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET) && \
+	defined(CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS)
+		/*
+		 * Deassert AC_OK to PMIC once POWER_GOOD is up. If left
+		 * asserted during S0, a subsequent PSCI shutdown with charger
+		 * plugged in causes PMIC to immediately re-trigger power-on
+		 * for off-mode charging on POWER_GOOD collapse. The EC would
+		 * then see POWER_GOOD recover and misinterpret shutdown as a
+		 * hard reset.
+		 */
+		reset_ac_passthru_pmic_signal();
+#endif
 	} else {
 		gpio_set_level(GPIO_PMIC_KPD_PWR, 1);
 		if (!enable)
@@ -882,6 +917,11 @@ static void power_off_seq(uint8_t shutdown_event)
 
 	lid_opened = 0;
 	ac_on = 0;
+
+#ifdef CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET
+	power_good_lost_deadline.val = 0;
+	hook_call_deferred(&power_good_lost_expired_data, -1);
+#endif
 }
 
 /**
@@ -913,9 +953,17 @@ static int power_on_seq(uint8_t poweron_event)
 	}
 
 	CPRINTS("POWER_GOOD seen");
-	/* if power-on is a success passthru the signals again */
+#ifdef CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
+	/*
+	 * If power-on is a success, pass through lid open. When
+	 * SUPPORT_HARD_RESET is enabled, do not re-assert AC passthru to
+	 * avoid a persistent PON trigger state during S0.
+	 */
+#ifndef CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET
 	passthru_ac_on_to_pmic();
+#endif
 	passthru_lid_open_to_pmic();
+#endif
 
 	return EC_SUCCESS;
 }
@@ -1045,11 +1093,38 @@ static uint8_t check_for_power_off_event(void)
 
 	power_button_was_pressed = pressed;
 
+#ifdef CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET
+	/*
+	 * POWER_GOOD released by AP: wait to distinguish between
+	 * a PSCI shutdown and a PSCI hard reset.
+	 */
+	if (!power_has_signals(IN_POWER_GOOD)) {
+		if (power_good_lost_deadline.val == 0) {
+			power_good_lost_deadline.val =
+				now.val + HARD_RESET_POWER_GOOD_LOST_DELAY;
+			CPRINTS("POWER_GOOD lost, waiting %dms",
+				HARD_RESET_POWER_GOOD_LOST_DELAY / MSEC);
+			hook_call_deferred(&power_good_lost_expired_data,
+					   HARD_RESET_POWER_GOOD_LOST_DELAY);
+		} else if (timestamp_expired(power_good_lost_deadline, &now)) {
+			power_good_lost_deadline.val = 0;
+			CPRINTS("POWER_GOOD is lost (timeout)");
+			return POWER_OFF_BY_POWER_GOOD_LOST;
+		}
+	} else {
+		if (power_good_lost_deadline.val != 0) {
+			CPRINTS("POWER_GOOD recovered");
+			power_good_lost_deadline.val = 0;
+			hook_call_deferred(&power_good_lost_expired_data, -1);
+		}
+	}
+#else
 	/* POWER_GOOD released by AP : shutdown immediately */
 	if (!power_has_signals(IN_POWER_GOOD)) {
 		CPRINTS("POWER_GOOD is lost");
 		return POWER_OFF_BY_POWER_GOOD_LOST;
 	}
+#endif
 
 	return POWER_OFF_CANCEL;
 }
