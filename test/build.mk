@@ -19,8 +19,6 @@ test-list-host =
 test-list-host += usb_sm_framework_h3
 test-list-host += usb_typec_drp_acc_trysrc
 test-list-host += usb_tcpmv2_compliance
-test-list-host += usb_pe_drp
-test-list-host += usb_pe_drp_noextended
 endif
 
 # Build up the list of coverage test targets based on test-list-host, but
@@ -42,10 +40,6 @@ sbs_charging-y=sbs_charging.o
 usb_sm_framework_h3-y=usb_sm_framework_h3.o
 usb_typec_drp_acc_trysrc-y=usb_typec_drp_acc_trysrc.o vpd_api.o \
 	usb_sm_checks.o
-usb_pe_drp_old-y=usb_pe_drp_old.o usb_sm_checks.o
-usb_pe_drp_old_noextended-y=usb_pe_drp_old_noextended.o usb_sm_checks.o
-usb_pe_drp-y=usb_pe_drp.o usb_sm_checks.o
-usb_pe_drp_noextended-y=usb_pe_drp_noextended.o usb_sm_checks.o
 usb_tcpmv2_compliance-y=usb_tcpmv2_compliance.o usb_tcpmv2_compliance_common.o \
 	usb_tcpmv2_td_pd_ll_e3.o \
 	usb_tcpmv2_td_pd_ll_e4.o \
