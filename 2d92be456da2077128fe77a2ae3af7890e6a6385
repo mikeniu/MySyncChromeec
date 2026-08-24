@@ -54,6 +54,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "43b8f465_7772fe6e",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-24T16:23:25Z",
+      "side": 1,
+      "message": "With the follow up changes in the stack, this would abort any further analysis between builds. So we may not get a comparison in sections, but we could still get a report on symbols.",
+      "parentUuid": "362be008_57f8f802",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c450799_30d7b406",
@@ -208,6 +226,24 @@
       "side": 1,
       "message": "If we can reasonably assume that the map file will be valid, it might be better to just not implement a backup plan and let this case fail.",
       "parentUuid": "826e034b_eaa79c13",
+      "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2051b86_a5dded3c",
+        "filename": "zephyr/zmake/zmake/analyze_build_diff.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-24T16:23:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a94261a2_8f4bf7ec",
       "revId": "2d92be456da2077128fe77a2ae3af7890e6a6385",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
