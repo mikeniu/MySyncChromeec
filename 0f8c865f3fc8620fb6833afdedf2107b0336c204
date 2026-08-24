@@ -16,6 +16,29 @@
       "message": "@brandon.breitenstein@intel.com I don\u0027t know what the correct value for this ought to be. I briefly experimented with increasing it to 50 ms. That reduced but did not eliminate the incidence of S0ix watchdogs in the absence of CL:8220610. Perhaps there is some higher value that would be sufficient.\n\nI\u0027m not exactly sure what that would prove other than that the watchdog timeouts are merely the result of excessive delay and not some deeper misconfiguration with deep sleep.",
       "revId": "0f8c865f3fc8620fb6833afdedf2107b0336c204",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b68b0fe8_42ed2d62",
+        "filename": "zephyr/boards/google/realtek/realtek.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-24T19:26:01Z",
+      "side": 1,
+      "message": "A recent change allows the `idlestats` command to show how much time the EC spends awake vs. sleep modes on the Realtek EC.\n\nDoes increasing this from 500us to 5000us affect the heavy sleep time?",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 27
+      },
+      "revId": "0f8c865f3fc8620fb6833afdedf2107b0336c204",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
