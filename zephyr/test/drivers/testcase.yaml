@@ -1573,9 +1573,13 @@ tests:
   drivers.usbc_console_pd:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_CONSOLE_PD=y
+    - CONFIG_PLATFORM_EC_USB_PD_PRL_EVENT_LOG=y
+    - CONFIG_PLATFORM_EC_USB_PD_TRY_SRC=y
   drivers.usbc_console_pd.ec_host_cmd:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_CONSOLE_PD=y
+    - CONFIG_PLATFORM_EC_USB_PD_PRL_EVENT_LOG=y
+    - CONFIG_PLATFORM_EC_USB_PD_TRY_SRC=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
@@ -1583,6 +1587,8 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_CONSOLE_PD=y
     - CONFIG_PLATFORM_EC_TCPC_INTERRUPT=n
+    - CONFIG_PLATFORM_EC_USB_PD_PRL_EVENT_LOG=y
+    - CONFIG_PLATFORM_EC_USB_PD_TRY_SRC=y
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
     - ./usbc_console_pd/usbc_legacy.dts
@@ -1590,6 +1596,8 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_CONSOLE_PD=y
     - CONFIG_PLATFORM_EC_TCPC_INTERRUPT=n
+    - CONFIG_PLATFORM_EC_USB_PD_PRL_EVENT_LOG=y
+    - CONFIG_PLATFORM_EC_USB_PD_TRY_SRC=y
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
     - ./usbc_console_pd/usbc_legacy.dts
