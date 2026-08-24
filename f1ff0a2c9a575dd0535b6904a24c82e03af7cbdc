@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f32f9a52_8cfa55af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-24T02:47:30Z",
+      "side": 1,
+      "message": "18:01:07: NOTICE: zephyr/dts/bindings/battery/sunwoda,l26d4pk3.yaml: file should not be executable; chmod -x to fix",
+      "revId": "f1ff0a2c9a575dd0535b6904a24c82e03af7cbdc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
