@@ -46,6 +46,30 @@
       },
       "revId": "6eb3adfb41bc0bb7f546cfdd1a351950984955d3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "229071d9_a8ca132d",
+        "filename": "zephyr/shim/src/flash.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-08-24T11:52:55Z",
+      "side": 1,
+      "message": "I actually ended up removing this check altogether. Intended to increase robustness against potentially buggy flash driver implementations that fail to follow the API source address alignment requirements, it actually caused selected unit tests to fail. That\u0027s because word alignment of the source buffer has not been enforced so far and the tests implementation uses unaligned buffers, for example:\n```c\nZTEST(rwsig, test_invalid_signature)\n{\n\t/* erase the first byte of signature */\n\tcrec_flash_physical_write(SIG_OFFSET + sig_header.sig_offset, 1,\n\t\t\t\t  \"\\xff\");\n\tzassert_false(rwsig_check_signature());\n\tzassert_equal(system_disable_jump_fake.call_count, 1);\n}\n```\nThe current test code relies on `crec_flash_physical_write` to accept unaligned buffers to simulate flash corruption and check signature verification in such scenarios.\n\nThe test code could be updated to only use aligned buffers. However, there might be more cases like this where unaligned data is used with the expectation that it will be accepted, potentially much harder to notice and fix than unit tests. To avoid that risk, I removed the check.\n\nCC: @dawidn@google.com",
+      "parentUuid": "80c1b882_bcbc464d",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 54
+      },
+      "revId": "6eb3adfb41bc0bb7f546cfdd1a351950984955d3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
