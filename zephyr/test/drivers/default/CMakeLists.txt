@@ -23,6 +23,7 @@ target_sources(app PRIVATE
     src/integration/usbc/usb_pd_rev3.c
     src/integration/usbc/usb_pd_timer.c
     src/integration/usbc/usb_prl.c
+    src/integration/usbc/usb_pe.c
     src/i2c.c
     src/i2c_passthru.c
     src/isl923x.c
