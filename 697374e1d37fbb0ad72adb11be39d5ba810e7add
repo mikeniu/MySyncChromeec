@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f974bb0_fa9f5a2d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-08-24T15:59:46Z",
+      "side": 1,
+      "message": "Remove the low coverage reason.",
+      "revId": "697374e1d37fbb0ad72adb11be39d5ba810e7add",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
