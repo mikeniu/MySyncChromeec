@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c211df6b_edd7a6ec",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-24T18:29:42Z",
+      "side": 1,
+      "message": "We can get 3 chars in 16bits using \nRadix-40 encoding - Allows 40 characters (`a-z`, `0-9`, `_`, `.`, `-`)\n```\nuint16_t file_code \u003d (val0 * 1600) + (val1 * 40) + val2;\n```\n -- or -- \n \n5-bit encoding (chars: `a-z`, `0-5`)\n```\n// (c0: 5 bits, c1: 5 bits, c2: 5 bits) -\u003e 15 bits\nuint16_t file_code \u003d ((c0 - \u0027a\u0027) \u003c\u003c 10) | ((c1 - \u0027a\u0027) \u003c\u003c 5) | (c2 - \u0027a\u0027);\n```\n\nNit: This could be cleaner using a union.\n\n```\nunion {\n  struct {\n    uint16 file_code;\n    uint8 line;\n    uint8 thread;\n  };\n  uint32_t raw;\n} info;\n```",
+      "revId": "2725ea42949863b75b87dcfb656d72a669589186",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
