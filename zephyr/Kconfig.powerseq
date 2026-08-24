@@ -314,6 +314,15 @@ config PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
 	when the switch-cap power is active. This mechanism ensures that the PMIC's
 	power signal flow remain undisturbed.
 
+config PLATFORM_EC_SUPPORT_HARD_RESET
+	bool "Support distinguishing PSCI Hard Reset from PSCI Shutdown"
+	depends on PLATFORM_EC_POWERSEQ_QC_EXP
+	default n
+	help
+	  Enable a 200ms delay on S4C (POWER_GOOD) rail loss to distinguish
+	  between a PSCI Hard Reset and a PSCI Shutdown. This prevents the
+	  system from powering off prematurely during a hard reset.
+
 config PLATFORM_EC_HOSTCMD_ENABLE_OFFMODE_HEARTBEAT
 	bool "Enable Support for AP to enter G3 and enable heartbeat wake"
 	depends on PLATFORM_EC_POWERSEQ_QC_EXP && PLATFORM_EC_HOSTCMD
