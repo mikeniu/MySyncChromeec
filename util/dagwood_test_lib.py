@@ -10,6 +10,16 @@ supporting both host-direct and containerized execution.
 """
 
 import argparse
+from pathlib import Path
+import sys
+
+
+DAGWOOD_DIR = Path(__file__).resolve().parents[2] / "dagwood"
+if str(DAGWOOD_DIR) not in sys.path:
+    sys.path.append(str(DAGWOOD_DIR))
+
+# pylint: disable=import-error, wrong-import-position
+import utils
 
 
 def add_common_args(parser: argparse.ArgumentParser):
@@ -42,8 +52,14 @@ def add_common_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "-d",
         "--device-serial",
-        default="/dev/ttyACM1",
-        help="Device serial port (default: /dev/ttyACM1)",
+        default=None,
+        help="Device serial port (default: automatically detected from Dagwood board)",
+    )
+    parser.add_argument(
+        "--board-id",
+        type=str,
+        required=False,
+        help="Dagwood board serial number",
     )
     parser.add_argument(
         "-r",
@@ -75,6 +91,8 @@ def get_twister_args(
         A list of string arguments to be passed to the twister command.
     """
     flash_cmd = "../dagwood/flash.py"
+    if getattr(args, "board_id", None):
+        flash_cmd += f",--board-id,{args.board_id}"
     if args.sram:
         flash_cmd += ",-r"
 
@@ -88,11 +106,16 @@ def get_twister_args(
     if args.build_only:
         twister_args.append("-b")
     else:
+        device_serial = args.device_serial
+        if not device_serial:
+            dev = utils.find_usb_device(getattr(args, "board_id", None))
+            device_serial = utils.find_ec_port(dev)
+
         twister_args.extend(
             [
                 "--device-testing",
                 "--device-serial",
-                args.device_serial,
+                device_serial,
                 "--flash-command",
                 flash_cmd,
                 "--device-flash-timeout",
