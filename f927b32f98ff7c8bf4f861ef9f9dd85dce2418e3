@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f40b6a02_7529f837",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-25T16:12:10Z",
+      "side": 1,
+      "message": "common/usbc/: 4564/5520 -\u003e 4645/5592 (+81/+72 | +9) [82.7% -\u003e 83.1% (+0.4%)]\n    common/usbc/usb_prl_sm.c: 650/745 -\u003e 725/817 (+75/+72 | +3) [87.2% -\u003e 88.7% (+1.5%)]\n    common/usbc/usb_pe_drp_sm.c: 2443/3154 -\u003e 2446/3154 (+3/+0 | +3) [77.5% -\u003e 77.6% (+0.1%)]\n    common/usbc/usb_pd_console.c: 136/139 -\u003e 138/139 (+2/+0 | +2) [97.8% -\u003e 99.3% (+1.4%)]\n    common/usbc/usb_tc_drp_acc_trysrc_sm.c: 1335/1482 -\u003e 1336/1482 (+1/+0 | +1) [90.1% -\u003e 90.1% (+0.1%)]",
+      "revId": "f927b32f98ff7c8bf4f861ef9f9dd85dce2418e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
