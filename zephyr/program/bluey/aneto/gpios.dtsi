@@ -81,6 +81,9 @@
 			gpios = <&gpio7 4 (GPIO_INPUT)>;
 			enum-name = "GPIO_BATT_PRES_ODL";
 		};
+		gpio_ec_tchscr_report_en: ec_tchscr_report_en {
+			gpios = <&gpio7 5 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
 		gpio_ec_soc_int_odl: ec_soc_int_odl {
 			gpios = <&gpio7 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 			enum-name = "GPIO_EC_INT_L";
@@ -93,6 +96,9 @@
 		};
 		gpio_en_pp3300_z1: en_pp3300_z1 {
 			gpios = <&gpio8 5 (GPIO_OUTPUT)>;
+		};
+		gpio_edp_bl_en_ec_3v: edp_bl_en_ec_3v {
+			gpios = <&gpio8 6 (GPIO_INPUT)>;
 		};
 		gpio_sys_rst_odl: sys_rst_odl {
 			gpios = <&gpio9 3 (GPIO_INPUT)>;
