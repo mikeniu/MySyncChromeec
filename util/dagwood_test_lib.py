@@ -106,10 +106,13 @@ def get_twister_args(
     if args.build_only:
         twister_args.append("-b")
     else:
+        board_id = getattr(args, "board_id", None)
         device_serial = args.device_serial
         if not device_serial:
-            dev = utils.find_usb_device(getattr(args, "board_id", None))
+            dev = utils.find_usb_device(board_id)
             device_serial = utils.find_ec_port(dev)
+            if not board_id:
+                board_id = dev.serial_number
 
         twister_args.extend(
             [
@@ -122,6 +125,9 @@ def get_twister_args(
                 "60",
             ]
         )
+
+        if board_id:
+            twister_args.append(f"--pytest-args=--board-id={board_id}")
 
     if args.sram:
         twister_args.append("-x=SNIPPET=sram-only")
