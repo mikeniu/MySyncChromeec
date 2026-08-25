@@ -8,8 +8,7 @@ find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 target_sources(app PRIVATE
 	${PLATFORM_EC_PROGRAM_DIR}/tanjiro/src/dp_alt_mode.c
 	${PLATFORM_EC_PROGRAM_DIR}/tanjiro/src/hibernate.c
-	${PLATFORM_EC_PROGRAM_DIR}/tanjiro/src/hooks.c
-	${PLATFORM_EC_PROGRAM_DIR}/tanjiro/src/i2c.c)
+	${PLATFORM_EC_PROGRAM_DIR}/tanjiro/src/hooks.c)
 
 if(DEFINED CONFIG_BOARD_TANJIRO)
 	project(tanjiro)
