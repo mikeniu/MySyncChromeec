@@ -8,6 +8,8 @@
 #include "gpio/gpio.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
+#include "power.h"
+#include "timer.h"
 
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
@@ -16,10 +18,22 @@
 
 LOG_MODULE_REGISTER(skywalker_backlight, LOG_LEVEL_INF);
 
-void edp_bl_en_1v8(enum gpio_signal signal)
+static void tchscr_report_ec_disable(void)
 {
-	int state = gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_edp_bl_en_1v8));
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_bl_en_od), state);
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tchscr_report_ec), 0);
+}
+DECLARE_DEFERRED(tchscr_report_ec_disable);
+
+void touchscreen_report_control(enum gpio_signal signal)
+{
+	if (gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_edp_bl_en_1v8))) {
+		hook_call_deferred(&tchscr_report_ec_disable_data,
+				   10 * USEC_PER_MSEC);
+	} else {
+		hook_call_deferred(&tchscr_report_ec_disable_data, -1);
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tchscr_report_ec),
+				1);
+	}
 }
 
 static void edp_bl_en_1v8_enable(void)
