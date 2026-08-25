@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5572a6a9_0b6032cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-08-25T08:10:55Z",
+      "side": 1,
+      "message": "Hi All,\n\nKindly review the change to help merge. Thank you",
+      "revId": "e826e4019c1bf75e60fc928ecf55ad2cacf9bf98",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
