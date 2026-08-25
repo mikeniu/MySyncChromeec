@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f7a346b_09bba5de",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-25T23:42:33Z",
+      "side": 1,
+      "message": "I don\u0027t think this is true.  If Realtek really masked all interrupts, nothing could actually wake the EC from sleep mode.\n\nThe recurring 200ms tick and 1 second tick that run on the system workqueue should be waking up the EC at a minimum of these rates.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 67
+      },
+      "revId": "827dcb7ebc559dfd0d1d3ee70d0310e521e3eaa7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
