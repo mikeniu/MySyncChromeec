@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5dbd2b36_793596d1",
+        "filename": "zephyr/test/drivers/panic/src/panic.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-25T16:21:27Z",
+      "side": 1,
+      "message": "Consider adding an assertion for `panic_get_exception_reg` here to ensure it\u0027s correctly set when `path` is NULL, similar to what is done in `test_panic_data_write_assert` above:\n\n```c\nzassert_equal(panic_get_exception_reg(pdata),\n              (uint8_t)(uintptr_t)k_current_get());\n```",
+      "range": {
+        "startLine": 473,
+        "startChar": 0,
+        "endLine": 473,
+        "endChar": 0
+      },
+      "revId": "8ac7ff6b577d9d753b34c2f8dc2c0303f4a9e5b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
