@@ -169,11 +169,6 @@
 			gpios = <&gpiod 2 (GPIO_INPUT)>;
 			enum-name = "GPIO_LID_OPEN";
 		};
-		/*
-		gpio_ec_fan2_tach_od: ec_fan2_tach_od {
-			gpios = <&gpiod 3 (GPIO_INPUT | GPIO_PULL_UP)>;
-		};
-		*/
 		gpio_ec_gsc_packet_mode: ec_gsc_packet_mode {
 			gpios = <&gpiod 4 (GPIO_OUTPUT)>;
 			enum-name = "GPIO_PACKET_MODE_EN";
@@ -207,5 +202,13 @@
 		gpio_ec_volup_btn_odl: ec_volup_btn_odl {
 			gpios = <&gpiof 5 (GPIO_INPUT)>;
 		};
+	};
+
+	unused-pins {
+		compatible = "unused-gpios";
+
+		unused-gpios =
+			<&gpiob 6 0>,
+			<&gpiod 3 0>;
 	};
 };
