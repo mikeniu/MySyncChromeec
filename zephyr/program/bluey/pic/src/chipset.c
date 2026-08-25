@@ -46,6 +46,14 @@ void board_chipset_shutdown_pic(void)
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_pic,
 	     HOOK_PRIO_DEFAULT);
 
+static void board_chipset_pre_init_pic(void)
+{
+	hook_call_deferred(&disable_pp5000_data, -1);
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 1);
+}
+DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init_pic,
+	     HOOK_PRIO_DEFAULT);
+
 static void board_chipset_hard_off_pic(void)
 {
 	hook_call_deferred(
