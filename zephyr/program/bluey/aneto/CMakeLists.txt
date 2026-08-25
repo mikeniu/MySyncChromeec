@@ -5,3 +5,4 @@
 zephyr_library_sources("src/extpower_custom.c")
 zephyr_library_sources("src/chipset.c")
 zephyr_library_sources("src/fan.c")
+zephyr_library_sources("src/touch_panel.c")
