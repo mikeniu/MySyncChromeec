@@ -33,6 +33,24 @@
       "message": "Hekla does not support TBT so we don\u0027t need to enable it.",
       "revId": "402a93cb13082cf75366e25864c9fe2563e5f0c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "872aacc4_755f4174",
+        "filename": "zephyr/program/ocelot/hekla/project.conf",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1380943
+      },
+      "writtenOn": "2026-08-25T08:09:05Z",
+      "side": 1,
+      "message": "Done. I enabled it as CONFIG_PLATFORM_EC_USBC_RETIMER_FW_UPDATE\u003dy defined for Hekla. May be we need to disable these if there is no retimer support?",
+      "parentUuid": "4d102253_daa82fa7",
+      "revId": "402a93cb13082cf75366e25864c9fe2563e5f0c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
