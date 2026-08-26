@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "204bbe57_4a291e4b",
+        "filename": "zephyr/cmake/linker/ld/linker_libraries.cmake",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-26T20:38:30Z",
+      "side": 1,
+      "message": "Will remove this, it\u0027s introduced in previous rebase, not needed.",
+      "parentUuid": "2213bef1_694044cd",
+      "revId": "1b3af4edf29f3094165273aabd5832d40926a477",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9bb5f0e7_a66fb288",
         "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
         "patchSetId": 6
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-26T18:25:57Z",
       "side": 1,
       "message": "I\u0027m looking at the MECC schematic v0.8, and it looks like this should be GPIO 120.",
+      "revId": "1b3af4edf29f3094165273aabd5832d40926a477",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa30244e_8bb496e2",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-26T20:38:30Z",
+      "side": 1,
+      "message": "Same mistake as above. will correct this.",
+      "parentUuid": "9bb5f0e7_a66fb288",
       "revId": "1b3af4edf29f3094165273aabd5832d40926a477",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }

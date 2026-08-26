@@ -16,6 +16,24 @@
       "message": "As noted in the `dsp_comms` node, I don\u0027t think this is right. 123 on the schematic is indeed `C_EN_PP5000_TYPEA_3V3_PP`. `C_EC_ISH_ALRT_1V8_OD` is 120.",
       "revId": "f09f02b556e191adc8387cc7815ee04d91bc928a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4dd4634_2546d16c",
+        "filename": "zephyr/program/atria/atriarvp-rtk/gpio.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-08-26T20:38:30Z",
+      "side": 0,
+      "message": "Will correct this. Actually you mentioned this to me quite some time ago, I updated Atria ISH bring up doc, forgot to update here.",
+      "parentUuid": "75ed4f4e_609ab1ca",
+      "revId": "f09f02b556e191adc8387cc7815ee04d91bc928a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
