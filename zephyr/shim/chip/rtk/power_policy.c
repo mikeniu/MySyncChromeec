@@ -4,6 +4,7 @@
  */
 
 #include "system.h"
+#include "watchdog.h"
 
 #include <zephyr/kernel.h>
 #include <zephyr/pm/pm.h>
@@ -30,5 +31,12 @@ const struct pm_state_info *pm_policy_next_state(uint8_t cpu, int32_t ticks)
 			ret = &cpu_state_list[i];
 		}
 	}
+
+	if (ret != NULL) {
+		/* Reload watchdog before entering deep sleep to avoid it firing
+		 * while interrupts are disabled */
+		watchdog_reload();
+	}
+
 	return ret;
 }
