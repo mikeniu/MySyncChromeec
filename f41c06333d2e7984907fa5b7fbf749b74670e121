@@ -16,6 +16,23 @@
       "message": "What was the error on this CL?",
       "revId": "f41c06333d2e7984907fa5b7fbf749b74670e121",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5209a1a8_19bbb44e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-08-26T19:26:54Z",
+      "side": 1,
+      "message": "i think twister blew up:\n```\nERROR   - CMake build failure: /mnt/host/source/src/platform/ec/zephyr/test/nissa for native_sim/native\nINFO    - 152/653 native_sim/native         nissa.uldren                                       ERROR CMake build failure (native \u003chost/llvm\u003e)\n...\ndevicetree error: ./boards/uldren.dts:83 (column 37): parse error: /named-gpios/voldn_btn_odl: duplicate node name\n```",
+      "revId": "f41c06333d2e7984907fa5b7fbf749b74670e121",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
