@@ -64,6 +64,9 @@ endif()
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
                                                             console_buffer.c)
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CONSOLE_CMD_HC
+                                                            console_hc.c)
+
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_CROS_DRV
                                                             ioex.c
                                                             ioex_drv.c)
