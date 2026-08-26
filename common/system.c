@@ -664,6 +664,9 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	 */
 	hook_notify(HOOK_SYSJUMP);
 
+	/* Ensure the next image starts with a fresh watchdog timer */
+	watchdog_reload();
+
 	chip_pre_system_jump();
 
 #ifdef CONFIG_DMA_CROS
