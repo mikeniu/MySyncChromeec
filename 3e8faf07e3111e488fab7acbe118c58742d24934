@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "901e8ac4_8b510163",
+        "filename": "zephyr/test/drivers/default/CMakeLists.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-26T22:16:20Z",
+      "side": 1,
+      "message": "Ack. Filed b/553125322 to track modularizing drivers/default into domain-specific test suites. For now, keeping these integration tests under src/integration/usbc/ within drivers.default avoids duplicating the multi-node emulator and overlay configurations.",
+      "parentUuid": "b8e2ed87_2c4d4fe8",
+      "revId": "3e8faf07e3111e488fab7acbe118c58742d24934",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0988b73f_4c0a9af9",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-08-26T21:30:50Z",
       "side": 1,
       "message": "Nit: It\u0027s kind of weird to interleave the source and sink tests.",
+      "revId": "3e8faf07e3111e488fab7acbe118c58742d24934",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c673410_cbb802e8",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_prl.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-26T22:16:20Z",
+      "side": 1,
+      "message": "Done. Grouped all Sink tests together and all Source tests together.",
+      "parentUuid": "0988b73f_4c0a9af9",
       "revId": "3e8faf07e3111e488fab7acbe118c58742d24934",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
