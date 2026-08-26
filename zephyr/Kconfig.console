@@ -177,3 +177,11 @@ config PLATFORM_EC_AP_FW_STATE
 	help
 	  Enable storing the last seen AP FW state.
 	  Provides a console command `apfwscreens` to view or clear it.
+
+config PLATFORM_EC_CONSOLE_CMD_HC
+	bool "Raw Host Command console command"
+	depends on PLATFORM_EC_HOSTCMD || EC_HOST_CMD
+	default y
+	help
+	  Enable the `hc` console command for raw host command execution over UART.
+
