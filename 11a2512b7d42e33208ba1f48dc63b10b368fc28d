@@ -72,6 +72,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "97b46c35_f121a5a1",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 3059,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T20:14:42Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9b2222e1_d874d87b",
+      "revId": "11a2512b7d42e33208ba1f48dc63b10b368fc28d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c076fb74_58918ff8",

@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04d47bdb_afe9e157",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 3073,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T20:14:42Z",
+      "side": 1,
+      "message": "I\u0027m not sure how this line was not covered by `test_dbg_acc_no_dts_force_sink`. Do you see this line covered locally?",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9029f91_948e9775",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T20:14:42Z",
+      "side": 1,
+      "message": "I don\u0027t think this is the best way to check this. Ideally, TCPM state would be inferred based on the CC and VBUS values as seen through the partner emulator or the TCPC and charger emulators. I think we have some other tests that check it this way.",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "350c9654_4ed0f8bb",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T20:14:42Z",
+      "side": 1,
+      "message": "Nit: Is this sleep supposed to allow the previous disconnect/S0 transition to take effect? If so, it should be up there. All of the emulator init stuff you just did should take effect immediately. In any case, `test_set_chipset_to_s0` already ends with a sleep.",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07eb1663_1f086147",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T20:14:42Z",
+      "side": 1,
+      "message": "If you always need this here, there should be a sleep at the end of `connect_partner` or, perhaps better, some of the emulator calls that underlie `connect_partner`.",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6b3ed8b_2fc699dd",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T20:14:42Z",
+      "side": 1,
+      "message": "Should AttachWait.SNK be possible? I thought the partner was configured to sink-only.",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4264d0d_47058f01",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T20:14:42Z",
+      "side": 1,
+      "message": "Line length should be 80 columns",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5764e6f2_5470a779",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T20:14:42Z",
+      "side": 1,
+      "message": "Isn\u0027t this already checked by the above test?",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
