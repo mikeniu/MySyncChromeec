@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2213bef1_694044cd",
+        "filename": "zephyr/cmake/linker/ld/linker_libraries.cmake",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T18:25:57Z",
+      "side": 1,
+      "message": "Is this necessary, or does it happen implicitly? If this is needed, I think it should probably be a separate CL, since it doesn\u0027t just affect atria.",
+      "revId": "1b3af4edf29f3094165273aabd5832d40926a477",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bb5f0e7_a66fb288",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T18:25:57Z",
+      "side": 1,
+      "message": "I\u0027m looking at the MECC schematic v0.8, and it looks like this should be GPIO 120.",
+      "revId": "1b3af4edf29f3094165273aabd5832d40926a477",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
