@@ -671,6 +671,12 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	dma_disable_all();
 #endif /* CONFIG_DMA_CROS */
 
+	/*
+	 * Reload watchdog immediately before jumping so that the target image
+	 * starts with a fresh watchdog window.
+	 */
+	watchdog_reload();
+
 	/* Jump to the reset vector */
 	resetvec = (void (*)(void))init_addr;
 	resetvec();
