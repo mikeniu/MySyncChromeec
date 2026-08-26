@@ -5,9 +5,8 @@
 
 / {
 	batteries {
-		default_battery:smp-atl-4-550 {
-			compatible = "smp,smp-atl-4-550", "battery-smart";
-			has_manuf_info;
+		default_battery: cosmx-ap23cbp {
+			compatible = "cosmx,ap23cbp", "battery-smart";
 		};
 	};
 };
