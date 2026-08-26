@@ -639,8 +639,17 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	/* Call other hooks; these may add tags */
 	hook_notify(HOOK_SYSJUMP);
 
+<<<<<<< HEAD   (3762013fc8807025e783b962a7d3ba51f6366a0a cbi: Check GPIO_EC_CBI_WP in legacy eeprom_is_write_protecte)
 	/* Disable interrupts before jump */
 	interrupt_disable_all();
+||||||| BASE   (b80e76e37a39b6d0b0181cc2f850eb432b7987d7 test: ec-aic: add a fan test)
+	chip_pre_system_jump();
+=======
+	/* Ensure the next image starts with a fresh watchdog timer */
+	watchdog_reload();
+
+	chip_pre_system_jump();
+>>>>>>> CHANGE (113d95806f09b9483491abedc8856116c3c90d9a system: Reload watchdog before sysjump)
 
 #ifdef CONFIG_DMA_CROS
 	/* Disable all DMA channels to avoid memory corruption */
