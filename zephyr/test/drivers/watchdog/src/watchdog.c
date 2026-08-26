@@ -52,7 +52,12 @@ static void watchdog_before(void *state)
 {
 	ARG_UNUSED(state);
 	set_test_runner_tid();
-	wdt_warning_triggered = false;
+
+	/* If previous test triggered warning, re-enable watchdog */
+	if (wdt_warning_triggered) {
+		wdt_setup(wdt, 0);
+		wdt_warning_triggered = false;
+	}
 
 	/* When shuffling need watchdog initialized and running
 	 * for other tests.
@@ -286,6 +291,71 @@ ZTEST(watchdog, test_cmd_watchdoginfo)
 	/* Test invalid arg */
 	zassert_not_equal(0, shell_execute_cmd(shell, "watchdoginfo invalid"),
 			  "watchdoginfo invalid should fail");
+}
+
+/**
+ * @brief TestPurpose: Verify that reloading the watchdog prevents expiration
+ * after an extended pre-jump delay (e.g. SHA-256 hash calculation).
+ *
+ * @details
+ * Simulates a long pre-jump workload consuming a large fraction of the
+ * watchdog window (60%), followed by watchdog_reload() at the sysjump
+ * boundary, and verifies that the target early-init workload (60%) completes
+ * without triggering a watchdog warning (total 120% without reload).
+ */
+ZTEST(watchdog, test_watchdog_sysjump_margin_with_reload)
+{
+	int simulated_ro_hash_delay_ms = DEFAULT_WDT_EXPIRY_MS * 6 / 10;
+	int simulated_rw_early_init_ms = DEFAULT_WDT_EXPIRY_MS * 6 / 10;
+
+	/* Reset watchdog before test */
+	watchdog_reload();
+	zassert_false(wdt_warning_triggered, "Watchdog warning already set.");
+
+	/* 1. Simulate RO hashing delay consuming budget */
+	k_busy_wait(simulated_ro_hash_delay_ms * 1000);
+
+	/* 2. Sysjump boundary: reload watchdog */
+	watchdog_reload();
+
+	/* 3. Simulate early RW driver initialization workload */
+	k_busy_wait(simulated_rw_early_init_ms * 1000);
+
+	/* 4. Verify watchdog warning was NOT triggered because reload refreshed
+	 * the timer */
+	zassert_false(
+		wdt_warning_triggered,
+		"Watchdog warning triggered despite sysjump watchdog reload.");
+}
+
+/**
+ * @brief TestPurpose: Prove that WITHOUT reloading the watchdog at sysjump,
+ * the cumulative delay of pre-jump hashing plus early RW init exhausts the
+ * watchdog window and triggers watchdog panic/warning.
+ */
+ZTEST(watchdog, test_watchdog_sysjump_margin_without_reload_exhausts)
+{
+	int simulated_ro_hash_delay_ms = DEFAULT_WDT_EXPIRY_MS * 6 / 10;
+	int simulated_rw_early_init_ms = DEFAULT_WDT_EXPIRY_MS * 6 / 10;
+
+	/* Reset watchdog before test */
+	watchdog_reload();
+	zassert_false(wdt_warning_triggered, "Watchdog warning already set.");
+
+	/* 1. Simulate RO hashing delay consuming budget */
+	k_busy_wait(simulated_ro_hash_delay_ms * 1000);
+
+	/* 2. Sysjump boundary: DO NOT reload watchdog (simulating pre-fix
+	 * behavior) */
+
+	/* 3. Simulate early RW driver initialization workload */
+	k_busy_wait(simulated_rw_early_init_ms * 1000);
+
+	/* 4. Verify watchdog warning WAS triggered because budget was exhausted
+	 */
+	zassert_true(
+		wdt_warning_triggered,
+		"Watchdog warning was expected to trigger when un-reloaded.");
 }
 
 /**
