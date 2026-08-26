@@ -83,6 +83,11 @@
 	label = "i2c2";
 	pinctrl-0 = < &i2c2_clk_gpc7_default &i2c2_data_gpd0_default >;
 	pinctrl-names = "default";
+	zephyr,transfer-timeout-ms = <650>;
+	/* Disable the hardware SCL/SDA timeout to support clock 
+	 * stretching beyond 255ms.
+	 */
+	scl-sda-low-timeout-ms = <0>;
 };
 &i2c3 {
 	status = "okay";
