@@ -101,7 +101,7 @@ if (DEFINED CONFIG_ARM)
   zephyr_cc_option(-mno-unaligned-access)
 endif()
 zephyr_cc_option(-Wimplicit-fallthrough)
-zephyr_cc_option(-Wint-conversion)
+zephyr_compile_options($<$<COMPILE_LANGUAGE:C>:-Wint-conversion>)
 
 if (DEFINED CONFIG_RISCV)
   zephyr_cc_option(-fsanitize=integer-divide-by-zero)
@@ -846,6 +846,44 @@ endif()
 #
 # Lists all targets defined with pw_add_library() and pw_add_test()
 function(ec_add_pw_log_zephyr_deps)
+  # TODO: b/552621198 - Fix upstream in Pigweed so pw_zephyrize_libraries_ifdef
+  # doesn't cause cyclic dependencies with Zephyr bootstrap object libraries
+  # (offsets/heap_constants).
+  # Remove pw_log_zephyr, pw_log_zephyr.pigweed_overrides, pw_hex_dump.log_bytes,
+  # and platform_ec_log.tokenized_handler from zephyr_interface to break the cycle
+  # with offsets/heap_constants, and link them to app instead.
+  if(TARGET zephyr_interface)
+    get_target_property(interface_libs zephyr_interface INTERFACE_LINK_LIBRARIES)
+    if(interface_libs)
+      list(REMOVE_ITEM interface_libs
+           pw_log_zephyr
+           pw_log_zephyr.pigweed_overrides
+           pw_hex_dump.log_bytes
+           platform_ec_log.tokenized_handler)
+      set_property(TARGET zephyr_interface PROPERTY INTERFACE_LINK_LIBRARIES "${interface_libs}")
+    endif()
+    if(TARGET pw_log_zephyr.pigweed_overrides)
+      target_include_directories(zephyr_interface INTERFACE
+        $<TARGET_PROPERTY:pw_log_zephyr.pigweed_overrides,INTERFACE_INCLUDE_DIRECTORIES>)
+    endif()
+  endif()
+  if(TARGET app)
+    if(CONFIG_PIGWEED_LOG_ZEPHYR AND TARGET pw_log_zephyr)
+      target_link_libraries(app INTERFACE pw_log_zephyr)
+    endif()
+    if(CONFIG_PIGWEED_LOG_PIGWEED_OVERRIDES)
+      if(TARGET pw_log_zephyr.pigweed_overrides)
+        target_link_libraries(app INTERFACE pw_log_zephyr.pigweed_overrides)
+      endif()
+      if(TARGET pw_hex_dump.log_bytes)
+        target_link_libraries(app INTERFACE pw_hex_dump.log_bytes)
+      endif()
+    endif()
+    if(CONFIG_PIGWEED_LOG_TOKENIZED_LIB AND TARGET platform_ec_log.tokenized_handler)
+      target_link_libraries(app INTERFACE platform_ec_log.tokenized_handler)
+    endif()
+  endif()
+
   foreach(lib pw_log_zephyr
 	      platform_ec_log.tokenized_handler
 	      cros.dsp.test
