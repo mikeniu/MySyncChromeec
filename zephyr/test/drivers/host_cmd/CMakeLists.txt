@@ -9,6 +9,7 @@ target_sources(app PRIVATE
     src/battery_display_soc.c
     src/battery_info.c
     src/console_print.c
+    src/console_hc.c
     src/charge_manager.c
     src/enter_bootloader.c
     src/get_cmd_versions.c
