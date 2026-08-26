@@ -835,16 +835,33 @@ static int exit_dbgr_mode(struct common_hnd *chnd)
 static int dbgr_reset_gpio(struct common_hnd *chnd)
 {
 	int ret = 0;
+	int addr;
 
-	printf("Reset GPIOs to default.\n");
+	printf("Reset GPIOs to default safely.
+");
 	if (chnd->dbgr_addr_3bytes)
 		ret |= i2c_write_byte(chnd, 0x80, 0xf0);
 	ret |= i2c_write_byte(chnd, 0x2f, 0x20);
 	ret |= i2c_write_byte(chnd, 0x2e, 0x07);
-	ret |= i2c_write_byte(chnd, 0x30, BIT(1));
+
+	// Instead of global reset (0x30, BIT(1)), manual loop
+	for (addr = 0x1610; addr <= 0x166F; addr++) {
+		if (chnd->conf.preserve_pin != -1 && addr == chnd->conf.preserve_pin)
+			continue;
+		
+		uint8_t val;
+		if (i2c_read_byte(chnd, addr, &val) == 0) {
+			if (val != 0x00) // Not Alternate Function
+				i2c_write_byte(chnd, addr, 0x80); // High-Z Input
+		}
+	}
+
+	ret |= i2c_write_byte(chnd, 0x2e, 0x08);
+	ret |= i2c_write_byte(chnd, 0x30, BIT(4));
 
 	if (ret < 0)
-		fprintf(stderr, "DBGR RESET GPIO FAILED\n");
+		fprintf(stderr, "EXIT DBGR MODE FAILED
+");
 
 	return 0;
 }
