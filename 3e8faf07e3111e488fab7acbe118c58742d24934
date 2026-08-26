@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8e2ed87_2c4d4fe8",
+        "filename": "zephyr/test/drivers/default/CMakeLists.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T21:30:50Z",
+      "side": 1,
+      "message": "Nit: `drivers/default` is already a cluttered catch-all target. I\u0027d prefer it if these tests were part of a TCPM-specific or PRL-specific target. At first glance, I don\u0027t think there is a PRL-specific target in the Zephyr tests yet.\n\nIf these tests depend on some common code that\u0027s only available in this target, no need to bend over backward to create a separate target.",
+      "revId": "3e8faf07e3111e488fab7acbe118c58742d24934",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0988b73f_4c0a9af9",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_prl.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-26T21:30:50Z",
+      "side": 1,
+      "message": "Nit: It\u0027s kind of weird to interleave the source and sink tests.",
+      "revId": "3e8faf07e3111e488fab7acbe118c58742d24934",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
