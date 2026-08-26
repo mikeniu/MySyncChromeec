@@ -9,6 +9,6 @@
 &i2c0_0 {
 	dagwood_eeprom: dagwood-eeprom@50 {
 		compatible = "vnd.i2c-device";
-                reg = <0x50>;
+		reg = <0x50>;
 	};
 };
