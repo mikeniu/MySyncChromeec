@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a82f33f8_25c3ce0d",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-08-26T13:04:09Z",
+      "side": 1,
+      "message": "Yes",
+      "parentUuid": "a9ca2e82_eb86b794",
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0943e114_f649ad7c",
         "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
         "patchSetId": 32
@@ -105,6 +123,30 @@
       "writtenOn": "2026-08-17T21:34:12Z",
       "side": 1,
       "message": "Is this stuff redundant with `_before`? What do you get by doing this twice per test?",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 23
+      },
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b25c1e6a_d60b741b",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-08-26T13:04:09Z",
+      "side": 1,
+      "message": "Yes I will update that in new patchset.",
+      "parentUuid": "c6eb5105_1daea3b3",
       "range": {
         "startLine": 78,
         "startChar": 0,
