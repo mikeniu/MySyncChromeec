@@ -835,16 +835,31 @@ static int exit_dbgr_mode(struct common_hnd *chnd)
 static int dbgr_reset_gpio(struct common_hnd *chnd)
 {
 	int ret = 0;
+	int addr;
 
-	printf("Reset GPIOs to default.\n");
+	printf("Reset GPIOs to default safely.\n");
 	if (chnd->dbgr_addr_3bytes)
 		ret |= i2c_write_byte(chnd, 0x80, 0xf0);
 	ret |= i2c_write_byte(chnd, 0x2f, 0x20);
 	ret |= i2c_write_byte(chnd, 0x2e, 0x07);
-	ret |= i2c_write_byte(chnd, 0x30, BIT(1));
+
+	// Instead of global reset (0x30, BIT(1)), manual loop
+	for (addr = 0x1610; addr <= 0x166F; addr++) {
+		// skip AP_RST_L (G1 = 0x1610 + (7 - 1)*8 + 1 = 0x1641)
+		if (addr == 0x1641)
+			continue;
+		uint8_t val;
+		if (i2c_read_byte(chnd, addr, &val) == 0) {
+			if (val != 0x00) // Not Alternate Function
+				ret |= i2c_write_byte(chnd, addr, 0x80); // High-Z Input
+		}
+	}
+
+	ret |= i2c_write_byte(chnd, 0x2e, 0x08);
+	ret |= i2c_write_byte(chnd, 0x30, BIT(4));
 
 	if (ret < 0)
-		fprintf(stderr, "DBGR RESET GPIO FAILED\n");
+		fprintf(stderr, "EXIT DBGR MODE FAILED\n");
 
 	return 0;
 }
@@ -1248,8 +1263,6 @@ static int send_special_waveform(struct common_hnd *chnd)
 		if (ret)
 			break;
 
-		/* wait for PLL stable for 5ms (plus remaining USB transfers) */
-		usleep(10 * MSEC);
 
 		/* Stop EC ASAP after sending special waveform. */
 		if (dbgr_stop_ec(chnd) >= 0) {
@@ -2274,6 +2287,7 @@ static const struct option longopts[] = { { "block-write-size", 1, 0, 'b' },
 					  { "serial", 1, 0, 's' },
 					  { "vendor", 1, 0, 'v' },
 					  { "write", 1, 0, 'w' },
+					  { "dbgr-preserve-pin", 1, 0, 1000 },
 					  { NULL, 0, 0, 0 } };
 
 static void display_usage(const char *program)
@@ -2366,7 +2380,7 @@ static int parse_parameters(int argc, char **argv, struct iteflash_config *conf)
 
 	while (!ret &&
 	       (opt = getopt_long(argc, argv, "?b:c:D:dehi:mp:R:r:s:uv:W:w:Zz",
-				  longopts, &idx)) != -1) {
+					  longopts, &idx)) != -1) {
 		switch (opt) {
 		case 'b':
 			conf->block_write_size = strtol(optarg, NULL, 10);
