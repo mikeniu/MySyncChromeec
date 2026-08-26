@@ -70,6 +70,30 @@
       },
       "revId": "827dcb7ebc559dfd0d1d3ee70d0310e521e3eaa7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40cf958d_3461ddbf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-26T15:23:05Z",
+      "side": 1,
+      "message": "The lapis project is not having watchdog issues with S0ix and the EC going into heavy sleep mode.  The Atria failures need more investigation before allowing this change.",
+      "parentUuid": "1b298490_aac0d86b",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 67
+      },
+      "revId": "827dcb7ebc559dfd0d1d3ee70d0310e521e3eaa7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
