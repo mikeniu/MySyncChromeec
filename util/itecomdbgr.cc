@@ -968,11 +968,6 @@ static int uart_app(struct itecomdbgr_config *conf)
 				  sizeof(disable_follow_mode));
 
 			if (getchipid(conf) == SUCCESS) {
-				/* Reset UART1*/
-				wr_reg(conf, 0xF02011, 1);
-
-				wr_reg(conf, 0xF01618, 0xFF);
-				wr_reg(conf, 0xF01619, 0xFF);
 				read_id_2(conf);
 			}
 			uart_flush(conf->g_fd);
@@ -1036,8 +1031,6 @@ static int uart_app(struct itecomdbgr_config *conf)
 
 out:
 
-	/* dbgr reset */
-	write_com(conf, dbgr_reset_buf, sizeof(dbgr_reset_buf));
 	uart_flush(conf->g_fd);
 	tcsetattr(tty_saved_fd, TCSANOW, &tty_saved);
 	close(tty_saved_fd);
