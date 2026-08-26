@@ -22,6 +22,30 @@
       },
       "revId": "827dcb7ebc559dfd0d1d3ee70d0310e521e3eaa7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf43c323_33082cd4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-08-26T00:18:46Z",
+      "side": 1,
+      "message": "I was probably a little too overzealous saying all...before_rts5912_sleep() calls _disable_irq() masking at PRIMASK and does not call _enable_irq() until after_rts5912_sleep() which gets called after a wake. So the entire time you are in deep sleep anything below PRIMASK is not able to be fired. I will update the commit message for clarity",
+      "parentUuid": "6f7a346b_09bba5de",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 67
+      },
+      "revId": "827dcb7ebc559dfd0d1d3ee70d0310e521e3eaa7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
