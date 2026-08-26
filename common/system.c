@@ -639,6 +639,9 @@ test_mockable_static void jump_to_image(uintptr_t init_addr)
 	/* Call other hooks; these may add tags */
 	hook_notify(HOOK_SYSJUMP);
 
+	/* Ensure the next image starts with a fresh watchdog timer */
+	watchdog_reload();
+
 	/* Disable interrupts before jump */
 	interrupt_disable_all();
 
