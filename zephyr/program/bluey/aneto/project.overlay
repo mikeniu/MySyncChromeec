@@ -21,6 +21,8 @@
 #include "keyboard.dtsi"
 #include "temp_sensors.dtsi"
 #include "battery.dtsi"
+#include "led_pins.dtsi"
+#include "led_policy.dtsi"
 /* TODO: Waiting for light bar ready
 #include <aneto/overlay.dtsi>
 */
