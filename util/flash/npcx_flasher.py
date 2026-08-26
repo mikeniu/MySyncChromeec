@@ -179,7 +179,7 @@ class NpcxUutFlasher(BaseEcFlasher):
                     img_cpy = os.path.join(temp_dir, "img_copy.bin")
                     shutil.copy2(self.args.image, img_cpy)
 
-                    preserve_sections_with_cur_image(cur_img, img_cpy, temp_dir)
+                    preserve_sections_with_cur_image(cur_img, img_cpy, temp_dir, ro_only=getattr(self.args, "ro", False))
 
                     wr_cmd = base_cmd + [
                         "--auto",

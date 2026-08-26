@@ -62,15 +62,9 @@ def parse_arguments(argv=None):
     parser.add_argument(
         "--mchp_loader", default="", help="Microchip bootloader file override"
     )
-    parser.add_argument(
-        "--token_db", default="", help="Pathname to the EC tokenized database"
-    )
-
+    
     # Behavioral Modifiers
-    parser.add_argument(
-        "--zephyr", action="store_true", help="Image is a Zephyr build"
-    )
-    parser.add_argument(
+        parser.add_argument(
         "--ro", action="store_true", help="Flash only the RO section"
     )
     parser.add_argument(
@@ -105,27 +99,12 @@ def parse_arguments(argv=None):
     parser.add_argument(
         "--raiden", action="store_true", help="Use raiden debugging"
     )
-    parser.add_argument(
-        "--servo_micro_uart_rx_rework",
-        action="store_true",
-        help="Servo micro hardware rework flag",
-    )
-    parser.add_argument(
-        "--use_i2c_pseudo",
-        action="store_true",
-        help="Use I2C pseudo interfaces",
-    )
-    parser.add_argument(
+            parser.add_argument(
         "--usbc_charging",
         action="store_true",
         help="Enable USBC charging during recovery",
     )
-    parser.add_argument(
-        "--verify_ec_type",
-        action="store_true",
-        help="Strictly verify the EC chip matches board",
-    )
-
+    
     # Debug / Execution Context
     parser.add_argument(
         "--dry_run",

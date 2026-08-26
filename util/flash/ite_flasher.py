@@ -243,7 +243,7 @@ class IteI2cFlasher(BaseEcFlasher):
                 )
                 subprocess.run(rd_cmd, check=True)
 
-                preserve_sections_with_cur_image(cur_img, img_cpy, temp_dir)
+                preserve_sections_with_cur_image(cur_img, img_cpy, temp_dir, ro_only=getattr(self.args, "ro", False))
 
             cmd.extend(["--erase", f"--write={temp_img}"])
             if not getattr(self.args, "verify", True):

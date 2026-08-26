@@ -189,7 +189,7 @@ class RtkFlasher(BaseEcFlasher):
                 self._logger.info("Reading RTK image: %s", " ".join(uut_rd))
                 subprocess.run(uut_rd, check=True)
 
-                preserve_sections_with_cur_image(cur_img, img_cpy, temp_dir)
+                preserve_sections_with_cur_image(cur_img, img_cpy, temp_dir, ro_only=getattr(self.args, "ro", False))
 
             uut_wr = [
                 rtk_uut,

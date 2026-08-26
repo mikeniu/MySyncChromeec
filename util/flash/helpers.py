@@ -29,11 +29,25 @@ def dump_fmap(image_path, flag="-e"):
         return ""
 
 
-def preserve_sections_with_cur_image(cur_img, new_img, temp_dir):
+def preserve_sections_with_cur_image(cur_img, new_img, temp_dir, ro_only=False):
     """
     Looks for preserved FMAP sections in cur_img, extracts them,
     and injects them into new_img using futility load_fmap.
+    If ro_only is True, overwrites ONLY the EC_RO section.
     """
+    if ro_only:
+        logger.info("RO-only requested. Patching existing dump with new EC_RO.")
+        sec_img = os.path.join(temp_dir, "EC_RO.bin")
+        try:
+            subprocess.run(["futility", "dump_fmap", "-x", new_img, "EC_RO"], check=True, cwd=temp_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            shutil.move(os.path.join(temp_dir, "EC_RO"), sec_img)
+            subprocess.run(["futility", "load_fmap", cur_img, f"EC_RO:{sec_img}"], check=True, cwd=temp_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            shutil.copyfile(cur_img, new_img)
+            return True
+        except subprocess.CalledProcessError as e:
+            logger.error("Failed to extract/inject EC_RO: %s", e)
+            raise
+
     fmap_output = dump_fmap(cur_img, "-e")
     if not fmap_output or " preserve" not in fmap_output:
         logger.info("No sections are being preserved")

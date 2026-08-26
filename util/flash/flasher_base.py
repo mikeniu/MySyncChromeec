@@ -83,6 +83,7 @@ class BaseEcFlasher(abc.ABC):
                 if self.servo:
                     count = getattr(self.args, "try_apshutdown_count", 16)
                     try:
+                        self.servo.save_add("ec_uart_regexp")
                         self.servo.set("ec_uart_regexp", "None")
                     except Exception as e:
                         self._logger.warning(
@@ -111,3 +112,4 @@ class BaseEcFlasher(abc.ABC):
         finally:
             if self.servo:
                 self.cleanup_dut()
+                self.servo.restore_all()
