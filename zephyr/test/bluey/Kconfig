@@ -100,4 +100,16 @@ config TEST_BOARD_MICA_LED
 config TEST_BOARD_MICA_THROTTLE
 	bool "Enable mica throttle tests"
 
+config TEST_BOARD_QUARTZ_CHIPSET
+	bool "Enable quartz chipset tests"
+
+config TEST_BOARD_QUARTZ_EXTPOWER
+	bool "Enable quartz extpower tests"
+
+config TEST_BOARD_QUARTZ_FAN
+	bool "Enable quartz fan tests"
+
+config TEST_BOARD_QUARTZ_LED
+	bool "Enable quartz led tests"
+
 source "Kconfig.zephyr"
