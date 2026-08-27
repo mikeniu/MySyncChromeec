@@ -45,6 +45,30 @@
       },
       "revId": "506a446f7828635869dd2754849f58f4971494b8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55705a72_d4311882",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.conf",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-27T19:58:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56af4cb1_9e8d0a56",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 29
+      },
+      "revId": "506a446f7828635869dd2754849f58f4971494b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
