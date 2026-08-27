@@ -61,7 +61,6 @@ struct tps6699x_response {
 				union error_status_t error;
 				struct ti_ccom ccom;
 				uint32_t pdos[4];
-				uint32_t pd_message[PDC_DISC_IDENTITY_VDO_COUNT];
 			};
 		} __packed;
 		union connector_status_t connector_status;
@@ -96,8 +95,6 @@ struct tps6699x_emul_pdc_data {
 	union cable_property_t cable_property;
 	union reg_port_control port_control;
 	bool frs_configured;
-	uint32_t rmdo;
-	uint32_t identity[PDC_DISC_IDENTITY_VDO_COUNT];
 	uint32_t current_cam;
 
 	struct tps6699x_response response;
