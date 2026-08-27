@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9b6b3d1_68d7c35e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-27T23:39:51Z",
+      "side": 1,
+      "message": "Verified on NPCX9, IT82002, and RTS5915",
+      "parentUuid": "c0c67326_587faa93",
+      "revId": "d88166f85239aff853f1e079fbdbd98d60ee7b5c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32451163_1d1b5a1f",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-08-27T17:36:19Z",
       "side": 1,
       "message": "Given the comment above related to `HOOK_SYSJUMP`, `watchdog_reload` uses a `K_SPINLOCK`, is this safe? or should we move this before `interrupt_disable_all` to ensure proper watchdog reset?",
+      "range": {
+        "startLine": 666,
+        "startChar": 0,
+        "endLine": 668,
+        "endChar": 18
+      },
+      "revId": "d88166f85239aff853f1e079fbdbd98d60ee7b5c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f77b0d7e_da810995",
+        "filename": "common/system.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 668,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-27T23:39:51Z",
+      "side": 1,
+      "message": "K_SPINLOCK works as expected even with interrupts disabled, technically a no-op since interrupts are already disabled. \n\nwatchdog_reload is specifically intended to be ISR safe, which means the constraints are similar to the constraints for HOOK_SYSJUMP handlers (no sleep, yield, interrupt-driven drivers, mutexes, or deferred functions).\n\nPrefer to keep this close to the jump to maximize the watchdog headroom for the next image.\n\nLegacy EC had similar functionality, specifically `DECLARE_HOOK(HOOK_SYSJUMP, watchdog_reload, HOOK_PRIO_LAST)`.",
+      "parentUuid": "32451163_1d1b5a1f",
       "range": {
         "startLine": 666,
         "startChar": 0,
