@@ -22,6 +22,30 @@
       },
       "revId": "441e4c0e032792c0e5c1f7190c7b07f5a415a1fa",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54d119ad_cf4bd6a9",
+        "filename": "zephyr/test/drivers/default/src/port80.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-08-27T18:28:28Z",
+      "side": 1,
+      "message": "Fair this was intended at more of a belt and suspenders check to insure the break in between codes was also checked",
+      "parentUuid": "d919fa10_0e8007ee",
+      "range": {
+        "startLine": 158,
+        "startChar": 1,
+        "endLine": 162,
+        "endChar": 64
+      },
+      "revId": "441e4c0e032792c0e5c1f7190c7b07f5a415a1fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
