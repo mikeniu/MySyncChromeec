@@ -16,6 +16,24 @@
       "message": "https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/program/atria/atriarvp-rtk/project.overlay;l\u003d49-52\nplease remove those lines to avoid conflict since GPIO120 now is EC-\u003eISH interrupt.",
       "revId": "e55a171fe4d7b31e759c56e798323c25995b04e0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "256427c9_b6ebcce5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-27T23:34:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "556b9bf0_e83e34f2",
+      "revId": "e55a171fe4d7b31e759c56e798323c25995b04e0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
