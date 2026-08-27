@@ -34,6 +34,24 @@
       "parentUuid": "75ed4f4e_609ab1ca",
       "revId": "f09f02b556e191adc8387cc7815ee04d91bc928a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c09033e0_22fc4162",
+        "filename": "zephyr/program/atria/atriarvp-rtk/gpio.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-27T00:12:22Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "a4dd4634_2546d16c",
+      "revId": "f09f02b556e191adc8387cc7815ee04d91bc928a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

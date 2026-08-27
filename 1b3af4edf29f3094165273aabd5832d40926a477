@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "26140658_6bfe1c62",
+        "filename": "zephyr/cmake/linker/ld/linker_libraries.cmake",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-27T00:12:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "204bbe57_4a291e4b",
+      "revId": "1b3af4edf29f3094165273aabd5832d40926a477",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9bb5f0e7_a66fb288",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Same mistake as above. will correct this.",
       "parentUuid": "9bb5f0e7_a66fb288",
+      "revId": "1b3af4edf29f3094165273aabd5832d40926a477",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99384ff9_3a3238fa",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1352056
+      },
+      "writtenOn": "2026-08-27T00:12:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa30244e_8bb496e2",
       "revId": "1b3af4edf29f3094165273aabd5832d40926a477",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
