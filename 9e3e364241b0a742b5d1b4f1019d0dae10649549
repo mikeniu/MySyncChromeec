@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ba936d8_1995a633",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-27T15:48:49Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: If this suite is testing the EC as a Sink (`usb_pe_test_sink`), then the partner emulator needs to connect as a Source. This should likely be `PD_ROLE_SOURCE`.",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 0
+      },
+      "revId": "9e3e364241b0a742b5d1b4f1019d0dae10649549",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd92dc28_1172118c",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-27T15:48:49Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: If this suite is testing the EC as a Source (`usb_pe_test_source`), then the partner emulator needs to connect as a Sink. This should likely be `PD_ROLE_SINK`.",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 0
+      },
+      "revId": "9e3e364241b0a742b5d1b4f1019d0dae10649549",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3acc1c8_0a80e30a",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-27T15:48:49Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: If you add a PDO to the array, you likely also need to increment the PDO count (e.g., `fixture-\u003esnk_ext.pdo_cnt \u003d 2;`) so that the emulator actually sends the newly added PDO in its capabilities message.",
+      "range": {
+        "startLine": 109,
+        "startChar": 0,
+        "endLine": 109,
+        "endChar": 0
+      },
+      "revId": "9e3e364241b0a742b5d1b4f1019d0dae10649549",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
