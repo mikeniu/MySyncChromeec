@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8adde95_06d9576c",
+        "filename": "zephyr/program/calypso/c1nv/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-08-27T08:28:07Z",
+      "side": 1,
+      "message": "Is this intended?",
+      "revId": "968de32367fd611360368df7bde99cb1bc183fa3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
