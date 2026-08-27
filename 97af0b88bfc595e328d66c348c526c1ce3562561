@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5e383d3_3f4515aa",
+        "filename": "util/dagwood_test_lib.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-27T20:06:16Z",
+      "side": 1,
+      "message": "As a followup, can you rename utils to be less generic? This looks like a standard package.",
+      "range": {
+        "startLine": 22,
+        "startChar": 7,
+        "endLine": 22,
+        "endChar": 12
+      },
+      "revId": "97af0b88bfc595e328d66c348c526c1ce3562561",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
