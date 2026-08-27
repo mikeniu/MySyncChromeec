@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23cc4dce_f14ffa0c",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_prl.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-27T22:56:04Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Since the partner is no longer configured as a DRP (`drp_ext` was removed), consider renaming this to `partner_pd_role` to reflect its actual usage.",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 0
+      },
+      "revId": "ade4c70eb0c509b6c1b41c99e046cf2fd7cce5f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9bf0a41_facff28c",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_prl.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-27T22:56:04Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Since the DRP extension (`drp_ext`) has been removed and the partner is now explicitly configured as either a Source or a Sink, consider renaming `drp_partner_pd_role` to `partner_pd_role` for clarity.",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 0
+      },
+      "revId": "ade4c70eb0c509b6c1b41c99e046cf2fd7cce5f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
