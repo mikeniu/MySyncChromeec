@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80cf64ca_d9c915a5",
+        "filename": "util/ectool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 9254,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-08-27T06:05:08Z",
+      "side": 1,
+      "message": "Keep `, cmd, cmd, cmd, cmd` for the `%s`.",
+      "range": {
+        "startLine": 9254,
+        "startChar": 49,
+        "endLine": 9254,
+        "endChar": 50
+      },
+      "revId": "12501bfe7b3f3f4df6c9daf290d800048c705cc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
