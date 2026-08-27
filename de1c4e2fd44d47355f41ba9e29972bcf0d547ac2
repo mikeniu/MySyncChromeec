@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c5e2150_235e0af1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-08-27T17:49:36Z",
+      "side": 1,
+      "message": "this is not a sufficient test for significant changes in system behavior.\nfull DTS EC, AP test runs would be appropriate here.",
+      "range": {
+        "startLine": 10,
+        "startChar": 5,
+        "endLine": 10,
+        "endChar": 7
+      },
+      "revId": "de1c4e2fd44d47355f41ba9e29972bcf0d547ac2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
