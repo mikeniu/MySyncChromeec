@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c315b15_661c4cc7",
+        "filename": "zephyr/program/atria/atriarvp-rtk/i2c.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-27T17:23:50Z",
+      "side": 1,
+      "message": "It is not clear to me that these hardware timeouts are used for target mode operation.  \n\nI\u0027ve opened a bug with Realtek to clarify the use of these properties.  It shouldn\u0027t cause any harm to set these properties.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 27
+      },
+      "revId": "506a446f7828635869dd2754849f58f4971494b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56af4cb1_9e8d0a56",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.conf",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-27T17:23:50Z",
+      "side": 1,
+      "message": "This is duplicated from dsp_comms.conf.",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 29
+      },
+      "revId": "506a446f7828635869dd2754849f58f4971494b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
