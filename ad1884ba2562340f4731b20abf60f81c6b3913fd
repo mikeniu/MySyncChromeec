@@ -22,6 +22,30 @@
       },
       "revId": "ad1884ba2562340f4731b20abf60f81c6b3913fd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99bea787_35916896",
+        "filename": "zephyr/program/calypso/c1nv/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-08-27T06:25:27Z",
+      "side": 1,
+      "message": "Remove the initial high.",
+      "parentUuid": "c4cd9a58_abf1fa1b",
+      "range": {
+        "startLine": 162,
+        "startChar": 36,
+        "endLine": 162,
+        "endChar": 57
+      },
+      "revId": "ad1884ba2562340f4731b20abf60f81c6b3913fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
