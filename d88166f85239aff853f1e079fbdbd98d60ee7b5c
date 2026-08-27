@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32451163_1d1b5a1f",
+        "filename": "common/system.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 668,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-27T17:36:19Z",
+      "side": 1,
+      "message": "Given the comment above related to `HOOK_SYSJUMP`, `watchdog_reload` uses a `K_SPINLOCK`, is this safe? or should we move this before `interrupt_disable_all` to ensure proper watchdog reset?",
+      "range": {
+        "startLine": 666,
+        "startChar": 0,
+        "endLine": 668,
+        "endChar": 18
+      },
+      "revId": "d88166f85239aff853f1e079fbdbd98d60ee7b5c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
