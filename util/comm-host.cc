@@ -32,6 +32,7 @@ int comm_init_dev(const char *device_name) __attribute__((weak));
 int comm_init_lpc(void) __attribute__((weak));
 int comm_init_i2c(int i2c_bus) __attribute__((weak));
 int comm_init_servo_spi(const char *device_name) __attribute__((weak));
+int comm_init_serial(const char *device_path) __attribute__((weak));
 
 static int fake_readmem(int offset, int bytes, void *dest)
 {
@@ -102,6 +103,11 @@ int comm_init_alt(int interfaces, const char *device_name, int i2c_bus)
 	/* Fallback to direct I2C */
 	if ((dev_is_cros_ec || i2c_bus != -1) && (interfaces & COMM_I2C) &&
 	    comm_init_i2c && !comm_init_i2c(i2c_bus))
+		return 0;
+
+	/* Fallback to serial */
+	if ((interfaces & COMM_SERIAL) && comm_init_serial &&
+	    !comm_init_serial(device_name))
 		return 0;
 
 	/* Give up */

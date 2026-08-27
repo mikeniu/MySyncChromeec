@@ -49,7 +49,8 @@ include util/focaltech/build.mk
 include util/elan/build.mk
 
 comm-objs=$(util-lock-objs:%=lock/%) comm-host.o comm-dev.o
-comm-objs+=comm-lpc.o comm-i2c.o misc_util.o comm-usb.o
+comm-objs+=comm-lpc.o comm-i2c.o misc_util.o comm-usb.o comm-serial.o \
+	uart_utils.o
 
 iteflash-objs = iteflash.o usb_if.o
 $(out)/util/iteflash: HOST_LDFLAGS+=$(LIBFTDIUSB_HOST_LDLIBS)
