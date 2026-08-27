@@ -124,4 +124,16 @@ config TEST_BOARD_ANNITE_FAN
 config TEST_BOARD_ANNITE_THROTTLE
 	bool "Enable annite throttle tests"
 
+config TEST_BOARD_PIC_CHIPSET
+	bool "Enable pic chipset tests"
+
+config TEST_BOARD_PIC_EXTPOWER
+	bool "Enable pic extpower tests"
+
+config TEST_BOARD_PIC_FAN
+	bool "Enable pic fan tests"
+
+config TEST_BOARD_PIC_THROTTLE
+	bool "Enable pic throttle tests"
+
 source "Kconfig.zephyr"
