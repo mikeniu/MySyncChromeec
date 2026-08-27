@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "859578d7_d1111b0e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-27T21:19:44Z",
+      "side": 1,
+      "message": "Instead of using 200ms timer, can we monitor the `PS_HOLD` signal to distinguish a shutdown (PS_HOLD holding low) from a reset?",
+      "revId": "e58c5463b025fa8c2d6f3eb95d938bac2daf438c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "386d901f_aa79c90e",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1097,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-27T21:19:44Z",
+      "side": 1,
+      "message": "Define a constant for this 200ms.",
+      "range": {
+        "startLine": 1097,
+        "startChar": 44,
+        "endLine": 1097,
+        "endChar": 47
+      },
+      "revId": "e58c5463b025fa8c2d6f3eb95d938bac2daf438c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
