@@ -70,4 +70,16 @@ config TEST_BOARD_BASEBOARD_CHIPSET
 config TEST_BOARD_BASEBOARD_THROTTLE
 	bool "Enable baseboard throttle tests"
 
+config TEST_BOARD_BLUEY_CHIPSET
+	bool "Enable bluey chipset tests"
+
+config TEST_BOARD_BLUEY_FAN
+	bool "Enable bluey fan tests"
+
+config TEST_BOARD_QUENBI_CHIPSET
+	bool "Enable quenbi chipset tests"
+
+config TEST_BOARD_QUENBI_FAN
+	bool "Enable quenbi fan tests"
+
 source "Kconfig.zephyr"
