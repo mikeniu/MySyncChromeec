@@ -51,7 +51,7 @@ static int ft98xx_algorithm_init(const struct fingerprint_algorithm *const alg)
 		.enroll_reject_thr = 30,
 		.enroll_continue_fail_thr = 3,
 		.far_level = 1,
-		.log_level = 1,
+		.log_level = 6,
 		.print_func_impl = NULL,
 	};
 
