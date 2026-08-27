@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "082538d4_41adbbec",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-08-27T15:08:04Z",
+      "side": 1,
+      "message": "please add \"LOW_COVERAGE_REASON\u003db:540336170 tracking test code\" in comment message",
+      "revId": "d70d602f144fab6918cc427cc551e596ee884a1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
