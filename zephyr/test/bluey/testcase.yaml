@@ -15,3 +15,17 @@ tests:
       - CONFIG_TEST_BOARD_BASEBOARD_THROTTLE=y
     extra_dtc_overlay_files:
       - "boards/native_sim.overlay"
+  bluey.bluey:
+    extra_configs:
+      - CONFIG_TEST_BOARD_BLUEY=y
+      - CONFIG_TEST_BOARD_BLUEY_CHIPSET=y
+      - CONFIG_TEST_BOARD_BLUEY_FAN=y
+    extra_dtc_overlay_files:
+      - "boards/bluey.overlay"
+  bluey.quenbi:
+    extra_configs:
+      - CONFIG_TEST_BOARD_QUENBI=y
+      - CONFIG_TEST_BOARD_QUENBI_CHIPSET=y
+      - CONFIG_TEST_BOARD_QUENBI_FAN=y
+    extra_dtc_overlay_files:
+      - "boards/quenbi.overlay"
