@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c0c67326_587faa93",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-27T17:38:49Z",
+      "side": 1,
+      "message": "Can we verify this on a real DUT too?  You can use `./util/lease_and_test_ec.py` see [go/cros-ec-lease-and-test](https://chromium.googlesource.com/chromiumos/platform/ec/+/main/docs/lease_and_test_ec.md) for details",
+      "revId": "d88166f85239aff853f1e079fbdbd98d60ee7b5c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "32451163_1d1b5a1f",
         "filename": "common/system.c",
         "patchSetId": 4
