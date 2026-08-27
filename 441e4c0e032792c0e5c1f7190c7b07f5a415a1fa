@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d919fa10_0e8007ee",
+        "filename": "zephyr/test/drivers/default/src/port80.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-27T18:26:22Z",
+      "side": 1,
+      "message": "Nit: I think, strictly speaking, this check is redundant with the final check. You should be able to demonstrate that this works as intended with a single sequence of notifications/writes, followed by a single host command.",
+      "range": {
+        "startLine": 158,
+        "startChar": 1,
+        "endLine": 162,
+        "endChar": 64
+      },
+      "revId": "441e4c0e032792c0e5c1f7190c7b07f5a415a1fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
