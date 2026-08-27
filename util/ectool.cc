@@ -13451,7 +13451,9 @@ const command *commands_find(const char *name)
 void print_help(const char *prog, int print_cmds)
 {
 	printf("Usage: %s [--dev=n]"
-	       " [--interface=dev|i2c|lpc] [--i2c_bus=n] [--device=vid:pid]"
+	       " [--interface=dev|i2c|lpc|serial]"
+	       " [--device=vid:pid|/dev/ttyUSB0|host:port]"
+	       " [--i2c_bus=n]"
 	       " --verbose",
 	       prog);
 	printf(" [--name=cros_ec|cros_fp|cros_pd|cros_scp|cros_ish] [--ascii] ");
@@ -13459,9 +13461,10 @@ void print_help(const char *prog, int print_cmds)
 	printf("  --i2c_bus=n  Specifies the number of an I2C bus to use. For\n"
 	       "               example, to use /dev/i2c-7, pass --i2c_bus=7.\n"
 	       "               Implies --interface=i2c.\n\n");
-	printf("  --interface Specifies the interface.\n\n");
-	printf("  --device    Specifies USB endpoint by vendor ID and product\n"
-	       "              ID (e.g. 18d1:5022).\n\n");
+	printf("  --interface  Specifies the interface.\n\n");
+	printf("  --device     Specifies USB endpoint by VID:PID (e.g. 18d1:5022)\n"
+	       "               or serial device path / host:port\n"
+	       "               (e.g. /dev/ttyUSB0, 127.0.0.1:2201).\n\n");
 	printf("  --verbose   Print more messages.\n\n");
 	if (print_cmds) {
 		const struct command *cmd;
@@ -13484,7 +13487,7 @@ int main(int argc, char *argv[])
 	int dev = 0;
 	int interfaces = COMM_ALL;
 	int i2c_bus = -1;
-	char device_name[41] = CROS_EC_DEV_NAME;
+	char device_name[128] = CROS_EC_DEV_NAME;
 	uint16_t vid = USB_VID_GOOGLE, pid = USB_PID_HAMMER;
 	int rv = -1;
 	int parse_error = 0;
@@ -13517,6 +13520,8 @@ int main(int argc, char *argv[])
 				interfaces = COMM_I2C;
 			} else if (!strcasecmp(optarg, "servo")) {
 				interfaces = COMM_SERVO;
+			} else if (!strcasecmp(optarg, "serial")) {
+				interfaces = COMM_SERIAL;
 			} else {
 				fprintf(stderr, "Invalid --interface\n");
 				parse_error = 1;
@@ -13526,13 +13531,16 @@ int main(int argc, char *argv[])
 			if (parse_vidpid(optarg, &vid, &pid)) {
 				interfaces = COMM_USB;
 			} else {
-				fprintf(stderr, "Invalid --device\n");
-				parse_error = 1;
+				strncpy(device_name, optarg,
+					sizeof(device_name) - 1);
+				device_name[sizeof(device_name) - 1] = '\0';
+				if (interfaces == COMM_ALL)
+					interfaces = COMM_SERIAL;
 			}
 			break;
 		case OPT_NAME:
-			strncpy(device_name, optarg, 40);
-			device_name[40] = '\0';
+			strncpy(device_name, optarg, sizeof(device_name) - 1);
+			device_name[sizeof(device_name) - 1] = '\0';
 			break;
 		case OPT_I2C_BUS:
 			i2c_bus = strtoull(optarg, &e, 0);
@@ -13592,8 +13600,8 @@ int main(int argc, char *argv[])
 	if (!(interfaces & COMM_DEV) || comm_init_dev(device_name)) {
 		/* If dev is excluded or isn't supported, find alternative */
 
-		/* Lock is not needed for COMM_USB */
-		if (!(interfaces & COMM_USB) &&
+		/* Lock is not needed for COMM_USB or COMM_SERIAL */
+		if (!(interfaces & (COMM_USB | COMM_SERIAL)) &&
 		    acquire_gec_lock(GEC_LOCK_TIMEOUT_SECS) < 0) {
 			fprintf(stderr, "Could not acquire GEC lock.\n");
 			exit(1);

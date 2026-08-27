@@ -34,8 +34,17 @@ enum comm_interface {
 	COMM_I2C = BIT(2),
 	COMM_SERVO = BIT(3),
 	COMM_USB = BIT(4),
+	COMM_SERIAL = BIT(5),
 	COMM_ALL = -1
 };
+
+/**
+ * Initialize serial interface
+ *
+ * @param device_path Path to serial device/PTY or host:port
+ * @return 0 in case of success, or error code.
+ */
+int comm_init_serial(const char *device_path);
 
 /**
  * Initialize alternative interfaces
