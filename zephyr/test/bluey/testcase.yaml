@@ -41,3 +41,13 @@ tests:
       - CONFIG_PLATFORM_EC_TEMP_SENSOR=y
     extra_dtc_overlay_files:
       - "boards/mica.overlay"
+  bluey.quartz:
+    extra_configs:
+      - CONFIG_TEST_BOARD_QUARTZ=y
+      - CONFIG_TEST_BOARD_QUARTZ_CHIPSET=y
+      - CONFIG_TEST_BOARD_QUARTZ_EXTPOWER=y
+      - CONFIG_TEST_BOARD_QUARTZ_FAN=y
+      - CONFIG_TEST_BOARD_QUARTZ_LED=y
+      - CONFIG_PLATFORM_EC_TEMP_SENSOR=y
+    extra_dtc_overlay_files:
+      - "boards/quartz.overlay"
