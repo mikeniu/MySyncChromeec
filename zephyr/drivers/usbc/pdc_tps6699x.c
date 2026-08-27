@@ -355,6 +355,10 @@ struct pdc_data_t {
 	union battery_status_t battery_status;
 	/* Battery capability on device */
 	union battery_capability_t battery_capability;
+	/* Discovery state output for pdc_get_identity_discovery */
+	bool *user_disc_out;
+	/* Origin of identity discovery */
+	enum vdo_origin_t disc_origin;
 };
 
 /**
@@ -1610,34 +1614,54 @@ static void cmd_get_identity_discovery(struct pdc_data_t *data)
 {
 	struct pdc_config_t const *cfg = data->dev->config;
 	union reg_received_identity_data_object received_identity_data_object;
-	bool *disc_state = (bool *)data->user_buf;
 	int rv;
 
-	if (data->vdo_req.vdo_origin == VDO_ORIGIN_SOP) {
+	if (data->disc_origin == VDO_ORIGIN_SOP) {
 		rv = tps_rd_received_sop_identity_data_object(
 			&cfg->i2c, &received_identity_data_object);
 		if (rv) {
-			LOG_ERR("TI%d: Failed to read partner VDO (%d)",
+			LOG_ERR("TI%d: Failed to read partner identity (%d)",
 				cfg->connector_number, rv);
 			goto error_recovery;
 		}
-	} else if (data->vdo_req.vdo_origin == VDO_ORIGIN_SOP_PRIME) {
+	} else if (data->disc_origin == VDO_ORIGIN_SOP_PRIME) {
 		rv = tps_rd_received_sop_prime_identity_data_object(
 			&cfg->i2c, &received_identity_data_object);
 		if (rv) {
-			LOG_ERR("TI%d: Failed to read cable VDO (%d)",
+			LOG_ERR("TI%d: Failed to read cable identity (%d)",
 				cfg->connector_number, rv);
 			goto error_recovery;
 		}
 	} else {
-		/* Unsupported */
-		LOG_ERR("TI%d: Unsupported VDO origin", cfg->connector_number);
+		LOG_ERR("TI%d: Unsupported VDO origin (%d)",
+			cfg->connector_number, data->disc_origin);
 		goto error_recovery;
 	}
 
-	*disc_state = (received_identity_data_object.response_type == 1) ?
-			      true :
-			      false;
+	if (data->user_disc_out != NULL) {
+		*data->user_disc_out =
+			(received_identity_data_object.response_type == 1);
+	}
+
+	if (data->user_buf != NULL) {
+		uint32_t *msg_out = (uint32_t *)data->user_buf;
+
+		if (received_identity_data_object.response_type != 1) {
+			LOG_DBG("TI%d: Identity not discovered (response_type=%d)",
+				cfg->connector_number,
+				received_identity_data_object.response_type);
+			data->cci_event.error = 1;
+			data->cci_event.data_len = 0;
+			memset(msg_out, 0,
+			       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
+		} else {
+			msg_out[0] = 0;
+			memcpy(&msg_out[1], received_identity_data_object.vdo,
+			       sizeof(uint32_t) * 6);
+			data->cci_event.data_len =
+				sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT;
+		}
+	}
 
 	data->cci_event.command_completed = 1;
 	/* Inform the system of the event */
@@ -2608,25 +2632,6 @@ static enum smf_state_result st_task_wait_run(void *o)
 		}
 		break;
 	}
-	case UCSI_GET_PD_MESSAGE:
-		offset = 2;
-		union get_pd_message_t get_pd_message_cmd;
-		memcpy(&get_pd_message_cmd,
-		       &data->raw_ucsi_cmd_data.data[offset],
-		       sizeof(union get_pd_message_t));
-		switch (get_pd_message_cmd.response_message_type) {
-		case GET_PD_MESSAGE_DISC_ID:
-			len = sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT;
-			break;
-		case GET_PD_MESSAGE_REVISION:
-			len = sizeof(uint32_t);
-			break;
-		default:
-			/* Unsupported GET_PD_MESSAGE command */
-			offset = 0;
-			len = 0;
-		}
-		break;
 	default:
 		/* No data for this command */
 		len = 0;
@@ -3125,11 +3130,20 @@ static int tps_get_vdo(const struct device *dev, union get_vdo_t vdo_req,
 static int tps_get_identity_discovery(const struct device *dev,
 				      bool *disc_state)
 {
+	struct pdc_data_t *data = dev->data;
+
 	if (disc_state == NULL) {
 		return -EINVAL;
 	}
 
-	return tps_post_command(dev, CMD_GET_IDENTITY_DISCOVERY, disc_state);
+	/* Direct calls to the get_identity_discovery API populate a bool
+	 * signaling the discover process is complete. This is only checked
+	 * with get_identity_discovery for SOP.
+	 */
+	data->user_disc_out = disc_state;
+	data->disc_origin = VDO_ORIGIN_SOP;
+
+	return tps_post_command(dev, CMD_GET_IDENTITY_DISCOVERY, NULL);
 }
 
 static int tps_set_comms_state(const struct device *dev, bool comms_active)
@@ -3283,6 +3297,38 @@ static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 
 		memcpy(&uor, command_specific, sizeof(union uor_t));
 		return tps_set_uor(dev, uor);
+	}
+
+	/* The linux UCSI driver sends GET_PD_MESSAGE to request partner (SOP)
+	 * and cable (SOP') identity. Intercept these commands and read the
+	 * information directly from the TI PDC registers.
+	 *
+	 * The TI PDC does not support mapping other versions of GET_PD_MESSAGE,
+	 * so return an error if received.
+	 */
+	if (ucsi_command == UCSI_GET_PD_MESSAGE) {
+		union get_pd_message_t get_pd_message_cmd = { 0 };
+
+		if (command_specific == NULL) {
+			return -EINVAL;
+		}
+
+		memcpy(&get_pd_message_cmd, command_specific,
+		       sizeof(union get_pd_message_t));
+		if (get_pd_message_cmd.response_message_type ==
+			    GET_PD_MESSAGE_DISC_ID &&
+		    (get_pd_message_cmd.recipient == VDO_ORIGIN_SOP ||
+		     get_pd_message_cmd.recipient == VDO_ORIGIN_SOP_PRIME)) {
+			struct pdc_data_t *data = dev->data;
+
+			data->user_disc_out = NULL;
+			data->disc_origin = get_pd_message_cmd.recipient;
+			return tps_post_command_with_callback(
+				dev, CMD_GET_IDENTITY_DISCOVERY, NULL,
+				lpm_data_out, callback);
+		}
+
+		return -ENOSYS;
 	}
 
 	memset(cmd_data.data, 0, sizeof(cmd_data.data));
