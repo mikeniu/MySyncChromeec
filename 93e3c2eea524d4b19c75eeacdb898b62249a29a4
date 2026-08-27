@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb106c6d_0807864d",
+        "filename": "test/build.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-27T00:19:03Z",
+      "side": 1,
+      "message": "Done. Updated commit message to list all 4 removed legacy test files.",
+      "parentUuid": "d0d8bc83_8ff990d1",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 0
+      },
+      "revId": "93e3c2eea524d4b19c75eeacdb898b62249a29a4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6c89f49_b02de388",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1855055a_4d438ea8",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-27T00:19:03Z",
+      "side": 1,
+      "message": "Done. Removed NULL format argument from zassert_ok.",
+      "parentUuid": "a6c89f49_b02de388",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 0
+      },
+      "revId": "93e3c2eea524d4b19c75eeacdb898b62249a29a4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "335fa3b7_d2bf9b3d",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-08-25T23:42:27Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: The `setup` functions for `ZTEST_SUITE` are expected to return a pointer to the suite-specific fixture struct when used with `ZTEST_F`. Here, both setup functions return a pointer to a generic `struct usb_pe_test_fixture` which is not wrapped in `struct usb_pe_test_sink_fixture` or `struct usb_pe_test_source_fixture`.\n\nWhen Ztest passes this memory to your test function, it casts the pointer to `struct usb_pe_test_sink_fixture *`. Since this memory was only allocated for a `struct usb_pe_test_fixture`, this results in undefined behavior (even though it currently \"works\" locally because the wrapper struct\u0027s only member is at offset 0).\n\nAdditionally, returning the same statically allocated `fixture` instance means that both test suites share the same memory under the hood, which could lead to race conditions or state pollution if tests are run concurrently.\n\nConsider statically allocating the actual wrapper structs:\n```c\nstatic struct usb_pe_test_sink_fixture sink_fixture;\nstatic struct usb_pe_test_source_fixture source_fixture;\n```\nThen populate and return pointers to them in their respective setup functions. Since `struct usb_pe_test_fixture` is the first member of both wrappers, `usb_pe_test_before` and `usb_pe_test_after` will still function correctly by casting `data` to `struct usb_pe_test_fixture *` inside.",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 67,
+        "endChar": 0
+      },
+      "revId": "93e3c2eea524d4b19c75eeacdb898b62249a29a4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14205ac9_31a22f87",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-08-27T00:19:03Z",
+      "side": 1,
+      "message": "Done. Statically allocated distinct sink_fixture and source_fixture wrapper structs in setup functions.",
+      "parentUuid": "335fa3b7_d2bf9b3d",
       "range": {
         "startLine": 67,
         "startChar": 0,
