@@ -435,73 +435,93 @@ ZTEST_USER(tps6699x, test_get_attention_vdo)
 	zassert_equal(get_attention_vdo.num_vdos, 2);
 }
 
-/* Cover the tps6699x driver returning revision with GET_PD_MESSAGE */
-ZTEST_USER(tps6699x, test_get_pd_message_revision)
-{
-	struct ucsi_memory_region ucsi_data;
-	struct ucsi_control_t *control = &ucsi_data.control;
-	union get_pd_message_t get_pd_message_cmd = { 0 };
-	uint32_t rmdo_in, rmdo_out;
-
-	access = ACCESS_OK;
-	RESET_FAKE(tps_rw_port_control);
-	tps_rw_port_control_fake.custom_fake = custom_fake_tps_rw_port_control;
-
-	/* Set revision in PDC emulator */
-	rmdo_in = 0x31110000;
-	emul_pdc_set_revision(emul, rmdo_in);
-	k_sleep(K_MSEC(SLEEP_MS));
-
-	/* GET_PD_MESSAGE command to request RMDO */
-	get_pd_message_cmd.connector_number = 0;
-	get_pd_message_cmd.recipient = 1;
-	get_pd_message_cmd.response_message_type = GET_PD_MESSAGE_REVISION;
-
-	/* Send GET_PD_MESSAGE */
-	memcpy(&control->command_specific, &get_pd_message_cmd.raw_value,
-	       sizeof(union get_pd_message_t));
-	zassert_ok(pdc_execute_ucsi_cmd(
-		dev, UCSI_GET_PD_MESSAGE, sizeof(union get_pd_message_t),
-		control->command_specific, ucsi_data.message_in, NULL));
-	k_sleep(K_MSEC(SLEEP_MS));
-
-	/* Verify returned RMDO matches the emulator's RMDO */
-	memcpy(&rmdo_out, &ucsi_data.message_in, sizeof(uint32_t));
-	zassert_equal(rmdo_in, rmdo_out);
-}
-
 /* Cover the tps6699x driver returning discover identity with GET_PD_MESSAGE */
 ZTEST_USER(tps6699x, test_get_pd_message_identity)
 {
 	struct ucsi_memory_region ucsi_data;
 	struct ucsi_control_t *control = &ucsi_data.control;
 	union get_pd_message_t get_pd_message_cmd = { 0 };
-	uint32_t disc_in[PDC_DISC_IDENTITY_VDO_COUNT] = { 0x1, 0x2, 0x3, 0x4,
+	uint32_t disc_in[PDC_DISC_IDENTITY_VDO_COUNT] = { 0x0, 0x2, 0x3, 0x4,
 							  0x5, 0x6, 0x7 };
 	uint32_t disc_out[PDC_DISC_IDENTITY_VDO_COUNT] = { 0 };
+	struct pdc_callback callback;
 
 	access = ACCESS_OK;
 	RESET_FAKE(tps_rw_port_control);
 	tps_rw_port_control_fake.custom_fake = custom_fake_tps_rw_port_control;
 
-	/* Set fake Disc ID response in PDC emulator */
-	emul_pdc_set_identity(emul, disc_in);
-	k_sleep(K_MSEC(SLEEP_MS));
+	/* Verify command_specific == NULL returns -EINVAL */
+	zassert_equal(pdc_execute_ucsi_cmd(dev, UCSI_GET_PD_MESSAGE, 0, NULL,
+					   ucsi_data.message_in, NULL),
+		      -EINVAL);
 
-	/* GET_PD_MESSAGE command to request Disc ID */
+	/* Verify unsupported response_message_type returns -ENOSYS */
 	get_pd_message_cmd.connector_number = 0;
-	get_pd_message_cmd.recipient = 1;
-	get_pd_message_cmd.response_message_type = GET_PD_MESSAGE_DISC_ID;
-
-	/* Send GET_PD_MESSAGE */
+	get_pd_message_cmd.recipient = VDO_ORIGIN_SOP;
+	get_pd_message_cmd.response_message_type = GET_PD_MESSAGE_REVISION;
 	memcpy(&control->command_specific, &get_pd_message_cmd.raw_value,
 	       sizeof(union get_pd_message_t));
+	zassert_equal(pdc_execute_ucsi_cmd(dev, UCSI_GET_PD_MESSAGE,
+					   sizeof(union get_pd_message_t),
+					   control->command_specific,
+					   ucsi_data.message_in, NULL),
+		      -ENOSYS);
+
+	/* Verify unsupported recipient returns -ENOSYS */
+	get_pd_message_cmd.recipient = 0;
+	get_pd_message_cmd.response_message_type = GET_PD_MESSAGE_DISC_ID;
+	memcpy(&control->command_specific, &get_pd_message_cmd.raw_value,
+	       sizeof(union get_pd_message_t));
+	zassert_equal(pdc_execute_ucsi_cmd(dev, UCSI_GET_PD_MESSAGE,
+					   sizeof(union get_pd_message_t),
+					   control->command_specific,
+					   ucsi_data.message_in, NULL),
+		      -ENOSYS);
+
+	/* Test case where response_type != 1 (identity not discovered) */
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+
+	get_pd_message_cmd.connector_number = 0;
+	get_pd_message_cmd.recipient = VDO_ORIGIN_SOP;
+	get_pd_message_cmd.response_message_type = GET_PD_MESSAGE_DISC_ID;
+	memcpy(&control->command_specific, &get_pd_message_cmd.raw_value,
+	       sizeof(union get_pd_message_t));
+
+	test_cc_cb_cci.raw_value = 0;
+	test_cc_cb_called = false;
+	memset(ucsi_data.message_in, 0x5a, sizeof(ucsi_data.message_in));
+
+	/* Send GET_PD_MESSAGE for SOP before identity is discovered */
 	zassert_ok(pdc_execute_ucsi_cmd(
 		dev, UCSI_GET_PD_MESSAGE, sizeof(union get_pd_message_t),
 		control->command_specific, ucsi_data.message_in, NULL));
 	k_sleep(K_MSEC(SLEEP_MS));
 
-	/* Verify returned RMDO matches the emulator's RMDO */
+	/* Verify error in CCI event */
+	zassert_true(test_cc_cb_cci.error);
+
+	memcpy(disc_out, &ucsi_data.message_in,
+	       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
+	for (int i = 0; i < PDC_DISC_IDENTITY_VDO_COUNT; i++) {
+		zassert_equal(0, disc_out[i]);
+	}
+
+	pdc_set_cc_callback(dev, NULL);
+
+	/* Set fake Disc ID response in PDC emulator */
+	emul_pdc_set_identity(emul, disc_in);
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Send GET_PD_MESSAGE for SOP once identity is discovered */
+	memset(ucsi_data.message_in, 0, sizeof(ucsi_data.message_in));
+	zassert_ok(pdc_execute_ucsi_cmd(
+		dev, UCSI_GET_PD_MESSAGE, sizeof(union get_pd_message_t),
+		control->command_specific, ucsi_data.message_in, NULL));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Verify returned Discover Identity matches the emulator's Discover
+	 * Identity */
 	memcpy(disc_out, &ucsi_data.message_in,
 	       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
 	for (int i = 0; i < PDC_DISC_IDENTITY_VDO_COUNT; i++) {
