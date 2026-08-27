@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2410e27a_bf1df385",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-27T19:49:32Z",
+      "side": 1,
+      "message": "Patch failed to apply in CQ. Rebasing to try again.",
+      "revId": "98e2501797c9fa0a1d14494ae0ce4e2ecd8c373e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
