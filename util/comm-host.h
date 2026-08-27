@@ -34,8 +34,17 @@ enum comm_interface {
 	COMM_I2C = BIT(2),
 	COMM_SERVO = BIT(3),
 	COMM_USB = BIT(4),
+	COMM_UART = BIT(5),
 	COMM_ALL = -1
 };
+
+/**
+ * Initialize UART interface
+ *
+ * @param device_path Path to TTY device/PTY or host:port
+ * @return 0 in case of success, or error code.
+ */
+int comm_init_uart(const char *device_path);
 
 /**
  * Initialize alternative interfaces
