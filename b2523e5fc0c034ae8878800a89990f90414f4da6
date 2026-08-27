@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5675565d_37dd8621",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-08-27T08:39:01Z",
+      "side": 1,
+      "message": "I verified patchset 9 locally to successfully enroll a fingerprint and run the matching algorithm.",
+      "revId": "b2523e5fc0c034ae8878800a89990f90414f4da6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
