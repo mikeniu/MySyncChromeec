@@ -288,34 +288,6 @@ static void tps6699x_emul_ucsi_set_pdos(struct tps6699x_emul_pdc_data *data,
 	}
 }
 
-static void
-tps699x_emul_get_pd_message(struct tps6699x_emul_pdc_data *data,
-			    const union get_pd_message_t *get_pd_message)
-{
-	switch (get_pd_message->response_message_type) {
-	case GET_PD_MESSAGE_DISC_ID:
-		data->response.result = TASK_COMPLETED_SUCCESSFULLY;
-		data->response.data.length =
-			sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT;
-		memcpy(data->response.data.pd_message, &data->identity,
-		       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
-		memcpy(&data->reg_val[REG_DATA_FOR_CMD1], &data->response,
-		       sizeof(data->response));
-		break;
-	case GET_PD_MESSAGE_REVISION:
-		data->response.result = TASK_COMPLETED_SUCCESSFULLY;
-		data->response.data.length = sizeof(uint32_t);
-		memcpy(data->response.data.pd_message, &data->rmdo,
-		       sizeof(uint32_t));
-		memcpy(data->reg_val[REG_DATA_FOR_CMD1], &data->response,
-		       sizeof(data->response));
-		break;
-	default:
-		/* Unsupported GET_PD_MESSAGE command */
-		break;
-	}
-}
-
 static void tps699x_emul_get_current_cam(struct tps6699x_emul_pdc_data *data)
 {
 	data->response.result = TASK_COMPLETED_SUCCESSFULLY;
@@ -391,10 +363,6 @@ static void tps6699x_emul_handle_ucsi(struct tps6699x_emul_pdc_data *data,
 		break;
 	case UCSI_SET_PDOS:
 		tps6699x_emul_ucsi_set_pdos(data, data_reg);
-		break;
-	case UCSI_GET_PD_MESSAGE:
-		tps699x_emul_get_pd_message(
-			data, (union get_pd_message_t *)&data_reg[2]);
 		break;
 	case UCSI_GET_CURRENT_CAM:
 		tps699x_emul_get_current_cam(data);
@@ -1540,16 +1508,14 @@ static int emul_tps6699x_set_identity(const struct emul *target, uint32_t *vdos)
 {
 	struct tps6699x_emul_pdc_data *data =
 		tps6699x_emul_get_pdc_data(target);
-	memcpy(&data->identity, vdos,
-	       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
-	return 0;
-}
+	union reg_received_identity_data_object *sop_id =
+		(union reg_received_identity_data_object *)
+			data->reg_val[REG_RECEIVED_SOP_IDENTITY_DATA_OBJECT];
 
-static int emul_tps6699x_set_revision(const struct emul *target, uint32_t rmdo)
-{
-	struct tps6699x_emul_pdc_data *data =
-		tps6699x_emul_get_pdc_data(target);
-	data->rmdo = rmdo;
+	sop_id->number_valid_vdos = 6;
+	sop_id->response_type = 1;
+	memcpy(sop_id->vdo, &vdos[1], sizeof(uint32_t) * 6);
+
 	return 0;
 }
 
@@ -1639,7 +1605,6 @@ static DEVICE_API(emul_pdc, emul_tps6699x_api) = {
 	.reset_feature_flags = emul_tps6699x_reset_feature_flags,
 	.get_autoneg_sink = emul_tps6699x_get_autoneg_sink,
 	.set_identity = emul_tps6699x_set_identity,
-	.set_revision = emul_tps6699x_set_revision,
 	.set_current_cam = emul_tps6699x_set_current_cam,
 	.get_sbu_mux_mode = emul_tps6699x_get_sbu_mux_mode,
 	.get_max_pdp = emul_tps6699x_get_max_pdp,
