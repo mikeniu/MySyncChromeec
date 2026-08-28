@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "hooks.h"
 #include "include/lpc.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
@@ -218,6 +219,60 @@ ZTEST_USER(host_cmd_host_event_commands, test_host_event_clear_b_cmd)
 
 	zassert_equal(ret_val, EC_RES_SUCCESS, "Expected %d, returned %d",
 		      EC_RES_SUCCESS, ret_val);
+
+	host_cmd_host_event(EC_HOST_EVENT_GET, EC_HOST_EVENT_B, &result);
+	events_b = result.value;
+	zassert_false(events_b & mask, "events_b=0x%X", events_b);
+}
+
+/**
+ * @brief Verify events_copy_b is cleared on HOOK_CHIPSET_SHUTDOWN.
+ */
+ZTEST_USER(host_cmd_host_event_commands, test_host_event_clear_b_on_shutdown)
+{
+	host_event_t events_b;
+	host_event_t mask = EC_HOST_EVENT_MASK(EC_HOST_EVENT_KEYBOARD_RECOVERY);
+	host_event_t lpc_event_mask;
+	struct ec_response_host_event result = { 0 };
+
+	lpc_event_mask = lpc_get_host_event_mask(LPC_HOST_EVENT_SMI);
+	lpc_set_host_event_mask(LPC_HOST_EVENT_SMI, lpc_event_mask | mask);
+
+	host_set_single_event(EC_HOST_EVENT_KEYBOARD_RECOVERY);
+
+	host_cmd_host_event(EC_HOST_EVENT_GET, EC_HOST_EVENT_B, &result);
+	events_b = result.value;
+	zassert_true(events_b & mask, "events_b=0x%X", events_b);
+
+	/* Trigger HOOK_CHIPSET_SHUTDOWN to clear events_copy_b */
+	hook_notify(HOOK_CHIPSET_SHUTDOWN);
+
+	host_cmd_host_event(EC_HOST_EVENT_GET, EC_HOST_EVENT_B, &result);
+	events_b = result.value;
+	zassert_false(events_b & mask, "events_b=0x%X", events_b);
+}
+
+/**
+ * @brief Verify events_copy_b is cleared on HOOK_CHIPSET_SUSPEND.
+ */
+ZTEST_USER(host_cmd_host_event_commands, test_host_event_clear_b_on_suspend)
+{
+	host_event_t events_b;
+	host_event_t mask = EC_HOST_EVENT_MASK(EC_HOST_EVENT_KEYBOARD_RECOVERY);
+	host_event_t lpc_event_mask;
+	struct ec_response_host_event result = { 0 };
+
+	lpc_event_mask = lpc_get_host_event_mask(LPC_HOST_EVENT_SMI);
+	lpc_set_host_event_mask(LPC_HOST_EVENT_SMI, lpc_event_mask | mask);
+
+	host_set_single_event(EC_HOST_EVENT_KEYBOARD_RECOVERY);
+
+	host_cmd_host_event(EC_HOST_EVENT_GET, EC_HOST_EVENT_B, &result);
+	events_b = result.value;
+	zassert_true(events_b & mask, "events_b=0x%X", events_b);
+
+	/* Trigger HOOK_CHIPSET_SUSPEND to clear events_copy_b */
+	hook_notify(HOOK_CHIPSET_SUSPEND);
 
 	host_cmd_host_event(EC_HOST_EVENT_GET, EC_HOST_EVENT_B, &result);
 	events_b = result.value;
