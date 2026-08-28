@@ -6,4 +6,6 @@
 #ifndef __CROS_EC_LED_LB_HOST_PROGRAM_H
 #define __CROS_EC_LED_LB_HOST_PROGRAM_H
 
+#include "ec_commands.h"
+
 #endif /* __CROS_EC_LED_LB_HOST_PROGRAM_H */
