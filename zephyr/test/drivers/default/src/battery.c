@@ -305,3 +305,58 @@ ZTEST_F(battery, test_get_disconnect_state)
 
 	zassert_equal(BATTERY_DISCONNECTED, rv, "RV=%x", rv);
 }
+
+ZTEST(battery, test_battery_fake_params)
+{
+	struct batt_params batt = { 0 };
+
+	batt.full_capacity = 5000;
+	batt.flags = BATT_FLAG_BAD_TEMPERATURE | BATT_FLAG_BAD_STATE_OF_CHARGE |
+		     BATT_FLAG_BAD_REMAINING_CAPACITY;
+
+	battery_set_fake_soc(75);
+	battery_set_fake_temp(3000);
+
+	zassert_equal(75, battery_get_fake_soc());
+	zassert_equal(3000, battery_get_fake_temp());
+
+	battery_apply_fake_params(&batt);
+
+	zassert_equal(75, batt.state_of_charge);
+	zassert_equal(3000, batt.temperature);
+	zassert_equal(3750, batt.remaining_capacity);
+	zassert_false(batt.flags & BATT_FLAG_BAD_TEMPERATURE);
+	zassert_false(batt.flags & BATT_FLAG_BAD_STATE_OF_CHARGE);
+	zassert_false(batt.flags & BATT_FLAG_BAD_REMAINING_CAPACITY);
+
+	/* Reset fake params */
+	battery_set_fake_soc(-1);
+	battery_set_fake_temp(-1);
+}
+
+void check_battery_soc_change(struct batt_params batt);
+
+ZTEST(battery, test_check_battery_soc_change)
+{
+	struct batt_params batt = { 0 };
+
+	batt.state_of_charge = 50;
+	batt.display_charge = 500;
+	check_battery_soc_change(batt);
+
+	/* Calling again with same SoC and display charge shouldn't notify */
+	check_battery_soc_change(batt);
+
+	/* Calling with changed SoC */
+	batt.state_of_charge = 60;
+	check_battery_soc_change(batt);
+
+	/* Calling with changed display charge */
+	batt.display_charge = 650;
+	check_battery_soc_change(batt);
+
+	/* Bad state of charge flag should not trigger on SoC change */
+	batt.flags |= BATT_FLAG_BAD_STATE_OF_CHARGE;
+	batt.state_of_charge = 70;
+	check_battery_soc_change(batt);
+}
