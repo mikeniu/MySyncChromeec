@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cdaab516_42971a3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-08-28T08:42:19Z",
+      "side": 1,
+      "message": "We considered that and conducted some experiments, it appears that PS_HOLD collapses in the same manner as S4c_PG, only slightly earlier; consequently, it cannot be utilized to differentiate between a hard reset and a shutdown.\n\nPlease examine the signal transition provided below for the hard reset scenario:\n```\n signal changes:\n 426.366600  +0.000000  soc_ps_hold_ls \u003d\u003e 0\n 426.366900  +0.000300  ap_plt_rst_n \u003d\u003e 0\n 426.440800  +0.073900  s4c_pwr_off_l \u003d\u003e 0\n 426.504900  +0.064100  s4c_pwr_off_l \u003d\u003e 1\n 426.541300  +0.036400  ap_plt_rst_n \u003d\u003e 1\n 426.542000  +0.000700  soc_ps_hold_ls \u003d\u003e 1\n```",
+      "parentUuid": "859578d7_d1111b0e",
+      "revId": "e58c5463b025fa8c2d6f3eb95d938bac2daf438c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "386d901f_aa79c90e",
         "filename": "power/qcom_exp.c",
         "patchSetId": 2
