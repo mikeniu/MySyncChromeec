@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-if PLATFORM_EC_HOSTCMD
+if HAS_HOSTCMD
 
 choice PLATFORM_EC_HOST_INTERFACE_TYPE
 	prompt "Select the host interface type"
@@ -62,4 +62,4 @@ config PLATFORM_EC_HOST_INTERFACE_USB
 
 endchoice # PLATFORM_EC_HOST_INTERFACE_TYPE
 
-endif # PLATFORM_EC_HOSTCMD
+endif # HAS_HOSTCMD

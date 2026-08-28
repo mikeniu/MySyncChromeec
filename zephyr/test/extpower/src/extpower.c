@@ -16,7 +16,7 @@ static int ac_hook_count;
 
 static void before_and_after(void *unused)
 {
-	if (IS_ENABLED(HAS_TASK_HOSTCMD)) {
+	if (IS_ENABLED(CONFIG_HAS_HOSTCMD)) {
 		host_clear_events(0xFFFFFFFF);
 	}
 }
@@ -36,7 +36,7 @@ ZTEST(extpower, test_extpower_gpio)
 	zassert_equal(ac_hook_count, 1);
 	zassert_equal(extpower_is_present(), 1);
 
-	if (IS_ENABLED(HAS_TASK_HOSTCMD)) {
+	if (IS_ENABLED(CONFIG_HAS_HOSTCMD)) {
 		zassert_true(host_is_event_set(EC_HOST_EVENT_AC_CONNECTED));
 	}
 
@@ -44,7 +44,7 @@ ZTEST(extpower, test_extpower_gpio)
 	zassert_equal(ac_hook_count, 2);
 	zassert_equal(extpower_is_present(), 0);
 
-	if (IS_ENABLED(HAS_TASK_HOSTCMD)) {
+	if (IS_ENABLED(CONFIG_HAS_HOSTCMD)) {
 		zassert_true(host_is_event_set(EC_HOST_EVENT_AC_DISCONNECTED));
 	}
 }
@@ -63,13 +63,13 @@ ZTEST(extpower, test_extpower_gpio_debounce)
 
 	zassert_equal(ac_hook_count, 0);
 
-	if (IS_ENABLED(HAS_TASK_HOSTCMD)) {
+	if (IS_ENABLED(CONFIG_HAS_HOSTCMD)) {
 		zassert_false(host_is_event_set(EC_HOST_EVENT_AC_CONNECTED));
 		zassert_false(host_is_event_set(EC_HOST_EVENT_AC_DISCONNECTED));
 	}
 }
 
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 ZTEST(extpower, test_extpower_ap_startup)
 {
 	hook_notify(HOOK_CHIPSET_SHUTDOWN);

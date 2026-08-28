@@ -38,7 +38,7 @@ static void extpower_update_host_events(int is_present)
 	host_clear_events(mask);
 }
 
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 static void extpower_sync_host_events(void)
 {
 	extpower_update_host_events(extpower_is_present());
@@ -52,7 +52,7 @@ test_mockable void extpower_handle_update(int is_present)
 {
 	hook_notify(HOOK_AC_CHANGE);
 
-	if (!IS_ENABLED(HAS_TASK_HOSTCMD)) {
+	if (!IS_ENABLED(CONFIG_HAS_HOSTCMD)) {
 		return;
 	}
 

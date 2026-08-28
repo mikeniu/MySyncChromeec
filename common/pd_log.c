@@ -28,7 +28,7 @@ void pd_log_event(uint8_t type, uint8_t size_port, uint16_t data, void *payload)
 	log_add_event(type, size_port, data, payload, timestamp);
 }
 
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 
 /* number of accessory entries we have queued since last check */
 static volatile int incoming_logs;
@@ -117,7 +117,7 @@ static enum ec_status hc_pd_write_log_entry(struct host_cmd_handler_args *args)
 }
 DECLARE_HOST_COMMAND(EC_CMD_PD_WRITE_LOG_ENTRY, hc_pd_write_log_entry,
 		     EC_VER_MASK(0));
-#else /* !HAS_TASK_HOSTCMD */
+#else /* !CONFIG_HAS_HOSTCMD */
 /* we are a PD accessory, send back the events as a VDM (VDO_CMD_GET_LOG) */
 int pd_vdm_get_log_entry(uint32_t *payload)
 {
@@ -128,4 +128,4 @@ int pd_vdm_get_log_entry(uint32_t *payload)
 
 	return 1 + DIV_ROUND_UP(byte_size, sizeof(uint32_t));
 }
-#endif /* !HAS_TASK_HOSTCMD */
+#endif /* !CONFIG_HAS_HOSTCMD */

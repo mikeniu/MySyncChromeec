@@ -97,7 +97,6 @@ configdefault DEVICE_API_ASSERT
 config EC_HOST_CMD
 	default n if ARCH_POSIX
 	default y if AP && !HECI
-	select EC_HOST_CMD_IN_PROGRESS_STATUS
 	select EC_HOST_CMD_DEDICATED_THREAD if ZTEST
 
 orsource "Kconfig.defaults-$(ARCH)"
