@@ -151,8 +151,8 @@ if(CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
       pw_log_zephyr.tokenized_lib
       zephyr_interface
   )
-  zephyr_library_link_libraries(platform_ec_log.tokenized_handler)
-
-
+  pw_zephyrize_libraries_ifdef(CONFIG_PIGWEED_LOG_TOKENIZED_LIB
+                               platform_ec_log.tokenized_handler
+  )
 
 endif()
