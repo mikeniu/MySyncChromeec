@@ -1,0 +1,37 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+
+/ {
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+
+		ec_i2c_adsp: ec_i2c_adsp {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_ADSP", "I2C_PORT_BATTERY";
+		};
+	};
+
+	batteries {
+		default_battery: pow-tech_sg20 {
+			compatible = "pow-tech,sg20", "battery-smart";
+		};
+	};
+
+	usbc {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port0@0 {
+			compatible = "named-usbc-port";
+			reg = <0>;
+		};
+		port1@1 {
+			compatible = "named-usbc-port";
+			reg = <1>;
+		};
+	};
+};
