@@ -475,7 +475,6 @@ class Renode(Platform):
             # TODO(b/382705460): We have seen this flake in the CQ.
             # Re-enable when missing character bug is fixed.
             "fp_transport",  # TODO(b/384094788)
-            "fpsensor_debug",  # TODO(b/384110894)
             "zephyr_flash_stm32f4",  # TODO(b/384974228)
             # TODO(b/384975384)
             "zephyr_counter_basic_api_stm32_subsec",
