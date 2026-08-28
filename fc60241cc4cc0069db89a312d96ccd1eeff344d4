@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cddd963b_297b93e4",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 758,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-28T18:08:13Z",
+      "side": 1,
+      "message": "For the old behavior, without this new CONFIG defined, this call is skipped. Is this change intended?\n\nAnd this #ifdef logic seems too compliced, you may think of simplifying it. Is it better to wrap these in functions so other places can reuse?\n```\n\t\tapply_ac_pon_trigger();\n\t\tret \u003d wait_pmic_pwron(enable, PMIC_POWER_AP_RESPONSE_TIMEOUT);\n\t\tclear_ac_pon_trigger();\n```",
+      "range": {
+        "startLine": 758,
+        "startChar": 2,
+        "endLine": 758,
+        "endChar": 27
+      },
+      "revId": "fc60241cc4cc0069db89a312d96ccd1eeff344d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4782f77f_544ab50c",
+        "filename": "power/qcom_exp.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 921,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-08-28T18:08:13Z",
+      "side": 1,
+      "message": "Use IS_ENABLED(), same as the following.",
+      "range": {
+        "startLine": 921,
+        "startChar": 7,
+        "endLine": 921,
+        "endChar": 44
+      },
+      "revId": "fc60241cc4cc0069db89a312d96ccd1eeff344d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
