@@ -29,3 +29,15 @@ tests:
       - CONFIG_TEST_BOARD_QUENBI_FAN=y
     extra_dtc_overlay_files:
       - "boards/quenbi.overlay"
+  bluey.mica:
+    extra_configs:
+      - CONFIG_TEST_BOARD_MICA=y
+      - CONFIG_TEST_BOARD_MICA_CHIPSET=y
+      - CONFIG_TEST_BOARD_MICA_EXTPOWER=y
+      - CONFIG_TEST_BOARD_MICA_FAN=y
+      - CONFIG_TEST_BOARD_MICA_KEYBOARD=y
+      - CONFIG_TEST_BOARD_MICA_LED=y
+      - CONFIG_TEST_BOARD_MICA_THROTTLE=y
+      - CONFIG_PLATFORM_EC_TEMP_SENSOR=y
+    extra_dtc_overlay_files:
+      - "boards/mica.overlay"

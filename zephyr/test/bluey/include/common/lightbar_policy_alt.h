@@ -1,0 +1,13 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#ifndef PLATFORM_EC_ZEPHYR_TEST_BLUEY_INCLUDE_COMMON_LIGHTBAR_POLICY_ALT_H_
+#define PLATFORM_EC_ZEPHYR_TEST_BLUEY_INCLUDE_COMMON_LIGHTBAR_POLICY_ALT_H_
+
+#define LED_ALT_POLICY_NORMAL 0
+#define LED_ALT_POLICY_DIAG_BASE 10
+
+#endif /* PLATFORM_EC_ZEPHYR_TEST_BLUEY_INCLUDE_COMMON_LIGHTBAR_POLICY_ALT_H_ \
+	*/
