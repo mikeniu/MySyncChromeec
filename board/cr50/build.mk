@@ -43,6 +43,17 @@ BRANCH_EXT:=
 # second time.
 ifeq ($(BOARD_MK_INCLUDED_ONCE),)
 
+RO_VER ?= 0.0.14
+RO_A_BIN ?= $(BDIR)/ROs/cr50.prod.ro.A.$(RO_VER).bin
+RO_B_BIN ?= $(BDIR)/ROs/cr50.prod.ro.B.$(RO_VER).bin
+
+ifneq ($(wildcard $(RO_A_BIN)),)
+CPPFLAGS += -DRO_A_BIN=$(RO_A_BIN)
+endif
+ifneq ($(wildcard $(RO_B_BIN)),)
+CPPFLAGS += -DRO_B_BIN=$(RO_B_BIN)
+endif
+
 # List of variables which can be defined in the environment or set in the make
 # command line.
 ENV_VARS := CR50_DEV CRYPTO_TEST CMAC_TEST DCRYPTO_TEST DRBG_TEST ECDSA_TEST\
@@ -118,6 +129,13 @@ else
 
 # Need to generate a .hex file
 all: hex
+
+ifneq ($(wildcard $(RO_A_BIN)),)
+$(out)/$(PROJECT).obj: $(RO_A_BIN)
+endif
+ifneq ($(wildcard $(RO_B_BIN)),)
+$(out)/$(PROJECT).obj: $(RO_B_BIN)
+endif
 
 ifeq ($(CONFIG_DCRYPTO_BOARD),y)
 # chip/g/build.mk also adds chip/g/dcrypto for CONFIG_DCRYPTO

@@ -31,6 +31,9 @@ and RW images at different Flash offset */
 
 #else
 #define IMAGE_RO_AT (CONFIG_PROGRAM_MEMORY_BASE + CONFIG_RO_MEM_OFF)
+#ifdef CHIP_RO_B_MEM_OFF
+#define IMAGE_RO_B_AT (CONFIG_PROGRAM_MEMORY_BASE + CHIP_RO_B_MEM_OFF)
+#endif
 #define IMAGE_RW_AT (CONFIG_PROGRAM_MEMORY_BASE + CONFIG_RW_MEM_OFF)
 #define IMAGE_RW_B_AT (CONFIG_PROGRAM_MEMORY_BASE + CONFIG_RW_B_MEM_OFF)
 #endif
@@ -75,6 +78,11 @@ SECTIONS
     } > FLASH =0xff
 #endif
 #ifdef CONFIG_RW_B_MEM_OFF
+#ifdef IMAGE_RO_B_AT
+    .image.RO_B : AT(IMAGE_RO_B_AT) {
+        *(.image.RO_B)
+    } > FLASH =0xff
+#endif
     .image.RW_B : AT(IMAGE_RW_B_AT) {
         *(.image.RW_B)
     } > FLASH =0xff

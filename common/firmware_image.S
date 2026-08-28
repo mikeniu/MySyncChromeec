@@ -23,6 +23,14 @@
 #ifdef CONFIG_FW_INCLUDE_RO
 .section .image.RO, "ax"
 .incbin FW_IMAGE(RO,)
+#elif defined(RO_A_BIN)
+.section .image.RO, "ax"
+.incbin STRINGIFY(RO_A_BIN)
+#endif
+
+#ifdef RO_B_BIN
+.section .image.RO_B, "ax"
+.incbin STRINGIFY(RO_B_BIN)
 #endif
 
 #ifdef CONFIG_RWSIG_TYPE_RWSIG
