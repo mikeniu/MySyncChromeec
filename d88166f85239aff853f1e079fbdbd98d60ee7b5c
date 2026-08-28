@@ -81,6 +81,30 @@
       },
       "revId": "d88166f85239aff853f1e079fbdbd98d60ee7b5c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f490823b_eacfd01c",
+        "filename": "common/system.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 668,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-08-28T01:02:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f77b0d7e_da810995",
+      "range": {
+        "startLine": 666,
+        "startChar": 0,
+        "endLine": 668,
+        "endChar": 18
+      },
+      "revId": "d88166f85239aff853f1e079fbdbd98d60ee7b5c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
