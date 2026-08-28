@@ -82,4 +82,22 @@ config TEST_BOARD_QUENBI_CHIPSET
 config TEST_BOARD_QUENBI_FAN
 	bool "Enable quenbi fan tests"
 
+config TEST_BOARD_MICA_CHIPSET
+	bool "Enable mica chipset tests"
+
+config TEST_BOARD_MICA_EXTPOWER
+	bool "Enable mica extpower tests"
+
+config TEST_BOARD_MICA_FAN
+	bool "Enable mica fan tests"
+
+config TEST_BOARD_MICA_KEYBOARD
+	bool "Enable mica keyboard tests"
+
+config TEST_BOARD_MICA_LED
+	bool "Enable mica led tests"
+
+config TEST_BOARD_MICA_THROTTLE
+	bool "Enable mica throttle tests"
+
 source "Kconfig.zephyr"
