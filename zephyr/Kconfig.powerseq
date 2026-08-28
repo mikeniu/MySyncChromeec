@@ -68,7 +68,7 @@ config PLATFORM_EC_POWERSEQ_S0IX_COUNTER
 
 config PLATFORM_EC_HOSTCMD_AP_RESET
 	bool "Host command: EC_CMD_AP_RESET"
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	help
 	  Enable support for EC_CMD_AP_RESET, used by the AP to request that
 	  the EC perform a reset of the AP.
@@ -85,7 +85,7 @@ config PLATFORM_EC_HOSTCMD_AP_RESET_SCHEDULED
 
 config PLATFORM_EC_HOSTCMD_AP_SHUTDOWN
 	bool "Host command: EC_CMD_AP_RESET"
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	help
 	  Enable support for EC_CMD_AP_SHUTDOWN, used by the AP to request that
 	  the EC perform a shutdown of the AP.
@@ -325,7 +325,7 @@ config PLATFORM_EC_SUPPORT_HARD_RESET
 
 config PLATFORM_EC_HOSTCMD_ENABLE_OFFMODE_HEARTBEAT
 	bool "Enable Support for AP to enter G3 and enable heartbeat wake"
-	depends on PLATFORM_EC_POWERSEQ_QC_EXP && PLATFORM_EC_HOSTCMD
+	depends on PLATFORM_EC_POWERSEQ_QC_EXP && HAS_HOSTCMD
 	help
 	  Enable Off-Mode Charging Heartbeat Wake mode for the QC_EXP driver.
 
