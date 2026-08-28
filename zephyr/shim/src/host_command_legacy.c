@@ -16,6 +16,24 @@
 #endif
 #endif /* !CONFIG_ZTEST */
 
+BUILD_ASSERT(sizeof(struct host_cmd_handler_args) ==
+		     sizeof(struct ec_host_cmd_handler_args),
+	     "Incompatible structure.");
+BUILD_ASSERT(offsetof(struct host_cmd_handler_args, command) ==
+	     offsetof(struct ec_host_cmd_handler_args, command));
+BUILD_ASSERT(offsetof(struct host_cmd_handler_args, version) ==
+	     offsetof(struct ec_host_cmd_handler_args, version));
+BUILD_ASSERT(offsetof(struct host_cmd_handler_args, params) ==
+	     offsetof(struct ec_host_cmd_handler_args, input_buf));
+BUILD_ASSERT(offsetof(struct host_cmd_handler_args, params_size) ==
+	     offsetof(struct ec_host_cmd_handler_args, input_buf_size));
+BUILD_ASSERT(offsetof(struct host_cmd_handler_args, response) ==
+	     offsetof(struct ec_host_cmd_handler_args, output_buf));
+BUILD_ASSERT(offsetof(struct host_cmd_handler_args, response_max) ==
+	     offsetof(struct ec_host_cmd_handler_args, output_buf_max));
+BUILD_ASSERT(offsetof(struct host_cmd_handler_args, response_size) ==
+	     offsetof(struct ec_host_cmd_handler_args, output_buf_size));
+
 struct host_command *zephyr_find_host_command(int command)
 {
 	STRUCT_SECTION_FOREACH(host_command, cmd)
