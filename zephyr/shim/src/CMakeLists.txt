@@ -51,7 +51,7 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FLASH_CROS  flash.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_GPIO_ID
 							    gpio_id.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOOKS       hooks.c)
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD     host_command.c)
+zephyr_library_sources_ifdef(CONFIG_HAS_HOSTCMD         host_command.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
                                                             console_buffer.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_CROS_DRV

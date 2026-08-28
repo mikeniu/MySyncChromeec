@@ -25,6 +25,11 @@
  */
 #ifdef CONFIG_ZEPHYR
 #include "shimmed_tasks.h"
+#else
+#ifdef HAS_TASK_HOSTCMD
+/* This is needed for legacy tests that use HAS_TASK_HOSTCMD */
+#define CONFIG_HAS_HOSTCMD
+#endif
 #endif /* CONFIG_ZEPHYR */
 
 #ifdef INCLUDE_ENV_CONFIG
@@ -2640,7 +2645,7 @@
 #define CONFIG_HOSTCMD_DEBUG_MODE HCDEBUG_NORMAL
 
 /* If we have host command task, assume we also are using host events. */
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 #define CONFIG_HOSTCMD_EVENTS
 #else
 #undef CONFIG_HOSTCMD_EVENTS
@@ -4775,7 +4780,7 @@
 #define CONFIG_USB_PD_CONSOLE_CMD
 
 /* Enables PD Host commands */
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 #define CONFIG_USB_PD_HOST_CMD
 #endif
 

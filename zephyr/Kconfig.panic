@@ -85,4 +85,5 @@ config PLATFORM_EC_PANIC_LOG_DEBUG
 	  Enables panic log debug features, including
 	  the `paniclog` console command.
 
+
 endif # PLATFORM_EC_PANIC

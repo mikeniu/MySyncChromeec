@@ -18,13 +18,11 @@ LOG_MODULE_REGISTER(cros_ec_heci, LOG_LEVEL_INF);
 
 #define CROS_EC_ISHTP_STACK_SIZE 1024
 
-#define HECI_CLIENT_CROS_EC_ISH_GUID                                   \
-	{                                                              \
-		0x7b7154d0, 0x56f4, 0x4bdc,                            \
-		{                                                      \
-			0xb0, 0xd8, 0x9e, 0x7c, 0xda, 0xe0, 0xd6, 0xa0 \
-		}                                                      \
-	}
+#define HECI_CLIENT_CROS_EC_ISH_GUID \
+	{ 0x7b7154d0,                \
+	  0x56f4,                    \
+	  0x4bdc,                    \
+	  { 0xb0, 0xd8, 0x9e, 0x7c, 0xda, 0xe0, 0xd6, 0xa0 } }
 
 /*
  * If we hit response buffer size issues, we can increase this. This is the
@@ -140,7 +138,7 @@ static void cros_ec_ishtp_process_msg(uint8_t *msg, const size_t msg_size)
 	heci_packet.response_size = 0;
 
 	heci_packet.driver_result = EC_RES_SUCCESS;
-	if (IS_ENABLED(HAS_TASK_HOSTCMD))
+	if (IS_ENABLED(CONFIG_HAS_HOSTCMD))
 		host_packet_receive(&heci_packet);
 }
 

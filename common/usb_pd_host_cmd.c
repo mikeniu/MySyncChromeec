@@ -27,7 +27,7 @@
 #define CPRINTS(format, args...)
 #endif /* CONFIG_COMMON_RUNTIME */
 
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 
 static enum ec_status hc_pd_ports(struct host_cmd_handler_args *args)
 {
@@ -147,4 +147,4 @@ uint8_t get_pd_control_flags(int port)
 	return control_flags;
 }
 #endif
-#endif /* HAS_TASK_HOSTCMD */
+#endif /* CONFIG_HAS_HOSTCMD */

@@ -312,7 +312,7 @@ static int cros_flash_it8xxx2_erase(const struct device *dev, int offset,
 	 * EC still need to handle AP's EC_CMD_GET_COMMS_STATUS command
 	 * during erasing.
 	 */
-	if (IS_ENABLED(HAS_TASK_HOSTCMD) &&
+	if (IS_ENABLED(CONFIG_HAS_HOSTCMD) &&
 	    IS_ENABLED(CONFIG_HOST_COMMAND_STATUS)) {
 		irq_enable(DT_IRQN(DT_NODELABEL(shi0)));
 	}

@@ -56,7 +56,7 @@ config PLATFORM_EC_ISR_CONSOLE_OUTPUT
 
 menuconfig PLATFORM_EC_HOSTCMD_CONSOLE
 	bool "Console Host Command"
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	default y
 	help
 	  Enable the EC_CMD_CONSOLE_SNAPSHOT and EC_CMD_CONSOLE_READ
@@ -86,6 +86,7 @@ config PLATFORM_EC_SOC_IT8XXX2_CONSOLE_BUF_H2RAM_SHARED
 	  This allows the system to enable CONFIG_SOC_IT8XXX2_KERNEL_IN_RAM
 	  without reducing other task stack sizes, by reusing the available
 	  H2RAM gap space for console-related buffers.
+
 
 endif # PLATFORM_EC_HOSTCMD_CONSOLE
 
@@ -160,8 +161,9 @@ config PLATFORM_EC_PRINTF_LONG_IS_32BITS
 
 config PLATFORM_EC_HOSTCMD_CONSOLE_PRINT
 	bool "Console Print Command"
-	depends on CONSOLE && PLATFORM_EC_HOSTCMD
+	depends on CONSOLE && HAS_HOSTCMD
 	default y
 	help
 	  Enable the EC_CMD_CONSOLE_PRINT host command. This allows the host
 	  to print messages directly to the EC console.
+
