@@ -42,7 +42,7 @@ static struct battery_misc_info battery_misc[CONFIG_BATTERY_COUNT];
  */
 static int prev_charge, prev_disp_charge;
 
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 static void battery_update(enum battery_index i)
 {
 	char *batt_str;
@@ -290,7 +290,7 @@ static void battery_init(void)
 	battery_memmap_set_index(BATT_IDX_MAIN);
 }
 DECLARE_HOOK(HOOK_INIT, battery_init, HOOK_PRIO_DEFAULT);
-#endif /* HAS_TASK_HOSTCMD */
+#endif /* CONFIG_HAS_HOSTCMD */
 
 static int is_battery_string_reliable(const char *buf)
 {
@@ -487,7 +487,7 @@ int update_static_battery_info(void)
 	       sizeof(battery_dynamic[BATT_IDX_MAIN]));
 	battery_dynamic[BATT_IDX_MAIN].flags = EC_BATT_FLAG_INVALID_DATA;
 
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 	battery_memmap_refresh(BATT_IDX_MAIN);
 #endif
 
@@ -595,7 +595,7 @@ void battery_set_dynamic_info(const struct batt_params *params, bool ac_present,
 
 	bd->flags = tmp;
 
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 	battery_memmap_refresh(BATT_IDX_MAIN);
 #endif
 

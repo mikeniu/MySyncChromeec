@@ -2672,7 +2672,7 @@
 #undef CONFIG_HOSTCMD_BATTERY_INFO
 
 /* If we have host command task, assume we also are using host events. */
-#ifdef HAS_TASK_HOSTCMD
+#if defined(HAS_TASK_HOSTCMD) || defined(CONFIG_HAS_HOSTCMD)
 #define CONFIG_HOSTCMD_EVENTS
 #else
 #undef CONFIG_HOSTCMD_EVENTS
@@ -4705,7 +4705,7 @@
 #define CONFIG_USB_PD_CONSOLE_CMD
 
 /* Enables PD Host commands */
-#ifdef HAS_TASK_HOSTCMD
+#if defined(HAS_TASK_HOSTCMD) || defined(CONFIG_HAS_HOSTCMD)
 #define CONFIG_USB_PD_HOST_CMD
 #endif
 
