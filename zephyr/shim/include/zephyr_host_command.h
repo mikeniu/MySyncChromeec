@@ -37,7 +37,7 @@ k_tid_t get_main_thread(void);
  */
 k_tid_t get_hostcmd_thread(void);
 
-#ifdef CONFIG_PLATFORM_EC_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 
 /**
  * See include/host_command.h for documentation.
@@ -60,7 +60,7 @@ k_tid_t get_hostcmd_thread(void);
 
 #endif /* CONFIG_EC_HOST_CMD */
 
-#else /* !CONFIG_PLATFORM_EC_HOSTCMD */
+#else /* !CONFIG_HAS_HOSTCMD */
 
 /*
  * Create a global var to reference the host command. The linker should remove
@@ -69,7 +69,7 @@ k_tid_t get_hostcmd_thread(void);
 #define DECLARE_HOST_COMMAND(command, routine, version_mask) \
 	int __remove_##command = ((int)(routine))
 
-#endif /* CONFIG_PLATFORM_EC_HOSTCMD */
+#endif /* CONFIG_HAS_HOSTCMD */
 
 #ifdef __cplusplus
 }
