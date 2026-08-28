@@ -340,7 +340,6 @@ void chipset_ap_rst_interrupt(enum gpio_signal signal)
 static void lid_event(void)
 {
 #ifdef CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
-	/* TODO: b/429110767 Add unit test to check for race condition */
 	if (!chipset_in_state(CHIPSET_STATE_HARD_OFF))
 		passthru_lid_open_to_pmic();
 #endif
