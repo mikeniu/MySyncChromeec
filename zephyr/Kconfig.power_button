@@ -5,7 +5,7 @@
 config PLATFORM_EC_HOSTCMD_POWER_BUTTON_PRESS
 	bool "Enable power button press host command"
 	default n
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	help
 	  Command used to simulate up to 2 power button presses from the host
 	  with configurable delay and duration.

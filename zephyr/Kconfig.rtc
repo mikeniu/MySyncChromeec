@@ -30,7 +30,7 @@ config PLATFORM_EC_CONSOLE_CMD_RTC_ALARM
 
 config PLATFORM_EC_HOSTCMD_RTC
 	bool "Host command: EC_CMD_RTC_GET_VALUE etc."
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	help
 	  Enables support for EC_CMD_RTC_GET_VALUE, EC_CMD_RTC_SET_VALUE,
 	  EC_CMD_RTC_GET_ALARM and EC_CMD_RTC_SET_ALARM which colectively allow
