@@ -1,0 +1,117 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <dt-bindings/gpio_defines.h>
+#include <cros/binman.dtsi>
+
+/ {
+	chosen {
+		cros-ec,flash-controller = &cros_flash;
+	};
+	aliases {
+		gpio-wp = &gpio_wp_l;
+	};
+	cros_flash: cros-flash {
+		compatible = "cros-ec,flash-emul";
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_ap_rst_l: ap_rst_l {
+			gpios = <&gpio0 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			enum-name = "GPIO_AP_RST_L";
+		};
+		gpio_ps_hold: ps_hold {
+			gpios = <&gpio0 1 GPIO_INPUT>;
+			enum-name = "GPIO_PS_HOLD";
+		};
+		gpio_power_good: power_good {
+			gpios = <&gpio0 2 GPIO_INPUT>;
+			enum-name = "GPIO_POWER_GOOD";
+		};
+		gpio_ap_suspend: ap_suspend {
+			gpios = <&gpio0 3 GPIO_INPUT>;
+			enum-name = "GPIO_AP_SUSPEND";
+		};
+		gpio_warm_reset_l: warm_reset_l {
+			gpios = <&gpio0 4 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			enum-name = "GPIO_WARM_RESET_L";
+		};
+		gpio_pmic_kpd_pwr: pmic_kpd_pwr {
+			gpios = <&gpio0 5 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+			enum-name = "GPIO_PMIC_KPD_PWR";
+		};
+		gpio_pmic_resin: pmic_resin {
+			gpios = <&gpio0 6 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+			enum-name = "GPIO_PMIC_RESIN";
+		};
+		gpio_lid_open_ec: lid_open_ec {
+			gpios = <&gpio0 7 (GPIO_INPUT | GPIO_PULL_UP)>;
+			enum-name = "GPIO_LID_OPEN";
+		};
+		gpio_ec_pwr_btn_odl: ec_pwr_btn_odl {
+			gpios = <&gpio0 8 (GPIO_INPUT | GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			enum-name = "GPIO_POWER_BUTTON_L";
+		};
+		gpio_acok_od: acok_od {
+			gpios = <&gpio0 9 GPIO_INPUT>;
+			enum-name = "GPIO_AC_PRESENT";
+		};
+		gpio_wp_l: wp_l {
+			gpios = <&gpio0 10 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+	};
+
+	gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_ap_rst: ap-rst {
+			irq-pin = <&gpio_ap_rst_l>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "chipset_ap_rst_interrupt";
+		};
+		int_ap_suspend: ap-suspend {
+			irq-pin = <&gpio_ap_suspend>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "power_signal_interrupt";
+		};
+		int_ps_hold: ps-hold {
+			irq-pin = <&gpio_ps_hold>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "power_signal_interrupt";
+		};
+		int_power_good: power-good {
+			irq-pin = <&gpio_power_good>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "power_signal_interrupt";
+		};
+		int_warm_reset: warm-reset {
+			irq-pin = <&gpio_warm_reset_l>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "chipset_sys_rst_interrupt";
+		};
+		int_lid_open_ec: lid_open_ec {
+			irq-pin = <&gpio_lid_open_ec>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "lid_interrupt";
+		};
+		int_power_button: power_button {
+			irq-pin = <&gpio_ec_pwr_btn_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "power_button_interrupt";
+		};
+		int_ac_present: ac_present {
+			irq-pin = <&gpio_acok_od>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "extpower_interrupt";
+		};
+	};
+};
+
+&gpio0 {
+	ngpios = <32>;
+};
