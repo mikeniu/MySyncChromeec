@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00091047_cfdfe5fa",
+        "filename": "common/port80.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1552197
+      },
+      "writtenOn": "2026-08-28T09:23:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7db00fce_50184c12",
+      "range": {
+        "startLine": 248,
+        "startChar": 7,
+        "endLine": 248,
+        "endChar": 34
+      },
+      "revId": "9931b3057ad3321152070daaa8c91306f79870de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "75a137fb_3ccac490",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-08-27T18:22:47Z",
       "side": 1,
       "message": "Keep the opcodes sorted.",
+      "range": {
+        "startLine": 3703,
+        "startChar": 0,
+        "endLine": 3703,
+        "endChar": 34
+      },
+      "revId": "9931b3057ad3321152070daaa8c91306f79870de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28cee318_568ba06c",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 3703,
+      "author": {
+        "id": 1552197
+      },
+      "writtenOn": "2026-08-28T09:23:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "75a137fb_3ccac490",
       "range": {
         "startLine": 3703,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "714871f9_c7a7d56c",
+        "filename": "zephyr/Kconfig",
+        "patchSetId": 1
+      },
+      "lineNbr": 541,
+      "author": {
+        "id": 1552197
+      },
+      "writtenOn": "2026-08-28T09:23:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f3bd0d9f_f5058544",
+      "range": {
+        "startLine": 541,
+        "startChar": 0,
+        "endLine": 541,
+        "endChar": 53
+      },
+      "revId": "9931b3057ad3321152070daaa8c91306f79870de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3ac4be4_8d84e6da",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-08-27T18:22:47Z",
       "side": 1,
       "message": "This is not needed.  This file is used to map Kconfig symbols to legacy EC config #define symbols.",
+      "range": {
+        "startLine": 1171,
+        "startChar": 0,
+        "endLine": 1174,
+        "endChar": 6
+      },
+      "revId": "9931b3057ad3321152070daaa8c91306f79870de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "599af79b_cf473731",
+        "filename": "zephyr/shim/include/config_chip.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1174,
+      "author": {
+        "id": 1552197
+      },
+      "writtenOn": "2026-08-28T09:23:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c3ac4be4_8d84e6da",
       "range": {
         "startLine": 1171,
         "startChar": 0,
