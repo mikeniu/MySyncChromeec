@@ -77,6 +77,14 @@ ZTEST(system, test_save_read_chip_reset_flags)
 	zassert_equal(chip_read_reset_flags(), arbitrary_flags);
 }
 
+ZTEST(system, test_system_get_hibernate_wake_source)
+{
+	enum hibernate_wake_source source;
+
+	/* Default weak implementation returns -ENOSYS */
+	zassert_equal(-ENOSYS, system_get_hibernate_wake_source(&source));
+}
+
 ZTEST(system, test_system_set_get_scratchpad)
 {
 	/* Arbitrary values */
