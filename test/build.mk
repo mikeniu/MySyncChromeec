@@ -53,6 +53,7 @@ test-list-host += u2f
 test-list-host += utils
 test-list-host += utils_str
 test-list-host += vboot
+test-list-host += virtual_nvmem
 test-list-host += x25519
 endif
 
@@ -99,12 +100,15 @@ u2f-y+=../board/cr50/dcrypto/u2f.o
 utils-y=utils.o
 utils_str-y=utils_str.o
 vboot-y=vboot.o
+virtual_nvmem-y=virtual_nvmem.o
 
 x25519-y=x25519.o
 
 TPM2_ROOT := $(CROS_WORKON_SRCROOT)/src/third_party/tpm2$(BRANCH_EXT)
 $(out)/RO/common/new_nvmem.o: CFLAGS += -I$(TPM2_ROOT) -I chip/g
 $(out)/RO/test/nvmem.o: CFLAGS += -I$(TPM2_ROOT)
+$(out)/RO/test/virtual_nvmem.o: CFLAGS += -I$(TPM2_ROOT) -I board/cr50 \
+	-I board/cr50/tpm2 -I chip/g
 $(out)/RO/test/nvmem_tpm2_mock.o: CFLAGS += -I$(TPM2_ROOT)
 $(out)/RO/common/u2f.o: CFLAGS += -DU2F_TEST
 
