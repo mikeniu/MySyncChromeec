@@ -10,6 +10,7 @@
 #include "host_command.h"
 #include "include/power_button.h"
 #include "mkbp_fifo.h"
+#include "mkbp_input_devices.h"
 #include "power.h"
 #include "tablet_mode.h"
 #include "test/drivers/test_state.h"
@@ -746,3 +747,16 @@ ZTEST(button, test_keyboard_pb_suspend_missed_release)
 	mock_pb_asserted = -1;
 }
 #endif
+
+ZTEST(button, test_power_button_is_eating_release)
+{
+	/* Default implementation returns 0 */
+	zassert_equal(power_button_is_eating_release(), 0);
+
+	/* Verify mkbp button update with power button press and release */
+	mkbp_button_update(KEYBOARD_BUTTON_POWER, 1);
+	zassert_true(mkbp_get_button_state() & BIT(EC_MKBP_POWER_BUTTON));
+
+	mkbp_button_update(KEYBOARD_BUTTON_POWER, 0);
+	zassert_false(mkbp_get_button_state() & BIT(EC_MKBP_POWER_BUTTON));
+}
