@@ -95,7 +95,7 @@ endif # HAS_TASK_CHIPSET
 
 config HAS_TASK_HOSTCMD
 	bool
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	help
 	  This turns on the hostcmd task which handles communication with the
 	  AP. The AP sends a command to the EC and it responds when able. An
@@ -133,7 +133,7 @@ endif # HAS_TASK_HOSTCMD
 config PLATFORM_EC_HOSTCMD_THREAD_INFO
 	bool "Host command: EC_CMD_THREAD_INFO"
 	depends on THREAD_MONITOR
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	depends on PLATFORM_EC_SYSTEM_UNLOCKED
 	default y
 	help
