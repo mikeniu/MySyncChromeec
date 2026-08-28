@@ -1690,7 +1690,7 @@ BUILD_ASSERT(CONFIG_EC_WRITABLE_STORAGE_SIZE % CONFIG_FLASH_ERASE_SIZE == 0);
 
 #endif
 
-#if defined(HAS_TASK_HOSTCMD) && defined(CONFIG_HOST_COMMAND_STATUS)
+#if defined(CONFIG_HAS_HOSTCMD) && defined(CONFIG_HOST_COMMAND_STATUS)
 #ifdef CONFIG_EC_HOST_CMD
 static struct {
 	int offset;
@@ -1705,7 +1705,7 @@ static enum ec_host_cmd_status erase_continue(void *user_data)
 	return EC_HOST_CMD_SUCCESS;
 }
 #endif /* CONFIG_EC_HOST_CMD */
-#endif /* HAS_TASK_HOSTCMD && CONFIG_HOST_COMMAND_STATUS */
+#endif /* CONFIG_HAS_HOSTCMD && CONFIG_HOST_COMMAND_STATUS */
 
 static enum ec_status flash_command_erase(struct host_cmd_handler_args *args)
 {
@@ -1743,7 +1743,7 @@ static enum ec_status flash_command_erase(struct host_cmd_handler_args *args)
 
 	switch (cmd) {
 	case FLASH_ERASE_SECTOR:
-#if defined(HAS_TASK_HOSTCMD) && defined(CONFIG_HOST_COMMAND_STATUS)
+#if defined(CONFIG_HAS_HOSTCMD) && defined(CONFIG_HOST_COMMAND_STATUS)
 #ifndef CONFIG_EC_HOST_CMD
 		args->result = EC_RES_IN_PROGRESS;
 		host_send_response(args);

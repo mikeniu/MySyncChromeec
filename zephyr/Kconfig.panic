@@ -79,7 +79,7 @@ config PLATFORM_EC_PANIC_LOG_DEBUG
 config PLATFORM_EC_PANIC_HOST_EVENT
 	bool "Publish EC_HOST_EVENT_PANIC on HOOK_CHIPSET_STARTUP"
 	default y
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	help
 	  Set EC_HOST_EVENT_PANIC inside HOOK_CHIPSET_STARTUP when an EC
 	  panic has occurred. This alerts the AP that a panic occurred on the

@@ -172,7 +172,7 @@ void test_run_multistep(void)
 	}
 }
 
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 enum ec_status test_send_host_command(int command, int version,
 				      const void *params, int params_size,
 				      void *resp, int resp_size)
@@ -189,7 +189,7 @@ enum ec_status test_send_host_command(int command, int version,
 
 	return host_command_process(&args);
 }
-#endif /* TASK_HAS_HOSTCMD */
+#endif /* CONFIG_HAS_HOSTCMD */
 
 /* Defined as test_export_static in common/console.c. */
 enum ec_error_list handle_command(char *input);
