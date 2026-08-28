@@ -1,0 +1,17 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+common:
+  platform_allow:
+    - native_sim
+tests:
+  bluey.baseboard:
+    extra_configs:
+      - CONFIG_TEST_BOARD_BASEBOARD=y
+      - CONFIG_TEST_BOARD_BASEBOARD_BATTERY=y
+      - CONFIG_TEST_BOARD_BASEBOARD_SWITCHCAP=y
+      - CONFIG_TEST_BOARD_BASEBOARD_CHIPSET=y
+      - CONFIG_TEST_BOARD_BASEBOARD_THROTTLE=y
+    extra_dtc_overlay_files:
+      - "boards/native_sim.overlay"
