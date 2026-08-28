@@ -26,6 +26,7 @@ __maybe_unused static uint16_t suppressed_cmds[] = {
 BUILD_ASSERT(ARRAY_SIZE(suppressed_cmds) <=
 		     CONFIG_EC_HOST_CMD_LOG_SUPPRESSED_NUMBER,
 	     "Increase number of the maximum number.");
+#endif /* CONFIG_SUPPRESSED_HOST_COMMANDS */
 
 BUILD_ASSERT(sizeof(struct host_cmd_handler_args) ==
 		     sizeof(struct ec_host_cmd_handler_args),
@@ -45,6 +46,11 @@ BUILD_ASSERT(offsetof(struct host_cmd_handler_args, response_max) ==
 BUILD_ASSERT(offsetof(struct host_cmd_handler_args, response_size) ==
 	     offsetof(struct ec_host_cmd_handler_args, output_buf_size));
 
+/* The struct ec_host_cmd_request_header used in the upstream is the same as */
+/* ec_host_request, but with different struct name. We use struct
+ * ec_host_request in the shim for code simplicity. These checks ensure that
+ * the two structures are really identical.
+ */
 BUILD_ASSERT(sizeof(struct ec_host_request) ==
 		     sizeof(struct ec_host_cmd_request_header),
 	     "Incompatible structure.");
@@ -74,7 +80,6 @@ BUILD_ASSERT(offsetof(struct ec_host_response, data_len) ==
 	     offsetof(struct ec_host_cmd_response_header, data_len));
 BUILD_ASSERT(offsetof(struct ec_host_response, reserved) ==
 	     offsetof(struct ec_host_cmd_response_header, reserved));
-#endif /* CONFIG_SUPPRESSED_HOST_COMMANDS */
 
 static void ec_host_cmd_user_cb(const struct ec_host_cmd_rx_ctx *rx_ctx,
 				void *user_data)
@@ -185,5 +190,6 @@ host_command_protocol_info(struct ec_host_cmd_handler_args *args)
 
 	return EC_HOST_CMD_SUCCESS;
 }
-EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_GET_PROTOCOL_INFO,
-			    host_command_protocol_info, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_PROTOCOL_INFO,
+			      host_command_protocol_info, EC_VER_MASK(0),
+			      struct ec_response_get_protocol_info);
