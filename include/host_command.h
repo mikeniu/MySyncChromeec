@@ -14,42 +14,73 @@
 
 #include <stdbool.h>
 
+#ifdef CONFIG_EC_HOST_CMD
+#include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
+#define DECLARE_HOST_COMMAND(id, handler, ver) \
+	EC_HOST_CMD_HANDLER_UNBOUND(id, (ec_host_cmd_handler_cb)handler, ver)
+#elif defined(CONFIG_PLATFORM_EC_HOSTCMD) || !defined(CONFIG_ZEPHYR)
+#include "host_command_legacy.h"
+#else
+#include "host_command_stub.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Args for host command handler */
+/* Keep sync with zephyr ec_host_cmd_handler_args. Needed for any external code
+ * that defines host command handlers. The union is formatted as
+ *   union {
+ *      <legacy_name>;
+ *      <upstream_name>;
+ *   }
+ */
 struct host_cmd_handler_args {
 	/*
 	 * The driver that receives the command sets up the send_response()
 	 * handler. Once the command is processed this handler is called to
 	 * send the response back to the host.
 	 */
-	void (*send_response)(struct host_cmd_handler_args *args);
+	union {
+		void (*send_response)(struct host_cmd_handler_args *args);
+		void *reserved;
+	};
 	uint16_t command; /* Command (e.g., EC_CMD_FLASH_GET_INFO) */
 	uint8_t version; /* Version of command (0-31) */
 
-	const void *params; /* Input parameters */
-	uint16_t params_size; /* Size of input parameters in bytes */
+	union {
+		const void *params; /* Input parameters */
+		const void *input_buf;
+	};
+	union {
+		uint16_t params_size; /* Size of input parameters in bytes */
+		uint16_t input_buf_size;
+	};
 
 	/*
-	 * Pointer to output response data buffer.  On input to the handler,
+	 * Pointer to output response data buffer. On input to the handler,
 	 * points to a buffer of size response_max.
 	 */
-	void *response;
+	union {
+		void *response;
+		void *output_buf;
+	};
 
 	/* Maximum size of response buffer provided to command handler */
-	uint16_t response_max;
+	union {
+		uint16_t response_max;
+		uint16_t output_buf_max;
+	};
 
 	/*
-	 * Size of data pointed to by response.  Defaults to 0, so commands
+	 * Size of data pointed to by response. Defaults to 0, so commands
 	 * which do not produce response data do not need to set this.
 	 */
-	uint16_t response_size;
+	union {
+		uint16_t response_size;
+		uint16_t output_buf_size;
+	};
 
-/* The upstream version of this structure doesn't have the result field.
- * Drop it for the compatibility.
- */
 #ifndef CONFIG_EC_HOST_CMD
 	/*
 	 * This is the result returned by command and therefore the status to
@@ -59,84 +90,9 @@ struct host_cmd_handler_args {
 	 * command execution is complete. The driver may still override this
 	 * when sending the response back to the host if it detects an error
 	 * in the response or in its own operation.
-	 *
-	 * Note that while this holds an ec_status enum, we are intentionally
-	 * representing this field as a uint16_t, to prevent issues related to
-	 * compiler optimizations affecting the range of values representable
-	 * by this field.
 	 */
 	uint16_t result;
 #endif
-};
-
-/* Args for host packet handler */
-struct host_packet {
-	/*
-	 * The driver that receives the command sets up the send_response()
-	 * handler. Once the command is processed this handler is called to
-	 * send the response back to the host.
-	 */
-	void (*send_response)(struct host_packet *pkt);
-
-	/*
-	 * Input request data. If request and response buffers overlap,
-	 * then request_temp must be non-null and be large enough to store the
-	 * entire request buffer. The request_temp buffer will then be used
-	 * as the buffer passed into the command handlers.
-	 */
-	const void *request;
-
-	/*
-	 * Input request temp buffer.  If this is non-null, the data has not
-	 * been copied from here into the request buffer yet.  The host command
-	 * handler should do so while verifying the command.  The interface
-	 * can't do it, because it doesn't know how much to copy.
-	 */
-	void *request_temp;
-
-	/*
-	 * Maximum size of request the interface can handle, in bytes.  The
-	 * buffers pointed to by *request and *request_temp must be at least
-	 * this big.
-	 */
-	uint16_t request_max;
-
-	/* Size of input request data, in bytes */
-	uint16_t request_size;
-
-	/* Pointer to output response data buffer */
-	void *response;
-
-	/* Maximum size of response buffer provided to command handler */
-	uint16_t response_max;
-
-	/* Size of output response data, in bytes */
-	uint16_t response_size;
-
-	/*
-	 * Error from driver; if this is non-zero, host command handler will
-	 * return a properly formatted error response packet rather than
-	 * calling a command handler.
-	 *
-	 * Note that while this holds an ec_status enum, we are intentionally
-	 * representing this field as a uint16_t, to prevent issues related to
-	 * compiler optimizations affecting the range of values representable
-	 * by this field.
-	 */
-	uint16_t driver_result;
-};
-
-/* Host command */
-struct host_command {
-	/*
-	 * Handler for the command.  Args points to context for handler.
-	 * Returns result status (EC_RES_*).
-	 */
-	enum ec_status (*handler)(struct host_cmd_handler_args *args);
-	/* Command code */
-	int command;
-	/* Mask of supported versions */
-	int version_mask;
 };
 
 typedef uint64_t host_event_t;
@@ -161,17 +117,6 @@ void host_command_init(void);
  * @return pointer to the buffer at that offset
  */
 uint8_t *host_get_memmap(int offset);
-
-/**
- * Process a host command and return its response
- *
- * @param args	        Command handler args
- * @return resulting status. Note that while this returns an ec_status enum, we
- * are intentionally specifying the return type as a uint16_t, to prevent issues
- * related to compiler optimizations affecting the range of values returnable
- * from this function.
- */
-uint16_t host_command_process(struct host_cmd_handler_args *args);
 
 /**
  * Set a single host event.
@@ -209,14 +154,6 @@ host_event_t host_get_events(void);
  */
 bool host_is_event_set(enum host_event_code event);
 
-/**
- * Find a command by command number.
- *
- * @param command	Command number to find
- * @return The command structure, or NULL if no match found.
- */
-const struct host_command *find_host_command(int command);
-
 #ifdef CONFIG_HOSTCMD_X86
 
 FORWARD_DECLARE_ENUM(power_state);
@@ -242,16 +179,6 @@ uint8_t lpc_is_active_wm_set_by_host(void);
 #endif
 
 /**
- * Send a response to the relevant driver for transmission
- *
- * Once command processing is complete, this is used to send a response
- * back to the host.
- *
- * @param args	Contains response to send
- */
-void host_send_response(struct host_cmd_handler_args *args);
-
-/**
  * Called by host interface module when a command is received.
  */
 void host_command_received(struct host_cmd_handler_args *args);
@@ -266,81 +193,9 @@ void host_command_received(struct host_cmd_handler_args *args);
  */
 int host_request_expected_size(const struct ec_host_request *r);
 
-/**
- * Handle a received host packet.
- *
- * @param packet	Host packet args
- */
-void host_packet_receive(struct host_packet *pkt);
-
-/**
- * Check if a Host Command that sent EC_HOST_CMD_IN_PROGRESS status has ended.
- *
- * @return True if the command has ended, False if not.
- */
-bool host_command_in_process_ended(void);
-
-/**
- * Get saved result of the command that has sent IN_PROGRESS status.
- *
- * This routine returns the save result and clears it.
- *
- * @return Save result.
- */
-uint8_t host_command_get_saved_result(void);
-
-/**
- * Find the handler for a command in Zephyr OS.
- *
- * @command		Command to handle (EC_CMD_...)
- *
- * Return: handler for the command, or NULL if not found.
- */
-#ifndef CONFIG_ZEPHYR
-__error("This function should only be called from Zephyr OS code")
-#endif
-	struct host_command *zephyr_find_host_command(int command);
-
 #if defined(CONFIG_ZEPHYR)
 #include "zephyr_host_command.h"
-#elif defined(HAS_TASK_HOSTCMD)
-#define EXPAND(off, cmd) __host_cmd_(off, cmd)
-#define __host_cmd_(off, cmd) __host_cmd_##off##cmd
-#define EXPANDSTR(off, cmd) "__host_cmd_" #off #cmd
-
-/*
- * Register a host command handler with
- * commands starting at offset 0x0000
- */
-#define DECLARE_HOST_COMMAND(command, routine, version_mask)                   \
-	static enum ec_status(routine)(struct host_cmd_handler_args * args);   \
-	const struct host_command __keep __no_sanitize_address EXPAND(0x0000,  \
-								      command) \
-		__attribute__((section(".rodata.hcmds." EXPANDSTR(             \
-			0x0000, command)))) = { routine, command,              \
-						version_mask }
-
-/*
- * Register a private host command handler with
- * commands starting at offset EC_CMD_BOARD_SPECIFIC_BASE,
- */
-#define DECLARE_PRIVATE_HOST_COMMAND(command, routine, version_mask)         \
-	static enum ec_status(routine)(struct host_cmd_handler_args * args); \
-	const struct host_command __keep __no_sanitize_address EXPAND(       \
-		EC_CMD_BOARD_SPECIFIC_BASE, command)                         \
-		__attribute__((section(".rodata.hcmds." EXPANDSTR(           \
-			EC_CMD_BOARD_SPECIFIC_BASE, command)))) = {          \
-			routine, EC_PRIVATE_HOST_COMMAND_VALUE(command),     \
-			version_mask                                         \
-		}
-#else /* !CONFIG_ZEPHYR && !HAS_TASK_HOSTCMD */
-#define DECLARE_HOST_COMMAND(command, routine, version_mask)                \
-	static enum ec_status(routine)(struct host_cmd_handler_args * args) \
-		__attribute__((unused))
-
-#define DECLARE_PRIVATE_HOST_COMMAND(command, routine, version_mask) \
-	DECLARE_HOST_COMMAND(command, routine, version_mask)
-#endif /* CONFIG_ZEPHYR */
+#endif
 
 /**
  * Politely ask the CPU to enable/disable its own throttling.
