@@ -1,0 +1,32 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <dt-bindings/gpio_defines.h>
+
+/ {
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_en_hdmi_pwr: en_hdmi_pwr {
+			gpios = <&gpio0 0 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_en_pp5000: ec_en_pp5000 {
+			gpios = <&gpio0 1 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_usb_en: ec_usb_en {
+			gpios = <&gpio0 2 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_3v_s3_en: ec_3v_s3_en {
+			gpios = <&gpio0 3 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_en_ppvar_oled: ec_en_ppvar_oled {
+			gpios = <&gpio0 4 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_batt_i2c_en_odl: ec_batt_i2c_en_odl {
+			gpios = <&gpio0 5 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+	};
+};
