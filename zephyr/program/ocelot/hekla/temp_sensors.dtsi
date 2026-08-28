@@ -58,10 +58,12 @@
 			sensor = <&apl6012_ch15>;
 		};
 		temp_chg: chg {
+			temp-host-halt = <120>;
 			power-good-pin = <&gpio_all_sys_pwrgd>;
 			sensor = <&apl6012_ch1>;
 		};
 		temp_bat_conn: bat_conn {
+			temp-host-halt = <120>;
 			power-good-pin = <&gpio_all_sys_pwrgd>;
 			sensor = <&apl6012_ch2>;
 		};
