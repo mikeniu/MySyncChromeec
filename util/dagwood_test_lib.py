@@ -19,7 +19,7 @@ if str(DAGWOOD_DIR) not in sys.path:
     sys.path.append(str(DAGWOOD_DIR))
 
 # pylint: disable=import-error, wrong-import-position
-import utils
+import dagwood_utils
 
 
 def add_common_args(parser: argparse.ArgumentParser):
@@ -109,8 +109,8 @@ def get_twister_args(
         board_id = getattr(args, "board_id", None)
         device_serial = args.device_serial
         if not device_serial:
-            dev = utils.find_usb_device(board_id)
-            device_serial = utils.find_ec_port(dev)
+            dev = dagwood_utils.find_usb_device(board_id)
+            device_serial = dagwood_utils.find_ec_port(dev)
             if not board_id:
                 board_id = dev.serial_number
 
