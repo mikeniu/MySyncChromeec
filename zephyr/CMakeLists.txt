@@ -170,6 +170,10 @@ if (DEFINED CONFIG_PLATFORM_EC)
     "${PLATFORM_EC}/include"
     "${PLATFORM_EC}/include/driver"
     "${PLATFORM_EC}/third_party")
+  if (CONFIG_ZTEST)
+    cros_ec_library_include_directories("${PLATFORM_EC}/zephyr/test/test_utils")
+    zephyr_include_directories("${PLATFORM_EC}/zephyr/test/test_utils")
+  endif()
 endif()
 
 if (ZEPHYR_PIGWEED_MODULE_DIR)
@@ -414,10 +418,12 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_BTN_IGN_OUT
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_btn_ign_out.cc")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FP_LED
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_led.cc")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                              "${PLATFORM_EC}/common/host_command_task.c")
 
-zephyr_library_sources_ifdef(CONFIG_HAS_HOSTCMD "${PLATFORM_EC}/common/host_command.c"
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
+                                                "${PLATFORM_EC}/common/host_command_task.c")
+
+zephyr_library_sources_ifdef(CONFIG_HAS_HOSTCMD
+                                                "${PLATFORM_EC}/common/host_command.c"
                                                 "${PLATFORM_EC}/common/host_event_commands.c")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
