@@ -721,6 +721,20 @@ int ccd_get_factory_mode(void)
 	return ccd_get_flag(CCD_FLAG_FACTORY_MODE_ENABLED);
 }
 
+int read_ccd_flags(uint8_t *out)
+{
+	if (!out)
+		return EC_ERROR_INVAL;
+
+	if (!ccd_config_loaded || force_disabled) {
+		*out = 0;
+		return EC_SUCCESS;
+	}
+
+	*out = (uint8_t)(raw_get_flags() & CCD_PUBLIC_FLAGS_MASK);
+	return EC_SUCCESS;
+}
+
 /******************************************************************************/
 /* Console commands */
 

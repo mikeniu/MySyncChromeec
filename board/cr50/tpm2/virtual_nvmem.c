@@ -11,6 +11,7 @@
 #ifdef CONFIG_PLATFORM_BOOT_PARAM
 #include "boot_param.h"
 #endif /* CONFIG_PLATFORM_BOOT_PARAM */
+#include "ccd_config.h"
 #include "console.h"
 #include "dcrypto.h"
 #include "factory_config.h"
@@ -354,6 +355,27 @@ static void GetRSUDevID(BYTE *to, size_t offset, size_t size)
 }
 BUILD_ASSERT(VIRTUAL_NV_INDEX_RSU_DEV_ID_SIZE == SHA256_DIGEST_SIZE);
 
+static void GetCcdFlags(BYTE *to, size_t offset, size_t size)
+{
+	uint8_t flags;
+
+	if (read_ccd_flags(&flags) != EC_SUCCESS) {
+		memset(to, 0, size);
+		return;
+	}
+
+	if (offset >= sizeof(flags)) {
+		memset(to, 0, size);
+		return;
+	}
+
+	if (offset + size > sizeof(flags))
+		size = sizeof(flags) - offset;
+
+	memcpy(to, ((BYTE *)&flags) + offset, size);
+}
+BUILD_ASSERT(sizeof(uint8_t) == VIRTUAL_NV_INDEX_CCD_FLAGS_SIZE);
+
 static void GetFactoryCfg(BYTE *to, size_t offset, size_t size)
 {
 	uint64_t fc;
@@ -412,8 +434,10 @@ static const struct virtual_nv_index_cfg index_config[] = {
 			TPMA_NV_REGULAR,
 			VIRTUAL_NV_INDEX_RSU_DEV_ID_SIZE,
 			GetRSUDevID)
-	/* TODO(b/278118981): implement get RMA BYTES and WV UDS */
+	/* Reserved for generic TPM2.0 stand-alone counter. */
+	/* Included in VIRTUAL_NV_INDEX_CCD_FLAGS. */
 	REGISTER_DEPRECATED_CONFIG(VIRTUAL_NV_INDEX_RMA_BYTES_UNIMPLEMENTED)
+	/* TODO(b/278118981): implement get WV UDS */
 	REGISTER_DEPRECATED_CONFIG(VIRTUAL_NV_INDEX_WV_UDS_BYTES_UNIMPLEMENTED)
 	REGISTER_CONFIG(VIRTUAL_NV_INDEX_FACTORY_CONFIG,
 			TPMA_NV_REGULAR,
@@ -434,6 +458,10 @@ static const struct virtual_nv_index_cfg index_config[] = {
 	REGISTER_DEPRECATED_CONFIG(VIRTUAL_NV_INDEX_DICE_CHAIN)
 	REGISTER_DEPRECATED_CONFIG(VIRTUAL_NV_INDEX_BOOT_PARAM)
 #endif /* !CONFIG_PLATFORM_BOOT_PARAM */
+	REGISTER_CONFIG(VIRTUAL_NV_INDEX_CCD_FLAGS,
+			TPMA_NV_REGULAR,
+			VIRTUAL_NV_INDEX_CCD_FLAGS_SIZE,
+			GetCcdFlags)
 };
 
 /* Check validity check of above config. */

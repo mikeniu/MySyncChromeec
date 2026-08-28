@@ -45,6 +45,11 @@ enum ccd_flag {
 	 */
 	CCD_FLAG_FACTORY_MODE_ENABLED = BIT(2),
 
+	/*
+	 * RMA mode state
+	 */
+	CCD_FLAG_RMA_MODE = BIT(3),
+
 	/* (flags in the middle are unused) */
 
 	/*
@@ -75,6 +80,11 @@ enum ccd_flag {
 	 */
 	CCD_FLAG_OVERRIDE_WP_STATE_ENABLED = BIT(23),
 };
+
+#define CCD_FLAG_TESTLAB		CCD_FLAG_TEST_LAB
+#define CCD_FLAG_FACTORY_MODE		CCD_FLAG_FACTORY_MODE_ENABLED
+#define CCD_PUBLIC_FLAGS_MASK		\
+	(CCD_FLAG_TESTLAB | CCD_FLAG_FACTORY_MODE | CCD_FLAG_RMA_MODE)
 
 /* Capabilities */
 enum ccd_capability {
@@ -369,5 +379,13 @@ void enable_ccd_factory_mode(int reset_required);
  * only if 'reset_required' is True.
  */
 void factory_enable(int reset_required);
+
+/**
+ * Read sanitized CCD flags for public exposure via virtual NV index.
+ *
+ * @param out		Pointer to byte receiving sanitized flags.
+ * @return EC_SUCCESS on success, or non-zero error code.
+ */
+int read_ccd_flags(uint8_t *out);
 
 #endif /* __CROS_EC_CCD_CONFIG_H */
