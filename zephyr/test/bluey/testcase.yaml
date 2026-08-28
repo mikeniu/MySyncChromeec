@@ -51,3 +51,13 @@ tests:
       - CONFIG_PLATFORM_EC_TEMP_SENSOR=y
     extra_dtc_overlay_files:
       - "boards/quartz.overlay"
+  bluey.annite:
+    extra_configs:
+      - CONFIG_TEST_BOARD_ANNITE=y
+      - CONFIG_TEST_BOARD_ANNITE_CHIPSET=y
+      - CONFIG_TEST_BOARD_ANNITE_EXTPOWER=y
+      - CONFIG_TEST_BOARD_ANNITE_FAN=y
+      - CONFIG_TEST_BOARD_ANNITE_THROTTLE=y
+      - CONFIG_PLATFORM_EC_TEMP_SENSOR=y
+    extra_dtc_overlay_files:
+      - "boards/annite.overlay"
