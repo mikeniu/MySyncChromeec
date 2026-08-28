@@ -1902,7 +1902,7 @@ host_command_get_board_version(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_GET_BOARD_VERSION, host_command_get_board_version,
 		     EC_VER_MASK(0));
 
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 static int is_full_reboot_command(int cmd)
 {
 	return cmd == EC_REBOOT_JUMP_RO || cmd == EC_REBOOT_JUMP_RW ||
@@ -1928,7 +1928,7 @@ static void deferred_reboot(void)
 }
 DECLARE_DEFERRED(deferred_reboot);
 #endif /* CONFIG_EC_HOST_CMD */
-#endif /* HAS_TASK_HOSTCMD*/
+#endif /* CONFIG_HAS_HOSTCMD*/
 
 STATIC_IF_NOT(CONFIG_ZTEST)
 enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
@@ -1945,7 +1945,7 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 		/* Cancel pending reboot */
 		reboot_at_shutdown.cmd = EC_REBOOT_CANCEL;
 		reboot_at_shutdown.flags = 0;
-#if defined(HAS_TASK_HOSTCMD) && defined(CONFIG_EC_HOST_CMD)
+#if defined(CONFIG_HAS_HOSTCMD) && defined(CONFIG_EC_HOST_CMD)
 		if (reboot_scheduled) {
 			hook_call_deferred(&deferred_reboot_data, -1);
 			reboot_scheduled = false;
@@ -1972,7 +1972,7 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 	CPRINTS("Executing host reboot command \'%s\'",
 		reboot_cmd_to_str(p.cmd));
 
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 	if (is_full_reboot_command(p.cmd)) {
 #ifdef CONFIG_EC_HOST_CMD
 		int status;
@@ -2009,7 +2009,7 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 		host_send_response(args);
 #endif /* CONFIG_EC_HOST_CMD */
 	}
-#endif /* HAS_TASK_HOSTCMD */
+#endif /* CONFIG_HAS_HOSTCMD */
 
 	return ec_error_to_status(handle_pending_reboot(&p));
 }
