@@ -112,4 +112,16 @@ config TEST_BOARD_QUARTZ_FAN
 config TEST_BOARD_QUARTZ_LED
 	bool "Enable quartz led tests"
 
+config TEST_BOARD_ANNITE_CHIPSET
+	bool "Enable annite chipset tests"
+
+config TEST_BOARD_ANNITE_EXTPOWER
+	bool "Enable annite extpower tests"
+
+config TEST_BOARD_ANNITE_FAN
+	bool "Enable annite fan tests"
+
+config TEST_BOARD_ANNITE_THROTTLE
+	bool "Enable annite throttle tests"
+
 source "Kconfig.zephyr"
