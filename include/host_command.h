@@ -395,73 +395,7 @@ uint32_t get_feature_flags0(void);
 uint32_t get_feature_flags1(void);
 
 #ifdef CONFIG_ZTEST
-static inline void
-stub_send_response_callback(struct host_cmd_handler_args *args)
-{
-	ARG_UNUSED(args);
-}
-
-#define BUILD_HOST_COMMAND(CMD, VERSION, RESPONSE, PARAMS)          \
-	{                                                           \
-		.send_response = stub_send_response_callback,       \
-		.command = (CMD),                                   \
-		.version = (VERSION),                               \
-		COND_CODE_0(IS_EMPTY(PARAMS),                       \
-			    (.params = &(PARAMS),                   \
-			     .params_size = sizeof(PARAMS)),        \
-			    (.params = NULL, .params_size = 0)),    \
-		COND_CODE_0(IS_EMPTY(RESPONSE),                     \
-			    (.response = &(RESPONSE),               \
-			     .response_max = sizeof(RESPONSE)),     \
-			    (.response = NULL, .response_max = 0)), \
-		.response_size = 0,                                 \
-	}
-
-#define BUILD_HOST_COMMAND_RESPONSE(CMD, VERSION, RESPONSE) \
-	BUILD_HOST_COMMAND(CMD, VERSION, RESPONSE, EMPTY)
-
-#define BUILD_HOST_COMMAND_PARAMS(CMD, VERSION, PARAMS) \
-	BUILD_HOST_COMMAND(CMD, VERSION, EMPTY, PARAMS)
-
-#define BUILD_HOST_COMMAND_SIMPLE(CMD, VERSION) \
-	BUILD_HOST_COMMAND(CMD, VERSION, EMPTY, EMPTY)
-
-#define CROS_EC_COMMAND_INFO struct host_cmd_handler_args
-
-static inline int CROS_EC_COMMAND(CROS_EC_COMMAND_INFO *handle,
-				  uint16_t command, uint8_t version,
-				  const void *params, uint16_t params_size,
-				  void *response, uint16_t response_size)
-{
-	struct host_cmd_handler_args args;
-	int rv;
-
-	if (handle == NULL)
-		handle = &args;
-
-	handle->send_response = stub_send_response_callback;
-	handle->command = command;
-	handle->version = version;
-	handle->params = params;
-	handle->params_size = params_size;
-	handle->response = response;
-	handle->response_max = response_size;
-	handle->response_size = 0;
-#ifndef CONFIG_EC_HOST_CMD
-	handle->result = 0;
-#endif
-
-	rv = host_command_process(handle);
-#ifndef CONFIG_EC_HOST_CMD
-	if (handle->result != EC_RES_SUCCESS)
-		return handle->result;
-#endif
-
-	return rv;
-}
-
-#include "ec_cmd_api.h"
-
+#include "host_command_test_utils.h"
 #endif /* CONFIG_ZTEST */
 
 #ifdef __cplusplus

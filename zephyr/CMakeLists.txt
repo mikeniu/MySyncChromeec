@@ -170,6 +170,10 @@ if (DEFINED CONFIG_PLATFORM_EC)
     "${PLATFORM_EC}/include"
     "${PLATFORM_EC}/include/driver"
     "${PLATFORM_EC}/third_party")
+  if (CONFIG_ZTEST)
+    cros_ec_library_include_directories("${PLATFORM_EC}/zephyr/test/test_utils")
+    zephyr_include_directories("${PLATFORM_EC}/zephyr/test/test_utils")
+  endif()
 endif()
 
 if (ZEPHYR_PIGWEED_MODULE_DIR)
