@@ -1,0 +1,73 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config TEST_DISABLE_INLINE_CHIPSET_IN_STATE
+	bool "Disable chipset_in_state inline method"
+	default y
+
+choice TEST_BOARD_VARIANT
+	prompt "Select board variant for tests"
+	help
+	  Board variant to use for tests
+
+	config TEST_BOARD_BASEBOARD
+		bool "Enable baseboard-specific tests"
+		help
+		  Enable Bluey baseboard tests.
+
+	config TEST_BOARD_BLUEY
+		bool "Enable bluey-specific tests"
+		help
+		  Enable Bluey tests.
+
+	config TEST_BOARD_QUENBI
+		bool "Enable quenbi-specific tests"
+		help
+		  Enable Quenbi tests.
+
+	config TEST_BOARD_MICA
+		bool "Enable mica-specific tests"
+		help
+		  Enable Mica tests.
+
+	config TEST_BOARD_QUARTZ
+		bool "Enable quartz-specific tests"
+		help
+		  Enable Quartz tests.
+
+	config TEST_BOARD_ANNITE
+		bool "Enable annite-specific tests"
+		help
+		  Enable Annite tests.
+
+	config TEST_BOARD_PIC
+		bool "Enable pic-specific tests"
+		help
+		  Enable Pic tests.
+
+endchoice # TEST_BOARD_VARIANT
+
+config TEST_BOARD_NAME
+	string "Board name"
+	default "baseboard" if TEST_BOARD_BASEBOARD
+	default "bluey" if TEST_BOARD_BLUEY
+	default "quenbi" if TEST_BOARD_QUENBI
+	default "mica" if TEST_BOARD_MICA
+	default "quartz" if TEST_BOARD_QUARTZ
+	default "annite" if TEST_BOARD_ANNITE
+	default "pic" if TEST_BOARD_PIC
+
+config TEST_BOARD_BASEBOARD_BATTERY
+	bool "Enable baseboard battery tests"
+
+config TEST_BOARD_BASEBOARD_SWITCHCAP
+	bool "Enable baseboard switchcap tests"
+
+config TEST_BOARD_BASEBOARD_CHIPSET
+	bool "Enable baseboard chipset tests"
+
+config TEST_BOARD_BASEBOARD_THROTTLE
+	bool "Enable baseboard throttle tests"
+
+source "Kconfig.zephyr"
