@@ -16,6 +16,24 @@
       "message": "Is this intended?",
       "revId": "968de32367fd611360368df7bde99cb1bc183fa3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "719eb852_c920ffcc",
+        "filename": "zephyr/program/calypso/c1nv/project.conf",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-08-28T02:28:55Z",
+      "side": 1,
+      "message": "No, this was left behind by mistake while resolving the conflict in patch 1. I\u0027ve removed CONFIG_PLATFORM_EC_EXTPOWER_GPIO_CUSTOM in patchset 5.",
+      "parentUuid": "b8adde95_06d9576c",
+      "revId": "968de32367fd611360368df7bde99cb1bc183fa3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
