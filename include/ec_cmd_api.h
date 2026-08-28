@@ -306,6 +306,7 @@ _CROS_EC_CV_F_P_R(EC_CMD_BATTERY_GET_DYNAMIC, 0, battery_get_dynamic,
 		  battery_dynamic_info, battery_dynamic_info);
 _CROS_EC_CV_F_P_R(EC_CMD_BATTERY_GET_DYNAMIC, 1, battery_get_dynamic_v1,
 		  battery_dynamic_info, battery_dynamic_info_v1);
+_CROS_EC_C0_F_PF_RF(EC_CMD_BATTERY_GET_MISC_INFO, battery_get_misc_info);
 _CROS_EC_CV_F_P_R(EC_CMD_BATTERY_GET_STATIC, 0, battery_get_static,
 		  battery_static_info, battery_static_info);
 _CROS_EC_CV_F_P_R(EC_CMD_BATTERY_GET_STATIC, 1, battery_get_static_v1,
