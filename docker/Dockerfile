@@ -40,6 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     uuid-dev \
     libyaml-dev \
     vim \
+    gosu \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

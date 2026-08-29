@@ -23,6 +23,8 @@ DOCKER_ARGS=(
   -it
   --rm
   --privileged
+  -e "HOST_UID=$(id -u)"
+  -e "HOST_GID=$(id -g)"
   -v "${WORKSPACE_DIR}:/workspace"
   -v "${CACHE_DIR}:/root/.cache/coreboot-sdk"
 )

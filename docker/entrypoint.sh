@@ -393,9 +393,24 @@ else
     echo "Warning: zmake directory not found. Skipping installation."
 fi
 
+# Set up host user permissions if HOST_UID and HOST_GID are provided
+if [ -n "${HOST_UID}" ] && [ -n "${HOST_GID}" ] && \
+   [ "${HOST_UID}" != "0" ]; then
+    groupadd -g "${HOST_GID}" hostuser 2>/dev/null || true
+    useradd -u "${HOST_UID}" -g "${HOST_GID}" -m -s /bin/bash \
+        hostuser 2>/dev/null || true
+    usermod -aG dialout,plugdev hostuser 2>/dev/null || true
+    chown -R "${HOST_UID}:${HOST_GID}" /workspace 2>/dev/null || true
+    chmod -R a+rX /root/.cache 2>/dev/null || true
+    chmod a+rx /root 2>/dev/null || true
+    EXEC_CMD=(gosu hostuser)
+else
+    EXEC_CMD=()
+fi
+
 # Run the requested command (if any), or drop to bash
 if [ $# -eq 0 ]; then
-    exec /bin/bash
+    exec "${EXEC_CMD[@]}" /bin/bash
 else
-    exec "$@"
+    exec "${EXEC_CMD[@]}" "$@"
 fi
