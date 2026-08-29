@@ -19,6 +19,12 @@ config BT_PASSTHRU_SENDER
 	select BT
 	select BT_HCI_RAW
 
+config BT_PASSTHRU_HOST_TRANSPORT
+	def_bool y
+	select PIGWEED_SPAN
+	select PIGWEED_STATUS
+	select PIGWEED_FUNCTION
+
 # Default buffer sizes to support HCI Command routing
 config BT_BUF_CMD_TX_SIZE
 	default 255
