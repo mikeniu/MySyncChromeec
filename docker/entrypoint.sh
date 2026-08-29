@@ -219,6 +219,11 @@ echo "Activating virtual environment..."
 # shellcheck disable=SC1091
 source "${VENV_DIR}/bin/activate"
 
+# Configure PATH for U-Boot binman tools. Prioritize local workspace tools if
+# present, falling back to the container cache.
+export PATH="${PATH}:/opt/repos/src/third_party/u-boot/tools/binman"
+export PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
+
 # Function to query and export Coreboot SDK toolchain paths into environment.
 # This ensures toolchain roots (e.g. COREBOOT_SDK_ROOT_arm) are available for
 # zmake builds and twister runs inside the container.
@@ -320,14 +325,6 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
 
     # Configure Coreboot SDK toolchain environment variables
     setup_coreboot_sdk_env
-
-    # Export U-Boot binman tools directory to PATH, preferring mounted workspace
-    # over build-time cache
-    if [ -d "/workspace/src/third_party/u-boot/tools/binman" ]; then
-        export PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
-    elif [ -d "/opt/repos/src/third_party/u-boot/tools/binman" ]; then
-        export PATH="/opt/repos/src/third_party/u-boot/tools/binman:${PATH}"
-    fi
 
     # Set up Realtek monitor binary (rtk_flame)
     MONITOR_CACHE="/workspace/.cache/rts5915_flash_upload.bin"
