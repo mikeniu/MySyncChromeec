@@ -207,6 +207,7 @@ register_ish_project(
     kconfig_files=[
         here / "dsp_comms.conf",
         here / "moonstone-ish" / "project.conf",
+        here / "bt.conf",
         here / ".." / ".." / "ish.conf",
     ],
     boards=["fatcat"],
