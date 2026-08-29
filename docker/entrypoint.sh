@@ -4,6 +4,21 @@
 # found in the LICENSE file.
 set -e
 
+# If running as root and host UID/GID are provided, set up host user and re-exec
+if [ "$(id -u)" = "0" ] && [ -n "${HOST_UID}" ] && \
+   [ -n "${HOST_GID}" ] && [ "${HOST_UID}" != "0" ]; then
+    groupadd -g "${HOST_GID}" hostuser 2>/dev/null || true
+    useradd -u "${HOST_UID}" -g "${HOST_GID}" -m -s /bin/bash \
+        hostuser 2>/dev/null || true
+    # Grant access to serial TTYs and USB devices for flashing/debug
+    usermod -aG dialout,plugdev hostuser 2>/dev/null || true
+    # Prepare devutils directory for monitor binary installation
+    mkdir -p /usr/share/ec-devutils
+    chown -R "${HOST_UID}:${HOST_GID}" /usr/share/ec-devutils
+    chmod 755 /entrypoint.sh
+    exec gosu hostuser /bin/bash /entrypoint.sh "$@"
+fi
+
 REPO_BASE="https://chromium.googlesource.com/chromiumos"
 
 echo "Entering Docker container..."
@@ -223,6 +238,10 @@ source "${VENV_DIR}/bin/activate"
 # present, falling back to the container cache.
 export PATH="${PATH}:/opt/repos/src/third_party/u-boot/tools/binman"
 export PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
+
+# Set up Coreboot SDK cache directory symlink for the current user
+mkdir -p "${HOME}/.cache"
+ln -sfn /workspace/.cache/coreboot-sdk "${HOME}/.cache/coreboot-sdk"
 
 # Function to query and export Coreboot SDK toolchain paths into environment.
 # This ensures toolchain roots (e.g. COREBOOT_SDK_ROOT_arm) are available for
