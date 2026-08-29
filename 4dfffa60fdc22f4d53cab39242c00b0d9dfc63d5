@@ -16,6 +16,24 @@
       "message": "This is probably not necessary or desirable if using `run_docker.sh` instead of just `docker run`. I\u0027ll investigate further.",
       "revId": "4dfffa60fdc22f4d53cab39242c00b0d9dfc63d5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad84f9ba_3cb920b6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-08-29T00:33:27Z",
+      "side": 1,
+      "message": "My original issue was the path not being set up when I did `docker run`, seemingly because the `-d zmake` check failed. I think it would be relatively difficult to encounter this via `run_docker.sh`. However, having non-existent paths in PATH is normal and benign. This seems simpler and a little less error-prone.",
+      "parentUuid": "0ad48420_b2bf8f9d",
+      "revId": "4dfffa60fdc22f4d53cab39242c00b0d9dfc63d5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
