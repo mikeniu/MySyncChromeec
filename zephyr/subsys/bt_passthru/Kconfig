@@ -14,4 +14,31 @@ module = BT_PASSTHRU
 module-str = BT Passthru
 source "subsys/logging/Kconfig.template.log_config"
 
+config BT_PASSTHRU_SENDER
+	def_bool y
+	select BT
+	select BT_HCI_RAW
+
+# Default buffer sizes to support HCI Command routing
+config BT_BUF_CMD_TX_SIZE
+	default 255
+
+config BT_BUF_EVT_RX_SIZE
+	default 255
+
+config BT_BUF_EVT_RX_COUNT
+	default 16
+
+config BT_BUF_ACL_TX_COUNT
+	default 3
+
+config BT_BUF_ACL_TX_SIZE
+	default 251
+
+config BT_BUF_ACL_RX_SIZE
+	default 255
+
+config BT_MAX_CONN
+	default 16
+
 endif # BT_PASSTHRU
