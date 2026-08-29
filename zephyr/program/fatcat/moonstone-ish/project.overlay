@@ -4,6 +4,7 @@
  */
 
  /* moonstone-ish project DTSI includes */
+#include "../bt.dtsi"
 #include "gpio.dtsi"
 #include "motionsense.dtsi"
 #include <cros/cbi_ufsc_std_schema.dtsi>
