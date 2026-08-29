@@ -1,0 +1,13 @@
+name: "Context Hub Runtime Environment (CHRE)"
+description:
+    "Context Hub Runtime Environment (CHRE) interface headers"
+
+third_party {
+  url {
+    type: GIT
+    value: "https://android.googlesource.com/platform/system/chre"
+  }
+  version: "upstream/main"
+  last_upgrade_date { year: 2026 month: 4 day: 13 }
+  license_type: NOTICE
+}
