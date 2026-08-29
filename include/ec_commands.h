@@ -4185,6 +4185,9 @@ enum ec_mkbp_event {
 	/* Power monitor telemetry event */
 	EC_MKBP_EVENT_PWRMON = 13,
 
+	/* Bluetooth passthrough event */
+	EC_MKBP_EVENT_BLUETOOTH = 14,
+
 	/* Number of MKBP events */
 	EC_MKBP_EVENT_COUNT,
 };
@@ -4207,6 +4210,7 @@ BUILD_ASSERT(EC_MKBP_EVENT_COUNT <= EC_MKBP_EVENT_TYPE_MASK);
 		[EC_MKBP_EVENT_ONLINE_CALIBRATION] = "ONLINE_CALIBRATION",     \
 		[EC_MKBP_EVENT_PCHG] = "PCHG",                                 \
 		[EC_MKBP_EVENT_PWRMON] = "PWRMON",                             \
+		[EC_MKBP_EVENT_BLUETOOTH] = "BLUETOOTH",                       \
 	}
 /* clang-format on */
 
@@ -9473,6 +9477,24 @@ struct ec_response_pwrmon {
 		uint8_t channel_count;
 		struct pwrmon_dump_info dump_info;
 	} __ec_align4;
+} __ec_align4;
+
+/* BT Passthrough */
+#define EC_CMD_BT_COMMAND 0x0609
+
+/* ChromeOS Host Command limit is strictly <256 bytes */
+#define BT_MAX_COMMAND_SIZE 240
+struct ec_param_bt_command {
+	uint32_t size;
+	uint8_t data[BT_MAX_COMMAND_SIZE];
+} __ec_align4;
+
+#define EC_CMD_BT_READ_EVENT 0x060A
+
+#define BT_MAX_EVENT_SIZE 240
+struct ec_response_bt_read_event {
+	uint32_t num_events;
+	uint8_t events[BT_MAX_EVENT_SIZE];
 } __ec_align4;
 
 /*****************************************************************************/
