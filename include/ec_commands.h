@@ -4182,11 +4182,11 @@ enum ec_mkbp_event {
 	/* Peripheral device charger event */
 	EC_MKBP_EVENT_PCHG = 12,
 
-	/* Power monitor telemetry event */
-	EC_MKBP_EVENT_PWRMON = 13,
-
 	/* Bluetooth passthrough event */
-	EC_MKBP_EVENT_BLUETOOTH = 14,
+	EC_MKBP_EVENT_BLUETOOTH = 13,
+
+	/* Power monitor telemetry event */
+	EC_MKBP_EVENT_PWRMON = 14,
 
 	/* Number of MKBP events */
 	EC_MKBP_EVENT_COUNT,
@@ -4209,8 +4209,8 @@ BUILD_ASSERT(EC_MKBP_EVENT_COUNT <= EC_MKBP_EVENT_TYPE_MASK);
 		[EC_MKBP_EVENT_DP_ALT_MODE_ENTERED] = "DP_ALT_MODE_ENTERED",   \
 		[EC_MKBP_EVENT_ONLINE_CALIBRATION] = "ONLINE_CALIBRATION",     \
 		[EC_MKBP_EVENT_PCHG] = "PCHG",                                 \
-		[EC_MKBP_EVENT_PWRMON] = "PWRMON",                             \
 		[EC_MKBP_EVENT_BLUETOOTH] = "BLUETOOTH",                       \
+		[EC_MKBP_EVENT_PWRMON] = "PWRMON",                             \
 	}
 /* clang-format on */
 
@@ -9439,7 +9439,7 @@ struct ec_response_battery_get_misc_info {
 /**
  * Power monitoring. Used to read power consumptions on rails
  */
-#define EC_CMD_PWRMON 0x0608
+#define EC_CMD_PWRMON 0x060B
 
 enum ec_pwrmon_cmd {
 	EC_PWRMON_GET_CHANNEL_COUNT = 0,
@@ -9480,7 +9480,7 @@ struct ec_response_pwrmon {
 } __ec_align4;
 
 /* BT Passthrough */
-#define EC_CMD_BT_COMMAND 0x0609
+#define EC_CMD_BT_COMMAND 0x0608
 
 /* ChromeOS Host Command limit is strictly <256 bytes */
 #define BT_MAX_COMMAND_SIZE 240
@@ -9489,7 +9489,7 @@ struct ec_param_bt_command {
 	uint8_t data[BT_MAX_COMMAND_SIZE];
 } __ec_align4;
 
-#define EC_CMD_BT_READ_EVENT 0x060A
+#define EC_CMD_BT_READ_EVENT 0x0609
 
 #define BT_MAX_EVENT_SIZE 240
 struct ec_response_bt_read_event {
