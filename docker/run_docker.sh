@@ -23,8 +23,10 @@ DOCKER_ARGS=(
   -it
   --rm
   --privileged
+  -e "HOST_UID=$(id -u)"
+  -e "HOST_GID=$(id -g)"
   -v "${WORKSPACE_DIR}:/workspace"
-  -v "${CACHE_DIR}:/root/.cache/coreboot-sdk"
+  -v "${CACHE_DIR}:/workspace/.cache/coreboot-sdk"
 )
 
 # 1. Forward USB subsystem for CCD/Servo interface (vendor ID 18d1,
