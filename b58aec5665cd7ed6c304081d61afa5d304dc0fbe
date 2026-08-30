@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed71e6c2_f46d188b",
+        "filename": "zephyr/test/ec-aic/i2c/src/main.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-30T11:28:00Z",
+      "side": 1,
+      "message": "would it make sense to measure the time that the read/write function took to execute and check it\u0027s within the expected range? like if this returns in 2ms then we know that the test i2c target driver is not working properly",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 18
+      },
+      "revId": "b58aec5665cd7ed6c304081d61afa5d304dc0fbe",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
