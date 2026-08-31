@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94f35956_0a7241bf",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-08-31T06:36:24Z",
+      "side": 1,
+      "message": "already override in `gpio_ec_pen_eject`",
+      "range": {
+        "startLine": 23,
+        "startChar": 2,
+        "endLine": 23,
+        "endChar": 32
+      },
+      "revId": "799b90c71c540b8941d02e854d7801e1ef458c97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3ff6a24_ef7b7eed",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-08-31T06:36:24Z",
+      "side": 1,
+      "message": "delete this input flag; GPIO97 power domain is 1.8V",
+      "range": {
+        "startLine": 196,
+        "startChar": 36,
+        "endLine": 196,
+        "endChar": 52
+      },
+      "revId": "799b90c71c540b8941d02e854d7801e1ef458c97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ab4609f_74d97990",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-08-31T06:36:24Z",
+      "side": 1,
+      "message": "Schematic net name error, should be pp5000",
+      "range": {
+        "startLine": 198,
+        "startChar": 2,
+        "endLine": 198,
+        "endChar": 22
+      },
+      "revId": "799b90c71c540b8941d02e854d7801e1ef458c97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
