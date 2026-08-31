@@ -21,6 +21,20 @@ fi
 
 REPO_BASE="https://chromium.googlesource.com/chromiumos"
 
+# Parse --fast flag from positional arguments
+ARGS=()
+for arg in "$@"; do
+    case "${arg}" in
+        --fast)
+            SKIP_UPDATE=1
+            ;;
+        *)
+            ARGS+=("${arg}")
+            ;;
+    esac
+done
+set -- "${ARGS[@]}"
+
 echo "Entering Docker container..."
 
 # Cache directory in the image
