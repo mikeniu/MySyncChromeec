@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e38ca5db_620593ab",
+        "filename": "zephyr/test/ec-aic/fan/prj.conf",
+        "patchSetId": 13
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-31T12:28:24Z",
+      "side": 1,
+      "message": "found an issue on some boards, not sure why only bumped into this now, added this config to stop an assert bootloop",
+      "revId": "6f9bbd4215f7dc1e1c24e9980673f4c37475b5e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
