@@ -81,6 +81,30 @@
       },
       "revId": "bc1120ff404c07cb9b30fb9355a944f10ecaa74a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89b58c29_6689ad9f",
+        "filename": "zephyr/test/ec-aic/fan/testcase.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-31T09:54:07Z",
+      "side": 1,
+      "message": "hey I\u0027ll leave it for now, thinking there should not really be a reason to distinguish between the two, you need dw for the tests anyway but even the ones that now don\u0027t need coordination may need it in the future, for example the i2c one, we currently register the fake eeprom devices all the time but once we have more tests using fake i2c devices we may need to add coordination to register the right one dynamically since the i2c target controller of the stm32 can only handle 2 targets at a time, so then we end up having to remember to change the test name etc etc... unless we have a good reason I would not bother, and we can always change them in the future",
+      "parentUuid": "1dc7d9dd_89aebb85",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 10
+      },
+      "revId": "bc1120ff404c07cb9b30fb9355a944f10ecaa74a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
