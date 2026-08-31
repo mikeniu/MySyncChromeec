@@ -1792,6 +1792,10 @@ enum ec_feature_code {
 	 * The EC supports power monitoring
 	 */
 	EC_FEATURE_PWRMON = 59,
+	/*
+	 * The EC supports Bluetooth passthrough
+	 */
+	EC_FEATURE_BT_PASSTHRU = 60,
 };
 
 #define EC_FEATURE_MASK_0(event_code) BIT(event_code % 32)
