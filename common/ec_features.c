@@ -209,6 +209,9 @@ uint32_t get_feature_flags1(void)
 #ifdef CONFIG_PWRMON
 		| EC_FEATURE_MASK_1(EC_FEATURE_PWRMON)
 #endif
+#if defined(CONFIG_BT_PASSTHRU) || defined(CONFIG_PLATFORM_EC_BT_PASSTHRU)
+		| EC_FEATURE_MASK_1(EC_FEATURE_BT_PASSTHRU)
+#endif
 		;
 	return board_override_feature_flags1(result);
 }
