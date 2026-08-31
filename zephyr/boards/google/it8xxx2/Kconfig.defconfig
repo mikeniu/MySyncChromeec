@@ -69,7 +69,7 @@ configdefault PMP_DATA_EXECUTION_PREVENTION
 	default n
 
 configdefault PMP_NO_LOCK_GLOBAL
-	default y
+	default y if CROS_EC_RO
 endif # RISCV_PMP
 
 endif # BOARD_IT8XXX2
