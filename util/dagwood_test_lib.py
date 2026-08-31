@@ -31,8 +31,11 @@ def add_common_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "-p",
         "--platform",
-        required=True,
-        help="Platform type (e.g., npcx9/npcx9m7f, realtek/rts5912)",
+        action="append",
+        help=(
+            "Platform type (e.g., npcx9/npcx9m7f, realtek/rts5912). "
+            "Can be specified multiple times. Optional when --hardware-map is used."
+        ),
     )
     parser.add_argument(
         "-T",
@@ -49,11 +52,17 @@ def add_common_args(parser: argparse.ArgumentParser):
         action="append",
         help="Specific test scenario to run. Can be specified multiple times.",
     )
-    parser.add_argument(
+    device_group = parser.add_mutually_exclusive_group()
+    device_group.add_argument(
         "-d",
         "--device-serial",
         default=None,
         help="Device serial port (default: automatically detected from Dagwood board)",
+    )
+    device_group.add_argument(
+        "--hardware-map",
+        default=None,
+        help="Load hardware map from a file.",
     )
     parser.add_argument(
         "--board-id",
@@ -90,24 +99,57 @@ def get_twister_args(
     Returns:
         A list of string arguments to be passed to the twister command.
     """
+    hardware_map = getattr(args, "hardware_map", None)
+    if not hardware_map and extra_args:
+        for idx, arg in enumerate(extra_args):
+            if arg == "--hardware-map" and idx + 1 < len(extra_args):
+                hardware_map = extra_args[idx + 1]
+                break
+            if arg.startswith("--hardware-map="):
+                hardware_map = arg.split("=", 1)[1]
+                break
+
+    platform = getattr(args, "platform", None)
+    if not hardware_map and not platform:
+        sys.exit(
+            "Error: -p/--platform is required when --hardware-map is not specified."
+        )
+
     flash_cmd = "../dagwood/flash.py"
     if getattr(args, "board_id", None):
         flash_cmd += f",--board-id,{args.board_id}"
-    if args.sram:
+    if getattr(args, "sram", False):
         flash_cmd += ",-r"
 
     twister_args = [
         "-ivc",
         "--toolchain=coreboot-sdk",
-        "-p",
-        args.platform,
     ]
+    if isinstance(platform, list):
+        for p in platform:
+            twister_args.extend(["-p", p])
+    elif platform:
+        twister_args.extend(["-p", platform])
 
-    if args.build_only:
+    if getattr(args, "build_only", False):
         twister_args.append("-b")
+    elif hardware_map:
+        twister_args.extend(
+            [
+                "--device-testing",
+                "--hardware-map",
+                hardware_map,
+                "--flash-command",
+                flash_cmd,
+                "--device-flash-timeout",
+                "60",
+            ]
+        )
+        if getattr(args, "board_id", None):
+            twister_args.append(f"--pytest-args=--board-id={args.board_id}")
     else:
         board_id = getattr(args, "board_id", None)
-        device_serial = args.device_serial
+        device_serial = getattr(args, "device_serial", None)
         if not device_serial:
             dev = dagwood_utils.find_usb_device(board_id)
             device_serial = dagwood_utils.find_ec_port(dev)
@@ -129,18 +171,32 @@ def get_twister_args(
         if board_id:
             twister_args.append(f"--pytest-args=--board-id={board_id}")
 
-    if args.sram:
+    if getattr(args, "sram", False):
         twister_args.append("-x=SNIPPET=sram-only")
 
-    if args.test_dir:
-        for t_dir in args.test_dir:
+    test_dir = getattr(args, "test_dir", None)
+    if test_dir:
+        for t_dir in test_dir:
             twister_args.extend(["-T", t_dir])
 
-    if args.test_scenario:
-        for scenario in args.test_scenario:
+    test_scenario = getattr(args, "test_scenario", None)
+    if test_scenario:
+        for scenario in test_scenario:
             twister_args.extend(["-s", scenario])
 
     if extra_args:
-        twister_args.extend(extra_args)
+        cleaned_extra_args = []
+        skip_next = False
+        for arg in extra_args:
+            if skip_next:
+                skip_next = False
+                continue
+            if arg == "--hardware-map":
+                skip_next = True
+                continue
+            if arg.startswith("--hardware-map="):
+                continue
+            cleaned_extra_args.append(arg)
+        twister_args.extend(cleaned_extra_args)
 
     return twister_args
