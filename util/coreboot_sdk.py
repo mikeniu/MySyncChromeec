@@ -29,7 +29,9 @@ if script_dir not in sys.path:
 from coreboot_sdk_portage_deps import get_portage_deps
 
 
-toolchain_name_map = {
+__all__ = ["init_toolchain"]
+
+_TOOLCHAIN_NAME_MAP = {
     "arm-eabi": "COREBOOT_SDK_ROOT_arm",
     "picolibc-arm-eabi": "COREBOOT_SDK_ROOT_picolibc_arm",
     "libstdcxx-arm-eabi": "COREBOOT_SDK_ROOT_libstdcxx_arm",
@@ -44,7 +46,7 @@ toolchain_name_map = {
 }
 
 
-def get_toolchains_shell(
+def _get_toolchains_shell(
     portage_toolchains: Dict[str, Tuple],
     local_filepath: Union[str, "os.PathLike[str]"] = os.path.expanduser(
         "~/.cache/coreboot-sdk"
@@ -152,7 +154,7 @@ def get_toolchains_shell(
                     continue
 
             result[
-                toolchain_name_map.get(target) or f"COREBOOT_SDK_ROOT_{target}"
+                _TOOLCHAIN_NAME_MAP.get(target) or f"COREBOOT_SDK_ROOT_{target}"
             ] = output_toolchain
     if not success:
         raise FileNotFoundError(
@@ -173,7 +175,7 @@ def init_toolchain(toolchain: str = None) -> Dict[str, str]:
 
     portage_toolchains = get_portage_deps()
 
-    return get_toolchains_shell(portage_toolchains, toolchain=toolchain)
+    return _get_toolchains_shell(portage_toolchains, toolchain=toolchain)
 
 
 def _parse_args(argv):
@@ -203,7 +205,7 @@ def main(argv):
             print(json.dumps(env_vars))
         elif args.toolchain:
             # return just the requested toolchain
-            print(env_vars[toolchain_name_map[args.toolchain]])
+            print(env_vars[_TOOLCHAIN_NAME_MAP[args.toolchain]])
         else:
             # Return a formatted string which can be declared as an associative array in bash
             print(
