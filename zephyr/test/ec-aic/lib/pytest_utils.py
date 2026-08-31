@@ -28,8 +28,12 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 def get_board_id(config: pytest.Config) -> str | None:
     """Determine the Dagwood board serial number."""
-    board_id = config.getoption("--board-id") or os.environ.get(
-        "DAGWOOD_BOARD_ID"
-    )
+    board_id = config.getoption("--board-id", default=None)
+    if not board_id and hasattr(config, "twister_harness_config"):
+        twister_config = config.twister_harness_config
+        if twister_config and twister_config.devices:
+            board_id = twister_config.devices[0].id or None
+    if not board_id:
+        board_id = os.environ.get("DAGWOOD_BOARD_ID")
     logger.info("Selected board-id: %s", board_id)
     return board_id
