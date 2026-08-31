@@ -7,6 +7,8 @@
 
 #include "drivers/ucsi_v3.h"
 #include "pdc_it52xx.h"
+#include "task_id.h"
+#include "usbc/pdc_utils.h"
 
 #include <assert.h>
 #include <string.h>
@@ -57,6 +59,9 @@ BUILD_ASSERT(IT52XX_CONTROL_BYTE_CNT == 0x8);
 
 /** UCSI status bit in the IT52XX interrupt status register. */
 #define IT52XX_INT_UCSI_STATUS BIT(1)
+
+/** IRQ event posted by the interrupt handler. */
+#define IT52XX_IRQ_EVENT BIT(0)
 
 /** Number of bytes in the IT52XX interrupt-status response. */
 #define IT52XX_INT_READ_STATUS_LENGTH 1
@@ -3276,6 +3281,8 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.get_capability = it52xx_get_capability,
 	.get_connector_capability = it52xx_get_connector_capability,
 	.set_ccom = it52xx_set_ccom,
+	.set_drp_mode = NULL, /* it52xx is trysrc DRP by build config */
+	.get_drp_mode = NULL,
 	.set_uor = it52xx_set_uor,
 	.set_pdr = it52xx_set_pdr,
 	.set_sink_path = it52xx_set_sink_path,
@@ -3285,36 +3292,230 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.set_rdo = it52xx_set_rdo,
 	.get_error_status = it52xx_get_error_status,
 	.get_vbus_voltage = it52xx_get_vbus_voltage,
+	.get_current_pdo = NULL, /* Duplicated function with .get_pdos */
 	.set_handler_cb = it52xx_set_handler_cb,
 	.read_power_level = it52xx_read_power_level,
 	.get_info = it52xx_get_info,
 	.get_hw_config = it52xx_get_hw_config,
 	.get_hw_frs_support = it52xx_get_hw_frs_support,
 	.set_power_level = it52xx_set_power_level,
+	.reconnect = NULL,
+	.update_retimer = NULL,
 	.get_cable_property = it52xx_get_cable_property,
 	.get_vdo = it52xx_get_vdo,
+	.get_identity_discovery = NULL,
 	.set_comms_state = it52xx_set_comms_state,
+	.is_vconn_sourcing = NULL,
 	.set_pdos = it52xx_set_pdo,
+	.get_pch_data_status = NULL,
 	.execute_ucsi_cmd = it52xx_execute_ucsi_cmd,
 	.manage_callback = it52xx_manage_callback,
 	.ack_cc_ci = NULL, /* The IT52XX driver sends ACK_CC_CI internally. */
 	.get_lpm_ppm_info = it52xx_get_lpm_ppm_info,
+	.set_frs = NULL,
 	.get_attention_vdo = it52xx_get_attention_vdo,
+	.set_battery_capability = NULL,
+	.set_battery_status = NULL,
 #ifdef CONFIG_USBC_PDC_DRIVEN_CCD
 	.get_sbu_mux_mode = it52xx_get_sbu_mux_mode,
 	.set_sbu_mux_mode = it52xx_set_sbu_mux_mode,
 #endif /* define(CONFIG_USBC_PDC_DRIVEN_CCD) */
+	.set_bbr_cts = NULL,
+	.set_ap_power_state = NULL,
+	.get_vendor_status = NULL,
+	.get_alert = NULL,
+	.set_max_pdp = NULL,
 };
 
 static int pdc_init(const struct device *dev)
 {
+	const struct pdc_config_t *cfg = dev->config;
+	struct pdc_data_t *data = dev->data;
+	int rv;
+
+	if (!i2c_is_ready_dt(&cfg->i2c)) {
+		LOG_ERR("device %s not ready", cfg->i2c.bus->name);
+		return -ENODEV;
+	}
+
+	if (!gpio_is_ready_dt(&cfg->irq_gpios)) {
+		LOG_ERR("device %s not ready", cfg->irq_gpios.port->name);
+		return -ENODEV;
+	}
+
+	k_event_init(&data->driver_event);
+
+	rv = gpio_pin_configure_dt(&cfg->irq_gpios, GPIO_INPUT);
+	if (rv < 0) {
+		LOG_ERR("Unable to configure GPIO");
+		return rv;
+	}
+
+	gpio_init_callback(&data->gpio_cb, cfg->callback_handler,
+			   BIT(cfg->irq_gpios.pin));
+
+	rv = gpio_add_callback(cfg->irq_gpios.port, &data->gpio_cb);
+	if (rv < 0) {
+		LOG_ERR("Unable to add callback");
+		return rv;
+	}
+
+	rv = gpio_pin_interrupt_configure_dt(&cfg->irq_gpios,
+					     GPIO_INT_EDGE_FALLING);
+	if (rv < 0) {
+		LOG_ERR("Unable to configure interrupt");
+		return rv;
+	}
+
+	/* Trigger IRQ on startup to read any pending interrupts */
+	k_event_post(&data->driver_event, IT52XX_IRQ_EVENT);
+
+	k_mutex_init(&data->mtx);
+
+	data->cmd = CMD_NONE;
+	data->error_recovery_counter = 0;
+	data->init_retry_counter = 0;
+	data->info.fw_version = PDC_FWVER_INVALID;
+	data->info_valid = false;
+
+	/* Set initial state */
+	data->init_local_state = INIT_PDC_SET_PPM_RESET;
+	smf_set_initial(SMF_CTX(data), &states[ST_INIT]);
+
+	/* Create the thread for this port */
+	cfg->create_thread(dev);
+
+	LOG_INF("ITE%d: ITE it52xx PDC DRIVER", cfg->connector_number);
+
 	return 0;
 }
 
-#define IT52XX_PDC_DEFINE(inst)                                              \
-	DEVICE_DT_INST_DEFINE(inst, pdc_init, NULL, NULL, NULL, POST_KERNEL, \
-			      CONFIG_APPLICATION_INIT_PRIORITY,              \
-			      &pdc_driver_api);
+static void it52xx_thread(void *dev, void *unused1, void *unused2)
+{
+	const struct pdc_config_t *cfg = ((const struct device *)dev)->config;
+	struct pdc_data_t *data = ((const struct device *)dev)->data;
+	enum state_t state;
+	uint32_t events;
+	bool irq_pending = false;
+
+	while (1) {
+		smf_run_state(SMF_CTX(data));
+
+		events =
+			k_event_wait(&data->driver_event,
+				     IT52XX_IRQ_EVENT | IT52XX_NEXT_STATE_READY,
+				     false, K_MSEC(T_TASK_TIMEOUT_EVENT));
+
+		if (events & IT52XX_IRQ_EVENT) {
+			irq_pending = true;
+		}
+
+		k_event_clear(&data->driver_event, events);
+
+		state = get_state(data);
+
+		/*
+		 * Handle command-completion (CC) IRQs while a command
+		 * transaction is in progress. This includes the response to
+		 * ACK_CC_CI, allowing the transaction to complete before
+		 * communication is suspended.
+		 */
+		if (state == ST_TASK_WAIT && irq_pending) {
+			irq_pending = false;
+			handle_irqs(data);
+		}
+
+		/*
+		 * Handle asynchronous connector-change indicator (CI) IRQs only
+		 * while communication is active. Do not start a new CI
+		 * transaction after communication suspension has been
+		 * requested.
+		 */
+		if (state == ST_IDLE && irq_pending) {
+			irq_pending = false;
+			if (check_comms_suspended()) {
+				LOG_INF("ITE%d: Ignoring CI interrupt",
+					cfg->connector_number);
+				continue;
+			}
+			handle_irqs(data);
+		}
+	}
+}
+
+#define PDC_DATA_STRUCT_NAME(inst) pdc_data_##inst
+
+BUILD_ASSERT(
+	EC_TASK_PRIORITY(EC_TASK_USBC_PDC_PRIO) ==
+		CONFIG_USBC_PDC_IT52XX_THREAD_PRIORITY,
+	"EC_TASK_USBC_PDC_PRIO does not match USBC_PDC_IT52XX_THREAD_PRIORITY.");
+
+#define IT52XX_PDC_DEFINE(inst)                                               \
+	K_THREAD_STACK_DEFINE(it52xx_thread_stack_area_##inst,                \
+			      CONFIG_USBC_PDC_IT52XX_STACK_SIZE);             \
+                                                                              \
+	static void create_thread_##inst(const struct device *dev)            \
+	{                                                                     \
+		struct pdc_data_t *data = dev->data;                          \
+                                                                              \
+		data->thread = k_thread_create(                               \
+			&data->thread_data, it52xx_thread_stack_area_##inst,  \
+			K_THREAD_STACK_SIZEOF(                                \
+				it52xx_thread_stack_area_##inst),             \
+			it52xx_thread, (void *)dev, 0, 0,                     \
+			CONFIG_USBC_PDC_IT52XX_THREAD_PRIORITY, K_ESSENTIAL,  \
+			K_FOREVER);                                           \
+		k_thread_name_set(data->thread, "IT52XX" STRINGIFY(inst));    \
+	}                                                                     \
+                                                                              \
+	static struct pdc_data_t PDC_DATA_STRUCT_NAME(inst);                  \
+                                                                              \
+	static void pdc_interrupt_callback##inst(const struct device *dev,    \
+						 struct gpio_callback *cb,    \
+						 uint32_t pins)               \
+	{                                                                     \
+		k_event_post(&PDC_DATA_STRUCT_NAME(inst).driver_event,        \
+			     IT52XX_IRQ_EVENT);                               \
+	}                                                                     \
+                                                                              \
+	static const struct pdc_config_t pdc_config##inst = {                 \
+		.i2c = I2C_DT_SPEC_INST_GET(inst),                            \
+		.irq_gpios = GPIO_DT_SPEC_INST_GET(inst, irq_gpios),          \
+		.connector_number =                                           \
+			USBC_PORT_FROM_PDC_DRIVER_NODE(DT_DRV_INST(inst)),    \
+		.bits.command_completed = 1,                                  \
+		.bits.external_supply_change = 1,                             \
+		.bits.power_operation_mode_change = 1,                        \
+		.bits.attention = 1,                                          \
+		.bits.fw_update_request = 0,                                  \
+		.bits.provider_capability_change_supported = 1,               \
+		.bits.negotiated_power_level_change = 1,                      \
+		.bits.pd_reset_complete = 1,                                  \
+		.bits.support_cam_change = 1,                                 \
+		.bits.battery_charging_status_change = 1,                     \
+		.bits.security_request_from_port_partner = 0,                 \
+		.bits.connector_partner_change = 1,                           \
+		.bits.power_direction_change = 1,                             \
+		.bits.set_retimer_mode = 0,                                   \
+		.bits.connect_change = 1,                                     \
+		.bits.error = 1,                                              \
+		.bits.sink_path_status_change = 1,                            \
+		.create_thread = create_thread_##inst,                        \
+		.no_fw_update = DT_INST_PROP(inst, no_fw_update),             \
+		.ccd = DT_INST_PROP(inst, ccd),                               \
+		.frs_supported = DT_INST_PROP(inst, frs_supported),           \
+		.callback_handler = pdc_interrupt_callback##inst,             \
+		.port_index_on_chip = DT_INST_PROP(inst, port_index_on_chip), \
+	};                                                                    \
+                                                                              \
+	DEVICE_DT_INST_DEFINE(inst, pdc_init, NULL,                           \
+			      &PDC_DATA_STRUCT_NAME(inst), &pdc_config##inst, \
+			      POST_KERNEL, CONFIG_PDC_DRIVER_INIT_PRIORITY,   \
+			      &pdc_driver_api);                               \
+                                                                              \
+	static struct pdc_data_t PDC_DATA_STRUCT_NAME(inst) = {               \
+		.dev = DEVICE_DT_INST_GET(inst),                              \
+	};
 
 DT_INST_FOREACH_STATUS_OKAY(IT52XX_PDC_DEFINE)
 
@@ -3331,3 +3532,10 @@ void pdc_it52xx_test_invalidate_chip_info(const struct device *dev)
 }
 /* LCOV_EXCL_STOP */
 #endif /* CONFIG_ZTEST */
+
+#ifdef CONFIG_USBC_PDC_DRIVEN_CCD
+/* If PDC-driven CCD is used, one of the PDC driver nodes for each driver compat
+ * type must be marked with the `ccd` property.
+ */
+CHECK_ONE_CCD_PORT_COUNT_FOR_DRIVER();
+#endif /* CONFIG_USBC_PDC_DRIVEN_CCD */
