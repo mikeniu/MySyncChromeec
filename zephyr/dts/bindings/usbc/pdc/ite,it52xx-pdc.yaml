@@ -7,3 +7,18 @@ description: ITE PDC it52xx
 compatible: "ite,it52xx-pdc"
 
 include: ["i2c-device.yaml", "pdc-device.yaml"]
+
+properties:
+  irq-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      Interrupt line from the PDC (Zephyr standard GPIO format).
+  port-index-on-chip:
+    type: int
+    enum:
+      - 1
+    required: true
+    description: |
+      Connector number used in UCSI commands sent to the PDC. The IT5271 is a
+      single-port PDC, so this value must be 1.
