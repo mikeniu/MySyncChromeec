@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ccd173f_db166711",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-08-31T08:33:00Z",
+      "side": 1,
+      "message": "changed to `fp_atc(gpioe0)`",
+      "range": {
+        "startLine": 9,
+        "startChar": 21,
+        "endLine": 9,
+        "endChar": 32
+      },
+      "revId": "d15ca29399aa51026bdf911a33364efb90c89e42",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4a1b1bd_149d3a5f",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-08-31T08:33:00Z",
+      "side": 1,
+      "message": "It\u0027s better to keep order",
+      "range": {
+        "startLine": 145,
+        "startChar": 2,
+        "endLine": 200,
+        "endChar": 0
+      },
+      "revId": "d15ca29399aa51026bdf911a33364efb90c89e42",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8991c4b9_e46f966e",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-08-31T08:33:00Z",
+      "side": 1,
+      "message": "use `/* EC_INT_MIPI_N */`",
+      "range": {
+        "startLine": 205,
+        "startChar": 17,
+        "endLine": 205,
+        "endChar": 32
+      },
+      "revId": "d15ca29399aa51026bdf911a33364efb90c89e42",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
