@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "acf236ed_2f48373a",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 3073,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-08-31T09:33:49Z",
+      "side": 1,
+      "message": "No it\u0027s not covered in local run as well.",
+      "parentUuid": "04d47bdb_afe9e157",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f9029f91_948e9775",
         "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
         "patchSetId": 33
