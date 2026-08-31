@@ -9,11 +9,15 @@
 	pdc_emul1: it52xx-pdc@26 {
 		compatible = "ite,it52xx-pdc";
 		reg = <0x26>;
+		irq-gpios = <&gpiof 5 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <1>;
 		ccd;
 	};
 
 	pdc_emul2: it52xx-pdc@27 {
 		compatible = "ite,it52xx-pdc";
 		reg = <0x27>;
+		irq-gpios = <&gpiof 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		port-index-on-chip = <1>;
 	};
 };
