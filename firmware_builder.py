@@ -14,6 +14,7 @@ import hashlib
 import multiprocessing
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -93,6 +94,268 @@ def run_cmd(cmd, exec_dir=None):
     return result.stdout.decode().strip()
 
 
+def log_step_title(name):
+    """Clearly log a step's title"""
+    title = f"##### START {name} #####"
+    hashes = "#" * len(title)
+    print("\n%s\n%s\n%s\n" % (hashes, title, hashes), flush=True)
+
+
+def get_repo_branch(repo_path):
+    """Determine a user-friendly branch name for a repository.
+
+    Resolves local branch, tracking branch, manifest branch (m/main), or
+    remote branch pointing at HEAD, avoiding generic 'HEAD' outputs for
+    detached HEADs.
+    """
+    res = subprocess.run(
+        ["git", "-C", repo_path, "symbolic-ref", "-q", "--short", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    local_branch = res.stdout.strip()
+
+    upstream = subprocess.run(
+        ["git", "-C", repo_path, "rev-parse", "--abbrev-ref", "@{upstream}"],
+        capture_output=True,
+        text=True,
+        check=False,
+    ).stdout.strip()
+
+    m_main = ""
+    m_res = subprocess.run(
+        ["git", "-C", repo_path, "symbolic-ref", "-q", "refs/remotes/m/main"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if m_res.returncode == 0:
+        m_ref = m_res.stdout.strip()
+        if m_ref.startswith("refs/remotes/"):
+            m_main = m_ref[len("refs/remotes/") :]
+
+    if local_branch:
+        if upstream:
+            return f"{local_branch} (tracking {upstream})"
+        elif m_main:
+            return f"{local_branch} (manifest: {m_main})"
+        return local_branch
+
+    # Detached HEAD state: resolve remote branch
+    points_at = (
+        subprocess.run(
+            [
+                "git",
+                "-C",
+                repo_path,
+                "for-each-ref",
+                "--format=%(refname:short)",
+                "--points-at",
+                "HEAD",
+                "refs/remotes/",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        .stdout.strip()
+        .splitlines()
+    )
+    remote_refs = [
+        r.strip()
+        for r in points_at
+        if r.strip() and not r.strip().startswith("m/")
+    ]
+
+    if m_main:
+        if remote_refs and m_main not in remote_refs:
+            return f"{remote_refs[0]} (manifest: {m_main})"
+        return m_main
+    elif remote_refs:
+        return remote_refs[0]
+
+    desc = subprocess.run(
+        ["git", "-C", repo_path, "describe", "--all", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=False,
+    ).stdout.strip()
+    if desc:
+        for prefix in ("refs/heads/", "refs/remotes/", "heads/", "remotes/"):
+            if desc.startswith(prefix):
+                desc = desc[len(prefix) :]
+                break
+        return desc
+
+    return "HEAD"
+
+
+def log_dependency_repo_info():
+    """Log current branch and recent commits for key dependency repositories."""
+    log_step_title("Dependency Repositories Info")
+    src_dir = os.path.abspath(
+        os.path.join(DIR, os.pardir, os.pardir)
+    )
+    repo_list_file = os.path.join(DIR, "util", "repo_dir.list")
+
+    rel_paths = []
+    if os.path.isfile(repo_list_file):
+        with open(repo_list_file, "r", encoding="utf-8") as f:
+            for line in f:
+                rel = line.strip()
+                if rel:
+                    rel_paths.append(rel)
+
+    if not rel_paths:
+        branch_ext = os.environ.get(
+            "BRANCH_EXT", "-private" if DIR.endswith("-private") else ""
+        )
+        gsc_utils_path = (
+            f"platform/gsc-utils{branch_ext}"
+            if os.path.exists(
+                os.path.join(src_dir, f"platform/gsc-utils{branch_ext}")
+            )
+            else "platform/gsc-utils"
+        )
+        rel_paths = [
+            os.path.relpath(DIR, src_dir),
+            "platform/cr50-utils",
+            f"platform/pinweaver{branch_ext}",
+            gsc_utils_path,
+            f"third_party/tpm2{branch_ext}",
+            "third_party/cryptoc",
+        ]
+
+    repos = []
+    for rel_path in rel_paths:
+        full_path = os.path.join(src_dir, rel_path)
+        if os.path.exists(full_path):
+            res = subprocess.run(
+                ["git", "-C", full_path, "rev-parse", "--show-toplevel"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if res.returncode == 0:
+                git_root = res.stdout.strip()
+                rel_git = os.path.relpath(git_root, src_dir)
+                if rel_git not in repos:
+                    repos.append(rel_git)
+
+    for rel_git in repos:
+        repo_path = os.path.join(src_dir, rel_git)
+        branch = get_repo_branch(repo_path)
+        commits = subprocess.run(
+            ["git", "-C", repo_path, "log", "-n", "3", "--oneline"],
+            capture_output=True,
+            text=True,
+            check=False,
+        ).stdout.strip()
+        print(f"=== Repository: {rel_git} (Branch: {branch}) ===")
+        if commits:
+            print(commits)
+        else:
+            print("  <no commits found>")
+        print("", flush=True)
+
+
+def log_compiler_info():
+    """Log compiler and toolchain locations and version information."""
+    log_step_title("Compiler and Toolchain Info")
+    env_vars = [
+        "COREBOOT_SDK_ROOT_arm",
+        "CROSS_COMPILE",
+        "CC",
+        "CXX",
+        "CFLAGS",
+        "EXTRA_CFLAGS",
+    ]
+    print("=== Environment Variables ===")
+    for var in env_vars:
+        if var in os.environ:
+            print(f"{var}={os.environ[var]}")
+    print("", flush=True)
+
+    sdk_root = os.environ.get("COREBOOT_SDK_ROOT_arm", "")
+
+    target_compilers = []
+    if sdk_root:
+        sdk_gcc = os.path.join(sdk_root, "bin", "arm-eabi-gcc")
+        if os.path.exists(sdk_gcc):
+            target_compilers.append(("Coreboot SDK ARM GCC", sdk_gcc))
+
+    which_arm_gcc = shutil.which("arm-eabi-gcc")
+    if which_arm_gcc and which_arm_gcc not in [p for _, p in target_compilers]:
+        target_compilers.append(("PATH arm-eabi-gcc", which_arm_gcc))
+
+    which_arm_none_gcc = shutil.which("arm-none-eabi-gcc")
+    if (
+        which_arm_none_gcc
+        and which_arm_none_gcc not in [p for _, p in target_compilers]
+    ):
+        target_compilers.append(("PATH arm-none-eabi-gcc", which_arm_none_gcc))
+
+    if not target_compilers:
+        print("No target compiler found in COREBOOT_SDK_ROOT_arm or PATH.\n")
+    else:
+        for desc, compiler_path in target_compilers:
+            print(f"=== {desc} ===")
+            print(f"Location: {compiler_path}")
+            if os.path.islink(compiler_path):
+                print(f"Symlink target: {os.path.realpath(compiler_path)}")
+            res = subprocess.run(
+                [compiler_path, "-v"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            output = res.stderr.strip() or res.stdout.strip()
+            if output:
+                print("Version details (-v):")
+                print(output)
+            print("", flush=True)
+
+    if sdk_root:
+        sdk_ld = os.path.join(sdk_root, "bin", "arm-eabi-ld")
+        if os.path.exists(sdk_ld):
+            print("=== Target Linker ===")
+            print(f"Location: {sdk_ld}")
+            res = subprocess.run(
+                [sdk_ld, "--version"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            lines = res.stdout.strip().splitlines()
+            if lines:
+                print(f"Version: {lines[0]}")
+            print("", flush=True)
+
+    host_tools = [
+        (
+            "Host GCC",
+            shutil.which("x86_64-pc-linux-gnu-gcc") or shutil.which("gcc"),
+        ),
+        ("Host Clang", shutil.which("clang")),
+        ("Ccache", shutil.which("ccache")),
+    ]
+    for name, tool_path in host_tools:
+        if tool_path:
+            print(f"=== {name} ===")
+            print(f"Location: {tool_path}")
+            res = subprocess.run(
+                [tool_path, "--version"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            lines = res.stdout.strip().splitlines()
+            if lines:
+                print(f"Version: {lines[0]}")
+            print("", flush=True)
+
+
 def init_toolchain():
     """Initialize coreboot-sdk.
 
@@ -117,6 +380,8 @@ def init_toolchain():
     for name, target in toolchains:
         run_result = run_cmd(["bazel", "--project", "fwsdk", "run", target])
         os.environ[name] = run_result
+
+    log_compiler_info()
 
 
 def build_codesigner():
@@ -346,6 +611,8 @@ def main(args):
     if not hasattr(opts, "func"):
         print("Must select a valid sub command!")
         return -1
+
+    log_dependency_repo_info()
 
     # Run selected sub command function
     try:
