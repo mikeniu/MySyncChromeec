@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09f59b0b_a7b5ba3a",
+        "filename": "zephyr/program/bluey/meru/keyboard.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-08-31T06:47:06Z",
+      "side": 1,
+      "message": "Should we delete all KB configs?",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 14
+      },
+      "revId": "8270dd8f3a9637484891b6640d1ea4ebfa291cb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9f3a6c2_9797b160",
+        "filename": "zephyr/program/bluey/meru/project.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-08-31T06:47:06Z",
+      "side": 1,
+      "message": "delete?",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 44
+      },
+      "revId": "8270dd8f3a9637484891b6640d1ea4ebfa291cb6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
