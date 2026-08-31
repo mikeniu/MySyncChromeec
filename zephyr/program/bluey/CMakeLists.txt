@@ -21,6 +21,11 @@ if(DEFINED CONFIG_BOARD_QUARTZ)
 	add_subdirectory(quartz)
 endif()
 
+if(DEFINED CONFIG_BOARD_MERU)
+	project(meru)
+	add_subdirectory(meru)
+endif()
+
 if(DEFINED CONFIG_BOARD_MICA)
 	project(mica)
 	add_subdirectory(mica)
