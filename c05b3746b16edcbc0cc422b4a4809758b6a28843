@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe6458c7_6c1b6f88",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-08-31T07:06:37Z",
+      "side": 1,
+      "message": "Should we use PWM to control brightness?",
+      "range": {
+        "startLine": 215,
+        "startChar": 2,
+        "endLine": 222,
+        "endChar": 4
+      },
+      "revId": "c05b3746b16edcbc0cc422b4a4809758b6a28843",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "042479b2_a603551d",
+        "filename": "zephyr/program/bluey/meru/led_pins.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-08-31T07:06:37Z",
+      "side": 1,
+      "message": "Take care of the nugget config later; quartz nugget used `led_pins`",
+      "range": {
+        "startLine": 7,
+        "startChar": 1,
+        "endLine": 7,
+        "endChar": 9
+      },
+      "revId": "c05b3746b16edcbc0cc422b4a4809758b6a28843",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
