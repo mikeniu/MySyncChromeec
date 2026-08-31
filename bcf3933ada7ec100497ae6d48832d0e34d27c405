@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29e980b4_c54ca431",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-08-31T18:51:57Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8671934683262791745) is being automatically retried for the following reasons:\n- Some child builders are now retryable:cq-orchestrator\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "bcf3933ada7ec100497ae6d48832d0e34d27c405",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
