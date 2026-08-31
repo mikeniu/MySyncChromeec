@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "55b6c858_f7bc1e0a",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4253897
+      },
+      "writtenOn": "2026-08-31T13:25:50Z",
+      "side": 1,
+      "message": "Modified in latest patchset.",
+      "parentUuid": "f9029f91_948e9775",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "350c9654_4ed0f8bb",
         "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
         "patchSetId": 33
