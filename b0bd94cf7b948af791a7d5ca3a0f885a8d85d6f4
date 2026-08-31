@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3de11214_5a118fdd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-08-31T21:35:25Z",
+      "side": 1,
+      "message": "Low coverage due to many board specific files that currently have no coverage.",
+      "revId": "b0bd94cf7b948af791a7d5ca3a0f885a8d85d6f4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
