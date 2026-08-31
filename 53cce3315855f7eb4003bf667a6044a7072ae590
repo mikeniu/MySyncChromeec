@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4510127a_db99d957",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-08-31T22:00:48Z",
+      "side": 1,
+      "message": "I\u0027d cherry pick https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8329087 as well just for completeness",
+      "revId": "53cce3315855f7eb4003bf667a6044a7072ae590",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
