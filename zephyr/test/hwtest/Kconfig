@@ -191,7 +191,7 @@ config HW_TEST_QUEUE
 config HW_TEST_RAM_LOCK
 	bool "NPCX RAM lock test"
 	select ZTEST
-	depends on NPCX_RAM_LOCK
+	select NPCX_RAM_LOCK
 	help
 	  The test verifies ram lock function of NPCX chip.
 
