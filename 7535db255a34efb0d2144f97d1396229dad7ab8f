@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "05e9c5d2_aed97740",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-01T01:41:39Z",
+      "side": 1,
+      "message": "The motivation was eliminating the legacy CONFIG_ALLOW_UNALIGNED_ACCESS macro from config_allowed.txt and its inverted shim in config_chip.h as part of Zephyr 4.4 cleanup.\n\nHere\u0027s a cl that guards the command directly on CONFIG_TRAP_UNALIGNED_ACCESS: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8329894",
+      "parentUuid": "c10ef25f_eef500e0",
+      "range": {
+        "startLine": 10,
+        "startChar": 54,
+        "endLine": 15,
+        "endChar": 48
+      },
+      "revId": "7535db255a34efb0d2144f97d1396229dad7ab8f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "5d5aac91_a41d63b2",
