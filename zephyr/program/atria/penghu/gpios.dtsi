@@ -44,6 +44,10 @@
 			gpios = <&gpioe 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
 			enum-name = "GPIO_PCH_PWRBTN_L";
 		};
+		gpio_pg_pp3300_s5_od: pg_pp3300_s5_od {
+			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			no-auto-init;
+		};
 		gpio_ec_forcepr_odl: ec_forcepr_odl {
 			gpios = <&gpioi 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
