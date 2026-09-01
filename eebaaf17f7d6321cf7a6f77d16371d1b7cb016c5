@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d099f08e_9cc48444",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 3073,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-01T22:27:04Z",
+      "side": 1,
+      "message": "OK, the reason this isn\u0027t covered is that the DRP policy update is handled in `tc_event_check` and `pd_update_dual_role_config` before this function runs. The state change intended here happens on line 1940. So this DRP state check is dead code and can be removed. Sorry for leading us down this rabbit hole.\n\nI think the new test is probably still a good addition. Here, I think you can just do this\n```\n\t\t\t * CC changes. pd_update_dual_role_config will\n\t\t\t * handle DRP policy changes before this state\n\t\t\t * runs.\n\t\t\t */\n\t\t\treturn;\n```",
+      "parentUuid": "acf236ed_2f48373a",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f9029f91_948e9775",
         "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
         "patchSetId": 33
