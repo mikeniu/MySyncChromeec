@@ -472,8 +472,6 @@ class Renode(Platform):
         # bloonchipper Zephyr tests to skip on Renode.
         if zephyr and test_name in [
             "benchmark",  # TODO(b/390253975)
-            # TODO(b/382705460): We have seen this flake in the CQ.
-            # Re-enable when missing character bug is fixed.
             "fp_transport",  # TODO(b/384094788)
             "fpsensor_debug",  # TODO(b/384110894)
             "zephyr_flash_stm32f4",  # TODO(b/384974228)
