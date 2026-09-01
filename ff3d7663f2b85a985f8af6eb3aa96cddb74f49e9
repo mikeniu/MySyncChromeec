@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9bd7c63_c482fc43",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-01T23:03:26Z",
+      "side": 1,
+      "message": "Can you grab some stats regarding the max watchdog period and the difference shown by `idlestats`?",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 4
+      },
+      "revId": "ff3d7663f2b85a985f8af6eb3aa96cddb74f49e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6298fd52_7cc936d8",
+        "filename": "zephyr/boards/google/realtek/realtek.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-01T23:03:26Z",
+      "side": 1,
+      "message": "Nit - line length.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 91
+      },
+      "revId": "ff3d7663f2b85a985f8af6eb3aa96cddb74f49e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
