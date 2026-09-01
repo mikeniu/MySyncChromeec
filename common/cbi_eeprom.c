@@ -36,7 +36,11 @@ static int eeprom_is_write_protected(void)
 	if (IS_ENABLED(CONFIG_BYPASS_CBI_EEPROM_WP_CHECK))
 		return 0;
 
+#ifdef CONFIG_EEPROM_CBI_WP
+	return gpio_get_level(GPIO_EC_CBI_WP);
+#else
 	return write_protect_is_asserted();
+#endif
 }
 
 static int eeprom_write(uint8_t *cbi)
