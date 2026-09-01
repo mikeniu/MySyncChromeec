@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10fb452b_da268541",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-09-01T09:50:40Z",
+      "side": 1,
+      "message": "Hi Kyle,  \nThe c1nv manifest has added the google-private(https://chrome-internal-review.googlesource.com/c/chromeos/project/calypso/c1nv/+/9542775), but this CL still builds fail. Can you help guide us on how to debug it?",
+      "revId": "d4717e14eb520257c974df80e5342512e1f34d8a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
