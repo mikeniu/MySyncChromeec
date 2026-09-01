@@ -67,10 +67,6 @@
 			gpios = <&gpiof 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 			no-auto-init;
 		};
-		gpio_usb_pd2_int_odl: usb_pd2_int_odl {
-			gpios = <&gpiob 2 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
-			no-auto-init;
-		};
 		/* The legacy system code requires GPIO_ENTERING_RW symbol */
 		ec-entering-rw {
 			enum-name = "GPIO_ENTERING_RW";
