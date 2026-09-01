@@ -8,7 +8,6 @@
 #include "gpio.h"
 #include "hooks.h"
 #include "i2c.h"
-#include "keyboard_protocol.h"
 #include "timer.h"
 
 /* Console output macro */

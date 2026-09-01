@@ -9,7 +9,6 @@
 #include "flash.h"
 #include "hooks.h"
 #include "host_task.h"
-#include "keyboard_scan.h"
 #include "stack_trace.h"
 #include "system.h"
 #include "task.h"
@@ -47,9 +46,6 @@ static int test_main(void)
 	test_init();
 
 	timer_init();
-#ifdef HAS_TASK_KEYSCAN
-	keyboard_scan_init();
-#endif
 	uart_init();
 
 	if (system_jumped_to_this_image()) {

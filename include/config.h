@@ -926,7 +926,6 @@
 #undef  CONFIG_CMD_ILIM
 #define CONFIG_CMD_INA
 #undef  CONFIG_CMD_JUMPTAGS
-#define CONFIG_CMD_KEYBOARD
 #undef  CONFIG_CMD_LEDTEST
 #undef  CONFIG_CMD_LID_ANGLE
 #undef  CONFIG_CMD_MCDP
@@ -1947,141 +1946,6 @@
  */
 #undef CONFIG_ENABLE_JTAG_SELECTION
 
-/*****************************************************************************/
-/* Keyboard config */
-
-/*
- * The Silego reset chip sits in between the EC and the physical keyboard on
- * column 2.  To save power in low-power modes, some Silego variants require
- * the signal to be inverted so that the open-drain output from the EC isn't
- * costing power due to the pull-up resistor in the Silego.
- */
-#undef CONFIG_KEYBOARD_COL2_INVERTED
-
-/*
- * Keyboards with the assistant key also move the refresh key matrix to row 3
- * instead of row 2.  This is used by the boot key detection code to determine
- * if the refresh key is held down at boot.
- */
-#undef CONFIG_KEYBOARD_REFRESH_ROW3
-
-/*
- * Config KSO to start from a different KSO pin. This is to allow some chips
- * to use alternate functions on KSO pins.
- */
-#define CONFIG_KEYBOARD_KSO_BASE 0
-
-/*
- * For certain board configurations, KSI2 or KSI3 will be stuck asserted for all
- * scan columns if the power button is held. We must be aware of this case
- * in order to correctly handle recovery mode key combinations.
- */
-#undef CONFIG_KEYBOARD_PWRBTN_ASSERTS_KSI2
-#undef CONFIG_KEYBOARD_PWRBTN_ASSERTS_KSI3
-
-/* Enable extra debugging output from keyboard modules */
-#undef CONFIG_KEYBOARD_DEBUG
-
-/*
- * Disables the directly connected keyboard pins and drivers on a particular
- * chip. You might want this enabled if the keyboard is indirectly connected
- * to the EC, perhaps through an I2C controller.
- */
-#undef CONFIG_KEYBOARD_NOT_RAW
-
-/* The board uses a negative edge-triggered GPIO for keyboard interrupts. */
-#undef CONFIG_KEYBOARD_IRQ_GPIO
-
-/* Compile code for 8042 keyboard protocol */
-#undef CONFIG_KEYBOARD_PROTOCOL_8042
-
-/* Compile code for MKBP keyboard protocol */
-#undef CONFIG_KEYBOARD_PROTOCOL_MKBP
-
-/* Support keyboard factory test scanning */
-#undef CONFIG_KEYBOARD_FACTORY_TEST
-
-/*
- * Keyboard config (struct keyboard_scan_config) is in board.c.  If this is
- * not defined, default values from common/keyboard_scan.c will be used.
- */
-#undef CONFIG_KEYBOARD_BOARD_CONFIG
-
-/*
- * Support for boot key combinations (e.g. refresh key being held on boot to
- * trigger recovery).
- */
-#define CONFIG_KEYBOARD_BOOT_KEYS
-
-/* Add support for the assistant key. */
-#undef CONFIG_KEYBOARD_ASSISTANT_KEY
-
-/* Add support for a switch that indicates if the device is in tablet mode. */
-#undef CONFIG_KEYBOARD_TABLET_MODE_SWITCH
-
-/*
- * Minimum CPU clocks between scans.  This ensures that keyboard scanning
- * doesn't starve the other EC tasks of CPU when running at a decreased system
- * clock.
- */
-#undef CONFIG_KEYBOARD_POST_SCAN_CLOCKS
-
-/*  Print keyboard scan time intervals. */
-#undef CONFIG_KEYBOARD_PRINT_SCAN_TIMES
-
-/*
- * Support for extra runtime key combinations (e.g. alt+volup+h/r for hibernate
- * and warm reboot, respectively).
- */
-#define CONFIG_KEYBOARD_RUNTIME_KEYS
-
-/*
- * Allow the keyboard scan code set tables to be modified at runtime.
- */
-#undef CONFIG_KEYBOARD_SCANCODE_MUTABLE
-
-/*
- * Allow board-specific 8042 keyboard callback when a key state is changed.
- */
-#undef CONFIG_KEYBOARD_SCANCODE_CALLBACK
-
-/*
- * Call board-supplied keyboard_suppress_noise() function when the debounced
- * keyboard state changes.  Some boards use this to send a signal to the audio
- * codec to suppress typing noise picked up by the microphone.
- */
-#undef CONFIG_KEYBOARD_SUPPRESS_NOISE
-
-/*
- * Enable keyboard testing functionality. This enables a message which receives
- * a list of keyscan events from the AP and processes them.  This will cause
- * keypresses to appear on the AP through the same mechanism as a normal
- * keyboard press.
- *
- * This can be used to spoof keyboard events, so is not normally defined,
- * except during internal testing.
- */
-#undef CONFIG_KEYBOARD_TEST
-
-/*
- * Enable quasi-bidirectional buffers for KSO pins. It has an open-drain output
- * and a low-impedance pull-up. The low-impedance pull-up is active when ec
- * changes the output data buffers from 0 to 1, thereby reducing the
- * low-to-high transition time.
- */
-#undef CONFIG_KEYBOARD_KSO_HIGH_DRIVE
-
-/*
- * Add support for keyboards with language ID pins
- */
-#undef CONFIG_KEYBOARD_LANGUAGE_ID
-
-/*
- * Enable keypad (a palm-sized keyboard section usually placed on the far right)
- */
-#undef CONFIG_KEYBOARD_KEYPAD
-
-/*****************************************************************************/
 
 /*****************************************************************************/
 
@@ -2230,57 +2094,6 @@
 /* Minute-IA watchdog timer vector number. */
 #define CONFIG_MIA_WDT_VEC 0xFF
 
-/* Support MKBP event */
-#undef CONFIG_MKBP_EVENT
-
-/* MKBP events are sent by using host event */
-#undef CONFIG_MKBP_USE_HOST_EVENT
-
-/* MKBP events are sent by using GPIO */
-#undef CONFIG_MKBP_USE_GPIO
-
-/*
- * MKBP events are notified by using both a GPIO and a host event.
- *
- * You should use this if you are using a GPIO to notify the AP of an MKBP
- * event, and you need an MKBP event to wake the AP in suspend and the AP cannot
- * wake from the GPIO.  Since you are using both a GPIO and a hostevent for the
- * notification, make sure that the S0 hostevent mask does NOT include MKBP
- * events.  Otherwise, you will have multiple consumers for a single event.
- * However, make sure to configure the host event *sleep* mask in coreboot to
- * include MKBP events.  In order to prevent all MKBP events from waking the AP,
- * use CONFIG_MKBP_EVENT_WAKEUP_MASK to filter the events.
- */
-#undef CONFIG_MKBP_USE_GPIO_AND_HOST_EVENT
-
-/* MKBP events are sent by using HECI on an ISH */
-#undef CONFIG_MKBP_USE_HECI
-
-/* MKBP events are sent by using custom method */
-#undef CONFIG_MKBP_USE_CUSTOM
-
-/*
- * If using MKBP to send host events, with this option, we can define the host
- * events that should wake the system in suspend.  Some examples are:
- *
- *    EC_HOST_EVENT_MASK(EC_HOST_EVENT_LID_OPEN)
- *    EC_HOST_EVENT_MASK(EC_HOST_EVENT_KEY_PRESSED)
- *
- * The only things that should be in this mask are:
- *    EC_HOST_EVENT_MASK(EC_HOST_EVENT_*)
- */
-#undef CONFIG_MKBP_HOST_EVENT_WAKEUP_MASK
-
-/*
- * Define which MKBP events should wakeup the system in suspend.  Some examples
- * are:
- *
- *    EC_MKBP_EVENT_KEY_MATRIX
- *    EC_MKBP_EVENT_SWITCH
- *
- * The only things that should be in this mask are EC_MKBP_EVENT_*.
- */
-#undef CONFIG_MKBP_EVENT_WAKEUP_MASK
 
 /* Support memory protection unit (MPU) */
 #undef CONFIG_MPU
@@ -2437,18 +2250,9 @@
 /* Support PWM output to display backlight */
 #undef CONFIG_PWM_DISPLIGHT
 
-/*
- * Support keyboard backlight control
- *
- * You need to define board_kblight_init unless CONFIG_PWM_KBLIGHT is used.
- * For example, lm3509 can be registered as a driver in board_kblight_init.
- */
-#undef CONFIG_KEYBOARD_BACKLIGHT
 
 /*
  * Support PWM output to keyboard backlight
- *
- * This implies CONFIG_KEYBOARD_BACKLIGHT.
  */
 #undef CONFIG_PWM_KBLIGHT
 
@@ -3897,30 +3701,6 @@
 #endif
 
 
-/******************************************************************************/
-/* The Matrix Keyboard Protocol depends on MKBP events. */
-#ifdef CONFIG_KEYBOARD_PROTOCOL_MKBP
-#define CONFIG_MKBP_EVENT
-#endif
-
-/******************************************************************************/
-/* MKBP events delivery methods. */
-#ifdef CONFIG_MKBP_EVENT
-#if !defined(CONFIG_MKBP_USE_CUSTOM) && \
-	!defined(CONFIG_MKBP_USE_HOST_EVENT) && \
-	!defined(CONFIG_MKBP_USE_GPIO) && \
-	!defined(CONFIG_MKBP_USE_GPIO_AND_HOST_EVENT) && \
-	!defined(CONFIG_MKBP_USE_HECI)
-#error Please define one of CONFIG_MKBP_USE_* macro.
-#endif
-
-#if defined(CONFIG_MKBP_USE_CUSTOM) + \
-	defined(CONFIG_MKBP_USE_GPIO) + \
-	defined(CONFIG_MKBP_USE_HOST_EVENT) + \
-	defined(CONFIG_MKBP_USE_HOST_HECI) > 1
-#error Must select only one type of MKBP event delivery method.
-#endif
-#endif /* CONFIG_MKBP_EVENT */
 
 /******************************************************************************/
 
@@ -4105,13 +3885,6 @@
 #define CONFIG_BATTERY_MAX_IMBALANCE_MV 200
 #endif
 
-#ifndef HAS_TASK_KEYPROTO
-#undef CONFIG_KEYBOARD_PROTOCOL_8042
-/*
- * Note that we don't undef CONFIG_KEYBOARD_PROTOCOL_MKBP, because it doesn't
- * have its own task.
- */
-#endif
 
 #ifndef HAS_TASK_PDCMD
 #undef CONFIG_HOSTCMD_PD
@@ -4244,9 +4017,6 @@
 #define CONFIG_SLEEP_TIMEOUT_MS 10000
 #endif
 
-#ifdef CONFIG_PWM_KBLIGHT
-#define CONFIG_KEYBOARD_BACKLIGHT
-#endif
 
 /*****************************************************************************/
 /* ISH power management related definitions */

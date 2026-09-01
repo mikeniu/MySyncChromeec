@@ -6,7 +6,6 @@
 /* PWM control module for keyboard backlight. */
 
 #include "common.h"
-#include "keyboard_backlight.h"
 #include "pwm.h"
 #include "system.h"
 #include "util.h"
