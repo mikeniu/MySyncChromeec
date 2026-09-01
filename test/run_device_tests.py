@@ -547,7 +547,6 @@ class Renode(Platform):
             "sbrk",  # TODO(b/485669288)
             "tpm_seed_clear",  # TODO(b/485669018)
             "utils",  # TODO(b/485624824)
-            "zephyr_kernel_poll",  # TODO(b/485639561)
         ]:
             return True
 
