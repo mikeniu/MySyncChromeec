@@ -9,7 +9,6 @@
 #include "gpio.h"
 #include "host_command.h"
 #include "i2c.h"
-#include "inductive_charging.h"
 #include "lid_switch.h"
 #include "motion_lid.h"
 #include "power_button.h"
