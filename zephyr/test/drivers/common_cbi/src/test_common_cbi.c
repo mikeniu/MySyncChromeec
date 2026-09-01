@@ -678,9 +678,90 @@ static void test_common_cbi_before_after(void *test_data)
 {
 	RESET_FAKE(eeprom_load);
 	eeprom_load_fake.custom_fake = __test_eeprom_load_default_impl;
+	gpio_pin_set_dt(GPIO_DT_FROM_ALIAS(gpio_cbi_wp), 0);
 
 	cbi_create();
 }
 
 ZTEST_SUITE(common_cbi, drivers_predicate_post_main, NULL,
 	    test_common_cbi_before_after, test_common_cbi_before_after, NULL);
+
+ZTEST_USER(common_cbi, test_cbi_eeprom_wp_blocks_bin_write)
+{
+	uint32_t original_sku = 0x11223344;
+	uint32_t read_sku;
+	const struct gpio_dt_spec *wp = GPIO_DT_FROM_ALIAS(gpio_cbi_wp);
+
+	gpio_pin_set_dt(wp, 0);
+	zassert_equal(cbi_config->drv->is_protected(), 0);
+	zassert_ok(cbi_clear());
+	zassert_ok(cbi_create());
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (uint8_t *)&original_sku,
+				      sizeof(original_sku)));
+
+	cbi_latch_eeprom_wp();
+	zassert_equal(cbi_config->drv->is_protected(), 1);
+
+	struct actual_set_params {
+		struct ec_params_set_cbi_bin params;
+		uint8_t actual_data[4];
+	};
+
+	struct actual_set_params hc_set_params = {
+		.params = {
+			.offset = 0,
+			.size = sizeof(original_sku),
+			.flags = EC_CBI_BIN_BUFFER_CLEAR,
+		},
+	};
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_CBI_BIN_WRITE, 0, hc_set_params);
+
+	zassert_equal(host_command_process(&set_args), EC_RES_ACCESS_DENIED);
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }));
+	zassert_equal(read_sku, original_sku);
+
+	gpio_pin_set_dt(wp, 0);
+}
+
+ZTEST_USER(common_cbi, test_cbi_eeprom_wp_blocks_set)
+{
+	uint32_t original_sku = 0x55667788;
+	uint32_t new_sku = 0x99AABBCC;
+	uint32_t read_sku;
+	const struct gpio_dt_spec *wp = GPIO_DT_FROM_ALIAS(gpio_cbi_wp);
+
+	gpio_pin_set_dt(wp, 0);
+	zassert_ok(cbi_clear());
+	zassert_ok(cbi_create());
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (uint8_t *)&original_sku,
+				      sizeof(original_sku)));
+
+	cbi_latch_eeprom_wp();
+
+	struct actual_set_params {
+		struct ec_params_set_cbi params;
+		uint8_t actual_data[sizeof(new_sku)];
+	};
+
+	struct actual_set_params hc_set_params = {
+		.params = {
+			.tag = CBI_TAG_SKU_ID,
+			.flag = 0,
+			.size = sizeof(new_sku),
+		},
+	};
+	memcpy(hc_set_params.params.data, &new_sku, sizeof(new_sku));
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_SET_CROS_BOARD_INFO, 0, hc_set_params);
+
+	zassert_equal(host_command_process(&set_args), EC_RES_ACCESS_DENIED);
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }));
+	zassert_equal(read_sku, original_sku);
+
+	gpio_pin_set_dt(wp, 0);
+}
