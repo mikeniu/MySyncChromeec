@@ -22,6 +22,30 @@
       },
       "revId": "0389db2a0d76f781b9dde8b6ce3ec47c0ec2653c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08809854_34bbc2e9",
+        "filename": "zephyr/subsys/bt_passthru/CMakeLists.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-09-01T21:01:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c03ef328_bc1b7f4d",
+      "range": {
+        "startLine": 15,
+        "startChar": 1,
+        "endLine": 19,
+        "endChar": 0
+      },
+      "revId": "0389db2a0d76f781b9dde8b6ce3ec47c0ec2653c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
