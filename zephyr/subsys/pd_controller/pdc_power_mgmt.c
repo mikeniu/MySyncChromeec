@@ -156,11 +156,6 @@ test_mockable_static_inline int sniff_pdc_set_rdo(const struct device *dev,
 #define VDO_NUM 8
 
 /**
- * @brief Cached duration for VBUS voltage.
- */
-#define VBUS_READ_CACHE_MS 500
-
-/**
  * @brief Minimum long button press in seconds.
  */
 #define PD_POWER_BUTTON_LONG_PRESS 4
@@ -192,8 +187,6 @@ enum pdc_cmd_t {
 	CMD_PDC_GET_RDO,
 	/** CMD_PDC_SET_RDO */
 	CMD_PDC_SET_RDO,
-	/** CMD_PDC_GET_VBUS_VOLTAGE */
-	CMD_PDC_GET_VBUS_VOLTAGE,
 	/** CMD_PDC_SET_SINK_PATH */
 	CMD_PDC_SET_SINK_PATH,
 	/** CMD_PDC_READ_POWER_LEVEL */
@@ -585,7 +578,6 @@ test_export_static const char *const pdc_cmd_names[] = {
 	[CMD_PDC_GET_PDOS] = "PDC_GET_PDOS",
 	[CMD_PDC_GET_RDO] = "PDC_GET_RDO",
 	[CMD_PDC_SET_RDO] = "PDC_SET_RDO",
-	[CMD_PDC_GET_VBUS_VOLTAGE] = "PDC_GET_VBUS_VOLTAGE",
 	[CMD_PDC_SET_SINK_PATH] = "PDC_SET_SINK_PATH",
 	[CMD_PDC_READ_POWER_LEVEL] = "PDC_READ_POWER_LEVEL",
 	[CMD_PDC_GET_INFO] = "PDC_GET_INFO",
@@ -950,15 +942,10 @@ struct pdc_port_t {
 	/** SINK_PATH_EN temp variable used with CMD_PDC_SET_SINK_PATH command
 	 */
 	bool sink_path_to_send;
-	/**
-	 * Time at which the current vbus value is expired and should be
-	 * re-queried.
-	 */
-	k_timepoint_t vbus_expired;
 	/** Timeout for a new contract to be negotiated after sending SET_RDO
 	 *  in the sink entry flow. */
 	k_timepoint_t new_contract_timeout;
-	/** VBUS temp variable used with CMD_PDC_GET_VBUS_VOLTAGE command */
+	/** Cached VBUS voltage in millivolts */
 	uint16_t vbus;
 	/** UOR variable used with CMD_PDC_SET_UOR command */
 	union uor_t uor;
@@ -1556,18 +1543,15 @@ static void handle_connector_status(struct pdc_port_t *port)
 		atomic_set(&port->hard_reset_sent, true);
 	}
 
-	/* On potential power changes, expire the vbus cache immediately. */
-	if (conn_status_change_bits.negotiated_power_level ||
-	    conn_status_change_bits.connector_partner ||
-	    conn_status_change_bits.pwr_direction) {
-		port->vbus_expired = sys_timepoint_calc(K_NO_WAIT);
-	}
-
 	if (!status->connect_status) {
 		/* Port is not connected */
+		port->vbus = 0;
 		set_pdc_state(port, PDC_UNATTACHED);
 		return;
 	}
+
+	/* Update cached VBUS voltage (voltage_scale in 5mV increments) */
+	port->vbus = status->voltage_reading * status->voltage_scale * 5;
 
 	switch (status->power_operation_mode) {
 	case USB_DEFAULT_OPERATION:
@@ -2299,8 +2283,8 @@ static void pdc_unattached_entry(void *obj)
 	/* Ensure VDOs aren't valid from previous connection */
 	discovery_info_init(port);
 
-	/* Clear VBUS cache timeout. */
-	port->vbus_expired = sys_timepoint_calc(K_NO_WAIT);
+	/* Clear cached VBUS */
+	port->vbus = 0;
 
 	/* Reset PD button */
 	port->ado = 0;
@@ -3263,9 +3247,6 @@ static int send_pdc_cmd(struct pdc_port_t *port)
 		break;
 	case CMD_PDC_SET_RDO:
 		rv = pdc_set_rdo(port->pdc, port->snk_policy.rdo_to_send);
-		break;
-	case CMD_PDC_GET_VBUS_VOLTAGE:
-		rv = pdc_get_vbus_voltage(port->pdc, &port->vbus);
 		break;
 	case CMD_PDC_SET_SINK_PATH:
 		LOG_INF("C%d: sink_path_to_send=%d, chg_mgr_active_charge_port=%d",
@@ -4845,27 +4826,12 @@ test_mockable bool pdc_power_mgmt_get_partner_data_swap_capable(int port)
 
 int pdc_power_mgmt_get_vbus_voltage(int port)
 {
-	struct pdc_port_t *port_data;
-
 	/* Make sure port is connected */
 	if (!pdc_power_mgmt_is_connected(port)) {
 		return 0;
 	}
 
-	port_data = &pdc_data[port]->port;
-
-	if (sys_timepoint_expired(port_data->vbus_expired)) {
-		/* Block until command completes */
-		if (public_api_block(port, CMD_PDC_GET_VBUS_VOLTAGE)) {
-			/* something went wrong */
-			return 0;
-		}
-
-		port_data->vbus_expired =
-			sys_timepoint_calc(K_MSEC(VBUS_READ_CACHE_MS));
-	}
-
-	/* Return VBUS */
+	/* Return cached VBUS */
 	return pdc_data[port]->port.vbus;
 }
 
