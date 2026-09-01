@@ -39,6 +39,30 @@
       },
       "revId": "95001a7412ddc6d435cf7eb56c52aebea8d532b0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1add08dc_1bbe9097",
+        "filename": "zephyr/program/calypso/c1nv/project.conf",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1286280
+      },
+      "writtenOn": "2026-09-01T06:06:38Z",
+      "side": 1,
+      "message": "No, this is added from CL: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8137780/7/zephyr/program/calypso/c1nv/project.conf",
+      "parentUuid": "64d6f790_12697792",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 42
+      },
+      "revId": "95001a7412ddc6d435cf7eb56c52aebea8d532b0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
