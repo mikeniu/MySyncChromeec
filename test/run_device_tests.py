@@ -524,7 +524,6 @@ class Renode(Platform):
         self, test_config: TestConfig, zephyr: bool
     ) -> bool:
         if test_config.test_name in [
-            "otp_key",  # TODO(b/385216796)
             "ram_lock",  # TODO(b/385216805)
             "rtc_npcx9",  # TODO(b/385217282)
         ]:
