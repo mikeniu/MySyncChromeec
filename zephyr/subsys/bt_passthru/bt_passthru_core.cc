@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "bt_passthru_hci_interceptor.h"
 #include "cros_hostcmd_transport.h"
 #include "zephyr_bt_sender.h"
 
@@ -18,6 +19,7 @@ static K_FIFO_DEFINE(hci_rx_queue);
 
 static chre::ZephyrBtSender g_bt_sender;
 static chre::CrosHostcmdTransport g_host_transport;
+static chre::BtPassthruHciInterceptor g_bt_interceptor(g_host_transport);
 
 static void hci_rx_thread_entry(void *p1, void *p2, void *p3)
 {
@@ -66,11 +68,18 @@ static int bt_passthru_init(void)
 
 	/*
 	 * Register the TX callback. When the AP sends an HCI Command down via
-	 * Host Commands, it is passed directly to the BT Sender.
+	 * Host Commands, it is passed to the interceptor or forwarded to the
+	 * BT Controller.
 	 */
 	g_host_transport.Start(
 		[](uint32_t /* type */, pw::span<const uint8_t> data,
 		   chre::HostTransport::RespondToHost & /* resp */) {
+			if (g_bt_interceptor.interceptCommand(
+				    data.data(), data.size(),
+				    chre::BtClientType::HOST)) {
+				return pw::OkStatus();
+			}
+
 			LOG_INF("TX to BT Controller: Size %zu bytes",
 				data.size());
 			g_bt_sender.sendH4HciPacketToController(data.data(),
