@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84c8c4ea_4c0d0c44",
+        "filename": "chip/npcx/hwtimer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-01T23:12:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c628f2c4_d867ad70",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 0
+      },
+      "revId": "7695555ba996592503c42a35623c19e66eacae0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec93d168_9daead5f",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-01T22:33:55Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: As a separate minor issue (pre-existing but worth noting): if a timer is scheduled exactly at the microsecond when the lower 32 bits wrap around (`deadline \u003d\u003d 0`), `evt_expired_us` becomes `0`. \n\nSince `0` is used as a sentinel for \"no events scheduled\" (e.g., set in `__hw_clock_event_clear`), `__hw_clock_event_irq` might inadvertently overwrite this valid timer with `EVT_MAX_EXPIRED_US` if `CONFIG_LOW_POWER_IDLE` is enabled. \n\nUsing a separate boolean flag for event validity (e.g. `evt_is_set`) instead of overloading `0` would prevent this rare (~every 71.58 minutes) edge case.",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 0
+      },
+      "revId": "7695555ba996592503c42a35623c19e66eacae0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "320b5561_a5502c4d",
+        "filename": "chip/npcx/hwtimer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-01T23:12:31Z",
+      "side": 1,
+      "message": "Fix in follow-up cl 8340510",
+      "parentUuid": "ec93d168_9daead5f",
       "range": {
         "startLine": 76,
         "startChar": 0,
