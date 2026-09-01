@@ -3156,4 +3156,10 @@
 #define CONFIG_SERIALNO_LEN 28
 #endif
 
-#endif  /* __CROS_EC_CONFIG_H */
+#if defined(CONFIG_BYPASS_CBI_EEPROM_WP_CHECK) && \
+	!defined(CONFIG_SYSTEM_UNLOCKED)
+#error "CONFIG_BYPASS_CBI_EEPROM_WP_CHECK is only permitted " \
+	"when CONFIG_SYSTEM_UNLOCK is also enabled."
+#endif /* CONFIG_BYPASS_CBI_EEPROM_WP_CHECK && !CONFIG_SYSTEM_UNLOCK */
+
+#endif /* __CROS_EC_CONFIG_H */
