@@ -10,7 +10,6 @@
 #include "gpio.h"
 #include "hooks.h"
 #include "host_command.h"
-#include "keyboard_scan.h"
 #include "lid_switch.h"
 #include "power_button.h"
 #include "task.h"
@@ -120,10 +119,6 @@ static void power_button_change_deferred(void)
 {
 	const int new_pressed = raw_power_button_pressed();
 
-	/* Re-enable keyboard scanning if power button is no longer pressed */
-	if (!new_pressed)
-		keyboard_scan_enable(1, KB_SCAN_DISABLE_POWER_BUTTON);
-
 	/* If power button hasn't changed state, nothing to do */
 	if (new_pressed == debounced_power_pressed) {
 		power_button_is_stable = 1;
@@ -146,14 +141,6 @@ DECLARE_DEFERRED(power_button_change_deferred);
 
 void power_button_interrupt(enum gpio_signal signal)
 {
-	/*
-	 * If power button is pressed, disable the matrix scan as soon as
-	 * possible to reduce the risk of false-reboot triggered by those keys
-	 * on the same column with refresh key.
-	 */
-	if (raw_power_button_pressed())
-		keyboard_scan_enable(0, KB_SCAN_DISABLE_POWER_BUTTON);
-
 	/* Reset power button debounce time */
 	power_button_is_stable = 0;
 	hook_call_deferred(&power_button_change_deferred_data,

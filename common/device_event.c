@@ -10,7 +10,6 @@
 #include "console.h"
 #include "host_command.h"
 #include "lpc.h"
-#include "mkbp_event.h"
 #include "util.h"
 
 /* Console output macros */

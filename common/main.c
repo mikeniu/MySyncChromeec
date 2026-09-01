@@ -16,7 +16,6 @@
 #include "gpio.h"
 #include "hooks.h"
 #include "i2c.h"
-#include "keyboard_scan.h"
 #ifdef CONFIG_MPU
 #include "mpu.h"
 #endif
@@ -148,9 +147,6 @@ test_mockable __keep int main(void)
 		 */
 		i2c_init();
 	}
-#ifdef HAS_TASK_KEYSCAN
-	keyboard_scan_init();
-#endif
 
 #ifndef CONFIG_VBOOT_EC
 #if defined(CONFIG_RWSIG) && !defined(HAS_TASK_RWSIG)

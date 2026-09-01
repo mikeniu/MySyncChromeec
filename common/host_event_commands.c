@@ -10,7 +10,6 @@
 #include "hooks.h"
 #include "host_command.h"
 #include "lpc.h"
-#include "mkbp_event.h"
 #include "power.h"
 #include "system.h"
 #include "task.h"
@@ -394,30 +393,6 @@ void host_clear_events(host_event_t mask)
 #endif  /* !CONFIG_LPC */
 }
 
-#ifndef CONFIG_LPC
-static int host_get_next_event(uint8_t *out)
-{
-	uint32_t event_out = (uint32_t)events;
-	memcpy(out, &event_out, sizeof(event_out));
-	host_events_atomic_clear(&events, event_out);
-	*(host_event_t *)host_get_memmap(EC_MEMMAP_HOST_EVENTS) = events;
-	return sizeof(event_out);
-}
-DECLARE_EVENT_SOURCE(EC_MKBP_EVENT_HOST_EVENT, host_get_next_event);
-
-#ifdef CONFIG_HOST_EVENT64
-static int host_get_next_event64(uint8_t *out)
-{
-	host_event_t event_out = events;
-
-	memcpy(out, &event_out, sizeof(event_out));
-	host_events_atomic_clear(&events, event_out);
-	*(host_event_t *)host_get_memmap(EC_MEMMAP_HOST_EVENTS) = events;
-	return sizeof(event_out);
-}
-DECLARE_EVENT_SOURCE(EC_MKBP_EVENT_HOST_EVENT64, host_get_next_event64);
-#endif
-#endif
 
 /**
  * Clear one or more host event bits from copy B.

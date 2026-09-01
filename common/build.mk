@@ -66,16 +66,10 @@ common-$(CONFIG_HOSTCMD_RTC)+=rtc.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller.o
 common-$(CONFIG_I2C_PERIPH)+=i2c_peripheral.o
 common-$(CONFIG_INDUCTIVE_CHARGING)+=inductive_charging.o
-common-$(CONFIG_KEYBOARD_PROTOCOL_8042)+=keyboard_8042.o \
-	keyboard_8042_sharedlib.o
-common-$(CONFIG_KEYBOARD_PROTOCOL_MKBP)+=keyboard_mkbp.o
-common-$(CONFIG_KEYBOARD_TEST)+=keyboard_test.o
 
 
 common-$(CONFIG_LID_SWITCH)+=lid_switch.o
 common-$(CONFIG_LPC)+=acpi.o port80.o ec_features.o
-
-common-$(CONFIG_MKBP_EVENT)+=mkbp_event.o
 common-$(CONFIG_PECI_COMMON)+=peci.o
 common-$(CONFIG_PHYSICAL_PRESENCE)+=physical_presence.o
 common-$(CONFIG_PINWEAVER)+=pinweaver_cr50.o
@@ -84,7 +78,6 @@ common-$(CONFIG_POWER_BUTTON_X86)+=power_button_x86.o
 common-$(CONFIG_PSTORE)+=pstore_commands.o
 common-$(CONFIG_PWM)+=pwm.o
 common-$(CONFIG_PWM_KBLIGHT)+=pwm_kblight.o
-common-$(CONFIG_KEYBOARD_BACKLIGHT)+=keyboard_backlight.o
 common-$(CONFIG_RMA_AUTH)+=rma_auth.o
 common-$(CONFIG_RSA)+=rsa.o
 common-$(CONFIG_RWSIG)+=rwsig.o vboot/common.o
@@ -118,7 +111,6 @@ common-$(HAS_TASK_CONSOLE)+=console.o console_output.o uart_buffering.o
 common-$(CONFIG_CMD_MEM)+=memory_commands.o
 common-$(HAS_TASK_HOSTCMD)+=host_command.o ec_features.o
 common-$(HAS_TASK_PDCMD)+=host_command_pd.o
-common-$(HAS_TASK_KEYSCAN)+=keyboard_scan.o
 
 common-$(HAS_TASK_TPM)+=tpm_registers.o
 common-$(CONFIG_STRONGBOX)+=strongbox.o

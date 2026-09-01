@@ -12,7 +12,6 @@
 #include "gpio.h"
 #include "hooks.h"
 #include "host_command.h"
-#include "keyboard_scan.h"
 #include "lid_switch.h"
 #include "power_button.h"
 #include "switch.h"
@@ -230,8 +229,7 @@ static void set_initial_pwrbtn_state(void)
 			CPRINTS("PB init-jumped");
 		}
 		return;
-	} else if ((reset_flags & EC_RESET_FLAG_AP_OFF) ||
-		   (keyboard_scan_get_boot_keys() == BOOT_KEY_DOWN_ARROW)) {
+	} else if (reset_flags & EC_RESET_FLAG_AP_OFF) {
 		/*
 		 * Reset triggered by keyboard-controlled reset, and down-arrow
 		 * was held down.  Or reset flags request AP off.

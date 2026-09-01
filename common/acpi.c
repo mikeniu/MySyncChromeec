@@ -11,7 +11,6 @@
 #include "gpio.h"
 #include "hooks.h"
 #include "host_command.h"
-#include "keyboard_backlight.h"
 #include "lpc.h"
 #include "ec_commands.h"
 #include "tablet_mode.h"
