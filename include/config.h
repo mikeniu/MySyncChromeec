@@ -764,65 +764,6 @@
 #undef CONFIG_CHIP_PRE_INIT
 
 /*****************************************************************************/
-/* Chipset config */
-
-/* AP chipset support; pick at most one */
-#undef CONFIG_CHIPSET_APOLLOLAKE	/* Intel Apollolake (x86) */
-#undef CONFIG_CHIPSET_BRASWELL		/* Intel Braswell (x86) */
-#undef CONFIG_CHIPSET_CANNONLAKE	/* Intel Cannonlake (x86) */
-#undef CONFIG_CHIPSET_COMETLAKE		/* Intel Cometlake (x86) */
-#undef CONFIG_CHIPSET_COMETLAKE_DISCRETE	/* Intel Cometlake (x86),
-						 * discrete EC control
-						 */
-#undef CONFIG_CHIPSET_ECDRIVEN		/* Placeholder power module */
-#undef CONFIG_CHIPSET_GEMINILAKE	/* Intel Geminilake (x86) */
-#undef CONFIG_CHIPSET_ICELAKE		/* Intel Icelake (x86) */
-#undef CONFIG_CHIPSET_MT817X		/* MediaTek MT817x */
-#undef CONFIG_CHIPSET_MT8183		/* MediaTek MT8183 */
-#undef CONFIG_CHIPSET_RK3288		/* Rockchip rk3288 */
-#undef CONFIG_CHIPSET_RK3399		/* Rockchip rk3399 */
-#undef CONFIG_CHIPSET_SKYLAKE		/* Intel Skylake (x86) */
-#undef CONFIG_CHIPSET_SC7180            /* Qualcomm SC7180 */
-#undef CONFIG_CHIPSET_SDM845            /* Qualcomm SDM845 */
-#undef CONFIG_CHIPSET_STONEY		/* AMD Stoney (x86)*/
-#undef CONFIG_CHIPSET_TIGERLAKE		/* Intel Tigerlake (x86) */
-
-/* Shared chipset support; automatically gets defined below. */
-#undef CONFIG_CHIPSET_APL_GLK		/* Apollolake & Geminilake */
-#undef CONFIG_CHIPSET_ICL_TGL		/* Icelake & Tigerlake */
-
-/* Support chipset throttling */
-#undef CONFIG_CHIPSET_CAN_THROTTLE
-
-/* Enable additional chipset debugging */
-#undef CONFIG_CHIPSET_DEBUG
-
-/* Enable chipset reset hook, requires a deferrable function */
-#undef CONFIG_CHIPSET_RESET_HOOK
-
-/*
- * Enable turning on PP3300_A rail before PP5000_A rail on the Ice Lake
- * and Tiger Lake chipsets. Enable this option if there is leakage from PP5000_A
- * resources into PP3300_A resources.
- */
-#undef CONFIG_CHIPSET_PP3300_RAIL_FIRST
-
-/*
- * Enable if chipset requires delay between power signals going high
- * and deasserting RSMRST to PCH.
- */
-#undef CONFIG_CHIPSET_X86_RSMRST_DELAY
-
-/* Support PMIC reset(using LDO_EN) in chipset */
-#undef CONFIG_CHIPSET_HAS_PLATFORM_PMIC_RESET
-
-/* Board requires chipset pre-init callback */
-#undef CONFIG_CHIPSET_HAS_PRE_INIT_CALLBACK
-
-/* Redefine when we need a different power-on sequence on the same chipset. */
-#define CONFIG_CHIPSET_POWER_SEQ_VERSION 0
-
-/*****************************************************************************/
 /*
  * Chip config for clock circuitry
  *	define = crystal / undef = oscillator
@@ -2154,20 +2095,8 @@
  */
 #undef CONFIG_POLLING_UART
 
-/* Define length of history buffer for port80 messages. */
-#define CONFIG_PORT80_HISTORY_LEN 128
-
-/*
- * Enable/Disable printing of port80 messages in interrupt context. By default,
- * this is disabled.
- */
-#define CONFIG_PORT80_PRINT_IN_INT 0
-
 /* MAX695x 7 segment driver */
 #undef CONFIG_MAX695X_SEVEN_SEGMENT_DISPLAY
-
-/* Config for power states and port80 message to be displayed on 7 -segment */
-#undef CONFIG_SEVEN_SEG_DISPLAY
 
 /* Compile common code to support power button debouncing */
 #undef CONFIG_POWER_BUTTON
@@ -2178,14 +2107,8 @@
 /* Allow the power button to send events while the lid is closed */
 #undef CONFIG_POWER_BUTTON_IGNORE_LID
 
-/* Support sending the power button signal to x86 chipsets */
-#undef CONFIG_POWER_BUTTON_X86
-
 /* Set power button state idle at init. Implemented only for npcx. */
 #undef CONFIG_POWER_BUTTON_INIT_IDLE
-
-/* Timeout before power button task gives up starting system */
-#define CONFIG_POWER_BUTTON_INIT_TIMEOUT	1
 
 /* Compile common code for AP power state machine */
 #undef CONFIG_POWER_COMMON
@@ -3798,41 +3721,6 @@
  * are not present.
  */
 
-#ifndef HAS_TASK_CHIPSET
-#undef CONFIG_CHIPSET_APOLLOLAKE
-#undef CONFIG_CHIPSET_BRASWELL
-#undef CONFIG_CHIPSET_CANNONLAKE
-#undef CONFIG_CHIPSET_COMETLAKE
-#undef CONFIG_CHIPSET_GEMINILAKE
-#undef CONFIG_CHIPSET_ICELAKE
-#undef CONFIG_CHIPSET_MT817X
-#undef CONFIG_CHIPSET_MT8183
-#undef CONFIG_CHIPSET_RK3399
-#undef CONFIG_CHIPSET_RK3288
-#undef CONFIG_CHIPSET_SDM845
-#undef CONFIG_CHIPSET_SKYLAKE
-#undef CONFIG_CHIPSET_STONEY
-#undef CONFIG_CHIPSET_TIGERLAKE
-#undef CONFIG_POWER_COMMON
-#endif
-
-/*
- * If a board has a chipset task, set the minimum charger power required for
- * powering on to 15W.  This is also the highest power discovered over Type-C by
- * analog signaling.  The EC normally does not communicate using USB PD when the
- * system is locked and in RO, so it would not be able to tell if higher power
- * is available.  However, if a 15W charger is discovered, it's likely that the
- * charger does speak USB PD and we would be able to negotiate more power after
- * booting the AP and jumping to EC RW.
- *
- * If a board needs more or less power to power on, they can re-define this
- * value in their board.h file.
- */
-#ifdef HAS_TASK_CHIPSET
-#ifndef CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON
-#define CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON 15000
-#endif /* !defined(CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON) */
-#endif /* defined(HAS_TASK_CHIPSET) */
 
 
 #ifdef CONFIG_CHARGER_LIMIT_POWER_THRESH_CHG_MW
@@ -3889,47 +3777,6 @@
 #ifndef CONFIG_ADC
 #undef CONFIG_CMD_ADC
 #endif
-
-/*****************************************************************************/
-/* Define derived Chipset configs */
-#if defined(CONFIG_CHIPSET_APOLLOLAKE) || \
-	defined(CONFIG_CHIPSET_GEMINILAKE)
-#define CONFIG_CHIPSET_APL_GLK
-#endif
-
-#if defined(CONFIG_CHIPSET_ICELAKE) || \
-	defined(CONFIG_CHIPSET_TIGERLAKE)
-#define CONFIG_CHIPSET_ICL_TGL
-#endif
-
-#if defined(CONFIG_CHIPSET_APL_GLK)
-#define CONFIG_CHIPSET_HAS_PRE_INIT_CALLBACK
-#endif
-
-#if defined(CONFIG_CHIPSET_APOLLOLAKE) || \
-	defined(CONFIG_CHIPSET_BRASWELL) || \
-	defined(CONFIG_CHIPSET_CANNONLAKE) || \
-	defined(CONFIG_CHIPSET_COMETLAKE) || \
-	defined(CONFIG_CHIPSET_COMETLAKE_DISCRETE) || \
-	defined(CONFIG_CHIPSET_GEMINILAKE) || \
-	defined(CONFIG_CHIPSET_ICELAKE) || \
-	defined(CONFIG_CHIPSET_SKYLAKE) || \
-	defined(CONFIG_CHIPSET_TIGERLAKE)
-#define CONFIG_POWER_COMMON
-#endif
-
-#if defined(CONFIG_CHIPSET_CANNONLAKE) || \
-	defined(CONFIG_CHIPSET_ICELAKE) || \
-	defined(CONFIG_CHIPSET_SKYLAKE) || \
-	defined(CONFIG_CHIPSET_TIGERLAKE)
-#define CONFIG_CHIPSET_X86_RSMRST_DELAY
-#endif
-
-/*****************************************************************************/
-/* Define derived seven segment display common path */
-#ifdef CONFIG_MAX695X_SEVEN_SEGMENT_DISPLAY
-#define CONFIG_SEVEN_SEG_DISPLAY
-#endif /* CONFIG_MAX695X_SEVEN_SEGMENT_DISPLAY */
 
 /*
  * Apply fuzzer and test config overrides last, since fuzzers and tests need to
