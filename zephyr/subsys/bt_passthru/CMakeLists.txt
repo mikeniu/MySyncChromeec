@@ -10,6 +10,7 @@ zephyr_library_sources(
 	bt_passthru_core.cc
 	zephyr_bt_sender.cc
 	cros_hostcmd_transport.cc
+	bt_passthru_hci_interceptor.cc
 )
 
 zephyr_library_link_libraries(
