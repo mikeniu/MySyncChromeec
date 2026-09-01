@@ -162,6 +162,7 @@ ZTEST(panic_output, test_feature_present)
 	zassert_true(IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED));
 }
 
+#if defined(CONFIG_TRAP_UNALIGNED_ACCESS) || defined(CONFIG_RISCV)
 ZTEST(panic_output, test_console_cmd__unaligned_unaligned)
 {
 	int rv;
@@ -174,6 +175,7 @@ ZTEST(panic_output, test_console_cmd__unaligned_unaligned)
 	zassert_equal(SIGSEGV, signal_received);
 	zassert_equal(2, signal_count);
 }
+#endif
 
 ZTEST(panic_output, test_console_cmd__watchdog)
 {

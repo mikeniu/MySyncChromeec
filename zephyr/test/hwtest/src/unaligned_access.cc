@@ -47,3 +47,13 @@ ZTEST(unaligned_access, test_unaligned_access)
 		zassert_equal(*test_array_ptr, expected_results[i]);
 	}
 }
+
+#if !defined(CONFIG_TRAP_UNALIGNED_ACCESS) && !defined(CONFIG_RISCV)
+ZTEST(unaligned_access,
+      test_crash_unaligned_disabled_if_unaligned_access_allowed)
+{
+	const char *crash_unaligned[2] = { "crash", "unaligned" };
+
+	zassert_equal(test_command_crash(2, crash_unaligned), EC_ERROR_PARAM1);
+}
+#endif

@@ -447,10 +447,13 @@ static int command_crash(int argc, const char **argv)
 		ccprintf("%08x", one / zero);
 	} else if (!strcasecmp(argv[1], "stack")) {
 		stack_overflow_recurse(1);
+#if defined(CONFIG_TRAP_UNALIGNED_ACCESS) || defined(CONFIG_RISCV)
 	} else if (!strcasecmp(argv[1], "unaligned")) {
-		volatile intptr_t unaligned_ptr = 0xcdef;
+		uint8_t buf[8] = { 0 };
+		volatile int *unaligned_ptr = (volatile int *)(buf + 1);
 		cflush();
-		ccprintf("%08x", *(volatile int *)unaligned_ptr);
+		ccprintf("%08x", *unaligned_ptr);
+#endif /* CONFIG_TRAP_UNALIGNED_ACCESS || CONFIG_RISCV */
 	} else if (!strcasecmp(argv[1], "watchdog")) {
 		while (1) {
 /* Yield on native posix to avoid locking up the simulated sys clock */
@@ -493,7 +496,9 @@ static int command_crash(int argc, const char **argv)
 
 DECLARE_CONSOLE_COMMAND(crash, command_crash,
 			"[assert | divzero | udivzero | stack"
+#if defined(CONFIG_TRAP_UNALIGNED_ACCESS) || defined(CONFIG_RISCV)
 			" | unaligned"
+#endif /* CONFIG_TRAP_UNALIGNED_ACCESS || CONFIG_RISCV */
 			" | watchdog | hang | null]",
 			"Crash the system (for testing)."
 #ifndef CONFIG_CMD_CRASH_NESTED
