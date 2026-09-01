@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fda24b41_1de7a9c6",
+        "filename": "zephyr/subsys/bt_passthru/zephyr_bt_sender.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-01T01:35:48Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: An HCI Command packet requires at least 4 bytes (1 for H4 type, 2 for Opcode, 1 for Parameter Length). If `bytes` is less than 4, this packet is malformed and should be dropped before attempting to allocate a buffer or send it.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 0
+      },
+      "revId": "8a642ddd263e535f0850622f283358ae50ba6786",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a08ecf6e_b7d04df2",
+        "filename": "zephyr/subsys/bt_passthru/zephyr_bt_sender.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-01T01:35:48Z",
+      "side": 1,
+      "message": "Nit: Create a helper conversion function and enums to map H4 types to the Zephyr buffer types.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 2
+      },
+      "revId": "8a642ddd263e535f0850622f283358ae50ba6786",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "def6b83a_0465427f",
+        "filename": "zephyr/subsys/bt_passthru/zephyr_bt_sender.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-01T01:35:48Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Since `BT_HCI_RAW` is selected in Kconfig, consider using `bt_hci_raw_send(buf)` instead of `bt_send(buf)`. `bt_send` is generally used by the host stack, while `bt_hci_raw_send` is the intended interface for raw HCI passthrough applications.",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 0
+      },
+      "revId": "8a642ddd263e535f0850622f283358ae50ba6786",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
