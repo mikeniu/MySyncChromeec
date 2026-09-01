@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e10faf25_8fd1c774",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 2621,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-09-01T23:44:43Z",
+      "side": 0,
+      "message": "Mapping GET_PD_MESSAGE to the TI PDC internal registers, I\u0027ve removed support for using GET_PD_MESSAGE to request partner/cable PD revision. The kernel does not use this",
+      "range": {
+        "startLine": 2621,
+        "startChar": 7,
+        "endLine": 2621,
+        "endChar": 30
+      },
+      "revId": "39b67a817ef76bc26b4c9e0d5dce6d647609734e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
