@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f140ac3_148a11c1",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-01T07:19:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94f35956_0a7241bf",
+      "range": {
+        "startLine": 23,
+        "startChar": 2,
+        "endLine": 23,
+        "endChar": 32
+      },
+      "revId": "799b90c71c540b8941d02e854d7801e1ef458c97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e3ff6a24_ef7b7eed",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b89c994b_fc7575df",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-01T07:19:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3ff6a24_ef7b7eed",
+      "range": {
+        "startLine": 196,
+        "startChar": 36,
+        "endLine": 196,
+        "endChar": 52
+      },
+      "revId": "799b90c71c540b8941d02e854d7801e1ef458c97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ab4609f_74d97990",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-08-31T06:36:24Z",
       "side": 1,
       "message": "Schematic net name error, should be pp5000",
+      "range": {
+        "startLine": 198,
+        "startChar": 2,
+        "endLine": 198,
+        "endChar": 22
+      },
+      "revId": "799b90c71c540b8941d02e854d7801e1ef458c97",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a93f64c8_17f13a28",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-01T07:19:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ab4609f_74d97990",
       "range": {
         "startLine": 198,
         "startChar": 2,
