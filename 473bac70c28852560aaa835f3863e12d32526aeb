@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b771d10d_fea188de",
+        "filename": "zephyr/shim/chip/rtk/power_policy.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-01T23:01:40Z",
+      "side": 1,
+      "message": "Why did you swap the search order to reverse order?  Also note that the Realtek EC only defines a single power state so this should be a no-op.",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 49
+      },
+      "revId": "473bac70c28852560aaa835f3863e12d32526aeb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
