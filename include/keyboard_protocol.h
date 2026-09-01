@@ -9,23 +9,6 @@
 #define __CROS_EC_KEYBOARD_PROTOCOL_H
 
 #include "common.h"
-#include "button.h"
-
-/* Routines common to all protocols */
-
-/**
- * Clear the keyboard buffer to host.
- */
-void keyboard_clear_buffer(void);
-
-/*
- * Respond to button changes. Implemented by a host-specific
- * handler.
- *
- * @param button	The button that changed.
- * @param is_pressed	Whether the button is now pressed.
- */
-void keyboard_update_button(enum keyboard_button_type button, int is_pressed);
 
 /* Protocol-specific includes */
 

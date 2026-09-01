@@ -6,7 +6,6 @@
  */
 
 #include "board_config.h"
-#include "button.h"
 #include "clock.h"
 #include "common.h"
 #include "console.h"
@@ -152,9 +151,6 @@ test_mockable __keep int main(void)
 #ifdef HAS_TASK_KEYSCAN
 	keyboard_scan_init();
 #endif
-#if defined(CONFIG_DEDICATED_RECOVERY_BUTTON) || defined(CONFIG_VOLUME_BUTTONS)
-	button_init();
-#endif /* defined(CONFIG_DEDICATED_RECOVERY_BUTTON | CONFIG_VOLUME_BUTTONS) */
 
 #ifndef CONFIG_VBOOT_EC
 #if defined(CONFIG_RWSIG) && !defined(HAS_TASK_RWSIG)

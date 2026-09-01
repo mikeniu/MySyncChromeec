@@ -45,7 +45,6 @@ common-$(CONFIG_CURVE25519)+=curve25519.o
 ifneq ($(CORE),cortex-m0)
 common-$(CONFIG_CURVE25519)+=curve25519-generic.o
 endif
-common-$(CONFIG_DEDICATED_RECOVERY_BUTTON)+=button.o
 common-$(CONFIG_DEVICE_EVENT)+=device_event.o
 common-$(CONFIG_DEVICE_STATE)+=device_state.o
 common-$(CONFIG_DPTF)+=dptf.o
@@ -111,7 +110,6 @@ common-$(CONFIG_USB_CONSOLE_STREAM)+=usb_console_stream.o
 common-$(CONFIG_USB_I2C)+=usb_i2c.o
 common-$(CONFIG_USB_PD_LOGGING)+=event_log.o pd_log.o
 common-$(CONFIG_VBOOT_HASH)+=sha256.o vboot_hash.o
-common-$(CONFIG_VOLUME_BUTTONS)+=button.o
 common-$(CONFIG_VSTORE)+=vstore.o
 common-$(CONFIG_WEBUSB_URL)+=webusb_desc.o
 common-$(CONFIG_WIRELESS)+=wireless.o

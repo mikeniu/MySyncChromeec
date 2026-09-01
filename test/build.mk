@@ -14,7 +14,6 @@ else
 test-list-host = aes
 test-list-host += base32
 test-list-host += base64
-test-list-host += button
 test-list-host += cec
 test-list-host += console_edit
 test-list-host += crc32
@@ -59,7 +58,6 @@ endif
 aes-y=aes.o
 base32-y=base32.o
 base64-y=base64.o
-button-y=button.o
 cec-y=cec.o
 console_edit-y=console_edit.o
 crc32-y=crc32.o

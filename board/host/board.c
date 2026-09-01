@@ -4,7 +4,6 @@
  */
 /* Emulator board-specific configuration */
 
-#include "button.h"
 #include "ec_comm.h"
 #include "extpower.h"
 #include "gpio.h"
@@ -42,9 +41,6 @@ const struct temp_sensor_t temp_sensors[] = {
 };
 BUILD_ASSERT(ARRAY_SIZE(temp_sensors) == TEMP_SENSOR_COUNT);
 
-test_mockable void button_interrupt(enum gpio_signal signal)
-{
-}
 
 #ifdef CONFIG_I2C
 /* I2C ports */

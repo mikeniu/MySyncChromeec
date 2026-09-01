@@ -5,7 +5,6 @@
  * Objects which can be shared between RO and RW for 8042 keyboard protocol.
  */
 
-#include "button.h"
 #include "keyboard_8042_sharedlib.h"
 #include "keyboard_config.h"
 #include "keyboard_protocol.h"

@@ -117,11 +117,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_FANS 1
 #endif
 
-#ifdef TEST_BUTTON
-#define CONFIG_KEYBOARD_PROTOCOL_8042
-#define CONFIG_VOLUME_BUTTONS
-#endif
-
 #ifdef TEST_CEC
 #define CONFIG_CEC
 #endif

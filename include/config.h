@@ -441,32 +441,11 @@
 /*****************************************************************************/
 
 /*
- * Support for entering recovery mode using the volume buttons or a dedicated
- * recovery button.  Note that these are *buttons* and not keys in the keyboard
- * matrix.
- */
-#undef CONFIG_BUTTON_TRIGGERED_RECOVERY
-
-/*
  * Compile detachable base support
  *
  * Enabled on all boards that have a detachable base.
  */
 #undef CONFIG_DETACHABLE_BASE
-
-/*
- * Indicates there is a dedicated recovery button.  Note, that if there are
- * volume buttons, a dedicated recovery button is not needed.  This is intended
- * because if a board has volume buttons, they can do everything a dedicated
- * recovery button can do.
- */
-#undef CONFIG_DEDICATED_RECOVERY_BUTTON
-
-/*
- * The board has volume up and volume down buttons.  Note, these are *buttons*
- * and not keys in the keyboard matrix.
- */
-#undef CONFIG_VOLUME_BUTTONS
 
 /* Support V1 CCD configuration */
 #undef CONFIG_CASE_CLOSED_DEBUG_V1
@@ -900,7 +879,6 @@
 #define CONFIG_CMD_BATTFAKE
 #undef  CONFIG_CMD_BATT_MFG_ACCESS
 #define CONFIG_CMD_RETIMER
-#undef  CONFIG_CMD_BUTTON
 #define CONFIG_CMD_CBI
 #undef  CONFIG_CMD_CCD_DISABLE  /* 'ccd disable' subcommand */
 #undef  CONFIG_CMD_CHARGEN
@@ -3997,15 +3975,6 @@
 	defined(CONFIG_CHARGER_ISL9241)
 #define CONFIG_CHARGER_NARROW_VDC
 #endif
-
-/*****************************************************************************/
-/*
- * Define CONFIG_BUTTON_TRIGGERED_RECOVERY if a board has a dedicated recovery
- * button.
- */
-#ifdef CONFIG_DEDICATED_RECOVERY_BUTTON
-#define CONFIG_BUTTON_TRIGGERED_RECOVERY
-#endif /* defined(CONFIG_DEDICATED_RECOVERY_BUTTON) */
 
 
 

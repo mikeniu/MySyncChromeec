@@ -8,7 +8,6 @@
 #ifndef __CROS_EC_KEYBOARD_8042_SHAREDLIB_H
 #define __CROS_EC_KEYBOARD_8042_SHAREDLIB_H
 
-#include "button.h"
 #include "keyboard_config.h"
 #include "keyboard_protocol.h"
 

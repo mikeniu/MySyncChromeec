@@ -7,7 +7,6 @@
 
 #include "atomic.h"
 #include "base_state.h"
-#include "button.h"
 #include "chipset.h"
 #include "common.h"
 #include "console.h"

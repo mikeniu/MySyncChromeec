@@ -6,7 +6,6 @@
  */
 
 #include "chipset.h"
-#include "button.h"
 #include "common.h"
 #include "console.h"
 #include "hooks.h"
