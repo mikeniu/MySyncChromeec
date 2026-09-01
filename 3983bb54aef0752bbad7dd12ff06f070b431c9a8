@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "002163b8_0126501b",
+        "filename": "zephyr/program/atria/BUILD.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-01T18:28:42Z",
+      "side": 1,
+      "message": "Nit: I guess this should be in the following ISH CL to separate EC changes from ISH changes.",
+      "revId": "3983bb54aef0752bbad7dd12ff06f070b431c9a8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
