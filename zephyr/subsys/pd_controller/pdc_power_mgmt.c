@@ -4845,27 +4845,12 @@ test_mockable bool pdc_power_mgmt_get_partner_data_swap_capable(int port)
 
 int pdc_power_mgmt_get_vbus_voltage(int port)
 {
-	struct pdc_port_t *port_data;
-
 	/* Make sure port is connected */
 	if (!pdc_power_mgmt_is_connected(port)) {
 		return 0;
 	}
 
-	port_data = &pdc_data[port]->port;
-
-	if (sys_timepoint_expired(port_data->vbus_expired)) {
-		/* Block until command completes */
-		if (public_api_block(port, CMD_PDC_GET_VBUS_VOLTAGE)) {
-			/* something went wrong */
-			return 0;
-		}
-
-		port_data->vbus_expired =
-			sys_timepoint_calc(K_MSEC(VBUS_READ_CACHE_MS));
-	}
-
-	/* Return VBUS */
+	/* Return cached VBUS */
 	return pdc_data[port]->port.vbus;
 }
 
