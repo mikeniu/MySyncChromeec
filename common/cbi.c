@@ -258,6 +258,17 @@ int cbi_write(void)
 	return cbi_config->drv->store(cbi);
 }
 
+/* Clears the CBI data, but doesn't set the magic signature or the header.
+ * Use only in tests to verify the handling of a completely uninitialized CBI.
+ */
+__test_only int cbi_clear(void)
+{
+	memset(cbi, 0, sizeof(cbi));
+	cache_status = CBI_CACHE_STATUS_SYNCED;
+
+	return cbi_write();
+}
+
 test_mockable int cbi_get_board_version(uint32_t *ver)
 {
 	uint8_t size = sizeof(*ver);
