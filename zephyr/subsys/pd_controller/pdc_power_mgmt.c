@@ -3900,19 +3900,6 @@ static void enforce_pd_chipset_suspend_policy_1(int port)
 }
 
 /**
- * @brief Chipset Startup (S5->S3) Policy 1:
- *	a) DRP Toggle OFF
- */
-static void enforce_pd_chipset_startup_policy_1(int port)
-{
-	LOG_DBG("C%d: Chipset Startup Policy 1", port);
-
-	pdc_power_mgmt_set_dual_role(port, PD_DRP_TOGGLE_OFF);
-	/* Notify PDC that the AP is starting up to enable retimer */
-	pdc_notify_ap_power_state(port, POWER_S0);
-}
-
-/**
  * Chipset Shutdown (S3->S5) Policy 1:
  *	a) DRP Force SINK
  */
@@ -3947,9 +3934,10 @@ static void pdc_apply_power_state_policy(struct k_work *work)
 	uint8_t port_count = pdc_power_mgmt_get_usb_pd_port_count();
 
 	if (chipset_in_state(CHIPSET_STATE_ON)) {
-		LOG_INF("PD: AP is ON: apply 'startup' followed by 'resume'");
+		LOG_INF("PD: AP is ON: apply 'resume' policy");
 		for (int i = 0; i < port_count; i++) {
-			enforce_pd_chipset_startup_policy_1(i);
+			/* Notify PDC that the AP is in S0 to enable retimers */
+			pdc_notify_ap_power_state(i, POWER_S0);
 			/*
 			 * Setting the dual role state clears the policy flag
 			 * SNK_POLICY_SWAP_TO_SRC which may get set in
