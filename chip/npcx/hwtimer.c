@@ -26,6 +26,8 @@
 
 /* Time when event will be expired unit:us */
 static volatile uint32_t evt_expired_us;
+/* Flag indicating whether an event deadline is currently armed */
+static volatile uint8_t evt_is_set;
 /* 32-bits event counter */
 static volatile uint32_t evt_cnt;
 /* Debugger information */
@@ -71,12 +73,13 @@ void __hw_clock_event_set(uint32_t deadline)
 	current = __hw_clock_source_read();
 
 	/* Is deadline min value? */
-	if (evt_expired_us != 0 && (int32_t)(evt_expired_us - current) > 0 &&
+	if (evt_is_set && (int32_t)(evt_expired_us - current) > 0 &&
 	    (int32_t)(deadline - evt_expired_us) >= 0)
 		return;
 
 	/* mark min event value */
 	evt_expired_us = deadline;
+	evt_is_set = 1;
 
 	evt_cnt_us = (int32_t)(deadline - current);
 	/* Deadline is behind current timer */
@@ -120,7 +123,7 @@ void __hw_clock_event_set(uint32_t deadline)
 /* Returns the time-stamp of the next programmed event */
 uint32_t __hw_clock_event_get(void)
 {
-	if (evt_expired_us)
+	if (evt_is_set)
 		return evt_expired_us;
 	else /* No events. Give maximum deadline */
 		return EVT_MAX_EXPIRED_US;
@@ -169,6 +172,7 @@ void __hw_clock_event_clear(void)
 
 	/* Clear event parameters */
 	evt_expired_us = 0;
+	evt_is_set = 0;
 	evt_cnt = 0;
 }
 
@@ -186,6 +190,7 @@ static void __hw_clock_event_irq(void)
 
 	/* Clear event parameters */
 	evt_expired_us = 0;
+	evt_is_set = 0;
 	evt_cnt = 0;
 
 	/* handle upper driver */
@@ -198,7 +203,7 @@ static void __hw_clock_event_irq(void)
 	 * ITIM32 is based on apb2 and ec won't wake-up in deep-idle even if it
 	 * expires.
 	 */
-	if (evt_expired_us == 0)
+	if (!evt_is_set)
 		__hw_clock_event_set(EVT_MAX_EXPIRED_US);
 #endif
 }
@@ -265,7 +270,7 @@ static void __hw_clock_source_irq(void)
 		process_timers(0);
 #ifdef CONFIG_LOW_POWER_IDLE
 		/* Set event for ITIM32. Please see above for detail */
-		if (evt_expired_us == 0)
+		if (!evt_is_set)
 			__hw_clock_event_set(EVT_MAX_EXPIRED_US);
 #endif
 	}
