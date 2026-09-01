@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0b24b9b_4f93cf28",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-01T14:54:51Z",
+      "side": 1,
+      "message": "@bernardo.perez.priego@intel.com This should be ready to submit, if you want.",
+      "revId": "2175a7d6e152887cec9062b189d50349c3cf6604",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
