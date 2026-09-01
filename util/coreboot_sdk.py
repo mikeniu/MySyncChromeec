@@ -17,7 +17,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from typing import Dict, Tuple, Union
+from typing import Dict, Tuple
 import urllib.request
 
 
@@ -48,21 +48,18 @@ _TOOLCHAIN_NAME_MAP = {
 
 def _get_toolchains_shell(
     portage_toolchains: Dict[str, Tuple],
-    local_filepath: Union[str, "os.PathLike[str]"] = os.path.expanduser(
-        "~/.cache/coreboot-sdk"
-    ),
     toolchain: str = None,
 ) -> Dict[str, str]:
     """Download and extract the toolchains using the shell.
 
     Args:
         portage_toolchains: Dict of architectures to download
-        local_filepath: Path to download the toolchains to
         toolchain: Individual toolchain to obtain if desired
 
     Returns:
         Dict of coreboot-sdk env variables and their respective paths
     """
+    cache_dir = os.path.expanduser("~/.cache/coreboot-sdk")
     result = {}
     success = True
     for target, (
@@ -72,8 +69,8 @@ def _get_toolchains_shell(
     ) in portage_toolchains.items():
         if toolchain and target != toolchain:
             continue
-        output_path = local_filepath + "/" + target
-        output_toolchain = output_path + "/" + toolchain_hash
+        output_path = os.path.join(cache_dir, target)
+        output_toolchain = os.path.join(output_path, toolchain_hash)
         tempfile.tempdir = output_path
         os.makedirs(output_path, exist_ok=True)
         with tempfile.TemporaryDirectory(toolchain_hash) as tmp_dir:
