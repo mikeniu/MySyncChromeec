@@ -94,7 +94,9 @@ static uint32_t reset_flags;
 static int jumped_to_image;
 static int disable_jump;  /* Disable ALL jumps if system is locked */
 static int force_locked;  /* Force system locked even if WP isn't enabled */
+#ifdef HAS_TASK_CHIPSET
 static enum ec_reboot_cmd reboot_at_shutdown;
+#endif
 
 /* On-going actions preventing going into deep-sleep mode */
 uint32_t sleep_mask;
@@ -748,6 +750,7 @@ static int handle_pending_reboot(enum ec_reboot_cmd cmd)
 /*****************************************************************************/
 /* Hooks */
 
+#ifdef HAS_TASK_CHIPSET
 static void system_common_shutdown(void)
 {
 	if (reboot_at_shutdown)
@@ -755,6 +758,7 @@ static void system_common_shutdown(void)
 	handle_pending_reboot(reboot_at_shutdown);
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, system_common_shutdown, HOOK_PRIO_DEFAULT);
+#endif
 
 /*****************************************************************************/
 /* Console commands */
@@ -779,8 +783,10 @@ static int command_sysinfo(int argc, char **argv)
 		ccputs(" unlocked");
 	ccputs("\n");
 
+#ifdef HAS_TASK_CHIPSET
 	if (reboot_at_shutdown)
 		ccprintf("Reboot at shutdown: %d\n", reboot_at_shutdown);
+#endif
 
 	return EC_SUCCESS;
 }
@@ -1012,9 +1018,11 @@ static int command_reboot(int argc, char **argv)
 			flags &= ~SYSTEM_RESET_HARD;
 		} else if (!strcasecmp(argv[i], "ap-off")) {
 			flags |= SYSTEM_RESET_LEAVE_AP_OFF;
+#ifdef HAS_TASK_CHIPSET
 		} else if (!strcasecmp(argv[i], "cancel")) {
 			reboot_at_shutdown = EC_REBOOT_CANCEL;
 			return EC_SUCCESS;
+#endif
 		} else if (!strcasecmp(argv[i], "preserve")) {
 			flags |= SYSTEM_RESET_PRESERVE_FLAGS;
 		} else
@@ -1234,6 +1242,7 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 	 */
 	memcpy(&p, args->params, sizeof(p));
 
+#ifdef HAS_TASK_CHIPSET
 	if (p.cmd == EC_REBOOT_CANCEL) {
 		/* Cancel pending reboot */
 		reboot_at_shutdown = EC_REBOOT_CANCEL;
@@ -1243,6 +1252,10 @@ enum ec_status host_command_reboot(struct host_cmd_handler_args *args)
 		reboot_at_shutdown = p.cmd;
 		return EC_RES_SUCCESS;
 	}
+#else
+	if (p.flags & EC_REBOOT_FLAG_ON_AP_SHUTDOWN)
+		return EC_RES_INVALID_PARAM;
+#endif
 
 #ifdef HAS_TASK_HOSTCMD
 	if (p.cmd == EC_REBOOT_JUMP_RO ||
