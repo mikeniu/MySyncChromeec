@@ -570,7 +570,6 @@ class Renode(Platform):
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
-            "unaligned_access",  # TODO(b/483118717)
             "exception",  # TODO(b/483118965)
             "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
             "fpsensor_debug",  # TODO(b/474439863)
