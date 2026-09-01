@@ -1144,9 +1144,6 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_partner_battery_pdo)
 
 ZTEST_USER(pdc_power_mgmt_api, test_get_vbus_voltage)
 {
-/* Keep in line with |pdc_power_mgmt_api.c|. */
-#define VBUS_READ_CACHE_MS 500
-
 	union connector_status_t connector_status = {};
 	union conn_status_change_bits_t change_bits = { 0 };
 	uint32_t mv_units = 50;
@@ -1163,22 +1160,13 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_vbus_voltage)
 	emul_pdc_configure_src(emul, &connector_status);
 	emul_pdc_connect_partner(emul, &connector_status);
 
-	start = k_cycle_get_32();
-	while (k_cycle_get_32() - start < timeout) {
-		k_msleep(TEST_WAIT_FOR_INTERVAL_MS);
-		out = pdc_power_mgmt_get_vbus_voltage(TEST_PORT);
-		if (out != expected_voltage_mv)
-			continue;
-
-		break;
-	}
-
-	zassert_equal(expected_voltage_mv, out, "expected=%d, out=%d",
-		      expected_voltage_mv, out);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
+	zassert_equal(expected_voltage_mv,
+		      pdc_power_mgmt_get_vbus_voltage(TEST_PORT));
 
 	/*
 	 * Change the voltage and expect that we keep getting cached value until
-	 * 500ms has passed.
+	 * connector status syncs.
 	 */
 	connector_status.voltage_reading = next_expected_voltage_mv / mv_units;
 	emul_pdc_set_connector_status(emul, &connector_status);
@@ -1187,10 +1175,8 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_vbus_voltage)
 		      pdc_power_mgmt_get_vbus_voltage(TEST_PORT));
 
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
-	zassert_true(TEST_WAIT_FOR(
-		next_expected_voltage_mv ==
-			pdc_power_mgmt_get_vbus_voltage(TEST_PORT),
-		VBUS_READ_CACHE_MS));
+	zassert_equal(next_expected_voltage_mv,
+		      pdc_power_mgmt_get_vbus_voltage(TEST_PORT));
 
 	/*
 	 * Connector status change bits can also immediately trigger vbus reads.
