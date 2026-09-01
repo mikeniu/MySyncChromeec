@@ -11,7 +11,6 @@
 GPIO_INT(LID_OPEN,             PIN(0, 0), GPIO_INT_BOTH, lid_interrupt)
 GPIO_INT(POWER_BUTTON_L,       PIN(0, 1), GPIO_INT_BOTH, power_button_interrupt)
 GPIO_INT(AC_PRESENT,           PIN(0, 2), GPIO_INT_BOTH, extpower_interrupt)
-GPIO_INT(CHARGE_DONE,          PIN(0, 5), GPIO_INT_BOTH, inductive_charging_interrupt)
 /* GPIOs for EC-CR50 communication */
 GPIO_INT(EC_PACKET_MODE_EN,    PIN(0, 16), GPIO_INT_RISING,
 	 ec_comm_packet_mode_en)
@@ -24,8 +23,5 @@ GPIO(ENTERING_RW,          PIN(0, 8), 0)
 GPIO(PCH_BKLTEN,           PIN(0, 9), 0)
 GPIO(ENABLE_BACKLIGHT,     PIN(0, 10), 0)
 
-/* Inductive charging */
-GPIO(CHARGE_EN,            PIN(0, 11), 0)
-GPIO(BASE_CHG_VDD_EN,      PIN(0, 12), 0)
 
 GPIO(USB_C0_DISCHARGE,     PIN(0, 15), 0)

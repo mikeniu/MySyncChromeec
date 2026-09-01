@@ -1893,19 +1893,10 @@
 /* Current/Power monitor */
 
 /*
- * Compile driver for INA219 or INA231 or INA3221.
- * Only one of these may be defined (if any).
+ * Compile driver for INA219 or INA231.
  */
 #undef CONFIG_INA219
 #undef CONFIG_INA231
-#undef CONFIG_INA3221
-
-
-/*****************************************************************************/
-/* Inductive charging */
-
-/* Enable inductive charging support */
-#undef CONFIG_INDUCTIVE_CHARGING
 
 /******************************************************************************/
 

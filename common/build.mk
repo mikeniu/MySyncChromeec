@@ -65,7 +65,6 @@ common-$(CONFIG_HOSTCMD_EVENTS)+=host_event_commands.o
 common-$(CONFIG_HOSTCMD_RTC)+=rtc.o
 common-$(CONFIG_I2C_CONTROLLER)+=i2c_controller.o
 common-$(CONFIG_I2C_PERIPH)+=i2c_peripheral.o
-common-$(CONFIG_INDUCTIVE_CHARGING)+=inductive_charging.o
 
 
 common-$(CONFIG_LID_SWITCH)+=lid_switch.o
