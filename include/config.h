@@ -2635,4 +2635,379 @@
 #define CONFIG_EC_MAX_SENSOR_FREQ_MILLIHZ \
 	CONFIG_EC_MAX_SENSOR_FREQ_DEFAULT_MILLIHZ
 #endif
-#endif  /* __CROS_EC_CONFIG_H */
+
+/* Enable BMI secondary port if needed. */
+#if defined(CONFIG_MAG_BMI_BMM150) || defined(CONFIG_MAG_BMI_LIS2MDL)
+#define CONFIG_BMI_SEC_I2C
+#endif
+
+/* Enable LSM2MDL secondary port if needed. */
+#if defined(CONFIG_MAG_LSM6DSM_BMM150) || defined(CONFIG_MAG_LSM6DSM_LIS2MDL)
+#define CONFIG_LSM6DSM_SEC_I2C
+#endif
+
+/* Load LIS2MDL driver if needed */
+#if defined(CONFIG_MAG_BMI_LIS2MDL) || defined(CONFIG_MAG_LSM6DSM_LIS2MDL)
+#define CONFIG_MAG_LIS2MDL
+#ifndef CONFIG_ACCELGYRO_SEC_ADDR_FLAGS
+#error "The i2c address of the magnetometer is not set."
+#endif
+#endif
+
+/* Load BMM150 driver if needed */
+#if defined(CONFIG_MAG_BMI_BMM150) || defined(CONFIG_MAG_LSM6DSM_BMM150)
+#define CONFIG_MAG_BMM150
+#ifndef CONFIG_ACCELGYRO_SEC_ADDR_FLAGS
+#error "The i2c address of the magnetometer is not set."
+#endif
+#endif
+
+/* Verify sensorhub is enabled */
+#ifdef CONFIG_MAG_LSM6DSM_LIS2MDL
+#ifndef CONFIG_SENSORHUB_LSM6DSM
+#error "Enable SENSORHUB_LSM6DSM."
+#endif
+#endif
+
+/* Fill LPC sense data on X86 architecture. */
+#ifdef CONFIG_HOSTCMD_X86
+#define CONFIG_MOTION_FILL_LPC_SENSE_DATA
+#endif
+
+/*
+ * TODO(crbug.com/888109): Makes sure RDP as PSTATE is only enabled where it
+ * makes sense.
+ */
+#ifdef CONFIG_FLASH_READOUT_PROTECTION_AS_PSTATE
+#ifdef CONFIG_FLASH_PSTATE
+#error "Flash readout protection and PSTATE may not work as intended."
+#endif
+
+#if !defined(CHIP_FAMILY_STM32H7) && !defined(CHIP_FAMILY_STM32F4) && \
+	!defined(CHIP_FAMILY_NPCX9)
+#error "Flash readout protection only implemented on STM32H7, STM32F4 and NPCX9"
+#endif
+#endif /* CONFIG_FLASH_READOUT_PROTECTION_AS_PSTATE */
+
+#if defined(CONFIG_USB_PD_TCPM_ANX3429) ||     \
+	defined(CONFIG_USB_PD_TCPM_ANX740X) || \
+	defined(CONFIG_USB_PD_TCPM_ANX7471)
+/* Note: ANX7447 is handled by its own driver, not ANX74XX. */
+#define CONFIG_USB_PD_TCPM_ANX74XX
+#endif
+
+#if defined(CONFIG_DPTF_MULTI_PROFILE) && !defined(CONFIG_DPTF)
+#error "CONFIG_DPTF_MULTI_PROFILE can be set only when CONFIG_DPTF is set."
+#endif /* CONFIG_DPTF_MULTI_PROFILE && !CONFIG_DPTF */
+
+/*
+ * The EC monitors the AP suspend/resume process using:
+ * - EC_CMD_HOST_SLEEP_EVENT (0x00A9)
+ * - SLP_S0 signal
+ *
+ * When the AP starts the suspend process, it sends EC_CMD_HOST_SLEEP_EVENT to
+ * signal to the EC that a suspend has begun. This starts the EC's timer, which
+ * uses CONFIG_SLEEP_TIMEOUT_MS to determine how long to wait for the suspend to
+ * complete (by monitoring SLP_S0) before considering the AP "hung". Similarly,
+ * when a resume is begun, the EC starts a timer using the same
+ * CONFIG_SLEEP_TIMEOUT_MS value and waits for the AP to send
+ * EC_CMD_HOST_SLEEP_EVENT to indicate the resume has completed.
+ *
+ * For AMD Systems:
+ * If the EC hits the timeout value CONFIG_SLEEP_TIMEOUT_MS, the AP is
+ * considered "hung" and the EC begins the recovery process. If
+ * CONFIG_POWER_SLEEP_FAILURE_DETECTION is enabled for the board, the EC will
+ * send the Host Event EC_HOST_EVENT_HANG_DETECT, possibly triggering recovery
+ * within the AP, and then start a timer to wait CONFIG_HARD_SLEEP_HANG_TIMEOUT.
+ * If the AP fails to complete the sleep step within
+ * CONFIG_HARD_SLEEP_HANG_TIMEOUT, the EC will forcefully reset the AP to
+ * complete recovery.
+ */
+
+/*
+ * Define the timeout in milliseconds between when the EC receives a suspend
+ * command and when the EC times out and asserts wake because the sleep signal
+ * SLP_S0 did not assert.
+ */
+#ifndef CONFIG_SLEEP_TIMEOUT_MS
+#define CONFIG_SLEEP_TIMEOUT_MS 10000
+#endif
+
+/*
+ * Define the timeout in milliseconds between when the EC |SysRq| to the AP
+ * and when the AP is forcibly reset because it didn't reboot on its own.
+ */
+#ifndef CONFIG_HARD_SLEEP_HANG_TIMEOUT
+#define CONFIG_HARD_SLEEP_HANG_TIMEOUT 10000
+#endif
+
+#ifdef CONFIG_PWM_KBLIGHT
+#define CONFIG_KEYBOARD_BACKLIGHT
+#endif
+
+/*****************************************************************************/
+/* ISH power management related definitions */
+#if defined(CONFIG_ISH_PM_D0I2) || defined(CONFIG_ISH_PM_D0I3) || \
+	defined(CONFIG_ISH_PM_D3) || defined(CONFIG_ISH_PM_RESET_PREP)
+
+#ifndef CONFIG_LOW_POWER_IDLE
+#error "Must define CONFIG_LOW_POWER_IDLE if enable ISH low power states"
+#endif
+
+#define CONFIG_ISH_PM_AONTASK
+
+#endif
+
+#ifdef CONFIG_ACCEL_FIFO
+#if !defined(CONFIG_ACCEL_FIFO_SIZE) || !defined(CONFIG_ACCEL_FIFO_THRES)
+#error "Using CONFIG_ACCEL_FIFO, must define _SIZE and _THRES"
+#endif
+
+#endif /* CONFIG_ACCEL_FIFO */
+
+/*
+ * If USB PD Discharge is enabled, verify that CONFIG_USB_PD_DISCHARGE_GPIO
+ * and CONFIG_USB_PD_PORT_MAX_COUNT, CONFIG_USB_PD_DISCHARGE_TCPC, or
+ * CONFIG_USB_PD_DISCHARGE_PPC is defined.
+ */
+#ifndef CONFIG_TEST_ENABLE_USB_PD_DISCHARGE
+#ifdef CONFIG_USB_PD_DISCHARGE
+#ifdef CONFIG_USB_PD_DISCHARGE_GPIO
+#if !defined(CONFIG_USB_PD_PORT_MAX_COUNT)
+#error "PD discharge port not defined"
+#endif
+#else
+#if !defined(CONFIG_USB_PD_DISCHARGE_TCPC) && \
+	!defined(CONFIG_USB_PD_DISCHARGE_PPC)
+#error "PD discharge implementation not defined"
+#endif
+#endif /* CONFIG_USB_PD_DISCHARGE_GPIO */
+#endif /* CONFIG_USB_PD_DISCHARGE */
+#endif /* CONFIG_TEST_ENABLE_USB_PD_DISCHARGE */
+
+/* Chargesplash defaults */
+#ifdef CONFIG_CHARGESPLASH
+#ifndef CONFIG_CHARGESPLASH_PERIOD
+#define CONFIG_CHARGESPLASH_PERIOD 900
+#endif
+#ifndef CONFIG_CHARGESPLASH_MAX_REQUESTS_PER_PERIOD
+#define CONFIG_CHARGESPLASH_MAX_REQUESTS_PER_PERIOD 5
+#endif
+#endif
+
+/* EC Codec Wake-on-Voice related definitions */
+#ifdef CONFIG_AUDIO_CODEC_WOV
+#define CONFIG_SHA256_SW
+#endif
+
+#ifdef CONFIG_SMBUS_PEC
+#define CONFIG_CRC8_CROS
+#endif
+
+/*
+ *  Vivaldi keyboard code to be enabled only if board has selected
+ *  CONFIG_KEYBOARD_PROTOCOL_8042 and not disabled CONFIG_KEYBOARD_VIVALDI
+ *  explicitly
+ */
+#ifndef CONFIG_KEYBOARD_PROTOCOL_8042
+#undef CONFIG_KEYBOARD_VIVALDI
+#endif
+
+#if defined(CONFIG_USB_PD_TCPM_MULTI_PS8XXX)
+#if defined(CONFIG_USB_PD_TCPM_PS8705) + defined(CONFIG_USB_PD_TCPM_PS8751) + \
+		defined(CONFIG_USB_PD_TCPM_PS8755) +                          \
+		defined(CONFIG_USB_PD_TCPM_PS8805) +                          \
+		defined(CONFIG_USB_PD_TCPM_PS8815) <                          \
+	2
+#error "Must select 2 CONFIG_USB_PD_TCPM_PS8* or above if " \
+	"CONFIG_USB_PD_TCPM_MULTI_PS8XXX is defined."
+#endif
+#endif /* CONFIG_USB_PD_TCPM_MULTI_PS8XXX  */
+
+#if defined(CONFIG_USB_PD_TCPM_PS8705) + defined(CONFIG_USB_PD_TCPM_PS8751) + \
+		defined(CONFIG_USB_PD_TCPM_PS8755) +                          \
+		defined(CONFIG_USB_PD_TCPM_PS8805) +                          \
+		defined(CONFIG_USB_PD_TCPM_PS8815) >                          \
+	1
+#if !defined(CONFIG_USB_PD_TCPM_MULTI_PS8XXX)
+#error "CONFIG_USB_PD_TCPM_MULTI_PS8XXX MUST be defined if more than one " \
+	"CONFIG_USB_PD_TCPM_PS8* are intended to support in a board."
+#endif
+#endif /* defined(CONFIG_USB_PD_TCPM_PS8705) + ... */
+
+/******************************************************************************/
+/* Check body detection setup */
+#if defined(CONFIG_BODY_DETECTION)
+#ifndef CONFIG_BODY_DETECTION_SENSOR
+#error CONFIG_BODY_DETECTION_SENSOR must be defined to use body detection
+#endif /* ifndef(CONFIG_BODY_DETECTION_SENSOR) */
+
+/* Non-zephyr only support V1 version of the body detection algorithm. */
+#ifndef CONFIG_ZEPHYR
+#ifdef CONFIG_BODY_DETECTION_ALOGIRTHM_V2
+#error "Only V1 algo for body detection is supported."
+#endif
+#ifndef CONFIG_BODY_DETECTION_ALOGIRTHM_V1
+#define CONFIG_BODY_DETECTION_ALOGIRTHM_V1
+#endif
+#endif /* ifndef CONFIG_ZEPHYR */
+
+#ifndef CONFIG_BODY_DETECTION_MAX_WINDOW_SIZE
+#define CONFIG_BODY_DETECTION_MAX_WINDOW_SIZE 250 /* max sensor odr (Hz) */
+#endif
+#ifndef CONFIG_BODY_DETECTION_VAR_THRESHOLD
+#define CONFIG_BODY_DETECTION_VAR_THRESHOLD 550 /* (mm/s^2)^2 */
+#endif
+#ifndef CONFIG_BODY_DETECTION_CONFIDENCE_DELTA
+#define CONFIG_BODY_DETECTION_CONFIDENCE_DELTA 525 /* (mm/s^2)^2 */
+#endif
+#ifndef CONFIG_BODY_DETECTION_VAR_NOISE_FACTOR
+#define CONFIG_BODY_DETECTION_VAR_NOISE_FACTOR 120 /* % */
+#endif
+#ifndef CONFIG_BODY_DETECTION_ON_BODY_CON
+#define CONFIG_BODY_DETECTION_ON_BODY_CON 50 /* % */
+#endif
+#ifndef CONFIG_BODY_DETECTION_OFF_BODY_CON
+#define CONFIG_BODY_DETECTION_OFF_BODY_CON 10 /* % */
+#endif
+#ifndef CONFIG_BODY_DETECTION_STATIONARY_DURATION
+#define CONFIG_BODY_DETECTION_STATIONARY_DURATION 15 /* second */
+#endif
+
+#else /* CONFIG_BODY_DETECTION */
+#ifdef CONFIG_BODY_DETECTION_SENSOR
+#error "Unexpected body detection property set"
+#else
+#define CONFIG_BODY_DETECTION_SENSOR 0
+#endif
+#endif /* CONFIG_BODY_DETECTION */
+
+/*
+ * Set parameters to dummy values to use IS_ENABLED().
+ * If a parameter is already set, it will trigger a compilatin error.
+ */
+
+/* To be able to use IS_ENABLED(CONFIG_GESTURE_SENSOR_DOUBLE_TAP) */
+#ifndef CONFIG_GESTURE_SENSOR_DOUBLE_TAP
+#define CONFIG_GESTURE_TAP_THRES_MG 0
+#define CONFIG_GESTURE_TAP_MAX_INTERSTICE_T 0
+#define CONFIG_GESTURE_TAP_SENSOR 0
+#endif /* CONFIG_GESTURE_SENSOR_DOUBLE_TAP */
+
+#ifndef CONFIG_ACCEL_FIFO
+#define CONFIG_ACCEL_FIFO_SIZE 0
+#endif
+
+#ifndef CONFIG_GESTURE_DETECTION
+#define CONFIG_GESTURE_DETECTION_MASK 0
+#endif /* CONFIG_GESTURE_DETECTION */
+
+#ifndef CONFIG_GESTURE_SIGMO
+#define CONFIG_GESTURE_SIGMO_SENSOR 0
+#endif /* CONFIG_GESTURE_SIGMO */
+
+#ifdef CONFIG_LID_ANGLE
+#if !defined(CONFIG_LID_ANGLE_SENSOR_BASE) || \
+	!defined(CONFIG_LID_ANGLE_SENSOR_LID)
+#error "Sensors must be identified for calculating lid angle."
+#endif
+#else /* CONFIG_LID_ANGLE */
+#define CONFIG_LID_ANGLE_SENSOR_BASE 0
+#define CONFIG_LID_ANGLE_SENSOR_LID 0
+#endif /* CONFIG_LID_ANGLE */
+
+#if defined(CONFIG_LID_ANGLE_UPDATE) && !defined(CONFIG_LID_ANGLE)
+#error "CONFIG_LID_ANGLE is needed for CONFIG_LID_ANGLE_UPDATE."
+#endif
+
+#ifndef CONFIG_ALS
+#define ALS_COUNT 0
+#endif /* CONFIG_ALS */
+
+#if defined(CONFIG_EEPROM_CBI_WP) && !defined(CONFIG_CBI_EEPROM)
+#error "CONFIG_EEPROM_CBI_WP requires CONFIG_CBI_EEPROM to be defined!"
+#endif
+
+#if defined(CONFIG_BYPASS_CBI_EEPROM_WP_CHECK) && \
+	!defined(CONFIG_SYSTEM_UNLOCKED)
+#error "CONFIG_BYPASS_CBI_EEPROM_WP_CHECK is only permitted " \
+	"when CONFIG_SYSTEM_UNLOCK is also enabled."
+#endif /* CONFIG_BYPASS_CBI_EEPROM_WP_CHECK && !CONFIG_SYSTEM_UNLOCK */
+
+#if defined(CONFIG_BOARD_VERSION_CBI) && defined(CONFIG_BOARD_VERSION_GPIO)
+#error "CONFIG_BOARD_VERSION_CBI and CONFIG_BOARD_VERSION_GPIO " \
+	"are mutually exclusive. "
+#endif /* CONFIG_BOARD_VERSION_CBI && CONFIG_BOARD_VERSION_GPIO */
+
+#if defined(CONFIG_CBI_EEPROM) && defined(CONFIG_CBI_GPIO)
+#error "CONFIG_CBI_EEPROM and CONFIG_CBI_GPIO are mutually exclusive."
+#endif
+
+#if defined(CONFIG_CBI_FLASH) && defined(CONFIG_CBI_GPIO)
+#error "CONFIG_CBI_FLASH and CONFIG_CBI_GPIO are mutually exclusive."
+#endif
+
+#if !defined(CONFIG_ZEPHYR) && !defined(CONFIG_ACCELGYRO_ICM_COMM_SPI) && \
+	!defined(CONFIG_ACCELGYRO_ICM_COMM_I2C)
+#ifdef I2C_PORT_ACCEL
+#define CONFIG_ACCELGYRO_ICM_COMM_I2C
+#else
+#define CONFIG_ACCELGYRO_ICM_COMM_SPI
+#endif
+#endif /* !CONFIG_ZEPHYR && !CONFIG_ACCELGYRO_ICM_COMM_SPI && \
+	* !CONFIG_ACCELGYRO_ICM_COMM_I2C                      \
+	*/
+
+#if !defined(CONFIG_ZEPHYR) && !defined(CONFIG_ACCELGYRO_BMI_COMM_SPI) && \
+	!defined(CONFIG_ACCELGYRO_BMI_COMM_I2C)
+#ifdef I2C_PORT_ACCEL
+#define CONFIG_ACCELGYRO_BMI_COMM_I2C
+#else
+#define CONFIG_ACCELGYRO_BMI_COMM_SPI
+#endif
+#endif /* !CONFIG_ZEPHYR && !CONFIG_ACCELGYRO_BMI_SPI && \
+	* !CONFIG_ACCELGYRO_BMI_I2C                      \
+	*/
+
+/* AMD STT requires AMD SB-RMI to be enabled */
+#if defined(CONFIG_AMD_STT) && !defined(CONFIG_AMD_SB_RMI)
+#define CONFIG_AMD_SB_RMI
+#endif
+
+/*
+ * Default timeout value for which EC has to wait for system to exit from S5
+ * before performing RTC reset and moving the system to G3.
+ */
+#if defined(CONFIG_BOARD_HAS_RTC_RESET) && !defined(CONFIG_S5_EXIT_WAIT)
+#define CONFIG_S5_EXIT_WAIT 4
+#endif
+
+/* HAS_GPU_DRIVER enables D-Notify and throttling. */
+#if defined(CONFIG_GPU_NVIDIA)
+#define HAS_GPU_DRIVER
+#endif
+
+/* Default to 1024 for end of ram data (panic and jump data) */
+#ifndef CONFIG_PRESERVED_END_OF_RAM_SIZE
+#define CONFIG_PRESERVED_END_OF_RAM_SIZE 1024
+#endif
+
+/* Select CONFIG_IT83XX_EXTENDED_ILM automatically */
+#if defined(CONFIG_IT83XX_EXTENDED_ILM_HWTIMER_DRIVER) ||     \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_I2C_CONTROLLER) || \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_I2C_DRIVER) ||     \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_IRQ_DRIVER) ||     \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_UART_DRIVER) ||    \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_USBC_PD_TIMER) ||  \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_TCPCI_DRIVER) ||   \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_TIMER) ||          \
+	defined(CONFIG_IT83XX_EXTENDED_ILM_RAA489000_DRIVER)
+#define CONFIG_IT83XX_EXTENDED_ILM
+#endif
+
+#ifdef HAVE_PRIVATE
+#include "private_config.h"
+#endif /* HAVE_PRIVATE */
+
+#endif /* __CROS_EC_CONFIG_H */
+
