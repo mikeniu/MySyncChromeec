@@ -71,6 +71,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a9162c3_7b8b41c1",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-01T20:39:43Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "55b6c858_f7bc1e0a",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "350c9654_4ed0f8bb",
@@ -84,6 +102,24 @@
       "writtenOn": "2026-08-26T20:14:42Z",
       "side": 1,
       "message": "Nit: Is this sleep supposed to allow the previous disconnect/S0 transition to take effect? If so, it should be up there. All of the emulator init stuff you just did should take effect immediately. In any case, `test_set_chipset_to_s0` already ends with a sleep.",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3aa43a03_f6e35bc3",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-01T20:39:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "350c9654_4ed0f8bb",
       "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -105,6 +141,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8c559c3_68eff662",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-01T20:39:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07eb1663_1f086147",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6b3ed8b_2fc699dd",
@@ -118,6 +172,24 @@
       "writtenOn": "2026-08-26T20:14:42Z",
       "side": 1,
       "message": "Should AttachWait.SNK be possible? I thought the partner was configured to sink-only.",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4d7f767_d1a418c2",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-01T20:39:43Z",
+      "side": 1,
+      "message": "Nice. I like the negative test for the unwanted state better.",
+      "parentUuid": "f6b3ed8b_2fc699dd",
       "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -139,6 +211,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b5d960f_0d06c0bd",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-01T20:39:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4264d0d_47058f01",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5764e6f2_5470a779",
@@ -152,6 +242,24 @@
       "writtenOn": "2026-08-26T20:14:42Z",
       "side": 1,
       "message": "Isn\u0027t this already checked by the above test?",
+      "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51771344_a5c52f71",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 33
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-01T20:39:43Z",
+      "side": 1,
+      "message": "This might be technically redundant, but I can see the argument for doing it in both places for clarity.",
+      "parentUuid": "5764e6f2_5470a779",
       "revId": "eebaaf17f7d6321cf7a6f77d16371d1b7cb016c5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
