@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9520566_5badbc96",
+        "filename": "zephyr/program/atria/penghu/adc.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-01T20:52:24Z",
+      "side": 1,
+      "message": "On the schematic, this is near the Wifi adapter, but there\u0027s no routing note. I\u0027ll take your word for it.",
+      "revId": "ede5c9a06ba989a137e2414cb8409c11e946c70b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
