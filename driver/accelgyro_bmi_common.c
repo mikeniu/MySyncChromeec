@@ -409,8 +409,7 @@ enum fifo_state {
 	FIFO_DATA_CONFIG,
 };
 
-#define BMI_FIFO_BUFFER 64
-static uint8_t bmi_buffer[BMI_FIFO_BUFFER];
+static uint8_t bmi_buffer[CONFIG_BMI_FIFO_BUFFER];
 
 int bmi_load_fifo(struct motion_sensor_t *s, uint32_t last_ts)
 {
