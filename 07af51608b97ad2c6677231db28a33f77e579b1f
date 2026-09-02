@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23bea77a_e3e166a6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-02T15:53:34Z",
+      "side": 1,
+      "message": "At first glance, this looks fine as an optimization. My main question, which I haven\u0027t investigated, is, \"Would a significant VBUS change trigger an alert that would prompt a status check and updated the cached value?\" If the answer is yes, this seems fine. If the answer is no, then there might need to be some additional operation to make sure the cached value is up to date.",
+      "revId": "07af51608b97ad2c6677231db28a33f77e579b1f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
