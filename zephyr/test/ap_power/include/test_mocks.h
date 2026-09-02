@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __TEST_AP_POWER_TEST_MOCKS_H
-#define __TEST_AP_POWER_TEST_MOCKS_H
+#ifndef PLATFORM_EC_ZEPHYR_TEST_AP_POWER_INCLUDE_TEST_MOCKS_H_
+#define PLATFORM_EC_ZEPHYR_TEST_AP_POWER_INCLUDE_TEST_MOCKS_H_
 
 #include <stdint.h>
 
@@ -21,4 +21,4 @@ DECLARE_FAKE_VALUE_FUNC(int, extpower_is_present);
 DECLARE_FAKE_VOID_FUNC(system_hibernate, uint32_t, uint32_t);
 DECLARE_FAKE_VALUE_FUNC(int, system_can_boot_ap);
 
-#endif /* __TEST_AP_POWER_TEST_MOCKS_H */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_AP_POWER_INCLUDE_TEST_MOCKS_H_ */

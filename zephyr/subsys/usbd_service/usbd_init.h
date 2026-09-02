@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __USBD_INIT_H
-#define __USBD_INIT_H
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_USBD_SERVICE_USBD_INIT_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_USBD_SERVICE_USBD_INIT_H_
 
 #include "hooks.h"
 #include "queue.h"
@@ -99,4 +99,4 @@ int usb_msg_deferred_register(const struct deferred_data *deferred);
 uint8_t google_get_in_ep(struct usbd_class_data *const c_data);
 uint8_t google_get_out_ep(struct usbd_class_data *const c_data);
 
-#endif /* __USBD_INIT_H */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_USBD_SERVICE_USBD_INIT_H_ */

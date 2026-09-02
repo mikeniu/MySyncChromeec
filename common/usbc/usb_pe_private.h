@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_USB_PE_PRIVATE_H
-#define __CROS_EC_USB_PE_PRIVATE_H
+#ifndef PLATFORM_EC_COMMON_USBC_USB_PE_PRIVATE_H_
+#define PLATFORM_EC_COMMON_USBC_USB_PE_PRIVATE_H_
 
 /** Internal header file for usb_pe.
  *
@@ -108,4 +108,4 @@ int pe_chk_fn(int port, int fn);
 void pe_clr_dpm_requests(int port);
 #endif /* TEST_BUILD */
 
-#endif /* __CROS_EC_USB_PE_PRIVATE_H */
+#endif /* PLATFORM_EC_COMMON_USBC_USB_PE_PRIVATE_H_ */

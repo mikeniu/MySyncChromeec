@@ -5,8 +5,8 @@
  * Renesas (Intersil) ISL-95522 battery charger driver header.
  */
 
-#ifndef __CROS_EC_ISL95522_H
-#define __CROS_EC_ISL95522_H
+#ifndef PLATFORM_EC_DRIVER_CHARGER_ISL95522_H_
+#define PLATFORM_EC_DRIVER_CHARGER_ISL95522_H_
 
 #include "driver/charger/isl95522_public.h"
 
@@ -126,4 +126,4 @@
 #define AC_REG_TO_CURRENT(REG) (((REG) * ISL95522_DEFAULT_RS1) / BOARD_RS1)
 #define AC_CURRENT_TO_REG(CUR) (((CUR) * BOARD_RS1) / ISL95522_DEFAULT_RS1)
 
-#endif /* __CROS_EC_ISL95522_H */
+#endif /* PLATFORM_EC_DRIVER_CHARGER_ISL95522_H_ */

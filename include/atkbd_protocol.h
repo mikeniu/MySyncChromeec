@@ -10,8 +10,8 @@
  * https://archive.org/details/bitsavers_ibmpcat618ferenceMar86_25829277/page/n151/mode/2up
  */
 
-#ifndef __CROS_EC_ATKBD_PROTOCOL_H
-#define __CROS_EC_ATKBD_PROTOCOL_H
+#ifndef PLATFORM_EC_INCLUDE_ATKBD_PROTOCOL_H_
+#define PLATFORM_EC_INCLUDE_ATKBD_PROTOCOL_H_
 
 #define ATKBD_CMD_OK_GETID 0xe8
 #define ATKBD_CMD_EX_ENABLE 0xea
@@ -42,4 +42,4 @@
 #define ATKBD_RET_INTERNAL_FAIL 0xfd
 #define ATKBD_RET_RESEND 0xfe
 
-#endif /* __CROS_EC_ATKBD_PROTOCOL_H */
+#endif /* PLATFORM_EC_INCLUDE_ATKBD_PROTOCOL_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_BMA4XX_H_
-#define ZEPHYR_INCLUDE_EMUL_EMUL_BMA4XX_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BMA4XX_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BMA4XX_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c_emul.h>
@@ -76,4 +76,4 @@ uint8_t bma4xx_emul_get_interrupt_config(const struct emul *emul,
 struct i2c_common_emul_data *
 emul_bma4xx_get_i2c_common_data(const struct emul *emul);
 
-#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_BMA4XX_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BMA4XX_H_ */

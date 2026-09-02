@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __MOCK_TCPCI_I2C_MOCK_H
-#define __MOCK_TCPCI_I2C_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_TCPCI_I2C_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_TCPCI_I2C_MOCK_H_
 
 #include "common.h"
 #include "usb_pd.h"
@@ -60,4 +60,4 @@ void tcpci_register_dump(void);
 }
 #endif
 
-#endif /* __MOCK_TCPCI_I2C_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_TCPCI_I2C_MOCK_H_ */

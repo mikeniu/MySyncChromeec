@@ -5,8 +5,8 @@
 
 /* Keyboard scanner module for Chrome EC */
 
-#ifndef __CROS_EC_KEYBOARD_SCAN_H
-#define __CROS_EC_KEYBOARD_SCAN_H
+#ifndef PLATFORM_EC_INCLUDE_KEYBOARD_SCAN_H_
+#define PLATFORM_EC_INCLUDE_KEYBOARD_SCAN_H_
 
 #include "common.h"
 #include "compile_time_macros.h"
@@ -233,4 +233,4 @@ void test_keyboard_scan_debounce_reset(void);
 }
 #endif
 
-#endif /* __CROS_EC_KEYBOARD_SCAN_H */
+#endif /* PLATFORM_EC_INCLUDE_KEYBOARD_SCAN_H_ */

@@ -5,8 +5,8 @@
 
 /* Input devices using Matrix Keyboard Protocol [MKBP] events for Chrome EC */
 
-#ifndef __CROS_EC_MKBP_INPUT_DEVICES_H
-#define __CROS_EC_MKBP_INPUT_DEVICES_H
+#ifndef PLATFORM_EC_INCLUDE_MKBP_INPUT_DEVICES_H_
+#define PLATFORM_EC_INCLUDE_MKBP_INPUT_DEVICES_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -37,4 +37,4 @@ uint32_t mkbp_get_switch_state(void);
 }
 #endif
 
-#endif /* __CROS_EC_MKBP_INPUT_DEVICES_H */
+#endif /* PLATFORM_EC_INCLUDE_MKBP_INPUT_DEVICES_H_ */

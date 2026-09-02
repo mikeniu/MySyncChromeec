@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_DRIVER_IOEXPANDER_TCA64XXA_H_
-#define __CROS_EC_DRIVER_IOEXPANDER_TCA64XXA_H_
+#ifndef PLATFORM_EC_DRIVER_IOEXPANDER_TCA64XXA_H_
+#define PLATFORM_EC_DRIVER_IOEXPANDER_TCA64XXA_H_
 
 /* io-expander driver specific flag bit for tca6416a */
 #define IOEX_FLAGS_TCA64XXA_FLAG_VER_TCA6416A IOEX_FLAGS_CUSTOM_BIT(24)
@@ -25,4 +25,4 @@
 
 extern const struct ioexpander_drv tca64xxa_ioexpander_drv;
 
-#endif /* __CROS_EC_DRIVER_IOEXPANDER_TCA64XXA_H_ */
+#endif /* PLATFORM_EC_DRIVER_IOEXPANDER_TCA64XXA_H_ */

@@ -4,8 +4,8 @@
  */
 /* BMI accelerometer and gyro common definitions for Chrome EC */
 
-#ifndef __CROS_EC_DRIVER_ACCELGYRO_BMI_COMMON_PUBLIC_H
-#define __CROS_EC_DRIVER_ACCELGYRO_BMI_COMMON_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_ACCELGYRO_BMI_COMMON_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_ACCELGYRO_BMI_COMMON_PUBLIC_H_
 
 /* Min and Max sampling frequency in mHz */
 #define BMI_ACCEL_MIN_FREQ 12500
@@ -28,4 +28,4 @@ struct bmi_drv_data_t {
 #endif
 };
 
-#endif /* __CROS_EC_DRIVER_ACCELGYRO_BMI_COMMON_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_ACCELGYRO_BMI_COMMON_PUBLIC_H_ */

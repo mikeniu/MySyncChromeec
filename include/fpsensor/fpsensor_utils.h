@@ -5,8 +5,8 @@
 
 /* Misc utilities for fingerprint management */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_UTILS_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_UTILS_H
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_UTILS_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_UTILS_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -51,4 +51,4 @@ bool skip_image_offset(enum fp_capture_type capture_type);
  */
 const std::string fourcc_to_string(uint32_t value);
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_UTILS_H */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_UTILS_H_ */

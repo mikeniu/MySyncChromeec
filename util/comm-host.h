@@ -6,8 +6,8 @@
  * the EC. This abstracts them.
  */
 
-#ifndef __UTIL_COMM_HOST_H
-#define __UTIL_COMM_HOST_H
+#ifndef PLATFORM_EC_UTIL_COMM_HOST_H_
+#define PLATFORM_EC_UTIL_COMM_HOST_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -114,4 +114,4 @@ extern int (*ec_readmem)(int offset, int bytes, void *dest);
 extern int (*ec_pollevent)(unsigned long mask, void *buffer, size_t buf_size,
 			   int timeout);
 
-#endif /* __UTIL_COMM_HOST_H */
+#endif /* PLATFORM_EC_UTIL_COMM_HOST_H_ */

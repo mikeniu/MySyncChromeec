@@ -4,8 +4,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __UTIL_UUT_CMD_H
-#define __UTIL_UUT_CMD_H
+#ifndef PLATFORM_EC_UTIL_UUT_CMD_H_
+#define PLATFORM_EC_UTIL_UUT_CMD_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -67,4 +67,4 @@ void cmd_disp_flash_erase_sect(uint8_t *resp_buf, uint32_t dev_num);
 void cmd_disp_exec_exit(uint8_t *resp_buf);
 void cmd_disp_exec_ret(uint8_t *resp_buf);
 
-#endif /* __UTIL_UUT_CMD_H */
+#endif /* PLATFORM_EC_UTIL_UUT_CMD_H_ */

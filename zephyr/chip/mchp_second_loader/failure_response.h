@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef FAILURE_RESPONSE_H
-#define FAILURE_RESPONSE_H
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_FAILURE_RESPONSE_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_FAILURE_RESPONSE_H_
 /* Failure Response Status as defined in
  * Crisis_Mode-cmdSequence_v2.pdf
  */
@@ -21,4 +21,4 @@
 #define RESP_CMD_POS 0
 #define RESP_FAILURE_STATUS_POS 1
 
-#endif /* #ifndef FAILURE_RESPONSE_H */
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_FAILURE_RESPONSE_H_ */

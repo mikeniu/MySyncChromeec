@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_DRIVERS_USBC_ALT_MODE_TEST_USBC_ALT_MODE_H_
-#define ZEPHYR_TEST_DRIVERS_USBC_ALT_MODE_TEST_USBC_ALT_MODE_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_USBC_ALT_MODE_INCLUDE_TEST_USBC_ALT_MODE_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_USBC_ALT_MODE_INCLUDE_TEST_USBC_ALT_MODE_H_
 
 #include "compile_time_macros.h"
 #include "emul/tcpc/emul_tcpci.h"
@@ -91,4 +91,5 @@ void connect_partner_to_port(const struct emul *tcpc_emul,
 void disconnect_partner_from_port(const struct emul *tcpc_emul,
 				  const struct emul *charger_emul);
 
-#endif /* ZEPHYR_TEST_DRIVERS_USBC_ALT_MODE_TEST_USBC_ALT_MODE_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_USBC_ALT_MODE_INCLUDE_TEST_USBC_ALT_MODE_H_ \
+	*/
