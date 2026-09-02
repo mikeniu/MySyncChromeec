@@ -85,4 +85,8 @@
 #define HAS_TASK_PCHG 1
 #endif /* CONFIG_HAS_TASK_PCHG */
 
+#ifdef CONFIG_HAS_TASK_THERMAL
+#define HAS_TASK_THERMAL 1
+#endif /* CONFIG_HAS_TASK_THERMAL */
+
 #endif /* __CROS_EC_SHIMMED_TASKS_H */

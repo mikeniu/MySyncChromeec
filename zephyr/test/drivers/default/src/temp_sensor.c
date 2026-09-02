@@ -266,6 +266,34 @@ ZTEST_USER(temp_sensor, test_temp_sensor_pct2075_fail)
 	zassert_equal(MILLI_KELVIN_TO_KELVIN(mk2), temp);
 }
 
+/** Test that the THERMAL task initializes, runs, and updates cached
+ * temperatures */
+ZTEST_USER(temp_sensor, test_thermal_task)
+{
+#if !defined(HAS_TASK_THERMAL)
+	ztest_test_skip();
+#else
+	const struct emul *dev = EMUL_DT_GET(DT_NODELABEL(pct2075_emul));
+	int mk = MILLI_CELSIUS_TO_MILLI_KELVIN(55000);
+	int temp = 0;
+
+	/* Verify task ID is valid */
+	zassert_true(TASK_ID_THERMAL < TASK_ID_COUNT,
+		     "TASK_ID_THERMAL is invalid");
+
+	/* Update emulated temperature */
+	pct2075_emul_set_temp(dev, mk);
+
+	/* Wait for thermal_task to poll and update the RAM cache */
+	k_msleep(CONFIG_THERMAL_TASK_PERIOD_MS + 100);
+
+	zassert_equal(EC_SUCCESS, temp_sensor_read(TEMP_SENSOR_ID(DT_NODELABEL(
+							   named_pct2075)),
+						   &temp));
+	zassert_equal(MILLI_KELVIN_TO_KELVIN(mk), temp);
+#endif
+}
+
 /*
  * Test we see reasonable prints from temperature sensors on the console
  */

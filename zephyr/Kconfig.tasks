@@ -194,6 +194,36 @@ config TASK_MOTIONSENSE_STACK_SIZE
 
 endif # HAS_TASK_MOTIONSENSE
 
+config HAS_TASK_THERMAL
+	bool
+	help
+	  This turns on the thermal task which periodically reads temperature
+	  sensors and updates temperature caches.
+
+if HAS_TASK_THERMAL
+
+config TASK_THERMAL_STACK_SIZE
+	int "THERMAL task stack size"
+	default 1024
+	help
+	  The stack size of the thermal task.
+
+config TASK_THERMAL_PRIORITY
+	int "THERMAL task priority"
+	default 17
+	help
+	  Priority of the THERMAL task. Lower numerical values indicate
+	  higher priority. Defaults to 17 (matching sensor/motionsense priority).
+
+config THERMAL_TASK_PERIOD_MS
+	int "THERMAL task polling period in milliseconds"
+	default 1000
+	help
+	  The period in milliseconds at which the THERMAL task polls temperature
+	  sensors and updates cached values in RAM.
+
+endif # HAS_TASK_THERMAL
+
 config HAS_TASK_POWERBTN
 	bool
 	depends on PLATFORM_EC_POWER_BUTTON
