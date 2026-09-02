@@ -16,6 +16,23 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "05ada77a645d7c58757f3f950499662bb322c44f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8debaa0_ef97a448",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-02T15:57:14Z",
+      "side": 1,
+      "message": "I think this CL identifies a significant source of unnecessary work. In the case of repeated suspend/S0 bounce, I would think that it would be fine to debounce the transition and only apply the policy change when it was stable.\n\nI\u0027m not familiar enough with the PDC event hooks to know if this is the correct solution or if it\u0027s very similar to what I just described.\n\nI have a vague recollection of Keith describing work to debounce the power state transition, and I can\u0027t remember what the status of that change was.",
+      "revId": "05ada77a645d7c58757f3f950499662bb322c44f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
