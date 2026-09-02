@@ -17,6 +17,52 @@
       "isAi": true,
       "revId": "07bff9d6a651f37644d95ee361441480be518b0d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24c73147_c341c25f",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T21:07:18Z",
+      "side": 1,
+      "message": "Currently we\u0027re only compiling fingerprint-related functionality into RW, which is why this is necessary. It would be clearer and robust if you use a config that enables fingerprint functionality.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 24
+      },
+      "revId": "07bff9d6a651f37644d95ee361441480be518b0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9e04969_4ae77fe6",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T21:07:18Z",
+      "side": 1,
+      "message": "How about using `memcmp` here to check the entire buffer?\n\nOr loop over the buffer like you do in `test_fp_buffer_after_reboot`.",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 62
+      },
+      "revId": "07bff9d6a651f37644d95ee361441480be518b0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
