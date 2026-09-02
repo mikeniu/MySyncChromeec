@@ -4,8 +4,8 @@
  */
 
 /* header for an orientation sensor. */
-#ifndef __CROS_EC_MOTION_ORIENTATION_H
-#define __CROS_EC_MOTION_ORIENTATION_H
+#ifndef PLATFORM_EC_INCLUDE_MOTION_ORIENTATION_H_
+#define PLATFORM_EC_INCLUDE_MOTION_ORIENTATION_H_
 
 #include "chipset.h"
 #include "common.h"
@@ -29,4 +29,4 @@ void motion_orientation_update(const struct motion_sensor_t *s);
 }
 #endif
 
-#endif /* __CROS_EC_MOTION_ORIENTATION_H */
+#endif /* PLATFORM_EC_INCLUDE_MOTION_ORIENTATION_H_ */

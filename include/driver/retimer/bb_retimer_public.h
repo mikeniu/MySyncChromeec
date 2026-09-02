@@ -5,8 +5,8 @@
  * Public header for Intel Burnside Bridge - Thunderbolt/USB/DisplayPort Retimer
  */
 
-#ifndef __CROS_EC_DRIVER_RETIMER_BB_RETIMER_PUBLIC_H
-#define __CROS_EC_DRIVER_RETIMER_BB_RETIMER_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_RETIMER_BB_RETIMER_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_RETIMER_BB_RETIMER_PUBLIC_H_
 
 #include "usb_mux.h"
 
@@ -72,4 +72,4 @@ int bb_retimer_set_dp_connection(const struct usb_mux *me, bool enable);
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_RETIMER_BB_RETIMER_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_RETIMER_BB_RETIMER_PUBLIC_H_ */

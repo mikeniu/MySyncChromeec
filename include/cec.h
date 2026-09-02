@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_INCLUDE_CEC_H_
+#define PLATFORM_EC_INCLUDE_CEC_H_
+
 #include "ec_commands.h"
 #include "task.h"
 
@@ -259,4 +262,4 @@ void send_mkbp_event(int port, uint32_t event);
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_INCLUDE_CEC_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_ASCP_H_
-#define ZEPHYR_INCLUDE_ASCP_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_ASCP_ASCP_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_ASCP_ASCP_H_
 
 #include "ec_commands.h"
 
@@ -37,4 +37,4 @@ int ascp_get_sk_f(uint8_t *buffer, size_t len);
 }
 #endif
 
-#endif /* ZEPHYR_INCLUDE_ASCP_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_ASCP_ASCP_H_ */

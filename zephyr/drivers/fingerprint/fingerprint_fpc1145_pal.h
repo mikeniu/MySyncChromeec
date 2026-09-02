@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_FPC1145_PAL_SENSOR_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_FPC1145_PAL_SENSOR_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FPC1145_PAL_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FPC1145_PAL_H_
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -96,4 +96,4 @@ int __unused fpc_pal_delay_us(uint64_t us);
 void __unused fpc_pal_log_entry(const char *tag, int log_level,
 				const char *format, ...);
 
-#endif /* ZEPHYR_DRIVERS_FINGERPRINT_FPC1145_PAL_SENSOR_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FPC1145_PAL_H_ */

@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_INCLUDE_GPIO_LIST_H_
+#define PLATFORM_EC_INCLUDE_GPIO_LIST_H_
+
 #include "compile_time_macros.h"
 #include "gpio.h"
 #include "gpio_signal.h"
@@ -140,6 +143,7 @@ const int ioex_ih_count = ARRAY_SIZE(ioex_irq_handlers);
 
 #ifdef __cplusplus
 }
-#endif
 
 #include "gpio.wrap"
+
+#endif /* PLATFORM_EC_INCLUDE_GPIO_LIST_H_ */

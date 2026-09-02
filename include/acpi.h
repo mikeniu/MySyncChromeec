@@ -5,8 +5,8 @@
 
 /* ACPI EC interface block. */
 
-#ifndef __CROS_EC_ACPI_H
-#define __CROS_EC_ACPI_H
+#ifndef PLATFORM_EC_INCLUDE_ACPI_H_
+#define PLATFORM_EC_INCLUDE_ACPI_H_
 
 #include <stdint.h>
 
@@ -82,4 +82,4 @@ int acpi_dptf_get_profile_num(void);
 }
 #endif
 
-#endif /* __CROS_EC_ACPI_H */
+#endif /* PLATFORM_EC_INCLUDE_ACPI_H_ */

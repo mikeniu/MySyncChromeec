@@ -9,8 +9,8 @@
  * @brief Backend API for Smart Battery emulator
  */
 
-#ifndef __EMUL_SMART_BATTERY_H
-#define __EMUL_SMART_BATTERY_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SMART_BATTERY_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SMART_BATTERY_H_
 
 #include "emul/emul_common_i2c.h"
 
@@ -205,4 +205,4 @@ emul_smart_battery_get_i2c_common_data(const struct emul *emul);
  * @}
  */
 
-#endif /* __EMUL_SMART_BATTERY_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SMART_BATTERY_H_ */

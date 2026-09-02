@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ACCELGYRO_H
-#define __CROS_EC_ACCELGYRO_H
+#ifndef PLATFORM_EC_INCLUDE_ACCELGYRO_H_
+#define PLATFORM_EC_INCLUDE_ACCELGYRO_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -276,4 +276,4 @@ struct als_drv_data_t {
 }
 #endif
 
-#endif /* __CROS_EC_ACCELGYRO_H */
+#endif /* PLATFORM_EC_INCLUDE_ACCELGYRO_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __MOCK_FPSENSOR_DETECT_MOCK_H
-#define __MOCK_FPSENSOR_DETECT_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_DETECT_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_DETECT_MOCK_H_
 
 #include "fpsensor/fpsensor_detect.h"
 
@@ -29,4 +29,4 @@ extern struct mock_ctrl_fpsensor_detect mock_ctrl_fpsensor_detect;
 }
 #endif
 
-#endif /* __MOCK_FPSENSOR_DETECT_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_DETECT_MOCK_H_ */

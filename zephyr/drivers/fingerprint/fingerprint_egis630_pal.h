@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_PAL_SENSOR_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_PAL_SENSOR_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS630_PAL_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS630_PAL_H_
 
 #include <assert.h>
 #include <stdbool.h>
@@ -241,4 +241,4 @@ void *plat_calloc(size_t count, size_t size);
  */
 void *plat_realloc(void *data, size_t size);
 
-#endif /* ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_PAL_SENSOR_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS630_PAL_H_ */

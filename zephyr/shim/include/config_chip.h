@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+/** TODO(b/510249930): Switch to PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CONFIG_CHIP_H_
+ */
 #ifndef __CROS_EC_CONFIG_CHIP_H
 #define __CROS_EC_CONFIG_CHIP_H
 

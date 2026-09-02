@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_PANIC_LOG_H
-#define __CROS_EC_PANIC_LOG_H
+#ifndef PLATFORM_EC_INCLUDE_PANIC_LOG_H_
+#define PLATFORM_EC_INCLUDE_PANIC_LOG_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,4 +24,4 @@ void panic_log_write_str(const char *str, size_t size);
 }
 #endif
 
-#endif /* __CROS_EC_PANIC_LOG_H */
+#endif /* PLATFORM_EC_INCLUDE_PANIC_LOG_H_ */

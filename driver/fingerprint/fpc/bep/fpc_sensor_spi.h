@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FPC_SENSOR_SPI_H
-#define __CROS_EC_FPC_SENSOR_SPI_H
+#ifndef PLATFORM_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_SENSOR_SPI_H_
+#define PLATFORM_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_SENSOR_SPI_H_
 
 /**
  * @file    fpc_sensor_spi.h
@@ -101,4 +101,4 @@ __staticlib_hook int fpc_sensor_wfi(uint16_t timeout_ms,
 				    fpc_wfi_check_t enter_wfi,
 				    bool enter_wfi_mode);
 
-#endif /* __CROS_EC_FPC_SENSOR_SPI_H */
+#endif /* PLATFORM_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_SENSOR_SPI_H_ */

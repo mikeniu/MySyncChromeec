@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef UTIL_FOCALTECH_CLI_H_
-#define UTIL_FOCALTECH_CLI_H_
+#ifndef PLATFORM_EC_UTIL_FOCALTECH_CLI_H_
+#define PLATFORM_EC_UTIL_FOCALTECH_CLI_H_
 
 #include <algorithm>
 #include <array>
@@ -57,4 +57,4 @@ std::expected<void, Error> ExecuteCommand(const AppConfig& config,
 
 }  // namespace focaltech
 
-#endif  // UTIL_FOCALTECH_CLI_H_
+#endif /* PLATFORM_EC_UTIL_FOCALTECH_CLI_H_ */

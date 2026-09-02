@@ -8,8 +8,8 @@
  * @brief Device Policy Manager for PD Controllers
  */
 
-#ifndef __CROS_EC_PDC_DPM_H
-#define __CROS_EC_PDC_DPM_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_DPM_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_DPM_H_
 
 /**
  * @brief Evaluate port's first SNK_CAP PDO for current consideration
@@ -78,4 +78,4 @@ void pdc_dpm_tbt_set_reset_ongoing(int port);
  */
 void pdc_dpm_tbt_clear_port(int port);
 
-#endif /* __CROS_EC_PDC_DPM_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_DPM_H_ */

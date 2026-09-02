@@ -5,8 +5,8 @@
 
 /* Nissa shared common functionality */
 
-#ifndef __CROS_EC_NISSA_NISSA_COMMON_H__
-#define __CROS_EC_NISSA_NISSA_COMMON_H__
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_NISSA_COMMON_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_NISSA_COMMON_H_
 
 #include <ap_power/ap_power.h>
 
@@ -21,4 +21,4 @@
 __override_proto void board_power_change(struct ap_power_ev_callback *,
 					 struct ap_power_ev_data);
 
-#endif /* __CROS_EC_NISSA_NISSA_COMMON_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_NISSA_COMMON_H_ */
