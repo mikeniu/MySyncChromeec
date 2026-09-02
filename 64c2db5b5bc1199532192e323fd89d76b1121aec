@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45869b75_43a7bbb3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1132339
+      },
+      "writtenOn": "2026-09-02T10:12:49Z",
+      "side": 1,
+      "message": "I have tested this patch with the test item in [b:298697108](https://partnerissuetracker.corp.google.com/issues/298697108#comment9).\nIt cause regression (spurious ITIM event timer interrupt). We may need to think more to cover both cases.",
+      "revId": "64c2db5b5bc1199532192e323fd89d76b1121aec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
