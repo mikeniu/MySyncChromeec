@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbd78504_d1c7ef30",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 28
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T23:57:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/8ce9a117-700f-4107-aaf7-30a798029ada)]\n\n**Review Summary**\n* **Functionality**: The CL properly migrates all authentication unit tests in `fpsensor_auth_commands.cc` to use version 1 host commands (`EC_CMD_FP_TEMPLATE`, v1). The previously identified missing test `test_fp_command_commit_without_seed` has been correctly updated in this patchset to use `FP_TEMPLATE_LOAD` and `FP_TEMPLATE_DECRYPT`. The template decryption behavior accurately simulates asynchronous execution and polling.\n* **Security**: No security vulnerabilities introduced. The cryptographic testing logic correctly utilizes the updated struct versions.\n* **Style**: Code style is consistent with the project guidelines.\n* **Testing \u0026 Test Coverage**: Test coverage is solid and appropriate. The tests successfully validate the asynchronous template decryption and loading pathways under the new protocol version.\n* **CL Size \u0026 Scope**: The CL size is appropriate and efficiently scoped to the migration of the auth tests.",
+      "isAi": true,
+      "revId": "c6dd76c951e50d4bf8fbd43b23ddaf1ea9b4ba01",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
