@@ -109,7 +109,7 @@
 	/* EC_I2C_SENSOR */
 	label = "I2C_SENSOR";
 	status = "okay";
-	clock-frequency = <I2C_BITRATE_FAST>;
+	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
 	scl-gpios = <&gpiof 2 0>;
 	sda-gpios = <&gpiof 3 0>;
 	pinctrl-0 = <&i2c3_clk_gpf2_default
