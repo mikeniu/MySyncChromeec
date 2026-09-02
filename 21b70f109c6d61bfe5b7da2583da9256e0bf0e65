@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a8f86fee_b6af57f8",
+        "filename": "chip/host/otp_key.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-02T15:06:23Z",
+      "side": 1,
+      "message": "I do not believe so\n\nhttps://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec-legacy/chip/host/otp_key.c?q\u003dplatform%2Fec-legacy%20chip%2Fhost%2Fotp_key.c\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch\n\n`src/platform/ec-legacy/chip/host/otp_key.c` is a symlink to `src/platform/ec-legacy/chip/npcx/otp_key.c`\n\nWhat is the concern here?",
+      "parentUuid": "6a84c520_ee6c954e",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "43774824_c7e5bc72",
         "filename": "test/mock/otpi_mock.c",
         "patchSetId": 14
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b9ef4172_5e8ce92b",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-02T15:06:23Z",
+      "side": 1,
+      "message": "this is for testing purposes. It is a way for the mock to confirm that the irqs are disabled.",
+      "parentUuid": "43774824_c7e5bc72",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "08d045f7_6651d05c",
         "filename": "zephyr/shim/chip/npcx/otp_key.c",
         "patchSetId": 14
@@ -48,6 +84,24 @@
       "writtenOn": "2026-09-02T06:13:18Z",
       "side": 1,
       "message": "I guess it\u0027s really hard to test on hardware. Can we get confirmation from Nuvoton that the otpi_write doesn\u0027t use interrupts, since the code is in ROM and we don\u0027t see it?",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f646bf2_36fbb2d8",
+        "filename": "zephyr/shim/chip/npcx/otp_key.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-02T15:06:23Z",
+      "side": 1,
+      "message": "@chlin56@nuvoton.corp-partner.google.com\n@chchang19@nuvoton.corp-partner.google.com\n\ncan you please confirm that this change is ok for the Nuvoton platform?",
+      "parentUuid": "08d045f7_6651d05c",
       "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
