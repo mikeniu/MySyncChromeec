@@ -497,10 +497,13 @@ class Renode(Platform):
 
     def _skip_test_chudow(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
+            "boringssl_crypto",  # TODO(b/556233130)
             "flash_physical",  # TODO(b/485314159)
             "flash_protection",  # TODO(b/508240888)
             "flash_protection_rw",  # TODO(b/508240888)
             "fpsensor_auth_crypto_stateful",  # TODO(b/485316342)
+            "fpsensor_auth_crypto_stateless",  # TODO(b/556233130)
+            "fpsensor_crypto",  # TODO(b/556233130)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
             "flash_write_protect",  # TODO(b/485316223)
@@ -575,6 +578,7 @@ class Renode(Platform):
             "fpsensor_debug",  # TODO(b/474439863)
             "otp_key",  # TODO(b/483121090)
             "restricted_console",  # TODO(b/474439863)
+            "tpm_seed_clear",  # TODO(b/556233130)
             "zephyr_cpp_newlib",  # TODO(b/484366615)
             "zephyr_cpp_std20",  # TODO(b/484366615)
             "zephyr_drivers_entropy",  # TODO(b/484366615)
