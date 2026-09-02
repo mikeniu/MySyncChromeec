@@ -482,6 +482,14 @@ def main():
             extra_env_vars["PW_PIGWEED_CIPD_INSTALL_DIR"] = str(
                 protoc_path_obj.parent.parent
             )
+            extra_env_vars["PATH"] = (
+                f"{protoc_path_obj.parent}:{os.environ.get('PATH', '')}"
+            )
+            twister_cli.extend(
+                [
+                    f"-x=PW_PIGWEED_CIPD_INSTALL_DIR={protoc_path_obj.parent.parent}"
+                ]
+            )
         gcov_tool = None
         if intercepted_args.toolchain == "host/gnu":
             gcov_tool = "gcov"
