@@ -12,6 +12,8 @@ if("${dir_pw_third_party_nanopb}" STREQUAL "")
   set(dir_pw_third_party_nanopb "${ZEPHYR_NANOPB_MODULE_DIR}" CACHE PATH "" FORCE)
 endif()
 
+set(pw_protobuf_compiler_PYTHON_OUT_DIR "${CMAKE_BINARY_DIR}/generated/proto_py" CACHE PATH "" FORCE)
+
 # One time setup: Zephyr does some strange handling of nanopb by linking the
 # sources directly into Zephyr instead of creating a static library which we
 # can depend on, so we need to create a fake target to keep the linker happy.
@@ -899,6 +901,8 @@ function(ec_add_pw_log_zephyr_deps)
 	      pw_fsm.fsm_test
 	      pw_transport.service
 	      pw_transport.service_test
+	      pw_host_command.service
+	      pw_host_command.service_test
 	      vsensor.body_detection
       )
     if(TARGET ${lib} AND TARGET zephyr_generated_headers)

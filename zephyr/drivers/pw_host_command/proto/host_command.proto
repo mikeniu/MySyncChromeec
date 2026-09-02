@@ -1,0 +1,33 @@
+// Copyright 2026 The ChromiumOS Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto3";
+
+package chromiumos.ec;
+
+import "nanopb.proto";
+
+service HostCommandService
+{
+	// Execute a ChromeOS EC Host Command
+	rpc ExecuteCommand(HostCommandRequest) returns (HostCommandResponse);
+}
+
+message HostCommandRequest
+{
+	// Command ID (e.g. EC_CMD_GET_VERSION = 0x02, EC_CMD_HELLO = 0x04)
+	uint32 command = 1;
+	// Command version (typically 0)
+	uint32 version = 2;
+	// Input parameters payload
+	bytes request_payload = 3;
+}
+
+message HostCommandResponse
+{
+	// Return code (enum ec_status, 0 = EC_RES_SUCCESS)
+	uint32 ec_status = 1;
+	// Output response payload
+	bytes response_payload = 2;
+}

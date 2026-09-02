@@ -1,0 +1,109 @@
+diff --git a/pw_protobuf_compiler/py/pw_protobuf_compiler/generate_protos.py b/pw_protobuf_compiler/py/pw_protobuf_compiler/generate_protos.py
+index be031b19b..b3a7dc8cd 100644
+--- a/pw_protobuf_compiler/py/pw_protobuf_compiler/generate_protos.py
++++ b/pw_protobuf_compiler/py/pw_protobuf_compiler/generate_protos.py
+@@ -228,10 +228,14 @@ def protoc_python_args(
+     )
+ 
+     if args.generate_type_hints and shutil.which('protoc-gen-mypy'):
+-        flags += (
+-            '--mypy_out',
+-            args.out_dir,
+-        )
++        try:
++            import mypy_protobuf  # type: ignore # pylint: disable=unused-import
++            flags += (
++                '--mypy_out',
++                args.out_dir,
++            )
++        except ImportError:
++            pass
+ 
+     return flags
+ 
+@@ -293,11 +297,16 @@ def main(input_args) -> int:
+             ) as file:
+                 file.write(f'@echo off\npython {args.plugin_path.resolve()}\n')
+ 
+-            args.plugin_path = wrapper_script = Path(file.name)
+-            _LOG.debug('Using generated plugin wrapper %s', args.plugin_path)
++    protoc_exec = args.protoc
++    if not shutil.which(str(protoc_exec)):
++        cipd_dir = os.environ.get('PW_PIGWEED_CIPD_INSTALL_DIR')
++        if cipd_dir and (Path(cipd_dir) / 'bin' / 'protoc').exists():
++            protoc_exec = Path(cipd_dir) / 'bin' / 'protoc'
++        elif Path('/usr/local/google/home/asemjonovs/chromiumos/.cache/cipd/packages/infra/3pp/tools/protoc/linux-amd64/version:2@21.9/bin/protoc').exists():
++            protoc_exec = Path('/usr/local/google/home/asemjonovs/chromiumos/.cache/cipd/packages/infra/3pp/tools/protoc/linux-amd64/version:2@21.9/bin/protoc')
+ 
+     cmd: tuple[str | Path, ...] = (
+-        args.protoc,
++        protoc_exec,
+         *[f'-I{include_path}' for include_path in include_paths],
+         *protoc_common_args(args),
+         *DEFAULT_PROTOC_ARGS[args.language](args, include_paths),
+diff --git a/pw_rpc/public/pw_rpc/internal/call_allocator.h b/pw_rpc/public/pw_rpc/internal/call_allocator.h
+index 494b4eeaa..c4681f55d 100644
+--- a/pw_rpc/public/pw_rpc/internal/call_allocator.h
++++ b/pw_rpc/public/pw_rpc/internal/call_allocator.h
+@@ -16,11 +16,10 @@
+ #include "pw_assert/assert.h"
+ #include "pw_rpc/internal/config.h"
+ 
+-#include PW_RPC_MAKE_UNIQUE_PTR_INCLUDE
+-
+ #if PW_RPC_ALLOW_INVOCATIONS_ON_STACK
+ #define _PW_RPC_DECLARE_CALL(type, name, ...) type name(__VA_ARGS__)
+ #else
++#include PW_RPC_MAKE_UNIQUE_PTR_INCLUDE
+ #define _PW_RPC_DECLARE_CALL(type, name, ...)                    \
+   auto name##_ptr = PW_RPC_MAKE_UNIQUE_PTR(type, ##__VA_ARGS__); \
+   PW_ASSERT(name##_ptr != nullptr);                              \
+diff --git a/pw_thread_zephyr/public/pw_thread_zephyr/sleep_inline.h b/pw_thread_zephyr/public/pw_thread_zephyr/sleep_inline.h
+index 74fd8c1d9..905273c20 100644
+--- a/pw_thread_zephyr/public/pw_thread_zephyr/sleep_inline.h
++++ b/pw_thread_zephyr/public/pw_thread_zephyr/sleep_inline.h
+@@ -25,7 +25,7 @@
+ 
+ namespace pw::this_thread {
+ 
+-void sleep_until(chrono::SystemClock::time_point wakeup_time) {
++inline void sleep_until(chrono::SystemClock::time_point wakeup_time) {
+   // With 32-bit timers, sleeping until a time point is not supported. Instead
+   // fall back to sleep for the duration until the upcoming time point. Note
+   // that the "at least" wait is not needed as zephyr already will add this for
+diff --git a/third_party/nanopb/CMakeLists.txt b/third_party/nanopb/CMakeLists.txt
+index c93344874..e2221a0bd 100644
+--- a/third_party/nanopb/CMakeLists.txt
++++ b/third_party/nanopb/CMakeLists.txt
+@@ -54,6 +54,13 @@ pw_proto_library(pw_third_party.nanopb.proto
+     "${dir_pw_third_party_nanopb}/generator/proto"
+ )
+ 
++find_program(PW_PROTOC_BINARY protoc
++  PATHS
++    "${PW_PIGWEED_CIPD_INSTALL_DIR}/bin"
++    "$ENV{PW_PIGWEED_CIPD_INSTALL_DIR}/bin"
++    "/usr/local/google/home/asemjonovs/chromiumos/.cache/cipd/packages/infra/3pp/tools/protoc/linux-amd64/version:2@21.9/bin"
++)
++
+ # Generates nanopb_pb2.py, which is needed to compile protobufs with Nanopb.
+ add_custom_command(
+   COMMAND
+@@ -61,7 +68,7 @@ add_custom_command(
+     "${CMAKE_CURRENT_LIST_DIR}/generate_nanopb_proto.py"
+     --nanopb-root "${dir_pw_third_party_nanopb}"
+     --nanopb-pb2-dir "${_pw_protobuf_compiler_NANOPB_PB2_DIR}"
+-    --protoc-binary "$ENV{PW_PIGWEED_CIPD_INSTALL_DIR}/bin/protoc"
++    --protoc-binary "${PW_PROTOC_BINARY}"
+   DEPENDS
+     "${CMAKE_CURRENT_LIST_DIR}/generate_nanopb_proto.py"
+     "${dir_pw_third_party_nanopb}/pb.h"
+@@ -81,7 +88,7 @@ add_custom_command(
+     "${dir_pw_third_party_nanopb}/generator/protoc"
+     "${dir_pw_third_party_nanopb}/generator/protoc-gen-nanopb.bat"
+     "${dir_pw_third_party_nanopb}/generator/protoc.bat"
+-    "$ENV{PW_PIGWEED_CIPD_INSTALL_DIR}/bin/protoc"
++    "${PW_PROTOC_BINARY}"
+   OUTPUT
+     "${dir_pw_third_party_nanopb}/generator/proto/nanopb_pb2.py"
+ )

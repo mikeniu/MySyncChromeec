@@ -1,0 +1,37 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config PLATFORM_EC_PW_HOST_COMMAND
+	bool "Pigweed RPC Host Command Service"
+	depends on ZEPHYR_PIGWEED_MODULE && NANOPB
+	select PIGWEED_SYNC_MUTEX
+	select PIGWEED_THREAD
+	select PIGWEED_THREAD_SLEEP
+	select PIGWEED_RPC_SERVER
+	help
+	  Enables the Pigweed RPC service to receive and execute ChromeOS EC
+	  host commands over Pigweed RPC.
+
+choice PIGWEED_LOG
+	default PIGWEED_LOG_STRING if PLATFORM_EC_PW_HOST_COMMAND_UART_SERVER
+endchoice
+
+if PLATFORM_EC_PW_HOST_COMMAND
+
+config PLATFORM_EC_PW_HOST_COMMAND_UART_SERVER
+	bool "Enable HDLC UART RPC Server for Host Commands"
+	default y
+	depends on !ARCH_POSIX && !ZTEST
+	help
+	  Spawns a background thread listening for HDLC-encoded Pigweed RPC
+	  host commands over the EC UART device.
+
+config PLATFORM_EC_PW_HOST_COMMAND_MAX_PAYLOAD_SIZE
+	int "Max payload size for Pigweed RPC Host Commands"
+	default 512
+	help
+	  Specifies the maximum size in bytes for host command request and
+	  response payloads transmitted over Pigweed RPC.
+
+endif # PLATFORM_EC_PW_HOST_COMMAND
