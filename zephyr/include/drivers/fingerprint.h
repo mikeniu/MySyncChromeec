@@ -8,8 +8,8 @@
  * @brief API for fingerprint sensors
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_
-#define ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_
 
 /**
  * @brief Fingerprint sensor Interface
@@ -645,4 +645,4 @@ static inline int z_impl_fingerprint_finger_status(const struct device *dev)
  * @}
  */
 #include <zephyr/syscalls/fingerprint.h>
-#endif /* ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_ */

@@ -5,8 +5,8 @@
 
 /* SHA-256 functions */
 
-#ifndef __CROS_EC_SHA256_H
-#define __CROS_EC_SHA256_H
+#ifndef PLATFORM_EC_INCLUDE_SHA256_H_
+#define PLATFORM_EC_INCLUDE_SHA256_H_
 
 #include "common.h"
 
@@ -53,4 +53,4 @@ void hmac_SHA256(uint8_t *output, const uint8_t *key, const int key_len,
 }
 #endif
 
-#endif /* __CROS_EC_SHA256_H */
+#endif /* PLATFORM_EC_INCLUDE_SHA256_H_ */

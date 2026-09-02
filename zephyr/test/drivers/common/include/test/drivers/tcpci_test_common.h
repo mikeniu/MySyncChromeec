@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __TCPCI_TEST_COMMON_H
-#define __TCPCI_TEST_COMMON_H
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_TCPCI_TEST_COMMON_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_TCPCI_TEST_COMMON_H_
 
 #include "stubs.h"
 
@@ -261,4 +261,5 @@ void test_tcpci_hard_reset_reinit(const struct emul *emul,
 void test_tcpci_get_vbus_voltage(const struct emul *emul,
 				 struct i2c_common_emul_data *common_data,
 				 enum usbc_port port);
-#endif /* __TCPCI_TEST_COMMON_H */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_TCPCI_TEST_COMMON_H_ \
+	*/

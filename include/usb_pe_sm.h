@@ -5,8 +5,8 @@
 
 /* USB Policy Engine module */
 
-#ifndef __CROS_EC_USB_PE_H
-#define __CROS_EC_USB_PE_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PE_SM_H_
+#define PLATFORM_EC_INCLUDE_USB_PE_SM_H_
 
 #include "usb_pd_tcpm.h"
 #include "usb_sm.h"
@@ -248,4 +248,4 @@ bool pd_vbus_valid_for_bist(int port);
 }
 #endif
 
-#endif /* __CROS_EC_USB_PE_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PE_SM_H_ */

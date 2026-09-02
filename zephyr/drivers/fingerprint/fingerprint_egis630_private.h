@@ -5,8 +5,8 @@
 
 /* Private sensor interface */
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_PRIVATE_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_PRIVATE_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS630_PRIVATE_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS630_PRIVATE_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -288,4 +288,5 @@ egis_api_return_t egis_apply_calibration_data(uint8_t *data_addr,
  */
 int fp_sensor_finger_status(void);
 
-#endif /* ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_PRIVATE_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS630_PRIVATE_H_ \
+	*/

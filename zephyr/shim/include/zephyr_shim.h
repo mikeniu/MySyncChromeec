@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __BOARD_H
-#define __BOARD_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_SHIM_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_SHIM_H_
 
 #include "common.h"
 
@@ -41,4 +41,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __BOARD_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_SHIM_H_ */

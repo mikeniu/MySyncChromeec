@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_ISL9241_H
-#define EMUL_ISL9241_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ISL9241_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ISL9241_H_
 
 #include <zephyr/drivers/emul.h>
 
@@ -33,4 +33,4 @@ void isl9241_emul_set_vbus(const struct emul *emul, int vbus_mv);
  */
 void isl9241_emul_set_vsys(const struct emul *emul, int vsys_mv);
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ISL9241_H_ */

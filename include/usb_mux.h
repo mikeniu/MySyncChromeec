@@ -5,8 +5,8 @@
 
 /* USB mux driver */
 
-#ifndef __CROS_EC_USB_MUX_H
-#define __CROS_EC_USB_MUX_H
+#ifndef PLATFORM_EC_INCLUDE_USB_MUX_H_
+#define PLATFORM_EC_INCLUDE_USB_MUX_H_
 
 #include "ec_commands.h"
 #include "i2c.h"
@@ -378,4 +378,4 @@ bool usb_mux_set_completed(int port);
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_INCLUDE_USB_MUX_H_ */

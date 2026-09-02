@@ -12,8 +12,8 @@
 extern "C" {
 #endif
 
-#ifndef __CROS_EC_TEST_ENUM_STINGS_H
-#define __CROS_EC_TEST_ENUM_STINGS_H
+#ifndef PLATFORM_EC_INCLUDE_TESTS_ENUM_STRINGS_H_
+#define PLATFORM_EC_INCLUDE_TESTS_ENUM_STRINGS_H_
 
 #ifndef TEST_BUILD
 #error enum_strings.h can only be used in test builds
@@ -99,4 +99,4 @@ static inline const char *from_pd_data_role(enum pd_data_role value)
 }
 #endif
 
-#endif /* __CROS_EC_TEST_ENUM_STINGS_H */
+#endif /* PLATFORM_EC_INCLUDE_TESTS_ENUM_STRINGS_H_ */
