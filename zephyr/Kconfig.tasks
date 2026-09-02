@@ -194,6 +194,22 @@ config TASK_MOTIONSENSE_STACK_SIZE
 
 endif # HAS_TASK_MOTIONSENSE
 
+config HAS_TASK_THERMAL
+	bool
+	help
+	  This turns on the thermal task which periodically reads temperature
+	  sensors and updates temperature caches.
+
+if HAS_TASK_THERMAL
+
+config TASK_THERMAL_STACK_SIZE
+	int "THERMAL task stack size"
+	default 1536
+	help
+	  The stack size of the thermal task.
+
+endif # HAS_TASK_THERMAL
+
 config HAS_TASK_POWERBTN
 	bool
 	depends on PLATFORM_EC_POWER_BUTTON

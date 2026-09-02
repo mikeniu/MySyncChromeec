@@ -68,6 +68,8 @@ enum {
 /* Helper macro to set tasks priorities */
 #define EC_TASK_PRIORITY(prio) K_PRIO_PREEMPT(EC_TASK_PRIO_COUNT - prio - 1)
 
+#define EC_TASK_THERMAL_PRIO EC_TASK_MOTIONSENSE_PRIO
+
 /*
  * List of CROS_EC_TASK items. See CONFIG_TASK_LIST in platform/ec's config.h
  * for more information.  For tests that want their own custom tasks, use
@@ -109,6 +111,11 @@ enum {
 		    (CROS_EC_TASK(MOTIONSENSE, motion_sense_task, 0,       \
 				  CONFIG_TASK_MOTIONSENSE_STACK_SIZE,      \
 				  EC_TASK_MOTIONSENSE_PRIO, 0)),           \
+		    ())                                                    \
+	COND_CODE_1(HAS_TASK_THERMAL,                                      \
+		    (CROS_EC_TASK(THERMAL, thermal_task, 0,                \
+				  CONFIG_TASK_THERMAL_STACK_SIZE,          \
+				  EC_TASK_THERMAL_PRIO, 0)),               \
 		    ())                                                    \
 	IF_ENABLED(HAS_TASK_USB_MUX,                                       \
 		   (CROS_EC_TASK(USB_MUX, usb_mux_task, 0,                 \
@@ -225,6 +232,7 @@ enum {
 	CROS_EC_TASK(CHARGER, NULL, 0, 0, EC_TASK_CHARGER_PRIO, 0)             \
 	CROS_EC_TASK(CHIPSET, NULL, 0, 0, EC_TASK_CHIPSET_PRIO, 0)             \
 	CROS_EC_TASK(MOTIONSENSE, NULL, 0, 0, EC_TASK_MOTIONSENSE_PRIO, 0)     \
+	CROS_EC_TASK(THERMAL, NULL, 0, 0, EC_TASK_THERMAL_PRIO, 0)             \
 	CROS_EC_TASK(USB_MUX, NULL, 0, 0, EC_TASK_USB_MUX_PRIO, 0)             \
 	CROS_EC_TASK(HOSTCMD, NULL, 0, 0, EC_TASK_HOSTCMD_PRIO, 0)             \
 	CROS_EC_TASK(KEYPROTO, NULL, 0, 0, EC_TASK_KEYPROTO_PRIO, 0)           \
