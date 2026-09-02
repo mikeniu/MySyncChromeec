@@ -22,6 +22,29 @@
       },
       "revId": "8fb1e3ac5170021a91ce3cff249449f2f4e977b6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7490e40_01924390",
+        "filename": "zephyr/test/hwtest/src/fpsensor_auth_crypto_stateful.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T21:57:07Z",
+      "side": 1,
+      "message": "Gemini suggested simplifications (verify):\n\n----\n\n### 1. Flatten the loop in `test_derive_encryption_key_invalid_info_size`\n\nThe `for (bool enable_auth : { false, true })` loop with its internal `if/else` state toggling adds unnecessary cognitive load. Because you correctly added `fpsensor_auth_crypto_stateful_after` to clear the `FP_CONTEXT_STATUS_SESSION_ESTABLISHED` flag after every test, you don\u0027t need to manually restore the state at the end of the test. You can flatten this into simple sequential assertions:\n\n```cpp\nZTEST(fpsensor_auth_crypto_stateful,\n      test_derive_encryption_key_invalid_info_size)\n{\n\tFpEncryptionKey key{};\n\tconstexpr std::array\u003cuint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES\u003e salt{};\n\tconst std::array\u003cuint8_t, SHA256_DIGEST_LENGTH - 1\u003e short_info{};\n\tconst std::array\u003cuint8_t, SHA256_DIGEST_LENGTH + 1\u003e long_info{};\n\n\t/* Verify invalid info sizes fail under Classic flow */\n\tzassert_equal(derive_encryption_key(key, salt, short_info, kFakeTpmSeed),\n\t\t      EC_ERROR_INVAL);\n\tzassert_equal(derive_encryption_key(key, salt, long_info, kFakeTpmSeed),\n\t\t      EC_ERROR_INVAL);\n\n\t/* Switch to Fingerprint Auth flow */\n\tglobal_context.fp_encryption_status |\u003d\n\t\tFP_CONTEXT_STATUS_SESSION_ESTABLISHED;\n\n\t/* Verify invalid info sizes fail under Fingerprint Auth flow */\n\tzassert_equal(derive_encryption_key(key, salt, short_info, kFakeTpmSeed),\n\t\t      EC_ERROR_INVAL);\n\tzassert_equal(derive_encryption_key(key, salt, long_info, kFakeTpmSeed),\n\t\t      EC_ERROR_INVAL);\n}\n\n```\n\n*Note: Also updated the arrays above to use `{}` instead of `{ 0 }` for value initialization, which is the preferred C++ style.*\n\n### 2. Extract the duplicated `input` payload\n\nThe new tests (`test_fp_decrypt_classic_in_fingerprint_auth_flow_fails` and `test_fp_decrypt_fingerprint_auth_in_classic_flow_fails`) copy-paste the exact same 32-byte `input` array that is also used in three of the existing tests.\n\nYou can extract this to a file-level `constexpr` array right below `kFakeUserId` and `kFakeTpmSeed` to remove this duplication across all 5 tests:\n\n```cpp\nconstexpr std::array\u003cuint8_t, 32\u003e kFakeInput \u003d { \n\t0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, \n\t6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2 \n};\n\n```\n\n### 3. Rely on `fpsensor_auth_crypto_stateful_after` for cleanup\n\nIn `test_fp_decrypt_fingerprint_auth_in_classic_flow_fails`, the code manually toggles the global state off at the end:\n\n```cpp\n\t/* Switch to Classic flow. */\n\tglobal_context.fp_encryption_status \u0026\u003d\n\t\t~FP_CONTEXT_STATUS_SESSION_ESTABLISHED;\n\n```\n\nBecause the `ZTEST_SUITE` now includes the `_after` teardown fixture that runs unconditionally at the end of the test to do this exact bitwise cleanup, you can safely rely on the fixture to handle it when the test exits. You only need to toggle it manually mid-test if you are actively testing the transition (which you are doing here, so keeping it in this specific test is fine, but you don\u0027t need to worry about restoring state at the *end* of any test).",
+      "range": {
+        "startLine": 180,
+        "startChar": 0,
+        "endLine": 182,
+        "endChar": 1
+      },
+      "revId": "8fb1e3ac5170021a91ce3cff249449f2f4e977b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
