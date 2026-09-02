@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48c3075a_447b581a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-02T20:26:07Z",
+      "side": 1,
+      "message": "This CL also doesn\u0027t quite match the version on `main`. (Compare `build.mk` deltas.)",
+      "revId": "c63fe0054fc515e680b285d2139a7233f67c032b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
