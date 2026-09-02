@@ -379,3 +379,7 @@
 	enable-pins = <&en_pp5000_usb_a0_vbus
 		       &en_pp5000_usb_a1_vbus_x>;
 };
+
+&i2c3 {
+	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
+};
