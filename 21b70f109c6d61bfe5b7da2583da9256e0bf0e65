@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8a93e83d_efde5cf8",
+        "filename": "chip/host/otp_key.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-02T17:14:18Z",
+      "side": 1,
+      "message": "I was concerned about adding irq_lock and unlock without ifdefs.",
+      "parentUuid": "a8f86fee_b6af57f8",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "43774824_c7e5bc72",
         "filename": "test/mock/otpi_mock.c",
         "patchSetId": 14
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "this is for testing purposes. It is a way for the mock to confirm that the irqs are disabled.",
       "parentUuid": "43774824_c7e5bc72",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c0da67a_05049237",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-02T17:14:18Z",
+      "side": 1,
+      "message": "I don\u0027t think it is mock\u0027s job to check such things. Additionally, having the irqs enabled during OTP modification is not a bad thing by default.",
+      "parentUuid": "b9ef4172_5e8ce92b",
       "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
