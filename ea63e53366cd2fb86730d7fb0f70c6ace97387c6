@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8370b78a_e6636e97",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-09-02T22:48:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "541427e9_20a45be5",
+      "range": {
+        "startLine": 359,
+        "startChar": 7,
+        "endLine": 359,
+        "endChar": 15
+      },
+      "revId": "ea63e53366cd2fb86730d7fb0f70c6ace97387c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a3f2adb6_360fda38",
@@ -64,6 +88,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74ac01d2_0b4c589f",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1655,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-09-02T22:48:41Z",
+      "side": 1,
+      "message": "Updated the unit test",
+      "parentUuid": "a3f2adb6_360fda38",
+      "range": {
+        "startLine": 1653,
+        "startChar": 0,
+        "endLine": 1655,
+        "endChar": 21
+      },
+      "revId": "ea63e53366cd2fb86730d7fb0f70c6ace97387c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7fb80995_0e2bd165",
@@ -77,6 +125,30 @@
       "writtenOn": "2026-09-02T18:10:45Z",
       "side": 1,
       "message": "Add a comment that the caller guarantees this is only called for SOP messages.",
+      "range": {
+        "startLine": 3140,
+        "startChar": 7,
+        "endLine": 3140,
+        "endChar": 18
+      },
+      "revId": "ea63e53366cd2fb86730d7fb0f70c6ace97387c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "101036a4_bc78cf2f",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 3140,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-09-02T22:48:41Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "7fb80995_0e2bd165",
       "range": {
         "startLine": 3140,
         "startChar": 7,
