@@ -16,6 +16,8 @@
 #include "temp_sensor/thermistor.h"
 #include "temp_sensor/tmp112.h"
 
+#include <zephyr/kernel.h>
+
 #if DT_HAS_COMPAT_STATUS_OKAY(TEMP_SENSORS_COMPAT)
 
 BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(TEMP_SENSORS_COMPAT) == 1,
@@ -370,6 +372,16 @@ void temp_sensors_update(void)
 		sensor->zephyr_info->update_temperature(sensor->idx);
 	}
 }
+#ifdef HAS_TASK_THERMAL
+void thermal_task(void *u)
+{
+	while (1) {
+		temp_sensors_update();
+		k_msleep(CONFIG_THERMAL_TASK_PERIOD_MS);
+	}
+}
+#else
 DECLARE_HOOK(HOOK_SECOND, temp_sensors_update, HOOK_PRIO_TEMP_SENSOR);
+#endif
 
 #endif /* DT_HAS_COMPAT_STATUS_OKAY(TEMP_SENSORS_COMPAT) */
