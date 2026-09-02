@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd89a478_01695a94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T22:23:55Z",
+      "side": 1,
+      "message": "We should still keep all the v0 versions, right? Don\u0027t we want to keep testing both v0 and v1 as long as we have code calling v0 (e.g., `biod`)?",
+      "revId": "e44d563b8cd34455fa64f61084164538d4893838",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
