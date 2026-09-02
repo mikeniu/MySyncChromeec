@@ -36,6 +36,11 @@ int charge_manager_get_active_charge_port(void)
 	return 0;
 }
 
+int charge_manager_get_active_charge_port_no_lock(void)
+{
+	return 0;
+}
+
 int charge_manager_get_charger_voltage(void)
 {
 	return 0;
