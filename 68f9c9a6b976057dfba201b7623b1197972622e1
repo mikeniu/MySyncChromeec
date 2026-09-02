@@ -96,6 +96,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "dec5f0d9_b3fd4da7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-02T18:30:06Z",
+      "side": 1,
+      "message": "@tomhughes@chromium.org\n\nYes, invalid templates are removed:\n\nhttps://source.corp.google.com/h/arsp/platform/superproject/+/main:system/desktop/fingerprint/hal/src/session.rs;l\u003d167?q\u003d%22for%20(id,%20record)%20in%20storage.iter()%20%7B%22\u0026ss\u003dh%2Farsp%2Fplatform%2Fsuperproject%2F%2B%2Frefs%2Fheads%2Fmain:system%2Fdesktop%2Ffingerprint%2Fhal%2F#:~:text\u003d166-,167,-168",
+      "parentUuid": "5e4c26f1_fccacd6c",
+      "range": {
+        "startLine": 11,
+        "startChar": 28,
+        "endLine": 13,
+        "endChar": 55
+      },
+      "revId": "68f9c9a6b976057dfba201b7623b1197972622e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "4de0dd27_8b9a702d",
