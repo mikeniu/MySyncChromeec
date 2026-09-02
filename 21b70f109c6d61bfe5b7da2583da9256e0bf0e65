@@ -109,6 +109,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1ff15bc9_7972c9f9",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-02T17:15:58Z",
+      "side": 1,
+      "message": "fine with me. WIthout this, we will not be able to test that IRQ are disabled.",
+      "parentUuid": "2c0da67a_05049237",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "08d045f7_6651d05c",
         "filename": "zephyr/shim/chip/npcx/otp_key.c",
         "patchSetId": 14
