@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4f055f8_f9758eef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T22:05:51Z",
+      "side": 1,
+      "message": "It would be safest to use `compare-builds` to make sure this CL doesn\u0027t introduce any changes in the firmware.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 55
+      },
+      "revId": "e97909f0887ab3f353b3a0c7a8cd4985cec2677f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a5a1837_4695b249",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T22:05:51Z",
+      "side": 1,
+      "message": "Let\u0027s abandon this CL:\n\n----\n\n### 1. Security \u0026 Functionality: Element Count vs. Byte Count (Critical)\n\n* **The Issue:** `std::array::size()` returns the **number of elements** in the container, whereas C-style memory functions like `memcpy` and `OPENSSL_cleanse` expect the **number of bytes**.\n* **Security Impact:** If `user_id` or `tpm_seed` ever use an underlying type larger than 1 byte (e.g., `uint32_t`), `.size()` will be strictly less than the total byte size of the array. Consequently, `OPENSSL_cleanse` will only wipe a fraction of the buffer. This leaves sensitive cryptographic material (like the TPM seed) resident in memory, creating a significant security vulnerability.\n* **Functional Impact:** Similarly, `memcpy` will only copy a fraction of the expected data, silently resulting in truncated keys or IDs, which will break subsequent cryptographic operations and authentication.\n\n### 2. Code Style \u0026 Semantics\n\n* **Semantic Mismatch:** Even if `user_id` and `tpm_seed` are defined as `std::array\u003cuint8_t, N\u003e` (meaning `.size()` happens to equal the byte count mathematically), using `.size()` for a byte-length parameter is semantically incorrect C++. It creates a fragile dependency where the correctness of a memory operation relies on the assumption that `sizeof(value_type) \u003d\u003d 1`.\n* **Misguided Consistency:** C-style APIs (`memcpy`, `memset`, `OPENSSL_cleanse`) operate on raw memory blocks. Passing `sizeof(buffer)` is the universally accepted, standard, and safest pattern for these specific functions, as it guarantees the entire memory footprint is accounted for regardless of the underlying element type.\n\n### Recommendations for Remediation\n\n**Revert the changes:** The original implementation using `sizeof(global_context.user_id)` and `sizeof(global_context.tpm_seed)` is completely safe, standard, and correct for interfacing with byte-oriented C APIs.",
+      "range": {
+        "startLine": 106,
+        "startChar": 3,
+        "endLine": 106,
+        "endChar": 32
+      },
+      "revId": "e97909f0887ab3f353b3a0c7a8cd4985cec2677f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
