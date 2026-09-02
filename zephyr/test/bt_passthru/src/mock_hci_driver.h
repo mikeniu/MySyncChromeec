@@ -19,6 +19,7 @@ size_t mock_hci_driver_get_tx_count(void);
 size_t mock_hci_driver_get_last_tx_packet(uint8_t *out_buf, size_t max_len);
 size_t mock_hci_driver_get_tx_packet(size_t index, uint8_t *out_buf,
 				     size_t max_len);
+void mock_hci_driver_set_send_result(int res);
 int mock_hci_driver_inject_empty_rx(void);
 
 #ifdef __cplusplus
