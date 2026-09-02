@@ -120,6 +120,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7e8cb72_e0847688",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T21:43:20Z",
+      "side": 1,
+      "message": "Ok. Please add a PSA in the team chat in case anyone else is planning to create a release before you do.",
+      "parentUuid": "dec5f0d9_b3fd4da7",
+      "range": {
+        "startLine": 11,
+        "startChar": 28,
+        "endLine": 13,
+        "endChar": 55
+      },
+      "revId": "68f9c9a6b976057dfba201b7623b1197972622e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "4de0dd27_8b9a702d",
