@@ -8,8 +8,8 @@
  * and reading the row lines.
  */
 
-#ifndef __CROS_EC_KEYBOARD_RAW_H
-#define __CROS_EC_KEYBOARD_RAW_H
+#ifndef PLATFORM_EC_INCLUDE_KEYBOARD_RAW_H_
+#define PLATFORM_EC_INCLUDE_KEYBOARD_RAW_H_
 
 #include "builtin/assert.h"
 #include "common.h"
@@ -136,4 +136,4 @@ void board_keyboard_drive_col(int col);
 }
 #endif
 
-#endif /* __CROS_EC_KEYBOARD_RAW_H */
+#endif /* PLATFORM_EC_INCLUDE_KEYBOARD_RAW_H_ */

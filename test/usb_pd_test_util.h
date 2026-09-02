@@ -5,8 +5,8 @@
  * Test utilities for USB PD unit test.
  */
 
-#ifndef __TEST_USB_PD_TEST_UTIL_H
-#define __TEST_USB_PD_TEST_UTIL_H
+#ifndef PLATFORM_EC_TEST_USB_PD_TEST_UTIL_H_
+#define PLATFORM_EC_TEST_USB_PD_TEST_UTIL_H_
 
 /* Simulate Rx message */
 void pd_test_rx_set_preamble(int port, int has_preamble);
@@ -31,4 +31,4 @@ int pd_test_tx_msg_verify_short(int port, uint16_t val);
 int pd_test_tx_msg_verify_word(int port, uint32_t val);
 int pd_test_tx_msg_verify_crc(int port);
 
-#endif /* __TEST_USB_PD_TEST_UTIL_H */
+#endif /* PLATFORM_EC_TEST_USB_PD_TEST_UTIL_H_ */

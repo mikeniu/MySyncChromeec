@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __TEST_TC_UTIL_USER_OVERRIDE_H
-#define __TEST_TC_UTIL_USER_OVERRIDE_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_TEST_TC_UTIL_USER_OVERRIDE_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_TEST_TC_UTIL_USER_OVERRIDE_H_
 
 #define PRINT_DATA(fmt, ...) ztest_printk_stdout(fmt, ##__VA_ARGS__)
 
@@ -21,4 +21,4 @@
  * */
 __printf_like(1, 2) void ztest_printk_stdout(const char *fmt, ...);
 
-#endif /* __TEST_TC_UTIL_USER_OVERRIDE_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_TEST_TC_UTIL_USER_OVERRIDE_H_ */

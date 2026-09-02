@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CURVE25519_H
-#define __CROS_EC_CURVE25519_H
+#ifndef PLATFORM_EC_THIRD_PARTY_BORINGSSL_INCLUDE_CURVE25519_H_
+#define PLATFORM_EC_THIRD_PARTY_BORINGSSL_INCLUDE_CURVE25519_H_
 
 #include <stdint.h>
 
@@ -16,7 +16,6 @@ extern "C" {
  *
  * Curve25519 is an elliptic curve. See https://tools.ietf.org/html/rfc7748.
  */
-
 
 /* X25519.
  *
@@ -67,12 +66,11 @@ void X25519_public_from_private(uint8_t out_public_value[32],
  * Low-level x25519 function, defined by either the generic or cortex-m0
  * implementation. Must not be called directly.
  */
-void x25519_scalar_mult(uint8_t out[32],
-			const uint8_t scalar[32],
+void x25519_scalar_mult(uint8_t out[32], const uint8_t scalar[32],
 			const uint8_t point[32]);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CROS_EC_CURVE25519_H */
+#endif /* PLATFORM_EC_THIRD_PARTY_BORINGSSL_INCLUDE_CURVE25519_H_ */

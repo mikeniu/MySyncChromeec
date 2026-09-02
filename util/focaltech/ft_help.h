@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef UTIL_FOCALTECH_FT_HELP_H_
-#define UTIL_FOCALTECH_FT_HELP_H_
+#ifndef PLATFORM_EC_UTIL_FOCALTECH_FT_HELP_H_
+#define PLATFORM_EC_UTIL_FOCALTECH_FT_HELP_H_
 
 #include <string_view>
 
@@ -36,4 +36,4 @@ Options:
 )";
 }  // namespace focaltech
 
-#endif  // UTIL_FOCALTECH_FT_HELP_H_
+#endif /* PLATFORM_EC_UTIL_FOCALTECH_FT_HELP_H_ */

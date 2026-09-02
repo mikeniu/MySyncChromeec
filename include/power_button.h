@@ -5,8 +5,8 @@
 
 /* Power button API for Chrome EC */
 
-#ifndef __CROS_EC_POWER_BUTTON_H
-#define __CROS_EC_POWER_BUTTON_H
+#ifndef PLATFORM_EC_INCLUDE_POWER_BUTTON_H_
+#define PLATFORM_EC_INCLUDE_POWER_BUTTON_H_
 
 #include "common.h"
 
@@ -98,4 +98,4 @@ static inline int power_button_is_eating_release(void)
 }
 #endif
 
-#endif /* __CROS_EC_POWER_BUTTON_H */
+#endif /* PLATFORM_EC_INCLUDE_POWER_BUTTON_H_ */

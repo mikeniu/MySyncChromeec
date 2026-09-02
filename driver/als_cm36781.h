@@ -5,8 +5,8 @@
  * Vishay CM36781 light sensor driver
  */
 
-#ifndef __CROS_EC_ALS_CM36781_H
-#define __CROS_EC_ALS_CM36781_H
+#ifndef PLATFORM_EC_DRIVER_ALS_CM36781_H_
+#define PLATFORM_EC_DRIVER_ALS_CM36781_H_
 
 /* I2C interface */
 #define CM36781_I2C_ADDR_FLAGS 0x51
@@ -43,4 +43,4 @@
 
 extern const struct accelgyro_drv cm36781_drv;
 
-#endif /* __CROS_EC_ALS_CM36781_H */
+#endif /* PLATFORM_EC_DRIVER_ALS_CM36781_H_ */

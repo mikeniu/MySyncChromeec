@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef UTIL_FOCALTECH_USB_TRANSPORT_H_
-#define UTIL_FOCALTECH_USB_TRANSPORT_H_
+#ifndef PLATFORM_EC_UTIL_FOCALTECH_USB_TRANSPORT_H_
+#define PLATFORM_EC_UTIL_FOCALTECH_USB_TRANSPORT_H_
 
 #include <chrono>
 #include <cstdint>
@@ -40,4 +40,4 @@ class UsbTransport {
 
 }  // namespace focaltech
 
-#endif  // UTIL_FOCALTECH_USB_TRANSPORT_H_
+#endif /* PLATFORM_EC_UTIL_FOCALTECH_USB_TRANSPORT_H_ */

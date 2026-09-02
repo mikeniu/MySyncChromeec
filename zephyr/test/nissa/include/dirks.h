@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_NISSA_INCLUDE_DIRKS_H_
-#define ZEPHYR_TEST_NISSA_INCLUDE_DIRKS_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_DIRKS_H_
+#define PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_DIRKS_H_
 
 #include "ec_commands.h"
 
@@ -24,4 +24,4 @@ enum charge_port {
 void board_bj_init(void);
 bool board_is_power_good(void);
 
-#endif /* ZEPHYR_TEST_NISSA_INCLUDE_DIRKS_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_DIRKS_H_ */

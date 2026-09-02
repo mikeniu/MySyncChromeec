@@ -5,8 +5,8 @@
 
 /* OTP memory module for Chrome EC */
 
-#ifndef __CROS_EC_OTP_H
-#define __CROS_EC_OTP_H
+#ifndef PLATFORM_EC_INCLUDE_OTP_H_
+#define PLATFORM_EC_INCLUDE_OTP_H_
 
 /*
  * OTP: One Time Programable memory is used for storing persistent data.
@@ -29,4 +29,4 @@ int otp_write_serial(const char *serialno);
  */
 const char *otp_read_serial(void);
 
-#endif /* __CROS_EC_OTP_H */
+#endif /* PLATFORM_EC_INCLUDE_OTP_H_ */

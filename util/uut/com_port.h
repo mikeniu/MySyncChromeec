@@ -6,8 +6,8 @@
 
 /* This file defines the ComPort interface header file. */
 
-#ifndef __UTIL_UUT_COM_PORT_H
-#define __UTIL_UUT_COM_PORT_H
+#ifndef PLATFORM_EC_UTIL_UUT_COM_PORT_H_
+#define PLATFORM_EC_UTIL_UUT_COM_PORT_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -148,4 +148,4 @@ uint32_t com_port_wait_read(int device_id);
 }
 #endif
 
-#endif /* __UTIL_UUT_COM_PORT_H */
+#endif /* PLATFORM_EC_UTIL_UUT_COM_PORT_H_ */

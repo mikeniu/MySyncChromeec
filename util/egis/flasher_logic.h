@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef UTIL_EGIS_FLASHER_LOGIC_H_
-#define UTIL_EGIS_FLASHER_LOGIC_H_
+#ifndef PLATFORM_EC_UTIL_EGIS_FLASHER_LOGIC_H_
+#define PLATFORM_EC_UTIL_EGIS_FLASHER_LOGIC_H_
 
 #include <expected>
 
@@ -20,4 +20,4 @@ std::expected<void, AppError> ExecuteRawCommandFlash(
 
 }  // namespace egis
 
-#endif  // UTIL_EGIS_FLASHER_LOGIC_H_
+#endif /* PLATFORM_EC_UTIL_EGIS_FLASHER_LOGIC_H_ */
