@@ -34,6 +34,24 @@
       "parentUuid": "dd89a478_01695a94",
       "revId": "e44d563b8cd34455fa64f61084164538d4893838",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a87b63b_55e7503f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T23:25:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/8372e127-25f4-41da-9c33-d609e2a1c775)]\n\n**Review Summary**\n* **Functionality**: The CL successfully migrates the authentication tests in `fpsensor_auth_commands.cc` from version 0 to version 1 host commands (`EC_CMD_FP_TEMPLATE`, v1). The previously identified missing test `test_fp_command_commit_without_seed` has been correctly updated in this patchset to use `FP_TEMPLATE_LOAD` and `FP_TEMPLATE_DECRYPT`. The asynchronous mock logic correctly simulates and polls the decryption result.\n* **Security**: No security vulnerabilities are introduced. Cryptographic abstractions and validations are properly maintained.\n* **Style**: Code style is consistent with the project guidelines.\n* **Testing \u0026 Test Coverage**: Test coverage is adequate and appropriate. The unit tests now correctly validate the v1 format and its asynchronous behavior.\n* **CL Size \u0026 Scope**: The CL size is appropriate and specifically scoped to migrating the existing auth tests.",
+      "isAi": true,
+      "revId": "e44d563b8cd34455fa64f61084164538d4893838",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
