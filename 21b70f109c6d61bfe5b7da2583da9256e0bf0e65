@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a733e318_b15c1aa7",
+        "filename": "chip/host/otp_key.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-02T17:19:14Z",
+      "side": 1,
+      "message": "ok. I created a similar change for ec-legacy\n\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8281008",
+      "parentUuid": "8a93e83d_efde5cf8",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "43774824_c7e5bc72",
         "filename": "test/mock/otpi_mock.c",
         "patchSetId": 14
@@ -121,6 +139,24 @@
       "side": 1,
       "message": "fine with me. WIthout this, we will not be able to test that IRQ are disabled.",
       "parentUuid": "2c0da67a_05049237",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "119f66e4_6659278e",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-02T17:19:14Z",
+      "side": 1,
+      "message": "so the final verdict is to remove them?",
+      "parentUuid": "1ff15bc9_7972c9f9",
       "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
