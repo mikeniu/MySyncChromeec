@@ -52,3 +52,6 @@ renode/.cipd
 renode/bin
 renode/lib
 renode/license.html.zst
+
+#codebuddy
+.codebuddy/

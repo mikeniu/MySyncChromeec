@@ -50,6 +50,12 @@ register_npcx9_project(
 )
 
 register_npcx9_project(
+    project_name="meru",
+    zephyr_board="npcx9/npcx9m7fb",
+    extra_modules=["google-private", "nanopb", "pigweed"],
+)
+
+register_npcx9_project(
     project_name="mica",
     zephyr_board="npcx9/npcx9m7fb",
     extra_modules=["google-private", "nanopb", "pigweed"],
@@ -71,6 +77,7 @@ register_npcx9_project(
 assert_rw_fwid_DO_NOT_EDIT(project_name="bluey", addr=0x80144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="quenbi", addr=0x80144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="quartz", addr=0x40144)
+assert_rw_fwid_DO_NOT_EDIT(project_name="meru", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="mica", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="annite", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="pic", addr=0x40144)
