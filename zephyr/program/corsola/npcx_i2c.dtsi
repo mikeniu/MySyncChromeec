@@ -45,7 +45,7 @@
 &i2c0_0 {
 	label = "I2C_SENSOR";
 	status = "okay";
-	clock-frequency = <I2C_BITRATE_FAST>;
+	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
 	pinctrl-0 = <&i2c0_0_sda_scl_gpb4_b5>;
 	pinctrl-names = "default";
 };
@@ -57,7 +57,7 @@
 &i2c1_0 {
 	label = "I2C_USB_C0";
 	status = "okay";
-	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
+	clock-frequency = <I2C_BITRATE_FAST>;
 	pinctrl-0 = <&i2c1_0_sda_scl_gp87_90>;
 	pinctrl-names = "default";
 
@@ -103,7 +103,7 @@
 &i2c2_0 {
 	label = "I2C_USB_C1";
 	status = "okay";
-	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
+	clock-frequency = <I2C_BITRATE_FAST>;
 	pinctrl-0 = <&i2c2_0_sda_scl_gp91_92>;
 	pinctrl-names = "default";
 
@@ -147,7 +147,7 @@
 &i2c3_0 {
 	label = "I2C_PWR_CBI";
 	status = "okay";
-	clock-frequency = <I2C_BITRATE_FAST>;
+	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
 	pinctrl-0 = <&i2c3_0_sda_scl_gpd0_d1>;
 	pinctrl-names = "default";
 
