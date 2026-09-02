@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b94845f_f35ad906",
+        "filename": "common/fpsensor/fpsensor_crypto.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T21:55:18Z",
+      "side": 1,
+      "message": "```\nif (fingerprint_auth_enabled()) {\n\t\tconstexpr std::string_view kFgPrefix \u003d\n\t\t\t\"fingerprint_auth_template:\";\n\t\tconstexpr size_t kFgDomainInfoLen \u003d\n\t\t\tkFgPrefix.size() + SHA256_DIGEST_LENGTH;\n\t\tCleanseWrapper\u003cstd::array\u003cuint8_t, kFgDomainInfoLen\u003e\u003e domain_info{};\n\n\t\tauto out_it \u003d std::ranges::copy(kFgPrefix, domain_info.begin()).out;\n\t\tstd::ranges::copy(info, out_it);\n\n\t\treturn derive_key(out_key, salt, tpm_seed, domain_info);\n\t}\n```\n\n\n* **Memory Sanitization (`CleanseWrapper`)**: Cryptographic context and domain separation strings are often treated as public, but best practices dictate scrubbing temporary buffers containing HKDF context material. Wrapping `domain_info` in `CleanseWrapper` ensures the stack is safely wiped when the function returns, maintaining consistency with how `prk` and `otp_key` are handled elsewhere in `fpsensor_crypto.cc`.\n* **Defensive Initialization (`{}`)**: Appending `{}` to `domain_info` value-initializes the underlying array. Even though the two `std::copy` operations overwrite the entire buffer immediately, explicit initialization is a standard defensive programming practice that prevents undefined behavior if future refactoring alters the bounds of the copy logic.\n* **Modern C++20 Algorithms (`std::ranges::copy`)**: Using `std::ranges::copy` instead of `std::copy` makes the code more concise by eliminating the `.begin()` and `.end()` boilerplate for the source ranges. Note the use of `.out` on the first call, as `std::ranges::copy` returns an `in_out_result` struct rather than just the destination iterator.\n* **Implicit Span Conversion**: The explicit `std::span{ domain_info }` constructor in the return statement was removed. C++20 implicitly converts any type that satisfies the `std::ranges::contiguous_range` concept (like `std::array`) into a `std::span`. *(Note: If the `CleanseWrapper` implementation in this codebase lacks the necessary iterator/range methods to support this implicit conversion, you can safely revert that specific line to `std::span{ domain_info }`)*.",
+      "range": {
+        "startLine": 238,
+        "startChar": 2,
+        "endLine": 249,
+        "endChar": 32
+      },
+      "revId": "8fb1e3ac5170021a91ce3cff249449f2f4e977b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
