@@ -19,6 +19,7 @@ target_sources(app PRIVATE
 	src/main.cc
 	src/mock_hci_driver.c
 	src/test_cros_hostcmd_transport.cc
+	src/test_zephyr_bt_sender.cc
 )
 
 target_link_libraries(app PRIVATE
