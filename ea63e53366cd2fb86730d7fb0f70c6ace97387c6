@@ -16,6 +16,75 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "ea63e53366cd2fb86730d7fb0f70c6ace97387c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "541427e9_20a45be5",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-02T18:10:45Z",
+      "side": 1,
+      "message": "Nit - rename to indicate this storage belongs to the caller.  Maybe `user_disc_out`?",
+      "range": {
+        "startLine": 359,
+        "startChar": 7,
+        "endLine": 359,
+        "endChar": 15
+      },
+      "revId": "ea63e53366cd2fb86730d7fb0f70c6ace97387c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3f2adb6_360fda38",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1655,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-02T18:10:45Z",
+      "side": 1,
+      "message": "No testing on this path.",
+      "range": {
+        "startLine": 1653,
+        "startChar": 0,
+        "endLine": 1655,
+        "endChar": 21
+      },
+      "revId": "ea63e53366cd2fb86730d7fb0f70c6ace97387c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fb80995_0e2bd165",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 3140,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-02T18:10:45Z",
+      "side": 1,
+      "message": "Add a comment that the caller guarantees this is only called for SOP messages.",
+      "range": {
+        "startLine": 3140,
+        "startChar": 7,
+        "endLine": 3140,
+        "endChar": 18
+      },
+      "revId": "ea63e53366cd2fb86730d7fb0f70c6ace97387c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
