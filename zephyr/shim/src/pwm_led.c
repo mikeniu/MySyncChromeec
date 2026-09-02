@@ -191,7 +191,7 @@ static void led_set_charge_port_tick(void)
 	int port;
 	int side_select_duty;
 
-	port = charge_manager_get_active_charge_port();
+	port = charge_manager_get_active_charge_port_no_lock();
 	switch (port) {
 	case 0:
 		side_select_duty = 100;
