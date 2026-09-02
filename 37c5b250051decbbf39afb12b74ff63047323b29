@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8eb9c775_dcb5e4be",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T21:40:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/86ee4c59-9870-49ce-94bc-1e107fc4ecf0)]\n\n**Review Summary:**\n* **Functionality:** Looks good. The multistep test correctly writes a canary value to `fp_buffer` and verifies that it is cleared upon a hard reset.\n* **Style:** Very clean. I left a minor suggestion to update the trailing comment on the `#endif` directive at the end of the file, as it still references `CONFIG_CROS_EC_RW` instead of the updated `CONFIG_PLATFORM_EC_FINGERPRINT`.\n* **Security:** No security vulnerabilities introduced. This test adds coverage to ensure sensitive fingerprint data is properly wiped across reboots, which is a positive security measure.\n* **Testing:** The CL correctly implements a Zephyr hardware test, and properly integrates it into the build system and test runner (`testcase.yaml`, `CMakeLists.txt`, `Kconfig`, and `run_device_tests.py`).\n* **CL Size \u0026 Scope:** The CL is well-scoped, self-contained, and appropriately sized for a new hardware test.\n* **Overall Quality:** Excellent. The logic is sound and addresses prior feedback nicely.",
+      "isAi": true,
+      "revId": "37c5b250051decbbf39afb12b74ff63047323b29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f237ab13_17b3fd34",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T21:40:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The `#endif` comment here still says `/* CONFIG_CROS_EC_RW */`, but the `#ifdef` on line 19 was updated to `CONFIG_PLATFORM_EC_FINGERPRINT`. Consider updating this comment to match.",
+      "isAi": true,
+      "revId": "37c5b250051decbbf39afb12b74ff63047323b29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
