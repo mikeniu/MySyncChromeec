@@ -13,6 +13,7 @@
 #include <zephyr/ztest.h>
 
 const struct board_batt_params *get_batt_params(void);
+extern int battery_init_retry_count;
 
 static struct board_batt_params conf_in_cbi = {
 	.fuel_gauge = {
@@ -64,6 +65,7 @@ static void battery_config_before(void *fixture)
 
 	manuf_in_batt = "LGC";
 	device_in_batt = "AC17A8M";
+	battery_init_retry_count = 0;
 }
 
 ZTEST_SUITE(battery_config_cbi, drivers_predicate_post_main, NULL,
@@ -166,17 +168,60 @@ ZTEST(battery_config_cbi, test_device_name_as_prefix)
 ZTEST(battery_config_cbi, test_manuf_name_not_found)
 {
 	manuf_in_batt = NULL;
-	init_battery_type();
-	zassert_equal_ptr(get_batt_params(), &board_battery_info[0].config);
+	for (int i = 0; i <= CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT; i++) {
+		init_battery_type();
+		zassert_equal_ptr(get_batt_params(),
+				  &board_battery_info[0].config);
+	}
+	zassert_equal(battery_init_retry_count, 0);
 	manuf_in_batt = "AS1GUXd3KB";
 }
 
 ZTEST(battery_config_cbi, test_device_name_not_found)
 {
 	device_in_batt = NULL;
-	init_battery_type();
-	zassert_equal_ptr(get_batt_params(), &board_battery_info[0].config);
+	for (int i = 0; i <= CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT; i++) {
+		init_battery_type();
+		zassert_equal_ptr(get_batt_params(),
+				  &board_battery_info[0].config);
+	}
+	zassert_equal(battery_init_retry_count, 0);
 	device_in_batt = "C214-43";
+}
+
+ZTEST(battery_config_cbi, test_manuf_name_retry_success)
+{
+	const struct board_batt_params *conf;
+
+	manuf_in_batt = NULL;
+	init_battery_type();
+	zassert_equal(battery_init_retry_count, 1);
+	zassert_equal_ptr(get_batt_params(), &board_battery_info[0].config);
+
+	manuf_in_batt = "xyz";
+	cbi_set_batt_conf(&conf_in_cbi, manuf_in_batt, device_in_batt);
+	init_battery_type();
+	zassert_equal(battery_init_retry_count, 0);
+	conf = get_batt_params();
+	zassert_equal(memcmp(conf, &conf_in_cbi, sizeof(*conf)), 0);
+}
+
+ZTEST(battery_config_cbi, test_device_name_retry_success)
+{
+	const struct board_batt_params *conf;
+
+	device_in_batt = NULL;
+	init_battery_type();
+	zassert_equal(battery_init_retry_count, 1);
+	zassert_equal_ptr(get_batt_params(), &board_battery_info[0].config);
+
+	device_in_batt = "AC17A8M";
+	manuf_in_batt = "xyz";
+	cbi_set_batt_conf(&conf_in_cbi, manuf_in_batt, device_in_batt);
+	init_battery_type();
+	zassert_equal(battery_init_retry_count, 0);
+	conf = get_batt_params();
+	zassert_equal(memcmp(conf, &conf_in_cbi, sizeof(*conf)), 0);
 }
 
 ZTEST(battery_config_cbi, test_batt_conf_main_invalid)
