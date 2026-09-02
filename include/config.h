@@ -173,6 +173,9 @@
 /* Support for BMIxxx hardware orientation sensor */
 #undef CONFIG_BMI_ORIENTATION_SENSOR
 
+/* Size of the BMI sensor software FIFO buffer */
+#undef CONFIG_BMI_FIFO_BUFFER
+
 /* Support for KIONIX KX022 hardware orientation sensor */
 #undef CONFIG_KX022_ORIENTATION_SENSOR
 
@@ -6897,6 +6900,10 @@
 #ifndef CONFIG_EC_MAX_SENSOR_FREQ_MILLIHZ
 #define CONFIG_EC_MAX_SENSOR_FREQ_MILLIHZ \
 	CONFIG_EC_MAX_SENSOR_FREQ_DEFAULT_MILLIHZ
+#endif
+
+#ifndef CONFIG_BMI_FIFO_BUFFER
+#define CONFIG_BMI_FIFO_BUFFER 64
 #endif
 
 /* Enable BMI secondary port if needed. */
