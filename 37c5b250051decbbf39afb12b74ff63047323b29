@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e2a4d8c_8231cbb3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-02T21:41:51Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8eb9c775_dcb5e4be",
+      "revId": "37c5b250051decbbf39afb12b74ff63047323b29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f237ab13_17b3fd34",
@@ -51,6 +69,24 @@
       "side": 1,
       "message": "Please fix",
       "parentUuid": "f237ab13_17b3fd34",
+      "revId": "37c5b250051decbbf39afb12b74ff63047323b29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c015dec_7c3f1c3c",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-02T21:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ff21d0a_2db0d21b",
       "revId": "37c5b250051decbbf39afb12b74ff63047323b29",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
