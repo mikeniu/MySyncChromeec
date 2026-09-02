@@ -10,6 +10,12 @@
 
 	label = "I2C_PORT_PD";
 	clock-frequency = <I2C_BITRATE_STANDARD>;
+
+	/* PDCs can clock stretch for more than 500ms.  Disable
+	 * the hardware SCL timer and extend the software timer.
+	 */
+	scl-sda-low-timeout = <0>;
+	transfer-timeout-ms = <650>;
 };
 
 &i2c4 {
