@@ -5,8 +5,8 @@
  * CAPELLA CM32183 light sensor driver
  */
 
-#ifndef __CROS_EC_ALS_CM32183_H
-#define __CROS_EC_ALS_CM32183_H
+#ifndef PLATFORM_EC_DRIVER_ALS_CM32183_H_
+#define PLATFORM_EC_DRIVER_ALS_CM32183_H_
 
 /* I2C interface */
 #define CM32183_I2C_ADDR 0x29
@@ -100,4 +100,4 @@
 
 extern const struct accelgyro_drv cm32183_drv;
 
-#endif /* __CROS_EC_ALS_CM32183_H */
+#endif /* PLATFORM_EC_DRIVER_ALS_CM32183_H_ */

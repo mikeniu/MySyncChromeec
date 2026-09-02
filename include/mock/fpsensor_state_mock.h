@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __MOCK_FPSENSOR_STATE_MOCK_H
-#define __MOCK_FPSENSOR_STATE_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_STATE_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_STATE_MOCK_H_
 
 #include "ec_commands.h"
 
@@ -27,4 +27,4 @@ int fpsensor_state_mock_set_tpm_seed(
 }
 #endif
 
-#endif /* __MOCK_FPSENSOR_STATE_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_STATE_MOCK_H_ */

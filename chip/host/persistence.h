@@ -5,8 +5,8 @@
 
 /* Persistence module for emulator */
 
-#ifndef __CROS_EC_PERSISTENCE_H
-#define __CROS_EC_PERSISTENCE_H
+#ifndef PLATFORM_EC_CHIP_HOST_PERSISTENCE_H_
+#define PLATFORM_EC_CHIP_HOST_PERSISTENCE_H_
 
 #include <stdio.h>
 
@@ -24,4 +24,4 @@ void remove_persistent_storage(const char *tag);
 }
 #endif
 
-#endif /* __CROS_EC_PERSISTENCE_H */
+#endif /* PLATFORM_EC_CHIP_HOST_PERSISTENCE_H_ */

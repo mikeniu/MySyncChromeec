@@ -9,8 +9,8 @@
  * @brief Backend API for Cros flash emulator
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_FLASH_H_
-#define ZEPHYR_INCLUDE_EMUL_EMUL_FLASH_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_FLASH_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_FLASH_H_
 
 #include <ec_commands.h>
 
@@ -24,4 +24,4 @@ void cros_flash_emul_protect_reset(void);
  */
 void cros_flash_emul_enable_protect(void);
 
-#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_FLASH_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_FLASH_H_ */

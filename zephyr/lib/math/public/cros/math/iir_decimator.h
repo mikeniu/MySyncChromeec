@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_MATH_IIR_DECIMATOR_H
-#define __CROS_MATH_IIR_DECIMATOR_H
+#ifndef PLATFORM_EC_ZEPHYR_LIB_MATH_PUBLIC_CROS_MATH_IIR_DECIMATOR_H_
+#define PLATFORM_EC_ZEPHYR_LIB_MATH_PUBLIC_CROS_MATH_IIR_DECIMATOR_H_
 
 #include "cros/math/iir_filter.h"
 
@@ -96,4 +96,4 @@ bool iir_decimator_step(struct iir_decimator_t *decimator, float *x, float *y,
 }
 #endif
 
-#endif /* __CROS_MATH_IIR_DECIMATOR_H */
+#endif /* PLATFORM_EC_ZEPHYR_LIB_MATH_PUBLIC_CROS_MATH_IIR_DECIMATOR_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef _HECI_INTENAL_H_
-#define _HECI_INTENAL_H_
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_HOST_SERVICE_HECI_HECI_INTERNAL_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_HOST_SERVICE_HECI_HECI_INTERNAL_H_
 #include "heci.h"
 #include "heci_intf.h"
 
@@ -324,4 +324,4 @@ bool heci_send_proto_msg(uint8_t host_addr, uint8_t fw_addr, bool last_frag,
 
 void process_host_msgs(void);
 
-#endif /* _HECI_INTENAL_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_HOST_SERVICE_HECI_HECI_INTERNAL_H_ */

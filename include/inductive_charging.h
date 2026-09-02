@@ -7,8 +7,8 @@
 
 #include "gpio.h"
 
-#ifndef __CROS_EC_INDUCTIVE_CHARGING_H
-#define __CROS_EC_INDUCTIVE_CHARGING_H
+#ifndef PLATFORM_EC_INCLUDE_INDUCTIVE_CHARGING_H_
+#define PLATFORM_EC_INCLUDE_INDUCTIVE_CHARGING_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,4 +25,4 @@ void inductive_charging_interrupt(enum gpio_signal);
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_INCLUDE_INDUCTIVE_CHARGING_H_ */

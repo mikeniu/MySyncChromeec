@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CTN730_H
-#define __CROS_EC_CTN730_H
+#ifndef PLATFORM_EC_DRIVER_NFC_CTN730_H_
+#define PLATFORM_EC_DRIVER_NFC_CTN730_H_
 
 #define CTN730_I2C_ADDR 0x28
 
@@ -133,4 +133,4 @@ struct ctn730_msg {
 	uint8_t payload[];
 } __packed;
 
-#endif /* __CROS_EC_CTN730_H */
+#endif /* PLATFORM_EC_DRIVER_NFC_CTN730_H_ */

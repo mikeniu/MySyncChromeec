@@ -8,8 +8,8 @@
  * This is an I2C temp sensor on the AMD Stony Ridge FT4 SOC.
  */
 
-#ifndef __CROS_EC_SB_TSI_H
-#define __CROS_EC_SB_TSI_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_SB_TSI_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_SB_TSI_H_
 
 #define SB_TSI_I2C_ADDR_FLAGS 0x4C
 
@@ -43,4 +43,4 @@
  */
 int sb_tsi_get_val(int idx, int *temp_ptr);
 
-#endif /* __CROS_EC_SB_TSI_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_SB_TSI_H_ */

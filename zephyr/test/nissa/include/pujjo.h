@@ -3,11 +3,11 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_NISSA_INCLUDE_PUJJO_H_
-#define ZEPHYR_TEST_NISSA_INCLUDE_PUJJO_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_PUJJO_H_
+#define PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_PUJJO_H_
 
 #include "ec_commands.h"
 
 extern const struct ec_response_keybd_config pujjo_kb;
 
-#endif /* ZEPHYR_TEST_NISSA_INCLUDE_PUJJO_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_PUJJO_H_ */

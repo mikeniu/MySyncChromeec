@@ -5,8 +5,8 @@
 
 /* Functions used to provide the Intel DPTF interface over ACPI */
 
-#ifndef __CROS_EC_DPTF_H
-#define __CROS_EC_DPTF_H
+#ifndef PLATFORM_EC_INCLUDE_DPTF_H_
+#define PLATFORM_EC_INCLUDE_DPTF_H_
 
 /**
  * Set fan duty target.
@@ -48,4 +48,4 @@ void dptf_set_charging_current_limit(int ma);
  */
 int dptf_get_charging_current_limit(void);
 
-#endif /* __CROS_EC_DPTF_H */
+#endif /* PLATFORM_EC_INCLUDE_DPTF_H_ */

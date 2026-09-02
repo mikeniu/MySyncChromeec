@@ -5,8 +5,8 @@
 
 /* KXCJ9 gsensor module for Chrome EC */
 
-#ifndef __CROS_EC_ACCEL_KXCJ9_H
-#define __CROS_EC_ACCEL_KXCJ9_H
+#ifndef PLATFORM_EC_DRIVER_ACCEL_KXCJ9_H_
+#define PLATFORM_EC_DRIVER_ACCEL_KXCJ9_H_
 
 #include "task.h"
 
@@ -108,4 +108,4 @@
 #define KXCJ9_ACCEL_MIN_FREQ 12500
 #define KXCJ9_ACCEL_MAX_FREQ MOTION_MAX_SENSOR_FREQUENCY(1600000, 6250)
 
-#endif /* __CROS_EC_ACCEL_KXCJ9_H */
+#endif /* PLATFORM_EC_DRIVER_ACCEL_KXCJ9_H_ */
