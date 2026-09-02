@@ -22,6 +22,30 @@
       },
       "revId": "473bac70c28852560aaa835f3863e12d32526aeb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2a4cc8c_4908d79e",
+        "filename": "zephyr/shim/chip/rtk/power_policy.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-02T21:10:47Z",
+      "side": 1,
+      "message": "This naively copied a pattern from the NPCX implementation, which I think is intended to ensure that the deepest available power state is chosen. However, like RTK, NPCX only has one low-power state. ITE also has one state and comments that this pattern should be used, but it doesn\u0027t actually use it. As you noted, with only one available state, they don\u0027t actually matter.\n\nI\u0027ll remove this change for now. As I compare the implementations, I\u0027m wondering whether it would be feasible to de-shim them and just use the upstream one.",
+      "parentUuid": "b771d10d_fea188de",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 49
+      },
+      "revId": "473bac70c28852560aaa835f3863e12d32526aeb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
