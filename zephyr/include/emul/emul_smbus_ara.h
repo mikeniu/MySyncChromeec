@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SMBUS_ARA_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SMBUS_ARA_H_
+
 #ifndef __EMUL_SMBUS_ARA_H
 
 #include <zephyr/drivers/emul.h>
@@ -19,4 +22,4 @@
 int emul_smbus_ara_queue_address(const struct emul *emul, int port,
 				 uint8_t address);
 
-#endif /* __EMUL_SMBUS_ARA_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SMBUS_ARA_H_ */

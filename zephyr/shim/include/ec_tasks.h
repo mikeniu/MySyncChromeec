@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_EC_TASKS_H
-#define __CROS_EC_EC_TASKS_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_EC_TASKS_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_EC_TASKS_H_
 
 #include "task.h"
 
@@ -29,4 +29,4 @@ void set_test_runner_tid(void);
 }
 #endif
 
-#endif /* __CROS_EC_EC_TASKS_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_EC_TASKS_H_ */

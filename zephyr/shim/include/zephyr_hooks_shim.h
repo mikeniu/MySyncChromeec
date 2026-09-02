@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOOKS_SHIM_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOOKS_SHIM_H_
+
 #if !defined(__CROS_EC_HOOKS_H) || defined(__CROS_EC_ZEPHYR_HOOKS_SHIM_H)
 #error "This file must only be included from hooks.h. Include hooks.h directly."
 #endif
@@ -69,4 +72,4 @@ struct zephyr_shim_hook_list {
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOOKS_SHIM_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_BODY_DETECTION_CLIENT_H
-#define __CROS_EC_BODY_DETECTION_CLIENT_H
+#ifndef PLATFORM_EC_INCLUDE_BODY_DETECTION_CLIENT_H_
+#define PLATFORM_EC_INCLUDE_BODY_DETECTION_CLIENT_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -29,4 +29,4 @@ void print_body_detect_mode(void);
 }
 #endif
 
-#endif /* __CROS_EC_BODY_DETECTION_CLIENT_H */
+#endif /* PLATFORM_EC_INCLUDE_BODY_DETECTION_CLIENT_H_ */

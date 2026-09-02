@@ -5,8 +5,8 @@
 
 /* External power detection API for Chrome EC */
 
-#ifndef __CROS_EC_EXTPOWER_H
-#define __CROS_EC_EXTPOWER_H
+#ifndef PLATFORM_EC_INCLUDE_EXTPOWER_H_
+#define PLATFORM_EC_INCLUDE_EXTPOWER_H_
 
 #include "common.h"
 
@@ -79,4 +79,4 @@ void extpower_handle_update(int is_present);
 }
 #endif
 
-#endif /* __CROS_EC_EXTPOWER_H */
+#endif /* PLATFORM_EC_INCLUDE_EXTPOWER_H_ */

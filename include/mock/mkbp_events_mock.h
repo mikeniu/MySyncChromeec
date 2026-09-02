@@ -8,8 +8,8 @@
  * @brief Controls for the mock MKBP keyboard protocol
  */
 
-#ifndef __MOCK_MKBP_EVENTS_MOCK_H
-#define __MOCK_MKBP_EVENTS_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_MKBP_EVENTS_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_MKBP_EVENTS_MOCK_H_
 
 struct mock_ctrl_mkbp_events {
 	int mkbp_send_event_return;
@@ -23,4 +23,4 @@ struct mock_ctrl_mkbp_events {
 
 extern struct mock_ctrl_mkbp_events mock_ctrl_mkbp_events;
 
-#endif /* __MOCK_MKBP_EVENTS_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_MKBP_EVENTS_MOCK_H_ */

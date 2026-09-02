@@ -5,8 +5,8 @@
 
 /* Backlight API for Chrome EC */
 
-#ifndef __CROS_EC_BACKLIGHT_H
-#define __CROS_EC_BACKLIGHT_H
+#ifndef PLATFORM_EC_INCLUDE_BACKLIGHT_H_
+#define PLATFORM_EC_INCLUDE_BACKLIGHT_H_
 
 #include "common.h"
 #include "gpio.h"
@@ -37,4 +37,4 @@ void enable_backlight(int enabled);
 }
 #endif
 
-#endif /* __CROS_EC_BACKLIGHT_H */
+#endif /* PLATFORM_EC_INCLUDE_BACKLIGHT_H_ */

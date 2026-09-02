@@ -5,8 +5,8 @@
 
 /* Flash memory module for Chrome EC */
 
-#ifndef __CROS_EC_FLASH_H
-#define __CROS_EC_FLASH_H
+#ifndef PLATFORM_EC_INCLUDE_FLASH_H_
+#define PLATFORM_EC_INCLUDE_FLASH_H_
 
 #include "common.h"
 #include "ec_commands.h" /* For EC_FLASH_PROTECT_* flags */
@@ -492,4 +492,4 @@ int crec_board_flash_select(int select);
 }
 #endif
 
-#endif /* __CROS_EC_FLASH_H */
+#endif /* PLATFORM_EC_INCLUDE_FLASH_H_ */

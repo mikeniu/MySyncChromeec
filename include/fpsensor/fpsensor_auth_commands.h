@@ -5,8 +5,8 @@
 
 /* Fingerprint sensor interface */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_AUTH_COMMANDS_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_AUTH_COMMANDS_H
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_AUTH_COMMANDS_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_AUTH_COMMANDS_H_
 
 #include "common.h"
 #include "openssl/sha.h"
@@ -76,4 +76,4 @@ enum ec_error_list generate_session_key_with_context(
 	std::span<const uint8_t, FP_CK_SESSION_NONCE_LEN> peer_nonce,
 	std::span<uint8_t, SHA256_DIGEST_LENGTH> session_key);
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_AUTH_COMMANDS_H */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_AUTH_COMMANDS_H_ */

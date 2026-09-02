@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __EC_INCLUDE_OTP_KEY_H
-#define __EC_INCLUDE_OTP_KEY_H
+#ifndef PLATFORM_EC_INCLUDE_OTP_KEY_H_
+#define PLATFORM_EC_INCLUDE_OTP_KEY_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -52,4 +52,4 @@ void otp_key_exit(void);
 }
 #endif
 
-#endif /* __EC_INCLUDE_OTP_KEY_H */
+#endif /* PLATFORM_EC_INCLUDE_OTP_KEY_H_ */

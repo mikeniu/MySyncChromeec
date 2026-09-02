@@ -3,10 +3,12 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_MKBP_EVENT_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_MKBP_EVENT_H_
+
 #if !defined(__CROS_EC_MKBP_EVENT_H) || defined(__CROS_EC_ZEPHYR_MKBP_EVENT_H)
 #error "This file must only be included from mkbp_event.h. " \
 	"Include mkbp_event.h directly"
-#endif
 #define __CROS_EC_ZEPHYR_MKBP_EVENT_H
 
 const struct mkbp_event_source *
@@ -21,3 +23,5 @@ zephyr_find_mkbp_event_source(uint8_t event_type);
 		.event_type = _type,                                   \
 		.get_data = _func,                                     \
 	}
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_MKBP_EVENT_H_ */

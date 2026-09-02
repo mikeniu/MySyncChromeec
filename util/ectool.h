@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_UTIL_ECTOOL_H_
+#define PLATFORM_EC_UTIL_ECTOOL_H_
+
 #include "ectool_pdc.h"
 
 /** @brief A handler for an `ectool` command.  */
@@ -56,3 +59,5 @@ int cmd_i2c_read(int argc, char *argv[]);
 int cmd_i2c_speed(int argc, char *argv[]);
 int cmd_i2c_write(int argc, char *argv[]);
 int cmd_i2c_xfer(int argc, char *argv[]);
+
+#endif /* PLATFORM_EC_UTIL_ECTOOL_H_ */

@@ -4,11 +4,14 @@
  */
 
 /* Console channels */
+
+#ifndef PLATFORM_EC_INCLUDE_CONSOLE_CHANNEL_H_
+#define PLATFORM_EC_INCLUDE_CONSOLE_CHANNEL_H_
+
 #ifdef __cplusplus
 enum console_channel : int {
 #else
 enum console_channel {
-#endif
 #define CONSOLE_CHANNEL(enumeration, string) enumeration,
 #include "console_channel.inc"
 #undef CONSOLE_CHANNEL
@@ -16,3 +19,5 @@ enum console_channel {
 	/* Channel count; not itself a channel */
 	CC_CHANNEL_COUNT
 };
+
+#endif /* PLATFORM_EC_INCLUDE_CONSOLE_CHANNEL_H_ */

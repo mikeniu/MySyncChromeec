@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_DRIVER_BC12_MT6360_PUBLIC_H
-#define __CROS_EC_DRIVER_BC12_MT6360_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_BC12_MT6360_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_BC12_MT6360_PUBLIC_H_
 
 #include <inttypes.h>
 
@@ -67,4 +67,4 @@ extern const struct bc12_drv mt6360_drv;
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_BC12_MT6360_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_BC12_MT6360_PUBLIC_H_ */

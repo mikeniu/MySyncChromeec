@@ -5,8 +5,8 @@
 
 /* Software panic constants. This file must be parsable by the assembler. */
 
-#ifndef __CROS_EC_SOFTWARE_PANIC_H
-#define __CROS_EC_SOFTWARE_PANIC_H
+#ifndef PLATFORM_EC_INCLUDE_SOFTWARE_PANIC_H_
+#define PLATFORM_EC_INCLUDE_SOFTWARE_PANIC_H_
 
 /* Holds software panic reason PANIC_SW_* */
 #define SOFTWARE_PANIC_REASON_REG r4
@@ -31,4 +31,4 @@ extern const char *const panic_sw_reasons[];
 extern int panic_sw_reason_is_valid(uint32_t vec);
 #endif
 
-#endif /* __CROS_EC_SOFTWARE_PANIC_H */
+#endif /* PLATFORM_EC_INCLUDE_SOFTWARE_PANIC_H_ */

@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_BC12_RT1739_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_BC12_RT1739_H_
+
 #include "driver/ppc/rt1739.h"
 
 #ifdef __cplusplus
@@ -19,4 +22,4 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_BC12_RT1739_H_ */

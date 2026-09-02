@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ROLLBACK_H
-#define __CROS_EC_ROLLBACK_H
+#ifndef PLATFORM_EC_INCLUDE_ROLLBACK_H_
+#define PLATFORM_EC_INCLUDE_ROLLBACK_H_
 
 #define CROS_EC_ROLLBACK_COOKIE 0x0b112233
 
@@ -79,4 +79,4 @@ int board_get_entropy(void *buffer, int len);
 }
 #endif
 
-#endif /* __CROS_EC_ROLLBACK_H */
+#endif /* PLATFORM_EC_INCLUDE_ROLLBACK_H_ */
