@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef TEST_PDC_SRC_TRACE_H
-#define TEST_PDC_SRC_TRACE_H
+#ifndef PLATFORM_EC_ZEPHYR_TEST_PDC_INCLUDE_PDC_TRACE_MSG_H_
+#define PLATFORM_EC_ZEPHYR_TEST_PDC_INCLUDE_PDC_TRACE_MSG_H_
 
 void set_pdc_trace_msg_mocks(void);
 
-#endif /* TEST_PDC_SRC_TRACE_H */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_PDC_INCLUDE_PDC_TRACE_MSG_H_ */

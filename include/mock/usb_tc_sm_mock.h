@@ -4,8 +4,8 @@
  */
 /* Mock USB TC state machine*/
 
-#ifndef __MOCK_USB_TC_SM_MOCK_H
-#define __MOCK_USB_TC_SM_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_USB_TC_SM_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_USB_TC_SM_MOCK_H_
 
 #include "common.h"
 #include "usb_pd.h"
@@ -38,4 +38,4 @@ void mock_tc_port_reset(void);
 }
 #endif
 
-#endif /* __MOCK_USB_TC_SM_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_USB_TC_SM_MOCK_H_ */

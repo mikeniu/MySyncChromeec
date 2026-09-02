@@ -5,8 +5,8 @@
 
 /* Kinetic KTU1125 Type-C Power Path Controller */
 
-#ifndef __CROS_EC_KTU1125_H
-#define __CROS_EC_KTU1125_H
+#ifndef PLATFORM_EC_DRIVER_PPC_KTU1125_H_
+#define PLATFORM_EC_DRIVER_PPC_KTU1125_H_
 
 #include "common.h"
 #include "driver/ppc/ktu1125_public.h"
@@ -121,4 +121,4 @@
 #define KTU1125_CC1S_CLAMP BIT(7)
 #define KTU1125_DATA_MASK_ALL 0xFC
 
-#endif /* defined(__CROS_EC_KTU1125_H) */
+#endif /* PLATFORM_EC_DRIVER_PPC_KTU1125_H_ */

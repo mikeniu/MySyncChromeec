@@ -5,8 +5,8 @@
 
 /* USBC PD Default Policies  */
 
-#ifndef __CROS_EC_USB_PD_POLICY_H
-#define __CROS_EC_USB_PD_POLICY_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_POLICY_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_POLICY_H_
 
 #include "usb_pe_sm.h"
 
@@ -58,4 +58,4 @@ __override_proto bool port_frs_disable_until_source_on(int port);
 }
 #endif
 
-#endif /* __CROS_EC_USB_PD_POLICY_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_POLICY_H_ */

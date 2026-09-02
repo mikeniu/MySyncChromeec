@@ -9,8 +9,8 @@
  * @brief Backend API for TCS3400 emulator
  */
 
-#ifndef __EMUL_TCS3400_H
-#define __EMUL_TCS3400_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_TCS3400_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_TCS3400_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c.h>
@@ -154,4 +154,4 @@ emul_tcs3400_get_i2c_common_data(const struct emul *emul);
  * @}
  */
 
-#endif /* __EMUL_TCS3400_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_TCS3400_H_ */

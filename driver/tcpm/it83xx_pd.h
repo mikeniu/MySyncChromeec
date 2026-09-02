@@ -4,8 +4,8 @@
  */
 
 /* USB Power delivery port management */
-#ifndef __CROS_EC_DRIVER_TCPM_IT83XX_H
-#define __CROS_EC_DRIVER_TCPM_IT83XX_H
+#ifndef PLATFORM_EC_DRIVER_TCPM_IT83XX_PD_H_
+#define PLATFORM_EC_DRIVER_TCPM_IT83XX_PD_H_
 
 #include "driver/tcpm/it8xxx2_pd_public.h"
 
@@ -457,4 +457,4 @@ void switch_plug_out_type(enum usbpd_port port);
  */
 const struct cc_para_t *board_get_cc_tuning_parameter(enum usbpd_port port);
 
-#endif /* __CROS_EC_DRIVER_TCPM_IT83XX_H */
+#endif /* PLATFORM_EC_DRIVER_TCPM_IT83XX_PD_H_ */

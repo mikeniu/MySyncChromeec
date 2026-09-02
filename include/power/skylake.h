@@ -5,8 +5,8 @@
 
 /* Skylake IMVP8 / ROP PMIC chipset power control module for Chrome EC */
 
-#ifndef __CROS_EC_SKYLAKE_H
-#define __CROS_EC_SKYLAKE_H
+#ifndef PLATFORM_EC_INCLUDE_POWER_SKYLAKE_H_
+#define PLATFORM_EC_INCLUDE_POWER_SKYLAKE_H_
 
 /*
  * Input state flags.
@@ -54,4 +54,4 @@ enum power_signal {
  */
 int board_has_working_reset_flags(void);
 
-#endif /* __CROS_EC_SKYLAKE_H */
+#endif /* PLATFORM_EC_INCLUDE_POWER_SKYLAKE_H_ */

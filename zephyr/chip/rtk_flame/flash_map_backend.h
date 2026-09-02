@@ -7,8 +7,8 @@
  * Function: RTK Flash Utility
  */
 
-#ifndef __FLASH_MAP_BACKEND_H__
-#define __FLASH_MAP_BACKEND_H__
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_RTK_FLAME_FLASH_MAP_BACKEND_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_RTK_FLAME_FLASH_MAP_BACKEND_H_
 
 /*********************
  *      INCLUDES
@@ -95,4 +95,4 @@ int32_t flash_program_page(uint32_t address, const uint8_t *data, uint32_t size,
 void slowtmr_dealy_us(uint32_t us);
 int32_t flash_write_status_reg(uint8_t sr1, uint8_t sr2);
 
-#endif /* __FLASH_MAP_BACKEND_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_RTK_FLAME_FLASH_MAP_BACKEND_H_ */

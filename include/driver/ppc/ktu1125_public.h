@@ -5,8 +5,8 @@
 
 /* Kinetic KTU1125 USB-C Power Path Controller */
 
-#ifndef __CROS_EC_DRIVER_PPC_KTU1125_PUBLIC_H
-#define __CROS_EC_DRIVER_PPC_KTU1125_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_PPC_KTU1125_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_PPC_KTU1125_PUBLIC_H_
 
 #define KTU1125_ADDR0_FLAGS 0x78
 #define KTU1125_ADDR1_FLAGS 0x79
@@ -22,4 +22,4 @@ extern const struct ppc_drv ktu1125_drv;
  */
 void ktu1125_interrupt(int port);
 
-#endif /* __CROS_EC_DRIVER_PPC_KTU1125_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_PPC_KTU1125_PUBLIC_H_ */

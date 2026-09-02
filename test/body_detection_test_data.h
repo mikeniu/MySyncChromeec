@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_BODY_DETECTION_TEST_DATA_H
-#define __CROS_EC_BODY_DETECTION_TEST_DATA_H
+#ifndef PLATFORM_EC_TEST_BODY_DETECTION_TEST_DATA_H_
+#define PLATFORM_EC_TEST_BODY_DETECTION_TEST_DATA_H_
 
 #include "body_detection.h"
 #include "motion_sense.h"
@@ -22,4 +22,4 @@ extern const size_t kBodyDetectOffOnTestDataLength;
 
 extern const struct body_detect_test_data kBodyDetectOnOffTestData[];
 extern const size_t kBodyDetectOnOffTestDataLength;
-#endif
+#endif /* PLATFORM_EC_TEST_BODY_DETECTION_TEST_DATA_H_ */

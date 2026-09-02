@@ -6,8 +6,8 @@
 /*
  * Contains USB PD flags definition and accessors
  */
-#ifndef __CROS_EC_USB_PD_FLAGS_H
-#define __CROS_EC_USB_PD_FLAGS_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_FLAGS_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_FLAGS_H_
 
 #include "stdint.h"
 
@@ -95,4 +95,4 @@ enum usb_pd_charger_otg get_usb_pd_charger_otg(void);
 }
 #endif
 
-#endif /* __CROS_EC_USB_PD_FLAGS_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_FLAGS_H_ */

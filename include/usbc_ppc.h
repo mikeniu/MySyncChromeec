@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_USBC_PPC_H
-#define __CROS_EC_USBC_PPC_H
+#ifndef PLATFORM_EC_INCLUDE_USBC_PPC_H_
+#define PLATFORM_EC_INCLUDE_USBC_PPC_H_
 
 #include "common.h"
 #include "usb_pd_tcpm.h"
@@ -346,4 +346,4 @@ __override_proto bool board_port_has_ppc(int port);
 }
 #endif
 
-#endif /* !defined(__CROS_EC_USBC_PPC_H) */
+#endif /* PLATFORM_EC_INCLUDE_USBC_PPC_H_ */

@@ -9,8 +9,8 @@
  * @brief Backend API for ANX7447 emulator
  */
 
-#ifndef __EMUL_ANX7447_H
-#define __EMUL_ANX7447_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_ANX7447_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_ANX7447_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c.h>
@@ -24,4 +24,4 @@ void anx7447_emul_set_tcpci_extra_reg(const struct emul *emul, int reg,
 				      int val);
 struct i2c_common_emul_data *
 anx7447_emul_get_i2c_common_data(const struct emul *emul);
-#endif /* __EMUL_ANX7447_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_ANX7447_H_ */

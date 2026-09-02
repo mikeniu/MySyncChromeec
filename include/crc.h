@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CRC_H
-#define __CROS_EC_CRC_H
+#ifndef PLATFORM_EC_INCLUDE_CRC_H_
+#define PLATFORM_EC_INCLUDE_CRC_H_
 /* CRC-32 implementation with USB constants */
 /* Note: it's a stateful CRC-32 to match the hardware block interface */
 
@@ -81,4 +81,4 @@ uint16_t cros_crc16(const uint8_t *data, int len, uint16_t previous_crc);
 
 #endif /* CONFIG_HW_CRC && !HOST_TOOLS_BUILD */
 
-#endif /* __CROS_EC_CRC_H */
+#endif /* PLATFORM_EC_INCLUDE_CRC_H_ */

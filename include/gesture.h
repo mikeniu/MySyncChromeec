@@ -5,8 +5,8 @@
 
 /* Header for gesture.c */
 
-#ifndef __CROS_EC_GESTURE_H
-#define __CROS_EC_GESTURE_H
+#ifndef PLATFORM_EC_INCLUDE_GESTURE_H_
+#define PLATFORM_EC_INCLUDE_GESTURE_H_
 
 /**
  * Run gesture detection engine. Modify the event flag when gestures are found.
@@ -24,4 +24,4 @@ void gesture_calc(uint32_t *event);
 #define TAP_ODR (1000000 / CONFIG_GESTURE_SAMPLING_INTERVAL_MS)
 #define TAP_ODR_LSM6DS0 (2 * TAP_ODR)
 
-#endif /* __CROS_EC_GESTURE_H */
+#endif /* PLATFORM_EC_INCLUDE_GESTURE_H_ */

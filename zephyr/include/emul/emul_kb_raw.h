@@ -11,8 +11,8 @@
  * @brief Backend API for kb raw emulator
  */
 
-#ifndef __EMUL_KB_RAW_H
-#define __EMUL_KB_RAW_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_KB_RAW_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_KB_RAW_H_
 
 struct device;
 
@@ -48,4 +48,4 @@ void emul_kb_raw_reset(const struct device *dev);
  * @}
  */
 
-#endif /* __EMUL_KB_RAW_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_KB_RAW_H_ */
