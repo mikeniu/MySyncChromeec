@@ -131,6 +131,15 @@ config CROS_EC_CBI_UFSC_KB_BACKLIGHT
 	  using CBI UFSC data. Auto-enabled if the 'kb_backlight_policy'
 	  node label is present in the Devicetree.
 
+config CROS_EC_CBI_UFSC_THERMAL_FAN
+	bool "Manage Thermal Fan via CBI UFSC"
+	default y if $(dt_nodelabel_enabled,fan_policy)
+	depends on PLATFORM_EC_FAN
+	help
+	  Enables generic logic to determine thermal fan presence using CBI
+	  UFSC data. Auto-enabled if the 'fan_policy' node label is present
+	  in the Devicetree.
+
 config CROS_EC_CBI_UFSC_PDC
 	bool "Select PDC Driver via CBI UFSC"
 	default y if DT_HAS_CROS_EC_CBI_UFSC_PDC_SELECTOR_ENABLED

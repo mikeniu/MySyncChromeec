@@ -3,4 +3,5 @@
 # found in the LICENSE file.
 
 zephyr_library_sources_ifdef(CONFIG_CROS_EC_CBI_UFSC_KB_BACKLIGHT keyboard_backlight.c)
+zephyr_library_sources_ifdef(CONFIG_CROS_EC_CBI_UFSC_THERMAL_FAN thermal_fan.c)
 zephyr_library_sources_ifdef(CONFIG_CROS_EC_CBI_UFSC_PDC pdc_selector.c)

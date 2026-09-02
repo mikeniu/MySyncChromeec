@@ -12,6 +12,43 @@
 		kb_backlight_policy: kb-backlight {
 			enable-value = <&ufsc_kb_backlight_present>;
 		};
+
+		fan_policy: fan {
+			enable-value = <&ufsc_thermal_fan_present>;
+		};
+	};
+
+	fans {
+		compatible = "cros-ec,fans";
+
+		fan0: fan_0 {
+			pwms = <&pwm_fan 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			rpm-min = <3100>;
+			rpm-start = <3100>;
+			rpm-max = <8000>;
+			tach = <&tach_fan>;
+		};
+	};
+
+	pwms {
+		pwm_fan: pwm@6 {
+			compatible = "cros,pwm-mock";
+			reg = <6 1>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+	};
+
+	tachs {
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		tach_fan: tach@0 {
+			compatible = "cros,tach-mock";
+			reg = <0 1>;
+			#tach-cells = <3>;
+			status = "okay";
+		};
 	};
 };
 
@@ -27,6 +64,23 @@
 		compatible = "cros-ec,cbi-ufsc-value";
 		status = "okay";
 		enum-name = "UFSC_KB_BACKLIGHT_ABSENT";
+		value = <0>;
+		default;
+	};
+};
+
+&ufsc_thermal_fan {
+	status = "okay";
+	ufsc_thermal_fan_present: value-present {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		enum-name = "UFSC_THERMAL_FAN_PRESENT";
+		value = <1>;
+	};
+	ufsc_thermal_fan_absent: value-absent {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		enum-name = "UFSC_THERMAL_FAN_ABSENT";
 		value = <0>;
 		default;
 	};
