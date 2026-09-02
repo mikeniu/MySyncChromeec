@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08d045f7_6651d05c",
+        "filename": "zephyr/shim/chip/npcx/otp_key.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-02T06:13:18Z",
+      "side": 1,
+      "message": "I guess it\u0027s really hard to test on hardware. Can we get confirmation from Nuvoton that the otpi_write doesn\u0027t use interrupts, since the code is in ROM and we don\u0027t see it?",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
