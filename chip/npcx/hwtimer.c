@@ -66,16 +66,27 @@ void __hw_clock_event_set(uint32_t deadline)
 {
 	fp_t inv_evt_tick = FLOAT_TO_FP(INT_32K_CLOCK / (float)SECOND);
 	uint32_t evt_cnt_us, current;
-	/* Is deadline min value? */
-	if (evt_expired_us != 0 && evt_expired_us < deadline)
-		return;
+
+	current = __hw_clock_source_read();
+
+	/* Check if an existing event is armed in the future */
+	if (evt_expired_us != 0 && evt_expired_us != EVT_MAX_EXPIRED_US &&
+	    (int32_t)(evt_expired_us - current) > 0) {
+		/* Existing event takes priority over idle sentinel */
+		if (deadline == EVT_MAX_EXPIRED_US)
+			return;
+
+		/* Existing event fires earlier than new deadline */
+		if ((int32_t)(deadline - evt_expired_us) >= 0)
+			return;
+	}
 
 	/* mark min event value */
 	evt_expired_us = deadline;
 
-	current = __hw_clock_source_read();
 	/* Deadline is behind current timer */
-	if (deadline < current) {
+	if (deadline != EVT_MAX_EXPIRED_US &&
+	    (int32_t)(deadline - current) <= 0) {
 		evt_cnt_us = 1;
 	} else {
 		evt_cnt_us = deadline - current;
