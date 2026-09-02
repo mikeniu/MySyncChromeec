@@ -5,8 +5,8 @@
 
 /* Emulator board configuration */
 
-#ifndef __CROS_EC_BOARD_H
-#define __CROS_EC_BOARD_H
+#ifndef PLATFORM_EC_BOARD_HOST_BOARD_H_
+#define PLATFORM_EC_BOARD_HOST_BOARD_H_
 
 /* Optional features */
 /* Default-yes, override to no by including fake_battery module. */
@@ -106,4 +106,4 @@ void fps_event(enum gpio_signal signal);
 
 #define CONFIG_COMMON_RECURSIVE_MUTEX
 
-#endif /* __CROS_EC_BOARD_H */
+#endif /* PLATFORM_EC_BOARD_HOST_BOARD_H_ */

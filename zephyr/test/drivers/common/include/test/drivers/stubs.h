@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __TEST_DRIVERS_STUBS_H
-#define __TEST_DRIVERS_STUBS_H
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_STUBS_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_STUBS_H_
 
 #include "power.h"
 
@@ -28,4 +28,5 @@ void sys_arch_reboot(int type);
 
 /* Declare GPIO_TEST interrupt handler */
 void gpio_test_interrupt(enum gpio_signal signal);
-#endif /* __TEST_DRIVERS_STUBS_H */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_STUBS_H_ \
+	*/

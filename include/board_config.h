@@ -5,8 +5,8 @@
  * Extra hooks for board and chip initialization/configuration
  */
 
-#ifndef __CROS_EC_BOARD_CONFIG_H
-#define __CROS_EC_BOARD_CONFIG_H
+#ifndef PLATFORM_EC_INCLUDE_BOARD_CONFIG_H_
+#define PLATFORM_EC_INCLUDE_BOARD_CONFIG_H_
 
 #include "common.h"
 
@@ -86,4 +86,4 @@ __override_proto uint32_t board_override_feature_flags1(uint32_t flags1);
 }
 #endif
 
-#endif /* __CROS_EC_BOARD_CONFIG_H */
+#endif /* PLATFORM_EC_INCLUDE_BOARD_CONFIG_H_ */

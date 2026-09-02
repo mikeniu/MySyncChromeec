@@ -8,8 +8,8 @@
  * these API should be implemented by shim drivers
  */
 
-#ifndef _HECI_BSP_H_
-#define _HECI_BSP_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_HOST_SERVICE_HECI_INTF_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_HOST_SERVICE_HECI_INTF_H_
 
 #include "heci.h"
 
@@ -64,4 +64,4 @@ int host_svr_hal_init(void);
 
 uint32_t get_heci_core_bitmap(void);
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_HOST_SERVICE_HECI_INTF_H_ */

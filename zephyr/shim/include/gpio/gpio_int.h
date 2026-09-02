@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_INT_H_
-#define ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_INT_H_
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_INT_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_INT_H_
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -92,4 +92,4 @@ DT_FOREACH_CHILD(DT_COMPAT_GET_ANY_STATUS_OKAY(cros_ec_gpio_interrupts),
 }
 #endif
 
-#endif /* ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_INT_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_INT_H_ */

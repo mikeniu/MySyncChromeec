@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_RSA_H
-#define __CROS_EC_RSA_H
+#ifndef PLATFORM_EC_INCLUDE_RSA_H_
+#define PLATFORM_EC_INCLUDE_RSA_H_
 
 #include "config.h"
 
@@ -71,4 +71,4 @@ int rsa_verify(const struct rsa_public_key *key, const uint8_t *signature,
 }
 #endif
 
-#endif /* __CROS_EC_RSA_H */
+#endif /* PLATFORM_EC_INCLUDE_RSA_H_ */

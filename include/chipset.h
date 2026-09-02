@@ -10,8 +10,8 @@
  * all main chipsets (x86, gaia, etc.).
  */
 
-#ifndef __CROS_EC_CHIPSET_H
-#define __CROS_EC_CHIPSET_H
+#ifndef PLATFORM_EC_INCLUDE_CHIPSET_H_
+#define PLATFORM_EC_INCLUDE_CHIPSET_H_
 
 #include "ap_reset_log.h"
 #include "common.h"
@@ -276,4 +276,4 @@ board_system_is_idle(uint64_t last_shutdown_time, uint64_t *target,
 }
 #endif
 
-#endif /* __CROS_EC_CHIPSET_H */
+#endif /* PLATFORM_EC_INCLUDE_CHIPSET_H_ */

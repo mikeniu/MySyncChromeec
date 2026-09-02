@@ -9,8 +9,8 @@
  * https://archive.org/details/ps-2-hardware-interface-technical-reference-ocr/PS2HardwareInterfaceTechnicalReference-OCR/page/n371/mode/1up
  */
 
-#ifndef __CROS_EC_I8042_PROTOCOL_H
-#define __CROS_EC_I8042_PROTOCOL_H
+#ifndef PLATFORM_EC_INCLUDE_I8042_PROTOCOL_H_
+#define PLATFORM_EC_INCLUDE_I8042_PROTOCOL_H_
 
 /* Some commands appear more than once.  Why? */
 
@@ -62,4 +62,4 @@
 /* Status Flags */
 #define I8042_AUX_DATA BIT(5)
 
-#endif /* __CROS_EC_I8042_PROTOCOL_H */
+#endif /* PLATFORM_EC_INCLUDE_I8042_PROTOCOL_H_ */

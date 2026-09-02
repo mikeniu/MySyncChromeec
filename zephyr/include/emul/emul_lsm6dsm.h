@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_LSM6DSM_H
-#define __EMUL_LSM6DSM_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LSM6DSM_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LSM6DSM_H_
 
 #include "ec_commands.h"
 
@@ -25,4 +25,4 @@ void emul_lsm6dsm_append_sample(const struct emul *target,
 				enum motionsensor_type type, float x, float y,
 				float z);
 
-#endif /* __EMUL_LSM6DSM_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LSM6DSM_H_ */

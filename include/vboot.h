@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_INCLUDE_VBOOT_H
-#define __CROS_EC_INCLUDE_VBOOT_H
+#ifndef PLATFORM_EC_INCLUDE_VBOOT_H_
+#define PLATFORM_EC_INCLUDE_VBOOT_H_
 
 #include "common.h"
 #include "rsa.h"
@@ -201,4 +201,4 @@ __test_only void vboot_disable_pd(void);
 }
 #endif
 
-#endif /* __CROS_EC_INCLUDE_VBOOT_H */
+#endif /* PLATFORM_EC_INCLUDE_VBOOT_H_ */

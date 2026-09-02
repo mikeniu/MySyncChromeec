@@ -7,8 +7,8 @@
  * Header file to expose retimer firmware update APIs.
  */
 
-#ifndef __ZEPHYR_INCLUDE_USBC_PD_RETIMER_FW_UPDATE_H
-#define __ZEPHYR_INCLUDE_USBC_PD_RETIMER_FW_UPDATE_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_USBC_RETIMER_FW_UPDATE_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_USBC_RETIMER_FW_UPDATE_H_
 
 /*
  * @brief Get result of last retimer firmware update operation.
@@ -20,4 +20,4 @@ int usb_retimer_fw_update_get_result(void);
  */
 void usb_retimer_fw_update_process_op(int port, int op);
 
-#endif /* __ZEPHYR_INCLUDE_USBC_PD_RETIMER_FW_UPDATE_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_USBC_RETIMER_FW_UPDATE_H_ */
