@@ -6,6 +6,7 @@ menuconfig PLATFORM_EC_TEMP_SENSOR
 	bool "Temperature sensors"
 	default y
 	depends on DT_HAS_CROS_EC_TEMP_SENSORS_ENABLED
+	select HAS_TASK_THERMAL
 	help
 	  Support for temperature sensors. Once enabled, "temps" console
 	  command and EC_CMD_TEMP_SENSOR_GET_INFO host command are available.
