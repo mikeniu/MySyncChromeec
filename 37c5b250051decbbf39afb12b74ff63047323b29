@@ -35,6 +35,24 @@
       "isAi": true,
       "revId": "37c5b250051decbbf39afb12b74ff63047323b29",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ff21d0a_2db0d21b",
+        "filename": "zephyr/test/hwtest/src/fp_buffer_clear.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-02T21:40:35Z",
+      "side": 1,
+      "message": "Please fix",
+      "parentUuid": "f237ab13_17b3fd34",
+      "revId": "37c5b250051decbbf39afb12b74ff63047323b29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
