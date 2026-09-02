@@ -24,7 +24,7 @@ static inline void stub_send_response_callback(CROS_EC_COMMAND_INFO *args)
 
 #define BUILD_HOST_COMMAND(CMD, VERSION, RESPONSE, PARAMS)              \
 	{                                                               \
-		.reserved = stub_send_response_callback,                \
+		.reserved = (void *)stub_send_response_callback,        \
 		.command = (CMD),                                       \
 		.version = (VERSION),                                   \
 		COND_CODE_0(IS_EMPTY(PARAMS),                           \

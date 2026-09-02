@@ -1,0 +1,6 @@
+tests:
+  bt_passthru.subsys:
+    extra_dtc_overlay_files:
+      - boards/native_sim.overlay
+    platform_allow:
+      - native_sim
