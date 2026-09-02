@@ -35,9 +35,6 @@
 		gpio_all_sys_pwrgd_r: all_sys_pwrgd_r {
 			gpios = <&gpiod 5 (GPIO_INPUT)>;
 		};
-		gpio_imvp9_vrrdy_od: imvp9_vrrdy_od {
-			gpios = <&gpioe 5 (GPIO_INPUT)>;
-		};
 		gpio_ec_accel_mb_int_l: ec_accel_mb_int_l {
 			gpios = <&gpiof 7 (GPIO_INPUT)>;
 		};
@@ -208,7 +205,8 @@
 			<&gpiog 7 0>, /* SPARE GPG7 */
 			<&gpioj 6 0>, /* SPARE GPJ6 PD2_INT*/
 			<&gpiof 0 0>, /* SPARE GPF0 */
-			<&gpiof 1 0>; /* SPARE GPF1 */
+			<&gpiof 1 0>, /* SPARE GPF1 */
+			<&gpioe 5 0>; /* SPARE GPE5 */
 	};
 };
 
