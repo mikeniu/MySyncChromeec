@@ -24,6 +24,8 @@ struct ap_pwrseq_data {
 	 * accessing `sm_data`.
 	 */
 	struct k_mutex mux;
+	/* Cached current power state for lock-free reads. */
+	atomic_t current_state;
 };
 
 /* Resolve into substate name string */
@@ -131,6 +133,7 @@ static void ap_pwrseq_thread(void *arg, void *unused1, void *unused2)
 			run_status =
 				ap_pwrseq_sm_run_state(data->sm_data, events);
 			new_state = ap_pwrseq_sm_get_cur_state(data->sm_data);
+			atomic_set(&data->current_state, new_state);
 
 			ap_pwrseq_state_unlock(dev);
 			if (run_status) {
@@ -177,6 +180,7 @@ static int ap_pwrseq_driver_init(const struct device *dev)
 
 	data->sm_data = ap_pwrseq_sm_get_instance();
 
+	atomic_set(&data->current_state, AP_POWER_STATE_UNINIT);
 	k_mutex_init(&data->mux);
 	k_event_init(&data->evt);
 
@@ -203,6 +207,9 @@ int ap_pwrseq_start(const struct device *dev, enum ap_pwrseq_state init_state)
 
 	ap_pwrseq_state_lock(dev);
 	ret = ap_pwrseq_sm_init(data->sm_data, ap_pwrseq_tid, init_state);
+	if (ret == 0) {
+		atomic_set(&data->current_state, init_state);
+	}
 	ap_pwrseq_state_unlock(dev);
 	if (ret) {
 		return ret;
@@ -228,15 +235,8 @@ void ap_pwrseq_post_event(const struct device *dev, enum ap_pwrseq_event event)
 enum ap_pwrseq_state ap_pwrseq_get_current_state(const struct device *dev)
 {
 	struct ap_pwrseq_data *const data = dev->data;
-	enum ap_pwrseq_state ret_state;
 
-	ap_pwrseq_state_lock(dev);
-
-	ret_state = ap_pwrseq_sm_get_cur_state(data->sm_data);
-
-	ap_pwrseq_state_unlock(dev);
-
-	return ret_state;
+	return (enum ap_pwrseq_state)atomic_get(&data->current_state);
 }
 
 const char *const ap_pwrseq_get_state_str(enum ap_pwrseq_state state)
