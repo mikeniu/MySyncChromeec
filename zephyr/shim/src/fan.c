@@ -285,7 +285,7 @@ void fan_tick_func(void)
 		}
 	}
 }
-DECLARE_HOOK(HOOK_TICK, fan_tick_func, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_SECOND, fan_tick_func, HOOK_PRIO_DEFAULT);
 
 int fan_get_duty(int ch)
 {
