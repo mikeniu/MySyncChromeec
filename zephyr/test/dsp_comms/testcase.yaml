@@ -48,3 +48,11 @@ tests:
       - PW_TRANSPORT_STATUS_FLAGS_SIZE=2
     platform_allow:
       - native_sim
+  pw_host_command.service:
+    harness: gtest
+    extra_configs:
+      - CONFIG_PLATFORM_EC_PW_HOST_COMMAND=y
+    extra_args:
+      - TEST_LIB=pw_host_command.service_test
+    platform_allow:
+      - native_sim

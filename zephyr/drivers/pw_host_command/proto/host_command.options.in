@@ -1,0 +1,6 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+chromiumos.ec.HostCommandRequest.request_payload max_size:@PW_HOST_COMMAND_MAX_PAYLOAD_SIZE@
+chromiumos.ec.HostCommandResponse.response_payload max_size:@PW_HOST_COMMAND_MAX_PAYLOAD_SIZE@
