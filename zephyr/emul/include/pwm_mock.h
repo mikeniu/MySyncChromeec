@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_INCLUDE_PWM_MOCK_H
-#define __EMUL_INCLUDE_PWM_MOCK_H
+#ifndef ZEPHYR_EMUL_INCLUDE_PWM_MOCK_H_
+#define ZEPHYR_EMUL_INCLUDE_PWM_MOCK_H_
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/pwm.h>
@@ -30,4 +30,4 @@ int pwm_mock_get_duty(const struct device *dev, uint32_t channel);
  */
 pwm_flags_t pwm_mock_get_flags(const struct device *dev, uint32_t channel);
 
-#endif /*__EMUL_INCLUDE_PWM_MOCK_H */
+#endif /* ZEPHYR_EMUL_INCLUDE_PWM_MOCK_H_ */

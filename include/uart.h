@@ -5,8 +5,8 @@
 
 /* uart.h - UART module for Chrome EC */
 
-#ifndef __CROS_EC_UART_H
-#define __CROS_EC_UART_H
+#ifndef INCLUDE_UART_H_
+#define INCLUDE_UART_H_
 
 #include "common.h"
 #include "gpio_signal.h"
@@ -398,4 +398,4 @@ void uart_init_buffer(void);
 }
 #endif
 
-#endif /* __CROS_EC_UART_H */
+#endif /* INCLUDE_UART_H_ */

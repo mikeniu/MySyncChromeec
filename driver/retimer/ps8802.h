@@ -6,8 +6,8 @@
  */
 #include "usb_mux.h"
 
-#ifndef __CROS_EC_USB_RETIMER_PS8802_H
-#define __CROS_EC_USB_RETIMER_PS8802_H
+#ifndef DRIVER_RETIMER_PS8802_H_
+#define DRIVER_RETIMER_PS8802_H_
 
 /*
  * PS8802 uses 7-bit I2C addresses 0x08 to 0x17 (ADDR=L).
@@ -115,4 +115,4 @@ int ps8802_i2c_field_update16(const struct usb_mux *me, int page, int offset,
 			      uint16_t field_mask, uint16_t set_value);
 int ps8802_chg_i2c_addr(int i2c_port);
 
-#endif /* __CROS_EC_USB_RETIMER_PS8802_H */
+#endif /* DRIVER_RETIMER_PS8802_H_ */

@@ -5,8 +5,8 @@
 
 /* Task scheduling / events module for Chrome EC operating system */
 
-#ifndef __CROS_EC_TASK_H
-#define __CROS_EC_TASK_H
+#ifndef INCLUDE_TASK_H_
+#define INCLUDE_TASK_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -510,4 +510,4 @@ struct irq_def {
 }
 #endif
 
-#endif /* __CROS_EC_TASK_H */
+#endif /* INCLUDE_TASK_H_ */

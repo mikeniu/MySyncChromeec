@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_LED_PWM_H
-#define __CROS_EC_LED_PWM_H
+#ifndef INCLUDE_LED_PWM_H_
+#define INCLUDE_LED_PWM_H_
 
 #include "ec_commands.h"
 
@@ -78,4 +78,4 @@ void set_pwm_led_color(enum pwm_led_id id, int color);
 }
 #endif
 
-#endif /* defined(__CROS_EC_LED_PWM_H) */
+#endif /* INCLUDE_LED_PWM_H_ */

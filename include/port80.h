@@ -5,8 +5,8 @@
 
 /* Port 80 module for Chrome EC */
 
-#ifndef __CROS_EC_PORT80_H
-#define __CROS_EC_PORT80_H
+#ifndef INCLUDE_PORT80_H_
+#define INCLUDE_PORT80_H_
 
 #include "common.h"
 
@@ -39,4 +39,4 @@ int port_80_read(void);
 }
 #endif
 
-#endif /* __CROS_EC_PORT80_H */
+#endif /* INCLUDE_PORT80_H_ */

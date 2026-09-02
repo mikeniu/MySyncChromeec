@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_REGISTERS_H
-#define __CROS_EC_REGISTERS_H
+#ifndef ZEPHYR_SHIM_INCLUDE_REGISTERS_H_
+#define ZEPHYR_SHIM_INCLUDE_REGISTERS_H_
 
 /*
  * This file is left intentionally blank. It is required since many of the
@@ -13,4 +13,4 @@
  * platform/ec/chip/...
  */
 
-#endif /* __CROS_EC_REGISTERS_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_REGISTERS_H_ */

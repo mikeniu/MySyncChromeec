@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_RAA489000_H
-#define EMUL_RAA489000_H
+#ifndef ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_RAA489000_H_
+#define ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_RAA489000_H_
 
 #include "driver/tcpm/raa489000.h"
 
-#endif /* EMUL_RAA489000_H */
+#endif /* ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_RAA489000_H_ */

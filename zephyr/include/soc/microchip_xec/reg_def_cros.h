@@ -8,8 +8,8 @@
  * @brief Microchip XEC register structure definitions used by the Chrome OS EC.
  */
 
-#ifndef _MICROCHIP_XEC_REG_DEF_CROS_H
-#define _MICROCHIP_XEC_REG_DEF_CROS_H
+#ifndef ZEPHYR_INCLUDE_SOC_MICROCHIP_XEC_REG_DEF_CROS_H_
+#define ZEPHYR_INCLUDE_SOC_MICROCHIP_XEC_REG_DEF_CROS_H_
 
 /* RTC register structure */
 struct rtc_hw {
@@ -38,4 +38,4 @@ struct rtc_hw {
 	__IOM uint32_t DLSB; /*!< (@ 0x001C) RTC daylight savings backward */
 };
 
-#endif /* _MICROCHIP_XEC_REG_DEF_CROS_H */
+#endif /* ZEPHYR_INCLUDE_SOC_MICROCHIP_XEC_REG_DEF_CROS_H_ */

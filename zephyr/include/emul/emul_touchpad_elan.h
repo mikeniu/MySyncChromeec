@@ -3,12 +3,12 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_TOUCHPAD_ELAN_H
-#define EMUL_TOUCHPAD_ELAN_H
+#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_TOUCHPAD_ELAN_H_
+#define ZEPHYR_INCLUDE_EMUL_EMUL_TOUCHPAD_ELAN_H_
 
 #include <zephyr/drivers/emul.h>
 
 void touchpad_elan_emul_set_raw_report(const struct emul *emul,
 				       const uint8_t *report);
 
-#endif
+#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_TOUCHPAD_ELAN_H_ */

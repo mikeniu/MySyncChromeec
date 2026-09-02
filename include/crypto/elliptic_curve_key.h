@@ -5,8 +5,8 @@
 
 /* Helpers for the boringssl elliptic curve key interface. */
 
-#ifndef __CROS_EC_ELLIPTIC_CURVE_KEY_H
-#define __CROS_EC_ELLIPTIC_CURVE_KEY_H
+#ifndef INCLUDE_CRYPTO_ELLIPTIC_CURVE_KEY_H_
+#define INCLUDE_CRYPTO_ELLIPTIC_CURVE_KEY_H_
 
 #include "openssl/ec_key.h"
 #include "openssl/mem.h"
@@ -17,4 +17,4 @@
  */
 bssl::UniquePtr<EC_KEY> generate_elliptic_curve_key();
 
-#endif /* __CROS_EC_ELLIPTIC_CURVE_KEY_H */
+#endif /* INCLUDE_CRYPTO_ELLIPTIC_CURVE_KEY_H_ */

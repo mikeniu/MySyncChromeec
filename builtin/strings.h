@@ -3,12 +3,12 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_STRINGS_H__
-#define __CROS_EC_STRINGS_H__
+#ifndef BUILTIN_STRINGS_H_
+#define BUILTIN_STRINGS_H_
 
 #include <stddef.h>
 
 int strcasecmp(const char *s1, const char *s2);
 int strncasecmp(const char *s1, const char *s2, size_t size);
 
-#endif /* __CROS_EC_STRINGS_H__ */
+#endif /* BUILTIN_STRINGS_H_ */

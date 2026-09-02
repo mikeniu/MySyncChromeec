@@ -5,8 +5,8 @@
 
 /* Fan control module for Chrome EC */
 
-#ifndef __CROS_EC_FAN_H
-#define __CROS_EC_FAN_H
+#ifndef INCLUDE_FAN_H_
+#define INCLUDE_FAN_H_
 
 #include "config.h"
 
@@ -287,4 +287,4 @@ enum fan_status fan_smart_control(int ch);
 }
 #endif
 
-#endif /* __CROS_EC_FAN_H */
+#endif /* INCLUDE_FAN_H_ */

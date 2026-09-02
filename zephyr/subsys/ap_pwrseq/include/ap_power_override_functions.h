@@ -17,8 +17,8 @@
  * as timeouts etc.
  */
 
-#ifndef __AP_PWRSEQ_AP_POWER_BOARD_FUNCTIONS_H__
-#define __AP_PWRSEQ_AP_POWER_BOARD_FUNCTIONS_H__
+#ifndef ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_AP_POWER_OVERRIDE_FUNCTIONS_H_
+#define ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_AP_POWER_OVERRIDE_FUNCTIONS_H_
 
 #include <zephyr/devicetree.h>
 
@@ -91,4 +91,4 @@ bool board_ap_power_check_power_rails_enabled(void);
 #define AP_PWRSEQ_DT_VALUE(p) \
 	DT_PROP(DT_COMPAT_GET_ANY_STATUS_OKAY(intel_ap_pwrseq), p)
 
-#endif /* __AP_PWRSEQ_AP_POWER_BOARD_FUNCTIONS_H__ */
+#endif /* ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_AP_POWER_OVERRIDE_FUNCTIONS_H_ */

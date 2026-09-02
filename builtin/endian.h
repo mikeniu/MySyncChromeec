@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EC_BUILTIN_ENDIAN_H
-#define __EC_BUILTIN_ENDIAN_H
+#ifndef BUILTIN_ENDIAN_H_
+#define BUILTIN_ENDIAN_H_
 
 #include <stdint.h>
 
@@ -46,4 +46,4 @@ static inline uint64_t be64toh(uint64_t in)
 }
 #endif
 
-#endif /* __EC_BUILTIN_ENDIAN_H */
+#endif /* BUILTIN_ENDIAN_H_ */

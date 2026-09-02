@@ -4,8 +4,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __UTIL_UUT_MAIN_H
-#define __UTIL_UUT_MAIN_H
+#ifndef UTIL_UUT_MAIN_H_
+#define UTIL_UUT_MAIN_H_
 
 #include <stdbool.h>
 
@@ -71,4 +71,4 @@ void display_color_msg(bool success, const char *fmt, ...);
 }
 #endif
 
-#endif /* __UTIL_UUT_MAIN_H */
+#endif /* UTIL_UUT_MAIN_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __UTIL_IPC_LOCK_H
-#define __UTIL_IPC_LOCK_H
+#ifndef UTIL_LOCK_IPC_LOCK_H_
+#define UTIL_LOCK_IPC_LOCK_H_
 
 struct ipc_lock {
 	int is_held; /* internal */
@@ -41,4 +41,4 @@ extern int acquire_lock(struct ipc_lock *lock, int timeout_msecs);
  */
 extern int release_lock(struct ipc_lock *lock);
 
-#endif /* __UTIL_IPC_LOCK_H */
+#endif /* UTIL_LOCK_IPC_LOCK_H_ */

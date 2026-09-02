@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __BOARD_LED_H
-#define __BOARD_LED_H
+#ifndef ZEPHYR_SHIM_INCLUDE_BOARD_LED_H_
+#define ZEPHYR_SHIM_INCLUDE_BOARD_LED_H_
 
 #include <stdint.h>
 
@@ -33,4 +33,4 @@ struct board_led_pwm_dt_channel {
 }
 #endif
 
-#endif /* __BOARD_LED_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_BOARD_LED_H_ */

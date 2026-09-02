@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_FT98XX_PAL_SENSOR_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_FT98XX_PAL_SENSOR_H_
+#ifndef ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_PAL_H_
+#define ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_PAL_H_
 
 #include <drivers/fingerprint.h>
 
@@ -77,4 +77,4 @@ void *__unused focal_malloc(uint32_t size);
  */
 void __unused focal_free(void *data);
 
-#endif
+#endif /* ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_PAL_H_ */

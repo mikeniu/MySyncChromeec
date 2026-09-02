@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_BASE_STATE_H
-#define __CROS_EC_BASE_STATE_H
+#ifndef INCLUDE_BASE_STATE_H_
+#define INCLUDE_BASE_STATE_H_
 
 #include "ec_commands.h"
 
@@ -34,4 +34,4 @@ void base_force_state(enum ec_set_base_state_cmd state);
 }
 #endif
 
-#endif /* __CROS_EC_BASE_STATE_H */
+#endif /* INCLUDE_BASE_STATE_H_ */

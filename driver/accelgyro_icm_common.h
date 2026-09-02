@@ -5,8 +5,8 @@
 
 /* ICM accelerometer and gyroscope common definitions for Chrome EC */
 
-#ifndef __CROS_EC_ACCELGYRO_ICM_COMMON_H
-#define __CROS_EC_ACCELGYRO_ICM_COMMON_H
+#ifndef DRIVER_ACCELGYRO_ICM_COMMON_H_
+#define DRIVER_ACCELGYRO_ICM_COMMON_H_
 
 #include "accelgyro.h"
 #include "builtin/stddef.h"
@@ -137,4 +137,4 @@ static inline int32_t icm_get_sensor_stabilized(const struct motion_sensor_t *s,
 	return time_until(ts, stabilize_ts);
 }
 
-#endif /* __CROS_EC_ACCELGYRO_ICM_COMMON_H */
+#endif /* DRIVER_ACCELGYRO_ICM_COMMON_H_ */

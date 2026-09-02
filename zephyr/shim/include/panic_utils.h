@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __ZEPHYR_SHIM_PANIC_UTILS_H
-#define __ZEPHYR_SHIM_PANIC_UTILS_H
+#ifndef ZEPHYR_SHIM_INCLUDE_PANIC_UTILS_H_
+#define ZEPHYR_SHIM_INCLUDE_PANIC_UTILS_H_
 
 #include <zephyr/kernel.h>
 
@@ -37,4 +37,4 @@ void get_thread_name(const struct k_thread *thread, char *name, size_t size);
  */
 uint32_t get_stack_ptr(const struct k_thread *thread);
 
-#endif /* __ZEPHYR_SHIM_PANIC_UTILS_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_PANIC_UTILS_H_ */

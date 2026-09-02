@@ -5,8 +5,8 @@
 
 /* USB Protocol Layer module */
 
-#ifndef __CROS_EC_USB_PRL_H
-#define __CROS_EC_USB_PRL_H
+#ifndef INCLUDE_USB_PRL_SM_H_
+#define INCLUDE_USB_PRL_SM_H_
 #include "common.h"
 #include "timer.h"
 #include "usb_pd.h"
@@ -159,4 +159,4 @@ void prl_set_data_role_check(int port, bool enable);
 }
 #endif
 
-#endif /* __CROS_EC_USB_PRL_H */
+#endif /* INCLUDE_USB_PRL_SM_H_ */

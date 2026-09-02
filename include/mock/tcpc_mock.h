@@ -4,8 +4,8 @@
  */
 /* Mock for the TCPC interface */
 
-#ifndef __MOCK_TCPC_MOCK_H
-#define __MOCK_TCPC_MOCK_H
+#ifndef INCLUDE_MOCK_TCPC_MOCK_H_
+#define INCLUDE_MOCK_TCPC_MOCK_H_
 
 #include "usb_pd.h"
 #include "usb_pd_tcpm.h"
@@ -47,4 +47,4 @@ extern struct mock_tcpc_ctrl mock_tcpc;
 }
 #endif
 
-#endif /* __MOCK_TCPC_MOCK_H */
+#endif /* INCLUDE_MOCK_TCPC_MOCK_H_ */

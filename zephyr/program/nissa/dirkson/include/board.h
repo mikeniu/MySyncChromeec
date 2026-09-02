@@ -5,8 +5,8 @@
 
 /* Dirkson declarations */
 
-#ifndef __CROS_EC_NISSA_DIRKSON_BOARD_H__
-#define __CROS_EC_NISSA_DIRKSON_BOARD_H__
+#ifndef ZEPHYR_PROGRAM_NISSA_DIRKSON_INCLUDE_BOARD_H_
+#define ZEPHYR_PROGRAM_NISSA_DIRKSON_INCLUDE_BOARD_H_
 
 enum charge_port {
 	CHARGE_PORT_TYPEC0,
@@ -15,4 +15,4 @@ enum charge_port {
 
 enum usbc_port { USBC_PORT_C0 = 0, USBC_PORT_COUNT };
 
-#endif /* __CROS_EC_NISSA_DIRKSON_BOARD_H__ */
+#endif /* ZEPHYR_PROGRAM_NISSA_DIRKSON_INCLUDE_BOARD_H_ */

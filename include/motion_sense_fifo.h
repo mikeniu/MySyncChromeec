@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_MOTION_SENSE_FIFO_H
-#define __CROS_EC_MOTION_SENSE_FIFO_H
+#ifndef INCLUDE_MOTION_SENSE_FIFO_H_
+#define INCLUDE_MOTION_SENSE_FIFO_H_
 
 #include "motion_sense.h"
 
@@ -139,4 +139,4 @@ __test_only void motion_sense_fifo_reset(void);
 }
 #endif
 
-#endif /*__CROS_EC_MOTION_SENSE_FIFO_H */
+#endif /* INCLUDE_MOTION_SENSE_FIFO_H_ */

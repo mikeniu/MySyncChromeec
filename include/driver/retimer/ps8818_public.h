@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-#ifndef __CROS_EC_USB_RETIMER_PS8818_H
-#define __CROS_EC_USB_RETIMER_PS8818_H
+#ifndef INCLUDE_DRIVER_RETIMER_PS8818_PUBLIC_H_
+#define INCLUDE_DRIVER_RETIMER_PS8818_PUBLIC_H_
 
 #define PS8818_I2C_ADDR0_FLAGS 0x28
 #define PS8818_I2C_ADDR1_FLAGS 0x30
@@ -104,4 +104,4 @@ int ps8818_i2c_field_update8(const struct usb_mux *me, int page, int offset,
 }
 #endif
 
-#endif /* __CROS_EC_USB_RETIMER_PS8818_H */
+#endif /* INCLUDE_DRIVER_RETIMER_PS8818_PUBLIC_H_ */

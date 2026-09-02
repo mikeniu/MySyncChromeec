@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_RT1715_H
-#define EMUL_RT1715_H
+#ifndef ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_RT1715_H_
+#define ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_RT1715_H_
 
 #include "driver/tcpm/rt1715.h"
 
-#endif /* EMUL_RT1715_H */
+#endif /* ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_RT1715_H_ */

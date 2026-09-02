@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __AP_POWER_HOST_SLEEP_H
-#define __AP_POWER_HOST_SLEEP_H
+#ifndef ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_AP_POWER_HOST_SLEEP_H_
+#define ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_AP_POWER_HOST_SLEEP_H_
 
 #include <ap_power/ap_power_interface.h>
 #include <power_host_sleep.h>
@@ -77,4 +77,4 @@ uint16_t host_get_sleep_timeout(void);
  */
 void host_set_sleep_transitions(uint32_t val);
 
-#endif /* __AP_PWRSEQ_HOST_SLEEP_H */
+#endif /* ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_AP_POWER_HOST_SLEEP_H_ */

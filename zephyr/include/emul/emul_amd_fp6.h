@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_AMD_FP6_USB_MUX_H
-#define EMUL_AMD_FP6_USB_MUX_H
+#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_AMD_FP6_H_
+#define ZEPHYR_INCLUDE_EMUL_EMUL_AMD_FP6_H_
 
 #include <zephyr/drivers/emul.h>
 
@@ -38,4 +38,4 @@ void amd_fp6_emul_set_xbar(const struct emul *emul, bool ready);
  */
 void amd_fp6_emul_set_delay(const struct emul *emul, int delay_reads);
 
-#endif
+#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_AMD_FP6_H_ */

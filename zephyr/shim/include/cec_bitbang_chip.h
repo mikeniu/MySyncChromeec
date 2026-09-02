@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CEC_CHIP_H
-#define __CROS_EC_CEC_CHIP_H
+#ifndef ZEPHYR_SHIM_INCLUDE_CEC_BITBANG_CHIP_H_
+#define ZEPHYR_SHIM_INCLUDE_CEC_BITBANG_CHIP_H_
 
 /* 1:1 conversion between us and ticks for testing purposes */
 
@@ -24,4 +24,4 @@
 #endif
 #endif
 
-#endif /* __CROS_EC_CEC_CHIP_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_CEC_BITBANG_CHIP_H_ */

@@ -8,8 +8,8 @@
  * @brief API for power signal ESPI callback.
  */
 
-#ifndef __AP_POWER_AP_POWER_ESPI_H__
-#define __AP_POWER_AP_POWER_ESPI_H__
+#ifndef ZEPHYR_INCLUDE_AP_POWER_AP_POWER_ESPI_H_
+#define ZEPHYR_INCLUDE_AP_POWER_AP_POWER_ESPI_H_
 
 #include <zephyr/drivers/espi.h>
 
@@ -33,4 +33,4 @@ void power_signal_espi_cb(const struct device *dev, struct espi_callback *cb,
 	(ESPI_BUS_EVENT_CHANNEL_READY | ESPI_BUS_EVENT_VWIRE_RECEIVED | \
 	 ESPI_BUS_RESET)
 
-#endif /* __AP_POWER_AP_POWER_ESPI_H__ */
+#endif /* ZEPHYR_INCLUDE_AP_POWER_AP_POWER_ESPI_H_ */

@@ -6,8 +6,8 @@
  * Parade 8828 USB/DP Mux.
  */
 
-#ifndef __CROS_EC_USB_MUX_PARADE8833_H
-#define __CROS_EC_USB_MUX_PARADE8833_H
+#ifndef INCLUDE_DRIVER_RETIMER_PS8833_H_
+#define INCLUDE_DRIVER_RETIMER_PS8833_H_
 
 #include "usb_mux.h"
 
@@ -52,4 +52,4 @@ extern const struct usb_mux_driver ps8833_usb_retimer_driver;
 }
 #endif
 
-#endif /* __CROS_EC_USB_MUX_PARADE8833_H */
+#endif /* INCLUDE_DRIVER_RETIMER_PS8833_H_ */

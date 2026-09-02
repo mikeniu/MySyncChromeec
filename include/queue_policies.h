@@ -4,8 +4,8 @@
  *
  * Queue policies.
  */
-#ifndef __CROS_EC_QUEUE_POLICIES_H
-#define __CROS_EC_QUEUE_POLICIES_H
+#ifndef INCLUDE_QUEUE_POLICIES_H_
+#define INCLUDE_QUEUE_POLICIES_H_
 
 #include "consumer.h"
 #include "producer.h"
@@ -56,4 +56,4 @@ extern struct consumer const null_consumer;
 }
 #endif
 
-#endif /* __CROS_EC_QUEUE_POLICIES_H */
+#endif /* INCLUDE_QUEUE_POLICIES_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_DRIVERS_FT98XX_SRC_TEST_HELPERS_H_
-#define ZEPHYR_TEST_DRIVERS_FT98XX_SRC_TEST_HELPERS_H_
+#ifndef ZEPHYR_TEST_FINGERPRINT_DRIVERS_FT98XX_SRC_FT98XX_PAL_TEST_HELPERS_H_
+#define ZEPHYR_TEST_FINGERPRINT_DRIVERS_FT98XX_SRC_FT98XX_PAL_TEST_HELPERS_H_
 
 #include <zephyr/kernel.h>
 
@@ -19,4 +19,4 @@ __syscall void ft98xx_focal_free(void *data);
 
 #include <zephyr/syscalls/ft98xx_pal_test_helpers.h>
 
-#endif /* ZEPHYR_TEST_DRIVERS_FT98XX_SRC_TEST_HELPERS_H_ */
+#endif // ZEPHYR_TEST_FINGERPRINT_DRIVERS_FT98XX_SRC_FT98XX_PAL_TEST_HELPERS_H_

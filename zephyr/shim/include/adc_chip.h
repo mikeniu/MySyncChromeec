@@ -10,7 +10,7 @@
  * platform/ec/chip/...
  */
 
-#ifndef __CROS_EC_ADC_CHIP_H
-#define __CROS_EC_ADC_CHIP_H
+#ifndef ZEPHYR_SHIM_INCLUDE_ADC_CHIP_H_
+#define ZEPHYR_SHIM_INCLUDE_ADC_CHIP_H_
 
-#endif /* __CROS_EC_ADC_CHIP_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_ADC_CHIP_H_ */

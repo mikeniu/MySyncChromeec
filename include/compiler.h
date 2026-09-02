@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_COMPILER_H
-#define __CROS_EC_COMPILER_H
+#ifndef INCLUDE_COMPILER_H_
+#define INCLUDE_COMPILER_H_
 
 #ifdef CONFIG_ZEPHYR
 /* Get the TOOLCHAIN_GCC_VERSION define. */
@@ -118,4 +118,4 @@
 #endif /* __clang__ */
 #endif /* __no_optimization */
 
-#endif /* __CROS_EC_COMPILER_H */
+#endif /* INCLUDE_COMPILER_H_ */

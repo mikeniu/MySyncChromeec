@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_BEP_MATCHER_H_
-#define __CROS_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_BEP_MATCHER_H_
+#ifndef DRIVER_FINGERPRINT_FPC_BEP_FPC_BEP_MATCHER_H_
+#define DRIVER_FINGERPRINT_FPC_BEP_FPC_BEP_MATCHER_H_
 
 #include <stdint.h>
 
@@ -32,4 +32,4 @@
 /* Max number of templates stored / matched against */
 #define FP_MAX_FINGER_COUNT_FPC (5)
 
-#endif /* __CROS_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_BEP_MATCHER_H_ */
+#endif /* DRIVER_FINGERPRINT_FPC_BEP_FPC_BEP_MATCHER_H_ */

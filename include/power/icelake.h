@@ -5,8 +5,8 @@
 
 /* Icelake chipset power control module for Chrome EC */
 
-#ifndef __CROS_EC_ICELAKE_H
-#define __CROS_EC_ICELAKE_H
+#ifndef INCLUDE_POWER_ICELAKE_H_
+#define INCLUDE_POWER_ICELAKE_H_
 
 #include "stdbool.h"
 
@@ -111,4 +111,4 @@ extern const int pwrok_signal_deassert_count;
 }
 #endif
 
-#endif /* __CROS_EC_ICELAKE_H */
+#endif /* INCLUDE_POWER_ICELAKE_H_ */

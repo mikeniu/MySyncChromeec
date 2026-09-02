@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 /* Richtek RT1715 Type-C port controller */
-#ifndef __CROS_EC_USB_PD_TCPM_RT1715_H
-#define __CROS_EC_USB_PD_TCPM_RT1715_H
+#ifndef DRIVER_TCPM_RT1715_H_
+#define DRIVER_TCPM_RT1715_H_
 
 /* I2C interface */
 #define RT1715_I2C_ADDR_FLAGS 0x4E
@@ -81,4 +81,4 @@
 
 extern const struct tcpm_drv rt1715_tcpm_drv;
 
-#endif /* defined(__CROS_EC_USB_PD_TCPM_RT1715_H) */
+#endif /* DRIVER_TCPM_RT1715_H_ */

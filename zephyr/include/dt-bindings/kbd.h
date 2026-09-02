@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef DT_BINDINGS_KBD_H_
-#define DT_BINDINGS_KBD_H_
+#ifndef ZEPHYR_INCLUDE_DT_BINDINGS_KBD_H_
+#define ZEPHYR_INCLUDE_DT_BINDINGS_KBD_H_
 
 #define KBD_RC(row, col) ((((row) & 0xff) << 8) | ((col) & 0xff))
 
@@ -34,4 +34,4 @@
 #define KBD_SCANCODE_HOME 0xe06c
 #define KBD_SCANCODE_END 0xe069
 
-#endif /* DT_BINDINGS_KBD_H_ */
+#endif /* ZEPHYR_INCLUDE_DT_BINDINGS_KBD_H_ */

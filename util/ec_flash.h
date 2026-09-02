@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __UTIL_EC_FLASH_H
-#define __UTIL_EC_FLASH_H
+#ifndef UTIL_EC_FLASH_H_
+#define UTIL_EC_FLASH_H_
 
 /**
  * Read EC flash memory
@@ -59,4 +59,4 @@ int ec_flash_erase(int offset, int size);
  */
 int ec_flash_erase_async(int offset, int size);
 
-#endif
+#endif /* UTIL_EC_FLASH_H_ */

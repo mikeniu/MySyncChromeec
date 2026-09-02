@@ -5,8 +5,8 @@
 
 /* Epic sub-board declarations */
 
-#ifndef __CROS_EC_NISSA_EPIC_SUB_BOARD_H__
-#define __CROS_EC_NISSA_EPIC_SUB_BOARD_H__
+#ifndef ZEPHYR_PROGRAM_NISSA_INCLUDE_EPIC_SUB_BOARD_H_
+#define ZEPHYR_PROGRAM_NISSA_INCLUDE_EPIC_SUB_BOARD_H_
 
 enum epic_sub_board_type {
 	EPIC_SB_UNKNOWN = -1, /* Uninitialised */
@@ -19,4 +19,4 @@ enum epic_sub_board_type {
 
 enum epic_sub_board_type epic_get_sb_type(void);
 
-#endif /* __CROS_EC_NISSA_EPIC_SUB_BOARD_H__ */
+#endif /* ZEPHYR_PROGRAM_NISSA_INCLUDE_EPIC_SUB_BOARD_H_ */

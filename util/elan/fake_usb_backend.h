@@ -79,4 +79,4 @@ class FakeUsbBackend : public UsbBackend {
 };
 
 }  // namespace elan
-#endif
+#endif  // UTIL_ELAN_FAKE_USB_BACKEND_H_

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ZEPHYR_CEC_H
-#define __CROS_EC_ZEPHYR_CEC_H
+#ifndef ZEPHYR_SHIM_INCLUDE_ZEPHYR_CEC_H_
+#define ZEPHYR_SHIM_INCLUDE_ZEPHYR_CEC_H_
 
 #include <zephyr/devicetree.h>
 
@@ -29,4 +29,4 @@ enum cec_port {
 }
 #endif
 
-#endif /* __CROS_EC_ZEPHYR_CEC_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_ZEPHYR_CEC_H_ */

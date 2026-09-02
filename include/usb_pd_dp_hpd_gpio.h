@@ -8,8 +8,8 @@
  * Note: Stubs of APIs are implemented for linking if feature is not enabled
  */
 
-#ifndef __CROS_EC_USB_DP_HPD_GPIO_H
-#define __CROS_EC_USB_DP_HPD_GPIO_H
+#ifndef INCLUDE_USB_PD_DP_HPD_GPIO_H_
+#define INCLUDE_USB_PD_DP_HPD_GPIO_H_
 
 #ifdef CONFIG_USB_PD_DP_HPD_GPIO
 /*
@@ -30,4 +30,4 @@ static inline enum ec_error_list dp_hpd_gpio_set(int port, bool level, bool irq)
 }
 
 #endif /* CONFIG_USB_PD_DP_HPD_GPIO */
-#endif /* __CROS_EC_USB_DP_HPD_GPIO_H */
+#endif /* INCLUDE_USB_PD_DP_HPD_GPIO_H_ */

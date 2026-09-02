@@ -12,8 +12,8 @@
  * and should be updated if necessary.
  */
 
-#ifndef VBOOT_REFERENCE_VB21_STRUCT_H_
-#define VBOOT_REFERENCE_VB21_STRUCT_H_
+#ifndef INCLUDE_VB21_STRUCT_H_
+#define INCLUDE_VB21_STRUCT_H_
 #include "2id.h"
 
 #include <stdint.h>
@@ -348,4 +348,4 @@ struct vb21_fw_preamble {
 }
 #endif
 
-#endif /* VBOOT_REFERENCE_VB21_STRUCT_H_ */
+#endif /* INCLUDE_VB21_STRUCT_H_ */

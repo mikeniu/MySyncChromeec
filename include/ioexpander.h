@@ -4,8 +4,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_IOEXPANDER_H
-#define __CROS_EC_IOEXPANDER_H
+#ifndef INCLUDE_IOEXPANDER_H_
+#define INCLUDE_IOEXPANDER_H_
 
 #ifdef CONFIG_ZEPHYR
 #define ioex_signal gpio_signal
@@ -254,4 +254,4 @@ int ioex_restore_gpio_state(int ioex, const int *state, int state_len);
 }
 #endif
 
-#endif /* __CROS_EC_IOEXPANDER_H */
+#endif /* INCLUDE_IOEXPANDER_H_ */

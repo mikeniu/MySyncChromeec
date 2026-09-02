@@ -3,12 +3,12 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_TOUCHPAD_H
-#define __CROS_EC_TOUCHPAD_H
+#ifndef INCLUDE_TOUCHPAD_H_
+#define INCLUDE_TOUCHPAD_H_
 
 void touchpad_interrupt(enum gpio_signal signal);
 
 /* Reset the touchpad, mainly used to recover it from malfunction. */
 void board_touchpad_reset(void);
 
-#endif
+#endif /* INCLUDE_TOUCHPAD_H_ */

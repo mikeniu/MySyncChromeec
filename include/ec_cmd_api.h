@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_EC_CMD_API_H
-#define __CROS_EC_EC_CMD_API_H
+#ifndef INCLUDE_EC_CMD_API_H_
+#define INCLUDE_EC_CMD_API_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -505,4 +505,4 @@ _CROS_EC_C0_F_PF(EC_CMD_ENTER_BOOTLOADER, enter_bootloader);
 }
 #endif
 
-#endif /* __CROS_EC_EC_CMD_API_H */
+#endif /* INCLUDE_EC_CMD_API_H_ */

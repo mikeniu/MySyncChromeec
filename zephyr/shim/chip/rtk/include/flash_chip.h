@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FLASH_CHIP_H
-#define __CROS_EC_FLASH_CHIP_H
+#ifndef ZEPHYR_SHIM_CHIP_RTK_INCLUDE_FLASH_CHIP_H_
+#define ZEPHYR_SHIM_CHIP_RTK_INCLUDE_FLASH_CHIP_H_
 
 #define CONFIG_SPI_FLASH_W25Q80 /* Internal SPI flash type. */
 
@@ -27,4 +27,4 @@
 
 #define BBRAM_WP_FLAG_INVALID 0xFFFFFFFF
 
-#endif /* __CROS_EC_FLASH_CHIP_H */
+#endif /* ZEPHYR_SHIM_CHIP_RTK_INCLUDE_FLASH_CHIP_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_SYS_TYPES_H__
-#define __CROS_EC_SYS_TYPES_H__
+#ifndef BUILTIN_SYS_TYPES_H_
+#define BUILTIN_SYS_TYPES_H_
 
 /* Data type for POSIX style clock() implementation */
 typedef long clock_t;
@@ -16,4 +16,4 @@ typedef long clock_t;
 typedef __SIZE_TYPE__ ssize_t;
 #undef unsigned
 
-#endif /* __CROS_EC_SYS_TYPES_H__ */
+#endif /* BUILTIN_SYS_TYPES_H_ */

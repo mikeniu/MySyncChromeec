@@ -5,8 +5,8 @@
  * Smart battery v1.0
  * Smart battery charger v1.1
  */
-#ifndef __CROS_EC_BATTERY_SMART_H
-#define __CROS_EC_BATTERY_SMART_H
+#ifndef INCLUDE_BATTERY_SMART_H_
+#define INCLUDE_BATTERY_SMART_H_
 
 #include "common.h"
 
@@ -208,4 +208,4 @@ int sb_read_mfgacc_block(int cmd, int block, uint8_t *data, int len);
 }
 #endif
 
-#endif /* __CROS_EC_BATTERY_SMART_H */
+#endif /* INCLUDE_BATTERY_SMART_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __HOST_BSP_SERVICE_H
-#define __HOST_BSP_SERVICE_H
+#ifndef ZEPHYR_SUBSYS_HOST_SERVICE_INCLUDE_HOST_BSP_SERVICE_H_
+#define ZEPHYR_SUBSYS_HOST_SERVICE_INCLUDE_HOST_BSP_SERVICE_H_
 /**
  * @brief host Services APIs
  * @defgroup host interface host Service APIs
@@ -32,4 +32,4 @@ int host_protocol_register(uint8_t protocol_id, bsp_msg_handler_f handler);
  * @}
  */
 
-#endif /* __HOST_BSP_SERVICE_H */
+#endif /* ZEPHYR_SUBSYS_HOST_SERVICE_INCLUDE_HOST_BSP_SERVICE_H_ */

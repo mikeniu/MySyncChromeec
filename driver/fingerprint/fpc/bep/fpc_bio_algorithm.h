@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FPC_BIO_ALGORITHM_H
-#define __CROS_EC_FPC_BIO_ALGORITHM_H
+#ifndef DRIVER_FINGERPRINT_FPC_BEP_FPC_BIO_ALGORITHM_H_
+#define DRIVER_FINGERPRINT_FPC_BEP_FPC_BIO_ALGORITHM_H_
 
 #include "common.h"
 
@@ -140,4 +140,4 @@ bio_enrollment_get_percent_complete(bio_enrollment_t enrollment);
 __staticlib int bio_enrollment_finish(bio_enrollment_t enrollment,
 				      bio_template_t *templ);
 
-#endif /* __CROS_EC_FPC_BIO_ALGORITHM_H */
+#endif /* DRIVER_FINGERPRINT_FPC_BEP_FPC_BIO_ALGORITHM_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __ZEPHYR_SHIM_IT5205_USB_MUX_H
-#define __ZEPHYR_SHIM_IT5205_USB_MUX_H
+#ifndef ZEPHYR_SHIM_INCLUDE_USBC_IT5205_USB_MUX_H_
+#define ZEPHYR_SHIM_INCLUDE_USBC_IT5205_USB_MUX_H_
 
 #include "usb_mux/it5205_public.h"
 
@@ -28,4 +28,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __ZEPHYR_SHIM_IT5205_USB_MUX_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_USBC_IT5205_USB_MUX_H_ */

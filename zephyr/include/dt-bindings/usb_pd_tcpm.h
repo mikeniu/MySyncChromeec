@@ -3,8 +3,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef DT_BINDINGS_USB_PD_TCPM_H_
-#define DT_BINDINGS_USB_PD_TCPM_H_
+#ifndef ZEPHYR_INCLUDE_DT_BINDINGS_USB_PD_TCPM_H_
+#define ZEPHYR_INCLUDE_DT_BINDINGS_USB_PD_TCPM_H_
 
 #ifndef BIT
 #define BIT(n) (1U << n)
@@ -37,4 +37,4 @@
 #define TCPC_FLAGS_SET_VCONN_IN_SYNC BIT(9)
 #define TCPC_FLAGS_VOLTAGE_ALARM BIT(10)
 
-#endif
+#endif /* ZEPHYR_INCLUDE_DT_BINDINGS_USB_PD_TCPM_H_ */

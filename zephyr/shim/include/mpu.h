@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_MPU_H
-#define __CROS_EC_MPU_H
+#ifndef ZEPHYR_SHIM_INCLUDE_MPU_H_
+#define ZEPHYR_SHIM_INCLUDE_MPU_H_
 
 #include <stdbool.h>
 
@@ -46,4 +46,4 @@ int mpu_lock_rw_flash(void);
 int mpu_lock_rollback(bool lock);
 #endif
 
-#endif /* __CROS_EC_CPU_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_MPU_H_ */

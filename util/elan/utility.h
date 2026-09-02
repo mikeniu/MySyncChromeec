@@ -124,4 +124,4 @@ void LogErr(std::format_string<Args...> fmt, Args&&... args) {
   std::print(stderr, fmt, std::forward<Args>(args)...);
 }
 
-#endif
+#endif  // UTIL_ELAN_UTILITY_H_

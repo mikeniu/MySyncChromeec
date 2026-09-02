@@ -7,8 +7,8 @@
  * Public functions, definitions, and structures.
  */
 
-#ifndef __CROS_EC_USB_RETIMER_KB8010_PUBLIC_H
-#define __CROS_EC_USB_RETIMER_KB8010_PUBLIC_H
+#ifndef INCLUDE_DRIVER_RETIMER_KB8010_PUBLIC_H_
+#define INCLUDE_DRIVER_RETIMER_KB8010_PUBLIC_H_
 
 #include "usb_mux.h"
 
@@ -31,4 +31,4 @@ extern const struct kb8010_control kb8010_controls[];
 }
 #endif
 
-#endif /* __CROS_EC_USB_RETIMER_KB8010_PUBLIC_H */
+#endif /* INCLUDE_DRIVER_RETIMER_KB8010_PUBLIC_H_ */

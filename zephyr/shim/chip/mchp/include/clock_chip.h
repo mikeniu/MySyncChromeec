@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CLOCK_CHIP_H
-#define __CROS_EC_CLOCK_CHIP_H
+#ifndef ZEPHYR_SHIM_CHIP_MCHP_INCLUDE_CLOCK_CHIP_H_
+#define ZEPHYR_SHIM_CHIP_MCHP_INCLUDE_CLOCK_CHIP_H_
 
 void clock_turbo(void);
 
-#endif /* __CROS_EC_CLOCK_CHIP_H */
+#endif /* ZEPHYR_SHIM_CHIP_MCHP_INCLUDE_CLOCK_CHIP_H_ */

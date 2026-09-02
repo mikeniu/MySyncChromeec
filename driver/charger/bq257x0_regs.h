@@ -5,8 +5,8 @@
  * TI bq257x0 battery charger driver.
  */
 
-#ifndef __CROS_EC_BQ257X0_REGS_H
-#define __CROS_EC_BQ257X0_REGS_H
+#ifndef DRIVER_CHARGER_BQ257X0_REGS_H_
+#define DRIVER_CHARGER_BQ257X0_REGS_H_
 
 #include "bq25710.h"
 
@@ -381,4 +381,4 @@
 	SET_BQ_FIELD(_chip, _reg, _field, _chip##_##_reg##_##_field##__##_c, \
 		     (_x))
 
-#endif /* __CROS_EC_BQ257X0_REGS_H */
+#endif /* DRIVER_CHARGER_BQ257X0_REGS_H_ */

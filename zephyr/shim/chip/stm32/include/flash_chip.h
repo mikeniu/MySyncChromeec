@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FLASH_CHIP_H
-#define __CROS_EC_FLASH_CHIP_H
+#ifndef ZEPHYR_SHIM_CHIP_STM32_INCLUDE_FLASH_CHIP_H_
+#define ZEPHYR_SHIM_CHIP_STM32_INCLUDE_FLASH_CHIP_H_
 
 /* Minimum write size */
 #define CONFIG_FLASH_WRITE_SIZE \
@@ -19,4 +19,4 @@
 /* RW image offset inside writable storage (RW part) */
 #define CONFIG_RW_STORAGE_OFF 0x0
 
-#endif /* __CROS_EC_FLASH_CHIP_H */
+#endif /* ZEPHYR_SHIM_CHIP_STM32_INCLUDE_FLASH_CHIP_H_ */

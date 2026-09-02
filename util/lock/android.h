@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ANDROID_H__
-#define ANDROID_H__
+#ifndef UTIL_LOCK_ANDROID_H_
+#define UTIL_LOCK_ANDROID_H_
 
 /*
  * in_android - Test to see if the underlying OS is Android
@@ -21,4 +21,4 @@ extern int in_android(void);
  */
 extern char *android_tmpdir_path(void);
 
-#endif
+#endif /* UTIL_LOCK_ANDROID_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CONFIG_CHIP_H
-#define __CROS_EC_CONFIG_CHIP_H
+#ifndef ZEPHYR_SHIM_INCLUDE_CONFIG_CHIP_H_
+#define ZEPHYR_SHIM_INCLUDE_CONFIG_CHIP_H_
 
 #include <zephyr/devicetree.h>
 #include <zephyr/toolchain.h>
@@ -3875,4 +3875,4 @@ BUILD_ASSERT((DT_NUM_INST_STATUS_OKAY(mps_mp2964)) == 1,
 }
 #endif
 
-#endif /* __CROS_EC_CONFIG_CHIP_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_CONFIG_CHIP_H_ */

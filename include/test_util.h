@@ -5,8 +5,8 @@
 
 /* Various utility for unit testing */
 
-#ifndef __CROS_EC_TEST_UTIL_H
-#define __CROS_EC_TEST_UTIL_H
+#ifndef INCLUDE_TEST_UTIL_H_
+#define INCLUDE_TEST_UTIL_H_
 
 #include "compile_time_macros.h"
 
@@ -528,4 +528,4 @@ void z_ztest_run_test_suite(const char *name, struct unit_test *suite);
 }
 #endif
 
-#endif /* __CROS_EC_TEST_UTIL_H */
+#endif /* INCLUDE_TEST_UTIL_H_ */

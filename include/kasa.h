@@ -5,8 +5,8 @@
 
 /* Kasa sphere fit algorithm */
 
-#ifndef __CROS_EC_KASA_H
-#define __CROS_EC_KASA_H
+#ifndef INCLUDE_KASA_H_
+#define INCLUDE_KASA_H_
 
 #include "vec3.h"
 
@@ -51,4 +51,4 @@ void kasa_compute(struct kasa_fit *kasa, fpv3_t bias, fp_t *radius);
 }
 #endif
 
-#endif /* __CROS_EC_KASA_H */
+#endif /* INCLUDE_KASA_H_ */

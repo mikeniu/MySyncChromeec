@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_OVERFLOW_H
-#define __CROS_EC_OVERFLOW_H
+#ifndef INCLUDE_OVERFLOW_H_
+#define INCLUDE_OVERFLOW_H_
 
 #include "compiler.h"
 
@@ -30,4 +30,4 @@
 
 #include "third_party/linux/overflow.h"
 
-#endif /* __CROS_EC_OVERFLOW_H */
+#endif /* INCLUDE_OVERFLOW_H_ */

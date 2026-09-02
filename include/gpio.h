@@ -5,8 +5,8 @@
 
 /* GPIO module for Chrome EC */
 
-#ifndef __CROS_EC_GPIO_H
-#define __CROS_EC_GPIO_H
+#ifndef INCLUDE_GPIO_H_
+#define INCLUDE_GPIO_H_
 
 #include "common.h"
 #include "console.h"
@@ -537,4 +537,4 @@ void gpio_set_wakepin(enum gpio_signal signal, uint32_t flags);
 }
 #endif
 
-#endif /* __CROS_EC_GPIO_H */
+#endif /* INCLUDE_GPIO_H_ */

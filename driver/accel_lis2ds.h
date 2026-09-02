@@ -5,8 +5,8 @@
 
 /* LIS2DS accelerometer module for Chrome EC */
 
-#ifndef __CROS_EC_ACCEL_LIS2DS_H
-#define __CROS_EC_ACCEL_LIS2DS_H
+#ifndef DRIVER_ACCEL_LIS2DS_H_
+#define DRIVER_ACCEL_LIS2DS_H_
 
 #include "driver/stm_mems_common.h"
 
@@ -176,4 +176,4 @@ void lis2ds_interrupt(enum gpio_signal signal);
 #endif
 #endif
 
-#endif /* __CROS_EC_ACCEL_LIS2DS_H */
+#endif /* DRIVER_ACCEL_LIS2DS_H_ */

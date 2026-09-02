@@ -5,8 +5,8 @@
 
 /* I2C interface for Chrome EC */
 
-#ifndef __CROS_EC_I2C_H
-#define __CROS_EC_I2C_H
+#ifndef INCLUDE_I2C_H_
+#define INCLUDE_I2C_H_
 
 #include "common.h"
 #include "gpio_signal.h"
@@ -485,4 +485,4 @@ __test_only void i2c_passthru_protect_reset(void);
 }
 #endif
 
-#endif /* __CROS_EC_I2C_H */
+#endif /* INCLUDE_I2C_H_ */

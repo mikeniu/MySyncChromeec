@@ -5,8 +5,8 @@
 
 /****** IPC helper definitions *****/
 
-#ifndef __IPC_HELPER_H
-#define __IPC_HELPER_H
+#ifndef ZEPHYR_SUBSYS_HOST_SERVICE_INCLUDE_BSP_HELPER_H_
+#define ZEPHYR_SUBSYS_HOST_SERVICE_INCLUDE_BSP_HELPER_H_
 
 #include "../heci/heci_internal.h"
 
@@ -76,4 +76,4 @@ extern int (*mng_host_access_req)(uint32_t timeout);
 
 void mng_host_access_dereq(void);
 
-#endif /* __IPC_HELPER_H */
+#endif /* ZEPHYR_SUBSYS_HOST_SERVICE_INCLUDE_BSP_HELPER_H_ */

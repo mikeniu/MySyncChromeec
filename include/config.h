@@ -15,8 +15,8 @@
  * assembler.
  */
 
-#ifndef __CROS_EC_CONFIG_H
-#define __CROS_EC_CONFIG_H
+#ifndef INCLUDE_CONFIG_H_
+#define INCLUDE_CONFIG_H_
 
 /*
  * When building for Zephyr tests, a shimmed_tasks.h header is defined
@@ -7414,4 +7414,4 @@
 #include "private_config.h"
 #endif /* HAVE_PRIVATE */
 
-#endif /* __CROS_EC_CONFIG_H */
+#endif /* INCLUDE_CONFIG_H_ */

@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_REX_SRC_FAKES_H
-#define ZEPHYR_TEST_REX_SRC_FAKES_H
+#ifndef ZEPHYR_TEST_REX_TESTS_PROGRAM_SRC_FAKES_H_
+#define ZEPHYR_TEST_REX_TESTS_PROGRAM_SRC_FAKES_H_
 
 /* Board specific fake functions to be declared here */
 
-#endif /* ZEPHYR_TEST_INTELRVP_SRC_FAKES_H */
+#endif /* ZEPHYR_TEST_REX_TESTS_PROGRAM_SRC_FAKES_H_ */

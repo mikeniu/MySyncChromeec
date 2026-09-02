@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_DRIVERS_INCLUDE_CHARGER_UTILS_H_
-#define ZEPHYR_TEST_DRIVERS_INCLUDE_CHARGER_UTILS_H_
+#ifndef ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_CHARGER_UTILS_H_
+#define ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_CHARGER_UTILS_H_
 
 #include "charger.h"
 
@@ -27,4 +27,4 @@ static inline uint8_t get_charger_num(const struct charger_drv *charger)
 	return chip;
 }
 
-#endif /* ZEPHYR_TEST_DRIVERS_INCLUDE_CHARGER_UTILS_H_ */
+#endif /* ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_CHARGER_UTILS_H_ */

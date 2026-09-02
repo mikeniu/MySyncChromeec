@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_MOCK_POWER_SIGNALS_H
-#define ZEPHYR_TEST_MOCK_POWER_SIGNALS_H
+#ifndef ZEPHYR_MOCK_INCLUDE_MOCK_POWER_SIGNALS_H_
+#define ZEPHYR_MOCK_INCLUDE_MOCK_POWER_SIGNALS_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,4 +38,4 @@ int power_wait_mask_signals_timeout_custom_fake(power_signal_mask_t want,
 						power_signal_mask_t mask,
 						int timeout);
 
-#endif /* ZEPHYR_TEST_MOCK_POWER_SIGNALS_H */
+#endif /* ZEPHYR_MOCK_INCLUDE_MOCK_POWER_SIGNALS_H_ */

@@ -5,8 +5,8 @@
 
 /* Chip config header file */
 
-#ifndef __CROS_EC_CONFIG_CHIP_H
-#define __CROS_EC_CONFIG_CHIP_H
+#ifndef CHIP_HOST_CONFIG_CHIP_H_
+#define CHIP_HOST_CONFIG_CHIP_H_
 
 /* Memory mapping */
 #if !defined(TEST_NVMEM) && !defined(TEST_CR50_FUZZ)
@@ -55,4 +55,4 @@ extern char __host_flash[CONFIG_FLASH_SIZE_BYTES];
 
 #define I2C_PORT_COUNT 1
 
-#endif /* __CROS_EC_CONFIG_CHIP_H */
+#endif /* CHIP_HOST_CONFIG_CHIP_H_ */

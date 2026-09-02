@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_PPM_DRIVER_H
-#define EMUL_PPM_DRIVER_H
+#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_PPM_DRIVER_H_
+#define ZEPHYR_INCLUDE_EMUL_EMUL_PPM_DRIVER_H_
 
 #include "usbc/ppm.h"
 
@@ -25,4 +25,4 @@ DECLARE_FAKE_VALUE_FUNC(int, ppm_driver_mock_execute_cmd_sync,
 DECLARE_FAKE_VALUE_FUNC(int, ppm_driver_mock_get_active_port_count,
 			const struct device *);
 
-#endif /* defined(EMUL_PPM_DRIVER_H) */
+#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_PPM_DRIVER_H_ */

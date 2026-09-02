@@ -24,4 +24,4 @@ class MockUsbBackend : public UsbBackend {
 
 }  // namespace elan
 
-#endif
+#endif  // UTIL_ELAN_MOCK_USB_BACKEND_H_

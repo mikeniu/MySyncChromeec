@@ -5,8 +5,8 @@
 
 /* LIS2MSL magnetometer module for Chrome EC */
 
-#ifndef __CROS_EC_MAG_LIS2MDL_H
-#define __CROS_EC_MAG_LIS2MDL_H
+#ifndef DRIVER_MAG_LIS2MDL_H_
+#define DRIVER_MAG_LIS2MDL_H_
 
 #include "accelgyro.h"
 #include "mag_cal.h"
@@ -86,4 +86,4 @@ void lis2mdl_normalize(const struct motion_sensor_t *s, intv3_t v,
 
 extern const struct accelgyro_drv lis2mdl_drv;
 
-#endif /* __CROS_EC_MAG_LIS2MDL_H */
+#endif /* DRIVER_MAG_LIS2MDL_H_ */

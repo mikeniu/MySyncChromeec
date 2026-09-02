@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_DRIVER_FINGERPRINT_FPC_FPC_MATCHER_H_
-#define __CROS_EC_DRIVER_FINGERPRINT_FPC_FPC_MATCHER_H_
+#ifndef DRIVER_FINGERPRINT_FPC_FPC_MATCHER_H_
+#define DRIVER_FINGERPRINT_FPC_FPC_MATCHER_H_
 
 #include "common.h"
 
@@ -16,4 +16,4 @@
 #error "Sensor type not defined!"
 #endif
 
-#endif /* __CROS_EC_DRIVER_FINGERPRINT_FPC_FPC_MATCHER_H_ */
+#endif /* DRIVER_FINGERPRINT_FPC_FPC_MATCHER_H_ */

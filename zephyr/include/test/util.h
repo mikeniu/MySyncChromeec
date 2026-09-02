@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __TEST_UTIL
-#define __TEST_UTIL
+#ifndef ZEPHYR_INCLUDE_TEST_UTIL_H_
+#define ZEPHYR_INCLUDE_TEST_UTIL_H_
 
 #define TEST_WAIT_FOR_INTERVAL_MS 100
 
@@ -26,4 +26,4 @@
  */
 #define TEST_WORKING_DELAY(timeout_ms) while (TEST_WAIT_FOR(false, timeout_ms))
 
-#endif
+#endif /* ZEPHYR_INCLUDE_TEST_UTIL_H_ */

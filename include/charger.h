@@ -5,8 +5,8 @@
 
 /* Charger/battery debug command module for Chrome EC */
 
-#ifndef __CROS_EC_CHARGER_H
-#define __CROS_EC_CHARGER_H
+#ifndef INCLUDE_CHARGER_H_
+#define INCLUDE_CHARGER_H_
 
 #include "common.h"
 #include "ocpc.h"
@@ -483,4 +483,4 @@ int charge_request(bool use_curr, bool is_full);
 }
 #endif
 
-#endif /* __CROS_EC_CHARGER_H */
+#endif /* INCLUDE_CHARGER_H_ */

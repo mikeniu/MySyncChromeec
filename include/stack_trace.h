@@ -5,8 +5,8 @@
 
 /* Trace dump module */
 
-#ifndef __CROS_EC_STACK_TRACE_H
-#define __CROS_EC_STACK_TRACE_H
+#ifndef INCLUDE_STACK_TRACE_H_
+#define INCLUDE_STACK_TRACE_H_
 
 #ifdef EMU_BUILD
 /*
@@ -26,4 +26,4 @@ static inline void task_dump_trace(void)
 }
 #endif
 
-#endif /* __CROS_EC_STACK_TRACE_H */
+#endif /* INCLUDE_STACK_TRACE_H_ */

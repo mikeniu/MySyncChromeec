@@ -5,8 +5,8 @@
 
 /* Base-32 encoding/decoding, designed for manual operator entry. */
 
-#ifndef __CROS_EC_BASE32_H
-#define __CROS_EC_BASE32_H
+#ifndef INCLUDE_BASE32_H_
+#define INCLUDE_BASE32_H_
 
 #include <stdint.h>
 
@@ -79,4 +79,4 @@ int base32_decode(uint8_t *dest, int destlen_bits, const char *src,
 }
 #endif
 
-#endif
+#endif /* INCLUDE_BASE32_H_ */

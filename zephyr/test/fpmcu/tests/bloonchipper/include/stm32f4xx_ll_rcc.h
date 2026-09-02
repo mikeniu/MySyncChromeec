@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __STM32F4xx_LL_RCC_H
-#define __STM32F4xx_LL_RCC_H
+#ifndef ZEPHYR_TEST_FPMCU_TESTS_BLOONCHIPPER_INCLUDE_STM32F4XX_LL_RCC_H_
+#define ZEPHYR_TEST_FPMCU_TESTS_BLOONCHIPPER_INCLUDE_STM32F4XX_LL_RCC_H_
 
 /* Add definitions of types normally provided by the STM32 HAL.
  * Tests don't use HAL, all needed functions are mocked.
@@ -14,4 +14,4 @@
 
 void LL_RCC_ConfigMCO(uint32_t MCOxSource, uint32_t MCOxPrescaler);
 
-#endif
+#endif /* ZEPHYR_TEST_FPMCU_TESTS_BLOONCHIPPER_INCLUDE_STM32F4XX_LL_RCC_H_ */

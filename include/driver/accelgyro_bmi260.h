@@ -5,8 +5,8 @@
 
 /* BMI260 accelerometer and gyro for Chrome EC */
 
-#ifndef __CROS_EC_ACCELGYRO_BMI260_H
-#define __CROS_EC_ACCELGYRO_BMI260_H
+#ifndef INCLUDE_DRIVER_ACCELGYRO_BMI260_H_
+#define INCLUDE_DRIVER_ACCELGYRO_BMI260_H_
 
 #include "accelgyro.h"
 #include "common.h"
@@ -356,4 +356,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __CROS_EC_ACCELGYRO_BMI260_H */
+#endif /* INCLUDE_DRIVER_ACCELGYRO_BMI260_H_ */

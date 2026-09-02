@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ECTOOL_PDC_H
-#define ECTOOL_PDC_H
+#ifndef UTIL_ECTOOL_PDC_H_
+#define UTIL_ECTOOL_PDC_H_
 
 #include "ectool_pdc_pcap.h"
 
@@ -12,4 +12,4 @@ extern const char cmd_pdc_trace_usage[];
 
 int cmd_pdc_trace(int argc, char *argv[]);
 
-#endif /* ECTOOL_PDC_H */
+#endif /* UTIL_ECTOOL_PDC_H_ */

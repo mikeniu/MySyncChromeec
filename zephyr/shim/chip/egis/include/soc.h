@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_SOC_H
-#define __CROS_EC_SOC_H
+#ifndef ZEPHYR_SHIM_CHIP_EGIS_INCLUDE_SOC_H_
+#define ZEPHYR_SHIM_CHIP_EGIS_INCLUDE_SOC_H_
 
-#endif /* __CROS_EC_SOC_H */
+#endif /* ZEPHYR_SHIM_CHIP_EGIS_INCLUDE_SOC_H_ */

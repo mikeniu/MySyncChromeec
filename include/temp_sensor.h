@@ -5,8 +5,8 @@
 
 /* Temperature sensor module for Chrome EC */
 
-#ifndef __CROS_EC_TEMP_SENSOR_H
-#define __CROS_EC_TEMP_SENSOR_H
+#ifndef INCLUDE_TEMP_SENSOR_H_
+#define INCLUDE_TEMP_SENSOR_H_
 
 #include "common.h"
 
@@ -80,4 +80,4 @@ int print_temps(void);
 }
 #endif
 
-#endif /* __CROS_EC_TEMP_SENSOR_H */
+#endif /* INCLUDE_TEMP_SENSOR_H_ */

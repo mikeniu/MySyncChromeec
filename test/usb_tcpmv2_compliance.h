@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef USB_TCPMV2_COMPLIANCE_H
-#define USB_TCPMV2_COMPLIANCE_H
+#ifndef TEST_USB_TCPMV2_COMPLIANCE_H_
+#define TEST_USB_TCPMV2_COMPLIANCE_H_
 
 #define PORT0 0
 
@@ -92,4 +92,4 @@ int test_connect_as_nonpd_sink(void);
 int test_retry_count_sop(void);
 int test_retry_count_hard_reset(void);
 
-#endif /* USB_TCPMV2_COMPLIANCE_H */
+#endif /* TEST_USB_TCPMV2_COMPLIANCE_H_ */

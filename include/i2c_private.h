@@ -8,8 +8,8 @@
  * i2c_controller.c. Don't include this directly unless you are implementing
  * these functions.
  */
-#ifndef __CROS_EC_I2C_PRIVATE_H
-#define __CROS_EC_I2C_PRIVATE_H
+#ifndef INCLUDE_I2C_PRIVATE_H_
+#define INCLUDE_I2C_PRIVATE_H_
 
 #include "i2c.h"
 
@@ -59,4 +59,4 @@ enum i2c_freq chip_i2c_get_freq(int port);
 }
 #endif
 
-#endif /* __CROS_EC_I2C_PRIVATE_H */
+#endif /* INCLUDE_I2C_PRIVATE_H_ */

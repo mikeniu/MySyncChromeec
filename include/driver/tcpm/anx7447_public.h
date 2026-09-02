@@ -5,8 +5,8 @@
 
 /* Analogix Type-C port controller */
 
-#ifndef __CROS_EC_DRIVER_TCPM_ANX7447_PUBLIC_H
-#define __CROS_EC_DRIVER_TCPM_ANX7447_PUBLIC_H
+#ifndef INCLUDE_DRIVER_TCPM_ANX7447_PUBLIC_H_
+#define INCLUDE_DRIVER_TCPM_ANX7447_PUBLIC_H_
 
 #include "usb_mux.h"
 
@@ -34,4 +34,4 @@ void anx7447_tcpc_update_hpd_status(const struct usb_mux *me,
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_TCPM_ANX7447_PUBLIC_H */
+#endif /* INCLUDE_DRIVER_TCPM_ANX7447_PUBLIC_H_ */

@@ -5,8 +5,8 @@
  * USB HID definitions.
  */
 
-#ifndef __CROS_EC_USB_HID_TOUCHPAD_H
-#define __CROS_EC_USB_HID_TOUCHPAD_H
+#ifndef INCLUDE_USB_HID_TOUCHPAD_H_
+#define INCLUDE_USB_HID_TOUCHPAD_H_
 
 #include "common.h"
 
@@ -170,4 +170,4 @@ void set_touchpad_report(struct usb_hid_touchpad_report *report);
 }
 #endif
 
-#endif
+#endif /* INCLUDE_USB_HID_TOUCHPAD_H_ */

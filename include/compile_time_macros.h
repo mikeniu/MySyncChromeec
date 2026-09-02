@@ -5,8 +5,8 @@
 
 /* Handy clever tricks */
 
-#ifndef __CROS_EC_COMPILE_TIME_MACROS_H
-#define __CROS_EC_COMPILE_TIME_MACROS_H
+#ifndef INCLUDE_COMPILE_TIME_MACROS_H_
+#define INCLUDE_COMPILE_TIME_MACROS_H_
 
 #if defined(__cplusplus) && !defined(CONFIG_ZEPHYR)
 #include <type_traits>
@@ -110,4 +110,4 @@
 #define GENMASK_ULL(h, l) (((BIT_ULL(h) << 1) - 1) ^ (BIT_ULL(l) - 1))
 #endif
 
-#endif /* __CROS_EC_COMPILE_TIME_MACROS_H */
+#endif // INCLUDE_COMPILE_TIME_MACROS_H_

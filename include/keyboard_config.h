@@ -5,8 +5,8 @@
 
 /* Keyboard configuration constants for Chrome EC */
 
-#ifndef __CROS_EC_KEYBOARD_CONFIG_H
-#define __CROS_EC_KEYBOARD_CONFIG_H
+#ifndef INCLUDE_KEYBOARD_CONFIG_H_
+#define INCLUDE_KEYBOARD_CONFIG_H_
 
 #include "common.h"
 
@@ -141,4 +141,4 @@ CONFIG_KEYBOARD_RUNTIME_KEYS.
 }
 #endif
 
-#endif /* __CROS_EC_KEYBOARD_CONFIG_H */
+#endif /* INCLUDE_KEYBOARD_CONFIG_H_ */

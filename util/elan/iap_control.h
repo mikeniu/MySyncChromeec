@@ -162,4 +162,4 @@ class IapControl {
 };
 }  // namespace elan
 
-#endif
+#endif  // UTIL_ELAN_IAP_CONTROL_H_

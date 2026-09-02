@@ -5,8 +5,8 @@
 
 /* SPI interface for Chrome EC */
 
-#ifndef __CROS_EC_SPI_H
-#define __CROS_EC_SPI_H
+#ifndef INCLUDE_SPI_H_
+#define INCLUDE_SPI_H_
 
 #include "host_command.h"
 
@@ -149,4 +149,4 @@ static inline void spi_event(enum gpio_signal signal)
 }
 #endif
 
-#endif /* __CROS_EC_SPI_H */
+#endif /* INCLUDE_SPI_H_ */

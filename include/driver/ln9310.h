@@ -5,8 +5,8 @@
  * LION Semiconductor LN-9310 switched capacitor converter.
  */
 
-#ifndef __CROS_EC_LN9310_H
-#define __CROS_EC_LN9310_H
+#ifndef INCLUDE_DRIVER_LN9310_H_
+#define INCLUDE_DRIVER_LN9310_H_
 
 #include "common.h"
 #include "gpio_signal.h"
@@ -249,4 +249,4 @@ __test_only void ln9310_reset_to_initial_state(void);
 }
 #endif
 
-#endif /* __CROS_EC_LN9310_H */
+#endif /* INCLUDE_DRIVER_LN9310_H_ */

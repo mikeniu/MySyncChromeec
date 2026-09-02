@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __FT98XX_BIO_ALG_H__
-#define __FT98XX_BIO_ALG_H__
+#ifndef ZEPHYR_SUBSYS_FINGERPRINT_ALG_FT98XX_BIO_ALG_H_
+#define ZEPHYR_SUBSYS_FINGERPRINT_ALG_FT98XX_BIO_ALG_H_
 
 #include <stdint.h>
 
@@ -40,4 +40,4 @@ struct ft_libfp_data {
 	uint8_t *feature_buf;
 };
 
-#endif
+#endif // ZEPHYR_SUBSYS_FINGERPRINT_ALG_FT98XX_BIO_ALG_H_

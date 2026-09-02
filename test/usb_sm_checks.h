@@ -5,8 +5,8 @@
 
 /* Validity tests for a state machine definition */
 
-#ifndef __CROS_EC_USB_SM_CHECKS_H
-#define __CROS_EC_USB_SM_CHECKS_H
+#ifndef TEST_USB_SM_CHECKS_H_
+#define TEST_USB_SM_CHECKS_H_
 
 int test_tc_no_parent_cycles(void);
 int test_tc_all_states_named(void);
@@ -17,4 +17,4 @@ int test_prl_all_states_named(void);
 int test_pe_no_parent_cycles(void);
 int test_pe_all_states_named(void);
 
-#endif /* __CROS_EC_USB_SM_CHECKS_H */
+#endif /* TEST_USB_SM_CHECKS_H_ */

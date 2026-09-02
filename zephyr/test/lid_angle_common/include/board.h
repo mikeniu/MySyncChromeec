@@ -7,8 +7,8 @@
  * @file Define the mocks for this test.
  */
 
-#ifndef __ZEPHYR_TEST_LID_ANGLE_COMMON_INCLUDE_BOARD_H
-#define __ZEPHYR_TEST_LID_ANGLE_COMMON_INCLUDE_BOARD_H
+#ifndef ZEPHYR_TEST_LID_ANGLE_COMMON_INCLUDE_BOARD_H_
+#define ZEPHYR_TEST_LID_ANGLE_COMMON_INCLUDE_BOARD_H_
 
 #include "chipset.h"
 #include "keyboard_scan.h"
@@ -20,4 +20,4 @@ DECLARE_FAKE_VALUE_FUNC(int, chipset_in_state, int);
 DECLARE_FAKE_VOID_FUNC(keyboard_scan_enable, int, enum kb_scan_disable_masks);
 DECLARE_FAKE_VALUE_FUNC(int, tablet_get_mode);
 
-#endif /* __ZEPHYR_TEST_LID_ANGLE_COMMON_INCLUDE_BOARD_H */
+#endif /* ZEPHYR_TEST_LID_ANGLE_COMMON_INCLUDE_BOARD_H_ */

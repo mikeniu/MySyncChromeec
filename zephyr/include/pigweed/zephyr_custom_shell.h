@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __ZEPHYR_CUSTOM_SHELL_H
-#define __ZEPHYR_CUSTOM_SHELL_H
+#ifndef ZEPHYR_INCLUDE_PIGWEED_ZEPHYR_CUSTOM_SHELL_H_
+#define ZEPHYR_INCLUDE_PIGWEED_ZEPHYR_CUSTOM_SHELL_H_
 
 #include <zephyr/sys/__assert.h>
 
@@ -54,4 +54,4 @@
 		PW_LOG_ERROR(_ft "\n", ##__VA_ARGS__); \
 	} while (0)
 
-#endif /* __ZEPHYR_CUSTOM_SHELL_H */
+#endif /* ZEPHYR_INCLUDE_PIGWEED_ZEPHYR_CUSTOM_SHELL_H_ */

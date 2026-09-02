@@ -31,4 +31,4 @@ class UsbBackend {
 
 }  // namespace elan
 
-#endif
+#endif  // UTIL_ELAN_USB_BACKEND_H_

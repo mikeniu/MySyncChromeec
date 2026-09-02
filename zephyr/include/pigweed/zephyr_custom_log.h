@@ -3,16 +3,14 @@
  * found in the LICENSE file.
  */
 
-#pragma once
+#ifndef ZEPHYR_INCLUDE_PIGWEED_ZEPHYR_CUSTOM_LOG_H_
+#define ZEPHYR_INCLUDE_PIGWEED_ZEPHYR_CUSTOM_LOG_H_
 
 #include <zephyr/logging/log_core.h>
 #include <zephyr/sys/__assert.h>
 
 // If static_assert wasn't defined by zephyr/sys/__assert.h that means it's not
 // supported, just ignore it.
-#ifndef static_assert
-#define static_assert(...)
-#endif
 
 #include <pw_log/log.h>
 
@@ -37,3 +35,5 @@
 	Z_PW_LOG(LOG_LEVEL_WRN, PW_LOG_WARN, format, ##__VA_ARGS__)
 #define LOG_ERR(format, ...) \
 	Z_PW_LOG(LOG_LEVEL_ERR, PW_LOG_ERROR, format, ##__VA_ARGS__)
+
+#endif // ZEPHYR_INCLUDE_PIGWEED_ZEPHYR_CUSTOM_LOG_H_

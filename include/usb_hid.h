@@ -5,8 +5,8 @@
  * USB HID definitions.
  */
 
-#ifndef __CROS_EC_USB_HID_H
-#define __CROS_EC_USB_HID_H
+#ifndef INCLUDE_USB_HID_H_
+#define INCLUDE_USB_HID_H_
 
 #define USB_HID_SUBCLASS_BOOT 1
 #define USB_HID_PROTOCOL_KEYBOARD 1
@@ -44,4 +44,4 @@ struct usb_hid_descriptor {
 	struct usb_hid_class_descriptor desc[1];
 } __packed;
 
-#endif /* USB_H */
+#endif /* INCLUDE_USB_HID_H_ */

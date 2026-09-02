@@ -40,4 +40,4 @@ class LibusbBackend : public UsbBackend {
 
 }  // namespace elan
 
-#endif
+#endif  // UTIL_ELAN_LIBUSB_BACKEND_H_

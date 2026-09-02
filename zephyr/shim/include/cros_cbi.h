@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CROS_CBI_H
-#define __CROS_EC_CROS_CBI_H
+#ifndef ZEPHYR_SHIM_INCLUDE_CROS_CBI_H_
+#define ZEPHYR_SHIM_INCLUDE_CROS_CBI_H_
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -166,4 +166,4 @@ int cros_cbi_ec_init(void);
 }
 #endif
 
-#endif /* __CROS_EC_CROS_CBI_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_CROS_CBI_H_ */

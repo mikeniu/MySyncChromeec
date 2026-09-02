@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_DRIVERS_USBC_TPS6699X_H_
-#define ZEPHYR_DRIVERS_USBC_TPS6699X_H_
+#ifndef ZEPHYR_DRIVERS_USBC_TPS6699X_CMD_H_
+#define ZEPHYR_DRIVERS_USBC_TPS6699X_CMD_H_
 
 #include "tps6699x_reg.h"
 
@@ -541,4 +541,4 @@ int tps_stream_data(const struct i2c_dt_spec *i2c,
 int tps_rd_received_attention_vdm(
 	const struct i2c_dt_spec *i2c,
 	union reg_received_attention_vdm *received_attention_vdm);
-#endif /* ZEPHYR_DRIVERS_USBC_TPS6699X_H_ */
+#endif /* ZEPHYR_DRIVERS_USBC_TPS6699X_CMD_H_ */

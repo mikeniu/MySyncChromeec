@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __SMHI_CLIENT_H
-#define __SMHI_CLIENT_H
+#ifndef ZEPHYR_SUBSYS_HOST_SERVICE_HECI_SMHI_CLIENT_H_
+#define ZEPHYR_SUBSYS_HOST_SERVICE_HECI_SMHI_CLIENT_H_
 
 #include "heci.h"
 
@@ -51,4 +51,4 @@ struct smhi_get_version_resp {
 	uint16_t build;
 } __packed;
 
-#endif /* __SMHI_CLIENT_H */
+#endif /* ZEPHYR_SUBSYS_HOST_SERVICE_HECI_SMHI_CLIENT_H_ */

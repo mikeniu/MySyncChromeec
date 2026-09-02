@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_CHROME_USBC_USB_MUXES_H
-#define ZEPHYR_CHROME_USBC_USB_MUXES_H
+#ifndef ZEPHYR_SHIM_INCLUDE_USBC_USB_MUXES_H_
+#define ZEPHYR_SHIM_INCLUDE_USBC_USB_MUXES_H_
 
 #include "usb_mux.h"
 #include "usbc/amd_fp6_usb_mux.h"
@@ -502,4 +502,4 @@ USB_MUX_FOREACH_CHAIN_VARGS(USB_MUX_FOREACH_NO_ROOT_MUX,
 }
 #endif
 
-#endif /* ZEPHYR_CHROME_USBC_USB_MUXES_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_USBC_USB_MUXES_H_ */

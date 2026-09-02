@@ -30,4 +30,4 @@ std::optional<uint16_t> ParseHex(std::string_view strv);
 
 }  // namespace elan
 
-#endif
+#endif  // UTIL_ELAN_CLI_H_

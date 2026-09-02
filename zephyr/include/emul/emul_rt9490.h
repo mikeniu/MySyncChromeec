@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_RT9490_H
-#define EMUL_RT9490_H
+#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_RT9490_H_
+#define ZEPHYR_INCLUDE_EMUL_EMUL_RT9490_H_
 
 #include <zephyr/drivers/emul.h>
 
@@ -14,4 +14,4 @@ int rt9490_emul_peek_reg(const struct emul *emul, int reg);
 
 int rt9490_emul_write_reg(const struct emul *emul, int reg, int val);
 
-#endif
+#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_RT9490_H_ */

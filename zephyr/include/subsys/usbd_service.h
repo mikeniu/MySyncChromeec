@@ -12,4 +12,4 @@
  */
 bool usb_is_suspended(void);
 
-#endif
+#endif /* ZEPHYR_INCLUDE_SUBSYS_USBD_SERVICE_H_ */

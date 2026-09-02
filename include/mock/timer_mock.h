@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __MOCK_TIMER_MOCK_H
-#define __MOCK_TIMER_MOCK_H
+#ifndef INCLUDE_MOCK_TIMER_MOCK_H_
+#define INCLUDE_MOCK_TIMER_MOCK_H_
 
 #include "timer.h"
 
@@ -20,4 +20,4 @@ timestamp_t get_time(void);
 }
 #endif
 
-#endif /* __MOCK_TIMER_MOCK_H */
+#endif /* INCLUDE_MOCK_TIMER_MOCK_H_ */

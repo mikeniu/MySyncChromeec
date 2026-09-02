@@ -5,8 +5,8 @@
 
 /* Cannonlake chipset power control module for Chrome EC */
 
-#ifndef __CROS_EC_CANNONLAKE_H
-#define __CROS_EC_CANNONLAKE_H
+#ifndef INCLUDE_POWER_CANNONLAKE_H_
+#define INCLUDE_POWER_CANNONLAKE_H_
 
 /* Input state flags. */
 #define IN_PCH_SLP_S3_DEASSERTED POWER_SIGNAL_MASK(X86_SLP_S3_DEASSERTED)
@@ -28,4 +28,4 @@
 #define CHARGER_INITIALIZED_DELAY_MS 100
 #define CHARGER_INITIALIZED_TRIES 40
 
-#endif /* __CROS_EC_CANNONLAKE_H */
+#endif /* INCLUDE_POWER_CANNONLAKE_H_ */

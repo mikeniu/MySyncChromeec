@@ -8,8 +8,8 @@
  * discrete sequencing.
  */
 
-#ifndef __CROS_EC_COMETLAKE_DISCRETE_H
-#define __CROS_EC_COMETLAKE_DISCRETE_H
+#ifndef INCLUDE_POWER_COMETLAKE_DISCRETE_H_
+#define INCLUDE_POWER_COMETLAKE_DISCRETE_H_
 
 /* Input state flags. */
 #define IN_PCH_SLP_S3_DEASSERTED POWER_SIGNAL_MASK(X86_SLP_S3_DEASSERTED)
@@ -147,4 +147,4 @@ void c10_gate_interrupt(enum gpio_signal signal);
  */
 void slp_s3_interrupt(enum gpio_signal signal);
 
-#endif /* __CROS_EC_COMETLAKE_DISCRETE_H */
+#endif /* INCLUDE_POWER_COMETLAKE_DISCRETE_H_ */

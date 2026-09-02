@@ -3,8 +3,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef DT_BINDINGS_USBC_MUX_H_
-#define DT_BINDINGS_USBC_MUX_H_
+#ifndef ZEPHYR_INCLUDE_DT_BINDINGS_USBC_MUX_H_
+#define ZEPHYR_INCLUDE_DT_BINDINGS_USBC_MUX_H_
 
 #ifndef BIT
 #define BIT(n) (1U << n)
@@ -29,4 +29,4 @@
 /* USB-C Dock connected */
 #define USB_PD_MUX_DOCK (USB_PD_MUX_USB_ENABLED | USB_PD_MUX_DP_ENABLED)
 
-#endif /* DT_BINDINGS_USBC_MUX_H_ */
+#endif /* ZEPHYR_INCLUDE_DT_BINDINGS_USBC_MUX_H_ */

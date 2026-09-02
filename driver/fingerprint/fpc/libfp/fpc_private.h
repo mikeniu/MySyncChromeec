@@ -5,8 +5,8 @@
 
 /* Private sensor interface */
 
-#ifndef __CROS_EC_FPC_PRIVATE_H
-#define __CROS_EC_FPC_PRIVATE_H
+#ifndef DRIVER_FINGERPRINT_FPC_LIBFP_FPC_PRIVATE_H_
+#define DRIVER_FINGERPRINT_FPC_LIBFP_FPC_PRIVATE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -178,4 +178,4 @@ int fpc_get_hwid(uint16_t *id);
 }
 #endif
 
-#endif /* __CROS_EC_FPC_PRIVATE_H */
+#endif /* DRIVER_FINGERPRINT_FPC_LIBFP_FPC_PRIVATE_H_ */

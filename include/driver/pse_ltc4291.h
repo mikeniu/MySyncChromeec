@@ -8,8 +8,8 @@
  * controller.
  */
 
-#ifndef __CROS_EC_DRIVER_PSE_LTC4291_H
-#define __CROS_EC_DRIVER_PSE_LTC4291_H
+#ifndef INCLUDE_DRIVER_PSE_LTC4291_H_
+#define INCLUDE_DRIVER_PSE_LTC4291_H_
 
 #include "i2c.h"
 #include "timer.h"
@@ -70,4 +70,4 @@ extern const int pse_port_hpmd[LTC4291_PORT_MAX];
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_PSE_LTC4291_H */
+#endif /* INCLUDE_DRIVER_PSE_LTC4291_H_ */

@@ -3,12 +3,12 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_DRIVERS_USBC_VCONN_SWAP_USBC_VCONN_SWAP_H_
-#define ZEPHYR_TEST_DRIVERS_USBC_VCONN_SWAP_USBC_VCONN_SWAP_H_
+#ifndef ZEPHYR_TEST_DRIVERS_USBC_VCONN_SWAP_INCLUDE_USBC_VCONN_SWAP_H_
+#define ZEPHYR_TEST_DRIVERS_USBC_VCONN_SWAP_INCLUDE_USBC_VCONN_SWAP_H_
 
 #include "compile_time_macros.h"
 #include "emul/tcpc/emul_tcpci.h"
 #include "emul/tcpc/emul_tcpci_partner_snk.h"
 #include "test/drivers/stubs.h"
 
-#endif /* ZEPHYR_TEST_DRIVERS_USBC_VCONN_SWAP_USBC_VCONN_SWAP_H_ */
+#endif /* ZEPHYR_TEST_DRIVERS_USBC_VCONN_SWAP_INCLUDE_USBC_VCONN_SWAP_H_ */

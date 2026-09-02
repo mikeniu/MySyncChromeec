@@ -5,8 +5,8 @@
 
 /* Richtek RT1739 Type-C Power Path Controller */
 
-#ifndef __CROS_EC_PPC_RT1739_H
-#define __CROS_EC_PPC_RT1739_H
+#ifndef DRIVER_PPC_RT1739_H_
+#define DRIVER_PPC_RT1739_H_
 
 #include "usb_charge.h"
 #include "usbc_ppc.h"
@@ -163,4 +163,4 @@ void rt1739_interrupt(int port);
 
 int rt1739_init(int port);
 
-#endif /* defined(__CROS_EC_PPC_RT1739_H) */
+#endif /* DRIVER_PPC_RT1739_H_ */

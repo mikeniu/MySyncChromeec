@@ -3,11 +3,11 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_TUSB1064_H
-#define EMUL_TUSB1064_H
+#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_TUSB1064_H_
+#define ZEPHYR_INCLUDE_EMUL_EMUL_TUSB1064_H_
 
 #include <zephyr/drivers/emul.h>
 
 int tusb1064_emul_peek_reg(const struct emul *emul, int reg);
 
-#endif
+#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_TUSB1064_H_ */

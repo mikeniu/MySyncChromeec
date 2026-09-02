@@ -8,8 +8,8 @@
 
 /* USB Power delivery port management */
 
-#ifndef __CROS_EC_USB_PD_TCPM_ANX7447_H
-#define __CROS_EC_USB_PD_TCPM_ANX7447_H
+#ifndef DRIVER_TCPM_ANX7447_H_
+#define DRIVER_TCPM_ANX7447_H_
 
 /* Registers: TCPC address used */
 #define ANX7447_REG_TCPC_SWITCH_0 0xB4
@@ -174,4 +174,4 @@ void anx7447_tcpc_update_hpd_status(const struct usb_mux *me,
  */
 int anx7447_flash_erase(int port);
 
-#endif /* __CROS_EC_USB_PD_TCPM_ANX7688_H */
+#endif /* DRIVER_TCPM_ANX7447_H_ */

@@ -4,8 +4,8 @@
  */
 /* Mock for DisplayPort alternate mode support */
 
-#ifndef __MOCK_DP_ALT_MODE_MOCK_H
-#define __MOCK_DP_ALT_MODE_MOCK_H
+#ifndef INCLUDE_MOCK_DP_ALT_MODE_MOCK_H_
+#define INCLUDE_MOCK_DP_ALT_MODE_MOCK_H_
 
 #include "common.h"
 
@@ -19,4 +19,4 @@ void mock_dp_alt_mode_reset(void);
 }
 #endif
 
-#endif /* __MOCK_DP_ALT_MODE_MOCK_H */
+#endif /* INCLUDE_MOCK_DP_ALT_MODE_MOCK_H_ */

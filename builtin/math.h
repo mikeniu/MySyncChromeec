@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_MATH_H__
-#define __CROS_EC_MATH_H__
+#ifndef BUILTIN_MATH_H_
+#define BUILTIN_MATH_H_
 
 #include "fpu.h"
 
@@ -20,4 +20,4 @@ static inline bool isinf(float a)
 	return __builtin_isinf(a);
 }
 
-#endif /* __CROS_EC_MATH_H__ */
+#endif /* BUILTIN_MATH_H_ */

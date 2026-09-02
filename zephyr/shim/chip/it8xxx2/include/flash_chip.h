@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FLASH_CHIP_H
-#define __CROS_EC_FLASH_CHIP_H
+#ifndef ZEPHYR_SHIM_CHIP_IT8XXX2_INCLUDE_FLASH_CHIP_H_
+#define ZEPHYR_SHIM_CHIP_IT8XXX2_INCLUDE_FLASH_CHIP_H_
 /*
  * One page program instruction allows maximum 256 bytes (a page) of data
  * to be programmed.
@@ -33,4 +33,4 @@
 #define CONFIG_FW_PSTATE_SIZE 0
 #endif /* CONFIG_PLATFORM_EC_FLASH_PSTATE_BANK */
 
-#endif /* __CROS_EC_FLASH_CHIP_H */
+#endif /* ZEPHYR_SHIM_CHIP_IT8XXX2_INCLUDE_FLASH_CHIP_H_ */

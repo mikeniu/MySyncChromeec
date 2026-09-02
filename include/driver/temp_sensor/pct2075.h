@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_PCT2075_H
-#define __CROS_EC_PCT2075_H
+#ifndef INCLUDE_DRIVER_TEMP_SENSOR_PCT2075_H_
+#define INCLUDE_DRIVER_TEMP_SENSOR_PCT2075_H_
 
 #include "i2c.h"
 
@@ -80,4 +80,4 @@ void pct2075_update_temperature(int idx);
 }
 #endif
 
-#endif /* __CROS_EC_PCT2075_H */
+#endif /* INCLUDE_DRIVER_TEMP_SENSOR_PCT2075_H_ */

@@ -3,8 +3,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef DT_BINDINGS_BATTERY_H_
-#define DT_BINDINGS_BATTERY_H_
+#ifndef ZEPHYR_INCLUDE_DT_BINDINGS_BATTERY_H_
+#define ZEPHYR_INCLUDE_DT_BINDINGS_BATTERY_H_
 
 /*
  * Macros used by LED devicetree files (led.dts) to define battery-level
@@ -33,4 +33,4 @@
 #define FG_FLAG_MFGACC BIT(2)
 #define FG_FLAG_MFGACC_SMB_BLOCK BIT(3)
 
-#endif /* DT_BINDINGS_BATTERY_H_ */
+#endif /* ZEPHYR_INCLUDE_DT_BINDINGS_BATTERY_H_ */

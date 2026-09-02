@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef _AP_PWRSEQ_H_
-#define _AP_PWRSEQ_H_
+#ifndef ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_H_
+#define ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_H_
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
 
@@ -259,4 +259,4 @@ int ap_pwrseq_state_unlock(const struct device *dev);
 }
 #endif
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */
-#endif /* _AP_PWRSEQ_H_ */
+#endif /* ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ATOMIC_H
-#define __CROS_EC_ATOMIC_H
+#ifndef ZEPHYR_SHIM_INCLUDE_ATOMIC_H_
+#define ZEPHYR_SHIM_INCLUDE_ATOMIC_H_
 
 #include <zephyr/sys/atomic.h>
 
@@ -21,4 +21,4 @@ static inline atomic_val_t atomic_clear_bits(atomic_t *addr, atomic_val_t bits)
 }
 #endif
 
-#endif /* __CROS_EC_ATOMIC_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_ATOMIC_H_ */

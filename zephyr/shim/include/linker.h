@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_LINKER_H
-#define __CROS_EC_LINKER_H
+#ifndef ZEPHYR_SHIM_INCLUDE_LINKER_H_
+#define ZEPHYR_SHIM_INCLUDE_LINKER_H_
 
 #ifdef CONFIG_FAKE_SHMEM
 /* Define __shared_mem_buf for the fake shared memory which is used with
@@ -16,4 +16,4 @@
 #define __shared_mem_buf _image_ram_end
 #endif /* CONFIG_FAKE_SHMEM */
 
-#endif
+#endif /* ZEPHYR_SHIM_INCLUDE_LINKER_H_ */

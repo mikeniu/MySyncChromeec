@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_SHIMMED_TASK_ID_H
-#define __CROS_EC_SHIMMED_TASK_ID_H
+#ifndef ZEPHYR_SHIM_INCLUDE_SHIMMED_TASK_ID_H_
+#define ZEPHYR_SHIM_INCLUDE_SHIMMED_TASK_ID_H_
 
 #include "common.h"
 
@@ -304,4 +304,4 @@ enum { CROS_EC_EXTRA_TASKS(EXTRA_TASK_ID) };
 }
 #endif
 
-#endif /* __CROS_EC_SHIMMED_TASK_ID_H */
+#endif // ZEPHYR_SHIM_INCLUDE_SHIMMED_TASK_ID_H_

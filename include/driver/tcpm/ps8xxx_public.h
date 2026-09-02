@@ -5,8 +5,8 @@
 
 /* Parade Tech Type-C port controller */
 
-#ifndef __CROS_EC_DRIVER_TCPM_PS8XXX_PUBLIC_H
-#define __CROS_EC_DRIVER_TCPM_PS8XXX_PUBLIC_H
+#ifndef INCLUDE_DRIVER_TCPM_PS8XXX_PUBLIC_H_
+#define INCLUDE_DRIVER_TCPM_PS8XXX_PUBLIC_H_
 
 #include "usb_mux.h"
 
@@ -99,4 +99,4 @@ extern const struct usb_mux_driver ps8xxx_usb_mux_driver;
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_TCPM_PS8XXX_PUBLIC_H */
+#endif /* INCLUDE_DRIVER_TCPM_PS8XXX_PUBLIC_H_ */

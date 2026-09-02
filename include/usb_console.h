@@ -5,8 +5,8 @@
 
 /* USB serial console module */
 
-#ifndef __CROS_EC_USB_CONSOLE_H
-#define __CROS_EC_USB_CONSOLE_H
+#ifndef INCLUDE_USB_CONSOLE_H_
+#define INCLUDE_USB_CONSOLE_H_
 
 #if defined(CONFIG_USB_CONSOLE) || defined(CONFIG_USB_CONSOLE_STREAM)
 
@@ -88,4 +88,4 @@ int usb_console_tx_blocked(void);
 
 #endif
 
-#endif /* __CROS_EC_USB_CONSOLE_H */
+#endif /* INCLUDE_USB_CONSOLE_H_ */

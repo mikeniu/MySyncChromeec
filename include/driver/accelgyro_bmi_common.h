@@ -4,8 +4,8 @@
  */
 /* BMI accelerometer and gyro common definitions for Chrome EC */
 
-#ifndef __CROS_EC_ACCELGYRO_BMI_COMMON_H
-#define __CROS_EC_ACCELGYRO_BMI_COMMON_H
+#ifndef INCLUDE_DRIVER_ACCELGYRO_BMI_COMMON_H_
+#define INCLUDE_DRIVER_ACCELGYRO_BMI_COMMON_H_
 
 #include "accelgyro.h"
 #include "accelgyro_bmi160.h"
@@ -325,4 +325,4 @@ int bmi_list_activities(const struct motion_sensor_t *s, uint32_t *enabled,
 }
 #endif
 
-#endif /* __CROS_EC_ACCELGYRO_BMI_COMMON_H */
+#endif /* INCLUDE_DRIVER_ACCELGYRO_BMI_COMMON_H_ */

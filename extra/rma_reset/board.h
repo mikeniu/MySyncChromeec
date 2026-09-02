@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_BOARD_H
-#define __CROS_EC_BOARD_H
+#ifndef EXTRA_RMA_RESET_BOARD_H_
+#define EXTRA_RMA_RESET_BOARD_H_
 
 #define CONFIG_RNG
 
-#endif /* __CROS_EC_BOARD_H */
+#endif /* EXTRA_RMA_RESET_BOARD_H_ */

@@ -14,8 +14,8 @@
 extern "C" {
 #endif
 
-#ifndef __CROS_USB_I2C_H
-#define __CROS_USB_I2C_H
+#ifndef INCLUDE_USB_I2C_H_
+#define INCLUDE_USB_I2C_H_
 
 /*
  * This header file describes i2c encapsulation when communicated over USB.
@@ -236,4 +236,4 @@ int usb_i2c_register_cros_cmd_handler(int (*cmd_handler)(
 }
 #endif
 
-#endif /* __CROS_USB_I2C_H */
+#endif /* INCLUDE_USB_I2C_H_ */

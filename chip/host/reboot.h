@@ -5,12 +5,12 @@
 
 /* Emulator self-reboot procedure */
 
-#ifndef __CROS_EC_REBOOT_H
-#define __CROS_EC_REBOOT_H
+#ifndef CHIP_HOST_REBOOT_H_
+#define CHIP_HOST_REBOOT_H_
 
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
 	void emulator_reboot(void);
 
-#endif /* __CROS_EC_REBOOT_H */
+#endif /* CHIP_HOST_REBOOT_H_ */

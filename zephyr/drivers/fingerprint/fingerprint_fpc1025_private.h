@@ -5,8 +5,8 @@
 
 /* Private sensor interface */
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_FPC1025_PRIVATE_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_FPC1025_PRIVATE_H_
+#ifndef ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FPC1025_PRIVATE_H_
+#define ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FPC1025_PRIVATE_H_
 
 #include <stdint.h>
 
@@ -235,4 +235,4 @@ void fp_sensor_lock(const struct device *dev);
  */
 void fp_sensor_unlock(const struct device *dev);
 
-#endif /* ZEPHYR_DRIVERS_FINGERPRINT_FPC1025_PRIVATE_H_ */
+#endif /* ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FPC1025_PRIVATE_H_ */

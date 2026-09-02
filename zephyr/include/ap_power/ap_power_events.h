@@ -8,8 +8,8 @@
  * @brief Internal API for sending AP power related event callbacks.
  */
 
-#ifndef __AP_POWER_AP_EVENTS_H__
-#define __AP_POWER_AP_EVENTS_H__
+#ifndef ZEPHYR_INCLUDE_AP_POWER_AP_POWER_EVENTS_H_
+#define ZEPHYR_INCLUDE_AP_POWER_AP_POWER_EVENTS_H_
 
 #include <ap_power/ap_power.h>
 
@@ -31,4 +31,4 @@ void ap_power_ev_send_callbacks(uint32_t event);
 }
 #endif
 
-#endif /* __AP_POWER_AP_EVENTS_H__ */
+#endif /* ZEPHYR_INCLUDE_AP_POWER_AP_POWER_EVENTS_H_ */

@@ -5,8 +5,8 @@
 
 /* USB Power delivery port management */
 
-#ifndef __CROS_EC_USB_PD_TCPM_H
-#define __CROS_EC_USB_PD_TCPM_H
+#ifndef INCLUDE_USB_PD_TCPM_H_
+#define INCLUDE_USB_PD_TCPM_H_
 
 #include "common.h"
 #include "compiler.h"
@@ -721,4 +721,4 @@ void tcpc_dump_registers(int port, const struct tcpc_reg_dump_map *reg,
 }
 #endif
 
-#endif /* __CROS_EC_USB_PD_TCPM_H */
+#endif /* INCLUDE_USB_PD_TCPM_H_ */

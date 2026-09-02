@@ -5,8 +5,8 @@
 
 /* AMD SB-RMI (Side-band Remote Management Interface) Driver */
 
-#ifndef __CROS_EC_SB_RMI_H
-#define __CROS_EC_SB_RMI_H
+#ifndef DRIVER_SB_RMI_H_
+#define DRIVER_SB_RMI_H_
 
 #include "common.h"
 
@@ -55,4 +55,4 @@
  */
 int sb_rmi_mailbox_xfer(int cmd, uint32_t msg_in, uint32_t *msg_out_ptr);
 
-#endif /* __CROS_EC_SB_RMI_H */
+#endif /* DRIVER_SB_RMI_H_ */

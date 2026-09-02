@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_STDLIB_H__
-#define __CROS_EC_STDLIB_H__
+#ifndef BUILTIN_STDLIB_H_
+#define BUILTIN_STDLIB_H_
 
 int atoi(const char *nptr);
 
-#endif /* __CROS_EC_STDLIB_H__ */
+#endif /* BUILTIN_STDLIB_H_ */

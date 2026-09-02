@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_STDDEF_H__
-#define __CROS_EC_STDDEF_H__
+#ifndef BUILTIN_STDDEF_H_
+#define BUILTIN_STDDEF_H_
 
 #ifndef __SIZE_TYPE__
 #define __SIZE_TYPE__ unsigned long
@@ -33,4 +33,4 @@ typedef __WCHAR_TYPE__ wchar_t;
 #define offsetof(TYPE, MEMBER) __builtin_offsetof(TYPE, MEMBER)
 #endif
 
-#endif /* __CROS_EC_STDDEF_H__ */
+#endif /* BUILTIN_STDDEF_H_ */

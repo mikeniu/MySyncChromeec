@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef MTLRVP_MCHP_BOARD_H_
-#define MTLRVP_MCHP_BOARD_H_
+#ifndef ZEPHYR_TEST_INTELRVP_BOARDS_MTLRVP_MCHP_BOARD_H_
+#define ZEPHYR_TEST_INTELRVP_BOARDS_MTLRVP_MCHP_BOARD_H_
 
 #include <dt-bindings/gpio/microchip-xec-gpio.h>
 
@@ -59,4 +59,4 @@
 #define KEYBOARD_DEBOUNCE_DOWN 9000
 #define KEYBOARD_DEBOUNCE_UP 40000
 
-#endif /* MTLRVP_MCHP_BOARD_H_ */
+#endif /* ZEPHYR_TEST_INTELRVP_BOARDS_MTLRVP_MCHP_BOARD_H_ */

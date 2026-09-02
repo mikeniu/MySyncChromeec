@@ -5,8 +5,8 @@
 
 /* USB charging control module for Chrome EC */
 
-#ifndef __CROS_EC_USB_CHARGE_H
-#define __CROS_EC_USB_CHARGE_H
+#ifndef INCLUDE_USB_CHARGE_H_
+#define INCLUDE_USB_CHARGE_H_
 
 #include "charge_manager.h"
 #include "common.h"
@@ -236,4 +236,4 @@ int board_vbus_sink_enable(int port, int enable);
 }
 #endif
 
-#endif /* __CROS_EC_USB_CHARGE_H */
+#endif /* INCLUDE_USB_CHARGE_H_ */

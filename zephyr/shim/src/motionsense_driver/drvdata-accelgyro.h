@@ -9,8 +9,8 @@
  * to utilize the information in device tree.
  *
  */
-#ifndef __ZEPHYR_SHIM_SRC_MOTIONSENSE_DRIVER_DRVDATA_ACCELGYRO_H
-#define __ZEPHYR_SHIM_SRC_MOTIONSENSE_DRIVER_DRVDATA_ACCELGYRO_H
+#ifndef ZEPHYR_SHIM_SRC_MOTIONSENSE_DRIVER_DRVDATA_ACCELGYRO_H_
+#define ZEPHYR_SHIM_SRC_MOTIONSENSE_DRIVER_DRVDATA_ACCELGYRO_H_
 
 /*
  * compatible = "cros-ec,accelgyro-als-channel-scale"
@@ -125,4 +125,4 @@
 		.irt = INT_TO_FP(DT_PROP(id, irt)),              \
 	}
 
-#endif /* __ZEPHYR_SHIM_SRC_MOTIONSENSE_DRIVER_DRVDATA_ACCELGYRO_H */
+#endif /* ZEPHYR_SHIM_SRC_MOTIONSENSE_DRIVER_DRVDATA_ACCELGYRO_H_ */

@@ -14,4 +14,4 @@ struct test_state {
 
 bool rauru_predicate_post_main(const void *state);
 
-#endif /* ZEPHYR_TEST_AP_POWER_INCLUDE_TEST_STATE_H_ */
+#endif /* ZEPHYR_TEST_RAURU_INCLUDE_TEST_STATE_H_ */

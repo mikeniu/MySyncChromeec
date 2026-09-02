@@ -5,8 +5,8 @@
  * MKBP keyboard protocol
  */
 
-#ifndef __CROS_EC_KEYBOARD_MKBP_H
-#define __CROS_EC_KEYBOARD_MKBP_H
+#ifndef INCLUDE_KEYBOARD_MKBP_H_
+#define INCLUDE_KEYBOARD_MKBP_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -31,4 +31,4 @@ void get_keyscan_config(struct ec_mkbp_config *dst);
 }
 #endif
 
-#endif /* __CROS_EC_KEYBOARD_MKBP_H */
+#endif /* INCLUDE_KEYBOARD_MKBP_H_ */

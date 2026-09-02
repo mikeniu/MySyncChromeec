@@ -5,8 +5,8 @@
 
 /* Per-test config flags */
 
-#ifndef __TEST_TEST_CONFIG_H
-#define __TEST_TEST_CONFIG_H
+#ifndef TEST_TEST_CONFIG_H_
+#define TEST_TEST_CONFIG_H_
 
 #ifndef TEST_BUILD
 #error test_config.h should not be included in non-test build.
@@ -455,4 +455,4 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_CURVE25519
 #endif /* TEST_X25519 */
 
-#endif /* __TEST_TEST_CONFIG_H */
+#endif /* TEST_TEST_CONFIG_H_ */

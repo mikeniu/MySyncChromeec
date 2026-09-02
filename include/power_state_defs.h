@@ -13,8 +13,8 @@
  * Either being set enables the S0ix states.
  */
 
-#ifndef __CROS_EC_POWER_STATE_DEFS_H
-#define __CROS_EC_POWER_STATE_DEFS_H
+#ifndef INCLUDE_POWER_STATE_DEFS_H_
+#define INCLUDE_POWER_STATE_DEFS_H_
 
 enum power_state {
 	/* Steady states */
@@ -46,4 +46,4 @@ enum power_state {
 #endif
 };
 
-#endif /* __CROS_EC_POWER_STATE_DEFS_H */
+#endif /* INCLUDE_POWER_STATE_DEFS_H_ */

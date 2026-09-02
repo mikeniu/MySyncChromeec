@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_CHROME_POWER_POWER_H
-#define ZEPHYR_CHROME_POWER_POWER_H
+#ifndef ZEPHYR_SHIM_INCLUDE_POWER_POWER_H_
+#define ZEPHYR_SHIM_INCLUDE_POWER_POWER_H_
 
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
@@ -32,4 +32,4 @@ enum power_signal {
 }
 #endif
 
-#endif /* ZEPHYR_CHROME_POWER_POWER_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_POWER_POWER_H_ */

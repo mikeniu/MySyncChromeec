@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CBI_FLASH_H
-#define __CROS_EC_CBI_FLASH_H
+#ifndef ZEPHYR_SHIM_INCLUDE_CBI_FLASH_H_
+#define ZEPHYR_SHIM_INCLUDE_CBI_FLASH_H_
 
 #include "cros_board_info.h"
 
@@ -22,4 +22,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __CROS_EC_CBI_FLASH_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_CBI_FLASH_H_ */

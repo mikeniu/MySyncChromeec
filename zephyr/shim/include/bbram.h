@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_BBRAM_H
-#define __CROS_EC_BBRAM_H
+#ifndef ZEPHYR_SHIM_INCLUDE_BBRAM_H_
+#define ZEPHYR_SHIM_INCLUDE_BBRAM_H_
 
 #include "retained_mem_bbram.h"
 
@@ -83,4 +83,4 @@ static inline int system_bbram_init(const struct device *dev)
 }
 #endif
 
-#endif /* __CROS_EC_BBRAM_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_BBRAM_H_ */

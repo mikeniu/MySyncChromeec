@@ -11,8 +11,8 @@
  * smoothing filter.
  */
 
-#ifndef __CROS_MATH_EXP_SMOOTHING_H
-#define __CROS_MATH_EXP_SMOOTHING_H
+#ifndef ZEPHYR_LIB_MATH_PUBLIC_CROS_MATH_EXP_SMOOTHING_H_
+#define ZEPHYR_LIB_MATH_PUBLIC_CROS_MATH_EXP_SMOOTHING_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,4 +65,4 @@ static inline float exp_smooth_step(struct exp_smooth_t *exp, float x)
 }
 #endif
 
-#endif /* __CROS_MATH_EXP_SMOOTHING_H */
+#endif /* ZEPHYR_LIB_MATH_PUBLIC_CROS_MATH_EXP_SMOOTHING_H_ */

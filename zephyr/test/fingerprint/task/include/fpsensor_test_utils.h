@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef TASK_FPSENSOR_TEST_UTILS_H
-#define TASK_FPSENSOR_TEST_UTILS_H
+#ifndef ZEPHYR_TEST_FINGERPRINT_TASK_INCLUDE_FPSENSOR_TEST_UTILS_H_
+#define ZEPHYR_TEST_FINGERPRINT_TASK_INCLUDE_FPSENSOR_TEST_UTILS_H_
 
 #include <zephyr/sys/printk.h>
 
@@ -29,4 +29,4 @@ class FpFrameSizeCacheTestHelper {
 	}
 };
 
-#endif /* TASK_FPSENSOR_TEST_UTILS_H */
+#endif /* ZEPHYR_TEST_FINGERPRINT_TASK_INCLUDE_FPSENSOR_TEST_UTILS_H_ */

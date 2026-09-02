@@ -17,4 +17,4 @@
 std::expected<std::vector<uint8_t>, elan::IapError> GetBinary(
     const std::string& file_path);
 
-#endif
+#endif  // UTIL_ELAN_FILE_CONTROL_H_

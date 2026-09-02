@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_RAURU_INCLUDE_RAURU_DP_H_
-#define ZEPHYR_RAURU_INCLUDE_RAURU_DP_H_
+#ifndef ZEPHYR_PROGRAM_RAURU_INCLUDE_RAURU_DP_H_
+#define ZEPHYR_PROGRAM_RAURU_INCLUDE_RAURU_DP_H_
 
 enum rauru_dp_port {
 	DP_PORT_NONE = -1,
@@ -21,4 +21,4 @@ bool rauru_is_hpd_high(enum rauru_dp_port port);
 bool rauru_has_hdmi_port(void);
 /* Detach and rotate the DP path */
 void rauru_detach_dp_path(enum rauru_dp_port port);
-#endif /* ZEPHYR_RAURU_INCLUDE_RAURU_DP_H_ */
+#endif /* ZEPHYR_PROGRAM_RAURU_INCLUDE_RAURU_DP_H_ */

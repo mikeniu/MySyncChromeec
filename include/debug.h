@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_DEBUG_H
-#define __CROS_EC_DEBUG_H
+#ifndef INCLUDE_DEBUG_H_
+#define INCLUDE_DEBUG_H_
 
 #include "common.h"
 #include "stdbool.h"
@@ -31,4 +31,4 @@ __override_proto bool debugger_was_connected(void);
 }
 #endif
 
-#endif /* __CROS_EC_DEBUG_H */
+#endif /* INCLUDE_DEBUG_H_ */

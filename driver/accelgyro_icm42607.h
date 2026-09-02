@@ -5,8 +5,8 @@
 
 /* ICM-42607 accelerometer and gyroscope for Chrome EC */
 
-#ifndef __CROS_EC_ACCELGYRO_ICM42607_H
-#define __CROS_EC_ACCELGYRO_ICM42607_H
+#ifndef DRIVER_ACCELGYRO_ICM42607_H_
+#define DRIVER_ACCELGYRO_ICM42607_H_
 
 #include "accelgyro.h"
 #include "common.h"
@@ -306,4 +306,4 @@ void icm42607_interrupt(enum gpio_signal signal);
 #endif
 #endif /* defined(CONFIG_ZEPHYR) */
 
-#endif /* __CROS_EC_ACCELGYRO_ICM42607_H */
+#endif /* DRIVER_ACCELGYRO_ICM42607_H_ */

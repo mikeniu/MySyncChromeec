@@ -5,8 +5,8 @@
 
 /* NX20P348x Type-C Power Path Controller */
 
-#ifndef __CROS_EC_NX20P348X_H
-#define __CROS_EC_NX20P348X_H
+#ifndef DRIVER_PPC_NX20P348X_H_
+#define DRIVER_PPC_NX20P348X_H_
 
 #include "common.h"
 #include "ppc/nx20p348x_public.h"
@@ -125,4 +125,4 @@
  */
 __override_proto int board_nx20p348x_init(int port);
 
-#endif /* defined(__CROS_EC_NX20P348X_H) */
+#endif /* DRIVER_PPC_NX20P348X_H_ */

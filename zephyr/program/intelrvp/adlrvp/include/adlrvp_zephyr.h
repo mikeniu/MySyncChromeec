@@ -5,8 +5,8 @@
 
 /* Intel ADL-RVP specific configuration */
 
-#ifndef __ADLRVP_BOARD_H
-#define __ADLRVP_BOARD_H
+#ifndef ZEPHYR_PROGRAM_INTELRVP_ADLRVP_INCLUDE_ADLRVP_ZEPHYR_H_
+#define ZEPHYR_PROGRAM_INTELRVP_ADLRVP_INCLUDE_ADLRVP_ZEPHYR_H_
 
 #include "config.h"
 
@@ -53,4 +53,4 @@ enum ioex_port {
 	IOEX_PORT_COUNT
 };
 
-#endif /* __ADLRVP_BOARD_H */
+#endif /* ZEPHYR_PROGRAM_INTELRVP_ADLRVP_INCLUDE_ADLRVP_ZEPHYR_H_ */

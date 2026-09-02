@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __CROS_EC_PDC_RUNTIME_PORT_CONFIG_H
-#define __CROS_EC_PDC_RUNTIME_PORT_CONFIG_H
+#ifndef ZEPHYR_INCLUDE_USBC_PDC_RUNTIME_PORT_CONFIG_H_
+#define ZEPHYR_INCLUDE_USBC_PDC_RUNTIME_PORT_CONFIG_H_
 
 #include <zephyr/device.h>
 
@@ -22,4 +22,4 @@
  */
 int board_get_pdc_for_port(int port, const struct device **dev);
 
-#endif /* __CROS_EC_PDC_RUNTIME_PORT_CONFIG_H */
+#endif /* ZEPHYR_INCLUDE_USBC_PDC_RUNTIME_PORT_CONFIG_H_ */

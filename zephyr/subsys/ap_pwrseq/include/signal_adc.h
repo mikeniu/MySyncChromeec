@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __AP_PWRSEQ_SIGNAL_ADC_H__
-#define __AP_PWRSEQ_SIGNAL_ADC_H__
+#ifndef ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_SIGNAL_ADC_H_
+#define ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_SIGNAL_ADC_H_
 
 #include <zephyr/devicetree.h>
 
@@ -71,4 +71,4 @@ int power_signal_adc_disable(enum pwr_sig_adc adc);
  */
 void power_signal_adc_init(void);
 
-#endif /* __AP_PWRSEQ_SIGNAL_ADC_H__ */
+#endif /* ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_SIGNAL_ADC_H_ */

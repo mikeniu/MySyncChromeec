@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ASSERT_H
-#define __CROS_EC_ASSERT_H
+#ifndef ZEPHYR_SHIM_INCLUDE_BUILTIN_ASSERT_H_
+#define ZEPHYR_SHIM_INCLUDE_BUILTIN_ASSERT_H_
 
 #include <zephyr/sys/__assert.h>
 
@@ -26,4 +26,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __CROS_EC_ASSERT_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_BUILTIN_ASSERT_H_ */

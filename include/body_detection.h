@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_BODY_DETECTION_H
-#define __CROS_EC_BODY_DETECTION_H
+#ifndef INCLUDE_BODY_DETECTION_H_
+#define INCLUDE_BODY_DETECTION_H_
 
 #include "body_detection_client.h"
 
@@ -47,4 +47,4 @@ bool body_detect_get_spoof(void);
 }
 #endif
 
-#endif /* __CROS_EC_BODY_DETECTION_H */
+#endif /* INCLUDE_BODY_DETECTION_H_ */

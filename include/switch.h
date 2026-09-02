@@ -5,8 +5,8 @@
 
 /* Switch module for Chrome EC */
 
-#ifndef __CROS_EC_SWITCH_H
-#define __CROS_EC_SWITCH_H
+#ifndef INCLUDE_SWITCH_H_
+#define INCLUDE_SWITCH_H_
 
 #include "common.h"
 #include "gpio.h"
@@ -32,4 +32,4 @@ static inline void switch_interrupt(enum gpio_signal signal)
 }
 #endif
 
-#endif /* __CROS_EC_SWITCH_H */
+#endif /* INCLUDE_SWITCH_H_ */

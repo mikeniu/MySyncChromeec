@@ -4,8 +4,8 @@
  */
 /* Ask the EC to set the lightbar state to reflect the CPU activity */
 
-#ifndef __CROS_EC_LIGHTBAR_H
-#define __CROS_EC_LIGHTBAR_H
+#ifndef INCLUDE_LIGHTBAR_H_
+#define INCLUDE_LIGHTBAR_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,4 +63,4 @@ extern void demo_tap(void);
 }
 #endif
 
-#endif /* __CROS_EC_LIGHTBAR_H */
+#endif /* INCLUDE_LIGHTBAR_H_ */

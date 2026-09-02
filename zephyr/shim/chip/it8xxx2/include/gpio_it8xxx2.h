@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_GPIO_IT8XXX2_H
-#define __CROS_EC_GPIO_IT8XXX2_H
+#ifndef ZEPHYR_SHIM_CHIP_IT8XXX2_INCLUDE_GPIO_IT8XXX2_H_
+#define ZEPHYR_SHIM_CHIP_IT8XXX2_INCLUDE_GPIO_IT8XXX2_H_
 
 enum gpio_port_to_node {
 	GPIO_A,
@@ -25,4 +25,4 @@ enum gpio_port_to_node {
 	GPIO_KSOL = 52
 };
 
-#endif /* __CROS_EC_GPIO_IT8XXX2_H */
+#endif /* ZEPHYR_SHIM_CHIP_IT8XXX2_INCLUDE_GPIO_IT8XXX2_H_ */

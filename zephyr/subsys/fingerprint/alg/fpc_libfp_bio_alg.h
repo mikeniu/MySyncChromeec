@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __FPC_LIBFP_BIO_ALG_H__
-#define __FPC_LIBFP_BIO_ALG_H__
+#ifndef ZEPHYR_SUBSYS_FINGERPRINT_ALG_FPC_LIBFP_BIO_ALG_H_
+#define ZEPHYR_SUBSYS_FINGERPRINT_ALG_FPC_LIBFP_BIO_ALG_H_
 
 #include <stdint.h>
 
@@ -17,4 +17,4 @@
  */
 #define FP_ALGORITHM_ENROLLMENT_SIZE 28
 
-#endif /* __FPC_LIBFP_BIO_ALG_H__ */
+#endif /* ZEPHYR_SUBSYS_FINGERPRINT_ALG_FPC_LIBFP_BIO_ALG_H_ */

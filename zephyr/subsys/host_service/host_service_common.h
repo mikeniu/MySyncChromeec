@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef HOST_SERVICE_COMMON_H
-#define HOST_SERVICE_COMMON_H
+#ifndef ZEPHYR_SUBSYS_HOST_SERVICE_HOST_SERVICE_COMMON_H_
+#define ZEPHYR_SUBSYS_HOST_SERVICE_HOST_SERVICE_COMMON_H_
 
 #include <zephyr/device.h>
 #include <zephyr/init.h>
@@ -18,4 +18,4 @@ int mng_and_boot_init(struct device *dev);
 void process_host_msgs(void);
 
 #endif
-#endif
+#endif /* ZEPHYR_SUBSYS_HOST_SERVICE_HOST_SERVICE_COMMON_H_ */

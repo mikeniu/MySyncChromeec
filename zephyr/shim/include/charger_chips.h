@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CHARGER_CHIPS_H
-#define __CROS_EC_CHARGER_CHIPS_H
+#ifndef ZEPHYR_SHIM_INCLUDE_CHARGER_CHIPS_H_
+#define ZEPHYR_SHIM_INCLUDE_CHARGER_CHIPS_H_
 
 #include "charger.h"
 
@@ -38,4 +38,4 @@ extern const struct charger_config_t chg_chips_alt[];
 }
 #endif
 
-#endif /* __CROS_EC_CHARGER_CHIPS_H */
+#endif /* ZEPHYR_SHIM_INCLUDE_CHARGER_CHIPS_H_ */

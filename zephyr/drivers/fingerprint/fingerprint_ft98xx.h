@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_FT98xx_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_FT98xx_H_
+#ifndef ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_H_
+#define ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_H_
 
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/spi.h>
@@ -26,4 +26,4 @@ struct ft98xx_data {
 	uint16_t errors;
 };
 
-#endif
+#endif /* ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_H_ */

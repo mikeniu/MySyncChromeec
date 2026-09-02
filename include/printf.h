@@ -5,8 +5,8 @@
 
 /* Printf-like functionality for Chrome EC */
 
-#ifndef __CROS_EC_PRINTF_H
-#define __CROS_EC_PRINTF_H
+#ifndef INCLUDE_PRINTF_H_
+#define INCLUDE_PRINTF_H_
 
 #include "common.h"
 #include "console.h"
@@ -159,4 +159,4 @@ size_t hex_str_buf_size(size_t num_bytes);
 }
 #endif
 
-#endif /* __CROS_EC_PRINTF_H */
+#endif /* INCLUDE_PRINTF_H_ */

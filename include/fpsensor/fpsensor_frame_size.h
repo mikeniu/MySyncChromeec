@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_FRAME_SIZE_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_FRAME_SIZE_H
+#ifndef INCLUDE_FPSENSOR_FPSENSOR_FRAME_SIZE_H_
+#define INCLUDE_FPSENSOR_FPSENSOR_FRAME_SIZE_H_
 
 #include "ec_commands.h"
 
@@ -51,4 +51,4 @@ class FpFrameSizeCache {
 #endif
 };
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_FRAME_SIZE_H */
+#endif /* INCLUDE_FPSENSOR_FPSENSOR_FRAME_SIZE_H_ */

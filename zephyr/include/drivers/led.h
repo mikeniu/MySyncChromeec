@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_LED_H__
-#define __CROS_EC_LED_H__
+#ifndef ZEPHYR_INCLUDE_DRIVERS_LED_H_
+#define ZEPHYR_INCLUDE_DRIVERS_LED_H_
 
 #include "ec_commands.h"
 
@@ -268,4 +268,4 @@ const struct led_pins_node_t *led_get_node(enum led_color color,
 enum power_state get_chipset_state(void);
 #endif /* TEST_BUILD */
 
-#endif /* __CROS_EC_LED_H__ */
+#endif /* ZEPHYR_INCLUDE_DRIVERS_LED_H_ */

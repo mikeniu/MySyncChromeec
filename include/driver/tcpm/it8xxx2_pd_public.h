@@ -3,10 +3,10 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_DRIVER_TCPM_IT8XXX2_PD_PUBLIC_H
-#define __CROS_EC_DRIVER_TCPM_IT8XXX2_PD_PUBLIC_H
+#ifndef INCLUDE_DRIVER_TCPM_IT8XXX2_PD_PUBLIC_H_
+#define INCLUDE_DRIVER_TCPM_IT8XXX2_PD_PUBLIC_H_
 
 extern const struct tcpm_drv it83xx_tcpm_drv;
 extern const struct tcpm_drv it8xxx2_tcpm_drv;
 
-#endif /* __CROS_EC_DRIVER_TCPM_IT8XXX2_PD_PUBLIC_H */
+#endif /* INCLUDE_DRIVER_TCPM_IT8XXX2_PD_PUBLIC_H_ */

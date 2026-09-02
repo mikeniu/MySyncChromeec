@@ -5,8 +5,8 @@
  * Header file for a USB interface.
  */
 
-#ifndef __UTIL_COMM_USB_H
-#define __UTIL_COMM_USB_H
+#ifndef UTIL_COMM_USB_H_
+#define UTIL_COMM_USB_H_
 
 #include "common.h"
 
@@ -34,4 +34,4 @@ int comm_init_usb(uint16_t vid, uint16_t pid);
  */
 void comm_usb_exit(void);
 
-#endif /* __UTIL_COMM_USB_H */
+#endif /* UTIL_COMM_USB_H_ */

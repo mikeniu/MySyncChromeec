@@ -6,8 +6,8 @@
 
 /* Lightbar IC interface */
 
-#ifndef __CROS_EC_LB_COMMON_H
-#define __CROS_EC_LB_COMMON_H
+#ifndef INCLUDE_LB_COMMON_H_
+#define INCLUDE_LB_COMMON_H_
 
 #include "ec_commands.h"
 
@@ -46,4 +46,4 @@ int lb_power(int enabled);
 }
 #endif
 
-#endif /* __CROS_EC_LB_COMMON_H */
+#endif /* INCLUDE_LB_COMMON_H_ */

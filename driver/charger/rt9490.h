@@ -8,8 +8,8 @@
 
 #include <stdbool.h>
 
-#ifndef __CROS_EC_RT9490_H
-#define __CROS_EC_RT9490_H
+#ifndef DRIVER_CHARGER_RT9490_H_
+#define DRIVER_CHARGER_RT9490_H_
 
 #define RT9490_ADDR_FLAGS 0x53
 
@@ -265,7 +265,7 @@ int rt9490_enable_pwm_1mhz(int chgnum, bool en);
 
 int rt9490_enable_hidden_mode(int chgnum, bool en);
 
-#endif /* __CROS_EC_RT9490_H */
+#endif /* DRIVER_CHARGER_RT9490_H_ */
 
 /*
  * Required for TS_ADC temperature calculation.

@@ -5,8 +5,8 @@
 
 /* Private sensor interface */
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_FT98XX_PRIVATE_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_FT98XX_PRIVATE_H_
+#ifndef ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_PRIVATE_H_
+#define ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_PRIVATE_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -409,4 +409,4 @@ int focal_algo_get_finger_detailed_info(int *finger_size, int *sub_tpl_size,
  * @retval others fake fingerprint
  */
 int focal_algo_anti_spoofing(uint16_t *raw_data);
-#endif /* ZEPHYR_DRIVERS_FINGERPRINT_FT98XX_PRIVATE_H_ */
+#endif /* ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_PRIVATE_H_ */

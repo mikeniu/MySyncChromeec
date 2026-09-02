@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __INTELRVP_BOARD_H
-#define __INTELRVP_BOARD_H
+#ifndef ZEPHYR_PROGRAM_INTELRVP_INCLUDE_INTELRVP_H_
+#define ZEPHYR_PROGRAM_INTELRVP_INCLUDE_INTELRVP_H_
 
 #include "compiler.h"
 #include "gpio_signal.h"
@@ -44,4 +44,4 @@ bool is_typec_port(int port);
 void board_charge_init(void);
 #endif
 
-#endif /* __INTELRVP_BOARD_H */
+#endif /* ZEPHYR_PROGRAM_INTELRVP_INCLUDE_INTELRVP_H_ */

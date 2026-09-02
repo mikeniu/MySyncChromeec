@@ -5,8 +5,8 @@
 
 /* LPC module for Chrome EC */
 
-#ifndef __CROS_EC_LPC_H
-#define __CROS_EC_LPC_H
+#ifndef INCLUDE_LPC_H_
+#define INCLUDE_LPC_H_
 
 #include "common.h"
 #include "host_command.h"
@@ -195,4 +195,4 @@ static inline void lpc_disable_host_interface_interrupts(void)
 }
 #endif
 
-#endif /* __CROS_EC_LPC_H */
+#endif /* INCLUDE_LPC_H_ */

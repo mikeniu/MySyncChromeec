@@ -5,8 +5,8 @@
  * Common functions for blinking LEDs.
  */
 
-#ifndef __CROS_EC_LED_COMMON_H
-#define __CROS_EC_LED_COMMON_H
+#ifndef INCLUDE_LED_COMMON_H_
+#define INCLUDE_LED_COMMON_H_
 
 #include "ec_commands.h"
 
@@ -112,4 +112,4 @@ void board_diag_led_power_fail(void);
 }
 #endif
 
-#endif /* __CROS_EC_LED_COMMON_H */
+#endif /* INCLUDE_LED_COMMON_H_ */

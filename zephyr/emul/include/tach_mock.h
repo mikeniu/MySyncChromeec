@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_INCLUDE_TACH_MOCK_H
-#define __EMUL_INCLUDE_TACH_MOCK_H
+#ifndef ZEPHYR_EMUL_INCLUDE_TACH_MOCK_H_
+#define ZEPHYR_EMUL_INCLUDE_TACH_MOCK_H_
 
 #include <zephyr/device.h>
 
-#endif /*__EMUL_INCLUDE_TACH_MOCK_H */
+#endif /* ZEPHYR_EMUL_INCLUDE_TACH_MOCK_H_ */
