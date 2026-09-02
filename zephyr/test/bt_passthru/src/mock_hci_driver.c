@@ -28,6 +28,7 @@ struct tx_packet {
 static const struct device *g_mock_dev;
 static struct tx_packet g_tx_packets[MAX_TX_PACKETS];
 static size_t g_tx_packet_count;
+static int g_send_result;
 
 static int mock_open(const struct device *dev)
 {
@@ -38,6 +39,12 @@ static int mock_open(const struct device *dev)
 
 static int mock_send(const struct device *dev, struct net_buf *buf)
 {
+	if (g_send_result != 0) {
+		LOG_WRN("mock_bt_hci simulated send failure: %d",
+			g_send_result);
+		return g_send_result;
+	}
+
 	if (g_tx_packet_count < MAX_TX_PACKETS) {
 		size_t copy_len = buf->len < MAX_TX_PACKET_LEN ?
 					  buf->len :
@@ -72,6 +79,7 @@ DT_INST_FOREACH_STATUS_OKAY(MOCK_DEVICE_INIT)
 void mock_hci_driver_reset(void)
 {
 	g_tx_packet_count = 0;
+	g_send_result = 0;
 }
 
 size_t mock_hci_driver_get_tx_count(void)
@@ -99,6 +107,11 @@ size_t mock_hci_driver_get_tx_packet(size_t index, uint8_t *out_buf,
 			     max_len;
 	memcpy(out_buf, g_tx_packets[index].data, len);
 	return len;
+}
+
+void mock_hci_driver_set_send_result(int res)
+{
+	g_send_result = res;
 }
 
 int mock_hci_driver_inject_empty_rx(void)
