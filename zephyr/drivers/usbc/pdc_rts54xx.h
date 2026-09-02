@@ -5,8 +5,8 @@
 
 /* Internal header with RTS54xx interface constants and types */
 
-#ifndef __CROS_EC_PDC_RTS54XX_H
-#define __CROS_EC_PDC_RTS54XX_H
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_USBC_PDC_RTS54XX_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_USBC_PDC_RTS54XX_H_
 
 #include "drivers/pdc.h"
 
@@ -180,4 +180,4 @@ enum sx_sleep_state {
 
 };
 
-#endif /* __CROS_EC_PDC_RTS54XX_H */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_USBC_PDC_RTS54XX_H_ */

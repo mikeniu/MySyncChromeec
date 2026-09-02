@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef DT_BINDINGS_MACROS_H_
-#define DT_BINDINGS_MACROS_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DT_BINDINGS_MACROS_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DT_BINDINGS_MACROS_H_
 
 /* Internal, recursive helpers to construct the integer from individual bits. */
 #define _BINARY1(b0) (b0)
@@ -33,4 +33,4 @@
  */
 #define BINARY(...) _BINARY_DISPATCHER(_NARG(__VA_ARGS__))(__VA_ARGS__)
 
-#endif /* DT_BINDINGS_MACROS_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DT_BINDINGS_MACROS_H_ */

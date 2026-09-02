@@ -5,8 +5,8 @@
  * Renesas (Intersil) ISL-9237/38 battery charger public header
  */
 
-#ifndef __CROS_EC_DRIVER_CHARGER_ISL923X_PUBLIC_H
-#define __CROS_EC_DRIVER_CHARGER_ISL923X_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_CHARGER_ISL923X_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_CHARGER_ISL923X_PUBLIC_H_
 
 #include "common.h"
 #include "stdbool.h"
@@ -89,4 +89,4 @@ enum ec_error_list isl9238c_resume(int chgnum);
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_CHARGER_ISL923X_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_CHARGER_ISL923X_PUBLIC_H_ */

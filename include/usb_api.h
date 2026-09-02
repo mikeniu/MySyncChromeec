@@ -9,8 +9,8 @@
  * implementation.
  */
 
-#ifndef __CROS_EC_USB_API_H
-#define __CROS_EC_USB_API_H
+#ifndef PLATFORM_EC_INCLUDE_USB_API_H_
+#define PLATFORM_EC_INCLUDE_USB_API_H_
 
 /*
  * Initialize the USB peripheral, enabling its clock and configuring the DP/DN
@@ -84,4 +84,4 @@ static inline void usb_wake(void)
 /* Board-specific USB wake, for side-band wake, called by usb_wake above. */
 void board_usb_wake(void);
 
-#endif /* __CROS_EC_USB_API_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_API_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ATOMIC_BIT_H
-#define __CROS_EC_ATOMIC_BIT_H
+#ifndef PLATFORM_EC_INCLUDE_ATOMIC_BIT_H_
+#define PLATFORM_EC_INCLUDE_ATOMIC_BIT_H_
 
 #ifndef CONFIG_ZEPHYR
 #include "atomic.h"
@@ -27,4 +27,4 @@ static inline atomic_val_t atomic_set(atomic_t *target, atomic_val_t value)
 
 #include "third_party/zephyr/atomic.h"
 #endif /* CONFIG_ZEPHYR */
-#endif /* __CROS_EC_ATOMIC_BIT_H */
+#endif /* PLATFORM_EC_INCLUDE_ATOMIC_BIT_H_ */

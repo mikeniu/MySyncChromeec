@@ -6,6 +6,10 @@
  */
 
 /* 	   NAME			OPERAND BYTES	MNEMONIC*/
+
+#ifndef PLATFORM_EC_INCLUDE_LIGHTBAR_OPCODE_LIST_H_
+#define PLATFORM_EC_INCLUDE_LIGHTBAR_OPCODE_LIST_H_
+
 #define LIGHTBAR_OPCODE_TABLE              \
 	OP(ON, 0, "on")                    \
 	OP(OFF, 0, "off")                  \
@@ -24,3 +28,5 @@
 	OP(CYCLE_ONCE, 0, "cycle.1")       \
 	OP(CYCLE, 0, "cycle")              \
 	OP(HALT, 0, "halt")
+
+#endif /* PLATFORM_EC_INCLUDE_LIGHTBAR_OPCODE_LIST_H_ */

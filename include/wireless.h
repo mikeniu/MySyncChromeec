@@ -5,8 +5,8 @@
 
 /* Wireless API for Chrome EC */
 
-#ifndef __CROS_EC_WIRELESS_H
-#define __CROS_EC_WIRELESS_H
+#ifndef PLATFORM_EC_INCLUDE_WIRELESS_H_
+#define PLATFORM_EC_INCLUDE_WIRELESS_H_
 
 #include "common.h"
 
@@ -32,4 +32,4 @@ static inline void wireless_set_state(enum wireless_power_state state)
 }
 #endif
 
-#endif /* __CROS_EC_WIRELESS_H */
+#endif /* PLATFORM_EC_INCLUDE_WIRELESS_H_ */

@@ -9,8 +9,8 @@
  * @brief Backend API for USB-C VCONN-powered device emulator
  */
 
-#ifndef __EMUL_TCPCI_PARTNER_VPD_H
-#define __EMUL_TCPCI_PARTNER_VPD_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_VPD_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_VPD_H_
 
 #include "emul/tcpc/emul_tcpci_partner_common.h"
 #include "emul/tcpc/emul_tcpci_partner_faulty_ext.h"
@@ -46,4 +46,4 @@ tcpci_vpd_emul_init(struct tcpci_vpd_emul_data *data,
  * @}
  */
 
-#endif /* __EMUL_TCPCI_PARTNER_VPD_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_VPD_H_ */

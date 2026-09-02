@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __ZEPHYR_SHIM_INCLUDE_USBC_BC12_UPSTREAM_H
-#define __ZEPHYR_SHIM_INCLUDE_USBC_BC12_UPSTREAM_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_BC12_UPSTREAM_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_BC12_UPSTREAM_H_
 
 /* Compatible properties for all upstream drivers */
 #define PI3USB9201_UPSTREAM_COMPAT diodes_pi3usb9201
@@ -16,4 +16,4 @@
 
 extern const struct bc12_drv bc12_upstream_drv;
 
-#endif /* __ZEPHYR_SHIM_INCLUDE_USBC_BC12_UPSTREAM_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_BC12_UPSTREAM_H_ */

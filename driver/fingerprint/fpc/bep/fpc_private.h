@@ -5,8 +5,8 @@
 
 /* Private sensor interface */
 
-#ifndef __CROS_EC_FPC_PRIVATE_H
-#define __CROS_EC_FPC_PRIVATE_H
+#ifndef PLATFORM_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_PRIVATE_H_
+#define PLATFORM_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_PRIVATE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -184,4 +184,4 @@ void fp_sensor_unlock(void);
 }
 #endif
 
-#endif /* __CROS_EC_FPC_PRIVATE_H */
+#endif /* PLATFORM_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_PRIVATE_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __ZEPHYR_SHIM_TUSB1064_USB_MUX_H
-#define __ZEPHYR_SHIM_TUSB1064_USB_MUX_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TUSB1064_USB_MUX_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TUSB1064_USB_MUX_H_
 
 #include "driver/usb_mux/tusb1064.h"
 
@@ -50,4 +50,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __ZEPHYR_SHIM_TUBS1064_USB_MUX_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TUSB1064_USB_MUX_H_ */

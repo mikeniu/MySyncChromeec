@@ -8,8 +8,8 @@
  * Refer to USB PD 3.0 spec, version 2.0, sections 8.2 and 8.3
  */
 
-#ifndef __CROS_EC_USB_DPM_H
-#define __CROS_EC_USB_DPM_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_DPM_SM_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_DPM_SM_H_
 
 #include "ec_commands.h"
 #include "usb_pd_tcpm.h"
@@ -239,4 +239,4 @@ enum dpm_pd_button_state {
 }
 #endif
 
-#endif /* __CROS_EC_USB_DPM_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_DPM_SM_H_ */

@@ -5,8 +5,8 @@
 
 /* Host command module for Chrome EC */
 
-#ifndef __CROS_EC_HOST_COMMAND_H
-#define __CROS_EC_HOST_COMMAND_H
+#ifndef PLATFORM_EC_INCLUDE_HOST_COMMAND_H_
+#define PLATFORM_EC_INCLUDE_HOST_COMMAND_H_
 
 #include "common.h"
 #include "compiler.h"
@@ -468,4 +468,4 @@ static inline int CROS_EC_COMMAND(CROS_EC_COMMAND_INFO *handle,
 }
 #endif
 
-#endif /* __CROS_EC_HOST_COMMAND_H */
+#endif /* PLATFORM_EC_INCLUDE_HOST_COMMAND_H_ */

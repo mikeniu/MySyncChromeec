@@ -5,8 +5,8 @@
  * USB definitions.
  */
 
-#ifndef __CROS_EC_USB_DESCRIPTOR_H
-#define __CROS_EC_USB_DESCRIPTOR_H
+#ifndef PLATFORM_EC_INCLUDE_USB_DESCRIPTOR_H_
+#define PLATFORM_EC_INCLUDE_USB_DESCRIPTOR_H_
 
 #include <stdint.h>
 
@@ -410,4 +410,4 @@ extern const void *webusb_url;
 }
 #endif
 
-#endif /* __CROS_EC_USB_DESCRIPTOR_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_DESCRIPTOR_H_ */

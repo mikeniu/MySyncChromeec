@@ -7,8 +7,8 @@
  * OCPC - One Charger IC per Type-C
  */
 
-#ifndef __CROS_EC_OCPC_H_
-#define __CROS_EC_OCPC_H_
+#ifndef PLATFORM_EC_INCLUDE_OCPC_H_
+#define PLATFORM_EC_INCLUDE_OCPC_H_
 
 #include "battery.h"
 
@@ -133,4 +133,4 @@ enum ec_error_list ocpc_calc_resistances(struct ocpc_data *ocpc,
 }
 #endif
 
-#endif /* __CROS_EC_OCPC_H */
+#endif /* PLATFORM_EC_INCLUDE_OCPC_H_ */

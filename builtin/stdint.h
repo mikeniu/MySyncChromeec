@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_STDINT_H__
-#define __CROS_EC_STDINT_H__
+#ifndef PLATFORM_EC_BUILTIN_STDINT_H_
+#define PLATFORM_EC_BUILTIN_STDINT_H_
 
 typedef unsigned char uint8_t;
 typedef signed char int8_t;
@@ -88,4 +88,4 @@ typedef int64_t int_fast64_t;
 #define INT64_MIN (INT64_C(-9223372036854775807) - 1)
 #endif
 
-#endif /* __CROS_EC_STDINT_H__ */
+#endif /* PLATFORM_EC_BUILTIN_STDINT_H_ */

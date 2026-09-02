@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_REALTEK_RTS5453P_PUBLIC_H
-#define __EMUL_REALTEK_RTS5453P_PUBLIC_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_REALTEK_RTS54XX_PUBLIC_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_REALTEK_RTS54XX_PUBLIC_H_
 
 #include "emul/emul_common_i2c.h"
 #include "include/usb_pd.h"
@@ -40,4 +40,4 @@
 struct i2c_common_emul_data *
 rts5453p_emul_get_i2c_common_data(const struct emul *emul);
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_REALTEK_RTS54XX_PUBLIC_H_ */

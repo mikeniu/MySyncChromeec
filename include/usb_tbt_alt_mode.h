@@ -8,8 +8,8 @@
  * Refer to USB Type-C Cable and Connector Specification Release 2.0 Section F
  */
 
-#ifndef __CROS_EC_USB_TBT_ALT_MODE_H
-#define __CROS_EC_USB_TBT_ALT_MODE_H
+#ifndef PLATFORM_EC_INCLUDE_USB_TBT_ALT_MODE_H_
+#define PLATFORM_EC_INCLUDE_USB_TBT_ALT_MODE_H_
 
 #include "tcpm/tcpm.h"
 #include "usb_pd_dpm_sm.h"
@@ -114,4 +114,4 @@ enum dpm_msg_setup_status tbt_setup_next_vdm(int port, int *vdo_count,
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_INCLUDE_USB_TBT_ALT_MODE_H_ */

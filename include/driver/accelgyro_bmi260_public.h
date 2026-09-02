@@ -5,8 +5,8 @@
 
 /* BMI260 accelerometer and gyro for Chrome EC */
 
-#ifndef __CROS_EC_DRIVER_ACCELGYRO_BMI260_PUBLIC_H
-#define __CROS_EC_DRIVER_ACCELGYRO_BMI260_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_ACCELGYRO_BMI260_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_ACCELGYRO_BMI260_PUBLIC_H_
 
 /*
  * The addr field of motion_sensor support both SPI and I2C:
@@ -28,4 +28,4 @@ void bmi260_interrupt(enum gpio_signal signal);
 extern struct i2c_stress_test_dev bmi260_i2c_stress_test_dev;
 #endif
 
-#endif /* __CROS_EC_DRIVER_ACCELGYRO_BMI260_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_ACCELGYRO_BMI260_PUBLIC_H_ */
