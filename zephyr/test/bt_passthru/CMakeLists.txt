@@ -18,6 +18,7 @@ target_include_directories(app PRIVATE
 target_sources(app PRIVATE
 	src/main.cc
 	src/mock_hci_driver.c
+	src/test_cros_hostcmd_transport.cc
 )
 
 target_link_libraries(app PRIVATE
