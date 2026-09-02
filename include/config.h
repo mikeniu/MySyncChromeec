@@ -7173,22 +7173,14 @@
 #define ALS_COUNT 0
 #endif /* CONFIG_ALS */
 
-/*
- * If the EC has exclusive control over CBI EEPROM WP, don't consult the main
- * flash WP.
- */
-#ifdef CONFIG_EEPROM_CBI_WP
-#define CONFIG_BYPASS_CBI_EEPROM_WP_CHECK
-#endif
-
 #if defined(CONFIG_EEPROM_CBI_WP) && !defined(CONFIG_CBI_EEPROM)
 #error "CONFIG_EEPROM_CBI_WP requires CONFIG_CBI_EEPROM to be defined!"
 #endif
 
 #if defined(CONFIG_BYPASS_CBI_EEPROM_WP_CHECK) && \
-	!defined(CONFIG_SYSTEM_UNLOCKED) && !defined(CONFIG_EEPROM_CBI_WP)
+	!defined(CONFIG_SYSTEM_UNLOCKED)
 #error "CONFIG_BYPASS_CBI_EEPROM_WP_CHECK is only permitted " \
-	"when CONFIG_SYSTEM_UNLOCK or CONFIG_EEPROM_CBI_WP is also enabled."
+	"when CONFIG_SYSTEM_UNLOCK is also enabled."
 #endif /* CONFIG_BYPASS_CBI_EEPROM_WP_CHECK && !CONFIG_SYSTEM_UNLOCK */
 
 #if defined(CONFIG_BOARD_VERSION_CBI) && defined(CONFIG_BOARD_VERSION_GPIO)
