@@ -39,6 +39,7 @@ static void battery_present_before_and_teardown(void *fixture)
 					  I2C_COMMON_EMUL_NO_FAIL_REG);
 	i2c_common_emul_set_write_fail_reg(f->common_data,
 					   I2C_COMMON_EMUL_NO_FAIL_REG);
+	battery_set_cached_presence(BP_NOT_SURE);
 }
 
 ZTEST_USER_F(battery_present, test_i2c_good)

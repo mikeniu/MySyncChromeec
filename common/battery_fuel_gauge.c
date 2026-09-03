@@ -199,6 +199,13 @@ void init_battery_type(void)
 				  (100 * MSEC);
 	int ret;
 
+	if (battery_is_cut_off() || battery_hw_present() == BP_NO) {
+		battery_set_cached_presence(BP_NO);
+		battery_conf = &board_battery_info[dflt];
+		battery_init_retry_count = 0;
+		return;
+	}
+
 	ret = battery_manufacturer_name(batt_manuf_name,
 					sizeof(batt_manuf_name));
 
@@ -212,11 +219,31 @@ void init_battery_type(void)
 				battery_init_retry_count, max_retries);
 			hook_call_deferred(&init_battery_type_data,
 					   retry_delay);
+			battery_set_cached_presence(BP_NOT_SURE);
 		} else {
 			battery_init_retry_count = 0;
+			if (battery_hw_present() == BP_NOT_SURE)
+				battery_set_cached_presence(BP_NO);
 		}
 		return;
 	}
+
+#if defined(CONFIG_BATTERY_SMART)
+	int mfg_access = 0;
+
+	if (sb_read(SB_MANUFACTURER_ACCESS, &mfg_access) == EC_SUCCESS &&
+	    (mfg_access & BIT(12))) {
+		CPRINTS("Battery permanent failure detected: 0x%04x",
+			mfg_access);
+		battery_set_cached_presence(BP_NO);
+		battery_conf = &board_battery_info[dflt];
+		battery_init_retry_count = 0;
+		hook_call_deferred(&init_battery_type_data, -1);
+		return;
+	}
+#endif
+
+	battery_set_cached_presence(BP_YES);
 
 	/* Don't carry over any previous name (in case i2c fail). */
 	memset(batt_device_name, 0, sizeof(batt_device_name));
