@@ -94,6 +94,13 @@ config PLATFORM_EC_KEYBOARD_PROTOCOL_8042
 
 	  See here for docs: https://wiki.osdev.org/%228042%22_PS/2_Controller
 
+config PLATFORM_EC_8042_AUX
+	bool "Enable 8042 AUX (mouse) support"
+	depends on PLATFORM_EC_KEYBOARD_PROTOCOL_8042
+	help
+	  Enable support for auxiliary device (PS/2 mouse) on the 8042
+	  controller.
+
 config PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP
 	bool "mkbp"
 	depends on AP

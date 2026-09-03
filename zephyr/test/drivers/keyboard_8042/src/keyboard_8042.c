@@ -215,6 +215,8 @@ ZTEST(keyboard_8042, test_command__system_reset)
 }
 
 FAKE_VOID_FUNC(lpc_keyboard_put_char, uint8_t, int);
+FAKE_VOID_FUNC(lpc_aux_put_char, uint8_t, int);
+FAKE_VOID_FUNC(send_aux_data_to_device, uint8_t);
 
 ZTEST(keyboard_8042, test_command__read_control_ram)
 {
@@ -499,21 +501,94 @@ ZTEST(keyboard_8042, test_command__test_mouse)
 
 ZTEST(keyboard_8042, test_command__echo_mouse_and_send_to_mouse)
 {
+	RESET_FAKE(lpc_aux_put_char);
+	RESET_FAKE(send_aux_data_to_device);
+
 	keyboard_host_write(I8042_ECHO_MOUSE, true);
 	k_sleep(K_MSEC(100));
 	keyboard_host_write(0x01, false);
 	k_sleep(K_MSEC(100));
 
+	zassert_equal(1, lpc_aux_put_char_fake.call_count);
+	zassert_equal(0x01, lpc_aux_put_char_fake.arg0_history[0]);
+
 	keyboard_host_write(I8042_SEND_TO_MOUSE, true);
 	k_sleep(K_MSEC(100));
 	keyboard_host_write(0x02, false);
 	k_sleep(K_MSEC(100));
+
+	zassert_equal(1, send_aux_data_to_device_fake.call_count);
+	zassert_equal(0x02, send_aux_data_to_device_fake.arg0_history[0]);
 }
 
 ZTEST(keyboard_8042, test_aux_interrupt)
 {
+	extern void send_aux_data_to_host_deferred(void);
+
+	RESET_FAKE(lpc_aux_put_char);
+
+	/* Disable AUX channel */
+	keyboard_host_write(I8042_DIS_MOUSE, true);
+	k_sleep(K_MSEC(50));
+
+	/* Send interrupt data while aux channel disabled -> ignored */
+	send_aux_data_to_host_interrupt(0x12);
+	send_aux_data_to_host_deferred();
+	k_sleep(K_MSEC(50));
+	zassert_equal(0, lpc_aux_put_char_fake.call_count);
+
+	/* Enable AUX channel and AUX IRQ */
+	keyboard_host_write(I8042_ENA_MOUSE, true);
+	k_sleep(K_MSEC(50));
+	keyboard_host_write(I8042_WRITE_CMD_BYTE, true);
+	k_sleep(K_MSEC(50));
+	keyboard_host_write(I8042_ENIRQ12, false);
+	k_sleep(K_MSEC(50));
+
 	send_aux_data_to_host_interrupt(0x33);
+	send_aux_data_to_host_deferred();
 	k_sleep(K_MSEC(100));
+
+	zassert_equal(1, lpc_aux_put_char_fake.call_count);
+	zassert_equal(0x33, lpc_aux_put_char_fake.arg0_history[0]);
+	zassert_equal(1, lpc_aux_put_char_fake.arg1_history[0]);
+}
+
+ZTEST(keyboard_8042, test_command__aux_enable_disable_irq)
+{
+	/* Ensure AUX IRQ is disabled initially */
+	keyboard_host_write(I8042_WRITE_CMD_BYTE, true);
+	k_sleep(K_MSEC(100));
+	keyboard_host_write(0x00, false);
+	k_sleep(K_MSEC(100));
+
+	/* Enable AUX IRQ (bit I8042_ENIRQ12) -> aux_enable_irq(1) */
+	keyboard_host_write(I8042_WRITE_CMD_BYTE, true);
+	k_sleep(K_MSEC(100));
+	keyboard_host_write(I8042_ENIRQ12, false);
+	k_sleep(K_MSEC(100));
+
+	/* Verify reading back byte 0 shows I8042_ENIRQ12 set */
+	keyboard_host_write(I8042_READ_CMD_BYTE, true);
+	k_sleep(K_MSEC(100));
+	zassert_equal(1, lpc_keyboard_put_char_fake.call_count);
+	zassert_true(lpc_keyboard_put_char_fake.arg0_history[0] &
+		     I8042_ENIRQ12);
+	RESET_FAKE(lpc_keyboard_put_char);
+
+	/* Disable AUX IRQ -> aux_enable_irq(0) */
+	keyboard_host_write(I8042_WRITE_CMD_BYTE, true);
+	k_sleep(K_MSEC(100));
+	keyboard_host_write(0x00, false);
+	k_sleep(K_MSEC(100));
+
+	/* Verify reading back byte 0 shows I8042_ENIRQ12 cleared */
+	keyboard_host_write(I8042_READ_CMD_BYTE, true);
+	k_sleep(K_MSEC(100));
+	zassert_equal(1, lpc_keyboard_put_char_fake.call_count);
+	zassert_false(lpc_keyboard_put_char_fake.arg0_history[0] &
+		      I8042_ENIRQ12);
+	RESET_FAKE(lpc_keyboard_put_char);
 }
 
 ZTEST(keyboard_8042, test_atkbdcommand__echo)
@@ -638,6 +713,35 @@ ZTEST(keyboard_8042, test_atkbdcommand__set_leds)
 	keyboard_host_write(0x07, false);
 	k_sleep(K_MSEC(100));
 	verify_lpc_chars(ack, ARRAY_SIZE(ack));
+}
+
+ZTEST(keyboard_8042, test_atkbdcommand__set_leds_keypress_timeout)
+{
+	const uint8_t ack[] = { ATKBD_RET_ACK };
+
+	keyboard_host_write(ATKBD_CMD_ENABLE, false);
+	k_sleep(K_MSEC(100));
+	RESET_FAKE(lpc_keyboard_put_char);
+
+	/* Start SETLEDS command, waits for option byte */
+	keyboard_host_write(ATKBD_CMD_SETLEDS, false);
+	k_sleep(K_MSEC(5));
+	verify_lpc_chars(ack, ARRAY_SIZE(ack));
+
+	/* Simulate keypress while waiting for 2nd byte */
+	keyboard_state_changed(1, 1, 1);
+	keyboard_state_changed(1, 1, 0);
+
+	/* Sleep briefly: scancode is kept in queue during SETLEDS */
+	k_sleep(K_MSEC(10));
+	zassert_equal(0, lpc_keyboard_put_char_fake.call_count);
+
+	/* Wait until SETLEDS timer expires (setleds deadline is 30ms) */
+	k_sleep(K_MSEC(50));
+
+	/* Scancode previously queued should now be sent */
+	zassert_true(lpc_keyboard_put_char_fake.call_count >= 2);
+	RESET_FAKE(lpc_keyboard_put_char);
 }
 
 ZTEST(keyboard_8042, test_atkbdcommand__set_ex_leds)
@@ -832,6 +936,39 @@ ZTEST(keyboard_8042, test_button__power_button)
 	k_sleep(K_MSEC(100));
 	const uint8_t pwr_rel2[] = { 0xe0, 0xf0, 0x37 };
 	verify_lpc_chars(pwr_rel2, ARRAY_SIZE(pwr_rel2));
+}
+
+ZTEST(keyboard_8042, test_button__power_button_disabled_or_not_s0)
+{
+	/* Power button when chipset is not in S0 (e.g. G3) */
+	test_set_chipset_to_g3();
+	RESET_FAKE(lpc_keyboard_put_char);
+
+	keyboard_update_button(KEYBOARD_BUTTON_POWER, 1);
+	k_sleep(K_MSEC(100));
+	zassert_equal(0, lpc_keyboard_put_char_fake.call_count);
+
+	keyboard_update_button(KEYBOARD_BUTTON_POWER, 0);
+	k_sleep(K_MSEC(100));
+	zassert_equal(0, lpc_keyboard_put_char_fake.call_count);
+
+	/* Power button when keystrokes are disabled */
+	test_set_chipset_to_s0();
+	keyboard_host_write(ATKBD_CMD_RESET_DIS, false);
+	k_sleep(K_MSEC(100));
+	RESET_FAKE(lpc_keyboard_put_char);
+
+	keyboard_update_button(KEYBOARD_BUTTON_POWER, 1);
+	k_sleep(K_MSEC(100));
+	zassert_equal(0, lpc_keyboard_put_char_fake.call_count);
+
+	keyboard_update_button(KEYBOARD_BUTTON_POWER, 0);
+	k_sleep(K_MSEC(100));
+	zassert_equal(0, lpc_keyboard_put_char_fake.call_count);
+
+	/* Re-enable keystrokes for subsequent tests */
+	keyboard_host_write(ATKBD_CMD_ENABLE, false);
+	k_sleep(K_MSEC(100));
 }
 
 FAKE_VALUE_FUNC(const uint8_t *, system_get_jump_tag, uint16_t, int *, int *);
