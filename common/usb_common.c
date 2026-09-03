@@ -170,7 +170,7 @@ __overridable int pd_board_check_request(uint32_t rdo, int pdo_cnt)
 
 int pd_get_source_pdo(const uint32_t **src_pdo_p, const int port)
 {
-#if defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM)
+#if defined(CONFIG_USB_PD_TCPMV2)
 	const uint32_t *src_pdo;
 	const int pdo_cnt = dpm_get_source_pdo(&src_pdo, port);
 #else
@@ -804,8 +804,8 @@ void pd_srccaps_dump(int port)
 
 int pd_broadcast_alert_msg(uint32_t ado)
 {
-#if defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM) && \
-	!defined(CONFIG_USB_VPD) && !defined(CONFIG_USB_CTVPD)
+#if defined(CONFIG_USB_PD_TCPMV2) && !defined(CONFIG_USB_VPD) && \
+	!defined(CONFIG_USB_CTVPD)
 	int ret = EC_SUCCESS;
 
 	for (int i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
@@ -821,8 +821,8 @@ int pd_broadcast_alert_msg(uint32_t ado)
 
 int pd_send_alert_msg(int port, uint32_t ado)
 {
-#if defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM) && \
-	!defined(CONFIG_USB_VPD) && !defined(CONFIG_USB_CTVPD)
+#if defined(CONFIG_USB_PD_TCPMV2) && !defined(CONFIG_USB_VPD) && \
+	!defined(CONFIG_USB_CTVPD)
 	struct rmdo partner_rmdo;
 
 	/*
