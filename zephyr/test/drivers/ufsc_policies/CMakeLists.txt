@@ -8,4 +8,5 @@ target_sources(app PRIVATE
 	src/mock_cbi.c
 	src/ufsc_kb_backlight.c
 	src/ufsc_thermal_fan.c
+	src/ufsc_tablet_mode.c
 )

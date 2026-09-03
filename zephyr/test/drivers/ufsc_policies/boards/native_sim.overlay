@@ -16,6 +16,42 @@
 		fan_policy: fan {
 			enable-value = <&ufsc_thermal_fan_present>;
 		};
+
+		tablet_mode_policy: tablet-mode {
+			enable-value = <&ufsc_form_factor_convertible>;
+		};
+	};
+
+	gpio2: gpio@102 {
+		status = "okay";
+		compatible = "zephyr,gpio-emul";
+		reg = <0x102 0x4>;
+		rising-edge;
+		falling-edge;
+		high-level;
+		low-level;
+		gpio-controller;
+		#gpio-cells = <2>;
+		ngpios = <32>;
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_tablet_mode_l: tablet_mode_l {
+			gpios = <&gpio2 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			enum-name = "GPIO_TABLET_MODE_L";
+		};
+	};
+
+	gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_tablet_mode: tablet_mode {
+			irq-pin = <&gpio_tablet_mode_l>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "gmr_tablet_switch_isr";
+		};
 	};
 
 	fans {
@@ -81,6 +117,23 @@
 		compatible = "cros-ec,cbi-ufsc-value";
 		status = "okay";
 		enum-name = "UFSC_THERMAL_FAN_ABSENT";
+		value = <0>;
+		default;
+	};
+};
+
+&ufsc_form_factor {
+	status = "okay";
+	ufsc_form_factor_convertible: value-convertible {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		enum-name = "UFSC_FORM_FACTOR_CONVERTIBLE";
+		value = <1>;
+	};
+	ufsc_form_factor_clamshell: value-clamshell {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		enum-name = "UFSC_FORM_FACTOR_CLAMSHELL";
 		value = <0>;
 		default;
 	};
