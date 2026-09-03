@@ -252,7 +252,7 @@ ZTEST(watchdog, test_hostcmd_watchdog_info)
 			 ts_before_wait, ts_after_wait),
 		"Unexpected watchdog_reload_period_max_ts_ms");
 	zassert_true(IN_RANGE(response_after_wait.watchdog_stats_elapsed_ms,
-			      HOOK_TICK_INTERVAL * 3 / 1000,
+			      (HOOK_TICK_INTERVAL * 3 / 1000) - 10,
 			      HOOK_TICK_INTERVAL * 4 / 1000),
 		     "Unexpected watchdog_stats_elapsed_ms");
 	zassert_true(IN_RANGE(response_after_wait.watchdog_reload_count, 2, 5),

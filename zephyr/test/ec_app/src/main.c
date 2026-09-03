@@ -100,6 +100,37 @@ ZTEST(ec_app_tests, test_hook_notify_init)
 	zassert_equal(1, sample_init_hook_count,
 		      "Expected sample_init_hook to run once.");
 }
+
+#ifdef CONFIG_PLATFORM_EC_HOOK_TICK
+static int sample_tick_hook_count;
+static int init_count_at_first_tick = -1;
+
+static void sample_tick_hook(void)
+{
+	if (init_count_at_first_tick < 0) {
+		init_count_at_first_tick = sample_init_hook_count;
+	}
+	sample_tick_hook_count++;
+}
+DECLARE_HOOK(HOOK_TICK, sample_tick_hook, HOOK_PRIO_DEFAULT);
+
+/**
+ * @brief Test HOOK_TICK runs strictly after HOOK_INIT has completed.
+ */
+ZTEST(ec_app_tests, test_hook_tick_after_init)
+{
+	/* Ensure at least one tick has fired */
+	if (sample_tick_hook_count == 0) {
+		k_msleep(CONFIG_CROS_EC_HOOK_TICK_INTERVAL / USEC_PER_MSEC +
+			 50);
+	}
+	zassert_true(sample_tick_hook_count > 0, "HOOK_TICK did not run");
+	zassert_equal(
+		1, init_count_at_first_tick,
+		"HOOK_TICK ran before HOOK_INIT completed (init_count=%d)",
+		init_count_at_first_tick);
+}
+#endif
 #endif
 
 #ifdef CONFIG_SHIMMED_TASKS
