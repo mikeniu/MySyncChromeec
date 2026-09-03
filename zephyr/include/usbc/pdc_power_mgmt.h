@@ -812,4 +812,11 @@ void pdc_power_mgmt_request_tbt_reset(int port);
  */
 void pdc_power_mgmt_simulate_power_button_press(int ms);
 
+#ifdef CONFIG_ZTEST
+/**
+ * @brief Reset cached battery design voltage and capacity for tests
+ */
+void pdc_power_mgmt_reset_battery_cache(void);
+#endif
+
 #endif /* __CROS_EC_PDC_POWER_MGMT_H */

@@ -4,6 +4,7 @@
  */
 
 #include "battery.h"
+#include "charge_state.h"
 #include "fakes.h"
 
 #include <zephyr/fff.h>
@@ -78,6 +79,29 @@ void set_battery_present(enum battery_present bp)
 int battery_is_present(void)
 {
 	return bp_val;
+}
+
+__attribute__((weak)) const struct batt_params *
+charger_current_battery_params(void)
+{
+	static struct batt_params test_batt;
+
+	test_batt.is_present = bp_val;
+	test_batt.remaining_capacity = remaining_capacity_val;
+	test_batt.status = battery_status_val;
+	test_batt.full_capacity = full_charge_capacity_val;
+	test_batt.flags = 0;
+	if (battery_remaining_capacity_fake.return_val != 0) {
+		test_batt.flags |= BATT_FLAG_BAD_REMAINING_CAPACITY;
+	}
+	if (battery_status_fake.return_val != 0) {
+		test_batt.flags |= BATT_FLAG_BAD_STATUS;
+	}
+	if (battery_full_charge_capacity_fake.return_val != 0) {
+		test_batt.flags |= BATT_FLAG_BAD_FULL_CAPACITY;
+	}
+
+	return &test_batt;
 }
 
 int test_extpower_present = 0;

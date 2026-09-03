@@ -37,6 +37,8 @@ static void pdc_battery_status_reset(void *data)
 	emul_pdc_disconnect(emul);
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_USBC_PORT0, -1));
 
+	pdc_power_mgmt_reset_battery_cache();
+
 	RESET_FAKE(battery_design_voltage);
 	battery_design_voltage_fake.custom_fake =
 		battery_design_voltage_custom_fake;
