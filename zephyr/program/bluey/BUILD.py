@@ -70,6 +70,7 @@ register_npcx9_project(
 register_npcx9_project(
     project_name="pic",
     zephyr_board="npcx9/npcx9m7fb",
+    extra_modules=["google-private", "nanopb", "pigweed"],
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses
