@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2aff845d_8a7f0176",
+        "filename": "include/config.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 6907,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T17:30:08Z",
+      "side": 1,
+      "message": "Should a minimum of 64 be enforced with a build time assert?",
+      "revId": "6c65ef66324fbd9b6a2e4f99bab6d60228484dfc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
