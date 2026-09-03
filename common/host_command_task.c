@@ -33,7 +33,7 @@
 /* Stop printing repeated host commands "+" after this count */
 #define HCDEBUG_MAX_REPEAT_COUNT 5
 
-static struct host_cmd_handler_args *pending_args;
+test_export_static struct host_cmd_handler_args *pending_args;
 
 static enum {
 	HCDEBUG_OFF, /* No host command debug output */
@@ -69,7 +69,7 @@ static uint8_t saved_result = EC_RES_UNAVAILABLE;
 static struct host_cmd_handler_args args0;
 
 /* Current host command packet from host, for protocol version 3+ */
-static struct host_packet *pkt0;
+test_export_static struct host_packet *pkt0;
 
 /*
  * Host command suppress
