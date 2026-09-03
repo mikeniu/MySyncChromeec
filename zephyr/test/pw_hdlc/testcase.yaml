@@ -1,0 +1,5 @@
+common:
+  platform_allow:
+    - native_sim
+tests:
+  pw_hdlc.unit_test: {}

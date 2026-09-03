@@ -1,0 +1,27 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config PLATFORM_EC_HDLC_ROUTER
+	bool "Enable HDLC Router subsystem"
+	depends on CPP
+	select PIGWEED_BYTES
+	select PIGWEED_CHECKSUM
+	select PIGWEED_HDLC
+	select PIGWEED_RESULT
+	select PIGWEED_STATUS
+	select PIGWEED_STREAM
+	select PIGWEED_VARINT
+	help
+	  Enables the ChromeOS EC Pigweed HDLC Router subsystem for
+	  multiplexing and demultiplexing Host Commands, console logs,
+	  and RPC channels over HDLC serial streams.
+
+config PLATFORM_EC_HDLC_ROUTER_SHELL
+	bool "Enable HDLC Router Shell integration"
+	depends on PLATFORM_EC_HDLC_ROUTER
+	depends on SHELL
+	default y
+	help
+	  Enables console commands and UART shell bypass mode for interactive
+	  and automated HDLC communication over the main EC UART console.

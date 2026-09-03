@@ -64,8 +64,11 @@ set(CMAKE_READELF    "${TOOLCHAIN_HOME}/${CROSS_COMPILE}readelf")
 set(CMAKE_GCOV       "${TOOLCHAIN_HOME}/${CROSS_COMPILE}gcov")
 
 # Compiler version isn't set yet, infer it from the directory name
-file(GLOB GCC_DIR LIST_DIRECTORIES true "${COREBOOT_SDK_ROOT}/lib/gcc/${CROSS_COMPILE_TARGET}/[0-9][0-9].[0-9].[0-9]")
-get_filename_component(GCC_VERSION ${GCC_DIR} NAME)
+file(GLOB GCC_DIR LIST_DIRECTORIES true "${COREBOOT_SDK_ROOT}/lib/gcc/${CROSS_COMPILE_TARGET}/[0-9]*")
+if(GCC_DIR)
+  list(GET GCC_DIR 0 FIRST_GCC_DIR)
+  get_filename_component(GCC_VERSION "${FIRST_GCC_DIR}" NAME)
+endif()
 
 # Older coreboot-sdk toolchains lacked multilib support for libstd++ and libgcc.
 # Fallback to just using the libraries under thumb/ if the multilib layout
