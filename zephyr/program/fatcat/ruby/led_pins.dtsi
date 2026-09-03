@@ -55,6 +55,11 @@
 				led-values = <90>;
 			};
 
+			power_led_white_s3: color-power-white-s3 {
+				led-color = "LED_WHITE";
+				led-values = <20>;
+			};
+
 			power_led_off: color-power-off {
 				led-color = "LED_OFF";
 				led-values = <0>;
