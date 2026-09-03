@@ -191,26 +191,24 @@ bool pd_capable(int port)
 	return true;
 }
 
-#ifndef CONFIG_TEST_USB_PE_SM
-enum idh_ptype get_usb_pd_mux_cable_type(int port)
+__overridable enum idh_ptype get_usb_pd_mux_cable_type(int port)
 {
 	return IDH_PTYPE_UNDEF;
 }
 
-const uint32_t *const pd_get_src_caps(int port)
+__overridable const uint32_t *const pd_get_src_caps(int port)
 {
 	return NULL;
 }
 
-void pd_set_src_caps(int port, int cnt, uint32_t *src_caps)
+__overridable void pd_set_src_caps(int port, int cnt, uint32_t *src_caps)
 {
 }
 
-uint8_t pd_get_src_cap_cnt(int port)
+__overridable uint8_t pd_get_src_cap_cnt(int port)
 {
 	return 0;
 }
-#endif
 
 #if !defined(CONFIG_USB_DRP_ACC_TRYSRC) && !defined(CONFIG_USB_CTVPD)
 int pd_is_connected(int port)

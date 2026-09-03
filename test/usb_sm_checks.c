@@ -31,13 +31,8 @@ const struct test_sm_data test_prl_sm_data[] = {};
 const int test_prl_sm_data_size;
 #endif
 
-#ifdef CONFIG_USB_PE_SM
 extern const struct test_sm_data test_pe_sm_data[];
 extern const int test_pe_sm_data_size;
-#else
-const struct test_sm_data test_pe_sm_data[] = {};
-const int test_pe_sm_data_size;
-#endif
 
 test_static int test_no_parent_cycles(const struct test_sm_data *const sm_data)
 {
