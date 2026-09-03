@@ -63,6 +63,30 @@
       },
       "revId": "70695087e41a998b1ad2a93bfd3176b60125c9ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f74115e9_02f95700",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/ocelotrvp-ite_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-09-03T18:34:17Z",
+      "side": 1,
+      "message": "PDP values should be in Watts, not milliwatts. This is a known issue in the VIF generation tool (see Ruby VIF for reference)",
+      "parentUuid": "15823ca6_97617b3a",
+      "range": {
+        "startLine": 358,
+        "startChar": 9,
+        "endLine": 358,
+        "endChar": 28
+      },
+      "revId": "70695087e41a998b1ad2a93bfd3176b60125c9ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
