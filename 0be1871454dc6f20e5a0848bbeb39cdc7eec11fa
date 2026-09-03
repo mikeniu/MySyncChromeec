@@ -21,6 +21,42 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "75162a2a_bf5fed58",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T18:20:49Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/a3ec6697-a1b5-4400-a51c-796f47540132)]\n\n### Review Summary\n\n*   **Functionality:** The migration to `DT_INST_FOREACH_STATUS_OKAY` is mostly correct. However, it introduces a dangerous silent failure mode where the `CROS_SYSTEM` device is completely dropped from the build if the devicetree node is missing. This explains the binary size changes for `pujjolo`, `deku`, and others mentioned in the commit message. See inline comment for a `BUILD_ASSERT` suggestion to catch this at compile-time.\n*   **Security:** No security issues identified.\n*   **Style:** The style conforms to Zephyr driver standards.\n*   **Testing:** Native sim and emulator devicetrees were correctly updated to include the new node. \n*   **CL Size \u0026 Scope:** The CL is appropriately sized and scoped to focus solely on the devicetree instantiation migration.\n\n### Action Items\n1. Add `BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) \u003d\u003d 1, ...)` to all updated driver files to prevent silent omission.\n2. Fix the missing `cros-ec,cros-system` nodes in the devicetrees for the boards that showed binary differences (`pujjolo`, `deku`, etc.).",
+      "isAi": true,
+      "revId": "0be1871454dc6f20e5a0848bbeb39cdc7eec11fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8bc2d65_43a6ebfe",
+        "filename": "zephyr/drivers/cros_system/cros_system_npcx.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T18:20:49Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `cros_system` is an essential driver for the EC, silently skipping its instantiation if the devicetree node is missing will lead to runtime crashes when `device_get_binding(\"CROS_SYSTEM\")` returns `NULL`. \n\nThe build differences mentioned in the commit message (`pujjolo`, `deku`, etc.) are almost certainly because these boards are missing the `cros-ec,cros-system` node in their devicetree (e.g., they might be using an `intel_ish` build which didn\u0027t get the node, or they don\u0027t include `npcx_cros.dtsi`). When the node is missing, `DT_INST_FOREACH_STATUS_OKAY` evaluates to nothing, and the device is silently dropped from the binary.\n\nI highly recommend adding a `BUILD_ASSERT` here and in all other SoC drivers to ensure the node is always present and only defined once. This will cause a compile-time failure for any board missing the node, rather than a silent runtime failure:\n\n```c\nBUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) \u003d\u003d 1,\n\t     \"Exactly one cros-ec,cros-system node is required\");\n```",
+      "isAi": true,
+      "revId": "0be1871454dc6f20e5a0848bbeb39cdc7eec11fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "de261edd_d90a6dd0",
         "filename": "zephyr/dts/board-overlays/native_sim.dts",
         "patchSetId": 12
