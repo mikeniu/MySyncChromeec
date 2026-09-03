@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53311081_d1aaf037",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T17:04:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/0fb31ccf-6d31-4585-a5be-0428409d70b6)]\n\n**Review Summary:**\n*   **Functionality:** The change correctly splits the image size configuration for specific ELAN sensors (`ELAN80SG` and `ELANI80SA`) instead of relying on the broader `ELAN80SERIES`. This accurately prepares for the upcoming `ELANHV515RC` sensor integration without breaking existing setups.\n*   **Style:** Clean and follows Kconfig conventions.\n*   **Security:** No security impact.\n*   **Testing:** Testing was appropriately performed by building `niedzica`. As a declarative Kconfig change, no additional unit tests are required.\n*   **CL Size \u0026 Scope:** Appropriately sized. The CL correctly focuses purely on the single logical step of separating the configuration.\n*   **Overall Quality:** Excellent. The change is straightforward and achieves its goal clearly.\n\nTAG\u003dagy\nCONV\u003d6c772991-b8b6-4982-92c2-d10fb36956d4",
+      "isAi": true,
+      "revId": "e1881fd5664beeba82774b743d32b2e4e8fc8398",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
