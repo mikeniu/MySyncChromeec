@@ -7,7 +7,28 @@
 #include "../../../../program/ec-aic/npcx-aic/project.overlay"
 
 &i2c0_0 {
-	dagwood_eeprom: dagwood-eeprom@50 {
+	dagwood_eeprom_0: dagwood-eeprom@50 {
+		compatible = "vnd.i2c-device";
+		reg = <0x50>;
+	};
+};
+
+&i2c7_0 {
+	dagwood_eeprom_1: dagwood-eeprom@50 {
+		compatible = "vnd.i2c-device";
+		reg = <0x50>;
+	};
+};
+
+&i2c1_0 {
+	dagwood_eeprom_2: dagwood-eeprom@50 {
+		compatible = "vnd.i2c-device";
+		reg = <0x50>;
+	};
+};
+
+&i2c2_0 {
+	dagwood_eeprom_3: dagwood-eeprom@50 {
 		compatible = "vnd.i2c-device";
 		reg = <0x50>;
 	};

@@ -7,7 +7,12 @@ common:
   - it8xxx2/it82002aw
   - npcx9/npcx9m7f
   - realtek/rts5912
+  # Ideally this would use pytest_dut_scope: session but that cause problems on
+  # realtek/rts5912, letting this reflesh for every case until that's solved
+  # somehow
+  timeout: 120
 tests:
   aic.i2c:
+    harness: pytest
     depends_on:
       - i2c

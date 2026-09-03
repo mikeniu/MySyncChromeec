@@ -6,7 +6,36 @@
 #include "../../../../program/ec-aic/ite-aic/project.overlay"
 
 &i2c1 {
-	dagwood_eeprom: dagwood-eeprom@50 {
+	scl-sda-low-timeout = <0>;
+	zephyr,transfer-timeout-ms = <400>;
+	dagwood_eeprom_0: dagwood-eeprom@50 {
+		compatible = "vnd.i2c-device";
+		reg = <0x50>;
+	};
+};
+
+&i2c2 {
+	scl-sda-low-timeout = <0>;
+	zephyr,transfer-timeout-ms = <400>;
+	dagwood_eeprom_1: dagwood-eeprom@50 {
+		compatible = "vnd.i2c-device";
+		reg = <0x50>;
+	};
+};
+
+&i2c3 {
+	scl-sda-low-timeout = <0>;
+	zephyr,transfer-timeout-ms = <400>;
+	dagwood_eeprom_2: dagwood-eeprom@50 {
+		compatible = "vnd.i2c-device";
+		reg = <0x50>;
+	};
+};
+
+&i2c4 {
+	scl-sda-low-timeout = <0>;
+	zephyr,transfer-timeout-ms = <400>;
+	dagwood_eeprom_3: dagwood-eeprom@50 {
 		compatible = "vnd.i2c-device";
 		reg = <0x50>;
 	};

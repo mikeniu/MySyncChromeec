@@ -9,8 +9,38 @@
 	scl-timeout-value = <400>;
 	sda-timeout-value = <400>;
 
-	dagwood_eeprom: dagwood-eeprom@50 {
+	dagwood_eeprom_0: dagwood-eeprom@50 {
 		compatible = "vnd.i2c-device";
-                reg = <0x50>;
+		reg = <0x50>;
+	};
+};
+
+&i2c_2 {
+	scl-timeout-value = <400>;
+	sda-timeout-value = <400>;
+
+	dagwood_eeprom_1: dagwood-eeprom@50 {
+		compatible = "vnd.i2c-device";
+		reg = <0x50>;
+	};
+};
+
+&i2c_5 {
+	scl-timeout-value = <400>;
+	sda-timeout-value = <400>;
+
+	dagwood_eeprom_2: dagwood-eeprom@50 {
+		compatible = "vnd.i2c-device";
+		reg = <0x50>;
+	};
+};
+
+&i2c_0 {
+	scl-timeout-value = <400>;
+	sda-timeout-value = <400>;
+
+	dagwood_eeprom_3: dagwood-eeprom@50 {
+		compatible = "vnd.i2c-device";
+		reg = <0x50>;
 	};
 };

@@ -14,16 +14,42 @@
 
 LOG_MODULE_REGISTER(aic_i2c);
 
-DEVICE_DT_DEFINE(DAGWOOD_I2C_DEV, NULL, NULL, NULL, NULL, POST_KERNEL, 90, 0);
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_0))
+DEVICE_DT_DEFINE(DT_NODELABEL(dagwood_eeprom_0), NULL, NULL, NULL, NULL,
+		 POST_KERNEL, 90, 0);
+#endif
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_1))
+DEVICE_DT_DEFINE(DT_NODELABEL(dagwood_eeprom_1), NULL, NULL, NULL, NULL,
+		 POST_KERNEL, 90, 0);
+#endif
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_2))
+DEVICE_DT_DEFINE(DT_NODELABEL(dagwood_eeprom_2), NULL, NULL, NULL, NULL,
+		 POST_KERNEL, 90, 0);
+#endif
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_3))
+DEVICE_DT_DEFINE(DT_NODELABEL(dagwood_eeprom_3), NULL, NULL, NULL, NULL,
+		 POST_KERNEL, 90, 0);
+#endif
 
 struct aic_i2c_fixture {
-	struct i2c_dt_spec dagwood_eeprom;
+	struct i2c_dt_spec eeprom[4];
 };
 
 static void *aic_i2c_setup(void)
 {
 	static struct aic_i2c_fixture fixture = {
-		.dagwood_eeprom = I2C_DT_SPEC_GET(DAGWOOD_I2C_DEV),
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_0))
+		.eeprom[0] = I2C_DT_SPEC_GET(DT_NODELABEL(dagwood_eeprom_0)),
+#endif
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_1))
+		.eeprom[1] = I2C_DT_SPEC_GET(DT_NODELABEL(dagwood_eeprom_1)),
+#endif
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_2))
+		.eeprom[2] = I2C_DT_SPEC_GET(DT_NODELABEL(dagwood_eeprom_2)),
+#endif
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_3))
+		.eeprom[3] = I2C_DT_SPEC_GET(DT_NODELABEL(dagwood_eeprom_3)),
+#endif
 	};
 
 	return &fixture;
@@ -37,16 +63,15 @@ ZTEST_SUITE(aic_i2c, NULL, aic_i2c_setup, NULL, NULL, NULL);
 #define I2C_STRETCH_100MS_OFFSET 0x40
 #define I2C_STRETCH_500MS_OFFSET 0x50
 
-ZTEST_F(aic_i2c, test_i2c_read_write)
+static void test_i2c_read_write(const struct i2c_dt_spec *i2c_spec)
 {
 	uint8_t read_byte;
 	uint8_t write_byte;
-	const struct i2c_dt_spec *i2c_spec = &fixture->dagwood_eeprom;
 	uint32_t start_time;
 	uint32_t elapsed_ms;
 
-	LOG_INF("Dagwood eeprom %s:0x%02x", fixture->dagwood_eeprom.bus->name,
-		fixture->dagwood_eeprom.addr);
+	LOG_INF("Dagwood eeprom %s:0x%02x", i2c_spec->bus->name,
+		i2c_spec->addr);
 
 	start_time = k_uptime_get_32();
 	zassert_ok(i2c_reg_read_byte_dt(i2c_spec, I2C_GOOD_OFFSET, &read_byte));
@@ -70,11 +95,10 @@ ZTEST_F(aic_i2c, test_i2c_read_write)
 	LOG_INF("I2C Read modify write successful");
 }
 
-ZTEST_F(aic_i2c, test_i2c_clock_stretch_50ms)
+static void test_i2c_clock_stretch_50ms(const struct i2c_dt_spec *i2c_spec)
 {
 	uint8_t read_byte;
 	uint8_t write_byte = 0x5a;
-	const struct i2c_dt_spec *i2c_spec = &fixture->dagwood_eeprom;
 	uint32_t start_time;
 	uint32_t elapsed_ms;
 
@@ -107,11 +131,10 @@ ZTEST_F(aic_i2c, test_i2c_clock_stretch_50ms)
 		      "Mismatch reading 50ms stretch offset");
 }
 
-ZTEST_F(aic_i2c, test_i2c_clock_stretch_100ms)
+static void test_i2c_clock_stretch_100ms(const struct i2c_dt_spec *i2c_spec)
 {
 	uint8_t read_byte;
 	uint8_t write_byte = 0xa5;
-	const struct i2c_dt_spec *i2c_spec = &fixture->dagwood_eeprom;
 	uint32_t start_time;
 	uint32_t elapsed_ms;
 
@@ -144,11 +167,11 @@ ZTEST_F(aic_i2c, test_i2c_clock_stretch_100ms)
 		      "Mismatch reading 100ms stretch offset");
 }
 
-ZTEST_F(aic_i2c, test_i2c_clock_stretch_500ms_timeout)
+static void
+test_i2c_clock_stretch_500ms_timeout(const struct i2c_dt_spec *i2c_spec)
 {
 	uint8_t read_byte;
 	uint8_t write_byte = 0x3c;
-	const struct i2c_dt_spec *i2c_spec = &fixture->dagwood_eeprom;
 	uint32_t start_time;
 	uint32_t elapsed_ms;
 	int ret;
@@ -195,4 +218,52 @@ ZTEST_F(aic_i2c, test_i2c_clock_stretch_500ms_timeout)
 		   "Controller failed to recover after clock stretch timeout");
 	elapsed_ms = k_uptime_get_32() - start_time;
 	LOG_INF("Recovery read took %u ms", elapsed_ms);
+}
+
+static void test_i2c_port(const struct i2c_dt_spec *i2c_spec)
+{
+	zassert_not_null(i2c_spec->bus, "I2C bus device is NULL");
+	zassert_true(device_is_ready(i2c_spec->bus),
+		     "I2C bus device %s is not ready", i2c_spec->bus->name);
+
+	test_i2c_read_write(i2c_spec);
+	test_i2c_clock_stretch_50ms(i2c_spec);
+	test_i2c_clock_stretch_100ms(i2c_spec);
+	test_i2c_clock_stretch_500ms_timeout(i2c_spec);
+}
+
+ZTEST_F(aic_i2c, test_i2c_port0)
+{
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_0))
+	test_i2c_port(&fixture->eeprom[0]);
+#else
+	ztest_test_skip();
+#endif
+}
+
+ZTEST_F(aic_i2c, test_i2c_port1)
+{
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_1))
+	test_i2c_port(&fixture->eeprom[1]);
+#else
+	ztest_test_skip();
+#endif
+}
+
+ZTEST_F(aic_i2c, test_i2c_port2)
+{
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_2))
+	test_i2c_port(&fixture->eeprom[2]);
+#else
+	ztest_test_skip();
+#endif
+}
+
+ZTEST_F(aic_i2c, test_i2c_port3)
+{
+#if DT_NODE_EXISTS(DT_NODELABEL(dagwood_eeprom_3))
+	test_i2c_port(&fixture->eeprom[3]);
+#else
+	ztest_test_skip();
+#endif
 }
