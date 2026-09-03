@@ -1194,7 +1194,8 @@ static const uint32_t pd_get_fixed_pdo(int port)
 
 bool pe_snk_in_epr_mode(int port)
 {
-	return PE_CHK_FLAG(port, PE_FLAGS_IN_EPR);
+	return IS_ENABLED(CONFIG_USB_PD_EPR) &&
+	       PE_CHK_FLAG(port, PE_FLAGS_IN_EPR);
 }
 
 void pe_snk_epr_explicit_exit(int port)

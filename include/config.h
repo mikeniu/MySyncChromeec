@@ -4703,7 +4703,6 @@
  */
 #define CONFIG_USB_TYPEC_SM
 #define CONFIG_USB_PRL_SM
-#define CONFIG_USB_PE_SM
 #define CONFIG_USB_DPM_SM
 
 /* Enables PD Console commands */
@@ -6016,9 +6015,6 @@
  *
  * Used to include files for unit and other builds tests.
  */
-
-/* Define to enable Policy Engine State Machine. */
-#undef CONFIG_TEST_USB_PE_SM
 
 /* Define to enable USB State Machine framework. */
 #undef CONFIG_TEST_SM
