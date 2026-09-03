@@ -16,6 +16,8 @@ tests:
       - CONFIG_PLATFORM_EC_HOSTCMD=n
       - CONFIG_EC_HOST_CMD=n
   tasks.extra_tasks.hostcmd_main:
+    tags:
+      - host_cmd
     timeout: 360
     extra_configs:
       - CONFIG_SHIMMED_TASKS=y
@@ -24,6 +26,8 @@ tests:
       - CONFIG_TASK_HOSTCMD_THREAD_MAIN=y
       - CONFIG_EC_HOST_CMD=n
   tasks.extra_tasks.hostcmd_dedicated:
+    tags:
+      - host_cmd
     extra_configs:
       - CONFIG_SHIMMED_TASKS=y
       - CONFIG_ASSERT_TEST=y
