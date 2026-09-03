@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39cd6996_6d6f4688",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T00:22:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/9ea4f01e-c1dc-444c-aad2-451d829e8d55)]\n\n**Review Summary**\n* **Functionality:** The cryptographic domain separation is implemented accurately by prefixing the HKDF info parameter when `fingerprint_auth_enabled()` is true.\n* **Security:** The isolation between the classic template flow and the fingerprint auth flow guarantees that templates enrolled under one mode cannot be incorrectly loaded by the other mode, providing solid defense against cross-protocol issues. Stack variables are managed securely using `CleanseWrapper` and `std::array`.\n* **Style:** Code aligns well with modern C++ standards, utilizing `std::string_view`, `std::array`, and `std::span` appropriately for memory safety.\n* **Testing \u0026 Test Coverage:** Test cases are thorough and explicit, verifying the different derivations and that the keys generated with identical seeds across different modes fail to cross-decrypt successfully. The test code correctly relies on the `fpsensor_auth_crypto_stateful_after` teardown fixture for state reset.\n* **CL Size \u0026 Scope:** The CL is appropriately sized and well-scoped to address the security domain separation.\n\nTAG\u003dagy\nCONV\u003d9ea4f01e-c1dc-444c-aad2-451d829e8d55",
+      "isAi": true,
+      "revId": "dd88e25f41b939d930d1d666d74a7d661cb0292f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
