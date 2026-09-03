@@ -63,34 +63,76 @@ static void work_queue_error(const void *data, int rv)
 }
 /* LCOV_EXCL_STOP */
 
-#ifdef CONFIG_PLATFORM_EC_HOOK_SECOND
-static void hook_second_work(struct k_work *work)
+#if defined(CONFIG_PLATFORM_EC_HOOK_SECOND) || \
+	defined(CONFIG_PLATFORM_EC_HOOK_TICK)
+/*
+ * Reschedule a periodic work item to hit the next absolute deadline,
+ * compensating for callback execution time and scheduling latency.
+ */
+static void reschedule_periodic_hook(struct k_work_delayable *dwork,
+				     uint32_t *next_target, uint32_t interval)
+{
+	int rv;
+	const uint32_t now = sys_clock_tick_get_32();
+
+	/*
+	 * Compute remaining delay until target deadline using 32-bit signed
+	 * modular distance. Valid delay must be strictly positive and cannot
+	 * exceed the nominal interval. If delay is negative (deadline missed)
+	 * or exceeds interval (clock jump / prolonged stall), reset target
+	 * to current uptime and schedule immediately without bursting.
+	 */
+	int32_t delay_ticks = (int32_t)(*next_target + interval - now);
+
+	if (delay_ticks > 0 && delay_ticks <= (int32_t)interval) {
+		*next_target += interval;
+	} else {
+		delay_ticks = 0;
+		*next_target = now;
+	}
+
+	rv = k_work_reschedule(dwork, delay_ticks > 0 ? K_TICKS(delay_ticks) :
+							K_NO_WAIT);
+	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
+	if (rv < 0)
+		work_queue_error(dwork, rv);
+	/* LCOV_EXCL_STOP */
+}
+
+static void start_periodic_hook(struct k_work_delayable *dwork,
+				uint32_t *next_target, uint32_t interval)
 {
 	int rv;
 
-	hook_notify(HOOK_SECOND);
-
-	rv = k_work_reschedule(&hook_seconds_work_data, K_SECONDS(1));
+	*next_target = sys_clock_tick_get_32() + interval;
+	rv = k_work_reschedule(dwork, K_TICKS(interval));
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
-		work_queue_error(&hook_seconds_work_data, rv);
+		work_queue_error(dwork, rv);
 	/* LCOV_EXCL_STOP */
+}
+#endif /* CONFIG_PLATFORM_EC_HOOK_SECOND || CONFIG_PLATFORM_EC_HOOK_TICK */
+
+#ifdef CONFIG_PLATFORM_EC_HOOK_SECOND
+static uint32_t next_hook_second_target;
+
+static void hook_second_work(struct k_work *work)
+{
+	hook_notify(HOOK_SECOND);
+	reschedule_periodic_hook(&hook_seconds_work_data,
+				 &next_hook_second_target,
+				 k_sec_to_ticks_ceil32(1));
 }
 #endif /* CONFIG_PLATFORM_EC_HOOK_SECOND */
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_TICK
+static uint32_t next_hook_tick_target;
+
 static void hook_tick_work(struct k_work *work)
 {
-	int rv;
-
 	hook_notify(HOOK_TICK);
-
-	rv = k_work_reschedule(&hook_ticks_work_data,
-			       K_USEC(HOOK_TICK_INTERVAL));
-	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
-	if (rv < 0)
-		work_queue_error(&hook_ticks_work_data, rv);
-	/* LCOV_EXCL_STOP */
+	reschedule_periodic_hook(&hook_ticks_work_data, &next_hook_tick_target,
+				 k_us_to_ticks_ceil32(HOOK_TICK_INTERVAL));
 }
 #endif /* CONFIG_PLATFORM_EC_HOOK_TICK */
 
@@ -106,27 +148,18 @@ BUILD_ASSERT(
 
 static int zephyr_shim_setup_hooks(void)
 {
-	int rv = 0;
-
 #ifdef CONFIG_PLATFORM_EC_HOOK_SECOND
 	/* Startup the HOOK_SECOND recurring work */
-	rv = k_work_reschedule(&hook_seconds_work_data, K_SECONDS(1));
-	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
-	if (rv < 0)
-		work_queue_error(&hook_seconds_work_data, rv);
-	/* LCOV_EXCL_STOP */
+	start_periodic_hook(&hook_seconds_work_data, &next_hook_second_target,
+			    k_sec_to_ticks_ceil32(1));
 #endif /* CONFIG_PLATFORM_EC_HOOK_SECOND */
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_TICK
 	/* Startup the HOOK_TICK recurring work */
-	rv = k_work_reschedule(&hook_ticks_work_data,
-			       K_USEC(HOOK_TICK_INTERVAL));
-	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
-	if (rv < 0)
-		work_queue_error(&hook_ticks_work_data, rv);
-	/* LCOV_EXCL_STOP */
+	start_periodic_hook(&hook_ticks_work_data, &next_hook_tick_target,
+			    k_us_to_ticks_ceil32(HOOK_TICK_INTERVAL));
 #endif /* CONFIG_PLATFORM_EC_HOOK_TICK */
-	return rv;
+	return 0;
 }
 
 SYS_INIT(zephyr_shim_setup_hooks, APPLICATION, 1);
