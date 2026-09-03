@@ -440,6 +440,62 @@ ZTEST_F(console_output, test_isr_output)
 	}
 }
 
+static struct k_work sysworkq_test_work;
+static bool sysworkq_work_completed;
+static const char *sysworkq_message = "sysworkq cprints test";
+
+static void sysworkq_test_handler(struct k_work *work)
+{
+	cprints(CC_SYSTEM, "%s", sysworkq_message);
+	sysworkq_work_completed = true;
+}
+
+ZTEST_F(console_output, test_sysworkq_console_output)
+{
+	uint8_t tx_content[SAMPLE_DATA_SIZE];
+	uint32_t tx_bytes;
+	const struct shell *ec_sh = get_ec_shell();
+
+	/* 1. Verify normal console output from sysworkq */
+	uart_emul_flush_tx_data(fixture->dev);
+	memset(tx_content, 0, sizeof(tx_content));
+	sysworkq_work_completed = false;
+	k_work_init(&sysworkq_test_work, sysworkq_test_handler);
+	k_work_submit(&sysworkq_test_work);
+
+	while (!sysworkq_work_completed) {
+		k_sleep(K_MSEC(1));
+	}
+	SHELL_SLEEP();
+
+	tx_bytes = uart_emul_get_tx_data(fixture->dev, tx_content,
+					 sizeof(tx_content));
+	zassert_true(tx_bytes >= strlen(sysworkq_message));
+	zassert_not_null(strstr((char *)tx_content, sysworkq_message));
+
+	/* 2. Verify non-blocking behavior under lock contention */
+	/* Acquire shell lock to simulate active print from another thread */
+	zassert_equal(k_sem_take(&ec_sh->ctx->lock_sem, K_NO_WAIT), 0);
+
+	uart_emul_flush_tx_data(fixture->dev);
+	memset(tx_content, 0, sizeof(tx_content));
+	sysworkq_work_completed = false;
+	k_work_init(&sysworkq_test_work, sysworkq_test_handler);
+	k_work_submit(&sysworkq_test_work);
+
+	/* Sysworkq should complete immediately without blocking on the lock */
+	while (!sysworkq_work_completed) {
+		k_sleep(K_MSEC(1));
+	}
+	k_sem_give(&ec_sh->ctx->lock_sem);
+
+	/* Under contention, UART output was dropped to avoid blocking sysworkq
+	 */
+	tx_bytes = uart_emul_get_tx_data(fixture->dev, tx_content,
+					 sizeof(tx_content));
+	zassert_equal(tx_bytes, 0);
+}
+
 void test_main(void)
 {
 	ec_app_main();
