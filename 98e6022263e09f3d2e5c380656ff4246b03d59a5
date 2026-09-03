@@ -22,6 +22,30 @@
       },
       "revId": "98e6022263e09f3d2e5c380656ff4246b03d59a5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73579e0f_7496024f",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T22:41:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff0d5512_f86145c2",
+      "range": {
+        "startLine": 400,
+        "startChar": 0,
+        "endLine": 400,
+        "endChar": 0
+      },
+      "revId": "98e6022263e09f3d2e5c380656ff4246b03d59a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
