@@ -35,6 +35,24 @@
       "isAi": true,
       "revId": "3afc0675c843c29fc8721788a5db9f4da261aa77",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38b3917a_f5f6af4e",
+        "filename": "chip/host/otp_key.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-03T20:14:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "61772482_45827651",
+      "revId": "3afc0675c843c29fc8721788a5db9f4da261aa77",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

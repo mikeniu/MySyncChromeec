@@ -108,6 +108,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cf8f1bd_d65cd264",
+        "filename": "chip/host/otp_key.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-03T20:14:13Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9e479640_19d2ce6c",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43774824_c7e5bc72",
