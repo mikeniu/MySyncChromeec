@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "003252c0_c16a2d01",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T20:17:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/5cb1a364-2a2a-483e-a772-992667f8beee)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly addresses the bug by wrapping the byte-by-byte OTP key programming sequence with `irq_lock()` and `irq_unlock()`. This ensures the programming loop won\u0027t be interrupted, resolving the likely cause of flakiness. The error handling paths are now correctly releasing the lock.\n*   **Security:** No security vulnerabilities are introduced. The use of interrupt locking during sensitive timing-critical cryptographic operations is a standard and secure practice.\n*   **Style:** The code conforms nicely to standard EC/Zephyr coding conventions. The previous syntax issues and missing braces have been fixed.\n*   **Consistency:** The addition of `#if defined(CONFIG_ZEPHYR)` guards around Zephyr-specific headers and assertions in the shared `test/mock/otpi_mock.c` mock fully addresses previous feedback, maintaining compatibility with legacy EC builds. Both `chip/host/otp_key.c` and `zephyr/shim/chip/npcx/otp_key.c` are updated consistently.\n*   **Testing \u0026 Test Coverage:** Excellent. The mock `otpi_write` asserts that interrupts are locked (when compiling under Zephyr), validating the fix directly. Furthermore, the hardware test validates that the interrupt state is properly restored after `otp_key_provision()` completes.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped, addressing a single specific issue with appropriate test modifications.\n\nTAG\u003dagy\nCONV\u003dd5d0010d-d7f8-47e7-807e-bac16be25182",
+      "isAi": true,
+      "revId": "1a01965e48e57eb26fbf7aea4caf9001b7cce627",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
