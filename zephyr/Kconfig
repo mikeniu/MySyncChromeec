@@ -472,6 +472,24 @@ config PLATFORM_EC_HOOK_TICK
 	  Enable support for the one tick hook. Disabling the hook save
 	  some memory and CPU time.
 
+config PLATFORM_EC_SYSWORKQ_RUNTIME_CHECK
+	bool "Enforce non-blocking runtime checks on sysworkq"
+	depends on PLATFORM_EC_HOOKS
+	default n
+	help
+	  Asserts that tasks running on the sysworkq thread do not call sleep
+	  or blocking wait functions.
+
+config PLATFORM_EC_SYSWORKQ_PANIC_ON_VIOLATION
+	bool "Panic/assert immediately on sysworkq blocking violation"
+	depends on PLATFORM_EC_SYSWORKQ_RUNTIME_CHECK
+	default n
+	help
+	  When enabled, any blocking violation (sleep, blocking mutex/sem take)
+	  on sysworkq triggers an immediate kernel panic/assertion. If disabled,
+	  violations are logged as FATAL warnings with caller PC without aborting
+	  execution.
+
 menuconfig PLATFORM_EC_HOSTCMD
 	bool "Host commands"
 	default n if ARCH_POSIX
