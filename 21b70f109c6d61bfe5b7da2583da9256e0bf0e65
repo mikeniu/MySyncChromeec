@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c6a22e7d_2471d00f",
+        "filename": "chip/host/otp_key.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-03T05:49:09Z",
+      "side": 1,
+      "message": "That\u0027s not I\u0027m concerned about. I\u0027m concerned about the fact that this can be automatically fetched to the ec-legacy branch and it won\u0027t work.",
+      "parentUuid": "a733e318_b15c1aa7",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "43774824_c7e5bc72",
         "filename": "test/mock/otpi_mock.c",
         "patchSetId": 14
@@ -157,6 +175,24 @@
       "side": 1,
       "message": "so the final verdict is to remove them?",
       "parentUuid": "1ff15bc9_7972c9f9",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8b867d7_30d14233",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-03T05:49:09Z",
+      "side": 1,
+      "message": "I can see this mock is used only for the key operations so I think it can stay. Just please add a comment explaining why it\u0027s here.",
+      "parentUuid": "119f66e4_6659278e",
       "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
