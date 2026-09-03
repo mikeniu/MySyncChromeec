@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "601e0609_54bc7358",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-03T20:07:29Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2bb8b109_b3e9018b",
+      "revId": "b41d4d6806c21b77f9a40794070c04e94775fccf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32cf9f91_5095c5e8",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Bug**: If `otpi_write` fails, the function returns without unlocking interrupts. This will leave the system with interrupts locked, likely causing a system freeze.\n\nPlease add `irq_unlock(key);` before the return, similar to how it was handled in `zephyr/shim/chip/npcx/otp_key.c`.",
       "isAi": true,
+      "revId": "b41d4d6806c21b77f9a40794070c04e94775fccf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ee1e39a_d8d0875e",
+        "filename": "chip/host/otp_key.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-03T20:07:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32cf9f91_5095c5e8",
       "revId": "b41d4d6806c21b77f9a40794070c04e94775fccf",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
