@@ -153,6 +153,12 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 #define AP_RST_TRANSITION_TIMEOUT (450 * MSEC)
 
 /*
+ * The timeout of waiting for PMIC to assert AP_RST_L during warm reset.
+ * Observed that the worst case is ~1.1s. Pick a safe value.
+ */
+#define PMIC_WARM_RESET_AP_RST_TIMEOUT (1500 * MSEC)
+
+/*
  * Duration to disable the AC_PRESENT interrupt to ignore the
  * spurious toggle from the switchcap turning on/off.
  * Based on o-scope measurements showing a ~500ms event.
@@ -1117,7 +1123,7 @@ static int warm_reset_seq(void)
 
 	/* Check that the PMIC asserts PON_RESET_N*/
 	rv = power_wait_signals_timeout(IN_AP_RST_ASSERTED,
-					PMIC_POWER_AP_RESPONSE_TIMEOUT);
+					PMIC_WARM_RESET_AP_RST_TIMEOUT);
 
 	/* Exception case: PMIC not work as expected, request a cold reset */
 	if (rv != EC_SUCCESS)
