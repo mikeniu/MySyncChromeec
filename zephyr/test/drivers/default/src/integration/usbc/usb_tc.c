@@ -195,6 +195,7 @@ ZTEST(usb_tc, test_tc_state_queries)
 	zassert_equal(PD_PLUG_FROM_DFP_UFP, tc_get_cable_plug(TEST_PORT));
 	zassert_false(tc_get_pd_enabled(TEST_PORT));
 	zassert_false(pd_alt_mode_capable(TEST_PORT));
+	zassert_equal(EC_RES_SUCCESS, pd_fetch_acc_log_entry(TEST_PORT));
 }
 
 /* =========================================================================
@@ -249,6 +250,7 @@ ZTEST_F(usb_tc, test_tc_dts_debug_accessory_cc1)
 
 	zassert_true(tc_is_attached_snk(TEST_PORT));
 	zassert_equal(POLARITY_CC1_DTS, tc_get_polarity(TEST_PORT));
+	pd_set_external_voltage_limit(TEST_PORT, CONFIG_USB_PD_MAX_VOLTAGE_MV);
 
 	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
 	isl923x_emul_set_adc_vbus(fixture->charger_emul, 0);
@@ -517,8 +519,24 @@ ZTEST(usb_tc, test_tc_error_recovery_and_suspend)
 	pd_set_suspend(TEST_PORT, true);
 	k_sleep(K_MSEC(100));
 
-	/* Resume port */
+	/* Resume port into Unattached.SRC and exercise hard reset request */
+	pd_set_dual_role(TEST_PORT, PD_DRP_FORCE_SOURCE);
 	pd_set_suspend(TEST_PORT, false);
+	k_sleep(K_MSEC(20));
+	tc_hard_reset_request(TEST_PORT);
+	k_sleep(K_MSEC(20));
+	zassert_equal(PD_ROLE_DFP, pd_get_data_role(TEST_PORT));
+
+	/* Suspend and resume port into Unattached.SNK and exercise hard reset
+	 */
+	pd_set_suspend(TEST_PORT, true);
+	k_sleep(K_MSEC(100));
+	pd_set_dual_role(TEST_PORT, PD_DRP_TOGGLE_ON);
+	pd_set_suspend(TEST_PORT, false);
+	k_sleep(K_MSEC(10));
+	tc_hard_reset_request(TEST_PORT);
+	k_sleep(K_MSEC(20));
+	zassert_equal(PD_ROLE_UFP, pd_get_data_role(TEST_PORT));
 	k_sleep(K_MSEC(100));
 }
 
