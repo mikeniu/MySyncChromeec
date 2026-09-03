@@ -211,6 +211,20 @@ test_mockable_static_inline enum battery_present battery_is_present(void)
 enum battery_present battery_hw_present(void);
 
 /**
+ * Get cached battery presence state.
+ *
+ * @return Current cached battery presence (BP_YES, BP_NO, or BP_NOT_SURE).
+ */
+enum battery_present battery_get_cached_presence(void);
+
+/**
+ * Set cached battery presence state.
+ *
+ * @param state  New battery presence state.
+ */
+void battery_set_cached_presence(enum battery_present state);
+
+/**
  * Check for battery initialization status.
  *
  * @return zero if not initialized.

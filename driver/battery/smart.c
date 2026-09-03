@@ -223,9 +223,7 @@ int battery_get_mode(int *mode)
 	return sb_read(SB_BATTERY_MODE, mode);
 }
 
-#if !defined(CONFIG_BATTERY_PRESENT_GPIO) && \
-	!defined(CONFIG_BATTERY_PRESENT_CUSTOM)
-__overridable enum battery_present battery_is_present(void)
+enum battery_present smart_battery_check_presence(void)
 {
 	int manufacture_date;
 
@@ -241,7 +239,6 @@ __overridable enum battery_present battery_is_present(void)
 
 	return BP_YES;
 }
-#endif
 
 /**
  * Force battery to mAh mode (instead of 10mW mode) for reporting capacity.
@@ -552,11 +549,14 @@ void battery_get_params(struct batt_params *batt)
 
 #if !defined(CONFIG_BATTERY_PRESENT_CUSTOM) && \
 	!defined(CONFIG_BATTERY_PRESENT_GPIO)
-	/* No hardware test, so we only know it's there if it responds */
-	if (batt_new.flags & BATT_FLAG_RESPONSIVE)
+	if (battery_get_cached_presence() == BP_NO)
+		batt_new.is_present = BP_NO;
+	else if (batt_new.flags & BATT_FLAG_RESPONSIVE)
 		batt_new.is_present = BP_YES;
 	else
 		batt_new.is_present = BP_NOT_SURE;
+
+	battery_set_cached_presence(batt_new.is_present);
 #endif
 
 	if (battery_want_charge(&batt_new))

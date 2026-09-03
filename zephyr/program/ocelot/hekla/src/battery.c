@@ -10,12 +10,17 @@ enum battery_present battery_is_present(void)
 {
 	static int retry_cnt;
 	int state;
+	enum battery_present cached = battery_get_cached_presence();
+
+	if (cached != BP_NOT_SURE) {
+		return cached;
+	}
 
 	if (sb_read(SB_MANUFACTURER_ACCESS, &state)) {
 		/* Require 2 consecutive failures before declaring the
 		 * battery missing.
 		 */
-		k_msleep(25);
+		k_busy_wait(100);
 		if (sb_read(SB_MANUFACTURER_ACCESS, &state)) {
 			if (retry_cnt > 100) {
 				return BP_NO;

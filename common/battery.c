@@ -7,6 +7,7 @@
 
 #include "battery.h"
 #include "battery_fuel_gauge.h"
+#include "battery_smart.h"
 #include "button.h"
 #include "charge_manager.h"
 #include "charge_state.h"
@@ -47,18 +48,46 @@ static enum battery_cutoff_states battery_cutoff_state =
 
 #endif
 
-#ifdef CONFIG_BATTERY_PRESENT_GPIO
-#ifdef CONFIG_BATTERY_PRESENT_CUSTOM
-#error "Don't define both CONFIG_BATTERY_PRESENT_CUSTOM and" \
-	"CONFIG_BATTERY_PRESENT_GPIO"
-#endif
-/**
- * Physical detection of battery.
- */
-enum battery_present battery_is_present(void)
+static enum battery_present cached_battery_presence = BP_NOT_SURE;
+
+enum battery_present battery_get_cached_presence(void)
 {
-	/* The GPIO is low when the battery is present */
+	return cached_battery_presence;
+}
+
+void battery_set_cached_presence(enum battery_present state)
+{
+	cached_battery_presence = state;
+}
+
+__overridable enum battery_present battery_hw_present(void)
+{
+#ifdef CONFIG_BATTERY_PRESENT_GPIO
 	return gpio_get_level(CONFIG_BATTERY_PRESENT_GPIO) ? BP_NO : BP_YES;
+#else
+	return BP_NOT_SURE;
+#endif
+}
+
+#ifndef CONFIG_BATTERY_PRESENT_CUSTOM
+/**
+ * Check for presence of battery.
+ */
+__overridable enum battery_present battery_is_present(void)
+{
+	if (battery_is_cut_off() || battery_hw_present() == BP_NO)
+		return BP_NO;
+
+	if (cached_battery_presence != BP_NOT_SURE)
+		return cached_battery_presence;
+
+	if (battery_hw_present() == BP_YES)
+		return BP_YES;
+
+#if defined(CONFIG_BATTERY_SMART)
+	cached_battery_presence = smart_battery_check_presence();
+#endif
+	return cached_battery_presence;
 }
 #endif
 

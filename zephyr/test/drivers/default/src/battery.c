@@ -87,11 +87,32 @@ ZTEST_USER(battery, test_battery_is_present_gpio)
 
 	zassert_not_null(dev, NULL);
 	/* ec_batt_pres_odl = 0 means battery present. */
+	battery_set_cached_presence(BP_NOT_SURE);
 	zassert_ok(gpio_emul_input_set(dev, GPIO_BATT_PRES_ODL_PORT, 0));
 	zassert_equal(BP_YES, battery_is_present());
 	/* ec_batt_pres_odl = 1 means battery missing. */
 	zassert_ok(gpio_emul_input_set(dev, GPIO_BATT_PRES_ODL_PORT, 1));
 	zassert_equal(BP_NO, battery_is_present());
+	init_battery_type();
+	zassert_equal(BP_NO, battery_get_cached_presence());
+	battery_set_cached_presence(BP_YES);
+}
+
+ZTEST_F(battery, test_init_battery_type_permanent_failure)
+{
+	static const struct emul *emul = EMUL_DT_GET(DT_NODELABEL(battery));
+	struct sbat_emul_bat_data *bat = sbat_emul_get_bat_data(emul);
+	uint16_t orig_mf_access = bat->mf_access;
+
+	bat->mf_access = BIT(12);
+	init_battery_type();
+	zassert_equal(BP_NO, battery_get_cached_presence());
+	zassert_equal(BP_NO, battery_is_present());
+
+	bat->mf_access = orig_mf_access;
+	init_battery_type();
+	zassert_equal(BP_YES, battery_get_cached_presence());
+	zassert_equal(BP_YES, battery_is_present());
 }
 
 ZTEST(battery, test_authenticate_battery_type)

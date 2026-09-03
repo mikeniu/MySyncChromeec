@@ -44,6 +44,7 @@ FAKE_VALUE_FUNC(int, mock_bbram_write, const struct device *, size_t, size_t,
 FAKE_VALUE_FUNC(int, power_button_is_pressed);
 FAKE_VALUE_FUNC(int, extpower_is_present);
 FAKE_VOID_FUNC(chipset_power_on);
+FAKE_VALUE_FUNC(enum battery_present, battery_get_cached_presence);
 
 /*
  * Additional chipset symbols pulled in by CONFIG_AP_POWER_CONTROL;
@@ -153,6 +154,8 @@ static void battery_before(void *data)
 	RESET_FAKE(chipset_in_state);
 	RESET_FAKE(chipset_force_shutdown);
 	RESET_FAKE(sb_read);
+	RESET_FAKE(battery_get_cached_presence);
+	battery_get_cached_presence_fake.return_val = BP_NOT_SURE;
 
 	mock_bbram_read_fake.custom_fake = mock_bbram_read_custom;
 	mock_bbram_write_fake.custom_fake = mock_bbram_write_custom;
@@ -338,4 +341,15 @@ ZTEST(fatcat_lapis_battery,
 	/* Now the double-fail sequence starts from a fresh counter. */
 	sb_read_fail_count = 1000;
 	zassert_equal(battery_is_present(), BP_YES);
+}
+
+ZTEST(fatcat_lapis_battery, test_battery_is_present__cached)
+{
+	battery_get_cached_presence_fake.return_val = BP_NO;
+	zassert_equal(battery_is_present(), BP_NO);
+	zassert_equal(sb_read_fake.call_count, 0);
+
+	battery_get_cached_presence_fake.return_val = BP_YES;
+	zassert_equal(battery_is_present(), BP_YES);
+	zassert_equal(sb_read_fake.call_count, 0);
 }
