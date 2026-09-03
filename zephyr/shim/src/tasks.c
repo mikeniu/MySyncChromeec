@@ -117,7 +117,7 @@ test_mockable k_tid_t get_hostcmd_thread(void)
 	return get_main_thread();
 #elif defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)
 	const struct ec_host_cmd *hc = ec_host_cmd_get_hc();
-	return (k_tid_t)&hc->thread;
+	return hc->thread;
 #elif defined(HAS_TASK_HOSTCMD)
 	return task_to_k_tid[TASK_ID_HOSTCMD];
 #else

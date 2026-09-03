@@ -118,7 +118,7 @@ int host_command_upstream_init(void)
 #ifdef CONFIG_EC_HOST_CMD_DEDICATED_THREAD
 	/* Rename upstream host command thread to match legacy */
 	const struct ec_host_cmd *hc = ec_host_cmd_get_hc();
-	k_tid_t hc_thread = (k_tid_t)&hc->thread;
+	k_tid_t hc_thread = hc->thread;
 
 	if (hc_thread) {
 		k_thread_name_set(hc_thread, "HOSTCMD");
