@@ -88,6 +88,7 @@ AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_action_g3_entry,
 
 static int board_ap_power_action_s4_exit(void *data)
 {
+	LOG_INF("===action_s4===: %d", power_signal_get(PWR_SLP_S4));
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_vdd1_en_ec),
 		!power_signal_get(PWR_SLP_S4));
 
@@ -108,6 +109,9 @@ int power_signal_external_init(void)
 int board_power_signal_get(enum power_signal signal)
 {
 	switch (signal) {
+	//case PWR_SLP_S4:
+	//	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_vdd1_en_ec), 1);
+	//	return 0;
 	case PWR_EC_PCH_SYS_PWROK:
 		return power_signal_get(PWR_PCH_PWROK);
 	case PWR_SYS_RST:
