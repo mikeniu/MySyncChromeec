@@ -3,6 +3,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3a100cc8_1eba21fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T18:13:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/ef266c98-db79-43fd-b31c-2c5fd2b33f45)]\n\n### Review Summary\n*   **Functionality:** The patch correctly introduces a `BUILD_ASSERT` to prevent multiple instances of `cros-ec,cros-system` from being defined, guarding against unsupported device tree configurations.\n*   **Style:** The use of `BUILD_ASSERT` matches standard Zephyr practices.\n*   **Security:** No security vulnerabilities introduced.\n*   **Testing:** As a build-time assertion, explicit unit tests are not necessary.\n*   **CL Size:** The CL is appropriately small and well-scoped.\n\nI\u0027ve left one minor suggestion inline to potentially tighten the check to `\u003d\u003d 1` for clearer error reporting in the 0-instance case.",
+      "isAi": true,
+      "revId": "ff0bd68b8e8d5edbbacb52896bff04e9addd12b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7fee6c58_e4fb4f99",
         "filename": "zephyr/shim/src/system.c",
         "patchSetId": 6
@@ -20,6 +38,24 @@
         "endLine": 29,
         "endChar": 63
       },
+      "revId": "ff0bd68b8e8d5edbbacb52896bff04e9addd12b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffef7760_4f564203",
+        "filename": "zephyr/shim/src/system.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T18:13:52Z",
+      "side": 1,
+      "message": "Since `sys_dev` is unconditionally initialized using `DT_CHOSEN(cros_ec_cros_system)` below, the build will already fail if there are 0 instances (albeit with a cryptic macro expansion error from `DT_CHOSEN`).\n\nConsider changing this condition to `\u003d\u003d 1` and updating the error message. This would provide a clearer, more explicit build error if the node is entirely omitted, in addition to catching the multiple-instance case:\n\n```c\nBUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(cros_ec_cros_system) \u003d\u003d 1,\n\t     \"Exactly one cros-system instance is required\");\n```",
+      "isAi": true,
       "revId": "ff0bd68b8e8d5edbbacb52896bff04e9addd12b9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
