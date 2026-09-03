@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21a8e0d3_bbe0942a",
+        "filename": "zephyr/test/drivers/fan/src/thermal.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T22:48:29Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: The first few lines of this function heavily duplicate the setup in `thermal_before()`. Consider extracting the shared resetting logic into a helper function (e.g., `reset_thermal_state()`) to call from both.",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 75,
+        "endChar": 0
+      },
+      "revId": "3012af7623bb18231f7b68e7911ecfdc57a9b4cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "801a7cce_1492465a",
+        "filename": "zephyr/test/drivers/fan/src/thermal.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T22:48:29Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: There are no assertions here to verify that the SMI warning actually triggered (or did not trigger in G3). Tests without assertions only ensure the code does not crash, but do not verify the intended logic. Consider checking the host event state or a mock to verify the behavior.",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 0
+      },
+      "revId": "3012af7623bb18231f7b68e7911ecfdc57a9b4cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9784dc58_8ee97f58",
+        "filename": "zephyr/test/drivers/fan/src/thermal.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T22:48:29Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: The comment indicates that `chipset_force_shutdown` is triggered, but there are no assertions to verify this. Consider adding a check (e.g., verifying the mock was called or checking the chipset state) to ensure the logic works as intended.",
+      "range": {
+        "startLine": 192,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 0
+      },
+      "revId": "3012af7623bb18231f7b68e7911ecfdc57a9b4cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8795719b_a5a74c35",
+        "filename": "zephyr/test/drivers/fan/src/thermal.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T22:48:29Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: This test lacks assertions to verify the expected behavior of the release hysteresis logic. Without assertions, it only provides line coverage but doesn\u0027t validate correctness.",
+      "range": {
+        "startLine": 199,
+        "startChar": 0,
+        "endLine": 199,
+        "endChar": 0
+      },
+      "revId": "3012af7623bb18231f7b68e7911ecfdc57a9b4cf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
