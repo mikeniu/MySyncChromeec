@@ -193,18 +193,15 @@ static
 		ccprintf(" TC State: %s, Flags: 0x%04x",
 			 tc_get_current_state(port), tc_get_flags(port));
 
-		if (IS_ENABLED(CONFIG_USB_PE_SM)) {
-			/* PD-FAFT requires a space before the PE State in the
-			 * following print */
-			ccprintf(" PE State: %s, Flags: 0x%04x",
-				 pe_get_current_state(port),
-				 pe_get_flags(port));
-			if (pe_is_explicit_contract(port)) {
-				if (pe_snk_in_epr_mode(port))
-					ccprintf(" EPR");
-				else
-					ccprintf(" SPR");
-			}
+		/* PD-FAFT requires a space before the PE State in the
+		 * following print */
+		ccprintf(" PE State: %s, Flags: 0x%04x",
+			 pe_get_current_state(port), pe_get_flags(port));
+		if (pe_is_explicit_contract(port)) {
+			if (pe_snk_in_epr_mode(port))
+				ccprintf(" EPR");
+			else
+				ccprintf(" SPR");
 		}
 		ccprintf("\n");
 

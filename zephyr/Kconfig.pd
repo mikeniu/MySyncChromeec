@@ -321,14 +321,6 @@ config PLATFORM_EC_USB_PRL_SM
 	  interface. You should normally define this unless you want to override
 	  it in your board code, which is not recommended.
 
-config PLATFORM_EC_USB_PE_SM
-	bool "Policy engine (PE) state machine"
-	default y
-	help
-	  This enables the top layer of the power-delivery (PD) protocol, which
-	  deals with the actually PD messages that are exchanged with attached
-	  USB devices. You should normally define this unless you want to
-	  override it in your board code, which is not recommended.
 
 config PLATFORM_EC_USB_DPM_SM
 	bool "Device Policy Manager (DPM) state machine"
