@@ -92,6 +92,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9e479640_19d2ce6c",
+        "filename": "chip/host/otp_key.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-03T20:00:59Z",
+      "side": 1,
+      "message": "if this file gets copied to ec-legacy, what is the concern?\n\nchip/host/otp_key.c",
+      "parentUuid": "c6a22e7d_2471d00f",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "43774824_c7e5bc72",
         "filename": "test/mock/otpi_mock.c",
         "patchSetId": 14
@@ -193,6 +211,24 @@
       "side": 1,
       "message": "I can see this mock is used only for the key operations so I think it can stay. Just please add a comment explaining why it\u0027s here.",
       "parentUuid": "119f66e4_6659278e",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "620eb34d_330839de",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-03T20:00:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8b867d7_30d14233",
       "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
