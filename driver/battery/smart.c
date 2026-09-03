@@ -223,9 +223,7 @@ int battery_get_mode(int *mode)
 	return sb_read(SB_BATTERY_MODE, mode);
 }
 
-#if !defined(CONFIG_BATTERY_PRESENT_GPIO) && \
-	!defined(CONFIG_BATTERY_PRESENT_CUSTOM)
-__overridable enum battery_present battery_is_present(void)
+enum battery_present smart_battery_check_presence(void)
 {
 	int manufacture_date;
 
@@ -241,7 +239,6 @@ __overridable enum battery_present battery_is_present(void)
 
 	return BP_YES;
 }
-#endif
 
 /**
  * Force battery to mAh mode (instead of 10mW mode) for reporting capacity.
