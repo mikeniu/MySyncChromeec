@@ -30,7 +30,7 @@ i2c_port_charger: &i2c2 {};
 gpio_acok: &gpio_acok_od {};
 gpio_lid: &gpio_lid_open {};
 gpio_pwrbtn: &gpio_gsc_ec_pwr_btn_odl {};
-gpio_fan_control: &gpio_en_pp5000_fan {};
+gpio_fan_control: &gpio_pdn_e3_n {};
 gpio_all_sys_pwr_good: &gpio_all_sys_pwrgd_r {};
 
 /* Map tachometers to common names */
