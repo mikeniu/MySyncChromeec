@@ -204,6 +204,13 @@ int sb_read_mfgacc(int cmd, int block, uint8_t *data, int len);
 /* Read manufactures access data from the battery */
 int sb_read_mfgacc_block(int cmd, int block, uint8_t *data, int len);
 
+/**
+ * Check smart battery presence directly via SMBus.
+ *
+ * @return Battery presence.
+ */
+enum battery_present smart_battery_check_presence(void);
+
 #ifdef __cplusplus
 }
 #endif
