@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9238be52_20b0e81a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T20:10:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/886200dc-1dfd-4a7e-960e-db46e21a3181)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly addresses the bug by wrapping the byte-by-byte OTP key programming sequence with `irq_lock()` and `irq_unlock()`. However, there is a syntax error in `chip/host/otp_key.c` that will break compilation.\n*   **Security:** No security vulnerabilities are introduced. The use of interrupt locking during sensitive timing-critical cryptographic operations is a standard and secure practice.\n*   **Style:** The code mostly conforms to standard EC/Zephyr coding conventions, except for the missing braces in the error handling block in `chip/host/otp_key.c`.\n*   **Consistency:** The fix for the error path unlock was applied correctly in `zephyr/shim/chip/npcx/otp_key.c` but introduces a syntax error in `chip/host/otp_key.c`.\n*   **Testing \u0026 Test Coverage:** Excellent. The mock `otpi_write` asserts that interrupts are locked, validating the fix directly. Furthermore, the hardware test validates that the interrupt state is properly restored after `otp_key_provision()` completes.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped, addressing a single specific issue with appropriate test modifications.\n\nTAG\u003dagy\nCONV\u003d886200dc-1dfd-4a7e-960e-db46e21a3181",
+      "isAi": true,
+      "revId": "3afc0675c843c29fc8721788a5db9f4da261aa77",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61772482_45827651",
+        "filename": "chip/host/otp_key.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T20:10:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Syntax Error**: This line is missing a semicolon and curly braces for the `if` block. It will cause a compilation error.\n\nIt should be formatted as:\n```c\n\t\tif (status !\u003d API_RET_OTP_STATUS_OK) {\n\t\t\tirq_unlock(key);\n\t\t\treturn EC_ERROR_UNKNOWN;\n\t\t}\n```",
+      "isAi": true,
+      "revId": "3afc0675c843c29fc8721788a5db9f4da261aa77",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
