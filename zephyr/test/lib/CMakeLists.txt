@@ -7,6 +7,7 @@ find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 project(utils)
 
 target_sources_ifdef(CONFIG_TEST_LIB_EXIT app PRIVATE src/exit.c)
+target_sources_ifdef(CONFIG_TEST_LIB_PRINTF app PRIVATE src/printf.c)
 target_sources_ifdef(CONFIG_TEST_LIB_SBRK app PRIVATE src/sbrk.c)
 target_sources_ifdef(CONFIG_TEST_LIB_STD_VECTOR app PRIVATE src/std_vector.cc)
 target_sources_ifdef(CONFIG_TEST_LIB_STDLIB app PRIVATE src/stdlib.c)

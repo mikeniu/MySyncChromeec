@@ -283,12 +283,12 @@ static void test_vsnprintf_64bit_long_supported(void)
 
 static void test_vsnprintf_long_not_supported(void)
 {
-	expect_success(err_str, "%ld", 0x7b);
-	expect_success(err_str, "%li", 0x7b);
-	expect_success(err_str, "%lu", 0x7b);
-	expect_success(err_str, "%lx", 0x7b);
-	expect_success(err_str, "%08lu", 123);
-	expect_success("13ERROR", "%d%lu%d", 13, 14L, 15);
+	expect_success_crec(err_str, "%ld", 0x7b);
+	expect_success_crec(err_str, "%li", 0x7b);
+	expect_success_crec(err_str, "%lu", 0x7b);
+	expect_success_crec(err_str, "%lx", 0x7b);
+	expect_success_crec(err_str, "%08lu", 123);
+	expect_success_crec("13ERROR", "%d%lu%d", 13, 14L, 15);
 
 	expect_success_crec(err_str, "%i", 123);
 	expect_success_crec(err_str, "%li", 123);
