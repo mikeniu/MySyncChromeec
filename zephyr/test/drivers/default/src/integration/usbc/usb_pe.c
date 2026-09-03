@@ -14,6 +14,7 @@
 #include "test/usb_pe.h"
 #include "usb_emsg.h"
 #include "usb_pd.h"
+#include "usb_pd_dpm_sm.h"
 #include "usb_pd_tcpm.h"
 #include "usb_pe_sm.h"
 #include "util.h"
@@ -197,6 +198,84 @@ ZTEST_F(usb_pe_test_sink, test_pe_source_caps_rejected)
 	zassert_true(pe_is_running(port), "PE should remain running");
 }
 
+/**
+ * @brief Test DPM VDM request parameter validation.
+ */
+ZTEST_F(usb_pe_test_sink, test_dpm_vdm_request_parameter_validation)
+{
+	int port = TEST_USB_PORT;
+	uint32_t vdo[VDO_MAX_SIZE + 1] = { 0 };
+
+	/* vdo_count == 0 should return EC_RES_INVALID_PARAM */
+	zassert_equal(pd_request_vdm(port, vdo, 0, TCPCI_MSG_SOP),
+		      EC_RES_INVALID_PARAM);
+
+	/* vdo_count > VDO_MAX_SIZE should return EC_RES_INVALID_PARAM */
+	zassert_equal(pd_request_vdm(port, vdo, VDO_MAX_SIZE + 1,
+				     TCPCI_MSG_SOP),
+		      EC_RES_INVALID_PARAM);
+
+	/* SVDM Attention message with vdo_count > PD_ATTENTION_MAX_VDO */
+	vdo[0] = VDO(USB_SID_PD, 1, CMD_ATTENTION);
+	zassert_equal(pd_request_vdm(port, vdo, PD_ATTENTION_MAX_VDO + 1,
+				     TCPCI_MSG_SOP),
+		      EC_RES_INVALID_PARAM);
+}
+
+/**
+ * @brief Test DPM VDM request queuing, checking, busy rejection, and clearing.
+ */
+ZTEST_F(usb_pe_test_sink, test_dpm_vdm_request_flow_and_busy)
+{
+	int port = TEST_USB_PORT;
+	uint32_t vdo[2];
+
+	/* Ensure no VDM request is currently pending */
+	dpm_clear_vdm_request(port);
+	zassert_false(dpm_check_vdm_request(port));
+
+	/* Valid VDM request */
+	vdo[0] = VDO(USB_SID_PD, 1, CMD_DISCOVER_IDENT);
+	vdo[1] = 0;
+	zassert_equal(pd_request_vdm(port, vdo, 2, TCPCI_MSG_SOP),
+		      EC_RES_SUCCESS);
+	zassert_true(dpm_check_vdm_request(port));
+
+	/* Second request should fail with EC_RES_BUSY while one is pending */
+	zassert_equal(pd_request_vdm(port, vdo, 2, TCPCI_MSG_SOP), EC_RES_BUSY);
+
+	/* Clear the request and verify */
+	dpm_clear_vdm_request(port);
+	zassert_false(dpm_check_vdm_request(port));
+}
+
+/**
+ * @brief Test DPM request enter mode parameter validation and flow.
+ */
+ZTEST_F(usb_pe_test_sink, test_dpm_request_enter_mode)
+{
+	int port = TEST_USB_PORT;
+
+	/* Port out of range */
+	zassert_equal(pd_request_enter_mode(board_get_usb_pd_port_count(),
+					    TYPEC_MODE_DP),
+		      EC_RES_INVALID_PARAM);
+
+	/* Invalid mode */
+	zassert_equal(pd_request_enter_mode(port, (enum typec_mode)0xff),
+		      EC_RES_INVALID_PARAM);
+
+	/* Valid mode DP */
+	zassert_equal(pd_request_enter_mode(port, TYPEC_MODE_DP),
+		      EC_RES_SUCCESS);
+
+	/* Second call should return EC_RES_BUSY */
+	zassert_equal(pd_request_enter_mode(port, TYPEC_MODE_DP), EC_RES_BUSY);
+
+	/* Reset DPM state to clean up flags */
+	dpm_init(port);
+}
+
 /* =========================================================================
  * Source Tests
  * ========================================================================= */
@@ -286,4 +365,37 @@ ZTEST_F(usb_pe_test_source, test_pe_sink_cap_query_as_source)
 	k_sleep(K_SECONDS(1));
 
 	zassert_true(pe_is_running(port), "PE should remain running");
+}
+
+/**
+ * @brief Test sending VDM request from DFP/Source.
+ */
+ZTEST_F(usb_pe_test_source, test_dpm_vdm_attention_source)
+{
+	int port = TEST_USB_PORT;
+	uint32_t vdo[1];
+
+	vdo[0] = VDO(USB_SID_PD, 1, CMD_ATTENTION);
+	zassert_equal(pd_request_vdm(port, vdo, 1, TCPCI_MSG_SOP),
+		      EC_RES_SUCCESS);
+
+	/* Allow DPM state machine to process and send VDM request */
+	k_sleep(K_SECONDS(1));
+
+	/* SVDM Attention clears DPM_FLAG_SEND_VDM_REQ automatically */
+	zassert_false(dpm_check_vdm_request(port));
+}
+
+/**
+ * @brief Test notifying DPM of an Attention message.
+ */
+ZTEST_F(usb_pe_test_source, test_dpm_notify_attention)
+{
+	int port = TEST_USB_PORT;
+	uint32_t buf[2] = {
+		VDO(USB_SID_DISPLAYPORT, 1, CMD_ATTENTION),
+		0,
+	};
+
+	dpm_notify_attention(port, 2, buf);
 }
