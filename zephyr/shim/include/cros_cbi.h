@@ -90,7 +90,9 @@ enum cbi_fw_config_value_id {
 #define DT_DRV_COMPAT cros_ec_cbi_ufsc_value
 
 #define CBI_UFSC_VALUE_COMPAT DT_DRV_COMPAT
-#define CBI_UFSC_VALUE_ID(id) DT_CAT(CBI_UFSC_VALUE_ID_, id)
+#define _CBI_UFSC_VALUE_ID(id) CBI_UFSC_VALUE_ID_##id
+#define _CBI_UFSC_VALUE_ID_EXPAND(id) _CBI_UFSC_VALUE_ID(id)
+#define CBI_UFSC_VALUE_ID(id) _CBI_UFSC_VALUE_ID_EXPAND(id)
 #define CBI_UFSC_VALUE_ID_WITH_COMMA(id) CBI_UFSC_VALUE_ID(id),
 #define CBI_UFSC_VALUE_INST_ENUM(inst, _) \
 	CBI_UFSC_VALUE_ID_WITH_COMMA(DT_INST(inst, CBI_UFSC_VALUE_COMPAT))
