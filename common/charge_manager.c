@@ -1161,8 +1161,7 @@ static void charge_manager_refresh(void)
 	/* New power requests must be set only after updating the globals. */
 	if (is_pd_port(updated_new_port)) {
 		/* Check if we can get requested voltage/current */
-		if ((IS_ENABLED(CONFIG_USB_PD_TCPMV2) &&
-		     IS_ENABLED(CONFIG_USB_PE_SM)) ||
+		if (IS_ENABLED(CONFIG_USB_PD_TCPMV2) ||
 		    IS_ENABLED(CONFIG_USB_PDC_POWER_MGMT)) {
 			uint32_t pdo;
 			uint32_t max_voltage;

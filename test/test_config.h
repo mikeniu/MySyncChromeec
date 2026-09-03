@@ -224,7 +224,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #endif
 
 #define CONFIG_USB_PD_TCPMV2
-#undef CONFIG_USB_PE_SM
 #undef CONFIG_USB_TYPEC_SM
 #undef CONFIG_USB_PD_HOST_CMD
 #undef CONFIG_USB_DPM_SM
@@ -245,7 +244,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_USB_PD_REV30
 #define CONFIG_USB_PD_EXTENDED_MESSAGES
 #define CONFIG_USB_PD_TCPMV2
-#undef CONFIG_USB_PE_SM
 #undef CONFIG_USB_DPM_SM
 #undef CONFIG_USB_TYPEC_SM
 #undef CONFIG_USB_PD_HOST_CMD
@@ -254,9 +252,7 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #endif
 
 #if defined(TEST_USB_PE_DRP_OLD) || defined(TEST_USB_PE_DRP_OLD_NOEXTENDED)
-#define CONFIG_TEST_USB_PE_SM
 #define CONFIG_USB_PD_PORT_MAX_COUNT 1
-#define CONFIG_USB_PE_SM
 #define CONFIG_USB_PID 0x5036
 #define CONFIG_USB_POWER_DELIVERY
 #undef CONFIG_USB_PRL_SM
@@ -280,9 +276,7 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #endif
 
 #if defined(TEST_USB_PE_DRP) || defined(TEST_USB_PE_DRP_NOEXTENDED)
-#define CONFIG_TEST_USB_PE_SM
 #define CONFIG_USB_PD_PORT_MAX_COUNT 1
-#define CONFIG_USB_PE_SM
 #define CONFIG_USB_PID 0x5036
 #define CONFIG_USB_POWER_DELIVERY
 #undef CONFIG_USB_PRL_SM
@@ -324,7 +318,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_USB_PD_REV30
 #define CONFIG_USB_PD_EXTENDED_MESSAGES
 #define CONFIG_USB_PD_TCPMV2
-#define CONFIG_USB_PE_SM
 #define CONFIG_USB_PRL_SM
 #define CONFIG_USB_TYPEC_SM
 #define CONFIG_USB_POWER_DELIVERY
@@ -356,7 +349,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_USB_PD_TCPC_LPM_EXIT_DEBOUNCE 1
 #define CONFIG_USB_POWER_DELIVERY
 #undef CONFIG_USB_PRL_SM
-#undef CONFIG_USB_PE_SM
 #undef CONFIG_USB_DPM_SM
 #undef CONFIG_USB_PD_HOST_CMD
 #endif
@@ -373,7 +365,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_USBC_SS_MUX
 #define CONFIG_USB_PD_VBUS_DETECT_TCPC
 #define CONFIG_USB_POWER_DELIVERY
-#define CONFIG_TEST_USB_PE_SM
 #define CONFIG_USB_PD_ALT_MODE_DFP
 #define CONFIG_USB_PD_DP_MODE
 #define CONFIG_USB_PD_DISCOVERY
@@ -407,7 +398,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 
 #ifdef TEST_USB_PD_CONSOLE
 #define CONFIG_USB_PD_PORT_MAX_COUNT 2
-#define CONFIG_USB_PE_SM
 #define CONFIG_CMD_PD
 #define CONFIG_USB_PD_TCPMV2
 #define CONFIG_USB_PD_TRY_SRC
