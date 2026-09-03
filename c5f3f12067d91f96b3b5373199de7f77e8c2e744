@@ -3,6 +3,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "386fbb5b_ee5cb95a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T21:46:47Z",
+      "side": 1,
+      "message": "### CQ Failure Triage (Patchset 1)\n\n#### Builder: [firmware-zephyr-cq](http://cr-buildbucket.appspot.com/build/8671660886506970097)\n\n**Step:** `test firmware|call build API script`\n**Failed Test Cases:**\n- `1) drivers.smart_battery.present on native_sim/native (host/gnu) failed (rc\u003d1)`\n- `1) drivers.smart_battery.present on native_sim/native (host/llvm) failed (rc\u003d1)`\n\n**Traceback:**\n```\nFile \"/mnt/host/source/src/platform/ec/zephyr/firmware_builder.py\", line 677, in test\nsubprocess.run(\nFile \"/usr/lib/python3.11/subprocess.py\", line 571, in run\nraise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command \u0027[\u0027make\u0027, \u0027-f\u0027, \u0027Makefile.cq\u0027, \u0027-j30\u0027, \u0027test\u0027, \u0027SPECIAL_BOARDS\u003dkrabby kingler rex geralt roach ovis brox brox-sku4 rauru fatcatrvp-npcx fatcatrvp-ite felino francka nereid nivviks kaladin uldrenite uldrenite-ish ocelotrvp-npcx ocelotrvp-ite\u0027]\u0027 returned non-zero exit status 2.\n13:03:24.717: WARNING: Metrics data empty.\n13:03:24.884: INFO: Endpoint execution completed, return code: 3\n13:03:24.956: INFO: Endpoint execution completed, return code: 3\n```\n\n**Reproduction:**\n```bash\nwest twister -p \u003cPLATFORM\u003e -s \u003cTEST ID\u003e, for example:\n```\n```bash\nwest twister -p native_sim/native -s drivers.smart_battery.present\n```\n```bash\nwest build -p -b native_sim/native zephyr/test/drivers -T drivers.smart_battery.present\n```\n\n#### Builder: [firmware-zephyr-cov-cq](http://cr-buildbucket.appspot.com/build/8671660886506970113)\n\n**Step:** `test firmware|call build API script`\n**Failed Test Cases:**\n- `1) drivers.smart_battery.present on native_sim/native (host/gnu) failed (rc\u003d1)`\n\n**Traceback:**\n```\nFile \"/mnt/host/source/src/platform/ec/zephyr/firmware_builder.py\", line 677, in test\nsubprocess.run(\nFile \"/usr/lib/python3.11/subprocess.py\", line 571, in run\nraise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command \u0027[\u0027make\u0027, \u0027-f\u0027, \u0027Makefile.cq\u0027, \u0027-j30\u0027, \u0027test\u0027, \u0027COVERAGE\u003d1\u0027, \u0027SPECIAL_BOARDS\u003dkrabby kingler rex geralt roach ovis brox brox-sku4 rauru fatcatrvp-npcx fatcatrvp-ite felino francka nereid nivviks kaladin uldrenite uldrenite-ish ocelotrvp-npcx ocelotrvp-ite\u0027]\u0027 returned non-zero exit status 2.\n13:41:41.614: WARNING: Metrics data empty.\n13:41:41.791: INFO: Endpoint execution completed, return code: 3\n13:41:41.866: INFO: Endpoint execution completed, return code: 3\n```\n\n**Reproduction:**\n```bash\nwest twister -p \u003cPLATFORM\u003e -s \u003cTEST ID\u003e, for example:\n```\n```bash\nwest twister -p native_sim/native -s drivers.smart_battery.present\n```\n```bash\nwest build -p -b native_sim/native zephyr/test/drivers -T drivers.smart_battery.present\n```\n\n#### Builder: [firmware-zephyr-public-cq](http://cr-buildbucket.appspot.com/build/8671660886506970161)\n\n**Step:** `test firmware|call build API script`\n**Failed Test Cases:**\n- `1) drivers.smart_battery.present on native_sim/native (host/gnu) failed (rc\u003d1)`\n- `1) drivers.smart_battery.present on native_sim/native (host/llvm) failed (rc\u003d1)`\n\n**Traceback:**\n```\nFile \"/mnt/host/source/src/platform/ec/zephyr/firmware_builder.py\", line 677, in test\nsubprocess.run(\nFile \"/usr/lib/python3.11/subprocess.py\", line 571, in run\nraise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command \u0027[\u0027make\u0027, \u0027-f\u0027, \u0027Makefile.cq\u0027, \u0027-j30\u0027, \u0027test\u0027, \u0027SPECIAL_BOARDS\u003dkrabby kingler rex geralt roach ovis brox brox-sku4 rauru fatcatrvp-npcx fatcatrvp-ite felino francka nereid nivviks kaladin uldrenite uldrenite-ish ocelotrvp-npcx ocelotrvp-ite\u0027]\u0027 returned non-zero exit status 2.\n13:02:57.841: WARNING: Metrics data empty.\n13:02:58.013: INFO: Endpoint execution completed, return code: 3\n13:02:58.085: INFO: Endpoint execution completed, return code: 3\n```\n\n**Reproduction:**\n```bash\nwest twister -p \u003cPLATFORM\u003e -s \u003cTEST ID\u003e, for example:\n```\n```bash\nwest twister -p native_sim/native -s drivers.smart_battery.present\n```\n```bash\nwest build -p -b native_sim/native zephyr/test/drivers -T drivers.smart_battery.present\n```",
+      "isAi": true,
+      "revId": "c5f3f12067d91f96b3b5373199de7f77e8c2e744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e63adf36_74871c17",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -14,6 +32,52 @@
       "writtenOn": "2026-09-02T22:17:25Z",
       "side": 1,
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
+      "revId": "c5f3f12067d91f96b3b5373199de7f77e8c2e744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dbcc43b_a1d2b8b9",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T21:46:47Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: If a board has both `CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT` and `CONFIG_BATTERY_INIT_TYPE_DEFERRED_RETRY_COUNT` configured, using `MAX` here will result in fewer total retries than before. \n\nPreviously, the code would do `CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT` synchronous retries *per* deferred attempt, resulting in effectively `(1 + RETRY_COUNT) * (1 + DEFERRED_RETRY_COUNT)` total attempts. Now it\u0027s just `1 + MAX(RETRY_COUNT, DEFERRED_RETRY_COUNT)`.\n\nIf both configs aren\u0027t meant to be used together anyway, this is perfectly fine, but I wanted to point out the subtle change in behavior.",
+      "range": {
+        "startLine": 195,
+        "startChar": 0,
+        "endLine": 195,
+        "endChar": 0
+      },
+      "revId": "c5f3f12067d91f96b3b5373199de7f77e8c2e744",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2943b00e_bdc88598",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T21:46:47Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: By removing the `for` loop here, `battery_device_name` no longer has any retry logic. If the first read fails, the code immediately gives up on getting the device name, whereas previously it was retried `CONFIG_BATTERY_INIT_TYPE_RETRY_COUNT` times. \n\nIf this is intentional, it\u0027s worth updating the commit message to reflect this behavior change. If it\u0027s a mistake, you might need to either add a deferred retry for the device name as well (which might mean re-running the whole function or using a state machine) or keep the synchronous retries here (if a short block is acceptable here, though that defeats the goal of the patch).",
+      "range": {
+        "startLine": 224,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 0
+      },
       "revId": "c5f3f12067d91f96b3b5373199de7f77e8c2e744",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
