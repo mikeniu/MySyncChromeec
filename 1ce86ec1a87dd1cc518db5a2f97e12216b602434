@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d6841ac_50ab6d96",
+        "filename": "include/config.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 1829,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-03T17:40:06Z",
+      "side": 1,
+      "message": "On `main` and `ec-legacy`, this is a 6-line change. Here, it\u0027s a 42-line change. Most of this stuff is unrelated to the original commit and is just coming along for the ride. Please trim it down.",
+      "revId": "1ce86ec1a87dd1cc518db5a2f97e12216b602434",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
