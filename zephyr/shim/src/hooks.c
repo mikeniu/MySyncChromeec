@@ -64,13 +64,32 @@ static void work_queue_error(const void *data, int rv)
 /* LCOV_EXCL_STOP */
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_SECOND
+static int64_t next_hook_second_target;
+
 static void hook_second_work(struct k_work *work)
 {
 	int rv;
+	const int64_t interval = k_sec_to_ticks_ceil64(1);
+	const int64_t now = k_uptime_ticks();
+	int64_t delay_ticks;
 
 	hook_notify(HOOK_SECOND);
 
-	rv = k_work_reschedule(&hook_seconds_work_data, K_SECONDS(1));
+	if (next_hook_second_target == 0) {
+		next_hook_second_target = now;
+	}
+
+	delay_ticks = next_hook_second_target + interval - now;
+	if (delay_ticks > 0) {
+		next_hook_second_target += interval;
+	} else {
+		delay_ticks = 0;
+		next_hook_second_target = now;
+	}
+
+	rv = k_work_reschedule(&hook_seconds_work_data,
+			       delay_ticks > 0 ? K_TICKS(delay_ticks) :
+						 K_NO_WAIT);
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_seconds_work_data, rv);
@@ -79,14 +98,32 @@ static void hook_second_work(struct k_work *work)
 #endif /* CONFIG_PLATFORM_EC_HOOK_SECOND */
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_TICK
+static int64_t next_hook_tick_target;
+
 static void hook_tick_work(struct k_work *work)
 {
 	int rv;
+	const int64_t interval = k_us_to_ticks_ceil64(HOOK_TICK_INTERVAL);
+	const int64_t now = k_uptime_ticks();
+	int64_t delay_ticks;
 
 	hook_notify(HOOK_TICK);
 
+	if (next_hook_tick_target == 0) {
+		next_hook_tick_target = now;
+	}
+
+	delay_ticks = next_hook_tick_target + interval - now;
+	if (delay_ticks > 0) {
+		next_hook_tick_target += interval;
+	} else {
+		delay_ticks = 0;
+		next_hook_tick_target = now;
+	}
+
 	rv = k_work_reschedule(&hook_ticks_work_data,
-			       K_USEC(HOOK_TICK_INTERVAL));
+			       delay_ticks > 0 ? K_TICKS(delay_ticks) :
+						 K_NO_WAIT);
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_ticks_work_data, rv);
@@ -110,7 +147,11 @@ void hook_start_periodic_hooks(void)
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_SECOND
 	/* Startup the HOOK_SECOND recurring work */
-	rv = k_work_reschedule(&hook_seconds_work_data, K_SECONDS(1));
+	const int64_t second_interval = k_sec_to_ticks_ceil64(1);
+
+	next_hook_second_target = k_uptime_ticks() + second_interval;
+	rv = k_work_reschedule(&hook_seconds_work_data,
+			       K_TICKS(second_interval));
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_seconds_work_data, rv);
@@ -119,8 +160,10 @@ void hook_start_periodic_hooks(void)
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_TICK
 	/* Startup the HOOK_TICK recurring work */
-	rv = k_work_reschedule(&hook_ticks_work_data,
-			       K_USEC(HOOK_TICK_INTERVAL));
+	const int64_t tick_interval = k_us_to_ticks_ceil64(HOOK_TICK_INTERVAL);
+
+	next_hook_tick_target = k_uptime_ticks() + tick_interval;
+	rv = k_work_reschedule(&hook_ticks_work_data, K_TICKS(tick_interval));
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_ticks_work_data, rv);
