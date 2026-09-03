@@ -97,7 +97,9 @@ void ec_app_main(void)
 		 *   In normal boot, it verifies and jumps to RW.
 		 * For RW, it returns immediately.
 		 */
+		watchdog_reload();
 		vboot_main();
+		watchdog_reload();
 	}
 
 #ifdef CONFIG_AP_PWRSEQ_DRIVER
@@ -113,7 +115,10 @@ void ec_app_main(void)
 
 	/* Call init hooks before main tasks start */
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_HOOKS)) {
+		watchdog_reload();
 		hook_notify(HOOK_INIT);
+		watchdog_reload();
+		hook_start_periodic_hooks();
 	}
 
 	/*

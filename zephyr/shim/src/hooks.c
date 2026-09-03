@@ -104,9 +104,9 @@ BUILD_ASSERT(
 	CONFIG_SYSTEM_WORKQUEUE_PRIORITY == EC_TASK_PRIORITY(EC_SYSWORKQ_PRIO),
 	"EC_SYSWORKQ_PRIO does not match CONFIG_SYSTEM_WORKQUEUE_PRIORITY.");
 
-static int zephyr_shim_setup_hooks(void)
+void hook_start_periodic_hooks(void)
 {
-	int rv = 0;
+	int rv;
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_SECOND
 	/* Startup the HOOK_SECOND recurring work */
@@ -126,10 +126,7 @@ static int zephyr_shim_setup_hooks(void)
 		work_queue_error(&hook_ticks_work_data, rv);
 	/* LCOV_EXCL_STOP */
 #endif /* CONFIG_PLATFORM_EC_HOOK_TICK */
-	return rv;
 }
-
-SYS_INIT(zephyr_shim_setup_hooks, APPLICATION, 1);
 
 void hook_notify(enum hook_type type)
 {

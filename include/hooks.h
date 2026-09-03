@@ -321,6 +321,19 @@ struct hook_data {
  */
 void hook_notify(enum hook_type type);
 
+#if defined(CONFIG_PLATFORM_EC_HOOKS)
+/**
+ * Start recurring periodic hooks (HOOK_TICK and HOOK_SECOND).
+ *
+ * Called from ec_app_main() after HOOK_INIT processing has completed.
+ */
+void hook_start_periodic_hooks(void);
+#else
+static inline void hook_start_periodic_hooks(void)
+{
+}
+#endif
+
 #ifdef __cplusplus
 }
 #endif

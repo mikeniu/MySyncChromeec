@@ -143,6 +143,7 @@ static void vboot_hash_all_chunks(void)
 		size_t size = min(CHUNK_SIZE, data_size - curr_pos);
 		hash_next_chunk(size);
 		curr_pos += size;
+		watchdog_reload();
 	} while (curr_pos < data_size);
 
 	hash = SHA256_final(&ctx);
