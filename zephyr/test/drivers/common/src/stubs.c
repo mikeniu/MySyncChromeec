@@ -238,3 +238,8 @@ int clock_get_freq(void)
 {
 	return 16000000;
 }
+
+__overridable void send_aux_data_to_device(uint8_t data)
+{
+	ARG_UNUSED(data);
+}

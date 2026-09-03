@@ -1067,7 +1067,7 @@ void keyboard_protocol_task(void *u)
 	}
 }
 
-static void send_aux_data_to_host_deferred(void)
+test_export_static void send_aux_data_to_host_deferred(void)
 {
 	uint8_t data;
 

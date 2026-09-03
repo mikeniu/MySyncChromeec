@@ -626,7 +626,7 @@ test_mockable void lpc_keyboard_put_char(uint8_t chr, int send_irq)
 }
 
 /* Put an aux char to host buffer by HIMDO and assert status bit 5. */
-void lpc_aux_put_char(uint8_t chr, int send_irq)
+test_mockable void lpc_aux_put_char(uint8_t chr, int send_irq)
 {
 	uint32_t kb_char = chr;
 	uint32_t status = I8042_AUX_DATA;
