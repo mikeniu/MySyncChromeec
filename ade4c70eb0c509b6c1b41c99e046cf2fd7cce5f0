@@ -45,6 +45,54 @@
       },
       "revId": "ade4c70eb0c509b6c1b41c99e046cf2fd7cce5f0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61e7cf6b_7504674d",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_prl.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T22:13:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23cc4dce_f14ffa0c",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 0
+      },
+      "revId": "ade4c70eb0c509b6c1b41c99e046cf2fd7cce5f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bd1b255_ac065079",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_prl.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T22:13:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9bf0a41_facff28c",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 0
+      },
+      "revId": "ade4c70eb0c509b6c1b41c99e046cf2fd7cce5f0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
