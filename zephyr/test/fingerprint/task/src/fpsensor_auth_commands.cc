@@ -1691,6 +1691,21 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_trivial_salt)
 	zassert_equal(global_context.templ_valid, 0u);
 }
 
+ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_v3)
+{
+	test_v0_template_layout params{};
+
+	setup_and_encrypt_v0_template(params, kTestSaltNonTrivial, false);
+
+	params.metadata.struct_version = 3;
+
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, &params,
+					     sizeof(params), NULL, 0),
+		      EC_RES_INVALID_PARAM);
+
+	zassert_equal(global_context.templ_valid, 0u);
+}
+
 ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_corrupted_tag)
 {
 	struct test_v0_template_layout params{};
