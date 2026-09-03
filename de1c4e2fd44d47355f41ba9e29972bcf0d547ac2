@@ -22,6 +22,52 @@
       },
       "revId": "de1c4e2fd44d47355f41ba9e29972bcf0d547ac2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60987af0_2aaf2fde",
+        "filename": "zephyr/program/fatcat/program.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-03T22:32:28Z",
+      "side": 1,
+      "message": "This does nothing on x86 platforms that use the AP power sequence subsystem (including all fatcat boards).\n\n`hook_notify(HOOK_CHIPSET_RESUME_INIT)` is only called by the MTK and QCOM power sequence drivers.",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 43
+      },
+      "revId": "de1c4e2fd44d47355f41ba9e29972bcf0d547ac2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fe66c64_ba9c9fe7",
+        "filename": "zephyr/program/fatcat/program.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-03T22:32:28Z",
+      "side": 1,
+      "message": "This is also not used by x86 platforms.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 50
+      },
+      "revId": "de1c4e2fd44d47355f41ba9e29972bcf0d547ac2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
