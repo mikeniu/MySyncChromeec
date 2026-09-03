@@ -64,13 +64,36 @@ static void work_queue_error(const void *data, int rv)
 /* LCOV_EXCL_STOP */
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_SECOND
+static uint32_t next_hook_second_target;
+
 static void hook_second_work(struct k_work *work)
 {
 	int rv;
+	const uint32_t interval = k_sec_to_ticks_ceil32(1);
+	int32_t delay_ticks;
 
 	hook_notify(HOOK_SECOND);
 
-	rv = k_work_reschedule(&hook_seconds_work_data, K_SECONDS(1));
+	const uint32_t now = sys_clock_tick_get_32();
+
+	/*
+	 * Compute remaining delay until target deadline using 32-bit signed
+	 * modular distance. Valid delay must be strictly positive and cannot
+	 * exceed the nominal interval. If delay is negative (deadline missed)
+	 * or exceeds interval (clock jump / prolonged stall), reset target
+	 * to current uptime and schedule immediately without bursting.
+	 */
+	delay_ticks = (int32_t)(next_hook_second_target + interval - now);
+	if (delay_ticks > 0 && delay_ticks <= (int32_t)interval) {
+		next_hook_second_target += interval;
+	} else {
+		delay_ticks = 0;
+		next_hook_second_target = now;
+	}
+
+	rv = k_work_reschedule(&hook_seconds_work_data,
+			       delay_ticks > 0 ? K_TICKS(delay_ticks) :
+						 K_NO_WAIT);
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_seconds_work_data, rv);
@@ -79,14 +102,36 @@ static void hook_second_work(struct k_work *work)
 #endif /* CONFIG_PLATFORM_EC_HOOK_SECOND */
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_TICK
+static uint32_t next_hook_tick_target;
+
 static void hook_tick_work(struct k_work *work)
 {
 	int rv;
+	const uint32_t interval = k_us_to_ticks_ceil32(HOOK_TICK_INTERVAL);
+	int32_t delay_ticks;
 
 	hook_notify(HOOK_TICK);
 
+	const uint32_t now = sys_clock_tick_get_32();
+
+	/*
+	 * Compute remaining delay until target deadline using 32-bit signed
+	 * modular distance. Valid delay must be strictly positive and cannot
+	 * exceed the nominal interval. If delay is negative (deadline missed)
+	 * or exceeds interval (clock jump / prolonged stall), reset target
+	 * to current uptime and schedule immediately without bursting.
+	 */
+	delay_ticks = (int32_t)(next_hook_tick_target + interval - now);
+	if (delay_ticks > 0 && delay_ticks <= (int32_t)interval) {
+		next_hook_tick_target += interval;
+	} else {
+		delay_ticks = 0;
+		next_hook_tick_target = now;
+	}
+
 	rv = k_work_reschedule(&hook_ticks_work_data,
-			       K_USEC(HOOK_TICK_INTERVAL));
+			       delay_ticks > 0 ? K_TICKS(delay_ticks) :
+						 K_NO_WAIT);
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_ticks_work_data, rv);
@@ -110,7 +155,11 @@ static int zephyr_shim_setup_hooks(void)
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_SECOND
 	/* Startup the HOOK_SECOND recurring work */
-	rv = k_work_reschedule(&hook_seconds_work_data, K_SECONDS(1));
+	const uint32_t second_interval = k_sec_to_ticks_ceil32(1);
+
+	next_hook_second_target = sys_clock_tick_get_32() + second_interval;
+	rv = k_work_reschedule(&hook_seconds_work_data,
+			       K_TICKS(second_interval));
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_seconds_work_data, rv);
@@ -119,8 +168,10 @@ static int zephyr_shim_setup_hooks(void)
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_TICK
 	/* Startup the HOOK_TICK recurring work */
-	rv = k_work_reschedule(&hook_ticks_work_data,
-			       K_USEC(HOOK_TICK_INTERVAL));
+	const uint32_t tick_interval = k_us_to_ticks_ceil32(HOOK_TICK_INTERVAL);
+
+	next_hook_tick_target = sys_clock_tick_get_32() + tick_interval;
+	rv = k_work_reschedule(&hook_ticks_work_data, K_TICKS(tick_interval));
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_ticks_work_data, rv);

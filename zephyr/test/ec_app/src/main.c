@@ -100,6 +100,52 @@ ZTEST(ec_app_tests, test_hook_notify_init)
 	zassert_equal(1, sample_init_hook_count,
 		      "Expected sample_init_hook to run once.");
 }
+#ifdef CONFIG_PLATFORM_EC_HOOK_TICK
+#define MAX_TICK_SAMPLES 5
+static int sample_tick_hook_count;
+static uint32_t tick_sample_timestamps[MAX_TICK_SAMPLES];
+
+static void sample_tick_hook(void)
+{
+	if (sample_tick_hook_count < MAX_TICK_SAMPLES) {
+		tick_sample_timestamps[sample_tick_hook_count] =
+			k_uptime_get_32();
+	}
+	/* Deliberately simulate lengthy callback work on tick 1 */
+	if (sample_tick_hook_count == 1) {
+		k_busy_wait(25000);
+	}
+	sample_tick_hook_count++;
+}
+DECLARE_HOOK(HOOK_TICK, sample_tick_hook, HOOK_PRIO_DEFAULT);
+
+/**
+ * @brief Test HOOK_TICK interval does not accumulate drift from callback work.
+ */
+ZTEST(ec_app_tests, test_hook_tick_no_drift)
+{
+	/* Wait for at least 3 ticks to be sampled */
+	while (sample_tick_hook_count < 3) {
+		k_msleep(20);
+	}
+
+	/*
+	 * Tick 1 had a 25ms busy wait in sample_tick_hook().
+	 * Without absolute deadline rescheduling, tick 2 would fire at
+	 * T_1 + 25ms + INTERVAL = 275ms after tick 1.
+	 * With absolute deadline rescheduling, tick 2 fires at T_1 + INTERVAL =
+	 * 250ms.
+	 */
+	uint32_t delta_ms =
+		tick_sample_timestamps[2] - tick_sample_timestamps[1];
+	uint32_t expected_ms =
+		CONFIG_CROS_EC_HOOK_TICK_INTERVAL / USEC_PER_MSEC;
+
+	zassert_true(IN_RANGE(delta_ms, expected_ms - 10, expected_ms + 10),
+		     "HOOK_TICK interval drifted: delta=%u ms (expected %u ms)",
+		     delta_ms, expected_ms);
+}
+#endif
 #endif
 
 #ifdef CONFIG_SHIMMED_TASKS
