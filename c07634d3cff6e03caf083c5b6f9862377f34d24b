@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef69e70f_33963a1e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T17:18:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/ee6ffac2-a455-4421-9cea-c94dd984b10d)]\n\n### Review Summary\n* **Functionality:** The test logic is sound and correctly validates that committing a legacy format (v3) template via `EC_CMD_FP_TEMPLATE` v0 is rejected with `EC_RES_INVALID_PARAM`. It also correctly verifies that the template is not marked as valid.\n* **Security:** No security concerns introduced.\n* **Style:** The code conforms well to the surrounding ZTEST patterns. \n* **Testing:** Excellent. This CL addresses test coverage for the specific failure mode in v0 format. \n* **CL Size \u0026 Scope:** The CL is well-scoped and concise.",
+      "isAi": true,
+      "revId": "c07634d3cff6e03caf083c5b6f9862377f34d24b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
