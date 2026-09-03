@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2012d089_075b18e1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T16:57:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/3585811d-8b9c-45fe-b8e6-1ec06fb88455)]\n\n### Review Summary\n*   **Functionality:** The hardware enablement configurations and driver additions look correct and align well with existing ELAN 80 series sensors.\n*   **Security:** No security vulnerabilities identified. The changes are confined to hardware configuration.\n*   **Style:** Mostly clean, though there are minor copy-paste remnants in comments and copyright headers (see inline comments).\n*   **Testing:** The CL currently only mentions a build test (`zmake build niedzica`). It would be beneficial to consider adding or updating a simulated test for the ELANHV515RC sensor if a simulator exists (e.g., using the `sensor_sim` framework) to test the driver logic without needing physical hardware.\n*   **CL Size:** The CL is appropriately scoped and self-contained.",
+      "isAi": true,
+      "revId": "3dd03f9b8a7db5f479512e17a519fc25fdf485e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8254b9e5_3b0f6ec3",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_elanhv515rc_config.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T16:57:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This comment references `ELANI80SA` but should likely reference `ELANHV515RC`. Looks like a copy-paste error.",
+      "isAi": true,
+      "revId": "3dd03f9b8a7db5f479512e17a519fc25fdf485e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4b95bbe_3470d184",
+        "filename": "zephyr/dts/bindings/fingerprint/elan.elanhv515rc.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T16:57:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider removing `All rights reserved.` to match the updated ChromiumOS copyright header format (as you did in `fingerprint_elanhv515rc_config.h`).",
+      "isAi": true,
+      "revId": "3dd03f9b8a7db5f479512e17a519fc25fdf485e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
