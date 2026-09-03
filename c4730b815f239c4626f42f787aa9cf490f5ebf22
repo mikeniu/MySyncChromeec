@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed3815c3_81993337",
+        "filename": "zephyr/test/drivers/host_cmd/src/host_command.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-03T22:05:28Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: This looks like an off-by-one error. `test_resp-\u003edata_len + sizeof(*test_resp)` gives the exact total size of the response, which means it corresponds to the index of the very first unused byte in the buffer. \n\nBy starting the loop at `+ 1`, this check skips validating the first trailing byte. It should likely be:\n`for (i \u003d test_resp-\u003edata_len + sizeof(*test_resp);`",
+      "range": {
+        "startLine": 468,
+        "startChar": 0,
+        "endLine": 468,
+        "endChar": 0
+      },
+      "revId": "c4730b815f239c4626f42f787aa9cf490f5ebf22",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
