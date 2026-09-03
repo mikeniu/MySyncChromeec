@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bb8b109_b3e9018b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T20:04:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/d66e03a0-3d7e-4ea1-b9d6-5bfa9528535e)]\n\n### Review Summary\n\n*   **Functionality:** The patch addresses the bug correctly by wrapping the byte-by-byte OTP key programming sequence with `irq_lock()` and `irq_unlock()`. However, there is a critical bug in `chip/host/otp_key.c` where the error path returns without unlocking interrupts, which could lead to a system hang.\n*   **Security:** No security vulnerabilities are introduced. The use of interrupt locking during sensitive timing-critical cryptographic operations is a standard and secure practice.\n*   **Style:** The code conforms nicely to standard EC/Zephyr coding conventions.\n*   **Consistency:** The fix for the error path unlock was applied in `zephyr/shim/chip/npcx/otp_key.c` but missed in `chip/host/otp_key.c`.\n*   **Testing \u0026 Test Coverage:** Excellent. The mock `otpi_write` asserts that interrupts are locked, validating the fix directly.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped, addressing a single specific issue with appropriate test modifications.\n\nTAG\u003dagy\nCONV\u003dd66e03a0-3d7e-4ea1-b9d6-5bfa9528535e",
+      "isAi": true,
+      "revId": "b41d4d6806c21b77f9a40794070c04e94775fccf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32cf9f91_5095c5e8",
+        "filename": "chip/host/otp_key.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-03T20:04:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Bug**: If `otpi_write` fails, the function returns without unlocking interrupts. This will leave the system with interrupts locked, likely causing a system freeze.\n\nPlease add `irq_unlock(key);` before the return, similar to how it was handled in `zephyr/shim/chip/npcx/otp_key.c`.",
+      "isAi": true,
+      "revId": "b41d4d6806c21b77f9a40794070c04e94775fccf",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
