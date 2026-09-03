@@ -492,6 +492,54 @@ static bool shell_is_active(void)
 	       shell_zephyr->ctx->state == SHELL_STATE_ACTIVE;
 }
 
+extern struct k_work_q k_sys_work_q;
+
+static inline bool is_sysworkq_thread(void)
+{
+	k_tid_t sysworkq_tid = k_work_queue_thread_get(&k_sys_work_q);
+	return (sysworkq_tid != NULL) && (k_current_get() == sysworkq_tid);
+}
+
+static void zephyr_shell_write(const struct shell *sh, const char *buff,
+			       size_t size)
+{
+	size_t written;
+	const char *p = buff;
+	const char *end = buff + size;
+
+	while (p < end) {
+		const char *nl = memchr(p, '\n', end - p);
+		if (nl != NULL) {
+			size_t len = nl - p;
+			if (len > 0 && p[len - 1] == '\r') {
+				len--;
+			}
+			if (len > 0) {
+				if (sh->iface->api->write(sh->iface, p, len,
+							  &written) < 0 ||
+				    written < len) {
+					break;
+				}
+			}
+			const char *eol =
+				(sh->shell_flag & SHELL_FLAG_OLF_CRLF) ?
+					"\r\n" :
+					"\n";
+			size_t eol_len =
+				(sh->shell_flag & SHELL_FLAG_OLF_CRLF) ? 2 : 1;
+			if (sh->iface->api->write(sh->iface, eol, eol_len,
+						  &written) < 0 ||
+			    written < eol_len) {
+				break;
+			}
+			p = nl + 1;
+		} else {
+			sh->iface->api->write(sh->iface, p, end - p, &written);
+			break;
+		}
+	}
+}
+
 static void zephyr_print(const char *buff, size_t size)
 {
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_LOG)) {
@@ -518,11 +566,19 @@ static void zephyr_print(const char *buff, size_t size)
 		return;
 	}
 
-	/* Send all legacy output directly to the shell.  The shell UART
-	 * backend uses uart_fifo_fill(), while LOG_MODE_MINIMAL uses
-	 * printk() and calls uart_poll_out().
+	/* Send legacy output directly to the shell.
+	 * On k_sys_work_q, do not block: use K_NO_WAIT try-lock and direct
+	 * non-blocking transport write to avoid 50 ms semaphore timeouts
+	 * and potential infinite hangs on full TX ring buffers.
 	 */
-	shell_fprintf(shell_zephyr, SHELL_NORMAL, "%s", buff);
+	if (is_sysworkq_thread()) {
+		if (k_sem_take(&shell_zephyr->ctx->lock_sem, K_NO_WAIT) == 0) {
+			zephyr_shell_write(shell_zephyr, buff, size);
+			k_sem_give(&shell_zephyr->ctx->lock_sem);
+		}
+	} else {
+		shell_fprintf(shell_zephyr, SHELL_NORMAL, "%s", buff);
+	}
 
 	/* Capture legacy output into the console buffer read by the AP.
 	 */
