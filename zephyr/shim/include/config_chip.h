@@ -1766,11 +1766,6 @@ extern char mock_end_of_ram_data[CONFIG_PRESERVED_END_OF_RAM_SIZE];
 #define CONFIG_USB_PRL_SM
 #endif
 
-#undef CONFIG_USB_PE_SM
-#ifdef CONFIG_PLATFORM_EC_USB_PE_SM
-#define CONFIG_USB_PE_SM
-#endif
-
 #undef CONFIG_USB_DPM_SM
 #ifdef CONFIG_PLATFORM_EC_USB_DPM_SM
 #define CONFIG_USB_DPM_SM
