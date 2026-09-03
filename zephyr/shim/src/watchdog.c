@@ -281,6 +281,18 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	panic_set_info_reg(pdata, exception_address);
 	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
 
+#if CONFIG_CPU_CORTEX_M
+	pdata->cm.frame[CORTEX_PANIC_FRAME_REGISTER_R0] = esf->basic.r0;
+	pdata->cm.frame[CORTEX_PANIC_FRAME_REGISTER_R1] = esf->basic.r1;
+	pdata->cm.frame[CORTEX_PANIC_FRAME_REGISTER_R2] = esf->basic.r2;
+	pdata->cm.frame[CORTEX_PANIC_FRAME_REGISTER_R3] = esf->basic.r3;
+	pdata->cm.frame[CORTEX_PANIC_FRAME_REGISTER_R12] = esf->basic.r12;
+	pdata->cm.frame[CORTEX_PANIC_FRAME_REGISTER_LR] = esf->basic.lr;
+	pdata->cm.frame[CORTEX_PANIC_FRAME_REGISTER_PC] = esf->basic.pc;
+	pdata->cm.frame[CORTEX_PANIC_FRAME_REGISTER_PSR] = esf->basic.xpsr;
+	pdata->flags |= PANIC_DATA_FLAG_FRAME_VALID;
+#endif
+
 	panic_data_finalize(pdata);
 }
 
