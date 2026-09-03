@@ -146,11 +146,10 @@ static bool pd_task_loop(int port)
 		dpm_run(port, evt, tc_get_pd_enabled(port));
 
 	/* Run policy engine state machine */
-	if (IS_ENABLED(CONFIG_USB_PE_SM))
-		pe_run(port, evt, tc_get_pd_enabled(port));
+	pe_run(port, evt, tc_get_pd_enabled(port));
 
 	/* Run protocol state machine */
-	if (IS_ENABLED(CONFIG_USB_PRL_SM) || IS_ENABLED(CONFIG_TEST_USB_PE_SM))
+	if (IS_ENABLED(CONFIG_USB_PRL_SM))
 		prl_run(port, evt, tc_get_pd_enabled(port));
 
 	/* Run TypeC state machine */
