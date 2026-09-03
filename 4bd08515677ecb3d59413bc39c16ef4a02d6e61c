@@ -16,6 +16,23 @@
       "message": "I still need to re-validate this, and that\u0027s currently blocked on S0ix failures.",
       "revId": "4bd08515677ecb3d59413bc39c16ef4a02d6e61c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9e14a1d_a4f39d10",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-03T20:44:16Z",
+      "side": 1,
+      "message": "In extensive testing with this CL and the port 80 optimization, I\u0027m not seeing any watchdog resets. It may be possible to improve the maximum watchdog reload time further by tuning the minimum deep sleep residency. See following CL.",
+      "revId": "4bd08515677ecb3d59413bc39c16ef4a02d6e61c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
