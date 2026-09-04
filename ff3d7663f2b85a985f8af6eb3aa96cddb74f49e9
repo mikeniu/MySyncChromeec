@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27eb3f12_4f3f9d89",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-04T23:43:29Z",
+      "side": 1,
+      "message": "Yes. See bug comment or commit message for tl;dr.",
+      "parentUuid": "f9bd7c63_c482fc43",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 4
+      },
+      "revId": "ff3d7663f2b85a985f8af6eb3aa96cddb74f49e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6298fd52_7cc936d8",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-01T23:03:26Z",
       "side": 1,
       "message": "Nit - line length.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 91
+      },
+      "revId": "ff3d7663f2b85a985f8af6eb3aa96cddb74f49e9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08330136_11692579",
+        "filename": "zephyr/boards/google/realtek/realtek.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-04T23:43:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6298fd52_7cc936d8",
       "range": {
         "startLine": 27,
         "startChar": 0,
