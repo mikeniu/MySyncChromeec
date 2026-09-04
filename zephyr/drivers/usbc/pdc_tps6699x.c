@@ -3232,11 +3232,12 @@ static void tps_start_thread(const struct device *dev)
 	k_thread_start(data->thread);
 }
 
-static bool tps_is_init_done(const struct device *dev)
+static enum pdc_driver_init_state_t tps_is_init_done(const struct device *dev)
 {
 	struct pdc_data_t *data = dev->data;
 
-	return data->init_done;
+	return data->init_done ? PDC_DRIVER_INIT_STATE_SUCCESS :
+				 PDC_DRIVER_INIT_STATE_WAIT;
 }
 
 static int tps_get_pch_data_status(const struct device *dev, uint8_t port_num,
