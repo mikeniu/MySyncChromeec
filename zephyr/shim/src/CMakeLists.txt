@@ -146,6 +146,7 @@ if(CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
       ${PLATFORM_EC}/include
       ${PLATFORM_EC}/zephyr/shim/chip/${CHIP}/include
       ${PLATFORM_EC}/zephyr/shim/include
+      ${PLATFORM_EC}/zephyr/subsys/hdlc_transport/include
     PUBLIC_DEPS
       pw_log_tokenized.handler
       pw_log_zephyr.tokenized_lib
