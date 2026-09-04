@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98a28b5d_7fe6bf69",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 34
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-04T21:25:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/57a2f65f-954c-4d41-bdcc-ba0c4e912180)]\n\n**Review Summary**\n* **Functionality**: The CL successfully implements the requested changes, updating the previously missed `test_fp_command_template_v1_commit_without_seed` test case to use `FP_TEMPLATE_LOAD` and `FP_TEMPLATE_DECRYPT`. The asynchronous polling works as intended.\n* **Security**: No security vulnerabilities introduced. Cryptographic operations are maintained correctly.\n* **Style**: Code style is consistent with the rest of the file and project guidelines.\n* **Testing \u0026 Test Coverage**: Test coverage is adequate. All template v0 tests have been migrated to the v1 protocol. A minor suggestion is left regarding uninitialized memory in one of the tests.\n* **CL Size \u0026 Scope**: The CL is small, well-scoped, and directly addresses the review feedback.",
+      "isAi": true,
+      "revId": "ade1dab63a978069d79e8962bab817b9c3721b89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbd11154_369a96c8",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 34
+      },
+      "lineNbr": 1108,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-04T21:25:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Minor: `info` is uninitialized here, but its fields (`nonce`, `encryption_salt`, `tag`) are copied into `enc_metadata_data` below. This results in copying uninitialized memory, which is undefined behavior and might cause test failures if run under memory sanitizers (MSAN).\n\nConsider initializing it to zero:\n```cpp\nstruct fp_auth_command_encryption_metadata info \u003d {};\n```",
+      "isAi": true,
+      "revId": "ade1dab63a978069d79e8962bab817b9c3721b89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
