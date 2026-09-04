@@ -35,6 +35,24 @@
       "isAi": true,
       "revId": "ade1dab63a978069d79e8962bab817b9c3721b89",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dc906eb_ea2cb7e8",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 34
+      },
+      "lineNbr": 1108,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-04T21:28:45Z",
+      "side": 1,
+      "message": "will do it in a follow up CL. It does not fit in this CL.",
+      "parentUuid": "bbd11154_369a96c8",
+      "revId": "ade1dab63a978069d79e8962bab817b9c3721b89",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
