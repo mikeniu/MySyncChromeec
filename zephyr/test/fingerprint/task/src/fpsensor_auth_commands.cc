@@ -136,17 +136,22 @@ struct __packed test_v0_template_layout {
 
 static void
 setup_and_encrypt_v0_template(struct test_v0_template_layout &params,
-			      uint8_t salt_fill, bool corrupt_tag)
+			      uint8_t salt_fill, bool corrupt_tag,
+			      bool encrypt = true)
 {
-	struct ec_params_fp_seed seed_params = {
-		.struct_version = FP_TEMPLATE_FORMAT_VERSION,
-		.reserved = 0,
-		.seed = { 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5,
-			  6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1 },
-	};
-	zassert_equal(test_send_host_command(EC_CMD_FP_SEED, 0, &seed_params,
-					     sizeof(seed_params), NULL, 0),
-		      EC_RES_SUCCESS);
+	if (encrypt) {
+		struct ec_params_fp_seed seed_params = {
+			.struct_version = FP_TEMPLATE_FORMAT_VERSION,
+			.reserved = 0,
+			.seed = { 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+				  1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1,
+				  2, 3, 4, 5, 6, 7, 8, 9, 0, 1 },
+		};
+		zassert_equal(
+			test_send_host_command(EC_CMD_FP_SEED, 0, &seed_params,
+					       sizeof(seed_params), NULL, 0),
+			EC_RES_SUCCESS);
+	}
 
 	set_test_fp_context({ 0, 1, 2, 3, 4, 5, 6, 7 });
 
@@ -161,22 +166,24 @@ setup_and_encrypt_v0_template(struct test_v0_template_layout &params,
 	std::ranges::fill(params.template_data, kTemplateFillByte);
 	std::ranges::fill(params.salt, salt_fill);
 
-	struct fp_auth_command_encryption_metadata info;
-	uint8_t *payload_start = params.template_data;
-	size_t payload_size =
-		sizeof(params.template_data) + sizeof(params.salt);
+	if (encrypt) {
+		struct fp_auth_command_encryption_metadata info;
+		uint8_t *payload_start = params.template_data;
+		size_t payload_size =
+			sizeof(params.template_data) + sizeof(params.salt);
 
-	encrypt_data_in_place(1, info, global_context.user_id,
-			      global_context.tpm_seed,
-			      { payload_start, payload_size });
+		encrypt_data_in_place(1, info, global_context.user_id,
+				      global_context.tpm_seed,
+				      { payload_start, payload_size });
 
-	std::ranges::copy(info.nonce, params.metadata.nonce);
-	std::ranges::copy(info.encryption_salt,
-			  params.metadata.encryption_salt);
-	std::ranges::copy(info.tag, params.metadata.tag);
+		std::ranges::copy(info.nonce, params.metadata.nonce);
+		std::ranges::copy(info.encryption_salt,
+				  params.metadata.encryption_salt);
+		std::ranges::copy(info.tag, params.metadata.tag);
 
-	if (corrupt_tag) {
-		params.metadata.tag[0] ^= 0x01;
+		if (corrupt_tag) {
+			params.metadata.tag[0] ^= 0x01;
+		}
 	}
 }
 
@@ -1696,6 +1703,20 @@ ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_v3)
 	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, &params,
 					     sizeof(params), NULL, 0),
 		      EC_RES_INVALID_PARAM);
+
+	zassert_equal(global_context.templ_valid, 0u);
+}
+
+ZTEST(fpsensor_auth_commands, test_fp_command_template_v0_commit_without_seed)
+{
+	struct test_v0_template_layout params{};
+
+	setup_and_encrypt_v0_template(params, kTestSaltNonTrivial, false,
+				      /*encrypt=*/false);
+
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 0, &params,
+					     sizeof(params), NULL, 0),
+		      EC_RES_UNAVAILABLE);
 
 	zassert_equal(global_context.templ_valid, 0u);
 }
