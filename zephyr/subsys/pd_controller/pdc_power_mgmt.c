@@ -3960,42 +3960,77 @@ static K_WORK_DELAYABLE_DEFINE(pdc_apply_power_state_policy_work,
 /**
  * @brief Returns true if all PDC port drivers have finished initializing
  *
- * @return bool True if all ports are ready, false if still pending.
+ * Note: this returns true once all PDC drivers have completed their
+ * initialization routines and are no longer pending. It does not check that all
+ * PDC drivers initialized successfully.
+ *
+ * @return bool True if all ports are done, false if still pending.
  */
 static bool pdc_all_ports_ready(void)
 {
 	int num_ports = pdc_power_mgmt_get_usb_pd_port_count();
 
 	for (uint8_t i = 0; i < num_ports; i++) {
-		if (!pdc_is_init_done(pdc_data[i]->port.pdc)) {
+		if (pdc_is_init_done(pdc_data[i]->port.pdc) ==
+		    PDC_DRIVER_INIT_STATE_WAIT) {
+			/* Result pending: driver is still attempting to
+			 * initialize. */
 			return false;
 		}
 	}
 	return true;
 }
 
+/**
+ * @brief Return a string description of an `enum pdc_driver_init_state_t` value
+ */
+static const char *pdc_driver_init_state_to_str(enum pdc_driver_init_state_t s)
+{
+	switch (s) {
+	case PDC_DRIVER_INIT_STATE_WAIT:
+		return "waiting";
+	case PDC_DRIVER_INIT_STATE_SUCCESS:
+		return "success";
+	case PDC_DRIVER_INIT_STATE_FAILED:
+		return "failed";
+	default:
+		return "unknown";
+	}
+}
+
 static enum smf_state_result pdc_init_run(void *obj)
 {
 	struct pdc_port_t *port = (struct pdc_port_t *)obj;
 	const struct pdc_config_t *const config = port->dev->config;
+	enum pdc_driver_init_state_t drv_state;
 
 	switch (port->init_local_state) {
 	case INIT_WAIT_FOR_READY:
-		if (!pdc_is_init_done(port->pdc)) {
-			/* Still waiting on driver to be ready */
+		drv_state = pdc_is_init_done(port->pdc);
+		if (drv_state == PDC_DRIVER_INIT_STATE_WAIT) {
+			/* Still waiting on driver to be complete init */
 			return SMF_EVENT_HANDLED;
 		}
 
-		LOG_INF("C%d: PDC Subsystem Started", config->connector_num);
+		LOG_INF("C%d: PDC Subsystem Started (driver state: %s)",
+			config->connector_num,
+			pdc_driver_init_state_to_str(drv_state));
 
 		/* Apply policy in case of a late sysjump since we won't receive
 		 * the usual hook calls upon AP power state changes. Only called
-		 * once, after all port drivers are ready.
+		 * once, after all port drivers have finished initializing.
 		 */
 		if (system_jumped_late() && pdc_all_ports_ready()) {
 			LOG_INF("PD: Handling late sysjump");
 			pdc_apply_power_state_policy(
 				&pdc_apply_power_state_policy_work.work);
+		}
+
+		if (drv_state != PDC_DRIVER_INIT_STATE_SUCCESS) {
+			LOG_ERR("C%d: PDC driver init failed. Disable this port.",
+				config->connector_num);
+			set_pdc_state(port, PDC_DISABLED);
+			return SMF_EVENT_HANDLED;
 		}
 
 		port->init_local_state = INIT_SET_SBU_MUX_FORCED_DEBUG;
