@@ -6,6 +6,10 @@
 #include "console.h"
 #include "panic_log.h"
 
+#if defined(CONFIG_HDLC_TRANSPORT)
+#include "hdlc_transport.h"
+#endif
+
 #include <zephyr/kernel.h>
 #include <zephyr/spinlock.h>
 #include <zephyr/sys/printk.h>
@@ -125,12 +129,28 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 	// https://github.com/zephyrproject-rtos/zephyr/issues/59454 Zephyr
 	// frontend should protect messages from getting corrupted from multiple
 	// threads.
+#if defined(CONFIG_HDLC_TRANSPORT)
+	char buf[log_tokenized::kBase64EncodedBufferSizeBytes + 7];
+	size_t len = 0;
+	if (k_is_in_isr()) {
+		memcpy(buf, "[ISR]", 5);
+		len = 5;
+	}
+	memcpy(buf + len, base64_string.data(), base64_string.size());
+	len += base64_string.size();
+	k_spin_unlock(&lock, key);
+
+	if (hdlc_send_frame(HDLC_ADDR_LOG, buf, len) != 0) {
+		printk("%.*s", static_cast<int>(len), buf);
+	}
+#else
 	if (k_is_in_isr()) {
 		printk("[ISR]%s", base64_string.c_str());
 	} else {
 		printk("%s", base64_string.c_str());
 	}
 	k_spin_unlock(&lock, key);
+#endif
 }
 
 } // namespace pw::log_zephyr

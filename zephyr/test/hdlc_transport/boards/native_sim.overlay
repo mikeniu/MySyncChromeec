@@ -1,0 +1,20 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+
+/ {
+	chosen {
+		zephyr,shell-uart = &euart0;
+	};
+
+	euart0: uart_emul0 {
+		compatible = "zephyr,uart-emul";
+		status = "okay";
+		current-speed = <0>;
+		rx-fifo-size = <1024>;
+		tx-fifo-size = <1024>;
+	};
+};

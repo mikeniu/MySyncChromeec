@@ -899,6 +899,8 @@ function(ec_add_pw_log_zephyr_deps)
 	      pw_fsm.fsm_test
 	      pw_transport.service
 	      pw_transport.service_test
+	      pw_hdlc.decoder
+	      pw_hdlc.encoder
 	      vsensor.body_detection
       )
     if(TARGET ${lib} AND TARGET zephyr_generated_headers)
