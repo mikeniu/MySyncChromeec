@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15595d4f_0e909b5c",
+        "filename": "zephyr/Kconfig.defaults",
+        "patchSetId": 6
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-04T15:04:02Z",
+      "side": 0,
+      "message": "Is this change related to the CONFIG_HAS_HOSTCMD addition?",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 38
+      },
+      "revId": "eecb02795393fff54f2a048ebdc451121d72b9a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
