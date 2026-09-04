@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7c81f489_d57c6129",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-04T21:49:30Z",
+      "side": 1,
+      "message": "let me clean those in a separate CL.",
+      "parentUuid": "2e68dfd2_00cc4f8b",
+      "revId": "4816742aa58fc7e6dedc25ced2d3a4c82899487c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3d702239_233014eb",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
         "patchSetId": 7
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-04T21:41:04Z",
       "side": 1,
       "message": "Nit: In modern C++, the `struct` keyword is redundant here—can be simplified to `ec_fp_template_encryption_metadata metadata;`.",
+      "revId": "4816742aa58fc7e6dedc25ced2d3a4c82899487c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d196cdc_05054d2d",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-04T21:49:30Z",
+      "side": 1,
+      "message": "let me clean those in a separate CL.",
+      "parentUuid": "3d702239_233014eb",
       "revId": "4816742aa58fc7e6dedc25ced2d3a4c82899487c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -52,6 +88,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7603f2e_0f5c0b30",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 820,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-04T21:49:30Z",
+      "side": 1,
+      "message": "let me clean those in a separate CL.",
+      "parentUuid": "08c3d0b6_870ef4ef",
+      "revId": "4816742aa58fc7e6dedc25ced2d3a4c82899487c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27725a86_2fd39a9d",
@@ -65,6 +119,30 @@
       "writtenOn": "2026-09-04T21:37:26Z",
       "side": 1,
       "message": "You should be able to remove this and rely on the implicit conversion like it used to",
+      "range": {
+        "startLine": 823,
+        "startChar": 10,
+        "endLine": 823,
+        "endChar": 28
+      },
+      "revId": "4816742aa58fc7e6dedc25ced2d3a4c82899487c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91e458f8_d5b93fb1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 823,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-04T21:49:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27725a86_2fd39a9d",
       "range": {
         "startLine": 823,
         "startChar": 10,
