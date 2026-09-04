@@ -52,6 +52,15 @@
 	};
 };
 
+/* Empirically, this value balances deep sleep residency (61%) and
+ * maximum watchdog reload time (705 ms) during S0ix. Decreasing the
+ * value significantly increases reload time and less significantly
+ * decreases residency.
+ */
+&idle {
+	min-residency-us = <2000>;
+};
+
 &it8801_mfd {
 	irq-gpios = <RTS5912_GPIO085 GPIO_ACTIVE_LOW>;
 };
