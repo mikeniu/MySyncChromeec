@@ -26,21 +26,26 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_output_custom.h>
 #include <zephyr/shell/shell.h>
-#ifdef CONFIG_SHELL_BACKEND_DUMMY /* nocheck */
+#if defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
 #include <zephyr/shell/shell_dummy.h> /* nocheck */
+#endif
+#if defined(CONFIG_SHELL_BACKEND_HDLC)
+const struct shell *shell_backend_hdlc_get_ptr(void);
 #endif
 #include <zephyr/shell/shell_uart.h>
 #include <zephyr/sys/printk-hooks.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/sys/ring_buffer.h>
 
-#if !defined(CONFIG_SHELL_BACKEND_SERIAL) && \
-	!defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
-#error Must select either CONFIG_SHELL_BACKEND_SERIAL or \
-	CONFIG_SHELL_BACKEND_DUMMY /* nocheck */
+#if !defined(CONFIG_SHELL_BACKEND_SERIAL) &&    \
+	!defined(CONFIG_SHELL_BACKEND_DUMMY) && \
+	!defined(CONFIG_SHELL_BACKEND_HDLC) /* nocheck */
+#error Must select either CONFIG_SHELL_BACKEND_SERIAL, \
+	CONFIG_SHELL_BACKEND_DUMMY, or CONFIG_SHELL_BACKEND_HDLC /* nocheck */
 #endif
-#if defined(CONFIG_SHELL_BACKEND_SERIAL) && \
-	defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
+#if ((defined(CONFIG_SHELL_BACKEND_SERIAL) ? 1 : 0) + \
+     (defined(CONFIG_SHELL_BACKEND_DUMMY) ? 1 : 0) +  \
+     (defined(CONFIG_SHELL_BACKEND_HDLC) ? 1 : 0)) > 1
 #error Must select only one shell backend
 #endif
 
@@ -194,6 +199,10 @@ static void shell_init_from_work(struct k_work *work)
 	log_backend = CONFIG_SHELL_BACKEND_SERIAL_LOG_LEVEL > 0;
 	if (CONFIG_SHELL_BACKEND_SERIAL_LOG_LEVEL <= LOG_LEVEL_DBG)
 		level = CONFIG_SHELL_BACKEND_SERIAL_LOG_LEVEL;
+#elif defined(CONFIG_SHELL_BACKEND_HDLC)
+	/* Shell is NOT the log backend; dedicated HDLC log backend is used */
+	log_backend = false;
+	level = 0;
 #endif
 
 	/* Initialize the shell and re-enable both RX and TX */
@@ -357,6 +366,8 @@ static int init_ec_shell(void)
 	shell_zephyr = shell_backend_uart_get_ptr();
 #elif defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
 	shell_zephyr = shell_backend_dummy_get_ptr(); /* nocheck */
+#elif defined(CONFIG_SHELL_BACKEND_HDLC)
+	shell_zephyr = shell_backend_hdlc_get_ptr();
 #else
 #error A shell backend must be enabled
 #endif

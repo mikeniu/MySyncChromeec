@@ -285,7 +285,8 @@ enum {
 		())                                                     \
 	COND_CODE_1(CONFIG_SHELL_BACKEND_SERIAL, (fn(SHELL)),           \
 		(COND_CODE_1(CONFIG_SHELL_BACKEND_DUMMY, (fn(SHELL)),   \
-		())))                                                   \
+		(COND_CODE_1(CONFIG_SHELL_BACKEND_HDLC, (fn(SHELL)),    \
+		())))))                                                 \
 	COND_CODE_1(CONFIG_AP_PWRSEQ, (fn(AP_PWRSEQ)), ())              \
 	fn(SYSWORKQ)                                                    \
 	fn(IDLE)

@@ -57,7 +57,8 @@
 #endif
 
 #if (defined(CONFIG_SHELL_BACKEND_SERIAL) || \
-     defined(CONFIG_SHELL_BACKEND_DUMMY))
+     defined(CONFIG_SHELL_BACKEND_DUMMY) ||  \
+     defined(CONFIG_SHELL_BACKEND_HDLC))
 #define HAS_TASK_SHELL 1
 #endif
 
