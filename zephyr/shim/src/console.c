@@ -26,21 +26,26 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_output_custom.h>
 #include <zephyr/shell/shell.h>
-#ifdef CONFIG_SHELL_BACKEND_DUMMY /* nocheck */
+#if defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
 #include <zephyr/shell/shell_dummy.h> /* nocheck */
+#endif
+#if defined(CONFIG_SHELL_BACKEND_HDLC)
+#include "hdlc_transport.h"
 #endif
 #include <zephyr/shell/shell_uart.h>
 #include <zephyr/sys/printk-hooks.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/sys/ring_buffer.h>
 
-#if !defined(CONFIG_SHELL_BACKEND_SERIAL) && \
+#if !defined(CONFIG_SHELL_BACKEND_SERIAL) &&   \
+	!defined(CONFIG_SHELL_BACKEND_HDLC) && \
 	!defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
-#error Must select either CONFIG_SHELL_BACKEND_SERIAL or \
-	CONFIG_SHELL_BACKEND_DUMMY /* nocheck */
+#error Must select either CONFIG_SHELL_BACKEND_SERIAL, \
+	CONFIG_SHELL_BACKEND_HDLC, or CONFIG_SHELL_BACKEND_DUMMY /* nocheck */
 #endif
-#if defined(CONFIG_SHELL_BACKEND_SERIAL) && \
-	defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
+#if ((defined(CONFIG_SHELL_BACKEND_SERIAL) ? 1 : 0) + \
+     (defined(CONFIG_SHELL_BACKEND_HDLC) ? 1 : 0) +   \
+     (defined(CONFIG_SHELL_BACKEND_DUMMY) ? 1 : 0)) > 1 /* nocheck */
 #error Must select only one shell backend
 #endif
 
@@ -190,11 +195,10 @@ static void shell_init_from_work(struct k_work *work)
 	uint32_t level = CONFIG_LOG_MAX_LEVEL;
 	ARG_UNUSED(work);
 
-#ifdef CONFIG_SHELL_BACKEND_SERIAL
+#if defined(CONFIG_SHELL_BACKEND_SERIAL)
 	log_backend = CONFIG_SHELL_BACKEND_SERIAL_LOG_LEVEL > 0;
 	if (CONFIG_SHELL_BACKEND_SERIAL_LOG_LEVEL <= LOG_LEVEL_DBG)
 		level = CONFIG_SHELL_BACKEND_SERIAL_LOG_LEVEL;
-#endif
 
 	/* Initialize the shell and re-enable both RX and TX */
 	shell_init(shell_zephyr, uart_shell_dev, shell_cfg_flags, log_backend,
@@ -203,6 +207,21 @@ static void shell_init_from_work(struct k_work *work)
 #if defined(CONFIG_UART_INTERRUPT_DRIVEN)
 	uart_irq_rx_enable(uart_shell_dev);
 	uart_irq_tx_enable(uart_shell_dev);
+#endif
+
+#elif defined(CONFIG_SHELL_BACKEND_HDLC)
+	/* Shell is NOT the log backend; dedicated HDLC log backend is used */
+	log_backend = false;
+	level = 0;
+
+	shell_init(shell_zephyr, NULL, shell_cfg_flags, log_backend, level);
+
+#if defined(CONFIG_UART_INTERRUPT_DRIVEN)
+	hdlc_transport_restore_irq();
+#endif
+
+#elif defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
+	shell_init(shell_zephyr, NULL, shell_cfg_flags, false, 0); /* nocheck */
 #endif
 
 	/* Notify the init signal that initialization is complete */
@@ -357,6 +376,8 @@ static int init_ec_shell(void)
 	shell_zephyr = shell_backend_uart_get_ptr();
 #elif defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
 	shell_zephyr = shell_backend_dummy_get_ptr(); /* nocheck */
+#elif defined(CONFIG_SHELL_BACKEND_HDLC)
+	shell_zephyr = shell_backend_hdlc_get_ptr();
 #else
 #error A shell backend must be enabled
 #endif

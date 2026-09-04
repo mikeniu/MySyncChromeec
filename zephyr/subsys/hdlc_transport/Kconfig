@@ -1,0 +1,116 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+menuconfig HDLC_TRANSPORT
+	bool "HDLC Transport over UART"
+	select CPP
+	select REQUIRES_FULL_LIBCPP
+	select PIGWEED_BYTES
+	select PIGWEED_CHECKSUM
+	select PIGWEED_RESULT
+	select PIGWEED_SPAN
+	select PIGWEED_STATUS
+	select PIGWEED_STREAM
+	help
+	  Enables HDLC frame encapsulation over the EC UART interface using
+	  Pigweed (pw_hdlc). Multiplexes shell, log, and RPC channels.
+
+if HDLC_TRANSPORT
+
+config HDLC_TRANSPORT_MAX_FRAME_SIZE
+	int "Maximum HDLC frame size in bytes"
+	default 1024
+	help
+	  Maximum size of unescaped frame payload that the decoder can process.
+
+config HDLC_TRANSPORT_RX_BUF_SIZE
+	int "HDLC UART RX ring buffer size in bytes"
+	default 512
+	help
+	  Size of ring buffer between UART ISR and HDLC RX decoder thread.
+
+config HDLC_TRANSPORT_RX_STACK_SIZE
+	int "HDLC RX thread stack size"
+	default 2048
+	help
+	  Stack size for the HDLC RX decoder worker thread.
+
+config HDLC_TRANSPORT_RX_PRIORITY
+	int "HDLC RX thread priority (preemptive)"
+	default 1
+	help
+	  Priority of the HDLC RX thread.
+
+config HDLC_TRANSPORT_INIT_PRIORITY
+	int "HDLC transport initialization priority"
+	default 60
+	help
+	  Init priority for HDLC transport (runs during POST_KERNEL).
+
+config SHELL_BACKEND_HDLC
+	bool "HDLC shell backend"
+	depends on SHELL
+	default y if !SHELL_BACKEND_SERIAL
+	help
+	  Enable HDLC-encapsulated Zephyr shell on channel HDLC_ADDR_SHELL (2).
+
+if SHELL_BACKEND_HDLC
+
+config SHELL_PROMPT_HDLC
+	string "HDLC shell prompt"
+	default "uart:~$ "
+	help
+	  Command prompt for HDLC shell backend.
+
+config SHELL_BACKEND_HDLC_RX_RING_BUFFER_SIZE
+	int "HDLC shell RX ring buffer size"
+	default 256
+	help
+	  Size of ring buffer for incoming shell keystrokes/data.
+
+config SHELL_BACKEND_HDLC_LOG_MESSAGE_QUEUE_TIMEOUT
+	int "Log message queue timeout in ms"
+	default 100
+
+config SHELL_BACKEND_HDLC_LOG_MESSAGE_QUEUE_SIZE
+	int "Log message queue size"
+	default 10
+
+config SHELL_BACKEND_HDLC_INIT_PRIORITY
+	int "HDLC shell backend init priority"
+	default 90
+	help
+	  Init priority for HDLC shell backend.
+
+endif # SHELL_BACKEND_HDLC
+
+config LOG_BACKEND_HDLC
+	bool "HDLC logging backend"
+	depends on LOG && !LOG_MODE_MINIMAL
+	select LOG_OUTPUT
+	default y
+	help
+	  Enable dedicated HDLC logging backend on channel HDLC_ADDR_LOG (1).
+
+if LOG_BACKEND_HDLC
+
+config LOG_BACKEND_HDLC_AUTOSTART
+	bool "Automatically start HDLC logging backend"
+	default y
+
+config LOG_BACKEND_HDLC_BUFFER_SIZE
+	int "HDLC log line buffer size"
+	default 256
+	help
+	  Size of formatted log line buffer before HDLC encapsulation.
+
+config LOG_BACKEND_HDLC_OUTPUT_DEFAULT
+	int "Default log output format"
+	default 0
+	help
+	  Log format (0 = standard text).
+
+endif # LOG_BACKEND_HDLC
+
+endif # HDLC_TRANSPORT
