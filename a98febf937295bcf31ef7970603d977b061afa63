@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8f7f483_f489f125",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-04T18:58:15Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a5d84fc5_66b0213d",
+      "revId": "a98febf937295bcf31ef7970603d977b061afa63",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "262bf1ef_b1fa89d7",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Using `struct ec_params_fp_template_v1` as a member here introduces unintended padding that breaks the wire format.\n\nBecause `ec_params_fp_template_v1` has an `__ec_align4` attribute in its definition, its size is padded from 9 bytes to 12 bytes. As a result, the `metadata` field will be placed at offset 12, whereas the actual `data` payload in `ec_params_fp_template_v1` starts at offset 9.\n\nThis will cause the `static_assert` below to fail during compilation, and more importantly, it results in an incorrect wire format payload.\n\nTo maintain the exact wire format without padding, you should list the fields individually, similar to how it was done for `test_v0_template_layout`:\n\n```cpp\nstruct __packed test_v1_template_layout {\n\tuint32_t offset;\n\tuint32_t size;\n\tuint8_t cmd;\n\tstruct ec_fp_template_encryption_metadata metadata;\n\tuint8_t template_data[sizeof(fp_template[0])];\n\tuint8_t salt[sizeof(global_context.fp_positive_match_salt[0])];\n};\n```\n(You will also need to update the references from `params.header.offset` to `params.offset`, etc.)",
       "isAi": true,
+      "revId": "a98febf937295bcf31ef7970603d977b061afa63",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d56e86d_c052c094",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 785,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-04T18:58:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "262bf1ef_b1fa89d7",
       "revId": "a98febf937295bcf31ef7970603d977b061afa63",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
