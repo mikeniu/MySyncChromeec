@@ -3973,6 +3973,16 @@ static void pdc_apply_power_state_policy(struct k_work *work)
 			enforce_pd_chipset_shutdown_policy_1(i);
 		}
 	}
+
+	/*
+	 * Wake all PDC port threads immediately to ensure power state and
+	 * DRP policy updates are processed without relying on timer expiry.
+	 */
+	for (int i = 0; i < port_count; i++) {
+		if (pdc_power_mgmt_is_pdc_port_valid(i)) {
+			k_event_post(&pdc_data[i]->port.sm_event, PDC_SM_EVENT);
+		}
+	}
 }
 
 static K_WORK_DELAYABLE_DEFINE(pdc_apply_power_state_policy_work,
