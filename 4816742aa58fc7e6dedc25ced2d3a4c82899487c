@@ -3,6 +3,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2e68dfd2_00cc4f8b",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-04T21:41:04Z",
+      "side": 1,
+      "message": "Nit: Consider using `FP_TEMPLATE_FORMAT_VERSION` here instead of the magic number `4`, matching line 142 in `setup_and_encrypt_v0_template`.",
+      "revId": "4816742aa58fc7e6dedc25ced2d3a4c82899487c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d702239_233014eb",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-04T21:41:04Z",
+      "side": 1,
+      "message": "Nit: In modern C++, the `struct` keyword is redundant here—can be simplified to `ec_fp_template_encryption_metadata metadata;`.",
+      "revId": "4816742aa58fc7e6dedc25ced2d3a4c82899487c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08c3d0b6_870ef4ef",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 820,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-04T21:41:04Z",
+      "side": 1,
+      "message": "Nit: Redundant `struct` keyword here as well. In addition, consider value-initializing it (`fp_auth_command_encryption_metadata info{};`) so uninitialized memory isn\u0027t passed down.",
+      "revId": "4816742aa58fc7e6dedc25ced2d3a4c82899487c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "27725a86_2fd39a9d",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
         "patchSetId": 7
