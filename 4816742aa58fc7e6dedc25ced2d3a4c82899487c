@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27725a86_2fd39a9d",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 7
+      },
+      "lineNbr": 823,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-04T21:37:26Z",
+      "side": 1,
+      "message": "You should be able to remove this and rely on the implicit conversion like it used to",
+      "range": {
+        "startLine": 823,
+        "startChar": 10,
+        "endLine": 823,
+        "endChar": 28
+      },
+      "revId": "4816742aa58fc7e6dedc25ced2d3a4c82899487c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
