@@ -778,64 +778,58 @@ struct v1_template_options {
 	bool encrypt = true;
 };
 
+/*
+ * Packed wire format of the EC_CMD_FP_TEMPLATE v1 load request payload.
+ */
+struct __packed test_v1_template_layout {
+	uint32_t offset;
+	uint32_t size;
+	uint8_t cmd;
+	struct ec_fp_template_encryption_metadata metadata;
+	uint8_t template_data[sizeof(fp_template[0])];
+	uint8_t salt[sizeof(global_context.fp_positive_match_salt[0])];
+};
+
+static_assert(offsetof(test_v1_template_layout, metadata) ==
+		      offsetof(ec_params_fp_template_v1, data),
+	      "v1 template layout metadata offset mismatch");
+
 static void load_v1_template(const v1_template_options &opts = {})
 {
-	constexpr size_t head_size = offsetof(ec_params_fp_template_v1, data);
-	constexpr size_t metadata_size =
-		sizeof(ec_fp_template_encryption_metadata);
-	constexpr size_t template_size = sizeof(fp_template[0]);
-	constexpr size_t salt_size =
-		sizeof(global_context.fp_positive_match_salt[0]);
+	test_v1_template_layout params{};
 
-	size_t payload_size =
-		template_size + (opts.include_salt ? salt_size : 0);
-	size_t params_size = head_size + metadata_size + payload_size;
+	const size_t payload_size =
+		sizeof(params.template_data) +
+		(opts.include_salt ? sizeof(params.salt) : 0);
+	const size_t total_size =
+		offsetof(test_v1_template_layout, template_data) + payload_size;
 
-	std::array<uint8_t,
-		   head_size + metadata_size + template_size + salt_size>
-		buffer{};
+	params.offset = 0;
+	params.size = static_cast<uint32_t>(
+		total_size - offsetof(test_v1_template_layout, metadata));
+	params.cmd = FP_TEMPLATE_LOAD;
 
-	uint8_t *head_ptr = buffer.data();
-	uint8_t *enc_metadata_ptr = head_ptr + head_size;
-	uint8_t *template_ptr = enc_metadata_ptr + metadata_size;
-	uint8_t *salt_ptr = template_ptr + template_size;
+	params.metadata.struct_version = opts.struct_version;
 
-	struct ec_params_fp_template_v1 head_data = {
-		.offset = 0,
-		.size = static_cast<uint32_t>(params_size - head_size),
-		.cmd = FP_TEMPLATE_LOAD,
-	};
-	memcpy(head_ptr, &head_data, head_size);
-
-	std::span template_data(template_ptr, template_size);
-	std::ranges::fill(template_data, 0xc4);
-
+	std::ranges::fill(params.template_data, kTemplateFillByte);
 	if (opts.include_salt) {
-		std::span salt_data(salt_ptr, salt_size);
-		std::ranges::fill(salt_data, opts.salt_fill);
+		std::ranges::fill(params.salt, opts.salt_fill);
 	}
-
-	struct ec_fp_template_encryption_metadata enc_metadata_data{
-		.struct_version = opts.struct_version,
-	};
 
 	if (opts.encrypt) {
 		struct fp_auth_command_encryption_metadata info;
 		encrypt_data_in_place(1, info, global_context.user_id,
 				      global_context.tpm_seed,
-				      { template_ptr, payload_size });
+				      { params.template_data, payload_size });
 
-		std::ranges::copy(info.nonce, enc_metadata_data.nonce);
+		std::ranges::copy(info.nonce, params.metadata.nonce);
 		std::ranges::copy(info.encryption_salt,
-				  enc_metadata_data.encryption_salt);
-		std::ranges::copy(info.tag, enc_metadata_data.tag);
+				  params.metadata.encryption_salt);
+		std::ranges::copy(info.tag, params.metadata.tag);
 	}
 
-	memcpy(enc_metadata_ptr, &enc_metadata_data, metadata_size);
-
-	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1,
-					     buffer.data(), params_size, NULL,
-					     0),
+	zassert_equal(test_send_host_command(EC_CMD_FP_TEMPLATE, 1, &params,
+					     total_size, nullptr, 0),
 		      EC_RES_SUCCESS);
 }
 
