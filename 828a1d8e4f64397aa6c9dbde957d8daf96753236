@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "505b3dc3_a78ba97e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-05T03:48:04Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7e1d7a69_63458aa3",
+      "revId": "828a1d8e4f64397aa6c9dbde957d8daf96753236",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11c1e98f_58a5f201",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aebb58bf_629c346b",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-05T03:48:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11c1e98f_58a5f201",
+      "revId": "828a1d8e4f64397aa6c9dbde957d8daf96753236",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34ea0cb3_c6374cec",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] To be consistent with standardizing local struct zero-initialization (e.g. `ec_response_fp_establish_pairing_key_keygen keygen_response;` on line 219 could be `... keygen_response{};`, and similarly `ec_params_fp_load_pairing_key load_params{};` here), consider value-initializing this struct to avoid any potential undefined behavior from uninitialized padding or additional fields.",
       "isAi": true,
+      "revId": "828a1d8e4f64397aa6c9dbde957d8daf96753236",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec815ded_e4307bac",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-05T03:48:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34ea0cb3_c6374cec",
       "revId": "828a1d8e4f64397aa6c9dbde957d8daf96753236",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
