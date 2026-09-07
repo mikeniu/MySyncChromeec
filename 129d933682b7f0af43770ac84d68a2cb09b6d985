@@ -22,6 +22,30 @@
       },
       "revId": "129d933682b7f0af43770ac84d68a2cb09b6d985",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4a741b9_781ad951",
+        "filename": "util/flash_ec",
+        "patchSetId": 4
+      },
+      "lineNbr": 1835,
+      "author": {
+        "id": 1153134
+      },
+      "writtenOn": "2026-09-07T08:43:35Z",
+      "side": 1,
+      "message": "This should be fine. Because compared with the original flow, this simply adds an extra EC reset action.",
+      "parentUuid": "a5e24149_f5c2ae85",
+      "range": {
+        "startLine": 1835,
+        "startChar": 0,
+        "endLine": 1835,
+        "endChar": 46
+      },
+      "revId": "129d933682b7f0af43770ac84d68a2cb09b6d985",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
