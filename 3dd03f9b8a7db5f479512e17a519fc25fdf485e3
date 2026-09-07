@@ -37,6 +37,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0be7482_1b933041",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_elanhv515rc_config.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-07T06:19:10Z",
+      "side": 1,
+      "message": "Fixed in PS2.",
+      "parentUuid": "8254b9e5_3b0f6ec3",
+      "revId": "3dd03f9b8a7db5f479512e17a519fc25fdf485e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4b95bbe_3470d184",
@@ -51,6 +69,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Consider removing `All rights reserved.` to match the updated ChromiumOS copyright header format (as you did in `fingerprint_elanhv515rc_config.h`).",
       "isAi": true,
+      "revId": "3dd03f9b8a7db5f479512e17a519fc25fdf485e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4a0300b_b5403780",
+        "filename": "zephyr/dts/bindings/fingerprint/elan.elanhv515rc.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-07T06:19:10Z",
+      "side": 1,
+      "message": "Fixed in PS2.",
+      "parentUuid": "c4b95bbe_3470d184",
       "revId": "3dd03f9b8a7db5f479512e17a519fc25fdf485e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
