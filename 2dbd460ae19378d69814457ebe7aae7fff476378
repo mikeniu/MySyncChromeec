@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31b108b9_b48e67bd",
+        "filename": "zephyr/boards/google/it8xxx2/Kconfig.defconfig",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-09-07T10:42:35Z",
+      "side": 1,
+      "message": "I think you could combine the conditions `default y if SOC_IT8XXX2_REG_SET_V2 \u0026\u0026 CROS_EC_RO`\n\nwould it make sense? just to avoid the if block with only one element inside",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 5
+      },
+      "revId": "2dbd460ae19378d69814457ebe7aae7fff476378",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
