@@ -62,7 +62,7 @@
 			enum-name = "GPIO_EC_INT_L";
 		};
 		gpio_ec_bkoff_odl: ec_bkoff_odl {
-			gpios = <&gpio8 0 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
+			gpios = <&gpio8 0 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
 		};
 		gpio_en_pp3300_z1: en_pp3300_z1 {
 			gpios = <&gpio8 5 (GPIO_OUTPUT)>;
