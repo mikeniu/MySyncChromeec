@@ -11,7 +11,7 @@
 
 #include <vector>
 
-void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
+void FpImageFrameParamsCache::populate_cache(uint32_t max_image_buffer_bytes)
 {
 	const size_t buffer_size =
 		sizeof(struct ec_response_fp_info_v3) +
@@ -39,10 +39,17 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 	for (uint8_t i = 0; i < num_types; ++i) {
 		const uint8_t type = params[i].fp_capture_type;
 		const uint32_t size = params[i].frame_size;
+		const uint32_t offset = params[i].image_data_offset_bytes;
 
-		if (size > max_frame_size_bytes) {
+		if (size > max_image_buffer_bytes) {
 			CPRINTF("Error: Type %u frame size (%u) exceeds max allowed (%u).",
-				type, size, max_frame_size_bytes);
+				type, size, max_image_buffer_bytes);
+			goto error_exit;
+		}
+
+		if (offset > max_image_buffer_bytes) {
+			CPRINTF("Error: Type %u image offset (%u) exceeds max buffer (%u).\n",
+				type, offset, max_image_buffer_bytes);
 			goto error_exit;
 		}
 
@@ -61,6 +68,7 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 
 		frame_params_[type] = {
 			.frame_size_bytes = size,
+			.image_data_offset_bytes = offset,
 		};
 	}
 
@@ -89,4 +97,17 @@ FpImageFrameParamsCache::get_frame_size(enum fp_capture_type capture_type) const
 	}
 
 	return frame_params_[capture_type].frame_size_bytes;
+}
+
+uint32_t FpImageFrameParamsCache::get_image_offset(
+	enum fp_capture_type capture_type) const
+{
+	if (static_cast<size_t>(capture_type) >= frame_params_.size()) {
+		CPRINTF("Error: Invalid fp_capture_type %d requested (max: %zu), "
+			"returning offset 0.\n",
+			capture_type, frame_params_.size());
+		return 0;
+	}
+
+	return frame_params_[capture_type].image_data_offset_bytes;
 }
