@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad4572b2_a893ba06",
+        "filename": "zephyr/test/drivers/keyboard_8042/src/keyboard_8042.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-08T17:49:26Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Function-scoped `extern` declarations are discouraged.\n\nAlso, is it strictly necessary to call `send_aux_data_to_host_deferred()` manually here? `send_aux_data_to_host_interrupt()` schedules it via `hook_call_deferred()`, which should naturally execute on the workqueue during the subsequent `k_sleep()`. If you can rely on the workqueue, you could remove both the manual calls (here and on line 549) and this `extern` declaration entirely. If you do need to keep the manual calls, please move the `extern` to the top of the file.",
+      "range": {
+        "startLine": 526,
+        "startChar": 0,
+        "endLine": 526,
+        "endChar": 0
+      },
+      "revId": "47003d69c16d8ed220e7381f25e06f81a8b599c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f7b5af0_9524a5b7",
+        "filename": "zephyr/test/drivers/keyboard_8042/src/keyboard_8042.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-08T17:49:26Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Just a heads up: writing `I8042_ENIRQ12` as the command byte data overwrites the entire byte (`controller_ram[0]`). This implicitly clears `I8042_AUX_DIS` (bit 5), which forcefully enables the AUX channel. This makes the `I8042_ENA_MOUSE` command on line 541 somewhat redundant. It\u0027s totally fine for the test, but just wanted to mention it.",
+      "range": {
+        "startLine": 545,
+        "startChar": 0,
+        "endLine": 545,
+        "endChar": 0
+      },
+      "revId": "47003d69c16d8ed220e7381f25e06f81a8b599c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
