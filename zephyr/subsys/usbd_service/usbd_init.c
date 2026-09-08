@@ -50,6 +50,21 @@ struct usb_msg_manager msg_manager = {
 };
 enum usbd_msg_type usb_message = USBD_MSG_MAX_NUMBER;
 
+static void usb_pm_notify(void)
+{
+	switch (usb_message) {
+	case USBD_MSG_RESUME:
+		hook_notify(HOOK_CHIPSET_RESUME);
+		break;
+	case USBD_MSG_SUSPEND:
+		hook_notify(HOOK_CHIPSET_SUSPEND);
+		break;
+	default:
+		break;
+	}
+}
+DECLARE_DEFERRED(usb_pm_notify);
+
 #if defined(CONFIG_CROS_EC_RO) && defined(CONFIG_USBD_HID_KEYBOARD)
 __overridable void keyboard_state_changed(int row, int col, int is_pressed)
 {
@@ -232,6 +247,12 @@ static int usb_device_init(void)
 	err = usbd_enable(&usb_device);
 	if (err) {
 		LOG_ERR("failed to enable device support");
+		goto error;
+	}
+
+	err = usb_msg_deferred_register(&usb_pm_notify_data);
+	if (err) {
+		LOG_ERR("failed to register pm deferred work");
 		goto error;
 	}
 
