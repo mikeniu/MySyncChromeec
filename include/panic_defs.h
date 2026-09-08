@@ -5,11 +5,8 @@
  * Panic handling macros and structures.
  */
 
-#if !defined(PLATFORM_EC_INCLUDE_PANIC_DEFS_H_) && \
-	!defined(__CROS_EC_PANIC_DEFS_H)
+#ifndef PLATFORM_EC_INCLUDE_PANIC_DEFS_H_
 #define PLATFORM_EC_INCLUDE_PANIC_DEFS_H_
-/* TODO(b/510249930): Remove this once all panic_defs.h copies are updated. */
-#define __CROS_EC_PANIC_DEFS_H
 
 #include <stdint.h>
 
