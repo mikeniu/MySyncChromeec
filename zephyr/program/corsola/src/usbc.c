@@ -14,6 +14,7 @@
 #include "hooks.h"
 #include "usb_charge.h"
 #include "usb_mux.h"
+#include "usb_pd.h"
 #include "usb_pd_tcpm.h"
 #include "usb_tc_sm.h"
 #include "usbc/usb_muxes.h"
@@ -74,6 +75,11 @@ uint8_t board_get_adjusted_usb_pd_port_count(void)
 	} else {
 		return CONFIG_USB_PD_PORT_MAX_COUNT - 1;
 	}
+}
+
+__override bool board_pd_port_num_is_valid(int port)
+{
+	return (port >= 0 && port < board_get_adjusted_usb_pd_port_count());
 }
 
 static void pd_set_dual_role_deferred(void)
