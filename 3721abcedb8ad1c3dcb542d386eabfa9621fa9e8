@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84780e93_21d28b0a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-09-08T16:06:46Z",
+      "side": 1,
+      "message": "Defer to Jon who is more familiar with our toolchain.",
+      "revId": "3721abcedb8ad1c3dcb542d386eabfa9621fa9e8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
