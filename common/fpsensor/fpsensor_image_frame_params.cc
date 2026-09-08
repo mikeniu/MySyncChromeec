@@ -11,7 +11,7 @@
 
 #include <vector>
 
-void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
+void FpImageFrameParamsCache::populate_cache(uint32_t max_image_buffer_bytes)
 {
 	const size_t buffer_size =
 		sizeof(struct ec_response_fp_info_v3) +
@@ -23,6 +23,7 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 
 	if (fp_sensor_get_info(info, buffer.size()) < 0) {
 		CPRINTF("Error: Failed to get fingerprint sensor info.\n");
+		frame_params_.fill({});
 		return;
 	}
 
@@ -40,10 +41,23 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 	for (uint8_t i = 0; i < num_types; ++i) {
 		const uint8_t type = params[i].fp_capture_type;
 		const uint32_t size = params[i].frame_size;
+		const uint32_t offset = params[i].image_data_offset_bytes;
 
-		if (size > max_frame_size_bytes) {
-			CPRINTF("Error: Type %u frame size (%u) exceeds max (%u).\n",
-				type, size, max_frame_size_bytes);
+		if (size == 0) {
+			CPRINTF("ERROR: Invalid 0 size for capture type %u.\n",
+				type);
+			goto error_exit;
+		}
+
+		if (size > max_image_buffer_bytes) {
+			CPRINTF("Error: Type %u frame size (%u) exceeds max buffer (%u).\n",
+				type, size, max_image_buffer_bytes);
+			goto error_exit;
+		}
+
+		if (offset > max_image_buffer_bytes) {
+			CPRINTF("Error: Type %u image offset (%u) exceeds max buffer (%u).\n",
+				type, offset, max_image_buffer_bytes);
 			goto error_exit;
 		}
 
@@ -53,14 +67,9 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 			goto error_exit;
 		}
 
-		if (size == 0) {
-			CPRINTF("ERROR: Invalid 0 size for capture type %u.\n",
-				type);
-			goto error_exit;
-		}
-
 		frame_params_[type] = {
 			.frame_size_bytes = size,
+			.image_data_offset_bytes = offset,
 		};
 	}
 
@@ -73,8 +82,8 @@ error_exit:
 uint32_t
 FpImageFrameParamsCache::get_frame_size(enum fp_capture_type capture_type) const
 {
-	if (static_cast<size_t>(capture_type) >= frame_params_.size() ||
-	    capture_type < 0) {
+	if (capture_type < 0 ||
+	    static_cast<size_t>(capture_type) >= frame_params_.size()) {
 		CPRINTF("Error: Invalid fp_capture_type %d requested (max: %zu), "
 			"returning size 0.\n",
 			capture_type, frame_params_.size());
@@ -88,4 +97,18 @@ FpImageFrameParamsCache::get_frame_size(enum fp_capture_type capture_type) const
 	}
 
 	return frame_params_[capture_type].frame_size_bytes;
+}
+
+uint32_t FpImageFrameParamsCache::get_image_offset(
+	enum fp_capture_type capture_type) const
+{
+	if (capture_type < 0 ||
+	    static_cast<size_t>(capture_type) >= frame_params_.size()) {
+		CPRINTF("Error: Invalid fp_capture_type %d requested (max: %zu), "
+			"returning offset 0.\n",
+			capture_type, frame_params_.size());
+		return 0;
+	}
+
+	return frame_params_[capture_type].image_data_offset_bytes;
 }
