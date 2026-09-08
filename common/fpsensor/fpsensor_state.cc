@@ -11,7 +11,7 @@
 #include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
-#include "fpsensor/fpsensor_frame_size.h"
+#include "fpsensor/fpsensor_image_frame_params.h"
 #include "fpsensor/fpsensor_state.h"
 #include "fpsensor_driver.h"
 #include "fpsensor_matcher.h"
@@ -57,7 +57,7 @@ struct fpsensor_context global_context = {
 	.fp_events = 0,
 	.sensor_mode = 0,
 	.current_capture_type = FP_CAPTURE_TYPE_INVALID,
-	.fp_frame_size_cache = {},
+	.fp_image_frame_params_cache = {},
 	.tpm_seed = { 0 },
 	.user_id = { 0 },
 	.positive_match_secret_state = {
