@@ -20,6 +20,8 @@
 #include <zephyr/sys/reboot.h>
 #include <zephyr/sys/util.h>
 
+#include <soc_clock.h>
+
 LOG_MODULE_REGISTER(cros_system, LOG_LEVEL_ERR);
 
 #define RTK_SCCON_REG_BASE ((SYSTEM_Type *)(DT_REG_ADDR(DT_NODELABEL(sccon))))
@@ -197,6 +199,16 @@ static int cros_system_rtk_init(void)
 	uint32_t invalid_value = 0;
 	/* In order to determine if reset from watchdog */
 	uint32_t flag = 0;
+
+	/* Apply deep-sleep workaround for RTS5915-VF or earlier silicon
+	 * (b/515078423)
+	 */
+	ensure_otp_initialized();
+	if (cached_otp.version.main_version == 0 &&
+	    cached_otp.version.sub_version <= 5) {
+		disable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
+	}
+
 	/* check reset cause */
 	reset_cause = UNKNOWN_RST;
 
@@ -326,6 +338,13 @@ int cros_system_hibernate(uint32_t seconds, uint32_t microseconds)
 
 	return 0;
 }
+
+#ifdef CONFIG_PM
+uint64_t cros_system_deep_sleep_ticks(void)
+{
+	return rts5912_clock_get_sleep_ticks();
+}
+#endif
 
 SYS_INIT(cros_system_rtk_init, PRE_KERNEL_1, CONFIG_CROS_SYSTEM_INIT_PRIORITY);
 

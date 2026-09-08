@@ -269,3 +269,9 @@
 &pwr_sys_rst {
 	gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
 };
+
+/ {
+	chosen {
+		/delete-property/ zephyr,host-cmd-espi-backend;
+	};
+};

@@ -119,5 +119,20 @@ ZTEST(tcpc_raa489000, test_raa489000_get_rx_message_raw)
 				     RAA489000_PORT);
 }
 
+ZTEST(tcpc_raa489000, test_init_error)
+{
+	const struct emul *raa489000_emul = EMUL_DT_GET(RAA489000_EMUL_NODE);
+	struct i2c_common_emul_data *common_data =
+		emul_tcpci_generic_get_i2c_common_data(raa489000_emul);
+	const struct tcpm_drv *drv = tcpc_config[RAA489000_PORT].drv;
+
+	/* Fail reading POWER_STATUS during tcpci_tcpm_init to test error path
+	 */
+	i2c_common_emul_set_read_fail_reg(common_data, TCPC_REG_POWER_STATUS);
+	zassert_not_equal(EC_SUCCESS, drv->init(RAA489000_PORT));
+	i2c_common_emul_set_read_fail_reg(common_data,
+					  I2C_COMMON_EMUL_NO_FAIL_REG);
+}
+
 ZTEST_SUITE(tcpc_raa489000, drivers_predicate_post_main, NULL, NULL, NULL,
 	    NULL);

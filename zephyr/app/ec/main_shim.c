@@ -13,7 +13,9 @@ int main(void)
 {
 	ec_app_main();
 
-	if (IS_ENABLED(CONFIG_TASK_HOSTCMD_THREAD_MAIN)) {
+	if (IS_ENABLED(CONFIG_TASK_HOSTCMD_THREAD_MAIN) ||
+	    (IS_ENABLED(CONFIG_EC_HOST_CMD) &&
+	     !IS_ENABLED(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))) {
 		host_command_main();
 	} else if (IS_ENABLED(CONFIG_THREAD_MONITOR)) {
 		/*

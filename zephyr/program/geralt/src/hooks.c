@@ -13,7 +13,6 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/drivers/pinctrl.h>
-#include <zephyr/init.h>
 
 #include <ap_power/ap_power.h>
 
@@ -78,21 +77,8 @@ static void board_suspend_handler(struct ap_power_ev_callback *cb,
 	}
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_5v_usm), value);
 }
-
-static int install_suspend_handler(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	/*
-	 * Add a callback for suspend/resume.
-	 */
-	ap_power_ev_init_callback(&cb, board_suspend_handler,
-				  AP_POWER_RESUME | AP_POWER_SUSPEND);
-	ap_power_ev_add_callback(&cb);
-	return 0;
-}
-
-SYS_INIT(install_suspend_handler, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_suspend_handler, AP_POWER_RESUME,
+			       AP_POWER_SUSPEND);
 
 static void board_hook_ac_change(void)
 {

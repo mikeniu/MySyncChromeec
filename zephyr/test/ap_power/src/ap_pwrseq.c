@@ -29,7 +29,6 @@
 
 LOG_MODULE_REGISTER(test_ap_pwrseq);
 
-static struct ap_power_ev_callback test_cb;
 static int power_resume_count;
 static int power_start_up_count;
 static int power_hard_off_count;
@@ -139,6 +138,11 @@ static void emul_ev_handler(struct ap_power_ev_callback *callback,
 		break;
 	};
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(emul_ev_handler, AP_POWER_RESUME,
+			       AP_POWER_STARTUP, AP_POWER_HARD_OFF,
+			       AP_POWER_SUSPEND, AP_POWER_SHUTDOWN,
+			       AP_POWER_SHUTDOWN_COMPLETE,
+			       AP_POWER_S0IX_RESET_TRACKING);
 
 static void ap_pwrseq_reset_ev_counters(void)
 {
@@ -635,24 +639,5 @@ void ap_pwrseq_after_test(void *data)
 	ap_pwrseq_reset_ev_counters();
 }
 
-void *ap_pwrseq_setup_suite(void)
-{
-	ap_power_ev_init_callback(&test_cb, emul_ev_handler,
-				  AP_POWER_RESUME | AP_POWER_STARTUP |
-					  AP_POWER_HARD_OFF | AP_POWER_SUSPEND |
-					  AP_POWER_SHUTDOWN |
-					  AP_POWER_SHUTDOWN_COMPLETE |
-					  AP_POWER_S0IX_RESET_TRACKING);
-
-	ap_power_ev_add_callback(&test_cb);
-
-	return NULL;
-}
-
-void ap_pwrseq_teardown_suite(void *data)
-{
-	ap_power_ev_remove_callback(&test_cb);
-}
-
-ZTEST_SUITE(ap_pwrseq, ap_power_predicate_post_main, ap_pwrseq_setup_suite,
-	    NULL, ap_pwrseq_after_test, NULL);
+ZTEST_SUITE(ap_pwrseq, ap_power_predicate_post_main, NULL, NULL,
+	    ap_pwrseq_after_test, NULL);

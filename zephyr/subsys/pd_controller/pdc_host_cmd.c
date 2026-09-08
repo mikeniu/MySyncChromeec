@@ -37,6 +37,9 @@ static enum ec_status hc_remote_pd_chip_info(struct host_cmd_handler_args *args)
 	switch (ret) {
 	case 0:
 		break;
+	case -ERANGE:
+	case -EINVAL:
+		return EC_RES_INVALID_PARAM;
 	case -EAGAIN:
 		/* Signal to AP FW to try again later. This can occur if a non-
 		 * live read is requested but no cached value is available yet.

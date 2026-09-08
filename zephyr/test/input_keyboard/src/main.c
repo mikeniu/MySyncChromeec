@@ -340,6 +340,77 @@ ZTEST(keyboard_input, test_keyboard_input_priority)
 		      EC_TASK_PRIORITY(EC_TASK_KEYSCAN_PRIO));
 }
 
+ZTEST(keyboard_input, test_ghost_filter)
+{
+	kbd_row_t *state = kbd_cfg.matrix_new_state;
+
+	if (!IS_ENABLED(CONFIG_CROS_EC_GHOST_FILTER)) {
+		memset(state, 0, kbd_cfg.col_size * sizeof(kbd_row_t));
+		state[6] = BIT(5) | BIT(7);
+		state[7] = BIT(5) | BIT(7);
+
+		input_kbd_matrix_drive_column_hook(
+			fake_dev, INPUT_KBD_MATRIX_COLUMN_DRIVE_NONE);
+
+		zassert_equal(state[6], BIT(5) | BIT(7));
+		zassert_equal(state[7], BIT(5) | BIT(7));
+		return;
+	}
+
+	/* Test Mask 0: LShift W Space [RShift] */
+	memset(state, 0, kbd_cfg.col_size * sizeof(kbd_row_t));
+	state[6] = BIT(0) | BIT(5) | BIT(7);
+	state[7] = BIT(1) | BIT(5) | BIT(7);
+	input_kbd_matrix_drive_column_hook(fake_dev,
+					   INPUT_KBD_MATRIX_COLUMN_DRIVE_NONE);
+	zassert_equal(state[6], BIT(0) | BIT(5) | BIT(7));
+	zassert_equal(state[7], BIT(1) | BIT(5));
+
+	/* Test Mask 1: W Space Q [C] */
+	memset(state, 0, kbd_cfg.col_size * sizeof(kbd_row_t));
+	state[5] = BIT(0) | BIT(5) | BIT(7);
+	state[6] = BIT(1) | BIT(5) | BIT(7);
+	input_kbd_matrix_drive_column_hook(fake_dev,
+					   INPUT_KBD_MATRIX_COLUMN_DRIVE_NONE);
+	zassert_equal(state[5], BIT(0) | BIT(7));
+	zassert_equal(state[6], BIT(1) | BIT(5) | BIT(7));
+
+	/* Test Mask 2: W Space E [X] */
+	memset(state, 0, kbd_cfg.col_size * sizeof(kbd_row_t));
+	state[6] = BIT(0) | BIT(5) | BIT(7);
+	state[8] = BIT(1) | BIT(5) | BIT(7);
+	input_kbd_matrix_drive_column_hook(fake_dev,
+					   INPUT_KBD_MATRIX_COLUMN_DRIVE_NONE);
+	zassert_equal(state[6], BIT(0) | BIT(5) | BIT(7));
+	zassert_equal(state[8], BIT(1) | BIT(7));
+
+	/* Test non-matching row mask: should not clear */
+	memset(state, 0, kbd_cfg.col_size * sizeof(kbd_row_t));
+	state[6] = BIT(5) | BIT(7);
+	state[7] = BIT(5);
+	input_kbd_matrix_drive_column_hook(fake_dev,
+					   INPUT_KBD_MATRIX_COLUMN_DRIVE_NONE);
+	zassert_equal(state[6], BIT(5) | BIT(7));
+	zassert_equal(state[7], BIT(5));
+
+	/* Test col1 not matching */
+	memset(state, 0, kbd_cfg.col_size * sizeof(kbd_row_t));
+	state[6] = BIT(5);
+	state[7] = BIT(5) | BIT(7);
+	input_kbd_matrix_drive_column_hook(fake_dev,
+					   INPUT_KBD_MATRIX_COLUMN_DRIVE_NONE);
+	zassert_equal(state[6], BIT(5));
+	zassert_equal(state[7], BIT(5) | BIT(7));
+
+	/* Test column != INPUT_KBD_MATRIX_COLUMN_DRIVE_NONE */
+	memset(state, 0, kbd_cfg.col_size * sizeof(kbd_row_t));
+	state[6] = BIT(5) | BIT(7);
+	state[7] = BIT(5) | BIT(7);
+	input_kbd_matrix_drive_column_hook(fake_dev, 0);
+	zassert_equal(state[6], BIT(5) | BIT(7));
+	zassert_equal(state[7], BIT(5) | BIT(7));
+}
+
 static void reset(void *fixture)
 {
 	ARG_UNUSED(fixture);
@@ -347,6 +418,9 @@ static void reset(void *fixture)
 	RESET_FAKE(keyboard_state_changed);
 	RESET_FAKE(mkbp_keyboard_add);
 	RESET_FAKE(system_is_locked);
+
+	memset(kbd_cfg.matrix_new_state, 0,
+	       kbd_cfg.col_size * sizeof(kbd_row_t));
 
 	memset(&last_evt, 0, sizeof(last_evt));
 }
