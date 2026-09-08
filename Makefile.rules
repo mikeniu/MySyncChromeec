@@ -298,10 +298,27 @@ $(rw-objs): | $(out)/ec_version.h
 $(out)/ec_version.h:
 	$(call quiet,version,VERSION)
 
-$(host-utils): $(out)/%:$(host-srcs)
+# Symlink exported headers into $(out)/include/chromeos/ec/ so that host tools
+# compiling against system libraries (e.g. libec) resolve <chromeos/ec/...>
+# headers to the local checkout instead of /usr/include/chromeos/ec/.
+chromeos-ec-headers := \
+	$(out)/include/chromeos/ec/ec_commands.h \
+	$(out)/include/chromeos/ec/ec_cmd_api.h \
+	$(out)/include/chromeos/ec/panic_defs.h \
+	$(out)/include/chromeos/ec/cros_ec_dev.h
+
+$(out)/include/chromeos/ec/%: include/%
+	@mkdir -p $(@D)
+	@ln -sf $(abspath $<) $@
+
+$(out)/include/chromeos/ec/cros_ec_dev.h: util/cros_ec_dev.h
+	@mkdir -p $(@D)
+	@ln -sf $(abspath $<) $@
+
+$(host-utils): $(out)/%:$(host-srcs) | $(chromeos-ec-headers)
 	$(call quiet,c_to_host,HOSTCC )
 
-$(host-utils-cxx): $(out)/%:$(host-srcs-cxx)
+$(host-utils-cxx): $(out)/%:$(host-srcs-cxx) | $(chromeos-ec-headers)
 	$(call quiet,cxx_to_host,HOSTCXX )
 
 .PHONY: clean
