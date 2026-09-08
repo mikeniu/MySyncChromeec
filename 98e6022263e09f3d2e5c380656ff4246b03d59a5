@@ -46,6 +46,31 @@
       },
       "revId": "98e6022263e09f3d2e5c380656ff4246b03d59a5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bba3f59e_7b93fa6b",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-08T17:50:31Z",
+      "side": 1,
+      "message": "Done. Added assertions verifying out-of-sequence drop when DP is idle and status update when DP is active.",
+      "parentUuid": "ff0d5512_f86145c2",
+      "range": {
+        "startLine": 400,
+        "startChar": 0,
+        "endLine": 400,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "98e6022263e09f3d2e5c380656ff4246b03d59a5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
