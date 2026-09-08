@@ -13,6 +13,7 @@
 
 struct FpImageFrameParam {
 	uint32_t frame_size_bytes = 0;
+	uint32_t image_data_offset_bytes = 0;
 };
 
 class FpImageFrameParamsCache {
@@ -30,13 +31,29 @@ class FpImageFrameParamsCache {
 	 * @brief Populates the frame parameters cache from the EC.
 	 *
 	 * Queries the EC via fp_sensor_get_info() and caches frame parameters
-	 * (currently frame size) indexed by capture type.
+	 * (frame size and image data offset) indexed by capture type.
 	 *
-	 * @param max_frame_size_bytes Maximum permissible frame buffer size.
+	 * @param max_image_buffer_bytes Maximum allowable capacity of the
+	 * underlying image/frame buffer, used for bounds validation.
 	 */
-	void populate_cache(uint32_t max_frame_size_bytes);
+	void populate_cache(uint32_t max_image_buffer_bytes);
 
+	/**
+	 * @brief Looks up the frame size for a given capture type.
+	 *
+	 * @param capture_type The enum fp_capture_type to look up.
+	 * @return Frame size in bytes if valid and configured, 0 otherwise.
+	 */
 	uint32_t get_frame_size(enum fp_capture_type capture_type) const;
+
+	/**
+	 * @brief Looks up the image data offset for a given capture type.
+	 *
+	 * @param capture_type The enum fp_capture_type to look up.
+	 * @return Image data offset in bytes if valid and configured, 0
+	 * otherwise.
+	 */
+	uint32_t get_image_offset(enum fp_capture_type capture_type) const;
 
     private:
 	std::array<FpImageFrameParam, FP_CAPTURE_TYPE_MAX> frame_params_ = {};
