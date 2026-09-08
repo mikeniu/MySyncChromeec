@@ -17,6 +17,7 @@
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 #include "test/usb_pe.h"
+#include "usb_pd.h"
 
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/kernel.h>
@@ -785,6 +786,35 @@ ZTEST_F(usb_detach_test, test_detach_source)
 	zassert_equal(pd_power_info.meas.current_max, 0,
 		      "Charging at VBUS max %dmA, but PD reports %dmA", 0,
 		      pd_power_info.meas.current_max);
+}
+
+ZTEST_F(usb_detach_test, test_attach_dfp_debug_accessory)
+{
+	struct emul_state *emul_state = &fixture->fixture;
+
+	/* Disconnect source partner and VBUS so SNK_PORT enters Unattached.SNK
+	 */
+	integration_usb_test_source_detach(emul_state);
+	isl923x_emul_set_adc_vbus(emul_state->charger_isl923x_emul, 0);
+	k_sleep(K_SECONDS(2));
+
+	/*
+	 * Connect DFP Debug Accessory (Rp on both CC1 and CC2) with VBUS.
+	 * This exercises tc_attach_wait_snk_run() setting new_cc_state to
+	 * PD_CC_DFP_DEBUG_ACC and transitioning to Attached.SNK.
+	 */
+	zassert_ok(tcpci_emul_connect_partner(
+		emul_state->tcpci_generic_emul, PD_ROLE_SOURCE,
+		TYPEC_CC_VOLT_RP_3_0, TYPEC_CC_VOLT_RP_1_5, POLARITY_CC1));
+	isl923x_emul_set_adc_vbus(emul_state->charger_isl923x_emul,
+				  DEFAULT_VBUS_MV);
+	k_sleep(K_SECONDS(2));
+
+	zassert_true(pd_is_connected(SNK_PORT), "Port not connected");
+	zassert_equal(pd_get_task_cc_state(SNK_PORT), PD_CC_DFP_DEBUG_ACC,
+		      "DFP Debug Accessory not detected");
+	zassert_equal(pd_get_power_role(SNK_PORT), PD_ROLE_SINK,
+		      "Expected sink power role");
 }
 
 ZTEST_SUITE(usb_detach_test, drivers_predicate_post_main,
