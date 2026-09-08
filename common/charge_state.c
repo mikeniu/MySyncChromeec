@@ -643,7 +643,7 @@ static int is_battery_critical(void)
  * will shut down the AP (if the AP is not already off) and then optionally
  * hibernate or cut off battery.
  */
-static int shutdown_on_critical_battery(void)
+test_export_static int shutdown_on_critical_battery(void)
 {
 	if (!is_battery_critical()) {
 		/* Reset shutdown warning time */
@@ -1209,7 +1209,8 @@ static void process_battery_present_change(const struct charger_info *info,
 }
 
 /* Decide on the charge state we are in */
-static void decide_charge_state(int *need_staticp, int *battery_criticalp)
+test_export_static void decide_charge_state(int *need_staticp,
+					    int *battery_criticalp)
 {
 	/*
 	 * Now decide what we want to do about it. We'll normally just pass
