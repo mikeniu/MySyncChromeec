@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16f0eb6a_6c0d2af0",
+        "filename": "include/host_command.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-08T17:27:44Z",
+      "side": 1,
+      "message": "What is SMALLEST_TYPE needed for?",
+      "revId": "640674a3984a7bafaa0e14ef40649e03ca2f80eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee21157c_9f85ced4",
+        "filename": "zephyr/shim/src/host_command_legacy.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-08T17:27:44Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: These `BUILD_ASSERT`s are now trivially true and no longer check compatibility with Zephyr\u0027s upstream structure.\\n\\nBecause this file includes `host_command.h` (and thus `host_command_legacy.h`), `ec_host_cmd_handler_args` is `#define`d to `host_cmd_handler_args`. As a result, this checks `sizeof(struct host_cmd_handler_args) \u003d\u003d sizeof(struct host_cmd_handler_args)`. Similarly, the `offsetof` checks verify that members within the exact same `union` have the same offset.\\n\\nIf the goal is to ensure `struct host_cmd_handler_args` stays in sync with Zephyr\u0027s upstream `struct ec_host_cmd_handler_args`, these assertions should remain in `zephyr/shim/src/host_command.c` where the actual Zephyr header is included.",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 0
+      },
+      "revId": "640674a3984a7bafaa0e14ef40649e03ca2f80eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
