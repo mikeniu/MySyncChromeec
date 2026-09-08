@@ -11,6 +11,7 @@
 #include "math_util.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
+#include "timer.h"
 
 #include <zephyr/shell/shell.h>
 #include <zephyr/ztest.h>
@@ -18,14 +19,25 @@
 int battery_outside_charging_temperature(struct batt_params *batt);
 bool battery_sustainer_enabled(void);
 enum ec_charge_control_mode get_chg_ctrl_mode(void);
+int set_chg_ctrl_mode(enum ec_charge_control_mode mode);
 int calculate_sleep_dur(int battery_critical, int sleep_usec);
 int charge_request(bool use_curr, bool is_full);
 void check_battery_change_soc(bool is_full, bool prev_full);
 const struct shell *get_ec_shell(void);
+void decide_charge_state(int *need_staticp, int *battery_criticalp);
+int shutdown_on_critical_battery(void);
+extern timestamp_t shutdown_target_time;
 
 struct charge_state_fixture {
 	struct charge_state_data charge_state_data;
 };
+
+static void reset_test_state(void)
+{
+	shutdown_target_time.val = 0;
+	get_time_mock = NULL;
+	set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL);
+}
 
 static void *setup(void)
 {
@@ -39,6 +51,7 @@ static void before(void *f)
 	struct charge_state_fixture *fixture = f;
 
 	fixture->charge_state_data = *charge_get_status();
+	reset_test_state();
 }
 
 static void after(void *f)
@@ -46,6 +59,7 @@ static void after(void *f)
 	struct charge_state_fixture *fixture = f;
 
 	*charge_get_status() = fixture->charge_state_data;
+	reset_test_state();
 }
 
 ZTEST_SUITE(charge_state, drivers_predicate_post_main, setup, before, after,
@@ -335,13 +349,21 @@ ZTEST(charge_state, test_hc_charge_state)
 	zassert_equal(EC_RES_SUCCESS, rv);
 
 	/* Check GET_PARAM and SET_PARAM across base parameters */
-	for (int i = 0; i <= CS_PARAM_CHG_INPUT_CURRENT_STEP; i++) {
+	for (int i = 0; i < CS_NUM_BASE_PARAMS; i++) {
 		memset(&resp, 0, sizeof(resp));
 		params.cmd = CHARGE_STATE_CMD_GET_PARAM;
 		params.get_param.param = i;
 		rv = test_send_host_command(EC_CMD_CHARGE_STATE, 0, &params,
 					    sizeof(params), &resp,
 					    sizeof(resp));
+		if (!IS_ENABLED(
+			    CONFIG_PLATFORM_EC_CHARGER_HYBRID_POWER_BOOST) &&
+		    (i == CS_PARAM_CHG_MIN_REQUIRED_MV ||
+		     i == CS_PARAM_CHG_IS_ADAPTER_SUFFICIENT)) {
+			zassert_equal(EC_RES_INVALID_PARAM, rv,
+				      "Param %d should be invalid", i);
+			continue;
+		}
 		zassert_equal(EC_RES_SUCCESS, rv, "Param %d failed get: %d", i,
 			      rv);
 
@@ -364,8 +386,7 @@ ZTEST(charge_state, test_hc_charge_state)
 					    sizeof(resp));
 
 		if (i == CS_PARAM_CHG_STATUS ||
-		    (CS_PARAM_LIMIT_POWER <= i &&
-		     i <= CS_PARAM_CHG_INPUT_CURRENT_STEP)) {
+		    (CS_PARAM_LIMIT_POWER <= i && i < CS_NUM_BASE_PARAMS)) {
 			zassert_equal(EC_RES_ACCESS_DENIED, rv,
 				      "Param %d was writable", i);
 		} else if (i == CS_PARAM_CHG_VOLTAGE ||
@@ -636,6 +657,9 @@ ZTEST(charge_state, test_charge_request)
 	curr->requested_voltage = 0;
 	curr->requested_current = 0;
 	zassert_ok(charge_request(true, false));
+
+	/* Request without current and not full (triggers inhibit mode) */
+	zassert_ok(charge_request(false, false));
 }
 
 ZTEST(charge_state, test_charge_problems)
@@ -735,4 +759,109 @@ ZTEST(charge_state, test_console_cmd_chgstate)
 	zassert_not_ok(shell_execute_cmd(shell, "chgstate sustain 20 bad"));
 	zassert_not_ok(shell_execute_cmd(shell, "chgstate sustain 80 20"));
 	zassert_not_ok(shell_execute_cmd(shell, "chgstate invalid_subcommand"));
+}
+
+ZTEST(charge_state, test_decide_charge_state)
+{
+	struct charge_state_data *curr = charge_get_status();
+	const struct battery_info *info = battery_get_info();
+	int need_static = 0, critical = 0;
+
+	curr->ac = 1;
+	curr->batt.is_present = BP_YES;
+	curr->batt.flags = BATT_FLAG_RESPONSIVE;
+	curr->batt.voltage = info->voltage_normal;
+
+	/* Mode not normal -> ST_IDLE */
+	set_chg_ctrl_mode(CHARGE_CONTROL_IDLE);
+	decide_charge_state(&need_static, &critical);
+	zassert_equal(ST_IDLE, curr->state);
+
+	/* Mode normal, unresponsive battery -> wakes battery */
+	set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL);
+	curr->batt.flags &= ~BATT_FLAG_RESPONSIVE;
+	decide_charge_state(&need_static, &critical);
+	zassert_equal(ST_PRECHARGE, curr->state);
+
+	/* Mode normal, responsive battery, low voltage */
+	curr->batt.flags |= BATT_FLAG_RESPONSIVE;
+	curr->batt.voltage = info->voltage_min;
+	decide_charge_state(&need_static, &critical);
+	if (IS_ENABLED(CONFIG_BATTERY_LOW_VOLTAGE_PROTECTION))
+		zassert_equal(ST_PRECHARGE, curr->state);
+	else
+		zassert_equal(ST_CHARGE, curr->state);
+
+	/* Mode normal, responsive battery, normal voltage -> ST_CHARGE */
+	curr->batt.voltage = info->voltage_normal;
+	decide_charge_state(&need_static, &critical);
+	zassert_equal(ST_CHARGE, curr->state);
+
+	/* Bad desired voltage/current sets requests to 0 */
+	curr->batt.desired_voltage = 8400;
+	curr->batt.desired_current = 2000;
+	curr->batt.flags |= BATT_FLAG_BAD_DESIRED_VOLTAGE;
+	decide_charge_state(&need_static, &critical);
+	zassert_equal(0, curr->requested_voltage);
+	zassert_equal(0, curr->requested_current);
+	curr->batt.flags &= ~BATT_FLAG_BAD_DESIRED_VOLTAGE;
+
+	/* Battery not present -> ST_IDLE, not charging */
+	curr->batt.is_present = BP_NO;
+	decide_charge_state(&need_static, &critical);
+	zassert_equal(ST_IDLE, curr->state);
+	zassert_equal(0, curr->batt_is_charging);
+	curr->batt.is_present = BP_YES;
+
+	/* No AC -> ST_DISCHARGE */
+	curr->ac = 0;
+	decide_charge_state(&need_static, &critical);
+	zassert_equal(ST_DISCHARGE, curr->state);
+	curr->ac = 1;
+
+	/* DEEP_CHARGE flag cleared when voltage returns to normal */
+	if (IS_ENABLED(CONFIG_BATTERY_LOW_VOLTAGE_PROTECTION)) {
+		curr->batt.flags |= BATT_FLAG_DEEP_CHARGE;
+		curr->batt.voltage = info->voltage_normal;
+		decide_charge_state(&need_static, &critical);
+		zassert_false(curr->batt.flags & BATT_FLAG_DEEP_CHARGE);
+	}
+}
+
+ZTEST(charge_state, test_shutdown_on_critical_battery)
+{
+	struct charge_state_data *curr = charge_get_status();
+	const struct battery_info *info = battery_get_info();
+	timestamp_t fake_time;
+
+	fake_time.val = 1000 * USEC_PER_SEC;
+	get_time_mock = &fake_time;
+
+	/* Normal conditions -> returns 0 */
+	curr->ac = 1;
+	curr->batt_is_charging = 1;
+	curr->batt.state_of_charge = 50;
+	curr->batt.voltage = 8400;
+	curr->batt.temperature = CELSIUS_TO_DECI_KELVIN(25);
+	shutdown_target_time.val = 0;
+	zassert_equal(0, shutdown_on_critical_battery());
+
+	/* Battery too hot -> critical, starts countdown */
+	curr->batt.temperature =
+		CELSIUS_TO_DECI_KELVIN(info->discharging_max_c + 10);
+	zassert_equal(1, shutdown_on_critical_battery());
+	zassert_not_equal(0ULL, shutdown_target_time.val);
+
+	/* Subsequent call before timeout still returns 1 */
+	zassert_equal(1, shutdown_on_critical_battery());
+
+	/* Battery cools down -> clears critical condition and resets timer */
+	curr->batt.temperature = CELSIUS_TO_DECI_KELVIN(25);
+	zassert_equal(0, shutdown_on_critical_battery());
+	zassert_equal(0ULL, shutdown_target_time.val);
+
+	/* Reset */
+	get_time_mock = NULL;
+	shutdown_target_time.val = 0;
+	curr->batt.temperature = CELSIUS_TO_DECI_KELVIN(25);
 }
