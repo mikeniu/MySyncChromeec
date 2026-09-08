@@ -81,7 +81,7 @@ static int prev_ac, prev_charge, prev_disp_charge;
 static enum battery_present prev_bp;
 test_export_static unsigned int user_current_limit = -1U;
 test_export_static timestamp_t shutdown_target_time;
-static timestamp_t precharge_start_time;
+test_export_static timestamp_t precharge_start_time;
 static struct sustain_soc sustain_soc;
 static struct current_limit {
 	uint32_t value; /* Charge limit to apply, in mA */
@@ -117,7 +117,7 @@ struct state {
 } local_state;
 
 /* Is battery connected but unresponsive after precharge? */
-static int battery_seems_dead;
+test_export_static int battery_seems_dead;
 
 static int battery_seems_disconnected;
 
@@ -975,7 +975,7 @@ static int get_desired_input_current(const struct charger_info *const info)
 #endif
 }
 
-static void wakeup_battery(int *need_static)
+test_export_static void wakeup_battery(int *need_static)
 {
 	timestamp_t timestamp;
 #ifndef CONFIG_PRECHARGE_DELAY_MS
@@ -1024,7 +1024,7 @@ __test_only enum charge_state charge_get_state(void)
 	return curr.state;
 }
 
-static void deep_charge_battery(int *need_static)
+test_export_static void deep_charge_battery(int *need_static)
 {
 	if ((curr.state == ST_IDLE) &&
 	    (curr.batt.flags & BATT_FLAG_DEEP_CHARGE)) {
@@ -1054,7 +1054,7 @@ static void deep_charge_battery(int *need_static)
 	}
 }
 
-static void revive_battery(int *need_static)
+test_export_static void revive_battery(int *need_static)
 {
 	if (IS_ENABLED(CONFIG_BATTERY_REQUESTS_NIL_WHEN_DEAD) &&
 	    curr.requested_voltage == 0 && curr.requested_current == 0 &&
