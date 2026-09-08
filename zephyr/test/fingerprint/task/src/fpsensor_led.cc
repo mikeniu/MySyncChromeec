@@ -13,6 +13,7 @@ extern "C" {
 #include <zephyr/ztest.h>
 
 #include <fpsensor/fpsensor_led.h>
+#include <hooks.h>
 #include <mkbp_event.h>
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
@@ -89,6 +90,55 @@ ZTEST(fp_led, test_match)
 	zassert_equal(fp_led_get(), BRIGHTNESS_OFF, "Led off 10s after match");
 	zassert_false(is_suspend_locked(),
 		      "Suspend should be unlocked after match timeout");
+}
+
+ZTEST(fp_led, test_match_resume)
+{
+	fp_led::update_mode(FP_MODE_MATCH);
+	k_sleep(K_MSEC(500));
+	zassert_equal(fp_led_get(), BRIGHTNESS_MATCH, "Led %d%% after match",
+		      BRIGHTNESS_MATCH);
+	k_sleep(K_SECONDS(10));
+	zassert_equal(fp_led_get(), BRIGHTNESS_OFF, "Led off 10s after match");
+	zassert_false(is_suspend_locked(),
+		      "Suspend should be unlocked after match timeout");
+
+	hook_notify(HOOK_CHIPSET_RESUME);
+	k_sleep(K_SECONDS(5));
+	zassert_equal(fp_led_get(), BRIGHTNESS_MATCH,
+		      "Led %d%% 5s after resume", BRIGHTNESS_MATCH);
+	zassert_true(is_suspend_locked(),
+		     "Suspend should be locked 5s after resume");
+
+	k_sleep(K_SECONDS(5));
+	zassert_equal(fp_led_get(), BRIGHTNESS_OFF, "Led off 10s after resume");
+	zassert_false(is_suspend_locked(),
+		      "Suspend should be unlocked after match timeout");
+}
+
+ZTEST(fp_led, test_match_resume_when_off)
+{
+	hook_notify(HOOK_CHIPSET_RESUME);
+	k_sleep(K_MSEC(500));
+	zassert_equal(fp_led_get(), BRIGHTNESS_OFF,
+		      "Led should stay off on resume");
+	zassert_false(is_suspend_locked(),
+		      "Suspend should not be locked on resume when off");
+}
+
+ZTEST(fp_led, test_match_resume_when_enroll)
+{
+	fp_led::update_mode(FP_MODE_ENROLL_SESSION);
+	k_sleep(K_MSEC(500));
+	zassert_equal(fp_led_get(), BRIGHTNESS_ENROLL, "Led %d%% after enroll",
+		      BRIGHTNESS_ENROLL);
+
+	hook_notify(HOOK_CHIPSET_RESUME);
+	k_sleep(K_MSEC(500));
+	zassert_equal(fp_led_get(), BRIGHTNESS_ENROLL,
+		      "Led should stay enroll on resume");
+
+	fp_led::update_mode(0);
 }
 
 ZTEST(fp_led, test_match_ok)

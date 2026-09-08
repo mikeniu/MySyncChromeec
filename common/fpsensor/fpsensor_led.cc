@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "hooks.h"
+
 #include <zephyr/device.h>
 #include <zephyr/drivers/led.h>
 #include <zephyr/init.h>
@@ -96,6 +98,7 @@ enum class Mode {
 	OFF,
 	ENROLL,
 	MATCH,
+	MATCH_EXPIRED,
 	MATCH_OK,
 	MATCH_NOK,
 };
@@ -120,7 +123,11 @@ void led_update_handler(struct k_work *work)
 	k_sem_take(&led_lock, K_FOREVER);
 	bool is_timer_expired = k_uptime_ticks() >= timer_scheduled_at_ticks;
 	if (is_timer_expired) {
-		led_mode = Mode::OFF;
+		if (led_mode == Mode::MATCH) {
+			led_mode = Mode::MATCH_EXPIRED;
+		} else {
+			led_mode = Mode::OFF;
+		}
 		set_led_brightness(BRIGHTNESS_OFF);
 	}
 	k_sem_give(&led_lock);
@@ -217,6 +224,22 @@ void off()
 
 	LOG_INF("Fingerprint led off.");
 }
+
+void resume()
+{
+	k_sem_take(&led_lock, K_FOREVER);
+	if (led_mode != Mode::MATCH_EXPIRED) {
+		k_sem_give(&led_lock);
+		return;
+	}
+	led_mode = Mode::MATCH;
+	set_led_with_timeout(BRIGHTNESS_MATCH,
+			     CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_MS);
+	k_sem_give(&led_lock);
+
+	LOG_INF("Fingerprint led resume.");
+}
+DECLARE_HOOK(HOOK_CHIPSET_RESUME, resume, HOOK_PRIO_DEFAULT);
 
 } /* namespace */
 

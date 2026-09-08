@@ -50,6 +50,21 @@ struct usb_msg_manager msg_manager = {
 };
 enum usbd_msg_type usb_message = USBD_MSG_MAX_NUMBER;
 
+static void usb_pm_notify(void)
+{
+	switch (usb_message) {
+	case USBD_MSG_RESUME:
+		hook_notify(HOOK_CHIPSET_RESUME);
+		break;
+	case USBD_MSG_SUSPEND:
+		hook_notify(HOOK_CHIPSET_SUSPEND);
+		break;
+	default:
+		break;
+	}
+}
+DECLARE_DEFERRED(usb_pm_notify);
+
 #if defined(CONFIG_CROS_EC_RO) && defined(CONFIG_USBD_HID_KEYBOARD)
 __overridable void keyboard_state_changed(int row, int col, int is_pressed)
 {
@@ -123,6 +138,9 @@ static void usb_device_msg_cb(struct usbd_context *const ctx,
 
 	/* broadcast usb event */
 	usb_message = msg->type;
+	if (usb_message == USBD_MSG_RESUME || usb_message == USBD_MSG_SUSPEND) {
+		hook_call_deferred(&usb_pm_notify_data, 0);
+	}
 	for (int i = 0; i < msg_manager.callback_count; i++) {
 		hook_call_deferred(&msg_manager.deferred[i], 0);
 	}
