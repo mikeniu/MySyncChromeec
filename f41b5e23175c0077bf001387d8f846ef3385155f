@@ -39,6 +39,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef669522_ccfda427",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 679,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-08T21:39:47Z",
+      "side": 1,
+      "message": "I do not believe so. If we need to do this, we should validate `validate_fp_buffer_offset(current_frame_size + current_image_offset, adjusted_offset, size)`",
+      "parentUuid": "3bbaaf01_5805b52a",
+      "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0abfa282_99d3f121",
         "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
         "patchSetId": 4
