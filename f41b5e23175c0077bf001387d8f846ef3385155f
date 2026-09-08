@@ -75,6 +75,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1b02590b_66f2f16a",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-08T21:44:50Z",
+      "side": 1,
+      "message": "but this is the offset from where the size starts",
+      "parentUuid": "0abfa282_99d3f121",
+      "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6a7aed28_b0c9ab3d",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
         "patchSetId": 4
