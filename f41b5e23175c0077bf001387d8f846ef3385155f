@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99ef8fce_f7915fed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-08T21:28:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/36e2f37b-5e73-4064-8c5d-f5983e7a7b85)]\n\n### Review Summary\n\n*   **Functionality:** The code effectively queries, caches, and validates the dynamic `image_data_offset_bytes`. The transition from a build-time constant to a dynamically fetched value is handled robustly. I noted a minor potential bounds validation edge case in `skip_image_offset` that existed previously but might be worth addressing.\n*   **Security:** No vulnerabilities introduced. Boundary validations are well-implemented, and integer overflow checks are appropriately used.\n*   **Style:** Clean and consistent with Chromium OS EC C++ style guidelines.\n*   **Testing:** Thorough Zephyr unit tests are included. They correctly mock and exercise the new cache behavior and offset boundaries. I provided one minor suggestion to ensure a specific integer overflow test remains robust across varying board configurations.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized, focused solely on the dynamic image offset cache and its immediate usage.",
+      "isAi": true,
+      "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bbaaf01_5805b52a",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 679,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-08T21:28:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Logic Question:** When `skip_image_offset` is true, we shift `offset` by `current_image_offset`. At line 662, we validated `offset + size \u003c\u003d current_frame_size`. When we re-validate here with `sizeof(fp_buffer)`, we only ensure we do not read past the physical buffer capacity.\n\nHowever, because `adjusted_offset \u003d offset + current_image_offset`, the final read can span up to `current_frame_size + current_image_offset`. This means the host could potentially request to read uninitialized memory past the end of the valid `current_frame_size` bounds (but still within `fp_buffer`). \n\nShould this validation check `validate_fp_buffer_offset(current_frame_size, adjusted_offset, size)` instead of `sizeof(fp_buffer)` to ensure the host only reads valid frame bytes?",
+      "isAi": true,
+      "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0abfa282_99d3f121",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-08T21:28:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion:** You currently validate that `offset` does not exceed `max_image_buffer_bytes`. Consider also validating that `offset \u003c size` (or `\u003c\u003d size`). If the image offset starts after the end of the frame size, it is structurally invalid and could cause logic errors later when computing sizes.",
+      "isAi": true,
+      "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a7aed28_b0c9ab3d",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-08T21:28:38Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing Edge Case:** If `image_offset` evaluates to `0` based on the simulated board configuration, the calculation `UINT32_MAX - image_offset + 1` overflows to `0`. Consequently, `(uint64_t)offset + image_offset` will equal `0`, meaning it will **not** overflow 32 bits, causing the `zassert_true` on line 210 to fail and break the test. \n\nTo make this test robust across environments, consider enforcing a non-zero offset at the beginning of the test:\n```cpp\nFpImageFrameParamsCacheTestHelper::set_image_offset(\n    global_context.fp_image_frame_params_cache,\n    FP_CAPTURE_SIMPLE_IMAGE, 100);\n```",
+      "isAi": true,
+      "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
