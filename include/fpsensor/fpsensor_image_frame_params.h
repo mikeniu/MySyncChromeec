@@ -3,23 +3,28 @@
  * found in the LICENSE file.
  */
 
-#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_FRAME_SIZE_H_
-#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_FRAME_SIZE_H_
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_IMAGE_FRAME_PARAMS_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_IMAGE_FRAME_PARAMS_H_
 
 #include "ec_commands.h"
 
 #include <array>
 #include <cstdint>
 
-class FpFrameSizeCache {
+struct FpImageFrameParam {
+	uint32_t frame_size_bytes = 0;
+};
+
+class FpImageFrameParamsCache {
     public:
-	FpFrameSizeCache() = default;
+	FpImageFrameParamsCache() = default;
 
 	/* No copying or moving of this object. */
-	FpFrameSizeCache(const FpFrameSizeCache &) = delete;
-	FpFrameSizeCache &operator=(const FpFrameSizeCache &) = delete;
-	FpFrameSizeCache(FpFrameSizeCache &&) = delete;
-	FpFrameSizeCache &operator=(FpFrameSizeCache &&) = delete;
+	FpImageFrameParamsCache(const FpImageFrameParamsCache &) = delete;
+	FpImageFrameParamsCache &
+	operator=(const FpImageFrameParamsCache &) = delete;
+	FpImageFrameParamsCache(FpImageFrameParamsCache &&) = delete;
+	FpImageFrameParamsCache &operator=(FpImageFrameParamsCache &&) = delete;
 
 	/**
 	 * @brief Internal method to populate the frame size array.
@@ -44,11 +49,11 @@ class FpFrameSizeCache {
 	uint32_t get_frame_size(enum fp_capture_type capture_type) const;
 
     private:
-	std::array<uint32_t, FP_CAPTURE_TYPE_MAX> frame_sizes_ = {};
+	std::array<FpImageFrameParam, FP_CAPTURE_TYPE_MAX> frame_params_ = {};
 
 #ifdef CONFIG_ZTEST
-	friend class FpFrameSizeCacheTestHelper;
+	friend class FpImageFrameParamsCacheTestHelper;
 #endif
 };
 
-#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_FRAME_SIZE_H_ */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_IMAGE_FRAME_PARAMS_H_ */

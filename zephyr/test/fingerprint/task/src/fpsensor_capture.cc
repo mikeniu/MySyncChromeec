@@ -16,7 +16,7 @@
 #include <drivers/fingerprint_sim.h>
 #include <ec_commands.h>
 #include <ec_tasks.h>
-#include <fpsensor/fpsensor_frame_size.h>
+#include <fpsensor/fpsensor_image_frame_params.h>
 #include <fpsensor/fpsensor_state.h>
 #include <host_command.h>
 
@@ -375,11 +375,11 @@ ZTEST_USER(fpsensor_capture,
 ZTEST_USER(fpsensor_capture,
 	   test_finger_capture_simple_image_scan_success_get_frame)
 {
-	FpFrameSizeCache frame_size_cache;
-	frame_size_cache.populate_cache(IMAGE_SIZE);
+	FpImageFrameParamsCache frame_params_cache;
+	frame_params_cache.populate_cache(IMAGE_SIZE);
 	constexpr enum fp_capture_type kCaptureType = FP_CAPTURE_SIMPLE_IMAGE;
 	const uint32_t image_size =
-		frame_size_cache.get_frame_size(kCaptureType);
+		frame_params_cache.get_frame_size(kCaptureType);
 	struct ec_params_fp_mode params = {
 		.mode = FP_MODE_CAPTURE |
 			(kCaptureType << FP_MODE_CAPTURE_TYPE_SHIFT),
@@ -424,11 +424,11 @@ ZTEST_USER(fpsensor_capture,
 ZTEST_USER(fpsensor_capture,
 	   test_finger_capture_simple_image_scan_success_get_frame_v1)
 {
-	FpFrameSizeCache frame_size_cache;
-	frame_size_cache.populate_cache(IMAGE_SIZE);
+	FpImageFrameParamsCache frame_params_cache;
+	frame_params_cache.populate_cache(IMAGE_SIZE);
 	constexpr enum fp_capture_type kCaptureType = FP_CAPTURE_SIMPLE_IMAGE;
 	const uint32_t image_size =
-		frame_size_cache.get_frame_size(kCaptureType);
+		frame_params_cache.get_frame_size(kCaptureType);
 	struct ec_params_fp_mode params = {
 		.mode = FP_MODE_CAPTURE |
 			(kCaptureType << FP_MODE_CAPTURE_TYPE_SHIFT),

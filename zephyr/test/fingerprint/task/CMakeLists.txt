@@ -37,8 +37,8 @@ target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_COMMANDS app PRIVATE
 	src/fpsensor_vendor_command.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_ASCP app PRIVATE
 	src/fpsensor_ascp.cc)
-target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_FRAME_SIZE app PRIVATE
-	src/fpsensor_frame_size.cc)
+target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_IMAGE_FRAME_PARAMS app PRIVATE
+	src/fpsensor_image_frame_params.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_BTN_IGN_OUT app PRIVATE
 	src/fpsensor_btn_ign_out.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_LED app PRIVATE
