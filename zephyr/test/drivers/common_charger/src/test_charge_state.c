@@ -18,18 +18,63 @@
 int battery_outside_charging_temperature(struct batt_params *batt);
 bool battery_sustainer_enabled(void);
 enum ec_charge_control_mode get_chg_ctrl_mode(void);
+int set_chg_ctrl_mode(enum ec_charge_control_mode mode);
 int calculate_sleep_dur(int battery_critical, int sleep_usec);
 int charge_request(bool use_curr, bool is_full);
 void check_battery_change_soc(bool is_full, bool prev_full);
 const struct shell *get_ec_shell(void);
+void sustain_battery_soc(void);
+void current_limit_battery_soc(void);
+void adjust_requested_vi(const struct charger_info *const info, bool is_full);
+void battery_sustainer_disable(void);
+extern unsigned int user_current_limit;
+
+static enum ec_error_list mock_discharge_on_ac(int chgnum, int enable)
+{
+	return EC_SUCCESS;
+}
+
+/*
+ * Strong override: common/battery.c provides a weak definition that queries
+ * battery_get_params(), and common/charge_state.c defines it as test_mockable
+ * (weak in test builds). Override it here so charge_get_display_charge()
+ * reads directly from curr.batt set in the test fixture.
+ */
+const struct batt_params *charger_current_battery_params(void)
+{
+	return &charge_get_status()->batt;
+}
+
+static struct charger_drv mock_chg_drv;
 
 struct charge_state_fixture {
 	struct charge_state_data charge_state_data;
+	const struct charger_drv *saved_driver_ptr;
 };
+
+static int test_send_host_command(int command, int version, const void *params,
+				  size_t params_size, void *resp,
+				  size_t resp_size);
+
+static void reset_current_limit(void)
+{
+	struct ec_params_current_limit_v1 p1 = {
+		.limit = -1U,
+		.battery_soc = 0,
+	};
+	test_send_host_command(EC_CMD_CHARGE_CURRENT_LIMIT, 1, &p1, sizeof(p1),
+			       NULL, 0);
+	user_current_limit = -1U;
+}
 
 static void *setup(void)
 {
 	static struct charge_state_fixture fixture;
+
+	fixture.saved_driver_ptr = chg_chips[0].drv;
+	mock_chg_drv = *chg_chips[0].drv;
+	mock_chg_drv.discharge_on_ac = mock_discharge_on_ac;
+	chg_chips[0].drv = &mock_chg_drv;
 
 	return &fixture;
 }
@@ -39,6 +84,9 @@ static void before(void *f)
 	struct charge_state_fixture *fixture = f;
 
 	fixture->charge_state_data = *charge_get_status();
+	set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL);
+	battery_sustainer_disable();
+	reset_current_limit();
 }
 
 static void after(void *f)
@@ -46,10 +94,20 @@ static void after(void *f)
 	struct charge_state_fixture *fixture = f;
 
 	*charge_get_status() = fixture->charge_state_data;
+	set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL);
+	battery_sustainer_disable();
+	reset_current_limit();
+}
+
+static void teardown(void *f)
+{
+	struct charge_state_fixture *fixture = f;
+
+	chg_chips[0].drv = fixture->saved_driver_ptr;
 }
 
 ZTEST_SUITE(charge_state, drivers_predicate_post_main, setup, before, after,
-	    NULL);
+	    teardown);
 
 static int test_send_host_command(int command, int version, const void *params,
 				  size_t params_size, void *resp,
@@ -213,6 +271,28 @@ ZTEST(charge_state, test_hc_charge_control__v2_and_v3)
 	rv = battery_sustainer_set_hc(2, 79, 101, 0);
 	zassert_equal(EC_RES_INVALID_PARAM, rv);
 
+	/* Test v2 lower < upper sets EC_CHARGE_CONTROL_FLAG_NO_IDLE */
+	rv = battery_sustainer_set_hc(2, 70, 85, 0);
+	zassert_equal(EC_RES_SUCCESS, rv);
+	rv = battery_sustainer_get_hc(3, &r);
+	zassert_equal(EC_RES_SUCCESS, rv);
+	zassert_equal(70, r.sustain_soc.lower);
+	zassert_equal(85, r.sustain_soc.upper);
+	zassert_true(r.flags & EC_CHARGE_CONTROL_FLAG_NO_IDLE);
+
+	/* Disable sustainer to reset flags */
+	rv = battery_sustainer_set_hc(2, -1, -1, 0);
+	zassert_equal(EC_RES_SUCCESS, rv);
+
+	/* Test v2 lower == upper does not set NO_IDLE */
+	rv = battery_sustainer_set_hc(2, 80, 80, 0);
+	zassert_equal(EC_RES_SUCCESS, rv);
+	rv = battery_sustainer_get_hc(3, &r);
+	zassert_equal(EC_RES_SUCCESS, rv);
+	zassert_equal(80, r.sustain_soc.lower);
+	zassert_equal(80, r.sustain_soc.upper);
+	zassert_false(r.flags & EC_CHARGE_CONTROL_FLAG_NO_IDLE);
+
 	/* Disable sustainer */
 	rv = battery_sustainer_set_hc(2, -1, -1, 0);
 	zassert_equal(EC_RES_SUCCESS, rv);
@@ -271,6 +351,143 @@ ZTEST(charge_state, test_hc_charge_control__v2_and_v3)
 	rv = test_send_host_command(EC_CMD_CHARGE_CONTROL, 3, &p, sizeof(p), &r,
 				    sizeof(r));
 	zassert_equal(EC_RES_ERROR, rv);
+}
+
+ZTEST(charge_state, test_battery_sustainer_state_machine)
+{
+	struct charge_state_data *curr = charge_get_status();
+
+	curr->ac = 1;
+	curr->batt.is_present = BP_YES;
+
+	/* Sustainer disabled: sustain_battery_soc does nothing */
+	zassert_ok(battery_sustainer_set_hc(3, -1, -1, 0));
+	zassert_ok(set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL));
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_NORMAL, get_chg_ctrl_mode());
+
+	/* Enable sustainer [70, 80] with idle allowed */
+	zassert_ok(battery_sustainer_set_hc(3, 70, 80, 0));
+
+	/* In NORMAL mode: */
+	/* soc < upper (75%): remains NORMAL */
+	curr->batt.display_charge = 750;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_NORMAL, get_chg_ctrl_mode());
+
+	/* soc == upper (80%): switches to IDLE */
+	curr->batt.display_charge = 800;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_IDLE, get_chg_ctrl_mode());
+
+	/* Reset to NORMAL mode, soc > upper (85%): switches to DISCHARGE */
+	zassert_ok(set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL));
+	curr->batt.display_charge = 850;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_DISCHARGE, get_chg_ctrl_mode());
+
+	/* In IDLE mode: */
+	zassert_ok(set_chg_ctrl_mode(CHARGE_CONTROL_IDLE));
+
+	/* soc between lower and upper (75%): remains IDLE */
+	curr->batt.display_charge = 750;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_IDLE, get_chg_ctrl_mode());
+
+	/* soc > upper (85%): switches to DISCHARGE */
+	curr->batt.display_charge = 850;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_DISCHARGE, get_chg_ctrl_mode());
+
+	/* Back to IDLE, soc < lower (65%): switches to NORMAL */
+	zassert_ok(set_chg_ctrl_mode(CHARGE_CONTROL_IDLE));
+	curr->batt.display_charge = 650;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_NORMAL, get_chg_ctrl_mode());
+
+	/* In DISCHARGE mode: */
+	zassert_ok(set_chg_ctrl_mode(CHARGE_CONTROL_DISCHARGE));
+
+	/* soc > upper (85%): remains DISCHARGE */
+	curr->batt.display_charge = 850;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_DISCHARGE, get_chg_ctrl_mode());
+
+	/* soc <= upper (75%): switches to IDLE */
+	curr->batt.display_charge = 750;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_IDLE, get_chg_ctrl_mode());
+
+	/* Enable sustainer [70, 80] with NO_IDLE flag */
+	zassert_ok(battery_sustainer_set_hc(3, 70, 80,
+					    EC_CHARGE_CONTROL_FLAG_NO_IDLE));
+
+	/* In DISCHARGE mode with NO_IDLE, soc <= upper (75%): stays DISCHARGE
+	 */
+	zassert_ok(set_chg_ctrl_mode(CHARGE_CONTROL_DISCHARGE));
+	curr->batt.display_charge = 750;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_DISCHARGE, get_chg_ctrl_mode());
+
+	/* In DISCHARGE mode with NO_IDLE, soc < lower (65%): switches to NORMAL
+	 */
+	curr->batt.display_charge = 650;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_NORMAL, get_chg_ctrl_mode());
+
+	/* In NORMAL mode with NO_IDLE, soc == upper (80%): switches to
+	 * DISCHARGE
+	 */
+	curr->batt.display_charge = 800;
+	sustain_battery_soc();
+	zassert_equal(CHARGE_CONTROL_DISCHARGE, get_chg_ctrl_mode());
+
+	/* Disable sustainer */
+	zassert_ok(battery_sustainer_set_hc(3, -1, -1, 0));
+	zassert_ok(set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL));
+}
+
+ZTEST(charge_state, test_current_limit_battery_soc)
+{
+	struct charge_state_data *curr = charge_get_status();
+	struct ec_params_current_limit_v1 p1 = {
+		.limit = 1500,
+		.battery_soc = 80,
+	};
+	const struct charger_info *info = charger_get_info();
+
+	curr->ac = 1;
+	curr->state = ST_CHARGE;
+	curr->requested_current = 2000;
+
+	/* Set v1 current limit: 1500 mA when soc >= 80% */
+	zassert_ok(test_send_host_command(EC_CMD_CHARGE_CURRENT_LIMIT, 1, &p1,
+					  sizeof(p1), NULL, 0));
+
+	/* When display charge < 80%: limit not applied */
+	curr->batt.display_charge = 700;
+	curr->requested_current = 2000;
+	current_limit_battery_soc();
+	adjust_requested_vi(info, false);
+	zassert_equal(charger_closest_current(2000), curr->requested_current);
+
+	/* When display charge >= 80%: limit applied */
+	curr->batt.display_charge = 850;
+	curr->requested_current = 2000;
+	current_limit_battery_soc();
+	adjust_requested_vi(info, false);
+	zassert_equal(charger_closest_current(1500), curr->requested_current);
+
+	/* Remove limit */
+	p1.limit = -1U;
+	p1.battery_soc = 0;
+	zassert_ok(test_send_host_command(EC_CMD_CHARGE_CURRENT_LIMIT, 1, &p1,
+					  sizeof(p1), NULL, 0));
+	curr->requested_current = 2000;
+	current_limit_battery_soc();
+	adjust_requested_vi(info, false);
+	zassert_equal(charger_closest_current(2000), curr->requested_current);
+	zassert_equal(-1U, user_current_limit);
 }
 
 /* ---------------- Host Command: EC_CMD_CHARGE_CURRENT_LIMIT ----------------
@@ -558,9 +775,18 @@ ZTEST(charge_state, test_led_pwr_get_state)
 	curr->batt.state_of_charge = 100;
 	zassert_equal(LED_PWRS_DISCHARGE, led_pwr_get_state());
 
-	/* ST_PRECHARGE */
+	/* ST_PRECHARGE normal */
 	curr->state = ST_PRECHARGE;
 	zassert_equal(LED_PWRS_IDLE, led_pwr_get_state());
+
+	/* ST_PRECHARGE with CHARGE_CONTROL_IDLE -> LED_PWRS_FORCED_IDLE */
+	curr->ac = 1;
+	zassert_ok(set_chg_ctrl_mode(CHARGE_CONTROL_IDLE));
+	curr->state = ST_PRECHARGE;
+	zassert_equal(LED_PWRS_FORCED_IDLE, led_pwr_get_state());
+
+	/* Restore to CHARGE_CONTROL_NORMAL */
+	zassert_ok(set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL));
 
 	/* Invalid state */
 	curr->state = (enum charge_state)99;
