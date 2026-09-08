@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6587640a_50b1ceff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-08T21:32:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/dad451ad-c4dd-47f5-bbb3-1663dd99b953)]\n\n### Review Summary\n* **Functionality**: The refactoring correctly maintains existing behavior by replacing the simple array with a struct array for frame parameters, while keeping boundary checks and error handling intact.\n* **Style**: Code style is consistent and readable. The transition to caching `FpImageFrameParam` is clean and correctly structured.\n* **Security**: Buffer sizes and boundary checks (e.g., `num_types \u003e frame_params_.size()`) are correctly implemented, preventing potential overflows.\n* **Testing \u0026 Test Coverage**: The CL thoroughly updates the corresponding unit tests (`fpsensor_image_frame_params.cc`, etc.) to match the new cache implementation. Test coverage remains solid.\n* **CL Size \u0026 Scope**: The CL is well-scoped, self-contained, and focused solely on refactoring the frame parameter cache.",
+      "isAi": true,
+      "revId": "38762f78f48c703dc1adf4a35d11469c2a3dbff7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e4723fd_0a816b4c",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 22
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-08T21:32:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Minor note: Since `capture_type` is cast to `size_t` on the left side of the `||`, any negative value will wrap around to a very large positive number and trigger the `\u003e\u003d frame_params_.size()` condition. Thus, the `capture_type \u003c 0` check here is effectively dead code and can safely be removed (though it is harmless as-is).",
+      "isAi": true,
+      "revId": "38762f78f48c703dc1adf4a35d11469c2a3dbff7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3b9ab93_d6993e4e",
+        "filename": "include/fpsensor/fpsensor_state.h",
+        "patchSetId": 22
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-08T21:32:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The comment mentions `(size and offset)`, but `FpImageFrameParam` currently only contains `frame_size_bytes`. If you plan to add the offset in a subsequent CL, this is perfectly fine. Otherwise, consider updating the comment or adding `offset` to the struct to match.",
+      "isAi": true,
+      "revId": "38762f78f48c703dc1adf4a35d11469c2a3dbff7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
