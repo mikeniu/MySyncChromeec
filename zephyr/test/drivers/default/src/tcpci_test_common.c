@@ -243,6 +243,9 @@ void test_tcpci_get_cc(const struct emul *emul,
 			"0x%x != (cc2 = 0x%x) in test case %d (CC 0x%x, role 0x%x)",
 			test_param[i].cc[0], cc1, i, cc_status, role_ctrl);
 	}
+
+	/* Reset CC status to open to avoid racing with background PD task */
+	tcpci_emul_set_reg(emul, TCPC_REG_CC_STATUS, 0);
 }
 
 /** Test TCPCI set cc */
@@ -653,6 +656,9 @@ void test_tcpci_alert(const struct emul *emul,
 	/* Test Hard reset */
 	tcpci_emul_set_reg(emul, TCPC_REG_ALERT, TCPC_REG_ALERT_RX_HARD_RST);
 	drv->tcpc_alert(port);
+
+	/* Reset CC status to open to avoid racing with background PD task */
+	tcpci_emul_set_reg(emul, TCPC_REG_CC_STATUS, 0);
 }
 
 /** Test TCPCI alert RX message */
