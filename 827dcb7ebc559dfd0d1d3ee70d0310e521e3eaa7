@@ -135,6 +135,24 @@
       "message": "I believe this will no longer be necessary",
       "revId": "827dcb7ebc559dfd0d1d3ee70d0310e521e3eaa7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a02c34e2_2c1a0ca5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1131142
+      },
+      "writtenOn": "2026-09-08T16:46:31Z",
+      "side": 1,
+      "message": "Agree abandoning patch",
+      "parentUuid": "cb057841_6996e414",
+      "revId": "827dcb7ebc559dfd0d1d3ee70d0310e521e3eaa7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
