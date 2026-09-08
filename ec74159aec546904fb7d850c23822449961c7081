@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9dc036c_a4595b15",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-08T08:23:57Z",
+      "side": 1,
+      "message": "Please split into smaller CLs, at lease like:\n- add pattern2 in common code\n- add pattern2 to egis660\n- debug code",
+      "revId": "ec74159aec546904fb7d850c23822449961c7081",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
