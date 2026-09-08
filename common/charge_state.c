@@ -79,7 +79,7 @@ static struct charge_state_data curr;
 static enum charge_state prev_state;
 static int prev_ac, prev_charge, prev_disp_charge;
 static enum battery_present prev_bp;
-static unsigned int user_current_limit = -1U;
+test_export_static unsigned int user_current_limit = -1U;
 test_export_static timestamp_t shutdown_target_time;
 static timestamp_t precharge_start_time;
 static struct sustain_soc sustain_soc;
@@ -217,7 +217,7 @@ static int battery_sustainer_set(int8_t lower, int8_t upper)
 	return EC_ERROR_INVAL;
 }
 
-static void battery_sustainer_disable(void)
+test_export_static void battery_sustainer_disable(void)
 {
 	battery_sustainer_set(-1, -1);
 }
@@ -526,7 +526,7 @@ void chgstate_set_manual_voltage(int volt_mv)
 }
 
 /* Force charging off before the battery is full. */
-static int set_chg_ctrl_mode(enum ec_charge_control_mode mode)
+test_export_static int set_chg_ctrl_mode(enum ec_charge_control_mode mode)
 {
 	bool discharge_on_ac = false;
 	int current, voltage;
@@ -895,7 +895,7 @@ sustain_switch_mode(enum ec_charge_control_mode mode)
 	return new_mode;
 }
 
-static void sustain_battery_soc(void)
+test_export_static void sustain_battery_soc(void)
 {
 	enum ec_charge_control_mode mode = get_chg_ctrl_mode();
 	enum ec_charge_control_mode new_mode;
@@ -917,7 +917,7 @@ static void sustain_battery_soc(void)
 		mode_text[new_mode]);
 }
 
-static void current_limit_battery_soc(void)
+test_export_static void current_limit_battery_soc(void)
 {
 	if (user_current_limit != current_limit.value &&
 	    charge_get_display_charge() / 10 >= current_limit.soc) {
@@ -1312,8 +1312,8 @@ static void decide_charge_state(int *need_staticp, int *battery_criticalp)
 }
 
 /* Determine voltage/current to request and make it so */
-static void adjust_requested_vi(const struct charger_info *const info,
-				bool is_full)
+test_export_static void
+adjust_requested_vi(const struct charger_info *const info, bool is_full)
 {
 	/* Turn charger off if it's not needed */
 	if (!IS_ENABLED(CONFIG_CHARGER_MAINTAIN_VBAT) &&
