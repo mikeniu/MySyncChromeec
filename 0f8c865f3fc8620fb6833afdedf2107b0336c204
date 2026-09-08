@@ -39,6 +39,30 @@
       },
       "revId": "0f8c865f3fc8620fb6833afdedf2107b0336c204",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4fd456f_f390d9b7",
+        "filename": "zephyr/boards/google/realtek/realtek.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-08T19:07:33Z",
+      "side": 1,
+      "message": "Yes. See full experimental results in bug. I now believe that 2 ms is close to a local optimum, given the current workload and surrounding deep sleep implementation.",
+      "parentUuid": "b68b0fe8_42ed2d62",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 27
+      },
+      "revId": "0f8c865f3fc8620fb6833afdedf2107b0336c204",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
