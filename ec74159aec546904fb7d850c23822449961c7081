@@ -16,6 +16,23 @@
       "message": "Please split into smaller CLs, at lease like:\n- add pattern2 in common code\n- add pattern2 to egis660\n- debug code",
       "revId": "ec74159aec546904fb7d850c23822449961c7081",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fab0e4f_e95db60e",
+        "filename": "util/ectool.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 2057,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-08T08:25:16Z",
+      "side": 1,
+      "message": "It\u0027s not needed here.",
+      "revId": "ec74159aec546904fb7d850c23822449961c7081",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
