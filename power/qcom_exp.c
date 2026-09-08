@@ -153,11 +153,23 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 #define AP_RST_TRANSITION_TIMEOUT (450 * MSEC)
 
 /*
+ * The timeout of waiting for PMIC to assert AP_RST_L during warm reset.
+ * Observed that the worst case is ~1.1s. Pick a safe value.
+ */
+#define PMIC_WARM_RESET_AP_RST_TIMEOUT (1500 * MSEC)
+
+/*
  * Duration to disable the AC_PRESENT interrupt to ignore the
  * spurious toggle from the switchcap turning on/off.
  * Based on o-scope measurements showing a ~500ms event.
  */
 #define AC_IRQ_DISABLE_DURATION (2000 * MSEC)
+
+/*
+ * Delay after POWER_GOOD drops during a PSCI hard reset to allow POWER_GOOD
+ * to recover before treating it as a PSCI shutdown.
+ */
+#define HARD_RESET_POWER_GOOD_LOST_DELAY (200 * MSEC)
 
 /* Heartbeat wake interval (45 minutes) */
 #define HEARTBEAT_WAKE_INTERVAL_SEC (45 * 60)
@@ -226,6 +238,9 @@ static char long_warm_reset;
  *  This variable is initialized to 0 i.e. POWER_G3
  */
 static enum power_state power_state_before_warm_reset;
+
+/* Deadline to check if POWER_GOOD is lost or just transient drop */
+static timestamp_t power_good_lost_deadline;
 
 enum power_request_t {
 	POWER_REQ_NONE,
@@ -565,6 +580,12 @@ static void sys_rst_timer_expired(void)
 }
 DECLARE_DEFERRED(sys_rst_timer_expired);
 
+static void power_good_lost_expired(void)
+{
+	task_wake(TASK_ID_CHIPSET);
+}
+DECLARE_DEFERRED(power_good_lost_expired);
+
 void chipset_sys_rst_interrupt(enum gpio_signal signal)
 {
 	/*
@@ -697,6 +718,21 @@ static int set_system_power(int enable)
  *
  * @return EC_SUCCESS or error
  */
+static void apply_ac_pon_trigger(void)
+{
+#ifdef CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
+	passthru_ac_on_to_pmic();
+#endif
+}
+
+static void clear_ac_pon_trigger(void)
+{
+#ifdef CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET))
+		reset_ac_passthru_pmic_signal();
+#endif
+}
+
 static int set_pmic_pwron(int enable, uint8_t event)
 {
 	int ret;
@@ -733,8 +769,9 @@ static int set_pmic_pwron(int enable, uint8_t event)
 
 	if (enable &&
 	    (event == POWER_ON_BY_AC_ON || event == POWER_ON_BY_RTC_ALARM)) {
-		passthru_ac_on_to_pmic();
+		apply_ac_pon_trigger();
 		ret = wait_pmic_pwron(enable, PMIC_POWER_AP_RESPONSE_TIMEOUT);
+		clear_ac_pon_trigger();
 	} else {
 		gpio_set_level(GPIO_PMIC_KPD_PWR, 1);
 		if (!enable)
@@ -882,6 +919,11 @@ static void power_off_seq(uint8_t shutdown_event)
 
 	lid_opened = 0;
 	ac_on = 0;
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET)) {
+		power_good_lost_deadline.val = 0;
+		hook_call_deferred(&power_good_lost_expired_data, -1);
+	}
 }
 
 /**
@@ -913,9 +955,16 @@ static int power_on_seq(uint8_t poweron_event)
 	}
 
 	CPRINTS("POWER_GOOD seen");
-	/* if power-on is a success passthru the signals again */
-	passthru_ac_on_to_pmic();
+#ifdef CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
+	/*
+	 * If power-on is a success, pass through lid open. When
+	 * SUPPORT_HARD_RESET is enabled, do not re-assert AC passthru to
+	 * avoid a persistent PON trigger state during S0.
+	 */
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET))
+		passthru_ac_on_to_pmic();
 	passthru_lid_open_to_pmic();
+#endif
 
 	return EC_SUCCESS;
 }
@@ -1045,10 +1094,42 @@ static uint8_t check_for_power_off_event(void)
 
 	power_button_was_pressed = pressed;
 
-	/* POWER_GOOD released by AP : shutdown immediately */
-	if (!power_has_signals(IN_POWER_GOOD)) {
-		CPRINTS("POWER_GOOD is lost");
-		return POWER_OFF_BY_POWER_GOOD_LOST;
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET)) {
+		/*
+		 * POWER_GOOD released by AP: wait to distinguish between
+		 * a PSCI shutdown and a PSCI hard reset.
+		 */
+		if (!power_has_signals(IN_POWER_GOOD)) {
+			if (power_good_lost_deadline.val == 0) {
+				power_good_lost_deadline.val =
+					now.val +
+					HARD_RESET_POWER_GOOD_LOST_DELAY;
+				CPRINTS("POWER_GOOD lost, waiting %dms",
+					HARD_RESET_POWER_GOOD_LOST_DELAY /
+						MSEC);
+				hook_call_deferred(
+					&power_good_lost_expired_data,
+					HARD_RESET_POWER_GOOD_LOST_DELAY);
+			} else if (timestamp_expired(power_good_lost_deadline,
+						     &now)) {
+				power_good_lost_deadline.val = 0;
+				CPRINTS("POWER_GOOD is lost (timeout)");
+				return POWER_OFF_BY_POWER_GOOD_LOST;
+			}
+		} else {
+			if (power_good_lost_deadline.val != 0) {
+				CPRINTS("POWER_GOOD recovered");
+				power_good_lost_deadline.val = 0;
+				hook_call_deferred(
+					&power_good_lost_expired_data, -1);
+			}
+		}
+	} else {
+		/* POWER_GOOD released by AP : shutdown immediately */
+		if (!power_has_signals(IN_POWER_GOOD)) {
+			CPRINTS("POWER_GOOD is lost");
+			return POWER_OFF_BY_POWER_GOOD_LOST;
+		}
 	}
 
 	return POWER_OFF_CANCEL;
@@ -1117,7 +1198,7 @@ static int warm_reset_seq(void)
 
 	/* Check that the PMIC asserts PON_RESET_N*/
 	rv = power_wait_signals_timeout(IN_AP_RST_ASSERTED,
-					PMIC_POWER_AP_RESPONSE_TIMEOUT);
+					PMIC_WARM_RESET_AP_RST_TIMEOUT);
 
 	/* Exception case: PMIC not work as expected, request a cold reset */
 	if (rv != EC_SUCCESS)

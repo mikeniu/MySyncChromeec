@@ -234,8 +234,9 @@ static void ev_handler(struct ap_power_ev_callback *cb,
 {
 	switch (data.event) {
 	/*
-	 * LCOV_EXCL_START unreachable case unless ap_power_ev_init_callback()
-	 * below adds an event without adding a case here.
+	 * LCOV_EXCL_START unreachable case unless the
+	 * AP_POWER_EVENT_CALLBACK_DEFINE() below adds an event without adding
+	 * a case here.
 	 */
 	default:
 		break;
@@ -260,31 +261,13 @@ static void ev_handler(struct ap_power_ev_callback *cb,
 		CASE_HOOK(RESET);
 	}
 }
-
-/*
- * Events are received from the AP power event system and sent to the hooks.
- */
-static int zephyr_shim_ap_power_event(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	/*
-	 * Register for all events.
-	 */
-	ap_power_ev_init_callback(
-		&cb, ev_handler,
-		AP_POWER_PRE_INIT | AP_POWER_STARTUP | AP_POWER_RESUME |
-			AP_POWER_SUSPEND |
+AP_POWER_EVENT_CALLBACK_DEFINE(ev_handler, AP_POWER_PRE_INIT, AP_POWER_STARTUP,
+			       AP_POWER_RESUME, AP_POWER_SUSPEND,
 #if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
-			AP_POWER_RESUME_INIT | AP_POWER_SUSPEND_COMPLETE |
+			       AP_POWER_RESUME_INIT, AP_POWER_SUSPEND_COMPLETE,
 #endif
-			AP_POWER_SHUTDOWN | AP_POWER_SHUTDOWN_COMPLETE |
-			AP_POWER_HARD_OFF | AP_POWER_RESET);
-	ap_power_ev_add_callback(&cb);
-	return 0;
-}
-
-SYS_INIT(zephyr_shim_ap_power_event, APPLICATION, 1);
+			       AP_POWER_SHUTDOWN, AP_POWER_SHUTDOWN_COMPLETE,
+			       AP_POWER_HARD_OFF, AP_POWER_RESET);
 #else /* !CONFIG_AP_PWRSEQ */
 
 /*

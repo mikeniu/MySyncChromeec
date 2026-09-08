@@ -23,14 +23,11 @@ struct ap_power_events_config {
 
 struct ap_power_events_data {
 	const struct ap_power_events_config *config;
-	struct ap_power_ev_callback cb;
 };
 
-static void ap_power_events_handler(struct ap_power_ev_callback *callback,
-				    struct ap_power_ev_data data)
+static void ap_power_events_apply(struct ap_power_events_data *inst,
+				  struct ap_power_ev_data data)
 {
-	struct ap_power_events_data *inst =
-		CONTAINER_OF(callback, struct ap_power_events_data, cb);
 	const struct ap_power_events_config *cfg = inst->config;
 	int value;
 
@@ -75,32 +72,35 @@ static int ap_power_events_init(struct ap_power_events_data *inst)
 			cfg->gpios[i].port->name, cfg->gpios[i].pin);
 	}
 
-	ap_power_ev_init_callback(&inst->cb, ap_power_events_handler,
-				  AP_POWER_PRE_INIT | AP_POWER_STARTUP |
-					  AP_POWER_HARD_OFF);
-	ap_power_ev_add_callback(&inst->cb);
-	LOG_INF("ap_power_events callback registered");
-
 	return 0;
 }
 
-#define AP_POWER_EVENTS_DEFINE(n)                                            \
-	static const struct gpio_dt_spec ap_pwr_gpios_##n[] = {              \
-		DT_INST_FOREACH_PROP_ELEM_SEP(n, event_gpios,                \
-					      GPIO_DT_SPEC_GET_BY_IDX, (, )) \
-	};                                                                   \
-	static const struct ap_power_events_config ap_pwr_cfg_##n = {        \
-		.gpios = ap_pwr_gpios_##n,                                   \
-		.num_gpios = ARRAY_SIZE(ap_pwr_gpios_##n),                   \
-	};                                                                   \
-	static struct ap_power_events_data ap_pwr_data_##n = {               \
-		.config = &ap_pwr_cfg_##n,                                   \
-	};                                                                   \
-	static int ap_pwr_init_##n(void)                                     \
-	{                                                                    \
-		return ap_power_events_init(&ap_pwr_data_##n);               \
-	}                                                                    \
-	SYS_INIT(ap_pwr_init_##n, APPLICATION,                               \
+#define AP_POWER_EVENTS_DEFINE(n)                                              \
+	static const struct gpio_dt_spec ap_pwr_gpios_##n[] = {                \
+		DT_INST_FOREACH_PROP_ELEM_SEP(n, event_gpios,                  \
+					      GPIO_DT_SPEC_GET_BY_IDX, (, ))   \
+	};                                                                     \
+	static const struct ap_power_events_config ap_pwr_cfg_##n = {          \
+		.gpios = ap_pwr_gpios_##n,                                     \
+		.num_gpios = ARRAY_SIZE(ap_pwr_gpios_##n),                     \
+	};                                                                     \
+	static struct ap_power_events_data ap_pwr_data_##n = {                 \
+		.config = &ap_pwr_cfg_##n,                                     \
+	};                                                                     \
+	static void ap_power_events_handler_##n(                               \
+		struct ap_power_ev_callback *cb, struct ap_power_ev_data data) \
+	{                                                                      \
+		ARG_UNUSED(cb);                                                \
+		ap_power_events_apply(&ap_pwr_data_##n, data);                 \
+	}                                                                      \
+	AP_POWER_EVENT_CALLBACK_DEFINE(ap_power_events_handler_##n,            \
+				       AP_POWER_PRE_INIT, AP_POWER_STARTUP,    \
+				       AP_POWER_HARD_OFF);                     \
+	static int ap_pwr_init_##n(void)                                       \
+	{                                                                      \
+		return ap_power_events_init(&ap_pwr_data_##n);                 \
+	}                                                                      \
+	SYS_INIT(ap_pwr_init_##n, APPLICATION,                                 \
 		 CONFIG_APPLICATION_INIT_PRIORITY);
 
 DT_INST_FOREACH_STATUS_OKAY(AP_POWER_EVENTS_DEFINE)

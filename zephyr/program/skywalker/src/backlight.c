@@ -8,7 +8,6 @@
 #include "host_command.h"
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/init.h>
 
 #include <ap_power/ap_power.h>
 
@@ -33,22 +32,8 @@ static void board_backlight_handler(struct ap_power_ev_callback *cb,
 	}
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_bl_en_od), value);
 }
-
-static int install_backlight_handler(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	/*
-	 * Add a callback for suspend/resume to
-	 * control the LCD backlight.
-	 */
-	ap_power_ev_init_callback(&cb, board_backlight_handler,
-				  AP_POWER_RESUME | AP_POWER_SUSPEND);
-	ap_power_ev_add_callback(&cb);
-	return 0;
-}
-
-SYS_INIT(install_backlight_handler, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_backlight_handler, AP_POWER_RESUME,
+			       AP_POWER_SUSPEND);
 
 /**
  * Host command to toggle backlight.

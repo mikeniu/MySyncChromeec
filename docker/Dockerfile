@@ -40,6 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     uuid-dev \
     libyaml-dev \
     vim \
+    gosu \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -74,9 +75,18 @@ RUN mkdir -p /opt/repos/src/third_party/zephyrproject && \
 RUN git clone --depth 1 \
     ${REPO_BASE}/third_party/pigweed/pigweed \
     /opt/repos/src/third_party/pigweed
-RUN git clone --depth 1 \
-    ${REPO_BASE}/third_party/u-boot \
-    /opt/repos/src/third_party/u-boot
+# Sparse checkout for u-boot
+RUN mkdir -p /opt/repos/src/third_party/u-boot && \
+    cd /opt/repos/src/third_party/u-boot && \
+    git clone --depth 1 --no-checkout \
+        ${REPO_BASE}/third_party/u-boot \
+        . && \
+    git config core.sparseCheckout true && \
+    echo "/tools/binman/" >> .git/info/sparse-checkout && \
+    echo "/tools/dtoc/" >> .git/info/sparse-checkout && \
+    echo "/tools/patman/" >> .git/info/sparse-checkout && \
+    echo "/tools/buildman/" >> .git/info/sparse-checkout && \
+    git checkout
 
 # Sparse checkout for chromiumos-overlay
 RUN mkdir -p /opt/repos/src/third_party/chromiumos-overlay && \
@@ -128,11 +138,6 @@ RUN VPYTHON_FILE="/opt/repos/src/platform/ec/zephyr/zmake/.vpython3" && \
 # Install zmake in system Python
 RUN python3 -m pip install --no-cache-dir --no-deps \
     /opt/repos/src/platform/ec/zephyr/zmake
-
-# Set PATH for binman. Include both build-time cache (/opt/repos) and mounted
-# workspace (/workspace), with /workspace taking precedence.
-ENV PATH="/opt/repos/src/third_party/u-boot/tools/binman:${PATH}"
-ENV PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
 
 # Build and install rtkupdate host utility
 RUN g++ -O2 -Wall -o /usr/bin/rtkupdate \

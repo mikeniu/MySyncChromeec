@@ -1125,6 +1125,7 @@ enum ec_error_list isl9241_set_acokref(int chgnum, int mv)
 /* ISL-9241 initialization */
 static void isl9241_init(int chgnum)
 {
+	uint16_t control4_mask = ISL9241_CONTROL4_SLEW_RATE_CTRL;
 #ifdef CONFIG_ISL9241_SWITCHING_FREQ
 	int ctl_val;
 #endif
@@ -1168,12 +1169,20 @@ static void isl9241_init(int chgnum)
 			   ISL9241_CONTROL3_ACLIM_RELOAD, MASK_SET))
 		goto init_fail;
 
+	if (CONFIG_CHARGER_SENSE_RESISTOR_AC == CONFIG_CHARGER_SENSE_RESISTOR) {
+		/*
+		 * A 1:1 ratio for Rs1:Rs2 is allowed, but Control4
+		 * register Bit<11> must be set.
+		 */
+		control4_mask |= ISL9241_CONTROL4_PSYS_RSENSE_RATIO;
+	}
+
 	/*
 	 * Set control4 register to
 	 * [13]: Slew rate control enable (sets VSYS ramp to 8mV/us)
 	 */
-	if (isl9241_update(chgnum, ISL9241_REG_CONTROL4,
-			   ISL9241_CONTROL4_SLEW_RATE_CTRL, MASK_SET))
+	if (isl9241_update(chgnum, ISL9241_REG_CONTROL4, control4_mask,
+			   MASK_SET))
 		goto init_fail;
 
 #ifndef CONFIG_CHARGE_RAMP_HW

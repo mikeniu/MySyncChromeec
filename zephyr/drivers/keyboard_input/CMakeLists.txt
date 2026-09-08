@@ -8,4 +8,5 @@ zephyr_library_sources_ifdef(CONFIG_CROS_EC_KEYBOARD_INPUT
 )
 
 zephyr_library_sources_ifdef(CONFIG_CROS_EC_COL_GPIO_DRIVE col_gpio_drive.c)
+zephyr_library_sources_ifdef(CONFIG_CROS_EC_GHOST_FILTER ghost_filter.c)
 zephyr_library_sources_ifdef(CONFIG_CROS_EC_SCANCODE_SET2 scancode_set2.c)

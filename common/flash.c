@@ -1631,11 +1631,10 @@ DECLARE_HOST_COMMAND(EC_CMD_FLASH_READ, flash_command_read, EC_VER_MASK(0));
 #ifdef CONFIG_EC_HOST_CMD
 BUILD_ASSERT(!((sizeof(struct ec_params_flash_write) +
 		sizeof(struct ec_host_cmd_request_header)) %
-	       CONFIG_FLASH_WRITE_SIZE),
-	     "The HC headers sizes and flash write size don't match");
-BUILD_ASSERT(!(CONFIG_EC_HOST_CMD_HANDLER_BUFFER_ALIGN %
-	       CONFIG_FLASH_WRITE_SIZE),
-	     "The host command buffer is not aligned with flash write size");
+	       sizeof(void *)),
+	     "The EC host command header size is not word-aligned");
+BUILD_ASSERT(!(CONFIG_EC_HOST_CMD_HANDLER_BUFFER_ALIGN % sizeof(void *)),
+	     "The EC host command buffer is not word-aligned");
 #endif /* CONFIG_EC_HOST_CMD */
 /**
  * Flash write command
@@ -1765,6 +1764,7 @@ static enum ec_status flash_command_erase(struct host_cmd_handler_args *args)
 		rc = erase_rc;
 		if (rc == EC_RES_SUCCESS) {
 			memcpy(&erase_info, p_1, sizeof(*p_1));
+			erase_info.params.offset = offset;
 			hook_call_deferred(&flash_erase_deferred_data,
 					   100 * MSEC);
 			erase_rc = EC_RES_BUSY;
