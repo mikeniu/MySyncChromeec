@@ -22,6 +22,30 @@
       },
       "revId": "8ac7ff6b577d9d753b34c2f8dc2c0303f4a9e5b9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95f5e7f3_c5676b3a",
+        "filename": "zephyr/test/drivers/panic/src/panic.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-08T19:16:24Z",
+      "side": 1,
+      "message": "Done in PS7: added assertion for panic_get_exception_reg(pdata).",
+      "parentUuid": "5dbd2b36_793596d1",
+      "range": {
+        "startLine": 473,
+        "startChar": 0,
+        "endLine": 473,
+        "endChar": 0
+      },
+      "revId": "8ac7ff6b577d9d753b34c2f8dc2c0303f4a9e5b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
