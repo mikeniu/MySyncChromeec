@@ -11,6 +11,7 @@
 #include "math_util.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
+#include "timer.h"
 
 #include <zephyr/shell/shell.h>
 #include <zephyr/ztest.h>
@@ -22,6 +23,11 @@ int calculate_sleep_dur(int battery_critical, int sleep_usec);
 int charge_request(bool use_curr, bool is_full);
 void check_battery_change_soc(bool is_full, bool prev_full);
 const struct shell *get_ec_shell(void);
+void wakeup_battery(int *need_static);
+void deep_charge_battery(int *need_static);
+void revive_battery(int *need_static);
+extern timestamp_t precharge_start_time;
+extern int battery_seems_dead;
 
 struct charge_state_fixture {
 	struct charge_state_data charge_state_data;
@@ -39,6 +45,9 @@ static void before(void *f)
 	struct charge_state_fixture *fixture = f;
 
 	fixture->charge_state_data = *charge_get_status();
+	battery_seems_dead = 0;
+	precharge_start_time.val = 0;
+	get_time_mock = NULL;
 }
 
 static void after(void *f)
@@ -46,6 +55,9 @@ static void after(void *f)
 	struct charge_state_fixture *fixture = f;
 
 	*charge_get_status() = fixture->charge_state_data;
+	battery_seems_dead = 0;
+	precharge_start_time.val = 0;
+	get_time_mock = NULL;
 }
 
 ZTEST_SUITE(charge_state, drivers_predicate_post_main, setup, before, after,
@@ -735,4 +747,105 @@ ZTEST(charge_state, test_console_cmd_chgstate)
 	zassert_not_ok(shell_execute_cmd(shell, "chgstate sustain 20 bad"));
 	zassert_not_ok(shell_execute_cmd(shell, "chgstate sustain 80 20"));
 	zassert_not_ok(shell_execute_cmd(shell, "chgstate invalid_subcommand"));
+}
+
+ZTEST(charge_state, test_wakeup_battery)
+{
+	struct charge_state_data *curr = charge_get_status();
+	const struct battery_info *info = battery_get_info();
+	timestamp_t fake_time;
+	int need_static = 0;
+
+	fake_time.val = 1000 * USEC_PER_SEC;
+	get_time_mock = &fake_time;
+
+	curr->ac = 1;
+	curr->batt.flags &= ~BATT_FLAG_RESPONSIVE;
+	curr->state = ST_IDLE;
+	battery_seems_dead = 0;
+
+	/* 1. First wakeup call starts precharge */
+	wakeup_battery(&need_static);
+	zassert_equal(1, need_static);
+	zassert_equal(ST_PRECHARGE, curr->state);
+
+	/* 2. After precharge delay, requested voltage and current are set */
+#ifdef CONFIG_PRECHARGE_DELAY_MS
+	fake_time.val += (CONFIG_PRECHARGE_DELAY_MS * USEC_PER_MSEC) + 1;
+#else
+	fake_time.val += 1;
+#endif
+	wakeup_battery(&need_static);
+	zassert_equal(info->voltage_max, curr->requested_voltage);
+	zassert_equal(info->precharge_current, curr->requested_current);
+
+	/* 3. Precharge timeout expires -> battery seems dead */
+	need_static = 0;
+	fake_time.val += (CONFIG_BATTERY_PRECHARGE_TIMEOUT + 1) * USEC_PER_SEC;
+	wakeup_battery(&need_static);
+	zassert_equal(1, battery_seems_dead);
+	zassert_equal(ST_IDLE, curr->state);
+	zassert_equal(0, curr->requested_voltage);
+	zassert_equal(0, curr->requested_current);
+
+	/* 4. Dead battery does nothing */
+	wakeup_battery(&need_static);
+	zassert_equal(ST_IDLE, curr->state);
+}
+
+ZTEST(charge_state, test_deep_charge_battery)
+{
+	struct charge_state_data *curr = charge_get_status();
+	const struct battery_info *info = battery_get_info();
+	timestamp_t fake_time;
+	int need_static = 0;
+
+	fake_time.val = 1000 * USEC_PER_SEC;
+	get_time_mock = &fake_time;
+
+	curr->ac = 1;
+	curr->state = ST_IDLE;
+	curr->batt.flags &= ~BATT_FLAG_DEEP_CHARGE;
+
+	/* 1. Start deep charge */
+	deep_charge_battery(&need_static);
+	zassert_equal(1, need_static);
+	zassert_equal(ST_PRECHARGE, curr->state);
+	zassert_true(curr->batt.flags & BATT_FLAG_DEEP_CHARGE);
+	zassert_equal(info->voltage_max, curr->requested_voltage);
+	zassert_equal(info->precharge_current, curr->requested_current);
+
+	/* 2. Low voltage precharge timeout */
+	need_static = 0;
+	fake_time.val += CONFIG_BATTERY_LOW_VOLTAGE_TIMEOUT + 100;
+	deep_charge_battery(&need_static);
+	zassert_equal(ST_IDLE, curr->state);
+	zassert_equal(0, curr->requested_voltage);
+	zassert_equal(0, curr->requested_current);
+
+	/* 3. ST_IDLE with DEEP_CHARGE flag set */
+	deep_charge_battery(&need_static);
+	zassert_equal(0, curr->requested_voltage);
+	zassert_equal(0, curr->requested_current);
+}
+
+ZTEST(charge_state, test_revive_battery)
+{
+	struct charge_state_data *curr = charge_get_status();
+	int need_static = 0;
+
+	/* 1. In ST_PRECHARGE, battery wakes up */
+	curr->state = ST_PRECHARGE;
+	battery_seems_dead = 0;
+	revive_battery(&need_static);
+	zassert_equal(1, need_static);
+	zassert_equal(0, battery_seems_dead);
+
+	/* 2. Dead battery wakes up */
+	curr->state = ST_IDLE;
+	battery_seems_dead = 1;
+	need_static = 0;
+	revive_battery(&need_static);
+	zassert_equal(1, need_static);
+	zassert_equal(0, battery_seems_dead);
 }
