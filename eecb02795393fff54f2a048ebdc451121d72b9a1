@@ -22,6 +22,30 @@
       },
       "revId": "eecb02795393fff54f2a048ebdc451121d72b9a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbb93b3c_4caaf515",
+        "filename": "zephyr/Kconfig.defaults",
+        "patchSetId": 6
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-08T15:23:59Z",
+      "side": 0,
+      "message": "In progress with adding this config it caused some tests to fail, digging deeper into the failures lead to this config not being needed.",
+      "parentUuid": "15595d4f_0e909b5c",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 38
+      },
+      "revId": "eecb02795393fff54f2a048ebdc451121d72b9a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
