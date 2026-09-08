@@ -5,11 +5,13 @@
 
 /* Mica lightbar LED control used to trigger a custom diagnostic sequence. */
 
+#include "battery.h"
 #include "hooks.h"
 #include "lb_policy.h"
 #include "led_common.h"
 #include "led_lb_host_program.h"
 #include "led_lightbar.h"
+#include "util.h"
 
 #include <zephyr/logging/log.h>
 
@@ -17,6 +19,13 @@ LOG_MODULE_REGISTER(mica_led_diag, LOG_LEVEL_ERR);
 
 /* true while power failure is detected. */
 static bool power_fail_flags;
+
+static void update_led_battery_vendor_fail_deferred(void);
+DECLARE_DEFERRED(update_led_battery_vendor_fail_deferred);
+static void update_led_battery_vendor_fail_deferred(void)
+{
+	lb_set_diag_policy(LED_ALT_POLICY_DIAG_BATTERY, 0);
+}
 
 /*
  * AP-triggered Diagnostics
@@ -68,3 +77,24 @@ static void board_clear_diag_led(void)
 	}
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_clear_diag_led, HOOK_PRIO_DEFAULT);
+
+/*
+ * Check the battery vendor at chipset startup and activate LED diagnostics for
+ * non-customer batteries.
+ */
+static void board_diag_led_battery_vendor_fail(void)
+{
+	struct battery_static_info *bs = &battery_static[BATT_IDX_MAIN];
+
+	/* Check if the battery is a customer battery. */
+	if (strncasecmp(bs->model_ext, "Dell", 4)) {
+		LOG_ERR("No Dell battery! LED Diag activated");
+
+		/* Deferred 5s to avoid state conflict */
+		hook_call_deferred(
+			&update_led_battery_vendor_fail_deferred_data,
+			5 * USEC_PER_SEC);
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_diag_led_battery_vendor_fail,
+	     HOOK_PRIO_DEFAULT);

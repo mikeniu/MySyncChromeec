@@ -188,4 +188,17 @@
 			color-15  { led-color = <&lightbar_off>;    period-ms = <3000>; };
 		};
 	};
+
+	/* Battery Vendor Check Failure: 1 Amber, 1 Off */
+	lb_state_diag_battery: lb-state-diag-battery {
+		board-led-alt-policy-label = <LED_ALT_POLICY_DIAG_BATTERY>;
+		pattern-0 {
+			transition = "LED_TRANSITION_STEP";
+			led-id = "EC_LED_ID_LIGHTBAR_LED";
+			cycle-count = <0>;
+			/* 1x Amber Flashes (0.8s ON, 1.2s OFF) */
+			color-0  { led-color = <&lightbar_red>;    period-ms = <800>; };
+			color-1  { led-color = <&lightbar_off>;    period-ms = <1200>; };
+		};
+	};
 };
