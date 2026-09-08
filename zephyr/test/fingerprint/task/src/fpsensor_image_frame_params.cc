@@ -12,7 +12,7 @@
 
 #include <drivers/fingerprint_sim.h>
 #include <fingerprint/v4l2_types.h>
-#include <fpsensor/fpsensor_frame_size.h>
+#include <fpsensor/fpsensor_image_frame_params.h>
 #include <memory>
 #include <mkbp_event.h>
 
@@ -45,23 +45,24 @@ static const struct fingerprint_image_frame_params image_frame_params_arr[] = {
 		DT_NODELABEL(fpsensor_sim))
 };
 
-static std::unique_ptr<FpFrameSizeCache> cache_fixture;
+static std::unique_ptr<FpImageFrameParamsCache> cache_fixture;
 
-static void fpsensor_frame_size_setup(void *fixture)
+static void fpsensor_image_frame_params_setup(void *fixture)
 {
 	ARG_UNUSED(fixture);
 
-	cache_fixture = std::make_unique<FpFrameSizeCache>();
+	cache_fixture = std::make_unique<FpImageFrameParamsCache>();
 	zassert_not_null(cache_fixture.get(),
 			 "Memory allocation failed for cache.");
 
 	cache_fixture->populate_cache(sizeof(image_buffer));
 }
 
-ZTEST_SUITE(fpsensor_frame_size, NULL, NULL, fpsensor_frame_size_setup, NULL,
-	    NULL);
+ZTEST_SUITE(fpsensor_image_frame_params, NULL, NULL,
+	    fpsensor_image_frame_params_setup, NULL, NULL);
 
-ZTEST(fpsensor_frame_size, test_cache_initialization_on_size_constraint_failure)
+ZTEST(fpsensor_image_frame_params,
+      test_cache_initialization_on_size_constraint_failure)
 {
 	zassert_true(ARRAY_SIZE(image_frame_params_arr) > 0,
 		     "image_frame_params_arr must not be empty for this test.");
@@ -69,7 +70,7 @@ ZTEST(fpsensor_frame_size, test_cache_initialization_on_size_constraint_failure)
 	uint32_t max_frame_size_bytes =
 		image_frame_params_arr[0].frame_size - 1;
 
-	FpFrameSizeCache failing_cache{};
+	FpImageFrameParamsCache failing_cache{};
 	failing_cache.populate_cache(max_frame_size_bytes);
 
 	for (int i = 0; i < FP_CAPTURE_TYPE_MAX; ++i) {
@@ -83,9 +84,10 @@ ZTEST(fpsensor_frame_size, test_cache_initialization_on_size_constraint_failure)
 	}
 }
 
-ZTEST(fpsensor_frame_size, test_cache_valid_type_initialization_and_lookup)
+ZTEST(fpsensor_image_frame_params,
+      test_cache_valid_type_initialization_and_lookup)
 {
-	FpFrameSizeCache *cache = cache_fixture.get();
+	FpImageFrameParamsCache *cache = cache_fixture.get();
 
 	for (const auto &params : image_frame_params_arr) {
 		const uint32_t expected_size = params.frame_size;
@@ -106,9 +108,9 @@ ZTEST(fpsensor_frame_size, test_cache_valid_type_initialization_and_lookup)
 	}
 }
 
-ZTEST(fpsensor_frame_size, test_cache_invalid_type_lookup)
+ZTEST(fpsensor_image_frame_params, test_cache_invalid_type_lookup)
 {
-	FpFrameSizeCache *cache = cache_fixture.get();
+	FpImageFrameParamsCache *cache = cache_fixture.get();
 
 	std::array<bool, FP_CAPTURE_TYPE_MAX> is_type_present = {};
 	for (const auto &params : image_frame_params_arr) {
@@ -135,27 +137,38 @@ ZTEST(fpsensor_frame_size, test_cache_invalid_type_lookup)
 	}
 }
 
-ZTEST(fpsensor_frame_size, test_cache_boundary_max_index)
+ZTEST(fpsensor_image_frame_params, test_cache_boundary_max_index)
 {
-	FpFrameSizeCache *cache = cache_fixture.get();
+	FpImageFrameParamsCache *cache = cache_fixture.get();
 
 	zassert_equal(
 		cache->get_frame_size(FP_CAPTURE_TYPE_MAX), 0,
 		"Expected zero size for invalid capture type (FP_CAPTURE_TYPE_MAX).");
 }
 
-ZTEST(fpsensor_frame_size, test_cache_boundary_negative_index)
+ZTEST(fpsensor_image_frame_params, test_cache_boundary_above_max_index)
 {
-	FpFrameSizeCache *cache = cache_fixture.get();
+	FpImageFrameParamsCache *cache = cache_fixture.get();
+	const enum fp_capture_type above_max_type =
+		static_cast<enum fp_capture_type>(FP_CAPTURE_TYPE_MAX + 1);
+
+	zassert_equal(
+		cache->get_frame_size(above_max_type), 0,
+		"Expected zero size for invalid capture type (FP_CAPTURE_TYPE_MAX + 1).");
+}
+
+ZTEST(fpsensor_image_frame_params, test_cache_boundary_negative_index)
+{
+	FpImageFrameParamsCache *cache = cache_fixture.get();
 
 	zassert_equal(
 		cache->get_frame_size(static_cast<enum fp_capture_type>(-1)), 0,
 		"Expected zero size for negative capture type (-1).");
 }
 
-ZTEST(fpsensor_frame_size, test_set_frame_size)
+ZTEST(fpsensor_image_frame_params, test_set_frame_size)
 {
-	FpFrameSizeCache *cache = cache_fixture.get();
+	FpImageFrameParamsCache *cache = cache_fixture.get();
 	const enum fp_capture_type test_type = FP_CAPTURE_VENDOR_FORMAT;
 	const uint32_t new_size = 1024;
 
@@ -166,7 +179,7 @@ ZTEST(fpsensor_frame_size, test_set_frame_size)
 		"Test setup error: new_size should be different from original.");
 
 	/* Use the test-only setter to override the cache */
-	zassert_true(FpFrameSizeCacheTestHelper::set_frame_size(
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
 			     *cache, test_type, new_size),
 		     "Failed to set frame size for test type %d", test_type);
 
@@ -178,13 +191,13 @@ ZTEST(fpsensor_frame_size, test_set_frame_size)
 		new_size, updated_size);
 }
 
-ZTEST(fpsensor_frame_size, test_set_frame_size_boundary_max_index)
+ZTEST(fpsensor_image_frame_params, test_set_frame_size_boundary_max_index)
 {
-	FpFrameSizeCache *cache = cache_fixture.get();
+	FpImageFrameParamsCache *cache = cache_fixture.get();
 	const uint32_t new_size = 512;
 
 	/* Verify that calling with FP_CAPTURE_TYPE_MAX is a no-op */
-	zassert_false(FpFrameSizeCacheTestHelper::set_frame_size(
+	zassert_false(FpImageFrameParamsCacheTestHelper::set_frame_size(
 		*cache, FP_CAPTURE_TYPE_MAX, new_size));
 
 	zassert_equal(
@@ -192,13 +205,13 @@ ZTEST(fpsensor_frame_size, test_set_frame_size_boundary_max_index)
 		"set_frame_size should ignore the out-of-bounds index FP_CAPTURE_TYPE_MAX.");
 }
 
-ZTEST(fpsensor_frame_size, test_set_frame_size_boundary_negative_index)
+ZTEST(fpsensor_image_frame_params, test_set_frame_size_boundary_negative_index)
 {
-	FpFrameSizeCache *cache = cache_fixture.get();
+	FpImageFrameParamsCache *cache = cache_fixture.get();
 	const uint32_t new_size = 512;
 
 	/* Verify that calling with -1 is a no-op */
-	zassert_false(FpFrameSizeCacheTestHelper::set_frame_size(
+	zassert_false(FpImageFrameParamsCacheTestHelper::set_frame_size(
 		*cache, static_cast<enum fp_capture_type>(-1), new_size));
 
 	zassert_equal(
