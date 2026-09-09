@@ -37,4 +37,12 @@ void get_thread_name(const struct k_thread *thread, char *name, size_t size);
  */
 uint32_t get_stack_ptr(const struct k_thread *thread);
 
+/**
+ * @brief Get the number of interrupt handlers preempted by the current one.
+ *
+ * @returns 0 in thread context or a non-nested ISR, otherwise the number of
+ *          active handlers excluding the current one. 0 if unsupported.
+ */
+uint8_t get_isr_depth(void);
+
 #endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_PANIC_UTILS_H_ */

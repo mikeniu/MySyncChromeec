@@ -1281,6 +1281,12 @@ tests:
     - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_PANIC=y
     - CONFIG_PLATFORM_EC_PANIC_HOST_EVENT=y
+  drivers.panic.rw.no_watchdog_struct:
+    extra_configs:
+    - CONFIG_CROS_EC_RW=y
+    - CONFIG_LINK_TEST_SUITE_PANIC=y
+    - CONFIG_PLATFORM_EC_PANIC_HOST_EVENT=y
+    - CONFIG_PLATFORM_EC_PANIC_WATCHDOG_STRUCT=n
   drivers.panic_output.ro:
     tags:
     - host_cmd
@@ -2292,6 +2298,17 @@ tests:
     - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_WATCHDOG=y
     - CONFIG_ZTEST_THREAD_PRIORITY=1
+    extra_conf_files:
+    - prj.conf
+    - watchdog/prj.conf
+  drivers.watchdog.rw.no_watchdog_struct:
+    tags:
+    - host_cmd
+    extra_configs:
+    - CONFIG_CROS_EC_RW=y
+    - CONFIG_LINK_TEST_SUITE_WATCHDOG=y
+    - CONFIG_ZTEST_THREAD_PRIORITY=1
+    - CONFIG_PLATFORM_EC_PANIC_WATCHDOG_STRUCT=n
     extra_conf_files:
     - prj.conf
     - watchdog/prj.conf
