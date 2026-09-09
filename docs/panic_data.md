@@ -152,36 +152,56 @@ In Zephyr EC, asserts override Zephyr's `zassert_post_action()` (see [zephyr/shi
 
 Watchdog resets require special coordination between the watchdog timer, the panic logging system, and the RO/RW images.
 
-There are three distinct software panic reasons associated with watchdogs:
+A watchdog warning timer fires `WATCHDOG_WARNING_LEADING_TIME_MS` (default 500 ms) before the hardware watchdog expires. The warning handler records the interrupted context in panic data. If the hardware watchdog then resets the EC, RW finalizes that record during `panic_data_init()`.
 
-1.  **`PANIC_SW_WATCHDOG_WARN`** (`0xDEAD6668`, introduced in commit [a58ecc0d44](https://chromium.googlesource.com/chromiumos/platform/ec/+/a58ecc0d441eeb5613af383e8de757f5d79879b2) (introduced warning)):
-    Set when the software watchdog warning timer fires. It captures the active thread context (the truncated thread ID in `exception`) and the Program Counter (PC) where execution was interrupted.
-2.  **`PANIC_SW_WATCHDOG`** (`0xDEAD6664`):
-    The "promoted" watchdog reason. During boot, if the reset flags indicate a watchdog reset and the existing panic reason in RAM is `PANIC_SW_WATCHDOG_WARN`, the reason is promoted to `PANIC_SW_WATCHDOG`. This preserves the captured PC (info) and thread ID (exception) from the warning.
-3.  **`PANIC_SW_WATCHDOG_HARD`** (`0xDEAD666A`, introduced in commit [60c5c62f4c](https://chromium.googlesource.com/chromiumos/platform/ec/+/60c5c62f4c193b25cc3fc9f43adce9b3e1d1b6e9) (introduced hard watchdog)):
-    Set when a hardware watchdog reset occurs, but there was no prior `PANIC_SW_WATCHDOG_WARN` recorded. This typically happens during a hard lockup where interrupts are disabled (e.g., inside an interrupt handler or critical section), preventing the watchdog warning interrupt from firing. A `PANIC_SW_WATCHDOG_HARD` panic will always have blank or missing PC and task/thread ID fields.
+RO never modifies watchdog panic data (since commit [682f4c61f1](https://chromium.googlesource.com/chromiumos/platform/ec/+/682f4c61f142f622091dcf60ccac339a8d5ac8f2)). Older RO images could only preserve `reason`, `info` and `exception`, and could overwrite a larger RW layout. RW finalizes the data after sysjump. As a result, a warning is not finalized while running RO (e.g. with EC software sync disabled).
 
-*(Note: Prior to the introduction of `PANIC_SW_WATCHDOG_WARN` and `PANIC_SW_WATCHDOG_HARD`, all watchdog resets appeared simply as `PANIC_SW_WATCHDOG`).*
+### Watchdog Panic Structure (`PANIC_ARCH_WATCHDOG`)
 
-### Watchdog Warning (Pre-Warning)
-To capture the state of the EC before a watchdog reset occurs, a software watchdog warning timer is configured to fire `WATCHDOG_WARNING_LEADING_TIME_MS` (default 500ms) before the hardware watchdog would expire.
+When `CONFIG_PLATFORM_EC_PANIC_WATCHDOG_STRUCT=y` (default), the warning handler writes `struct watchdog_panic_data` (`pdata->arch == PANIC_ARCH_WATCHDOG`). This struct has the same layout on every architecture. It is defined in [include/panic_defs.h](../include/panic_defs.h).
 
-When this warning fires:
-1.  The truncated thread ID and the Program Counter (PC) of the active thread are captured into `exception` and `info`. (Console `printk` statements output the full un-truncated thread pointer address via `%p`).
-2.  These are stored in the `exception` and `info` fields of the panic data, respectively.
-3.  The panic reason is set to `PANIC_SW_WATCHDOG_WARN`.
-4.  If the hardware watchdog subsequently expires, the system resets with the reset reason flag `EC_RESET_FLAG_WATCHDOG` set.
+| Offset | Type | Field | Description |
+| :--- | :--- | :--- | :--- |
+| 0 | `uint32_t` | `reason_x86` | Software panic reason at the x86/NDS32 reason offset (`x86.vector` / `nds_n8.itype`). |
+| 4 | `uint8_t` | `struct_major_version` | Incremented on breaking layout changes. Currently 1. |
+| 5 | `uint8_t` | `struct_minor_version` | Incremented on append-only additions. Currently 0. |
+| 6 | `uint16_t` | `struct_flags` | `WATCHDOG_PANIC_FLAG_*`. |
+| 8 | `uint32_t` | `thread_id` | Thread running when the warning fired. |
+| 12 | `uint32_t` | `reason_cm` | Software panic reason at the Cortex-M reason offset (`cm.regs[R4]`). |
+| 16 | `uint32_t` | `pc` | Thread PC when the warning fired (`MEPC` on RISC-V). |
+| 20 | `uint32_t` | `lr` | Thread LR when the warning fired (`RA` on RISC-V). |
+| 24 | `uint32_t` | `sp` | Thread SP at exception entry. |
+| 28 | `char[16]` | `image_version` | Last 16 characters of the EC version string (not NUL-terminated). |
+| 44 | `uint32_t` | `reason_riscv` | Software panic reason at the RISC-V reason offset (`riscv.regs[11]`). |
+| 48 | `uint32_t` | `uptime` | ms since boot when the warning fired; wraps at ~49.7 days. |
+| 52 | `uint32_t` | `reset_flags` | EC reset flags at warning time. |
+| 56 | `uint32_t` | `power_signals` | AP power signal mask. |
+| 60 | `uint8_t` | `power_state` | AP power state (`enum panic_power_state`; `0xFF` = unknown). |
+| 61 | `uint8_t` | `battery_level` | Battery state of charge (%); `0xFF` = unknown. |
+| 62 | `uint8_t` | `isr_depth` | Interrupt handlers active when the warning fired, excluding the warning; 0 = thread context. If non-zero, `pc`/`lr`/`sp` describe the thread as of the outermost interrupt. |
+| 63 | `uint8_t[1]` | `reserved` | Zero. |
 
-### Watchdog Reset Promotion
-During early initialization, if the reset flags indicate a watchdog reset (`EC_RESET_FLAG_WATCHDOG`), the initialization logic checks the existing panic data in RAM:
-*   **If the existing panic reason is `PANIC_SW_WATCHDOG_WARN`**: The reason is "promoted" to `PANIC_SW_WATCHDOG`, preserving the captured `info` (PC) and `exception` (task ID) fields.
-*   **If the existing panic reason is NOT `PANIC_SW_WATCHDOG_WARN`**: The panic data is overwritten with the reason `PANIC_SW_WATCHDOG_HARD`, and all other registers are left blank.
+`WATCHDOG_PANIC_FLAG_WARNING` is set when the warning fires. RW clears it after a watchdog reset if the data is still new and the major version is supported. If the flag is still set, the warning fired but no watchdog reset followed. All three `reason_*` fields are set to `PANIC_SW_WATCHDOG` at warning time, so the reason alone cannot distinguish a warning from a reset; readers must check the flag.
 
-Before commit [682f4c61f1](https://chromium.googlesource.com/chromiumos/platform/ec/+/682f4c61f142f622091dcf60ccac339a8d5ac8f2) (which restricted promotion to RW), the RO image would perform the watchdog promotion first during pre-init. This caused compatibility issues:
+#### Compatibility with Older Images
 
-If the RO image was unable to interpret the RW panic data (e.g., because the RO image expected a smaller `panic_data` layout), it would overwrite the panic data using its own layout. Even if it could interpret the data, RO's promotion would only preserve the `reason`, `info`, and `exception` fields, blanking out any new registers or fields that the newer RW image may have populated.
+Images that predate `PANIC_ARCH_WATCHDOG` ignore `arch` and read the software panic reason from their native register slot. `reason_x86`, `reason_cm` and `reason_riscv` sit at those offsets (checked by `BUILD_ASSERT`s). With all three set to `PANIC_SW_WATCHDOG`, an older image treats the data as an existing watchdog panic and leaves it intact.
 
-To resolve this, commit [682f4c61f1](https://chromium.googlesource.com/chromiumos/platform/ec/+/682f4c61f142f622091dcf60ccac339a8d5ac8f2) restricted the watchdog promotion logic to run **only in the RW image**. The RO image preserves the reset flags and does not modify the panic data, allowing the RW image to safely perform the promotion after sysjump. *Note*: With this change, the watchdog warning reason (`PANIC_SW_WATCHDOG_WARN`) will not be promoted while executing the RO image, even if a watchdog reset occurred. This is typically not noticed since the EC immediately jumps to RW unless EC software sync is disabled for development.
+#### Evolving the Structure
+
+* **Minor version**: append fields or assign reserved bytes, then bump `WATCHDOG_PANIC_DATA_MINOR_VERSION` and update the size `BUILD_ASSERT`. Readers that support major version 1 can always decode the fields they know about. Fields added in `1.N` must only be read when `struct_minor_version >= N`. Reserved bytes are zero when written and ignored by readers until a minor version defines them.
+* **Major version**: required for any removal or reordering. `reason_*`, `struct_major_version` and `struct_minor_version` must stay at their current offsets. Readers reject an unknown major version.
+* **Size ceiling**: the struct must not exceed `sizeof(struct cortex_panic_data)` (104 bytes), so `sizeof(struct panic_data)` does not change on any board. Older RO images require an exact size match (see [Constraints on Panic Data Size](#constraints-on-panic-data-size)).
+
+### Legacy Software Panic Reasons
+
+When `CONFIG_PLATFORM_EC_PANIC_WATCHDOG_STRUCT=n`, or when there was no warning, watchdogs use the architecture register layout and these reasons:
+
+1.  **`PANIC_SW_WATCHDOG_WARN`** (`0xDEAD6668`, commit [a58ecc0d44](https://chromium.googlesource.com/chromiumos/platform/ec/+/a58ecc0d441eeb5613af383e8de757f5d79879b2)): written by the warning handler. `info` holds the interrupted PC and `exception` holds the truncated thread ID.
+2.  **`PANIC_SW_WATCHDOG`** (`0xDEAD6664`): after a watchdog reset, RW promotes a new `PANIC_SW_WATCHDOG_WARN` to this reason in place, preserving `info` and `exception`.
+3.  **`PANIC_SW_WATCHDOG_HARD`** (`0xDEAD666A`, commit [60c5c62f4c](https://chromium.googlesource.com/chromiumos/platform/ec/+/60c5c62f4c193b25cc3fc9f43adce9b3e1d1b6e9)): written by RW after a watchdog reset when no new warning was recorded. This typically means a hard lockup with interrupts disabled. PC and thread ID are blank, and the `RO_IMAGE`/`RW_IMAGE` flags are cleared because the source image is unknown.
+
+*(Prior to `PANIC_SW_WATCHDOG_WARN` and `PANIC_SW_WATCHDOG_HARD`, all watchdog resets appeared as `PANIC_SW_WATCHDOG`.)*
 
 ## Zephyr Integration
 

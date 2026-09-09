@@ -225,10 +225,30 @@ static void log_thread_info(const struct k_thread *thread, void *user_data)
 	}
 }
 
+/* Frame stacked when the current thread was interrupted, or NULL. */
+static struct arch_esf *wdt_get_thread_esf(const struct k_thread *thread)
+{
+#if defined(CONFIG_RISCV)
+	return (struct arch_esf *)get_stack_ptr(thread);
+#elif defined(CONFIG_CPU_CORTEX_M)
+	struct arch_esf *esf;
+
+	/*
+	 * Threads run on PSP; PSP points at the frame stacked when the thread
+	 * was interrupted (by the outermost ISR if nested).
+	 */
+	ARG_UNUSED(thread);
+	__asm__ volatile("mrs %0, psp" : "=r"(esf));
+	return esf;
+#else
+	ARG_UNUSED(thread);
+	return NULL;
+#endif
+}
+
 __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 					       int channel_id)
 {
-	uint32_t exception_address = 0;
 	const char *thread_name;
 	if (IS_ENABLED(CONFIG_THREAD_NAME)) {
 		thread_name = k_thread_name_get(k_current_get());
@@ -236,29 +256,19 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 		thread_name = "unknown";
 	}
 	struct k_thread *thread = k_current_get();
+	struct arch_esf *esf = wdt_get_thread_esf(thread);
+	uint32_t pc = 0;
+	uint32_t lr = 0;
 
-#ifdef CONFIG_RISCV
-	struct arch_esf *esf = (struct arch_esf *)get_stack_ptr(thread);
-
-	exception_address = esf->mepc;
-	printk("WDT pre-warning MEPC:%p RA:%p THREAD:%p THREAD_NAME:%s\n",
-	       (void *)esf->mepc, (void *)esf->ra, (void *)thread, thread_name);
-#elif CONFIG_CPU_CORTEX_M
-	struct arch_esf *esf;
-	/*
-	 * Watchdog warning should only be triggered while executing in thread
-	 * context, thus PSP will point to esf.
-	 */
-	__asm__ volatile("mrs %0, psp" : "=r"(esf));
-	printk("WDT pre-warning PC:%p LR:%p THREAD:%p THREAD_NAME:%s\n",
-	       (void *)esf->basic.pc, (void *)esf->basic.lr, (void *)thread,
-	       thread_name);
-	exception_address = esf->basic.pc;
-#else
-	/* TODO(b/176523207): watchdog warning message */
-	printk("Watchdog deadline is close! THREAD:%p THREAD_NAME:%s\n",
-	       (void *)thread, thread_name);
+#if defined(CONFIG_RISCV)
+	pc = esf->mepc;
+	lr = esf->ra;
+#elif defined(CONFIG_CPU_CORTEX_M)
+	pc = esf->basic.pc;
+	lr = esf->basic.lr;
 #endif
+	printk("WDT pre-warning PC:%p LR:%p THREAD:%p THREAD_NAME:%s\n",
+	       (void *)pc, (void *)lr, (void *)thread, thread_name);
 #ifdef TEST_BUILD
 	wdt_warning_triggered = true;
 #endif
@@ -272,12 +282,8 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 		k_thread_foreach_unlocked(log_thread_info, NULL);
 	}
 
-	/* Save the current task id in panic info.
-	 * The PANIC_SW_WATCHDOG_WARN reason will be changed to a regular
-	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
-	 * occurs.
-	 */
-	panic_data_write_watchdog_warning(exception_address, thread);
+	/* Finalized by panic_data_init() if a watchdog reset follows. */
+	panic_data_write_watchdog_warning(pc, lr, (uint32_t)(uintptr_t)esf);
 }
 
 __maybe_unused static void
