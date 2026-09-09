@@ -8,7 +8,7 @@
 
 #define DT_DRV_COMPAT elan_elan80sg
 
-#include "fingerprint_elan80series_private.h"
+#include "fingerprint_elan_series_private.h"
 
 #include <stdbool.h>
 #include <stddef.h>
