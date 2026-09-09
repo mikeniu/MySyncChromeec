@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7cfd80a9_4d822c87",
+        "filename": "zephyr/shim/src/hooks.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-09T23:04:56Z",
+      "side": 1,
+      "message": "If BT_HCI_RAW doesn\u0027t need the system workqueue, then can we modify upstream code that forces the system workqueue to be cooperative?\n\n```\n# The Bluetooth subsystem requires the system workqueue to execute at\n# a cooperative priority.\nconfig SYSTEM_WORKQUEUE_PRIORITY\n\trange -256 -1 if !BT_HCI_RAW\n```\n\nThe main purpose of this check is to ensure we only service the watchdog timer from the lowest priority thread.  If we\u0027re stuck with making the system workqueue cooperative, then we may need create separate low-priority thread to service the watchdog.",
+      "range": {
+        "startLine": 109,
+        "startChar": 7,
+        "endLine": 109,
+        "endChar": 17
+      },
+      "revId": "3c39666065293109b619bd37ede3cb4426e03619",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
