@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2945cb55_010cdfa1",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-09T21:06:20Z",
+      "side": 1,
+      "message": "Nit: We should have a macro or maybe even a function that can construct a DP Status VDO (what should be here) from its component fields. That would be more readable here, even if the field values are made up for the purpose of this test.",
+      "revId": "ac36702b07a770f597370c763d60d1851c3764ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83ce3a3d_daed5f7b",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-09T21:06:20Z",
+      "side": 1,
+      "message": "From what I can see, this is mostly testing error paths that would result from the PE and DPM state machines becomes desynchronized. That shouldn\u0027t be possible normally, so I guess you wouldn\u0027t be able to use the whole stack like the `usbc_dp_mode` tests do. That would mean that you\u0027d need to call directly into the internal APIs like this, even though it\u0027s a little clunky. If you keep venturing into DPM coverage, be aware that there may be a cleaner way.",
+      "revId": "ac36702b07a770f597370c763d60d1851c3764ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
