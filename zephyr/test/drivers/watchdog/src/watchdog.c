@@ -13,6 +13,7 @@
 #include "hooks.h"
 #include "host_command.h"
 #include "panic.h"
+#include "task.h"
 #include "test/drivers/stubs.h"
 #include "test/drivers/test_state.h"
 #include "watchdog.h"
@@ -133,13 +134,15 @@ ZTEST(watchdog, test_wdt_warning_handler)
 
 	struct panic_data *pdata = panic_get_data();
 
-	zassert_not_null(pdata);
-	zassert_equal(PANIC_SW_WATCHDOG_WARN, panic_get_reason_reg(pdata),
+	zassert_not_null(pdata, NULL);
+	zassert_equal(PANIC_ARCH_WATCHDOG, pdata->arch, NULL);
+	zassert_true(pdata->wd.flags & WATCHDOG_PANIC_FLAG_WARNING, NULL);
+
+	zassert_equal(PANIC_SW_WATCHDOG, panic_get_reason_reg(pdata),
 		      "Watchdog warning panic reason was not set");
 
-	zassert_equal((uint8_t)(uintptr_t)k_current_get(),
-		      panic_get_exception_reg(pdata),
-		      "Panic exception should match current thread id");
+	zassert_equal(task_get_current(), pdata->wd.thread_id,
+		      "Panic thread ID should match current task");
 }
 
 /**
