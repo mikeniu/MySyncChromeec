@@ -15,18 +15,29 @@ Tokenized EC logs should be transparent to the developer in most scenarios.
 Detokenizing occurs before the log is outputted to console or saved to
 `cros_ec.log` on the DUT.
 
-## Enabling Tokenization in EC
+## Enabling and Disabling Tokenization in EC
 
-Add the Zephyr snippet [`pw-tokenize`] to your project's configuration.
-Additionally, make sure `picolibc`, `pigweed` modules are added to your project.
+Tokenized logging is enabled by default for all Zephyr EC projects registered
+via `zmake`. The build system automatically includes the [`pw-tokenize`]
+snippet and pulls in the `pigweed` module.
+
+### Opting Out
+
+If a project needs to disable tokenized logging (for example, FPMCUs using LLVM/Newlib),
+it can opt out by passing `tokenized_logging=False` in `BUILD.py`:
 
 ```python
-register_brox_project(
-    project_name="brox",
-    modules=["picolibc", "ec", "pigweed"],
-    snippets=["pw-tokenize"],
+register_fpmcu_variant(
+    project_name="bloonchipper",
+    ...
+    tokenized_logging=False,
 )
 ```
+
+When `tokenized_logging=False` is specified, `zmake` will neither apply the
+`pw-tokenize` snippet nor append the `pigweed` module.
+
+### Snippet Details
 
 The `pw-tokenize` snippet automatically configures the necessary Kconfig
 options:
@@ -59,7 +70,7 @@ There are three types of databases available when using tokenization in EC.
 ### Local EC Images
 
 1. Building EC with Tokenization
-    1. Enable Tokenization as defined above.
+    1. Tokenization is enabled by default (unless opted out in `BUILD.py`).
     2. Kick off your compile as [normal](zephyr_build.md), the token database is
        generated as part of your build.
 2. Token Database Locations

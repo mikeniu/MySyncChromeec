@@ -17,6 +17,7 @@ def register_fpmcu_variant(
     **kwargs,
 ):
     """Register an fpmcu variant"""
+    kwargs.setdefault("tokenized_logging", False)
     return register_func(
         project_name=project_name,
         zephyr_board=zephyr_board,

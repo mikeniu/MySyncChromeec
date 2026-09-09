@@ -5,7 +5,11 @@
 """Define zmake projects for it8xxx2_evb."""
 
 
-def register_it8xxx2_evb_project(project_name, zephyr_board):
+def register_it8xxx2_evb_project(
+    project_name,
+    zephyr_board,
+    tokenized_logging=True,
+):
     """Register a variant of the it8xxx2_evb"""
     register_func = register_binman_project
 
@@ -20,11 +24,14 @@ def register_it8xxx2_evb_project(project_name, zephyr_board):
         kconfig_files=[
             here / project_name / "project.conf",
         ],
+        tokenized_logging=tokenized_logging,
     )
 
 
 register_it8xxx2_evb_project(
-    project_name="it8xxx2_evb", zephyr_board="it8xxx2/it81302bx"
+    project_name="it8xxx2_evb",
+    zephyr_board="it8xxx2/it81302bx",
+    tokenized_logging=False,
 )
 
 # The it82002_evb board consists of the it82002 BGA board connected

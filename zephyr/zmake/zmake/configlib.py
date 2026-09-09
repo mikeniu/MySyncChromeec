@@ -33,6 +33,16 @@ def register_raw_project(**kwargs):
     """Register a project that uses RawBinPacker."""
     kwargs.setdefault("supported_toolchains", ["coreboot-sdk", "zephyr"])
     kwargs.setdefault("output_packer", zmake.output_packers.RawBinPacker)
+    if kwargs.pop("tokenized_logging", False):
+        snippets = list(kwargs.get("snippets") or [])
+        if "pw-tokenize" not in snippets:
+            kwargs["snippets"] = ["pw-tokenize", *snippets]
+
+        modules = list(kwargs.get("modules") or ["ec"])
+        if "pigweed" not in modules:
+            modules.append("pigweed")
+            kwargs["modules"] = modules
+
     return _register_project(**kwargs)
 
 
@@ -40,6 +50,7 @@ def register_raw_project(**kwargs):
 def register_binman_project(**kwargs):
     """Register a project that uses BinmanPacker."""
     kwargs.setdefault("output_packer", zmake.output_packers.BinmanPacker)
+    kwargs.setdefault("tokenized_logging", True)
     return register_raw_project(**kwargs)
 
 
@@ -82,4 +93,5 @@ def register_rtk_project(**kwargs):
     """Register a project that uses RawBinPacker."""
     kwargs.setdefault("output_packer", zmake.output_packers.RTKBinmanPacker)
     kwargs.setdefault("modules", ["cmsis_6", "ec"])
+    kwargs.setdefault("tokenized_logging", True)
     return register_raw_project(**kwargs)

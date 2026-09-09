@@ -23,4 +23,5 @@ register_raw_project(
     project_name="rtk_flame",
     zephyr_board="realtek/rts5912",
     modules=["ec", "cmsis_6"],
+    tokenized_logging=False,
 )
