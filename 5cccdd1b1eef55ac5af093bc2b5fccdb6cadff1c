@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d200e72_51dc039d",
+        "filename": "include/config.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1963,
+      "author": {
+        "id": 4818932
+      },
+      "writtenOn": "2026-09-09T14:14:07Z",
+      "side": 1,
+      "message": "Why is it needed?",
+      "range": {
+        "startLine": 1962,
+        "startChar": 0,
+        "endLine": 1963,
+        "endChar": 17
+      },
+      "revId": "5cccdd1b1eef55ac5af093bc2b5fccdb6cadff1c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
