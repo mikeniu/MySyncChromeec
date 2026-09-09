@@ -11,6 +11,7 @@ def register_corsola_project(
     project_name,
     chip="it8xxx2/it81202bx",
     boards=None,
+    tokenized_logging=True,
 ):
     """Register a variant of corsola."""
     register_func = register_binman_project
@@ -31,6 +32,7 @@ def register_corsola_project(
             here / project_name / "project.conf",
         ],
         boards=boards,
+        tokenized_logging=tokenized_logging,
     )
 
 
@@ -59,11 +61,13 @@ register_corsola_project("krabby")
 register_corsola_project(
     project_name="kingler",
     chip="npcx9/npcx9m3f",
+    tokenized_logging=False,
 )
 
 register_corsola_project(
     project_name="steelix",
     chip="npcx9/npcx9m3f",
+    tokenized_logging=False,
 )
 
 register_corsola_project(
@@ -78,11 +82,13 @@ register_corsola_project("magikarp")
 register_corsola_project(
     project_name="voltorb",
     chip="npcx9/npcx9m3f",
+    tokenized_logging=False,
 )
 
 register_corsola_project(
     project_name="ponyta",
     chip="npcx9/npcx9m3f",
+    tokenized_logging=False,
 )
 
 register_corsola_project("chinchou")
@@ -101,6 +107,7 @@ register_corsola_project(
 register_corsola_project(
     project_name="squirtle",
     chip="npcx9/npcx9m3f",
+    tokenized_logging=False,
 )
 
 register_corsola_project(

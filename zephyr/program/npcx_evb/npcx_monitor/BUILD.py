@@ -9,4 +9,5 @@ register_raw_project(
     zephyr_board="npcx_evb/npcx9m6f",
     modules=["ec", "cmsis_6"],
     dts_overlays=["prj.dts"],
+    tokenized_logging=False,
 )

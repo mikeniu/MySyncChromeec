@@ -5,7 +5,12 @@
 """Define zmake projects for roach."""
 
 
-def register_variant(project_name, rwsig_sign=True, boards=None):
+def register_variant(
+    project_name,
+    rwsig_sign=True,
+    boards=None,
+    tokenized_logging=True,
+):
     """Register a variant of Roach."""
 
     if boards is None:
@@ -24,16 +29,22 @@ def register_variant(project_name, rwsig_sign=True, boards=None):
             here / project_name / "project.conf",
         ],
         boards=boards,
+        tokenized_logging=tokenized_logging,
         **signer_kwarg,
     )
 
 
 # Keyboard tester
-register_variant("axii", rwsig_sign=False, boards=[])
+register_variant(
+    "axii",
+    rwsig_sign=False,
+    boards=[],
+    tokenized_logging=False,
+)
 # Detachable keyboards
 register_variant("roach", boards=["geralt"])
 register_variant("kelpie", boards=["geralt"])
-register_variant("spikyrock", boards=["staryu"])
+register_variant("spikyrock", boards=["staryu"], tokenized_logging=False)
 register_variant("eirtae", boards=["jedi"])
 
 # Note for reviews, do not let anyone edit these assertions, the addresses
