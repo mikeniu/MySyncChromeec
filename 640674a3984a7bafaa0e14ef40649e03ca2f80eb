@@ -54,6 +54,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "45e1030c_daa39f4f",
+        "filename": "include/host_command.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-09T03:39:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e853cdb6_a357a7af",
+      "revId": "640674a3984a7bafaa0e14ef40649e03ca2f80eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee21157c_9f85ced4",
@@ -73,6 +91,31 @@
         "endLine": 19,
         "endChar": 0
       },
+      "revId": "640674a3984a7bafaa0e14ef40649e03ca2f80eb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6f41de8_3671e7ef",
+        "filename": "zephyr/shim/src/host_command_legacy.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-09T03:39:10Z",
+      "side": 1,
+      "message": "Done. Moved BUILD_ASSERTs back to host_command.c and removed them from host_command_legacy.c.",
+      "parentUuid": "ee21157c_9f85ced4",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 0
+      },
+      "isAi": true,
       "revId": "640674a3984a7bafaa0e14ef40649e03ca2f80eb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
