@@ -194,6 +194,8 @@ ZTEST(usb_tc, test_tc_state_queries)
 	zassert_false(tc_is_attached_src(TEST_PORT));
 	zassert_equal(PD_PLUG_FROM_DFP_UFP, tc_get_cable_plug(TEST_PORT));
 	zassert_false(tc_get_pd_enabled(TEST_PORT));
+	zassert_false(pd_alt_mode_capable(TEST_PORT));
+	zassert_equal(EC_RES_SUCCESS, pd_fetch_acc_log_entry(TEST_PORT));
 }
 
 /* =========================================================================
@@ -202,6 +204,8 @@ ZTEST(usb_tc, test_tc_state_queries)
 
 ZTEST_F(usb_tc, test_tc_attach_as_sink)
 {
+	unsigned int orig_mv = pd_get_max_voltage();
+
 	/* Partner connects as Source (Rp + VBUS) -> EC attaches as Sink */
 	tcpci_partner_init(&fixture->partner_emul, PD_REV20);
 	fixture->partner_emul.extensions = tcpci_src_emul_init(
@@ -215,11 +219,28 @@ ZTEST_F(usb_tc, test_tc_attach_as_sink)
 	zassert_true(tc_is_attached_snk(TEST_PORT));
 	zassert_false(tc_is_attached_src(TEST_PORT));
 	zassert_equal(PD_ROLE_SINK, pd_get_power_role(TEST_PORT));
+	zassert_true(tc_get_pd_enabled(TEST_PORT));
+	zassert_true(pd_alt_mode_capable(TEST_PORT));
+
+	/* Verify power control routines in Attached.SNK */
+	pd_set_external_voltage_limit(TEST_PORT, 5000);
+	zassert_equal(5000, pd_get_max_voltage());
+
+	pd_set_new_power_request(TEST_PORT);
+
+	pd_request_source_voltage(TEST_PORT, 9000);
+	zassert_equal(9000, pd_get_max_voltage());
+
+	/* Restore max voltage */
+	pd_set_max_voltage(orig_mv);
+	zassert_equal(orig_mv, pd_get_max_voltage());
 
 	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
 	isl923x_emul_set_adc_vbus(fixture->charger_emul, 0);
 	k_sleep(K_SECONDS(1));
 	zassert_false(tc_is_attached_snk(TEST_PORT));
+	zassert_false(tc_get_pd_enabled(TEST_PORT));
+	zassert_false(pd_alt_mode_capable(TEST_PORT));
 }
 
 ZTEST_F(usb_tc, test_tc_dts_debug_accessory_cc1)
@@ -374,6 +395,9 @@ ZTEST_F(usb_tc, test_tc_attach_as_source)
 	zassert_false(tc_is_attached_snk(TEST_PORT));
 	zassert_equal(PD_ROLE_SOURCE, pd_get_power_role(TEST_PORT));
 	zassert_equal(POLARITY_CC2, tc_get_polarity(TEST_PORT));
+
+	/* Verify pd_update_contract executes in Attached.SRC */
+	pd_update_contract(TEST_PORT);
 
 	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
 	k_sleep(K_SECONDS(1));
