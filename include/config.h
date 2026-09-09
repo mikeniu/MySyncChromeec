@@ -2024,9 +2024,6 @@
  */
 #undef CONFIG_POWER_SIGNAL_INTERRUPT_STORM_DETECT_THRESHOLD
 
-/* Use part of the EC's data EEPROM to hold persistent storage for the AP. */
-#undef CONFIG_PSTORE
-
 /* Support S0ix */
 #undef CONFIG_POWER_S0IX
 
@@ -3063,11 +3060,6 @@
 /* Support computing hash of code for verified boot */
 #undef CONFIG_VBOOT_HASH
 
-/* Support for secure temporary storage for verified boot */
-#undef CONFIG_VSTORE
-
-/* Number of supported slots for secure temporary storage */
-#undef CONFIG_VSTORE_SLOT_COUNT
 
 /*****************************************************************************/
 /* Watchdog config */

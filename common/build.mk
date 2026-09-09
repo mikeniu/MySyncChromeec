@@ -62,7 +62,6 @@ common-$(CONFIG_PHYSICAL_PRESENCE)+=physical_presence.o
 common-$(CONFIG_PINWEAVER)+=pinweaver_cr50.o
 common-$(CONFIG_POWER_BUTTON)+=power_button.o
 
-common-$(CONFIG_PSTORE)+=pstore_commands.o
 common-$(CONFIG_PWM)+=pwm.o
 common-$(CONFIG_RMA_AUTH)+=rma_auth.o
 common-$(CONFIG_RSA)+=rsa.o
@@ -84,7 +83,6 @@ common-$(CONFIG_USB_CONSOLE_STREAM)+=usb_console_stream.o
 common-$(CONFIG_USB_I2C)+=usb_i2c.o
 common-$(CONFIG_USB_PD_LOGGING)+=event_log.o pd_log.o
 common-$(CONFIG_VBOOT_HASH)+=sha256.o vboot_hash.o
-common-$(CONFIG_VSTORE)+=vstore.o
 common-$(CONFIG_WEBUSB_URL)+=webusb_desc.o
 
 common-$(HAS_TASK_CONSOLE)+=console.o console_output.o uart_buffering.o
