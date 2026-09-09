@@ -1,0 +1,33 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+include: base.yaml
+
+description: Devicetree keyboard layout patch definition
+
+compatible: "cros-ec,keyboard-layout-patch"
+
+properties:
+  vivaldi-config:
+    type: phandle
+    description: |
+      Phandle to the active Vivaldi top-row configuration child node under
+      cros-ec,vivaldi-keys.
+  copies:
+    type: array
+    description: |
+      Scancode copy list, given as pairs of coordinates:
+      <dst_row dst_col>, <src_row src_col>, ...
+
+      Each pair copies the scancode at <src_row src_col> to
+      <dst_row dst_col>. The source keeps its own scancode, so this is a
+      one way copy and not an exchange. In builds with
+      CONFIG_PLATFORM_EC_KEYBOARD_DEBUG the keycap label is copied too.
+
+      Entries are applied in order and later entries observe the writes made
+      by earlier ones, which lets a board rotate several positions by
+      chaining them.
+
+      Example, remapping right-ctrl to the 102nd key for a CA-FR layout:
+        copies = <3 14>, <2 7>;

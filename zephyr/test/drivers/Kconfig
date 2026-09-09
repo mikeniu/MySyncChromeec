@@ -297,6 +297,11 @@ config LINK_TEST_SUITE_UFSC_POLICIES
 	help
 	  Include the test suite exercising the UFSC policies.
 
+config LINK_TEST_SUITE_UFSC_KEYBOARD_LAYOUT
+	bool "Link and test the UFSC keyboard layout selector and patch driver"
+	help
+	  Include the test suite exercising the UFSC keyboard layout driver.
+
 config LINK_TEST_SUITE_UPSTREAM_FUEL_GAUGE
 	bool "Link and test usage of upstream fuel-gauge API"
 
