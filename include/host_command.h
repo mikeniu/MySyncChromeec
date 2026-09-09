@@ -28,6 +28,26 @@
 extern "C" {
 #endif
 
+#define _SMALLEST_TYPE_1(T) T
+#define _SMALLEST_TYPE_2(T1, T2)                                            \
+	__typeof__(__builtin_choose_expr(sizeof(T1) < sizeof(T2), *(T1 *)0, \
+					 *(T2 *)0))
+#define _SMALLEST_TYPE_3(T1, ...) \
+	_SMALLEST_TYPE_2(T1, _SMALLEST_TYPE_2(__VA_ARGS__))
+#define _SMALLEST_TYPE_4(T1, ...) \
+	_SMALLEST_TYPE_2(T1, _SMALLEST_TYPE_3(__VA_ARGS__))
+#define _SMALLEST_TYPE_5(T1, ...) \
+	_SMALLEST_TYPE_2(T1, _SMALLEST_TYPE_4(__VA_ARGS__))
+#define _SMALLEST_TYPE_6(T1, ...) \
+	_SMALLEST_TYPE_2(T1, _SMALLEST_TYPE_5(__VA_ARGS__))
+
+#define _GET_SMALLEST_TYPE_MACRO(_1, _2, _3, _4, _5, _6, NAME, ...) NAME
+#define SMALLEST_TYPE(...)                                           \
+	_GET_SMALLEST_TYPE_MACRO(__VA_ARGS__, _SMALLEST_TYPE_6,      \
+				 _SMALLEST_TYPE_5, _SMALLEST_TYPE_4, \
+				 _SMALLEST_TYPE_3, _SMALLEST_TYPE_2, \
+				 _SMALLEST_TYPE_1)(__VA_ARGS__)
+
 /* Keep sync with zephyr ec_host_cmd_handler_args. Needed for any external code
  * that defines host command handlers.
  */
