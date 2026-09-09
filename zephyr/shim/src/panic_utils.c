@@ -11,6 +11,10 @@
 
 #include <zephyr/kernel.h>
 
+#ifdef CONFIG_CPU_CORTEX_M
+#include <cmsis_core.h>
+#endif
+
 static bool print_trace_address(void *arg, unsigned long pc)
 {
 	int *frame_idx = (int *)arg;
@@ -120,4 +124,26 @@ uint32_t get_stack_ptr(const struct k_thread *thread)
 #elif defined(CONFIG_ARCH_POSIX)
 	return (uint32_t)thread->callee_saved.thread_status;
 #endif
+}
+
+uint8_t get_isr_depth(void)
+{
+	uint32_t active = 0;
+
+#if defined(CONFIG_RISCV)
+	active = _current_cpu->nested;
+#elif defined(CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
+	/* Zephyr does not track nesting on Cortex-M; count active handlers. */
+	for (int i = 0; i < ARRAY_SIZE(NVIC->IABR); i++) {
+		active += __builtin_popcount(NVIC->IABR[i]);
+	}
+	active += __builtin_popcount(
+		SCB->SHCSR &
+		(SCB_SHCSR_MEMFAULTACT_Msk | SCB_SHCSR_BUSFAULTACT_Msk |
+		 SCB_SHCSR_USGFAULTACT_Msk | SCB_SHCSR_SVCALLACT_Msk |
+		 SCB_SHCSR_MONITORACT_Msk | SCB_SHCSR_PENDSVACT_Msk |
+		 SCB_SHCSR_SYSTICKACT_Msk));
+#endif
+
+	return active > 1 ? MIN(active - 1, UINT8_MAX) : 0;
 }

@@ -85,4 +85,14 @@ config PLATFORM_EC_PANIC_HOST_EVENT
 	  panic has occurred. This alerts the AP that a panic occurred on the
 	  previous boot.
 
+config PLATFORM_EC_PANIC_WATCHDOG_STRUCT
+	bool "Use watchdog_panic_data for watchdog warnings"
+	default y
+	help
+	  Record watchdog warnings in the architecture-agnostic
+	  struct watchdog_panic_data (PANIC_ARCH_WATCHDOG), which stores
+	  additional system context. See docs/panic_data.md. When disabled,
+	  warnings use the legacy PANIC_SW_WATCHDOG_WARN reason in the
+	  architecture register layout.
+
 endif # PLATFORM_EC_PANIC
