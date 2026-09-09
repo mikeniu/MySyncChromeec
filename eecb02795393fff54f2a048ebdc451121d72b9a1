@@ -46,6 +46,31 @@
       },
       "revId": "eecb02795393fff54f2a048ebdc451121d72b9a1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2377b63a_95021198",
+        "filename": "zephyr/Kconfig.defaults",
+        "patchSetId": 6
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-09T03:05:52Z",
+      "side": 0,
+      "message": "Moved this change out to a separate CL.",
+      "parentUuid": "cbb93b3c_4caaf515",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 38
+      },
+      "isAi": true,
+      "revId": "eecb02795393fff54f2a048ebdc451121d72b9a1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
