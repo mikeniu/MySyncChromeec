@@ -298,6 +298,8 @@ enum fingerprint_capture_type {
 	FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST = 16,
 	/** Capture for pixel reset value test. */
 	FINGERPRINT_CAPTURE_TYPE_RESET_TEST = 20,
+	/** Capture for pattern2 test. */
+	FINGERPRINT_CAPTURE_TYPE_PATTERN2 = 24,
 	/** End of enum. */
 	FINGERPRINT_CAPTURE_TYPE_MAX,
 };

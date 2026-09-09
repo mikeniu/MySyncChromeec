@@ -124,6 +124,7 @@ fp_capture_types = {
     "pattern1": 12,
     "quality_test": 16,
     "reset_test": 20,
+    "pattern2": 24,
 }
 
 
@@ -630,15 +631,14 @@ def cmd_wait_for_event(args, comm) -> int:
 def get_frame_size(capture_type, comm) -> tuple[int, int]:
     """Gets FP frame size."""
 
-    fp_info = commands.FpInfoCmd2()
-    ret = fp_info.run(comm)
-    if ret != commands.EcCommandResult.SUCCESS:
-        print(f"Failed to get FP info: {ret.name}")
-        return None
-
-    for image_frame_params in fp_info.response.image_frame_params:
-        if image_frame_params.fp_capture_type == capture_type:
-            return image_frame_params.width, image_frame_params.height
+    # Try different FP_INFO command versions
+    for cmd_class in [commands.FpInfoCmd3, commands.FpInfoCmd2, commands.FpInfoCmd1]:
+        fp_info = cmd_class()
+        ret = fp_info.run(comm)
+        if ret == commands.EcCommandResult.SUCCESS:
+            for image_frame_params in fp_info.response.image_frame_params:
+                if image_frame_params.fp_capture_type == capture_type:
+                    return image_frame_params.width, image_frame_params.height
 
     print(f"No matching capture type: {capture_type}")
     return None
@@ -648,7 +648,11 @@ def cmd_fp_frame(args, comm) -> int:
     """Captures FP frame."""
 
     capture_type = fp_capture_types[args.type or "simple_image"]
-    width, height = get_frame_size(capture_type, comm)
+    frame_size_info = get_frame_size(capture_type, comm)
+    if frame_size_info is None:
+        print(f"Failed to get frame size for capture type: {args.type}")
+        return -1
+    width, height = frame_size_info
     frame_size = width * height
     max_res_size = get_max_res_size(comm)
     if max_res_size < 0:

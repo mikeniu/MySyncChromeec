@@ -8606,6 +8606,7 @@ struct ec_params_fp_passthru {
  * @FP_CAPTURE_PATTERN1: Self test pattern (e.g. inverted checkerboard)
  * @FP_CAPTURE_QUALITY_TEST: Capture for Quality test with fixed contrast
  * @FP_CAPTURE_RESET_TEST: Capture for pixel reset value test
+ * @FP_CAPTURE_PATTERN2: Capture for pattern2 test
  * @FP_CAPTURE_TYPE_MAX: End of enum
  *
  * @note This enum must remain ordered, if you add new values you must ensure
@@ -8623,6 +8624,7 @@ enum fp_capture_type {
 	FP_CAPTURE_PATTERN1 = 12,
 	FP_CAPTURE_QUALITY_TEST = 16,
 	FP_CAPTURE_RESET_TEST = 20,
+	FP_CAPTURE_PATTERN2 = 24,
 	FP_CAPTURE_TYPE_MAX,
 };
 /* LINT.ThenChange(/test/fpsensor_utils.cc,
