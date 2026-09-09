@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba630cb8_0e3860e6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-09-09T10:42:33Z",
+      "side": 1,
+      "message": "- add pattern2 in common code\nthis CL\n- add pattern2 to egis660\nhttps://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8379801\n- debug code test on smolec\nhttps://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8376403",
+      "parentUuid": "e9dc036c_a4595b15",
+      "revId": "ec74159aec546904fb7d850c23822449961c7081",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0fab0e4f_e95db60e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-08T08:25:16Z",
       "side": 1,
       "message": "It\u0027s not needed here.",
+      "revId": "ec74159aec546904fb7d850c23822449961c7081",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76623bcf_008934e3",
+        "filename": "util/ectool.cc",
+        "patchSetId": 5
+      },
+      "lineNbr": 2057,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-09-09T10:42:33Z",
+      "side": 1,
+      "message": "OK, removed.",
+      "parentUuid": "0fab0e4f_e95db60e",
       "revId": "ec74159aec546904fb7d850c23822449961c7081",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
