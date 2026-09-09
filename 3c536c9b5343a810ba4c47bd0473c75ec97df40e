@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2055df1d_23819904",
+        "filename": "include/config.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1896,
+      "author": {
+        "id": 4818932
+      },
+      "writtenOn": "2026-09-09T14:09:05Z",
+      "side": 1,
+      "message": "Are those still used?",
+      "range": {
+        "startLine": 1896,
+        "startChar": 22,
+        "endLine": 1896,
+        "endChar": 38
+      },
+      "revId": "3c536c9b5343a810ba4c47bd0473c75ec97df40e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
