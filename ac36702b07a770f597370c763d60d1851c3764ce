@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "67a82150_3709f5f9",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-09T21:39:27Z",
+      "side": 1,
+      "message": "This actually already exists in usb_pd.h as `VDO_DP_STATUS`. Swapped to using it here.",
+      "parentUuid": "2945cb55_010cdfa1",
+      "revId": "ac36702b07a770f597370c763d60d1851c3764ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "83ce3a3d_daed5f7b",
         "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_pe.c",
         "patchSetId": 5
