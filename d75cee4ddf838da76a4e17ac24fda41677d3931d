@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72628b2d_483af051",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-09T21:37:23Z",
+      "side": 1,
+      "message": "I\u0027m not convinced SMALLEST_TYPE is needed. As I understand it, EC_HOST_CMD_HANDLER_REQ_ONLY should be used when the response size varies,  EC_HOST_CMD_HANDLER_RESP_ONLY should be used when the request size varies, and EC_HOST_CMD_HANDLER_UNBOUND should be used when both vary.\n\nFor handlers that support multiple versions the bounds for each version must be checked by that handler. The SMALLEST_TYPE check may even lead developers to assume the response size does not need to be checked in the handler.",
+      "revId": "d75cee4ddf838da76a4e17ac24fda41677d3931d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
