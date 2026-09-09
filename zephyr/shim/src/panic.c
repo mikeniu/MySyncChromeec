@@ -4,11 +4,14 @@
  */
 
 #include "builtin/assert.h"
+#include "charge_state.h"
 #include "common.h"
+#include "cros_version.h"
 #include "hooks.h"
 #include "host_command.h"
 #include "panic.h"
 #include "panic_utils.h"
+#include "power.h"
 #include "system.h"
 #include "task.h"
 
@@ -19,6 +22,12 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
+
+#if defined(CONFIG_AP_PWRSEQ)
+#include <ap_power/ap_power_interface.h>
+#include <ap_power/ap_pwrseq.h>
+#include <x86_non_dsx_common_pwrseq_sm_handler.h>
+#endif
 
 LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 
@@ -141,11 +150,42 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 
 void panic_data_print(const struct panic_data *pdata)
 {
-	PANIC_REG_LIST(PANIC_PRINT_REGS, PANIC_PRINT_REGS);
+	if (pdata->arch == PANIC_ARCH_WATCHDOG) {
+		if (pdata->wd.struct_major_version !=
+		    WATCHDOG_PANIC_DATA_MAJOR_VERSION) {
+			panic_printf(
+				"  Unsupported watchdog struct version: %u.%u\n",
+				pdata->wd.struct_major_version,
+				pdata->wd.struct_minor_version);
+			return;
+		}
+		panic_printf("=== WATCHDOG ====== struct version: %u.%u ===\n",
+			     pdata->wd.struct_major_version,
+			     pdata->wd.struct_minor_version);
+		panic_printf("  struct_flags:   0x%04X\n",
+			     pdata->wd.struct_flags);
+		panic_printf("  thread_id:      0x%08X\n", pdata->wd.thread_id);
+		panic_printf("  pc:             0x%08X\n", pdata->wd.pc);
+		panic_printf("  lr:             0x%08X\n", pdata->wd.lr);
+		panic_printf("  sp:             0x%08X\n", pdata->wd.sp);
+		panic_printf("  version:        %.16s\n", pdata->wd.version);
+		panic_printf("  warning_uptime: %u ms\n",
+			     pdata->wd.warning_uptime);
+		panic_printf("  reset_flags:    0x%08X\n",
+			     pdata->wd.reset_flags);
+		panic_printf("  power_signals:  0x%04X\n",
+			     pdata->wd.power_signals);
+		panic_printf("  power_state:    0x%02X\n",
+			     pdata->wd.power_state);
+		panic_printf("  battery_level:  %u%%\n",
+			     pdata->wd.battery_level);
+	} else {
+		PANIC_REG_LIST(PANIC_PRINT_REGS, PANIC_PRINT_REGS);
 #if defined(CONFIG_RISCV) && !defined(CONFIG_64BIT)
-	PANIC_PRINT_REGS(NULL, riscv.regs[10], S1);
-	PANIC_PRINT_REGS(NULL, riscv.regs[11], S0);
+		PANIC_PRINT_REGS(NULL, riscv.regs[10], S1);
+		PANIC_PRINT_REGS(NULL, riscv.regs[11], S0);
 #endif
+	}
 }
 
 /**
@@ -227,14 +267,73 @@ void panic_data_write_assert(const char *path, unsigned int line)
 	panic_data_finalize(pdata);
 }
 
-void panic_data_write_watchdog_warning(uintptr_t pc,
-				       const struct k_thread *thread)
+void panic_data_write_watchdog_warning(uintptr_t pc, uintptr_t lr)
 {
 	struct panic_data *const pdata = panic_data_reset(NULL);
 
-	panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
-	panic_set_info_reg(pdata, (uint32_t)pc);
-	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_WATCHDOG_STRUCT)) {
+		size_t ver_len = strlen(current_image_data.version);
+		size_t copy_len = MIN(ver_len, sizeof(pdata->wd.version));
+
+		pdata->arch = PANIC_ARCH_WATCHDOG;
+		pdata->wd.struct_major_version =
+			WATCHDOG_PANIC_DATA_MAJOR_VERSION;
+		pdata->wd.struct_minor_version =
+			WATCHDOG_PANIC_DATA_MINOR_VERSION;
+		pdata->wd.struct_flags = WATCHDOG_PANIC_FLAG_WARNING;
+		pdata->wd.reset_flags = system_get_reset_flags();
+		memcpy(pdata->wd.version,
+		       current_image_data.version + (ver_len - copy_len),
+		       copy_len);
+
+		pdata->wd.thread_id = (uint32_t)(uintptr_t)k_current_get();
+		pdata->wd.pc = (uint32_t)pc;
+		pdata->wd.lr = (uint32_t)lr;
+		pdata->wd.sp = get_stack_ptr(k_current_get());
+		pdata->wd.warning_uptime = (uint32_t)k_uptime_get();
+#if defined(CONFIG_PLATFORM_EC_POWERSEQ_LEGACY) || defined(CONFIG_AP_PWRSEQ)
+		pdata->wd.power_signals = (uint16_t)power_get_signals();
+#endif
+#if defined(CONFIG_PLATFORM_EC_POWERSEQ_LEGACY)
+		pdata->wd.power_state = (uint8_t)power_get_state();
+#elif defined(CONFIG_AP_PWRSEQ_DRIVER)
+		pdata->wd.power_state = (uint8_t)ap_pwrseq_get_current_state(
+			ap_pwrseq_get_instance());
+#elif defined(CONFIG_AP_PWRSEQ)
+		pdata->wd.power_state = (uint8_t)pwr_sm_get_state();
+#endif
+#if defined(CONFIG_PLATFORM_EC_CHARGER)
+		pdata->wd.battery_level = (uint8_t)charge_get_percent();
+#endif
+
+		/*
+		 * Populate all reason fields to satisfy older RO on any
+		 * architecture.
+		 */
+		pdata->wd.reason_x86 = PANIC_SW_WATCHDOG;
+		pdata->wd.reason_cm = PANIC_SW_WATCHDOG;
+		pdata->wd.reason_riscv = PANIC_SW_WATCHDOG;
+	} else {
+		panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
+		panic_set_info_reg(pdata, (uint32_t)pc);
+		panic_set_exception_reg(pdata,
+					(uint8_t)(uintptr_t)k_current_get());
+	}
+
+	panic_data_finalize(pdata);
+}
+
+test_export_static void panic_finalize_watchdog(void)
+{
+	struct panic_data *const pdata = panic_get_data();
+
+	assert(pdata);
+	assert(pdata->arch == PANIC_ARCH_WATCHDOG);
+	assert(pdata->wd.struct_flags & WATCHDOG_PANIC_FLAG_WARNING);
+	assert(pdata->wd.struct_major_version ==
+	       WATCHDOG_PANIC_DATA_MAJOR_VERSION);
+
+	pdata->wd.struct_flags &= ~WATCHDOG_PANIC_FLAG_WARNING;
 
 	panic_data_finalize(pdata);
 }
@@ -325,14 +424,24 @@ __override void zassert_post_action(const char *path, unsigned int line)
 
 uint32_t panic_get_reason_reg(const struct panic_data *pdata)
 {
-	return pdata ? PANIC_REG_REASON(pdata) : 0;
+	if (!pdata)
+		return 0;
+	if (pdata->arch == PANIC_ARCH_WATCHDOG)
+		return pdata->wd.reason_cm;
+	return PANIC_REG_REASON(pdata);
 }
 
 void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason)
 {
-	if (pdata) {
-		PANIC_REG_REASON(pdata) = reason;
+	if (!pdata)
+		return;
+	if (pdata->arch == PANIC_ARCH_WATCHDOG) {
+		pdata->wd.reason_x86 = reason;
+		pdata->wd.reason_cm = reason;
+		pdata->wd.reason_riscv = reason;
+		return;
 	}
+	PANIC_REG_REASON(pdata) = reason;
 }
 
 uint32_t panic_get_info_reg(const struct panic_data *pdata)
@@ -398,11 +507,12 @@ test_export_static int panic_data_init(void)
 	 * image.
 	 */
 	if (is_watchdog_reset) {
-		/* If the panic reason is a watchdog warning, then change
-		 * the reason to a regular watchdog reason while preserving
-		 * the info and exception from the watchdog warning.
-		 */
-		if (is_panic_new && reason == PANIC_SW_WATCHDOG_WARN) {
+		if (is_panic_new && pdata &&
+		    pdata->arch == PANIC_ARCH_WATCHDOG &&
+		    (pdata->wd.struct_flags & WATCHDOG_PANIC_FLAG_WARNING)) {
+			LOG_INF("Finalizing watchdog warning panic");
+			panic_finalize_watchdog();
+		} else if (is_panic_new && reason == PANIC_SW_WATCHDOG_WARN) {
 			LOG_INF("Promoting watchdog warning to watchdog panic");
 			panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG);
 			panic_data_finalize(pdata);
