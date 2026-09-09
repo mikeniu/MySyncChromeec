@@ -20,7 +20,10 @@
 #include "usb_tc_sm.h"
 
 #include <zephyr/kernel.h>
+#include <zephyr/shell/shell.h>
 #include <zephyr/ztest.h>
+
+const struct shell *get_ec_shell(void);
 
 #define TEST_PORT 0
 #define DEFAULT_VBUS_MV 5000
@@ -194,6 +197,11 @@ ZTEST(usb_tc, test_tc_state_queries)
 	zassert_false(tc_is_attached_src(TEST_PORT));
 	zassert_equal(PD_PLUG_FROM_DFP_UFP, tc_get_cable_plug(TEST_PORT));
 	zassert_false(tc_get_pd_enabled(TEST_PORT));
+
+	zassert_equal(EC_RES_SUCCESS, pd_fetch_acc_log_entry(TEST_PORT));
+	zassert_false(pd_alt_mode_capable(TEST_PORT));
+
+	pd_request_source_voltage(TEST_PORT, 5000);
 }
 
 /* =========================================================================
@@ -215,6 +223,15 @@ ZTEST_F(usb_tc, test_tc_attach_as_sink)
 	zassert_true(tc_is_attached_snk(TEST_PORT));
 	zassert_false(tc_is_attached_src(TEST_PORT));
 	zassert_equal(PD_ROLE_SINK, pd_get_power_role(TEST_PORT));
+
+	/* Verify power control routines in Attached.SNK */
+	pd_set_external_voltage_limit(TEST_PORT, 5000);
+	pd_set_new_power_request(TEST_PORT);
+	pd_request_source_voltage(TEST_PORT, 5000);
+	pd_update_contract(TEST_PORT);
+
+	/* Check console command output in Attached.SNK */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 state"));
 
 	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
 	isl923x_emul_set_adc_vbus(fixture->charger_emul, 0);
@@ -326,6 +343,8 @@ ZTEST_F(usb_tc, test_tc_audio_accessory)
 	/* Audio Accessory connection from Unattached.SRC */
 	pd_set_dual_role(TEST_PORT, PD_DRP_FORCE_SOURCE);
 	k_sleep(K_MSEC(100));
+	tc_hard_reset_request(TEST_PORT);
+	k_sleep(K_MSEC(50));
 
 	tcpci_partner_init(&fixture->partner_emul, PD_REV20);
 	fixture->partner_emul.extensions = NULL;
@@ -378,6 +397,14 @@ ZTEST_F(usb_tc, test_tc_attach_as_source)
 	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
 	k_sleep(K_SECONDS(1));
 	zassert_false(tc_is_attached_src(TEST_PORT));
+
+	/* Force sink to transition to Unattached.SNK and trigger hard reset */
+	pd_set_dual_role(TEST_PORT, PD_DRP_FORCE_SINK);
+	k_sleep(K_MSEC(50));
+	tc_hard_reset_request(TEST_PORT);
+	k_sleep(K_MSEC(50));
+	pd_set_dual_role(TEST_PORT, PD_DRP_TOGGLE_ON);
+	k_sleep(K_MSEC(50));
 }
 
 ZTEST_F(usb_tc, test_tc_try_src_flow)
