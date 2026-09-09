@@ -463,7 +463,7 @@ BUILD_ASSERT(AES256_BLOCK_CIPHER_KEY_SIZE == PRIMARY_SEED_SIZE);
 static int get_decrypted_eps(uint8_t eps[PRIMARY_SEED_SIZE])
 {
 	int i;
-	uint8_t frk2[AES256_BLOCK_CIPHER_KEY_SIZE];
+	uint8_t frk2[AES256_BLOCK_CIPHER_KEY_SIZE] __aligned(4);
 
 	CPRINTS("%s: getting eps", __func__);
 	if (!DCRYPTO_ladder_compute_frk2(K_CROS_FW_MAJOR_VERSION, frk2))
@@ -477,12 +477,9 @@ static int get_decrypted_eps(uint8_t eps[PRIMARY_SEED_SIZE])
 			always_memset(frk2, 0, sizeof(frk2));
 			return 0;     /* Flash read INFO1 failed. */
 		}
+		word ^= *(const uint32_t *)(frk2 + i);
 		memcpy(eps + i, &word, sizeof(word));
 	}
-
-	/* One-time-pad decrypt EPS. */
-	for (i = 0; i < PRIMARY_SEED_SIZE; i++)
-		eps[i] ^= frk2[i];
 
 	always_memset(frk2, 0, sizeof(frk2));
 	return 1;
