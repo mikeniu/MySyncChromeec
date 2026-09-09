@@ -5,7 +5,12 @@
 """Define zmake projects for roach."""
 
 
-def register_variant(project_name, rwsig_sign=True, boards=None):
+def register_variant(
+    project_name,
+    rwsig_sign=True,
+    boards=None,
+    tokenized_logging=False,
+):
     """Register a variant of Roach."""
 
     if boards is None:
@@ -24,6 +29,7 @@ def register_variant(project_name, rwsig_sign=True, boards=None):
             here / project_name / "project.conf",
         ],
         boards=boards,
+        tokenized_logging=tokenized_logging,
         **signer_kwarg,
     )
 

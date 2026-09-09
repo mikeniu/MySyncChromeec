@@ -14,12 +14,14 @@ register_npcx_project(
     project_name="minimal-npcx9",
     zephyr_board="npcx9/npcx9m3f",
     dts_overlays=[here / "npcx9.dts"],
+    tokenized_logging=False,
 )
 
 register_binman_project(
     project_name="minimal-it8xxx2",
     zephyr_board="it8xxx2/it81302bx",
     dts_overlays=[here / "it8xxx2.dts"],
+    tokenized_logging=False,
 )
 
 register_rtk_project(
@@ -27,6 +29,7 @@ register_rtk_project(
     zephyr_board="realtek/rts5912",
     dts_overlays=[here / "realtek.dts"],
     kconfig_files=[here / "realtek.conf"],
+    tokenized_logging=False,
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses

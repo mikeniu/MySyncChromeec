@@ -9,6 +9,7 @@ def register_ite_project(
     project_name,
     extra_kconfig_files=(),
     extra_dt_overlays=(),
+    tokenized_logging=True,
 ):
     """Register an ITE variant of ec-aic."""
 
@@ -27,6 +28,7 @@ def register_ite_project(
             *extra_kconfig_files,
         ],
         boards=["ec-aic"],
+        tokenized_logging=tokenized_logging,
     )
 
 
@@ -34,6 +36,7 @@ def register_nuvoton_project(
     project_name,
     extra_kconfig_files=(),
     extra_dt_overlays=(),
+    tokenized_logging=True,
 ):
     """Register an Nuvoton variant of ec-aic."""
 
@@ -52,6 +55,7 @@ def register_nuvoton_project(
             *extra_kconfig_files,
         ],
         boards=["ec-aic"],
+        tokenized_logging=tokenized_logging,
     )
 
 
@@ -59,6 +63,7 @@ def register_realtek_project(
     project_name,
     extra_kconfig_files=(),
     extra_dt_overlays=(),
+    tokenized_logging=True,
 ):
     """Register an Realtek variant of ec-aic."""
 
@@ -77,6 +82,7 @@ def register_realtek_project(
             *extra_kconfig_files,
         ],
         boards=["ec-aic"],
+        tokenized_logging=tokenized_logging,
     )
 
 
@@ -84,6 +90,7 @@ def register_realtek_project(
 # AIC and serves as a minimal EC build.
 aic_ite = register_ite_project(
     project_name="ite-aic",
+    tokenized_logging=False,
 )
 
 # ITE + RTK PDC project. Assumes a Realtek PDC evaluation board is connected to
@@ -102,18 +109,21 @@ aic_ite_rtk_pdc = register_ite_project(
         here / "ite-aic" / "project_pdc.overlay",
         here / "ite-aic" / "project_pdc_rtk.overlay",
     ),
+    tokenized_logging=False,
 )
 
 # Base NPCX (Nuvoton) project. This build assumes no additional hardware
 # attached to the AIC and serves as a minimal EC build.
 npcx_aic = register_nuvoton_project(
     project_name="npcx-aic",
+    tokenized_logging=False,
 )
 
 # Base RTS (Realtek) project. This build assumes no additional hardware
 # attached to the AIC and serves as a minimal EC build.
 rtk_aic = register_realtek_project(
     project_name="rtk-aic",
+    tokenized_logging=False,
 )
 
 assert_rw_fwid_DO_NOT_EDIT(project_name="ite-aic", addr=0x60098)

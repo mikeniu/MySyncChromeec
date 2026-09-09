@@ -12,6 +12,7 @@ import tempfile
 import hypothesis
 import hypothesis.strategies as st
 import pytest
+import zmake.configlib
 import zmake.modules
 import zmake.output_packers
 import zmake.project
@@ -423,3 +424,42 @@ def test_snippets(tmp_path, snippets, expected_snippet_def):
         assert "SNIPPET" not in config.cmake_defs
     else:
         assert config.cmake_defs["SNIPPET"] == expected_snippet_def
+
+
+def test_register_binman_project_tokenized_logging(monkeypatch):
+    """Test that register_binman_project enables tokenized logging by default
+    and supports opting out, while register_raw_project defaults to False.
+    """
+    called_kwargs = {}
+
+    def mock_register_project(**kwargs):
+        called_kwargs.update(kwargs)
+
+    monkeypatch.setattr(
+        zmake.configlib, "_register_project", mock_register_project
+    )
+
+    # By default, binman projects enable tokenized logging.
+    zmake.configlib.register_binman_project(
+        project_name="test_proj", zephyr_board="lm4"
+    )
+    assert "pw-tokenize" in called_kwargs["snippets"]
+    assert "pigweed" in called_kwargs["modules"]
+
+    # When opted out via tokenized_logging=False, snippet and pigweed module are not added.
+    called_kwargs.clear()
+    zmake.configlib.register_binman_project(
+        project_name="test_proj",
+        zephyr_board="lm4",
+        tokenized_logging=False,
+    )
+    assert "pw-tokenize" not in called_kwargs.get("snippets", [])
+    assert "pigweed" not in called_kwargs.get("modules", [])
+
+    # By default, raw projects do not enable tokenized logging.
+    called_kwargs.clear()
+    zmake.configlib.register_raw_project(
+        project_name="test_raw_proj", zephyr_board="lm4"
+    )
+    assert "pw-tokenize" not in called_kwargs.get("snippets", [])
+    assert "pigweed" not in called_kwargs.get("modules", [])
