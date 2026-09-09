@@ -152,36 +152,61 @@ In Zephyr EC, asserts override Zephyr's `zassert_post_action()` (see [zephyr/shi
 
 Watchdog resets require special coordination between the watchdog timer, the panic logging system, and the RO/RW images.
 
-There are three distinct software panic reasons associated with watchdogs:
+### Unified Watchdog Panic Structure (`PANIC_ARCH_WATCHDOG`)
 
-1.  **`PANIC_SW_WATCHDOG_WARN`** (`0xDEAD6668`, introduced in commit [a58ecc0d44](https://chromium.googlesource.com/chromiumos/platform/ec/+/a58ecc0d441eeb5613af383e8de757f5d79879b2) (introduced warning)):
-    Set when the software watchdog warning timer fires. It captures the active thread context (the truncated thread ID in `exception`) and the Program Counter (PC) where execution was interrupted.
-2.  **`PANIC_SW_WATCHDOG`** (`0xDEAD6664`):
-    The "promoted" watchdog reason. During boot, if the reset flags indicate a watchdog reset and the existing panic reason in RAM is `PANIC_SW_WATCHDOG_WARN`, the reason is promoted to `PANIC_SW_WATCHDOG`. This preserves the captured PC (info) and thread ID (exception) from the warning.
-3.  **`PANIC_SW_WATCHDOG_HARD`** (`0xDEAD666A`, introduced in commit [60c5c62f4c](https://chromium.googlesource.com/chromiumos/platform/ec/+/60c5c62f4c193b25cc3fc9f43adce9b3e1d1b6e9) (introduced hard watchdog)):
-    Set when a hardware watchdog reset occurs, but there was no prior `PANIC_SW_WATCHDOG_WARN` recorded. This typically happens during a hard lockup where interrupts are disabled (e.g., inside an interrupt handler or critical section), preventing the watchdog warning interrupt from firing. A `PANIC_SW_WATCHDOG_HARD` panic will always have blank or missing PC and task/thread ID fields.
+In Zephyr EC, when `CONFIG_PLATFORM_EC_PANIC_WATCHDOG_STRUCT` is enabled (default `y`), watchdog warnings use a dedicated, architecture-agnostic panic structure (`struct watchdog_panic_data`, with `pdata->arch = PANIC_ARCH_WATCHDOG`, `pdata->wd.struct_major_version = WATCHDOG_PANIC_DATA_MAJOR_VERSION` (`1`), and `pdata->wd.struct_minor_version = WATCHDOG_PANIC_DATA_MINOR_VERSION` (`0`)):
 
-*(Note: Prior to the introduction of `PANIC_SW_WATCHDOG_WARN` and `PANIC_SW_WATCHDOG_HARD`, all watchdog resets appeared simply as `PANIC_SW_WATCHDOG`).*
+| Offset | Type | Field | Description |
+| :--- | :--- | :--- | :--- |
+| `0` | `uint32_t` | `reason_x86` | Legacy reason slot aligned with `x86.vector` and `nds_n8.itype`. |
+| `4` | `uint8_t` | `struct_major_version` | Major version (`WATCHDOG_PANIC_DATA_MAJOR_VERSION`, currently `1`). Incremented only on breaking layout changes. |
+| `5` | `uint8_t` | `struct_minor_version` | Minor version (`WATCHDOG_PANIC_DATA_MINOR_VERSION`, currently `0`). Incremented on append-only field additions. |
+| `6` | `uint16_t` | `struct_flags` | `WATCHDOG_PANIC_FLAG_*` bitmask (`BIT(0)` = `WATCHDOG_PANIC_FLAG_WARNING`). |
+| `8` | `uint32_t` | `thread_id` | Interrupted Zephyr `k_tid_t` pointer (`k_current_get()`). |
+| `12` | `uint32_t` | `reason_cm` | Legacy reason slot aligned with Cortex-M `cm.regs[3]` (`R4`). |
+| `16` | `uint32_t` | `pc` | Interrupted Program Counter (`PC` on ARM, `MEPC` on RISC-V). |
+| `20` | `uint32_t` | `lr` | Interrupted Link / Return Address register (`LR` on ARM, `RA` on RISC-V). |
+| `24` | `uint32_t` | `sp` | Interrupted Stack Pointer (`get_stack_ptr(k_current_get())`). |
+| `28..43` | `char[16]` | `version` | Tail 16 bytes of running firmware version (`current_image_data.version`). |
+| `44` | `uint32_t` | `reason_riscv` | Legacy reason slot aligned with RISC-V `riscv.regs[11]` (`s0`). |
+| `48` | `uint32_t` | `warning_uptime` | EC uptime (`k_uptime_get()`, ms) when the watchdog warning fired. |
+| `52` | `uint32_t` | `reset_flags` | EC reset flags (`system_get_reset_flags()`). |
+| `56` | `uint16_t` | `power_signals` | Current AP power signal bitmask (`power_get_signals()`). |
+| `58` | `uint8_t` | `power_state` | Current AP power state (`power_get_state()` / `ap_pwrseq_get_current_state()` / `pwr_sm_get_state()`). |
+| `59` | `uint8_t` | `battery_level` | Cached battery charge percentage (`charge_get_percent()`, `0..100`) (total `v1.0` size: `60` bytes). |
 
-### Watchdog Warning (Pre-Warning)
-To capture the state of the EC before a watchdog reset occurs, a software watchdog warning timer is configured to fire `WATCHDOG_WARNING_LEADING_TIME_MS` (default 500ms) before the hardware watchdog would expire.
+#### Backward Compatibility with Deployed RO Images
 
-When this warning fires:
-1.  The truncated thread ID and the Program Counter (PC) of the active thread are captured into `exception` and `info`. (Console `printk` statements output the full un-truncated thread pointer address via `%p`).
-2.  These are stored in the `exception` and `info` fields of the panic data, respectively.
-3.  The panic reason is set to `PANIC_SW_WATCHDOG_WARN`.
-4.  If the hardware watchdog subsequently expires, the system resets with the reset reason flag `EC_RESET_FLAG_WATCHDOG` set.
+Older RO (or RW) firmware images do not inspect `pdata->arch` for `PANIC_ARCH_WATCHDOG`; they read the software panic reason directly from their native architecture's register offset (`x86.vector` at offset `0`, `cm.regs[3]` at offset `12`, or `riscv.regs[11]` at offset `44`). By placing `reason_x86`, `reason_cm`, and `reason_riscv` at those exact byte offsets (enforced via `BUILD_ASSERT`s in `include/panic_defs.h`) and populating all three with `PANIC_SW_WATCHDOG` (`0xDEAD6664`), older firmware recognizes the watchdog panic and preserves the panic data across sysjump.
 
-### Watchdog Reset Promotion
-During early initialization, if the reset flags indicate a watchdog reset (`EC_RESET_FLAG_WATCHDOG`), the initialization logic checks the existing panic data in RAM:
-*   **If the existing panic reason is `PANIC_SW_WATCHDOG_WARN`**: The reason is "promoted" to `PANIC_SW_WATCHDOG`, preserving the captured `info` (PC) and `exception` (task ID) fields.
-*   **If the existing panic reason is NOT `PANIC_SW_WATCHDOG_WARN`**: The panic data is overwritten with the reason `PANIC_SW_WATCHDOG_HARD`, and all other registers are left blank.
+#### Watchdog Warning and Post-Reset Finalization
 
-Before commit [682f4c61f1](https://chromium.googlesource.com/chromiumos/platform/ec/+/682f4c61f142f622091dcf60ccac339a8d5ac8f2) (which restricted promotion to RW), the RO image would perform the watchdog promotion first during pre-init. This caused compatibility issues:
+1. **Watchdog Warning (`panic_data_write_watchdog_warning`)**:
+   When the watchdog pre-warning timer fires (`WATCHDOG_WARNING_LEADING_TIME_MS` before hardware watchdog expiry) and `CONFIG_PLATFORM_EC_PANIC_WATCHDOG_STRUCT` is enabled, the handler populates `struct watchdog_panic_data` with `pc`, `lr`, `sp`, `thread_id`, `version`, `warning_uptime`, `reset_flags`, `power_signals`, `power_state`, `battery_level`, sets all three `reason_*` fields to `PANIC_SW_WATCHDOG`, and sets `WATCHDOG_PANIC_FLAG_WARNING` in `wd.struct_flags`.
+2. **Post-Reset Finalization (`panic_finalize_watchdog` in RW `panic_data_init`)**:
+   On subsequent boot in RW when `EC_RESET_FLAG_WATCHDOG` is set:
+   - If unread (`panic_data_is_new()`) `PANIC_ARCH_WATCHDOG` data has `WATCHDOG_PANIC_FLAG_WARNING` set, `panic_finalize_watchdog()` clears `WATCHDOG_PANIC_FLAG_WARNING`, preserving all warning context captured before the reset.
+   - If unread legacy panic data has `PANIC_SW_WATCHDOG_WARN` (`0xDEAD6668`), it is promoted in-place to `PANIC_SW_WATCHDOG` (`0xDEAD6664`).
+   - Otherwise (no prior unread warning, e.g., interrupts were locked during a hard hang), `panic_data_init()` resets the standard architecture `panic_data` structure, sets `PANIC_SW_WATCHDOG_HARD` (`0xDEAD666A`), and clears the `RO_IMAGE`/`RW_IMAGE` flags (since the source image of a hard watchdog reset without a warning cannot be determined).
+   - As before (since commit [682f4c61f1](https://chromium.googlesource.com/chromiumos/platform/ec/+/682f4c61f142f622091dcf60ccac339a8d5ac8f2)), RO skips watchdog finalization/promotion so legacy RO images never clobber RW panic data before jumping to RW.
 
-If the RO image was unable to interpret the RW panic data (e.g., because the RO image expected a smaller `panic_data` layout), it would overwrite the panic data using its own layout. Even if it could interpret the data, RO's promotion would only preserve the `reason`, `info`, and `exception` fields, blanking out any new registers or fields that the newer RW image may have populated.
+#### Updating and Augmenting `struct watchdog_panic_data` Going Forward
 
-To resolve this, commit [682f4c61f1](https://chromium.googlesource.com/chromiumos/platform/ec/+/682f4c61f142f622091dcf60ccac339a8d5ac8f2) restricted the watchdog promotion logic to run **only in the RW image**. The RO image preserves the reset flags and does not modify the panic data, allowing the RW image to safely perform the promotion after sysjump. *Note*: With this change, the watchdog warning reason (`PANIC_SW_WATCHDOG_WARN`) will not be promoted while executing the RO image, even if a watchdog reset occurred. This is typically not noticed since the EC immediately jumps to RW unless EC software sync is disabled for development.
+`struct watchdog_panic_data` uses semantic versioning (`struct_major_version`, `struct_minor_version`) combined with a versioned `union` and compile-time `BUILD_ASSERT`s to guarantee forward and backward compatibility across RO/RW images and host parsers (`libec`, `ectool`, crash-reporter):
+
+1. **Append-Only Additions (Increment `struct_minor_version`, Keep `struct_major_version == 1`)**:
+   - All `v1.0` fields (offsets `0..59`) are frozen in `WATCHDOG_PANIC_DATA_V1_0_FIELDS` / `struct watchdog_panic_data_v1_0` (`60` bytes) and locked down by per-field `offsetof()` `BUILD_ASSERT`s in `include/panic_defs.h`.
+   - To add new fields in minor version `1.(N+1)`:
+     1. Append the new fields to the anonymous struct inside `struct watchdog_panic_data` after the `v1.N` fields (so direct `pdata->wd.<field>` access works seamlessly).
+     2. Define `struct watchdog_panic_data_v1_<N+1>` (embedding `struct watchdog_panic_data_v1_<N>` as its first member) and add it to the `union` inside `struct watchdog_panic_data` with a `BUILD_ASSERT(sizeof(struct watchdog_panic_data_v1_<N+1>) == ...)`.
+     3. Increment `WATCHDOG_PANIC_DATA_MINOR_VERSION`.
+   - **Size Ceiling (`104` bytes)**: `panic_get_data()` requires `pdata->struct_size == sizeof(struct panic_data)` (`CONFIG_PANIC_DATA_SIZE`). The union inside `struct panic_data` is bounded by `sizeof(struct cortex_panic_data)` (`104` bytes on boards with `CONFIG_DO_NOT_INCLUDE_RV32I_PANIC_DATA`) or `sizeof(struct rv32i_panic_data)` (`132` bytes otherwise). Because `v1.0` is `60` bytes, up to **`44` bytes** of new fields can be appended (up to `104` bytes total, enforced by `BUILD_ASSERT(sizeof(struct watchdog_panic_data) <= sizeof(struct cortex_panic_data))`) without increasing `sizeof(struct panic_data)` on any board or breaking deployed RO images.
+2. **Reader Forward Compatibility (`struct_major_version == 1`)**:
+   - Any `v1.x` reader (`panic_data_print()`, `panic_finalize_watchdog()`, `libec`) checks `pdata->wd.struct_major_version == 1`.
+   - Because minor versions are strictly append-only, an older `v1.0` processor or tool can always decode the `v1.0` fields (`0..59`) even when reading panic data written by newer `v1.1+` firmware, and newer readers check `pdata->wd.struct_minor_version >= N` before reading fields added in `v1.N`.
+3. **Breaking Layout Changes (Increment `struct_major_version`)**:
+   - If existing fields must ever be removed or reordered, increment `WATCHDOG_PANIC_DATA_MAJOR_VERSION` (e.g., to `2`), reset `WATCHDOG_PANIC_DATA_MINOR_VERSION` to `0`, and add `struct watchdog_panic_data_v2_0 v2_0` to the `union` in `struct watchdog_panic_data` while keeping `reason_x86` (offset `0`), `struct_major_version` (offset `4`), `struct_minor_version` (offset `5`), `reason_cm` (offset `12`), and `reason_riscv` (offset `44`) at their fixed offsets.
+   - Older processors checking `struct_major_version == 1` will cleanly recognize that they cannot interpret `struct_major_version == 2` without misparsing fields or requiring a new `PANIC_ARCH_*` value.
 
 ## Zephyr Integration
 

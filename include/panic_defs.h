@@ -8,7 +8,13 @@
 #ifndef PLATFORM_EC_INCLUDE_PANIC_DEFS_H_
 #define PLATFORM_EC_INCLUDE_PANIC_DEFS_H_
 
+#include <stddef.h>
 #include <stdint.h>
+
+/* If BUILD_ASSERT isn't already defined, make it a no-op */
+#ifndef BUILD_ASSERT
+#define BUILD_ASSERT(_cond)
+#endif /* !BUILD_ASSERT */
 
 #ifdef __cplusplus
 extern "C" {
@@ -135,6 +141,112 @@ struct posix_panic_data {
 	uint8_t reserved[3];
 };
 
+/* Flags for watchdog_panic_data.flags */
+/*
+ * This flag indicates that watchdog_panic_data was populated during a watchdog
+ * warning and has not yet been finalized following a watchdog reset.
+ */
+#define WATCHDOG_PANIC_FLAG_WARNING BIT(0)
+
+#define WATCHDOG_PANIC_DATA_MAJOR_VERSION 1
+#define WATCHDOG_PANIC_DATA_MINOR_VERSION 0
+
+/*
+ * Architecture-agnostic watchdog panic data (PANIC_ARCH_WATCHDOG).
+ *
+ * Backward Compatibility with Deployed RO Images:
+ * Legacy RO/RW firmware inspects panic_data without checking for
+ * PANIC_ARCH_WATCHDOG, reading the panic reason from its native architecture's
+ * register offset:
+ *   - x86 / NDS32: offset 0  (x86.vector / nds_n8.itype) -> reason_x86
+ *   - Cortex-M:    offset 12 (cm.regs[3] / R4)           -> reason_cm
+ *   - RISC-V:      offset 44 (riscv.regs[11] / S0)       -> reason_riscv
+ * All three reason_* fields MUST remain at these exact byte offsets and be
+ * populated with PANIC_SW_WATCHDOG so older RO images recognize the watchdog
+ * panic and do not overwrite panic_data.
+ *
+ * Versioning & Append-Only Evolution:
+ * - struct_major_version (offset 4) and struct_minor_version (offset 5) use
+ *   semantic versioning:
+ *   1. Append-Only Additions (increment struct_minor_version, keep
+ *      struct_major_version):
+ *      All existing fields in v1.0 (offsets 0..59, 60 bytes total) are frozen
+ *      and enforced via struct watchdog_panic_data_v1_0 and per-field
+ *      offsetof() BUILD_ASSERTs below.
+ *      To add new fields in v1.(N+1):
+ *        a) Append the new fields to the anonymous struct inside
+ *           struct watchdog_panic_data (after the v1.N fields).
+ *        b) Define struct watchdog_panic_data_v1_<N+1> (embedding v1_<N> as its
+ *           first member) and add it to the union in struct watchdog_panic_data
+ *           along with a sizeof() BUILD_ASSERT.
+ *        c) Increment WATCHDOG_PANIC_DATA_MINOR_VERSION.
+ *      Because updates are strictly append-only, any v1.x reader (checking
+ *      struct_major_version == 1) can always safely decode all fields up to
+ *      MIN(reader_minor, pdata->wd.struct_minor_version).
+ *   2. Breaking Layout Changes (increment struct_major_version, reset
+ *      struct_minor_version):
+ *      If fields must ever be removed or reordered, increment
+ *      WATCHDOG_PANIC_DATA_MAJOR_VERSION (e.g. to 2) and add a v2_0 struct to
+ *      the union while keeping reason_x86 (0), struct_major_version (4),
+ *      struct_minor_version (5), reason_cm (12), and reason_riscv (44) at their
+ *      fixed offsets. Readers checking struct_major_version == 1 will cleanly
+ *      reject struct_major_version != 1 without misinterpreting fields.
+ *   3. Union Size Ceiling (104 bytes):
+ *      panic_get_data() requires pdata->struct_size == sizeof(struct
+ * panic_data) (CONFIG_PANIC_DATA_SIZE). The union size in struct panic_data is
+ * bounded by cortex_panic_data (104 bytes when
+ *      CONFIG_DO_NOT_INCLUDE_RV32I_PANIC_DATA is set) or rv32i_panic_data
+ *      (132 bytes otherwise). Since v1.0 is 60 bytes, up to 44 bytes of new
+ *      fields can be appended (up to 104 bytes total) without changing
+ *      sizeof(struct panic_data) on any board or breaking RO/RW size
+ *      compatibility.
+ */
+#define WATCHDOG_PANIC_DATA_V1_0_FIELDS                                       \
+	/* --- Header & Architecture Alignment --- */                         \
+	uint32_t reason_x86; /* offset 0. Matches x86.vector / nds_n8.itype   \
+			      */                                              \
+	uint8_t struct_major_version; /* offset 4:                            \
+					 WATCHDOG_PANIC_DATA_MAJOR_VERSION */ \
+	uint8_t struct_minor_version; /* offset 5:                            \
+					 WATCHDOG_PANIC_DATA_MINOR_VERSION */ \
+	uint16_t struct_flags; /* offset 6: WATCHDOG_PANIC_FLAG_* */          \
+	uint32_t thread_id; /* offset 8: Interrupted k_tid_t pointer */       \
+	uint32_t reason_cm; /* offset 12. Matches cm.regs[3] / R4 */          \
+                                                                              \
+	/* --- Execution Registers --- */                                     \
+	uint32_t pc; /* offset 16 */                                          \
+	uint32_t lr; /* offset 20 */                                          \
+	uint32_t sp; /* offset 24 */                                          \
+                                                                              \
+	/* --- Firmware Build --- */                                          \
+	char version[16]; /* offset 28-43: Tail 16 bytes of EC version */     \
+	uint32_t reason_riscv; /* offset 44. Matches riscv.regs[11] */        \
+                                                                              \
+	/* --- Timestamps & System Telemetry --- */                           \
+	uint32_t warning_uptime; /* offset 48 */                              \
+	uint32_t reset_flags; /* offset 52 */                                 \
+	uint16_t power_signals; /* offset 56 */                               \
+	uint8_t power_state; /* offset 58 */                                  \
+	uint8_t battery_level /* offset 59 */
+
+/* Frozen v1.0 layout (60 bytes) */
+struct watchdog_panic_data_v1_0 {
+	WATCHDOG_PANIC_DATA_V1_0_FIELDS;
+};
+
+struct watchdog_panic_data {
+	union {
+		struct {
+			WATCHDOG_PANIC_DATA_V1_0_FIELDS;
+			/*
+			 * Append v1.1+ fields here and add a corresponding
+			 * struct watchdog_panic_data_v1_<N> to this union.
+			 */
+		};
+		struct watchdog_panic_data_v1_0 v1_0;
+	};
+};
+
 /* Data saved across reboots */
 struct panic_data {
 	uint8_t arch; /* Architecture (PANIC_ARCH_*) */
@@ -152,6 +264,8 @@ struct panic_data {
 		struct rv32i_panic_data riscv; /* RISC-V RV32I */
 #endif
 		struct posix_panic_data posix; /* POSIX (native_sim) */
+		struct watchdog_panic_data wd; /* Common Watchdog Panic struct
+						*/
 	};
 
 	/*
@@ -161,6 +275,44 @@ struct panic_data {
 	uint32_t struct_size; /* Size of this struct */
 	uint32_t magic; /* PANIC_SAVE_MAGIC if valid */
 };
+
+/*
+ * Compile-time assertions to guarantee exact byte alignment with legacy unions,
+ * freeze v1.0 field offsets, and ensure watchdog_panic_data does not grow
+ * sizeof(struct panic_data).
+ */
+BUILD_ASSERT(offsetof(struct panic_data, wd) == 4);
+BUILD_ASSERT(sizeof(struct watchdog_panic_data_v1_0) == 60);
+BUILD_ASSERT(sizeof(struct watchdog_panic_data) >=
+	     sizeof(struct watchdog_panic_data_v1_0));
+BUILD_ASSERT(sizeof(struct watchdog_panic_data) <=
+	     sizeof(struct cortex_panic_data));
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, reason_x86) == 0);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, struct_major_version) == 4);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, struct_minor_version) == 5);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, struct_flags) == 6);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, thread_id) == 8);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, reason_cm) == 12);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, pc) == 16);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, lr) == 20);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, sp) == 24);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, version) == 28);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, reason_riscv) == 44);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, warning_uptime) == 48);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, reset_flags) == 52);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, power_signals) == 56);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, power_state) == 58);
+BUILD_ASSERT(offsetof(struct watchdog_panic_data, battery_level) == 59);
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_x86) ==
+	     offsetof(struct panic_data, x86.vector));
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_x86) ==
+	     offsetof(struct panic_data, nds_n8.itype));
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_cm) ==
+	     offsetof(struct panic_data, cm.regs[CORTEX_PANIC_REGISTER_R4]));
+#ifndef CONFIG_DO_NOT_INCLUDE_RV32I_PANIC_DATA
+BUILD_ASSERT(offsetof(struct panic_data, wd.reason_riscv) ==
+	     offsetof(struct panic_data, riscv.regs[11]));
+#endif
 
 #define PANIC_DATA_MAGIC 0x21636e50 /* "Pnc!" */
 #define PANIC_DATA_VERSION 2
@@ -173,6 +325,7 @@ enum panic_arch {
 	PANIC_ARCH_RISCV_RV32I = 4, /* RISC-V RV32I */
 #endif
 	PANIC_ARCH_POSIX = 5, /* POSIX (native_sim) */
+	PANIC_ARCH_WATCHDOG = 6, /* Common Watchdog Panic struct */
 };
 
 #define PANIC_ZEPHYR_FATAL_ERROR 0xDEAD6800

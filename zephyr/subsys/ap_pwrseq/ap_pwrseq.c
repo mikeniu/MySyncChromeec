@@ -252,6 +252,10 @@ int ap_pwrseq_state_lock(const struct device *dev)
 {
 	struct ap_pwrseq_data *const data = dev->data;
 
+	if (k_is_in_isr()) {
+		return 0;
+	}
+
 	/* Acquire lock to ensure no `run` operation is in progress. */
 	return k_mutex_lock(&data->mux, K_FOREVER);
 }
@@ -259,6 +263,10 @@ int ap_pwrseq_state_lock(const struct device *dev)
 int ap_pwrseq_state_unlock(const struct device *dev)
 {
 	struct ap_pwrseq_data *const data = dev->data;
+
+	if (k_is_in_isr()) {
+		return 0;
+	}
 
 	return k_mutex_unlock(&data->mux);
 }
