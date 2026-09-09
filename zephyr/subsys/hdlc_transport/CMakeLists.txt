@@ -13,6 +13,12 @@ zephyr_library_sources_ifdef(
     src/shell_hdlc.c
 )
 
+zephyr_library_sources_ifdef(
+    CONFIG_LOG_BACKEND_HDLC
+    src/log_backend_hdlc.c
+)
+
+zephyr_include_directories(include)
 
 zephyr_library_link_libraries(
     pw_hdlc.encoder

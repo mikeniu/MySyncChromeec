@@ -85,4 +85,32 @@ config SHELL_BACKEND_HDLC_INIT_PRIORITY
 
 endif # SHELL_BACKEND_HDLC
 
+config LOG_BACKEND_HDLC
+	bool "HDLC logging backend"
+	depends on LOG && !LOG_MODE_MINIMAL
+	select LOG_OUTPUT
+	default y
+	help
+	  Enable dedicated HDLC logging backend on channel HDLC_ADDR_LOG (1).
+
+if LOG_BACKEND_HDLC
+
+config LOG_BACKEND_HDLC_AUTOSTART
+	bool "Automatically start HDLC logging backend"
+	default y
+
+config LOG_BACKEND_HDLC_BUFFER_SIZE
+	int "HDLC log line buffer size"
+	default 256
+	help
+	  Size of formatted log line buffer before HDLC encapsulation.
+
+config LOG_BACKEND_HDLC_OUTPUT_DEFAULT
+	int "Default log output format"
+	default 0
+	help
+	  Log format (0 = standard text).
+
+endif # LOG_BACKEND_HDLC
+
 endif # HDLC_TRANSPORT
