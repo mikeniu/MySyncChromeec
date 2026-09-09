@@ -7,8 +7,15 @@
 
 import argparse
 import os
+from pathlib import Path
+import shutil
 import sys
 
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPT_DIR))
+
+# pylint: disable=wrong-import-position
 import dagwood_test_lib
 
 
@@ -22,7 +29,18 @@ def main():
 
     twister_args = dagwood_test_lib.get_twister_args(args, extra_args)
 
-    cmd = ["./twister"]
+    ec_root = SCRIPT_DIR.parent
+    twister_script = ec_root / "twister"
+    if not twister_script.is_file():
+        twister_script = Path("./twister").resolve()
+
+    if shutil.which("vpython3"):
+        cmd = [str(twister_script)]
+    else:
+        # When vpython3 is not available (e.g., inside Docker container),
+        # use Python directly.
+        cmd = [sys.executable, str(twister_script)]
+
     cmd.extend(twister_args)
     print(f"Running command: {' '.join(cmd)}")
 

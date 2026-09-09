@@ -118,15 +118,23 @@ __noreturn
 #endif /* !CONFIG_ZEPHYR */
 
 /**
- * Log a panic in the panic log, but don't halt the system. Normally
- * called on the subsequent reboot after panic detection.
+ * Reset/prepare a panic_data structure for writing.
+ *
+ * Sets struct size/version, architecture, and default image flags
+ * (PANIC_DATA_FLAG_RW_IMAGE or PANIC_DATA_FLAG_RO_IMAGE).
+ * Note: magic is NOT set here; call panic_data_finalize() when writing
+ * completes.
+ *
+ * @param pdata Pointer to panic_data to reset, or NULL to reset and return
+ *              the system panic data buffer from get_panic_data_write().
+ * @return Pointer to the prepared panic_data structure.
  */
-void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
+struct panic_data *panic_data_reset(struct panic_data *pdata);
 
 /**
- * Retrieve the currently stored panic reason + info.
+ * Finalize panic data by setting the valid magic number and flushing to RAM.
  */
-void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
+void panic_data_finalize(struct panic_data *pdata);
 
 /**
  * Get the panic reason field from a panic_data structure for the current
@@ -139,6 +147,30 @@ uint32_t panic_get_reason_reg(const struct panic_data *pdata);
  * architecture.
  */
 void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason);
+
+/**
+ * Get the panic info field from a panic_data structure for the current
+ * architecture.
+ */
+uint32_t panic_get_info_reg(const struct panic_data *pdata);
+
+/**
+ * Set the panic info field in a panic_data structure for the current
+ * architecture.
+ */
+void panic_set_info_reg(struct panic_data *pdata, uint32_t info);
+
+/**
+ * Get the panic exception/thread field from a panic_data structure for the
+ * current architecture.
+ */
+uint8_t panic_get_exception_reg(const struct panic_data *pdata);
+
+/**
+ * Set the panic exception/thread field in a panic_data structure for the
+ * current architecture.
+ */
+void panic_set_exception_reg(struct panic_data *pdata, uint8_t exception);
 
 /**
  * Check if stored panic data represents a new panic.

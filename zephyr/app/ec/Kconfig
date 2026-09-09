@@ -79,27 +79,6 @@ config CROS_EC_HOOK_TICK_INTERVAL
 	  periodically by the HOOKS task. The interval must be shorter than
 	  1 second and is set according the EC chipset's sleep requirements.
 
-config CROS_EC_LIGHTBAR_ANIMATION_HOLD_MS
-	int "Lightbar animation end hold time (ms)"
-	default 50
-	help
-	  Specifies the duration (in milliseconds) to hold the final state
-	  of a one-shot lightbar animation before allowing a transition
-	  to the next state. This helps prevent abrupt visual changes.
-	  The default value is 50ms. Some platforms may require a
-	  longer hold time due to hardware or driver latencies to ensure
-	  animations complete fully.
-
-config CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS
-	int "AC unplug animation start delay (ms)"
-	default 0
-	help
-	  Specifies a configurable delay (in milliseconds) to wait after an AC
-	  unplug event is detected before triggering the unplug animation.
-	  Set to 0 to trigger the animation instantly (default). Increasing this
-	  value provides a platform sync window to prevent the unplug animation
-	  from being cut short or played while the lightbar rails are unpowered.
-
 # When building for the host, we still need values for the various memory
 # sizes, though they aren't actually used, so just set some reasonable-looking
 # values and then ignore them.

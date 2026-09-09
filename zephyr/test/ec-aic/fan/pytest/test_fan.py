@@ -1,0 +1,231 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+"""Tests for EC AIC fan PWM control and tachometer measurement."""
+
+# pylint: disable=import-error, broad-exception-caught
+from __future__ import annotations
+
+import logging
+from pathlib import Path
+import re
+import sys
+import time
+
+import pytest
+from twister_harness import DeviceAdapter
+from twister_harness import Shell
+import usb.core
+
+
+DAGWOOD_DIR = Path(__file__).resolve().parents[6] / "dagwood"
+if str(DAGWOOD_DIR) not in sys.path:
+    sys.path.append(str(DAGWOOD_DIR))
+
+# pylint: disable=import-error, wrong-import-position
+import dagwood_utils
+
+
+logger = logging.getLogger(__name__)
+
+
+def get_actual_rpm(shell: Shell, timeout: float = 3.0) -> int:
+    """Query faninfo on the EC and return the reported Actual RPM."""
+    deadline = time.time() + timeout
+    last_output = ""
+    while time.time() < deadline:
+        lines = shell.exec_command("faninfo")
+        last_output = "\n".join(lines)
+        # Match 'Actual: <rpm> rpm' or 'Fan 0 Actual: <rpm> rpm'
+        if match := re.search(
+            r"(?:Fan\s+\d+\s+)?Actual:\s*(\d+)\s*rpm",
+            last_output,
+            re.IGNORECASE,
+        ):
+            rpm = int(match.group(1))
+            logger.debug("Parsed actual RPM from EC: %d", rpm)
+            return rpm
+        time.sleep(0.5)
+
+    raise AssertionError(
+        f"Could not parse 'Actual: <rpm> rpm' from 'faninfo' output:\n{last_output}"
+    )
+
+
+def wait_for_expected_rpm(
+    shell: Shell,
+    expected_rpm: int,
+    tolerance_pct: float = 0.05,
+    timeout: float = 5.0,
+) -> int:
+    """Poll faninfo until reported RPM matches expected RPM within tolerance."""
+    deadline = time.time() + timeout
+    tolerance = max(int(expected_rpm * tolerance_pct), 100)
+    last_rpm = -1
+
+    while time.time() < deadline:
+        last_rpm = get_actual_rpm(shell)
+        if abs(last_rpm - expected_rpm) <= tolerance:
+            logger.info(
+                "EC reported %d RPM, matching target %d RPM within tolerance (+/-%d RPM)",
+                last_rpm,
+                expected_rpm,
+                tolerance,
+            )
+            return last_rpm
+        time.sleep(0.5)
+
+    assert abs(last_rpm - expected_rpm) <= tolerance, (
+        f"EC RPM mismatch: EC reported {last_rpm} RPM, expected {expected_rpm} RPM "
+        f"(allowed tolerance +/-{tolerance} RPM)"
+    )
+    return last_rpm
+
+
+def wait_for_expected_pwm(
+    dev: usb.core.Device,
+    expected_duty: int,
+    expected_freq: int = 25000,
+    duty_tolerance: int = 5,
+    freq_tolerance_pct: float = 0.10,
+    timeout: float = 5.0,
+) -> tuple[int, int]:
+    """Poll PWM measurement from Dagwood until duty cycle and frequency match expected values."""
+    deadline = time.time() + timeout
+    freq_tolerance = int(expected_freq * freq_tolerance_pct)
+    last_freq, last_dc = -1, -1
+
+    while time.time() < deadline:
+        try:
+            last_freq, last_dc = dagwood_utils.dw_fan_get_pwm(dev)
+            if (
+                abs(last_dc - expected_duty) <= duty_tolerance
+                and abs(last_freq - expected_freq) <= freq_tolerance
+            ):
+                logger.info(
+                    "Dagwood measured PWM: freq=%d Hz (expected %d), duty=%d%% (expected %d%%)",
+                    last_freq,
+                    expected_freq,
+                    last_dc,
+                    expected_duty,
+                )
+                return last_freq, last_dc
+        except Exception as e:
+            logger.debug("dw_fan_get_pwm error during polling: %s", e)
+        time.sleep(0.5)
+
+    assert abs(last_dc - expected_duty) <= duty_tolerance, (
+        f"PWM duty mismatch: Dagwood measured {last_dc}%, expected {expected_duty}% "
+        f"(tolerance +/-{duty_tolerance}%)"
+    )
+    assert abs(last_freq - expected_freq) <= freq_tolerance, (
+        f"PWM frequency mismatch: Dagwood measured {last_freq} Hz, expected {expected_freq} Hz "
+        f"(tolerance +/-{freq_tolerance} Hz)"
+    )
+    return last_freq, last_dc
+
+
+@pytest.mark.parametrize("target_duty", [25, 50, 75])
+def test_fan_pwm(
+    shell: Shell,
+    dagwood_dev: usb.core.Device,
+    target_duty: int,
+) -> None:
+    """Verify EC fan PWM output duty cycle and frequency measured by Dagwood.
+
+    1. Sets fan duty cycle on the DUT using 'fanduty <target_duty>'.
+    2. Reads measured PWM frequency and duty cycle from Dagwood via USB endpoint.
+    3. Verifies measured duty cycle and frequency match expected values.
+    """
+    logger.info("Setting DUT fan duty to %d%%", target_duty)
+    shell.exec_command(f"fanduty {target_duty}")
+
+    wait_for_expected_pwm(dagwood_dev, expected_duty=target_duty)
+
+
+@pytest.mark.parametrize("target_rpm", [2500, 3000, 3500])
+def test_fan_tach_reading(
+    shell: Shell,
+    dagwood_dev: usb.core.Device,
+    target_rpm: int,
+) -> None:
+    """Verify EC tachometer accurately reads fake RPM generated by the control board.
+
+    1. Sets fan duty cycle on the DUT using 'fanduty 50' to enable fan control.
+    2. Sets fake tachometer RPM on Dagwood via USB endpoint.
+    3. Allows tachometer signal to stabilize.
+    4. Runs 'faninfo' on the EC console.
+    5. Verifies EC's 'Actual: <rpm> rpm' matches the target within tolerance.
+    """
+    logger.info("Setting DUT fan duty to 50%% before testing tachometer")
+    shell.exec_command("fanduty 50")
+
+    logger.info("Setting fake tachometer RPM on Dagwood to %d", target_rpm)
+    dagwood_utils.dw_fan_set_tach(dagwood_dev, target_rpm)
+
+    # Allow tachometer sampling clock to capture sufficient pulses
+    time.sleep(1.0)
+
+    # Verify EC faninfo reads the correct RPM
+    actual_rpm = wait_for_expected_rpm(shell, expected_rpm=target_rpm)
+    logger.info(
+        "Successfully verified fake RPM %d: EC measured %d RPM",
+        target_rpm,
+        actual_rpm,
+    )
+
+
+def wait_for_stalled_message(
+    dut: DeviceAdapter,
+    fan_idx: int = 0,
+    timeout: float = 4.0,
+) -> bool:
+    """Wait for 'Fan <fan_idx> stalled!' message from the EC console."""
+    deadline = time.time() + timeout
+    pattern = re.compile(rf"Fan\s+{fan_idx}\s+stalled!", re.IGNORECASE)
+    while time.time() < deadline:
+        try:
+            line = dut.readline(timeout=0.5)
+            if pattern.search(line):
+                logger.info("Detected stalled message: %s", line.strip())
+                return True
+        except Exception:
+            pass
+    return False
+
+
+def test_fan_stalled(
+    dut: DeviceAdapter,
+    shell: Shell,
+    dagwood_dev: usb.core.Device,
+) -> None:
+    """Verify EC reports a fan stall error only when duty cycle is non-zero.
+
+    1. Sets fake tachometer RPM to 0 on Dagwood.
+    2. Sets fan duty cycle to non-zero (50%) on the DUT.
+    3. Verifies that the EC prints 'Fan 0 stalled!' periodically via HOOK_SECOND.
+    4. Sets fan duty cycle to 0% on the DUT.
+    5. Verifies that the EC no longer prints the stalled error message when duty is 0%.
+    """
+    logger.info("Setting fake tachometer to 0 RPM on Dagwood")
+    dagwood_utils.dw_fan_set_tach(dagwood_dev, 0)
+
+    logger.info("Setting DUT fan duty to 50% with tachometer at 0 RPM")
+    shell.exec_command("fanduty 50")
+
+    # Verify 'Fan 0 stalled!' error is printed when duty is non-zero
+    stalled = wait_for_stalled_message(dut, fan_idx=0, timeout=4.0)
+    assert (
+        stalled
+    ), "Expected 'Fan 0 stalled!' error from EC when duty > 0% and RPM is 0"
+
+    logger.info("Setting DUT fan duty to 0% with tachometer at 0 RPM")
+    shell.exec_command("fanduty 0")
+    dut.clear_buffer()
+
+    # Verify 'Fan 0 stalled!' error is not printed when duty is 0%
+    stalled_at_zero = wait_for_stalled_message(dut, fan_idx=0, timeout=3.0)
+    assert (
+        not stalled_at_zero
+    ), "Did not expect 'Fan 0 stalled!' error from EC when duty is 0%"

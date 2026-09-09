@@ -8,6 +8,7 @@
 #include "chipset.h"
 #include "common.h"
 #include "gpio.h"
+#include "hooks.h"
 #include "power/qcom.h"
 
 void passthru_lid_open_to_pmic(void)
@@ -24,8 +25,14 @@ void passthru_ac_on_to_pmic(void)
 		gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_acok_r_od)));
 }
 
+void reset_ac_passthru_pmic_signal(void)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_sysok_gate), 0);
+}
+
 void reset_all_passthru_pmic_signal(void)
 {
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_sysok_gate), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pmic_lid_open_od), 0);
 }
+DECLARE_HOOK(HOOK_INIT, reset_all_passthru_pmic_signal, HOOK_PRIO_DEFAULT);

@@ -7,149 +7,123 @@
 / {
 	named-temp-sensors {
 		compatible = "cros-ec,temp-sensors";
-		status = "disabled";
 
-		temp_charger: charger {
-			temp-host-high = <70>;
-			temp-host-halt = <73>;
-			temp-host-release-high = <67>;
-			power-good-pin = <&gpio_all_sys_pwrgd>;
-			sensor = <&apl6012_ch1>;
-		};
-		temp_batt: batt {
-			temp-host-high = <70>;
-			temp-host-halt = <73>;
-			temp-host-release-high = <67>;
-			power-good-pin = <&gpio_all_sys_pwrgd>;
-			sensor = <&apl6012_ch2>;
-		};
-		temp_vcore: vcore {
+		temp_chg_ther: chg_ther {
 			temp-host-high = <70>;
 			temp-host-halt = <73>;
 			temp-host-release-high = <67>;
 			power-good-pin = <&gpio_all_sys_pwrgd>;
 			sensor = <&apl6012_ch3>;
 		};
-		temp_vccgt: vccgt {
+		temp_ssd: ssd {
 			temp-host-high = <70>;
 			temp-host-halt = <73>;
 			temp-host-release-high = <67>;
 			power-good-pin = <&gpio_all_sys_pwrgd>;
 			sensor = <&apl6012_ch4>;
 		};
-		temp_typec_mb: typec_mb {
+		temp_ambient: ambient {
 			temp-host-high = <70>;
 			temp-host-halt = <73>;
 			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch9>;
+		};
+		temp_pcore: pcore {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch12>;
+		};
+		temp_vccgt: vccgt {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch13>;
+		};
+		temp_ddr: ddr {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch14>;
+		};
+		temp_5v: 5v {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch15>;
+		};
+		temp_chg: chg {
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch1>;
+		};
+		temp_bat_conn: bat_conn {
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch2>;
+		};
+		temp_tc_mb: tc_mb {
 			power-good-pin = <&gpio_all_sys_pwrgd>;
 			sensor = <&apl6012_ch5>;
 		};
-		temp_typec_db: typec_db {
-			temp-host-high = <70>;
-			temp-host-halt = <73>;
-			temp-host-release-high = <67>;
-			power-good-pin = <&gpio_all_sys_pwrgd>;
-			sensor = <&apl6012_ch6>;
-		};
-		temp_pd_mb: pd_mb {
-			temp-host-high = <70>;
-			temp-host-halt = <73>;
-			temp-host-release-high = <67>;
+		temp_tc_db: tc_db {
 			power-good-pin = <&gpio_all_sys_pwrgd>;
 			sensor = <&apl6012_ch7>;
-		};
-		temp_pd_db: pd_db {
-			temp-host-high = <70>;
-			temp-host-halt = <73>;
-			temp-host-release-high = <67>;
-			power-good-pin = <&gpio_all_sys_pwrgd>;
-			sensor = <&apl6012_ch8>;
-		};
-	};
-
-	fan_steps: fan-step {
-		compatible = "cros-ec,fan-steps";
-		status = "disabled";
-		level_0 {
-			temp-on = <40 39 39 39 39>;
-			temp-off = <99 99 99 99 99>;
-			rpm-target = <0>;
-		};
-		level_1 {
-			temp-on = <44 43 43 43 43>;
-			temp-off = <37 36 36 36 36>;
-			rpm-target = <2100>;
-		};
-		level_2 {
-			temp-on = <48 47 47 47 47>;
-			temp-off = <41 40 40 40 40>;
-			rpm-target = <2500>;
-		};
-		level_3 {
-			temp-on = <51 50 50 50 50>;
-			temp-off = <46 45 45 45 45>;
-			rpm-target = <2900>;
-		};
-		level_4 {
-			temp-on = <53 52 52 52 52>;
-			temp-off = <49 48 48 48 48>;
-			rpm-target = <3200>;
-		};
-		level_5 {
-			temp-on = <56 55 55 55 55>;
-			temp-off = <51 50 50 50 50>;
-			rpm-target = <3500>;
-		};
-		level_6 {
-			temp-on = <63 62 62 62 62>;
-			temp-off = <54 53 53 53 53>;
-			rpm-target = <3750>;
-		};
-		level_7 {
-			temp-on = <99 99 99 99 99>;
-			temp-off = <61 60 60 60 60>;
-			rpm-target = <4200>;
 		};
 	};
 };
 
 &i2c_2 {
-	apl6012: apl6012@38 {
+	apl6012: apl6012@3f {
 		compatible = "cros-ec,temp-sensor-apl6012";
 		reg = <0x3f>;
-		status = "disabled";
 
-		apl6012_ch1: charger {
+		apl6012_ch1: chg {
 			temperature-type = "APL6012_IDX_CH1";
-			thermistor = <&apl_NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V_12K_100K>;
 		};
-		apl6012_ch2: batt {
+		apl6012_ch2: bat_conn {
 			temperature-type = "APL6012_IDX_CH2";
-			thermistor = <&apl_NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V_12K_100K>;
 		};
-		apl6012_ch3: vcore {
+		apl6012_ch3: chg_ther {
 			temperature-type = "APL6012_IDX_CH3";
-			thermistor = <&apl_NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V_12K_47K>;
 		};
-		apl6012_ch4: vccgt {
+		apl6012_ch4: ssd {
 			temperature-type = "APL6012_IDX_CH4";
-			thermistor = <&apl_NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V_12K_47K>;
 		};
-		apl6012_ch5: typec_mb {
+		apl6012_ch5: tc_mb {
 			temperature-type = "APL6012_IDX_CH5";
-			thermistor = <&apl_NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V_12K_100K>;
 		};
-		apl6012_ch6: typec_db {
-			temperature-type = "APL6012_IDX_CH6";
-			thermistor = <&apl_NTC_5V_12K_47K>;
-		};
-		apl6012_ch7: pd_mb {
+		apl6012_ch7: tc_db {
 			temperature-type = "APL6012_IDX_CH7";
-			thermistor = <&apl_NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V_12K_100K>;
 		};
-		apl6012_ch8: pd_db {
-			temperature-type = "APL6012_IDX_CH8";
-			thermistor = <&apl_NTC_5V_12K_47K>;
+		apl6012_ch9: ambient {
+			temperature-type = "APL6012_IDX_CH9";
+			thermistor = <&NTC_5V_8K2_10K>;
+		};
+		apl6012_ch12: pcore {
+			temperature-type = "APL6012_IDX_CH12";
+			thermistor = <&NTC_5V_12K_47K>;
+		};
+		apl6012_ch13: vccgt {
+			temperature-type = "APL6012_IDX_CH13";
+			thermistor = <&NTC_5V_12K_47K>;
+		};
+		apl6012_ch14: ddr {
+			temperature-type = "APL6012_IDX_CH14";
+			thermistor = <&NTC_5V_12K_47K>;
+		};
+		apl6012_ch15: 5v {
+			temperature-type = "APL6012_IDX_CH15";
+			thermistor = <&NTC_5V_12K_47K>;
 		};
 	};
 };

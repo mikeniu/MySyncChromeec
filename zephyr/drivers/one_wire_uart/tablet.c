@@ -54,15 +54,11 @@ static void base_shutdown_hook(struct ap_power_ev_callback *cb,
 		/* LCOV_EXCL_STOP */
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(base_shutdown_hook, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);
 
 static void ec_ec_comm_init(void)
 {
-	static struct ap_power_ev_callback cb;
-
-	ap_power_ev_init_callback(&cb, base_shutdown_hook,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&cb);
-
 	one_wire_uart_set_callback(one_wire_uart, recv_cb);
 }
 DECLARE_HOOK(HOOK_INIT, ec_ec_comm_init, HOOK_PRIO_DEFAULT);

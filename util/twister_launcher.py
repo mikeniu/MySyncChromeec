@@ -315,6 +315,7 @@ def main():
     parser.add_argument("-T", "--testsuite-root", action="append")
     parser.add_argument("--quarantine-list", action="append")
     parser.add_argument("-p", "--platform", action="append")
+    parser.add_argument("--hardware-map")
     parser.add_argument("-v", "--verbose", action="count", default=0)
     parser.add_argument("--gcov-tool")
     parser.add_argument(
@@ -376,6 +377,9 @@ def main():
         twister_cli.append("-v")
 
     def is_dagwood_platform():
+        if intercepted_args.hardware_map:
+            return True
+
         if intercepted_args.platform is None:
             return False
 
@@ -428,11 +432,14 @@ def main():
         # Pass user-provided -p args when present.
         for arg in intercepted_args.platform:
             twister_cli.extend(["-p", arg])
-    else:
+    elif not intercepted_args.hardware_map:
         # native_sim and unit_testing when nothing was requested by user.
         twister_cli.extend(["-p", "native_sim"])
         twister_cli.extend(["-p", "unit_testing"])
         twister_cli.extend(["-p", "unit_testing/unit_testing"])
+
+    if intercepted_args.hardware_map:
+        twister_cli.extend(["--hardware-map", intercepted_args.hardware_map])
 
     twister_cli.extend(["--outdir", intercepted_args.outdir])
 

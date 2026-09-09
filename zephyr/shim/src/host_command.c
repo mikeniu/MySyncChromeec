@@ -3,7 +3,6 @@
  * found in the LICENSE file.
  */
 
-#include "console.h"
 #include "hooks.h"
 #include "host_command.h"
 #include "string.h"
@@ -13,23 +12,13 @@
 #include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
 #include <zephyr/sys/iterable_sections.h>
 
-#ifdef CONFIG_EC_HOST_CMD
 #ifndef CONFIG_ZTEST
-#if !defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) || \
-	defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)
-BUILD_ASSERT(0, "The upstream Host Command subsystem is supported only with "
-		"reusing the main thread.");
+#ifdef CONFIG_EC_HOST_CMD_DEDICATED_THREAD
+#error "The upstream Host Command subsystem is supported only with reusing " \
+	"the main thread."
 #endif
-#else
-#if (defined(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED) &&  \
-     !defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)) || \
-	(defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) &&   \
-	 defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
-BUILD_ASSERT(
-	0,
-	"Host command thread setting mismatch between ChromeOS EC and upstream.");
-#endif
-#endif /* CONFIG_ZTEST */
+#endif /* !CONFIG_ZTEST */
+
 #ifdef CONFIG_SUPPRESSED_HOST_COMMANDS
 __maybe_unused static uint16_t suppressed_cmds[] = {
 	CONFIG_SUPPRESSED_HOST_COMMANDS
@@ -86,20 +75,7 @@ BUILD_ASSERT(offsetof(struct ec_host_response, data_len) ==
 BUILD_ASSERT(offsetof(struct ec_host_response, reserved) ==
 	     offsetof(struct ec_host_cmd_response_header, reserved));
 #endif /* CONFIG_SUPPRESSED_HOST_COMMANDS */
-#endif /* CONFIG_EC_HOST_CMD */
 
-struct host_command *zephyr_find_host_command(int command)
-{
-	STRUCT_SECTION_FOREACH(host_command, cmd)
-	{
-		if (cmd->command == command)
-			return cmd;
-	}
-
-	return NULL;
-}
-
-#ifdef CONFIG_EC_HOST_CMD
 static void ec_host_cmd_user_cb(const struct ec_host_cmd_rx_ctx *rx_ctx,
 				void *user_data)
 {
@@ -115,23 +91,17 @@ static void ec_host_cmd_user_cb(const struct ec_host_cmd_rx_ctx *rx_ctx,
 		system_reset(SYSTEM_RESET_HARD);
 	}
 }
-#endif /* CONFIG_EC_HOST_CMD */
 
 void host_command_main(void)
 {
 	k_thread_priority_set(get_main_thread(),
 			      EC_TASK_PRIORITY(EC_TASK_HOSTCMD_PRIO));
 	k_thread_name_set(get_main_thread(), "HOSTCMD");
-#ifndef CONFIG_EC_HOST_CMD
-	host_command_task(NULL);
-#else
 #ifndef CONFIG_EC_HOST_CMD_DEDICATED_THREAD
 	ec_host_cmd_task();
 #endif /* CONFIG_EC_HOST_CMD_DEDICATED_THREAD */
-#endif
 }
 
-#ifdef CONFIG_EC_HOST_CMD
 int host_command_upstream_init(void)
 {
 #ifdef CONFIG_SUPPRESSED_HOST_COMMANDS
@@ -145,14 +115,22 @@ int host_command_upstream_init(void)
 	/* Set the user callback for custom EC procedures */
 	ec_host_cmd_set_user_cb(ec_host_cmd_user_cb, NULL);
 
+#ifdef CONFIG_EC_HOST_CMD_DEDICATED_THREAD
+	/* Rename upstream host command thread to match legacy */
+	const struct ec_host_cmd *hc = ec_host_cmd_get_hc();
+	k_tid_t hc_thread = hc->thread;
+
+	if (hc_thread) {
+		k_thread_name_set(hc_thread, "HOSTCMD");
+	}
+#endif
+
 	return 0;
 }
 SYS_INIT(host_command_upstream_init, POST_KERNEL,
 	 CONFIG_EC_HOST_CMD_INIT_PRIORITY);
 DECLARE_HOOK(HOOK_INIT, host_command_init, HOOK_PRIO_DEFAULT);
-#endif
 
-#ifdef CONFIG_EC_HOST_CMD
 static enum ec_host_cmd_status
 host_command_get_cmd_versions(struct ec_host_cmd_handler_args *args)
 {
@@ -209,4 +187,3 @@ host_command_protocol_info(struct ec_host_cmd_handler_args *args)
 }
 EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_GET_PROTOCOL_INFO,
 			    host_command_protocol_info, EC_VER_MASK(0));
-#endif

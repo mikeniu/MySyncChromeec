@@ -45,6 +45,7 @@
 
 *   [Unit Tests](./unit_tests.md)
     *   [Zephyr Testing](./zephyr/ztest.md)
+*   [Leased DUT EC Testing](./lease_and_test_ec.md)
 *   [Code Coverage](./code_coverage.md)
 *   [ChromeOS EC Firmware Test Requirements](./chromeos-ec-firmware-test-requirements.md)
 
