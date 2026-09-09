@@ -119,9 +119,6 @@
 /* Link against third_party/cryptoc. */
 #undef CONFIG_LIBCRYPTOC
 
-/* Support AP hang detection host command and state machine */
-#undef CONFIG_AP_HANG_DETECT
-
 /* Support AP Warm reset Interrupt. */
 #undef CONFIG_AP_WARM_RESET_INTERRUPT
 
@@ -779,7 +776,6 @@
 #undef  CONFIG_CMD_CLOCKGATES
 #undef  CONFIG_CMD_COMXTEST
 #define CONFIG_CMD_CRASH
-#define CONFIG_CMD_DEVICE_EVENT
 #undef  CONFIG_CMD_DLOG
 #define CONFIG_CMD_DUMP_NVMEM
 #undef  CONFIG_CMD_DUMP_NVCACHE
@@ -1147,12 +1143,6 @@
 #define CONFIG_DEBUG_STACK_OVERFLOW
 
 /*****************************************************************************/
-
-/* Support events from devices attached to the EC */
-#undef CONFIG_DEVICE_EVENT
-
-/* Monitor the states of other devices */
-#undef CONFIG_DEVICE_STATE
 
 /* Support DMA transfers inside the EC */
 #undef CONFIG_DMA

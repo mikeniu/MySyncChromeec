@@ -51,9 +51,6 @@ uint32_t get_feature_flags0(void)
 #ifdef CONFIG_BATTERY_SMART
 		| EC_FEATURE_MASK_0(EC_FEATURE_SMART_BATTERY)
 #endif
-#ifdef CONFIG_AP_HANG_DETECT
-		| EC_FEATURE_MASK_0(EC_FEATURE_HANG_DETECT)
-#endif
 #if 0
 		| EC_FEATURE_MASK_0(EC_FEATURE_PMU) /* Obsolete */
 #endif
@@ -80,9 +77,6 @@ uint32_t get_feature_flags0(void)
 #endif
 #if defined(HAS_TASK_RWSIG) || defined(HAS_TASK_RWSIG_RO)
 		| EC_FEATURE_MASK_0(EC_FEATURE_RWSIG)
-#endif
-#ifdef CONFIG_DEVICE_EVENT
-		| EC_FEATURE_MASK_0(EC_FEATURE_DEVICE_EVENT)
 #endif
 		;
 }

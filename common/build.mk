@@ -20,7 +20,6 @@ common-$(CONFIG_AES_GCM)+=aes-gcm.o
 common-$(CONFIG_AP_RO_VERIFICATION)+=ap_ro_integrity_check.o
 common-$(CONFIG_CMD_ADC)+=adc.o
 
-common-$(CONFIG_AP_HANG_DETECT)+=ap_hang_detect.o
 common-$(CONFIG_BASE32)+=base32.o
 common-$(CONFIG_BASE64)+=base64.o
 common-${CONFIG_BOARD_ID_FEATURES} += board_id_features.o
@@ -37,8 +36,6 @@ common-$(CONFIG_CURVE25519)+=curve25519.o
 ifneq ($(CORE),cortex-m0)
 common-$(CONFIG_CURVE25519)+=curve25519-generic.o
 endif
-common-$(CONFIG_DEVICE_EVENT)+=device_event.o
-common-$(CONFIG_DEVICE_STATE)+=device_state.o
 common-$(CONFIG_EC_EFS_SUPPORT)+=ec_comm.o ec_efs.o
 common-$(CONFIG_EXTRACT_PRINTF_STRINGS)+=cmsg.o
 common-$(CONFIG_EXTENSION_COMMAND)+=extension.o
