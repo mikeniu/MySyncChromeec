@@ -28,4 +28,10 @@ config CMD_I2C_DTS_PROTECT
 	help
 	  Enable EC console command to controll i2c protection.
 
+config CMD_I2C_DTS_PORTMAP
+	bool "The EC console command to display I2C port mapping"
+	default y
+	help
+	  Enable EC console command to display I2C port mapping.
+
 endif # I2C_DTS_PASSTHRU
