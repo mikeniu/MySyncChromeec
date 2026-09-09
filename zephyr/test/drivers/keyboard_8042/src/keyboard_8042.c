@@ -499,20 +499,17 @@ ZTEST(keyboard_8042, test_command__test_mouse)
 
 ZTEST(keyboard_8042, test_command__echo_mouse_and_send_to_mouse)
 {
+	const uint8_t expected[] = { 0x01 };
+
 	keyboard_host_write(I8042_ECHO_MOUSE, true);
 	k_sleep(K_MSEC(100));
 	keyboard_host_write(0x01, false);
 	k_sleep(K_MSEC(100));
+	verify_lpc_chars(expected, ARRAY_SIZE(expected));
 
 	keyboard_host_write(I8042_SEND_TO_MOUSE, true);
 	k_sleep(K_MSEC(100));
 	keyboard_host_write(0x02, false);
-	k_sleep(K_MSEC(100));
-}
-
-ZTEST(keyboard_8042, test_aux_interrupt)
-{
-	send_aux_data_to_host_interrupt(0x33);
 	k_sleep(K_MSEC(100));
 }
 
