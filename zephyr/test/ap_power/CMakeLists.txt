@@ -19,6 +19,7 @@ target_sources(app PRIVATE
   src/hibdelay.c
   src/hibernate.c
   src/host_command.c
+  src/panic.c
   src/test_mocks.c
   src/main.c)
 
