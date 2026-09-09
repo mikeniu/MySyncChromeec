@@ -1,0 +1,34 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+include: base.yaml
+
+description: Devicetree keyboard layout patch definition
+
+compatible: "cros-ec,keyboard-layout-patch"
+
+properties:
+  scan-cols:
+    type: int
+    description: Number of active scan columns (e.g. 18 for Numpad).
+  vol-up-rc:
+    type: array
+    description: Row and Col coordinates for Volume Up key <row col>.
+  vivaldi-config:
+    type: phandle
+    description: |
+      Phandle to the active Vivaldi top-row configuration child node under
+      cros-ec,vivaldi-keys.
+  patches:
+    type: array
+    description: |
+      Array of scancode override triples:
+      <row col scancode>, <row col scancode>, ...
+      Example: patches = <0 1 0x0042>, <3 4 0x0055>;
+  swaps:
+    type: array
+    description: |
+      Array of scancode swap/copy coordinate pairs:
+      <dst_row dst_col>, <src_row src_col>
+      Example: swaps = <3 14>, <2 7>;
