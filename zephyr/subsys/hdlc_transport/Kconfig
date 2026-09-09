@@ -1,0 +1,51 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+menuconfig HDLC_TRANSPORT
+	bool "HDLC Transport over UART"
+	select CPP
+	select REQUIRES_FULL_LIBCPP
+	select PIGWEED_BYTES
+	select PIGWEED_CHECKSUM
+	select PIGWEED_RESULT
+	select PIGWEED_SPAN
+	select PIGWEED_STATUS
+	select PIGWEED_STREAM
+	help
+	  Enables HDLC frame encapsulation over the EC UART interface using
+	  Pigweed (pw_hdlc). Multiplexes shell, log, and RPC channels.
+
+if HDLC_TRANSPORT
+
+config HDLC_TRANSPORT_MAX_FRAME_SIZE
+	int "Maximum HDLC frame size in bytes"
+	default 1024
+	help
+	  Maximum size of unescaped frame payload that the decoder can process.
+
+config HDLC_TRANSPORT_RX_BUF_SIZE
+	int "HDLC UART RX ring buffer size in bytes"
+	default 512
+	help
+	  Size of ring buffer between UART ISR and HDLC RX decoder thread.
+
+config HDLC_TRANSPORT_RX_STACK_SIZE
+	int "HDLC RX thread stack size"
+	default 2048
+	help
+	  Stack size for the HDLC RX decoder worker thread.
+
+config HDLC_TRANSPORT_RX_PRIORITY
+	int "HDLC RX thread priority (preemptive)"
+	default 1
+	help
+	  Priority of the HDLC RX thread.
+
+config HDLC_TRANSPORT_INIT_PRIORITY
+	int "HDLC transport initialization priority"
+	default 60
+	help
+	  Init priority for HDLC transport (runs during POST_KERNEL).
+
+endif # HDLC_TRANSPORT
