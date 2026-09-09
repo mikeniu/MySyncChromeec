@@ -21,6 +21,7 @@ target_sources(app PRIVATE
 	src/test_cros_hostcmd_transport.cc
 	src/test_zephyr_bt_sender.cc
 	src/test_bt_hci_interceptor.cc
+	src/test_bt_passthru_flow.cc
 )
 
 target_link_libraries(app PRIVATE
