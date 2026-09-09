@@ -460,9 +460,12 @@ int bmi_load_fifo(struct motion_sensor_t *s, uint32_t last_ts)
 	/* Add one byte to get an empty FIFO frame.*/
 	length++;
 
-	if (length > sizeof(bmi_buffer))
+	if (length > sizeof(bmi_buffer)) {
 		CPRINTS("unexpected large FIFO: %d", length);
-	length = min(length, sizeof(bmi_buffer));
+		bmi_write8(s->port, s->i2c_spi_addr_flags, BMI_CMD_REG(V(s)),
+			   BMI_CMD_FIFO_FLUSH);
+		return EC_SUCCESS;
+	}
 
 	bmi_read_n(s->port, s->i2c_spi_addr_flags, BMI_FIFO_DATA(V(s)),
 		   bmi_buffer, length);
