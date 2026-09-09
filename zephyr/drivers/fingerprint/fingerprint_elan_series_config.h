@@ -3,11 +3,11 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_FINGERPRINT_ELAN80SERIES_CONFIG_H
-#define __CROS_FINGERPRINT_ELAN80SERIES_CONFIG_H
+#ifndef __CROS_FINGERPRINT_ELAN_SERIES_CONFIG_H
+#define __CROS_FINGERPRINT_ELAN_SERIES_CONFIG_H
 
 /*
- * Select the correct configuration file based on the enabled ELAN80 series
+ * Select the correct configuration file based on the enabled ELAN series
  * fingerprint sensor.
  */
 
@@ -19,4 +19,4 @@
 #error "No valid configuration for fingerprint sensor."
 #endif
 
-#endif /* __CROS_FINGERPRINT_ELAN80SERIES_CONFIG_H */
+#endif /* __CROS_FINGERPRINT_ELAN_SERIES_CONFIG_H */
