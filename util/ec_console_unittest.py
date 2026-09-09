@@ -360,5 +360,90 @@ class ServoInterpManagerTest(unittest.TestCase):
         mgr.restore()
 
 
+class LogThemeTest(unittest.TestCase):
+    """Tests for TUI log color styling and ANSI formatting."""
+
+    def test_format_row_colored(self):
+        """Test formatting log row with ANSI colors enabled."""
+        theme = ec_console.LogTheme()
+        record = ec_console.LogRecord(
+            "00:01:00.000", "INF", "usb_pd", "init ok", ""
+        )
+        row = theme.format_row(record, use_color=True)
+        self.assertIn("usb_pd", row)
+        self.assertIn("init ok", row)
+        self.assertIn("\033[", row)
+
+    def test_format_row_uncolored(self):
+        """Test formatting log row without ANSI colors."""
+        theme = ec_console.LogTheme()
+        record = ec_console.LogRecord(
+            "00:01:00.000", "INF", "usb_pd", "init ok", ""
+        )
+        row = theme.format_row(record, use_color=False)
+        self.assertIn("usb_pd", row)
+        self.assertIn("init ok", row)
+        self.assertNotIn("\033[", row)
+
+    def test_strip_ansi(self):
+        """Test strip_ansi removes all escape sequences."""
+        raw = "\033[1;32mGreen message\033[0m"
+        self.assertEqual(ec_console.strip_ansi(raw), "Green message")
+
+
+class TuiLayoutTest(unittest.TestCase):
+    """Tests for curses-based dual-pane TUI layout."""
+
+    def test_tui_layout_init(self):
+        """Test TuiLayout default properties."""
+        tui = ec_console.TuiLayout(device="/dev/pts/11", baudrate=115200)
+        self.assertEqual(tui.device, "/dev/pts/11")
+        self.assertEqual(tui.baudrate, 115200)
+        self.assertFalse(tui.is_scrolled)
+
+    @mock.patch("sys.stdout.write")
+    def test_tui_add_log(self, _mock_write):
+        """Test adding logs to TuiLayout history."""
+        tui = ec_console.TuiLayout(device="/dev/pts/11")
+        record = ec_console.LogRecord("00:00:00.000", "INF", "ec", "test", "")
+        tui.add_log(record)
+        self.assertEqual(tui.log_count, 1)
+        self.assertEqual(len(tui.log_history), 1)
+
+    @mock.patch("sys.stdout.write")
+    def test_tui_scroll(self, _mock_write):
+        """Test scrolling up and down in log history."""
+        tui = ec_console.TuiLayout(device="/dev/pts/11")
+        for i in range(50):
+            tui.add_log(
+                ec_console.LogRecord(
+                    "00:00:00.000", "INF", "ec", f"test {i}", ""
+                )
+            )
+        tui.scroll_up(lines=5)
+        self.assertTrue(tui.is_scrolled)
+        tui.scroll_bottom()
+        self.assertFalse(tui.is_scrolled)
+
+    @mock.patch("sys.stdout.write")
+    def test_tui_toggle_pause(self, _mock_write):
+        """Test toggling pause state."""
+        tui = ec_console.TuiLayout(device="/dev/pts/11")
+        self.assertFalse(tui.paused)
+        tui.toggle_pause()
+        self.assertTrue(tui.paused)
+        tui.toggle_pause()
+        self.assertFalse(tui.paused)
+
+    @mock.patch("sys.stdout.write")
+    def test_tui_set_hdlc_active(self, _mock_write):
+        """Test updating HDLC active badge."""
+        tui = ec_console.TuiLayout(device="/dev/pts/11")
+        tui.set_hdlc_active(True)
+        self.assertTrue(tui.hdlc_active)
+        tui.set_hdlc_active(False)
+        self.assertFalse(tui.hdlc_active)
+
+
 if __name__ == "__main__":
     unittest.main()

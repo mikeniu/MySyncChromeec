@@ -20,6 +20,7 @@ Channels:
 
 import argparse
 import atexit
+import collections
 from dataclasses import dataclass
 import enum
 import fcntl
@@ -28,6 +29,7 @@ from pathlib import Path
 import pty
 import re
 import select
+import shutil
 import signal
 import subprocess
 import sys
@@ -424,6 +426,458 @@ class LogParser:
         )
 
 
+class LogTheme:
+    """Color styling matching Pigweed Console."""
+
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+    DIM = "\033[2m"
+    UNDERLINE = "\033[4m"
+    INVERSE = "\033[7m"
+
+    TIME_COLOR = "\033[38;5;244m"  # Dim gray
+    PANE_BORDER = "\033[38;5;67m"  # Slate / Steel blue
+    LOG_TITLE = "\033[1;36m"  # Cyan bold
+    SHELL_TITLE = "\033[1;35m"  # Magenta bold
+
+    LEVEL_STYLES = {
+        "INF": ("\033[1;32m", " INF "),  # Bold green
+        "WRN": ("\033[1;33m", " WRN "),  # Bold yellow
+        "ERR": ("\033[1;31m", " ERR "),  # Bold red
+        "DBG": ("\033[38;5;244m", " DBG "),  # Dim gray
+        "SYS": ("\033[1;36m", " SYS "),  # Bright cyan
+        "CRT": ("\033[41;97;1m", " CRT "),  # White on Red
+    }
+
+    MODULE_COLORS = [
+        "\033[36m",  # Cyan
+        "\033[32m",  # Green
+        "\033[33m",  # Yellow
+        "\033[35m",  # Magenta
+        "\033[38;5;141m",  # Purple
+        "\033[34m",  # Blue
+        "\033[38;5;208m",  # Orange
+        "\033[38;5;37m",  # Teal
+    ]
+
+    def get_module_color(self, mod: str) -> str:
+        """Deterministically picks an accent color based on module name."""
+        h = sum(ord(c) for c in mod)
+        return self.MODULE_COLORS[h % len(self.MODULE_COLORS)]
+
+    def format_row(
+        self, record: LogRecord, max_width: int = 120, use_color: bool = True
+    ) -> str:
+        """Formats a LogRecord as a single aligned table row."""
+        if not use_color:
+            prefix = (
+                f"{record.timestamp:>14}  {record.level:3}  "
+                f"{record.module:>10}  "
+            )
+            avail = max(10, max_width - len(prefix))
+            msg = record.message.expandtabs(4)[:avail]
+            return f"{prefix}{msg}"
+
+        ts = f"{record.timestamp:>14}"
+        ts_styled = f"{self.TIME_COLOR}{ts}{self.RESET}"
+
+        lvl_color, lvl_tag = self.LEVEL_STYLES.get(
+            record.level, ("\033[1;37m", f" {record.level[:3]} ")
+        )
+        lvl_styled = f"{lvl_color}{lvl_tag}{self.RESET}"
+
+        mod = record.module[:10]
+        mod_color = self.get_module_color(record.module)
+        mod_styled = f"{mod_color}{mod:>10}{self.RESET}"
+
+        prefix_len = 14 + 1 + 5 + 1 + 10 + 2  # 33 characters
+        avail = max(10, max_width - prefix_len)
+        msg = record.message.expandtabs(4)
+        if len(msg) > avail:
+            msg = msg[: avail - 1] + "…"
+
+        msg_color = self.RESET
+        if record.level in ("ERR", "CRT"):
+            msg_color = "\033[91m"
+        elif record.level == "WRN":
+            msg_color = "\033[93m"
+
+        return (
+            f"{ts_styled} {lvl_styled} {mod_styled}  "
+            f"{msg_color}{msg}{self.RESET}"
+        )
+
+
+class TuiLayout:
+    """Terminal User Interface layout for pw_console look-and-feel."""
+
+    def __init__(
+        self,
+        device: str,
+        baudrate: int = 115200,
+        token_info: str = "None",
+        log_file: Optional[str] = None,
+        pty_info: Optional[str] = None,
+        mouse_mode: bool = False,
+    ):
+        self.device = device
+        self.baudrate = baudrate
+        self.token_info = token_info
+        self.log_file = log_file
+        self.pty_info = pty_info
+        self.mouse_mode = mouse_mode
+        self.theme = LogTheme()
+
+        self.rows = 24
+        self.cols = 80
+        self.log_top = 4
+        self.log_bottom = 14
+        self.split_row = 15
+        self.shell_top = 16
+        self.shell_bottom = 23
+        self.status_row = 24
+
+        self.log_history = collections.deque(maxlen=2000)
+        self.log_count = 0
+        self.view_end_index: Optional[int] = None
+        self.paused = False
+        self.started = False
+        self.hdlc_active = False
+
+    @property
+    def lines_behind(self) -> int:
+        """Returns number of lines behind the latest log when scrolled."""
+        if self.view_end_index is None:
+            return 0
+        return max(0, self.log_count - self.view_end_index)
+
+    @property
+    def is_scrolled(self) -> bool:
+        """Returns True if the log window is scrolled back."""
+        return self.view_end_index is not None
+
+    def recalculate_geometry(self):
+        """Recalculates pane boundaries based on current terminal dimensions."""
+        size = shutil.get_terminal_size((80, 24))
+        self.rows = max(10, size.lines)
+        self.cols = max(40, size.columns)
+
+        if self.pty_info:
+            # Full-screen logs mode
+            self.log_top = 4
+            self.log_bottom = self.rows - 1
+            self.split_row = 0
+            self.shell_top = 0
+            self.shell_bottom = 0
+            self.status_row = self.rows
+        else:
+            # Split-screen: logs on top, interactive shell on bottom
+            shell_height = max(5, min(14, self.rows // 3))
+            self.split_row = self.rows - shell_height - 1
+            self.log_top = 4
+            self.log_bottom = self.split_row - 1
+            self.shell_top = self.split_row + 1
+            self.shell_bottom = self.rows - 1
+            self.status_row = self.rows
+
+    def render_chrome(self):
+        """Draws the top header, pane titles, table header, and status footer."""
+        # 1. Top Header Bar
+        dev_text = f"Device: {self.device} ({self.baudrate})"
+        tok_text = f"Tokens: {self.token_info}"
+        log_text = f"Logs: {self.log_file}" if self.log_file else ""
+        parts = [" PIGWEED / ZEPHYR EC CONSOLE", dev_text, tok_text]
+        if log_text:
+            parts.append(log_text)
+        header_str = " │ ".join(parts) + " "
+        header_line = (
+            f"\033[1;1H\033[7m{header_str.ljust(self.cols)[:self.cols]}\033[0m"
+        )
+
+        # 2. Log Pane Title Bar
+        title = " Device Logs "
+        if self.lines_behind > 0:
+            badge = f" [SCROLL: -{self.lines_behind}] "
+            badge_style = "\033[1;33m"
+        elif self.paused:
+            badge = " [PAUSED] "
+            badge_style = "\033[1;33m"
+        else:
+            badge = " [Follow: ON] "
+            badge_style = "\033[1;32m"
+        dash_len = max(0, self.cols - len(title) - len(badge) - 5)
+        log_title_line = (
+            f"\033[2;1H\033[1;36m───\033[1;37m{title}\033[1;36m"
+            + ("─" * dash_len)
+            + f"{badge_style}{badge}\033[1;36m──\033[0m\033[K"
+        )
+
+        # 3. Table Column Headers
+        tbl_hdr = "          TIME  LEVEL      MODULE  MESSAGE"
+        truncated_tbl = tbl_hdr.ljust(self.cols)[: self.cols]
+        tbl_line = f"\033[3;1H\033[4;37m{truncated_tbl}\033[0m\033[K"
+
+        lines = [header_line, log_title_line, tbl_line]
+
+        # 4. Shell Pane Title Bar (if not PTY mode)
+        if not self.pty_info:
+            shell_title = " EC Shell (Zephyr) "
+            s_dash_len = max(0, self.cols - len(shell_title) - 5)
+            shell_title_line = (
+                f"\033[{self.split_row};1H\033[1;35m───"
+                f"\033[1;37m{shell_title}\033[1;35m"
+                + ("─" * s_dash_len)
+                + "──\033[0m\033[K"
+            )
+            lines.append(shell_title_line)
+
+        # 5. Status Bar
+        proto_label = (
+            "Protocol: HDLC (Muxed)"
+            if self.hdlc_active
+            else "Protocol: Raw UART"
+        )
+        if self.pty_info:
+            status_parts = [
+                " [PgUp/PgDn, j/k] Scroll ",
+                " [Home/End] Top/Bottom ",
+                " [Ctrl+C/q] Exit ",
+                f"Virtual PTY: {self.pty_info}",
+                proto_label
+                + (
+                    f" [SCROLL: -{self.lines_behind}]"
+                    if self.lines_behind > 0
+                    else ""
+                ),
+            ]
+        else:
+            status_parts = [
+                " [Ctrl+] Exit ",
+                " [PgUp/PgDn] Scroll ",
+                (
+                    " [Ctrl+P] Follow "
+                    if self.is_scrolled
+                    else (
+                        " [Ctrl+P] Pause "
+                        if not self.paused
+                        else " [Ctrl+P] Resume "
+                    )
+                ),
+                proto_label
+                + (
+                    f" [SCROLL: -{self.lines_behind}]"
+                    if self.lines_behind > 0
+                    else (" [PAUSED]" if self.paused else "")
+                ),
+            ]
+        status_str = " │ ".join(status_parts) + " "
+        truncated_status = status_str.ljust(self.cols)[: self.cols]
+        status_line = (
+            f"\033[{self.status_row};1H\033[7m{truncated_status}\033[0m"
+        )
+        lines.append(status_line)
+
+        sys.stdout.write("".join(lines))
+        sys.stdout.flush()
+
+    def _render_log_rows(self):
+        """Renders log rows according to current view window."""
+        visible_rows = self.log_bottom - self.log_top + 1
+        total_in_buf = len(self.log_history)
+        if total_in_buf == 0:
+            return
+
+        if self.view_end_index is None:
+            records = list(self.log_history)[-visible_rows:]
+        else:
+            offset_from_end = max(0, self.log_count - self.view_end_index)
+            end_pos = max(0, total_in_buf - offset_from_end)
+            start_pos = max(0, end_pos - visible_rows)
+            records = list(self.log_history)[start_pos:end_pos]
+
+        start_row = self.log_bottom - len(records) + 1
+        for i in range(visible_rows):
+            row = self.log_top + i
+            if row < start_row:
+                sys.stdout.write(f"\033[{row};1H\033[K")
+            else:
+                idx = row - start_row
+                row_str = self.theme.format_row(
+                    records[idx], max_width=self.cols
+                )
+                sys.stdout.write(f"\033[{row};1H{row_str}\033[K")
+
+    def redraw_log_pane(self):
+        """Redraws log rows and chrome badges without disturbing shell."""
+        sys.stdout.write("\0337")
+        self.render_chrome()
+        self._render_log_rows()
+        if not self.pty_info:
+            sys.stdout.write(f"\033[{self.shell_top};{self.shell_bottom}r")
+        else:
+            sys.stdout.write(f"\033[{self.log_top};{self.log_bottom}r")
+        sys.stdout.write("\0338")
+        sys.stdout.flush()
+
+    def redraw(self, clear: bool = True):
+        """Redraws entire display with recent logs and restored cursor."""
+        self.recalculate_geometry()
+        if clear:
+            sys.stdout.write("\033[2J\033[H")
+        self.render_chrome()
+        self._render_log_rows()
+
+        if not self.pty_info:
+            sys.stdout.write(
+                f"\033[{self.shell_top};{self.shell_bottom}r"
+                f"\033[{self.shell_top};1H"
+            )
+        else:
+            sys.stdout.write(
+                f"\033[{self.log_top};{self.log_bottom}r"
+                f"\033[{self.log_bottom};1H"
+            )
+        sys.stdout.flush()
+
+    def scroll_up(self, lines: Optional[int] = None):
+        """Scrolls the log window backward in time."""
+        visible_rows = self.log_bottom - self.log_top + 1
+        step = lines if lines is not None else max(1, visible_rows - 2)
+        total_in_buf = len(self.log_history)
+        if total_in_buf == 0:
+            return
+        if self.view_end_index is None:
+            self.view_end_index = self.log_count
+
+        min_end_index = max(
+            1,
+            self.log_count - total_in_buf + min(visible_rows, total_in_buf),
+        )
+        self.view_end_index = max(min_end_index, self.view_end_index - step)
+        self.redraw_log_pane()
+
+    def scroll_down(self, lines: Optional[int] = None):
+        """Scrolls the log window forward toward latest logs."""
+        visible_rows = self.log_bottom - self.log_top + 1
+        step = lines if lines is not None else max(1, visible_rows - 2)
+        if self.view_end_index is None:
+            return
+        self.view_end_index += step
+        if self.view_end_index >= self.log_count:
+            self.view_end_index = None  # Resumed follow mode!
+        self.redraw_log_pane()
+
+    def scroll_top(self):
+        """Scrolls to earliest log in history."""
+        visible_rows = self.log_bottom - self.log_top + 1
+        total_in_buf = len(self.log_history)
+        if total_in_buf == 0:
+            return
+        min_end_index = max(
+            1,
+            self.log_count - total_in_buf + min(visible_rows, total_in_buf),
+        )
+        self.view_end_index = min_end_index
+        self.redraw_log_pane()
+
+    def scroll_bottom(self):
+        """Scrolls to latest logs and resumes follow mode."""
+        self.view_end_index = None
+        self.paused = False
+        self.redraw_log_pane()
+
+    def add_log(self, record: LogRecord):
+        """Appends a log record and updates display without shell jitter."""
+        self.log_count += 1
+        self.log_history.append(record)
+        if self.paused or self.is_scrolled:
+            if self.is_scrolled:
+                sys.stdout.write("\0337")
+                self.render_chrome()
+                if not self.pty_info:
+                    sys.stdout.write(
+                        f"\033[{self.shell_top};{self.shell_bottom}r"
+                    )
+                else:
+                    sys.stdout.write(f"\033[{self.log_top};{self.log_bottom}r")
+                sys.stdout.write("\0338")
+                sys.stdout.flush()
+            return
+
+        row_str = self.theme.format_row(record, max_width=self.cols)
+
+        if not self.pty_info:
+            sys.stdout.write(
+                f"\0337"
+                f"\033[{self.log_top};{self.log_bottom}r"
+                f"\033[{self.log_bottom};1H\n{row_str}\r"
+                f"\033[{self.shell_top};{self.shell_bottom}r"
+                f"\0338"
+            )
+        else:
+            sys.stdout.write(f"\033[{self.log_bottom};1H\n{row_str}\r")
+        sys.stdout.flush()
+
+    def write_shell_data(self, data: bytes):
+        """Passes interactive shell bytes through while preserving layout."""
+        if b"\x1b[2J" in data:
+            # Clear only shell region lines
+            sys.stdout.write("\0337")
+            for r in range(self.shell_top, self.shell_bottom + 1):
+                sys.stdout.write(f"\033[{r};1H\033[2K")
+            sys.stdout.write(f"\033[{self.shell_top};1H\0338")
+            sys.stdout.flush()
+            data = data.replace(b"\x1b[2J", b"").replace(b"\x1b[H", b"")
+        if data:
+            sys.stdout.buffer.write(data)
+            sys.stdout.buffer.flush()
+
+    def set_hdlc_active(self, active: bool):
+        """Updates HDLC transport state and refreshes status line if changed."""
+        if self.hdlc_active != active:
+            self.hdlc_active = active
+            if self.started:
+                self.redraw_log_pane()
+
+    def toggle_pause(self):
+        """Toggles log stream scrolling pause or resumes follow if scrolled."""
+        if self.is_scrolled:
+            self.scroll_bottom()
+            return
+        self.paused = not self.paused
+        self.render_chrome()
+        if not self.paused:
+            self.redraw(clear=False)
+
+    def _on_resize(self, _signum=None, _frame=None):
+        if self.started:
+            self.redraw(clear=True)
+
+    def start(self):
+        """Initializes alternate screen and starts the TUI."""
+        self.started = True
+        sys.stdout.write("\033[?1049h\033[2J\033[H")
+        if self.mouse_mode:
+            sys.stdout.write("\033[?1000h\033[?1006h")
+        sys.stdout.flush()
+        signal.signal(signal.SIGWINCH, self._on_resize)
+        self.redraw(clear=True)
+
+    def stop(self):
+        """Restores the original screen buffer and terminal state."""
+        if not self.started:
+            return
+        self.started = False
+        try:
+            signal.signal(signal.SIGWINCH, signal.SIG_DFL)
+        except (ValueError, OSError):
+            pass
+        if self.mouse_mode:
+            sys.stdout.write("\033[?1006l\033[?1000l")
+        sys.stdout.write("\033[r\033[?25h\033[?1049l")
+        sys.stdout.flush()
+
+
 class EcConsole:
     """Manages HDLC transport over UART, demuxing logs and shell."""
 
@@ -457,7 +911,8 @@ class EcConsole:
         if token_db:
             self._init_detokenizer(token_db)
 
-        self.tui = None
+        self.theme = LogTheme()
+        self.tui: Optional[TuiLayout] = None
         self._log_buffer = ""
         self._raw_str_buf = ""
 
@@ -594,10 +1049,12 @@ class EcConsole:
                 f"{record.module:>10}: {clean_msg}\n"
             )
             self.log_fp.flush()
-        if self.running:
+        if self.tui:
+            self.tui.add_log(record)
+        elif self.running:
             sys.stderr.write(
-                f"{record.timestamp:>14} [{record.level:3}] "
-                f"{record.module:>10}: {record.message}\n"
+                self.theme.format_row(record, use_color=sys.stderr.isatty())
+                + "\n"
             )
             sys.stderr.flush()
 
@@ -617,6 +1074,8 @@ class EcConsole:
         """Routes shell output to the PTY master, TUI shell pane, or stdout."""
         if self.pty_master_fd >= 0:
             os.write(self.pty_master_fd, payload)
+        elif self.tui:
+            self.tui.write_shell_data(payload)
         else:
             sys.stdout.buffer.write(payload)
             sys.stdout.buffer.flush()
@@ -659,6 +1118,8 @@ class EcConsole:
                     if LogParser.is_log(line):
                         if self.mode == "auto" and self.decoder.hdlc_detected:
                             self.decoder.hdlc_detected = False
+                            if self.tui:
+                                self.tui.set_hdlc_active(False)
                         self._handle_log_line(line)
                     else:
                         if self.log_raw_shell and line.strip():
@@ -686,6 +1147,8 @@ class EcConsole:
                     or stripped.endswith(">")
                 ):
                     self.decoder.hdlc_detected = False
+                    if self.tui:
+                        self.tui.set_hdlc_active(False)
             if not self.decoder.hdlc_detected:
                 on_shell_output(self._raw_str_buf, False)
                 self._raw_str_buf = ""
@@ -697,7 +1160,14 @@ class EcConsole:
         """
 
         def _emit_shell(text: str, is_line: bool):
-            if not self.decoder.hdlc_detected:
+            should_suppress = (
+                self.suppress_shell_frame
+                and self.log_raw_shell
+                and self.tui is not None
+                and self.pty_master_fd < 0
+                and bool(text.strip())
+            )
+            if not should_suppress and not self.decoder.hdlc_detected:
                 suffix = "\r\n" if is_line else ""
                 self._write_shell_output((text + suffix).encode())
 
@@ -860,13 +1330,33 @@ class EcConsole:
         orig_stdin_attr = None
         use_stdin = self.pty_master_fd < 0 and sys.stdin.isatty()
         is_pty_mode = self.pty_master_fd >= 0
-        if not self.raw_mode:
+        use_tui = not self.raw_mode and sys.stdout.isatty()
+
+        if use_tui:
+            pty_info = (
+                f"{self.pty_symlink} ({os.ttyname(self.pty_slave_fd)})"
+                if is_pty_mode
+                else None
+            )
+            self.tui = TuiLayout(
+                device=self.device_path,
+                baudrate=self.baudrate,
+                token_info=self.token_info,
+                log_file=self.log_file_path,
+                pty_info=pty_info,
+                mouse_mode=self.mouse_mode,
+            )
+            self.tui.start()
+        elif not self.raw_mode:
             print(
                 "[HDLC] Console started. Press Ctrl+] to exit.",
                 file=sys.stderr,
             )
 
+        # Probe transport after starting TUI/stdout so any wake response renders
         self._probe_transport()
+        if self.tui:
+            self.tui.set_hdlc_active(self.decoder.hdlc_detected)
 
         if use_stdin:
             orig_stdin_attr = termios.tcgetattr(sys.stdin.fileno())
