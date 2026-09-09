@@ -576,6 +576,13 @@ timestamp_t system_get_rtc(void);
 #endif /* defined(CONFIG_RTC) */
 
 /**
+ * Read the real-time clock in seconds.
+ *
+ * @return The real-time clock value in seconds.
+ */
+uint32_t system_get_rtc_sec(void);
+
+/**
  * Print out the current real-time clock value to the console.
  *
  * @param channel	Console channel to print on.
