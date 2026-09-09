@@ -34,6 +34,42 @@
       "message": "There is some more cleanup that you can do in a followup CL:\n\n-----\n\n### 1. Inconsistent Memory Clearing (`memset` vs `std::ranges::fill`)\n\nWhile you successfully replaced `memcpy` operations across the file, there is a lingering C-style `memset` that was missed.\n\n**Location:** `test_fp_mode_enroll_session_transitions`\n\n```cpp\nparams.mode \u003d FP_MODE_ENROLL_SESSION | FP_MODE_FINGER_UP;\nmemset(params.mac, 0, sizeof(params.mac)); // \u003c-- Legacy construct\n\n```\n\n**Recommendation:** Replace this with modern C++ standard algorithms to remain consistent with your other changes:\n\n```cpp\nstd::ranges::fill(params.mac, 0);\n\n```\n\n### 2. Redundant `enum` Keywords\n\nYou correctly removed the redundant C-style `struct` keywords from variable declarations (e.g., `ec_params_fp_context_v1 ctx_params`). However, the legacy `enum` keywords were left untouched throughout the file. In C++, `enum` is similarly unnecessary when declaring variables or return types.\n\n**Locations:** Multiple instances. Examples include:\n\n* `enum ec_status rv;` -\u003e `ec_status rv;`\n* `static enum ec_status wait_for_template_decrypt_result(void)` -\u003e `static ec_status wait_for_template_decrypt_result()`\n* `enum ec_error_list ret \u003d ...` -\u003e `ec_error_list ret \u003d ...` (or simply use `auto`)\n\n**Recommendation:** Remove the `enum` keyword from variable declarations, function parameters, and return types for complete consistency with your `struct` cleanup.\n\n### 3. C-Style Empty Parameter Lists (`(void)`)\n\nSeveral functions in the test file still use the C-style `(void)` to denote an empty parameter list. In modern C++, a simply empty set of parentheses `()` is the standard and correct way to declare a function taking no arguments.\n\n**Locations:**\n\n* `static enum ec_status wait_for_template_decrypt_result(void)`\n* `static enum ec_error_list establish_session(void)`\n* `void reset_session(void);`\n* `static void *fpsensor_auth_commands_setup(void)`\n\n**Recommendation:** Update these to use `()`. Example: `static ec_status wait_for_template_decrypt_result()`\n\n### 4. Lingering C-Style Casts\n\nSince the theme of the patch is modernizing C++, it is worth updating the legacy C-style casts to their safer C++ equivalents (`static_cast` / `reinterpret_cast`).\n\n**Locations:**\n\n* **Return Cast:** In `test_send_host_command`:\n```cpp\nreturn (enum ec_status)host_command_process(\u0026args);\n\n```\n\n\n*Suggestion:* `return static_cast\u003cec_status\u003e(host_command_process(\u0026args));`\n* **Pointer Cast:** In `before_fpsensor_auth_commands`:\n```cpp\nzassert_ok(crec_flash_write(ROLLBACK0_ADDR, sizeof(data), (const char *)\u0026data));\n\n```\n\n\n*Suggestion:* `reinterpret_cast\u003cconst char*\u003e(\u0026data)`\n* **Unnecessary/Dangerous Cast:** In multiple tests (e.g., `test_fp_command_establish_session`), there is a strange cast of a `uint32_t` bitmask to a signed integer:\n```cpp\nzassert_true((((int)status) \u0026 (FP_ENC_STATUS_SEED_SET)) \u003d\u003d (FP_ENC_STATUS_SEED_SET));\n\n```\n\n\nCasting an unsigned 32-bit status register to a signed `int` is functionally dangerous if the MSB (bit 31) is set, as it invokes implementation-defined behavior for negative values.\n*Suggestion:* Remove the `(int)` cast entirely. The bitwise `\u0026` operator works perfectly (and more safely) on `uint32_t`.",
       "revId": "497c8527e7e00920460ba1ef80ccb45a5e4f4131",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6be708ee_5959218d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-09T23:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c47a0e2_4640977e",
+      "revId": "497c8527e7e00920460ba1ef80ccb45a5e4f4131",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75bb3055_f3437ac8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-09T23:19:47Z",
+      "side": 1,
+      "message": "ok. will do in a follow up CL.",
+      "parentUuid": "499bfdd1_26960aac",
+      "revId": "497c8527e7e00920460ba1ef80ccb45a5e4f4131",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
