@@ -5,6 +5,7 @@
 
 """Unit tests for ec_console.py HDLC framing, decoder, and CLI utility."""
 
+import io
 import os
 import sys
 import unittest
@@ -203,6 +204,138 @@ class EcConsoleRawModeFallbackTest(unittest.TestCase):
             mock_write.assert_called()
 
 
+class LogParserTest(unittest.TestCase):
+    """Tests for structured log parsing and categorization."""
+
+    def test_zephyr_log_parsing(self):
+        """Test parsing standard Zephyr logs."""
+        line = "[00:00:01,123] <inf> usb_pd: USB PD init complete"
+        record = ec_console.LogParser.parse(line)
+        self.assertEqual(record.timestamp, "00:00:01.123")
+        self.assertEqual(record.level, "INF")
+        self.assertEqual(record.module, "usb_pd")
+        self.assertEqual(record.message, "USB PD init complete")
+
+    def test_ec_bracket_log_parsing(self):
+        """Test parsing legacy EC bracketed logs."""
+        line = "[0.137115 VB Main]"
+        record = ec_console.LogParser.parse(line)
+        self.assertEqual(record.timestamp, "0.137115")
+        self.assertEqual(record.level, "INF")
+        self.assertEqual(record.module, "VB")
+        self.assertEqual(record.message, "Main")
+
+    def test_ec_bracket_error_log(self):
+        """Test parsing EC bracketed logs with error indicator."""
+        line = "[0.140045 ERR: VB fail]"
+        record = ec_console.LogParser.parse(line)
+        self.assertEqual(record.level, "ERR")
+        self.assertEqual(record.module, "VB")
+
+    def test_sys_bracket_log_parsing(self):
+        """Test parsing system bracket logs."""
+        line = "[Image: RO, version 1.0]"
+        record = ec_console.LogParser.parse(line)
+        self.assertEqual(record.level, "INF")
+        self.assertEqual(record.module, "sys")
+        self.assertEqual(record.message, "Image: RO, version 1.0")
+
+    def test_isr_prefix_handling(self):
+        """Test [ISR] tag is recognized and preserved."""
+        line = "[ISR] [00:00:01.123] <err> gpio: isr error"
+        record = ec_console.LogParser.parse(line)
+        self.assertEqual(record.level, "ERR")
+        self.assertEqual(record.module, "gpio")
+        self.assertTrue(record.message.startswith("[ISR]"))
+
+    def test_is_log(self):
+        """Test is_log distinguishes log lines from shell prompts/output."""
+        self.assertTrue(
+            ec_console.LogParser.is_log("[00:00:01.123] <inf> test: msg")
+        )
+        self.assertTrue(ec_console.LogParser.is_log("[0.123 ec test]"))
+        self.assertFalse(ec_console.LogParser.is_log("uart:~$ "))
+        self.assertFalse(ec_console.LogParser.is_log("help command output"))
+
+
+class DetokenizerTest(unittest.TestCase):
+    """Tests for Pigweed detokenizer integration."""
+
+    @mock.patch("os.open")
+    @mock.patch("os.isatty", return_value=False)
+    @mock.patch("termios.tcgetattr")
+    @mock.patch("termios.tcsetattr")
+    def test_format_log_detokenization(
+        self, _mock_tcset, _mock_tcget, _mock_isatty, mock_open
+    ):
+        """Test formatting log string with mocked detokenizer."""
+        mock_open.return_value = 10
+        console = ec_console.EcConsole(device_path="/dev/null")
+        mock_detok = mock.Mock()
+        mock_detok.detokenize_text.side_effect = lambda text: text.replace(
+            "`TOKEN", "Detokenized message"
+        )
+        console.detokenizer = mock_detok
+
+        formatted = console._format_log("`TOKEN~")
+        self.assertIn("Detokenized message", formatted)
+        self.assertNotIn("~", formatted)
+
+    @mock.patch("os.open")
+    @mock.patch("os.isatty", return_value=False)
+    @mock.patch("termios.tcgetattr")
+    @mock.patch("termios.tcsetattr")
+    def test_format_log_preserves_prompt_tilde(
+        self, _mock_tcset, _mock_tcget, _mock_isatty, mock_open
+    ):
+        """Test prompt tildes like 'ec:~>' are not stripped by detokenizer."""
+        mock_open.return_value = 10
+        console = ec_console.EcConsole(device_path="/dev/null")
+        mock_detok = mock.Mock()
+        mock_detok.detokenize_text.side_effect = lambda text: text
+        console.detokenizer = mock_detok
+
+        formatted = console._format_log("ec:~> help")
+        self.assertEqual(formatted, "ec:~> help")
+
+
+class LogFileTest(unittest.TestCase):
+    """Tests for file logging of EC log records."""
+
+    @mock.patch("os.open")
+    @mock.patch("os.isatty", return_value=False)
+    @mock.patch("termios.tcgetattr")
+    @mock.patch("termios.tcsetattr")
+    def test_handle_log_line_writes_to_file(
+        self, _mock_tcset, _mock_tcget, _mock_isatty, mock_open
+    ):
+        """Test handle_log_line writes clean formatted lines to log file."""
+        mock_open.return_value = 10
+        console = ec_console.EcConsole(device_path="/dev/null")
+        fake_file = io.StringIO()
+        console.log_fp = fake_file
+
+        console._handle_log_line("[00:00:01.000] <inf> test: Hello world")
+        output = fake_file.getvalue()
+        self.assertIn("test: Hello world", output)
+        self.assertIn("[INF]", output)
+
+
+class TokenDbResolutionTest(unittest.TestCase):
+    """Tests for default EC directory and token database discovery."""
+
+    def test_get_default_ec_dir(self):
+        """Test EC directory path resolution."""
+        ec_dir = ec_console.get_default_ec_dir()
+        self.assertTrue(ec_dir.exists())
+
+    def test_get_default_token_db(self):
+        """Test default token database path string generation."""
+        token_db = ec_console.get_default_token_db()
+        self.assertIsInstance(token_db, str)
+        self.assertTrue(token_db.endswith(".bin"))
+
+
 class ServoInterpManagerTest(unittest.TestCase):
     """Tests for Servo EC-3PO interpreter management."""
 
@@ -213,7 +346,7 @@ class ServoInterpManagerTest(unittest.TestCase):
         mock_run.return_value.stdout = "ec_ec3po_interp_connect:on\n"
 
         mgr = ec_console.ServoInterpManager(device="/dev/pts/11", enabled=True)
-        mgr.disconnect()
+        mgr.setup()
         self.assertTrue(mgr.needs_restore)
 
         mgr.restore()
@@ -222,7 +355,7 @@ class ServoInterpManagerTest(unittest.TestCase):
     def test_disabled_manager(self):
         """Test disabled manager does not issue commands."""
         mgr = ec_console.ServoInterpManager(device="/dev/pts/11", enabled=False)
-        mgr.disconnect()
+        mgr.setup()
         self.assertFalse(mgr.needs_restore)
         mgr.restore()
 
