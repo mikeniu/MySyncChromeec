@@ -78,7 +78,6 @@ common-$(CONFIG_TPM_I2CP)+=i2cp_tpm.o
 common-$(CONFIG_U2F)+=u2f.o
 common-$(CONFIG_USB_CONSOLE_STREAM)+=usb_console_stream.o
 common-$(CONFIG_USB_I2C)+=usb_i2c.o
-common-$(CONFIG_USB_PD_LOGGING)+=event_log.o pd_log.o
 common-$(CONFIG_VBOOT_HASH)+=sha256.o vboot_hash.o
 common-$(CONFIG_WEBUSB_URL)+=webusb_desc.o
 

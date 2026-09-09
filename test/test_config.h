@@ -16,7 +16,6 @@
 
 /* Don't compile features unless specifically testing for them */
 #undef CONFIG_VBOOT_HASH
-#undef CONFIG_USB_PD_LOGGING
 
 #ifdef TEST_AES
 #define CONFIG_AES

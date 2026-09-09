@@ -2601,12 +2601,6 @@
 /* Define if using internal comparator for PD receive */
 #undef CONFIG_USB_PD_INTERNAL_COMP
 
-/* Record main PD events in a circular buffer */
-#undef CONFIG_USB_PD_LOGGING
-
-/* The size in bytes of the FIFO used for event logging */
-#define CONFIG_EVENT_LOG_SIZE 512
-
 /* Save power by waking up on VBUS rather than polling CC */
 #define CONFIG_USB_PD_LOW_POWER
 
