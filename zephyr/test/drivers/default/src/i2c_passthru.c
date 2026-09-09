@@ -5,6 +5,7 @@
 
 #include "console.h"
 #include "driver/ln9310.h"
+#include "drivers/i2c/i2c_dts_passthru.h"
 #include "ec_commands.h"
 #include "host_command.h"
 #include "i2c.h"
@@ -208,6 +209,87 @@ ZTEST_USER(i2c_passthru, test_command_i2cprotect)
 	/* Too many arguments returns EC_ERROR_PARAM_COUNT */
 	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2cprotect 5 1"),
 		      EC_ERROR_PARAM_COUNT);
+}
+
+ZTEST_USER(i2c_passthru, test_command_i2c_portmap)
+{
+	if (!IS_ENABLED(CONFIG_CMD_I2C_DTS_PORTMAP)) {
+		ztest_test_skip();
+		return;
+	}
+
+	/* Show status without argument */
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2c_portmap"),
+		      EC_SUCCESS);
+
+	/* Any argument returns EC_ERROR_PARAM_COUNT */
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2c_portmap 5"),
+		      EC_ERROR_PARAM_COUNT);
+	zassert_equal(shell_execute_cmd(get_ec_shell(), "i2c_portmap 5 1"),
+		      EC_ERROR_PARAM_COUNT);
+}
+
+ZTEST_USER(i2c_passthru, test_i2c_portmap_helper)
+{
+	if (!IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
+		ztest_test_skip();
+		return;
+	}
+
+	/* Port 5 is configured in native_sim.overlay i2c-passthru to &i2c0 */
+	const struct device *dev5 = i2c_portmap(5);
+	zassert_not_null(dev5);
+	zassert_equal(dev5, DEVICE_DT_GET(DT_NODELABEL(i2c0)));
+
+	/* Port 0 is not in i2c-passthru, maps directly to physical controller 0
+	 * (&i2c0) */
+	const struct device *dev0 = i2c_portmap(0);
+	zassert_not_null(dev0);
+	zassert_equal(dev0, DEVICE_DT_GET(DT_NODELABEL(i2c0)));
+
+	/* Port 99 is neither in i2c-passthru nor a valid controller index */
+	zassert_is_null(i2c_portmap(99));
+}
+
+ZTEST_USER(i2c_passthru, test_passthru_unconfigured_port)
+{
+	if (!IS_ENABLED(CONFIG_I2C_DTS_PASSTHRU)) {
+		ztest_test_skip();
+		return;
+	}
+
+	uint8_t param_buf[sizeof(struct ec_params_i2c_passthru) +
+			  sizeof(struct ec_params_i2c_passthru_msg)];
+	uint8_t response_buf[sizeof(struct ec_response_i2c_passthru) + 2];
+	struct ec_params_i2c_passthru *params =
+		(struct ec_params_i2c_passthru *)&param_buf;
+	struct ec_response_i2c_passthru *response =
+		(struct ec_response_i2c_passthru *)&response_buf;
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_SIMPLE(EC_CMD_I2C_PASSTHRU, 0);
+
+	/* Port 0 is not in i2c-passthru DTS node */
+	params->port = 0;
+	params->num_msgs = 1;
+	params->msg[0].addr_flags = LN9310_I2C_ADDR_0_FLAGS | EC_I2C_FLAG_READ;
+	params->msg[0].len = 1;
+	args.params = &param_buf;
+	args.params_size = sizeof(param_buf);
+	args.response = &response_buf;
+	args.response_max = sizeof(response_buf);
+
+	/* When system is locked, unconfigured port is denied */
+	system_is_locked_fake.return_val = true;
+	zassert_equal(host_command_process(&args), EC_RES_ACCESS_DENIED);
+
+	/* When system is unlocked, unconfigured port is allowed and mapped */
+	system_is_locked_fake.return_val = false;
+	zassert_equal(host_command_process(&args), EC_RES_SUCCESS);
+	zassert_equal(response->i2c_status, EC_I2C_STATUS_NAK);
+
+	/* Unmapped remote port 99 returns INVALID_PARAM when unlocked */
+	params->port = 99;
+	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
 }
 
 ZTEST_USER(i2c_passthru, test_passthru_protect_tcpcs)
