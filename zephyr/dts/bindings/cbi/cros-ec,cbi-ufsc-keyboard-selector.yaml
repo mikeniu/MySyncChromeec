@@ -1,0 +1,20 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+include: base.yaml
+
+description: Devicetree keyboard layout and matrix patch selector via CBI UFSC
+
+compatible: "cros-ec,cbi-ufsc-keyboard-selector"
+
+child-binding:
+  description: Step or category patch selector (e.g. region, numpad, vivaldi)
+  properties:
+    selections:
+      type: phandles
+      required: true
+      description: |
+        Alternating list of <&ufsc_value &layout_patch_node>. The driver evaluates
+        each UFSC condition and, upon a match, applies the patches described in the
+        corresponding layout_patch_node.

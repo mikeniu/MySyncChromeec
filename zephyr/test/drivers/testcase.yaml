@@ -1702,6 +1702,16 @@ tests:
     - boards/native_sim.overlay
     - ufsc_policies/boards/native_sim.overlay
     - ufsc_policies/binman.dts
+  drivers.ufsc_keyboard_layout:
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_UFSC_KEYBOARD_LAYOUT=y
+    extra_conf_files:
+    - prj.conf
+    - ufsc_keyboard_layout/prj.conf
+    extra_dtc_overlay_files:
+    - boards/native_sim.overlay
+    - ufsc_keyboard_layout/boards/native_sim.overlay
+    - ufsc_keyboard_layout/binman.dts
   drivers.upstream_fuel_gauge:
     tags:
     - host_cmd
