@@ -54,7 +54,6 @@ enum battery_type {
 
 #ifdef TEST_KB_8042
 #define CONFIG_KEYBOARD_PROTOCOL_8042
-#define CONFIG_8042_AUX
 #define CONFIG_KEYBOARD_DEBUG
 #endif
 
