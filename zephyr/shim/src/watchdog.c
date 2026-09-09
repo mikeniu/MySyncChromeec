@@ -237,6 +237,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	}
 	struct k_thread *thread = k_current_get();
 
+	uint32_t lr = 0;
 #ifdef CONFIG_RISCV
 	exception_address = csr_read(mepc);
 	printk("WDT pre-warning MEPC:%p THREAD:%p THREAD_NAME:%s\n",
@@ -252,6 +253,7 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	       (void *)esf->basic.pc, (void *)esf->basic.lr, (void *)thread,
 	       thread_name);
 	exception_address = esf->basic.pc;
+	lr = esf->basic.lr;
 #else
 	/* TODO(b/176523207): watchdog warning message */
 	printk("Watchdog deadline is close! THREAD:%p THREAD_NAME:%s\n",
@@ -270,12 +272,11 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 		k_thread_foreach_unlocked(log_thread_info, NULL);
 	}
 
-	/* Save the current task id in panic info.
-	 * The PANIC_SW_WATCHDOG_WARN reason will be changed to a regular
-	 * PANIC_SW_WATCHDOG in system_common_pre_init if a watchdog reset
-	 * occurs.
+	/* Save the watchdog warning panic info.
+	 * The watchdog warning panic will be finalized in panic_data_init()
+	 * if a watchdog reset occurs.
 	 */
-	panic_data_write_watchdog_warning(exception_address, thread);
+	panic_data_write_watchdog_warning(exception_address, lr);
 }
 
 __maybe_unused static void
