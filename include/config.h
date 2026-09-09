@@ -128,27 +128,6 @@
 /* Allow proprietary communication protocols' extensions. */
 #undef CONFIG_EXTENSION_COMMAND
 
-/*
- * Support controlling the display backlight based on the state of the lid
- * switch.  The EC will disable the backlight when the lid is closed.
- *
- * The GPIO should be named GPIO_ENABLE_BACKLIGHT if active high, or
- * GPIO_ENABLE_BACKLIGHT_L if active low. See CONFIG_BACKLIGHT_LID_ACTIVE_LOW.
- */
-#undef CONFIG_BACKLIGHT_LID
-
-/*
- * The backlight GPIO pin is active low and named GPIO_BACKLIGHT_ENABLED_L
- */
-#undef CONFIG_BACKLIGHT_LID_ACTIVE_LOW
-
-/*
- * If defined, EC will enable the backlight signal only if this GPIO is
- * asserted AND the lid is open.  This supports passing the backlight-enable
- * signal from the AP through EC.
- */
-#undef CONFIG_BACKLIGHT_REQ_GPIO
-
 /* Support base32 text encoding */
 #undef CONFIG_BASE32
 
@@ -420,13 +399,6 @@
 
 /*****************************************************************************/
 
-/*
- * Compile detachable base support
- *
- * Enabled on all boards that have a detachable base.
- */
-#undef CONFIG_DETACHABLE_BASE
-
 /* Support V1 CCD configuration */
 #undef CONFIG_CASE_CLOSED_DEBUG_V1
 /* Allow unsafe debugging functionality in V1 configuration */
@@ -435,11 +407,6 @@
 #undef CONFIG_CCD_ITE_PROGRAMMING
 /* Loosen Open restrictions for prePVT devices */
 #undef CONFIG_CCD_OPEN_PREPVT
-
-/*
- * Capsense chip has buttons, too.
- */
-#undef CONFIG_CAPSENSE
 
 /*****************************************************************************/
 /* Support CEC */
@@ -1903,11 +1870,8 @@
 
 /*
  * EC supports x86 host communication with AP. This can either be through LPC
- * or eSPI. The CONFIG_HOSTCMD_X86 will get automatically defined if either
- * CONFIG_HOSTCMD_LPC or CONFIG_HOSTCMD_ESPI are defined. LPC and eSPI are
- * mutually exclusive.
+ * or eSPI. LPC and eSPI are mutually exclusive.
  */
-#undef CONFIG_HOSTCMD_X86
 /* Support host command interface over LPC bus. */
 #undef CONFIG_HOSTCMD_LPC
 /* Support host command interface over eSPI bus. */
@@ -2114,12 +2078,6 @@
 /*****************************************************************************/
 /* Support PWM output to display backlight */
 #undef CONFIG_PWM_DISPLIGHT
-
-
-/*
- * Support PWM output to keyboard backlight
- */
-#undef CONFIG_PWM_KBLIGHT
 
 /* Size of each RAM bank in chip, default is CONFIG_RAM_SIZE */
 #undef CONFIG_RAM_BANK_SIZE
@@ -2388,36 +2346,6 @@
  * it refuses to change certain fields. (e.g. board version, OEM ID)
  */
 #undef CONFIG_SYSTEM_UNLOCKED
-
-/*
- * Device can be a tablet as well as a clamshell.
- */
-#undef CONFIG_TABLET_MODE
-
-/*
- * Add a virtual switch to indicate when we are in tablet mode.
- */
-#undef CONFIG_TABLET_MODE_SWITCH
-
-/*
- * Config to identify what devices use GMR sensor to detect tablet mode. If a
- * board selects this config, it also needs to provide GMR_TABLET_MODE_GPIO_L
- * and direct its interrupt to gmr_tablet_switch_isr.
- */
-#undef CONFIG_GMR_TABLET_MODE
-
-/*
- * Board provides board_sensor_at_360 method instead of GMR_TABLET_MODE_GPIO_L
- * as the means for determining the state of the flipped-360-degree mode.
- */
-#undef CONFIG_GMR_TABLET_MODE_CUSTOM
-
-/*
- * Add a virtual switch to indicate when detachable device has
- * base attached.
- */
-#undef CONFIG_BASE_ATTACHED_SWITCH
-
 /*****************************************************************************/
 /* Task config */
 
@@ -3381,23 +3309,11 @@
 #error Must enable eSPI to enable virtual wires.
 #endif
 
-/******************************************************************************/
 /*
- * Automatically define CONFIG_HOSTCMD_X86 if either child option is defined.
  * Ensure LPC and eSPI are mutually exclusive
  */
-#if defined(CONFIG_HOSTCMD_LPC) || defined(CONFIG_HOSTCMD_ESPI)
-#define CONFIG_HOSTCMD_X86
-#endif
-
 #if defined(CONFIG_HOSTCMD_LPC) && defined(CONFIG_HOSTCMD_ESPI)
 #error Must select only one type of host communication bus.
-#endif
-
-#if defined(CONFIG_HOSTCMD_X86) && \
-	!defined(CONFIG_HOSTCMD_LPC) && \
-	!defined(CONFIG_HOSTCMD_ESPI)
-#error Must select one type of host communication bus.
 #endif
 
 /******************************************************************************/
@@ -3652,11 +3568,6 @@
 #ifndef CONFIG_ACCELGYRO_SEC_ADDR_FLAGS
 #error "The i2c address of the magnetometer is not set."
 #endif
-#endif
-
-/* Fill LPC sense data on X86 architecture. */
-#ifdef CONFIG_HOSTCMD_X86
-#define CONFIG_MOTION_FILL_LPC_SENSE_DATA
 #endif
 
 /*
