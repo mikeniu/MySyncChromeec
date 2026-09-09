@@ -12,6 +12,7 @@
 #include "host_command.h"
 #include "i2c.h"
 #include "i2c_battery_parser.h"
+#include "i2c_dts_passthru.h"
 #include "i2c_msg_queue.h"
 #include "system.h"
 #include "util.h"
@@ -26,6 +27,7 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/init.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/util.h>
 
 LOG_MODULE_REGISTER(i2c_dts_passthru, CONFIG_I2C_DTS_PASSTHRU_LOG_LEVEL);
 
@@ -79,6 +81,62 @@ find_i2c_passthru_port_config(const struct device *dev, int remote_port)
 		if (cfg->ports[i].remote_port == remote_port)
 			return &cfg->ports[i];
 	}
+	return NULL;
+}
+
+#define I2C_MAX_CONTROLLERS 16
+
+static const struct device *i2c_controllers[I2C_MAX_CONTROLLERS];
+
+static void init_i2c_controllers(void)
+{
+	const struct device *dev = I2C_PASSTHRU_DEV;
+
+	if (dev != NULL) {
+		const struct i2c_passthru_config *cfg = dev->config;
+
+		for (size_t index = 0; index < cfg->num_ports; index++) {
+			const struct i2c_passthru_port_config *port_cfg =
+				&cfg->ports[index];
+
+			if (port_cfg->remote_port >= 0 &&
+			    port_cfg->remote_port <
+				    ARRAY_SIZE(i2c_controllers)) {
+				i2c_controllers[port_cfg->remote_port] =
+					port_cfg->i2c_dev;
+			}
+		}
+	}
+
+	const struct device *devices;
+	size_t num_devices = z_device_get_all_static(&devices);
+	size_t controller_idx = 0;
+
+	for (size_t i = 0; i < num_devices; i++) {
+		const struct device *d = &devices[i];
+
+		if (DEVICE_API_IS(i2c, d)) {
+			while (controller_idx < ARRAY_SIZE(i2c_controllers) &&
+			       i2c_controllers[controller_idx] != NULL) {
+				controller_idx++;
+			}
+			if (controller_idx < ARRAY_SIZE(i2c_controllers)) {
+				i2c_controllers[controller_idx++] = d;
+			}
+		}
+	}
+}
+
+ZTESTABLE_STATIC const struct device *i2c_portmap(int remote_port)
+{
+	if (remote_port >= 0 && remote_port < ARRAY_SIZE(i2c_controllers)) {
+		const struct device *i2c_dev = i2c_controllers[remote_port];
+
+		if (i2c_dev != NULL && device_is_ready(i2c_dev)) {
+			return i2c_dev;
+		}
+	}
+
 	return NULL;
 }
 
@@ -201,11 +259,12 @@ i2c_command_passthru(struct ec_host_cmd_handler_args *args)
 
 	if (port_cfg != NULL) {
 		i2c_dev = port_cfg->i2c_dev;
+	} else if (!system_is_locked()) {
+		i2c_dev = i2c_portmap(remote_port);
+		if (i2c_dev == NULL) {
+			return EC_HOST_CMD_INVALID_PARAM;
+		}
 	} else {
-		/* TODO: Add remote mapping for i2c_device that is not in the
-		 * list. Unlocked system should allow passthru even if
-		 * unconfigured in DTS
-		 */
 		return EC_HOST_CMD_ACCESS_DENIED;
 	}
 
@@ -412,6 +471,27 @@ DECLARE_CONSOLE_COMMAND(i2cprotect, command_i2cprotect, "[remote_port]",
 			"Protect I2C bus");
 #endif
 
+#ifdef CONFIG_CMD_I2C_DTS_PORTMAP
+static int command_i2c_portmap(int argc, const char **argv)
+{
+	if (argc > 1) {
+		return EC_ERROR_PARAM_COUNT;
+	}
+
+	for (size_t i = 0; i < ARRAY_SIZE(i2c_controllers); i++) {
+		const struct device *i2c_dev = i2c_controllers[i];
+
+		if (i2c_dev != NULL) {
+			ccprintf("Remote Port %d: %s\n", (int)i, i2c_dev->name);
+		}
+	}
+
+	return EC_SUCCESS;
+}
+DECLARE_CONSOLE_COMMAND(i2c_portmap, command_i2c_portmap, NULL,
+			"Show I2C port mapping");
+#endif /* CONFIG_CMD_I2C_DTS_PORTMAP */
+
 #if DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT)
 
 #define PASSTHRU_CHILD_DEVICES(node_id)                         \
@@ -455,6 +535,7 @@ DECLARE_CONSOLE_COMMAND(i2cprotect, command_i2cprotect, "[remote_port]",
 	static int i2c_dts_passthru_init(const struct device *dev)          \
 	{                                                                   \
 		ARG_UNUSED(dev);                                            \
+		init_i2c_controllers();                                     \
 		return 0;                                                   \
 	}                                                                   \
 	DEVICE_DT_INST_DEFINE(inst, i2c_dts_passthru_init, NULL, NULL,      \
