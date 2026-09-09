@@ -114,6 +114,32 @@ void mock_hci_driver_set_send_result(int res)
 	g_send_result = res;
 }
 
+int mock_hci_driver_inject_rx(const uint8_t *data, size_t len)
+{
+	if (!g_mock_dev || len == 0) {
+		return -EINVAL;
+	}
+
+	struct net_buf *buf = bt_buf_get_rx(BT_BUF_EVT, K_NO_WAIT);
+	if (!buf) {
+		LOG_ERR("Failed to allocate mock RX buffer");
+		return -ENOMEM;
+	}
+
+	/* bt_buf_get_rx(BT_BUF_EVT) already appends BT_HCI_H4_EVT (0x04).
+	 * If the caller provided the H4 type prefix, skip it to avoid
+	 * duplicate.
+	 */
+	if (data[0] == BT_HCI_H4_EVT) {
+		net_buf_add_mem(buf, data + 1, len - 1);
+	} else {
+		net_buf_add_mem(buf, data, len);
+	}
+	bt_hci_recv(g_mock_dev, buf);
+
+	return 0;
+}
+
 int mock_hci_driver_inject_empty_rx(void)
 {
 	if (!g_mock_dev) {
