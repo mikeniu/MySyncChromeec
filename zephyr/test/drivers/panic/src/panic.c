@@ -8,12 +8,17 @@
  * @brief Unit Tests for panic.
  */
 
+#include "charge_state.h"
 #include "common.h"
+#include "cros_version.h"
 #include "ec_tasks.h"
 #include "hooks.h"
 #include "host_command.h"
 #include "panic.h"
+#include "panic_utils.h"
+#include "power.h"
 #include "system.h"
+#include "task.h"
 #include "test/drivers/stubs.h"
 #include "test/drivers/test_state.h"
 
@@ -23,27 +28,32 @@
 #include <zephyr/ztest.h>
 
 int panic_data_init(void);
+void panic_data_write_hard_watchdog(void);
+void panic_finalize_watchdog(void);
 
 struct panic_test_fixture {
 	struct panic_data saved_pdata;
 };
 
-static struct panic_data hard_watchdog_panic;
-
-static void panic_setup_hard_watchdog_panic(void)
+static void zassert_hard_watchdog_panic(const struct panic_data *pdata)
 {
-	panic_data_reset(&hard_watchdog_panic);
-	hard_watchdog_panic.flags &=
-		~(PANIC_DATA_FLAG_RW_IMAGE | PANIC_DATA_FLAG_RO_IMAGE);
-	panic_set_reason_reg(&hard_watchdog_panic, PANIC_SW_WATCHDOG_HARD);
-	panic_data_finalize(&hard_watchdog_panic);
+	zassert_not_null(pdata, NULL);
+	zassert_equal(pdata->arch, PANIC_ARCH_WATCHDOG,
+		      "Expected arch %d, got %d", PANIC_ARCH_WATCHDOG,
+		      pdata->arch);
+	zassert_equal(pdata->struct_version, 2, NULL);
+	zassert_equal(pdata->magic, PANIC_DATA_MAGIC, NULL);
+	zassert_equal(pdata->wd.struct_version, 1, NULL);
+	zassert_equal(pdata->wd.reason_cm, PANIC_SW_WATCHDOG_HARD, NULL);
+	zassert_equal(pdata->wd.reason_x86, PANIC_SW_WATCHDOG_HARD, NULL);
+	zassert_equal(pdata->wd.reason_riscv, PANIC_SW_WATCHDOG_HARD, NULL);
+	zassert_equal(pdata->wd.flags, 0, NULL);
 }
 
 static void *panic_test_setup(void)
 {
 	static struct panic_test_fixture panic_fixture = { 0 };
 
-	panic_setup_hard_watchdog_panic();
 	return &panic_fixture;
 }
 
@@ -133,8 +143,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic)
 	panic_data_init();
 
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
-		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
-				  sizeof(hard_watchdog_panic), NULL);
+		zassert_hard_watchdog_panic(panic_get_data());
 	} else {
 		/* In RO, existing panic data should remain unchanged */
 		zassert_mem_equal(panic_get_data(), &original_pdata,
@@ -173,6 +182,71 @@ ZTEST(panic, test_panic_data_init__watch_dog_warn_panic)
 	}
 }
 
+ZTEST(panic, test_panic_data_init__watchdog_warning)
+{
+	/*
+	 * Watchdog warning panic data should be finalized after a watchdog
+	 * reset: WATCHDOG_PANIC_FLAG_WARNING cleared and warning context
+	 * preserved.
+	 */
+	panic_data_write_watchdog_warning(0x10080000, 0x10080120);
+
+	struct panic_data *pdata = panic_get_data();
+
+	zassert_not_null(pdata, NULL);
+	zassert_true(pdata->wd.flags & WATCHDOG_PANIC_FLAG_WARNING, NULL);
+
+	/* Simulate a watchdog reset cause */
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+
+	pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_equal(pdata->arch, PANIC_ARCH_WATCHDOG, NULL);
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
+		zassert_false(pdata->wd.flags & WATCHDOG_PANIC_FLAG_WARNING,
+			      "Warning flag must be cleared upon finalization");
+		zassert_equal(pdata->wd.pc, 0x10080000, "PC must be preserved");
+		zassert_equal(pdata->wd.lr, 0x10080120, "LR must be preserved");
+	} else {
+		/* In RO, existing panic data should remain unchanged */
+		zassert_true(pdata->wd.flags & WATCHDOG_PANIC_FLAG_WARNING,
+			     "Warning flag must be preserved in RO");
+	}
+}
+
+ZTEST(panic, test_panic_data_init__watchdog_warning_already_read)
+{
+	/*
+	 * If a watchdog warning panic was already read by the host
+	 * (PANIC_DATA_FLAG_OLD_HOSTCMD set, e.g., EC recovered without
+	 * resetting and host fetched the warning), a subsequent watchdog reset
+	 * must NOT finalize the stale warning; it must overwrite with a new
+	 * hard watchdog panic in RW.
+	 */
+	panic_data_write_watchdog_warning(0x10080000, 0x10080120);
+	struct panic_data *pdata = get_panic_data_write();
+
+	pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTCMD;
+	const struct panic_data original_pdata = *pdata;
+
+	zassert_false(panic_data_is_new());
+
+	/* Simulate a watchdog reset cause */
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_init();
+
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
+		zassert_true(panic_data_is_new());
+		zassert_hard_watchdog_panic(panic_get_data());
+	} else {
+		/* In RO, existing panic data should remain unchanged */
+		zassert_false(panic_data_is_new());
+		zassert_mem_equal(panic_get_data(), &original_pdata,
+				  sizeof(original_pdata), NULL);
+	}
+}
+
 ZTEST(panic, test_panic_data_init__watch_dog_warn_panic_already_read)
 {
 	panic_data_write_sw(PANIC_SW_WATCHDOG_WARN, 0x12, 0x34);
@@ -185,8 +259,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_warn_panic_already_read)
 	panic_data_init();
 
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
-		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
-				  sizeof(hard_watchdog_panic), NULL);
+		zassert_hard_watchdog_panic(panic_get_data());
 	} else {
 		/* In RO, existing panic data should remain unchanged */
 		zassert_mem_equal(panic_get_data(), &original_pdata,
@@ -244,8 +317,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_panic_already_read)
 
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
 		zassert_true(panic_data_is_new());
-		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
-				  sizeof(hard_watchdog_panic), NULL);
+		zassert_hard_watchdog_panic(panic_get_data());
 	} else {
 		/* In RO, existing panic data should remain unchanged */
 		zassert_false(panic_data_is_new());
@@ -279,8 +351,7 @@ ZTEST(panic, test_panic_data_init__watch_dog_hard_panic_already_read)
 	panic_data_init();
 
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
-		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
-				  sizeof(hard_watchdog_panic), NULL);
+		zassert_hard_watchdog_panic(panic_get_data());
 	} else {
 		/* In RO, existing panic data should remain unchanged */
 		zassert_mem_equal(panic_get_data(), &original_pdata,
@@ -329,8 +400,7 @@ ZTEST(panic, test_panic_data_init__invalid_sw_reason_watchdog)
 	panic_data_init();
 
 	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
-		zassert_mem_equal(panic_get_data(), &hard_watchdog_panic,
-				  sizeof(hard_watchdog_panic), NULL);
+		zassert_hard_watchdog_panic(panic_get_data());
 	} else {
 		/* In RO, existing panic data should remain unchanged */
 		zassert_mem_equal(panic_get_data(), &original_pdata,
@@ -429,6 +499,14 @@ ZTEST(panic, test_panic_reason_reg)
 
 	panic_set_reason_reg(&test_pdata, PANIC_SW_WATCHDOG);
 	zassert_equal(panic_get_reason_reg(&test_pdata), PANIC_SW_WATCHDOG);
+
+	test_pdata.arch = PANIC_ARCH_WATCHDOG;
+	panic_set_reason_reg(&test_pdata, PANIC_SW_WATCHDOG_HARD);
+	zassert_equal(panic_get_reason_reg(&test_pdata),
+		      PANIC_SW_WATCHDOG_HARD);
+	zassert_equal(test_pdata.wd.reason_x86, PANIC_SW_WATCHDOG_HARD);
+	zassert_equal(test_pdata.wd.reason_cm, PANIC_SW_WATCHDOG_HARD);
+	zassert_equal(test_pdata.wd.reason_riscv, PANIC_SW_WATCHDOG_HARD);
 }
 
 ZTEST(panic, test_panic_field_accessors)
@@ -487,19 +565,89 @@ ZTEST(panic, test_panic_data_write_assert_no_file)
 
 ZTEST(panic, test_panic_data_write_watchdog_warning)
 {
-	panic_data_write_watchdog_warning(0x10080000, k_current_get());
+	system_set_reset_flags(EC_RESET_FLAG_POWER_ON);
+	panic_data_write_watchdog_warning(0x10080000, 0x10080120);
 
 	struct panic_data *pdata = panic_get_data();
 
 	zassert_not_null(pdata, "Panic data must not be NULL after write");
 	zassert_equal(pdata->magic, PANIC_DATA_MAGIC, "Magic must be valid");
-	zassert_equal(panic_get_reason_reg(pdata), PANIC_SW_WATCHDOG_WARN,
-		      "Reason must be PANIC_SW_WATCHDOG_WARN");
-	zassert_equal(panic_get_info_reg(pdata), 0x10080000,
-		      "Info register must match PC");
-	zassert_equal(panic_get_exception_reg(pdata),
-		      (uint8_t)(uintptr_t)k_current_get(),
-		      "Exception register must store thread ID");
+	zassert_equal(pdata->arch, PANIC_ARCH_WATCHDOG,
+		      "Arch must be PANIC_ARCH_WATCHDOG");
+	zassert_true(pdata->wd.flags & WATCHDOG_PANIC_FLAG_WARNING,
+		     "Warning flag must be set");
+	zassert_equal(
+		panic_get_reason_reg(pdata), PANIC_SW_WATCHDOG,
+		"Watchdog warning panic reason must be PANIC_SW_WATCHDOG");
+	zassert_equal(pdata->wd.pc, 0x10080000, "PC register mismatch");
+	zassert_equal(pdata->wd.lr, 0x10080120, "LR register mismatch");
+	zassert_equal(pdata->wd.sp, get_stack_ptr(k_current_get()),
+		      "SP register mismatch");
+	zassert_equal(pdata->wd.thread_id, (uint32_t)(uintptr_t)k_current_get(),
+		      "Thread ID mismatch");
+	zassert_equal(pdata->wd.reset_flags, system_get_reset_flags(),
+		      "Reset flags mismatch");
+
+	size_t ver_len = strlen(current_image_data.version);
+	size_t copy_len = MIN(ver_len, sizeof(pdata->wd.version));
+	const char *expected_ver =
+		current_image_data.version + (ver_len - copy_len);
+
+	zassert_mem_equal(pdata->wd.version, expected_ver, copy_len,
+			  "Version tail mismatch");
+
+#if defined(CONFIG_PLATFORM_EC_POWERSEQ) || \
+	defined(CONFIG_AP_PWRSEQ_DRIVER) || defined(CONFIG_X86_NON_DSX_PWRSEQ)
+	zassert_equal(pdata->wd.power_state, (uint8_t)power_get_state(),
+		      "Power state mismatch");
+#endif
+#if defined(CONFIG_PLATFORM_EC_POWERSEQ) || \
+	defined(CONFIG_AP_PWRSEQ_POWER_SIGNALS)
+	zassert_equal(pdata->wd.power_signals, power_get_signals(),
+		      "Power signals mismatch");
+#endif
+#if defined(CONFIG_PLATFORM_EC_CHARGER)
+	zassert_equal(pdata->wd.charge_state,
+		      (uint8_t)charge_get_status()->state,
+		      "Charge state mismatch");
+	zassert_equal(pdata->wd.battery_level, (uint8_t)charge_get_percent(),
+		      "Battery level mismatch");
+#endif
+#if defined(CONFIG_HAS_HOSTCMD)
+	zassert_equal(pdata->wd.host_events, host_get_events(),
+		      "Host events mismatch");
+#endif
+}
+
+ZTEST(panic, test_panic_finalize_watchdog)
+{
+	panic_data_write_watchdog_warning(0x10080000, 0x10080120);
+
+	struct panic_data *pdata = panic_get_data();
+
+	zassert_not_null(pdata, NULL);
+	zassert_true(pdata->wd.flags & WATCHDOG_PANIC_FLAG_WARNING, NULL);
+
+	panic_finalize_watchdog();
+
+	pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_false(pdata->wd.flags & WATCHDOG_PANIC_FLAG_WARNING,
+		      "Warning flag must be cleared");
+	zassert_equal(pdata->wd.pc, 0x10080000, "PC must be preserved");
+	zassert_equal(pdata->wd.lr, 0x10080120, "LR must be preserved");
+}
+
+ZTEST(panic, test_panic_data_write_hard_watchdog)
+{
+	system_set_reset_flags(EC_RESET_FLAG_WATCHDOG);
+	panic_data_write_hard_watchdog();
+
+	const struct panic_data *pdata = panic_get_data();
+
+	zassert_hard_watchdog_panic(pdata);
+	zassert_equal(pdata->wd.reset_flags, EC_RESET_FLAG_WATCHDOG,
+		      "Reset flags must be captured on hard watchdog");
 }
 
 ZTEST(panic, test_panic_data_write_fatal)
@@ -563,4 +711,25 @@ ZTEST(panic, test_panic_host_event)
 	host_clear_events(CONFIG_HOST_EVENT_REPORT_MASK);
 	hook_notify(HOOK_CHIPSET_STARTUP);
 	zassert_false(host_is_event_set(EC_HOST_EVENT_PANIC), NULL);
+}
+
+ZTEST(panic, test_panic_data_print_watchdog)
+{
+	panic_data_write_watchdog_warning(0x10080000, 0x10080120);
+	struct panic_data *pdata = panic_get_data();
+
+	panic_data_print(pdata);
+
+	/* Future struct versions >= 1 must still print v1 fields */
+	pdata->wd.struct_version = WATCHDOG_PANIC_DATA_STRUCT_VERSION + 1;
+	panic_data_print(pdata);
+}
+
+ZTEST(panic, test_panic_data_print_watchdog_unsupported_version)
+{
+	panic_data_write_watchdog_warning(0x10080000, 0x10080120);
+	struct panic_data *pdata = panic_get_data();
+
+	pdata->wd.struct_version = 0;
+	panic_data_print(pdata);
 }

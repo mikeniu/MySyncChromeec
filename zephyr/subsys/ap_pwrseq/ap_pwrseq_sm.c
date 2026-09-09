@@ -186,7 +186,7 @@ enum ap_pwrseq_state ap_pwrseq_sm_get_cur_state(void *const data)
 {
 	struct ap_pwrseq_sm_data *sm_data = data;
 
-	if (!sm_data->smf.current) {
+	if (!sm_data || !sm_data->smf.current) {
 		return AP_POWER_STATE_UNDEF;
 	}
 

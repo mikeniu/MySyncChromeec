@@ -229,12 +229,17 @@ enum ap_pwrseq_state ap_pwrseq_get_current_state(const struct device *dev)
 {
 	struct ap_pwrseq_data *const data = dev->data;
 	enum ap_pwrseq_state ret_state;
+	bool lock = !k_is_in_isr();
 
-	ap_pwrseq_state_lock(dev);
+	if (lock) {
+		ap_pwrseq_state_lock(dev);
+	}
 
 	ret_state = ap_pwrseq_sm_get_cur_state(data->sm_data);
 
-	ap_pwrseq_state_unlock(dev);
+	if (lock) {
+		ap_pwrseq_state_unlock(dev);
+	}
 
 	return ret_state;
 }

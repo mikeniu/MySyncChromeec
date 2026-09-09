@@ -133,9 +133,12 @@ test_mockable power_signal_mask_t power_get_signals(void)
 {
 	int value;
 
-	for (int i = 0; i < ARRAY_SIZE(polled_signals); i++) {
-		value = power_signal_get(polled_signals[i]);
-		atomic_set_bit_to(&power_signals, polled_signals[i], value);
+	if (!k_is_in_isr()) {
+		for (int i = 0; i < ARRAY_SIZE(polled_signals); i++) {
+			value = power_signal_get(polled_signals[i]);
+			atomic_set_bit_to(&power_signals, polled_signals[i],
+					  value);
+		}
 	}
 	return atomic_get(&power_signals);
 }
