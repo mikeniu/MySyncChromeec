@@ -2038,17 +2038,6 @@
  */
 #undef CONFIG_CPU_PROCHOT_ACTIVE_LOW
 
-/*****************************************************************************/
-/* Support PWM control */
-#undef CONFIG_PWM
-
-/* Define clock input to PWM module. */
-#undef CONFIG_PWM_INPUT_LFCLK
-
-/*****************************************************************************/
-/* Support PWM output to display backlight */
-#undef CONFIG_PWM_DISPLIGHT
-
 /* Size of each RAM bank in chip, default is CONFIG_RAM_SIZE */
 #undef CONFIG_RAM_BANK_SIZE
 

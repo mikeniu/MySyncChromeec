@@ -59,7 +59,6 @@ common-$(CONFIG_PHYSICAL_PRESENCE)+=physical_presence.o
 common-$(CONFIG_PINWEAVER)+=pinweaver_cr50.o
 common-$(CONFIG_POWER_BUTTON)+=power_button.o
 
-common-$(CONFIG_PWM)+=pwm.o
 common-$(CONFIG_RMA_AUTH)+=rma_auth.o
 common-$(CONFIG_RSA)+=rsa.o
 common-$(CONFIG_RWSIG)+=rwsig.o vboot/common.o
