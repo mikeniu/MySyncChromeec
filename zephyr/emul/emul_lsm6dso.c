@@ -5,11 +5,16 @@
 
 #define DT_DRV_COMPAT cros_lsm6dso_emul
 
+#include "driver/accelgyro_lsm6dso.h"
 #include "driver/accelgyro_lsm6dso_public.h"
+#include "emul/emul_common_i2c.h"
+#include "emul/emul_lsm6dso.h"
+#include "math_util.h"
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/emul_stub_device.h>
+#include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/drivers/i2c_emul.h>
 #include <zephyr/logging/log.h>
@@ -17,108 +22,281 @@
 LOG_MODULE_REGISTER(lsm6dso_emul, CONFIG_SENSOR_LOG_LEVEL);
 
 struct lsm6dso_emul_data {
-	uint8_t reg[0x7f];
+	struct i2c_common_emul_data i2c;
+	uint8_t reg[0x80];
+	/* FIFO is 3kB (each sample pattern is 7 bytes) */
+	uint8_t fifo[3072];
+	uint8_t *fifo_head;
 };
 
-struct lsm6dso_emul_cfg {};
+struct lsm6dso_emul_cfg {
+	struct i2c_common_emul_cfg i2c;
+	const struct gpio_dt_spec gpio_spec;
+};
 
-static void lsm6dso_emul_reset(const struct emul *target)
+static int emul_lsm6dso_get_fifo_count(const struct emul *emul)
 {
-	struct lsm6dso_emul_data *data = target->data;
+	struct lsm6dso_emul_data *data = emul->data;
 
-	data->reg[LSM6DSO_INT1_CTRL] = 0;
-	data->reg[LSM6DSO_CTRL3_ADDR] = LSM6DSO_IF_INC;
+	return ((int)FIELD_GET(0x3, data->reg[LSM6DSO_FIFO_STS2_ADDR]) << 8) |
+	       data->reg[LSM6DSO_FIFO_STS1_ADDR];
 }
 
-static int lsm6dso_emul_handle_write(const struct emul *target, uint8_t regn,
-				     uint8_t value)
+static int emul_lsm6dso_get_fifo_wm(const struct emul *emul)
 {
-	struct lsm6dso_emul_data *data = target->data;
+	struct lsm6dso_emul_data *data = emul->data;
 
-	switch (regn) {
-	case LSM6DSO_CTRL3_ADDR:
-		if (FIELD_GET(LSM6DSO_SW_RESET, value) == 1) {
-			/* Perform a soft reset */
-			lsm6dso_emul_reset(target);
-			return 0;
-		}
-		break;
-	}
-
-	data->reg[regn] = value;
-	return 0;
+	return ((int)FIELD_GET(0x1, data->reg[LSM6DSO_FIFO_CTRL2_ADDR]) << 8) |
+	       data->reg[LSM6DSO_FIFO_CTRL1_ADDR];
 }
 
-static int lsm6dso_emul_transfer_i2c(const struct emul *target,
-				     struct i2c_msg *msgs, int num_msgs,
-				     int addr)
+static void lsm6dso_emul_set_interrupt_pin(const struct emul *emul, bool active)
 {
-	struct lsm6dso_emul_data *data = target->data;
+	const struct lsm6dso_emul_cfg *config = emul->cfg;
+	struct lsm6dso_emul_data *data = emul->data;
 
-	i2c_dump_msgs_rw(target->dev, msgs, num_msgs, addr, false);
-
-	if (num_msgs < 1) {
-		LOG_ERR("Invalid number of messages: %d", num_msgs);
-		return -EIO;
-	}
-	if (FIELD_GET(I2C_MSG_READ, msgs->flags) != 0) {
-		LOG_ERR("Unexpected read");
-		return -EIO;
-	}
-	if (msgs->len < 1) {
-		LOG_ERR("Unexpected msg0 length %d", msgs->len);
-		return -EIO;
+	if (config->gpio_spec.port == NULL) {
+		return;
 	}
 
-	uint8_t regn = msgs->buf[0];
-	bool is_read = FIELD_GET(I2C_MSG_READ, msgs->flags) == 1;
-	bool is_stop = FIELD_GET(I2C_MSG_STOP, msgs->flags) == 1;
-
-	if (!is_stop && !is_read) {
-		/* First message was a write with the register number, check
-		 * next message
-		 */
-		msgs++;
-		is_read = FIELD_GET(I2C_MSG_READ, msgs->flags) == 1;
-		is_stop = FIELD_GET(I2C_MSG_STOP, msgs->flags) == 1;
+	if (active && (data->reg[LSM6DSO_INT1_CTRL] &
+		       (LSM6DSO_INT_FIFO_TH | LSM6DSO_INT_FIFO_FULL |
+			LSM6DSO_INT_FIFO_OVR)) == 0) {
+		return;
 	}
-	if (is_read) {
-		/* Read data */
-		for (int i = 0; i < msgs->len; ++i) {
-			msgs->buf[i] = data->reg[regn + i];
-		}
+
+	int pin_value;
+	if ((config->gpio_spec.dt_flags & GPIO_ACTIVE_LOW) != 0) {
+		pin_value = active ? 0 : 1;
 	} else {
-		/* Write data */
-		int rc = lsm6dso_emul_handle_write(target, regn, msgs->buf[1]);
-
-		if (rc != 0) {
-			return rc;
-		}
+		pin_value = active ? 1 : 0;
 	}
+	gpio_emul_input_set(config->gpio_spec.port, config->gpio_spec.pin,
+			    pin_value);
+}
+
+static void emul_lsm6dso_set_fifo_count(const struct emul *emul, int count)
+{
+	struct lsm6dso_emul_data *data = emul->data;
+	int wm = emul_lsm6dso_get_fifo_wm(emul);
+
+	data->reg[LSM6DSO_FIFO_STS1_ADDR] = 0;
+	data->reg[LSM6DSO_FIFO_STS2_ADDR] = 0;
+
+	if (count >= wm && wm != 0) {
+		data->reg[LSM6DSO_FIFO_STS2_ADDR] |= BIT(7);
+	}
+	if (count == 0) {
+		data->reg[LSM6DSO_FIFO_STS2_ADDR] |= BIT(4);
+	} else {
+		data->reg[LSM6DSO_FIFO_STS2_ADDR] |= FIELD_GET(0x300, count);
+		data->reg[LSM6DSO_FIFO_STS1_ADDR] = FIELD_GET(0xff, count);
+	}
+	LOG_DBG("FIFO_STATUS (%d): 0x%02x %02x", count,
+		data->reg[LSM6DSO_FIFO_STS1_ADDR],
+		data->reg[LSM6DSO_FIFO_STS2_ADDR]);
+}
+
+void emul_lsm6dso_append_raw_tag(const struct emul *emul, uint8_t raw_tag,
+				 int16_t x, int16_t y, int16_t z)
+{
+	struct lsm6dso_emul_data *data = emul->data;
+	int current_fifo_count = emul_lsm6dso_get_fifo_count(emul);
+	int current_fifo_wm = emul_lsm6dso_get_fifo_wm(emul);
+	int fifo_pos = current_fifo_count * LSM6DSO_FIFO_SAMPLE_SIZE;
+
+	if (fifo_pos + LSM6DSO_FIFO_SAMPLE_SIZE > sizeof(data->fifo)) {
+		LOG_ERR("FIFO full");
+		return;
+	}
+
+	data->fifo_head[fifo_pos++] = raw_tag << 3;
+	data->fifo_head[fifo_pos++] = FIELD_GET(0xff, x);
+	data->fifo_head[fifo_pos++] = FIELD_GET(0xff00, x);
+	data->fifo_head[fifo_pos++] = FIELD_GET(0xff, y);
+	data->fifo_head[fifo_pos++] = FIELD_GET(0xff00, y);
+	data->fifo_head[fifo_pos++] = FIELD_GET(0xff, z);
+	data->fifo_head[fifo_pos++] = FIELD_GET(0xff00, z);
+
+	emul_lsm6dso_set_fifo_count(emul, current_fifo_count + 1);
+	if (current_fifo_count + 1 >= current_fifo_wm && current_fifo_wm != 0) {
+		data->reg[LSM6DSO_FIFO_STS2_ADDR] |= BIT(7);
+		lsm6dso_emul_set_interrupt_pin(emul, true);
+	}
+}
+
+void emul_lsm6dso_append_sample(const struct emul *emul,
+				enum motionsensor_type type, float x, float y,
+				float z)
+{
+	static const uint32_t la_fs[] = { 2, 16, 4, 8 };
+	static const uint32_t g_fs[] = { 250, 500, 1000, 2000 };
+	struct lsm6dso_emul_data *data = emul->data;
+	int16_t reg_x, reg_y, reg_z;
+	uint8_t raw_tag;
+	uint32_t fs;
+
+	__ASSERT_NO_MSG(type == MOTIONSENSE_TYPE_ACCEL ||
+			type == MOTIONSENSE_TYPE_GYRO);
+
+	if (type == MOTIONSENSE_TYPE_ACCEL) {
+		fs = la_fs[FIELD_GET(LSM6DSO_ACCEL_FS_MASK,
+				     data->reg[LSM6DSO_CTRL1_ADDR])];
+		raw_tag = LSM6DSO_ACC_TAG;
+	} else {
+		fs = g_fs[FIELD_GET(LSM6DSO_GYRO_FS_MASK,
+				    data->reg[LSM6DSO_CTRL2_ADDR])];
+		raw_tag = LSM6DSO_GYRO_TAG;
+	}
+
+	__ASSERT_NO_MSG(ABS(x) < (float)fs);
+	__ASSERT_NO_MSG(ABS(y) < (float)fs);
+	__ASSERT_NO_MSG(ABS(z) < (float)fs);
+
+	reg_x = (int16_t)((x / fs) * INT16_MAX);
+	reg_y = (int16_t)((y / fs) * INT16_MAX);
+	reg_z = (int16_t)((z / fs) * INT16_MAX);
+
+	if (type == MOTIONSENSE_TYPE_ACCEL) {
+		data->reg[LSM6DSO_STATUS_REG] |= LSM6DSO_STS_XLDA_UP;
+		data->reg[LSM6DSO_ACCEL_OUT_X_L_ADDR] = FIELD_GET(0xff, reg_x);
+		data->reg[LSM6DSO_ACCEL_OUT_X_L_ADDR + 1] =
+			FIELD_GET(0xff00, reg_x);
+		data->reg[LSM6DSO_ACCEL_OUT_X_L_ADDR + 2] =
+			FIELD_GET(0xff, reg_y);
+		data->reg[LSM6DSO_ACCEL_OUT_X_L_ADDR + 3] =
+			FIELD_GET(0xff00, reg_y);
+		data->reg[LSM6DSO_ACCEL_OUT_X_L_ADDR + 4] =
+			FIELD_GET(0xff, reg_z);
+		data->reg[LSM6DSO_ACCEL_OUT_X_L_ADDR + 5] =
+			FIELD_GET(0xff00, reg_z);
+	} else {
+		data->reg[LSM6DSO_STATUS_REG] |= LSM6DSO_STS_GDA_UP;
+		data->reg[LSM6DSO_GYRO_OUT_X_L_ADDR] = FIELD_GET(0xff, reg_x);
+		data->reg[LSM6DSO_GYRO_OUT_X_L_ADDR + 1] =
+			FIELD_GET(0xff00, reg_x);
+		data->reg[LSM6DSO_GYRO_OUT_X_L_ADDR + 2] =
+			FIELD_GET(0xff, reg_y);
+		data->reg[LSM6DSO_GYRO_OUT_X_L_ADDR + 3] =
+			FIELD_GET(0xff00, reg_y);
+		data->reg[LSM6DSO_GYRO_OUT_X_L_ADDR + 4] =
+			FIELD_GET(0xff, reg_z);
+		data->reg[LSM6DSO_GYRO_OUT_X_L_ADDR + 5] =
+			FIELD_GET(0xff00, reg_z);
+	}
+
+	const bool append_to_fifo = (data->reg[LSM6DSO_FIFO_CTRL4_ADDR] &
+				     LSM6DSO_FIFO_MODE_MASK) != 0;
+
+	if (append_to_fifo) {
+		emul_lsm6dso_append_raw_tag(emul, raw_tag, reg_x, reg_y, reg_z);
+	}
+}
+
+static void lsm6dso_emul_reset(const struct emul *emul)
+{
+	struct lsm6dso_emul_data *data = emul->data;
+
+	memset(data->reg, 0, sizeof(data->reg));
+	data->reg[LSM6DSO_WHO_AM_I_REG] = LSM6DSO_WHO_AM_I;
+	data->reg[LSM6DSO_CTRL3_ADDR] = LSM6DSO_IF_INC;
+	data->fifo_head = data->fifo;
+	emul_lsm6dso_set_fifo_count(emul, 0);
+	lsm6dso_emul_set_interrupt_pin(emul, false);
+}
+
+static int lsm6dso_emul_read_byte(const struct emul *emul, int reg,
+				  uint8_t *val, int bytes)
+{
+	struct lsm6dso_emul_data *data = emul->data;
+
+	LOG_DBG("Reading byte %d starting at register 0x%02x", bytes, reg);
+	if (reg < 0 || reg + bytes >= sizeof(data->reg)) {
+		return -ENOTSUP;
+	}
+
+	if (reg == LSM6DSO_FIFO_DATA_ADDR_TAG) {
+		int fifo_count = emul_lsm6dso_get_fifo_count(emul);
+		if (fifo_count == 0) {
+			LOG_ERR("Tried to read FIFO, but no entries are there");
+			return -EINVAL;
+		}
+		*val = data->fifo_head[bytes];
+		if ((bytes % LSM6DSO_FIFO_SAMPLE_SIZE) ==
+		    (LSM6DSO_FIFO_SAMPLE_SIZE - 1)) {
+			data->fifo_head += LSM6DSO_FIFO_SAMPLE_SIZE;
+			emul_lsm6dso_set_fifo_count(emul, fifo_count - 1);
+			if (fifo_count - 1 < emul_lsm6dso_get_fifo_wm(emul)) {
+				lsm6dso_emul_set_interrupt_pin(emul, false);
+			}
+			if (data->fifo_head >=
+			    data->fifo + sizeof(data->fifo)) {
+				data->fifo_head = data->fifo;
+			}
+		}
+		return 0;
+	}
+
+	*val = data->reg[reg + bytes];
 	return 0;
 }
 
-static int lsm6dso_emul_init(const struct emul *target,
+static int lsm6dso_emul_write_byte(const struct emul *emul, int reg,
+				   uint8_t val, int bytes)
+{
+	struct lsm6dso_emul_data *data = emul->data;
+
+	LOG_DBG("Writing byte %d starting at register 0x%02x: 0x%02x",
+		bytes - 1, reg, val);
+	if (reg < 0 || reg + bytes - 1 >= sizeof(data->reg)) {
+		return -ENOTSUP;
+	}
+
+	data->reg[reg + bytes - 1] = val;
+
+	if (reg == LSM6DSO_CTRL3_ADDR && (val & LSM6DSO_SW_RESET) != 0) {
+		lsm6dso_emul_reset(emul);
+	}
+
+	return 0;
+}
+
+static int lsm6dso_emul_init(const struct emul *emul,
 			     const struct device *parent)
 {
-	struct lsm6dso_emul_data *data = target->data;
+	const struct lsm6dso_emul_cfg *config = emul->cfg;
+	struct lsm6dso_emul_data *data = emul->data;
 
-	data->reg[LSM6DSO_WHO_AM_I_REG] = LSM6DSO_WHO_AM_I;
+	data->i2c.i2c = parent;
+	i2c_common_emul_init(&data->i2c);
+	lsm6dso_emul_reset(emul);
+
+	__ASSERT(config->gpio_spec.dt_flags & GPIO_ACTIVE_LOW,
+		 "The lsm6dso driver only supports active low configuration");
 
 	return 0;
 }
 
-static const struct i2c_emul_api lsm6dso_emul_api_i2c = {
-	.transfer = lsm6dso_emul_transfer_i2c,
-};
-
-#define LSM6DSO_EMUL(inst)                                                   \
-	static struct lsm6dso_emul_data lsm6dso_emul_data_##inst;            \
-	const static struct lsm6dso_emul_cfg lsm6dso_emul_cfg_##inst;        \
-	EMUL_DT_INST_DEFINE(inst, lsm6dso_emul_init,                         \
-			    &lsm6dso_emul_data_##inst,                       \
-			    &lsm6dso_emul_cfg_##inst, &lsm6dso_emul_api_i2c, \
-			    NULL)
+#define LSM6DSO_EMUL(inst)                                                    \
+	static struct lsm6dso_emul_data lsm6dso_emul_data_##inst = {        \
+		.i2c = {                                                    \
+			.write_byte = lsm6dso_emul_write_byte,              \
+			.read_byte = lsm6dso_emul_read_byte,                \
+			.i2c = DEVICE_DT_GET(DT_INST_PARENT(inst)),         \
+		},                                                          \
+	}; \
+	const static struct lsm6dso_emul_cfg lsm6dso_emul_cfg_##inst = {    \
+		.i2c = {                                                    \
+			.dev_label = DT_NODE_FULL_NAME(DT_DRV_INST(inst)),  \
+			.data = &lsm6dso_emul_data_##inst.i2c,              \
+			.addr = DT_INST_REG_ADDR(inst),                     \
+		},                                                          \
+		.gpio_spec = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {}), \
+	}; \
+	EMUL_DT_INST_DEFINE(inst, lsm6dso_emul_init,                          \
+			    &lsm6dso_emul_data_##inst,                        \
+			    &lsm6dso_emul_cfg_##inst, &i2c_common_emul_api,   \
+			    NULL);
 
 DT_INST_FOREACH_STATUS_OKAY(LSM6DSO_EMUL)
 DT_INST_FOREACH_STATUS_OKAY(EMUL_STUB_DEVICE)
