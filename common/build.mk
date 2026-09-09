@@ -21,10 +21,6 @@ common-$(CONFIG_AP_RO_VERIFICATION)+=ap_ro_integrity_check.o
 common-$(CONFIG_CMD_ADC)+=adc.o
 
 common-$(CONFIG_AP_HANG_DETECT)+=ap_hang_detect.o
-common-$(CONFIG_AUDIO_CODEC)+=audio_codec.o
-common-$(CONFIG_AUDIO_CODEC_DMIC)+=audio_codec_dmic.o
-common-$(CONFIG_AUDIO_CODEC_I2S_RX)+=audio_codec_i2s_rx.o
-common-$(CONFIG_AUDIO_CODEC_WOV)+=audio_codec_wov.o
 common-$(CONFIG_BACKLIGHT_LID)+=backlight_lid.o
 common-$(CONFIG_BASE32)+=base32.o
 common-$(CONFIG_BASE64)+=base64.o
@@ -106,10 +102,6 @@ common-$(HAS_TASK_PDCMD)+=host_command_pd.o
 
 common-$(HAS_TASK_TPM)+=tpm_registers.o
 common-$(CONFIG_STRONGBOX)+=strongbox.o
-
-ifneq ($(HAVE_PRIVATE_AUDIO_CODEC_WOV_LIBS),y)
-common-$(CONFIG_AUDIO_CODEC_WOV)+=hotword_dsp_api.o
-endif
 
 ifneq ($(CONFIG_COMMON_RUNTIME),)
 common-$(CONFIG_MALLOC)+=shmalloc.o
