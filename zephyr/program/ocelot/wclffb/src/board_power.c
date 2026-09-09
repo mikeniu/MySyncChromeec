@@ -88,13 +88,13 @@ AP_POWER_APP_STATE_DEFINE(G3, board_ap_power_action_g3_entry,
 
 static int board_ap_power_action_s4_exit(void *data)
 {
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_vdd2_vr_en_s4_ec),
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_vdd1_en_ec),
 		!power_signal_get(PWR_SLP_S4));
 
 	k_busy_wait(5000);
 
 	//return 0;
-	return gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_vdd2_vr_pwrgd));
+	return gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_vdd2_pwrgd));
 }
 
 AP_POWER_APP_STATE_DEFINE(S4, NULL, NULL, board_ap_power_action_s4_exit);
