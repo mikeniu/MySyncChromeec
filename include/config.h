@@ -767,7 +767,6 @@
 #define CONFIG_CMD_BATTFAKE
 #undef  CONFIG_CMD_BATT_MFG_ACCESS
 #define CONFIG_CMD_RETIMER
-#define CONFIG_CMD_CBI
 #undef  CONFIG_CMD_CCD_DISABLE  /* 'ccd disable' subcommand */
 #undef  CONFIG_CMD_CHARGEN
 #define CONFIG_CMD_CHARGER
@@ -824,7 +823,6 @@
 #undef  CONFIG_CMD_PD_CONTROL
 #undef  CONFIG_CMD_PD_DEV_DUMP_INFO
 #undef  CONFIG_CMD_PD_FLASH
-#define CONFIG_CMD_PECI
 #define CONFIG_CMD_PINMUX
 #undef  CONFIG_CMD_PLL
 #undef  CONFIG_CMD_PMU
@@ -1950,21 +1948,6 @@
 
 /* Support one-wire interface */
 #undef CONFIG_ONEWIRE
-
-/* Support PECI interface to x86 processor */
-#undef CONFIG_PECI
-
-/* Common code for PECI interface to x86 processor */
-#undef CONFIG_PECI_COMMON
-
-/*
- * Maximum operating temperature in degrees Celcius used on some x86
- * processors. CPU chip temperature is reported relative to this value and
- * is never reported greater than this value. Processor asserts PROCHOT#
- * and starts throttling frequency and voltage at this temp. Operation may
- * become unreliable if temperature exceeds this limit.
- */
-#undef CONFIG_PECI_TJMAX
 
 /* Support physical presence detection (via a physical button) */
 #undef CONFIG_PHYSICAL_PRESENCE
@@ -3133,20 +3116,6 @@
 
 /*****************************************************************************/
 
-/*
- * Support controlling power to WiFi, WWAN (3G/LTE), and/or bluetooth modules.
- */
-#undef CONFIG_WIRELESS
-
-/*
- * Support for WiFi devices that must remain powered in suspend.  Set to the
- * combination of EC_WIRELESS_SWITCH flags (from ec_commands.h) which should
- * be set in suspend.
- */
-#undef CONFIG_WIRELESS_SUSPEND
-
-/* WiFi power control signal is active-low. */
-#undef CONFIG_WLAN_POWER_ACTIVE_LOW
 
 /* Support Wake-on-Voice */
 #undef CONFIG_WAKE_ON_VOICE
@@ -3202,11 +3171,6 @@
  */
 #undef CONFIG_SN_BITS_SUPPORT
 
-/*
- * Define this to enable Cros Board Info support. I2C_EEPROM_PORT and
- * I2C_EEPROM_ADDR must be defined as well.
- */
-#undef CONFIG_CROS_BOARD_INFO
 
 /*****************************************************************************/
 /*

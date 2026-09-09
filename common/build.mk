@@ -26,7 +26,6 @@ common-$(CONFIG_BASE64)+=base64.o
 common-${CONFIG_BOARD_ID_FEATURES} += board_id_features.o
 common-$(CONFIG_CASE_CLOSED_DEBUG_V1)+=ccd_config.o
 common-$(CONFIG_CEC)+=cec.o
-common-$(CONFIG_CROS_BOARD_INFO)+=cbi.o
 common-$(CONFIG_CMD_CHARGEN) += chargen.o
 common-$(CONFIG_CMD_I2CWEDGE)+=i2c_wedge.o
 common-$(CONFIG_COMMON_GPIO)+=gpio.o gpio_commands.o
@@ -59,7 +58,6 @@ common-$(CONFIG_I2C_PERIPH)+=i2c_peripheral.o
 
 
 common-$(CONFIG_LID_SWITCH)+=lid_switch.o
-common-$(CONFIG_PECI_COMMON)+=peci.o
 common-$(CONFIG_PHYSICAL_PRESENCE)+=physical_presence.o
 common-$(CONFIG_PINWEAVER)+=pinweaver_cr50.o
 common-$(CONFIG_POWER_BUTTON)+=power_button.o
@@ -88,7 +86,6 @@ common-$(CONFIG_USB_PD_LOGGING)+=event_log.o pd_log.o
 common-$(CONFIG_VBOOT_HASH)+=sha256.o vboot_hash.o
 common-$(CONFIG_VSTORE)+=vstore.o
 common-$(CONFIG_WEBUSB_URL)+=webusb_desc.o
-common-$(CONFIG_WIRELESS)+=wireless.o
 
 common-$(HAS_TASK_CONSOLE)+=console.o console_output.o uart_buffering.o
 common-$(CONFIG_CMD_MEM)+=memory_commands.o
