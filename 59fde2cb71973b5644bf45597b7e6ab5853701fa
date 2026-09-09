@@ -35,6 +35,23 @@
       "parentUuid": "7c4d7cfd_d042104e",
       "revId": "59fde2cb71973b5644bf45597b7e6ab5853701fa",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c98abf93_ba6939e1",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.elan",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-09T08:28:48Z",
+      "side": 1,
+      "message": "Looks like you are trying to reuse FP driver named Elan 80 Series for the Elan 515 driver. It\u0027s confusing. If you are going to re-use the existing FP driver, please rename it first to a proper, more generic name. It also applies for the algo.",
+      "revId": "59fde2cb71973b5644bf45597b7e6ab5853701fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
