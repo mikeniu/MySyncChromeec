@@ -288,6 +288,14 @@ config PLATFORM_EC_CHARGER_RT9490
 	  battery charge management and system power path management device for
 	  1-4 cell Li-Ion and Li-polymer battery.
 
+config PLATFORM_EC_CHARGER_SGM41538
+	bool "Use the SGM41538 charger"
+	depends on PLATFORM_EC_I2C
+	select PLATFORM_EC_CHARGER_NARROW_VDC
+	help
+	  Enables the driver for the SGM41538 battery charger
+	  controller.
+
 if PLATFORM_EC_OCPC
 
 config PLATFORM_EC_OCPC_DEF_RBATT_MOHMS
