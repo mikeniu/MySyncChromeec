@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4e1b8d0_4fd4066a",
+        "filename": "include/host_command.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-09T15:38:50Z",
+      "side": 1,
+      "message": "Please note which order the fields are defined in the unions (i.e. which is legacy?).",
+      "revId": "7a78bb26ef8903e53cfb32c32a36eeb2297b1cf7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7ff6d78_98bee4c9",
+        "filename": "include/host_command_legacy.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-09T15:38:50Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Consider adding `#include \u003czephyr/linker/iterable_sections.h\u003e` to the includes at the top of this file. `STRUCT_SECTION_ITERABLE` is defined there, and while it might be implicitly included via `common.h` in Zephyr builds, explicitly including it ensures this header remains self-contained.",
+      "range": {
+        "startLine": 191,
+        "startChar": 0,
+        "endLine": 191,
+        "endChar": 0
+      },
+      "revId": "7a78bb26ef8903e53cfb32c32a36eeb2297b1cf7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
