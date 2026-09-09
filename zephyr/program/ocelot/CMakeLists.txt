@@ -43,6 +43,7 @@ if(DEFINED CONFIG_BOARD_HEKLA)
 	zephyr_library_sources("hekla/src/battery.c")
 	zephyr_library_sources("hekla/src/board_power.c")
 	zephyr_library_sources("hekla/src/board.c")
+	zephyr_library_sources("hekla/src/fan.c")
 endif()
 
 if(DEFINED CONFIG_BOARD_MATSU)

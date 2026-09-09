@@ -37,6 +37,7 @@ register_npcx9_project(
 
 register_npcx9_project(
     project_name="c1nv",
+    extra_modules=["google-private", "nanopb", "pigweed"],
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses

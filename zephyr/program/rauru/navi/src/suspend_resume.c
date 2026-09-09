@@ -124,6 +124,10 @@ static void navi_power_event_handler(struct ap_power_ev_callback *callback,
 	const struct gpio_dt_spec *s3_indicator_l =
 		GPIO_DT_FROM_NODELABEL(gpio_ap_in_sleep_l);
 
+	if (board_version > 1) {
+		return;
+	}
+
 	switch (data.event) {
 	case AP_POWER_SHUTDOWN:
 		/* fall-through */
@@ -135,6 +139,8 @@ static void navi_power_event_handler(struct ap_power_ev_callback *callback,
 		break;
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(navi_power_event_handler, AP_POWER_RESUME_INIT,
+			       AP_POWER_SHUTDOWN);
 
 /*
  * Initializes the workaround. This function is called during system
@@ -142,8 +148,6 @@ static void navi_power_event_handler(struct ap_power_ev_callback *callback,
  */
 static void init_suspend_resume_workaround(void)
 {
-	static struct ap_power_ev_callback power_event_cb;
-
 	if (board_version == PREINIT_VERSION) {
 		if (cbi_get_board_version(&board_version)) {
 			LOG_ERR("Getting board version failed.");
@@ -157,11 +161,6 @@ static void init_suspend_resume_workaround(void)
 	}
 
 	LOG_INF("Board version <= 1. Applying suspend/resume workaround.");
-
-	/* Register for AP power events */
-	ap_power_ev_init_callback(&power_event_cb, navi_power_event_handler,
-				  AP_POWER_RESUME_INIT | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&power_event_cb);
 
 	/* Initialize the CS_L interrupt callback */
 	gpio_init_callback(&cs_callback, ap_wakeup_isr, BIT(cs_gpio.pin));

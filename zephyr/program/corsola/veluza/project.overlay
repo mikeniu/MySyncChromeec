@@ -367,6 +367,7 @@
 };
 &i2c3 {
 	/* EC_I2C_SENSOR */
+	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
 	zephyr,transfer-timeout-ms = <200>;
 };
 &i2c4 {

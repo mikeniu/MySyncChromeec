@@ -186,13 +186,5 @@ test_export_static void power_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-test_export_static void meliks_callback_init(void)
-{
-	static struct ap_power_ev_callback meliks_cb;
-
-	ap_power_ev_init_callback(&meliks_cb, power_handler,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&meliks_cb);
-}
-DECLARE_HOOK(HOOK_INIT, meliks_callback_init, HOOK_PRIO_DEFAULT);
+AP_POWER_EVENT_CALLBACK_DEFINE(power_handler, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);

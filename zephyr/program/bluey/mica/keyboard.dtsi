@@ -81,8 +81,8 @@
 	pinctrl-names = "default", "sleep";
 	row-size = <8>;
 	col-size = <18>;
-	debounce-down-ms = <20>;
-	debounce-up-ms = <20>;
+	debounce-down-ms = <5>;
+	debounce-up-ms = <5>;
 	actual-key-mask = <
 		0x08	/* C0 */
 		0xff	/* C1 */

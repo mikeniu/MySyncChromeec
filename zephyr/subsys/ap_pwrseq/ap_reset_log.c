@@ -12,15 +12,4 @@ static void reset_handler(struct ap_power_ev_callback *callback,
 {
 	report_ap_reset(CHIPSET_RESET_AP_REQ);
 }
-
-static int register_reset_handler(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	ap_power_ev_init_callback(&cb, reset_handler, AP_POWER_RESET);
-	ap_power_ev_add_callback(&cb);
-
-	return 0;
-}
-
-SYS_INIT(register_reset_handler, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+AP_POWER_EVENT_CALLBACK_DEFINE(reset_handler, AP_POWER_RESET);

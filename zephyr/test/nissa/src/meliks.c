@@ -511,8 +511,6 @@ ZTEST(meliks, test_meliks_callback)
 {
 	struct ap_power_ev_data data;
 
-	meliks_callback_init();
-
 	data.event = AP_POWER_STARTUP;
 	power_handler(NULL, data);
 

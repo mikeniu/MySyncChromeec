@@ -1,6 +1,8 @@
 common:
   platform_allow:
   - native_sim
+  tags:
+  - host_cmd
 tests:
   hostcmd_console.log_immediate:
     extra_configs:

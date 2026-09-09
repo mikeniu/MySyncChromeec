@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "ghost_filter.h"
+
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
@@ -55,6 +57,10 @@ static void drive_one_col_gpio(const struct device *col_dev,
 void input_kbd_matrix_drive_column_hook(const struct device *dev, int col)
 {
 	DT_INST_FOREACH_STATUS_OKAY(DRIVE_ONE_INSTANCE);
+
+	if (IS_ENABLED(CONFIG_CROS_EC_GHOST_FILTER)) {
+		input_kbd_matrix_ghost_filter_hook(dev, col);
+	}
 }
 #undef DRIVE_ONE_INSTANCE
 

@@ -1126,11 +1126,13 @@ class Zmake:
         self,
         target1,
         target2,
+        sections=False,
     ):
         """Analyze binary differences between two EC builds."""
         success = zmake.analyze_build_diff.analyze_build_diff(
             target1,
             target2,
+            sections=sections,
             output_fn=self.logger.info,
         )
         return 0 if success else 1
