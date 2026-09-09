@@ -48,4 +48,41 @@ config HDLC_TRANSPORT_INIT_PRIORITY
 	help
 	  Init priority for HDLC transport (runs during POST_KERNEL).
 
+config SHELL_BACKEND_HDLC
+	bool "HDLC shell backend"
+	depends on SHELL
+	default y if !SHELL_BACKEND_SERIAL
+	help
+	  Enable HDLC-encapsulated Zephyr shell on channel HDLC_ADDR_SHELL (2).
+
+if SHELL_BACKEND_HDLC
+
+config SHELL_PROMPT_HDLC
+	string "HDLC shell prompt"
+	default "uart:~$ "
+	help
+	  Command prompt for HDLC shell backend.
+
+config SHELL_BACKEND_HDLC_RX_RING_BUFFER_SIZE
+	int "HDLC shell RX ring buffer size"
+	default 256
+	help
+	  Size of ring buffer for incoming shell keystrokes/data.
+
+config SHELL_BACKEND_HDLC_LOG_MESSAGE_QUEUE_TIMEOUT
+	int "Log message queue timeout in ms"
+	default 100
+
+config SHELL_BACKEND_HDLC_LOG_MESSAGE_QUEUE_SIZE
+	int "Log message queue size"
+	default 10
+
+config SHELL_BACKEND_HDLC_INIT_PRIORITY
+	int "HDLC shell backend init priority"
+	default 90
+	help
+	  Init priority for HDLC shell backend.
+
+endif # SHELL_BACKEND_HDLC
+
 endif # HDLC_TRANSPORT
