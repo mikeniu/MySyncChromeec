@@ -9,4 +9,3 @@
 CHIP:=host
 
 board-y=board.o
-board-$(CONFIG_FANS)+=fan.o

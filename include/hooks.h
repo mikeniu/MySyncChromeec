@@ -60,12 +60,6 @@ enum hook_priority {
 	HOOK_PRIO_INIT_EC_EFS = HOOK_PRIO_INIT_CR50_BOARD + 1,
 	HOOK_PRIO_INIT_EC_CR50_COMM = HOOK_PRIO_INIT_EC_EFS + 1,
 
-
-	/* Specific values to lump temperature-related hooks together */
-	HOOK_PRIO_TEMP_SENSOR = 6000,
-	/* After all sensors have been polled */
-	HOOK_PRIO_TEMP_SENSOR_DONE = HOOK_PRIO_TEMP_SENSOR + 1,
-
 	/* Once devices are initialized, run FIPS tests and print status. */
 	HOOK_PRIO_INIT_FIPS = 9997,    /* FIPS init executes last */
 	HOOK_PRIO_INIT_PRINT_FIPS_STATUS = 9998,    /* Status of FIPS tests. */

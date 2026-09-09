@@ -61,7 +61,7 @@ CONSOLE_CHANNEL(CC_MOTION_SENSE, "u18")
 CONSOLE_CHANNEL(CC_PD_HOST_CMD,  "u19")
 #endif
 CONSOLE_CHANNEL(CC_PORT80,       "u20")
-#if defined(CONFIG_PWM) || defined(CONFIG_FANS)
+#if defined(CONFIG_PWM)
 CONSOLE_CHANNEL(CC_PWM,          "u21")
 #endif
 CONSOLE_CHANNEL(CC_SPI,          "spi")

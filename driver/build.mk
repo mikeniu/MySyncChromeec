@@ -11,7 +11,3 @@ _driver_cur_dir:=$(dir $(lastword $(MAKEFILE_LIST)))
 
 # Current/Power monitor
 driver-$(CONFIG_INA219)$(CONFIG_INA231)+=ina2xx.o
-
-# Thermistors
-driver-$(CONFIG_THERMISTOR)+=temp_sensor/thermistor.o
-driver-$(CONFIG_THERMISTOR_NCP15WB)+=temp_sensor/thermistor_ncp15wb.o

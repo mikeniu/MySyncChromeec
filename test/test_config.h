@@ -100,23 +100,6 @@
 #define CONFIG_MALLOC
 #endif
 
-#ifdef TEST_THERMAL
-#define CONFIG_CHIPSET_CAN_THROTTLE
-#define CONFIG_FANS 1
-#define CONFIG_I2C
-#define CONFIG_I2C_CONTROLLER
-#define CONFIG_TEMP_SENSOR
-#define CONFIG_THROTTLE_AP
-#define CONFIG_THERMISTOR
-#define CONFIG_THERMISTOR_NCP15WB
-#define I2C_PORT_THERMAL 0
-int ncp15wb_calculate_temp(uint16_t adc);
-#endif
-
-#ifdef TEST_FAN
-#define CONFIG_FANS 1
-#endif
-
 #ifdef TEST_CEC
 #define CONFIG_CEC
 #endif

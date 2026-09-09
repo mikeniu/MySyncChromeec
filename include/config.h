@@ -907,7 +907,6 @@
 #define CONFIG_CMD_SYSLOCK
 #define CONFIG_CMD_SYSRST
 #undef  CONFIG_CMD_TASKREADY
-#define CONFIG_CMD_TEMP_SENSOR
 #define CONFIG_CMD_TIMERINFO
 #define CONFIG_CMD_TYPEC
 #undef  CONFIG_CMD_USART_INFO
@@ -1236,34 +1235,6 @@
 
 /* Add support for CCD factory mode */
 #undef CONFIG_FACTORY_MODE
-
-/*****************************************************************************/
-/* Number of cooling fans. Undef if none. */
-#undef CONFIG_FANS
-
-/* Percentage to which all fans are set at initiation */
-#define CONFIG_FAN_INIT_SPEED 100
-
-/* Support fan control while in low-power idle */
-#undef CONFIG_FAN_DSLEEP
-
-/*
- * Fans have non-const configuration.
- */
-#undef CONFIG_FAN_DYNAMIC
-
-/*
- * Replace the default fan_percent_to_rpm() function with a board-specific
- * implementation in board.c
- */
-#undef CONFIG_FAN_RPM_CUSTOM
-
-/*
- * We normally check and update the fans once per second (HOOK_SECOND). If this
- * is #defined to a postive integer N, we will only update the fans every N
- * seconds instead.
- */
-#undef CONFIG_FAN_UPDATE_PERIOD
 
 /*****************************************************************************/
 /* Flash configuration */
@@ -2531,93 +2502,6 @@
 #undef CONFIG_TEST_MOCK_LIST
 
 /*****************************************************************************/
-/* Temperature sensor config */
-
-/* Compile common code for temperature sensor support */
-#undef CONFIG_TEMP_SENSOR
-
-/* Support particular temperature sensor chips */
-#undef CONFIG_TEMP_SENSOR_ADT7481	/* ADT 7481 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_BD99992GW	/* BD99992GW PMIC, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_EC_ADC        /* Thermistors on EC's own ADC */
-#undef CONFIG_TEMP_SENSOR_G753		/* G753 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_G781		/* G781 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_G782		/* G782 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_SB_TSI	/* SB_TSI sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_TMP006	/* TI TMP006 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_TMP411	/* TI TMP411 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_TMP432	/* TI TMP432 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_TMP468	/* TI TMP468 sensor, on I2C bus */
-#undef CONFIG_TEMP_SENSOR_F75303	/* Fintek  F75303 sensor, on I2C bus */
-
-/* Compile common code for thermistor support */
-#undef CONFIG_THERMISTOR
-
-/* Support particular thermistors */
-#undef CONFIG_THERMISTOR_NCP15WB	/* NCP15WB thermistor */
-
-/*
- * If defined, image includes lookup tables and helper functions that convert
- * thermistor ADC readings into degrees K based off of various circuit
- * configurations.
- */
-#undef CONFIG_STEINHART_HART_3V0_22K6_47K_4050B
-#undef CONFIG_STEINHART_HART_3V3_13K7_47K_4050B
-#undef CONFIG_STEINHART_HART_3V3_51K1_47K_4050B
-#undef CONFIG_STEINHART_HART_6V0_51K1_47K_4050B
-#undef CONFIG_STEINHART_HART_3V3_30K9_47K_4050B
-
-/*
- * If defined, active-high GPIO which indicates temperature sensor chips are
- * powered.  If not defined, temperature sensors are assumed to be always
- * powered.
- */
-#undef CONFIG_TEMP_SENSOR_POWER_GPIO
-
-/* Compile common code for throttling the CPU based on the temp sensors */
-#undef CONFIG_THROTTLE_AP
-
-/*
- * Throttle the CPU when battery discharge current is too high. When
- * this feature is enabled, BAT_MAX_DISCHG_CURRENT must be defined in board.h.
- */
-#undef CONFIG_THROTTLE_AP_ON_BAT_DISCHG_CURRENT
-
-/*
- * Throttle the CPU when battery voltage drops below a defined threshold
- * where the board still boots but some components don't function perfectly.
- * When this feature is enabled, BAT_LOW_VOLTAGE_THRESH must be defined in
- * board.h.
- */
-#undef CONFIG_THROTTLE_AP_ON_BAT_VOLTAGE
-
-/*
- * If defined, dptf is enabled to manage thermals.
- *
- * NOTE: This doesn't mean that thermal control is completely taken care by
- * DPTF. We have some hybrid solutions where the EC still manages the fans.
- */
-#undef CONFIG_DPTF
-
-/*
- * If defined, this indicates to the motion lid driver that the board does not
- * have any GMR sensor and hence DPTF profile selection is required to be done
- * based on lid angle.
- */
-#undef CONFIG_DPTF_MOTION_LID_NO_GMR_SENSOR
-
-/*
- * If defined, device supports multiple DPTF profiles depending upon device mode
- * e.g. clamshell v/s 360-degree flipped mode or base detached v/s attached
- * mode.
- *
- * This config can be used by any driver that does lid angle calculation or base
- * state detection to determine if different profile numbers need to be
- * indicated to the host.
- */
-#undef CONFIG_DPTF_MULTI_PROFILE
-
-/*****************************************************************************/
 /* Touchpad config */
 
 /* Enable touchpad. (You must pick a driver from the options below.) */
@@ -3596,27 +3480,7 @@
 #define CONFIG_CRC8
 #endif /* defined(CONFIG_EXPERIMENTAL_CONSOLE) */
 
-/******************************************************************************/
-/*
- * Thermal throttling AP must have temperature sensor enabled to get
- * the temperature readings.
- */
-#if defined(CONFIG_THROTTLE_AP) && !defined(CONFIG_TEMP_SENSOR)
-#define CONFIG_TEMP_SENSOR
-#endif
 
-/******************************************************************************/
-/*
- * DPTF must have temperature sensor enabled to get the readings for
- * generating DPTF thresholds events.
- */
-#if defined(CONFIG_DPTF) && !defined(CONFIG_TEMP_SENSOR)
-#define CONFIG_TEMP_SENSOR
-#endif
-
-
-
-/******************************************************************************/
 
 
 /*****************************************************************************/
@@ -3679,12 +3543,6 @@
 	defined(CONFIG_USB_PD_DISCHARGE_TCPC) || \
 	defined(CONFIG_USB_PD_DISCHARGE_PPC)
 #define CONFIG_USB_PD_DISCHARGE
-#endif
-
-/*****************************************************************************/
-/* Define derived thermistor common path */
-#ifdef CONFIG_THERMISTOR_NCP15WB
-#define CONFIG_THERMISTOR
 #endif
 
 /*****************************************************************************/
@@ -3841,10 +3699,6 @@
 /* Note: ANX7447 is handled by its own driver, not ANX74XX. */
 #define CONFIG_USB_PD_TCPM_ANX74XX
 #endif
-
-#if defined(CONFIG_DPTF_MULTI_PROFILE) && !defined(CONFIG_DPTF)
-#error "CONFIG_DPTF_MULTI_PROFILE can be set only when CONFIG_DPTF is set."
-#endif /* CONFIG_DPTF_MULTI_PROFILE && !CONFIG_DPTF */
 
 /*
  * Define the timeout in milliseconds between when the EC receives a suspend

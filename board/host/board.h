@@ -24,15 +24,6 @@
 
 #include "gpio_signal.h"
 
-enum temp_sensor_id {
-	TEMP_SENSOR_CPU = 0,
-	TEMP_SENSOR_BOARD,
-	TEMP_SENSOR_CASE,
-	TEMP_SENSOR_BATTERY,
-
-	TEMP_SENSOR_COUNT
-};
-
 enum adc_channel {
 	ADC_CH_CHARGER_CURRENT,
 	ADC_AC_ADAPTER_ID_VOLTAGE,
