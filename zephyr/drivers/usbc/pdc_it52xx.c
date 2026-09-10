@@ -1339,12 +1339,24 @@ static enum smf_state_result st_get_cci_run(void *o)
 
 		return SMF_EVENT_HANDLED;
 	case IT52XX_CMD_ERROR:
-		LOG_ERR("ITE%d: [CCI] Error indicator", cfg->connector_number);
-		/*
-		 * The command was not successfully completed,
-		 * so set cci_event.error to 1b.
-		 */
-		data->cci_event.error = 1;
+	case IT52XX_CMD_NOT_SUPPORTED:
+	case IT52XX_CMD_NOT_SUPPORTED_ERROR:
+		if (data->cci_message.cmd_sts == IT52XX_CMD_NOT_SUPPORTED) {
+			data->cci_event.not_supported = 1;
+			data->cci_event.error = 0;
+			LOG_ERR("ITE%d: [CCI] Not-supported indicator",
+				cfg->connector_number);
+		} else if (data->cci_message.cmd_sts == IT52XX_CMD_ERROR) {
+			data->cci_event.not_supported = 0;
+			data->cci_event.error = 1;
+			LOG_ERR("ITE%d: [CCI] Error indicator",
+				cfg->connector_number);
+		} else {
+			data->cci_event.not_supported = 1;
+			data->cci_event.error = 1;
+			LOG_ERR("ITE%d: [CCI] Unrecognized command",
+				cfg->connector_number);
+		}
 		/* Command completed */
 		data->cci_event.command_completed = 1;
 		/* Clear busy event */
@@ -1353,8 +1365,8 @@ static enum smf_state_result st_get_cci_run(void *o)
 		call_cci_event_cb(data);
 
 		/*
-		 * A command error occurred, the subsystem should read
-		 * the status_register to determine the cause.
+		 * If the error indicator is set, the subsystem should read the
+		 * status register to determine the cause.
 		 *
 		 * PPM_RESET is always handled by IT5271 firmware and
 		 * [CCI] reports IT52XX_CMD_RESET_COMPLETE, as required by UCSI.

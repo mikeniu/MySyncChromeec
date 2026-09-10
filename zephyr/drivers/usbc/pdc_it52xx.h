@@ -29,8 +29,15 @@ enum it52xx_cmd_status {
 	IT52XX_CMD_ACK_COMPLETE = 0x20,
 	/** Command has completed */
 	IT52XX_CMD_DONE = 0x80,
-	/** Command completed with error. Send GET_ERROR_STATUS for details */
+	/** Recognized command is unsupported and completed without an error */
+	IT52XX_CMD_NOT_SUPPORTED = 0x82,
+	/**
+	 * Recognized command is supported and completed with an error.
+	 * Send GET_ERROR_STATUS for details.
+	 */
 	IT52XX_CMD_ERROR = 0xC0,
+	/** Unrecognized command is unsupported and completed with an error */
+	IT52XX_CMD_NOT_SUPPORTED_ERROR = 0xC2,
 };
 
 /**
