@@ -96,6 +96,7 @@ static int cm36781_get_offset(const struct motion_sensor_t *s, int16_t *offset,
 			      int16_t *temp)
 {
 	*offset = CM36781_GET_DATA(s)->offset;
+	*temp = EC_MOTION_SENSE_INVALID_CALIB_TEMP;
 	return EC_SUCCESS;
 }
 
