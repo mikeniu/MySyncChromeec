@@ -3,32 +3,39 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-"""Host console utility for HDLC multiplexed EC UART.
+"""EC Console Utility for ChromiumOS.
 
-Multiplexes interactive shell and logging over HDLC framing:
-  - HDLC_ADDR_LOG (1): Dedicated EC log channel
-  - HDLC_ADDR_SHELL (2): Interactive Zephyr shell channel
-  - HDLC_ADDR_RPC (0x52): Reserved Pigweed RPC channel
+Multiplexes and demultiplexes HDLC-encapsulated UART channels between the host
+and the Zephyr EC with a Pigweed Console (pw console) inspired user interface.
 
-Provides a PTY interface for terminal interaction and a single-command
-execution mode (-c / --command). Automatically detects and falls back to
-raw UART mode when communicating with non-HDLC DUTs or RO firmware.
+Channels:
+  - HDLC_ADDR_LOG (1): Dedicated EC log channel (formatted in table view or
+    log file).
+  - HDLC_ADDR_SHELL (2): Interactive Zephyr shell channel (routed to terminal
+    or virtual PTY).
+  - HDLC_ADDR_RPC (0x52): Reserved Pigweed RPC channel.
 """
 
+# pylint: disable=too-many-lines
+
 import argparse
+import atexit
+from dataclasses import dataclass
 import enum
 import fcntl
 import os
+from pathlib import Path
 import pty
 import re
 import select
+import signal
 import subprocess
 import sys
 import termios
 import threading
 import time
 import tty
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 import zlib
 
 
@@ -40,17 +47,35 @@ HDLC_ADDR_LOG = 1
 HDLC_ADDR_SHELL = 2
 HDLC_ADDR_RPC = 0x52
 
+_ESCAPE_BYTE = bytes([HDLC_ESCAPE])
+_FLAG_BYTE = bytes([HDLC_FLAG])
+
 _ANSI_RE = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]")
+
+# Terminal Key Escape Sequences for TUI Scrollback
+_PAGE_UP_SEQS = (b"\x1b[5~", b"\x1b[[5~", b"\x1b[5;2~", b"\x1b[5;5~")
+_PAGE_DOWN_SEQS = (b"\x1b[6~", b"\x1b[[6~", b"\x1b[6;2~", b"\x1b[6;5~")
+_LINE_UP_SEQS = (b"\x1b[1;2A", b"\x1b[1;5A", b"\x1b[1;3A", b"\x1b[a")
+_LINE_DOWN_SEQS = (b"\x1b[1;2B", b"\x1b[1;5B", b"\x1b[1;3B", b"\x1b[b")
+_TOP_SEQS = (b"\x1b[1;2H", b"\x1b[1;5H")
+_BOTTOM_SEQS = (b"\x1b[1;2F", b"\x1b[1;5F")
+_HOME_SEQS = (b"\x1b[H", b"\x1b[1~", b"\x1b[7~", b"\x1bOH")
+_END_SEQS = (b"\x1b[F", b"\x1b[4~", b"\x1b[8~", b"\x1bOF")
+_PTY_UP_SEQS = _LINE_UP_SEQS + (b"\x1b[A", b"k")
+_PTY_DOWN_SEQS = _LINE_DOWN_SEQS + (b"\x1b[B", b"j")
+_PTY_TOP_SEQS = _TOP_SEQS + _HOME_SEQS + (b"g",)
+_PTY_BOTTOM_SEQS = _BOTTOM_SEQS + _END_SEQS + (b"G",)
+_MOUSE_UP_RE = re.compile(rb"\x1b\[<64;\d+;\d+[Mm]")
+_MOUSE_DOWN_RE = re.compile(rb"\x1b\[<65;\d+;\d+[Mm]")
 _RESET_INDICATORS = (
     "Booting Zephyr",
     "*** Booting",
     "Image: RO",
-    "Jumping to image RO",
+    "Image: RW",
+    "Jumping to image",
     "Rebooting",
     "Reset cause:",
-    "ec:~>",
-    "ec:~$",
-    "ec:~#",
+    "Software sync",
 )
 
 
@@ -92,7 +117,7 @@ _KNOWN_FIRST_ADDR_BYTES = frozenset(
 
 
 def encode_ui_frame(address: int, payload: bytes) -> bytes:
-    """Encodes an Unnumbered Information (UI) HDLC frame."""
+    """Encodes an HDLC unnumbered information (UI) frame."""
     frame = encode_address(address) + bytes([_UI_CONTROL_BYTE]) + payload
     fcs = zlib.crc32(frame).to_bytes(4, "little")
     raw = frame + fcs
@@ -197,7 +222,7 @@ class HdlcDecoder:
                     self._state = DecoderState.INTERFRAME
                     return
 
-                # In raw serial, prompt or text may contain "~" (0x7E).
+                # In raw serial, prompt or text may contain '~' (0x7E).
                 # Check if header matches known HDLC channels. If not, abort raw.
                 if not self._is_hdlc_header():
                     self._state = DecoderState.INTERFRAME
@@ -267,64 +292,398 @@ class HdlcDecoder:
         self._flush_raw_buf()
 
 
+@dataclass
+class LogRecord:
+    """Structured representation of an EC or Zephyr log message."""
+
+    timestamp: str
+    level: str
+    module: str
+    message: str
+    raw: str
+
+
+class LogParser:
+    """Parses Zephyr and EC log strings into structured LogRecords."""
+
+    ZEPHYR_RE = re.compile(
+        r"^(?:\[(?P<ts>[0-9:.,]+)\]\s*)?"
+        r"\<(?P<lvl>[a-zA-Z]+)\>\s*(?P<mod>[a-zA-Z0-9_\-]+):\s*(?P<msg>.*)$"
+    )
+    EC_BRACKET_RE = re.compile(
+        r"^\[\s*(?P<ts>\d+\.\d+)\s+(?:(?P<lvl>[A-Z]{3,4}):\s*)?"
+        r"(?P<mod>[a-zA-Z0-9_\-]+)\s+(?P<msg>.*)\]$"
+    )
+    EC_GENERIC_RE = re.compile(r"^\[\s*(?P<ts>\d+\.\d+)\s+(?P<msg>.*)\]$")
+    SYS_BRACKET_RE = re.compile(
+        r"^\[(?P<msg>(?:Image|Reset|Build|Boot|Panic|Warm|Sysjump).*)\]$",
+        re.IGNORECASE,
+    )
+    BOOT_BANNER_RE = re.compile(
+        r"^(?:\*{3}\s+Booting|\-{3}\s+UART\s+initialized|Rebooting!|"
+        r"Jumping\s+to\s+image|Boot\s+Time:|Reset\s+cause:|Connecting\s+to\s+)",
+        re.IGNORECASE,
+    )
+    CRASH_LOG_RE = re.compile(
+        r"^(?:>{3}\s*ZEPHYR\s+FATAL|={3,}\s*.*(?:CRASH|PANIC|FAULT)|"
+        r"ASSERTION\s+FAIL|call\s+trace:|Faulting\s+instruction|"
+        r"Current\s+thread:|Halting\s+system|\s*[a-z0-9/]+:\s+0x[0-9a-fA-F]+)",
+        re.IGNORECASE,
+    )
+    DRIVER_LOG_RE = re.compile(
+        r"^(?:(?:Port\s+C\d|TI\d|C\d(?:\s+State)?|PPM(?:\s+driver)?|BCFG|"
+        r"PD|USB|TCPC|PPC|battery|charger|soc_[a-z0-9_]+|boot_keys|"
+        r"pdc(?:_[a-z0-9_]+)?|PDO|[VIP]):\s+|"
+        r"AP_FW\s+\d+|"
+        r"C\d(?:\s+attached|,\s*set\s+FRS)|"
+        r"PPM\s+driver\s+found|"
+        r"Querying\s+USB-C|Final\s+USB-C|Initialized\s+PPM|"
+        r"Power\s+Sequence\s+thread|Request\s+start\s+from|"
+        r"Enable\s+alternate\s+charger|Power\s+state:|power\s+state\s+\d+|"
+        r"Policy\s+\d+\s+->|host\s+sleep|Setting\s+up\s+target|"
+        r"DSP\s+Initialization|Port\s+80\s+writes|"
+        r"Command\s+0x[0-9a-fA-F]+\s+ignored|Error\s+with\s+UCSI|"
+        r"(?:LB|Lightbar)[_\s]|Failed\s+to\s+decode|.*socat\[|"
+        r"[0-9a-fA-F]{2}(?:\s+[0-9a-fA-F]{2}){3,})",
+        re.IGNORECASE,
+    )
+    TOKEN_LOG_RE = re.compile(r"^(?:`[A-Za-z0-9+/]+={0,2})+")
+    PROMPT_PREFIX_RE = re.compile(
+        r"^(?P<prompt>(?:(?:ec|uart|cros-ec|console|shell|"
+        r"[a-zA-Z0-9_\-]+(?:\([a-zA-Z0-9_]+\))?)(?:\[[a-zA-Z0-9_]+\])?[:~>]*"
+        r"[#>$]|[>#$])\s+)(?P<rest>\S.*)$"
+    )
+    SHELL_PROMPT_RE = re.compile(
+        r"^(?:(?:ec|uart|cros-ec|console|shell|"
+        r"[a-zA-Z0-9_\-]+(?:\([a-zA-Z0-9_]+\))?)(?:\[[a-zA-Z0-9_]+\])?[:~>]*"
+        r"[#>$]|[>#$])\s*$"
+    )
+
+    @classmethod
+    def parse(cls, line: str, default_module: str = "sys") -> LogRecord:
+        """Parses a log line into structured components."""
+        raw_line = line
+        line = line.strip()
+        now_str = time.strftime("%H:%M:%S")
+
+        is_isr = False
+        if line.startswith("[ISR]"):
+            is_isr = True
+            line = line[5:].lstrip()
+
+        ts = now_str
+        lvl = "INF"
+        mod = default_module
+        msg = line
+
+        if line.startswith("`"):
+            mod = "token"
+            m = cls.TOKEN_LOG_RE.match(line)
+            if m:
+                rest = line[m.end() :].lstrip()
+                if rest:
+                    sub_rec = cls.parse(rest, default_module="token")
+                    mod = sub_rec.module
+                    lvl = sub_rec.level
+                    msg = sub_rec.message
+
+        # 1. Zephyr structured log: [00:00:00.123,456] <inf> usb_pd: message
+        elif cls.ZEPHYR_RE.match(line):
+            m = cls.ZEPHYR_RE.match(line)
+            raw_ts = m.group("ts") or now_str
+            if "," in raw_ts:
+                parts = raw_ts.split(",")
+                ts = f"{parts[0]}.{parts[1][:3]}"
+            else:
+                ts = raw_ts
+            lvl = m.group("lvl").upper()[:3]
+            mod = m.group("mod")
+            msg = m.group("msg")
+        elif cls.EC_BRACKET_RE.match(line):
+            # 2. EC bracket log: [0.137115 VB Main] or [0.140045 ERR: VB fail]
+            m = cls.EC_BRACKET_RE.match(line)
+            ts = m.group("ts")
+            lvl = (m.group("lvl") or "INF").upper()[:3]
+            mod = m.group("mod")
+            msg = m.group("msg")
+            if lvl == "INF":
+                msg_upper = msg.upper()
+                if any(
+                    msg_upper.startswith(p)
+                    for p in ("FAIL", "ERR", "ERROR", "PANIC")
+                ):
+                    lvl = "ERR"
+                elif any(msg_upper.startswith(p) for p in ("WARN", "WRN")):
+                    lvl = "WRN"
+        elif cls.EC_GENERIC_RE.match(line):
+            # 3. EC generic bracket log: [0.137115 something happened]
+            m = cls.EC_GENERIC_RE.match(line)
+            ts = m.group("ts")
+            raw_msg = m.group("msg")
+            parts = raw_msg.split(None, 1)
+            mod = parts[0] if len(parts) == 2 else "ec"
+            msg = parts[1] if len(parts) == 2 else raw_msg
+        elif cls.SYS_BRACKET_RE.match(line):
+            # 4. System bracket log: [Image: RO, ...]
+            m = cls.SYS_BRACKET_RE.match(line)
+            mod = "sys"
+            msg = m.group("msg")
+        elif cls.BOOT_BANNER_RE.match(line):
+            # 5. Boot and initialization banners
+            lvl = "SYS"
+            mod = "boot"
+        elif cls.CRASH_LOG_RE.match(line):
+            # 6. Crash / Fatal logs
+            lvl = "CRT"
+            mod = "crash"
+        elif cls.DRIVER_LOG_RE.match(line):
+            # 7. Driver printks and subsystem messages
+            if ":" in line:
+                mod_cand, msg_cand = line.split(":", 1)
+                mod_str = mod_cand.strip()
+                if " " in mod_str:
+                    mod_str = mod_str.split()[0]
+                mod = mod_str[:12]
+                msg = msg_cand.strip()
+            else:
+                line_lower = line.lower()
+                if line_lower.startswith("host sleep"):
+                    mod = "power"
+                elif line_lower.startswith(
+                    ("querying usb-c", "final usb-c", "ppm")
+                ):
+                    mod = "pdc"
+                elif line_lower.startswith("port 80"):
+                    mod = "port80"
+                elif line_lower.startswith(("setting up target", "dsp")):
+                    mod = "sensor"
+                elif line_lower.startswith("error with ucsi"):
+                    mod = "ucsi"
+                elif line_lower.startswith(("lb", "lightbar")):
+                    mod = "lightbar"
+                elif line_lower.startswith("ap_fw"):
+                    mod = "ap"
+
+        if is_isr and not msg.startswith("[ISR]"):
+            msg = f"[ISR] {msg}" if msg else "[ISR]"
+
+        return LogRecord(
+            timestamp=ts, level=lvl, module=mod, message=msg, raw=raw_line
+        )
+
+    @classmethod
+    def is_log(cls, line: str) -> bool:
+        """Returns True if the line matches any known structured log pattern."""
+        s = line.strip().lstrip(
+            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0e\x0f\x1b\x7f\ufffd"
+        )
+        if s.startswith("[ISR]"):
+            s = s[5:].lstrip()
+        if s.startswith("`"):
+            return True
+        return bool(
+            cls.ZEPHYR_RE.match(s)
+            or cls.EC_BRACKET_RE.match(s)
+            or cls.EC_GENERIC_RE.match(s)
+            or cls.SYS_BRACKET_RE.match(s)
+            or cls.BOOT_BANNER_RE.match(s)
+            or cls.CRASH_LOG_RE.match(s)
+            or cls.DRIVER_LOG_RE.match(s)
+        )
+
+
 class EcConsole:
-    """Main EC console session manager."""
+    """Manages HDLC transport over UART, demuxing logs and shell."""
 
     def __init__(
         self,
         device_path: str,
         baudrate: int = 115200,
+        log_file: Optional[str] = None,
         pty_symlink: Optional[str] = None,
+        token_db: Optional[str] = None,
+        token_prefix: str = "`",
+        raw_mode: bool = False,
         mode: str = "auto",
+        log_raw_shell: bool = True,
     ):
         self.device_path = device_path
         self.baudrate = baudrate
+        self.log_file_path = log_file
         self.pty_symlink = pty_symlink
+        self.token_db = token_db
+        self.token_prefix = token_prefix
+        self.raw_mode = raw_mode
         self.mode = mode
+        self.log_raw_shell = log_raw_shell
+        self.detokenizer = None
+        self.token_info = "None"
+        if token_db:
+            self._init_detokenizer(token_db)
+
+        self.tui = None
+        self._log_buffer = ""
+        self._raw_str_buf = ""
+        self._waiting_shell_response = False
+        self._pending_echo_count = 0
+        self._log_capture_handler: Optional[Callable[[str, str], None]] = None
 
         self.uart_fd = -1
         self.pty_master_fd = -1
         self.pty_slave_fd = -1
+        self.log_fp = None
         self.running = False
 
         self.decoder = HdlcDecoder(
-            callback=self._on_frame_received,
+            self._on_frame_received,
             raw_callback=self._on_raw_data_received,
         )
-        self._raw_str_buf = ""
+
+    def _init_detokenizer(self, token_db: str):
+        """Initializes the Pigweed detokenizer with the specified database."""
+        # pylint: disable=import-outside-toplevel,import-error
+        try:
+            from pw_tokenizer import detokenize
+
+            self.detokenizer = detokenize.AutoUpdatingDetokenizer(
+                token_db, prefix=self.token_prefix
+            )
+        except ImportError:
+            try:
+                candidates = [
+                    Path(__file__).resolve().parents[3]
+                    / "third_party"
+                    / "pigweed"
+                    / "pw_tokenizer"
+                    / "py",
+                    Path(__file__).resolve().parents[2]
+                    / "third_party"
+                    / "pigweed"
+                    / "pw_tokenizer"
+                    / "py",
+                ]
+                for pw_path in candidates:
+                    if pw_path.exists():
+                        sys.path.append(str(pw_path))
+                        break
+                from pw_tokenizer import detokenize
+
+                self.detokenizer = detokenize.AutoUpdatingDetokenizer(
+                    token_db, prefix=self.token_prefix
+                )
+            except (ImportError, OSError, ValueError) as e:
+                sys.stderr.write(
+                    f"[HDLC] Warning: Failed to load detokenizer: {e}\n"
+                )
+
+        if self.detokenizer:
+            count = 0
+            if hasattr(self.detokenizer, "database"):
+                count = len(self.detokenizer.database.entries())
+            if count:
+                self.token_info = f"{count} tokens"
+            elif os.path.exists(token_db):
+                self.token_info = "Active"
+            else:
+                self.token_info = "None"
+
+    def _format_log(self, payload: Union[bytes, str]) -> str:
+        """Detokenizes or decodes a log payload."""
+        if isinstance(payload, bytes):
+            if self.detokenizer:
+                try:
+                    if (
+                        payload
+                        and payload[0] < 0x20
+                        and payload[0] not in (9, 10, 13)
+                    ):
+                        detok = self.detokenizer.detokenize(payload)
+                        if detok.ok():
+                            return str(detok)
+                except Exception:  # pylint: disable=broad-except
+                    pass
+            text = payload.decode(errors="replace")
+        else:
+            text = payload
+
+        if self.detokenizer:
+            prefix = re.escape(self.token_prefix)
+            # Remove trailing delimiter '~' attached to base64 tokens (e.g. `base64~).
+            # Avoid global .replace("~", "") which corrupts prompts like "ec:~>".
+            text = re.sub(rf"({prefix}[A-Za-z0-9+/\-_]+=*)~", r"\1", text)
+            text = str(self.detokenizer.detokenize_text(text))
+        return text
 
     def _open_uart(self):
+        # Open the UART device or PTY (O_NONBLOCK prevents hanging on physical serial DCD)
         self.uart_fd = os.open(
             self.device_path, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK
         )
-        attrs = termios.tcgetattr(self.uart_fd)
-        attrs[0] = 0
-        attrs[1] = 0
-        attrs[2] = termios.CS8 | termios.CREAD | termios.CLOCAL
-        attrs[3] = 0
-        attrs[4] = termios.B115200
-        attrs[5] = termios.B115200
-        termios.tcsetattr(self.uart_fd, termios.TCSANOW, attrs)
+        flags = fcntl.fcntl(self.uart_fd, fcntl.F_GETFL)
+        fcntl.fcntl(self.uart_fd, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
+        if os.isatty(self.uart_fd):
+            tty.setraw(self.uart_fd)
+            attr = termios.tcgetattr(self.uart_fd)
+            baud = getattr(termios, f"B{self.baudrate}", termios.B115200)
+            attr[4] = baud
+            attr[5] = baud
+            termios.tcsetattr(self.uart_fd, termios.TCSANOW, attr)
 
     def _setup_pty(self):
-        if not self.pty_symlink:
-            return
+        if self.pty_symlink:
+            self.pty_master_fd, self.pty_slave_fd = pty.openpty()
+            slave_name = os.ttyname(self.pty_slave_fd)
+            tty.setraw(self.pty_master_fd)
 
-        self.pty_master_fd, self.pty_slave_fd = pty.openpty()
-        flags = fcntl.fcntl(self.pty_master_fd, fcntl.F_GETFL)
-        fcntl.fcntl(self.pty_master_fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+            if os.path.exists(self.pty_symlink) or os.path.islink(
+                self.pty_symlink
+            ):
+                os.unlink(self.pty_symlink)
+            os.symlink(slave_name, self.pty_symlink)
 
-        pts_name = os.ttyname(self.pty_slave_fd)
-        if os.path.islink(self.pty_symlink) or os.path.exists(self.pty_symlink):
-            os.unlink(self.pty_symlink)
-        os.symlink(pts_name, self.pty_symlink)
-        print(
-            f"[HDLC] PTY forwarder created: {self.pty_symlink} -> {pts_name}",
-            file=sys.stderr,
-        )
+            if self.raw_mode or not sys.stdout.isatty():
+                print(
+                    f"[HDLC] Virtual shell PTY created at: {slave_name}",
+                    file=sys.stderr,
+                )
+                print(
+                    f"[HDLC] Symlinked to: {self.pty_symlink}",
+                    file=sys.stderr,
+                )
+
+    def _handle_log_line(self, line: str, default_module: str = "sys"):
+        """Processes and outputs a single completed log line."""
+        if self._log_capture_handler:
+            self._log_capture_handler(line, default_module)
+        record = LogParser.parse(line, default_module=default_module)
+        if self.log_fp:
+            clean_msg = strip_ansi(record.message)
+            self.log_fp.write(
+                f"{record.timestamp:>14} [{record.level:3}] "
+                f"{record.module:>10}: {clean_msg}\n"
+            )
+            self.log_fp.flush()
+        if self.running:
+            sys.stderr.write(
+                f"{record.timestamp:>14} [{record.level:3}] "
+                f"{record.module:>10}: {record.message}\n"
+            )
+            sys.stderr.flush()
+
+    def _process_log_payload(self, payload: bytes):
+        """Buffers incoming log chunks, only emitting lines on newline."""
+        log_text = self._format_log(payload)
+        self._log_buffer += log_text
+        while "\n" in self._log_buffer:
+            line, self._log_buffer = self._log_buffer.split("\n", 1)
+            if line.endswith("\r"):
+                line = line[:-1]
+            line = line.strip()
+            if line:
+                self._handle_log_line(line)
 
     def _write_shell_output(self, payload: bytes):
-        """Routes shell output to PTY master or stdout."""
+        """Routes shell output to the PTY master or stdout."""
         if self.pty_master_fd >= 0:
             os.write(self.pty_master_fd, payload)
         else:
@@ -333,63 +692,225 @@ class EcConsole:
 
     def _check_raw_mode_indicators(self, text: str):
         """Checks if received text indicates raw UART mode or reset."""
-        if self.mode == "auto" and self.decoder.hdlc_detected:
-            if any(ind in text for ind in _RESET_INDICATORS):
+        stripped = text.strip()
+        is_reset = any(ind in text for ind in _RESET_INDICATORS) or bool(
+            LogParser.BOOT_BANNER_RE.match(stripped)
+        )
+        is_prompt = bool(
+            LogParser.SHELL_PROMPT_RE.match(stripped)
+        ) or stripped.endswith((">", "$", "#"))
+        if is_reset or is_prompt:
+            if is_reset:
+                self._waiting_shell_response = False
+                self._pending_echo_count = 0
+            if self.mode == "auto" and self.decoder.hdlc_detected:
                 self.decoder.hdlc_detected = False
+                if self.tui:
+                    self.tui.set_hdlc_active(False)
 
-    def _on_raw_data_received(self, data: bytes):
-        """Handles raw bytes received outside HDLC frames."""
+    def _process_raw_text_stream(
+        self,
+        data: bytes,
+        on_shell_output: Callable[[str, bool], None],
+    ):
+        """Processes incoming raw serial text, parsing logs and routing shell text."""
         self._raw_str_buf += data.decode(errors="replace")
         self._check_raw_mode_indicators(self._raw_str_buf)
 
-        if "\n" in self._raw_str_buf:
-            lines = self._raw_str_buf.split("\n")
-            for line in lines[:-1]:
-                line = line.rstrip("\r")
-                self._check_raw_mode_indicators(line)
-                if not self.decoder.hdlc_detected:
-                    self._write_shell_output((line + "\r\n").encode())
-            self._raw_str_buf = lines[-1]
+        # Check if there is an incomplete token at the end of the buffer.
+        remaining = ""
+        to_process = self._raw_str_buf
+        if self.detokenizer:
+            prefix = re.escape(self.token_prefix)
+            m = re.search(rf"{prefix}[A-Za-z0-9+/\-_=]*$", self._raw_str_buf)
+            if m:
+                to_process = self._raw_str_buf[: m.start()]
+                remaining = self._raw_str_buf[m.start() :]
 
-        stripped = self._raw_str_buf.lstrip("\r\n")
-        if stripped and not stripped.startswith("["):
-            if self.mode == "auto" and self.decoder.hdlc_detected:
-                if (
-                    any(ind in stripped for ind in _RESET_INDICATORS)
-                    or stripped.endswith("> ")
-                    or stripped.endswith(">")
-                ):
-                    self.decoder.hdlc_detected = False
+        if to_process:
+            formatted = self._format_log(to_process)
+            self._check_raw_mode_indicators(formatted)
+            if "\n" in formatted:
+                lines = formatted.split("\n")
+                for line in lines[:-1]:
+                    line = line.rstrip("\r")
+                    self._check_raw_mode_indicators(line)
+                    if self.mode == "auto" and self.decoder.hdlc_detected:
+                        self.decoder.hdlc_detected = False
+                        if self.tui:
+                            self.tui.set_hdlc_active(False)
+
+                    # Decouple shell prompt prefix from log line if attached
+                    m = LogParser.PROMPT_PREFIX_RE.match(line)
+                    if m:
+                        prompt = m.group("prompt")
+                        rest = m.group("rest")
+                        self._waiting_shell_response = False
+                        self._pending_echo_count = 0
+                        on_shell_output(prompt, False)
+                        line = rest
+
+                    if not line:
+                        if self._waiting_shell_response:
+                            on_shell_output("", True)
+                        continue
+
+                    if LogParser.SHELL_PROMPT_RE.match(line):
+                        self._waiting_shell_response = False
+                        self._pending_echo_count = 0
+                        on_shell_output(line, False)
+                    elif LogParser.is_log(line):
+                        self._handle_log_line(line)
+                    elif self._waiting_shell_response:
+                        if self.log_raw_shell and line.strip():
+                            self._handle_log_line(line, default_module="shell")
+                        on_shell_output(line, True)
+                    else:
+                        self._handle_log_line(line, default_module="sys")
+                self._raw_str_buf = lines[-1] + remaining
+            else:
+                self._raw_str_buf = formatted + remaining
+
+        # Flush prompt or typing echo if present in remaining buffer
+        has_partial_token = bool(
+            self.detokenizer
+            and re.search(
+                rf"{re.escape(self.token_prefix)}[A-Za-z0-9+/\-_=]*$",
+                self._raw_str_buf,
+            )
+        )
+        if self._raw_str_buf and not has_partial_token:
+            if LogParser.SHELL_PROMPT_RE.match(self._raw_str_buf):
+                self._check_raw_mode_indicators(self._raw_str_buf)
+                if not self.decoder.hdlc_detected:
+                    self._waiting_shell_response = False
+                    self._pending_echo_count = 0
+                    on_shell_output(self._raw_str_buf, False)
+                    self._raw_str_buf = ""
+            elif (
+                not self._waiting_shell_response and self._raw_str_buf.isspace()
+            ):
+                if not self.decoder.hdlc_detected:
+                    on_shell_output(self._raw_str_buf, False)
+                    self._raw_str_buf = ""
+            elif self._pending_echo_count > 0:
+                if not self.decoder.hdlc_detected:
+                    on_shell_output(self._raw_str_buf, False)
+                    self._pending_echo_count = max(
+                        0, self._pending_echo_count - len(self._raw_str_buf)
+                    )
+                    self._raw_str_buf = ""
+
+    def _on_raw_data_received(self, data: bytes):
+        """Handles raw bytes received outside HDLC frames.
+
+        Used when receiving data from RO firmware or non-HDLC DUTs.
+        """
+
+        def _emit_shell(text: str, is_line: bool):
             if not self.decoder.hdlc_detected:
-                self._write_shell_output(self._raw_str_buf.encode())
-                self._raw_str_buf = ""
+                suffix = "\r\n" if is_line else ""
+                self._write_shell_output((text + suffix).encode())
+
+        self._process_raw_text_stream(data, _emit_shell)
 
     def _flush_raw_buffer_idle(self):
         """Flushes buffered raw shell text when the UART stream goes idle."""
+        if not self._raw_str_buf:
+            return
         stripped = self._raw_str_buf.lstrip("\r\n")
-        if stripped:
-            if self.mode == "auto" and self.decoder.hdlc_detected:
-                if (
-                    any(ind in stripped for ind in _RESET_INDICATORS)
-                    or stripped.endswith("> ")
-                    or stripped.endswith(">")
-                ):
-                    self.decoder.hdlc_detected = False
-            if not self.decoder.hdlc_detected and not stripped.startswith("["):
-                self._write_shell_output(self._raw_str_buf.encode())
-                self._raw_str_buf = ""
+        has_partial_token = bool(
+            self.detokenizer
+            and re.search(
+                rf"{re.escape(self.token_prefix)}[A-Za-z0-9+/\-_=]*$",
+                self._raw_str_buf,
+            )
+        )
+        if not stripped or has_partial_token:
+            return
+
+        self._check_raw_mode_indicators(stripped)
+        if self.decoder.hdlc_detected:
+            return
+
+        if LogParser.SHELL_PROMPT_RE.match(stripped):
+            self._waiting_shell_response = False
+            self._pending_echo_count = 0
+            self._write_shell_output(self._raw_str_buf.encode())
+            self._raw_str_buf = ""
+            return
+
+        m = LogParser.PROMPT_PREFIX_RE.match(stripped)
+        if m:
+            prompt = m.group("prompt")
+            rest = m.group("rest")
+            self._waiting_shell_response = False
+            self._pending_echo_count = 0
+            self._write_shell_output(prompt.encode())
+            self._raw_str_buf = ""
+            if rest:
+                if LogParser.is_log(rest):
+                    self._handle_log_line(rest)
+                else:
+                    self._handle_log_line(rest, default_module="sys")
+            return
+
+        if LogParser.is_log(stripped):
+            self._handle_log_line(stripped)
+            self._raw_str_buf = ""
+            return
+
+        if self._waiting_shell_response:
+            if self.log_raw_shell and stripped:
+                self._handle_log_line(stripped, default_module="shell")
+            self._write_shell_output(self._raw_str_buf.encode())
+        else:
+            self._handle_log_line(stripped, default_module="sys")
+        self._raw_str_buf = ""
+
+    def _flush_log_buffer(self):
+        """Flushes any remaining partial log lines in the buffers."""
+        self.decoder.flush_pending_raw()
+        if self._log_buffer:
+            line = self._log_buffer.rstrip("\r\n").strip()
+            self._log_buffer = ""
+            if line:
+                self._handle_log_line(line)
+        if self._raw_str_buf:
+            formatted = self._format_log(self._raw_str_buf)
+            self._raw_str_buf = ""
+            for line in formatted.splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                if LogParser.SHELL_PROMPT_RE.match(line):
+                    self._waiting_shell_response = False
+                    self._pending_echo_count = 0
+                    self._write_shell_output(line.encode())
+                elif LogParser.is_log(line):
+                    self._handle_log_line(line)
+                elif self._waiting_shell_response:
+                    if self.log_raw_shell and line.strip():
+                        self._handle_log_line(line, default_module="shell")
+                    self._write_shell_output((line + "\r\n").encode())
+                else:
+                    self._handle_log_line(line, default_module="sys")
 
     def _on_frame_received(self, address: int, payload: bytes):
         if self.mode != "raw":
             self.decoder.hdlc_detected = True
+            if self.tui and not self.tui.hdlc_active:
+                self.tui.set_hdlc_active(True)
         if self._raw_str_buf:
+            raw_leftover = self._raw_str_buf.strip()
             self._raw_str_buf = ""
-        if address == HDLC_ADDR_SHELL:
+            if raw_leftover:
+                formatted = self._format_log(raw_leftover)
+                self._handle_log_line(formatted)
+        if address == HDLC_ADDR_LOG:
+            self._process_log_payload(payload)
+        elif address == HDLC_ADDR_SHELL:
             self._write_shell_output(payload)
-        elif address == HDLC_ADDR_LOG:
-            msg = payload.decode(errors="replace")
-            sys.stderr.write(f"[LOG] {msg}")
-            sys.stderr.flush()
         else:
             sys.stderr.write(
                 f"[HDLC] Unhandled frame on address {hex(address)}: "
@@ -398,7 +919,13 @@ class EcConsole:
             sys.stderr.flush()
 
     def send_shell_data(self, data: bytes):
-        """Transmits shell input data over HDLC or raw UART."""
+        """Transmits shell input data over HDLC or raw UART depending on mode."""
+        if b"\r" in data or b"\n" in data:
+            self._waiting_shell_response = True
+            self._pending_echo_count = 0
+        else:
+            self._pending_echo_count += len(data)
+
         if self.mode == "raw" or (
             self.mode == "auto" and not self.decoder.hdlc_detected
         ):
@@ -408,7 +935,14 @@ class EcConsole:
             os.write(self.uart_fd, frame)
 
     def _probe_transport(self):
-        """Probes the UART to determine if HDLC or raw serial is active."""
+        """Probes the UART to determine if HDLC or raw serial is active.
+
+        Sends a plain carriage return first to check for an active raw shell.
+        If a raw response is received (or in raw mode), remains in raw mode
+        without transmitting binary HDLC frames (preventing syntax errors /
+        garbage on non-HDLC DUTs). If no raw response is received within
+        timeout, probes with an HDLC shell frame.
+        """
         if self.mode == "raw":
             self.decoder.hdlc_detected = False
             return
@@ -418,13 +952,15 @@ class EcConsole:
             os.write(self.uart_fd, encode_ui_frame(HDLC_ADDR_SHELL, b"\r"))
             return
 
-        # Auto mode: safe probe sequence
+        # Auto mode: Safe probe sequence
+        # 1. Send plain newline first to test for raw shell / non-HDLC DUT
         os.write(self.uart_fd, b"\r")
         rlist, _, _ = select.select([self.uart_fd], [], [], 0.25)
         if rlist:
             data = os.read(self.uart_fd, 512)
             if data:
                 self.decoder.process_bytes(data)
+                # Drain any immediate trailing prompt/echo bytes
                 while True:
                     drain, _, _ = select.select([self.uart_fd], [], [], 0.05)
                     if not drain:
@@ -434,9 +970,13 @@ class EcConsole:
                         break
                     self.decoder.process_bytes(more)
 
+                # If raw response received without HDLC, the DUT is non-HDLC or in RO.
+                # Stay in raw mode and do NOT send an HDLC probe.
                 if not self.decoder.hdlc_detected:
                     return
 
+        # 2. If no response to raw newline, the DUT may be running HDLC in RW
+        # (the HDLC parser ignores non-HDLC bytes). Probe with HDLC shell frame.
         if not self.decoder.hdlc_detected:
             os.write(self.uart_fd, encode_ui_frame(HDLC_ADDR_SHELL, b"\r"))
             rlist, _, _ = select.select([self.uart_fd], [], [], 0.25)
@@ -454,19 +994,23 @@ class EcConsole:
                     self.decoder.process_bytes(more)
 
     def run_interactive(self):
-        """Runs the interactive console session in terminal mode."""
+        """Runs the interactive console session."""
         self._open_uart()
         self._setup_pty()
+
+        if self.log_file_path:
+            # pylint: disable=consider-using-with
+            self.log_fp = open(self.log_file_path, "a", encoding="utf-8")
 
         self.running = True
         orig_stdin_attr = None
         use_stdin = self.pty_master_fd < 0 and sys.stdin.isatty()
         is_pty_mode = self.pty_master_fd >= 0
-
-        print(
-            "[HDLC] Console started. Press Ctrl+] to exit.",
-            file=sys.stderr,
-        )
+        if not self.raw_mode:
+            print(
+                "[HDLC] Console started. Press Ctrl+] to exit.",
+                file=sys.stderr,
+            )
 
         self._probe_transport()
 
@@ -507,13 +1051,91 @@ class EcConsole:
                     data = os.read(sys.stdin.fileno(), 256)
                     if not data:
                         break
-                    if b"\x1d" in data or b"\x1c" in data:  # Ctrl+] to exit
+                    if (
+                        b"\x1d" in data or b"\x1c" in data
+                    ):  # Ctrl+] or Ctrl+\ to exit
                         break
-                    if is_pty_mode and (b"\x03" in data or data == b"q"):
+                    if is_pty_mode and (
+                        b"\x03" in data or data == b"q"
+                    ):  # Ctrl+C or 'q' to exit in PTY mode
                         break
+                    if self.tui and b"\x0c" in data:  # Ctrl+L to redraw
+                        self.tui.redraw(clear=True)
+                        if not is_pty_mode:
+                            self.send_shell_data(b"\r")
+                        continue
+                    if self.tui and b"\x10" in data:  # Ctrl+P to toggle pause
+                        self.tui.toggle_pause()
+                        continue
+
+                    # Handle scroll keys in TUI mode
+                    if self.tui:
+                        handled = False
+                        if is_pty_mode:
+                            if data in _PTY_UP_SEQS:
+                                self.tui.scroll_up(1)
+                                handled = True
+                            elif data in _PTY_DOWN_SEQS:
+                                self.tui.scroll_down(1)
+                                handled = True
+                            elif data in _PTY_TOP_SEQS:
+                                self.tui.scroll_top()
+                                handled = True
+                            elif data in _PTY_BOTTOM_SEQS:
+                                self.tui.scroll_bottom()
+                                handled = True
+                            elif data == b" ":
+                                self.tui.scroll_down()
+                                handled = True
+
+                        if not handled:
+                            if any(s in data for s in _PAGE_UP_SEQS):
+                                self.tui.scroll_up()
+                                handled = True
+                            elif any(s in data for s in _PAGE_DOWN_SEQS):
+                                self.tui.scroll_down()
+                                handled = True
+                            elif any(s in data for s in _LINE_UP_SEQS):
+                                self.tui.scroll_up(1)
+                                handled = True
+                            elif any(s in data for s in _LINE_DOWN_SEQS):
+                                self.tui.scroll_down(1)
+                                handled = True
+                            elif any(s in data for s in _TOP_SEQS):
+                                self.tui.scroll_top()
+                                handled = True
+                            elif any(s in data for s in _BOTTOM_SEQS):
+                                self.tui.scroll_bottom()
+                                handled = True
+                            elif self.tui.is_scrolled and any(
+                                s in data for s in _END_SEQS
+                            ):
+                                self.tui.scroll_bottom()
+                                handled = True
+                            elif self.tui.is_scrolled and any(
+                                s in data for s in _HOME_SEQS
+                            ):
+                                self.tui.scroll_top()
+                                handled = True
+
+                        if not handled and self.mouse_mode:
+                            if _MOUSE_UP_RE.search(data):
+                                self.tui.scroll_up(3)
+                                handled = True
+                            elif _MOUSE_DOWN_RE.search(data):
+                                self.tui.scroll_down(3)
+                                handled = True
+                            elif data.startswith(b"\x1b[<"):
+                                handled = True
+
+                        if handled:
+                            continue
+
                     if use_stdin:
                         self.send_shell_data(data)
+
         finally:
+            self._flush_log_buffer()
             if orig_stdin_attr is not None:
                 termios.tcsetattr(
                     sys.stdin.fileno(), termios.TCSADRAIN, orig_stdin_attr
@@ -526,6 +1148,8 @@ class EcConsole:
                 os.close(self.pty_slave_fd)
             if self.pty_symlink and os.path.islink(self.pty_symlink):
                 os.unlink(self.pty_symlink)
+            if self.log_fp:
+                self.log_fp.close()
 
     def _execute_command_impl(self, command: str, timeout: float = 3.0) -> str:
         self._open_uart()
@@ -540,7 +1164,11 @@ class EcConsole:
             if self.mode != "raw":
                 self.decoder.hdlc_detected = True
             if self._raw_str_buf:
+                raw_leftover = self._raw_str_buf.strip()
                 self._raw_str_buf = ""
+                if raw_leftover:
+                    formatted = self._format_log(raw_leftover)
+                    self._handle_log_line(formatted)
             if address == HDLC_ADDR_SHELL:
                 collected.extend(payload)
                 if not is_reboot_cmd:
@@ -551,7 +1179,8 @@ class EcConsole:
                 ):
                     done.set()
             elif address == HDLC_ADDR_LOG:
-                log_text = payload.decode(errors="replace")
+                self._process_log_payload(payload)
+                log_text = self._format_log(payload)
                 if is_reboot_cmd and any(
                     ind in log_text
                     for ind in ("Booting", "Image:", "Jumping", "Reset cause:")
@@ -559,98 +1188,152 @@ class EcConsole:
                     seen_reboot_banner = True
                 collected.extend(log_text.encode())
 
-        def on_cmd_raw(data: bytes):
+        def _cmd_capture_log(line: str, _default_module: str = "sys"):
             nonlocal seen_reboot_banner
-            self._raw_str_buf += data.decode(errors="replace")
-            self._check_raw_mode_indicators(self._raw_str_buf)
+            if is_reboot_cmd:
+                if any(
+                    ind in line
+                    for ind in ("Booting", "Image:", "Jumping", "Reset cause:")
+                ):
+                    seen_reboot_banner = True
+                collected.extend((line + "\n").encode())
 
-            if "\n" in self._raw_str_buf:
-                lines = self._raw_str_buf.split("\n")
-                for line in lines[:-1]:
-                    line = line.rstrip("\r")
-                    self._check_raw_mode_indicators(line)
-                    if is_reboot_cmd and any(
-                        ind in line
+        self._log_capture_handler = _cmd_capture_log
+
+        def on_cmd_raw(data: bytes):
+            def _emit_cmd_shell(text: str, is_line: bool):
+                nonlocal seen_reboot_banner
+                if (
+                    is_line
+                    and is_reboot_cmd
+                    and any(
+                        ind in text
                         for ind in (
                             "Booting",
                             "Image:",
                             "Jumping",
                             "Reset cause:",
                         )
-                    ):
-                        seen_reboot_banner = True
-                    collected.extend((line + "\n").encode())
-                    if not is_reboot_cmd:
-                        if b":~$" in collected or b">" in collected:
-                            done.set()
-                    elif seen_reboot_banner:
-                        if b":~$" in collected or b">" in collected:
-                            done.set()
-                self._raw_str_buf = lines[-1]
+                    )
+                ):
+                    seen_reboot_banner = True
 
-            stripped = self._raw_str_buf.lstrip("\r\n")
-            if stripped and not stripped.startswith("["):
-                self._check_raw_mode_indicators(stripped)
-                if not self.decoder.hdlc_detected:
-                    collected.extend(self._raw_str_buf.encode())
-                    self._raw_str_buf = ""
-                    if not is_reboot_cmd:
-                        if b":~$" in collected or b">" in collected:
-                            done.set()
-                    elif seen_reboot_banner:
-                        if b":~$" in collected or b">" in collected:
-                            done.set()
+                suffix = "\n" if is_line else ""
+                collected.extend((text + suffix).encode())
+                if not is_reboot_cmd:
+                    if (
+                        b":~$" in collected
+                        or b">" in collected
+                        or LogParser.SHELL_PROMPT_RE.match(text)
+                    ):
+                        done.set()
+                elif seen_reboot_banner:
+                    if (
+                        b":~$" in collected
+                        or b">" in collected
+                        or LogParser.SHELL_PROMPT_RE.match(text)
+                    ):
+                        done.set()
+
+            self._process_raw_text_stream(data, _emit_cmd_shell)
 
         self.decoder = HdlcDecoder(on_cmd_frame, raw_callback=on_cmd_raw)
+
+        # Probe transport
         self._probe_transport()
 
+        # Clear any initial prompt output from waking
         collected.clear()
         done.clear()
         self._raw_str_buf = ""
+        self._waiting_shell_response = True
 
         cmd_bytes = command.encode() + b"\r"
         self.send_shell_data(cmd_bytes)
 
-        start_time = time.time()
-        while time.time() - start_time < timeout and not done.is_set():
-            rlist, _, _ = select.select([self.uart_fd], [], [], 0.1)
-            if rlist:
-                try:
-                    data = os.read(self.uart_fd, 512)
-                except OSError:
-                    time.sleep(0.05)
-                    continue
-                if data:
-                    self.decoder.process_bytes(data)
-            else:
-                self.decoder.flush_pending_raw()
+        try:
+            start_time = time.time()
+            while time.time() - start_time < timeout and not done.is_set():
+                rlist, _, _ = select.select([self.uart_fd], [], [], 0.1)
+                if rlist:
+                    try:
+                        data = os.read(self.uart_fd, 512)
+                    except OSError:
+                        time.sleep(0.05)
+                        continue
+                    if data:
+                        self.decoder.process_bytes(data)
+                else:
+                    self.decoder.flush_pending_raw()
 
-        if self._raw_str_buf:
-            for line in self._raw_str_buf.splitlines():
-                line = line.strip()
-                if line:
-                    collected.extend((line + "\n").encode())
-            self._raw_str_buf = ""
+            if self._raw_str_buf:
+                formatted = self._format_log(self._raw_str_buf)
+                self._raw_str_buf = ""
+                for line in formatted.splitlines():
+                    line = line.strip()
+                    if line:
+                        if LogParser.is_log(line):
+                            self._handle_log_line(line)
+                        else:
+                            collected.extend((line + "\n").encode())
+                            if self.log_raw_shell and self.log_fp:
+                                self._handle_log_line(
+                                    line, default_module="shell"
+                                )
 
-        os.close(self.uart_fd)
-        self.uart_fd = -1
-        return collected.decode(errors="replace")
+            self._flush_log_buffer()
+        finally:
+            self._log_capture_handler = None
+            os.close(self.uart_fd)
+            self.uart_fd = -1
+        result = collected.decode(errors="replace")
+        return self._format_log(result)
 
     def execute_command(self, command: str, timeout: float = 3.0) -> str:
-        """Executes a single shell command over HDLC or raw UART."""
+        """Executes a single shell command over HDLC or raw UART and returns output."""
+        if self.log_file_path:
+            with open(self.log_file_path, "a", encoding="utf-8") as fp:
+                self.log_fp = fp
+                try:
+                    return self._execute_command_impl(command, timeout)
+                finally:
+                    self.log_fp = None
         return self._execute_command_impl(command, timeout)
 
 
 # Backward compatibility alias
-EcConsoleInteractive = EcConsole
+HdlcConsole = EcConsole
+
+
+def get_default_ec_dir() -> Path:
+    """Returns the EC repository root directory."""
+    if "EC_DIR" in os.environ:
+        return Path(os.environ["EC_DIR"])
+    return Path(__file__).resolve().parent.parent
+
+
+def get_default_token_db() -> str:
+    """Returns default token database path (${EC_DIR}/build/tokens.bin or zephyr database.bin)."""
+    ec_dir = get_default_ec_dir()
+    tokens_bin = ec_dir / "build" / "tokens.bin"
+    candidates = []
+    if tokens_bin.is_file():
+        candidates.append(tokens_bin)
+    candidates.extend(ec_dir.glob("build/zephyr/*/output/database.bin"))
+    if candidates:
+        latest = max(candidates, key=lambda p: p.stat().st_mtime)
+        return str(latest)
+    return str(tokens_bin)
 
 
 def query_default_device() -> str:
-    """Queries servod via dut-control for active EC UART pty."""
-    for ctrl in ("raw_ec_uart_pty", "ec_uart_pty"):
+    """Queries dut-control for the EC UART PTY (preferring raw_ec_uart_pty)."""
+    last_err = ""
+    for control in ("raw_ec_uart_pty", "ec_uart_pty"):
+        cmd = ["dut-control", "--", control, "-o"]
         try:
             res = subprocess.run(
-                ["dut-control", "--", ctrl],
+                cmd,
                 capture_output=True,
                 text=True,
                 check=True,
@@ -664,25 +1347,36 @@ def query_default_device() -> str:
                 "dut-control not found. Ensure dut-control is in PATH, "
                 "or specify --device / -d explicitly."
             ) from e
-        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            err_output = (
+                getattr(e, "stderr", "") or getattr(e, "stdout", "") or str(e)
+            )
+            last_err = err_output.strip()
             continue
 
     raise RuntimeError(
-        "Could not determine EC UART pty from servod. Ensure servod is "
-        "running, or specify --device / -d explicitly."
+        f"Failed to query dut-control for EC UART PTY ({last_err}). "
+        "Ensure servod is running, or specify --device / -d explicitly."
     )
 
 
 class ServoInterpManager:
-    """Manages servod ec3po interpreter state during ec_console runs."""
+    """Manages servod ec3po interpreter connection state to prevent conflicts.
 
-    def __init__(self, device: Optional[str] = None, enabled: bool = True):
-        self.device = device
+    When ec_ec3po_interp_connect is 'on', servod's ec3po interpreter reads from
+    raw_ec_uart_pty, causing byte-stealing and interfering with HDLC framing.
+    This manager temporarily turns it 'off' while ec_console.py is active,
+    and restores it to 'on' upon exit.
+    """
+
+    def __init__(self, enabled: bool = True, device: Optional[str] = None):
         self.enabled = enabled
+        self.device = device
         self.needs_restore = False
+        self._registered = False
 
-    def disconnect(self):
-        """Disconnects ec3po interpreter if needed."""
+    def setup(self):
+        """Checks if ec3po interpreter is active and disconnects it."""
         if not self.enabled:
             return
 
@@ -705,6 +1399,8 @@ class ServoInterpManager:
             ec_pty = controls.get("ec_uart_pty", "").strip()
             status = controls.get("ec_ec3po_interp_connect", "").strip().lower()
 
+            # If device is explicitly ec_uart_pty (ec3po's own output PTY),
+            # do not disconnect ec3po, otherwise ec_uart_pty would receive no data!
             if self.device and self.device == ec_pty:
                 if status == "off":
                     subprocess.run(
@@ -731,14 +1427,15 @@ class ServoInterpManager:
                         "(ec_ec3po_interp_connect:off)\n"
                     )
                     sys.stderr.flush()
+                    self._register_cleanup()
         except (subprocess.SubprocessError, FileNotFoundError, OSError):
             pass
 
     def restore(self):
-        """Restores ec3po interpreter connection if previously disconnected."""
-        if not self.enabled or not self.needs_restore:
+        """Restores ec_ec3po_interp_connect to 'on' if it was disconnected."""
+        if not self.needs_restore:
             return
-
+        self.needs_restore = False
         try:
             res = subprocess.run(
                 ["dut-control", "--", "ec_ec3po_interp_connect:on"],
@@ -753,74 +1450,140 @@ class ServoInterpManager:
                     "(ec_ec3po_interp_connect:on)\n"
                 )
                 sys.stderr.flush()
-                self.needs_restore = False
         except (subprocess.SubprocessError, FileNotFoundError, OSError):
             pass
 
+    def _register_cleanup(self):
+        if self._registered:
+            return
+        self._registered = True
+        atexit.register(self.restore)
+
+        def _sig_handler(signum, _frame):
+            self.restore()
+            sys.exit(128 + signum)
+
+        for sig in (signal.SIGTERM, signal.SIGHUP):
+            try:
+                signal.signal(sig, _sig_handler)
+            except (ValueError, OSError):
+                pass
+
 
 def main():
-    """Main entry point for ec_console."""
+    """Main entry point for EC console utility."""
+    default_token_db = get_default_token_db()
     parser = argparse.ArgumentParser(
-        description="Host console utility for HDLC multiplexed EC UART."
+        description="EC Console Utility for ChromiumOS",
     )
     parser.add_argument(
         "-d",
         "--device",
-        help="Serial device path (default: queried via dut-control)",
+        default=None,
+        help=(
+            "Path to UART device or PTY (default: query "
+            "'dut-control -- raw_ec_uart_pty -o')"
+        ),
     )
     parser.add_argument(
         "-b",
         "--baudrate",
         type=int,
         default=115200,
-        help="UART baudrate (default: 115200)",
+        help="Baud rate (default: 115200)",
     )
     parser.add_argument(
         "-m",
         "--mode",
         choices=["auto", "hdlc", "raw"],
         default="auto",
-        help="Transport mode (default: auto)",
+        help=(
+            "Framing protocol mode: 'auto' (detect HDLC or fallback to raw), "
+            "'hdlc' (force HDLC framing), or 'raw' (unframed raw serial) "
+            "(default: auto)"
+        ),
     )
     parser.add_argument(
         "-p",
         "--pty",
-        help="Symlink path for PTY forwarder (e.g. /tmp/ec_uart_pty)",
+        help="Create a virtual unencapsulated shell PTY symlinked at this path",
+    )
+    parser.add_argument(
+        "-l",
+        "--log-file",
+        help="Path to file to write received EC log lines to",
+    )
+    parser.add_argument(
+        "-t",
+        "--token-db",
+        default=default_token_db,
+        help=(
+            f"Path to Pigweed token database to detokenize logs "
+            f"(default: {default_token_db})"
+        ),
+    )
+    parser.add_argument(
+        "--token-prefix",
+        default="`",
+        help="Prefix character for tokenized messages (default: '`')",
     )
     parser.add_argument(
         "-c",
         "--command",
-        help="Execute a single command on EC shell and print output, then exit",
+        help="Send a single shell command and exit after printing response",
+    )
+    parser.add_argument(
+        "--raw",
+        action="store_true",
+        help="Disable interactive split TUI and stream logs in raw mode",
+    )
+    parser.add_argument(
+        "--no-raw-shell-logs",
+        dest="log_raw_shell",
+        action="store_false",
+        default=True,
+        help="Do not log raw UART shell responses under Device Logs",
     )
     parser.add_argument(
         "--no-interp-control",
         action="store_true",
-        help="Do not manage ec_ec3po_interp_connect via dut-control",
+        help=(
+            "Disable automatic disconnect and restoration of servod's "
+            "ec_ec3po_interp_connect"
+        ),
     )
 
     args = parser.parse_args()
 
     device = args.device
     if not device:
-        device = query_default_device()
+        try:
+            device = query_default_device()
+        except RuntimeError as e:
+            parser.error(str(e))
 
     interp_mgr = ServoInterpManager(
-        device=device, enabled=not args.no_interp_control
+        enabled=not args.no_interp_control,
+        device=device,
     )
-    interp_mgr.disconnect()
+    interp_mgr.setup()
 
     try:
         console = EcConsole(
             device_path=device,
             baudrate=args.baudrate,
+            log_file=args.log_file,
             pty_symlink=args.pty,
+            token_db=args.token_db if args.token_db else None,
+            token_prefix=args.token_prefix,
+            raw_mode=args.raw,
             mode=args.mode,
+            log_raw_shell=args.log_raw_shell,
         )
 
         if args.command is not None:
             output = console.execute_command(args.command)
-            sys.stdout.write(output)
-            sys.stdout.flush()
+            print(output)
         else:
             console.run_interactive()
     finally:
