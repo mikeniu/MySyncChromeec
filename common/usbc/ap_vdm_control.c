@@ -119,6 +119,17 @@ void ap_vdm_attention_enqueue(int port, int length, uint32_t *buf)
 	struct attention_queue_entry new_entry;
 
 	/*
+	 * Validate length against the attention buffer size.
+	 * PD_HEADER_CNT is a 3-bit field (max 7) but the spec limits
+	 * Attention to at most PD_ATTENTION_MAX_VDO data objects.
+	 * Clamp to prevent stack buffer overflow from malformed messages.
+	 */
+	if (length > PD_ATTENTION_MAX_VDO) {
+		CPRINTS("C%d: Attention with %d VDOs, clamping", port, length);
+		length = PD_ATTENTION_MAX_VDO;
+	}
+
+	/*
 	 * Process HPD from the message if we're configured
 	 * Note: the IRQ toggles are time critical and should be done before
 	 * sending the VDM to the queue
@@ -157,6 +168,11 @@ static uint8_t ap_vdm_attention_pop(int port, uint32_t *buf,
 				  &popped_entry);
 
 		length = popped_entry.objects;
+		if (length > PD_ATTENTION_MAX_VDO) {
+			CPRINTS("C%d: Attention pop with %d VDOs, clamping",
+				port, length);
+			length = PD_ATTENTION_MAX_VDO;
+		}
 		memcpy(buf, popped_entry.attention, length * sizeof(buf[0]));
 	}
 	*items_left = queue_count(&ap_storage[port].attention_queue);
