@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97fe9027_5a5e3f6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5156336
+      },
+      "writtenOn": "2026-09-10T21:49:19Z",
+      "side": 1,
+      "message": "Gyroscope",
+      "revId": "58dbb5069867cf8c4c36f6faf1df53c5d238ab57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
