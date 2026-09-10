@@ -62,7 +62,6 @@ export STATIC_VERSION
 #    a ccache issue.
 
 # commands to build all targets
-cmd_exe = $(CXX) $(ro-objs) $(HOST_TEST_LDFLAGS) $(LDFLAGS_EXTRA) -o $@
 cmd_c_to_o = $(CC) -std=gnu11 $(C_WARN) $(C_WARN-$(CROSS_COMPILE_CC_NAME)) \
 		$(CFLAGS) -MMD -MP -MF $@.d -c $< \
 		-MT $(@D)/$(@F) -o $(@D)/$(@F)
@@ -77,13 +76,6 @@ cmd_cxx_to_host = $(HOSTCXX) $(HOST_CXXFLAGS) \
 		-MMD -MP -MF $@.d -MT $@ -o $@ \
 		$(sort $(foreach c,$($(*F)-objs),util/$(c:%.o=%.cc)) $(wildcard $*.cc)) $(HOST_LDFLAGS)
 cmd_o_to_a = $(AR) rcs $@ $^
-cmd_host_test = $(MAKE) BOARD=host PROJECT=$* \
-	V=$(V) out=build/host/$* TEST_BUILD=y EMU_BUILD=y \
-	$(if $(TEST_SCRIPT),TEST_SCRIPT=$(TEST_SCRIPT)) $(TEST_FLAG) \
-	build/host/$*/$*.exe
-cmd_coverage_test = $(subst build/host,build/coverage,$(cmd_host_test))
-cmd_run_host_test = ./util/run_host_test $* $(silent)
-cmd_run_coverage_test = ./util/run_host_test --coverage $* $(silent)
 # generate new version.h, compare if it changed and replace if so
 cmd_version = ./util/getversion.sh > $@.tmp && \
 	cmp -s $@.tmp $@ && rm -f $@.tmp || mv $@.tmp $@
@@ -92,7 +84,6 @@ cmd_copyrw-y = cd $(out) && cp RW/$(PROJECT).RW.flat RW/$(PROJECT).RW.bin
 
 cmd_cp_script = cp "$<" "$@" && chmod +x "$@"
 cmd_symlink_hdr = mkdir -p $(@D) && ln -srf $< $@
-
 # If outputing to tty and column command exists, pipe into column.
 # Otherwise, print in newline format.
 cmd_pretty_print_cmd = @$(1) \
@@ -172,63 +163,6 @@ print-tests:
 	$(call cmd_pretty_print_list, \
 		$(sort $(test-targets)))
 
-# Emulator test executables
-host-test-targets=$(foreach t,$(test-list-host),host-$(t))
-run-test-targets=$(foreach t,$(test-list-host),run-$(t))
-.PHONY: $(host-test-targets) $(run-test-targets)
-
-$(host-test-targets): host-%: | $(FAILED_BOARDS_DIR)
-	@touch $(FAILED_BOARDS_DIR)/test-$*
-	+$(call quiet,host_test,BUILD  )
-
-$(run-test-targets): run-%: host-%
-	$(call quiet,run_host_test,TEST   )
-	@rm -f $(FAILED_BOARDS_DIR)/test-$*
-
-host-coverage-targets=$(foreach t,$(test-list-host),host-coverage-$(t))
-run-coverage-targets=$(foreach t,$(test-list-host),run-coverage-$(t))
-.PHONY: $(host-coverage-targets) $(run-coverage-targets)
-
-$(host-coverage-targets): host-coverage-%: | $(FAILED_BOARDS_DIR)
-	@touch $(FAILED_BOARDS_DIR)/test-$*
-	+$(call quiet,coverage_test,BUILD  )
-
-$(run-coverage-targets): run-coverage-%: host-coverage-%
-	$(call quiet,run_coverage_test,TEST   )
-	@rm -f $(FAILED_BOARDS_DIR)/test-$*
-
-.PHONY: print-host-tests
-print-host-tests:
-	$(call cmd_pretty_print_list, \
-		$(sort $(host-test-targets) $(run-test-targets)))
-
-$(FAILED_BOARDS_DIR):
-	@mkdir $(FAILED_BOARDS_DIR)
-
-cov-test-targets=$(foreach t,$(cov-test-list-host),build/coverage/$(t).info)
-bldversion=$(shell (./util/getversion.sh ; echo VERSION) | $(CPP) -P -)
-
-cmd_lcov=lcov --rc branch_coverage=1 --gcov-tool \
-	$(HOSTGCOV) -q -o $@ -c -d build/coverage/$* -t $* \
-	--exclude '*/ec/test/*' --exclude '*/ec/include/tests/*' \
-	--exclude '*/ec/board/host/*' --exclude '*/ec/chip/host/*' \
-	--exclude '*/ec/core/host/*' --exclude '*/ec/include/mock/*' \
-	--exclude '*/ec/include/test_util.h' --exclude '*_test.c' \
-	--exclude '*_test.cc' --exclude '*_test.h' \
-	--ignore-errors gcov,inconsistent,empty,mismatch,unused,negative,count
-cmd_merge_cov=lcov --ignore-errors missing,empty \
-	--rc branch_coverage=1 -o build/coverage/lcov.info \
-	$(foreach info,$^,-a ${info})
-
-.DELETE_ON_ERROR: build/coverage/%.info
-build/coverage/%.info: run-coverage-%
-	$(call quiet,lcov,COV    )
-
-.PHONY: test-coverage
-test-coverage: TEST_FLAG=TEST_COVERAGE=y
-test-coverage: $(cov-test-targets)
-	$(call quiet,merge_cov,MERGE  )
-
 $(out)/%.bin: $(out)/%.obj
 	$(call quiet,obj_to_bin,OBJCOPY)
 	$(call quiet,copyrw-y,COPY_RW)
@@ -238,14 +172,6 @@ flat-y := $(out)/RW/$(PROJECT).RW.flat
 flat-$(CONFIG_FW_INCLUDE_RO) += $(out)/RO/$(PROJECT).RO.flat
 
 flat-$(CONFIG_DRAM_BASE) += $(out)/RW/$(PROJECT).RW.flat.dram
-
-ifneq ($(TEST_SCRIPT),)
-$(out)/$(PROJECT).exe: test/$(TEST_SCRIPT) | $(ro-objs)
-	$(call quiet,cp_script,CP     )
-else
-$(out)/$(PROJECT).exe: $(ro-objs)
-	$(call quiet,exe,EXE    )
-endif
 
 $(out)/RO/%.o.cmd:%.c
 	$(file > $@,$(subst .o.cmd,.o,$(cmd_c_to_o)))
@@ -344,13 +270,11 @@ help:
 	@echo "  proj-<boardname>     - Build a single board (similar to 'all BOARD=boardname')"
 	@echo ""
 	@echo "  tests [BOARD=]       - Build all on-device unit tests for a specific board"
-	@echo "  test-coverage        - Build and run all host unit tests for code coverage"
 	@echo ""
 	@echo "  BOARD=host utils-host        - Build EC host utilities"
 	@echo "  BOARD=host utils-test        - Build and run EC host utility unit tests"
 	@echo ""
 	@echo "  print-tests     [BOARD=]     - Print on-device test targets"
-	@echo "  print-host-tests             - Print all host unit test targets"
 	@echo ""
 	@echo "Common Variables:"
 	@echo "  V=1                  - Show make output"
