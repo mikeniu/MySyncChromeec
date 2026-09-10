@@ -31,6 +31,8 @@ enum it52xx_cmd_status {
 	IT52XX_CMD_DONE = 0x80,
 	/** Command completed with error. Send GET_ERROR_STATUS for details */
 	IT52XX_CMD_ERROR = 0xC0,
+	/** Command is unsupported and completed with error */
+	IT52XX_CMD_NOT_SUPPORTED_ERROR = 0xC2,
 };
 
 /**

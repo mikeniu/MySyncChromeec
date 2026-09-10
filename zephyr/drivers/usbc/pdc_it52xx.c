@@ -1339,12 +1339,15 @@ static enum smf_state_result st_get_cci_run(void *o)
 
 		return SMF_EVENT_HANDLED;
 	case IT52XX_CMD_ERROR:
+	case IT52XX_CMD_NOT_SUPPORTED_ERROR:
 		LOG_ERR("ITE%d: [CCI] Error indicator", cfg->connector_number);
 		/*
 		 * The command was not successfully completed,
 		 * so set cci_event.error to 1b.
 		 */
 		data->cci_event.error = 1;
+		data->cci_event.not_supported = data->cci_message.cmd_sts ==
+						IT52XX_CMD_NOT_SUPPORTED_ERROR;
 		/* Command completed */
 		data->cci_event.command_completed = 1;
 		/* Clear busy event */
