@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7896bb7_0765d103",
+        "filename": "zephyr/program/atria/atriarvp-rtk/project.conf",
+        "patchSetId": 11
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-10T17:17:45Z",
+      "side": 1,
+      "message": "Nit for followup CL: Based on the preceding comment, I initially thought that this section was all about sending sensor status _from_ the ISH _to_ the EC via DSP comms. But after the change to the ISH GPIO config, the following items seem to actually be about sending data from the EC to the ISH. I think the comment might be able to make that more clear.",
+      "revId": "ba354c47b33b18f122b66400f7010522392d4895",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
