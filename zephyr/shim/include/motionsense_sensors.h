@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_MOTIONSENSE_SENSORS_H
-#define __CROS_EC_MOTIONSENSE_SENSORS_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_MOTIONSENSE_SENSORS_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_MOTIONSENSE_SENSORS_H_
 
 #include "motion_sense.h"
 #include "motionsense_sensors_defs.h"
@@ -92,4 +92,4 @@ void motion_sense_set_on_body_sensor_index(int idx);
 }
 #endif
 
-#endif /* __CROS_EC_MOTIONSENSE_SENSORS_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_MOTIONSENSE_SENSORS_H_ */

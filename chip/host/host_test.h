@@ -5,8 +5,8 @@
 
 /* Unit testing for Chrome EC */
 
-#ifndef __CROS_EC_HOST_TEST_H
-#define __CROS_EC_HOST_TEST_H
+#ifndef PLATFORM_EC_CHIP_HOST_HOST_TEST_H_
+#define PLATFORM_EC_CHIP_HOST_HOST_TEST_H_
 
 /* Emulator exit codes */
 #define EXIT_CODE_HIBERNATE BIT(7)
@@ -14,4 +14,4 @@
 /* Get emulator executable name */
 const char *__get_prog_name(void);
 
-#endif /* __CROS_EC_HOST_TEST_H */
+#endif /* PLATFORM_EC_CHIP_HOST_HOST_TEST_H_ */

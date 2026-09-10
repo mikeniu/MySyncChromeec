@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_COMMON_USB_PD_PDO_H
-#define __CROS_EC_COMMON_USB_PD_PDO_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_PDO_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_PDO_H_
 
 /* ---------------- Power Data Objects (PDOs) ----------------- */
 #ifndef CONFIG_USB_PD_CUSTOM_PDO
@@ -16,4 +16,4 @@ extern const uint32_t pd_snk_pdo[3];
 extern const int pd_snk_pdo_cnt;
 #endif /* CONFIG_USB_PD_CUSTOM_PDO */
 
-#endif /* __CROS_EC_COMMON_USB_PD_PDO_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_PDO_H_ */

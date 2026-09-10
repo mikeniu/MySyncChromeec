@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_LIS2DW12_H_
-#define ZEPHYR_INCLUDE_EMUL_EMUL_LIS2DW12_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LIS2DW12_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LIS2DW12_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c_emul.h>
@@ -97,4 +97,4 @@ void lis2dw12_emul_clear_accel_reading(const struct emul *emul);
 struct i2c_common_emul_data *
 emul_lis2dw12_get_i2c_common_data(const struct emul *emul);
 
-#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_LIS2DW12_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LIS2DW12_H_ */

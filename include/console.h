@@ -5,8 +5,8 @@
 
 /* Debug console for Chrome EC */
 
-#ifndef __CROS_EC_CONSOLE_H
-#define __CROS_EC_CONSOLE_H
+#ifndef PLATFORM_EC_INCLUDE_CONSOLE_H_
+#define PLATFORM_EC_INCLUDE_CONSOLE_H_
 
 #include "common.h"
 #include "config.h"
@@ -316,4 +316,4 @@ void console_has_input(void);
 }
 #endif
 
-#endif /* __CROS_EC_CONSOLE_H */
+#endif /* PLATFORM_EC_INCLUDE_CONSOLE_H_ */

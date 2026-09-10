@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_POWER_MT8186_H_
-#define __CROS_EC_POWER_MT8186_H_
+#ifndef PLATFORM_EC_INCLUDE_POWER_MT8186_H_
+#define PLATFORM_EC_INCLUDE_POWER_MT8186_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -16,4 +16,4 @@ board_handle_host_sleep_event(enum host_sleep_event state);
 __override_proto void board_handle_sleep_hang(enum sleep_hang_type hang_type);
 #endif
 
-#endif /* __CROS_EC_POWER_MT8186_H_ */
+#endif /* PLATFORM_EC_INCLUDE_POWER_MT8186_H_ */

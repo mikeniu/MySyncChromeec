@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_USBC_OCP_H
-#define __CROS_EC_USBC_OCP_H
+#ifndef PLATFORM_EC_INCLUDE_USBC_OCP_H_
+#define PLATFORM_EC_INCLUDE_USBC_OCP_H_
 
 #include "common.h"
 
@@ -81,4 +81,4 @@ __override_proto void board_overcurrent_event(int port, int is_overcurrented);
 }
 #endif
 
-#endif /* !defined(__CROS_EC_USBC_OCP_H) */
+#endif /* PLATFORM_EC_INCLUDE_USBC_OCP_H_ */

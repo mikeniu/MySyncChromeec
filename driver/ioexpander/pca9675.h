@@ -5,8 +5,8 @@
  * NXP PCA9675PW I/O Port expander driver header
  */
 
-#ifndef __CROS_EC_IOEXPANDER_PCA9675_H
-#define __CROS_EC_IOEXPANDER_PCA9675_H
+#ifndef PLATFORM_EC_DRIVER_IOEXPANDER_PCA9675_H_
+#define PLATFORM_EC_DRIVER_IOEXPANDER_PCA9675_H_
 
 /* PCA9675 IO pins that can be referenced in gpio.inc */
 enum pca9675_io_pins {
@@ -36,4 +36,4 @@ enum pca9675_io_pins {
 
 extern const struct ioexpander_drv pca9675_ioexpander_drv;
 
-#endif /* __CROS_EC_IOEXPANDER_PCA9675_H */
+#endif /* PLATFORM_EC_DRIVER_IOEXPANDER_PCA9675_H_ */

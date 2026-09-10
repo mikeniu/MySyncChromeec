@@ -5,8 +5,8 @@
 
 /* Header for motion_sense.c */
 
-#ifndef __CROS_EC_MOTION_SENSE_H
-#define __CROS_EC_MOTION_SENSE_H
+#ifndef PLATFORM_EC_INCLUDE_MOTION_SENSE_H_
+#define PLATFORM_EC_INCLUDE_MOTION_SENSE_H_
 
 #include "accelgyro.h"
 #include "atomic.h"
@@ -399,4 +399,4 @@ enum sensor_config motion_sense_get_ec_config(void);
 #include "motionsense_sensors.h"
 #endif
 
-#endif /* __CROS_EC_MOTION_SENSE_H */
+#endif /* PLATFORM_EC_INCLUDE_MOTION_SENSE_H_ */

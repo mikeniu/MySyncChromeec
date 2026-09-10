@@ -5,8 +5,8 @@
 
 /* ITE PD INTC control module */
 
-#ifndef __CROS_EC_ITE_PD_INTC_H
-#define __CROS_EC_ITE_PD_INTC_H
+#ifndef PLATFORM_EC_DRIVER_TCPM_ITE_PD_INTC_H_
+#define PLATFORM_EC_DRIVER_TCPM_ITE_PD_INTC_H_
 
 /**
  * ITE embedded PD interrupt routine
@@ -19,4 +19,4 @@
  */
 void chip_pd_irq(enum usbpd_port port);
 
-#endif /* __CROS_EC_ITE_PD_INTC_H */
+#endif /* PLATFORM_EC_DRIVER_TCPM_ITE_PD_INTC_H_ */

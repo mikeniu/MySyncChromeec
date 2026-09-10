@@ -5,8 +5,8 @@
  * MAX6958/MAX6959 7-Segment LED Display Driver header
  */
 
-#ifndef __CROS_EC_MAX656X_H
-#define __CROS_EC_MAX656X_H
+#ifndef PLATFORM_EC_DRIVER_LED_MAX695X_H_
+#define PLATFORM_EC_DRIVER_LED_MAX695X_H_
 
 /* I2C interface */
 #define MAX695X_I2C_ADDR1_FLAGS 0x38
@@ -41,4 +41,4 @@
 #define MAX695X_DIGIT2_ADDR 0x22
 #define MAX695X_DIGIT3_ADDR 0x23
 
-#endif /* __CROS_EC_MAX656X_H */
+#endif /* PLATFORM_EC_DRIVER_LED_MAX695X_H_ */

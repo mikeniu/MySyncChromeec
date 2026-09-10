@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_RETAINED_MEM_BBRAM_H
-#define __CROS_EC_RETAINED_MEM_BBRAM_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_RETAINED_MEM_BBRAM_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_RETAINED_MEM_BBRAM_H_
 
 #include <zephyr/device.h>
 #include <zephyr/toolchain.h>
@@ -52,4 +52,4 @@ int retained_mem_bbram_init(const struct device *dev);
 }
 #endif
 
-#endif /* __CROS_EC_RETAINED_MEM_BBRAM_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_RETAINED_MEM_BBRAM_H_ */

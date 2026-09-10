@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_EVENT_LOG_H
-#define __CROS_EC_EVENT_LOG_H
+#ifndef PLATFORM_EC_INCLUDE_EVENT_LOG_H_
+#define PLATFORM_EC_INCLUDE_EVENT_LOG_H_
 
 #include <stdint.h>
 
@@ -47,4 +47,4 @@ int log_dequeue_event(struct event_log_entry *r);
 }
 #endif
 
-#endif /* __CROS_EC_EVENT_LOG_H */
+#endif /* PLATFORM_EC_INCLUDE_EVENT_LOG_H_ */
