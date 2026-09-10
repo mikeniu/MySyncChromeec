@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9aa4bc44_021ac841",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 8635,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-09-10T06:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed20309b_f6ddf379",
+      "revId": "37863163e71ce50daec2946b4e62095b8cbd3b49",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ddd263ba_20fb004f",
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d3e6cb25_c4c794c4",
+        "filename": "util/ectool_usb/ectool.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 634,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-09-10T06:02:34Z",
+      "side": 1,
+      "message": "This is unrelated to adding the pattern2 test; there were some issues when testing with `python3 ectool.py fpmode mode_capture constant`, but that should be fixed in another CL.",
+      "parentUuid": "ddd263ba_20fb004f",
+      "revId": "37863163e71ce50daec2946b4e62095b8cbd3b49",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1f9445d7_075cf646",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
         "patchSetId": 6
@@ -48,6 +84,24 @@
       "writtenOn": "2026-09-09T12:14:30Z",
       "side": 1,
       "message": "Is finger really needed here?",
+      "revId": "37863163e71ce50daec2946b4e62095b8cbd3b49",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce3e5915_624be538",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-09-10T06:02:34Z",
+      "side": 1,
+      "message": "fixed, it\u0027s not really needed here.",
+      "parentUuid": "1f9445d7_075cf646",
       "revId": "37863163e71ce50daec2946b4e62095b8cbd3b49",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
