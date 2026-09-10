@@ -52,6 +52,25 @@
       "parentUuid": "0e1b84a9_f6503b47",
       "revId": "d75cee4ddf838da76a4e17ac24fda41677d3931d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "974c5807_4bd7b268",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-10T19:38:38Z",
+      "side": 1,
+      "message": "Opened b/559709343 to track adding upstream per-version host command handler support, and added a TODO(b/559709343) comment above SMALLEST_TYPE in include/host_command.h.",
+      "parentUuid": "07005c9e_3153a9b1",
+      "isAi": true,
+      "revId": "d75cee4ddf838da76a4e17ac24fda41677d3931d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
