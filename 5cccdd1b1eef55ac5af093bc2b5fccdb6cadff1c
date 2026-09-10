@@ -22,6 +22,30 @@
       },
       "revId": "5cccdd1b1eef55ac5af093bc2b5fccdb6cadff1c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67297f7c_17f1f8d7",
+        "filename": "include/config.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1963,
+      "author": {
+        "id": 4845415
+      },
+      "writtenOn": "2026-09-10T12:59:27Z",
+      "side": 1,
+      "message": "automatic checks were complaining as those detected `CONFIG_LPC` as a new flag (what is false). Not needed so removed.",
+      "parentUuid": "5d200e72_51dc039d",
+      "range": {
+        "startLine": 1962,
+        "startChar": 0,
+        "endLine": 1963,
+        "endChar": 17
+      },
+      "revId": "5cccdd1b1eef55ac5af093bc2b5fccdb6cadff1c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
