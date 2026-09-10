@@ -93,6 +93,30 @@
       },
       "revId": "8e8bfc6f572a2cf55d4be0dfe0ec68f11fdaeba2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df1e38db_c5e4ac92",
+        "filename": "board/hyperdebug/board_util.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T23:47:11Z",
+      "side": 1,
+      "message": "cros lint said it was missing.",
+      "parentUuid": "7532da17_44c4bd13",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 0
+      },
+      "revId": "8e8bfc6f572a2cf55d4be0dfe0ec68f11fdaeba2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
