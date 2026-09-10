@@ -6,8 +6,8 @@
 
 /* This file defines the UART console application operations. */
 
-#ifndef __UTIL_UUT_OPR_H
-#define __UTIL_UUT_OPR_H
+#ifndef PLATFORM_EC_UTIL_UUT_OPR_H_
+#define PLATFORM_EC_UTIL_UUT_OPR_H_
 
 /*---------------------------------------------------------------------------
  * Constant definitions
@@ -56,4 +56,4 @@ void opr_execute_exit(uint32_t addr);
 bool opr_execute_return(uint32_t addr);
 bool opr_scan_baudrate(void);
 enum sync_result opr_check_sync(uint32_t baudrate);
-#endif /* __UTIL_UUT_OPR_H */
+#endif /* PLATFORM_EC_UTIL_UUT_OPR_H_ */

@@ -7,8 +7,8 @@
  * Public functions, definitions, and structures.
  */
 
-#ifndef __CROS_EC_USB_RETIMER_ANX7483_PUBLIC_H
-#define __CROS_EC_USB_RETIMER_ANX7483_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_RETIMER_ANX7483_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_RETIMER_ANX7483_PUBLIC_H_
 
 #include "usb_mux.h"
 
@@ -81,4 +81,4 @@ extern const struct usb_mux_driver anx7483_usb_retimer_driver;
 }
 #endif
 
-#endif /* __CROS_EC_USB_RETIMER_ANX7483_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_RETIMER_ANX7483_PUBLIC_H_ */

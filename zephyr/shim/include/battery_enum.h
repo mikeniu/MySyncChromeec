@@ -3,10 +3,14 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CONFIG_CHIP_H
+#if !defined(__CROS_EC_CONFIG_CHIP_H) || \
+	defined(PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_BATTERY_ENUM_H_)
 #error "This file must only be included from config_chip.h and it should be" \
 	"included in all zephyr builds automatically"
 #endif
+
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_BATTERY_ENUM_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_BATTERY_ENUM_H_
 
 #define BATTERY_ENUM(val) DT_CAT(BATTERY_, val)
 #define BATTERY_TYPE(id) BATTERY_ENUM(DT_STRING_UPPER_TOKEN(id, enum_name))
@@ -27,3 +31,4 @@ enum battery_type {
 #if DT_NODE_EXISTS(DT_NODELABEL(default_battery_3s))
 extern const enum battery_type DEFAULT_BATTERY_TYPE_3S;
 #endif
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_BATTERY_ENUM_H_ */

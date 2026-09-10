@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FLASH_CHIP_H
-#define __CROS_EC_FLASH_CHIP_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_CHIP_EGIS_INCLUDE_FLASH_CHIP_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_CHIP_EGIS_INCLUDE_FLASH_CHIP_H_
 
 /* The flash chip can differ per project. Use P25Q16 as a default option. */
 #define CONFIG_SPI_FLASH_P25Q16
@@ -30,4 +30,4 @@
  */
 #define CONFIG_FLASH_BANK_SIZE 4096
 
-#endif /* __CROS_EC_FLASH_CHIP_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_CHIP_EGIS_INCLUDE_FLASH_CHIP_H_ */

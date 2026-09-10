@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EGIS_BEP_BIO_ALG_H__
-#define __EGIS_BEP_BIO_ALG_H__
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_FINGERPRINT_ALG_EGIS_BEP_BIO_ALG_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_FINGERPRINT_ALG_EGIS_BEP_BIO_ALG_H_
 
 #include "common.h"
 
@@ -137,4 +137,4 @@ bio_enrollment_get_percent_complete(bio_enrollment_t enrollment);
 __staticlib int bio_enrollment_finish(bio_enrollment_t enrollment,
 				      bio_template_t *templ);
 
-#endif /* __EGIS_BEP_BIO_ALG_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_FINGERPRINT_ALG_EGIS_BEP_BIO_ALG_H_ */

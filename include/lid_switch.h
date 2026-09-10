@@ -5,8 +5,8 @@
 
 /* Lid switch API for Chrome EC */
 
-#ifndef __CROS_EC_LID_SWITCH_H
-#define __CROS_EC_LID_SWITCH_H
+#ifndef PLATFORM_EC_INCLUDE_LID_SWITCH_H_
+#define PLATFORM_EC_INCLUDE_LID_SWITCH_H_
 
 #include "common.h"
 #include "stdbool.h"
@@ -40,4 +40,4 @@ void enable_lid_detect(bool enable);
 }
 #endif
 
-#endif /* __CROS_EC_LID_SWITCH_H */
+#endif /* PLATFORM_EC_INCLUDE_LID_SWITCH_H_ */

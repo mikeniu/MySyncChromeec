@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ZEPHYR_WP_EXTERNAL_H
-#define __CROS_EC_ZEPHYR_WP_EXTERNAL_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_WP_EXTERNAL_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_WP_EXTERNAL_H_
 
 #include <stdbool.h>
 
@@ -19,4 +19,4 @@ void disable_write_protect_external(void);
 }
 #endif
 
-#endif /* __CROS_EC_ZEPHYR_WP_EXTERNAL_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_WP_EXTERNAL_H_ */

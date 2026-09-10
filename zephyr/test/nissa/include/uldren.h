@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_NISSA_INCLUDE_ULDREN_H_
-#define ZEPHYR_TEST_NISSA_INCLUDE_ULDREN_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_ULDREN_H_
+#define PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_ULDREN_H_
 
 #include "ec_commands.h"
 
@@ -16,4 +16,4 @@ void motionsense_init(void);
 
 extern enum uldren_sub_board_type uldren_cached_sub_board;
 
-#endif /* ZEPHYR_TEST_NISSA_INCLUDE_ULDREN_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_ULDREN_H_ */

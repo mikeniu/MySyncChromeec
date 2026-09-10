@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_ELAN80SERIES_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_ELAN80SERIES_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_H_
 
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/spi.h>
@@ -27,4 +27,5 @@ struct elan80series_data {
 	uint16_t errors;
 };
 
-#endif /* ZEPHYR_DRIVERS_FINGERPRINT_ELAN80SERIES_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_H_ \
+	*/

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef _HECI_SYSTEM_STATE_H_
-#define _HECI_SYSTEM_STATE_H_
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_HOST_SERVICE_HECI_HECI_SYSTEM_STATE_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_HOST_SERVICE_HECI_HECI_SYSTEM_STATE_H_
 
 #include "heci_internal.h"
 
@@ -21,4 +21,4 @@
  */
 void heci_handle_system_state_msg(uint8_t *msg, const size_t length);
 
-#endif /* _HECI_SYSTEM_STATE_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_HOST_SERVICE_HECI_HECI_SYSTEM_STATE_H_ */

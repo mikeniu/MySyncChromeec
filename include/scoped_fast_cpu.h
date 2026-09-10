@@ -5,8 +5,8 @@
 
 /* A class to scope the range of boosting CPU. */
 
-#ifndef __CROS_EC_SCOPED_FAST_CPU_H
-#define __CROS_EC_SCOPED_FAST_CPU_H
+#ifndef PLATFORM_EC_INCLUDE_SCOPED_FAST_CPU_H_
+#define PLATFORM_EC_INCLUDE_SCOPED_FAST_CPU_H_
 
 #include "clock.h"
 
@@ -33,4 +33,4 @@ class ScopedFastCpu {
 	static inline int current_state_;
 };
 
-#endif /* __CROS_EC_SCOPED_FAST_CPU_H */
+#endif /* PLATFORM_EC_INCLUDE_SCOPED_FAST_CPU_H_ */
