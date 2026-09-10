@@ -16,6 +16,24 @@
       "message": "@jbettis@chromium.org\nHow are you going to test this change and make sure nothing will break?",
       "revId": "8e8bfc6f572a2cf55d4be0dfe0ec68f11fdaeba2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ef304fa_98e21a81",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-10T21:11:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/591ab3d4-e0f9-456e-87a1-0bfc33f9e4af)]\n\n**Review Summary**\n* **Functionality**: This CL is an automated refactor to standardize C/C++ include guards across the codebase (removing the `__` prefix). No operational logic was modified, so functionality remains unchanged.\n* **Security**: No security risks or vulnerabilities were introduced; changes are strictly preprocessor directives.\n* **Style**: The new `PLATFORM_EC_...` include guards are applied consistently across all files, adhering to standard C/C++ style by avoiding reserved `__` prefixes.\n* **Testing \u0026 Test Coverage**: As an automated script-based refactoring of header guards, this does not require new test coverage.\n* **CL Size \u0026 Scope**: While the CL is large in terms of files modified, it strictly contains a single automated refactoring task, which aligns with guidelines for self-contained mechanical changes.",
+      "isAi": true,
+      "revId": "8e8bfc6f572a2cf55d4be0dfe0ec68f11fdaeba2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
