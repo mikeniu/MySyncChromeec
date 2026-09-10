@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "369cb18e_f0f557b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-10T21:17:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/e814d586-eb52-43b8-b93a-1faee79631c2)]\n\n### Review Summary\n\n*   **Functionality**: The script logic generally works well and accurately detects various styles of existing header guards. However, there is a critical index-shifting bug when removing `#pragma once` that could result in the script modifying or deleting the wrong lines. See inline comments.\n*   **Security**: No security issues found. Using `subprocess.run` with checked arguments for `git` is safe in this context.\n*   **Style**: The Python code adheres well to standard style guidelines and uses appropriate type hints and docstrings.\n*   **Testing \u0026 Test Coverage**: Excellent unit test coverage for various edge cases (internal `#endif`, missing guards, precondition checks). I recommend adding a test case where a file contains both `#pragma once` and `#ifndef` to catch the line-shifting bug.\n*   **CL Size \u0026 Scope**: The CL size is appropriate and self-contained (one script and its corresponding test file).",
+      "isAi": true,
+      "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "441cae21_55c3d199",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-10T21:17:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Edge Case**: If a line starts with a block comment but also contains code (e.g., `/* comment */ #include \u003cfoo.h\u003e`), the script will treat the entire line as a comment because it matches `stripped.startswith(\"/*\")`, potentially inserting the header guard after it.\n\nConsider using your existing `strip_comments()` function here to check if the line contains any code, similar to how it is used in `has_non_comment_lines()`. In fact, the entire `while` loop could be simplified to:\n\n```python\n    while idx \u003c n:\n        code, in_block_comment \u003d strip_comments(lines[idx], in_block_comment)\n        if code:\n            break\n        idx +\u003d 1\n        last_comment_or_blank_idx \u003d idx\n```",
+      "isAi": true,
+      "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41acc7d5_e8f277be",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-10T21:17:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Logic / Intent**: `#pragma once` removal is currently inside this `else` block. If a file already has valid header guards (`top_clean` and `bottom_clean` are both true) but also contains `#pragma once` inside the guards, the `#pragma once` will not be removed.\n\nIf the intent is to remove `#pragma once` from all files regardless of their current guard status, consider moving the `#pragma once` removal to the beginning of the function (before calling `find_header_guard_bounds`).",
+      "isAi": true,
+      "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38f4c727_495f790a",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-10T21:17:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Bug**: Removing `#pragma once` modifies the `lines` list on line 503, which means `ifndef_idx` and `define_idx` (computed earlier on line 445) may no longer point to the correct lines if the `#pragma once` appeared before them.\n\nThis will cause the regex replacements on lines 510-515 or the deletions on lines 525-526 to target the wrong lines, potentially corrupting the file.\n\nConsider re-running `find_header_guard_bounds` (and potentially re-evaluating `top_clean`) after removing any `#pragma once` directives to ensure the indices are accurate.",
+      "isAi": true,
+      "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
