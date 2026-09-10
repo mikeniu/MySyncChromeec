@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20e228ba_3a616e36",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-10T23:11:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `m_def.group(1)` will never be empty here because the regular expression on line 288 (`r\"^\\s*#\\s*define\\s+([A-Za-z0-9_]+)\"`) uses `+`, which requires at least one character to match. You can safely remove the `or not m_def.group(1)` condition.",
+      "isAi": true,
+      "revId": "f148f0f98ec9bcf174727c952a957a9f081e1c7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
