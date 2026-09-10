@@ -3,7 +3,10 @@ common:
   - native_sim
 tests:
   pdc.driver.it52xx:
-    build_only: true
+    timeout: 30
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_IT52XX=y
+    - CONFIG_TEST_SKIP_EC_APP_MAIN=y
     extra_dtc_overlay_files:
     - "./boards/it52xx.overlay"
 
