@@ -43,6 +43,7 @@ LOG_MODULE_REGISTER(ite_it52xx_emul);
 #define IT52XX_CONTROL_MAX_LENGTH 10
 /* Include a one-byte count and four bytes of data */
 #define IT52XX_CCI_LENGTH 5
+#define IT52XX_GET_ERROR_STATUS_LENGTH 16
 #define IT52XX_GET_PDC_INFO_LENGTH 29
 #define IT52XX_ALERT_UCSI BIT(1)
 
@@ -50,6 +51,7 @@ LOG_MODULE_REGISTER(ite_it52xx_emul);
 #define IT52XX_UCSI_PPM_RESET 0x01
 #define IT52XX_UCSI_ACK_CC_CI 0x04
 #define IT52XX_UCSI_SET_NOTIFICATION_ENABLE 0x05
+#define IT52XX_UCSI_GET_ERROR_STATUS 0x13
 #define IT52XX_UCSI_VENDOR_DEFINED 0x20
 
 #define IT52XX_VENDOR_ID 0x048d
@@ -81,6 +83,7 @@ struct it52xx_emul_data {
 	bool notification_enable_seen;
 	bool get_pdc_info_seen;
 	union notification_enable_t notification_enable;
+	union error_status_t error_status;
 	struct pdc_info_t info;
 };
 
@@ -344,6 +347,7 @@ static int it52xx_emul_ppm_reset(struct it52xx_emul_data *data)
 	union cci_event_t cci = { .reset_completed = 1 };
 
 	data->notification_enable.raw_value = 0;
+	data->error_status.raw_value = 0;
 	data->lpm_state = IT52XX_EMUL_LPM_IDLE_0;
 	data->ppm_reset_seen = true;
 	data->notification_enable_seen = false;
@@ -412,8 +416,38 @@ static int it52xx_emul_get_pdc_info(struct it52xx_emul_data *data)
 				 (data->request[4] >> 7);
 	int rv;
 
-	if (connector != 1 || vendor_command != 0) {
-		return -EINVAL;
+	/* IT5271 accepts only connector number 1 */
+	if (connector != 1) {
+		union cci_event_t error_cci = {
+			.error = 1,
+			.command_completed = 1,
+		};
+		union error_status_t error = {
+			.non_existent_connector_number = 1,
+		};
+
+		/* IT5271 replaces the stored error when a command reports an
+		 * error. */
+		data->error_status = error;
+		return it52xx_emul_send_command_result(data, error_cci, NULL,
+						       0);
+	}
+
+	/* IT5271 supports only vendor command 0 */
+	if (vendor_command != 0) {
+		union cci_event_t error_cci = {
+			.error = 1,
+			.command_completed = 1,
+		};
+		union error_status_t error = {
+			.invalid_command_specific_param = 1,
+		};
+
+		/* IT5271 replaces the stored error when a command reports an
+		 * error. */
+		data->error_status = error;
+		return it52xx_emul_send_command_result(data, error_cci, NULL,
+						       0);
 	}
 
 	it52xx_emul_build_info_response(data, response);
@@ -421,6 +455,45 @@ static int it52xx_emul_get_pdc_info(struct it52xx_emul_data *data)
 					     sizeof(response));
 	if (rv == 0) {
 		data->get_pdc_info_seen = true;
+	}
+
+	return rv;
+}
+
+static int it52xx_emul_get_error_status(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = { .command_completed = 1 };
+	uint8_t response[IT52XX_GET_ERROR_STATUS_LENGTH] = { 0 };
+	uint16_t error_status;
+	int rv;
+
+	/* IT5271 accepts only connector number 1 */
+	if ((data->request[4] & 0x7f) != 1) {
+		union cci_event_t error_cci = {
+			.error = 1,
+			.command_completed = 1,
+		};
+		union error_status_t error = {
+			.non_existent_connector_number = 1,
+		};
+
+		/* IT5271 replaces the stored error when a command reports an
+		 * error. */
+		data->error_status = error;
+		return it52xx_emul_send_command_result(data, error_cci, NULL,
+						       0);
+	}
+
+	error_status = data->error_status.raw_value & GENMASK(14, 0);
+	/* IT5271 supports error-status from bit0 to bit14. */
+	response[0] = error_status;
+	response[1] = error_status >> 8;
+
+	rv = it52xx_emul_send_command_result(data, cci, response,
+					     sizeof(response));
+	if (rv == 0) {
+		/* IT5271 clears error information while processing command */
+		data->error_status.raw_value = 0;
 	}
 
 	return rv;
@@ -455,10 +528,25 @@ static int it52xx_emul_process_idle_1(struct it52xx_emul_data *data,
 		return it52xx_emul_set_notification_enable(data);
 	case IT52XX_UCSI_ACK_CC_CI:
 		return it52xx_emul_ack_cc_ci(data);
+	case IT52XX_UCSI_GET_ERROR_STATUS:
+		return it52xx_emul_get_error_status(data);
 	case IT52XX_UCSI_VENDOR_DEFINED:
 		return it52xx_emul_get_pdc_info(data);
-	default:
-		return -EINVAL;
+	default: {
+		union cci_event_t cci = {
+			.not_supported = 1,
+			.error = 1,
+			.command_completed = 1,
+		};
+		union error_status_t error = {
+			.unrecognized_command = 1,
+		};
+
+		/* IT5271 replaces the stored error when a command reports an
+		 * error. */
+		data->error_status = error;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
 	}
 }
 
@@ -510,6 +598,7 @@ static void it52xx_emul_reset_data(struct it52xx_emul_data *data)
 	memset(data->msgin, 0, sizeof(data->msgin));
 	data->msgin_length = 0;
 	data->notification_enable.raw_value = 0;
+	data->error_status.raw_value = 0;
 	data->lpm_state = IT52XX_EMUL_LPM_IDLE_0;
 	data->ppm_reset_seen = false;
 	data->notification_enable_seen = false;
@@ -523,6 +612,23 @@ static int emul_it52xx_reset(const struct emul *emul)
 	it52xx_emul_reset_data(data);
 
 	return it52xx_emul_set_irq(data, false);
+}
+
+static int
+emul_it52xx_set_error_status(const struct emul *emul,
+			     const union error_status_t *error_status)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (error_status == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	data->error_status = *error_status;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
 }
 
 static int emul_it52xx_set_info(const struct emul *emul,
@@ -639,6 +745,7 @@ static int it52xx_emul_init(const struct emul *emul,
 
 static DEVICE_API(emul_pdc, emul_it52xx_api) = {
 	.reset = emul_it52xx_reset,
+	.set_error_status = emul_it52xx_set_error_status,
 	.set_info = emul_it52xx_set_info,
 	.idle_wait = emul_it52xx_idle_wait,
 };
