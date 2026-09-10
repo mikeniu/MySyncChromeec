@@ -19,6 +19,43 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40f48b85_15f20bba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T22:58:01Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "369cb18e_f0f557b8",
+      "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6cb600b_f0fbb9fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T22:58:01Z",
+      "side": 1,
+      "message": "Addressed all review comments: simplified find_guard_insertion_index() using strip_comments(), moved #pragma once removal to the beginning of fix_header_guard() to eliminate the index-shifting bug, and added 3 unit tests covering mixed comment/code lines and #pragma once with existing guards.",
+      "parentUuid": "369cb18e_f0f557b8",
+      "isAi": true,
+      "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "441cae21_55c3d199",
@@ -32,6 +69,25 @@
       "writtenOn": "2026-09-10T21:17:06Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Edge Case**: If a line starts with a block comment but also contains code (e.g., `/* comment */ #include \u003cfoo.h\u003e`), the script will treat the entire line as a comment because it matches `stripped.startswith(\"/*\")`, potentially inserting the header guard after it.\n\nConsider using your existing `strip_comments()` function here to check if the line contains any code, similar to how it is used in `has_non_comment_lines()`. In fact, the entire `while` loop could be simplified to:\n\n```python\n    while idx \u003c n:\n        code, in_block_comment \u003d strip_comments(lines[idx], in_block_comment)\n        if code:\n            break\n        idx +\u003d 1\n        last_comment_or_blank_idx \u003d idx\n```",
+      "isAi": true,
+      "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9541bed0_f6f9ef52",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T22:58:01Z",
+      "side": 1,
+      "message": "Done. Simplified the loop to use strip_comments() so lines with mixed comments and code immediately break and receive the guard before them. Added test_mixed_comment_and_code_on_first_line.",
+      "parentUuid": "441cae21_55c3d199",
       "isAi": true,
       "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -55,6 +111,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "469a177a_e56a12eb",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T22:58:01Z",
+      "side": 1,
+      "message": "Done. Moved #pragma once removal to the beginning of fix_header_guard() before find_header_guard_bounds(), so it is removed regardless of existing guard status. Added test_pragma_once_inside_existing_guard.",
+      "parentUuid": "41acc7d5_e8f277be",
+      "isAi": true,
+      "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38f4c727_495f790a",
@@ -68,6 +143,25 @@
       "writtenOn": "2026-09-10T21:17:06Z",
       "side": 1,
       "message": "[Gerrit AI Review] **Bug**: Removing `#pragma once` modifies the `lines` list on line 503, which means `ifndef_idx` and `define_idx` (computed earlier on line 445) may no longer point to the correct lines if the `#pragma once` appeared before them.\n\nThis will cause the regex replacements on lines 510-515 or the deletions on lines 525-526 to target the wrong lines, potentially corrupting the file.\n\nConsider re-running `find_header_guard_bounds` (and potentially re-evaluating `top_clean`) after removing any `#pragma once` directives to ensure the indices are accurate.",
+      "isAi": true,
+      "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39e01e85_c4a9562a",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T22:58:01Z",
+      "side": 1,
+      "message": "Done. Stripping #pragma once before calculating bounds ensures all indices are accurate with no index shifting. Added test_pragma_once_with_existing_guard.",
+      "parentUuid": "38f4c727_495f790a",
       "isAi": true,
       "revId": "f8c4bf9113acfa9c7be5928d682461fedd794f1a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
