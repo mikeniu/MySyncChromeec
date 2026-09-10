@@ -347,7 +347,7 @@ fifo_stage_unit(struct ec_response_motion_sensor_data *data,
  */
 static void fifo_stage_timestamp(uint32_t timestamp, uint8_t sensor_num)
 {
-	struct ec_response_motion_sensor_data vector;
+	struct ec_response_motion_sensor_data vector = { 0 };
 
 	vector.flags = MOTIONSENSE_SENSOR_FLAG_TIMESTAMP;
 	vector.timestamp = timestamp;
@@ -411,7 +411,7 @@ void motion_sense_fifo_reset_needed_flags(void)
 void motion_sense_fifo_insert_async_event(struct motion_sensor_t *sensor,
 					  enum motion_sense_async_event event)
 {
-	struct ec_response_motion_sensor_data vector;
+	struct ec_response_motion_sensor_data vector = { 0 };
 
 	vector.flags = event;
 	vector.timestamp = __hw_clock_source_read();
