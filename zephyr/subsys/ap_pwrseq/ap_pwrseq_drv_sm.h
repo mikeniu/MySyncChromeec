@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef _AP_PWRSEQ_INT_SM_H_
-#define _AP_PWRSEQ_INT_SM_H_
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_AP_PWRSEQ_DRV_SM_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_AP_PWRSEQ_DRV_SM_H_
 #include "ap_power/ap_pwrseq.h"
 
 #include <zephyr/kernel/thread.h>
@@ -68,4 +68,4 @@ int ap_pwrseq_sm_run_state(void *const data, uint32_t events);
  * @retval AP_POWER_STATE_UNDEF If state machine has not been initialized.
  **/
 enum ap_pwrseq_state ap_pwrseq_sm_get_cur_state(void *const data);
-#endif /* _AP_PWRSEQ_INT_SM_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_AP_PWRSEQ_DRV_SM_H_ */

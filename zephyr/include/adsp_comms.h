@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ADSP_COMMS_H
-#define __CROS_EC_ADSP_COMMS_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_ADSP_COMMS_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_ADSP_COMMS_H_
 
 #include "charge_manager.h"
 
@@ -79,4 +79,4 @@ struct adsp_comms_callback {
 }
 #endif
 
-#endif /* __CROS_EC_ADSP_COMMS_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_ADSP_COMMS_H_ */

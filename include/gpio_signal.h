@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_GPIO_SIGNAL_H
-#define __CROS_EC_GPIO_SIGNAL_H
+#ifndef PLATFORM_EC_INCLUDE_GPIO_SIGNAL_H_
+#define PLATFORM_EC_INCLUDE_GPIO_SIGNAL_H_
 
 #include "compile_time_macros.h"
 
@@ -62,4 +62,4 @@ BUILD_ASSERT(IOEX_SIGNAL_END < IOEX_LIMIT);
 
 #endif /* !CONFIG_ZEPHYR */
 
-#endif /* __CROS_EC_GPIO_SIGNAL_H */
+#endif /* PLATFORM_EC_INCLUDE_GPIO_SIGNAL_H_ */

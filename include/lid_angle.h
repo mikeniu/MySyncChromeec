@@ -5,8 +5,8 @@
 
 /* Lid angle module for Chrome EC */
 
-#ifndef __CROS_EC_LID_ANGLE_H
-#define __CROS_EC_LID_ANGLE_H
+#ifndef PLATFORM_EC_INCLUDE_LID_ANGLE_H_
+#define PLATFORM_EC_INCLUDE_LID_ANGLE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,4 +40,4 @@ __override_proto void lid_angle_peripheral_enable(int enable);
 }
 #endif
 
-#endif /* __CROS_EC_LID_ANGLE_H */
+#endif /* PLATFORM_EC_INCLUDE_LID_ANGLE_H_ */

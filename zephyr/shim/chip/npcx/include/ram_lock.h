@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_RAM_LOCK_H_
-#define __CROS_EC_RAM_LOCK_H_
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_RAM_LOCK_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_RAM_LOCK_H_
 
 enum mpu_region {
 	REGION_DATA_RAM = 0, /* For internal data RAM */
@@ -23,4 +23,4 @@ enum mpu_region {
 
 int ram_lock_config_lock_region(uint8_t region, uint32_t addr, uint32_t size);
 
-#endif // __CROS_EC_RAM_LOCK_H_
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_RAM_LOCK_H_ */

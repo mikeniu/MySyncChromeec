@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_KEYBOARD_BACKLIGHT_H
-#define __CROS_EC_KEYBOARD_BACKLIGHT_H
+#ifndef PLATFORM_EC_INCLUDE_KEYBOARD_BACKLIGHT_H_
+#define PLATFORM_EC_INCLUDE_KEYBOARD_BACKLIGHT_H_
 
 /**
  * If GPIO_EN_KEYBOARD_BACKLIGHT is defined, this GPIO will be set when
@@ -100,4 +100,4 @@ extern const struct kblight_drv kblight_pwm;
 uint8_t kblight_get_current_enable(void);
 #endif /* TEST_BUILD */
 
-#endif /* __CROS_EC_KEYBOARD_BACKLIGHT_H */
+#endif /* PLATFORM_EC_INCLUDE_KEYBOARD_BACKLIGHT_H_ */

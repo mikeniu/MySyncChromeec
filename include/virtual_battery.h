@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_VIRTUAL_BATTERY_H
-#define __CROS_EC_VIRTUAL_BATTERY_H
+#ifndef PLATFORM_EC_INCLUDE_VIRTUAL_BATTERY_H_
+#define PLATFORM_EC_INCLUDE_VIRTUAL_BATTERY_H_
 
 #if defined(CONFIG_I2C_VIRTUAL_BATTERY) && defined(CONFIG_BATTERY_SMART) && \
 	!defined(VIRTUAL_BATTERY_ADDR_FLAGS)
@@ -29,4 +29,4 @@ int virtual_battery_handler(struct i2c_battery_parser_state *state,
 			    int *err_code, int xferflags, int read_len,
 			    int write_len, const uint8_t *out);
 
-#endif /* __CROS_EC_VIRTUAL_BATTERY_H */
+#endif /* PLATFORM_EC_INCLUDE_VIRTUAL_BATTERY_H_ */

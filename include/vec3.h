@@ -4,8 +4,8 @@
  */
 
 /* Header file for common math functions. */
-#ifndef __CROS_EC_VEC_3_H
-#define __CROS_EC_VEC_3_H
+#ifndef PLATFORM_EC_INCLUDE_VEC3_H_
+#define PLATFORM_EC_INCLUDE_VEC3_H_
 
 #include "math_util.h"
 
@@ -88,4 +88,4 @@ fp_t fpv3_norm(const fpv3_t v);
 }
 #endif
 
-#endif /* __CROS_EC_VEC_3_H */
+#endif /* PLATFORM_EC_INCLUDE_VEC3_H_ */

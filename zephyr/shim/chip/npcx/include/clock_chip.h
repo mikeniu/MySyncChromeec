@@ -3,12 +3,12 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CLOCK_CHIP_H
-#define __CROS_EC_CLOCK_CHIP_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_CLOCK_CHIP_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_CLOCK_CHIP_H_
 
 /**
  * TODO(b:180112248) implement in zephyr's clock_control.h
  */
 void clock_turbo(void);
 
-#endif /* __CROS_EC_CLOCK_CHIP_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_CLOCK_CHIP_H_ */
