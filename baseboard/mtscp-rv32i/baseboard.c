@@ -34,7 +34,7 @@ struct mpu_entry mpu_entries[NR_MPU_ENTRIES] = {
 	{ CONFIG_DRAM_BASE, DRAM_NC_BASE,
 	  MPU_ATTR_C | MPU_ATTR_W | MPU_ATTR_R },
 	{ DRAM_NC_BASE, (unsigned int)KERNEL_BASE + (unsigned int)KERNEL_SIZE,
-	  MPU_ATTR_W | MPU_ATTR_R },
+	  MPU_ATTR_W | MPU_ATTR_R | MPU_ATTR_C },
 #else
 	{ 0x10000000, 0x11400000, MPU_ATTR_W | MPU_ATTR_R },
 #endif
