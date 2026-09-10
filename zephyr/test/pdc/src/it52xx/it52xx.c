@@ -28,6 +28,7 @@ static const struct device *dev2 = DEVICE_DT_GET(IT52XX_NODE2);
 #define PDC_COMMAND_COMPLETE BIT(0)
 #define PDC_OPERATION_TIMEOUT K_SECONDS(2)
 #define IT52XX_GET_ERROR_STATUS_DATA_LENGTH 16
+#define IT52XX_GET_CONNECTOR_STATUS_DATA_LENGTH sizeof(union connector_status_t)
 
 static K_EVENT_DEFINE(pdc_event);
 static atomic_t waiting_for_command_response;
@@ -155,6 +156,19 @@ static void read_error_status(const struct emul *target,
 	zassert_equal(actual.raw_value, expected->raw_value);
 }
 
+static void read_connector_status(const struct emul *target,
+				  const struct device *pdc,
+				  const union connector_status_t *expected)
+{
+	union connector_status_t actual = { 0 };
+
+	prepare_for_command();
+	zassert_ok(pdc_get_connector_status(pdc, &actual));
+	wait_for_command(target, pdc, IT52XX_GET_CONNECTOR_STATUS_DATA_LENGTH);
+	zassert_mem_equal(actual.raw_value, expected->raw_value,
+			  sizeof(actual.raw_value));
+}
+
 static void *it52xx_setup(void)
 {
 	zassert_true(device_is_ready(dev));
@@ -278,6 +292,104 @@ ZTEST(it52xx, test_invalid_vendor_parameters_report_cci_error)
 					command_specific, NULL, &cc_callback));
 	wait_for_command_result(emul, dev, 0, true, false);
 	read_error_status(emul, dev, &invalid_command);
+}
+
+ZTEST(it52xx, test_get_connector_status)
+{
+	union connector_status_t first = { 0 };
+	union connector_status_t second = { 0 };
+	union connector_status_t first_after_read;
+	union connector_status_t second_after_read;
+
+	/* Set different connector status bits for two emulators */
+	first.raw_conn_status_change_bits =
+		UCSI_CHANGE_BITS_EXTERNAL_SUPPLY_CHANGE |
+		UCSI_CHANGE_BITS_CONNECTOR_PARTNER |
+		UCSI_CHANGE_BITS_CONNECT_CHANGE;
+	first.power_operation_mode = PD_OPERATION;
+	first.connect_status = 1;
+	first.power_direction = 0;
+	first.conn_partner_flags = CONNECTOR_PARTNER_FLAG_USB;
+	first.conn_partner_type = DFP_ATTACHED;
+	first.rdo = 0x12345678;
+	first.battery_charging_cap_status = 1;
+	first.bcd_pd_version = 0x0300;
+	first.orientation = 1;
+	first.sink_path_status = 1;
+	first.power_reading_ready = 1;
+	first.current_scale = 1;
+	first.peak_current = 600;
+	first.average_current = 500;
+	first.voltage_scale = 10;
+	first.voltage_reading = 100;
+
+	second.raw_conn_status_change_bits =
+		UCSI_CHANGE_BITS_PWR_OPERATION_MODE |
+		UCSI_CHANGE_BITS_PWR_DIRECTION |
+		UCSI_CHANGE_BITS_SINK_PATH_STATUS_CHANGE;
+	second.power_operation_mode = USB_TC_CURRENT_3A;
+	second.connect_status = 1;
+	second.power_direction = 1;
+	second.conn_partner_flags = CONNECTOR_PARTNER_FLAG_ALTERNATE_MODE;
+	second.conn_partner_type = UFP_ATTACHED;
+	second.rdo = 0xaabbccdd;
+	second.provider_caps_limited_reason = 2;
+	second.bcd_pd_version = 0x0200;
+	second.power_reading_ready = 1;
+	second.current_scale = 2;
+	second.peak_current = 700;
+	second.average_current = 650;
+	second.voltage_scale = 5;
+	second.voltage_reading = 360;
+
+	first_after_read = first;
+	first_after_read.raw_conn_status_change_bits = 0;
+	second_after_read = second;
+	second_after_read.raw_conn_status_change_bits = 0;
+
+	/* Verify that both APIs reject NULL pointers */
+	zassert_equal(emul_pdc_set_connector_status(emul, NULL), -EINVAL);
+	zassert_equal(pdc_get_connector_status(dev, NULL), -EINVAL);
+
+	/* Set connector status to both emul, then read verify fields. */
+	zassert_ok(emul_pdc_set_connector_status(emul, &first));
+	zassert_ok(emul_pdc_set_connector_status(emul2, &second));
+	read_connector_status(emul, dev, &first);
+	read_connector_status(emul2, dev2, &second);
+
+	/* Only the change bits are cleared by GET_CONNECTOR_STATUS. */
+	read_connector_status(emul, dev, &first_after_read);
+	read_connector_status(emul2, dev2, &second_after_read);
+}
+
+ZTEST(it52xx, test_get_vbus_voltage)
+{
+	union connector_status_t status = { 0 };
+	uint16_t voltage = 0;
+
+	/* Verify that the API rejects a NULL output pointer */
+	zassert_equal(pdc_get_vbus_voltage(dev, NULL), -EINVAL);
+
+	status.voltage_scale = 10;
+	status.voltage_reading = 100;
+	zassert_ok(emul_pdc_set_connector_status(emul, &status));
+
+	prepare_for_command();
+	/* Verify that the connector-status fields convert to 5000 mV */
+	zassert_ok(pdc_get_vbus_voltage(dev, &voltage));
+	wait_for_command(emul, dev, IT52XX_GET_CONNECTOR_STATUS_DATA_LENGTH);
+	zassert_equal(voltage, 5000);
+
+	status.voltage_scale = 5;
+	status.voltage_reading = 360;
+	zassert_ok(emul_pdc_set_connector_status(emul2, &status));
+	voltage = 0;
+
+	prepare_for_command();
+	/* Verify that the connector-status fields convert to 9000 mV */
+	zassert_ok(pdc_get_vbus_voltage(dev2, &voltage));
+	wait_for_command(emul2, dev2, IT52XX_GET_CONNECTOR_STATUS_DATA_LENGTH);
+	zassert_equal(voltage, 9000);
 }
 
 ZTEST_SUITE(it52xx, NULL, it52xx_setup, NULL, NULL, NULL);
