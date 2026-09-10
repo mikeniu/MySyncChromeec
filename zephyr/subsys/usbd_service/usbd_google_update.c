@@ -29,6 +29,8 @@ static struct net_buf *gupdate_buf_alloc(const uint8_t ep)
 	struct net_buf *buf = NULL;
 	struct udc_buf_info *bi;
 
+	/* ite debug */
+	printk("gupdate buffer allocate %#x\n", ep);
 	buf = net_buf_alloc(&gupdate_pool, K_NO_WAIT);
 	if (!buf) {
 		return NULL;
