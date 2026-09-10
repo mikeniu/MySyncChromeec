@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb0e15f7_4a159008",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 35
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-10T22:59:29Z",
+      "side": 1,
+      "message": "This looks good modulo 2 outstanding comments.\n\nNote that currently, it looks like PD FAFT doesn\u0027t like this change, so we\u0027ll need to coordinate FAFT fixes if we want to submit it.",
+      "revId": "9b96eaf1759e2ef84e7c24fd165f9f96e888924c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
