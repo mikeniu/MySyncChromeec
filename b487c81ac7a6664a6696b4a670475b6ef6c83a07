@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d30f01e4_2147c387",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1353551
+      },
+      "writtenOn": "2026-09-10T02:24:50Z",
+      "side": 1,
+      "message": "Could you explain what the whole CL chain is for? Which bug are we fixing?",
+      "revId": "b487c81ac7a6664a6696b4a670475b6ef6c83a07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
