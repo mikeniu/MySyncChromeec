@@ -256,6 +256,14 @@ int dsp_client_get_cbi_flags(const struct device* dev,
     return -EINVAL;
   }
 
+  if (data->pending_response_length > sizeof(data->response_buffer)) {
+    LOG_ERR("Response length %u exceeds buffer capacity %zu",
+            data->pending_response_length,
+            sizeof(data->response_buffer));
+    k_mutex_unlock(&data->mutex);
+    return -EMSGSIZE;
+  }
+
   rc = i2c_read_dt(
       &cfg->i2c, data->response_buffer, data->pending_response_length);
   if (rc != 0) {
