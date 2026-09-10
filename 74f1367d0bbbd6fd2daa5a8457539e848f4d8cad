@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3bcb180_0ddbf731",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-10T18:21:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/2b81670b-e12d-457c-a491-80bd9286be4d)]\n\n**Review Summary:**\n* **Functionality**: The CL applies a widespread, automated refactor to standardize include guards across the codebase. No functional logic is changed.\n* **Style**: The new include guards successfully follow the consistent pattern `PLATFORM_EC_\u003cpath\u003e_H_`. However, an issue was noted where automated line wrapping left a backslash `\\` inside a block comment on a few header files, which is stylistically awkward (see inline comment).\n* **Security**: N/A, no logical changes.\n* **Testing**: N/A, this is an automated style refactor.\n* **CL Size \u0026 Scope**: The CL is very large due to touching many files, but this is acceptable as it is a single, mechanical, automated change that shouldn\u0027t be split.\n* **Overall Quality**: Good, minus the minor line wrap formatting quirk in a few files.",
+      "isAi": true,
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff64606d_a8f073ea",
+        "filename": "zephyr/include/dt-bindings/charger/intersil_isl9241.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-10T18:21:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This automated line wrap left a backslash inside a block comment. While functionally harmless due to C line continuation, it is stylistically awkward and unnecessary for block comments `/* ... */`. Consider updating the script to simply wrap the comment without a backslash or relax the line length constraint for header guard comments. This issue is present in several other files in this CL as well.",
+      "isAi": true,
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
