@@ -5,8 +5,8 @@
  * USB DC Shimming Definitions.
  */
 
-#ifndef __USB_DC_H
-#define __USB_DC_H
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_USB_DC_USB_DC_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_USB_DC_USB_DC_H_
 
 #include "common.h"
 
@@ -22,4 +22,4 @@ bool check_usb_is_configured(void);
  */
 bool request_usb_wake(void);
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_USB_DC_USB_DC_H_ */

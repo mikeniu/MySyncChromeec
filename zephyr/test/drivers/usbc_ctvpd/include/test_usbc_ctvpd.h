@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_DRIVERS_USBC_ALT_MODE_TEST_USBC_ALT_MODE_H_
-#define ZEPHYR_TEST_DRIVERS_USBC_ALT_MODE_TEST_USBC_ALT_MODE_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_USBC_CTVPD_INCLUDE_TEST_USBC_CTVPD_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_USBC_CTVPD_INCLUDE_TEST_USBC_CTVPD_H_
 
 #include "compile_time_macros.h"
 #include "emul/tcpc/emul_tcpci.h"
@@ -26,4 +26,5 @@ struct usbc_ctvpd_fixture {
 	struct common_fixture common;
 };
 
-#endif /* ZEPHYR_TEST_DRIVERS_USBC_ALT_MODE_TEST_USBC_ALT_MODE_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_USBC_CTVPD_INCLUDE_TEST_USBC_CTVPD_H_ \
+	*/

@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __CROS_EC_USB_COMMON_H
-#define __CROS_EC_USB_COMMON_H
+#ifndef PLATFORM_EC_INCLUDE_USB_COMMON_H_
+#define PLATFORM_EC_INCLUDE_USB_COMMON_H_
 
 /* Functions that are shared between old and new PD stacks */
 #include "ec_commands.h"
@@ -306,4 +306,4 @@ void pd_srccaps_dump(int port);
 }
 #endif
 
-#endif /* __CROS_EC_USB_COMMON_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_COMMON_H_ */

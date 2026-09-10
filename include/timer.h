@@ -5,8 +5,8 @@
 
 /* Timer module for Chrome EC operating system */
 
-#ifndef __CROS_EC_TIMER_H
-#define __CROS_EC_TIMER_H
+#ifndef PLATFORM_EC_INCLUDE_TIMER_H_
+#define PLATFORM_EC_INCLUDE_TIMER_H_
 
 #ifndef CONFIG_ZEPHYR
 #include <time.h>
@@ -194,4 +194,4 @@ extern timestamp_t *get_time_mock;
 }
 #endif
 
-#endif /* __CROS_EC_TIMER_H */
+#endif /* PLATFORM_EC_INCLUDE_TIMER_H_ */

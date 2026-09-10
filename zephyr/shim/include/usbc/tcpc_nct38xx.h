@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_TCPC_NCT38XX_H
-#define __CROS_EC_TCPC_NCT38XX_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_NCT38XX_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_NCT38XX_H_
 
 #include "driver/tcpm/nct38xx.h"
 
@@ -57,4 +57,4 @@ const struct device *nct38xx_get_gpio_device_from_port(const int port);
 }
 #endif
 
-#endif /* __CROS_EC_TCPC_NCT38XX_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_NCT38XX_H_ */

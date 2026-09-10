@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef UTIL_FOCALTECH_LIBUSB_TRANSPORT_H_
-#define UTIL_FOCALTECH_LIBUSB_TRANSPORT_H_
+#ifndef PLATFORM_EC_UTIL_FOCALTECH_LIBUSB_TRANSPORT_H_
+#define PLATFORM_EC_UTIL_FOCALTECH_LIBUSB_TRANSPORT_H_
 
 #include <libusb.h>
 
@@ -69,4 +69,4 @@ class LibusbTransport : public UsbTransport {
 
 }  // namespace focaltech
 
-#endif  // UTIL_FOCALTECH_LIBUSB_TRANSPORT_H_
+#endif /* PLATFORM_EC_UTIL_FOCALTECH_LIBUSB_TRANSPORT_H_ */

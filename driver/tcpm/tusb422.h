@@ -5,8 +5,8 @@
 
 /* TI TUSB422 Type-C port controller */
 
-#ifndef __CROS_EC_USB_PD_TCPM_TUSB422_H
-#define __CROS_EC_USB_PD_TCPM_TUSB422_H
+#ifndef PLATFORM_EC_DRIVER_TCPM_TUSB422_H_
+#define PLATFORM_EC_DRIVER_TCPM_TUSB422_H_
 
 #include "driver/tcpm/tusb422_public.h"
 
@@ -19,4 +19,4 @@
 #define TUSB422_REG_PHY_BMC_RX_CTRL 0x96
 #define TUSB422_REG_PHY_BMC_RX_CTRL_FRS_RX_EN BIT(3)
 
-#endif /* defined(__CROS_EC_USB_PD_TCPM_TUSB422_H) */
+#endif /* PLATFORM_EC_DRIVER_TCPM_TUSB422_H_ */

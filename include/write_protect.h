@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_WRITE_PROTECT_H
-#define __CROS_EC_WRITE_PROTECT_H
+#ifndef PLATFORM_EC_INCLUDE_WRITE_PROTECT_H_
+#define PLATFORM_EC_INCLUDE_WRITE_PROTECT_H_
 
 #ifdef CONFIG_ZEPHYR
 #include "zephyr_write_protect.h"
@@ -47,4 +47,4 @@ static inline void write_protect_set(int value)
 #endif
 
 #endif /* !CONFIG_ZEPHYR */
-#endif /* __CROS_EC_WRITE_PROTECT_H */
+#endif /* PLATFORM_EC_INCLUDE_WRITE_PROTECT_H_ */

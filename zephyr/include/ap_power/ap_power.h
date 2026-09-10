@@ -21,8 +21,8 @@
  * from the HOOK_CHIPSET notifications.
  */
 
-#ifndef __AP_POWER_AP_POWER_H__
-#define __AP_POWER_AP_POWER_H__
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_POWER_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_POWER_H_
 
 #include <zephyr/kernel.h>
 
@@ -176,4 +176,4 @@ struct ap_power_ev_callback {
 }
 #endif
 
-#endif /* __AP_POWER_AP_POWER_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_POWER_H_ */

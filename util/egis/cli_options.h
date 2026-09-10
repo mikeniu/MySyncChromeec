@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef UTIL_EGIS_CLI_OPTIONS_H_
-#define UTIL_EGIS_CLI_OPTIONS_H_
+#ifndef PLATFORM_EC_UTIL_EGIS_CLI_OPTIONS_H_
+#define PLATFORM_EC_UTIL_EGIS_CLI_OPTIONS_H_
 
 #include <cstdint>
 #include <optional>
@@ -46,4 +46,4 @@ std::optional<FlasherConfig> ParseArgs(int argc, char* argv[]);
 
 }  // namespace egis
 
-#endif  // UTIL_EGIS_CLI_OPTIONS_H_
+#endif /* PLATFORM_EC_UTIL_EGIS_CLI_OPTIONS_H_ */

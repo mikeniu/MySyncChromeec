@@ -7,8 +7,8 @@
  * @file drivers/rvp_board_id.h
  * @brief Public APIs for board id driver for Intel RVPs.
  */
-#ifndef ZEPHYR_INCLUDE_DRIVERS_RVP_BOARD_ID_H_
-#define ZEPHYR_INCLUDE_DRIVERS_RVP_BOARD_ID_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_RVP_BOARD_ID_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_RVP_BOARD_ID_H_
 
 /**
  * @brief Number of GPIO straps encoding each RVP identifier.
@@ -55,4 +55,4 @@ typedef void (*rvp_board_id_handler)(void);
  */
 int get_rvp_id_config(enum rvp_id_type id_type);
 
-#endif /* ZEPHYR_INCLUDE_DRIVERS_RVP_BOARD_ID_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_RVP_BOARD_ID_H_ */

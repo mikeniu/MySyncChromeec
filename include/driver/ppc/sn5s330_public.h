@@ -5,8 +5,8 @@
 
 /* TI SN5S330 USB-C Power Path Controller */
 
-#ifndef __CROS_EC_DRIVER_PPC_SN5S330_PUBLIC_H
-#define __CROS_EC_DRIVER_PPC_SN5S330_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_PPC_SN5S330_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_PPC_SN5S330_PUBLIC_H_
 
 #define SN5S330_ADDR0_FLAGS 0x40
 #define SN5S330_ADDR1_FLAGS 0x41
@@ -26,4 +26,4 @@ extern const struct ppc_drv sn5s330_drv;
  */
 void sn5s330_interrupt(int port);
 
-#endif /* __CROS_EC_DRIVER_PPC_SN5S330_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_PPC_SN5S330_PUBLIC_H_ */

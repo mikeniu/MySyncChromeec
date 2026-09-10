@@ -3,7 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef __UTIL_CROS_EC_DEV_H
+#if !defined(PLATFORM_EC_UTIL_CROS_EC_DEV_H_) && !defined(__UTIL_CROS_EC_DEV_H)
+#define PLATFORM_EC_UTIL_CROS_EC_DEV_H_
+/* TODO(b/510249930): Remove this once all cros_ec_dev.h copies are updated. */
 #define __UTIL_CROS_EC_DEV_H
 
 #include "ec_commands.h"
@@ -96,4 +98,4 @@ struct cros_ec_readmem_v2 {
 }
 #endif
 
-#endif /* __UTIL_CROS_EC_DEV_H */
+#endif /* PLATFORM_EC_UTIL_CROS_EC_DEV_H_ */

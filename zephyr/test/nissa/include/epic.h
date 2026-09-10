@@ -3,11 +3,11 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_NISSA_INCLUDE_EPIC_H_
-#define ZEPHYR_TEST_NISSA_INCLUDE_EPIC_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_EPIC_H_
+#define PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_EPIC_H_
 
 #include "ec_commands.h"
 
 void form_factor_init(void);
 
-#endif /* ZEPHYR_TEST_NISSA_INCLUDE_EPIC_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_EPIC_H_ */

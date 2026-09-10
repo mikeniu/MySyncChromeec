@@ -7,8 +7,8 @@
  * USB Power delivery port management For Cypress EZ-PD CCG6DF, CCG6SF
  * CCGXXF FW is designed to adapt standard TCPM driver procedures.
  */
-#ifndef __CROS_EC_DRIVER_TCPM_CCGXXF_H
-#define __CROS_EC_DRIVER_TCPM_CCGXXF_H
+#ifndef PLATFORM_EC_DRIVER_TCPM_CCGXXF_H_
+#define PLATFORM_EC_DRIVER_TCPM_CCGXXF_H_
 
 #define CCGXXF_I2C_ADDR1_FLAGS 0x0B
 #define CCGXXF_I2C_ADDR2_FLAGS 0x1B
@@ -90,4 +90,4 @@ extern const struct ioexpander_drv ccgxxf_ioexpander_drv;
 
 #endif /* CONFIG_IO_EXPANDER_CCGXXF */
 
-#endif /* __CROS_EC_DRIVER_TCPM_CCGXXF_H */
+#endif /* PLATFORM_EC_DRIVER_TCPM_CCGXXF_H_ */

@@ -13,8 +13,8 @@
  * the Zephyr rtc API.
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_CROS_RTC_H_
-#define ZEPHYR_INCLUDE_DRIVERS_CROS_RTC_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_RTC_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_RTC_H_
 
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
@@ -205,4 +205,4 @@ static inline int z_impl_cros_rtc_reset_alarm(const struct device *dev)
  * @}
  */
 #include <zephyr/syscalls/cros_rtc.h>
-#endif /* ZEPHYR_INCLUDE_DRIVERS_CROS_RTC_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_RTC_H_ */
