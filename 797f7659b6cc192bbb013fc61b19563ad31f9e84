@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cd3dc98_a0705bed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-10T23:05:14Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/40c1a2c6-5d3e-4ab5-a2ea-7188995b7be2)]\n\n### Review Summary\n\n*   **Functionality:** The build system changes properly create symlinks to the local checkout\u0027s exported headers in `$(out)/include/chromeos/ec/` and ensure host utilities correctly resolve these headers over the system ones. The use of order-only prerequisites (`| $(chromeos-ec-headers)`) is idiomatic Make and ensures symlinks are created before the host utils compile, without triggering unnecessary rebuilds. The `#ifndef` header guard cleanup perfectly aligns with the `TODO` removals.\n*   **Security:** No security implications.\n*   **Style:** Clean and follows standard Make practices (e.g., using `$(@D)` and `$(abspath $\u003c)`). The C preprocessor cleanup is straightforward.\n*   **Testing \u0026 Test Coverage:** As this is a build system and header configuration change, the specified manual test (`make build/host/util/ectool`) is the most appropriate way to verify the behavior.\n*   **CL Size \u0026 Scope:** The CL is appropriately scoped to fixing the build configuration for host tools and removing the associated outdated header guard logic.",
+      "isAi": true,
+      "revId": "797f7659b6cc192bbb013fc61b19563ad31f9e84",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
