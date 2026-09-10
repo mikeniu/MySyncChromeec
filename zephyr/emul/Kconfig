@@ -240,6 +240,15 @@ config EMUL_SMBUS_ARA
 	help
 	  Enable the SMBUS ARA emulator. This driver use emulated I2C bus.
 
+config EMUL_PDC_IT52XX
+	bool "ITE IT52XX Type-C Power Delivery Controller emulator"
+	default y
+	depends on DT_HAS_ITE_IT52XX_PDC_ENABLED && EMUL
+	select EMUL_COMMON_I2C
+	help
+	  Enable the ITE IT52XX emulator. This driver uses an emulated I2C bus.
+	  Emulator API is available in zephyr/include/emul/emul_ite_it52xx.h
+
 config EMUL_PDC_RTS54
 	bool "Realtek RTS5453P Type-C Power Delivery Controller emulator"
 	default y
