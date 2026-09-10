@@ -22,6 +22,30 @@
       },
       "revId": "3c536c9b5343a810ba4c47bd0473c75ec97df40e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b2fee1d_92c47665",
+        "filename": "include/config.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1896,
+      "author": {
+        "id": 4845415
+      },
+      "writtenOn": "2026-09-10T11:18:02Z",
+      "side": 1,
+      "message": "No, but I am removing things one by one. Will remove in future CLs.",
+      "parentUuid": "2055df1d_23819904",
+      "range": {
+        "startLine": 1896,
+        "startChar": 22,
+        "endLine": 1896,
+        "endChar": 38
+      },
+      "revId": "3c536c9b5343a810ba4c47bd0473c75ec97df40e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
