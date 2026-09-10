@@ -1119,7 +1119,7 @@ static enum ec_status host_cmd_motion_sense(struct host_cmd_handler_args *args)
 	const void *in_scale;
 	void *out_scale;
 	void *out_offset;
-	int16_t out_temp;
+	int16_t out_temp = EC_MOTION_SENSE_INVALID_CALIB_TEMP;
 	size_t host_id;
 
 	switch (in->cmd) {
