@@ -10,7 +10,9 @@
 #include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_auth_crypto.h"
 #include "fpsensor/fpsensor_console.h"
+#include "fpsensor/fpsensor_state.h"
 #include "host_command.h"
+#include "openssl/mem.h"
 
 #include <array>
 #include <ascp/ascp.h>
@@ -24,10 +26,24 @@ static ec_status fp_command_ascp_establish(struct host_cmd_handler_args *args)
 	const auto *params =
 		static_cast<const ec_params_fp_ascp_establish *>(args->params);
 
-	/* Prevent overwriting pairing_key if session is already established. */
+	/*
+	 * If an authentication session is already active, invalidate the
+	 * session and clear existing in-memory templates before accepting a new
+	 * pairing key.
+	 *
+	 * Note: Do NOT clear session_nonce or FP_CONTEXT_SESSION_NONCE_SET here
+	 * because the host HAL calls EC_CMD_FP_GENERATE_NONCE before
+	 * ascp_establish. The session key and TPM seed will be securely derived
+	 * and set during the subsequent EC_CMD_FP_ESTABLISH_SESSION command.
+	 */
 	if (fingerprint_auth_enabled()) {
-		CPRINTS("ASCP establish blocked: session active");
-		return EC_RES_ACCESS_DENIED;
+		CPRINTS("ASCP establish: invalidating active session for re-pairing");
+		global_context.fp_encryption_status &=
+			~(FP_CONTEXT_STATUS_SESSION_ESTABLISHED |
+			  FP_ENC_STATUS_SEED_SET);
+		OPENSSL_cleanse(global_context.tpm_seed.data(),
+				global_context.tpm_seed.size());
+		fp_reset_context();
 	}
 
 	if (params->pk_g[0] != 0x04) {
