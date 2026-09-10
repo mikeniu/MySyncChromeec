@@ -307,6 +307,27 @@ TEST_F(DspComms, ProcessingError) {
                 kClient, static_cast<cros_dsp_comms_CbiFlag>(99), nullptr));
 }
 
+TEST_F(DspComms, ResponseLengthExceedsBufferSize) {
+  gpio_remove_callback_dt(&kServiceInterruptSpec, &gpio_callbacks_);
+
+  struct gpio_callback custom_cb;
+  custom_cb.handler =
+      [](const struct device*, struct gpio_callback*, gpio_port_pins_t) {
+        auto* data = static_cast<struct dsp_client_data*>(kClient->data);
+        data->pending_response_length = sizeof(data->response_buffer) + 1;
+        k_event_post(&data->response_ready_event, 1);
+      };
+  custom_cb.pin_mask = BIT(kServiceInterruptSpec.pin);
+  ASSERT_EQ(0, gpio_add_callback_dt(&kServiceInterruptSpec, &custom_cb));
+
+  cros_dsp_comms_GetCbiFlagsResponse response;
+  EXPECT_EQ(-EMSGSIZE,
+            dsp_client_get_cbi_flags(
+                kClient, cros_dsp_comms_CbiFlag_VERSION, &response));
+
+  gpio_remove_callback_dt(&kServiceInterruptSpec, &custom_cb);
+}
+
 TEST_F(DspComms, ReadCbiVersion) {
   uint32_t out;
   uint8_t size = static_cast<uint8_t>(sizeof(out));
