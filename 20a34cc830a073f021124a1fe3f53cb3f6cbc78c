@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf4480c8_dc90c55d",
+        "filename": "include/host_command.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-10T17:48:26Z",
+      "side": 1,
+      "message": "Per the GCC Manual https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html:\n\"This built-in function is only available in C.\". This will fail to compile if this is included in any c++ files.",
+      "revId": "20a34cc830a073f021124a1fe3f53cb3f6cbc78c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

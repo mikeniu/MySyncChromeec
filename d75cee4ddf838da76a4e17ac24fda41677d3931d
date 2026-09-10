@@ -34,6 +34,24 @@
       "parentUuid": "72628b2d_483af051",
       "revId": "d75cee4ddf838da76a4e17ac24fda41677d3931d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07005c9e_3153a9b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-10T17:48:26Z",
+      "side": 1,
+      "message": "\u003e With this convention, the upstream macros naming convention is misleading.\n\nYes, but SMALLEST_TYPE convention is also confusing.\n\n\u003e Ideally, we should have separate handlers for each version making it clear the expected request/response structs to be used, so the upstream host command handler common processing can reject requests before invoking the handler.\n\nAgree, can we please open a bug for adding per version handler support upstream and add a TODO comment here.",
+      "parentUuid": "0e1b84a9_f6503b47",
+      "revId": "d75cee4ddf838da76a4e17ac24fda41677d3931d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
