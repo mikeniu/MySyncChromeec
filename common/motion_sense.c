@@ -709,7 +709,7 @@ static inline void increment_sensor_collection(struct motion_sensor_t *sensor,
 void motion_sense_push_raw_xyz(struct motion_sensor_t *s)
 {
 	if (IS_ENABLED(CONFIG_ACCEL_FIFO)) {
-		struct ec_response_motion_sensor_data vector;
+		struct ec_response_motion_sensor_data vector = { 0 };
 		int *v = s->raw_xyz;
 
 		vector.flags = 0;
@@ -836,7 +836,7 @@ static void check_and_queue_gestures(uint32_t *event)
 	    (*event & TASK_EVENT_MOTION_ACTIVITY_INTERRUPT(
 			      MOTIONSENSE_ACTIVITY_DOUBLE_TAP))) {
 		if (IS_ENABLED(CONFIG_GESTURE_HOST_DETECTION)) {
-			struct ec_response_motion_sensor_data vector;
+			struct ec_response_motion_sensor_data vector = { 0 };
 
 			vector.flags = MOTIONSENSE_SENSOR_FLAG_BYPASS_FIFO;
 			/*
@@ -863,7 +863,7 @@ static void check_and_queue_gestures(uint32_t *event)
 			      MOTIONSENSE_ACTIVITY_SIG_MOTION))) {
 		struct motion_sensor_t *activity_sensor;
 		if (IS_ENABLED(CONFIG_GESTURE_HOST_DETECTION)) {
-			struct ec_response_motion_sensor_data vector;
+			struct ec_response_motion_sensor_data vector = { 0 };
 
 			/* Send events to the FIFO */
 			vector.flags = MOTIONSENSE_SENSOR_FLAG_WAKEUP |
