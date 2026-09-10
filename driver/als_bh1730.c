@@ -126,6 +126,7 @@ static int bh1730_get_offset(const struct motion_sensor_t *s, int16_t *offset,
 			     int16_t *temp)
 {
 	*offset = 0;
+	*temp = EC_MOTION_SENSE_INVALID_CALIB_TEMP;
 
 	return EC_SUCCESS;
 }
