@@ -38,6 +38,125 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bb2dab06_08960937",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-10T18:42:54Z",
+      "side": 1,
+      "message": "[Jetski Generated Review]\n\nOverall, this is a valuable cleanup to eliminate reserved double-underscore macros (`__CROS_EC_...`) and standardize header guards across the repository to `PLATFORM_EC_\u003cPATH\u003e_\u003cFILE\u003e_H_`.\n\nHere is a summary of findings to address before landing:\n\n1. **`third_party/boringssl/include/curve25519.h`**: Inadvertently modified via the symlink `include/curve25519.h`. `util/fix_header_guards.py` should be updated to skip symlinks or check resolved paths against excluded directories, and the change to `curve25519.h` should be reverted.\n2. **Script idempotency \u0026 Zephyr shim headers**: Running `util/fix_header_guards.py --use-c-comments --prefix\u003dPLATFORM_EC_ .` on a clean tree is not currently idempotent (modifies 17 files):\n   - It moves `#ifndef` above the `#error` inclusion checks in `zephyr_host_command.h`, `zephyr_hooks_shim.h`, `zephyr_gpio_signal.h`, `zephyr_mkbp_event.h`, and `zephyr_shim.h`. This prematurely defines the macro and causes the `#error` condition to always trigger during Zephyr compilation (the cause of earlier tryjob failures).\n   - It duplicates guards on `ec_commands.h`, `ec_cmd_api.h`, `panic_defs.h`, and `cros_ec_dev.h` because it does not recognize `#if !defined(...) \u0026\u0026 !defined(...)`.\n3. **Continuation comment formatting**: `build_endif_lines()` uses `\\t*/`, which conflicts with `cros format` (`clang-format`), which formats wrapped block comments with 8 spaces (`        */`), leading to formatting churn.\n4. **`util/make_linux_ec_commands_h.sh`**: Dual sed replacements produce duplicate `#if !defined` checks and export an internal `TODO(b/510249930)` comment into the upstream kernel header.\n\nSee inline comments for specific line references and suggestions.",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f11cfc9f_430b7f01",
+        "filename": "chip/host/config_chip.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-10T18:42:54Z",
+      "side": 1,
+      "message": "[Jetski Generated Review]\nNit: The TODO comment references `PLATFORM_EC_BOARD_HOST_CONFIG_CHIP_H_`, but the file is located under `chip/host/`, so the expected macro name is `PLATFORM_EC_CHIP_HOST_CONFIG_CHIP_H_`.",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18dea3d7_0aed6a26",
+        "filename": "third_party/boringssl/include/curve25519.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-10T18:42:54Z",
+      "side": 1,
+      "message": "[Jetski Generated Review]\nThis `third_party` header appears to have been inadvertently modified because `include/curve25519.h` is a symlink pointing to `../third_party/boringssl/include/curve25519.h`.\n\n`collect_header_files()` in `util/fix_header_guards.py` checked only the path components of `include/curve25519.h` (which did not contain `third_party`), but `fix_header_guard()` resolved the symlink and modified this vendored file.\n\n`third_party` files should remain untouched; please revert this change and update the script to ignore symlinks (`path.is_symlink()`) or verify `is_excluded(path.resolve())`.",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d47ceb8_034f4995",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-10T18:42:54Z",
+      "side": 1,
+      "message": "[Jetski Generated Review]\nUsing `\\t*/` for wrapped `#endif` comments conflicts with `cros format` (`clang-format`), which re-indents continuation comments with 8 spaces (`        */`). Running `fix_header_guards.py` followed by `cros format` causes repeated formatting churn.\n\nConsider matching `clang-format`\u0027s 8 spaces (and updating `test_long_comment_wrapping` in `fix_header_guards_unittest.py`) so running the script and `cros format` is clean and idempotent.",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05ef8849_82f7333e",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-10T18:42:54Z",
+      "side": 1,
+      "message": "[Jetski Generated Review]\nTwo idempotency issues to consider:\n1. `find_header_guard_bounds()` only searches for literal `^\\s*#\\s*ifndef\\b`, so it doesn\u0027t recognize compatibility shims like `#if !defined(...) \u0026\u0026 !defined(...)` (used in `include/ec_commands.h`, `ec_cmd_api.h`, etc.). Re-running the script adds duplicate `#ifndef` and `#endif` blocks to these files.\n2. In Zephyr shim headers (`zephyr_host_command.h`, `zephyr_hooks_shim.h`, etc.), the top-level inclusion `#error` check is treated as non-comment code before the guard. The script attempts to \"fix\" it by moving `#ifndef` above the check, which defines the macro too early and permanently triggers the `#error` during Zephyr builds.\n\nSupporting `#if !defined(...)` and preserving these shim checks will make `fix_header_guards.py` fully idempotent when run across the repo.",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2153958c_84a21fa6",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-10T18:42:54Z",
+      "side": 1,
+      "message": "[Jetski Generated Review]\n`is_excluded(p)` inspects `p.parts`, which evaluates the symlink path rather than its target. For symlinks like `include/curve25519.h`, `p.parts` does not include `third_party`, so it gets processed and mutates the target inside `third_party/`.\n\nConsider skipping symlinks (`if path.is_symlink(): continue`) or checking `is_excluded(p.resolve())`.",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4a26125_6bee5ee8",
+        "filename": "util/make_linux_ec_commands_h.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-10T18:42:54Z",
+      "side": 1,
+      "message": "[Jetski Generated Review]\nWith `include/ec_commands.h` now defining both `PLATFORM_EC_INCLUDE_EC_COMMANDS_H_` and `__CROS_EC_EC_COMMANDS_H`, these two substitutions:\n```sh\nsed -i \"s/__CROS_EC_EC_COMMANDS_H/__CROS_EC_COMMANDS_H/\" \"${tmp}\"\nsed -i \"s/PLATFORM_EC_INCLUDE_EC_COMMANDS_H_/__CROS_EC_COMMANDS_H/\" \"${tmp}\"\n```\nproduce:\n```c\n#if !defined(__CROS_EC_COMMANDS_H) \u0026\u0026 \\\n\t!defined(__CROS_EC_COMMANDS_H)\n#define __CROS_EC_COMMANDS_H\n/* TODO(b/510249930): Remove this once all ec_commands.h copies are updated. */\n#define __CROS_EC_COMMANDS_H\n```\nThis leaves duplicate checks and an internal Google Buganizer `TODO` in the upstream-bound Linux kernel header. Consider replacing the entire guard block with a clean `#ifndef __CROS_EC_COMMANDS_H` / `#define __CROS_EC_COMMANDS_H`.",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ff64606d_a8f073ea",
         "filename": "zephyr/include/dt-bindings/charger/intersil_isl9241.h",
         "patchSetId": 11
