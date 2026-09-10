@@ -34,6 +34,24 @@
       "parentUuid": "d30f01e4_2147c387",
       "revId": "b487c81ac7a6664a6696b4a670475b6ef6c83a07",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "616669c8_cb403c8f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-09-10T03:42:27Z",
+      "side": 1,
+      "message": "The CL chain is for backporting the security fix  to the Skywalker branch, https://partnerissuetracker.corp.google.com/issues/537016699.\n\nYes, this patch is to avoid merge conflict.",
+      "parentUuid": "0017b787_3ca478bf",
+      "revId": "b487c81ac7a6664a6696b4a670475b6ef6c83a07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
