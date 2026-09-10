@@ -53,6 +53,98 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5951fe48_e3bc43a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "https://crrev.com/c/8392017?tab\u003dflows",
+      "parentUuid": "e1bf8fdc_00c4278b",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f18c763_284fba0c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Done. I have moved the script and its unit tests into its own prior CL in the chain.",
+      "parentUuid": "e1bf8fdc_00c4278b",
+      "isAi": true,
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26a96ec1_cd009b3f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Addressed all findings: reverted curve25519.h and excluded symlinks, ensured full script idempotency across the tree, handled continuation comment formatting, removed dual defines from ec_commands.h via host symlinks, and moved the script into its own prerequisite CL.",
+      "parentUuid": "bb2dab06_08960937",
+      "isAi": true,
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef608618_91d22fbc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "bb2dab06_08960937",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ede2b887_26e39992",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Please stop posting these al reviews.",
+      "parentUuid": "a3bcb180_0ddbf731",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f11cfc9f_430b7f01",
@@ -66,6 +158,43 @@
       "writtenOn": "2026-09-10T18:42:54Z",
       "side": 1,
       "message": "[Jetski Generated Review]\nNit: The TODO comment references `PLATFORM_EC_BOARD_HOST_CONFIG_CHIP_H_`, but the file is located under `chip/host/`, so the expected macro name is `PLATFORM_EC_CHIP_HOST_CONFIG_CHIP_H_`.",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4b0cd11_cfc6e5ae",
+        "filename": "chip/host/config_chip.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f11cfc9f_430b7f01",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0312ce7_6f750cfe",
+        "filename": "chip/host/config_chip.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Done. Fixed macro name to PLATFORM_EC_CHIP_HOST_CONFIG_CHIP_H_.",
+      "parentUuid": "f11cfc9f_430b7f01",
+      "isAi": true,
       "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -87,6 +216,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "887b82b6_a65cfb91",
+        "filename": "third_party/boringssl/include/curve25519.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Done. Reverted curve25519.h, and updated fix_header_guards.py to skip symlinks (path.is_symlink()) and verify path.resolve() against excluded directories.",
+      "parentUuid": "18dea3d7_0aed6a26",
+      "isAi": true,
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d47ceb8_034f4995",
@@ -100,6 +248,43 @@
       "writtenOn": "2026-09-10T18:42:54Z",
       "side": 1,
       "message": "[Jetski Generated Review]\nUsing `\\t*/` for wrapped `#endif` comments conflicts with `cros format` (`clang-format`), which re-indents continuation comments with 8 spaces (`        */`). Running `fix_header_guards.py` followed by `cros format` causes repeated formatting churn.\n\nConsider matching `clang-format`\u0027s 8 spaces (and updating `test_long_comment_wrapping` in `fix_header_guards_unittest.py`) so running the script and `cros format` is clean and idempotent.",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "434e2f34_8e98c39a",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Moved out of this cl.",
+      "parentUuid": "1d47ceb8_034f4995",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aadcac44_02cb9ada",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Done. Added whitespace normalization in fix_header_guards.py so neither indentation style triggers churn, and formatted the script and tests with cros format.",
+      "parentUuid": "1d47ceb8_034f4995",
+      "isAi": true,
       "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -121,6 +306,43 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef132c6d_0bdafa8d",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Done. Added is_precondition_check() to preserve #error inclusion checks before #ifndef, added support for #if !defined(...) compatibility guards, and skipped headers with deferred TODOs. Re-running the script is now fully idempotent across the codebase.",
+      "parentUuid": "05ef8849_82f7333e",
+      "isAi": true,
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa8aa4ae_0f622476",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "moved out of this cl.",
+      "parentUuid": "05ef8849_82f7333e",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2153958c_84a21fa6",
@@ -134,6 +356,43 @@
       "writtenOn": "2026-09-10T18:42:54Z",
       "side": 1,
       "message": "[Jetski Generated Review]\n`is_excluded(p)` inspects `p.parts`, which evaluates the symlink path rather than its target. For symlinks like `include/curve25519.h`, `p.parts` does not include `third_party`, so it gets processed and mutates the target inside `third_party/`.\n\nConsider skipping symlinks (`if path.is_symlink(): continue`) or checking `is_excluded(p.resolve())`.",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6419a4b7_17344a4d",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "moved out of this cl.",
+      "parentUuid": "2153958c_84a21fa6",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0de331e5_80f02473",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Done. Updated collect_header_files() to skip symlinks and verify resolved path components.",
+      "parentUuid": "2153958c_84a21fa6",
+      "isAi": true,
       "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -155,6 +414,43 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48d27f83_98040872",
+        "filename": "util/make_linux_ec_commands_h.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "Done. With host tools resolving headers via local symlinks in $(out)/include/chromeos/ec/ (in child CL 8374722), include/ec_commands.h no longer needs dual defines, eliminating duplicate checks in the kernel export script.",
+      "parentUuid": "c4a26125_6bee5ee8",
+      "isAi": true,
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e312efa_d6068c5e",
+        "filename": "util/make_linux_ec_commands_h.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "This is going away in the next cl.",
+      "parentUuid": "c4a26125_6bee5ee8",
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff64606d_a8f073ea",
@@ -168,6 +464,25 @@
       "writtenOn": "2026-09-10T18:21:53Z",
       "side": 1,
       "message": "[Gerrit AI Review] This automated line wrap left a backslash inside a block comment. While functionally harmless due to C line continuation, it is stylistically awkward and unnecessary for block comments `/* ... */`. Consider updating the script to simply wrap the comment without a backslash or relax the line length constraint for header guard comments. This issue is present in several other files in this CL as well.",
+      "isAi": true,
+      "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea052108_02f7a431",
+        "filename": "zephyr/include/dt-bindings/charger/intersil_isl9241.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-10T21:00:25Z",
+      "side": 1,
+      "message": "I investigated this with cros format (clang-format). Because the trailing comment immediately follows #endif, clang-format treats it as part of a preprocessor directive and mandates the line-continuation backslash when wrapping lines that exceed ColumnLimit: 80. If the backslash is removed or wrapped without it, cros format reports a formatting violation and re-inserts it.",
+      "parentUuid": "ff64606d_a8f073ea",
       "isAi": true,
       "revId": "74f1367d0bbbd6fd2daa5a8457539e848f4d8cad",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
