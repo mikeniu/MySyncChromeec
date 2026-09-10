@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_PWM_H
-#define __CROS_EC_PWM_H
+#ifndef PLATFORM_EC_INCLUDE_PWM_H_
+#define PLATFORM_EC_INCLUDE_PWM_H_
 
 #include "util.h"
 
@@ -84,4 +84,4 @@ int pwm_get_duty(enum pwm_channel ch);
 }
 #endif
 
-#endif /* __CROS_EC_PWM_H */
+#endif /* PLATFORM_EC_INCLUDE_PWM_H_ */

@@ -5,8 +5,8 @@
  * The functions implemented by keyboard component of EC core.
  */
 
-#ifndef __CROS_EC_KEYBOARD_8042_SHAREDLIB_H
-#define __CROS_EC_KEYBOARD_8042_SHAREDLIB_H
+#ifndef PLATFORM_EC_INCLUDE_KEYBOARD_8042_SHAREDLIB_H_
+#define PLATFORM_EC_INCLUDE_KEYBOARD_8042_SHAREDLIB_H_
 
 #include "button.h"
 #include "keyboard_config.h"
@@ -203,4 +203,4 @@ enum scancode_values {
 }
 #endif
 
-#endif /* __CROS_EC_KEYBOARD_8042_SHAREDLIB_H */
+#endif /* PLATFORM_EC_INCLUDE_KEYBOARD_8042_SHAREDLIB_H_ */

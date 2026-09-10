@@ -6,8 +6,8 @@
  * AMD FP8 USB/DP/USB4 Mux.
  */
 
-#ifndef __CROS_EC_USB_MUX_AMD_FP8_H
-#define __CROS_EC_USB_MUX_AMD_FP8_H
+#ifndef PLATFORM_EC_DRIVER_USB_MUX_AMD_FP8_H_
+#define PLATFORM_EC_DRIVER_USB_MUX_AMD_FP8_H_
 
 #include "gpio.h"
 
@@ -86,4 +86,4 @@ enum amd_fp8_command_status {
 
 void amd_fp8_mux_interrupt(enum gpio_signal signal);
 
-#endif /* __CROS_EC_USB_MUX_AMD_FP8_H */
+#endif /* PLATFORM_EC_DRIVER_USB_MUX_AMD_FP8_H_ */

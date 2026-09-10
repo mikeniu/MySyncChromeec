@@ -5,8 +5,8 @@
  * Charger profile override for fast charging
  */
 
-#ifndef __CROS_EC_CHARGER_PROFILE_OVERRIDE_H
-#define __CROS_EC_CHARGER_PROFILE_OVERRIDE_H
+#ifndef PLATFORM_EC_INCLUDE_CHARGER_PROFILE_OVERRIDE_H_
+#define PLATFORM_EC_INCLUDE_CHARGER_PROFILE_OVERRIDE_H_
 
 #include "charge_state.h"
 
@@ -92,4 +92,4 @@ enum ec_status charger_profile_override_set_param(uint32_t param,
 }
 #endif
 
-#endif /* __CROS_EC_CHARGER_PROFILE_OVERRIDE_H */
+#endif /* PLATFORM_EC_INCLUDE_CHARGER_PROFILE_OVERRIDE_H_ */

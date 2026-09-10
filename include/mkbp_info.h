@@ -1,12 +1,12 @@
-/* Copyright 2022 The ChromiumOS Authors.
+/* Copyright 2022 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
 
 /* MKBP info host command for Chrome EC */
 
-#ifndef __CROS_EC_MKBP_INFO_H
-#define __CROS_EC_MKBP_INFO_H
+#ifndef PLATFORM_EC_INCLUDE_MKBP_INFO_H_
+#define PLATFORM_EC_INCLUDE_MKBP_INFO_H_
 
 /**
  * Board specific function to set support volume buttons.
@@ -24,4 +24,4 @@ uint32_t get_supported_buttons(void);
 uint32_t get_supported_switches(void);
 #endif /* TEST_BUILD */
 
-#endif /* __CROS_EC_MKBP_INFO_H */
+#endif /* PLATFORM_EC_INCLUDE_MKBP_INFO_H_ */

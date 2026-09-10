@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_REX_TESTS_REX_SRC_REX_FAKES_H_
-#define ZEPHYR_TEST_REX_TESTS_REX_SRC_REX_FAKES_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_REX_TESTS_REX_SRC_REX_FAKES_H_
+#define PLATFORM_EC_ZEPHYR_TEST_REX_TESTS_REX_SRC_REX_FAKES_H_
 
 #include "charge_manager.h"
 #include "cros_cbi.h"
@@ -39,4 +39,4 @@ int mock_cros_cbi_get_fw_config_kb8010(enum cbi_fw_config_field_id field_id,
 int mock_cros_cbi_get_fw_config_usb3(enum cbi_fw_config_field_id field_id,
 				     uint32_t *value);
 
-#endif /* ZEPHYR_TEST_REX_TESTS_REX_SRC_REX_FAKES_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_REX_TESTS_REX_SRC_REX_FAKES_H_ */

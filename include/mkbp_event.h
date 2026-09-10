@@ -5,8 +5,8 @@
  * Event handling in MKBP keyboard protocol
  */
 
-#ifndef __CROS_EC_MKBP_EVENT_H
-#define __CROS_EC_MKBP_EVENT_H
+#ifndef PLATFORM_EC_INCLUDE_MKBP_EVENT_H_
+#define PLATFORM_EC_INCLUDE_MKBP_EVENT_H_
 
 #include "common.h"
 
@@ -77,4 +77,4 @@ __test_only void mkbp_event_clear_all(void);
 }
 #endif
 
-#endif /* __CROS_EC_MKBP_EVENT_H */
+#endif /* PLATFORM_EC_INCLUDE_MKBP_EVENT_H_ */

@@ -5,8 +5,8 @@
  * EC-EC communication, functions for client.
  */
 
-#ifndef EC_EC_COMM_CLIENT_H_
-#define EC_EC_COMM_CLIENT_H_
+#ifndef PLATFORM_EC_INCLUDE_EC_EC_COMM_CLIENT_H_
+#define PLATFORM_EC_INCLUDE_EC_EC_COMM_CLIENT_H_
 
 #include "config.h"
 
@@ -63,4 +63,4 @@ int ec_ec_client_hibernate(void);
 }
 #endif
 
-#endif /* EC_EC_COMM_CLIENT_H_ */
+#endif /* PLATFORM_EC_INCLUDE_EC_EC_COMM_CLIENT_H_ */

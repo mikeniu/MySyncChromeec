@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef _INCLUDE_EC_APP_MAIN_H
-#define _INCLUDE_EC_APP_MAIN_H
+#ifndef PLATFORM_EC_ZEPHYR_APP_EC_INCLUDE_EC_APP_MAIN_H_
+#define PLATFORM_EC_ZEPHYR_APP_EC_INCLUDE_EC_APP_MAIN_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,4 +16,4 @@ void ec_app_main(void);
 };
 #endif
 
-#endif /* _INCLUDE_EC_APP_MAIN_H */
+#endif /* PLATFORM_EC_ZEPHYR_APP_EC_INCLUDE_EC_APP_MAIN_H_ */

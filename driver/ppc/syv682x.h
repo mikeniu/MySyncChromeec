@@ -5,8 +5,8 @@
 
 /* Silergy SYV682x Type-C Power Path Controller */
 
-#ifndef __CROS_EC_SYV682X_H
-#define __CROS_EC_SYV682X_H
+#ifndef PLATFORM_EC_DRIVER_PPC_SYV682X_H_
+#define PLATFORM_EC_DRIVER_PPC_SYV682X_H_
 
 #include "common.h"
 #include "driver/ppc/syv682x_public.h"
@@ -109,4 +109,4 @@
  */
 __override_proto int syv682x_board_is_syv682c(int port);
 
-#endif /* defined(__CROS_EC_SYV682X_H) */
+#endif /* PLATFORM_EC_DRIVER_PPC_SYV682X_H_ */

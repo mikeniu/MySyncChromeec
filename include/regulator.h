@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_REGULATOR_H
-#define __CROS_EC_REGULATOR_H
+#ifndef PLATFORM_EC_INCLUDE_REGULATOR_H_
+#define PLATFORM_EC_INCLUDE_REGULATOR_H_
 
 #include "common.h"
 
@@ -60,4 +60,4 @@ int board_regulator_get_voltage(uint32_t index, uint32_t *voltage_mv);
 }
 #endif
 
-#endif /* !defined(__CROS_EC_REGULATOR_H) */
+#endif /* PLATFORM_EC_INCLUDE_REGULATOR_H_ */

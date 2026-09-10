@@ -4,8 +4,8 @@
  *
  * Cros Board Info
  */
-#ifndef __CROS_EC_CROS_BOARD_INFO_H
-#define __CROS_EC_CROS_BOARD_INFO_H
+#ifndef PLATFORM_EC_INCLUDE_CROS_BOARD_INFO_H_
+#define PLATFORM_EC_INCLUDE_CROS_BOARD_INFO_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -281,4 +281,4 @@ int cbi_clear(void);
 }
 #endif
 
-#endif /* __CROS_EC_CROS_BOARD_INFO_H */
+#endif /* PLATFORM_EC_INCLUDE_CROS_BOARD_INFO_H_ */

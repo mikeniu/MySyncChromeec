@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_SHA256_CHIP_H
-#define __CROS_EC_SHA256_CHIP_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_SHA256_HW_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_SHA256_HW_H_
 
 #include <zephyr/crypto/crypto.h>
 
@@ -28,4 +28,4 @@ void SHA256_abort(struct sha256_ctx *ctx);
 }
 #endif
 
-#endif /* __CROS_EC_SHA256_CHIP_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_SHA256_HW_H_ */

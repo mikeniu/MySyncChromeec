@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_BTN_IGN_OUT_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_BTN_IGN_OUT_H
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_BTN_IGN_OUT_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_BTN_IGN_OUT_H_
 
 #include "ec_commands.h"
 
@@ -23,4 +23,4 @@ inline void update(std::uint32_t sensor_mode)
 
 } // namespace btn_ign_out
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_BTN_IGN_OUT_H */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_BTN_IGN_OUT_H_ */

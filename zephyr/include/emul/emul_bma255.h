@@ -9,8 +9,8 @@
  * @brief Backend API for BMA255 emulator
  */
 
-#ifndef __EMUL_BMA255_H
-#define __EMUL_BMA255_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BMA255_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BMA255_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c.h>
@@ -188,4 +188,4 @@ emul_bma_get_i2c_common_data(const struct emul *emul);
  * @}
  */
 
-#endif /* __EMUL_BMA255_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BMA255_H_ */

@@ -9,8 +9,8 @@
  * mutexes of interest.
  */
 
-#ifndef _MUTEX_HISTORY_H
-#define _MUTEX_HISTORY_H
+#ifndef PLATFORM_EC_ZEPHYR_DEBUG_MUTEX_HISTORY_H_
+#define PLATFORM_EC_ZEPHYR_DEBUG_MUTEX_HISTORY_H_
 
 #include <zephyr/kernel.h>
 #include <zephyr/sys/ring_buffer.h>
@@ -73,4 +73,4 @@ void mutex_history_log(struct ring_buf *rb, const struct k_mutex *mutex,
  */
 void mutex_history_dump(struct ring_buf *rb);
 
-#endif /* _MUTEX_HISTORY_H */
+#endif /* PLATFORM_EC_ZEPHYR_DEBUG_MUTEX_HISTORY_H_ */

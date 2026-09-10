@@ -5,8 +5,8 @@
 
 /* Watchdog driver */
 
-#ifndef __CROS_EC_WATCHDOG_H
-#define __CROS_EC_WATCHDOG_H
+#ifndef PLATFORM_EC_INCLUDE_WATCHDOG_H_
+#define PLATFORM_EC_INCLUDE_WATCHDOG_H_
 
 #include "config.h"
 
@@ -62,4 +62,4 @@ test_mockable_static_inline void watchdog_reload(void)
 }
 #endif
 
-#endif /* __CROS_EC_WATCHDOG_H */
+#endif /* PLATFORM_EC_INCLUDE_WATCHDOG_H_ */
