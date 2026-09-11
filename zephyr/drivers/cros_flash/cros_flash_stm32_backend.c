@@ -49,7 +49,14 @@ int flash_change_rdp(const struct device *dev, bool enable, bool permanent)
 	err = flash_ex_op(dev, FLASH_STM32_EX_OP_RDP, (uintptr_t)&rdp_request,
 			  NULL);
 
-	return err;
+	/*
+	 * Upstream implementation of flash_ex_op for FLASH_STM32_EX_OP_RDP
+	 * parameter does not follow the return value pattern documented in
+	 * the API (0 on success, negative error code on failure). Instead,
+	 * it returns the index of RDP mode set on success. Squash these
+	 * return values to zero.
+	 */
+	return err < 0 ? err : 0;
 }
 
 int flash_get_rdp(const struct device *dev, bool *enable, bool *permanent)
