@@ -37,6 +37,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f9adbf9_fc37fde9",
+        "filename": "zephyr/shim/chip/rtkfp/mpu_regions.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:20:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35125156_6550c0af",
+      "revId": "cef33b51a8afcce310ffa896e19d5aebba22b723",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f0129066_51d94715",
@@ -55,6 +73,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca7729ac_2f4fa7c8",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:20:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0129066_51d94715",
+      "revId": "cef33b51a8afcce310ffa896e19d5aebba22b723",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d8fdfee_61d2d9ff",
@@ -69,6 +105,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] The logic here appears to be inverted. For ARMv8-M, enabling the MPU region (via `MPU_RLAR_EN_Msk`) applies its access permissions (which typically enforce the lock). Disabling the region removes those restrictions and falls back to the default memory map.\n\nWhen `lock` is true, you likely want to **enable** the region (`MPU-\u003eRLAR |\u003d MPU_RLAR_EN_Msk;`), and when false, you want to **disable** it. This would match the behavior of the non-Cortex-M33 logic below.",
       "isAi": true,
+      "revId": "cef33b51a8afcce310ffa896e19d5aebba22b723",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76f79988_4f647818",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:20:27Z",
+      "side": 1,
+      "message": "`CONFIG_MPU_DISABLE_BACKGROUND_MAP` is `y`, so default memory map is disabled",
+      "parentUuid": "3d8fdfee_61d2d9ff",
       "revId": "cef33b51a8afcce310ffa896e19d5aebba22b723",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
