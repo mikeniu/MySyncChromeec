@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a36a05b9_c1aa5cde",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-11T02:36:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/706170fd-36bf-431e-ba67-647f1bd87e04)]\n\n**Review Summary:**\n* **Functionality \u0026 Security:** The M33 rollback lock correctly disables the MPU region, which effectively locks the region when the background map is disabled (`CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy`). Left an inline suggestion to document this non-obvious hardware dependency, as it is critical for security and explains the test failures.\n* **Style:** The code is clean and addresses all previous feedback, including the `BUILD_ASSERT` for rollback contiguity and removing the redundant `mpu_config` comment.\n* **CL Size \u0026 Scope:** The CL is well-scoped to adding Cortex-M33 MPU support.\n* **Testing:** As discussed, MPU tests in privileged mode without a disabled background map will not trigger faults on ARMv8-M. Relying on hardware-in-the-loop tests or explicitly documenting the test limitation is acceptable. No new tests required.",
+      "isAi": true,
+      "revId": "0e3e96fb927339e51aa4751f5cf31b6c6983d961",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e765b3a6_7c2992a8",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-11T02:36:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] On ARMv8-M, MPU regions cannot be configured with \"Privileged No-Access\" (`P_NA`) permissions. Therefore, disabling the MPU region here relies entirely on the default memory map being disabled (via `CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy` which clears `PRIVDEFENA`) to prevent privileged access. \n\nThis is a critical security property and a non-obvious hardware limitation. Please add a brief comment here explaining this dependency. This hardware limitation also explains why MPU-related unit tests running in privileged mode with the background map enabled will fail to trigger faults.",
+      "isAi": true,
+      "revId": "0e3e96fb927339e51aa4751f5cf31b6c6983d961",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
