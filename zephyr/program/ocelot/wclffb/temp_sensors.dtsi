@@ -16,10 +16,10 @@
 		thermistor = <&thermistor_3V3_30K9_47K_4050B>;
 		adc = <&adc_cpu_vr_therm>;
 	};
-	temp_ssd_thermistor: ssd-thermistor {
+	temp_lpddr_thermistor: lpddr-thermistor {
 		compatible = "cros-ec,temp-sensor-thermistor";
 		thermistor = <&thermistor_3V3_30K9_47K_4050B>;
-		adc = <&adc_ssd_therm>;
+		adc = <&adc_lpddr_therm>;
 	};
 	temp_regulator_thermistor: ambient-thermistor {
 		compatible = "cros-ec,temp-sensor-thermistor";
@@ -52,12 +52,12 @@
 			sensor = <&temp_cpu_vr_thermistor>;
 			power-good-pin = <&gpio_all_sys_pwrgd_r>;
 		};
-		temp_ssd: ssd-thermistor {
+		temp_lpddr: lpddr-thermistor {
 			temp-host-high = <75>;
 			temp-host-halt = <85>;
 			temp-host-release-high = <70>;
 			temp-host-release-halt = <80>;
-			sensor = <&temp_ssd_thermistor>;
+			sensor = <&temp_lpddr_thermistor>;
 			power-good-pin = <&gpio_all_sys_pwrgd_r>;
 		};
 		temp_regulator: ambient-thermistor {

@@ -11,29 +11,60 @@
 };
 
 &vivaldi_kbd {
-	vivaldi-keys = <VIVALDI_KEYS_STRAUSS_T14>;
+	/* status = "disabled"; */
+
+	/* wclffb physical matrix map -- verified on-board by getevent scancode
+	 * sweep (2026-07-10). STRAUSS_T14 did NOT match this board: it placed
+	 * action keys on the '1' (0,2) and 'a' (2,2) cells, so those keys emitted
+	 * Back/Fullscreen. Each entry below is the (row,col) of the physical key
+	 * that carries the matching vivaldi-code. Refresh MUST be (3,2) (KSO2) for
+	 * the GSC recovery combo -- KEYBOARD_REFRESH_ROW3=y enforces this via a
+	 * BUILD_ASSERT. The other 12 actions live on the physical F1..F12 keys. */
+	/* Physical top-row map verified on wclffa2. */
+	vivaldi-keys = <
+		KBD_RC(6, 4)  /* Back                 <- F1  */
+		KBD_RC(7, 5)  /* Refresh              <- F2  */
+		KBD_RC(6, 5)  /* Fullscreen           <- F3  */
+		KBD_RC(5, 5)  /* Overview             <- F4  */
+		KBD_RC(7, 6)  /* Snapshot             <- F5  */
+		KBD_RC(6, 6)  /* Brightness down      <- F6  */
+		KBD_RC(5, 6)  /* Brightness up        <- F7  */
+		KBD_RC(7, 9)  /* Privacy screen       <- F8  */
+		KBD_RC(6, 9)  /* Keyboard backlight - <- F9  */
+		KBD_RC(5, 9)  /* Keyboard backlight + <- F10 */
+		KBD_RC(7, 11) /* Keyboard backlight   <- F11 */
+		KBD_RC(6, 11) /* Microphone mute      <- F12 */
+		KBD_RC(6, 13) /* Volume mute          */
+		KBD_RC(7, 13) /* Volume down          */
+		KBD_RC(7, 14) /* Volume up            */
+	>;
 
 	kbd_config_0: kbd-config-0 {
+		/* 13 action keys = 12 physical F-keys + Refresh (on Caps/KSO2).
+		 * Order must line up index-for-index with vivaldi-keys above.
+		 * Dropped VIVALDI_TK_KBD_BKLIGHT_TOGGLE from the old 14-key list --
+		 * this keyboard only has 12 top-row keys (F1..F12) plus the Caps
+		 * Refresh key; 'del' (right of F12) stays a normal Delete key. */
 		vivaldi-codes = <
-			VIVALDI_TK_BACK               /* T1 */
-			VIVALDI_TK_REFRESH            /* T2 */
-			VIVALDI_TK_FULLSCREEN         /* T3 */
-			VIVALDI_TK_OVERVIEW           /* T4 */
-			VIVALDI_TK_SNAPSHOT           /* T5 */
-			VIVALDI_TK_BRIGHTNESS_DOWN    /* T6 */
-			VIVALDI_TK_BRIGHTNESS_UP      /* T7 */
-			VIVALDI_TK_KBD_BKLIGHT_TOGGLE /* T8 */
-			VIVALDI_TK_DICTATE            /* T9 */
-			VIVALDI_TK_ACCESSIBILITY      /* T10 */
-			VIVALDI_TK_MICMUTE            /* T11 */
-			VIVALDI_TK_VOL_MUTE           /* T12 */
-			VIVALDI_TK_VOL_DOWN           /* T13 */
-			VIVALDI_TK_VOL_UP             /* T14 */
+			VIVALDI_TK_BACK
+			VIVALDI_TK_REFRESH
+			VIVALDI_TK_FULLSCREEN
+			VIVALDI_TK_OVERVIEW
+			VIVALDI_TK_SNAPSHOT
+			VIVALDI_TK_BRIGHTNESS_DOWN
+			VIVALDI_TK_BRIGHTNESS_UP
+			VIVALDI_TK_PRIVACY_SCRN_TOGGLE
+			VIVALDI_TK_KBD_BKLIGHT_DOWN
+			VIVALDI_TK_KBD_BKLIGHT_UP
+			VIVALDI_TK_KBD_BKLIGHT_TOGGLE
+			VIVALDI_TK_MICMUTE
+			VIVALDI_TK_VOL_MUTE
+			VIVALDI_TK_VOL_DOWN
+			VIVALDI_TK_VOL_UP
 		>;
 		capabilities = <(VIVALDI_KEYBD_CAP_FUNCTION_KEYS |
 				VIVALDI_KEYBD_CAP_SCRNLOCK_KEY |
-				VIVALDI_KEYBD_CAP_ASSISTANT_KEY)
-		>;
+				VIVALDI_KEYBD_CAP_ASSISTANT_KEY)>;
 	};
 };
 
@@ -96,6 +127,9 @@
 	kso-ignore-mask = <04>;
 	debounce-down-ms = <15>;
 	debounce-up-ms = <15>;
+	/* General matrix settle time applied to every column (matches sibling
+	 * boards: nissa/*, trulo/*, fatcat/*, ocelot/kodkod, ocelot/ojal). */
+	settle-time-us = <80>;
 	actual-key-mask = <
 		0xff  /* C0 */
 		0xff  /* C1 */
@@ -118,47 +152,50 @@
 	kso-gpio {
 		compatible = "cros-ec,col-gpio";
 		col-num = <2>;
-		col-gpios = <&gpioksol 2 GPIO_ACTIVE_HIGH>;
+		col-gpios = <&gpioksol 2 GPIO_ACTIVE_LOW>;
 	};
 
-	/*
 	boot-keys {
 		compatible = "cros-ec,boot-keys";
-		down-arrow-rc = <KBD_RC(6, 11)>;
-		esc-rc = <KBD_RC(1, 1)>;
-		left-shift-rc = <KBD_RC(5, 7)>;
-		refresh-rc = <KBD_RC(3, 2)>;
+		down-arrow-rc = <KBD_RC(0, 9)>;
+		esc-rc = <KBD_RC(7, 4)>;
+		left-shift-rc = <KBD_RC(7, 0)>;
+		refresh-rc = <KBD_RC(7, 5)>;
 	};
 
 	runtime-keys {
 		compatible = "cros-ec,runtime-keys";
-		left-alt-rc = <KBD_RC(6, 13)>;
-		right-alt-rc = <KBD_RC(0, 10)>;
-		h-rc = <KBD_RC(1, 6)>;
-		r-rc = <KBD_RC(7, 9)>;
+		left-alt-rc = <KBD_RC(3, 2)>;
+		right-alt-rc = <KBD_RC(2, 2)>;
+		h-rc = <KBD_RC(3, 8)>;
+		r-rc = <KBD_RC(4, 7)>;
 	};
-	*/
 
+	/* Rebuilt 2026-09-14 from an on-board getevent + EC-console ("KB scancode
+	 * R:C missing") sweep -- see memory/project_wclffa2_keyboard_specA_vs_specB.md
+	 * for the full physical-key -> (row,col) table this was generated from.
+	 * Row order per column below is KSI0..KSI7 (top to bottom = row 0..7).
+	 * Vivaldi overrides the top-row entries above; col12 is unused. */
 	scancode-set2 {
 		compatible = "cros-ec,scancode-set2";
 
 		default {
-			col0-codes  = <0x004d 0x0052 0x0041 0x0000 0x004b 0x0044 0x0046 0x0009>;
-			col1-codes  = <0x0000 0x0000 0x0000 0x0000 0x0000 0x0000 0x0000 0x0037>;
-			col2-codes  = <0x0016 0x0000 0x001c 0x0058 0x000d 0x000e 0x0005 0x0076>;
-			col3-codes  = <0x0000 0x0000 0x0000 0x0059 0x0000 0x0000 0x0012 0x0000>;
-			col4-codes  = <0xe014 0x0000 0x0000 0x0000 0x0000 0x0014 0x0000 0x0000>;
-			col5-codes  = <0x0000 0x0000 0x0000 0x0000 0xe01f 0x0000 0x0000 0x0000>;
-			col6-codes  = <0x0015 0x001a 0x0022 0x001b 0x001d 0x001e 0x0005 0x0004>;
-			col7-codes  = <0x0000 0xe011 0x0011 0x0000 0x0000 0x0000 0x0000 0x0000>;
-			col8-codes  = <0x0054 0xe06b 0x0000 0xe075 0x0000 0x0055 0x0000 0xe071>;
-			col9-codes  = <0x004e 0x0000 0x0049 0x0000 0x0054 0x0045 0x0007 0x0078>;
-			col10-codes = <0xe074 0xe072 0x004c 0x005d 0x005a 0x0066 0x0000 0x0000>;
-			col11-codes = <0x0000 0x0000 0x0000 0x0000 0x0000 0x004a 0x0000 0x0000>;
-			col12-codes = <0x003c 0x0032 0x0031 0x0033 0x0035 0x003d 0x003e 0x0083>;
-			col13-codes = <0x002c 0x002a 0x002b 0x0034 0x002d 0x002e 0x0036 0x000b>;
-			col14-codes = <0x0026 0x0000 0x0021 0x0023 0x0024 0x0025 0x000c 0x0003>;
-			col15-codes = <0x003b 0x0029 0x0041 0x003a 0x0042 0x0043 0x000a 0x0001>;
+			col0-codes  = <0x0000 0x0000 0x0000 0x0000 0x0058 0x0000 0x0059 0x0012>; /* # # # # Caps # R-Shift L-Shift */
+			col1-codes  = <0x0000 0x0000 0x0000 0x0000 0xe014 0x0014 0xe06b 0x0000>; /* # # # # R-Ctrl L-Ctrl Left # */
+			col2-codes  = <0x0000 0x0000 0xe011 0x0011 0x0000 0x0000 0x0000 0x0000>; /* # Fn R-Alt L-Alt # # # # */
+			col3-codes  = <0x0000 0xe01f 0x0000 0x0000 0x0000 0x0000 0xe074 0x0000>; /* # Assistant # # # # Right # */
+			col4-codes  = <0x001a 0x001c 0x0015 0x000d 0x0016 0x000e 0x0005 0x0076>; /* z a q Tab 1 ` F1 Esc */
+			col5-codes  = <0x0000 0x0022 0x001b 0x001d 0x001e 0x000c 0x0004 0x0006>; /* # x s w 2 F4 F3 F2 */
+			col6-codes  = <0x0000 0x0023 0x0021 0x0024 0x0026 0x0083 0x000b 0x0003>; /* # d c e 3 F7 F6 F5 */
+			col7-codes  = <0x002a 0x0032 0x002b 0x0034 0x002d 0x002c 0x0025 0x002e>; /* v b f g r t 4 5 */
+			col8-codes  = <0x003a 0x0031 0x003b 0x0033 0x003c 0x0035 0x003d 0x0036>; /* m n j h u y 7 6 */
+			col9-codes  = <0xe072 0x0041 0x0042 0x0043 0x003e 0x0009 0x0001 0x000a>; /* Down , k i 8 F10 F9 F8 */
+			col10-codes = <0x0000 0x0049 0x004b 0x0052 0x0044 0x0054 0x0046 0x0055>; /* # . l ' o [ 9 = */
+			col11-codes = <0x0029 0x004a 0x004c 0x004d 0x0045 0x0066 0x0007 0x0078>; /* Space / ; p 0 Backspace F12 F11 */
+			col12-codes = <0xe075 0x0000 0x0000 0x0000 0x0000 0x0000 0x0000 0x0000>; /* Up # # # # # # # */
+			col13-codes = <0x0000 0x0000 0x005a 0x0000 0x0000 0x004e 0x0000 0x0000>; /* # # Enter # # - # # */
+			col14-codes = <0x0000 0x0000 0x0000 0x0000 0x0000 0x0000 0x0000 0x0000>; /* # # # # # # # # */
+			col15-codes = <0x0000 0x0000 0x0000 0x0000 0x005d 0x005b 0x0000 0x0000>; /* # # # # \ ] # # */
 		};
 	};
 };

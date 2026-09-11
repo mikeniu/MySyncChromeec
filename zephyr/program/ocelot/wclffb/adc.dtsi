@@ -27,7 +27,7 @@
 			enum-name = "ADC_TEMP_SENSOR_CHARGER";
 			io-channels = <&adc0 4>;
 		};
-		adc_ssd_therm: ssd_therm {
+		adc_lpddr_therm: lpddr_therm {
 			enum-name = "ADC_TEMP_SENSOR_SSD";
 			io-channels = <&adc0 5>;
 		};

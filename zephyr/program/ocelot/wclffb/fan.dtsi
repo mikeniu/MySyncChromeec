@@ -2,34 +2,117 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+
 / {
 	fans {
 		compatible = "cros-ec,fans";
 
 		fan0: fan_0 {
-			pwms = <&pwm1 PWM_CHANNEL_1 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
-			rpm-min = <2500>;
-			rpm-start = <2500>;
+			pwms = <&pwm7 PWM_CHANNEL_7 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			rpm-min = <2000>;
+			rpm-start = <2000>;
 			rpm-max = <6000>;
 			tach = <&tach0>;
 			rpm-deviation = <1>;
 			pgood-gpio = <&gpio_all_sys_pwrgd_r>;
-			enable-gpio = <&gpio_en_pp5000_fan>;
+		};
+
+		fan1: fan_1 {
+			pwms = <&pwm1 PWM_CHANNEL_1 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			rpm-min = <2000>;
+			rpm-start = <2000>;
+			rpm-max = <6000>;
+			tach = <&tach1>;
+			rpm-deviation = <1>;
+			pgood-gpio = <&gpio_all_sys_pwrgd_r>;
 		};
 	};
 };
 
-&pwm1{
+/* FAN0: PWM7 on GPA7 */
+&pwm7 {
+	status = "okay";
+	prescaler-cx = <PWM_PRESCALER_C6>;
+	pinctrl-0 = <&pwm7_gpa7_default>;
+	pinctrl-names = "default";
+};
+
+/* FAN1: PWM1 on GPA1 */
+&pwm1 {
 	status = "okay";
 	prescaler-cx = <PWM_PRESCALER_C6>;
 	pinctrl-0 = <&pwm1_gpa1_default>;
 	pinctrl-names = "default";
 };
 
+&tach0a_gpd6_default {
+	bias-pull-up;
+};
+
+&tach1a_gpd7_default {
+	bias-pull-up;
+};
+
+/* FAN0 tach: TACH0 on GPD6 */
 &tach0 {
 	status = "okay";
 	pinctrl-0 = <&tach0a_gpd6_default>;
 	pinctrl-names = "default";
 	channel = <IT8XXX2_TACH_CHANNEL_A>;
 	pulses-per-round = <2>;
+};
+
+/* FAN1 tach: TACH1 on GPD7 */
+&tach1 {
+	status = "okay";
+	pinctrl-0 = <&tach1a_gpd7_default>;
+	pinctrl-names = "default";
+	channel = <IT8XXX2_TACH_CHANNEL_A>;
+	pulses-per-round = <2>;
+};
+
+/*
+ * Fan speed table — same 6-step SEN3/SOC-driven curve as wclffb.
+ * Sensor order: <ambient charger soc lpddr cpu_vr>
+ */
+/ {
+	fan_steps {
+		compatible = "cros-ec,fan-steps";
+
+		level_0 {
+			temp-on = <0xff 0xff 43 0xff 0xff>;
+			temp-off = <0xff 0xff 0xff 0xff 0xff>;
+			rpm-target = <0>;
+		};
+		level_1 {
+			temp-on = <0xff 0xff 45 0xff 0xff>;
+			temp-off = <0xff 0xff 40 0xff 0xff>;
+			rpm-target = <2000>;
+		};
+		level_2 {
+			temp-on = <0xff 0xff 47 0xff 0xff>;
+			temp-off = <0xff 0xff 42 0xff 0xff>;
+			rpm-target = <2800>;
+		};
+		level_3 {
+			temp-on = <0xff 0xff 49 0xff 0xff>;
+			temp-off = <0xff 0xff 44 0xff 0xff>;
+			rpm-target = <3200>;
+		};
+		level_4 {
+			temp-on = <0xff 0xff 51 0xff 0xff>;
+			temp-off = <0xff 0xff 46 0xff 0xff>;
+			rpm-target = <4000>;
+		};
+		level_5 {
+			temp-on = <0xff 0xff 53 0xff 0xff>;
+			temp-off = <0xff 0xff 48 0xff 0xff>;
+			rpm-target = <4600>;
+		};
+		level_6 {
+			temp-on = <0xff 0xff 0xff 0xff 0xff>;
+			temp-off = <0xff 0xff 50 0xff 0xff>;
+			rpm-target = <5000>;
+		};
+	};
 };

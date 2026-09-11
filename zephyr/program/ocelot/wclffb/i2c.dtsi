@@ -47,25 +47,3 @@
 		&i2c2_data_gpf7_default>;
 	pinctrl-names = "default";
 };
-
-/* reserved for sensor */
-&i2c3 {
-	status = "okay";
-	clock-frequency = <I2C_BITRATE_FAST>;
-	pinctrl-0 = <&i2c3_clk_gpb2_default
-		&i2c3_data_gpb5_default>;
-	scl-gpios = <&gpiob 2 0>;
-	sda-gpios = <&gpiob 5 0>;
-	pinctrl-names = "default";
-};
-/* r
-eserved for acc sensor */
-&i2c5 {
-	status = "okay";
-	clock-frequency = <I2C_BITRATE_FAST>;
-	pinctrl-0 = <&i2c5_clk_gpe1_default
-		&i2c5_data_gpe2_default>;
-	scl-gpios = <&gpioe 1 0>;
-	sda-gpios = <&gpioe 2 0>;
-	pinctrl-names = "default";
-};
