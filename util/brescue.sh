@@ -116,11 +116,25 @@ case "$(stat -c '%s' "${source}")" in
     chip_extension=''
     addr=0x44000
     ;;
+  (507904)
+    # Cr50 image built without RO_A (524288 - 16384).
+    skip=0
+    count=233472
+    chip_extension=''
+    addr=0x44000
+    ;;
   (1048576)
     skip=$(rw_offset "${source}")
     count=$(( 1048576/2 - "${skip}" ))
     chip_extension='--dauntless'
     addr="$(printf '0x%x' $(( 0x80000 + "${skip}" )))"
+    ;;
+  (1032192)
+    # Ti50 image built without RO_A (1048576 - 16384).
+    skip=0
+    count=$(( 1048576/2 - 16384 ))
+    chip_extension='--dauntless'
+    addr=0x84000
     ;;
   (*)
     echo "Unrecognized input file" >&2
