@@ -77,6 +77,22 @@ Add `spi_drive` GSC command          | 0.24.180            | 0.23.180           
 Run APRV after WP events             | 0.24.172            | 0.23.180            | M138/M139
 NT - Image BID checks                | RO .108 RW 0.33.190 | RO .113 RW 0.33.210 | M138/M140
 
+# Security Fixes
+
+This section covers vulnerabilities with CVE records relevant for Ti50 firmware.
+
+CVE ID        | Notes                          | Fixed in Ti50 Version
+--------------|--------------------------------|----------------------
+CVE-2025-2884 | TCGVRT0009: OOB read in TPM2.0 | 0.x3.170 / 0.x4.160
+
+# Certifications
+
+This section covers product certifications and validations relevant for GSCs and ti50 firmware.
+
+Certification Body | Certification Profile | Certification Target | Certification #
+-------------------|-----------------------|----------------------|----------------
+(currently none)   |                       |                      |
+
 # DT RO revisions
 
 ## 0.0.32
