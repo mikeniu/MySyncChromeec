@@ -1,0 +1,127 @@
+/* Copyright 2024 The ChromiumOS Authors.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/st/stm32.dtsi>
+#include <zephyr/dt-bindings/pinctrl/stm32-pinctrl.h>
+#include <st/h7/stm32h743vitx-pinctrl.dtsi>
+
+&iwdg {
+	status = "okay";
+};
+
+/* RNG module uses hsi48 clock as a source by default. */
+/* TODO: Enable only to get random number. Connect it to RNG and device suspend and resume?. */
+&clk_hsi48 {
+	status = "okay";
+};
+
+&perck {
+	status = "okay";
+	clocks = <&rcc STM32_SRC_HSI_KER CKPER_SEL(0)>;
+};
+
+&rng {
+	status = "okay";
+};
+
+&dmamux1 {
+	status = "okay";
+};
+
+&dma1 {
+	/*
+	 * Only SPI1 and SPI4 use DMA, and both are configured to use streams
+	 * from DMA2: numeric channels 8-15 in &spi1 and &spi4 properties
+	 * correspond to physical channels 0-7 in DMA2. With only four out of
+	 * eight available DMA2 streams occupied, one DMA instance is more than
+	 * enough. Disable DMA1 to save power.
+	 */
+	status = "disabled";
+};
+
+&dma2 {
+	status = "okay";
+};
+
+&spi1 {
+	compatible = "st,stm32h7-spi", "st,stm32-spi-host-cmd", "st,stm32-spi-fifo";
+	status = "okay";
+
+	pinctrl-0 = <&spi1_nss_pa4 &spi1_sck_pa5 &spi1_miso_pa6 &spi1_mosi_pa7>;
+	pinctrl-names = "default";
+
+	/* Select per_ck(hsi_ker_ck) as source clock for SPI1 */
+	clocks = <&rcc STM32_CLOCK(APB2, 12U)>,
+		 <&rcc STM32_SRC_CKPER SPI123_SEL(4)>;
+
+	/* Use channel 3 for SPI1_TX_DMA (38) and channel 0 for SPI1_RX_DMA (37).
+	 * Source: RM0433 STM32H7x Reference Manual, Table 102 */
+	dmas = <&dmamux1 11 38 (STM32_DMA_PERIPH_TX | STM32_DMA_PRIORITY_VERY_HIGH)
+		 &dmamux1 8 37 (STM32_DMA_PERIPH_RX | STM32_DMA_PRIORITY_VERY_HIGH)>;
+	dma-names = "tx", "rx";
+
+	/* This field is used to point at our CS pin */
+	cs-gpios = <&gpioa 4 (GPIO_PULL_UP)>;
+};
+
+&spi4 {
+	/*
+	 * pinctrl-0 is inherited from upstream google_icetower.dts (pins 11-14).
+	 * Add pinctrl-1 for production hardware (pins 2,4,5,6) and override
+	 * pinctrl-names.
+	 */
+	pinctrl-1 = <&spi4_sck_pe2 &spi4_nss_pe4
+		     &spi4_miso_pe5 &spi4_mosi_pe6>;
+	pinctrl-names = "default", "prod";
+
+	/* Select hsi_ker_ck as source clock for SPI4 */
+	clocks = <&rcc STM32_CLOCK(APB2, 13U)>,
+		 <&rcc STM32_SRC_HSI_KER SPI45_SEL(3)>;
+
+	/* Use channel 1 for SPI4_TX_DMA (84) and channel 4 for SPI4_RX_DMA (83).
+	 * Source: RM0433 STM32H7x Reference Manual, Table 102 */
+	dmas = <&dmamux1 9 84 (STM32_DMA_PERIPH_TX | STM32_DMA_PRIORITY_HIGH)
+	       &dmamux1 12 83 (STM32_DMA_PERIPH_RX | STM32_DMA_PRIORITY_HIGH)>;
+	dma-names = "tx", "rx";
+};
+
+/*
+ * Extend SRAM1 to cover contiguous SRAM1, SRAM2 and SRAM3 (288kB total).
+ * Disable SRAM2 and SRAM3 to avoid generating overlapping linker regions.
+ */
+&sram1 {
+	reg = <0x30000000 DT_SIZE_K(288)>;
+	zephyr,memory-region = "SRAM1";
+};
+
+&sram2 {
+	status = "disabled";
+};
+
+&sram3 {
+	status = "disabled";
+};
+
+/*
+ * Upstream Ethernet node contains references to sram2 and sram3 nodes.
+ * Remove this property to avoid unresolved phandles to disabled nodes.
+ */
+&mac {
+	/delete-property/ memory-regions;
+};
+
+&pll {
+	div-m = <4>;
+	mul-n = <50>;
+	div-p = <2>;
+	clocks = <&clk_hsi>;
+	status = "okay";
+};
+
+&usart1 {
+	/* Select hsi_ker_ck as source clock for USART1 */
+	clocks = <&rcc STM32_CLOCK(APB2, 4U)>,
+		 <&rcc STM32_SRC_HSI_KER USART16_SEL(3)>;
+};
