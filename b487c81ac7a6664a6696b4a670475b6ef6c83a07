@@ -70,6 +70,24 @@
       "parentUuid": "616669c8_cb403c8f",
       "revId": "b487c81ac7a6664a6696b4a670475b6ef6c83a07",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1acb6803_88ae4dd3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1353551
+      },
+      "writtenOn": "2026-09-11T07:22:02Z",
+      "side": 1,
+      "message": "From the bug, we only need one patch CL:8377563, which is pretty simple (not considering the tests). If the tests cause conflicts, we can simply drop the tests modification from the cherry-pick (as long as the tests still pass).",
+      "parentUuid": "9589062b_c140d147",
+      "revId": "b487c81ac7a6664a6696b4a670475b6ef6c83a07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
