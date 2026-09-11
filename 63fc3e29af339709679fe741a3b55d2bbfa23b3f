@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8abe8eb_1be0c8b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-11T02:36:30Z",
+      "side": 1,
+      "message": "Fixed in PS3",
+      "parentUuid": "6ca9bd5d_68c85f50",
+      "revId": "63fc3e29af339709679fe741a3b55d2bbfa23b3f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5973e6b_09291408",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] It looks like the previous name was already misspelled as `elan80elan80series_pal` and the find-and-replace resulted in `elan80elan_series_pal`. Since we are renaming the driver to `elan_series`, this should probably be updated to simply `elan_series_pal` for consistency and correctness.",
       "isAi": true,
+      "revId": "63fc3e29af339709679fe741a3b55d2bbfa23b3f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e70b4728_aae34681",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_elan_series_pal.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-11T02:36:30Z",
+      "side": 1,
+      "message": "Fixed in PS3",
+      "parentUuid": "e5973e6b_09291408",
       "revId": "63fc3e29af339709679fe741a3b55d2bbfa23b3f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
