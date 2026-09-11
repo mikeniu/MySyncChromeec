@@ -42,6 +42,9 @@ static const uint8_t out_preamble[EC_SPI_PREAMBLE_LENGTH] = {
 	EC_SPI_FRAME_START,
 };
 
+/* A host command is in processing by the host command task? */
+static bool shi_cmd_processing;
+
 /* Store read and write data buffer */
 static uint8_t in_msg[SPI_RX_MAX_FIFO_SIZE] __aligned(4);
 static uint8_t out_msg[SPI_TX_MAX_FIFO_SIZE] __aligned(4);
@@ -138,6 +141,8 @@ static void spi_send_response_packet(struct host_packet *pkt)
 {
 	int i, tx_size;
 
+	shi_cmd_processing = false;
+
 	if (spi_peripheral_state != SPI_STATE_PROCESSING) {
 		CPRINTS("The request data is not processing.");
 		return;
@@ -177,24 +182,26 @@ static void spi_host_request_data(uint8_t *in_msg_addr, int count)
 /* Parse header for version of spi-protocol */
 static void spi_parse_header(void)
 {
-	struct ec_host_request *r = (struct ec_host_request *)in_msg;
+	struct ec_host_request r;
 
-	/* Store request data from Rx FIFO to in_msg buffer */
-	spi_host_request_data(in_msg, sizeof(*r));
+	/* Store request header from Rx FIFO to local buffer */
+	spi_host_request_data((uint8_t *)&r, sizeof(r));
 
 	/* Protocol version 3 */
-	if (in_msg[0] == EC_HOST_REQUEST_VERSION) {
+	if (r.struct_version == EC_HOST_REQUEST_VERSION) {
 		int pkt_size;
 
 		/* Check how big the packet should be */
-		pkt_size = host_request_expected_size(r);
+		pkt_size = host_request_expected_size(&r);
 
 		if (pkt_size == 0 || pkt_size > sizeof(in_msg))
 			return spi_bad_received_data(pkt_size);
 
+		/* Copy verified header to in_msg buffer */
+		memcpy(in_msg, &r, sizeof(r));
+
 		/* Store request data from Rx FIFO to in_msg buffer */
-		spi_host_request_data(in_msg + sizeof(*r),
-				      pkt_size - sizeof(*r));
+		spi_host_request_data(in_msg + sizeof(r), pkt_size - sizeof(r));
 
 		/* Set up parameters for host request */
 		spi_packet.send_response = spi_send_response_packet;
@@ -216,6 +223,7 @@ static void spi_parse_header(void)
 		spi_set_state(SPI_STATE_PROCESSING);
 
 		/* Go to common-layer to handle request */
+		shi_cmd_processing = true;
 		host_packet_receive(&spi_packet);
 	} else {
 		/* Invalid version number */
@@ -279,7 +287,11 @@ void spi_peripheral_int_handler(void)
 		/* write clear peripheral status */
 		IT83XX_SPI_RX_VLISR = IT83XX_SPI_RVLI;
 		/* Parse header for version of spi-protocol */
-		spi_parse_header();
+		if (!shi_cmd_processing) {
+			spi_parse_header();
+		} else {
+			CPRINTS("The host cmd task is processing the request.");
+		}
 	}
 
 	/* Clear the interrupt status */
