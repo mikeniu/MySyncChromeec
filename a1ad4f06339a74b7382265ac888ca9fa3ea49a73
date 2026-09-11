@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "008088ec_47ad960b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-11T02:26:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/4fc4499f-234b-4f27-b83c-da8d1beb7c3a)]\n\n**Review Summary**\n* **Functionality**: The code properly implements the OTP key reading and provisioning logic using the Zephyr OTP API. The previous feedback (NULL checks, device readiness checks in init) has been well-incorporated. I left a minor suggestion to also ensure device readiness before attempting reads to fail gracefully.\n* **Security**: Excellent use of `trng_rand_bytes` for key generation and `OPENSSL_cleanse` to sanitize the stack buffer before returning. The fallback error conditions correctly route to the cleanse logic.\n* **Style**: The code follows EC and Zephyr coding style conventions well and is cleanly structured.\n* **Testing**: The implementation correctly relies on the existing `otp_key` device test suite (`run_device_tests.py -t otp_key`), which is standard for EC OTP implementations.\n* **CL Size**: The CL is appropriately sized, small, and self-contained.\n\nTAG\u003dagy\nCONV\u003d4fc4499f-234b-4f27-b83c-da8d1beb7c3a",
+      "isAi": true,
+      "revId": "a1ad4f06339a74b7382265ac888ca9fa3ea49a73",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c8eda5a_6e3f149a",
+        "filename": "zephyr/shim/chip/rtkfp/otp_key.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-11T02:26:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While `otp_key_init` logs an error if the device is not ready, it does not prevent this function from being called later by the upper layers. Consider adding a `!device_is_ready(otp_dev)` check here to fail gracefully instead of potentially crashing inside `otp_read`:\n\n```c\n\tif (!device_is_ready(otp_dev)) {\n\t\treturn EC_ERROR_HW_INTERNAL;\n\t}\n```",
+      "isAi": true,
+      "revId": "a1ad4f06339a74b7382265ac888ca9fa3ea49a73",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70d708a7_fbe7a675",
+        "filename": "zephyr/shim/chip/rtkfp/otp_key.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-11T02:26:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `otp_key_buffer` is allocated on the stack as a byte array. If the underlying `otp_read` or `otp_program` driver implementations cast this to a `uint32_t *` internally for word-aligned accesses (which is common for OTP/Flash controllers), this may result in an unaligned memory access fault.\n\nConsider forcing 4-byte alignment here just to be safe, since you already enforce `BUILD_ASSERT(OTP_KEY_SIZE_BYTES % 4 \u003d\u003d 0)` above:\n\n```c\n\tuint8_t __aligned(4) otp_key_buffer[OTP_KEY_SIZE_BYTES] \u003d { 0 };\n```",
+      "isAi": true,
+      "revId": "a1ad4f06339a74b7382265ac888ca9fa3ea49a73",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
