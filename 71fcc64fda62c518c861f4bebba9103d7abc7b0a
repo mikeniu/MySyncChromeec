@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "10980513_561ef63f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:08:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "33ef5eac_6fecf861",
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "042b6eec_cfe9b322",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] There seems to be a typo here. The Kconfig defines `CONFIG_CROS_SYSTEM_REALTEKFP_INIT_PRIORITY` (with `FP`), but here you are checking `CONFIG_CROS_SYSTEM_REALTEK_INIT_PRIORITY`. Because the checked macro is undefined, this `#if` condition will evaluate to 0 and fail to catch priority configuration errors.",
       "isAi": true,
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e10ec100_faefbacb",
+        "filename": "zephyr/drivers/cros_system/cros_system_rtkfp.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:08:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "042b6eec_cfe9b322",
       "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5951748_0679cc48",
+        "filename": "zephyr/program/fpmcu/realtekfp/realtekfp.dts",
+        "patchSetId": 8
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:08:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a91170c_c757f31a",
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd9a71d9_04430507",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] The comment mentions 128KB sectors, but the sizes for `rollback0` and `rollback1` are both `\u003c0x1000\u003e` (4KB). Please correct the comment to reflect the actual size.",
       "isAi": true,
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4667d9d_3b670bde",
+        "filename": "zephyr/program/fpmcu/realtekfp/realtekfp.dts",
+        "patchSetId": 8
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:08:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd9a71d9_04430507",
       "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -91,6 +163,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27870b53_b81877c4",
+        "filename": "zephyr/program/fpmcu/realtekfp/realtekfp.dts",
+        "patchSetId": 8
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:08:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b22f428c_157a3166",
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "553ef6cd_c31a6f95",
@@ -105,6 +195,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] The unit-address in the node name (`@32000`) does not match the first address specified in the `reg` property (`0x42000`). It should be renamed to `partition@42000` to comply with DeviceTree specifications.",
       "isAi": true,
+      "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f69f27b_76311f42",
+        "filename": "zephyr/program/fpmcu/realtekfp/realtekfp.dts",
+        "patchSetId": 8
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:08:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "553ef6cd_c31a6f95",
       "revId": "71fcc64fda62c518c861f4bebba9103d7abc7b0a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
