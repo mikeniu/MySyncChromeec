@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab848520_9c9559eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-11T15:43:06Z",
+      "side": 1,
+      "message": "how would this impact when the files are copied to `platform/ec-legacy`?",
+      "revId": "19f072b2990e0b1ad8400d9c18205d8827ef48cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
