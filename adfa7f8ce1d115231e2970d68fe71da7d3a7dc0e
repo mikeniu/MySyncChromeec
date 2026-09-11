@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63dd910c_0bf2bf17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-11T02:55:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/702813ac-4867-465e-8fc9-0548f17bfdcb)]\n\n### Review Summary\n\n*   **Functionality**: Basic skeleton implementation looks functional for early board bring-up. The previous issue with the `CROS_SYSTEM` initialization `#if` check has been resolved, and the DTS node names correctly match their unit addresses.\n*   **Security**: No obvious security vulnerabilities introduced.\n*   **Style**: The DTS comments have been successfully updated to match the actual configurations for RO, rollback, and RW sectors. Code style follows standard conventions and copyright years have been updated.\n*   **Consistency**: The skeleton structure is consistent with other Zephyr FPMCU board implementations.\n*   **Testing \u0026 Test Coverage**: This CL introduces a new hardware variant. While lacking test coverage is typical for initial skeleton boards, consider adding basic unit tests as non-stub logic is implemented for this MCU.\n*   **CL Size \u0026 Scope**: The size of the CL is appropriate and self-contained for adding a new board variant.",
+      "isAi": true,
+      "revId": "adfa7f8ce1d115231e2970d68fe71da7d3a7dc0e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
