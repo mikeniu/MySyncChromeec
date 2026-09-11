@@ -381,6 +381,11 @@ test_mockable int battery_cutoff_in_progress(void)
 	return (battery_cutoff_state == BATTERY_CUTOFF_STATE_IN_PROGRESS);
 }
 
+void battery_cutoff_set_state(enum battery_cutoff_states state)
+{
+	battery_cutoff_state = state;
+}
+
 const struct deferred_data __keep pending_cutoff_deferred_data;
 /* Cutoff timeout */
 static timestamp_t cutoff_timeout;

@@ -494,6 +494,13 @@ int board_cut_off_battery(void);
 int battery_cutoff_in_progress(void);
 
 /**
+ * Set the battery cutoff state.
+ *
+ * @param state New cutoff state.
+ */
+void battery_cutoff_set_state(enum battery_cutoff_states state);
+
+/**
  * Return if the battery has been cut off.
  */
 int battery_is_cut_off(void);
