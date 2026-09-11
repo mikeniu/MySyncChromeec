@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "629f8f1d_8a12d46d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3487009
+      },
+      "writtenOn": "2026-09-11T14:13:40Z",
+      "side": 1,
+      "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
+      "revId": "a0c4267d3cbc646e5c00d620412293b4603427ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
