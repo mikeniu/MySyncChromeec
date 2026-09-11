@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2145688_e73b6063",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:21:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52fdf758_c3881350",
+      "revId": "6f435eb9ba9076efc9cef01439309e4d38424a27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ccbf707_653f0776",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa9b357c_db32b28e",
+        "filename": "zephyr/shim/chip/rtkfp/otp_key.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:21:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ccbf707_653f0776",
+      "revId": "6f435eb9ba9076efc9cef01439309e4d38424a27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c5b3f77_ac2ca956",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] It might be a good idea to add a NULL check for `key_buffer` before passing it to `otp_read` to prevent potential null pointer dereferences if called improperly:\n\n```c\n\tif (!key_buffer) {\n\t\treturn EC_ERROR_INVAL;\n\t}\n```",
       "isAi": true,
+      "revId": "6f435eb9ba9076efc9cef01439309e4d38424a27",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "487e38b5_944d82a7",
+        "filename": "zephyr/shim/chip/rtkfp/otp_key.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-11T02:21:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c5b3f77_ac2ca956",
       "revId": "6f435eb9ba9076efc9cef01439309e4d38424a27",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
