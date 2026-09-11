@@ -30,7 +30,7 @@ struct cros_flash_data {
 /* Driver convenience defines */
 #define DRV_DATA(dev) ((struct cros_flash_data *)(dev)->data)
 
-#define FLASH_SIZE DT_REG_SIZE(DT_CHOSEN(zephyr_flash))
+#define CROS_EC_FLASH_SIZE DT_REG_SIZE(DT_CHOSEN(zephyr_flash))
 
 static const struct device *const flash_controller =
 	DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
@@ -117,8 +117,8 @@ static int cros_flash_flags_to_sectors(const struct device *dev,
 	*disable_mask = 0;
 
 	if (prot_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
-		return cros_flash_sector_mask_from_offset(dev, 0, FLASH_SIZE,
-							  enable_mask);
+		return cros_flash_sector_mask_from_offset(
+			dev, 0, CROS_EC_FLASH_SIZE, enable_mask);
 	}
 
 	err = cros_flash_sector_mask_from_offset(dev, CONFIG_WP_STORAGE_OFF,
@@ -295,8 +295,8 @@ static int cros_flash_disable_wp_all(const struct device *dev)
 		return -EACCES;
 	}
 
-	err = cros_flash_sector_mask_from_offset(flash_controller, 0,
-						 FLASH_SIZE, &disable_mask);
+	err = cros_flash_sector_mask_from_offset(
+		flash_controller, 0, CROS_EC_FLASH_SIZE, &disable_mask);
 	if (err) {
 		return err;
 	}
