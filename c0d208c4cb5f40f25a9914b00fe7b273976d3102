@@ -1,0 +1,122 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0de1df06_32d2b1b5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-09-11T22:14:58Z",
+      "side": 1,
+      "message": "LGTM after comments are addressed, need EC team review for CR+2",
+      "revId": "c0d208c4cb5f40f25a9914b00fe7b273976d3102",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1feee4f4_3b2578b9",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-09-11T22:14:58Z",
+      "side": 1,
+      "message": "rv is set but never used, please check the return value and log an error if the SMBus transaction fails",
+      "fixSuggestions": [
+        {
+          "fixId": "d8ce8559_03eec30d",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "zephyr/program/fatcat/ruby/src/battery.c",
+              "range": {
+                "startLine": 1,
+                "startChar": 0,
+                "endLine": 1,
+                "endChar": 0
+              },
+              "replacement": "\tif (rv) {\n\t\tLOG_ERR(\"Failed to write 0x2000 to 0x34: %d\", rv);\n\t}\n\n"
+            },
+            {
+              "path": "zephyr/program/fatcat/ruby/src/battery.c",
+              "range": {
+                "startLine": 1,
+                "startChar": 0,
+                "endLine": 1,
+                "endChar": 0
+              },
+              "replacement": "\n"
+            },
+            {
+              "path": "zephyr/program/fatcat/ruby/src/battery.c",
+              "range": {
+                "startLine": 1,
+                "startChar": 0,
+                "endLine": 1,
+                "endChar": 0
+              },
+              "replacement": "\tif (rv) {\n\t\tLOG_ERR(\"Failed to write 0x4000 to 0x34: %d\", rv);\n\t}\n"
+            }
+          ]
+        }
+      ],
+      "revId": "c0d208c4cb5f40f25a9914b00fe7b273976d3102",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ca36a9b_8fb98727",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-09-11T22:14:58Z",
+      "side": 1,
+      "message": "No magic numbers, please #define 0x34, 0x2000 and 0x4000 as constants.",
+      "range": {
+        "startLine": 29,
+        "startChar": 15,
+        "endLine": 29,
+        "endChar": 27
+      },
+      "revId": "c0d208c4cb5f40f25a9914b00fe7b273976d3102",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "267b9568_ec7f9caa",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1551272
+      },
+      "writtenOn": "2026-09-11T22:14:58Z",
+      "side": 1,
+      "message": "This hook runs synchronously during HOOK_INIT. A 1000ms sleep will stall the EC boot/initialization process by 1 second, consider using a deferred hook or a timer-based approach instead.",
+      "range": {
+        "startLine": 30,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 16
+      },
+      "revId": "c0d208c4cb5f40f25a9914b00fe7b273976d3102",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
