@@ -37,3 +37,36 @@ tests:
     - CONFIG_TEST_BOARD_RESTRICTED_CONSOLE=y
     extra_dtc_overlay_files:
     - ./boards/bloonchipper/bloonchipper.dtsi
+  fpmcu.dartmonkey.power:
+    extra_configs:
+    - CONFIG_TEST_BOARD_DARTMONKEY=y
+    - CONFIG_TEST_BOARD_POWER=y
+    - CONFIG_PM=y
+    extra_dtc_overlay_files:
+    - ./boards/dartmonkey/dartmonkey.dtsi
+  fpmcu.dartmonkey.ec_quirks:
+    extra_configs:
+    - CONFIG_TEST_BOARD_DARTMONKEY=y
+    - CONFIG_TEST_BOARD_EC_QUIRKS=y
+    extra_dtc_overlay_files:
+    - ./boards/dartmonkey/dartmonkey.dtsi
+  fpmcu.dartmonkey.init_dev:
+    extra_configs:
+    - CONFIG_TEST_BOARD_DARTMONKEY=y
+    - CONFIG_TEST_BOARD_INIT=y
+    - CONFIG_TEST_BOARD_INIT_DEV=y
+    extra_dtc_overlay_files:
+    - ./boards/dartmonkey/dartmonkey.dtsi
+  fpmcu.dartmonkey.init_prod:
+    extra_configs:
+    - CONFIG_TEST_BOARD_DARTMONKEY=y
+    - CONFIG_TEST_BOARD_INIT=y
+    - CONFIG_TEST_BOARD_INIT_PROD=y
+    extra_dtc_overlay_files:
+    - ./boards/dartmonkey/dartmonkey.dtsi
+  fpmcu.dartmonkey.clock:
+    extra_configs:
+    - CONFIG_TEST_BOARD_DARTMONKEY=y
+    - CONFIG_TEST_BOARD_CLOCK=y
+    extra_dtc_overlay_files:
+    - ./boards/dartmonkey/dartmonkey.dtsi
