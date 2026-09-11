@@ -9,3 +9,4 @@ project(fpmcu)
 add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
 
 add_subdirectory_ifdef(CONFIG_TEST_BOARD_BLOONCHIPPER tests/bloonchipper)
+add_subdirectory_ifdef(CONFIG_TEST_BOARD_DARTMONKEY tests/dartmonkey)
