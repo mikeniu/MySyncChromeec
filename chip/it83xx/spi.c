@@ -42,6 +42,9 @@ static const uint8_t out_preamble[EC_SPI_PREAMBLE_LENGTH] = {
 	EC_SPI_FRAME_START,
 };
 
+/* A host command is in processing by the host command task? */
+static bool shi_cmd_processing;
+
 /* Store read and write data buffer */
 static uint8_t in_msg[SPI_RX_MAX_FIFO_SIZE] __aligned(4);
 static uint8_t out_msg[SPI_TX_MAX_FIFO_SIZE] __aligned(4);
@@ -138,6 +141,8 @@ static void spi_send_response_packet(struct host_packet *pkt)
 {
 	int i, tx_size;
 
+	shi_cmd_processing = false;
+
 	if (spi_peripheral_state != SPI_STATE_PROCESSING) {
 		CPRINTS("The request data is not processing.");
 		return;
@@ -216,6 +221,7 @@ static void spi_parse_header(void)
 		spi_set_state(SPI_STATE_PROCESSING);
 
 		/* Go to common-layer to handle request */
+		shi_cmd_processing = true;
 		host_packet_receive(&spi_packet);
 	} else {
 		/* Invalid version number */
@@ -279,7 +285,11 @@ void spi_peripheral_int_handler(void)
 		/* write clear peripheral status */
 		IT83XX_SPI_RX_VLISR = IT83XX_SPI_RVLI;
 		/* Parse header for version of spi-protocol */
-		spi_parse_header();
+		if (!shi_cmd_processing) {
+			spi_parse_header();
+		} else {
+			CPRINTS("The host cmd task is processing the request.");
+		}
 	}
 
 	/* Clear the interrupt status */
