@@ -20,6 +20,12 @@ config BOARD_QUARTZ
 	  Build Google Quartz board. The board uses Nuvoton
 	  NPCX9 chip as the EC.
 
+config BOARD_MERU
+	bool "Google Meru baseboard"
+	help
+	  Build Google Meru board. The board uses Nuvoton
+	  NPCX9 chip as the EC.
+
 config BOARD_MICA
 	bool "Google MICA baseboard"
 	help

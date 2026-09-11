@@ -41,6 +41,11 @@ if(DEFINED CONFIG_BOARD_PIC)
 	add_subdirectory(pic)
 endif()
 
+if(DEFINED CONFIG_BOARD_MERU)
+	project(meru)
+	add_subdirectory(meru)
+endif()
+
 if(DEFINED CONFIG_BOARD_MICA)
 	zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_THROTTLE_AP
 					"mica/src/throttle.c")
