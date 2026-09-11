@@ -216,3 +216,24 @@ assert_rw_fwid_DO_NOT_EDIT(project_name="chudow", addr=0x82274)
 
 chobienia = register_ft9001_project("chobienia", boards=["fatcat"])
 assert_rw_fwid_DO_NOT_EDIT(project_name="chobienia", addr=0x82274)
+
+dartmonkey = register_fpmcu_variant(
+    project_name="dartmonkey",
+    zephyr_board="google_icetower",
+    register_func=register_binman_project,
+    variant_modules=["hal_stm32", "cmsis_6"],
+    variant_optional_modules=["fpc"],
+    variant_dts_overlays=[
+        here / "dartmonkey" / "dartmonkey.dts",
+        here / "dartmonkey" / "ec_quirks.dts",
+    ],
+    variant_kconfig_files=[
+        here / "dartmonkey" / "prj.conf",
+        here / "dartmonkey" / "ec_quirks.conf",
+    ],
+    signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
+        here / "dartmonkey" / "dev_key.pem",
+    ),
+)
+
+assert_rw_fwid_DO_NOT_EDIT(project_name="dartmonkey", addr=0x10029C)
