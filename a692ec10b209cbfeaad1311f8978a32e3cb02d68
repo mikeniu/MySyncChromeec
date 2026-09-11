@@ -3,6 +3,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "01692609_496f5335",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-11T02:15:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/c5911f8f-d229-445a-ae99-4954c649d97c)]\n\n### Review Summary\n**Functionality**: Great work addressing the previous issues! The protection bits are now correctly merged using `flash_set_status_for_prot`, and `physical_get_protect` correctly maps `EC_ERROR_ACCESS_DENIED` to `1`. Left a minor suggestion to clean up the unused `all_protected` shadow state.\n**Style \u0026 Consistency**: The code is clean and follows standard formatting. Left a small refactoring suggestion in `cros_flash_rtkfp_init` to reuse `flash_set_status`, and a note on idiomatic pointer null checks.\n**Security**: The software write protection logic now correctly locks memory-mapped access during soft protect operations. It accurately enforces extending-only protection when the hardware WP pin is asserted.\n**Testing**: Acknowledged that unit tests were omitted for this hardware driver. This is acceptable if validated directly on Realtek hardware, though adding Zephyr software tests would be beneficial long-term.\n**CL Size**: The CL size remains small and well-scoped to introducing the single `cros_flash_rtkfp` driver.\n\nTAG\u003dagy\nCONV\u003d332d44bf-0873-4ef1-9d29-153df0a4e835",
+      "isAi": true,
+      "revId": "a692ec10b209cbfeaad1311f8978a32e3cb02d68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "18bee8c3_f43da2c9",
         "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
         "patchSetId": 7
@@ -32,6 +50,24 @@
       "writtenOn": "2026-09-11T02:15:25Z",
       "side": 1,
       "message": "[Gerrit AI Review] Minor style suggestion: `cfg` is a pointer, so it is more idiomatic in C to check `if (!cfg) {` or `if (cfg \u003d\u003d NULL) {` rather than comparing against `0`.",
+      "isAi": true,
+      "revId": "a692ec10b209cbfeaad1311f8978a32e3cb02d68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfc3e354_c1bf14b4",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-11T02:15:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Minor suggestion: You can simplify this block by calling your helper function directly:\n```c\n\tflash_set_status(dev, sr1, sr2);\n```",
       "isAi": true,
       "revId": "a692ec10b209cbfeaad1311f8978a32e3cb02d68",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
