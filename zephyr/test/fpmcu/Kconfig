@@ -16,11 +16,17 @@ choice TEST_BOARD_VARIANT
 		help
 		Enable bloonchippers tests.
 
+	config TEST_BOARD_DARTMONKEY
+		bool "Enable dartmonkey-specific tests"
+		help
+		  Enable dartmonkey tests.
+
 endchoice # TEST_BOARD_VARIANT
 
 config TEST_BOARD_NAME
 	string "Board name"
 	default "bloonchipper" if TEST_BOARD_BLOONCHIPPER
+	default "dartmonkey" if TEST_BOARD_DARTMONKEY
 
 config TEST_BOARD_TRANSPORT_SPI
 	bool "Enable SPI transport layer tests"
@@ -62,5 +68,18 @@ config TEST_BOARD_EC_QUIRKS
 
 config TEST_BOARD_RESTRICTED_CONSOLE
 	bool "Board restricted console tests"
+
+config TEST_BOARD_INIT
+	bool "Board init tests"
+	select PINCTRL
+
+config TEST_BOARD_INIT_DEV
+	bool "Board init dev hardware tests"
+
+config TEST_BOARD_INIT_PROD
+	bool "Board init prod hardware tests"
+
+config TEST_BOARD_CLOCK
+	bool "Board clock tests"
 
 source "Kconfig.zephyr"
