@@ -3,6 +3,161 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b0c85ee1_44b47dca",
+        "filename": "util/fix_header_guards.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2026-09-11T00:21:02Z",
+      "side": 1,
+      "message": "I don\u0027t think any of these are needed, because builtin types can be written directly since python 3.9. `List[str]` can be `list[str]` and so forth, and `Optional[str]` can be `str | None` (though the last requires Python 3.10).\n\nI don\u0027t mind retaining `Optional` if you feel it\u0027s more readable, though.",
+      "fixSuggestions": [
+        {
+          "fixId": "5b37bc2b_2e5a8f7a",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 14,
+                "startChar": 0,
+                "endLine": 15,
+                "endChar": 0
+              },
+              "replacement": ""
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 45,
+                "startChar": 0,
+                "endLine": 46,
+                "endChar": 0
+              },
+              "replacement": "    filepath: Path, root: Path, prefix: str | None \u003d None\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 73,
+                "startChar": 0,
+                "endLine": 74,
+                "endChar": 0
+              },
+              "replacement": "def strip_comments(line: str, in_block_comment: bool) -\u003e tuple[str, bool]:\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 123,
+                "startChar": 0,
+                "endLine": 124,
+                "endChar": 0
+              },
+              "replacement": "def has_non_comment_lines(lines: list[str], start: int, end: int) -\u003e bool:\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 147,
+                "startChar": 0,
+                "endLine": 148,
+                "endChar": 0
+              },
+              "replacement": "def is_precondition_check(lines: list[str], start: int, end: int) -\u003e bool:\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 176,
+                "startChar": 0,
+                "endLine": 177,
+                "endChar": 0
+              },
+              "replacement": "    macro: str | None, expected_guard: str\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 189,
+                "startChar": 0,
+                "endLine": 190,
+                "endChar": 0
+              },
+              "replacement": "def find_guard_insertion_index(lines: list[str]) -\u003e int:\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 226,
+                "startChar": 0,
+                "endLine": 227,
+                "endChar": 0
+              },
+              "replacement": ") -\u003e list[str]:\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 250,
+                "startChar": 0,
+                "endLine": 256,
+                "endChar": 0
+              },
+              "replacement": "def find_header_guard_bounds(lines: list[str], expected_guard: str) -\u003e tuple[\n    int | None,\n    int | None,\n    str | None,\n    int | None,\n    int | None,\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 379,
+                "startChar": 0,
+                "endLine": 380,
+                "endChar": 0
+              },
+              "replacement": "    prefix: str | None \u003d None,\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 571,
+                "startChar": 0,
+                "endLine": 573,
+                "endChar": 0
+              },
+              "replacement": "    paths: list[Path],\n    exclude_dirs: set[str] | None \u003d None,\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 626,
+                "startChar": 0,
+                "endLine": 627,
+                "endChar": 0
+              },
+              "replacement": "def parse_args(argv: list[str] | None \u003d None) -\u003e argparse.Namespace:\n"
+            },
+            {
+              "path": "util/fix_header_guards.py",
+              "range": {
+                "startLine": 679,
+                "startChar": 0,
+                "endLine": 680,
+                "endChar": 0
+              },
+              "replacement": "def main(argv: list[str] | None \u003d None) -\u003e int:\n"
+            }
+          ]
+        }
+      ],
+      "revId": "f148f0f98ec9bcf174727c952a957a9f081e1c7e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "20e228ba_3a616e36",
         "filename": "util/fix_header_guards.py",
         "patchSetId": 2
