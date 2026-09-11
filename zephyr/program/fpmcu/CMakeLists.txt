@@ -29,6 +29,12 @@ if (DEFINED CONFIG_BASEBOARD_HELIPILOT)
 	add_subdirectory(helipilot)
 	project(helipilot)
 endif()
+if (DEFINED CONFIG_BOARD_DARTMONKEY)
+	# Expected rollback version is 0 on dartmonkey.
+	set(EXPECTED_ROLLBACK_VERSION 0)
+	add_subdirectory(dartmonkey)
+	project(dartmonkey)
+endif()
 
 if (DEFINED CONFIG_BOARD_ET171)
 	add_subdirectory(et171)
