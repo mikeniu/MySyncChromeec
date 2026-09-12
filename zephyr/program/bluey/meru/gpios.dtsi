@@ -135,6 +135,9 @@
 		gpio_fp_apm: fp_apm {
 			gpios = <&gpiob 5 (GPIO_INPUT)>;
 		};
+		gpio_en_pp3300_base_x: en_pp3300_base_x {
+			gpios = <&gpiob 6 (GPIO_OUTPUT)>;
+		};
 		gpio_ec_en_vph_pwr_1a_s5_r: ec_en_vph_pwr_1a_s5_r {
 			gpios = <&gpioc 0 (GPIO_OUTPUT)>;
 		};
@@ -162,6 +165,10 @@
 		gpio_smb2360_b_chg_led_pg_odl: smb2360_b_chg_led_pg_odl {
 			gpios = <&gpioe 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
+		gpio_lid_360_l: lid_360_l {
+ 			gpios = <&gpioe 4 (GPIO_INPUT)>;
+			enum-name = "GPIO_TABLET_MODE_L";
+ 		};
 		gpio_ccd_mode_odl: ccd_mode_odl {
 			gpios = <&gpioe 5 (GPIO_INPUT)>;
 			enum-name = "GPIO_CCD_MODE_ODL";
@@ -190,7 +197,6 @@
 
 		unused-gpios =
 			<&gpio0 2 0>,
-			<&gpio3 4 (GPIO_INPUT | GPIO_PULL_DOWN)>,
 			<&gpio3 7 (GPIO_INPUT | GPIO_PULL_DOWN)>,
 			<&gpio4 1 (GPIO_INPUT | GPIO_PULL_DOWN)>,
 			<&gpio5 2 0>,
