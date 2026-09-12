@@ -135,6 +135,9 @@
 		gpio_fp_apm: fp_apm {
 			gpios = <&gpiob 5 (GPIO_INPUT)>;
 		};
+		gpio_en_pp3300_base_x: en_pp3300_base_x {
+			gpios = <&gpiob 6 (GPIO_OUTPUT)>;
+		};
 		gpio_ec_en_vph_pwr_1a_s5_r: ec_en_vph_pwr_1a_s5_r {
 			gpios = <&gpioc 0 (GPIO_OUTPUT)>;
 		};
