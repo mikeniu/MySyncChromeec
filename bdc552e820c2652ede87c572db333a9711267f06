@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "212d6de9_39032c55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-12T00:14:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/ef438214-4282-4ad3-9cda-99584e56475f)]\n\n**Review Summary**\n* **Functionality**: The change correctly disables deep sleep during the `rtc_stm32f4` test using `disable_sleep(SLEEP_MASK_AP_RUN)`. This successfully prevents the RTC alarm interrupt from being conflated with system sleep wake-up routines. The sleep configuration is correctly restored at the end of the `run_test` execution, ensuring the system state is cleaned up properly.\n* **Security**: No security implications.\n* **Style**: The code changes adhere to standard project coding style guidelines. The added inline comment in `test/rtc_stm32f4.c` effectively explains the rationale behind disabling sleep during the test.\n* **Testing \u0026 Test Coverage**: This CL itself fixes an existing test and re-enables it in the device test suite (`test/run_device_tests.py`), restoring the test coverage it provides for `BLOONCHIPPER`.\n* **CL Size \u0026 Scope**: The size is minimal, addressing exactly one issue clearly.\n\nOverall quality is excellent.",
+      "isAi": true,
+      "revId": "bdc552e820c2652ede87c572db333a9711267f06",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
