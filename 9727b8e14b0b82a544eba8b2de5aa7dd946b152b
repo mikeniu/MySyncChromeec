@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f2e4293_c156c63a",
+        "filename": "util/fix_header_guards_unittest.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1361259
+      },
+      "writtenOn": "2026-09-13T23:15:24Z",
+      "side": 1,
+      "message": "Use `self.enterContext` and then you don\u0027t need to disable any warnings or use an explicit `tearDown`.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 9
+      },
+      "fixSuggestions": [
+        {
+          "fixId": "745b18fc_f5458278",
+          "description": "prompt_to_edit API",
+          "replacements": [
+            {
+              "path": "util/fix_header_guards_unittest.py",
+              "range": {
+                "startLine": 26,
+                "startChar": 0,
+                "endLine": 29,
+                "endChar": 0
+              },
+              "replacement": "        self.tmp_dir \u003d self.enterContext(tempfile.TemporaryDirectory())\n"
+            },
+            {
+              "path": "util/fix_header_guards_unittest.py",
+              "range": {
+                "startLine": 31,
+                "startChar": 0,
+                "endLine": 34,
+                "endChar": 0
+              },
+              "replacement": ""
+            }
+          ]
+        }
+      ],
+      "revId": "9727b8e14b0b82a544eba8b2de5aa7dd946b152b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
