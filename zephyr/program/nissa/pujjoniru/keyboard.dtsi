@@ -12,6 +12,11 @@
 		compatible = "cros-ec,kblight-pwm";
 		pwms = <&pwm7 PWM_CHANNEL_1 PWM_HZ(324) PWM_POLARITY_NORMAL>;
 	};
+
+	cros-keyscan {
+		compatible = "cros-ec,keyscan";
+		min-post-scan-delay = <2000>;
+	};
 };
 
 &vivaldi_kbd {

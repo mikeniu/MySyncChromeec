@@ -23,8 +23,9 @@ DOCKER_ARGS=(
   -it
   --rm
   --privileged
+  -e "HOST_UID=$(id -u)"
+  -e "HOST_GID=$(id -g)"
   -v "${WORKSPACE_DIR}:/workspace"
-  -v "${CACHE_DIR}:/root/.cache/coreboot-sdk"
 )
 
 # 1. Forward USB subsystem for CCD/Servo interface (vendor ID 18d1,
@@ -46,23 +47,6 @@ for tty_dev in /dev/ttyACM0 /dev/ttyACM1 /dev/ttyACM2; do
   fi
 done
 
-# Process arguments for fast startup options
-FILTERED_ARGS=()
-for arg in "$@"; do
-  case "${arg}" in
-    --fast)
-      export SKIP_UPDATE=1
-      ;;
-    *)
-      FILTERED_ARGS+=("${arg}")
-      ;;
-  esac
-done
-
-if [ "${SKIP_UPDATE:-0}" = "1" ]; then
-  DOCKER_ARGS+=( -e SKIP_UPDATE=1 )
-fi
-
 # Execute the container run
 echo "Launching Docker container..."
-exec docker run "${DOCKER_ARGS[@]}" "${IMAGE_NAME}" "${FILTERED_ARGS[@]}"
+exec docker run "${DOCKER_ARGS[@]}" "${IMAGE_NAME}" "$@"

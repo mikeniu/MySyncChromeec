@@ -60,6 +60,7 @@ void passthru_lid_open_to_pmic(void);
 void passthru_ac_on_to_pmic(void);
 void reset_all_passthru_pmic_signal(void);
 void chipset_acok_passthru_interrupt(enum gpio_signal signal);
+void reset_ac_passthru_pmic_signal(void);
 #endif
 
 #endif /* __CROS_EC_POWER_QCOM_H_ */

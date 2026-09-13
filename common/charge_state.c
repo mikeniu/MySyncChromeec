@@ -79,9 +79,9 @@ static struct charge_state_data curr;
 static enum charge_state prev_state;
 static int prev_ac, prev_charge, prev_disp_charge;
 static enum battery_present prev_bp;
-static unsigned int user_current_limit = -1U;
+test_export_static unsigned int user_current_limit = -1U;
 test_export_static timestamp_t shutdown_target_time;
-static timestamp_t precharge_start_time;
+test_export_static timestamp_t precharge_start_time;
 static struct sustain_soc sustain_soc;
 static struct current_limit {
 	uint32_t value; /* Charge limit to apply, in mA */
@@ -117,11 +117,11 @@ struct state {
 } local_state;
 
 /* Is battery connected but unresponsive after precharge? */
-static int battery_seems_dead;
+test_export_static int battery_seems_dead;
 
 static int battery_seems_disconnected;
 
-static int problems_exist;
+test_export_static int problems_exist;
 
 static const char *const prob_text[] = {
 	"static update",     "set voltage",	 "set current", "set mode",
@@ -217,7 +217,7 @@ static int battery_sustainer_set(int8_t lower, int8_t upper)
 	return EC_ERROR_INVAL;
 }
 
-static void battery_sustainer_disable(void)
+test_export_static void battery_sustainer_disable(void)
 {
 	battery_sustainer_set(-1, -1);
 }
@@ -526,7 +526,7 @@ void chgstate_set_manual_voltage(int volt_mv)
 }
 
 /* Force charging off before the battery is full. */
-static int set_chg_ctrl_mode(enum ec_charge_control_mode mode)
+test_export_static int set_chg_ctrl_mode(enum ec_charge_control_mode mode)
 {
 	bool discharge_on_ac = false;
 	int current, voltage;
@@ -643,7 +643,7 @@ static int is_battery_critical(void)
  * will shut down the AP (if the AP is not already off) and then optionally
  * hibernate or cut off battery.
  */
-static int shutdown_on_critical_battery(void)
+test_export_static int shutdown_on_critical_battery(void)
 {
 	if (!is_battery_critical()) {
 		/* Reset shutdown warning time */
@@ -895,7 +895,7 @@ sustain_switch_mode(enum ec_charge_control_mode mode)
 	return new_mode;
 }
 
-static void sustain_battery_soc(void)
+test_export_static void sustain_battery_soc(void)
 {
 	enum ec_charge_control_mode mode = get_chg_ctrl_mode();
 	enum ec_charge_control_mode new_mode;
@@ -917,7 +917,7 @@ static void sustain_battery_soc(void)
 		mode_text[new_mode]);
 }
 
-static void current_limit_battery_soc(void)
+test_export_static void current_limit_battery_soc(void)
 {
 	if (user_current_limit != current_limit.value &&
 	    charge_get_display_charge() / 10 >= current_limit.soc) {
@@ -975,7 +975,7 @@ static int get_desired_input_current(const struct charger_info *const info)
 #endif
 }
 
-static void wakeup_battery(int *need_static)
+test_export_static void wakeup_battery(int *need_static)
 {
 	timestamp_t timestamp;
 #ifndef CONFIG_PRECHARGE_DELAY_MS
@@ -1024,7 +1024,7 @@ __test_only enum charge_state charge_get_state(void)
 	return curr.state;
 }
 
-static void deep_charge_battery(int *need_static)
+test_export_static void deep_charge_battery(int *need_static)
 {
 	if ((curr.state == ST_IDLE) &&
 	    (curr.batt.flags & BATT_FLAG_DEEP_CHARGE)) {
@@ -1054,7 +1054,7 @@ static void deep_charge_battery(int *need_static)
 	}
 }
 
-static void revive_battery(int *need_static)
+test_export_static void revive_battery(int *need_static)
 {
 	if (IS_ENABLED(CONFIG_BATTERY_REQUESTS_NIL_WHEN_DEAD) &&
 	    curr.requested_voltage == 0 && curr.requested_current == 0 &&
@@ -1209,7 +1209,8 @@ static void process_battery_present_change(const struct charger_info *info,
 }
 
 /* Decide on the charge state we are in */
-static void decide_charge_state(int *need_staticp, int *battery_criticalp)
+test_export_static void decide_charge_state(int *need_staticp,
+					    int *battery_criticalp)
 {
 	/*
 	 * Now decide what we want to do about it. We'll normally just pass
@@ -1312,8 +1313,8 @@ static void decide_charge_state(int *need_staticp, int *battery_criticalp)
 }
 
 /* Determine voltage/current to request and make it so */
-static void adjust_requested_vi(const struct charger_info *const info,
-				bool is_full)
+test_export_static void
+adjust_requested_vi(const struct charger_info *const info, bool is_full)
 {
 	/* Turn charger off if it's not needed */
 	if (!IS_ENABLED(CONFIG_CHARGER_MAINTAIN_VBAT) &&

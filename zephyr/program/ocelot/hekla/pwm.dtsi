@@ -10,12 +10,14 @@
 	pinctrl-names = "default";
 };
 
-/* FAN1_PWM */
+/* FAN0_PWM */
 &pwm2 {
 	status = "okay";
 	pinctrl-0 = <&pwm2_gpio025>;
 	pinctrl-names = "default";
 };
+
+/* FAN1_PWM */
 &pwm3 {
 	status = "okay";
 	pinctrl-0 = <&pwm3_gpio026>;

@@ -472,10 +472,7 @@ class Renode(Platform):
         # bloonchipper Zephyr tests to skip on Renode.
         if zephyr and test_name in [
             "benchmark",  # TODO(b/390253975)
-            # TODO(b/382705460): We have seen this flake in the CQ.
-            # Re-enable when missing character bug is fixed.
             "fp_transport",  # TODO(b/384094788)
-            "fpsensor_debug",  # TODO(b/384110894)
             "zephyr_flash_stm32f4",  # TODO(b/384974228)
             # TODO(b/384975384)
             "zephyr_counter_basic_api_stm32_subsec",
@@ -500,10 +497,14 @@ class Renode(Platform):
 
     def _skip_test_chudow(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
+            "boringssl_crypto",  # TODO(b/556233130)
             "flash_physical",  # TODO(b/485314159)
             "flash_protection",  # TODO(b/508240888)
             "flash_protection_rw",  # TODO(b/508240888)
+            "fp_buffer_clear",  # TODO(b/556401798)
             "fpsensor_auth_crypto_stateful",  # TODO(b/485316342)
+            "fpsensor_auth_crypto_stateless",  # TODO(b/556233130)
+            "fpsensor_crypto",  # TODO(b/556233130)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
             "flash_write_protect",  # TODO(b/485316223)
@@ -524,7 +525,6 @@ class Renode(Platform):
         self, test_config: TestConfig, zephyr: bool
     ) -> bool:
         if test_config.test_name in [
-            "otp_key",  # TODO(b/385216796)
             "ram_lock",  # TODO(b/385216805)
             "rtc_npcx9",  # TODO(b/385217282)
         ]:
@@ -539,17 +539,18 @@ class Renode(Platform):
             "flash_protection",  # TODO(b/485668014)
             "flash_protection_rw",  # TODO(b/485668836)
             "flash_write_protect",  # TODO(b/485668014)
+            "fp_buffer_clear",  # TODO(b/485669018)
             "fp_transport",  # TODO(b/485668240)
             "malloc",  # TODO(b/485669070)
             "null_pointer",  # TODO(b/485624833)
             "panic",  # TODO(b/485668836)
             "panic_data",  # TODO(b/485667679)
+            "panic_strip_gpr",  # TODO(b/485668836)
             "reboot",  # TODO(b/488128262)
             "rollback_entropy",  # TODO(b/485670085)
             "sbrk",  # TODO(b/485669288)
             "tpm_seed_clear",  # TODO(b/485669018)
             "utils",  # TODO(b/485624824)
-            "zephyr_kernel_poll",  # TODO(b/485639561)
         ]:
             return True
 
@@ -574,12 +575,12 @@ class Renode(Platform):
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
-            "unaligned_access",  # TODO(b/483118717)
             "exception",  # TODO(b/483118965)
             "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
             "fpsensor_debug",  # TODO(b/474439863)
             "otp_key",  # TODO(b/483121090)
             "restricted_console",  # TODO(b/474439863)
+            "tpm_seed_clear",  # TODO(b/556233130)
             "zephyr_cpp_newlib",  # TODO(b/484366615)
             "zephyr_cpp_std20",  # TODO(b/484366615)
             "zephyr_drivers_entropy",  # TODO(b/484366615)
@@ -801,6 +802,9 @@ class AllTests:
                 enable_hw_write_protect=True,
             ),
             TestConfig(
+                test_name="fp_buffer_clear",
+            ),
+            TestConfig(
                 config_name="fp_transport_spi_ro",
                 test_name="fp_transport",
                 imagetype_to_use=ImageType.RO,
@@ -874,6 +878,10 @@ class AllTests:
                 exclude_boards=[BLOONCHIPPER, DARTMONKEY],
             ),
             TestConfig(test_name="panic"),
+            TestConfig(
+                test_name="panic_strip_gpr",
+                skip_for_ec_legacy=True,
+            ),
             TestConfig(
                 config_name="panic_data",
                 test_name="panic_data",
@@ -1696,18 +1704,13 @@ def run_test_zephyr(test: TestConfig) -> str:
     if test.zephyr_name:
         return []
 
-    # TODO(b/382705460): This extra command is to work around an issue where
-    # sometimes there is a missing character in the test command: "zest"
-    # instead of "ztest".
-    test_cmd = "\n\n\n\n\n\n"
-
     if len(test.test_args) == 0:
         # If there are no args just run-all not to be limited by suite name
-        test_cmd += "ztest run-all\n"
+        test_cmd = "ztest run-all\n"
     else:
         # ZTEST console doesn't support passing test arguments
         # Assume a testsuite for every test + arg combination
-        test_cmd += "ztest run-testcase " + test.test_name
+        test_cmd = "ztest run-testcase " + test.test_name
         for test_arg in test.test_args:
             test_cmd = test_cmd + "_" + test_arg
         test_cmd = test_cmd + "\n"

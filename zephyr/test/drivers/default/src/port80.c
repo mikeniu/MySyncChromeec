@@ -10,6 +10,7 @@
 
 #include "console.h"
 #include "ec_commands.h"
+#include "hooks.h"
 #include "host_command.h"
 #include "port80.h"
 #include "test/drivers/test_state.h"
@@ -18,6 +19,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/shell/shell.h>
+#include <zephyr/shell/shell_dummy.h>
 #include <zephyr/ztest.h>
 
 /*
@@ -182,6 +184,80 @@ ZTEST(port80, test_port80_wrap)
 	CHECK_ARGS_RESULT(args)
 	zassert_equal(args.response_size, sizeof(uint16_t), NULL);
 	zassert_equal(response.data.codes[0], size, NULL);
+}
+
+/**
+ * @brief TestPurpose: Verify repeated chipset resume events only record a
+ * single port 80 resume marker.
+ *
+ * @details
+ * The HOOK_CHIPSET_RESUME handler skips writing a PORT_80_EVENT_RESUME marker
+ * when the most recent history entry is already a resume marker. This prevents
+ * S0ix churn (repeated S3->S0 transitions) from flooding the port 80 history
+ * with redundant markers. An intervening non-resume write breaks the run, so
+ * the following resume is recorded again.
+ *
+ * Expected Results
+ *  - Repeated HOOK_CHIPSET_RESUME notifications record a single write.
+ *  - A resume after an intervening port 80 write records a new write.
+ */
+ZTEST(port80, test_port80_resume_dedup)
+{
+	const char *buffer;
+	size_t buffer_size;
+
+	port80_flush();
+
+	/* Simulate S0ix churn: many chipset resume notifications in a row. Only
+	 * the first should record a PORT_80_EVENT_RESUME marker; the rest are
+	 * skipped because the last history entry is already a resume.
+	 */
+	for (int i = 0; i < 5; i++) {
+		hook_notify(HOOK_CHIPSET_RESUME);
+	}
+
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "port80"), NULL);
+	buffer = shell_backend_dummy_get_output(get_ec_shell(), &buffer_size);
+
+	/* Verify (S3->S0) appears exactly once in the buffer. */
+	const char *first_resume = strstr(buffer, "(S3->S0)");
+	zassert_not_null(first_resume,
+			 "Expected (S3->S0) in console output: %s", buffer);
+	const char *second_resume =
+		strstr(first_resume + strlen("(S3->S0)"), "(S3->S0)");
+	zassert_is_null(
+		second_resume,
+		"Repeated resume events should record a single marker: %s",
+		buffer);
+
+	/* A normal port 80 write breaks the run, so the following resume is
+	 * recorded again: 1 resume + 1 code + 1 resume.
+	 */
+	port_80_write(0x42);
+	hook_notify(HOOK_CHIPSET_RESUME);
+	hook_notify(HOOK_CHIPSET_RESUME);
+
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "port80"), NULL);
+	buffer = shell_backend_dummy_get_output(get_ec_shell(), &buffer_size);
+
+	first_resume = strstr(buffer, "(S3->S0)");
+	zassert_not_null(first_resume,
+			 "Expected first (S3->S0) in console output: %s",
+			 buffer);
+	const char *p42 = strstr(first_resume, " 42");
+	zassert_not_null(p42, "Expected '42' in console output: %s", buffer);
+	second_resume = strstr(p42, "(S3->S0)");
+	zassert_not_null(second_resume,
+			 "Expected second (S3->S0) in console output: %s",
+			 buffer);
+	const char *third_resume =
+		strstr(second_resume + strlen("(S3->S0)"), "(S3->S0)");
+	zassert_is_null(
+		third_resume,
+		"Repeated second resume events should not add another marker: %s",
+		buffer);
 }
 
 /**

@@ -290,6 +290,14 @@ ZTEST(power_common_no_tasks, test_power_reboot_ap_at_g3)
 	zassert_equal(POWER_G3S5, power_get_state());
 }
 
+/* Test power_set_s5_inactivity_timer_enable */
+ZTEST(power_common_no_tasks, test_power_s5_inactivity_timer_enable)
+{
+	/* Verify enabling and disabling S5 inactivity timer */
+	power_set_s5_inactivity_timer_enable(0);
+	power_set_s5_inactivity_timer_enable(1);
+}
+
 static void *mock_time_setup()
 {
 	struct power_common_no_tasks_mock_time_fixture *fixture =

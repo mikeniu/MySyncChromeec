@@ -122,15 +122,11 @@ static void base_startup_hook(struct ap_power_ev_callback *cb,
 		return;
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(base_startup_hook, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);
 
 static int base_init(void)
 {
-	static struct ap_power_ev_callback cb;
-
-	ap_power_ev_init_callback(&cb, base_startup_hook,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&cb);
-
 	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF) || extpower_is_present()) {
 		base_detect_enable(true);
 	}

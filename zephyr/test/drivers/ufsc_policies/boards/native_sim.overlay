@@ -12,6 +12,79 @@
 		kb_backlight_policy: kb-backlight {
 			enable-value = <&ufsc_kb_backlight_present>;
 		};
+
+		fan_policy: fan {
+			enable-value = <&ufsc_thermal_fan_present>;
+		};
+
+		tablet_mode_policy: tablet-mode {
+			enable-value = <&ufsc_form_factor_convertible>;
+		};
+	};
+
+	gpio2: gpio@102 {
+		status = "okay";
+		compatible = "zephyr,gpio-emul";
+		reg = <0x102 0x4>;
+		rising-edge;
+		falling-edge;
+		high-level;
+		low-level;
+		gpio-controller;
+		#gpio-cells = <2>;
+		ngpios = <32>;
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_tablet_mode_l: tablet_mode_l {
+			gpios = <&gpio2 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			enum-name = "GPIO_TABLET_MODE_L";
+		};
+	};
+
+	gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_tablet_mode: tablet_mode {
+			irq-pin = <&gpio_tablet_mode_l>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "gmr_tablet_switch_isr";
+		};
+	};
+
+	fans {
+		compatible = "cros-ec,fans";
+
+		fan0: fan_0 {
+			pwms = <&pwm_fan 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			rpm-min = <3100>;
+			rpm-start = <3100>;
+			rpm-max = <8000>;
+			tach = <&tach_fan>;
+		};
+	};
+
+	pwms {
+		pwm_fan: pwm@6 {
+			compatible = "cros,pwm-mock";
+			reg = <6 1>;
+			#pwm-cells = <3>;
+			status = "okay";
+		};
+	};
+
+	tachs {
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		tach_fan: tach@0 {
+			compatible = "cros,tach-mock";
+			reg = <0 1>;
+			#tach-cells = <3>;
+			status = "okay";
+		};
 	};
 };
 
@@ -27,6 +100,40 @@
 		compatible = "cros-ec,cbi-ufsc-value";
 		status = "okay";
 		enum-name = "UFSC_KB_BACKLIGHT_ABSENT";
+		value = <0>;
+		default;
+	};
+};
+
+&ufsc_thermal_fan {
+	status = "okay";
+	ufsc_thermal_fan_present: value-present {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		enum-name = "UFSC_THERMAL_FAN_PRESENT";
+		value = <1>;
+	};
+	ufsc_thermal_fan_absent: value-absent {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		enum-name = "UFSC_THERMAL_FAN_ABSENT";
+		value = <0>;
+		default;
+	};
+};
+
+&ufsc_form_factor {
+	status = "okay";
+	ufsc_form_factor_convertible: value-convertible {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		enum-name = "UFSC_FORM_FACTOR_CONVERTIBLE";
+		value = <1>;
+	};
+	ufsc_form_factor_clamshell: value-clamshell {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		enum-name = "UFSC_FORM_FACTOR_CLAMSHELL";
 		value = <0>;
 		default;
 	};

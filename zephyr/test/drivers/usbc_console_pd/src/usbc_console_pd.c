@@ -99,6 +99,9 @@ static void common_before(struct common_fixture *fixture)
 {
 	/* Set chipset to ON, this will set TCPM to DRP */
 	test_set_chipset_to_s0();
+	pd_comm_enable(TEST_PORT, 1);
+	pd_set_suspend(TEST_PORT, 0);
+	pd_set_dual_role(TEST_PORT, PD_DRP_TOGGLE_ON);
 
 	/* TODO(b/214401892): Check why need to give time TCPM to spin */
 	k_sleep(K_SECONDS(1));
@@ -124,7 +127,7 @@ static void usbc_console_pd_after(void *data)
 	common_after(&outer->common);
 }
 
-ZTEST_USER_F(usbc_console_pd, test_pd_command)
+ZTEST_F(usbc_console_pd, test_pd_srccaps)
 {
 	struct common_fixture *common = &fixture->common;
 	struct tcpci_src_emul_data *src_ext = &common->src_ext;
@@ -161,6 +164,317 @@ ZTEST_USER_F(usbc_console_pd, test_pd_command)
 	zassert_not_null(strstr(cmd_output, "Variable"));
 	zassert_not_null(strstr(cmd_output, "Augmnt"));
 	zassert_not_null(strstr(cmd_output, "DRP UP USB DRD FRS"));
+
+	/* Also verify state command with explicit contract */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 state"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "Port C0"));
+	zassert_not_null(strstr(cmd_output, "Role:"));
+	zassert_not_null(strstr(cmd_output, "TC State:"));
+
+	/* Exercise power negotiation, swaps, resets, and controls with partner
+	 * connected */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dev 5"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dev 9"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dev 15"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dev 20"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dev"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 swap power"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 swap data"));
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_USBC_VCONN_SWAP)) {
+		zassert_ok(
+			shell_execute_cmd(get_ec_shell(), "pd 0 swap vconn"));
+	}
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 soft"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 hard"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 tx"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 charger"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 suspend"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 resume"));
+}
+
+ZTEST_F(usbc_console_pd, test_pd_usage_and_invalid_args)
+{
+	/* Insufficient argument count */
+	zassert_equal(EC_ERROR_PARAM_COUNT,
+		      shell_execute_cmd(get_ec_shell(), "pd"));
+	zassert_equal(EC_ERROR_PARAM_COUNT,
+		      shell_execute_cmd(get_ec_shell(), "pd 0"));
+
+	/* Invalid port numbers */
+	zassert_equal(EC_ERROR_PARAM2,
+		      shell_execute_cmd(get_ec_shell(), "pd invalid state"));
+	zassert_equal(EC_ERROR_PARAM2,
+		      shell_execute_cmd(get_ec_shell(), "pd 99 state"));
+}
+
+ZTEST_F(usbc_console_pd, test_pd_dump)
+{
+	const char *cmd_output = NULL;
+	size_t output_size = 0;
+
+	/* Insufficient argument count falls through to param count error */
+	zassert_equal(EC_ERROR_PARAM_COUNT,
+		      shell_execute_cmd(get_ec_shell(), "pd dump"));
+	zassert_equal(EC_ERROR_PARAM2,
+		      shell_execute_cmd(get_ec_shell(), "pd dump invalid"));
+
+	/* Test level < DEBUG_DISABLE clamp */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd dump -1"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "debug=0"));
+
+	/* Test valid level */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd dump 2"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "debug=2"));
+
+	/* Test level > DEBUG_LEVEL_MAX clamp */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd dump 10"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "debug=3"));
+}
+
+ZTEST_F(usbc_console_pd, test_pd_trysrc)
+{
+	const char *cmd_output = NULL;
+	size_t output_size = 0;
+
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_TRY_SRC)) {
+		ztest_test_skip();
+	}
+
+	/* Get status */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd trysrc"));
+
+	/* Override OFF (0) */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd trysrc 0"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "Try.SRC Forced OFF"));
+
+	/* Override ON (1) */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd trysrc 1"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "Try.SRC Forced ON"));
+
+	/* System controlled (2) */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd trysrc 2"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "Try.SRC System controlled"));
+
+	/* Invalid arguments */
+	zassert_equal(EC_ERROR_PARAM3,
+		      shell_execute_cmd(get_ec_shell(), "pd trysrc 3"));
+	zassert_equal(EC_ERROR_PARAM3,
+		      shell_execute_cmd(get_ec_shell(), "pd trysrc invalid"));
+}
+
+ZTEST_F(usbc_console_pd, test_pd_version)
+{
+	const char *cmd_output = NULL;
+	size_t output_size = 0;
+
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd version"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(cmd_output);
+	zassert_true(strlen(cmd_output) > 0);
+}
+
+ZTEST_F(usbc_console_pd, test_pd_bistsharemode)
+{
+	zassert_ok(
+		shell_execute_cmd(get_ec_shell(), "pd bistsharemode enable"));
+	zassert_ok(
+		shell_execute_cmd(get_ec_shell(), "pd bistsharemode disable"));
+	zassert_equal(EC_ERROR_PARAM2,
+		      shell_execute_cmd(get_ec_shell(),
+					"pd bistsharemode invalid"));
+}
+
+ZTEST_F(usbc_console_pd, test_pd_dual_role_actions)
+{
+	const char *cmd_output = NULL;
+	size_t output_size = 0;
+
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_DUAL_ROLE)) {
+		ztest_test_skip();
+	}
+
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 tx"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 charger"));
+
+	/* dev subcmd with default voltage */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dev"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "max req:"));
+
+	/* dev subcmd with explicit voltage */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dev 15"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "max req: 15000mV"));
+
+	/* dev subcmd invalid arg */
+	zassert_equal(EC_ERROR_PARAM3,
+		      shell_execute_cmd(get_ec_shell(), "pd 0 dev invalid"));
+
+	/* disable / enable */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 disable"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "Port C0 disable"));
+
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 enable"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "Port C0 enabled"));
+
+	/* hard / soft resets */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 hard"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 soft"));
+
+	/* suspend / resume */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 suspend"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 resume"));
+}
+
+ZTEST_F(usbc_console_pd, test_pd_swap)
+{
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_DUAL_ROLE)) {
+		ztest_test_skip();
+	}
+
+	zassert_equal(EC_ERROR_PARAM_COUNT,
+		      shell_execute_cmd(get_ec_shell(), "pd 0 swap"));
+
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 swap power"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 swap data"));
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_USBC_VCONN_SWAP)) {
+		zassert_ok(
+			shell_execute_cmd(get_ec_shell(), "pd 0 swap vconn"));
+	}
+
+	zassert_equal(EC_ERROR_PARAM3,
+		      shell_execute_cmd(get_ec_shell(), "pd 0 swap invalid"));
+}
+
+ZTEST_F(usbc_console_pd, test_pd_dualrole)
+{
+	const char *cmd_output = NULL;
+	size_t output_size = 0;
+
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_DUAL_ROLE)) {
+		ztest_test_skip();
+	}
+
+	/* on */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dualrole on"));
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dualrole"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "dual-role toggling: on"));
+
+	/* off */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dualrole off"));
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dualrole"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "dual-role toggling: off"));
+
+	/* freeze */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dualrole freeze"));
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dualrole"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "dual-role toggling: freeze"));
+
+	/* sink */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dualrole sink"));
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dualrole"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "dual-role toggling: force sink"));
+
+	/* source */
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dualrole source"));
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 dualrole"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(
+		strstr(cmd_output, "dual-role toggling: force source"));
+
+	/* invalid */
+	zassert_equal(EC_ERROR_PARAM4,
+		      shell_execute_cmd(get_ec_shell(),
+					"pd 0 dualrole invalid"));
+}
+
+ZTEST_F(usbc_console_pd, test_pd_state_and_info)
+{
+	const char *cmd_output = NULL;
+	size_t output_size = 0;
+
+	/* state */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 state"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "Port C0"));
+	zassert_not_null(strstr(cmd_output, "Role:"));
+	zassert_not_null(strstr(cmd_output, "TC State:"));
+
+	/* state with comm disabled */
+	pd_comm_enable(TEST_PORT, 0);
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 state"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "Disable"));
+	pd_comm_enable(TEST_PORT, 1);
+
+	/* cc */
+	shell_backend_dummy_clear_output(get_ec_shell());
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "pd 0 cc"));
+	cmd_output =
+		shell_backend_dummy_get_output(get_ec_shell(), &output_size);
+	zassert_not_null(strstr(cmd_output, "Port C0 CC"));
+}
+
+ZTEST_F(usbc_console_pd, test_prllog)
+{
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_USB_PD_PRL_EVENT_LOG)) {
+		ztest_test_skip();
+	}
+
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "prllog"));
+	zassert_ok(shell_execute_cmd(get_ec_shell(), "prllog clear"));
 }
 
 ZTEST_SUITE(usbc_console_pd, drivers_predicate_post_main, usbc_console_pd_setup,

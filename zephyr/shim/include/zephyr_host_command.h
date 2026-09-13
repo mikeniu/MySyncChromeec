@@ -37,40 +37,6 @@ k_tid_t get_main_thread(void);
  */
 k_tid_t get_hostcmd_thread(void);
 
-#ifdef CONFIG_PLATFORM_EC_HOSTCMD
-
-/**
- * See include/host_command.h for documentation.
- */
-#ifdef CONFIG_EC_HOST_CMD
-
-#include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
-#define DECLARE_HOST_COMMAND(id, handler, ver) \
-	EC_HOST_CMD_HANDLER_UNBOUND(id, (ec_host_cmd_handler_cb)handler, ver)
-
-#else
-
-#define DECLARE_HOST_COMMAND(_command, _routine, _version_mask)         \
-	static const STRUCT_SECTION_ITERABLE(host_command,              \
-					     _cros_hcmd_##_command) = { \
-		.handler = _routine,                                    \
-		.command = _command,                                    \
-		.version_mask = _version_mask,                          \
-	}
-
-#endif /* CONFIG_EC_HOST_CMD */
-
-#else /* !CONFIG_PLATFORM_EC_HOSTCMD */
-
-/*
- * Create a global var to reference the host command. The linker should remove
- * it since it is never referenced.
- */
-#define DECLARE_HOST_COMMAND(command, routine, version_mask) \
-	int __remove_##command = ((int)(routine))
-
-#endif /* CONFIG_PLATFORM_EC_HOSTCMD */
-
 #ifdef __cplusplus
 }
 #endif

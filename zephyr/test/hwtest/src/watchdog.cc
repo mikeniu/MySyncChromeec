@@ -32,14 +32,10 @@ static void test_watchdog(void)
 
 static void test_panic_data(void)
 {
-	uint32_t reason = 0;
-	uint32_t info = 0;
-	uint8_t exception = UINT8_MAX;
+	struct panic_data *pdata = panic_get_data();
 
-	panic_get_reason(&reason, &info, &exception);
-
-	/* TODO(b/302354851): Only "reason" is set for watchdog in Zephyr. */
-	zassert_equal(reason, PANIC_SW_WATCHDOG);
+	zassert_not_null(pdata);
+	zassert_equal(panic_get_reason_reg(pdata), PANIC_SW_WATCHDOG);
 }
 
 static void (*test_steps[])(void) = { test_watchdog, test_panic_data };
