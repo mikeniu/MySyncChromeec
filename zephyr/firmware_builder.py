@@ -170,6 +170,10 @@ def get_projects():
                 "mica",
                 "mensa",
                 "annite",
+                "hekla",
+                "c1nv",
+                "aneto",
+                "pic",
             ]
             and not platform_ec_private.exists()
         ):

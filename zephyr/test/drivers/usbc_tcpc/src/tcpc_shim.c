@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "usb_pd_tcpm.h"
 #include "usbc/tcpci.h"
 
 #include <zephyr/logging/log.h>
@@ -46,6 +47,35 @@ ZTEST(tcpc_shim, test_tcpc_alt_enable)
 	zassert_mem_equal(&tcpc_config[0],
 			  &TCPC_ALT_FROM_NODELABEL(tcpc_anx7447_alt),
 			  sizeof(struct tcpc_config_t));
+}
+
+ZTEST(tcpc_shim, test_audio_accessory_cc_states)
+{
+	/* Verify Audio Accessory CC voltage profile detection (Ra on CC1 & CC2)
+	 */
+	zassert_true(cc_is_audio_acc(TYPEC_CC_VOLT_RA, TYPEC_CC_VOLT_RA));
+	zassert_false(cc_is_audio_acc(TYPEC_CC_VOLT_RD, TYPEC_CC_VOLT_RD));
+	zassert_false(cc_is_audio_acc(TYPEC_CC_VOLT_RA, TYPEC_CC_VOLT_RD));
+}
+
+ZTEST(tcpc_shim, test_debug_accessory_cc_states)
+{
+	/* Verify Source Debug Accessory CC voltage profile detection (Rp on CC1
+	 * & CC2)
+	 */
+	zassert_true(
+		cc_is_src_dbg_acc(TYPEC_CC_VOLT_RP_DEF, TYPEC_CC_VOLT_RP_1_5));
+	zassert_true(
+		cc_is_src_dbg_acc(TYPEC_CC_VOLT_RP_3_0, TYPEC_CC_VOLT_RP_3_0));
+	zassert_false(cc_is_src_dbg_acc(TYPEC_CC_VOLT_RD, TYPEC_CC_VOLT_RD));
+
+	/* Verify Sink Debug Accessory CC voltage profile detection (Rd on CC1 &
+	 * CC2)
+	 */
+	zassert_true(cc_is_snk_dbg_acc(TYPEC_CC_VOLT_RD, TYPEC_CC_VOLT_RD));
+	zassert_false(
+		cc_is_snk_dbg_acc(TYPEC_CC_VOLT_RP_DEF, TYPEC_CC_VOLT_RP_DEF));
+	zassert_false(cc_is_snk_dbg_acc(TYPEC_CC_VOLT_RD, TYPEC_CC_VOLT_RA));
 }
 
 void tcpc_shim_before_test(void *data)

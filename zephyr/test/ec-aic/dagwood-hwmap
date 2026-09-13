@@ -10,9 +10,14 @@
 # to your system.
 #
 #     $ find /dev/serial/by-id -name "*Dagwood*"
-#    /dev/serial/by-id/usb-Google_Dagwood_3635383134325119001C003A-if04
-#    /dev/serial/by-id/usb-Google_Dagwood_3635383134325119001C003A-if00
-#    /dev/serial/by-id/usb-Google_Dagwood_3635383134325119001C003A-if02
+#     /dev/serial/by-id/usb-Google_Dagwood_3635383134325119001C003A-if04
+#     /dev/serial/by-id/usb-Google_Dagwood_3635383134325119001C003A-if00
+#     /dev/serial/by-id/usb-Google_Dagwood_3635383134325119001C003A-if02
+#
+# To physically identify a board, use the identification command to blink
+# the status LED:
+#
+#     $ ../dagwood/flash.py --board-id 3635383134325119001C003A -i
 #
 # Each Dagwood board presents 3 serial devices to the host. twister needs
 # to connect to the serial device that passes through the EC console
@@ -32,7 +37,7 @@
 #
 # Add additional entries for each Dagwood board
 - connected: true
-  id: 3635383134325119001C003A
+  id: "3635383134325119001C003A"
   platform: realtek/rts5912
   product: Dagwood
   runner: unknown

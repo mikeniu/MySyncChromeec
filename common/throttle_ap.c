@@ -58,7 +58,7 @@ void throttle_ap(enum throttle_level level, enum throttle_type type,
 
 	switch (type) {
 	case THROTTLE_SOFT:
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 		host_throttle_cpu(tmpval);
 #endif
 		break;

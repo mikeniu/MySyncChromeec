@@ -247,6 +247,12 @@ DECLARE_HOST_COMMAND(EC_CMD_PORT80_READ, port80_command_read,
 
 static void port80_log_resume(void)
 {
+	/* Skip if the last entry is a resume marker (e.g. S0ix churn). */
+	if ((writes > 0) && history[(writes - 1) % ARRAY_SIZE(history)] ==
+				    PORT_80_EVENT_RESUME) {
+		return;
+	}
+
 	/* Store port 80 event so we know where resume happened */
 	port_80_write(PORT_80_EVENT_RESUME);
 }

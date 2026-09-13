@@ -69,7 +69,10 @@ configdefault PMP_DATA_EXECUTION_PREVENTION
 	default n
 
 configdefault PMP_NO_LOCK_GLOBAL
-	default y
+	default y if CROS_EC_RO
 endif # RISCV_PMP
+
+configdefault SOC_IT8XXX2_UART_TX_STRATPPING_PIN
+	default y if SOC_IT8XXX2_REG_SET_V2 && CROS_EC_RO
 
 endif # BOARD_IT8XXX2

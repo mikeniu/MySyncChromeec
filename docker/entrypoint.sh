@@ -4,7 +4,36 @@
 # found in the LICENSE file.
 set -e
 
+# If running as root and host UID/GID are provided, set up host user and re-exec
+if [ "$(id -u)" = "0" ] && [ -n "${HOST_UID}" ] && \
+   [ -n "${HOST_GID}" ] && [ "${HOST_UID}" != "0" ]; then
+    groupadd -g "${HOST_GID}" hostuser 2>/dev/null || true
+    useradd -u "${HOST_UID}" -g "${HOST_GID}" -m -s /bin/bash \
+        hostuser 2>/dev/null || true
+    # Grant access to serial TTYs and USB devices for flashing/debug
+    usermod -aG dialout,plugdev hostuser 2>/dev/null || true
+    # Prepare devutils directory for monitor binary installation
+    mkdir -p /usr/share/ec-devutils
+    chown -R "${HOST_UID}:${HOST_GID}" /usr/share/ec-devutils
+    chmod 755 /entrypoint.sh
+    exec gosu hostuser /bin/bash /entrypoint.sh "$@"
+fi
+
 REPO_BASE="https://chromium.googlesource.com/chromiumos"
+
+# Parse --fast flag from positional arguments
+ARGS=()
+for arg in "$@"; do
+    case "${arg}" in
+        --fast)
+            SKIP_UPDATE=1
+            ;;
+        *)
+            ARGS+=("${arg}")
+            ;;
+    esac
+done
+set -- "${ARGS[@]}"
 
 echo "Entering Docker container..."
 
@@ -133,6 +162,42 @@ clone_zephyrproject_sparse() {
     fi
 }
 
+# Specialized clone/update function for u-boot (sparse checkout)
+clone_uboot_sparse() {
+    local repo_url="${REPO_BASE}/third_party/u-boot"
+    local target_dir="/workspace/src/third_party/u-boot"
+    local cached_dir="${CACHE_BASE}/src/third_party/u-boot"
+
+    if [ ! -d "${target_dir}" ]; then
+        if [ -d "${cached_dir}" ]; then
+            echo "Populating U-Boot from build-time cache..."
+            mkdir -p "$(dirname "${target_dir}")"
+            cp -a "${cached_dir}" "${target_dir}"
+            update_repo "${target_dir}" "U-Boot"
+        else
+            echo "Performing sparse checkout of U-Boot..."
+            mkdir -p "${target_dir}"
+            cd "${target_dir}" || exit 1
+            git clone --depth 1 --no-checkout --quiet "${repo_url}" .
+            git config core.sparseCheckout true
+
+            # Define directories to include
+            {
+                echo "/tools/binman/"
+                echo "/tools/dtoc/"
+                echo "/tools/patman/"
+                echo "/tools/buildman/"
+            } >> .git/info/sparse-checkout
+
+            git checkout --quiet
+            cd - > /dev/null
+        fi
+    else
+        echo "U-Boot directory already exists. Checking for updates..."
+        update_repo "${target_dir}" "U-Boot"
+    fi
+}
+
 # Function to populate a repository from build-time cache if it doesn't exist
 populate_if_missing() {
     local target_dir="${1}"
@@ -166,8 +231,7 @@ else
     clone_zephyrproject_sparse &
     clone_or_update "${REPO_BASE}/third_party/pigweed/pigweed" \
         "/workspace/src/third_party/pigweed" "Pigweed" &
-    clone_or_update "${REPO_BASE}/third_party/u-boot" \
-        "/workspace/src/third_party/u-boot" "U-Boot" &
+    clone_uboot_sparse &
     clone_overlay_sparse &
     wait
 fi
@@ -183,6 +247,40 @@ fi
 echo "Activating virtual environment..."
 # shellcheck disable=SC1091
 source "${VENV_DIR}/bin/activate"
+
+# Configure PATH for U-Boot binman tools. Prioritize local workspace tools if
+# present, falling back to the container cache.
+export PATH="${PATH}:/opt/repos/src/third_party/u-boot/tools/binman"
+export PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
+
+# Set up Coreboot SDK cache directory symlink for the current user
+mkdir -p "${HOME}/.cache"
+ln -sfn /workspace/.cache/coreboot-sdk "${HOME}/.cache/coreboot-sdk"
+
+# Function to query and export Coreboot SDK toolchain paths into environment.
+# This ensures toolchain roots (e.g. COREBOOT_SDK_ROOT_arm) are available for
+# zmake builds and twister runs inside the container.
+setup_coreboot_sdk_env() {
+    local sdk_script=""
+    if [ -f "/workspace/src/platform/ec/util/coreboot_sdk.py" ]; then
+        sdk_script="/workspace/src/platform/ec/util/coreboot_sdk.py"
+    elif [ -f "/opt/repos/src/platform/ec/util/coreboot_sdk.py" ]; then
+        sdk_script="/opt/repos/src/platform/ec/util/coreboot_sdk.py"
+    fi
+
+    if [ -n "${sdk_script}" ]; then
+        eval "$(python3 -c '
+import json, subprocess, sys
+try:
+    script = sys.argv[1]
+    out = subprocess.check_output([sys.executable, script, "-j"]).decode()
+    for k, v in json.loads(out).items():
+        print(f"export {k}=\"{v}\"")
+except Exception as e:
+    sys.stderr.write(f"Warning: Failed to load Coreboot SDK: {e}\n")
+' "${sdk_script}")"
+    fi
+}
 
 # Function to compute sha256 hash of python requirement files
 compute_reqs_hash() {
@@ -258,13 +356,8 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
         echo "${CURRENT_HASH}" > "${HASH_FILE}"
     fi
 
-    # Export U-Boot binman tools directory to PATH, preferring mounted workspace
-    # over build-time cache
-    if [ -d "/workspace/src/third_party/u-boot/tools/binman" ]; then
-        export PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
-    elif [ -d "/opt/repos/src/third_party/u-boot/tools/binman" ]; then
-        export PATH="/opt/repos/src/third_party/u-boot/tools/binman:${PATH}"
-    fi
+    # Configure Coreboot SDK toolchain environment variables
+    setup_coreboot_sdk_env
 
     # Set up Realtek monitor binary (rtk_flame)
     MONITOR_CACHE="/workspace/.cache/rts5915_flash_upload.bin"

@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+/* LCOV_EXCL_START - Test fakes */
+
 int battery_is_present(void)
 {
 	return 1;
@@ -41,3 +43,5 @@ int lid_is_open(void)
 {
 	return 0;
 }
+
+/* LCOV_EXCL_STOP */

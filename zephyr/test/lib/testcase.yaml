@@ -8,6 +8,9 @@ tests:
     - CONFIG_LIBC_EXIT=y
     - CONFIG_TEST_LIB_EXIT=y
     - CONFIG_ZTEST_FATAL_HOOK=y
+  lib.printf:
+    extra_configs:
+    - CONFIG_TEST_LIB_PRINTF=y
   lib.sbrk:
     extra_configs:
     - CONFIG_TEST_LIB_SBRK=y

@@ -61,13 +61,5 @@ test_export_static void pen_detect_change(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-static void pen_init(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	ap_power_ev_init_callback(&cb, pen_detect_change,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&cb);
-}
-DECLARE_HOOK(HOOK_INIT, pen_init, HOOK_PRIO_INIT_I2C);
+AP_POWER_EVENT_CALLBACK_DEFINE(pen_detect_change, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);

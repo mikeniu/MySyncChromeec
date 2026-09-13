@@ -41,8 +41,11 @@ declare -A repos=(
 declare -A expected_diffs=(
   # b/389761200 17452ff89d458b4201bc1ce2debbb30703f45c0d
   #   Revert "drivers: watchdog: stm32 iwdg: explicit single channel"
+  # 27cd5256bd6c369ddee54def02515b1edbc417ae
+  #   CHROMIUM: cmake: only require Python 3.11
   ['zephyrproject/zephyr']="\
     17452ff89d458b4201bc1ce2debbb30703f45c0d \
+    27cd5256bd6c369ddee54def02515b1edbc417ae \
     "
 )
 
