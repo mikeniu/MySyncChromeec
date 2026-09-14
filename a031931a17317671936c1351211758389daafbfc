@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "faabb4b9_4f027bcc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-14T23:25:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c3222a6_de2502ec",
+      "range": {
+        "startLine": 9,
+        "startChar": 51,
+        "endLine": 9,
+        "endChar": 60
+      },
+      "revId": "a031931a17317671936c1351211758389daafbfc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a1c0e30_9f40db21",
@@ -37,6 +61,24 @@
       "writtenOn": "2026-09-14T22:21:35Z",
       "side": 1,
       "message": "* **Incomplete Migration of Memory Operations:** While the patch correctly updates `memset` to `std::ranges::fill`, there is still a C-style `memcpy` present in the unchanged context that could be modernized to match the new style.\nIn `generate_valid_establish_session_request` (around line 407):\n```cpp\nmemcpy(session_params-\u003enonce, nonce.data(), FP_AES_KEY_NONCE_BYTES);\n\n```\n\n\nTo be perfectly consistent with the rest of the file (which already uses `std::ranges::copy` in several places), consider updating it to:\n```cpp\nstd::ranges::copy(nonce, session_params-\u003enonce);\n\n```",
+      "revId": "a031931a17317671936c1351211758389daafbfc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fca6f4d8_7b6b09dd",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_auth_commands.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-14T23:25:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a1c0e30_9f40db21",
       "revId": "a031931a17317671936c1351211758389daafbfc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
