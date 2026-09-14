@@ -171,9 +171,6 @@
 		gpio_ec_pmic_lid_open_od: ec_pmic_lid_open_od {
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 		};
-		gpio_smb2360_b_chg_led_pg_odl: smb2360_b_chg_led_pg_odl {
-			gpios = <&gpioe 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
-		};
 		gpio_lid_360_l: lid_360_l {
  			gpios = <&gpioe 4 (GPIO_INPUT)>;
 			enum-name = "GPIO_TABLET_MODE_L";
@@ -182,7 +179,7 @@
 			gpios = <&gpioe 5 (GPIO_INPUT)>;
 			enum-name = "GPIO_CCD_MODE_ODL";
 		};
-		gpio_smb2360_a_chg_led_pg_odl: smb2360_a_chg_led_pg_odl {
+		gpio_chg_led_pg: chg_led_pg {
 			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_en_pp5000_wlc_x: en_pp5000wlc_x {
