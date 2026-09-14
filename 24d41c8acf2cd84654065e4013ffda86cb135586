@@ -155,6 +155,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0da4b8d5_db219965",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-14T18:12:52Z",
+      "side": 1,
+      "message": "Do you know why that happens? Wouldn\u0027t you expect the initial state of a test case to be disconnected?\n\n\u003e and allows time for asynchronous disconnect debounce to settle\n\nFor the purposes of these tests (and most tests), this operation ought to be synchronous. It looks like we have `disconnect_source_from_port` and `disconnect_sink_from_port` for that purpose. You could use `disconnect_source_from_port` here to replace several individual operations.",
+      "parentUuid": "7b2dd8b8_3c17a1c0",
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cc22250a_5ed31339",
         "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
         "patchSetId": 32
@@ -184,6 +202,24 @@
       "side": 1,
       "message": "It ensures that TEST_PORT is not left in a suspended/disabled state from a previous test run and is ready to detect and negotiate partner attachments.",
       "parentUuid": "cc22250a_5ed31339",
+      "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fde293c0_064911d9",
+        "filename": "zephyr/test/drivers/default/src/integration/usbc/usb_attach_wait_src.c",
+        "patchSetId": 32
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-14T18:12:52Z",
+      "side": 1,
+      "message": "From what I can see, none of the tests in this suite suspend the port, so at most, I might expect this to affect the behavior of whichever test in the suite runs first. (I don\u0027t think it\u0027s possible to interrupt one suite with another suite in ztest.) If the other suites are well behaved, then this shouldn\u0027t be necessary.\n\nIf one of these tests is somehow leaving a port suspended, you should debug that.\n\nIf some other suite is leaving the port suspended, ideally you should find that suite and fix it. However, this could be pretty tedious and ought to be outside the scope of this CL. It might be easier just to move this operation to `_setup`, comment why it\u0027s necessary, and call it a day. Alternatively, you could move this test into its own suite and avoid the issue. I would consider any of those moves acceptable.\n\nIf you do try to debug this, the `zephyr.exe` binary built by twister takes some arguments that allow you to run individual suites or tests within a single config from `testcase.yaml`. (See `zephyr.exe --help`.) That can help narrow down which other test is messing with yours. Like I said, it\u0027s annoying.",
+      "parentUuid": "bd5c1659_ca6e9d89",
       "revId": "24d41c8acf2cd84654065e4013ffda86cb135586",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
