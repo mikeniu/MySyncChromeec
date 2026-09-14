@@ -213,6 +213,29 @@ register_ish_project(
 )
 
 register_ish_project(
+    project_name="moonstone-ish-chre",
+    zephyr_board="intel_ish_5_8_0",
+    dts_overlays=[
+        here / "moonstone-ish" / "project.overlay",
+    ],
+    kconfig_files=[
+        here / "dsp_comms.conf",
+        here / "moonstone-ish" / "project.conf",
+        here / ".." / ".." / "ish.conf",
+        here / "chre.conf",
+    ],
+    modules=[
+        "ec",
+        "chre",
+        "cmsis_6",
+        "hal_intel_public",
+        "pigweed",
+        "nanopb",
+    ],
+    skip_build_all=True,
+)
+
+register_ish_project(
     project_name="fatcat-ish-idle",
     boards=["fatcat"],
     zephyr_board="intel_ish_5_8_0",

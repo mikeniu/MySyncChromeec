@@ -6,3 +6,14 @@
 # rebooting.
 configdefault CACHE_MANAGEMENT
 	default y if DCACHE
+
+config ISH_CHRE
+	bool "Use CHRE on ISH"
+	depends on PIGWEED_CHRONO_SYSTEM_TIMER
+	depends on PIGWEED_SYNC_THREAD_NOTIFICATION
+	depends on PIGWEED_SYNC_TIMED_THREAD_NOTIFICATION
+	help
+	  Enable the Context Hub Runtime Environment (CHRE) on Intel ISH.
+	  CHRE is an event-driven runtime architecture designed for low-power,
+	  always-on contextual computing such as sensor fusion, activity
+	  recognition, and nanoapps.
