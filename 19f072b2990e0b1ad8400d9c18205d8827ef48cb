@@ -16,6 +16,24 @@
       "message": "how would this impact when the files are copied to `platform/ec-legacy`?",
       "revId": "19f072b2990e0b1ad8400d9c18205d8827ef48cb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1ac261c_6158b559",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-14T21:41:39Z",
+      "side": 1,
+      "message": "Yes, if you copy these files to ec-legacy, make sure the CQ passes.",
+      "parentUuid": "ab848520_9c9559eb",
+      "revId": "19f072b2990e0b1ad8400d9c18205d8827ef48cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
