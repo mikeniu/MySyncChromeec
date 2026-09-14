@@ -50,6 +50,31 @@
       ],
       "revId": "9727b8e14b0b82a544eba8b2de5aa7dd946b152b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c80054dd_34983bcd",
+        "filename": "util/fix_header_guards_unittest.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-14T16:26:21Z",
+      "side": 1,
+      "message": "Done. Switched to self.enterContext(tempfile.TemporaryDirectory()) and removed tearDown (kept the pylint disable comment since ChromeOS\u0027s pylint 3.2 consider-using-with check does not yet recognize TestCase.enterContext).",
+      "parentUuid": "6f2e4293_c156c63a",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 9
+      },
+      "isAi": true,
+      "revId": "9727b8e14b0b82a544eba8b2de5aa7dd946b152b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
