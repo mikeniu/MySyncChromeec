@@ -43,11 +43,6 @@
 	};
 
 	gpio-interrupts {
-		int_s3_power_monitor: s3_power_monitor {
-			irq-pin = <&gpio_pp1800_l1i_s3_ec>;
-			flags = <GPIO_INT_EDGE_BOTH>;
-			handler = "s3_power_interrupt";
-		};
 		int_extpower: extpower {
 			irq-pin = <&gpio_chg_led_pg>;
 			flags = <GPIO_INT_EDGE_BOTH>;
