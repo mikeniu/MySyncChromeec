@@ -35,6 +35,23 @@
       "parentUuid": "37069969_92cae725",
       "revId": "31cff74bb05451002cd9b2a5c5ae2cac79a09058",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8b42dd7_b381b10d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-14T13:05:17Z",
+      "side": 1,
+      "message": "Can you try to run `zmake -D compare-builds ` for this and the next change? It\u0027s only the configs renaming so the output binaries should be the same",
+      "revId": "31cff74bb05451002cd9b2a5c5ae2cac79a09058",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
