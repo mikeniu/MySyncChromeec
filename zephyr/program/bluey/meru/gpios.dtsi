@@ -228,8 +228,6 @@
 			<&gpio8 6 0>,
 			<&gpio9 1 0>,
 			<&gpio9 2 0>,
-			<&gpioc 2 0>,
-			<&gpioc 3 0>,
 			<&gpioc 5 0>,
 			<&gpiod 5 0>,
 			<&gpioe 1 0>,
