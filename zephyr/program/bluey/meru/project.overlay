@@ -13,7 +13,6 @@
 #include "../adc.dtsi"
 #include "../common.dtsi"
 #include "../psl.dtsi"
-#include <meru/overlay.dtsi>
 
 /* meru project DTS includes */
 
