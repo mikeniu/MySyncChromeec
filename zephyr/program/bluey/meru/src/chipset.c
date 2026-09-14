@@ -1,9 +1,9 @@
-/* Copyright 2026 The ChromiumOS Authors
+/* Copyright 2025 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
 
-/* Meru chipset-specific configuration */
+/* Quartz chipset-specific configuration */
 
 #include "battery.h"
 #include "common.h"
@@ -21,7 +21,7 @@ static void disable_pp5000_s5(void)
 }
 DECLARE_DEFERRED(disable_pp5000_s5);
 
-void board_chipset_startup_meru(void)
+void board_chipset_startup_quartz(void)
 {
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_haptic_en_ec), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tpad_en), 1);
@@ -29,10 +29,10 @@ void board_chipset_startup_meru(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_enavdd_oled), 1);
 }
-DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_meru,
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_quartz,
 	     HOOK_PRIO_DEFAULT);
 
-void board_chipset_shutdown_meru(void)
+void board_chipset_shutdown_quartz(void)
 {
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_haptic_en_ec), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_tpad_en), 0);
@@ -41,7 +41,7 @@ void board_chipset_shutdown_meru(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_enavdd_oled), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_sys_throttle_mira), 0);
 }
-DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_meru,
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_quartz,
 	     HOOK_PRIO_DEFAULT);
 
 void s3_power_interrupt(enum gpio_signal signal)
@@ -57,7 +57,7 @@ static void enable_s3_interrupt(void)
 }
 DECLARE_HOOK(HOOK_INIT, enable_s3_interrupt, HOOK_PRIO_DEFAULT);
 
-static void board_chipset_pre_init_meru(void)
+static void board_chipset_pre_init_quartz(void)
 {
 	hook_call_deferred(&disable_pp5000_s5_data, -1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 1);
@@ -67,15 +67,15 @@ static void board_chipset_pre_init_meru(void)
 				1);
 	}
 }
-DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init_meru,
+DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init_quartz,
 	     HOOK_PRIO_DEFAULT);
 
-static void board_chipset_hard_off_meru(void)
+static void board_chipset_hard_off_quartz(void)
 {
 	hook_call_deferred(
 		&disable_pp5000_s5_data,
 		(5000 + CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
 			USEC_PER_MSEC);
 }
-DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_chipset_hard_off_meru,
+DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_chipset_hard_off_quartz,
 	     HOOK_PRIO_DEFAULT);
