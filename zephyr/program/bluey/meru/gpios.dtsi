@@ -190,6 +190,14 @@
 		ec_i2c_sensor_scl {
 			gpios = <&gpiof 3 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
 		};
+		gpio_gsc_ec_voldn_btn_odl: gsc_ec_voldn_btn_odl {
+			gpios = <&gpiof 4 (GPIO_INPUT)>;
+			enum-name = "GPIO_VOLUME_DOWN_L";
+		};
+		gpio_gsc_ec_volup_btn_odl: gsc_ec_volup_btn_odl {
+			gpios = <&gpiof 5 (GPIO_INPUT)>;
+			enum-name = "GPIO_VOLUME_UP_L";
+		};
 		gpio_led_ec_do_argb_di: led_ec_do_argb_di {
 			gpios = <&gpio3 5 (GPIO_OUTPUT)>;
 		};
