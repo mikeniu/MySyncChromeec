@@ -1495,6 +1495,7 @@ struct ec_params_read_memmap {
  */
 struct ec_params_get_cmd_versions {
 	uint8_t cmd;
+	uint8_t reserved;
 } __ec_align1;
 
 /**
@@ -2024,6 +2025,7 @@ enum ec_flash_erase_cmd {
  */
 struct ec_params_flash_erase_v1 {
 	uint8_t cmd;
+	uint8_t reserved;
 	uint8_t reserved;
 	uint16_t flag;
 	struct ec_params_flash_erase params;
@@ -2577,6 +2579,7 @@ struct lightbar_program_ex {
 
 struct ec_params_lightbar {
 	uint8_t cmd; /* Command (see enum lightbar_command) */
+	uint8_t reserved;
 	union {
 		/*
 		 * The following commands have no args:
@@ -2790,6 +2793,7 @@ struct ec_response_led_control {
 
 struct ec_params_vboot_hash {
 	uint8_t cmd; /* enum ec_vboot_hash_cmd */
+	uint8_t reserved;
 	uint8_t hash_type; /* enum ec_vboot_hash_type */
 	uint8_t nonce_size; /* Nonce size; may be 0 */
 	uint8_t reserved0; /* Reserved; set 0 */
@@ -3175,6 +3179,7 @@ enum motionsense_spoof_mode {
 
 struct ec_params_motion_sense {
 	uint8_t cmd;
+	uint8_t reserved;
 	union {
 		/* Used for MOTIONSENSE_CMD_DUMP. */
 		struct __ec_todo_unpacked {
@@ -3854,6 +3859,7 @@ struct ec_params_auto_fan_ctrl_v1 {
 struct ec_params_auto_fan_ctrl_v2 {
 	uint8_t fan_idx;
 	uint8_t cmd; /* enum ec_auto_fan_ctrl_cmd */
+	uint8_t reserved;
 	uint8_t set_auto; /* only used with EC_AUTO_FAN_CONTROL_CMD_SET - bool
 			   */
 } __ec_align4;
@@ -4084,6 +4090,7 @@ struct ec_collect_item {
 
 struct ec_params_keyscan_seq_ctrl {
 	uint8_t cmd; /* Command to send (enum ec_keyscan_seq_cmd) */
+	uint8_t reserved;
 	union {
 		struct __ec_align1 {
 			uint8_t active; /* still active */
@@ -4737,6 +4744,7 @@ struct ec_params_charge_control {
 
 	/* Below are the fields added in V2. */
 	uint8_t cmd; /* enum ec_charge_control_cmd. */
+	uint8_t reserved;
 	uint8_t flags; /* enum ec_charge_control_flag (v3+) */
 	/*
 	 * Lower and upper thresholds for battery sustainer. This struct isn't
@@ -5105,6 +5113,7 @@ enum charge_state_params {
 
 struct ec_params_charge_state {
 	uint8_t cmd; /* enum charge_state_command */
+	uint8_t reserved;
 	union {
 		/* get_state has no args */
 
@@ -5206,6 +5215,7 @@ enum ec_chargesplash_cmd {
 struct __ec_align1 ec_params_chargesplash {
 	/* enum ec_chargesplash_cmd */
 	uint8_t cmd;
+	uint8_t reserved;
 };
 
 struct __ec_align1 ec_response_chargesplash {
@@ -5644,6 +5654,7 @@ struct __ec_align4 ec_param_ec_codec_set_shm_addr {
 
 struct __ec_align4 ec_param_ec_codec {
 	uint8_t cmd; /* enum ec_codec_subcmd */
+	uint8_t reserved;
 	uint8_t reserved[3];
 
 	union {
@@ -5700,6 +5711,7 @@ struct __ec_align1 ec_param_ec_codec_dmic_get_gain_idx {
 
 struct __ec_align4 ec_param_ec_codec_dmic {
 	uint8_t cmd; /* enum ec_codec_dmic_subcmd */
+	uint8_t reserved;
 	uint8_t reserved[3];
 
 	union {
@@ -5767,6 +5779,7 @@ struct __ec_align4 ec_param_ec_codec_i2s_rx_set_bclk {
 
 struct __ec_align4 ec_param_ec_codec_i2s_rx {
 	uint8_t cmd; /* enum ec_codec_i2s_rx_subcmd */
+	uint8_t reserved;
 	uint8_t reserved[3];
 
 	union {
@@ -5815,6 +5828,7 @@ struct __ec_align4 ec_param_ec_codec_wov_set_lang_shm {
 
 struct __ec_align4 ec_param_ec_codec_wov {
 	uint8_t cmd; /* enum ec_codec_wov_subcmd */
+	uint8_t reserved;
 	uint8_t reserved[3];
 
 	union {
@@ -5851,6 +5865,7 @@ enum ec_pse_subcmd {
 
 struct __ec_align1 ec_params_pse {
 	uint8_t cmd; /* enum ec_pse_subcmd */
+	uint8_t reserved;
 	uint8_t port; /* PSE port */
 };
 
@@ -5900,6 +5915,7 @@ enum ec_reboot_cmd {
 
 struct ec_params_reboot_ec {
 	uint8_t cmd; /* enum ec_reboot_cmd */
+	uint8_t reserved;
 	uint8_t flags; /* See EC_REBOOT_FLAG_* */
 } __ec_align1;
 
@@ -6476,6 +6492,7 @@ enum usb_pd_fw_update_cmds {
 struct ec_params_usb_pd_fw_update {
 	uint16_t dev_id;
 	uint8_t cmd;
+	uint8_t reserved;
 	uint8_t port;
 
 	/* Size to write in bytes */
@@ -8073,6 +8090,7 @@ struct ec_params_pchg_update {
 	uint8_t port;
 	/* enum ec_pchg_update_cmd */
 	uint8_t cmd;
+	uint8_t reserved;
 	/* Padding */
 	uint8_t reserved0;
 	uint8_t reserved1;
@@ -8111,6 +8129,7 @@ struct ec_response_display_soc {
 
 struct ec_params_set_base_state {
 	uint8_t cmd; /* enum ec_set_base_state_cmd */
+	uint8_t reserved;
 } __ec_align1;
 
 enum ec_set_base_state_cmd {
@@ -8133,6 +8152,7 @@ enum ec_i2c_control_command {
 struct ec_params_i2c_control {
 	uint8_t port; /* I2C port number */
 	uint8_t cmd; /* enum ec_i2c_control_command */
+	uint8_t reserved;
 	union {
 		uint16_t speed_khz;
 	} cmd_params;
@@ -8874,6 +8894,7 @@ enum fp_frame_cmd {
 struct ec_params_fp_frame_v1 {
 	uint8_t cmd;
 	uint8_t reserved;
+	uint8_t reserved;
 	uint16_t index;
 	uint32_t offset;
 	uint32_t size;
@@ -8909,6 +8930,7 @@ struct ec_params_fp_template_v1 {
 	uint32_t offset;
 	uint32_t size;
 	uint8_t cmd;
+	uint8_t reserved;
 	uint8_t data[FLEXIBLE_ARRAY_MEMBER_SIZE];
 } __ec_align4;
 
@@ -9457,6 +9479,7 @@ enum ec_pwrmon_cmd {
 
 struct ec_params_pwrmon {
 	uint8_t cmd;
+	uint8_t reserved;
 	union {
 		uint16_t set_rate;
 		uint8_t channel_id;
