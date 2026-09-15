@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81da0772_567d39f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T20:37:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/297f5d2b-6f8c-4e95-9eb4-5fe735fd619a)]\n\n### Review Summary\n\n*   **Functionality:** The changes successfully address the thread starvation and blocking IO issues by replacing the `ThreadPoolExecutor` with a non-blocking `select.select()` and `os.read()` loop. Removing background threads also enables the use of `sys.exit(exit_code)` for process termination, replacing the abrupt `os._exit()`, which is a notable improvement.\n*   **Style:** The code style is clean, properly structured, and handles the `EOFError` control flow well across the call stack.\n*   **Security:** No security issues introduced.\n*   **Testing:** The author manually verified the script behavior using the provided `TEST\u003d` command on Renode. Since this is a test orchestration script, this testing approach is appropriate.\n*   **CL Size \u0026 Scope:** The CL is perfectly sized, focused entirely on fixing the blocking read issue and removing the unused executor logic.",
+      "isAi": true,
+      "revId": "df9a272cdaef41498ada3dad56ea1e97396395ad",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
