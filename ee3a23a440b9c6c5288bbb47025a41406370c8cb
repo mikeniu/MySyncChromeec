@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ba83b2b_a08abc3f",
+        "filename": "include/fpsensor/fpsensor_state.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-15T10:26:38Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s a good approach. Enabling one config causes unexpected results. If the FP frame buffer has to be in the nocache region, it has to be just defined in DTS.",
+      "revId": "ee3a23a440b9c6c5288bbb47025a41406370c8cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
