@@ -22,6 +22,30 @@
       },
       "revId": "3c39666065293109b619bd37ede3cb4426e03619",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea8fb8cb_085c1956",
+        "filename": "zephyr/shim/src/hooks.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-09-15T04:02:27Z",
+      "side": 1,
+      "message": "Good idea. This is the PR:\nhttps://github.com/zephyrproject-rtos/zephyr/pull/119123",
+      "parentUuid": "7cfd80a9_4d822c87",
+      "range": {
+        "startLine": 109,
+        "startChar": 7,
+        "endLine": 109,
+        "endChar": 17
+      },
+      "revId": "3c39666065293109b619bd37ede3cb4426e03619",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
