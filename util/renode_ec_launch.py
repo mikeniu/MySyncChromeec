@@ -11,8 +11,8 @@ import argparse
 import os
 import pathlib
 import shlex
-import subprocess
 import sys
+import tempfile
 from typing import List, Optional
 
 
@@ -57,7 +57,9 @@ def msg_run(cmd: List[str]) -> None:
         cmd: A list of strings representing the command and its arguments.
     """
     print(f"\033[1;32m> {shlex.join(cmd)}\033[m")
-    subprocess.run(cmd, check=True)
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os.execvp(cmd[0], cmd)
 
 
 def launch(
@@ -67,6 +69,7 @@ def launch(
     zephyr_bin: str,
     ec_project: str,
     uart: str,
+    gdb_port: Optional[int] = 3333,
 ) -> int:
     """Launches an EC image in Renode.
 
@@ -124,6 +127,9 @@ def launch(
     # Outside the chroot, we may not have libicu
     # https://aka.ms/dotnet-missing-libicu
     os.environ["DOTNET_SYSTEM_GLOBALIZATION_INVARIANT"] = "1"
+    os.environ.setdefault(
+        "XDG_CONFIG_HOME", os.path.join(tempfile.gettempdir(), ".config")
+    )
 
     renode_execute: List[str] = []
     # We set the machine name to the exact board name, since we might be
@@ -136,9 +142,10 @@ def launch(
     # Change logLevel from WARNING to ERROR, since the console is flooded
     # with WARNINGs.
     renode_execute.append("logLevel 3;")
-    # https://renode.readthedocs.io/en/latest/debugging/gdb.html
-    # (gdb) target remote :3333
-    renode_execute.append("machine StartGdbServer 3333;")
+    if gdb_port and gdb_port > 0:
+        # https://renode.readthedocs.io/en/latest/debugging/gdb.html
+        # (gdb) target remote :3333
+        renode_execute.append(f"machine StartGdbServer {gdb_port};")
 
     if board in GPIO_WP_MAP:
         wp_state = GPIO_WP_ENABLE if enable_write_protect else GPIO_WP_DISABLE
@@ -234,6 +241,13 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         help="Target path for the UART PTY symlink.",
     )
 
+    parser.add_argument(
+        "--gdb-port",
+        type=int,
+        default=3333,
+        help="Port number to start GDB server on (0 to disable).",
+    )
+
     opts = parser.parse_args(argv)
     return launch(
         board=opts.board,
@@ -242,6 +256,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         zephyr_bin=opts.zephyr_bin,
         ec_project=opts.ec,
         uart=opts.uart,
+        gdb_port=opts.gdb_port,
     )
 
 
