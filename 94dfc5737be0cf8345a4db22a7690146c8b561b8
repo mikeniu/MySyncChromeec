@@ -16,6 +16,23 @@
       "message": "The previous build (https://cr-buildbucket.appspot.com/build/8670648328414204433) is being automatically retried for the following reasons:\n- Some child builders are now retryable:cq-orchestrator\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
       "revId": "94dfc5737be0cf8345a4db22a7690146c8b561b8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a2ce14f_7b914cf6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T22:46:34Z",
+      "side": 1,
+      "message": "Approving for fingerprint files.\n\nI\u0027m not sure how the copybot stuff is going to handle this with the `ec-legacy` branch. If it\u0027s not automatically applied, please cherry-pick the script and run on the `ec-legacy` branch so we don\u0027t get future conflicts.",
+      "revId": "94dfc5737be0cf8345a4db22a7690146c8b561b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
