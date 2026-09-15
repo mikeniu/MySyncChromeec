@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5540e3ad_f3665615",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-15T12:09:36Z",
+      "side": 1,
+      "message": "Please run zmake compare-build for all existing FPMCU projects.",
+      "revId": "ee3a23a440b9c6c5288bbb47025a41406370c8cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8ba83b2b_a08abc3f",
         "filename": "include/fpsensor/fpsensor_state.h",
         "patchSetId": 2
@@ -32,6 +49,24 @@
       "side": 1,
       "message": "It seemed the best of available solutions to me.\n\nZephyr\u0027s cache documentation, [doc/hardware/cache/guide.rst](https://github.com/zephyrproject-rtos/zephyr/blob/6275de3e4eac3620d31ba118eafadf6098ee4c24/doc/hardware/cache/guide.rst?plain\u003d1#L4), provides two mechanisms to disable caching applicable to our use case:\n* Disabling Caching for a Memory Region ([link](https://github.com/zephyrproject-rtos/zephyr/blob/6275de3e4eac3620d31ba118eafadf6098ee4c24/doc/hardware/cache/guide.rst#disabling-caching-for-a-memory-region)),\n* Automatically Disabling Caching by Variable ([link](https://github.com/zephyrproject-rtos/zephyr/blob/6275de3e4eac3620d31ba118eafadf6098ee4c24/doc/hardware/cache/guide.rst#automatically-disabling-caching-by-variable)).\n\nDisabling caching for the _entire_ region, which requires annotations in devicetree, is unnecessary; it\u0027s enough to selectively disable cache for the fingerprint buffer. That\u0027s how I understand intended `FP_FRAME_SECTION` usage, designed as a variable attribute.\n\nFollowing the Zephyr documentation linked above, to disable caching for a variable, the requirements are:\n* enabled CONFIG_DCACHE (enabled in dartmonkey prj.conf),\n* enabled CONFIG_NOCACHE_MEMORY (enabled in dartmonkey prj.conf),\n* the __nocache attribute appended at the end of any uncached buffer definition.\n\nThe last requirement is satisfied by the code added in this CL.\n\nGiven that disabling caching for the entire memory region requires devicetree annotations _and_ variable attribute _and_ specific Kconfig options enabled, could you please explain why you think that approach is better?",
       "parentUuid": "8ba83b2b_a08abc3f",
+      "revId": "ee3a23a440b9c6c5288bbb47025a41406370c8cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75244f4b_b2d0e82f",
+        "filename": "include/fpsensor/fpsensor_state.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-15T12:09:36Z",
+      "side": 1,
+      "message": "I think the `Automatically Disabling Caching by Variable` approach is good here (for dartmonkey, nocache area within `sram0`).\n\nI\u0027m saying that there is a hidden assumption (nocache is always needed). You always apply __nocache to the fp_frame section if the `CONFIG_NOCACHE_MEMORY` is set.\n\nI think we can make such assumption with additional but:\n- please describe why we always do that (SPI always uses DMA so nocache is always needed)\n- add same ifdef for `FP_TEMPLATE_SECTION`",
+      "parentUuid": "1c307075_e925e2c5",
       "revId": "ee3a23a440b9c6c5288bbb47025a41406370c8cb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
