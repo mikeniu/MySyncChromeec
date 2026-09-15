@@ -45,8 +45,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import argparse
 from collections import namedtuple
-import concurrent
-from concurrent.futures.thread import ThreadPoolExecutor
 from contextlib import ExitStack
 import copy
 from dataclasses import dataclass
@@ -58,7 +56,10 @@ import logging
 import os
 from pathlib import Path
 import re
+import select
+import signal
 import socket
+import stat
 import subprocess
 import sys
 import tempfile
@@ -415,9 +416,19 @@ class Renode(Platform):
 
     def __init__(self):
         self.process = None
+        self.temp_dir = None
+        self.console_pty = ""
+        self.renode_log_path = ""
 
     def get_console(self, board_config: BoardConfig) -> Optional[str]:
-        return "/tmp/renode-uart"
+        if self.temp_dir is None:
+            # pylint: disable-next=consider-using-with
+            self.temp_dir = tempfile.TemporaryDirectory(prefix="renode-")
+            self.console_pty = os.path.join(self.temp_dir.name, "renode-uart")
+            self.renode_log_path = os.path.join(
+                self.temp_dir.name, "renode.log"
+            )
+        return self.console_pty
 
     def hw_write_protect(self, enable: bool) -> None:
         pass
@@ -436,10 +447,19 @@ class Renode(Platform):
         enable_hw_write_protect: bool,
         zephyr: bool,
     ) -> bool:
+        if self.process:
+            self.cleanup()
+        if self.temp_dir is None:
+            self.get_console(board_config)
+
         cmd = [
             "./util/renode-ec-launch",
             "--board",
             board_config.name,
+            "--uart",
+            self.console_pty,
+            "--gdb-port",
+            "0",
         ]
         if zephyr:
             # We've adopted the convention that we prefix upstream Zephyr test
@@ -454,15 +474,76 @@ class Renode(Platform):
         if enable_hw_write_protect:
             cmd.append("--enable-write-protect")
 
-        # pylint: disable-next=consider-using-with
-        self.process = subprocess.Popen(
-            cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE
+        env = os.environ.copy()
+        env["XDG_CONFIG_HOME"] = self.temp_dir.name
+        with open(self.renode_log_path, "wb") as renode_log_file:
+            # pylint: disable-next=consider-using-with
+            self.process = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=renode_log_file,
+                stderr=subprocess.STDOUT,
+                start_new_session=True,
+                env=env,
+            )
+
+        # Wait up to 60s for Renode to create the UART PTY symlink
+        start_wait = time.monotonic()
+        while time.monotonic() - start_wait < 60.0:
+            if self.process.poll() is not None:
+                try:
+                    with open(
+                        self.renode_log_path,
+                        "r",
+                        encoding="utf-8",
+                        errors="replace",
+                    ) as f:
+                        log_out = f.read()
+                except OSError:
+                    log_out = ""
+                logging.error(
+                    "Renode exited prematurely with returncode %d:\n%s",
+                    self.process.returncode,
+                    log_out,
+                )
+                self.cleanup()
+                return False
+            if os.path.exists(self.console_pty):
+                try:
+                    st = os.stat(self.console_pty)
+                    if stat.S_ISCHR(st.st_mode):
+                        # Allow emulation startup and UART connection to settle
+                        time.sleep(1)
+                        return True
+                except OSError:
+                    pass
+            time.sleep(0.1)
+
+        logging.error(
+            "Timed out waiting for Renode console PTY %s", self.console_pty
         )
-        time.sleep(10)
-        return True
+        self.cleanup()
+        return False
 
     def cleanup(self) -> None:
-        self.process.kill()
+        if self.process:
+            if self.process.stdin:
+                try:
+                    self.process.stdin.close()
+                except OSError:
+                    pass
+            try:
+                os.killpg(os.getpgid(self.process.pid), signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            try:
+                self.process.wait(timeout=5)
+            except (subprocess.TimeoutExpired, ProcessLookupError):
+                pass
+            self.process = None
+        if self.temp_dir:
+            self.temp_dir.cleanup()
+            self.temp_dir = None
 
     def _skip_test_bloonchipper(
         self, test_config: TestConfig, zephyr: bool
@@ -1641,20 +1722,38 @@ def erase_rw(image_path: str):
         image_file.truncate()
 
 
-def readline(
-    executor: ThreadPoolExecutor, file: BinaryIO, timeout_secs: float
-) -> Optional[bytes]:
+def readline(file: BinaryIO, timeout_secs: float) -> Optional[bytes]:
     """Read a line with timeout."""
-    future = executor.submit(file.readline)
-    try:
-        return future.result(timeout_secs)
-    except concurrent.futures.TimeoutError:
-        return None
+    fd = file.fileno()
+    line = bytearray()
+    end_time = time.monotonic() + timeout_secs
+    while True:
+        remaining = end_time - time.monotonic()
+        if remaining <= 0:
+            return bytes(line) if line else None
+
+        ready, _, _ = select.select([fd], [], [], remaining)
+        if not ready:
+            return bytes(line) if line else None
+
+        try:
+            ch = os.read(fd, 1)
+        except OSError as e:
+            if line:
+                return bytes(line)
+            raise EOFError("Console disconnected") from e
+
+        if not ch:
+            if line:
+                return bytes(line)
+            raise EOFError("Console disconnected")
+
+        line.extend(ch)
+        if ch == b"\n":
+            return bytes(line)
 
 
-def readlines_until_timeout(
-    executor, file: BinaryIO, timeout_secs: float
-) -> list[bytes]:
+def readlines_until_timeout(file: BinaryIO, timeout_secs: float) -> list[bytes]:
     """Continuously read lines for timeout_secs."""
     lines: list[bytes] = []
     end_time = time.monotonic() + timeout_secs
@@ -1663,7 +1762,10 @@ def readlines_until_timeout(
         if remaining <= 0:
             return lines
 
-        line = readline(executor, file, remaining)
+        try:
+            line = readline(file, remaining)
+        except EOFError:
+            return lines
         if not line:
             return lines
         lines.append(line)
@@ -1722,7 +1824,6 @@ def run_test(
     test: TestConfig,
     board_config: BoardConfig,
     console: io.FileIO,
-    executor: ThreadPoolExecutor,
     zephyr: bool,
 ) -> bool:
     """Run specified test."""
@@ -1763,7 +1864,11 @@ def run_test(
             logging.debug("Test timed out")
             return False
 
-        line = readline(executor, console, remaining_secs)
+        try:
+            line = readline(console, remaining_secs)
+        except EOFError:
+            logging.error("Console disconnected")
+            return False
         if not line:
             continue
 
@@ -1782,7 +1887,7 @@ def run_test(
         for finish_re in test.finish_regexes:
             if finish_re.match(line_str):
                 # flush read the remaining
-                lines = readlines_until_timeout(executor, console, 1)
+                lines = readlines_until_timeout(console, 1)
                 logging.debug(lines)
                 test.logs.extend(lines)
 
@@ -1873,7 +1978,6 @@ def flash_and_run_test(
     platform: Platform,
     board_config: BoardConfig,
     args: argparse.Namespace,
-    executor,
 ) -> bool:
     """Run a single test using the test and board configuration specified"""
     build_board = board_config.name
@@ -1954,7 +2058,7 @@ def flash_and_run_test(
             )
         else:
             # pylint: disable-next=consider-using-with
-            console_file = open(console_pty, "wb+", buffering=0)
+            console_file = open(console_pty, "r+b", buffering=0)
             console = stack.enter_context(console_file)
 
         platform.hw_write_protect(test.enable_hw_write_protect)
@@ -1972,7 +2076,6 @@ def flash_and_run_test(
             test,
             board_config,
             console,
-            executor=executor,
             zephyr=args.zephyr,
         )
 
@@ -2158,47 +2261,44 @@ def main():
     )
     logging.debug("Running tests: %s", [test.config_name for test in test_list])
 
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        for test in test_list:
-            if (
-                (test.skip_for_zephyr and args.zephyr)
-                or (test.skip_for_ec_legacy and not args.zephyr)
-                or platform.skip_test(test, board_config, args.zephyr)
-            ):
-                test.status = TestStatus.SKIP
-                continue
-            if flash_and_run_test(test, platform, board_config, args, executor):
-                test.status = TestStatus.PASS
-            else:
-                test.status = TestStatus.FAIL
+    for test in test_list:
+        if (
+            (test.skip_for_zephyr and args.zephyr)
+            or (test.skip_for_ec_legacy and not args.zephyr)
+            or platform.skip_test(test, board_config, args.zephyr)
+        ):
+            test.status = TestStatus.SKIP
+            continue
+        if flash_and_run_test(test, platform, board_config, args):
+            test.status = TestStatus.PASS
+        else:
+            test.status = TestStatus.FAIL
 
-        colorama.init()
-        exit_code = 0
-        for test in test_list:
-            # print results
-            print('Test "' + test.config_name + '": ', end="")
-            if test.status == TestStatus.SKIP:
-                print(colorama.Fore.YELLOW + "SKIPPED")
-            elif test.status == TestStatus.PASS:
-                print(colorama.Fore.GREEN + "PASSED")
-            else:
-                print(colorama.Fore.RED + "FAILED")
-                exit_code = 1
+    colorama.init()
+    exit_code = 0
+    for test in test_list:
+        # print results
+        print('Test "' + test.config_name + '": ', end="")
+        if test.status == TestStatus.SKIP:
+            print(colorama.Fore.YELLOW + "SKIPPED")
+        elif test.status == TestStatus.PASS:
+            print(colorama.Fore.GREEN + "PASSED")
+        else:
+            print(colorama.Fore.RED + "FAILED")
+            exit_code = 1
 
-            print(colorama.Style.RESET_ALL)
+        print(colorama.Style.RESET_ALL)
 
-        if args.json:
-            write_json_results(test_list, args.json)
+    if args.json:
+        write_json_results(test_list, args.json)
 
-        if exit_code != 0:
-            print(
-                f"Tests failed for {args.board}"
-                f'{" Zephyr" if args.zephyr else ""}'
-                f'{" Renode" if args.renode else ""}'
-            )
-        # TODO(b/368684364): Fix the underlying issue that prevents sys.exit()
-        # from working correctly.
-        os._exit(exit_code)  # pylint: disable=protected-access
+    if exit_code != 0:
+        print(
+            f"Tests failed for {args.board}"
+            f'{" Zephyr" if args.zephyr else ""}'
+            f'{" Renode" if args.renode else ""}'
+        )
+    sys.exit(exit_code)
 
 
 def get_power_utilization(

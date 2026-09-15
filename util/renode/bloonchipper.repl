@@ -26,3 +26,10 @@ GPIO_SLP: Miscellaneous.Button @ gpioPortA 8
         ReleaseOnReset false
 
 fpsensor: Sensors.GenericSPISensor @ spi2
+
+sysbus:
+    init:
+        Tag <0x40021000, 0x40021003> "GPIOE_MODER" 0xFFFFFFFF
+        Tag <0x40021004, 0x40021007> "GPIOE_OTYPER" 0x00000008
+        // FLASH and USB tags are required for CubeMX-based projects to pass the initialization phase
+        Tag <0x50000010, 0x5000003f> "USB:RESET" 0x80000000
