@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a91aae8e_c277d5e0",
+        "filename": "zephyr/test/drivers/default/src/battery.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T20:01:05Z",
+      "side": 1,
+      "message": "It is safer to reset fake parameters in the `battery_after` function. If a `zassert` fails in this test, lines 334-335 will be skipped, leaving the fake parameters active for other tests in the suite.",
+      "range": {
+        "startLine": 334,
+        "startChar": 0,
+        "endLine": 334,
+        "endChar": 0
+      },
+      "revId": "0ad10fa29d0d82f59720887cb9894b3d2fae9b6d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "664c445f_82b42d22",
+        "filename": "zephyr/test/drivers/default/src/battery.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T20:01:05Z",
+      "side": 1,
+      "message": "This test is missing assertions. The commit message states it verifies hook notifications, but there are no checks to see if `hook_notify` was actually called. Consider using a mock for `hook_notify` to verify that the `HOOK_BATTERY_SOC_CHANGE` is triggered (or not triggered) as expected.",
+      "range": {
+        "startLine": 342,
+        "startChar": 0,
+        "endLine": 342,
+        "endChar": 0
+      },
+      "revId": "0ad10fa29d0d82f59720887cb9894b3d2fae9b6d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
