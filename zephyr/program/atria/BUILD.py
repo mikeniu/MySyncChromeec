@@ -28,6 +28,8 @@ def register_rtk59_project(
             *extra_kconfig_base_files,
             # Project-specific KConfig customization.
             here / project_name / "project.conf",
+            # DSP comms shared config.
+            here / "dsp_comms.conf",
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
@@ -69,7 +71,7 @@ def register_it8xxx2_project(
 # Realtek RVP SKU
 register_rtk59_project(
     project_name="atriarvp-rtk",
-    extra_modules=["pigweed"],
+    extra_modules=["pigweed", "nanopb"],
     snippets=["pw-tokenize"],
 )
 
@@ -88,6 +90,7 @@ register_ish_project(
     ],
     kconfig_files=[
         here / "atriarvp-ish" / "project.conf",
+        here / "dsp_comms.conf",
         here / ".." / ".." / "ish.conf",
     ],
 )

@@ -75,6 +75,7 @@ THIRD_PARTY_MODULES = [
 ]
 
 THIRD_PARTY_PRIVATE_MODULES = [
+    "google-private",
     "intel_module_private",
 ]
 
@@ -403,6 +404,12 @@ def main():
         # Upstream tests we also wish to run:
         for path in ZEPHYR_TEST_PATHS:
             twister_cli.extend(["-T", str(zephyr_base / path)])
+
+        # Tests from private Zephyr modules:
+        for module_name in THIRD_PARTY_PRIVATE_MODULES:
+            test_dir = zephyr_modules_private_dir / module_name / "test"
+            if test_dir.is_dir():
+                twister_cli.extend(["-T", str(test_dir)])
 
         # Include additional upstream tests when running on-device tests.
         if is_dagwood_platform():

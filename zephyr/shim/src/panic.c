@@ -185,26 +185,85 @@ void panic_data_finalize(struct panic_data *pdata)
 	}
 }
 
-test_export_static void copy_esf_to_panic_data(const struct arch_esf *esf,
-					       struct panic_data *pdata)
+void panic_data_write_esf(const struct arch_esf *esf)
 {
-	pdata = panic_data_reset(pdata);
+	struct panic_data *pdata = panic_data_reset(NULL);
 
-	if (PANIC_ARCH == PANIC_ARCH_CORTEX_M) {
-		pdata->flags |= PANIC_DATA_FLAG_FRAME_VALID;
+	if (esf) {
+		if (PANIC_ARCH == PANIC_ARCH_CORTEX_M) {
+			pdata->flags |= PANIC_DATA_FLAG_FRAME_VALID;
+		}
+
+		PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
 	}
 
-	PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
-
 	/* Finalize and flush the panic data to RAM before reboot. */
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_assert(const char *path, unsigned int line)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+	uint32_t info;
+
+	if (path) {
+		const char *last_slash = strrchr(path, '/');
+		const char *filename = last_slash ? last_slash + 1 : path;
+
+		/*
+		 * Encode the first two characters of the filename and 16-bit
+		 * line number into the 32-bit panic info register.
+		 */
+		info = (filename[0] << 24) | (filename[1] << 16) |
+		       (line & 0xffff);
+	} else {
+		info = (uint32_t)-1;
+	}
+
+	panic_set_reason_reg(pdata, PANIC_SW_ASSERT);
+	panic_set_info_reg(pdata, info);
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)k_current_get());
+
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_watchdog_warning(uintptr_t pc,
+				       const struct k_thread *thread)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
+	panic_set_info_reg(pdata, (uint32_t)pc);
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_fatal(unsigned int reason, const struct k_thread *thread)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, PANIC_ZEPHYR_FATAL_ERROR);
+	panic_set_info_reg(pdata, (uint32_t)reason);
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_sw(uint32_t reason, uint32_t info, uint8_t exception)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, reason);
+	panic_set_info_reg(pdata, info);
+	panic_set_exception_reg(pdata, exception);
+
 	panic_data_finalize(pdata);
 }
 
 #if !defined(CONFIG_ZTEST_FATAL_HOOK)
 void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 {
-	struct panic_data *pdata = get_panic_data_write();
-
 	/*
 	 * If CONFIG_LOG is on, the exception details
 	 * have already been logged to the console.
@@ -214,22 +273,15 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 	}
 
 	if ((PANIC_ARCH != PANIC_ARCH_UNSUPPORTED) && esf) {
-		copy_esf_to_panic_data(esf, pdata);
+		panic_data_write_esf(esf);
 		if (!IS_ENABLED(CONFIG_LOG)) {
 			panic_data_print(panic_get_data());
 		}
 	} else {
-		/* If a esf structure is empty, store just the reason provided
+		/* If an esf structure is empty, store just the reason provided
 		 * by Zephyr. It can be caused e.g. by a spurious interrupt.
 		 */
-		pdata = panic_data_reset(pdata);
-
-		panic_set_reason_reg(pdata, PANIC_ZEPHYR_FATAL_ERROR);
-		panic_set_info_reg(pdata, (uint32_t)reason);
-		panic_set_exception_reg(pdata,
-					(uint8_t)(uintptr_t)k_current_get());
-
-		panic_data_finalize(pdata);
+		panic_data_write_fatal(reason, k_current_get());
 	}
 
 	LOG_PANIC();
@@ -252,13 +304,7 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #ifdef CONFIG_ASSERT_NO_FILE_INFO
 __override void assert_post_action(void)
 {
-	struct panic_data *const pdata = panic_data_reset(NULL);
-
-	panic_set_reason_reg(pdata, PANIC_SW_ASSERT);
-	panic_set_info_reg(pdata, (uint32_t)-1);
-	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)k_current_get());
-
-	panic_data_finalize(pdata);
+	panic_data_write_assert(NULL, 0);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
@@ -269,29 +315,13 @@ __override void assert_post_action(void)
 #else
 __override void assert_post_action(const char *path, unsigned int line)
 {
-	const k_tid_t thread = k_current_get();
-	struct panic_data *const pdata = panic_data_reset(NULL);
-	uint32_t info = (uint32_t)-1;
-
-	if (path) {
-		const char *last_slash = strrchr(path, '/');
-		const char *filename = last_slash ? last_slash + 1 : path;
-
-		info = (filename[0] << 24) | (filename[1] << 16) |
-		       (line & 0xffff);
-	}
-
-	panic_set_reason_reg(pdata, PANIC_SW_ASSERT);
-	panic_set_info_reg(pdata, info);
-	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
-
-	panic_data_finalize(pdata);
+	panic_data_write_assert(path, line);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT)) {
-		print_stack_trace(thread);
+		print_stack_trace(k_current_get());
 	}
 
 	panic_reboot();

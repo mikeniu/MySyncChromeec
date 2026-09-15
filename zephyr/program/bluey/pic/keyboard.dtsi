@@ -109,7 +109,7 @@
 		down-arrow-rc = <KBD_RC(6, 11)>;
 		esc-rc = <KBD_RC(1, 1)>;
 		left-shift-rc = <KBD_RC(5, 7)>;
-		refresh-rc = <KBD_RC(2, 2)>;
+		refresh-rc = <KBD_RC(3, 2)>;
 	};
 
 	runtime-keys {
@@ -128,18 +128,18 @@
 	kbd_config_0: kbd-config-0 {
 		vivaldi-codes = <
 			VIVALDI_TK_BACK               /* T1  = F1  */
-			VIVALDI_TK_FORWARD            /* T2  = F2  */
-			VIVALDI_TK_REFRESH            /* T3  = F3  */
+			VIVALDI_TK_HOME               /* T2  = F2  */
+			VIVALDI_TK_OVERVIEW           /* T3  = F3  */
 			VIVALDI_TK_FULLSCREEN         /* T4  = F4  */
-			VIVALDI_TK_OVERVIEW           /* T5  = F5  */
-			VIVALDI_TK_ACCESSIBILITY      /* T6  = F6  */
+			VIVALDI_TK_SNAPSHOT           /* T5  = F5  */
+			VIVALDI_TK_BRIGHTNESS_DOWN    /* T6  = F6  */
 			VIVALDI_TK_BRIGHTNESS_UP      /* T7  = F7  */
-			VIVALDI_TK_BRIGHTNESS_DOWN    /* T8  = F8  */
+			VIVALDI_TK_KBD_BKLIGHT_TOGGLE /* T8  = F8  */
 			VIVALDI_TK_MICMUTE            /* T9  = F9  */
 			VIVALDI_TK_VOL_MUTE           /* T10 = F10 */
 			VIVALDI_TK_VOL_DOWN           /* T11 = F11 */
 			VIVALDI_TK_VOL_UP             /* T12 = F12 */
-			VIVALDI_TK_FULLSCREEN         /* T13 = F13 */
+			VIVALDI_TK_ACCESSIBILITY      /* T13 = F13 */
 			VIVALDI_TK_DICTATE            /* T14 = F14 */
 		>;
 		capabilities = <(VIVALDI_KEYBD_CAP_FUNCTION_KEYS |

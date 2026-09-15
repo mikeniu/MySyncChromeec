@@ -170,6 +170,9 @@ if (DEFINED CONFIG_PLATFORM_EC)
     "${PLATFORM_EC}/include"
     "${PLATFORM_EC}/include/driver"
     "${PLATFORM_EC}/third_party")
+  if (CONFIG_ZTEST)
+    zephyr_include_directories("${PLATFORM_EC}/zephyr/test/test_utils")
+  endif()
 endif()
 
 if (ZEPHYR_PIGWEED_MODULE_DIR)
@@ -190,9 +193,10 @@ if (ZEPHYR_PIGWEED_MODULE_DIR)
                            ${PLATFORM_EC}/zephyr/include/pigweed/pw_zephyr_tokenized_custom_log.h)
 
     include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/backend.cmake")
-    pw_set_backend(pw_log_tokenized.handler platform_ec_log.tokenized_handler)
+    pw_set_backend(pw_log_tokenized.handler pw_build.empty)
     include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log/backend.cmake")
     pw_set_backend(pw_log pw_log_tokenized)
+    target_link_libraries(ec_shim PUBLIC pw_log_tokenized)
   endif()
 endif()
 
@@ -414,16 +418,11 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_BTN_IGN_OUT
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_btn_ign_out.cc")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FP_LED
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_led.cc")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                                "${PLATFORM_EC}/common/host_command.c")
-if (NOT DEFINED CONFIG_EC_HOST_CMD)
-  zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                                "${PLATFORM_EC}/common/host_command_task.c")
-endif()
 
-if (DEFINED CONFIG_PLATFORM_EC_HOSTCMD OR DEFINED CONFIG_EC_HOST_CMD)
-  zephyr_library_sources("${PLATFORM_EC}/common/host_event_commands.c")
-endif()
+zephyr_library_sources_ifdef(CONFIG_HAS_HOSTCMD "${PLATFORM_EC}/common/host_command.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
+                                              "${PLATFORM_EC}/common/host_command_task.c")
+zephyr_library_sources_ifdef(CONFIG_HAS_HOSTCMD "${PLATFORM_EC}/common/host_event_commands.c")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
                                                 "${PLATFORM_EC}/common/uart_hostcmd.c")
@@ -837,56 +836,9 @@ if (DEFINED CONFIG_SOC_INTEL_ISH_5_8_0)
   )
 endif()
 
-# Pigweed libraries rely on Zephyr headers that transitively include
-# heap_constants.h. Because pigweed library targets are not created using
-# zephyr_library(), they lacks the implicit dependency on
-# zephyr_generated_headers.  We defer adding this dependency to the top-level
-# directory scope to ensure the Pigweed module has been fully evaluated and the
-# library targets exist.
-#
 # Lists all targets defined with pw_add_library() and pw_add_test()
 function(ec_add_pw_log_zephyr_deps)
-  # TODO: b/552621198 - Fix upstream in Pigweed so pw_zephyrize_libraries_ifdef
-  # doesn't cause cyclic dependencies with Zephyr bootstrap object libraries
-  # (offsets/heap_constants).
-  # Remove pw_log_zephyr, pw_log_zephyr.pigweed_overrides, pw_hex_dump.log_bytes,
-  # and platform_ec_log.tokenized_handler from zephyr_interface to break the cycle
-  # with offsets/heap_constants, and link them to app instead.
-  if(TARGET zephyr_interface)
-    get_target_property(interface_libs zephyr_interface INTERFACE_LINK_LIBRARIES)
-    if(interface_libs)
-      list(REMOVE_ITEM interface_libs
-           pw_log_zephyr
-           pw_log_zephyr.pigweed_overrides
-           pw_hex_dump.log_bytes
-           platform_ec_log.tokenized_handler)
-      set_property(TARGET zephyr_interface PROPERTY INTERFACE_LINK_LIBRARIES "${interface_libs}")
-    endif()
-    if(TARGET pw_log_zephyr.pigweed_overrides)
-      target_include_directories(zephyr_interface INTERFACE
-        $<TARGET_PROPERTY:pw_log_zephyr.pigweed_overrides,INTERFACE_INCLUDE_DIRECTORIES>)
-    endif()
-  endif()
-  if(TARGET app)
-    if(CONFIG_PIGWEED_LOG_ZEPHYR AND TARGET pw_log_zephyr)
-      target_link_libraries(app INTERFACE pw_log_zephyr)
-    endif()
-    if(CONFIG_PIGWEED_LOG_PIGWEED_OVERRIDES)
-      if(TARGET pw_log_zephyr.pigweed_overrides)
-        target_link_libraries(app INTERFACE pw_log_zephyr.pigweed_overrides)
-      endif()
-      if(TARGET pw_hex_dump.log_bytes)
-        target_link_libraries(app INTERFACE pw_hex_dump.log_bytes)
-      endif()
-    endif()
-    if(CONFIG_PIGWEED_LOG_TOKENIZED_LIB AND TARGET platform_ec_log.tokenized_handler)
-      target_link_libraries(app INTERFACE platform_ec_log.tokenized_handler)
-    endif()
-  endif()
-
-  foreach(lib pw_log_zephyr
-	      platform_ec_log.tokenized_handler
-	      cros.dsp.test
+  foreach(lib cros.dsp.test
 	      dsp.client
 	      dsp.service
 	      math.iir_decimator

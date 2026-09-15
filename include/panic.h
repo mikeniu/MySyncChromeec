@@ -117,6 +117,50 @@ __noreturn
 	void software_panic(uint32_t reason, uint32_t info);
 #endif /* !CONFIG_ZEPHYR */
 
+struct arch_esf;
+struct k_thread;
+
+/**
+ * Write panic data for a hardware exception (ESF).
+ *
+ * @param esf Pointer to the architecture exception stack frame, or NULL.
+ */
+void panic_data_write_esf(const struct arch_esf *esf);
+
+/**
+ * Write panic data for an assertion failure.
+ *
+ * @param path File path where assertion failed, or NULL if stripped.
+ * @param line Line number where assertion failed.
+ */
+void panic_data_write_assert(const char *path, unsigned int line);
+
+/**
+ * Write panic data for a watchdog warning event.
+ *
+ * @param pc Program counter where execution was interrupted.
+ * @param thread Thread pointer of the interrupted thread.
+ */
+void panic_data_write_watchdog_warning(uintptr_t pc,
+				       const struct k_thread *thread);
+
+/**
+ * Write panic data for a Zephyr fatal error without an ESF.
+ *
+ * @param reason Zephyr fatal error reason code (e.g. K_ERR_KERNEL_PANIC).
+ * @param thread Thread pointer of the faulting thread.
+ */
+void panic_data_write_fatal(unsigned int reason, const struct k_thread *thread);
+
+/**
+ * Write a generic software panic reason, info, and exception.
+ *
+ * @param reason PANIC_SW_* constant.
+ * @param info Reason-specific 32-bit auxiliary info.
+ * @param exception Exception or truncated thread ID byte.
+ */
+void panic_data_write_sw(uint32_t reason, uint32_t info, uint8_t exception);
+
 /**
  * Reset/prepare a panic_data structure for writing.
  *
