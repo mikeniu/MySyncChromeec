@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2f9ddbce_09f5b81f",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-15T11:26:44Z",
+      "side": 1,
+      "message": "Not sure, I\u0027ll check this",
+      "parentUuid": "b99600fb_85c64e6c",
+      "revId": "269cf3c3dabf925b9052e559159e29928738a905",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9585dd5b_42299f8b",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-15T10:40:25Z",
       "side": 1,
       "message": "This looks hacky. Isn\u0027t Zephyr still supporting a change of system clock in a better way? \n\nShouldn\u0027t we at least use `sys_clock_hw_cycles_per_sec_update`?",
+      "revId": "269cf3c3dabf925b9052e559159e29928738a905",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "343a5550_7de1fc5a",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-15T11:26:44Z",
+      "side": 1,
+      "message": "I agree. I\u0027ll look into a more civilized way of updating this variable",
+      "parentUuid": "9585dd5b_42299f8b",
       "revId": "269cf3c3dabf925b9052e559159e29928738a905",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
