@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0082e993_cc02a50c",
+        "filename": "common/usb_pd_host_cmd_common.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T21:53:50Z",
+      "side": 1,
+      "message": "Non-blocking comment\nI\u0027m seeing a pattern here - when a command has multiple versions, then you can\u0027t rely on the `validate_handler()` to catch invalid request/responses.\n\nCould the `EC_HOST_CMD_HANDLER` and other macros be enhanced to support multiple command versions?",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 40
+      },
+      "revId": "af6a3fa3d253c5d00adcaedac0db0344b5d7ceb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b9e213b_21ba7dc0",
+        "filename": "common/usb_pd_host_cmd_common.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T21:53:50Z",
+      "side": 1,
+      "message": "Are there any build time checks that the values of `enum ec_host_cmd_status` match the legacy `enum ec_status`?",
+      "range": {
+        "startLine": 392,
+        "startChar": 10,
+        "endLine": 393,
+        "endChar": 14
+      },
+      "revId": "af6a3fa3d253c5d00adcaedac0db0344b5d7ceb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc20ee89_39a52c19",
+        "filename": "common/usbc/usb_pd_host.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T21:53:50Z",
+      "side": 1,
+      "message": "Isn\u0027t this redundant with the checks by `validate_handler()`?",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 38
+      },
+      "revId": "af6a3fa3d253c5d00adcaedac0db0344b5d7ceb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6dc49887_d6cb054b",
+        "filename": "zephyr/test/drivers/host_cmd/src/usb_pd_host_cmd.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T21:53:50Z",
+      "side": 1,
+      "message": "Should `hc_typec_status` be modified to just return `EC_RES_INVALID_RESPONSE` instead of `EC_RES_RESPONSE_TOO_BIG`?  Then you can eliminate this guard.",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 168,
+        "endChar": 69
+      },
+      "revId": "af6a3fa3d253c5d00adcaedac0db0344b5d7ceb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
