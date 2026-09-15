@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "674129fa_88323095",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T20:30:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/01b24e1f-a921-43a1-b07d-22b661e3da3f)]\n\n### Review Summary\n\n*   **Functionality**: The change correctly replaces `subprocess.run` with `os.execvp` to avoid leaving the Python wrapper process running. The addition of the `--gdb-port` flag is well-implemented and functional. There is a minor edge case with the hardcoded temporary directory for `XDG_CONFIG_HOME` that could cause permission issues in shared environments.\n*   **Style**: The code adheres to style guidelines. Minor suggestions have been made to clean up unreachable code (`return 0` after `execvp`) and improve docstrings/type hints for functions that no longer return.\n*   **Security**: No security vulnerabilities introduced. As noted above, the shared temporary directory could present a minor local permission conflict, but not a significant vulnerability.\n*   **Testing**: This is a utility script update and was tested manually as stated in the CL description. No automated tests were modified or added, which is acceptable for this type of script.\n*   **CL Size \u0026 Scope**: The CL is small, focused, and well-scoped.",
+      "isAi": true,
+      "revId": "62a3e2dab424708b1d035421932008d79cba5251",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6720f2a_d888c470",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T20:30:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider updating the docstring for `msg_run` to clarify that this function replaces the current process and does not return, to avoid confusion for future callers. You could also update the return type hint from `-\u003e None` to `-\u003e typing.NoReturn` (requires `from typing import NoReturn`).",
+      "isAi": true,
+      "revId": "62a3e2dab424708b1d035421932008d79cba5251",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a8e75e4_b0f12c39",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T20:30:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `tempfile.gettempdir()` usually resolves to a shared directory like `/tmp`. Hardcoding a path like `/tmp/.config` can lead to permission denied errors if multiple users run this script on the same machine (the first user to run it will own the directory, and others won\u0027t be able to write to it).\n\nConsider using a user-specific temporary directory, for example:\n```python\n        \"XDG_CONFIG_HOME\", os.path.join(tempfile.gettempdir(), f\"renode-config-{os.getuid()}\")\n```",
+      "isAi": true,
+      "revId": "62a3e2dab424708b1d035421932008d79cba5251",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d16775c_a7c54311",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T20:30:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `msg_run` now uses `os.execvp()`, the current process is replaced and `msg_run` will never return if successful. Therefore, this `return 0` is unreachable dead code and can be safely removed.",
+      "isAi": true,
+      "revId": "62a3e2dab424708b1d035421932008d79cba5251",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
