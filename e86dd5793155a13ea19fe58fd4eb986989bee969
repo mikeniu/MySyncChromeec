@@ -34,6 +34,24 @@
       "parentUuid": "f577f71d_9e9da88d",
       "revId": "e86dd5793155a13ea19fe58fd4eb986989bee969",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dd0ba9a_4b1aa915",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-09-15T15:29:38Z",
+      "side": 1,
+      "message": "I think we could merge this CL as the firmware are supported.",
+      "parentUuid": "772c15e5_fefe6149",
+      "revId": "e86dd5793155a13ea19fe58fd4eb986989bee969",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
