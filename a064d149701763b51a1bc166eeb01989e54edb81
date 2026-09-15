@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7e4ad82_e7c9f93f",
+        "filename": "common/usb_pd_host_cmd.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T17:00:01Z",
+      "side": 1,
+      "message": "Why is the `__override` needed here and in a few other places in this CL?",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 10
+      },
+      "revId": "a064d149701763b51a1bc166eeb01989e54edb81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
