@@ -34,6 +34,24 @@
       "message": "@devin.lu@quantatw.com I don\u0027t have any real objection to these being in devicetree. However\n1. Although these targets appear on the I2C bus, I\u0027m not currently aware that we need to do anything with them in software. We have no EC drivers for eUSB adapters. What are you intending to do with them from the EC?\n2. More specifically, there are not any legacy EC drivers for eUSB adapters. If we develop drivers, they\u0027ll be Zephyr drivers that get I2C port references from devicetree. That means that we\u0027ll never use the `I2C_PORT_*` names assigned in this CL. They\u0027re misleading. Please make a CL to remove them.",
       "revId": "47b19976ad1b7dc9c8d44bc074dca36564e0b495",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbbb0095_681fe438",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1106416
+      },
+      "writtenOn": "2026-09-15T03:14:34Z",
+      "side": 1,
+      "message": "Hi @alevkoy@chromium.org, we don\u0027t need to do anything now. but we need to write byte to the eUSB on the ec console. please see b:559364426.",
+      "parentUuid": "66e5d999_f751dd45",
+      "revId": "47b19976ad1b7dc9c8d44bc074dca36564e0b495",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
