@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37cc6586_2f4c30b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:21:24Z",
+      "side": 1,
+      "message": "Done. I registered console_socket with ExitStack, updated readline() to pass file directly to select.select() and use unbuffered file.read(1), added handling for transient EAGAIN/EWOULDBLOCK OSErrors, and simplified both readline() and readlines_until_timeout().",
+      "parentUuid": "19eaa148_7c0dcf7b",
+      "revId": "53aa3170799732c5a853382ba67e8e7753f766c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "96ed4ead_f2a03d45",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-09-15T21:04:54Z",
       "side": 1,
       "message": "In `readline()`, you correctly catch `OSError` when calling `os.read()`. However, you immediately treat *any* `OSError` as a fatal disconnect. If the underlying file descriptor is non-blocking (or if `select()` experiences a spurious wakeup), `os.read()` can throw an `OSError` with `EAGAIN` or `EWOULDBLOCK`. Treating this as an `EOFError` will prematurely crash the test.\n\n* **Suggestion:** Check the error number and safely continue if it\u0027s a transient blocking error.\n\n```python\nimport errno\n\n# ... inside readline() ...\n        try:\n            ch \u003d os.read(fd, 1)\n        except OSError as e:\n            if e.errno in (errno.EAGAIN, errno.EWOULDBLOCK):\n                continue\n            if line:\n                return bytes(line)\n            raise EOFError(\"Console disconnected\") from e\n\n```",
+      "range": {
+        "startLine": 1657,
+        "startChar": 0,
+        "endLine": 1662,
+        "endChar": 57
+      },
+      "revId": "53aa3170799732c5a853382ba67e8e7753f766c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db5c7387_5f090876",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1662,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:21:24Z",
+      "side": 1,
+      "message": "Done. I added a check for errno.EAGAIN and errno.EWOULDBLOCK so transient blocking errors continue the loop rather than raising EOFError.",
+      "parentUuid": "96ed4ead_f2a03d45",
       "range": {
         "startLine": 1657,
         "startChar": 0,
