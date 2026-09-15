@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "19eaa148_7c0dcf7b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T21:09:12Z",
+      "side": 1,
+      "message": "### 1. Fix Socket Resource Leak in `flash_and_run_test`\n\nWhen calling `console_socket.makefile()`, Python\u0027s documentation specifies that closing the returned file object does *not* close the underlying socket. Because `console_socket` isn\u0027t registered with the `ExitStack`, it leaks until the garbage collector cleans it up.\n\n**Suggestion:** Register the socket itself with the `ExitStack`:\n\n```python\n        if args.remote and args.console_port:\n            console_socket \u003d stack.enter_context(\n                socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n            )\n            console_socket.connect((args.remote, args.console_port))\n            console \u003d stack.enter_context(\n                console_socket.makefile(mode\u003d\"rwb\", buffering\u003d0)\n            )\n\n```\n\n### 2. Improve I/O Abstraction \u0026 Cross-Platform Compatibility\n\nDropping down to `os.read(fd, 1)` bypasses Python\u0027s socket abstractions. On Windows, calling `os.read()` on a socket file descriptor crashes with `[WinError 6] The handle is invalid`.\n\nBecause `flash_and_run_test` opens the stream with `buffering\u003d0`, it is perfectly safe to use `file.read(1)` instead. Furthermore, `select.select()` natively accepts Python file-like objects, so we don\u0027t need to manually extract the `.fileno()`.\n\n### 3. Handle Transient `OSError`s (`EAGAIN`)\n\nWhen working with non-blocking file descriptors or after a spurious `select()` wakeup, reads can raise an `OSError` with `EAGAIN` or `EWOULDBLOCK`. The current implementation treats *all* `OSError`s as fatal disconnects, which will prematurely crash the test. We should catch and ignore these specific transient errors.\n\n### 4. Code Simplification (DRY)\n\nThe `readline` and `readlines_until_timeout` functions currently duplicate the timeout and EOF return logic. By leveraging Python\u0027s walrus operator (`:\u003d`) and consolidating the exit paths, we can make the code much more concise.\n\nHere is a refactored version of both functions that incorporates the **I/O abstraction (`file.read`)**, the **transient error fix (`EAGAIN`)**, and the **DRY simplifications**:\n\n```python\nimport errno\n\ndef readline(file: BinaryIO, timeout_secs: float) -\u003e Optional[bytes]:\n    \"\"\"Read a line with timeout.\"\"\"\n    line \u003d bytearray()\n    end_time \u003d time.monotonic() + timeout_secs\n\n    while (remaining :\u003d end_time - time.monotonic()) \u003e 0:\n        # Pass `file` directly to select\n        if not select.select([file], [], [], remaining)[0]:\n            break  # Timeout reached, exit loop\n\n        try:\n            ch \u003d file.read(1)\n        except OSError as e:\n            # Ignore transient errors, treat all other OSErrors as EOF\n            if e.errno in (errno.EAGAIN, errno.EWOULDBLOCK):\n                continue\n            ch \u003d b\"\"\n\n        if not ch:\n            if not line:\n                raise EOFError(\"Console disconnected\")\n            break  # We have a partial line, exit loop to return it\n\n        line.extend(ch)\n        if ch \u003d\u003d b\"\\n\":\n            return bytes(line)\n\n    # Single exit point for both Timeouts and Partial Line EOFs\n    return bytes(line) if line else None\n\ndef readlines_until_timeout(file: BinaryIO, timeout_secs: float) -\u003e list[bytes]:\n    \"\"\"Continuously read lines for timeout_secs.\"\"\"\n    lines: list[bytes] \u003d []\n    end_time \u003d time.monotonic() + timeout_secs\n    \n    while (remaining :\u003d end_time - time.monotonic()) \u003e 0:\n        try:\n            line \u003d readline(file, remaining)\n            if not line:\n                break\n            lines.append(line)\n        except EOFError:\n            break\n            \n    return lines\n\n```",
+      "revId": "53aa3170799732c5a853382ba67e8e7753f766c2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "96ed4ead_f2a03d45",
         "filename": "test/run_device_tests.py",
         "patchSetId": 2
