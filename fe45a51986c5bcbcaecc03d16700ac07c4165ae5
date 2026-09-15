@@ -75,6 +75,52 @@
       "parentUuid": "2837831b_c6404b4f",
       "revId": "fe45a51986c5bcbcaecc03d16700ac07c4165ae5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e36a64c_c533c67b",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-15T21:26:22Z",
+      "side": 1,
+      "message": "could you a comment about this delay? i didn\u0027t see mention of a required\ndelay in the spec. is this due to a quirk in the battery?",
+      "range": {
+        "startLine": 52,
+        "startChar": 1,
+        "endLine": 52,
+        "endChar": 19
+      },
+      "revId": "fe45a51986c5bcbcaecc03d16700ac07c4165ae5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e92a848_d41ed2c8",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-15T21:26:22Z",
+      "side": 1,
+      "message": "could just say \"1 * SECOND\".",
+      "range": {
+        "startLine": 53,
+        "startChar": 6,
+        "endLine": 53,
+        "endChar": 26
+      },
+      "revId": "fe45a51986c5bcbcaecc03d16700ac07c4165ae5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
