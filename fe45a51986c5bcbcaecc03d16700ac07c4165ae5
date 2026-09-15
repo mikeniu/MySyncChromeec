@@ -79,6 +79,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b924cec2_fefb4386",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T21:31:10Z",
+      "side": 1,
+      "message": "This should only be done for the BYD battery.  The ATL battery has a different address and mask for the FET register.\n\nI also think it is better if this support is handled by the common battery code and not implemented as a Ruby specific fix.",
+      "range": {
+        "startLine": 46,
+        "startChar": 6,
+        "endLine": 46,
+        "endChar": 14
+      },
+      "revId": "fe45a51986c5bcbcaecc03d16700ac07c4165ae5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3e36a64c_c533c67b",
         "filename": "zephyr/program/fatcat/ruby/src/battery.c",
         "patchSetId": 2
