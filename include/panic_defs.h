@@ -104,6 +104,10 @@ struct rv32i_panic_data {
 	uint32_t mcause; /* mcause */
 };
 
+/* Intel x86 exception vector numbers */
+#define X86_VEC_DOUBLE_FAULT 8
+#define X86_VEC_PAGE_FAULT 14
+
 /* x86 registers saved on panic */
 struct x86_panic_data {
 	uint32_t vector; /* Exception vector number */
