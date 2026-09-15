@@ -9502,6 +9502,18 @@ struct ec_response_bt_read_event {
 	uint8_t events[BT_MAX_EVENT_SIZE];
 } __ec_align4;
 
+#define EC_CMD_BT_CONTROL 0x060B
+
+enum ec_bt_control_subcmd {
+	EC_BT_CONTROL_RESET = 0,
+	EC_BT_CONTROL_SUBCMD_COUNT,
+};
+
+struct ec_params_bt_control {
+	uint8_t subcmd; /* enum ec_bt_control_subcmd */
+	uint8_t reserved[3];
+} __ec_align4;
+
 /*****************************************************************************/
 /*
  * Reserve a range of host commands for board-specific, experimental, or
