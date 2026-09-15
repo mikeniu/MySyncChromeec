@@ -16,6 +16,24 @@
       "message": "I think this can be splitted into 2 CLs.",
       "revId": "40c194f3df1fa8768a7755882a120cc1246a37b6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ac705e3_b1f4c984",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_stm32_backend.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-15T10:53:44Z",
+      "side": 1,
+      "message": "Makes sense, I\u0027ll split it.",
+      "parentUuid": "c336a5c4_875a7bfa",
+      "revId": "40c194f3df1fa8768a7755882a120cc1246a37b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
