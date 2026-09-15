@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6526ad12_53234def",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T22:24:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](go/traj/6e454b68-5018-4fb8-9815-48525c66dc08)]\n\n### Review Summary\n\n*   **Functionality:** The transition to `select.select()` successfully eliminates the need for background threads. However, there are two related edge cases that will cause the test script to incorrectly throw an EOF or block indefinitely: `io.RawIOBase.read()` returning `None` instead of throwing `BlockingIOError`, and sockets/PTYs being blocking by default which leaves them susceptible to spurious wakeups. See inline comments.\n*   **Style:** The code refactoring is very clean, especially leveraging the walrus operator.\n*   **Security:** No security issues identified.\n*   **Testing:** Manual testing is appropriate for this orchestrator script, but the edge cases identified above should be addressed to ensure test stability in CI environments.\n*   **CL Size \u0026 Scope:** The CL size is perfect and tightly scoped to replacing the ThreadPoolExecutor.",
+      "isAi": true,
+      "revId": "939b2e168cf09514d67d8d274d37d87ea010b620",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "069165cb_94447147",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1660,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T22:24:27Z",
+      "side": 1,
+      "message": "When `file` is in non-blocking mode (which it must be to truly prevent blocking—see my other comment), Python\u0027s `io.RawIOBase.read()` returns `None` when no bytes are available (the equivalent of `EAGAIN`) instead of raising a `BlockingIOError`.\n\nCurrently, if `ch` is `None`, `if not ch:` evaluates to `True`, which incorrectly treats the non-blocking read as an `EOFError` or an end-of-line. Additionally, if the code were to reach the next line, `line.extend(None)` would crash with a `TypeError`.\n\nTo fix this, explicitly check if `ch is None` and `continue` to the next iteration:\n\n```python\n        try:\n            ch \u003d file.read(1)\n        except OSError as e:\n            if e.errno in (errno.EAGAIN, errno.EWOULDBLOCK):\n                continue\n            ch \u003d b\"\"\n\n        if ch is None:\n            continue\n\n        if not ch:\n            if not line:\n                raise EOFError(\"Console disconnected\")\n            break\n```",
+      "isAi": true,
+      "revId": "939b2e168cf09514d67d8d274d37d87ea010b620",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86a8a442_ebd3d96b",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1971,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T22:24:27Z",
+      "side": 1,
+      "message": "To guarantee that `file.read(1)` in `readline()` will never block, the underlying socket or PTY file descriptor must be explicitly set to non-blocking mode. Otherwise, if `select.select()` experiences a spurious wakeup (which can happen on Linux, especially with sockets), `file.read(1)` could still block indefinitely, defeating the purpose of this CL.\n\nYou can set the file descriptor to non-blocking right after it\u0027s opened. Note that doing this will cause `file.read(1)` to return `None` on empty reads, making the fix in `readline()` mandatory.\n\n```python\n        if args.remote and args.console_port:\n            console_socket \u003d stack.enter_context(\n                socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n            )\n            console_socket.connect((args.remote, args.console_port))\n            console_socket.setblocking(False)  # Ensure non-blocking\n            console \u003d stack.enter_context(\n                console_socket.makefile(mode\u003d\"rwb\", buffering\u003d0)\n            )\n        else:\n            console_pty \u003d platform.get_console(board_config)\n            if not console_pty:\n                logging.error(\"Unable to find console pty\")\n                return False\n            # pylint: disable-next\u003dconsider-using-with\n            console \u003d stack.enter_context(\n                open(console_pty, \"r+b\", buffering\u003d0)\n            )\n            os.set_blocking(console.fileno(), False)  # Ensure non-blocking\n```",
+      "isAi": true,
+      "revId": "939b2e168cf09514d67d8d274d37d87ea010b620",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
