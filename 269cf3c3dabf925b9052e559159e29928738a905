@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e5972677_84fb0bd4",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-15T12:55:02Z",
+      "side": 1,
+      "message": "I checked the clock control driver implementation for STM32H7 (drivers/clock_control/clock_stm32_ll_h7.c). Unfortunately, it does not allow for such granular control we need in this function. Actually, it returns `-ENOTSUP` for PLL1 or HSI clock sources. So direct HAL calls are necessary for now.",
+      "parentUuid": "2f9ddbce_09f5b81f",
+      "revId": "269cf3c3dabf925b9052e559159e29928738a905",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9585dd5b_42299f8b",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 2
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "I agree. I\u0027ll look into a more civilized way of updating this variable",
       "parentUuid": "9585dd5b_42299f8b",
+      "revId": "269cf3c3dabf925b9052e559159e29928738a905",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93a642d2_e1052ac3",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-15T12:55:02Z",
+      "side": 1,
+      "message": "Alright, the current implementation is not only hacky but also incorrect. There\u0027s a dedicated mechanism upstream though: `CONFIG_SYSTEM_CLOCK_HW_CYCLES_PER_SEC_RUNTIME_UPDATE\u003dy` and calling `z_sys_clock_hw_cycles_per_sec_update()`. I\u0027ll use this mechanism here.\n\nThanks for catching this!",
+      "parentUuid": "343a5550_7de1fc5a",
       "revId": "269cf3c3dabf925b9052e559159e29928738a905",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
