@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8e935e7_384f49a6",
+        "filename": "zephyr/test/drivers/button/src/main.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T19:52:54Z",
+      "side": 1,
+      "message": "Nit: use sizeof(event_data) instead of hardcoding 4 for the size.\n\nAnd elsewhere through this function.",
+      "range": {
+        "startLine": 775,
+        "startChar": 0,
+        "endLine": 775,
+        "endChar": 0
+      },
+      "revId": "da9e806fe5711d2ae391f211a62d22aa45498516",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
