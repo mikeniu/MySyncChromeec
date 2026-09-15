@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9039c15_4d25c77c",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T20:15:17Z",
+      "side": 1,
+      "message": "Delete rts54xx reference",
+      "range": {
+        "startLine": 216,
+        "startChar": 53,
+        "endLine": 216,
+        "endChar": 68
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61afee96_81a5844c",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T20:15:17Z",
+      "side": 1,
+      "message": "Delete this part of the comment.",
+      "range": {
+        "startLine": 264,
+        "startChar": 52,
+        "endLine": 264,
+        "endChar": 67
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d2fd987_4243bdb2",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 1110,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T20:15:17Z",
+      "side": 1,
+      "message": "Delete this from the comment.",
+      "range": {
+        "startLine": 1110,
+        "startChar": 23,
+        "endLine": 1110,
+        "endChar": 47
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95837aa0_24b83db2",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 2730,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T20:15:17Z",
+      "side": 1,
+      "message": "Delete references to the rts54xx driver.",
+      "range": {
+        "startLine": 2730,
+        "startChar": 45,
+        "endLine": 2730,
+        "endChar": 69
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e22ab7a7_663a2ad0",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 2946,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T20:15:17Z",
+      "side": 1,
+      "message": "```suggestion\n\t * instead of looping forever waiting for a dead PDC. This isolates\n\t * the port while letting the rest of the system proceed.\n```",
+      "range": {
+        "startLine": 2944,
+        "startChar": 55,
+        "endLine": 2946,
+        "endChar": 31
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9efe84e_beec86c3",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 2969,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T20:15:17Z",
+      "side": 1,
+      "message": "Delete rts54xx references.",
+      "range": {
+        "startLine": 2969,
+        "startChar": 31,
+        "endLine": 2969,
+        "endChar": 55
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ad899ed_1f918c57",
+        "filename": "zephyr/test/pdc/src/tps6699x/tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T20:15:17Z",
+      "side": 1,
+      "message": "Use the WAIT_FOR() macro.",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 46
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
