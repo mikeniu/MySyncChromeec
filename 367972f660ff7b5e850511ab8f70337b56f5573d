@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2d7630d_a77abfd3",
+        "filename": "zephyr/test/bluey/tests/quartz/src/stubs.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:27:33Z",
+      "side": 1,
+      "message": "Returning the start of the buffer when the offset is out of bounds might mask bugs. It might be safer to return NULL or use an assertion to fail the test loudly if an invalid offset is requested.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 0
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64c2f9c9_94daa3c4",
+        "filename": "zephyr/test/bluey/tests/quartz/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:27:33Z",
+      "side": 1,
+      "message": "This test case doesn\u0027t contain any assertions. It would be better to verify that the interrupt for s3_power_monitor is correctly configured or that the handler is registered after HOOK_INIT.",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 0
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f096f8a_92492767",
+        "filename": "zephyr/test/bluey/tests/quartz/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:27:33Z",
+      "side": 1,
+      "message": "The HOOK_CHIPSET_HARD_OFF notification is called here but its effects are not verified. Consider asserting that the relevant power rails (e.g., gpio_ec_en_pp5000_s5) are turned off.",
+      "range": {
+        "startLine": 111,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 0
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2586af51_5bfde495",
+        "filename": "zephyr/test/bluey/tests/quartz/src/test_extpower.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:27:33Z",
+      "side": 1,
+      "message": "There are no assertions in this test.",
+      "range": {
+        "startLine": 54,
+        "startChar": 1,
+        "endLine": 54,
+        "endChar": 32
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ede535a7_35efc308",
+        "filename": "zephyr/test/bluey/tests/quartz/src/test_fan.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:27:33Z",
+      "side": 1,
+      "message": "The fan table ramp-up logic in this test seems to conflict with the \u0027temp-on\u0027 thresholds defined in quartz.overlay. \n\nFor level 1, temp-on is 44, but the test expects it to trigger at 43. \nFor level 5, temp-on is 52, but the test expects it to trigger at 51. \n\nIs the underlying fan control logic using a \u0027greater than\u0027 comparison instead of \u0027greater than or equal\u0027, or is there a 1-degree offset intended here?",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 0
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3ef2fa2_a03d6fa0",
+        "filename": "zephyr/test/bluey/tests/quartz/src/test_fan.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:27:33Z",
+      "side": 1,
+      "message": "In quartz.overlay, level_6 has temp-on set to 99 for all sensors. This test expects PMIC temp 53 to trigger level 6 (6000 RPM). These values are inconsistent.",
+      "range": {
+        "startLine": 90,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 0
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
