@@ -49,6 +49,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3b297a8b_bef98412",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 840,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T20:24:19Z",
+      "side": 1,
+      "message": "A single I2C error will now cause this port to be disabled.  Keep the ST_ERROR_RECOVERY state in this path.",
+      "range": {
+        "startLine": 840,
+        "startChar": 0,
+        "endLine": 840,
+        "endChar": 29
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5d2fd987_4243bdb2",
         "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
         "patchSetId": 7
@@ -157,6 +180,29 @@
         "startChar": 0,
         "endLine": 242,
         "endChar": 46
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51c69439_e48c01d2",
+        "filename": "zephyr/test/pdc/src/tps6699x/tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-15T20:24:19Z",
+      "side": 1,
+      "message": "Note that these emulator errors are self clearing.  You need to set a create a permanent failure so that the init logic fails at least `PDC_INIT_RETRY_MAX` times.\n\nYou can use `i2c_common_emul_set_write_fail_reg` to set a persistent failure.  Note that you have to clear the I2C error status using `I2C_COMMON_EMUL_NO_FAIL_REG` as part of the test cleanup.",
+      "range": {
+        "startLine": 356,
+        "startChar": 1,
+        "endLine": 356,
+        "endChar": 24
       },
       "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
