@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a98ba2db_603e869a",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-15T19:04:05Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Since this is a failure log, consider using `LOG_ERR` or `LOG_WRN` instead of `LOG_INF`.",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 0
+      },
+      "revId": "fe45a51986c5bcbcaecc03d16700ac07c4165ae5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "02dea59a_b4f65d89",
         "filename": "zephyr/program/fatcat/ruby/src/battery.c",
         "patchSetId": 2
