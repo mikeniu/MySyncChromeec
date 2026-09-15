@@ -71,6 +71,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75f961e0_8aea8749",
+        "filename": "util/ectool_usb/ectool.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 634,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-15T10:01:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3e6cb25_c4c794c4",
+      "revId": "37863163e71ce50daec2946b4e62095b8cbd3b49",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f9445d7_075cf646",
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "fixed, it\u0027s not really needed here.",
       "parentUuid": "1f9445d7_075cf646",
+      "revId": "37863163e71ce50daec2946b4e62095b8cbd3b49",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "628b1b97_657151e2",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_utils.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-15T10:01:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce3e5915_624be538",
       "revId": "37863163e71ce50daec2946b4e62095b8cbd3b49",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
