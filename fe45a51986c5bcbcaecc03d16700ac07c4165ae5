@@ -16,6 +16,24 @@
       "message": "If BATTERY_CUTOFF_STATE_NORMAL is inteneded to be used as the battery discharge state, should we set it to NORMAL only after the first and second commands are run successfully ?",
       "revId": "fe45a51986c5bcbcaecc03d16700ac07c4165ae5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2837831b_c6404b4f",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-09-15T15:05:19Z",
+      "side": 1,
+      "message": "BATTERY_CUTOFF_STATE_IN_PROCESS is used for stop reading battery through I2C during the first and second command.\nSo I set it back to normal even commands are fail.",
+      "parentUuid": "02dea59a_b4f65d89",
+      "revId": "fe45a51986c5bcbcaecc03d16700ac07c4165ae5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
