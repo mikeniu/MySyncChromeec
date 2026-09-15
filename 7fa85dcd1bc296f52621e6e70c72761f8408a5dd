@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c53325e6_f02f9d12",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T21:18:25Z",
+      "side": 1,
+      "message": "In the signature for `launch()`, the type hint for `gdb_port` is written as:\n\n```python\ngdb_port: Optional[int] \u003d 3333,\n\n```\n\n**Recommendation:**\n`Optional[int]` implies the value is expected to be either an `int` or `None`. However, `argparse` uses `type\u003dint` with a default of `3333`, so it will essentially always pass an `int`. While the inline logic (`if gdb_port and gdb_port \u003e 0:`) perfectly handles both `0` and `None` safely, it is cleaner Python style to just type it as `gdb_port: int \u003d 3333` unless `None` is specifically intended to be passed by an internal caller.",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 35
+      },
+      "revId": "7fa85dcd1bc296f52621e6e70c72761f8408a5dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
