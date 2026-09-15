@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "46356271_c9bea41f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T23:08:18Z",
+      "side": 1,
+      "message": "Done. I set console sockets and PTY file descriptors to non-blocking mode in flash_and_run_test(), and added an explicit check for ch is None in readline().",
+      "parentUuid": "6526ad12_53234def",
+      "revId": "939b2e168cf09514d67d8d274d37d87ea010b620",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "069165cb_94447147",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "70b448cc_22d95131",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1660,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T23:08:18Z",
+      "side": 1,
+      "message": "Done. I added if ch is None: continue to handle non-blocking RawIOBase.read() returning None.",
+      "parentUuid": "069165cb_94447147",
+      "revId": "939b2e168cf09514d67d8d274d37d87ea010b620",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "86a8a442_ebd3d96b",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "To guarantee that `file.read(1)` in `readline()` will never block, the underlying socket or PTY file descriptor must be explicitly set to non-blocking mode. Otherwise, if `select.select()` experiences a spurious wakeup (which can happen on Linux, especially with sockets), `file.read(1)` could still block indefinitely, defeating the purpose of this CL.\n\nYou can set the file descriptor to non-blocking right after it\u0027s opened. Note that doing this will cause `file.read(1)` to return `None` on empty reads, making the fix in `readline()` mandatory.\n\n```python\n        if args.remote and args.console_port:\n            console_socket \u003d stack.enter_context(\n                socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n            )\n            console_socket.connect((args.remote, args.console_port))\n            console_socket.setblocking(False)  # Ensure non-blocking\n            console \u003d stack.enter_context(\n                console_socket.makefile(mode\u003d\"rwb\", buffering\u003d0)\n            )\n        else:\n            console_pty \u003d platform.get_console(board_config)\n            if not console_pty:\n                logging.error(\"Unable to find console pty\")\n                return False\n            # pylint: disable-next\u003dconsider-using-with\n            console \u003d stack.enter_context(\n                open(console_pty, \"r+b\", buffering\u003d0)\n            )\n            os.set_blocking(console.fileno(), False)  # Ensure non-blocking\n```",
       "isAi": true,
+      "revId": "939b2e168cf09514d67d8d274d37d87ea010b620",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cacc3aef_fec7dc18",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1971,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T23:08:18Z",
+      "side": 1,
+      "message": "Done. I set both console_socket.setblocking(False) and os.set_blocking(console.fileno(), False) right after opening.",
+      "parentUuid": "86a8a442_ebd3d96b",
       "revId": "939b2e168cf09514d67d8d274d37d87ea010b620",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
