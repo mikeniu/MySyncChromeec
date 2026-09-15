@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b99600fb_85c64e6c",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-15T10:40:25Z",
+      "side": 1,
+      "message": "Is it possible to perform any of these actions via clock control driver?",
+      "revId": "269cf3c3dabf925b9052e559159e29928738a905",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9585dd5b_42299f8b",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-15T10:40:25Z",
+      "side": 1,
+      "message": "This looks hacky. Isn\u0027t Zephyr still supporting a change of system clock in a better way? \n\nShouldn\u0027t we at least use `sys_clock_hw_cycles_per_sec_update`?",
+      "revId": "269cf3c3dabf925b9052e559159e29928738a905",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
