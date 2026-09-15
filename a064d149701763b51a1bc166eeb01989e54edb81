@@ -22,6 +22,30 @@
       },
       "revId": "a064d149701763b51a1bc166eeb01989e54edb81",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7d3fafe_ba9a3ea5",
+        "filename": "common/usb_pd_host_cmd.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-15T19:45:27Z",
+      "side": 1,
+      "message": "Good catch, that was leftover from an earlier fix for linker errors when the configs were not correct.  Removed `__override` as it is no longer needed.",
+      "parentUuid": "f7e4ad82_e7c9f93f",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 10
+      },
+      "revId": "a064d149701763b51a1bc166eeb01989e54edb81",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
