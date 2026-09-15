@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "192f447c_98b256be",
+        "filename": "zephyr/test/bluey/Kconfig",
+        "patchSetId": 9
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T21:17:49Z",
+      "side": 1,
+      "message": "These Kconfig options are defined here and set in `testcase.yaml`, but they are not used in `tests/bluey/CMakeLists.txt` to conditionally include the source files. While not a bug, it makes the Kconfigs appear as dead code in the build system. Consider using `target_sources_ifdef` in the variant\u0027s CMakeLists.txt.",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 0
+      },
+      "revId": "e9b7eaaa5d4cfecf406708478877367264bfe830",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "def06b94_89b33492",
+        "filename": "zephyr/test/bluey/tests/bluey/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T21:17:49Z",
+      "side": 1,
+      "message": "Manual declarations of these functions are used here. If these functions are defined in the `chipset.c` being tested, it might be cleaner to have a local header for the board\u0027s internal functions or just include the relevant board header if available.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 0
+      },
+      "revId": "e9b7eaaa5d4cfecf406708478877367264bfe830",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d27311be_4c06afae",
+        "filename": "zephyr/test/bluey/tests/bluey/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T21:17:49Z",
+      "side": 1,
+      "message": "This test only verifies `gpio_ec_en_usba`. For better coverage, consider verifying all pins enabled in `board_chipset_startup_bluey`, similar to the `test_chipset_startup_direct` test.",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 0
+      },
+      "revId": "e9b7eaaa5d4cfecf406708478877367264bfe830",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
