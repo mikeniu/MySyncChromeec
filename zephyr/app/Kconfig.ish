@@ -32,4 +32,11 @@ config ISH_CHRE_PRIORITY
 	help
 	  Preemptible priority for the CHRE event loop thread.
 
+config CHRE_HELLO_WORLD
+	bool "Load HelloWorld static nanoapp"
+	default y
+	help
+	  Statically link and run the CHRE HelloWorld example nanoapp
+	  at boot to verify the CHRE event loop and nanoapp runtime.
+
 endif # ISH_CHRE

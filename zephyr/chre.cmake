@@ -5,4 +5,7 @@
 if(CONFIG_ISH_CHRE)
   target_sources(app PRIVATE shim/src/chre.cc)
   target_link_libraries(app PRIVATE chre)
+  if(CONFIG_CHRE_HELLO_WORLD)
+    target_link_libraries(app PRIVATE chre.apps.hello_world)
+  endif()
 endif()

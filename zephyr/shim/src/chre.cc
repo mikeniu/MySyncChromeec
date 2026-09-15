@@ -12,6 +12,27 @@
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
+#include <zephyr/sys/util.h>
+
+#ifdef CONFIG_CHRE_HELLO_WORLD
+namespace chre
+{
+UniquePtr<Nanoapp> initializeStaticNanoappHelloWorld();
+} // namespace chre
+#endif
+
+namespace chre
+{
+#ifdef CONFIG_CHRE_HELLO_WORLD
+const StaticNanoappInitFunction kStaticNanoappList[] = {
+	initializeStaticNanoappHelloWorld,
+};
+const size_t kStaticNanoappCount = ARRAY_SIZE(kStaticNanoappList);
+#else
+const StaticNanoappInitFunction kStaticNanoappList[] = { nullptr };
+const size_t kStaticNanoappCount = 0;
+#endif
+} // namespace chre
 
 static K_THREAD_STACK_DEFINE(chre_thread_stack, CONFIG_ISH_CHRE_STACK_SIZE);
 static struct k_thread chre_thread;
