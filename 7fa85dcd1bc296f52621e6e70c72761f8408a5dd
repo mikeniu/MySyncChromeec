@@ -48,6 +48,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05ece98a_ad0f0b82",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T23:07:24Z",
+      "side": 1,
+      "message": "Done. I updated the type hint to gdb_port: int \u003d 3333.",
+      "parentUuid": "c53325e6_f02f9d12",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 35
+      },
+      "revId": "7fa85dcd1bc296f52621e6e70c72761f8408a5dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c1fe2da_78f12261",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T23:07:24Z",
+      "side": 1,
+      "message": "Done. I simplified the condition to if gdb_port \u003e 0:.",
+      "parentUuid": "a65b4128_dcb7857c",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 35
+      },
+      "revId": "7fa85dcd1bc296f52621e6e70c72761f8408a5dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6943fc0_0e03aac2",
@@ -61,6 +109,30 @@
       "writtenOn": "2026-09-15T21:26:23Z",
       "side": 1,
       "message": "The current implementation for setting `XDG_CONFIG_HOME` uses a UID-based path, which will break parallel test execution.\n\nBecause the path is tied to `os.getuid()`, any concurrent test runs executed by the same user (e.g., testing multiple boards simultaneously locally or in a CI environment) will evaluate to the exact same directory (e.g., `/tmp/renode-config-1000`). When multiple Renode instances try to share the same configuration directory at the same time, it will lead to file lock errors, race conditions, and flaky tests.\n\n**Recommendation:**\nReplace the static path with `tempfile.mkdtemp()` to generate a unique directory for every run. This guarantees complete process isolation so parallel tests can run safely.\n\n```python\nimport tempfile\n\nos.environ.setdefault(\n    \"XDG_CONFIG_HOME\",\n    tempfile.mkdtemp(prefix\u003d\"renode-config-\")\n)\n\n```\n\n**Note on cleanup:** Because `os.execvp()` replaces the Python process, Python cannot automatically delete this directory when the test finishes. As a result, a new folder will be left in `/tmp` for every run. However, relying on the operating system\u0027s routine `/tmp` garbage collection is the standard and necessary trade-off here to enable safe concurrent testing.",
+      "range": {
+        "startLine": 134,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 76
+      },
+      "revId": "7fa85dcd1bc296f52621e6e70c72761f8408a5dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "acbd8463_54b05f50",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T23:07:24Z",
+      "side": 1,
+      "message": "Done. I updated the XDG_CONFIG_HOME fallback to use tempfile.mkdtemp(prefix\u003d\"renode-config-\") when XDG_CONFIG_HOME is unset so parallel test invocations get unique directories.",
+      "parentUuid": "d6943fc0_0e03aac2",
       "range": {
         "startLine": 134,
         "startChar": 0,

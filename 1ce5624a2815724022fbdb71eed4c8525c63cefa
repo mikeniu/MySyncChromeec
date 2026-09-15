@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b463fb5_3f0b7753",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T23:07:24Z",
+      "side": 1,
+      "message": "Done in patchset 3. I updated launch()\u0027s docstring to document gdb_port and clarify the return behavior.",
+      "parentUuid": "121ecfba_aaefcc84",
+      "revId": "1ce5624a2815724022fbdb71eed4c8525c63cefa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e1389ef5_4a1268fd",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37332402_d2c05d4e",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T23:07:24Z",
+      "side": 1,
+      "message": "Done in patchset 3. I documented gdb_port in the Args: section.",
+      "parentUuid": "e1389ef5_4a1268fd",
+      "revId": "1ce5624a2815724022fbdb71eed4c8525c63cefa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f8fff97_01bb3d9b",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] The `Returns:` section of this docstring is now outdated. Since `msg_run` uses `os.execvp`, the function no longer returns on success. Consider updating this to reflect the new behavior, for example: `Returns: Non-zero on error. Does not return on success.`",
       "isAi": true,
+      "revId": "1ce5624a2815724022fbdb71eed4c8525c63cefa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22fd8c6a_09967458",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T23:07:24Z",
+      "side": 1,
+      "message": "Done in patchset 3. I updated the Returns: section to state that it returns non-zero on error and does not return on success.",
+      "parentUuid": "9f8fff97_01bb3d9b",
       "revId": "1ce5624a2815724022fbdb71eed4c8525c63cefa",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
