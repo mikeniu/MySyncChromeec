@@ -51,6 +51,24 @@
       "parentUuid": "6a2ce14f_7b914cf6",
       "revId": "94dfc5737be0cf8345a4db22a7690146c8b561b8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9232825_eb418dcb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T23:33:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/07105cd4-c115-4e56-9b81-d4b9386b4d7e)]\n\n**Review Summary:**\n* **Functionality**: The CL applies a widespread, automated refactor to standardize include guards across the codebase. No functional logic is changed.\n* **Security**: No security vulnerabilities were introduced; changes are strictly preprocessor directives.\n* **Style**: The new `PLATFORM_EC_...` include guards are applied consistently across all files, avoiding reserved `__` prefixes.\n* **Testing \u0026 Test Coverage**: As an automated script-based refactoring of header guards, this does not require new test coverage.\n* **CL Size \u0026 Scope**: While the CL is large in terms of files modified, it strictly contains a single automated refactoring task, which aligns with guidelines for self-contained mechanical changes.\n* **Overall Quality**: Good, the automated refactoring is clean and adheres to C/C++ best practices for header guards.\n\nTAG\u003dagy\nCONV\u003dde4eef35-314b-42bd-b3c7-a5b9da52621a",
+      "isAi": true,
+      "revId": "94dfc5737be0cf8345a4db22a7690146c8b561b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
