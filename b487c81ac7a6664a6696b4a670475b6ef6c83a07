@@ -88,6 +88,24 @@
       "parentUuid": "9589062b_c140d147",
       "revId": "b487c81ac7a6664a6696b4a670475b6ef6c83a07",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70668a48_0f681791",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-09-15T18:21:04Z",
+      "side": 1,
+      "message": "\u003e The chain has 13 CLs. Could you tell me which CLs are the actual fixes? How hard is it to solve the conflict manually?\n\nYes, the chain has a total of 13 CLs, including the actual security fix, CL:8377563. When I ran __./twister -v -T zephyr/test/drivers -s drivers.common_cbi__, I encountered compilation errors due to missing dependencies. To address these, I cherry-picked the required dependent CLs, which resulted in some merge conflicts. As a result, I ended up cherry-picking 12 dependent CLs followed by the actual security fix CL:8377563.\n\n\u003e From the bug, we only need one patch CL:8377563, which is pretty simple (not considering the tests). If the tests cause conflicts, we can simply drop the tests modification from the cherry-pick (as long as the tests still pass).\n\nIt means I need to drop the tests that were added in this CL if they cause any issues. However, in this case, the error is coming from different test cases that were not added in this CL. Should we remove those tests as well?",
+      "parentUuid": "1acb6803_88ae4dd3",
+      "revId": "b487c81ac7a6664a6696b4a670475b6ef6c83a07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
