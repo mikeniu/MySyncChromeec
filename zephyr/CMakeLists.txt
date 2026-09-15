@@ -836,6 +836,8 @@ if (DEFINED CONFIG_SOC_INTEL_ISH_5_8_0)
   )
 endif()
 
+include(chre.cmake)
+
 # Lists all targets defined with pw_add_library() and pw_add_test()
 function(ec_add_pw_log_zephyr_deps)
   foreach(lib cros.dsp.test
