@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d370832f_5dbf2497",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T20:55:02Z",
+      "side": 1,
+      "message": "Done in patchset 2. I updated msg_run\u0027s docstring and return type hint to NoReturn, changed the default XDG_CONFIG_HOME to a user-specific temporary directory, and removed the unreachable return 0.",
+      "parentUuid": "674129fa_88323095",
+      "revId": "62a3e2dab424708b1d035421932008d79cba5251",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e6720f2a_d888c470",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Consider updating the docstring for `msg_run` to clarify that this function replaces the current process and does not return, to avoid confusion for future callers. You could also update the return type hint from `-\u003e None` to `-\u003e typing.NoReturn` (requires `from typing import NoReturn`).",
       "isAi": true,
+      "revId": "62a3e2dab424708b1d035421932008d79cba5251",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "681214f6_92c6b7f2",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T20:55:02Z",
+      "side": 1,
+      "message": "Done in patchset 2. I updated msg_run\u0027s docstring to clarify that it replaces the current process and changed the return type hint to NoReturn.",
+      "parentUuid": "e6720f2a_d888c470",
       "revId": "62a3e2dab424708b1d035421932008d79cba5251",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bd4a30c_ea1a81f0",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T20:55:02Z",
+      "side": 1,
+      "message": "Done in patchset 2. I updated the default XDG_CONFIG_HOME to os.path.join(tempfile.gettempdir(), f\u0027renode-config-{os.getuid()}\u0027).",
+      "parentUuid": "6a8e75e4_b0f12c39",
+      "revId": "62a3e2dab424708b1d035421932008d79cba5251",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d16775c_a7c54311",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Since `msg_run` now uses `os.execvp()`, the current process is replaced and `msg_run` will never return if successful. Therefore, this `return 0` is unreachable dead code and can be safely removed.",
       "isAi": true,
+      "revId": "62a3e2dab424708b1d035421932008d79cba5251",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "760a4edd_9b3a907d",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T20:55:02Z",
+      "side": 1,
+      "message": "Done in patchset 2. I removed the unreachable return 0 statement.",
+      "parentUuid": "3d16775c_a7c54311",
       "revId": "62a3e2dab424708b1d035421932008d79cba5251",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
