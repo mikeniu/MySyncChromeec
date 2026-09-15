@@ -26,3 +26,16 @@ GPIO_SLP: Miscellaneous.Button @ gpioPortA 8
         ReleaseOnReset false
 
 fpsensor: Sensors.GenericSPISensor @ spi2
+
+// Override sysbus init from platforms/cpus/stm32f4.repl to copy its Tag
+// definitions while omitting `ApplySVD @https://dl.antmicro.com/...`.
+// In Renode .repl syntax, defining `sysbus: init:` replaces the base
+// `init:` section completely, eliminating the external HTTP download
+// of STM32F40x.svd.gz (which is only used for debug register names and
+// frequently fails with HTTP 403 on CQ bots).
+sysbus:
+    init:
+        Tag <0x40021000, 0x40021003> "GPIOE_MODER" 0xFFFFFFFF
+        Tag <0x40021004, 0x40021007> "GPIOE_OTYPER" 0x00000008
+        // FLASH and USB tags are required for CubeMX-based projects to pass the initialization phase
+        Tag <0x50000010, 0x5000003f> "USB:RESET" 0x80000000
