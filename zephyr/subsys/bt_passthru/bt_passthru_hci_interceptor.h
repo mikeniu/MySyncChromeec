@@ -29,9 +29,7 @@ class BtPassthruHciInterceptor : public BtHciInterceptor {
 		return false;
 	}
 
-	void notifyReset() override
-	{
-	}
+	void notifyReset() override;
 
     private:
 	void synthesizeReadSupportedCommands();

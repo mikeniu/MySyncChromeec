@@ -103,4 +103,9 @@ bool BtPassthruHciInterceptor::interceptCommand(const uint8_t *h4Buffer,
 	}
 }
 
+void BtPassthruHciInterceptor::notifyReset()
+{
+	LOG_INF("BtPassthruHciInterceptor reset");
+}
+
 } // namespace chre

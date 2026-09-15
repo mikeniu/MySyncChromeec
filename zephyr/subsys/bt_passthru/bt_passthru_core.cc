@@ -66,6 +66,11 @@ static int bt_passthru_init(void)
 		return err;
 	}
 
+	g_host_transport.SetResetHandler([]() {
+		LOG_INF("Resetting BT Passthru state");
+		g_bt_interceptor.notifyReset();
+	});
+
 	/*
 	 * Register the TX callback. When the AP sends an HCI Command down via
 	 * Host Commands, it is passed to the interceptor or forwarded to the

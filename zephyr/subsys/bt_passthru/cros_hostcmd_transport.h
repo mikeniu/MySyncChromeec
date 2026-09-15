@@ -34,6 +34,10 @@ class CrosHostcmdTransport : public HostTransport {
 	static size_t GetPendingEvents(uint8_t *out_buffer, size_t max_size,
 				       uint32_t *num_events);
 
+	using ResetHandler = void (*)();
+	static void SetResetHandler(ResetHandler handler);
+	static void Reset();
+
     private:
 	/*
 	 * Ring buffer to store HCI events arriving from the controller until
@@ -47,6 +51,9 @@ class CrosHostcmdTransport : public HostTransport {
 
 	/* Callback to process AP commands */
 	static HandleHostMsg msg_handler_;
+
+	/* Callback to notify subsystem of host reset */
+	static ResetHandler reset_handler_;
 };
 
 } // namespace chre
