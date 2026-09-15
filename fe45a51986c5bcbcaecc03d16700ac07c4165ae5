@@ -34,6 +34,24 @@
       "parentUuid": "02dea59a_b4f65d89",
       "revId": "fe45a51986c5bcbcaecc03d16700ac07c4165ae5",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cde6f9fd_98338324",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-09-15T15:10:54Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2837831b_c6404b4f",
+      "revId": "fe45a51986c5bcbcaecc03d16700ac07c4165ae5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
