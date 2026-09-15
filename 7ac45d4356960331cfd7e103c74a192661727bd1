@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "865f5f07_dbeeef45",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-15T15:38:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69690ef7_99e8763a",
+      "revId": "7ac45d4356960331cfd7e103c74a192661727bd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57225ddf_a0ddc24e",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "**Security \u0026 Functionality:** Removing this check re-introduces the vulnerability where the `pairing_key` can be unexpectedly overwritten while an active fingerprint auth session is established (b/518008615).\n\nIf this revert is necessary to fix a severe regression (b/557346763), please confirm that there is a follow-up planned to address the pairing key overwrite issue. Otherwise, consider whether there is an alternative fix that resolves the regression without completely removing this security check.",
       "isAi": true,
+      "revId": "7ac45d4356960331cfd7e103c74a192661727bd1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05b29b0b_78412e6f",
+        "filename": "common/fpsensor/fpsensor_auth_ascp.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-15T15:38:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57225ddf_a0ddc24e",
       "revId": "7ac45d4356960331cfd7e103c74a192661727bd1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
