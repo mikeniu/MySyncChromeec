@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ad78f84_b5b6a313",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T23:25:58Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/4b5c73ea-d34a-44a8-90f5-77cd68933fd1)]\n\n### Review Summary\n\n*   **Functionality:** The author successfully applied the recommended changes to handle non-blocking IO edge cases. By checking for `ch is None`, safely handling `EAGAIN`/`EWOULDBLOCK` exceptions, and explicitly setting the socket and PTY to non-blocking mode, the script avoids premature EOF errors and spurious blocking. The removal of the `ThreadPoolExecutor` cleanly simplifies the program structure and allows the use of `sys.exit()`.\n*   **Style:** Cleanly uses the walrus operator, reducing code duplication and making the read loops concise. The use of `ExitStack` to manage socket lifecycles prevents resource leaks.\n*   **Security:** No security issues introduced.\n*   **Testing:** Manual testing on the device emulator (Renode) is appropriate for this test orchestrator script.\n*   **CL Size \u0026 Scope:** The CL is well-scoped, focusing purely on replacing the threaded blocking I/O with non-blocking I/O.",
+      "isAi": true,
+      "revId": "a723f64df393db7709578870ef06bac82571a8b3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
