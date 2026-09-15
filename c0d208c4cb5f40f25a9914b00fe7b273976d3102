@@ -96,6 +96,48 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab88cb0d_604393ed",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1318406
+      },
+      "writtenOn": "2026-09-15T07:49:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1feee4f4_3b2578b9",
+      "revId": "c0d208c4cb5f40f25a9914b00fe7b273976d3102",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a44377f0_8f4e6020",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1318406
+      },
+      "writtenOn": "2026-09-15T07:49:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ca36a9b_8fb98727",
+      "range": {
+        "startLine": 29,
+        "startChar": 15,
+        "endLine": 29,
+        "endChar": 27
+      },
+      "revId": "c0d208c4cb5f40f25a9914b00fe7b273976d3102",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "267b9568_ec7f9caa",
@@ -109,6 +151,30 @@
       "writtenOn": "2026-09-11T22:14:58Z",
       "side": 1,
       "message": "This hook runs synchronously during HOOK_INIT. A 1000ms sleep will stall the EC boot/initialization process by 1 second, consider using a deferred hook or a timer-based approach instead.",
+      "range": {
+        "startLine": 30,
+        "startChar": 1,
+        "endLine": 30,
+        "endChar": 16
+      },
+      "revId": "c0d208c4cb5f40f25a9914b00fe7b273976d3102",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f59f0616_8f437792",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1318406
+      },
+      "writtenOn": "2026-09-15T07:49:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "267b9568_ec7f9caa",
       "range": {
         "startLine": 30,
         "startChar": 1,
