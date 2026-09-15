@@ -45,8 +45,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import argparse
 from collections import namedtuple
-import concurrent
-from concurrent.futures.thread import ThreadPoolExecutor
 from contextlib import ExitStack
 import copy
 from dataclasses import dataclass
@@ -58,6 +56,7 @@ import logging
 import os
 from pathlib import Path
 import re
+import select
 import socket
 import subprocess
 import sys
@@ -1641,20 +1640,38 @@ def erase_rw(image_path: str):
         image_file.truncate()
 
 
-def readline(
-    executor: ThreadPoolExecutor, file: BinaryIO, timeout_secs: float
-) -> Optional[bytes]:
+def readline(file: BinaryIO, timeout_secs: float) -> Optional[bytes]:
     """Read a line with timeout."""
-    future = executor.submit(file.readline)
-    try:
-        return future.result(timeout_secs)
-    except concurrent.futures.TimeoutError:
-        return None
+    fd = file.fileno()
+    line = bytearray()
+    end_time = time.monotonic() + timeout_secs
+    while True:
+        remaining = end_time - time.monotonic()
+        if remaining <= 0:
+            return bytes(line) if line else None
+
+        ready, _, _ = select.select([fd], [], [], remaining)
+        if not ready:
+            return bytes(line) if line else None
+
+        try:
+            ch = os.read(fd, 1)
+        except OSError as e:
+            if line:
+                return bytes(line)
+            raise EOFError("Console disconnected") from e
+
+        if not ch:
+            if line:
+                return bytes(line)
+            raise EOFError("Console disconnected")
+
+        line.extend(ch)
+        if ch == b"\n":
+            return bytes(line)
 
 
-def readlines_until_timeout(
-    executor, file: BinaryIO, timeout_secs: float
-) -> list[bytes]:
+def readlines_until_timeout(file: BinaryIO, timeout_secs: float) -> list[bytes]:
     """Continuously read lines for timeout_secs."""
     lines: list[bytes] = []
     end_time = time.monotonic() + timeout_secs
@@ -1663,7 +1680,10 @@ def readlines_until_timeout(
         if remaining <= 0:
             return lines
 
-        line = readline(executor, file, remaining)
+        try:
+            line = readline(file, remaining)
+        except EOFError:
+            return lines
         if not line:
             return lines
         lines.append(line)
@@ -1722,7 +1742,6 @@ def run_test(
     test: TestConfig,
     board_config: BoardConfig,
     console: io.FileIO,
-    executor: ThreadPoolExecutor,
     zephyr: bool,
 ) -> bool:
     """Run specified test."""
@@ -1763,7 +1782,11 @@ def run_test(
             logging.debug("Test timed out")
             return False
 
-        line = readline(executor, console, remaining_secs)
+        try:
+            line = readline(console, remaining_secs)
+        except EOFError:
+            logging.error("Console disconnected")
+            return False
         if not line:
             continue
 
@@ -1782,7 +1805,7 @@ def run_test(
         for finish_re in test.finish_regexes:
             if finish_re.match(line_str):
                 # flush read the remaining
-                lines = readlines_until_timeout(executor, console, 1)
+                lines = readlines_until_timeout(console, 1)
                 logging.debug(lines)
                 test.logs.extend(lines)
 
@@ -1873,7 +1896,6 @@ def flash_and_run_test(
     platform: Platform,
     board_config: BoardConfig,
     args: argparse.Namespace,
-    executor,
 ) -> bool:
     """Run a single test using the test and board configuration specified"""
     build_board = board_config.name
@@ -1972,7 +1994,6 @@ def flash_and_run_test(
             test,
             board_config,
             console,
-            executor=executor,
             zephyr=args.zephyr,
         )
 
@@ -2158,47 +2179,44 @@ def main():
     )
     logging.debug("Running tests: %s", [test.config_name for test in test_list])
 
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        for test in test_list:
-            if (
-                (test.skip_for_zephyr and args.zephyr)
-                or (test.skip_for_ec_legacy and not args.zephyr)
-                or platform.skip_test(test, board_config, args.zephyr)
-            ):
-                test.status = TestStatus.SKIP
-                continue
-            if flash_and_run_test(test, platform, board_config, args, executor):
-                test.status = TestStatus.PASS
-            else:
-                test.status = TestStatus.FAIL
+    for test in test_list:
+        if (
+            (test.skip_for_zephyr and args.zephyr)
+            or (test.skip_for_ec_legacy and not args.zephyr)
+            or platform.skip_test(test, board_config, args.zephyr)
+        ):
+            test.status = TestStatus.SKIP
+            continue
+        if flash_and_run_test(test, platform, board_config, args):
+            test.status = TestStatus.PASS
+        else:
+            test.status = TestStatus.FAIL
 
-        colorama.init()
-        exit_code = 0
-        for test in test_list:
-            # print results
-            print('Test "' + test.config_name + '": ', end="")
-            if test.status == TestStatus.SKIP:
-                print(colorama.Fore.YELLOW + "SKIPPED")
-            elif test.status == TestStatus.PASS:
-                print(colorama.Fore.GREEN + "PASSED")
-            else:
-                print(colorama.Fore.RED + "FAILED")
-                exit_code = 1
+    colorama.init()
+    exit_code = 0
+    for test in test_list:
+        # print results
+        print('Test "' + test.config_name + '": ', end="")
+        if test.status == TestStatus.SKIP:
+            print(colorama.Fore.YELLOW + "SKIPPED")
+        elif test.status == TestStatus.PASS:
+            print(colorama.Fore.GREEN + "PASSED")
+        else:
+            print(colorama.Fore.RED + "FAILED")
+            exit_code = 1
 
-            print(colorama.Style.RESET_ALL)
+        print(colorama.Style.RESET_ALL)
 
-        if args.json:
-            write_json_results(test_list, args.json)
+    if args.json:
+        write_json_results(test_list, args.json)
 
-        if exit_code != 0:
-            print(
-                f"Tests failed for {args.board}"
-                f'{" Zephyr" if args.zephyr else ""}'
-                f'{" Renode" if args.renode else ""}'
-            )
-        # TODO(b/368684364): Fix the underlying issue that prevents sys.exit()
-        # from working correctly.
-        os._exit(exit_code)  # pylint: disable=protected-access
+    if exit_code != 0:
+        print(
+            f"Tests failed for {args.board}"
+            f'{" Zephyr" if args.zephyr else ""}'
+            f'{" Renode" if args.renode else ""}'
+        )
+    sys.exit(exit_code)
 
 
 def get_power_utilization(
