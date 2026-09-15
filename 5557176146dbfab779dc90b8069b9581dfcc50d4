@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fccef99b_496ed232",
+        "filename": "zephyr/test/system_shim/src/test_system.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T20:07:46Z",
+      "side": 1,
+      "message": "This test doesn\u0027t actually verify that system_get_hibernate_wake_source delegates to cros_system_get_hibernate_wake_source as stated in the commit message. It only verifies that the function returns -ENOSYS. If system_get_hibernate_wake_source were hardcoded to return -ENOSYS, this test would still pass.\n\nTo properly test delegation, consider mocking cros_system_get_hibernate_wake_source (e.g., using FFF) to return a distinct value and verifying that system_get_hibernate_wake_source forwards it. If that is not feasible, the commit message and test description should be updated to clarify that this only tests the default fallback behavior.",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 0
+      },
+      "revId": "5557176146dbfab779dc90b8069b9581dfcc50d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
