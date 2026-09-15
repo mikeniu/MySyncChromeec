@@ -73,6 +73,8 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_EXCEPTION(pdata) ((pdata)->cm.regs[1])
 #define PANIC_REG_REASON(pdata) ((pdata)->cm.regs[3])
 #define PANIC_REG_INFO(pdata) ((pdata)->cm.regs[4])
+#define PANIC_ARCH_POST_COPY(pdata) \
+	((pdata)->flags |= PANIC_DATA_FLAG_FRAME_VALID)
 #elif defined(CONFIG_RISCV) && !defined(CONFIG_64BIT)
 /*
  * Not all registers are passed in the context from Zephyr
@@ -103,20 +105,25 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_EXCEPTION(pdata) ((pdata)->riscv.mcause)
 #define PANIC_REG_REASON(pdata) ((pdata)->riscv.regs[11])
 #define PANIC_REG_INFO(pdata) ((pdata)->riscv.regs[10])
+#define PANIC_ARCH_POST_COPY(pdata)
 #elif defined(CONFIG_X86)
 #define PANIC_ARCH PANIC_ARCH_X86
-#define PANIC_REG_LIST(M, M_GPR) \
-	M(eax, x86.eax, eax)     \
-	M(ebx, x86.ebx, ebx)     \
-	M(ecx, x86.ecx, ecx)     \
-	M(edx, x86.edx, edx)     \
-	M(esi, x86.esi, esi)     \
-	M(edi, x86.edi, edi)     \
-	M(cs, x86.cs, cs)        \
-	M(eip, x86.eip, eip)
-#define PANIC_REG_EXCEPTION(pdata) ((pdata)->x86.eflags)
-#define PANIC_REG_REASON(pdata) ((pdata)->x86.vector)
-#define PANIC_REG_INFO(pdata) ((pdata)->x86.error_code)
+#define PANIC_REG_LIST(M, M_GPR)      \
+	M_GPR(eax, x86.eax, eax)      \
+	M_GPR(ebx, x86.ebx, ebx)      \
+	M_GPR(ecx, x86.ecx, ecx)      \
+	M_GPR(edx, x86.edx, edx)      \
+	M_GPR(esi, x86.esi, esi)      \
+	M_GPR(edi, x86.edi, edi)      \
+	M(cs, x86.cs, cs)             \
+	M(eip, x86.eip, eip)          \
+	M(eflags, x86.eflags, eflags) \
+	M(errorCode, x86.error_code, err_code)
+#define PANIC_REG_EXCEPTION(pdata) (pdata->x86.eflags)
+#define PANIC_REG_REASON(pdata) (pdata->x86.vector)
+#define PANIC_REG_INFO(pdata) (pdata->x86.error_code)
+#define PANIC_ARCH_POST_COPY(pdata) \
+	((pdata)->x86.task_id = (uint8_t)(uintptr_t)k_current_get())
 #elif defined(CONFIG_ARCH_POSIX)
 #define PANIC_ARCH PANIC_ARCH_POSIX
 #define PANIC_REG_LIST(M, M_GPR) \
@@ -124,6 +131,8 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_EXCEPTION(pdata) ((pdata)->posix.exception)
 #define PANIC_REG_REASON(pdata) ((pdata)->posix.reason)
 #define PANIC_REG_INFO(pdata) ((pdata)->posix.info)
+#define PANIC_ARCH_POST_COPY(pdata) \
+	((pdata)->posix.exception = (uint8_t)(uintptr_t)k_current_get())
 #else
 /* Not implemented for this arch */
 #error "Unsupported architecture for PANIC_ARCH"
@@ -190,10 +199,7 @@ void panic_data_write_esf(const struct arch_esf *esf)
 	struct panic_data *pdata = panic_data_reset(NULL);
 
 	if (esf) {
-		if (PANIC_ARCH == PANIC_ARCH_CORTEX_M) {
-			pdata->flags |= PANIC_DATA_FLAG_FRAME_VALID;
-		}
-
+		PANIC_ARCH_POST_COPY(pdata);
 		PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
 	}
 
