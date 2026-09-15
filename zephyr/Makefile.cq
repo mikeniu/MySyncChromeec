@@ -62,6 +62,7 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 	'$(PLATFORM)/ec-private/fingerprint/*/mcutest/**' \
 	'$(PLATFORM)/ec-private/test/**' \
 	'$(THIRD_PARTY)/pigweed/pw_unit_test/**' \
+	'$(THIRD_PARTY)/zephyr/google-private/test/**' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/arch/posix/**' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/boards/native/native_posix/**' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/boards/native/native_sim/**' \

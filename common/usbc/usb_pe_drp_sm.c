@@ -4654,7 +4654,7 @@ static void pe_give_battery_cap_entry(int port)
 		 */
 		msg[BCDB_FULL_CAP] = 0xffff;
 
-		if (IS_ENABLED(HAS_TASK_HOSTCMD) &&
+		if (IS_ENABLED(CONFIG_HAS_HOSTCMD) &&
 		    *host_get_memmap(EC_MEMMAP_BATTERY_VERSION) != 0) {
 			int design_volt, design_cap, full_cap;
 
@@ -4752,7 +4752,7 @@ static void pe_give_battery_status_entry(int port)
 
 			*msg = BSDO_CAP(BSDO_CAP_UNKNOWN);
 
-			if (IS_ENABLED(HAS_TASK_HOSTCMD) &&
+			if (IS_ENABLED(CONFIG_HAS_HOSTCMD) &&
 			    *host_get_memmap(EC_MEMMAP_BATTERY_VERSION) != 0) {
 				v = *(int *)host_get_memmap(
 					EC_MEMMAP_BATT_DVLT);

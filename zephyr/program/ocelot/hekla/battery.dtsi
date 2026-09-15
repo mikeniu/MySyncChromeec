@@ -8,5 +8,8 @@
 		default_battery: celxpert-p360644 {
 			compatible = "celxpert,p360644", "battery-smart";
 		};
+		smp-a540734 {
+			compatible = "smp,a540734", "battery-smart";
+		};
 	};
 };

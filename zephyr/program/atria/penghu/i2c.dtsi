@@ -7,6 +7,14 @@
 	named-i2c-ports {
 		compatible = "named-i2c-ports";
 
+		i2c_ec_i2c_eusba: ec_i2c_eusba {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_EUSBA";
+		};
+		i2c_ec_i2c_eusbb: ec_i2c_eusbb {
+			i2c-port = <&i2c3>;
+			enum-names = "I2C_PORT_EUSBB";
+		};
 		i2c_ec_i2c_pd_prog: ec_i2c_pd_prog {
 			i2c-port = <&i2c1>;
 			enum-names = "I2C_PORT_PD";
@@ -22,12 +30,30 @@
 	};
 };
 
+&i2c0 {
+	pinctrl-0 = <&i2c0_clk_gpb3_default
+		     &i2c0_data_gpb4_default>;
+	pinctrl-names = "default";
+
+	label = "I2C_PORT_EUSBA";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+};
+
 &i2c1 {
 	pinctrl-0 = <&i2c1_clk_gpc1_default
 		     &i2c1_data_gpc2_default>;
 	pinctrl-names = "default";
 
 	label = "I2C_PORT_PD";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+};
+
+&i2c3 {
+	pinctrl-0 = <&i2c3_clk_gph1_default
+		     &i2c3_data_gph2_default>;
+	pinctrl-names = "default";
+
+	label = "I2C_PORT_EUSBB";
 	clock-frequency = <I2C_BITRATE_STANDARD>;
 };
 
@@ -58,7 +84,15 @@
 	};
 };
 
+&i2c0 {
+	status = "okay";
+};
+
 &i2c1 {
+	status = "okay";
+};
+
+&i2c3 {
 	status = "okay";
 };
 

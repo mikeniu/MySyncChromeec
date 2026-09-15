@@ -105,9 +105,11 @@ extern uint64_t __deferred_until_end[];
 extern const struct test_i2c_xfer __test_i2c_xfer[];
 extern const struct test_i2c_xfer __test_i2c_xfer_end[];
 
+#if defined(CONFIG_PLATFORM_EC_HOSTCMD) || !defined(CONFIG_ZEPHYR)
 /* Host commands */
 extern const struct host_command __hcmds[];
 extern const struct host_command __hcmds_end[];
+#endif
 
 /* MKBP events */
 extern const struct mkbp_event_source __mkbp_evt_srcs[];

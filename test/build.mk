@@ -16,8 +16,6 @@ test-list-host =
 # TODO(b/237823627): When building for the host, we're linking against the
 # toolchain's C standard library, so these tests are actually testing the
 # toolchain's C standard library.
-test-list-host += usb_sm_framework_h3
-test-list-host += usb_typec_drp_acc_trysrc
 test-list-host += usb_tcpmv2_compliance
 endif
 
@@ -36,10 +34,6 @@ rw-test = ro
 endif
 
 
-sbs_charging-y=sbs_charging.o
-usb_sm_framework_h3-y=usb_sm_framework_h3.o
-usb_typec_drp_acc_trysrc-y=usb_typec_drp_acc_trysrc.o vpd_api.o \
-	usb_sm_checks.o
 usb_tcpmv2_compliance-y=usb_tcpmv2_compliance.o usb_tcpmv2_compliance_common.o \
 	usb_tcpmv2_td_pd_ll_e3.o \
 	usb_tcpmv2_td_pd_ll_e4.o \

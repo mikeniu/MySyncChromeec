@@ -37,7 +37,7 @@ zephyr_library_sources_ifdef(CONFIG_HW_TEST_PANIC src/panic.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_PANIC_STRIP_GPR src/panic.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_PANIC_DATA src/panic_data.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_PMP_ENTRIES src/pmp_entries.c)
-zephyr_library_sources_ifdef(CONFIG_HW_TEST_PRINTF src/printf.c)
+zephyr_library_sources_ifdef(CONFIG_HW_TEST_PRINTF ${PLATFORM_EC}/zephyr/test/lib/src/printf.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_QUEUE src/queue.c
                                                 ${PLATFORM_EC}/common/queue_policies.c)
 zephyr_library_sources_ifdef(CONFIG_HW_TEST_RAM_LOCK src/ram_lock.c)
