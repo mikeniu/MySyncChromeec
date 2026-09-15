@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62f1267c_5239b21e",
+        "filename": "zephyr/test/bluey/Kconfig",
+        "patchSetId": 9
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:32:28Z",
+      "side": 1,
+      "message": "CONFIG_TEST_BOARD_ANNITE is used in testcase.yaml but is not defined in this Kconfig file. You should add a top-level config (likely a menuconfig) for TEST_BOARD_ANNITE that these sub-configs depend on.",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8c9da84_ac9004ef",
+        "filename": "zephyr/test/bluey/boards/annite.overlay",
+        "patchSetId": 9
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:32:28Z",
+      "side": 1,
+      "message": "Why not include the real dts file here from the board? This copy will get out of date.",
+      "range": {
+        "startLine": 81,
+        "startChar": 1,
+        "endLine": 82,
+        "endChar": 35
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab93053b_f0eaf787",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:32:28Z",
+      "side": 1,
+      "message": "It\u0027s slightly cleaner to reset the GPIOs in the suite\u0027s \u0027after\u0027 function or just rely on the next test\u0027s \u0027before\u0027. However, resetting to a known state (0) here is fine. Just note that some of these might be active-low, so 0 might not mean \u0027off\u0027 logically for all rails (though it does for these specifically).",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29fc9ac0_59f098b5",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:32:28Z",
+      "side": 1,
+      "message": "Accessing the worker handler directly is a bit hacky. While it works for unit tests to bypass the scheduler, consider if there\u0027s a more standard way to trigger deferred work in your test environment, or at least add a comment explaining why this direct call is used.",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0f78166_911890f0",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_extpower.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:32:28Z",
+      "side": 1,
+      "message": "There are no assertions in this test.",
+      "range": {
+        "startLine": 44,
+        "startChar": 1,
+        "endLine": 44,
+        "endChar": 33
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aeb5379f_aed2ef99",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_fan.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:32:28Z",
+      "side": 1,
+      "message": "This is redefined here and in fan.c. Consider putting this in a shared header (e.g., annite_board.h) to avoid duplication and potential mismatch if the DT node label changes.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79ea9b47_dae38cfe",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_fan.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-15T22:32:28Z",
+      "side": 1,
+      "message": "The fan_table_to_rpm function in fan.c uses static variables (current_level, up_level_delay_count, etc.) to track state. These are not reset in test_fan_before, which means test cases within this suite can interfere with each other. \n\nYou should reset this state in test_fan_before. Since they are static in fan.c, you can trigger a reset by calling board_override_fan_control(0, temp) with chipset_in_state returning 0.",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
