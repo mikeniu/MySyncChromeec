@@ -358,6 +358,11 @@ ZTEST(panic, test_panic_data_write_esf)
 	zassert_equal(pdata->struct_version, PANIC_DATA_VERSION);
 	zassert_equal(pdata->struct_size, CONFIG_PANIC_DATA_SIZE);
 	zassert_equal(pdata->flags, expected_flags);
+	if (IS_ENABLED(CONFIG_ARCH_POSIX)) {
+		zassert_equal(pdata->posix.exception,
+			      (uint8_t)(uintptr_t)k_current_get(),
+			      "Exception register must store thread ID");
+	}
 }
 
 ZTEST(panic, test_panic_data_write_esf_null)
