@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71f0d595_f93c45ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T23:27:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/69f0bff3-e051-4e73-aa13-7251652e5f97)]\n\n### Review Summary\n*   **Functionality**: The change correctly replaces `subprocess.run` with `os.execvp` to prevent leaving a Python wrapper process behind. The addition of the `--gdb-port` flag provides a way to avoid port collisions during automated testing. `XDG_CONFIG_HOME` correctly uses a uniquely generated temporary directory to ensure process isolation for parallel tests.\n*   **Style**: The code follows standard Python style guidelines. Type hints (`NoReturn`, `int \u003d 3333`) and docstrings are appropriately updated to reflect the new behavior.\n*   **Security**: No security vulnerabilities introduced. Using `tempfile.mkdtemp` correctly avoids potential shared directory permission issues.\n*   **Testing**: This change modifies a developer utility. Manual testing is sufficient here. The new flag and temp directory logic specifically aim to improve automated test reliability.\n*   **CL Size \u0026 Scope**: The CL is small, well-scoped, and focuses exactly on resolving the wrapper process and port collision issues.",
+      "isAi": true,
+      "revId": "f88e3ac9134db2cd6d1f84b0da2ca0c5d5355ace",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
