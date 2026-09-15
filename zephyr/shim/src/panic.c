@@ -103,15 +103,17 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 #define PANIC_REG_INFO(pdata) (pdata->riscv.regs[10])
 #elif defined(CONFIG_X86)
 #define PANIC_ARCH PANIC_ARCH_X86
-#define PANIC_REG_LIST(M, M_GPR) \
-	M(eax, x86.eax, eax)     \
-	M(ebx, x86.ebx, ebx)     \
-	M(ecx, x86.ecx, ecx)     \
-	M(edx, x86.edx, edx)     \
-	M(esi, x86.esi, esi)     \
-	M(edi, x86.edi, edi)     \
-	M(cs, x86.cs, cs)        \
-	M(eip, x86.eip, eip)
+#define PANIC_REG_LIST(M, M_GPR)      \
+	M_GPR(eax, x86.eax, eax)      \
+	M_GPR(ebx, x86.ebx, ebx)      \
+	M_GPR(ecx, x86.ecx, ecx)      \
+	M_GPR(edx, x86.edx, edx)      \
+	M_GPR(esi, x86.esi, esi)      \
+	M_GPR(edi, x86.edi, edi)      \
+	M(cs, x86.cs, cs)             \
+	M(eip, x86.eip, eip)          \
+	M(eflags, x86.eflags, eflags) \
+	M(errorCode, x86.error_code, err_code)
 #define PANIC_REG_EXCEPTION(pdata) (pdata->x86.eflags)
 #define PANIC_REG_REASON(pdata) (pdata->x86.vector)
 #define PANIC_REG_INFO(pdata) (pdata->x86.error_code)
@@ -190,6 +192,10 @@ test_export_static void copy_esf_to_panic_data(const struct arch_esf *esf,
 
 	if (PANIC_ARCH == PANIC_ARCH_CORTEX_M) {
 		pdata->flags |= PANIC_DATA_FLAG_FRAME_VALID;
+	}
+
+	if (IS_ENABLED(CONFIG_X86)) {
+		pdata->x86.task_id = (uint8_t)(uintptr_t)k_current_get();
 	}
 
 	PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
