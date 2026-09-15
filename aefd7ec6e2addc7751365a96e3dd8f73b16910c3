@@ -16,6 +16,24 @@
       "message": "Maybe undefine it only for STM32H7?",
       "revId": "aefd7ec6e2addc7751365a96e3dd8f73b16910c3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b56159ed_f4e68715",
+        "filename": "zephyr/shim/include/shimmed_task_id.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-15T10:53:18Z",
+      "side": 1,
+      "message": "I can add an `#ifdef` for STM32H7, although if this symbol was defined for any other platform, it would break the exact same way.\n\nI can also remove the `#undef` altogether and change the identifier in `CROS_EC_TASK` (line 204) instead. What is cleaner in your opinion?",
+      "parentUuid": "5a025b25_f8ed8759",
+      "revId": "aefd7ec6e2addc7751365a96e3dd8f73b16910c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
