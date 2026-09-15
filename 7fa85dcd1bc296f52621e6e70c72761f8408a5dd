@@ -22,6 +22,30 @@
       },
       "revId": "7fa85dcd1bc296f52621e6e70c72761f8408a5dd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a65b4128_dcb7857c",
+        "filename": "util/renode_ec_launch.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-15T21:19:04Z",
+      "side": 1,
+      "message": "Then remove the `gdb_port` truthiness check",
+      "parentUuid": "c53325e6_f02f9d12",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 35
+      },
+      "revId": "7fa85dcd1bc296f52621e6e70c72761f8408a5dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
