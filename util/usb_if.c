@@ -212,6 +212,7 @@ int usb_trx(struct usb_endpoint *uep, void *outbuf, int outlen, void *inbuf,
 			fprintf(stderr, "%s:%d, only sent %d/%d bytes\n",
 				__FILE__, __LINE__, actual, outlen);
 			usb_shut_down(uep);
+			return -1;
 		}
 	}
 
@@ -228,6 +229,7 @@ int usb_trx(struct usb_endpoint *uep, void *outbuf, int outlen, void *inbuf,
 			fprintf(stderr, "%s:%d, only received %d/%d bytes\n",
 				__FILE__, __LINE__, actual, inlen);
 			usb_shut_down(uep);
+			return -1;
 		}
 
 		if (rxed_count)
@@ -255,6 +257,15 @@ void usb_clear_in_buffer(struct usb_endpoint *uep)
 
 void usb_shut_down(struct usb_endpoint *uep)
 {
+	/*
+	 * Callers can invoke this more than once on the same endpoint, on
+	 * nested error paths in particular. Closing the device handle frees
+	 * it, so clear it to keep the next invocation from closing it again.
+	 */
+	if (!uep->devh)
+		return;
+
 	libusb_close(uep->devh);
+	uep->devh = NULL;
 	libusb_exit(NULL);
 }
