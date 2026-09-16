@@ -16,6 +16,24 @@
       "message": "Add the new capture type to zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay for consistency.",
       "revId": "b4eeb82d80d91dea18af93643b59933f357a8e96",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf07e323_24363929",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-09-16T16:31:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c266ccb_b6cca9fe",
+      "revId": "b4eeb82d80d91dea18af93643b59933f357a8e96",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
