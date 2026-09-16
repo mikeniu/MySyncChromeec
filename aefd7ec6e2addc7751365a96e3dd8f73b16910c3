@@ -52,6 +52,24 @@
       "parentUuid": "b56159ed_f4e68715",
       "revId": "aefd7ec6e2addc7751365a96e3dd8f73b16910c3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afc15bb8_55f0019d",
+        "filename": "zephyr/shim/include/shimmed_task_id.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-16T09:14:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d58f3b4f_111a29ca",
+      "revId": "aefd7ec6e2addc7751365a96e3dd8f73b16910c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
