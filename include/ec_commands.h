@@ -5,7 +5,10 @@
 
 /* Host communication command constants for Chrome EC */
 
-#ifndef __CROS_EC_EC_COMMANDS_H
+#if !defined(PLATFORM_EC_INCLUDE_EC_COMMANDS_H_) && \
+	!defined(__CROS_EC_EC_COMMANDS_H)
+#define PLATFORM_EC_INCLUDE_EC_COMMANDS_H_
+/* TODO(b/510249930): Remove this once all ec_commands.h copies are updated. */
 #define __CROS_EC_EC_COMMANDS_H
 
 #if !defined(__ACPI__) && !defined(__KERNEL__)
@@ -9558,4 +9561,4 @@ struct ec_response_pwrmon {
 }
 #endif
 
-#endif /* __CROS_EC_EC_COMMANDS_H */
+#endif /* PLATFORM_EC_INCLUDE_EC_COMMANDS_H_ */
