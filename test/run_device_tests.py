@@ -462,7 +462,9 @@ class Renode(Platform):
         return True
 
     def cleanup(self) -> None:
-        self.process.kill()
+        if self.process:
+            self.process.kill()
+            self.process = None
 
     def _skip_test_bloonchipper(
         self, test_config: TestConfig, zephyr: bool
@@ -1949,60 +1951,59 @@ def flash_and_run_test(
         logging.info("Build complete. Skipping execution due to --build-only.")
         return True
 
-    # Get the console file before flashing to listen ASAP after flashing.
-    console_pty = platform.get_console(board_config)
+    try:
+        # Get the console file before flashing to listen ASAP after flashing.
+        console_pty = platform.get_console(board_config)
 
-    # flash test binary
-    if not platform.flash(
-        board_config,
-        image_path,
-        args.flasher,
-        args.remote,
-        args.jlink_port,
-        test.test_name,
-        test.enable_hw_write_protect,
-        args.zephyr,
-    ):
-        logging.debug("Flashing failed")
-        return False
-
-    with ExitStack() as stack:
-        if args.remote and args.console_port:
-            console_socket = stack.enter_context(
-                socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            )
-            console_socket.connect((args.remote, args.console_port))
-            console_socket.setblocking(False)
-            console = stack.enter_context(
-                console_socket.makefile(mode="rwb", buffering=0)
-            )
-        else:
-            # pylint: disable-next=consider-using-with
-            console_file = open(console_pty, "wb+", buffering=0)
-            console = stack.enter_context(console_file)
-            os.set_blocking(console.fileno(), False)
-
-        platform.hw_write_protect(test.enable_hw_write_protect)
-
-        if test.toggle_power:
-            power_cycle(platform, board_config)
-        else:
-            # In some cases flash_ec leaves the board off, so just ensure it is on
-            platform.power(board_config, power_on=True)
-
-        # run the test
-        logging.info('Running test: "%s"', test.config_name)
-
-        ret = run_test(
-            test,
+        # flash test binary
+        if not platform.flash(
             board_config,
-            console,
-            zephyr=args.zephyr,
-        )
+            image_path,
+            args.flasher,
+            args.remote,
+            args.jlink_port,
+            test.test_name,
+            test.enable_hw_write_protect,
+            args.zephyr,
+        ):
+            logging.debug("Flashing failed")
+            return False
 
+        with ExitStack() as stack:
+            if args.remote and args.console_port:
+                console_socket = stack.enter_context(
+                    socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                )
+                console_socket.connect((args.remote, args.console_port))
+                console_socket.setblocking(False)
+                console = stack.enter_context(
+                    console_socket.makefile(mode="rwb", buffering=0)
+                )
+            else:
+                # pylint: disable-next=consider-using-with
+                console_file = open(console_pty, "wb+", buffering=0)
+                console = stack.enter_context(console_file)
+                os.set_blocking(console.fileno(), False)
+
+            platform.hw_write_protect(test.enable_hw_write_protect)
+
+            if test.toggle_power:
+                power_cycle(platform, board_config)
+            else:
+                # In some cases flash_ec leaves the board off, so just ensure it is on
+                platform.power(board_config, power_on=True)
+
+            # run the test
+            logging.info('Running test: "%s"', test.config_name)
+
+            return run_test(
+                test,
+                board_config,
+                console,
+                zephyr=args.zephyr,
+            )
+    finally:
         platform.cleanup()
-
-        return ret
 
 
 def write_json_results(
