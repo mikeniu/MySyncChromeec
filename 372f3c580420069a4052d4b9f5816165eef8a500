@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34210063_c81735fb",
+        "filename": "zephyr/program/bluey/meru/quartz_vif.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-09-16T09:13:20Z",
+      "side": 1,
+      "message": "This file should be renamed for meru.",
+      "revId": "372f3c580420069a4052d4b9f5816165eef8a500",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
