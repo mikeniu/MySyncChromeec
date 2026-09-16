@@ -69,6 +69,24 @@
       "isAi": true,
       "revId": "94dfc5737be0cf8345a4db22a7690146c8b561b8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa6024b6_c6d0874b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-16T15:32:03Z",
+      "side": 1,
+      "message": "Tom. You prevented this from submitting with this non-actionable comment.",
+      "parentUuid": "b9232825_eb418dcb",
+      "revId": "94dfc5737be0cf8345a4db22a7690146c8b561b8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
