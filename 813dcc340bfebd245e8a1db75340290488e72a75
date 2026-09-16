@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2265017_4120702f",
+        "filename": "common/system.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 1820,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-16T16:53:44Z",
+      "side": 1,
+      "message": "Nit - use {} around all branches.",
+      "range": {
+        "startLine": 1820,
+        "startChar": 0,
+        "endLine": 1820,
+        "endChar": 45
+      },
+      "revId": "813dcc340bfebd245e8a1db75340290488e72a75",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
