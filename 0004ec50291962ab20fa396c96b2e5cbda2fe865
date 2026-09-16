@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c46cb48_15c56981",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-16T20:36:12Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/d50f3e85-7fe3-4d88-9c34-4067dd26ddcd)]\n\n### Review Summary\n*   **Functionality:** The changes correctly ensure that Renode test processes and their child processes are properly terminated, preventing leaked background processes. The use of `start_new_session\u003dTrue` combined with `os.killpg` on the process ID correctly tears down the entire process group. Explicitly closing `stdin` also helps cleanly signal completion to the subprocess.\n*   **Style \u0026 Consistency:** Excellent. The use of `contextlib.suppress` makes the cleanup code very clean and readable. The change correctly adopts the feedback from the previous patchset to simplify `os.getpgid(self.process.pid)` to `self.process.pid`.\n*   **Security:** No security issues introduced; safely manages process signals.\n*   **Testing:** This change is an improvement to the testing infrastructure itself and appears to have the right scope.\n*   **CL Size/Scope:** The CL is appropriately small and well-scoped to fixing the Renode process termination and stdin handling.",
+      "isAi": true,
+      "revId": "0004ec50291962ab20fa396c96b2e5cbda2fe865",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
