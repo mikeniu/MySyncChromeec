@@ -17,6 +17,23 @@
       "isAi": true,
       "revId": "45914ef62ae6a4262458610f12d441a2f343aa8b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13749aad_3fb6d88a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-16T21:05:40Z",
+      "side": 1,
+      "message": "### `Makefile.rules`: Streamlining the API Boundary \u0026 Rules\n\n**File:** `Makefile.rules`\n\nDefining an explicit list of exported headers is a great practice, as it creates a strict API boundary. However, repeating the output directory string and writing separate rules for `include/%` and `util/%` is a bit boilerplate-heavy.\n\n**Suggestion:** We can clean this up by declaring an explicitly formatted variable for our API boundary and using Make\u0027s `vpath` to simplify the symlink rule.\n\n```makefile\n# --- Define the Public API Boundary ---\n# Only these headers will be exposed to host tools via \u003cchromeos/ec/...\u003e\nEC_EXPORTED_HEADERS :\u003d \\\n\tinclude/ec_commands.h \\\n\tinclude/ec_cmd_api.h \\\n\tinclude/panic_defs.h \\\n\tutil/cros_ec_dev.h\n\n# Extract filenames and map them to the $(out) directory\nchromeos-ec-headers :\u003d $(patsubst %,$(out)/include/chromeos/ec/%,$(notdir $(EC_EXPORTED_HEADERS)))\n\n# Tell Make to search \u0027include\u0027 and \u0027util\u0027 when it needs a %.h file for this rule\nvpath %.h include util\n\n$(out)/include/chromeos/ec/%.h: %.h\n\t@mkdir -p $(@D)\n\t@ln -srf $\u003c $@\n\n```\n\nThis makes adding new headers in the future much easier (you only have to add it to the `EC_EXPORTED_HEADERS` list) and removes the need for multiple specific target rules.\n\n### `Makefile.rules`: Avoid Absolute Symlinks\n\n**File:** `Makefile.rules`\n\nIn the original patch, `$(abspath $\u003c)` is used to generate the symlinks. Absolute symlinks inside a build directory (`$(out)`) break relocatability. If the build directory is moved, or if the source tree is mounted differently across environments (e.g., inside vs. outside of a chroot/container), these symlinks will break. This can also negatively impact build caching tools like `ccache`.\n\n**Suggestion:** Change `ln -sf` to `ln -srf` to generate relative symlinks (as shown in the snippet for point #2 above). GNU `ln` supports the `-r` (relative) flag, which perfectly handles the path math for us.",
+      "revId": "45914ef62ae6a4262458610f12d441a2f343aa8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
