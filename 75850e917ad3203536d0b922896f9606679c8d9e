@@ -16,6 +16,24 @@
       "message": "Allocate a temporary buffer for request so that host_packet_receive isolates and copies the request parameters into a task-safe snapshot, rather than aliasing the volatile hardware buffer.\n\nHere\u0027s a similar [fix](https://github.com/zephyrproject-rtos/zephyr/pull/115353/) in Zephyr upstream.",
       "revId": "75850e917ad3203536d0b922896f9606679c8d9e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c98e74e_3147546e",
+        "filename": "chip/it83xx/spi.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1273969
+      },
+      "writtenOn": "2026-09-16T08:20:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "268fb7c2_d4d86044",
+      "revId": "75850e917ad3203536d0b922896f9606679c8d9e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
