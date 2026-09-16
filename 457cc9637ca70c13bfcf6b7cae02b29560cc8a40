@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "324affe5_b0b3ea66",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-16T23:30:52Z",
+      "side": 1,
+      "message": "If I end up submitting this, it will need to be rebased on your in-flight CL. The verbose comment is primarily for your benefit, to describe the tradeoffs. Compared to the previous state, this is simpler and easier to maintain but provides less isolation. The more specific cgroups rules would represent a middle ground.",
+      "revId": "457cc9637ca70c13bfcf6b7cae02b29560cc8a40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
