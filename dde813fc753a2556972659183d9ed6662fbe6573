@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df0e0012_d8c0290a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-16T20:32:54Z",
+      "side": 1,
+      "message": "Acknowledged.",
+      "parentUuid": "a241f8fa_3d789465",
+      "revId": "dde813fc753a2556972659183d9ed6662fbe6573",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "943a90de_365b45bc",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Since `start_new_session\u003dTrue` is used in `subprocess.Popen`, the spawned process is the leader of its new process group, meaning its PID is exactly its PGID.\n\nYou can simplify `os.getpgid(self.process.pid)` to just `self.process.pid`. This is also slightly more robust because `os.getpgid()` could theoretically raise a `ProcessLookupError` if the group leader has already terminated and been reaped, which would bypass the `os.killpg()` call entirely and potentially leave child processes orphaned.\n\n```python\n                os.killpg(self.process.pid, signal.SIGKILL)\n```",
       "isAi": true,
+      "revId": "dde813fc753a2556972659183d9ed6662fbe6573",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98a9c0eb_d3ae933f",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-16T20:32:54Z",
+      "side": 1,
+      "message": "Done. Simplified os.killpg(os.getpgid(self.process.pid), signal.SIGKILL) to os.killpg(self.process.pid, signal.SIGKILL).",
+      "parentUuid": "943a90de_365b45bc",
       "revId": "dde813fc753a2556972659183d9ed6662fbe6573",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
