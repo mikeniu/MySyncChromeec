@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b635559e_accfd135",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-09-16T11:54:23Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8670512011227708065) is being automatically retried for the following reasons:\n- Some child builders are now retryable:ocelot-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
