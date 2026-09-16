@@ -70,6 +70,27 @@ Or using the helper script:
 > ./run_docker.sh --fast
 > ```
 
+### 3. Hardware Access (Flashing and Device Testing)
+The plain `docker run` above is enough for building. Flashing and device
+testing additionally need the host's USB devices and serial ports, which
+`run_docker.sh` configures automatically. To do the same from a raw
+`docker run`, add:
+
+```bash
+docker run -it --rm \
+  --device-cgroup-rule="c *:* rmw" \
+  -v $(pwd)/workspace:/workspace \
+  -v /dev:/dev \
+  ec-builder
+```
+
+Bind mounting `/dev` keeps devices visible across hotplug and
+re-enumeration, so a board that resets into its bootloader and returns
+under a different `ttyACM` number stays usable. The cgroup rule is
+required because Docker denies `open()` on devices outside a small
+default allowlist; limiting it to character devices leaves block devices
+(disks) inaccessible. `--privileged` is not needed.
+
 ---
 
 ## Using the Tools (Inside the Container)
