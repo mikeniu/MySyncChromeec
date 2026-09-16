@@ -83,25 +83,29 @@
 	col-size = <18>;
 	debounce-down-ms = <20>;
 	debounce-up-ms = <20>;
+	/* US keyboard mask (default layout).
+	 * JP-only keys are masked out: (0,6) (1,12) (3,12) (2,17) (6,17).
+	 * Runtime override in keyboard_customization.c for JP layout.
+	 */
 	actual-key-mask = <
-		0x08	/* C0 */
-		0xff	/* C1 */
-		0xff	/* C2 */
-		0xff	/* C3 */
-		0xff	/* C4 */
-		0xff	/* C5 */
-		0xfe	/* C6 */
-		0xa0	/* C7 */
-		0xff	/* C8 */
-		0xf2	/* C9 */
+		0x08	/* C0  */
+		0xff	/* C1  */
+		0xff	/* C2  */
+		0xff	/* C3  */
+		0xff	/* C4  */
+		0xff	/* C5  */
+		0xfe	/* C6  - mask (0,6) */
+		0xa0	/* C7  */
+		0xff	/* C8  */
+		0xf2	/* C9  */
 		0x01	/* C10 */
-		0xff	/* C11 */
-		0xc0	/* C12 */
+		0xff	/* C11 - enable (3,11) */
+		0xc0	/* C12 - mask (1,12)(3,12) */
 		0x40	/* C13 */
 		0x0a	/* C14 */
 		0x40	/* C15 */
 		0x01	/* C16 */
-		0x00	/* C17 */
+		0x00	/* C17 - mask (2,17)(6,17) */
 	>;
 
 	boot-keys {

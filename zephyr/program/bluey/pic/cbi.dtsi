@@ -1,0 +1,38 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	pic-fw-config {
+		compatible = "cros-ec,cbi-fw-config";
+
+		/*
+		 * FW_CONFIG field to select keyboard layout.
+		 * US and UK share the same physical matrix; JP has 5 extra
+		 * keys and misses one US-only key.
+		 */
+		kb-layout {
+			enum-name = "FW_KB_LAYOUT";
+			start = <0>;
+			size = <2>;
+
+			kb-layout-us {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_KB_LAYOUT_US";
+				value = <0>;
+				default;
+			};
+			kb-layout-jp {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_KB_LAYOUT_JP";
+				value = <1>;
+			};
+			kb-layout-uk {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_KB_LAYOUT_UK";
+				value = <2>;
+			};
+		};
+	};
+};
