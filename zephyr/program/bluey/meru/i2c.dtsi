@@ -7,11 +7,25 @@
 	named-i2c-ports {
 		compatible = "named-i2c-ports";
 
+		i2c_ec_i2c_misc_scl_3v3: ec_i2c_misc_scl_3v3 {
+			i2c-port = <&i2c3_0>;
+			enum-names = "I2C_PORT_WLC";
+		};
+
 		i2c_ec_i2c_adsp: ec_i2c_adsp {
 			i2c-port = <&i2c5_0>;
 			enum-names = "I2C_PORT_ADSP", "I2C_PORT_BATTERY";
 		};
 	};
+};
+
+&i2c3_0 {
+	status = "okay";
+	pinctrl-0 = <&i2c3_0_sda_scl_gpd0_d1>;
+	pinctrl-names = "default";
+
+	label = "I2C_PORT_WLC";
+	clock-frequency = <I2C_BITRATE_FAST>;
 };
 
 &i2c5_0 {
@@ -21,6 +35,10 @@
 
 	label = "I2C_PORT_ADSP";
 	clock-frequency = <I2C_BITRATE_STANDARD>;
+};
+
+&i2c_ctrl3 {
+	status = "okay";
 };
 
 &i2c_ctrl5 {
