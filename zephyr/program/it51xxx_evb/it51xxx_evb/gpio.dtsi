@@ -13,6 +13,29 @@
 	named-gpios {
 		compatible = "named-gpios";
 
+		/*
+		 * Use pin 0 from each IT8300 GPIO group for output access tests.
+		 * Connect GPIOA.0 to GPIOA.1 to also exercise interrupt handling.
+		 */
+		it8300_irq_out: it8300_irq_out {
+			gpios = <&ioex_it8300_gpa 0 GPIO_OUTPUT_LOW>;
+		};
+		it8300_irq_in: it8300_irq_in {
+			gpios = <&ioex_it8300_gpa 1 GPIO_INPUT_PULL_UP>;
+		};
+		it8300_gpb_out: it8300_gpb_out {
+			gpios = <&ioex_it8300_gpb 0 GPIO_OUTPUT_LOW>;
+		};
+		it8300_gpc_out: it8300_gpc_out {
+			gpios = <&ioex_it8300_gpc 0 GPIO_OUTPUT_LOW>;
+		};
+		it8300_gpd_out: it8300_gpd_out {
+			gpios = <&ioex_it8300_gpd 0 GPIO_OUTPUT_LOW>;
+		};
+		it8300_gpe_out: it8300_gpe_out {
+			gpios = <&ioex_it8300_gpe 0 GPIO_OUTPUT_LOW>;
+		};
+
 		power_button_l: power_button_l {
 			gpios = <&gpioc 0 GPIO_INPUT_PULL_UP>;
 			enum-name = "GPIO_POWER_BUTTON_L";
@@ -76,8 +99,7 @@
 			<&gpiob 0 GPIO_INPUT_PULL_DOWN>,
 			/* gpiob1 */
 			<&gpiob 1 GPIO_INPUT_PULL_DOWN>,
-			/* gpiob2 */
-			<&gpiob 2 GPIO_INPUT_PULL_DOWN>,
+
 			/* gpiob3 */
 			<&gpiob 3 GPIO_INPUT_PULL_DOWN>,
 			/* gpiob4 */

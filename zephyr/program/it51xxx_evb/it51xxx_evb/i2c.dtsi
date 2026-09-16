@@ -115,4 +115,12 @@
 	push-pull-recovery;
 
 	fifo-enable;   /* FIFO2 */
+
+	it8300_external_gpio: it8300@20 {
+		compatible = "ite,it8300";
+		reg = <0x20>;
+		alert-gpios = <&gpiob 2 0>;
+	};
 };
+
+#include <ite/it8300-gpio-cfg.dtsi>
