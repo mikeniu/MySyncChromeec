@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b6430472_253e2c84",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-16T09:22:23Z",
+      "side": 1,
+      "message": "Ping.",
+      "parentUuid": "5540e3ad_f3665615",
+      "revId": "ee3a23a440b9c6c5288bbb47025a41406370c8cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8ba83b2b_a08abc3f",
         "filename": "include/fpsensor/fpsensor_state.h",
         "patchSetId": 2
@@ -85,6 +103,24 @@
       "side": 1,
       "message": "I added a comment that explains why `__nocache` attribute is used. As agreed offline, `FP_TEMPLATE_SECTION` remains unmodified.",
       "parentUuid": "75244f4b_b2d0e82f",
+      "revId": "ee3a23a440b9c6c5288bbb47025a41406370c8cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e65a31ed_e25b7b55",
+        "filename": "include/fpsensor/fpsensor_state.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-16T09:22:23Z",
+      "side": 1,
+      "message": "Marked as resolved.",
+      "parentUuid": "24b1f878_70e69a74",
       "revId": "ee3a23a440b9c6c5288bbb47025a41406370c8cb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
