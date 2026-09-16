@@ -145,6 +145,7 @@ clone_zephyrproject_sparse() {
             {
                 echo "/zephyr/"
                 echo "/modules/hal/cmsis_6/"
+                echo "/modules/hal/stm32/"
                 echo "/modules/lib/picolibc/"
                 echo "/modules/lib/nanopb/"
             } >> .git/info/sparse-checkout

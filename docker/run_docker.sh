@@ -20,13 +20,17 @@ mkdir -p "${CACHE_DIR}"
 
 # Base Docker run arguments
 DOCKER_ARGS=(
-  -it
   --rm
   --privileged
   -e "HOST_UID=$(id -u)"
   -e "HOST_GID=$(id -g)"
   -v "${WORKSPACE_DIR}:/workspace"
 )
+
+# Only allocate TTY if attached to an interactive terminal
+if [ -t 0 ] && [ -t 1 ]; then
+  DOCKER_ARGS+=( -it )
+fi
 
 # 1. Forward USB subsystem for CCD/Servo interface (vendor ID 18d1,
 # device ID 5214)
@@ -38,12 +42,10 @@ else
 fi
 
 # 2. Forward TTY serial devices if they exist on the host
-for tty_dev in /dev/ttyACM0 /dev/ttyACM1 /dev/ttyACM2; do
+for tty_dev in /dev/ttyACM*; do
   if [ -c "${tty_dev}" ]; then
     echo "Forwarding serial device: ${tty_dev}"
     DOCKER_ARGS+=( --device="${tty_dev}:${tty_dev}" )
-  else
-    echo "Notice: Serial device ${tty_dev} not active on host, skipping..."
   fi
 done
 

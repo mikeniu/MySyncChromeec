@@ -41,6 +41,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libyaml-dev \
     vim \
     gosu \
+    openocd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -68,6 +69,7 @@ RUN mkdir -p /opt/repos/src/third_party/zephyrproject && \
     git config core.sparseCheckout true && \
     echo "/zephyr/" >> .git/info/sparse-checkout && \
     echo "/modules/hal/cmsis_6/" >> .git/info/sparse-checkout && \
+    echo "/modules/hal/stm32/" >> .git/info/sparse-checkout && \
     echo "/modules/lib/picolibc/" >> .git/info/sparse-checkout && \
     echo "/modules/lib/nanopb/" >> .git/info/sparse-checkout && \
     git pull --depth=1 origin main && \
