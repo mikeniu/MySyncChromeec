@@ -22,6 +22,30 @@
       },
       "revId": "8267579c47c57a4c7fec06e410425a832c4a881d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6ccae85_7d71fc8e",
+        "filename": "zephyr/program/bluey/meru/keyboard.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-16T13:20:04Z",
+      "side": 0,
+      "message": "+1",
+      "parentUuid": "83a4d532_f08b7759",
+      "range": {
+        "startLine": 26,
+        "startChar": 2,
+        "endLine": 51,
+        "endChar": 13
+      },
+      "revId": "8267579c47c57a4c7fec06e410425a832c4a881d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
