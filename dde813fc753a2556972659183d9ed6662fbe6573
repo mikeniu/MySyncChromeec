@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a241f8fa_3d789465",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-16T20:07:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM with minor suggestions** — See inline comments for optional improvements. [[trajectory](go/traj/5970b658-5256-4fbe-b9a9-5c5cef3ca74c)]\n\n### Review Summary\n*   **Functionality:** The changes correctly ensure that Renode test processes and all their child processes are properly terminated, preventing leaked background processes. Explicitly closing `stdin` is also a good improvement to cleanly signal completion to the subprocess.\n*   **Style \u0026 Consistency:** Excellent. The use of `contextlib.suppress` makes the cleanup code very clean and readable.\n*   **Security:** No security issues introduced; safely manages process signals.\n*   **Testing:** This is an improvement to the testing infrastructure itself and appears to have the right scope.\n*   **CL Size/Scope:** The CL is appropriately small and well-scoped.\n\nOverall, the patch looks solid. I left one minor suggestion to simplify and slightly improve the robustness of the `os.killpg` call, but otherwise it is a great fix.",
+      "isAi": true,
+      "revId": "dde813fc753a2556972659183d9ed6662fbe6573",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "943a90de_365b45bc",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-16T20:07:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Since `start_new_session\u003dTrue` is used in `subprocess.Popen`, the spawned process is the leader of its new process group, meaning its PID is exactly its PGID.\n\nYou can simplify `os.getpgid(self.process.pid)` to just `self.process.pid`. This is also slightly more robust because `os.getpgid()` could theoretically raise a `ProcessLookupError` if the group leader has already terminated and been reaped, which would bypass the `os.killpg()` call entirely and potentially leave child processes orphaned.\n\n```python\n                os.killpg(self.process.pid, signal.SIGKILL)\n```",
+      "isAi": true,
+      "revId": "dde813fc753a2556972659183d9ed6662fbe6573",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
