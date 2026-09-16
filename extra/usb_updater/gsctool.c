@@ -4621,6 +4621,7 @@ static int pop_flog_dt(struct transfer_descriptor *td,
 		       struct parsed_flog_entry *parsed_entry)
 {
 	union dt_entry_u entry;
+	size_t payload_size;
 	size_t resp_size = sizeof(entry);
 	int rv = send_vendor_command(td, VENDOR_CC_POP_LOG_ENTRY_MS,
 				     &parsed_entry->raw_timestamp,
@@ -4632,12 +4633,29 @@ static int pop_flog_dt(struct transfer_descriptor *td,
 		parsed_entry->end_of_list = true;
 		return 0;
 	}
+	/*
+	 * The GSC is not trusted to report a consistent entry, the payload
+	 * size has to be derived from the number of bytes actually received,
+	 * and then verified against the size reported in the entry header.
+	 * Note that 'entry.evt.size' covers both the event type and the
+	 * payload, subtracting from it would underflow if it is not checked
+	 * first.
+	 */
+	if (resp_size < offsetof(dt_event_t, payload)) {
+		fprintf(stderr, "%s: truncated log entry, %zd bytes\n",
+			__func__, resp_size);
+		return -1;
+	}
+	payload_size = resp_size - offsetof(dt_event_t, payload);
+	if (entry.evt.size < sizeof(entry.evt.event_type)) {
+		payload_size = 0;
+	} else if ((entry.evt.size - sizeof(entry.evt.event_type)) <
+		   payload_size) {
+		payload_size = entry.evt.size - sizeof(entry.evt.event_type);
+	}
 	parsed_entry->event_type = entry.evt.event_type;
-	parsed_entry->payload_size =
-		MIN(entry.evt.size - sizeof(entry.evt.event_type),
-		    MAX_PAYLOAD_SIZE);
-	memcpy(parsed_entry->payload, entry.evt.payload,
-	       parsed_entry->payload_size);
+	parsed_entry->payload_size = payload_size;
+	memcpy(parsed_entry->payload, entry.evt.payload, payload_size);
 	parsed_entry->raw_timestamp = entry.evt.time;
 	parsed_entry->timestamp =
 		(parsed_entry->raw_timestamp & ~(1ULL << 63)) / 1000;
@@ -4650,6 +4668,7 @@ static int pop_flog(struct transfer_descriptor *td,
 		    struct parsed_flog_entry *parsed_entry)
 {
 	union entry_u entry;
+	size_t payload_size;
 	size_t resp_size = sizeof(entry);
 	uint32_t ts = (uint32_t)parsed_entry->raw_timestamp;
 	int rv = send_vendor_command(td, VENDOR_CC_POP_LOG_ENTRY, &ts,
@@ -4660,11 +4679,21 @@ static int pop_flog(struct transfer_descriptor *td,
 		parsed_entry->end_of_list = true;
 		return 0;
 	}
+	/*
+	 * Do not parse the header unless it was received in full, and do not
+	 * copy more payload bytes than the GSC actually sent.
+	 */
+	if (resp_size < offsetof(struct flash_log_entry, payload)) {
+		fprintf(stderr, "%s: truncated log entry, %zd bytes\n",
+			__func__, resp_size);
+		return -1;
+	}
+	payload_size = resp_size - offsetof(struct flash_log_entry, payload);
+	if (FLASH_LOG_PAYLOAD_SIZE(entry.r.size) < payload_size)
+		payload_size = FLASH_LOG_PAYLOAD_SIZE(entry.r.size);
 	parsed_entry->event_type = entry.r.type;
-	parsed_entry->payload_size =
-		MIN(FLASH_LOG_PAYLOAD_SIZE(entry.r.size), MAX_PAYLOAD_SIZE);
-	memcpy(parsed_entry->payload, entry.r.payload,
-	       parsed_entry->payload_size);
+	parsed_entry->payload_size = payload_size;
+	memcpy(parsed_entry->payload, entry.r.payload, payload_size);
 	parsed_entry->raw_timestamp = entry.r.timestamp;
 	parsed_entry->timestamp = entry.r.timestamp;
 	parsed_entry->timestamp_reliable = true;
