@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de2e6971_4b86fca7",
+        "filename": "zephyr/shim/src/cbi/ufsc/keyboard_layout.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-09-16T10:35:04Z",
+      "side": 1,
+      "message": "this file is only complied in if `DT_HAS_CROS_EC_CBI_UFSC_KEYBOARD_SELECTOR_ENABLED` so this should not really be needed right?",
+      "revId": "3e35a6a044c0f6c5761897be3a15c6d029203700",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46ed91d1_53baea6f",
+        "filename": "zephyr/shim/src/cbi/ufsc/keyboard_layout.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-09-16T10:35:04Z",
+      "side": 1,
+      "message": "this could be an `IF_ENABLED` too I think?",
+      "revId": "3e35a6a044c0f6c5761897be3a15c6d029203700",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfa09656_bb42e11d",
+        "filename": "zephyr/shim/src/cbi/ufsc/keyboard_layout.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-09-16T10:35:04Z",
+      "side": 1,
+      "message": "same `IF_ENABLED`",
+      "revId": "3e35a6a044c0f6c5761897be3a15c6d029203700",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
