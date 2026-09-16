@@ -17,6 +17,23 @@
       "isAi": true,
       "revId": "0004ec50291962ab20fa396c96b2e5cbda2fe865",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71071fe4_447cd518",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-16T20:40:42Z",
+      "side": 1,
+      "message": "Non-blocking for this CL since the issue already exists, but if you want to address in followup CLs that would be great:\n\n----\n\n* **Pipe Deadlock Risk (Existing Issue):** In `flash()`, the process is opened with `stdout\u003dsubprocess.PIPE`. However, there is an immediate `time.sleep(10)` right after `Popen`. If the Renode process outputs heavily to `stdout` during startup, it could fill the OS pipe buffer (typically 64KB on Linux). If the buffer fills up, Renode will block indefinitely waiting for Python to read from the pipe, while Python is stuck in `sleep(10)`.\n* *Suggestion:* If `stdout` isn\u0027t actively read or polled during this startup window, consider using a separate thread to consume it, passing `stdout\u003dsubprocess.DEVNULL` (if the output isn\u0027t needed), or replacing `time.sleep(10)` with a polling loop that reads from the pipe until a specific \"ready\" string is encountered.\n\n\n* **Hardcoded Sleep (Existing Issue):** The `time.sleep(10)` itself is a brittle way to wait for a process to be ready.\n* *Suggestion:* Consider replacing this with a mechanism that polls a socket or reads stdout to determine exactly when the emulator is ready to accept connections. This will make your tests both faster (no unnecessary waiting) and less flaky (won\u0027t fail on slow machines).",
+      "revId": "0004ec50291962ab20fa396c96b2e5cbda2fe865",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
