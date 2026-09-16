@@ -3204,7 +3204,8 @@ static void print_ccd_info(void *response, size_t response_size,
 	}
 
 	/* Now report CCD state on the console. */
-	const char *const state = ccd_info.ccd_state > ARRAY_SIZE(state_names) ?
+	const char *const state = ccd_info.ccd_state >=
+						  ARRAY_SIZE(state_names) ?
 					  "Error" :
 					  state_names[ccd_info.ccd_state];
 	const char *const password = (ccd_info.ccd_indicator_bitmap &
