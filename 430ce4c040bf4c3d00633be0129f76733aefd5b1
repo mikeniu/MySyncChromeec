@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "55a561f6_ab348aa5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-16T18:34:56Z",
+      "side": 1,
+      "message": "The pdc.tps6699x tests are failing.  Please run all the PDC tests locally before uploading your CL.",
+      "revId": "430ce4c040bf4c3d00633be0129f76733aefd5b1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e63bd880_922574bb",
