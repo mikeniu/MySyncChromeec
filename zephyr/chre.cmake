@@ -3,6 +3,17 @@
 # found in the LICENSE file.
 
 if(CONFIG_ISH_CHRE)
+  pw_add_library(chre.platform.ec.log INTERFACE
+    HEADERS
+      shim/include/chre/target_platform/log.h
+    PUBLIC_INCLUDES
+      shim/include
+  )
+  pw_zephyrize_libraries_ifdef(CONFIG_ISH_CHRE
+    chre.platform.ec.log
+  )
+  pw_set_backend(chre.platform.log chre.platform.ec.log)
+
   target_sources(app PRIVATE shim/src/chre.cc)
   target_link_libraries(app PRIVATE chre)
   if(CONFIG_CHRE_HELLO_WORLD)
