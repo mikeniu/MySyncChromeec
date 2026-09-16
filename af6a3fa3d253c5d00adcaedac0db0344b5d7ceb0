@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "886433da_a40a1a7a",
+        "filename": "common/usb_pd_host_cmd_common.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-16T02:29:03Z",
+      "side": 1,
+      "message": "Yes, I was discussing with Rob on this in an earlier CL.  I filed http://b/559709343 to track this effort.",
+      "parentUuid": "0082e993_cc02a50c",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 40
+      },
+      "revId": "af6a3fa3d253c5d00adcaedac0db0344b5d7ceb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b9e213b_21ba7dc0",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-15T21:53:50Z",
       "side": 1,
       "message": "Are there any build time checks that the values of `enum ec_host_cmd_status` match the legacy `enum ec_status`?",
+      "range": {
+        "startLine": 392,
+        "startChar": 10,
+        "endLine": 393,
+        "endChar": 14
+      },
+      "revId": "af6a3fa3d253c5d00adcaedac0db0344b5d7ceb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32d5d748_09f07088",
+        "filename": "common/usb_pd_host_cmd_common.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-16T02:29:03Z",
+      "side": 1,
+      "message": "Yes, see [ec_commands.h](https://chromium.googlesource.com/chromiumos/platform/ec/+/main/include/ec_commands.h#773)",
+      "parentUuid": "7b9e213b_21ba7dc0",
       "range": {
         "startLine": 392,
         "startChar": 10,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f50f0848_3ed16946",
+        "filename": "common/usbc/usb_pd_host.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-16T02:29:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc20ee89_39a52c19",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 38
+      },
+      "revId": "af6a3fa3d253c5d00adcaedac0db0344b5d7ceb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6dc49887_d6cb054b",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-09-15T21:53:50Z",
       "side": 1,
       "message": "Should `hc_typec_status` be modified to just return `EC_RES_INVALID_RESPONSE` instead of `EC_RES_RESPONSE_TOO_BIG`?  Then you can eliminate this guard.",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 168,
+        "endChar": 69
+      },
+      "revId": "af6a3fa3d253c5d00adcaedac0db0344b5d7ceb0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d4850d3_da6da18d",
+        "filename": "zephyr/test/drivers/host_cmd/src/usb_pd_host_cmd.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-16T02:29:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6dc49887_d6cb054b",
       "range": {
         "startLine": 168,
         "startChar": 0,
