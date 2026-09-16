@@ -496,8 +496,43 @@ class Renode(Platform):
                 start_new_session=True,
                 env=env,
             )
-        time.sleep(10)
-        return True
+
+        return self._wait_for_console()
+
+    def _wait_for_console(self, timeout: float = 60.0) -> bool:
+        """Waits for the Renode process to create the UART PTY."""
+        console_path = Path(self._env_dir) / "renode-uart"
+        log_path = Path(self._env_dir) / "renode.log"
+
+        start_wait = time.monotonic()
+        while time.monotonic() - start_wait < timeout:
+            if self.process.poll() is not None:
+                try:
+                    log_out = log_path.read_text(
+                        encoding="utf-8", errors="replace"
+                    )
+                except OSError:
+                    log_out = ""
+                logging.error(
+                    "Renode exited prematurely with returncode %d:\n%s",
+                    self.process.returncode,
+                    log_out,
+                )
+                self.cleanup()
+                return False
+
+            if console_path.is_char_device():
+                # Allow emulation startup and UART connection to settle
+                time.sleep(1)
+                return True
+
+            time.sleep(0.1)
+
+        logging.error(
+            "Timed out waiting for Renode console PTY %s", console_path
+        )
+        self.cleanup()
+        return False
 
     def cleanup(self) -> None:
         if self.process:
@@ -2029,7 +2064,7 @@ def flash_and_run_test(
                 )
             else:
                 # pylint: disable-next=consider-using-with
-                console_file = open(console_pty, "wb+", buffering=0)
+                console_file = open(console_pty, "r+b", buffering=0)
                 console = stack.enter_context(console_file)
                 os.set_blocking(console.fileno(), False)
 
