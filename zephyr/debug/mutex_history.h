@@ -42,7 +42,7 @@ typedef struct {
  * @param size Size of mutex history buffer
  */
 #define MUTEX_HISTORY_DECLARE(name, size) \
-	RING_BUF_ITEM_DECLARE(name, (MUTEX_EVENT_TYPE_SIZE * size))
+	RING_BUF_DECLARE(name, (MUTEX_EVENT_TYPE_SIZE * size))
 
 /**
  * @brief Log mutex event in mutex history buffer

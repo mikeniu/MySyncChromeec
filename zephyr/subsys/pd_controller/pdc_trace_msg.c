@@ -181,7 +181,7 @@ test_mockable bool pdc_trace_msg_resp(int port,
  * @param pl_size    Number of bytes to process.
  */
 static void fifo_pl_to_str(char *str, const size_t str_len,
-			   const uint8_t pl_size)
+			   const uint8_t pl_size, const size_t offset)
 {
 	int str_index;
 
@@ -206,7 +206,8 @@ static void fifo_pl_to_str(char *str, const size_t str_len,
 	uint32_t chunk2;
 	uint8_t *p;
 
-	chunk1 = ring_buf_get_claim(&msg_fifo_rbuf, &p, entries);
+	chunk1 = ring_buf_get_ptr(&msg_fifo_rbuf, &p, offset);
+	chunk1 = MIN(chunk1, entries);
 
 	for (int i = 0; i < chunk1; ++i) {
 		snprintf(&str[str_index], entry_str_len + 1, " %02x", p[i]);
@@ -214,16 +215,14 @@ static void fifo_pl_to_str(char *str, const size_t str_len,
 	}
 
 	if (chunk1 < entries) {
-		chunk2 = ring_buf_get_claim(&msg_fifo_rbuf, &p,
-					    entries - chunk1);
+		chunk2 = ring_buf_get_ptr(&msg_fifo_rbuf, &p, offset + chunk1);
+		chunk2 = MIN(chunk2, entries - chunk1);
 		for (int i = 0; i < chunk2; ++i) {
 			snprintf(&str[str_index], entry_str_len + 1, " %02x",
 				 p[i]);
 			str_index += entry_str_len;
 		}
 	}
-
-	ring_buf_get_finish(&msg_fifo_rbuf, 0);
 
 	str[str_index] = '\0';
 }
@@ -238,9 +237,11 @@ static void fifo_pl_to_str(char *str, const size_t str_len,
  * @param sh         Shell handle for output.
  *                   If NULL, a debug log entry is written.
  * @param e          Pointer to msg_entry.
+ * @param offset     Byte offset of payload in msg_fifo_rbuf.
  */
 __maybe_unused static void fifo_entry_print(const struct shell *sh,
-					    const struct pdc_trace_msg_entry *e)
+					    const struct pdc_trace_msg_entry *e,
+					    const size_t offset)
 {
 	char str_buf[STR_BUF_SIZE];
 	uint16_t sn;
@@ -251,7 +252,7 @@ __maybe_unused static void fifo_entry_print(const struct shell *sh,
 	dir = e->direction;
 	sz = e->pdc_data_size;
 
-	fifo_pl_to_str(str_buf, sizeof(str_buf), sz);
+	fifo_pl_to_str(str_buf, sizeof(str_buf), sz, offset);
 
 	if (sh != NULL) {
 		shell_fprintf(sh, SHELL_NORMAL, ENTRY_FMT, sn, pn,
@@ -329,26 +330,20 @@ hc_pdc_trace_msg_get_entries(struct host_cmd_handler_args *args)
 		}
 
 		if (IS_ENABLED(CONFIG_USBC_PDC_TRACE_MSG_LOG_LEVEL_DBG)) {
-			uint8_t *p;
-
-			ring_buf_get_claim(&msg_fifo_rbuf, &p, sizeof(entry));
-			fifo_entry_print(NULL, &entry);
-			/*
-			 * Note: No need for ring_buf_get_finish()
-			 * here. fifo_entry_print() takes care of
-			 * calling ring_buf_get_finish() after the
-			 * entry, including payload, is processed.
-			 */
+			fifo_entry_print(NULL, &entry, sizeof(entry));
 		}
 
 		if (cap_entry_bytes > MAX_HC_PDC_TRACE_MSG_GET_PAYLOAD) {
 			/* this will never fit, skip it */
-			ring_buf_get(&msg_fifo_rbuf, NULL, cap_entry_bytes);
+			ring_buf_consume(
+				&msg_fifo_rbuf,
+				MIN(cap_entry_bytes,
+				    ring_buf_size_get(&msg_fifo_rbuf)));
 			msg_fifo_unlock();
 			continue;
 		}
 
-		ring_buf_get(&msg_fifo_rbuf, NULL, sizeof(entry));
+		ring_buf_consume(&msg_fifo_rbuf, sizeof(entry));
 		memcpy(&r->payload[r->pl_size], &entry, sizeof(entry));
 		r->pl_size += sizeof(entry);
 
@@ -464,8 +459,10 @@ int cmd_pdc_trace(const struct shell *sh, int argc, const char **argv)
 			break;
 		}
 
-		fifo_entry_print(sh, &entry);
-		ring_buf_get(&msg_fifo_rbuf, NULL, entry.pdc_data_size);
+		fifo_entry_print(sh, &entry, 0);
+		ring_buf_consume(&msg_fifo_rbuf,
+				 MIN(entry.pdc_data_size,
+				     ring_buf_size_get(&msg_fifo_rbuf)));
 
 		msg_fifo_unlock();
 	}

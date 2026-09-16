@@ -31,8 +31,7 @@ void mutex_history_log(struct ring_buf *rb, const struct k_mutex *mutex,
 
 	if (space < MUTEX_EVENT_TYPE_SIZE) {
 		// Not enough space, drop the oldest event to make room
-		uint8_t temp[MUTEX_EVENT_TYPE_SIZE];
-		ring_buf_get(rb, temp, MUTEX_EVENT_TYPE_SIZE);
+		ring_buf_consume(rb, MUTEX_EVENT_TYPE_SIZE);
 	}
 
 	// Put the new event
