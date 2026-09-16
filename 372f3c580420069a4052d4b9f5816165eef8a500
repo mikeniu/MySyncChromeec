@@ -16,6 +16,24 @@
       "message": "This file should be renamed for meru.",
       "revId": "372f3c580420069a4052d4b9f5816165eef8a500",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7063cd2c_5b51b9e6",
+        "filename": "zephyr/program/bluey/meru/quartz_vif.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-16T09:23:10Z",
+      "side": 1,
+      "message": "Hi Kyle,\n\nThe content of this file is not suitable for Meru. We will replace it with `meru_vif.xml` once it is ready. For now, please keep the incorrect file name to avoid anyone using the unsuitable content.",
+      "parentUuid": "34210063_c81735fb",
+      "revId": "372f3c580420069a4052d4b9f5816165eef8a500",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
