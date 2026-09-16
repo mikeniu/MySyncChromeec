@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c542065_c7c79cbd",
+        "filename": "common/mkbp_event.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 464,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-16T19:38:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7790ed90_611932d7",
+      "range": {
+        "startLine": 461,
+        "startChar": 0,
+        "endLine": 464,
+        "endChar": 0
+      },
+      "revId": "e5414d166d8bcd8a5e543383020b3646d451e9de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a38c681b_bf068afc",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-16T11:19:16Z",
       "side": 1,
       "message": "In the `else` block, `p-\u003eevent_type` is accessed. If the host sends a 1-byte request for Version 1, `args-\u003einput_buf_size` will be 1, but this field is at offset 1. You should check `if (args-\u003einput_buf_size \u003c sizeof(*p)) return EC_HOST_CMD_INVALID_PARAM;` at the start of the `else` block.",
+      "range": {
+        "startLine": 95,
+        "startChar": 0,
+        "endLine": 95,
+        "endChar": 0
+      },
+      "revId": "e5414d166d8bcd8a5e543383020b3646d451e9de",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47ebe9d5_c19a34e8",
+        "filename": "common/mkbp_info.c",
+        "patchSetId": 27
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-16T19:38:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a38c681b_bf068afc",
       "range": {
         "startLine": 95,
         "startChar": 0,
