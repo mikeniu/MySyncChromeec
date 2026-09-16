@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be7eb6f7_52c97c0f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-16T09:23:03Z",
+      "side": 1,
+      "message": "zmake compare-builds",
+      "revId": "5fe18dbbca0e521f70cf7ca3f06bd70cdbbe9e29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
