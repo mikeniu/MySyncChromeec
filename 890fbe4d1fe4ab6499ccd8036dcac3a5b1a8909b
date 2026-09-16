@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05c24131_79cecaaf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-16T20:45:26Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/05a654ed-a01a-4c88-a364-199cb8d0d6cc)]\n\n### Review Summary\n*   **Functionality:** Looks good. The use of `tempfile.TemporaryDirectory` correctly isolates the filesystem state per Renode instance by providing unique paths for the PTY symlink, log file, and `XDG_CONFIG_HOME`.\n*   **Security:** Utilizing `tempfile.TemporaryDirectory` creates the temporary directory safely with appropriate restricted permissions.\n*   **Style:** The style is clean and well-documented. Disabling `consider-using-with` for `subprocess.Popen` and `tempfile.TemporaryDirectory` is correct since these objects must outlive the function scope. The file descriptor handling with `open` and `Popen` is well-reasoned and correctly implemented.\n*   **Testing \u0026 Test Coverage:** This CL improves the testing infrastructure to allow concurrent runs safely. No additional tests are needed.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped, small, and addresses the concurrency issue directly.",
+      "isAi": true,
+      "revId": "890fbe4d1fe4ab6499ccd8036dcac3a5b1a8909b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
