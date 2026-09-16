@@ -16,6 +16,24 @@
       "message": "Nit: Line over 80 columns. The rest of the file _mostly_ breaks before 80",
       "revId": "e8d6947011719487cde787daea91217df15da6e6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4de24a11_17bb4a26",
+        "filename": "docker/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-16T22:23:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94d20987_eb01687e",
+      "revId": "e8d6947011719487cde787daea91217df15da6e6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
