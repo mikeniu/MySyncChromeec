@@ -3,7 +3,10 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_EC_CMD_API_H
+#if !defined(PLATFORM_EC_INCLUDE_EC_CMD_API_H_) && \
+	!defined(__CROS_EC_EC_CMD_API_H)
+#define PLATFORM_EC_INCLUDE_EC_CMD_API_H_
+/* TODO(b/510249930): Remove this once all ec_cmd_api.h copies are updated. */
 #define __CROS_EC_EC_CMD_API_H
 
 #ifdef __cplusplus
@@ -499,4 +502,4 @@ _CROS_EC_C0_F_PF(EC_CMD_ENTER_BOOTLOADER, enter_bootloader);
 }
 #endif
 
-#endif /* __CROS_EC_EC_CMD_API_H */
+#endif /* PLATFORM_EC_INCLUDE_EC_CMD_API_H_ */
