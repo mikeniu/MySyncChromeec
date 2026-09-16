@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0c285f5_819bb9d9",
+        "filename": "common/cbi.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-16T23:41:12Z",
+      "side": 1,
+      "message": "not sure if you\u0027re limiting this patch to basic remappings,\nbut it would make more sense for this to be `EC_HOST_CMD_INVALID_PARAM`.",
+      "range": {
+        "startLine": 536,
+        "startChar": 9,
+        "endLine": 536,
+        "endChar": 26
+      },
+      "revId": "c5a5d1e56694eafd7a4e29ce2cdaa570beff2a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "203abfa7_8fb65112",
+        "filename": "common/flash.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 1587,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-16T23:41:12Z",
+      "side": 1,
+      "message": "maybe change `.num_banks_desc` to `banks_to_copy` for added validation.",
+      "range": {
+        "startLine": 1587,
+        "startChar": 8,
+        "endLine": 1587,
+        "endChar": 22
+      },
+      "revId": "c5a5d1e56694eafd7a4e29ce2cdaa570beff2a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a952c475_cfa282f5",
+        "filename": "common/flash.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 1602,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-16T23:41:12Z",
+      "side": 1,
+      "message": "these checks should be done as compile time asserts,\nbut i\u0027m not sure if the compiler can derive `.output_buf_max`.\n\nin any case, we should do these checks before we do any work.",
+      "range": {
+        "startLine": 1600,
+        "startChar": 2,
+        "endLine": 1602,
+        "endChar": 39
+      },
+      "revId": "c5a5d1e56694eafd7a4e29ce2cdaa570beff2a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98e2b6d2_e21a53d2",
+        "filename": "common/rollback.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-16T23:41:12Z",
+      "side": 1,
+      "message": "EC_HOST_CMD_RESPONSE_TOO_BIG.\nalso, do this check before doing any work, ideally as compile time assert.",
+      "range": {
+        "startLine": 600,
+        "startChar": 9,
+        "endLine": 600,
+        "endChar": 37
+      },
+      "revId": "c5a5d1e56694eafd7a4e29ce2cdaa570beff2a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e8b684c_1d8ce833",
+        "filename": "common/rollback.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-16T23:41:12Z",
+      "side": 1,
+      "message": "EC_HOST_CMD_RESPONSE_TOO_BIG",
+      "range": {
+        "startLine": 614,
+        "startChar": 9,
+        "endLine": 614,
+        "endChar": 37
+      },
+      "revId": "c5a5d1e56694eafd7a4e29ce2cdaa570beff2a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
