@@ -52,6 +52,24 @@
       "message": "Can you try to run `zmake -D compare-builds ` for this and the next change? It\u0027s only the configs renaming so the output binaries should be the same",
       "revId": "31cff74bb05451002cd9b2a5c5ae2cac79a09058",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8924433_c9332083",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-16T08:37:45Z",
+      "side": 1,
+      "message": "Hi Dawid,\n\nI ran `zmake -D compare-builds -k --ref1 HEAD~2 --ref2 HEAD niedzica`.\n\nThe binary output has a minor, expected difference because this refactor also renames the driver/algorithm symbols and string literals (from `elan80series` to `elan_series`), which changes the literal pool string length.\n\nHere is the `size` output of `zephyr.rw.elf`:\n\n```text\n   text    data     bss     dec     hex filename\n 210492    5884  192874  409250   63ea2 (HEAD~2: d0e8e5c26d)\n 210472    5884  192874  409230   63e8e (HEAD:   0b69024e5f)\n```\n- `text` section decreased by 20 bytes due to shorter string names.\n- `data` and `bss` sections remain identical.",
+      "parentUuid": "a8b42dd7_b381b10d",
+      "revId": "31cff74bb05451002cd9b2a5c5ae2cac79a09058",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
