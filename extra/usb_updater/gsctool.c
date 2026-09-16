@@ -748,6 +748,11 @@ static int ts_read(void *buf, size_t max_rx_size)
 	rv = fread(response, 1, sizeof(response), tpm_output);
 	if (rv > 0)
 		rv -= 1; /* Discard the \n character added by trunks_send. */
+	/*
+	 * The read can fill the entire buffer, terminate it before it is
+	 * printed below, the trailing newline is not needed either.
+	 */
+	response[rv > 0 ? rv : 0] = '\0';
 
 	debug("response of size %d, max rx size %zd: %s\n", rv, max_rx_size,
 	      response);
@@ -5020,7 +5025,11 @@ static int get_console_logs(struct transfer_descriptor *td, bool *empty)
 	if (empty)
 		*empty = response_size == 0;
 
-	printf("%s", response);
+	/*
+	 * The GSC can fill the entire buffer, which would leave no room for a
+	 * terminating zero, print no more than what was received.
+	 */
+	printf("%.*s", (int)response_size, response);
 	if (empty && *empty)
 		printf("\n");
 	return 0;
