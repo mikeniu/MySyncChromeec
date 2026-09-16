@@ -928,9 +928,10 @@ static int tpm_send_pkt(struct transfer_descriptor *td, unsigned int digest,
 	}
 
 	if (response && response_size) {
-		len = MIN(len, *response_size);
-		memcpy(response, raw_response + response_offset, len);
-		*response_size = len;
+		size_t copy_size = MIN((size_t)len, *response_size);
+
+		memcpy(response, raw_response + response_offset, copy_size);
+		*response_size = copy_size;
 	}
 
 	/* Return the actual return code from the TPM response header. */
@@ -1143,9 +1144,10 @@ static int transfer_block(struct usb_endpoint *uep, struct update_pdu *updu,
 
 	/* Now send the block, chunk by chunk. */
 	for (transfer_size = 0; transfer_size < payload_size;) {
-		int chunk_size;
+		size_t chunk_size;
 
-		chunk_size = MIN(uep->chunk_len, payload_size - transfer_size);
+		chunk_size = MIN((size_t)uep->chunk_len,
+				 payload_size - transfer_size);
 		do_xfer(uep, transfer_data_ptr, chunk_size, NULL, 0, 0, NULL);
 		transfer_data_ptr += chunk_size;
 		transfer_size += chunk_size;
@@ -1204,7 +1206,7 @@ static void transfer_section(struct transfer_descriptor *td, uint8_t *data_ptr,
 		struct update_pdu updu;
 
 		/* prepare the header to prepend to the block. */
-		payload_size = MIN(data_len, SIGNED_TRANSFER_SIZE);
+		payload_size = MIN(data_len, (size_t)SIGNED_TRANSFER_SIZE);
 		updu.block_size =
 			htobe32(payload_size + sizeof(struct update_pdu));
 
