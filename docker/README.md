@@ -179,3 +179,22 @@ docker run --rm \
   -v $(pwd)/workspace/.cache/coreboot-sdk:/root/.cache/coreboot-sdk \
   ec-builder bash -c "cd /workspace/src/platform/ec && python3 ./twister -ivc -s hibernate_z5.default"
 ```
+
+### Building and Flashing Dagwood Firmware (OpenOCD & ST-Link)
+The container includes `openocd` and the `hal_stm32` Zephyr module to build
+and flash the Dagwood fixture MCU firmware directly using an attached ST-Link
+debugger:
+
+1. **Inside the container**:
+   ```bash
+   cd /workspace/src/platform/dagwood
+   # Build and flash via OpenOCD & ST-Link:
+   ./build_from_chroot.py -f
+   # Or flash existing build without rebuilding:
+   ./build_from_chroot.py --flash-only
+   ```
+
+2. **Direct from host via `run_docker.sh`**:
+   ```bash
+   ./run_docker.sh bash -c "cd /workspace/src/platform/dagwood && ./build_from_chroot.py -f"
+   ```
