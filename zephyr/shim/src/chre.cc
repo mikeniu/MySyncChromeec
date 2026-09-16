@@ -11,8 +11,31 @@
 
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
-#include <zephyr/sys/printk.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/logging/log_ctrl.h>
 #include <zephyr/sys/util.h>
+
+#include <cstdarg>
+
+LOG_MODULE_REGISTER(chre, LOG_LEVEL_INF);
+
+extern "C" void chre_ec_log(uint8_t level, const char *fmt, ...)
+{
+#if CONFIG_LOG_RUNTIME_FILTERING
+	if (level >
+	    Z_LOG_RUNTIME_FILTER(((const struct log_source_dynamic_data *)
+					  Z_LOG_CURRENT_DATA())
+					 ->filters)) {
+		return;
+	}
+#endif
+	va_list ap;
+	va_start(ap, fmt);
+	z_log_msg_runtime_vcreate(Z_LOG_LOCAL_DOMAIN_ID, Z_LOG_CURRENT_DATA(),
+				  level, NULL, 0, Z_LOG_MSG_CBPRINTF_FLAGS(0),
+				  fmt, ap);
+	va_end(ap);
+}
 
 namespace chre
 {
@@ -53,7 +76,7 @@ static void chre_thread_entry(void *arg1, void *arg2, void *arg3)
 	ARG_UNUSED(arg2);
 	ARG_UNUSED(arg3);
 
-	printk("Starting CHRE runtime\n");
+	LOG_INF("Starting CHRE runtime");
 
 #ifndef CONFIG_ZTEST
 	chre::setPlatformPigweedAllocator(chre_allocator);
@@ -67,7 +90,7 @@ static void chre_thread_entry(void *arg1, void *arg2, void *arg3)
 	chre::EventLoopManagerSingleton::get()->getEventLoop().run();
 
 	chre::deinitCommon();
-	printk("CHRE runtime exited\n");
+	LOG_INF("CHRE runtime exited");
 }
 
 static int chre_init(void)
