@@ -125,6 +125,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aff05dc4_273f798e",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-09-16T05:19:25Z",
+      "side": 1,
+      "message": "This delay time is from our battery team.\nBMU IC requires action timing between commands.\nAnd it suggests more than 500ms.",
+      "parentUuid": "3e36a64c_c533c67b",
+      "range": {
+        "startLine": 52,
+        "startChar": 1,
+        "endLine": 52,
+        "endChar": 19
+      },
+      "revId": "fe45a51986c5bcbcaecc03d16700ac07c4165ae5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6e92a848_d41ed2c8",
         "filename": "zephyr/program/fatcat/ruby/src/battery.c",
         "patchSetId": 2
