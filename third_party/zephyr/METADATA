@@ -7,7 +7,7 @@ third_party {
     type: GIT
     value: "https://github.com/zephyrproject-rtos/zephyr"
   }
-  version: "8b4a3e23287f88dc270e1fe9400acd7be2963db2"
+  version: "684c9e8f32e4373a21098559f748f06915f950c9"
   last_upgrade_date { year: 2022 month: 3 day: 4 }
   license_type: NOTICE
 }
