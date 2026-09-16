@@ -69,6 +69,24 @@
       "parentUuid": "1c307075_e925e2c5",
       "revId": "ee3a23a440b9c6c5288bbb47025a41406370c8cb",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24b1f878_70e69a74",
+        "filename": "include/fpsensor/fpsensor_state.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-16T09:13:44Z",
+      "side": 1,
+      "message": "I added a comment that explains why `__nocache` attribute is used. As agreed offline, `FP_TEMPLATE_SECTION` remains unmodified.",
+      "parentUuid": "75244f4b_b2d0e82f",
+      "revId": "ee3a23a440b9c6c5288bbb47025a41406370c8cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
