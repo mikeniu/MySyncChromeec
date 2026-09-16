@@ -4104,8 +4104,8 @@ static bool get_bid(struct transfer_descriptor *td, struct board_id *bid)
 	int rv;
 	size_t response_size = sizeof(*bid);
 
-	rv = send_vendor_command(td, VENDOR_CC_GET_BOARD_ID, bid, response_size,
-				 bid, &response_size);
+	rv = send_vendor_command(td, VENDOR_CC_GET_BOARD_ID, NULL, 0, bid,
+				 &response_size);
 	if (rv) {
 		/* b/424475170 H1 will return NO_SUCH_COMMAND if there's */
 		/* currently a BID mismatch. */
@@ -4125,7 +4125,7 @@ static bool get_bid(struct transfer_descriptor *td, struct board_id *bid)
 		fprintf(stderr,
 			"Error reading board ID: response size %zd, "
 			"first byte %#02x\n",
-			response_size, response_size ? *(uint8_t *)&bid : -1);
+			response_size, response_size ? *(uint8_t *)bid : -1);
 		exit(update_error);
 	}
 
@@ -5714,7 +5714,7 @@ int main(int argc, char *argv[])
 	int get_endorsement_seed = 0;
 	const char *endorsement_seed_str = "";
 	int corrupt_inactive_rw = 0;
-	struct board_id bid;
+	struct board_id bid = { 0 };
 	enum board_id_action bid_action;
 	int password = 0;
 	int ccd_open = 0;
