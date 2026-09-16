@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca1cf5bd_f1ecbe1d",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-16T10:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9039c15_4d25c77c",
+      "range": {
+        "startLine": 216,
+        "startChar": 53,
+        "endLine": 216,
+        "endChar": 68
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61afee96_81a5844c",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-15T20:15:17Z",
       "side": 1,
       "message": "Delete this part of the comment.",
+      "range": {
+        "startLine": 264,
+        "startChar": 52,
+        "endLine": 264,
+        "endChar": 67
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "132903c8_c256f489",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-16T10:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "61afee96_81a5844c",
       "range": {
         "startLine": 264,
         "startChar": 52,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3864392_760c74e2",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 840,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-16T10:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b297a8b_bef98412",
+      "range": {
+        "startLine": 840,
+        "startChar": 0,
+        "endLine": 840,
+        "endChar": 29
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d2fd987_4243bdb2",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-09-15T20:15:17Z",
       "side": 1,
       "message": "Delete this from the comment.",
+      "range": {
+        "startLine": 1110,
+        "startChar": 23,
+        "endLine": 1110,
+        "endChar": 47
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad40aa8f_b22fb08e",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 1110,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-16T10:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d2fd987_4243bdb2",
       "range": {
         "startLine": 1110,
         "startChar": 23,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "23810dfb_93da8915",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 2730,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-16T10:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95837aa0_24b83db2",
+      "range": {
+        "startLine": 2730,
+        "startChar": 45,
+        "endLine": 2730,
+        "endChar": 69
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e22ab7a7_663a2ad0",
@@ -129,6 +249,30 @@
       "writtenOn": "2026-09-15T20:15:17Z",
       "side": 1,
       "message": "```suggestion\n\t * instead of looping forever waiting for a dead PDC. This isolates\n\t * the port while letting the rest of the system proceed.\n```",
+      "range": {
+        "startLine": 2944,
+        "startChar": 55,
+        "endLine": 2946,
+        "endChar": 31
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c2f38c5_d940b34c",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 2946,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-16T10:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e22ab7a7_663a2ad0",
       "range": {
         "startLine": 2944,
         "startChar": 55,
@@ -162,6 +306,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "36a5ab20_b5a9b7d5",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 2969,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-16T10:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9efe84e_beec86c3",
+      "range": {
+        "startLine": 2969,
+        "startChar": 31,
+        "endLine": 2969,
+        "endChar": 55
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ad899ed_1f918c57",
@@ -185,6 +353,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3b7b99f_53e88e00",
+        "filename": "zephyr/test/pdc/src/tps6699x/tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-16T10:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ad899ed_1f918c57",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 46
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "51c69439_e48c01d2",
@@ -198,6 +390,30 @@
       "writtenOn": "2026-09-15T20:24:19Z",
       "side": 1,
       "message": "Note that these emulator errors are self clearing.  You need to set a create a permanent failure so that the init logic fails at least `PDC_INIT_RETRY_MAX` times.\n\nYou can use `i2c_common_emul_set_write_fail_reg` to set a persistent failure.  Note that you have to clear the I2C error status using `I2C_COMMON_EMUL_NO_FAIL_REG` as part of the test cleanup.",
+      "range": {
+        "startLine": 356,
+        "startChar": 1,
+        "endLine": 356,
+        "endChar": 24
+      },
+      "revId": "9a2dc77ffe990a1bb45089409d99f88dee471146",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "658bb2ed_fb65fc2c",
+        "filename": "zephyr/test/pdc/src/tps6699x/tps6699x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-16T10:50:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51c69439_e48c01d2",
       "range": {
         "startLine": 356,
         "startChar": 1,
