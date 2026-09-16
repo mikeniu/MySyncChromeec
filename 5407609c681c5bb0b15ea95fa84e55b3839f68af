@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52697de9_c9a6d4f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-16T19:02:51Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/9a8576a4-45cc-4d58-9bec-ca5186f7c13a)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly adds support for `EGIS_CAPTURE_PATTERN2` by mapping it in `convert_fp_capture_type_to_egis_capture_type` and appending the new configuration into the device tree overlay. It properly translates the generic fingerprint capture type to the EGIS specific one.\n*   **Style:** The style conforms to the existing Zephyr coding conventions. The switch case addition and DTS modifications are clean and align with surrounding code patterns.\n*   **Security:** No security vulnerabilities introduced. The changes are straightforward enum additions and mapping configurations.\n*   **Testing \u0026 Test Coverage:** Test coverage is appropriate and correctly implemented. The author followed previous review feedback by successfully updating both the `.overlay` device tree configurations and the `zassert_equal` statements in `egis660.c` to exercise the new mapping.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized, focused solely on adding the `PATTERN2` capture mode for testing.",
+      "isAi": true,
+      "revId": "5407609c681c5bb0b15ea95fa84e55b3839f68af",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
