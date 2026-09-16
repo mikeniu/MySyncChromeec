@@ -17,6 +17,29 @@
       "isAi": true,
       "revId": "9f11cdc12c5a376a265974d441a20c70c7307076",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5490761_5b8640d9",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1656,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-16T18:42:18Z",
+      "side": 1,
+      "message": "Currently, the patch handles `EAGAIN` and `EWOULDBLOCK`, but treats all other `OSError`s as fatal, mapping them to an `EOFError`. If the script receives a non-fatal interrupt signal during the `read()` system call, it will raise `errno.EINTR` (Interrupted system call) and incorrectly assume the console disconnected.\n* **Recommendation:** Include `errno.EINTR` in the tuple of ignorable `errno`s to ensure maximum robustness.\n\n\n```python\nexcept OSError as e:\n    if e.errno in (errno.EAGAIN, errno.EWOULDBLOCK, errno.EINTR):\n        continue\n    ch \u003d b\"\"\n\n```",
+      "range": {
+        "startLine": 1656,
+        "startChar": 0,
+        "endLine": 1656,
+        "endChar": 60
+      },
+      "revId": "9f11cdc12c5a376a265974d441a20c70c7307076",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
