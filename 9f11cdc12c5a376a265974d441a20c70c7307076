@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03410ded_46a3d1cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-16T17:55:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **LGTM** — All checks pass. [[trajectory](go/traj/ea4451e7-936f-4b88-8687-bc84078c738c)]\n\n### Review Summary\n\n*   **Functionality:** The author has successfully implemented all of the requested changes for non-blocking IO. The additions of explicit `ch is None` checks, catching `errno.EAGAIN` and `errno.EWOULDBLOCK`, and setting both the socket and PTY to non-blocking mode using `setblocking(False)` and `os.set_blocking()` properly guard against spurious wakeups from `select()` and premature EOF errors. Replacing the ThreadPoolExecutor cleanly avoids thread starvation and allows `sys.exit()` to function normally.\n*   **Style:** The changes are clean and idiomatic Python, making good use of context managers (`ExitStack`) and the walrus operator to simplify read loops.\n*   **Security:** No security vulnerabilities introduced.\n*   **Testing:** The author has verified the changes manually using Renode, which is the appropriate testing method for this test orchestration script.\n*   **CL Size \u0026 Scope:** The CL is perfectly scoped to replacing blocking thread execution with non-blocking select for test execution logs.",
+      "isAi": true,
+      "revId": "9f11cdc12c5a376a265974d441a20c70c7307076",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
