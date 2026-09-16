@@ -17,6 +17,23 @@
       "isAi": true,
       "revId": "890fbe4d1fe4ab6499ccd8036dcac3a5b1a8909b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6c9471e_a8e2d929",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-16T20:46:44Z",
+      "side": 1,
+      "message": "### 1. Guard `temp_dir.cleanup()` against `OSError`\n\nIf the Renode process crashes or leaves behind locked artifacts/restrictive permissions, `self.temp_dir.cleanup()` will raise an `OSError` (e.g., `PermissionError` or `DirectoryNotEmpty`). Because this is unguarded, it will bubble up and interrupt the test runner\u0027s entire teardown phase.\n\nSince you are already importing `suppress`, we should wrap the directory cleanup:\n\n```python\n         if self.temp_dir:\n             with suppress(OSError):\n                 self.temp_dir.cleanup()\n             self.temp_dir \u003d None\n\n```\n\n### 2. Simplify state management\n\nCurrently, `console_pty` and `renode_log_path` are tracked as instance variables and manually synced via `_init_env()`. Because these strings are just derived directly from the temporary directory\u0027s name, we don\u0027t actually need to store them in `__init__`.\n\nWe can reduce the mental overhead and prevent any potential \"stale state\" bugs by using a `@property` for lazy initialization and computing the paths on the fly.\n\nHere is how we could streamline the class:\n\n```python\n    def __init__(self):\n        self.process \u003d None\n        self.temp_dir \u003d None\n\n    @property\n    def _env_dir(self) -\u003e str:\n        \"\"\"Lazily initialize the isolated environment and return its path.\"\"\"\n        if not self.temp_dir:\n            # pylint: disable-next\u003dconsider-using-with\n            self.temp_dir \u003d tempfile.TemporaryDirectory(prefix\u003d\"ec-renode-\")\n        return self.temp_dir.name\n\n    def get_console(self, board_config: BoardConfig) -\u003e Optional[str]:\n        return os.path.join(self._env_dir, \"renode-uart\")\n\n```\n\nThen, in your `flash()` method, you can just build the paths locally:\n\n```python\n    def flash(\n        # ... args ...\n    ) -\u003e bool:\n        if self.process:\n            self.cleanup()\n\n        uart_pty \u003d os.path.join(self._env_dir, \"renode-uart\")\n        log_path \u003d os.path.join(self._env_dir, \"renode.log\")\n\n        cmd \u003d [\n            \"./util/renode-ec-launch\",\n            \"--board\",\n            board_config.name,\n            \"--uart\",\n            uart_pty,\n            # ...\n        ]\n        \n        # ... [zephyr logic] ...\n\n        env \u003d os.environ.copy()\n        env[\"XDG_CONFIG_HOME\"] \u003d self._env_dir\n        \n        with open(log_path, \"wb\") as renode_log_file:\n            # ... [Popen block] ...\n\n```\n\nThis drops the number of state variables we have to track from three to just one (`temp_dir`) and ensures we are always working with the currently active directory path.",
+      "revId": "890fbe4d1fe4ab6499ccd8036dcac3a5b1a8909b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
