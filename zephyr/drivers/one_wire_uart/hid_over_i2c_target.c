@@ -50,7 +50,7 @@ static void hid_reset(const struct device *dev)
 static int hid_get_report(int report_id, uint8_t *out)
 {
 	if (report_id == REPORT_ID_DEVICE_CERT) {
-		*(uint16_t *)out = 257;
+		*(uint16_t *)out = 257 + 2;
 		out[2] = REPORT_ID_DEVICE_CERT;
 		/* TODO:
 		 * Fill the buf with 256 zeroes looks fine for linux kernel,
@@ -58,7 +58,7 @@ static int hid_get_report(int report_id, uint8_t *out)
 		 */
 		memset(out + 3, 0, 256);
 	} else if (report_id == REPORT_ID_DEVICE_CAPS) {
-		*(uint16_t *)out = 3;
+		*(uint16_t *)out = 3 + 2;
 		out[2] = REPORT_ID_DEVICE_CAPS;
 		out[3] = MAX_FINGERS;
 		out[4] = 0;
@@ -92,7 +92,10 @@ static int hid_handler(const struct device *dev, const uint8_t *in, int in_size,
 					 K_NO_WAIT);
 			if (ret == 0) {
 				*(uint16_t *)out =
-					sizeof(struct usb_hid_touchpad_report);
+					sizeof(struct usb_hid_touchpad_report) +
+					2;
+			} else {
+				*(uint16_t *)out = 0;
 			}
 
 			if (k_msgq_num_used_get(data->touchpad_report_queue) ==
@@ -264,7 +267,8 @@ void hid_i2c_touchpad_add(const struct device *dev,
 		sizeof(report_desc##inst), /* ReportDescLength */              \
 		REPORT_DESC_REG, /* ReportDescRegister */                      \
 		INPUT_REG, /* InputRegister */                                 \
-		sizeof(struct usb_hid_touchpad_report), /* MaxInputLength */   \
+		sizeof(struct usb_hid_touchpad_report) + 2, /* MaxInputLength  \
+							     */                \
 		OUTPUT_REG, /* OutputRegister (unused) */                      \
 		0, /* MaxOutputLength */                                       \
 		CMD_REG, /* CommandRegister */                                 \
