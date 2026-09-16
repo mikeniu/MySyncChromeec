@@ -50,14 +50,12 @@ docker build -t ec-builder .
 ```
 
 ### 2. Run the Container (Interactive Development)
-To spin up the container, map your persistent local workspace, map the
-persistent SDK toolchain cache, and drop into a bash shell with all dependencies
-ready:
+To spin up the container, map your persistent local workspace, and drop into a
+bash shell with all dependencies ready:
 
 ```bash
 docker run -it --rm \
   -v $(pwd)/workspace:/workspace \
-  -v $(pwd)/workspace/.cache/coreboot-sdk:/root/.cache/coreboot-sdk \
   ec-builder
 ```
 
@@ -168,7 +166,6 @@ You can trigger builds or run tests directly from your host machine:
 ```bash
 docker run --rm \
   -v $(pwd)/workspace:/workspace \
-  -v $(pwd)/workspace/.cache/coreboot-sdk:/root/.cache/coreboot-sdk \
   ec-builder zmake --checkout /workspace build skyrim
 ```
 
@@ -176,7 +173,6 @@ docker run --rm \
 ```bash
 docker run --rm \
   -v $(pwd)/workspace:/workspace \
-  -v $(pwd)/workspace/.cache/coreboot-sdk:/root/.cache/coreboot-sdk \
   ec-builder bash -c "cd /workspace/src/platform/ec && python3 ./twister -ivc -s hibernate_z5.default"
 ```
 
