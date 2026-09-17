@@ -8,6 +8,7 @@ import argparse
 from functools import partial
 import sys
 import time
+from typing import Optional
 
 import command
 import communication
@@ -628,14 +629,25 @@ def cmd_wait_for_event(args, comm) -> int:
     return 0
 
 
-def get_frame_size(capture_type, comm) -> tuple[int, int]:
+def get_frame_size(capture_type, comm) -> Optional[tuple[int, int]]:
     """Gets FP frame size."""
 
-    fp_info = commands.FpInfoCmd2()
+    fp_info_cmd = commands.get_cmd(commands.ECCommandsIds.FP_INFO, comm)
+    if not fp_info_cmd:
+        print("No supported FP info")
+        return None
+    fp_info = fp_info_cmd()
     ret = fp_info.run(comm)
     if ret != commands.EcCommandResult.SUCCESS:
         print(f"Failed to get FP info: {ret.name}")
         return None
+
+    if fp_info.cmd_version == 1:
+        print(
+            "FP info v1 doesn't support capture type queries, "
+            "using default frame size"
+        )
+        return fp_info.response.width, fp_info.response.height
 
     for image_frame_params in fp_info.response.image_frame_params:
         if image_frame_params.fp_capture_type == capture_type:
@@ -649,7 +661,10 @@ def cmd_fp_frame(args, comm) -> int:
     """Captures FP frame."""
 
     capture_type = fp_capture_types[args.type or "simple_image"]
-    width, height = get_frame_size(capture_type, comm)
+    frame_size_res = get_frame_size(capture_type, comm)
+    if not frame_size_res:
+        return -1
+    width, height = frame_size_res
     frame_size = width * height
     max_res_size = get_max_res_size(comm)
     if max_res_size < 0:
