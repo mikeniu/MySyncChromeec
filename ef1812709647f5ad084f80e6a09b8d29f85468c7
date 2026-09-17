@@ -22,6 +22,29 @@
       },
       "revId": "ef1812709647f5ad084f80e6a09b8d29f85468c7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36bfdd1c_17d4f60b",
+        "filename": "zephyr/program/bluey/meru/src/pen_control.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-09-17T11:13:14Z",
+      "side": 1,
+      "message": "can;t this be moved to board_chipset_startup_meru ?",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 67
+      },
+      "revId": "ef1812709647f5ad084f80e6a09b8d29f85468c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
