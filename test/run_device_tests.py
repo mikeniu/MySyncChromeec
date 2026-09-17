@@ -456,15 +456,15 @@ class Renode(Platform):
         if self.process:
             self.cleanup()
 
-        uart_pty = os.path.join(self._env_dir, "renode-uart")
-        log_path = os.path.join(self._env_dir, "renode.log")
+        uart_pty = Path(self._env_dir) / "renode-uart"
+        log_path = Path(self._env_dir) / "renode.log"
 
         cmd = [
             "./util/renode-ec-launch",
             "--board",
             board_config.name,
             "--uart",
-            uart_pty,
+            str(uart_pty),
             "--gdb-port",
             "0",
         ]
@@ -496,8 +496,44 @@ class Renode(Platform):
                 start_new_session=True,
                 env=env,
             )
-        time.sleep(10)
-        return True
+
+        return self._wait_for_console(uart_pty, log_path)
+
+    def _wait_for_console(
+        self, console_path: Path, log_path: Path, timeout: float = 60.0
+    ) -> bool:
+        """Waits for the Renode process to create the UART PTY."""
+        end_time = time.monotonic() + timeout
+
+        while time.monotonic() < end_time:
+            if self.process.poll() is not None:
+                try:
+                    log_out = log_path.read_text(
+                        encoding="utf-8", errors="replace"
+                    )
+                except OSError:
+                    log_out = ""
+                logging.error(
+                    "Renode exited prematurely with returncode %d:\n%s",
+                    self.process.returncode,
+                    log_out,
+                )
+                self.cleanup()
+                return False
+
+            if console_path.is_char_device():
+                # Allow emulation startup and UART connection to settle before
+                # tests send commands to the PTY.
+                time.sleep(1)
+                return True
+
+            time.sleep(0.1)
+
+        logging.error(
+            "Timed out waiting for Renode console PTY: %s", console_path
+        )
+        self.cleanup()
+        return False
 
     def cleanup(self) -> None:
         if self.process:
@@ -2024,7 +2060,7 @@ def flash_and_run_test(
                 )
             else:
                 # pylint: disable-next=consider-using-with
-                console_file = open(console_pty, "wb+", buffering=0)
+                console_file = open(console_pty, "r+b", buffering=0)
                 console = stack.enter_context(console_file)
                 os.set_blocking(console.fileno(), False)
 
