@@ -254,7 +254,11 @@ source "${VENV_DIR}/bin/activate"
 export PATH="${PATH}:/opt/repos/src/third_party/u-boot/tools/binman"
 export PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
 
-# Set up Coreboot SDK cache directory symlink for the current user
+# Set up Coreboot SDK cache directory symlink for the current user. The target
+# lives under the bind-mounted workspace so that downloaded toolchains outlive
+# the container. Create it before linking: nothing can write through a
+# dangling symlink, so the SDK download would fail against a bare workspace.
+mkdir -p /workspace/.cache/coreboot-sdk
 mkdir -p "${HOME}/.cache"
 ln -sfn /workspace/.cache/coreboot-sdk "${HOME}/.cache/coreboot-sdk"
 
