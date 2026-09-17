@@ -22,6 +22,11 @@ and delegates execution to the appropriate DUT handler:
   and EC sections with `cbfstool`/`futility`, and executes host tests with
   Tradefed (`atest`) in the Android tree.
 
+> **Note**: If you already have a network-reachable DUT (IP or hostname) and
+> only want to flash EC RW or RO over SSH/ADB without requiring a `crosfleet`
+> lease or physical Servo connection, use [`util/flash_dut.py`](./flash_dut.md)
+> instead.
+
 ---
 
 ## Prerequisites
