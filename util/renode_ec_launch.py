@@ -11,9 +11,9 @@ import argparse
 import os
 import pathlib
 import shlex
-import subprocess
 import sys
-from typing import List, Optional
+import tempfile
+from typing import List, NoReturn, Optional
 
 
 DEFAULT_BOARD = "bloonchipper"
@@ -50,14 +50,16 @@ GPIO_WP_ENABLE = "Release"
 GPIO_WP_DISABLE = "Press"
 
 
-def msg_run(cmd: List[str]) -> None:
-    """Prints a command and executes it.
+def msg_run(cmd: List[str]) -> NoReturn:
+    """Prints a command and executes it, replacing the current process.
 
     Args:
         cmd: A list of strings representing the command and its arguments.
     """
     print(f"\033[1;32m> {shlex.join(cmd)}\033[m")
-    subprocess.run(cmd, check=True)
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os.execvp(cmd[0], cmd)
 
 
 def launch(
@@ -67,6 +69,7 @@ def launch(
     zephyr_bin: str,
     ec_project: str,
     uart: str,
+    gdb_port: int = 3333,
 ) -> int:
     """Launches an EC image in Renode.
 
@@ -79,8 +82,10 @@ def launch(
         zephyr_bin: Path to Zephyr binary.
         ec_project: The name of the EC project.
         uart: Path to the UART PTY.
+        gdb_port: Port number to start GDB server on (0 to disable).
+
     Returns:
-        0 on success, otherwise non-zero.
+        Non-zero on error. Does not return on success.
     """
 
     # Since we are going to cd later, we need to determine the absolute path
@@ -124,6 +129,13 @@ def launch(
     # Outside the chroot, we may not have libicu
     # https://aka.ms/dotnet-missing-libicu
     os.environ["DOTNET_SYSTEM_GLOBALIZATION_INVARIANT"] = "1"
+    if "XDG_CONFIG_HOME" not in os.environ:
+        os.environ["XDG_CONFIG_HOME"] = tempfile.mkdtemp(
+            prefix="ec-renode-config-"
+        )
+    os.makedirs(
+        os.path.join(os.environ["XDG_CONFIG_HOME"], "renode"), exist_ok=True
+    )
 
     renode_execute: List[str] = []
     # We set the machine name to the exact board name, since we might be
@@ -136,9 +148,10 @@ def launch(
     # Change logLevel from WARNING to ERROR, since the console is flooded
     # with WARNINGs.
     renode_execute.append("logLevel 3;")
-    # https://renode.readthedocs.io/en/latest/debugging/gdb.html
-    # (gdb) target remote :3333
-    renode_execute.append("machine StartGdbServer 3333;")
+    if gdb_port > 0:
+        # https://renode.readthedocs.io/en/latest/debugging/gdb.html
+        # (gdb) target remote :3333
+        renode_execute.append(f"machine StartGdbServer {gdb_port};")
 
     if board in GPIO_WP_MAP:
         wp_state = GPIO_WP_ENABLE if enable_write_protect else GPIO_WP_DISABLE
@@ -167,7 +180,6 @@ def launch(
         renode_cmd += ["--execute", renode_execute_str]
 
     msg_run(renode_cmd)
-    return 0
 
 
 def main(argv: Optional[List[str]] = None) -> Optional[int]:
@@ -234,6 +246,13 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         help="Target path for the UART PTY symlink.",
     )
 
+    parser.add_argument(
+        "--gdb-port",
+        type=int,
+        default=3333,
+        help="Port number to start GDB server on (0 to disable).",
+    )
+
     opts = parser.parse_args(argv)
     return launch(
         board=opts.board,
@@ -242,6 +261,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         zephyr_bin=opts.zephyr_bin,
         ec_project=opts.ec,
         uart=opts.uart,
+        gdb_port=opts.gdb_port,
     )
 
 
