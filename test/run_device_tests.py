@@ -46,6 +46,7 @@ from abc import ABC, abstractmethod
 import argparse
 from collections import namedtuple
 from contextlib import ExitStack
+from contextlib import suppress
 import copy
 from dataclasses import dataclass
 from dataclasses import field
@@ -58,6 +59,7 @@ import os
 from pathlib import Path
 import re
 import select
+import signal
 import socket
 import subprocess
 import sys
@@ -442,10 +444,15 @@ class Renode(Platform):
         enable_hw_write_protect: bool,
         zephyr: bool,
     ) -> bool:
+        if self.process:
+            self.cleanup()
+
         cmd = [
             "./util/renode-ec-launch",
             "--board",
             board_config.name,
+            "--gdb-port",
+            "0",
         ]
         if zephyr:
             # We've adopted the convention that we prefix upstream Zephyr test
@@ -462,15 +469,23 @@ class Renode(Platform):
 
         # pylint: disable-next=consider-using-with
         self.process = subprocess.Popen(
-            cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE
+            cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            start_new_session=True,
         )
         time.sleep(10)
         return True
 
     def cleanup(self) -> None:
         if self.process:
-            self.process.kill()
-            self.process.wait()
+            if self.process.stdin:
+                with suppress(OSError):
+                    self.process.stdin.close()
+            with suppress(ProcessLookupError, PermissionError):
+                os.killpg(self.process.pid, signal.SIGKILL)
+            with suppress(subprocess.TimeoutExpired, ProcessLookupError):
+                self.process.wait(timeout=5)
             self.process = None
 
     def _skip_test_bloonchipper(
