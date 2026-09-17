@@ -51,6 +51,24 @@
       "parentUuid": "b8f62922_8d2426ce",
       "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1cad07b_30b73b0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-17T06:27:33Z",
+      "side": 1,
+      "message": "Currently it is:\n```\n./twister -s fingerprint.drivers.elan80sg\n```",
+      "parentUuid": "35630c86_7cf30c62",
+      "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
