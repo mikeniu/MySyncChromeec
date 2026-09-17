@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_BC12_PI3USB9201_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_BC12_PI3USB9201_H_
+
 #include "driver/bc12/pi3usb9201_public.h"
 
 #ifdef __cplusplus
@@ -19,3 +22,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_BC12_PI3USB9201_H_ */

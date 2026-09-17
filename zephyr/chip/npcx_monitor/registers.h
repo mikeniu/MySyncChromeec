@@ -8,8 +8,8 @@
  * to Zephyr upstream
  */
 
-#ifndef __CROS_EC_REGISTERS_H
-#define __CROS_EC_REGISTERS_H
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_NPCX_MONITOR_REGISTERS_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_NPCX_MONITOR_REGISTERS_H_
 
 /*
  * The monitor code doesn't build cleanly under the Zephyr environment if
@@ -356,4 +356,4 @@
 #define MASK_CMD_WR_ADR \
 	(MASK(EXEC_DONE) | FLASH_SEL | MASK(RD_WR) | MASK(A_SIZE))
 
-#endif /* __CROS_EC_REGISTERS_H */
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_NPCX_MONITOR_REGISTERS_H_ */

@@ -5,8 +5,8 @@
 
 /* Intel X86 chipset power control module for Chrome EC */
 
-#ifndef __CROS_EC_INTEL_X86_H
-#define __CROS_EC_INTEL_X86_H
+#ifndef PLATFORM_EC_INCLUDE_POWER_INTEL_X86_H_
+#define PLATFORM_EC_INCLUDE_POWER_INTEL_X86_H_
 
 #include "espi.h"
 #include "power.h"
@@ -104,4 +104,4 @@ __override_proto void intel_x86_sys_reset_delay(void);
 }
 #endif
 
-#endif /* __CROS_EC_INTEL_X86_H */
+#endif /* PLATFORM_EC_INCLUDE_POWER_INTEL_X86_H_ */

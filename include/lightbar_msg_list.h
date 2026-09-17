@@ -6,6 +6,10 @@
  * we can automatically derive the correct constants, functions, and message
  * types.
  */
+
+#ifndef PLATFORM_EC_INCLUDE_LIGHTBAR_MSG_LIST_H_
+#define PLATFORM_EC_INCLUDE_LIGHTBAR_MSG_LIST_H_
+
 #define LIGHTBAR_MSG_LIST              \
 	LBMSG(ERROR), /* 0 */          \
 		LBMSG(S5), /* 1 */     \
@@ -20,3 +24,5 @@
 		LBMSG(KONAMI), /* A */ \
 		LBMSG(TAP), /* B */    \
 		LBMSG(PROGRAM), /* C */
+
+#endif /* PLATFORM_EC_INCLUDE_LIGHTBAR_MSG_LIST_H_ */

@@ -3,7 +3,8 @@
  * found in the LICENSE file.
  */
 
-#pragma once
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_PIGWEED_ZEPHYR_CUSTOM_LOG_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_PIGWEED_ZEPHYR_CUSTOM_LOG_H_
 
 #include <zephyr/logging/log_core.h>
 #include <zephyr/sys/__assert.h>
@@ -37,3 +38,5 @@
 	Z_PW_LOG(LOG_LEVEL_WRN, PW_LOG_WARN, format, ##__VA_ARGS__)
 #define LOG_ERR(format, ...) \
 	Z_PW_LOG(LOG_LEVEL_ERR, PW_LOG_ERROR, format, ##__VA_ARGS__)
+
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_PIGWEED_ZEPHYR_CUSTOM_LOG_H_ */

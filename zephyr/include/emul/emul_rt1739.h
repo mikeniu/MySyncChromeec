@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_RT1739_H
-#define EMUL_RT1739_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_RT1739_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_RT1739_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/sys/slist.h>
@@ -58,4 +58,4 @@ struct _snode *rt1739_emul_get_reg_set_history_head(const struct emul *emul);
  */
 void rt1739_emul_reset_set_reg_history(const struct emul *emul);
 
-#endif /* EMUL_RT1739_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_RT1739_H_ */

@@ -4,6 +4,7 @@
  */
 
 #include "common.dtsi"
+#include "btn_ign.dtsi"
 
 #define FT9849_COMMON_IMAGE_PROPS \
 	width = <80>; \

@@ -5,9 +5,9 @@
 
 /* This header is only needed for CR50 compatibility */
 
-#ifndef __CROS_EC_TIME_H__
-#define __CROS_EC_TIME_H__
+#ifndef PLATFORM_EC_BUILTIN_TIME_H_
+#define PLATFORM_EC_BUILTIN_TIME_H_
 
 #include <timer.h>
 
-#endif /* __CROS_EC_TIME_H__ */
+#endif /* PLATFORM_EC_BUILTIN_TIME_H_ */

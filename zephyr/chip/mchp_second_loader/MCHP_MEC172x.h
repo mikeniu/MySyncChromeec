@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef MCHP_MEC172X_H
-#define MCHP_MEC172X_H
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_MCHP_MEC172X_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_MCHP_MEC172X_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -2062,4 +2062,4 @@ struct EC_REG_BANK_INST_Type {
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_MCHP_MEC172X_H_ */

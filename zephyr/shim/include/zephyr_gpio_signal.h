@@ -3,10 +3,13 @@
  * found in the LICENSE file.
  */
 
-#if !defined(__CROS_EC_GPIO_SIGNAL_H) || defined(__CROS_EC_ZEPHYR_GPIO_SIGNAL_H)
+#if !defined(PLATFORM_EC_INCLUDE_GPIO_SIGNAL_H_) || \
+	defined(PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_GPIO_SIGNAL_H_)
 #error "This file must only be included from gpio_signal.h. Include gpio_signal.h directly."
 #endif
-#define __CROS_EC_ZEPHYR_GPIO_SIGNAL_H
+
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_GPIO_SIGNAL_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_GPIO_SIGNAL_H_
 
 #include <zephyr/devicetree.h>
 #include <zephyr/toolchain.h>
@@ -194,3 +197,4 @@ const struct gpio_dt_spec *gpio_get_dt_spec(enum gpio_signal signal);
 #ifdef __cplusplus
 }
 #endif
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_GPIO_SIGNAL_H_ */

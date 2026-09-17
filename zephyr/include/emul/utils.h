@@ -9,8 +9,8 @@
  * @brief Utils for emulators.
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_UTILS_H_
-#define ZEPHYR_INCLUDE_EMUL_UTILS_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_UTILS_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_UTILS_H_
 
 /**
  * @brief Helper macro for EMUL_GET_USBC_PROP_BINDING.
@@ -47,4 +47,4 @@
 	(DT_FOREACH_STATUS_OKAY_VARGS(                                     \
 		named_usbc_port, EMUL_GET_USBC_PROP_BINDING_IF_NODE_MATCH, \
 		chip, node, prop) NULL)
-#endif /* ZEPHYR_INCLUDE_EMUL_UTILS_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_UTILS_H_ */

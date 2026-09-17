@@ -5,8 +5,8 @@
 
 /* Richtek RT1715 Type-C port controller */
 
-#ifndef __CROS_EC_DRIVER_TCPM_RT1715_PUBLIC_H
-#define __CROS_EC_DRIVER_TCPM_RT1715_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_TCPM_RT1715_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_TCPM_RT1715_PUBLIC_H_
 
 #include "usb_pd_tcpm.h"
 
@@ -25,4 +25,4 @@ extern const struct tcpm_drv rt1715_tcpm_drv;
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_TCPM_RT1715_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_TCPM_RT1715_PUBLIC_H_ */

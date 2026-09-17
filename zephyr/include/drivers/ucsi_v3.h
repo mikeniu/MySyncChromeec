@@ -16,8 +16,8 @@
  * @brief UCSI Data Structures and Types.
  *
  */
-#ifndef ZEPHYR_INCLUDE_DRIVERS_UCSI_V3_H_
-#define ZEPHYR_INCLUDE_DRIVERS_UCSI_V3_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_UCSI_V3_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_UCSI_V3_H_
 
 #include <errno.h>
 
@@ -1631,4 +1631,4 @@ BUILD_ASSERT(offsetof(struct ucsi_memory_region, message_out) ==
  * @}
  */
 
-#endif /* ZEPHYR_INCLUDE_DRIVERS_UCSI_V3_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_UCSI_V3_H_ */

@@ -5,8 +5,8 @@
  * ANX7483: Active redriver with linear equilzation
  */
 
-#ifndef __CROS_EC_USB_RETIMER_ANX7483_H
-#define __CROS_EC_USB_RETIMER_ANX7483_H
+#ifndef PLATFORM_EC_DRIVER_RETIMER_ANX7483_H_
+#define PLATFORM_EC_DRIVER_RETIMER_ANX7483_H_
 
 #include "common.h"
 
@@ -203,4 +203,4 @@ extern const size_t anx7483_BA_dock_flip_count;
  */
 #define ANX7483_CFG1_DEF 0xEE
 
-#endif /* __CROS_EC_USB_RETIMER_ANX7483_H */
+#endif /* PLATFORM_EC_DRIVER_RETIMER_ANX7483_H_ */

@@ -5,8 +5,8 @@
 
 /* TI SN5S330 Type-C Power Path Controller */
 
-#ifndef __CROS_EC_SN5S330_H
-#define __CROS_EC_SN5S330_H
+#ifndef PLATFORM_EC_DRIVER_PPC_SN5S330_H_
+#define PLATFORM_EC_DRIVER_PPC_SN5S330_H_
 
 #include "common.h"
 #include "driver/ppc/sn5s330_public.h"
@@ -164,4 +164,4 @@ enum sn5s330_pp_idx {
  */
 #define SN5S330_VBUS_GOOD_MASK BIT(0)
 
-#endif /* defined(__CROS_EC_SN5S330_H) */
+#endif /* PLATFORM_EC_DRIVER_PPC_SN5S330_H_ */

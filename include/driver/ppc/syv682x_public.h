@@ -5,8 +5,8 @@
 
 /* Silergy SYV682x Type-C Power Path Controller */
 
-#ifndef __CROS_EC_DRIVER_PPC_SYV682X_PUBLIC_H
-#define __CROS_EC_DRIVER_PPC_SYV682X_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_PPC_SYV682X_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_PPC_SYV682X_PUBLIC_H_
 
 /* I2C addresses */
 #define SYV682X_ADDR0_FLAGS 0x40
@@ -18,4 +18,4 @@ extern const struct ppc_drv syv682x_drv;
 
 void syv682x_interrupt(int port);
 
-#endif /* __CROS_EC_DRIVER_PPC_SYV682X_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_PPC_SYV682X_PUBLIC_H_ */
