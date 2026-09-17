@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ec47253_c04dd7a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-09-17T10:17:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f6876d5_715737e6",
+      "revId": "5b6f32b2ab4c8190c13b1cc7b9841d3e5e6ee135",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76df97a0_1928e04d",
@@ -50,6 +68,42 @@
       "side": 1,
       "message": "[Gerrit AI Review] Overwriting `config4` removes the `FINGERPRINT_CAPTURE_TYPE_RESET_TEST` configuration, which may break existing reset tests in the simulator. If `PATTERN2` simulation is needed, consider appending it as a new `config5` block instead.",
       "isAi": true,
+      "revId": "5b6f32b2ab4c8190c13b1cc7b9841d3e5e6ee135",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99812a1a_d75f2c54",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-09-17T10:17:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76df97a0_1928e04d",
+      "revId": "5b6f32b2ab4c8190c13b1cc7b9841d3e5e6ee135",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88b0823e_a6d9d4bd",
+        "filename": "zephyr/test/fingerprint/drivers/egis660/boards/native_sim.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4412439
+      },
+      "writtenOn": "2026-09-17T10:17:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b63527d_bd422af3",
       "revId": "5b6f32b2ab4c8190c13b1cc7b9841d3e5e6ee135",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
