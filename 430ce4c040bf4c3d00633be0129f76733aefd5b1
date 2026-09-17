@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dce6a7f1_201f1f96",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 844,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-17T06:20:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e63bd880_922574bb",
+      "range": {
+        "startLine": 844,
+        "startChar": 0,
+        "endLine": 844,
+        "endChar": 36
+      },
+      "revId": "430ce4c040bf4c3d00633be0129f76733aefd5b1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "13f54c9c_7ee7a6c9",
@@ -54,6 +78,30 @@
       "writtenOn": "2026-09-16T16:16:56Z",
       "side": 1,
       "message": "Specify the timeout directly instead of a calculation based on loops.  This matches your original calculation, but 5 seconds is probably too long.\n```\n#define ST_DISABLE_POLL_TIMEOUT_US USEC_PER_SEC(5)\n```",
+      "range": {
+        "startLine": 227,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 32
+      },
+      "revId": "430ce4c040bf4c3d00633be0129f76733aefd5b1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4f6ff34_480969bb",
+        "filename": "zephyr/test/pdc/src/tps6699x/tps6699x.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-17T06:20:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13f54c9c_7ee7a6c9",
       "range": {
         "startLine": 227,
         "startChar": 0,
