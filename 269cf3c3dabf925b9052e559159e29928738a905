@@ -72,6 +72,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5b7130a_ac927473",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-17T18:33:56Z",
+      "side": 1,
+      "message": "Following a discussion with @dawidn we had in a meeting today, I checked if any of those LL/HAL API calls can be replaced with a call to Zephyr\u0027s drivers for STM32 in their current shape.\n\nThe answer, unfortunately, is no.",
+      "parentUuid": "6114eb13_329bd12c",
+      "revId": "269cf3c3dabf925b9052e559159e29928738a905",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9585dd5b_42299f8b",
