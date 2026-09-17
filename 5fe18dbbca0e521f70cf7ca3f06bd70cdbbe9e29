@@ -16,6 +16,24 @@
       "message": "zmake compare-builds",
       "revId": "5fe18dbbca0e521f70cf7ca3f06bd70cdbbe9e29",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea3c6650_311eafa1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-17T13:07:40Z",
+      "side": 1,
+      "message": "Passed. I\u0027ll include it in the `TEST` tag.\n\n```\n$ zmake compare-builds --ref1 ccbeac10fbb --ref2 5fe18dbbca0 sanok srebrna stobnica smolec chudow chobienia niedzica bloonchipper helipilot 2\u003e\u00261 | tee compare-builds-flashsize.log\n$ tail -n 3 compare-builds-flashsize.log \nZephyr compare builds successful:\n   ccbeac10fbb (ccbeac10fbba0c49d3ee6653b30fdae0ea9306d9): \"fpsensor: add __nocache support for fingerprint frame buffer\"\n   5fe18dbbca0 (5fe18dbbca0e521f70cf7ca3f06bd70cdbbe9e29): \"zephyr: drivers: cros_flash: rename FLASH_SIZE\"\n```",
+      "parentUuid": "be7eb6f7_52c97c0f",
+      "revId": "5fe18dbbca0e521f70cf7ca3f06bd70cdbbe9e29",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
