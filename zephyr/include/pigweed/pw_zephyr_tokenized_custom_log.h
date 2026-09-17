@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __PW_ZEPHYR_TOKENIZED_CUSTOM_LOG_H
-#define __PW_ZEPHYR_TOKENIZED_CUSTOM_LOG_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_PIGWEED_PW_ZEPHYR_TOKENIZED_CUSTOM_LOG_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_PIGWEED_PW_ZEPHYR_TOKENIZED_CUSTOM_LOG_H_
 
 /* See src/third_party/pigweed/pw_log_tokenized/public/pw_log_tokenized/config.h
  * to see how file and module can be included in tokenized logging output.
@@ -38,4 +38,5 @@
 #define PW_EC_CHANNEL_TO_FLAG(channel) ((channel) + 1)
 #define PW_FLAG_TO_EC_CHANNEL(flag) ((enum console_channel)((flag) - 1))
 
-#endif /* __PW_ZEPHYR_TOKENIZED_CUSTOM_LOG_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_PIGWEED_PW_ZEPHYR_TOKENIZED_CUSTOM_LOG_H_ \
+	*/

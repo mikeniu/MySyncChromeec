@@ -3,11 +3,11 @@
  * found in the LICENSE file.
  */
 
-#ifndef __UTIL_LOCKS_H
-#define __UTIL_LOCKS_H
+#ifndef PLATFORM_EC_UTIL_LOCK_LOCKS_H_
+#define PLATFORM_EC_UTIL_LOCK_LOCKS_H_
 
 #define SYSTEM_LOCKFILE_DIR "/run/lock"
 #define LOCKFILE_NAME "firmware_utility_lock"
 #define CROS_EC_LOCKFILE_NAME "cros_ec_lock"
 
-#endif /* __UTIL_LOCKS_H */
+#endif /* PLATFORM_EC_UTIL_LOCK_LOCKS_H_ */

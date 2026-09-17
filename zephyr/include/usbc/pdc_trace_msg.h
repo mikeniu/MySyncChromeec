@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_PDC_TRACE_MSG_H_
-#define ZEPHYR_INCLUDE_DRIVERS_PDC_TRACE_MSG_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_TRACE_MSG_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_TRACE_MSG_H_
 
 #include "common.h"
 
@@ -39,4 +39,4 @@ int cmd_pdc_trace(const struct shell *sh, int argc, const char **argv);
 }
 #endif
 
-#endif /* ZEPHYR_INCLUDE_DRIVERS_PDC_TRACE_MSG_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_TRACE_MSG_H_ */

@@ -5,8 +5,8 @@
 
 /* Richtek BC 1.2 Detection */
 
-#ifndef __CROS_EC_DRIVER_BC12_RT1718S_H
-#define __CROS_EC_DRIVER_BC12_RT1718S_H
+#ifndef PLATFORM_EC_DRIVER_BC12_RT1718S_H_
+#define PLATFORM_EC_DRIVER_BC12_RT1718S_H_
 
 int rt1718s_bc12_init(int port);
-#endif /* __CROS_EC_DRIVER_BC12_RT1718S_H */
+#endif /* PLATFORM_EC_DRIVER_BC12_RT1718S_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_H_
-#define ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_H_
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_H_
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -143,4 +143,4 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(unused_gpios) <= 1,
 }
 #endif
 
-#endif /* ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_GPIO_GPIO_H_ */

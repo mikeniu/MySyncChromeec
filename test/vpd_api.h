@@ -5,8 +5,8 @@
 
 /* Vconn Power Device API module */
 
-#ifndef __CROS_EC_VPD_API_H
-#define __CROS_EC_VPD_API_H
+#ifndef PLATFORM_EC_TEST_VPD_API_H_
+#define PLATFORM_EC_TEST_VPD_API_H_
 
 #include "gpio.h"
 #include "usb_pd.h"
@@ -312,4 +312,4 @@ void vpd_vconn_pwr_sel_odl(enum vpd_pwr en);
  */
 void vpd_ct_cc_sel(enum vpd_cc sel);
 
-#endif /* __CROS_EC_VPD_API_H */
+#endif /* PLATFORM_EC_TEST_VPD_API_H_ */

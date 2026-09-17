@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_PMIC_MP2964_H
-#define __CROS_EC_PMIC_MP2964_H
+#ifndef PLATFORM_EC_DRIVER_MP2964_H_
+#define PLATFORM_EC_DRIVER_MP2964_H_
 
 #define MP2964_PAGE 0x00
 #define MP2964_STORE_USER_ALL 0x15
@@ -42,4 +42,4 @@ struct mp2964_reg_val {
 int mp2964_tune(const struct mp2964_reg_val *page0, int count0,
 		const struct mp2964_reg_val *page1, int count1);
 
-#endif /* __CROS_EC_PMIC_MP2964_H */
+#endif /* PLATFORM_EC_DRIVER_MP2964_H_ */

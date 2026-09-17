@@ -5,8 +5,8 @@
 
 /* PI3USB9201 USB BC 1.2 Charger Detector driver definitions */
 
-#ifndef __CROS_EC_DRIVER_BC12_PI3USB9201_H
-#define __CROS_EC_DRIVER_BC12_PI3USB9201_H
+#ifndef PLATFORM_EC_DRIVER_BC12_PI3USB9201_H_
+#define PLATFORM_EC_DRIVER_BC12_PI3USB9201_H_
 
 #include "driver/bc12/pi3usb9201_public.h"
 
@@ -44,4 +44,4 @@ enum pi3usb9201_mode {
 	PI3USB9201_USB_PATH_ON,
 };
 
-#endif /* __CROS_EC_DRIVER_BC12_PI3USB9201_H */
+#endif /* PLATFORM_EC_DRIVER_BC12_PI3USB9201_H_ */

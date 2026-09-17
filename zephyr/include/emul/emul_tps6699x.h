@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_TPS6699X_H_
-#define __EMUL_TPS6699X_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_TPS6699X_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_TPS6699X_H_
 
 #include "drivers/ucsi_v3.h"
 #include "emul/emul_common_i2c.h"
@@ -143,4 +143,4 @@ int emul_pdc_set_interrupt_patch_loaded(const struct emul *target);
 struct i2c_common_emul_data *
 emul_tps6699x_get_i2c_common_data(const struct emul *emul);
 
-#endif /* __EMUL_TPS6699X_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_TPS6699X_H_ */

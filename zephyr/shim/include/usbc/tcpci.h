@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPCI_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPCI_H_
+
 #include "driver/tcpm/tcpci.h"
 #include "usbc/tcpc_anx7447.h"
 #include "usbc/tcpc_anx7447_emul.h"
@@ -126,3 +129,5 @@ DT_FOREACH_USBC_DRIVER_STATUS_OK_VARGS(TCPC_ALT_DECLARE, TCPC_DRIVERS)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPCI_H_ */

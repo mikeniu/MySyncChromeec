@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef UTIL_ELAN_FILE_CONTROL_H_
-#define UTIL_ELAN_FILE_CONTROL_H_
+#ifndef PLATFORM_EC_UTIL_ELAN_FILE_CONTROL_H_
+#define PLATFORM_EC_UTIL_ELAN_FILE_CONTROL_H_
 
 #include <cstddef>
 #include <cstdint>
@@ -17,4 +17,4 @@
 std::expected<std::vector<uint8_t>, elan::IapError> GetBinary(
     const std::string& file_path);
 
-#endif
+#endif /* PLATFORM_EC_UTIL_ELAN_FILE_CONTROL_H_ */

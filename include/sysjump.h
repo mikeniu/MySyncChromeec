@@ -6,8 +6,8 @@
 
 /* sysjump implementation-specific structures */
 
-#ifndef __CROS_EC_SYSJUMP_IMPL_H
-#define __CROS_EC_SYSJUMP_IMPL_H
+#ifndef PLATFORM_EC_INCLUDE_SYSJUMP_H_
+#define PLATFORM_EC_INCLUDE_SYSJUMP_H_
 
 #include <inttypes.h>
 
@@ -62,4 +62,4 @@ struct jump_data {
 }
 #endif
 
-#endif /* __CROS_EC_SYSJUMP_IMPL_H */
+#endif /* PLATFORM_EC_INCLUDE_SYSJUMP_H_ */

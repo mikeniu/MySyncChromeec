@@ -5,8 +5,8 @@
 
 /* Atomic operations for emulator */
 
-#ifndef __CROS_EC_ATOMIC_H
-#define __CROS_EC_ATOMIC_H
+#ifndef PLATFORM_EC_CORE_HOST_ATOMIC_H_
+#define PLATFORM_EC_CORE_HOST_ATOMIC_H_
 
 #include "atomic_t.h"
 #include "common.h"
@@ -61,4 +61,4 @@ static inline atomic_val_t atomic_load(atomic_t *addr)
 	return __atomic_load_n(addr, __ATOMIC_SEQ_CST);
 }
 
-#endif /* __CROS_EC_ATOMIC_H */
+#endif /* PLATFORM_EC_CORE_HOST_ATOMIC_H_ */

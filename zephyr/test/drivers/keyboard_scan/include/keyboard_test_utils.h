@@ -11,9 +11,16 @@
  * @param pressed 1 if pressed, 0 otherwise
  * @return int 0 if successful
  */
+
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_KEYBOARD_SCAN_INCLUDE_KEYBOARD_TEST_UTILS_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_KEYBOARD_SCAN_INCLUDE_KEYBOARD_TEST_UTILS_H_
+
 int emulate_keystate(int row, int col, int pressed);
 
 /**
  * @brief Clears any pressed keys in the keyboard emulator
  */
 void clear_emulated_keys(void);
+
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_KEYBOARD_SCAN_INCLUDE_KEYBOARD_TEST_UTILS_H_ \
+	*/

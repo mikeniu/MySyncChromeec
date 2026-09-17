@@ -5,8 +5,8 @@
 
 /* Define power signals from device tree */
 
-#ifndef __X86_POWER_SIGNALS_H__
-#define __X86_POWER_SIGNALS_H__
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_POWER_SIGNALS_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_POWER_SIGNALS_H_
 
 #define IN_PCH_SLP_S0 POWER_SIGNAL_MASK(PWR_SLP_S0)
 #define IN_PCH_SLP_S3 POWER_SIGNAL_MASK(PWR_SLP_S3)
@@ -35,4 +35,4 @@
 #warning ("Input power signals state flags not defined");
 #endif
 
-#endif /* __X86_POWER_SIGNALS_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_POWER_SIGNALS_H_ */

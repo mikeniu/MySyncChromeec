@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_PS8811_H
-#define __EMUL_PS8811_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_RETIMER_EMUL_PS8811_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_RETIMER_EMUL_PS8811_H_
 
 #include "driver/retimer/ps8811.h"
 #include "emul/emul_common_i2c.h"
@@ -61,4 +61,4 @@ int ps8811_emul_set_reg1(const struct emul *emulator, int reg, uint8_t val);
 
 void ps8811_emul_reset(const struct emul *emul);
 
-#endif /* __EMUL_PS8811_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_RETIMER_EMUL_PS8811_H_ */

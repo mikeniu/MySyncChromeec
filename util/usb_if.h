@@ -4,8 +4,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EC_EXTRA_USB_UPDATER_USB_IF_H
-#define __EC_EXTRA_USB_UPDATER_USB_IF_H
+#ifndef PLATFORM_EC_UTIL_USB_IF_H_
+#define PLATFORM_EC_UTIL_USB_IF_H_
 
 #include <libusb.h>
 
@@ -49,4 +49,4 @@ void usb_shut_down(struct usb_endpoint *uep);
 	fprintf(stderr, "%s:%d, %s returned %d (%s)\n", __FILE__, __LINE__, m, \
 		r, libusb_strerror(r))
 
-#endif /* ! __EC_EXTRA_USB_UPDATER_USB_IF_H */
+#endif /* PLATFORM_EC_UTIL_USB_IF_H_ */

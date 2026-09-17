@@ -5,8 +5,8 @@
 
 /* Commons acc/gyro function for ST sensors oin Chrome EC */
 
-#ifndef __CROS_EC_ST_COMMONS_H
-#define __CROS_EC_ST_COMMONS_H
+#ifndef PLATFORM_EC_DRIVER_STM_MEMS_COMMON_H_
+#define PLATFORM_EC_DRIVER_STM_MEMS_COMMON_H_
 
 #include "accelgyro.h"
 #include "common.h"
@@ -130,4 +130,4 @@ struct stprivate_data {
 	uint8_t resol;
 };
 
-#endif /* __CROS_EC_ST_COMMONS_H */
+#endif /* PLATFORM_EC_DRIVER_STM_MEMS_COMMON_H_ */
