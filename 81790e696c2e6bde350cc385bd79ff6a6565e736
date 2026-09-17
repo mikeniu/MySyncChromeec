@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdb4e01c_f37157b9",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-09-17T11:07:18Z",
+      "side": 0,
+      "message": "do you need backlight control by EC ? are this GPIO is moving elsewhere.",
+      "range": {
+        "startLine": 92,
+        "startChar": 19,
+        "endLine": 92,
+        "endChar": 29
+      },
+      "revId": "81790e696c2e6bde350cc385bd79ff6a6565e736",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
