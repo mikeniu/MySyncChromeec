@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "94698058_5afab822",
+        "filename": "common/battery.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "This is existing legacy semantics from commit c4ec9ee779 (\"battery: Prevent CUTOFF_AT_SHUTDOWN when FORCE_CUTOFF_AT_SHUTDOWN is enabled\"). When `CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN` is enabled, the EC unconditionally cuts off battery during shutdown, so host requests attempting to schedule cutoff at shutdown are rejected with error. Leaving unchanged here to maintain behavioral parity in this migration CL.",
+      "parentUuid": "77dfe2f7_cc4815f1",
+      "range": {
+        "startLine": 581,
+        "startChar": 9,
+        "endLine": 581,
+        "endChar": 26
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "798f036a_801f90c4",
         "filename": "common/battery_info.c",
         "patchSetId": 25
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-17T03:11:58Z",
       "side": 1,
       "message": "EC_HOST_CMD_RESPONSE_TOO_BIG",
+      "range": {
+        "startLine": 149,
+        "startChar": 10,
+        "endLine": 149,
+        "endChar": 38
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9e60d3d_101bf078",
+        "filename": "common/battery_info.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "798f036a_801f90c4",
       "range": {
         "startLine": 149,
         "startChar": 10,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38aba44b_538a4d2f",
+        "filename": "common/battery_info.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2876030e_2e896728",
+      "range": {
+        "startLine": 166,
+        "startChar": 10,
+        "endLine": 166,
+        "endChar": 38
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29cf2dc6_c8422763",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-09-17T03:11:58Z",
       "side": 1,
       "message": "EC_HOST_CMD_RESPONSE_TOO_BIG",
+      "range": {
+        "startLine": 183,
+        "startChar": 10,
+        "endLine": 183,
+        "endChar": 38
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c69e98ad_c4437fed",
+        "filename": "common/battery_info.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29cf2dc6_c8422763",
       "range": {
         "startLine": 183,
         "startChar": 10,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddc8d341_bae1cf32",
+        "filename": "common/battery_info.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d799ab5_677bf3e7",
+      "range": {
+        "startLine": 192,
+        "startChar": 10,
+        "endLine": 192,
+        "endChar": 38
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19b10492_4b944227",
@@ -129,6 +249,30 @@
       "writtenOn": "2026-09-17T03:11:58Z",
       "side": 1,
       "message": "EC_HOST_CMD_RESPONSE_TOO_BIG",
+      "range": {
+        "startLine": 235,
+        "startChar": 10,
+        "endLine": 235,
+        "endChar": 38
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc122470_f93350f1",
+        "filename": "common/battery_info.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19b10492_4b944227",
       "range": {
         "startLine": 235,
         "startChar": 10,
@@ -162,6 +306,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b8b7316_27bfb69f",
+        "filename": "common/battery_info.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa755ae1_68e7b63c",
+      "range": {
+        "startLine": 244,
+        "startChar": 10,
+        "endLine": 244,
+        "endChar": 38
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da2c676e_af939871",
@@ -175,6 +343,30 @@
       "writtenOn": "2026-09-17T03:11:58Z",
       "side": 1,
       "message": "EC_HOST_CMD_RESPONSE_TOO_BIG",
+      "range": {
+        "startLine": 2032,
+        "startChar": 10,
+        "endLine": 2032,
+        "endChar": 38
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0be723f_d7bc6f3b",
+        "filename": "common/charge_state.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 2032,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da2c676e_af939871",
       "range": {
         "startLine": 2032,
         "startChar": 10,
@@ -210,6 +402,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "54fcdbf1_e275a43e",
+        "filename": "common/charge_state.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 2304,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Agreed. Because `ec_params_charge_state` and its subcommands have varying request and response payload sizes between v0 (1-byte request) and v1, I have changed the registration to `EC_HOST_CMD_HANDLER_UNBOUND` and added per-subcommand validation for input size (`EC_HOST_CMD_REQUEST_TRUNCATED`) and output buffer capacity (`EC_HOST_CMD_RESPONSE_TOO_BIG`).",
+      "parentUuid": "a84a26b1_310546d1",
+      "range": {
+        "startLine": 2304,
+        "startChar": 13,
+        "endLine": 2304,
+        "endChar": 35
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0476fbd3_c9e8486c",
         "filename": "common/chargesplash.c",
         "patchSetId": 25
@@ -221,6 +437,30 @@
       "writtenOn": "2026-09-17T03:11:58Z",
       "side": 1,
       "message": "EC_HOST_CMD_REQUEST_TRUNCATED. does the framework already prevent this?",
+      "range": {
+        "startLine": 224,
+        "startChar": 9,
+        "endLine": 224,
+        "endChar": 34
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42c20920_04fdf8b8",
+        "filename": "common/chargesplash.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Yes, updated",
+      "parentUuid": "0476fbd3_c9e8486c",
       "range": {
         "startLine": 224,
         "startChar": 9,
@@ -254,6 +494,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "768ade5b_e6fc3951",
+        "filename": "common/chargesplash.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d129337b_30d1c754",
+      "range": {
+        "startLine": 228,
+        "startChar": 9,
+        "endLine": 228,
+        "endChar": 37
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6473b2b6_edf00195",
@@ -271,6 +535,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b223920_4b97cb1c",
+        "filename": "common/peripheral_charger.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 1019,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6473b2b6_edf00195",
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d2fb40c_bad38b48",
@@ -284,6 +566,30 @@
       "writtenOn": "2026-09-17T03:11:58Z",
       "side": 1,
       "message": "EC_HOST_CMD_RESPONSE_TOO_BIG",
+      "range": {
+        "startLine": 1022,
+        "startChar": 10,
+        "endLine": 1022,
+        "endChar": 38
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d27d2d77_71d14d22",
+        "filename": "common/peripheral_charger.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 1022,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d2fb40c_bad38b48",
       "range": {
         "startLine": 1022,
         "startChar": 10,
@@ -317,6 +623,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61308c07_80ce1ae2",
+        "filename": "common/peripheral_charger.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 1028,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7163f52_f5214cdd",
+      "range": {
+        "startLine": 1028,
+        "startChar": 10,
+        "endLine": 1028,
+        "endChar": 38
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9bb1e13_7d38138a",
@@ -330,6 +660,30 @@
       "writtenOn": "2026-09-17T03:11:58Z",
       "side": 1,
       "message": "EC_HOST_CMD_INVALID_VERSION, but this should never happen.",
+      "range": {
+        "startLine": 109,
+        "startChar": 9,
+        "endLine": 109,
+        "endChar": 34
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "117c80a1_fc6340df",
+        "filename": "power/common.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9bb1e13_7d38138a",
       "range": {
         "startLine": 109,
         "startChar": 9,
@@ -363,6 +717,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5fe57d6_526214ba",
+        "filename": "power/host_sleep.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0eda4d1e_63f2b751",
+      "range": {
+        "startLine": 61,
+        "startChar": 24,
+        "endLine": 61,
+        "endChar": 25
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3b6b8908_c8ac8a54",
@@ -386,6 +764,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ece9e672_6926ccad",
+        "filename": "power/host_sleep.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b6b8908_c8ac8a54",
+      "range": {
+        "startLine": 77,
+        "startChar": 11,
+        "endLine": 77,
+        "endChar": 39
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bedd6b58_bd914861",
@@ -399,6 +801,30 @@
       "writtenOn": "2026-09-17T03:11:58Z",
       "side": 1,
       "message": "\u0026\u0026 args-\u003einput_buff_size \u003e sizeof(*p)...",
+      "range": {
+        "startLine": 55,
+        "startChar": 24,
+        "endLine": 55,
+        "endChar": 25
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96580ba4_26b0d8a0",
+        "filename": "zephyr/subsys/ap_pwrseq/x86_non_dsx_common_pwrseq_host_command.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-17T17:59:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bedd6b58_bd914861",
       "range": {
         "startLine": 55,
         "startChar": 24,
