@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "022e28da_50ca9d09",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T18:33:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b2faea8_c7d339a9",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44866e67_b05978be",
@@ -107,6 +125,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6360ac4d_5ae408fe",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T18:33:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53e60f90_44139247",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f25dfe15_e946d95d",
@@ -138,6 +174,24 @@
       "side": 1,
       "message": "The CONFIG_ROLLBACK_SIZE is defined as rollback0_size + rollback1_size, is that OK",
       "parentUuid": "f25dfe15_e946d95d",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eae9d2dc_8746597c",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T18:33:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a9ce889_0250f3c4",
       "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -209,6 +263,24 @@
       "side": 1,
       "message": "I have added a comment about this.\nHowever, this configuration causes MPU-related tests (such as rollback_region) to consistently fail because the tests are running in privileged mode, so MPU errors cannot be triggered when running these tests. And I noticed that the FPMCU applications do not enable `CONFIG_USERSPACE`, so the MPU\u0027s protection function is unlikely to be working. Do you have any idea about it?",
       "parentUuid": "1baf009c_92e8e96e",
+      "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbed3293_ade54683",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T18:33:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b4484a5_cd031304",
       "revId": "bc6d50a9b87a4fccf9f9b06a8f95c14a4aa5eaf0",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },

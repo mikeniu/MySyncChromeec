@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fec6bcf4_3b7f5cd4",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T18:33:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed40cdd1_8155d2c5",
+      "range": {
+        "startLine": 32,
+        "startChar": 1,
+        "endLine": 36,
+        "endChar": 6
+      },
+      "revId": "b77b5c4509f6140ec7b50fe532f2997d8d3bbd59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cfc00122_5c0a6b4d",
@@ -95,6 +119,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "56aec11a_2c70e352",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T18:33:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb03cdc5_a1593ff9",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 56
+      },
+      "revId": "b77b5c4509f6140ec7b50fe532f2997d8d3bbd59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "948f43f4_72f50ec9",
@@ -132,6 +180,30 @@
       "side": 1,
       "message": "OK, modified",
       "parentUuid": "948f43f4_72f50ec9",
+      "range": {
+        "startLine": 31,
+        "startChar": 1,
+        "endLine": 65,
+        "endChar": 2
+      },
+      "revId": "b77b5c4509f6140ec7b50fe532f2997d8d3bbd59",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ad15a3b_e75f17b7",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T18:33:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e885e443_3f6214db",
       "range": {
         "startLine": 31,
         "startChar": 1,
