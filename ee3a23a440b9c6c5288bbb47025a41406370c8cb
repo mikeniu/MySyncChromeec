@@ -36,6 +36,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2dd789b_5311c887",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-09-17T06:50:20Z",
+      "side": 1,
+      "message": "Done. The command returned success:\n```\n$ zmake compare-builds --ref1 8ddd37e0d9b --ref2 ccbeac10fbb sanok srebrna\nstobnica smolec chudow chobienia niedzica bloonchipper helipilot 2\u003e\u00261 | tee\ncompare-builds-nocache.log\n$ tail -n 3 compare-builds-nocache.log \nZephyr compare builds successful:\n   8ddd37e0d9b (8ddd37e0d9bd778a84fabee7f9f5b4682c64e709): \"Update expected diffs\nand upstream commit hashes\"\n   ccbeac10fbb (ccbeac10fbba0c49d3ee6653b30fdae0ea9306d9): \"fpsensor: add\n__nocache support for fingerprint frame buffer\"\n```",
+      "parentUuid": "b6430472_253e2c84",
+      "revId": "ee3a23a440b9c6c5288bbb47025a41406370c8cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ba83b2b_a08abc3f",
