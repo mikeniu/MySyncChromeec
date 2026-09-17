@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9be32ae_1cd8874c",
+        "filename": "zephyr/program/bluey/meru/project.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-17T01:05:10Z",
+      "side": 1,
+      "message": "Meru does not have the `google-private` repo now, b/562282757.",
+      "parentUuid": "bec488c9_e8d9b751",
+      "revId": "aea5970e2f181d149cb220df26694ce2bdc470c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "81d9a0f2_379a9f10",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-09-16T18:23:03Z",
       "side": 1,
       "message": "we have enabled hibernation for all board except quartz and mica",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 30
+      },
+      "revId": "aea5970e2f181d149cb220df26694ce2bdc470c4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bd1f739_c7ddd047",
+        "filename": "zephyr/program/bluey/meru/project.conf",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-17T01:05:10Z",
+      "side": 1,
+      "message": "This requires EC `PSL_IN` hardware change. We will verify the functionality on the proto board before enabling it.",
+      "parentUuid": "81d9a0f2_379a9f10",
       "range": {
         "startLine": 34,
         "startChar": 0,
