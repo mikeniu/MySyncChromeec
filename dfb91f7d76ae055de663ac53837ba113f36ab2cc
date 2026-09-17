@@ -22,6 +22,25 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "cba9fe7f_7ebe1270",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T00:35:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/e3c1f73e-7188-4d76-9145-a8740e4b16d5)]\n\n**Review Summary:**\n*   **Functionality \u0026 Security:** Cortex-M33 (ARMv8-M) MPU support is correctly added. The mechanism to lock the rollback region by disabling the MPU region (relying on `CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy` for protection) is logically sound and well-documented.\n*   **Style \u0026 Consistency:** The code uses appropriate Zephyr macros and devicetree bindings. The author has acknowledged previous style feedback regarding `#if defined()` abstractions, pending the next patchset upload.\n*   **CL Size \u0026 Scope:** The CL is appropriately scoped to adding Cortex-M33 support.\n*   **Testing:** As previously discussed, MPU faults in privileged mode tests on ARMv8-M are a known limitation when relying on the disabled background map. Hardware/manual validation is acceptable in this case.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "dfb91f7d76ae055de663ac53837ba113f36ab2cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "b756dba1_8e397c04",
         "filename": "zephyr/shim/chip/rtkfp/mpu_regions.c",
         "patchSetId": 10
