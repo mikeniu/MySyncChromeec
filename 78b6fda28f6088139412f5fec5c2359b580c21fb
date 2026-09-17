@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d5b40b8_399fe670",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T00:15:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/cef94ea3-92c8-4115-9022-698d6d2a9e82)]\n\n### Review Summary\n\n*   **Functionality:** The build system changes properly create symlinks to the local checkout\u0027s exported headers in `$(out)/include/chromeos/ec/` and ensure host utilities correctly resolve these headers over the system ones. The addition of `.d` dependencies for host utils in `Makefile` and `-MP` in `cmd_c_to_host` and `cmd_cxx_to_host` correctly handles incremental builds. The use of relative symlinks (`ln -srf`) fixes relocatability concerns from previous patchsets. The `#ifndef` header guard cleanup is straightforward and complete.\n*   **Security:** No security implications.\n*   **Style:** Clean and follows standard Make practices. The C preprocessor cleanup is perfectly aligned with the `TODO` removals.\n*   **Testing \u0026 Test Coverage:** As this is a build system and header configuration change, the specified manual test (`make build/host/util/ectool`) is the most appropriate way to verify the behavior.\n*   **CL Size \u0026 Scope:** The CL is appropriately scoped to fixing the build configuration for host tools and removing the associated outdated header guard logic.\n\nAll previous feedback has been nicely addressed. Great cleanup!",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "78b6fda28f6088139412f5fec5c2359b580c21fb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
