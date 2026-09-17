@@ -8,6 +8,8 @@
 #include "stubs.h"
 #include "temp_sensor/temp_sensor.h"
 
+#include <string.h>
+
 #include <zephyr/ztest.h>
 
 #define TEMP_CPU TEMP_SENSOR_ID(DT_NODELABEL(temp_cpu))
@@ -20,7 +22,9 @@ static void test_fan_before(void *fixture)
 	ARG_UNUSED(fixture);
 	RESET_FAKE(chipset_get_power_on_reason);
 	RESET_FAKE(fan_set_duty);
+	RESET_FAKE(fan_get_duty);
 	RESET_FAKE(fan_smart_control);
+	memset(fan_data, 0, sizeof(fan_data));
 	RESET_FAKE(fan_set_rpm_mode);
 	RESET_FAKE(fan_set_rpm_target);
 	RESET_FAKE(chipset_in_state);

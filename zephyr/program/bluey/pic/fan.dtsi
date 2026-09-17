@@ -9,9 +9,9 @@
 
 		fan1: fan_1 {
 			pwms = <&pwm5 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
-			rpm-min = <3150>;
-			rpm-start = <3150>;
-			rpm-max = <8500>;
+			rpm-min = <2000>;
+			rpm-start = <2000>;
+			rpm-max = <4000>;
 			rpm-deviation = <1>;
 			tach = <&tach2>;
 		};
@@ -25,39 +25,29 @@
 			rpm-target = <0>;
 		};
 		level_1 {
-			temp-on = <47>;
-			temp-off = <44>;
-			rpm-target = <4500>;
+			temp-on = <48>;
+			temp-off = <43>;
+			rpm-target = <2500>;
 		};
 		level_2 {
-			temp-on = <50>;
+			temp-on = <51>;
 			temp-off = <46>;
-			rpm-target = <5200>;
+			rpm-target = <2800>;
 		};
 		level_3 {
-			temp-on = <53>;
+			temp-on = <55>;
 			temp-off = <49>;
-			rpm-target = <6000>;
+			rpm-target = <3100>;
 		};
 		level_4 {
-			temp-on = <56>;
-			temp-off = <52>;
-			rpm-target = <6800>;
+			temp-on = <59>;
+			temp-off = <53>;
+			rpm-target = <3300>;
 		};
 		level_5 {
-			temp-on = <68>;
-			temp-off = <54>;
-			rpm-target = <7500>;
-		};
-		level_6 {
-			temp-on = <72>;
-			temp-off = <66>;
-			rpm-target = <8000>;
-		};
-		level_7 {
 			temp-on = <99>;
-			temp-off = <70>;
-			rpm-target = <8300>;
+			temp-off = <57>;
+			rpm-target = <3400>;
 		};
 	};
 };
