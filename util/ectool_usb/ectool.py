@@ -631,10 +631,18 @@ def cmd_wait_for_event(args, comm) -> int:
 def get_frame_size(capture_type, comm) -> tuple[int, int]:
     """Gets FP frame size."""
 
-    fp_info = commands.FpInfoCmd2()
+    fp_info_cmd = commands.get_cmd(commands.ECCommandsIds.FP_INFO, comm)
+    if not fp_info_cmd:
+        print("No supported FP info")
+        return None
+    fp_info = fp_info_cmd()
     ret = fp_info.run(comm)
     if ret != commands.EcCommandResult.SUCCESS:
         print(f"Failed to get FP info: {ret.name}")
+        return None
+
+    if fp_info.cmd_version == 1:
+        print("FP info v1 doesn't support capture type queries")
         return None
 
     for image_frame_params in fp_info.response.image_frame_params:
