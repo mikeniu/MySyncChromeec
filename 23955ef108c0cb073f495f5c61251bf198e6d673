@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ccd16013_6159d2ef",
+        "filename": "zephyr/program/fpmcu/dartmonkey/soc.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-17T08:49:52Z",
+      "side": 1,
+      "message": "Please add a comment how this is used.",
+      "revId": "23955ef108c0cb073f495f5c61251bf198e6d673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1aad7ca9_7bd26f53",
+        "filename": "zephyr/program/fpmcu/dartmonkey/soc.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-17T08:49:52Z",
+      "side": 1,
+      "message": "Please add a comment that CKPER_SEL(0) selects hsi_ker_ck as a source clock.",
+      "revId": "23955ef108c0cb073f495f5c61251bf198e6d673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5e74adf_1dd4b89e",
+        "filename": "zephyr/program/fpmcu/dartmonkey/soc.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-17T08:49:52Z",
+      "side": 1,
+      "message": "Please add a comment why source clock is configured in this way. Applies to all peripherals.",
+      "revId": "23955ef108c0cb073f495f5c61251bf198e6d673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f62f1007_ffb71636",
+        "filename": "zephyr/program/fpmcu/dartmonkey/soc.dtsi",
+        "patchSetId": 4
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-17T08:49:52Z",
+      "side": 1,
+      "message": "Please add a comment how this is used and why it\u0027s configured here.",
+      "revId": "23955ef108c0cb073f495f5c61251bf198e6d673",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
