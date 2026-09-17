@@ -3,20 +3,15 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Helper script to run the EC Firmware Docker environment with
-# persistent caching and hardware device forwarding (CCD/Servo and
-# Serial TTYs).
+# Thin wrapper around "docker run" for the EC firmware container, adding
+# host user mapping and hardware device forwarding (CCD/Servo and Serial
+# TTYs).
 
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORKSPACE_DIR="${SCRIPT_DIR}/workspace"
-CACHE_DIR="${WORKSPACE_DIR}/.cache/coreboot-sdk"
-IMAGE_NAME="ec-builder"
-
-# Ensure directories exist on host
-mkdir -p "${WORKSPACE_DIR}"
-mkdir -p "${CACHE_DIR}"
+# Resolve the workspace against this script's location, not the caller's
+# working directory.
+WORKSPACE_DIR="$(realpath "$(dirname "${BASH_SOURCE[0]}")/workspace")"
 
 # Hardware access is granted in two independent layers:
 #
@@ -39,20 +34,19 @@ mkdir -p "${CACHE_DIR}"
 # Those majors are statically assigned so they are stable across distros, but
 # the list has to be extended for hardware using any other driver, so the
 # wildcard is the default.
-DOCKER_ARGS=(
-  --rm
-  --device-cgroup-rule="c *:* rmw"
-  -e "HOST_UID=$(id -u)"
-  -e "HOST_GID=$(id -g)"
-  -v "${WORKSPACE_DIR}:/workspace"
-  -v "/dev:/dev"
-)
 
-# Only allocate TTY if attached to an interactive terminal
+# Only allocate a TTY when attached to an interactive terminal, so that the
+# wrapper stays usable from scripts and CI.
+TTY_ARGS=()
 if [ -t 0 ] && [ -t 1 ]; then
-  DOCKER_ARGS+=( -it )
+  TTY_ARGS=( -it )
 fi
 
-# Execute the container run
-echo "Launching Docker container..."
-exec docker run "${DOCKER_ARGS[@]}" "${IMAGE_NAME}" "$@"
+exec docker run --rm \
+  "${TTY_ARGS[@]}" \
+  --device-cgroup-rule="c *:* rmw" \
+  -e "HOST_UID=$(id -u)" \
+  -e "HOST_GID=$(id -g)" \
+  -v "${WORKSPACE_DIR}:/workspace" \
+  -v /dev:/dev \
+  ec-builder "$@"
