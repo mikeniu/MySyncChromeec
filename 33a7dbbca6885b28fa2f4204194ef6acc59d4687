@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74409cef_4f0a95b7",
+        "filename": "common/battery.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-17T18:53:54Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "94698058_5afab822",
+      "range": {
+        "startLine": 581,
+        "startChar": 9,
+        "endLine": 581,
+        "endChar": 26
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "798f036a_801f90c4",
@@ -414,6 +438,30 @@
       "side": 1,
       "message": "Agreed. Because `ec_params_charge_state` and its subcommands have varying request and response payload sizes between v0 (1-byte request) and v1, I have changed the registration to `EC_HOST_CMD_HANDLER_UNBOUND` and added per-subcommand validation for input size (`EC_HOST_CMD_REQUEST_TRUNCATED`) and output buffer capacity (`EC_HOST_CMD_RESPONSE_TOO_BIG`).",
       "parentUuid": "a84a26b1_310546d1",
+      "range": {
+        "startLine": 2304,
+        "startChar": 13,
+        "endLine": 2304,
+        "endChar": 35
+      },
+      "revId": "33a7dbbca6885b28fa2f4204194ef6acc59d4687",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b64b3d2_3f707b4a",
+        "filename": "common/charge_state.c",
+        "patchSetId": 25
+      },
+      "lineNbr": 2304,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-17T18:53:54Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "54fcdbf1_e275a43e",
       "range": {
         "startLine": 2304,
         "startChar": 13,
