@@ -54,6 +54,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c47c1a7_5d84ddbe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1265562
+      },
+      "writtenOn": "2026-09-17T17:19:13Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "97e59728_345a1f9d",
+      "revId": "93af3eb45d11638dee8343dca2ff99674f012012",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a855d04d_ae02aef0",
@@ -75,6 +93,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "93af3eb45d11638dee8343dca2ff99674f012012",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd467a14_46e960ee",
+        "filename": "third_party/linux/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1265562
+      },
+      "writtenOn": "2026-09-17T17:19:13Z",
+      "side": 1,
+      "message": "I am open to suggestions, but so far I don\u0027t see good options for properly filtering the AutoVM monitoring for a single header.\n\nHonestly, from the security team perspective it would be better you take this header from `third_party/kernel/upstream` or some place that has its own scanning and patching rather than keeping a separate copy that needs its own monitoring.",
+      "parentUuid": "a855d04d_ae02aef0",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 9999
+      },
       "revId": "93af3eb45d11638dee8343dca2ff99674f012012",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
