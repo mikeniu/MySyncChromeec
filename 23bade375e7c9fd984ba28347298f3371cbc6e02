@@ -33,6 +33,24 @@
       "message": "Please also adjust all elan80series tests.",
       "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35630c86_7cf30c62",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-17T06:19:42Z",
+      "side": 1,
+      "message": "I\u0027m working on updating the elan80series tests. Could you share the command to run these tests locally so I can verify my changes?",
+      "parentUuid": "b8f62922_8d2426ce",
+      "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
