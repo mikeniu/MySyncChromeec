@@ -423,9 +423,18 @@ class Renode(Platform):
 
     def __init__(self):
         self.process = None
+        self.temp_dir = None
+
+    @property
+    def _env_dir(self) -> str:
+        """Lazily initialize the isolated environment and return its path."""
+        if not self.temp_dir:
+            # pylint: disable-next=consider-using-with
+            self.temp_dir = tempfile.TemporaryDirectory(prefix="ec-renode-")
+        return self.temp_dir.name
 
     def get_console(self, board_config: BoardConfig) -> Optional[str]:
-        return "/tmp/renode-uart"
+        return os.path.join(self._env_dir, "renode-uart")
 
     def hw_write_protect(self, enable: bool) -> None:
         pass
@@ -447,10 +456,15 @@ class Renode(Platform):
         if self.process:
             self.cleanup()
 
+        uart_pty = os.path.join(self._env_dir, "renode-uart")
+        log_path = os.path.join(self._env_dir, "renode.log")
+
         cmd = [
             "./util/renode-ec-launch",
             "--board",
             board_config.name,
+            "--uart",
+            uart_pty,
             "--gdb-port",
             "0",
         ]
@@ -467,13 +481,21 @@ class Renode(Platform):
         if enable_hw_write_protect:
             cmd.append("--enable-write-protect")
 
-        # pylint: disable-next=consider-using-with
-        self.process = subprocess.Popen(
-            cmd,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            start_new_session=True,
-        )
+        env = os.environ.copy()
+        env["XDG_CONFIG_HOME"] = self._env_dir
+        # Open within a context manager; Popen inherits the duplicated
+        # underlying OS file descriptor, so closing the parent's Python
+        # file object immediately is safe.
+        with open(log_path, "wb") as renode_log_file:
+            # pylint: disable-next=consider-using-with
+            self.process = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=renode_log_file,
+                stderr=subprocess.STDOUT,
+                start_new_session=True,
+                env=env,
+            )
         time.sleep(10)
         return True
 
@@ -487,6 +509,10 @@ class Renode(Platform):
             with suppress(subprocess.TimeoutExpired, ProcessLookupError):
                 self.process.wait(timeout=5)
             self.process = None
+        if self.temp_dir:
+            with suppress(OSError):
+                self.temp_dir.cleanup()
+            self.temp_dir = None
 
     def _skip_test_bloonchipper(
         self, test_config: TestConfig, zephyr: bool
