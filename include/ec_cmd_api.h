@@ -3,11 +3,8 @@
  * found in the LICENSE file.
  */
 
-#if !defined(PLATFORM_EC_INCLUDE_EC_CMD_API_H_) && \
-	!defined(__CROS_EC_EC_CMD_API_H)
+#ifndef PLATFORM_EC_INCLUDE_EC_CMD_API_H_
 #define PLATFORM_EC_INCLUDE_EC_CMD_API_H_
-/* TODO(b/510249930): Remove this once all ec_cmd_api.h copies are updated. */
-#define __CROS_EC_EC_CMD_API_H
 
 #ifdef __cplusplus
 extern "C" {
