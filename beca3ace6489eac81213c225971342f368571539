@@ -16,6 +16,24 @@
       "message": "@li1.feng@intel.com does atria need this?",
       "revId": "beca3ace6489eac81213c225971342f368571539",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00f5525f_32a138e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1116125
+      },
+      "writtenOn": "2026-09-17T19:52:29Z",
+      "side": 1,
+      "message": "Atria motion sensors are active during both S0 and S0ix(S3) so Atria doesn\u0027t need this. The fix only is applied to sensors which are inactive in S0ix(or S3).",
+      "parentUuid": "0fb68e18_d05381c9",
+      "revId": "beca3ace6489eac81213c225971342f368571539",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
