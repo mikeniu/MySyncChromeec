@@ -41,6 +41,25 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "a9151167_09d1b6e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T00:38:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/caa7513c-a8b6-4a31-94f7-90008fdfe157)]\n\n**Review Summary:**\n* **Functionality \u0026 Security:** The MPU support for Cortex-M33 is cleanly implemented. The strategy of using a disabled background map (`CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy`) in conjunction with disabling the specific MPU region to achieve rollback locking is correct and addresses previous security considerations. \n* **Style \u0026 Consistency:** The code conforms well to Zephyr\u0027s style guidelines. Re-using the statically defined MPU regions via `arm_cmse_mpu_region_get` is an elegant approach for ARMv8-M.\n* **Testing \u0026 Scope:** The patch is correctly scoped. Since MPU faults in privileged mode tests on ARMv8-M with a disabled background map are a known limitation, explicit hardware tests or validation are acceptable here.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "dfb91f7d76ae055de663ac53837ba113f36ab2cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "b756dba1_8e397c04",
         "filename": "zephyr/shim/chip/rtkfp/mpu_regions.c",
         "patchSetId": 10
@@ -56,6 +75,31 @@
         "startLine": 29,
         "startChar": 0,
         "endLine": 29,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "dfb91f7d76ae055de663ac53837ba113f36ab2cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d7f7dae_e96cedb3",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T00:38:34Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider checking `if (region \u003e\u003d 0)` instead of `!\u003d -EINVAL`. This is more robust in case the underlying lookup function ever returns a different negative error code (e.g., `-ENOENT`).",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 117,
         "endChar": 9999
       },
       "tag": "cl_review_agent",
