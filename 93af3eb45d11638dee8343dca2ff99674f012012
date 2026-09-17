@@ -33,6 +33,50 @@
       "message": "Defer to Tom, who added this file in the first place.",
       "revId": "93af3eb45d11638dee8343dca2ff99674f012012",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97e59728_345a1f9d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T17:14:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](https://goto.corp.google.com/traj/08b4a7f6-2d04-4ef8-9c2d-020d368148aa)]\n\n**Review Summary**\n*   **Functionality \u0026 Policy:** The CL removes the `METADATA` file to reduce Linux CVE noise, but replacing it with `README.md` breaks integration with automated license compliance and security vulnerability tracking tools.\n*   **Security:** Bypassing CVE tracking by removing the `METADATA` file means any future vulnerabilities in this specific header might not be automatically flagged.\n*   **Style:** The `README.md` is readable and captures the source information well.\n*   **Testing \u0026 Test Coverage:** N/A (Documentation/Metadata change only).\n*   **CL Size \u0026 Scope:** **XS** (Size is small and well-scoped to this specific change).",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "93af3eb45d11638dee8343dca2ff99674f012012",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a855d04d_ae02aef0",
+        "filename": "third_party/linux/README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T17:14:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While I understand the intent to avoid noisy CVE tracking for a single header, replacing the `METADATA` file with a plain `README.md` completely bypasses automated license compliance and security scanning tools.\n\nConsider if there is a supported way in the `METADATA` schema to filter or scope CVE tracking, or consult with the security team before removing standard metadata from a `third_party/` directory.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "93af3eb45d11638dee8343dca2ff99674f012012",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
