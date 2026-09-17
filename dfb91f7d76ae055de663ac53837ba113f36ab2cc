@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0a50bb4_23a62a24",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T00:31:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/f959de74-1c59-4f66-bb8a-e83760d50750)]\n\n**Review Summary:**\n*   **Functionality:** The Cortex-M33 (ARMv8-M) MPU support is implemented correctly. The fallback to disabling the region for lock operations (due to the lack of `P_NA` permissions) is well-documented and logically sound given `CONFIG_MPU_DISABLE_BACKGROUND_MAP\u003dy`.\n*   **Security:** Access restrictions are appropriately handled for the rollback regions using the MPU.\n*   **Style:** Clean and well-commented. The recent refactoring to handle M33 differences using preprocessor directives is clear. Left a minor inline suggestion to explicitly sum the sizes of the rollback regions for better robustness.\n*   **Consistency:** Consistent with Zephyr\u0027s ARMv8-M MPU configuration APIs.\n*   **Testing \u0026 CL Size:** The CL is scoped perfectly to the new SoC support. As discussed in previous iterations, MPU faults in privileged mode tests on ARMv8-M are a known limitation; manual or HW validation is acceptable here. No new unit tests requested.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "dfb91f7d76ae055de663ac53837ba113f36ab2cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b756dba1_8e397c04",
+        "filename": "zephyr/shim/chip/rtkfp/mpu_regions.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T00:31:50Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] While there is a `BUILD_ASSERT` ensuring `rollback0` and `rollback1` are contiguous, using `2 * DT_REG_SIZE(DT_NODELABEL(rollback0))` implicitly assumes that `rollback0` and `rollback1` have the exact same size. For strict correctness and robustness against future devicetree changes, consider explicitly summing their sizes:\n\n```c\n#define REGION_FLASH_ROLLBACK_SIZE (DT_REG_SIZE(DT_NODELABEL(rollback0)) + \\\n                                    DT_REG_SIZE(DT_NODELABEL(rollback1)))\n```",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "dfb91f7d76ae055de663ac53837ba113f36ab2cc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
