@@ -15,6 +15,11 @@ if [ "$(id -u)" = "0" ] && [ -n "${HOST_UID}" ] && \
     # Prepare devutils directory for monitor binary installation
     mkdir -p /usr/share/ec-devutils
     chown -R "${HOST_UID}:${HOST_GID}" /usr/share/ec-devutils
+    # First run: Bind-mounted directory does not exist; implicitly created by
+    # root. Transfer to the unprivileged user.
+    # Subsequent runs: Unprivileged user already owns it. chown is a no-op.
+    # Not recursive: The user created and owns the contents.
+    chown "${HOST_UID}:${HOST_GID}" /workspace
     chmod 755 /entrypoint.sh
     exec gosu hostuser /bin/bash /entrypoint.sh "$@"
 fi
