@@ -21,6 +21,7 @@
 
 DECLARE_FAKE_VALUE_FUNC(enum power_on_event_t, chipset_get_power_on_reason);
 DECLARE_FAKE_VOID_FUNC(fan_set_duty, int, int);
+DECLARE_FAKE_VALUE_FUNC(int, fan_get_duty, int);
 DECLARE_FAKE_VALUE_FUNC(enum fan_status, fan_smart_control, int);
 DECLARE_FAKE_VOID_FUNC(fan_set_rpm_mode, int, int);
 DECLARE_FAKE_VOID_FUNC(fan_set_rpm_target, int, int);
