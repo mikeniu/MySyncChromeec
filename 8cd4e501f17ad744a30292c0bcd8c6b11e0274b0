@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22a22558_0dd81ab9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-17T15:56:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/2b7a2fd4-bc35-45f3-b557-6015b84e8f1b)]\n\n**Review Summary:**\n*   **Functionality:** The devicetree addition of `config4` for `PATTERN2` in `smolec.dts` is correct and properly maps `FINGERPRINT_CAPTURE_TYPE_PATTERN2`.\n*   **Security:** No security issues introduced by this configuration change.\n*   **Style:** Code style is clean and consistent with the surrounding `config` blocks.\n*   **Testing \u0026 Test Coverage:** Manual test steps (`ectool.py`) are clearly documented. Resolving the previous patchset feedback by dropping the `native_sim.overlay` modification ensures that existing simulation test configurations (like `RESET_TEST`) remain intact.\n*   **CL Size \u0026 Scope:** The CL is appropriately sized, focused, and self-contained.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8cd4e501f17ad744a30292c0bcd8c6b11e0274b0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
