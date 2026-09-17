@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fe390817_3464d050",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-09-17T11:57:36Z",
+      "side": 1,
+      "message": "\u003e Should we use PWM to control brightness?\n\ndo we have charging LED on the chassis ?",
+      "parentUuid": "fe6458c7_6c1b6f88",
+      "range": {
+        "startLine": 215,
+        "startChar": 2,
+        "endLine": 222,
+        "endChar": 4
+      },
+      "revId": "c05b3746b16edcbc0cc422b4a4809758b6a28843",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "042479b2_a603551d",
         "filename": "zephyr/program/bluey/meru/led_pins.dtsi",
         "patchSetId": 2
