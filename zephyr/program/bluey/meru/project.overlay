@@ -68,7 +68,7 @@
 
 	gpio-interrupts {
 		int_extpower_a: extpower_a {
-			irq-pin = <&gpio_smb2360_a_chg_led_pg_odl>;
+			irq-pin = <&gpio_pgood_acok_odl>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "extpower_interrupt";
 		};
@@ -164,4 +164,11 @@
 		&adc0_chan7_gpe1
 		&adc0_chan11_gpc7>;
 	pinctrl-names = "default";
+};
+
+/* Power domain device controlled by PSL (Power Switch Logic) IO pads */
+&power_ctrl_psl {
+	status = "okay";
+	pinctrl-names = "sleep";
+	pinctrl-0 = <&psl_in1_gpd2 &psl_in2_gp00 &psl_in3_gp01 &psl_in4_gp02>;
 };
