@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcbb83d9_1cae0c78",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-18T07:19:44Z",
+      "side": 1,
+      "message": "proto board has a charging/power LED to indicate the board\u0027s power state, but the LED will be removed after proto",
+      "parentUuid": "fe390817_3464d050",
+      "range": {
+        "startLine": 215,
+        "startChar": 2,
+        "endLine": 222,
+        "endChar": 4
+      },
+      "revId": "c05b3746b16edcbc0cc422b4a4809758b6a28843",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "042479b2_a603551d",
