@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cb2b3f4_dc41e39a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-18T16:47:58Z",
+      "side": 1,
+      "message": "Nit: Implicitly, this is a cherry pick of CL:8139628. There was already a partial cherry pick in CL:8164129, so this can\u0027t literally be a cherry pick as far as Gerrit is concerned. But it might still be helpful to reference the original commit or CL number in the commit message.",
+      "revId": "543c2da33574a801b934a9caba43cb4da9f71fff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d17bbf4e_323d44c6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-18T16:47:58Z",
+      "side": 1,
+      "message": "Nit: This appears to be the wrong bug number, and \"CL:8094724\" below is also invalid. These were copied from the original commit message, where they are also wrong. I think you could defend leaving them in place or removing them and putting in a bug number that makes sense.",
+      "revId": "543c2da33574a801b934a9caba43cb4da9f71fff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
