@@ -4,7 +4,7 @@ This directory contains the Docker and scripting configuration to set up an
 isolated, automated build and test environment for building ChromiumOS EC
 firmware and running tests on the Dagwood test fixture.
 
-The docker build is setup to clone all repositories needed to build EC
+The docker build is set up to clone all repositories needed to build EC
 firmware images and run the twister based tests.
 
 When entering the container, the entrypoint.sh script pulls the latest
@@ -110,7 +110,7 @@ zmake --checkout /workspace build skyrim
 ```
 
 Because zmake is not running inside a full cros_sdk checkout, you must always
-specify the `--checkout /workspace` option when running `zmake commands.
+specify the `--checkout /workspace` option when running `zmake` commands.
 
 The final firmware image will be populated on your host filesystem at
 `workspace/src/platform/ec/build/zephyr/skyrim/output/ec.bin`.
@@ -131,7 +131,7 @@ To run host-based emulation tests using Zephyr's Twister inside the container:
    ```
 
 #### 2. Real Device Testing on Dagwood (using Helper Script)
-To run tests against a Dagwoord board and EC Add-in-card (AIC) connected to the
+To run tests against a Dagwood board and EC Add-in-card (AIC) connected to the
 host, you can use the `run_dagwood_tests.py` helper script. It automatically
 handles device forwarding and configures twister with the required parameters
 (toolchain, flash command, etc.).
