@@ -187,6 +187,30 @@
       },
       "revId": "124007e1bf5ef30dcf129fd3b556feaa085e72ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb145cff_a33bf1c4",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 40
+      },
+      "lineNbr": 2019,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-18T16:02:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "21402417_cb41f1b3",
+      "range": {
+        "startLine": 2019,
+        "startChar": 0,
+        "endLine": 2019,
+        "endChar": 56
+      },
+      "revId": "124007e1bf5ef30dcf129fd3b556feaa085e72ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
