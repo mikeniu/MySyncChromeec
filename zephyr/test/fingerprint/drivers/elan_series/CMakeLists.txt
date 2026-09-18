@@ -4,10 +4,10 @@
 
 cmake_minimum_required(VERSION 3.13.1)
 find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
-project(elan80series_test)
+project(elan_series_test)
 
 FILE(GLOB app_sources src/*.c)
 target_sources(app PRIVATE ${app_sources})
 
-# Add fingerprint drivers directory to include fingerprint_elan80series_pal.h
+# Add fingerprint drivers directory to include fingerprint_elan_series_pal.h
 target_include_directories(app PUBLIC ${PLATFORM_EC}/zephyr/drivers/fingerprint)

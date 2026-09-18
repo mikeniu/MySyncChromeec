@@ -5,6 +5,6 @@
 
 / {
 	chosen {
-		cros-fp,fingerprint-sensor = &elan80series;
+		cros-fp,fingerprint-sensor = &elan_series;
 	};
 };
