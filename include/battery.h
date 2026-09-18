@@ -5,8 +5,8 @@
  * Battery charging parameters and constraints
  */
 
-#ifndef __CROS_EC_BATTERY_H
-#define __CROS_EC_BATTERY_H
+#ifndef PLATFORM_EC_INCLUDE_BATTERY_H_
+#define PLATFORM_EC_INCLUDE_BATTERY_H_
 
 #include "common.h"
 #include "compiler.h"
@@ -675,4 +675,4 @@ enum battery_access_type battery_check_access_limit(void);
 }
 #endif
 
-#endif /* __CROS_EC_BATTERY_H */
+#endif /* PLATFORM_EC_INCLUDE_BATTERY_H_ */

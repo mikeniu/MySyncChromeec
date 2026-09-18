@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef DT_BINDINGS_IMVP_H_
-#define DT_BINDINGS_IMVP_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DT_BINDINGS_IMVP_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DT_BINDINGS_IMVP_H_
 
 #define RT3645_UPDATE_ENTRY(page, reg, val) ((page) << 16 | (reg) << 8 | (val))
 
@@ -71,4 +71,4 @@
 #define PWM_HIZ_SEL_REG 0x12
 #define CRC_CHECK_REG 0x13
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DT_BINDINGS_IMVP_H_ */

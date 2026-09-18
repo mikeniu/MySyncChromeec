@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_PDC_H_
-#define ZEPHYR_INCLUDE_EMUL_PDC_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PDC_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PDC_H_
 
 #include "drivers/ucsi_v3.h"
 #include "usb_pd.h"
@@ -1056,4 +1056,4 @@ static inline int emul_pdc_get_max_pdp(const struct emul *target,
 	return -ENOSYS;
 }
 
-#endif /* ZEPHYR_INCLUDE_EMUL_PDC_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PDC_H_ */

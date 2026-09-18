@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CHARGER_CHG_RT9478_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CHARGER_CHG_RT9478_H_
+
 #include <zephyr/devicetree.h>
 #ifdef CONFIG_PLATFORM_EC_CHARGER_RT9478
 #include "driver/charger/rt9478.h"
@@ -25,3 +28,5 @@ extern "C" {
 #endif
 
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CHARGER_CHG_RT9478_H_ */

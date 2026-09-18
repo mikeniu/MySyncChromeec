@@ -60,7 +60,9 @@ ZTEST_USER(extra_tasks, test_hostcmd_thread_mapping)
 	k_tid_t main_thread;
 
 #ifdef CONFIG_HAS_HOSTCMD
-#ifdef CONFIG_TASK_HOSTCMD_THREAD_MAIN
+#if defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) || \
+	(defined(CONFIG_EC_HOST_CMD) &&         \
+	 !defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
 	k_thread_name_set(get_main_thread(), "HOSTCMD");
 #endif /* CONFIG_TASK_HOSTCMD_THREAD_MAIN */
 
@@ -68,7 +70,8 @@ ZTEST_USER(extra_tasks, test_hostcmd_thread_mapping)
 	zassert_not_null(hostcmd_thread);
 	zassert_equal(hostcmd_thread, get_hostcmd_thread());
 
-#ifdef CONFIG_TASK_HOSTCMD_THREAD_DEDICATED
+#if defined(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED) || \
+	defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)
 	main_thread = find_thread_by_name("main");
 	zassert_not_null(main_thread);
 	zassert_equal(main_thread, get_main_thread());

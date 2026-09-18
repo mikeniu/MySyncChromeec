@@ -5,8 +5,8 @@
 
 /* A drop-in replacement wrapper for OPENSSL_cleanse. */
 
-#ifndef __CROS_EC_CRYPTO_CLEANSE_WRAPPER_H
-#define __CROS_EC_CRYPTO_CLEANSE_WRAPPER_H
+#ifndef PLATFORM_EC_INCLUDE_CRYPTO_CLEANSE_WRAPPER_H_
+#define PLATFORM_EC_INCLUDE_CRYPTO_CLEANSE_WRAPPER_H_
 
 #include "openssl/mem.h"
 
@@ -42,4 +42,4 @@ template <typename T> class CleanseWrapper : public T {
 	}
 };
 
-#endif /* __CROS_EC_CRYPTO_CLEANSE_WRAPPER_H */
+#endif /* PLATFORM_EC_INCLUDE_CRYPTO_CLEANSE_WRAPPER_H_ */

@@ -5,8 +5,8 @@
 
 /* USB Power delivery port management */
 
-#ifndef __CROS_EC_USB_PD_TCPM_TCPCI_H
-#define __CROS_EC_USB_PD_TCPM_TCPCI_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_TCPM_TCPCI_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_TCPM_TCPCI_H_
 
 #include "config.h"
 #include "ec_commands.h"
@@ -410,4 +410,4 @@ int tcpci_tcpc_fast_role_swap_enable(int port, int enable);
 }
 #endif
 
-#endif /* __CROS_EC_USB_PD_TCPM_TCPCI_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_TCPM_TCPCI_H_ */

@@ -6,8 +6,8 @@
  * Integrated Re-timers for USB3.2/DisplayPort
  */
 
-#ifndef __CROS_EC_USB_MUX_ANX3443_H
-#define __CROS_EC_USB_MUX_ANX3443_H
+#ifndef PLATFORM_EC_DRIVER_USB_MUX_ANX3443_H_
+#define PLATFORM_EC_DRIVER_USB_MUX_ANX3443_H_
 
 #define ANX3443_I2C_READY_DELAY (30 * MSEC)
 
@@ -42,4 +42,4 @@
 
 extern const struct usb_mux_driver anx3443_usb_mux_driver;
 
-#endif /* __CROS_EC_USB_MUX_ANX3443_H */
+#endif /* PLATFORM_EC_DRIVER_USB_MUX_ANX3443_H_ */

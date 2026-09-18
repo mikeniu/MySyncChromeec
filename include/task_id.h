@@ -5,8 +5,8 @@
 
 /* define the task identifier of all compiled tasks */
 
-#ifndef __CROS_EC_TASK_ID_H
-#define __CROS_EC_TASK_ID_H
+#ifndef PLATFORM_EC_INCLUDE_TASK_ID_H_
+#define PLATFORM_EC_INCLUDE_TASK_ID_H_
 
 /* For Zephyr builds just used shimmed tasks ids, otherwise use platform/ec's */
 #ifdef CONFIG_ZEPHYR
@@ -68,4 +68,4 @@ enum {
 }
 #endif
 #endif /* CONFIG_ZEPHYR */
-#endif /* __CROS_EC_TASK_ID_H */
+#endif /* PLATFORM_EC_INCLUDE_TASK_ID_H_ */

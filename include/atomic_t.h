@@ -5,8 +5,8 @@
 
 /* This file is to provide atomic_t definition */
 
-#ifndef __CROS_EC_ATOMIC_T_H
-#define __CROS_EC_ATOMIC_T_H
+#ifndef PLATFORM_EC_INCLUDE_ATOMIC_T_H_
+#define PLATFORM_EC_INCLUDE_ATOMIC_T_H_
 
 #ifndef CONFIG_ZEPHYR
 #ifdef __cplusplus
@@ -25,4 +25,4 @@ typedef atomic_t atomic_val_t;
 #include <zephyr/sys/atomic.h>
 #endif
 
-#endif /* __CROS_EC_ATOMIC_T_H */
+#endif /* PLATFORM_EC_INCLUDE_ATOMIC_T_H_ */

@@ -5,8 +5,8 @@
 
 /* Cometlake chipset power control module for Chrome EC */
 
-#ifndef __CROS_EC_COMETLAKE_H
-#define __CROS_EC_COMETLAKE_H
+#ifndef PLATFORM_EC_INCLUDE_POWER_COMETLAKE_H_
+#define PLATFORM_EC_INCLUDE_POWER_COMETLAKE_H_
 
 /* Input state flags. */
 #define IN_PCH_SLP_S3_DEASSERTED POWER_SIGNAL_MASK(X86_SLP_S3_DEASSERTED)
@@ -44,4 +44,4 @@ enum power_signal {
 void all_sys_pgood_check_reboot(void);
 __override_proto void board_chipset_forced_shutdown(void);
 
-#endif /* __CROS_EC_COMETLAKE_H */
+#endif /* PLATFORM_EC_INCLUDE_POWER_COMETLAKE_H_ */

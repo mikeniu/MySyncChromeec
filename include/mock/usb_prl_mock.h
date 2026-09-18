@@ -4,8 +4,8 @@
  */
 /* Mock for USB protocol layer */
 
-#ifndef __MOCK_USB_PRL_MOCK_H
-#define __MOCK_USB_PRL_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_USB_PRL_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_USB_PRL_MOCK_H_
 
 #include "common.h"
 #include "usb_emsg.h"
@@ -40,4 +40,4 @@ void mock_prl_report_error(int port, enum pe_error e,
 }
 #endif
 
-#endif /* __MOCK_DP_ALT_MODE_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_USB_PRL_MOCK_H_ */

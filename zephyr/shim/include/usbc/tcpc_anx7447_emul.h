@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_ANX7447_EMUL_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_ANX7447_EMUL_H_
+
 #include "driver/tcpm/anx7447_public.h"
 
 #include <zephyr/devicetree.h>
@@ -30,3 +33,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_ANX7447_EMUL_H_ */

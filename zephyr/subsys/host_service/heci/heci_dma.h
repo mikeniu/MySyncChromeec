@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_HOST_SERVICE_HECI_HECI_DMA_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_HOST_SERVICE_HECI_HECI_DMA_H_
+
 #include "heci_internal.h"
 
 #define GET_NUM_PAGE_BITMAPS(size) ((size + BITS_PER_DW - 1) / BITS_PER_DW)
@@ -24,3 +27,5 @@ bool send_client_msg_dma(struct heci_conn_t *conn, struct mrd_t *msg);
 void heci_dma_alloc_notification(struct heci_bus_msg_t *msg);
 
 void heci_dma_xfer_ack(struct heci_bus_msg_t *msg);
+
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_HOST_SERVICE_HECI_HECI_DMA_H_ */

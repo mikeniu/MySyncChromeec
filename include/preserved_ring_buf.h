@@ -23,8 +23,8 @@
  * support mixing word types on the same instance.
  */
 
-#ifndef __PRESERVED_RING_BUF_H
-#define __PRESERVED_RING_BUF_H
+#ifndef PLATFORM_EC_INCLUDE_PRESERVED_RING_BUF_H_
+#define PLATFORM_EC_INCLUDE_PRESERVED_RING_BUF_H_
 
 #include "link_defs.h"
 
@@ -128,4 +128,4 @@ void preserved_ring_buf_write(const preserved_ring_buf_t *buf,
 uint32_t preserved_ring_buf_read(const preserved_ring_buf_t *buf,
 				 uint32_t offset);
 
-#endif /* __PRESERVED_RING_BUF_H */
+#endif /* PLATFORM_EC_INCLUDE_PRESERVED_RING_BUF_H_ */

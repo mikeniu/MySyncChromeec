@@ -4,8 +4,8 @@
  *
  * Very simple 8-bit CRC function.
  */
-#ifndef __CROS_EC_CRC8_H
-#define __CROS_EC_CRC8_H
+#ifndef PLATFORM_EC_INCLUDE_CRC8_H_
+#define PLATFORM_EC_INCLUDE_CRC8_H_
 
 #include <stdint.h>
 
@@ -41,4 +41,4 @@ uint8_t cros_crc8_arg(const uint8_t *data, int len, uint8_t previous_crc);
 }
 #endif
 
-#endif /* __CROS_EC_CRC8_H */
+#endif /* PLATFORM_EC_INCLUDE_CRC8_H_ */

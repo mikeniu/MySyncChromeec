@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_NX20P348X_H
-#define EMUL_NX20P348X_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_NX20P348X_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_NX20P348X_H_
 
 #include <zephyr/drivers/emul.h>
 
@@ -36,4 +36,4 @@ void nx20p348x_emul_set_interrupt1(const struct emul *emul, uint8_t val);
  */
 void nx20p348x_emul_set_tcpc_interact(const struct emul *emul, bool en);
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_NX20P348X_H_ */

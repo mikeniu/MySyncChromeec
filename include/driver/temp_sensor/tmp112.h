@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_TMP112_H
-#define __CROS_EC_TMP112_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_TMP112_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_TMP112_H_
 
 #include "i2c.h"
 
@@ -75,4 +75,4 @@ void tmp112_update_temperature(int idx);
 }
 #endif
 
-#endif /* __CROS_EC_TMP112_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_TMP112_H_ */
