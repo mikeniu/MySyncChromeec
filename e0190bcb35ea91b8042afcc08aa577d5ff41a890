@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af3c8eef_edabae1c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-18T19:48:30Z",
+      "side": 1,
+      "message": "this change has to be tested on a device before it can be merged. We do not any regressions in fingerprint firmware.",
+      "revId": "e0190bcb35ea91b8042afcc08aa577d5ff41a890",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
