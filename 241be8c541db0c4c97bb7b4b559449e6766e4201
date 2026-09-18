@@ -1,0 +1,100 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc642157_b02b119b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 30
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-18T16:54:14Z",
+      "side": 1,
+      "message": "Nit: \u0027Update unit test expectations for the new handler validation flow.\u0027 appears to be left over from Patchset 1 (which touched zephyr/test/ascp/src/ascp_claim_test.cc); no test files are modified in this CL anymore.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "241be8c541db0c4c97bb7b4b559449e6766e4201",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "055b8744_f52458ac",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 30
+      },
+      "lineNbr": 584,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-18T16:54:14Z",
+      "side": 1,
+      "message": "Support for EC_CMD_FP_INFO version 2 was removed on main in CL:7763367 (b/498614014). It looks like a rebase conflict resolution accidentally re-introduced the v2 handling and EC_VER_MASK(2) here.\n\nAdditionally, setting response_size to the smaller v2 size (196 bytes) before calling fp_sensor_get_info(r, response_size) at line 539 would cause fp_sensor_get_info() (which writes v3 fp_image_frame_params_v2 entries totaling 236 bytes into r) to either fail or overflow the validated output_buf_max check.\n\nPlease remove the resurrected v2 handling and register EC_CMD_FP_INFO with EC_VER_MASK(3) and struct ec_response_fp_info_v3 only.",
+      "range": {
+        "startLine": 516,
+        "startChar": 0,
+        "endLine": 584,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "241be8c541db0c4c97bb7b4b559449e6766e4201",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3f2d916_a7fb4ced",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 30
+      },
+      "lineNbr": 1141,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-18T16:54:14Z",
+      "side": 1,
+      "message": "Nit: fp_commit_template() was updated to return enum ec_host_cmd_status, which fp_task() stores directly into global_context.template_decryption_result (line 415). Consider using EC_HOST_CMD_ERROR / EC_HOST_CMD_BUSY here and casting atomic_get(\u0026global_context.template_decryption_result) directly to enum ec_host_cmd_status instead of casting through enum ec_status first.",
+      "range": {
+        "startLine": 1122,
+        "startChar": 0,
+        "endLine": 1141,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "241be8c541db0c4c97bb7b4b559449e6766e4201",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "364b270b_6ee7a437",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 30
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-18T16:54:14Z",
+      "side": 1,
+      "message": "Because EC_CMD_FP_MODE is registered with SMALLEST_TYPE(struct ec_params_fp_mode, struct ec_params_fp_mode_v1), the host command framework only validates that args-\u003einput_buf_size \u003e\u003d sizeof(struct ec_params_fp_mode) (4 bytes). If version \u003d\u003d 1 is called with input_buf_size \u003c sizeof(struct ec_params_fp_mode_v1) (36 bytes), p_1-\u003emac (32 bytes) will be read out-of-bounds.\n\nPlease check the input buffer size for v1 (similar to fp_command_frame):\nif (args-\u003einput_buf_size \u003c sizeof(struct ec_params_fp_mode_v1))\n    return EC_HOST_CMD_REQUEST_TRUNCATED;",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 350,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "241be8c541db0c4c97bb7b4b559449e6766e4201",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
