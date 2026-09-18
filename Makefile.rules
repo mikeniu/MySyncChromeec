@@ -86,6 +86,7 @@ cmd_elf_to_bin = $(OBJCOPY) -O binary $< $@
 cmd_elf_to_hex = $(OBJCOPY) -O ihex $< $@
 cmd_bin_to_hex = $(OBJCOPY) -I binary -O ihex \
 	--change-addresses $(_program_memory_base) $^ $@
+cmd_hex_to_bin = $(OBJCOPY) -I ihex -O binary $< $@
 cmd_smap = $(NM) $< | sort > $@
 cmd_elf = $(CC) $(objs) $(libsharedobjs_elf-y) $(LDFLAGS) \
 	-o $@ -Wl,-T,$< -Wl,-Map,$(patsubst %.elf,%.map,$@)

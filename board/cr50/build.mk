@@ -44,13 +44,19 @@ BRANCH_EXT:=
 ifeq ($(BOARD_MK_INCLUDED_ONCE),)
 
 RO_VER ?= 0.0.14
-RO_A_BIN ?= $(BDIR)/ROs/cr50.prod.ro.A.$(RO_VER).bin
-RO_B_BIN ?= $(BDIR)/ROs/cr50.prod.ro.B.$(RO_VER).bin
+# The prebuilt production ROs are checked in as Intel HEX, but .incbin needs
+# raw binaries, so they get converted into $(out) by the rule below. Gate on
+# the .hex: the .bin does not exist until that rule runs, so testing for it
+# here would silently drop the RO from the image on every clean build.
+RO_A_HEX ?= $(BDIR)/ROs/cr50.prod.ro.A.$(RO_VER).hex
+RO_B_HEX ?= $(BDIR)/ROs/cr50.prod.ro.B.$(RO_VER).hex
+RO_A_BIN ?= $(out)/cr50.prod.ro.A.$(RO_VER).bin
+RO_B_BIN ?= $(out)/cr50.prod.ro.B.$(RO_VER).bin
 
-ifneq ($(wildcard $(RO_A_BIN)),)
+ifneq ($(wildcard $(RO_A_HEX)),)
 CPPFLAGS += -DRO_A_BIN=$(RO_A_BIN)
 endif
-ifneq ($(wildcard $(RO_B_BIN)),)
+ifneq ($(wildcard $(RO_B_HEX)),)
 CPPFLAGS += -DRO_B_BIN=$(RO_B_BIN)
 endif
 
@@ -130,10 +136,13 @@ else
 # Need to generate a .hex file
 all: hex
 
-ifneq ($(wildcard $(RO_A_BIN)),)
+$(out)/cr50.prod.ro.%.bin: $(BDIR)/ROs/cr50.prod.ro.%.hex
+	$(call quiet,hex_to_bin,OBJCOPY)
+
+ifneq ($(wildcard $(RO_A_HEX)),)
 $(out)/$(PROJECT).obj: $(RO_A_BIN)
 endif
-ifneq ($(wildcard $(RO_B_BIN)),)
+ifneq ($(wildcard $(RO_B_HEX)),)
 $(out)/$(PROJECT).obj: $(RO_B_BIN)
 endif
 
