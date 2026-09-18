@@ -31,6 +31,7 @@
 		cros-fp,fingerprint-memory-template = &sram1;
 		zephyr,host-cmd-spi-backend = &spi1;
 		zephyr,nocache-ram = &sram4;
+		zephyr,system-timer = &lptim1;
 	};
 
 	named-bbram-regions {
