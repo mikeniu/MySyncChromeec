@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bacec9c_8c3dcabd",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-18T07:08:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ccd173f_db166711",
+      "range": {
+        "startLine": 9,
+        "startChar": 21,
+        "endLine": 9,
+        "endChar": 32
+      },
+      "revId": "d15ca29399aa51026bdf911a33364efb90c89e42",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4a1b1bd_149d3a5f",
