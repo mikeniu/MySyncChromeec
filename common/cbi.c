@@ -68,6 +68,9 @@ struct cbi_data *cbi_find_tag(const void *buf, enum cbi_data_tag tag)
 	const uint8_t *end = CBI_END(h);
 	const uint8_t *p;
 
+	if (h->total_size > CBI_IMAGE_SIZE)
+		return NULL;
+
 	for (p = h->data; p + sizeof(*d) <= end;) {
 		d = (struct cbi_data *)p;
 
@@ -518,7 +521,35 @@ static enum ec_status hc_cbi_bin_write(struct host_cmd_handler_args *args)
 	if ((p->offset + p->size) > CBI_FLASH_SIZE)
 		return EC_RES_INVALID_PARAM;
 
+<<<<<<< PATCH SET (37ee1824bbd3b8f77f82abf3bba1b4c6a2bbdb11 cbi: Invalidate cache in hc_cbi_bin_write and bound total_si)
+	cbi_invalidate_cache();
+
+	if (p->flags & EC_CBI_BIN_BUFFER_CLEAR)
+		memset(cbi, 0xFF, CBI_IMAGE_SIZE);
+
+	if (p->offset < CBI_IMAGE_SIZE) {
+		uint32_t write_size = p->size;
+
+		if ((p->offset + p->size) > CBI_IMAGE_SIZE)
+			write_size = CBI_IMAGE_SIZE - p->offset;
+
+		memcpy(cbi + p->offset, p->data, write_size);
+	} else {
+||||||| BASE      (0b79d21ed654e302e261de12e7f50764097b698d util: renode: Run board tests in parallel with isolated reso)
+	if (p->flags & EC_CBI_BIN_BUFFER_CLEAR)
+		memset(cbi, 0xFF, CBI_IMAGE_SIZE);
+
+	if (p->offset < CBI_IMAGE_SIZE) {
+		uint32_t write_size = p->size;
+
+		if ((p->offset + p->size) > CBI_IMAGE_SIZE)
+			write_size = CBI_IMAGE_SIZE - p->offset;
+
+		memcpy(cbi + p->offset, p->data, write_size);
+	} else {
+=======
 	if (p->offset >= CBI_IMAGE_SIZE) {
+>>>>>>> BASE      (4fc584ff5971c7e71f95378ae66011a2ac35d2c0 port80: Allow EC_CMD_PORT80_WRITE with HAS_HOSTCMD)
 		CPRINTS("CBI buffer overflow");
 		return EC_RES_ERROR;
 	}
