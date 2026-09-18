@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a80718ac_0d077359",
+        "filename": "common/cbi.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-18T15:12:56Z",
+      "side": 1,
+      "message": "This was returning EC_RES_ERROR in legacy EC, and existing unit tests (e.g. test_cbi_flash_host_write_overflow) expect EC_RES_ERROR. Keeping EC_HOST_CMD_ERROR to preserve existing behavior and pass unit tests.",
+      "parentUuid": "e0c285f5_819bb9d9",
+      "range": {
+        "startLine": 536,
+        "startChar": 9,
+        "endLine": 536,
+        "endChar": 26
+      },
+      "revId": "c5a5d1e56694eafd7a4e29ce2cdaa570beff2a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "203abfa7_8fb65112",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-16T23:41:12Z",
       "side": 1,
       "message": "maybe change `.num_banks_desc` to `banks_to_copy` for added validation.",
+      "range": {
+        "startLine": 1587,
+        "startChar": 8,
+        "endLine": 1587,
+        "endChar": 22
+      },
+      "revId": "c5a5d1e56694eafd7a4e29ce2cdaa570beff2a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c26b199_72ed4738",
+        "filename": "common/flash.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 1587,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-18T15:12:56Z",
+      "side": 1,
+      "message": "Done. Changed to use banks_to_copy when incrementing args-\u003eoutput_buf_size.",
+      "parentUuid": "203abfa7_8fb65112",
       "range": {
         "startLine": 1587,
         "startChar": 8,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "867e7b29_7126ad89",
+        "filename": "common/flash.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 1602,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-18T15:12:56Z",
+      "side": 1,
+      "message": "Done. Moved the output_buf_max validation to the beginning of the block before writing to r_1. Because args-\u003eoutput_buf_max is dynamic (provided by the host at runtime), it cannot be evaluated at compile time.",
+      "parentUuid": "a952c475_cfa282f5",
+      "range": {
+        "startLine": 1600,
+        "startChar": 2,
+        "endLine": 1602,
+        "endChar": 39
+      },
+      "revId": "c5a5d1e56694eafd7a4e29ce2cdaa570beff2a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "98e2b6d2_e21a53d2",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de9b79d7_9d3a875c",
+        "filename": "common/rollback.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-18T15:12:56Z",
+      "side": 1,
+      "message": "Done. Updated return to EC_HOST_CMD_RESPONSE_TOO_BIG and moved the size check to the beginning of host_command_rollback_info before reading flash or writing to r. Because output_buf_max is provided by the host at runtime, it cannot be checked at compile time.",
+      "parentUuid": "98e2b6d2_e21a53d2",
+      "range": {
+        "startLine": 600,
+        "startChar": 9,
+        "endLine": 600,
+        "endChar": 37
+      },
+      "revId": "c5a5d1e56694eafd7a4e29ce2cdaa570beff2a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e8b684c_1d8ce833",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-09-16T23:41:12Z",
       "side": 1,
       "message": "EC_HOST_CMD_RESPONSE_TOO_BIG",
+      "range": {
+        "startLine": 614,
+        "startChar": 9,
+        "endLine": 614,
+        "endChar": 37
+      },
+      "revId": "c5a5d1e56694eafd7a4e29ce2cdaa570beff2a45",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "939b1756_c4a67a4a",
+        "filename": "common/rollback.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-18T15:12:56Z",
+      "side": 1,
+      "message": "Done. Updated to EC_HOST_CMD_RESPONSE_TOO_BIG.",
+      "parentUuid": "0e8b684c_1d8ce833",
       "range": {
         "startLine": 614,
         "startChar": 9,
