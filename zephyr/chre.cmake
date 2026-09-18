@@ -12,7 +12,9 @@ if(CONFIG_ISH_CHRE)
   pw_zephyrize_libraries_ifdef(CONFIG_ISH_CHRE
     chre.platform.ec.log
   )
-  pw_set_backend(chre.platform.log chre.platform.ec.log)
+  if(DEFINED chre.platform.log_BACKEND)
+    pw_set_backend(chre.platform.log chre.platform.ec.log)
+  endif()
 
   target_sources(app PRIVATE shim/src/chre.cc)
   if(NOT CONFIG_ZTEST)

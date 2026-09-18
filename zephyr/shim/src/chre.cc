@@ -9,13 +9,13 @@
 #include "chre/target_platform/context.h"
 #include "pw_thread/thread.h"
 
+#include <stdarg.h>
+
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
 #include <zephyr/sys/util.h>
-
-#include <cstdarg>
 
 LOG_MODULE_REGISTER(chre, LOG_LEVEL_INF);
 
