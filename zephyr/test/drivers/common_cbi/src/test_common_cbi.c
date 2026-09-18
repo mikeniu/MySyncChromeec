@@ -884,6 +884,57 @@ ZTEST_USER(common_cbi, test_cros_cbi_ufsc_default)
 		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_d))));
 }
 
+ZTEST_USER(common_cbi, test_hc_cbi_bin_write__staged_write_invalidates_cache)
+{
+	uint32_t original_sku = 0x87654321;
+	uint32_t updated_sku = 0x12345678;
+	uint32_t read_sku;
+	struct actual_bin_params {
+		struct ec_params_set_cbi_bin params;
+		uint8_t actual_data[4];
+	} hc_bin_params = {
+            .params = {
+                .offset = 0,
+                .size = 4,
+                .flags = EC_CBI_BIN_BUFFER_CLEAR,
+            },
+        };
+	struct host_cmd_handler_args bin_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_CBI_BIN_WRITE, 0, hc_bin_params);
+	struct actual_set_params {
+		struct ec_params_set_cbi params;
+		uint8_t actual_data[sizeof(uint32_t)];
+	} hc_set_params = {
+            .params = {
+                .tag = CBI_TAG_SKU_ID,
+                .flag = CBI_SET_INIT,
+                .size = sizeof(original_sku),
+            },
+        };
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_SET_CROS_BOARD_INFO, 0, hc_set_params);
+
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+
+	/* Write initial SKU with valid CRC to EEPROM via host command */
+	memcpy(hc_set_params.params.data, &original_sku, sizeof(original_sku));
+	zassert_equal(host_command_process(&set_args), EC_RES_SUCCESS);
+
+	/* Stage a clear (0xFF) without EC_CBI_BIN_BUFFER_WRITE */
+	zassert_equal(host_command_process(&bin_args), EC_RES_SUCCESS);
+
+	/* Subsequent EC_CMD_SET_CROS_BOARD_INFO (without INIT) reloads from
+	 * EEPROM */
+	hc_set_params.params.flag = 0;
+	memcpy(hc_set_params.params.data, &updated_sku, sizeof(updated_sku));
+	zassert_equal(host_command_process(&set_args), EC_RES_SUCCESS);
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }));
+	zassert_equal(read_sku, updated_sku);
+}
+
 static void test_common_cbi_before_after(void *test_data)
 {
 	RESET_FAKE(eeprom_load);
