@@ -12,6 +12,27 @@
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
+#include <zephyr/sys/util.h>
+
+namespace chre
+{
+#ifdef CONFIG_CHRE_TIMER_WORLD
+UniquePtr<Nanoapp> initializeStaticNanoappTimerWorld();
+#endif
+#ifdef CONFIG_CHRE_HELLO_WORLD
+UniquePtr<Nanoapp> initializeStaticNanoappHelloWorld();
+#endif
+
+const StaticNanoappInitFunction kStaticNanoappList[] = {
+#ifdef CONFIG_CHRE_TIMER_WORLD
+	initializeStaticNanoappTimerWorld,
+#endif
+#ifdef CONFIG_CHRE_HELLO_WORLD
+	initializeStaticNanoappHelloWorld,
+#endif
+};
+const size_t kStaticNanoappCount = ARRAY_SIZE(kStaticNanoappList);
+} // namespace chre
 
 #ifndef CONFIG_ZTEST
 #include "chre/target_platform/memory_impl.h"
