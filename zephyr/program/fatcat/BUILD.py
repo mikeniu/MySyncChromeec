@@ -232,7 +232,7 @@ register_ish_project(
         "pigweed",
         "nanopb",
     ],
-    skip_build_all=True,
+    skip_build_all=not has_internal_chre(),  # pylint: disable=undefined-variable
 )
 
 register_ish_project(
