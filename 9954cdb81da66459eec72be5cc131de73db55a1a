@@ -16,6 +16,23 @@
       "message": "zmake build meru PASS on `firmware-bluey-16702.B`.",
       "revId": "9954cdb81da66459eec72be5cc131de73db55a1a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cd977fb_410828aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-18T01:50:33Z",
+      "side": 1,
+      "message": "We need this CL to unblock the AP FW build in the AP FW branch.",
+      "revId": "9954cdb81da66459eec72be5cc131de73db55a1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
