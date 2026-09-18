@@ -25,6 +25,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "92af2f8d_a7713adf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 30
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-18T18:07:17Z",
+      "side": 1,
+      "message": "Done. Removed the sentence from the commit message.",
+      "parentUuid": "bc642157_b02b119b",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 9999
+      },
+      "revId": "241be8c541db0c4c97bb7b4b559449e6766e4201",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "055b8744_f52458ac",
@@ -45,6 +69,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "241be8c541db0c4c97bb7b4b559449e6766e4201",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ca8d6b6_9416f4ec",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 30
+      },
+      "lineNbr": 584,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-18T18:07:17Z",
+      "side": 1,
+      "message": "Done. Removed the resurrected v2 conversion handling and registered EC_CMD_FP_INFO with EC_VER_MASK(3) and struct ec_response_fp_info_v3 only.",
+      "parentUuid": "055b8744_f52458ac",
+      "range": {
+        "startLine": 516,
+        "startChar": 0,
+        "endLine": 584,
+        "endChar": 9999
+      },
       "revId": "241be8c541db0c4c97bb7b4b559449e6766e4201",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -73,6 +121,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a596e75_dbf7a350",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 30
+      },
+      "lineNbr": 1141,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-18T18:07:17Z",
+      "side": 1,
+      "message": "Done. Updated FP_TEMPLATE_DECRYPT to set EC_HOST_CMD_ERROR / EC_HOST_CMD_BUSY and cast atomic_get(\u0026global_context.template_decryption_result) directly to enum ec_host_cmd_status.",
+      "parentUuid": "e3f2d916_a7fb4ced",
+      "range": {
+        "startLine": 1122,
+        "startChar": 0,
+        "endLine": 1141,
+        "endChar": 9999
+      },
+      "revId": "241be8c541db0c4c97bb7b4b559449e6766e4201",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "364b270b_6ee7a437",
@@ -93,6 +165,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "241be8c541db0c4c97bb7b4b559449e6766e4201",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "663edf2d_9321b37f",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 30
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-18T18:07:17Z",
+      "side": 1,
+      "message": "Done. Added input_buf_size check for v1 before accessing p_1-\u003emac.",
+      "parentUuid": "364b270b_6ee7a437",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 350,
+        "endChar": 9999
+      },
       "revId": "241be8c541db0c4c97bb7b4b559449e6766e4201",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
