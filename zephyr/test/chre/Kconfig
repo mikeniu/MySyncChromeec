@@ -1,0 +1,25 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config ISH_CHRE
+	bool "Enable CHRE for ISH"
+	default y
+
+config ISH_CHRE_STACK_SIZE
+	int "CHRE thread stack size"
+	default 2048
+
+config ISH_CHRE_PRIORITY
+	int "CHRE thread priority"
+	default 5
+
+config CHRE_TIMER_WORLD
+	bool "Enable CHRE TimerWorld static nanoapp"
+	default y
+
+config CHRE_HELLO_WORLD
+	bool "Enable CHRE HelloWorld static nanoapp"
+	default n
+
+source "Kconfig.zephyr"
