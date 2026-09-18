@@ -4,8 +4,34 @@
 
 """This module defines helpers accessible to all BUILD.py files."""
 
+import os
+
 from zmake import signers  # pylint: disable=unused-import
 import zmake.output_packers
+import zmake.util
+
+
+def has_internal_chre() -> bool:
+    """Return True if the internal CHRE checkout is available and enabled."""
+    if os.environ.get("PLATFORM_EC_USE_INTERNAL_CHRE", "").lower() in (
+        "0",
+        "false",
+        "no",
+    ):
+        return False
+    try:
+        checkout = zmake.util.locate_cros_checkout()
+        return (
+            checkout
+            / "src"
+            / "third_party"
+            / "android"
+            / "platform"
+            / "system"
+            / "chre_internal"
+        ).exists()
+    except (KeyError, OSError, RuntimeError):
+        return False
 
 
 def _register_project(**kwargs):
