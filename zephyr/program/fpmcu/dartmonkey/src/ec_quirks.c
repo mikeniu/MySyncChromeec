@@ -36,9 +36,14 @@ static void prepare_for_sysjump_to_ec(void)
 	arm_core_mpu_disable();
 
 	/*
-	 * Disable system clock (Cortex-M Systick in this case) because it's
-	 * unused in EC.
+	 * Disable system clock because it's unused in EC.
 	 */
+#if defined(CONFIG_PM)
+	/* LPTIM1 */
+	RESET_PERIPHERAL(DT_NODELABEL(lptim1));
+#else
+	/* Cortex-M Systick */
 	sys_clock_disable();
+#endif
 }
 DECLARE_HOOK(HOOK_SYSJUMP, prepare_for_sysjump_to_ec, HOOK_PRIO_LAST);
