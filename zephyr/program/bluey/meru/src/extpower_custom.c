@@ -12,8 +12,7 @@ int board_extpower_is_present(void)
 {
 	/* The pins are ACTIVE_LOW in DTS, so gpio_pin_get_dt returns 1 when
 	 * connected. */
-	return gpio_pin_get_dt(
-		GPIO_DT_FROM_NODELABEL(gpio_smb2360_a_chg_led_pg_odl));
+	return gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_pgood_acok_odl));
 }
 
 void board_extpower_enable_interrupt(void)
