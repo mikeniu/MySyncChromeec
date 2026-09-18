@@ -33,6 +33,23 @@
       "message": "We need this CL to unblock the AP FW build in the AP FW branch.",
       "revId": "9954cdb81da66459eec72be5cc131de73db55a1a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "141cc176_71210ca5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-09-18T02:04:12Z",
+      "side": 1,
+      "message": "Note that the build for EC firmware qual will be built from FSI milestone - 1 branch, but not this branch.",
+      "revId": "9954cdb81da66459eec72be5cc131de73db55a1a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
