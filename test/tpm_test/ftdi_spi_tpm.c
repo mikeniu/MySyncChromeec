@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -54,11 +55,6 @@ enum TpmStsBits {
 	Expect = (1 << 3),
 	selfTestDone = (1 << 2),
 	responseRetry = (1 << 1),
-};
-
-enum {
-	false = 0,
-	true = 1
 };
 
 /*
@@ -240,7 +236,7 @@ static void GetVersion(void)
 
 int FtdiSpiInit(uint32_t freq, int enable_debug)
 {
-	uint32_t did_vid, status;
+	uint32_t did_vid, status = 0;
 	uint8_t cmd;
 	uint16_t vid;
 

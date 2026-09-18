@@ -429,7 +429,8 @@ int safe_memcmp(const void *s1, const void *s2, size_t size)
 }
 
 
-__stdlib_compat void *memchr(const void *buffer, int c, size_t n)
+/* Parentheses avoid expanding glibc's C23 const-generic memchr() macro. */
+__stdlib_compat void *(memchr)(const void *buffer, int c, size_t n)
 {
 	char *current = (char *)buffer;
 	char *end = current + n;

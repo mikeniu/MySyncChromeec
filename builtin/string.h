@@ -18,7 +18,8 @@ int memcmp(const void *s1, const void *s2, size_t len);
 void *memcpy(void *dest, const void *src, size_t len);
 void *memmove(void *dest, const void *src, size_t n);
 void *memset(void *dest, int c, size_t len);
-void *memchr(const void *buffer, int c, size_t n);
+/* Parentheses avoid expanding glibc's C23 const-generic memchr() macro. */
+void *(memchr)(const void *buffer, int c, size_t n);
 
 size_t strnlen(const char *s, size_t maxlen);
 char *strncpy(char *dest, const char *src, size_t n);

@@ -76,7 +76,13 @@ int memcmp(const void *s1, const void *s2, size_t len);
 void *memcpy(void *dest, const void *src, size_t len);
 void *memset(void *dest, int c, size_t len);
 void *memmove(void *dest, const void *src, size_t len);
-void *memchr(const void *buffer, int c, size_t n);
+/*
+ * glibc 2.42+ in C23 mode (the default for gcc-15) defines memchr() as a
+ * function-like macro providing a const-generic return type. It would be
+ * expanded in the prototype below and break host builds, so wrap the name in
+ * parentheses to suppress macro expansion. The EC provides its own memchr().
+ */
+void *(memchr)(const void *buffer, int c, size_t n);
 int strcasecmp(const char *s1, const char *s2);
 int strncasecmp(const char *s1, const char *s2, size_t size);
 size_t strlen(const char *s);
