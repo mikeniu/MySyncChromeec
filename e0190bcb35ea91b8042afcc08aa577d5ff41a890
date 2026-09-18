@@ -16,6 +16,75 @@
       "message": "this change has to be tested on a device before it can be merged. We do not any regressions in fingerprint firmware.",
       "revId": "e0190bcb35ea91b8042afcc08aa577d5ff41a890",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b7fccf8_279d5a03",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-18T22:11:01Z",
+      "side": 1,
+      "message": "why did you flip the logic. \u003e vs. \u003c. \n\njust keep it the same for consistency.",
+      "range": {
+        "startLine": 518,
+        "startChar": 0,
+        "endLine": 519,
+        "endChar": 30
+      },
+      "revId": "e0190bcb35ea91b8042afcc08aa577d5ff41a890",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c5b2606_a56eebc4",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-18T22:11:01Z",
+      "side": 1,
+      "message": "was this here?",
+      "range": {
+        "startLine": 349,
+        "startChar": 1,
+        "endLine": 350,
+        "endChar": 40
+      },
+      "revId": "e0190bcb35ea91b8042afcc08aa577d5ff41a890",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "901ad0ac_6371fd03",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-18T22:11:01Z",
+      "side": 1,
+      "message": "I do not believe this is the C++ way to convert",
+      "range": {
+        "startLine": 361,
+        "startChar": 8,
+        "endLine": 361,
+        "endChar": 33
+      },
+      "revId": "e0190bcb35ea91b8042afcc08aa577d5ff41a890",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
