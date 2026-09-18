@@ -12,5 +12,11 @@ if(CONFIG_ISH_CHRE)
       chre
       pw_allocator_zephyr.synchronized_heap_allocator
     )
+    if(CONFIG_CHRE_TIMER_WORLD)
+      target_link_libraries(app PRIVATE chre.apps.timer_world)
+    endif()
+    if(CONFIG_CHRE_HELLO_WORLD)
+      target_link_libraries(app PRIVATE chre.apps.hello_world)
+    endif()
   endif()
 endif()
