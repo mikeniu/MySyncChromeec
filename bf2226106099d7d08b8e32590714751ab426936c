@@ -318,6 +318,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78ed3ecd_16c77b7f",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-18T20:01:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89d0b924_3ea4441b",
+      "range": {
+        "startLine": 941,
+        "startChar": 0,
+        "endLine": 941,
+        "endChar": 67
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "30cae164_58240317",
@@ -355,6 +379,30 @@
       "side": 1,
       "message": "Removed the outer for loop and rearranged the type.",
       "parentUuid": "30cae164_58240317",
+      "range": {
+        "startLine": 968,
+        "startChar": 0,
+        "endLine": 968,
+        "endChar": 50
+      },
+      "revId": "bf2226106099d7d08b8e32590714751ab426936c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bcf1012_b89338f6",
+        "filename": "zephyr/drivers/usbc/pdc_it52xx.c",
+        "patchSetId": 39
+      },
+      "lineNbr": 968,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-18T20:01:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8731147_0e15e69d",
       "range": {
         "startLine": 968,
         "startChar": 0,
