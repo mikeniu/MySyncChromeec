@@ -69,6 +69,24 @@
       "parentUuid": "35630c86_7cf30c62",
       "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cbff303_2e6c4831",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-18T09:41:15Z",
+      "side": 1,
+      "message": "Hi Dawid,\nI am currently working on renaming the fingerprint driver tests to elan_series. The tests run successfully locally (./twister -s fingerprint.drivers.elan80sg returns TEST EXECUTION SUCCESSFUL).\nHowever, when running repo upload --cbr ., the presubmit hook fails at ./util/zephyr_check_testcase_yaml.py with the following error:\n```\n[FAILED] chromiumos/platform/ec: zephyr_check_testcase_yaml\n    Hook script \"./util/zephyr_check_testcase_yaml.py --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      fatal: path \u0027zephyr/test/fingerprint/drivers/elan80series/testcase.yaml\u0027 does not exist in \u002773eb69c6d23ec4c9b9030b184008066ffd1f1116\u0027\n      Traceback (most recent call last):\n        ...\n      subprocess.CalledProcessError: Command \u0027[\u0027git\u0027, \u0027show\u0027, \u002773eb69c6d23ec4c9b9030b184008066ffd1f1116:zephyr/test/fingerprint/drivers/elan80series/testcase.yaml\u0027]\u0027 returned non-zero exit status 128.\n\nFATAL: Preupload failed due to above error(s).\n```\nIt seems the presubmit script fails to handle the directory/file rename from elan80series/testcase.yaml to elan_series/testcase.yaml because git show attempts to query the old path in the renamed commit.\nCould you advise on the recommended approach to pass this check, or if I missed something in the rename process?",
+      "parentUuid": "a1cad07b_30b73b0d",
+      "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
