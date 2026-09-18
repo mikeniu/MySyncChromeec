@@ -11,7 +11,6 @@
 #include "../interrupts.dtsi"
 #include "../adc.dtsi"
 #include "../common.dtsi"
-#include "../psl.dtsi"
 
 /* meru project DTS includes */
 
@@ -21,6 +20,7 @@
 #include "i2c.dtsi"
 #include "led_pins.dtsi"
 #include "led_policy.dtsi"
+#include "psl.dtsi"
 
 /* meru overrides follow... */
 &int_ac_present {
@@ -68,7 +68,7 @@
 
 	gpio-interrupts {
 		int_extpower_a: extpower_a {
-			irq-pin = <&gpio_smb2360_a_chg_led_pg_odl>;
+			irq-pin = <&gpio_pgood_acok_odl>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "extpower_interrupt";
 		};

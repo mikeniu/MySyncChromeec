@@ -33,7 +33,7 @@
 			enum-name = "GPIO_AC_PRESENT";
 		};
 		gpio_pgood_acok_odl: pgood_acok_odl {
-			gpios = <&gpio0 2 (GPIO_INPUT)>;
+			gpios = <&gpio0 2 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_led_ec_do_argb_di: led_ec_do_argb_di {
 			gpios = <&gpio3 5 (GPIO_OUTPUT)>;
@@ -178,9 +178,6 @@
 			gpios = <&gpioe 5 (GPIO_INPUT)>;
 			enum-name = "GPIO_CCD_MODE_ODL";
 		};
-		gpio_smb2360_a_chg_led_pg_odl: smb2360_a_chg_led_pg_odl {
-			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
-		};
 		gpio_en_pp5000_wlc_x: en_pp5000_wlc_x {
 			gpios = <&gpiof 1 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
@@ -255,6 +252,7 @@
 			<&gpiod 3 0>, /* EC_PP1100_DISP_X */
 			<&gpioe 2 0>, /* EC_CAM_LED */
 			<&gpioe 3 0>,
+			<&gpiof 0 0>,
 			<&gpio3 2 0>;
 	};
 };
