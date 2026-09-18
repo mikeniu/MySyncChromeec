@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a2bc4cb_5c856f03",
+        "filename": "zephyr/program/bluey/meru/project.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-18T08:49:30Z",
+      "side": 1,
+      "message": "Where is `psl_in4_gp02` defined ? Maybe copy the psl.dtsi from bluey program to meru project and define the `psl_in4_gp02` in this file.\n\n```\nwake_source_pgood: \u0026psl_in4_gp02 {\n\t/* EC_ACOK_OD */\n\tpsl-in-mode \u003d \"edge\";\n\tpsl-in-pol \u003d \"high-rising\";\n};\n```",
+      "range": {
+        "startLine": 173,
+        "startChar": 57,
+        "endLine": 173,
+        "endChar": 69
+      },
+      "revId": "574089bb9cd0d830ba7f53a119cbdfc0e17914e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
