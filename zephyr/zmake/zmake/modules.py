@@ -24,11 +24,12 @@ def third_party_module(name, checkout):
 
 
 def chre_module(name, checkout):
-    """Special handler for CHRE to allow internal testing
+    """Special handler for CHRE to use internal manifest by default.
 
-    By default this function will resolve to the public CHRE repo, but if the
-    environment variable PLATFORM_EC_USE_INTERNAL_CHRE is set, then the internal
-    manifest's checkout of CHRE is returned.
+    By default this function will resolve to the internal manifest's checkout of
+    CHRE (chre_internal) if available, falling back to the public repo. If the
+    environment variable PLATFORM_EC_USE_INTERNAL_CHRE is explicitly set to
+    0/false/no, the public repo is used.
 
     Args:
         name: The name of the module.
@@ -37,8 +38,27 @@ def chre_module(name, checkout):
     Return:
         The path to the module module.
     """
-    if "PLATFORM_EC_USE_INTERNAL_CHRE" in os.environ:
-        name += "_internal"
+    internal_name = f"{name}_internal"
+    internal_path = (
+        checkout
+        / "src"
+        / "third_party"
+        / "android"
+        / "platform"
+        / "system"
+        / internal_name
+    )
+    env_setting = os.environ.get("PLATFORM_EC_USE_INTERNAL_CHRE")
+    if env_setting is not None:
+        if env_setting.lower() in ("0", "false", "no"):
+            use_internal = False
+        else:
+            use_internal = True
+    else:
+        use_internal = internal_path.exists()
+
+    if use_internal:
+        return internal_path
     return (
         checkout
         / "src"

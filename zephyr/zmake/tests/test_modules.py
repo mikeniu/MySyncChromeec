@@ -41,3 +41,59 @@ def test_locate_in_directory(modules):
         assert (
             zmake.modules.locate_from_directory(modules_dir) == expected_modules
         )
+
+
+def test_chre_module_default_with_internal(tmp_path, monkeypatch):
+    """Test chre_module resolves to chre_internal when present by default."""
+    monkeypatch.delenv("PLATFORM_EC_USE_INTERNAL_CHRE", raising=False)
+    internal_dir = (
+        tmp_path
+        / "src"
+        / "third_party"
+        / "android"
+        / "platform"
+        / "system"
+        / "chre_internal"
+    )
+    internal_dir.mkdir(parents=True)
+    assert zmake.modules.chre_module("chre", tmp_path) == internal_dir
+
+
+def test_chre_module_default_without_internal(tmp_path, monkeypatch):
+    """Test chre_module falls back to chre when internal is missing."""
+    monkeypatch.delenv("PLATFORM_EC_USE_INTERNAL_CHRE", raising=False)
+    public_dir = (
+        tmp_path
+        / "src"
+        / "third_party"
+        / "android"
+        / "platform"
+        / "system"
+        / "chre"
+    )
+    assert zmake.modules.chre_module("chre", tmp_path) == public_dir
+
+
+def test_chre_module_env_override_disable(tmp_path, monkeypatch):
+    """Test chre_module resolves to public repo when PLATFORM_EC_USE_INTERNAL_CHRE=0."""
+    monkeypatch.setenv("PLATFORM_EC_USE_INTERNAL_CHRE", "0")
+    internal_dir = (
+        tmp_path
+        / "src"
+        / "third_party"
+        / "android"
+        / "platform"
+        / "system"
+        / "chre_internal"
+    )
+    internal_dir.mkdir(parents=True)
+    public_dir = (
+        tmp_path
+        / "src"
+        / "third_party"
+        / "android"
+        / "platform"
+        / "system"
+        / "chre"
+    )
+    assert zmake.modules.chre_module("chre", tmp_path) == public_dir
