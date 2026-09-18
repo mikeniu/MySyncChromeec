@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67bc1a00_a43fef20",
+        "filename": "extra/usb_updater/gsctool.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 5032,
+      "author": {
+        "id": 1324172
+      },
+      "writtenOn": "2026-09-18T22:54:56Z",
+      "side": 1,
+      "message": "We don\u0027t need to check response_size \u003c FLASH_PAGE_SIZE here:\n\nNull-termination is not required: printf(\"%.*s\", (int)response_size, response) specifies an explicit precision. It prints at most response_size bytes and stops early only if it hits a \\0, so it does not need a terminating null character even when the buffer is completely filled (response_size \u003d\u003d FLASH_PAGE_SIZE).\n\nBuffer capacity is already enforced: response_size is initialized to sizeof(response) (equal to FLASH_PAGE_SIZE) before the call and passed by pointer to send_vendor_command(), which treats it as the maximum buffer capacity. Both the TPM path (MIN(len, *response_size)) and the USB path clamp the received size so response_size can never exceed FLASH_PAGE_SIZE.\n\nEnd-of-log detection: If the question was whether \u003c FLASH_PAGE_SIZE indicates the last chunk of log data, the loop in main() calls get_console_logs() repeatedly until the GSC returns an empty response (response_size \u003d\u003d 0).",
+      "range": {
+        "startLine": 5028,
+        "startChar": 1,
+        "endLine": 5032,
+        "endChar": 46
+      },
+      "revId": "d582468c98cf0cab3d4fb01e31b7d205a2c46fe8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
