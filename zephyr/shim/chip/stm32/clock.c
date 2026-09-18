@@ -82,10 +82,6 @@ test_mockable void clock_enable_module(enum module_id module, int enable)
 		       LL_RCC_SYS_CLKSOURCE_STATUS_PLL1) {
 		}
 
-		if (IS_ENABLED(CONFIG_SYSTEM_CLOCK_HW_CYCLES_PER_SEC_RUNTIME_UPDATE)) {
-			z_sys_clock_hw_cycles_per_sec_update(PLL_FREQ);
-		}
-
 		LL_SetSystemCoreClock(PLL_FREQ);
 	} else {
 		/*
@@ -123,10 +119,6 @@ test_mockable void clock_enable_module(enum module_id module, int enable)
 
 		LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE3);
 		while (LL_PWR_IsActiveFlag_VOS() == 0) {
-		}
-
-		if (IS_ENABLED(CONFIG_SYSTEM_CLOCK_HW_CYCLES_PER_SEC_RUNTIME_UPDATE)) {
-			z_sys_clock_hw_cycles_per_sec_update(STM32_HSI_FREQ);
 		}
 
 		LL_SetSystemCoreClock(STM32_HSI_FREQ);
