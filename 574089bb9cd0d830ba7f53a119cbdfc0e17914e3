@@ -22,6 +22,30 @@
       },
       "revId": "574089bb9cd0d830ba7f53a119cbdfc0e17914e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc42eb86_e71c8c27",
+        "filename": "zephyr/program/bluey/meru/project.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-18T09:08:00Z",
+      "side": 1,
+      "message": "Done. Thanks.",
+      "parentUuid": "3a2bc4cb_5c856f03",
+      "range": {
+        "startLine": 173,
+        "startChar": 57,
+        "endLine": 173,
+        "endChar": 69
+      },
+      "revId": "574089bb9cd0d830ba7f53a119cbdfc0e17914e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
