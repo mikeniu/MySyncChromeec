@@ -68,6 +68,9 @@ struct cbi_data *cbi_find_tag(const void *buf, enum cbi_data_tag tag)
 	const uint8_t *end = CBI_END(h);
 	const uint8_t *p;
 
+	if (h->total_size > CBI_IMAGE_SIZE)
+		return NULL;
+
 	for (p = h->data; p + sizeof(*d) <= end;) {
 		d = (struct cbi_data *)p;
 
@@ -520,8 +523,10 @@ static enum ec_status hc_cbi_bin_write(struct host_cmd_handler_args *args)
 
 	if (p->offset >= CBI_IMAGE_SIZE) {
 		CPRINTS("CBI buffer overflow");
-		return EC_RES_ERROR;
+		return EC_RES_INVALID_PARAM;
 	}
+
+	cbi_invalidate_cache();
 
 	if (p->flags & EC_CBI_BIN_BUFFER_CLEAR)
 		memset(cbi, 0xFF, CBI_IMAGE_SIZE);
@@ -537,7 +542,6 @@ static enum ec_status hc_cbi_bin_write(struct host_cmd_handler_args *args)
 				CPRINTS("Failed to write CBI");
 				return EC_RES_ERROR;
 			}
-			cbi_invalidate_cache();
 			cbi_read();
 			if (cbi_get_cache_status() != CBI_CACHE_STATUS_SYNCED) {
 				CPRINTF("Cannot Read CBI (Error %d)\n",
