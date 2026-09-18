@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "92a55308_dba779ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-18T07:14:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55eb9384_330e09ab",
+      "range": {
+        "startLine": 7,
+        "startChar": 6,
+        "endLine": 7,
+        "endChar": 12
+      },
+      "revId": "ef1812709647f5ad084f80e6a09b8d29f85468c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36bfdd1c_17d4f60b",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-17T11:13:14Z",
       "side": 1,
       "message": "can;t this be moved to board_chipset_startup_meru ?",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 67
+      },
+      "revId": "ef1812709647f5ad084f80e6a09b8d29f85468c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c2d19d1_982ee3d8",
+        "filename": "zephyr/program/bluey/meru/src/pen_control.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-18T07:14:25Z",
+      "side": 1,
+      "message": "The pchg power will be dynamically controlled by `pchg_startup` and `pchg_shutdown`",
+      "parentUuid": "36bfdd1c_17d4f60b",
       "range": {
         "startLine": 26,
         "startChar": 0,

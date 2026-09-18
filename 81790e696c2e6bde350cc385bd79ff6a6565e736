@@ -22,6 +22,30 @@
       },
       "revId": "81790e696c2e6bde350cc385bd79ff6a6565e736",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0431ab5_8c451d22",
+        "filename": "zephyr/program/bluey/meru/gpios.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-18T07:14:25Z",
+      "side": 0,
+      "message": "Meru does not control backlight",
+      "parentUuid": "fdb4e01c_f37157b9",
+      "range": {
+        "startLine": 92,
+        "startChar": 19,
+        "endLine": 92,
+        "endChar": 29
+      },
+      "revId": "81790e696c2e6bde350cc385bd79ff6a6565e736",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
