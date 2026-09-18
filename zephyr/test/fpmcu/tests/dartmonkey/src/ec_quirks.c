@@ -39,7 +39,7 @@ ZTEST(ec_quirks, test_prepare_for_sysjump)
 	zassert_equal(arm_core_mpu_disable_fake.call_count, 1,
 		      "MPU should be disabled before sysjump");
 
-	zassert_equal(stm32_reset_line_toggle_fake.call_count, 2,
+	zassert_equal(stm32_reset_line_toggle_fake.call_count, 3,
 		      "Timers and UARTs should be reset");
 
 	zassert_equal(stm32_reset_line_toggle_fake.arg0_history[0],
@@ -52,5 +52,11 @@ ZTEST(ec_quirks, test_prepare_for_sysjump)
 		      DEVICE_DT_GET(DT_NODELABEL(rctl)));
 	zassert_equal(stm32_reset_line_toggle_fake.arg1_history[1],
 		      STM32_RESET(APB2, 4U),
+		      "USART1 reset line toggle mismatch");
+
+	zassert_equal(stm32_reset_line_toggle_fake.arg0_history[2],
+		      DEVICE_DT_GET(DT_NODELABEL(rctl)));
+	zassert_equal(stm32_reset_line_toggle_fake.arg1_history[2],
+		      STM32_RESET(APB1L, 9U),
 		      "USART1 reset line toggle mismatch");
 }
