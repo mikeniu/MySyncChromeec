@@ -23,8 +23,8 @@ static void usbd_gfake_disable(struct usbd_class_data *const c_data)
 	LOG_DBG("configuration disabled");
 }
 
-static void *usbd_gfake_get_desc(struct usbd_class_data *const c_data,
-				 const enum usbd_speed speed)
+static const void *usbd_gfake_get_desc(struct usbd_class_data *const c_data,
+				       const enum usbd_speed speed)
 {
 	const struct device *dev = usbd_class_get_private(c_data);
 	struct google_data *data = dev->data;

@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_AOZ1380_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_AOZ1380_H_
+
 #include "ppc/aoz1380_public.h"
 
 #ifdef __cplusplus
@@ -21,3 +24,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_AOZ1380_H_ */

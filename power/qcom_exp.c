@@ -392,18 +392,19 @@ void rtc_callback(const struct device *dev)
 }
 #endif
 
-static enum ec_status
-host_command_offmode_charing_active(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_offmode_charing_active(struct ec_host_cmd_handler_args *args)
 {
 	/*
 	 * Set the flag to indicate we are entering the off-mode charging state.
 	 */
 	heartbeat_mode = 1;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_ENABLE_OFFMODE_HEARTBEAT,
-		     host_command_offmode_charing_active, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_ENABLE_OFFMODE_HEARTBEAT,
+			    host_command_offmode_charing_active,
+			    EC_VER_MASK(0));
 
 /*
  * On chipset shutdown complete, determine the next wake-up event.

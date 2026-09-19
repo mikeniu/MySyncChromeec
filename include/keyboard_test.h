@@ -6,8 +6,8 @@
 
 /* Keyboard scanner test module for Chrome EC */
 
-#ifndef __CROS_EC_KEYBOARD_TEST_H
-#define __CROS_EC_KEYBOARD_TEST_H
+#ifndef PLATFORM_EC_INCLUDE_KEYBOARD_TEST_H_
+#define PLATFORM_EC_INCLUDE_KEYBOARD_TEST_H_
 
 #include <timer.h>
 
@@ -47,4 +47,4 @@ int keyscan_seq_next_event_delay(void);
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_INCLUDE_KEYBOARD_TEST_H_ */

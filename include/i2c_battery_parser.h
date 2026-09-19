@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef __CROS_EC_I2C_BATTERY_PARSER_H
-#define __CROS_EC_I2C_BATTERY_PARSER_H
+#ifndef PLATFORM_EC_INCLUDE_I2C_BATTERY_PARSER_H_
+#define PLATFORM_EC_INCLUDE_I2C_BATTERY_PARSER_H_
 
 #include "i2c.h"
 
@@ -54,4 +54,4 @@ int battery_permission_handler(struct i2c_battery_parser_state *state,
  */
 struct i2c_battery_parser_state i2c_battery_parser_state_create(void);
 
-#endif // __CROS_EC_I2C_BATTERY_PARSER_H
+#endif /* PLATFORM_EC_INCLUDE_I2C_BATTERY_PARSER_H_ */

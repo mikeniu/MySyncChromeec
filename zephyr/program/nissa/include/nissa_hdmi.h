@@ -5,8 +5,8 @@
 
 /* Nissa shared HDMI sub-board functionality */
 
-#ifndef __CROS_EC_NISSA_NISSA_HDMI_H__
-#define __CROS_EC_NISSA_NISSA_HDMI_H__
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_NISSA_HDMI_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_NISSA_HDMI_H_
 
 #include "common.h"
 
@@ -49,4 +49,4 @@ void nissa_configure_hdmi_vcc(void);
  */
 __override_proto void nissa_configure_hdmi_power_gpios(void);
 
-#endif /* __CROS_EC_NISSA_NISSA_HDMI_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_NISSA_HDMI_H_ */

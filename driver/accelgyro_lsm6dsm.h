@@ -5,8 +5,8 @@
 
 /* LSM6DSM (also LSM6DSL) Accel and Gyro driver for Chrome EC */
 
-#ifndef __CROS_EC_ACCELGYRO_LSM6DSM_H
-#define __CROS_EC_ACCELGYRO_LSM6DSM_H
+#ifndef PLATFORM_EC_DRIVER_ACCELGYRO_LSM6DSM_H_
+#define PLATFORM_EC_DRIVER_ACCELGYRO_LSM6DSM_H_
 
 #include "driver/accelgyro_lsm6dsm_public.h"
 #include "mag_bmm150.h"
@@ -335,4 +335,4 @@ struct lsm6dsm_data {
 
 int lsm6dsm_set_data_rate(const struct motion_sensor_t *s, int rate, int rnd);
 
-#endif /* __CROS_EC_ACCELGYRO_LSM6DSM_H */
+#endif /* PLATFORM_EC_DRIVER_ACCELGYRO_LSM6DSM_H_ */

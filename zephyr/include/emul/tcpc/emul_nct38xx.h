@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_NCT38XX_H
-#define __EMUL_NCT38XX_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_NCT38XX_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_NCT38XX_H_
 
 #include <zephyr/drivers/emul.h>
 
@@ -19,4 +19,4 @@ int nct38xx_emul_set_reg(const struct emul *emul, int r, uint16_t val);
 
 void nct38xx_emul_reset(const struct emul *emul);
 
-#endif /* __EMUL_NCT38XX_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_NCT38XX_H_ */

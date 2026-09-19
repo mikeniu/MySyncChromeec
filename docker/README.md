@@ -4,7 +4,7 @@ This directory contains the Docker and scripting configuration to set up an
 isolated, automated build and test environment for building ChromiumOS EC
 firmware and running tests on the Dagwood test fixture.
 
-The docker build is setup to clone all repositories needed to build EC
+The docker build is set up to clone all repositories needed to build EC
 firmware images and run the twister based tests.
 
 When entering the container, the entrypoint.sh script pulls the latest
@@ -50,14 +50,12 @@ docker build -t ec-builder .
 ```
 
 ### 2. Run the Container (Interactive Development)
-To spin up the container, map your persistent local workspace, map the
-persistent SDK toolchain cache, and drop into a bash shell with all dependencies
-ready:
+To spin up the container, map your persistent local workspace, and drop into a
+bash shell with all dependencies ready:
 
 ```bash
 docker run -it --rm \
   -v $(pwd)/workspace:/workspace \
-  -v $(pwd)/workspace/.cache/coreboot-sdk:/root/.cache/coreboot-sdk \
   ec-builder
 ```
 
@@ -71,6 +69,27 @@ Or using the helper script:
 > ```bash
 > ./run_docker.sh --fast
 > ```
+
+### 3. Hardware Access (Flashing and Device Testing)
+The plain `docker run` above is enough for building. Flashing and device
+testing additionally need the host's USB devices and serial ports, which
+`run_docker.sh` configures automatically. To do the same from a raw
+`docker run`, add:
+
+```bash
+docker run -it --rm \
+  --device-cgroup-rule="c *:* rmw" \
+  -v $(pwd)/workspace:/workspace \
+  -v /dev:/dev \
+  ec-builder
+```
+
+Bind mounting `/dev` keeps devices visible across hotplug and
+re-enumeration, so a board that resets into its bootloader and returns
+under a different `ttyACM` number stays usable. The cgroup rule is
+required because Docker denies `open()` on devices outside a small
+default allowlist; limiting it to character devices leaves block devices
+(disks) inaccessible. `--privileged` is not needed.
 
 ---
 
@@ -91,7 +110,7 @@ zmake --checkout /workspace build skyrim
 ```
 
 Because zmake is not running inside a full cros_sdk checkout, you must always
-specify the `--checkout /workspace` option when running `zmake commands.
+specify the `--checkout /workspace` option when running `zmake` commands.
 
 The final firmware image will be populated on your host filesystem at
 `workspace/src/platform/ec/build/zephyr/skyrim/output/ec.bin`.
@@ -112,7 +131,7 @@ To run host-based emulation tests using Zephyr's Twister inside the container:
    ```
 
 #### 2. Real Device Testing on Dagwood (using Helper Script)
-To run tests against a Dagwoord board and EC Add-in-card (AIC) connected to the
+To run tests against a Dagwood board and EC Add-in-card (AIC) connected to the
 host, you can use the `run_dagwood_tests.py` helper script. It automatically
 handles device forwarding and configures twister with the required parameters
 (toolchain, flash command, etc.).
@@ -168,7 +187,6 @@ You can trigger builds or run tests directly from your host machine:
 ```bash
 docker run --rm \
   -v $(pwd)/workspace:/workspace \
-  -v $(pwd)/workspace/.cache/coreboot-sdk:/root/.cache/coreboot-sdk \
   ec-builder zmake --checkout /workspace build skyrim
 ```
 
@@ -176,6 +194,24 @@ docker run --rm \
 ```bash
 docker run --rm \
   -v $(pwd)/workspace:/workspace \
-  -v $(pwd)/workspace/.cache/coreboot-sdk:/root/.cache/coreboot-sdk \
   ec-builder bash -c "cd /workspace/src/platform/ec && python3 ./twister -ivc -s hibernate_z5.default"
 ```
+
+### Building and Flashing Dagwood Firmware (OpenOCD & ST-Link)
+The container includes `openocd` and the `hal_stm32` Zephyr module to build
+and flash the Dagwood fixture MCU firmware directly using an attached ST-Link
+debugger:
+
+1. **Inside the container**:
+   ```bash
+   cd /workspace/src/platform/dagwood
+   # Build and flash via OpenOCD & ST-Link:
+   ./build_from_chroot.py -f
+   # Or flash existing build without rebuilding:
+   ./build_from_chroot.py --flash-only
+   ```
+
+2. **Direct from host via `run_docker.sh`**:
+   ```bash
+   ./run_docker.sh bash -c "cd /workspace/src/platform/dagwood && ./build_from_chroot.py -f"
+   ```

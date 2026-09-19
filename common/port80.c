@@ -257,3 +257,14 @@ static void port80_log_resume(void)
 	port_80_write(PORT_80_EVENT_RESUME);
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, port80_log_resume, HOOK_PRIO_DEFAULT);
+
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_PORT80_WRITE
+static enum ec_status port80_command_write(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_port80_write *p = args->params;
+
+	port_80_write(p->code);
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_PORT80_WRITE, port80_command_write, EC_VER_MASK(0));
+#endif

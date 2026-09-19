@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_HOST_COMMAND_LEGACY_H
-#define __CROS_EC_HOST_COMMAND_LEGACY_H
+#ifndef PLATFORM_EC_INCLUDE_HOST_COMMAND_LEGACY_H_
+#define PLATFORM_EC_INCLUDE_HOST_COMMAND_LEGACY_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -244,4 +244,4 @@ __error("This function should only be called from Zephyr OS code")
 }
 #endif
 
-#endif /* __CROS_EC_HOST_COMMAND_LEGACY_H */
+#endif /* PLATFORM_EC_INCLUDE_HOST_COMMAND_LEGACY_H_ */

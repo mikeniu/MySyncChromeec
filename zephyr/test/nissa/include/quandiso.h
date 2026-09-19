@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_NISSA_INCLUDE_QUANDISO_H_
-#define ZEPHYR_TEST_NISSA_INCLUDE_QUANDISO_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_QUANDISO_H_
+#define PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_QUANDISO_H_
 
 void kb_layout_init(void);
 void fan_init(void);
@@ -12,4 +12,4 @@ void board_init(void);
 
 extern enum quandiso_sub_board_type quandiso_cached_sub_board;
 
-#endif /* ZEPHYR_TEST_NISSA_INCLUDE_QUANDISO_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_QUANDISO_H_ */

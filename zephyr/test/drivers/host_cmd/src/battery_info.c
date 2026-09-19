@@ -200,5 +200,35 @@ ZTEST(host_cmd_battery_info, test_get_dynamic)
 	zassert_mem_equal(batt, &response1, sizeof(response1));
 }
 
+#ifdef CONFIG_HOSTCMD_BATTERY_GET_MISC_INFO
+/* Test EC_CMD_BATTERY_GET_MISC_INFO returns error on invalid battery index */
+ZTEST(host_cmd_battery_info, test_get_misc_info__invalid_index)
+{
+	struct ec_response_battery_get_misc_info response;
+	struct ec_params_battery_get_misc_info params = {
+		/* Index is out of range */
+		.index = CONFIG_BATTERY_COUNT + 1,
+	};
+	int rv;
+
+	rv = ec_cmd_battery_get_misc_info(NULL, &params, &response);
+	zassert_equal(EC_RES_INVALID_PARAM, rv, "Got %d", rv);
+}
+
+/* Test EC_CMD_BATTERY_GET_MISC_INFO retrieves battery misc status correctly */
+ZTEST(host_cmd_battery_info, test_get_misc_info)
+{
+	struct ec_response_battery_get_misc_info response;
+	struct ec_params_battery_get_misc_info params = {
+		.index = 0,
+	};
+	int rv;
+
+	memset(&response, 0, sizeof(response));
+	rv = ec_cmd_battery_get_misc_info(NULL, &params, &response);
+	zassert_ok(rv, "Got %d", rv);
+}
+#endif
+
 ZTEST_SUITE(host_cmd_battery_info, drivers_predicate_post_main, NULL, NULL,
 	    NULL, NULL);

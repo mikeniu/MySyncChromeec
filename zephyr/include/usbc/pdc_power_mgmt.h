@@ -7,8 +7,8 @@
  * @file
  * @brief PDC API for USB-C Power Management.
  */
-#ifndef __CROS_EC_PDC_POWER_MGMT_H
-#define __CROS_EC_PDC_POWER_MGMT_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_POWER_MGMT_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_POWER_MGMT_H_
 
 #include "usb_mux.h"
 #include "usb_pd.h"
@@ -812,4 +812,4 @@ void pdc_power_mgmt_request_tbt_reset(int port);
  */
 void pdc_power_mgmt_simulate_power_button_press(int ms);
 
-#endif /* __CROS_EC_PDC_POWER_MGMT_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_POWER_MGMT_H_ */

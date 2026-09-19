@@ -5,8 +5,8 @@
 
 /* Pujjoga sub-board declarations */
 
-#ifndef __CROS_EC_NISSA_PUJJOGA_SUB_BOARD_H__
-#define __CROS_EC_NISSA_PUJJOGA_SUB_BOARD_H__
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_PUJJOGA_SUB_BOARD_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_PUJJOGA_SUB_BOARD_H_
 
 #include <ap_power/ap_power.h>
 
@@ -33,4 +33,4 @@ void pujjoga_configure_hdmi_vcc(void);
 void hdmi_power_handler(struct ap_power_ev_callback *cb,
 			struct ap_power_ev_data data);
 
-#endif /* __CROS_EC_NISSA_PUJJOGA_SUB_BOARD_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_PUJJOGA_SUB_BOARD_H_ */

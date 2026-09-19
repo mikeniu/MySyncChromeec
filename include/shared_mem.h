@@ -14,8 +14,8 @@
  * replacement for malloc() / free().
  */
 
-#ifndef __CROS_EC_SHARED_MEM_H
-#define __CROS_EC_SHARED_MEM_H
+#ifndef PLATFORM_EC_INCLUDE_SHARED_MEM_H_
+#define PLATFORM_EC_INCLUDE_SHARED_MEM_H_
 
 #include "common.h"
 
@@ -100,4 +100,4 @@ extern struct shm_buffer *allocced_buf_chain;
 }
 #endif
 
-#endif /* __CROS_EC_SHARED_MEM_H */
+#endif /* PLATFORM_EC_INCLUDE_SHARED_MEM_H_ */

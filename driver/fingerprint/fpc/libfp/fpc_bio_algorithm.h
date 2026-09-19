@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef BIOD_BIO_ALGORITHM_H_
-#define BIOD_BIO_ALGORITHM_H_
+#ifndef PLATFORM_EC_DRIVER_FINGERPRINT_FPC_LIBFP_FPC_BIO_ALGORITHM_H_
+#define PLATFORM_EC_DRIVER_FINGERPRINT_FPC_LIBFP_FPC_BIO_ALGORITHM_H_
 
 #include "common.h"
 
@@ -278,4 +278,4 @@ typedef struct {
 __staticlib int bio_sensor_get_image_status(bio_image_t image,
 					    bio_image_status_t *image_status);
 
-#endif /* BIOD_BIO_ALGORITHM_H_ */
+#endif /* PLATFORM_EC_DRIVER_FINGERPRINT_FPC_LIBFP_FPC_BIO_ALGORITHM_H_ */

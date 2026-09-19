@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_POWER_QCOM_H_
-#define __CROS_EC_POWER_QCOM_H_
+#ifndef PLATFORM_EC_INCLUDE_POWER_QCOM_H_
+#define PLATFORM_EC_INCLUDE_POWER_QCOM_H_
 
 #if defined(CONFIG_CHIPSET_SC7180) || defined(CONFIG_CHIPSET_SC7280)
 enum power_signal {
@@ -63,4 +63,4 @@ void chipset_acok_passthru_interrupt(enum gpio_signal signal);
 void reset_ac_passthru_pmic_signal(void);
 #endif
 
-#endif /* __CROS_EC_POWER_QCOM_H_ */
+#endif /* PLATFORM_EC_INCLUDE_POWER_QCOM_H_ */

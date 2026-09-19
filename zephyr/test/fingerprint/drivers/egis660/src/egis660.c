@@ -317,6 +317,9 @@ ZTEST_F(egis660, test_convert_fp_capture_type_to_egis_capture_type)
 			      FINGERPRINT_CAPTURE_TYPE_PATTERN1),
 		      EGIS_CAPTURE_PATTERN1);
 	zassert_equal(convert_fp_capture_type_to_egis_capture_type(
+			      FINGERPRINT_CAPTURE_TYPE_PATTERN2),
+		      EGIS_CAPTURE_PATTERN2);
+	zassert_equal(convert_fp_capture_type_to_egis_capture_type(
 			      FINGERPRINT_CAPTURE_TYPE_RESET_TEST),
 		      -EINVAL);
 	zassert_equal(convert_fp_capture_type_to_egis_capture_type(

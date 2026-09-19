@@ -212,8 +212,8 @@ static void usbd_gi2c_disable(struct usbd_class_data *const c_data)
 	LOG_DBG("configuration disabled");
 }
 
-static void *usbd_gi2c_get_desc(struct usbd_class_data *const c_data,
-				const enum usbd_speed speed)
+static const void *usbd_gi2c_get_desc(struct usbd_class_data *const c_data,
+				      const enum usbd_speed speed)
 {
 	struct google_data *data = usbd_class_get_private(c_data);
 

@@ -21,10 +21,11 @@
 
 #ifdef CONFIG_HOSTCMD_TYPEC_DISCOVERY
 /* Retrieve all discovery results for the given port and transmit type */
-static enum ec_status hc_typec_discovery(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_typec_discovery(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_typec_discovery *p = args->params;
-	struct ec_response_typec_discovery *r = args->response;
+	const struct ec_params_typec_discovery *p = args->input_buf;
+	struct ec_response_typec_discovery *r = args->output_buf;
 	const struct pd_discovery *disc;
 	enum tcpci_msg_type type;
 
@@ -32,10 +33,10 @@ static enum ec_status hc_typec_discovery(struct host_cmd_handler_args *args)
 	BUILD_ASSERT(sizeof(r->discovery_vdo) == sizeof(union disc_ident_ack));
 
 	if (p->port >= board_get_usb_pd_port_count())
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	if (p->partner_type > TYPEC_PARTNER_SOP_PRIME)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	type = p->partner_type == TYPEC_PARTNER_SOP ? TCPCI_MSG_SOP :
 						      TCPCI_MSG_SOP_PRIME;
@@ -49,7 +50,7 @@ static enum ec_status hc_typec_discovery(struct host_cmd_handler_args *args)
 	disc = pd_get_am_discovery_and_notify_access(p->port, type);
 
 	/* Initialize return size to that of discovery with no SVIDs */
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
 	if (pd_get_identity_discovery(p->port, type) == PD_DISC_COMPLETE) {
 		r->identity_count = disc->identity_cnt;
@@ -58,13 +59,13 @@ static enum ec_status hc_typec_discovery(struct host_cmd_handler_args *args)
 		       sizeof(r->discovery_vdo));
 	} else {
 		r->identity_count = 0;
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 	}
 
 	if (pd_get_modes_discovery(p->port, type) == PD_DISC_COMPLETE) {
 		int svid_i;
 		int max_resp_svids =
-			(args->response_max - args->response_size) /
+			(args->output_buf_max - args->output_buf_size) /
 			sizeof(struct svid_mode_info);
 
 		if (disc->svid_cnt > max_resp_svids) {
@@ -81,7 +82,7 @@ static enum ec_status hc_typec_discovery(struct host_cmd_handler_args *args)
 			memcpy(r->svids[svid_i].mode_vdo,
 			       disc->svids[svid_i].mode_vdo,
 			       sizeof(r->svids[svid_i].mode_vdo));
-			args->response_size += sizeof(struct svid_mode_info);
+			args->output_buf_size += sizeof(struct svid_mode_info);
 		}
 	} else {
 		r->svid_count = 0;
@@ -94,13 +95,14 @@ static enum ec_status hc_typec_discovery(struct host_cmd_handler_args *args)
 	 */
 	if (!pd_discovery_access_validate(p->port, type)) {
 		CPRINTS("[C%d] %s returns EC_RES_BUSY!!", p->port, __func__);
-		return EC_RES_BUSY;
+		return EC_HOST_CMD_BUSY;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_TYPEC_DISCOVERY, hc_typec_discovery,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_TYPEC_DISCOVERY, hc_typec_discovery, EC_VER_MASK(0),
+		    struct ec_params_typec_discovery,
+		    struct ec_response_typec_discovery);
 #endif /* CONFIG_HOSTCMD_TYPEC_DISCOVERY */
 
 /* Default to feature unavailable, with boards supporting it overriding */
