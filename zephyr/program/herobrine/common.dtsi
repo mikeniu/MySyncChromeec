@@ -34,6 +34,16 @@
 				MKBP_EVENT_HOST_EVENT | \
 				MKBP_EVENT_SENSOR_FIFO)>;
 	};
+
+	ap_pwrseq: ap-pwrseq {
+		compatible = "cros-ec,qcom-ap-pwrseq";
+		switchcap = <&switchcap>;
+		ap-rst-gpios = <&gpio5 1 GPIO_ACTIVE_HIGH>;
+		ap-suspend-gpios = <&gpio5 7 GPIO_ACTIVE_HIGH>;
+		power-good-gpios = <&gpio3 7 GPIO_PULL_DOWN>;
+		pmic-kpd-pwr-odl-gpios = <&gpioa 2 GPIO_OPEN_DRAIN>;
+		pmic-resin-gpios = <&gpioa 0 GPIO_OPEN_DRAIN>;
+	};
 };
 
 &shi0 {

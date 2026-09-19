@@ -41,31 +41,6 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "button_interrupt";
 		};
-		int_ap_rst: ap_rst {
-			irq-pin = <&gpio_ap_rst_l>;
-			flags = <GPIO_INT_EDGE_BOTH>;
-			handler = "chipset_ap_rst_interrupt";
-		};
-		int_ap_suspend: ap_suspend {
-			irq-pin = <&gpio_ap_suspend>;
-			flags = <GPIO_INT_EDGE_BOTH>;
-			handler = "power_signal_interrupt";
-		};
-		int_power_good: power_good {
-			irq-pin = <&gpio_mb_power_good>;
-			flags = <GPIO_INT_EDGE_BOTH>;
-			handler = "power_signal_interrupt";
-		};
-		int_ps_hold: ps_hold {
-			irq-pin = <&gpio_ps_hold>;
-			flags = <GPIO_INT_EDGE_BOTH>;
-			handler = "power_signal_interrupt";
-		};
-		int_warm_reset: warm_reset {
-			irq-pin = <&gpio_warm_reset_l>;
-			flags = <GPIO_INT_EDGE_BOTH>;
-			handler = "power_signal_interrupt";
-		};
 		int_usb_c0_bc12: usb_c0_bc12 {
 			irq-pin = <&gpio_usb_c0_bc12_int_l>;
 			flags = <GPIO_INT_EDGE_FALLING>;
