@@ -150,6 +150,10 @@ void ec_app_main(void)
 	}
 #endif
 
+	if (IS_ENABLED(CONFIG_QCOM_AP_PWRSEQ_DRIVER)) {
+		qcom_pwrseq_task_start();
+	}
+
 	if (IS_ENABLED(CONFIG_USB_PD_ALTMODE_INTEL)) {
 		intel_altmode_task_start();
 	}

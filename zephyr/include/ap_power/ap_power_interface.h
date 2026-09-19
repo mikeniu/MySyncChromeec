@@ -226,6 +226,11 @@ void ap_power_init_reset_log(void);
 void ap_pwrseq_task_start(void);
 
 /**
+ * @brief Starts the Qualcomm AP power sequence thread.
+ */
+void qcom_pwrseq_task_start(void);
+
+/**
  * @brief Returns the AP_PWRSEQ thread ID.
  */
 k_tid_t get_ap_pwrseq_thread(void);

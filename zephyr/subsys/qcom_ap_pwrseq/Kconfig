@@ -1,0 +1,11 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config QCOM_AP_PWRSEQ_DRIVER
+	bool "Qualcomm AP power sequencing driver"
+	default y
+	depends on DT_HAS_CROS_EC_QCOM_AP_PWRSEQ_ENABLED
+	select AP_POWER_CONTROL
+	help
+	  Enables the AP power sequence driver for Qualcomm chipsets.
