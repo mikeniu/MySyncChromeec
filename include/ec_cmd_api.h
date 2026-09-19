@@ -494,6 +494,7 @@ _CROS_EC_C0_F_PF(EC_CMD_USB_PD_RW_HASH_ENTRY, usb_pd_rw_hash_entry);
 _CROS_EC_C0_F_PF_RF(EC_CMD_VBOOT_HASH, vboot_hash);
 _CROS_EC_C0_F_PF_RF(EC_CMD_VSTORE_READ, vstore_read);
 _CROS_EC_C0_F_PF(EC_CMD_VSTORE_WRITE, vstore_write);
+_CROS_EC_C0_F_PF(EC_CMD_PORT80_WRITE, port80_write);
 _CROS_EC_C0_F_PF(EC_CMD_UCSI_PPM_SET, ucsi_ppm_set);
 _CROS_EC_C0_F_PF(EC_CMD_FP_VENDOR, fp_vendor);
 _CROS_EC_C0_F_PF(EC_CMD_ENTER_BOOTLOADER, enter_bootloader);
