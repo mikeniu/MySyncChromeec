@@ -1,0 +1,15 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+common:
+  platform_allow:
+    - native_sim
+tests:
+  qcom_ap_pwrseq.default: {}
+  qcom_ap_pwrseq.sysjump_s0:
+    extra_args: EXTRA_CFLAGS=-DTEST_SYSJUMP_S0
+  qcom_ap_pwrseq.sysjump_s3:
+    extra_args: EXTRA_CFLAGS=-DTEST_SYSJUMP_S3
+  qcom_ap_pwrseq.sysjump_g3:
+    extra_args: EXTRA_CFLAGS=-DTEST_SYSJUMP_G3
