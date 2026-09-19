@@ -136,11 +136,11 @@ static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 		return TASK_ID_SHELL;
 	}
 
-#ifdef CONFIG_AP_PWRSEQ
+#if defined(CONFIG_AP_PWRSEQ) || defined(CONFIG_QCOM_AP_PWRSEQ_DRIVER)
 	if (get_ap_pwrseq_thread() == thread_id) {
 		return TASK_ID_AP_PWRSEQ;
 	}
-#endif /* CONFIG_AP_PWRSEQ */
+#endif /* CONFIG_AP_PWRSEQ || CONFIG_QCOM_AP_PWRSEQ_DRIVER */
 
 	for (size_t i = 0; i < TASK_ID_COUNT; ++i) {
 		if (task_to_k_tid[i] == thread_id) {
