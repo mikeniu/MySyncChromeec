@@ -1,0 +1,25 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	switchcap: switchcap {
+		compatible = "cros-ec,switchcap";
+		enable-gpios = <&gpio0 5 GPIO_ACTIVE_HIGH>;
+		power-good-gpios = <&gpio0 6 GPIO_ACTIVE_HIGH>;
+	};
+
+	qcom_ap_pwrseq: qcom-ap-pwrseq {
+		compatible = "cros-ec,qcom-ap-pwrseq";
+		switchcap = <&switchcap>;
+		ap-rst-gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
+		ap-suspend-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
+		power-good-gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+		pmic-kpd-pwr-odl-gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
+		pmic-resin-gpios = <&gpio0 4 GPIO_ACTIVE_HIGH>;
+	};
+};
