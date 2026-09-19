@@ -5,8 +5,8 @@
 
 /* SPI flash interface for Chrome EC */
 
-#ifndef __CROS_EC_SPI_FLASH_H
-#define __CROS_EC_SPI_FLASH_H
+#ifndef PLATFORM_EC_INCLUDE_SPI_FLASH_H_
+#define PLATFORM_EC_INCLUDE_SPI_FLASH_H_
 
 /* Obtain SPI flash size from JEDEC size */
 #define SPI_FLASH_SIZE(x) (1 << (x))
@@ -185,4 +185,4 @@ int spi_flash_check_protect(unsigned int offset, unsigned int bytes);
  */
 int spi_flash_set_protect(unsigned int offset, unsigned int bytes);
 
-#endif /* __CROS_EC_SPI_FLASH_H */
+#endif /* PLATFORM_EC_INCLUDE_SPI_FLASH_H_ */

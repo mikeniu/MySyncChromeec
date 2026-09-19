@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_ANX7483_H
-#define __EMUL_ANX7483_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_RETIMER_EMUL_ANX7483_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_RETIMER_EMUL_ANX7483_H_
 
 #include "driver/retimer/anx7483.h"
 #include "driver/retimer/anx7483_public.h"
@@ -139,4 +139,4 @@ int anx7483_emul_validate_tuning(const struct emul *emul,
 				 const struct anx7483_tuning_set *tuning,
 				 size_t tuning_count);
 
-#endif /* __EMUL_ANX7483_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_RETIMER_EMUL_ANX7483_H_ */

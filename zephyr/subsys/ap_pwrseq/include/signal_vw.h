@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __AP_PWRSEQ_SIGNAL_VW_H__
-#define __AP_PWRSEQ_SIGNAL_VW_H__
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_SIGNAL_VW_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_SIGNAL_VW_H_
 
 #include <zephyr/devicetree.h>
 
@@ -58,4 +58,4 @@ void power_signal_vw_init(void);
 #define ANY_INST_HAS_INTEL_AP_PWRSEQ_PLTRST \
 	(DT_FOREACH_STATUS_OKAY(intel_ap_pwrseq_vw, HAS_PLTRST_VWIRE) 0)
 
-#endif /* __AP_PWRSEQ_SIGNAL_VW_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_SIGNAL_VW_H_ */

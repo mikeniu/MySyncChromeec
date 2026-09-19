@@ -2,6 +2,10 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+
+#ifndef PLATFORM_EC_ZEPHYR_TEST_USB_UPDATER_INCLUDE_FAKES_H_
+#define PLATFORM_EC_ZEPHYR_TEST_USB_UPDATER_INCLUDE_FAKES_H_
+
 #include "ec_commands.h"
 #include "rwsig.h"
 #include "system.h"
@@ -30,3 +34,5 @@ DECLARE_FAKE_VALUE_FUNC(enum rwsig_status, rwsig_get_status);
 	FAKE(touchpad_task)         \
 	FAKE(system_get_version)    \
 	FAKE(rwsig_get_status)
+
+#endif /* PLATFORM_EC_ZEPHYR_TEST_USB_UPDATER_INCLUDE_FAKES_H_ */

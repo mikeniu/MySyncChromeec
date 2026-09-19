@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_NFC_CTN730_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_NFC_CTN730_H_
+
 #include "driver/nfc/ctn730.h"
 #include "peripheral_charger.h"
 
@@ -31,3 +34,5 @@ extern struct pchg_drv ctn730_drv;
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_NFC_CTN730_H_ */

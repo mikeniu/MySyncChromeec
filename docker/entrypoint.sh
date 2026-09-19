@@ -15,6 +15,11 @@ if [ "$(id -u)" = "0" ] && [ -n "${HOST_UID}" ] && \
     # Prepare devutils directory for monitor binary installation
     mkdir -p /usr/share/ec-devutils
     chown -R "${HOST_UID}:${HOST_GID}" /usr/share/ec-devutils
+    # First run: Bind-mounted directory does not exist; implicitly created by
+    # root. Transfer to the unprivileged user.
+    # Subsequent runs: Unprivileged user already owns it. chown is a no-op.
+    # Not recursive: The user created and owns the contents.
+    chown "${HOST_UID}:${HOST_GID}" /workspace
     chmod 755 /entrypoint.sh
     exec gosu hostuser /bin/bash /entrypoint.sh "$@"
 fi
@@ -145,6 +150,7 @@ clone_zephyrproject_sparse() {
             {
                 echo "/zephyr/"
                 echo "/modules/hal/cmsis_6/"
+                echo "/modules/hal/stm32/"
                 echo "/modules/lib/picolibc/"
                 echo "/modules/lib/nanopb/"
             } >> .git/info/sparse-checkout
@@ -253,7 +259,11 @@ source "${VENV_DIR}/bin/activate"
 export PATH="${PATH}:/opt/repos/src/third_party/u-boot/tools/binman"
 export PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
 
-# Set up Coreboot SDK cache directory symlink for the current user
+# Set up Coreboot SDK cache directory symlink for the current user. The target
+# lives under the bind-mounted workspace so that downloaded toolchains outlive
+# the container. Create it before linking: nothing can write through a
+# dangling symlink, so the SDK download would fail against a bare workspace.
+mkdir -p /workspace/.cache/coreboot-sdk
 mkdir -p "${HOME}/.cache"
 ln -sfn /workspace/.cache/coreboot-sdk "${HOME}/.cache/coreboot-sdk"
 

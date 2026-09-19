@@ -9,8 +9,8 @@
  * @brief Backend API for BMI emulator
  */
 
-#ifndef __EMUL_BMI_H
-#define __EMUL_BMI_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BMI_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BMI_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c.h>
@@ -536,4 +536,4 @@ emul_bmi_get_i2c_common_data(const struct emul *emul);
  * @}
  */
 
-#endif /* __EMUL_BMI_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BMI_H_ */

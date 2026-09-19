@@ -5,8 +5,8 @@
  * Symbols from linker definitions
  */
 
-#ifndef __CROS_EC_LINK_DEFS_H
-#define __CROS_EC_LINK_DEFS_H
+#ifndef PLATFORM_EC_INCLUDE_LINK_DEFS_H_
+#define PLATFORM_EC_INCLUDE_LINK_DEFS_H_
 
 #include "console.h"
 #include "hooks.h"
@@ -189,4 +189,4 @@ extern const char __noinit_end_of_ram_end[];
 }
 #endif
 
-#endif /* __CROS_EC_LINK_DEFS_H */
+#endif /* PLATFORM_EC_INCLUDE_LINK_DEFS_H_ */

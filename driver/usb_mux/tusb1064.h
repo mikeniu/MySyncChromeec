@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_TUSB1064_H
-#define __CROS_EC_TUSB1064_H
+#ifndef PLATFORM_EC_DRIVER_USB_MUX_TUSB1064_H_
+#define PLATFORM_EC_DRIVER_USB_MUX_TUSB1064_H_
 
 #include "usb_mux.h"
 
@@ -152,4 +152,4 @@ int tusb1064_set_dp_rx_eq(const struct usb_mux *me, int db);
 
 int tusb1064_set_mux(const struct usb_mux *me, mux_state_t mux_state,
 		     bool *ack_required);
-#endif /* __CROS_EC_TUSB1064_H */
+#endif /* PLATFORM_EC_DRIVER_USB_MUX_TUSB1064_H_ */

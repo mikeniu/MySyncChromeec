@@ -44,6 +44,12 @@ config BOARD_PIC
 	  Build Google PIC board. The board uses Nuvoton
 	  NPCX9 chip as the EC.
 
+config BOARD_MERU
+	bool "Google Meru baseboard"
+	help
+	  Build Google Meru board. The board uses Nuvoton
+	  NPCX9 chip as the EC.
+
 module = Bluey
 module-str = Bluey board-specific code
 source "subsys/logging/Kconfig.template.log_config"

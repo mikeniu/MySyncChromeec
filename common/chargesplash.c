@@ -214,18 +214,11 @@ DECLARE_CONSOLE_COMMAND(chargesplash, command_chargesplash,
 			"[state|request|reset|lockout]",
 			"Charge splash controls");
 
-static enum ec_status chargesplash_host_cmd(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+chargesplash_host_cmd(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_chargesplash *params = args->params;
-	struct ec_response_chargesplash *response = args->response;
-
-	if (args->params_size < sizeof(*params)) {
-		return EC_RES_INVALID_PARAM;
-	}
-
-	if (args->response_max < sizeof(*response)) {
-		return EC_RES_INVALID_RESPONSE;
-	}
+	const struct ec_params_chargesplash *params = args->input_buf;
+	struct ec_response_chargesplash *response = args->output_buf;
 
 	switch (params->cmd) {
 	case EC_CHARGESPLASH_GET_STATE:
@@ -246,7 +239,7 @@ static enum ec_status chargesplash_host_cmd(struct host_cmd_handler_args *args)
 		locked_out = true;
 		break;
 	default:
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	/* All commands return the (possibly updated) state */
@@ -254,8 +247,9 @@ static enum ec_status chargesplash_host_cmd(struct host_cmd_handler_args *args)
 	response->display_initialized = display_initialized;
 	response->locked_out = locked_out;
 
-	args->response_size = sizeof(*response);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*response);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_CHARGESPLASH, chargesplash_host_cmd,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_CHARGESPLASH, chargesplash_host_cmd, EC_VER_MASK(0),
+		    struct ec_params_chargesplash,
+		    struct ec_response_chargesplash);

@@ -5,8 +5,8 @@
 
 /* USB Power delivery port management - common header for TCPM drivers */
 
-#ifndef __CROS_EC_USB_PD_TCPM_TCPM_H
-#define __CROS_EC_USB_PD_TCPM_TCPM_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_TCPM_TCPM_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_TCPM_TCPM_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -681,4 +681,4 @@ int tcpm_reset_bist_type_2(int port);
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_TCPM_TCPM_H_ */

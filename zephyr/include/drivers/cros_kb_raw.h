@@ -19,8 +19,8 @@
  * the Zephyr kscan API.
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_CROS_KB_RAW_H_
-#define ZEPHYR_INCLUDE_DRIVERS_CROS_KB_RAW_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_KB_RAW_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_KB_RAW_H_
 
 #include "gpio_signal.h"
 
@@ -144,4 +144,4 @@ static inline void cros_kb_raw_set_col2(int level)
 /**
  * @}
  */
-#endif /* ZEPHYR_INCLUDE_DRIVERS_CROS_KB_RAW_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_KB_RAW_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef GPIO_H
-#define GPIO_H
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_GPIO_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_GPIO_H_
 
 #include "MCHP_MEC172x.h"
 
@@ -12,4 +12,4 @@
 
 void gpio_pin_ctrl1_reg_write(uint32_t pin, uint32_t data);
 
-#endif /* #ifndef GPIO_H */
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_GPIO_H_ */

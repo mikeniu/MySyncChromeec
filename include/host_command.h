@@ -5,8 +5,8 @@
 
 /* Host command module for Chrome EC */
 
-#ifndef __CROS_EC_HOST_COMMAND_H
-#define __CROS_EC_HOST_COMMAND_H
+#ifndef PLATFORM_EC_INCLUDE_HOST_COMMAND_H_
+#define PLATFORM_EC_INCLUDE_HOST_COMMAND_H_
 
 #include "common.h"
 #include "compiler.h"
@@ -296,4 +296,4 @@ uint32_t get_feature_flags1(void);
 }
 #endif
 
-#endif /* __CROS_EC_HOST_COMMAND_H */
+#endif /* PLATFORM_EC_INCLUDE_HOST_COMMAND_H_ */

@@ -8,8 +8,8 @@
  * For more details on LIS2DW12 device please refer to www.st.com.
  */
 
-#ifndef __CROS_EC_ACCEL_LIS2DW12_H
-#define __CROS_EC_ACCEL_LIS2DW12_H
+#ifndef PLATFORM_EC_DRIVER_ACCEL_LIS2DW12_H_
+#define PLATFORM_EC_DRIVER_ACCEL_LIS2DW12_H_
 
 #include "driver/accel_lis2dw12_public.h"
 #include "stm_mems_common.h"
@@ -240,4 +240,4 @@ int lis2dw12_set_power_mode(const struct motion_sensor_t *s,
 #endif
 #endif
 
-#endif /* __CROS_EC_ACCEL_LIS2DW12_H */
+#endif /* PLATFORM_EC_DRIVER_ACCEL_LIS2DW12_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_SUBSYS_UCSI_INCLUDE_PPM_H_
-#define ZEPHYR_SUBSYS_UCSI_INCLUDE_PPM_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PPM_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PPM_H_
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -225,4 +225,4 @@ struct ucsi_pd_driver {
  */
 int eppm_init(void);
 
-#endif /* ZEPHYR_SUBSYS_UCSI_INCLUDE_PPM_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PPM_H_ */

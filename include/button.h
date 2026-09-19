@@ -5,8 +5,8 @@
 
 /* Button API for Chrome EC */
 
-#ifndef __CROS_EC_BUTTON_H
-#define __CROS_EC_BUTTON_H
+#ifndef PLATFORM_EC_INCLUDE_BUTTON_H_
+#define PLATFORM_EC_INCLUDE_BUTTON_H_
 
 #include "common.h"
 #include "compile_time_macros.h"
@@ -137,4 +137,4 @@ __test_only enum debug_state get_button_debug_state(void);
 }
 #endif
 
-#endif /* __CROS_EC_BUTTON_H */
+#endif /* PLATFORM_EC_INCLUDE_BUTTON_H_ */

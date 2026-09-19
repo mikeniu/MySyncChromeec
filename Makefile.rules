@@ -71,10 +71,10 @@ cmd_c_to_s = $(CC) -S $(C_WARN) $(CFLAGS) $(C_WARN-$(CROSS_COMPILE_CC_NAME)) \
 		-MT $(@D)/$(@F) -o $(@D)/$(@F)
 cmd_cxx_to_o = $(CXX) $(CFLAGS) $(CXXFLAGS) -MMD -MP -MF $@.d \
 		      -c $< -MT $(@D)/$(@F) -o $(@D)/$(@F)
-cmd_c_to_host = $(HOSTCC) $(HOST_CFLAGS) -MMD -MF $@.d -MT $@ -o $@ \
+cmd_c_to_host = $(HOSTCC) $(HOST_CFLAGS) -MMD -MP -MF $@.d -MT $@ -o $@ \
 	         $(sort $(foreach c,$($(*F)-objs),util/$(c:%.o=%.c)) $(wildcard $*.c)) $(HOST_LDFLAGS)
 cmd_cxx_to_host = $(HOSTCXX) $(HOST_CXXFLAGS) \
-		-MMD -MF $@.d -MT $@ -o $@ \
+		-MMD -MP -MF $@.d -MT $@ -o $@ \
 		$(sort $(foreach c,$($(*F)-objs),util/$(c:%.o=%.cc)) $(wildcard $*.cc)) $(HOST_LDFLAGS)
 cmd_o_to_a = $(AR) rcs $@ $^
 cmd_host_test = $(MAKE) BOARD=host PROJECT=$* \
@@ -91,6 +91,7 @@ cmd_mv_from_tmp = mv $(out)/$*.bin.tmp $(out)/$*.bin
 cmd_copyrw-y = cd $(out) && cp RW/$(PROJECT).RW.flat RW/$(PROJECT).RW.bin
 
 cmd_cp_script = cp "$<" "$@" && chmod +x "$@"
+cmd_symlink_hdr = mkdir -p $(@D) && ln -srf $< $@
 
 # If outputing to tty and column command exists, pipe into column.
 # Otherwise, print in newline format.
@@ -298,10 +299,25 @@ $(rw-objs): | $(out)/ec_version.h
 $(out)/ec_version.h:
 	$(call quiet,version,VERSION)
 
-$(host-utils): $(out)/%:$(host-srcs)
+# Symlink exported headers into $(out)/include/chromeos/ec/ so that host tools
+# compiling against system libraries (e.g. libec) resolve <chromeos/ec/...>
+# headers to the local checkout instead of /usr/include/chromeos/ec/.
+chromeos-ec-headers := \
+	$(out)/include/chromeos/ec/ec_commands.h \
+	$(out)/include/chromeos/ec/ec_cmd_api.h \
+	$(out)/include/chromeos/ec/panic_defs.h \
+	$(out)/include/chromeos/ec/cros_ec_dev.h
+
+$(out)/include/chromeos/ec/%: include/%
+	$(call quiet,symlink_hdr,SYMLINK)
+
+$(out)/include/chromeos/ec/cros_ec_dev.h: util/cros_ec_dev.h
+	$(call quiet,symlink_hdr,SYMLINK)
+
+$(host-utils): $(out)/%:$(host-srcs) | $(chromeos-ec-headers)
 	$(call quiet,c_to_host,HOSTCC )
 
-$(host-utils-cxx): $(out)/%:$(host-srcs-cxx)
+$(host-utils-cxx): $(out)/%:$(host-srcs-cxx) | $(chromeos-ec-headers)
 	$(call quiet,cxx_to_host,HOSTCXX )
 
 .PHONY: clean

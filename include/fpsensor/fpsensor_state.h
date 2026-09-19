@@ -5,8 +5,8 @@
 
 /* Fingerprint sensor interface */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_STATE_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_STATE_H
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_STATE_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_STATE_H_
 
 #include "atomic.h"
 #include "common.h"
@@ -208,4 +208,4 @@ fp_read_match_secret(int8_t fgr,
 		     std::span<uint8_t, FP_POSITIVE_MATCH_SECRET_BYTES>
 			     positive_match_secret);
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_STATE_H */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_STATE_H_ */

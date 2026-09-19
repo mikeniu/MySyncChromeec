@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_PCT2075_H
-#define EMUL_PCT2075_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PCT2075_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PCT2075_H_
 
 #include "emul/emul_common_i2c.h"
 
@@ -29,4 +29,4 @@ struct pct2075_data {
  */
 int pct2075_emul_set_temp(const struct emul *emul, int mk);
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PCT2075_H_ */

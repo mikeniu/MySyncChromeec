@@ -503,6 +503,16 @@ config PLATFORM_EC_HOSTCMD_GET_UPTIME_INFO
 	  the EC has been powered up, the number of AP resets, an optional log
 	  of AP-reset events and some flags.
 
+config PLATFORM_EC_HOSTCMD_PORT80_WRITE
+	bool "Host command: EC_CMD_PORT80_WRITE"
+	depends on PLATFORM_EC_HOSTCMD && PLATFORM_EC_PORT80 && !AP_X86
+	default y
+	help
+	  Enable the EC_CMD_PORT80_WRITE host command which allows the host AP
+	  to log POST code events to the EC's port 80 history buffer.
+
+	  Note: This feature is only used for non-x86 projects.
+
 config PLATFORM_EC_HOSTCMD_REGULATOR
 	bool "Host command of voltage regulator control"
 	help

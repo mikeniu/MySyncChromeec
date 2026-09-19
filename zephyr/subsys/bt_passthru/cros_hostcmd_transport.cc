@@ -116,8 +116,10 @@ size_t CrosHostcmdTransport::GetPendingEvents(uint8_t *out_buffer,
 		/* Deadlock Protection: Discard events that can never fit in the
 		 * MTU */
 		if (static_cast<size_t>(event_len + 1) > max_size) {
-			ring_buf_get(&bt_events_ring_buf_, nullptr,
-				     event_len + 1);
+			ring_buf_consume(
+				&bt_events_ring_buf_,
+				MIN(static_cast<uint32_t>(event_len + 1),
+				    ring_buf_size_get(&bt_events_ring_buf_)));
 			continue;
 		}
 

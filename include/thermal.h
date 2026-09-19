@@ -5,8 +5,8 @@
 
 /* Thermal engine module for Chrome EC */
 
-#ifndef __CROS_EC_THERMAL_H
-#define __CROS_EC_THERMAL_H
+#ifndef PLATFORM_EC_INCLUDE_THERMAL_H_
+#define PLATFORM_EC_INCLUDE_THERMAL_H_
 
 /* The thermal configuration for a single temp sensor is defined here. */
 #include "ec_commands.h"
@@ -35,4 +35,4 @@ void board_override_fan_control(int fan, int *tmp);
 }
 #endif
 
-#endif /* __CROS_EC_THERMAL_H */
+#endif /* PLATFORM_EC_INCLUDE_THERMAL_H_ */

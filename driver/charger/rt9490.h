@@ -4,12 +4,13 @@
  *
  * Richtek 5A 1-4 cell buck-boost switching battery charger driver.
  */
+
+#ifndef PLATFORM_EC_DRIVER_CHARGER_RT9490_H_
+#define PLATFORM_EC_DRIVER_CHARGER_RT9490_H_
+
 #include "temp_sensor.h"
 
 #include <stdbool.h>
-
-#ifndef __CROS_EC_RT9490_H
-#define __CROS_EC_RT9490_H
 
 #define RT9490_ADDR_FLAGS 0x53
 
@@ -265,8 +266,6 @@ int rt9490_enable_pwm_1mhz(int chgnum, bool en);
 
 int rt9490_enable_hidden_mode(int chgnum, bool en);
 
-#endif /* __CROS_EC_RT9490_H */
-
 /*
  * Required for TS_ADC temperature calculation.
  * Non-zephyr devices that using TS_ADC must define this in board layer.
@@ -276,3 +275,5 @@ extern const struct thermistor_info rt9490_thermistor_info;
 int rt9490_get_thermistor_val(const struct temp_sensor_t *sensor,
 			      int *temp_ptr);
 extern const struct rt9490_init_setting rt9490_setting;
+
+#endif /* PLATFORM_EC_DRIVER_CHARGER_RT9490_H_ */

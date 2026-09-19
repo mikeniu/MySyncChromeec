@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __HID_VIVALDI_H
-#define __HID_VIVALDI_H
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_USBD_SERVICE_HID_VIVALDI_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_USBD_SERVICE_HID_VIVALDI_H_
 
 #include "ec_commands.h"
 
@@ -53,4 +53,4 @@
 int32_t get_vivaldi_feature_report(const uint16_t req_len, uint8_t *data);
 uint32_t vivaldi_convert_function_key(int keycode);
 
-#endif /* __HID_VIVALDI_H */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_USBD_SERVICE_HID_VIVALDI_H_ */

@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef UTIL_FOCALTECH_FT_LOG_H_
-#define UTIL_FOCALTECH_FT_LOG_H_
+#ifndef PLATFORM_EC_UTIL_FOCALTECH_FT_LOG_H_
+#define PLATFORM_EC_UTIL_FOCALTECH_FT_LOG_H_
 
 #include <unistd.h>
 
@@ -135,4 +135,4 @@ void FtLog(LogLevel level, const std::source_location& loc,
 
 #endif  // FT_LOG_DIS
 
-#endif  // UTIL_FOCALTECH_FT_LOG_H_
+#endif /* PLATFORM_EC_UTIL_FOCALTECH_FT_LOG_H_ */
