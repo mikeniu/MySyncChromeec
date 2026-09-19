@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "de92ecf2_d958674f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-19T18:15:33Z",
+      "side": 1,
+      "message": "I\u0027ve verified these changes from EC side on different boards, brox, skywalker, and fatcat. This set confirms that boards that already have upstream host command enabled and disabled working. Fingerprint already has upstream host commands enabled as well. This refactoring is now using upstream host command macros and verifying request/response sizes now (for security reasons). If you have bandwidth to help verify fingerprint, that would appreciated.",
+      "parentUuid": "af3c8eef_edabae1c",
+      "revId": "e0190bcb35ea91b8042afcc08aa577d5ff41a890",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1b7fccf8_279d5a03",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 31
@@ -31,6 +49,30 @@
       "writtenOn": "2026-09-18T22:11:01Z",
       "side": 1,
       "message": "why did you flip the logic. \u003e vs. \u003c. \n\njust keep it the same for consistency.",
+      "range": {
+        "startLine": 518,
+        "startChar": 0,
+        "endLine": 519,
+        "endChar": 30
+      },
+      "revId": "e0190bcb35ea91b8042afcc08aa577d5ff41a890",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "940463d9_d3a36db8",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-19T18:15:33Z",
+      "side": 1,
+      "message": "Done. Restored the original if (response_size \u003e args-\u003eoutput_buf_max) check.",
+      "parentUuid": "1b7fccf8_279d5a03",
       "range": {
         "startLine": 518,
         "startChar": 0,
@@ -64,6 +106,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4611834_eac3cc00",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-19T18:15:33Z",
+      "side": 1,
+      "message": "No, this was not present originally in legacy code. It was added in response to your earlier review comment on Patchset 30 to prevent p_1-\u003emac from being read out of bounds when version \u003d\u003d 1 is invoked with an undersized buffer.",
+      "parentUuid": "3c5b2606_a56eebc4",
+      "range": {
+        "startLine": 349,
+        "startChar": 1,
+        "endLine": 350,
+        "endChar": 40
+      },
+      "revId": "e0190bcb35ea91b8042afcc08aa577d5ff41a890",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "901ad0ac_6371fd03",
@@ -77,6 +143,30 @@
       "writtenOn": "2026-09-18T22:11:01Z",
       "side": 1,
       "message": "I do not believe this is the C++ way to convert",
+      "range": {
+        "startLine": 361,
+        "startChar": 8,
+        "endLine": 361,
+        "endChar": 33
+      },
+      "revId": "e0190bcb35ea91b8042afcc08aa577d5ff41a890",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f5609ed_68b68907",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 31
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-19T18:15:33Z",
+      "side": 1,
+      "message": "Done. Updated to static_cast\u003cenum ec_host_cmd_status\u003e(ret).",
+      "parentUuid": "901ad0ac_6371fd03",
       "range": {
         "startLine": 361,
         "startChar": 8,
