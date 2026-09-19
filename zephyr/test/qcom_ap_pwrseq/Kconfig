@@ -1,0 +1,33 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+source "Kconfig.zephyr"
+
+config TEST_DEFAULT
+	bool
+	default y if !TEST_SYSJUMP && !TEST_EC_APP_MAIN
+
+config TEST_EC_APP_MAIN
+	bool "Test ec_app_main starts the power sequence task"
+
+config TEST_SYSJUMP
+	bool
+
+choice TEST_SYSJUMP_CHOICE
+	prompt "Select sysjump test state"
+	optional
+
+config TEST_SYSJUMP_S0
+	bool "Test power sequencing with system jump in S0"
+	select TEST_SYSJUMP
+
+config TEST_SYSJUMP_S3
+	bool "Test power sequencing with system jump in S3"
+	select TEST_SYSJUMP
+
+config TEST_SYSJUMP_G3
+	bool "Test power sequencing with system jump in G3"
+	select TEST_SYSJUMP
+
+endchoice

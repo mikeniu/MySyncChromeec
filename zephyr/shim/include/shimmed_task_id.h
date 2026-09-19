@@ -248,6 +248,7 @@ enum {
 	COND_CODE_1(CONFIG_SHELL_BACKEND_SERIAL, (fn(SHELL)),           \
 		(IF_ENABLED(CONFIG_SHELL_BACKEND_DUMMY, (fn(SHELL)))))  \
 	IF_ENABLED(CONFIG_AP_PWRSEQ, (fn(AP_PWRSEQ)))                   \
+	IF_ENABLED(CONFIG_QCOM_AP_PWRSEQ_DRIVER, (fn(AP_PWRSEQ)))       \
 	fn(SYSWORKQ)                                                    \
 	fn(IDLE)
 /* clang-format on */

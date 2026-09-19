@@ -1,0 +1,41 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+description: Qualcomm AP Power Sequence Driver
+
+compatible: "cros-ec,qcom-ap-pwrseq"
+
+properties:
+  switchcap:
+    type: phandle
+    required: true
+    description: Switchcap device driver.
+
+  ap-rst-gpios:
+    type: phandle-array
+    required: true
+    description: Input GPIO indicating AP reset state.
+
+  ap-suspend-gpios:
+    type: phandle-array
+    required: true
+    description: Input GPIO indicating AP suspend state.
+
+  power-good-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      Input GPIO indicating motherboard power good state.
+
+  pmic-kpd-pwr-odl-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      Output open-drain GPIO to PMIC power key signal.
+
+  pmic-resin-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      Output open-drain GPIO to PMIC reset signal.
