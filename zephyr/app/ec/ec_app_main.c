@@ -145,7 +145,8 @@ void ec_app_main(void)
 	}
 
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
-	if (IS_ENABLED(CONFIG_AP_PWRSEQ)) {
+	if (IS_ENABLED(CONFIG_AP_PWRSEQ) ||
+	    IS_ENABLED(CONFIG_QCOM_AP_PWRSEQ_DRIVER)) {
 		ap_pwrseq_task_start();
 	}
 #endif
