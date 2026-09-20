@@ -4,209 +4,209 @@
  */
 
 / {
-	NTC_5V_12K_47K: NTC-5V-12K-47K {
+	NTC_5V15_12K_47K: NTC-5V15-12K-47K {
 		status = "okay";
 		compatible = "cros-ec,thermistor";
 		scaling-factor = <15>;
 		num-pairs = <10>;
-		steinhart-reference-mv = <5000>;
+		steinhart-reference-mv = <5150>;
 		steinhart-reference-res = <12000>;
 
 		sample-datum-0 {
-			milivolt = <(3583 / 15)>;
+			milivolt = <(3690 / 15)>;
 			temp = <35>;
 			sample-index = <0>;
 		};
 
 		sample-datum-1 {
-			milivolt = <(3360 / 15)>;
+			milivolt = <(3461 / 15)>;
 			temp = <40>;
 			sample-index = <1>;
 		};
 
 		sample-datum-2 {
-			milivolt = <(2890 / 15)>;
+			milivolt = <(2976 / 15)>;
 			temp = <50>;
 			sample-index = <2>;
 		};
 
 		sample-datum-3 {
-			milivolt = <(2415 / 15)>;
+			milivolt = <(2487 / 15)>;
 			temp = <60>;
 			sample-index = <3>;
 		};
 
 		sample-datum-4 {
-			milivolt = <(1969 / 15)>;
+			milivolt = <(2028 / 15)>;
 			temp = <70>;
 			sample-index = <4>;
 		};
 
 		sample-datum-5 {
-			milivolt = <(1575 / 15)>;
+			milivolt = <(1622 / 15)>;
 			temp = <80>;
 			sample-index = <5>;
 		};
 
 		sample-datum-6 {
-			milivolt = <(1402 / 15)>;
-			temp = <85>;
+			milivolt = <(1281 / 15)>;
+			temp = <90>;
 			sample-index = <6>;
 		};
 
 		sample-datum-7 {
-			milivolt = <(1243 / 15)>;
-			temp = <90>;
+			milivolt = <(1134 / 15)>;
+			temp = <95>;
 			sample-index = <7>;
 		};
 
 		sample-datum-8 {
-			milivolt = <(1101 / 15)>;
-			temp = <95>;
+			milivolt = <(1003 / 15)>;
+			temp = <100>;
 			sample-index = <8>;
 		};
 
 		sample-datum-9 {
-			milivolt = <(974 / 15)>;
-			temp = <100>;
+			milivolt = <(886 / 15)>;
+			temp = <105>;
 			sample-index = <9>;
 		};
 	};
 
-	NTC_5V_8K2_10K: NTC_5V_8K2_10K {
+	NTC_5V15_8K2_10K: NTC_5V15_8K2_10K {
 		status = "okay";
 		compatible = "cros-ec,thermistor";
 		scaling-factor = <15>;
 		num-pairs = <10>;
-		steinhart-reference-mv = <5000>;
+		steinhart-reference-mv = <5150>;
 		steinhart-reference-res = <8200>;
 
 		sample-datum-0 {
-			milivolt = <(3650 / 15)>;
+			milivolt = <(3759 / 15)>;
 			temp = <5>;
 			sample-index = <0>;
 		};
 
 		sample-datum-1 {
-			milivolt = <(3211 / 15)>;
+			milivolt = <(3308 / 15)>;
 			temp = <15>;
 			sample-index = <1>;
 		};
 
 		sample-datum-2 {
-			milivolt = <(2747 / 15)>;
+			milivolt = <(2830 / 15)>;
 			temp = <25>;
 			sample-index = <2>;
 		};
 
 		sample-datum-3 {
-			milivolt = <(2292 / 15)>;
-			temp = <25>;
+			milivolt = <(2361 / 15)>;
+			temp = <35>;
 			sample-index = <3>;
 		};
 
 		sample-datum-4 {
-			milivolt = <(1873 / 15)>;
+			milivolt = <(1929 / 15)>;
 			temp = <45>;
 			sample-index = <4>;
 		};
 
 		sample-datum-5 {
-			milivolt = <(1507 / 15)>;
+			milivolt = <(1553 / 15)>;
 			temp = <55>;
 			sample-index = <5>;
 		};
 
 		sample-datum-6 {
-			milivolt = <(1347 / 15)>;
+			milivolt = <(1388 / 15)>;
 			temp = <60>;
 			sample-index = <6>;
 		};
 
 		sample-datum-7 {
-			milivolt = <(1201 / 15)>;
+			milivolt = <(1237 / 15)>;
 			temp = <65>;
 			sample-index = <7>;
 		};
 
 		sample-datum-8 {
-			milivolt = <(1070 / 15)>;
+			milivolt = <(1102 / 15)>;
 			temp = <70>;
 			sample-index = <8>;
 		};
 
 		sample-datum-9 {
-			milivolt = <(952 / 15)>;
+			milivolt = <(981 / 15)>;
 			temp = <75>;
 			sample-index = <9>;
 		};
 	};
 
-	NTC_5V_12K_100K: NTC_5V_12K_100K {
+	NTC_5V15_12K_100K: NTC_5V15_12K_100K {
 		status = "okay";
 		compatible = "cros-ec,thermistor";
 		scaling-factor = <15>;
 		num-pairs = <10>;
-		steinhart-reference-mv = <5000>;
+		steinhart-reference-mv = <5150>;
 		steinhart-reference-res = <12000>;
 
 		sample-datum-0 {
-			milivolt = <(3672 / 15)>;
+			milivolt = <(3783 / 15)>;
 			temp = <50>;
 			sample-index = <0>;
 		};
 
 		sample-datum-1 {
-			milivolt = <(3465 / 15)>;
-			temp = <55>;
+			milivolt = <(3344 / 15)>;
+			temp = <60>;
 			sample-index = <1>;
 		};
 
 		sample-datum-2 {
-			milivolt = <(3247 / 15)>;
-			temp = <60>;
+			milivolt = <(2877 / 15)>;
+			temp = <70>;
 			sample-index = <2>;
 		};
 
 		sample-datum-3 {
-			milivolt = <(2793 / 15)>;
-			temp = <70>;
+			milivolt = <(2411 / 15)>;
+			temp = <80>;
 			sample-index = <3>;
 		};
 
 		sample-datum-4 {
-			milivolt = <(2341 / 15)>;
-			temp = <80>;
+			milivolt = <(1978 / 15)>;
+			temp = <90>;
 			sample-index = <4>;
 		};
 
 		sample-datum-5 {
-			milivolt = <(1920 / 15)>;
-			temp = <90>;
+			milivolt = <(1595 / 15)>;
+			temp = <100>;
 			sample-index = <5>;
 		};
 
 		sample-datum-6 {
-			milivolt = <(1549 / 15)>;
-			temp = <100>;
+			milivolt = <(1272 / 15)>;
+			temp = <110>;
 			sample-index = <6>;
 		};
 
 		sample-datum-7 {
-			milivolt = <(1234 / 15)>;
-			temp = <110>;
+			milivolt = <(1132 / 15)>;
+			temp = <115>;
 			sample-index = <7>;
 		};
 
 		sample-datum-8 {
-			milivolt = <(1099 / 15)>;
-			temp = <115>;
+			milivolt = <(1007 / 15)>;
+			temp = <120>;
 			sample-index = <8>;
 		};
 
 		sample-datum-9 {
-			milivolt = <(977 / 15)>;
-			temp = <120>;
+			milivolt = <(894 / 15)>;
+			temp = <125>;
 			sample-index = <9>;
 		};
 	};
