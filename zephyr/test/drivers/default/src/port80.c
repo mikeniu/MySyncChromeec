@@ -69,6 +69,49 @@ ZTEST(port80, test_port80_write)
 }
 
 /**
+ * @brief TestPurpose: Verify EC_CMD_PORT80_WRITE host command
+ *
+ * @details
+ * Validate that the EC_CMD_PORT80_WRITE host command logs POST codes to the
+ * port 80 history buffer.
+ *
+ * Expected Results
+ *  - POST codes sent via EC_CMD_PORT80_WRITE are recorded in the buffer.
+ */
+ZTEST(port80, test_hostcmd_port80_write)
+{
+	struct ec_response_port80_read response;
+	struct ec_params_port80_read read_params;
+	struct host_cmd_handler_args read_args = BUILD_HOST_COMMAND(
+		EC_CMD_PORT80_READ, 1, response, read_params);
+	struct ec_params_port80_write write_params;
+
+	port80_flush();
+
+	write_params.code = 0x56;
+	zassert_ok(ec_cmd_port80_write(NULL, &write_params), NULL);
+	write_params.code = 0x78;
+	zassert_ok(ec_cmd_port80_write(NULL, &write_params), NULL);
+
+	/* Get the buffer info */
+	read_params.subcmd = EC_PORT80_GET_INFO;
+	zassert_ok(host_command_process(&read_args), NULL);
+	CHECK_ARGS_RESULT(read_args)
+	zassert_equal(read_args.response_size, sizeof(response.get_info), NULL);
+	zassert_equal(response.get_info.writes, 2, NULL);
+
+	/* Read the buffer */
+	read_params.subcmd = EC_PORT80_READ_BUFFER;
+	read_params.read_buffer.offset = 0;
+	read_params.read_buffer.num_entries = 2;
+	zassert_ok(host_command_process(&read_args), NULL);
+	CHECK_ARGS_RESULT(read_args)
+	zassert_equal(read_args.response_size, sizeof(uint16_t) * 2, NULL);
+	zassert_equal(response.data.codes[0], 0x56, NULL);
+	zassert_equal(response.data.codes[1], 0x78, NULL);
+}
+
+/**
  * @brief TestPurpose: Verify port 80 read parameters
  *
  * @details
