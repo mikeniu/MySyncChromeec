@@ -26,6 +26,9 @@ LOG_MODULE_REGISTER(test);
 static char mock_data[64] =
 	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@";
 
+BUILD_ASSERT(sizeof(mock_data) >= BBRAM_REGION_OFFSET(chg_limit_flags) +
+					  BBRAM_REGION_SIZE(chg_limit_flags));
+
 int system_preinitialize(const struct device *unused);
 int system_bbram_write(const struct device *dev, size_t offset, size_t size,
 		       const uint8_t *data);
@@ -33,7 +36,9 @@ int system_bbram_write(const struct device *dev, size_t offset, size_t size,
 ZTEST(system, test_invalid_bbram_index)
 {
 	zassert_equal(EC_ERROR_INVAL,
-		      system_get_bbram(SYSTEM_BBRAM_IDX_TRY_SLOT + 1, NULL));
+		      system_get_bbram(SYSTEM_BBRAM_IDX_MAX, NULL));
+	zassert_equal(EC_ERROR_INVAL,
+		      system_set_bbram(SYSTEM_BBRAM_IDX_MAX, 0));
 }
 
 ZTEST(system, test_bbram_get)
@@ -66,6 +71,41 @@ ZTEST(system, test_bbram_get)
 	zassert_ok(rc);
 	zassert_mem_equal(output, mock_data + BBRAM_REGION_OFFSET(try_slot),
 			  BBRAM_REGION_SIZE(try_slot), NULL);
+
+	rc = system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, output);
+	zassert_ok(rc);
+	zassert_mem_equal(output,
+			  mock_data + BBRAM_REGION_OFFSET(chg_limit_lower),
+			  BBRAM_REGION_SIZE(chg_limit_lower), NULL);
+
+	rc = system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, output);
+	zassert_ok(rc);
+	zassert_mem_equal(output,
+			  mock_data + BBRAM_REGION_OFFSET(chg_limit_upper),
+			  BBRAM_REGION_SIZE(chg_limit_upper), NULL);
+
+	rc = system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, output);
+	zassert_ok(rc);
+	zassert_mem_equal(output,
+			  mock_data + BBRAM_REGION_OFFSET(chg_limit_flags),
+			  BBRAM_REGION_SIZE(chg_limit_flags), NULL);
+}
+
+ZTEST(system, test_bbram_set_get)
+{
+	uint8_t val;
+
+	zassert_ok(system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, 80));
+	zassert_ok(system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, &val));
+	zassert_equal(val, 80);
+
+	zassert_ok(system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, 85));
+	zassert_ok(system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, &val));
+	zassert_equal(val, 85);
+
+	zassert_ok(system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, 1));
+	zassert_ok(system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, &val));
+	zassert_equal(val, 1);
 }
 
 ZTEST(system, test_save_read_chip_reset_flags)
