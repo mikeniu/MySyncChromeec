@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49572c42_c0161a5d",
+        "filename": "zephyr/subsys/adsp_comms/adsp_comms.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-21T15:42:40Z",
+      "side": 1,
+      "message": "Update help text to reflect new functionality for charge control sustain.",
+      "revId": "940bc39e7445194c4ec882e47f3873c4a370c5fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
