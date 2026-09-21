@@ -1,0 +1,39 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	pic-fw-config {
+		compatible = "cros-ec,cbi-fw-config";
+
+		/*
+		 * Keyboard physical layout. Factory programs FW_CONFIG[1:0]:
+		 *   0 = US (dtsi base mask)
+		 *   1 = UK / UK
+		 *   2 = JP / JP
+		 */
+		kb-layout {
+			enum-name = "FW_KB_LAYOUT";
+			start = <0>;
+			size = <2>;
+
+			kb-layout-us {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_KB_LAYOUT_DEFAULT";
+				value = <0>;
+				default;
+			};
+			kb-layout-uk {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_KB_LAYOUT_UK";
+				value = <1>;
+			};
+			kb-layout-jp {
+				compatible = "cros-ec,cbi-fw-config-value";
+				enum-name = "FW_KB_LAYOUT_JP";
+				value = <2>;
+			};
+		};
+	};
+};
