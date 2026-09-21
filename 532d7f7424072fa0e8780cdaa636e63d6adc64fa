@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b9dbae3_bea68cae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-09-21T10:44:50Z",
+      "side": 1,
+      "message": "I checked that skywalker and other projects using this branch don\u0027t have CONFIG_PLATFORM_EC_EEPROM_CBI_WP enabled so we don\u0027t need this change on this branch.",
+      "revId": "532d7f7424072fa0e8780cdaa636e63d6adc64fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
