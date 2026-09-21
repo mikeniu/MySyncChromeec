@@ -39,6 +39,30 @@
       },
       "revId": "5ef358e0ec409be5648600c90f624064e7be9b5a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f966586c_d7527ade",
+        "filename": "docs/flash_dut.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-21T16:07:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3eedc72_d87a6431",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 7
+      },
+      "revId": "5ef358e0ec409be5648600c90f624064e7be9b5a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
