@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9786bc9_e6574ee8",
+        "filename": "zephyr/program/bluey/pic/src/keyboard_customization.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-09-21T05:20:58Z",
+      "side": 1,
+      "message": "Please provide the context for the lock key handling implementation. Does the lock key work without customization?",
+      "revId": "35f167ae622f70aa40f7d4ab115239c6802bbe06",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
