@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vif:VIF xmlns:opt="http://usb.org/VendorInfoFileOptionalContent.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:vif="http://usb.org/VendorInfoFile.xsd">
-  <vif:VIF_Specification>3.37</vif:VIF_Specification>
+  <vif:VIF_Specification>3.38</vif:VIF_Specification>
   <vif:VIF_App>
     <vif:Vendor>USB-IF</vif:Vendor>
     <vif:Name>VIF Editor</vif:Name>
-    <vif:Version>3.15.0.0</vif:Version>
+    <vif:Version>3.16.0.0</vif:Version>
   </vif:VIF_App>
   <vif:Vendor_Name>Google</vif:Vendor_Name>
   <vif:Model_Part_Number>Hylia</vif:Model_Part_Number>
   <vif:Product_Revision>0</vif:Product_Revision>
-  <vif:TID>0</vif:TID>
+  <vif:TID>16425</vif:TID>
   <vif:VIF_Product_Type value="0">Port Product</vif:VIF_Product_Type>
   <vif:Certification_Type value="0">End Product</vif:Certification_Type>
   <vif:Product>
@@ -136,6 +136,7 @@
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <vif:PD_Power_As_Sink value="65000">65000 mW</vif:PD_Power_As_Sink>
     <vif:EPR_Supported_As_Snk value="false" />
+    <vif:Time_to_EPR_Ready value="0">0 ms</vif:Time_to_EPR_Ready>
     <vif:No_USB_Suspend_May_Be_Set value="true" />
     <vif:GiveBack_May_Be_Set value="false" />
     <vif:Higher_Capability_Set value="false" />
@@ -167,12 +168,12 @@
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;PD Sink SKEDB-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-    <vif:Snk_SPR_Minimum_PDP value="0">0 mW</vif:Snk_SPR_Minimum_PDP>
-    <vif:Snk_SPR_Operational_PDP value="60">60 mW</vif:Snk_SPR_Operational_PDP>
-    <vif:Snk_SPR_Maximum_PDP value="65">65 mW</vif:Snk_SPR_Maximum_PDP>
-    <vif:Snk_EPR_Minimum_PDP value="0">0 mW</vif:Snk_EPR_Minimum_PDP>
-    <vif:Snk_EPR_Operational_PDP value="0">0 mW</vif:Snk_EPR_Operational_PDP>
-    <vif:Snk_EPR_Maximum_PDP value="0">0 mW</vif:Snk_EPR_Maximum_PDP>
+    <vif:Snk_SPR_Minimum_PDP value="0">0 W</vif:Snk_SPR_Minimum_PDP>
+    <vif:Snk_SPR_Operational_PDP value="60">60 W</vif:Snk_SPR_Operational_PDP>
+    <vif:Snk_SPR_Maximum_PDP value="65">65 W</vif:Snk_SPR_Maximum_PDP>
+    <vif:Snk_EPR_Minimum_PDP value="0">0 W</vif:Snk_EPR_Minimum_PDP>
+    <vif:Snk_EPR_Operational_PDP value="0">0 W</vif:Snk_EPR_Operational_PDP>
+    <vif:Snk_EPR_Maximum_PDP value="0">0 W</vif:Snk_EPR_Maximum_PDP>
     <vif:Snk_PPS_Charging_Supported value="false" />
     <vif:Snk_VBUS_Powered value="true" />
     <vif:Snk_AC_Supply_Powered value="false" />
@@ -318,6 +319,7 @@
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <vif:PD_Power_As_Sink value="65000">65000 mW</vif:PD_Power_As_Sink>
     <vif:EPR_Supported_As_Snk value="false" />
+    <vif:Time_to_EPR_Ready value="0">0 ms</vif:Time_to_EPR_Ready>
     <vif:No_USB_Suspend_May_Be_Set value="true" />
     <vif:GiveBack_May_Be_Set value="false" />
     <vif:Higher_Capability_Set value="false" />
@@ -349,12 +351,12 @@
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;PD Sink SKEDB-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-    <vif:Snk_SPR_Minimum_PDP value="0">0 mW</vif:Snk_SPR_Minimum_PDP>
-    <vif:Snk_SPR_Operational_PDP value="60">60 mW</vif:Snk_SPR_Operational_PDP>
-    <vif:Snk_SPR_Maximum_PDP value="65">65 mW</vif:Snk_SPR_Maximum_PDP>
-    <vif:Snk_EPR_Minimum_PDP value="0">0 mW</vif:Snk_EPR_Minimum_PDP>
-    <vif:Snk_EPR_Operational_PDP value="0">0 mW</vif:Snk_EPR_Operational_PDP>
-    <vif:Snk_EPR_Maximum_PDP value="0">0 mW</vif:Snk_EPR_Maximum_PDP>
+    <vif:Snk_SPR_Minimum_PDP value="0">0 W</vif:Snk_SPR_Minimum_PDP>
+    <vif:Snk_SPR_Operational_PDP value="60">60 W</vif:Snk_SPR_Operational_PDP>
+    <vif:Snk_SPR_Maximum_PDP value="65">65 W</vif:Snk_SPR_Maximum_PDP>
+    <vif:Snk_EPR_Minimum_PDP value="0">0 W</vif:Snk_EPR_Minimum_PDP>
+    <vif:Snk_EPR_Operational_PDP value="0">0 W</vif:Snk_EPR_Operational_PDP>
+    <vif:Snk_EPR_Maximum_PDP value="0">0 W</vif:Snk_EPR_Maximum_PDP>
     <vif:Snk_PPS_Charging_Supported value="false" />
     <vif:Snk_VBUS_Powered value="true" />
     <vif:Snk_AC_Supply_Powered value="false" />
