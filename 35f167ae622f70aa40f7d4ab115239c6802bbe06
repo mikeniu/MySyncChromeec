@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5fd62de9_aefbdffa",
+        "filename": "zephyr/program/bluey/pic/project.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-09-21T05:26:19Z",
+      "side": 1,
+      "message": "Please describe how the EC close LCD pin triggers the lock event. Is there any doc or issue tracker?",
+      "revId": "35f167ae622f70aa40f7d4ab115239c6802bbe06",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c9786bc9_e6574ee8",
         "filename": "zephyr/program/bluey/pic/src/keyboard_customization.c",
         "patchSetId": 1
