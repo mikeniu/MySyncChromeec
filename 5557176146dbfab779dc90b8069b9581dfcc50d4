@@ -22,6 +22,30 @@
       },
       "revId": "5557176146dbfab779dc90b8069b9581dfcc50d4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28f82f12_0f007584",
+        "filename": "zephyr/test/system_shim/src/test_system.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-21T17:19:07Z",
+      "side": 1,
+      "message": "I\u0027ve made the requested updates; please let me know if this meets your approval.",
+      "parentUuid": "fccef99b_496ed232",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 0
+      },
+      "revId": "5557176146dbfab779dc90b8069b9581dfcc50d4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
