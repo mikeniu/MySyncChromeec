@@ -9,6 +9,7 @@
 #include "ec_commands.h"
 #include "host_command.h"
 #include "math_util.h"
+#include "system.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 #include "timer.h"
@@ -16,6 +17,7 @@
 #include <zephyr/shell/shell.h>
 #include <zephyr/ztest.h>
 
+void charger_init(void);
 int battery_outside_charging_temperature(struct batt_params *batt);
 bool battery_sustainer_enabled(void);
 enum ec_charge_control_mode get_chg_ctrl_mode(void);
@@ -370,7 +372,127 @@ ZTEST(charge_state, test_hc_charge_control__v2_and_v3)
 	p.mode = CHARGE_CONTROL_COUNT;
 	rv = test_send_host_command(EC_CMD_CHARGE_CONTROL, 3, &p, sizeof(p), &r,
 				    sizeof(r));
-	zassert_equal(EC_RES_ERROR, rv);
+	zassert_equal(EC_RES_INVALID_PARAM, rv);
+
+	/* Test buffer too small on GET */
+	p.cmd = EC_CHARGE_CONTROL_CMD_GET;
+	rv = test_send_host_command(EC_CMD_CHARGE_CONTROL, 3, &p, sizeof(p), &r,
+				    sizeof(r) - 1);
+	zassert_equal(EC_RES_RESPONSE_TOO_BIG, rv);
+}
+
+ZTEST(charge_state, test_charge_control_bbram_save_load)
+{
+	int8_t lower, upper;
+	uint8_t flags;
+
+	/* Save and load valid settings */
+	zassert_ok(charge_control_save_to_bbram(
+		75, 80, EC_CHARGE_CONTROL_FLAG_NO_IDLE));
+	zassert_ok(charge_control_load_from_bbram(&lower, &upper, &flags));
+	zassert_equal(75, lower);
+	zassert_equal(80, upper);
+	zassert_equal(EC_CHARGE_CONTROL_FLAG_NO_IDLE, flags);
+
+	/* Save and load disabled settings (-1, -1) */
+	zassert_ok(charge_control_save_to_bbram(-1, -1, 0));
+	zassert_ok(charge_control_load_from_bbram(&lower, &upper, &flags));
+	zassert_equal(-1, lower);
+	zassert_equal(-1, upper);
+	zassert_equal(0, flags);
+
+	/* Zeroed BBRAM (uninitialized after battery disconnect) defaults to
+	 * disabled */
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, 0);
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, 0);
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, 0);
+	zassert_ok(charge_control_load_from_bbram(&lower, &upper, &flags));
+	zassert_equal(-1, lower);
+	zassert_equal(-1, upper);
+	zassert_equal(0, flags);
+
+	/* All 0xFF BBRAM defaults to disabled */
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, 0xFF);
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, 0xFF);
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, 0xFF);
+	zassert_ok(charge_control_load_from_bbram(&lower, &upper, &flags));
+	zassert_equal(-1, lower);
+	zassert_equal(-1, upper);
+	zassert_equal(0, flags);
+
+	/* Invalid BBRAM (lower > upper) defaults to disabled */
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, 80);
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, 70);
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, 0);
+	zassert_ok(charge_control_load_from_bbram(&lower, &upper, &flags));
+	zassert_equal(-1, lower);
+	zassert_equal(-1, upper);
+	zassert_equal(0, flags);
+
+	/* Invalid BBRAM (upper > 100) defaults to disabled */
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, 50);
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, 105);
+	system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, 0);
+	zassert_ok(charge_control_load_from_bbram(&lower, &upper, &flags));
+	zassert_equal(-1, lower);
+	zassert_equal(-1, upper);
+	zassert_equal(0, flags);
+}
+
+ZTEST(charge_state, test_charge_control_persistence_across_init)
+{
+	struct charge_state_data *curr = charge_get_status();
+	struct ec_response_charge_control r;
+	uint8_t raw_val;
+
+	curr->ac = 1;
+
+	/* Set sustainer via host command */
+	zassert_ok(battery_sustainer_set_hc(3, 75, 80,
+					    EC_CHARGE_CONTROL_FLAG_NO_IDLE));
+	zassert_true(battery_sustainer_enabled());
+
+	/* Verify BBRAM was updated */
+	zassert_ok(
+		system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, &raw_val));
+	zassert_equal(75, (int8_t)raw_val);
+	zassert_ok(
+		system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, &raw_val));
+	zassert_equal(80, (int8_t)raw_val);
+	zassert_ok(
+		system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, &raw_val));
+	zassert_equal(EC_CHARGE_CONTROL_FLAG_NO_IDLE, raw_val);
+
+	/* Simulate EC reboot / re-initialization */
+	charger_init();
+
+	/* Verify sustainer is restored from BBRAM */
+	zassert_true(battery_sustainer_enabled());
+	zassert_ok(battery_sustainer_get_hc(3, &r));
+	zassert_equal(75, r.sustain_soc.lower);
+	zassert_equal(80, r.sustain_soc.upper);
+	zassert_equal(EC_CHARGE_CONTROL_FLAG_NO_IDLE, r.flags);
+
+	/* Disable sustainer via host command */
+	zassert_ok(battery_sustainer_set_hc(3, -1, -1, 0));
+	zassert_false(battery_sustainer_enabled());
+
+	/* Verify BBRAM was updated with disabled state */
+	zassert_ok(
+		system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, &raw_val));
+	zassert_equal((uint8_t)-1, raw_val);
+	zassert_ok(
+		system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, &raw_val));
+	zassert_equal((uint8_t)-1, raw_val);
+
+	/* Simulate EC reboot / re-initialization */
+	charger_init();
+
+	/* Verify sustainer remains disabled */
+	zassert_false(battery_sustainer_enabled());
+	zassert_ok(battery_sustainer_get_hc(3, &r));
+	zassert_equal(-1, r.sustain_soc.lower);
+	zassert_equal(-1, r.sustain_soc.upper);
 }
 
 ZTEST(charge_state, test_battery_sustainer_state_machine)
