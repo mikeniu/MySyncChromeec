@@ -460,4 +460,24 @@ config PLATFORM_EC_BATTERY_REPLACE_NULLS
 	  with caution on existing projects since it may rename shipped
 	  batteries.
 
+config PLATFORM_EC_CHARGE_CONTROL
+	bool "Support battery charge control host command"
+	default y if PLATFORM_EC_CHARGER || PLATFORM_EC_CHARGE_CONTROL_PERSIST_TO_BBRAM
+	help
+	  Enable host command handler for EC_CMD_CHARGE_CONTROL.
+	  When PLATFORM_EC_CHARGER is enabled, full charge control mode
+	  switching (NORMAL, IDLE, DISCHARGE) and battery sustainer are
+	  supported. When PLATFORM_EC_CHARGER is disabled (charging offloaded
+	  to AP), only CHARGE_CONTROL_NORMAL is supported (e.g. for persisting
+	  charge limits to BBRAM); non-normal modes (IDLE, DISCHARGE) are
+	  rejected.
+
+config PLATFORM_EC_CHARGE_CONTROL_PERSIST_TO_BBRAM
+	bool "Persist battery charge control limits in BBRAM"
+	default n
+	select PLATFORM_EC_CHARGE_CONTROL
+	help
+	  Persists the battery charge control sustainer limit settings across
+	  EC resets and low-power states in battery-backed RAM (BBRAM).
+
 endif # PLATFORM_EC_BATTERY
