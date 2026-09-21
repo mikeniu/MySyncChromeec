@@ -117,6 +117,27 @@ struct sustain_soc {
 	uint8_t flags; /* enum ec_charge_control_flag */
 };
 
+/**
+ * Save charge control sustainer settings to BBRAM.
+ *
+ * @param lower Lower battery SoC threshold (percentage, -1 for disabled).
+ * @param upper Upper battery SoC threshold (percentage, -1 for disabled).
+ * @param flags Flags (enum ec_charge_control_flag).
+ * @return EC_SUCCESS or non-zero error.
+ */
+int charge_control_save_to_bbram(int8_t lower, int8_t upper, uint8_t flags);
+
+/**
+ * Load and validate charge control sustainer settings from BBRAM.
+ *
+ * @param lower Pointer to store lower battery SoC threshold.
+ * @param upper Pointer to store upper battery SoC threshold.
+ * @param flags Pointer to store flags.
+ * @return EC_SUCCESS or non-zero error.
+ */
+int charge_control_load_from_bbram(int8_t *lower, int8_t *upper,
+				   uint8_t *flags);
+
 #define BAT_MAX_DISCHG_CURRENT 5000 /* mA */
 #define BAT_LOW_VOLTAGE_THRESH 3200 /* mV */
 
