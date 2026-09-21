@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c141107_4e29ee99",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 32
+      },
+      "lineNbr": 791,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-21T16:08:28Z",
+      "side": 1,
+      "message": "this is not the C++ way to case",
+      "range": {
+        "startLine": 791,
+        "startChar": 3,
+        "endLine": 791,
+        "endChar": 42
+      },
+      "revId": "6f2fcc92061667ed84905eccb6b654ef08e2329d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d76f955d_04f6ca1b",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 32
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-21T16:08:28Z",
+      "side": 1,
+      "message": "let us not include this in this CL, but rather in a separate CL. I do not believe it belongs here",
+      "range": {
+        "startLine": 867,
+        "startChar": 1,
+        "endLine": 868,
+        "endChar": 40
+      },
+      "revId": "6f2fcc92061667ed84905eccb6b654ef08e2329d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dd4a5ee_05a0f1a0",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 32
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-21T16:08:28Z",
+      "side": 1,
+      "message": "let us not include this in this CL, but rather in a separate CL. I do not believe it belongs here",
+      "range": {
+        "startLine": 872,
+        "startChar": 0,
+        "endLine": 873,
+        "endChar": 39
+      },
+      "revId": "6f2fcc92061667ed84905eccb6b654ef08e2329d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0a40fba_c81eed33",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 32
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-21T16:08:28Z",
+      "side": 1,
+      "message": "why smaller type?",
+      "range": {
+        "startLine": 879,
+        "startChar": 8,
+        "endLine": 879,
+        "endChar": 21
+      },
+      "revId": "6f2fcc92061667ed84905eccb6b654ef08e2329d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5b6b817_c459459b",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 32
+      },
+      "lineNbr": 1111,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-21T16:08:28Z",
+      "side": 1,
+      "message": "let us not include this in this CL, but rather in a separate CL. I do not believe it belongs here",
+      "range": {
+        "startLine": 1110,
+        "startChar": 1,
+        "endLine": 1111,
+        "endChar": 40
+      },
+      "revId": "6f2fcc92061667ed84905eccb6b654ef08e2329d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30e06c3b_91e9a60c",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 32
+      },
+      "lineNbr": 1117,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-21T16:08:28Z",
+      "side": 1,
+      "message": "let us not include this in this CL, but rather in a separate CL. I do not believe it belongs here",
+      "range": {
+        "startLine": 1115,
+        "startChar": 0,
+        "endLine": 1117,
+        "endChar": 0
+      },
+      "revId": "6f2fcc92061667ed84905eccb6b654ef08e2329d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea62fa7c_9ce294fe",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 32
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-21T16:08:28Z",
+      "side": 1,
+      "message": "let us not include this in this CL, but rather in a separate CL. I do not believe it belongs here",
+      "range": {
+        "startLine": 349,
+        "startChar": 1,
+        "endLine": 350,
+        "endChar": 40
+      },
+      "revId": "6f2fcc92061667ed84905eccb6b654ef08e2329d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
