@@ -95,6 +95,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "84e81fc1_8de2f19f",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 32
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-21T16:22:51Z",
+      "side": 1,
+      "message": "The upstream host command handler has its own req/resp size checks, when multiple versions of request/response types are supported, we need to use to verify the size of the smallest type to be accepted. The larger structs need validation within the handler, which is not ideal, but necessary to handle any OOB memory access vulnerabilities.  I have https://b.corp.google.com/issues/559709343 that will split the host command handlers to support each version to eliminate this tech debt and have the upstream code handle this verification.",
+      "parentUuid": "c0a40fba_c81eed33",
+      "range": {
+        "startLine": 879,
+        "startChar": 8,
+        "endLine": 879,
+        "endChar": 21
+      },
+      "revId": "6f2fcc92061667ed84905eccb6b654ef08e2329d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d5b6b817_c459459b",
         "filename": "common/fpsensor/fpsensor.cc",
         "patchSetId": 32
