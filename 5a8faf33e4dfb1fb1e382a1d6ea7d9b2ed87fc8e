@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8241304f_5e402826",
+        "filename": "zephyr/test/adsp_comms/src/test_adsp_i2c_mode.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-21T17:19:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f1c6d7e6_332d7c44",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 0
+      },
+      "revId": "5a8faf33e4dfb1fb1e382a1d6ea7d9b2ed87fc8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aac7e4f8_c2ee2246",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75386577_5a3527b0",
+        "filename": "zephyr/test/adsp_comms/src/test_adsp_i2c_mode.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-21T17:19:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "aac7e4f8_c2ee2246",
+      "range": {
+        "startLine": 111,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 0
+      },
+      "revId": "5a8faf33e4dfb1fb1e382a1d6ea7d9b2ed87fc8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc2d8a39_8da5d264",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-09-15T20:26:20Z",
       "side": 1,
       "message": "There are no asserts in this test. Actually, there don\u0027t seem to be any asserts in the rest of the tests after this one either.",
+      "range": {
+        "startLine": 119,
+        "startChar": 26,
+        "endLine": 119,
+        "endChar": 49
+      },
+      "revId": "5a8faf33e4dfb1fb1e382a1d6ea7d9b2ed87fc8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "629ebff3_92e10d42",
+        "filename": "zephyr/test/adsp_comms/src/test_adsp_i2c_mode.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-21T17:19:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "fc2d8a39_8da5d264",
       "range": {
         "startLine": 119,
         "startChar": 26,
