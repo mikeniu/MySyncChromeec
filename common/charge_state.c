@@ -942,7 +942,26 @@ void charger_init(void)
 	 */
 	battery_get_params(&curr.batt);
 
+#if defined(CONFIG_CHARGE_CONTROL_PERSIST_TO_BBRAM)
+	{
+		int8_t lower, upper;
+		uint8_t flags;
+
+		if (charge_control_load_from_bbram(&lower, &upper, &flags) ==
+			    EC_SUCCESS &&
+		    lower != -1 && upper != -1) {
+			if (battery_sustainer_set(lower, upper) == EC_SUCCESS) {
+				sustain_soc.flags = flags;
+			} else {
+				battery_sustainer_disable();
+			}
+		} else {
+			battery_sustainer_disable();
+		}
+	}
+#else
 	battery_sustainer_disable();
+#endif
 }
 DECLARE_HOOK(HOOK_INIT, charger_init, HOOK_PRIO_DEFAULT);
 
@@ -2024,8 +2043,16 @@ charge_command_charge_control(struct ec_host_cmd_handler_args *args)
 			} else {
 				sustain_soc.flags = p->flags;
 			}
+#if defined(CONFIG_CHARGE_CONTROL_PERSIST_TO_BBRAM)
+			charge_control_save_to_bbram(sustain_soc.lower,
+						     sustain_soc.upper,
+						     sustain_soc.flags);
+#endif
 		} else {
 			battery_sustainer_disable();
+#if defined(CONFIG_CHARGE_CONTROL_PERSIST_TO_BBRAM)
+			charge_control_save_to_bbram(-1, -1, 0);
+#endif
 		}
 	} else if (p->cmd == EC_CHARGE_CONTROL_CMD_GET) {
 		if (args->output_buf_max < sizeof(*r)) {
@@ -2394,6 +2421,11 @@ static int command_chgstate(int argc, const char **argv)
 			rv = battery_sustainer_set(lower, upper);
 			if (rv)
 				return EC_ERROR_INVAL;
+#if defined(CONFIG_CHARGE_CONTROL_PERSIST_TO_BBRAM)
+			charge_control_save_to_bbram(sustain_soc.lower,
+						     sustain_soc.upper,
+						     sustain_soc.flags);
+#endif
 		} else {
 			return EC_ERROR_PARAM1;
 		}
