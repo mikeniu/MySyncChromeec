@@ -505,6 +505,10 @@ enum system_bbram_idx {
 	SYSTEM_BBRAM_IDX_PD1,
 	SYSTEM_BBRAM_IDX_PD2,
 	SYSTEM_BBRAM_IDX_TRY_SLOT,
+	/* Battery charge control sustainer limit settings */
+	SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER,
+	SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER,
+	SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS,
 };
 
 /* Maximum number of bbram indexes allotted for PD port state data */
