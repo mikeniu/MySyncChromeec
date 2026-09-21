@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <ec_commands.h>
 #include <fpsensor/fpsensor_state.h>
+#include <host_command.h>
 #include <span>
 
 /* Define the missing FFF mocks for the linker */
@@ -405,6 +406,22 @@ ZTEST_USER(fpsensor_state,
 		FP_MODE_ENROLL_IMAGE | FP_MODE_ENROLL_SESSION,
 		"Expected sensor_mode to be ENROLL_IMAGE | ENROLL_SESSION, got 0x%x",
 		global_context.sensor_mode);
+}
+
+ZTEST_USER(fpsensor_state, test_fp_mode_v1_truncated)
+{
+	struct ec_params_fp_mode_v1 params = {
+		.mode = FP_MODE_MATCH,
+	};
+	struct ec_response_fp_mode response;
+	constexpr size_t truncated_size = sizeof(params) - 1;
+
+	int rv = CROS_EC_COMMAND(NULL, EC_CMD_FP_MODE, 1, &params,
+				 truncated_size, &response, sizeof(response));
+
+	zassert_equal(rv, EC_HOST_CMD_REQUEST_TRUNCATED,
+		      "Expected truncated v1 request to be rejected, got %d",
+		      rv);
 }
 
 static void *fpsensor_setup(void)
