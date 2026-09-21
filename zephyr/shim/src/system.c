@@ -55,6 +55,24 @@ static int bbram_lookup(enum system_bbram_idx idx, int *offset_out,
 		*size_out = BBRAM_REGION_SIZE(try_slot);
 		break;
 #endif
+#if BBRAM_HAS_REGION(chg_limit_lower)
+	case SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER:
+		*offset_out = BBRAM_REGION_OFFSET(chg_limit_lower);
+		*size_out = BBRAM_REGION_SIZE(chg_limit_lower);
+		break;
+#endif
+#if BBRAM_HAS_REGION(chg_limit_upper)
+	case SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER:
+		*offset_out = BBRAM_REGION_OFFSET(chg_limit_upper);
+		*size_out = BBRAM_REGION_SIZE(chg_limit_upper);
+		break;
+#endif
+#if BBRAM_HAS_REGION(chg_limit_flags)
+	case SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS:
+		*offset_out = BBRAM_REGION_OFFSET(chg_limit_flags);
+		*size_out = BBRAM_REGION_SIZE(chg_limit_flags);
+		break;
+#endif
 	default:
 		return EC_ERROR_INVAL;
 	}
@@ -73,6 +91,22 @@ int system_get_bbram(enum system_bbram_idx idx, uint8_t *value)
 		return rc;
 
 	rc = system_bbram_read(bbram_dev, offset, size, value);
+
+	return rc ? EC_ERROR_INVAL : EC_SUCCESS;
+}
+
+int system_set_bbram(enum system_bbram_idx idx, uint8_t value)
+{
+	int offset, size, rc;
+
+	if (bbram_dev == NULL)
+		return EC_ERROR_INVAL;
+
+	rc = bbram_lookup(idx, &offset, &size);
+	if (rc)
+		return rc;
+
+	rc = system_bbram_write(bbram_dev, offset, size, &value);
 
 	return rc ? EC_ERROR_INVAL : EC_SUCCESS;
 }
