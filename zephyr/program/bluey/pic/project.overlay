@@ -20,6 +20,7 @@
 #include "fan.dtsi"
 #include "i2c.dtsi"
 #include "keyboard.dtsi"
+#include "pic_ec_ufsc.dtsi"
 #include "temp_sensors.dtsi"
 #include "battery.dtsi"
 #include "led.dtsi"

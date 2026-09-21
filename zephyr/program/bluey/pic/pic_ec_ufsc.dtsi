@@ -1,0 +1,39 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+
+/*
+ * pic board-specific UFSC value definitions.
+ *
+ * Keyboard physical layout is encoded in EC_OEM_2BIT_FIELD0
+ * (UFSC DWORD 3, bits [28:27]). Factory programs the field as:
+ *   0 = US (default)
+ *   1 = UK
+ *   2 = JP
+ */
+
+&ufsc_ec_oem_2bit_field0 {
+	status = "okay";
+	enum-name = "UFSC_EC_KB_LAYOUT";
+
+	ufsc_kb_layout_us: kb-layout-us {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <0>;
+		default;
+	};
+	ufsc_kb_layout_uk: kb-layout-uk {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <1>;
+	};
+	ufsc_kb_layout_jp: kb-layout-jp {
+		compatible = "cros-ec,cbi-ufsc-value";
+		status = "okay";
+		value = <2>;
+	};
+};
