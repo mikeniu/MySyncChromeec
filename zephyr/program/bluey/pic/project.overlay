@@ -80,16 +80,16 @@
 	current-speed = <3333333>;
 	pinctrl-0 = <&uart4_sout_gp35>;
 	pinctrl-names = "default";
-	data-bits = <8>;
+	data-bits = <6>;
 	tx-invert;
 
 	uart4_dev0: uart4_dev0 {
 		status = "okay";
 		chain-length = <8>;
 		reset-delay = <200>;
-		bits-per-symbol = <5>;
-		one-symbol = <BINARY(1,1,1,0,0)>;
-		zero-symbol = <BINARY(1,0,0,0,0)>;
+		bits-per-symbol = <4>;
+		one-symbol = <BINARY(1,1,1,0)>;
+		zero-symbol = <BINARY(1,0,0,0)>;
 	};
 };
 
