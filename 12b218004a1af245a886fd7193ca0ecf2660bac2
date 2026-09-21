@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7453f2a8_e97a84a6",
+        "filename": "zephyr/program/bluey/meru/src/pen_control.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-21T05:52:50Z",
+      "side": 1,
+      "message": "if you use zephyr LOG_MODULE, `CPRINTS` is now reduantant.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 67
+      },
+      "revId": "12b218004a1af245a886fd7193ca0ecf2660bac2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
