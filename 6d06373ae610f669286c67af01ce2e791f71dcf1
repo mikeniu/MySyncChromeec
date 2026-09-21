@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb7a520d_74f1164e",
+        "filename": "zephyr/test/adsp_comms/src/test_adsp_comms.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-21T17:54:57Z",
+      "side": 1,
+      "message": "Consider adding assertions to verify the effects of these messages. If they only update internal state that isn\u0027t exported, perhaps a mock or an \u0027extern\u0027ed internal variable could be used to verify they were processed correctly.",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 0
+      },
+      "revId": "6d06373ae610f669286c67af01ce2e791f71dcf1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d821b87_4e15781e",
+        "filename": "zephyr/test/adsp_comms/src/test_adsp_i2c_mode.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-21T17:54:57Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: The comment says \u0027When chipset is OFF\u0027, but the assertion checks for \u0027CHIPSET_STATE_ON\u0027. While technically correct (the code is likely checking if NOT in ON state), it might be clearer to document that the code under test specifically queries for the ON state here.",
+      "range": {
+        "startLine": 226,
+        "startChar": 0,
+        "endLine": 226,
+        "endChar": 0
+      },
+      "revId": "6d06373ae610f669286c67af01ce2e791f71dcf1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
