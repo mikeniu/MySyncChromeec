@@ -460,4 +460,11 @@ config PLATFORM_EC_BATTERY_REPLACE_NULLS
 	  with caution on existing projects since it may rename shipped
 	  batteries.
 
+config PLATFORM_EC_CHARGE_CONTROL_PERSIST_TO_BBRAM
+	bool "Persist battery charge control limits in BBRAM"
+	default n
+	help
+	  Persists the battery charge control sustainer limit settings across
+	  EC resets and low-power states in battery-backed RAM (BBRAM).
+
 endif # PLATFORM_EC_BATTERY
