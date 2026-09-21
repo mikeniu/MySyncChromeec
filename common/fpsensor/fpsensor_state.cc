@@ -346,6 +346,8 @@ fp_command_mode(struct ec_host_cmd_handler_args *args)
 	uint32_t mode_out;
 
 	if (args->version == 1) {
+		if (args->input_buf_size < sizeof(struct ec_params_fp_mode_v1))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
 		mac = std::span{ p_1->mac };
 	}
 

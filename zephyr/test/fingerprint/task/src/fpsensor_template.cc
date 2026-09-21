@@ -238,6 +238,23 @@ ZTEST_USER(fpsensor_template, test_fp_template_v1_load_template_success)
 	zassert_equal(test_info_buffer->template_info.template_valid, 1);
 }
 
+ZTEST_USER(fpsensor_template, test_fp_template_v1_load_template_truncated)
+{
+	uint8_t params_buffer[FP_TEMPLATE_V1_PARAMS_BUFFER_SIZE] = { 0 };
+	struct ec_params_fp_template_v1 *params =
+		(struct ec_params_fp_template_v1 *)params_buffer;
+
+	params->cmd = FP_TEMPLATE_LOAD;
+
+	/* Pass a size smaller than required for v1 */
+	int rv = ec_cmd_fp_template_v1(
+		NULL, params,
+		offsetof(struct ec_params_fp_template_v1, data) - 1);
+	zassert_equal(rv, EC_HOST_CMD_REQUEST_TRUNCATED,
+		      "Expected truncated v1 request to be rejected, got %d",
+		      rv);
+}
+
 ZTEST_USER(fpsensor_template, test_fp_template_v1_load_template_invalid_tag)
 {
 	uint8_t params_buffer[FP_TEMPLATE_V1_PARAMS_BUFFER_SIZE];
@@ -637,6 +654,21 @@ ZTEST_USER(fpsensor_template, test_fp_frame_get_encrypted_template_success)
 
 	/* b/114160734: Not more than 1 encrypted message per second. */
 	k_sleep(K_SECONDS(1));
+}
+
+ZTEST_USER(fpsensor_template, test_fp_frame_v1_truncated)
+{
+	struct ec_params_fp_frame_v1 template_request = {
+		.cmd = FP_FRAME_ENCRYPT_TEMPLATE,
+		.index = 0,
+	};
+
+	int rv = CROS_EC_COMMAND(NULL, EC_CMD_FP_FRAME, 1, &template_request,
+				 sizeof(struct ec_params_fp_frame_v1) - 1, NULL,
+				 0);
+	zassert_equal(rv, EC_HOST_CMD_REQUEST_TRUNCATED,
+		      "Expected truncated v1 request to be rejected, got %d",
+		      rv);
 }
 
 ZTEST_USER(fpsensor_template, test_fp_frame_v1_no_template)

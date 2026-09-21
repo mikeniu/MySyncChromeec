@@ -864,6 +864,8 @@ static enum ec_host_cmd_status
 fp_command_frame(struct ec_host_cmd_handler_args *args)
 {
 	if (args->version == 1) {
+		if (args->input_buf_size < sizeof(struct ec_params_fp_frame_v1))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
 		return fp_command_frame_v1(args);
 	}
 
@@ -1101,6 +1103,9 @@ static enum ec_host_cmd_status
 fp_command_template(struct ec_host_cmd_handler_args *args)
 {
 	if (args->version == 1) {
+		if (args->input_buf_size <
+		    offsetof(struct ec_params_fp_template_v1, data))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
 		return fp_command_template_v1(args);
 	}
 
