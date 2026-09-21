@@ -45,6 +45,18 @@
 			offset = <0x0f>;
 			size = <0x01>;
 		};
+		chg_limit_lower: chg-limit-lower {
+			offset = <0x10>;
+			size = <0x01>;
+		};
+		chg_limit_upper: chg-limit-upper {
+			offset = <0x11>;
+			size = <0x01>;
+		};
+		chg_limit_flags: chg-limit-flags {
+			offset = <0x12>;
+			size = <0x01>;
+		};
 		ramlog {
 			offset = <0x20>;
 			size = <0x01>;
