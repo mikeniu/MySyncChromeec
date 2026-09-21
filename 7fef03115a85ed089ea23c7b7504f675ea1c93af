@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09ccac8f_5ee4e76c",
+        "filename": "zephyr/test/qcom_exp_power/CMakeLists.txt",
+        "patchSetId": 9
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-21T17:19:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e231d84d_ff14e27d",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 0
+      },
+      "revId": "7fef03115a85ed089ea23c7b7504f675ea1c93af",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4071fca_9d7c201a",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-15T20:12:41Z",
       "side": 1,
       "message": "This test calls power_chipset_handle_sleep_hang but contains no assertions to verify that the hang event was actually triggered. Since qcom_cleanup() explicitly clears EC_HOST_EVENT_HANG_DETECT, you should add a zassert here to verify that the host event is set correctly.",
+      "range": {
+        "startLine": 457,
+        "startChar": 0,
+        "endLine": 457,
+        "endChar": 0
+      },
+      "revId": "7fef03115a85ed089ea23c7b7504f675ea1c93af",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2ca73e7_94ad4a89",
+        "filename": "zephyr/test/qcom_exp_power/src/main.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-21T17:19:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e4071fca_9d7c201a",
       "range": {
         "startLine": 457,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "acb6d0ee_d68d8369",
+        "filename": "zephyr/test/qcom_exp_power/src/main.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-21T17:19:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "28bd09d8_cd0cf933",
+      "range": {
+        "startLine": 535,
+        "startChar": 0,
+        "endLine": 535,
+        "endChar": 0
+      },
+      "revId": "7fef03115a85ed089ea23c7b7504f675ea1c93af",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07bb1f66_aa4ffae8",
@@ -93,6 +165,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5b2689d_f8eb658d",
+        "filename": "zephyr/test/qcom_exp_power/src/main.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-21T17:19:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "07bb1f66_aa4ffae8",
+      "range": {
+        "startLine": 556,
+        "startChar": 0,
+        "endLine": 556,
+        "endChar": 0
+      },
+      "revId": "7fef03115a85ed089ea23c7b7504f675ea1c93af",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f340ebe_1ad181d0",
@@ -106,6 +202,30 @@
       "writtenOn": "2026-09-15T20:12:41Z",
       "side": 1,
       "message": "Defining test_main and manually calling ztest_run_test_suites is an obsolete pattern in modern Zephyr ZTest (ZTest v3), which automatically provides the entry point for suites declared with ZTEST_SUITE. If you need custom initialization before running the suites, consider using a custom main() or the ZTEST_SUITE setup/before hooks.",
+      "range": {
+        "startLine": 622,
+        "startChar": 0,
+        "endLine": 622,
+        "endChar": 0
+      },
+      "revId": "7fef03115a85ed089ea23c7b7504f675ea1c93af",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6591635_dec1edfb",
+        "filename": "zephyr/test/qcom_exp_power/src/main.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-21T17:19:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3f340ebe_1ad181d0",
       "range": {
         "startLine": 622,
         "startChar": 0,
