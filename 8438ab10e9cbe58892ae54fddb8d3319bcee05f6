@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22dd8948_40cac88e",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-21T20:43:15Z",
+      "side": 1,
+      "message": "this constant also needs to change.",
+      "range": {
+        "startLine": 53,
+        "startChar": 10,
+        "endLine": 53,
+        "endChar": 22
+      },
+      "revId": "8438ab10e9cbe58892ae54fddb8d3319bcee05f6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
