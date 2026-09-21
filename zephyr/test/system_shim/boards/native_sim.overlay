@@ -106,5 +106,17 @@
 			offset = <0x10>;
 			size = <0x04>;
 		};
+		chg_limit_lower: chg-limit-lower {
+			offset = <0x14>;
+			size = <0x01>;
+		};
+		chg_limit_upper: chg-limit-upper {
+			offset = <0x15>;
+			size = <0x01>;
+		};
+		chg_limit_flags: chg-limit-flags {
+			offset = <0x16>;
+			size = <0x01>;
+		};
 	};
 };
