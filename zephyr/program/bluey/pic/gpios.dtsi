@@ -136,8 +136,9 @@
 		gpio_ec_en_pp5000_fan: ec_en_pp5000_fan {
 			gpios = <&gpiob 3 ( GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
-		gpio_ec_close_lcd_n: ec_close_lcd_n {
-			gpios = <&gpiob 5 (GPIO_INPUT)>;
+		/* Dedicated screen-lock button, active-low. */
+		gpio_ec_scrnlock_l: ec_scrnlock_l {
+			gpios = <&gpiob 5 (GPIO_INPUT | GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ec_en_vph_pwr_1a: ec_en_vph_pwr_1a {
 			gpios = <&gpioc 0 (GPIO_OUTPUT)>;
