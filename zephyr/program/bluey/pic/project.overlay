@@ -20,6 +20,7 @@
 #include "fan.dtsi"
 #include "i2c.dtsi"
 #include "keyboard.dtsi"
+#include "cbi.dtsi"
 #include "temp_sensors.dtsi"
 #include "battery.dtsi"
 #include "led.dtsi"
@@ -56,6 +57,11 @@
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "extpower_interrupt";
 		};
+		int_ec_close_lcd_n: ec_close_lcd_n {
+			irq-pin = <&gpio_ec_close_lcd_n>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "pic_lock_button_interrupt";
+		};
 	};
 };
 
@@ -77,6 +83,7 @@
 
 &uart4 {
 	status = "okay";
+
 	current-speed = <3333333>;
 	pinctrl-0 = <&uart4_sout_gp35>;
 	pinctrl-names = "default";
