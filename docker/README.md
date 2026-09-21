@@ -22,6 +22,8 @@ The workspace directory structure matches standard expectations of ChromiumOS
 *   `entrypoint.sh`: Runs on container startup to fetch/update checkouts,
     initialize python virtual environments, auto-install `.vpython3`
     dependencies, and export Coreboot SDK environment variables dynamically.
+*   `workspace/`: Bind mount source for the container. Tracked, but empty, so
+    that a fresh checkout owns it; everything below it is ignored.
 *   `workspace/src/platform/ec/`: The Chromium OS EC firmware source.
 *   `workspace/src/platform/dagwood/`: The Dagwood test/verification tool.
 *   `workspace/src/third_party/zephyrproject/`: Zephyr RTOS project
@@ -63,6 +65,13 @@ Or using the helper script:
 ```bash
 ./run_docker.sh
 ```
+
+> **The container runs as the owner of `workspace/`.** That directory is part
+> of the checkout, so it belongs to whoever cloned the tree, and build
+> artifacts land on the host owned by them. Do not delete it: Docker recreates
+> a missing bind mount source as `root:root`, leaving the container no way to
+> tell who started it, so it runs everything as root instead. To recover, run
+> `sudo chown -R "$(id -u):$(id -g)" workspace`.
 
 > **Fast Startup**: Pass `--fast` (or set `SKIP_UPDATE=1`) to bypass remote
 > repository git checks for sub-second container launch:

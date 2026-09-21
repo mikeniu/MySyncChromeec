@@ -3,9 +3,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Thin wrapper around "docker run" for the EC firmware container, adding
-# host user mapping and hardware device forwarding (CCD/Servo and Serial
-# TTYs).
+# Thin wrapper around "docker run" for the EC firmware container, adding the
+# workspace mount and hardware device forwarding (CCD/Servo and Serial TTYs).
 
 set -e
 
@@ -45,8 +44,6 @@ fi
 exec docker run --rm \
   "${TTY_ARGS[@]}" \
   --device-cgroup-rule="c *:* rmw" \
-  -e "HOST_UID=$(id -u)" \
-  -e "HOST_GID=$(id -g)" \
   -v "${WORKSPACE_DIR}:/workspace" \
   -v /dev:/dev \
   ec-builder "$@"
