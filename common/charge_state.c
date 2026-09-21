@@ -81,8 +81,20 @@ static int prev_ac, prev_charge, prev_disp_charge;
 static enum battery_present prev_bp;
 static unsigned int user_current_limit = -1U;
 test_export_static timestamp_t shutdown_target_time;
+<<<<<<< PATCH SET (744bca2e0323062202b4f00c09bb1573e3df7eeb charge_control: Support persisting charge limit to BBRAM)
+test_export_static timestamp_t precharge_start_time;
+static struct sustain_soc sustain_soc = {
+	.lower = CHARGE_CONTROL_SUSTAINER_DISABLED,
+	.upper = CHARGE_CONTROL_SUSTAINER_DISABLED,
+	.flags = 0,
+};
+||||||| BASE      (61760131fbf53ec740a9e456fdf7a2f1b4fe04cf zephyr: system: Add BBRAM support for charge control persist)
+test_export_static timestamp_t precharge_start_time;
+static struct sustain_soc sustain_soc;
+=======
 static timestamp_t precharge_start_time;
 static struct sustain_soc sustain_soc;
+>>>>>>> BASE      (048bed6a24fd4275df284514a3b550a120449414 zephyr: system: Add BBRAM support for charge control persist)
 static struct current_limit {
 	uint32_t value; /* Charge limit to apply, in mA */
 	int soc; /* Minimum battery SoC at which the limit will be applied. */
@@ -181,18 +193,20 @@ void reset_prev_disp_charge(void)
 	prev_disp_charge = -1;
 }
 
-test_export_static bool battery_sustainer_enabled(void)
+bool battery_sustainer_enabled(void)
 {
-	return sustain_soc.lower != -1 && sustain_soc.upper != -1;
+	return sustain_soc.lower != CHARGE_CONTROL_SUSTAINER_DISABLED &&
+	       sustain_soc.upper != CHARGE_CONTROL_SUSTAINER_DISABLED;
 }
 
-static int battery_sustainer_set(int8_t lower, int8_t upper)
+int battery_sustainer_set(int8_t lower, int8_t upper, uint8_t flags)
 {
-	if (lower == -1 || upper == -1) {
+	if (lower == CHARGE_CONTROL_SUSTAINER_DISABLED ||
+	    upper == CHARGE_CONTROL_SUSTAINER_DISABLED) {
 		if (battery_sustainer_enabled()) {
 			CPRINTS("Sustainer disabled");
-			sustain_soc.lower = -1;
-			sustain_soc.upper = -1;
+			sustain_soc.lower = CHARGE_CONTROL_SUSTAINER_DISABLED;
+			sustain_soc.upper = CHARGE_CONTROL_SUSTAINER_DISABLED;
 			sustain_soc.flags = 0;
 		}
 		return EC_SUCCESS;
@@ -210,6 +224,7 @@ static int battery_sustainer_set(int8_t lower, int8_t upper)
 			CPRINTS("Sustainer enabled: %d ~ %d%%", lower, upper);
 		sustain_soc.lower = lower;
 		sustain_soc.upper = upper;
+		sustain_soc.flags = flags;
 		return EC_SUCCESS;
 	}
 
@@ -217,9 +232,26 @@ static int battery_sustainer_set(int8_t lower, int8_t upper)
 	return EC_ERROR_INVAL;
 }
 
+<<<<<<< PATCH SET (744bca2e0323062202b4f00c09bb1573e3df7eeb charge_control: Support persisting charge limit to BBRAM)
+void battery_sustainer_get(int8_t *lower, int8_t *upper, uint8_t *flags)
+||||||| BASE      (61760131fbf53ec740a9e456fdf7a2f1b4fe04cf zephyr: system: Add BBRAM support for charge control persist)
+test_export_static void battery_sustainer_disable(void)
+=======
 static void battery_sustainer_disable(void)
+>>>>>>> BASE      (048bed6a24fd4275df284514a3b550a120449414 zephyr: system: Add BBRAM support for charge control persist)
 {
-	battery_sustainer_set(-1, -1);
+	if (lower)
+		*lower = sustain_soc.lower;
+	if (upper)
+		*upper = sustain_soc.upper;
+	if (flags)
+		*flags = sustain_soc.flags;
+}
+
+void battery_sustainer_disable(void)
+{
+	battery_sustainer_set(CHARGE_CONTROL_SUSTAINER_DISABLED,
+			      CHARGE_CONTROL_SUSTAINER_DISABLED, 0);
 }
 
 static const char *const state_list[] = { "idle", "discharge", "charge",
@@ -526,7 +558,13 @@ void chgstate_set_manual_voltage(int volt_mv)
 }
 
 /* Force charging off before the battery is full. */
+<<<<<<< PATCH SET (744bca2e0323062202b4f00c09bb1573e3df7eeb charge_control: Support persisting charge limit to BBRAM)
+int set_chg_ctrl_mode(enum ec_charge_control_mode mode)
+||||||| BASE      (61760131fbf53ec740a9e456fdf7a2f1b4fe04cf zephyr: system: Add BBRAM support for charge control persist)
+test_export_static int set_chg_ctrl_mode(enum ec_charge_control_mode mode)
+=======
 static int set_chg_ctrl_mode(enum ec_charge_control_mode mode)
+>>>>>>> BASE      (048bed6a24fd4275df284514a3b550a120449414 zephyr: system: Add BBRAM support for charge control persist)
 {
 	bool discharge_on_ac = false;
 	int current, voltage;
@@ -942,7 +980,25 @@ void charger_init(void)
 	 */
 	battery_get_params(&curr.batt);
 
+#if defined(CONFIG_CHARGE_CONTROL_PERSIST_TO_BBRAM)
+	{
+		int8_t lower, upper;
+		uint8_t flags;
+
+		if (charge_control_load_from_bbram(&lower, &upper, &flags) ==
+			    EC_SUCCESS &&
+		    lower != CHARGE_CONTROL_SUSTAINER_DISABLED &&
+		    upper != CHARGE_CONTROL_SUSTAINER_DISABLED) {
+			if (battery_sustainer_set(lower, upper, flags) !=
+			    EC_SUCCESS)
+				battery_sustainer_disable();
+		} else {
+			battery_sustainer_disable();
+		}
+	}
+#else
 	battery_sustainer_disable();
+#endif
 }
 DECLARE_HOOK(HOOK_INIT, charger_init, HOOK_PRIO_DEFAULT);
 
@@ -1997,57 +2053,6 @@ void trigger_ocpc_reset(void)
 /* Host commands */
 
 static enum ec_status
-charge_command_charge_control(struct host_cmd_handler_args *args)
-{
-	const struct ec_params_charge_control *p = args->params;
-	struct ec_response_charge_control *r = args->response;
-	int rv;
-
-	if (p->cmd == EC_CHARGE_CONTROL_CMD_SET) {
-		if (p->mode == CHARGE_CONTROL_NORMAL) {
-			rv = battery_sustainer_set(p->sustain_soc.lower,
-						   p->sustain_soc.upper);
-			if (rv == EC_RES_UNAVAILABLE)
-				return EC_RES_UNAVAILABLE;
-			if (rv)
-				return EC_RES_INVALID_PARAM;
-			if (args->version == 2) {
-				/*
-				 * V2 uses lower == upper to indicate NO_IDLE.
-				 * TODO: Remove this if-branch once all OS-side
-				 * components are updated to v3.
-				 */
-				if (sustain_soc.lower < sustain_soc.upper)
-					sustain_soc.flags =
-						EC_CHARGE_CONTROL_FLAG_NO_IDLE;
-			} else {
-				sustain_soc.flags = p->flags;
-			}
-		} else {
-			battery_sustainer_disable();
-		}
-	} else if (p->cmd == EC_CHARGE_CONTROL_CMD_GET) {
-		r->mode = get_chg_ctrl_mode();
-		r->sustain_soc.lower = sustain_soc.lower;
-		r->sustain_soc.upper = sustain_soc.upper;
-		if (args->version > 2)
-			r->flags = sustain_soc.flags;
-		args->response_size = sizeof(*r);
-		return EC_RES_SUCCESS;
-	} else {
-		return EC_RES_INVALID_PARAM;
-	}
-
-	rv = set_chg_ctrl_mode(p->mode);
-	if (rv != EC_SUCCESS)
-		return EC_RES_ERROR;
-
-	return EC_RES_SUCCESS;
-}
-DECLARE_HOST_COMMAND(EC_CMD_CHARGE_CONTROL, charge_command_charge_control,
-		     EC_VER_MASK(2) | EC_VER_MASK(3));
-
-static enum ec_status
 charge_command_current_limit(struct host_cmd_handler_args *args)
 {
 	if (args->version == 0) {
@@ -2364,9 +2369,14 @@ static int command_chgstate(int argc, const char **argv)
 			upper = strtoi(argv[3], &e, 0);
 			if (*e)
 				return EC_ERROR_PARAM3;
-			rv = battery_sustainer_set(lower, upper);
+			rv = battery_sustainer_set(lower, upper, 0);
 			if (rv)
 				return EC_ERROR_INVAL;
+#if defined(CONFIG_CHARGE_CONTROL_PERSIST_TO_BBRAM)
+			charge_control_save_to_bbram(sustain_soc.lower,
+						     sustain_soc.upper,
+						     sustain_soc.flags);
+#endif
 		} else {
 			return EC_ERROR_PARAM1;
 		}
