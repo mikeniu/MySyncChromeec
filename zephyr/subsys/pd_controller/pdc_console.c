@@ -166,6 +166,49 @@ static int cmd_pdc_get_connector_status(const struct shell *sh, size_t argc,
 	return print_get_connector_status(sh, port);
 }
 
+static int cmd_pdc_get_attention_vdo(const struct shell *sh, size_t argc,
+				     char **argv)
+{
+	int rv;
+	uint8_t port;
+	union get_attention_vdo_t vdo;
+
+	/* Get PD port number */
+	rv = cmd_get_pd_port(sh, argv[1], &port);
+	if (rv)
+		return rv;
+
+	rv = pdc_power_mgmt_get_attention_vdo(port, &vdo);
+	if (rv) {
+		shell_error(sh, "Port %d GET_ATTENTION_VDO failed: %d", port,
+			    rv);
+		return rv;
+	}
+
+	shell_fprintf(sh, SHELL_INFO, "Port %d GET_ATTENTION_VDO:\n", port);
+	shell_fprintf(sh, SHELL_INFO,
+		      "   alt_mode_index                   : %u\n",
+		      vdo.alt_mode_index);
+	shell_fprintf(sh, SHELL_INFO,
+		      "   num_vdos                         : %u\n",
+		      vdo.num_vdos);
+	shell_fprintf(sh, SHELL_INFO,
+		      "   sequence_number                  : %u\n",
+		      vdo.sequence_number);
+	shell_fprintf(sh, SHELL_INFO,
+		      "   vdm_header                       : 0x%08x\n",
+		      vdo.vdm_heade);
+	shell_fprintf(sh, SHELL_INFO,
+		      "   vdo                              : 0x%08x\n",
+		      vdo.vdo);
+	shell_fprintf(sh, SHELL_INFO,
+		      "   hpd_lvl / hpd_irq                : %d / %d\n",
+		      PD_VDO_DPSTS_HPD_LVL(vdo.vdo),
+		      PD_VDO_DPSTS_HPD_IRQ(vdo.vdo));
+
+	return 0;
+}
+
 static int cmd_pdc_get_cable_prop(const struct shell *sh, size_t argc,
 				  char **argv)
 {
@@ -987,6 +1030,10 @@ SHELL_STATIC_SUBCMD_SET_CREATE(
 	SHELL_CMD_ARG(cable_prop, NULL,
 		      SHELL_HELP("Print the UCSI GET_CABLE_PROPERTY", "<port>"),
 		      cmd_pdc_get_cable_prop, 2, 0),
+	SHELL_CMD_ARG(attention_vdo, NULL,
+		      SHELL_HELP("Send the UCSI GET_ATTENTION_VDO command",
+				 "<port>"),
+		      cmd_pdc_get_attention_vdo, 2, 0),
 	SHELL_CMD_ARG(
 		src_voltage, NULL,
 		SHELL_HELP("Request to source a given voltage from PSU. "

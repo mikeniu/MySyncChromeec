@@ -1869,6 +1869,7 @@ static void handle_attention_vdo(struct pdc_port_t *port)
 {
 	const struct pdc_config_t *config = port->dev->config;
 	int port_num = config->connector_num;
+
 	/* Check for an HPD wake on DP Status. The conditions are...
 	 *  a) Device is suspended.
 	 *  b) Port is currently using an alternate mode.
@@ -5950,6 +5951,32 @@ pdc_power_mgmt_get_cable_prop(int port, union cable_property_t *cable_prop)
 	}
 
 	*cable_prop = pdc_data[port]->port.cable_prop;
+
+	return 0;
+}
+
+int pdc_power_mgmt_get_attention_vdo(int port, union get_attention_vdo_t *vdo)
+{
+	int ret;
+
+	if (!pdc_power_mgmt_is_pdc_port_valid(port)) {
+		return -ERANGE;
+	}
+
+	if (vdo == NULL) {
+		return -EINVAL;
+	}
+
+	/*
+	 * The driver writes the result into port->attention_vdo, so just
+	 * trigger the command and copy the result out afterwards.
+	 */
+	ret = public_api_block(port, CMD_PDC_GET_ATTENTION_VDO);
+	if (ret) {
+		return ret;
+	}
+
+	*vdo = pdc_data[port]->port.attention_vdo;
 
 	return 0;
 }

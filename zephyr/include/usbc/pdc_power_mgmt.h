@@ -543,6 +543,19 @@ void pdc_power_mgmt_request_source_voltage(int port, int mv);
 int pdc_power_mgmt_get_cable_prop(int port, union cable_property_t *cable_prop);
 
 /**
+ * @brief Actively send UCSI GET_ATTENTION_VDO to the PDC and return the result
+ *
+ * Unlike pdc_power_mgmt_get_dp_status(), which returns the cached DP status
+ * VDO, this issues the UCSI command to the PDC and blocks until it completes.
+ *
+ * @param port USB-C port number
+ * @param vdo Output variable to store the attention VDO
+ *
+ * @retval 0 if successful or error code
+ */
+int pdc_power_mgmt_get_attention_vdo(int port, union get_attention_vdo_t *vdo);
+
+/**
  * @brief Sets the SRC CAPs sent by the PDC to its port partner when attached in
  * a source power role
  *
