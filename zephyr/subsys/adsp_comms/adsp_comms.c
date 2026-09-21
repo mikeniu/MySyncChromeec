@@ -11,8 +11,10 @@
 #include "chipset.h"
 #include "common.h"
 #include "console.h"
+#include "ec_commands.h"
 #include "extpower.h"
 #include "hooks.h"
+#include "util.h"
 
 #include <zephyr/logging/log.h>
 
@@ -54,6 +56,42 @@ static int command_chgstate(int argc, const char **argv)
 		(bp == BP_YES) ? "YES" : (bp == BP_NO ? "NO" : "NOT_SURE");
 	int batt_is_charging = 0;
 
+	if (argc > 1) {
+		if (IS_ENABLED(
+			    CONFIG_PLATFORM_EC_CHARGE_CONTROL_PERSIST_TO_BBRAM) &&
+		    !strcasecmp(argv[1], "sustain")) {
+			char *e;
+			int lower, upper;
+			int rv;
+
+			if (argc <= 3)
+				return EC_ERROR_PARAM_COUNT;
+			lower = strtoi(argv[2], &e, 0);
+			if (*e)
+				return EC_ERROR_PARAM2;
+			upper = strtoi(argv[3], &e, 0);
+			if (*e)
+				return EC_ERROR_PARAM3;
+
+			if (lower == -1 || upper == -1) {
+				rv = charge_control_save_to_bbram(-1, -1, 0);
+			} else if (0 <= lower && lower <= upper &&
+				   upper <= 100) {
+				rv = charge_control_save_to_bbram(
+					lower, upper,
+					(lower < upper) ?
+						EC_CHARGE_CONTROL_FLAG_NO_IDLE :
+						0);
+			} else {
+				return EC_ERROR_INVAL;
+			}
+			if (rv)
+				return EC_ERROR_UNKNOWN;
+		} else {
+			return EC_ERROR_PARAM1;
+		}
+	}
+
 	if (active_charge_state == LED_PWRS_CHARGE ||
 	    active_charge_state == LED_PWRS_CHARGE_NEAR_FULL) {
 		state_str = "charge";
@@ -70,9 +108,24 @@ static int command_chgstate(int argc, const char **argv)
 	ccprintf("\tstate_of_charge = %d%%\n", soc);
 	ccprintf("\tis_present = %s\n", pres_str);
 
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_CHARGE_CONTROL_PERSIST_TO_BBRAM)) {
+		int8_t lower, upper;
+		uint8_t flags;
+
+		if (charge_control_load_from_bbram(&lower, &upper, &flags) ==
+			    EC_SUCCESS &&
+		    lower != -1 && upper != -1) {
+			ccprintf("Battery sustainer = on (%d%% ~ %d%%)\n",
+				 lower, upper);
+		} else {
+			ccprintf("Battery sustainer = off\n");
+		}
+	}
+
 	return EC_SUCCESS;
 }
-DECLARE_CONSOLE_COMMAND(chgstate, command_chgstate, NULL,
+DECLARE_CONSOLE_COMMAND(chgstate, command_chgstate,
+			"\n[sustain <lower> <upper>]",
 			"Get charge state machine status");
 
 #ifdef CONFIG_BATTERY_STATUS_CUSTOM
