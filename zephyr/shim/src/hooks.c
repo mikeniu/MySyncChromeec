@@ -43,6 +43,20 @@ BUILD_ASSERT(ARRAY_SIZE(hook_registry) == HOOK_TYPE_COUNT,
 BUILD_ASSERT(NUM_VA_ARGS_LESS_1(HOOK_TYPES_LIST) + 1 == HOOK_TYPE_COUNT,
 	     "At least one hook type is missing from HOOK_TYPES_LIST");
 
+#ifdef CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE
+static K_KERNEL_STACK_DEFINE(hook_work_queue_stack,
+			     CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE);
+static struct k_work_q hook_work_queue;
+static struct k_work_q *const hook_work_q = &hook_work_queue;
+
+k_tid_t get_hooks_thread(void)
+{
+	return hook_work_queue.thread_id;
+}
+#else
+static struct k_work_q *const hook_work_q = &k_sys_work_q;
+#endif /* CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE */
+
 #ifdef CONFIG_PLATFORM_EC_HOOK_SECOND
 static void hook_second_work(struct k_work *work);
 static K_WORK_DELAYABLE_DEFINE(hook_seconds_work_data, hook_second_work);
@@ -70,7 +84,8 @@ static void hook_second_work(struct k_work *work)
 
 	hook_notify(HOOK_SECOND);
 
-	rv = k_work_reschedule(&hook_seconds_work_data, K_SECONDS(1));
+	rv = k_work_reschedule_for_queue(hook_work_q, &hook_seconds_work_data,
+					 K_SECONDS(1));
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_seconds_work_data, rv);
@@ -85,8 +100,8 @@ static void hook_tick_work(struct k_work *work)
 
 	hook_notify(HOOK_TICK);
 
-	rv = k_work_reschedule(&hook_ticks_work_data,
-			       K_USEC(HOOK_TICK_INTERVAL));
+	rv = k_work_reschedule_for_queue(hook_work_q, &hook_ticks_work_data,
+					 K_USEC(HOOK_TICK_INTERVAL));
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_ticks_work_data, rv);
@@ -94,6 +109,7 @@ static void hook_tick_work(struct k_work *work)
 }
 #endif /* CONFIG_PLATFORM_EC_HOOK_TICK */
 
+#ifndef CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE
 /*
  * Numerically lower priorities take precedence, so verify the hook
  * related threads cannot preempt any of the shimmed tasks.
@@ -103,14 +119,27 @@ BUILD_ASSERT(CONFIG_SYSTEM_WORKQUEUE_PRIORITY >= (EC_TASK_PRIO_COUNT - 1),
 BUILD_ASSERT(
 	CONFIG_SYSTEM_WORKQUEUE_PRIORITY == EC_TASK_PRIORITY(EC_SYSWORKQ_PRIO),
 	"EC_SYSWORKQ_PRIO does not match CONFIG_SYSTEM_WORKQUEUE_PRIORITY.");
+#endif /* !CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE */
 
 static int zephyr_shim_setup_hooks(void)
 {
 	int rv = 0;
 
+#ifdef CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE
+	static const struct k_work_queue_config cfg = {
+		.name = "ec_hooks",
+		.no_yield = IS_ENABLED(CONFIG_SYSTEM_WORKQUEUE_NO_YIELD),
+	};
+
+	k_work_queue_start(&hook_work_queue, hook_work_queue_stack,
+			   K_KERNEL_STACK_SIZEOF(hook_work_queue_stack),
+			   EC_TASK_PRIORITY(EC_SYSWORKQ_PRIO), &cfg);
+#endif /* CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE */
+
 #ifdef CONFIG_PLATFORM_EC_HOOK_SECOND
 	/* Startup the HOOK_SECOND recurring work */
-	rv = k_work_reschedule(&hook_seconds_work_data, K_SECONDS(1));
+	rv = k_work_reschedule_for_queue(hook_work_q, &hook_seconds_work_data,
+					 K_SECONDS(1));
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_seconds_work_data, rv);
@@ -119,8 +148,8 @@ static int zephyr_shim_setup_hooks(void)
 
 #ifdef CONFIG_PLATFORM_EC_HOOK_TICK
 	/* Startup the HOOK_TICK recurring work */
-	rv = k_work_reschedule(&hook_ticks_work_data,
-			       K_USEC(HOOK_TICK_INTERVAL));
+	rv = k_work_reschedule_for_queue(hook_work_q, &hook_ticks_work_data,
+					 K_USEC(HOOK_TICK_INTERVAL));
 	/* LCOV_EXCL_START cannot fail unless delay = K_NO_WAIT */
 	if (rv < 0)
 		work_queue_error(&hook_ticks_work_data, rv);
@@ -184,7 +213,7 @@ int hook_call_deferred(const struct deferred_data *data, int us)
 	} else if (us >= 0) {
 		k_timeout_t delay = K_USEC(us);
 
-		rv = k_work_reschedule(work, delay);
+		rv = k_work_reschedule_for_queue(hook_work_q, work, delay);
 		/*
 		 * 0 delay for hook_call_deferred is "run as soon as possible",
 		 * but Zephyr has no direct equivalent. K_NO_WAIT is the nearest
@@ -199,12 +228,13 @@ int hook_call_deferred(const struct deferred_data *data, int us)
 		 * result, then instead request a minimum delay.
 		 */
 		if (rv == -EBUSY && K_TIMEOUT_EQ(delay, K_NO_WAIT)) {
-			rv = k_work_reschedule(work, K_TICKS(1));
+			rv = k_work_reschedule_for_queue(hook_work_q, work,
+							 K_TICKS(1));
 		}
 
 		/*
-		 * LCOV_EXCL_START k_work_reschedule only returns errors
-		 * if queue is stopped or unspecified, and the system
+		 * LCOV_EXCL_START k_work_reschedule_for_queue only returns
+		 * errors if queue is stopped or unspecified, and the system
 		 * never does either of those.
 		 */
 		if (rv < 0) {

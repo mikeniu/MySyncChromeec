@@ -287,6 +287,8 @@ enum {
 		(COND_CODE_1(CONFIG_SHELL_BACKEND_DUMMY, (fn(SHELL)),   \
 		())))                                                   \
 	COND_CODE_1(CONFIG_AP_PWRSEQ, (fn(AP_PWRSEQ)), ())              \
+	COND_CODE_1(CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE,        \
+		    (fn(HOOKS)), ())                                    \
 	fn(SYSWORKQ)                                                    \
 	fn(IDLE)
 /* clang-format on */
