@@ -108,6 +108,19 @@ register_ish_project(
     ],
 )
 
+register_ish_project(
+    project_name="atria-ish-idle",
+    boards=["atria"],
+    zephyr_board="intel_ish_5_8_0",
+    dts_overlays=[
+        here / "atria-ish-idle" / "project.overlay",
+    ],
+    kconfig_files=[
+        here / "atria-ish-idle" / "project.conf",
+        here / ".." / ".." / "ish.conf",
+    ],
+)
+
 # Note for reviews, do not let anyone edit these assertions, the addresses
 # must not change after the first RO release.
 assert_rw_fwid_DO_NOT_EDIT(project_name="atriarvp-rtk", addr=0x80404)
