@@ -1,0 +1,177 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <cros/thermistor/thermistor.dtsi>
+#include <dt-bindings/gpio_defines.h>
+
+/ {
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_ec_en_pp5000_s5: ec_en_pp5000_s5 {
+			gpios = <&gpio0 0 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_haptic_en_ec: haptic_en_ec {
+			gpios = <&gpio0 1 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_tpad_en: tpad_en {
+			gpios = <&gpio0 2 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_bl_off_odl: bl_off_odl {
+			gpios = <&gpio0 3 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_en_pp5000_fan: ec_en_pp5000_fan {
+			gpios = <&gpio0 4 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_enavdd_oled: ec_enavdd_oled {
+			gpios = <&gpio0 5 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_sys_throttle_mira: sys_throttle_mira {
+			gpios = <&gpio0 6 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_en_pp3300_s3: ec_en_pp3300_s3 {
+			gpios = <&gpio0 7 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_pp1800_l1i_s3_ec: pp1800_l1i_s3_ec {
+			gpios = <&gpio0 8 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_smb2360_a_chg_led_pg_odl: smb2360_a_chg_led_pg_odl {
+			gpios = <&gpio0 9 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+		gpio_smb2360_b_chg_led_pg_odl: smb2360_b_chg_led_pg_odl {
+			gpios = <&gpio0 10 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+	};
+
+	gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_s3_power_monitor: s3_power_monitor {
+			irq-pin = <&gpio_pp1800_l1i_s3_ec>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "s3_power_interrupt";
+		};
+		int_extpower_a: extpower_a {
+			irq-pin = <&gpio_smb2360_a_chg_led_pg_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "extpower_interrupt";
+		};
+		int_extpower_b: extpower_b {
+			irq-pin = <&gpio_smb2360_b_chg_led_pg_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "extpower_interrupt";
+		};
+	};
+
+	adc0: adc {
+		compatible = "zephyr,adc-emul";
+		nchannels = <4>;
+		ref-internal-mv = <3300>;
+		#io-channel-cells = <1>;
+		status = "okay";
+	};
+
+	named-adc-channels {
+		compatible = "named-adc-channels";
+
+		adc_temp_pmic: pmic {
+			enum-name = "ADC_TEMP_SENSOR_1";
+			io-channels = <&adc0 0>;
+		};
+		adc_temp_ambient: ambient {
+			enum-name = "ADC_TEMP_SENSOR_2";
+			io-channels = <&adc0 1>;
+		};
+		adc_temp_ssd: ssd {
+			enum-name = "ADC_TEMP_SENSOR_3";
+			io-channels = <&adc0 2>;
+		};
+		adc_temp_charger: charger {
+			enum-name = "ADC_TEMP_SENSOR_4";
+			io-channels = <&adc0 3>;
+		};
+	};
+
+	temp_sensor_pmic: pmic {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_pmic>;
+	};
+	temp_sensor_ambient: ambient {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_ambient>;
+	};
+	temp_sensor_ssd: ssd {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_ssd>;
+	};
+	temp_sensor_charger: charger {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_charger>;
+	};
+
+	named-temp-sensors {
+		compatible = "cros-ec,temp-sensors";
+		temp_pmic: pmic {
+			sensor = <&temp_sensor_pmic>;
+		};
+		temp_ambient: ambient {
+			sensor = <&temp_sensor_ambient>;
+		};
+		temp_ssd: ssd {
+			sensor = <&temp_sensor_ssd>;
+		};
+		temp_charger: charger {
+			sensor = <&temp_sensor_charger>;
+		};
+	};
+
+	fan_steps: fan-steps {
+		compatible = "cros-ec,fan-steps";
+		level_0 {
+			temp-on = <42 0 46 55>;
+			temp-off = <99 0 99 99>;
+			rpm-target = <0 0>;
+		};
+		level_1 {
+			temp-on = <44 0 46 55>;
+			temp-off = <39 0 99 99>;
+			rpm-target = <2700 3100>;
+		};
+		level_2 {
+			temp-on = <46 0 46 55>;
+			temp-off = <41 0 99 99>;
+			rpm-target = <3700 3200>;
+		};
+		level_3 {
+			temp-on = <48 0 46 55>;
+			temp-off = <43 0 99 99>;
+			rpm-target = <4200 3800>;
+		};
+		level_4 {
+			temp-on = <50 0 46 55>;
+			temp-off = <45 0 99 99>;
+			rpm-target = <4700 4200>;
+		};
+		level_5 {
+			temp-on = <52 0 48 57>;
+			temp-off = <47 0 41 52>;
+			rpm-target = <5000 4700>;
+		};
+		level_6 {
+			temp-on = <99 0 99 99>;
+			temp-off = <49 0 43 54>;
+			rpm-target = <6000 5000>;
+		};
+	};
+};
+
+&thermistor_3V3_100K_100K_4250B {
+	status = "okay";
+};
