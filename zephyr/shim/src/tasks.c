@@ -137,6 +137,12 @@ static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 		return TASK_ID_SYSWORKQ;
 	}
 
+#ifdef CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE
+	if (get_hooks_thread() == thread_id) {
+		return TASK_ID_HOOKS;
+	}
+#endif
+
 #if defined(HAS_TASK_HOSTCMD) || \
 	(!defined(CONFIG_SHIMMED_TASKS) && !defined(CONFIG_HAS_TEST_TASKS))
 	if (get_hostcmd_thread() == thread_id) {
@@ -398,8 +404,12 @@ inline bool in_deferred_context(void)
 	if (k_is_pre_kernel()) {
 		return false;
 	}
+#ifdef CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE
+	return (k_current_get() == get_hooks_thread());
+#else
 	/*
 	 * Deferred calls run in the sysworkq.
 	 */
 	return (k_current_get() == get_sysworkq_thread());
+#endif
 }

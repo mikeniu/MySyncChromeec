@@ -472,6 +472,14 @@ config PLATFORM_EC_HOOK_TICK
 	  Enable support for the one tick hook. Disabling the hook save
 	  some memory and CPU time.
 
+config PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE
+	bool "Use a dedicated workqueue for hooks"
+	depends on PLATFORM_EC_HOOKS
+	help
+	  Use a dedicated workqueue for running EC hooks (HOOK_SECOND,
+	  HOOK_TICK) and deferred calls instead of the Zephyr system
+	  workqueue.
+
 menuconfig PLATFORM_EC_HOSTCMD
 	bool "Host commands"
 	default n if ARCH_POSIX
