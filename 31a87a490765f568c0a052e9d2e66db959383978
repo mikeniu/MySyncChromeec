@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05dd8a11_49bd1a82",
+        "filename": "common/cbi.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-09-22T20:07:58Z",
+      "side": 1,
+      "message": "good call",
+      "parentUuid": "5553a50b_c40b9f6b",
+      "range": {
+        "startLine": 526,
+        "startChar": 9,
+        "endLine": 526,
+        "endChar": 21
+      },
+      "revId": "31a87a490765f568c0a052e9d2e66db959383978",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "480ba856_cbe9ca02",
@@ -64,6 +88,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "514259d8_bcd2109e",
+        "filename": "common/cbi.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-09-22T20:07:58Z",
+      "side": 1,
+      "message": "after this point the content is changed in any case (either inside the \u0027if\u0027 or by the memcpy on line 538) so the cache should be invalidated",
+      "parentUuid": "480ba856_cbe9ca02",
+      "range": {
+        "startLine": 529,
+        "startChar": 1,
+        "endLine": 529,
+        "endChar": 21
+      },
+      "revId": "31a87a490765f568c0a052e9d2e66db959383978",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "176822c7_c5196ff4",
@@ -77,6 +125,30 @@
       "writtenOn": "2026-09-22T18:30:58Z",
       "side": 1,
       "message": "move before the attempt to write to cbi? i\u0027m not sure that `EC_RES_ERROR`\nguarantees CBI wasn\u0027t modified.",
+      "range": {
+        "startLine": 545,
+        "startChar": 3,
+        "endLine": 545,
+        "endChar": 23
+      },
+      "revId": "31a87a490765f568c0a052e9d2e66db959383978",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0e2047a_b6d3ed4f",
+        "filename": "common/cbi.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-09-22T20:07:58Z",
+      "side": 1,
+      "message": "that is exactly the purpose of the added `invalidate()` call. Do you think this one should be removed?",
+      "parentUuid": "176822c7_c5196ff4",
       "range": {
         "startLine": 545,
         "startChar": 3,
