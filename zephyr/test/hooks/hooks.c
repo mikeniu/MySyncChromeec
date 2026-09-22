@@ -4,6 +4,7 @@
  */
 
 #include "ap_power/ap_power.h"
+#include "ec_tasks.h"
 #include "hooks.h"
 
 #include <stdbool.h>
@@ -74,6 +75,14 @@ static bool deferred_func_called;
 #define DEFERRED_DELAY_US (500 * 1000)
 static void deferred_func(void)
 {
+#ifdef CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE
+	zassert_not_equal(k_current_get(), k_sys_work_q.thread_id);
+	zassert_equal(k_current_get(), get_hooks_thread());
+	zassert_true(k_thread_priority_get(get_hooks_thread()) <
+		     k_thread_priority_get(k_sys_work_q.thread_id));
+#else
+	zassert_equal(k_current_get(), k_sys_work_q.thread_id);
+#endif
 	deferred_func_called = true;
 }
 DECLARE_DEFERRED(deferred_func);
