@@ -3,3 +3,6 @@ common:
     - native_sim
 tests:
   hooks.default: {}
+  hooks.dedicated_workqueue:
+    extra_configs:
+      - CONFIG_PLATFORM_EC_HOOK_DEDICATED_WORKQUEUE=y
