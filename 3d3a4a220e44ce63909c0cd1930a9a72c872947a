@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7d439b1_b6dab88a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-22T23:19:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n*   **Functionality:** The explicitly added size validation correctly protects against out-of-bounds reads for version 1 requests, addressing the underlying vulnerability.\n*   **Architecture \u0026 Component Fit:** The logic fits within the existing Zephyr host command framework by addressing a known limitation of the `SMALLEST_TYPE` validation mechanism, placing the conditional validation properly within the handlers.\n*   **Code Simplicity:** ❌ **Changes Requested** — The explicit validation checks for the base version (v0) in `fp_command_frame` and `fp_command_template` are mathematically redundant and can be deleted. The host command framework already implicitly validates the base size.\n*   **Idiomaticity \u0026 Readability:** Excellent. The logic is placed clearly and uses appropriate internal error codes (`EC_HOST_CMD_REQUEST_TRUNCATED`).\n*   **Testing \u0026 Test Coverage:** ❌ **Changes Requested** — Automated test coverage is mandatory for all new branch paths and error handling. This CL adds logic to return `EC_HOST_CMD_REQUEST_TRUNCATED` when `input_buf_size` is too small, but there are no unit tests covering these new error paths.\n*   **CL Size \u0026 Scope:** Size: S (+13, -0). The CL is atomic and focused.\n\n**Missing Test Coverage**\n\nCurrently, the newly added branches returning `EC_HOST_CMD_REQUEST_TRUNCATED` are untested. You must add unit tests to verify these bounds checks, especially since they are security/robustness critical.\n\nFor example, in `zephyr/test/fingerprint/task/src/fpsensor_template.cc`:\n\n```cpp\nZTEST_USER(fpsensor_template, test_fp_template_v1_load_template_truncated)\n{\n\tuint8_t params_buffer[FP_TEMPLATE_V1_PARAMS_BUFFER_SIZE] \u003d {0};\n\tstruct ec_params_fp_template_v1 *params \u003d\n\t\t(struct ec_params_fp_template_v1 *)params_buffer;\n\n\tparams-\u003ecmd \u003d FP_TEMPLATE_LOAD;\n\t\n\t/* Pass a size smaller than required for v1 */\n\tzassert_equal(ec_cmd_fp_template_v1(NULL, params,\n\t\t\t\t\t    offsetof(struct ec_params_fp_template_v1, data) - 1),\n\t\t      EC_HOST_CMD_REQUEST_TRUNCATED);\n}\n```\n\nPlease apply similar tests for the other modified endpoints (`EC_CMD_FP_MODE` and `EC_CMD_FP_FRAME`) in their respective test files.\n\nSee inline comments for details on removing the redundant v0 size checks. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8434542_c67bb682-bde6-4427-8b4e-19782cc1d189.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3d3a4a220e44ce63909c0cd1930a9a72c872947a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7ae9649_16cd97ff",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-22T23:19:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe explicit check for the v0 (`struct ec_params_fp_frame`) size is mathematically redundant. The host command framework already guarantees that `args-\u003einput_buf_size` is at least the size of the smallest type via `SMALLEST_TYPE(struct ec_params_fp_frame, struct ec_params_fp_frame_v1)` configured at the bottom of this file.\n\nSince `sizeof(struct ec_params_fp_frame)` **is** the smallest type (8 bytes vs 12 bytes for v1), the framework will drop the command and return `EC_HOST_CMD_REQUEST_TRUNCATED` before it even reaches this handler if the buffer is smaller than 8 bytes.\n\nTo improve code simplicity, remove this redundant check. This will also make the implementation consistent with `fp_command_mode` in `fpsensor_state.cc`, which correctly omits the check for its base version. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8434542_c67bb682-bde6-4427-8b4e-19782cc1d189.pb)",
+      "range": {
+        "startLine": 872,
+        "startChar": 0,
+        "endLine": 873,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3d3a4a220e44ce63909c0cd1930a9a72c872947a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c3d1418_ccfed30b",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 1116,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-22T23:19:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nSimilar to `fp_command_frame`, this size check for the base version (`ec_params_fp_template`) is redundant. The framework already guarantees the buffer is large enough for the shortest struct configured in `SMALLEST_TYPE(struct ec_params_fp_template, struct ec_params_fp_template_v1)`.\n\nPlease remove this check to keep the handlers minimalist and avoid redundant boilerplate. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8434542_c67bb682-bde6-4427-8b4e-19782cc1d189.pb)",
+      "range": {
+        "startLine": 1115,
+        "startChar": 0,
+        "endLine": 1116,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3d3a4a220e44ce63909c0cd1930a9a72c872947a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
