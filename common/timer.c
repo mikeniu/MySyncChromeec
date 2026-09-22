@@ -142,7 +142,16 @@ int timer_arm(timestamp_t event, task_id_t tskid)
 
 	/* Modify the next event if needed */
 	if ((event.le.hi < now.le.hi) ||
-	    ((event.le.hi == now.le.hi) && (event.le.lo <= next_deadline)))
+	    ((event.le.hi == now.le.hi) && (event.le.lo <= next_deadline)) ||
+	    /*
+	     * If the deadline we are tracking has already passed, the
+	     * hardware event was lost. Trigger process_timers() so the
+	     * event timer gets re-armed, otherwise every future deadline
+	     * is suppressed by the stale next_deadline and the EC hangs
+	     * until the watchdog fires (b/562134129).
+	     */
+	    ((next_deadline != 0xffffffff) &&
+	     ((int32_t)(next_deadline - now.le.lo) <= 0)))
 		task_trigger_irq(timer_irq);
 
 	return EC_SUCCESS;
