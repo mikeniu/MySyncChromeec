@@ -22,6 +22,30 @@
       },
       "revId": "d74bf1040d6adc5ac95b3d1ddbde36e25315d8e1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43f37266_99284149",
+        "filename": "include/ec_cmd_api.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 3900655
+      },
+      "writtenOn": "2026-09-22T10:16:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "663783e4_4d0f4f96",
+      "range": {
+        "startLine": 462,
+        "startChar": 0,
+        "endLine": 465,
+        "endChar": 60
+      },
+      "revId": "d74bf1040d6adc5ac95b3d1ddbde36e25315d8e1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
