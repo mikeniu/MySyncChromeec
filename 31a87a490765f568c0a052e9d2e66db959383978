@@ -16,6 +16,75 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "31a87a490765f568c0a052e9d2e66db959383978",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5553a50b_c40b9f6b",
+        "filename": "common/cbi.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-22T18:30:58Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be EC_RES_INVALID_PARAM since this is the same class\nof error as the previous checks.",
+      "range": {
+        "startLine": 526,
+        "startChar": 9,
+        "endLine": 526,
+        "endChar": 21
+      },
+      "revId": "31a87a490765f568c0a052e9d2e66db959383978",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "480ba856_cbe9ca02",
+        "filename": "common/cbi.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-22T18:30:58Z",
+      "side": 1,
+      "message": "should this go inside the following `if`?",
+      "range": {
+        "startLine": 529,
+        "startChar": 1,
+        "endLine": 529,
+        "endChar": 21
+      },
+      "revId": "31a87a490765f568c0a052e9d2e66db959383978",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "176822c7_c5196ff4",
+        "filename": "common/cbi.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-22T18:30:58Z",
+      "side": 1,
+      "message": "move before the attempt to write to cbi? i\u0027m not sure that `EC_RES_ERROR`\nguarantees CBI wasn\u0027t modified.",
+      "range": {
+        "startLine": 545,
+        "startChar": 3,
+        "endLine": 545,
+        "endChar": 23
+      },
+      "revId": "31a87a490765f568c0a052e9d2e66db959383978",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
