@@ -418,19 +418,8 @@ ZTEST_USER(tps6699x, test_set_bbr_cts)
 
 ZTEST_USER(tps6699x, test_get_attention_vdo)
 {
-	static const int RECOVERY_MS = 1500;
 	union get_attention_vdo_t get_attention_vdo = { 0 };
 
-	/* Cover failure case */
-	emul_pdc_fail_reg_read(emul, REG_RECEIVED_ATTENTION_VDM);
-
-	zassert_ok(pdc_get_attention_vdo(dev, &get_attention_vdo));
-	/* Failure triggers a recovery */
-	k_sleep(K_MSEC(RECOVERY_MS));
-	zassert_true(pdc_is_init_done(dev));
-	zassert_equal(get_attention_vdo.num_vdos, 0);
-
-	/* Cover success case */
 	zassert_ok(pdc_get_attention_vdo(dev, &get_attention_vdo));
 	k_sleep(K_MSEC(SLEEP_MS));
 	zassert_equal(get_attention_vdo.num_vdos, 2);

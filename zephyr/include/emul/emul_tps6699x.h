@@ -68,6 +68,7 @@ struct tps6699x_response {
 		union connector_capability_t connector_capability;
 		union cable_property_t cable_property;
 		uint32_t current_cam;
+		union get_attention_vdo_t get_attention_vdo;
 	} data;
 } __packed;
 
@@ -93,6 +94,7 @@ struct tps6699x_emul_pdc_data {
 	union pdr_t pdr;
 	enum ccom_t ccom;
 	union cable_property_t cable_property;
+	union get_attention_vdo_t get_attention_vdo;
 	union reg_port_control port_control;
 	bool frs_configured;
 	uint32_t current_cam;

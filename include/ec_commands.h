@@ -5,11 +5,8 @@
 
 /* Host communication command constants for Chrome EC */
 
-#if !defined(PLATFORM_EC_INCLUDE_EC_COMMANDS_H_) && \
-	!defined(__CROS_EC_EC_COMMANDS_H)
+#ifndef PLATFORM_EC_INCLUDE_EC_COMMANDS_H_
 #define PLATFORM_EC_INCLUDE_EC_COMMANDS_H_
-/* TODO(b/510249930): Remove this once all ec_commands.h copies are updated. */
-#define __CROS_EC_EC_COMMANDS_H
 
 #if !defined(__ACPI__) && !defined(__KERNEL__)
 #include <stdint.h>
@@ -3752,6 +3749,13 @@ struct ec_params_vstore_write {
 	uint8_t slot; /* Slot to write to */
 	uint8_t data[EC_VSTORE_SLOT_SIZE];
 } __ec_align1;
+
+/* Write port80 / post code event */
+#define EC_CMD_PORT80_WRITE 0x004C
+
+struct ec_params_port80_write {
+	uint32_t code;
+} __ec_align4;
 
 /*****************************************************************************/
 /* Thermal engine commands. Note that there are two implementations. We'll
