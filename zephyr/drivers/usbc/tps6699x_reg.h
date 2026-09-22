@@ -1412,21 +1412,6 @@ union reg_received_identity_data_object {
 };
 
 /**
- * @brief 4.52 Received Attention VDM Register (Offset = 4Eh)
- */
-union reg_received_attention_vdm {
-	struct {
-		uint8_t number_valid_vdos : 3;
-		uint8_t reserved0 : 2;
-		uint8_t sequence_number : 3;
-
-		uint32_t vdm_header;
-		uint32_t vdo;
-	} __packed;
-	uint8_t raw_value[9];
-};
-
-/**
  * @brief 4.56 Thunderbolt Configuration Register (Offset 0x52)
  */
 

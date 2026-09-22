@@ -6,6 +6,8 @@
 #ifndef PLATFORM_EC_ZEPHYR_TEST_SYSTEM_SHIM_INCLUDE_FAKES_H_
 #define PLATFORM_EC_ZEPHYR_TEST_SYSTEM_SHIM_INCLUDE_FAKES_H_
 
+#include "drivers/cros_system.h"
+
 #include <stdint.h>
 
 #include <zephyr/fff.h>
@@ -13,6 +15,8 @@
 DECLARE_FAKE_VALUE_FUNC(int, cros_system_get_reset_cause);
 DECLARE_FAKE_VALUE_FUNC(uint64_t, cros_system_deep_sleep_ticks);
 DECLARE_FAKE_VALUE_FUNC(int, cros_system_hibernate, uint32_t, uint32_t);
+DECLARE_FAKE_VALUE_FUNC(int, cros_system_get_hibernate_wake_source,
+			enum hibernate_wake_source *);
 DECLARE_FAKE_VALUE_FUNC(const char *, cros_system_chip_vendor);
 DECLARE_FAKE_VALUE_FUNC(const char *, cros_system_chip_name);
 DECLARE_FAKE_VALUE_FUNC(const char *, cros_system_chip_revision);
