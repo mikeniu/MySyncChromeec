@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91dd1a13_9a3e8e07",
+        "filename": "common/charge_control.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T17:36:10Z",
+      "side": 1,
+      "message": "Nice Catch! This was a miss. Since platforms without EC charger can\u0027t support the chargecontrol feature of `IDLE` and `DISCHARGE`, we would have ended up just resting the last charge limit.\n\nUpdate the code, the Kconfig discription and added additional test in the Commit message",
+      "parentUuid": "7644711c_c0a6204b",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 0
+      },
+      "revId": "13c79f0e372398329318701fc4d781312f69ea36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbd252f7_392ab450",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-22T15:09:47Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: When `CONFIG_CHARGER` is disabled, if the host sets `p-\u003emode` to a valid non-normal mode like `CHARGE_CONTROL_IDLE`, this code will silently accept it and return `EC_HOST_CMD_SUCCESS`. However, because the mode is not persisted in BBRAM and there is no `local_state` to store it in memory, a subsequent `GET` command will return `CHARGE_CONTROL_NORMAL`. We should probably reject non-normal modes with `EC_HOST_CMD_INVALID_PARAM` or `EC_HOST_CMD_UNAVAILABLE` if `CONFIG_CHARGER` is disabled, since the EC cannot enforce or even remember them.",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 0
+      },
+      "revId": "13c79f0e372398329318701fc4d781312f69ea36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85e02c71_4c94cc07",
+        "filename": "common/charge_control.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T17:36:10Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "cbd252f7_392ab450",
       "range": {
         "startLine": 113,
         "startChar": 0,
