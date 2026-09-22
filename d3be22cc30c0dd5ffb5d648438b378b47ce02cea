@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c2a7ce7c_784d3ac9",
+        "filename": "zephyr/test/bluey/Kconfig",
+        "patchSetId": 9
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:49Z",
+      "side": 1,
+      "message": "The top-level Kconfig option, CONFIG_TEST_BOARD_ANNITE, is defined in the TEST_BOARD_VARIANT choice block (lines 39-43), which corresponds to CONFIG_TEST_BOARD_NAME\u003d\"annite\" (line 58). Meanwhile, the related feature sub-configs (CONFIG_TEST_BOARD_ANNITE_CHIPSET, CONFIG_TEST_BOARD_ANNITE_EXTPOWER, CONFIG_TEST_BOARD_ANNITE_FAN, and CONFIG_TEST_BOARD_ANNITE_THROTTLE) are grouped with other variant configurations (lines 115-125) and are selected within testcase.yaml. \n\nPlease advise if this implementation deviates from standard practices. I can see similar approach was taking in `zephyr/test/rex/kconfig`",
+      "parentUuid": "62f1267c_5239b21e",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f8c9da84_ac9004ef",
         "filename": "zephyr/test/bluey/boards/annite.overlay",
         "patchSetId": 9
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-15T22:32:28Z",
       "side": 1,
       "message": "Why not include the real dts file here from the board? This copy will get out of date.",
+      "range": {
+        "startLine": 81,
+        "startChar": 1,
+        "endLine": 82,
+        "endChar": 35
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43e4ea94_ac11db0d",
+        "filename": "zephyr/test/bluey/boards/annite.overlay",
+        "patchSetId": 9
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:49Z",
+      "side": 1,
+      "message": "Added an explanation to the code detailing why this table is being redefined. Perhaps I should file a bug to clean up the fan.dtsi across the entire program to ensure it can be properly included in the test; what are your thoughts?",
+      "parentUuid": "f8c9da84_ac9004ef",
       "range": {
         "startLine": 81,
         "startChar": 1,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8c1f0e8_4bbb8912",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:49Z",
+      "side": 1,
+      "message": "All these GPIOs are active high. Added a comment to reflect that.",
+      "parentUuid": "ab93053b_f0eaf787",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29fc9ac0_59f098b5",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-09-15T22:32:28Z",
       "side": 1,
       "message": "Accessing the worker handler directly is a bit hacky. While it works for unit tests to bypass the scheduler, consider if there\u0027s a more standard way to trigger deferred work in your test environment, or at least add a comment explaining why this direct call is used.",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad31a7a9_0e427e80",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "29fc9ac0_59f098b5",
       "range": {
         "startLine": 83,
         "startChar": 0,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a71032de_49a54946",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_extpower.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c0f78166_911890f0",
+      "range": {
+        "startLine": 44,
+        "startChar": 1,
+        "endLine": 44,
+        "endChar": 33
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aeb5379f_aed2ef99",
@@ -139,6 +259,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df8ce74c_7ba68e07",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_fan.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "aeb5379f_aed2ef99",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79ea9b47_dae38cfe",
@@ -152,6 +296,30 @@
       "writtenOn": "2026-09-15T22:32:28Z",
       "side": 1,
       "message": "The fan_table_to_rpm function in fan.c uses static variables (current_level, up_level_delay_count, etc.) to track state. These are not reset in test_fan_before, which means test cases within this suite can interfere with each other. \n\nYou should reset this state in test_fan_before. Since they are static in fan.c, you can trigger a reset by calling board_override_fan_control(0, temp) with chipset_in_state returning 0.",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1281f67a_fb36017e",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_fan.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "79ea9b47_dae38cfe",
       "range": {
         "startLine": 31,
         "startChar": 0,
