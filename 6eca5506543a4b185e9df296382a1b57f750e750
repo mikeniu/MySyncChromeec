@@ -34,6 +34,75 @@
       "parentUuid": "8dcfa0c5_fa5cc6d0",
       "revId": "6eca5506543a4b185e9df296382a1b57f750e750",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb2a9e95_bd699143",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 33
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-22T17:05:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality:** The host command definitions are functionally correct; macro changes properly map old return status enumerations to the new ones and correctly switch parameters out for `input_buf` and `output_buf`.\n\n**Architecture \u0026 Component Fit:** The change correctly updates host command registration to use the newly standardized upstream macros properly.\n\n**Code Simplicity:** The changes are mostly straightforward and simple parameter swaps.\n\n**Idiomaticity \u0026 Readability:** Needs minor adjustments. Two instances of C-style casts to `(enum ec_host_cmd_status)` remain in `common/fpsensor/fpsensor_state.cc`. I have left inline comments indicating how to update them to use `static_cast\u003cenum ec_host_cmd_status\u003e(...)` for idiomatic C++ usage.\n\n**Testing:** Existing tests execute correctly (e.g. `TEST\u003d./twister -p native_sim -s ascp.claim -s fingerprint.task.commands`), and as this is mainly a structural refactoring mapping legacy macro declarations to new ones, test coverage remains sufficient.\n\n**CL Size \u0026 Scope:** `Size: L (+292, -250)`. Based on `gerrit info`, this CL is too large for a single atomic review. It bundles macro migrations across multiple distinct functional areas of the fingerprint sensor, modifying many different files. Please break it into smaller, logically independent CLs to assist the reviewers, such as:\n*   CL 1: Base sensor and state migration (`fpsensor.cc` and `fpsensor_state.cc`).\n*   CL 2: Authentication commands (`fpsensor_auth_*.cc`).\n*   CL 3: Vendor and ASCP claim commands (`fpsensor_vendor_command.cc`, `claim.c`). [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8008794_867d587d-a21a-4188-9350-39824885b661.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6eca5506543a4b185e9df296382a1b57f750e750",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91ec190e_a40057c1",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-22T17:05:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Use idiomatic C++ `static_cast` instead of a C-style cast here (and on line 492).\n\n```cpp\n\t\treturn static_cast\u003cenum ec_host_cmd_status\u003e(fp_set_sensor_mode(\n\t\t\tFP_MODE_RESET_SENSOR, \u0026mode_output, std::nullopt));\n``` [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8008794_867d587d-a21a-4188-9350-39824885b661.pb)",
+      "range": {
+        "startLine": 385,
+        "startChar": 0,
+        "endLine": 386,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6eca5506543a4b185e9df296382a1b57f750e750",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c98f406a_eb24f26b",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-22T17:05:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Use idiomatic C++ `static_cast` instead of a C-style cast.\n\n```cpp\n\t\treturn static_cast\u003cenum ec_host_cmd_status\u003e(ret);\n``` [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8008794_867d587d-a21a-4188-9350-39824885b661.pb)",
+      "range": {
+        "startLine": 492,
+        "startChar": 0,
+        "endLine": 492,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6eca5506543a4b185e9df296382a1b57f750e750",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
