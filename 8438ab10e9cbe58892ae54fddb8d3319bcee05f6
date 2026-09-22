@@ -22,6 +22,30 @@
       },
       "revId": "8438ab10e9cbe58892ae54fddb8d3319bcee05f6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10b2d9bf_00097273",
+        "filename": "zephyr/program/fatcat/ruby/src/battery.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 3387694
+      },
+      "writtenOn": "2026-09-22T02:29:47Z",
+      "side": 1,
+      "message": "It will show FAILED when uploading code.\n`error: Marco \u0027SECOND\u0027 should not be used in Zephyr code. Use \u0027USEC_PER_SEC\u0027.`",
+      "parentUuid": "22dd8948_40cac88e",
+      "range": {
+        "startLine": 53,
+        "startChar": 10,
+        "endLine": 53,
+        "endChar": 22
+      },
+      "revId": "8438ab10e9cbe58892ae54fddb8d3319bcee05f6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
