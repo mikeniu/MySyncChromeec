@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7644711c_c0a6204b",
+        "filename": "common/charge_control.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-22T15:09:47Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: When `CONFIG_CHARGER` (or `CONFIG_PLATFORM_EC_CHARGER`) is disabled, `p-\u003emode` is not validated. If the host sends an invalid mode (e.g., `CHARGE_CONTROL_COUNT` or any arbitrary value), the command will skip the `CHARGE_CONTROL_NORMAL` block, skip the `#if defined(CONFIG_CHARGER)` block, save `-1, -1, 0` to BBRAM, and silently return `EC_HOST_CMD_SUCCESS`. It should instead validate `p-\u003emode` or return `EC_HOST_CMD_INVALID_PARAM` for unsupported modes when the charger is disabled.",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 0
+      },
+      "revId": "13c79f0e372398329318701fc4d781312f69ea36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbd252f7_392ab450",
+        "filename": "common/charge_control.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-22T15:09:47Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: When `CONFIG_CHARGER` is disabled, if the host sets `p-\u003emode` to a valid non-normal mode like `CHARGE_CONTROL_IDLE`, this code will silently accept it and return `EC_HOST_CMD_SUCCESS`. However, because the mode is not persisted in BBRAM and there is no `local_state` to store it in memory, a subsequent `GET` command will return `CHARGE_CONTROL_NORMAL`. We should probably reject non-normal modes with `EC_HOST_CMD_INVALID_PARAM` or `EC_HOST_CMD_UNAVAILABLE` if `CONFIG_CHARGER` is disabled, since the EC cannot enforce or even remember them.",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 0
+      },
+      "revId": "13c79f0e372398329318701fc4d781312f69ea36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
