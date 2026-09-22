@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d3fd977_fe79b4aa",
+        "filename": "zephyr/test/pdc/src/tps6699x/tps6699x.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 927,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-22T15:24:10Z",
+      "side": 1,
+      "message": "This is already tested by `zephyr/test/pdc/src/generic/pdc_test.c`.  This isn\u0027t needed here.",
+      "range": {
+        "startLine": 904,
+        "startChar": 0,
+        "endLine": 927,
+        "endChar": 60
+      },
+      "revId": "1d965d9b1aefd230fd8c7ea8e180cd6c2f5ec9b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad299c2e_4ad3ffd2",
+        "filename": "zephyr/test/pdc/src/tps6699x/tps6699x.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1072,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-22T15:24:10Z",
+      "side": 1,
+      "message": "This is also already tested by `pdc_api.c`.",
+      "range": {
+        "startLine": 978,
+        "startChar": 0,
+        "endLine": 1072,
+        "endChar": 27
+      },
+      "revId": "1d965d9b1aefd230fd8c7ea8e180cd6c2f5ec9b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
