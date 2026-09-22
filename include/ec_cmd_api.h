@@ -3,11 +3,8 @@
  * found in the LICENSE file.
  */
 
-#if !defined(PLATFORM_EC_INCLUDE_EC_CMD_API_H_) && \
-	!defined(__CROS_EC_EC_CMD_API_H)
+#ifndef PLATFORM_EC_INCLUDE_EC_CMD_API_H_
 #define PLATFORM_EC_INCLUDE_EC_CMD_API_H_
-/* TODO(b/510249930): Remove this once all ec_cmd_api.h copies are updated. */
-#define __CROS_EC_EC_CMD_API_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -309,6 +306,7 @@ _CROS_EC_CV_F_P_R(EC_CMD_BATTERY_GET_DYNAMIC, 0, battery_get_dynamic,
 		  battery_dynamic_info, battery_dynamic_info);
 _CROS_EC_CV_F_P_R(EC_CMD_BATTERY_GET_DYNAMIC, 1, battery_get_dynamic_v1,
 		  battery_dynamic_info, battery_dynamic_info_v1);
+_CROS_EC_C0_F_PF_RF(EC_CMD_BATTERY_GET_MISC_INFO, battery_get_misc_info);
 _CROS_EC_CV_F_P_R(EC_CMD_BATTERY_GET_STATIC, 0, battery_get_static,
 		  battery_static_info, battery_static_info);
 _CROS_EC_CV_F_P_R(EC_CMD_BATTERY_GET_STATIC, 1, battery_get_static_v1,
@@ -498,6 +496,7 @@ _CROS_EC_C0_F_PF(EC_CMD_USB_PD_RW_HASH_ENTRY, usb_pd_rw_hash_entry);
 _CROS_EC_C0_F_PF_RF(EC_CMD_VBOOT_HASH, vboot_hash);
 _CROS_EC_C0_F_PF_RF(EC_CMD_VSTORE_READ, vstore_read);
 _CROS_EC_C0_F_PF(EC_CMD_VSTORE_WRITE, vstore_write);
+_CROS_EC_C0_F_PF(EC_CMD_PORT80_WRITE, port80_write);
 _CROS_EC_C0_F_PF(EC_CMD_UCSI_PPM_SET, ucsi_ppm_set);
 _CROS_EC_C0_F_PF(EC_CMD_FP_VENDOR, fp_vendor);
 _CROS_EC_C0_F_RF(EC_CMD_FP_ASCP_CLAIM, fp_ascp_claim);

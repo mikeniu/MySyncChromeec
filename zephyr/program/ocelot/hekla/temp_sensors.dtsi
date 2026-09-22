@@ -83,47 +83,47 @@
 
 		apl6012_ch1: chg {
 			temperature-type = "APL6012_IDX_CH1";
-			thermistor = <&NTC_5V_12K_100K>;
+			thermistor = <&NTC_5V15_12K_100K>;
 		};
 		apl6012_ch2: bat_conn {
 			temperature-type = "APL6012_IDX_CH2";
-			thermistor = <&NTC_5V_12K_100K>;
+			thermistor = <&NTC_5V15_12K_100K>;
 		};
 		apl6012_ch3: chg_ther {
 			temperature-type = "APL6012_IDX_CH3";
-			thermistor = <&NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V15_12K_47K>;
 		};
 		apl6012_ch4: ssd {
 			temperature-type = "APL6012_IDX_CH4";
-			thermistor = <&NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V15_12K_47K>;
 		};
 		apl6012_ch5: tc_mb {
 			temperature-type = "APL6012_IDX_CH5";
-			thermistor = <&NTC_5V_12K_100K>;
+			thermistor = <&NTC_5V15_12K_100K>;
 		};
 		apl6012_ch7: tc_db {
 			temperature-type = "APL6012_IDX_CH7";
-			thermistor = <&NTC_5V_12K_100K>;
+			thermistor = <&NTC_5V15_12K_100K>;
 		};
 		apl6012_ch9: ambient {
 			temperature-type = "APL6012_IDX_CH9";
-			thermistor = <&NTC_5V_8K2_10K>;
+			thermistor = <&NTC_5V15_8K2_10K>;
 		};
 		apl6012_ch12: pcore {
 			temperature-type = "APL6012_IDX_CH12";
-			thermistor = <&NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V15_12K_47K>;
 		};
 		apl6012_ch13: vccgt {
 			temperature-type = "APL6012_IDX_CH13";
-			thermistor = <&NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V15_12K_47K>;
 		};
 		apl6012_ch14: ddr {
 			temperature-type = "APL6012_IDX_CH14";
-			thermistor = <&NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V15_12K_47K>;
 		};
 		apl6012_ch15: 5v {
 			temperature-type = "APL6012_IDX_CH15";
-			thermistor = <&NTC_5V_12K_47K>;
+			thermistor = <&NTC_5V15_12K_47K>;
 		};
 	};
 };
