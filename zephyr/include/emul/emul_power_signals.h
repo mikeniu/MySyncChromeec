@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_POWER_SIGNALS_H_
-#define EMUL_POWER_SIGNALS_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_POWER_SIGNALS_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_POWER_SIGNALS_H_
 
 /**
  * @brief Test platform definition,
@@ -46,4 +46,4 @@ int power_signal_emul_load(
  */
 int power_signal_emul_unload(void);
 
-#endif /* EMUL_POWER_SIGNALS_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_POWER_SIGNALS_H_ */

@@ -5,8 +5,8 @@
 
 /* Verified boot hashing memory module for Chrome EC */
 
-#ifndef __CROS_EC_VBOOT_HASH_H
-#define __CROS_EC_VBOOT_HASH_H
+#ifndef PLATFORM_EC_INCLUDE_VBOOT_HASH_H_
+#define PLATFORM_EC_INCLUDE_VBOOT_HASH_H_
 
 #include "common.h"
 
@@ -66,4 +66,4 @@ void vboot_hash_abort(void);
 }
 #endif
 
-#endif /* __CROS_EC_VBOOT_HASH_H */
+#endif /* PLATFORM_EC_INCLUDE_VBOOT_HASH_H_ */

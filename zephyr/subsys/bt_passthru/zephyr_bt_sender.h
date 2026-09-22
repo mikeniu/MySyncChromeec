@@ -3,7 +3,8 @@
  * found in the LICENSE file.
  */
 
-#pragma once
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_BT_PASSTHRU_ZEPHYR_BT_SENDER_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_BT_PASSTHRU_ZEPHYR_BT_SENDER_H_
 
 #include "chre/platform/shared/bt_controller_sender.h"
 
@@ -28,3 +29,5 @@ class ZephyrBtSender : public BtControllerSender {
 };
 
 } // namespace chre
+
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_BT_PASSTHRU_ZEPHYR_BT_SENDER_H_ */

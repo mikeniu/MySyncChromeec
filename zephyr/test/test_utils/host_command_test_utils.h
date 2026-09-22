@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_HOST_COMMAND_TEST_UTILS_H
-#define __CROS_EC_HOST_COMMAND_TEST_UTILS_H
+#ifndef PLATFORM_EC_ZEPHYR_TEST_TEST_UTILS_HOST_COMMAND_TEST_UTILS_H_
+#define PLATFORM_EC_ZEPHYR_TEST_TEST_UTILS_HOST_COMMAND_TEST_UTILS_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -85,4 +85,4 @@ static inline int CROS_EC_COMMAND(CROS_EC_COMMAND_INFO *handle,
 }
 #endif
 
-#endif /* __CROS_EC_HOST_COMMAND_TEST_UTILS_H */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_TEST_UTILS_HOST_COMMAND_TEST_UTILS_H_ */

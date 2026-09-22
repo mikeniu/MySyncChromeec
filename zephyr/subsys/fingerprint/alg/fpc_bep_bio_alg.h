@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __FPC_BEP_BIO_ALG_H__
-#define __FPC_BEP_BIO_ALG_H__
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_FINGERPRINT_ALG_FPC_BEP_BIO_ALG_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_FINGERPRINT_ALG_FPC_BEP_BIO_ALG_H_
 
 #include <stdint.h>
 
@@ -20,4 +20,4 @@
 /* Declaration of FPC1025 algorithm. */
 extern const fpc_bep_algorithm_t fpc_bep_algorithm_pfe_1025;
 
-#endif /* __FPC_BEP_BIO_ALG_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_FINGERPRINT_ALG_FPC_BEP_BIO_ALG_H_ */

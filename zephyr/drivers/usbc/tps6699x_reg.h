@@ -7,8 +7,8 @@
  * @file
  * @brief TI TPS6699x Register addresses and i2c command structure
  */
-#ifndef __CROS_EC_PDC_TPS6699X_REG_H
-#define __CROS_EC_PDC_TPS6699X_REG_H
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_REG_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_REG_H_
 
 #include "compile_time_macros.h"
 
@@ -1636,4 +1636,4 @@ enum srdy_switch_select {
 	SWITCH_SELECT_PP_PD_POLICY = 0x07,
 };
 
-#endif /* __CROS_EC_PDC_TPS6699X_REG_H */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_REG_H_ */

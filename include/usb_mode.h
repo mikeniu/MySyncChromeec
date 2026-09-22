@@ -9,8 +9,8 @@
  * USB Power Delivery Specification Revision 3.0, Version 2.0 Section 6.4.8
  */
 
-#ifndef __CROS_EC_USB_MODE_H
-#define __CROS_EC_USB_MODE_H
+#ifndef PLATFORM_EC_INCLUDE_USB_MODE_H_
+#define PLATFORM_EC_INCLUDE_USB_MODE_H_
 
 #include "tcpm/tcpm.h"
 #include "usb_pd_tcpm.h"
@@ -98,4 +98,4 @@ uint32_t enter_usb_setup_next_msg(int port, enum tcpci_msg_type *type);
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_INCLUDE_USB_MODE_H_ */

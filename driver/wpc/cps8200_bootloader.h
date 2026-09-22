@@ -2,6 +2,10 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+
+#ifndef PLATFORM_EC_DRIVER_WPC_CPS8200_BOOTLOADER_H_
+#define PLATFORM_EC_DRIVER_WPC_CPS8200_BOOTLOADER_H_
+
 const uint32_t boot_hex[] = {
 	0x20003D00, 0x20000149, 0x20000157, 0x20000159, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x2000015B,
@@ -83,3 +87,5 @@ const uint32_t boot_hex[] = {
 };
 const size_t boot_hex_len = ARRAY_SIZE(boot_hex);
 BUILD_ASSERT(ARRAY_SIZE(boot_hex) == 458);
+
+#endif /* PLATFORM_EC_DRIVER_WPC_CPS8200_BOOTLOADER_H_ */

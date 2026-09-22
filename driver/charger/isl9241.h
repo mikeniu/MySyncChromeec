@@ -5,8 +5,8 @@
  * Renesas (Intersil) ISL-9241 (and RAA489110) battery charger driver header.
  */
 
-#ifndef __CROS_EC_ISL9241_H
-#define __CROS_EC_ISL9241_H
+#ifndef PLATFORM_EC_DRIVER_CHARGER_ISL9241_H_
+#define PLATFORM_EC_DRIVER_CHARGER_ISL9241_H_
 
 #include "driver/charger/isl9241_public.h"
 
@@ -193,4 +193,4 @@
 #define AC_CURRENT_TO_REG(CUR) \
 	(((CUR) * CONFIG_CHARGER_SENSE_RESISTOR_AC) / ISL9241_DEFAULT_RS1)
 
-#endif /* __CROS_EC_ISL9241_H */
+#endif /* PLATFORM_EC_DRIVER_CHARGER_ISL9241_H_ */

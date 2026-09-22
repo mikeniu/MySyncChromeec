@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef UTIL_EGIS_USB_INTERFACE_H_
-#define UTIL_EGIS_USB_INTERFACE_H_
+#ifndef PLATFORM_EC_UTIL_EGIS_USB_INTERFACE_H_
+#define PLATFORM_EC_UTIL_EGIS_USB_INTERFACE_H_
 
 #include <chrono>
 #include <cstdint>
@@ -87,4 +87,4 @@ class UsbInterface {
 
 }  // namespace egis
 
-#endif  // UTIL_EGIS_USB_INTERFACE_H_
+#endif /* PLATFORM_EC_UTIL_EGIS_USB_INTERFACE_H_ */

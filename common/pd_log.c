@@ -57,12 +57,13 @@ void pd_log_recv_vdm(int port, int cnt, uint32_t *payload)
 }
 
 /* we are a PD MCU/EC, send back the events to the host */
-static enum ec_status hc_pd_get_log_entry(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_pd_get_log_entry(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_pd_log *r = args->response;
+	struct ec_response_pd_log *r = args->output_buf;
 
 dequeue_retry:
-	args->response_size = log_dequeue_event((struct event_log_entry *)r);
+	args->output_buf_size = log_dequeue_event((struct event_log_entry *)r);
 	/* if the MCU log no longer has entries, try connected accessories */
 	if (r->type == PD_EVENT_NO_ENTRY) {
 		int i, res;
@@ -73,7 +74,7 @@ dequeue_retry:
 				continue;
 			res = pd_fetch_acc_log_entry(i);
 			if (res == EC_RES_BUSY) /* host should retry */
-				return EC_RES_BUSY;
+				return EC_HOST_CMD_BUSY;
 		}
 		/* we have received new entries from an accessory */
 		if (incoming_logs)
@@ -81,21 +82,22 @@ dequeue_retry:
 		/* else the current entry is already "PD_EVENT_NO_ENTRY" */
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PD_GET_LOG_ENTRY, hc_pd_get_log_entry,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_PD_GET_LOG_ENTRY, hc_pd_get_log_entry,
+			      EC_VER_MASK(0), struct ec_response_pd_log);
 
-static enum ec_status hc_pd_write_log_entry(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_pd_write_log_entry(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_pd_write_log_entry *p = args->params;
+	const struct ec_params_pd_write_log_entry *p = args->input_buf;
 	uint8_t type = p->type;
 	uint8_t port = p->port;
 
 	if (type < PD_EVENT_MCU_BASE || type >= PD_EVENT_ACC_BASE)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	if (port > 0 && port >= board_get_usb_pd_port_count())
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	switch (type) {
 	/* Charge event: Log data for all ports */
@@ -113,10 +115,11 @@ static enum ec_status hc_pd_write_log_entry(struct host_cmd_handler_args *args)
 		break;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PD_WRITE_LOG_ENTRY, hc_pd_write_log_entry,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_PD_WRITE_LOG_ENTRY, hc_pd_write_log_entry,
+			     EC_VER_MASK(0),
+			     struct ec_params_pd_write_log_entry);
 #else /* !CONFIG_HAS_HOSTCMD */
 /* we are a PD accessory, send back the events as a VDM (VDO_CMD_GET_LOG) */
 int pd_vdm_get_log_entry(uint32_t *payload)

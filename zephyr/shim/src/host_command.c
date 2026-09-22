@@ -166,7 +166,8 @@ host_command_get_cmd_versions(struct ec_host_cmd_handler_args *args)
 }
 EC_HOST_CMD_HANDLER(EC_CMD_GET_CMD_VERSIONS, host_command_get_cmd_versions,
 		    EC_VER_MASK(0) | EC_VER_MASK(1),
-		    struct ec_params_get_cmd_versions,
+		    SMALLEST_TYPE(struct ec_params_get_cmd_versions,
+				  struct ec_params_get_cmd_versions_v1),
 		    struct ec_response_get_cmd_versions);
 
 test_export_static enum ec_host_cmd_status

@@ -3,12 +3,14 @@
  * found in the LICENSE file.
  */
 
-#if !defined(__CROS_EC_HOST_COMMAND_H) || \
-	defined(__CROS_EC_ZEPHYR_HOST_COMMAND_H)
+#if !defined(PLATFORM_EC_INCLUDE_HOST_COMMAND_H_) || \
+	defined(PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOST_COMMAND_H_)
 #error "This file must only be included from host_command.h. " \
 	"Include host_command.h directly"
 #endif
-#define __CROS_EC_ZEPHYR_HOST_COMMAND_H
+
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOST_COMMAND_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOST_COMMAND_H_
 
 #include <stdbool.h>
 
@@ -40,3 +42,5 @@ k_tid_t get_hostcmd_thread(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOST_COMMAND_H_ */

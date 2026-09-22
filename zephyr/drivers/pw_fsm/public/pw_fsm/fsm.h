@@ -3,7 +3,8 @@
  * found in the LICENSE file.
  */
 
-#pragma once
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_PW_FSM_PUBLIC_PW_FSM_FSM_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_PW_FSM_PUBLIC_PW_FSM_FSM_H_
 
 #include <algorithm>
 #include <array>
@@ -643,3 +644,5 @@ class EventStateMachine : public StateMachine<State> {
 };
 
 }  // namespace pw::fsm
+
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_PW_FSM_PUBLIC_PW_FSM_FSM_H_ */

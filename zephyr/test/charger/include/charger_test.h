@@ -3,12 +3,12 @@
  * found in the LICENSE file.
  */
 
-#ifndef __ZEPHYR_TEST_CHARGER_INCLUDE_MAIN_H
-#define __ZEPHYR_TEST_CHARGER_INCLUDE_MAIN_H
+#ifndef PLATFORM_EC_ZEPHYR_TEST_CHARGER_INCLUDE_CHARGER_TEST_H_
+#define PLATFORM_EC_ZEPHYR_TEST_CHARGER_INCLUDE_CHARGER_TEST_H_
 
 #include <stdbool.h>
 
 bool charger_predicate_pre_main(const void *state);
 bool charger_predicate_post_main(const void *state);
 
-#endif /* __ZEPHYR_TEST_CHARGER_INCLUDE_MAIN_H */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_CHARGER_INCLUDE_CHARGER_TEST_H_ */

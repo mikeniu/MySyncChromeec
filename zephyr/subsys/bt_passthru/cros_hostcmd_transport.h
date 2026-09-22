@@ -3,7 +3,8 @@
  * found in the LICENSE file.
  */
 
-#pragma once
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_BT_PASSTHRU_CROS_HOSTCMD_TRANSPORT_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_BT_PASSTHRU_CROS_HOSTCMD_TRANSPORT_H_
 
 #include "chre/platform/shared/host_transport.h"
 #include "ec_commands.h"
@@ -50,3 +51,5 @@ class CrosHostcmdTransport : public HostTransport {
 };
 
 } // namespace chre
+
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_BT_PASSTHRU_CROS_HOSTCMD_TRANSPORT_H_ */

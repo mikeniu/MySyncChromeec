@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ROM_CHIP_H
-#define __CROS_EC_ROM_CHIP_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_ROM_CHIP_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_ROM_CHIP_H_
 
 #include "common.h"
 #include "util.h"
@@ -82,4 +82,4 @@ enum API_RETURN_STATUS_T otpi_write(uint32_t address, uint8_t data);
  */
 enum API_RETURN_STATUS_T otpi_write_protect(uint32_t address, uint32_t size);
 
-#endif /* __CROS_EC_ROM_CHIP_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_ROM_CHIP_H_ */

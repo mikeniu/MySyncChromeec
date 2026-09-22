@@ -8,8 +8,8 @@
  * sequencer chip for Chrome EC
  */
 
-#ifndef __CROS_EC_ALDERLAKE_SLG4BD44540_H
-#define __CROS_EC_ALDERLAKE_SLG4BD44540_H
+#ifndef PLATFORM_EC_INCLUDE_POWER_ALDERLAKE_SLG4BD44540_H_
+#define PLATFORM_EC_INCLUDE_POWER_ALDERLAKE_SLG4BD44540_H_
 
 /* Input state flags. */
 #define IN_PCH_SLP_S3_DEASSERTED POWER_SIGNAL_MASK(X86_SLP_S3_DEASSERTED)
@@ -46,4 +46,4 @@ enum power_signal {
 
 __override_proto int board_get_all_sys_pgood(void);
 
-#endif /* __CROS_EC_ALDERLAKE_SLG4BD44540_H */
+#endif /* PLATFORM_EC_INCLUDE_POWER_ALDERLAKE_SLG4BD44540_H_ */

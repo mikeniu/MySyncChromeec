@@ -6,8 +6,8 @@
  * device, which is currently the UART.
  */
 
-#ifndef __CROS_EC_PANIC_H
-#define __CROS_EC_PANIC_H
+#ifndef PLATFORM_EC_INCLUDE_PANIC_H_
+#define PLATFORM_EC_INCLUDE_PANIC_H_
 
 #include "common.h"
 #include "panic_defs.h"
@@ -317,4 +317,4 @@ int test_command_crash(int argc, const char **argv);
 }
 #endif
 
-#endif /* __CROS_EC_PANIC_H */
+#endif /* PLATFORM_EC_INCLUDE_PANIC_H_ */

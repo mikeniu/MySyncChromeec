@@ -3,7 +3,8 @@
  * found in the LICENSE file.
  */
 
-#pragma once
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_BT_PASSTHRU_BT_PASSTHRU_HCI_INTERCEPTOR_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_BT_PASSTHRU_BT_PASSTHRU_HCI_INTERCEPTOR_H_
 
 #include "chre/platform/shared/bt_hci_interceptor.h"
 #include "chre/platform/shared/host_transport.h"
@@ -40,3 +41,6 @@ class BtPassthruHciInterceptor : public BtHciInterceptor {
 };
 
 } // namespace chre
+
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_BT_PASSTHRU_BT_PASSTHRU_HCI_INTERCEPTOR_H_ \
+	*/

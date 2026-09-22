@@ -5,11 +5,11 @@
 
 /* BMI323 gsensor module for Chrome EC */
 
-#ifndef __CROS_EC_ACCELGYRO_BMI323_H
-#define __CROS_EC_ACCELGYRO_BMI323_H
+#ifndef PLATFORM_EC_DRIVER_ACCELGYRO_BMI323_H_
+#define PLATFORM_EC_DRIVER_ACCELGYRO_BMI323_H_
 
 #include "accelgyro_bmi3xx.h"
 
 #define BMI323_CHIP_ID 0x43
 
-#endif /* __CROS_EC_ACCELGYRO_BMI323_H */
+#endif /* PLATFORM_EC_DRIVER_ACCELGYRO_BMI323_H_ */

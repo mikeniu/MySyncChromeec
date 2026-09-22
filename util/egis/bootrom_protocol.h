@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef UTIL_EGIS_BOOTROM_PROTOCOL_H_
-#define UTIL_EGIS_BOOTROM_PROTOCOL_H_
+#ifndef PLATFORM_EC_UTIL_EGIS_BOOTROM_PROTOCOL_H_
+#define PLATFORM_EC_UTIL_EGIS_BOOTROM_PROTOCOL_H_
 
 #include <array>
 #include <cstddef>
@@ -259,4 +259,4 @@ constexpr std::expected<size_t, std::errc> GetSecureResponseEnvelopeSize(
 
 }  // namespace egis::bootrom_protocol
 
-#endif  // UTIL_EGIS_BOOTROM_PROTOCOL_H_
+#endif /* PLATFORM_EC_UTIL_EGIS_BOOTROM_PROTOCOL_H_ */

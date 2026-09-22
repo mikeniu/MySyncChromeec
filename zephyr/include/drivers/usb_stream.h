@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_USB_STREAM_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_USB_STREAM_H_
+
 #include "consumer.h"
 #include "producer.h"
 
@@ -36,3 +39,5 @@ struct usb_stream_config {
 
 extern const struct usb_stream_config usb_update;
 extern const struct usb_stream_config i2c_usb_;
+
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_USB_STREAM_H_ */
