@@ -9,18 +9,18 @@
 		fan_0 {
 			pwms = <&pwm2 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
 			tach = <&tach0>;
-			rpm-min = <1000>;
-			rpm-start = <1400>;
-			rpm-max = <4200>;
+			rpm-min = <1600>;
+			rpm-start = <1600>;
+			rpm-max = <4000>;
 			rpm-deviation = <1>;
 			pgood-gpio = <&gpio_all_sys_pwrgd>;
 		};
 		fan_1 {
 			pwms = <&pwm3 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
 			tach = <&tach1>;
-			rpm-min = <1000>;
-			rpm-start = <1650>;
-			rpm-max = <4900>;
+			rpm-min = <1800>;
+			rpm-start = <1800>;
+			rpm-max = <5400>;
 			rpm-deviation = <1>;
 			pgood-gpio = <&gpio_all_sys_pwrgd>;
 		};
@@ -30,24 +30,44 @@
 		compatible = "cros-ec,fan-steps";
 
 		level_0 {
-			temp-on = <40 0xff 0xff 0xff 0xff 40 0xff>;
-			temp-off = <0xff 0xff 0xff 0xff 0xff 0xff 0xff>;
+			temp-on = <0xff 0xff 0xff 40 40>;
+			temp-off = <0xff 0xff 0xff 0xff 0xff>;
 			rpm-target = <0 0>;
 		};
 		level_1 {
-			temp-on = <45 0xff 0xff 0xff 0xff 45 0xff>;
-			temp-off = <38 0xff 0xff 0xff 0xff 38 0xff>;
-			rpm-target = <2000 2000>;
+			temp-on = <0xff 0xff 0xff 43 43>;
+			temp-off = <0xff 0xff 0xff 39 39>;
+			rpm-target = <1800 2000>;
 		};
 		level_2 {
-			temp-on = <55 0xff 0xff 0xff 0xff 55 0xff>;
-			temp-off = <41 0xff 0xff 0xff 0xff 41 0xff>;
-			rpm-target = <3200 3500>;
+			temp-on = <0xff 0xff 0xff 45 45>;
+			temp-off = <0xff 0xff 0xff 41 41>;
+			rpm-target = <2400 2600>;
 		};
 		level_3 {
-			temp-on = <99 0xff 0xff 0xff 0xff 99 0xff>;
-			temp-off = <50 0xff 0xff 0xff 0xff 50 0xff>;
-			rpm-target = <4200 4900>;
+			temp-on = <0xff 0xff 0xff 48 48>;
+			temp-off = <0xff 0xff 0xff 43 43>;
+			rpm-target = <2700 2900>;
+		};
+		level_4 {
+			temp-on = <0xff 0xff 0xff 51 51>;
+			temp-off = <0xff 0xff 0xff 46 46>;
+			rpm-target = <3100 3300>;
+		};
+		level_5 {
+			temp-on = <0xff 0xff 0xff 53 53>;
+			temp-off = <0xff 0xff 0xff 49 49>;
+			rpm-target = <3500 3700>;
+		};
+		level_6 {
+			temp-on = <0xff 0xff 0xff 56 56>;
+			temp-off = <0xff 0xff 0xff 51 51>;
+			rpm-target = <3800 4000>;
+		};
+		level_7 {
+			temp-on = <0xff 0xff 0xff 0xff 0xff>;
+			temp-off = <0xff 0xff 0xff 54 54>;
+			rpm-target = <4100 4300>;
 		};
 	};
 };
