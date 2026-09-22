@@ -69,6 +69,24 @@
       "parentUuid": "7a0c756d_85dfc88e",
       "revId": "2d7177f40bc13174ce76a974ebf8599bc19c948f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de479800_2a95ae03",
+        "filename": "common/charge_control.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T15:00:21Z",
+      "side": 1,
+      "message": "Hey @asemjonovs@google.com, Please let me know if this looks okay to you. \n\nThanks",
+      "parentUuid": "57642718_deb7efc9",
+      "revId": "2d7177f40bc13174ce76a974ebf8599bc19c948f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
