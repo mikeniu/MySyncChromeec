@@ -8,7 +8,7 @@
 &spi0 {
 	status = "okay";
 	pinctrl-names = "default";
-	pinctrl-0 = <&spi_mosi_gpio096>;
+	pinctrl-0 = <&spip_sclk_mosi_miso_gp95_gpa1_gpa3_gpa5_sl>;
 
 	spi0_dev0: spi0_dev0@0 {
 		reg = <0>;

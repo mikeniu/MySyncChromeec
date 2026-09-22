@@ -1,0 +1,64 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* Blanc program common DTS includes */
+#include <cros/integrated_fwid.dtsi>
+
+/* Include the standard and OEM schema templates */
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+
+/* Include the generated file that defines the values for this project */
+#include "blanc_ec_ufsc.dtsi"
+
+/* blanc project DTS includes */
+#include "battery.dtsi"
+#include "fan.dtsi"
+#include "gpios.dtsi"
+#include "i2c.dtsi"
+#include "interrupts.dtsi"
+#include "keyboard.dtsi"
+#include "power_signals.dtsi"
+#include "pwm.dtsi"
+#include "usb_typec.dtsi"
+#include "usba.dtsi"
+#include "adc.dtsi"
+#include "temp_sensors.dtsi"
+#include <cros/cbi_flash.dtsi>
+
+/*
+ * Aliases to common names
+ */
+gpio_ec_pch_wake_odl: &gpio_ec_soc_wake_odl {};
+
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x50000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 * EC_RO section ends at 0x50000 byte which
+			 * is the offset.
+			 */
+			offset = <0x50000>;
+			size = <0x1000>;
+		};
+	};
+};
+
+
+/* AP interface */
+&espi0 {
+	status = "okay";
+	pinctrl-0 = <&espi_lpc_gp46_47_51_52_53_54_55_57>;
+	pinctrl-names = "default";
+};
+
+&sha0 {
+	status = "okay";
+};

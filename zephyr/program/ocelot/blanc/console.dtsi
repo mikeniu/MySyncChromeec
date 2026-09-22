@@ -1,0 +1,29 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	chosen {
+		zephyr,console = &uart2;
+		zephyr,shell-uart = &uart2;
+	};
+};
+
+&uart2 {
+    status = "okay";
+    current-speed = <3333333>;      // 3.333333 MHz baud rate
+    pinctrl-0 = <&uart1_2_sout_gp65>; // Configure the specific TX pin
+    pinctrl-names = "default";
+    data-bits = <8>;                // (2+8=10, a multiple of 5)
+    tx-invert;                      // Mandatory for idle-low signal
+
+    uart2_dev0: uart2_dev0 {
+        status = "okay";
+        chain-length = <8>;
+        reset-delay = <200>;
+        bits-per-symbol = <5>;
+        one-symbol = <BINARY(1,1,1,0,0)>;
+        zero-symbol = <BINARY(1,0,0,0,0)>;
+    };
+};
