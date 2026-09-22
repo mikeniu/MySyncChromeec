@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7c7cca7_810de8b5",
+        "filename": "zephyr/test/bluey/tests/quartz/src/stubs.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f2d7630d_a77abfd3",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 0
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64c2f9c9_94daa3c4",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-15T22:27:33Z",
       "side": 1,
       "message": "This test case doesn\u0027t contain any assertions. It would be better to verify that the interrupt for s3_power_monitor is correctly configured or that the handler is registered after HOOK_INIT.",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 0
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe843905_b0b6f44e",
+        "filename": "zephyr/test/bluey/tests/quartz/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "64c2f9c9_94daa3c4",
       "range": {
         "startLine": 84,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6b3904b_53daa3ba",
+        "filename": "zephyr/test/bluey/tests/quartz/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5f096f8a_92492767",
+      "range": {
+        "startLine": 111,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 0
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2586af51_5bfde495",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-09-15T22:27:33Z",
       "side": 1,
       "message": "There are no assertions in this test.",
+      "range": {
+        "startLine": 54,
+        "startChar": 1,
+        "endLine": 54,
+        "endChar": 32
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "777675c4_72e7ec03",
+        "filename": "zephyr/test/bluey/tests/quartz/src/test_extpower.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2586af51_5bfde495",
       "range": {
         "startLine": 54,
         "startChar": 1,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7aa9dcef_bbac6d86",
+        "filename": "zephyr/test/bluey/tests/quartz/src/test_fan.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ede535a7_35efc308",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 0
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3ef2fa2_a03d6fa0",
@@ -129,6 +249,30 @@
       "writtenOn": "2026-09-15T22:27:33Z",
       "side": 1,
       "message": "In quartz.overlay, level_6 has temp-on set to 99 for all sensors. This test expects PMIC temp 53 to trigger level 6 (6000 RPM). These values are inconsistent.",
+      "range": {
+        "startLine": 90,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 0
+      },
+      "revId": "367972f660ff7b5e850511ab8f70337b56f5573d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2782ac79_0d41d556",
+        "filename": "zephyr/test/bluey/tests/quartz/src/test_fan.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T13:47:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c3ef2fa2_a03d6fa0",
       "range": {
         "startLine": 90,
         "startChar": 0,
