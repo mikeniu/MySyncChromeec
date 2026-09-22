@@ -164,8 +164,9 @@ static void x86_non_dsx_chipset_state_entry_cb(const struct device *dev,
 }
 AP_PWRSEQ_STATE_ENTRY_CALLBACK_DEFINE(x86_non_dsx_chipset_state_entry_cb,
 				      AP_POWER_STATE_G3, AP_POWER_STATE_S3,
-				      AP_POWER_STATE_S0, AP_POWER_STATE_S5,
+				      AP_POWER_STATE_S0, AP_POWER_STATE_S5
 #if CONFIG_AP_PWRSEQ_S0IX
+				      ,
 				      AP_POWER_STATE_S0ix
 #endif
 );
@@ -208,8 +209,9 @@ static void x86_non_dsx_chipset_state_exit_cb(const struct device *dev,
 	}
 }
 AP_PWRSEQ_STATE_EXIT_CALLBACK_DEFINE(x86_non_dsx_chipset_state_exit_cb,
-				     AP_POWER_STATE_G3, AP_POWER_STATE_S0,
+				     AP_POWER_STATE_G3, AP_POWER_STATE_S0
 #if CONFIG_AP_PWRSEQ_S0IX
+				     ,
 				     AP_POWER_STATE_S0ix
 #endif
 );
