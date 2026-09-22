@@ -257,6 +257,15 @@ static void tps699x_emul_get_cable_property(struct tps6699x_emul_pdc_data *data)
 	memcpy(&data->reg_val[REG_DATA_FOR_CMD1], &data->response, 5 + 1);
 }
 
+static void tps699x_emul_get_attention_vdo(struct tps6699x_emul_pdc_data *data)
+{
+	data->response.result = TASK_COMPLETED_SUCCESSFULLY;
+	data->response.data.get_attention_vdo = data->get_attention_vdo;
+
+	memcpy(&data->reg_val[REG_DATA_FOR_CMD1], &data->response,
+	       sizeof(data->response));
+}
+
 static void tps6699x_emul_ucsi_set_pdos(struct tps6699x_emul_pdc_data *data,
 					uint8_t *data_reg)
 {
@@ -368,6 +377,9 @@ static void tps6699x_emul_handle_ucsi(struct tps6699x_emul_pdc_data *data,
 		break;
 	case UCSI_GET_CURRENT_CAM:
 		tps699x_emul_get_current_cam(data);
+		break;
+	case UCSI_GET_ATTENTION_VDO:
+		tps699x_emul_get_attention_vdo(data);
 		break;
 	default:
 		LOG_WRN("tps6699x_emul: Unimplemented UCSI command %#04x", cmd);
@@ -1150,9 +1162,6 @@ static int emul_tps6699x_reset(const struct emul *target)
 	const union reg_port_control *pdc_port_control =
 		(const union reg_port_control *)data->reg_val[REG_PORT_CONTROL];
 	union reg_mode *reg_mode = (union reg_mode *)data->reg_val[REG_MODE];
-	union reg_received_attention_vdm *attention_vdm =
-		(union reg_received_attention_vdm *)
-			data->reg_val[REG_RECEIVED_ATTENTION_VDM];
 	memset(data->reg_val, 0, sizeof(data->reg_val));
 
 	/* Reset PDOs. */
@@ -1175,11 +1184,11 @@ static int emul_tps6699x_reset(const struct emul *target)
 	/* Initialize reg_mode to APP0 to indicate running from flash. */
 	*((uint32_t *)reg_mode->data) = REG_MODE_APP0;
 
-	/* Init received attention vdm */
-	attention_vdm->number_valid_vdos = 2;
-	attention_vdm->sequence_number = 1;
-	attention_vdm->vdm_header = 0;
-	attention_vdm->vdo = 0x1;
+	/* Init received attention vdo */
+	data->get_attention_vdo.num_vdos = 2;
+	data->get_attention_vdo.sequence_number = 1;
+	data->get_attention_vdo.vdm_heade = 0;
+	data->get_attention_vdo.vdo = 0x1;
 
 	data->pending_rdo = 0;
 	k_work_cancel_delayable(&data->delayed_sink_contract_negotiation_work);
@@ -1250,9 +1259,6 @@ static int tps6699x_emul_init(const struct emul *emul,
 	const struct i2c_common_emul_cfg *cfg = emul->cfg;
 	union reg_mode *reg_mode =
 		(union reg_mode *)data->pdc_data.reg_val[REG_MODE];
-	union reg_received_attention_vdm *attention_vdm =
-		(union reg_received_attention_vdm *)
-			data->pdc_data.reg_val[REG_RECEIVED_ATTENTION_VDM];
 	LOG_INF("TPS669X emul init");
 
 	data->common.i2c = parent;
@@ -1272,11 +1278,11 @@ static int tps6699x_emul_init(const struct emul *emul,
 	/* Init register to APP0 */
 	*((uint32_t *)reg_mode->data) = REG_MODE_APP0;
 
-	/* Init received attention vdm */
-	attention_vdm->number_valid_vdos = 2;
-	attention_vdm->sequence_number = 1;
-	attention_vdm->vdm_header = 0;
-	attention_vdm->vdo = 0x1;
+	/* Init received attention vdo */
+	data->pdc_data.get_attention_vdo.num_vdos = 2;
+	data->pdc_data.get_attention_vdo.sequence_number = 1;
+	data->pdc_data.get_attention_vdo.vdm_heade = 0;
+	data->pdc_data.get_attention_vdo.vdo = 0x1;
 
 	return 0;
 }

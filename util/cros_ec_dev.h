@@ -3,10 +3,8 @@
  * found in the LICENSE file.
  */
 
-#if !defined(PLATFORM_EC_UTIL_CROS_EC_DEV_H_) && !defined(__UTIL_CROS_EC_DEV_H)
+#ifndef PLATFORM_EC_UTIL_CROS_EC_DEV_H_
 #define PLATFORM_EC_UTIL_CROS_EC_DEV_H_
-/* TODO(b/510249930): Remove this once all cros_ec_dev.h copies are updated. */
-#define __UTIL_CROS_EC_DEV_H
 
 #include "ec_commands.h"
 
