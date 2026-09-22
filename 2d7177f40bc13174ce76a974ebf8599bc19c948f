@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aaa6de58_228d8a74",
+        "filename": "common/charge_control.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T07:10:56Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "560cdb8b_f3b5c6d0",
+      "revId": "2d7177f40bc13174ce76a974ebf8599bc19c948f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a0c756d_85dfc88e",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-21T15:39:56Z",
       "side": 1,
       "message": "I\u0027m unclear on why we have a duplicate host command definition/handler for `EC_CMD_CHARGE_CONTRO`L.  See common/charge_state.c for the other definition. Can we consolidate these?",
+      "revId": "2d7177f40bc13174ce76a974ebf8599bc19c948f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57642718_deb7efc9",
+        "filename": "common/charge_control.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T07:10:56Z",
+      "side": 1,
+      "message": "The host command has been relocated to this file; keeping this comment open to ensure nothing is overlooked.",
+      "parentUuid": "7a0c756d_85dfc88e",
       "revId": "2d7177f40bc13174ce76a974ebf8599bc19c948f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
