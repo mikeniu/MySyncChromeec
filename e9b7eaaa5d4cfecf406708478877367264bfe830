@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd14c7e1_93579d99",
+        "filename": "zephyr/test/bluey/Kconfig",
+        "patchSetId": 9
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T11:11:34Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "192f447c_98b256be",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 0
+      },
+      "revId": "e9b7eaaa5d4cfecf406708478877367264bfe830",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "def06b94_89b33492",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b992e7e_b93d1e3b",
+        "filename": "zephyr/test/bluey/tests/bluey/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T11:11:34Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "def06b94_89b33492",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 0
+      },
+      "revId": "e9b7eaaa5d4cfecf406708478877367264bfe830",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d27311be_4c06afae",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-09-15T21:17:49Z",
       "side": 1,
       "message": "This test only verifies `gpio_ec_en_usba`. For better coverage, consider verifying all pins enabled in `board_chipset_startup_bluey`, similar to the `test_chipset_startup_direct` test.",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 0
+      },
+      "revId": "e9b7eaaa5d4cfecf406708478877367264bfe830",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73135a00_b7c0fc5f",
+        "filename": "zephyr/test/bluey/tests/bluey/src/test_chipset.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-22T11:11:34Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d27311be_4c06afae",
       "range": {
         "startLine": 89,
         "startChar": 0,
