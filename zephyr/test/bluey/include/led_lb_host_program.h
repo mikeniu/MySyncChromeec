@@ -4,8 +4,11 @@
  */
 
 /* Stub header to satisfy includes in board-level source files during unit
- * tests. */
+ * tests.
+ */
 #ifndef PLATFORM_EC_ZEPHYR_TEST_BLUEY_INCLUDE_LED_LB_HOST_PROGRAM_H_
 #define PLATFORM_EC_ZEPHYR_TEST_BLUEY_INCLUDE_LED_LB_HOST_PROGRAM_H_
+
+#include "ec_commands.h"
 
 #endif /* PLATFORM_EC_ZEPHYR_TEST_BLUEY_INCLUDE_LED_LB_HOST_PROGRAM_H_ */
