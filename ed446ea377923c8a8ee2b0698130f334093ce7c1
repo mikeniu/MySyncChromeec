@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "725b5a41_e4efb1d4",
+        "filename": "zephyr/test/bluey/testcase.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-22T20:28:32Z",
+      "side": 1,
+      "message": "CONFIG_TEST_BOARD_QUARTZ is not defined in Kconfig. Only the sub-test configs (e.g., CONFIG_TEST_BOARD_QUARTZ_CHIPSET) were added. Please remove this or add the config definition to Kconfig.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 0
+      },
+      "revId": "ed446ea377923c8a8ee2b0698130f334093ce7c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
