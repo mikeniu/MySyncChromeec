@@ -20,6 +20,12 @@ if(DEFINED CONFIG_BOARD_OCELOTRVP_NPCX)
 	zephyr_library_sources("src/rvp_usbc_runtime.c")
 endif()
 
+if(DEFINED CONFIG_BOARD_BLANC)
+	project(blanc)
+	zephyr_library_sources("blanc/src/board_power.c")
+	zephyr_library_sources("blanc/src/board.c")
+endif()
+
 if(DEFINED CONFIG_BOARD_OCELOTRVP_MCHP)
 	project(ocelotrvp-mchp)
 	zephyr_library_sources("src/rvp_board_power.c")
