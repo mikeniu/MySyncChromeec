@@ -30,12 +30,14 @@ fi
 
 REPO_BASE="https://chromium.googlesource.com/chromiumos"
 
-# Parse --fast flag from positional arguments
+# Default to skipping remote git pulls and pip checks; pass --update to
+# pull the latest upstream changes.
+SKIP_UPDATE=1
 ARGS=()
 for arg in "$@"; do
     case "${arg}" in
-        --fast)
-            SKIP_UPDATE=1
+        --update)
+            SKIP_UPDATE=""
             ;;
         *)
             ARGS+=("${arg}")
@@ -224,7 +226,7 @@ populate_if_missing() {
 
 # Clone or update repositories (parallelized for speed)
 if [ -n "${SKIP_UPDATE}" ]; then
-    echo "Skipping repository updates (fast startup enabled)..."
+    echo "Skipping repository updates (pass --update to sync)..."
     populate_if_missing "/workspace/src/platform/ec" "EC firmware"
     populate_if_missing "/workspace/src/platform/dagwood" "Dagwood"
     populate_if_missing \
