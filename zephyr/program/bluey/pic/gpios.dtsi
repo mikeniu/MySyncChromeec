@@ -6,7 +6,6 @@
 / {
 	aliases {
 		gpio-wp = &gpio_ec_wp_l;
-		gpio-btn-ign-in = &gpio_fp_pwr_btn_ignore;
 	};
 
 	named-gpios {
@@ -72,11 +71,6 @@
 		gpio_ec_wp_l: write-protect {
 			gpios = <&gpio7 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
-		/*
-		gpio_ec_fan_tach_od: ec_fan_tach_od {
-			gpios = <&gpio7 3 (GPIO_INPUT | GPIO_PULL_UP)>;
-		};
-		*/
 		gpio_ec_batt_pres_odl: ec_batt_pres_odl {
 			gpios = <&gpio7 4 (GPIO_INPUT)>;
 			enum-name = "GPIO_BATT_PRES_ODL";
@@ -101,6 +95,9 @@
 		gpio_en_edl_boot_l: en_edl_boot_l {
 			gpios = <&gpio9 4 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INACTIVE)>;
 		};
+		gpio_profile_erase_1v8: profile_erase_1v8 {
+			gpios = <&gpio9 5 (GPIO_OUTPUT)>;
+		};
 		gpio_ec_pmk_rst: ec_pmk_rst {
 			gpios = <&gpio9 6 (GPIO_OUTPUT)>;
 			enum-name = "GPIO_PMIC_RESIN";
@@ -115,6 +112,9 @@
 		};
 		gpio_ec_soc_qsh_int_odl: ec_soc_qsh_int_odl {
 			gpios = <&gpioa 2 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
+		};
+		gpio_ant_tuner_cfg_1v8: ant_tuner_cfg_1v8 {
+			gpios = <&gpioa 3 (GPIO_OUTPUT)>;
 		};
 		gpio_soc_ps_hold_ls: soc_ps_hold_ls {
 			gpios = <&gpioa 4 (GPIO_INPUT)>;
@@ -133,14 +133,10 @@
 		gpio_sc_resout_ls: sc_resout_ls {
 			gpios = <&gpiob 0 (GPIO_INPUT)>;
 		};
-		/* Reserve only: new for sol. */
-		gpio_edp_solc: ec_edp_solc {
-			gpios = <&gpiob 2 (GPIO_OUTPUT)>;
-		};
 		gpio_ec_en_pp5000_fan: ec_en_pp5000_fan {
 			gpios = <&gpiob 3 ( GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
-		gpio_fp_pwr_btn_ignore: fp_pwr_btn_ignore {
+		gpio_ec_close_lcd_n: ec_close_lcd_n {
 			gpios = <&gpiob 5 (GPIO_INPUT)>;
 		};
 		gpio_ec_en_vph_pwr_1a: ec_en_vph_pwr_1a {
@@ -169,11 +165,6 @@
 			gpios = <&gpiod 2 (GPIO_INPUT)>;
 			enum-name = "GPIO_LID_OPEN";
 		};
-		/*
-		gpio_ec_fan2_tach_od: ec_fan2_tach_od {
-			gpios = <&gpiod 3 (GPIO_INPUT | GPIO_PULL_UP)>;
-		};
-		*/
 		gpio_ec_gsc_packet_mode: ec_gsc_packet_mode {
 			gpios = <&gpiod 4 (GPIO_OUTPUT)>;
 			enum-name = "GPIO_PACKET_MODE_EN";
@@ -197,9 +188,6 @@
 		};
 		gpio_smb2360_a_chg_led_pg_odl: smb2360_a_chg_led_pg_odl {
 			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
-		};
-		gpio_ec_spare_gpiof1: ec_spare_gpiof1 {
-			gpios = <&gpiof 1 (GPIO_INPUT)>;
 		};
 		gpio_ec_voldn_btn_odl: ec_voldn_btn_odl {
 			gpios = <&gpiof 4 (GPIO_INPUT)>;

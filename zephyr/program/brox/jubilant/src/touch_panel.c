@@ -22,6 +22,13 @@ LOG_MODULE_REGISTER(brox_touch, LOG_LEVEL_INF);
 #define TOUCH_ENABLE_DELAY_MS 500
 #define TOUCH_DISABLE_DELAY_MS 0
 
+/*
+ * Set once the board version and FW_CONFIG indicate the EC should drive the
+ * touch power sequence. Gates board_power_event_handler so it stays inert on
+ * boards/configs where the callback was previously never registered.
+ */
+static bool touch_pwrseq_ec_control;
+
 static void touch_disable_deferred(struct k_work *work)
 {
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_touch_en), 0);
@@ -42,6 +49,10 @@ static K_WORK_DELAYABLE_DEFINE(touch_enable_deferred_data,
 void board_power_event_handler(struct ap_power_ev_callback *cb,
 			       struct ap_power_ev_data data)
 {
+	if (!touch_pwrseq_ec_control) {
+		return;
+	}
+
 	switch (data.event) {
 	case AP_POWER_SHUTDOWN:
 		/* Cancel touch_enable touch_disable k_work. */
@@ -53,6 +64,8 @@ void board_power_event_handler(struct ap_power_ev_callback *cb,
 		return;
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(board_power_event_handler, AP_POWER_SHUTDOWN,
+			       AP_POWER_HARD_OFF);
 
 void soc_edp_bl_interrupt(const struct device *device,
 			  struct gpio_callback *callback, gpio_port_pins_t pins)
@@ -74,7 +87,6 @@ void soc_edp_bl_interrupt(const struct device *device,
 
 static void touch_enable_init(void)
 {
-	static struct ap_power_ev_callback power_cb;
 	static struct gpio_callback cb;
 	const struct gpio_dt_spec *const tpgpio_gpio =
 		GPIO_DT_FROM_NODELABEL(gpio_soc_edp_bl_en);
@@ -107,9 +119,7 @@ static void touch_enable_init(void)
 		return;
 	}
 
-	ap_power_ev_init_callback(&power_cb, board_power_event_handler,
-				  AP_POWER_SHUTDOWN | AP_POWER_HARD_OFF);
-	ap_power_ev_add_callback(&power_cb);
+	touch_pwrseq_ec_control = true;
 
 	gpio_init_callback(&cb, soc_edp_bl_interrupt, BIT(tpgpio_gpio->pin));
 	gpio_add_callback(tpgpio_gpio->port, &cb);

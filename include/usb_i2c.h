@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_INCLUDE_USB_I2C_H_
+#define PLATFORM_EC_INCLUDE_USB_I2C_H_
+
 #include "consumer.h"
 #include "producer.h"
 #include "registers.h"
@@ -13,9 +16,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifndef __CROS_USB_I2C_H
-#define __CROS_USB_I2C_H
 
 /*
  * This header file describes i2c encapsulation when communicated over USB.
@@ -236,4 +236,4 @@ int usb_i2c_register_cros_cmd_handler(int (*cmd_handler)(
 }
 #endif
 
-#endif /* __CROS_USB_I2C_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_I2C_H_ */

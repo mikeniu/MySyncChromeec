@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __LIBC_RECURSIVE_MUTEX_H
-#define __LIBC_RECURSIVE_MUTEX_H
+#ifndef PLATFORM_EC_LIBC_RECURSIVE_MUTEX_H_
+#define PLATFORM_EC_LIBC_RECURSIVE_MUTEX_H_
 
 #include "atomic_t.h"
 #include "task.h"
@@ -74,4 +74,4 @@ int mutex_try_lock_recursive(struct mutex_r *mtx);
  */
 void mutex_unlock_recursive(struct mutex_r *mtx);
 
-#endif /* __LIBC_RECURSIVE_MUTEX_H */
+#endif /* PLATFORM_EC_LIBC_RECURSIVE_MUTEX_H_ */

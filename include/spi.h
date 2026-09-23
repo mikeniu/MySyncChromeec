@@ -5,8 +5,8 @@
 
 /* SPI interface for Chrome EC */
 
-#ifndef __CROS_EC_SPI_H
-#define __CROS_EC_SPI_H
+#ifndef PLATFORM_EC_INCLUDE_SPI_H_
+#define PLATFORM_EC_INCLUDE_SPI_H_
 
 #include "host_command.h"
 
@@ -127,7 +127,7 @@ int spi_transaction_wait(const struct spi_device_t *spi_device);
  * Get SPI protocol information. This function is called in runtime if board's
  * host command transport is SPI.
  */
-enum ec_status spi_get_protocol_info(struct host_cmd_handler_args *args);
+enum ec_status spi_get_protocol_info(struct ec_host_cmd_handler_args *args);
 
 #ifdef CONFIG_SPI
 /**
@@ -149,4 +149,4 @@ static inline void spi_event(enum gpio_signal signal)
 }
 #endif
 
-#endif /* __CROS_EC_SPI_H */
+#endif /* PLATFORM_EC_INCLUDE_SPI_H_ */

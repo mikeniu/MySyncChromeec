@@ -76,13 +76,17 @@
 	pinctrl-0 = < &i2c1_clk_gpc1_default &i2c1_data_gpc2_default >;
 	pinctrl-names = "default";
 	label = "i2c1";
+	zephyr,transfer-timeout-ms = <250>;
 };
 &i2c2 {
 	status = "okay";
 	clock-frequency = <I2C_BITRATE_STANDARD>;
 	label = "i2c2";
 	pinctrl-0 = < &i2c2_clk_gpc7_default &i2c2_data_gpd0_default >;
+	scl-gpios = <&gpioc 7 0>;
+	sda-gpios = <&gpiod 0 0>;
 	pinctrl-names = "default";
+	zephyr,transfer-timeout-ms = <250>;
 };
 &i2c3 {
 	status = "okay";

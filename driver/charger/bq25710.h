@@ -5,8 +5,8 @@
  * TI bq25710 battery charger driver.
  */
 
-#ifndef __CROS_EC_BQ25710_H
-#define __CROS_EC_BQ25710_H
+#ifndef PLATFORM_EC_DRIVER_CHARGER_BQ25710_H_
+#define PLATFORM_EC_DRIVER_CHARGER_BQ25710_H_
 
 /* SMBUS Interface */
 #define BQ25710_SMBUS_ADDR1_FLAGS 0x09
@@ -142,4 +142,4 @@ enum ec_error_list bq257x0_set_option_reg(int chgnum, int reg, int option);
  */
 int bq25710_set_min_system_voltage(int chgnum, int mv);
 
-#endif /* __CROS_EC_BQ25710_H */
+#endif /* PLATFORM_EC_DRIVER_CHARGER_BQ25710_H_ */

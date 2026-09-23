@@ -5,8 +5,8 @@
  * Driver header for Intel Burnside Bridge - Thunderbolt/USB/DisplayPort Retimer
  */
 
-#ifndef __CROS_EC_BB_RETIMER_H
-#define __CROS_EC_BB_RETIMER_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_RETIMER_BB_RETIMER_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_RETIMER_BB_RETIMER_H_
 
 #include "driver/retimer/bb_retimer_public.h"
 #include "usb_mux.h"
@@ -60,4 +60,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __CROS_EC_BB_RETIMER_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_RETIMER_BB_RETIMER_H_ */

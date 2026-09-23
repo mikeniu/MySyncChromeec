@@ -7,6 +7,11 @@ config TEST_LIB_EXIT
 	help
 	  exit tests.
 
+config TEST_LIB_PRINTF
+	bool "printf tests"
+	help
+	  printf tests.
+
 config TEST_LIB_SBRK
 	bool "sbrk tests"
 	help

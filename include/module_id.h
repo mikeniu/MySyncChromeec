@@ -5,8 +5,8 @@
 
 /* Module IDs for Chrome EC */
 
-#ifndef __CROS_EC_MODULE_ID_H
-#define __CROS_EC_MODULE_ID_H
+#ifndef PLATFORM_EC_INCLUDE_MODULE_ID_H_
+#define PLATFORM_EC_INCLUDE_MODULE_ID_H_
 
 #include "common.h"
 
@@ -70,4 +70,4 @@ enum module_id {
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_INCLUDE_MODULE_ID_H_ */

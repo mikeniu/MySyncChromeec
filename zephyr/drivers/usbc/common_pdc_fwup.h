@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef ZEPHYR_DRIVERS_USBC_COMMON_PDC_FWUP_H_
-#define ZEPHYR_DRIVERS_USBC_COMMON_PDC_FWUP_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_USBC_COMMON_PDC_FWUP_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_USBC_COMMON_PDC_FWUP_H_
 
 #include <stdlib.h>
 
@@ -29,4 +29,4 @@
 int pdc_common_fwup_parse_start_cli_args(const struct shell *sh, size_t argc,
 					 char **argv, struct i2c_dt_spec *i2c);
 
-#endif /* ZEPHYR_DRIVERS_USBC_COMMON_PDC_FWUP_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_USBC_COMMON_PDC_FWUP_H_ */
