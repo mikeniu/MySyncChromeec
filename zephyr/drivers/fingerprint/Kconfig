@@ -43,7 +43,7 @@ config FINGERPRINT_SENSOR_IMAGE_OFFSET
 	default 2340 if FINGERPRINT_SENSOR_FPC1145
 	default 0 if FINGERPRINT_SENSOR_EGIS630
 	default 172 if FINGERPRINT_SENSOR_EGIS660
-	default 0 if FINGERPRINT_SENSOR_ELAN80SERIES
+	default 0 if FINGERPRINT_SENSOR_ELAN_SERIES
 	default 0 if FINGERPRINT_SENSOR_FT98XX
 	help
 	  This is an offset of the raw fingerprint image in the image data
