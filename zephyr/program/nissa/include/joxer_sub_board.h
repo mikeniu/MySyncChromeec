@@ -5,8 +5,8 @@
 
 /* Joxer sub-board declarations */
 
-#ifndef __CROS_EC_NISSA_NISSA_SUB_BOARD_H__
-#define __CROS_EC_NISSA_NISSA_SUB_BOARD_H__
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_JOXER_SUB_BOARD_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_JOXER_SUB_BOARD_H_
 
 enum joxer_sub_board_type {
 	JOXER_SB_UNKNOWN = -1, /* Uninitialised */
@@ -16,4 +16,4 @@ enum joxer_sub_board_type {
 
 enum joxer_sub_board_type joxer_get_sb_type(void);
 
-#endif /* __CROS_EC_NISSA_NISSA_SUB_BOARD_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_JOXER_SUB_BOARD_H_ */

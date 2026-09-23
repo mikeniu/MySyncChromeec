@@ -9,9 +9,9 @@ in the Dagwood firmware, and consumed by twister running on the host system.
 ## Building and running tests
 
 A wrapper script `./dagwood` is provided in the `platform/ec` root directory. It
-simplifies testing by automatically configuring the required toolchain, device
-testing parameters, and flash commands for running on a single Dagwood board
-connected to `/dev/ttyACM1`.
+simplifies testing by automatically detecting connected Dagwood boards,
+configuring the required toolchain, device testing parameters, and flash
+commands.
 
 This is currently only supported in the chroot environment, and you must also
 have the dagwood repository available.
@@ -27,10 +27,15 @@ directory must be `~/chromiumos/src/platform/ec`
 README].
 1. After flashing the Dagwood firmware, reboot the Dagwood board by pressing
 the `NRST` reset button.
-1. Verify the Dagwood TTY ports are visible.  This can be run inside or outside
-the chroot.
+1. Verify the Dagwood board is detected and obtain its board ID. This can be
+run inside or outside the chroot:
     ```bash
-    $ $ find /dev -name "ttyACM*"
+    $ ../dagwood/flash.py -l
+    Board id: 3635383134325119001C003A version: v0.0.1
+    ```
+    Alternatively, verify the Dagwood TTY ports under `/dev`:
+    ```bash
+    $ find /dev -name "ttyACM*"
     /dev/ttyACM2
     /dev/ttyACM1
     /dev/ttyACM0
@@ -63,6 +68,15 @@ directory.
 ./dagwood -s aic.i2c -p realtek/rts5912
 ```
 
+### Running on a specific Dagwood board
+When multiple Dagwood boards are connected to your host, specify the target board
+using `--board-id <board_id>`. The script automatically identifies the
+corresponding EC serial console port and configures the flash tool.
+
+```bash
+./dagwood -s aic.i2c -p realtek/rts5912 --board-id 3635383134325119001C003A
+```
+
 ### Running the tests from SRAM
 By default, the dagwood script reprograms the integrated SPI flash
 with the test binary. On Nuvoton and Realtek platforms, the test binaries can
@@ -89,13 +103,12 @@ directly into SRAM.
 
 To run tests on multiple Dagwood boards connected to the host, use the
 [`./dagwood-hwmap`] file. You need to edit this file to specify the
-serial ID and serial device path for each Dagwood connected.
+board ID and serial device path for each Dagwood connected.
 
 A file header comment in [`./dagwood-hwmap`] provides details on how to modify
 the hardware map.
 
-To build and run the tests against all boards, replace the `--device-serial`
-parameter with the `--hardware-map` option.
+To build and run the tests against all boards, use the `--hardware-map` option.
 
 ```bash
 ./twister -ivc -s aic.i2c --toolchain=coreboot-sdk \

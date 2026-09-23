@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef __CROS_EC_IO_EXPANDER_IT8801_H
-#define __CROS_EC_IO_EXPANDER_IT8801_H
+#ifndef PLATFORM_EC_DRIVER_IOEXPANDER_IT8801_H_
+#define PLATFORM_EC_DRIVER_IOEXPANDER_IT8801_H_
 
 /* I2C address flags (7-bit without R/W) */
 #define IT8801_I2C_ADDR1 0x38
@@ -125,4 +125,4 @@ int it8801_pwm_get_duty(enum pwm_channel ch);
 
 #endif /* CONFIG_IO_EXPANDER_IT8801_PWM */
 
-#endif /* __CROS_EC_KBEXPANDER_IT8801_H */
+#endif /* PLATFORM_EC_DRIVER_IOEXPANDER_IT8801_H_ */

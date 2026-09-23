@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_VEC_4_H
+#ifndef PLATFORM_EC_INCLUDE_VEC4_H_
 
-#define __CROS_EC_VEC_4_H
+#define PLATFORM_EC_INCLUDE_VEC4_H_
 
 #include "math_util.h"
 
@@ -20,4 +20,4 @@ typedef fp_t fpv4_t[4];
 }
 #endif
 
-#endif /* __CROS_EC_VEC_4_H */
+#endif /* PLATFORM_EC_INCLUDE_VEC4_H_ */

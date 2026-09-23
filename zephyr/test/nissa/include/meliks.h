@@ -3,15 +3,14 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_NISSA_INCLUDE_MELIKS_H_
-#define ZEPHYR_TEST_NISSA_INCLUDE_MELIKS_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_MELIKS_H_
+#define PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_MELIKS_H_
 
 void panel_power_detect_init(void);
 void lcd_reset_detect_init(void);
 void handle_tsp_ta(void);
-void meliks_callback_init(void);
 void power_handler(struct ap_power_ev_callback *cb,
 		   struct ap_power_ev_data data);
 void board_init_battery_type(void);
 
-#endif /* ZEPHYR_TEST_NISSA_INCLUDE_MELIKS_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_MELIKS_H_ */

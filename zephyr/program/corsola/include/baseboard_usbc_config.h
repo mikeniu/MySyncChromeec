@@ -5,8 +5,8 @@
 
 /* Corsola daughter board detection */
 
-#ifndef __CROS_EC_BASEBOARD_USBC_CONFIG_H
-#define __CROS_EC_BASEBOARD_USBC_CONFIG_H
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_CORSOLA_INCLUDE_BASEBOARD_USBC_CONFIG_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_CORSOLA_INCLUDE_BASEBOARD_USBC_CONFIG_H_
 
 #include "gpio.h"
 #include "usb_mux.h"
@@ -46,4 +46,5 @@ enum usbc_port {
  */
 int corsola_is_dp_muxable(int port);
 
-#endif /* __CROS_EC_BASEBOARD_USBC_CONFIG_H */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_CORSOLA_INCLUDE_BASEBOARD_USBC_CONFIG_H_ \
+	*/

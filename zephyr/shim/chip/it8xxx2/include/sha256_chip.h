@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_IT8XXX2_SHA256_H
-#define __CROS_EC_IT8XXX2_SHA256_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_CHIP_IT8XXX2_INCLUDE_SHA256_CHIP_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_CHIP_IT8XXX2_INCLUDE_SHA256_CHIP_H_
 
 #include "common.h"
 
@@ -30,4 +30,4 @@ extern uint8_t it8xxx2_sha256_get_sha1hbaddr(void);
 extern uint8_t it8xxx2_sha256_get_sha2hbaddr(void);
 #endif
 
-#endif /* __CROS_EC_IT8XXX2_SHA256_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_CHIP_IT8XXX2_INCLUDE_SHA256_CHIP_H_ */

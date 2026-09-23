@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef UTIL_ELAN_CLI_H_
-#define UTIL_ELAN_CLI_H_
+#ifndef PLATFORM_EC_UTIL_ELAN_CLI_H_
+#define PLATFORM_EC_UTIL_ELAN_CLI_H_
 
 #include <cstdint>
 #include <optional>
@@ -30,4 +30,4 @@ std::optional<uint16_t> ParseHex(std::string_view strv);
 
 }  // namespace elan
 
-#endif
+#endif /* PLATFORM_EC_UTIL_ELAN_CLI_H_ */

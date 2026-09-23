@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __SKYRIM_TEST_USB_MUX_CONFIG
-#define __SKYRIM_TEST_USB_MUX_CONFIG
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_SKYRIM_INCLUDE_ZTEST_USB_MUX_CONFIG_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_SKYRIM_INCLUDE_ZTEST_USB_MUX_CONFIG_H_
 
 #define WINTERHOLD_CHARGE_CURRENT_MAX 1152
 
@@ -29,4 +29,4 @@ void setup_mux(void);
 
 #endif /* CONFIG_ZTEST */
 
-#endif /* __SKYRIM_TEST_USB_MUX_CONFIG */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_SKYRIM_INCLUDE_ZTEST_USB_MUX_CONFIG_H_ */

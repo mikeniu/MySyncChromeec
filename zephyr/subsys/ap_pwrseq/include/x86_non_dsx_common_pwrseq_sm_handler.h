@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __X86_NON_DSX_COMMON_PWRSEQ_SM_HANDLER_H__
-#define __X86_NON_DSX_COMMON_PWRSEQ_SM_HANDLER_H__
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_NON_DSX_COMMON_PWRSEQ_SM_HANDLER_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_NON_DSX_COMMON_PWRSEQ_SM_HANDLER_H_
 
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
@@ -57,4 +57,5 @@ bool chipset_is_vw_power_good(void);
  * @return true if all AP power rails are good, and false otherwise.
  */
 bool chipset_is_all_power_good(void);
-#endif /* __X86_NON_DSX_COMMON_PWRSEQ_SM_HANDLER_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_NON_DSX_COMMON_PWRSEQ_SM_HANDLER_H_ \
+	*/
