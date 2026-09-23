@@ -28,8 +28,6 @@ if [ "$(id -u)" = "0" ]; then
     fi
 fi
 
-REPO_BASE="https://chromium.googlesource.com/chromiumos"
-
 # Default to skipping remote git pulls and pip checks; pass --update to
 # pull the latest upstream changes.
 UPDATE=""
@@ -51,169 +49,12 @@ echo "Entering Docker container..."
 # Cache directory in the image
 CACHE_BASE="/opt/repos"
 
-# Function to safely update a repository if it has no local changes
-update_repo() {
-    local repo_dir="${1}"
-    local repo_name="${2}"
-    local remote="${3:-origin}"
-    local branch="${4:-}"
-
-    if (cd "${repo_dir}" && git diff --quiet && git diff --cached --quiet); then
-        echo "Updating ${repo_name} (fetching deltas)..."
-        if [ -z "${branch}" ]; then
-            (cd "${repo_dir}" && git pull --quiet "${remote}")
-        else
-            (cd "${repo_dir}" && git pull --quiet "${remote}" "${branch}")
-        fi
-    else
-        echo "Warning: ${repo_name} has local changes." \
-             "Skipping automatic update to avoid conflicts."
-    fi
-}
-
-# Function to clone or update a repository, using build-time cache if available
-clone_or_update() {
-    local repo_url="${1}"
-    local target_dir="${2}"
-    local repo_name="${3}"
-
-    if [ ! -d "${target_dir}" ]; then
-        # Check if we have a cached version in the image
-        # Map /workspace to $CACHE_BASE
-        local cached_dir="${target_dir//\/workspace/${CACHE_BASE}}"
-        if [ -d "${cached_dir}" ]; then
-            echo "Populating ${repo_name} from build-time cache..."
-            mkdir -p "$(dirname "${target_dir}")"
-            cp -a "${cached_dir}" "${target_dir}"
-            update_repo "${target_dir}" "${repo_name}"
-        else
-            echo "Downloading the latest ${repo_name}..."
-            git clone --quiet "${repo_url}" "${target_dir}"
-        fi
-    else
-        echo "${repo_name} directory already exists. Checking for updates..."
-        update_repo "${target_dir}" "${repo_name}"
-    fi
-}
-
-# Specialized clone/update function for chromiumos-overlay (sparse checkout)
-clone_overlay_sparse() {
-    local repo_url="${REPO_BASE}/overlays/chromiumos-overlay"
-    local target_dir="/workspace/src/third_party/chromiumos-overlay"
-    local cached_dir="${CACHE_BASE}/src/third_party/chromiumos-overlay"
-
-    if [ ! -d "${target_dir}" ]; then
-        if [ -d "${cached_dir}" ]; then
-            echo "Populating ChromiumOS Overlay from build-time cache..."
-            mkdir -p "$(dirname "${target_dir}")"
-            cp -a "${cached_dir}" "${target_dir}"
-            update_repo "${target_dir}" "ChromiumOS Overlay" "origin" "main"
-        else
-            echo "Performing sparse checkout of ChromiumOS Overlay..."
-            cd "${target_dir}" || exit 1
-            git init -b main -q
-            git remote add origin "${repo_url}"
-            git config core.sparseCheckout true
-
-            # Define directories to include
-            echo "/eclass/coreboot-sdk-ec-dependencies.eclass" \
-                >> .git/info/sparse-checkout
-
-            git pull --depth=1 --quiet origin main
-            # Set up branch tracking so git pull works without arguments
-            # next time
-            git branch --set-upstream-to=origin/main main
-            cd - > /dev/null
-        fi
-    else
-        echo "ChromiumOS Overlay directory already exists." \
-             "Checking for updates..."
-        update_repo "${target_dir}" "ChromiumOS Overlay" "origin" "main"
-    fi
-}
-
-# Specialized clone/update function for zephyrproject (sparse checkout)
-clone_zephyrproject_sparse() {
-    local repo_url="${REPO_BASE}/third_party/zephyrproject"
-    local target_dir="/workspace/src/third_party/zephyrproject"
-    local cached_dir="${CACHE_BASE}/src/third_party/zephyrproject"
-
-    if [ ! -d "${target_dir}" ]; then
-        if [ -d "${cached_dir}" ]; then
-            echo "Populating Zephyr Project from build-time cache..."
-            mkdir -p "$(dirname "${target_dir}")"
-            cp -a "${cached_dir}" "${target_dir}"
-            update_repo "${target_dir}" "Zephyr Project" "origin" "main"
-        else
-            echo "Performing sparse checkout of Zephyr Project..."
-            mkdir -p "${target_dir}"
-            cd "${target_dir}"
-            git init -b main -q
-            git remote add origin "${repo_url}"
-            git config core.sparseCheckout true
-
-            # Define directories to include
-            {
-                echo "/zephyr/"
-                echo "/modules/hal/cmsis_6/"
-                echo "/modules/hal/stm32/"
-                echo "/modules/lib/picolibc/"
-                echo "/modules/lib/nanopb/"
-            } >> .git/info/sparse-checkout
-
-            git pull --depth=1 --quiet origin main
-            # Set up branch tracking so git pull works without arguments
-            # next time
-            git branch --set-upstream-to=origin/main main
-            cd - > /dev/null
-        fi
-    else
-        echo "Zephyr Project directory already exists." \
-             "Checking for updates..."
-        update_repo "${target_dir}" "Zephyr Project" "origin" "main"
-    fi
-}
-
-# Specialized clone/update function for u-boot (sparse checkout)
-clone_uboot_sparse() {
-    local repo_url="${REPO_BASE}/third_party/u-boot"
-    local target_dir="/workspace/src/third_party/u-boot"
-    local cached_dir="${CACHE_BASE}/src/third_party/u-boot"
-
-    if [ ! -d "${target_dir}" ]; then
-        if [ -d "${cached_dir}" ]; then
-            echo "Populating U-Boot from build-time cache..."
-            mkdir -p "$(dirname "${target_dir}")"
-            cp -a "${cached_dir}" "${target_dir}"
-            update_repo "${target_dir}" "U-Boot"
-        else
-            echo "Performing sparse checkout of U-Boot..."
-            mkdir -p "${target_dir}"
-            cd "${target_dir}" || exit 1
-            git clone --depth 1 --no-checkout --quiet "${repo_url}" .
-            git config core.sparseCheckout true
-
-            # Define directories to include
-            {
-                echo "/tools/binman/"
-                echo "/tools/dtoc/"
-                echo "/tools/patman/"
-                echo "/tools/buildman/"
-            } >> .git/info/sparse-checkout
-
-            git checkout --quiet
-            cd - > /dev/null
-        fi
-    else
-        echo "U-Boot directory already exists. Checking for updates..."
-        update_repo "${target_dir}" "U-Boot"
-    fi
-}
-
-# Function to populate a repository from build-time cache if it doesn't exist
-populate_if_missing() {
+# Populate a repository from the build-time cache if missing, and pull
+# upstream changes when UPDATE is set.
+setup_repo() {
     local target_dir="${1}"
     local repo_name="${2}"
+
     if [ ! -d "${target_dir}" ]; then
         local cached_dir="${target_dir//\/workspace/${CACHE_BASE}}"
         if [ -d "${cached_dir}" ]; then
@@ -222,31 +63,30 @@ populate_if_missing() {
             cp -a "${cached_dir}" "${target_dir}"
         fi
     fi
+
+    if [ -n "${UPDATE}" ]; then
+        if (cd "${target_dir}" && git diff --quiet && \
+            git diff --cached --quiet); then
+            echo "Updating ${repo_name} (fetching deltas)..."
+            (cd "${target_dir}" && git pull --quiet)
+        else
+            echo "Warning: ${repo_name} has local changes." \
+                 "Skipping automatic update to avoid conflicts."
+        fi
+    fi
 }
 
-# Clone or update repositories (parallelized for speed)
 if [ -z "${UPDATE}" ]; then
     echo "Skipping repository updates (pass --update to sync)..."
-    populate_if_missing "/workspace/src/platform/ec" "EC firmware"
-    populate_if_missing "/workspace/src/platform/dagwood" "Dagwood"
-    populate_if_missing \
-        "/workspace/src/third_party/zephyrproject" "Zephyr Project"
-    populate_if_missing "/workspace/src/third_party/pigweed" "Pigweed"
-    populate_if_missing "/workspace/src/third_party/u-boot" "U-Boot"
-    populate_if_missing \
-        "/workspace/src/third_party/chromiumos-overlay" "ChromiumOS Overlay"
-else
-    clone_or_update "${REPO_BASE}/platform/ec" \
-        "/workspace/src/platform/ec" "EC firmware" &
-    clone_or_update "${REPO_BASE}/platform/dagwood" \
-        "/workspace/src/platform/dagwood" "Dagwood" &
-    clone_zephyrproject_sparse &
-    clone_or_update "${REPO_BASE}/third_party/pigweed/pigweed" \
-        "/workspace/src/third_party/pigweed" "Pigweed" &
-    clone_uboot_sparse &
-    clone_overlay_sparse &
-    wait
 fi
+setup_repo "/workspace/src/platform/ec" "EC firmware" &
+setup_repo "/workspace/src/platform/dagwood" "Dagwood" &
+setup_repo "/workspace/src/third_party/zephyrproject" "Zephyr Project" &
+setup_repo "/workspace/src/third_party/pigweed" "Pigweed" &
+setup_repo "/workspace/src/third_party/u-boot" "U-Boot" &
+setup_repo "/workspace/src/third_party/chromiumos-overlay" \
+    "ChromiumOS Overlay" &
+wait
 
 # Set up python virtual environment if it doesn't exist
 VENV_DIR="/workspace/.venv"
