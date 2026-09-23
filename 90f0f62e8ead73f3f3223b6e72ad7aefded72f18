@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19135de6_7e5ffc7c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-23T06:56:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8376403_6e52355c-b9fb-4417-9efd-232beaa11f89.pb)\n\n### Review Summary\n\n*   **Functionality:** The addition of `config4` to `smolec.dts` mapping `FINGERPRINT_CAPTURE_TYPE_PATTERN2` is correct and resolves previous patchset comments.\n*   **Architecture \u0026 Component Fit:** The new capture type aligns well with the existing Devicetree configuration pattern for fingerprint capture settings in `zephyr/program`.\n*   **Code Simplicity:** The change is minimal.\n*   **Idiomaticity \u0026 Readability:** The code perfectly fits the surrounding Devicetree blocks.\n*   **Security:** No security issues introduced by this configuration change.\n*   **Testing \u0026 Test Coverage:** Manual test steps (`ectool.py ...`) are documented. Because this is purely a Devicetree hardware configuration mapping, hardware testing as indicated is exactly the appropriate level of verification.\n*   **CL Size \u0026 Scope:** Size: XS (+4, -0). The CL is focused on a single logical change and easily reviewable.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "90f0f62e8ead73f3f3223b6e72ad7aefded72f18",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
