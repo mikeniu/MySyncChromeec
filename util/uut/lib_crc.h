@@ -8,8 +8,8 @@
  * This file contains public definitions and prototypes for the CRC functions.
  */
 
-#ifndef __UTIL_UUT_LIB_CRC_H
-#define __UTIL_UUT_LIB_CRC_H
+#ifndef PLATFORM_EC_UTIL_UUT_LIB_CRC_H_
+#define PLATFORM_EC_UTIL_UUT_LIB_CRC_H_
 
 /*-------------------------------------------------------------------*\
  *                                                                   *
@@ -65,4 +65,4 @@
  */
 unsigned short update_crc(unsigned short crc, unsigned char c);
 
-#endif /* __UTIL_UUT_LIB_CRC_H */
+#endif /* PLATFORM_EC_UTIL_UUT_LIB_CRC_H_ */

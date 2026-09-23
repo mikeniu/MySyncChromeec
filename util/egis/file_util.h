@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef UTIL_EGIS_FILE_UTIL_H_
-#define UTIL_EGIS_FILE_UTIL_H_
+#ifndef PLATFORM_EC_UTIL_EGIS_FILE_UTIL_H_
+#define PLATFORM_EC_UTIL_EGIS_FILE_UTIL_H_
 
 #include <array>
 #include <cstdint>
@@ -25,4 +25,4 @@ LoadAesKey(std::string_view key_file_path);
 
 }  // namespace egis
 
-#endif  // UTIL_EGIS_FILE_UTIL_H_
+#endif /* PLATFORM_EC_UTIL_EGIS_FILE_UTIL_H_ */

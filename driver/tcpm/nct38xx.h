@@ -6,8 +6,8 @@
 
 /* Nuvoton Type-C port controller */
 
-#ifndef __CROS_EC_USB_PD_TCPM_NCT38XX_H
-#define __CROS_EC_USB_PD_TCPM_NCT38XX_H
+#ifndef PLATFORM_EC_DRIVER_TCPM_NCT38XX_H_
+#define PLATFORM_EC_DRIVER_TCPM_NCT38XX_H_
 
 #include "common.h"
 
@@ -149,4 +149,4 @@ void nct38xx_reset_notify(int port);
 
 extern const struct ioexpander_drv nct38xx_ioexpander_drv;
 
-#endif /* defined(__CROS_EC_USB_PD_TCPM_NCT38XX_H) */
+#endif /* PLATFORM_EC_DRIVER_TCPM_NCT38XX_H_ */

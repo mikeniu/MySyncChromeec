@@ -13,8 +13,8 @@
  * It provides raw access to flash memory module.
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_CROS_FLASH_H_
-#define ZEPHYR_INCLUDE_DRIVERS_CROS_FLASH_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_FLASH_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_FLASH_H_
 
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
@@ -297,4 +297,4 @@ z_impl_cros_flash_physical_get_status(const struct device *dev, uint8_t *sr1,
  * @}
  */
 #include <zephyr/syscalls/cros_flash.h>
-#endif /* ZEPHYR_INCLUDE_DRIVERS_CROS_FLASH_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_FLASH_H_ */

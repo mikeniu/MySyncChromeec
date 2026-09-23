@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_TABLET_MODE_H
-#define __CROS_EC_TABLET_MODE_H
+#ifndef PLATFORM_EC_INCLUDE_TABLET_MODE_H_
+#define PLATFORM_EC_INCLUDE_TABLET_MODE_H_
 
 #include "common.h"
 
@@ -79,4 +79,4 @@ __test_only void tablet_reset(void);
 }
 #endif
 
-#endif /* __CROS_EC_TABLET_MODE_H */
+#endif /* PLATFORM_EC_INCLUDE_TABLET_MODE_H_ */

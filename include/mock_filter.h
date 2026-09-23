@@ -9,8 +9,8 @@
  * See test/mock/README.md for more information.
  */
 
-#ifndef __CROS_EC_MOCK_FILTER_H
-#define __CROS_EC_MOCK_FILTER_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_FILTER_H_
+#define PLATFORM_EC_INCLUDE_MOCK_FILTER_H_
 
 /* If included directly from Makefile, dump mock list. */
 #ifdef _MAKEFILE
@@ -18,4 +18,4 @@
 CONFIG_TEST_MOCK_LIST
 #endif
 
-#endif /*  __CROS_EC_MOCK_FILTER_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_FILTER_H_ */

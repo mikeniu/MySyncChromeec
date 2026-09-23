@@ -5,8 +5,8 @@
  * USB-PD Cable type header.
  */
 
-#ifndef __CROS_EC_USB_PD_VDO_H
-#define __CROS_EC_USB_PD_VDO_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_VDO_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_VDO_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -1173,4 +1173,4 @@ BUILD_ASSERT(sizeof(uint32_t) == sizeof(union product_type_vdo2));
 }
 #endif
 
-#endif /* __CROS_EC_USB_PD_VDO_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_VDO_H_ */

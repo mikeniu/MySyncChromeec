@@ -5,8 +5,8 @@
 
 /* Device event module for Chrome EC */
 
-#ifndef __CROS_EC_DEVICE_EVENT_H
-#define __CROS_EC_DEVICE_EVENT_H
+#ifndef PLATFORM_EC_INCLUDE_DEVICE_EVENT_H_
+#define PLATFORM_EC_INCLUDE_DEVICE_EVENT_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -58,4 +58,4 @@ void device_enable_event(enum ec_device_event event);
 }
 #endif
 
-#endif /* __CROS_EC_DEVICE_EVENT_H */
+#endif /* PLATFORM_EC_INCLUDE_DEVICE_EVENT_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_ISL923X_H_
-#define ZEPHYR_INCLUDE_EMUL_EMUL_ISL923X_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ISL923X_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ISL923X_H_
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/emul.h>
@@ -121,4 +121,4 @@ uint16_t isl923x_emul_peek_reg(const struct emul *emul, int reg);
 struct i2c_common_emul_data *
 emul_isl923x_get_i2c_common_data(const struct emul *emul);
 
-#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_ISL923X_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ISL923X_H_ */

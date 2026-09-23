@@ -124,6 +124,7 @@ fp_capture_types = {
     "pattern1": 12,
     "quality_test": 16,
     "reset_test": 20,
+    "pattern2": 24,
 }
 
 

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __UTIL_UART_UTILS_H
-#define __UTIL_UART_UTILS_H
+#ifndef PLATFORM_EC_UTIL_UART_UTILS_H_
+#define PLATFORM_EC_UTIL_UART_UTILS_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,4 +22,4 @@ int uart_flush(int fd);
 }
 #endif
 
-#endif /* __UTIL_UART_UTILS_H */
+#endif /* PLATFORM_EC_UTIL_UART_UTILS_H_ */

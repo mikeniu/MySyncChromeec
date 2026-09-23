@@ -5,8 +5,8 @@
 
 /* Fingerprint sensor interface */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_H
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -206,4 +206,4 @@ int fp_idle(void);
 }
 #endif
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_H */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_H_ */

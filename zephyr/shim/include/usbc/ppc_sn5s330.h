@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_SN5S330_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_SN5S330_H_
+
 #include "ppc/sn5s330_public.h"
 
 #ifdef __cplusplus
@@ -23,3 +26,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_SN5S330_H_ */

@@ -8,8 +8,8 @@
  * @brief ITE it8xxx2 register structure definitions used by the Chrome OS EC.
  */
 
-#ifndef _ITE_IT8XXX2_REG_DEF_CROS_H
-#define _ITE_IT8XXX2_REG_DEF_CROS_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_SOC_ITE_IT8XXX2_REG_DEF_CROS_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_SOC_ITE_IT8XXX2_REG_DEF_CROS_H_
 
 /*
  * ECPM (EC Clock and Power Management) device registers
@@ -51,4 +51,4 @@ struct ecpm_reg {
 	volatile uint8_t ECPM_SCDCR4;
 };
 
-#endif /* _ITE_IT8XXX2_REG_DEF_CROS_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_SOC_ITE_IT8XXX2_REG_DEF_CROS_H_ */

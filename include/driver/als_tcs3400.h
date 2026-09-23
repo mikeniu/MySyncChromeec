@@ -5,8 +5,8 @@
  * AMS TCS3400 light sensor driver
  */
 
-#ifndef __CROS_EC_ALS_TCS3400_H
-#define __CROS_EC_ALS_TCS3400_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_ALS_TCS3400_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_ALS_TCS3400_H_
 
 #include "driver/als_tcs3400_public.h"
 
@@ -146,4 +146,4 @@ enum crbg_index {
 }
 #endif
 
-#endif /* __CROS_EC_ALS_TCS3400_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_ALS_TCS3400_H_ */

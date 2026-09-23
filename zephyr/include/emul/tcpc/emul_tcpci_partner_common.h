@@ -9,8 +9,8 @@
  * @brief Common code used by TCPCI partner device emulators
  */
 
-#ifndef __EMUL_TCPCI_PARTNER_COMMON_H
-#define __EMUL_TCPCI_PARTNER_COMMON_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_COMMON_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_COMMON_H_
 
 #include "ec_commands.h"
 #include "emul/tcpc/emul_tcpci.h"
@@ -679,4 +679,4 @@ void tcpci_partner_received_msg_status(struct tcpci_partner_data *data,
  * @}
  */
 
-#endif /* __EMUL_TCPCI_PARTNER_COMMON_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_COMMON_H_ */

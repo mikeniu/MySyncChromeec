@@ -5,8 +5,8 @@
 
 /* BMI160 accelerometer and gyro and BMM150 compass module for Chrome EC */
 
-#ifndef __CROS_EC_ACCELGYRO_BMI160_H
-#define __CROS_EC_ACCELGYRO_BMI160_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_ACCELGYRO_BMI160_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_ACCELGYRO_BMI160_H_
 
 #include "accelgyro.h"
 #include "driver/accelgyro_bmi160_public.h"
@@ -413,4 +413,4 @@ int bmi160_sec_raw_write8(const int port, const uint16_t addr_flags,
 }
 #endif
 
-#endif /* __CROS_EC_ACCELGYRO_BMI160_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_ACCELGYRO_BMI160_H_ */

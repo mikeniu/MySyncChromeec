@@ -8,8 +8,8 @@
  * @brief Controls for the mock rollback block library
  */
 
-#ifndef __MOCK_ROLLBACK_LATEST_MOCK_H
-#define __MOCK_ROLLBACK_LATEST_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_ROLLBACK_LATEST_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_ROLLBACK_LATEST_MOCK_H_
 
 #include <stdbool.h>
 
@@ -41,4 +41,4 @@ extern const struct rollback_data fake_latest_rollback_real;
 }
 #endif
 
-#endif /* __MOCK_ROLLBACK_LATEST_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_ROLLBACK_LATEST_MOCK_H_ */
