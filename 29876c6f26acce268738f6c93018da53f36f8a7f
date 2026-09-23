@@ -93,6 +93,30 @@
       },
       "revId": "29876c6f26acce268738f6c93018da53f36f8a7f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5cb2af8_31d0bcf1",
+        "filename": "common/charge_control.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-23T10:14:46Z",
+      "side": 1,
+      "message": "Acknowledged. Using `IS_ENABLED()` would cause undefined reference linker errors on boards without CONFIG_PLATFORM_EC_CHARGER (since `common/charge_state.c` is not built) unless dummy stubs are added for all reference functions. Kept #if to avoid adding boilerplate stubs.",
+      "parentUuid": "4d0f7d83_a4e40e11",
+      "range": {
+        "startLine": 150,
+        "startChar": 6,
+        "endLine": 150,
+        "endChar": 13
+      },
+      "revId": "29876c6f26acce268738f6c93018da53f36f8a7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
