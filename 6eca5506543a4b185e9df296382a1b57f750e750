@@ -80,6 +80,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58c6841d_fd0927c7",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T20:51:53Z",
+      "side": 1,
+      "message": "Done. Updated to static_cast\u003cenum ec_host_cmd_status\u003e(...).",
+      "parentUuid": "91ec190e_a40057c1",
+      "range": {
+        "startLine": 385,
+        "startChar": 0,
+        "endLine": 386,
+        "endChar": 9999
+      },
+      "revId": "6eca5506543a4b185e9df296382a1b57f750e750",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c98f406a_eb24f26b",
@@ -101,6 +125,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "6eca5506543a4b185e9df296382a1b57f750e750",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a079990e_150a5bd5",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 33
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T20:51:53Z",
+      "side": 1,
+      "message": "Done. Updated to static_cast\u003cenum ec_host_cmd_status\u003e(ret).",
+      "parentUuid": "c98f406a_eb24f26b",
+      "range": {
+        "startLine": 492,
+        "startChar": 0,
+        "endLine": 492,
+        "endChar": 9999
+      },
       "revId": "6eca5506543a4b185e9df296382a1b57f750e750",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
