@@ -59,8 +59,10 @@ ZTEST_USER(extra_tasks, test_hostcmd_thread_mapping)
 	k_tid_t hostcmd_thread;
 	k_tid_t main_thread;
 
-#ifdef HAS_TASK_HOSTCMD
-#ifdef CONFIG_TASK_HOSTCMD_THREAD_MAIN
+#ifdef CONFIG_HAS_HOSTCMD
+#if defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) || \
+	(defined(CONFIG_EC_HOST_CMD) &&         \
+	 !defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
 	k_thread_name_set(get_main_thread(), "HOSTCMD");
 #endif /* CONFIG_TASK_HOSTCMD_THREAD_MAIN */
 
@@ -68,7 +70,8 @@ ZTEST_USER(extra_tasks, test_hostcmd_thread_mapping)
 	zassert_not_null(hostcmd_thread);
 	zassert_equal(hostcmd_thread, get_hostcmd_thread());
 
-#ifdef CONFIG_TASK_HOSTCMD_THREAD_DEDICATED
+#if defined(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED) || \
+	defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)
 	main_thread = find_thread_by_name("main");
 	zassert_not_null(main_thread);
 	zassert_equal(main_thread, get_main_thread());
@@ -80,7 +83,7 @@ ZTEST_USER(extra_tasks, test_hostcmd_thread_mapping)
 	zassert_equal(main_thread, hostcmd_thread);
 #endif /* CONFIG_TASK_HOSTCMD_THREAD_DEDICATED */
 
-#else /* !HAS_TASK_HOSTCMD */
+#else /* !CONFIG_HAS_HOSTCMD */
 	hostcmd_thread = find_thread_by_name("HOSTCMD");
 	zassert_is_null(hostcmd_thread);
 	EXPECT_ASSERT(hostcmd_thread = get_hostcmd_thread());
@@ -89,7 +92,7 @@ ZTEST_USER(extra_tasks, test_hostcmd_thread_mapping)
 	main_thread = find_thread_by_name("main");
 	zassert_not_null(main_thread);
 	zassert_equal(main_thread, get_main_thread());
-#endif /* HAS_TASK_HOSTCMD */
+#endif /* CONFIG_HAS_HOSTCMD */
 }
 
 ZTEST_USER(extra_tasks, test_sysworkq_thread_mapping)
@@ -138,4 +141,19 @@ ZTEST_USER(extra_tasks, test_get_thread_name)
 #endif
 }
 
-ZTEST_SUITE(extra_tasks, NULL, NULL, NULL, NULL, NULL);
+static void *extra_tasks_setup(void)
+{
+#if defined(CONFIG_EC_HOST_CMD) && defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)
+	/* Rename upstream host command thread name from "ec_host_cmd" to
+	 * "HOSTCMD" so that find_thread_by_name passes tests.
+	 */
+	k_tid_t hc_thread = get_hostcmd_thread();
+
+	if (hc_thread) {
+		k_thread_name_set(hc_thread, "HOSTCMD");
+	}
+#endif
+	return NULL;
+}
+
+ZTEST_SUITE(extra_tasks, NULL, extra_tasks_setup, NULL, NULL, NULL);

@@ -104,6 +104,8 @@ static void ap_change(struct ap_power_ev_callback *callback,
 {
 	change_detected();
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(ap_change, AP_POWER_INITIALIZED,
+			       AP_POWER_HARD_OFF, AP_POWER_STARTUP);
 
 /*
  * Hook to listen for external power supply changes.
@@ -142,11 +144,11 @@ DECLARE_CONSOLE_COMMAND(hibdelay, command_hibernation_delay, "[sec]",
 /*
  * Host command to set the hibernation delay
  */
-static enum ec_status
-host_command_hibernation_delay(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_hibernation_delay(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_hibernation_delay *p = args->params;
-	struct ec_response_hibernation_delay *r = args->response;
+	const struct ec_params_hibernation_delay *p = args->input_buf;
+	struct ec_response_hibernation_delay *r = args->output_buf;
 
 	/* Only change the hibernation delay if seconds is non-zero. */
 	if (p->seconds)
@@ -161,21 +163,9 @@ host_command_hibernation_delay(struct host_cmd_handler_args *args)
 	r->time_g3 = 0;
 	r->time_remaining = 0;
 
-	args->response_size = sizeof(struct ec_response_hibernation_delay);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(struct ec_response_hibernation_delay);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_HIBERNATION_DELAY, host_command_hibernation_delay,
-		     EC_VER_MASK(0));
-
-static int hibernate_init(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	ap_power_ev_init_callback(&cb, ap_change,
-				  AP_POWER_INITIALIZED | AP_POWER_HARD_OFF |
-					  AP_POWER_STARTUP);
-	ap_power_ev_add_callback(&cb);
-	return 0;
-}
-
-SYS_INIT(hibernate_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+EC_HOST_CMD_HANDLER(EC_CMD_HIBERNATION_DELAY, host_command_hibernation_delay,
+		    EC_VER_MASK(0), struct ec_params_hibernation_delay,
+		    struct ec_response_hibernation_delay);

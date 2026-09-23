@@ -96,6 +96,25 @@ ZTEST(host_cmd_pdc, test_ec_cmd_pd_chip_info_v0)
 
 	RESET_FAKE(pdc_power_mgmt_get_info);
 
+	/* Invalid parameter or out of range port */
+	pdc_power_mgmt_get_info_fake.return_val = -ERANGE;
+
+	rv = ec_cmd_pd_chip_info(NULL, &req, &resp);
+
+	zassert_equal(EC_RES_INVALID_PARAM, rv, "Got %d, expected %d", rv,
+		      EC_RES_INVALID_PARAM);
+
+	RESET_FAKE(pdc_power_mgmt_get_info);
+
+	pdc_power_mgmt_get_info_fake.return_val = -EINVAL;
+
+	rv = ec_cmd_pd_chip_info(NULL, &req, &resp);
+
+	zassert_equal(EC_RES_INVALID_PARAM, rv, "Got %d, expected %d", rv,
+		      EC_RES_INVALID_PARAM);
+
+	RESET_FAKE(pdc_power_mgmt_get_info);
+
 	/* Cached read but no data available */
 	pdc_power_mgmt_get_info_fake.return_val = -EAGAIN;
 

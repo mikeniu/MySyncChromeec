@@ -10,8 +10,8 @@
  * emulator
  */
 
-#ifndef __EMUL_REALTEK_RTS5453P_H
-#define __EMUL_REALTEK_RTS5453P_H
+#ifndef PLATFORM_EC_ZEPHYR_EMUL_EMUL_REALTEK_RTS54XX_H_
+#define PLATFORM_EC_ZEPHYR_EMUL_EMUL_REALTEK_RTS54XX_H_
 
 #include "drivers/pdc.h"
 #include "drivers/ucsi_v3.h"
@@ -629,4 +629,4 @@ struct rts5453p_emul_pdc_data {
 struct i2c_common_emul_data *
 rts5453p_emul_get_i2c_common_data(const struct emul *emul);
 
-#endif /* __EMUL_REALTEK_RTS5453P_H */
+#endif /* PLATFORM_EC_ZEPHYR_EMUL_EMUL_REALTEK_RTS54XX_H_ */

@@ -5,8 +5,8 @@
  * Benchmark utility functions.
  */
 
-#ifndef __CROS_EC_BENCHMARK_H
-#define __CROS_EC_BENCHMARK_H
+#ifndef PLATFORM_EC_INCLUDE_BENCHMARK_H_
+#define PLATFORM_EC_INCLUDE_BENCHMARK_H_
 
 #include "clock.h"
 #include "console.h"
@@ -165,4 +165,4 @@ template <int MAX_NUM_RESULTS = 5> class Benchmark {
 	int num_results_ = 0;
 };
 
-#endif /* __CROS_EC_BENCHMARK_H */
+#endif /* PLATFORM_EC_INCLUDE_BENCHMARK_H_ */

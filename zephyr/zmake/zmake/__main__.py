@@ -305,6 +305,11 @@ def get_argparser():
         type=pathlib.Path,
         help="Second build directory or ec.bin file",
     )
+    analyze_build_diff.add_argument(
+        "--sections",
+        action="store_true",
+        help="Print detailed section size comparison and changed sections",
+    )
 
     return parser, sub
 

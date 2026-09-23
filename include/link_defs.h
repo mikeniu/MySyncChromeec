@@ -5,8 +5,8 @@
  * Symbols from linker definitions
  */
 
-#ifndef __CROS_EC_LINK_DEFS_H
-#define __CROS_EC_LINK_DEFS_H
+#ifndef PLATFORM_EC_INCLUDE_LINK_DEFS_H_
+#define PLATFORM_EC_INCLUDE_LINK_DEFS_H_
 
 #include "console.h"
 #include "hooks.h"
@@ -105,9 +105,11 @@ extern uint64_t __deferred_until_end[];
 extern const struct test_i2c_xfer __test_i2c_xfer[];
 extern const struct test_i2c_xfer __test_i2c_xfer_end[];
 
+#if defined(CONFIG_PLATFORM_EC_HOSTCMD) || !defined(CONFIG_ZEPHYR)
 /* Host commands */
 extern const struct host_command __hcmds[];
 extern const struct host_command __hcmds_end[];
+#endif
 
 /* MKBP events */
 extern const struct mkbp_event_source __mkbp_evt_srcs[];
@@ -187,4 +189,4 @@ extern const char __noinit_end_of_ram_end[];
 }
 #endif
 
-#endif /* __CROS_EC_LINK_DEFS_H */
+#endif /* PLATFORM_EC_INCLUDE_LINK_DEFS_H_ */

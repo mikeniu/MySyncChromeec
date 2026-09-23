@@ -5,8 +5,8 @@
 
 /* LSM6DS0 accelerometer and gyro module for Chrome EC */
 
-#ifndef __CROS_EC_ACCELGYRO_LSM6DS0_H
-#define __CROS_EC_ACCELGYRO_LSM6DS0_H
+#ifndef PLATFORM_EC_DRIVER_ACCELGYRO_LSM6DS0_H_
+#define PLATFORM_EC_DRIVER_ACCELGYRO_LSM6DS0_H_
 
 #include "accelgyro.h"
 #include "task.h"
@@ -130,4 +130,4 @@ struct lsm6ds0_data {
 	int16_t offset[3];
 };
 
-#endif /* __CROS_EC_ACCELGYRO_LSM6DS0_H */
+#endif /* PLATFORM_EC_DRIVER_ACCELGYRO_LSM6DS0_H_ */

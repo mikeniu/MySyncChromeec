@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __INTEL_RVP_BOARD_ID_H
-#define __INTEL_RVP_BOARD_ID_H
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_INTELRVP_INCLUDE_INTEL_RVP_BOARD_ID_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_INTELRVP_INCLUDE_INTEL_RVP_BOARD_ID_H_
 
 #include <zephyr/drivers/gpio.h>
 
@@ -24,4 +24,4 @@ extern const struct gpio_dt_spec fab_id_config[];
 
 extern const struct gpio_dt_spec board_id_config[];
 
-#endif /* __INTEL_RVP_BOARD_ID_H */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_INTELRVP_INCLUDE_INTEL_RVP_BOARD_ID_H_ */

@@ -36,8 +36,8 @@
  * read as '1', not '0'.
  */
 
-#ifndef __AP_PWRSEQ_POWER_SIGNALS_H__
-#define __AP_PWRSEQ_POWER_SIGNALS_H__
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_POWER_SIGNALS_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_POWER_SIGNALS_H_
 
 #include <zephyr/devicetree.h>
 
@@ -341,4 +341,4 @@ static inline int power_wait_signals_off_timeout(power_signal_mask_t want,
 
 int power_signal_external_init(void);
 
-#endif /* __AP_PWRSEQ_POWER_SIGNALS_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_POWER_SIGNALS_H_ */

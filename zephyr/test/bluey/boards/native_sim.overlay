@@ -1,0 +1,67 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <dt-bindings/gpio_defines.h>
+
+/ {
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_ec_en_vph_pwr_1a: ec_en_vph_pwr_1a {
+			gpios = <&gpio0 0 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_pmic_lid_open_od: ec_pmic_lid_open_od {
+			gpios = <&gpio0 1 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_lid_open: lid_open {
+			gpios = <&gpio0 2 (GPIO_INPUT | GPIO_OUTPUT)>;
+			enum-name = "GPIO_LID_OPEN";
+		};
+		gpio_ec_pmic_acok: ec_pmic_acok {
+			gpios = <&gpio0 3 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_acok_od: acok_od {
+			gpios = <&gpio0 4 (GPIO_INPUT | GPIO_OUTPUT)>;
+			enum-name = "GPIO_AC_PRESENT";
+		};
+		gpio_prochot_in: prochot_in {
+			gpios = <&gpio0 5 (GPIO_INPUT | GPIO_OUTPUT)>;
+			enum-name = "GPIO_CPU_PROCHOT";
+		};
+	};
+
+	gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_acok_passthru: acok_passthru {
+			irq-pin = <&gpio_acok_od>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "chipset_acok_passthru_interrupt";
+		};
+		int_prochot: prochot {
+			irq-pin = <&gpio_prochot_in>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "throttle_ap_prochot_input_interrupt";
+		};
+	};
+
+	adc0: adc {
+		compatible = "zephyr,adc-emul";
+		nchannels = <1>;
+		ref-internal-mv = <3300>;
+		#io-channel-cells = <1>;
+		status = "okay";
+	};
+
+	named-adc-channels {
+		compatible = "named-adc-channels";
+
+		vph_pwr {
+			enum-name = "ADC_VPH_PWR";
+			io-channels = <&adc0 0>;
+		};
+	};
+};

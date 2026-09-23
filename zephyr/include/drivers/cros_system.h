@@ -11,8 +11,8 @@
  * directly.
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_CROS_SYSTEM_H_
-#define ZEPHYR_INCLUDE_DRIVERS_CROS_SYSTEM_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_SYSTEM_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_SYSTEM_H_
 
 /**
  * @brief cros system Interface
@@ -130,4 +130,4 @@ int cros_system_get_hibernate_wake_source(enum hibernate_wake_source *source);
 /**
  * @}
  */
-#endif /* ZEPHYR_INCLUDE_DRIVERS_CROS_SYSTEM_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_SYSTEM_H_ */

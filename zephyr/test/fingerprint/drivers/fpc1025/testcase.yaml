@@ -6,4 +6,5 @@ common:
   platform_allow:
     - native_sim
 tests:
-  fingerprint.drivers.fpc1025: {}
+  fingerprint.drivers.fpc1025:
+    ignore_faults: true

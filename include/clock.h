@@ -5,8 +5,8 @@
 
 /* Clocks and power management settings */
 
-#ifndef __CROS_EC_CLOCK_H
-#define __CROS_EC_CLOCK_H
+#ifndef PLATFORM_EC_INCLUDE_CLOCK_H_
+#define PLATFORM_EC_INCLUDE_CLOCK_H_
 
 #include "common.h"
 
@@ -116,4 +116,4 @@ void clock_refresh_console_in_use(void);
 }
 #endif
 
-#endif /* __CROS_EC_CLOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_CLOCK_H_ */

@@ -17,6 +17,7 @@
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 #include "test/usb_pe.h"
+#include "usb_pd.h"
 
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/kernel.h>
@@ -294,7 +295,7 @@ ZTEST_F(integration_usb_attach_src_then_snk, test_snk_port_pd_info)
 		      DEFAULT_VBUS_SNK_PORT_MA, response.meas.current_max);
 
 	zassert_true(response.meas.current_lim >= DEFAULT_VBUS_SNK_PORT_MA,
-		     "Charging at VBUS max %dmA, but PD current limit %dmA",
+		     "Expected PD current limit >= %dmA, but got %dmA",
 		     DEFAULT_VBUS_SNK_PORT_MA, response.meas.current_lim);
 
 	zassert_equal(response.max_power,
@@ -312,8 +313,8 @@ ZTEST_F(integration_usb_attach_src_then_snk, test_src_port_pd_info)
 
 	/* Assert */
 	zassert_equal(response.role, USB_PD_PORT_POWER_SOURCE,
-		      "Power role %d, but PD reports role %d", PD_ROLE_SOURCE,
-		      response.role);
+		      "Power role %d, but PD reports role %d",
+		      USB_PD_PORT_POWER_SOURCE, response.role);
 
 	zassert_equal(response.type, USB_CHG_TYPE_NONE,
 		      "Charger type %d, but PD reports type %d",
@@ -364,7 +365,7 @@ ZTEST_F(integration_usb_attach_snk_then_src, test_snk_port_pd_info)
 		      DEFAULT_VBUS_SNK_PORT_MA, response.meas.current_max);
 
 	zassert_true(response.meas.current_lim >= DEFAULT_VBUS_SNK_PORT_MA,
-		     "Charging at VBUS max %dmA, but PD current limit %dmA",
+		     "Expected PD current limit >= %dmA, but got %dmA",
 		     DEFAULT_VBUS_SNK_PORT_MA, response.meas.current_lim);
 
 	zassert_equal(response.max_power,
@@ -382,8 +383,8 @@ ZTEST_F(integration_usb_attach_snk_then_src, test_src_port_pd_info)
 
 	/* Assert */
 	zassert_equal(response.role, USB_PD_PORT_POWER_SOURCE,
-		      "Power role %d, but PD reports role %d", PD_ROLE_SOURCE,
-		      response.role);
+		      "Power role %d, but PD reports role %d",
+		      USB_PD_PORT_POWER_SOURCE, response.role);
 
 	zassert_equal(response.type, USB_CHG_TYPE_NONE,
 		      "Charger type %d, but PD reports type %d",
@@ -421,7 +422,7 @@ ZTEST_F(integration_usb_attach_src_then_snk, test_snk_port_typec_status)
 
 	zassert_equal(response.source_cap_count,
 		      DEFAULT_SOURCE_SENT_TO_SINK_CAP_COUNT,
-		      "Source received %d source PDOs",
+		      "Port received %d source PDOs",
 		      response.source_cap_count);
 
 	/* The source emulator is being attached to a sink port (our policy
@@ -481,7 +482,7 @@ ZTEST_F(integration_usb_attach_snk_then_src, test_snk_port_typec_status)
 
 	zassert_equal(response.source_cap_count,
 		      DEFAULT_SOURCE_SENT_TO_SINK_CAP_COUNT,
-		      "Source received %d source PDOs",
+		      "Port received %d source PDOs",
 		      response.source_cap_count);
 
 	/* The source emulator is being attached to a sink port (our policy
@@ -627,7 +628,7 @@ ZTEST_F(usb_detach_test, test_detach_src_snk)
 		      snk_power_info.meas.current_max);
 
 	zassert_true(snk_power_info.meas.current_lim >= 0,
-		     "Charging at VBUS max %dmA, but PD current limit %dmA", 0,
+		     "Expected PD current limit >= %dmA, but got %dmA", 0,
 		     snk_power_info.meas.current_lim);
 
 	zassert_equal(snk_power_info.max_power, 0,
@@ -645,8 +646,8 @@ ZTEST_F(usb_detach_test, test_detach_src_snk)
 
 	/* TODO(b/209907615): Confirm measure value requirements */
 	zassert_within((int32_t)src_power_info.meas.voltage_now, 0, 10,
-		       "Expected Charging at VBUS %dmV, but PD reports %dmV",
-		       DEFAULT_VBUS_MV, src_power_info.meas.voltage_now);
+		       "Expected Charging at VBUS %dmV, but PD reports %dmV", 0,
+		       src_power_info.meas.voltage_now);
 
 	zassert_equal(src_power_info.meas.current_max, 0,
 		      "Charging at VBUS max %dmA, but PD reports %dmA", 0,
@@ -689,7 +690,7 @@ ZTEST_F(usb_detach_test, test_detach_snk_src)
 		      snk_power_info.meas.current_max);
 
 	zassert_true(snk_power_info.meas.current_lim >= 0,
-		     "Charging at VBUS max %dmA, but PD current limit %dmA", 0,
+		     "Expected PD current limit >= %dmA, but got %dmA", 0,
 		     snk_power_info.meas.current_lim);
 
 	zassert_equal(snk_power_info.max_power, 0,
@@ -707,8 +708,8 @@ ZTEST_F(usb_detach_test, test_detach_snk_src)
 
 	/* TODO(b/209907615): Confirm measure value requirements */
 	zassert_within((int32_t)src_power_info.meas.voltage_now, 0, 10,
-		       "Expected Charging at VBUS %dmV, but PD reports %dmV",
-		       DEFAULT_VBUS_MV, src_power_info.meas.voltage_now);
+		       "Expected Charging at VBUS %dmV, but PD reports %dmV", 0,
+		       src_power_info.meas.voltage_now);
 
 	zassert_equal(src_power_info.meas.current_max, 0,
 		      "Charging at VBUS max %dmA, but PD reports %dmA", 0,
@@ -747,8 +748,8 @@ ZTEST_F(usb_detach_test, test_detach_sink)
 		      DEFAULT_VBUS_SNK_PORT_MA, pd_power_info.meas.current_max);
 
 	zassert_true(pd_power_info.meas.current_lim >= 500,
-		     "Charging at VBUS max %dmA, but PD current limit %dmA",
-		     500, pd_power_info.meas.current_lim);
+		     "Expected PD current limit >= %dmA, but got %dmA", 500,
+		     pd_power_info.meas.current_lim);
 
 	zassert_equal(pd_power_info.max_power,
 		      DEFAULT_VBUS_MV * DEFAULT_VBUS_SNK_PORT_MA,
@@ -779,12 +780,41 @@ ZTEST_F(usb_detach_test, test_detach_source)
 
 	/* TODO(b/209907615): Confirm measure value requirements */
 	zassert_within((int32_t)pd_power_info.meas.voltage_now, 0, 10,
-		       "Expected Charging at VBUS %dmV, but PD reports %dmV",
-		       DEFAULT_VBUS_MV, pd_power_info.meas.voltage_now);
+		       "Expected Charging at VBUS %dmV, but PD reports %dmV", 0,
+		       pd_power_info.meas.voltage_now);
 
 	zassert_equal(pd_power_info.meas.current_max, 0,
 		      "Charging at VBUS max %dmA, but PD reports %dmA", 0,
 		      pd_power_info.meas.current_max);
+}
+
+ZTEST_F(usb_detach_test, test_attach_dfp_debug_accessory)
+{
+	struct emul_state *emul_state = &fixture->fixture;
+
+	/* Disconnect source partner and VBUS so SNK_PORT enters Unattached.SNK
+	 */
+	integration_usb_test_source_detach(emul_state);
+	isl923x_emul_set_adc_vbus(emul_state->charger_isl923x_emul, 0);
+	k_sleep(K_SECONDS(2));
+
+	/*
+	 * Connect DFP Debug Accessory (Rp on both CC1 and CC2) with VBUS.
+	 * This exercises tc_attach_wait_snk_run() setting new_cc_state to
+	 * PD_CC_DFP_DEBUG_ACC and transitioning to Attached.SNK.
+	 */
+	zassert_ok(tcpci_emul_connect_partner(
+		emul_state->tcpci_generic_emul, PD_ROLE_SOURCE,
+		TYPEC_CC_VOLT_RP_3_0, TYPEC_CC_VOLT_RP_1_5, POLARITY_CC1));
+	isl923x_emul_set_adc_vbus(emul_state->charger_isl923x_emul,
+				  DEFAULT_VBUS_MV);
+	k_sleep(K_SECONDS(2));
+
+	zassert_true(pd_is_connected(SNK_PORT), "Port not connected");
+	zassert_equal(pd_get_task_cc_state(SNK_PORT), PD_CC_DFP_DEBUG_ACC,
+		      "DFP Debug Accessory not detected");
+	zassert_equal(pd_get_power_role(SNK_PORT), PD_ROLE_SINK,
+		      "Expected sink power role");
 }
 
 ZTEST_SUITE(usb_detach_test, drivers_predicate_post_main,

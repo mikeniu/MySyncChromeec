@@ -5,8 +5,8 @@
  * NXP PCA(L)6408 I/O expander
  */
 
-#ifndef __CROS_EC_IOEXPANDER_PCAL6408_H
-#define __CROS_EC_IOEXPANDER_PCAL6408_H
+#ifndef PLATFORM_EC_DRIVER_IOEXPANDER_PCAL6408_H_
+#define PLATFORM_EC_DRIVER_IOEXPANDER_PCAL6408_H_
 
 #define PCAL6408_I2C_ADDR0 0x20
 #define PCAL6408_I2C_ADDR1 0x21
@@ -39,4 +39,4 @@ int pcal6408_ioex_event_handler(int ioex);
 
 extern const struct ioexpander_drv pcal6408_ioexpander_drv;
 
-#endif /* __CROS_EC_IOEXPANDER_PCAL6408_H */
+#endif /* PLATFORM_EC_DRIVER_IOEXPANDER_PCAL6408_H_ */

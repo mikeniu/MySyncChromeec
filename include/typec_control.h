@@ -5,8 +5,8 @@
 
 /* Type-C control logic header */
 
-#ifndef __CROS_EC_TYPEC_CONTROL_H
-#define __CROS_EC_TYPEC_CONTROL_H
+#ifndef PLATFORM_EC_INCLUDE_TYPEC_CONTROL_H_
+#define PLATFORM_EC_INCLUDE_TYPEC_CONTROL_H_
 
 #include "usb_pd_tcpm.h"
 
@@ -51,4 +51,4 @@ void typec_set_vconn(int port, bool enable);
 }
 #endif
 
-#endif /* __CROS_EC_TYPEC_CONTROL_H */
+#endif /* PLATFORM_EC_INCLUDE_TYPEC_CONTROL_H_ */

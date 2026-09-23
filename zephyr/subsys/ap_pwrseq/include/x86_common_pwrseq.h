@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __X86_COMMON_PWRSEQ_H__
-#define __X86_COMMON_PWRSEQ_H__
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_COMMON_PWRSEQ_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_COMMON_PWRSEQ_H_
 
 #include <zephyr/logging/log.h>
 
@@ -21,4 +21,4 @@ struct pwrseq_context {
 };
 #endif
 
-#endif /* __X86_COMMON_PWRSEQ_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_X86_COMMON_PWRSEQ_H_ */
