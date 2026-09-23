@@ -44,6 +44,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67362e69_2f6a905d",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T19:51:10Z",
+      "side": 1,
+      "message": "Done. Moved check into fp_command_frame_v1 using sizeof(*params).",
+      "parentUuid": "296f952c_e72756d4",
+      "range": {
+        "startLine": 867,
+        "startChar": 0,
+        "endLine": 868,
+        "endChar": 9999
+      },
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "941d9d23_9f0f05a0",
@@ -64,6 +88,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10965cc6_862faf0a",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 1108,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T19:51:10Z",
+      "side": 1,
+      "message": "Done. Moved check into fp_command_template_v1 using sizeof(*params).",
+      "parentUuid": "941d9d23_9f0f05a0",
+      "range": {
+        "startLine": 1106,
+        "startChar": 0,
+        "endLine": 1108,
+        "endChar": 9999
+      },
       "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -92,6 +140,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "762568e8_39fd83d0",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T19:51:10Z",
+      "side": 1,
+      "message": "Done. Scoped p_1 inside args-\u003eversion \u003d\u003d 1 block using sizeof(*p_1).",
+      "parentUuid": "69940b68_2e27a221",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 352,
+        "endChar": 9999
+      },
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9abba1c_8d8c29b1",
@@ -112,6 +184,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e39f887c_34f8ae44",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T19:51:10Z",
+      "side": 1,
+      "message": "Done. Extracted truncated_size constant.",
+      "parentUuid": "b9abba1c_8d8c29b1",
+      "range": {
+        "startLine": 411,
+        "startChar": 0,
+        "endLine": 425,
+        "endChar": 9999
+      },
       "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -140,6 +236,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ce81818_34726aa7",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T19:51:10Z",
+      "side": 1,
+      "message": "Done. Declared params on stack, renamed test to test_fp_template_v1_truncated, and extracted truncated_size.",
+      "parentUuid": "e5318d55_e42fe54c",
+      "range": {
+        "startLine": 241,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 9999
+      },
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50224a7a_54221795",
@@ -160,6 +280,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32a2eb34_deaa45a8",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 672,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T19:51:10Z",
+      "side": 1,
+      "message": "Done. Extracted truncated_size constant.",
+      "parentUuid": "50224a7a_54221795",
+      "range": {
+        "startLine": 659,
+        "startChar": 0,
+        "endLine": 672,
+        "endChar": 9999
+      },
       "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
