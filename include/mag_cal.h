@@ -5,8 +5,8 @@
 
 /* Online magnetometer calibration */
 
-#ifndef __CROS_EC_MAG_CAL_H
-#define __CROS_EC_MAG_CAL_H
+#ifndef PLATFORM_EC_INCLUDE_MAG_CAL_H_
+#define PLATFORM_EC_INCLUDE_MAG_CAL_H_
 
 #include "kasa.h"
 #include "mat44.h"
@@ -47,4 +47,4 @@ int mag_cal_update(struct mag_cal_t *moc, const intv3_t v);
 }
 #endif
 
-#endif /* __CROS_EC_MAG_CAL_H */
+#endif /* PLATFORM_EC_INCLUDE_MAG_CAL_H_ */

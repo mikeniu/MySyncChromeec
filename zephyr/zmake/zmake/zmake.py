@@ -645,6 +645,9 @@ class Zmake:
                 util.update_symlink(self.zephyr_base, build_dir / "zephyr_base")
 
                 dts_overlay_config = project.find_dts_overlays(module_paths)
+                kconfig_overlay_config = project.find_kconfig_overlays(
+                    module_paths
+                )
 
                 toolchain_support = project.get_toolchain(
                     self.module_paths, override=toolchain
@@ -698,6 +701,7 @@ class Zmake:
                         | module_config
                         | dts_overlay_config
                         | build_config
+                        | kconfig_overlay_config
                     )
 
                     wait_func = self.executor.append(
@@ -1122,11 +1126,13 @@ class Zmake:
         self,
         target1,
         target2,
+        sections=False,
     ):
         """Analyze binary differences between two EC builds."""
         success = zmake.analyze_build_diff.analyze_build_diff(
             target1,
             target2,
+            sections=sections,
             output_fn=self.logger.info,
         )
         return 0 if success else 1

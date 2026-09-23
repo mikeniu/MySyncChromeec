@@ -7,9 +7,11 @@
 from abc import ABC, abstractmethod
 import argparse
 from enum import Enum
+import os
+import re
 import subprocess
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class DutOsType(str, Enum):
@@ -159,10 +161,117 @@ class DutHandler(ABC):
             self._servo_ssh(
                 f"servodtool instance wait-for-active --port {servo_port} --timeout 60"
             )
+            # Give servod a brief pause to settle USB/CCD interface initialization
+            time.sleep(3)
+        except subprocess.CalledProcessError:
+            self._recover_servod()
+
+    def _find_uhubctl_target(self, servo_serial: str) -> Tuple[str, str]:
+        """Find hub location and port in `sudo uhubctl` matching the device's USB sysfs path."""
+        if not servo_serial:
+            raise RuntimeError(
+                "Cannot recover servod: servo_serial is missing from lease configuration"
+            )
+
+        # 1. Query the USB sysfs path via servodtool
+        res_path = self._servo_ssh(
+            f"servodtool device -s {servo_serial} usb-path",
+            capture_output=True,
+            check=False,
+        )
+        usb_path = res_path.stdout.strip()
+        if not usb_path:
+            raise RuntimeError(
+                f"Failed to find USB sysfs path for servo device {servo_serial}"
+            )
+
+        # 2. Get active hubs listed by uhubctl
+        res_hub = self._servo_ssh(
+            "sudo uhubctl",
+            capture_output=True,
+            check=False,
+        )
+        uhubctl_out = res_hub.stdout
+        if not uhubctl_out:
+            raise RuntimeError(
+                "Failed to list USB hubs: sudo uhubctl command returned empty output"
+            )
+
+        hub_re = re.compile(r"hub (\S+)\s*\[")
+
+        # 3. Match usb_path against uhubctl hubs
+        dev_name = os.path.basename(usb_path.rstrip("/"))
+        hubs = [
+            m.group(1)
+            for line in uhubctl_out.splitlines()
+            if (m := hub_re.search(line))
+        ]
+
+        # Find the longest hub location in uhubctl that is a parent prefix of dev_name
+        matching_target = None
+        max_len = -1
+        for hub in hubs:
+            prefix = f"{hub}."
+            if dev_name.startswith(prefix):
+                remainder = dev_name[len(prefix) :]
+                port = remainder.split(".")[0]
+                if len(hub) > max_len:
+                    max_len = len(hub)
+                    matching_target = (hub, port)
+
+        if matching_target:
+            return matching_target
+
+        raise RuntimeError(
+            f"Could not determine uhubctl target for servo {servo_serial} "
+            f"(usb-path: {usb_path}). No matching hub found in uhubctl output."
+        )
+
+    def _recover_servod(self) -> None:
+        """Attempt to recover servod by power-cycling the USB port via uhubctl."""
+        servo_hostname = self.details["servo_hostname"]
+        servo_port = self.details["servo_port"]
+        board = self.details["board"]
+        model = self.details["model"]
+        servo_serial = self.details["servo_serial"]
+
+        print(
+            f"Warning: servod on port {servo_port} failed to become active. "
+            "Attempting recovery by power cycling USB port via uhubctl..."
+        )
+
+        # 1. Stop servod
+        self._servo_ssh(
+            f"sudo stop servod PORT={servo_port}",
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+        # 2. Find uhubctl target (raises RuntimeError on failure)
+        hub_loc, port = self._find_uhubctl_target(servo_serial)
+        print(f"Power cycling USB port {port} on hub {hub_loc} via uhubctl...")
+        self._servo_ssh(
+            f"sudo uhubctl -l {hub_loc} -p {port} -a cycle",
+        )
+
+        time.sleep(5)
+
+        # 3. Restart servod
+        self._servo_ssh(
+            f"sudo start servod PORT={servo_port} BOARD={board} "
+            f"MODEL={model} SERIALNAME={servo_serial}",
+            check=False,
+        )
+        try:
+            self._servo_ssh(
+                f"servodtool instance wait-for-active --port {servo_port} --timeout 60"
+            )
+            time.sleep(3)
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
                 f"servod failed to become active on {servo_hostname} "
-                f"(port {servo_port}): {e}"
+                f"(port {servo_port}) even after recovery attempt: {e}"
             ) from e
 
     def verify_ec_up(self) -> None:
@@ -231,3 +340,6 @@ class DutHandler(ABC):
     @abstractmethod
     def execute_test_flow(self) -> None:
         """Execute the test flow for the target OS."""
+
+    def cleanup(self) -> None:
+        """Perform any handler-specific cleanup at the end of execution."""

@@ -10,6 +10,7 @@
 #include "host_command.h"
 #include "include/power_button.h"
 #include "mkbp_fifo.h"
+#include "mkbp_input_devices.h"
 #include "power.h"
 #include "tablet_mode.h"
 #include "test/drivers/test_state.h"
@@ -49,6 +50,14 @@ static char *button_debug_state_strings[] = {
 #ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
 static int mock_pb_asserted = -1;
 #endif
+static int mock_eating_release = -1;
+
+int power_button_is_eating_release(void)
+{
+	if (mock_eating_release >= 0)
+		return mock_eating_release;
+	return 0;
+}
 
 struct button_fixture {
 	timestamp_t fake_time;
@@ -81,6 +90,7 @@ static void button_before(void *f)
 
 static void button_after(void *f)
 {
+	mock_eating_release = -1;
 #ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
 	extern int debounced_power_pressed;
 	mock_pb_asserted = -1;
@@ -746,3 +756,54 @@ ZTEST(button, test_keyboard_pb_suspend_missed_release)
 	mock_pb_asserted = -1;
 }
 #endif
+
+/* Test power_button_is_eating_release and MKBP power button event filtering */
+ZTEST(button, test_power_button_is_eating_release)
+{
+	uint32_t event_data = 0;
+
+	/* 1. Default implementation returns 0 */
+	mock_eating_release = -1;
+	zassert_equal(power_button_is_eating_release(), 0);
+
+	/* 2. When eating release is 0: release event IS queued to MKBP FIFO */
+	mock_eating_release = 0;
+	mkbp_clear_fifo();
+	mkbp_button_update(KEYBOARD_BUTTON_POWER, 1);
+	zassert_true(mkbp_get_button_state() & BIT(EC_MKBP_POWER_BUTTON));
+	/* Pop the press event from FIFO */
+	zassert_equal(sizeof(event_data),
+		      mkbp_fifo_get_next_event((uint8_t *)&event_data,
+					       EC_MKBP_EVENT_BUTTON));
+	zassert_true(event_data & BIT(EC_MKBP_POWER_BUTTON));
+
+	/* Release power button: release event is queued to FIFO */
+	mkbp_button_update(KEYBOARD_BUTTON_POWER, 0);
+	zassert_false(mkbp_get_button_state() & BIT(EC_MKBP_POWER_BUTTON));
+	zassert_equal(sizeof(event_data),
+		      mkbp_fifo_get_next_event((uint8_t *)&event_data,
+					       EC_MKBP_EVENT_BUTTON));
+	zassert_false(event_data & BIT(EC_MKBP_POWER_BUTTON));
+
+	/* 3. When eating release is 1: release event is SKIPPED from MKBP FIFO
+	 */
+	mock_eating_release = 1;
+	zassert_equal(power_button_is_eating_release(), 1);
+	mkbp_clear_fifo();
+	mkbp_button_update(KEYBOARD_BUTTON_POWER, 1);
+	zassert_true(mkbp_get_button_state() & BIT(EC_MKBP_POWER_BUTTON));
+	/* Pop the press event from FIFO */
+	zassert_equal(sizeof(event_data),
+		      mkbp_fifo_get_next_event((uint8_t *)&event_data,
+					       EC_MKBP_EVENT_BUTTON));
+	zassert_true(event_data & BIT(EC_MKBP_POWER_BUTTON));
+
+	/* Release power button: release event is eaten and skipped from FIFO */
+	mkbp_button_update(KEYBOARD_BUTTON_POWER, 0);
+	zassert_false(mkbp_get_button_state() & BIT(EC_MKBP_POWER_BUTTON));
+	/* MKBP FIFO should be empty since release event was eaten */
+	zassert_equal(-1, mkbp_fifo_get_next_event((uint8_t *)&event_data,
+						   EC_MKBP_EVENT_BUTTON));
+
+	mock_eating_release = -1;
+}

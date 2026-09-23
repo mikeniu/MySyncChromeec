@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_H_
-#define ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_H_
 
 #include <zephyr/device.h>
 
@@ -27,4 +27,4 @@ int decode_wp_from_sysjump(struct cros_flash_protection *protection,
 			   uint32_t prot_flags, const void *jump_data,
 			   size_t size, int version);
 void prepare_wp_jump(struct cros_flash_protection *protection);
-#endif /* ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_H_ */

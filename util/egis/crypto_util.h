@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef UTIL_EGIS_CRYPTO_UTIL_H_
-#define UTIL_EGIS_CRYPTO_UTIL_H_
+#ifndef PLATFORM_EC_UTIL_EGIS_CRYPTO_UTIL_H_
+#define PLATFORM_EC_UTIL_EGIS_CRYPTO_UTIL_H_
 
 #include <array>
 #include <cstdint>
@@ -68,4 +68,4 @@ void Cleanse(std::span<uint8_t> data);
 
 }  // namespace egis::crypto
 
-#endif  // UTIL_EGIS_CRYPTO_UTIL_H_
+#endif /* PLATFORM_EC_UTIL_EGIS_CRYPTO_UTIL_H_ */

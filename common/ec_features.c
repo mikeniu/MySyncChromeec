@@ -206,6 +206,12 @@ uint32_t get_feature_flags1(void)
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
 		| EC_FEATURE_MASK_1(EC_FEATURE_CONSOLE_LOG_EVENT)
 #endif
+#ifdef CONFIG_PWRMON
+		| EC_FEATURE_MASK_1(EC_FEATURE_PWRMON)
+#endif
+#ifdef CONFIG_BT_PASSTHRU
+		| EC_FEATURE_MASK_1(EC_FEATURE_BT_PASSTHRU)
+#endif
 		;
 	return board_override_feature_flags1(result);
 }

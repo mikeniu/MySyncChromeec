@@ -5,11 +5,11 @@
 
 /* Corsola Hook function  */
 
-#ifndef __CROS_EC_ITE_HOOKS_H
-#define __CROS_EC_ITE_HOOKS_H
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_CORSOLA_INCLUDE_ITE_HOOKS_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_CORSOLA_INCLUDE_ITE_HOOKS_H_
 
 #include "common.h"
 
 __override_proto void board_rt9490_adc_control(void);
 
-#endif /* __CROS_EC_ITE_HOOKS_H */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_CORSOLA_INCLUDE_ITE_HOOKS_H_ */

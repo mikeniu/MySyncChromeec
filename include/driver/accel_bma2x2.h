@@ -5,8 +5,8 @@
 
 /* BMA2x2 gsensor module for Chrome EC */
 
-#ifndef __CROS_EC_ACCEL_BMA2x2_H
-#define __CROS_EC_ACCEL_BMA2x2_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_ACCEL_BMA2X2_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_ACCEL_BMA2X2_H_
 
 #include "accel_bma2x2_public.h"
 
@@ -159,4 +159,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __CROS_EC_ACCEL_BMA2x2_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_ACCEL_BMA2X2_H_ */

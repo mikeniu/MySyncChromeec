@@ -5,8 +5,8 @@
 
 /* USB Extended message buffer */
 
-#ifndef __CROS_EC_USB_EBUF_H
-#define __CROS_EC_USB_EBUF_H
+#ifndef PLATFORM_EC_INCLUDE_USB_EMSG_H_
+#define PLATFORM_EC_INCLUDE_USB_EMSG_H_
 
 #ifdef CONFIG_USB_PD_REV30
 #define EXTENDED_BUFFER_SIZE 260
@@ -23,4 +23,4 @@ struct extended_msg {
 /* Defined in usb_prl_sm.c */
 extern struct extended_msg tx_emsg[CONFIG_USB_PD_PORT_MAX_COUNT];
 extern struct extended_msg rx_emsg[CONFIG_USB_PD_PORT_MAX_COUNT];
-#endif /* __CROS_EC_USB_EBUF_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_EMSG_H_ */

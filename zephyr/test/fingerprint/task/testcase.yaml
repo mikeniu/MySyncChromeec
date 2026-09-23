@@ -80,6 +80,8 @@ tests:
     - prj.conf
 
   fingerprint.task.commands:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_COMMANDS=y
     - CONFIG_PLATFORM_EC_FINGERPRINT_VENDOR_COMMAND=y
@@ -114,12 +116,15 @@ tests:
     - CONFIG_LED=y
     - CONFIG_LED_PWM=y
     - CONFIG_PWM=y
+    - CONFIG_PM=y
     extra_conf_files:
     - prj.conf
     extra_dtc_overlay_files:
     - fp_led.dtsi
 
   fingerprint.task.auth_commands:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS=y
     - CONFIG_EC_HOST_CMD=y
@@ -129,6 +134,8 @@ tests:
     - prj.conf
 
   fingerprint.task.auth_commands_otp:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS=y
     - CONFIG_NPCX_OTP_KEY=y

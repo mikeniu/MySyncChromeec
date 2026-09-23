@@ -373,13 +373,3 @@ int tps_stream_data(const struct i2c_dt_spec *i2c,
 }
 /* LCOV_EXCL_STOP */
 #endif
-
-int tps_rd_received_attention_vdm(
-	const struct i2c_dt_spec *i2c,
-	union reg_received_attention_vdm *received_attention_vdm)
-{
-	return tps_xfer_reg(i2c, REG_RECEIVED_ATTENTION_VDM,
-			    received_attention_vdm->raw_value,
-			    sizeof(union reg_received_attention_vdm),
-			    I2C_MSG_READ);
-}
