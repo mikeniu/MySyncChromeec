@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_F75303_H
-#define __CROS_EC_F75303_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_F75303_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_F75303_H_
 
 #include "i2c.h"
 
@@ -87,4 +87,4 @@ void f75303_update_temperature(int idx);
 }
 #endif
 
-#endif /* __CROS_EC_F75303_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_F75303_H_ */

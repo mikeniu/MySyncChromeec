@@ -5,8 +5,8 @@
 
 /* KX022 gsensor module for Chrome EC */
 
-#ifndef __CROS_EC_ACCEL_KX022_H
-#define __CROS_EC_ACCEL_KX022_H
+#ifndef PLATFORM_EC_DRIVER_ACCEL_KX022_H_
+#define PLATFORM_EC_DRIVER_ACCEL_KX022_H_
 
 /*
  * 7-bit address is 001111Xb. Where 'X' is determined
@@ -136,4 +136,4 @@
 #define KX022_ACCEL_MIN_FREQ 12500
 #define KX022_ACCEL_MAX_FREQ MOTION_MAX_SENSOR_FREQUENCY(1600000, 6250)
 
-#endif /* __CROS_EC_ACCEL_KX022_H */
+#endif /* PLATFORM_EC_DRIVER_ACCEL_KX022_H_ */

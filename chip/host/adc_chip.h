@@ -5,12 +5,12 @@
 
 /* Host-specific ADC module for Chrome EC */
 
-#ifndef __CROS_EC_ADC_CHIP_H
-#define __CROS_EC_ADC_CHIP_H
+#ifndef PLATFORM_EC_CHIP_HOST_ADC_CHIP_H_
+#define PLATFORM_EC_CHIP_HOST_ADC_CHIP_H_
 
 /* Place-holder data structure to define ADC channels. */
 struct adc_t {
 	int unused;
 };
 
-#endif /* __CROS_EC_ADC_CHIP_H */
+#endif /* PLATFORM_EC_CHIP_HOST_ADC_CHIP_H_ */

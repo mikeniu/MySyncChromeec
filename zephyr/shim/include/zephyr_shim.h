@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+/** TODO(b/510249930): Switch to PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_SHIM_H_
+ */
 #ifndef __BOARD_H
 #define __BOARD_H
 

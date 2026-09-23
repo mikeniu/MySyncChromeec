@@ -79,9 +79,9 @@ static struct charge_state_data curr;
 static enum charge_state prev_state;
 static int prev_ac, prev_charge, prev_disp_charge;
 static enum battery_present prev_bp;
-static unsigned int user_current_limit = -1U;
+test_export_static unsigned int user_current_limit = -1U;
 test_export_static timestamp_t shutdown_target_time;
-static timestamp_t precharge_start_time;
+test_export_static timestamp_t precharge_start_time;
 static struct sustain_soc sustain_soc;
 static struct current_limit {
 	uint32_t value; /* Charge limit to apply, in mA */
@@ -117,11 +117,11 @@ struct state {
 } local_state;
 
 /* Is battery connected but unresponsive after precharge? */
-static int battery_seems_dead;
+test_export_static int battery_seems_dead;
 
 static int battery_seems_disconnected;
 
-static int problems_exist;
+test_export_static int problems_exist;
 
 static const char *const prob_text[] = {
 	"static update",     "set voltage",	 "set current", "set mode",
@@ -217,7 +217,7 @@ static int battery_sustainer_set(int8_t lower, int8_t upper)
 	return EC_ERROR_INVAL;
 }
 
-static void battery_sustainer_disable(void)
+test_export_static void battery_sustainer_disable(void)
 {
 	battery_sustainer_set(-1, -1);
 }
@@ -526,7 +526,7 @@ void chgstate_set_manual_voltage(int volt_mv)
 }
 
 /* Force charging off before the battery is full. */
-static int set_chg_ctrl_mode(enum ec_charge_control_mode mode)
+test_export_static int set_chg_ctrl_mode(enum ec_charge_control_mode mode)
 {
 	bool discharge_on_ac = false;
 	int current, voltage;
@@ -643,7 +643,7 @@ static int is_battery_critical(void)
  * will shut down the AP (if the AP is not already off) and then optionally
  * hibernate or cut off battery.
  */
-static int shutdown_on_critical_battery(void)
+test_export_static int shutdown_on_critical_battery(void)
 {
 	if (!is_battery_critical()) {
 		/* Reset shutdown warning time */
@@ -895,7 +895,7 @@ sustain_switch_mode(enum ec_charge_control_mode mode)
 	return new_mode;
 }
 
-static void sustain_battery_soc(void)
+test_export_static void sustain_battery_soc(void)
 {
 	enum ec_charge_control_mode mode = get_chg_ctrl_mode();
 	enum ec_charge_control_mode new_mode;
@@ -917,7 +917,7 @@ static void sustain_battery_soc(void)
 		mode_text[new_mode]);
 }
 
-static void current_limit_battery_soc(void)
+test_export_static void current_limit_battery_soc(void)
 {
 	if (user_current_limit != current_limit.value &&
 	    charge_get_display_charge() / 10 >= current_limit.soc) {
@@ -975,7 +975,7 @@ static int get_desired_input_current(const struct charger_info *const info)
 #endif
 }
 
-static void wakeup_battery(int *need_static)
+test_export_static void wakeup_battery(int *need_static)
 {
 	timestamp_t timestamp;
 #ifndef CONFIG_PRECHARGE_DELAY_MS
@@ -1024,7 +1024,7 @@ __test_only enum charge_state charge_get_state(void)
 	return curr.state;
 }
 
-static void deep_charge_battery(int *need_static)
+test_export_static void deep_charge_battery(int *need_static)
 {
 	if ((curr.state == ST_IDLE) &&
 	    (curr.batt.flags & BATT_FLAG_DEEP_CHARGE)) {
@@ -1054,7 +1054,7 @@ static void deep_charge_battery(int *need_static)
 	}
 }
 
-static void revive_battery(int *need_static)
+test_export_static void revive_battery(int *need_static)
 {
 	if (IS_ENABLED(CONFIG_BATTERY_REQUESTS_NIL_WHEN_DEAD) &&
 	    curr.requested_voltage == 0 && curr.requested_current == 0 &&
@@ -1209,7 +1209,8 @@ static void process_battery_present_change(const struct charger_info *info,
 }
 
 /* Decide on the charge state we are in */
-static void decide_charge_state(int *need_staticp, int *battery_criticalp)
+test_export_static void decide_charge_state(int *need_staticp,
+					    int *battery_criticalp)
 {
 	/*
 	 * Now decide what we want to do about it. We'll normally just pass
@@ -1312,8 +1313,8 @@ static void decide_charge_state(int *need_staticp, int *battery_criticalp)
 }
 
 /* Determine voltage/current to request and make it so */
-static void adjust_requested_vi(const struct charger_info *const info,
-				bool is_full)
+test_export_static void
+adjust_requested_vi(const struct charger_info *const info, bool is_full)
 {
 	/* Turn charger off if it's not needed */
 	if (!IS_ENABLED(CONFIG_CHARGER_MAINTAIN_VBAT) &&
@@ -1996,11 +1997,11 @@ void trigger_ocpc_reset(void)
 /*****************************************************************************/
 /* Host commands */
 
-static enum ec_status
-charge_command_charge_control(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+charge_command_charge_control(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_charge_control *p = args->params;
-	struct ec_response_charge_control *r = args->response;
+	const struct ec_params_charge_control *p = args->input_buf;
+	struct ec_response_charge_control *r = args->output_buf;
 	int rv;
 
 	if (p->cmd == EC_CHARGE_CONTROL_CMD_SET) {
@@ -2008,9 +2009,9 @@ charge_command_charge_control(struct host_cmd_handler_args *args)
 			rv = battery_sustainer_set(p->sustain_soc.lower,
 						   p->sustain_soc.upper);
 			if (rv == EC_RES_UNAVAILABLE)
-				return EC_RES_UNAVAILABLE;
+				return EC_HOST_CMD_UNAVAILABLE;
 			if (rv)
-				return EC_RES_INVALID_PARAM;
+				return EC_HOST_CMD_INVALID_PARAM;
 			if (args->version == 2) {
 				/*
 				 * V2 uses lower == upper to indicate NO_IDLE.
@@ -2027,50 +2028,61 @@ charge_command_charge_control(struct host_cmd_handler_args *args)
 			battery_sustainer_disable();
 		}
 	} else if (p->cmd == EC_CHARGE_CONTROL_CMD_GET) {
+		if (args->output_buf_max < sizeof(*r)) {
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+		}
 		r->mode = get_chg_ctrl_mode();
 		r->sustain_soc.lower = sustain_soc.lower;
 		r->sustain_soc.upper = sustain_soc.upper;
 		if (args->version > 2)
 			r->flags = sustain_soc.flags;
-		args->response_size = sizeof(*r);
-		return EC_RES_SUCCESS;
+		args->output_buf_size = sizeof(*r);
+		return EC_HOST_CMD_SUCCESS;
 	} else {
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	rv = set_chg_ctrl_mode(p->mode);
 	if (rv != EC_SUCCESS)
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_CHARGE_CONTROL, charge_command_charge_control,
-		     EC_VER_MASK(2) | EC_VER_MASK(3));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_CHARGE_CONTROL,
+			     charge_command_charge_control,
+			     EC_VER_MASK(2) | EC_VER_MASK(3),
+			     struct ec_params_charge_control);
 
-static enum ec_status
-charge_command_current_limit(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+charge_command_current_limit(struct ec_host_cmd_handler_args *args)
 {
 	if (args->version == 0) {
-		const struct ec_params_current_limit *p = args->params;
+		const struct ec_params_current_limit *p = args->input_buf;
 		user_current_limit = p->limit;
 		current_limit.value = p->limit;
 	} else {
-		const struct ec_params_current_limit_v1 *p = args->params;
+		const struct ec_params_current_limit_v1 *p = args->input_buf;
+
+		if (args->input_buf_size < sizeof(*p))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
 
 		/* Check if battery state of charge param is within range */
 		if (p->battery_soc > 100) {
 			CPRINTS("Invalid battery_soc: %d", p->battery_soc);
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		}
 
 		current_limit.value = p->limit;
 		current_limit.soc = p->battery_soc;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_CHARGE_CURRENT_LIMIT, charge_command_current_limit,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_CHARGE_CURRENT_LIMIT,
+			     charge_command_current_limit,
+			     EC_VER_MASK(0) | EC_VER_MASK(1),
+			     SMALLEST_TYPE(struct ec_params_current_limit,
+					   struct ec_params_current_limit_v1));
 
 /*
  * Expose charge/battery related state
@@ -2100,36 +2112,47 @@ static int charge_get_charge_state_debug(int param, uint32_t *value)
 	case CS_PARAM_DEBUG_BATT_REMOVED:
 	default:
 		*value = 0;
-		return EC_ERROR_INVAL;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
-	return EC_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-static enum ec_status
-charge_command_charge_state(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+charge_command_charge_state(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_charge_state *in = args->params;
-	struct ec_response_charge_state *out = args->response;
+	const struct ec_params_charge_state *in = args->input_buf;
+	struct ec_response_charge_state *out = args->output_buf;
 	const struct charger_info *info = charger_get_info();
 	uint32_t val;
-	int rv = EC_RES_SUCCESS;
+	int rv = EC_HOST_CMD_SUCCESS;
 	int chgnum = 0;
 
-	if (args->version > 0)
+	if (args->input_buf_size < sizeof(in->cmd))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
+	if (args->version > 0 &&
+	    args->input_buf_size >= sizeof(struct ec_params_charge_state))
 		chgnum = in->chgnum;
 
 	switch (in->cmd) {
 	case CHARGE_STATE_CMD_GET_STATE:
+		if (args->output_buf_max < sizeof(out->get_state))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
 		out->get_state.ac = curr.ac;
 		out->get_state.chg_voltage = curr.chg.voltage;
 		out->get_state.chg_current = curr.chg.current;
 		out->get_state.chg_input_current = curr.chg.input_current;
 		out->get_state.batt_state_of_charge = curr.batt.state_of_charge;
-		args->response_size = sizeof(out->get_state);
+		args->output_buf_size = sizeof(out->get_state);
 		break;
 
 	case CHARGE_STATE_CMD_GET_PARAM:
+		if (args->input_buf_size <
+		    sizeof(in->cmd) + sizeof(in->get_param))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
+		if (args->output_buf_max < sizeof(out->get_param))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
 		val = 0;
 		if (IS_ENABLED(CONFIG_CHARGER_PROFILE_OVERRIDE) &&
 		    in->get_param.param >= CS_PARAM_CUSTOM_PROFILE_MIN &&
@@ -2210,7 +2233,7 @@ charge_command_charge_state(struct host_cmd_handler_args *args)
 			case CS_PARAM_CHG_MIN_REQUIRED_MV:
 				if (charger_get_minimum_charging_mv(chgnum,
 								    &val)) {
-					rv = EC_RES_INVALID_PARAM;
+					rv = EC_HOST_CMD_INVALID_PARAM;
 				};
 				break;
 			case CS_PARAM_CHG_IS_ADAPTER_SUFFICIENT:
@@ -2218,18 +2241,22 @@ charge_command_charge_state(struct host_cmd_handler_args *args)
 				break;
 #endif /* CONFIG_PLATFORM_EC_CHARGER_HYBRID_POWER_BOOST */
 			default:
-				rv = EC_RES_INVALID_PARAM;
+				rv = EC_HOST_CMD_INVALID_PARAM;
 			}
 		}
 
 		/* got something */
 		out->get_param.value = val;
-		args->response_size = sizeof(out->get_param);
+		args->output_buf_size = sizeof(out->get_param);
 		break;
 
 	case CHARGE_STATE_CMD_SET_PARAM:
+		if (args->input_buf_size <
+		    sizeof(in->cmd) + sizeof(in->set_param))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
+
 		if (system_is_locked())
-			return EC_RES_ACCESS_DENIED;
+			return EC_HOST_CMD_ACCESS_DENIED;
 
 		val = in->set_param.value;
 		if (IS_ENABLED(CONFIG_CHARGER_PROFILE_OVERRIDE) &&
@@ -2249,7 +2276,7 @@ charge_command_charge_state(struct host_cmd_handler_args *args)
 			case CS_PARAM_CHG_INPUT_CURRENT:
 				if (charger_set_input_current_limit(chgnum,
 								    val))
-					rv = EC_RES_ERROR;
+					rv = EC_HOST_CMD_ERROR;
 				break;
 			case CS_PARAM_CHG_STATUS:
 			case CS_PARAM_LIMIT_POWER:
@@ -2267,28 +2294,28 @@ charge_command_charge_state(struct host_cmd_handler_args *args)
 			case CS_PARAM_CHG_IS_ADAPTER_SUFFICIENT:
 #endif /* CONFIG_PLATFORM_EC_CHARGER_HYBRID_POWER_BOOST */
 				/* Can't set this */
-				rv = EC_RES_ACCESS_DENIED;
+				rv = EC_HOST_CMD_ACCESS_DENIED;
 				break;
 			case CS_PARAM_CHG_OPTION:
 				if (charger_set_option(val))
-					rv = EC_RES_ERROR;
+					rv = EC_HOST_CMD_ERROR;
 				break;
 			default:
-				rv = EC_RES_INVALID_PARAM;
+				rv = EC_HOST_CMD_INVALID_PARAM;
 			}
 		}
 		break;
 
 	default:
 		CPRINTS("EC_CMD_CHARGE_STATE: bad cmd 0x%x", in->cmd);
-		rv = EC_RES_INVALID_PARAM;
+		rv = EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	return rv;
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_CHARGE_STATE, charge_command_charge_state,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_CHARGE_STATE, charge_command_charge_state,
+			    EC_VER_MASK(0) | EC_VER_MASK(1));
 
 /*****************************************************************************/
 /* Console commands */

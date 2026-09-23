@@ -5,8 +5,8 @@
  * Common functions for stateful LEDs (charger and power)
  */
 
-#ifndef __CROS_EC_ONOFFSTATES_LED_H
-#define __CROS_EC_ONOFFSTATES_LED_H
+#ifndef PLATFORM_EC_INCLUDE_LED_ONOFF_STATES_H_
+#define PLATFORM_EC_INCLUDE_LED_ONOFF_STATES_H_
 
 #include "ec_commands.h"
 
@@ -89,4 +89,4 @@ board_get_led_state(enum led_states desired_state);
 }
 #endif
 
-#endif /* __CROS_EC_ONOFFSTATES_LED_H */
+#endif /* PLATFORM_EC_INCLUDE_LED_ONOFF_STATES_H_ */

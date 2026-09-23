@@ -5,8 +5,8 @@
 
 /* AMD STT (Skin Temperature Tracking) Manager */
 
-#ifndef __CROS_EC_AMD_STT_H
-#define __CROS_EC_AMD_STT_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_AMD_STT_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_AMD_STT_H_
 
 #define AMD_STT_WRITE_SENSOR_VALUE_CMD 0x3A
 
@@ -24,4 +24,4 @@ enum amd_stt_pcb_sensor {
 int board_get_soc_temp_mk(int *temp_mk);
 int board_get_ambient_temp_mk(int *temp_mk);
 
-#endif /* __CROS_EC_AMD_STT_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_AMD_STT_H_ */

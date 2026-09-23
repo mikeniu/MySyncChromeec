@@ -5,8 +5,8 @@
 
 /* Header file for common math functions. */
 
-#ifndef __CROS_EC_MATH_UTIL_H
-#define __CROS_EC_MATH_UTIL_H
+#ifndef PLATFORM_EC_INCLUDE_MATH_UTIL_H_
+#define PLATFORM_EC_INCLUDE_MATH_UTIL_H_
 
 #include "config.h"
 #include "limits.h"
@@ -253,4 +253,4 @@ uint64_t bitmask_uint64(int offset);
 }
 #endif
 
-#endif /* __CROS_EC_MATH_UTIL_H */
+#endif /* PLATFORM_EC_INCLUDE_MATH_UTIL_H_ */

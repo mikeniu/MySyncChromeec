@@ -5,8 +5,8 @@
  * Battery fuel gauge parameters
  */
 
-#ifndef __CROS_EC_BATTERY_FUEL_GAUGE_H
-#define __CROS_EC_BATTERY_FUEL_GAUGE_H
+#ifndef PLATFORM_EC_INCLUDE_BATTERY_FUEL_GAUGE_H_
+#define PLATFORM_EC_INCLUDE_BATTERY_FUEL_GAUGE_H_
 
 #include "battery.h"
 #include "common.h"
@@ -81,4 +81,4 @@ board_battery_imbalance_mv(const struct board_batt_params *info);
 }
 #endif
 
-#endif /* __CROS_EC_BATTERY_FUEL_GAUGE_H */
+#endif /* PLATFORM_EC_INCLUDE_BATTERY_FUEL_GAUGE_H_ */

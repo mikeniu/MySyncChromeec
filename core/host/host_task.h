@@ -5,8 +5,8 @@
 
 /* Emulator task scheduling module */
 
-#ifndef __CROS_EC_HOST_TASK_H
-#define __CROS_EC_HOST_TASK_H
+#ifndef PLATFORM_EC_CORE_HOST_HOST_TASK_H_
+#define PLATFORM_EC_CORE_HOST_HOST_TASK_H_
 
 #include "task.h"
 
@@ -34,4 +34,4 @@ void task_register_interrupt(void);
  */
 pid_t getpid(void);
 
-#endif /* __CROS_EC_HOST_TASK_H */
+#endif /* PLATFORM_EC_CORE_HOST_HOST_TASK_H_ */

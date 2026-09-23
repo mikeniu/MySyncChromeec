@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 zephyr_interface_library_named(test_utils)
+target_include_directories(test_utils INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 zephyr_library_sources(fff.c)
 

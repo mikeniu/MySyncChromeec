@@ -5,8 +5,8 @@
  * Vishay VEML3328 light sensor driver
  */
 
-#ifndef __CROS_EC_ALS_VEML3328_H
-#define __CROS_EC_ALS_VEML3328_H
+#ifndef PLATFORM_EC_DRIVER_ALS_VEML3328_H_
+#define PLATFORM_EC_DRIVER_ALS_VEML3328_H_
 
 #include "accelgyro.h"
 
@@ -88,4 +88,4 @@ struct veml3328_rgb_drv_data_t {
 extern const struct accelgyro_drv veml3328_drv;
 extern const struct accelgyro_drv veml3328_rgb_drv;
 
-#endif /* __CROS_EC_ALS_VEML3328_H */
+#endif /* PLATFORM_EC_DRIVER_ALS_VEML3328_H_ */

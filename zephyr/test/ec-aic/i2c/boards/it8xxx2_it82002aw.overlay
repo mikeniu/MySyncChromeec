@@ -6,6 +6,8 @@
 #include "../../../../program/ec-aic/ite-aic/project.overlay"
 
 &i2c1 {
+	scl-sda-low-timeout = <0>;
+	zephyr,transfer-timeout-ms = <400>;
 	dagwood_eeprom: dagwood-eeprom@50 {
 		compatible = "vnd.i2c-device";
 		reg = <0x50>;

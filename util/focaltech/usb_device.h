@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef UTIL_FOCALTECH_USB_DEVICE_H_
-#define UTIL_FOCALTECH_USB_DEVICE_H_
+#ifndef PLATFORM_EC_UTIL_FOCALTECH_USB_DEVICE_H_
+#define PLATFORM_EC_UTIL_FOCALTECH_USB_DEVICE_H_
 
 #include <atomic>
 #include <chrono>
@@ -65,4 +65,4 @@ class UsbDevice {
 
 }  // namespace focaltech
 
-#endif  // UTIL_FOCALTECH_USB_DEVICE_H_
+#endif /* PLATFORM_EC_UTIL_FOCALTECH_USB_DEVICE_H_ */

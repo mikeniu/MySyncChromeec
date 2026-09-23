@@ -8,8 +8,8 @@
  * @brief Backend API for SYV682X emulator
  */
 
-#ifndef __EMUL_SYV682X_H
-#define __EMUL_SYV682X_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SYV682X_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SYV682X_H_
 
 #include <stdint.h>
 
@@ -158,4 +158,4 @@ int syv682x_emul_get_reg(const struct emul *emul, int reg, uint8_t *val);
 struct i2c_common_emul_data *
 emul_syv682x_get_i2c_common_data(const struct emul *emul);
 
-#endif /* __EMUL_SYV682X_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SYV682X_H_ */

@@ -101,7 +101,7 @@ if (DEFINED CONFIG_ARM)
   zephyr_cc_option(-mno-unaligned-access)
 endif()
 zephyr_cc_option(-Wimplicit-fallthrough)
-zephyr_cc_option(-Wint-conversion)
+zephyr_compile_options($<$<COMPILE_LANGUAGE:C>:-Wint-conversion>)
 
 if (DEFINED CONFIG_RISCV)
   zephyr_cc_option(-fsanitize=integer-divide-by-zero)
@@ -170,6 +170,9 @@ if (DEFINED CONFIG_PLATFORM_EC)
     "${PLATFORM_EC}/include"
     "${PLATFORM_EC}/include/driver"
     "${PLATFORM_EC}/third_party")
+  if (CONFIG_ZTEST)
+    zephyr_include_directories("${PLATFORM_EC}/zephyr/test/test_utils")
+  endif()
 endif()
 
 if (ZEPHYR_PIGWEED_MODULE_DIR)
@@ -190,9 +193,10 @@ if (ZEPHYR_PIGWEED_MODULE_DIR)
                            ${PLATFORM_EC}/zephyr/include/pigweed/pw_zephyr_tokenized_custom_log.h)
 
     include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/backend.cmake")
-    pw_set_backend(pw_log_tokenized.handler platform_ec_log.tokenized_handler)
+    pw_set_backend(pw_log_tokenized.handler pw_build.empty)
     include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log/backend.cmake")
     pw_set_backend(pw_log pw_log_tokenized)
+    target_link_libraries(ec_shim PUBLIC pw_log_tokenized)
   endif()
 endif()
 
@@ -414,14 +418,12 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_BTN_IGN_OUT
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_btn_ign_out.cc")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FP_LED
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_led.cc")
+
+zephyr_library_sources_ifdef(CONFIG_HAS_HOSTCMD "${PLATFORM_EC}/common/host_command.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                                "${PLATFORM_EC}/common/host_command.c")
-if (NOT DEFINED CONFIG_EC_HOST_CMD)
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                                "${PLATFORM_EC}/common/host_command_task.c")
-endif()
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                                "${PLATFORM_EC}/common/host_event_commands.c")
+                                              "${PLATFORM_EC}/common/host_command_task.c")
+zephyr_library_sources_ifdef(CONFIG_HAS_HOSTCMD "${PLATFORM_EC}/common/host_event_commands.c")
+
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
                                                 "${PLATFORM_EC}/common/uart_hostcmd.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_GET_UPTIME_INFO
@@ -834,18 +836,9 @@ if (DEFINED CONFIG_SOC_INTEL_ISH_5_8_0)
   )
 endif()
 
-# Pigweed libraries rely on Zephyr headers that transitively include
-# heap_constants.h. Because pigweed library targets are not created using
-# zephyr_library(), they lacks the implicit dependency on
-# zephyr_generated_headers.  We defer adding this dependency to the top-level
-# directory scope to ensure the Pigweed module has been fully evaluated and the
-# library targets exist.
-#
 # Lists all targets defined with pw_add_library() and pw_add_test()
 function(ec_add_pw_log_zephyr_deps)
-  foreach(lib pw_log_zephyr
-	      platform_ec_log.tokenized_handler
-	      cros.dsp.test
+  foreach(lib cros.dsp.test
 	      dsp.client
 	      dsp.service
 	      math.iir_decimator

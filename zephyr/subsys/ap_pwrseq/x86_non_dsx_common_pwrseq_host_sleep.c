@@ -20,10 +20,10 @@ static void slp_s0_debug_alarm(struct k_work *work)
 }
 static K_WORK_DELAYABLE_DEFINE(slp_s0_debug_alarm_data, slp_s0_debug_alarm);
 
-static enum ec_status
-host_command_slp_s0_debug_alarm(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_slp_s0_debug_alarm(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_set_alarm_slp_s0_dbg *p = args->params;
+	const struct ec_params_set_alarm_slp_s0_dbg *p = args->input_buf;
 	struct k_work_sync work_sync;
 
 	if (p->time < 1)
@@ -32,10 +32,11 @@ host_command_slp_s0_debug_alarm(struct host_cmd_handler_args *args)
 	else
 		k_work_schedule(&slp_s0_debug_alarm_data, K_SECONDS(p->time));
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_SET_ALARM_SLP_S0_DBG,
-		     host_command_slp_s0_debug_alarm, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_SET_ALARM_SLP_S0_DBG,
+			     host_command_slp_s0_debug_alarm, EC_VER_MASK(0),
+			     struct ec_params_set_alarm_slp_s0_dbg);
 
 /**
  * Test the RTC alarm by setting an interrupt on RTC match.
@@ -244,23 +245,8 @@ static void ap_power_sleep_event_handler(struct ap_power_ev_callback *cb,
 		break;
 	}
 }
-
-/*
- * Registers callback for s0ix events.
- */
-static int ap_power_sleep_s0ix_event(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	/*
-	 * Register for all events.
-	 */
-	ap_power_ev_init_callback(
-		&cb, ap_power_sleep_event_handler,
-		AP_POWER_S0IX_SUSPEND_START | AP_POWER_S0IX_SUSPEND |
-			AP_POWER_S0IX_RESUME | AP_POWER_S0IX_RESUME_COMPLETE |
-			AP_POWER_S0IX_RESET_TRACKING);
-	ap_power_ev_add_callback(&cb);
-	return 0;
-}
-SYS_INIT(ap_power_sleep_s0ix_event, APPLICATION, 1);
+AP_POWER_EVENT_CALLBACK_DEFINE(ap_power_sleep_event_handler,
+			       AP_POWER_S0IX_SUSPEND_START,
+			       AP_POWER_S0IX_SUSPEND, AP_POWER_S0IX_RESUME,
+			       AP_POWER_S0IX_RESUME_COMPLETE,
+			       AP_POWER_S0IX_RESET_TRACKING);
