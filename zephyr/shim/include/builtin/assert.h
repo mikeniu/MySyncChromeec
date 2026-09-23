@@ -17,11 +17,6 @@ extern "C" {
 #define ASSERT __ASSERT_NO_MSG
 #define assert __ASSERT_NO_MSG
 
-/* TODO(b/269175417): This should be handled in Zephyr __assert.h */
-#ifndef __ASSERT_UNREACHABLE
-#define __ASSERT_UNREACHABLE CODE_UNREACHABLE
-#endif
-
 #ifdef __cplusplus
 }
 #endif
