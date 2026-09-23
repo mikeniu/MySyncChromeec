@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef _AP_PWRSEQ_SM_H_
-#define _AP_PWRSEQ_SM_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_SM_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_SM_H_
 #include "ap_power/ap_pwrseq_sm_defs.h"
 
 /**
@@ -411,4 +411,4 @@ enum ap_pwrseq_state ap_pwrseq_sm_get_entry_state(void *const data);
  * @retval AP_POWER_STATE_UNDEF If state machine is not doing state transition.
  **/
 enum ap_pwrseq_state ap_pwrseq_sm_get_exit_state(void *const data);
-#endif /* _AP_PWRSEQ_SM_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_SM_H_ */

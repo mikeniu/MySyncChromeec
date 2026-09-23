@@ -3,7 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ZEPHYR_SHIM_USBC_UTIL
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_UTILS_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_UTILS_H_
 
 /*
  * Enable interrupt from the `irq` property of an instance's node.
@@ -132,4 +133,4 @@
 #define NODES_GET_USBC_ID(nodes) GET_ARG_N(1, __DEBRACKET nodes)
 #define NODES_GET_PROP_ID(nodes) GET_ARG_N(2, __DEBRACKET nodes)
 
-#endif /* __CROS_EC_ZEPHYR_SHIM_USBC_UTIL */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_UTILS_H_ */

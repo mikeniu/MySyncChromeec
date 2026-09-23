@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_SHIMMED_TEST_TASKS_H
-#define __CROS_EC_SHIMMED_TEST_TASKS_H
+#ifndef PLATFORM_EC_ZEPHYR_TEST_TASKS_SHIMMED_TEST_TASKS_H_
+#define PLATFORM_EC_ZEPHYR_TEST_TASKS_SHIMMED_TEST_TASKS_H_
 
 /*
  * Manually define these HAS_TASK_* defines. There is a build time assert
@@ -19,4 +19,4 @@
 	CROS_EC_TASK(TASK_2, task2_entry, 0, 512, 1, 0) \
 	CROS_EC_TASK(TASK_3, task3_entry, 0, 512, 0, 0)
 
-#endif /* __CROS_EC_SHIMMED_TEST_TASKS_H */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_TASKS_SHIMMED_TEST_TASKS_H_ */

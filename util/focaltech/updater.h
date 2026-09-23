@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef UTIL_FOCALTECH_UPDATER_H_
-#define UTIL_FOCALTECH_UPDATER_H_
+#ifndef PLATFORM_EC_UTIL_FOCALTECH_UPDATER_H_
+#define PLATFORM_EC_UTIL_FOCALTECH_UPDATER_H_
 
 #include <openssl/sha.h>
 
@@ -121,4 +121,4 @@ inline std::array<uint8_t, SHA256_DIGEST_LENGTH> CalculateSha256(
 
 }  // namespace focaltech
 
-#endif  // UTIL_FOCALTECH_UPDATER_H_
+#endif /* PLATFORM_EC_UTIL_FOCALTECH_UPDATER_H_ */

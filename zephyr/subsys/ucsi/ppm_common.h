@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef UM_PPM_PPM_COMMON_H_
-#define UM_PPM_PPM_COMMON_H_
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_UCSI_PPM_COMMON_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_UCSI_PPM_COMMON_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -43,4 +43,4 @@ struct ucsi_ppm_device *ppm_data_init(const struct ucsi_pd_driver *pd_driver,
 				      union connector_status_t *data,
 				      int num_ports);
 
-#endif /* UM_PPM_PPM_COMMON_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_UCSI_PPM_COMMON_H_ */

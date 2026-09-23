@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef UTIL_ELAN_UTILITY_H_
-#define UTIL_ELAN_UTILITY_H_
+#ifndef PLATFORM_EC_UTIL_ELAN_UTILITY_H_
+#define PLATFORM_EC_UTIL_ELAN_UTILITY_H_
 
 #include <bit>
 #include <concepts>
@@ -124,4 +124,4 @@ void LogErr(std::format_string<Args...> fmt, Args&&... args) {
   std::print(stderr, fmt, std::forward<Args>(args)...);
 }
 
-#endif
+#endif /* PLATFORM_EC_UTIL_ELAN_UTILITY_H_ */

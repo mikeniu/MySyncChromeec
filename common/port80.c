@@ -247,7 +247,24 @@ DECLARE_HOST_COMMAND(EC_CMD_PORT80_READ, port80_command_read,
 
 static void port80_log_resume(void)
 {
+	/* Skip if the last entry is a resume marker (e.g. S0ix churn). */
+	if ((writes > 0) && history[(writes - 1) % ARRAY_SIZE(history)] ==
+				    PORT_80_EVENT_RESUME) {
+		return;
+	}
+
 	/* Store port 80 event so we know where resume happened */
 	port_80_write(PORT_80_EVENT_RESUME);
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, port80_log_resume, HOOK_PRIO_DEFAULT);
+
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD_PORT80_WRITE
+static enum ec_status port80_command_write(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_port80_write *p = args->params;
+
+	port_80_write(p->code);
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_PORT80_WRITE, port80_command_write, EC_VER_MASK(0));
+#endif

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef UTIL_ELAN_IAP_CONTROL_H_
-#define UTIL_ELAN_IAP_CONTROL_H_
+#ifndef PLATFORM_EC_UTIL_ELAN_IAP_CONTROL_H_
+#define PLATFORM_EC_UTIL_ELAN_IAP_CONTROL_H_
 
 #include <libusb-1.0/libusb.h>
 
@@ -162,4 +162,4 @@ class IapControl {
 };
 }  // namespace elan
 
-#endif
+#endif /* PLATFORM_EC_UTIL_ELAN_IAP_CONTROL_H_ */

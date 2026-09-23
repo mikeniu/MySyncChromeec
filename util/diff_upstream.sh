@@ -39,10 +39,10 @@ declare -A repos=(
 
 # All expected diffs (FROMPULLs)
 declare -A expected_diffs=(
-  # b/389761200 17452ff89d458b4201bc1ce2debbb30703f45c0d
-  #   Revert "drivers: watchdog: stm32 iwdg: explicit single channel"
+  # 27cd5256bd6c369ddee54def02515b1edbc417ae
+  #   CHROMIUM: cmake: only require Python 3.11
   ['zephyrproject/zephyr']="\
-    17452ff89d458b4201bc1ce2debbb30703f45c0d \
+    27cd5256bd6c369ddee54def02515b1edbc417ae \
     "
 )
 
@@ -69,41 +69,13 @@ for repo in "${all_repos[@]}"; do
     upstream_commit="${upstream_branch}"
   fi
   case "${upstream_commit}" in
-    # picolibc has a commit out of order
-    b25f4a47784d2c24695977c903fe114565ae2bc6)
-      upstream_commit=1c73900b79dbc02b80d09f5d637382249158e1ec
-      ;;
-    # zephyrproject/modules/hal/intel switched upstream repos here
-    8c6772bb56997da40e3f624192334de22ee5e5a8)
-      upstream_commit=82a33b2de29523d9ce572b3d0110a808665cd3ff
-      ;;
-    # hal_stm32 switched upstream repos here
-    2a535edbfb51d2524578a1b8f8342e9644ac0864)
-      upstream_commit=9d05ebdff47b5071fa092de243a1244e7c27f518
-      ;;
-    # chre
-    9e5f90b27e929ff9803abf3841eb3a452dc4830f)
-      upstream_commit=0e9e07d8eb89107aa57ad25a12ba1ed4112c53ab
-      ;;
-    # pigweed
-    495cbd601502e07c8d39873df8d791100b4a7e38)
-      upstream_commit=58a89e7894dd90be8fab467f9504afa4533b0aa0
-      ;;
-    # zephyr/main
-    dfe251554b26412dd683ee26474925d7132218ac)
-      upstream_commit=458e6f8ae3d
-      ;;
     # nanopb upstream switch
     54a8f364e39bf21e2c5fd3ee7e36557f8b2f6da5)
       upstream_commit=65cbefb4695bc7af1cb733ced99618afb3586b20
       ;;
-    # picolibc upstream switch
-    e16b6e6e69dcceaa778f8eeb68c8e1f70e271aa9)
-      upstream_commit=01254932e8e81085817ed61fd858648584ffe37c
-      ;;
-    # cmsis_6 upstream switch
-    a04b38d91cda4ff3064d67349006f23b2ba8273b)
-      upstream_commit=30a859f44ef8ab4dc8f84b03ed586fd16ccf9d74
+    # hal_intel
+    71e18c0f225e5941cc1fc84f0ae35d61d9c654d0)
+      upstream_commit=1be7610
       ;;
   esac
   echo "==============================="

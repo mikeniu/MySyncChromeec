@@ -4,14 +4,15 @@
  *
  * PS8818 retimer.
  */
+
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_RETIMER_PS8818_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_RETIMER_PS8818_PUBLIC_H_
+
 #include "usb_mux.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifndef __CROS_EC_USB_RETIMER_PS8818_H
-#define __CROS_EC_USB_RETIMER_PS8818_H
 
 #define PS8818_I2C_ADDR0_FLAGS 0x28
 #define PS8818_I2C_ADDR1_FLAGS 0x30
@@ -104,4 +105,4 @@ int ps8818_i2c_field_update8(const struct usb_mux *me, int page, int offset,
 }
 #endif
 
-#endif /* __CROS_EC_USB_RETIMER_PS8818_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_RETIMER_PS8818_PUBLIC_H_ */

@@ -2,9 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+configdefault ZTEST
+	default y
+
 config HW_TEST_ABORT
 	bool "Abort test"
-	select ZTEST
+	depends on ZTEST
 	depends on PLATFORM_EC_PANIC
 	help
 	  The test verify if abort() call works correctly and validates panic
@@ -12,150 +15,165 @@ config HW_TEST_ABORT
 
 config HW_TEST_AES
 	bool "AES test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies AES functions.
 
 config HW_TEST_BBRAM_RETAINED_MEM
 	bool "BBRAM retained memory test"
-	select ZTEST
+	depends on ZTEST
 	depends on PLATFORM_EC_BBRAM_TYPE_RETAINED_MEM
 	help
 	  The test verifies "BBRAM" using retained memory.
 
 config HW_TEST_BENCHMARK
 	bool "Benchmark test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies benchmark feature.
 
 config HW_TEST_BORINGSSL_CRYPTO
 	bool "Benchmark test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies the boringssl library.
 
 config HW_TEST_CORTEXM_FPU
 	bool "Cortex-M FPU test"
-	select ZTEST
+	depends on ZTEST
 	depends on BOARD_FINGERPRINT
 
 config HW_TEST_CRC
 	bool "CRC test"
-	select ZTEST
+	depends on ZTEST
 
 config HW_TEST_EXCEPTION
 	bool "Exception test"
-	select ZTEST
-	select ZTEST_FATAL_HOOK
+	depends on ZTEST
+	depends on ZTEST_FATAL_HOOK
 
 config HW_TEST_EXIT
 	bool "Exit test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies if the exit() call works correctly and validates panic
 	  data.
 
 config HW_TEST_FLASH_PHYSICAL
 	bool "Flash physical test"
-	select ZTEST
+	depends on ZTEST
 	depends on FLASH
 
 config HW_TEST_FLASH_PROTECTION
 	bool "Flash protection test"
-	select ZTEST
+	depends on ZTEST
 	depends on PLATFORM_EC_FLASH_CROS
 
 config HW_TEST_FLASH_PROTECTION_RW
 	bool "Flash protection RW test"
-	select ZTEST
+	depends on ZTEST
 	depends on PLATFORM_EC_FLASH_CROS
 
 config HW_TEST_FLASH_WRITE_PROTECT
 	bool "Flash write protect test"
-	select ZTEST
+	depends on ZTEST
 	depends on PLATFORM_EC_FLASH_CROS
+
+config HW_TEST_FP_BUFFER_CLEAR
+	bool "fp_buffer clear test"
+	select ZTEST
+	depends on BOARD_FINGERPRINT
+	help
+	  The test verifies if the fp_buffer is cleared after reboot.
 
 config HW_TEST_FP_TRANSPORT
 	bool "FP transport layer test"
-	select ZTEST
+	depends on ZTEST
 	depends on EC_HOST_CMD
 
 config HW_TEST_FPSENSOR_AUTH_CRYPTO_STATEFUL
 	bool "FP sensor auth crypto stateful test"
-	select ZTEST
+	depends on ZTEST
 	select MOCK_ROLLBACK
 	select MOCK_OTP if NPCX_OTP_KEY
 
 config HW_TEST_FPSENSOR_AUTH_CRYPTO_STATELESS
 	bool "FP sensor auth crypto stateless test"
-	select ZTEST
+	depends on ZTEST
 
 config HW_TEST_FPSENSOR_CRYPTO
 	bool "FP sensor crypto test"
-	select ZTEST
+	depends on ZTEST
 
 config HW_TEST_FPSENSOR_DEBUG
 	bool "FP sensor debug test"
-	select ZTEST
+	depends on ZTEST
 
 config HW_TEST_FPSENSOR_HW
 	bool "FP sensor hw test"
-	select ZTEST
+	depends on ZTEST
 
 config HW_TEST_FPSENSOR_UTILS
 	bool "FP sensor utils test"
-	select ZTEST
+	depends on ZTEST
 
 config HW_TEST_FTRAPV
 	bool "ftrapv test"
-	select ZTEST
+	depends on ZTEST
 	depends on BOARD_FINGERPRINT
 	help
 	  The test verify if int overflow causes a crash.
 
 config HW_TEST_LIBC_PRINTF
 	bool "libc printf test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  Prints a hardcoded string to check by a test runner.
 
 config HW_TEST_LIBCXX
 	bool "libcxx test"
-	select ZTEST
+	depends on ZTEST
 	select XSI_SINGLE_PROCESS
 	help
 	  The test verifies time measurement system_clock vs udelay.
 
 config HW_TEST_MALLOC
 	bool "malloc test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies basic malloc operations.
 
 config HW_TEST_OTP_KEY
 	bool "OTP key test"
-	select ZTEST
+	depends on ZTEST
 	select MOCK_OTP
 	help
 		The test verifies basic OTP key functionality
 
 config HW_TEST_NULL_POINTER
 	bool "null pointer test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies null pointer dereference crashes.
 
 config HW_TEST_PANIC
 	bool "Panic test"
-	select ZTEST
+	depends on ZTEST
 	depends on ARM || RISCV
 	help
 	  The test verifies panic data.
 
+config HW_TEST_PANIC_STRIP_GPR
+	bool "Panic strip GPR test"
+	depends on ZTEST
+	depends on ARM || RISCV
+	help
+	  The test verifies that general purpose registers are
+	  stripped during panic.
+
 config HW_TEST_PANIC_DATA
 	bool "Panic data test"
-	select ZTEST
+	depends on ZTEST
 	select ASSERT
 	select PLATFORM_EC_DEBUG_ASSERT
 	help
@@ -163,46 +181,46 @@ config HW_TEST_PANIC_DATA
 
 config HW_TEST_PMP_ENTRIES
 	bool "pmp entries test"
-	select ZTEST
+	depends on ZTEST
 	depends on RISCV_PMP
 	help
 	  The test verifies the pmp entries in both RO and RW.
 
 config HW_TEST_PRINTF
 	bool "printf test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies printf related functions.
 
 config HW_TEST_QUEUE
 	bool "Queue test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies queue functionality in EC.
 
 config HW_TEST_RAM_LOCK
 	bool "NPCX RAM lock test"
-	select ZTEST
+	depends on ZTEST
 	depends on NPCX_RAM_LOCK
 	help
 	  The test verifies ram lock function of NPCX chip.
 
 config HW_TEST_RESTRICTED_CONSOLE
 	bool "Restricted console test"
-	select ZTEST
+	depends on ZTEST
 	depends on BOARD_FINGERPRINT
 	help
 	  The test verifies restricted console.
 
 config HW_TEST_REBOOT
 	bool "Reboot test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies basic reboot functionality.
 
 config HW_TEST_RNG_BENCHMARK
 	bool "RNG benchmark test"
-	select ZTEST
+	depends on ZTEST
 	depends on BOARD_FINGERPRINT
 	help
 	  The test measures performance of the hardware (TRNG) compared to the
@@ -210,14 +228,14 @@ config HW_TEST_RNG_BENCHMARK
 
 config HW_TEST_ROLLBACK
 	bool "Rollback test"
-	select ZTEST
+	depends on ZTEST
 	depends on BOARD_FINGERPRINT
 	help
 	  The test verifies rollback regions functionality.
 
 config HW_TEST_ROLLBACK_MINIMAL_VERSION
 	bool "Rollback minimal version test"
-	select ZTEST
+	depends on ZTEST
 	depends on BOARD_FINGERPRINT
 	depends on PLATFORM_EC_ROLLBACK
 	help
@@ -226,14 +244,14 @@ config HW_TEST_ROLLBACK_MINIMAL_VERSION
 
 config HW_TEST_ROLLBACK_LOCK_PANIC
 	bool "Rollback lock panic test"
-	select ZTEST
+	depends on ZTEST
 	depends on BOARD_FINGERPRINT
 	help
 	  The test verifies that panic occurs if function mpu_lock_rollback fails.
 
 config HW_TEST_ROLLBACK_ENTROPY
 	bool "Rollback entropy test"
-	select ZTEST
+	depends on ZTEST
 	select MOCK_OTP if NPCX_OTP_KEY
 	depends on PLATFORM_EC_ROLLBACK
 	help
@@ -241,93 +259,93 @@ config HW_TEST_ROLLBACK_ENTROPY
 
 config HW_TEST_RTC_NPCX9
 	bool "RTC NPCX9 test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies NPCX RTC functionality
 
 config HW_TEST_SBRK
 	bool "SBRK test"
-	select ZTEST
+	depends on ZTEST
 	depends on NEWLIB_LIBC_SUPPORTED
 	help
 	  The test verifies sbrk return values.
 
 config HW_TEST_SHA256
 	bool "SHA256 test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies SHA256 functions.
 
 config HW_TEST_SHA256_UNROLLED
 	bool "SHA256 unrolled test"
-	select ZTEST
+	depends on ZTEST
 	select PLATFORM_EC_SHA256_UNROLLED
 	help
 	  The test verifies SHA256 functions with forced unrolled config.
 
 config HW_TEST_STATIC_IF
 	bool "STATIC_IF test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies SHA256 functions with forced unrolled config.
 
 config HW_TEST_STD_VECTOR
 	bool "std_vector test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies std::vector and dynamic memory allocation.
 
 config HW_TEST_STDLIB
 	bool "stdlib test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test builtin stdlib functions used by Zephyr.
 
 config HW_TEST_TIMER
 	bool "timer test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies some functions defined in timer.h.
 
 config HW_TEST_TPM_SEED_CLEAR
 	bool "TPM seed clear test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies if the tpm seed is cleared after reboot.
 
 config HW_TEST_SYSTEM_IS_LOCKED
 	bool "system_is_locked test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies system_is_locked function with wp on/off.
 
 config HW_TEST_UNALIGNED_ACCESS
 	bool "Unaligned access test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies unaligned access works properly.
 
 config HW_TEST_UNALIGNED_ACCESS_BENCHMARK
 	bool "Unaligned access benchmark test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The benchmark test of unaligned access.
 
 config HW_TEST_UTILS
 	bool "Utils test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies util functions.
 
 config HW_TEST_UTILS_STR
 	bool "Utils string test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies util string functions.
 
 config HW_TEST_WATCHDOG
 	bool "Watchdog test"
-	select ZTEST
+	depends on ZTEST
 	help
 	  The test verifies that the watchdog fires on a busy loop.
 

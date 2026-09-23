@@ -3,8 +3,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef DT_BINDINGS_GPIO_DEFINES_H_
-#define DT_BINDINGS_GPIO_DEFINES_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DT_BINDINGS_GPIO_DEFINES_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DT_BINDINGS_GPIO_DEFINES_H_
 
 #include <zephyr/dt-bindings/gpio/gpio.h>
 
@@ -160,4 +160,4 @@
 #define GPIO_INT_LEVEL_ACTIVE \
 	(GPIO_INT_ENABLE | GPIO_INT_LEVELS_LOGICAL | GPIO_INT_HIGH_1)
 
-#endif /* DT_BINDINGS_GPIO_DEFINES_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DT_BINDINGS_GPIO_DEFINES_H_ */

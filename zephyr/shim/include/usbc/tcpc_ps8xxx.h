@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_TCPC_PS8XXX_H
-#define __CROS_EC_TCPC_PS8XXX_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_PS8XXX_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_PS8XXX_H_
 
 #include "driver/tcpm/ps8xxx_public.h"
 #include "usbc/utils.h"
@@ -44,4 +44,4 @@ DT_FOREACH_STATUS_OKAY(PS8XXX_COMPAT, TCPC_VERIFY_NO_FLAGS_ACTIVE_ALERT_HIGH)
 }
 #endif
 
-#endif /* __CROS_EC_TCPC_PS8XXX_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_PS8XXX_H_ */

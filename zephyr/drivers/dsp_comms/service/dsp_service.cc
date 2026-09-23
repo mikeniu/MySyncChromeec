@@ -56,23 +56,19 @@ Driver driver(DT_INST_REG_ADDR(0),
 
 }  // namespace cros::dsp::service
 
-static void dsp_service_startup(struct ap_power_ev_callback* cb,
+static void dsp_service_startup(struct ap_power_ev_callback*,
                                 struct ap_power_ev_data) {
+  static bool started;
+
+  if (started) {
+    return;
+  }
   /* Only run this once */
-  ap_power_ev_remove_callback(cb);
+  started = true;
 
   cros::dsp::service::driver.Init().IgnoreError();
 }
-
-static int init_driver() {
-  static struct ap_power_ev_callback cb;
-
-  ap_power_ev_init_callback(&cb, dsp_service_startup, AP_POWER_STARTUP);
-  ap_power_ev_add_callback(&cb);
-  return 0;
-}
-
-SYS_INIT(init_driver, APPLICATION, 50);
+AP_POWER_EVENT_CALLBACK_DEFINE(dsp_service_startup, AP_POWER_STARTUP);
 
 static inline int ParseGetCbiFlagsRequest(
     const cros_dsp_comms_GetCbiFlagsRequest& request,
