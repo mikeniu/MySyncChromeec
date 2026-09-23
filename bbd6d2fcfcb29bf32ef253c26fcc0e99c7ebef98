@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48798c17_d7a28db7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-23T19:54:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** The explicit size validation correctly protects against out-of-bounds memory reads for version 1 requests, validating the buffer size before accessing version-specific fields.\n*   **Architecture \u0026 Component Fit:** The logic fits perfectly within the existing Zephyr host command framework. Placing the conditional bounds validation within the version-specific `v1` handlers cleanly addresses the `SMALLEST_TYPE` framework limitation while keeping preconditions close to the consumer.\n*   **Code Simplicity:** The implementation is minimal and as simple as possible. Redundant checks for the base `v0` version were successfully removed, and the `sizeof(*params)` idiom is consistently applied.\n*   **Idiomaticity \u0026 Readability:** Excellent. The logic correctly surfaces `EC_HOST_CMD_REQUEST_TRUNCATED`. The tests idiomatically construct explicit structure payloads and extract descriptive constants (`truncated_size`) without `C`-style casting or manual offsets.\n*   **Testing \u0026 Test Coverage:** Comprehensive automated tests have been thoughtfully added to verify the `EC_HOST_CMD_REQUEST_TRUNCATED` error branches for `EC_CMD_FP_MODE`, `EC_CMD_FP_FRAME`, and `EC_CMD_FP_TEMPLATE_LOAD` endpoints.\n*   **CL Size \u0026 Scope:** Size: M (+55, -2). The CL is focused strictly on implementing explicit bounds checking for versioned host commands and remains tightly scoped. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8434542_f97df8be-5256-4c6f-a7cb-916e99bbfc39.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "bbd6d2fcfcb29bf32ef253c26fcc0e99c7ebef98",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
