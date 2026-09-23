@@ -3,11 +3,11 @@
  * found in the LICENSE file.
  */
 
-#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_PAL_H_
-#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_PAL_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN_SERIES_PAL_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN_SERIES_PAL_H_
 
-#include "fingerprint_elan80series_config.h"
-#include "fingerprint_elan80series_private.h"
+#include "fingerprint_elan_series_config.h"
+#include "fingerprint_elan_series_private.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -203,5 +203,5 @@ uint32_t __unused elan_get_tick(void);
  */
 int __unused elan_register_initialization(void);
 
-#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_PAL_H_ \
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN_SERIES_PAL_H_ \
 	*/

@@ -3,22 +3,22 @@
  * found in the LICENSE file.
  */
 
-#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ELAN80SERIES_H_
-#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ELAN80SERIES_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ELAN_SERIES_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ELAN_SERIES_H_
 
 /**
  * Stop SPI transactions
  *
  * @param target The target emulator
  */
-void elan80series_stop_spi(const struct emul *target);
+void elan_series_stop_spi(const struct emul *target);
 
 /**
  * Start SPI transactions
  *
  * @param target The target emulator
  */
-void elan80series_start_spi(const struct emul *target);
+void elan_series_start_spi(const struct emul *target);
 
 /**
  * Set the Hardware ID (HWID) registers on the Elan80series emulator.
@@ -30,7 +30,7 @@ void elan80series_start_spi(const struct emul *target);
  * @param hwid_lo The low byte of the 16-bit HWID
  * @param hwid_hi The high byte of the 16-bit HWID
  */
-void elan80series_set_hwid(const struct emul *target, uint8_t hwid_lo,
-			   uint8_t hwid_hi);
+void elan_series_set_hwid(const struct emul *target, uint8_t hwid_lo,
+			  uint8_t hwid_hi);
 
-#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ELAN80SERIES_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ELAN_SERIES_H_ */

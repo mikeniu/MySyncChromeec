@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_H_
-#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN_SERIES_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN_SERIES_H_
 
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/spi.h>
 
 #include <drivers/fingerprint.h>
 
-struct elan80series_cfg {
+struct elan_series_cfg {
 	struct spi_dt_spec spi;
 	struct gpio_dt_spec interrupt;
 	struct gpio_dt_spec reset_pin;
@@ -20,12 +20,12 @@ struct elan80series_cfg {
 	struct fingerprint_image_frame_params sensor_image_configs[];
 };
 
-struct elan80series_data {
+struct elan_series_data {
 	const struct device *dev;
 	fingerprint_callback_t callback;
 	struct gpio_callback irq_cb;
 	uint16_t errors;
 };
 
-#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_H_ \
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN_SERIES_H_ \
 	*/

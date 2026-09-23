@@ -191,13 +191,13 @@ config EMUL_EGIS660
 	  that can be issued by the public driver (without EGIS private
 	  library)
 
-config EMUL_ELAN80SERIES
-	bool "ELAN80SERIES fingerprint sensor emulator"
+config EMUL_ELAN_SERIES
+	bool "ELAN_SERIES fingerprint sensor emulator"
 	depends on ZTEST && ARCH_POSIX
 	depends on DT_HAS_ELAN_ELAN80SG_ENABLED
 	default y
 	help
-	  This option enables the ELAN80SERIES fingerprint sensor emulator.
+	  This option enables the Elan series fingerprint sensor emulator.
 	  It supports only basic commands (get hardware id, enter low power
 	  mode) that can be issued by the public driver (without ELAN private
 	  library)
