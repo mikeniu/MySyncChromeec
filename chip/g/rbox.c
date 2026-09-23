@@ -4,13 +4,18 @@
  */
 
 #include "clock.h"
+#include "console.h"
 #include "ec_commands.h"
+#include "extension.h"
 #include "hooks.h"
 #include "rdd.h"
 #include "registers.h"
 #include "system.h"
 #include "timer.h"
+#include "util.h"
 
+#define CPRINTS(format, args...) cprints(CC_RBOX, format, ## args)
+#define RBOX_LOCKOUT_MAX_SEC 600
 
 void rbox_clear_wakeup(void)
 {
@@ -153,3 +158,93 @@ static void rbox_init(void)
 	       GC_RBOX_FUSE_CTRL_OVERRIDE_FUSE_READY_MASK);
 }
 DECLARE_HOOK(HOOK_INIT, rbox_init, HOOK_PRIO_DEFAULT - 1);
+
+static void rbox_lockout_set_hw(int enable)
+{
+	uint32_t mask = GC_RBOX_CHECK_OUTPUT_PWRB_OUT_MASK; /* Bit 2 (0x4) */
+
+	if (enable) {
+		/* 1. Disable Refresh+Power (COMBO0) hardware EC reset */
+		GWRITE(RBOX, DEBUG_KEY_COMBO0, 0x0);
+
+		/* 2. Force PWRB_OUT (bit 2) output-enabled HIGH (1 = unpressed) */
+		GWRITE_FIELD(RBOX, OVERRIDE_OUTPUT, VAL,
+			     GREAD_FIELD(RBOX, OVERRIDE_OUTPUT, VAL) | mask);
+		GWRITE_FIELD(RBOX, OVERRIDE_OUTPUT, OEN,
+			     GREAD_FIELD(RBOX, OVERRIDE_OUTPUT, OEN) | mask);
+		GWRITE_FIELD(RBOX, OVERRIDE_OUTPUT, EN,
+			     GREAD_FIELD(RBOX, OVERRIDE_OUTPUT, EN) | mask);
+	} else {
+		/* 1. Return PWRB_OUT (bit 2) to hardware passthrough */
+		GWRITE_FIELD(RBOX, OVERRIDE_OUTPUT, EN,
+			     GREAD_FIELD(RBOX, OVERRIDE_OUTPUT, EN) & ~mask);
+		GWRITE_FIELD(RBOX, OVERRIDE_OUTPUT, OEN,
+			     GREAD_FIELD(RBOX, OVERRIDE_OUTPUT, OEN) & ~mask);
+
+		/* 2. Re-enable Refresh+Power (COMBO0 = 0xC0) */
+		GWRITE(RBOX, DEBUG_KEY_COMBO0, 0xC0);
+	}
+}
+
+static void rbox_lockout_expire(void)
+{
+	CPRINTS("RBOX lockout expired; restoring passthrough");
+	rbox_lockout_set_hw(0);
+}
+DECLARE_DEFERRED(rbox_lockout_expire);
+
+static void rbox_set_lockout(uint16_t timeout_sec)
+{
+	if (timeout_sec > RBOX_LOCKOUT_MAX_SEC)
+		timeout_sec = RBOX_LOCKOUT_MAX_SEC;
+
+	if (timeout_sec == 0) {
+		hook_call_deferred(&rbox_lockout_expire_data, -1);
+		rbox_lockout_set_hw(0);
+		CPRINTS("RBOX lockout disabled");
+		return;
+	}
+
+	rbox_lockout_set_hw(1);
+	/* Keep Cr50 awake while timer is active and schedule auto-revert */
+	delay_sleep_by((uint32_t)timeout_sec * SECOND);
+	hook_call_deferred(&rbox_lockout_expire_data,
+			   (uint32_t)timeout_sec * SECOND);
+	CPRINTS("RBOX lockout enabled for %d s", timeout_sec);
+}
+
+static int command_rbox_lockout(int argc, char **argv)
+{
+	char *e;
+	int sec = 0;
+
+	if (argc > 1) {
+		sec = strtoi(argv[1], &e, 10);
+		if (*e || sec < 0)
+			return EC_ERROR_PARAM1;
+		if (sec > RBOX_LOCKOUT_MAX_SEC)
+			sec = RBOX_LOCKOUT_MAX_SEC;
+		rbox_set_lockout((uint16_t)sec);
+	}
+	ccprintf("OVERRIDE_OUTPUT=0x%08x DEBUG_KEY_COMBO0=0x%02x\n",
+		 GREG32(RBOX, OVERRIDE_OUTPUT), GREAD(RBOX, DEBUG_KEY_COMBO0));
+	return EC_SUCCESS;
+}
+DECLARE_SAFE_CONSOLE_COMMAND(rboxlockout, command_rbox_lockout, "[timeout_sec]",
+			     "Lock out PWRB_OUT and Refresh+Power");
+
+static enum vendor_cmd_rc vc_rbox_lockout(enum vendor_cmd_cc code,
+					  void *buf, size_t input_size,
+					  size_t *response_size)
+{
+	uint16_t timeout_sec = 0;
+
+	*response_size = 0;
+	if (input_size >= sizeof(uint16_t)) {
+		const uint8_t *in = buf;
+		timeout_sec = ((uint16_t)in[0] << 8) | in[1];
+	}
+	rbox_set_lockout(timeout_sec);
+	return VENDOR_RC_SUCCESS;
+}
+DECLARE_VENDOR_COMMAND(VENDOR_CC_RBOX_LOCKOUT, vc_rbox_lockout);

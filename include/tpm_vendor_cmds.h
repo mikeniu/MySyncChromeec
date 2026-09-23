@@ -212,6 +212,9 @@ enum vendor_cmd_cc {
 	 */
 	VENDOR_CC_GET_CR50_METRICS = 73,
 
+	/* Sentinel PoC: Override PWRB_OUT high and disable Refresh+Power (COMBO0) with <=600s timer */
+	VENDOR_CC_RBOX_LOCKOUT = 84,
+
 	/*
 	 * Used for UMA collection for feature launch. After feature launch,
 	 * this can be removed as long as the value is reserved.
