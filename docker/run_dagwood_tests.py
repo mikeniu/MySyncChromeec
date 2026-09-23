@@ -43,8 +43,8 @@ def main():
     # Join twister args into a space-separated string for bash -c
     twister_cmd = " ".join(twister_args)
     cmd = [run_docker_sh]
-    if not args.update:
-        cmd.append("--fast")
+    if args.update:
+        cmd.append("--update")
     cmd.extend(
         [
             "bash",
