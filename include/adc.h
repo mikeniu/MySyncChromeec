@@ -5,8 +5,8 @@
 
 /* ADC interface for Chrome EC */
 
-#ifndef __CROS_EC_ADC_H
-#define __CROS_EC_ADC_H
+#ifndef PLATFORM_EC_INCLUDE_ADC_H_
+#define PLATFORM_EC_INCLUDE_ADC_H_
 
 #include "adc_chip.h"
 #include "common.h"
@@ -90,4 +90,4 @@ int adc_set_watchdog_delay(int delay_ms);
 }
 #endif
 
-#endif /* __CROS_EC_ADC_H */
+#endif /* PLATFORM_EC_INCLUDE_ADC_H_ */

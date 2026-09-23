@@ -250,10 +250,11 @@ test_export_static void process_tx_irq(const struct device *dev)
 
 	if (!ring_buf_is_empty(tx_ring_buf)) {
 		uint8_t *data;
-		int data_size = ring_buf_get_claim(tx_ring_buf, &data, 16);
+		int data_size =
+			MIN(ring_buf_get_ptr(tx_ring_buf, &data, 0), 16U);
 
 		filled = uart_fifo_fill(bus, data, data_size);
-		ring_buf_get_finish(tx_ring_buf, max(filled, 0));
+		ring_buf_consume(tx_ring_buf, max(filled, 0));
 	}
 
 	if (filled <= 0 && uart_irq_tx_complete(bus)) {
@@ -269,16 +270,16 @@ test_export_static void find_header(const struct device *dev)
 
 	while (!ring_buf_is_empty(rx_ring_buf)) {
 		uint8_t *data;
-		uint32_t claimed = ring_buf_get_claim(rx_ring_buf, &data, 512);
+		uint32_t claimed = ring_buf_get_ptr(rx_ring_buf, &data, 0);
 
 		uint8_t *ptr = memchr(data, HEADER_MAGIC, claimed);
 
 		if (!ptr) {
-			ring_buf_get_finish(rx_ring_buf, claimed);
+			ring_buf_consume(rx_ring_buf, claimed);
 			continue;
 		}
 
-		ring_buf_get_finish(rx_ring_buf, ptr - data);
+		ring_buf_consume(rx_ring_buf, ptr - data);
 		break;
 	}
 }
@@ -312,7 +313,7 @@ test_export_static void process_rx_fifo(const struct device *dev)
 		if (msg.header.payload_len > ONE_WIRE_UART_MAX_PAYLOAD_SIZE ||
 		    (!msg.header.ack && !msg.header.reset &&
 		     msg.header.payload_len < 1)) {
-			ring_buf_get(rx_ring_buf, NULL, 1);
+			ring_buf_consume(rx_ring_buf, 1);
 			continue;
 		}
 
@@ -328,7 +329,7 @@ test_export_static void process_rx_fifo(const struct device *dev)
 
 		/* bad checksum, drop 1 byte and loop again */
 		if (!verify_checksum(&msg)) {
-			ring_buf_get(rx_ring_buf, NULL, 1);
+			ring_buf_consume(rx_ring_buf, 1);
 			continue;
 		}
 
@@ -357,7 +358,8 @@ test_export_static void process_rx_fifo(const struct device *dev)
 		}
 
 		/* drop `len` bytes from `rx_ring_buf` */
-		ring_buf_get(rx_ring_buf, NULL, len);
+		ring_buf_consume(rx_ring_buf,
+				 MIN(len, ring_buf_size_get(rx_ring_buf)));
 	}
 }
 

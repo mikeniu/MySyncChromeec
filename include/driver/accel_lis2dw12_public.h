@@ -5,8 +5,8 @@
 
 /* LIS2DW12 gsensor module for Chrome EC */
 
-#ifndef __CROS_EC_DRIVER_ACCEL_LIS2DW12_PUBLIC_H
-#define __CROS_EC_DRIVER_ACCEL_LIS2DW12_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_ACCEL_LIS2DW12_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_ACCEL_LIS2DW12_PUBLIC_H_
 
 #include "config.h"
 #include "gpio_signal.h"
@@ -42,4 +42,4 @@ void lis2dw12_interrupt(enum gpio_signal signal);
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_ACCEL_LIS2DW12_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_ACCEL_LIS2DW12_PUBLIC_H_ */

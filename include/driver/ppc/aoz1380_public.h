@@ -11,8 +11,8 @@
  * controlled PPC chips that are similar to the AOZ1380
  */
 
-#ifndef __CROS_EC_AOZ1380_PUBLIC_H
-#define __CROS_EC_AOZ1380_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_PPC_AOZ1380_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_PPC_AOZ1380_PUBLIC_H_
 
 #include "usb_pd_tcpm.h"
 
@@ -48,4 +48,4 @@ void aoz1380_interrupt(int port);
 }
 #endif
 
-#endif /* defined(__CROS_EC_AOZ1380_H) */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_PPC_AOZ1380_PUBLIC_H_ */

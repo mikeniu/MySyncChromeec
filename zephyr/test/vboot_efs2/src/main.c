@@ -27,6 +27,8 @@
 
 #define SERIAL_BUFFER_SIZE DT_PROP(DT_NODELABEL(test_uart), buffer_size)
 
+static uint8_t discard_buf[SERIAL_BUFFER_SIZE];
+
 static int show_power_shortage_called;
 void show_power_shortage(void)
 {
@@ -168,7 +170,8 @@ static void reply_cr50_payload(const struct device *dev, void *user_data)
 		while (bytes_read == sizeof(req) &&
 		       req.magic != CR50_PACKET_MAGIC) {
 			/* Consume one byte and then peek again. */
-			serial_vnd_read_out_data(uart_shell_dev, NULL, 1);
+			serial_vnd_read_out_data(uart_shell_dev, discard_buf,
+						 1);
 			bytes_read = serial_vnd_peek_out_data(
 				uart_shell_dev, (void *)&req, sizeof(req));
 		}
@@ -179,9 +182,9 @@ static void reply_cr50_payload(const struct device *dev, void *user_data)
 			 */
 			if (req.size + sizeof(req) <=
 			    serial_vnd_out_data_size_get(uart_shell_dev)) {
-				serial_vnd_read_out_data(uart_shell_dev, NULL,
-							 req.size +
-								 sizeof(req));
+				serial_vnd_read_out_data(
+					uart_shell_dev, discard_buf,
+					req.size + sizeof(req));
 				serial_vnd_queue_in_data(
 					uart_shell_dev, user_data,
 					sizeof(struct cr50_comm_response));
@@ -191,7 +194,7 @@ static void reply_cr50_payload(const struct device *dev, void *user_data)
 		/* Packet mode is off, so just consume enough bytes from the out
 		 * buffer to clear it.
 		 */
-		serial_vnd_read_out_data(uart_shell_dev, NULL,
+		serial_vnd_read_out_data(uart_shell_dev, discard_buf,
 					 SERIAL_BUFFER_SIZE);
 	}
 }
@@ -323,7 +326,8 @@ void vboot_efs2_cleanup(void *fixture)
 				 EC_RESET_FLAG_AP_IDLE);
 	vboot_disable_pd();
 	serial_vnd_set_callback(uart_shell_dev, NULL, NULL);
-	serial_vnd_read_out_data(uart_shell_dev, NULL, SERIAL_BUFFER_SIZE);
+	serial_vnd_read_out_data(uart_shell_dev, discard_buf,
+				 SERIAL_BUFFER_SIZE);
 }
 
 ZTEST_SUITE(vboot_efs2, NULL, vboot_efs2_setup, NULL, vboot_efs2_cleanup, NULL);

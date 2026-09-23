@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_KB8010_H
-#define EMUL_KB8010_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_KB8010_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_KB8010_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/sys/slist.h>
@@ -17,4 +17,4 @@
  */
 void kb8010_emul_set_reset(const struct emul *emul, bool assert_reset);
 
-#endif /* EMUL_KB8010_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_KB8010_H_ */

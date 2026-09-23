@@ -6,6 +6,7 @@
 /* c1nv program common DTS includes */
 
 #include <cros/integrated_fwid.dtsi>
+#include <dt-bindings/macros.h>
 
 /* Include the standard and OEM schema templates */
 #include <cros/cbi_ufsc_std_schema.dtsi>
@@ -18,6 +19,7 @@
 #include "../adc.dtsi"
 #include "../common.dtsi"
 #include "battery.dtsi"
+#include <c1nv/overlay.dtsi>
 
 /* c1nv project DTS includes */
 
@@ -44,4 +46,31 @@
 			size = <0x1000>;
 		};
 	};
+};
+
+&uart4 {
+	status = "okay";
+	current-speed = <3333333>;
+	pinctrl-0 = <&uart4_sout_gp35>;
+	pinctrl-names = "default";
+	data-bits = <7>;
+	tx-invert;
+
+	uart4_dev0: uart4_dev0 {
+		status = "okay";
+		chain-length = <8>;
+		reset-delay = <80>;
+		bits-per-symbol = <3>;
+		one-symbol = <BINARY(1,1,0)>;
+		zero-symbol = <BINARY(1,0,0)>;
+	};
+};
+
+&pcc {
+	clock-frequency = <DT_FREQ_M(80)>;
+	core-prescaler = <1>;
+	apb1-prescaler = <4>;
+	apb2-prescaler = <4>;
+	apb3-prescaler = <4>;
+	apb4-prescaler = <1>;
 };

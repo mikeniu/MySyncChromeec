@@ -7,8 +7,8 @@
  * @file
  * @brief TI TPS6699x Register addresses and i2c command structure
  */
-#ifndef __CROS_EC_PDC_TPS6699X_REG_H
-#define __CROS_EC_PDC_TPS6699X_REG_H
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_REG_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_REG_H_
 
 #include "compile_time_macros.h"
 
@@ -1412,21 +1412,6 @@ union reg_received_identity_data_object {
 };
 
 /**
- * @brief 4.52 Received Attention VDM Register (Offset = 4Eh)
- */
-union reg_received_attention_vdm {
-	struct {
-		uint8_t number_valid_vdos : 3;
-		uint8_t reserved0 : 2;
-		uint8_t sequence_number : 3;
-
-		uint32_t vdm_header;
-		uint32_t vdo;
-	} __packed;
-	uint8_t raw_value[9];
-};
-
-/**
  * @brief 4.56 Thunderbolt Configuration Register (Offset 0x52)
  */
 
@@ -1636,4 +1621,4 @@ enum srdy_switch_select {
 	SWITCH_SELECT_PP_PD_POLICY = 0x07,
 };
 
-#endif /* __CROS_EC_PDC_TPS6699X_REG_H */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_REG_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef _COMMON_h_
-#define _COMMON_h_
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_COMMON_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_COMMON_H_
 
 #include <zephyr/devicetree.h>
 
@@ -30,4 +30,4 @@ enum failure_resp_type {
 	SERIAL_RECV_TIMEOUT
 };
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_COMMON_H_ */

@@ -5,10 +5,10 @@
 
 /* Inductive charging control */
 
-#include "gpio.h"
+#ifndef PLATFORM_EC_INCLUDE_INDUCTIVE_CHARGING_H_
+#define PLATFORM_EC_INCLUDE_INDUCTIVE_CHARGING_H_
 
-#ifndef __CROS_EC_INDUCTIVE_CHARGING_H
-#define __CROS_EC_INDUCTIVE_CHARGING_H
+#include "gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,4 +25,4 @@ void inductive_charging_interrupt(enum gpio_signal);
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_INCLUDE_INDUCTIVE_CHARGING_H_ */

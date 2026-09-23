@@ -3,12 +3,12 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CPU_H
-#define __CROS_EC_CPU_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CPU_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CPU_H_
 
 /* Do nothing for Zephyr */
 static inline void cpu_init(void)
 {
 }
 
-#endif /* __CROS_EC_CPU_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CPU_H_ */

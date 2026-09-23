@@ -56,7 +56,12 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FLASH_CROS  flash.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_GPIO_ID
 							    gpio_id.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOOKS       hooks.c)
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD     host_command.c)
+if(CONFIG_EC_HOST_CMD)
+    zephyr_library_sources(host_command.c)
+elseif(CONFIG_PLATFORM_EC_HOSTCMD)
+    zephyr_library_sources(host_command_legacy.c)
+endif()
+
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
                                                             console_buffer.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_CROS_DRV
@@ -112,44 +117,5 @@ zephyr_library_sources_ifdef(CONFIG_HECI
 endif()
 
 if(CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
-  if (DEFINED CONFIG_SOC_FAMILY_NPCX)
-    set(CHIP "npcx")
-  elseif (DEFINED CONFIG_SOC_FAMILY_ITE_EC)
-    set(CHIP "it8xxx2")
-  elseif (DEFINED CONFIG_SOC_FAMILY_MICROCHIP_MEC)
-    set(CHIP "mchp")
-  elseif (DEFINED CONFIG_SOC_FAMILY_STM32)
-    set(CHIP "stm32")
-  elseif (DEFINED CONFIG_SOC_FAMILY_REALTEK_EC)
-    set(CHIP "rtk")
-  elseif (DEFINED CONFIG_SOC_EGIS_ET171)
-    set(CHIP "egis")
-  elseif (DEFINED CONFIG_SOC_EM32F967)
-    set(CHIP "elan")
-  elseif (DEFINED CONFIG_SOC_SERIES_FT90)
-    set(CHIP "ft90")
-  else ()
-    set(CHIP "stub")
-  endif()
-
-  pw_add_library(platform_ec_log.tokenized_handler STATIC
-    HEADERS
-      ${PLATFORM_EC}/zephyr/shim/include/zephyr_console_shim.h
-    SOURCES
-      pw_log_zephyr_tokenized.cc
-    PUBLIC_INCLUDES
-      ${PLATFORM_EC}/include
-      ${PLATFORM_EC}/zephyr/shim/chip/${CHIP}/include
-      ${PLATFORM_EC}/zephyr/shim/include
-    PUBLIC_DEPS
-      pw_log_tokenized.handler
-      pw_log_zephyr.tokenized_lib
-      zephyr_interface
-  )
-  pw_zephyrize_libraries_ifdef(CONFIG_PIGWEED_LOG_TOKENIZED_LIB
-                              platform_ec_log.tokenized_handler
-  )
-
-
-
+  zephyr_library_sources(pw_log_zephyr_tokenized.cc)
 endif()

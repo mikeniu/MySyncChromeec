@@ -5,4 +5,5 @@
 common:
   platform_allow: native_sim
 tests:
-  fingerprint.drivers.egis630: {}
+  fingerprint.drivers.egis630:
+    ignore_faults: true

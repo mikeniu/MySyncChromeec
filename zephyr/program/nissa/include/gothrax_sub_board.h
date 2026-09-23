@@ -5,8 +5,8 @@
 
 /* Gothrax sub-board declarations */
 
-#ifndef __CROS_EC_NISSA_GOTHRAX_SUB_BOARD_H__
-#define __CROS_EC_NISSA_GOTHRAX_SUB_BOARD_H__
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_GOTHRAX_SUB_BOARD_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_GOTHRAX_SUB_BOARD_H_
 
 enum gothrax_sub_board_type {
 	GOTHRAX_SB_UNKNOWN = -1, /* Uninitialised */
@@ -18,4 +18,4 @@ enum gothrax_sub_board_type {
 
 enum gothrax_sub_board_type gothrax_get_sb_type(void);
 
-#endif /* __CROS_EC_NISSA_GOTHRAX_SUB_BOARD_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_GOTHRAX_SUB_BOARD_H_ */

@@ -3,13 +3,13 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_DRIVER_TCPM_ANX7447_H_
+#define PLATFORM_EC_DRIVER_TCPM_ANX7447_H_
+
 #include "driver/tcpm/anx7447_public.h"
 #include "usb_mux.h"
 
 /* USB Power delivery port management */
-
-#ifndef __CROS_EC_USB_PD_TCPM_ANX7447_H
-#define __CROS_EC_USB_PD_TCPM_ANX7447_H
 
 /* Registers: TCPC address used */
 #define ANX7447_REG_TCPC_SWITCH_0 0xB4
@@ -174,4 +174,4 @@ void anx7447_tcpc_update_hpd_status(const struct usb_mux *me,
  */
 int anx7447_flash_erase(int port);
 
-#endif /* __CROS_EC_USB_PD_TCPM_ANX7688_H */
+#endif /* PLATFORM_EC_DRIVER_TCPM_ANX7447_H_ */

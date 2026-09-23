@@ -5,8 +5,8 @@
 
 /* Fingerprint sensor interface */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_AUTH_CRYPTO_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_AUTH_CRYPTO_H
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_AUTH_CRYPTO_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_AUTH_CRYPTO_H_
 
 #include "ec_commands.h"
 #include "openssl/ec.h"
@@ -263,4 +263,4 @@ enum ec_error_list compute_message_signature(
 	std::span<const uint8_t, FP_CHALLENGE_SIZE> challenge,
 	std::span<uint8_t, SHA256_DIGEST_LENGTH> signature);
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_AUTH_CRYPTO_H */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_AUTH_CRYPTO_H_ */
