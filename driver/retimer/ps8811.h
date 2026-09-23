@@ -5,10 +5,10 @@
  * PS8811 retimer.
  */
 
-#include "usb_mux.h"
+#ifndef PLATFORM_EC_DRIVER_RETIMER_PS8811_H_
+#define PLATFORM_EC_DRIVER_RETIMER_PS8811_H_
 
-#ifndef __CROS_EC_USB_RETIMER_PS8811_H
-#define __CROS_EC_USB_RETIMER_PS8811_H
+#include "usb_mux.h"
 
 /*
  * PS8811 uses 7-bit I2C addresses 0x28 to 0x29 (ADDR=LL).
@@ -197,4 +197,4 @@ int ps8811_i2c_write(const struct usb_mux *me, int page, int offset, int data);
 int ps8811_i2c_field_update(const struct usb_mux *me, int page, int offset,
 			    uint8_t field_mask, uint8_t set_value);
 
-#endif /* __CROS_EC_USB_RETIMER_PS8802_H */
+#endif /* PLATFORM_EC_DRIVER_RETIMER_PS8811_H_ */

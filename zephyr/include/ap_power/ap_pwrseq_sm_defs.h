@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef _AP_PWRSEQ_SM_DEFS_H_
-#define _AP_PWRSEQ_SM_DEFS_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_SM_DEFS_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_SM_DEFS_H_
 #include "ap_power/ap_pwrseq.h"
 
 #include <zephyr/smf.h>
@@ -75,4 +75,4 @@ DT_FOREACH_STATUS_OKAY(ap_pwrseq_sub_states,
 		       AP_PWRSEQ_EACH_CHIPSET_SUB_STATE_DECL)
 DT_FOREACH_STATUS_OKAY(ap_pwrseq_sub_states, AP_PWRSEQ_EACH_APP_SUB_STATE_DECL)
 
-#endif /* _AP_PWRSEQ_SM_DEFS_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_PWRSEQ_SM_DEFS_H_ */

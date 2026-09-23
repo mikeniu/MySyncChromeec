@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_NISSA_INCLUDE_PIRRHA_H_
-#define ZEPHYR_TEST_NISSA_INCLUDE_PIRRHA_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_PIRRHA_H_
+#define PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_PIRRHA_H_
 
 extern const struct ec_response_keybd_config pirrha_kb_legacy;
 
@@ -13,4 +13,4 @@ void lcd_reset_detect_init(void);
 void handle_tsp_ta(void);
 void pirrha_callback_init(void);
 
-#endif /* ZEPHYR_TEST_NISSA_INCLUDE_PIRRHA_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_PIRRHA_H_ */

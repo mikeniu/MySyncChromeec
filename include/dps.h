@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_DPS__H
-#define __CROS_EC_DPS__H
+#ifndef PLATFORM_EC_INCLUDE_DPS_H_
+#define PLATFORM_EC_INCLUDE_DPS_H_
 
 #include "common.h"
 
@@ -95,4 +95,4 @@ __test_only int dps_get_flag(void);
 }
 #endif
 
-#endif /* __CROS_EC_DPS__H */
+#endif /* PLATFORM_EC_INCLUDE_DPS_H_ */

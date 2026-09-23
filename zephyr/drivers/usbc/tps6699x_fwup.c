@@ -192,7 +192,7 @@ static int run_task_sync(const struct i2c_dt_spec *i2c, enum command_task task,
 	if (cmd_data_check.data[0] != 0) {
 		LOG_ERR("Command '%s' failed. Chip says %02x", task_str,
 			cmd_data_check.data[0]);
-		return rv;
+		return -1;
 	}
 
 	LOG_ERR("Command '%s' succeeded!!", task_str);
@@ -212,8 +212,8 @@ static int do_reset_pdc(const struct i2c_dt_spec *i2c)
 	union gaid_params_t params;
 	int rv;
 
-	/* Default behavior is to switch banks. */
-	params.switch_banks = GAID_MAGIC_VALUE;
+	/* Do a simple reboot of the PDC. Do not copy or swap flash banks */
+	params.switch_banks = 0;
 	params.copy_banks = 0;
 
 	memcpy(cmd_data.data, &params, sizeof(params));
@@ -572,6 +572,8 @@ static int cmd_pdc_tps_fwup_send_initiate(const struct shell *sh, size_t argc,
 	rv = pdc_tps6699x_fwup_send_initiate(decode_buffer, decoded_byte_count);
 	if (rv < 0) {
 		shell_error(sh, "TPS_FWUP: Initiate (TFUi) error: %d", rv);
+		shell_error(sh, "For dual-port TI PDCs, ensure the update is "
+				"targeting the PDC with the lower I2C address");
 		return rv;
 	}
 

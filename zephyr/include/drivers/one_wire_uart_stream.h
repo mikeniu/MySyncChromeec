@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_STREAM_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_STREAM_H_
+
 #include "consumer.h"
 #include "producer.h"
 
@@ -41,3 +44,5 @@ void updater_stream_written(struct consumer const *consumer, size_t count);
 	}
 
 extern const struct usb_stream_config usb_update;
+
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_STREAM_H_ */

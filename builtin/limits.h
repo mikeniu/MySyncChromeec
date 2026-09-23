@@ -3,11 +3,11 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_LIMITS_H_
-#define __CROS_EC_LIMITS_H_
+#ifndef PLATFORM_EC_BUILTIN_LIMITS_H_
+#define PLATFORM_EC_BUILTIN_LIMITS_H_
 
 #define CHAR_BIT 8
 
 #define ULONG_MAX 0xffffffffu
 
-#endif /* __CROS_EC_LIMITS_H_ */
+#endif /* PLATFORM_EC_BUILTIN_LIMITS_H_ */

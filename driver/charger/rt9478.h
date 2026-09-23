@@ -5,8 +5,8 @@
  * Richtek 2-4 cell NVDC switching battery charger driver.
  */
 
-#ifndef __CROS_EC_RT9478_H
-#define __CROS_EC_RT9478_H
+#ifndef PLATFORM_EC_DRIVER_CHARGER_RT9478_H_
+#define PLATFORM_EC_DRIVER_CHARGER_RT9478_H_
 
 /* SMBUS Interface */
 #define RT9478_SMBUS_ADDR1_FLAGS 0x09
@@ -336,4 +336,4 @@ int rt9478_set_min_system_voltage(int chgnum, int mv);
 	SET_RT_FIELD(_chip, _reg, _field, _chip##_##_reg##_##_field##__##_c, \
 		     (_x))
 
-#endif /* __CROS_EC_RT9478_H */
+#endif /* PLATFORM_EC_DRIVER_CHARGER_RT9478_H_ */

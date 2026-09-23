@@ -3,12 +3,14 @@
  * found in the LICENSE file.
  */
 
-#if !defined(__CROS_EC_HOST_COMMAND_H) || \
-	defined(__CROS_EC_ZEPHYR_HOST_COMMAND_H)
+#if !defined(PLATFORM_EC_INCLUDE_HOST_COMMAND_H_) || \
+	defined(PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOST_COMMAND_H_)
 #error "This file must only be included from host_command.h. " \
 	"Include host_command.h directly"
 #endif
-#define __CROS_EC_ZEPHYR_HOST_COMMAND_H
+
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOST_COMMAND_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOST_COMMAND_H_
 
 #include <stdbool.h>
 
@@ -37,40 +39,8 @@ k_tid_t get_main_thread(void);
  */
 k_tid_t get_hostcmd_thread(void);
 
-#ifdef CONFIG_PLATFORM_EC_HOSTCMD
-
-/**
- * See include/host_command.h for documentation.
- */
-#ifdef CONFIG_EC_HOST_CMD
-
-#include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
-#define DECLARE_HOST_COMMAND(id, handler, ver) \
-	EC_HOST_CMD_HANDLER_UNBOUND(id, (ec_host_cmd_handler_cb)handler, ver)
-
-#else
-
-#define DECLARE_HOST_COMMAND(_command, _routine, _version_mask)         \
-	static const STRUCT_SECTION_ITERABLE(host_command,              \
-					     _cros_hcmd_##_command) = { \
-		.handler = _routine,                                    \
-		.command = _command,                                    \
-		.version_mask = _version_mask,                          \
-	}
-
-#endif /* CONFIG_EC_HOST_CMD */
-
-#else /* !CONFIG_PLATFORM_EC_HOSTCMD */
-
-/*
- * Create a global var to reference the host command. The linker should remove
- * it since it is never referenced.
- */
-#define DECLARE_HOST_COMMAND(command, routine, version_mask) \
-	int __remove_##command = ((int)(routine))
-
-#endif /* CONFIG_PLATFORM_EC_HOSTCMD */
-
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_HOST_COMMAND_H_ */

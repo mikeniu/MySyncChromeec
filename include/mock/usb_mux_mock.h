@@ -4,8 +4,8 @@
  */
 /* Mock USB Type-C mux */
 
-#ifndef __MOCK_USB_MUX_MOCK_H
-#define __MOCK_USB_MUX_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_USB_MUX_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_USB_MUX_MOCK_H_
 
 #include "usb_mux.h"
 
@@ -29,4 +29,4 @@ extern struct mock_usb_mux_ctrl mock_usb_mux;
 }
 #endif
 
-#endif /* __MOCK_USB_MUX_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_USB_MUX_MOCK_H_ */

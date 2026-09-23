@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_STDARG_H__
-#define __CROS_EC_STDARG_H__
+#ifndef PLATFORM_EC_BUILTIN_STDARG_H_
+#define PLATFORM_EC_BUILTIN_STDARG_H_
 
 /* We use -nostdinc -ffreestanding to keep host system include files
  * from contaminating our build.
@@ -22,4 +22,4 @@ typedef __builtin_va_list va_list;
 #include_next <stdarg.h>
 #endif
 
-#endif /* __CROS_EC_STDARG_H__ */
+#endif /* PLATFORM_EC_BUILTIN_STDARG_H_ */

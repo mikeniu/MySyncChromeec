@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_DRIVERS_BOARD_ID_INTEL_RVP_COMMON_H_
-#define ZEPHYR_TEST_DRIVERS_BOARD_ID_INTEL_RVP_COMMON_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_BOARD_ID_INTEL_RVP_SRC_BOARD_ID_TEST_COMMON_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_BOARD_ID_INTEL_RVP_SRC_BOARD_ID_TEST_COMMON_H_
 
 #include "cros_board_info.h"
 
@@ -48,4 +48,5 @@ void send_ap_pwrseq_s5_exit(enum ap_pwrseq_state entry);
 /* Reset the fakes and, when the straps are ready, their pins before a test. */
 void board_id_intel_rvp_reset(void);
 
-#endif /* ZEPHYR_TEST_DRIVERS_BOARD_ID_INTEL_RVP_COMMON_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_BOARD_ID_INTEL_RVP_SRC_BOARD_ID_TEST_COMMON_H_ \
+	*/

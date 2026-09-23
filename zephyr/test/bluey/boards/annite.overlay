@@ -1,0 +1,133 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+#include <cros/thermistor/thermistor.dtsi>
+#include <dt-bindings/gpio_defines.h>
+
+/ {
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_ec_en_pp5000: ec_en_pp5000 {
+			gpios = <&gpio0 0 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_bl_off_odl: ec_bl_off_odl {
+			gpios = <&gpio0 1 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_en_pp5000_fan: ec_en_pp5000_fan {
+			gpios = <&gpio0 2 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_3v_s3_en: ec_3v_s3_en {
+			gpios = <&gpio0 3 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_en_ppvar_oled: ec_en_ppvar_oled {
+			gpios = <&gpio0 4 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_batt_i2c_en_odl: ec_batt_i2c_en_odl {
+			gpios = <&gpio0 5 (GPIO_OUTPUT | GPIO_INPUT)>;
+		};
+		gpio_ec_sys_throttle_mira: ec_sys_throttle_mira {
+			gpios = <&gpio0 6 (GPIO_OUTPUT | GPIO_INPUT)>;
+			enum-name = "GPIO_CPU_PROCHOT";
+		};
+		gpio_pgood_acok_odl: pgood_acok_odl {
+			gpios = <&gpio0 7 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+	};
+
+	gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_gpio_pgood_acok_odl: gpio_pgood_acok_odl {
+			irq-pin = <&gpio_pgood_acok_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "extpower_interrupt";
+		};
+	};
+
+	adc0: adc {
+		compatible = "zephyr,adc-emul";
+		nchannels = <1>;
+		ref-internal-mv = <3300>;
+		#io-channel-cells = <1>;
+		status = "okay";
+	};
+
+	named-adc-channels {
+		compatible = "named-adc-channels";
+
+		adc_temp_cpu: cpu {
+			enum-name = "ADC_TEMP_SENSOR_1";
+			io-channels = <&adc0 0>;
+		};
+	};
+
+	temp_sensor_cpu: cpu {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_cpu>;
+	};
+
+	named-temp-sensors {
+		compatible = "cros-ec,temp-sensors";
+		temp_cpu: cpu {
+			sensor = <&temp_sensor_cpu>;
+		};
+	};
+
+	/*
+	 * fan_steps defined here for native_sim tests instead of including
+	 * program/bluey/annite/fan.dtsi directly, because fan.dtsi references
+	 * NPCX SoC PWM and Tachometer nodes not present on native_sim.
+	 */
+	fan_steps: fan-steps {
+		compatible = "cros-ec,fan-steps";
+		level_0 {
+			temp-on = <45>;
+			temp-off = <99>;
+			rpm-target = <0 0>;
+		};
+		level_1 {
+			temp-on = <47>;
+			temp-off = <44>;
+			rpm-target = <4500 4500>;
+		};
+		level_2 {
+			temp-on = <50>;
+			temp-off = <46>;
+			rpm-target = <5200 5200>;
+		};
+		level_3 {
+			temp-on = <53>;
+			temp-off = <49>;
+			rpm-target = <6000 6000>;
+		};
+		level_4 {
+			temp-on = <56>;
+			temp-off = <52>;
+			rpm-target = <6800 6800>;
+		};
+		level_5 {
+			temp-on = <68>;
+			temp-off = <54>;
+			rpm-target = <7500 7500>;
+		};
+		level_6 {
+			temp-on = <72>;
+			temp-off = <66>;
+			rpm-target = <8000 8000>;
+		};
+		level_7 {
+			temp-on = <99>;
+			temp-off = <70>;
+			rpm-target = <8300 8300>;
+		};
+	};
+};
+
+&thermistor_3V3_100K_100K_4250B {
+	status = "okay";
+};

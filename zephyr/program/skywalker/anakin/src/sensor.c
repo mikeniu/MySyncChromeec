@@ -78,13 +78,13 @@ static void sense_startup_hook(struct ap_power_ev_callback *cb,
 		return;
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(sense_startup_hook, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);
 
 static void board_setup_init(void)
 {
 	int ret;
 	uint32_t val;
-	static struct ap_power_ev_callback cb;
-
 	ret = cros_cbi_get_fw_config(FORM_FACTOR, &val);
 	if (ret != 0) {
 		LOG_ERR("Error retrieving CBI FW_CONFIG field %d", FORM_FACTOR);
@@ -95,10 +95,6 @@ static void board_setup_init(void)
 		motion_sensor_count = 0;
 		gmr_tablet_switch_disable();
 	}
-
-	ap_power_ev_init_callback(&cb, sense_startup_hook,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&cb);
 
 	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
 		gpio_enable_dt_interrupt(

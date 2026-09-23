@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_KRABBY_INCLUDE_TEST_STATE_H_
-#define ZEPHYR_TEST_KRABBY_INCLUDE_TEST_STATE_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_KRABBY_INCLUDE_TEST_STATE_H_
+#define PLATFORM_EC_ZEPHYR_TEST_KRABBY_INCLUDE_TEST_STATE_H_
 
 #include <stdbool.h>
 
@@ -14,4 +14,4 @@ struct test_state {
 
 bool krabby_predicate_post_main(const void *state);
 
-#endif /* ZEPHYR_TEST_AP_POWER_INCLUDE_TEST_STATE_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_KRABBY_INCLUDE_TEST_STATE_H_ */

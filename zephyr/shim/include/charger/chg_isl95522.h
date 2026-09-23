@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CHARGER_CHG_ISL95522_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CHARGER_CHG_ISL95522_H_
+
 #include "driver/charger/isl95522_public.h"
 
 #include <zephyr/devicetree.h>
@@ -26,3 +29,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CHARGER_CHG_ISL95522_H_ */

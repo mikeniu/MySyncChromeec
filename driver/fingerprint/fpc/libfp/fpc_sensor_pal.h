@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef FPC_PAL_SENSOR_H_
-#define FPC_PAL_SENSOR_H_
+#ifndef PLATFORM_EC_DRIVER_FINGERPRINT_FPC_LIBFP_FPC_SENSOR_PAL_H_
+#define PLATFORM_EC_DRIVER_FINGERPRINT_FPC_LIBFP_FPC_SENSOR_PAL_H_
 
 #include "common.h"
 
@@ -96,4 +96,4 @@ __staticlib_hook int fpc_pal_delay_us(uint64_t us);
 __staticlib_hook void fpc_pal_log_entry(const char *tag, int log_level,
 					const char *format, ...);
 
-#endif // FPC_PAL_SENSOR_H_
+#endif /* PLATFORM_EC_DRIVER_FINGERPRINT_FPC_LIBFP_FPC_SENSOR_PAL_H_ */
