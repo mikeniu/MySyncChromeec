@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CEC_COUNTER_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CEC_COUNTER_H_
+
 #include "driver/cec/bitbang.h"
 
 /**
@@ -90,3 +93,5 @@ void cros_cec_bitbang_disable_timer(int port);
  * @param port CEC port to control
  */
 void cros_cec_bitbang_init_timer(int port);
+
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CEC_COUNTER_H_ */

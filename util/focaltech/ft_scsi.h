@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef UTIL_FOCALTECH_FT_SCSI_H_
-#define UTIL_FOCALTECH_FT_SCSI_H_
+#ifndef PLATFORM_EC_UTIL_FOCALTECH_FT_SCSI_H_
+#define PLATFORM_EC_UTIL_FOCALTECH_FT_SCSI_H_
 
 #include <array>
 #include <cassert>
@@ -94,4 +94,4 @@ std::expected<size_t, Error> ReceiveBulkDataIn(
 
 }  // namespace focaltech
 
-#endif  // UTIL_FOCALTECH_FT_SCSI_H_
+#endif /* PLATFORM_EC_UTIL_FOCALTECH_FT_SCSI_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_GPIO_CONTROLLER_MOCK_H_
-#define ZEPHYR_INCLUDE_EMUL_GPIO_CONTROLLER_MOCK_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_GPIO_CONTROLLER_MOCK_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_GPIO_CONTROLLER_MOCK_H_
 
 /**
  * Return the number of calls made to the GPIO mock controller .pin_configure
@@ -16,4 +16,4 @@
  */
 int gpio_mock_controller_pin_configure_call_count(const struct device *port);
 
-#endif /* ZEPHYR_INCLUDE_EMUL_GPIO_CONTROLLER_MOCK_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_GPIO_CONTROLLER_MOCK_H_ */

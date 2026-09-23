@@ -5,8 +5,8 @@
 
 /* Common power interface for all chipsets */
 
-#ifndef __CROS_EC_POWER_H
-#define __CROS_EC_POWER_H
+#ifndef PLATFORM_EC_INCLUDE_POWER_H_
+#define PLATFORM_EC_INCLUDE_POWER_H_
 
 #include "chipset.h"
 #include "common.h"
@@ -467,4 +467,4 @@ void power_fake_disable(void);
 }
 #endif
 
-#endif /* __CROS_EC_POWER_H */
+#endif /* PLATFORM_EC_INCLUDE_POWER_H_ */

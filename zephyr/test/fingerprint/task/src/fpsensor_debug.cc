@@ -220,7 +220,8 @@ ZTEST(fpsensor_debug, test_get_image_frame_params)
 		  FP_CAPTURE_ABNORMAL_TEST, FP_CAPTURE_NOISE_TEST,
 		  FP_CAPTURE_SIMPLE_IMAGE, FP_CAPTURE_PATTERN0,
 		  FP_CAPTURE_PATTERN1, FP_CAPTURE_QUALITY_TEST,
-		  FP_CAPTURE_RESET_TEST, FP_CAPTURE_TYPE_MAX });
+		  FP_CAPTURE_RESET_TEST, FP_CAPTURE_PATTERN2,
+		  FP_CAPTURE_TYPE_MAX });
 	constexpr struct fp_image_frame_params_v2 zero_params{};
 
 	for (enum fp_capture_type current_capture_type : kCaptureTypesArray) {

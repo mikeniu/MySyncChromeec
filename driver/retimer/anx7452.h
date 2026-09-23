@@ -5,8 +5,8 @@
  * ANX7452: 2-Lane USB4 Retimer MUX driver
  */
 
-#ifndef __CROS_EC_USB_RETIMER_ANX7452_H
-#define __CROS_EC_USB_RETIMER_ANX7452_H
+#ifndef PLATFORM_EC_DRIVER_RETIMER_ANX7452_H_
+#define PLATFORM_EC_DRIVER_RETIMER_ANX7452_H_
 
 /*
  * Programming guide specifies it may be as much as 30-50 ms after chip power on
@@ -77,4 +77,4 @@
 #define ANX7452_CTLTOP_CFG2_TBT_EN BIT(0)
 #define ANX7452_CTLTOP_CFG2_REG_BIT_MASK \
 	(ANX7452_CTLTOP_CFG2_USB4_EN | ANX7452_CTLTOP_CFG2_TBT_EN)
-#endif /* __CROS_EC_USB_RETIMER_ANX7452_H */
+#endif /* PLATFORM_EC_DRIVER_RETIMER_ANX7452_H_ */

@@ -30,3 +30,4 @@
 "efs",
 "ap-idle",
 "initial-pwr",
+"pdc",

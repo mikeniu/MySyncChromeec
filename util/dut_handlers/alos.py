@@ -64,8 +64,10 @@ class AlosHandler(DutHandler):
         See go/al-care for environment setup instructions.
         """
         if hasattr(self.args, "android_dir") and self.args.android_dir:
-            return self.args.android_dir
-        return os.environ.get("ANDROID_BUILD_TOP", os.path.expanduser("~/alos"))
+            return os.path.abspath(os.path.expanduser(self.args.android_dir))
+        return os.path.abspath(
+            os.path.expanduser(os.environ.get("ANDROID_BUILD_TOP", "~/alos"))
+        )
 
     @property
     def corp_adb_helper_path(self) -> str:
@@ -105,20 +107,34 @@ class AlosHandler(DutHandler):
         dut_hostname = self.details["dut_hostname"]
         helper_path = self.corp_adb_helper_path
 
+        if not self._is_adb_connected():
+            if not os.path.isdir(self.android_dir):
+                raise FileNotFoundError(
+                    f"Android directory not found at '{self.android_dir}'. "
+                    "Cannot run corp-adb-helper to connect ADB to DUT. "
+                    "Please set the ANDROID_BUILD_TOP environment variable, "
+                    "pass --android-dir, or see go/al-care for setup instructions."
+                )
+            if not os.path.exists(helper_path):
+                raise FileNotFoundError(
+                    f"corp-adb-helper script not found at '{helper_path}'. "
+                    "Cannot connect ADB to DUT. "
+                    "Please check your Android repository or see go/al-care."
+                )
+
         start_time = time.time()
         while not self._is_adb_connected():
             self._cached_adb_target = None
-            if os.path.exists(helper_path):
-                print(
-                    f"Connecting ADB to ALOS DUT {dut_hostname} using "
-                    f"corp-adb-helper ({helper_path})..."
-                )
-                res = subprocess.run(
-                    [sys.executable, helper_path, dut_hostname, "-f"],
-                    check=False,
-                )
-                if res.returncode == 0 and self._is_adb_connected():
-                    break
+            print(
+                f"Connecting ADB to ALOS DUT {dut_hostname} using "
+                f"corp-adb-helper ({helper_path})..."
+            )
+            res = subprocess.run(
+                [sys.executable, helper_path, dut_hostname, "-f"],
+                check=False,
+            )
+            if res.returncode == 0 and self._is_adb_connected():
+                break
 
             if time.time() - start_time > timeout_secs:
                 raise RuntimeError(

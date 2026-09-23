@@ -70,9 +70,9 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 	M(basic.pc, cm.frame[6], pc)      \
 	M(basic.xpsr, cm.frame[7], xpsr)  \
 	EXTRA_PANIC_REG_LIST(M, M_GPR)
-#define PANIC_REG_EXCEPTION(pdata) pdata->cm.regs[1]
-#define PANIC_REG_REASON(pdata) pdata->cm.regs[3]
-#define PANIC_REG_INFO(pdata) pdata->cm.regs[4]
+#define PANIC_REG_EXCEPTION(pdata) ((pdata)->cm.regs[1])
+#define PANIC_REG_REASON(pdata) ((pdata)->cm.regs[3])
+#define PANIC_REG_INFO(pdata) ((pdata)->cm.regs[4])
 #elif defined(CONFIG_RISCV) && !defined(CONFIG_64BIT)
 /*
  * Not all registers are passed in the context from Zephyr
@@ -100,9 +100,9 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 	M_GPR(t6, riscv.regs[12], t6) \
 	M(mepc, riscv.mepc, mepc)     \
 	M(mstatus, riscv.mcause, mstatus)
-#define PANIC_REG_EXCEPTION(pdata) (pdata->riscv.mcause)
-#define PANIC_REG_REASON(pdata) (pdata->riscv.regs[11])
-#define PANIC_REG_INFO(pdata) (pdata->riscv.regs[10])
+#define PANIC_REG_EXCEPTION(pdata) ((pdata)->riscv.mcause)
+#define PANIC_REG_REASON(pdata) ((pdata)->riscv.regs[11])
+#define PANIC_REG_INFO(pdata) ((pdata)->riscv.regs[10])
 #elif defined(CONFIG_X86)
 #define PANIC_ARCH PANIC_ARCH_X86
 #define PANIC_REG_LIST(M, M_GPR) \
@@ -114,16 +114,16 @@ LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 	M(edi, x86.edi, edi)     \
 	M(cs, x86.cs, cs)        \
 	M(eip, x86.eip, eip)
-#define PANIC_REG_EXCEPTION(pdata) (pdata->x86.eflags)
-#define PANIC_REG_REASON(pdata) (pdata->x86.vector)
-#define PANIC_REG_INFO(pdata) (pdata->x86.error_code)
+#define PANIC_REG_EXCEPTION(pdata) ((pdata)->x86.eflags)
+#define PANIC_REG_REASON(pdata) ((pdata)->x86.vector)
+#define PANIC_REG_INFO(pdata) ((pdata)->x86.error_code)
 #elif defined(CONFIG_ARCH_POSIX)
 #define PANIC_ARCH PANIC_ARCH_POSIX
 #define PANIC_REG_LIST(M, M_GPR) \
 	M(dummy, posix.esf_placeholder, placeholder) /* nocheck */
-#define PANIC_REG_EXCEPTION(pdata) (pdata->posix.exception)
-#define PANIC_REG_REASON(pdata) (pdata->posix.reason)
-#define PANIC_REG_INFO(pdata) (pdata->posix.info)
+#define PANIC_REG_EXCEPTION(pdata) ((pdata)->posix.exception)
+#define PANIC_REG_REASON(pdata) ((pdata)->posix.reason)
+#define PANIC_REG_INFO(pdata) ((pdata)->posix.info)
 #else
 /* Not implemented for this arch */
 #error "Unsupported architecture for PANIC_ARCH"
@@ -156,7 +156,7 @@ void panic_data_print(const struct panic_data *pdata)
  * Note: magic is NOT set here; call panic_data_finalize() when writing
  * completes.
  */
-test_export_static struct panic_data *panic_data_reset(struct panic_data *pdata)
+struct panic_data *panic_data_reset(struct panic_data *pdata)
 {
 	if (!pdata) {
 		pdata = get_panic_data_write();
@@ -177,7 +177,7 @@ test_export_static struct panic_data *panic_data_reset(struct panic_data *pdata)
 /**
  * Finalize panic data by setting the valid magic number and flushing to RAM.
  */
-test_export_static void panic_data_finalize(struct panic_data *pdata)
+void panic_data_finalize(struct panic_data *pdata)
 {
 	if (pdata) {
 		pdata->magic = PANIC_DATA_MAGIC;
@@ -185,26 +185,85 @@ test_export_static void panic_data_finalize(struct panic_data *pdata)
 	}
 }
 
-test_export_static void copy_esf_to_panic_data(const struct arch_esf *esf,
-					       struct panic_data *pdata)
+void panic_data_write_esf(const struct arch_esf *esf)
 {
-	pdata = panic_data_reset(pdata);
+	struct panic_data *pdata = panic_data_reset(NULL);
 
-	if (PANIC_ARCH == PANIC_ARCH_CORTEX_M) {
-		pdata->flags |= PANIC_DATA_FLAG_FRAME_VALID;
+	if (esf) {
+		if (PANIC_ARCH == PANIC_ARCH_CORTEX_M) {
+			pdata->flags |= PANIC_DATA_FLAG_FRAME_VALID;
+		}
+
+		PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
 	}
 
-	PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
-
 	/* Finalize and flush the panic data to RAM before reboot. */
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_assert(const char *path, unsigned int line)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+	uint32_t info;
+
+	if (path) {
+		const char *last_slash = strrchr(path, '/');
+		const char *filename = last_slash ? last_slash + 1 : path;
+
+		/*
+		 * Encode the first two characters of the filename and 16-bit
+		 * line number into the 32-bit panic info register.
+		 */
+		info = (filename[0] << 24) | (filename[1] << 16) |
+		       (line & 0xffff);
+	} else {
+		info = (uint32_t)-1;
+	}
+
+	panic_set_reason_reg(pdata, PANIC_SW_ASSERT);
+	panic_set_info_reg(pdata, info);
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)k_current_get());
+
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_watchdog_warning(uintptr_t pc,
+				       const struct k_thread *thread)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
+	panic_set_info_reg(pdata, (uint32_t)pc);
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_fatal(unsigned int reason, const struct k_thread *thread)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, PANIC_ZEPHYR_FATAL_ERROR);
+	panic_set_info_reg(pdata, (uint32_t)reason);
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_sw(uint32_t reason, uint32_t info, uint8_t exception)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, reason);
+	panic_set_info_reg(pdata, info);
+	panic_set_exception_reg(pdata, exception);
+
 	panic_data_finalize(pdata);
 }
 
 #if !defined(CONFIG_ZTEST_FATAL_HOOK)
 void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 {
-	struct panic_data *pdata = get_panic_data_write();
-
 	/*
 	 * If CONFIG_LOG is on, the exception details
 	 * have already been logged to the console.
@@ -214,19 +273,15 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 	}
 
 	if ((PANIC_ARCH != PANIC_ARCH_UNSUPPORTED) && esf) {
-		copy_esf_to_panic_data(esf, pdata);
+		panic_data_write_esf(esf);
 		if (!IS_ENABLED(CONFIG_LOG)) {
 			panic_data_print(panic_get_data());
 		}
 	} else {
-		/* If a esf structure is empty, store just the reason provided
+		/* If an esf structure is empty, store just the reason provided
 		 * by Zephyr. It can be caused e.g. by a spurious interrupt.
 		 */
-		uint8_t flags = pdata->flags;
-		panic_set_reason(PANIC_ZEPHYR_FATAL_ERROR, (uint32_t)reason,
-				 (uint8_t)(uintptr_t)k_current_get());
-		/* Keep panic flags */
-		pdata->flags = flags;
+		panic_data_write_fatal(reason, k_current_get());
 	}
 
 	LOG_PANIC();
@@ -249,8 +304,7 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #ifdef CONFIG_ASSERT_NO_FILE_INFO
 __override void assert_post_action(void)
 {
-	panic_set_reason(PANIC_SW_ASSERT, -1,
-			 (uint8_t)(uintptr_t)k_current_get());
+	panic_data_write_assert(NULL, 0);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
@@ -261,24 +315,13 @@ __override void assert_post_action(void)
 #else
 __override void assert_post_action(const char *path, unsigned int line)
 {
-	const k_tid_t thread = k_current_get();
-
-	/* Extract filename from path */
-	const char *last_slash = strrchr(path, '/');
-	const char *filename = last_slash ? last_slash + 1 : path;
-	/* Top two bytes of info register is first two characters of filename.
-	 * Bottom two bytes of info register is line number.
-	 */
-	panic_set_reason(PANIC_SW_ASSERT,
-			 (filename[0] << 24) | (filename[1] << 16) |
-				 (line & 0xffff),
-			 (uint8_t)(uintptr_t)thread);
+	panic_data_write_assert(path, line);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT)) {
-		print_stack_trace(thread);
+		print_stack_trace(k_current_get());
 	}
 
 	panic_reboot();
@@ -286,19 +329,6 @@ __override void assert_post_action(const char *path, unsigned int line)
 }
 #endif /* CONFIG_ASSERT_NO_FILE_INFO */
 #endif /* CONFIG_PLATFORM_EC_DEBUG_ASSERT */
-
-void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
-{
-	struct panic_data *const pdata = panic_data_reset(NULL);
-
-	/* Log panic cause */
-	PANIC_REG_EXCEPTION(pdata) = exception;
-	PANIC_REG_REASON(pdata) = reason;
-	PANIC_REG_INFO(pdata) = info;
-
-	/* Finalize and flush the panic data to RAM before potential reboot. */
-	panic_data_finalize(pdata);
-}
 
 uint32_t panic_get_reason_reg(const struct panic_data *pdata)
 {
@@ -312,16 +342,27 @@ void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason)
 	}
 }
 
-void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
+uint32_t panic_get_info_reg(const struct panic_data *pdata)
 {
-	struct panic_data *const pdata = panic_get_data();
+	return pdata ? PANIC_REG_INFO(pdata) : 0;
+}
 
-	if (pdata && pdata->struct_version == PANIC_DATA_VERSION) {
-		*exception = PANIC_REG_EXCEPTION(pdata);
-		*reason = PANIC_REG_REASON(pdata);
-		*info = PANIC_REG_INFO(pdata);
-	} else {
-		*exception = *reason = *info = 0;
+void panic_set_info_reg(struct panic_data *pdata, uint32_t info)
+{
+	if (pdata) {
+		PANIC_REG_INFO(pdata) = info;
+	}
+}
+
+uint8_t panic_get_exception_reg(const struct panic_data *pdata)
+{
+	return pdata ? (uint8_t)PANIC_REG_EXCEPTION(pdata) : 0;
+}
+
+void panic_set_exception_reg(struct panic_data *pdata, uint8_t exception)
+{
+	if (pdata) {
+		PANIC_REG_EXCEPTION(pdata) = exception;
 	}
 }
 

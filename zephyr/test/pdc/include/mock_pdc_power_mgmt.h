@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_TEST_PDC_INCLUDE_MOCK_PDC_POWER_MGMT_H_
+#define PLATFORM_EC_ZEPHYR_TEST_PDC_INCLUDE_MOCK_PDC_POWER_MGMT_H_
+
 #include "drivers/ucsi_v3.h"
 #include "usbc/pdc_power_mgmt.h"
 
@@ -63,3 +66,5 @@ DECLARE_FAKE_VOID_FUNC(pdc_power_mgmt_simulate_power_button_press, int);
  * @brief Reset the above set of fakes
  */
 void helper_reset_pdc_power_mgmt_fakes(void);
+
+#endif /* PLATFORM_EC_ZEPHYR_TEST_PDC_INCLUDE_MOCK_PDC_POWER_MGMT_H_ */

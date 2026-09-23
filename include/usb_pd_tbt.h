@@ -5,8 +5,8 @@
  * Thunderbolt-compatible mode header.
  */
 
-#ifndef __CROS_EC_USB_PD_TBT_COMPAT_H
-#define __CROS_EC_USB_PD_TBT_COMPAT_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_TBT_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_TBT_H_
 
 #include "usb_pd_vdo.h"
 
@@ -299,4 +299,4 @@ union tbt_dev_mode_enter_cmd {
 }
 #endif
 
-#endif /* __CROS_EC_USB_PD_TBT_COMPAT_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_TBT_H_ */

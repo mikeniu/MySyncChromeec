@@ -5,8 +5,8 @@
 
 /* RTC cross-platform functions */
 
-#ifndef __CROS_EC_RTC_H
-#define __CROS_EC_RTC_H
+#ifndef PLATFORM_EC_INCLUDE_RTC_H_
+#define PLATFORM_EC_INCLUDE_RTC_H_
 
 #include "common.h"
 
@@ -53,4 +53,4 @@ struct calendar_date sec_to_date(uint32_t sec);
 }
 #endif
 
-#endif /* __CROS_EC_RTC_H */
+#endif /* PLATFORM_EC_INCLUDE_RTC_H_ */

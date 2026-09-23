@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_ICM42607_H
-#define EMUL_ICM42607_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ICM42607_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ICM42607_H_
 
 #include "emul/emul_common_i2c.h"
 
@@ -24,4 +24,4 @@ void icm42607_emul_push_fifo(const struct emul *emul, const uint8_t *src,
 struct i2c_common_emul_data *
 emul_icm42607_get_i2c_common_data(const struct emul *emul);
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ICM42607_H_ */

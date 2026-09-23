@@ -391,8 +391,9 @@ rw-objs := $(sort $(rw-common-objs) $(rw-only-objs))
 
 ro-deps := $(addsuffix .d, $(ro-objs))
 rw-deps := $(addsuffix .d, $(rw-objs))
+host-deps := $(addsuffix .d, $(host-utils) $(host-utils-cxx))
 
-deps := $(ro-deps) $(rw-deps) $(deps-y)
+deps := $(ro-deps) $(rw-deps) $(host-deps) $(deps-y)
 
 .PHONY: ro rw
 $(config): $(out)/$(PROJECT).bin

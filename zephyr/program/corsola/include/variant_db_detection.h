@@ -5,8 +5,8 @@
 
 /* Corsola daughter board detection */
 
-#ifndef __CROS_EC_CORSOLA_DB_DETECTION_H
-#define __CROS_EC_CORSOLA_DB_DETECTION_H
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_CORSOLA_INCLUDE_VARIANT_DB_DETECTION_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_CORSOLA_INCLUDE_VARIANT_DB_DETECTION_H_
 
 #include <stdint.h>
 
@@ -39,4 +39,5 @@ inline enum corsola_db_type corsola_get_db_type(void)
  */
 test_mockable uint8_t board_get_adjusted_usb_pd_port_count(void);
 
-#endif /* __CROS_EC_CORSOLA_DB_DETECTION_H */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_CORSOLA_INCLUDE_VARIANT_DB_DETECTION_H_ \
+	*/

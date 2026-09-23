@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __CROS_EC_DRIVER_CEC_BITBANG_H
-#define __CROS_EC_DRIVER_CEC_BITBANG_H
+#ifndef PLATFORM_EC_DRIVER_CEC_BITBANG_H_
+#define PLATFORM_EC_DRIVER_CEC_BITBANG_H_
 
 #include "common.h"
 #include "gpio_signal.h"
@@ -134,4 +134,4 @@ void cec_gpio_interrupt(enum gpio_signal signal);
  */
 __test_only int cec_get_state(int port);
 
-#endif /* __CROS_EC_DRIVER_CEC_BITBANG_H */
+#endif /* PLATFORM_EC_DRIVER_CEC_BITBANG_H_ */

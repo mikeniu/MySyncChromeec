@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_ELAN80SERIES_H_
-#define ZEPHYR_INCLUDE_EMUL_EMUL_ELAN80SERIES_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ELAN80SERIES_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ELAN80SERIES_H_
 
 /**
  * Stop SPI transactions
@@ -33,4 +33,4 @@ void elan80series_start_spi(const struct emul *target);
 void elan80series_set_hwid(const struct emul *target, uint8_t hwid_lo,
 			   uint8_t hwid_hi);
 
-#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_ELAN80SERIES_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ELAN80SERIES_H_ */

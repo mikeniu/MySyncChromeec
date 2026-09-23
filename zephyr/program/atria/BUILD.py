@@ -9,6 +9,9 @@ def register_rtk59_project(
     project_name,
     extra_kconfig_base_files=(),
     extra_kconfig_proj_files=(),
+    extra_modules=(),
+    snippets=None,
+    **kwargs,
 ):
     """Register a Realtek-based variant of atria."""
     register_rtk_project(
@@ -25,15 +28,23 @@ def register_rtk59_project(
             *extra_kconfig_base_files,
             # Project-specific KConfig customization.
             here / project_name / "project.conf",
+            # DSP comms shared config.
+            here / "dsp_comms.conf",
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
+        modules=["cmsis_6", "ec", *extra_modules],
+        snippets=snippets,
+        **kwargs,
     )
 
 
 def register_it8xxx2_project(
     project_name,
     extra_kconfig_files=(),
+    extra_modules=(),
+    snippets=None,
+    **kwargs,
 ):
     """Register an it8xxx2 based variant of atria."""
     register_binman_project(
@@ -51,16 +62,23 @@ def register_it8xxx2_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_files,
         ],
+        modules=["ec", *extra_modules],
+        snippets=snippets,
+        **kwargs,
     )
 
 
 # Realtek RVP SKU
 register_rtk59_project(
     project_name="atriarvp-rtk",
+    extra_modules=["pigweed", "nanopb"],
+    snippets=["pw-tokenize"],
 )
 
 register_it8xxx2_project(
     project_name="penghu",
+    extra_modules=["pigweed"],
+    snippets=["pw-tokenize"],
 )
 
 register_ish_project(
@@ -72,6 +90,7 @@ register_ish_project(
     ],
     kconfig_files=[
         here / "atriarvp-ish" / "project.conf",
+        here / "dsp_comms.conf",
         here / ".." / ".." / "ish.conf",
     ],
 )

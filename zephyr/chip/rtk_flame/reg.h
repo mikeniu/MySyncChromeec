@@ -7,7 +7,8 @@
  * Function: RTK Flash Utility
  */
 
-#ifndef __REG_H__
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_RTK_FLAME_REG_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_RTK_FLAME_REG_H_
 
 #include <stdint.h>
 #include <stdio.h>
@@ -897,4 +898,4 @@ struct system { /*!< (@ 0x40020000) SYSTEM Structure */
 #define SLWTMR_INTSTS_STS (0x1UL)
 /////////////////////////SLWTMR END
 
-#endif /* __REG_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_RTK_FLAME_REG_H_ */

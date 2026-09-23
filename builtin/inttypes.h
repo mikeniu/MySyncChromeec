@@ -3,12 +3,12 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_INTTYPES_H__
-#define __CROS_EC_INTTYPES_H__
+#ifndef PLATFORM_EC_BUILTIN_INTTYPES_H_
+#define PLATFORM_EC_BUILTIN_INTTYPES_H_
 
 #include <stdint.h>
 
 #define PRIx64 "llx"
 #define PRId64 "lld"
 
-#endif /* __CROS_EC_INTTYPES_H__ */
+#endif /* PLATFORM_EC_BUILTIN_INTTYPES_H_ */

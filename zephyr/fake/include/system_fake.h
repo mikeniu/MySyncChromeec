@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_FAKE_SYSTEM_FAKE_H
-#define ZEPHYR_FAKE_SYSTEM_FAKE_H
+#ifndef PLATFORM_EC_ZEPHYR_FAKE_INCLUDE_SYSTEM_FAKE_H_
+#define PLATFORM_EC_ZEPHYR_FAKE_INCLUDE_SYSTEM_FAKE_H_
 
 #include "ec_commands.h"
 
@@ -32,4 +32,4 @@ void system_set_shrspi_image_copy(enum ec_image new_image_copy);
  */
 void system_fake_setenv(jmp_buf *env);
 
-#endif /* ZEPHYR_FAKE_SYSTEM_FAKE_H */
+#endif /* PLATFORM_EC_ZEPHYR_FAKE_INCLUDE_SYSTEM_FAKE_H_ */
