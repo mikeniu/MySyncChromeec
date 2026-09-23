@@ -78,17 +78,8 @@ static void board_chargers_suspend(struct ap_power_ev_callback *const cb,
 	if (board_get_charger_chip_count() > 1)
 		fn(CHARGER_SECONDARY);
 }
-
-static int board_chargers_suspend_init(void)
-{
-	static struct ap_power_ev_callback cb = {
-		.handler = board_chargers_suspend,
-		.events = AP_POWER_SUSPEND | AP_POWER_RESUME,
-	};
-	ap_power_ev_add_callback(&cb);
-	return 0;
-}
-SYS_INIT(board_chargers_suspend_init, APPLICATION, 0);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_chargers_suspend, AP_POWER_SUSPEND,
+			       AP_POWER_RESUME);
 
 int board_set_active_charge_port(int port)
 {

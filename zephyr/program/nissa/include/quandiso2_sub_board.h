@@ -5,8 +5,8 @@
 
 /* Quandiso2 sub-board declarations */
 
-#ifndef __CROS_EC_NISSA_NISSA_SUB_BOARD_H__
-#define __CROS_EC_NISSA_NISSA_SUB_BOARD_H__
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_QUANDISO2_SUB_BOARD_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_QUANDISO2_SUB_BOARD_H_
 
 enum quandiso2_sub_board_type {
 	QUANDISO2_SB_UNKNOWN = -1, /* Uninitialised */
@@ -18,4 +18,4 @@ enum quandiso2_sub_board_type {
 
 enum quandiso2_sub_board_type quandiso_get_sb_type(void);
 
-#endif /* __CROS_EC_NISSA_NISSA_SUB_BOARD_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_QUANDISO2_SUB_BOARD_H_ */

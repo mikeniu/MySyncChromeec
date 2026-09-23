@@ -45,11 +45,15 @@
 	chosen {
 		cros-ec,keyboard = &kbd;
 	};
+};
 
-	tabletmode_interrupt: tabletmode-interrupt {
-		compatible = "cros,tabletmode-interrupt";
-		irq-gpios = <RTS5912_GPIO120 GPIO_ACTIVE_LOW>;
-	};
+/* Empirically, this value balances deep sleep residency (61%) and
+ * maximum watchdog reload time (705 ms) during S0ix. Decreasing the
+ * value significantly increases reload time and less significantly
+ * decreases residency.
+ */
+&idle {
+	min-residency-us = <2000>;
 };
 
 &it8801_mfd {

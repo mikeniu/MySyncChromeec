@@ -5,8 +5,8 @@
 
 /* LSM6DSO Accel and Gyro driver for Chrome EC */
 
-#ifndef __CROS_EC_ACCELGYRO_LSM6DSO_H
-#define __CROS_EC_ACCELGYRO_LSM6DSO_H
+#ifndef PLATFORM_EC_DRIVER_ACCELGYRO_LSM6DSO_H_
+#define PLATFORM_EC_DRIVER_ACCELGYRO_LSM6DSO_H_
 
 #include "driver/accelgyro_lsm6dso_public.h"
 #include "stm_mems_common.h"
@@ -212,4 +212,4 @@ void lsm6dso_interrupt(enum gpio_signal signal);
 #endif
 #endif /* CONFIG_ZEPHYR */
 
-#endif /* __CROS_EC_ACCELGYRO_LSM6DSO_H */
+#endif /* PLATFORM_EC_DRIVER_ACCELGYRO_LSM6DSO_H_ */

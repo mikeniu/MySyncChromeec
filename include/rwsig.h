@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_RWSIG_H
-#define __CROS_EC_RWSIG_H
+#ifndef PLATFORM_EC_INCLUDE_RWSIG_H_
+#define PLATFORM_EC_INCLUDE_RWSIG_H_
 
 #include "config.h"
 #include "rsa.h"
@@ -126,4 +126,4 @@ void rwsig_jump_now(void);
 }
 #endif
 
-#endif /* __CROS_EC_RWSIG_H */
+#endif /* PLATFORM_EC_INCLUDE_RWSIG_H_ */

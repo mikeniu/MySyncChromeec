@@ -10,8 +10,8 @@
  * This header provides functions for initializing and using IIR filters. It
  * includes support for Butterworth low-pass filters.
  */
-#ifndef __CROS_MATH_IIR_FILTER_H
-#define __CROS_MATH_IIR_FILTER_H
+#ifndef PLATFORM_EC_ZEPHYR_LIB_MATH_PUBLIC_CROS_MATH_IIR_FILTER_H_
+#define PLATFORM_EC_ZEPHYR_LIB_MATH_PUBLIC_CROS_MATH_IIR_FILTER_H_
 
 #include <stdint.h>
 
@@ -126,4 +126,4 @@ int filter_butterworth_lpf_init(struct iir_filter_t *filter, uint8_t rank,
 }
 #endif
 
-#endif /* __CROS_MATH_IIR_FILTER_H */
+#endif /* PLATFORM_EC_ZEPHYR_LIB_MATH_PUBLIC_CROS_MATH_IIR_FILTER_H_ */

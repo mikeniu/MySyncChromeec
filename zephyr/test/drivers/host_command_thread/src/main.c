@@ -27,14 +27,16 @@ static k_tid_t fake_main_tid;
 /* 0 - did not run, 1 - true, -1 - false */
 static int last_check_main_thread_result;
 
-static enum ec_status check_main_thread(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+check_main_thread(struct ec_host_cmd_handler_args *args)
 {
 	last_check_main_thread_result =
 		(k_current_get() == get_main_thread() ? 1 : -1);
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-DECLARE_HOST_COMMAND(CUSTOM_COMMAND_ID, check_main_thread, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_UNBOUND(CUSTOM_COMMAND_ID, check_main_thread,
+			    EC_VER_MASK(0));
 
 static void fake_main_thread(void *a, void *b, void *c)
 {

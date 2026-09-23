@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_DRIVER_FINGERPRINT_FPC_FPC_SENSOR_H_
-#define __CROS_EC_DRIVER_FINGERPRINT_FPC_FPC_SENSOR_H_
+#ifndef PLATFORM_EC_DRIVER_FINGERPRINT_FPC_FPC_SENSOR_H_
+#define PLATFORM_EC_DRIVER_FINGERPRINT_FPC_FPC_SENSOR_H_
 
 #include "common.h"
 
@@ -82,4 +82,4 @@ __staticlib int fp_sensor_acquire_image(uint8_t *image_data);
 __staticlib int fp_sensor_acquire_image_with_mode(uint8_t *image_data,
 						  int mode);
 
-#endif /* __CROS_EC_DRIVER_FINGERPRINT_FPC_FPC_SENSOR_H_ */
+#endif /* PLATFORM_EC_DRIVER_FINGERPRINT_FPC_FPC_SENSOR_H_ */

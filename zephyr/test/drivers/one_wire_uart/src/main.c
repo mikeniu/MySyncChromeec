@@ -210,7 +210,7 @@ ZTEST(one_wire_uart_driver, test_tx)
 	/* resend timer expired, resend the same message */
 	zassert_equal(ring_buf_size_get(data->tx_ring_buf), sizeof(msg.header));
 
-	ring_buf_get(data->tx_ring_buf, NULL, 1);
+	ring_buf_consume(data->tx_ring_buf, 1);
 	fake_time.val = 6 * USEC_PER_MSEC;
 	process_tx_irq(dev);
 	/* resend timer expired, but tx_ring_buf not fully consumed,

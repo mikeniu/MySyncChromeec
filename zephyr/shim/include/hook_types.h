@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __CROS_EC_HOOK_TYPES_H_
-#define __CROS_EC_HOOK_TYPES_H_
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_HOOK_TYPES_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_HOOK_TYPES_H_
 
 #include <zephyr/sys/util_macro.h>
 
@@ -68,4 +68,4 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_HOOK_TYPES_H_ */

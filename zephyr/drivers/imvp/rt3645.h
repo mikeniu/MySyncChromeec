@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_DRIVERS_IMVP_RT3645_H_
-#define ZEPHYR_DRIVERS_IMVP_RT3645_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_IMVP_RT3645_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_IMVP_RT3645_H_
 
 #include <zephyr/device.h>
 #include <zephyr/types.h>
@@ -51,4 +51,4 @@ int rt3645_load_config(const struct device *dev);
 
 int rt3645_store_config(const struct device *dev);
 
-#endif /* ZEPHYR_DRIVERS_IMVP_RT3645_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_IMVP_RT3645_H_ */

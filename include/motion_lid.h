@@ -5,8 +5,8 @@
 
 /* Header for motion_lid.h */
 
-#ifndef __CROS_EC_MOTION_LID_H
-#define __CROS_EC_MOTION_LID_H
+#ifndef PLATFORM_EC_INCLUDE_MOTION_LID_H_
+#define PLATFORM_EC_INCLUDE_MOTION_LID_H_
 
 #include "host_command.h"
 #include "math_util.h"
@@ -42,4 +42,4 @@ void motion_lid_calc(void);
 }
 #endif
 
-#endif /* __CROS_EC_MOTION_LID_H */
+#endif /* PLATFORM_EC_INCLUDE_MOTION_LID_H_ */
