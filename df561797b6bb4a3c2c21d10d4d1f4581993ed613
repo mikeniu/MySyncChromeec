@@ -16,6 +16,24 @@
       "message": "Please add **LOW_COVERAGE_REASON** tag in the commit message.",
       "revId": "df561797b6bb4a3c2c21d10d4d1f4581993ed613",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "521c419c_b5c14088",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-09-23T07:00:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "432847bf_c9a389da",
+      "revId": "df561797b6bb4a3c2c21d10d4d1f4581993ed613",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
