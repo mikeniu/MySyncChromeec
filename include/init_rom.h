@@ -9,8 +9,8 @@
  * objects are placed into the .init_rom region using the __init_rom attribute.
  */
 
-#ifndef __CROS_EC_INIT_ROM_H
-#define __CROS_EC_INIT_ROM_H
+#ifndef PLATFORM_EC_INCLUDE_INIT_ROM_H_
+#define PLATFORM_EC_INCLUDE_INIT_ROM_H_
 
 #include "stdbool.h"
 
@@ -70,4 +70,4 @@ int init_rom_copy(int offset, int size, char *data);
 }
 #endif
 
-#endif /* __CROS_EC_INIT_ROM_H */
+#endif /* PLATFORM_EC_INCLUDE_INIT_ROM_H_ */

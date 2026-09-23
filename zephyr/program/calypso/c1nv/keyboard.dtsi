@@ -14,6 +14,12 @@
 		/delete-property/ cros-ec,raw-kb;
 		cros-ec,keyboard = &kbd;
 	};
+
+	kb_bl_pwm {
+		compatible = "cros-ec,kblight-pwm";
+		pwms = <&pwm2 0 PWM_HZ(324) PWM_POLARITY_NORMAL>;
+		status = "okay";
+	};
 };
 
 &kbd {
@@ -116,4 +122,10 @@
 		r-rc = <KBD_RC(7, 9)>;
 		vol-up-rc = <KBD_RC(1, 5)>;
 	};
+};
+
+&pwm2 {
+	status = "okay";
+	pinctrl-0 = <&pwm2_gpc4>;
+	pinctrl-names = "default";
 };

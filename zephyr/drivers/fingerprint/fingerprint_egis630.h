@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS630_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS630_H_
 
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/spi.h>
@@ -31,4 +31,4 @@ struct egis630_calibration_data {
 	uint8_t data[];
 };
 
-#endif /* ZEPHYR_DRIVERS_FINGERPRINT_EGIS630_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS630_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_PDC_UTILS_H_
-#define ZEPHYR_INCLUDE_DRIVERS_PDC_UTILS_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_UTILS_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_UTILS_H_
 
 #define __TALLY_CCD_PROP(node) COND_CODE_1(DT_PROP(node, ccd), (1), (0)) +
 
@@ -26,4 +26,4 @@
 			     DT_DRV_COMPAT) " PDC node must be tagged " \
 					    "with the `ccd` property")
 
-#endif /* ZEPHYR_INCLUDE_DRIVERS_PDC_UTILS_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_UTILS_H_ */

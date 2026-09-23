@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_SHIMMED_TASK_ID_H
-#define __CROS_EC_SHIMMED_TASK_ID_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_SHIMMED_TASK_ID_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_SHIMMED_TASK_ID_H_
 
 #include "common.h"
 
@@ -276,10 +276,13 @@ enum {
  */
 /* clang-format off */
 #define CROS_EC_EXTRA_TASKS(fn)                                         \
-	COND_CODE_1(CONFIG_TASK_HOSTCMD_THREAD_MAIN, (fn(HOSTCMD)),     \
+	COND_CODE_1(CONFIG_TASK_HOSTCMD_THREAD_MAIN,                    \
+		(IF_ENABLED(CONFIG_SHIMMED_TASKS, (fn(HOSTCMD)))),      \
 		(fn(MAIN)))                                             \
 	COND_CODE_1(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED,               \
-		(IF_ENABLED(CONFIG_EC_HOST_CMD, (fn(HOSTCMD)))), ())    \
+		(IF_ENABLED(CONFIG_SHIMMED_TASKS,                       \
+			    (IF_ENABLED(CONFIG_EC_HOST_CMD, (fn(HOSTCMD)))))), \
+		())                                                     \
 	COND_CODE_1(CONFIG_SHELL_BACKEND_SERIAL, (fn(SHELL)),           \
 		(COND_CODE_1(CONFIG_SHELL_BACKEND_DUMMY, (fn(SHELL)),   \
 		())))                                                   \
@@ -301,4 +304,4 @@ enum { CROS_EC_EXTRA_TASKS(EXTRA_TASK_ID) };
 }
 #endif
 
-#endif /* __CROS_EC_SHIMMED_TASK_ID_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_SHIMMED_TASK_ID_H_ */

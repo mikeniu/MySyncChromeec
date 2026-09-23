@@ -22,8 +22,8 @@
  * of chipset_.
  */
 
-#ifndef __AP_POWER_AP_POWER_INTERFACE_H__
-#define __AP_POWER_AP_POWER_INTERFACE_H__
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_POWER_INTERFACE_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_POWER_INTERFACE_H_
 
 #include <zephyr/kernel.h>
 #include <zephyr/sys/util.h>
@@ -230,4 +230,4 @@ void ap_pwrseq_task_start(void);
  */
 k_tid_t get_ap_pwrseq_thread(void);
 
-#endif /* __AP_POWER_AP_POWER_INTERFACE_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_AP_POWER_AP_POWER_INTERFACE_H_ */

@@ -1,0 +1,74 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+common:
+  platform_allow:
+    - native_sim
+tests:
+  bluey.baseboard:
+    extra_configs:
+      - CONFIG_TEST_BOARD_BASEBOARD=y
+      - CONFIG_TEST_BOARD_BASEBOARD_BATTERY=y
+      - CONFIG_TEST_BOARD_BASEBOARD_SWITCHCAP=y
+      - CONFIG_TEST_BOARD_BASEBOARD_CHIPSET=y
+      - CONFIG_TEST_BOARD_BASEBOARD_THROTTLE=y
+    extra_dtc_overlay_files:
+      - "boards/native_sim.overlay"
+  bluey.bluey:
+    extra_configs:
+      - CONFIG_TEST_BOARD_BLUEY=y
+      - CONFIG_TEST_BOARD_BLUEY_CHIPSET=y
+      - CONFIG_TEST_BOARD_BLUEY_FAN=y
+    extra_dtc_overlay_files:
+      - "boards/bluey.overlay"
+  bluey.quenbi:
+    extra_configs:
+      - CONFIG_TEST_BOARD_QUENBI=y
+      - CONFIG_TEST_BOARD_QUENBI_CHIPSET=y
+      - CONFIG_TEST_BOARD_QUENBI_FAN=y
+    extra_dtc_overlay_files:
+      - "boards/quenbi.overlay"
+  bluey.mica:
+    extra_configs:
+      - CONFIG_TEST_BOARD_MICA=y
+      - CONFIG_TEST_BOARD_MICA_CHIPSET=y
+      - CONFIG_TEST_BOARD_MICA_EXTPOWER=y
+      - CONFIG_TEST_BOARD_MICA_FAN=y
+      - CONFIG_TEST_BOARD_MICA_KEYBOARD=y
+      - CONFIG_TEST_BOARD_MICA_LED=y
+      - CONFIG_TEST_BOARD_MICA_THROTTLE=y
+      - CONFIG_PLATFORM_EC_TEMP_SENSOR=y
+    extra_dtc_overlay_files:
+      - "boards/mica.overlay"
+  bluey.quartz:
+    extra_configs:
+      - CONFIG_TEST_BOARD_QUARTZ=y
+      - CONFIG_TEST_BOARD_QUARTZ_CHIPSET=y
+      - CONFIG_TEST_BOARD_QUARTZ_EXTPOWER=y
+      - CONFIG_TEST_BOARD_QUARTZ_FAN=y
+      - CONFIG_TEST_BOARD_QUARTZ_LED=y
+      - CONFIG_PLATFORM_EC_TEMP_SENSOR=y
+    extra_dtc_overlay_files:
+      - "boards/quartz.overlay"
+  bluey.annite:
+    extra_configs:
+      - CONFIG_TEST_BOARD_ANNITE=y
+      - CONFIG_TEST_BOARD_ANNITE_CHIPSET=y
+      - CONFIG_TEST_BOARD_ANNITE_EXTPOWER=y
+      - CONFIG_TEST_BOARD_ANNITE_FAN=y
+      - CONFIG_TEST_BOARD_ANNITE_THROTTLE=y
+      - CONFIG_PLATFORM_EC_TEMP_SENSOR=y
+    extra_dtc_overlay_files:
+      - "boards/annite.overlay"
+  bluey.pic:
+    extra_configs:
+      - CONFIG_TEST_BOARD_PIC=y
+      - CONFIG_TEST_BOARD_PIC_CHIPSET=y
+      - CONFIG_TEST_BOARD_PIC_EXTPOWER=y
+      - CONFIG_TEST_BOARD_PIC_FAN=y
+      - CONFIG_TEST_BOARD_PIC_THROTTLE=y
+      - CONFIG_PLATFORM_EC_TEMP_SENSOR=y
+      - CONFIG_PLATFORM_EC_NUM_FANS=1
+    extra_dtc_overlay_files:
+      - "boards/pic.overlay"

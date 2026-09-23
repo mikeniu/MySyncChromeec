@@ -5,8 +5,8 @@
 
 /* USB Type-C module */
 
-#ifndef __CROS_EC_USB_TC_H
-#define __CROS_EC_USB_TC_H
+#ifndef PLATFORM_EC_INCLUDE_USB_TC_SM_H_
+#define PLATFORM_EC_INCLUDE_USB_TC_SM_H_
 
 #include "usb_pd.h"
 #include "usb_pd_tcpm.h"
@@ -422,4 +422,4 @@ void tc_ctvpd_detected(int port);
 }
 #endif
 
-#endif /* __CROS_EC_USB_TC_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_TC_SM_H_ */

@@ -5,8 +5,8 @@
 
 /* Hardware timer driver API */
 
-#ifndef __CROS_EC_HWTIMER_H
-#define __CROS_EC_HWTIMER_H
+#ifndef PLATFORM_EC_INCLUDE_HWTIMER_H_
+#define PLATFORM_EC_INCLUDE_HWTIMER_H_
 
 #include <stdint.h>
 
@@ -125,4 +125,4 @@ void hwtimer_reset_watchdog(void);
 }
 #endif
 
-#endif /* __CROS_EC_HWTIMER_H */
+#endif /* PLATFORM_EC_INCLUDE_HWTIMER_H_ */

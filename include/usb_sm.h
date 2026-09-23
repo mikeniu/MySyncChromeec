@@ -5,8 +5,8 @@
 
 /* USB State Machine Framework */
 
-#ifndef __CROS_EC_USB_SM_H
-#define __CROS_EC_USB_SM_H
+#ifndef PLATFORM_EC_INCLUDE_USB_SM_H_
+#define PLATFORM_EC_INCLUDE_USB_SM_H_
 
 #include "compiler.h" /* for typeof() on Zephyr */
 
@@ -118,4 +118,4 @@ struct test_sm_data {
 }
 #endif
 
-#endif /* __CROS_EC_USB_SM_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_SM_H_ */

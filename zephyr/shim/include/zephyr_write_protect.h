@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ZEPHYR_WRITE_PROTECT_H
-#define __CROS_EC_ZEPHYR_WRITE_PROTECT_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_WRITE_PROTECT_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_WRITE_PROTECT_H_
 
 #include "gpio/gpio_int.h"
 #include "gpio_signal.h"
@@ -43,4 +43,4 @@ static inline bool write_protect_is_asserted(void)
 }
 #endif
 
-#endif /* __CROS_EC_ZEPHYR_WRITE_PROTECT_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_WRITE_PROTECT_H_ */

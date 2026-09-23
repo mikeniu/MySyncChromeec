@@ -5,8 +5,8 @@
 
 /* RMA challenge-response */
 
-#ifndef __CROS_EC_RMA_AUTH_H
-#define __CROS_EC_RMA_AUTH_H
+#ifndef PLATFORM_EC_INCLUDE_RMA_AUTH_H_
+#define PLATFORM_EC_INCLUDE_RMA_AUTH_H_
 
 #include "common.h" /* For __packed. */
 
@@ -86,4 +86,4 @@ void get_rma_device_id(uint8_t rma_device_id[RMA_DEVICE_ID_SIZE]);
 }
 #endif
 
-#endif
+#endif /* PLATFORM_EC_INCLUDE_RMA_AUTH_H_ */

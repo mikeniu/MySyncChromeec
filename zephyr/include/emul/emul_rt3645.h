@@ -8,8 +8,8 @@
  * @brief Emulator for Richtek RT3645 IMVP9.1 PWM Controller
  */
 
-#ifndef EMUL_RT3645_H
-#define EMUL_RT3645_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_RT3645_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_RT3645_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/sys/slist.h>
@@ -64,4 +64,4 @@ void rt3645_emul_set_nvm_stat(const struct emul *emul, uint8_t stat);
  */
 void rt3645_emul_set_product_id(const struct emul *emul, uint8_t id);
 
-#endif /* EMUL_RT3645_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_RT3645_H_ */

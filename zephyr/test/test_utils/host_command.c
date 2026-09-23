@@ -40,7 +40,7 @@ static uint8_t cal_checksum(const uint8_t *const buffer, const uint16_t size)
 
 static uint16_t pass_args_to_sim(struct host_cmd_handler_args *args)
 {
-	uint8_t rx_buf[args->params_size + RX_HEADER_SIZE];
+	uint8_t rx_buf[args->input_buf_size + RX_HEADER_SIZE];
 	struct ec_host_request *rx_header = (struct ec_host_request *)rx_buf;
 	struct ec_host_response *tx_header;
 	int rv;
@@ -51,10 +51,10 @@ static uint16_t pass_args_to_sim(struct host_cmd_handler_args *args)
 	rx_header->checksum = 0;
 	rx_header->command = args->command;
 	rx_header->command_version = args->version;
-	rx_header->data_len = args->params_size;
+	rx_header->data_len = args->input_buf_size;
 	rx_header->reserved = 0;
 
-	memcpy(rx_buf + RX_HEADER_SIZE, args->params, args->params_size);
+	memcpy(rx_buf + RX_HEADER_SIZE, args->input_buf, args->input_buf_size);
 	rx_header->checksum = cal_checksum(rx_buf, sizeof(rx_buf));
 
 	ec_host_cmd_backend_sim_install_send_cb(host_send, &tx_buf);
@@ -62,12 +62,12 @@ static uint16_t pass_args_to_sim(struct host_cmd_handler_args *args)
 	if (original_len_max == 0) {
 		original_len_max = tx_buf->len_max;
 	}
-	uint16_t requested_len = args->response_max + TX_HEADER_SIZE;
+	uint16_t requested_len = args->output_buf_max + TX_HEADER_SIZE;
 	if (requested_len > original_len_max) {
 		LOG_WRN("requested response size %d exceeds Host Command TX "
 			"buffer size %d. Truncating.",
 			requested_len, original_len_max);
-		args->response_max = original_len_max - TX_HEADER_SIZE;
+		args->output_buf_max = original_len_max - TX_HEADER_SIZE;
 		tx_buf->len_max = original_len_max;
 	} else {
 		tx_buf->len_max = requested_len;
@@ -82,9 +82,9 @@ static uint16_t pass_args_to_sim(struct host_cmd_handler_args *args)
 	zassert_equal(rv, 0, "Send was not called after %dms",
 		      CONFIG_TEST_UTILS_HOST_CMD_RESPONSE_TIMEOUT_MS);
 
-	args->response_size = tx_buf->len - TX_HEADER_SIZE;
-	memcpy(args->response, (uint8_t *)tx_buf->buf + TX_HEADER_SIZE,
-	       args->response_size);
+	args->output_buf_size = tx_buf->len - TX_HEADER_SIZE;
+	memcpy(args->output_buf, (uint8_t *)tx_buf->buf + TX_HEADER_SIZE,
+	       args->output_buf_size);
 	tx_header = tx_buf->buf;
 
 	return tx_header->result;

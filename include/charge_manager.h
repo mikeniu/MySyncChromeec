@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CHARGE_MANAGER_H
-#define __CROS_EC_CHARGE_MANAGER_H
+#ifndef PLATFORM_EC_INCLUDE_CHARGE_MANAGER_H_
+#define PLATFORM_EC_INCLUDE_CHARGE_MANAGER_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -465,4 +465,4 @@ __override_proto int board_is_dc_jack_present(void);
 }
 #endif
 
-#endif /* __CROS_EC_CHARGE_MANAGER_H */
+#endif /* PLATFORM_EC_INCLUDE_CHARGE_MANAGER_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_EGIS660_H_
-#define ZEPHYR_INCLUDE_EMUL_EMUL_EGIS660_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_EGIS660_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_EGIS660_H_
 
 /* EGIS660 example hardware id */
 #define EGIS660_HWID 0x2D11
@@ -17,4 +17,4 @@
  */
 void egis660_set_hwid(const struct emul *target, uint16_t hardware_id);
 
-#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_EGIS660_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_EGIS660_H_ */

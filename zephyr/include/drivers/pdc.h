@@ -8,8 +8,8 @@
  * @brief Public APIs for Power Delivery Controller Chip drivers.
  *
  */
-#ifndef ZEPHYR_INCLUDE_DRIVERS_PDC_H_
-#define ZEPHYR_INCLUDE_DRIVERS_PDC_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_PDC_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_PDC_H_
 
 #include "ec_commands.h"
 #include "power.h"
@@ -1570,4 +1570,4 @@ static inline int pdc_set_max_pdp(const struct device *dev,
  * @}
  */
 
-#endif /* ZEPHYR_INCLUDE_DRIVERS_PDC_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_PDC_H_ */

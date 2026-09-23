@@ -5,8 +5,8 @@
  * Parade PS8743 USB Type-C Redriving Switch for USB Host / DisplayPort.
  */
 
-#ifndef __CROS_EC_DRIVER_USB_MUX_PS8743_PUBLIC_H
-#define __CROS_EC_DRIVER_USB_MUX_PS8743_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_USB_MUX_PS8743_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_USB_MUX_PS8743_PUBLIC_H_
 
 #include "usb_mux.h"
 
@@ -120,4 +120,4 @@ int ps8743_check_chip_id(const struct usb_mux *me, int *val);
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_USB_MUX_PS8743_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_USB_MUX_PS8743_PUBLIC_H_ */

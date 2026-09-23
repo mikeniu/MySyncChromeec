@@ -77,7 +77,7 @@ ZTEST(hid_i2c_touchpad, test_touchpad_event)
 	callbacks->stop(target_cfg);
 	zassert_equal(read_len, sizeof(struct usb_hid_touchpad_report) + 2);
 	zassert_equal(sys_get_le16(read_ptr),
-		      sizeof(struct usb_hid_touchpad_report));
+		      sizeof(struct usb_hid_touchpad_report) + 2);
 	zassert_mem_equal(&expected1, read_ptr + 2,
 			  sizeof(struct usb_hid_touchpad_report));
 	zassert_equal(gpio_emul_output_get(hid_irq->port, hid_irq->pin), 0);
@@ -87,7 +87,7 @@ ZTEST(hid_i2c_touchpad, test_touchpad_event)
 	callbacks->stop(target_cfg);
 	zassert_equal(read_len, sizeof(struct usb_hid_touchpad_report) + 2);
 	zassert_equal(sys_get_le16(read_ptr),
-		      sizeof(struct usb_hid_touchpad_report));
+		      sizeof(struct usb_hid_touchpad_report) + 2);
 	zassert_mem_equal(&expected2, read_ptr + 2,
 			  sizeof(struct usb_hid_touchpad_report));
 	zassert_equal(gpio_emul_output_get(hid_irq->port, hid_irq->pin), 1);
@@ -167,7 +167,7 @@ ZTEST(hid_i2c_touchpad, test_get_report)
 				      sizeof(get_report_request));
 	callbacks->buf_read_requested(target_cfg, &read_ptr, &read_len);
 	callbacks->stop(target_cfg);
-	zassert_equal(*(uint16_t *)read_ptr, 257);
+	zassert_equal(*(uint16_t *)read_ptr, 257 + 2);
 	zassert_equal(read_ptr[2], REPORT_ID_DEVICE_CERT);
 
 	get_report_request[2] = REPORT_ID_DEVICE_CAPS;
@@ -175,7 +175,7 @@ ZTEST(hid_i2c_touchpad, test_get_report)
 				      sizeof(get_report_request));
 	callbacks->buf_read_requested(target_cfg, &read_ptr, &read_len);
 	callbacks->stop(target_cfg);
-	zassert_equal(*(uint16_t *)read_ptr, 3);
+	zassert_equal(*(uint16_t *)read_ptr, 3 + 2);
 	zassert_equal(read_ptr[2], REPORT_ID_DEVICE_CAPS);
 
 	get_report_request[2] = 99;

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_SYSTEM_CHIP_H_
-#define __CROS_EC_SYSTEM_CHIP_H_
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_SYSTEM_CHIP_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_SYSTEM_CHIP_H_
 
 #define SET_BIT(reg, bit) ((reg) |= (0x1 << (bit)))
 #define CLEAR_BIT(reg, bit) ((reg) &= (~(0x1 << (bit))))
@@ -73,4 +73,4 @@ extern unsigned int __flash_lplfw_start;
 extern unsigned int __flash_lplfw_end;
 #endif
 
-#endif // __CROS_EC_SYSTEM_CHIP_H_
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_CHIP_NPCX_INCLUDE_SYSTEM_CHIP_H_ */

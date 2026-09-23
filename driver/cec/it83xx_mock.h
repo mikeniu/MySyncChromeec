@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __CROS_EC_DRIVER_CEC_IT83XX_MOCK_H
-#define __CROS_EC_DRIVER_CEC_IT83XX_MOCK_H
+#ifndef PLATFORM_EC_DRIVER_CEC_IT83XX_MOCK_H_
+#define PLATFORM_EC_DRIVER_CEC_IT83XX_MOCK_H_
 
 /* Mock versions of the CEC registers for testing */
 
@@ -38,4 +38,4 @@ struct mock_it83xx_cec_regs {
 
 extern struct mock_it83xx_cec_regs mock_it83xx_cec_regs;
 
-#endif /* __CROS_EC_DRIVER_CEC_IT83XX_MOCK_H */
+#endif /* PLATFORM_EC_DRIVER_CEC_IT83XX_MOCK_H_ */

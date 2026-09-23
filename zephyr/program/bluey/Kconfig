@@ -32,10 +32,22 @@ config BOARD_ANNITE
 	  Build Google ANNITE board. The board uses Nuvoton
 	  NPCX9 chip as the EC.
 
+config BOARD_ANETO
+	bool "Google ANETO baseboard"
+	help
+	  Build Google ANETO board. The board uses Nuvoton
+	  NPCX9 chip as the EC.
+
 config BOARD_PIC
 	bool "Google PIC baseboard"
 	help
 	  Build Google PIC board. The board uses Nuvoton
+	  NPCX9 chip as the EC.
+
+config BOARD_MERU
+	bool "Google Meru baseboard"
+	help
+	  Build Google Meru board. The board uses Nuvoton
 	  NPCX9 chip as the EC.
 
 module = Bluey

@@ -8,8 +8,8 @@
  * @brief PD task to configure USB-C Alternate modes on Intel SoC.
  */
 
-#ifndef __CROS_EC_PD_TASK_INTEL_ALTMODE_H
-#define __CROS_EC_PD_TASK_INTEL_ALTMODE_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PD_TASK_INTEL_ALTMODE_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PD_TASK_INTEL_ALTMODE_H_
 
 /**
  * @brief Starts the Intel Alternate Mode configuration thread.
@@ -47,4 +47,4 @@ static inline bool is_pd_intel_altmode_task_suspended(void)
 }
 #endif /* defined(CONFIG_USBC_INTEL_ALTMODE) */
 
-#endif /* __CROS_EC_PD_TASK_INTEL_ALTMODE_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PD_TASK_INTEL_ALTMODE_H_ */

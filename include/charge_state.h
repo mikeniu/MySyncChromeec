@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __CROS_EC_CHARGE_STATE_H
-#define __CROS_EC_CHARGE_STATE_H
+#ifndef PLATFORM_EC_INCLUDE_CHARGE_STATE_H_
+#define PLATFORM_EC_INCLUDE_CHARGE_STATE_H_
 
 #include "battery.h"
 #include "battery_smart.h"
@@ -385,4 +385,4 @@ int board_should_charger_bypass(void);
 /* Config Charger */
 #include "charge_state.h"
 
-#endif /* __CROS_EC_CHARGE_STATE_H */
+#endif /* PLATFORM_EC_INCLUDE_CHARGE_STATE_H_ */

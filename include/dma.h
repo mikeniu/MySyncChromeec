@@ -5,8 +5,8 @@
  * DMA interface
  */
 
-#ifndef __CROS_EC_DMA_H
-#define __CROS_EC_DMA_H
+#ifndef PLATFORM_EC_INCLUDE_DMA_H_
+#define PLATFORM_EC_INCLUDE_DMA_H_
 
 #ifdef CONFIG_DMA_CROS
 
@@ -176,4 +176,4 @@ void dma_init(void);
 #endif
 
 #endif /* CONFIG_DMA_CROS */
-#endif
+#endif /* PLATFORM_EC_INCLUDE_DMA_H_ */

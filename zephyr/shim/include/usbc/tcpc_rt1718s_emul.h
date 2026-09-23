@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __ZEPHYR_SHIM_TCPC_RT1718S_EMUL_H
-#define __ZEPHYR_SHIM_TCPC_RT1718S_EMUL_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_RT1718S_EMUL_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_RT1718S_EMUL_H_
 
 #include "driver/tcpm/rt1718s_public.h"
 
@@ -33,4 +33,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __ZEPHYR_SHIM_TPCP_RT1718S_EMUL_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_RT1718S_EMUL_H_ */

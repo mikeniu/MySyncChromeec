@@ -3,11 +3,11 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_STDBOOL_H__
-#define __CROS_EC_STDBOOL_H__
+#ifndef PLATFORM_EC_BUILTIN_STDBOOL_H_
+#define PLATFORM_EC_BUILTIN_STDBOOL_H_
 
 #define bool _Bool
 #define true 1
 #define false 0
 
-#endif /* __CROS_EC_STDBOOL_H__ */
+#endif /* PLATFORM_EC_BUILTIN_STDBOOL_H_ */

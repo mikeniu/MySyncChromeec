@@ -8,8 +8,8 @@
  * be notified when the queue is read from so that it can take action, such as
  * adding new units to the queue.
  */
-#ifndef __CROS_EC_PRODUCER_H
-#define __CROS_EC_PRODUCER_H
+#ifndef PLATFORM_EC_INCLUDE_PRODUCER_H_
+#define PLATFORM_EC_INCLUDE_PRODUCER_H_
 
 #include "queue.h"
 
@@ -46,4 +46,4 @@ struct producer {
 }
 #endif
 
-#endif /* __CROS_EC_PRODUCER_H */
+#endif /* PLATFORM_EC_INCLUDE_PRODUCER_H_ */
