@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21b58795_5154e30b",
+        "filename": "common/charge_control.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-09-23T06:19:43Z",
+      "side": 1,
+      "message": "please take a look at my review cmd from other CL.\n\nThis region is very precious and we don\u0027t need to exhaust it by using upper/lower and flag.\n\nif you need a flag then make use of Kconfig to know which all platform would make use of such BBRAM feature for charge limit.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 66
+      },
+      "revId": "29876c6f26acce268738f6c93018da53f36f8a7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d0f7d83_a4e40e11",
+        "filename": "common/charge_control.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-09-23T06:19:43Z",
+      "side": 1,
+      "message": "why are we not using `IS_ENABLED` ?",
+      "range": {
+        "startLine": 150,
+        "startChar": 6,
+        "endLine": 150,
+        "endChar": 13
+      },
+      "revId": "29876c6f26acce268738f6c93018da53f36f8a7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
