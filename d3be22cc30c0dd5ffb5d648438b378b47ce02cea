@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a785a73d_cfc2c82d",
+        "filename": "zephyr/test/bluey/Kconfig",
+        "patchSetId": 9
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-23T15:59:01Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c2a7ce7c_784d3ac9",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 0
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f8c9da84_ac9004ef",
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "Added an explanation to the code detailing why this table is being redefined. Perhaps I should file a bug to clean up the fan.dtsi across the entire program to ensure it can be properly included in the test; what are your thoughts?",
       "parentUuid": "f8c9da84_ac9004ef",
+      "range": {
+        "startLine": 81,
+        "startChar": 1,
+        "endLine": 82,
+        "endChar": 35
+      },
+      "revId": "d3be22cc30c0dd5ffb5d648438b378b47ce02cea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31d854bb_85b0809d",
+        "filename": "zephyr/test/bluey/boards/annite.overlay",
+        "patchSetId": 9
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-23T15:59:01Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "43e4ea94_ac11db0d",
       "range": {
         "startLine": 81,
         "startChar": 1,
