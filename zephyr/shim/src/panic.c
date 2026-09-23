@@ -296,7 +296,7 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 	 * the watchdog will overwrite this panic.
 	 */
 	panic_reboot();
-	__ASSERT_UNREACHABLE;
+	CODE_UNREACHABLE;
 }
 #endif /* CONFIG_ZTEST_FATAL_HOOK */
 
@@ -310,7 +310,7 @@ __override void assert_post_action(void)
 		command_crash_nested_handler();
 
 	panic_reboot();
-	__ASSERT_UNREACHABLE;
+	CODE_UNREACHABLE;
 }
 #else
 __override void assert_post_action(const char *path, unsigned int line)
@@ -325,7 +325,7 @@ __override void assert_post_action(const char *path, unsigned int line)
 	}
 
 	panic_reboot();
-	__ASSERT_UNREACHABLE;
+	CODE_UNREACHABLE;
 }
 #endif /* CONFIG_ASSERT_NO_FILE_INFO */
 #endif /* CONFIG_PLATFORM_EC_DEBUG_ASSERT */
