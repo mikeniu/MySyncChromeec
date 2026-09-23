@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de531973_5f70d62d",
+        "filename": "zephyr/test/bluey/testcase.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-23T16:30:17Z",
+      "side": 1,
+      "message": "local branch, Kconfig:39-43 defines CONFIG_TEST_BOARD_ANNITE under choice TEST_BOARD_VARIANT, and CMakeLists.txt:20 uses add_subdirectory_ifdef(CONFIG_TEST_BOARD_ANNITE tests/annite).",
+      "parentUuid": "e28d5e03_2d576ee1",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 0
+      },
+      "revId": "fde70658535df7c05f7e918de9ff8bb8d7d20097",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8990228_d42a9ff9",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-22T20:29:34Z",
       "side": 1,
       "message": "An assertion is missing here to verify that the throttle GPIO remains 0 when the chipset is off. Without it, this block doesn\u0027t validate anything.",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 0
+      },
+      "revId": "fde70658535df7c05f7e918de9ff8bb8d7d20097",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eaf7725b_c9a9d9b8",
+        "filename": "zephyr/test/bluey/tests/annite/src/test_throttle.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-23T16:30:17Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b8990228_d42a9ff9",
       "range": {
         "startLine": 31,
         "startChar": 0,
