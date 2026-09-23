@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "493d8623_c4327247",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-23T09:25:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n*   **Functionality**: The logic works as intended, performing a widespread rename from `elan80series` to `elan_series` across the sensor emulator and related test drivers.\n*   **Architecture \u0026 Component Fit**: The rename is consistently applied across `CMakeLists.txt`, Kconfigs, headers, C files, and devicetree overlays.\n*   **Code Simplicity**: The changes are as simple as possible (a direct terminology replace). No further simplifications are needed.\n*   **Idiomaticity \u0026 Readability**: Code remains idiomatic and standard C/Zephyr constructs are kept intact.\n*   **Security**: No security risks identified.\n*   **Testing \u0026 Test Coverage**: Existing tests were appropriately relocated and updated for the new names.\n*   **CL Size \u0026 Scope**: Size: L (+336, -338). Although this CL consists mainly of renaming variables, macros, and files without functional changes, it exceeds the strict guidelines for a single CL. Please split this CL to keep review units smaller.\n    *   **CL 1**: Rename the emulator (`zephyr/emul/emul_elan_series.c`, `zephyr/include/emul/emul_elan_series.h`) along with their Kconfig and CMake bindings.\n    *   **CL 2**: Rename the test suite files (`zephyr/test/fingerprint/drivers/elan_series/...`) alongside their respective board overlays and CMake configurations. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8450590_8892b5c3-486e-4173-8e11-49af90c18ee4.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "73eb69c6d23ec4c9b9030b184008066ffd1f1116",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
