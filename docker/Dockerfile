@@ -65,7 +65,7 @@ RUN git clone --depth 1 \
 RUN mkdir -p /opt/repos/src/third_party/zephyrproject && \
     cd /opt/repos/src/third_party/zephyrproject && \
     git init -b main && \
-    git remote add origin \
+    git remote add -t main origin \
         ${REPO_BASE}/third_party/zephyrproject && \
     git config core.sparseCheckout true && \
     echo "/zephyr/" >> .git/info/sparse-checkout && \
@@ -95,7 +95,7 @@ RUN mkdir -p /opt/repos/src/third_party/u-boot && \
 RUN mkdir -p /opt/repos/src/third_party/chromiumos-overlay && \
     cd /opt/repos/src/third_party/chromiumos-overlay && \
     git init -b main && \
-    git remote add origin \
+    git remote add -t main origin \
         ${REPO_BASE}/overlays/chromiumos-overlay && \
     git config core.sparseCheckout true && \
     echo "/eclass/coreboot-sdk-ec-dependencies.eclass" \
