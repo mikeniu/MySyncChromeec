@@ -31,6 +31,19 @@ def module_dts_overlay_name(modpath, board_name):
     return modpath / "zephyr" / "dts" / "board-overlays" / f"{board_name}.dts"
 
 
+def module_kconfig_overlay_name(modpath, project_name):
+    """Given a project name, return the expected Kconfig overlay path.
+
+    Args:
+        modpath: the module path as a pathlib.Path object
+        project_name: the name of the project
+
+    Returns:
+        A pathlib.Path object to the expected overlay path.
+    """
+    return modpath / "include" / project_name / "project.conf"
+
+
 @dataclasses.dataclass
 class ProjectConfig:
     """All the information needed to define a project."""
@@ -124,6 +137,28 @@ class Project:
             return build_config.BuildConfig(
                 cmake_defs={"DTC_OVERLAY_FILE": ";".join(map(str, overlays))}
             )
+        return build_config.BuildConfig()
+
+    def find_kconfig_overlays(self, modules):
+        """Find appropriate kconfig overlays from registered modules.
+
+        Args:
+            modules: A dictionary of module names mapping to paths.
+
+        Returns:
+            A BuildConfig with relevant configurations for found Kconfig
+            overlay files.
+        """
+        overlays = []
+        for module_path in modules.values():
+            kconf_path = module_kconfig_overlay_name(
+                module_path, self.config.project_name
+            )
+            if kconf_path.is_file():
+                overlays.append(kconf_path.resolve())
+
+        if overlays:
+            return build_config.BuildConfig(kconfig_files=overlays)
         return build_config.BuildConfig()
 
     def prune_modules(self, module_paths):

@@ -90,10 +90,10 @@ static bool want_reboot_ap_at_g3; /* Want to reboot AP from G3? */
 /* Want to reboot AP from G3 with delay? */
 static uint64_t reboot_ap_at_g3_delay;
 
-static enum ec_status
-host_command_reboot_ap_on_g3(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_reboot_ap_on_g3(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_reboot_ap_on_g3_v1 *cmd = args->params;
+	const struct ec_params_reboot_ap_on_g3_v1 *cmd = args->input_buf;
 
 	/* Store request for processing at g3 */
 	want_reboot_ap_at_g3 = true;
@@ -106,13 +106,14 @@ host_command_reboot_ap_on_g3(struct host_cmd_handler_args *args)
 		reboot_ap_at_g3_delay = cmd->reboot_ap_at_g3_delay;
 		break;
 	default:
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_VERSION;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_REBOOT_AP_ON_G3, host_command_reboot_ap_on_g3,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_REBOOT_AP_ON_G3,
+			    host_command_reboot_ap_on_g3,
+			    EC_VER_MASK(0) | EC_VER_MASK(1));
 
 __overridable int power_signal_get_level(enum gpio_signal signal)
 {
@@ -360,28 +361,29 @@ static void power_set_active_wake_mask(void)
  */
 static struct smart_discharge_zone sdzone;
 
-static enum ec_status hc_smart_discharge(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_smart_discharge(struct ec_host_cmd_handler_args *args)
 {
 	static uint16_t hours_to_zero;
 	static struct discharge_rate drate;
-	const struct ec_params_smart_discharge *p = args->params;
-	struct ec_response_smart_discharge *r = args->response;
+	const struct ec_params_smart_discharge *p = args->input_buf;
+	struct ec_response_smart_discharge *r = args->output_buf;
 
 	if (p->flags & EC_SMART_DISCHARGE_FLAGS_SET) {
 		int cap;
 
 		if (battery_full_charge_capacity(&cap))
-			return EC_RES_UNAVAILABLE;
+			return EC_HOST_CMD_UNAVAILABLE;
 
 		if (p->drate.hibern < p->drate.cutoff)
 			/* Hibernation discharge rate should be always higher */
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		else if (p->drate.cutoff > 0 && p->drate.hibern > 0)
 			drate = p->drate;
 		else if (p->drate.cutoff == 0 && p->drate.hibern == 0)
 			; /* no-op. use the current drate. */
 		else
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 
 		/* Commit */
 		hours_to_zero = p->hours_to_zero;
@@ -394,12 +396,13 @@ static enum ec_status hc_smart_discharge(struct host_cmd_handler_args *args)
 	r->hours_to_zero = hours_to_zero;
 	r->dzone = sdzone;
 	r->drate = drate;
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_SMART_DISCHARGE, hc_smart_discharge,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_SMART_DISCHARGE, hc_smart_discharge, EC_VER_MASK(0),
+		    struct ec_params_smart_discharge,
+		    struct ec_response_smart_discharge);
 
 __overridable enum critical_shutdown
 board_system_is_idle(uint64_t last_shutdown_time, uint64_t *target,
@@ -1057,11 +1060,11 @@ static int command_hibernation_delay(int argc, const char **argv)
 DECLARE_CONSOLE_COMMAND(hibdelay, command_hibernation_delay, "[sec]",
 			"Set the delay before going into hibernation");
 
-static enum ec_status
-host_command_hibernation_delay(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_hibernation_delay(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_hibernation_delay *p = args->params;
-	struct ec_response_hibernation_delay *r = args->response;
+	const struct ec_params_hibernation_delay *p = args->input_buf;
+	struct ec_response_hibernation_delay *r = args->output_buf;
 
 	uint32_t time_g3;
 	uint64_t t = get_time().val - last_shutdown_time;
@@ -1084,30 +1087,32 @@ host_command_hibernation_delay(struct host_cmd_handler_args *args)
 		r->time_remaining = hibernate_delay - time_g3;
 	r->hibernate_delay = hibernate_delay;
 
-	args->response_size = sizeof(struct ec_response_hibernation_delay);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(struct ec_response_hibernation_delay);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_HIBERNATION_DELAY, host_command_hibernation_delay,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_HIBERNATION_DELAY, host_command_hibernation_delay,
+		    EC_VER_MASK(0), struct ec_params_hibernation_delay,
+		    struct ec_response_hibernation_delay);
 #endif /* CONFIG_HIBERNATE */
 
 #ifdef CONFIG_POWER_SHUTDOWN_PAUSE_IN_S5
-static enum ec_status
-host_command_pause_in_s5(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_pause_in_s5(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_get_set_value *p = args->params;
-	struct ec_response_get_set_value *r = args->response;
+	const struct ec_params_get_set_value *p = args->input_buf;
+	struct ec_response_get_set_value *r = args->output_buf;
 
 	if (p->flags & EC_GSV_SET)
 		pause_in_s5 = p->value;
 
 	r->value = pause_in_s5;
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GSV_PAUSE_IN_S5, host_command_pause_in_s5,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_GSV_PAUSE_IN_S5, host_command_pause_in_s5,
+		    EC_VER_MASK(0), struct ec_params_get_set_value,
+		    struct ec_response_get_set_value);
 
 static int command_pause_in_s5(int argc, const char **argv)
 {
@@ -1169,10 +1174,13 @@ DECLARE_HOOK(HOOK_INIT, restore_enable_5v_state, HOOK_PRIO_FIRST);
 
 static void preserve_enable_5v_state(void)
 {
-	mutex_lock(&pwr_5v_ctl_mtx);
+	/*
+	 * Note: Interrupts are already disabled during HOOK_SYSJUMP,
+	 * so pwr_5v_en_req can be read atomically without locking
+	 * pwr_5v_ctl_mtx.
+	 */
 	system_add_jump_tag(P5_SYSJUMP_TAG, 0, sizeof(pwr_5v_en_req),
 			    &pwr_5v_en_req);
-	mutex_unlock(&pwr_5v_ctl_mtx);
 }
 DECLARE_HOOK(HOOK_SYSJUMP, preserve_enable_5v_state, HOOK_PRIO_DEFAULT);
 #endif /* defined(CONFIG_POWER_PP5000_CONTROL) */

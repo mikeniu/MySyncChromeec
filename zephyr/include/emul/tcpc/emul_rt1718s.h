@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_RT1718S_H
-#define __EMUL_RT1718S_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_RT1718S_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_RT1718S_H_
 
 #include "emul/tcpc/emul_tcpci.h"
 
@@ -75,4 +75,4 @@ void rt1718s_emul_reset_set_history(const struct emul *emul);
  */
 void rt1718s_emul_set_device_id(const struct emul *emul, uint16_t device_id);
 
-#endif /* __EMUL_RT1718S_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_RT1718S_H_ */

@@ -8,8 +8,8 @@
  * @brief API for fingerprint sensor simulator
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_SIM_H_
-#define ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_SIM_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_SIM_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_SIM_H_
 
 #include <drivers/fingerprint.h>
 
@@ -75,4 +75,4 @@ __syscall void fingerprint_load_image(const struct device *dev, uint8_t *image,
 #endif
 
 #include <zephyr/syscalls/fingerprint_sim.h>
-#endif /* ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_SIM_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_SIM_H_ */

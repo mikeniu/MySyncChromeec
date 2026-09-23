@@ -9,8 +9,8 @@
  * @brief PDC PDO helper functions
  */
 
-#ifndef __EMUL_PDC_PDO_H
-#define __EMUL_PDC_PDO_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PDC_PDO_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PDC_PDO_H_
 
 #include "drivers/pdc.h"
 #include "drivers/ucsi_v3.h"
@@ -66,4 +66,4 @@ int emul_pdc_pdo_set_direct(struct emul_pdc_pdo_t *data,
 			    enum pdo_offset_t pdo_offset, uint8_t num_pdos,
 			    enum pdo_source_t source, const uint32_t *pdos);
 
-#endif /* __EMUL_PDC_PDO_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PDC_PDO_H_ */

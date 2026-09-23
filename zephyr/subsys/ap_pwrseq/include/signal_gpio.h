@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __AP_PWRSEQ_SIGNAL_GPIO_H__
-#define __AP_PWRSEQ_SIGNAL_GPIO_H__
+#ifndef PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_SIGNAL_GPIO_H_
+#define PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_SIGNAL_GPIO_H_
 
 #include <zephyr/devicetree.h>
 
@@ -74,4 +74,4 @@ int power_signal_gpio_disable(enum pwr_sig_gpio gpio);
  */
 void power_signal_gpio_init(void);
 
-#endif /* __AP_PWRSEQ_SIGNAL_GPIO_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_SUBSYS_AP_PWRSEQ_INCLUDE_SIGNAL_GPIO_H_ */

@@ -60,8 +60,6 @@ struct usb_mux_info_t {
 struct intel_altmode_data {
 	/* Driver event object to receive events posted. */
 	struct k_event evt;
-	/* Callback for the AP power events */
-	struct ap_power_ev_callback cb;
 	/* Cache the dta status register */
 	union data_status_reg data_status[CONFIG_USB_PD_PORT_MAX_COUNT];
 	/*
@@ -107,6 +105,8 @@ static void intel_altmode_suspend_handler(struct ap_power_ev_callback *cb,
 		LOG_ERR("Invalid suspend event");
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(intel_altmode_suspend_handler, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);
 
 static void intel_altmode_event_cb(void)
 {
@@ -288,12 +288,6 @@ static void intel_altmode_thread(void *unused1, void *unused2, void *unused3)
 
 	/* Initialize events */
 	k_event_init(&intel_altmode_task_data.evt);
-
-	/* Add callbacks for suspend hooks */
-	ap_power_ev_init_callback(&intel_altmode_task_data.cb,
-				  intel_altmode_suspend_handler,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&intel_altmode_task_data.cb);
 
 	/* Register PD interrupt callback */
 	for (i = 0; i < pdc_power_mgmt_get_usb_pd_port_count(); i++)

@@ -3,7 +3,8 @@
  * found in the LICENSE file.
  */
 
-#pragma once
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_PW_TRANSPORT_PUBLIC_PW_TRANSPORT_SERVICE_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_PW_TRANSPORT_PUBLIC_PW_TRANSPORT_SERVICE_H_
 
 #include <pb_encode.h>
 
@@ -389,3 +390,6 @@ class Transport {
 };
 
 }  // namespace pw::transport
+
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_PW_TRANSPORT_PUBLIC_PW_TRANSPORT_SERVICE_H_ \
+        */

@@ -8,8 +8,8 @@
  * @brief Chrome OS-specific API for Serial Host Interface (SHI)
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_CROS_SHI_H_
-#define ZEPHYR_INCLUDE_DRIVERS_CROS_SHI_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_SHI_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_SHI_H_
 
 /**
  * @brief CROS Serial Host Interface Driver APIs
@@ -80,4 +80,4 @@ static inline int z_impl_cros_shi_disable(const struct device *dev)
  * @}
  */
 #include <zephyr/syscalls/cros_shi.h>
-#endif /* ZEPHYR_INCLUDE_DRIVERS_CROS_SHI_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_SHI_H_ */

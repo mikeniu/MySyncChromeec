@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef UTIL_FOCALTECH_TEST_UTILS_H_
-#define UTIL_FOCALTECH_TEST_UTILS_H_
+#ifndef PLATFORM_EC_UTIL_FOCALTECH_TEST_UTILS_H_
+#define PLATFORM_EC_UTIL_FOCALTECH_TEST_UTILS_H_
 
 #include <gmock/gmock.h>
 #include <openssl/sha.h>
@@ -45,4 +45,4 @@ ACTION_P(ReturnValidCsw, tag) {
 
 }  // namespace focaltech::testing
 
-#endif  // UTIL_FOCALTECH_TEST_UTILS_H_
+#endif /* PLATFORM_EC_UTIL_FOCALTECH_TEST_UTILS_H_ */

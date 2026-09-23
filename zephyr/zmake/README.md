@@ -97,7 +97,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake compare-builds
 
-**Usage:** `zmake compare-builds [-h] [--ref1 REF1] [--ref2 REF2] [-k] [-n] [-b] [-d] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name ...)`
+**Usage:** `zmake compare-builds [-h] [-m MODULE] [--ref1 REF1] [--ref2 REF2] [-k] [-n] [-b] [-d] [-D CMAKE_DEFS] [-t TOOLCHAIN] [--extra-cflags EXTRA_CFLAGS] (-a | project_name ...)`
 
 #### Positional Arguments
 
@@ -110,6 +110,7 @@ Chromium OS's meta-build tool for Zephyr
 |   |   |
 |---|---|
 | `-h`, `--help` | show this help message and exit |
+| `-m MODULE`, `--module MODULE` | Name of the module repository to compare (e.g. 'ec', 'google-private'), default='ec' |
 | `--ref1 REF1` | 1st git reference (commit, branch, etc), default=HEAD |
 | `--ref2 REF2` | 2nd git reference (commit, branch, etc), default=HEAD~. If ref2==ref1 then only one checkout is performed and the firmware binary comparison is skipped. |
 | `-k`, `--keep-temps` | Keep temporary build directories on exit |
@@ -152,7 +153,7 @@ Chromium OS's meta-build tool for Zephyr
 
 ### zmake analyze-build-diff
 
-**Usage:** `zmake analyze-build-diff [-h] target1 target2`
+**Usage:** `zmake analyze-build-diff [-h] target1 target2 [--sections]`
 
 #### Positional Arguments
 
@@ -166,3 +167,4 @@ Chromium OS's meta-build tool for Zephyr
 |   |   |
 |---|---|
 | `-h`, `--help` | show this help message and exit |
+| `--sections` | Print detailed section size comparison and changed sections |

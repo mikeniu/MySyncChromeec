@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __POWER_HOST_SLEEP_H
-#define __POWER_HOST_SLEEP_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_POWER_HOST_SLEEP_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_POWER_HOST_SLEEP_H_
 
 /*
  * This file is for Zephyr ap_pwrseq to reuse legacy EC code.
@@ -40,4 +40,4 @@ void power_set_host_sleep_state(enum host_sleep_event state);
 }
 #endif
 
-#endif /* __POWER_HOST_SLEEP_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_POWER_HOST_SLEEP_H_ */

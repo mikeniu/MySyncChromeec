@@ -3,10 +3,10 @@
  * found in the LICENSE file.
  */
 
-#ifndef __ZEPHYR_USB_CONFIG_H
-#define __ZEPHYR_USB_CONFIG_H
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_REX_SCREEBO_INCLUDE_USB_CONFIG_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_REX_SCREEBO_INCLUDE_USB_CONFIG_H_
 
 extern uint32_t usb_db_type;
 extern uint32_t usb_mb_type;
 
-#endif /* __ZEPHYR_USB_CONFIG_H */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_REX_SCREEBO_INCLUDE_USB_CONFIG_H_ */

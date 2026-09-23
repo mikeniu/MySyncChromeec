@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_SYSTEM_BOOT_TIME_H
-#define __CROS_EC_SYSTEM_BOOT_TIME_H
+#ifndef PLATFORM_EC_INCLUDE_SYSTEM_BOOT_TIME_H_
+#define PLATFORM_EC_INCLUDE_SYSTEM_BOOT_TIME_H_
 
 #include "ec_commands.h"
 
@@ -23,4 +23,4 @@ void update_ap_boot_time(enum boot_time_param param);
 }
 #endif
 
-#endif /* __CROS_EC_SYSTEM_BOOT_TIME_H */
+#endif /* PLATFORM_EC_INCLUDE_SYSTEM_BOOT_TIME_H_ */

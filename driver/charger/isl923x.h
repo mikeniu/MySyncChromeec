@@ -6,8 +6,8 @@
  * Also supports Renesas RAA489000 battery charger.
  */
 
-#ifndef __CROS_EC_ISL923X_H
-#define __CROS_EC_ISL923X_H
+#ifndef PLATFORM_EC_DRIVER_CHARGER_ISL923X_H_
+#define PLATFORM_EC_DRIVER_CHARGER_ISL923X_H_
 
 #include "driver/charger/isl923x_public.h"
 
@@ -401,4 +401,4 @@ enum isl9237_fsm_state {
 #define ISL923X_AC_PROCHOT_CURRENT_MAX 6400 /* mA */
 #define ISL923X_DC_PROCHOT_CURRENT_MAX 12800 /* mA */
 
-#endif /* __CROS_EC_ISL923X_H */
+#endif /* PLATFORM_EC_DRIVER_CHARGER_ISL923X_H_ */

@@ -9,8 +9,8 @@
  * @brief Backend API for pi3usb9201 emulator
  */
 
-#ifndef __EMUL_PI3USB9201_H
-#define __EMUL_PI3USB9201_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PI3USB9201_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PI3USB9201_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c.h>
@@ -43,4 +43,4 @@ int pi3usb9201_emul_set_reg(const struct emul *emul, int reg, uint8_t val);
  */
 int pi3usb9201_emul_get_reg(const struct emul *emul, int reg, uint8_t *val);
 
-#endif /* __EMUL_PI3USB9201_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_PI3USB9201_H_ */

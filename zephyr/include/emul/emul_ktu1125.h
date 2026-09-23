@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef EMUL_KTU1125_H
-#define EMUL_KTU1125_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_KTU1125_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_KTU1125_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/sys/slist.h>
@@ -33,4 +33,4 @@ int ktu1125_emul_set_reg(const struct emul *emul, int reg, int val);
  */
 void ktu1125_emul_assert_irq(const struct emul *emul, bool assert_irq);
 
-#endif /* EMUL_KTU1125_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_KTU1125_H_ */

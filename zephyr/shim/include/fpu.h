@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FPU_H
-#define __CROS_EC_FPU_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_FPU_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_FPU_H_
 
 /*
  * These functions are available in newlib but we are are using Zephyr's
@@ -75,4 +75,4 @@ static inline float fabsf(float v)
 
 #endif /* CONFIG_FPU && CONFIG_MINIMAL_LIBC */
 
-#endif /* __CROS_EC_MATH_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_FPU_H_ */

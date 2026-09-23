@@ -5,8 +5,8 @@
 
 /* Version number for Chrome EC */
 
-#ifndef __CROS_EC_VERSION_H
-#define __CROS_EC_VERSION_H
+#ifndef PLATFORM_EC_INCLUDE_CROS_VERSION_H_
+#define PLATFORM_EC_INCLUDE_CROS_VERSION_H_
 
 #include "common.h"
 #include "system.h"
@@ -67,4 +67,4 @@ int ver_get_num_commits(enum ec_image copy);
 }
 #endif
 
-#endif /* __CROS_EC_VERSION_H */
+#endif /* PLATFORM_EC_INCLUDE_CROS_VERSION_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_STDIO_H__
-#define __CROS_EC_STDIO_H__
+#ifndef PLATFORM_EC_BUILTIN_STDIO_H_
+#define PLATFORM_EC_BUILTIN_STDIO_H_
 
 #include "common.h"
 
@@ -58,4 +58,4 @@ snprintf(char *str, size_t size, const char *format, ...);
 __warn_unused_result __stdlib_compat int
 vsnprintf(char *str, size_t size, const char *format, va_list args);
 
-#endif /* __CROS_EC_STDIO_H__ */
+#endif /* PLATFORM_EC_BUILTIN_STDIO_H_ */

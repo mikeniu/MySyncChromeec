@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_EM32F967_WP_H_
-#define ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_EM32F967_WP_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_EM32F967_WP_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_EM32F967_WP_H_
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -103,4 +103,4 @@ void flash_em32_write_protect_1_disable(void);
  */
 void flash_em32_write_protect_2_disable(void);
 
-#endif /* ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_EM32F967_WP_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_CROS_FLASH_CROS_FLASH_EM32F967_WP_H_ */

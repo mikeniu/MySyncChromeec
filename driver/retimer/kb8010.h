@@ -5,8 +5,8 @@
  * Driver for Kandou KB8001 USB-C 40 Gb/s multiprotocol switch.
  */
 
-#ifndef __CROS_EC_KB8010_H
-#define __CROS_EC_KB8010_H
+#ifndef PLATFORM_EC_DRIVER_RETIMER_KB8010_H_
+#define PLATFORM_EC_DRIVER_RETIMER_KB8010_H_
 
 #include "compile_time_macros.h"
 
@@ -70,4 +70,4 @@
 #define KB8010_REG_SBBR_BR_RX_CAL_OFFSET_EYE_BG_SAT_OVF 0XFECA
 #define KB8010_REG_SBBR_BR_RX_CAL_VGA2_GXR 0XFFB9
 
-#endif /* __CROS_EC_KB8010_H  */
+#endif /* PLATFORM_EC_DRIVER_RETIMER_KB8010_H_ */

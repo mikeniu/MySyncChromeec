@@ -43,16 +43,8 @@ __overridable void board_power_change(struct ap_power_ev_callback *cb,
 	}
 #endif
 }
-
-static void board_setup_init(void)
-{
-	static struct ap_power_ev_callback cb;
-
-	ap_power_ev_init_callback(&cb, board_power_change,
-				  AP_POWER_STARTUP | AP_POWER_SHUTDOWN);
-	ap_power_ev_add_callback(&cb);
-}
-DECLARE_HOOK(HOOK_INIT, board_setup_init, HOOK_PRIO_INIT_I2C);
+AP_POWER_EVENT_CALLBACK_DEFINE(board_power_change, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN);
 
 int pd_check_vconn_swap(int port)
 {

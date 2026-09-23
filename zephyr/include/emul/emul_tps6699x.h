@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_TPS6699X_H_
-#define __EMUL_TPS6699X_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_TPS6699X_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_TPS6699X_H_
 
 #include "drivers/ucsi_v3.h"
 #include "emul/emul_common_i2c.h"
@@ -61,7 +61,6 @@ struct tps6699x_response {
 				union error_status_t error;
 				struct ti_ccom ccom;
 				uint32_t pdos[4];
-				uint32_t pd_message[PDC_DISC_IDENTITY_VDO_COUNT];
 			};
 		} __packed;
 		union connector_status_t connector_status;
@@ -69,6 +68,7 @@ struct tps6699x_response {
 		union connector_capability_t connector_capability;
 		union cable_property_t cable_property;
 		uint32_t current_cam;
+		union get_attention_vdo_t get_attention_vdo;
 	} data;
 } __packed;
 
@@ -94,10 +94,9 @@ struct tps6699x_emul_pdc_data {
 	union pdr_t pdr;
 	enum ccom_t ccom;
 	union cable_property_t cable_property;
+	union get_attention_vdo_t get_attention_vdo;
 	union reg_port_control port_control;
 	bool frs_configured;
-	uint32_t rmdo;
-	uint32_t identity[PDC_DISC_IDENTITY_VDO_COUNT];
 	uint32_t current_cam;
 
 	struct tps6699x_response response;
@@ -146,4 +145,4 @@ int emul_pdc_set_interrupt_patch_loaded(const struct emul *target);
 struct i2c_common_emul_data *
 emul_tps6699x_get_i2c_common_data(const struct emul *emul);
 
-#endif /* __EMUL_TPS6699X_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_TPS6699X_H_ */

@@ -44,6 +44,10 @@
 			gpios = <&gpioe 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
 			enum-name = "GPIO_PCH_PWRBTN_L";
 		};
+		gpio_pg_pp3300_s5_od: pg_pp3300_s5_od {
+			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			no-auto-init;
+		};
 		gpio_ec_forcepr_odl: ec_forcepr_odl {
 			gpios = <&gpioi 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
@@ -65,10 +69,6 @@
 		/* Retain these GPIO declarations for debugging pdc purposes. */
 		gpio_usb_pd1_int_odl: usb_pd_int_odl {
 			gpios = <&gpiof 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
-			no-auto-init;
-		};
-		gpio_usb_pd2_int_odl: usb_pd2_int_odl {
-			gpios = <&gpiob 2 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 			no-auto-init;
 		};
 		/* The legacy system code requires GPIO_ENTERING_RW symbol */
