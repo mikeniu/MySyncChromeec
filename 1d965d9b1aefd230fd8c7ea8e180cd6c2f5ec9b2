@@ -48,6 +48,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6178277_eef08c2b",
+        "filename": "zephyr/test/pdc/src/tps6699x/tps6699x.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 927,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-23T06:33:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f185ddb_4759b403",
+      "range": {
+        "startLine": 904,
+        "startChar": 0,
+        "endLine": 927,
+        "endChar": 60
+      },
+      "revId": "1d965d9b1aefd230fd8c7ea8e180cd6c2f5ec9b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad299c2e_4ad3ffd2",
@@ -61,6 +85,30 @@
       "writtenOn": "2026-09-22T15:24:10Z",
       "side": 1,
       "message": "This is also already tested by `pdc_api.c`.",
+      "range": {
+        "startLine": 978,
+        "startChar": 0,
+        "endLine": 1072,
+        "endChar": 27
+      },
+      "revId": "1d965d9b1aefd230fd8c7ea8e180cd6c2f5ec9b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2652a392_dba407fd",
+        "filename": "zephyr/test/pdc/src/tps6699x/tps6699x.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1072,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-23T06:33:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad299c2e_4ad3ffd2",
       "range": {
         "startLine": 978,
         "startChar": 0,
