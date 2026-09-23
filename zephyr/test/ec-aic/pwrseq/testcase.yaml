@@ -1,0 +1,13 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+common:
+  platform_allow:
+    - realtek/rts5912
+  timeout: 120
+tests:
+  aic.pwrseq:
+    harness: pytest
+    harness_config:
+      pytest_dut_scope: session
