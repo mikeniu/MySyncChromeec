@@ -5,8 +5,8 @@
 
 /* Thermistor module for Chrome EC */
 
-#ifndef __CROS_EC_TEMP_SENSOR_THERMISTOR_H
-#define __CROS_EC_TEMP_SENSOR_THERMISTOR_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_THERMISTOR_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_THERMISTOR_H_
 
 #include <stdint.h>
 
@@ -173,4 +173,4 @@ int thermistor_get_temperature(int idx_adc, int *temp_ptr,
 }
 #endif
 
-#endif /* __CROS_EC_TEMP_SENSOR_THERMISTOR_NCP15WB_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_THERMISTOR_H_ */

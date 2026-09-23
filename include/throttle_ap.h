@@ -5,8 +5,8 @@
 
 /* Common interface to throttle the AP */
 
-#ifndef __CROS_EC_THROTTLE_AP_H
-#define __CROS_EC_THROTTLE_AP_H
+#ifndef PLATFORM_EC_INCLUDE_THROTTLE_AP_H_
+#define PLATFORM_EC_INCLUDE_THROTTLE_AP_H_
 
 #define PROCHOT_IN_DEBOUNCE_US (100 * MSEC)
 
@@ -113,4 +113,4 @@ static inline void throttle_ap(enum throttle_level level,
 void throttle_gpu(enum throttle_level level, enum throttle_type type,
 		  enum throttle_sources source);
 
-#endif /* __CROS_EC_THROTTLE_AP_H */
+#endif /* PLATFORM_EC_INCLUDE_THROTTLE_AP_H_ */

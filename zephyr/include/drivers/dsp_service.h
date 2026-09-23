@@ -7,8 +7,8 @@
  * @file drivers/dsp_comms/service/dsp_service.cc
  * @brief Public APIs for dsp_service
  */
-#ifndef ZEPHYR_INCLUDE_DRIVERS_DSP_SERVICE_H_
-#define ZEPHYR_INCLUDE_DRIVERS_DSP_SERVICE_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_DSP_SERVICE_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_DSP_SERVICE_H_
 
 /**
  * Called from the deferred GMR sensor ISR handler when the GMR sensor GPIO
@@ -18,4 +18,4 @@
  */
 void dsp_service_hook_tablet_mode_change(void);
 
-#endif /* ZEPHYR_INCLUDE_DRIVERS_DSP_SERVICE_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_DSP_SERVICE_H_ */

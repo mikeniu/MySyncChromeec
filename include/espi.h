@@ -5,8 +5,8 @@
 
 /* eSPI module for Chrome EC */
 
-#ifndef __CROS_EC_ESPI_H
-#define __CROS_EC_ESPI_H
+#ifndef PLATFORM_EC_INCLUDE_ESPI_H_
+#define PLATFORM_EC_INCLUDE_ESPI_H_
 
 #include "gpio_signal.h"
 
@@ -109,4 +109,4 @@ void espi_wait_vw_not_dirty(enum espi_vw_signal signal,
 }
 #endif
 
-#endif /* __CROS_EC_ESPI_H */
+#endif /* PLATFORM_EC_INCLUDE_ESPI_H_ */

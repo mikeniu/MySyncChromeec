@@ -8,8 +8,8 @@
  * @brief Nuvoton NPCX register structure definitions used by the Chrome OS EC.
  */
 
-#ifndef _NUVOTON_NPCX_REG_DEF_CROS_H
-#define _NUVOTON_NPCX_REG_DEF_CROS_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_SOC_NUVOTON_NPCX_REG_DEF_CROS_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_SOC_NUVOTON_NPCX_REG_DEF_CROS_H_
 
 /*
  * Monotonic Counter (MTC) device registers
@@ -25,4 +25,4 @@ struct mtc_reg {
 #define NPCX_WTC_PTO 30
 #define NPCX_WTC_WIE 31
 
-#endif /* _NUVOTON_NPCX_REG_DEF_CROS_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_SOC_NUVOTON_NPCX_REG_DEF_CROS_H_ */

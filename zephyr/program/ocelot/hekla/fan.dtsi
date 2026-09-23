@@ -9,20 +9,45 @@
 		fan_0 {
 			pwms = <&pwm2 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
 			tach = <&tach0>;
-			rpm-min = <960>;
-			rpm-start = <1200>;
-			rpm-max = <4800>;
+			rpm-min = <1000>;
+			rpm-start = <1400>;
+			rpm-max = <4200>;
 			rpm-deviation = <1>;
 			pgood-gpio = <&gpio_all_sys_pwrgd>;
 		};
 		fan_1 {
 			pwms = <&pwm3 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
-			tach = <&tach0>; // rts5912.dtsi lack of tach1, so use tach0 as a placeholder
-			rpm-min = <960>;
-			rpm-start = <1200>;
-			rpm-max = <4800>;
+			tach = <&tach1>;
+			rpm-min = <1000>;
+			rpm-start = <1650>;
+			rpm-max = <4900>;
 			rpm-deviation = <1>;
 			pgood-gpio = <&gpio_all_sys_pwrgd>;
+		};
+	};
+
+	fan_steps: fan-steps {
+		compatible = "cros-ec,fan-steps";
+
+		level_0 {
+			temp-on = <40 0xff 0xff 0xff 0xff 40 0xff>;
+			temp-off = <0xff 0xff 0xff 0xff 0xff 0xff 0xff>;
+			rpm-target = <0 0>;
+		};
+		level_1 {
+			temp-on = <45 0xff 0xff 0xff 0xff 45 0xff>;
+			temp-off = <38 0xff 0xff 0xff 0xff 38 0xff>;
+			rpm-target = <2000 2000>;
+		};
+		level_2 {
+			temp-on = <55 0xff 0xff 0xff 0xff 55 0xff>;
+			temp-off = <41 0xff 0xff 0xff 0xff 41 0xff>;
+			rpm-target = <3200 3500>;
+		};
+		level_3 {
+			temp-on = <99 0xff 0xff 0xff 0xff 99 0xff>;
+			temp-off = <50 0xff 0xff 0xff 0xff 50 0xff>;
+			rpm-target = <4200 4900>;
 		};
 	};
 };
@@ -31,6 +56,13 @@
 &tach0 {
 	status = "okay";
 	pinctrl-0 = <&tacho0_gpio052>;
+	pinctrl-names = "default";
+	pulses-per-round = <2>;
+};
+
+&tach1 {
+	status = "okay";
+	pinctrl-0 = <&tacho1_gpio053>;
 	pinctrl-names = "default";
 	pulses-per-round = <2>;
 };

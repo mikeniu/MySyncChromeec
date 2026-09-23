@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ZEPHYR_CONSOLE_SHIM_H
-#define __CROS_EC_ZEPHYR_CONSOLE_SHIM_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_CONSOLE_SHIM_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_CONSOLE_SHIM_H_
 
 #include <zephyr/shell/shell.h>
 
@@ -97,4 +97,4 @@ k_tid_t get_shell_thread(void);
 }
 #endif
 
-#endif /* __CROS_EC_ZEPHYR_CONSOLE_SHIM_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_CONSOLE_SHIM_H_ */

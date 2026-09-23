@@ -5,4 +5,5 @@
 # Add source files
 target_sources(app PRIVATE
   src/fan.c
+  src/thermal.c
 )

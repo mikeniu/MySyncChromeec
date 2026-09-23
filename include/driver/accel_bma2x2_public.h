@@ -5,8 +5,8 @@
 
 /* BMA2x2 gsensor module for Chrome EC */
 
-#ifndef __CROS_EC_DRIVER_ACCEL_BMA2x2_PUBLIC_H
-#define __CROS_EC_DRIVER_ACCEL_BMA2x2_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_ACCEL_BMA2X2_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_ACCEL_BMA2X2_PUBLIC_H_
 
 #include "accelgyro.h"
 
@@ -54,4 +54,4 @@ extern const struct accelgyro_drv bma2x2_accel_drv;
 }
 #endif
 
-#endif /* CROS_EC_DRIVER_ACCEL_BMA2x2_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_ACCEL_BMA2X2_PUBLIC_H_ */

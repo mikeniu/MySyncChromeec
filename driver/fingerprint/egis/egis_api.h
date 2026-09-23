@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_DRIVER_FINGERPRINT_EGIS_EGIS_API_H_
-#define __CROS_EC_DRIVER_FINGERPRINT_EGIS_EGIS_API_H_
+#ifndef PLATFORM_EC_DRIVER_FINGERPRINT_EGIS_EGIS_API_H_
+#define PLATFORM_EC_DRIVER_FINGERPRINT_EGIS_EGIS_API_H_
 
 #include "plat_log.h"
 
@@ -316,4 +316,4 @@ egis_api_return_t egis_apply_calibration_data(uint8_t *data_addr,
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_FINGERPRINT_EGIS_EGIS_API_H_ */
+#endif /* PLATFORM_EC_DRIVER_FINGERPRINT_EGIS_EGIS_API_H_ */
