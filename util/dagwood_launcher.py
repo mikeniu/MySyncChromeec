@@ -45,6 +45,7 @@ def main():
     print(f"Running command: {' '.join(cmd)}")
 
     try:
+        os.chdir(ec_root)
         os.execvp(cmd[0], cmd)
     except OSError as e:
         print(f"Error executing {cmd[0]}: {e}", file=sys.stderr)
