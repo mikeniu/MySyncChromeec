@@ -30,12 +30,14 @@ fi
 
 REPO_BASE="https://chromium.googlesource.com/chromiumos"
 
-# Parse --fast flag from positional arguments
+# Default to skipping remote git pulls and pip checks; pass --update to
+# pull the latest upstream changes.
+UPDATE=""
 ARGS=()
 for arg in "$@"; do
     case "${arg}" in
-        --fast)
-            SKIP_UPDATE=1
+        --update)
+            UPDATE=1
             ;;
         *)
             ARGS+=("${arg}")
@@ -223,8 +225,8 @@ populate_if_missing() {
 }
 
 # Clone or update repositories (parallelized for speed)
-if [ -n "${SKIP_UPDATE}" ]; then
-    echo "Skipping repository updates (fast startup enabled)..."
+if [ -z "${UPDATE}" ]; then
+    echo "Skipping repository updates (pass --update to sync)..."
     populate_if_missing "/workspace/src/platform/ec" "EC firmware"
     populate_if_missing "/workspace/src/platform/dagwood" "Dagwood"
     populate_if_missing \
@@ -331,7 +333,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
         python3 -m pip install -q --no-deps \
             -e /workspace/src/platform/ec/zephyr/zmake
 
-        if [ -z "${SKIP_UPDATE}" ]; then
+        if [ -n "${UPDATE}" ]; then
             # Install standard Zephyr dependencies to support twister executions
             ZEPHYR_REQS_DIR="/workspace/src/third_party"
             ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/zephyrproject/zephyr/scripts"
@@ -383,7 +385,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
             echo "Copying pre-installed Realtek monitor binary to cache..."
             mkdir -p "$(dirname "${MONITOR_CACHE}")"
             cp "${MONITOR_DEST}" "${MONITOR_CACHE}"
-        elif [ -z "${SKIP_UPDATE}" ]; then
+        else
             echo "Monitor binary not found in cache. Building rtk_flame..."
             if zmake --checkout /workspace build rtk_flame; then
                 echo "Caching monitor binary..."
@@ -415,7 +417,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
             echo "Copying pre-installed NPCX monitor binary to cache..."
             mkdir -p "$(dirname "${NPCX_MONITOR_CACHE}")"
             cp "${NPCX_MONITOR_DEST}" "${NPCX_MONITOR_CACHE}"
-        elif [ -z "${SKIP_UPDATE}" ]; then
+        else
             echo "Monitor binary not found in cache. Building npcx_monitor..."
             if zmake --checkout /workspace build npcx_monitor; then
                 echo "Caching monitor binary..."
