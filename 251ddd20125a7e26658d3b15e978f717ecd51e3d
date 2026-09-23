@@ -18,6 +18,150 @@
       "isAi": true,
       "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "296f952c_e72756d4",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-23T18:50:44Z",
+      "side": 1,
+      "message": "Please move this check into `fp_command_frame_v1` using `sizeof(*params)` (right after casting `params` and before dereferencing `params-\u003eoffset` and `params-\u003esize`), so `fp_command_frame` stays a simple version dispatcher and `fp_command_frame_v1` validates its own input:\n\n```cpp\nstatic enum ec_host_cmd_status\nfp_command_frame_v1(struct ec_host_cmd_handler_args *args)\n{\n\tconst auto *params \u003d static_cast\u003cconst struct ec_params_fp_frame_v1 *\u003e(\n\t\targs-\u003einput_buf);\n\tif (args-\u003einput_buf_size \u003c sizeof(*params))\n\t\treturn EC_HOST_CMD_REQUEST_TRUNCATED;\n\n\tvoid *out \u003d args-\u003eoutput_buf;\n\tuint32_t offset \u003d params-\u003eoffset;\n\tuint32_t size \u003d params-\u003esize;\n```",
+      "range": {
+        "startLine": 867,
+        "startChar": 0,
+        "endLine": 868,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "941d9d23_9f0f05a0",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 1108,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-23T18:50:44Z",
+      "side": 1,
+      "message": "Similarly, please move this check into `fp_command_template_v1` and use `sizeof(*params)` instead of `offsetof(struct ec_params_fp_template_v1, data)` (`data` is a flexible/zero-length array and `__ec_align4` is `__packed`, so `sizeof(*params)` is also 9 bytes and is already relied upon by `SMALLEST_TYPE` below):\n\n```cpp\nstatic enum ec_host_cmd_status\nfp_command_template_v1(struct ec_host_cmd_handler_args *args)\n{\n\tconst auto *params \u003d\n\t\tstatic_cast\u003cconst struct ec_params_fp_template_v1 *\u003e(\n\t\t\targs-\u003einput_buf);\n\tenum ec_status status;\n\n\tif (args-\u003einput_buf_size \u003c sizeof(*params))\n\t\treturn EC_HOST_CMD_REQUEST_TRUNCATED;\n\n\tswitch (params-\u003ecmd) {\n```",
+      "range": {
+        "startLine": 1106,
+        "startChar": 0,
+        "endLine": 1108,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69940b68_2e27a221",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-23T18:50:44Z",
+      "side": 1,
+      "message": "Please scope `p_1` inside the `args-\u003eversion \u003d\u003d 1` block (removing the cast at line 341) and use `sizeof(*p_1)`:\n\n```cpp\n\tif (args-\u003eversion \u003d\u003d 1) {\n\t\tconst auto *p_1 \u003d\n\t\t\tstatic_cast\u003cconst ec_params_fp_mode_v1 *\u003e(\n\t\t\t\targs-\u003einput_buf);\n\t\tif (args-\u003einput_buf_size \u003c sizeof(*p_1))\n\t\t\treturn EC_HOST_CMD_REQUEST_TRUNCATED;\n\t\tmac \u003d std::span{ p_1-\u003emac };\n\t}\n```",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 352,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9abba1c_8d8c29b1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_state.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-23T18:50:44Z",
+      "side": 1,
+      "message": "Extracting `constexpr size_t truncated_size \u003d sizeof(params) - 1;` makes the `CROS_EC_COMMAND` call more self-describing:\n\n```cpp\nZTEST_USER(fpsensor_state, test_fp_mode_v1_truncated)\n{\n\tstruct ec_params_fp_mode_v1 params \u003d {\n\t\t.mode \u003d FP_MODE_MATCH,\n\t};\n\tstruct ec_response_fp_mode response;\n\tconstexpr size_t truncated_size \u003d sizeof(params) - 1;\n\n\tint rv \u003d CROS_EC_COMMAND(NULL, EC_CMD_FP_MODE, 1, \u0026params,\n\t\t\t\t truncated_size, \u0026response, sizeof(response));\n\n\tzassert_equal(rv, EC_HOST_CMD_REQUEST_TRUNCATED,\n\t\t      \"Expected truncated v1 request to be rejected, got %d\",\n\t\t      rv);\n}\n```",
+      "range": {
+        "startLine": 411,
+        "startChar": 0,
+        "endLine": 425,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5318d55_e42fe54c",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-23T18:50:44Z",
+      "side": 1,
+      "message": "Since no trailing `data` payload is needed, we can declare `struct ec_params_fp_template_v1` directly on the stack (avoiding `params_buffer` and the C-style cast), rename to `test_fp_template_v1_truncated`, and use `constexpr size_t truncated_size \u003d sizeof(params) - 1;`:\n\n```cpp\nZTEST_USER(fpsensor_template, test_fp_template_v1_truncated)\n{\n\tstruct ec_params_fp_template_v1 params \u003d {\n\t\t.cmd \u003d FP_TEMPLATE_LOAD,\n\t};\n\tconstexpr size_t truncated_size \u003d sizeof(params) - 1;\n\n\tint rv \u003d ec_cmd_fp_template_v1(NULL, \u0026params, truncated_size);\n\tzassert_equal(rv, EC_HOST_CMD_REQUEST_TRUNCATED,\n\t\t      \"Expected truncated v1 request to be rejected, got %d\",\n\t\t      rv);\n}\n```",
+      "range": {
+        "startLine": 241,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50224a7a_54221795",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_template.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 672,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-23T18:50:44Z",
+      "side": 1,
+      "message": "Similarly, please extract `constexpr size_t truncated_size \u003d sizeof(template_request) - 1;` for readability:\n\n```cpp\nZTEST_USER(fpsensor_template, test_fp_frame_v1_truncated)\n{\n\tstruct ec_params_fp_frame_v1 template_request \u003d {\n\t\t.cmd \u003d FP_FRAME_ENCRYPT_TEMPLATE,\n\t\t.index \u003d 0,\n\t};\n\tconstexpr size_t truncated_size \u003d sizeof(template_request) - 1;\n\n\tint rv \u003d CROS_EC_COMMAND(NULL, EC_CMD_FP_FRAME, 1, \u0026template_request,\n\t\t\t\t truncated_size, NULL, 0);\n\tzassert_equal(rv, EC_HOST_CMD_REQUEST_TRUNCATED,\n\t\t      \"Expected truncated v1 request to be rejected, got %d\",\n\t\t      rv);\n}\n```",
+      "range": {
+        "startLine": 659,
+        "startChar": 0,
+        "endLine": 672,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
