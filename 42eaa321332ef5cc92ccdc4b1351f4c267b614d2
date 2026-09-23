@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e7c306a_e7d3e4aa",
+        "filename": "zephyr/test/bluey/tests/quenbi/src/test_fan.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-23T16:29:38Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b231ee2a_e6d471a6",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 0
+      },
+      "revId": "42eaa321332ef5cc92ccdc4b1351f4c267b614d2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "56d64c86_fae14242",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-22T20:06:19Z",
       "side": 1,
       "message": "The comment mentions target RPM, but the code checks and mocks actual RPM (fan_get_rpm_actual_fake). Consider updating the comment text.",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 0
+      },
+      "revId": "42eaa321332ef5cc92ccdc4b1351f4c267b614d2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2becf097_f54e674a",
+        "filename": "zephyr/test/bluey/tests/quenbi/src/test_fan.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-23T16:29:38Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "56d64c86_fae14242",
       "range": {
         "startLine": 80,
         "startChar": 0,
