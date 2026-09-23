@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14e34146_ed826b70",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T16:31:01Z",
+      "side": 1,
+      "message": "Removed the redundant v0 checks in fp_command_frame and fp_command_template and added unit test cases covering the truncated v1 request checks for EC_CMD_FP_MODE, EC_CMD_FP_FRAME, and EC_CMD_FP_TEMPLATE in fpsensor_state.cc and fpsensor_template.cc.",
+      "parentUuid": "c7d439b1_b6dab88a",
+      "revId": "3d3a4a220e44ce63909c0cd1930a9a72c872947a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e7ae9649_16cd97ff",
@@ -45,6 +63,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c73faa9_03065318",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T16:31:01Z",
+      "side": 1,
+      "message": "Done. Removed redundant check for v0.",
+      "parentUuid": "e7ae9649_16cd97ff",
+      "range": {
+        "startLine": 872,
+        "startChar": 0,
+        "endLine": 873,
+        "endChar": 9999
+      },
+      "revId": "3d3a4a220e44ce63909c0cd1930a9a72c872947a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9c3d1418_ccfed30b",
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "3d3a4a220e44ce63909c0cd1930a9a72c872947a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88ae65d3_1fb515de",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 1116,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-23T16:31:01Z",
+      "side": 1,
+      "message": "Done. Removed redundant check for v0.",
+      "parentUuid": "9c3d1418_ccfed30b",
+      "range": {
+        "startLine": 1115,
+        "startChar": 0,
+        "endLine": 1116,
+        "endChar": 9999
+      },
       "revId": "3d3a4a220e44ce63909c0cd1930a9a72c872947a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
