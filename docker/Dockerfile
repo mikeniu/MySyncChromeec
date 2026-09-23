@@ -62,46 +62,40 @@ RUN git clone --depth 1 \
     ${REPO_BASE}/platform/dagwood \
     /opt/repos/src/platform/dagwood
 # Sparse checkout for zephyrproject
-RUN mkdir -p /opt/repos/src/third_party/zephyrproject && \
+RUN git clone --depth 1 --no-checkout \
+        ${REPO_BASE}/third_party/zephyrproject \
+        /opt/repos/src/third_party/zephyrproject && \
     cd /opt/repos/src/third_party/zephyrproject && \
-    git init -b main && \
-    git remote add origin \
-        ${REPO_BASE}/third_party/zephyrproject && \
-    git config core.sparseCheckout true && \
-    echo "/zephyr/" >> .git/info/sparse-checkout && \
-    echo "/modules/hal/cmsis_6/" >> .git/info/sparse-checkout && \
-    echo "/modules/hal/stm32/" >> .git/info/sparse-checkout && \
-    echo "/modules/lib/picolibc/" >> .git/info/sparse-checkout && \
-    echo "/modules/lib/nanopb/" >> .git/info/sparse-checkout && \
-    git pull --depth=1 origin main && \
-    git branch --set-upstream-to=origin/main main
+    git sparse-checkout set --no-cone \
+        /zephyr/ \
+        /modules/hal/cmsis_6/ \
+        /modules/hal/stm32/ \
+        /modules/lib/picolibc/ \
+        /modules/lib/nanopb/ && \
+    git checkout
 RUN git clone --depth 1 \
     ${REPO_BASE}/third_party/pigweed/pigweed \
     /opt/repos/src/third_party/pigweed
 # Sparse checkout for u-boot
-RUN mkdir -p /opt/repos/src/third_party/u-boot && \
-    cd /opt/repos/src/third_party/u-boot && \
-    git clone --depth 1 --no-checkout \
+RUN git clone --depth 1 --no-checkout \
         ${REPO_BASE}/third_party/u-boot \
-        . && \
-    git config core.sparseCheckout true && \
-    echo "/tools/binman/" >> .git/info/sparse-checkout && \
-    echo "/tools/dtoc/" >> .git/info/sparse-checkout && \
-    echo "/tools/patman/" >> .git/info/sparse-checkout && \
-    echo "/tools/buildman/" >> .git/info/sparse-checkout && \
+        /opt/repos/src/third_party/u-boot && \
+    cd /opt/repos/src/third_party/u-boot && \
+    git sparse-checkout set --no-cone \
+        /tools/binman/ \
+        /tools/dtoc/ \
+        /tools/patman/ \
+        /tools/buildman/ && \
     git checkout
 
 # Sparse checkout for chromiumos-overlay
-RUN mkdir -p /opt/repos/src/third_party/chromiumos-overlay && \
+RUN git clone --depth 1 --no-checkout \
+        ${REPO_BASE}/overlays/chromiumos-overlay \
+        /opt/repos/src/third_party/chromiumos-overlay && \
     cd /opt/repos/src/third_party/chromiumos-overlay && \
-    git init -b main && \
-    git remote add origin \
-        ${REPO_BASE}/overlays/chromiumos-overlay && \
-    git config core.sparseCheckout true && \
-    echo "/eclass/coreboot-sdk-ec-dependencies.eclass" \
-        >> .git/info/sparse-checkout && \
-    git pull --depth=1 origin main && \
-    git branch --set-upstream-to=origin/main main
+    git sparse-checkout set --no-cone \
+        /eclass/coreboot-sdk-ec-dependencies.eclass && \
+    git checkout
 
 # Pre-install python dependencies to speed up runtime setup
 # Install Zephyr build/run test dependencies
