@@ -7,6 +7,7 @@
 #include <cros/integrated_fwid.dtsi>
 
 /* penghu project DTS includes */
+#include "adc.dtsi"
 #include "binman.dtsi"
 #include "fan.dtsi"
 #include "gpios.dtsi"
@@ -18,6 +19,7 @@
 #include "led_policy.dtsi"
 #include "power_signals.dtsi"
 #include "pwm.dtsi"
+#include "temp_sensors.dtsi"
 #include "usb_typec.dtsi"
 
 #include <cros/cbi_ufsc_std_schema.dtsi>

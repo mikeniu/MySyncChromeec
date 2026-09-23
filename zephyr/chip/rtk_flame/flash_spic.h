@@ -7,8 +7,8 @@
  * Function: RTK Flash Utility
  */
 
-#ifndef __FLASH_SPIC_H__
-#define __FLASH_SPIC_H__
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_RTK_FLAME_FLASH_SPIC_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_RTK_FLAME_FLASH_SPIC_H_
 
 /*********************
  *      INCLUDES
@@ -82,4 +82,4 @@ enum spic_status spic_write(const struct spic_command *command,
 enum spic_status spic_read(const struct spic_command *command, void *data,
 			   uint32_t *length);
 
-#endif /* __FLASH_SPIC_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_RTK_FLAME_FLASH_SPIC_H_ */

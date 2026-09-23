@@ -3,12 +3,12 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_UART_PRINTF_INCLUDE_PANIC_LOG_H_
-#define ZEPHYR_TEST_UART_PRINTF_INCLUDE_PANIC_LOG_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_UART_PRINTF_INCLUDE_PANIC_LOG_H_
+#define PLATFORM_EC_ZEPHYR_TEST_UART_PRINTF_INCLUDE_PANIC_LOG_H_
 
 #include <stddef.h>
 
 void panic_log_write_char(const char c);
 void panic_log_write_str(const char *str, size_t size);
 
-#endif /* ZEPHYR_TEST_UART_PRINTF_INCLUDE_PANIC_LOG_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_UART_PRINTF_INCLUDE_PANIC_LOG_H_ */

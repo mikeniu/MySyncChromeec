@@ -8,6 +8,7 @@
 #include "crc8.h"
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_smart_battery.h"
+#include "hooks.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 
@@ -62,6 +63,10 @@ static void battery_after(void *data)
 	struct battery_fixture *fixture = data;
 	const struct device *dev =
 		DEVICE_DT_GET(DT_GPIO_CTLR(GPIO_BATT_PRES_ODL_PATH, gpios));
+
+	/* Reset fake params */
+	battery_set_fake_soc(-1);
+	battery_set_fake_temp(-1);
 
 	/* Set default state (battery is present) */
 	gpio_emul_input_set(dev, GPIO_BATT_PRES_ODL_PORT, 0);
@@ -304,4 +309,79 @@ ZTEST_F(battery, test_get_disconnect_state)
 	int rv = battery_get_disconnect_state();
 
 	zassert_equal(BATTERY_DISCONNECTED, rv, "RV=%x", rv);
+}
+
+/* Test setting, getting, and applying fake SoC and temperature parameters */
+ZTEST(battery, test_battery_fake_params)
+{
+	struct batt_params batt = { 0 };
+
+	batt.full_capacity = 5000;
+	batt.flags = BATT_FLAG_BAD_TEMPERATURE | BATT_FLAG_BAD_STATE_OF_CHARGE |
+		     BATT_FLAG_BAD_REMAINING_CAPACITY;
+
+	battery_set_fake_soc(75);
+	battery_set_fake_temp(3000);
+
+	zassert_equal(75, battery_get_fake_soc());
+	zassert_equal(3000, battery_get_fake_temp());
+
+	battery_apply_fake_params(&batt);
+
+	zassert_equal(75, batt.state_of_charge);
+	zassert_equal(3000, batt.temperature);
+	zassert_equal(3750, batt.remaining_capacity);
+	zassert_false(batt.flags & BATT_FLAG_BAD_TEMPERATURE);
+	zassert_false(batt.flags & BATT_FLAG_BAD_STATE_OF_CHARGE);
+	zassert_false(batt.flags & BATT_FLAG_BAD_REMAINING_CAPACITY);
+}
+
+static int soc_change_hook_count;
+static void soc_change_hook_handler(void)
+{
+	soc_change_hook_count++;
+}
+DECLARE_HOOK(HOOK_BATTERY_SOC_CHANGE, soc_change_hook_handler,
+	     HOOK_PRIO_DEFAULT);
+
+void check_battery_soc_change(struct batt_params batt);
+
+/* Test check_battery_soc_change notification logic on SoC and display charge
+ * changes */
+ZTEST(battery, test_check_battery_soc_change)
+{
+	struct batt_params batt = { 0 };
+
+	soc_change_hook_count = 0;
+
+	batt.state_of_charge = 50;
+	batt.display_charge = 500;
+	check_battery_soc_change(batt);
+	zassert_equal(1, soc_change_hook_count);
+
+	/* Calling again with same SoC and display charge shouldn't notify */
+	check_battery_soc_change(batt);
+	zassert_equal(1, soc_change_hook_count);
+
+	/* Calling with changed SoC */
+	batt.state_of_charge = 60;
+	check_battery_soc_change(batt);
+	zassert_equal(2, soc_change_hook_count);
+
+	/* Calling with changed display charge */
+	batt.display_charge = 650;
+	check_battery_soc_change(batt);
+	zassert_equal(3, soc_change_hook_count);
+
+	/* Bad state of charge flag should not trigger on SoC change */
+	batt.flags |= BATT_FLAG_BAD_STATE_OF_CHARGE;
+	batt.state_of_charge = 70;
+	check_battery_soc_change(batt);
+	zassert_equal(3, soc_change_hook_count);
+
+	/* Bad state of charge flag should still trigger if display charge
+	 * changes */
+	batt.display_charge = 700;
+	check_battery_soc_change(batt);
+	zassert_equal(4, soc_change_hook_count);
 }

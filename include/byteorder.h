@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EC_INCLUDE_BYTEORDER_H
-#define __EC_INCLUDE_BYTEORDER_H
+#ifndef PLATFORM_EC_INCLUDE_BYTEORDER_H_
+#define PLATFORM_EC_INCLUDE_BYTEORDER_H_
 
 #include <endian.h>
 
-#endif /* __EC_INCLUDE_BYTEORDER_H */
+#endif /* PLATFORM_EC_INCLUDE_BYTEORDER_H_ */

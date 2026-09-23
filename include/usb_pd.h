@@ -5,8 +5,8 @@
 
 /* USB Power delivery module */
 
-#ifndef __CROS_EC_USB_PD_H
-#define __CROS_EC_USB_PD_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -3810,4 +3810,4 @@ __override_proto int pd_get_usb_pd_3a_ports(void);
 }
 #endif
 
-#endif /* __CROS_EC_USB_PD_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_H_ */

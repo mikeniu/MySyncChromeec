@@ -9,8 +9,8 @@
  * @brief Backend API for BB retimer emulator
  */
 
-#ifndef __EMUL_BB_RETIMER_H
-#define __EMUL_BB_RETIMER_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BB_RETIMER_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BB_RETIMER_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c.h>
@@ -86,4 +86,4 @@ emul_bb_retimer_get_i2c_common_data(const struct emul *emul);
  * @}
  */
 
-#endif /* __EMUL_BB_RETIMER */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_BB_RETIMER_H_ */

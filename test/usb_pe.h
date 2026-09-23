@@ -4,8 +4,8 @@
  *
  * Test USB PE module.
  */
-#ifndef __CROS_TEST_USB_PE_H
-#define __CROS_TEST_USB_PE_H
+#ifndef PLATFORM_EC_TEST_USB_PE_H_
+#define PLATFORM_EC_TEST_USB_PE_H_
 
 #include "common.h"
 
@@ -92,4 +92,4 @@ enum usb_pe_state {
 void set_state_pe(const int port, const enum usb_pe_state new_state);
 enum usb_pe_state get_state_pe(const int port);
 
-#endif /* __CROS_TEST_USB_PE_H */
+#endif /* PLATFORM_EC_TEST_USB_PE_H_ */

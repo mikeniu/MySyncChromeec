@@ -11,8 +11,8 @@
  * Delivery Controller Interface for SoC and Retimer" document.
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_INTEL_ALTMODE_H_
-#define ZEPHYR_INCLUDE_DRIVERS_INTEL_ALTMODE_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_INTEL_ALTMODE_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_INTEL_ALTMODE_H_
 
 #include <zephyr/device.h>
 
@@ -323,4 +323,4 @@ bool pd_altmode_is_usb_enabled(union data_status_reg status);
  */
 #include <zephyr/syscalls/intel_altmode.h>
 
-#endif /* ZEPHYR_INCLUDE_DRIVERS_INTEL_ALTMODE_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_INTEL_ALTMODE_H_ */

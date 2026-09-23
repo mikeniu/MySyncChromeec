@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ASSERT_H__
-#define __CROS_EC_ASSERT_H__
+#ifndef PLATFORM_EC_BUILTIN_ASSERT_H_
+#define PLATFORM_EC_BUILTIN_ASSERT_H_
 
 /* Include CONFIG definitions for EC sources. */
 #ifndef THIRD_PARTY
@@ -75,4 +75,4 @@ __noreturn void panic_assert_fail(const char *msg, const char *func,
 }
 #endif
 
-#endif /* __CROS_EC_ASSERT_H__ */
+#endif /* PLATFORM_EC_BUILTIN_ASSERT_H_ */

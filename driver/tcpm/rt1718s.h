@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __CROS_EC_USB_PD_TCPM_RT1718S_H
-#define __CROS_EC_USB_PD_TCPM_RT1718S_H
+#ifndef PLATFORM_EC_DRIVER_TCPM_RT1718S_H_
+#define PLATFORM_EC_DRIVER_TCPM_RT1718S_H_
 
 #include "tcpm/rt1718s_public.h"
 #include "usb_charge.h"
@@ -283,4 +283,4 @@ __override_proto int board_rt1718s_set_snk_enable(int port, int enable);
  * @return EC_SUCCESS if success, EC_ERROR_UNKNOWN otherwise.
  */
 __override_proto int board_rt1718s_set_src_enable(int port, int enable);
-#endif /* __CROS_EC_USB_PD_TCPM_MT6370_H */
+#endif /* PLATFORM_EC_DRIVER_TCPM_RT1718S_H_ */

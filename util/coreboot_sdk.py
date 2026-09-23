@@ -17,7 +17,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from typing import Dict, Tuple, Union
+from typing import Dict, Tuple
 import urllib.request
 
 
@@ -29,7 +29,9 @@ if script_dir not in sys.path:
 from coreboot_sdk_portage_deps import get_portage_deps
 
 
-toolchain_name_map = {
+__all__ = ["init_toolchain"]
+
+_TOOLCHAIN_NAME_MAP = {
     "arm-eabi": "COREBOOT_SDK_ROOT_arm",
     "picolibc-arm-eabi": "COREBOOT_SDK_ROOT_picolibc_arm",
     "libstdcxx-arm-eabi": "COREBOOT_SDK_ROOT_libstdcxx_arm",
@@ -44,23 +46,20 @@ toolchain_name_map = {
 }
 
 
-def get_toolchains_shell(
+def _get_toolchains_shell(
     portage_toolchains: Dict[str, Tuple],
-    local_filepath: Union[str, "os.PathLike[str]"] = os.path.expanduser(
-        "~/.cache/coreboot-sdk"
-    ),
     toolchain: str = None,
 ) -> Dict[str, str]:
     """Download and extract the toolchains using the shell.
 
     Args:
         portage_toolchains: Dict of architectures to download
-        local_filepath: Path to download the toolchains to
         toolchain: Individual toolchain to obtain if desired
 
     Returns:
         Dict of coreboot-sdk env variables and their respective paths
     """
+    cache_dir = os.path.expanduser("~/.cache/coreboot-sdk")
     result = {}
     success = True
     for target, (
@@ -70,8 +69,8 @@ def get_toolchains_shell(
     ) in portage_toolchains.items():
         if toolchain and target != toolchain:
             continue
-        output_path = local_filepath + "/" + target
-        output_toolchain = output_path + "/" + toolchain_hash
+        output_path = os.path.join(cache_dir, target)
+        output_toolchain = os.path.join(output_path, toolchain_hash)
         tempfile.tempdir = output_path
         os.makedirs(output_path, exist_ok=True)
         with tempfile.TemporaryDirectory(toolchain_hash) as tmp_dir:
@@ -152,7 +151,7 @@ def get_toolchains_shell(
                     continue
 
             result[
-                toolchain_name_map.get(target) or f"COREBOOT_SDK_ROOT_{target}"
+                _TOOLCHAIN_NAME_MAP.get(target) or f"COREBOOT_SDK_ROOT_{target}"
             ] = output_toolchain
     if not success:
         raise FileNotFoundError(
@@ -173,7 +172,7 @@ def init_toolchain(toolchain: str = None) -> Dict[str, str]:
 
     portage_toolchains = get_portage_deps()
 
-    return get_toolchains_shell(portage_toolchains, toolchain=toolchain)
+    return _get_toolchains_shell(portage_toolchains, toolchain=toolchain)
 
 
 def _parse_args(argv):
@@ -203,7 +202,7 @@ def main(argv):
             print(json.dumps(env_vars))
         elif args.toolchain:
             # return just the requested toolchain
-            print(env_vars[toolchain_name_map[args.toolchain]])
+            print(env_vars[_TOOLCHAIN_NAME_MAP[args.toolchain]])
         else:
             # Return a formatted string which can be declared as an associative array in bash
             print(

@@ -5,8 +5,8 @@
 
 /* FIFO buffer of MKBP events for Chrome EC */
 
-#ifndef __CROS_EC_MKBP_FIFO_H
-#define __CROS_EC_MKBP_FIFO_H
+#ifndef PLATFORM_EC_INCLUDE_MKBP_FIFO_H_
+#define PLATFORM_EC_INCLUDE_MKBP_FIFO_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -57,4 +57,4 @@ int mkbp_fifo_get_next_event(uint8_t *out, enum ec_mkbp_event evt);
 }
 #endif
 
-#endif /* __CROS_EC_MKBP_FIFO_H */
+#endif /* PLATFORM_EC_INCLUDE_MKBP_FIFO_H_ */

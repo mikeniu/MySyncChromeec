@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef TEST_PDC_SRC_UTIL_PCAP_H
-#define TEST_PDC_SRC_UTIL_PCAP_H
+#ifndef PLATFORM_EC_ZEPHYR_TEST_PDC_SRC_UTIL_PCAP_H_
+#define PLATFORM_EC_ZEPHYR_TEST_PDC_SRC_UTIL_PCAP_H_
 
 #include <stdio.h>
 
@@ -26,4 +26,4 @@ FILE *pcap_open(void);
  */
 void pcap_append(FILE *fp, const void *pl, size_t pl_sz);
 
-#endif /* TEST_PDC_SRC_UTIL_PCAP_H */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_PDC_SRC_UTIL_PCAP_H_ */

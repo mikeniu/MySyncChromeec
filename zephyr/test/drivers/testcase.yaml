@@ -3,6 +3,8 @@ common:
   - native_sim
 tests:
   drivers.default:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT=y
@@ -20,6 +22,8 @@ tests:
     - default/boards/native_sim.overlay
     - default/boards/touchpad.dtsi
   drivers.default.dp21:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT=y
@@ -37,6 +41,8 @@ tests:
     - default/boards/native_sim.overlay
     - default/boards/touchpad.dtsi
   drivers.default.ec_host_cmd:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT=y
@@ -54,6 +60,8 @@ tests:
     - default/boards/native_sim.overlay
     - default/boards/touchpad.dtsi
   drivers.default.bring_up:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT=y
@@ -71,6 +79,8 @@ tests:
     - default/boards/native_sim.overlay
     - default/boards/touchpad.dtsi
   drivers.default.bring_up.ec_host_cmd:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT=y
@@ -89,6 +99,8 @@ tests:
     - default/boards/native_sim.overlay
     - default/boards/touchpad.dtsi
   drivers.default.console_cmds:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT_CONSOLE_CMDS=y
@@ -102,6 +114,8 @@ tests:
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
   drivers.default.console_cmds_ro:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_CROS_EC_RO=y
@@ -114,6 +128,8 @@ tests:
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
   drivers.default.console_cmds_rw:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_CROS_EC_RW=y
@@ -126,6 +142,8 @@ tests:
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
   drivers.default.console_cmds.ec_host_cmd:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT_CONSOLE_CMDS=y
@@ -138,6 +156,8 @@ tests:
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
   drivers.default.console_cmds.gpio_keys:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT_CONSOLE_CMDS=y
@@ -151,6 +171,8 @@ tests:
     - default/boards/native_sim.overlay
     - default/boards/power_button.dtsi
   drivers.default.console_cmds.gpio_keys.ec_host_cmd:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT_CONSOLE_CMDS=y
@@ -165,6 +187,8 @@ tests:
     - default/boards/native_sim.overlay
     - default/boards/power_button.dtsi
   drivers.default.mock_power:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT=y
@@ -181,6 +205,8 @@ tests:
     - default/boards/native_sim.overlay
     - default/boards/touchpad.dtsi
   drivers.default.mock_power.ec_host_cmd:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_DEFAULT=y
@@ -204,12 +230,16 @@ tests:
     - prj.conf
     - acpi_strings_fifo/prj.conf
   drivers.amd_fp6_usb_mux:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./amd_fp6_usb_mux/usbc.dts
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_AMD_FP6_USB_MUX=y
   drivers.amd_fp6_usb_mux.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./amd_fp6_usb_mux/usbc.dts
@@ -219,6 +249,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.anx7447:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ANX7447=y
     extra_conf_files:
@@ -228,6 +260,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./anx7447/tcpc_policy.dts
   drivers.anx7447.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ANX7447=y
     extra_conf_files:
@@ -238,12 +272,16 @@ tests:
     - ./boards/native_sim.overlay
     - ./anx7447/tcpc_policy.dts
   drivers.ap_mux_control:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_AP_MUX_CONTROL=y
     extra_conf_files:
     - prj.conf
     - ap_mux_control/prj.conf
   drivers.ap_mux_control.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_AP_MUX_CONTROL=y
     extra_conf_files:
@@ -259,6 +297,8 @@ tests:
     - CONFIG_LINK_TEST_SUITE_USBC_DP_MODE=y
     - CONFIG_PLATFORM_EC_USB_PD_DP21_MODE=y
   drivers.bmi3xx:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_BMI3XX=y
     extra_dtc_overlay_files:
@@ -268,6 +308,8 @@ tests:
     - prj.conf
     - ./bmi3xx/prj.conf
   drivers.bmi3xx.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_BMI3XX=y
     extra_dtc_overlay_files:
@@ -278,6 +320,8 @@ tests:
     - ./bmi3xx/prj.conf
     - ec_host_cmd.conf
   drivers.button:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_BUTTON=y
@@ -286,6 +330,8 @@ tests:
     - CONFIG_PLATFORM_EC_EMULATED_SYSRQ=y
     - CONFIG_PLATFORM_EC_HOSTCMD_POWER_BUTTON_PRESS=y
   drivers.button.keyboard_pb:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_BUTTON=y
@@ -296,6 +342,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD=y
     - CONFIG_PLATFORM_EC_POWER_BUTTON_X86=y
   drivers.button.ec_host_cmd:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_BUTTON=y
@@ -306,6 +354,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.button.detachable:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_BUTTON=y
@@ -322,6 +372,8 @@ tests:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
   drivers.cbi_flash:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CBI_FLASH=y
     - CONFIG_PLATFORM_EC_CBI_FLASH=y
@@ -330,6 +382,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./cbi_flash/binman.dts
   drivers.cbi_flash.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CBI_FLASH=y
     - CONFIG_PLATFORM_EC_CBI_FLASH=y
@@ -341,6 +395,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.cbi_flash.from_eeprom:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CBI_FLASH_FROM_EEPROM=y
     - CONFIG_PLATFORM_EC_CBI_FLASH=y
@@ -356,16 +412,22 @@ tests:
     extra_dtc_overlay_files:
     - boards/native_sim.overlay
   drivers.common_cbi:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_COMMON_CBI=y
     - CONFIG_PLATFORM_EC_EEPROM_CBI_WP=y
     - CONFIG_PLATFORM_EC_SYSTEM_UNLOCKED=y
   drivers.common_cbi.system_locked:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_COMMON_CBI=y
     - CONFIG_PLATFORM_EC_EEPROM_CBI_WP=y
     - CONFIG_PLATFORM_EC_SYSTEM_UNLOCKED=n
   drivers.common_cbi.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_COMMON_CBI=y
     - CONFIG_PLATFORM_EC_EEPROM_CBI_WP=y
@@ -373,11 +435,15 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.common_cbi_gpio:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_COMMON_CBI_GPIO=y
     - CONFIG_PLATFORM_EC_CBI_EEPROM=n
     - CONFIG_PLATFORM_EC_CBI_GPIO=y
   drivers.common_cbi_gpio.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_COMMON_CBI_GPIO=y
     - CONFIG_PLATFORM_EC_CBI_EEPROM=n
@@ -386,6 +452,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.cec_common:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CEC_COMMON=y
     - CONFIG_PLATFORM_EC_CEC=y
@@ -396,6 +464,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./cec_common/cec_common.dts
   drivers.cec_common.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CEC_COMMON=y
     - CONFIG_PLATFORM_EC_CEC=y
@@ -430,6 +500,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./cec_common/cec_common.dts
   drivers.common_charger:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_PLATFORM_EC_CHARGER_INPUT_CURRENT_DERATE_PCT=5
     - CONFIG_PLATFORM_EC_CHARGER_MIN_INPUT_CURRENT_LIMIT=100
@@ -440,6 +512,8 @@ tests:
     - CONFIG_PLATFORM_EC_CHARGER_RAA489000=n
     - CONFIG_PLATFORM_EC_CHARGER_RUNTIME_CONFIG=y
   drivers.common_charger.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_PLATFORM_EC_CHARGER_INPUT_CURRENT_DERATE_PCT=5
     - CONFIG_PLATFORM_EC_CHARGER_MIN_INPUT_CURRENT_LIMIT=100
@@ -453,10 +527,14 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.chargesplash:
+    tags:
+    - host_cmd
     timeout: 360
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CHARGESPLASH=y
   drivers.chargesplash.ec_host_cmd:
+    tags:
+    - host_cmd
     timeout: 600
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CHARGESPLASH=y
@@ -464,11 +542,15 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.chargesplash.mock_power:
+    tags:
+    - host_cmd
     timeout: 600
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CHARGESPLASH=y
     - CONFIG_POWER_SEQUENCE_MOCK=y
   drivers.chargesplash.mock_power.ec_host_cmd:
+    tags:
+    - host_cmd
     timeout: 600
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CHARGESPLASH=y
@@ -477,15 +559,21 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.console:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CONSOLE=y
   drivers.console.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CONSOLE=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.console_cmd_crash:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CONSOLE_CMD_CRASH=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH=y
@@ -497,6 +585,8 @@ tests:
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
   drivers.console_cmd_crash.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CONSOLE_CMD_CRASH=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH=y
@@ -508,12 +598,16 @@ tests:
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
   drivers.console_cmd_mfallow:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CONSOLE_CMD_MFALLOW=y
     extra_conf_files:
     - prj.conf
     - console_cmd_mfallow/prj.conf
   drivers.console_cmd_mfallow.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CONSOLE_CMD_MFALLOW=y
     extra_conf_files:
@@ -531,6 +625,8 @@ tests:
     - default/boards/native_sim.overlay
 
   drivers.cros_flash:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CROS_FLASH=y
     - CONFIG_CROS_FLASH_BACKEND_FAKE=y
@@ -541,6 +637,8 @@ tests:
     extra_dtc_overlay_files:
     - cros_flash/boards/native_sim.overlay
   drivers.cros_flash.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_CROS_FLASH=y
     - CONFIG_CROS_FLASH_BACKEND_FAKE=y
@@ -554,12 +652,16 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.dps:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_PD_DPS=y
     extra_conf_files:
     - prj.conf
     - dps/prj.conf
   drivers.dps.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_PD_DPS=y
     extra_conf_files:
@@ -567,6 +669,8 @@ tests:
     - dps/prj.conf
     - ec_host_cmd.conf
   drivers.fan:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FAN=y
     extra_conf_files:
@@ -576,6 +680,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./fan/fans.dts
   drivers.fan.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FAN=y
     extra_conf_files:
@@ -586,10 +692,14 @@ tests:
     - ./boards/native_sim.overlay
     - ./fan/fans.dts
   drivers.flash:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FLASH=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_FLASH=y
   drivers.flash.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FLASH=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_FLASH=y
@@ -597,12 +707,16 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.flash.page_layout:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FLASH=y
     - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=500
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_FLASH=y
     - CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT=y
   drivers.flash.page_layout.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FLASH=y
     - CONFIG_SHELL_BACKEND_DUMMY_BUF_SIZE=500
@@ -612,6 +726,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.flash.rollback:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FLASH=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_FLASH=y
@@ -620,6 +736,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./flash/rollback.dts
   drivers.flash.rollback.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_FLASH=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_FLASH=y
@@ -636,10 +754,14 @@ tests:
     extra_dtc_overlay_files:
     - ./gpio_init/gpio_init.dts
   drivers.gpio_unhook:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_GPIO_UNHOOK=y
     - CONFIG_GPIO_GET_CONFIG=y
   drivers.gpio_unhook.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_GPIO_UNHOOK=y
     - CONFIG_GPIO_GET_CONFIG=y
@@ -647,6 +769,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_COMMANDS=y
     - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
@@ -657,7 +781,13 @@ tests:
     - CONFIG_PLATFORM_EC_BATTERY_FUEL_GAUGE=y
     - CONFIG_PLATFORM_EC_CBI_EEPROM=y
     - CONFIG_PLATFORM_EC_HOST_COMMAND_ENTER_BOOTLOADER=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_AP_RESET=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_AP_RESET_SCHEDULED=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_AP_SHUTDOWN=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_BATTERY_GET_MISC_INFO=y
   drivers.host_cmd.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_COMMANDS=y
     - CONFIG_PLATFORM_EC_BATTERY_CUT_OFF=y
@@ -665,16 +795,24 @@ tests:
     - CONFIG_PLATFORM_EC_LID_ANGLE_UPDATE=y
     - CONFIG_PLATFORM_EC_HOST_COMMAND_STATUS=y
     - CONFIG_PLATFORM_EC_HOST_COMMAND_ENTER_BOOTLOADER=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_AP_RESET=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_AP_RESET_SCHEDULED=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_AP_SHUTDOWN=y
+    - CONFIG_PLATFORM_EC_HOSTCMD_BATTERY_GET_MISC_INFO=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.host_cmd_read_memmap:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_COMMAND_READ_MEMMAP=y
     - CONFIG_PLATFORM_EC_HOST_COMMAND_STATUS=y
     - CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI=n
     - CONFIG_PLATFORM_EC_HOST_INTERFACE_SHI=y
   drivers.host_cmd_read_memmap.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_COMMAND_READ_MEMMAP=y
     - CONFIG_PLATFORM_EC_HOST_COMMAND_STATUS=y
@@ -684,6 +822,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.host_cmd_read_memmap.no_switches:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_COMMAND_READ_MEMMAP=y
     - CONFIG_PLATFORM_EC_HOST_COMMAND_STATUS=y
@@ -691,6 +831,8 @@ tests:
     - CONFIG_PLATFORM_EC_HOST_INTERFACE_SHI=y
     - CONFIG_PLATFORM_EC_SWITCH=n
   drivers.host_cmd_read_memmap.no_switches.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_COMMAND_READ_MEMMAP=y
     - CONFIG_PLATFORM_EC_HOST_COMMAND_STATUS=y
@@ -701,6 +843,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.icm42607:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_PLATFORM_EC_ACCELGYRO_BMI160=n
     - CONFIG_LINK_TEST_SUITE_ICM42607=y
@@ -710,6 +854,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./icm42607/sensor.dts
   drivers.icm42607.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_PLATFORM_EC_ACCELGYRO_BMI160=n
     - CONFIG_LINK_TEST_SUITE_ICM42607=y
@@ -722,14 +868,20 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.isl923x:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ISL923X=y
   drivers.isl923x.prochot_override:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ISL923X=y
     - CONFIG_PLATFORM_EC_CHARGER_AC_PROCHOT_CURRENT_MA=640
     - CONFIG_PLATFORM_EC_CHARGER_DC_PROCHOT_CURRENT_MA=1280
   drivers.isl9238c:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ISL923X=y
     - CONFIG_PLATFORM_EC_CHARGER_ISL9238=n
@@ -738,6 +890,8 @@ tests:
     - CONFIG_PLATFORM_EC_CHARGER_SENSE_RESISTOR=5
     - CONFIG_PLATFORM_EC_CHARGER_SENSE_RESISTOR_AC=10
   drivers.isl9238c.buck:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ISL923X=y
     - CONFIG_PLATFORM_EC_CHARGER_ISL9238=n
@@ -745,16 +899,22 @@ tests:
     - CONFIG_PLATFORM_EC_ISL9238C_INPUT_VOLTAGE_MV=4000
     - CONFIG_PLATFORM_EC_ISL9238C_ENABLE_BUCK_MODE=y
   drivers.isl923x.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ISL923X=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.isl923x.mock_power:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ISL923X=y
     - CONFIG_POWER_SEQUENCE_MOCK=y
   drivers.isl923x.mock_power.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ISL923X=y
     - CONFIG_POWER_SEQUENCE_MOCK=y
@@ -762,6 +922,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.isl9241:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ISL9241=y
     - CONFIG_PLATFORM_EC_CHARGER_DUMP_PROCHOT=y
@@ -772,6 +934,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./isl9241/usbc.dts
   drivers.isl9241.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ISL9241=y
     - CONFIG_PLATFORM_EC_CHARGER_DUMP_PROCHOT=y
@@ -784,12 +948,16 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.i2c_controller:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_I2C_CONTROLLER=y
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - i2c_controller/i2c.dts
   drivers.i2c_controller.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_I2C_CONTROLLER=y
     extra_dtc_overlay_files:
@@ -799,10 +967,14 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.it8xxx2_hw_sha256:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_IT8XXX2_HW_SHA256=y
     - CONFIG_PLATFORM_EC_SHA256_HW_ACCELERATE=y
   drivers.it8xxx2_hw_sha256.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_IT8XXX2_HW_SHA256=y
     - CONFIG_PLATFORM_EC_SHA256_HW_ACCELERATE=y
@@ -810,11 +982,15 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.keyboard_8042:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP=n
     - CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042=y
     - CONFIG_LINK_TEST_SUITE_KEYBOARD_8042=y
   drivers.keyboard_8042.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP=n
     - CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042=y
@@ -823,15 +999,21 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.keyboard_scan:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_KEYBOARD_SCAN=y
   drivers.keyboard_scan.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_KEYBOARD_SCAN=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.led_driver:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_LED_DRIVER=y
     extra_conf_files:
@@ -872,6 +1054,8 @@ tests:
     - ./led_driver/led_pins.dts
     - ./led_driver/led_policy_sequence.dts
   drivers.led_driver.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_LED_DRIVER=y
     extra_conf_files:
@@ -892,10 +1076,14 @@ tests:
     - ./boards/native_sim.overlay
     - ./led_driver/max695x_led.overlay
   drivers.led_common:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_LED_COMMON=y
     - CONFIG_PLATFORM_EC_LED_DT=n
   drivers.led_common.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_LED_COMMON=y
     - CONFIG_PLATFORM_EC_LED_DT=n
@@ -911,10 +1099,14 @@ tests:
     - ./boards/native_sim.overlay
     - ./led_pwm_fade/led_policy.dts
   drivers.locate_chip:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_LOCATE_CHIP_ALTS=y
     - CONFIG_PLATFORM_EC_CBI=n
   drivers.locate_chip.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_LOCATE_CHIP_ALTS=y
     - CONFIG_PLATFORM_EC_CBI=n
@@ -932,6 +1124,7 @@ tests:
     tags:
     - common
     - mkbp
+    - host_cmd
   drivers.lis2dh:
     timeout: 15
     extra_configs:
@@ -976,7 +1169,10 @@ tests:
     tags:
     - common
     - mkbp
+    - host_cmd
   drivers.nct38xx:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_NCT38XX=y
     - CONFIG_PLATFORM_EC_USB_PD_TCPC_LOW_POWER=y
@@ -984,6 +1180,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./nct38xx/tcpc_policy.dts
   drivers.nct38xx.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_NCT38XX=y
     - CONFIG_PLATFORM_EC_USB_PD_TCPC_LOW_POWER=y
@@ -994,6 +1192,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.nx20p3481:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./nx20p348x/usbc.dts
@@ -1002,6 +1202,8 @@ tests:
     - CONFIG_PLATFORM_EC_USBC_PPC_NX20P3481=y
     - CONFIG_PLATFORM_EC_USBC_PPC_NX20P3483=n
   drivers.nx20p3481.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./nx20p348x/usbc.dts
@@ -1013,6 +1215,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.nx20p3483:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./nx20p348x/usbc.dts
@@ -1020,6 +1224,8 @@ tests:
     - CONFIG_LINK_TEST_SUITE_NX20P348X=y
     - CONFIG_PLATFORM_EC_USBC_PPC_NX20P3483=y
   drivers.nx20p3483.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./nx20p348x/usbc.dts
@@ -1034,6 +1240,8 @@ tests:
     - CONFIG_LINK_TEST_SUITE_PRESERVED_RING_BUF=y
     - CONFIG_PLATFORM_EC_PRESERVED_RING_BUF=y
   drivers.panic_log.minimal:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_PANIC_LOG=y
     - CONFIG_PLATFORM_EC_PANIC_LOG=y
@@ -1047,6 +1255,8 @@ tests:
     extra_conf_files:
     - prj.conf
   drivers.panic_log.immediate:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_PANIC_LOG=y
     - CONFIG_PLATFORM_EC_PANIC_LOG=y
@@ -1070,6 +1280,8 @@ tests:
     - CONFIG_LINK_TEST_SUITE_PANIC=y
     - CONFIG_PLATFORM_EC_PANIC_HOST_EVENT=y
   drivers.panic_output.ro:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_CROS_EC_RO=y
     - CONFIG_LINK_TEST_SUITE_PANIC_OUTPUT=y
@@ -1078,6 +1290,8 @@ tests:
     - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
     - CONFIG_ZTEST_THREAD_PRIORITY=1
   drivers.panic_output.rw:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_PANIC_OUTPUT=y
@@ -1086,6 +1300,8 @@ tests:
     - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
     - CONFIG_ZTEST_THREAD_PRIORITY=1
   drivers.panic_output.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_PANIC_OUTPUT=y
     - CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH=y
@@ -1100,6 +1316,8 @@ tests:
     - CONFIG_LINK_TEST_SUITE_PANIC_REASON=y
     - CONFIG_ASSERT_TEST=y
   drivers.power_host_sleep:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
     # Make tests independent of chipset specific code
@@ -1110,6 +1328,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWERSEQ_S0IX=y
     - CONFIG_PLATFORM_EC_EMULATED_SYSRQ=y
   drivers.power_host_sleep_ro:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_CROS_EC_RO=y
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
@@ -1120,6 +1340,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWERSEQ_HOST_SLEEP=y
     - CONFIG_PLATFORM_EC_POWERSEQ_S0IX=y
   drivers.power_host_sleep_rw:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
@@ -1131,6 +1353,8 @@ tests:
     - CONFIG_PLATFORM_EC_POWERSEQ_HOST_SLEEP=y
     - CONFIG_PLATFORM_EC_POWERSEQ_S0IX=y
   drivers.power_host_sleep.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_POWER_HOST_SLEEP=y
     # Make tests independent of chipset specific code
@@ -1161,6 +1385,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./ps8743/mux.dts
   drivers.ps8xxx:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_PS8XXX=y
     extra_conf_files:
@@ -1170,6 +1396,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./ps8xxx/usbc.dts"
   drivers.ps8xxx.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_PS8XXX=y
     extra_conf_files:
@@ -1199,6 +1427,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./rt1715/rt1715.dts
   drivers.rt1718s:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_RT1718S=y
     extra_conf_files:
@@ -1208,6 +1438,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./rt1718s/ppc_tcpc.dts
   drivers.rt1718s.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_RT1718S=y
     extra_conf_files:
@@ -1227,6 +1459,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./ktu1125/ktu1125.dts
   drivers.rt1739:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_RT1739=y
     extra_conf_files:
@@ -1236,6 +1470,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./rt1739/ppc.dts
   drivers.rt1739.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_RT1739=y
     extra_conf_files:
@@ -1246,6 +1482,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./rt1739/ppc.dts
   drivers.rt9490:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_RT9490=y
     extra_conf_files:
@@ -1255,6 +1493,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./rt9490/charger.dts
   drivers.rt9490.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_RT9490=y
     extra_conf_files:
@@ -1265,6 +1505,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./rt9490/charger.dts
   drivers.random:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_RANDOM=y
     - CONFIG_PLATFORM_EC_RANDOM=y
@@ -1273,6 +1515,8 @@ tests:
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
   drivers.random.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_RANDOM=y
     - CONFIG_PLATFORM_EC_RANDOM=y
@@ -1284,12 +1528,16 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.shim_espi:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SHIM_ESPI=y
     - CONFIG_PLATFORM_EC_HOSTCMD=y
     extra_dtc_overlay_files:
     - boards/native_sim.overlay
   drivers.shim_espi.no_temp_sensor:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SHIM_ESPI=y
     - CONFIG_PLATFORM_EC_HOSTCMD=y
@@ -1297,6 +1545,8 @@ tests:
     - boards/native_sim.overlay
     - shim_espi/no_temp_sensor.dtsi
   drivers.shim_gpio_id:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SHIM_GPIO_ID=y
     extra_conf_files:
@@ -1305,6 +1555,8 @@ tests:
     - boards/native_sim.overlay
     - shim_gpio_id/gpio_id.dts
   drivers.shim_gpio_id.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SHIM_GPIO_ID=y
     extra_conf_files:
@@ -1314,21 +1566,29 @@ tests:
     - boards/native_sim.overlay
     - shim_gpio_id/gpio_id.dts
   drivers.shim_pwm_hc:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SHIM_PWM_HC=y
   drivers.shim_pwm_hc.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SHIM_PWM_HC=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.shim_rtc:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SHIM_RTC=y
     - CONFIG_PLATFORM_EC_RTC=y
     - CONFIG_PLATFORM_EC_HOSTCMD=y
     - CONFIG_PLATFORM_EC_HOSTCMD_RTC=y
   drivers.shim_rtc.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SHIM_RTC=y
     - CONFIG_PLATFORM_EC_RTC=y
@@ -1338,6 +1598,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.sm5803:
+    tags:
+    - host_cmd
     extra_conf_files:
     - prj.conf
     - sm5803/prj.conf
@@ -1348,6 +1610,8 @@ tests:
     - sm5803/sm5803.dts
     timeout: 120
   drivers.sm5803.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_conf_files:
     - prj.conf
     - sm5803/prj.conf
@@ -1362,6 +1626,7 @@ tests:
     tags:
     - common
     - system
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SYSTEM=y
     - CONFIG_POWER_SEQUENCE_MOCK=y
@@ -1369,6 +1634,7 @@ tests:
     tags:
     - common
     - system
+    - host_cmd
     extra_configs:
     - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_SYSTEM=y
@@ -1377,6 +1643,7 @@ tests:
     tags:
     - common
     - system
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SYSTEM=y
     - CONFIG_POWER_SEQUENCE_MOCK=y
@@ -1387,6 +1654,7 @@ tests:
     tags:
     - common
     - system
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SYSTEM=y
     - CONFIG_PLATFORM_EC_BOARD_VERSION_CBI=y
@@ -1395,6 +1663,7 @@ tests:
     tags:
     - common
     - system
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_SYSTEM=y
     - CONFIG_PLATFORM_EC_BOARD_VERSION_CBI=y
@@ -1403,9 +1672,13 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.timer:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_TIMER=y
   drivers.timer.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_TIMER=y
     extra_conf_files:
@@ -1432,6 +1705,8 @@ tests:
     - ufsc_policies/boards/native_sim.overlay
     - ufsc_policies/binman.dts
   drivers.upstream_fuel_gauge:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./upstream_fuel_gauge/fuel_gauge.dts
@@ -1440,6 +1715,8 @@ tests:
     - CONFIG_FUEL_GAUGE=y
     - CONFIG_EMUL=y
   drivers.upstream_fuel_gauge.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - ./boards/native_sim.overlay
     - ./upstream_fuel_gauge/fuel_gauge.dts
@@ -1451,15 +1728,21 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usb_common:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_COMMON=y
   drivers.usb_common.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_COMMON=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usb_port_power_dumb:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_PORT_POWER_DUMB=y
     - CONFIG_PLATFORM_EC_USB_PORT_POWER_DUMB=y
@@ -1467,6 +1750,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./usb_port_power_dumb/usba.dts
   drivers.usb_port_power_dumb.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_PORT_POWER_DUMB=y
     - CONFIG_PLATFORM_EC_USB_PORT_POWER_DUMB=y
@@ -1477,12 +1762,16 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usb_pd_discharge:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_COMMON=y
     - CONFIG_PLATFORM_EC_USB_PD_DISCHARGE=y
     - CONFIG_PLATFORM_EC_USB_PD_DISCHARGE_PPC=y
     - CONFIG_PLATFORM_EC_USB_PD_FLAGS=y
   drivers.usb_pd_discharge.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_COMMON=y
     - CONFIG_PLATFORM_EC_USB_PD_DISCHARGE=y
@@ -1492,20 +1781,28 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usb_pd_discovery:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_PD_DISCOVERY=y
   drivers.usb_pd_discovery.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_PD_DISCOVERY=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usb_pd_flags:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_COMMON=y
     - CONFIG_PLATFORM_EC_USB_PD_FLAGS=y
     - CONFIG_PLATFORM_EC_USB_PD_RUNTIME_FLAGS=y
   drivers.usb_pd_flags.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_COMMON=y
     - CONFIG_PLATFORM_EC_USB_PD_FLAGS=y
@@ -1514,6 +1811,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usb_retimer_fw_update:
+    tags:
+    - host_cmd
     timeout: 120
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_RETIMER_FW_UPDATE=y
@@ -1521,6 +1820,8 @@ tests:
     - prj.conf
     - usb_retimer_fw_update/prj.conf
   drivers.usb_retimer_fw_update.ec_host_cmd:
+    tags:
+    - host_cmd
     timeout: 120
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USB_RETIMER_FW_UPDATE=y
@@ -1529,6 +1830,8 @@ tests:
     - usb_retimer_fw_update/prj.conf
     - ec_host_cmd.conf
   drivers.usbc_alt_mode:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_ALT_MODE=y
     timeout: 120
@@ -1536,6 +1839,8 @@ tests:
     - prj.conf
     - usbc_alt_mode/prj.conf
   drivers.usbc_alt_mode.accurate_irq:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_ALT_MODE=y
     - CONFIG_PLATFORM_EC_USB_PD_DP_HPD_GPIO_IRQ_ACCURATE=y
@@ -1544,6 +1849,8 @@ tests:
     - prj.conf
     - usbc_alt_mode/prj.conf
   drivers.usbc_alt_mode.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_ALT_MODE=y
     timeout: 120
@@ -1552,6 +1859,8 @@ tests:
     - usbc_alt_mode/prj.conf
     - ec_host_cmd.conf
   drivers.usbc_alt_mode_ec_entry:
+    tags:
+    - host_cmd
     timeout: 120
     extra_configs:
     - CONFIG_PLATFORM_EC_USB_PD_REQUIRE_AP_MODE_ENTRY=n
@@ -1561,6 +1870,8 @@ tests:
     - prj.conf
     - usbc_alt_mode/prj.conf
   drivers.usbc_alt_mode_ec_entry.ec_host_cmd:
+    tags:
+    - host_cmd
     timeout: 120
     extra_configs:
     - CONFIG_PLATFORM_EC_USB_PD_REQUIRE_AP_MODE_ENTRY=n
@@ -1571,25 +1882,41 @@ tests:
     - usbc_alt_mode/prj.conf
     - ec_host_cmd.conf
   drivers.usbc_console_pd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_CONSOLE_PD=y
+    - CONFIG_PLATFORM_EC_USB_PD_PRL_EVENT_LOG=y
+    - CONFIG_PLATFORM_EC_USB_PD_TRY_SRC=y
   drivers.usbc_console_pd.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_CONSOLE_PD=y
+    - CONFIG_PLATFORM_EC_USB_PD_PRL_EVENT_LOG=y
+    - CONFIG_PLATFORM_EC_USB_PD_TRY_SRC=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_console_pd_legacy:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_CONSOLE_PD=y
     - CONFIG_PLATFORM_EC_TCPC_INTERRUPT=n
+    - CONFIG_PLATFORM_EC_USB_PD_PRL_EVENT_LOG=y
+    - CONFIG_PLATFORM_EC_USB_PD_TRY_SRC=y
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
     - ./usbc_console_pd/usbc_legacy.dts
   drivers.usbc_console_pd_legacy.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_CONSOLE_PD=y
     - CONFIG_PLATFORM_EC_TCPC_INTERRUPT=n
+    - CONFIG_PLATFORM_EC_USB_PD_PRL_EVENT_LOG=y
+    - CONFIG_PLATFORM_EC_USB_PD_TRY_SRC=y
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
     - ./usbc_console_pd/usbc_legacy.dts
@@ -1597,15 +1924,21 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_ctvpd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_CTVPD=y
   drivers.usbc_ctvpd.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_CTVPD=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_frs:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_FRS=y
     - CONFIG_PLATFORM_EC_USB_PD_FRS_TCPC=y
@@ -1613,6 +1946,8 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_POWER_CONTRACT=y
   drivers.usbc_frs.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_FRS=y
     - CONFIG_PLATFORM_EC_USB_PD_FRS_TCPC=y
@@ -1620,15 +1955,21 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_ocp:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_OCP=y
   drivers.usbc_ocp.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_OCP=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_ppc:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_PPC=y
     - CONFIG_PLATFORM_EC_USB_PD_VBUS_DETECT_PPC=y
@@ -1636,6 +1977,8 @@ tests:
     - default/boards/native_sim.overlay
     - ./usbc_ppc/ppc_alts.dts
   drivers.usbc_ppc.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_PPC=y
     - CONFIG_PLATFORM_EC_USB_PD_VBUS_DETECT_PPC=y
@@ -1646,6 +1989,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_tcpc:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
     - usbc_tcpc/tcpc_alts.dts
@@ -1653,7 +1998,14 @@ tests:
     - CONFIG_LINK_TEST_SUITE_USBC_TCPC=y
     - CONFIG_PLATFORM_EC_USB_PD_DUAL_ROLE_AUTO_TOGGLE=n
     - CONFIG_PLATFORM_EC_USB_PD_DISCHARGE_TCPC=n
+  drivers.usbc_sm:
+    extra_dtc_overlay_files:
+    - default/boards/native_sim.overlay
+    extra_configs:
+    - CONFIG_LINK_TEST_SUITE_USBC_SM=y
   drivers.usbc_tcpc.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - default/boards/native_sim.overlay
     - usbc_tcpc/tcpc_alts.dts
@@ -1665,24 +2017,34 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_retimer.anx7483:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_RETIMER_ANX7483=y
   drivers.usbc_retimer.anx7483.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_RETIMER_ANX7483=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_retimer.ps8811:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_RETIMER_PS8811=y
   drivers.usbc_retimer.ps8811.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_RETIMER_PS8811=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_svdm_dfp_only:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_SVDM_DFP_ONLY=y
     extra_conf_files:
@@ -1691,6 +2053,8 @@ tests:
     extra_dtc_overlay_files:
     - usbc_svdm_dfp_only/boards/native_sim.overlay
   drivers.usbc_svdm_dfp_only.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_SVDM_DFP_ONLY=y
     extra_conf_files:
@@ -1700,19 +2064,27 @@ tests:
     extra_dtc_overlay_files:
     - usbc_svdm_dfp_only/boards/native_sim.overlay
   drivers.usbc_tbt_mode:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_TBT_MODE=y
   drivers.usbc_tbt_mode.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_TBT_MODE=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_usb4_mode:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_USB4_MODE=y
     - CONFIG_PLATFORM_EC_USB_PD_DATA_RESET_MSG=y
   drivers.usbc_usb4_mode.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_USB4_MODE=y
     - CONFIG_PLATFORM_EC_USB_PD_DATA_RESET_MSG=y
@@ -1720,9 +2092,13 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.usbc_vconn_swap:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_VCONN_SWAP=y
   drivers.usbc_vconn_swap.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_VCONN_SWAP=y
     extra_conf_files:
@@ -1732,14 +2108,18 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_FAKE_PDOS=y
   drivers.host_cmd_thread:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_CMD_THREAD=y
     - CONFIG_TASK_HOSTCMD_THREAD_MAIN=y
+    - CONFIG_EC_HOST_CMD=n
     - CONFIG_EC_HOST_CMD_DEDICATED_THREAD=n
   drivers.host_cmd_thread.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_HOST_CMD_THREAD=y
-    - CONFIG_TASK_HOSTCMD_THREAD_MAIN=y
     - CONFIG_EC_HOST_CMD_DEDICATED_THREAD=n
     extra_conf_files:
     - prj.conf
@@ -1751,24 +2131,34 @@ tests:
     - CONFIG_LINK_TEST_SUITE_BC12_UPSTREAM=y
     - CONFIG_USB_BC12=y
   drivers.pi3usb9201:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_PI3USB9201=y
   drivers.pi3usb9201.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_PI3USB9201=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.memmap:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_MEMMAP=y
   drivers.memmap.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_MEMMAP=y
     extra_conf_files:
     - prj.conf
     - ec_host_cmd.conf
   drivers.anx7452:
+    tags:
+    - host_cmd
     extra_conf_files:
     - prj.conf
     - anx7452/prj.conf
@@ -1778,6 +2168,8 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_ANX7452=y
   drivers.anx7452.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_conf_files:
     - prj.conf
     - anx7452/prj.conf
@@ -1798,6 +2190,8 @@ tests:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_KB8010=y
   drivers.flash_cbi:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - boards/native_sim.overlay
     - cbi_flash/binman.dts
@@ -1807,6 +2201,8 @@ tests:
     - CONFIG_PLATFORM_EC_FLASH_SIZE_BYTES=0x80000
     - CONFIG_PLATFORM_EC_CBI_FLASH=y
   drivers.flash_cbi.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_dtc_overlay_files:
     - boards/native_sim.overlay
     - cbi_flash/binman.dts
@@ -1819,6 +2215,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.body_detection:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_FPU=y
     - CONFIG_LINK_TEST_SUITE_BODY_DETECTION=y
@@ -1829,6 +2227,8 @@ tests:
     - CONFIG_PLATFORM_EC_BODY_DETECTION_NOTIFY_MODE_CHANGE=y
     - CONFIG_PLATFORM_EC_GESTURE_HOST_DETECTION=y
   drivers.body_detection.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_FPU=y
     - CONFIG_LINK_TEST_SUITE_BODY_DETECTION=y
@@ -1842,6 +2242,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.body_detection_v1:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_BODY_DETECTION=y
     - CONFIG_PLATFORM_EC_BODY_DETECTION=y
@@ -1851,6 +2253,8 @@ tests:
     - CONFIG_PLATFORM_EC_BODY_DETECTION_NOTIFY_MODE_CHANGE=y
     - CONFIG_PLATFORM_EC_GESTURE_HOST_DETECTION=y
   drivers.watchdog_helper:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_PLATFORM_EC_WATCHDOG_HELPER=y
     - CONFIG_LINK_TEST_SUITE_WATCHDOG_HELPER=y
@@ -1858,6 +2262,8 @@ tests:
     - ./boards/native_sim.overlay
     - ./watchdog_helper/watchdog_helper.dts
   drivers.watchdog_helper.ec_host_cmd:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_PLATFORM_EC_WATCHDOG_HELPER=y
     - CONFIG_LINK_TEST_SUITE_WATCHDOG_HELPER=y
@@ -1868,6 +2274,8 @@ tests:
     - prj.conf
     - ec_host_cmd.conf
   drivers.watchdog.ro:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_CROS_EC_RO=y
     - CONFIG_LINK_TEST_SUITE_WATCHDOG=y
@@ -1876,6 +2284,8 @@ tests:
     - prj.conf
     - watchdog/prj.conf
   drivers.watchdog.rw:
+    tags:
+    - host_cmd
     extra_configs:
     - CONFIG_CROS_EC_RW=y
     - CONFIG_LINK_TEST_SUITE_WATCHDOG=y

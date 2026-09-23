@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_MOCK_POWER_H
-#define ZEPHYR_TEST_MOCK_POWER_H
+#ifndef PLATFORM_EC_ZEPHYR_MOCK_INCLUDE_MOCK_POWER_H_
+#define PLATFORM_EC_ZEPHYR_MOCK_INCLUDE_MOCK_POWER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,4 +45,4 @@ int command_power_custom_fake(int argc, const char **argv);
  */
 void mock_power_request(enum power_request_t req);
 
-#endif /* ZEPHYR_TEST_MOCK_POWER_H */
+#endif /* PLATFORM_EC_ZEPHYR_MOCK_INCLUDE_MOCK_POWER_H_ */

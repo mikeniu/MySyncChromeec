@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_AP_RESET_LOG_H
-#define __CROS_EC_AP_RESET_LOG_H
+#ifndef PLATFORM_EC_INCLUDE_AP_RESET_LOG_H_
+#define PLATFORM_EC_INCLUDE_AP_RESET_LOG_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -91,4 +91,4 @@ void test_chipset_corrupt_reset_log_checksum(void);
 }
 #endif
 
-#endif /* __CROS_EC_AP_RESET_LOG_H */
+#endif /* PLATFORM_EC_INCLUDE_AP_RESET_LOG_H_ */

@@ -9,3 +9,8 @@
  * There is no register for emulator, but this file exists to prevent
  * compilation failure if any file includes registers.h
  */
+
+#ifndef PLATFORM_EC_CHIP_HOST_REGISTERS_H_
+#define PLATFORM_EC_CHIP_HOST_REGISTERS_H_
+
+#endif /* PLATFORM_EC_CHIP_HOST_REGISTERS_H_ */
