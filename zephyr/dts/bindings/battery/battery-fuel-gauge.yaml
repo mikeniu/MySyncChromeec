@@ -71,3 +71,8 @@ properties:
        It should be an enum and its value should be a name of function
        which will be assigned to imbalance_mv pointer.
     type: string
+  init:
+    description: |
+       Name of the C function to be called when this battery model is
+       initialized (e.g., to turn on D-FET after cutoff).
+    type: string

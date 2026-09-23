@@ -45,15 +45,22 @@
 		.discharging_max_c = DT_PROP(node, discharging_max_c),       \
 	},
 
+#define DECLARE_BATT_INIT(node)                   \
+	COND_CODE_1(DT_NODE_HAS_PROP(node, init), \
+		    (extern void DT_STRING_TOKEN(node, init)(void);), ())
+
 #define NODE_BATT_PARAMS(node)                                              \
 	{                                                                   \
 		.manuf_name = DT_PROP(node, manuf_name),                    \
 		.device_name = DT_PROP(node, device_name),                  \
+		.init = DT_STRING_TOKEN_OR(node, init, NULL),               \
 		.config = { .fuel_gauge = NODE_FUEL_GAUGE(node).batt_info = \
 				    NODE_BATT_INFO(node) },                 \
 	},
 
 #if DT_HAS_COMPAT_STATUS_OKAY(battery_smart)
+
+DT_FOREACH_STATUS_OKAY(battery_smart, DECLARE_BATT_INIT)
 
 const struct batt_conf_embed board_battery_info[] = { DT_FOREACH_STATUS_OKAY(
 	battery_smart, NODE_BATT_PARAMS) };

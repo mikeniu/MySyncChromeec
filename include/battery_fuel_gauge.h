@@ -24,6 +24,7 @@ extern "C" {
 struct batt_conf_embed {
 	char *manuf_name;
 	char *device_name;
+	void (*init)(void);
 	struct board_batt_params config;
 };
 

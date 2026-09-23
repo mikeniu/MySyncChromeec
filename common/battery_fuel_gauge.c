@@ -256,6 +256,8 @@ void init_battery_type(void)
 		battery_conf = &board_battery_info[type];
 		battery_init_retry_count = 0;
 		hook_call_deferred(&init_battery_type_data, -1);
+		if (battery_conf->init)
+			battery_conf->init();
 		return;
 	}
 
