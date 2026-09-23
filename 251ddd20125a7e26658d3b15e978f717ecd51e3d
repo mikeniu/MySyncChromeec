@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62b65d21_0584e6da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-23T16:36:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n*   **Functionality:** The explicitly added size validation correctly protects against out-of-bounds reads for version 1 requests, addressing the underlying vulnerability.\n*   **Architecture \u0026 Component Fit:** The logic fits within the existing Zephyr host command framework by addressing a known limitation of the `SMALLEST_TYPE` validation mechanism, placing the conditional validation properly within the handlers.\n*   **Code Simplicity:** The redundant base version (v0) size checks in `fp_command_frame` and `fp_command_template` were correctly removed, streamlining the logic.\n*   **Idiomaticity \u0026 Readability:** Excellent. The logic is placed clearly and uses appropriate internal error codes (`EC_HOST_CMD_REQUEST_TRUNCATED`). The unit tests cleanly invoke `CROS_EC_COMMAND` directly when wrapper APIs hardcode the size argument, perfectly facilitating negative bounds testing.\n*   **Testing \u0026 Test Coverage:** Comprehensive unit tests have been added to rigorously verify the truncated bounds checks for `EC_CMD_FP_MODE`, `EC_CMD_FP_FRAME`, and `EC_CMD_FP_TEMPLATE_LOAD` v1 APIs, fully addressing all prior feedback.\n*   **CL Size \u0026 Scope:** Size: M (+56, -0). The CL focuses entirely on bounds checking logic for explicit structure payloads across operations and maintains a tight scope. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8434542_0eec52e7-53b4-42e3-8ba5-eae2c0c1af82.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "251ddd20125a7e26658d3b15e978f717ecd51e3d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
