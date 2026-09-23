@@ -3,11 +3,11 @@
  * found in the LICENSE file.
  */
 
-#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_CONFIG_H_
-#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_CONFIG_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN_SERIES_CONFIG_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN_SERIES_CONFIG_H_
 
 /*
- * Select the correct configuration file based on the enabled ELAN80 series
+ * Select the correct configuration file based on the enabled ELAN series
  * fingerprint sensor.
  */
 
@@ -19,5 +19,5 @@
 #error "No valid configuration for fingerprint sensor."
 #endif
 
-#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN80SERIES_CONFIG_H_ \
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_ELAN_SERIES_CONFIG_H_ \
 	*/

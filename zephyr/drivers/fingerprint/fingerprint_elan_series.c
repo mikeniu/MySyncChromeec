@@ -3,9 +3,9 @@
  * found in the LICENSE file.
  */
 
-#include "fingerprint_elan80series.h"
-#include "fingerprint_elan80series_pal.h"
-#include "fingerprint_elan80series_private.h"
+#include "fingerprint_elan_series.h"
+#include "fingerprint_elan_series_pal.h"
+#include "fingerprint_elan_series_private.h"
 
 #include <assert.h>
 
@@ -43,11 +43,11 @@ convert_fp_capture_type_to_elan_capture_type(enum fingerprint_capture_type mode)
 	}
 }
 
-static void elan80series_use_flash_addresses(const struct device *dev)
+static void elan_series_use_flash_addresses(const struct device *dev)
 {
 #if DT_ANY_INST_HAS_PROP_STATUS_OKAY(base_image) && \
 	DT_ANY_INST_HAS_PROP_STATUS_OKAY(ft_info)
-	const struct elan80series_cfg *cfg = dev->config;
+	const struct elan_series_cfg *cfg = dev->config;
 
 	if (cfg->base_image_addr != 0 && cfg->ft_info_addr != 0) {
 		use_flash_addresses(cfg->base_image_addr, cfg->ft_info_addr);
@@ -55,7 +55,7 @@ static void elan80series_use_flash_addresses(const struct device *dev)
 #endif
 }
 
-static int elan80series_get_hwid(const struct device *dev, uint16_t *id)
+static int elan_series_get_hwid(const struct device *dev, uint16_t *id)
 {
 	int rc;
 	uint8_t id_hi = 0, id_lo = 0;
@@ -74,13 +74,13 @@ static int elan80series_get_hwid(const struct device *dev, uint16_t *id)
 	return 0;
 }
 
-static int elan80series_check_hwid(const struct device *dev)
+static int elan_series_check_hwid(const struct device *dev)
 {
-	struct elan80series_data *data = dev->data;
+	struct elan_series_data *data = dev->data;
 	uint16_t id = 0;
 	int status;
 
-	status = elan80series_get_hwid(dev, &id);
+	status = elan_series_get_hwid(dev, &id);
 	if (status < 0) {
 		assert(status == -ENOTSUP);
 		data->errors |= FINGERPRINT_ERROR_SPI_COMM;
@@ -96,9 +96,9 @@ static int elan80series_check_hwid(const struct device *dev)
 	return 0;
 }
 
-static inline int elan80series_enable_irq(const struct device *dev)
+static inline int elan_series_enable_irq(const struct device *dev)
 {
-	const struct elan80series_cfg *cfg = dev->config;
+	const struct elan_series_cfg *cfg = dev->config;
 	int rc;
 
 	rc = gpio_pin_interrupt_configure_dt(&cfg->interrupt,
@@ -110,9 +110,9 @@ static inline int elan80series_enable_irq(const struct device *dev)
 	return rc;
 }
 
-static inline int elan80series_disable_irq(const struct device *dev)
+static inline int elan_series_disable_irq(const struct device *dev)
 {
-	const struct elan80series_cfg *cfg = dev->config;
+	const struct elan_series_cfg *cfg = dev->config;
 	int rc;
 
 	rc = gpio_pin_interrupt_configure_dt(&cfg->interrupt, GPIO_INT_DISABLE);
@@ -123,21 +123,21 @@ static inline int elan80series_disable_irq(const struct device *dev)
 	return rc;
 }
 
-static int elan80series_init(const struct device *dev)
+static int elan_series_init(const struct device *dev)
 {
-	struct elan80series_data *data = dev->data;
+	struct elan_series_data *data = dev->data;
 	int rc;
 
 	data->errors = FINGERPRINT_ERROR_DEAD_PIXELS_UNKNOWN;
 
-	if (IS_ENABLED(CONFIG_HAVE_ELAN80SERIES_PRIVATE_DRIVER)) {
+	if (IS_ENABLED(CONFIG_HAVE_ELAN_SERIES_PRIVATE_DRIVER)) {
 		elan_execute_reset();
 		elan_alg_param_setting();
-		elan80series_use_flash_addresses(dev);
+		elan_series_use_flash_addresses(dev);
 	}
 	elan_set_hv_chip(true);
 
-	rc = elan80series_check_hwid(dev);
+	rc = elan_series_check_hwid(dev);
 	if (rc != 0) {
 		data->errors |= FINGERPRINT_ERROR_INIT_FAIL;
 		return rc;
@@ -145,7 +145,7 @@ static int elan80series_init(const struct device *dev)
 
 	if (elan_execute_calibration() < 0)
 		data->errors |= FINGERPRINT_ERROR_INIT_FAIL;
-	if (IS_ENABLED(CONFIG_HAVE_ELAN80SERIES_PRIVATE_DRIVER)) {
+	if (IS_ENABLED(CONFIG_HAVE_ELAN_SERIES_PRIVATE_DRIVER)) {
 		if (elan_woe_mode() != 0)
 			data->errors |= FINGERPRINT_ERROR_SPI_COMM;
 	}
@@ -153,9 +153,9 @@ static int elan80series_init(const struct device *dev)
 	return 0;
 }
 
-static int elan80series_deinit(const struct device *dev)
+static int elan_series_deinit(const struct device *dev)
 {
-	if (!IS_ENABLED(CONFIG_HAVE_ELAN80SERIES_PRIVATE_DRIVER)) {
+	if (!IS_ENABLED(CONFIG_HAVE_ELAN_SERIES_PRIVATE_DRIVER)) {
 		return 0;
 	}
 
@@ -169,13 +169,13 @@ static int elan80series_deinit(const struct device *dev)
 	return 0;
 }
 
-static int elan80series_get_info(
+static int elan_series_get_info(
 	const struct device *dev, struct fingerprint_sensor_info *sensor_info,
 	struct fingerprint_image_frame_params image_frame_params_array[],
 	uint8_t *num_params)
 {
-	const struct elan80series_cfg *cfg = dev->config;
-	struct elan80series_data *data = dev->data;
+	const struct elan_series_cfg *cfg = dev->config;
+	struct elan_series_data *data = dev->data;
 	uint16_t id = 0;
 
 	if (sensor_info == NULL || num_params == NULL ||
@@ -202,7 +202,7 @@ static int elan80series_get_info(
 
 	*num_params = num_defined_configs;
 
-	if (elan80series_get_hwid(dev, &id)) {
+	if (elan_series_get_hwid(dev, &id)) {
 		return -EINVAL;
 	}
 
@@ -212,29 +212,29 @@ static int elan80series_get_info(
 	return 0;
 }
 
-static int elan80series_config(const struct device *dev,
-			       fingerprint_callback_t cb)
+static int elan_series_config(const struct device *dev,
+			      fingerprint_callback_t cb)
 {
-	struct elan80series_data *data = dev->data;
+	struct elan_series_data *data = dev->data;
 
 	data->callback = cb;
 
 	return 0;
 }
 
-static int elan80series_maintenance(const struct device *dev, uint8_t *buf,
-				    size_t size)
+static int elan_series_maintenance(const struct device *dev, uint8_t *buf,
+				   size_t size)
 {
 	if (size < CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE) {
 		return -EINVAL;
 	}
 
-	if (!IS_ENABLED(CONFIG_HAVE_ELAN80SERIES_PRIVATE_DRIVER)) {
+	if (!IS_ENABLED(CONFIG_HAVE_ELAN_SERIES_PRIVATE_DRIVER)) {
 		return 0;
 	}
 
 	int rv;
-	struct elan80series_data *data = dev->data;
+	struct elan_series_data *data = dev->data;
 	fp_sensor_info_t sensor_info;
 	uint32_t start = k_uptime_get_32();
 	uint32_t end;
@@ -269,17 +269,17 @@ static int elan80series_maintenance(const struct device *dev, uint8_t *buf,
 	return 0;
 }
 
-static int elan80series_set_mode(const struct device *dev,
-				 enum fingerprint_sensor_mode mode)
+static int elan_series_set_mode(const struct device *dev,
+				enum fingerprint_sensor_mode mode)
 {
 	int rc = 0;
 
 	switch (mode) {
 	case FINGERPRINT_SENSOR_MODE_DETECT:
-		if (IS_ENABLED(CONFIG_HAVE_ELAN80SERIES_PRIVATE_DRIVER)) {
+		if (IS_ENABLED(CONFIG_HAVE_ELAN_SERIES_PRIVATE_DRIVER)) {
 			rc = elan_woe_mode();
 			if (rc == 0) {
-				rc = elan80series_enable_irq(dev);
+				rc = elan_series_enable_irq(dev);
 			}
 		} else {
 			rc = -ENOTSUP;
@@ -287,10 +287,10 @@ static int elan80series_set_mode(const struct device *dev,
 		break;
 
 	case FINGERPRINT_SENSOR_MODE_LOW_POWER:
-		if (IS_ENABLED(CONFIG_HAVE_ELAN80SERIES_PRIVATE_DRIVER)) {
+		if (IS_ENABLED(CONFIG_HAVE_ELAN_SERIES_PRIVATE_DRIVER)) {
 			rc = elan_woe_mode();
 			if (rc == 0) {
-				rc = elan80series_disable_irq(dev);
+				rc = elan_series_disable_irq(dev);
 			}
 		} else {
 			rc = -ENOTSUP;
@@ -298,7 +298,7 @@ static int elan80series_set_mode(const struct device *dev,
 		break;
 
 	case FINGERPRINT_SENSOR_MODE_IDLE:
-		rc = elan80series_disable_irq(dev);
+		rc = elan_series_disable_irq(dev);
 		break;
 
 	default:
@@ -315,10 +315,9 @@ BUILD_ASSERT(FINGERPRINT_SENSOR_SCAN_TOO_FAST == FP_SENSOR_TOO_FAST);
 BUILD_ASSERT(FINGERPRINT_SENSOR_SCAN_LOW_SENSOR_COVERAGE ==
 	     FP_SENSOR_LOW_COVERAGE);
 
-static int
-elan80series_acquire_image(const struct device *dev,
-			   enum fingerprint_capture_type capture_type,
-			   uint8_t *image_buf, size_t image_buf_size)
+static int elan_series_acquire_image(const struct device *dev,
+				     enum fingerprint_capture_type capture_type,
+				     uint8_t *image_buf, size_t image_buf_size)
 {
 	if (image_buf_size < CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE) {
 		return -EINVAL;
@@ -332,7 +331,7 @@ elan80series_acquire_image(const struct device *dev,
 		return -EINVAL;
 	}
 
-	if (!IS_ENABLED(CONFIG_HAVE_ELAN80SERIES_PRIVATE_DRIVER)) {
+	if (!IS_ENABLED(CONFIG_HAVE_ELAN_SERIES_PRIVATE_DRIVER)) {
 		return -ENOTSUP;
 	}
 
@@ -350,11 +349,11 @@ BUILD_ASSERT((int)FINGERPRINT_FINGER_STATE_NONE == (int)FINGER_NONE);
 BUILD_ASSERT((int)FINGERPRINT_FINGER_STATE_PARTIAL == (int)FINGER_PARTIAL);
 BUILD_ASSERT((int)FINGERPRINT_FINGER_STATE_PRESENT == (int)FINGER_PRESENT);
 
-static int elan80series_finger_status(const struct device *dev)
+static int elan_series_finger_status(const struct device *dev)
 {
 	enum finger_state rc;
 
-	if (!IS_ENABLED(CONFIG_HAVE_ELAN80SERIES_PRIVATE_DRIVER)) {
+	if (!IS_ENABLED(CONFIG_HAVE_ELAN_SERIES_PRIVATE_DRIVER)) {
 		return -ENOTSUP;
 	}
 
@@ -367,34 +366,34 @@ static int elan80series_finger_status(const struct device *dev)
 	return rc;
 }
 
-static DEVICE_API(fingerprint, cros_fp_elan80series_driver_api) = {
-	.init = elan80series_init,
-	.deinit = elan80series_deinit,
-	.config = elan80series_config,
-	.get_info = elan80series_get_info,
-	.maintenance = elan80series_maintenance,
-	.set_mode = elan80series_set_mode,
-	.acquire_image = elan80series_acquire_image,
-	.finger_status = elan80series_finger_status,
+static DEVICE_API(fingerprint, cros_fp_elan_series_driver_api) = {
+	.init = elan_series_init,
+	.deinit = elan_series_deinit,
+	.config = elan_series_config,
+	.get_info = elan_series_get_info,
+	.maintenance = elan_series_maintenance,
+	.set_mode = elan_series_set_mode,
+	.acquire_image = elan_series_acquire_image,
+	.finger_status = elan_series_finger_status,
 };
 
-static void elan80series_irq(const struct device *dev, struct gpio_callback *cb,
-			     uint32_t pins)
+static void elan_series_irq(const struct device *dev, struct gpio_callback *cb,
+			    uint32_t pins)
 {
-	struct elan80series_data *data =
-		CONTAINER_OF(cb, struct elan80series_data, irq_cb);
+	struct elan_series_data *data =
+		CONTAINER_OF(cb, struct elan_series_data, irq_cb);
 
-	elan80series_disable_irq(data->dev);
+	elan_series_disable_irq(data->dev);
 
 	if (data->callback != NULL) {
 		data->callback(dev);
 	}
 }
 
-static int elan80series_init_driver(const struct device *dev)
+static int elan_series_init_driver(const struct device *dev)
 {
-	const struct elan80series_cfg *cfg = dev->config;
-	struct elan80series_data *data = dev->data;
+	const struct elan_series_cfg *cfg = dev->config;
+	struct elan_series_data *data = dev->data;
 	int ret;
 
 	if (!spi_is_ready_dt(&cfg->spi)) {
@@ -425,14 +424,14 @@ static int elan80series_init_driver(const struct device *dev)
 	}
 
 	data->dev = dev;
-	gpio_init_callback(&data->irq_cb, elan80series_irq,
+	gpio_init_callback(&data->irq_cb, elan_series_irq,
 			   BIT(cfg->interrupt.pin));
 	gpio_add_callback_dt(&cfg->interrupt, &data->irq_cb);
 
 	return 0;
 }
 
-#define ELAN80SERIES_SENSOR_INFO(inst)                                     \
+#define ELAN_SERIES_SENSOR_INFO(inst)                                      \
 	{                                                                  \
 		.vendor_id = FOURCC('E', 'L', 'A', 'N'),                   \
 		.product_id = PID,                                         \
@@ -442,7 +441,7 @@ static int elan80series_init_driver(const struct device *dev)
 			FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)), \
 	}
 
-#define ELAN80SERIES_IMAGE_PARAM_INITIALIZER(idx, inst)                        \
+#define ELAN_SERIES_IMAGE_PARAM_INITIALIZER(idx, inst)                         \
 	{                                                                      \
 		.frame_size =                                                  \
 			FINGERPRINT_SENSOR_FRAME_SIZE(idx, DT_DRV_INST(inst)), \
@@ -458,7 +457,7 @@ static int elan80series_init_driver(const struct device *dev)
 		.reserved = 0,                                                 \
 	}
 
-#define ELAN80SERIES_BUILD_ASSERT_IMAGE_SIZE(idx, inst)                        \
+#define ELAN_SERIES_BUILD_ASSERT_IMAGE_SIZE(idx, inst)                         \
 	BUILD_ASSERT(                                                          \
 		CONFIG_FINGERPRINT_SENSOR_IMAGE_SIZE >=                        \
 			FINGERPRINT_SENSOR_FRAME_SIZE(idx, DT_DRV_INST(inst)), \
@@ -470,30 +469,30 @@ static int elan80series_init_driver(const struct device *dev)
 		     CONFIG_FLASH_BASE_ADDRESS),                      \
 		    (0))
 
-#define ELAN80SERIES_DEFINE(inst)                                            \
-	static struct elan80series_data elan80series_data_##inst;            \
-	static const struct elan80series_cfg elan80series_cfg_##inst = {     \
-		.spi = SPI_DT_SPEC_INST_GET(inst, SPI_OP_MODE_MASTER |       \
-							  SPI_WORD_SET(8)),  \
-		.base_image_addr = GET_PARTITION_ADDRESS(inst, base_image),  \
-		.ft_info_addr = GET_PARTITION_ADDRESS(inst, ft_info),        \
-		.interrupt = GPIO_DT_SPEC_INST_GET(inst, irq_gpios),         \
-		.reset_pin = GPIO_DT_SPEC_INST_GET(inst, reset_gpios),       \
-		.sensor_info = ELAN80SERIES_SENSOR_INFO(inst),               \
-		.sensor_image_configs = { LISTIFY(                           \
-			FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)),   \
-			ELAN80SERIES_IMAGE_PARAM_INITIALIZER, (, ), inst) }, \
-	};                                                                   \
-	LISTIFY(FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)),           \
-		ELAN80SERIES_BUILD_ASSERT_IMAGE_SIZE, (;), inst)             \
-	BUILD_ASSERT(FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)) <=    \
-			     NUM_IMAGE_CAPTURE_TYPES,                        \
-		     "ELAN80SERIES: Number of image configs exceeds "        \
-		     "NUM_IMAGE_CAPTURE_TYPES");                             \
-	DEVICE_DT_INST_DEFINE(inst, elan80series_init_driver, NULL,          \
-			      &elan80series_data_##inst,                     \
-			      &elan80series_cfg_##inst, POST_KERNEL,         \
-			      CONFIG_FINGERPRINT_SENSOR_INIT_PRIORITY,       \
-			      &cros_fp_elan80series_driver_api)
+#define ELAN_SERIES_DEFINE(inst)                                            \
+	static struct elan_series_data elan_series_data_##inst;             \
+	static const struct elan_series_cfg elan_series_cfg_##inst = {      \
+		.spi = SPI_DT_SPEC_INST_GET(inst, SPI_OP_MODE_MASTER |      \
+							  SPI_WORD_SET(8)), \
+		.base_image_addr = GET_PARTITION_ADDRESS(inst, base_image), \
+		.ft_info_addr = GET_PARTITION_ADDRESS(inst, ft_info),       \
+		.interrupt = GPIO_DT_SPEC_INST_GET(inst, irq_gpios),        \
+		.reset_pin = GPIO_DT_SPEC_INST_GET(inst, reset_gpios),      \
+		.sensor_info = ELAN_SERIES_SENSOR_INFO(inst),               \
+		.sensor_image_configs = { LISTIFY(                          \
+			FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)),  \
+			ELAN_SERIES_IMAGE_PARAM_INITIALIZER, (, ), inst) }, \
+	};                                                                  \
+	LISTIFY(FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)),          \
+		ELAN_SERIES_BUILD_ASSERT_IMAGE_SIZE, (;), inst)             \
+	BUILD_ASSERT(FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)) <=   \
+			     NUM_IMAGE_CAPTURE_TYPES,                       \
+		     "ELAN_SERIES: Number of image configs exceeds "        \
+		     "NUM_IMAGE_CAPTURE_TYPES");                            \
+	DEVICE_DT_INST_DEFINE(inst, elan_series_init_driver, NULL,          \
+			      &elan_series_data_##inst,                     \
+			      &elan_series_cfg_##inst, POST_KERNEL,         \
+			      CONFIG_FINGERPRINT_SENSOR_INIT_PRIORITY,      \
+			      &cros_fp_elan_series_driver_api)
 
-DT_INST_FOREACH_STATUS_OKAY(ELAN80SERIES_DEFINE);
+DT_INST_FOREACH_STATUS_OKAY(ELAN_SERIES_DEFINE);
