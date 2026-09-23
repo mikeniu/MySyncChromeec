@@ -9,8 +9,8 @@
  * used by unit test code.
  */
 
-#ifndef __CROS_EC_ROLLBACK_PRIVATE_H
-#define __CROS_EC_ROLLBACK_PRIVATE_H
+#ifndef PLATFORM_EC_COMMON_ROLLBACK_PRIVATE_H_
+#define PLATFORM_EC_COMMON_ROLLBACK_PRIVATE_H_
 
 #include "config.h"
 
@@ -36,4 +36,4 @@ void secure_clear(void *buffer, size_t size);
 #endif
 #endif
 
-#endif /* __CROS_EC_ROLLBACK_PRIVATE_H */
+#endif /* PLATFORM_EC_COMMON_ROLLBACK_PRIVATE_H_ */

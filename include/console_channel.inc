@@ -41,7 +41,7 @@ CONSOLE_CHANNEL(CC_FP, "fingerprint")
 CONSOLE_CHANNEL(CC_GESTURE, "gesture")
 #endif
 CONSOLE_CHANNEL(CC_GPIO, "gpio")
-#ifdef HAS_TASK_HOSTCMD
+#if defined(HAS_TASK_HOSTCMD) || defined(CONFIG_HAS_HOSTCMD)
 CONSOLE_CHANNEL(CC_HOSTCMD, "hostcmd")
 #endif
 #ifdef CONFIG_I2C

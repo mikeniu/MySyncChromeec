@@ -59,6 +59,7 @@ EOF
 
 # Change header guards
 sed -i "s/__CROS_EC_EC_COMMANDS_H/__CROS_EC_COMMANDS_H/" "${tmp}"
+sed -i "s/PLATFORM_EC_INCLUDE_EC_COMMANDS_H_/__CROS_EC_COMMANDS_H/" "${tmp}"
 
 # Convert UINT32_MAX into U32_MAX (and friends).
 sed -i "s/UINT\([0-9]\{1,2\}\)_MAX/U\1_MAX/" "${tmp}"

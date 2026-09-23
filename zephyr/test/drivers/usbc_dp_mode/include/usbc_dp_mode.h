@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_DRIVERS_USBC_DP_MODE_INCLUDE_USBC_DP_MODE_H_
-#define ZEPHYR_TEST_DRIVERS_USBC_DP_MODE_INCLUDE_USBC_DP_MODE_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_USBC_DP_MODE_INCLUDE_USBC_DP_MODE_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_USBC_DP_MODE_INCLUDE_USBC_DP_MODE_H_
 
 #define TEST_PORT USBC_PORT_C0
 #define PD_SPEC_REVISION 0x3000
@@ -24,4 +24,5 @@ void add_dp_discovery(struct tcpci_partner_data *partner, int svdm_version);
 void add_displayport_mode_responses(struct tcpci_partner_data *partner,
 				    int svdm_version);
 
-#endif /* ZEPHYR_TEST_DRIVERS_USBC_DP_MODE_INCLUDE_USBC_DP_MODE_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_USBC_DP_MODE_INCLUDE_USBC_DP_MODE_H_ \
+	*/

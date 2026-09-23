@@ -11,6 +11,10 @@
 #include "gpio/gpio_int.h"
 #include "hooks.h"
 
+#ifndef CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS
+#define CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS 0
+#endif
+
 static void disable_pp5000_s5(void)
 {
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 0);
@@ -68,9 +72,10 @@ DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init_quartz,
 
 static void board_chipset_hard_off_quartz(void)
 {
-	hook_call_deferred(&disable_pp5000_s5_data,
-			   (5000 + CONFIG_CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
-				   USEC_PER_MSEC);
+	hook_call_deferred(
+		&disable_pp5000_s5_data,
+		(5000 + CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
+			USEC_PER_MSEC);
 }
 DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_chipset_hard_off_quartz,
 	     HOOK_PRIO_DEFAULT);

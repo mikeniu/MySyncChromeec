@@ -138,7 +138,7 @@ static void cros_ec_ishtp_process_msg(uint8_t *msg, const size_t msg_size)
 	heci_packet.response_size = 0;
 
 	heci_packet.driver_result = EC_RES_SUCCESS;
-	if (IS_ENABLED(HAS_TASK_HOSTCMD))
+	if (IS_ENABLED(CONFIG_HAS_HOSTCMD))
 		host_packet_receive(&heci_packet);
 }
 

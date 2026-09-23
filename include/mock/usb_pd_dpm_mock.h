@@ -4,8 +4,8 @@
  */
 /* Mock of Device Policy Manager implementation */
 
-#ifndef __MOCK_USB_PD_DPM_MOCK_H
-#define __MOCK_USB_PD_DPM_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_USB_PD_DPM_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_USB_PD_DPM_MOCK_H_
 
 #include "common.h"
 #include "usb_pd_dpm_sm.h"
@@ -28,4 +28,4 @@ void mock_dpm_reset(void);
 }
 #endif
 
-#endif /* __MOCK_USB_PD_DPM_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_USB_PD_DPM_MOCK_H_ */

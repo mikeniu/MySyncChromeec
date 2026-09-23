@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_DRIVERS_EGIS660_SRC_TEST_HELPERS_H_
-#define ZEPHYR_TEST_DRIVERS_EGIS660_SRC_TEST_HELPERS_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_FINGERPRINT_DRIVERS_EGIS660_SRC_EGIS660_PAL_TEST_HELPERS_H_
+#define PLATFORM_EC_ZEPHYR_TEST_FINGERPRINT_DRIVERS_EGIS660_SRC_EGIS660_PAL_TEST_HELPERS_H_
 
 #include <zephyr/devicetree.h>
 #include <zephyr/kernel.h>
@@ -38,4 +38,5 @@ __syscall int egis660_pal_flash_write(uint32_t offset, const void *data,
 
 #include <zephyr/syscalls/egis660_pal_test_helpers.h>
 
-#endif /* ZEPHYR_TEST_DRIVERS_EGIS660_SRC_TEST_HELPERS_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_FINGERPRINT_DRIVERS_EGIS660_SRC_EGIS660_PAL_TEST_HELPERS_H_ \
+	*/

@@ -5,8 +5,8 @@
 
 /* LIS2DH/LIS2DE/LNG2DM accelerometer module for Chrome EC */
 
-#ifndef __CROS_EC_ACCEL_LIS2DH_H
-#define __CROS_EC_ACCEL_LIS2DH_H
+#ifndef PLATFORM_EC_DRIVER_ACCEL_LIS2DH_H_
+#define PLATFORM_EC_DRIVER_ACCEL_LIS2DH_H_
 
 #include "driver/stm_mems_common.h"
 
@@ -193,4 +193,4 @@ extern const struct accelgyro_drv lis2dh_drv;
 	TASK_EVENT_MOTION_SENSOR_INTERRUPT(SENSOR_ID(DT_ALIAS(lis2dh_int)))
 #endif
 
-#endif /* __CROS_EC_ACCEL_LIS2DH_H */
+#endif /* PLATFORM_EC_DRIVER_ACCEL_LIS2DH_H_ */

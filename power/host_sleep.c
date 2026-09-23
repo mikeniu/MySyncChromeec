@@ -34,11 +34,11 @@ power_chipset_handle_host_sleep_event(enum host_sleep_event state,
 }
 /* LCOV_EXCL_STOP */
 
-static enum ec_status
-host_command_host_sleep_event(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_host_sleep_event(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_host_sleep_event_v1 *p = args->params;
-	struct ec_response_host_sleep_event_v1 *r = args->response;
+	const struct ec_params_host_sleep_event_v1 *p = args->input_buf;
+	struct ec_response_host_sleep_event_v1 *r = args->output_buf;
 	struct host_sleep_event_context ctx;
 	enum host_sleep_event state = p->sleep_event;
 
@@ -58,7 +58,9 @@ host_command_host_sleep_event(struct host_cmd_handler_args *args)
 		ctx.sleep_timeout_ms = EC_HOST_SLEEP_TIMEOUT_DEFAULT;
 
 		/* The original version contained only state. */
-		if (args->version >= 1)
+		if (args->version >= 1 &&
+		    args->input_buf_size >=
+			    sizeof(struct ec_params_host_sleep_event_v1))
 			ctx.sleep_timeout_ms =
 				p->suspend_params.sleep_timeout_ms;
 
@@ -73,10 +75,13 @@ host_command_host_sleep_event(struct host_cmd_handler_args *args)
 	case HOST_SLEEP_EVENT_S0IX_RESUME:
 	case HOST_SLEEP_EVENT_S3_RESUME:
 		if (args->version >= 1) {
+			if (args->output_buf_max < sizeof(*r))
+				return EC_HOST_CMD_RESPONSE_TOO_BIG;
+
 			r->resume_response.sleep_transitions =
 				ctx.sleep_transitions;
 
-			args->response_size = sizeof(*r);
+			args->output_buf_size = sizeof(*r);
 		}
 
 		break;
@@ -85,10 +90,13 @@ host_command_host_sleep_event(struct host_cmd_handler_args *args)
 		break;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_HOST_SLEEP_EVENT, host_command_host_sleep_event,
-		     EC_VER_MASK(0) | EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_REQ_ONLY(
+	EC_CMD_HOST_SLEEP_EVENT, host_command_host_sleep_event,
+	EC_VER_MASK(0) | EC_VER_MASK(1),
+	SMALLEST_TYPE(struct ec_params_host_sleep_event,
+		      struct ec_params_host_sleep_event_v1));
 
 enum host_sleep_event power_get_host_sleep_state(void)
 {
@@ -409,17 +417,19 @@ void sleep_reset_tracking(void)
 	timeout_hang_type = SLEEP_HANG_NONE;
 }
 
-static enum ec_status
-host_command_host_sleep_signal_transitions(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status host_command_host_sleep_signal_transitions(
+	struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_host_sleep_signal_transitions *resp = args->response;
-	args->response_size = sizeof(*resp);
+	struct ec_response_host_sleep_signal_transitions *resp =
+		args->output_buf;
+	args->output_buf_size = sizeof(*resp);
 	resp->sleep_signal_transitions = sleep_signal_transitions;
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_HOST_SLEEP_SIGNAL_TRANSITIONS,
-		     host_command_host_sleep_signal_transitions,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_HOST_SLEEP_SIGNAL_TRANSITIONS,
+			      host_command_host_sleep_signal_transitions,
+			      EC_VER_MASK(0),
+			      struct ec_response_host_sleep_signal_transitions);
 
 static int command_sleep_fail_timeout(int argc, const char **argv)
 {

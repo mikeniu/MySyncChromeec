@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef _HECI_H_
-#define _HECI_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_HOST_SERVICE_HECI_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_HOST_SERVICE_HECI_H_
 /**
  * @brief HECI Interface
  * @defgroup heci_interface HECI Interface
@@ -155,4 +155,4 @@ int heci_add_fix_clients(uint32_t addr, heci_msg_proc_handler_f hdl);
 /*
  * @}
  */
-#endif /* _HECI_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_HOST_SERVICE_HECI_H_ */

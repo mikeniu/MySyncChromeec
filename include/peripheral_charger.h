@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_PERIPHERAL_CHARGER_H
-#define __CROS_EC_PERIPHERAL_CHARGER_H
+#ifndef PLATFORM_EC_INCLUDE_PERIPHERAL_CHARGER_H_
+#define PLATFORM_EC_INCLUDE_PERIPHERAL_CHARGER_H_
 
 #include "atomic.h"
 #include "common.h"
@@ -440,4 +440,4 @@ void pchg_shutdown(void);
 }
 #endif
 
-#endif /* __CROS_EC_PERIPHERAL_CHARGER_H */
+#endif /* PLATFORM_EC_INCLUDE_PERIPHERAL_CHARGER_H_ */

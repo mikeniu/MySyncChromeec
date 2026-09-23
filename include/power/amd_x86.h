@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_POWER_AMD_X86_H_
-#define __CROS_EC_POWER_AMD_X86_H_
+#ifndef PLATFORM_EC_INCLUDE_POWER_AMD_X86_H_
+#define PLATFORM_EC_INCLUDE_POWER_AMD_X86_H_
 
 /*
  * In legacy EC-OS, the power signals are defined as part of
@@ -26,4 +26,4 @@ enum power_signal {
 
 #endif
 
-#endif /* __CROS_EC_POWER_AMD_X86_H_ */
+#endif /* PLATFORM_EC_INCLUDE_POWER_AMD_X86_H_ */

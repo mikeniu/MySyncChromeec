@@ -11,6 +11,10 @@
 #include "led_common.h"
 #include "power/qcom.h"
 
+#ifndef CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS
+#define CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS 0
+#endif
+
 static void disable_pp5000(void)
 {
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 0);
@@ -42,11 +46,20 @@ void board_chipset_shutdown_pic(void)
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_pic,
 	     HOOK_PRIO_DEFAULT);
 
+static void board_chipset_pre_init_pic(void)
+{
+	hook_call_deferred(&disable_pp5000_data, -1);
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 1);
+}
+DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init_pic,
+	     HOOK_PRIO_DEFAULT);
+
 static void board_chipset_hard_off_pic(void)
 {
-	hook_call_deferred(&disable_pp5000_data,
-			   (5000 + CONFIG_CROS_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
-				   USEC_PER_MSEC);
+	hook_call_deferred(
+		&disable_pp5000_data,
+		(5000 + CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
+			USEC_PER_MSEC);
 }
 DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_chipset_hard_off_pic,
 	     HOOK_PRIO_DEFAULT);

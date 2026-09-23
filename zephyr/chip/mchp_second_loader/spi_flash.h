@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef SPI_FLASH_H
-#define SPI_FLASH_H
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_SPI_FLASH_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_SPI_FLASH_H_
 
 #define FLASH_DATA_COMPARE_ERROR (1 << 0)
 
@@ -15,4 +15,4 @@ enum failure_resp_type spi_flash_sector_erase(uint32_t addr);
 enum failure_resp_type
 spi_splash_check_sector_content_same(uint32_t sector_address, uint8_t *status,
 				     uint8_t *input_data_ptr);
-#endif /* #ifndef SPI_FLASH_H */
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_SPI_FLASH_H_ */

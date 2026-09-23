@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef ZEPHYR_INCLUDE_SUBSYS_USBD_SERVICE_H_
-#define ZEPHYR_INCLUDE_SUBSYS_USBD_SERVICE_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_SUBSYS_USBD_SERVICE_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_SUBSYS_USBD_SERVICE_H_
 
 /**
  * Checks whether the USB device controller is suspended.
@@ -12,4 +12,4 @@
  */
 bool usb_is_suspended(void);
 
-#endif
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_SUBSYS_USBD_SERVICE_H_ */

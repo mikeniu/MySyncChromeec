@@ -5,11 +5,11 @@
 
 /* CPU specific header file */
 
-#ifndef __CROS_EC_CPU_H
-#define __CROS_EC_CPU_H
+#ifndef PLATFORM_EC_CORE_HOST_CPU_H_
+#define PLATFORM_EC_CORE_HOST_CPU_H_
 
 static inline void cpu_init(void)
 {
 }
 
-#endif /* __CROS_EC_CPU_H */
+#endif /* PLATFORM_EC_CORE_HOST_CPU_H_ */

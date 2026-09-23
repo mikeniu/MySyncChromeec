@@ -9,8 +9,8 @@
  * section 5.2
  */
 
-#ifndef __CROS_EC_USB_DP_ALT_MODE_H
-#define __CROS_EC_USB_DP_ALT_MODE_H
+#ifndef PLATFORM_EC_INCLUDE_USB_DP_ALT_MODE_H_
+#define PLATFORM_EC_INCLUDE_USB_DP_ALT_MODE_H_
 
 #include "config.h"
 #include "tcpm/tcpm.h"
@@ -337,4 +337,4 @@ static inline enum dp_bit_rate dp_get_cable_bit_rate(int port)
 }
 #endif
 
-#endif /* __CROS_EC_USB_DP_ALT_MODE_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_DP_ALT_MODE_H_ */

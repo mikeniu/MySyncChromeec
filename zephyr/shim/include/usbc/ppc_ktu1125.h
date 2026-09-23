@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_KTU1125_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_KTU1125_H_
+
 #include "ppc/ktu1125_public.h"
 
 #ifdef __cplusplus
@@ -22,3 +25,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_KTU1125_H_ */
