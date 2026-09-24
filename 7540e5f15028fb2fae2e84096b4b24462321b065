@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1aaf7d15_e45635b9",
+        "filename": "zephyr/subsys/adsp_comms/adsp_comms.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-24T19:09:49Z",
+      "side": 1,
+      "message": "wouldn\u0027t `rv` already have a valid `EC_ERROR_*` value?",
+      "range": {
+        "startLine": 92,
+        "startChar": 11,
+        "endLine": 92,
+        "endChar": 27
+      },
+      "revId": "7540e5f15028fb2fae2e84096b4b24462321b065",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
