@@ -8,6 +8,7 @@
 import argparse
 import os
 from pathlib import Path
+import shlex
 import sys
 
 
@@ -40,8 +41,8 @@ def main():
 
     run_docker_sh = str(SCRIPT_DIR / "run_docker.sh")
 
-    # Join twister args into a space-separated string for bash -c
-    twister_cmd = " ".join(twister_args)
+    # Quote twister args into a single command string for bash -c
+    twister_cmd = shlex.join(twister_args)
     cmd = [run_docker_sh]
     if not args.update:
         cmd.append("--fast")
