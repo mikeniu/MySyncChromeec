@@ -9,8 +9,8 @@
  * @brief Backend API for USB-C source device emulator
  */
 
-#ifndef __EMUL_TCPCI_PARTNER_SRC_H
-#define __EMUL_TCPCI_PARTNER_SRC_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_SRC_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_SRC_H_
 
 #include "emul/tcpc/emul_tcpci.h"
 #include "emul/tcpc/emul_tcpci_partner_common.h"
@@ -155,4 +155,4 @@ void tcpci_src_emul_clear_status_received(struct tcpci_src_emul_data *data);
  * @}
  */
 
-#endif /* __EMUL_TCPCI_PARTNER_SRC_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_SRC_H_ */

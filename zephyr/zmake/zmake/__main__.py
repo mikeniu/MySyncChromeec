@@ -195,6 +195,15 @@ def get_argparser():
         "compare-builds", help="Compare output binaries from two commits"
     )
     compare_builds.add_argument(
+        "-m",
+        "--module",
+        default="ec",
+        help=(
+            "Name of the module repository to compare (e.g. 'ec', 'google-private'), "
+            "default='ec'"
+        ),
+    )
+    compare_builds.add_argument(
         "--ref1",
         default="HEAD",
         help="1st git reference (commit, branch, etc), default=HEAD",
@@ -295,6 +304,11 @@ def get_argparser():
         "target2",
         type=pathlib.Path,
         help="Second build directory or ec.bin file",
+    )
+    analyze_build_diff.add_argument(
+        "--sections",
+        action="store_true",
+        help="Print detailed section size comparison and changed sections",
     )
 
     return parser, sub

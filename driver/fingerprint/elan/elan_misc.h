@@ -4,8 +4,8 @@
  */
 /* ELAN Platform Abstraction Layer callbacks */
 
-#ifndef __CROS_EC_DRIVER_FINGERPRINT_ELAN_ELAN_MISC_H_
-#define __CROS_EC_DRIVER_FINGERPRINT_ELAN_ELAN_MISC_H_
+#ifndef PLATFORM_EC_DRIVER_FINGERPRINT_ELAN_ELAN_MISC_H_
+#define PLATFORM_EC_DRIVER_FINGERPRINT_ELAN_ELAN_MISC_H_
 
 #include "timer.h"
 
@@ -46,4 +46,4 @@ __staticlib_hook uint32_t elan_get_tick(void);
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_FINGERPRINT_ELAN_ELAN_MISC_H__ */
+#endif /* PLATFORM_EC_DRIVER_FINGERPRINT_ELAN_ELAN_MISC_H_ */

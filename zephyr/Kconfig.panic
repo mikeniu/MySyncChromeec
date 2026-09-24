@@ -76,4 +76,13 @@ config PLATFORM_EC_PANIC_LOG_DEBUG
 	  Enables panic log debug features, including
 	  the `paniclog` console command.
 
+config PLATFORM_EC_PANIC_HOST_EVENT
+	bool "Publish EC_HOST_EVENT_PANIC on HOOK_CHIPSET_STARTUP"
+	default y
+	depends on HAS_HOSTCMD
+	help
+	  Set EC_HOST_EVENT_PANIC inside HOOK_CHIPSET_STARTUP when an EC
+	  panic has occurred. This alerts the AP that a panic occurred on the
+	  previous boot.
+
 endif # PLATFORM_EC_PANIC

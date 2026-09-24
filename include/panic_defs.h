@@ -5,8 +5,8 @@
  * Panic handling macros and structures.
  */
 
-#ifndef __CROS_EC_PANIC_DEFS_H
-#define __CROS_EC_PANIC_DEFS_H
+#ifndef PLATFORM_EC_INCLUDE_PANIC_DEFS_H_
+#define PLATFORM_EC_INCLUDE_PANIC_DEFS_H_
 
 #include <stdint.h>
 
@@ -198,4 +198,4 @@ enum panic_arch {
 }
 #endif
 
-#endif /* __CROS_EC_PANIC_DEFS_H */
+#endif /* PLATFORM_EC_INCLUDE_PANIC_DEFS_H_ */

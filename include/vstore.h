@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_VSTORE_H
-#define __CROS_EC_VSTORE_H
+#ifndef PLATFORM_EC_INCLUDE_VSTORE_H_
+#define PLATFORM_EC_INCLUDE_VSTORE_H_
 
 #ifdef TEST_BUILD
 
@@ -13,4 +13,4 @@ void vstore_clear_lock(void);
 
 #endif /* TEST_BUILD */
 
-#endif /* __CROS_EC_VSTORE_H */
+#endif /* PLATFORM_EC_INCLUDE_VSTORE_H_ */

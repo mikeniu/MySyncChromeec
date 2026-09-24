@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_FPC1025_H_
-#define ZEPHYR_INCLUDE_EMUL_EMUL_FPC1025_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_FPC1025_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_FPC1025_H_
 
 /* FPC1025 example hardware id */
 #define FPC1025_HWID 0x021F
@@ -24,4 +24,4 @@ void fpc1025_set_hwid(const struct emul *target, uint16_t hardware_id);
  */
 uint8_t fpc1025_get_low_power_mode(const struct emul *target);
 
-#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_FPC1025_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_FPC1025_H_ */

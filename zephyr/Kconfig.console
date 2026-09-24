@@ -37,7 +37,7 @@ config PLATFORM_EC_ISR_CONSOLE_OUTPUT
 
 menuconfig PLATFORM_EC_HOSTCMD_CONSOLE
 	bool "Console Host Command"
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	default y
 	help
 	  Enable the EC_CMD_CONSOLE_SNAPSHOT and EC_CMD_CONSOLE_READ
@@ -70,7 +70,7 @@ config PLATFORM_EC_SOC_IT8XXX2_CONSOLE_BUF_H2RAM_SHARED
 
 config PLATFORM_EC_HOSTCMD_CONSOLE_EVENT
 	bool "Host event console logs"
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	help
 	  Signal new console logs with a host event.
 
@@ -154,7 +154,7 @@ config PLATFORM_EC_PRINTF_LONG_IS_32BITS
 
 config PLATFORM_EC_HOSTCMD_CONSOLE_PRINT
 	bool "Console Print Command"
-	depends on CONSOLE && PLATFORM_EC_HOSTCMD
+	depends on CONSOLE && HAS_HOSTCMD
 	default y
 	help
 	  Enable the EC_CMD_CONSOLE_PRINT host command. This allows the host
@@ -172,7 +172,7 @@ config PLATFORM_EC_CONSOLE_START_SHELL_TASK
 
 config PLATFORM_EC_AP_FW_STATE
 	bool "AP FW state tracking"
-	depends on PLATFORM_EC_HOSTCMD
+	depends on HAS_HOSTCMD
 	default y
 	help
 	  Enable storing the last seen AP FW state.

@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "common.h"
 #include "cros_board_info.h"
 #include "cros_cbi.h"
 #include "hooks.h"
@@ -67,7 +68,7 @@ static void input_kbd_actual_key_mask_replace(void)
 	LOG_INF("Keyboard actual_key_mask replace done");
 }
 
-static int kb_init(void)
+test_export_static int kb_init(void)
 {
 	uint32_t board_id = 0;
 	int rv;
