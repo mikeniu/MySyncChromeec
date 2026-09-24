@@ -5,8 +5,8 @@
 
 /* common.h - Common includes for Chrome EC */
 
-#ifndef __CROS_EC_COMMON_H
-#define __CROS_EC_COMMON_H
+#ifndef PLATFORM_EC_INCLUDE_COMMON_H_
+#define PLATFORM_EC_INCLUDE_COMMON_H_
 
 #include "compile_time_macros.h"
 
@@ -591,4 +591,4 @@ enum ec_error_list {
 }
 #endif
 
-#endif /* __CROS_EC_COMMON_H */
+#endif /* PLATFORM_EC_INCLUDE_COMMON_H_ */

@@ -13,6 +13,8 @@
 DEFINE_FAKE_VALUE_FUNC(int, cros_system_get_reset_cause);
 DEFINE_FAKE_VALUE_FUNC(uint64_t, cros_system_deep_sleep_ticks);
 DEFINE_FAKE_VALUE_FUNC(int, cros_system_hibernate, uint32_t, uint32_t);
+DEFINE_FAKE_VALUE_FUNC(int, cros_system_get_hibernate_wake_source,
+		       enum hibernate_wake_source *);
 DEFINE_FAKE_VALUE_FUNC(const char *, cros_system_chip_vendor);
 DEFINE_FAKE_VALUE_FUNC(const char *, cros_system_chip_name);
 DEFINE_FAKE_VALUE_FUNC(const char *, cros_system_chip_revision);
@@ -34,6 +36,7 @@ static void system_before_after(void *test_data)
 	RESET_FAKE(cros_system_get_reset_cause);
 	RESET_FAKE(cros_system_deep_sleep_ticks);
 	RESET_FAKE(cros_system_hibernate);
+	RESET_FAKE(cros_system_get_hibernate_wake_source);
 	RESET_FAKE(cros_system_chip_vendor);
 	RESET_FAKE(cros_system_chip_name);
 	RESET_FAKE(cros_system_chip_revision);

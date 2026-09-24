@@ -77,6 +77,36 @@ ZTEST(system, test_save_read_chip_reset_flags)
 	zassert_equal(chip_read_reset_flags(), arbitrary_flags);
 }
 
+static int
+custom_cros_system_get_hibernate_wake_source(enum hibernate_wake_source *source)
+{
+	*source = WAKE_SOURCE_PWR_BTN;
+	return 0;
+}
+
+/* Test system_get_hibernate_wake_source delegates to cros_system driver */
+ZTEST(system, test_system_get_hibernate_wake_source)
+{
+	enum hibernate_wake_source source = WAKE_SOURCE_UNKNOWN;
+
+	/* Test successful query with custom fake setting the out parameter */
+	cros_system_get_hibernate_wake_source_fake.custom_fake =
+		custom_cros_system_get_hibernate_wake_source;
+
+	zassert_ok(system_get_hibernate_wake_source(&source));
+	zassert_equal(cros_system_get_hibernate_wake_source_fake.call_count, 1);
+	zassert_equal(cros_system_get_hibernate_wake_source_fake.arg0_val,
+		      &source);
+	zassert_equal(source, WAKE_SOURCE_PWR_BTN);
+
+	/* Test error return value is properly forwarded */
+	cros_system_get_hibernate_wake_source_fake.custom_fake = NULL;
+	cros_system_get_hibernate_wake_source_fake.return_val = -ENOSYS;
+
+	zassert_equal(-ENOSYS, system_get_hibernate_wake_source(&source));
+	zassert_equal(cros_system_get_hibernate_wake_source_fake.call_count, 2);
+}
+
 ZTEST(system, test_system_set_get_scratchpad)
 {
 	/* Arbitrary values */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ZEPHYR_ADC_H
-#define __CROS_EC_ZEPHYR_ADC_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_ADC_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_ADC_H_
 
 #include <zephyr/drivers/adc.h>
 
@@ -47,4 +47,4 @@ enum adc_channel { ADC_CH_COUNT };
 }
 #endif
 
-#endif /* __CROS_EC_ZEPHYR_ADC_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_ADC_H_ */

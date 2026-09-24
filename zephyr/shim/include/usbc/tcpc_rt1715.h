@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_RT1715_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_RT1715_H_
+
 #include "driver/tcpm/rt1715.h"
 #include "usbc/utils.h"
 
@@ -34,3 +37,5 @@ DT_FOREACH_STATUS_OKAY(RT1715_TCPC_COMPAT,
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_TCPC_RT1715_H_ */

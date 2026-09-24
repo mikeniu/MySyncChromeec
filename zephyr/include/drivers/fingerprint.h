@@ -8,8 +8,8 @@
  * @brief API for fingerprint sensors
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_
-#define ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_
 
 /**
  * @brief Fingerprint sensor Interface
@@ -298,6 +298,8 @@ enum fingerprint_capture_type {
 	FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST = 16,
 	/** Capture for pixel reset value test. */
 	FINGERPRINT_CAPTURE_TYPE_RESET_TEST = 20,
+	/** Capture for pattern2 test. */
+	FINGERPRINT_CAPTURE_TYPE_PATTERN2 = 24,
 	/** End of enum. */
 	FINGERPRINT_CAPTURE_TYPE_MAX,
 };
@@ -645,4 +647,4 @@ static inline int z_impl_fingerprint_finger_status(const struct device *dev)
  * @}
  */
 #include <zephyr/syscalls/fingerprint.h>
-#endif /* ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_FINGERPRINT_H_ */

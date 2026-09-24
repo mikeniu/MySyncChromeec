@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef UTIL_FOCALTECH_MOCK_USB_TRANSPORT_H_
-#define UTIL_FOCALTECH_MOCK_USB_TRANSPORT_H_
+#ifndef PLATFORM_EC_UTIL_FOCALTECH_MOCK_USB_TRANSPORT_H_
+#define PLATFORM_EC_UTIL_FOCALTECH_MOCK_USB_TRANSPORT_H_
 
 #include <gmock/gmock.h>
 
@@ -26,4 +26,4 @@ class MockUsbTransport : public UsbTransport {
 
 }  // namespace focaltech::testing
 
-#endif  // UTIL_FOCALTECH_MOCK_USB_TRANSPORT_H_
+#endif /* PLATFORM_EC_UTIL_FOCALTECH_MOCK_USB_TRANSPORT_H_ */

@@ -9,8 +9,8 @@
  * @brief Backend API for USB-C malfunctioning device emulator
  */
 
-#ifndef __EMUL_TCPCI_PARTNER_FAULTY_EXT_H
-#define __EMUL_TCPCI_PARTNER_FAULTY_EXT_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_FAULTY_EXT_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_FAULTY_EXT_H_
 
 #include "emul/tcpc/emul_tcpci.h"
 #include "emul/tcpc/emul_tcpci_partner_common.h"
@@ -105,4 +105,5 @@ void tcpci_faulty_ext_clear_actions_list(struct tcpci_faulty_ext_data *data);
  * @}
  */
 
-#endif /* __EMUL_TCPCI_PARTNER_FAULTY_EXT_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_FAULTY_EXT_H_ \
+	*/

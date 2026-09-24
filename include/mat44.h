@@ -4,9 +4,9 @@
  */
 
 /* Header file for common math functions. */
-#ifndef __CROS_EC_MAT_44_H
+#ifndef PLATFORM_EC_INCLUDE_MAT44_H_
 
-#define __CROS_EC_MAT_44_H
+#define PLATFORM_EC_INCLUDE_MAT44_H_
 
 #include "math_util.h"
 #include "util.h"
@@ -31,4 +31,4 @@ void mat44_fp_solve(mat44_fp_t A, fpv4_t x, const fpv4_t b,
 }
 #endif
 
-#endif /* __CROS_EC_MAT_44_H */
+#endif /* PLATFORM_EC_INCLUDE_MAT44_H_ */

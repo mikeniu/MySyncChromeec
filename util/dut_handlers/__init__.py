@@ -7,6 +7,7 @@
 import argparse
 from typing import Any, Dict
 
+from .alos import AlosHandler
 from .base import DutHandler
 from .base import DutOsType
 from .cros import CrosHandler
@@ -18,9 +19,7 @@ def create_dut_handler(
     """Instantiate the appropriate target handler for the DUT OS type."""
     os_type = details.get("os_type")
     if os_type == DutOsType.ANDROID:
-        raise NotImplementedError(
-            f"Leased DUT has OS type '{os_type}', but Android is not supported yet."
-        )
+        return AlosHandler(details, args, ec_dir)
     return CrosHandler(details, args, ec_dir)
 
 
@@ -28,5 +27,6 @@ __all__ = [
     "DutHandler",
     "DutOsType",
     "CrosHandler",
+    "AlosHandler",
     "create_dut_handler",
 ]

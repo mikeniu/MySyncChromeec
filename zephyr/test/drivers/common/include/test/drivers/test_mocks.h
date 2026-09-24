@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __TEST_DRIVERS_TEST_MOCKS_H
-#define __TEST_DRIVERS_TEST_MOCKS_H
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_TEST_MOCKS_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_TEST_MOCKS_H_
 
 #include <stdint.h>
 
@@ -124,4 +124,5 @@ DECLARE_FAKE_VALUE_FUNC(int, gpio_configure_port_pin, int, int, int);
 /* Mocks for drivers */
 DECLARE_FAKE_VALUE_FUNC(int, ppc_get_alert_status, int);
 
-#endif /* __TEST_DRIVERS_TEST_MOCKS_H */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_TEST_MOCKS_H_ \
+	*/

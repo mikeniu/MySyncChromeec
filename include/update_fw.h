@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_UPDATE_FW_H
-#define __CROS_EC_UPDATE_FW_H
+#ifndef PLATFORM_EC_INCLUDE_UPDATE_FW_H_
+#define PLATFORM_EC_INCLUDE_UPDATE_FW_H_
 
 #include "compile_time_macros.h"
 
@@ -299,4 +299,4 @@ extern const uint8_t touchpad_fw_full_hash[32];
 }
 #endif
 
-#endif /* ! __CROS_EC_UPDATE_FW_H */
+#endif /* PLATFORM_EC_INCLUDE_UPDATE_FW_H_ */

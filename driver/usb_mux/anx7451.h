@@ -6,8 +6,8 @@
  * Integrated Re-timers for USB3.2/DisplayPort
  */
 
-#ifndef __CROS_EC_USB_MUX_ANX7451_H
-#define __CROS_EC_USB_MUX_ANX7451_H
+#ifndef PLATFORM_EC_DRIVER_USB_MUX_ANX7451_H_
+#define PLATFORM_EC_DRIVER_USB_MUX_ANX7451_H_
 
 #include "usb_mux.h"
 
@@ -55,4 +55,4 @@ extern const struct usb_mux_driver anx7451_usb_mux_driver;
  */
 uint16_t board_anx7451_get_usb_i2c_addr(const struct usb_mux *me);
 
-#endif /* __CROS_EC_USB_MUX_ANX7451_H */
+#endif /* PLATFORM_EC_DRIVER_USB_MUX_ANX7451_H_ */

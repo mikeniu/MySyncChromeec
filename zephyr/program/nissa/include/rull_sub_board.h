@@ -5,8 +5,8 @@
 
 /* Anraggar sub-board declarations */
 
-#ifndef __CROS_EC_NISSA_NISSA_SUB_BOARD_H__
-#define __CROS_EC_NISSA_NISSA_SUB_BOARD_H__
+#ifndef PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_RULL_SUB_BOARD_H_
+#define PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_RULL_SUB_BOARD_H_
 
 enum rull_sub_board_type {
 	RULL_SB_UNKNOWN = -1, /* Uninitialised */
@@ -16,4 +16,4 @@ enum rull_sub_board_type {
 
 enum rull_sub_board_type rull_get_sb_type(void);
 
-#endif /* __CROS_EC_NISSA_NISSA_SUB_BOARD_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_PROGRAM_NISSA_INCLUDE_RULL_SUB_BOARD_H_ */

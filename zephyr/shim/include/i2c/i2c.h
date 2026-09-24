@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_CHROME_I2C_I2C_H
-#define ZEPHYR_CHROME_I2C_I2C_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_I2C_I2C_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_I2C_I2C_H_
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -230,4 +230,4 @@ enum i2c_ports i2c_get_port_from_device(const struct device *i2c_dev);
 }
 #endif
 
-#endif /* ZEPHYR_CHROME_I2C_I2C_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_I2C_I2C_H_ */

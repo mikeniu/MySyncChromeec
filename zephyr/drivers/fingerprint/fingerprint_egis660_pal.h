@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_EGIS660_PAL_SENSOR_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_EGIS660_PAL_SENSOR_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS660_PAL_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS660_PAL_H_
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -199,4 +199,4 @@ int __unused egis_apns_data_read(uint32_t offset, size_t size, void *data);
 int __unused egis_apns_data_write(uint32_t offset, const void *data,
 				  size_t size);
 
-#endif /* ZEPHYR_DRIVERS_FINGERPRINT_EGIS660_PAL_SENSOR_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS660_PAL_H_ */

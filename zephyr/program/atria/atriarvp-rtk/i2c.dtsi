@@ -12,6 +12,21 @@ i2c_port_charger: &i2c_0 {
 	scl-timeout-value = <100>;
 };
 
+&i2c_1 {
+	pinctrl-0 = <&i2c01_clk_gpio118
+		     &i2c01_data_gpio119>;
+	pinctrl-names = "default";
+	status = "okay";
+	sda-timeout-value = <100>;
+	scl-timeout-value = <100>;
+
+	dsp_service: dsp-service@21 {
+		compatible = "cros,dsp-service";
+		reg = <0x21>;
+		int-gpios = <RTS5912_GPIO120 GPIO_ACTIVE_LOW>;
+	};
+};
+
 i2c_port_pd: &i2c_3 {
 	pinctrl-0 = <&i2c03_clk_gpio100
 		     &i2c03_data_gpio101>;
@@ -25,6 +40,12 @@ i2c_port_pd: &i2c_3 {
 	status = "okay";
 	scl-gpios = <RTS5912_GPIO094 GPIO_ACTIVE_HIGH>;
 	sda-gpios = <RTS5912_GPIO095 GPIO_ACTIVE_HIGH>;
+};
+
+&i2c_1_wrapper {
+	status = "okay";
+	scl-gpios = <RTS5912_GPIO118 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <RTS5912_GPIO119 GPIO_ACTIVE_HIGH>;
 };
 
 &i2c_3_wrapper {

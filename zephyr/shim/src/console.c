@@ -79,13 +79,13 @@ static void uart_rx_handle(const struct device *dev)
 
 	do {
 		/* Get some bytes on the ring buffer */
-		len = ring_buf_put_claim(&rx_buffer, &data, rx_buffer.size);
+		len = ring_buf_put_ptr(&rx_buffer, &data, 0);
 		if (len > 0) {
 			/* Read from the FIFO up to `len` bytes */
 			rd_len = uart_fifo_read(dev, data, len);
 
 			/* Put `rd_len` bytes on the ring buffer */
-			ring_buf_put_finish(&rx_buffer, rd_len);
+			ring_buf_commit(&rx_buffer, rd_len);
 		} else {
 			/*
 			 * There's no room on the ring buffer, throw away 1

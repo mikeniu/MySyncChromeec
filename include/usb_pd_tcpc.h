@@ -5,8 +5,8 @@
 
 /* USB Power delivery port controller */
 
-#ifndef __CROS_EC_USB_PD_TCPC_H
-#define __CROS_EC_USB_PD_TCPC_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_TCPC_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_TCPC_H_
 
 #include "usb_pd_tcpm.h"
 
@@ -75,4 +75,4 @@ void rx_buf_clear(int port);
 }
 #endif
 
-#endif /* __CROS_EC_USB_PD_TCPC_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_TCPC_H_ */
