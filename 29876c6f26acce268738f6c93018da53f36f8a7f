@@ -121,6 +121,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "add7e5fe_5a127b90",
+        "filename": "common/charge_control.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-24T18:41:50Z",
+      "side": 1,
+      "message": "ah, ok. could you pull out those terms as an explicit validation step for clarity?",
+      "parentUuid": "80495b0c_87b4b7a5",
+      "range": {
+        "startLine": 41,
+        "startChar": 13,
+        "endLine": 41,
+        "endChar": 22
+      },
+      "revId": "29876c6f26acce268738f6c93018da53f36f8a7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4d0f7d83_a4e40e11",
         "filename": "common/charge_control.c",
         "patchSetId": 5
