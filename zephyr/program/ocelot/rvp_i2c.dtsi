@@ -96,12 +96,3 @@
 		reg = <0x39>;
 	};
 };
-
-&i2c_port_ish {
-	label = "I2C_PORT_ISH";
-	clock-frequency = <I2C_BITRATE_FAST>;
-	dsp_service: dsp-service@29 {
-		compatible = "cros,dsp-service";
-		reg = <0x29>;
-	};
-};
