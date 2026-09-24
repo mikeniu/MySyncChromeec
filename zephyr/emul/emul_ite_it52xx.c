@@ -1201,6 +1201,11 @@ static int emul_it52xx_reset(const struct emul *emul)
 	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
 
 	it52xx_emul_reset_data(data);
+	/*
+	 * Common PDC tests reset emulator data without restarting the driver.
+	 * Keep the LPM ready to accept the next test command.
+	 */
+	data->lpm_state = IT52XX_EMUL_LPM_IDLE_1;
 
 	return it52xx_emul_set_irq(data, false);
 }
