@@ -160,6 +160,141 @@ class TestLcovStencil(unittest.TestCase):
         self.assertIn("BRF:3\n", filtered)
         self.assertIn("BRH:1\n", filtered)
 
+    def test_compile_exclude_patterns(self):
+        """Tests compiling glob patterns into regex."""
+        self.assertIsNone(lcov_stencil.compile_exclude_patterns([]))
+        exclude_re = lcov_stencil.compile_exclude_patterns(
+            ["*/drivers/*", "**/mock/**"]
+        )
+        self.assertIsNotNone(exclude_re)
+        self.assertTrue(exclude_re.match("/path/drivers/cros_rtc.c"))
+        self.assertTrue(exclude_re.match("/path/test/mock/test.c"))
+        self.assertFalse(exclude_re.match("/path/common/main.c"))
+
+    def test_parse_template_file_with_exclude(self):
+        """Tests that excluded files are omitted from template parsing."""
+        template_content = (
+            "SF:/ec/common/main.c\n"
+            "DA:10,1\n"
+            "end_of_record\n"
+            "SF:/ec/zephyr/drivers/cros_rtc.c\n"
+            "DA:20,1\n"
+            "end_of_record\n"
+        )
+        exclude_re = lcov_stencil.compile_exclude_patterns(["*/drivers/*"])
+        with tempfile.NamedTemporaryFile("w+", encoding="utf-8") as f:
+            f.write(template_content)
+            f.flush()
+            result = lcov_stencil.parse_template_file(f.name, exclude_re)
+
+        self.assertIn("SF:/ec/common/main.c", result)
+        self.assertNotIn("SF:/ec/zephyr/drivers/cros_rtc.c", result)
+
+    def test_main_with_exclude_patterns(self):
+        """Tests CLI execution with --exclude-pattern."""
+        template_content = (
+            "SF:/ec/common/main.c\n"
+            "DA:10,1\n"
+            "end_of_record\n"
+            "SF:/ec/zephyr/drivers/cros_rtc.c\n"
+            "DA:20,1\n"
+            "end_of_record\n"
+        )
+        coverage_content = (
+            "SF:/ec/common/main.c\n"
+            "DA:10,5\n"
+            "end_of_record\n"
+            "SF:/ec/zephyr/drivers/cros_rtc.c\n"
+            "DA:20,3\n"
+            "end_of_record\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            template_path = Path(tmpdir) / "template.info"
+            cov_path = Path(tmpdir) / "cov.info"
+            out_path = Path(tmpdir) / "out.info"
+
+            template_path.write_text(template_content, encoding="utf-8")
+            cov_path.write_text(coverage_content, encoding="utf-8")
+
+            lcov_stencil.main(
+                [
+                    "--exclude-pattern",
+                    "*/drivers/*",
+                    "-o",
+                    str(out_path),
+                    str(template_path),
+                    str(cov_path),
+                ]
+            )
+
+            result = out_path.read_text(encoding="utf-8")
+            self.assertIn("/ec/common/main.c", result)
+            self.assertNotIn("/ec/zephyr/drivers/cros_rtc.c", result)
+
+    def test_exclude_patterns_from_file(self):
+        """Tests streaming exclusion filtering of records."""
+        content = (
+            "TN:my_test\n"
+            "SF:/ec/common/main.c\n"
+            "DA:10,1\n"
+            "end_of_record\n"
+            "TN:my_test\n"
+            "SF:/ec/zephyr/drivers/cros_rtc.c\n"
+            "DA:20,1\n"
+            "end_of_record\n"
+        )
+        exclude_re = lcov_stencil.compile_exclude_patterns(["*/drivers/*"])
+        with tempfile.NamedTemporaryFile("w+", encoding="utf-8") as f:
+            f.write(content)
+            f.flush()
+            out = io.StringIO()
+            lcov_stencil.exclude_patterns_from_file(f.name, out, exclude_re)
+
+        result = out.getvalue()
+        self.assertIn("TN:my_test\nSF:/ec/common/main.c", result)
+        self.assertNotIn("cros_rtc.c", result)
+
+    def test_exclude_patterns_from_file_no_filter(self):
+        """Tests that exclude_patterns_from_file passes through when no regex."""
+        content = "SF:/ec/common/main.c\nDA:10,1\nend_of_record\n"
+        with tempfile.NamedTemporaryFile("w+", encoding="utf-8") as f:
+            f.write(content)
+            f.flush()
+            out = io.StringIO()
+            lcov_stencil.exclude_patterns_from_file(f.name, out, None)
+
+        self.assertEqual(out.getvalue(), content)
+
+    def test_main_single_file_exclude(self):
+        """Tests CLI execution when only a single input file is provided."""
+        content = (
+            "TN:test\n"
+            "SF:/ec/common/main.c\n"
+            "DA:10,1\n"
+            "end_of_record\n"
+            "SF:/ec/zephyr/test/mock/mock.c\n"
+            "DA:5,1\n"
+            "end_of_record\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            in_path = Path(tmpdir) / "in.info"
+            out_path = Path(tmpdir) / "out.info"
+            in_path.write_text(content, encoding="utf-8")
+
+            lcov_stencil.main(
+                [
+                    "--exclude-pattern",
+                    "*/mock/*",
+                    "-o",
+                    str(out_path),
+                    str(in_path),
+                ]
+            )
+
+            result = out_path.read_text(encoding="utf-8")
+            self.assertIn("/ec/common/main.c", result)
+            self.assertNotIn("/ec/zephyr/test/mock/mock.c", result)
+
 
 if __name__ == "__main__":
     unittest.main()

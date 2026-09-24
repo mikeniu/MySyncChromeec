@@ -27,8 +27,8 @@ GENERATED_AND_SYSTEM_PATTERNS='**/.cache/**' \
 	'**/lib/gcc/**' \
 	'**/picolibc/picolibc/include/**' \
 	'**/third_party/boringssl/crypto/**' \
-	'/usr/include/**' \
-	'/usr/lib/**' \
+	'**/usr/include/**' \
+	'**/usr/lib/**' \
 	'$(PLATFORM_EC)/build/**' \
 	'$(PLATFORM_EC)/test/mock/**' \
 	'$(PLATFORM_EC)/twister-out*/**' \
@@ -124,16 +124,14 @@ $(BUILD)/zephyr/zephyr_merged.info: $(BUILD)/zephyr/all_tests.info $(BUILD)/zeph
 	-a $(BUILD)/zephyr/all_tests.info -a $(BUILD)/zephyr/all_builds.info
 
 $(BUILD)/zephyr/lcov.info: $(BUILD)/zephyr/zephyr_merged.info
-	/usr/bin/lcov -o $@ --rc branch_coverage=1 --rc no_exception_branch=1 \
-	--ignore-errors inconsistent,inconsistent --ignore-errors unused,unused --ignore-errors gcov,gcov \
-	-r $(BUILD)/zephyr/zephyr_merged.info \
-	$(GENERATED_AND_SYSTEM_PATTERNS)
+	$(PLATFORM_EC)/util/lcov_stencil.py \
+	$(foreach p, $(GENERATED_AND_SYSTEM_PATTERNS), --exclude-pattern $(p)) \
+	-o $@ $<
 
 $(BUILD)/zephyr/lcov_no_tests.info: $(BUILD)/zephyr/lcov.info
-	/usr/bin/lcov -o $@ --rc branch_coverage=1 --rc no_exception_branch=1 \
-	--ignore-errors inconsistent,inconsistent --ignore-errors unused,unused --ignore-errors gcov,gcov \
-	-r $(BUILD)/zephyr/lcov.info \
-	$(TEST_PATTERNS)
+	$(PLATFORM_EC)/util/lcov_stencil.py \
+	$(foreach p, $(TEST_PATTERNS), --exclude-pattern $(p)) \
+	-o $@ $<
 
 $(BUILD)/zephyr/lcov_rpt: $(BUILD)/zephyr/lcov.info
 	/usr/bin/genhtml --branch-coverage -q -o $@ \
@@ -150,15 +148,7 @@ $(BUILD)/zephyr/%_merged.info: $(BUILD)/zephyr/%/output/zephyr.info $(BUILD)/zep
 	--ignore-errors inconsistent,inconsistent --ignore-errors unused,unused --ignore-errors gcov,gcov \
 	-a $(BUILD)/zephyr/all_tests.info -a $<
 
-$(BUILD)/zephyr/%_stenciled.info: $(BUILD)/zephyr/%/output/zephyr.info $(BUILD)/zephyr/%_merged.info
-	$(PLATFORM_EC)/util/lcov_stencil.py -o $@ $^
-
-.PRECIOUS: $(BUILD)/zephyr/%_final.info
-$(BUILD)/zephyr/%_final.info: $(BUILD)/zephyr/%_stenciled.info
-	/usr/bin/lcov -o $@ --rc branch_coverage=1 --rc no_exception_branch=1 \
-	--ignore-errors inconsistent,inconsistent --ignore-errors unused,unused --ignore-errors gcov,gcov \
-	-r $< \
-	'$(PLATFORM_EC)/zephyr/drivers/cros_displight/*' \
+BOARD_EXCLUDE_PATTERNS='$(PLATFORM_EC)/zephyr/drivers/cros_displight/*' \
 	'$(PLATFORM_EC)/zephyr/drivers/cros_flash/*' \
 	'$(PLATFORM_EC)/zephyr/drivers/cros_kb_raw*' \
 	'$(PLATFORM_EC)/zephyr/drivers/cros_kblight/*' \
@@ -185,6 +175,15 @@ $(BUILD)/zephyr/%_final.info: $(BUILD)/zephyr/%_stenciled.info
 	'$(PLATFORM_EC)/zephyr/shim/core/**' \
 	'$(PLATFORM_EC)/driver/tcpm/it8xxx2.c' \
 	$(GENERATED_AND_SYSTEM_PATTERNS) $(TEST_PATTERNS)
+
+$(BUILD)/zephyr/%_stenciled.info: $(BUILD)/zephyr/%/output/zephyr.info $(BUILD)/zephyr/%_merged.info
+	$(PLATFORM_EC)/util/lcov_stencil.py \
+	$(foreach p, $(BOARD_EXCLUDE_PATTERNS), --exclude-pattern $(p)) \
+	-o $@ $^
+
+.PRECIOUS: $(BUILD)/zephyr/%_final.info
+$(BUILD)/zephyr/%_final.info: $(BUILD)/zephyr/%_stenciled.info
+	cp $< $@
 
 .PRECIOUS: $(BUILD)/zephyr/%_rpt
 $(BUILD)/zephyr/%_rpt: $(BUILD)/zephyr/%_final.info
