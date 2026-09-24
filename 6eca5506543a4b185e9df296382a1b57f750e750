@@ -75,6 +75,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "968e5a8e_babc7843",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 33
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-24T16:53:51Z",
+      "side": 1,
+      "message": "I generated a `srebrna` firmware with this change and flashed it on a Ruby device. I was able to enroll 3 fingers and match with all enrolled 3 fingers.\n\n@asemjonovs@google.com\n\nmaybe you can add this to the testing part of the commit message.",
+      "parentUuid": "3d8eed0b_33854c67",
+      "revId": "6eca5506543a4b185e9df296382a1b57f750e750",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "91ec190e_a40057c1",
         "filename": "common/fpsensor/fpsensor_state.cc",
         "patchSetId": 33
