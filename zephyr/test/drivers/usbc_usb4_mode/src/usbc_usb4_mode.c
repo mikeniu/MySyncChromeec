@@ -12,7 +12,13 @@
 #include "test/drivers/stubs.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
+#include "usb_mode.h"
+#include "usb_pd.h"
+#include "usb_pd_tbt.h"
 #include "usb_pd_vdo.h"
+#include "usb_pe_sm.h"
+#include "usb_prl_sm.h"
+#include "usb_tbt_alt_mode.h"
 
 #include <stdint.h>
 
@@ -297,11 +303,362 @@ ZTEST_F(usbc_usb4_mode, test_usb4_pd2_no_entry)
 			  USB_PD_MUX_USB4_ENABLED, "Unexpected USB4 mode set");
 }
 
-/*
- * TODO(b/260095516): This test suite is only testing the default good case, and
- * one error case where the cable doesn't support USB4. This suite needs to be
- * expanded to cover cases where the port partner rejects Enter_USB along with
- * active cable cases.
- */
+/* If the partner rejects Enter_USB, the EC should fall back to USB mode */
+ZTEST_F(usbc_usb4_mode, test_usb4_partner_rejected)
+{
+	struct ec_response_typec_status status;
+
+	fixture->partner.cable = &passive_usb4;
+	connect_sink_to_port(&fixture->partner, fixture->tcpci_emul,
+			     fixture->charger_emul);
+
+	/* Partner rejects Enter_USB */
+	fixture->partner.enter_usb_accept = false;
+
+	verify_cable_found(fixture->partner.cable);
+
+	status = host_cmd_typec_status(TEST_PORT);
+	zassert_equal((status.mux_state & USB_MUX_CHECK_MASK),
+		      USB_PD_MUX_USB_ENABLED, "Unexpected starting mux: 0x%02x",
+		      status.mux_state);
+
+	host_cmd_typec_control_enter_mode(TEST_PORT, TYPEC_MODE_USB4);
+	k_sleep(K_SECONDS(2));
+
+	status = host_cmd_typec_status(TEST_PORT);
+	zassert_equal((status.mux_state & USB_MUX_CHECK_MASK),
+		      USB_PD_MUX_USB_ENABLED, "Failed to see USB still set");
+	zassert_not_equal((status.mux_state & USB_MUX_CHECK_MASK),
+			  USB_PD_MUX_USB4_ENABLED, "Unexpected USB4 mode set");
+}
+
+ZTEST_F(usbc_usb4_mode, test_enter_usb_cable_capabilities)
+{
+	struct pd_discovery *disc_sop;
+	struct pd_discovery *disc_sop_prime;
+	union tbt_mode_resp_cable cable_mode_resp = { 0 };
+
+	connect_sink_to_port(&fixture->partner, fixture->tcpci_emul,
+			     fixture->charger_emul);
+
+	disc_sop =
+		pd_get_am_discovery_and_notify_access(TEST_PORT, TCPCI_MSG_SOP);
+	disc_sop_prime = pd_get_am_discovery_and_notify_access(
+		TEST_PORT, TCPCI_MSG_SOP_PRIME);
+
+	/* Baseline passive USB4 cable: capable */
+	zassert_true(enter_usb_cable_is_capable(TEST_PORT));
+
+	/* Non-e-marked cable: not capable */
+	disc_sop_prime->identity.idh.product_type = IDH_PTYPE_UNDEF;
+	zassert_false(enter_usb_cable_is_capable(TEST_PORT));
+
+	/* Passive cable with speed < Gen1: not capable */
+	disc_sop_prime->identity.idh.product_type = IDH_PTYPE_PCABLE;
+	disc_sop_prime->identity.product_t1.p_rev30.ss = USB_R30_SS_U2_ONLY;
+	zassert_false(enter_usb_cable_is_capable(TEST_PORT));
+
+	/* Active cable with SVDM 2.0+ and VDO 1.3+: USB4 not supported */
+	disc_sop_prime->svdm_vers = SVDM_VER_2_0;
+	disc_sop_prime->identity.idh.product_type = IDH_PTYPE_ACABLE;
+	disc_sop_prime->identity.product_t1.a_rev30.vdo_ver = VDO_VERSION_1_3;
+	disc_sop_prime->identity.product_t2.a2_rev30.usb_40_support =
+		USB4_NOT_SUPPORTED;
+	zassert_false(enter_usb_cable_is_capable(TEST_PORT));
+
+	/* Active cable with SVDM 2.0+ and VDO 1.3+: USB4 supported */
+	disc_sop_prime->identity.product_t2.a2_rev30.usb_40_support =
+		USB4_SUPPORTED;
+	zassert_true(enter_usb_cable_is_capable(TEST_PORT));
+
+	/* Active cable with VDO < 1.3 */
+	disc_sop_prime->identity.product_t1.a_rev30.vdo_ver = 0;
+
+	/* No modal support: not capable */
+	disc_sop->identity.idh.modal_support = 0;
+	zassert_false(enter_usb_cable_is_capable(TEST_PORT));
+
+	/* Modal support present, but Intel SVID not discovered: not capable */
+	disc_sop->identity.idh.modal_support = 1;
+	disc_sop_prime->svid_cnt = 0;
+	zassert_false(enter_usb_cable_is_capable(TEST_PORT));
+
+	/* Intel SVID discovered, but non-rounded support: not capable */
+	disc_sop_prime->svid_cnt = 1;
+	disc_sop_prime->svids[0].svid = USB_VID_INTEL;
+	disc_sop_prime->svids[0].mode_cnt = 1;
+	disc_sop_prime->svids[0].discovery = PD_DISC_COMPLETE;
+	cable_mode_resp.tbt_rounded = TBT_GEN3_NON_ROUNDED;
+	disc_sop_prime->svids[0].mode_vdo[0] = cable_mode_resp.raw_value;
+	zassert_false(enter_usb_cable_is_capable(TEST_PORT));
+
+	/* Intel SVID discovered with rounded support: capable */
+	cable_mode_resp.tbt_rounded = TBT_GEN3_GEN4_ROUNDED_NON_ROUNDED;
+	disc_sop_prime->svids[0].mode_vdo[0] = cable_mode_resp.raw_value;
+	zassert_true(enter_usb_cable_is_capable(TEST_PORT));
+}
+
+ZTEST_F(usbc_usb4_mode, test_enter_usb_port_partner_capabilities)
+{
+	struct pd_discovery *disc_sop;
+
+	connect_sink_to_port(&fixture->partner, fixture->tcpci_emul,
+			     fixture->charger_emul);
+
+	disc_sop =
+		pd_get_am_discovery_and_notify_access(TEST_PORT, TCPCI_MSG_SOP);
+
+	/* Partner supports USB4 */
+	enter_usb_init(TEST_PORT);
+	zassert_true(enter_usb_port_partner_is_capable(TEST_PORT));
+
+	/* Partner revision < PD_REV30: not capable */
+	prl_set_rev(TEST_PORT, TCPCI_MSG_SOP, PD_REV20);
+	zassert_false(enter_usb_port_partner_is_capable(TEST_PORT));
+	prl_set_rev(TEST_PORT, TCPCI_MSG_SOP, PD_REV30);
+
+	/* When USB4 state is INACTIVE: not capable */
+	enter_usb_failed(TEST_PORT);
+	zassert_false(enter_usb_port_partner_is_capable(TEST_PORT));
+
+	/* When partner does not advertise USB4 in product VDO: not capable */
+	enter_usb_init(TEST_PORT);
+	disc_sop->identity.product_t1.raw_value = 0;
+	zassert_false(enter_usb_port_partner_is_capable(TEST_PORT));
+}
+
+ZTEST_F(usbc_usb4_mode, test_enter_usb_state_machine)
+{
+	enum tcpci_msg_type tx_type;
+	uint32_t payload;
+	struct ec_response_typec_status status;
+
+	fixture->partner.cable = &passive_usb4;
+	connect_sink_to_port(&fixture->partner, fixture->tcpci_emul,
+			     fixture->charger_emul);
+
+	enter_usb_init(TEST_PORT);
+	zassert_false(enter_usb_entry_is_done(TEST_PORT));
+
+	/* First message for passive cable transitions to USB4_ENTER_SOP */
+	tx_type = TCPCI_MSG_SOP;
+	payload = enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	zassert_not_equal(payload, 0);
+
+	/* Subsequent call in USB4_ENTER_SOP sets type to SOP */
+	payload = enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	zassert_not_equal(payload, 0);
+	zassert_equal(tx_type, TCPCI_MSG_SOP);
+
+	/* Partner accepts SOP Enter_USB */
+	enter_usb_accepted(TEST_PORT, TCPCI_MSG_SOP);
+	zassert_true(enter_usb_entry_is_done(TEST_PORT));
+
+	status = host_cmd_typec_status(TEST_PORT);
+	zassert_equal((status.mux_state & USB_MUX_CHECK_MASK),
+		      USB_PD_MUX_USB4_ENABLED);
+
+	/* Setup next msg when active returns -1 */
+	payload = enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	zassert_equal(payload, (uint32_t)-1);
+
+	/* Calling accepted or rejected while active is a no-op */
+	enter_usb_accepted(TEST_PORT, TCPCI_MSG_SOP);
+	enter_usb_rejected(TEST_PORT, TCPCI_MSG_SOP);
+	zassert_true(enter_usb_entry_is_done(TEST_PORT));
+
+	/* Exit mode request resets state and mux */
+	usb4_exit_mode_request(TEST_PORT);
+	zassert_false(enter_usb_entry_is_done(TEST_PORT));
+
+	status = host_cmd_typec_status(TEST_PORT);
+	zassert_equal((status.mux_state & USB_MUX_CHECK_MASK),
+		      USB_PD_MUX_USB_ENABLED);
+
+	/* When USB4 state is INACTIVE, setup next msg returns 0 */
+	enter_usb_failed(TEST_PORT);
+	payload = enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	zassert_equal(payload, 0);
+}
+
+ZTEST_F(usbc_usb4_mode, test_enter_usb_active_cable_handshake)
+{
+	struct pd_discovery *disc_sop_prime;
+	enum tcpci_msg_type tx_type;
+	uint32_t payload;
+
+	fixture->partner.cable = &passive_usb4;
+	connect_sink_to_port(&fixture->partner, fixture->tcpci_emul,
+			     fixture->charger_emul);
+
+	disc_sop_prime = pd_get_am_discovery_and_notify_access(
+		TEST_PORT, TCPCI_MSG_SOP_PRIME);
+
+	/* Configure active cable with SOP'' support */
+	disc_sop_prime->svdm_vers = SVDM_VER_2_0;
+	disc_sop_prime->identity.idh.product_type = IDH_PTYPE_ACABLE;
+	disc_sop_prime->identity.product_t1.a_rev30.vdo_ver = VDO_VERSION_1_3;
+	disc_sop_prime->identity.product_t1.a_rev20.sop_p_p = 1;
+	disc_sop_prime->identity.product_t2.a2_rev30.usb_40_support =
+		USB4_SUPPORTED;
+
+	enter_usb_init(TEST_PORT);
+
+	/* USB4_START -> USB4_ENTER_SOP_PRIME */
+	payload = enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	zassert_not_equal(payload, 0);
+	zassert_equal(tx_type, TCPCI_MSG_SOP_PRIME);
+
+	/* Next msg while in USB4_ENTER_SOP_PRIME */
+	payload = enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	zassert_equal(tx_type, TCPCI_MSG_SOP_PRIME);
+
+	/* SOP' accepted with sop_p_p=1 -> USB4_ENTER_SOP_PRIME_PRIME */
+	enter_usb_accepted(TEST_PORT, TCPCI_MSG_SOP_PRIME);
+	payload = enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	zassert_equal(tx_type, TCPCI_MSG_SOP_PRIME_PRIME);
+
+	/* SOP'' accepted -> USB4_ENTER_SOP */
+	enter_usb_accepted(TEST_PORT, TCPCI_MSG_SOP_PRIME_PRIME);
+	payload = enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	zassert_equal(tx_type, TCPCI_MSG_SOP);
+
+	/* SOP accepted -> USB4_ACTIVE */
+	enter_usb_accepted(TEST_PORT, TCPCI_MSG_SOP);
+	zassert_true(enter_usb_entry_is_done(TEST_PORT));
+
+	/* Repeat for active cable without SOP'' support (sop_p_p=0) */
+	disc_sop_prime->identity.product_t1.a_rev20.sop_p_p = 0;
+	enter_usb_init(TEST_PORT);
+
+	payload = enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	zassert_equal(tx_type, TCPCI_MSG_SOP_PRIME);
+
+	/* SOP' accepted with sop_p_p=0 transitions directly to USB4_ENTER_SOP
+	 */
+	enter_usb_accepted(TEST_PORT, TCPCI_MSG_SOP_PRIME);
+	payload = enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	zassert_equal(tx_type, TCPCI_MSG_SOP);
+}
+
+ZTEST_F(usbc_usb4_mode, test_enter_usb_rejection_and_errors)
+{
+	enum tcpci_msg_type tx_type;
+
+	fixture->partner.cable = &passive_usb4;
+	connect_sink_to_port(&fixture->partner, fixture->tcpci_emul,
+			     fixture->charger_emul);
+
+	/* 1. Unexpected response type for passive cable triggers failure */
+	enter_usb_init(TEST_PORT);
+	enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	enter_usb_accepted(TEST_PORT, TCPCI_MSG_SOP_PRIME);
+	zassert_true(enter_usb_entry_is_done(TEST_PORT));
+
+	/* 2. Direct rejection in USB4_ENTER_SOP */
+	enter_usb_init(TEST_PORT);
+	enter_usb_setup_next_msg(TEST_PORT, &tx_type);
+	enter_usb_rejected(TEST_PORT, TCPCI_MSG_SOP);
+	zassert_true(enter_usb_entry_is_done(TEST_PORT));
+
+	/* 3. Unexpected accepted call in USB4_START hits default failure */
+	enter_usb_init(TEST_PORT);
+	enter_usb_accepted(TEST_PORT, TCPCI_MSG_SOP);
+	zassert_true(enter_usb_entry_is_done(TEST_PORT));
+}
+
+ZTEST_F(usbc_usb4_mode, test_usb4_cable_speed_and_payload)
+{
+	struct pd_discovery *disc_sop_prime;
+	union enter_usb_data_obj eudo;
+	union tbt_mode_resp_cable cable_mode = { 0 };
+
+	fixture->partner.cable = &passive_usb4;
+	connect_sink_to_port(&fixture->partner, fixture->tcpci_emul,
+			     fixture->charger_emul);
+
+	disc_sop_prime = pd_get_am_discovery_and_notify_access(
+		TEST_PORT, TCPCI_MSG_SOP_PRIME);
+
+	/* Passive cable speeds */
+	disc_sop_prime->identity.product_t1.p_rev30.ss =
+		USB_R30_SS_U32_U40_GEN1;
+	zassert_equal(get_usb4_cable_speed(TEST_PORT), USB_R30_SS_U32_U40_GEN1);
+
+	disc_sop_prime->identity.product_t1.p_rev30.ss =
+		USB_R30_SS_U32_U40_GEN2;
+	zassert_true(get_usb4_cable_speed(TEST_PORT) >=
+		     USB_R30_SS_U32_U40_GEN2);
+
+	/* Active cable speed clamping */
+	disc_sop_prime->identity.idh.product_type = IDH_PTYPE_ACABLE;
+	disc_sop_prime->identity.product_t1.a_rev30.vdo_ver = VDO_VERSION_1_3;
+	disc_sop_prime->identity.product_t1.a_rev30.ss =
+		USB_R30_SS_U32_U40_GEN2;
+	disc_sop_prime->svid_cnt = 1;
+	disc_sop_prime->svids[0].svid = USB_VID_INTEL;
+	disc_sop_prime->svids[0].mode_cnt = 1;
+	disc_sop_prime->svids[0].discovery = PD_DISC_COMPLETE;
+	cable_mode.tbt_cable_speed = TBT_SS_TBT_GEN3;
+	disc_sop_prime->svids[0].mode_vdo[0] = cable_mode.raw_value;
+	zassert_equal(get_usb4_cable_speed(TEST_PORT), USB_R30_SS_U32_U40_GEN2);
+
+	/* Active cable with vdo_ver < VDO_VERSION_1_3 returns max_usb4_speed */
+	disc_sop_prime->identity.product_t1.a_rev30.vdo_ver = 0;
+	zassert_equal(get_usb4_cable_speed(TEST_PORT), USB_R30_SS_U40_GEN3);
+	disc_sop_prime->identity.product_t1.a_rev30.vdo_ver = VDO_VERSION_1_3;
+
+	/* Cable current: 5A */
+	disc_sop_prime->identity.product_t1.p_rev20.vbus_cur = USB_VBUS_CUR_5A;
+	eudo.raw_value = get_enter_usb_msg_payload(TEST_PORT);
+	zassert_equal(eudo.cable_current, USB4_CABLE_CURRENT_5A);
+
+	/* Cable current: invalid */
+	disc_sop_prime->identity.product_t1.p_rev20.vbus_cur = 0;
+	eudo.raw_value = get_enter_usb_msg_payload(TEST_PORT);
+	zassert_equal(eudo.cable_current, USB4_CABLE_CURRENT_INVALID);
+
+	/* Active cable active element: Retimer vs Redriver */
+	disc_sop_prime->identity.product_t2.a2_rev30.active_elem =
+		ACTIVE_RETIMER;
+	eudo.raw_value = get_enter_usb_msg_payload(TEST_PORT);
+	zassert_equal(eudo.cable_type, CABLE_TYPE_ACTIVE_RETIMER);
+
+	disc_sop_prime->identity.product_t2.a2_rev30.active_elem =
+		ACTIVE_REDRIVER;
+	eudo.raw_value = get_enter_usb_msg_payload(TEST_PORT);
+	zassert_equal(eudo.cable_type, CABLE_TYPE_ACTIVE_REDRIVER);
+
+	/* PD 2.0 active cable: Retimer vs Redriver from TBT mode VDO */
+	prl_set_rev(TEST_PORT, TCPCI_MSG_SOP_PRIME, PD_REV20);
+	cable_mode.retimer_type = USB_RETIMER;
+	disc_sop_prime->svids[0].mode_vdo[0] = cable_mode.raw_value;
+	eudo.raw_value = get_enter_usb_msg_payload(TEST_PORT);
+	zassert_equal(eudo.cable_type, CABLE_TYPE_ACTIVE_RETIMER);
+
+	cable_mode.retimer_type = 0;
+	disc_sop_prime->svids[0].mode_vdo[0] = cable_mode.raw_value;
+	eudo.raw_value = get_enter_usb_msg_payload(TEST_PORT);
+	zassert_equal(eudo.cable_type, CABLE_TYPE_ACTIVE_REDRIVER);
+	prl_set_rev(TEST_PORT, TCPCI_MSG_SOP_PRIME, PD_REV30);
+
+	/* Passive cable with TBT active cable flag */
+	disc_sop_prime->identity.idh.product_type = IDH_PTYPE_PCABLE;
+	disc_sop_prime->svid_cnt = 1;
+	disc_sop_prime->svids[0].svid = USB_VID_INTEL;
+	disc_sop_prime->svids[0].mode_cnt = 1;
+	disc_sop_prime->svids[0].discovery = PD_DISC_COMPLETE;
+	cable_mode.tbt_active_passive = TBT_CABLE_ACTIVE;
+	disc_sop_prime->svids[0].mode_vdo[0] = cable_mode.raw_value;
+	eudo.raw_value = get_enter_usb_msg_payload(TEST_PORT);
+	zassert_equal(eudo.cable_type, CABLE_TYPE_ACTIVE_REDRIVER);
+
+	/* Passive cable default */
+	cable_mode.tbt_active_passive = TBT_CABLE_PASSIVE;
+	disc_sop_prime->svids[0].mode_vdo[0] = cable_mode.raw_value;
+	eudo.raw_value = get_enter_usb_msg_payload(TEST_PORT);
+	zassert_equal(eudo.cable_type, CABLE_TYPE_PASSIVE);
+}
+
 ZTEST_SUITE(usbc_usb4_mode, drivers_predicate_post_main, usbc_usb4_mode_setup,
 	    usbc_usb4_mode_before, usbc_usb4_mode_after, NULL);
