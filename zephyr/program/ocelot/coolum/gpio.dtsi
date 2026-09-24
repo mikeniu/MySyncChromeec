@@ -1,0 +1,140 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ *
+ * This file was auto-generated but contains manual edits
+ */
+
+/ {
+	aliases {
+		gpio-wp = &gpio_c_ec_wp_odl_r;
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		/* unimplemented GPIOs */
+		entering-rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+
+		/* current sensor pwr enable */
+		gpio_ec_en_pwrmon: ec_pwrmon {
+			gpios = <&gpiob 3 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_c_ec_wp_odl_r: c_ec_wp_odl_r {
+			gpios = <&gpiob 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+		gpio_ec_soc_wake_odl: ec_soc_wake_odl{
+			gpios = <&gpiob 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
+		};
+		gpio_acok: acok {
+			gpios = <&gpioc 0 (GPIO_INPUT)>;
+			enum-name = "GPIO_AC_PRESENT";
+		};
+		gpio_ec_pwr_led_pwm_en: ec_pwr_led_pwm_en {
+			gpios = <&gpioc 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_ec_en_edp_bl: ec_en_edp_bl {
+			gpios = <&gpioc 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_HIGH)>;
+		};
+		gpio_espi_soc_rst_l: espi_soc_rst_l {
+			gpios = <&gpiod 2 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		gpio_lid_open: lid_open {
+			gpios = <&gpiod 3 (GPIO_INPUT)>;
+			enum-name = "GPIO_LID_OPEN";
+		};
+		gpio_en_slp_z: en_slp_z {
+			gpios = <&gpiod 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH)>;
+			no-auto-init;
+		};
+		gpio_all_sys_pwrgd_r: all_sys_pwrgd_r {
+			gpios = <&gpiod 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		gpio_pm_pwrbtn_n_r: pm_pwrbtn_n_r {
+			gpios = <&gpioe 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW)>;
+			enum-name = "GPIO_PCH_PWRBTN_L";
+		};
+		gpio_gsc_ec_pwr_btn_odl: gsc_ec_pwr_btn_odl {
+			gpios = <&gpioe 4 (GPIO_INPUT)>;
+			enum-name = "GPIO_POWER_BUTTON_L";
+		};
+		gpio_pg_pp1250_soc_s5_od: pg_pp1250_soc_s5_od {
+			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		gpio_ec_soc_syspwrok: ec_soc_syspwrok {
+			gpios = <&gpiof 1 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_en_pp5000_usba: en_pp5000_usba {
+			gpios = <&gpiof 4 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_batt_in_l: batt_int_l {
+			gpios = <&gpiof 6 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+			enum-name = "GPIO_BATT_PRES_ODL";
+		};
+		gpio_en_pp5000_led: en_pp5000_led {
+			gpios = <&gpiog 3 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_amp_mute_odl: amp_mute_odl {
+			gpios = <&gpioh 0 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH)>;
+		};
+		gpio_slp_s3_l: slp_s3_l {
+			gpios = <&gpioh 3 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		gpio_slp_s4_l: slp_s4_l {
+			gpios = <&gpioh 4 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		gpio_ec_soc_rtcrst: ec_soc_rtcrst {
+			gpios = <&gpioh 5 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_prochot_odl: prochot_odl {
+			gpios = <&gpioi 0 (GPIO_OUTPUT | GPIO_OPEN_DRAIN |GPIO_OUTPUT_INIT_HIGH)>;
+		};
+		/* Power sequencing signal needed by temp sensor driver */
+		gpio_en_s5_rails: en_s5_rails {
+			gpios = <&gpioi 7 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_ec_soc_rsmrst_l: ec_soc_rsmrst_l {
+			gpios = <&gpioj 0 (GPIO_OUTPUT | GPIO_ACTIVE_LOW)>;
+		};
+		gpio_ec_plt_pwrok: ec_plt_pwrok {
+			gpios = <&gpioj 1 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
+		};
+		gpio_sys_slp_s0ix_l: sys_slp_s0ix_l {
+			gpios = <&gpioj 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+		};
+		gpio_ec_gsc_packet_mode: ec_gsc_packet_mode {
+			gpios = <&gpioj 6 GPIO_OUTPUT>;
+			enum-name = "GPIO_PACKET_MODE_EN";
+		};
+		gpio_sys_rst_odl: sys_rst_odl {
+			gpios = <&gpioj 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+		};
+		gpio_ec_soc_int_odl: ec_soc_int_odl {
+			gpios = <&gpiom 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
+			enum-name = "GPIO_EC_INT_L";
+		};
+	};
+
+	unused-pins {
+		compatible = "unused-gpios";
+		unused-gpios =
+			<&gpioa 0 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpioa 2 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpioa 3 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpioa 4 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpioa 5 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpiob 4 (GPIO_INPUT | GPIO_PULL_DOWN)>, /* EC_SPARE_GPB4 */
+			<&gpiod 1 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpioe 1 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpioe 2 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpioe 5 (GPIO_INPUT | GPIO_PULL_DOWN)>, /* EC_SPARE_GPE5 */
+			<&gpioe 6 (GPIO_INPUT | GPIO_PULL_DOWN)>, /* EC_SPARE_GPE6 */
+			<&gpiof 2 (GPIO_INPUT | GPIO_PULL_DOWN)>, /* EC_SPARE_GPF2 */
+			<&gpiof 3 (GPIO_INPUT | GPIO_PULL_DOWN)>, /* EC_SPARE_GPF3 */
+			<&gpiof 7 (GPIO_INPUT | GPIO_PULL_DOWN)>, /* EC_SPARE_GPF7 */
+			<&gpiog 1 (GPIO_INPUT | GPIO_PULL_DOWN)>, /* EC_SPARE_GPG1 */
+			<&gpioj 4 (GPIO_INPUT | GPIO_PULL_DOWN)>; /* EC_SPARE_GPJ4 */
+	};
+};
