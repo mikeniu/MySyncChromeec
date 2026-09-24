@@ -57,6 +57,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4098d6c5_afcf5028",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 33
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T03:21:52Z",
+      "side": 1,
+      "message": "This CL is part of an overarching, subsystem-by-subsystem migration of host commands to the upstream Zephyr framework (b/485895088), mirroring the pattern of already-merged CLs (battery, USB/PD, keyboard). The changes here are purely mechanical 1:1 macro and parameter migrations across the fingerprint subsystem, and any non-mechanical logic (input buffer size validation) has already been split into a separate follow-up CL (CL:8434542). Given that the CL is already well into review with Firas and undergoing hardware validation, keeping it unified as a single subsystem change avoids adding extra rebase churn and overhead to the stack.",
+      "parentUuid": "bb2a9e95_bd699143",
+      "revId": "6eca5506543a4b185e9df296382a1b57f750e750",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "91ec190e_a40057c1",
         "filename": "common/fpsensor/fpsensor_state.cc",
         "patchSetId": 33
