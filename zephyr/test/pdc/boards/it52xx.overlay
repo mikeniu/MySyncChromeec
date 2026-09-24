@@ -5,6 +5,13 @@
 
 #include "native_sim.overlay"
 
+/ {
+	zephyr,user {
+		/* IT52XX reports only the major and minor FW version fields. */
+		fw_version_mask = <0x00ffff00>;
+	};
+};
+
 &i2c0 {
 	pdc_emul1: it52xx-pdc@26 {
 		compatible = "ite,it52xx-pdc";
