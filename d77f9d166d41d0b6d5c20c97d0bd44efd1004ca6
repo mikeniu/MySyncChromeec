@@ -1,0 +1,130 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1b6837d_0d1e4972",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T02:59:15Z",
+      "side": 1,
+      "message": "Please add details of change to commit message.",
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98de15c9_98441ddb",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T02:59:15Z",
+      "side": 1,
+      "message": "battery_get_disconnect_state() is called periodically. If the battery is permanently disconnected or if the wakeup command fails, this will repeatedly call board_wakeup_cutoff_battery() and spam the console logs on every invocation. Consider adding a state variable or flag to ensure this is only attempted once per disconnection event.",
+      "range": {
+        "startLine": 505,
+        "startChar": 0,
+        "endLine": 505,
+        "endChar": 0
+      },
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cef866f_96fd8cbf",
+        "filename": "include/battery.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T02:59:15Z",
+      "side": 1,
+      "message": "Add docstring comment for this function.",
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72475dfe_08f45852",
+        "filename": "include/config.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T02:59:15Z",
+      "side": 1,
+      "message": "The comment states this supports it as a host command and console command, but neither is implemented in this change. Also, the function name in the comment (board_wakeup_cut_off_battery) uses an extra underscore compared to the actual implementation (board_wakeup_cutoff_battery).",
+      "range": {
+        "startLine": 602,
+        "startChar": 0,
+        "endLine": 602,
+        "endChar": 0
+      },
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9bfd2a0_63133ae1",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 8327,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T02:59:15Z",
+      "side": 1,
+      "message": "Inserting a field in the middle of struct fuel_gauge_info alters the offsets of the subsequent fields (sleep_mode and fet). This struct is exposed via host commands, this will break backward compatibility with the host. Please append the new field to the end of the struct instead. Add support to the host command for this change.",
+      "range": {
+        "startLine": 8327,
+        "startChar": 0,
+        "endLine": 8327,
+        "endChar": 0
+      },
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d932682_b99c63ff",
+        "filename": "zephyr/Kconfig.battery",
+        "patchSetId": 8
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T02:59:15Z",
+      "side": 1,
+      "message": "nit: capitalize all of `D-FET`",
+      "range": {
+        "startLine": 181,
+        "startChar": 23,
+        "endLine": 181,
+        "endChar": 28
+      },
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
