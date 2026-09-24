@@ -47,6 +47,7 @@ LOG_MODULE_REGISTER(ite_it52xx_emul);
 #define IT52XX_CONTROL_MAX_LENGTH 10
 /* Include a one-byte count and four bytes of data */
 #define IT52XX_CCI_LENGTH 5
+#define IT52XX_GET_CABLE_PROPERTY_LENGTH 5
 #define IT52XX_GET_ERROR_STATUS_LENGTH 16
 #define IT52XX_GET_PDC_INFO_LENGTH 29
 #define IT52XX_ALERT_UCSI BIT(1)
@@ -62,10 +63,14 @@ LOG_MODULE_REGISTER(ite_it52xx_emul);
 #define IT52XX_UCSI_SET_UOR 0x09
 #define IT52XX_UCSI_SET_PDR 0x0b
 #define IT52XX_UCSI_GET_PDOS 0x10
+#define IT52XX_UCSI_GET_CABLE_PROPERTY 0x11
 #define IT52XX_UCSI_GET_CONNECTOR_STATUS 0x12
 #define IT52XX_UCSI_GET_ERROR_STATUS 0x13
+#define IT52XX_UCSI_SET_POWER_LEVEL 0x14
+#define IT52XX_UCSI_SET_SINK_PATH 0x1c
 #define IT52XX_UCSI_SET_PDOS 0x1d
 #define IT52XX_UCSI_VENDOR_DEFINED 0x20
+#define IT52XX_UCSI_GET_LPM_PPM_INFO 0x22
 
 #define IT52XX_VDC_GET_PDC_INFO 0
 #define IT52XX_VDC_SET_RDO 4
@@ -110,9 +115,12 @@ struct it52xx_emul_data {
 	union uor_t uor;
 	union pdr_t pdr;
 	struct emul_pdc_pdo_t pdo;
+	union cable_property_t cable_property;
 	union connector_status_t connector_status;
 	union error_status_t error_status;
+	enum usb_typec_current_t requested_power_level;
 	struct pdc_info_t info;
+	struct lpm_ppm_info_t lpm_ppm_info;
 	/* A CI event is awaiting ACK_CC_CI from the EC */
 	bool connector_change_pending;
 	/* An asynchronous CI event is queued */
@@ -580,6 +588,25 @@ static int it52xx_emul_vendor_defined(struct it52xx_emul_data *data)
 	}
 }
 
+static int it52xx_emul_get_lpm_ppm_info(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = { .command_completed = 1 };
+	uint8_t connector = data->request[4] & 0x7f;
+
+	/* IT5271 accepts only connector number 1. */
+	if (connector != 1) {
+		data->error_status = (union error_status_t){
+			.non_existent_connector_number = 1,
+		};
+		cci.error = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	return it52xx_emul_send_command_result(
+		data, cci, (const uint8_t *)&data->lpm_ppm_info,
+		sizeof(data->lpm_ppm_info));
+}
+
 static int it52xx_emul_get_capability(struct it52xx_emul_data *data)
 {
 	union cci_event_t cci = { .command_completed = 1 };
@@ -782,6 +809,31 @@ static int it52xx_emul_get_pdos(struct it52xx_emul_data *data)
 		data, cci, response, returned_pdos * sizeof(uint32_t));
 }
 
+static int it52xx_emul_get_cable_property(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = { .command_completed = 1 };
+	uint8_t connector = data->request[4] & 0x7f;
+
+	if (!data->capability.bmOptionalFeatures.cable_details) {
+		cci.not_supported = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	/* IT5271 accepts only connector number 1. */
+	if (connector != 1) {
+		data->error_status = (union error_status_t){
+			.non_existent_connector_number = 1,
+		};
+		cci.error = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	/* IT5271 returns the five defined cable-property bytes. */
+	return it52xx_emul_send_command_result(
+		data, cci, (const uint8_t *)&data->cable_property,
+		IT52XX_GET_CABLE_PROPERTY_LENGTH);
+}
+
 static int it52xx_emul_set_pdos(struct it52xx_emul_data *data)
 {
 	const union ucsi_set_pdos_t *request =
@@ -907,6 +959,67 @@ static int it52xx_emul_get_error_status(struct it52xx_emul_data *data)
 	return rv;
 }
 
+static int it52xx_emul_set_power_level(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = { .command_completed = 1 };
+	uint8_t connector = data->request[4] & 0x7f;
+	bool source = data->request[4] & BIT(7);
+	enum usb_typec_current_t current = data->request[6] & 0x07;
+
+	if (!data->capability.bmOptionalFeatures.set_power_level) {
+		cci.not_supported = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	/* IT5271 accepts only connector number 1. */
+	if (connector != 1) {
+		data->error_status = (union error_status_t){
+			.non_existent_connector_number = 1,
+		};
+		cci.error = 1;
+	} else if (current > TC_CURRENT_USB_DEFAULT ||
+		   !data->connector_status.connect_status ||
+		   source != data->connector_status.power_direction) {
+		data->error_status = (union error_status_t){
+			.invalid_command_specific_param = 1,
+		};
+		cci.error = 1;
+	} else {
+		data->requested_power_level = current;
+	}
+
+	return it52xx_emul_send_command_result(data, cci, NULL, 0);
+}
+
+static int it52xx_emul_set_sink_path(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = { .command_completed = 1 };
+	uint8_t connector = data->request[4] & 0x7f;
+	bool enable = data->request[4] & BIT(7);
+
+	/* IT5271 accepts only connector number 1. */
+	if (connector != 1) {
+		data->error_status = (union error_status_t){
+			.non_existent_connector_number = 1,
+		};
+		cci.error = 1;
+	} else if (enable && !data->connector_status.connect_status) {
+		data->error_status = (union error_status_t){
+			.incompatible_connector_partner = 1,
+		};
+		cci.error = 1;
+	} else if (enable && data->connector_status.power_direction) {
+		data->error_status = (union error_status_t){
+			.cc_communication_error = 1,
+		};
+		cci.error = 1;
+	} else {
+		data->connector_status.sink_path_status = enable;
+	}
+
+	return it52xx_emul_send_command_result(data, cci, NULL, 0);
+}
+
 static int it52xx_emul_ack_cc_ci(struct it52xx_emul_data *data)
 {
 	union cci_event_t cci = { .acknowledge_command = 1 };
@@ -957,14 +1070,22 @@ static int it52xx_emul_process_idle_1(struct it52xx_emul_data *data,
 		return it52xx_emul_set_pdr(data);
 	case IT52XX_UCSI_GET_PDOS:
 		return it52xx_emul_get_pdos(data);
+	case IT52XX_UCSI_GET_CABLE_PROPERTY:
+		return it52xx_emul_get_cable_property(data);
 	case IT52XX_UCSI_GET_CONNECTOR_STATUS:
 		return it52xx_emul_get_connector_status(data);
 	case IT52XX_UCSI_GET_ERROR_STATUS:
 		return it52xx_emul_get_error_status(data);
+	case IT52XX_UCSI_SET_POWER_LEVEL:
+		return it52xx_emul_set_power_level(data);
+	case IT52XX_UCSI_SET_SINK_PATH:
+		return it52xx_emul_set_sink_path(data);
 	case IT52XX_UCSI_SET_PDOS:
 		return it52xx_emul_set_pdos(data);
 	case IT52XX_UCSI_VENDOR_DEFINED:
 		return it52xx_emul_vendor_defined(data);
+	case IT52XX_UCSI_GET_LPM_PPM_INFO:
+		return it52xx_emul_get_lpm_ppm_info(data);
 	default: {
 		union cci_event_t cci = {
 			.not_supported = 1,
@@ -1055,8 +1176,11 @@ static void it52xx_emul_reset_data(struct it52xx_emul_data *data)
 	data->uor.raw_value = 0;
 	data->pdr.raw_value = 0;
 	emul_pdc_pdo_reset(&data->pdo);
+	memset(&data->cable_property, 0, sizeof(data->cable_property));
 	memset(&data->connector_status, 0, sizeof(data->connector_status));
 	data->error_status.raw_value = 0;
+	data->requested_power_level = TC_CURRENT_PPM_DEFINED;
+	memset(&data->lpm_ppm_info, 0, sizeof(data->lpm_ppm_info));
 	data->connector_change_pending = false;
 	data->async_event_queued = false;
 	data->inject_ci_on_next_control = false;
@@ -1209,6 +1333,21 @@ static int emul_it52xx_set_partner_rdo(const struct emul *emul, uint32_t rdo)
 	return 0;
 }
 
+static int emul_it52xx_get_sink_path(const struct emul *emul, bool *enable)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (enable == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	*enable = data->connector_status.sink_path_status;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
 static int emul_it52xx_set_connector_status(
 	const struct emul *emul,
 	const union connector_status_t *connector_status)
@@ -1296,6 +1435,39 @@ static int emul_it52xx_set_info(const struct emul *emul,
 	return 0;
 }
 
+static int emul_it52xx_set_lpm_ppm_info(const struct emul *emul,
+					const struct lpm_ppm_info_t *info)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (info == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	data->lpm_ppm_info = *info;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
+static int
+emul_it52xx_get_requested_power_level(const struct emul *emul,
+				      enum usb_typec_current_t *level)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (level == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	*level = data->requested_power_level;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
 static int it52xx_emul_maybe_assert_async_event(struct it52xx_emul_data *data)
 {
 	union conn_status_change_bits_t enabled_changes =
@@ -1352,6 +1524,34 @@ static int emul_it52xx_pulse_irq(const struct emul *emul)
 	i2c_common_emul_unlock_data(&data->common);
 
 	return rv;
+}
+
+static int emul_it52xx_set_cable_property(const struct emul *emul,
+					  const union cable_property_t property)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	data->cable_property = property;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
+static int emul_it52xx_get_cable_property(const struct emul *emul,
+					  union cable_property_t *property)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (property == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	*property = data->cable_property;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
 }
 
 static int emul_it52xx_idle_wait(const struct emul *emul)
@@ -1482,12 +1682,17 @@ static DEVICE_API(emul_pdc, emul_it52xx_api) = {
 	.set_rdo = emul_it52xx_set_rdo,
 	.get_rdo = emul_it52xx_get_rdo,
 	.set_partner_rdo = emul_it52xx_set_partner_rdo,
+	.get_sink_path = emul_it52xx_get_sink_path,
 	.set_connector_status = emul_it52xx_set_connector_status,
 	.set_error_status = emul_it52xx_set_error_status,
 	.get_pdos = emul_it52xx_get_pdos,
 	.set_pdos = emul_it52xx_set_pdos,
 	.set_info = emul_it52xx_set_info,
+	.set_lpm_ppm_info = emul_it52xx_set_lpm_ppm_info,
+	.get_requested_power_level = emul_it52xx_get_requested_power_level,
 	.pulse_irq = emul_it52xx_pulse_irq,
+	.set_cable_property = emul_it52xx_set_cable_property,
+	.get_cable_property = emul_it52xx_get_cable_property,
 	.idle_wait = emul_it52xx_idle_wait,
 };
 
