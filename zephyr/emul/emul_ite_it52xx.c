@@ -55,6 +55,7 @@ void pdc_it52xx_test_invalidate_chip_info(const struct device *dev);
 #define IT52XX_UCSI_PPM_RESET 0x01
 #define IT52XX_UCSI_ACK_CC_CI 0x04
 #define IT52XX_UCSI_SET_NOTIFICATION_ENABLE 0x05
+#define IT52XX_UCSI_GET_CONNECTOR_STATUS 0x12
 #define IT52XX_UCSI_GET_ERROR_STATUS 0x13
 #define IT52XX_UCSI_VENDOR_DEFINED 0x20
 
@@ -87,6 +88,7 @@ struct it52xx_emul_data {
 	bool notification_enable_seen;
 	bool get_pdc_info_seen;
 	union notification_enable_t notification_enable;
+	union connector_status_t connector_status;
 	union error_status_t error_status;
 	struct pdc_info_t info;
 };
@@ -464,6 +466,42 @@ static int it52xx_emul_get_pdc_info(struct it52xx_emul_data *data)
 	return rv;
 }
 
+static int it52xx_emul_get_connector_status(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = { .command_completed = 1 };
+	int rv;
+
+	/* IT5271 accepts only connector number 1 */
+	if ((data->request[4] & 0x7f) != 1) {
+		union cci_event_t error_cci = {
+			.error = 1,
+			.command_completed = 1,
+		};
+		union error_status_t error = {
+			.non_existent_connector_number = 1,
+		};
+
+		/* IT5271 replaces the stored error when a command reports an
+		 * error. */
+		data->error_status = error;
+		return it52xx_emul_send_command_result(data, error_cci, NULL,
+						       0);
+	}
+
+	rv = it52xx_emul_send_command_result(
+		data, cci, data->connector_status.raw_value,
+		sizeof(data->connector_status.raw_value));
+	if (rv == 0) {
+		/*
+		 * IT5271 clears connector-status change bits while processing
+		 * the command.
+		 */
+		data->connector_status.raw_conn_status_change_bits = 0;
+	}
+
+	return rv;
+}
+
 static int it52xx_emul_get_error_status(struct it52xx_emul_data *data)
 {
 	union cci_event_t cci = { .command_completed = 1 };
@@ -532,6 +570,8 @@ static int it52xx_emul_process_idle_1(struct it52xx_emul_data *data,
 		return it52xx_emul_set_notification_enable(data);
 	case IT52XX_UCSI_ACK_CC_CI:
 		return it52xx_emul_ack_cc_ci(data);
+	case IT52XX_UCSI_GET_CONNECTOR_STATUS:
+		return it52xx_emul_get_connector_status(data);
 	case IT52XX_UCSI_GET_ERROR_STATUS:
 		return it52xx_emul_get_error_status(data);
 	case IT52XX_UCSI_VENDOR_DEFINED:
@@ -602,6 +642,7 @@ static void it52xx_emul_reset_data(struct it52xx_emul_data *data)
 	memset(data->msgin, 0, sizeof(data->msgin));
 	data->msgin_length = 0;
 	data->notification_enable.raw_value = 0;
+	memset(&data->connector_status, 0, sizeof(data->connector_status));
 	data->error_status.raw_value = 0;
 	data->lpm_state = IT52XX_EMUL_LPM_IDLE_0;
 	data->ppm_reset_seen = false;
@@ -616,6 +657,23 @@ static int emul_it52xx_reset(const struct emul *emul)
 	it52xx_emul_reset_data(data);
 
 	return it52xx_emul_set_irq(data, false);
+}
+
+static int emul_it52xx_set_connector_status(
+	const struct emul *emul,
+	const union connector_status_t *connector_status)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (connector_status == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	data->connector_status = *connector_status;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
 }
 
 static int
@@ -752,6 +810,7 @@ static int it52xx_emul_init(const struct emul *emul,
 
 static DEVICE_API(emul_pdc, emul_it52xx_api) = {
 	.reset = emul_it52xx_reset,
+	.set_connector_status = emul_it52xx_set_connector_status,
 	.set_error_status = emul_it52xx_set_error_status,
 	.set_info = emul_it52xx_set_info,
 	.idle_wait = emul_it52xx_idle_wait,
