@@ -127,6 +127,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8b2cffa_916360ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 33
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T17:46:38Z",
+      "side": 1,
+      "message": "Done. Split the fingerprint migration across 3 CLs as suggested:\n1. CL:8008794: Base sensor and state migration\n2. CL:8465042: Authentication commands\n3. CL:8465043: Vendor and ASCP claim commands\nFollowed by CL:8434542 for input buffer size validation.",
+      "parentUuid": "bb2a9e95_bd699143",
+      "revId": "6eca5506543a4b185e9df296382a1b57f750e750",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91ec190e_a40057c1",
