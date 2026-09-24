@@ -85,6 +85,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2e102933_1f3f050c",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T16:04:10Z",
+      "side": 1,
+      "message": "Understood, our battery cutoff procedure attempts up to `CONFIG_BATTERY_CUTOFF_RETRY_COUNT` times to make sure cutoff succeeds. Could we add something similar for wakeup (or use a timeout)?  If for some reason, the battery refuses to wake-up, I prefer to limit traffic on the I2C bus instead of persistent spamming of the wakeup command.",
+      "parentUuid": "e09ed503_66cf4964",
+      "range": {
+        "startLine": 505,
+        "startChar": 0,
+        "endLine": 505,
+        "endChar": 0
+      },
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8cef866f_96fd8cbf",
         "filename": "include/battery.h",
         "patchSetId": 8
@@ -202,6 +226,30 @@
       "side": 1,
       "message": "I don\u0027t think we need to add a host command for this feature.",
       "parentUuid": "f9bfd2a0_63133ae1",
+      "range": {
+        "startLine": 8327,
+        "startChar": 0,
+        "endLine": 8327,
+        "endChar": 0
+      },
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1733f4ea_3bfbdca8",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 8327,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T16:04:10Z",
+      "side": 1,
+      "message": "This affects the response to `EC_CMD_BATTERY_CONFIG` since you\u0027ve added a field to `struct fuel_gauge_info`, the layout of `struct board_batt_params` (see line 8362 below) has changed. Because `fuel_gauge` comes before `batt_info`, the offsets for all battery constants in the host command response have shifted.\n\nYou must increment `EC_BATTERY_CONFIG_STRUCT_VERSION` to 0x01 so that host-side tools (like ectool) can detect the layout change and parse the response correctly.",
+      "parentUuid": "b738aa3e_f9fab9f2",
       "range": {
         "startLine": 8327,
         "startChar": 0,
