@@ -5,6 +5,7 @@
 
 #include "drivers/pdc.h"
 #include "drivers/ucsi_v3.h"
+#include "emul/emul_common_i2c.h"
 #include "emul/emul_ite_it52xx.h"
 #include "emul/emul_pdc.h"
 
@@ -14,6 +15,8 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/emul.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/kernel.h>
 #include <zephyr/sys/atomic.h>
 #include <zephyr/ztest.h>
@@ -25,6 +28,8 @@ static const struct emul *emul = EMUL_DT_GET(IT52XX_NODE);
 static const struct emul *emul2 = EMUL_DT_GET(IT52XX_NODE2);
 static const struct device *dev = DEVICE_DT_GET(IT52XX_NODE);
 static const struct device *dev2 = DEVICE_DT_GET(IT52XX_NODE2);
+static const struct gpio_dt_spec irq_gpio =
+	GPIO_DT_SPEC_GET(IT52XX_NODE, irq_gpios);
 
 #define PDC_COMMAND_COMPLETE BIT(0)
 #define PDC_CONNECTOR_CHANGE BIT(1)
@@ -573,6 +578,230 @@ ZTEST(it52xx, test_ack_connector_change_interrupt)
 	k_msleep(1);
 	/* Verify GET_CONNECTOR_STATUS still returns the stored change bits. */
 	read_connector_status(emul, dev, &status);
+}
+
+ZTEST(it52xx, test_i2c_write_error_recovery)
+{
+	struct i2c_common_emul_data *i2c_emul =
+		emul_it52xx_get_i2c_common_data(emul);
+	struct capability_t capability;
+	bool recovery_started = false;
+	bool recovery_completed = false;
+
+	/* Keep failing writes until the driver enters error recovery. */
+	i2c_common_emul_set_fail_auto_clear(i2c_emul, false);
+	i2c_common_emul_set_write_fail_reg(i2c_emul,
+					   I2C_COMMON_EMUL_FAIL_ALL_REG);
+	prepare_for_command();
+	zassert_ok(pdc_get_capability(dev, &capability));
+	wait_for_command_callback(dev, 0, true, false);
+
+	for (int i = 0; i < 100; ++i) {
+		if (!pdc_is_init_done(dev)) {
+			recovery_started = true;
+			break;
+		}
+		k_msleep(10);
+	}
+	zassert_true(recovery_started);
+
+	/* Restore I2C and verify that recovery reinitializes the PDC. */
+	i2c_common_emul_set_write_fail_reg(i2c_emul,
+					   I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_fail_auto_clear(i2c_emul, true);
+	for (int i = 0; i < 200; ++i) {
+		if (pdc_is_init_done(dev) && emul_it52xx_init_complete(emul)) {
+			recovery_completed = true;
+			break;
+		}
+		k_msleep(10);
+	}
+	zassert_true(recovery_completed);
+
+	/* A command must complete normally after recovery. */
+	prepare_for_command();
+	zassert_ok(pdc_get_capability(dev, &capability));
+	wait_for_command(emul, dev, IT52XX_GET_CAPABILITY_DATA_LENGTH);
+}
+
+ZTEST(it52xx, test_ppm_reset_with_irq_low_and_no_pending_event)
+{
+	union connector_status_t status = {
+		.raw_conn_status_change_bits = UCSI_CHANGE_BITS_CONNECT_CHANGE,
+		.connect_status = 1,
+	};
+	bool reinitialization_started = false;
+	bool reinitialization_completed = false;
+	bool cleanup_completed = false;
+
+	zassert_ok(emul_pdc_idle_wait(emul));
+	k_event_set(&pdc_event, 0);
+	atomic_set(&ci_callback_count, 0);
+
+	/*
+	 * Disable the GPIO interrupt while the emulator asserts its active-low
+	 * IRQ. Re-enable falling-edge detection while the line is already low,
+	 * leaving no IRQ event cached by the driver.
+	 */
+	zassert_ok(
+		gpio_pin_interrupt_configure_dt(&irq_gpio, GPIO_INT_DISABLE));
+	zassert_ok(emul_pdc_set_connector_status(emul, &status));
+	zassert_ok(emul_pdc_pulse_irq(emul));
+	zassert_equal(gpio_pin_get_raw(irq_gpio.port, irq_gpio.pin), 0);
+	zassert_ok(gpio_pin_interrupt_configure_dt(&irq_gpio,
+						   GPIO_INT_EDGE_FALLING));
+	k_msleep(50);
+	zassert_equal(atomic_get(&ci_callback_count), 0);
+
+	/* Start a PPM_RESET initialization without a pending IRQ event. */
+	zassert_ok(pdc_reset(dev));
+	for (int i = 0; i < 200; ++i) {
+		if (!pdc_is_init_done(dev)) {
+			reinitialization_started = true;
+			break;
+		}
+		k_msleep(10);
+	}
+	zassert_true(reinitialization_started);
+
+	for (int i = 0; i < 200; ++i) {
+		if (pdc_is_init_done(dev) && emul_it52xx_init_complete(emul)) {
+			reinitialization_completed = true;
+			break;
+		}
+		k_msleep(10);
+	}
+
+	/*
+	 * If no new falling edge was generated, create one after the check so
+	 * the driver can finish initialization before the next test starts.
+	 */
+	if (!reinitialization_completed) {
+		zassert_ok(gpio_emul_input_set_dt(&irq_gpio, 1));
+		zassert_ok(gpio_emul_input_set_dt(&irq_gpio, 0));
+		for (int i = 0; i < 200; ++i) {
+			if (pdc_is_init_done(dev) &&
+			    emul_it52xx_init_complete(emul)) {
+				cleanup_completed = true;
+				break;
+			}
+			k_msleep(10);
+		}
+		zassert_true(cleanup_completed);
+	}
+
+	zassert_true(reinitialization_completed,
+		     "PPM_RESET did not generate an observable IRQ event");
+}
+
+ZTEST(it52xx, test_repeated_recovery_failures_disable_pdc)
+{
+	struct i2c_common_emul_data *i2c_emul =
+		emul_it52xx_get_i2c_common_data(emul2);
+	struct capability_t capability;
+	bool recovery_started = false;
+	bool pdc_disabled = false;
+
+	/*
+	 * Clear the emulator's initialization record so init_done becoming true
+	 * without a completed emulator initialization identifies ST_DISABLE.
+	 */
+	zassert_ok(emul_pdc_reset(emul2));
+	zassert_false(emul_it52xx_init_complete(emul2));
+
+	/* Keep every I2C write failing across all recovery attempts. */
+	i2c_common_emul_set_fail_auto_clear(i2c_emul, false);
+	i2c_common_emul_set_write_fail_reg(i2c_emul,
+					   I2C_COMMON_EMUL_FAIL_ALL_REG);
+	prepare_for_command();
+	zassert_ok(pdc_get_capability(dev2, &capability));
+	wait_for_command_callback(dev2, 0, true, false);
+
+	/* Verify that the driver starts a recovery initialization. */
+	for (int i = 0; i < 200; ++i) {
+		if (!pdc_is_init_done(dev2)) {
+			recovery_started = true;
+			break;
+		}
+		k_msleep(10);
+	}
+	zassert_true(recovery_started);
+
+	/*
+	 * After all recovery attempts fail, ST_DISABLE sets init_done without
+	 * completing the emulator initialization sequence.
+	 */
+	for (int i = 0; i < 500; ++i) {
+		if (pdc_is_init_done(dev2) &&
+		    !emul_it52xx_init_complete(emul2)) {
+			pdc_disabled = true;
+			break;
+		}
+		k_msleep(10);
+	}
+	zassert_true(pdc_disabled);
+
+	/* Restoring I2C must not restart a PDC that entered ST_DISABLE. */
+	i2c_common_emul_set_write_fail_reg(i2c_emul,
+					   I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_fail_auto_clear(i2c_emul, true);
+	k_msleep(200);
+	zassert_true(pdc_is_init_done(dev2));
+	zassert_false(emul_it52xx_init_complete(emul2));
+}
+
+ZTEST(it52xx, test_resume_with_pending_ci_and_irq_low)
+{
+	union connector_status_t status = {
+		.raw_conn_status_change_bits = UCSI_CHANGE_BITS_CONNECT_CHANGE,
+		.connect_status = 1,
+	};
+	struct capability_t capability;
+	bool reinitialization_started = false;
+	bool reinitialization_completed = false;
+
+	zassert_ok(emul_pdc_idle_wait(emul));
+	k_event_set(&pdc_event, 0);
+	atomic_set(&ci_callback_count, 0);
+
+	/* Suspend PDC communication before generating a connector change. */
+	zassert_ok(pdc_set_comms_state(dev, false));
+	zassert_ok(emul_pdc_set_connector_status(emul, &status));
+	zassert_ok(emul_pdc_pulse_irq(emul));
+
+	/*
+	 * Let the driver observe the IRQ while suspended. The CI is not
+	 * handled, so the active-low IRQ remains low when resume sends
+	 * PPM_RESET.
+	 */
+	k_msleep(50);
+	zassert_equal(atomic_get(&ci_callback_count), 0);
+
+	zassert_ok(pdc_set_comms_state(dev, true));
+	for (int i = 0; i < 200; ++i) {
+		if (!pdc_is_init_done(dev)) {
+			reinitialization_started = true;
+			break;
+		}
+		k_msleep(10);
+	}
+	zassert_true(reinitialization_started);
+
+	/* PPM_RESET must complete even though IRQ was already low. */
+	for (int i = 0; i < 200; ++i) {
+		if (pdc_is_init_done(dev) && emul_it52xx_init_complete(emul)) {
+			reinitialization_completed = true;
+			break;
+		}
+		k_msleep(10);
+	}
+	zassert_true(reinitialization_completed);
+	zassert_equal(atomic_get(&ci_callback_count), 0);
+
+	/* A command must complete normally after resume. */
+	prepare_for_command();
+	zassert_ok(pdc_get_capability(dev, &capability));
+	wait_for_command(emul, dev, IT52XX_GET_CAPABILITY_DATA_LENGTH);
 }
 
 ZTEST_SUITE(it52xx, NULL, it52xx_setup, NULL, NULL, NULL);
