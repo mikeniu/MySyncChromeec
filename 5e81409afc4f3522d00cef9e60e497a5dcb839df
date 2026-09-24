@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afe56887_e66d3111",
+        "filename": "zephyr/program/bluey/meru/led_policy.dtsi",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-24T07:28:19Z",
+      "side": 1,
+      "message": "This looks like a mistake",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 53
+      },
+      "revId": "5e81409afc4f3522d00cef9e60e497a5dcb839df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
