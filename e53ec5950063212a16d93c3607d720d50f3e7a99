@@ -36,6 +36,24 @@
       "parentUuid": "71ff08f5_4b127c69",
       "revId": "e53ec5950063212a16d93c3607d720d50f3e7a99",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa59b741_f00ef53b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 36
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T17:46:59Z",
+      "side": 1,
+      "message": "Done. The split is now uploaded:\n- CL:8008794: Base sensor and state migration\n- CL:8465042: Authentication commands\n- CL:8465043: Vendor and ASCP claim commands\nFollowed by CL:8434542 for input buffer size validation. Verified with git diff that the net state across the split matches exactly.",
+      "parentUuid": "cbf68f4f_a4bcd040",
+      "revId": "e53ec5950063212a16d93c3607d720d50f3e7a99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
