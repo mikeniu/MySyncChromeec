@@ -264,9 +264,9 @@ void power_sleep_hang_recovery(enum sleep_hang_type hang_type)
 	stop_hard_hang_timer();
 
 	if (hang_type == SLEEP_HANG_S0IX_SUSPEND)
-		ccprints("S0ix suspend sleep hang detected!");
+		ccprints("S0ix/S3 suspend sleep hang detected!");
 	else if (hang_type == SLEEP_HANG_S0IX_RESUME)
-		ccprints("S0ix resume sleep hang detected!");
+		ccprints("S0ix/S3 resume sleep hang detected!");
 
 	ccprints("Consecutive sleep hang count: soft=%d hard=%d",
 		 soft_sleep_hang_count, hard_sleep_hang_count);
