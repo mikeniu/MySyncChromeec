@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71ff08f5_4b127c69",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 36
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-24T17:14:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality:** The host command definitions are functionally correct. The structural macro migrations properly map legacy return statuses and parameters to the new Zephyr framework equivalents. The removal of the in-flight size checks aligns with the \"Single Logical Change\" rule, leaving them for a dedicated follow-up CL.\n\n**Architecture \u0026 Component Fit:** The change correctly updates host command registration across the fingerprint subsystem to use the upstream macro interface.\n\n**Code Simplicity:** The changes are clean and represent a straightforward migration without over-engineering.\n\n**Idiomaticity \u0026 Readability:** Excellent. Prior C-style casting issues to `enum ec_host_cmd_status` have been resolved in favor of modern idiomatic C++ `static_cast`.\n\n**Testing:** Existing tests execute correctly and have been verified on hardware. As this is a pure API migration CL, the existing test coverage is sufficient.\n\n**CL Size \u0026 Scope:** `Size: L (+292, -250)`. Based on `gerrit info`, this CL remains too large for a single atomic review. I acknowledge the previous discussion regarding subsystem unity and human review progress; however, my instructions strictly mandate rejecting all `Size: L` CLs without exception, as they violate the Single Logical Change rule for atomic reviews. Please split the migration into smaller, independently reviewable CLs (e.g., **S** or **M**), such as:\n1. CL 1: Base sensor and state migration (`fpsensor.cc` and `fpsensor_state.cc`).\n2. CL 2: Authentication commands (`fpsensor_auth_*.cc`).\n3. CL 3: Vendor and ASCP claim commands (`fpsensor_vendor_command.cc`, `claim.c`).\n\n**Commit Message:** The commit message correctly follows Chromium subsystem formatting guidelines (`BUG\u003db:...`, `TEST\u003d...`) and accurately explains the scope of the migration. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8008794_cffa49b8-b643-4acb-98c2-6eb7dd802a91.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e53ec5950063212a16d93c3607d720d50f3e7a99",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
