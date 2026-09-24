@@ -135,6 +135,31 @@ class TestLcovStencil(unittest.TestCase):
             lcov_stencil.filter_coverage_file(f.name, out, template_data)
             self.assertEqual(out.getvalue(), "")
 
+    def test_filter_coverage_file_brda_taken_tracking(self):
+        """Tests that BRDA taken count (4th field) determines branch hits."""
+        template_data = defaultdict(set, {"SF:/path/to/branch.c": {"10"}})
+        # branch 0 taken 5 -> hit
+        # branch 1 taken 0 -> not hit
+        # branch 2 taken - -> not hit
+        coverage_content = (
+            "SF:/path/to/branch.c\n"
+            "BRDA:10,0,0,5\n"
+            "BRDA:10,0,1,0\n"
+            "BRDA:10,0,2,-\n"
+            "BRF:3\n"
+            "BRH:1\n"
+            "end_of_record\n"
+        )
+        with tempfile.NamedTemporaryFile("w+", encoding="utf-8") as f:
+            f.write(coverage_content)
+            f.flush()
+            out = io.StringIO()
+            lcov_stencil.filter_coverage_file(f.name, out, template_data)
+            filtered = out.getvalue()
+
+        self.assertIn("BRF:3\n", filtered)
+        self.assertIn("BRH:1\n", filtered)
+
 
 if __name__ == "__main__":
     unittest.main()
