@@ -48,4 +48,14 @@ int emul_it52xx_get_notification_enable(
  */
 bool emul_it52xx_init_complete(const struct emul *emul);
 
+/**
+ * @brief Inject a connector change while the next CONTROL write is received.
+ *
+ * @param emul IT52XX emulator instance.
+ * @param status Connector status to report for the injected change.
+ * @return 0 on success or -EINVAL if status is NULL.
+ */
+int emul_it52xx_inject_ci_on_next_control(
+	const struct emul *emul, const union connector_status_t *status);
+
 #endif /* __EMUL_ITE_IT52XX_H */
