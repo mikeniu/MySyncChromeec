@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a942813_523cba27",
+        "filename": "docker/run_dagwood_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-24T22:34:43Z",
+      "side": 1,
+      "message": "This is now quite a thin wrapper, very much like `run_docker.sh`. I retain a suspicion that there might be a way to get rid of them, but this is all I\u0027ve come up with so far.",
+      "revId": "4c8d5d5b21026969ec0dd52e5454c49089a576c7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
