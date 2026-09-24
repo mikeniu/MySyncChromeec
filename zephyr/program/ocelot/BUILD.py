@@ -242,10 +242,6 @@ register_rtk59_project(
 register_it8xxx2_project(
     project_name="coolum",
     chip="it8xxx2/it82002bw",
-    extra_kconfig_base_files=[
-        here / "rvp_program.conf",
-        here / "dsp_comms.conf",
-    ],
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses
