@@ -53,10 +53,14 @@ void pdc_it52xx_test_invalidate_chip_info(const struct device *dev);
 
 /* UCSI commands supported by the emulator. */
 #define IT52XX_UCSI_PPM_RESET 0x01
+#define IT52XX_UCSI_CONNECTOR_RESET 0x03
 #define IT52XX_UCSI_ACK_CC_CI 0x04
 #define IT52XX_UCSI_SET_NOTIFICATION_ENABLE 0x05
 #define IT52XX_UCSI_GET_CAPABILITY 0x06
 #define IT52XX_UCSI_GET_CONNECTOR_CAPABILITY 0x07
+#define IT52XX_UCSI_SET_CCOM 0x08
+#define IT52XX_UCSI_SET_UOR 0x09
+#define IT52XX_UCSI_SET_PDR 0x0b
 #define IT52XX_UCSI_GET_CONNECTOR_STATUS 0x12
 #define IT52XX_UCSI_GET_ERROR_STATUS 0x13
 #define IT52XX_UCSI_VENDOR_DEFINED 0x20
@@ -90,8 +94,12 @@ struct it52xx_emul_data {
 	bool notification_enable_seen;
 	bool get_pdc_info_seen;
 	union notification_enable_t notification_enable;
+	union connector_reset_t connector_reset;
 	struct capability_t capability;
 	union connector_capability_t connector_capability;
+	enum ccom_t ccom;
+	union uor_t uor;
+	union pdr_t pdr;
 	union connector_status_t connector_status;
 	union error_status_t error_status;
 	struct pdc_info_t info;
@@ -538,6 +546,126 @@ static int it52xx_emul_get_connector_capability(struct it52xx_emul_data *data)
 		sizeof(data->connector_capability.raw_value));
 }
 
+static int it52xx_emul_connector_reset(struct it52xx_emul_data *data)
+{
+	union connector_reset_t reset = { .raw_value = data->request[4] };
+	union cci_event_t cci = { .command_completed = 1 };
+
+	/* IT5271 accepts only connector number 1 */
+	if (reset.connector_number != 1) {
+		data->error_status = (union error_status_t){
+			.non_existent_connector_number = 1,
+		};
+		cci.error = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	data->connector_reset = reset;
+	return it52xx_emul_send_command_result(data, cci, NULL, 0);
+}
+
+static int it52xx_emul_set_ccom(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = { .command_completed = 1 };
+	uint8_t connector = data->request[4] & 0x7f;
+	uint8_t mode = ((data->request[4] & BIT(7)) >> 7) |
+		       ((data->request[5] & 0x07) << 1);
+	enum ccom_t ccom;
+
+	if (!data->capability.bmOptionalFeatures.set_ccom) {
+		cci.not_supported = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	/* IT5271 accepts only connector number 1 */
+	if (connector != 1) {
+		data->error_status = (union error_status_t){
+			.non_existent_connector_number = 1,
+		};
+		cci.error = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	switch (mode) {
+	case BIT(0):
+		ccom = CCOM_RP;
+		break;
+	case BIT(1):
+		ccom = CCOM_RD;
+		break;
+	case BIT(2):
+		ccom = CCOM_DRP;
+		break;
+	default:
+		data->error_status = (union error_status_t){
+			.invalid_command_specific_param = 1,
+		};
+		cci.error = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	data->ccom = ccom;
+	return it52xx_emul_send_command_result(data, cci, NULL, 0);
+}
+
+static int it52xx_emul_set_uor(struct it52xx_emul_data *data)
+{
+	union uor_t uor = {
+		.raw_value = sys_get_le16(&data->request[4]),
+	};
+	union cci_event_t cci = { .command_completed = 1 };
+
+	/* IT5271 accepts only connector number 1 */
+	if (uor.connector_number != 1) {
+		data->error_status = (union error_status_t){
+			.non_existent_connector_number = 1,
+		};
+		cci.error = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	if (uor.swap_to_dfp == uor.swap_to_ufp) {
+		data->error_status = (union error_status_t){
+			.invalid_command_specific_param = 1,
+		};
+		cci.error = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	data->uor = uor;
+	return it52xx_emul_send_command_result(data, cci, NULL, 0);
+}
+
+static int it52xx_emul_set_pdr(struct it52xx_emul_data *data)
+{
+	union pdr_t pdr = {
+		.raw_value = sys_get_le16(&data->request[4]),
+	};
+	union cci_event_t cci = { .command_completed = 1 };
+	uint8_t role = ((data->request[4] & BIT(7)) >> 7) |
+		       ((data->request[5] & 0x03) << 1);
+
+	/* IT5271 accepts only connector number 1 */
+	if (pdr.connector_number != 1) {
+		data->error_status = (union error_status_t){
+			.non_existent_connector_number = 1,
+		};
+		cci.error = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	if (role == 0 || (pdr.swap_to_src && pdr.swap_to_snk)) {
+		data->error_status = (union error_status_t){
+			.invalid_command_specific_param = 1,
+		};
+		cci.error = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	data->pdr = pdr;
+	return it52xx_emul_send_command_result(data, cci, NULL, 0);
+}
+
 static int it52xx_emul_get_connector_status(struct it52xx_emul_data *data)
 {
 	union cci_event_t cci = { .command_completed = 1 };
@@ -645,14 +773,22 @@ static int it52xx_emul_process_idle_1(struct it52xx_emul_data *data,
 				      uint8_t command)
 {
 	switch (command) {
-	case IT52XX_UCSI_SET_NOTIFICATION_ENABLE:
-		return it52xx_emul_set_notification_enable(data);
+	case IT52XX_UCSI_CONNECTOR_RESET:
+		return it52xx_emul_connector_reset(data);
 	case IT52XX_UCSI_ACK_CC_CI:
 		return it52xx_emul_ack_cc_ci(data);
+	case IT52XX_UCSI_SET_NOTIFICATION_ENABLE:
+		return it52xx_emul_set_notification_enable(data);
 	case IT52XX_UCSI_GET_CAPABILITY:
 		return it52xx_emul_get_capability(data);
 	case IT52XX_UCSI_GET_CONNECTOR_CAPABILITY:
 		return it52xx_emul_get_connector_capability(data);
+	case IT52XX_UCSI_SET_CCOM:
+		return it52xx_emul_set_ccom(data);
+	case IT52XX_UCSI_SET_UOR:
+		return it52xx_emul_set_uor(data);
+	case IT52XX_UCSI_SET_PDR:
+		return it52xx_emul_set_pdr(data);
 	case IT52XX_UCSI_GET_CONNECTOR_STATUS:
 		return it52xx_emul_get_connector_status(data);
 	case IT52XX_UCSI_GET_ERROR_STATUS:
@@ -738,6 +874,10 @@ static void it52xx_emul_reset_data(struct it52xx_emul_data *data)
 	memset(data->msgin, 0, sizeof(data->msgin));
 	data->msgin_length = 0;
 	data->notification_enable.raw_value = 0;
+	data->connector_reset.raw_value = 0;
+	data->ccom = CCOM_DRP;
+	data->uor.raw_value = 0;
+	data->pdr.raw_value = 0;
 	memset(&data->connector_status, 0, sizeof(data->connector_status));
 	data->error_status.raw_value = 0;
 	data->connector_change_pending = false;
@@ -758,6 +898,22 @@ static int emul_it52xx_reset(const struct emul *emul)
 	it52xx_emul_reset_data(data);
 
 	return it52xx_emul_set_irq(data, false);
+}
+
+static int emul_it52xx_get_connector_reset(const struct emul *emul,
+					   union connector_reset_t *reset)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (reset == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	*reset = data->connector_reset;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
 }
 
 static int emul_it52xx_set_capability(const struct emul *emul,
@@ -788,6 +944,51 @@ static int emul_it52xx_set_connector_capability(
 
 	i2c_common_emul_lock_data(&data->common, K_FOREVER);
 	data->connector_capability = *connector_capability;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
+static int emul_it52xx_get_ccom(const struct emul *emul, enum ccom_t *ccom)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (ccom == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	*ccom = data->ccom;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
+static int emul_it52xx_get_uor(const struct emul *emul, union uor_t *uor)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (uor == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	*uor = data->uor;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
+static int emul_it52xx_get_pdr(const struct emul *emul, union pdr_t *pdr)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (pdr == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	*pdr = data->pdr;
 	i2c_common_emul_unlock_data(&data->common);
 
 	return 0;
@@ -1020,8 +1221,12 @@ static int it52xx_emul_init(const struct emul *emul,
 
 static DEVICE_API(emul_pdc, emul_it52xx_api) = {
 	.reset = emul_it52xx_reset,
+	.get_connector_reset = emul_it52xx_get_connector_reset,
 	.set_capability = emul_it52xx_set_capability,
 	.set_connector_capability = emul_it52xx_set_connector_capability,
+	.get_ccom = emul_it52xx_get_ccom,
+	.get_uor = emul_it52xx_get_uor,
+	.get_pdr = emul_it52xx_get_pdr,
 	.set_connector_status = emul_it52xx_set_connector_status,
 	.set_error_status = emul_it52xx_set_error_status,
 	.set_info = emul_it52xx_set_info,
