@@ -48,7 +48,7 @@
 		};
 		/* EC_RTC_RST */
 		gpio_ec_soc_rtcrst: ec_soc_rtcrst {
-			gpios = <RTS5912_GPIO061 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+			gpios = <RTS5912_GPIO102 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		/* EN_S5_RAILS */
 		gpio_en_s5_rails: en_s5_rails {
@@ -112,7 +112,7 @@
 		};
 		/* EC_A13 */
 		gpio_ec_soc_int_odl: ec_soc_int_odl {
-			gpios = <RTS5912_GPIO094 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+			gpios = <RTS5912_GPIO105 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
 			enum-name = "GPIO_EC_INT_L";
 		};
 		/* EC_N4 SOC_WAKE_ODL
@@ -150,10 +150,6 @@
 		/* EC_PD1_INT */
 		gpio_ec_pd1_int: ec_pd1_int {
 			gpios = <RTS5912_GPIO100 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
-		};
-		/* EC_FP_SSO */
-		gpio_ec_fp_sso: ec_fp_sso {
-			gpios = <RTS5912_GPIO102 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		/* EC_FP_ATC */
 		gpio_ec_fp_atc: ec_fp_atc {
@@ -197,7 +193,7 @@
 		};
 		/* EC_CAMERA_FW_SHUT_CTRL */
 		gpio_ec_camera_fw_shut_ctrl: ec_camera_fw_shut_ctrl {
-			gpios = <RTS5912_GPIO040 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_LOW)>;
+			gpios = <RTS5912_GPIO022 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_LOW)>;
 		};
 	};
 
@@ -223,10 +219,10 @@
 			<RTS5912_GPIO095 0>,	/* EC_A12 */
 			<RTS5912_GPIO078 0>,	/* EC_CHG_MOD1_P1 */
 			<RTS5912_GPIO060 0>,	/* EC_HDMI_HPD_L_STRAP */
-			<RTS5912_GPIO105 0>,	/* EC_SOC_ME_UNLOCK_R */
 			<RTS5912_GPIO084 0>,	/* EC_CATERR */
 			<RTS5912_GPIO027 0>,	/* EC_LED_BAT_CHG */
 			<RTS5912_GPIO031 0>,	/* EC_LED_BAT_FULL */
-			<RTS5912_GPIO022 0>;	/* EC_PWRBTN_LED_CTRL */
+			<RTS5912_GPIO094 0>,	/* EC_A13 */
+			<RTS5912_GPIO040 0>;	/* EC_N8 */
 	};
 };
