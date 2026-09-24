@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_H_
-#define ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_H_
 
 #include <stdint.h>
 
@@ -83,4 +83,4 @@ void one_wire_uart_set_callback(const struct device *device,
  */
 void one_wire_uart_keyboard_add(const uint8_t *key_matrix);
 
-#endif /* ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_H_ */

@@ -5,12 +5,12 @@
  * Author : Analogix Semiconductor.
  */
 
+#ifndef PLATFORM_EC_DRIVER_TCPM_ANX74XX_H_
+#define PLATFORM_EC_DRIVER_TCPM_ANX74XX_H_
+
 #include "usb_mux.h"
 
 /* USB Power delivery port management */
-
-#ifndef __CROS_EC_USB_PD_TCPM_ANX74XX_H
-#define __CROS_EC_USB_PD_TCPM_ANX74XX_H
 
 /* I2C interface */
 #define ANX74XX_I2C_ADDR1_FLAGS 0x28
@@ -224,4 +224,4 @@ void anx74xx_tcpc_update_hpd_status(const struct usb_mux *me,
 extern struct i2c_stress_test_dev anx74xx_i2c_stress_test_dev;
 #endif
 
-#endif /* __CROS_EC_USB_PD_TCPM_ANX74XX_H */
+#endif /* PLATFORM_EC_DRIVER_TCPM_ANX74XX_H_ */

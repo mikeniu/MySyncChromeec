@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_INTERNAL_H_
-#define ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_INTERNAL_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_INTERNAL_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_INTERNAL_H_
 
 #include "timer.h"
 #include "usb_hid_touchpad.h"
@@ -114,4 +114,4 @@ void process_packet(void);
 void process_tx_irq(const struct device *dev);
 #endif
 
-#endif /* ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_INTERNAL_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_ONE_WIRE_UART_INTERNAL_H_ */

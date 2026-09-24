@@ -28,21 +28,23 @@ The main source code for fingerprint sensor functionality lives in the
 The following "boards" (specified by the `BOARD` environment variable when
 building the EC code) are for fingerprint:
 
-MCU                      | Sensor     | Firmware (EC "board")                          | Dev Board                                  | Nucleo Board
------------------------- | ---------- | ---------------------------------------------- | ------------------------------------------ | ------------
-[STM32H743] \(Cortex-M7) | [FPC 1145] | `dartmonkey`<br>(aka `nocturne_fp`, `nami_fp`) | [Icetower v3] <br>(Previously Dragontalon) | [Nucleo H743ZI2]
-[STM32F412] \(Cortex-M4) | [FPC 1025] | `bloonchipper`<br>(aka `hatch_fp`)             | [Dragonclaw v4]                            | [Nucleo F412ZG]
-[NPCX99FP] \(Cortex-M4)  | [FPC 1025] | `helipilot`                                    | [Quincy v3]                                | N/A
+MCU                      | Sensor      | Firmware (EC "board")                          | Dev Board                                  | Nucleo Board
+------------------------ | ----------- | ---------------------------------------------- | ------------------------------------------ | ------------
+[STM32H743] \(Cortex-M7) | [FPC 1145]  | `dartmonkey`<br>(aka `nocturne_fp`, `nami_fp`) | [Icetower v3] <br>(Previously Dragontalon) | [Nucleo H743ZI2]
+[STM32F412] \(Cortex-M4) | [FPC 1025]  | `bloonchipper`<br>(aka `hatch_fp`)             | [Dragonclaw v4]                            | [Nucleo F412ZG]
+[NPCX99FP] \(Cortex-M4)  | [FPC 1025]  | `helipilot`                                    | [Quincy v3]                                | N/A
+[NPCX99FP] \(Cortex-M4)  | [Elan 80SG] | `buccaneer`                                    | [Quincy v3]                                | N/A
 
 RAM and Flash details for each board are in the [Fingerprint MCU RAM and Flash]
 document.
 
 ### Sensor Template Sizes
 
-Sensor     | Fingerprint Template Size
----------- | --------------------------------
-[FPC 1145] | [~48 KB][FPC 1145 Template Size]
-[FPC 1025] | [~5 KB][FPC 1025 Template Size]
+Sensor      | Fingerprint Template Size
+----------- | ---------------------------------
+[FPC 1145]  | [~48 KB][FPC 1145 Template Size]
+[FPC 1025]  | [~5 KB][FPC 1025 Template Size]
+[Elan 80SG] | [~19 KB][Elan 80SG Template Size]
 
 ### Determining Hardware {#chromeos-config-fingerprint}
 
@@ -657,6 +659,8 @@ that are connected via UART use [`cros_ec_uart.c`].
 [FPC 1025]: ../../driver/fingerprint/fpc/bep/fpc1025_private.h
 [FPC 1145 Template Size]: https://chromium.googlesource.com/chromiumos/platform/ec/+/127521b109be8aac352e80e319e46ed123360408/driver/fingerprint/fpc/libfp/fpc1145_private.h#46
 [FPC 1025 Template Size]: https://chromium.googlesource.com/chromiumos/platform/ec/+/127521b109be8aac352e80e319e46ed123360408/driver/fingerprint/fpc/bep/fpc1025_private.h#44
+[Elan 80SG Template Size]: https://chromium.googlesource.com/chromiumos/platform/ec/+/5b62e59cc5a1f50a2ae04d9f6eba49502dccfbf8/zephyr/subsys/fingerprint/alg/Kconfig#68
+[Elan 80SG]: ../../zephyr/drivers/fingerprint/fingerprint_elan80sg_config.h
 [Dragonclaw v4]: ./fingerprint-dev-for-partners.md#fpmcu-dev-board
 [Icetower v3]: ./fingerprint-dev-for-partners.md#fpmcu-dev-board
 [Quincy v3]: ./fingerprint-dev-for-partners.md#fpmcu-dev-board

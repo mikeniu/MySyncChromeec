@@ -103,6 +103,7 @@ def register_rtk59_project(
     project_name,
     extra_kconfig_base_files=(),
     extra_kconfig_proj_files=(),
+    extra_modules=(),
 ):
     """Register a realtek based variant of ocelot."""
     register_rtk_project(
@@ -122,7 +123,7 @@ def register_rtk59_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_proj_files,
         ],
-        modules=["cmsis_6", "ec"],
+        modules=["cmsis_6", "ec", *extra_modules],
     )
 
 
@@ -178,6 +179,7 @@ register_rtk59_project(
 
 register_rtk59_project(
     project_name="hekla",
+    extra_modules=["google-private", "pigweed", "nanopb"],
 )
 
 matsu = register_it8xxx2_project(

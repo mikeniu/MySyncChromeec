@@ -9,6 +9,10 @@
  * @param percent Brightness in percentage
  * @return EC_SUCCESS or EC_ERROR_*
  */
+
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_DISPLIGHT_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_DISPLIGHT_H_
+
 int displight_set(int percent);
 
 /**
@@ -17,3 +21,5 @@ int displight_set(int percent);
  * @return Brightness in percentage
  */
 int displight_get(void);
+
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_CROS_DISPLIGHT_H_ */

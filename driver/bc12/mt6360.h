@@ -3,7 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_MT6360_H
+#ifndef PLATFORM_EC_DRIVER_BC12_MT6360_H_
+#define PLATFORM_EC_DRIVER_BC12_MT6360_H_
 
 #include "bc12/mt6360_public.h"
 
@@ -91,4 +92,4 @@
 	(MT6360_BUCK_VOSEL_MIN + \
 	 MT6360_BUCK_VOSEL_STEP_MV * MT6360_BUCK_VOSEL_MAX_STEP)
 
-#endif /* __CROS_EC_MT6360_H */
+#endif /* PLATFORM_EC_DRIVER_BC12_MT6360_H_ */

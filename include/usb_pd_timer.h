@@ -5,8 +5,8 @@
 
 /* USB Power delivery module */
 
-#ifndef __CROS_EC_USB_PD_TIMER_H
-#define __CROS_EC_USB_PD_TIMER_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_TIMER_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_TIMER_H_
 
 #include "atomic.h"
 #include "atomic_bit.h"
@@ -388,4 +388,4 @@ extern ATOMIC_DEFINE(timer_disabled, PD_TIMER_COUNT *MAX_PD_PORTS);
 }
 #endif
 
-#endif /* __CROS_EC_USB_PD_TIMER_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_TIMER_H_ */

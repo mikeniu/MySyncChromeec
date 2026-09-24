@@ -5,8 +5,8 @@
  * Silicon Mitus SM5803 Buck-Boost Charger
  */
 
-#ifndef __CROS_EC_SM5803_H
-#define __CROS_EC_SM5803_H
+#ifndef PLATFORM_EC_DRIVER_CHARGER_SM5803_H_
+#define PLATFORM_EC_DRIVER_CHARGER_SM5803_H_
 
 #include "common.h"
 #include "usb_pd_tcpm.h"
@@ -556,4 +556,4 @@ sm5803_set_vbus_monitor_sel(int chgnum, enum sm5803_phot2_vbus_sel vbus_sel);
 enum ec_error_list
 sm5803_set_vsys_monitor_sel(int chgnum, enum sm5803_phot3_vbus_sel vsys_sel);
 enum ec_error_list sm5803_set_ibat_phot_sel(int chgnum, int ibat_sel);
-#endif
+#endif /* PLATFORM_EC_DRIVER_CHARGER_SM5803_H_ */

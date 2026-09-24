@@ -5,8 +5,8 @@
 
 /* Kionix Accelerometer driver for Chrome EC */
 
-#ifndef __CROS_EC_ACCEL_KIONIX_H
-#define __CROS_EC_ACCEL_KIONIX_H
+#ifndef PLATFORM_EC_DRIVER_ACCEL_KIONIX_H_
+#define PLATFORM_EC_DRIVER_ACCEL_KIONIX_H_
 
 #include "accelgyro.h"
 #include "common.h"
@@ -72,4 +72,4 @@ extern const struct accelgyro_drv kionix_accel_drv;
 extern struct i2c_stress_test_dev kionix_i2c_stress_test_dev;
 #endif
 
-#endif /* __CROS_EC_ACCEL_KIONIX_H */
+#endif /* PLATFORM_EC_DRIVER_ACCEL_KIONIX_H_ */

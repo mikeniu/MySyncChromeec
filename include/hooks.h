@@ -5,8 +5,8 @@
 
 /* System hooks for Chrome EC */
 
-#ifndef __CROS_EC_HOOKS_H
-#define __CROS_EC_HOOKS_H
+#ifndef PLATFORM_EC_INCLUDE_HOOKS_H_
+#define PLATFORM_EC_INCLUDE_HOOKS_H_
 
 #include "common.h"
 
@@ -428,4 +428,4 @@ int hook_call_deferred(const struct deferred_data *data, int us);
 	}
 #endif
 
-#endif /* __CROS_EC_HOOKS_H */
+#endif /* PLATFORM_EC_INCLUDE_HOOKS_H_ */

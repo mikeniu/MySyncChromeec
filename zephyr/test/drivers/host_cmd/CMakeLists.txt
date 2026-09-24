@@ -28,6 +28,7 @@ target_sources(app PRIVATE
     src/usb_pd_control.c
     src/usb_pd_host_cmd.c
     src/ap_hang_detect.c
+    src/ap_control.c
 )
 
 add_subdirectory(

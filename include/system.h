@@ -5,8 +5,8 @@
 
 /* System module for Chrome EC */
 
-#ifndef __CROS_EC_SYSTEM_H
-#define __CROS_EC_SYSTEM_H
+#ifndef PLATFORM_EC_INCLUDE_SYSTEM_H_
+#define PLATFORM_EC_INCLUDE_SYSTEM_H_
 
 #include "atomic.h"
 #include "common.h"
@@ -864,4 +864,4 @@ void system_compensate_rtc(void);
 }
 #endif
 
-#endif /* __CROS_EC_SYSTEM_H */
+#endif /* PLATFORM_EC_INCLUDE_SYSTEM_H_ */

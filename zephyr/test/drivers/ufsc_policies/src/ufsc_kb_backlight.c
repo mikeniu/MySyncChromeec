@@ -9,14 +9,12 @@
 #include "host_command.h"
 #include "keyboard_backlight.h"
 #include "system.h"
+#include "ufsc_policies_test.h"
 
 #include <zephyr/fff.h>
 #include <zephyr/ztest.h>
 
 #define VALUE_NODE_PRESENT DT_NODELABEL(ufsc_kb_backlight_present)
-
-/* Declare the function we want to mock from the CBI subsystem. */
-FAKE_VALUE_FUNC(bool, cros_cbi_ufsc_check_match, enum cbi_ufsc_value_id);
 
 static bool mock_ufsc_kb_backlight_present;
 
