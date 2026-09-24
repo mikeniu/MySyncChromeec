@@ -46,6 +46,30 @@
       },
       "revId": "5e81409afc4f3522d00cef9e60e497a5dcb839df",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49ef79d5_8bfeecc8",
+        "filename": "zephyr/program/bluey/meru/led_policy.dtsi",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-24T07:29:46Z",
+      "side": 1,
+      "message": "NIT: Maybe mention about this change in the commit message",
+      "parentUuid": "6ce824c4_df048cc7",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 53
+      },
+      "revId": "5e81409afc4f3522d00cef9e60e497a5dcb839df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
