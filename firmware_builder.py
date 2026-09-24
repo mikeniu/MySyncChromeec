@@ -1,4 +1,4 @@
-#!/usr/bin/env -S python3 -u
+#!/usr/bin/env vpython3
 # -*- coding: utf-8 -*-
 # Copyright 2020 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
@@ -17,14 +17,22 @@ import shutil
 import subprocess
 import sys
 
-# pylint: disable=import-error
+from firmware_builder_util import download_and_set_path
+from firmware_builder_util import is_inside_chroot
+from firmware_builder_util import PackageData
+from firmware_builder_util import setup_path
+
+# pylint: disable=import-error,wrong-import-order
 from google.protobuf import json_format
 from util.coreboot_sdk import init_toolchain
 
 # cros format puts this here
 import yaml  # pylint: disable=wrong-import-order
 
-# pylint: disable=wrong-import-order
+
+setup_path()
+
+# pylint: disable=wrong-import-order,wrong-import-position
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
 from chromite.lib.chromeos_version import VersionInfo
 import scripts.firmware_builder_lib
@@ -120,6 +128,84 @@ EXPECTED_UNUSED_BOARDS = {
 }
 
 
+INSTALL_PACKAGES_LIST = [
+    PackageData(
+        package_name="infra/3pp/tools/make/linux-amd64",
+        package_version="latest",
+        is_exec=True,
+    ),
+    PackageData(
+        package_name="experimental/pbusse_at_google.com/chromiumos/infra/tools/clang",
+        package_version="latest",
+        is_exec=True,
+    ),
+    PackageData(
+        package_name="experimental/pbusse_at_google.com/chromiumos/infra/tools/gcc",
+        package_version="latest",
+        is_exec=True,
+    ),
+    PackageData(
+        package_name="experimental/pbusse_at_google.com/chromiumos/infra/tools/openssl",
+        package_version="latest",
+        is_pkg_config=True,
+    ),
+    PackageData(
+        package_name="chromiumos/infra/tools/futility",
+        package_version="latest",
+        is_exec=True,
+    ),
+    PackageData(
+        package_name="infra/3pp/tools/protoc/linux-amd64",
+        package_version="latest",
+        is_exec=True,
+    ),
+    PackageData(
+        package_name="infra/3pp/tools/protobuf-cpp/linux-amd64",
+        package_version="latest",
+        is_pkg_config=True,
+    ),
+    PackageData(
+        package_name="chromiumos/infra/tools/zstd",
+        package_version="latest",
+        is_exec=True,
+    ),
+    PackageData(
+        package_name="infra/3pp/static_libs/bzip2/linux-amd64",
+        package_version="latest",
+        is_exec=True,
+    ),
+    PackageData(
+        package_name="infra/3pp/tools/cmake/linux-amd64",
+        package_version="latest",
+        is_exec=True,
+    ),
+    PackageData(
+        package_name="infra/3pp/tools/ninja/linux-amd64",
+        package_version="latest",
+        is_exec=True,
+    ),
+    PackageData(
+        package_name="experimental/pbusse_at_google.com/chromiumos/infra/tools/pkg-config",
+        package_version="latest",
+        is_exec=True,
+    ),
+    PackageData(
+        package_name="experimental/pbusse_at_google.com/chromiumos/infra/tools/lcov",
+        package_version="latest",
+        is_exec=True,
+    ),
+]
+
+
+def prepare_env():
+    """Prepares the environment for building and testing EC targets."""
+    env = os.environ.copy()
+    env.update(init_toolchain())
+    if not is_inside_chroot():
+        download_and_set_path(INSTALL_PACKAGES_LIST, env)
+    return env
+
+
 def build(opts):
     """Builds all EC firmware targets
 
@@ -131,8 +217,7 @@ def build(opts):
     message.
     """
     metric_list = firmware_pb2.FwBuildMetricList()  # pylint: disable=no-member
-    env = os.environ.copy()
-    env.update(init_toolchain())
+    env = prepare_env()
 
     if opts.code_coverage:
         print(
@@ -303,8 +388,7 @@ def bundle_firmware(opts):
     cmd = ["make", "print-all-baseboards", f"-j{opts.cpus}"]
     print(f"# Running {' '.join(cmd)}.")
     baseboards = {}
-    env = os.environ.copy()
-    env.update(init_toolchain())
+    env = prepare_env()
     for line in subprocess.run(
         cmd,
         cwd=os.path.dirname(__file__),
@@ -417,8 +501,7 @@ def test(opts):
     #
     # Otherwise, build the 'runtests' target, which verifies all
     # posix-based unit tests build and pass.
-    env = os.environ.copy()
-    env.update(init_toolchain())
+    env = prepare_env()
     target = "coverage" if opts.code_coverage else "runtests"
     cmd = ["make", target, f"-j{opts.cpus}"]
     print(f"# Running {' '.join(cmd)}.")
@@ -473,8 +556,7 @@ def check_inherits(opts):
     the boards and ec targets.
     """
 
-    env = os.environ.copy()
-    env.update(init_toolchain())
+    env = prepare_env()
     cmd = ["make", "print-boards", f"-j{opts.cpus}"]
     print(f"# Running {' '.join(cmd)}.")
     ec_boards = set()
