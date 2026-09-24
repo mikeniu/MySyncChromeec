@@ -6,7 +6,7 @@
 /* Keyboard scanner module for Chrome EC */
 
 #include "adc.h"
-#include "atomic_bit.h"
+#include "atomic.h"
 #include "battery.h"
 #include "chipset.h"
 #include "clock.h"

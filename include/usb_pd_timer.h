@@ -9,7 +9,6 @@
 #define PLATFORM_EC_INCLUDE_USB_PD_TIMER_H_
 
 #include "atomic.h"
-#include "atomic_bit.h"
 
 #include <stdbool.h>
 
