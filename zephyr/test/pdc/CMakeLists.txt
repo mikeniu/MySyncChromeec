@@ -90,6 +90,10 @@ if (DEFINED CONFIG_TEST_SUITE_PDC_RTS54XX)
 	target_sources(app PRIVATE src/rts54xx/rts54xx.c)
 endif()
 
+if (DEFINED CONFIG_TEST_SUITE_PDC_IT52XX)
+	target_sources(app PRIVATE src/it52xx/it52xx.c)
+endif()
+
 if (DEFINED CONFIG_TEST_SUITE_PDC_TPS6699X)
 	zephyr_include_directories(${PLATFORM_EC}/zephyr/drivers/usbc)
 	target_sources(app PRIVATE src/tps6699x/tps6699x.c)
