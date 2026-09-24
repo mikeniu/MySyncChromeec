@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68c3ab95_32b9d869",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-24T17:54:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n* **Functionality \u0026 Architecture \u0026 Component Fit:** The migration of ASCP claim is correct. However, for `fp_command_vendor`, modifying the macro to `EC_HOST_CMD_HANDLER_REQ_ONLY` introduces a functional misconfiguration because the handler populates `output_buf`, which a strictly request-only macro discourages or disallows (typically sizing the response buffer bounds to 0). This breaks the expected caller interface and must be corrected.\n* **Code Simplicity:** The old code was relocated mostly verbatim, which aligns with the Pure Move policy. A non-blocking inline snippet was provided for a follow-up CL to merge `ret` declaration and execution, and flatten control-flow branches.\n* **Idiomaticity \u0026 Readability:** Code matches C/EC ecosystem standards as written. \n* **Testing \u0026 Test Coverage:** No new logic was introduced; automated testing matches the previous implementation state.\n* **CL Size \u0026 Scope:** Size: S (+24, -21). The CL is atomic, correctly scoped, and adheres to the Single Logical Change rule.\n* **Commit Message:** Highly accurate, properly formatted (`BUG\u003db:...`, `TEST\u003d...`), and clearly states the *what* and *why* for this CL.\n\nPlease address the registration macro for `fp_command_vendor` so the handler can emit its payload properly. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8465043_30548198-9bcd-468f-b70d-31a73260838f.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4b9aed133042eb103ff47835040287c6d65ae61a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af856548_d169d539",
+        "filename": "common/fpsensor/fpsensor_vendor_command.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-24T17:54:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] 💡 **Suggestion for a follow-up CL (to keep this move CL pure):**\n\nSince this is a functionally pure migration, you can keep it verbatim for this CL. For a follow-up, consider narrowing the lexical scope of `ret` by merging its declaration with initialization, and flattening the control flow by removing the unnecessary `else` after the early `return`:\n\n```cpp\n\tint ret \u003d fp_vendor_command(params-\u003eparam1,\n\t\t\t\treinterpret_cast\u003cuint8_t *\u003e(args-\u003eoutput_buf),\n\t\t\t\targs-\u003eoutput_buf_max);\n\tif (ret \u003c 0) {\n\t\treturn EC_HOST_CMD_ERROR;\n\t}\n\t\n\tif (ret \u003e args-\u003eoutput_buf_max) {\n``` [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8465043_30548198-9bcd-468f-b70d-31a73260838f.pb)",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4b9aed133042eb103ff47835040287c6d65ae61a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3036909_c6ea7d62",
+        "filename": "common/fpsensor/fpsensor_vendor_command.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-24T17:54:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Architectural Mismatch / Functional Regression**\n\nThe `fp_command_vendor` handler populates `args-\u003eoutput_buf` and sets `args-\u003eoutput_buf_size` (indicating it returns a dynamically sized response). However, `EC_HOST_CMD_HANDLER_REQ_ONLY` declares to the upstream framework that this command only expects request data and has no response struct. In Zephyr limits, this may constrain the allocated maximum response buffer bound to `0`, leading to truncations or memory corruption when the handler writes to it (whereas the old `DECLARE_HOST_COMMAND` expanded to `EC_HOST_CMD_HANDLER_UNBOUND` which permitted dynamic responses).\n\nPlease use `EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_FP_VENDOR, fp_command_vendor, EC_VER_MASK(0))` or a similar appropriate macro that permits generating a response. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8465043_30548198-9bcd-468f-b70d-31a73260838f.pb)",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4b9aed133042eb103ff47835040287c6d65ae61a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
