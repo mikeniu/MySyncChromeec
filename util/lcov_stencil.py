@@ -14,9 +14,11 @@ https://github.com/linux-test-project/lcov/blob/master/bin/geninfo
 
 import argparse
 from collections import defaultdict
+import fnmatch
 import logging
+import re
 import sys
-from typing import Dict, Set
+from typing import Dict, List, Optional, Set
 
 
 def parse_args(argv=None):
@@ -40,6 +42,15 @@ def parse_args(argv=None):
         help="destination filename, defaults to stdout",
     )
     parser.add_argument(
+        "--exclude-pattern",
+        "--exclude",
+        "-r",
+        dest="exclude_patterns",
+        action="append",
+        default=[],
+        help="Glob pattern of files to exclude from coverage (like lcov -r)",
+    )
+    parser.add_argument(
         "template_file",
         help="lcov info file to use as template",
     )
@@ -51,7 +62,19 @@ def parse_args(argv=None):
     return parser.parse_args(argv)
 
 
-def parse_template_file(filename) -> Dict[str, Set[str]]:
+def compile_exclude_patterns(
+    patterns: List[str],
+) -> Optional[re.Pattern]:
+    """Compiles a list of glob patterns into a single regex."""
+    if not patterns:
+        return None
+    regexes = [fnmatch.translate(p) for p in patterns]
+    return re.compile("|".join(f"(?:{r})" for r in regexes))
+
+
+def parse_template_file(
+    filename: str, exclude_re: Optional[re.Pattern] = None
+) -> Dict[str, Set[str]]:
     """Reads the template file and returns covered lines.
 
     Reads the lines that indicate covered line numbers (FN, DA, and BRDA)
@@ -75,6 +98,13 @@ def parse_template_file(filename) -> Dict[str, Set[str]]:
             ):
                 pass
             elif line.startswith("SF:"):
+                file_path = line[3:]
+                if exclude_re and exclude_re.match(file_path):
+                    for skip_l in template_file:
+                        if skip_l.strip() == "end_of_record":
+                            break
+                    file_name = None
+                    continue
                 file_name = line
                 if file_name not in data_by_path:
                     data_by_path[file_name] = set()
@@ -212,7 +242,8 @@ def main(argv=None):
             opts.output_file, "w", encoding="utf-8"
         )
 
-    data_by_path = parse_template_file(opts.template_file)
+    exclude_re = compile_exclude_patterns(opts.exclude_patterns)
+    data_by_path = parse_template_file(opts.template_file, exclude_re)
     with output_file:
         for lcov_input in [opts.template_file] + opts.lcov_input:
             filter_coverage_file(lcov_input, output_file, data_by_path)

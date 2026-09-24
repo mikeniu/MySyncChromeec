@@ -158,15 +158,7 @@ $(BUILD)/zephyr/%_merged.info: $(BUILD)/zephyr/%/output/zephyr.info $(BUILD)/zep
 	--ignore-errors inconsistent,inconsistent --ignore-errors unused,unused --ignore-errors gcov,gcov \
 	-a $(BUILD)/zephyr/all_tests.info -a $<
 
-$(BUILD)/zephyr/%_stenciled.info: $(BUILD)/zephyr/%/output/zephyr.info $(BUILD)/zephyr/%_merged.info
-	$(PLATFORM_EC)/util/lcov_stencil.py -o $@ $^
-
-.PRECIOUS: $(BUILD)/zephyr/%_final.info
-$(BUILD)/zephyr/%_final.info: $(BUILD)/zephyr/%_stenciled.info
-	/usr/bin/lcov -o $@ --rc branch_coverage=1 --rc no_exception_branch=1 \
-	--ignore-errors inconsistent,inconsistent --ignore-errors unused,unused --ignore-errors gcov,gcov \
-	-r $< \
-	'$(PLATFORM_EC)/zephyr/drivers/cros_displight/*' \
+BOARD_EXCLUDE_PATTERNS='$(PLATFORM_EC)/zephyr/drivers/cros_displight/*' \
 	'$(PLATFORM_EC)/zephyr/drivers/cros_flash/*' \
 	'$(PLATFORM_EC)/zephyr/drivers/cros_kb_raw*' \
 	'$(PLATFORM_EC)/zephyr/drivers/cros_kblight/*' \
@@ -193,6 +185,18 @@ $(BUILD)/zephyr/%_final.info: $(BUILD)/zephyr/%_stenciled.info
 	'$(PLATFORM_EC)/zephyr/shim/core/**' \
 	'$(PLATFORM_EC)/driver/tcpm/it8xxx2.c' \
 	$(GENERATED_AND_SYSTEM_PATTERNS) $(TEST_PATTERNS)
+
+$(BUILD)/zephyr/%_stenciled.info: $(BUILD)/zephyr/%/output/zephyr.info $(BUILD)/zephyr/%_merged.info
+	$(PLATFORM_EC)/util/lcov_stencil.py \
+	$(foreach p, $(BOARD_EXCLUDE_PATTERNS), --exclude-pattern $(p)) \
+	-o $@ $^
+
+.PRECIOUS: $(BUILD)/zephyr/%_final.info
+$(BUILD)/zephyr/%_final.info: $(BUILD)/zephyr/%_stenciled.info
+	/usr/bin/lcov -o $@ --rc branch_coverage=1 --rc no_exception_branch=1 \
+	--ignore-errors inconsistent,inconsistent --ignore-errors unused,unused --ignore-errors gcov,gcov \
+	-r $< \
+	$(BOARD_EXCLUDE_PATTERNS)
 
 .PRECIOUS: $(BUILD)/zephyr/%_rpt
 $(BUILD)/zephyr/%_rpt: $(BUILD)/zephyr/%_final.info

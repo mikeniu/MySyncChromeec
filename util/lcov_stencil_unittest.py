@@ -135,6 +135,77 @@ class TestLcovStencil(unittest.TestCase):
             lcov_stencil.filter_coverage_file(f.name, out, template_data)
             self.assertEqual(out.getvalue(), "")
 
+    def test_compile_exclude_patterns(self):
+        """Tests compiling glob patterns into regex."""
+        self.assertIsNone(lcov_stencil.compile_exclude_patterns([]))
+        exclude_re = lcov_stencil.compile_exclude_patterns(
+            ["*/drivers/*", "**/mock/**"]
+        )
+        self.assertIsNotNone(exclude_re)
+        self.assertTrue(exclude_re.match("/path/drivers/cros_rtc.c"))
+        self.assertTrue(exclude_re.match("/path/test/mock/test.c"))
+        self.assertFalse(exclude_re.match("/path/common/main.c"))
+
+    def test_parse_template_file_with_exclude(self):
+        """Tests that excluded files are omitted from template parsing."""
+        template_content = (
+            "SF:/ec/common/main.c\n"
+            "DA:10,1\n"
+            "end_of_record\n"
+            "SF:/ec/zephyr/drivers/cros_rtc.c\n"
+            "DA:20,1\n"
+            "end_of_record\n"
+        )
+        exclude_re = lcov_stencil.compile_exclude_patterns(["*/drivers/*"])
+        with tempfile.NamedTemporaryFile("w+", encoding="utf-8") as f:
+            f.write(template_content)
+            f.flush()
+            result = lcov_stencil.parse_template_file(f.name, exclude_re)
+
+        self.assertIn("SF:/ec/common/main.c", result)
+        self.assertNotIn("SF:/ec/zephyr/drivers/cros_rtc.c", result)
+
+    def test_main_with_exclude_patterns(self):
+        """Tests CLI execution with --exclude-pattern."""
+        template_content = (
+            "SF:/ec/common/main.c\n"
+            "DA:10,1\n"
+            "end_of_record\n"
+            "SF:/ec/zephyr/drivers/cros_rtc.c\n"
+            "DA:20,1\n"
+            "end_of_record\n"
+        )
+        coverage_content = (
+            "SF:/ec/common/main.c\n"
+            "DA:10,5\n"
+            "end_of_record\n"
+            "SF:/ec/zephyr/drivers/cros_rtc.c\n"
+            "DA:20,3\n"
+            "end_of_record\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            template_path = Path(tmpdir) / "template.info"
+            cov_path = Path(tmpdir) / "cov.info"
+            out_path = Path(tmpdir) / "out.info"
+
+            template_path.write_text(template_content, encoding="utf-8")
+            cov_path.write_text(coverage_content, encoding="utf-8")
+
+            lcov_stencil.main(
+                [
+                    "--exclude-pattern",
+                    "*/drivers/*",
+                    "-o",
+                    str(out_path),
+                    str(template_path),
+                    str(cov_path),
+                ]
+            )
+
+            result = out_path.read_text(encoding="utf-8")
+            self.assertIn("/ec/common/main.c", result)
+            self.assertNotIn("/ec/zephyr/drivers/cros_rtc.c", result)
+
 
 if __name__ == "__main__":
     unittest.main()
