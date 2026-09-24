@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58b64caf_369b784f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-24T18:34:19Z",
+      "side": 1,
+      "message": "Code changes LGTM, but note that zephyr/Makefile.cq (EC_LEGACY_TESTS in firmware-zephyr-cov-cq) still runs \u0027make test-coverage BOARD\u003dhost\u0027, which compiles common/usbc/usb_pd_timer.c (usb_tcpmv2_compliance) without CONFIG_ZEPHYR (core/host/atomic.h lacks ATOMIC_DEFINE / atomic_*_bit). Please rebase on top of https://crrev.com/c/8274396 (or add Cq-Depend: chromium:8274396) so firmware-zephyr-cov-cq passes.",
+      "isAi": true,
+      "revId": "bfa35341f174763bda6232cf1e042bedc9708202",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
