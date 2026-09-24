@@ -6,6 +6,7 @@
 /* ITE IT52XX Power Delivery Controller emulator. */
 
 #include "drivers/pdc.h"
+#include "drivers/ucsi_v3.h"
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_ite_it52xx.h"
 #include "emul/emul_pdc.h"
@@ -18,7 +19,9 @@
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/drivers/i2c.h>
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
 #define DT_DRV_COMPAT ite_it52xx_pdc
@@ -26,6 +29,11 @@
 #define LOG_LEVEL CONFIG_I2C_LOG_LEVEL
 LOG_MODULE_REGISTER(ite_it52xx_emul);
 
+/* Test-only driver helper, matching the RTK/TI emulator cache-reset behavior.
+ */
+void pdc_it52xx_test_invalidate_chip_info(const struct device *dev);
+
+/* IT52XX SMBus commands */
 #define IT52XX_CMD_CCI 0x80
 #define IT52XX_CMD_CONTROL 0x81
 /* Message response from the IT52XX emulator to the EC */
@@ -33,18 +41,54 @@ LOG_MODULE_REGISTER(ite_it52xx_emul);
 #define IT52XX_CMD_CLEAR_ALERT 0xbc
 #define IT52XX_CMD_GET_ALERT 0xbd
 
+/* Include SMBus command, byte count, UCSI command, UCSI data length */
+#define IT52XX_CONTROL_MIN_LENGTH 4
+/* Include IT52XX_CONTROL_MIN_LENGTH + UCSI command-specific max 6 bytes */
+#define IT52XX_CONTROL_MAX_LENGTH 10
+/* Include a one-byte count and four bytes of data */
 #define IT52XX_CCI_LENGTH 5
+#define IT52XX_GET_PDC_INFO_LENGTH 29
+#define IT52XX_ALERT_UCSI BIT(1)
+
+/* UCSI commands supported by the emulator. */
+#define IT52XX_UCSI_PPM_RESET 0x01
+#define IT52XX_UCSI_ACK_CC_CI 0x04
+#define IT52XX_UCSI_SET_NOTIFICATION_ENABLE 0x05
+#define IT52XX_UCSI_VENDOR_DEFINED 0x20
+
+#define IT52XX_VENDOR_ID 0x048d
+#define IT52XX_NOTIFICATION_ENABLE_MASK GENMASK(16, 0)
+
+/* States of the emulated IT5271 LPM UCSI command interface */
+enum it52xx_emul_lpm_state {
+	/* State before notification enabled */
+	IT52XX_EMUL_LPM_IDLE_0,
+	/* State after notification enabled */
+	IT52XX_EMUL_LPM_IDLE_1,
+	IT52XX_EMUL_LPM_WAIT_CMD_ACK,
+	IT52XX_EMUL_LPM_WAIT_ASYNC_EVENT_ACK,
+};
 
 struct it52xx_emul_data {
 	struct i2c_common_emul_data common;
 	struct gpio_dt_spec irq_gpio;
+
 	uint8_t request[PDC_MAX_DATA_LENGTH];
 	size_t request_length;
 	uint8_t alert_status;
 	uint8_t cci[IT52XX_CCI_LENGTH];
-	uint8_t msgin[PDC_MAX_DATA_LENGTH];
+	uint8_t msgin[IT52XX_GET_PDC_INFO_LENGTH + 1];
 	size_t msgin_length;
+
+	enum it52xx_emul_lpm_state lpm_state;
+	bool ppm_reset_seen;
+	bool notification_enable_seen;
+	bool get_pdc_info_seen;
+	union notification_enable_t notification_enable;
+	struct pdc_info_t info;
 };
+
+static int it52xx_emul_process_control(struct it52xx_emul_data *data);
 
 static struct it52xx_emul_data *it52xx_emul_get_data(const struct emul *emul)
 {
@@ -126,8 +170,7 @@ static int it52xx_emul_finish_write(const struct emul *emul, int reg, int bytes)
 
 	switch (reg) {
 	case IT52XX_CMD_CONTROL:
-		/* Command handling is added with individual command support. */
-		return 0;
+		return it52xx_emul_process_control(data);
 	case IT52XX_CMD_CLEAR_ALERT:
 		if (data->request_length != 2) {
 			return -EINVAL;
@@ -256,6 +299,212 @@ static int it52xx_emul_access_reg(const struct emul *emul, int reg, int bytes,
 	return reg;
 }
 
+static int it52xx_emul_set_cci(struct it52xx_emul_data *data,
+			       union cci_event_t cci, const uint8_t *payload,
+			       size_t payload_length)
+{
+	if (payload_length > IT52XX_GET_PDC_INFO_LENGTH) {
+		return -EINVAL;
+	}
+
+	/* Fillup [CCI] messages */
+	memset(data->cci, 0, sizeof(data->cci));
+	data->cci[0] = IT52XX_CCI_LENGTH - 1;
+	cci.data_len = payload_length;
+	sys_put_le32(cci.raw_value, &data->cci[1]);
+
+	/* Fillup [MSGIN] messages */
+	memset(data->msgin, 0, sizeof(data->msgin));
+	data->msgin[0] = payload_length;
+	if (payload_length > 0) {
+		memcpy(&data->msgin[1], payload, payload_length);
+	}
+	data->msgin_length = payload_length + 1;
+
+	/* Assert the UCSI alert to notify the EC */
+	data->alert_status |= IT52XX_ALERT_UCSI;
+	return it52xx_emul_set_irq(data, true);
+}
+
+static int it52xx_emul_send_command_result(struct it52xx_emul_data *data,
+					   union cci_event_t cci,
+					   const uint8_t *payload,
+					   size_t payload_length)
+{
+	enum it52xx_emul_lpm_state previous_state = data->lpm_state;
+	int rv;
+
+	data->lpm_state = IT52XX_EMUL_LPM_WAIT_CMD_ACK;
+	rv = it52xx_emul_set_cci(data, cci, payload, payload_length);
+	if (rv != 0) {
+		data->lpm_state = previous_state;
+	}
+
+	return rv;
+}
+
+static int it52xx_emul_ppm_reset(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = { .reset_completed = 1 };
+
+	data->notification_enable.raw_value = 0;
+	data->lpm_state = IT52XX_EMUL_LPM_IDLE_0;
+	data->ppm_reset_seen = true;
+	data->notification_enable_seen = false;
+	data->get_pdc_info_seen = false;
+
+	return it52xx_emul_set_cci(data, cci, NULL, 0);
+}
+
+static int it52xx_emul_set_notification_enable(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = { .command_completed = 1 };
+	int rv;
+
+	/* IT52XX implements the UCSI 2.1/3.0 notification bits 0 through 16. */
+	data->notification_enable.raw_value = data->request[4] |
+					      (data->request[5] << 8) |
+					      (data->request[6] << 16);
+	data->notification_enable.raw_value &= IT52XX_NOTIFICATION_ENABLE_MASK;
+	if (data->notification_enable.raw_value != 0) {
+		data->notification_enable.command_completed = 1;
+	}
+
+	rv = it52xx_emul_send_command_result(data, cci, NULL, 0);
+	if (rv == 0) {
+		data->notification_enable_seen = true;
+	}
+
+	return rv;
+}
+
+static void it52xx_emul_build_info_response(struct it52xx_emul_data *data,
+					    uint8_t *response)
+{
+	response[0] = data->info.vid;
+	response[1] = data->info.vid >> 8;
+	response[2] = data->info.pid;
+	response[3] = data->info.pid >> 8;
+
+	/* The IT52XX response carries firmware version as little endian. */
+	response[4] = PDC_FWVER_GET_MINOR(data->info.fw_version);
+	response[5] = PDC_FWVER_GET_MAJOR(data->info.fw_version);
+	response[6] = PDC_FWVER_GET_PATCH(data->info.fw_version);
+	response[7] = 0;
+
+	response[8] = data->info.pd_revision;
+	response[9] = data->info.pd_revision >> 8;
+	response[10] = data->info.pd_version;
+	response[11] = data->info.pd_version >> 8;
+	response[12] = data->info.is_running_flash_code;
+	response[13] = data->info.running_in_flash_bank;
+	memcpy(&response[14], data->info.project_name,
+	       sizeof(data->info.project_name));
+	response[27] = data->info.extra;
+	response[28] = data->info.extra >> 8;
+}
+
+static int it52xx_emul_get_pdc_info(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = {
+		.vendor_defined_indicator = 1,
+		.command_completed = 1,
+	};
+	uint8_t response[IT52XX_GET_PDC_INFO_LENGTH] = { 0 };
+	uint8_t connector = data->request[4] & 0x7f;
+	uint8_t vendor_command = ((data->request[5] & 0x0f) << 1) |
+				 (data->request[4] >> 7);
+	int rv;
+
+	if (connector != 1 || vendor_command != 0) {
+		return -EINVAL;
+	}
+
+	it52xx_emul_build_info_response(data, response);
+	rv = it52xx_emul_send_command_result(data, cci, response,
+					     sizeof(response));
+	if (rv == 0) {
+		data->get_pdc_info_seen = true;
+	}
+
+	return rv;
+}
+
+static int it52xx_emul_ack_cc_ci(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = { .acknowledge_command = 1 };
+	enum it52xx_emul_lpm_state previous_state = data->lpm_state;
+	int rv;
+
+	if (data->lpm_state != IT52XX_EMUL_LPM_WAIT_CMD_ACK &&
+	    data->lpm_state != IT52XX_EMUL_LPM_WAIT_ASYNC_EVENT_ACK &&
+	    data->lpm_state != IT52XX_EMUL_LPM_IDLE_1) {
+		return -EINVAL;
+	}
+
+	data->lpm_state = IT52XX_EMUL_LPM_IDLE_1;
+	rv = it52xx_emul_set_cci(data, cci, NULL, 0);
+	if (rv != 0) {
+		data->lpm_state = previous_state;
+	}
+
+	return rv;
+}
+
+static int it52xx_emul_process_idle_1(struct it52xx_emul_data *data,
+				      uint8_t command)
+{
+	switch (command) {
+	case IT52XX_UCSI_SET_NOTIFICATION_ENABLE:
+		return it52xx_emul_set_notification_enable(data);
+	case IT52XX_UCSI_ACK_CC_CI:
+		return it52xx_emul_ack_cc_ci(data);
+	case IT52XX_UCSI_VENDOR_DEFINED:
+		return it52xx_emul_get_pdc_info(data);
+	default:
+		return -EINVAL;
+	}
+}
+
+static int it52xx_emul_process_control(struct it52xx_emul_data *data)
+{
+	/* Validate the [CTRL] message length and fields */
+	if (data->request_length < IT52XX_CONTROL_MIN_LENGTH ||
+	    data->request_length > IT52XX_CONTROL_MAX_LENGTH ||
+	    data->request[1] != data->request_length - 2 ||
+	    data->request[3] != 0) {
+		return -EINVAL;
+	}
+
+	uint8_t command = data->request[2];
+
+	/* IT5271 accepts PPM_RESET in every PPM state. */
+	if (command == IT52XX_UCSI_PPM_RESET) {
+		return it52xx_emul_ppm_reset(data);
+	}
+
+	switch (data->lpm_state) {
+	case IT52XX_EMUL_LPM_IDLE_0:
+		if (command == IT52XX_UCSI_SET_NOTIFICATION_ENABLE) {
+			return it52xx_emul_set_notification_enable(data);
+		}
+		/* IT5271 ignores other commands until notifications are set. */
+		return 0;
+	case IT52XX_EMUL_LPM_IDLE_1:
+		return it52xx_emul_process_idle_1(data, command);
+	case IT52XX_EMUL_LPM_WAIT_CMD_ACK:
+	case IT52XX_EMUL_LPM_WAIT_ASYNC_EVENT_ACK:
+		if (command == IT52XX_UCSI_ACK_CC_CI) {
+			return it52xx_emul_ack_cc_ci(data);
+		}
+		/* IT5271 waits for ACK_CC_CI before accepting another command.
+		 */
+		return 0;
+	}
+
+	return -EINVAL;
+}
+
 /* API functions */
 static void it52xx_emul_reset_data(struct it52xx_emul_data *data)
 {
@@ -264,6 +513,11 @@ static void it52xx_emul_reset_data(struct it52xx_emul_data *data)
 	memset(data->cci, 0, sizeof(data->cci));
 	memset(data->msgin, 0, sizeof(data->msgin));
 	data->msgin_length = 0;
+	data->notification_enable.raw_value = 0;
+	data->lpm_state = IT52XX_EMUL_LPM_IDLE_0;
+	data->ppm_reset_seen = false;
+	data->notification_enable_seen = false;
+	data->get_pdc_info_seen = false;
 }
 
 static int emul_it52xx_reset(const struct emul *emul)
@@ -273,6 +527,77 @@ static int emul_it52xx_reset(const struct emul *emul)
 	it52xx_emul_reset_data(data);
 
 	return it52xx_emul_set_irq(data, false);
+}
+
+static int emul_it52xx_set_info(const struct emul *emul,
+				const struct pdc_info_t *info)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (info == NULL) {
+		/* NULL invalidates the driver cache, not the emulated PDC info.
+		 */
+		pdc_it52xx_test_invalidate_chip_info(emul->dev);
+		return 0;
+	}
+
+	data->info = *info;
+	return 0;
+}
+
+static int emul_it52xx_idle_wait(const struct emul *emul)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	for (int i = 0; i < 200; ++i) {
+		bool emulator_idle;
+
+		i2c_common_emul_lock_data(&data->common, K_FOREVER);
+		emulator_idle = data->lpm_state == IT52XX_EMUL_LPM_IDLE_1 &&
+				data->alert_status == 0;
+		i2c_common_emul_unlock_data(&data->common);
+
+		if (emulator_idle) {
+			return 0;
+		}
+
+		k_msleep(10);
+	}
+
+	return -ETIMEDOUT;
+}
+
+/* Unit test functions */
+bool emul_it52xx_init_complete(const struct emul *emul)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+	bool complete;
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	/* Check whether the driver completed the initialization flow */
+	complete = data->lpm_state == IT52XX_EMUL_LPM_IDLE_1 &&
+		   data->ppm_reset_seen && data->notification_enable_seen &&
+		   data->get_pdc_info_seen;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return complete;
+}
+
+int emul_it52xx_get_notification_enable(
+	const struct emul *emul, union notification_enable_t *notifications)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (notifications == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	/* Return the notification mask received during initialization */
+	*notifications = data->notification_enable;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
 }
 
 /* Device instantiation */
@@ -298,6 +623,17 @@ static int it52xx_emul_init(const struct emul *emul,
 	data->common.cfg = cfg;
 	i2c_common_emul_init(&data->common);
 
+	data->info = (struct pdc_info_t){
+		.fw_version = 0x010200,
+		.pd_revision = 0x0302,
+		.pd_version = 0x0101,
+		.vid = IT52XX_VENDOR_ID,
+		.pid = 0x5271,
+		.is_running_flash_code = 1,
+		.running_in_flash_bank = 1,
+		.project_name = "GOOGLE",
+	};
+
 	/*
 	 * The PDC driver has not configured the IRQ GPIO as an input yet.
 	 * Calling gpio_emul_input_set() here would return -EINVAL. The IRQ GPIO
@@ -310,6 +646,8 @@ static int it52xx_emul_init(const struct emul *emul,
 
 static DEVICE_API(emul_pdc, emul_it52xx_api) = {
 	.reset = emul_it52xx_reset,
+	.set_info = emul_it52xx_set_info,
+	.idle_wait = emul_it52xx_idle_wait,
 };
 
 #define IT52XX_EMUL_DEFINE(inst)                                              \
