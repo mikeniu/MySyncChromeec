@@ -144,9 +144,11 @@ To run host-based emulation tests using Zephyr's Twister inside the container:
 
 #### 2. Real Device Testing on Dagwood (using Helper Script)
 To run tests against a Dagwood board and EC Add-in-card (AIC) connected to the
-host, you can use the `run_dagwood_tests.py` helper script. It automatically
-handles device forwarding and configures twister with the required parameters
-(toolchain, flash command, etc.).
+host, you can use the `run_dagwood_tests.py` helper script. It starts the
+container with access to the host's USB devices and serial ports, then passes
+its arguments to `./dagwood` in `workspace/src/platform/ec`. That launcher
+locates the Dagwood board and its EC serial port and invokes twister with the
+required parameters (toolchain, flash command, etc.).
 
 Test results are available on your host filesystem at
 `workspace/src/platform/ec/twister-out/`.
