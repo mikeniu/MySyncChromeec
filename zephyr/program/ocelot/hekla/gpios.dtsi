@@ -48,7 +48,7 @@
 		};
 		/* EC_RTC_RST */
 		gpio_ec_soc_rtcrst: ec_soc_rtcrst {
-			gpios = <RTS5912_GPIO061 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+			gpios = <RTS5912_GPIO109 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		/* EN_S5_RAILS */
 		gpio_en_s5_rails: en_s5_rails {
@@ -112,7 +112,7 @@
 		};
 		/* EC_A13 */
 		gpio_ec_soc_int_odl: ec_soc_int_odl {
-			gpios = <RTS5912_GPIO094 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
+			gpios = <RTS5912_GPIO107 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
 			enum-name = "GPIO_EC_INT_L";
 		};
 		/* EC_N4 SOC_WAKE_ODL
@@ -197,7 +197,7 @@
 		};
 		/* EC_CAMERA_FW_SHUT_CTRL */
 		gpio_ec_camera_fw_shut_ctrl: ec_camera_fw_shut_ctrl {
-			gpios = <RTS5912_GPIO040 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_LOW)>;
+			gpios = <RTS5912_GPIO022 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_LOW)>;
 		};
 	};
 
@@ -213,9 +213,7 @@
 			<RTS5912_GPIO128 0>,	/* EC_F1 */
 			<RTS5912_GPIO130 0>,	/* SPI_FLASH2_HOLD_R */
 			<RTS5912_GPIO111 0>,	/* EC_FLASH_SPI_CLK */
-			<RTS5912_GPIO107 0>,	/* EC_FLASH_SPI_CS_N */
 			<RTS5912_GPIO108 0>,	/* EC_STRAP0 EC_FLASH_SPI_MOSI_R */
-			<RTS5912_GPIO109 0>,	/* EC_FLASH_SPI_MISO */
 			<RTS5912_GPIO015 0>,	/* EC_LPBH */
 			<RTS5912_GPIO086 0>,	/* EC_C13 */
 			<RTS5912_GPIO092 0>,	/* D_DOOR_SW */
@@ -227,6 +225,7 @@
 			<RTS5912_GPIO084 0>,	/* EC_CATERR */
 			<RTS5912_GPIO027 0>,	/* EC_LED_BAT_CHG */
 			<RTS5912_GPIO031 0>,	/* EC_LED_BAT_FULL */
-			<RTS5912_GPIO022 0>;	/* EC_PWRBTN_LED_CTRL */
+			<RTS5912_GPIO094 0>,	/* EC_A13 */
+			<RTS5912_GPIO040 0>;	/* EC_N8 */
 	};
 };
