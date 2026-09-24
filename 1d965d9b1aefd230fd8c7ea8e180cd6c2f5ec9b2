@@ -96,6 +96,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "efa3092f_86c9d3b5",
+        "filename": "zephyr/test/pdc/src/tps6699x/tps6699x.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 927,
+      "author": {
+        "id": 1501901
+      },
+      "writtenOn": "2026-09-24T01:15:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d3c3516_f76337c4",
+      "range": {
+        "startLine": 904,
+        "startChar": 0,
+        "endLine": 927,
+        "endChar": 60
+      },
+      "revId": "1d965d9b1aefd230fd8c7ea8e180cd6c2f5ec9b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad299c2e_4ad3ffd2",
