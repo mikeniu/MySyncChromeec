@@ -7,10 +7,11 @@
 
 #include <cros/integrated_fwid.dtsi>
 
-/* ocelotrvp-ite project DTS includes */
+/* coolum project DTS includes */
 
 #include "binman.dtsi"
 #include "generated.dtsi"
+#include "interrupt.dtsi"
 #include "power_signals.dtsi"
 
 /*
@@ -20,19 +21,14 @@
 i2c_port_pd1: &i2c1 {};
 i2c_port_pd2: &i2c3 {};
 i2c_port_charger: &i2c4 {};
-i2c_port_ish: &i2c5 {};
 
 /*
  * Map GPIOs used for interrupts to common names
  */
 
 gpio_acok: &gpio_acok_od {};
-gpio_dc_jack_present: &gpio_std_adp_prsnt_r {};
 gpio_lid: &gpio_lid_open {};
 gpio_pwrbtn: &gpio_gsc_ec_pwr_btn_odl {};
-gpio_voldn: &gpio_ec_voldn_btn_odl {};
-gpio_volup: &gpio_ec_volup_btn_odl {};
-gpio_fan_control: &gpio_ec_fan_pwr_disable_n_r {};
 gpio_all_sys_pwr_good: &gpio_all_sys_pwrgd_r {};
 gpio_temp_sensor_power_good: &gpio_en_s5_rails {};
 
@@ -45,20 +41,13 @@ tach_fan0: &tach0 {};
 #include "../ite_hibernate.dtsi"
 #include "../rvp_usba.dtsi"
 #include "../rvp_battery.dtsi"
-#include "../rvp_i2c.dtsi"
-#include "../rvp_interrupts.dtsi"
-#include "../rvp_usbc.dtsi"
 #include "../rvp_keyboard.dtsi"
-#include "../rvp_leds.dtsi"
-#include "../rvp_fans.dtsi"
 #include "../rvp_temp_sensors.dtsi"
-#include "../rvp_ioex_gpio.dtsi"
-#include "../rvp_imvp.dtsi"
-#include <ite/it8801-common-cfg.dtsi>
 
-&it8801_mfd {
-        irq-gpios = <&gpioi 6 GPIO_ACTIVE_LOW>;
-};
+
+#include "i2c.dtsi"
+#include "imvp.dtsi"
+#include "usbc.dtsi"
 
 /* ocelotrvp-ite overrides follow... */
 / {
@@ -109,38 +98,11 @@ tach_fan0: &tach0 {};
 
 /* Update board-specific references  */
 
-&pdc_rtk_c0 {
-	irq-gpios = <&gpiof 5 GPIO_ACTIVE_LOW>;
-};
-
-&pdc_rtk_c1 {
-	irq-gpios = <&gpiof 5 GPIO_ACTIVE_LOW>;
-};
-
-&pdc_ti_c0 {
-	irq-gpios = <&gpiof 5 GPIO_ACTIVE_LOW>;
-};
-
-&pdc_ti_c1 {
-	irq-gpios = <&gpiof 5 GPIO_ACTIVE_LOW>;
-};
-
-&fan0 {
-	pwms = <&pwm5 PWM_CHANNEL_5 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
-};
-
 &kblight {
 	pwms = <&pwm1 PWM_CHANNEL_1 PWM_HZ(324) PWM_POLARITY_NORMAL>;
-};
-
-&dsp_service {
-	int-gpios = <&gpioh 6 (GPIO_ACTIVE_LOW |
-				GPIO_VOLTAGE_1P8 |
-				GPIO_OPEN_DRAIN)>;
 };
 
 &imvp_rt3645 {
 	enable-gpios = <&gpioi 7 GPIO_ACTIVE_HIGH>;
 };
 
-/delete-node/ &rvp_board_id;
