@@ -74,6 +74,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "55613396_632ea9fe",
+        "filename": "common/charge_control.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-09-24T04:19:35Z",
+      "side": 1,
+      "message": "i think there\u0027s one more case to consider:\nif the BBRAM hasn\u0027t been initialized (i.e. CRC mismatch),\nit\u0027ll be zero\u0027d out on init and these values won\u0027t be valid.\nwhat\u0027s the appropriate handling of `raw_flag` \u003d\u003d 0?",
+      "range": {
+        "startLine": 41,
+        "startChar": 13,
+        "endLine": 41,
+        "endChar": 22
+      },
+      "revId": "29876c6f26acce268738f6c93018da53f36f8a7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4d0f7d83_a4e40e11",
         "filename": "common/charge_control.c",
         "patchSetId": 5
