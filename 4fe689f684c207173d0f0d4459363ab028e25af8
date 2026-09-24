@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1eae2e9_48411547",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-09-24T05:46:46Z",
+      "side": 1,
+      "message": "Please add that this change is for the track pad power on sequence.",
+      "revId": "4fe689f684c207173d0f0d4459363ab028e25af8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
