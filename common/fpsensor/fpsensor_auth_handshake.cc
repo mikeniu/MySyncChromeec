@@ -38,46 +38,48 @@ enum ec_error_list check_context_cleared()
 	return EC_SUCCESS;
 }
 
-static enum ec_status
-fp_command_establish_pairing_key_keygen(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_establish_pairing_key_keygen(struct ec_host_cmd_handler_args *args)
 {
 	auto *r = static_cast<ec_response_fp_establish_pairing_key_keygen *>(
-		args->response);
+		args->output_buf);
 
 	ScopedFastCpu fast_cpu;
 
 	ecdh_key = generate_elliptic_curve_key();
 	if (ecdh_key == nullptr) {
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
 	std::optional<fp_elliptic_curve_public_key> pubkey =
 		create_pubkey_from_ec_key(*ecdh_key);
 	if (!pubkey.has_value()) {
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
 	r->pubkey = pubkey.value();
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_ESTABLISH_PAIRING_KEY_KEYGEN,
-		     fp_command_establish_pairing_key_keygen, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(
+	EC_CMD_FP_ESTABLISH_PAIRING_KEY_KEYGEN,
+	fp_command_establish_pairing_key_keygen, EC_VER_MASK(0),
+	struct ec_response_fp_establish_pairing_key_keygen);
 
-static enum ec_status
-fp_command_establish_pairing_key_wrap(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_establish_pairing_key_wrap(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params =
 		static_cast<const ec_params_fp_establish_pairing_key_wrap *>(
-			args->params);
+			args->input_buf);
 	auto *r = static_cast<ec_response_fp_establish_pairing_key_wrap *>(
-		args->response);
+		args->output_buf);
 
 	CleanseWrapper<std::array<uint8_t, FP_PAIRING_KEY_LEN> > new_pairing_key;
 
 	if (ecdh_key == nullptr) {
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
 	ScopedFastCpu fast_cpu;
@@ -85,7 +87,7 @@ fp_command_establish_pairing_key_wrap(struct host_cmd_handler_args *args)
 	bssl::UniquePtr<EC_KEY> public_key =
 		create_ec_key_from_pubkey(params->peers_pubkey);
 	if (public_key == nullptr) {
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
 	/*
@@ -96,7 +98,7 @@ fp_command_establish_pairing_key_wrap(struct host_cmd_handler_args *args)
 	enum ec_error_list ret = generate_ecdh_shared_secret_without_kdf(
 		*ecdh_key, *public_key, new_pairing_key);
 	if (ret != EC_SUCCESS) {
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
 	ret = encrypt_pairing_key(FP_AES_KEY_ENC_METADATA_VERSION,
@@ -104,17 +106,19 @@ fp_command_establish_pairing_key_wrap(struct host_cmd_handler_args *args)
 				  new_pairing_key,
 				  r->encrypted_pairing_key.data);
 	if (ret != EC_SUCCESS) {
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
 	/* Deallocate the FPMCU's ECDH private key. */
 	ecdh_key = nullptr;
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_ESTABLISH_PAIRING_KEY_WRAP,
-		     fp_command_establish_pairing_key_wrap, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_FP_ESTABLISH_PAIRING_KEY_WRAP,
+		    fp_command_establish_pairing_key_wrap, EC_VER_MASK(0),
+		    struct ec_params_fp_establish_pairing_key_wrap,
+		    struct ec_response_fp_establish_pairing_key_wrap);
 
 /*
  * DESIGN NOTE:
@@ -135,11 +139,11 @@ DECLARE_HOST_COMMAND(EC_CMD_FP_ESTABLISH_PAIRING_KEY_WRAP,
  * to the host OS, re-establishing a local session domain does not grant
  * additional capabilities or alter the threat model boundary.
  */
-static enum ec_status
-fp_command_load_pairing_key(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+fp_command_load_pairing_key(struct ec_host_cmd_handler_args *args)
 {
 	const auto *params = static_cast<const ec_params_fp_load_pairing_key *>(
-		args->params);
+		args->input_buf);
 
 	ScopedFastCpu fast_cpu;
 
@@ -148,13 +152,14 @@ fp_command_load_pairing_key(struct host_cmd_handler_args *args)
 		params->encrypted_pairing_key.data, pairing_key);
 	if (ret != EC_SUCCESS) {
 		CPRINTS("load_pairing_key: Failed to decrypt pairing key");
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_LOAD_PAIRING_KEY, fp_command_load_pairing_key,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FP_LOAD_PAIRING_KEY,
+			     fp_command_load_pairing_key, EC_VER_MASK(0),
+			     ec_params_fp_load_pairing_key);
 
 enum ec_error_list generate_session_key_with_context(
 	std::span<const uint8_t, FP_CK_SESSION_NONCE_LEN> fpmcu_nonce,
