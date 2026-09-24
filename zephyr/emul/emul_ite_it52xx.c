@@ -87,9 +87,17 @@ struct it52xx_emul_data {
 	union connector_status_t connector_status;
 	union error_status_t error_status;
 	struct pdc_info_t info;
+	/* A CI event is awaiting ACK_CC_CI from the EC */
+	bool connector_change_pending;
+	/* An asynchronous CI event is queued */
+	bool async_event_queued;
+	/* Inject a connector change while processing the next CONTROL write */
+	bool inject_ci_on_next_control;
+	union connector_status_t injected_connector_status;
 };
 
 static int it52xx_emul_process_control(struct it52xx_emul_data *data);
+static int it52xx_emul_maybe_assert_async_event(struct it52xx_emul_data *data);
 
 static struct it52xx_emul_data *it52xx_emul_get_data(const struct emul *emul)
 {
@@ -171,6 +179,15 @@ static int it52xx_emul_finish_write(const struct emul *emul, int reg, int bytes)
 
 	switch (reg) {
 	case IT52XX_CMD_CONTROL:
+		if (data->inject_ci_on_next_control) {
+			data->inject_ci_on_next_control = false;
+			data->connector_status =
+				data->injected_connector_status;
+			data->async_event_queued = true;
+			if (it52xx_emul_maybe_assert_async_event(data) != 0) {
+				return -EIO;
+			}
+		}
 		return it52xx_emul_process_control(data);
 	case IT52XX_CMD_CLEAR_ALERT:
 		if (data->request_length != 2) {
@@ -180,7 +197,15 @@ static int it52xx_emul_finish_write(const struct emul *emul, int reg, int bytes)
 		data->alert_status &= ~data->request[1];
 		/* If no alerts remain, set the active-low IRQ to high. */
 		if (data->alert_status == 0) {
-			return it52xx_emul_set_irq(data, false);
+			int rv = it52xx_emul_set_irq(data, false);
+
+			if (rv != 0) {
+				return rv;
+			}
+
+			/* Check if we can assert an IRQ for a queued CI event
+			 */
+			return it52xx_emul_maybe_assert_async_event(data);
 		}
 		return 0;
 	case IT52XX_CMD_CCI:
@@ -311,6 +336,10 @@ static int it52xx_emul_set_cci(struct it52xx_emul_data *data,
 	/* Fillup [CCI] messages */
 	memset(data->cci, 0, sizeof(data->cci));
 	data->cci[0] = IT52XX_CCI_LENGTH - 1;
+	/* IT5271 keeps the connector-change indication set until CI ACK. */
+	if (!cci.reset_completed && data->connector_change_pending) {
+		cci.connector_change = 1;
+	}
 	cci.data_len = payload_length;
 	sys_put_le32(cci.raw_value, &data->cci[1]);
 
@@ -350,6 +379,11 @@ static int it52xx_emul_ppm_reset(struct it52xx_emul_data *data)
 
 	data->notification_enable.raw_value = 0;
 	data->error_status.raw_value = 0;
+	data->connector_change_pending = false;
+	data->async_event_queued = false;
+	data->inject_ci_on_next_control = false;
+	memset(&data->injected_connector_status, 0,
+	       sizeof(data->injected_connector_status));
 	data->lpm_state = IT52XX_EMUL_LPM_IDLE_0;
 	data->ppm_reset_seen = true;
 	data->notification_enable_seen = false;
@@ -541,6 +575,7 @@ static int it52xx_emul_ack_cc_ci(struct it52xx_emul_data *data)
 {
 	union cci_event_t cci = { .acknowledge_command = 1 };
 	enum it52xx_emul_lpm_state previous_state = data->lpm_state;
+	bool previous_connector_change = data->connector_change_pending;
 	int rv;
 
 	if (data->lpm_state != IT52XX_EMUL_LPM_WAIT_CMD_ACK &&
@@ -549,10 +584,16 @@ static int it52xx_emul_ack_cc_ci(struct it52xx_emul_data *data)
 		return -EINVAL;
 	}
 
+	/* Command-specific byte bit 0 acknowledges connector change (CI). */
+	if (data->request[4] & BIT(0)) {
+		data->connector_change_pending = false;
+	}
+
 	data->lpm_state = IT52XX_EMUL_LPM_IDLE_1;
 	rv = it52xx_emul_set_cci(data, cci, NULL, 0);
 	if (rv != 0) {
 		data->lpm_state = previous_state;
+		data->connector_change_pending = previous_connector_change;
 	}
 
 	return rv;
@@ -617,13 +658,26 @@ static int it52xx_emul_process_control(struct it52xx_emul_data *data)
 	case IT52XX_EMUL_LPM_IDLE_1:
 		return it52xx_emul_process_idle_1(data, command);
 	case IT52XX_EMUL_LPM_WAIT_CMD_ACK:
-	case IT52XX_EMUL_LPM_WAIT_ASYNC_EVENT_ACK:
 		if (command == IT52XX_UCSI_ACK_CC_CI) {
 			return it52xx_emul_ack_cc_ci(data);
 		}
 		/* IT5271 waits for ACK_CC_CI before accepting another command.
 		 */
 		return 0;
+	case IT52XX_EMUL_LPM_WAIT_ASYNC_EVENT_ACK:
+		if (command == IT52XX_UCSI_ACK_CC_CI) {
+			return it52xx_emul_ack_cc_ci(data);
+		}
+		/*
+		 * Defer the active CI while the new command owns CCI. If the
+		 * command consumes the connector-status change bits, the queued
+		 * CI is dropped; otherwise it is asserted after the command and
+		 * its ACK complete.
+		 */
+		data->connector_change_pending = false;
+		data->async_event_queued = true;
+		data->lpm_state = IT52XX_EMUL_LPM_IDLE_1;
+		return it52xx_emul_process_idle_1(data, command);
 	}
 
 	return -EINVAL;
@@ -640,6 +694,11 @@ static void it52xx_emul_reset_data(struct it52xx_emul_data *data)
 	data->notification_enable.raw_value = 0;
 	memset(&data->connector_status, 0, sizeof(data->connector_status));
 	data->error_status.raw_value = 0;
+	data->connector_change_pending = false;
+	data->async_event_queued = false;
+	data->inject_ci_on_next_control = false;
+	memset(&data->injected_connector_status, 0,
+	       sizeof(data->injected_connector_status));
 	data->lpm_state = IT52XX_EMUL_LPM_IDLE_0;
 	data->ppm_reset_seen = false;
 	data->notification_enable_seen = false;
@@ -702,6 +761,64 @@ static int emul_it52xx_set_info(const struct emul *emul,
 	return 0;
 }
 
+static int it52xx_emul_maybe_assert_async_event(struct it52xx_emul_data *data)
+{
+	union conn_status_change_bits_t enabled_changes =
+		conn_status_mask_from_notification(data->notification_enable);
+	union cci_event_t cci = { .connector_change = 1 };
+	enum it52xx_emul_lpm_state previous_state;
+	int rv;
+
+	/*
+	 * Do not assert IRQ for a queued CI event while a CC/CI flow is
+	 * in progress or before the previous alert has been cleared.
+	 */
+	if (!data->async_event_queued || data->connector_change_pending ||
+	    data->lpm_state != IT52XX_EMUL_LPM_IDLE_1 ||
+	    data->alert_status != 0) {
+		return 0;
+	}
+
+	/* Assert the IRQ only when a connector status-change bit is enabled */
+	if (!(data->connector_status.raw_conn_status_change_bits &
+	      enabled_changes.raw_value)) {
+		data->async_event_queued = false;
+		return 0;
+	}
+
+	previous_state = data->lpm_state;
+	data->async_event_queued = false;
+	data->connector_change_pending = true;
+	data->lpm_state = IT52XX_EMUL_LPM_WAIT_ASYNC_EVENT_ACK;
+	rv = it52xx_emul_set_cci(data, cci, NULL, 0);
+	if (rv != 0) {
+		data->async_event_queued = true;
+		data->connector_change_pending = false;
+		data->lpm_state = previous_state;
+	}
+
+	return rv;
+}
+
+static int emul_it52xx_pulse_irq(const struct emul *emul)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+	union conn_status_change_bits_t enabled_changes;
+	int rv = 0;
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	enabled_changes =
+		conn_status_mask_from_notification(data->notification_enable);
+	if (data->connector_status.raw_conn_status_change_bits &
+	    enabled_changes.raw_value) {
+		data->async_event_queued = true;
+		rv = it52xx_emul_maybe_assert_async_event(data);
+	}
+	i2c_common_emul_unlock_data(&data->common);
+
+	return rv;
+}
+
 static int emul_it52xx_idle_wait(const struct emul *emul)
 {
 	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
@@ -757,6 +874,24 @@ int emul_it52xx_get_notification_enable(
 	return 0;
 }
 
+int emul_it52xx_inject_ci_on_next_control(
+	const struct emul *emul, const union connector_status_t *status)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (status == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	/* Inject this connector change during the next [CTRL] write */
+	data->injected_connector_status = *status;
+	data->inject_ci_on_next_control = true;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
 /* Device instantiation */
 
 /**
@@ -806,6 +941,7 @@ static DEVICE_API(emul_pdc, emul_it52xx_api) = {
 	.set_connector_status = emul_it52xx_set_connector_status,
 	.set_error_status = emul_it52xx_set_error_status,
 	.set_info = emul_it52xx_set_info,
+	.pulse_irq = emul_it52xx_pulse_irq,
 	.idle_wait = emul_it52xx_idle_wait,
 };
 
