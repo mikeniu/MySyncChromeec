@@ -11,6 +11,7 @@
 #include "emul/emul_ite_it52xx.h"
 #include "emul/emul_pdc.h"
 #include "emul/emul_pdc_pdo.h"
+#include "include/usb_pd.h"
 
 #include <errno.h>
 #include <string.h>
@@ -35,6 +36,8 @@ LOG_MODULE_REGISTER(ite_it52xx_emul);
 #define IT52XX_CMD_CONTROL 0x81
 /* Message response from the IT52XX emulator to the EC */
 #define IT52XX_CMD_MSGIN 0x82
+/* Message data from the EC to the IT52XX emulator */
+#define IT52XX_CMD_MSGOUT 0x83
 #define IT52XX_CMD_CLEAR_ALERT 0xbc
 #define IT52XX_CMD_GET_ALERT 0xbd
 
@@ -58,8 +61,10 @@ LOG_MODULE_REGISTER(ite_it52xx_emul);
 #define IT52XX_UCSI_SET_CCOM 0x08
 #define IT52XX_UCSI_SET_UOR 0x09
 #define IT52XX_UCSI_SET_PDR 0x0b
+#define IT52XX_UCSI_GET_PDOS 0x10
 #define IT52XX_UCSI_GET_CONNECTOR_STATUS 0x12
 #define IT52XX_UCSI_GET_ERROR_STATUS 0x13
+#define IT52XX_UCSI_SET_PDOS 0x1d
 #define IT52XX_UCSI_VENDOR_DEFINED 0x20
 
 #define IT52XX_VDC_GET_PDC_INFO 0
@@ -68,6 +73,7 @@ LOG_MODULE_REGISTER(ite_it52xx_emul);
 
 #define IT52XX_VENDOR_ID 0x048d
 #define IT52XX_NOTIFICATION_ENABLE_MASK GENMASK(16, 0)
+#define IT52XX_SET_PDO_MAX_COUNT 7
 
 /* States of the emulated IT5271 LPM UCSI command interface */
 enum it52xx_emul_lpm_state {
@@ -89,6 +95,8 @@ struct it52xx_emul_data {
 	uint8_t cci[IT52XX_CCI_LENGTH];
 	uint8_t msgin[IT52XX_GET_PDC_INFO_LENGTH + 1];
 	size_t msgin_length;
+	uint8_t msgout[IT52XX_SET_PDO_MAX_COUNT * sizeof(uint32_t)];
+	size_t msgout_length;
 
 	enum it52xx_emul_lpm_state lpm_state;
 	bool ppm_reset_seen;
@@ -196,6 +204,17 @@ static int it52xx_emul_finish_write(const struct emul *emul, int reg, int bytes)
 	LOG_DBG("finish_write reg=%d, bytes=%d", reg, bytes);
 
 	switch (reg) {
+	case IT52XX_CMD_MSGOUT:
+		data->msgout_length = 0;
+		if (data->request_length < 2 ||
+		    data->request[1] != data->request_length - 2 ||
+		    data->request[1] > sizeof(data->msgout)) {
+			return -EINVAL;
+		}
+
+		memcpy(data->msgout, &data->request[2], data->request[1]);
+		data->msgout_length = data->request[1];
+		return 0;
 	case IT52XX_CMD_CONTROL:
 		if (data->inject_ci_on_next_control) {
 			data->inject_ci_on_next_control = false;
@@ -715,6 +734,104 @@ static int it52xx_emul_set_pdr(struct it52xx_emul_data *data)
 	return it52xx_emul_send_command_result(data, cci, NULL, 0);
 }
 
+static int it52xx_emul_get_pdos(struct it52xx_emul_data *data)
+{
+	const union get_pdos_t *request =
+		(const union get_pdos_t *)&data->request[4];
+	union cci_event_t cci = { .command_completed = 1 };
+	union error_status_t error = { 0 };
+	uint32_t pdos[UCSI_GET_PDOS_MAX_NUM] = { 0 };
+	uint8_t response[sizeof(pdos)] = { 0 };
+	uint8_t requested_pdos = request->number_of_pdos + 1;
+	uint8_t returned_pdos = 0;
+	int rv = 0;
+
+	/* IT5271 accepts only connector number 1. */
+	if (request->connector_number != 1) {
+		error.non_existent_connector_number = 1;
+	} else if (request->pdo_offset + requested_pdos > PDO_OFFSET_MAX) {
+		error.invalid_command_specific_param = 1;
+	} else if (request->pdo_source == PARTNER_PDO &&
+		   !data->connector_status.connect_status) {
+		error.cc_communication_error = 1;
+	} else {
+		/* The driver requests the cached current SPR PDOs. */
+		rv = emul_pdc_pdo_get_direct(&data->pdo, request->pdo_type,
+					     request->pdo_offset,
+					     requested_pdos,
+					     request->pdo_source, pdos);
+		if (rv != 0) {
+			error.invalid_command_specific_param = 1;
+		}
+	}
+
+	if (error.raw_value != 0) {
+		data->error_status = error;
+		cci.error = 1;
+		return it52xx_emul_send_command_result(data, cci, NULL, 0);
+	}
+
+	/* IT5271 stops the response at the first unavailable PDO. */
+	while (returned_pdos < requested_pdos && pdos[returned_pdos] != 0) {
+		sys_put_le32(pdos[returned_pdos],
+			     &response[returned_pdos * sizeof(uint32_t)]);
+		returned_pdos++;
+	}
+
+	return it52xx_emul_send_command_result(
+		data, cci, response, returned_pdos * sizeof(uint32_t));
+}
+
+static int it52xx_emul_set_pdos(struct it52xx_emul_data *data)
+{
+	const union ucsi_set_pdos_t *request =
+		(const union ucsi_set_pdos_t *)&data->request[4];
+	union cci_event_t cci = { .command_completed = 1 };
+	union error_status_t error = { 0 };
+	uint32_t pdos[IT52XX_SET_PDO_MAX_COUNT] = { 0 };
+	size_t data_length = request->number_of_pdos * sizeof(uint32_t);
+	int rv = 0;
+
+	/* IT5271 accepts only connector number 1. */
+	if (request->connector_number != 1) {
+		error.non_existent_connector_number = 1;
+	} else if (request->number_of_pdos == 0 ||
+		   request->number_of_pdos > IT52XX_SET_PDO_MAX_COUNT ||
+		   request->data_index != 0 || !request->end_of_message ||
+		   request->reserved0 != 0 || request->reserved1 != 0 ||
+		   request->reserved2 != 0 || data->request[3] != data_length ||
+		   data->msgout_length != data_length) {
+		error.invalid_command_specific_param = 1;
+	} else {
+		for (uint8_t i = 0; i < request->number_of_pdos; ++i) {
+			pdos[i] = sys_get_le32(
+				&data->msgout[i * sizeof(uint32_t)]);
+		}
+
+		/* IT5271 requires the first PDO to advertise vSafe5V. */
+		if (PDO_FIXED_VOLTAGE(pdos[0]) != 5000) {
+			error.invalid_command_specific_param = 1;
+		} else {
+			rv = emul_pdc_pdo_set_direct(
+				&data->pdo, request->pdo_type, PDO_OFFSET_0,
+				request->number_of_pdos, LPM_PDO, pdos);
+			if (rv != 0) {
+				error.invalid_command_specific_param = 1;
+			}
+		}
+	}
+
+	/* The CONTROL command consumes the preceding MSGOUT payload. */
+	data->msgout_length = 0;
+
+	if (error.raw_value != 0) {
+		data->error_status = error;
+		cci.error = 1;
+	}
+
+	return it52xx_emul_send_command_result(data, cci, NULL, 0);
+}
+
 static int it52xx_emul_get_connector_status(struct it52xx_emul_data *data)
 {
 	union cci_event_t cci = { .command_completed = 1 };
@@ -838,10 +955,14 @@ static int it52xx_emul_process_idle_1(struct it52xx_emul_data *data,
 		return it52xx_emul_set_uor(data);
 	case IT52XX_UCSI_SET_PDR:
 		return it52xx_emul_set_pdr(data);
+	case IT52XX_UCSI_GET_PDOS:
+		return it52xx_emul_get_pdos(data);
 	case IT52XX_UCSI_GET_CONNECTOR_STATUS:
 		return it52xx_emul_get_connector_status(data);
 	case IT52XX_UCSI_GET_ERROR_STATUS:
 		return it52xx_emul_get_error_status(data);
+	case IT52XX_UCSI_SET_PDOS:
+		return it52xx_emul_set_pdos(data);
 	case IT52XX_UCSI_VENDOR_DEFINED:
 		return it52xx_emul_vendor_defined(data);
 	default: {
@@ -864,15 +985,19 @@ static int it52xx_emul_process_idle_1(struct it52xx_emul_data *data,
 
 static int it52xx_emul_process_control(struct it52xx_emul_data *data)
 {
+	uint8_t command;
+
 	/* Validate the [CTRL] message length and fields */
 	if (data->request_length < IT52XX_CONTROL_MIN_LENGTH ||
 	    data->request_length > IT52XX_CONTROL_MAX_LENGTH ||
-	    data->request[1] != data->request_length - 2 ||
-	    data->request[3] != 0) {
+	    data->request[1] != data->request_length - 2) {
 		return -EINVAL;
 	}
 
-	uint8_t command = data->request[2];
+	command = data->request[2];
+	if (command != IT52XX_UCSI_SET_PDOS && data->request[3] != 0) {
+		return -EINVAL;
+	}
 
 	/* IT5271 accepts PPM_RESET in every PPM state. */
 	if (command == IT52XX_UCSI_PPM_RESET) {
@@ -922,6 +1047,8 @@ static void it52xx_emul_reset_data(struct it52xx_emul_data *data)
 	memset(data->cci, 0, sizeof(data->cci));
 	memset(data->msgin, 0, sizeof(data->msgin));
 	data->msgin_length = 0;
+	memset(data->msgout, 0, sizeof(data->msgout));
+	data->msgout_length = 0;
 	data->notification_enable.raw_value = 0;
 	data->connector_reset.raw_value = 0;
 	data->ccom = CCOM_DRP;
@@ -1114,6 +1241,46 @@ emul_it52xx_set_error_status(const struct emul *emul,
 	i2c_common_emul_unlock_data(&data->common);
 
 	return 0;
+}
+
+static int emul_it52xx_get_pdos(const struct emul *emul,
+				enum pdo_type_t pdo_type,
+				enum pdo_offset_t pdo_offset, uint8_t num_pdos,
+				enum pdo_source_t source, uint32_t *pdos)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+	int rv;
+
+	if (pdos == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	rv = emul_pdc_pdo_get_direct(&data->pdo, pdo_type, pdo_offset, num_pdos,
+				     source, pdos);
+	i2c_common_emul_unlock_data(&data->common);
+
+	return rv;
+}
+
+static int emul_it52xx_set_pdos(const struct emul *emul,
+				enum pdo_type_t pdo_type,
+				enum pdo_offset_t pdo_offset, uint8_t num_pdos,
+				enum pdo_source_t source, const uint32_t *pdos)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+	int rv;
+
+	if (pdos == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	rv = emul_pdc_pdo_set_direct(&data->pdo, pdo_type, pdo_offset, num_pdos,
+				     source, pdos);
+	i2c_common_emul_unlock_data(&data->common);
+
+	return rv;
 }
 
 static int emul_it52xx_set_info(const struct emul *emul,
@@ -1317,6 +1484,8 @@ static DEVICE_API(emul_pdc, emul_it52xx_api) = {
 	.set_partner_rdo = emul_it52xx_set_partner_rdo,
 	.set_connector_status = emul_it52xx_set_connector_status,
 	.set_error_status = emul_it52xx_set_error_status,
+	.get_pdos = emul_it52xx_get_pdos,
+	.set_pdos = emul_it52xx_set_pdos,
 	.set_info = emul_it52xx_set_info,
 	.pulse_irq = emul_it52xx_pulse_irq,
 	.idle_wait = emul_it52xx_idle_wait,
