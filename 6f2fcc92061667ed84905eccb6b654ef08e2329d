@@ -189,6 +189,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d70b76a8_03237369",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 32
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-24T17:05:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84e81fc1_8de2f19f",
+      "range": {
+        "startLine": 879,
+        "startChar": 8,
+        "endLine": 879,
+        "endChar": 21
+      },
+      "revId": "6f2fcc92061667ed84905eccb6b654ef08e2329d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5b6b817_c459459b",
