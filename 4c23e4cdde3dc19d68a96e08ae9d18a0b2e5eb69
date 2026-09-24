@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e5296c9_f2e2851a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-24T02:13:12Z",
+      "side": 1,
+      "message": "Rebased, need CR+2 again.",
+      "revId": "4c23e4cdde3dc19d68a96e08ae9d18a0b2e5eb69",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
