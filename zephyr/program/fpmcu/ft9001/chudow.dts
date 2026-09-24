@@ -42,3 +42,12 @@
 		};
 	};
 };
+
+&eport5 {
+	/* Keep BTN_IGN pin driven low since button ignore functionality is disabled. */
+	gpio_btn_ign_out {
+		gpio-hog;
+		gpios = <1 GPIO_ACTIVE_HIGH>;
+		output-low;
+	};
+};
