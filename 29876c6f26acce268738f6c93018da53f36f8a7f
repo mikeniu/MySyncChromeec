@@ -97,6 +97,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "80495b0c_87b4b7a5",
+        "filename": "common/charge_control.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-24T08:36:43Z",
+      "side": 1,
+      "message": "When BBRAM is zeroed out on init/CRC mismatch (0x00 across all 3 bytes), charge_control_load_from_bbram() handles it via the !(l \u003d\u003d 0 \u0026\u0026 u \u003d\u003d 0) check: A (0, 0) setting is physically invalid as a real charging limit so (0, 0, 0) fails range validation and falls through to return disabled (lower \u003d -1, upper \u003d -1, flags \u003d 0). raw_flags \u003d\u003d 0 itself is a valid flag state when limits are active (e.g. 75% ~ 80% without NO_IDLE), so we rely on (lower \u003d\u003d 0 \u0026\u0026 upper \u003d\u003d 0) to detect uninitialized BBRAM rather than checking raw_flags. This is verified in test_charge_control_bbram_save_load.",
+      "parentUuid": "55613396_632ea9fe",
+      "range": {
+        "startLine": 41,
+        "startChar": 13,
+        "endLine": 41,
+        "endChar": 22
+      },
+      "revId": "29876c6f26acce268738f6c93018da53f36f8a7f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4d0f7d83_a4e40e11",
         "filename": "common/charge_control.c",
         "patchSetId": 5
