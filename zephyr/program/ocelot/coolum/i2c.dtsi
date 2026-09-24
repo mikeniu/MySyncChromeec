@@ -1,0 +1,53 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+
+		i2c_named_i2c_port_pd1: named_i2c_port_pd_aic1 {
+			i2c-port = <&i2c_port_pd1>;
+			enum-names = "I2C_PORT_PD";
+		};
+		i2c_named_i2c_port_pd2: named_i2c_port_pd_aic2 {
+			i2c-port = <&i2c_port_pd2>;
+			enum-names = "I2C_PORT_PD_SPARE";
+		};
+		i2c_named_i2c_port_charger: named_i2c_port_charger {
+			i2c-port = <&i2c_port_charger>;
+			enum-names = "I2C_PORT_BATTERY",
+				"I2C_PORT_CHARGER",
+				"I2C_PORT_PORT80";
+		};
+	};
+};
+
+&i2c_port_pd1 {
+	label = "I2C_PORT_PD";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+};
+
+&i2c_port_pd2 {
+	/* Port not used. All PDCs on bus i2c_port_pd1 */
+	label = "I2C_PORT_PD_SPARE";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+};
+
+&i2c_port_charger {
+	label = "I2C_PORT_CHARGER";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+
+	imvp_rt3645: richtek-imvp@20 {
+		compatible = "richtek,rt3645";
+		status = "okay";
+		reg = <0x20>;
+	};
+	charger: isl9238@9 {
+		compatible = "intersil,isl923x";
+		status = "okay";
+		reg = <0x9>;
+	};
+};
+
