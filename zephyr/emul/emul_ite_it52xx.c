@@ -10,6 +10,7 @@
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_ite_it52xx.h"
 #include "emul/emul_pdc.h"
+#include "emul/emul_pdc_pdo.h"
 
 #include <errno.h>
 #include <string.h>
@@ -65,6 +66,10 @@ void pdc_it52xx_test_invalidate_chip_info(const struct device *dev);
 #define IT52XX_UCSI_GET_ERROR_STATUS 0x13
 #define IT52XX_UCSI_VENDOR_DEFINED 0x20
 
+#define IT52XX_VDC_GET_PDC_INFO 0
+#define IT52XX_VDC_SET_RDO 4
+#define IT52XX_VDC_GET_RDO 5
+
 #define IT52XX_VENDOR_ID 0x048d
 #define IT52XX_NOTIFICATION_ENABLE_MASK GENMASK(16, 0)
 
@@ -100,6 +105,7 @@ struct it52xx_emul_data {
 	enum ccom_t ccom;
 	union uor_t uor;
 	union pdr_t pdr;
+	struct emul_pdc_pdo_t pdo;
 	union connector_status_t connector_status;
 	union error_status_t error_status;
 	struct pdc_info_t info;
@@ -463,44 +469,7 @@ static int it52xx_emul_get_pdc_info(struct it52xx_emul_data *data)
 		.command_completed = 1,
 	};
 	uint8_t response[IT52XX_GET_PDC_INFO_LENGTH] = { 0 };
-	uint8_t connector = data->request[4] & 0x7f;
-	uint8_t vendor_command = ((data->request[5] & 0x0f) << 1) |
-				 (data->request[4] >> 7);
 	int rv;
-
-	/* IT5271 accepts only connector number 1 */
-	if (connector != 1) {
-		union cci_event_t error_cci = {
-			.error = 1,
-			.command_completed = 1,
-		};
-		union error_status_t error = {
-			.non_existent_connector_number = 1,
-		};
-
-		/* IT5271 replaces the stored error when a command reports an
-		 * error. */
-		data->error_status = error;
-		return it52xx_emul_send_command_result(data, error_cci, NULL,
-						       0);
-	}
-
-	/* IT5271 supports only vendor command 0 */
-	if (vendor_command != 0) {
-		union cci_event_t error_cci = {
-			.error = 1,
-			.command_completed = 1,
-		};
-		union error_status_t error = {
-			.invalid_command_specific_param = 1,
-		};
-
-		/* IT5271 replaces the stored error when a command reports an
-		 * error. */
-		data->error_status = error;
-		return it52xx_emul_send_command_result(data, error_cci, NULL,
-						       0);
-	}
 
 	it52xx_emul_build_info_response(data, response);
 	rv = it52xx_emul_send_command_result(data, cci, response,
@@ -510,6 +479,90 @@ static int it52xx_emul_get_pdc_info(struct it52xx_emul_data *data)
 	}
 
 	return rv;
+}
+
+static int it52xx_emul_set_rdo(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = {
+		.vendor_defined_indicator = 1,
+		.command_completed = 1,
+	};
+
+	/* IT5271 accepts SET_RDO only while we're sink role. */
+	if (!data->connector_status.connect_status ||
+	    data->connector_status.power_direction) {
+		union cci_event_t error_cci = {
+			.error = 1,
+			.command_completed = 1,
+		};
+
+		data->error_status = (union error_status_t){
+			.incompatible_connector_partner = 1,
+		};
+		return it52xx_emul_send_command_result(data, error_cci, NULL,
+						       0);
+	}
+
+	data->pdo.rdo = sys_get_le32(&data->request[6]);
+	data->connector_status.rdo = data->pdo.rdo;
+	return it52xx_emul_send_command_result(data, cci, NULL, 0);
+}
+
+static int it52xx_emul_get_rdo(struct it52xx_emul_data *data)
+{
+	union cci_event_t cci = {
+		.vendor_defined_indicator = 1,
+		.command_completed = 1,
+	};
+	uint8_t response[sizeof(uint32_t)];
+	uint32_t rdo = data->connector_status.power_direction ?
+			       data->pdo.partner_rdo :
+			       data->pdo.rdo;
+
+	sys_put_le32(rdo, response);
+	return it52xx_emul_send_command_result(data, cci, response,
+					       sizeof(response));
+}
+
+static int it52xx_emul_vendor_defined(struct it52xx_emul_data *data)
+{
+	uint8_t connector = data->request[4] & 0x7f;
+	uint8_t vendor_command = ((data->request[5] & 0x0f) << 1) |
+				 (data->request[4] >> 7);
+
+	/* IT5271 accepts only connector number 1. */
+	if (connector != 1) {
+		data->error_status = (union error_status_t){
+			.non_existent_connector_number = 1,
+		};
+		return it52xx_emul_send_command_result(
+			data,
+			(union cci_event_t){
+				.error = 1,
+				.command_completed = 1,
+			},
+			NULL, 0);
+	}
+
+	switch (vendor_command) {
+	case IT52XX_VDC_GET_PDC_INFO:
+		return it52xx_emul_get_pdc_info(data);
+	case IT52XX_VDC_SET_RDO:
+		return it52xx_emul_set_rdo(data);
+	case IT52XX_VDC_GET_RDO:
+		return it52xx_emul_get_rdo(data);
+	default:
+		data->error_status = (union error_status_t){
+			.invalid_command_specific_param = 1,
+		};
+		return it52xx_emul_send_command_result(
+			data,
+			(union cci_event_t){
+				.error = 1,
+				.command_completed = 1,
+			},
+			NULL, 0);
+	}
 }
 
 static int it52xx_emul_get_capability(struct it52xx_emul_data *data)
@@ -794,7 +847,7 @@ static int it52xx_emul_process_idle_1(struct it52xx_emul_data *data,
 	case IT52XX_UCSI_GET_ERROR_STATUS:
 		return it52xx_emul_get_error_status(data);
 	case IT52XX_UCSI_VENDOR_DEFINED:
-		return it52xx_emul_get_pdc_info(data);
+		return it52xx_emul_vendor_defined(data);
 	default: {
 		union cci_event_t cci = {
 			.not_supported = 1,
@@ -878,6 +931,7 @@ static void it52xx_emul_reset_data(struct it52xx_emul_data *data)
 	data->ccom = CCOM_DRP;
 	data->uor.raw_value = 0;
 	data->pdr.raw_value = 0;
+	emul_pdc_pdo_reset(&data->pdo);
 	memset(&data->connector_status, 0, sizeof(data->connector_status));
 	data->error_status.raw_value = 0;
 	data->connector_change_pending = false;
@@ -989,6 +1043,44 @@ static int emul_it52xx_get_pdr(const struct emul *emul, union pdr_t *pdr)
 
 	i2c_common_emul_lock_data(&data->common, K_FOREVER);
 	*pdr = data->pdr;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
+static int emul_it52xx_set_rdo(const struct emul *emul, uint32_t rdo)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	data->pdo.rdo = rdo;
+	data->connector_status.rdo = rdo;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
+static int emul_it52xx_get_rdo(const struct emul *emul, uint32_t *rdo)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	if (rdo == NULL) {
+		return -EINVAL;
+	}
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	*rdo = data->pdo.rdo;
+	i2c_common_emul_unlock_data(&data->common);
+
+	return 0;
+}
+
+static int emul_it52xx_set_partner_rdo(const struct emul *emul, uint32_t rdo)
+{
+	struct it52xx_emul_data *data = it52xx_emul_get_data(emul);
+
+	i2c_common_emul_lock_data(&data->common, K_FOREVER);
+	data->pdo.partner_rdo = rdo;
 	i2c_common_emul_unlock_data(&data->common);
 
 	return 0;
@@ -1227,6 +1319,9 @@ static DEVICE_API(emul_pdc, emul_it52xx_api) = {
 	.get_ccom = emul_it52xx_get_ccom,
 	.get_uor = emul_it52xx_get_uor,
 	.get_pdr = emul_it52xx_get_pdr,
+	.set_rdo = emul_it52xx_set_rdo,
+	.get_rdo = emul_it52xx_get_rdo,
+	.set_partner_rdo = emul_it52xx_set_partner_rdo,
 	.set_connector_status = emul_it52xx_set_connector_status,
 	.set_error_status = emul_it52xx_set_error_status,
 	.set_info = emul_it52xx_set_info,
