@@ -62,6 +62,9 @@ config TEST_SUITE_PDC_PMC_USB_MUX
 config TEST_SUITE_PDC_RTS54XX
 	bool "Enable RTS54xx PDC tests"
 
+config TEST_SUITE_PDC_IT52XX
+	bool "Enable IT52xx PDC tests"
+
 config TEST_SUITE_PDC_TPS6699X
 	bool "Enable TPS6699x PDC tests"
 
