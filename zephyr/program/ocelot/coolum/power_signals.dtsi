@@ -3,34 +3,143 @@
  * found in the LICENSE file.
  */
 
-#include "../power_signals.dtsi"
+/ {
+	chosen {
+		intel-ap-pwrseq,espi = &espi0;
+	};
 
-&pwr_en_pp3300_a {
-        /* EC_DS3 net. This connects to the PRIM_VR_EN signal and
-         * both the EN1 and EN2 pins on the RT6585 LDO. */
-	gpios = <&gpioi 7 GPIO_ACTIVE_HIGH>;
-};
-&pwr_rsmrst_pwrgd {
-        /* RSMRST_PWRGD_N_R net  */
-	gpios = <&gpiof 0 GPIO_ACTIVE_HIGH>;
-};
-&pwr_ec_pch_rsmrst {
-        /* RM_RSMST_N_R net */
-	gpios = <&gpioj 0 GPIO_ACTIVE_LOW>;
-};
-&pwr_slp_s0 {
-        /* PCH_SLP_S0_N_R net */
-	gpios = <&gpioj 5 GPIO_ACTIVE_LOW>;
-};
-&pwr_pch_pwrok {
-        /* PCH_PWROK_EC_R net */
-	gpios = <&gpioj 1 GPIO_ACTIVE_HIGH>;
-};
-&pwr_all_sys_pwrgd {
-        /* ALL_SYS_PWRGD_R net */
-	gpios = <&gpiod 5 GPIO_ACTIVE_HIGH>;
-};
-&pwr_sys_rst {
-        gpios = <&gpioj 7 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
+	common-pwrseq {
+		compatible = "intel,ap-pwrseq";
+
+		sys-pwrok-delay = <3>;
+		all-sys-pwrgd-timeout = <20>;
+		sys-reset-delay = <60>;
+	};
+
+	pwr_en_pp5000_s5: pwr-en-pp5000-s5  {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "PP5000_S5 enable output to LS";
+		enum-name = "PWR_EN_PP5000_A";
+		gpios = <&gpioi 7 GPIO_ACTIVE_HIGH>;
+		output;
+	};
+	pwr_rsmrst_pwrgd: rsmrst-pwrgd-ec-n {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "RSMRST power good from regulator";
+		enum-name = "PWR_RSMRST_PWRGD";
+		gpios = <&gpiof 0 (GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;    //PG_PP1250_SOC_S5_OD
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+	pwr_ec_pch_rsmrst: pm-rsmrst-ec-n {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "RSMRST output to PCH";
+		enum-name = "PWR_EC_PCH_RSMRST";
+		gpios = <&gpioj 0 (GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
+		reset-val = <1>;
+		output;
+	};
+	pwr_slp_s0: pm-slp-s0-r-n {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SLP_S0_L input from PCH";
+		enum-name = "PWR_SLP_S0";
+		gpios = <&gpioj 5 (GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+	pwr_pch_pwrok: ec-pm-pch-pwrok {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "PCH_PWROK output to PCH";
+		enum-name = "PWR_PCH_PWROK";
+		gpios = <&gpioj 1 (GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
+		output;
+	};
+	pwr-ec-pch-sys-pwrok {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SYS_PWROK output to PCH";
+		enum-name = "PWR_EC_PCH_SYS_PWROK";
+                gpios = <&gpiof 1 (GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
+		output;
+	};
+	pwr-slp-s3 {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SLP_S3_L input from PCH";
+		enum-name = "PWR_SLP_S3";
+                gpios = <&gpioh 3 (GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+	pwr-slp-s4 {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SLP_S4_L input from PCH";
+		enum-name = "PWR_SLP_S4";
+                gpios = <&gpioh 4 (GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+	pwr-slp-s5 {
+		compatible = "intel,ap-pwrseq-vw";
+		dbg-label = "SLP_S5 virtual wire input from PCH";
+		enum-name = "PWR_SLP_S5";
+		virtual-wire = "ESPI_VWIRE_SIGNAL_SLP_S5";
+		reset-val = <1>;
+		vw-invert;
+	};
+	pwr_all_sys_pwrgd: all_sys_pwrgd {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "all power good";
+		enum-name = "PWR_ALL_SYS_PWRGD";
+		gpios = <&gpiod 5 (GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+	pwr_sys_rst: pwr-sys-rst-l {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SYS_RESET# output to PCH";
+		enum-name = "PWR_SYS_RST";
+                gpios = <&gpioj 7 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		output;
+	};
+	pwr_pltrst: pwr-pltrst {
+		compatible = "intel,ap-pwrseq-vw";
+		dbg-label = "PLTRST virtual wire input from PCH";
+		enum-name = "PWR_PLTRST";
+		virtual-wire = "ESPI_VWIRE_SIGNAL_PLTRST";
+		reset-val = <1>;
+		vw-invert;
+	};
+	ap-power {
+		compatible = "ap-pwrseq-sub-states";
+		chipset = "S0ix";
+	};
 };
 
+/*
+ * Because the power signals directly reference the GPIOs,
+ * the correspinding named-gpios need to have no-auto-init set.
+ */
+&gpio_en_s5_rails {
+	no-auto-init;
+};
+&gpio_pg_pp1250_soc_s5_od {
+	no-auto-init;
+};
+&gpio_ec_soc_rsmrst_l {
+	no-auto-init;
+};
+&gpio_slp_s4_l {
+	no-auto-init;
+};
+&gpio_slp_s3_l {
+	no-auto-init;
+};
+&gpio_sys_slp_s0ix_l {
+	no-auto-init;
+};
+&gpio_all_sys_pwrgd_r {
+	no-auto-init;
+};
+&gpio_ec_plt_pwrok {
+	no-auto-init;
+};
+&gpio_ec_soc_syspwrok {
+	no-auto-init;
+};
+&gpio_sys_rst_odl {
+	no-auto-init;
+};
