@@ -10,6 +10,14 @@ tests:
     extra_dtc_overlay_files:
     - "./boards/it52xx.overlay"
 
+  pdc.driver.it52xx.specific:
+    timeout: 30
+    extra_configs:
+    - CONFIG_TEST_SUITE_PDC_IT52XX=y
+    - CONFIG_TEST_SKIP_EC_APP_MAIN=y
+    extra_dtc_overlay_files:
+    - "./boards/it52xx.overlay"
+
   pdc.driver.rts545x:
     timeout: 500
     extra_configs:
