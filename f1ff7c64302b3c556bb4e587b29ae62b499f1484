@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c40510d8_12dd8eb4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-24T18:20:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n**Functionality:**\nThe CL successfully migrates the host command declarations and handlers to the upstream `EC_HOST_CMD` framework. The changes are mechanical updates to arguments and return types, correctly tracking the previous behavior.\n\n**Architecture \u0026 Component Fit:**\nThe changes align perfectly with the component\u0027s architecture, smoothly translating legacy host command macros to the standard `EC_HOST_CMD_HANDLER` patterns without introducing any layering mismatch.\n\n**Code Simplicity:**\nThe migration is implemented as directly and simply as possible. The updated code properly maps `EC_RES_*` constants to `EC_HOST_CMD_*` and accurately maps `args-\u003eparams` / `args-\u003eresponse` to `args-\u003einput_buf` / `args-\u003eoutput_buf`.\n\n**Idiomaticity \u0026 Readability:**\nThe updated code conforms cleanly to C++ repository guidelines and preserves explicit type-safe casts where needed.\n\n**Security:**\nNo new security boundaries or vulnerabilities are introduced; security contexts for sessions remain strictly intact.\n\n**Testing \u0026 Test Coverage:**\nSince this CL serves as a purely mechanical migration for existing host command bindings without altering inner behavioral logic, existing test suite coverage continues to provide correct validation.\n\n**CL Size \u0026 Scope:**\n`Size: M (+83, -71)`. The CL is appropriately sized and embodies a single, tightly-focused atomic change.\n\n**Commit Message:**\nThe commit message accurately describes the migration, explains the rationale, and properly specifies the `BUG\u003d` and `TEST\u003d` footers following ChromiumOS development conventions.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8465042_92e8e6fb-ac5c-414c-a16a-6a1c9deae6d6.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f1ff7c64302b3c556bb4e587b29ae62b499f1484",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
