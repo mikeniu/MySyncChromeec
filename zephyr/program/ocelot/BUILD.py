@@ -239,6 +239,11 @@ register_rtk59_project(
     ],
 )
 
+register_it8xxx2_project(
+    project_name="coolum",
+    chip="it8xxx2/it82002bw",
+)
+
 # Note for reviews, do not let anyone edit these assertions, the addresses
 # must not change after the first RO release.
 assert_rw_fwid_DO_NOT_EDIT(project_name="hekla", addr=0x80404)
@@ -251,3 +256,4 @@ assert_rw_fwid_DO_NOT_EDIT(project_name="ocelotrvp-mchp", addr=0x40318)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ojal", addr=0x80404)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ocicat", addr=0x60098)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ocelotrvp-rtk", addr=0x80404)
+assert_rw_fwid_DO_NOT_EDIT(project_name="coolum", addr=0x60098)
