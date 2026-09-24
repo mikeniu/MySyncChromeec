@@ -93,6 +93,30 @@
       },
       "revId": "c05b3746b16edcbc0cc422b4a4809758b6a28843",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94b3c9be_1f16f57d",
+        "filename": "zephyr/program/bluey/meru/led_pins.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1449895
+      },
+      "writtenOn": "2026-09-24T02:09:57Z",
+      "side": 1,
+      "message": "meru nugget used `led_pins2`",
+      "parentUuid": "042479b2_a603551d",
+      "range": {
+        "startLine": 7,
+        "startChar": 1,
+        "endLine": 7,
+        "endChar": 9
+      },
+      "revId": "c05b3746b16edcbc0cc422b4a4809758b6a28843",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
