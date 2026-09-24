@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd5bd9e9_31f1e7c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 37
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-24T17:49:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**Functionality:** The host command definitions are functionally correct. The structural macro migrations properly map legacy return statuses and parameters to the new Zephyr framework equivalents. The missing size check removal correctly aligns with earlier review feedback to defer those changes to a follow-up CL.\n\n**Architecture \u0026 Component Fit:** The change correctly updates host command registration across the fingerprint subsystem to use the upstream macro interface.\n\n**Code Simplicity:** The changes are clean and represent a straightforward migration without over-engineering.\n\n**Idiomaticity \u0026 Readability:** Excellent. Prior C-style casting issues to `enum ec_host_cmd_status` have been resolved in favor of modern idiomatic C++ `static_cast` for all modified functions.\n\n**Testing:** Existing tests execute correctly and have been verified on hardware. As this is a pure API migration CL preserving identical behavior, the existing test coverage is sufficient.\n\n**CL Size \u0026 Scope:** `Size: L (+185, -158)`. Based on `gerrit info`, this CL is still categorized as too large for a single atomic review threshold (250+ total lines changed). While it is smaller than previous patchsets (previously `Size: L (+292, -250)`), the 343-line size continues to violate the strict Single Logical Change size limits for atomic code review. Please split the migration further into smaller, independently reviewable CLs (e.g., **S** or **M**), such as:\n1. CL 1: Base sensor information and frame commands (`fp_command_info`, `fp_command_frame`).\n2. CL 2: Base sensor stats and template commands (`fp_command_stats`, `fp_command_template`, `fp_command_confirm_template`).\n3. CL 3: Sensor state and mode commands (`fpsensor_state.cc`).\n\n**Commit Message:** The commit message correctly follows Chromium subsystem formatting guidelines (`BUG\u003db:...`, `TEST\u003d...`) and accurately explains the scope of the migration. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8008794_4591f8c9-c489-4f55-b8f2-86db1b9acf00.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1edb21c56c0163fd02f479215c483bf5bcbe9dbd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
