@@ -12,6 +12,7 @@
 /* Define delays for deferred power sequencing */
 #define PP5000_PWR_DISABLE_DELAY (100 * USEC_PER_MSEC)
 #define USBA_PWR_ENABLE_DELAY (10 * USEC_PER_MSEC)
+#define PP3300_S3_ENABLE_DELAY (1 * USEC_PER_MSEC)
 
 /*
  * Deferred function to deassert gpio_ec_en_pp5000.
@@ -29,11 +30,18 @@ static void usba_pwr_enable_deferred(void)
 }
 DECLARE_DEFERRED(usba_pwr_enable_deferred);
 
-void board_chipset_startup_mensa(void)
+static void enable_pp3300_s3_deferred(void)
 {
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp3300_s3), 1);
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_ppvar_oled), 1);
+}
+DECLARE_DEFERRED(enable_pp3300_s3_deferred);
+
+void board_chipset_startup_mensa(void)
+{
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000), 1);
+	hook_call_deferred(&enable_pp3300_s3_deferred_data,
+			   PP3300_S3_ENABLE_DELAY);
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_ppvar_oled), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_i2c_ec_adsp_batt), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_bkoff_odl), 1);
@@ -53,6 +61,7 @@ void board_chipset_shutdown_mensa(void)
 	hook_call_deferred(&pp5000_pwr_disable_deferred_data,
 			   PP5000_PWR_DISABLE_DELAY);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_usba), 0);
+	hook_call_deferred(&enable_pp3300_s3_deferred_data, -1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp3300_s3), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_ppvar_oled), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 0);
