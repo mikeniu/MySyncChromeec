@@ -421,6 +421,7 @@ static int it52xx_emul_send_command_result(struct it52xx_emul_data *data,
 static int it52xx_emul_ppm_reset(struct it52xx_emul_data *data)
 {
 	union cci_event_t cci = { .reset_completed = 1 };
+	int rv;
 
 	data->notification_enable.raw_value = 0;
 	data->error_status.raw_value = 0;
@@ -433,6 +434,17 @@ static int it52xx_emul_ppm_reset(struct it52xx_emul_data *data)
 	data->ppm_reset_seen = true;
 	data->notification_enable_seen = false;
 	data->get_pdc_info_seen = false;
+
+	/*
+	 * IT5271 deasserts its active-low IRQ before reporting PPM_RESET
+	 * completion. This guarantees a new falling edge if the previous UCSI
+	 * alert had left the IRQ asserted.
+	 */
+	data->alert_status &= ~IT52XX_ALERT_UCSI;
+	rv = it52xx_emul_set_irq(data, false);
+	if (rv != 0) {
+		return rv;
+	}
 
 	return it52xx_emul_set_cci(data, cci, NULL, 0);
 }
