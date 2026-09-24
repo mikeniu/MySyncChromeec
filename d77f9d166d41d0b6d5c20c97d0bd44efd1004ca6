@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e09ed503_66cf4964",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-24T08:13:29Z",
+      "side": 1,
+      "message": "A single attempt may not be sufficient. If the wakeup command is interrupted by another battery command, the battery may fail to wake up. Periodic retries can improve the reliability of the battery wakeup process.\n\nOnce the battery wakes up successfully, the disconnected state will be cleared and the retries will stop. Therefore, we prefer to keep the current periodic retry mechanism and only optimize the logging if needed.",
+      "parentUuid": "98de15c9_98441ddb",
+      "range": {
+        "startLine": 505,
+        "startChar": 0,
+        "endLine": 505,
+        "endChar": 0
+      },
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8cef866f_96fd8cbf",
         "filename": "include/battery.h",
         "patchSetId": 8
@@ -54,6 +78,24 @@
       "writtenOn": "2026-09-24T02:59:15Z",
       "side": 1,
       "message": "Add docstring comment for this function.",
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e564db34_d34b9c9e",
+        "filename": "include/battery.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-24T08:13:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8cef866f_96fd8cbf",
       "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -81,6 +123,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd3fb1e2_5ee60ae1",
+        "filename": "include/config.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-24T08:13:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72475dfe_08f45852",
+      "range": {
+        "startLine": 602,
+        "startChar": 0,
+        "endLine": 602,
+        "endChar": 0
+      },
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9bfd2a0_63133ae1",
@@ -94,6 +160,30 @@
       "writtenOn": "2026-09-24T02:59:15Z",
       "side": 1,
       "message": "Inserting a field in the middle of struct fuel_gauge_info alters the offsets of the subsequent fields (sleep_mode and fet). This struct is exposed via host commands, this will break backward compatibility with the host. Please append the new field to the end of the struct instead. Add support to the host command for this change.",
+      "range": {
+        "startLine": 8327,
+        "startChar": 0,
+        "endLine": 8327,
+        "endChar": 0
+      },
+      "revId": "d77f9d166d41d0b6d5c20c97d0bd44efd1004ca6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b738aa3e_f9fab9f2",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 8327,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-24T08:13:29Z",
+      "side": 1,
+      "message": "I don\u0027t think we need to add a host command for this feature.",
+      "parentUuid": "f9bfd2a0_63133ae1",
       "range": {
         "startLine": 8327,
         "startChar": 0,
