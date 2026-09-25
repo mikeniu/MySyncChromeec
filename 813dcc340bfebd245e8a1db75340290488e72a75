@@ -22,6 +22,30 @@
       },
       "revId": "813dcc340bfebd245e8a1db75340290488e72a75",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2050dfd_60b44e05",
+        "filename": "common/system.c",
+        "patchSetId": 30
+      },
+      "lineNbr": 1820,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-25T16:44:28Z",
+      "side": 1,
+      "message": "Done. Added braces around all branches.",
+      "parentUuid": "c2265017_4120702f",
+      "range": {
+        "startLine": 1820,
+        "startChar": 0,
+        "endLine": 1820,
+        "endChar": 45
+      },
+      "revId": "813dcc340bfebd245e8a1db75340290488e72a75",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
