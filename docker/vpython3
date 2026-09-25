@@ -1,0 +1,11 @@
+#!/bin/sh
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Stand-in for vpython3, so that EC scripts such as twister, which start with
+# "#!/usr/bin/env vpython3", run directly in the container. The real vpython3
+# comes from depot_tools and would build its own environment from CIPD in
+# every container. Plain python3 is enough, because the image installs the
+# Zephyr requirements that cover twister's dependencies.
+exec python3 "$@"
