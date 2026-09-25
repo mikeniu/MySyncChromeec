@@ -141,10 +141,9 @@ To run host-based emulation tests using Zephyr's Twister inside the container:
    ```bash
    cd /workspace/src/platform/ec
    ```
-2. Run the tests using `python3 ./twister` (prefixing with `python3` is required
-   to bypass the `vpython3` shebang):
+2. Run the tests:
    ```bash
-   python3 ./twister -ivc -s hibernate_z5.default
+   ./twister -ivc -s hibernate_z5.default
    ```
 
 #### 2. Real Device Testing on Dagwood (using Helper Script)
@@ -211,7 +210,7 @@ docker run --rm \
 ```bash
 docker run --rm \
   -v $(pwd)/workspace:/workspace \
-  ec-builder bash -c "cd /workspace/src/platform/ec && python3 ./twister -ivc -s hibernate_z5.default"
+  ec-builder bash -c "cd /workspace/src/platform/ec && ./twister -ivc -s hibernate_z5.default"
 ```
 
 ### Building and Flashing Dagwood Firmware (OpenOCD & ST-Link)
