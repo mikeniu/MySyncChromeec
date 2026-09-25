@@ -45,6 +45,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bde9ef2b_55629d01",
+        "filename": "common/fpsensor/fpsensor_vendor_command.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-25T16:57:16Z",
+      "side": 1,
+      "message": "Acknowledged. Will clean up in a follow-up CL.",
+      "parentUuid": "af856548_d169d539",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 9999
+      },
+      "revId": "4b9aed133042eb103ff47835040287c6d65ae61a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d3036909_c6ea7d62",
@@ -66,6 +90,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "4b9aed133042eb103ff47835040287c6d65ae61a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9259c85f_0ff9ba1e",
+        "filename": "common/fpsensor/fpsensor_vendor_command.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-25T16:57:16Z",
+      "side": 1,
+      "message": "Done. Updated to EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_FP_VENDOR, fp_command_vendor, EC_VER_MASK(0)).",
+      "parentUuid": "d3036909_c6ea7d62",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 9999
+      },
       "revId": "4b9aed133042eb103ff47835040287c6d65ae61a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
