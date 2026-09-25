@@ -174,6 +174,13 @@ RUN git clone --depth 1 \
     cd / && \
     rm -rf /tmp/vboot_reference
 
+# EC scripts such as twister start with "#!/usr/bin/env vpython3". Run them
+# with plain python3; the Zephyr requirements installed above cover
+# twister's dependencies. The real vpython3 comes from depot_tools and would
+# build its own environment from CIPD in every container.
+RUN printf '#!/bin/sh\nexec python3 "$@"\n' > /usr/local/bin/vpython3 && \
+    chmod +x /usr/local/bin/vpython3
+
 # The entrypoint creates the build user with the workspace owner's UID. Free
 # UID 1000, which the base image assigns to an unused "ubuntu" user.
 RUN userdel -r ubuntu
