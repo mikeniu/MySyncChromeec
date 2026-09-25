@@ -66,11 +66,14 @@ setup_repo() {
 
     if [ ! -d "${target_dir}" ]; then
         local cached_dir="${target_dir//\/workspace/${CACHE_BASE}}"
-        if [ -d "${cached_dir}" ]; then
-            echo "Populating ${repo_name} from build-time cache..."
-            mkdir -p "$(dirname "${target_dir}")"
-            cp -a "${cached_dir}" "${target_dir}"
+        if [ ! -d "${cached_dir}" ]; then
+            echo "Error: No ${repo_name} checkout in ${target_dir}" \
+                 "or ${cached_dir}." >&2
+            return 1
         fi
+        echo "Populating ${repo_name} from build-time cache..."
+        mkdir -p "$(dirname "${target_dir}")"
+        cp -a "${cached_dir}" "${target_dir}"
     fi
 
     if [ -n "${UPDATE}" ]; then
@@ -88,14 +91,31 @@ setup_repo() {
 if [ -z "${UPDATE}" ]; then
     echo "Skipping repository updates (pass --update to sync)..."
 fi
-setup_repo "/workspace/src/platform/ec" "EC firmware" &
-setup_repo "/workspace/src/platform/dagwood" "Dagwood" &
-setup_repo "/workspace/src/third_party/zephyrproject" "Zephyr Project" &
-setup_repo "/workspace/src/third_party/pigweed" "Pigweed" &
-setup_repo "/workspace/src/third_party/u-boot" "U-Boot" &
-setup_repo "/workspace/src/third_party/chromiumos-overlay" \
-    "ChromiumOS Overlay" &
-wait
+
+# Set up the repositories in parallel. A bare "wait" returns 0 however the
+# jobs exit, so remember which repository each job handles and wait on each.
+declare -A REPO_JOBS=()
+start_setup_repo() {
+    setup_repo "$@" &
+    REPO_JOBS[$!]="${2}"
+}
+start_setup_repo "/workspace/src/platform/ec" "EC firmware"
+start_setup_repo "/workspace/src/platform/dagwood" "Dagwood"
+start_setup_repo "/workspace/src/third_party/zephyrproject" "Zephyr Project"
+start_setup_repo "/workspace/src/third_party/pigweed" "Pigweed"
+start_setup_repo "/workspace/src/third_party/u-boot" "U-Boot"
+start_setup_repo "/workspace/src/third_party/chromiumos-overlay" \
+    "ChromiumOS Overlay"
+REPO_SETUP_FAILED=""
+for pid in "${!REPO_JOBS[@]}"; do
+    if ! wait "${pid}"; then
+        echo "Error: Failed to set up ${REPO_JOBS[${pid}]}." >&2
+        REPO_SETUP_FAILED=1
+    fi
+done
+if [ -n "${REPO_SETUP_FAILED}" ]; then
+    exit 1
+fi
 
 # Set up python virtual environment if it doesn't exist
 VENV_DIR="/workspace/.venv"
