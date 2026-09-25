@@ -564,6 +564,7 @@ class Renode(Platform):
             "zephyr_counter_basic_api_stm32_subsec",
             # TODO(b/390255521)
             "timer",
+            "panic_data",  # TODO(b/566195066)
         ]:
             return True
 
@@ -658,6 +659,7 @@ class Renode(Platform):
             "flash_protection",  # TODO(b/487848806)
             "flash_protection_rw",  # TODO(b/487848806)
             "flash_write_protect",  # TODO(b/406944986)
+            "panic_data",  # TODO(b/566195066)
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
