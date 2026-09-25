@@ -1147,17 +1147,23 @@ test_mockable void keyboard_update_button(enum keyboard_button_type button,
 static int command_typematic(int argc, const char **argv)
 {
 	int i;
+	timestamp_t now;
 
 	if (argc == 3) {
 		typematic_first_delay = strtoi(argv[1], NULL, 0) * MSEC;
 		typematic_inter_delay = strtoi(argv[2], NULL, 0) * MSEC;
 	}
 
+	now = get_time();
+
 	ccprintf("From host:   0x%02x\n", typematic_value_from_host);
 	ccprintf("First delay: %3d ms\n", typematic_first_delay / 1000);
 	ccprintf("Inter delay: %3d ms\n", typematic_inter_delay / 1000);
-	ccprintf("Now:         %.6" PRId64 "\n", get_time().val);
-	ccprintf("Deadline:    %.6" PRId64 "\n", typematic_deadline.val);
+	ccprintf("Now:         %" PRId64 ".%06" PRId64 "\n",
+		 now.val / USEC_PER_SEC, now.val % USEC_PER_SEC);
+	ccprintf("Deadline:    %" PRId64 ".%06" PRId64 "\n",
+		 typematic_deadline.val / USEC_PER_SEC,
+		 typematic_deadline.val % USEC_PER_SEC);
 
 	ccputs("Repeat scan code: {");
 	for (i = 0; i < typematic_len; ++i)

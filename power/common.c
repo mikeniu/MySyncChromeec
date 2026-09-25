@@ -852,11 +852,14 @@ static void siglog_deferred(void)
 
 	CPRINTF("%d signal changes:\n", tmp_siglog_entries);
 	for (; siglog_head < tmp_siglog_tail; siglog_head++) {
+		uint64_t t_val = siglog[PTR2IDX(siglog_head)].time.val;
+
 		if (siglog_head != tmp_siglog_head)
-			tdiff.val = siglog[PTR2IDX(siglog_head)].time.val -
+			tdiff.val = t_val -
 				    siglog[PTR2IDX(siglog_head - 1)].time.val;
-		CPRINTF("  %.6lld  +%.6lld  %s => %d\n",
-			siglog[PTR2IDX(siglog_head)].time.val, tdiff.val,
+		CPRINTF("  %lld.%06lld  +%lld.%06lld  %s => %d\n",
+			t_val / USEC_PER_SEC, t_val % USEC_PER_SEC,
+			tdiff.val / USEC_PER_SEC, tdiff.val % USEC_PER_SEC,
 			power_signal_get_name(
 				siglog[PTR2IDX(siglog_head)].signal),
 			siglog[PTR2IDX(siglog_head)].level);
