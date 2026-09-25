@@ -113,7 +113,9 @@ default allowlist; limiting it to character devices leaves block devices
 ## Using the Tools (Inside the Container)
 
 Once you have entered the container, the virtual environment is automatically
-activated and environment variables are exported globally.
+activated and environment variables are exported globally. The shell, and any
+command passed to the container, starts in the EC checkout,
+`/workspace/src/platform/ec`.
 
 ### Verify `zmake` is working
 ```bash
@@ -137,14 +139,9 @@ The final firmware image will be populated on your host filesystem at
 #### 1. Host-based Emulation Testing
 To run host-based emulation tests using Zephyr's Twister inside the container:
 
-1. Navigate to the EC platform directory:
-   ```bash
-   cd /workspace/src/platform/ec
-   ```
-2. Run the tests:
-   ```bash
-   ./twister -ivc -s hibernate_z5.default
-   ```
+```bash
+./twister -ivc -s hibernate_z5.default
+```
 
 #### 2. Real Device Testing on Dagwood (using Helper Script)
 To run tests against a Dagwood board and EC Add-in-card (AIC) connected to the
@@ -210,7 +207,7 @@ docker run --rm \
 ```bash
 docker run --rm \
   -v $(pwd)/workspace:/workspace \
-  ec-builder bash -c "cd /workspace/src/platform/ec && ./twister -ivc -s hibernate_z5.default"
+  ec-builder ./twister -ivc -s hibernate_z5.default
 ```
 
 ### Building and Flashing Dagwood Firmware (OpenOCD & ST-Link)
