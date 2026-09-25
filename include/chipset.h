@@ -10,8 +10,8 @@
  * all main chipsets (x86, gaia, etc.).
  */
 
-#ifndef __CROS_EC_CHIPSET_H
-#define __CROS_EC_CHIPSET_H
+#ifndef PLATFORM_EC_INCLUDE_CHIPSET_H_
+#define PLATFORM_EC_INCLUDE_CHIPSET_H_
 
 #include "ap_reset_log.h"
 #include "common.h"
@@ -125,6 +125,17 @@ void chipset_handle_espi_reset_assert(void);
  * Perform chipset pre-initialization work within the context of chipset task.
  */
 void chipset_pre_init_callback(void);
+
+/**
+ * Check if the current wake is an off-mode charging wake.
+ *
+ * This can be used by the power sequence or board specific code to indicate if
+ * the current wake occurs to perform an off-mode charging task which won't be
+ * booting to the OS.
+ *
+ * @return non-zero if the current wake is an off-mode charging wake.
+ */
+int chipset_is_offmode_charging_wake(void);
 
 #else /* !CONFIG_AP_POWER_CONTROL */
 
@@ -265,4 +276,4 @@ board_system_is_idle(uint64_t last_shutdown_time, uint64_t *target,
 }
 #endif
 
-#endif /* __CROS_EC_CHIPSET_H */
+#endif /* PLATFORM_EC_INCLUDE_CHIPSET_H_ */

@@ -1,1 +1,0 @@
-fpsensor_auth_commands.cc

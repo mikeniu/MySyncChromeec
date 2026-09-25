@@ -240,4 +240,4 @@ which leads to test flakiness (and developers ignoring tests since they're flaky
 [`test`]: /test
 [`host` board]: /board/host/
 [`test_util.h`]: /include/test_util.h
-[Mock README]: /common/mock/README.md
+[Mock README]: /test/mock/README.md

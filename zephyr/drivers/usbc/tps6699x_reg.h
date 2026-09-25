@@ -7,8 +7,8 @@
  * @file
  * @brief TI TPS6699x Register addresses and i2c command structure
  */
-#ifndef __CROS_EC_PDC_TPS6699X_REG_H
-#define __CROS_EC_PDC_TPS6699X_REG_H
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_REG_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_REG_H_
 
 #include "compile_time_macros.h"
 
@@ -92,6 +92,7 @@ enum tps6699x_reg {
 	REG_RECEIVED_ALERT_DATA_OBJECT = 0x74,
 	REG_TX_ALERT_DATA_OBJECT = 0x75,
 	REG_TX_SOURCE_CAPABILITIES_EXTENDED_DATA_BLOCK = 0x77,
+	REG_TX_SOURCE_INFO = 0x78,
 	REG_TRANSMITTED_STATUS_DATA_BLOCK = 0x79,
 	REG_TRANSMITTED_PPS_STATUS_DATA_BLOCK = 0x7a,
 	REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT = 0x7b,
@@ -1411,21 +1412,6 @@ union reg_received_identity_data_object {
 };
 
 /**
- * @brief 4.52 Received Attention VDM Register (Offset = 4Eh)
- */
-union reg_received_attention_vdm {
-	struct {
-		uint8_t number_valid_vdos : 3;
-		uint8_t reserved0 : 2;
-		uint8_t sequence_number : 3;
-
-		uint32_t vdm_header;
-		uint32_t vdo;
-	} __packed;
-	uint8_t raw_value[9];
-};
-
-/**
  * @brief 4.56 Thunderbolt Configuration Register (Offset 0x52)
  */
 
@@ -1454,6 +1440,23 @@ union reg_thunderbolt_configuration {
 		uint32_t source_vconn_delay : 8;
 	} __packed;
 	uint8_t raw_value[8];
+};
+
+/**
+ * @brief 4.60 Intel VID Status Register (Offset 0x59)
+ */
+union reg_intel_vid_status {
+	struct {
+		uint8_t intel_vid_detected : 1;
+		uint8_t tbt_mode_active : 1;
+		uint8_t forced_tbt_mode : 1;
+		uint8_t reserved0 : 5;
+		uint32_t tbt_attention : 32;
+		uint16_t tbt_enter_mode : 16;
+		uint16_t tbt_mode_rx_sop : 16;
+		uint16_t tbt_mode_rx_sopp : 16;
+	} __packed;
+	uint8_t raw_value[11];
 };
 
 /**
@@ -1529,6 +1532,78 @@ union reg_adc_results {
 };
 
 /**
+ * @brief 4.76 Tx Source Capabilities Extended Data Block Register
+ * (Offset = 0x77)
+ */
+union reg_source_cap_ext_data_block {
+	struct {
+		uint32_t voltage_regulation : 8;
+		uint32_t hold_up_time : 8;
+		uint32_t compliance : 8;
+		uint32_t touch_current : 8;
+		uint32_t peak_current_1 : 16;
+		uint32_t peak_current_2 : 16;
+		uint32_t peak_current_3 : 16;
+		uint32_t touch_temperature : 8;
+		uint32_t source_input : 8;
+		uint32_t num_fixed_batt : 4;
+		uint32_t num_swap_batt : 4;
+		uint32_t source_pdp : 8;
+		uint32_t sourec_pdp_epr : 8;
+	} __packed;
+	uint8_t raw_value[15];
+};
+
+/**
+ * @brief 4.77 Tx Source Info (Offset = 0x78)
+ */
+union reg_source_info {
+	struct {
+		uint32_t reported_pdp : 8;
+		uint32_t present_pdp : 8;
+		uint32_t maximum_pdp : 8;
+		uint32_t reserved : 7;
+		uint32_t port_managed_garunteed : 1;
+		uint32_t guaranteed_pdp : 9;
+		uint32_t maximum_pdp_2 : 9;
+		uint32_t reserved_2 : 12;
+		uint32_t dps_port : 1;
+		uint32_t port_type : 1;
+	} __packed;
+	uint8_t raw_value[8];
+};
+
+/**
+ * @brief 4.81 Transmitted Battery Status Data Objects Register (Offset = 0x7B)
+ */
+union reg_battery_status {
+	struct {
+		/* Support one fixed battery on chrome devices */
+		uint32_t reserved0 : 8;
+		uint32_t fixed_battery0_battery_info : 8;
+		uint32_t fixed_battery0_present_capacity : 16;
+		uint32_t reserved1[3];
+	} __packed;
+	uint8_t raw_value[16];
+};
+
+/**
+ * @brief 4.82 Tx Battery Capabilities Register (Offset = 0x7D)
+ */
+union reg_battery_capability {
+	struct {
+		/* Support one fixed battery on chrome devices */
+		uint16_t vid_0;
+		uint16_t pid_0;
+		uint16_t battery_design_capacity_0;
+		uint16_t battery_last_full_charge_capacity_0;
+		uint8_t battery_type_0;
+		uint8_t reserved[27];
+	} __packed;
+	uint8_t raw_value[36];
+};
+
+/**
  * @brief - 10.6.1 SRDY switch settings
  */
 enum srdy_switch_select {
@@ -1546,4 +1621,4 @@ enum srdy_switch_select {
 	SWITCH_SELECT_PP_PD_POLICY = 0x07,
 };
 
-#endif /* __CROS_EC_PDC_TPS6699X_REG_H */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_REG_H_ */

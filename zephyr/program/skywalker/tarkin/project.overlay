@@ -31,6 +31,12 @@
 		smp_c31n2313 {
 			compatible = "smp,c31n2313","battery-smart";
 		};
+		celxpert_b340543 {
+			compatible = "celxpert,b340543","battery-smart";
+		};
+		dynapack_b140336 {
+			compatible = "dynapack,b140336","battery-smart";
+		};
 	};
 
 	gpio-interrupts {
@@ -162,12 +168,49 @@
 	status = "disabled";
 };
 
+&i2c2 {
+	pdc_power_p0_ti: tps6699-pdc@20 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x20>;
+		irq-gpios = <&gpiod 3 GPIO_ACTIVE_LOW>;
+		port-index-on-chip = <0x1>;
+		zephyr,deferred-init;
+		frs-supported;
+		ccd;
+	};
+	pdc_power_p1_ti: tps6699-pdc@21 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x21>;
+		irq-gpios = <&gpioa 6 GPIO_ACTIVE_LOW>;
+		port-index-on-chip = <0x1>;
+		zephyr,deferred-init;
+		frs-supported;
+	};
+};
+
 &i2c3 {
     status = "disabled";
 };
 
 &sha0 {
 	status = "okay";
+};
+
+&usbc_port0 {
+	pdc = <&pdc_power_p0 &pdc_power_p0_ti>;
+	zephyr,deferred-init;
+};
+
+&usbc_port1 {
+	pdc = <&pdc_power_p1 &pdc_power_p1_ti>;
+	zephyr,deferred-init;
+};
+
+&pdc_power_p0 {
+	zephyr,deferred-init;
+};
+&pdc_power_p1 {
+	zephyr,deferred-init;
 };
 
 /*
@@ -187,6 +230,7 @@
 		 /delete-node/ pstate;
 
 		 ec-ro {
+			size = <(0x60000 - (0x1000 * 2))>;
 			fmap {
 				offset =  <(0x60000 - (0x1000 * 2) - 0x400)>;
 				/*

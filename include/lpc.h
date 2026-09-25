@@ -5,8 +5,8 @@
 
 /* LPC module for Chrome EC */
 
-#ifndef __CROS_EC_LPC_H
-#define __CROS_EC_LPC_H
+#ifndef PLATFORM_EC_INCLUDE_LPC_H_
+#define PLATFORM_EC_INCLUDE_LPC_H_
 
 #include "common.h"
 #include "host_command.h"
@@ -38,14 +38,6 @@ int lpc_keyboard_input_pending(void);
  * @param send_irq	If non-zero, asserts IRQ
  */
 void lpc_keyboard_put_char(uint8_t chr, int send_irq);
-
-/**
- * Send an aux byte to host via keyboard port 0x60.
- *
- * @param chr		Byte to send
- * @param send_irq	If non-zero, asserts IRQ
- */
-void lpc_aux_put_char(uint8_t chr, int send_irq);
 
 /**
  * Clear the keyboard buffer.
@@ -173,8 +165,26 @@ void lpc_init_mask(void);
  */
 void lpc_s3_resume_clear_masks(void);
 
+/**
+ * Enable / disable the eSPI/LPC host-interface interrupts.
+ *
+ * Used to quiesce the interface across a sysjump so no new host command
+ * is dispatched between the pre-jump ACK and the actual sysjump.
+ */
+#ifdef CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI
+void lpc_enable_host_interface_interrupts(void);
+void lpc_disable_host_interface_interrupts(void);
+#else
+static inline void lpc_enable_host_interface_interrupts(void)
+{
+}
+static inline void lpc_disable_host_interface_interrupts(void)
+{
+}
+#endif /* !CONFIG_PLATFORM_EC_HOST_INTERFACE_ESPI */
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CROS_EC_LPC_H */
+#endif /* PLATFORM_EC_INCLUDE_LPC_H_ */

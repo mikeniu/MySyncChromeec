@@ -48,6 +48,7 @@
 #include <zephyr/drivers/spi.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/minmax.h>
 
 #include <drivers/cros_flash.h>
 #include <soc.h>
@@ -59,6 +60,11 @@ LOG_MODULE_REGISTER(cros_flash, LOG_LEVEL_ERR);
  * scheme for RO -> [RB ->] -> RW protection.
  */
 #define FLASH_PROTECTION_START 0
+#define WP_END (CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE)
+#ifdef CONFIG_ROLLBACK
+#define RB_END (CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE)
+#endif /* CONFIG_ROLLBACK */
+#define ALL_END (CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE)
 
 struct cros_flash_andestech_xip_data {
 	const struct device *flash_dev;
@@ -183,7 +189,7 @@ static int check_prot_reg(const struct device *dev, unsigned int offset,
 }
 
 static int set_status_for_prot(const struct device *dev, uint8_t reg1,
-			       uint8_t reg2)
+			       uint8_t reg2, bool volatile_write)
 {
 	int ret;
 	struct andes_xip_ex_ops_set_in op_in;
@@ -197,6 +203,7 @@ static int set_status_for_prot(const struct device *dev, uint8_t reg1,
 	op_in.regs[0] = reg1;
 	op_in.regs[1] = reg2;
 
+	op_in.volatile_write = volatile_write;
 	/* Update only protection related bits */
 	ret = flash_andes_xip_set_status_regs(dev, &op_in);
 
@@ -204,7 +211,7 @@ static int set_status_for_prot(const struct device *dev, uint8_t reg1,
 }
 
 static int set_flash_prot(const struct device *dev, uint32_t offset,
-			  uint32_t bytes)
+			  uint32_t bytes, bool volatile_write)
 {
 	int rv;
 	uint8_t sr1, sr2;
@@ -221,7 +228,7 @@ static int set_flash_prot(const struct device *dev, uint32_t offset,
 		return rv;
 	}
 
-	return set_status_for_prot(dev, sr1, sr2);
+	return set_status_for_prot(dev, sr1, sr2, volatile_write);
 }
 
 static uint32_t cros_flash_andes_xip_get_protect_flags(const struct device *dev)
@@ -279,17 +286,16 @@ static uint32_t cros_flash_andes_xip_get_protect_flags(const struct device *dev)
 
 	/* Check if ranges fully overlap. This logic assumes a certain flash
 	 * layout: RO -> ROLLBACKS -> RW. */
-	if (prot_end >= (CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE)) {
+	if (prot_end >= ALL_END) {
 		flags |= EC_FLASH_PROTECT_ALL_AT_BOOT |
 			 EC_FLASH_PROTECT_RO_AT_BOOT;
 #ifdef CONFIG_ROLLBACK
 		flags |= EC_FLASH_PROTECT_ROLLBACK_AT_BOOT;
-	} else if (prot_end >= (CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE)) {
+	} else if (prot_end >= RB_END) {
 		flags |= EC_FLASH_PROTECT_RO_AT_BOOT |
 			 EC_FLASH_PROTECT_ROLLBACK_AT_BOOT;
 #endif /* CONFIG_ROLLBACK */
-	} else if (prot_end >=
-		   (CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE)) {
+	} else if (prot_end >= WP_END) {
 		flags |= EC_FLASH_PROTECT_RO_AT_BOOT;
 	}
 
@@ -372,6 +378,7 @@ static int cros_flash_andes_xip_protect_at_boot(const struct device *dev,
 	uint32_t new_prot_end;
 	uint32_t curr_prot_start;
 	uint32_t curr_prot_end;
+	bool volatile_write = true;
 
 	k_mutex_lock(&data->flash_lock, K_FOREVER);
 
@@ -383,11 +390,11 @@ static int cros_flash_andes_xip_protect_at_boot(const struct device *dev,
 	/* There is no independent protection of each section. Protection of WP
 	 * is within protection ranges of Rollbacks */
 	if (new_flags & EC_FLASH_PROTECT_ALL_AT_BOOT) {
-		new_prot_end = CONFIG_RW_MEM_OFF + CONFIG_RW_SIZE;
+		new_prot_end = ALL_END;
 	} else if (new_flags & EC_FLASH_PROTECT_ROLLBACK_AT_BOOT) {
-		new_prot_end = CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE;
+		new_prot_end = RB_END;
 	} else if (new_flags & EC_FLASH_PROTECT_RO_AT_BOOT) {
-		new_prot_end = CONFIG_WP_STORAGE_OFF + CONFIG_WP_STORAGE_SIZE;
+		new_prot_end = WP_END;
 	} else {
 		/* Disable protection of WP section, but do not disable
 		 * protection of the flash header. */
@@ -422,8 +429,14 @@ static int cros_flash_andes_xip_protect_at_boot(const struct device *dev,
 		ret = flash_andes_xip_lock_status(dev, false);
 	}
 
+	/* If the change impacts the WP region, make it non-volatile. */
+	if ((curr_prot_end >= WP_END) != (new_prot_end >= WP_END)) {
+		volatile_write = false;
+	}
+
 	if (!ret) {
-		ret = set_flash_prot(dev, FLASH_PROTECTION_START, new_prot_end);
+		ret = set_flash_prot(dev, FLASH_PROTECTION_START, new_prot_end,
+				     volatile_write);
 	}
 
 	/* Always lock the status register if it was locked before. */
@@ -618,7 +631,7 @@ static int flash_andes_xip_init(const struct device *dev)
 
 	data->flash_dev = DEVICE_DT_GET(FLASH_DEV);
 	if (!device_is_ready(data->flash_dev)) {
-		LOG_ERR("device %s not ready", data->flash_dev->name);
+		LOG_ERR_DEVICE_NOT_READY(data->flash_dev);
 		return -ENODEV;
 	}
 	k_mutex_init(&data->flash_lock);

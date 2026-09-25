@@ -5,9 +5,10 @@
  * USB-PD Cable type header.
  */
 
-#ifndef __CROS_EC_USB_PD_VDO_H
-#define __CROS_EC_USB_PD_VDO_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_VDO_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_VDO_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -24,11 +25,32 @@ extern "C" {
 /*
  * ############################################################################
  *
- * Reference: USB Power Delivery Specification Revision 3.2, Version 1.0
- * Updated to ECN released on October, 2023
+ * Reference: USB Power Delivery Specification Revision 3.2, Version 1.2
+ * Updated to ECN released on May, 2026
  *
  * ############################################################################
  */
+
+enum usb_pd_vconn_power {
+	USB_PD_VCONN_POWER_1W = 0,
+	USB_PD_VCONN_POWER_1_5W,
+	USB_PD_VCONN_POWER_2W,
+	USB_PD_VCONN_POWER_3W,
+	USB_PD_VCONN_POWER_4W,
+	USB_PD_VCONN_POWER_5W,
+	USB_PD_VCONN_POWER_6W,
+};
+
+enum usb_rev30_ss {
+	USB_R30_SS_U2_ONLY,
+	USB_R30_SS_U32_U40_GEN1,
+	USB_R30_SS_U32_U40_GEN2,
+	USB_R30_SS_U40_GEN3,
+	USB_R30_SS_U40_GEN4,
+	USB_R30_SS_RES_5,
+	USB_R30_SS_RES_6,
+	USB_R30_SS_RES_7,
+};
 
 /*****************************************************************************/
 /*
@@ -37,48 +59,100 @@ extern "C" {
  * <31>    : USB Communications Capable as USB Host
  * <30>    : USB Communications Capable as a USB Device
  * <29:27> : Product Type (UFP):
- *           000b = Undefined
+ *           000b = Not a UFP
  *           001b = PDUSB Hub
  *           010b = PDUSB Peripheral
  *           011b = PSD (PD 3.0)
- *           101b = Alternate Mode Adapter (AMA)
- *           110b = Vconn-Powered USB Device (VPD, PD 3.0)
- *           111b = Reserved, shall NOT be used
+ *           100b = Invalid, receiver Should Ignore this field
+ *           101b = Deprecated, Alternate Mode Adapter (AMA)
+ *           110b...111b = Invalid; receiver Should Ignore this field
  *
  *           Product Type (Cable Plug):
- *           000b = Undefined
- *           001b...010b = Reserved, Shall NOT be used
+ *           000b = Not a Cable Plug/VPD
+ *           001b...010b = Invalid, receiver Should Ignore this field
  *           011b = Passive Cable
  *           100b = Active Cable
- *           101b...111b = Reserved, Shall NOT be used
+ *           101b = Invalid, receiver Should Ignore this field
+ *           110b = VCONN Powered USB Device (VPD)
+ *           111b = Invalid, Shall Not be used
  * <26>    : Modal Operation Supported
  * <25:23> : Product Type (DFP):
- *           000b = Undefined
+ *           000b = Not a DFP
  *           001b = PDUSB Hub
  *           010b = PDUSB Host
  *           011b = Power Brick
- *           100b = Alternate Mode Controller (AMC)
- *           101b...111b = Reserved, Shall NOT be used
+ *           100b = Deprecated, Alternate Mode Controller (AMC)
+ *           101b...111b = Invalid, Shall NOT be used
  * <22:21> : Connector Type
- *           00b = Reserved for compatibility with legacy systems
- *           01b = Reserved, Shall Not be used
+ *           00b = Deprecated, Unknown connector type
+ *           01b = Invalid, Shall Not be used
  *           10b = USB Type-C Receptacle
  *           11b = USB Type-C Captive Plug
- * <20:16> : Reserved
+ * <20:16> : Reserved, receiver Shall Ignore this field.
  * <15:0>  : USB Vendor ID
  */
+
+enum idh_ptype_ufp {
+	IDH_PTYPE_UFP_NOT_UFP,
+	IDH_PTYPE_UFP_HUB,
+	IDH_PTYPE_UFP_PERIPH,
+	IDH_PTYPE_UFP_PSD = 3,
+	IDH_PTYPE_UFP_PCABLE = 3,
+	IDH_PTYPE_UFP_ACABLE,
+	IDH_PTYPE_UFP_VPD = 6,
+};
+
+enum idh_ptype_dfp {
+	IDH_PTYPE_DFP_NOT_DFP,
+	IDH_PTYPE_DFP_HUB,
+	IDH_PTYPE_DFP_HOST,
+	IDH_PTYPE_DFP_POWER_BRICK,
+};
+
 enum connector_type {
 	USB_TYPEC_RECEPTACLE = 2,
 	USB_TYPEC_CAPTIVE_PLUG,
 };
 
-enum idh_ptype_dfp {
-	IDH_PTYPE_DFP_UNDEFINED,
-	IDH_PTYPE_DFP_HUB,
-	IDH_PTYPE_DFP_HOST,
-	IDH_PTYPE_DFP_POWER_BRICK,
-	IDH_PTYPE_DFP_AMC,
+union id_header_vdo_rev3 {
+	struct {
+		uint16_t usb_vendor_id : 16;
+		unsigned int reserved : 5;
+		enum connector_type connector_type : 2;
+		/*
+		 * These two fields represent a single field of type enum
+		 * idh_ptype_dfp, but that field is split to avoid
+		 * structure-packing issues across a byte boundary. Do not
+		 * access these fields directly. Instead, use the helper
+		 * functions set_idh_product_type_dfp() and
+		 * get_idh_product_type_dfp().
+		 */
+		unsigned int product_type_dfp_lo : 1;
+		unsigned int product_type_dfp_hi : 2;
+		bool modal_supported : 1;
+		enum idh_ptype_ufp product_type_ufp : 3;
+		bool usb_device : 1;
+		bool usb_host : 1;
+	};
+	uint32_t raw_value;
 };
+
+BUILD_ASSERT(sizeof(union id_header_vdo_rev3) == sizeof(uint32_t));
+
+static inline void set_idh_product_type_dfp(union id_header_vdo_rev3 *idh,
+					    enum idh_ptype_dfp ptype)
+{
+	idh->product_type_dfp_hi = ptype >> 1;
+	idh->product_type_dfp_lo = ptype & 0x1;
+}
+
+static inline enum idh_ptype_dfp
+get_idh_product_type_dfp(const union id_header_vdo_rev3 *idh)
+{
+	return (enum idh_ptype_dfp)((idh->product_type_dfp_hi << 1) |
+				    idh->product_type_dfp_lo);
+}
+
 /*****************************************************************************/
 /*
  * Table 6-38 Cert Stat VDO (Note: same as Revision 2.0)
@@ -103,94 +177,78 @@ struct product_vdo {
 
 /*****************************************************************************/
 /*
- * USB PD r 3.2 v 1.0 Table 6-40 UFP VDO
+ * Table 6-40 UFP VDO (PD Revision 3.2 / 3.1 / 3.0)
  * -------------------------------------------------------------
- * <31:29> : UFP VDO version
- *           Version 1.0 = 000b
- *           Version 1.1 = 001b
- *           Version 1.3 = 011b
- *           Values 100b...111b are Reserved and Shall Not be used
- * <28>    : Reserved
- * <27:24> : Device Capability
- *           0001b = USB2.0 Device capable
- *           0010b = USB2.0 Device capable (Billboard only)
- *           0100b = USB3.2 Device capable
- *           1000b = USB4 Device Capable
- * <23:22> : Connector Type
- *           As of PD r 3.1 v 1.8, this field is legacy and Shall be set to 00b
- *           Values as of PD r 3.0 v 2.0
- *           00b = Reserved, Shall Not be used
- *           01b = Reserved, Shall Not be used
- *           10b = USB Type-C Receptacle
- *           11b = USB Type-C Captive Plug
- * <21:11> : Reserved
- * <10:8>  : VCONN Power
- *           000b = 1W
- *           001b = 1.5W
- *           010b = 2W
- *           011b = 3W
- *           100b = 4W
- *           101b = 5W
- *           110b = 6W
- *           111b = Reserved, Shall Not be used
- *           When VCONN Required field is set to No, the VCONN Power Field is
- *           Reserved and Shall be set to zero.
+ * <31:29> : UFP Version:
+ *           000b - Invalid, Shall Not be used (Version 1.0)
+ *           001b - Deprecated, Version 1.1
+ *           010b - Deprecated, Version 1.2
+ *           011b - Version 1.3
+ *           100b...111b - Invalid, Shall Not be used.
+ * <28>    : Reserved, receiver Shall Ignore this field.
+ * <27>    : USB4 Device Capability
+ * <26>    : USB 3.2 Device Capability
+ * <25:24> : USB 2.0 Device Capability:
+ *           00b - Device is not USB 2.0 capable.
+ *           01b - Device is USB 2.0 capable of USB 2.0 as a billboard Device
+ * only. 10b - Device is capable of USB 2.0. 11b - Invalid, receiver Shall
+ * assume 00b <23:22> : Connector Type (Legacy) - Shall be set to 00b <21:11> :
+ * Reserved, receiver Shall Ignore this field. <10:8>  : VCONN Power: 000b - 1W
+ *           001b - 1.5W
+ *           010b - 2W
+ *           011b - 3W
+ *           100b - 4W
+ *           101b - 5W
+ *           110b - 6W
+ *           111b - Invalid, Shall Not be used.
  * <7>     : VCONN Required
- *           0 = No
- *           1 = Yes
- * <6>     : VBUS Required
- *           0 = No
- *           1 = Yes
- * <5:3>   : Alternate Modes
- *           001b = Supports TBT3 alternate mode
- *           010b = Supports Alternate Modes that reconfigure
- *                  the signals on the [USB Type-C 2.0] connector
- *                  – except for [TBT3]
- *           100b = Supports Alternate Modes that do not
- *                  reconfigure the signals on the [USB Type-C 2.0]
- *                  connector
- * <2:0>   : USB Highest Speed
- *           000b = USB 2.0 only, no SuperSpeed support
- *           001b = USB 3.2 Gen1
- *           010b = USB 3.2/USB4 Gen2
- *           011b = USB4 Gen3
- *           100b = USB4 Gen4
- *           101b…111b = Reserved, Shall Not be used
+ * <6>     : VBUS Required 0 means required, 1 means not required
+ * <5>     : No Signal Reconfig. Alternate Mode Support
+ * <4>     : Non-[TBT3] Signal Reconfig. Alternate Mode Support
+ * <3>     : [TBT3] Alternate Mode Support
+ * <2:0>   : USB Highest Speed:
+ *           000b - [USB2] only, no SuperSpeed support
+ *           001b - [USB3] Gen1
+ *           010b - [USB3]/[USB4] Gen2
+ *           011b - [USB4] Gen3
+ *           100b - [USB4] Gen4
+ *           101b...111b - Invalid, Shall Not be used
  */
 
-enum usb_rev30_ss {
-	USB_R30_SS_U2_ONLY,
-	USB_R30_SS_U32_U40_GEN1,
-	USB_R30_SS_U32_U40_GEN2,
-	USB_R30_SS_U40_GEN3,
-	USB_R30_SS_U40_GEN4,
-	USB_R30_SS_RES_5,
-	USB_R30_SS_RES_6,
-	USB_R30_SS_RES_7,
+enum ufp_vdo_version {
+	UFP_VDO_VERSION_1_0 = 0,
+	UFP_VDO_VERSION_1_1 = 1,
+	UFP_VDO_VERSION_1_2 = 2,
+	UFP_VDO_VERSION_1_3 = 3,
 };
 
-enum usb_pd_vconn_power {
-	USB_PD_VCONN_POWER_1W = 0,
-	USB_PD_VCONN_POWER_1_5W,
-	USB_PD_VCONN_POWER_2W,
-	USB_PD_VCONN_POWER_3W,
-	USB_PD_VCONN_POWER_4W,
-	USB_PD_VCONN_POWER_5W,
-	USB_PD_VCONN_POWER_6W,
+enum ufp_usb2_cap {
+	UFP_USB2_NOT_CAPABLE = 0,
+	UFP_USB2_CAPABLE_BILLBOARD = 1,
+	UFP_USB2_CAPABLE = 2,
 };
+typedef enum ufp_usb2_cap usb2_mode;
 
-union ufp_vdo_rev30 {
+enum ufp_vbus_required {
+	UFP_VDO_VBUS_REQUIRED = 0,
+	UFP_VDO_VBUS_NOT_REQUIRED = 1,
+};
+union ufp_vdo_rev3 {
 	struct {
-		enum usb_rev30_ss usb_highest_speed : 3;
-		unsigned int alternate_modes : 3;
-		unsigned int vbus_required : 1;
-		unsigned int vconn_required : 1;
+		enum usb_rev30_ss speed : 3;
+		bool tbt_support : 1;
+		bool non_tbt3_signal_reconfig : 1;
+		bool no_signal_reconfig : 1;
+		enum ufp_vbus_required vbus : 1;
+		bool vconn : 1;
 		enum usb_pd_vconn_power vconn_power : 3;
 		unsigned int reserved1 : 11;
 		unsigned int connector_type : 2;
-		unsigned int device_capability : 4;
+		enum ufp_usb2_cap usb2_cap : 2;
+		bool usb3_cap : 1;
+		bool usb4_cap : 1;
 		unsigned int reserved2 : 1;
-		unsigned int ufp_vdo_version : 3;
+		enum ufp_vdo_version version : 3;
 	};
 	uint32_t raw_value;
 };
@@ -217,25 +275,43 @@ union ufp_vdo_rev30 {
 
 /*****************************************************************************/
 /*
- * Table 6-41 DFP VDO
+ * Table 6-41 DFP VDO (PD Revision 3.2 / 3.1 / 3.0)
  * -------------------------------------------------------------
- * <31:29> : DFP VDO version
- *           Version 1.0 = 000b
- *           Version 1.1 = 001b
- *           Values 010b...111b are Reserved and Shall Not be used
- * <28:27> : Reserved
- * <26:24> : Host Capability
- *           001b = USB2.0 host capable
- *           010b = USB3.2 host capable
- *           100b = USB4 host capable
- * <23:22> : Connector Type
- *           00b = Reserved, Shall Not be used
- *           01b = Reserved, Shall Not be used
- *           10b = USB Type-C Receptacle
- *           11b = USB Type-C Captive Plug
- * <21:5>  : Reserved
+ * <31:29> : DFP Version:
+ *           000b - Invalid, Shall Not be used (Version 1.0)
+ *           001b - Deprecated, Version 1.1
+ *           010b - Version 1.2
+ *           011b - Version 1.3
+ *           100b...111b - Invalid, Shall Not be used.
+ * <28:27> : Reserved, receiver Shall Ignore this field.
+ * <26>    : USB4 Host Capability
+ * <25>    : USB 3.2 Host Capability
+ * <24>    : USB 2.0 Host Capability:
+ * <23:22> : Connector Type (Legacy) - Shall be set to 00b
+ * <21:5>  : Reserved, receiver Shall Ignore this field.
  * <4:0>   : Port number
  */
+
+enum dfp_vdo_version {
+	DFP_VDO_VERSION_1_0 = 0,
+	DFP_VDO_VERSION_1_1 = 1,
+	DFP_VDO_VERSION_1_2 = 2,
+};
+
+union dfp_vdo_rev3 {
+	struct {
+		unsigned int port_num : 5;
+		unsigned int reserved1 : 17;
+		enum connector_type connector_type : 2;
+		bool usb2_cap : 1;
+		bool usb3_cap : 1;
+		bool usb4_cap : 1;
+		unsigned int reserved2 : 2;
+		enum dfp_vdo_version version : 3;
+	};
+	uint32_t raw_value;
+};
+
 /* DFP VDO Version 1.1; update the value when DFP VDO version changes */
 #define VDO_DFP(cap, ctype, port)                                    \
 	((0x1) << 29 | ((cap) & 0x7) << 24 | ((ctype) & 0x3) << 22 | \
@@ -672,12 +748,6 @@ enum vpd_cts_support {
 /*****************************************************************************/
 /*
  * Table 6-23 ID Header VDO
- *
- * Note: PD 3.0 ID header (Table 6-34, PD Revision 3.1 Spec) makes use of
- * reserved bits 25:21 for a connector type and product type (DFP).  It is not
- * advised to create a structure using these bits however, as the DFP product
- * type crosses a byte boundary and causes problems with gcc's structure
- * alignment.
  * -------------------------------------------------------------
  * <31>    : USB Communications Capable as USB Host
  * <30>    : USB Communications Capable as a USB Device
@@ -1103,4 +1173,4 @@ BUILD_ASSERT(sizeof(uint32_t) == sizeof(union product_type_vdo2));
 }
 #endif
 
-#endif /* __CROS_EC_USB_PD_VDO_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_VDO_H_ */

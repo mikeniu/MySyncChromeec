@@ -12,6 +12,7 @@
  */
 #include "comm-host.h"
 #include "misc_util.h"
+#include "panic_defs.h"
 
 #include <assert.h>
 #include <ctype.h>
@@ -25,7 +26,6 @@
 #include <string.h>
 #include <time.h>
 
-#include <chromeos/ec/panic_defs.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -279,7 +279,8 @@ static int get_panic_info(struct panic_data &pdata)
 
 	memcpy(&pdata, ec_inbuf, bytes_read);
 
-	if (pdata.struct_version > 2 || pdata.struct_version == 0) {
+	if (pdata.struct_version > PANIC_DATA_VERSION ||
+	    pdata.struct_version == 0) {
 		std::cerr << "Error: Unexpected struct version: "
 			  << pdata.struct_version << std::endl;
 		return -1;

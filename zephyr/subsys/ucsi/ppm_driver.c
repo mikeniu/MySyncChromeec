@@ -16,7 +16,7 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/sys_clock.h>
+#include <zephyr/sys/clock.h>
 
 #include <drivers/pdc.h>
 #include <usbc/ppm.h>
@@ -244,6 +244,7 @@ static int ucsi_ppm_execute_cmd_sync(const struct device *device,
 	case UCSI_GET_PD_MESSAGE:
 	case UCSI_GET_ATTENTION_VDO:
 	case UCSI_GET_CAM_CS:
+	case UCSI_GET_LPM_PPM_INFO:
 	case UCSI_SET_CCOM:
 	case UCSI_SET_UOR:
 	case UCSI_SET_PDR:
@@ -253,6 +254,7 @@ static int ucsi_ppm_execute_cmd_sync(const struct device *device,
 	case UCSI_SET_PDOS:
 	case UCSI_SET_NEW_CAM:
 	case UCSI_SET_USB:
+	case UCSI_VENDOR_DEFINED_COMMAND:
 		conn = UCSI_7BIT_PORTMASK(control->command_specific[0]);
 		break;
 	case UCSI_GET_ALTERNATE_MODES:
@@ -357,6 +359,8 @@ done:
 				(struct capability_t *)lpm_data_out;
 			caps->bNumConnectors =
 				ucsi_get_active_port_count(device);
+			caps->bNumAltModes = DT_INST_PROP_OR(
+				0, b_num_alt_modes, caps->bNumAltModes);
 			break;
 		}
 		default:
@@ -410,6 +414,12 @@ static void ppm_ci_cb(const struct device *dev,
 		LOG_WRN("%s: Received CI on invalid connector = %u (port_count=%u)",
 			__func__, cci_event.connector_change,
 			data->active_port_count);
+		return;
+	}
+
+	if (chipset_in_state(CHIPSET_STATE_ANY_SUSPEND)) {
+		LOG_DBG("C%d: Suppressing PPM CI during suspend",
+			cci_event.connector_change);
 		return;
 	}
 

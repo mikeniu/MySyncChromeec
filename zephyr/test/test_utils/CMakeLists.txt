@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 zephyr_interface_library_named(test_utils)
+target_include_directories(test_utils INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 zephyr_library_sources(fff.c)
 
@@ -18,5 +19,7 @@ if (CONFIG_ZTEST_TC_UTIL_USER_OVERRIDE AND CONFIG_BOARD_NATIVE_SIM)
   zephyr_include_directories("${PLATFORM_EC}/zephyr/include/test")
   zephyr_library_sources(ztest_printk)
 endif()
+
+zephyr_library_sources_ifdef(CONFIG_EC_HOST_CMD host_command.c)
 
 zephyr_library_link_libraries(test_utils)

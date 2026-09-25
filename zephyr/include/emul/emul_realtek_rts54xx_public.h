@@ -3,10 +3,13 @@
  * found in the LICENSE file.
  */
 
-#ifndef __EMUL_REALTEK_RTS5453P_PUBLIC_H
-#define __EMUL_REALTEK_RTS5453P_PUBLIC_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_REALTEK_RTS54XX_PUBLIC_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_REALTEK_RTS54XX_PUBLIC_H_
 
+#include "emul/emul_common_i2c.h"
 #include "include/usb_pd.h"
+
+#include <zephyr/drivers/emul.h>
 
 #define RTS5453P_MAX_EPR_PDO_OFFSET 4
 
@@ -26,4 +29,15 @@
 #define RTS5453P_BATT_SNK PDO_BATT(5000, 20000, 45000)
 #define RTS5453P_VAR_SNK PDO_VAR(5000, 20000, 3000)
 
-#endif
+/**
+ * @brief Get pointer to i2c_common_emul_data for RTS5453P emulator
+ *
+ * Used to configure I2C failure injection for testing error paths.
+ *
+ * @param emul Pointer to RTS5453P emulator
+ * @return Pointer to i2c_common_emul_data structure
+ */
+struct i2c_common_emul_data *
+rts5453p_emul_get_i2c_common_data(const struct emul *emul);
+
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_REALTEK_RTS54XX_PUBLIC_H_ */

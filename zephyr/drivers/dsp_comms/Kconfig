@@ -51,6 +51,7 @@ config PLATFORM_EC_DSP_REMOTE_TABLET_SWITCH
 config PLATFORM_EC_DSP_REMOTE_LID_ANGLE
 	bool "Lid angle based tablet/clamshell mode is done on the DSP core"
 	default y if !TEST
+	depends on PLATFORM_EC_TABLET_MODE
 	help
 	  Handle lid angle based tablet/clamshell mode swaps from the DSP core.
 

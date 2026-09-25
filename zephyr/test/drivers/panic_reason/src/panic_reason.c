@@ -14,17 +14,32 @@
 
 ZTEST(panic_reason, test_panic_reason_zephyr)
 {
-	uint32_t reason;
-	uint32_t info;
-	uint8_t exception;
+	struct panic_data *pdata;
 
 	k_sys_fatal_error_handler(K_ERR_KERNEL_PANIC, NULL);
 
-	/* ESF structure empty, make sure the reason from Zephyr is stored */
-	panic_get_reason(&reason, &info, &exception);
-	zassert_equal(PANIC_ZEPHYR_FATAL_ERROR, reason);
-	zassert_equal(K_ERR_KERNEL_PANIC, info);
-	zassert_equal(task_get_current(), exception);
+	pdata = panic_get_data();
+	zassert_not_null(pdata);
+	zassert_equal(PANIC_ZEPHYR_FATAL_ERROR, panic_get_reason_reg(pdata));
+	zassert_equal(K_ERR_KERNEL_PANIC, panic_get_info_reg(pdata));
+	zassert_equal((uint8_t)(uintptr_t)k_current_get(),
+		      panic_get_exception_reg(pdata));
+}
+
+ZTEST(panic_reason, test_panic_reason_zephyr_with_esf)
+{
+	struct arch_esf esf = {
+		.dummy = 0x12345678, /* nocheck */
+	};
+	struct panic_data *pdata;
+
+	k_sys_fatal_error_handler(K_ERR_KERNEL_PANIC, &esf);
+
+	pdata = panic_get_data();
+	zassert_not_null(pdata, NULL);
+	zassert_equal(PANIC_ARCH_POSIX, pdata->arch);
+	zassert_equal(0x12345678, pdata->posix.esf_placeholder);
+	zassert_equal(PANIC_DATA_MAGIC, pdata->magic);
 }
 
 ZTEST_SUITE(panic_reason, drivers_predicate_post_main, NULL, NULL, NULL, NULL);

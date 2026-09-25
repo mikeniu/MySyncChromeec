@@ -35,13 +35,15 @@ struct keyboard_type key_typ = {
 	.row_left_shift = JAINA_KEYBOARD_ROW_LEFT_SHIFT,
 };
 
-static int keyboard_choose(void)
+static uint32_t get_keyboard_locale(void)
 {
-	uint32_t val;
+	uint32_t kb_matrix;
+	uint32_t kb_matrix2;
 
-	cros_cbi_get_fw_config(KB_MATRIX, &val);
+	cros_cbi_get_fw_config(KB_MATRIX, &kb_matrix);
+	cros_cbi_get_fw_config(KB_MATRIX2, &kb_matrix2);
 
-	return val;
+	return (kb_matrix2 << 2) | kb_matrix;
 }
 
 struct boot_key_entry boot_key_list[] = {
@@ -57,12 +59,20 @@ BUILD_ASSERT(ARRAY_SIZE(boot_key_list) == BOOT_KEY_COUNT);
 
 static void key_choose(void)
 {
-	if (keyboard_choose() == 1) {
+	uint32_t locale = get_keyboard_locale();
+	switch (locale) {
+	case 4:
+		CPRINTS("keyboard_choose UK");
+		break;
+	case 1:
 		key_typ.col_right_alt = JAINA_KEYBOARD2_COL_RIGHT_ALT;
 		key_typ.row_right_alt = JAINA_KEYBOARD2_ROW_RIGHT_ALT;
 		CPRINTS("keyboard_choose JP");
-	} else {
+		break;
+	case 0:
+	default:
 		CPRINTS("keyboard_choose US");
+		break;
 	}
 }
 

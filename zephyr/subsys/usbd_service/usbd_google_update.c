@@ -35,7 +35,6 @@ static struct net_buf *gupdate_buf_alloc(const uint8_t ep)
 	}
 
 	bi = udc_get_buf_info(buf);
-	memset(bi, 0, sizeof(struct udc_buf_info));
 	bi->ep = ep;
 
 	return buf;
@@ -188,6 +187,8 @@ static int usbd_gupdate_request(struct usbd_class_data *const c_data,
 	if (bi->ep == google_get_in_ep(c_data)) {
 		/* Finish Tx */
 		k_sem_give(&data->sync_sem);
+
+		return 0;
 	}
 
 ep_request_error:
@@ -213,8 +214,8 @@ static void usbd_gupdate_disable(struct usbd_class_data *const c_data)
 	LOG_DBG("configuration disabled");
 }
 
-static void *usbd_gupdate_get_desc(struct usbd_class_data *const c_data,
-				   const enum usbd_speed speed)
+static const void *usbd_gupdate_get_desc(struct usbd_class_data *const c_data,
+					 const enum usbd_speed speed)
 {
 	struct google_data *data = usbd_class_get_private(c_data);
 

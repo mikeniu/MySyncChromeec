@@ -5,8 +5,8 @@
 
 /* Header for motion_sense.c */
 
-#ifndef __CROS_EC_MOTION_SENSE_H
-#define __CROS_EC_MOTION_SENSE_H
+#ifndef PLATFORM_EC_INCLUDE_MOTION_SENSE_H_
+#define PLATFORM_EC_INCLUDE_MOTION_SENSE_H_
 
 #include "accelgyro.h"
 #include "atomic.h"
@@ -148,6 +148,8 @@ struct motion_data_t {
  * the components.
  */
 #define MOTIONSENSE_FLAG_IN_SPOOF_MODE BIT(1)
+/* When set the sensor is in forced (polled) mode for sample collection */
+#define MOTIONSENSE_FLAG_IN_FORCED_MODE BIT(2)
 
 struct motion_sensor_t {
 	/* RO fields */
@@ -160,6 +162,9 @@ struct motion_sensor_t {
 	/* One mutex per physical chip. */
 	mutex_t *mutex;
 	void *drv_data;
+
+	/* Minimum number of samples in batch to trigger spreading */
+	uint8_t spreading_threshold;
 
 	/* i2c port */
 	uint8_t port;
@@ -394,4 +399,4 @@ enum sensor_config motion_sense_get_ec_config(void);
 #include "motionsense_sensors.h"
 #endif
 
-#endif /* __CROS_EC_MOTION_SENSE_H */
+#endif /* PLATFORM_EC_INCLUDE_MOTION_SENSE_H_ */

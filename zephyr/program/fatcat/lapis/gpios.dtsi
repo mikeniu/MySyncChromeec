@@ -6,6 +6,7 @@
 / {
 	aliases {
 		gpio-wp = &gpio_ec_wp_odl;
+		gpio-btn-ign-in = &gpio_fp_atc;
 	};
 
 	named-gpios {
@@ -27,7 +28,7 @@
 		};
 		/* EC_WP_ODL */
 		gpio_ec_wp_odl: ec_wp_odl {
-			gpios = <&gpiof 4 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+			gpios = <&gpiof 4 (GPIO_INPUT | GPIO_ACTIVE_LOW | GPIO_VOLTAGE_1P8)>;
 		};
 		/* EC_GSC_PACKET_MODE */
 		gpio_ec_gsc_packet_mode: ec_gsc_packet_mode {
@@ -178,18 +179,13 @@
 		gpio_fp_rst_ec: fp_rst_ec {
 			gpios = <&gpiof 9 GPIO_INPUT>;
 		};
-
-		gpio_fp_rxd1: fp_rxd1 {
-			gpios = <&gpiob 6 (GPIO_OUTPUT | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
-		};
-
 		/* EDP_BIST_EN */
 		gpio_edp_bist_en: edp_bist_en {
 			gpios = <&gpiob 15 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		/* TP_Disable */
 		gpio_tp_disable: tp_disable {
-			gpios = <&gpioh 11 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_HIGH)>;
+			gpios = <&gpioh 11 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		/* Amber LED */
 		gpio_led_amber: led_amber {

@@ -4,6 +4,7 @@
  */
 
 #include "ec_commands.h"
+#include "fpsensor_test_utils.h"
 
 #include <zephyr/fff.h>
 #include <zephyr/sys/util.h>
@@ -14,8 +15,6 @@
 #include <fpsensor/fpsensor_frame_size.h>
 #include <memory>
 #include <mkbp_event.h>
-
-DEFINE_FFF_GLOBALS;
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
@@ -152,4 +151,57 @@ ZTEST(fpsensor_frame_size, test_cache_boundary_negative_index)
 	zassert_equal(
 		cache->get_frame_size(static_cast<enum fp_capture_type>(-1)), 0,
 		"Expected zero size for negative capture type (-1).");
+}
+
+ZTEST(fpsensor_frame_size, test_set_frame_size)
+{
+	FpFrameSizeCache *cache = cache_fixture.get();
+	const enum fp_capture_type test_type = FP_CAPTURE_VENDOR_FORMAT;
+	const uint32_t new_size = 1024;
+
+	/* Verify the state before modification */
+	uint32_t original_size = cache->get_frame_size(test_type);
+	zassert_not_equal(
+		new_size, original_size,
+		"Test setup error: new_size should be different from original.");
+
+	/* Use the test-only setter to override the cache */
+	zassert_true(FpFrameSizeCacheTestHelper::set_frame_size(
+			     *cache, test_type, new_size),
+		     "Failed to set frame size for test type %d", test_type);
+
+	/* Verify the state after modification */
+	uint32_t updated_size = cache->get_frame_size(test_type);
+	zassert_equal(
+		updated_size, new_size,
+		"Cache failed to update with set_frame_size. Expected: %u, Actual: %u",
+		new_size, updated_size);
+}
+
+ZTEST(fpsensor_frame_size, test_set_frame_size_boundary_max_index)
+{
+	FpFrameSizeCache *cache = cache_fixture.get();
+	const uint32_t new_size = 512;
+
+	/* Verify that calling with FP_CAPTURE_TYPE_MAX is a no-op */
+	zassert_false(FpFrameSizeCacheTestHelper::set_frame_size(
+		*cache, FP_CAPTURE_TYPE_MAX, new_size));
+
+	zassert_equal(
+		cache->get_frame_size(FP_CAPTURE_TYPE_MAX), 0,
+		"set_frame_size should ignore the out-of-bounds index FP_CAPTURE_TYPE_MAX.");
+}
+
+ZTEST(fpsensor_frame_size, test_set_frame_size_boundary_negative_index)
+{
+	FpFrameSizeCache *cache = cache_fixture.get();
+	const uint32_t new_size = 512;
+
+	/* Verify that calling with -1 is a no-op */
+	zassert_false(FpFrameSizeCacheTestHelper::set_frame_size(
+		*cache, static_cast<enum fp_capture_type>(-1), new_size));
+
+	zassert_equal(
+		cache->get_frame_size(static_cast<enum fp_capture_type>(-1)), 0,
+		"set_frame_size should ignore the negative out-of-bounds index -1.");
 }

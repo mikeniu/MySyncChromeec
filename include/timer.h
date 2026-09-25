@@ -5,8 +5,8 @@
 
 /* Timer module for Chrome EC operating system */
 
-#ifndef __CROS_EC_TIMER_H
-#define __CROS_EC_TIMER_H
+#ifndef PLATFORM_EC_INCLUDE_TIMER_H_
+#define PLATFORM_EC_INCLUDE_TIMER_H_
 
 #ifndef CONFIG_ZEPHYR
 #include <time.h>
@@ -47,23 +47,6 @@ typedef union {
  * Initialize the timer module.
  */
 void timer_init(void);
-
-/**
- * Launch a one-shot timer for a task.
- *
- * Note that each task can have only a single active timer.
- *
- * @param tstamp	Expiration timestamp for timer
- * @param tskid		Task to set timer for
- *
- * @return EC_SUCCESS, or non-zero if error.
- */
-int timer_arm(timestamp_t tstamp, task_id_t tskid);
-
-/**
- * Cancel a running timer for the specified task id.
- */
-void timer_cancel(task_id_t tskid);
 
 /**
  * Check if a timestamp has passed / expired
@@ -211,4 +194,4 @@ extern timestamp_t *get_time_mock;
 }
 #endif
 
-#endif /* __CROS_EC_TIMER_H */
+#endif /* PLATFORM_EC_INCLUDE_TIMER_H_ */

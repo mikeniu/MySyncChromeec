@@ -77,6 +77,16 @@ __overridable const int supplier_priority[] = {
 	[CHARGE_SUPPLIER_OTHER] = 4,
 	[CHARGE_SUPPLIER_VBUS] = 4,
 #endif
+#if defined(CONFIG_TEST_CHARGE_RAMP)
+	[CHARGE_SUPPLIER_TEST1] = 5,
+	[CHARGE_SUPPLIER_TEST2] = 5,
+	[CHARGE_SUPPLIER_TEST3] = 5,
+	[CHARGE_SUPPLIER_TEST4] = 5,
+	[CHARGE_SUPPLIER_TEST5] = 5,
+	[CHARGE_SUPPLIER_TEST6] = 5,
+	[CHARGE_SUPPLIER_TEST7] = 5,
+	[CHARGE_SUPPLIER_TEST8] = 5,
+#endif
 
 };
 BUILD_ASSERT(ARRAY_SIZE(supplier_priority) == CHARGE_SUPPLIER_COUNT);
@@ -108,7 +118,7 @@ static int save_log[CHARGE_PORT_COUNT];
 #endif
 
 /* Use mutexing to sync charge_manager_refresh and pdc_power_mgmt */
-#ifdef CONFIG_USB_PDC_POWER_MGMT
+#ifdef CONFIG_ZEPHYR
 K_MUTEX_DEFINE(cm_refresh);
 
 // #define CM_MUTEX_DEBUG
@@ -142,11 +152,11 @@ void charge_manager_dump_mutex_history()
 #define CM_MUTEX_UNLOCK(m) mutex_unlock(m)
 #endif /* CM_MUTEX_DEBUG */
 
-#else /* CONFIG_USB_PDC_POWER_MGMT */
+#else /* CONFIG_ZEPHYR */
 /* TODO(b/427504021) - Legacy EC mutexes are not recursive */
 #define CM_MUTEX_LOCK(m)
 #define CM_MUTEX_UNLOCK(m)
-#endif /* CONFIG_USB_PDC_POWER_MGMT */
+#endif /* CONFIG_ZEPHYR */
 
 /* Store current state of port enable / charge current. */
 /* During charge_manager_refresh, the following data is considered stale. Make
@@ -785,11 +795,13 @@ static bool is_dualrole_charging_capable(int port)
 
 static bool is_battery_disconnected(void)
 {
-	return (IS_ENABLED(CONFIG_BATTERY) &&
-		(battery_is_present() == BP_NO ||
-		 battery_is_present() == BP_NOT_SURE ||
-		 (battery_is_present() == BP_YES &&
-		  battery_is_cut_off() != BATTERY_CUTOFF_STATE_NORMAL)));
+	if (!IS_ENABLED(CONFIG_BATTERY)) {
+		return false;
+	}
+	enum battery_present bp = battery_is_present();
+	return (bp == BP_NO || bp == BP_NOT_SURE ||
+		(bp == BP_YES &&
+		 battery_is_cut_off() != BATTERY_CUTOFF_STATE_NORMAL));
 }
 
 static inline bool is_charge_available(const struct charge_port_info *info)
@@ -1149,9 +1161,7 @@ static void charge_manager_refresh(void)
 	/* New power requests must be set only after updating the globals. */
 	if (is_pd_port(updated_new_port)) {
 		/* Check if we can get requested voltage/current */
-		if ((IS_ENABLED(CONFIG_USB_PD_TCPMV1) &&
-		     IS_ENABLED(CONFIG_USB_PD_DUAL_ROLE)) ||
-		    (IS_ENABLED(CONFIG_USB_PD_TCPMV2) &&
+		if ((IS_ENABLED(CONFIG_USB_PD_TCPMV2) &&
 		     IS_ENABLED(CONFIG_USB_PE_SM)) ||
 		    IS_ENABLED(CONFIG_USB_PDC_POWER_MGMT)) {
 			uint32_t pdo;
@@ -1680,103 +1690,11 @@ int charge_manager_set_acokref(int pdo_mv)
 	return charger_set_acokref(charge_get_active_chg_chip(), pdo_mv);
 }
 
-#if defined(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT) && \
-	!defined(CONFIG_USB_PD_TCPMV2)
-/* Note: this functionality is a part of the TCPMv2 Device Poicy Manager */
-
-/* Bitmap of ports used as power source */
-static volatile uint32_t source_port_bitmap;
-BUILD_ASSERT(sizeof(source_port_bitmap) * 8 >= CONFIG_USB_PD_PORT_MAX_COUNT);
-
-static inline int has_other_active_source(int port)
+static enum ec_host_cmd_status
+hc_pd_power_info(struct ec_host_cmd_handler_args *args)
 {
-	return source_port_bitmap & ~BIT(port);
-}
-
-static inline int is_active_source(int port)
-{
-	return source_port_bitmap & BIT(port);
-}
-
-static int can_supply_max_current(int port)
-{
-#ifdef CONFIG_USB_PD_MAX_TOTAL_SOURCE_CURRENT
-	/*
-	 * This guarantees active 3A source continues to supply 3A.
-	 *
-	 * Since redistribution occurs sequentially, younger ports get
-	 * priority. Priority surfaces only when 3A source is released.
-	 * That is, when 3A source is released, the youngest active
-	 * port gets 3A.
-	 */
-	int p;
-	if (!is_active_source(port))
-		/* Non-active ports don't get 3A */
-		return 0;
-	for (p = 0; p < board_get_usb_pd_port_count(); p++) {
-		if (p == port)
-			continue;
-		if (source_port_rp[p] ==
-		    CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT)
-			return 0;
-	}
-	return 1;
-#else
-	return is_active_source(port) && !has_other_active_source(port);
-#endif /* CONFIG_USB_PD_MAX_TOTAL_SOURCE_CURRENT */
-}
-
-void charge_manager_source_port(int port, int enable)
-{
-	uint32_t prev_bitmap = source_port_bitmap;
-	int p, rp;
-
-	if (enable)
-		atomic_or((atomic_t *)&source_port_bitmap, 1 << port);
-	else
-		atomic_clear_bits((atomic_t *)&source_port_bitmap, 1 << port);
-
-	/* No change, exit early. */
-	if (prev_bitmap == source_port_bitmap)
-		return;
-
-	/* Set port limit according to policy */
-	for (p = 0; p < board_get_usb_pd_port_count(); p++) {
-		rp = can_supply_max_current(p) ?
-			     CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT :
-			     CONFIG_USB_PD_PULLUP;
-		source_port_rp[p] = rp;
-
-#ifdef CONFIG_USB_PD_LOGGING
-		if (is_connected(p) && !is_sink(p))
-			charge_manager_save_log(p);
-#endif
-
-		typec_set_source_current_limit(p, rp);
-		if (IS_ENABLED(CONFIG_USB_PD_TCPMV2))
-			typec_select_src_current_limit_rp(p, rp);
-		else
-			tcpm_select_rp_value(p, rp);
-		pd_update_contract(p);
-	}
-}
-
-int charge_manager_get_source_pdo(const uint32_t **src_pdo, const int port)
-{
-	if (can_supply_max_current(port)) {
-		*src_pdo = pd_src_pdo_max;
-		return pd_src_pdo_max_cnt;
-	}
-
-	*src_pdo = pd_src_pdo;
-	return pd_src_pdo_cnt;
-}
-#endif /* CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT && !CONFIG_USB_PD_TCPMV2 */
-
-static enum ec_status hc_pd_power_info(struct host_cmd_handler_args *args)
-{
-	const struct ec_params_usb_pd_power_info *p = args->params;
-	struct ec_response_usb_pd_power_info *r = args->response;
+	const struct ec_params_usb_pd_power_info *p = args->input_buf;
+	struct ec_response_usb_pd_power_info *r = args->output_buf;
 	int port = p->port;
 
 	/* If host is asking for the charging port, set port appropriately */
@@ -1789,48 +1707,53 @@ static enum ec_status hc_pd_power_info(struct host_cmd_handler_args *args)
 	 * voltage, current and power parameters set to 0.
 	 */
 	if (port >= CHARGE_PORT_COUNT)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_COMMAND;
 
 	charge_manager_fill_power_info(port, r);
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_PD_POWER_INFO, hc_pd_power_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_USB_PD_POWER_INFO, hc_pd_power_info, EC_VER_MASK(0),
+		    struct ec_params_usb_pd_power_info,
+		    struct ec_response_usb_pd_power_info);
 
-static enum ec_status hc_charge_port_count(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_charge_port_count(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_charge_port_count *resp = args->response;
+	struct ec_response_charge_port_count *resp = args->output_buf;
 
-	args->response_size = sizeof(*resp);
+	args->output_buf_size = sizeof(*resp);
 	resp->port_count = CHARGE_PORT_COUNT;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_CHARGE_PORT_COUNT, hc_charge_port_count,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_CHARGE_PORT_COUNT, hc_charge_port_count,
+			      EC_VER_MASK(0),
+			      struct ec_response_charge_port_count);
 
-static enum ec_status
-hc_charge_port_override(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_charge_port_override(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_charge_port_override *p = args->params;
+	const struct ec_params_charge_port_override *p = args->input_buf;
 	const int16_t op = p->override_port;
 
 	if (!is_valid_override_port(op))
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
-	return charge_manager_set_override(op) == EC_SUCCESS ? EC_RES_SUCCESS :
-							       EC_RES_ERROR;
+	return charge_manager_set_override(op) == EC_SUCCESS ?
+		       EC_HOST_CMD_SUCCESS :
+		       EC_HOST_CMD_ERROR;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PD_CHARGE_PORT_OVERRIDE, hc_charge_port_override,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_PD_CHARGE_PORT_OVERRIDE,
+			     hc_charge_port_override, EC_VER_MASK(0),
+			     struct ec_params_charge_port_override);
 
 #if CONFIG_DEDICATED_CHARGE_PORT_COUNT > 0
-static enum ec_status
-hc_override_dedicated_charger_limit(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_override_dedicated_charger_limit(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_dedicated_charger_limit *p = args->params;
+	const struct ec_params_dedicated_charger_limit *p = args->input_buf;
 	struct charge_port_info ci = {
 		.current = p->current_lim,
 		.voltage = p->voltage_lim,
@@ -1841,15 +1764,17 @@ hc_override_dedicated_charger_limit(struct host_cmd_handler_args *args)
 	 * to apply a change every time a dedicated charger is plugged.
 	 */
 	if (charge_port != DEDICATED_CHARGE_PORT)
-		return EC_RES_UNAVAILABLE;
+		return EC_HOST_CMD_UNAVAILABLE;
 
 	charge_manager_update_charge(CHARGE_SUPPLIER_DEDICATED,
 				     DEDICATED_CHARGE_PORT, &ci);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_OVERRIDE_DEDICATED_CHARGER_LIMIT,
-		     hc_override_dedicated_charger_limit, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_OVERRIDE_DEDICATED_CHARGER_LIMIT,
+			     hc_override_dedicated_charger_limit,
+			     EC_VER_MASK(0),
+			     struct ec_params_dedicated_charger_limit);
 #endif
 
 static int command_charge_port_override(int argc, const char **argv)
@@ -1902,17 +1827,18 @@ static void charge_manager_external_power_limit_off(void)
 DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, charge_manager_external_power_limit_off,
 	     HOOK_PRIO_DEFAULT);
 
-static enum ec_status
-hc_external_power_limit(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_external_power_limit(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_external_power_limit_v1 *p = args->params;
+	const struct ec_params_external_power_limit_v1 *p = args->input_buf;
 
 	charge_manager_set_external_power_limit(p->current_lim, p->voltage_lim);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_EXTERNAL_POWER_LIMIT, hc_external_power_limit,
-		     EC_VER_MASK(1));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_EXTERNAL_POWER_LIMIT,
+			     hc_external_power_limit, EC_VER_MASK(1),
+			     struct ec_params_external_power_limit_v1);
 
 static int command_external_power_limit(int argc, const char **argv)
 {

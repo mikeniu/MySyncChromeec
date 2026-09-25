@@ -8,6 +8,7 @@
 #define _XOPEN_SOURCE 500
 #endif
 
+#include "mock/fpsensor_crypto_mock.h"
 #include "mock_fingerprint_algorithm.h"
 
 #include <stdlib.h>
@@ -26,13 +27,19 @@
 #include <drivers/fingerprint_sim.h>
 #include <ec_commands.h>
 #include <ec_tasks.h>
+#include <flash.h>
 #include <fpsensor/fpsensor_state.h>
 #include <host_command.h>
 #include <mkbp_event.h>
 #include <rollback.h>
+#include <rollback_private.h>
 #include <system.h>
 
-DEFINE_FFF_GLOBALS;
+#define ROLLBACK0_ADDR DT_REG_ADDR(DT_NODELABEL(rollback0))
+#define ROLLBACK0_SIZE DT_REG_SIZE(DT_NODELABEL(rollback0))
+
+#define ROLLBACK1_ADDR DT_REG_ADDR(DT_NODELABEL(rollback1))
+#define ROLLBACK1_SIZE DT_REG_SIZE(DT_NODELABEL(rollback1))
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 FAKE_VALUE_FUNC(int, system_is_locked);
@@ -1382,6 +1389,88 @@ ZTEST_USER(fpsensor_template, test_fp_template_cleans_buffer_on_failure)
 		"fp_enc_buffer should be clean even after failed commit.");
 }
 
+ZTEST_USER(fpsensor_template,
+	   test_fp_frame_v1_encrypt_template_key_derivation_failure)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE,
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+	struct ec_params_fp_frame_v1 encrypt_request = {
+		.cmd = FP_FRAME_ENCRYPT_TEMPLATE,
+		.index = 0,
+	};
+	struct ec_params_fp_frame_v1 get_request = {
+		.cmd = FP_FRAME_GET_ENCRYPTED_TEMPLATE,
+		.offset = 0,
+		.size = sizeof(encrypted_template),
+	};
+
+	/* Switch mode to enroll. */
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	zassert_true(response.mode &
+		     (FP_MODE_ENROLL_SESSION | FP_MODE_ENROLL_IMAGE));
+
+	k_msleep(1);
+
+	/* Put finger on the sensor. */
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	fingerprint_set_state(fp_sim, &state);
+
+	enroll_percent = 100;
+	mock_alg_enroll_step_fake.custom_fake = custom_enroll_step;
+	mock_alg_enroll_finish_fake.custom_fake = custom_enroll_finish;
+
+	fingerprint_run_callback(fp_sim);
+	k_msleep(1);
+
+	/* Inject key derivation failure. */
+	mock_ctrl_fpsensor_crypto.output_type =
+		MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FAIL;
+
+	/*
+	 * Scheduling the encryption command succeeds (returns EC_RES_SUCCESS),
+	 * but the underlying task will fail during key derivation.
+	 */
+	zassert_ok(ec_cmd_fp_frame_v1(NULL, &encrypt_request, NULL));
+
+	/* Allow fpsensor task to process the encryption request. */
+	k_msleep(1);
+
+	/*
+	 * Verify metadata in global fp_enc_buffer remains uninitialized.
+	 */
+	static const uint8_t zero_nonce[FP_CONTEXT_NONCE_BYTES] = { 0 };
+	static const uint8_t zero_salt[FP_CONTEXT_ENCRYPTION_SALT_BYTES] = { 0 };
+	static const uint8_t zero_tag[FP_CONTEXT_TAG_BYTES] = { 0 };
+
+	zassert_equal(
+		fp_enc_buffer.metadata.struct_version, 0,
+		"struct_version should remain 0 on key derivation failure");
+	zassert_mem_equal(
+		fp_enc_buffer.metadata.nonce, zero_nonce, sizeof(zero_nonce),
+		"Nonce should remain zeroed on key derivation failure");
+	zassert_mem_equal(
+		fp_enc_buffer.metadata.encryption_salt, zero_salt,
+		sizeof(zero_salt),
+		"Encryption salt should remain zeroed on key derivation failure");
+	zassert_mem_equal(fp_enc_buffer.metadata.tag, zero_tag,
+			  sizeof(zero_tag),
+			  "Tag should remain zeroed on key derivation failure");
+
+	/*
+	 * Confirm that getting encrypted template returns EC_RES_UNAVAILABLE.
+	 */
+	zassert_equal(EC_RES_UNAVAILABLE,
+		      ec_cmd_fp_frame_v1(NULL, &get_request,
+					 encrypted_template));
+
+	/* Rate-limit sleep required between encryption requests. */
+	k_sleep(K_SECONDS(1));
+}
+
 static void *fpsensor_setup(void)
 {
 	struct ec_params_fp_seed fp_seed_params = {
@@ -1389,6 +1478,22 @@ static void *fpsensor_setup(void)
 		.reserved = 0,
 		.seed = FAKE_TPM_SEED,
 	};
+	const struct rollback_data data = {
+		.id = 0,
+		.rollback_min_version = 0,
+#ifdef CONFIG_PLATFORM_EC_ROLLBACK_SECRET_SIZE
+		.secret = { 0 },
+#endif
+		.cookie = CROS_EC_ROLLBACK_COOKIE,
+	};
+
+	zassert_ok(crec_flash_erase(ROLLBACK0_ADDR, ROLLBACK0_SIZE));
+	zassert_ok(crec_flash_write(ROLLBACK0_ADDR, sizeof(data),
+				    (const char *)&data));
+
+	zassert_ok(crec_flash_erase(ROLLBACK1_ADDR, ROLLBACK1_SIZE));
+	zassert_ok(crec_flash_write(ROLLBACK1_ADDR, sizeof(data),
+				    (const char *)&data));
 
 	/* Start shimmed tasks. */
 	start_ec_tasks();
@@ -1447,6 +1552,9 @@ static void fpsensor_before(void *f)
 
 	/* Reset seed for random() */
 	srandom(0xdeadc0de);
+
+	/* Reset mock controller. */
+	mock_ctrl_fpsensor_crypto = MOCK_CTRL_DEFAULT_FPSENSOR_CRYPTO;
 }
 
 ZTEST_SUITE(fpsensor_template, NULL, fpsensor_setup, fpsensor_before, NULL,

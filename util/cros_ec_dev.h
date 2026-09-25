@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __UTIL_CROS_EC_DEV_H
-#define __UTIL_CROS_EC_DEV_H
+#ifndef PLATFORM_EC_UTIL_CROS_EC_DEV_H_
+#define PLATFORM_EC_UTIL_CROS_EC_DEV_H_
 
 #include "ec_commands.h"
 
@@ -96,4 +96,4 @@ struct cros_ec_readmem_v2 {
 }
 #endif
 
-#endif /* __UTIL_CROS_EC_DEV_H */
+#endif /* PLATFORM_EC_UTIL_CROS_EC_DEV_H_ */

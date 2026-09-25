@@ -141,8 +141,14 @@ static void keyboard_input_cb(struct input_event *evt, void *user_data)
 }
 INPUT_CALLBACK_DEFINE(kbd_dev, keyboard_input_cb, NULL);
 
+#if DT_NODE_HAS_COMPAT(CROS_EC_KEYBOARD_NODE, gpio_kbd_matrix)
+#define KEYBOARD_COLS_DT DT_PROP_LEN(CROS_EC_KEYBOARD_NODE, col_gpios);
+#else
+#define KEYBOARD_COLS_DT DT_PROP(CROS_EC_KEYBOARD_NODE, col_size);
+#endif
+
 /* referenced in common/keyboard_8042.c */
-uint8_t keyboard_cols = DT_PROP(CROS_EC_KEYBOARD_NODE, col_size);
+uint8_t keyboard_cols = KEYBOARD_COLS_DT;
 
 static int cmd_ksstate(const struct shell *sh, size_t argc, char **argv)
 {
@@ -225,21 +231,22 @@ SHELL_CMD_ARG_REGISTER(kbpress, NULL,
 				  "[clear | col row [0 | 1]]"),
 		       cmd_kbpress, 1, 3);
 
-static enum ec_status
-mkbp_command_simulate_key(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+mkbp_command_simulate_key(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_mkbp_simulate_key *p = args->params;
+	const struct ec_params_mkbp_simulate_key *p = args->input_buf;
 	const struct input_kbd_matrix_common_config *cfg = kbd_dev->config;
 
 	if (system_is_locked())
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 
 	if (p->col >= cfg->col_size || p->row >= cfg->row_size)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	simulate_key(p->row, p->col, p->pressed);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_MKBP_SIMULATE_KEY, mkbp_command_simulate_key,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_MKBP_SIMULATE_KEY,
+			     mkbp_command_simulate_key, EC_VER_MASK(0),
+			     struct ec_params_mkbp_simulate_key);

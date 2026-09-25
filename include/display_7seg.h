@@ -5,8 +5,8 @@
 
 /* Seven Segment Display module for Chrome EC */
 
-#ifndef __CROS_EC_DISPLAY_7SEG_H
-#define __CROS_EC_DISPLAY_7SEG_H
+#ifndef PLATFORM_EC_INCLUDE_DISPLAY_7SEG_H_
+#define PLATFORM_EC_INCLUDE_DISPLAY_7SEG_H_
 
 enum seven_seg_module_display {
 	SEVEN_SEG_CONSOLE_DISPLAY, /* Console data */
@@ -23,4 +23,4 @@ enum seven_seg_module_display {
  */
 int display_7seg_write(enum seven_seg_module_display module, uint16_t data);
 
-#endif /* __CROS_EC_DISPLAY_7SEG_H */
+#endif /* PLATFORM_EC_INCLUDE_DISPLAY_7SEG_H_ */

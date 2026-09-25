@@ -7,13 +7,30 @@
 #include <cros/integrated_fwid.dtsi>
 
 
-/* atriarvp-rtk project DTS includes */
+/* atriarvp-rtk project DTS includes. These files generally describe hardware
+ * physically located on the RTS5915 MECC and therefore specific to
+ * atriarvp-rtk.
+ */
 #include "adc.dtsi"
+#include "atria_ec_ufsc.dtsi"
 #include "gpio.dtsi"
 #include "i2c.dtsi"
+#include "keyboard.dtsi"
 #include "power_signals.dtsi"
 
-#include "../rvp_consolidated.dtsi"
+/* These files generally describe hardware physically located on the atria RVP
+ * or AICs other than the MECC and therefore specific to NVL RVP builds.
+ * (atriarvp-rtk is currently the only such build.)
+ */
+#include "rvp_battery.dtsi"
+#include "rvp_fan.dtsi"
+#include "rvp_i2c.dtsi"
+#include "rvp_ioex_gpio.dtsi"
+#include "rvp_leds.dtsi"
+#include "rvp_pd.dtsi"
+#include "rvp_usbc.dtsi"
+#include "rvp_runtime_pdc.dtsi"
+#include "rvp_temp_sensors.dtsi"
 
 #include <ite/it8801-common-cfg.dtsi>
 
@@ -24,10 +41,35 @@
 		compatible = "cros-ec,cse-early-rec";
 	        cse-early-rec-gpios = <RTS5912_GPIO015 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_VOLTAGE_1P8)>;
 	};
+
+	chosen {
+		cros-ec,keyboard = &kbd;
+	};
+};
+
+/* Empirically, this value balances deep sleep residency (61%) and
+ * maximum watchdog reload time (705 ms) during S0ix. Decreasing the
+ * value significantly increases reload time and less significantly
+ * decreases residency.
+ */
+&idle {
+	min-residency-us = <2000>;
 };
 
 &it8801_mfd {
 	irq-gpios = <RTS5912_GPIO085 GPIO_ACTIVE_LOW>;
+};
+
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x7f000>;
+		};
+		cbi_flash: cbi {
+			offset = <0x7f000>;
+			size = <0x1000>;
+		};
+	};
 };
 
 &espi0 {
@@ -36,6 +78,18 @@
 
 &sha0 {
 	status = "okay";
+};
+
+&pdc_rtk_c0 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+
+&pdc_rtk_c1 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+
+&pdc_rtk_c2 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
 };
 
 &pdc_ti_c0 {
@@ -50,6 +104,10 @@
 	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
 };
 
+&pdc_ti_c0_hbr {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+
 &ulpm {
 	status = "okay";
 	/* BC_ACOK: AC power present, wakes EC on rising edge */
@@ -61,6 +119,11 @@
 	wkup-pin@3 {
 		wkup-pin-mode = "vin";
 		wkup-pin-pol = "falling";
+	};
+	/* SMC_LID: Lid open, wakes EC on rising edge */
+	wkup-pin@5 {
+		wkup-pin-mode = "vin";
+		wkup-pin-pol = "rising";
 	};
 };
 
@@ -83,4 +146,3 @@ tach_fan0: &tach0 {
         pinctrl-0 = <&pwm2_gpio025>;
         pinctrl-names = "default";
 };
-

@@ -21,7 +21,7 @@ const char expected_output[] =
 	"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n";
 
 /* |chargen| is only supported in RW */
-#if defined(SECTION_IS_RW)
+#if defined(CONFIG_CROS_EC_RW)
 ZTEST_USER(console_cmd_chargen, test_no_args)
 {
 	const struct device *uart_shell_dev =

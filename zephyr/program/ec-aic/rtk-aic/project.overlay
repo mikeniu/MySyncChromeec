@@ -23,6 +23,31 @@
 	named-i2c-ports {
 		compatible = "named-i2c-ports";
 	};
+
+	fans {
+		compatible = "cros-ec,fans";
+
+		fan0: fan_0 {
+			pwms = <&pwm2 0 PWM_KHZ(25) PWM_POLARITY_NORMAL>;
+			rpm-min = <2200>;
+			rpm-start = <2200>;
+			rpm-max = <4200>;
+			tach = <&tach0>;
+		};
+	};
+};
+
+&pwm2 {
+	status = "okay";
+	pinctrl-0 = <&pwm2_gpio025>;
+	pinctrl-names = "default";
+};
+
+&tach0 {
+	status = "okay";
+	pinctrl-0 = <&tacho0_gpio052>;
+	pinctrl-names = "default";
+	pulses-per-round = <2>;
 };
 
 &i2c_0 {
@@ -68,6 +93,12 @@
 
         clock-frequency = <I2C_BITRATE_STANDARD>;
         status = "okay";
+
+        eeprom0: eeprom@52 {
+                reg = <0x52>;
+                size = <256>;
+                compatible = "zephyr,i2c-target-eeprom";
+        };
 };
 
 &i2c_5 {
@@ -105,8 +136,8 @@
 
 &i2c_4_wrapper {
         status = "okay";
-        scl-gpios = <&gpiob 1 GPIO_ACTIVE_HIGH>;
-        sda-gpios = <&gpiob 2 GPIO_ACTIVE_HIGH>;
+        scl-gpios = <RTS5912_GPIO017 GPIO_ACTIVE_HIGH>;
+        sda-gpios = <RTS5912_GPIO018 GPIO_ACTIVE_HIGH>;
 };
 
 &i2c_5_wrapper {

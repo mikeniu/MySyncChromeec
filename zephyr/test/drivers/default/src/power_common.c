@@ -7,6 +7,7 @@
 #include "battery_smart.h"
 #include "chipset.h"
 #include "common.h"
+#include "console.h"
 #include "ec_tasks.h"
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_smart_battery.h"
@@ -287,6 +288,14 @@ ZTEST(power_common_no_tasks, test_power_reboot_ap_at_g3)
 	test_power_common_state();
 	zassert_true(k_uptime_delta(&before_time) >= 3000);
 	zassert_equal(POWER_G3S5, power_get_state());
+}
+
+/* Test power_set_s5_inactivity_timer_enable */
+ZTEST(power_common_no_tasks, test_power_s5_inactivity_timer_enable)
+{
+	/* Verify enabling and disabling S5 inactivity timer */
+	power_set_s5_inactivity_timer_enable(0);
+	power_set_s5_inactivity_timer_enable(1);
 }
 
 static void *mock_time_setup()
@@ -821,13 +830,13 @@ ZTEST(power_common_hibernation, test_power_cmd_hibernation_delay)
 static void siglog_before(void *state)
 {
 	/* enable chipset channel */
-	zassert_ok(shell_execute_cmd(get_ec_shell(), "chan chipset"));
+	console_channel_enable("chipset");
 }
 
 static void siglog_after(void *state)
 {
 	/* disable chipset channel */
-	zassert_ok(shell_execute_cmd(get_ec_shell(), "chan chipset"));
+	console_channel_disable("chipset");
 }
 
 #ifdef CONFIG_PLATFORM_EC_BRINGUP

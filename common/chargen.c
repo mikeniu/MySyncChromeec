@@ -14,7 +14,7 @@
 #include "util.h"
 #include "watchdog.h"
 
-#ifndef SECTION_IS_RO
+#ifndef CONFIG_CROS_EC_RO
 
 /**
  * Some unit tests do not have a watchdog enabled and the watchdog
@@ -196,4 +196,4 @@ DECLARE_SAFE_CONSOLE_COMMAND(chargen, command_chargen,
 			     "Generate a constant stream of characters on the "
 			     "UART console,\nrepeating every 'seq_length' "
 			     "characters, up to 'num_chars' total.");
-#endif /* !SECTION_IS_RO */
+#endif /* !CONFIG_CROS_EC_RO */

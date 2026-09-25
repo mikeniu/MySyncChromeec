@@ -20,7 +20,7 @@
 #include <zephyr/sys/reboot.h>
 #include <zephyr/sys/util.h>
 
-#define DT_DRV_COMPAT cros_ec_cros_system
+#include <soc_clock.h>
 
 LOG_MODULE_REGISTER(cros_system, LOG_LEVEL_ERR);
 
@@ -32,12 +32,11 @@ LOG_MODULE_REGISTER(cros_system, LOG_LEVEL_ERR);
 #define RTK_VIVO_BACKUP0_REG (*((volatile uint32_t *)0x40104ff8))
 #define RTK_VIVO_BACKUP1_REG (*((volatile uint32_t *)0x40104ffc))
 
-#define BBRAM_KEY_VALUE 0xA5
+#define BBRAM_KEY_VALUE 0x52544b21 /* RTK! */
+#define BBRAM_KEY_REV_VALUE ~BBRAM_KEY_VALUE
 
 /* Driver data */
-struct cros_system_rtk_data {
-	int reset; /* reset cause */
-};
+static int reset_cause = UNKNOWN_RST;
 
 static const struct device *const watchdog =
 	DEVICE_DT_GET(DT_CHOSEN(cros_ec_watchdog));
@@ -51,7 +50,7 @@ static int system_rtk_watchdog_stop(void)
 {
 #ifdef CONFIG_WATCHDOG
 	if (!device_is_ready(watchdog)) {
-		LOG_ERR("device %s not ready", watchdog->name);
+		LOG_ERR_DEVICE_NOT_READY(watchdog);
 		return -ENODEV;
 	}
 
@@ -61,16 +60,17 @@ static int system_rtk_watchdog_stop(void)
 	return 0;
 }
 
-static const char *cros_system_rtk_get_chip_vendor(const struct device *dev)
+const char *cros_system_chip_vendor(void)
 {
-	ARG_UNUSED(dev);
-
 	return "rtk";
 }
 
 #define RTK_CHIP_INFO_BASE 0x40010B80
 #define CHIP_ID_OFFSET 0x70
 #define RTK_CHIP_INFO_REG (RTK_CHIP_INFO_BASE + CHIP_ID_OFFSET)
+#define CHIP_VERSION_OFFSET 0x74
+#define RTK_CHIP_VERSION_REG (RTK_CHIP_INFO_BASE + CHIP_VERSION_OFFSET)
+
 #define RTK_PUF_INFO_BASE 0x40010800UL
 #define OTP_OFFSET_BASE 0x680UL
 #define OTP_CTRL_REGISTER 0x24
@@ -83,7 +83,8 @@ static const char *cros_system_rtk_get_chip_vendor(const struct device *dev)
 #define PUF_OPERATION_STAGE_ACTIVE 1ul
 #define PUF_OPERATION_STATE_SLEEP 0ul
 #define OTP_TIMEROUT_WAIT 50
-static uint32_t get_otp_chip_info(void)
+
+static void get_otp_chip_data(uint32_t *chip_info, uint32_t *chip_version)
 {
 	uint32_t timeout = k_ms_to_cyc_ceil32(OTP_TIMEROUT_WAIT);
 	uint32_t start, temp_time;
@@ -98,79 +99,122 @@ static uint32_t get_otp_chip_info(void)
 		temp_time = k_cycle_get_32();
 	}
 
-	uint32_t chip_info = *((volatile uint32_t *)RTK_CHIP_INFO_REG);
+	*chip_info = *((volatile uint32_t *)RTK_CHIP_INFO_REG);
+	*chip_version = *((volatile uint32_t *)RTK_CHIP_VERSION_REG);
 
 	*(volatile uint32_t *)RTK_OTP_CTRL_REG = PUF_OPERATION_STATE_SLEEP;
+}
 
-	return chip_info;
+union rtk_chip_info_reg {
+	uint32_t raw;
+	struct {
+		uint8_t reserved;
+		uint8_t sub_id;
+		uint16_t main_id;
+	} __packed;
+};
+
+union rtk_chip_version_reg {
+	uint32_t raw;
+	struct {
+		uint16_t reserved;
+		uint8_t sub_version;
+		uint8_t main_version;
+	} __packed;
+};
+
+static struct {
+	bool initialized;
+	union rtk_chip_info_reg info;
+	union rtk_chip_version_reg version;
+} cached_otp;
+
+static void ensure_otp_initialized(void)
+{
+	if (cached_otp.initialized)
+		return;
+
+	get_otp_chip_data(&cached_otp.info.raw, &cached_otp.version.raw);
+	cached_otp.initialized = true;
 }
 
 static uint32_t system_get_chip_id(void)
 {
-	/* [31:16] main id */
-	uint32_t raw_id = get_otp_chip_info();
-	uint16_t main_id = (raw_id >> 16) & 0xFFFF;
-
-	return main_id;
+	ensure_otp_initialized();
+	return cached_otp.info.main_id;
 }
 
 static uint8_t system_get_chip_version(void)
 {
-	/* [15:8] chip version */
-	uint32_t raw_id = get_otp_chip_info();
-	uint16_t sub_id = (raw_id >> 8) & 0xFF;
-
-	return sub_id;
+	ensure_otp_initialized();
+	return cached_otp.info.sub_id;
 }
 
-static const char *cros_system_rtk_get_chip_name(const struct device *dev)
+const char *cros_system_chip_name(void)
 {
-	ARG_UNUSED(dev);
-
-	static char buf[8] = { 'r', 't', 's' };
+	static char buf[sizeof("rts5915U")];
 	uint32_t chip_id = system_get_chip_id();
+	uint8_t chip_version = system_get_chip_version();
 
-	snprintf(buf + 3, sizeof(buf) - 3, "%04x", (uint16_t)chip_id);
-
-	return buf;
-}
-
-static const char *cros_system_rtk_get_chip_revision(const struct device *dev)
-{
-	ARG_UNUSED(dev);
-
-	static char buf[5];
-	uint8_t rev = system_get_chip_version();
-
-	snprintf(buf, sizeof(buf), "%c", rev);
+	snprintf(buf, sizeof(buf), "rts%04x%c", chip_id, chip_version);
+	/* Unless snprintf failed in an obscure way, this will be a no-op. */
+	buf[sizeof(buf) - 1] = '\0';
 
 	return buf;
 }
 
-static int cros_system_rtk_get_reset_cause(const struct device *dev)
+const char *cros_system_chip_revision(void)
 {
-	struct cros_system_rtk_data *data = dev->data;
+	/* "VF255" serves as a size template: "V" + 1 char + up to 3 digits
+	 * (255) + '\0' (6 bytes total) */
+	static char buf[sizeof("VF255")];
+	ensure_otp_initialized();
+	uint8_t main_version = cached_otp.version.main_version;
+	uint8_t sub_version = cached_otp.version.sub_version;
 
-	return data->reset;
+	/* VF:  main 0, sub 5, "VF0"
+	 * VF1: main 0, sub 1, "VF1"
+	 * VG:  main 6, sub 0, "VG0"
+	 */
+	if (main_version == 0x0)
+		sub_version = sub_version - 5;
+
+	snprintf(buf, sizeof(buf), "V%c%d", main_version + 'F', sub_version);
+
+	return buf;
 }
 
-static int cros_system_rtk_init(const struct device *dev)
+int cros_system_get_reset_cause(void)
 {
-	struct cros_system_rtk_data *data = dev->data;
+	return reset_cause;
+}
+
+static int cros_system_rtk_init(void)
+{
 	WDT_Type *wdt_reg = RTK_WDT_REG_BASE;
 	uint32_t vivo_reg0 = RTK_VIVO_BACKUP0_REG;
 	uint32_t vivo_reg1 = RTK_VIVO_BACKUP1_REG;
-	uint32_t key_val = 0;
+	uint32_t key_val = 0, key_rev_val = 0;
 	uint32_t value = 0;
 	uint32_t invalid_value = 0;
 	/* In order to determine if reset from watchdog */
 	uint32_t flag = 0;
+
+	/* Apply deep-sleep workaround for RTS5915-VF or earlier silicon
+	 * (b/515078423)
+	 */
+	ensure_otp_initialized();
+	if (cached_otp.version.main_version == 0 &&
+	    cached_otp.version.sub_version <= 5) {
+		disable_sleep(SLEEP_MASK_FORCE_NO_DSLEEP);
+	}
+
 	/* check reset cause */
-	data->reset = UNKNOWN_RST;
+	reset_cause = UNKNOWN_RST;
 
 	/* is the WDT reset */
 	if (wdt_reg->STS & WDT_STS_RSTFLAG) {
-		data->reset = WATCHDOG_RST;
+		reset_cause = WATCHDOG_RST;
 		/* Clear watchdog reset status initially */
 		wdt_reg->CTRL |= WDT_CTRL_CLRRSTFLAG;
 		/* Setup flag if reset from watchdog */
@@ -178,16 +222,19 @@ static int cros_system_rtk_init(const struct device *dev)
 	} else if ((vivo_reg0 ^ vivo_reg1) == UINT32_MAX) {
 		/* VIN3 (GPIO115) connect to power button */
 		if (vivo_reg1 & BIT(SYSTEM_VIVOCTRL_VIN3STS_Pos)) {
-			data->reset = POWERUP;
+			reset_cause = POWERUP;
 		}
 	}
 
 	/* check if bbram's key remained */
 	bbram_read(bbram_dev, BBRAM_REGION_OFFSET(key), BBRAM_REGION_SIZE(key),
 		   (uint8_t *)&key_val);
+	bbram_read(bbram_dev, BBRAM_REGION_OFFSET(key_rev),
+		   BBRAM_REGION_SIZE(key_rev), (uint8_t *)&key_rev_val);
 
 	/* If No, Init BBRAM reset_flags to 0x0 */
-	if (key_val != BBRAM_KEY_VALUE) {
+	if ((key_val != BBRAM_KEY_VALUE) ||
+	    (key_rev_val != BBRAM_KEY_REV_VALUE)) {
 		bbram_write(bbram_dev, BBRAM_REGION_OFFSET(saved_reset_flags),
 			    BBRAM_REGION_SIZE(saved_reset_flags),
 			    (uint8_t *)&value);
@@ -208,10 +255,20 @@ static int cros_system_rtk_init(const struct device *dev)
 			    BBRAM_REGION_SIZE(wp_at_boot),
 			    (uint8_t *)&invalid_value);
 
+		/* clear board_batt_keep as 0 */
+		invalid_value = 0;
+		bbram_write(bbram_dev, BBRAM_REGION_OFFSET(board_batt_keep),
+			    BBRAM_REGION_SIZE(board_batt_keep),
+			    (uint8_t *)&invalid_value);
+
 		/* Set key as BBRAM_KEY_VALUE  */
 		key_val = BBRAM_KEY_VALUE;
+		key_rev_val = BBRAM_KEY_REV_VALUE;
 		bbram_write(bbram_dev, BBRAM_REGION_OFFSET(key),
 			    BBRAM_REGION_SIZE(key), (uint8_t *)&key_val);
+		bbram_write(bbram_dev, BBRAM_REGION_OFFSET(key_rev),
+			    BBRAM_REGION_SIZE(key_rev),
+			    (uint8_t *)&key_rev_val);
 
 	} else {
 		/* If key remained and not reset from wdt, setup
@@ -224,10 +281,8 @@ static int cros_system_rtk_init(const struct device *dev)
 	return 0;
 }
 
-static int cros_system_rtk_soc_reset(const struct device *dev)
+int cros_system_soc_reset(void)
 {
-	ARG_UNUSED(dev);
-
 	/* Disable interrupts to avoid task swaps during reboot */
 	interrupt_disable_all();
 
@@ -260,8 +315,7 @@ void wake_isr(enum gpio_signal signal)
 {
 }
 
-static int cros_system_rtk_hibernate(const struct device *dev, uint32_t seconds,
-				     uint32_t microseconds)
+int cros_system_hibernate(uint32_t seconds, uint32_t microseconds)
 {
 	/* Disable interrupt first */
 	interrupt_disable_all();
@@ -285,25 +339,16 @@ static int cros_system_rtk_hibernate(const struct device *dev, uint32_t seconds,
 	return 0;
 }
 
-static const struct cros_system_driver_api cros_system_driver_rtk_api = {
-	.get_reset_cause = cros_system_rtk_get_reset_cause,
-	.soc_reset = cros_system_rtk_soc_reset,
-	.hibernate = cros_system_rtk_hibernate,
-	.chip_vendor = cros_system_rtk_get_chip_vendor,
-	.chip_name = cros_system_rtk_get_chip_name,
-	.chip_revision = cros_system_rtk_get_chip_revision,
-};
-#if CONFIG_CROS_SYSTEM_REALTEK_INIT_PRIORITY >= \
+#ifdef CONFIG_PM
+uint64_t cros_system_deep_sleep_ticks(void)
+{
+	return rts5912_clock_get_sleep_ticks();
+}
+#endif
+
+SYS_INIT(cros_system_rtk_init, PRE_KERNEL_1, CONFIG_CROS_SYSTEM_INIT_PRIORITY);
+
+#if CONFIG_CROS_SYSTEM_INIT_PRIORITY >= \
 	CONFIG_PLATFORM_EC_SYSTEM_PRE_INIT_PRIORITY
 #error "CROS_SYSTEM must initialize before the SYSTEM_PRE initialization"
 #endif
-
-#define CROS_SYSTEM_RTK_INIT(inst)                                          \
-	static struct cros_system_rtk_data cros_system_rtk_dev_data_##inst; \
-	DEVICE_DEFINE(cros_system_rtk_##inst, "CROS_SYSTEM",                \
-		      cros_system_rtk_init, NULL,                           \
-		      &cros_system_rtk_dev_data_##inst, NULL, PRE_KERNEL_1, \
-		      CONFIG_CROS_SYSTEM_REALTEK_INIT_PRIORITY,             \
-		      &cros_system_driver_rtk_api);
-
-DT_INST_FOREACH_STATUS_OKAY(CROS_SYSTEM_RTK_INIT)

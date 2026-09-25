@@ -1,0 +1,23 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "../../../../program/ec-aic/ite-aic/project.overlay"
+
+&binman {
+	ec_rw: ec-rw {
+		rw-fw {
+			/* Allocate 16 KiB (4 sectors of 4 KiB) at offset 0x5B000 (0x60000 - 0x5000)
+			 * for testing multi-sector flash erase and status polling.
+			 */
+			test_flash_block: test-flash-block {
+				compatible = "cros-ec,flash-layout";
+				offset = <(0x60000 - 0x5000)>;
+				type = "fill";
+				fill-byte = [ FF ];
+				size = < 0x4000 >;
+			};
+		};
+	};
+};

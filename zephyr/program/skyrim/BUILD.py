@@ -7,6 +7,7 @@
 
 def register_skyrim_project(
     project_name,
+    snippets=None,
 ):
     """Register a variant of skyrim."""
     register_npcx_project(
@@ -21,7 +22,8 @@ def register_skyrim_project(
             # Project-specific KConfig customization.
             here / project_name / "project.conf",
         ],
-        inherited_from=["skyrim"],
+        boards=["skyrim"],
+        snippets=snippets,
     )
 
 
@@ -32,11 +34,13 @@ register_skyrim_project(
 
 register_skyrim_project(
     project_name="winterhold",
+    snippets=["npcx-45mhz"],
 )
 
 
 register_skyrim_project(
     project_name="frostflow",
+    snippets=["npcx-45mhz"],
 )
 
 register_skyrim_project(

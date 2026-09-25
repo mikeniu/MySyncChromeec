@@ -367,7 +367,8 @@
 };
 &i2c3 {
 	/* EC_I2C_SENSOR */
-	transfer-timeout-ms = <200>;
+	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
+	zephyr,transfer-timeout-ms = <200>;
 };
 &i2c4 {
 	/delete-node/ tusb1064-mux-1@44;

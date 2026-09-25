@@ -28,6 +28,7 @@ egis_capture_mode_t convert_fp_capture_type_to_egis_capture_type(
 {
 	switch (capture_type) {
 	case FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT:
+		return EGIS_CAPTURE_IMAGE_COLLECTION;
 	case FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE:
 		return EGIS_CAPTURE_NORMAL_FORMAT;
 	case FINGERPRINT_CAPTURE_TYPE_PATTERN0:
@@ -113,6 +114,8 @@ int convert_egis_get_image_error_code(egis_api_return_t code)
 		return FINGERPRINT_SENSOR_SCAN_TOO_FAST;
 	case EGIS_API_IMAGE_QUALITY_PARTIAL:
 		return FINGERPRINT_SENSOR_SCAN_LOW_SENSOR_COVERAGE;
+	case EGIS_API_ERROR:
+		return -EINVAL;
 	default:
 		assert(code < 0);
 		return code;
@@ -314,8 +317,8 @@ static int egis630_acquire_image(const struct device *dev,
 		return -ENOTSUP;
 	}
 
-	int ret = convert_egis_get_image_error_code(
-		egis_get_image_with_mode(image_buf, egis_capture_type));
+	int ret = convert_egis_get_image_error_code(egis_get_image_with_mode(
+		image_buf, image_buf_size, egis_capture_type));
 	if (ret < 0) {
 		LOG_ERR("Failed to acquire image with capture_type %d: %d",
 			capture_type, ret);
@@ -372,12 +375,12 @@ static int egis630_init_driver(const struct device *dev)
 	int ret;
 
 	if (!spi_is_ready_dt(&cfg->spi)) {
-		LOG_ERR("SPI bus is not ready");
+		LOG_ERR_DEVICE_NOT_READY(cfg->spi.bus);
 		return -EINVAL;
 	}
 
 	if (!gpio_is_ready_dt(&cfg->reset_pin)) {
-		LOG_ERR("Port for sensor reset GPIO is not ready");
+		LOG_ERR_DEVICE_NOT_READY(cfg->reset_pin.port);
 		return -EINVAL;
 	}
 
@@ -388,7 +391,7 @@ static int egis630_init_driver(const struct device *dev)
 	}
 
 	if (!gpio_is_ready_dt(&cfg->interrupt)) {
-		LOG_ERR("Port for interrupt GPIO is not ready");
+		LOG_ERR_DEVICE_NOT_READY(cfg->interrupt.port);
 		return -EINVAL;
 	}
 

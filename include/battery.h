@@ -5,8 +5,8 @@
  * Battery charging parameters and constraints
  */
 
-#ifndef __CROS_EC_BATTERY_H
-#define __CROS_EC_BATTERY_H
+#ifndef PLATFORM_EC_INCLUDE_BATTERY_H_
+#define PLATFORM_EC_INCLUDE_BATTERY_H_
 
 #include "common.h"
 #include "compiler.h"
@@ -339,6 +339,41 @@ int battery_time_at_rate(int rate, int *minutes);
 int battery_status(int *status);
 
 /**
+ * Set the fake state of charge.
+ *
+ * @param soc		Percentage (0-100) or -1 to use real level.
+ */
+void battery_set_fake_soc(int soc);
+
+/**
+ * Get the current fake state of charge.
+ *
+ * @return percentage or -1 if not faking.
+ */
+int battery_get_fake_soc(void);
+
+/**
+ * Set the fake battery temperature.
+ *
+ * @param temp		Temperature in 0.1 K or -1 to use real temperature.
+ */
+void battery_set_fake_temp(int temp);
+
+/**
+ * Get the current fake battery temperature.
+ *
+ * @return temperature or -1 if not faking.
+ */
+int battery_get_fake_temp(void);
+
+/**
+ * Apply faked parameters if faking is enabled.
+ *
+ * @param batt		Battery parameters to modify
+ */
+void battery_apply_fake_params(struct batt_params *batt);
+
+/**
  * Read battery charge cycle count.
  *
  * @param count		Destination for count.
@@ -602,6 +637,21 @@ void battery_set_dynamic_info(const struct batt_params *params, bool ac_present,
 			      bool is_charging, bool sustainer_idle);
 
 /**
+ * @brief Filters battery status with discharge current deadband
+ *
+ * Filter out nuisance discharge state transitions when specific
+ * conditions are met.
+ *
+ * @param batt_flags latest computed flags (EC_BATT_FLAG_*).
+ * @param params latest observed battery parameters.
+ *
+ * @return filtered batt_flags.
+ *
+ */
+uint8_t batt_deadband_check(uint8_t batt_flags,
+			    const struct batt_params *params);
+
+/**
  * Calculate if battery is full based on whether it is accepting charge.
  *
  * @param batt Battery parameters.
@@ -625,4 +675,4 @@ enum battery_access_type battery_check_access_limit(void);
 }
 #endif
 
-#endif /* __CROS_EC_BATTERY_H */
+#endif /* PLATFORM_EC_INCLUDE_BATTERY_H_ */

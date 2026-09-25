@@ -137,6 +137,7 @@ class IshBinPacker(BasePacker):
         del version_string
         single_dir = dir_map["singleimage"]
         yield single_dir / "zephyr" / "ish_fw.bin", "ish_fw.bin"
+        yield single_dir / "zephyr" / "zephyr.lst", "zephyr.lst"
         yield (
             single_dir / "zephyr" / "component_manifest.json",
             "component_manifest.json",
@@ -156,11 +157,9 @@ class BinmanPacker(BasePacker):
     def configs(self):
         yield "ro", build_config.BuildConfig(
             kconfig_defs={"CONFIG_CROS_EC_RO": "y"},
-            cmake_defs={"CMAKE_C_FLAGS": "-DSECTION_IS_RO"},
         )
         yield "rw", build_config.BuildConfig(
             kconfig_defs={"CONFIG_CROS_EC_RW": "y"},
-            cmake_defs={"CMAKE_C_FLAGS": "-DSECTION_IS_RW"},
         )
 
     def pack_firmware(

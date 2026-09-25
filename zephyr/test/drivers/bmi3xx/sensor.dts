@@ -69,12 +69,27 @@
 	};
 };
 
-/* motionsense framework supports at most 8 sensors, remove two so we can add
- * our test target.
+/* motionsense framework supports at most 8 sensors, remove unrelated 
+ * sensors so we can add our test target.
  */
 &ms_bmi160_accel {
 	status = "disabled";
 };
 &ms_bmi160_gyro {
+	status = "disabled";
+};
+&ms_bma4xx {
+	status = "disabled";
+};
+&tcs3400_clear {
+	status = "disabled";
+};
+&tcs3400_rgb {
+	status = "disabled";
+};
+&bma422_emul {
+	status = "disabled";
+};
+&tcs_emul {
 	status = "disabled";
 };

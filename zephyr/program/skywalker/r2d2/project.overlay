@@ -86,11 +86,29 @@
 	};
 
 	batteries {
-		default_battery: SIMPLO_CP856931 {
-			compatible = "SIMPLO,CP856931", "battery-smart";
+		default_battery: smp_cp856931 {
+			compatible = "smp,cp856931", "battery-smart";
 		};
-		SIMPLO_CP856932 {
-			compatible = "SIMPLO,CP856932", "battery-smart";
+		smp_cp856932 {
+			compatible = "smp,cp856932", "battery-smart";
+		};
+		smp_cp870432 {
+			compatible = "smp,cp870432", "battery-smart";
+		};
+		smp_cp87886601 {
+			compatible = "smp,cp87886601", "battery-smart";
+		};
+		smp_cp87522501 {
+			compatible = "smp,cp87522501", "battery-smart";
+		};
+		smp_sb1fb00013 {
+			compatible = "smp,sb1fb00013", "battery-smart";
+		};
+		smp_sb1fb00014 {
+			compatible = "smp,sb1fb00014", "battery-smart";
+		};
+		smp_sb1fb00015 {
+			compatible = "smp,sb1fb00015", "battery-smart";
 		};
 	};
 

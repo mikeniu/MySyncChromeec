@@ -9,8 +9,8 @@
  * @brief Common code used by devices emulated on I2C bus
  */
 
-#ifndef __EMUL_COMMON_I2C_H
-#define __EMUL_COMMON_I2C_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_COMMON_I2C_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_COMMON_I2C_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c.h>
@@ -393,4 +393,4 @@ void i2c_common_emul_init(struct i2c_common_emul_data *data);
  * @}
  */
 
-#endif /* __EMUL_COMMON_I2C_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_COMMON_I2C_H_ */

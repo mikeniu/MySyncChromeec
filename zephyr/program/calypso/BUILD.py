@@ -8,10 +8,12 @@
 def register_npcx9_project(
     project_name,
     extra_kconfig_files=(),
+    extra_modules=(),
 ):
     """Register an npcx9 based variant of mensa."""
     register_npcx_project(
         project_name=project_name,
+        boards=["calypso"],
         zephyr_board="npcx9/npcx9m7fb",
         dts_overlays=[
             here / project_name / "project.overlay",
@@ -24,13 +26,21 @@ def register_npcx9_project(
             # Additional project-specific KConfig customization.
             *extra_kconfig_files,
         ],
+        modules=["cmsis_6", "ec", *extra_modules],
     )
 
 
 register_npcx9_project(
     project_name="mensa",
+    extra_modules=["google-private", "nanopb", "pigweed"],
+)
+
+register_npcx9_project(
+    project_name="c1nv",
+    extra_modules=["google-private", "nanopb", "pigweed"],
 )
 
 # Note for reviews, do not let anyone edit these assertions, the addresses
 # must not change after the first RO release.
 assert_rw_fwid_DO_NOT_EDIT(project_name="mensa", addr=0x40144)
+assert_rw_fwid_DO_NOT_EDIT(project_name="c1nv", addr=0x40144)

@@ -9,13 +9,19 @@ find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 if(DEFINED CONFIG_BOARD_ATRIARVP_RTK)
   project(atriarvp-rtk)
   zephyr_library_sources("src/rvp_board_power.c")
-  zephyr_library_sources_ifdef(
-    CONFIG_PDC_RUNTIME_PORT_CONFIG "src/rvp_usbc_runtime.c")
   zephyr_include_directories_ifdef(CONFIG_PLATFORM_EC_DEDICATED_CHARGE_PORT
     "../intelrvp/include")
   zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_DEDICATED_CHARGE_PORT
     "../intelrvp/src/dc_jack.c")
 
+endif()
+
+if(DEFINED CONFIG_BOARD_PENGHU)
+	project(penghu)
+	# TODO: We are using rvp_board_power.c as a starting point. If any modifications
+	# are needed later, we can create a new variant. Otherwise, if no changes are
+	# required, rvp_board_power.c should be renamed to common_board_power.c.
+	zephyr_library_sources("src/rvp_board_power.c")
 endif()
 
 zephyr_include_directories("include/")

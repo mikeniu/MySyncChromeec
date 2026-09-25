@@ -52,27 +52,11 @@ static const struct rt3645_config_t config0 = {
 	.enable_gpio = GPIO_DT_SPEC_GET(DT_DRV_INST(0), enable_gpios),
 };
 
-#ifdef CONFIG_IMVP_FACTORY_UPDATE
-static void imvp_init_cb(const struct device *dev,
-			 const enum ap_pwrseq_state entry,
-			 const enum ap_pwrseq_state exit);
-#endif
-
 static int rt3645_update(const struct device *dev);
 
 static int rt3645_init(const struct device *dev)
 {
 	config = dev->config;
-
-#if defined(CONFIG_IMVP_FACTORY_UPDATE)
-	static struct ap_pwrseq_state_callback ap_pwrseq_imvp_cb;
-	const struct device *ap_pwrseq_dev = ap_pwrseq_get_instance();
-
-	ap_pwrseq_imvp_cb.cb = imvp_init_cb;
-	ap_pwrseq_imvp_cb.states_bit_mask = BIT(AP_POWER_STATE_G3);
-	ap_pwrseq_register_state_exit_callback(ap_pwrseq_dev,
-					       &ap_pwrseq_imvp_cb);
-#endif
 
 	return 0;
 }
@@ -87,10 +71,6 @@ static int rt3645_apply_update_data(const struct device *dev)
 	int rv = 0;
 	int prev_page = -1;
 	struct rt3645_info update_entries;
-
-	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
-		return -EINVAL;
-	}
 
 	/* Apply each register update from the raw_data array */
 	for (size_t i = 0; i < ARRAY_SIZE(raw_data); i++) {
@@ -129,10 +109,6 @@ static int rt3645_crc_check(const struct device *dev)
 {
 	uint8_t crc_val;
 
-	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
-		return -EINVAL;
-	}
-
 	rt3645_set_page(dev, RT3645_PAGE_D);
 	rt3645_read_reg(dev, CRC_REG, &crc_val);
 
@@ -148,10 +124,6 @@ static int rt3645_crc_check(const struct device *dev)
 static int rt3645_lock_nvm(const struct device *dev)
 {
 	int rv = 0;
-	if (!chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
-		return -EINVAL;
-	}
-
 	rt3645_set_page(dev, RT3645_PAGE_GLOBAL);
 
 	rv = rt3645_write_reg(dev, CONFIG_MODE_REG, LOCK_CODE1);
@@ -228,6 +200,7 @@ static int rt3645_update(const struct device *dev)
 	}
 	if (reg_val != PRODUCT_ID) {
 		LOG_ERR("Wrong Product Id");
+		rv = -EINVAL;
 		goto lock_imvp;
 	}
 	/* Delay of 1ms after reading product id */
@@ -300,6 +273,7 @@ static void imvp_init_cb(const struct device *dev,
 		rt3645_initiate_update(rt3645_dev);
 	}
 }
+AP_PWRSEQ_STATE_EXIT_CALLBACK_DEFINE(imvp_init_cb, AP_POWER_STATE_G3);
 #endif
 
 int rt3645_read_reg(const struct device *dev, uint8_t reg, uint8_t *val)

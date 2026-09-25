@@ -9,8 +9,8 @@
  * @brief Backend API for USB-C sink device emulator
  */
 
-#ifndef __EMUL_TCPCI_PARTNER_SNK_H
-#define __EMUL_TCPCI_PARTNER_SNK_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_SNK_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_SNK_H_
 
 #include "emul/tcpc/emul_tcpci.h"
 #include "emul/tcpc/emul_tcpci_partner_common.h"
@@ -103,4 +103,4 @@ int tcpci_snk_emul_send_request_msg(struct tcpci_snk_emul_data *data,
  * @}
  */
 
-#endif /* __EMUL_TCPCI_PARTNER_SNK_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_SNK_H_ */

@@ -7,8 +7,8 @@
 
 /* USB Power delivery port management */
 /* For Fairchild FUSB302 */
-#ifndef __CROS_EC_DRIVER_TCPM_FUSB302_H
-#define __CROS_EC_DRIVER_TCPM_FUSB302_H
+#ifndef PLATFORM_EC_DRIVER_TCPM_FUSB302_H_
+#define PLATFORM_EC_DRIVER_TCPM_FUSB302_H_
 
 /* Chip Device ID - 302A or 302B */
 #define FUSB302_DEVID_302A 0x08
@@ -208,4 +208,4 @@ enum fusb302_txfifo_tokens {
 
 extern const struct tcpm_drv fusb302_tcpm_drv;
 
-#endif /* __CROS_EC_DRIVER_TCPM_FUSB302_H */
+#endif /* PLATFORM_EC_DRIVER_TCPM_FUSB302_H_ */

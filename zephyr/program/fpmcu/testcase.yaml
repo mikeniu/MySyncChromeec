@@ -44,6 +44,7 @@ tests:
   exception:
     extra_configs:
     - CONFIG_HW_TEST_EXCEPTION=y
+    - CONFIG_ZTEST_FATAL_HOOK=y
     extra_conf_files:
     - prj_hw_tests.conf
   exit:
@@ -64,11 +65,23 @@ tests:
     - CONFIG_PM=n
     extra_conf_files:
     - prj_hw_tests.conf
+  flash_protection:
+    extra_configs:
+    - CONFIG_HW_TEST_FLASH_PROTECTION=y
+    # Added to reduce RO flash usage
+    - CONFIG_PM=n
+    extra_conf_files:
+    - prj_hw_tests.conf
   flash_protection_rw:
     extra_configs:
     - CONFIG_HW_TEST_FLASH_PROTECTION_RW=y
     # Added to reduce RO flash usage
     - CONFIG_PM=n
+    extra_conf_files:
+    - prj_hw_tests.conf
+  fp_buffer_clear:
+    extra_configs:
+    - CONFIG_HW_TEST_FP_BUFFER_CLEAR=y
     extra_conf_files:
     - prj_hw_tests.conf
   fp_transport:
@@ -151,10 +164,17 @@ tests:
     - CONFIG_PLATFORM_EC_PANIC_STRIP_GPR=n
     extra_conf_files:
     - prj_hw_tests.conf
+  panic_strip_gpr:
+    extra_configs:
+    - CONFIG_HW_TEST_PANIC_STRIP_GPR=y
+    - CONFIG_PLATFORM_EC_PANIC_STRIP_GPR=y
+    extra_conf_files:
+    - prj_hw_tests.conf
   panic_data:
     extra_configs:
     - CONFIG_HW_TEST_PANIC_DATA=y
     - CONFIG_PLATFORM_EC_DEBUG_ASSERT_REBOOTS=y
+    - CONFIG_PLATFORM_EC_PANIC_STRIP_GPR=n
     extra_conf_files:
     - prj_hw_tests.conf
   pmp_entries:

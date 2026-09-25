@@ -5,8 +5,8 @@
 
 /* Private sensor interface */
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_FT98XX_PRIVATE_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_FT98XX_PRIVATE_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_PRIVATE_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_PRIVATE_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -134,12 +134,14 @@ int ft_sensor_set_mode(int mode);
  * @brief Acquire image with specified capture mode
  *
  * @param[out] img  Captured image data buffer
+ * @param[in]  img_buf_size  Image data buffer size
  * @param[in]  mode Capture type (fingerprint_capture_type)
  *
  * @retval 0      Success
  * @retval others Failure
  */
-int ft_sensor_acquire_image_with_mode(uint8_t *img, int mode);
+int ft_sensor_acquire_image_with_mode(uint8_t *img, size_t img_buf_size,
+				      int mode);
 
 #define LIBFP_API_VERSION "v5.2.8"
 
@@ -407,4 +409,5 @@ int focal_algo_get_finger_detailed_info(int *finger_size, int *sub_tpl_size,
  * @retval others fake fingerprint
  */
 int focal_algo_anti_spoofing(uint16_t *raw_data);
-#endif /* ZEPHYR_DRIVERS_FINGERPRINT_FT98XX_PRIVATE_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_FT98XX_PRIVATE_H_ \
+	*/

@@ -11,7 +11,6 @@
 #include "host_command.h"
 #include "keyboard_backlight.h"
 #include "lid_switch.h"
-#include "rgb_keyboard.h"
 #include "timer.h"
 #include "util.h"
 
@@ -108,8 +107,6 @@ static void keyboard_backlight_init(void)
 	/* Uses PWM by default. Can be customized by board_kblight_init */
 	if (IS_ENABLED(CONFIG_PWM_KBLIGHT))
 		kblight_register(&kblight_pwm);
-	else if (IS_ENABLED(CONFIG_RGB_KEYBOARD))
-		kblight_register(&kblight_rgbkbd);
 
 	board_kblight_init();
 	if (kblight_init())
@@ -176,33 +173,35 @@ static int cc_kblight(int argc, const char **argv)
 DECLARE_CONSOLE_COMMAND(kblight, cc_kblight, "percent",
 			"Get/set keyboard backlight");
 
-static enum ec_status
-hc_get_keyboard_backlight(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_get_keyboard_backlight(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_pwm_get_keyboard_backlight *r = args->response;
+	struct ec_response_pwm_get_keyboard_backlight *r = args->output_buf;
 
 	r->percent = kblight_get();
 	r->enabled = kblight_get_enabled();
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PWM_GET_KEYBOARD_BACKLIGHT,
-		     hc_get_keyboard_backlight, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_PWM_GET_KEYBOARD_BACKLIGHT,
+			      hc_get_keyboard_backlight, EC_VER_MASK(0),
+			      struct ec_response_pwm_get_keyboard_backlight);
 
-static enum ec_status
-hc_set_keyboard_backlight(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_set_keyboard_backlight(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_pwm_set_keyboard_backlight *p = args->params;
+	const struct ec_params_pwm_set_keyboard_backlight *p = args->input_buf;
 
 	if (kblight_set(p->percent))
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 	if (kblight_enable(p->percent > 0))
-		return EC_RES_ERROR;
-	return EC_RES_SUCCESS;
+		return EC_HOST_CMD_ERROR;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PWM_SET_KEYBOARD_BACKLIGHT,
-		     hc_set_keyboard_backlight, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_PWM_SET_KEYBOARD_BACKLIGHT,
+			     hc_set_keyboard_backlight, EC_VER_MASK(0),
+			     struct ec_params_pwm_set_keyboard_backlight);
 
 #ifdef TEST_BUILD
 uint8_t kblight_get_current_enable(void)

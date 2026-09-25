@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "builtin/endian.h"
 #include "drivers/ucsi_v3.h"
 #include "emul/emul_common_i2c.h"
 #include "emul/emul_pdc.h"
@@ -22,6 +23,7 @@
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/drivers/i2c_emul.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/minmax.h>
 #include <zephyr/ztest.h>
 
 #define DT_DRV_COMPAT ti_tps6699_pdc
@@ -31,6 +33,7 @@ LOG_MODULE_REGISTER(tps6699x_emul);
 
 /* TODO(b/349609367): Do not rely on this test-only driver function. */
 bool pdc_tps6699x_test_idle_wait(void);
+void pdc_tps6699x_test_invalidate_chip_info(const struct device *dev);
 
 /* TODO(b/345292002): Implement this emulator to the point where
  * pdc.generic.tps6699x passes.
@@ -254,6 +257,15 @@ static void tps699x_emul_get_cable_property(struct tps6699x_emul_pdc_data *data)
 	memcpy(&data->reg_val[REG_DATA_FOR_CMD1], &data->response, 5 + 1);
 }
 
+static void tps699x_emul_get_attention_vdo(struct tps6699x_emul_pdc_data *data)
+{
+	data->response.result = TASK_COMPLETED_SUCCESSFULLY;
+	data->response.data.get_attention_vdo = data->get_attention_vdo;
+
+	memcpy(&data->reg_val[REG_DATA_FOR_CMD1], &data->response,
+	       sizeof(data->response));
+}
+
 static void tps6699x_emul_ucsi_set_pdos(struct tps6699x_emul_pdc_data *data,
 					uint8_t *data_reg)
 {
@@ -284,34 +296,6 @@ static void tps6699x_emul_ucsi_set_pdos(struct tps6699x_emul_pdc_data *data,
 	if (emul_pdc_pdo_set_direct(&data->pdo, pdo_type, pdo_offset, num_pdos,
 				    source, pdos)) {
 		LOG_ERR("pdc_pdo_set_direct failed");
-	}
-}
-
-static void
-tps699x_emul_get_pd_message(struct tps6699x_emul_pdc_data *data,
-			    const union get_pd_message_t *get_pd_message)
-{
-	switch (get_pd_message->response_message_type) {
-	case GET_PD_MESSAGE_DISC_ID:
-		data->response.result = TASK_COMPLETED_SUCCESSFULLY;
-		data->response.data.length =
-			sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT;
-		memcpy(data->response.data.pd_message, &data->identity,
-		       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
-		memcpy(&data->reg_val[REG_DATA_FOR_CMD1], &data->response,
-		       sizeof(data->response));
-		break;
-	case GET_PD_MESSAGE_REVISION:
-		data->response.result = TASK_COMPLETED_SUCCESSFULLY;
-		data->response.data.length = sizeof(uint32_t);
-		memcpy(data->response.data.pd_message, &data->rmdo,
-		       sizeof(uint32_t));
-		memcpy(data->reg_val[REG_DATA_FOR_CMD1], &data->response,
-		       sizeof(data->response));
-		break;
-	default:
-		/* Unsupported GET_PD_MESSAGE command */
-		break;
 	}
 }
 
@@ -391,12 +375,11 @@ static void tps6699x_emul_handle_ucsi(struct tps6699x_emul_pdc_data *data,
 	case UCSI_SET_PDOS:
 		tps6699x_emul_ucsi_set_pdos(data, data_reg);
 		break;
-	case UCSI_GET_PD_MESSAGE:
-		tps699x_emul_get_pd_message(
-			data, (union get_pd_message_t *)&data_reg[2]);
-		break;
 	case UCSI_GET_CURRENT_CAM:
 		tps699x_emul_get_current_cam(data);
+		break;
+	case UCSI_GET_ATTENTION_VDO:
+		tps699x_emul_get_attention_vdo(data);
 		break;
 	default:
 		LOG_WRN("tps6699x_emul: Unimplemented UCSI command %#04x", cmd);
@@ -643,9 +626,8 @@ static void
 tps6699x_emul_handle_port_control(struct tps6699x_emul_pdc_data *data,
 				  const union reg_port_control *pc)
 {
-	if (data->port_control.fr_swap_enabled != pc->fr_swap_enabled) {
-		data->frs_configured = true;
-	}
+	/* Any access to this register sets the FRS bit */
+	data->frs_configured = true;
 
 	/*
 	 * The tps6699x driver doesn't send the UCSI_SET_UOR cmd to control data
@@ -1080,6 +1062,16 @@ static int emul_tps6699x_set_info(const struct emul *target,
 	struct tps6699x_emul_pdc_data *data =
 		tps6699x_emul_get_pdc_data(target);
 
+	if (info == NULL) {
+		LOG_INF("%s: info is NULL. "
+			"Invalidate driver's chip info cache.",
+			__func__);
+
+		pdc_tps6699x_test_invalidate_chip_info(target->dev);
+
+		return 0;
+	}
+
 	union reg_version *reg_version =
 		(union reg_version *)data->reg_val[REG_VERSION];
 	union reg_tx_identity *reg_tx_identity =
@@ -1170,9 +1162,6 @@ static int emul_tps6699x_reset(const struct emul *target)
 	const union reg_port_control *pdc_port_control =
 		(const union reg_port_control *)data->reg_val[REG_PORT_CONTROL];
 	union reg_mode *reg_mode = (union reg_mode *)data->reg_val[REG_MODE];
-	union reg_received_attention_vdm *attention_vdm =
-		(union reg_received_attention_vdm *)
-			data->reg_val[REG_RECEIVED_ATTENTION_VDM];
 	memset(data->reg_val, 0, sizeof(data->reg_val));
 
 	/* Reset PDOs. */
@@ -1195,11 +1184,11 @@ static int emul_tps6699x_reset(const struct emul *target)
 	/* Initialize reg_mode to APP0 to indicate running from flash. */
 	*((uint32_t *)reg_mode->data) = REG_MODE_APP0;
 
-	/* Init received attention vdm */
-	attention_vdm->number_valid_vdos = 2;
-	attention_vdm->sequence_number = 1;
-	attention_vdm->vdm_header = 0;
-	attention_vdm->vdo = 0x1;
+	/* Init received attention vdo */
+	data->get_attention_vdo.num_vdos = 2;
+	data->get_attention_vdo.sequence_number = 1;
+	data->get_attention_vdo.vdm_heade = 0;
+	data->get_attention_vdo.vdo = 0x1;
 
 	data->pending_rdo = 0;
 	k_work_cancel_delayable(&data->delayed_sink_contract_negotiation_work);
@@ -1270,9 +1259,6 @@ static int tps6699x_emul_init(const struct emul *emul,
 	const struct i2c_common_emul_cfg *cfg = emul->cfg;
 	union reg_mode *reg_mode =
 		(union reg_mode *)data->pdc_data.reg_val[REG_MODE];
-	union reg_received_attention_vdm *attention_vdm =
-		(union reg_received_attention_vdm *)
-			data->pdc_data.reg_val[REG_RECEIVED_ATTENTION_VDM];
 	LOG_INF("TPS669X emul init");
 
 	data->common.i2c = parent;
@@ -1292,11 +1278,11 @@ static int tps6699x_emul_init(const struct emul *emul,
 	/* Init register to APP0 */
 	*((uint32_t *)reg_mode->data) = REG_MODE_APP0;
 
-	/* Init received attention vdm */
-	attention_vdm->number_valid_vdos = 2;
-	attention_vdm->sequence_number = 1;
-	attention_vdm->vdm_header = 0;
-	attention_vdm->vdo = 0x1;
+	/* Init received attention vdo */
+	data->pdc_data.get_attention_vdo.num_vdos = 2;
+	data->pdc_data.get_attention_vdo.sequence_number = 1;
+	data->pdc_data.get_attention_vdo.vdm_heade = 0;
+	data->pdc_data.get_attention_vdo.vdo = 0x1;
 
 	return 0;
 }
@@ -1530,16 +1516,14 @@ static int emul_tps6699x_set_identity(const struct emul *target, uint32_t *vdos)
 {
 	struct tps6699x_emul_pdc_data *data =
 		tps6699x_emul_get_pdc_data(target);
-	memcpy(&data->identity, vdos,
-	       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
-	return 0;
-}
+	union reg_received_identity_data_object *sop_id =
+		(union reg_received_identity_data_object *)
+			data->reg_val[REG_RECEIVED_SOP_IDENTITY_DATA_OBJECT];
 
-static int emul_tps6699x_set_revision(const struct emul *target, uint32_t rmdo)
-{
-	struct tps6699x_emul_pdc_data *data =
-		tps6699x_emul_get_pdc_data(target);
-	data->rmdo = rmdo;
+	sop_id->number_valid_vdos = 6;
+	sop_id->response_type = 1;
+	memcpy(sop_id->vdo, &vdos[1], sizeof(uint32_t) * 6);
+
 	return 0;
 }
 
@@ -1564,6 +1548,66 @@ static int emul_tps6699x_get_sbu_mux_mode(const struct emul *target,
 
 	union reg_status *r = (union reg_status *)data->reg_val[REG_STATUS];
 	*mode = r->sbumux_mode;
+
+	return 0;
+}
+
+static int emul_tps6699x_get_max_pdp(const struct emul *target,
+				     enum max_pdp_t *max_pdp)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	union reg_source_cap_ext_data_block *source_cap_ext =
+		(union reg_source_cap_ext_data_block *)data
+			->reg_val[REG_TX_SOURCE_CAPABILITIES_EXTENDED_DATA_BLOCK];
+	union reg_source_info *source_info =
+		(union reg_source_info *)data->reg_val[REG_TX_SOURCE_INFO];
+
+	if (source_cap_ext->source_pdp == 7 && source_info->maximum_pdp == 7) {
+		*max_pdp = MAX_PDP_7_5W;
+	} else if (source_cap_ext->source_pdp == 15 &&
+		   source_info->maximum_pdp == 15) {
+		*max_pdp = MAX_PDP_15W;
+	} else {
+		LOG_ERR("Invalid max PDP in emulator: source_pdp=%d, maximum_pdp=%d",
+			source_cap_ext->source_pdp, source_info->maximum_pdp);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+static int
+emul_tps6699x_get_battery_capability(const struct emul *target,
+				     union battery_capability_t *bcap)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	union battery_capability_t *_bcap =
+		(union battery_capability_t *)
+			data->reg_val[REG_TX_BATTERY_CAPABILITIES];
+
+	bcap->vid = be16toh(_bcap->vid);
+	bcap->pid = be16toh(_bcap->pid);
+	bcap->design_capacity = be16toh(_bcap->design_capacity);
+	bcap->last_full_charge_capacity =
+		be16toh(_bcap->last_full_charge_capacity);
+
+	return 0;
+}
+
+static int emul_tps6699x_get_battery_status(const struct emul *target,
+					    union battery_status_t *bstat)
+{
+	struct tps6699x_emul_pdc_data *data =
+		tps6699x_emul_get_pdc_data(target);
+	union battery_status_t *_bstat =
+		(union battery_status_t *)data
+			->reg_val[REG_TRANSMITTED_BATTERY_STATUS_DATA_OBJECT];
+
+	bstat->reserved = _bstat->reserved;
+	bstat->flags = _bstat->flags;
+	bstat->present_capacity = be16toh(_bstat->present_capacity);
 
 	return 0;
 }
@@ -1604,10 +1648,19 @@ static DEVICE_API(emul_pdc, emul_tps6699x_api) = {
 	.reset_feature_flags = emul_tps6699x_reset_feature_flags,
 	.get_autoneg_sink = emul_tps6699x_get_autoneg_sink,
 	.set_identity = emul_tps6699x_set_identity,
-	.set_revision = emul_tps6699x_set_revision,
 	.set_current_cam = emul_tps6699x_set_current_cam,
 	.get_sbu_mux_mode = emul_tps6699x_get_sbu_mux_mode,
+	.get_max_pdp = emul_tps6699x_get_max_pdp,
+	.get_battery_capability = emul_tps6699x_get_battery_capability,
+	.get_battery_status = emul_tps6699x_get_battery_status,
 };
+
+struct i2c_common_emul_data *
+emul_tps6699x_get_i2c_common_data(const struct emul *emul)
+{
+	struct tps6699x_emul_data *data = emul->data;
+	return &data->common;
+}
 
 /* clang-format off */
 #define TPS6699X_EMUL_DEFINE(n) \

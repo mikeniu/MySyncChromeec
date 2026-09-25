@@ -42,7 +42,7 @@ static void generate_ec_soc_dsw_pwrok_handler(int delay)
 	}
 }
 
-void board_ap_power_force_shutdown(void)
+static void board_ap_power_shutdown(void)
 {
 	int timeout_ms = X86_NON_DSX_ADLP_NONPWRSEQ_FORCE_SHUTDOWN_TO_MS;
 
@@ -95,6 +95,11 @@ void board_ap_power_force_shutdown(void)
 }
 
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
+void board_ap_power_force_shutdown(void)
+{
+	board_ap_power_shutdown();
+}
+
 void board_ap_power_action_g3_s5(void)
 {
 	power_signal_enable(PWR_DSW_PWROK);
@@ -153,8 +158,7 @@ bool board_ap_power_check_power_rails_enabled(void)
 	       power_signal_get(PWR_EC_SOC_DSW_PWROK);
 }
 #else
-#ifndef CONFIG_EMUL_AP_PWRSEQ_DRIVER
-/* This is called by AP Power Sequence driver only when AP exits S0 or S0ix */
+/* Invoked by AP power sequence driver when AP exits S0 or S0ix */
 static void board_ap_power_cb(const struct device *dev,
 			      const enum ap_pwrseq_state entry,
 			      const enum ap_pwrseq_state exit)
@@ -166,32 +170,23 @@ static void board_ap_power_cb(const struct device *dev,
 	power_signal_enable(PWR_DSW_PWROK);
 	power_signal_enable(PWR_PG_PP1P05);
 }
-
-static int board_ap_power_init(void)
-{
-	const struct device *ap_pwrseq_dev = ap_pwrseq_get_instance();
-	static struct ap_pwrseq_state_callback exit_cb = {
-		.cb = board_ap_power_cb,
-		.states_bit_mask =
-			(BIT(AP_POWER_STATE_S0) | BIT(AP_POWER_STATE_S0ix)),
-	};
-
-	ap_pwrseq_register_state_exit_callback(ap_pwrseq_dev, &exit_cb);
-
-	return 0;
-}
-SYS_INIT(board_ap_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
-#endif /* CONFIG_EMUL_AP_PWRSEQ_DRIVER */
+AP_PWRSEQ_STATE_EXIT_CALLBACK_DEFINE(board_ap_power_cb, AP_POWER_STATE_S0,
+				     AP_POWER_STATE_S0ix);
 
 static int board_ap_power_g3_entry(void *data)
 {
-	board_ap_power_force_shutdown();
+	board_ap_power_shutdown();
 
 	return 0;
 }
 
 static int board_ap_power_g3_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		board_ap_power_shutdown();
+		return 1;
+	}
+
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		power_signal_enable(PWR_DSW_PWROK);
 		power_signal_enable(PWR_PG_PP1P05);

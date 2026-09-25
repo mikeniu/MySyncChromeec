@@ -26,6 +26,9 @@ LOG_MODULE_REGISTER(test);
 static char mock_data[64] =
 	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@";
 
+BUILD_ASSERT(sizeof(mock_data) >= BBRAM_REGION_OFFSET(chg_limit_flags) +
+					  BBRAM_REGION_SIZE(chg_limit_flags));
+
 int system_preinitialize(const struct device *unused);
 int system_bbram_write(const struct device *dev, size_t offset, size_t size,
 		       const uint8_t *data);
@@ -33,7 +36,9 @@ int system_bbram_write(const struct device *dev, size_t offset, size_t size,
 ZTEST(system, test_invalid_bbram_index)
 {
 	zassert_equal(EC_ERROR_INVAL,
-		      system_get_bbram(SYSTEM_BBRAM_IDX_TRY_SLOT + 1, NULL));
+		      system_get_bbram(SYSTEM_BBRAM_IDX_MAX, NULL));
+	zassert_equal(EC_ERROR_INVAL,
+		      system_set_bbram(SYSTEM_BBRAM_IDX_MAX, 0));
 }
 
 ZTEST(system, test_bbram_get)
@@ -66,6 +71,41 @@ ZTEST(system, test_bbram_get)
 	zassert_ok(rc);
 	zassert_mem_equal(output, mock_data + BBRAM_REGION_OFFSET(try_slot),
 			  BBRAM_REGION_SIZE(try_slot), NULL);
+
+	rc = system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, output);
+	zassert_ok(rc);
+	zassert_mem_equal(output,
+			  mock_data + BBRAM_REGION_OFFSET(chg_limit_lower),
+			  BBRAM_REGION_SIZE(chg_limit_lower), NULL);
+
+	rc = system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, output);
+	zassert_ok(rc);
+	zassert_mem_equal(output,
+			  mock_data + BBRAM_REGION_OFFSET(chg_limit_upper),
+			  BBRAM_REGION_SIZE(chg_limit_upper), NULL);
+
+	rc = system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, output);
+	zassert_ok(rc);
+	zassert_mem_equal(output,
+			  mock_data + BBRAM_REGION_OFFSET(chg_limit_flags),
+			  BBRAM_REGION_SIZE(chg_limit_flags), NULL);
+}
+
+ZTEST(system, test_bbram_set_get)
+{
+	uint8_t val;
+
+	zassert_ok(system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, 80));
+	zassert_ok(system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER, &val));
+	zassert_equal(val, 80);
+
+	zassert_ok(system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, 85));
+	zassert_ok(system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER, &val));
+	zassert_equal(val, 85);
+
+	zassert_ok(system_set_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, 1));
+	zassert_ok(system_get_bbram(SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS, &val));
+	zassert_equal(val, 1);
 }
 
 ZTEST(system, test_save_read_chip_reset_flags)
@@ -75,6 +115,36 @@ ZTEST(system, test_save_read_chip_reset_flags)
 	chip_save_reset_flags(0);
 	chip_save_reset_flags(arbitrary_flags);
 	zassert_equal(chip_read_reset_flags(), arbitrary_flags);
+}
+
+static int
+custom_cros_system_get_hibernate_wake_source(enum hibernate_wake_source *source)
+{
+	*source = WAKE_SOURCE_PWR_BTN;
+	return 0;
+}
+
+/* Test system_get_hibernate_wake_source delegates to cros_system driver */
+ZTEST(system, test_system_get_hibernate_wake_source)
+{
+	enum hibernate_wake_source source = WAKE_SOURCE_UNKNOWN;
+
+	/* Test successful query with custom fake setting the out parameter */
+	cros_system_get_hibernate_wake_source_fake.custom_fake =
+		custom_cros_system_get_hibernate_wake_source;
+
+	zassert_ok(system_get_hibernate_wake_source(&source));
+	zassert_equal(cros_system_get_hibernate_wake_source_fake.call_count, 1);
+	zassert_equal(cros_system_get_hibernate_wake_source_fake.arg0_val,
+		      &source);
+	zassert_equal(source, WAKE_SOURCE_PWR_BTN);
+
+	/* Test error return value is properly forwarded */
+	cros_system_get_hibernate_wake_source_fake.custom_fake = NULL;
+	cros_system_get_hibernate_wake_source_fake.return_val = -ENOSYS;
+
+	zassert_equal(-ENOSYS, system_get_hibernate_wake_source(&source));
+	zassert_equal(cros_system_get_hibernate_wake_source_fake.call_count, 2);
 }
 
 ZTEST(system, test_system_set_get_scratchpad)
@@ -101,9 +171,7 @@ ZTEST(system, test_system_get_scratchpad_fail)
 
 static jmp_buf jmp_hibernate;
 
-static int _test_cros_system_native_posix_hibernate(const struct device *dev,
-						    uint32_t seconds,
-						    uint32_t microseconds)
+static int _test_cros_system_hibernate(uint32_t seconds, uint32_t microseconds)
 {
 	longjmp(jmp_hibernate, 1);
 
@@ -116,16 +184,12 @@ ZTEST(system, test_system_hibernate)
 	 * Due to setjmp usage, this test provides no coverage, but does
 	 * actually cover the code. This is due to a bug in LCOV.
 	 */
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
 	int ret = setjmp(jmp_hibernate);
 	/* Validate 0th and last bit preserved*/
 	uint32_t secs = BIT(31) + 1;
 	uint32_t msecs = BIT(31) + 3;
 
-	zassert_not_null(sys_dev);
-
-	cros_system_native_posix_hibernate_fake.custom_fake =
-		_test_cros_system_native_posix_hibernate;
+	cros_system_hibernate_fake.custom_fake = _test_cros_system_hibernate;
 
 	if (ret == 0) {
 		system_hibernate(secs, msecs);
@@ -133,66 +197,46 @@ ZTEST(system, test_system_hibernate)
 
 	zassert_not_equal(ret, 0);
 
-	zassert_equal(cros_system_native_posix_hibernate_fake.call_count, 1);
-	zassert_equal(cros_system_native_posix_hibernate_fake.arg0_val,
-		      sys_dev);
-	zassert_equal(cros_system_native_posix_hibernate_fake.arg1_val, secs);
-	zassert_equal(cros_system_native_posix_hibernate_fake.arg2_val, msecs);
+	zassert_equal(cros_system_hibernate_fake.call_count, 1);
+	zassert_equal(cros_system_hibernate_fake.arg0_val, secs);
+	zassert_equal(cros_system_hibernate_fake.arg1_val, msecs);
 	zassert_equal(board_hibernate_fake.call_count, 1);
 }
 
 ZTEST(system, test_system_hibernate__failure)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
 	/* Validate 0th and last bit preserved*/
 	uint32_t secs = BIT(31) + 1;
 	uint32_t msecs = BIT(31) + 3;
 
-	zassert_not_null(sys_dev);
-
-	cros_system_native_posix_hibernate_fake.return_val = -1;
+	cros_system_hibernate_fake.return_val = -1;
 
 	system_hibernate(secs, msecs);
 
-	zassert_equal(cros_system_native_posix_hibernate_fake.call_count, 1);
-	zassert_equal(cros_system_native_posix_hibernate_fake.arg0_val,
-		      sys_dev);
-	zassert_equal(cros_system_native_posix_hibernate_fake.arg1_val, secs);
-	zassert_equal(cros_system_native_posix_hibernate_fake.arg2_val, msecs);
+	zassert_equal(cros_system_hibernate_fake.call_count, 1);
+	zassert_equal(cros_system_hibernate_fake.arg0_val, secs);
+	zassert_equal(cros_system_hibernate_fake.arg1_val, msecs);
 }
 
 ZTEST(system, test_system_get_chip_values)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
-
-	zassert_not_null(sys_dev);
-
 	/* Vendor */
-	cros_system_native_posix_get_chip_vendor_fake.return_val = "a";
+	cros_system_chip_vendor_fake.return_val = "a";
 	zassert_mem_equal(system_get_chip_vendor(), "a", sizeof("a"));
-	zassert_equal(cros_system_native_posix_get_chip_vendor_fake.call_count,
-		      1);
-	zassert_equal(cros_system_native_posix_get_chip_vendor_fake.arg0_val,
-		      sys_dev);
+	zassert_equal(cros_system_chip_vendor_fake.call_count, 1);
 
 	/* Name */
-	cros_system_native_posix_get_chip_name_fake.return_val = "b";
+	cros_system_chip_name_fake.return_val = "b";
 	zassert_mem_equal(system_get_chip_name(), "b", sizeof("b"));
-	zassert_equal(cros_system_native_posix_get_chip_name_fake.call_count,
-		      1);
-	zassert_equal(cros_system_native_posix_get_chip_name_fake.arg0_val,
-		      sys_dev);
+	zassert_equal(cros_system_chip_name_fake.call_count, 1);
 
 	/* Revision */
-	cros_system_native_posix_get_chip_revision_fake.return_val = "c";
+	cros_system_chip_revision_fake.return_val = "c";
 	zassert_mem_equal(system_get_chip_revision(), "c", sizeof("c"));
-	zassert_equal(
-		cros_system_native_posix_get_chip_revision_fake.call_count, 1);
-	zassert_equal(cros_system_native_posix_get_chip_revision_fake.arg0_val,
-		      sys_dev);
+	zassert_equal(cros_system_chip_revision_fake.call_count, 1);
 }
 
-static int _test_cros_system_native_posix_soc_reset(const struct device *dev)
+static int _test_cros_system_soc_reset(void)
 {
 	printf("called from soc reset");
 	longjmp(jmp_hibernate, 1);
@@ -206,7 +250,6 @@ ZTEST(system, test_system_reset)
 	 * Despite using setjmp this test consistently covers the code under
 	 * test. Context: https://github.com/llvm/llvm-project/issues/50119
 	 */
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
 	int ret = setjmp(jmp_hibernate);
 	uint32_t arbitrary_flags_w_reset_wait_ext = 0x1234 |
 						    SYSTEM_RESET_WAIT_EXT;
@@ -215,34 +258,24 @@ ZTEST(system, test_system_reset)
 	system_encode_save_flags(arbitrary_flags_w_reset_wait_ext,
 				 &encoded_arbitrary_flags_w_reset_wait_ext);
 
-	zassert_not_null(sys_dev);
-
-	cros_system_native_posix_soc_reset_fake.custom_fake =
-		_test_cros_system_native_posix_soc_reset;
+	cros_system_soc_reset_fake.custom_fake = _test_cros_system_soc_reset;
 
 	if (ret == 0) {
 		system_reset(arbitrary_flags_w_reset_wait_ext);
 	}
 
-	zassert_not_null(sys_dev);
-
 	zassert_equal(chip_read_reset_flags(),
 		      encoded_arbitrary_flags_w_reset_wait_ext);
 
 	zassert_equal(watchdog_reload_fake.call_count, 1000);
-	zassert_equal(cros_system_native_posix_soc_reset_fake.call_count, 1);
-	zassert_equal(cros_system_native_posix_soc_reset_fake.arg0_val,
-		      sys_dev);
+	zassert_equal(cros_system_soc_reset_fake.call_count, 1);
 }
 
 ZTEST_USER(system, test_system_console_cmd__idlestats)
 {
-	const struct device *sys_dev = device_get_binding("CROS_SYSTEM");
 	const struct shell *shell_zephyr = get_ec_shell();
 	const char *outbuffer;
 	size_t buffer_size;
-
-	zassert_not_null(sys_dev);
 
 	shell_backend_dummy_clear_output(shell_zephyr);
 
@@ -255,19 +288,18 @@ ZTEST_USER(system, test_system_console_cmd__idlestats)
 	zassert_not_null(strstr(outbuffer, "Time spent in deep-sleep:"));
 	zassert_not_null(strstr(outbuffer, "Total time on:"));
 
-	zassert_equal(cros_system_native_posix_deep_sleep_ticks_fake.call_count,
-		      1);
+	zassert_equal(cros_system_deep_sleep_ticks_fake.call_count, 1);
 }
 
 ZTEST(system, test_init_invalid_reset_cause)
 {
-	cros_system_native_posix_get_reset_cause_fake.return_val = -1;
+	cros_system_get_reset_cause_fake.return_val = -1;
 	zassert_equal(-1, system_preinitialize(NULL));
 }
 
 ZTEST(system, test_init_cause_vcc1_rst_pin)
 {
-	cros_system_native_posix_get_reset_cause_fake.return_val = VCC1_RST_PIN;
+	cros_system_get_reset_cause_fake.return_val = VCC1_RST_PIN;
 	chip_save_reset_flags(0);
 	system_clear_reset_flags(0xffffffff);
 
@@ -283,7 +315,7 @@ ZTEST(system, test_init_cause_vcc1_rst_pin)
 
 ZTEST(system, test_init_cause_debug_rst)
 {
-	cros_system_native_posix_get_reset_cause_fake.return_val = DEBUG_RST;
+	cros_system_get_reset_cause_fake.return_val = DEBUG_RST;
 	chip_save_reset_flags(0);
 	system_clear_reset_flags(0xffffffff);
 
@@ -293,7 +325,7 @@ ZTEST(system, test_init_cause_debug_rst)
 
 ZTEST(system, test_init_cause_watchdog_rst)
 {
-	cros_system_native_posix_get_reset_cause_fake.return_val = WATCHDOG_RST;
+	cros_system_get_reset_cause_fake.return_val = WATCHDOG_RST;
 	chip_save_reset_flags(0);
 	system_clear_reset_flags(0xffffffff);
 

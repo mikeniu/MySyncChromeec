@@ -20,11 +20,17 @@
 #include <ec_commands.h>
 #include <ec_tasks.h>
 #include <fingerprint/fingerprint_alg.h>
+#include <flash.h>
 #include <fpsensor/fpsensor_state.h>
 #include <host_command.h>
 #include <rollback.h>
+#include <rollback_private.h>
 
-DEFINE_FFF_GLOBALS;
+#define ROLLBACK0_ADDR DT_REG_ADDR(DT_NODELABEL(rollback0))
+#define ROLLBACK0_SIZE DT_REG_SIZE(DT_NODELABEL(rollback0))
+
+#define ROLLBACK1_ADDR DT_REG_ADDR(DT_NODELABEL(rollback1))
+#define ROLLBACK1_SIZE DT_REG_SIZE(DT_NODELABEL(rollback1))
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
@@ -146,17 +152,20 @@ ZTEST_USER(fpsensor_match, test_match_no_templates_mkbp_event)
 	/* Trigger match with no templates loaded. */
 	trigger_match_attempt(FP_MODE_MATCH);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
-
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_MATCH
+	 * - MKBP event is FINGER_DOWN and FP_MATCH
 	 * - Match failed with NO_TEMPLATES
 	 * - Finger ID is FP_NO_SUCH_TEMPLATE
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
 		      EC_MKBP_FP_ERR_MATCH_NO_TEMPLATES);
@@ -237,17 +246,21 @@ ZTEST_USER(fpsensor_match, test_match_no_match_mkbp_event)
 	/* Make sure that 'match' was called. */
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_MATCH
+	 * - MKBP event is FINGER_DOWN and FP_MATCH
 	 * - Match failed with NO_MATCH
 	 * - Finger ID is FP_NO_SUCH_TEMPLATE
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), EC_MKBP_FP_ERR_MATCH_NO);
 	zassert_equal(EC_MKBP_FP_MATCH_IDX(fp_events),
@@ -318,17 +331,21 @@ ZTEST_USER(fpsensor_match, test_match_success_mkbp_event)
 	/* Make sure that 'match' was called. */
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_MATCH
+	 * - MKBP events are FINGER_DOWN and FP_MATCH
 	 * - Match succeeded with MATCH_YES
 	 * - Finger ID is 0
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events), EC_MKBP_FP_ERR_MATCH_YES);
 	zassert_equal(EC_MKBP_FP_MATCH_IDX(fp_events), 0);
@@ -355,17 +372,21 @@ ZTEST_USER(fpsensor_match, test_match_success_template_updated_mkbp_event)
 	/* Make sure that 'match' was called. */
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_MATCH
+	 * - MKBP event is FINGER_DOWN and FP_MATCH
 	 * - Match succeeded with MATCH_YES_UPDATED
 	 * - Finger ID is 0
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
 		      EC_MKBP_FP_ERR_MATCH_YES_UPDATED);
@@ -393,17 +414,21 @@ ZTEST_USER(fpsensor_match, test_match_success_template_update_failed_mkbp_event)
 	/* Make sure that 'match' was called. */
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_MATCH
+	 * - MKBP events are FINGER_DOWN and FP_MATCH
 	 * - Match succeeded with MATCH_YES_UPDATE_FAILED
 	 * - Finger ID is 0
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
 		      EC_MKBP_FP_ERR_MATCH_YES_UPDATE_FAILED);
@@ -684,22 +709,101 @@ ZTEST_USER(fpsensor_match, test_match_error_mkbp_event)
 	/* Make sure that 'match' was called. */
 	zassert_equal(mock_alg_match_fake.call_count, 1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
 	/*
 	 * Confirm that:
-	 * - MKBP event is FP_MATCH
+	 * - MKBP events are FINGER_DOWN and FP_MATCH
 	 * - Match failed with NO_INTERNAL
 	 * - Finger ID is FP_NO_SUCH_TEMPLATE
 	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_MATCH);
 	zassert_equal(EC_MKBP_FP_ERRCODE(fp_events),
 		      EC_MKBP_FP_ERR_MATCH_NO_INTERNAL);
 	zassert_equal(EC_MKBP_FP_MATCH_IDX(fp_events),
 		      FP_NO_SUCH_TEMPLATE & 0xF);
+}
+
+ZTEST_USER(fpsensor_match, test_match_no_match_keeps_stats_valid)
+{
+	struct ec_response_fp_stats stats = { 0 };
+
+	/* Load example template. */
+	zassert_ok(ec_cmd_fp_template(
+		NULL,
+		(struct ec_params_fp_template *)example_template_encrypted,
+		sizeof(example_template_encrypted)));
+
+	/* Mock a "No Match" result from the algorithm. */
+	mock_alg_match_fake.return_val = FP_MATCH_RESULT_NO_MATCH;
+
+	/* Trigger a match attempt. */
+	trigger_match_attempt(FP_MODE_MATCH);
+
+	/* Ensure the match algorithm was actually executed. */
+	zassert_equal(mock_alg_match_fake.call_count, 1,
+		      "Match algorithm was not called");
+
+	/* Verify timestamps_invalid should not have FPSTATS_MATCHING_INV. */
+	zassert_ok(ec_cmd_fp_stats(NULL, &stats));
+	zassert_false(
+		stats.timestamps_invalid & FPSTATS_MATCHING_INV,
+		"Matching stats should be valid even on a 'No Match' result");
+}
+
+ZTEST_USER(fpsensor_match, test_match_internal_error_sets_invalid_flag)
+{
+	struct ec_response_fp_stats stats = { 0 };
+
+	/* Load example template. */
+	zassert_ok(ec_cmd_fp_template(
+		NULL,
+		(struct ec_params_fp_template *)example_template_encrypted,
+		sizeof(example_template_encrypted)));
+
+	/* Mock an internal error (Negative value means error). */
+	mock_alg_match_fake.return_val = -1;
+
+	/* Trigger a match attempt. */
+	trigger_match_attempt(FP_MODE_MATCH);
+
+	/* Ensure the match algorithm was actually executed. */
+	zassert_equal(mock_alg_match_fake.call_count, 1,
+		      "Match algorithm was not called");
+
+	/* Verify timestamps_invalid should have FPSTATS_MATCHING_INV. */
+	zassert_ok(ec_cmd_fp_stats(NULL, &stats));
+	zassert_true(stats.timestamps_invalid & FPSTATS_MATCHING_INV,
+		     "Internal error must set the invalid flag");
+}
+
+ZTEST_USER(fpsensor_match, test_match_no_templates_sets_invalid)
+{
+	struct ec_response_fp_stats stats = { 0 };
+
+	/*
+	 * Ensure NO templates are loaded.
+	 * (fpsensor_before resets the state, so we just don't call
+	 * ec_cmd_fp_template)
+	 */
+
+	/* Trigger a match attempt. */
+	trigger_match_attempt(FP_MODE_MATCH);
+
+	/*
+	 * Even if no match happened, the 'matching' attempt occurred
+	 * but was invalid because of missing templates.
+	 */
+	zassert_ok(ec_cmd_fp_stats(NULL, &stats));
+	zassert_true(stats.timestamps_invalid & FPSTATS_MATCHING_INV,
+		     "Invalid flag should be set if no templates are enrolled");
 }
 
 static void *fpsensor_setup(void)
@@ -709,6 +813,22 @@ static void *fpsensor_setup(void)
 		.reserved = 0,
 		.seed = FAKE_TPM_SEED,
 	};
+	const struct rollback_data data = {
+		.id = 0,
+		.rollback_min_version = 0,
+#ifdef CONFIG_PLATFORM_EC_ROLLBACK_SECRET_SIZE
+		.secret = { 0 },
+#endif
+		.cookie = CROS_EC_ROLLBACK_COOKIE,
+	};
+
+	zassert_ok(crec_flash_erase(ROLLBACK0_ADDR, ROLLBACK0_SIZE));
+	zassert_ok(crec_flash_write(ROLLBACK0_ADDR, sizeof(data),
+				    (const char *)&data));
+
+	zassert_ok(crec_flash_erase(ROLLBACK1_ADDR, ROLLBACK1_SIZE));
+	zassert_ok(crec_flash_write(ROLLBACK1_ADDR, sizeof(data),
+				    (const char *)&data));
 
 	/* Start shimmed tasks. */
 	start_ec_tasks();

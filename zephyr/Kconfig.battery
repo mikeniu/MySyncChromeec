@@ -110,6 +110,14 @@ config PLATFORM_EC_BATTERY_PRESENT_NONE
 
 endchoice # PLATFORM_EC_BATTERY_PRESENT_MODE
 
+config PLATFORM_EC_BATTERY_STATUS_CUSTOM
+	bool "Call a custom battery_status function"
+	help
+	  Use this method to provide a custom battery_status() function.
+	  This can be used to intercept or override the battery status
+	  reading from the fuel gauge, for example to provide status
+	  from an external processor.
+
 config PLATFORM_EC_USE_BATTERY_DEVICE_CHEMISTRY
 	bool "Provide information about battery chemistry"
 	help
@@ -166,6 +174,21 @@ config PLATFORM_EC_BATTERY_CUT_OFF
 	  console command and the EC_CMD_BATTERY_CUT_OFF host command.
 	  Once defined, a board specific board_cut_off_battery() function
 	  has to be provided.
+
+config PLATFORM_EC_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN
+	bool "Battery cut-off at shutdown"
+	depends on PLATFORM_EC_BATTERY_CUT_OFF
+	help
+	  If this option is enabled, all battery cutoff commands will be
+	  deferred until the chipset is shutting down.
+
+	  Some boards can only execute a battery cutoff when the power state is
+	  G3 (fully off). This feature allows for that requirement by forcing
+	  a shutdown when a cutoff is requested and delaying the actual
+	  battery command until the transition to G3.
+
+	  When enabled, the actual battery cutoff command is deferred until the
+	  transition to G3, triggered by the HOOK_CHIPSET_SHUTDOWN_COMPLETE hook.
 
 config PLATFORM_EC_BATTERY_CUTOFF_TIMEOUT_MSEC
 	int "Timeout for battery cutoff completion"
@@ -252,6 +275,24 @@ config PLATFORM_EC_BATTERY_REVIVE_DISCONNECT
 	  If this battery is found to be in disconnect state, take it out of
 	  this state by force-applying a charge current. Once defined,
 	  a battery_get_disconnect_state() function has to be provided.
+
+config PLATFORM_EC_BATTERY_DEADBAND
+	bool "Enable battery discharge deadband filter"
+	help
+	  Filter out nuisance discharge state transitions when specific
+	  conditions are met. Some charger chip, battery, adapter
+	  combinations may result in a trivial amount of battery
+	  discharge. These transitions can happen at a rapid rate and
+	  are not meaningful at the system level.
+
+config PLATFORM_EC_BATTERY_DEADBAND_MA
+	int "Discharge deadband current threshold in mA"
+	depends on PLATFORM_EC_BATTERY_DEADBAND
+	default 10
+	help
+	  When PLATFORM_EC_BATTERY_DEADBAND is enabled, nuisance discharge reports
+	  are filtered out if the discharge current is less than this threshold
+	  (in mA).
 
 config PLATFORM_EC_BATTERY_MEASURE_IMBALANCE
 	bool "Measure the battery cells imbalance"
@@ -372,6 +413,11 @@ config PLATFORM_EC_HOSTCMD_BATTERY_INFO
 	  ec_response_battery_static/dynamic_info structures, only make sense
 	  when PLATFORM_EC_BATTERY_INFO is enabled.
 
+config PLATFORM_EC_HOSTCMD_BATTERY_GET_MISC_INFO
+	bool "Host command: battery misc info"
+	depends on PLATFORM_EC_BATTERY_FUEL_GAUGE
+	help
+	  Include host command to fetch battery misc info.
 endif # PLATFORM_EC_BATTERY_INFO
 
 if PLATFORM_EC_I2C_VIRTUAL_BATTERY
@@ -403,5 +449,35 @@ config PLATFORM_EC_BATTERY_ACCESS_LIMIT
 	default n
 	help
 	  Enabling this limits the access to the battery host commands from the EC console.
+
+config PLATFORM_EC_BATTERY_REPLACE_NULLS
+	bool "Replace null characters in battery manufacturer name with underscores"
+	default y
+	help
+	  Enable this to replace NULL characters embedded in the battery
+	  manufacturer name with underscores to avoid issues with string
+	  handling. This should be enabled for new projects, but use
+	  with caution on existing projects since it may rename shipped
+	  batteries.
+
+config PLATFORM_EC_CHARGE_CONTROL
+	bool "Support battery charge control host command"
+	default y if PLATFORM_EC_CHARGER || PLATFORM_EC_CHARGE_CONTROL_PERSIST_TO_BBRAM
+	help
+	  Enable host command handler for EC_CMD_CHARGE_CONTROL.
+	  When PLATFORM_EC_CHARGER is enabled, full charge control mode
+	  switching (NORMAL, IDLE, DISCHARGE) and battery sustainer are
+	  supported. When PLATFORM_EC_CHARGER is disabled (charging offloaded
+	  to AP), only CHARGE_CONTROL_NORMAL is supported (e.g. for persisting
+	  charge limits to BBRAM); non-normal modes (IDLE, DISCHARGE) are
+	  rejected.
+
+config PLATFORM_EC_CHARGE_CONTROL_PERSIST_TO_BBRAM
+	bool "Persist battery charge control limits in BBRAM"
+	default n
+	select PLATFORM_EC_CHARGE_CONTROL
+	help
+	  Persists the battery charge control sustainer limit settings across
+	  EC resets and low-power states in battery-backed RAM (BBRAM).
 
 endif # PLATFORM_EC_BATTERY
