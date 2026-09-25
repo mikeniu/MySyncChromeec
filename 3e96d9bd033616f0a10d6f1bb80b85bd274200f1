@@ -16,6 +16,24 @@
       "message": "This presumes that the same user clones the tree and runs the docker. If that holds, then this seemed like the most straightforward way to bootstrap ownership of `/workspace` on the first run.\n\nIf we can further assume that the same user also builds the docker image, there might be further simplifications available. I haven\u0027t fully thought through that.",
       "revId": "3e96d9bd033616f0a10d6f1bb80b85bd274200f1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aafb4117_0a8af714",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-25T16:35:26Z",
+      "side": 1,
+      "message": "I envision that we will periodically publish working doccker images.  Users would just download the latest image instead of needing to build locally.",
+      "parentUuid": "7b5a48c7_2a3dc82f",
+      "revId": "3e96d9bd033616f0a10d6f1bb80b85bd274200f1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
