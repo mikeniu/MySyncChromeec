@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d8be091_28a885c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T18:38:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5ce961c0-eeb8-4e9f-ac84-e6698ba9a20f)]\n\n### Review Summary\n* **Functionality:** The patch accurately converts the fingerprint sensor host commands from the older `DECLARE_HOST_COMMAND` macros to the new `EC_HOST_CMD` framework (`EC_HOST_CMD_HANDLER` family). Behavior is strictly preserved as a pure migration.\n* **Architecture \u0026 Component Fit:** Aligns with the upstream EC codebase migration towards the `EC_HOST_CMD` framework. The types and return constants used are correct.\n* **Code Simplicity:** The changes are as simple as possible for a mechanical migration.\n* **Idiomaticity \u0026 Readability:** Correctly uses `static_cast` for C++ enum conversions (`ec_status` to `ec_host_cmd_status`). The use of `REQ_ONLY`, `RESP_ONLY`, and full `HANDLER` macros appropriately matches the payloads of each command.\n* **Security:** No security impact; the cryptographic handlers (seed and sign match) are unchanged in behavior and validation. \n* **Testing:** No new logic is introduced, and this pure migration is covered by the existing test suite (`fingerprint.task.commands` in `native_sim`).\n* **CL Size \u0026 Scope:** Size: M (+64, -52). The CL is well-scoped strictly to the `fpsensor_state.cc` migration.\n* **Commit Message:** Accurately reflects the changes, contains the correct `BUG\u003d` and `TEST\u003d` footers for ChromiumOS, and is well-formatted.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "0ec3064973b4d27348c05bccaee703efbcf103ef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
