@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef928367_7da0d253",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-25T16:57:44Z",
+      "side": 1,
+      "message": "Done. Switched macro to EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_FP_VENDOR, fp_command_vendor, EC_VER_MASK(0)) to support dynamic responses.",
+      "parentUuid": "68c3ab95_32b9d869",
+      "revId": "4b9aed133042eb103ff47835040287c6d65ae61a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af856548_d169d539",
