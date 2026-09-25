@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "b3ae03372fe546635e8cee36baa401dfdd68a3d8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb883c7c_99d773c0",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-25T17:35:50Z",
+      "side": 1,
+      "message": "Done. Added struct for consistency.",
+      "parentUuid": "ac054fcb_b35af7cd",
+      "range": {
+        "startLine": 160,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 9999
+      },
+      "revId": "b3ae03372fe546635e8cee36baa401dfdd68a3d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
