@@ -279,6 +279,9 @@ if [ -f "${NPCX_MONITOR_CACHE}" ] && [ ! -f "${NPCX_MONITOR_DEST}" ]; then
     cp "${NPCX_MONITOR_CACHE}" "${NPCX_MONITOR_DEST}"
 fi
 
+# Start in the EC checkout, where the EC tools expect to run.
+cd /workspace/src/platform/ec
+
 # Run the requested command (if any), or drop to bash
 if [ $# -eq 0 ]; then
     exec /bin/bash
