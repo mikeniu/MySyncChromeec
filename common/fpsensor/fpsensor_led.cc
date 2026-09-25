@@ -4,6 +4,7 @@
  */
 
 #include <zephyr/device.h>
+#include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/led.h>
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
@@ -65,6 +66,10 @@ SYS_INIT(init, POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY);
 namespace
 {
 
+const struct gpio_dt_spec lid_open_gpio =
+	GPIO_DT_SPEC_GET(DT_ALIAS(gpio_lid_open), gpios);
+struct gpio_callback lid_open_cb;
+
 consteval uint8_t perceivedToEmitted(float perceived, int gamma = 3)
 {
 	/* Constrain input */
@@ -96,6 +101,7 @@ enum class Mode {
 	OFF,
 	ENROLL,
 	MATCH,
+	MATCH_EXPIRED,
 	MATCH_OK,
 	MATCH_NOK,
 };
@@ -120,7 +126,11 @@ void led_update_handler(struct k_work *work)
 	k_sem_take(&led_lock, K_FOREVER);
 	bool is_timer_expired = k_uptime_ticks() >= timer_scheduled_at_ticks;
 	if (is_timer_expired) {
-		led_mode = Mode::OFF;
+		if (led_mode == Mode::MATCH) {
+			led_mode = Mode::MATCH_EXPIRED;
+		} else {
+			led_mode = Mode::OFF;
+		}
 		set_led_brightness(BRIGHTNESS_OFF);
 	}
 	k_sem_give(&led_lock);
@@ -217,6 +227,38 @@ void off()
 
 	LOG_INF("Fingerprint led off.");
 }
+
+void lid_open(struct k_work *)
+{
+	k_sem_take(&led_lock, K_FOREVER);
+	if (led_mode != Mode::MATCH && led_mode != Mode::MATCH_EXPIRED) {
+		k_sem_give(&led_lock);
+		return;
+	}
+	led_mode = Mode::MATCH;
+	set_led_with_timeout(BRIGHTNESS_MATCH,
+			     CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_MS);
+	k_sem_give(&led_lock);
+
+	LOG_INF("Fingerprint led lid open.");
+}
+K_WORK_DEFINE(lid_open_work, lid_open);
+
+void on_lid_open(const struct device *, struct gpio_callback *, uint32_t)
+{
+	k_work_submit(&lid_open_work);
+}
+
+int init_rw()
+{
+	gpio_pin_configure_dt(&lid_open_gpio, GPIO_INPUT);
+	gpio_init_callback(&lid_open_cb, on_lid_open, BIT(lid_open_gpio.pin));
+	gpio_add_callback_dt(&lid_open_gpio, &lid_open_cb);
+	gpio_pin_interrupt_configure_dt(&lid_open_gpio,
+					GPIO_INT_EDGE_TO_ACTIVE);
+	return 0;
+}
+SYS_INIT(init_rw, POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY);
 
 } /* namespace */
 

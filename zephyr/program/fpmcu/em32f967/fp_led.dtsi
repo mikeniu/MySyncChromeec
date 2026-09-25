@@ -12,7 +12,16 @@
 		};
 	};
 
+	gpio-keys {
+		compatible = "gpio-keys";
+
+		gpio_lid_open: gpio_lid_open {
+			gpios = <&gpiob 8 (GPIO_PULL_UP | GPIO_ACTIVE_HIGH)>;
+		};
+	};
+
 	aliases {
 		pwm-fp-led = &fp_led;
+		gpio-lid-open = &gpio_lid_open;
 	};
 };

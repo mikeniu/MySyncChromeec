@@ -6,6 +6,8 @@ extern "C" {
 #include "pwm_mock.h"
 }
 
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/gpio/gpio_emul.h>
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/fff.h>
 #include <zephyr/kernel.h>
@@ -34,6 +36,17 @@ extern "C" void pm_state_exit_post_ops(enum pm_state state, uint8_t substate_id)
 
 const struct device *pwm_fp_led =
 	DEVICE_DT_GET(DT_PWMS_CTLR(DT_ALIAS(pwm_fp_led)));
+const struct gpio_dt_spec lid_open_gpio =
+	GPIO_DT_SPEC_GET(DT_ALIAS(gpio_lid_open), gpios);
+
+static void simulate_lid_open()
+{
+	zassert_ok(
+		gpio_emul_input_set(lid_open_gpio.port, lid_open_gpio.pin, 0));
+	zassert_ok(
+		gpio_emul_input_set(lid_open_gpio.port, lid_open_gpio.pin, 1));
+	k_sleep(K_MSEC(10));
+}
 
 static bool is_suspend_locked()
 {
@@ -89,6 +102,77 @@ ZTEST(fp_led, test_match)
 	zassert_equal(fp_led_get(), BRIGHTNESS_OFF, "Led off 10s after match");
 	zassert_false(is_suspend_locked(),
 		      "Suspend should be unlocked after match timeout");
+}
+
+ZTEST(fp_led, test_match_lid_open)
+{
+	fp_led::update_mode(FP_MODE_MATCH);
+	k_sleep(K_MSEC(500));
+	zassert_equal(fp_led_get(), BRIGHTNESS_MATCH, "Led %d%% after match",
+		      BRIGHTNESS_MATCH);
+	k_sleep(K_SECONDS(10));
+	zassert_equal(fp_led_get(), BRIGHTNESS_OFF, "Led off 10s after match");
+	zassert_false(is_suspend_locked(),
+		      "Suspend should be unlocked after match timeout");
+
+	simulate_lid_open();
+	k_sleep(K_SECONDS(5));
+	zassert_equal(fp_led_get(), BRIGHTNESS_MATCH,
+		      "Led %d%% 5s after lid open", BRIGHTNESS_MATCH);
+	zassert_true(is_suspend_locked(),
+		     "Suspend should be locked 5s after lid open");
+
+	k_sleep(K_SECONDS(5));
+	zassert_equal(fp_led_get(), BRIGHTNESS_OFF,
+		      "Led off 10s after lid open");
+	zassert_false(is_suspend_locked(),
+		      "Suspend should be unlocked after match timeout");
+}
+
+ZTEST(fp_led, test_match_lid_open_before_timeout)
+{
+	fp_led::update_mode(FP_MODE_MATCH);
+	k_sleep(K_SECONDS(5));
+	zassert_equal(fp_led_get(), BRIGHTNESS_MATCH, "Led %d%% 5s after match",
+		      BRIGHTNESS_MATCH);
+
+	simulate_lid_open();
+	k_sleep(K_SECONDS(8));
+	zassert_equal(fp_led_get(), BRIGHTNESS_MATCH,
+		      "Led %d%% 8s after lid open", BRIGHTNESS_MATCH);
+	zassert_true(is_suspend_locked(),
+		     "Suspend should be locked 8s after lid open");
+
+	k_sleep(K_SECONDS(3));
+	zassert_equal(fp_led_get(), BRIGHTNESS_OFF,
+		      "Led off 10s after lid open");
+	zassert_false(is_suspend_locked(),
+		      "Suspend should be unlocked after match timeout");
+}
+
+ZTEST(fp_led, test_match_lid_open_when_off)
+{
+	simulate_lid_open();
+	k_sleep(K_MSEC(500));
+	zassert_equal(fp_led_get(), BRIGHTNESS_OFF,
+		      "Led should stay off on lid open");
+	zassert_false(is_suspend_locked(),
+		      "Suspend should not be locked on lid open when off");
+}
+
+ZTEST(fp_led, test_match_lid_open_when_enroll)
+{
+	fp_led::update_mode(FP_MODE_ENROLL_SESSION);
+	k_sleep(K_MSEC(500));
+	zassert_equal(fp_led_get(), BRIGHTNESS_ENROLL, "Led %d%% after enroll",
+		      BRIGHTNESS_ENROLL);
+
+	simulate_lid_open();
+	k_sleep(K_MSEC(500));
+	zassert_equal(fp_led_get(), BRIGHTNESS_ENROLL,
+		      "Led should stay enroll on lid open");
+
+	fp_led::update_mode(0);
 }
 
 ZTEST(fp_led, test_match_ok)

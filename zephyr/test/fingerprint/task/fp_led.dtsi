@@ -22,6 +22,14 @@
 		};
 	};
 
+	gpio-keys {
+		compatible = "gpio-keys";
+
+		gpio_lid_open: gpio_lid_open {
+			gpios = <&gpio0 3 (GPIO_PULL_UP | GPIO_ACTIVE_HIGH)>;
+		};
+	};
+
 	power-states {
 		suspend_to_idle: suspend_to_idle {
 			compatible = "zephyr,power-state";
@@ -33,5 +41,6 @@
 
 	aliases {
 		pwm-fp-led = &fp_led;
+		gpio-lid-open = &gpio_lid_open;
 	};
 };
