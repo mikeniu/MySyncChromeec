@@ -1,0 +1,42 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbd9e3ea_d61e8e5c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T20:00:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Nit: There appears to be a stray `--renode` argument left over in the commit message body here. Consider removing it.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8329791_7fd01e0b-953c-4f88-ab0e-d4a01ee5b10b.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ceb7728c546bded181fb6bf28a09792129cccb85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0216f91_3483d2a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T20:00:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/7fd01e0b-953c-4f88-ab0e-d4a01ee5b10b)]\n\n### Review Summary\n* **Functionality:** The CL successfully removes `otp_key` from the skipped test list, re-enabling it for the helipilot board on Renode.\n* **Architecture \u0026 Component Fit:** The change correctly modifies the existing test configuration without altering architectural boundaries.\n* **Code Simplicity:** The single-line deletion is as simple as possible.\n* **Idiomaticity \u0026 Readability:** The Python code change is idiomatic and clean.\n* **Security:** No security implications were found.\n* **Testing:** The change improves test coverage by enabling an automated device test.\n* **CL Size \u0026 Scope:** Size: XS (+0, -1). The CL is atomic and properly scoped.\n* **Commit Message:** The commit message accurately describes the change and provides the necessary tracking footers. I left a minor nit regarding a stray command-line flag in the commit message body.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ceb7728c546bded181fb6bf28a09792129cccb85",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
