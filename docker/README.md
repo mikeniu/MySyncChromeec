@@ -74,6 +74,11 @@ Or using the helper script:
 > tell who started it, so it runs everything as root instead. To recover, run
 > `sudo chown -R "$(id -u):$(id -g)" workspace`.
 
+> **Only `--rm` containers are supported.** `run_docker.sh` always passes
+> `--rm`. Each time a container starts, the entrypoint creates a user for the
+> owner of `workspace/`, so a stopped container cannot be started again: it
+> exits with `useradd: user 'hostuser' already exists`.
+
 > **Updating Repositories**: Container startup skips remote git checks by
 > default so existing checkouts launch immediately and local state is left
 > untouched. Pass `--update` to pull the latest upstream changes across all
