@@ -37,8 +37,7 @@ def main():
     if shutil.which("vpython3"):
         cmd = [str(twister_script)]
     else:
-        # When vpython3 is not available (e.g., inside Docker container),
-        # use Python directly.
+        # When vpython3 is not available, use Python directly.
         cmd = [sys.executable, str(twister_script)]
 
     cmd.extend(twister_args)
