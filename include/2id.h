@@ -12,8 +12,8 @@
  * and should be updated if necessary.
  */
 
-#ifndef VBOOT_REFERENCE_VBOOT_2ID_H_
-#define VBOOT_REFERENCE_VBOOT_2ID_H_
+#ifndef PLATFORM_EC_INCLUDE_2ID_H_
+#define PLATFORM_EC_INCLUDE_2ID_H_
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -52,4 +52,4 @@ struct vb2_id {
 }
 #endif
 
-#endif /* VBOOT_REFERENCE_VBOOT_2ID_H_ */
+#endif /* PLATFORM_EC_INCLUDE_2ID_H_ */

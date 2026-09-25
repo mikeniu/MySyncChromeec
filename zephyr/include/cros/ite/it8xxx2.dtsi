@@ -7,22 +7,30 @@
 
 / {
 	chosen {
-		cros-ec,cros-system = &cros_system;
 		cros-ec,bbram = &bbram;
 		cros-ec,cec-counter = &counter0;
 		cros-ec,espi = &espi0;
 		cros-ec,flash = &flash0;
 		cros-ec,flash-controller = &fiu0;
-		cros-ec,raw-kb = &cros_kb_raw;
 		cros-ec,sha = &sha0;
 		cros-ec,watchdog = &twd0;
 		cros,rtc = &cros_rtc;
 	};
 
-	cros_system: cros-system {
-		compatible = "cros-ec,cros-system";
+	/*
+	 * The 'reg' property for these unpadded tracking regions is intentionally omitted.
+	 * Board definitions must include the appropriate ROM and RAM override files
+	 * (e.g., #include "it8xxx2_1m_rom.dtsi" and #include "it8xxx2_60k_ram.dtsi")
+	 * to explicitly declare the physical sizes of the chip variant.
+	 */
+	rom_unpadded: rom-unpadded@0 {
+		compatible = "zephyr,memory-region";
+		zephyr,memory-region = "ROM_UNPADDED";
 	};
-
+	ram_unpadded: ram-unpadded@0 {
+		compatible = "zephyr,memory-region";
+		zephyr,memory-region = "RAM_UNPADDED";
+	};
 	named-bbram-regions {
 		compatible = "named-bbram-regions";
 
@@ -56,6 +64,18 @@
 		};
 		unlock-flash-at-boot {
 			offset = <0x07>;
+			size = <0x01>;
+		};
+		chg_limit_lower: chg-limit-lower {
+			offset = <0x0f>;
+			size = <0x01>;
+		};
+		chg_limit_upper: chg-limit-upper {
+			offset = <0x10>;
+			size = <0x01>;
+		};
+		chg_limit_flags: chg-limit-flags {
+			offset = <0x11>;
 			size = <0x01>;
 		};
 	};
@@ -113,6 +133,7 @@
 		size = <0x60000>;
 
 		ec-ro {
+			size = <(0x60000 - 4096)>;
 			fmap {
 				offset = <(0x60000 - 4096 - 0x400)>;
 				/*

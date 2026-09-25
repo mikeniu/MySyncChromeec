@@ -15,24 +15,41 @@
 
 #include <drivers/pdc.h>
 
-LOG_MODULE_REGISTER(pdc_host_cmd, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(pdc_host_cmd, CONFIG_USB_PDC_LOG_LEVEL);
 
 #ifdef CONFIG_PLATFORM_EC_HOSTCMD_PD_CHIP_INFO
 /* EC_CMD_PD_CHIP_INFO implementation when a PDC is used. */
 
-static enum ec_status hc_remote_pd_chip_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_remote_pd_chip_info(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_pd_chip_info *p = args->params;
+	const struct ec_params_pd_chip_info *p = args->input_buf;
 	struct ec_response_pd_chip_info_v3 resp = { 0 };
 	struct pdc_info_t pdc_info;
+	int ret;
 
 	/* Safety check to make sure the pdc_info_t struct and host command use
 	 * the same project name length.
 	 */
 	BUILD_ASSERT(sizeof(resp.fw_name_str) == sizeof(pdc_info.project_name));
 
-	if (pdc_power_mgmt_get_info(p->port, &pdc_info, p->live)) {
-		return EC_RES_ERROR;
+	ret = pdc_power_mgmt_get_info(p->port, &pdc_info, p->live);
+
+	switch (ret) {
+	case 0:
+		break;
+	case -ERANGE:
+	case -EINVAL:
+		return EC_RES_INVALID_PARAM;
+	case -EAGAIN:
+		/* Signal to AP FW to try again later. This can occur if a non-
+		 * live read is requested but no cached value is available yet.
+		 */
+		LOG_ERR("PD: No cached chip info for C%d", p->port);
+		return EC_HOST_CMD_BUSY;
+	default:
+		LOG_ERR("PD: Cannot get chip info for C%d: %d", p->port, ret);
+		return EC_HOST_CMD_ERROR;
 	}
 
 	resp.vendor_id = pdc_info.vid;
@@ -50,18 +67,18 @@ static enum ec_status hc_remote_pd_chip_info(struct host_cmd_handler_args *args)
 	 * basic fields set above.
 	 */
 	if (args->version == 0) {
-		args->response_size = sizeof(struct ec_response_pd_chip_info);
+		args->output_buf_size = sizeof(struct ec_response_pd_chip_info);
 
 		/* All V0 fields populated above */
 	} else if (args->version == 1) {
-		args->response_size =
+		args->output_buf_size =
 			sizeof(struct ec_response_pd_chip_info_v1);
 
 		/* PDC doesn't use the min_req_fw_version_string field added in
 		 * V1.
 		 */
 	} else if (args->version >= 2) {
-		args->response_size =
+		args->output_buf_size =
 			sizeof(struct ec_response_pd_chip_info_v2);
 
 		/* Fill in V2-specific info. `fw_name_str` must be NUL-
@@ -76,7 +93,7 @@ static enum ec_status hc_remote_pd_chip_info(struct host_cmd_handler_args *args)
 			sizeof(resp.fw_name_str));
 	}
 	if (args->version >= 3) {
-		args->response_size =
+		args->output_buf_size =
 			sizeof(struct ec_response_pd_chip_info_v3);
 
 		/* Fill in V3-specific info. `driver_name` must be NUL-
@@ -86,43 +103,43 @@ static enum ec_status hc_remote_pd_chip_info(struct host_cmd_handler_args *args)
 			sizeof(resp.driver_name));
 	}
 
-	memcpy(args->response, &resp, args->response_size);
+	if (args->output_buf_max < args->output_buf_size)
+		return EC_HOST_CMD_RESPONSE_TOO_BIG;
 
-	LOG_INF("PD_CHIP_INFO (C%d): live: %d, ver: %u.%u.%u (%s), "
-		"%04x:%04x, driver: %s, flags: %#04x %s",
-		p->port, p->live, resp.fw_version_string[2],
-		resp.fw_version_string[1], resp.fw_version_string[0],
-		*resp.fw_name_str ? resp.fw_name_str : "N/A", resp.vendor_id,
-		resp.product_id, *resp.driver_name ? resp.driver_name : "Unk",
-		resp.fw_update_flags,
-		(resp.fw_update_flags & USB_PD_CHIP_INFO_FWUP_FLAG_NO_UPDATE) ?
-			"no-update" :
-			"");
+	memcpy(args->output_buf, &resp, args->output_buf_size);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_PD_CHIP_INFO, hc_remote_pd_chip_info,
-		     EC_VER_MASK(0) | EC_VER_MASK(1) | EC_VER_MASK(2) |
-			     EC_VER_MASK(3));
+EC_HOST_CMD_HANDLER(EC_CMD_PD_CHIP_INFO, hc_remote_pd_chip_info,
+		    EC_VER_MASK(0) | EC_VER_MASK(1) | EC_VER_MASK(2) |
+			    EC_VER_MASK(3),
+		    struct ec_params_pd_chip_info,
+		    SMALLEST_TYPE(struct ec_response_pd_chip_info,
+				  struct ec_response_pd_chip_info_v1,
+				  struct ec_response_pd_chip_info_v2,
+				  struct ec_response_pd_chip_info_v3));
 #endif /* CONFIG_HOSTCMD_PD_CHIP_INFO */
 
-static enum ec_status hc_pd_ports(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_pd_ports(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_usb_pd_ports *r = args->response;
+	struct ec_response_usb_pd_ports *r = args->output_buf;
 
 	r->num_ports = pdc_power_mgmt_get_usb_pd_port_count();
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_PD_PORTS, hc_pd_ports, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_USB_PD_PORTS, hc_pd_ports, EC_VER_MASK(0),
+			      struct ec_response_usb_pd_ports);
 
 #ifndef CONFIG_PDC_POWER_MGMT_USB_MUX
-static enum ec_status hc_usb_pd_mux_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_usb_pd_mux_info(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_usb_pd_mux_info *p = args->params;
-	struct ec_response_usb_pd_mux_info *r = args->response;
+	const struct ec_params_usb_pd_mux_info *p = args->input_buf;
+	struct ec_response_usb_pd_mux_info *r = args->output_buf;
 	int port = p->port, rv;
 	union data_status_reg status;
 
@@ -140,11 +157,12 @@ static enum ec_status hc_usb_pd_mux_info(struct host_cmd_handler_args *args)
 		   (status.tbt ? USB_PD_MUX_TBT_COMPAT_ENABLED : 0) |
 		   (status.usb4 ? USB_PD_MUX_USB4_ENABLED : 0);
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_USB_PD_MUX_INFO, hc_usb_pd_mux_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_USB_PD_MUX_INFO, hc_usb_pd_mux_info, EC_VER_MASK(0),
+		    struct ec_params_usb_pd_mux_info,
+		    struct ec_response_usb_pd_mux_info);
 #endif /* CONFIG_PDC_POWER_MGMT_USB_MUX */
 
 #if !defined(CONFIG_USB_PD_ALTMODE_INTEL)

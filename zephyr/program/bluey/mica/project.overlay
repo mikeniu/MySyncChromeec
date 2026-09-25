@@ -7,12 +7,11 @@
 
 #include <cros/integrated_fwid.dtsi>
 #include <dt-bindings/macros.h>
+#include "src/lb_policy.h"
 
 #include "../interrupts.dtsi"
 #include "../adc.dtsi"
-#include "../i2c.dtsi"
 #include "../common.dtsi"
-#include "../battery.dtsi"
 #include "../psl.dtsi"
 #include <mica/overlay.dtsi>
 
@@ -20,17 +19,60 @@
 
 #include "gpios.dtsi"
 #include "fan.dtsi"
+#include "i2c.dtsi"
 #include "keyboard.dtsi"
 #include "temp_sensors.dtsi"
+#include "battery.dtsi"
 
 /* mica overrides follow... */
-&cbi_flash {
-	/*
-	 * CBI section size is 0x1000 bytes, the CBI portion lies at the end of
-	 * EC_RO section.
-	 */
-	offset = <0x3e000>;
-	size = <0x1000>;
+
+&int_ac_present {
+	status = "disabled";
+};
+
+/ {
+	named-usbc-port {
+		usbc_port0: port0 {
+			compatible = "named-usbc-port";
+		};
+		usbc_port1: port1 {
+			compatible = "named-usbc-port";
+		};
+	};
+
+	gpio-interrupts {
+		int_extpower_a: extpower_a {
+			irq-pin = <&gpio_smb2360_a_chg_led_pg_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "extpower_interrupt";
+		};
+		int_extpower_b: extpower_b {
+			irq-pin = <&gpio_smb2360_b_chg_led_pg_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "extpower_interrupt";
+		};
+		int_gpio_pgood_acok_odl: gpio_pgood_acok_odl {
+			irq-pin = <&gpio_pgood_acok_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "extpower_interrupt";
+		};
+	};
+};
+
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x3e000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 */
+			offset = <0x3e000>;
+			size = <0x1000>;
+		};
+	};
 };
 
 &uart4 {
@@ -59,4 +101,91 @@
 	apb2-prescaler = <4>;
 	apb3-prescaler = <4>;
 	apb4-prescaler = <1>;
+};
+
+&{/lb-led-colors} {
+	/* RAMDUMP Collection: 10 Red */
+	lb_state_ramdump_lcd: lb_state_ramdump_lcd {
+		board-led-alt-policy-label = <LED_ALT_POLICY_DIAG_RAMDUMP>;
+		pattern-0 {
+			transition = "LED_TRANSITION_STEP";
+			led-id = "EC_LED_ID_LIGHTBAR_LED";
+			cycle-count = <0>;
+			/* 4x Amber Flashes (0.5s ON, 0.5s OFF) */
+			color-0  { led-color = <&lightbar_red>; period-ms = <500>; };
+			color-1  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-2  { led-color = <&lightbar_red>; period-ms = <500>; };
+			color-3  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-4  { led-color = <&lightbar_red>; period-ms = <500>; };
+			color-5  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-6  { led-color = <&lightbar_red>; period-ms = <500>; };
+			color-7  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-8  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-9  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-10  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-11  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-12  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-13  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-14  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-15  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-16  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-17  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-18  { led-color = <&lightbar_red>;  period-ms = <500>; };
+			color-19  { led-color = <&lightbar_off>;    period-ms = <500>; };
+		};
+	};
+
+	/* LCD Failure: 4 Amber, 3 White */
+	lb_state_diag_lcd: lb-state-diag-lcd {
+		board-led-alt-policy-label = <LED_ALT_POLICY_DIAG_LCD>;
+		pattern-0 {
+			transition = "LED_TRANSITION_STEP";
+			led-id = "EC_LED_ID_LIGHTBAR_LED";
+			cycle-count = <0>;
+			/* 4x Amber Flashes (0.5s ON, 0.5s OFF) */
+			color-0  { led-color = <&lightbar_yellow>; period-ms = <500>; };
+			color-1  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-2  { led-color = <&lightbar_yellow>; period-ms = <500>; };
+			color-3  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-4  { led-color = <&lightbar_yellow>; period-ms = <500>; };
+			color-5  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-6  { led-color = <&lightbar_yellow>; period-ms = <500>; };
+			color-7  { led-color = <&lightbar_off>;    period-ms = <1500>; };
+			/* 3x White Flashes (0.5s ON, 0.5s OFF) */
+			color-8  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-9  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-10  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-11  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-12  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-13  { led-color = <&lightbar_off>;    period-ms = <3000>; };
+		};
+	};
+
+	/* Power Rail Failure: 3 Amber, 5 White */
+	lb_state_diag_pwr: lb-state-diag-pwr {
+		board-led-alt-policy-label = <LED_ALT_POLICY_DIAG_PWR>;
+		pattern-0 {
+			transition = "LED_TRANSITION_STEP";
+			led-id = "EC_LED_ID_LIGHTBAR_LED";
+			cycle-count = <0>;
+			/* 3x Amber Flashes */
+			color-0  { led-color = <&lightbar_yellow>; period-ms = <500>; };
+			color-1  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-2  { led-color = <&lightbar_yellow>; period-ms = <500>; };
+			color-3  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-4  { led-color = <&lightbar_yellow>; period-ms = <500>; };
+			color-5  { led-color = <&lightbar_off>;    period-ms = <1500>; };
+			/* 5x White Flashes */
+			color-6  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-7  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-8  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-9  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-10  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-11  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-12  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-13  { led-color = <&lightbar_off>;    period-ms = <500>; };
+			color-14  { led-color = <&lightbar_white>;  period-ms = <500>; };
+			color-15  { led-color = <&lightbar_off>;    period-ms = <3000>; };
+		};
+	};
 };

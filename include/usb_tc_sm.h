@@ -5,8 +5,8 @@
 
 /* USB Type-C module */
 
-#ifndef __CROS_EC_USB_TC_H
-#define __CROS_EC_USB_TC_H
+#ifndef PLATFORM_EC_INCLUDE_USB_TC_SM_H_
+#define PLATFORM_EC_INCLUDE_USB_TC_SM_H_
 
 #include "usb_pd.h"
 #include "usb_pd_tcpm.h"
@@ -388,6 +388,17 @@ void tc_usb_firmware_fw_update_run(int port);
  */
 void tc_usb_firmware_fw_update_limited_run(int port);
 
+/**
+ * Updates the data role in the TCPC's stored message header
+ *
+ * This directly triggers an update to the data role, without waiting for the
+ * TC to run.
+ *
+ * @param port USB-C port number
+ * @param data_role Data role to program into TCPC
+ */
+void tc_set_msg_header_data_role(int port, enum pd_data_role data_role);
+
 #ifdef CONFIG_USB_CTVPD
 
 /**
@@ -411,4 +422,4 @@ void tc_ctvpd_detected(int port);
 }
 #endif
 
-#endif /* __CROS_EC_USB_TC_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_TC_SM_H_ */

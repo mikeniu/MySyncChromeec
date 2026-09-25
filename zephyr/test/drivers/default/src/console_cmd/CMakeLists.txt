@@ -25,7 +25,6 @@ target_sources(app PRIVATE
 	md.c
 	hibdelay.c
 	hostevent.c
-	panic_output.c
 	port80.c
 	powerindebug.c
 	power_button.c

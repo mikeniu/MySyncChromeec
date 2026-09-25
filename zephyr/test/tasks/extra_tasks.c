@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#include "ec_tasks.h"
 #include "host_command.h"
+#include "panic_utils.h"
 #include "task.h"
 #include "zephyr_console_shim.h"
 
@@ -59,31 +59,31 @@ ZTEST_USER(extra_tasks, test_hostcmd_thread_mapping)
 	k_tid_t hostcmd_thread;
 	k_tid_t main_thread;
 
-#ifdef HAS_TASK_HOSTCMD
-#ifdef CONFIG_TASK_HOSTCMD_THREAD_MAIN
+#ifdef CONFIG_HAS_HOSTCMD
+#if defined(CONFIG_TASK_HOSTCMD_THREAD_MAIN) || \
+	(defined(CONFIG_EC_HOST_CMD) &&         \
+	 !defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD))
 	k_thread_name_set(get_main_thread(), "HOSTCMD");
 #endif /* CONFIG_TASK_HOSTCMD_THREAD_MAIN */
 
 	hostcmd_thread = find_thread_by_name("HOSTCMD");
 	zassert_not_null(hostcmd_thread);
 	zassert_equal(hostcmd_thread, get_hostcmd_thread());
-	zassert_equal(TASK_ID_HOSTCMD, thread_id_to_task_id(hostcmd_thread));
-	zassert_equal(task_id_to_thread_id(TASK_ID_HOSTCMD), hostcmd_thread);
 
-#ifdef CONFIG_TASK_HOSTCMD_THREAD_DEDICATED
+#if defined(CONFIG_TASK_HOSTCMD_THREAD_DEDICATED) || \
+	defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)
 	main_thread = find_thread_by_name("main");
 	zassert_not_null(main_thread);
 	zassert_equal(main_thread, get_main_thread());
 	zassert_not_equal(main_thread, hostcmd_thread);
-	zassert_equal(TASK_ID_MAIN, thread_id_to_task_id(main_thread));
-	zassert_equal(task_id_to_thread_id(TASK_ID_MAIN), main_thread);
+
 #else
 	main_thread = get_main_thread();
 	zassert_not_null(main_thread);
 	zassert_equal(main_thread, hostcmd_thread);
 #endif /* CONFIG_TASK_HOSTCMD_THREAD_DEDICATED */
 
-#else /* !HAS_TASK_HOSTCMD */
+#else /* !CONFIG_HAS_HOSTCMD */
 	hostcmd_thread = find_thread_by_name("HOSTCMD");
 	zassert_is_null(hostcmd_thread);
 	EXPECT_ASSERT(hostcmd_thread = get_hostcmd_thread());
@@ -92,7 +92,7 @@ ZTEST_USER(extra_tasks, test_hostcmd_thread_mapping)
 	main_thread = find_thread_by_name("main");
 	zassert_not_null(main_thread);
 	zassert_equal(main_thread, get_main_thread());
-#endif /* HAS_TASK_HOSTCMD */
+#endif /* CONFIG_HAS_HOSTCMD */
 }
 
 ZTEST_USER(extra_tasks, test_sysworkq_thread_mapping)
@@ -102,8 +102,6 @@ ZTEST_USER(extra_tasks, test_sysworkq_thread_mapping)
 	sysworkq_thread = find_thread_by_name("sysworkq");
 	zassert_not_null(sysworkq_thread);
 	zassert_equal(sysworkq_thread, get_sysworkq_thread());
-	zassert_equal(TASK_ID_SYSWORKQ, thread_id_to_task_id(sysworkq_thread));
-	zassert_equal(task_id_to_thread_id(TASK_ID_SYSWORKQ), sysworkq_thread);
 }
 
 ZTEST_USER(extra_tasks, test_idle_thread_mapping)
@@ -113,8 +111,6 @@ ZTEST_USER(extra_tasks, test_idle_thread_mapping)
 	idle_thread = find_thread_by_name("idle");
 	zassert_not_null(idle_thread);
 	zassert_equal(idle_thread, get_idle_thread());
-	zassert_equal(TASK_ID_IDLE, thread_id_to_task_id(idle_thread));
-	zassert_equal(task_id_to_thread_id(TASK_ID_IDLE), idle_thread);
 }
 
 ZTEST_USER(extra_tasks, test_shell_thread_to_task_mapping)
@@ -124,55 +120,40 @@ ZTEST_USER(extra_tasks, test_shell_thread_to_task_mapping)
 	shell_thread = find_thread_by_name("shell_uart");
 	zassert_not_null(shell_thread);
 	zassert_equal(shell_thread, get_shell_thread());
-	zassert_equal(TASK_ID_SHELL, thread_id_to_task_id(shell_thread));
-	zassert_equal(task_id_to_thread_id(TASK_ID_SHELL), shell_thread);
 }
 
-ZTEST_USER(extra_tasks, test_invalid_task_id)
+ZTEST_USER(extra_tasks, test_get_thread_name)
 {
-	k_tid_t thread_id;
+	char name[32];
+	k_tid_t thread = k_current_get();
 
-	EXPECT_ASSERT(thread_id = task_id_to_thread_id(TASK_ID_INVALID));
-	zassert_is_null(thread_id);
+	get_thread_name(thread, name, sizeof(name));
+#ifdef CONFIG_THREAD_NAME
+	const char *expected_name = k_thread_name_get(thread);
 
-	EXPECT_ASSERT(thread_id = task_id_to_thread_id(-1));
-	zassert_is_null(thread_id);
+	zassert_not_null(expected_name);
+	zassert_equal(strcmp(name, expected_name), 0);
+#else
+	char expected[32];
+
+	snprintf(expected, sizeof(expected), "%p", thread);
+	zassert_equal(strcmp(name, expected), 0);
+#endif
 }
 
-ZTEST_USER(extra_tasks, test_invalid_thread_id)
+static void *extra_tasks_setup(void)
 {
-	task_id_t task_id;
+#if defined(CONFIG_EC_HOST_CMD) && defined(CONFIG_EC_HOST_CMD_DEDICATED_THREAD)
+	/* Rename upstream host command thread name from "ec_host_cmd" to
+	 * "HOSTCMD" so that find_thread_by_name passes tests.
+	 */
+	k_tid_t hc_thread = get_hostcmd_thread();
 
-	EXPECT_ASSERT(task_id = thread_id_to_task_id(NULL));
-	zassert_equal(task_id, TASK_ID_INVALID);
-}
-
-ZTEST_USER(extra_tasks, test_invalid_dummy_thread)
-{
-	task_id_t task_id;
-	extern struct k_thread _thread_dummy;
-
-	task_id = thread_id_to_task_id(&_thread_dummy);
-	zassert_equal(task_id, TASK_ID_INVALID);
-}
-
-ZTEST_USER(extra_tasks, test_extra_task_enumeration)
-{
-	for (task_id_t task_id = 0; task_id < TASK_ID_COUNT + EXTRA_TASK_COUNT;
-	     task_id++) {
-		zassert_not_null(task_id_to_thread_id(task_id));
+	if (hc_thread) {
+		k_thread_name_set(hc_thread, "HOSTCMD");
 	}
+#endif
+	return NULL;
 }
 
-ZTEST_USER(extra_tasks, test_extra_task_unmapped)
-{
-	task_id_t task_id;
-
-	/* Not a real thread */
-	struct k_thread thread_data = { 0 };
-
-	task_id = thread_id_to_task_id(&thread_data);
-	zassert_equal(task_id, TASK_ID_INVALID);
-}
-
-ZTEST_SUITE(extra_tasks, NULL, NULL, NULL, NULL, NULL);
+ZTEST_SUITE(extra_tasks, NULL, extra_tasks_setup, NULL, NULL, NULL);

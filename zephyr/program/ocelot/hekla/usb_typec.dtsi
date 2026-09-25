@@ -1,0 +1,58 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <usbc-policy.dtsi>
+
+/ {
+	usbc {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		usbc_port0: port0@0 {
+			compatible = "named-usbc-port";
+			reg = <0>;
+			chg = <&charger>;
+			pdc = <&pdc_power_p0>;
+			pd-retimer;
+			policy = <&cros_policy>;
+		};
+		usbc_port1: port1@1 {
+			compatible = "named-usbc-port";
+			reg = <1>;
+			pdc = <&pdc_power_p1>;
+			pd-retimer;
+			policy = <&cros_policy>;
+		};
+		ppm-driver {
+			compatible = "ucsi-ppm";
+		};
+	};
+};
+
+&i2c_1 {
+	charger: isl9238@9 {
+		compatible = "intersil,isl923x";
+		status = "okay";
+		reg = <0x9>;
+	};
+};
+
+&i2c_2 {
+	pdc_power_p0: tps6699-pdc@20 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x20>;
+		irq-gpios = <RTS5912_GPIO100 GPIO_ACTIVE_LOW>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+		ccd;
+	};
+	pdc_power_p1: tps6699-pdc@21 {
+		compatible = "ti,tps6699-pdc";
+		reg = <0x21>;
+		irq-gpios = <RTS5912_GPIO083 GPIO_ACTIVE_LOW>;
+		port-index-on-chip = <0x1>;
+		frs-supported;
+	};
+};

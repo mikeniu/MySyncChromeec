@@ -625,39 +625,13 @@ test_mockable void lpc_keyboard_put_char(uint8_t chr, int send_irq)
 	LOG_INF("KB put %02x", kb_char);
 }
 
-/* Put an aux char to host buffer by HIMDO and assert status bit 5. */
-void lpc_aux_put_char(uint8_t chr, int send_irq)
-{
-	uint32_t kb_char = chr;
-	uint32_t status = I8042_AUX_DATA;
-	int rv;
-
-	rv = espi_write_lpc_request(espi_dev, E8042_SET_FLAG, &status);
-	if (rv) {
-		LOG_ERR("ESPI write failed: E8042_SET_FLAG = %d", rv);
-	}
-	rv = espi_write_lpc_request(espi_dev, E8042_WRITE_KB_CHAR, &kb_char);
-	if (rv) {
-		LOG_ERR("ESPI write failed: E8042_WRITE_KB_CHAR = %d", rv);
-	}
-	LOG_INF("AUX put %02x", kb_char);
-}
-
 static void kbc_ibf_obe_handler(uint32_t data)
 {
 #ifdef HAS_TASK_KEYPROTO
 	uint8_t is_ibf = is_8042_ibf(data);
-	uint32_t status = I8042_AUX_DATA;
-	int rv;
 
 	if (is_ibf) {
 		keyboard_host_write(get_8042_data(data), get_8042_type(data));
-	} else if (IS_ENABLED(CONFIG_8042_AUX)) {
-		rv = espi_write_lpc_request(espi_dev, E8042_CLEAR_FLAG,
-					    &status);
-		if (rv) {
-			LOG_ERR("ESPI write failed: E8042_CLEAR_FLAG = %d", rv);
-		}
 	}
 	task_wake(TASK_ID_KEYPROTO);
 #endif
@@ -808,12 +782,23 @@ uint32_t get_8042_data(uint32_t data)
 	return kbc->data;
 }
 
-static void espi_sysjump(void)
+void lpc_enable_host_interface_interrupts(void)
 {
-	uint32_t enable = 0;
-
-	/* Disable host interface interrupts during the sysjump */
+	uint32_t enable = 1;
 	espi_write_lpc_request(espi_dev, ECUSTOM_HOST_SUBS_INTERRUPT_EN,
 			       &enable);
+}
+
+void lpc_disable_host_interface_interrupts(void)
+{
+	uint32_t enable = 0;
+	espi_write_lpc_request(espi_dev, ECUSTOM_HOST_SUBS_INTERRUPT_EN,
+			       &enable);
+}
+
+static void espi_sysjump(void)
+{
+	/* Disable host interface interrupts during the sysjump */
+	lpc_disable_host_interface_interrupts();
 }
 DECLARE_HOOK(HOOK_SYSJUMP, espi_sysjump, HOOK_PRIO_DEFAULT);

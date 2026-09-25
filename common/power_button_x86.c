@@ -513,17 +513,19 @@ DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, powerbtn_x86_changed, HOOK_PRIO_DEFAULT);
 /**
  * Handle configuring the power button behavior through a host command
  */
-static enum ec_status hc_config_powerbtn_x86(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_config_powerbtn_x86(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_config_power_button *p = args->params;
+	const struct ec_params_config_power_button *p = args->input_buf;
 
 	power_button_pulse_enabled =
 		!!(p->flags & EC_POWER_BUTTON_ENABLE_PULSE);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_CONFIG_POWER_BUTTON, hc_config_powerbtn_x86,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_CONFIG_POWER_BUTTON, hc_config_powerbtn_x86,
+			     EC_VER_MASK(0),
+			     struct ec_params_config_power_button);
 
 /*
  * Currently, the only reason why we disable power button pulse is to allow
@@ -536,12 +538,36 @@ static void power_button_pulse_setting_reset(void)
 	power_button_pulse_enabled = 1;
 }
 
+/*
+ * Handle power button suspend transition.
+ *
+ * For keyboard-matrix power buttons, if the power button is physically held
+ * during suspend entry, we must force the PCH power button signal to high
+ * (released) to prevent the AP from seeing a stuck button on resume (which
+ * could cause wake loops).
+ *
+ * We check the raw physical state using power_button_signal_asserted()
+ * because the S0 tablet mode suppression logic overrides the debounced
+ * state to 0 (released) to hide the press from the AP, making
+ * power_button_is_pressed() unreliable here.
+ */
+static void power_button_suspend(void)
+{
+	power_button_pulse_setting_reset();
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD) &&
+	    power_button_signal_asserted()) {
+		CPRINTS("PB held during suspend, forcing PCH release");
+		set_pwrbtn_to_pch(1, 0);
+		pwrbtn_state = PWRBTN_STATE_IDLE;
+	}
+}
+
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, power_button_pulse_setting_reset,
 	     HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, power_button_pulse_setting_reset,
 	     HOOK_PRIO_DEFAULT);
-DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, power_button_pulse_setting_reset,
-	     HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, power_button_suspend, HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, power_button_pulse_setting_reset,
 	     HOOK_PRIO_DEFAULT);
 

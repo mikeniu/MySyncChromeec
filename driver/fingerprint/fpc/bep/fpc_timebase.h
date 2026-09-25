@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FPC_TIMEBASE_H
-#define __CROS_EC_FPC_TIMEBASE_H
+#ifndef PLATFORM_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_TIMEBASE_H_
+#define PLATFORM_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_TIMEBASE_H_
 
 /**
  * @file    fpc_timebase.h
@@ -40,4 +40,4 @@ __staticlib_hook uint32_t fpc_timebase_get_tick(void);
  */
 __staticlib_hook void fpc_timebase_busy_wait(uint32_t ms);
 
-#endif /* __CROS_EC_FPC_TIMEBASE_H */
+#endif /* PLATFORM_EC_DRIVER_FINGERPRINT_FPC_BEP_FPC_TIMEBASE_H_ */

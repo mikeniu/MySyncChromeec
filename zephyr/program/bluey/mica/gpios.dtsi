@@ -6,6 +6,7 @@
 / {
 	aliases {
 		gpio-wp = &gpio_ec_wp_l;
+		gpio-btn-ign-in = &gpio_fp_pwr_btn_ignore;
 	};
 
 	named-gpios {
@@ -24,6 +25,9 @@
 			gpios = <&gpio0 1 (GPIO_INPUT)>;
 			enum-name = "GPIO_AC_PRESENT";
 		};
+		gpio_pgood_acok_odl: pgood_acok_odl {
+			gpios = <&gpio0 2 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
 		gpio_led_ec_do_argb_di_ls: led_ec_do_argb_di_ls {
 			gpios = <&gpio3 5 (GPIO_OUTPUT)>;
 		};
@@ -33,11 +37,10 @@
 		gpio_ec_l1i_pwr_detect: ec_l1i_pwr_detect {
 			gpios = <&gpio5 0 (GPIO_INPUT)>;
 		};
-		/*
 		gpio_ec_sys_throttle_mira: ec_sys_throttle_mira {
-			gpios = <&gpio5 2 (GPIO_OUTPUT | GPIO_OPEN_DRAIN) >;
+			gpios = <&gpio5 2 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+			enum-name = "GPIO_CPU_PROCHOT";
 		};
-		*/
 		gpio_dock_vdm_pwr_on: dock_vdm_pwr_on {
 			gpios = <&gpio5 4 (GPIO_INPUT)>;
 		};
@@ -67,7 +70,7 @@
 		};
 		/* Write protect signal for the EC. */
 		gpio_ec_wp_l: write-protect {
-			gpios = <&gpio7 0 GPIO_INPUT>;
+			gpios = <&gpio7 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		/*
 		gpio_ec_fan_tach_od: ec_fan_tach_od {
@@ -80,6 +83,7 @@
 		};
 		gpio_ec_soc_int_odl: ec_soc_int_odl {
 			gpios = <&gpio7 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
+			enum-name = "GPIO_EC_INT_L";
 		};
 		gpio_ec_rst_odl: ec_rst_odl {
 			gpios = <&gpio7 7 (GPIO_INPUT)>;
@@ -111,7 +115,6 @@
 		};
 		gpio_ec_soc_qsh_int_odl: ec_soc_qsh_int_odl {
 			gpios = <&gpioa 2 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
-			enum-name = "GPIO_EC_INT_L";
 		};
 		gpio_soc_ps_hold_ls: soc_ps_hold_ls {
 			gpios = <&gpioa 4 (GPIO_INPUT)>;
@@ -182,7 +185,7 @@
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN)>;
 		};
 		gpio_smb2360_b_chg_led_pg_odl: smb2360_b_chg_led_pg_odl {
-			gpios = <&gpioe 0 (GPIO_INPUT)>;
+			gpios = <&gpioe 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ec_kb_bl_en: ec_kb_bl_en {
 			gpios = <&gpioe 2 (GPIO_OUTPUT)>;
@@ -193,7 +196,7 @@
 			enum-name = "GPIO_CCD_MODE_ODL";
 		};
 		gpio_smb2360_a_chg_led_pg_odl: smb2360_a_chg_led_pg_odl {
-			gpios = <&gpiof 0 (GPIO_INPUT)>;
+			gpios = <&gpiof 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ec_spare_gpiof1: ec_spare_gpiof1 {
 			gpios = <&gpiof 1 (GPIO_INPUT)>;

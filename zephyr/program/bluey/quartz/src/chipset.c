@@ -5,10 +5,21 @@
 
 /* Quartz chipset-specific configuration */
 
+#include "battery.h"
 #include "common.h"
 #include "gpio.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
+
+#ifndef CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS
+#define CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS 0
+#endif
+
+static void disable_pp5000_s5(void)
+{
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 0);
+}
+DECLARE_DEFERRED(disable_pp5000_s5);
 
 void board_chipset_startup_quartz(void)
 {
@@ -17,8 +28,6 @@ void board_chipset_startup_quartz(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_bl_off_odl), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 1);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_enavdd_oled), 1);
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 1);
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_pp5000_led_x), 1);
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_quartz,
 	     HOOK_PRIO_DEFAULT);
@@ -30,8 +39,7 @@ void board_chipset_shutdown_quartz(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_bl_off_odl), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_fan), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_enavdd_oled), 0);
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 0);
-	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_en_pp5000_led_x), 0);
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_sys_throttle_mira), 0);
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, board_chipset_shutdown_quartz,
 	     HOOK_PRIO_DEFAULT);
@@ -48,3 +56,26 @@ static void enable_s3_interrupt(void)
 	gpio_enable_dt_interrupt(GPIO_INT_FROM_NODELABEL(int_s3_power_monitor));
 }
 DECLARE_HOOK(HOOK_INIT, enable_s3_interrupt, HOOK_PRIO_DEFAULT);
+
+static void board_chipset_pre_init_quartz(void)
+{
+	hook_call_deferred(&disable_pp5000_s5_data, -1);
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_en_pp5000_s5), 1);
+
+	if (battery_is_present() != BP_YES) {
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_sys_throttle_mira),
+				1);
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_PRE_INIT, board_chipset_pre_init_quartz,
+	     HOOK_PRIO_DEFAULT);
+
+static void board_chipset_hard_off_quartz(void)
+{
+	hook_call_deferred(
+		&disable_pp5000_s5_data,
+		(5000 + CONFIG_PLATFORM_EC_LIGHTBAR_AC_UNPLUG_DELAY_MS) *
+			USEC_PER_MSEC);
+}
+DECLARE_HOOK(HOOK_CHIPSET_HARD_OFF, board_chipset_hard_off_quartz,
+	     HOOK_PRIO_DEFAULT);

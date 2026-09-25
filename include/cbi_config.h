@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CBI_CONFIG_H
-#define __CROS_EC_CBI_CONFIG_H
+#ifndef PLATFORM_EC_INCLUDE_CBI_CONFIG_H_
+#define PLATFORM_EC_INCLUDE_CBI_CONFIG_H_
 
 #include "cros_board_info.h"
 
@@ -28,4 +28,4 @@ extern const struct cbi_storage_config_t gpio_cbi_config;
 }
 #endif
 
-#endif /* __CROS_EC_CBI_CONFIG_H */
+#endif /* PLATFORM_EC_INCLUDE_CBI_CONFIG_H_ */

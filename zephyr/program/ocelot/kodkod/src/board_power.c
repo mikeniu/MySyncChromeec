@@ -23,7 +23,7 @@
 
 LOG_MODULE_DECLARE(ap_pwrseq, LOG_LEVEL_INF);
 
-void board_ap_power_force_shutdown(void)
+static void board_ap_power_shutdown(void)
 {
 	power_signal_set(PWR_EC_PCH_RSMRST, 1);
 	power_signal_set(PWR_EN_PP3300_A, 0);
@@ -32,26 +32,20 @@ void board_ap_power_force_shutdown(void)
 
 int board_ap_power_action_g3_entry(void *data)
 {
-	board_ap_power_force_shutdown();
+	board_ap_power_shutdown();
 	return 0;
 }
 
 static int board_ap_power_action_g3_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		board_ap_power_shutdown();
+		return 1;
+	}
+
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		power_signal_set(PWR_EN_PP5000_A, 1);
 		power_signal_set(PWR_EN_PP3300_A, 1);
-
-		/* Indication to soc on recovery boot */
-		if (system_is_manual_recovery()) {
-			gpio_pin_set_dt(
-				GPIO_DT_FROM_NODELABEL(gpio_cse_early_rec_sw),
-				1);
-		} else {
-			gpio_pin_set_dt(
-				GPIO_DT_FROM_NODELABEL(gpio_cse_early_rec_sw),
-				0);
-		}
 
 		update_ap_boot_time(ARAIL);
 	}

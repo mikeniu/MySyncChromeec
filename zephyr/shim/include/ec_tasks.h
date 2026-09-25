@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_EC_TASKS_H
-#define __CROS_EC_EC_TASKS_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_EC_TASKS_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_EC_TASKS_H_
 
 #include "task.h"
 
@@ -16,20 +16,6 @@ extern "C" {
 
 /** Starts all of the shimmed EC tasks. Requires CONFIG_SHIMMED_TASKS=y. */
 void start_ec_tasks(void);
-
-/**
- * Maps an EC task id to a Zephyr thread id.
- *
- * @returns Thread id OR NULL if mapping fails
- */
-k_tid_t task_id_to_thread_id(task_id_t task_id);
-
-/**
- * Maps a Zephyr thread id to an EC task id.
- *
- * @returns Task id OR TASK_ID_INVALID if mapping fails
- */
-task_id_t thread_id_to_task_id(k_tid_t thread_id);
 
 #ifdef TEST_BUILD
 /**
@@ -43,4 +29,4 @@ void set_test_runner_tid(void);
 }
 #endif
 
-#endif /* __CROS_EC_EC_TASKS_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_EC_TASKS_H_ */

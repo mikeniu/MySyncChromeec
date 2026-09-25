@@ -9,21 +9,14 @@
 
 / {
 	chosen {
-		cros-ec,cros-system = &cros_system;
 		cros-ec,adc = &adc0;
 		cros-ec,bbram = &bbram;
 		cros-ec,espi = &espi0;
 		cros-ec,flash = &flash1;
 		cros-ec,flash-controller = &fiu0;
-		cros-ec,raw-kb = &cros_kb_raw;
 		cros-ec,watchdog = &wdog;
 		cros,rtc = &crtc;
 	};
-
-	cros_system: cros-system {
-		compatible = "cros-ec,cros-system";
-	};
-
 	named-bbram-regions {
 		compatible = "named-bbram-regions";
 
@@ -53,6 +46,18 @@
 		};
 		pd2 {
 			offset = <0x0f>;
+			size = <0x01>;
+		};
+		chg_limit_lower: chg-limit-lower {
+			offset = <0x10>;
+			size = <0x01>;
+		};
+		chg_limit_upper: chg-limit-upper {
+			offset = <0x11>;
+			size = <0x01>;
+		};
+		chg_limit_flags: chg-limit-flags {
+			offset = <0x12>;
 			size = <0x01>;
 		};
 		ramlog {

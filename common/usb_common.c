@@ -173,10 +173,6 @@ int pd_get_source_pdo(const uint32_t **src_pdo_p, const int port)
 #if defined(CONFIG_USB_PD_TCPMV2) && defined(CONFIG_USB_PE_SM)
 	const uint32_t *src_pdo;
 	const int pdo_cnt = dpm_get_source_pdo(&src_pdo, port);
-#elif defined(CONFIG_USB_PD_DYNAMIC_SRC_CAP) || \
-	defined(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT)
-	const uint32_t *src_pdo;
-	const int pdo_cnt = charge_manager_get_source_pdo(&src_pdo, port);
 #else
 	const uint32_t *src_pdo = pd_src_pdo;
 	const int pdo_cnt = pd_src_pdo_cnt;

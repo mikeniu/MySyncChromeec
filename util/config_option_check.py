@@ -97,13 +97,14 @@ def obtain_config_options_in_use():
     config_debug_option_re = re.compile(r"\b(CONFIG_DEBUG_[a-zA-Z0-9_]+)")
     options_in_use = set()
     for dirpath, dirnames, filenames in os.walk(cwd, topdown=True):
-        # Ignore the build and private directories (taken from .gitignore)
+        # Ignore the build, private, docker directories, virtualenvs, etc.
         for i in range(len(dirnames) - 1, -1, -1):
-            if (
-                dirnames[i] == "build"
-                or dirnames[i] == "private"
-                or dirnames[i].startswith("twister-out")
-            ):
+            if dirnames[i] in (
+                "build",
+                "private",
+                "docker",
+                ".venv",
+            ) or dirnames[i].startswith("twister-out"):
                 del dirnames[i]
         for file in filenames:
             # Ignore hidden files.
@@ -122,7 +123,9 @@ def obtain_config_options_in_use():
     for file in file_list:
         if CONFIG_FILE in file:
             continue
-        with open(file, "r", encoding="utf-8") as cur_file:
+        # Handle non-UTF-8 characters gracefully. Other linters, e.g.
+        # cros format/cros lint, will enforce valid source encoding.
+        with open(file, "r", encoding="utf-8", errors="replace") as cur_file:
             for line in cur_file:
                 match = config_option_re.findall(line)
                 if match:

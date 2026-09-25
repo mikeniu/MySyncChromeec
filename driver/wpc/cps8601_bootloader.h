@@ -2,6 +2,10 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+
+#ifndef PLATFORM_EC_DRIVER_WPC_CPS8601_BOOTLOADER_H_
+#define PLATFORM_EC_DRIVER_WPC_CPS8601_BOOTLOADER_H_
+
 const uint32_t cps8601_boot_hex[] = {
 	0xe1100102, 0x0c01bb58, 0xf52982e5, 0x3a83e582, 0x22e083f5, 0x25e90650,
 	0x22e6f882, 0xe906febb, 0xe2f88225, 0x2982e522, 0x83e582f5, 0xe483f53a,
@@ -107,3 +111,5 @@ const uint32_t cps8601_boot_hex[] = {
 	0xa3fde0a3, 0xe0a3fee0, 0xf854eeff, 0x0444eefe, 0xff90ecfe, 0xad000200,
 };
 const size_t cps8601_boot_hex_len = ARRAY_SIZE(cps8601_boot_hex);
+
+#endif /* PLATFORM_EC_DRIVER_WPC_CPS8601_BOOTLOADER_H_ */

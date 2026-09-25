@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SM5803_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SM5803_H_
+
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/gpio.h>
 
@@ -136,3 +139,5 @@ uint8_t sm5803_emul_get_tint_low_th(const struct emul *emul);
 
 /** Set the reported VSYS voltage (as measured), in mV. */
 void sm5803_emul_set_vsys_measured_mv(const struct emul *emul, uint16_t mv);
+
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_SM5803_H_ */

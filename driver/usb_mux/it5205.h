@@ -5,8 +5,8 @@
  * ITE IT5205 Type-C USB alternate mode mux.
  */
 
-#ifndef __CROS_EC_IT5205_H
-#define __CROS_EC_IT5205_H
+#ifndef PLATFORM_EC_DRIVER_USB_MUX_IT5205_H_
+#define PLATFORM_EC_DRIVER_USB_MUX_IT5205_H_
 
 #include "stdbool.h"
 #include "usb_mux.h"
@@ -62,4 +62,4 @@
 enum ec_error_list it5205h_enable_csbu_switch(const struct usb_mux *me,
 					      bool en);
 
-#endif /* __CROS_EC_IT5205_H */
+#endif /* PLATFORM_EC_DRIVER_USB_MUX_IT5205_H_ */

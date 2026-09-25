@@ -9,8 +9,8 @@
  * @brief Backend API for TCPCI emulator
  */
 
-#ifndef __EMUL_TCPCI_H
-#define __EMUL_TCPCI_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_H_
 
 #include "emul/emul_common_i2c.h"
 
@@ -400,4 +400,4 @@ int tcpci_emul_set_vbus_level(const struct emul *emul, enum vbus_level level);
  * @}
  */
 
-#endif /* __EMUL_TCPCI */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_H_ */

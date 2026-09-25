@@ -5,8 +5,8 @@
 
 /* Apollolake chipset power control module for Chrome EC */
 
-#ifndef __CROS_EC_APOLLOLAKE_H
-#define __CROS_EC_APOLLOLAKE_H
+#ifndef PLATFORM_EC_INCLUDE_POWER_APOLLOLAKE_H_
+#define PLATFORM_EC_INCLUDE_POWER_APOLLOLAKE_H_
 
 /*
  * Input state flags.
@@ -48,4 +48,4 @@ enum power_signal {
 	POWER_SIGNAL_COUNT
 };
 
-#endif /* __CROS_EC_APOLLOLAKE_H */
+#endif /* PLATFORM_EC_INCLUDE_POWER_APOLLOLAKE_H_ */

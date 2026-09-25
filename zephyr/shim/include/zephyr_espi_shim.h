@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_ZEPHYR_ESPI_SHIM_H
-#define __CROS_EC_ZEPHYR_ESPI_SHIM_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_ESPI_SHIM_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_ESPI_SHIM_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -65,4 +65,4 @@ uint32_t get_8042_data(uint32_t data);
 }
 #endif
 
-#endif /* __CROS_EC_ZEPHYR_ESPI_SHIM_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_ZEPHYR_ESPI_SHIM_H_ */

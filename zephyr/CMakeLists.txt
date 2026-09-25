@@ -101,7 +101,7 @@ if (DEFINED CONFIG_ARM)
   zephyr_cc_option(-mno-unaligned-access)
 endif()
 zephyr_cc_option(-Wimplicit-fallthrough)
-zephyr_cc_option(-Wint-conversion)
+zephyr_compile_options($<$<COMPILE_LANGUAGE:C>:-Wint-conversion>)
 
 if (DEFINED CONFIG_RISCV)
   zephyr_cc_option(-fsanitize=integer-divide-by-zero)
@@ -170,16 +170,33 @@ if (DEFINED CONFIG_PLATFORM_EC)
     "${PLATFORM_EC}/include"
     "${PLATFORM_EC}/include/driver"
     "${PLATFORM_EC}/third_party")
+  if (CONFIG_ZTEST)
+    zephyr_include_directories("${PLATFORM_EC}/zephyr/test/test_utils")
+  endif()
 endif()
 
 if (ZEPHYR_PIGWEED_MODULE_DIR)
   if (DEFINED CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
-    zephyr_include_directories("${PLATFORM_EC}/zephyr/include/pigweed")
+    zephyr_include_directories(
+      "${PLATFORM_EC}/zephyr/include/pigweed"
+      "${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log/public"
+      "${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/public"
+      "${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/metadata_public_overrides"
+    )
     include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_build/pigweed.cmake")
     add_library(log_tokenized_config INTERFACE)
     target_compile_options(log_tokenized_config INTERFACE -include
                            ${PLATFORM_EC}/zephyr/include/pigweed/pw_zephyr_tokenized_custom_log.h)
     pw_set_module_config(pw_log_tokenized_CONFIG log_tokenized_config)
+    pw_set_module_config(pw_tokenizer_CONFIG log_tokenized_config)
+    zephyr_compile_options(-include
+                           ${PLATFORM_EC}/zephyr/include/pigweed/pw_zephyr_tokenized_custom_log.h)
+
+    include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/backend.cmake")
+    pw_set_backend(pw_log_tokenized.handler pw_build.empty)
+    include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log/backend.cmake")
+    pw_set_backend(pw_log pw_log_tokenized)
+    target_link_libraries(ec_shim PUBLIC pw_log_tokenized)
   endif()
 endif()
 
@@ -279,6 +296,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_DETACHABLE_BASE
                                                 "${PLATFORM_EC}/common/base_state.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY
                                                 "${PLATFORM_EC}/common/battery.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_DEADBAND
+                                                "${PLATFORM_EC}/common/battery_deadband.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_INFO
                                                 "${PLATFORM_EC}/common/battery_info.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BATTERY_FUEL_GAUGE
@@ -289,8 +308,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BC12_DETECT_RT1718S
                                                 "${PLATFORM_EC}/driver/bc12/rt1718s.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BC12_DETECT_PI3USB9201
                                                 "${PLATFORM_EC}/driver/bc12/pi3usb9201.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_BC12_DETECT_MT6360
-                                                "${PLATFORM_EC}/driver/bc12/mt6360.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_ISL9237
                                                 "${PLATFORM_EC}/driver/charger/isl923x.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_ISL9238
@@ -317,6 +334,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER_SM5803
                                                 "${PLATFORM_EC}/driver/charger/sm5803.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGESPLASH
                                                 "${PLATFORM_EC}/common/chargesplash.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGE_CONTROL
+                                                "${PLATFORM_EC}/common/charge_control.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_CHARGER
 						"${PLATFORM_EC}/common/charger.c"
 						"${PLATFORM_EC}/common/charge_state.c")
@@ -397,27 +416,32 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_AUTH_METHOD_HANDSHAK
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_handshake.cc")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_AUTH_METHOD_ASCP
 						"${PLATFORM_EC}/common/fpsensor/fpsensor_auth_ascp.cc")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FINGERPRINT_BTN_IGN_OUT
+						"${PLATFORM_EC}/common/fpsensor/fpsensor_btn_ign_out.cc")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FP_LED
+						"${PLATFORM_EC}/common/fpsensor/fpsensor_led.cc")
+
+zephyr_library_sources_ifdef(CONFIG_HAS_HOSTCMD "${PLATFORM_EC}/common/host_command.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                                "${PLATFORM_EC}/common/host_command.c")
-if (NOT DEFINED CONFIG_EC_HOST_CMD)
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                                "${PLATFORM_EC}/common/host_command_task.c")
-endif()
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD
-                                                "${PLATFORM_EC}/common/host_event_commands.c")
+                                              "${PLATFORM_EC}/common/host_command_task.c")
+zephyr_library_sources_ifdef(CONFIG_HAS_HOSTCMD "${PLATFORM_EC}/common/host_event_commands.c")
+
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
                                                 "${PLATFORM_EC}/common/uart_hostcmd.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_GET_UPTIME_INFO
                                                 "${PLATFORM_EC}/common/uptime.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_REGULATOR
-                                                "${PLATFORM_EC}/common/regulator.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C
                                                 "${PLATFORM_EC}/common/i2c_controller.c"
                                                 "${PLATFORM_EC}/common/i2c_passthru.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C_DEBUG
                                                 "${PLATFORM_EC}/common/i2c_trace.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY
+                                                "${PLATFORM_EC}/common/i2c_battery_parser.c"
                                                 "${PLATFORM_EC}/common/virtual_battery.c")
+if (DEFINED CONFIG_PLATFORM_EC_BATTERY)
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_I2C_PASSTHRU_RESTRICTED
+                                                "${PLATFORM_EC}/common/i2c_battery_parser.c")
+endif()
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_CCGXXF
                                                 "${PLATFORM_EC}/driver/ioexpander/ccgxxf.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_IT8801
@@ -426,14 +450,8 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_NCT38XX
                                                 "${PLATFORM_EC}/driver/ioexpander/ioexpander_nct38xx.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_PCA9675
                                                 "${PLATFORM_EC}/driver/ioexpander/pca9675.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_PCAL6408
-                                                "${PLATFORM_EC}/driver/ioexpander/pcal6408.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_TCA64XXA
-                                                "${PLATFORM_EC}/driver/ioexpander/tca64xxa.c")
 zephyr_library_sources_ifdef(CONFIG_HAS_TASK_KEYSCAN
                                                 "${PLATFORM_EC}/common/keyboard_scan.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RGB_KEYBOARD
-                                                "${PLATFORM_EC}/common/rgb_keyboard.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_8042
                                                 "${PLATFORM_EC}/common/keyboard_8042.c"
                                                 "${PLATFORM_EC}/common/keyboard_8042_sharedlib.c")
@@ -444,8 +462,6 @@ zephyr_library_sources_ifdef(CONFIG_MKBP_PROTOCOL
                                                 "${PLATFORM_EC}/common/mkbp_info.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_MKBP
                                                 "${PLATFORM_EC}/common/keyboard_mkbp.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_PROTOCOL_STUB
-                                                "${PLATFORM_EC}/common/keyboard_protocol_stub.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MKBP_INPUT_DEVICES
                                                 "${PLATFORM_EC}/common/mkbp_input_devices.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PWM_KBLIGHT
@@ -517,8 +533,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PANIC
                                                 "${PLATFORM_EC}/common/panic_output.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PRESERVED_RING_BUF "${PLATFORM_EC}/common/preserved_ring_buf.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PANIC_LOG "${PLATFORM_EC}/common/panic_log.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PSE_LTC4291
-                                                "${PLATFORM_EC}/driver/pse_ltc4291.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RSA
                                                 "${PLATFORM_EC}/common/rsa.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RWSIG
@@ -562,8 +576,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_PCT2075
                                                 "${PLATFORM_EC}/driver/temp_sensor/pct2075.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_SB_TSI
                                                 "${PLATFORM_EC}/driver/temp_sensor/sb_tsi.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_TMP112
-                                                "${PLATFORM_EC}/driver/temp_sensor/tmp112.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_F75303
                                                 "${PLATFORM_EC}/driver/temp_sensor/f75303.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_TEMP_SENSOR_APL6012
@@ -629,10 +641,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8802
                                                 "${PLATFORM_EC}/driver/retimer/ps8802.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8818
                                                 "${PLATFORM_EC}/driver/retimer/ps8818.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8828
-                                                "${PLATFORM_EC}/driver/retimer/ps8828.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8833
-                                                "${PLATFORM_EC}/driver/retimer/ps8833.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_PS8811
                                                 "${PLATFORM_EC}/driver/retimer/ps8811.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_ANX3443
@@ -643,8 +651,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_SS_MUX
                                                 "${PLATFORM_EC}/driver/usb_mux/usb_mux.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_AMD_FP6
                                                 "${PLATFORM_EC}/driver/usb_mux/amd_fp6.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_AMD_FP8
-                                                "${PLATFORM_EC}/driver/usb_mux/amd_fp8.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_IT5205
                                                 "${PLATFORM_EC}/driver/usb_mux/it5205.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_MUX_PS8743
@@ -670,8 +676,8 @@ endif ()
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_HOST_CMD
                                                 "${PLATFORM_EC}/common/usb_pd_host_cmd_common.c")
 
-zephyr_library_sources_ifdef(CONFIG_SVDM_RSP_DFP_ONLY
-                                                "${PLATFORM_EC}/common/usbc/svdm_rsp_dfp_only.c")
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SVDM_RSP
+                                                "${PLATFORM_EC}/common/usbc/svdm_rsp.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_OCP
                                                 "${PLATFORM_EC}/common/usbc_ocp.c")
 
@@ -685,8 +691,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_DUAL_ROLE
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_DP_HPD_GPIO
                                                 "${PLATFORM_EC}/common/usbc/dp_hpd_gpio.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_VDM_AP_CONTROL
-                                                "${PLATFORM_EC}/common/usbc/ap_vdm_control.c")
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USB_PD_TCPM_ANX7447
                                                 "${PLATFORM_EC}/driver/tcpm/anx7447.c")
@@ -744,16 +748,12 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_VBOOT_EFS2
 
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_VSTORE
                                                 "${PLATFORM_EC}/common/vstore.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_RTC
-						"${PLATFORM_EC}/common/rtc.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MATH_UTIL
 						"${PLATFORM_EC}/common/math_util.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_MAX695X_SEVEN_SEGMENT_DISPLAY
 						"${PLATFORM_EC}/driver/led/max695x.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LED_DRIVER_TLC59116F
                                                 "${PLATFORM_EC}/driver/led/tlc59116f.c")
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP
-                                                "${PLATFORM_EC}/common/host_command_memory_dump.c")
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_AP_HANG_DETECT
                                                 "${PLATFORM_EC}/common/ap_hang_detect.c")
 
@@ -838,17 +838,9 @@ if (DEFINED CONFIG_SOC_INTEL_ISH_5_8_0)
   )
 endif()
 
-# Pigweed libraries rely on Zephyr headers that transitively include
-# heap_constants.h. Because pigweed library targets are not created using
-# zephyr_library(), they lacks the implicit dependency on
-# zephyr_generated_headers.  We defer adding this dependency to the top-level
-# directory scope to ensure the Pigweed module has been fully evaluated and the
-# library targets exist.
-#
 # Lists all targets defined with pw_add_library() and pw_add_test()
 function(ec_add_pw_log_zephyr_deps)
-  foreach(lib pw_log_zephyr
-	      cros.dsp.test
+  foreach(lib cros.dsp.test
 	      dsp.client
 	      dsp.service
 	      math.iir_decimator

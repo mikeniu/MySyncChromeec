@@ -439,16 +439,36 @@ static const struct mkbp_event_source *find_mkbp_event_source(uint8_t type)
 #endif
 }
 
-static enum ec_status mkbp_get_next_event(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+mkbp_get_next_event(struct ec_host_cmd_handler_args *args)
 {
 	static int last;
 	int i, evt;
-	struct ec_response_get_next_event_v3 *r = args->response;
+	struct ec_response_get_next_event_v3 *r = args->output_buf;
 	const struct mkbp_event_source *src;
+	size_t max_rsp_needed;
 
 	int data_size = -EC_ERROR_BUSY;
 
-	memset(args->response, 0, args->response_max);
+	switch (args->version) {
+	case 0:
+		max_rsp_needed = sizeof(struct ec_response_get_next_event);
+		break;
+	case 1:
+	case 2:
+		max_rsp_needed = sizeof(struct ec_response_get_next_event_v1);
+		break;
+	case 3:
+		max_rsp_needed = sizeof(struct ec_response_get_next_event_v3);
+		break;
+	default:
+		return EC_HOST_CMD_INVALID_VERSION;
+	}
+
+	if (args->output_buf_max < max_rsp_needed)
+		return EC_HOST_CMD_RESPONSE_TOO_BIG;
+
+	memset(args->output_buf, 0, args->output_buf_max);
 	do {
 		/*
 		 * Find the next event to service.  We do this in a round-robin
@@ -462,7 +482,7 @@ static enum ec_status mkbp_get_next_event(struct host_cmd_handler_args *args)
 
 		if (i == EC_MKBP_EVENT_COUNT) {
 			if (set_inactive_if_no_events())
-				return EC_RES_UNAVAILABLE;
+				return EC_HOST_CMD_UNAVAILABLE;
 			/* An event was set just now, restart loop. */
 			continue;
 		}
@@ -472,7 +492,7 @@ static enum ec_status mkbp_get_next_event(struct host_cmd_handler_args *args)
 
 		src = find_mkbp_event_source(evt);
 		if (src == NULL)
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 
 		r->event_type = evt;
 
@@ -509,9 +529,12 @@ static enum ec_status mkbp_get_next_event(struct host_cmd_handler_args *args)
 			max_size = member_size(
 				union ec_response_get_next_data_v1, key_matrix);
 			break;
-		default:
+		case 3:
 			max_size = member_size(
 				union ec_response_get_next_data_v3, key_matrix);
+			break;
+		default:
+			return EC_HOST_CMD_INVALID_VERSION;
 		}
 		data_size = min(data_size, max_size);
 	}
@@ -521,38 +544,43 @@ static enum ec_status mkbp_get_next_event(struct host_cmd_handler_args *args)
 		r->event_type |= EC_MKBP_HAS_MORE_EVENTS;
 
 	if (data_size < 0)
-		return EC_RES_ERROR;
-	args->response_size = 1 + data_size;
+		return EC_HOST_CMD_ERROR;
+	args->output_buf_size = 1 + data_size;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_NEXT_EVENT, mkbp_get_next_event,
-		     EC_VER_MASK(0) | EC_VER_MASK(1) | EC_VER_MASK(2) |
-			     EC_VER_MASK(3));
+EC_HOST_CMD_HANDLER_RESP_ONLY(
+	EC_CMD_GET_NEXT_EVENT, mkbp_get_next_event,
+	EC_VER_MASK(0) | EC_VER_MASK(1) | EC_VER_MASK(2) | EC_VER_MASK(3),
+	SMALLEST_TYPE(struct ec_response_get_next_event,
+		      struct ec_response_get_next_event_v1,
+		      struct ec_response_get_next_event_v3));
 
 #ifdef CONFIG_MKBP_HOST_EVENT_WAKEUP_MASK
 #ifndef CONFIG_HOSTCMD_X86
-static enum ec_status
-mkbp_get_host_event_wake_mask(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+mkbp_get_host_event_wake_mask(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_host_event_mask *r = args->response;
+	struct ec_response_host_event_mask *r = args->output_buf;
 
 	r->mask = mkbp_host_event_wake_mask;
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_HOST_EVENT_GET_WAKE_MASK,
-		     mkbp_get_host_event_wake_mask, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_HOST_EVENT_GET_WAKE_MASK,
+			      mkbp_get_host_event_wake_mask, EC_VER_MASK(0),
+			      struct ec_response_host_event_mask);
 #endif /* !CONFIG_HOSTCMD_X86 */
 #endif /* CONFIG_MKBP_HOST_EVENT_WAKEUP_MASK */
 
 #if defined(CONFIG_MKBP_EVENT_WAKEUP_MASK) || \
 	defined(CONFIG_MKBP_HOST_EVENT_WAKEUP_MASK)
-static enum ec_status hc_mkbp_wake_mask(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_mkbp_wake_mask(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_mkbp_event_wake_mask *r = args->response;
-	const struct ec_params_mkbp_event_wake_mask *p = args->params;
+	struct ec_response_mkbp_event_wake_mask *r = args->output_buf;
+	const struct ec_params_mkbp_event_wake_mask *p = args->input_buf;
 	enum ec_mkbp_event_mask_action action = p->action;
 
 	switch (action) {
@@ -572,14 +600,14 @@ static enum ec_status hc_mkbp_wake_mask(struct host_cmd_handler_args *args)
 
 		default:
 			/* Unknown mask, or mask is not in use. */
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		}
 
-		args->response_size = sizeof(*r);
+		args->output_buf_size = sizeof(*r);
 		break;
 
 	case SET_WAKE_MASK:
-		args->response_size = 0;
+		args->output_buf_size = 0;
 
 		switch (p->mask_type) {
 #ifdef CONFIG_MKBP_HOST_EVENT_WAKEUP_MASK
@@ -601,17 +629,19 @@ static enum ec_status hc_mkbp_wake_mask(struct host_cmd_handler_args *args)
 
 		default:
 			/* Unknown mask, or mask is not in use. */
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 		}
 		break;
 
 	default:
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_MKBP_WAKE_MASK, hc_mkbp_wake_mask, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_MKBP_WAKE_MASK, hc_mkbp_wake_mask, EC_VER_MASK(0),
+		    struct ec_params_mkbp_event_wake_mask,
+		    struct ec_response_mkbp_event_wake_mask);
 
 static int command_mkbp_wake_mask(int argc, const char **argv)
 {

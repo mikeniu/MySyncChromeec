@@ -1,0 +1,93 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/thermistor/thermistor.dtsi>
+
+/ {
+	named-adc-channels {
+
+		adc_temp_charger1: charger1 {
+			enum-name = "ADC_TEMP_SENSOR_1";
+			io-channels = <&adc0 0>;
+		};
+		adc_temp_cpu: cpu {
+			enum-name = "ADC_TEMP_SENSOR_3";
+			io-channels = <&adc0 2>;
+		};
+		adc_temp_prebuck: prebuck {
+			enum-name = "ADC_TEMP_SENSOR_2";
+			io-channels = <&adc0 1>;
+		};
+		adc_temp_charger2: charger2 {
+			enum-name = "ADC_TEMP_SENSOR_4";
+			io-channels = <&adc0 3>;
+		};
+	};
+
+	temp_sensor_charger1: charger1 {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_charger1>;
+	};
+	temp_sensor_cpu: cpu {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_cpu>;
+	};
+	temp_sensor_prebuck: prebuck {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_prebuck>;
+	};
+	temp_sensor_charger2: charger2 {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_charger2>;
+	};
+
+	named-temp-sensors {
+		compatible = "cros-ec,temp-sensors";
+		temp_charger1: charger1 {
+			sensor = <&temp_sensor_charger1>;
+			temp-host-high = <125>;
+			temp-host-halt = <150>;
+			temp-host-release-high = <115>;
+			temp-host-release-halt = <140>;
+		};
+		temp_cpu: cpu {
+			sensor = <&temp_sensor_cpu>;
+			temp-host-high = <100>;
+			temp-host-halt = <110>;
+			temp-host-release-high = <90>;
+			temp-host-release-halt = <100>;
+		};
+		temp_prebuck: prebuck {
+			sensor = <&temp_sensor_prebuck>;
+			temp-host-high = <125>;
+			temp-host-halt = <150>;
+			temp-host-release-high = <115>;
+			temp-host-release-halt = <140>;
+		};
+		temp_charger2: charger2 {
+			sensor = <&temp_sensor_charger2>;
+			temp-host-high = <125>;
+			temp-host-halt = <150>;
+			temp-host-release-high = <115>;
+			temp-host-release-halt = <140>;
+		};
+	};
+};
+
+&thermistor_3V3_100K_100K_4250B {
+	status = "okay";
+};
+
+&adc0 {
+	pinctrl-0 = <&adc0_chan0_gp45
+		&adc0_chan1_gp44
+		&adc0_chan2_gp43
+		&adc0_chan3_gp42>;
+	pinctrl-names = "default";
+};

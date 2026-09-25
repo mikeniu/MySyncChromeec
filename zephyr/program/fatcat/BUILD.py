@@ -9,12 +9,13 @@ def register_npcx9_project(
     project_name,
     zephyr_board,
     extra_kconfig_files=(),
-    inherited_from=None,
+    boards=None,
     extra_modules=(),
+    snippets=None,
 ):
     """Register an npcx9 based variant of fatcat."""
-    if inherited_from is None:
-        inherited_from = ["fatcat"]
+    if boards is None:
+        boards = ["fatcat"]
 
     register_npcx_project(
         project_name=project_name,
@@ -31,7 +32,8 @@ def register_npcx9_project(
             *extra_kconfig_files,
         ],
         modules=["cmsis_6", "ec", *extra_modules],
-        inherited_from=inherited_from,
+        boards=boards,
+        snippets=snippets,
     )
 
 
@@ -39,11 +41,13 @@ def register_it8xxx2_project(
     project_name,
     extra_kconfig_files=(),
     extra_modules=(),
-    inherited_from=None,
+    boards=None,
+    snippets=None,
+    **kwargs,
 ):
     """Register an it8xxx2 based variant of fatcat."""
-    if inherited_from is None:
-        inherited_from = ["fatcat"]
+    if boards is None:
+        boards = ["fatcat"]
 
     register_binman_project(
         project_name=project_name,
@@ -60,16 +64,23 @@ def register_it8xxx2_project(
             *extra_kconfig_files,
         ],
         modules=["ec", *extra_modules],
-        inherited_from=inherited_from,
+        boards=boards,
+        snippets=snippets,
+        **kwargs,
     )
 
 
 def register_realtek_project(
     project_name,
     extra_kconfig_files=(),
+    boards=None,
     extra_modules=(),
+    snippets=None,
 ):
     """Register an realtek_ec based variant of fatcat."""
+    if boards is None:
+        boards = ["fatcat"]
+
     register_rtk_project(
         project_name=project_name,
         zephyr_board="realtek/rts5912",
@@ -85,6 +96,8 @@ def register_realtek_project(
             *extra_kconfig_files,
         ],
         modules=["cmsis_6", "ec", *extra_modules],
+        boards=boards,
+        snippets=snippets,
     )
 
 
@@ -116,6 +129,7 @@ register_npcx9_project(
     project_name="ruby",
     zephyr_board="npcx9/npcx9m7fb",
     extra_modules=["google-private", "nanopb", "pigweed"],
+    snippets=["pw-tokenize"],
 )
 
 register_it8xxx2_project(
@@ -144,6 +158,7 @@ register_realtek_project(
     project_name="lapis",
     extra_kconfig_files=[],
     extra_modules=["google-private", "pigweed", "nanopb"],
+    snippets=["pw-tokenize"],
 )
 
 register_it8xxx2_project(
@@ -152,6 +167,7 @@ register_it8xxx2_project(
         here / "dsp_comms.conf",
     ],
     extra_modules=["google-private", "pigweed", "nanopb"],
+    snippets=["pw-tokenize"],
 )
 
 register_ish_project(
@@ -163,8 +179,9 @@ register_ish_project(
     kconfig_files=[
         here / "dsp_comms.conf",
         here / "kinmen-ish" / "project.conf",
+        here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["fatcat"],
+    boards=["fatcat"],
 )
 
 register_ish_project(
@@ -176,8 +193,9 @@ register_ish_project(
     kconfig_files=[
         here / "dsp_comms.conf",
         here / "ruby-ish" / "project.conf",
+        here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["fatcat"],
+    boards=["fatcat"],
 )
 
 register_ish_project(
@@ -189,18 +207,21 @@ register_ish_project(
     kconfig_files=[
         here / "dsp_comms.conf",
         here / "moonstone-ish" / "project.conf",
+        here / ".." / ".." / "ish.conf",
     ],
-    inherited_from=["fatcat"],
+    boards=["fatcat"],
 )
 
 register_ish_project(
     project_name="fatcat-ish-idle",
+    boards=["fatcat"],
     zephyr_board="intel_ish_5_8_0",
     dts_overlays=[
         here / "fatcat-ish-idle" / "project.overlay",
     ],
     kconfig_files=[
         here / "fatcat-ish-idle" / "project.conf",
+        here / ".." / ".." / "ish.conf",
     ],
 )
 

@@ -17,3 +17,10 @@ config CROS_EC_SCANCODE_SET2
 	default y
 	help
 	  Define a scancode_set2 array based on the devicetree definition.
+
+config CROS_EC_GHOST_FILTER
+	bool "Enable the ghost filter mask"
+	depends on CROS_EC_KEYBOARD_INPUT
+	select INPUT_KBD_DRIVE_COLUMN_HOOK
+	help
+	  Enable the ghost filter mask.

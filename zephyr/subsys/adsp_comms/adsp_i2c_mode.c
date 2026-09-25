@@ -6,6 +6,7 @@
 /* Bluey ADSP I2C port configuration */
 
 #include "adsp_comms.h"
+#include "chipset.h"
 #include "common.h"
 #include "gpio.h"
 #include "hooks.h"
@@ -152,6 +153,14 @@ void board_chipset_startup_i2c_target(void)
 }
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, board_chipset_startup_i2c_target,
 	     HOOK_PRIO_DEFAULT);
+
+static void adsp_i2c_init(void)
+{
+	if (chipset_in_state(CHIPSET_STATE_ON)) {
+		board_chipset_startup_i2c_target();
+	}
+}
+DECLARE_HOOK(HOOK_INIT, adsp_i2c_init, HOOK_PRIO_DEFAULT);
 
 /*
  * After the AP is powered-off turn back the I2C_PORT_ADSP to controller mode

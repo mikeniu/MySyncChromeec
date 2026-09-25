@@ -8,8 +8,8 @@
  * @brief Device Policy Manager for PD Controllers
  */
 
-#ifndef __CROS_EC_PDC_DPM_H
-#define __CROS_EC_PDC_DPM_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_DPM_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_DPM_H_
 
 /**
  * @brief Evaluate port's first SNK_CAP PDO for current consideration
@@ -18,13 +18,6 @@
  * @param vsafe5v_pdo First PDO of port partner's SNK_CAPs
  */
 void pdc_dpm_eval_sink_fixed_pdo(int port, uint32_t vsafe5v_pdo);
-
-/**
- * @brief Add USB PD source to max current request
- *
- * @param port USBC port number
- */
-void pdc_dpm_add_pd_source(int port);
 
 /**
  * @brief Add typec-only port to max current request
@@ -56,4 +49,33 @@ void pdc_dpm_remove_source(int port);
  */
 int pdc_dpm_get_source_current(const int port);
 
-#endif /* __CROS_EC_PDC_DPM_H */
+/**
+ * @brief Evaluate partner's first Sink PDO for TBT3/USB4 3A reset
+ *
+ * @param port USBC port number
+ * @param vsafe5v_pdo First PDO of port partner's SNK_CAPs
+ */
+void pdc_dpm_tbt_eval_sink_pdo(int port, uint32_t vsafe5v_pdo);
+
+/**
+ * @brief Check pending TBT3/USB4 reset
+ *
+ * @param port USBC port number
+ */
+void pdc_dpm_tbt_check_reset(int port);
+
+/**
+ * @brief Start 5 second TBT3/USB4 3A reset ongoing timer in DPM
+ *
+ * @param port USBC port number
+ */
+void pdc_dpm_tbt_set_reset_ongoing(int port);
+
+/**
+ * @brief Clear TBT3/USB4 reset flags
+ *
+ * @param port USBC port number
+ */
+void pdc_dpm_tbt_clear_port(int port);
+
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_DPM_H_ */

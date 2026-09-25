@@ -8,8 +8,8 @@
  * @brief Controls for the mock charge_manager
  */
 
-#ifndef __MOCK_CHARGE_MANAGER_MOCK_H
-#define __MOCK_CHARGE_MANAGER_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_CHARGE_MANAGER_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_CHARGE_MANAGER_MOCK_H_
 
 struct mock_ctrl_charge_manager {
 	int vbus_voltage_mv;
@@ -24,4 +24,4 @@ extern struct mock_ctrl_charge_manager mock_ctrl_charge_manager;
 
 void mock_charge_manager_set_vbus_voltage(int voltage_mv);
 
-#endif /* __MOCK_CHARGE_MANAGER_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_CHARGE_MANAGER_MOCK_H_ */

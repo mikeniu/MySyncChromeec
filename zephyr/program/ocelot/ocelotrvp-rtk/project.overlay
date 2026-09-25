@@ -1,0 +1,55 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* ocelot program common DTS includes */
+
+#include <cros/integrated_fwid.dtsi>
+
+/* ocelotrvp-rtk program common DTS includes */
+
+#include "gpio.dtsi"
+#include "i2c.dtsi"
+#include "power_signals.dtsi"
+#include "../rvp_battery.dtsi"
+#include "../rvp_interrupts.dtsi"
+#include "../rvp_ioex_gpio.dtsi"
+#include "../rvp_usbc.dtsi"
+
+&espi0 {
+	status = "okay";
+};
+
+&sha0 {
+	status = "okay";
+};
+
+&pdc_rtk_c0 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+&pdc_rtk_c1 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+&pdc_ti_c0 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+&pdc_ti_c1 {
+	irq-gpios = <RTS5912_GPIO027 GPIO_ACTIVE_LOW>;
+};
+
+&ulpm {
+	status = "okay";
+	bc_acok: wkup-pin@0 {
+		wkup-pin-mode = "vin";
+		wkup-pin-pol = "rising";
+	};
+	power_btn: wkup-pin@3 {
+		wkup-pin-mode = "vin";
+		wkup-pin-pol = "falling";
+	};
+	smc_lid: wkup-pin@5 {
+		wkup-pin-mode = "vin";
+		wkup-pin-pol = "rising";
+	};
+};

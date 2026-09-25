@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __CROS_EC_NPCX_MONITOR_H
-#define __CROS_EC_NPCX_MONITOR_H
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_NPCX_MONITOR_NPCX_MONITOR_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_NPCX_MONITOR_NPCX_MONITOR_H_
 
 #include <stdint.h>
 
@@ -30,4 +30,4 @@ struct monitor_header_tag {
 	uint16_t reserved;
 } __packed;
 
-#endif /* __CROS_EC_NPCX_MONITOR_H */
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_NPCX_MONITOR_NPCX_MONITOR_H_ */

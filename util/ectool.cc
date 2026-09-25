@@ -709,6 +709,9 @@ static const char *const ec_feature_names[] = {
 	[EC_FEATURE_STRAUSS] = "Strauss",
 	[EC_FEATURE_POE] = "POE",
 	[EC_FEATURE_CHARGER_HYBRID_POWER_BOOST] = "Hybrid Power Boost charger",
+	[EC_FEATURE_CONSOLE_LOG_EVENT] = "Console log event",
+	[EC_FEATURE_PWRMON] = "Power monitoring",
+	[EC_FEATURE_BT_PASSTHRU] = "Bluetooth Passthrough",
 };
 
 int cmd_inventory(int argc, char *argv[])
@@ -843,6 +846,7 @@ static const char *reset_cause_to_str(uint16_t cause)
 		"shutdown: thermal",
 		"shutdown: power button",
 		"shutdown: at AP's request",
+		"shutdown: for battery cutoff",
 	};
 	BUILD_ASSERT(ARRAY_SIZE(shutdown_causes) ==
 		     CHIPSET_SHUTDOWN_COUNT - CHIPSET_SHUTDOWN_BEGIN);
@@ -991,6 +995,7 @@ int cmd_reboot_ec(int argc, char *argv[])
 		 * That reboots the AP as well, so unlikely we'll be around
 		 * to see a return code from this...
 		 */
+		sync();
 		rv = ec_command(EC_CMD_REBOOT, 0, NULL, 0, NULL, 0);
 		return (rv < 0 ? rv : 0);
 	}
@@ -1033,6 +1038,9 @@ int cmd_reboot_ec(int argc, char *argv[])
 			return -1;
 		}
 	}
+
+	if (p.cmd != EC_REBOOT_CANCEL)
+		sync();
 
 	rv = ec_command(EC_CMD_REBOOT_EC, 0, &p, sizeof(p), NULL, 0);
 	return (rv < 0 ? rv : 0);
@@ -1912,6 +1920,7 @@ int cmd_rollback_info(int argc, char *argv[])
 
 int cmd_apreset(int argc, char *argv[])
 {
+	sync();
 	return ec_command(EC_CMD_AP_RESET, 0, NULL, 0, NULL, 0);
 }
 
@@ -2892,6 +2901,7 @@ int cmd_stress_test(int argc, char *argv[])
 	if (reboot) {
 		printf("Issuing ec reboot. Expect a few early failed"
 		       " ioctl messages.\n");
+		sync();
 		ec_command(EC_CMD_REBOOT, 0, NULL, 0, NULL, 0);
 		sleep(2);
 	}
@@ -9527,7 +9537,6 @@ static void cmd_cbi_help(char *cmd)
 		"    [get_flag] is combination of:\n"
 		"      01b: Invalidate cache and reload data from EEPROM\n"
 		"    [set_flag] is combination of:\n"
-		"      01b: Skip write to EEPROM. Use for back-to-back writes\n"
 		"      10b: Set all fields to defaults first\n");
 }
 
@@ -11179,6 +11188,48 @@ int cmd_force_lid_open(int argc, char *argv[])
 	}
 
 	rv = ec_command(EC_CMD_FORCE_LID_OPEN, 0, &p, sizeof(p), NULL, 0);
+	if (rv < 0)
+		return rv;
+	printf("Success.\n");
+	return 0;
+}
+
+int cmd_powerbtn_press(int argc, char *argv[])
+{
+	struct ec_params_power_button_press p = { 0 };
+	char *e;
+	int rv;
+
+	if (argc > 1) {
+		p.first_press_delay_ms = strtol(argv[1], &e, 0);
+		if (e && *e) {
+			fprintf(stderr, "Bad value.\n");
+			return -1;
+		}
+	}
+	if (argc > 2) {
+		p.first_press_duration_ms = strtol(argv[2], &e, 0);
+		if (e && *e) {
+			fprintf(stderr, "Bad value.\n");
+			return -1;
+		}
+	}
+	if (argc > 3) {
+		p.second_press_delay_ms = strtol(argv[3], &e, 0);
+		if (e && *e) {
+			fprintf(stderr, "Bad value.\n");
+			return -1;
+		}
+	}
+	if (argc > 4) {
+		p.second_press_duration_ms = strtol(argv[4], &e, 0);
+		if (e && *e) {
+			fprintf(stderr, "Bad value.\n");
+			return -1;
+		}
+	}
+
+	rv = ec_command(EC_CMD_POWER_BUTTON_PRESS, 0, &p, sizeof(p), NULL, 0);
 	if (rv < 0)
 		return rv;
 	printf("Success.\n");
@@ -12898,6 +12949,99 @@ static int cmd_s0ix_counter(int argc, char *argv[])
 	return 0;
 }
 
+int cmd_thread_info(int argc, char *argv[])
+{
+	struct ec_response_thread_info_list list;
+	int rv;
+
+	rv = ec_command(EC_CMD_THREAD_INFO_LIST, 0, NULL, 0, &list,
+			sizeof(list));
+	if (rv < 0) {
+		return rv;
+	}
+
+	printf("Found %u threads:\n", list.thread_count);
+
+	for (uint32_t i = 0; i < list.thread_count; i++) {
+		struct ec_params_thread_info_detail p;
+		struct ec_response_thread_info_detail r;
+
+		p.thread_id = list.thread_ids[i];
+		rv = ec_command(EC_CMD_THREAD_INFO_DETAIL, 0, &p, sizeof(p), &r,
+				sizeof(r));
+		if (rv < 0) {
+			fprintf(stderr,
+				"Failed to get thread detail for ID 0x%08x: %d\n",
+				p.thread_id, rv);
+			continue;
+		}
+
+		printf("\nThread ID 0x%08x (@ %" PRIu64 " us):\n", p.thread_id,
+		       r.timestamp_us);
+
+		/* Name */
+		if (r.valid_flags & EC_THREAD_INFO_DETAIL_NAME_VALID) {
+			printf("  %-15s%s\n", "Name:", r.name);
+		} else {
+			printf("  %-15s(unknown)\n", "Name:");
+		}
+
+		/* Basic information */
+		printf("  %-15s0x%08x\n", "Entry Point:", r.entry_point);
+		if (r.timeout_us == 0xffffffff) {
+			printf("  %-15sNone\n", "Timeout:");
+		} else {
+			printf("  %-15s%u us\n", "Timeout:", r.timeout_us);
+		}
+
+		printf("  %-15s0x%04x\n", "User Options:", r.user_options);
+		printf("  %-15s%d\n", "Priority:", r.prio);
+		printf("  %-15s0x%02x\n", "Thread State:", r.thread_state);
+		printf("  %-15s%s\n", "Is Idle:", r.is_idle ? "Yes" : "No");
+		printf("  %-15s%s\n",
+		       "Is Current:", r.is_current ? "Yes" : "No");
+
+		/* Stack usage */
+		if (r.valid_flags & EC_THREAD_INFO_DETAIL_STACK_VALID) {
+			printf("  %-15s%u bytes\n", "Stack Cur:", r.stack_cur);
+			printf("  %-15s%u bytes\n", "Stack Max:", r.stack_max);
+			printf("  %-15s%u bytes\n",
+			       "Stack Size:", r.stack_size);
+		}
+
+		/* Timing */
+		if (r.valid_flags & EC_THREAD_INFO_DETAIL_RUNTIME_USAGE_VALID) {
+			printf("  %-15s%u us\n",
+			       "Execution:", r.execution_time_us);
+		}
+
+		/* Analysis */
+		if (r.valid_flags &
+		    EC_THREAD_INFO_DETAIL_USAGE_ANALYSIS_VALID) {
+			printf("  %-15s%u us\n",
+			       "Window Peak:", r.window_peak_us);
+			printf("  %-15s%u us\n",
+			       "Window Avg:", r.window_avg_us);
+		}
+
+		/* Scheduling */
+		printf("  %-15s0x%08x\n", "Pending On:", r.pending_on);
+
+		/* CPU registers */
+		if (r.valid_flags & EC_THREAD_INFO_DETAIL_PC_VALID) {
+			printf("  %-15s0x%08x\n", "PC:", r.pc);
+		}
+		if (r.valid_flags & EC_THREAD_INFO_DETAIL_LR_VALID) {
+			printf("  %-15s0x%08x\n", "LR:", r.lr);
+		}
+		if (r.valid_flags & EC_THREAD_INFO_DETAIL_SP_VALID) {
+			printf("  %-15s0x%08x\n", "SP:", r.sp);
+		}
+	}
+
+	return 0;
+}
+
 /* NULL-terminated list of commands. Please keep sorted. */
 const struct command commands[] = {
 	{ "adcread", cmd_adc_read, "<channel>\n\tRead an ADC channel." },
@@ -13109,6 +13253,9 @@ const struct command commands[] = {
 	  "\n\tRapidly write bytes to port 80." },
 	{ "port80read", cmd_port80_read,
 	  "\n\tPrint history of port 80 write." },
+	{ "powerbtn_press", cmd_powerbtn_press,
+	  "[<1st_del_ms>] [<1st_dur_ms>] [<2nd_del_ms>] [<2nd_dur_ms>]\n"
+	  "\tSimulate up to 2 consecutive delayed power button presses." },
 	{ "powerinfo", cmd_power_info,
 	  "\n\tPrints power-related information." },
 	{ "protoinfo", cmd_proto_info,
@@ -13213,6 +13360,8 @@ const struct command commands[] = {
 	{ "test", cmd_test,
 	  "result length [version]\n"
 	  "\tFake a variety of responses, purely for testing purposes." },
+	{ "threadinfo", cmd_thread_info,
+	  "\n\tDumps Zephyr thread tracking and info." },
 	{ "thermalget", cmd_thermal_get_threshold,
 	  "<platform-specific args>\n"
 	  "\tGet the threshold temperature values from the thermal engine." },

@@ -19,6 +19,12 @@ The [Zephyr build](zephyr_build.md) documentation details the usage of Google's
 meta build tool `zmake`, used to configure and build Zephyr EC binaries. Start
 here if you only need to build a Zephyr EC binary for an existing board.
 
+The [Remote DUT EC Flashing](../flash_dut.md) guide explains how to flash
+built EC RW or RO images directly onto remote ChromeOS (`cros`) and Android
+(`alos`) DUTs over SSH or ADB using `util/flash_dut.py`. For automated DUT
+leasing and end-to-end test execution, see the
+[Leased DUT EC Testing](../lease_and_test_ec.md) guide.
+
 The [project configuration](project_config.md) documentation details the steps
 required to create a new Chromebook program (reference board) and for creating a
 new project variant.

@@ -15,8 +15,8 @@
  * assembler.
  */
 
-#ifndef __CROS_EC_CONFIG_H
-#define __CROS_EC_CONFIG_H
+#ifndef PLATFORM_EC_INCLUDE_CONFIG_H_
+#define PLATFORM_EC_INCLUDE_CONFIG_H_
 
 /*
  * When building for Zephyr tests, a shimmed_tasks.h header is defined
@@ -25,6 +25,11 @@
  */
 #ifdef CONFIG_ZEPHYR
 #include "shimmed_tasks.h"
+#else
+#ifdef HAS_TASK_HOSTCMD
+/* This is needed for legacy tests that use HAS_TASK_HOSTCMD */
+#define CONFIG_HAS_HOSTCMD
+#endif
 #endif /* CONFIG_ZEPHYR */
 
 #ifdef INCLUDE_ENV_CONFIG
@@ -578,6 +583,12 @@
 
 /* If the battery is too hot or too cold, stop charging */
 #undef CONFIG_BATTERY_CHECK_CHARGE_TEMP_LIMITS
+
+/*
+ * If this option is enabled, all battery cutoff commands will be
+ * deferred until the chipset is shutting down.
+ */
+#undef CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN
 
 /*
  * Support battery cut-off as host command and console command.
@@ -1881,8 +1892,8 @@
  */
 #undef CONFIG_PANIC_LOG_DEBUG
 
-/* Enable generic SVDM DFP identity response */
-#undef CONFIG_SVDM_RSP_DFP_ONLY
+/* Enable generic SVDM response support */
+#undef CONFIG_SVDM_RSP
 
 /*
  * noinit_end_of_ram is a memory section placed at the very end
@@ -1890,7 +1901,7 @@
  * The section is useful for preserving data across reboots.
  * May not be enabled in RO.
  */
-#ifndef SECTION_IS_RO
+#ifndef CONFIG_CROS_EC_RO
 #define CONFIG_NOINIT_END_OF_RAM_SECTION
 #else
 #undef CONFIG_NOINIT_END_OF_RAM_SECTION
@@ -1945,9 +1956,6 @@
  */
 #undef CONFIG_GPIO_POWER_DOWN
 
-/* Allow unaligned access */
-#undef CONFIG_ALLOW_UNALIGNED_ACCESS
-
 /*
  * Protect the code RAM section on devices that execute code from RAM. On these
  * devices, this mechanism protects the code from being modified using the MPU.
@@ -1974,18 +1982,6 @@
 #define CONFIG_COMMON_TIMER
 
 /*****************************************************************************/
-
-/*
- * Make it possible for console to be output to different channels that can be
- * turned on and off.
- *
- * This is useful as a developer convenience when the console is crowded with
- * messages, to make it easier to use the interactive console.
- * FAFT and servod also use this feature.
- *
- * Boards may #undef this to reduce image size.
- */
-#define CONFIG_CONSOLE_CHANNEL
 
 /*
  * Provide additional help on console commands, such as the supported
@@ -2681,7 +2677,7 @@
 #undef CONFIG_HOSTCMD_BATTERY_INFO
 
 /* If we have host command task, assume we also are using host events. */
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 #define CONFIG_HOSTCMD_EVENTS
 #else
 #undef CONFIG_HOSTCMD_EVENTS
@@ -2727,9 +2723,7 @@
 /* EC supports EC_CMD_TYPEC_DISCOVERY */
 #define CONFIG_HOSTCMD_TYPEC_DISCOVERY
 
-/* EC supports EC_CMD_TYPEC_CONTROL
- * Note: this gets undefined later if TCPMv1 is selected.
- */
+/* EC supports EC_CMD_TYPEC_CONTROL */
 #define CONFIG_HOSTCMD_TYPEC_CONTROL
 
 /* EC supports EC_CMD_TYPEC_STATUS */
@@ -2907,20 +2901,6 @@
 #define CONFIG_I2C_CHIP_MAX_TRANSFER_SIZE 255
 
 /*
- * Enable i2c_xfer() for receiving request larger than
- * CONFIG_I2C_CHIP_MAX_TRANSFER_SIZE.
- */
-#undef CONFIG_I2C_XFER_LARGE_TRANSFER
-
-/*
- * If defined, makes i2c_xfer callback into board-provided functions before the
- * start and after the end of every I2C transaction. This can be used by boards
- * to implement any I2C device specific quirks e.g. requiring minimum bus-free
- * time between every I2C transaction with a device.
- */
-#undef CONFIG_I2C_XFER_BOARD_CALLBACK
-
-/*
  * EC uses an I2C controller interface.
  * Note: if this is defined, i2c_init() will be called
  * automatically at board boot.
@@ -2950,30 +2930,6 @@
  * size.
  */
 #define CONFIG_I2C_EXTRA_PACKET_SIZE 0
-
-/*
- * I2C multi-port controller.
- *
- * If CONFIG_I2C_MULTI_PORT_CONTROLLER is defined, a single on-chip I2C
- * controller may have multiple I2C ports attached. Therefore, I2c operations
- * must lock the controller (not just the port) to prevent hardware access
- * conflicts.
- */
-#undef CONFIG_I2C_MULTI_PORT_CONTROLLER
-
-/*
- * Enable the legacy I2C bitbang driver.
- *
- * If defined, the board must define array i2c_bitbang_ports[] and
- * i2c_bitbang_ports_count (same as i2c_ports/i2c_ports_count), but with
- * port number starting from I2C_PORT_COUNT, and .drv=&bitbang_drv.
- *
- * For example:
- * {"battery", 2, 100, GPIO_I2C3_SCL, GPIO_I2C3_SDA, .drv = &bitbang_drv},
- *
- * This option cannot be used by Zephyr EC projects.
- */
-#undef CONFIG_I2C_BITBANG_CROS_EC
 
 /*
  * If defined, reduce I2C traffic from update functions (i2c_update8/16
@@ -3372,12 +3328,6 @@
 #undef CONFIG_KEYBOARD_STRAUSS
 
 /*
- * Enable the 8042 AUX port. This is typically used for PS/2 mouse devices.
- * You will need to implement send_aux_data_to_device and lpc_aux_put_char.
- */
-#undef CONFIG_8042_AUX
-
-/*
  * Invert the IRQ1/IRQ12 interrupts that come from the NPCX keyboard controller
  * such that they are active low.
  */
@@ -3471,13 +3421,6 @@
 #undef CONFIG_LED_DRIVER_LP5562 /* LP5562, on I2C interface */
 #undef CONFIG_LED_DRIVER_MP3385 /* MPS MP3385, on I2C */
 #undef CONFIG_LED_DRIVER_OZ554 /* O2Micro OZ554, on I2C */
-#undef CONFIG_LED_DRIVER_IS31FL3733B /* Lumissil IS31FL3733B on I2C */
-#undef CONFIG_LED_DRIVER_IS31FL3743B /* Lumissil IS31FL3743B on SPI */
-#undef CONFIG_LED_DRIVER_AW20198 /* Awinic AW20198 on I2C */
-#undef CONFIG_LED_DRIVER_TLC59116F /* TLC59116F on I2C */
-
-/* Enable late init for is31fl3743b. Work around b:232443638. */
-#undef CONFIG_IS31FL3743B_LATE_INIT
 
 /* Offset in flash where little firmware will live. */
 #undef CONFIG_LFW_OFFSET
@@ -3909,6 +3852,11 @@
  */
 #undef CONFIG_POWER_BUTTON_TO_PCH_CUSTOM
 
+/*
+ * Enable power button press host command.
+ */
+#undef CONFIG_HOSTCMD_POWER_BUTTON_PRESS
+
 /* Compile common code for AP power state machine */
 #undef CONFIG_POWER_COMMON
 
@@ -4021,29 +3969,6 @@
  * Call keyboard backlight init function during init hook instead of start-up
  */
 #undef CONFIG_KBLIGHT_HOOK_INIT
-
-/*
- * RGB Keyboard
- */
-#undef CONFIG_RGB_KEYBOARD
-
-/*
- * Enable debug messages from a RGB keyboard task.
- */
-#undef CONFIG_RGB_KEYBOARD_DEBUG
-
-/*
- * Enable demo for RGB keyboard to run on reset.
- *
- * FLOW: In each iteration, a new color is placed in (0,0) and the rest of LEDs
- * copy colors from adjacent LEDs.
- *
- * DOT: A red dot is placed on (0,0) and traverses the grid from top to bottom
- * left to right. After the entire matrix is traversed, it's repeated with a
- * new color.
- */
-#undef CONFIG_RGBKBD_DEMO_FLOW
-#undef CONFIG_RGBKBD_DEMO_DOT
 
 #ifndef CONFIG_ZEPHYR
 /* Support Real-Time Clock (RTC) */
@@ -4173,21 +4098,6 @@
 
 /* Size of the poweron config field if needed. */
 #undef CONFIG_POWERON_CONF_LEN
-
-/****************************************************************************/
-/* Shared objects library. */
-
-/* Support shared objects library between RO and RW. */
-#undef CONFIG_SHAREDLIB
-
-/* Size of shared objects library. */
-#undef CONFIG_SHAREDLIB_SIZE
-
-/* Program memory offset of shared objects library. */
-#undef CONFIG_SHAREDLIB_MEM_OFF
-
-/* Storage  offset of sharedobjects library. */
-#undef CONFIG_SHAREDLIB_STORAGE_OFF
 
 /* Allow the board to use a GPIO for the SCI# signal. */
 #undef CONFIG_SCI_GPIO
@@ -4732,23 +4642,11 @@
  * Enables USB Power Delivery
  *
  * When this config option is enabled, one of the following must be enabled:
- *	CONFIG_USB_PD_TCPMV1 - legacy power delivery state machine
  *	CONFIG_USB_PD_TCPMV2 - current power delivery state machine
  *	CONFIG_USB_PD_CONTROLLER - power delivery controller state machine
+ * TCPMv1 is not supported in platform/ec (see platform/ec-legacy)
  */
 #undef CONFIG_USB_POWER_DELIVERY
-
-/*
- * Enables the Legacy power delivery state machine.
- * NOTE: Should not be used for new designs.
- */
-#undef CONFIG_USB_PD_TCPMV1
-
-/*
- * Enables PD protocol state names in the TPCMv1 console output.
- * Disable to save ~900 bytes in flash space.
- */
-#define CONFIG_USB_PD_TCPMV1_DEBUG
 
 /*
  * Enables Version 2 of the Power Delivery state machine
@@ -4806,7 +4704,7 @@
 #define CONFIG_USB_PD_CONSOLE_CMD
 
 /* Enables PD Host commands */
-#ifdef HAS_TASK_HOSTCMD
+#ifdef CONFIG_HAS_HOSTCMD
 #define CONFIG_USB_PD_HOST_CMD
 #endif
 
@@ -4955,9 +4853,6 @@
 
 /* Enable Displayport 2.1 Capability */
 #undef CONFIG_USB_PD_DP21_MODE
-
-/* Dynamic USB PD source capability */
-#undef CONFIG_USB_PD_DYNAMIC_SRC_CAP
 
 /* Support USB PD flash. */
 #undef CONFIG_USB_PD_FLASH
@@ -5490,17 +5385,6 @@
 /* SYV682 does not pass through CC, instead it bypasses to the TCPC */
 #undef CONFIG_USBC_PPC_SYV682X_NO_CC
 
-/*
- * TODO(b/445132756): This config is now a no-op.
- *
- * Smart discharge support in the SYV682x driver has been removed due to
- * unreliable behavior (see bug for details). This config is kept temporarily
- * to avoid breaking builds for boards that may still define it.
- *
- */
-/* Define to enable SYV682X VBUS smart discharge. */
-#undef CONFIG_USBC_PPC_SYV682X_SMART_DISCHARGE
-
 /* PPC is capable of gating the SBU lines. */
 #undef CONFIG_USBC_PPC_SBU
 
@@ -5739,13 +5623,6 @@
 
 /* Default pull-up value on the USB-C ports when they are used as source. */
 #define CONFIG_USB_PD_PULLUP TYPEC_RP_1A5
-/*
- * Override the pull-up value when only zero or one port is actively sourcing
- * current and we can advertise more current than what is defined by
- * `CONFIG_USB_PD_PULLUP`.
- * Should be defined with one of the tcpc_rp_value.
- */
-#undef CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT
 
 /*
  * Ignore all non-fixed PDOs received from a src_caps message. Enable this for
@@ -5754,21 +5631,14 @@
 #undef CONFIG_USB_PD_ONLY_FIXED_PDOS
 
 /*
- * Total current in mA the board can supply to external devices through
- * USB-C ports
- *
- * When a sink device is plugged or unplugged, source current redistribution
- * occurs. If this macro is defined, redistribution occurs in such a way
- * that there is no current drop (e.g. 3A -> 1.5A) on active source ports.
- */
-#undef CONFIG_USB_PD_MAX_TOTAL_SOURCE_CURRENT
-
-/*
  * Maximum number of interrupts in a second. Exceeding this limit
  * will cause the TCPM to break the PD connection to avoid a
- * watchdog timeout crash
+ * watchdog timeout crash.
+ *
+ * The default of 500 (one every 2ms) is chosen to cover normal PD
+ * behavior while mitigating interrupt storms.
  */
-#define CONFIG_USB_PD_INT_STORM_MAX 1800
+#define CONFIG_USB_PD_INT_STORM_MAX 500
 
 /******************************************************************************/
 /* stm32f4 dwc usb configs. */
@@ -6259,21 +6129,18 @@
 /******************************************************************************/
 /*
  * If CONFIG_USB_POWER_DELIVERY is enabled, make sure either
- * CONFIG_USB_PD_TCPMV1 or CONFIG_USB_PD_TCPMV2 is enabled but not both. Also
- * make sure CONFIG_USB_PD_DECODE_SOP is enabled with CONFIG_USB_PD_TCPMV2
+ * CONFIG_USB_PD_CONTROLLER or CONFIG_USB_PD_TCPMV2 is enabled but not both.
+ * Also make sure CONFIG_USB_PD_DECODE_SOP is enabled with CONFIG_USB_PD_TCPMV2
  */
 #ifdef CONFIG_USB_POWER_DELIVERY
-#if defined(CONFIG_USB_PD_TCPMV1) && defined(CONFIG_USB_PD_TCPMV2)
-#error Only one version of the USB PD State Machine can be enabled.
+#if defined(CONFIG_USB_PD_TCPMV2) == defined(CONFIG_USB_PD_CONTROLLER)
+#error Enable exactly one of CONFIG_USB_PD_TCPMV2 or CONFIG_USB_PD_CONTROLLER
 #endif
-#if !defined(CONFIG_USB_PD_TCPMV1) && !defined(CONFIG_USB_PD_TCPMV2) && \
-	!defined(CONFIG_USB_PD_CONTROLLER)
-#error Please enable CONFIG_USB_PD_TCPMV1 or CONFIG_USB_PD_TCPMV2 or CONFIG_USB_PD_CONTROLLER.
-#endif
+
 #if defined(CONFIG_USB_PD_TCPMV2) && !defined(CONFIG_USB_PD_DECODE_SOP)
 #error CONFIG_USB_PD_DECODE_SOP must be enabled with the TCPMV2 PD state machine
 #endif
-#endif
+#endif /* CONFIG_USB_POWER_DELIVERY */
 
 /******************************************************************************/
 /*
@@ -6360,10 +6227,6 @@
  * CONFIG_USB_PD_3A_PORTS to 0.
  */
 #ifdef CONFIG_USB_PD_TCPMV2
-#if defined(CONFIG_USB_PD_MAX_TOTAL_SOURCE_CURRENT) || \
-	defined(CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT)
-#error Define CONFIG_USB_PD_MAX_SINGLE_SOURCE_CURRENT is limited to TCPMv1
-#endif
 #ifndef CONFIG_USB_PD_3A_PORTS
 #define CONFIG_USB_PD_3A_PORTS 1
 #endif
@@ -7368,14 +7231,6 @@
 #endif
 #endif /* defined(CONFIG_USB_PD_TCPM_PS8705) + ... */
 
-/*
- * CONFIG_HOSTCMD_TYPEC_CONTROL is not supported for TCPMv1, so disable it in
- * that case.
- */
-#ifdef CONFIG_USB_PD_TCPMV1
-#undef CONFIG_HOSTCMD_TYPEC_CONTROL
-#endif /* CONFIG_USB_PD_TCPMV1 */
-
 /******************************************************************************/
 /* Check body detection setup */
 #if defined(CONFIG_BODY_DETECTION)
@@ -7465,22 +7320,14 @@
 #define ALS_COUNT 0
 #endif /* CONFIG_ALS */
 
-/*
- * If the EC has exclusive control over CBI EEPROM WP, don't consult the main
- * flash WP.
- */
-#ifdef CONFIG_EEPROM_CBI_WP
-#define CONFIG_BYPASS_CBI_EEPROM_WP_CHECK
-#endif
-
 #if defined(CONFIG_EEPROM_CBI_WP) && !defined(CONFIG_CBI_EEPROM)
 #error "CONFIG_EEPROM_CBI_WP requires CONFIG_CBI_EEPROM to be defined!"
 #endif
 
 #if defined(CONFIG_BYPASS_CBI_EEPROM_WP_CHECK) && \
-	!defined(CONFIG_SYSTEM_UNLOCKED) && !defined(CONFIG_EEPROM_CBI_WP)
+	!defined(CONFIG_SYSTEM_UNLOCKED)
 #error "CONFIG_BYPASS_CBI_EEPROM_WP_CHECK is only permitted " \
-	"when CONFIG_SYSTEM_UNLOCK or CONFIG_EEPROM_CBI_WP is also enabled."
+	"when CONFIG_SYSTEM_UNLOCK is also enabled."
 #endif /* CONFIG_BYPASS_CBI_EEPROM_WP_CHECK && !CONFIG_SYSTEM_UNLOCK */
 
 #if defined(CONFIG_BOARD_VERSION_CBI) && defined(CONFIG_BOARD_VERSION_GPIO)
@@ -7558,4 +7405,4 @@
 #include "private_config.h"
 #endif /* HAVE_PRIVATE */
 
-#endif /* __CROS_EC_CONFIG_H */
+#endif /* PLATFORM_EC_INCLUDE_CONFIG_H_ */

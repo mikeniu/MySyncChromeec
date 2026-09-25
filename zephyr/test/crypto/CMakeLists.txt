@@ -7,5 +7,6 @@ find_package(Zephyr REQUIRED HINTS "${ZEPHYR_BASE}")
 project(crypto)
 
 target_sources_ifdef(CONFIG_TEST_SHA256 app PRIVATE src/sha256.c)
+target_sources_ifdef(CONFIG_TEST_X25519 app PRIVATE src/x25519.c)
 
 add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)

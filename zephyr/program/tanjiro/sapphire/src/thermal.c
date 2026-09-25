@@ -19,8 +19,8 @@ typedef enum {
 	LIMIT_NONE = 9999,
 	LIMIT_2500 = 2500,
 	LIMIT_2000 = 2000,
-	LIMIT_1500 = 1500,
-	LIMIT_700 = 700
+	LIMIT_1600 = 1600,
+	LIMIT_500 = 500
 } charge_limit_t;
 
 typedef struct {
@@ -29,13 +29,13 @@ typedef struct {
 } temp_limit_t;
 
 static const charge_limit_t limit_table[LIMIT_LEVELS] = {
-	LIMIT_NONE, LIMIT_2500, LIMIT_2000, LIMIT_1500, LIMIT_700
+	LIMIT_NONE, LIMIT_2500, LIMIT_2000, LIMIT_1600, LIMIT_500
 };
 
-static const temp_limit_t charge_temp_limits[LIMIT_LEVELS - 1] = { { 40, 35 },
-								   { 60, 57 },
-								   { 65, 62 },
-								   { 70, 67 } };
+static const temp_limit_t charge_temp_limits[LIMIT_LEVELS - 1] = { { 36, 34 },
+								   { 44, 38 },
+								   { 48, 43 },
+								   { 57, 48 } };
 
 static void update_charge_limit(void)
 {

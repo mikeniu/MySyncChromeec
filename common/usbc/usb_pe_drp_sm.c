@@ -1651,7 +1651,7 @@ static bool pe_should_send_data_reset(const int port)
 	const struct pd_discovery *disc =
 		pd_get_am_discovery(port, TCPCI_MSG_SOP);
 	const enum idh_ptype ufp_ptype = pd_get_product_type(port);
-	const union ufp_vdo_rev30 ufp_vdo = {
+	const union ufp_vdo_rev3 ufp_vdo = {
 		.raw_value = disc->identity_cnt >= VDO_INDEX_PTYPE_UFP1_VDO ?
 				     disc->identity.product_t1.raw_value :
 				     0
@@ -1666,8 +1666,8 @@ static bool pe_should_send_data_reset(const int port)
 		* products to not respond to it at all).
 		*/
 	       (ufp_ptype == IDH_PTYPE_HUB || ufp_ptype == IDH_PTYPE_PERIPH) &&
-	       ((ufp_vdo.device_capability & VDO_UFP1_CAPABILITY_USB4) ||
-		ufp_vdo.alternate_modes);
+	       (ufp_vdo.usb4_cap || ufp_vdo.tbt_support ||
+		ufp_vdo.non_tbt3_signal_reconfig || ufp_vdo.no_signal_reconfig);
 }
 
 /*
@@ -4237,7 +4237,7 @@ static void pe_snk_hard_reset_entry(int port)
 	 * customer.  For systems which should have a battery, this condition is
 	 * not expected to be encountered by a customer.
 	 */
-	if (IS_ENABLED(CONFIG_BATTERY) && (battery_is_present() == BP_NO) &&
+	if (IS_ENABLED(CONFIG_BATTERY) && (battery_is_present() != BP_YES) &&
 	    IS_ENABLED(CONFIG_CHARGE_MANAGER) &&
 	    ((port == charge_manager_get_active_charge_port() ||
 	      (charge_manager_get_active_charge_port() == CHARGE_PORT_NONE))) &&
@@ -4632,7 +4632,7 @@ static void pe_give_battery_cap_entry(int port)
 		msg[BCDB_FULL_CAP] = 0;
 		/* Set invalid battery bit in response bit 0, byte 8 */
 		msg[BCDB_BATT_TYPE] = 1;
-	} else if (battery_is_present()) {
+	} else if (battery_is_present() == BP_YES) {
 		/*
 		 * The Battery Design Capacity field shall return the
 		 * Battery’s design capacity in tenths of Wh. If the
@@ -4654,7 +4654,7 @@ static void pe_give_battery_cap_entry(int port)
 		 */
 		msg[BCDB_FULL_CAP] = 0xffff;
 
-		if (IS_ENABLED(HAS_TASK_HOSTCMD) &&
+		if (IS_ENABLED(CONFIG_HAS_HOSTCMD) &&
 		    *host_get_memmap(EC_MEMMAP_BATTERY_VERSION) != 0) {
 			int design_volt, design_cap, full_cap;
 
@@ -4736,7 +4736,7 @@ static void pe_give_battery_status_entry(int port)
 		return;
 	print_current_state(port);
 
-	if (battery_is_present()) {
+	if (battery_is_present() == BP_YES) {
 		/*
 		 * We only have one fixed battery,
 		 * so make sure batt cap ref is 0.
@@ -4752,7 +4752,7 @@ static void pe_give_battery_status_entry(int port)
 
 			*msg = BSDO_CAP(BSDO_CAP_UNKNOWN);
 
-			if (IS_ENABLED(HAS_TASK_HOSTCMD) &&
+			if (IS_ENABLED(CONFIG_HAS_HOSTCMD) &&
 			    *host_get_memmap(EC_MEMMAP_BATTERY_VERSION) != 0) {
 				v = *(int *)host_get_memmap(
 					EC_MEMMAP_BATT_DVLT);
@@ -5004,6 +5004,18 @@ static void pe_drs_evaluate_swap_run(int port)
 		/* Accept Message sent. Transtion to PE_DRS_Change */
 		if (PE_CHK_FLAG(port, PE_FLAGS_ACCEPT)) {
 			PE_CLR_FLAG(port, PE_FLAGS_ACCEPT);
+			/*
+			 * Update the data role in TCPC message-header register
+			 * immediately after Accept TX complete (DR_Swap)
+			 * instead of waiting for the TC state machine. This
+			 * reduces latency so that if the partner starts a new
+			 * AMS shortly after Accept, GoodCRC is sent with the
+			 * correct data role.
+			 */
+			tc_set_msg_header_data_role(
+				port, pe[port].data_role == PD_ROLE_UFP ?
+					      PD_ROLE_DFP :
+					      PD_ROLE_UFP);
 			set_state_pe(port, PE_DRS_CHANGE);
 		} else {
 			/*

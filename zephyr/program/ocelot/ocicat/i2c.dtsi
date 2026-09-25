@@ -45,6 +45,8 @@
 
 &i2c2 {
 	status = "okay";
+	scl-gpios = < &gpioc 7 0x0 >;
+	sda-gpios = < &gpiod 0 0x0 >;
 	pinctrl-0 = <&i2c2_clk_gpc7_default
 		&i2c2_data_gpd0_default>;
 	pinctrl-names = "default";
@@ -63,6 +65,8 @@
 
 &i2c5 {
 	status = "okay";
+	scl-gpios = < &gpioe 1 0x0 >;
+	sda-gpios = < &gpioe 2 0x0 >;
 	pinctrl-0 = <&i2c5_clk_gpe1_default
 		     &i2c5_data_gpe2_default>;
 	pinctrl-names = "default";

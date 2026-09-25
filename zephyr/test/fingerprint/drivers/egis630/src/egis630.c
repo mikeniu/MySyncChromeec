@@ -15,6 +15,7 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/ztest.h>
 #include <zephyr/ztest_assert.h>
+#include <zephyr/ztest_error_hook.h>
 
 #include <drivers/fingerprint.h>
 #include <emul/emul_egis630.h>
@@ -53,6 +54,9 @@ static void egis630_before(void *data)
 
 /* Maps Egis image capture errors to fingerprint errors. */
 int convert_egis_get_image_error_code(egis_api_return_t code);
+
+/* Returns the usable size of a block previously returned by sys_alloc(). */
+size_t sys_alloc_usable_size(void *data);
 
 /* Converts capture types from the ec domain to the egis domain. */
 egis_capture_mode_t convert_fp_capture_type_to_egis_capture_type(
@@ -192,7 +196,7 @@ ZTEST_F(egis630, test_convert_fp_capture_type_to_egis_capture_type)
 {
 	zassert_equal(convert_fp_capture_type_to_egis_capture_type(
 			      FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT),
-		      EGIS_CAPTURE_NORMAL_FORMAT);
+		      EGIS_CAPTURE_IMAGE_COLLECTION);
 	zassert_equal(convert_fp_capture_type_to_egis_capture_type(
 			      FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE),
 		      EGIS_CAPTURE_NORMAL_FORMAT);
@@ -259,8 +263,8 @@ ZTEST_F(egis630, test_acquire_image_wrong_capture_type)
 ZTEST_F(egis630, test_plat_get_time)
 {
 	uint64_t time_msecs = egis630_plat_get_time();
-	uint64_t ecpected_time_mecs = k_uptime_get();
-	zassert_equal(time_msecs, ecpected_time_mecs);
+	uint64_t expected_time_msecs = k_uptime_get();
+	zassert_equal(time_msecs, expected_time_msecs);
 }
 
 ZTEST_F(egis630, test_plat_wait_time)
@@ -317,16 +321,196 @@ ZTEST_F(egis630, test_sys_alloc_normal)
 	sys_free(void_ptr);
 }
 
+ZTEST_F(egis630, test_sys_alloc_honors_count)
+{
+	size_t count = 5;
+	size_t size = sizeof(uint32_t);
+
+	void *ptr = sys_alloc(count, size);
+	zassert_not_null(ptr, "sys_alloc failed to allocate block");
+
+	size_t usable_size = sys_alloc_usable_size(ptr);
+	zassert_true(usable_size >= count * size,
+		     "Expected usable size at least %zu, got %zu", count * size,
+		     usable_size);
+
+	sys_free(ptr);
+}
+
+ZTEST_F(egis630, test_sys_alloc_zero_elements)
+{
+	ztest_set_fault_valid(true);
+
+	sys_alloc(0, 16);
+
+	zassert_unreachable("sys_alloc(0, 16) did not trigger k_oops()");
+}
+
+ZTEST_F(egis630, test_sys_alloc_zero_size)
+{
+	ztest_set_fault_valid(true);
+
+	sys_alloc(8, 0);
+
+	zassert_unreachable("sys_alloc(8, 0) did not trigger k_oops()");
+}
+
+ZTEST_F(egis630, test_plat_realloc_shrinking_prevents_over_read)
+{
+	size_t old_size = 64;
+	uint8_t *old_ptr = sys_alloc(1, old_size);
+	zassert_not_null(old_ptr);
+	memset(old_ptr, 0xA5, old_size);
+
+	size_t new_size = 16;
+	uint8_t *new_ptr = plat_realloc(old_ptr, new_size);
+	zassert_not_null(new_ptr, "plat_realloc failed to shrink");
+
+	zassert_true(sys_alloc_usable_size(new_ptr) >= new_size,
+		     "Usable size is smaller than requested shrink size");
+	for (size_t i = 0; i < new_size; i++) {
+		zassert_equal(new_ptr[i], 0xA5,
+			      "Corrupt data after shrink at byte %zu", i);
+	}
+
+	sys_free(new_ptr);
+}
+
+ZTEST_F(egis630, test_plat_realloc_growing_bounds_copy)
+{
+	size_t old_size = 8;
+	uint8_t *old_ptr = sys_alloc(1, old_size);
+	zassert_not_null(old_ptr);
+	memset(old_ptr, 0x5A, old_size);
+
+	size_t new_size = 32;
+	uint8_t *new_ptr = plat_realloc(old_ptr, new_size);
+	zassert_not_null(new_ptr, "plat_realloc failed to grow");
+
+	zassert_true(sys_alloc_usable_size(new_ptr) >= new_size,
+		     "Usable size is smaller than requested grow size");
+	for (size_t i = 0; i < old_size; i++) {
+		zassert_equal(new_ptr[i], 0x5A, "Corrupt data at byte %zu", i);
+	}
+
+	sys_free(new_ptr);
+}
+
+ZTEST_F(egis630, test_plat_realloc_zero_size)
+{
+	/* Allocate valid starting arena */
+	void *ptr = sys_alloc(1, 128);
+	zassert_not_null(ptr, "Initial allocation of 128 bytes failed");
+
+	/* Resize target size down to 0. */
+	void *realloc_ptr = plat_realloc(ptr, 0);
+
+	/* Realloc to 0 frees memory and returns NULL. */
+	zassert_is_null(realloc_ptr,
+			"realloc to 0 size should free memory and return NULL");
+
+	/*
+	 * Ensure NULL realloc with zero target size is cleanly handled and also
+	 * returns NULL.
+	 */
+	void *null_realloc = plat_realloc(NULL, 0);
+	zassert_is_null(null_realloc, "realloc(NULL, 0) should return NULL");
+}
+
+ZTEST_F(egis630, test_sys_alloc_usable_size_handles_null)
+{
+	zassert_equal(sys_alloc_usable_size(NULL), 0,
+		      "sys_alloc_usable_size should return 0 on NULL input");
+}
+
+ZTEST_F(egis630, test_plat_calloc_initializes_normal)
+{
+	size_t count = 10;
+	size_t size = sizeof(uint16_t);
+
+	uint16_t *ptr = plat_calloc(count, size);
+	zassert_not_null(ptr, "plat_calloc returned NULL");
+
+	size_t usable_size = sys_alloc_usable_size(ptr);
+	zassert_true(usable_size >= count * size,
+		     "Mismatch in calloc usable size");
+
+	for (size_t i = 0; i < count; i++) {
+		zassert_equal(
+			ptr[i], 0,
+			"plat_calloc failed to zero-initialize at index %zu",
+			i);
+	}
+	sys_free(ptr);
+}
+
+ZTEST_F(egis630, test_plat_calloc_overflow_panics)
+{
+	ztest_set_fault_valid(true);
+
+	plat_calloc(SIZE_MAX / 2, 4);
+
+	zassert_unreachable("plat_calloc overflow did not trigger k_oops()");
+}
+
+ZTEST_F(egis630, test_sys_alloc_huge_size_panics)
+{
+	ztest_set_fault_valid(true);
+
+	size_t malicious_size = SIZE_MAX - 2;
+	sys_alloc(1, malicious_size);
+
+	zassert_unreachable("sys_alloc huge size OOM did not trigger k_oops()");
+}
+
+ZTEST_F(egis630, test_sys_alloc_multiplication_overflow_panics)
+{
+	ztest_set_fault_valid(true);
+
+	sys_alloc(SIZE_MAX / 2 + 1, 2);
+
+	zassert_unreachable(
+		"sys_alloc multiplication overflow did not trigger k_oops()");
+}
+
+ZTEST_F(egis630, test_sys_alloc_oom_panics)
+{
+	ztest_set_fault_valid(true);
+
+	sys_alloc(1, CONFIG_FINGERPRINT_SENSOR_EGIS630_HEAP_SIZE + 256);
+
+	zassert_unreachable("sys_alloc OOM did not trigger k_oops()");
+}
+
+ZTEST_F(egis630, test_sys_free_handles_null)
+{
+	sys_free(NULL);
+	zassert_true(true, "sys_free successfully handled NULL");
+}
+
+ZTEST_F(egis630, test_plat_realloc_null_data)
+{
+	size_t size = 32;
+	void *ptr = plat_realloc(NULL, size);
+
+	zassert_not_null(ptr,
+			 "plat_realloc(NULL, size) should allocate new memory");
+	zassert_true(sys_alloc_usable_size(ptr) >= size,
+		     "Allocated size mismatch");
+
+	sys_free(ptr);
+}
+
 ZTEST_F(egis630, test_periphery_spi_write_read_success)
 {
 	uint8_t tx_buf[1] = { 0xFD };
 	uint8_t rx_buf[3] = { 0 };
-	uint8_t expeceted_rx_buf[3] = { 0x1, 0x1E, 0x6 };
+	uint8_t expected_rx_buf[3] = { 0x1, 0x1E, 0x6 };
 
 	zassert_ok(fingerprint_init(fixture->dev));
 	zassert_ok(egis630_periphery_spi_write_read(tx_buf, sizeof(tx_buf),
 						    rx_buf, sizeof(rx_buf)));
-	zassert_mem_equal(rx_buf, expeceted_rx_buf, sizeof(expeceted_rx_buf),
+	zassert_mem_equal(rx_buf, expected_rx_buf, sizeof(expected_rx_buf),
 			  "Received data does not match sent data");
 }
 
@@ -415,6 +599,34 @@ ZTEST_F(egis630, test_output_log_format_no_logging_info_greater_than_debug)
 {
 	output_log(LOG_DEBUG, "tag", "file", "func", 10, "info %.1f", 2.1f);
 	zassert_equal(printf_buffer[0], '\0');
+}
+
+ZTEST_F(egis630, test_output_log_invalid_level)
+{
+	char expected_printf_buffer[sizeof(printf_buffer)];
+
+	memset(expected_printf_buffer, 0, sizeof(expected_printf_buffer));
+	snprintf(expected_printf_buffer, sizeof(expected_printf_buffer),
+		 "<func:10> invalid level 123");
+
+	/* 9 is above the maximum valid level (LOG_ASSERT = 7). */
+	output_log((LOG_LEVEL)9, "tag", "file", "func", 10, "invalid level %d",
+		   123);
+
+	zassert_mem_equal(printf_buffer, expected_printf_buffer,
+			  sizeof(printf_buffer),
+			  "LOG message did not match expected message");
+}
+
+ZTEST_F(egis630, test_output_log_filtered_below_min)
+{
+	/* 0 is below the minimum valid level (LOG_VERBOSE = 2). */
+	output_log((LOG_LEVEL)0, "tag", "file", "func", 10,
+		   "should be filtered");
+
+	zassert_equal(
+		printf_buffer[0], '\0',
+		"Buffer should remain completely empty when filtered early");
 }
 
 ZTEST_F(egis630, test_set_debug_level_success_verbose)

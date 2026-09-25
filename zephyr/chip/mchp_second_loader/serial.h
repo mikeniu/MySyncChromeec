@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef SERIAL_H
-#define SERIAL_H
+#ifndef PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_SERIAL_H_
+#define PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_SERIAL_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -14,4 +14,4 @@ void serial_send_host_char(uint8_t data);
 bool serial_receive_host_char(uint8_t *rx_data);
 enum failure_resp_type serial_receive_host_bytes(uint8_t *buff, uint8_t len);
 
-#endif /* #ifndef SERIAL_H */
+#endif /* PLATFORM_EC_ZEPHYR_CHIP_MCHP_SECOND_LOADER_SERIAL_H_ */

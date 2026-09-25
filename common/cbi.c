@@ -21,6 +21,9 @@
 #include "util.h"
 #endif
 
+#define CBI_END(h) ((const uint8_t *)(h) + (h)->total_size)
+#define CBI_NEXT_ENTRY(d) ((const uint8_t *)(d) + sizeof(*(d)) + (d)->size)
+
 /*
  * Functions and variables defined here shared with host tools (e.g. cbi-util).
  * TODO: Move these to common/cbi/cbi.c and common/cbi/utils.c if they grow.
@@ -62,12 +65,22 @@ struct cbi_data *cbi_find_tag(const void *buf, enum cbi_data_tag tag)
 {
 	struct cbi_data *d;
 	const struct cbi_header *h = (struct cbi_header *)buf;
+	const uint8_t *end = CBI_END(h);
 	const uint8_t *p;
-	for (p = h->data; p + sizeof(*d) < (uint8_t *)buf + h->total_size;) {
+
+	if (h->total_size > CBI_IMAGE_SIZE)
+		return NULL;
+
+	for (p = h->data; p + sizeof(*d) <= end;) {
 		d = (struct cbi_data *)p;
+
+		/* Check that the payload fits within the buffer boundaries */
+		if (CBI_NEXT_ENTRY(d) > end)
+			break;
+
 		if (d->tag == tag)
 			return d;
-		p += sizeof(*d) + d->size;
+		p = CBI_NEXT_ENTRY(d);
 	}
 	return NULL;
 }
@@ -223,6 +236,9 @@ test_mockable int cbi_set_board_info(enum cbi_data_tag tag, const uint8_t *buf,
 				     uint8_t size)
 {
 	struct cbi_data *d;
+	bool is_resize = false;
+	size_t old_entry_size = 0;
+	size_t new_entry_size = 0;
 
 	d = cbi_find_tag(cbi, tag);
 
@@ -237,17 +253,30 @@ test_mockable int cbi_set_board_info(enum cbi_data_tag tag, const uint8_t *buf,
 	}
 #endif
 
-	/* If we found the entry, but the size doesn't match, delete it */
 	if (d && d->size != size) {
+		is_resize = true;
+		old_entry_size = sizeof(*d) + d->size;
+	}
+
+	if (!d || is_resize) {
+		if (size > 0)
+			new_entry_size = sizeof(*d) + size;
+
+		/* Check if new item would fit before making any modifications
+		 */
+		if (sizeof(cbi) <
+		    head->total_size - old_entry_size + new_entry_size)
+			return EC_ERROR_OVERFLOW;
+	}
+
+	/* Delete old entry if we are resizing or removing it */
+	if (is_resize) {
 		cbi_remove_tag(cbi, d);
 		d = NULL;
 	}
 
 	if (!d) {
 		uint8_t *p;
-		/* Not found. Check if new item would fit */
-		if (sizeof(cbi) < head->total_size + sizeof(*d) + size)
-			return EC_ERROR_OVERFLOW;
 		/* Append new item */
 		p = cbi_set_data(&cbi[head->total_size], tag, buf, size);
 		head->total_size = p - cbi;
@@ -331,7 +360,7 @@ common_cbi_set(const struct __ec_align4 ec_params_set_cbi *p)
 	 * If we ultimately cannot write to the flash, then fail early unless
 	 * we are explicitly trying to write to the in-memory CBI only
 	 */
-	if (cbi_config->drv->is_protected() && !(p->flag & CBI_SET_NO_SYNC)) {
+	if (cbi_config->drv->is_protected()) {
 		CPRINTS("Failed to write due to WP");
 		return EC_RES_ACCESS_DENIED;
 	}
@@ -362,10 +391,6 @@ common_cbi_set(const struct __ec_align4 ec_params_set_cbi *p)
 	head->minor_version = CBI_VERSION_MINOR;
 	head->crc = cbi_crc8(head);
 	cache_status = CBI_CACHE_STATUS_SYNCED;
-
-	/* Skip write if client asks so. */
-	if (p->flag & CBI_SET_NO_SYNC)
-		return EC_RES_SUCCESS;
 
 	/* We already checked write protect failure case. */
 	if (cbi_write())
@@ -428,6 +453,9 @@ DECLARE_HOST_COMMAND(EC_CMD_CBI_BIN_READ, hc_cbi_bin_read, EC_VER_MASK(0));
 static bool is_valid_cbi(const uint8_t *cbi)
 {
 	const struct cbi_header *head = (const struct cbi_header *)cbi;
+	const uint8_t *end = CBI_END(head);
+	const uint8_t *p;
+	struct cbi_data *d;
 
 	/* Check magic */
 	if (memcmp(head->magic, cbi_magic, sizeof(head->magic))) {
@@ -435,7 +463,7 @@ static bool is_valid_cbi(const uint8_t *cbi)
 		return false;
 	}
 
-	/* check version */
+	/* Check version */
 	if (head->major_version > CBI_VERSION_MAJOR) {
 		CPRINTS("Bad CBI version");
 		return false;
@@ -455,6 +483,16 @@ static bool is_valid_cbi(const uint8_t *cbi)
 	if (cbi_crc8(head) != head->crc) {
 		CPRINTS("Bad CRC");
 		return false;
+	}
+
+	/* Check TLV sizes to prevent caching malformed tags */
+	for (p = head->data; p + sizeof(*d) <= end;) {
+		d = (struct cbi_data *)p;
+		if (CBI_NEXT_ENTRY(d) > end) {
+			CPRINTS("Bad CBI TLV size");
+			return false;
+		}
+		p = CBI_NEXT_ENTRY(d);
 	}
 
 	return true;
@@ -483,27 +521,27 @@ static enum ec_status hc_cbi_bin_write(struct host_cmd_handler_args *args)
 	if ((p->offset + p->size) > CBI_FLASH_SIZE)
 		return EC_RES_INVALID_PARAM;
 
+	if (p->offset >= CBI_IMAGE_SIZE) {
+		CPRINTS("CBI buffer overflow");
+		return EC_RES_INVALID_PARAM;
+	}
+
+	cbi_invalidate_cache();
+
 	if (p->flags & EC_CBI_BIN_BUFFER_CLEAR)
 		memset(cbi, 0xFF, CBI_IMAGE_SIZE);
 
-	if (p->offset < CBI_IMAGE_SIZE) {
-		uint32_t write_size = p->size;
+	uint32_t write_size = p->size;
+	if ((p->offset + p->size) > CBI_IMAGE_SIZE)
+		write_size = CBI_IMAGE_SIZE - p->offset;
 
-		if ((p->offset + p->size) > CBI_IMAGE_SIZE)
-			write_size = CBI_IMAGE_SIZE - p->offset;
-
-		memcpy(cbi + p->offset, p->data, write_size);
-	} else {
-		CPRINTS("CBI buffer overflow");
-		return EC_RES_ERROR;
-	}
+	memcpy(cbi + p->offset, p->data, write_size);
 	if (p->flags & EC_CBI_BIN_BUFFER_WRITE) {
 		if (is_valid_cbi(cbi)) {
 			if (cbi_config->drv->store(cbi)) {
 				CPRINTS("Failed to write CBI");
 				return EC_RES_ERROR;
 			}
-			cbi_invalidate_cache();
 			cbi_read();
 			if (cbi_get_cache_status() != CBI_CACHE_STATUS_SYNCED) {
 				CPRINTF("Cannot Read CBI (Error %d)\n",
@@ -623,6 +661,12 @@ static int cc_cbi(int argc, const char **argv)
 				ccprintf("Set requires: <tag> <hex_string>\n");
 				return EC_ERROR_PARAM_COUNT;
 			}
+		} else if (setter->tag == CBI_TAG_DRAM_PART_NUM ||
+			   setter->tag == CBI_TAG_OEM_NAME) {
+			if (argc < 4) {
+				ccprintf("Set requires: <tag> <string>\n");
+				return EC_ERROR_PARAM_COUNT;
+			}
 		} else {
 			if (argc < 5) {
 				ccprintf(
@@ -634,9 +678,13 @@ static int cc_cbi(int argc, const char **argv)
 		if (setter->tag == CBI_TAG_DRAM_PART_NUM ||
 		    setter->tag == CBI_TAG_OEM_NAME) {
 			setter->size = strlen(argv[3]) + 1;
+			if (setter->size > CONFIG_CONSOLE_INPUT_LINE_SIZE) {
+				ccprintf("String too long\n");
+				return EC_ERROR_PARAM3;
+			}
 			memcpy(setter->data, argv[3], setter->size);
 
-			last_arg = 5;
+			last_arg = 4;
 
 		} else if (setter->tag == CBI_TAG_UFSC) {
 			const char *val_str = argv[3];
@@ -711,8 +759,6 @@ static int cc_cbi(int argc, const char **argv)
 		for (i = last_arg; i < argc; i++) {
 			if (strcasecmp(argv[i], "init") == 0) {
 				setter->flag |= CBI_SET_INIT;
-			} else if (strcasecmp(argv[i], "skip_write") == 0) {
-				setter->flag |= CBI_SET_NO_SYNC;
 			} else {
 				ccprintf("Invalid option: %s\n", argv[i]);
 				return EC_ERROR_PARAM1 + i - 1;
@@ -734,7 +780,7 @@ static int cc_cbi(int argc, const char **argv)
 
 DECLARE_CONSOLE_COMMAND(cbi, cc_cbi,
 			"[set <tag> <value> <size> | "
-			"remove <tag>] [init | skip_write]",
+			"remove <tag>] [init]",
 			"Print or change Cros Board Info from flash");
 #endif /* CONFIG_CMD_CBI */
 

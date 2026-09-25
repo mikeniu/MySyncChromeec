@@ -5,6 +5,7 @@
 
 #include "cros_board_info.h"
 #include "cros_cbi.h"
+#include "ec_commands.h"
 #include "host_command.h"
 #include "test/drivers/test_mocks.h"
 #include "test/drivers/test_state.h"
@@ -107,6 +108,69 @@ ZTEST(common_cbi, test_cbi_set_string)
 	/* Validate that next address for write was set appropriately */
 	zassert_equal_ptr(addr_byte_after_store - expected_added_memory,
 			  &cbi_data.data);
+}
+
+ZTEST_USER(common_cbi, test_cbi_find_tag_out_of_bounds)
+{
+	struct test_cbi_blob {
+		struct cbi_header cbi_head;
+		struct cbi_data cbi_data;
+	} __packed blob = {
+		.cbi_head = {
+			.magic = { 0x43, 0x42, 0x49 }, /* 'C', 'B', 'I' */
+			.version = 0,
+			.total_size = sizeof(struct test_cbi_blob),
+		},
+		.cbi_data = {
+			.tag = 1,
+			.size = 10, /* Size exceeds bounds limit */
+		},
+	};
+	blob.cbi_head.crc = cbi_crc8(&blob.cbi_head);
+
+	zassert_is_null(cbi_find_tag(&blob, 1), NULL);
+}
+
+ZTEST_USER(common_cbi, test_is_valid_cbi_out_of_bounds)
+{
+	struct test_cbi_blob {
+		struct cbi_header cbi_head;
+		struct cbi_data cbi_data;
+	} __packed blob = {
+		.cbi_head = {
+			.magic = { 0x43, 0x42, 0x49 }, /* 'C', 'B', 'I' */
+			.version = 0,
+			.total_size = sizeof(struct test_cbi_blob),
+		},
+		.cbi_data = {
+			.tag = 1,
+			.size = 10, /* Size exceeds bounds limit */
+		},
+	};
+	blob.cbi_head.crc = cbi_crc8(&blob.cbi_head);
+
+	struct actual_set_params {
+		struct ec_params_set_cbi_bin params;
+		uint8_t actual_data[sizeof(blob)];
+	};
+
+	struct actual_set_params hc_set_params = {
+		.params = {
+		.offset = 0,
+		.size = sizeof(blob),
+		.flags = EC_CBI_BIN_BUFFER_CLEAR | EC_CBI_BIN_BUFFER_WRITE,
+		},
+	};
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_CBI_BIN_WRITE, 0, hc_set_params);
+
+	memcpy(hc_set_params.params.data, &blob, sizeof(blob));
+
+	/* Turn off write-protect so we can actually write */
+	gpio_wp_l_set(1);
+
+	zassert_not_equal(host_command_process(&set_args), EC_RES_SUCCESS,
+			  NULL);
 }
 
 ZTEST_USER(common_cbi, test_hc_cbi_set_then_get)
@@ -230,30 +294,41 @@ ZTEST_USER(common_cbi, test_hc_cbi_set_then_get__with_too_small_response)
 
 ZTEST_USER(common_cbi, test_hc_cbi_bin_write_then_read)
 {
-	/*
-	 * cbi_bin commands will do a validity check on the header.
-	 * This data allows the cbi to pass the validity check.
-	 */
-	const uint8_t data[] = {
-		0x43, 0x42, 0x49, 0x96, 0x00, 0x00, 0x30, 0x00
+	/* Create a valid CBI blob with the header and 1 TLVs. */
+	struct test_cbi_blob {
+		struct cbi_header head;
+		struct cbi_data tag1;
+		uint8_t tag1_data[4];
+	} __packed blob = {
+		.head = {
+			.magic = { 0x43, 0x42, 0x49 }, /* 'C', 'B', 'I' */
+			.version = 0,
+			.total_size = sizeof(struct test_cbi_blob),
+		},
+		.tag1 = {
+			.tag = CBI_TAG_SKU_ID,
+			.size = 4,
+		},
+		.tag1_data = { 0x11, 0x22, 0x33, 0x44 },
 	};
+	blob.head.crc = cbi_crc8(&blob.head);
 
 	struct actual_set_params {
 		struct ec_params_set_cbi_bin params;
-		uint8_t actual_data[ARRAY_SIZE(data)];
+		uint8_t actual_data[sizeof(struct test_cbi_blob)];
 	};
 
 	struct actual_set_params hc_set_params = {
 		.params = {
 		.offset = 0,
-		.size = ARRAY_SIZE(data),
+		.size = sizeof(struct test_cbi_blob),
 		.flags = EC_CBI_BIN_BUFFER_CLEAR | EC_CBI_BIN_BUFFER_WRITE,
 		},
 	};
 	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
 		EC_CMD_CBI_BIN_WRITE, 0, hc_set_params);
 
-	memcpy(hc_set_params.params.data, data, ARRAY_SIZE(data));
+	memcpy(hc_set_params.params.data, &blob, sizeof(struct test_cbi_blob));
 
 	/* Turn off write-protect so we can actually write */
 	gpio_wp_l_set(1);
@@ -262,11 +337,11 @@ ZTEST_USER(common_cbi, test_hc_cbi_bin_write_then_read)
 
 	struct ec_params_get_cbi_bin hc_get_params = {
 		.offset = 0,
-		.size = ARRAY_SIZE(data),
+		.size = sizeof(struct test_cbi_blob),
 	};
 
 	struct test_ec_params_get_cbi_response {
-		uint8_t data[ARRAY_SIZE(data)];
+		uint8_t data[sizeof(struct test_cbi_blob)];
 	};
 	struct test_ec_params_get_cbi_response hc_get_response;
 	struct host_cmd_handler_args get_args = BUILD_HOST_COMMAND(
@@ -809,13 +884,297 @@ ZTEST_USER(common_cbi, test_cros_cbi_ufsc_default)
 		CBI_UFSC_VALUE_ID(DT_NODELABEL(value_d))));
 }
 
+ZTEST_USER(common_cbi, test_hc_cbi_bin_write__staged_write_invalidates_cache)
+{
+	uint32_t original_sku = 0x87654321;
+	uint32_t updated_sku = 0x12345678;
+	uint32_t read_sku;
+	struct actual_bin_params {
+		struct ec_params_set_cbi_bin params;
+		uint8_t actual_data[4];
+	} hc_bin_params = {
+            .params = {
+                .offset = 0,
+                .size = 4,
+                .flags = EC_CBI_BIN_BUFFER_CLEAR,
+            },
+        };
+	struct host_cmd_handler_args bin_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_CBI_BIN_WRITE, 0, hc_bin_params);
+	struct actual_set_params {
+		struct ec_params_set_cbi params;
+		uint8_t actual_data[sizeof(uint32_t)];
+	} hc_set_params = {
+            .params = {
+                .tag = CBI_TAG_SKU_ID,
+                .flag = CBI_SET_INIT,
+                .size = sizeof(original_sku),
+            },
+        };
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_SET_CROS_BOARD_INFO, 0, hc_set_params);
+
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+
+	/* Write initial SKU with valid CRC to EEPROM via host command */
+	memcpy(hc_set_params.params.data, &original_sku, sizeof(original_sku));
+	zassert_equal(host_command_process(&set_args), EC_RES_SUCCESS);
+
+	/* Stage a clear (0xFF) without EC_CBI_BIN_BUFFER_WRITE */
+	zassert_equal(host_command_process(&bin_args), EC_RES_SUCCESS);
+
+	/* Subsequent EC_CMD_SET_CROS_BOARD_INFO (without INIT) reloads from
+	 * EEPROM */
+	hc_set_params.params.flag = 0;
+	memcpy(hc_set_params.params.data, &updated_sku, sizeof(updated_sku));
+	zassert_equal(host_command_process(&set_args), EC_RES_SUCCESS);
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }));
+	zassert_equal(read_sku, updated_sku);
+}
+
 static void test_common_cbi_before_after(void *test_data)
 {
 	RESET_FAKE(eeprom_load);
 	eeprom_load_fake.custom_fake = __test_eeprom_load_default_impl;
+	gpio_pin_set_dt(GPIO_DT_FROM_ALIAS(gpio_cbi_wp), 0);
 
 	cbi_create();
 }
 
 ZTEST_SUITE(common_cbi, drivers_predicate_post_main, NULL,
 	    test_common_cbi_before_after, test_common_cbi_before_after, NULL);
+
+ZTEST_USER(common_cbi, test_cbi_set_board_info__resize_overflow)
+{
+	uint32_t original_sku = 0x12345678;
+	uint32_t read_sku;
+
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+	zassert_ok(cbi_create(), "cbi_create failed");
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (uint8_t *)&original_sku,
+				      sizeof(original_sku)),
+		   "Failed to set initial SKU");
+
+	zassert_equal(cbi_set_board_info(CBI_TAG_SKU_ID,
+					 (uint8_t *)&original_sku, 250),
+		      EC_ERROR_OVERFLOW,
+		      "Expected overflow when resizing SKU to 250 bytes");
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }),
+		   "Failed to read SKU after failed resize");
+	zassert_equal(read_sku, original_sku, "SKU corrupted after overflow");
+}
+
+ZTEST_USER(common_cbi, test_cc_cbi_set_string_tag)
+{
+	const char expected_oem_name[] = "TestOEM";
+	const char expected_dram_part[] = "DRAM1234";
+	char str_buf[64] = { 0 };
+	uint8_t size = sizeof(str_buf);
+
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+	zassert_ok(cbi_create(), "cbi_create failed");
+
+	/* Test setting OEM_NAME (tag 4) via console command with 4 arguments.
+	 */
+	zassert_ok(shell_execute_cmd(NULL, "cbi set 4 TestOEM"),
+		   "Failed to set OEM_NAME via console");
+
+	/* Verify OEM_NAME tag value. */
+	size = sizeof(str_buf);
+	zassert_ok(cbi_get_board_info(CBI_TAG_OEM_NAME, (uint8_t *)str_buf,
+				      &size),
+		   "Failed to get OEM_NAME");
+	zassert_equal(size, sizeof(expected_oem_name), "Size mismatch");
+	zassert_mem_equal(str_buf, expected_oem_name, sizeof(expected_oem_name),
+			  "OEM_NAME value mismatch");
+
+	/* Test setting DRAM_PART_NUM (tag 3) via console command. */
+	zassert_ok(shell_execute_cmd(NULL, "cbi set 3 DRAM1234"),
+		   "Failed to set DRAM_PART_NUM via console");
+
+	size = sizeof(str_buf);
+	zassert_ok(cbi_get_board_info(CBI_TAG_DRAM_PART_NUM, (uint8_t *)str_buf,
+				      &size),
+		   "Failed to get DRAM_PART_NUM");
+	zassert_equal(size, sizeof(expected_dram_part), "Size mismatch");
+	zassert_mem_equal(str_buf, expected_dram_part,
+			  sizeof(expected_dram_part),
+			  "DRAM_PART_NUM value mismatch");
+
+	/* Test missing required value argument for string tag (argc < 4). */
+	zassert_not_equal(shell_execute_cmd(NULL, "cbi set 4"), 0,
+			  "Expected failure for missing value arg");
+
+	/* Test string length exceeding limit. */
+	char long_cmd[CONFIG_CONSOLE_INPUT_LINE_SIZE + 32];
+	memset(long_cmd, 'A', sizeof(long_cmd) - 1);
+	long_cmd[sizeof(long_cmd) - 1] = '\0';
+	memcpy(long_cmd, "cbi set 4 ", 10);
+	zassert_not_equal(shell_execute_cmd(NULL, long_cmd), 0,
+			  "Expected failure for oversized string");
+}
+
+extern test_export_static bool cached_ssfc_ready;
+extern test_export_static bool cached_ufsc_ready;
+extern test_export_static bool cached_fw_config_ready;
+
+ZTEST_USER(common_cbi, test_cros_cbi_ssfc__read_before_init)
+{
+	cached_ssfc_ready = false;
+
+	zassert_false(cros_cbi_ssfc_check_match(0),
+		      "Expected false when checking SSFC match before init");
+}
+
+ZTEST_USER(common_cbi, test_cros_cbi_ufsc__read_before_init)
+{
+	cached_ufsc_ready = false;
+
+	zassert_false(cros_cbi_ufsc_check_match(0),
+		      "Expected false when checking UFSC match before init");
+}
+
+ZTEST_USER(common_cbi, test_cros_cbi_fw_config__read_before_init)
+{
+	uint32_t val;
+
+	cached_fw_config_ready = false;
+
+	zassert_equal(cros_cbi_get_fw_config(0, &val), -EINVAL,
+		      "Expected -EINVAL when checking FW config before init");
+}
+
+ZTEST_USER(common_cbi, test_cros_cbi_ssfc_init)
+{
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+
+	cros_cbi_ssfc_init();
+
+	/* Verify invalid SSFC value_id returns false. */
+	zassert_false(cros_cbi_ssfc_check_match((enum cbi_ssfc_value_id)9999),
+		      "Expected false for invalid SSFC value_id");
+}
+
+ZTEST_USER(common_cbi,
+	   test_hc_cbi_bin_write__buffer_clear_overflow_preserves_cache)
+{
+	uint32_t original_sku = 0x87654321;
+	uint32_t read_sku;
+	struct actual_set_params {
+		struct ec_params_set_cbi_bin params;
+		uint8_t actual_data[4];
+	} hc_set_params = {
+		.params = {
+			.offset = CBI_IMAGE_SIZE + 10,
+			.size = 4,
+			.flags = EC_CBI_BIN_BUFFER_CLEAR,
+		},
+	};
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_CBI_BIN_WRITE, 0, hc_set_params);
+
+	gpio_wp_l_set(1);
+	zassert_ok(cbi_clear(), "cbi_clear failed");
+	zassert_ok(cbi_create(), "cbi_create failed");
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (uint8_t *)&original_sku,
+				      sizeof(original_sku)),
+		   "Failed to set initial SKU");
+
+	zassert_equal(
+		host_command_process(&set_args), EC_RES_INVALID_PARAM,
+		"Expected INVALID_PARAM when writing out of bounds with clear flag");
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }),
+		   "Failed to read SKU after invalid bin write");
+	zassert_equal(read_sku, original_sku,
+		      "RAM cache was wiped by invalid bin write");
+}
+
+ZTEST_USER(common_cbi, test_cbi_eeprom_wp_blocks_bin_write)
+{
+	uint32_t original_sku = 0x11223344;
+	uint32_t read_sku;
+	const struct gpio_dt_spec *wp = GPIO_DT_FROM_ALIAS(gpio_cbi_wp);
+
+	gpio_pin_set_dt(wp, 0);
+	zassert_equal(cbi_config->drv->is_protected(), 0);
+	zassert_ok(cbi_clear());
+	zassert_ok(cbi_create());
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (uint8_t *)&original_sku,
+				      sizeof(original_sku)));
+
+	cbi_latch_eeprom_wp();
+	zassert_equal(cbi_config->drv->is_protected(), 1);
+
+	struct actual_set_params {
+		struct ec_params_set_cbi_bin params;
+		uint8_t actual_data[4];
+	};
+
+	struct actual_set_params hc_set_params = {
+		.params = {
+			.offset = 0,
+			.size = sizeof(original_sku),
+			.flags = EC_CBI_BIN_BUFFER_CLEAR,
+		},
+	};
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_CBI_BIN_WRITE, 0, hc_set_params);
+
+	zassert_equal(host_command_process(&set_args), EC_RES_ACCESS_DENIED);
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }));
+	zassert_equal(read_sku, original_sku);
+
+	gpio_pin_set_dt(wp, 0);
+}
+
+ZTEST_USER(common_cbi, test_cbi_eeprom_wp_blocks_set)
+{
+	uint32_t original_sku = 0x55667788;
+	uint32_t new_sku = 0x99AABBCC;
+	uint32_t read_sku;
+	const struct gpio_dt_spec *wp = GPIO_DT_FROM_ALIAS(gpio_cbi_wp);
+
+	gpio_pin_set_dt(wp, 0);
+	zassert_ok(cbi_clear());
+	zassert_ok(cbi_create());
+	zassert_ok(cbi_set_board_info(CBI_TAG_SKU_ID, (uint8_t *)&original_sku,
+				      sizeof(original_sku)));
+
+	cbi_latch_eeprom_wp();
+
+	struct actual_set_params {
+		struct ec_params_set_cbi params;
+		uint8_t actual_data[sizeof(new_sku)];
+	};
+
+	struct actual_set_params hc_set_params = {
+		.params = {
+			.tag = CBI_TAG_SKU_ID,
+			.flag = 0,
+			.size = sizeof(new_sku),
+		},
+	};
+	memcpy(hc_set_params.params.data, &new_sku, sizeof(new_sku));
+	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
+		EC_CMD_SET_CROS_BOARD_INFO, 0, hc_set_params);
+
+	zassert_equal(host_command_process(&set_args), EC_RES_ACCESS_DENIED);
+
+	zassert_ok(cbi_get_board_info(CBI_TAG_SKU_ID, (uint8_t *)&read_sku,
+				      (uint8_t[]){ sizeof(read_sku) }));
+	zassert_equal(read_sku, original_sku);
+
+	gpio_pin_set_dt(wp, 0);
+}

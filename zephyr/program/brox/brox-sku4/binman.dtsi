@@ -26,6 +26,7 @@
 		/delete-node/ pstate;
 
 		ec-ro {
+			size = <(0x70000 - (0x1000 * 2))>;
 			fmap {
 				offset =  <(0x70000 - (0x1000 * 2) - 0x400)>;
 				/*

@@ -18,19 +18,21 @@ import zmake.modules
 from zmake.output_packers import packer_registry
 
 
-def get_git_hash(ref):
+def get_git_hash(ref, repo_dir):
     """Get the full git commit hash for a git reference
 
     Args:
         ref: Git reference (e.g. HEAD, m/main, sha256)
+        repo_dir: Path to git repository directory
 
     Returns:
         A string, with the full hash of the git reference
     """
+    cmd = ["git", "-C", str(repo_dir), "rev-parse", ref]
 
     try:
         result = subprocess.run(
-            ["git", "rev-parse", ref],
+            cmd,
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
@@ -43,6 +45,32 @@ def get_git_hash(ref):
     full_reference = result.stdout.strip()
 
     return full_reference
+
+
+def get_git_commit_title(ref, repo_dir):
+    """Get the git commit message title of the given ref.
+
+    Args:
+        ref: Git reference (e.g. HEAD, m/main, sha256)
+        repo_dir: Path to git repository directory
+
+    Returns:
+        A string commit title, or None on failure
+    """
+    cmd = ["git", "-C", str(repo_dir), "show", "-s", "--format=%s", ref]
+
+    try:
+        result = subprocess.run(
+            cmd,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            encoding="utf-8",
+        )
+    except subprocess.CalledProcessError:
+        return None
+
+    return result.stdout.strip()
 
 
 def _git_clone_repo(module_name, work_dir, git_source, dst_dir):
@@ -93,7 +121,7 @@ def _git_do_checkout(work_dir, dst_dir, git_ref):
     Returns:
         0 on success, non-zero otherwise
     """
-    cmd = ["git", "-C", dst_dir, "checkout", "--quiet", git_ref]
+    cmd = ["git", "-C", str(dst_dir), "checkout", "--quiet", git_ref]
     try:
         subprocess.run(
             cmd,
@@ -144,20 +172,29 @@ def _compare_non_test_projects(projects, cmp_method, *args):
     return failed_projects
 
 
+# pylint:disable=too-many-instance-attributes
 @dataclasses.dataclass
 class CheckoutConfig:
     """All the information needed to build the EC at a specific checkout."""
 
     temp_dir: str
     ref: str
+    target_module: str
+    target_module_path: pathlib.Path
     full_ref: str = dataclasses.field(default_factory=str)
+    commit_title: str = dataclasses.field(default_factory=str)
     work_dir: pathlib.Path = dataclasses.field(default_factory=pathlib.Path)
     zephyr_dir: pathlib.Path = dataclasses.field(default_factory=pathlib.Path)
     modules_dir: pathlib.Path = dataclasses.field(default_factory=pathlib.Path)
     projects_dirs: List[pathlib.Path] = dataclasses.field(default_factory=list)
 
     def __post_init__(self):
-        self.full_ref = get_git_hash(self.ref)
+        self.full_ref = get_git_hash(
+            ref=self.ref, repo_dir=self.target_module_path
+        )
+        self.commit_title = get_git_commit_title(
+            ref=self.ref, repo_dir=self.target_module_path
+        )
         self.work_dir = pathlib.Path(self.temp_dir) / self.full_ref
         self.zephyr_dir = self.work_dir / "zephyr-base"
         self.modules_dir = self.work_dir / "modules"
@@ -168,6 +205,9 @@ class CheckoutConfig:
 
         os.mkdir(self.work_dir)
 
+    def __str__(self):
+        return f"{self.ref} ({self.full_ref}): \"{self.commit_title or '<Unnamed>'}\""
+
 
 class CompareBuilds:
     """Information required to build Zephyr EC projects at a specific EC git
@@ -176,9 +216,9 @@ class CompareBuilds:
     Args:
         temp_dir: Temporary directory where all sources will be checked out
             and built.
-        ref1: 1st git reference for the EC repository.  May be a partial hash,
+        ref1: 1st git reference for the target repository. May be a partial hash,
             local branch name, or remote branch name.
-        ref2: 2nd git reference for the EC repository.
+        ref2: 2nd git reference for the target repository.
             Special case: if ref1 == ref2 then the 2nd checkout is skipped
             and the final build comparison is skipped. This is used by
             firmware_builder.py in the CQ to verify that compare-builds can
@@ -187,20 +227,49 @@ class CompareBuilds:
             tasks to.
         sequential: True to perform git checkouts sequentially. False to
             do the git checkouts in parallel.
+        target_module: Name of the module repository to compare.
+        target_module_path: Path to the target module repository.
 
     Attributes:
         checkouts: list of CheckoutConfig objects containing information
-            about the code checkout at each EC git reference.
+            about the code checkout at each git reference.
     """
 
-    def __init__(self, temp_dir, ref1, ref2, executor, sequential):
+    def __init__(
+        self,
+        temp_dir,
+        ref1,
+        ref2,
+        executor,
+        sequential,
+        target_module,
+        target_module_path,
+    ):
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.target_module = target_module
+        self.target_module_path = target_module_path
 
         self.checkouts = []
-        self.checkouts.append(CheckoutConfig(temp_dir, ref1))
+        self.checkouts.append(
+            CheckoutConfig(
+                temp_dir=temp_dir,
+                ref=ref1,
+                target_module=target_module,
+                target_module_path=target_module_path,
+            )
+        )
         self.single_checkout = False
-        if get_git_hash(ref1) != get_git_hash(ref2):
-            self.checkouts.append(CheckoutConfig(temp_dir, ref2))
+        if get_git_hash(ref=ref1, repo_dir=target_module_path) != get_git_hash(
+            ref=ref2, repo_dir=target_module_path
+        ):
+            self.checkouts.append(
+                CheckoutConfig(
+                    temp_dir=temp_dir,
+                    ref=ref2,
+                    target_module=target_module,
+                    target_module_path=target_module_path,
+                )
+            )
         else:
             self.logger.info(
                 "Single checkout detected. Firmware comparison disabled."
@@ -266,7 +335,11 @@ class CompareBuilds:
                     )
                     continue
                 dst_dir = checkout.modules_dir / module_name
-                git_ref = checkout.full_ref if module_name == "ec" else "HEAD"
+                git_ref = (
+                    checkout.full_ref
+                    if module_name == self.target_module
+                    else "HEAD"
+                )
                 self._do_git_work(
                     func=functools.partial(
                         _git_clone_repo,
@@ -317,7 +390,11 @@ class CompareBuilds:
                     has_zephyrproject = True
                     continue
                 dst_dir = checkout.modules_dir / module_name
-                git_ref = checkout.full_ref if module_name == "ec" else "HEAD"
+                git_ref = (
+                    checkout.full_ref
+                    if module_name == self.target_module
+                    else "HEAD"
+                )
                 self._do_git_work(
                     func=functools.partial(
                         _git_do_checkout,
@@ -330,21 +407,31 @@ class CompareBuilds:
                 checkout.zephyr_dir = (
                     checkout.modules_dir.parent / "zephyrproject" / "zephyr"
                 )
+                git_ref = (
+                    checkout.full_ref
+                    if self.target_module in ("zephyr", "zephyrproject")
+                    else "HEAD"
+                )
                 self._do_git_work(
                     func=functools.partial(
                         _git_do_checkout,
                         work_dir=checkout.work_dir,
                         dst_dir=checkout.modules_dir.parent / "zephyrproject",
-                        git_ref="HEAD",
+                        git_ref=git_ref,
                     )
                 )
             else:
+                git_ref = (
+                    checkout.full_ref
+                    if self.target_module in ("zephyr", "zephyr-base")
+                    else "HEAD"
+                )
                 self._do_git_work(
                     func=functools.partial(
                         _git_do_checkout,
                         work_dir=checkout.work_dir,
                         dst_dir="zephyr-base",
-                        git_ref="HEAD",
+                        git_ref=git_ref,
                     )
                 )
 

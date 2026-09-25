@@ -1,0 +1,30 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "../native_sim.overlay"
+
+/ {
+	/*
+	 * Mock BBRAM device. The test driver in
+	 * tests/lapis/src/battery.c instantiates a device for this node
+	 * whose read/write callbacks are FFF fakes, so the test fully
+	 * controls what bbram_read()/bbram_write() do.
+	 */
+	mock_bbram: mock-bbram {
+	};
+
+	chosen {
+		cros-ec,bbram = &mock_bbram;
+	};
+
+	named-bbram-regions {
+		compatible = "named-bbram-regions";
+
+		board_batt_keep: board_batt_keep {
+			offset = <0x10>;
+			size = <0x04>;
+		};
+	};
+};

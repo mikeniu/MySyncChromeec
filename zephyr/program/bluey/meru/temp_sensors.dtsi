@@ -1,0 +1,65 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <cros/thermistor/thermistor.dtsi>
+
+/ {
+	temp_sensor_cpu: cpu {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_cpu>;
+	};
+	temp_sensor_core: core {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_core>;
+	};
+	temp_sensor_charger: charger {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_charger>;
+	};
+	temp_sensor_ambient: ambient {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_ambient>;
+	};
+	temp_sensor_hw_shutdown: hw_shutdown {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_hw_shutdown>;
+	};
+	temp_sensor_typec: typec {
+		compatible = "cros-ec,temp-sensor-thermistor";
+		thermistor = <&thermistor_3V3_100K_100K_4250B>;
+		adc = <&adc_temp_typec>;
+	};
+
+	named-temp-sensors {
+		compatible = "cros-ec,temp-sensors";
+		temp_cpu: cpu {
+			sensor = <&temp_sensor_cpu>;
+		};
+		temp_core: core {
+			sensor = <&temp_sensor_core>;
+		};
+		temp_charger: charger {
+			sensor = <&temp_sensor_charger>;
+		};
+		temp_ambient: ambient {
+			sensor = <&temp_sensor_ambient>;
+		};
+		temp_hw_shutdown: hw_shutdown {
+			sensor = <&temp_sensor_hw_shutdown>;
+		};
+		temp_typec: typec {
+			sensor = <&temp_sensor_typec>;
+		};
+	};
+};
+
+&thermistor_3V3_100K_100K_4250B {
+	status = "okay";
+};

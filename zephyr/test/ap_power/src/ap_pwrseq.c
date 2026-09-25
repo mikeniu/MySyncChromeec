@@ -5,9 +5,9 @@
 
 #include "ap_power/ap_power.h"
 #include "ap_power/ap_power_interface.h"
+#include "ap_power_host_sleep.h"
 #include "chipset.h"
 #include "ec_commands.h"
-#include "ec_tasks.h"
 #include "emul/emul_power_signals.h"
 #include "host_command.h"
 #include "lpc.h"
@@ -29,13 +29,13 @@
 
 LOG_MODULE_REGISTER(test_ap_pwrseq);
 
-static struct ap_power_ev_callback test_cb;
 static int power_resume_count;
 static int power_start_up_count;
 static int power_hard_off_count;
 static int power_shutdown_count;
 static int power_shutdown_complete_count;
 static int power_suspend_count;
+static int power_s0ix_reset_tracking_count;
 
 #define S5_INACTIVITY_TIMEOUT_MS                                               \
 	COND_CODE_0(                                                           \
@@ -129,10 +129,20 @@ static void emul_ev_handler(struct ap_power_ev_callback *callback,
 	case AP_POWER_SUSPEND:
 		power_suspend_count++;
 		break;
+
+	case AP_POWER_S0IX_RESET_TRACKING:
+		power_s0ix_reset_tracking_count++;
+		break;
+
 	default:
 		break;
 	};
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(emul_ev_handler, AP_POWER_RESUME,
+			       AP_POWER_STARTUP, AP_POWER_HARD_OFF,
+			       AP_POWER_SUSPEND, AP_POWER_SHUTDOWN,
+			       AP_POWER_SHUTDOWN_COMPLETE,
+			       AP_POWER_S0IX_RESET_TRACKING);
 
 static void ap_pwrseq_reset_ev_counters(void)
 {
@@ -142,6 +152,7 @@ static void ap_pwrseq_reset_ev_counters(void)
 	power_shutdown_count = 0;
 	power_shutdown_complete_count = 0;
 	power_suspend_count = 0;
+	power_s0ix_reset_tracking_count = 0;
 }
 
 static void verify_ap_inputs(bool in_s0)
@@ -159,13 +170,19 @@ static void verify_ap_inputs(bool in_s0)
 	for (int ap = 0; ap < ARRAY_SIZE(ap_inputs); ap++) {
 		for (int ec = 0; ec < ARRAY_SIZE(ec_outputs); ec++) {
 			int phys_level;
+			gpio_flags_t flags;
 
 			if (ec_outputs[ec].signal_enum == ap_inputs[ap]) {
-				phys_level = gpio_emul_output_get(
-					ec_outputs[ec].gpio_spec.port,
-					ec_outputs[ec].gpio_spec.pin);
+				gpio_emul_flags_get_dt(
+					&ec_outputs[ec].gpio_spec, &flags);
+				phys_level =
+					gpio_emul_output_get_dt(
+						&ec_outputs[ec].gpio_spec) ^
+					(flags & GPIO_ACTIVE_LOW);
 				zassert_equal(
-					phys_level, expected_level,
+					phys_level,
+					expected_level ^
+						(flags & GPIO_ACTIVE_LOW),
 					"%s (%d) signal isn't at physical %d",
 					ec_outputs[ec].signal_name,
 					ec_outputs[ec].signal_enum,
@@ -185,7 +202,8 @@ static void power_up_test_g3_to_s0_helper(void)
 			      EMUL_POWER_SIGNAL_TEST_PLATFORM(tp_sys_g3_to_s0)),
 		      "Unable to load test platform `tp_sys_g3_to_s0`");
 
-	k_msleep(500);
+	ap_power_exit_hardoff();
+	k_msleep(400);
 
 	zassert_equal(1, power_start_up_count,
 		      "AP_POWER_STARTUP event not generated");
@@ -453,8 +471,14 @@ ZTEST(ap_pwrseq, test_ap_pwrseq_3_sleep_reset)
 
 	/* Trigger reset and later power fail */
 	power_signal_set(PWR_SYS_RST, 1);
-	k_msleep(20);
+	k_msleep(100);
 	power_signal_set(PWR_SYS_RST, 0);
+
+	/* Verify host sleep state was reset after chipset reset */
+	zassert_true(power_s0ix_reset_tracking_count > 0,
+		     "AP_POWER_S0IX_RESET_TRACKING not called");
+	zassert_equal(0, ap_power_sleep_get_notify(),
+		      "Host sleep state not reset after power loss");
 
 	/* Allow up to 50 ms for the force-shutdown timeout loop plus the
 	 * 30 ms minimum power-down delay in board_ap_power_force_shutdown.
@@ -606,8 +630,6 @@ ZTEST(ap_pwrseq, test_get_ap_pwrseq_thread)
 	pwrseq_thread = find_thread_by_name(pwrseq_name);
 	zassert_not_null(pwrseq_thread);
 	zassert_equal(pwrseq_thread, get_ap_pwrseq_thread());
-	zassert_equal(TASK_ID_AP_PWRSEQ, thread_id_to_task_id(pwrseq_thread));
-	zassert_equal(task_id_to_thread_id(TASK_ID_AP_PWRSEQ), pwrseq_thread);
 }
 
 void ap_pwrseq_after_test(void *data)
@@ -617,23 +639,5 @@ void ap_pwrseq_after_test(void *data)
 	ap_pwrseq_reset_ev_counters();
 }
 
-void *ap_pwrseq_setup_suite(void)
-{
-	ap_power_ev_init_callback(&test_cb, emul_ev_handler,
-				  AP_POWER_RESUME | AP_POWER_STARTUP |
-					  AP_POWER_HARD_OFF | AP_POWER_SUSPEND |
-					  AP_POWER_SHUTDOWN |
-					  AP_POWER_SHUTDOWN_COMPLETE);
-
-	ap_power_ev_add_callback(&test_cb);
-
-	return NULL;
-}
-
-void ap_pwrseq_teardown_suite(void *data)
-{
-	ap_power_ev_remove_callback(&test_cb);
-}
-
-ZTEST_SUITE(ap_pwrseq, ap_power_predicate_post_main, ap_pwrseq_setup_suite,
-	    NULL, ap_pwrseq_after_test, NULL);
+ZTEST_SUITE(ap_pwrseq, ap_power_predicate_post_main, NULL, NULL,
+	    ap_pwrseq_after_test, NULL);

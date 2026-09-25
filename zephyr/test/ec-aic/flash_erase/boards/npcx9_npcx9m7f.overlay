@@ -1,0 +1,20 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "../../../../program/ec-aic/npcx-aic/project.overlay"
+
+&binman {
+	ec_rw: ec-rw {
+		rw-fw {
+			test_flash_block: test-flash-block {
+				compatible = "cros-ec,flash-layout";
+				offset = <(0x50000 - 0x5000)>;
+				type = "fill";
+				fill-byte = [ FF ];
+				size = < 0x4000 >;
+			};
+		};
+	};
+};

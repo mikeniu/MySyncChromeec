@@ -7,8 +7,7 @@ third_party {
     type: GIT
     value: "https://github.com/torvalds/linux.git"
   }
-  version: "5925fa68fe8244651b3f78a88c4af99190a88f0d"
-  last_upgrade_date { year: 2020 month: 9 day: 18 }
+  version: "786262be6048deab760f68c8acc2c85607165894"
+  last_upgrade_date { year: 2026 month: 9 day: 1 }
   license_type: NOTICE
 }
-
