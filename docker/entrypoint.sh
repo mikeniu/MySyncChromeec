@@ -15,11 +15,20 @@ if [ "$(id -u)" = "0" ]; then
     HOST_UID="$(stat -c '%u' /workspace)"
     HOST_GID="$(stat -c '%g' /workspace)"
     if [ "${HOST_UID}" != "0" ]; then
-        groupadd -g "${HOST_GID}" hostuser 2>/dev/null || true
-        useradd -u "${HOST_UID}" -g "${HOST_GID}" -m -s /bin/bash \
-            hostuser 2>/dev/null || true
+        # Reuse the image's group if it already has one with this GID.
+        if ! getent group "${HOST_GID}" >/dev/null; then
+            groupadd -g "${HOST_GID}" hostuser
+        fi
+        # useradd warns when the UID is outside the range it assigns by
+        # itself, as large host UIDs often are, so only show its output
+        # if it fails.
+        if ! USERADD_OUTPUT="$(useradd -u "${HOST_UID}" -g "${HOST_GID}" \
+                -m -s /bin/bash hostuser 2>&1)"; then
+            echo "${USERADD_OUTPUT}" >&2
+            exit 1
+        fi
         # Grant access to serial TTYs and USB devices for flashing/debug
-        usermod -aG dialout,plugdev hostuser 2>/dev/null || true
+        usermod -aG dialout,plugdev hostuser
         # Prepare devutils directory for monitor binary installation
         mkdir -p /usr/share/ec-devutils
         chown -R "${HOST_UID}:${HOST_GID}" /usr/share/ec-devutils
