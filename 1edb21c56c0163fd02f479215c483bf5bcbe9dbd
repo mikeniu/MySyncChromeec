@@ -18,6 +18,24 @@
       "isAi": true,
       "revId": "1edb21c56c0163fd02f479215c483bf5bcbe9dbd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46f9583f_6a3f613f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 37
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-25T17:35:47Z",
+      "side": 1,
+      "message": "Done. Split this CL further into 3 smaller CLs:\n1. CL:8008794: Info and frame host commands (+58, -50)\n2. Template and stats host commands (+63, -56)\n3. State and mode host commands (+65, -53)",
+      "parentUuid": "bd5bd9e9_31f1e7c7",
+      "revId": "1edb21c56c0163fd02f479215c483bf5bcbe9dbd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
