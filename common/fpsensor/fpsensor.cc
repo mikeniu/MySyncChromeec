@@ -13,9 +13,11 @@
 #include "ec_commands.h"
 #include "fpsensor/fpsensor.h"
 #include "fpsensor/fpsensor_auth_commands.h"
+#include "fpsensor/fpsensor_btn_ign_out.h"
 #include "fpsensor/fpsensor_console.h"
 #include "fpsensor/fpsensor_crypto.h"
 #include "fpsensor/fpsensor_detect.h"
+#include "fpsensor/fpsensor_led.h"
 #include "fpsensor/fpsensor_modes.h"
 #include "fpsensor/fpsensor_state.h"
 #include "fpsensor/fpsensor_utils.h"
@@ -24,6 +26,7 @@
 #include "link_defs.h"
 #include "mkbp_event.h"
 #include "openssl/mem.h"
+#include "overflow.h"
 #include "scoped_fast_cpu.h"
 #include "sha256.h"
 #include "spi.h"
@@ -33,10 +36,12 @@
 #include "util.h"
 #include "watchdog.h"
 
+#include <algorithm>
 #include <array>
 #include <variant>
 
 #ifdef CONFIG_ZEPHYR
+#include <zephyr/pm/policy.h>
 #include <zephyr/shell/shell.h>
 #endif
 
@@ -44,7 +49,7 @@
 #error "fpsensor requires RNG"
 #endif
 
-#if defined(SECTION_IS_RO)
+#if defined(CONFIG_CROS_EC_RO)
 #error "fpsensor code should not be in RO image."
 #endif
 
@@ -60,8 +65,24 @@ static uint32_t matching_time_us;
 static uint32_t overall_time_us;
 static timestamp_t overall_t0;
 static uint8_t timestamps_invalid;
+/*
+ * Last matched template index, persisted for telemetry (EC_CMD_FP_STATS).
+ * Unlike global_context, this is not cleared when the secret is read.
+ */
+static int8_t stats_template_matched;
 
 BUILD_ASSERT(sizeof(struct ec_fp_template_encryption_metadata) % 4 == 0);
+
+#ifndef CONFIG_ZEPHYR
+/* Define the PM functions for compatibility with EC-legacy. */
+static inline void pm_policy_state_all_lock_get(void)
+{
+}
+
+static inline void pm_policy_state_all_lock_put(void)
+{
+}
+#endif /* CONFIG_ZEPHYR */
 
 /* Interrupt line from the fingerprint sensor */
 extern "C" void fps_event(enum gpio_signal signal)
@@ -87,6 +108,16 @@ static uint32_t enroll_session;
 static uint32_t fp_process_enroll(void)
 {
 	int percent = 0;
+
+	/* Prevent enrollment if we have reached max capacity. */
+	if (global_context.templ_valid >= FP_MAX_FINGER_COUNT) {
+		CPRINTS("Error: Max templates reached.");
+		fp_enrollment_finish(nullptr);
+		global_context.sensor_mode &= ~FP_MODE_ENROLL_SESSION;
+		enroll_session &= ~FP_MODE_ENROLL_SESSION;
+		return EC_MKBP_FP_ENROLL |
+		       EC_MKBP_FP_ERRCODE(EC_MKBP_FP_ERR_ENROLL_INTERNAL);
+	}
 
 	if (global_context.template_newly_enrolled != FP_NO_SUCH_TEMPLATE)
 		CPRINTS("Warning: previously enrolled template has not been "
@@ -140,6 +171,8 @@ static uint32_t fp_process_match(void)
 	int res = -1;
 	uint32_t updated = 0;
 	int32_t fgr = FP_NO_SUCH_TEMPLATE;
+	timestamps_invalid = 0;
+	stats_template_matched = static_cast<int8_t>(FP_NO_SUCH_TEMPLATE);
 
 	/* match finger against current templates */
 	fp_disable_positive_match_secret(
@@ -161,12 +194,14 @@ static uint32_t fp_process_match(void)
 			 * with EC_MKBP_FP_ERR_MATCH_NO_INTERNAL.
 			 */
 			if (fgr >= 0 && fgr < FP_MAX_FINGER_COUNT) {
+				stats_template_matched = fgr;
 				fp_enable_positive_match_secret(
 					fgr,
 					&global_context
 						 .positive_match_secret_state);
 			} else {
 				res = EC_MKBP_FP_ERR_MATCH_NO_INTERNAL;
+				timestamps_invalid |= FPSTATS_MATCHING_INV;
 			}
 		} else if (res < 0) {
 			/*
@@ -176,17 +211,18 @@ static uint32_t fp_process_match(void)
 			 * happened.
 			 */
 			res = EC_MKBP_FP_ERR_MATCH_NO_INTERNAL;
+			timestamps_invalid |= FPSTATS_MATCHING_INV;
 		}
+
+		fp_led::update_match(fp_match_success(res));
 
 		if (res == EC_MKBP_FP_ERR_MATCH_YES_UPDATED)
 			global_context.templ_dirty |= updated;
 	} else {
 		CPRINTS("No enrolled templates");
 		res = EC_MKBP_FP_ERR_MATCH_NO_TEMPLATES;
-	}
-
-	if (!fp_match_success(res))
 		timestamps_invalid |= FPSTATS_MATCHING_INV;
+	}
 
 	matching_time_us = time_since32(t0);
 	return EC_MKBP_FP_MATCH | EC_MKBP_FP_ERRCODE(res) |
@@ -244,7 +280,10 @@ static enum ec_status fp_commit_template(std::span<const uint8_t> context);
 extern "C" void fp_task(void)
 {
 	int timeout_us = -1;
+	__maybe_unused bool pm_locked = true;
 
+	/* Lock PM for initialization. */
+	pm_policy_state_all_lock_get();
 	CPRINTS("FP_SENSOR_SEL: %s",
 		fp_sensor_type_to_str(fpsensor_detect_get_type()));
 
@@ -257,8 +296,23 @@ extern "C" void fp_task(void)
 	while (1) {
 		enum finger_state st = FINGER_NONE;
 
+		/* Unlock PM while waiting for an event except for an
+		 * enrollment process.
+		 */
+		if (!(global_context.sensor_mode & FP_MODE_ENROLL_SESSION)) {
+			pm_policy_state_all_lock_put();
+			pm_locked = false;
+		}
 		/* Wait for a sensor IRQ or a new mode configuration */
 		uint32_t evt = task_wait_event(timeout_us);
+
+		/* Lock PM for any FP related actions, especially communication
+		 * with a FP sensor.
+		 */
+		if (!pm_locked) {
+			pm_policy_state_all_lock_get();
+			pm_locked = true;
+		}
 
 		if (evt & TASK_EVENT_UPDATE_CONFIG) {
 			uint32_t mode = global_context.sensor_mode;
@@ -369,7 +423,6 @@ extern "C" void fp_task(void)
 			}
 		} else if (evt & (TASK_EVENT_SENSOR_IRQ | TASK_EVENT_TIMER)) {
 			overall_t0 = get_time();
-			timestamps_invalid = 0;
 			/*
 			 * TODO(b/316859625): Remove CONFIG_ZEPHYR block after
 			 * migration to Zephyr is completed.
@@ -403,8 +456,17 @@ extern "C" void fp_task(void)
 			}
 
 			if (st == FINGER_PRESENT &&
-			    global_context.sensor_mode & FP_MODE_ANY_CAPTURE)
+			    (global_context.sensor_mode &
+			     FP_MODE_ANY_CAPTURE)) {
+				CPRINTS("Finger down (capture mode)!");
+				/*
+				 * Send FINGER_DOWN immediately upon detection
+				 * during a capture session so the host can
+				 * accurately measure interaction latency.
+				 */
+				send_mkbp_event(EC_MKBP_FP_FINGER_DOWN);
 				fp_process_finger();
+			}
 
 			if (global_context.sensor_mode & FP_MODE_ANY_WAIT_IRQ) {
 				fp_configure_detect();
@@ -430,6 +492,8 @@ extern "C" void fp_task(void)
 				fp_sensor_low_power();
 			}
 		}
+		fp_btn_ign_out::update(global_context.sensor_mode);
+		fp_led::update_mode(global_context.sensor_mode);
 	}
 #else /* !HAVE_FP_PRIVATE_DRIVER */
 	while (1) {
@@ -470,44 +534,11 @@ static enum ec_status fp_command_info(struct host_cmd_handler_args *args)
 	r->template_info.template_dirty = global_context.templ_dirty;
 	r->template_info.template_version = FP_TEMPLATE_FORMAT_VERSION;
 
-	if (args->version == 2) {
-		struct ec_response_fp_info_v2 *r_v2 =
-			static_cast<ec_response_fp_info_v2 *>(args->response);
-		/* Convert to v2 format. The formats differ only in the frame
-		 * array, which is located at the end of the structures
-		 *
-		 * SAFETY: 'r->image_frame_params' and r_v2->image_frame_params
-		 * overlap inexactly, but copying data is safe because we copy
-		 * data forward (from the first field of the structure to the
-		 * last).
-		 */
-		for (int i = 0; i < FP_MAX_CAPTURE_TYPES; i++) {
-			r_v2->image_frame_params[i].frame_size =
-				r->image_frame_params[i].frame_size;
-			r_v2->image_frame_params[i].pixel_format =
-				r->image_frame_params[i].pixel_format;
-			r_v2->image_frame_params[i].width =
-				r->image_frame_params[i].width;
-			r_v2->image_frame_params[i].height =
-				r->image_frame_params[i].height;
-			r_v2->image_frame_params[i].bpp =
-				r->image_frame_params[i].bpp;
-			r_v2->image_frame_params[i].fp_capture_type =
-				r->image_frame_params[i].fp_capture_type;
-			r_v2->image_frame_params[i].reserved =
-				r->image_frame_params[i].reserved;
-		}
-		response_size = sizeof(struct ec_response_fp_info_v2) +
-				FP_MAX_CAPTURE_TYPES *
-					sizeof(struct fp_image_frame_params);
-	}
-
 	args->response_size = response_size;
 
 	return EC_RES_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info,
-		     EC_VER_MASK(2) | EC_VER_MASK(3));
+DECLARE_HOST_COMMAND(EC_CMD_FP_INFO, fp_command_info, EC_VER_MASK(3));
 
 BUILD_ASSERT(FP_CONTEXT_NONCE_BYTES == 12);
 
@@ -537,11 +568,15 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	 */
 	struct ec_fp_template_encryption_metadata *enc_info =
 		&fp_enc_buffer.metadata;
-	enc_info->struct_version = FP_TEMPLATE_FORMAT_VERSION;
+
+	CleanseWrapper<std::array<uint8_t, FP_CONTEXT_NONCE_BYTES> > nonce{};
+	CleanseWrapper<std::array<uint8_t, FP_CONTEXT_ENCRYPTION_SALT_BYTES> >
+		encryption_salt{};
+	CleanseWrapper<std::array<uint8_t, FP_CONTEXT_TAG_BYTES> > tag{};
+
 	trng_init();
-	trng_rand_bytes(enc_info->nonce, FP_CONTEXT_NONCE_BYTES);
-	trng_rand_bytes(enc_info->encryption_salt,
-			FP_CONTEXT_ENCRYPTION_SALT_BYTES);
+	trng_rand_bytes(nonce.data(), nonce.size());
+	trng_rand_bytes(encryption_salt.data(), encryption_salt.size());
 	trng_exit();
 
 	if (fgr == global_context.template_newly_enrolled) {
@@ -558,7 +593,7 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	}
 
 	FpEncryptionKey key;
-	ret = derive_encryption_key(key, enc_info->encryption_salt,
+	ret = derive_encryption_key(key, encryption_salt,
 				    global_context.user_id,
 				    global_context.tpm_seed);
 	if (ret != EC_SUCCESS) {
@@ -578,19 +613,25 @@ static enum ec_error_list encrypt_template(uint16_t fgr)
 	ret = aes_128_gcm_encrypt(key,
 				  encrypted_template_and_positive_match_salt,
 				  encrypted_template_and_positive_match_salt,
-				  enc_info->nonce, enc_info->tag);
+				  nonce, tag);
 	if (ret != EC_SUCCESS) {
 		OPENSSL_cleanse(&fp_enc_buffer, sizeof(fp_enc_buffer));
 		CPRINTS("fgr%d: Failed to encrypt template", fgr);
 		return EC_ERROR_UNAVAILABLE;
 	}
 
+	enc_info->struct_version = FP_TEMPLATE_FORMAT_VERSION;
+	std::ranges::copy(nonce, enc_info->nonce);
+	std::ranges::copy(encryption_salt, enc_info->encryption_salt);
+	std::ranges::copy(tag, enc_info->tag);
+
 	global_context.templ_dirty &= ~BIT(fgr);
 
 	return EC_SUCCESS;
 }
 
-static enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output)
+test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
+					    uint8_t *output)
 {
 	enum ec_error_list ret;
 
@@ -600,14 +641,6 @@ static enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output)
 	if (global_context.current_capture_type == FP_CAPTURE_TYPE_INVALID) {
 		return EC_RES_INVALID_PARAM;
 	}
-
-	/*
-	 * Checks if the capture type is one where we only care about
-	 * the embedded/offset image bytes, like simple, pattern0,
-	 * pattern1, and reset_test.
-	 */
-	if (skip_image_offset(global_context.current_capture_type))
-		offset += FP_SENSOR_IMAGE_OFFSET;
 
 	uint32_t current_frame_size =
 		global_context.fp_frame_size_cache.get_frame_size(
@@ -620,6 +653,29 @@ static enum ec_status get_frame(uint32_t offset, uint32_t size, uint8_t *output)
 	ret = validate_fp_buffer_offset(current_frame_size, offset, size);
 	if (ret != EC_SUCCESS)
 		return EC_RES_INVALID_PARAM;
+
+	/*
+	 * Checks if the capture type is one where we only care about
+	 * the embedded/offset image bytes, like simple, pattern0,
+	 * pattern1, and reset_test.
+	 */
+	if (skip_image_offset(global_context.current_capture_type)) {
+		uint32_t adjusted_offset;
+
+		if (check_add_overflow(
+			    offset,
+			    static_cast<uint32_t>(FP_SENSOR_IMAGE_OFFSET),
+			    &adjusted_offset)) {
+			return EC_RES_INVALID_PARAM;
+		}
+
+		ret = validate_fp_buffer_offset(sizeof(fp_buffer),
+						adjusted_offset, size);
+		if (ret != EC_SUCCESS)
+			return EC_RES_INVALID_PARAM;
+
+		offset = adjusted_offset;
+	}
 
 	memcpy(output, fp_buffer + offset, size);
 
@@ -820,12 +876,7 @@ static enum ec_status fp_command_stats(struct host_cmd_handler_args *args)
 	r->overall_t0.lo = overall_t0.le.lo;
 	r->overall_t0.hi = overall_t0.le.hi;
 	r->timestamps_invalid = timestamps_invalid;
-	/*
-	 * Note that this is set to FP_NO_SUCH_TEMPLATE when positive match
-	 * secret is read/disabled, and we are not using this field in biod.
-	 */
-	r->template_matched =
-		global_context.positive_match_secret_state.template_matched;
+	r->template_matched = stats_template_matched;
 
 	args->response_size = sizeof(*r);
 	return EC_RES_SUCCESS;

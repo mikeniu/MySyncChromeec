@@ -45,12 +45,15 @@
 
 *   [Unit Tests](./unit_tests.md)
     *   [Zephyr Testing](./zephyr/ztest.md)
+*   [Leased DUT EC Testing](./lease_and_test_ec.md)
+*   [Remote DUT EC Flashing](./flash_dut.md)
 *   [Code Coverage](./code_coverage.md)
 *   [ChromeOS EC Firmware Test Requirements](./chromeos-ec-firmware-test-requirements.md)
 
 ## Updaters
 
 *   [USB Updater](./usb_updater.md)
+*   [Remote DUT EC Flashing](./flash_dut.md)
 
 ## USB
 

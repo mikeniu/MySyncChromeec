@@ -4,5 +4,5 @@
 
 # ISH includes a data cache.  Ensure panic info is synced to memory before
 # rebooting.
-config CACHE_MANAGEMENT
-	default y
+configdefault CACHE_MANAGEMENT
+	default y if DCACHE

@@ -27,7 +27,14 @@ const struct pm_state_info *pm_policy_next_state(uint8_t cpu, int32_t ticks)
 				    PM_ALL_SUBSTATES)) {
 				break;
 			}
-			ret = &cpu_state_list[i];
+
+			/* Find suitable power state by residency time */
+			if (ticks == K_TICKS_FOREVER ||
+			    ticks >= k_us_to_ticks_ceil32(
+					     cpu_state_list[i]
+						     .min_residency_us)) {
+				ret = &cpu_state_list[i];
+			}
 		}
 	}
 	return ret;

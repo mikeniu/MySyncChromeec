@@ -41,7 +41,7 @@ CONSOLE_CHANNEL(CC_FP, "fingerprint")
 CONSOLE_CHANNEL(CC_GESTURE, "gesture")
 #endif
 CONSOLE_CHANNEL(CC_GPIO, "gpio")
-#ifdef HAS_TASK_HOSTCMD
+#if defined(HAS_TASK_HOSTCMD) || defined(CONFIG_HAS_HOSTCMD)
 CONSOLE_CHANNEL(CC_HOSTCMD, "hostcmd")
 #endif
 #ifdef CONFIG_I2C
@@ -62,9 +62,6 @@ CONSOLE_CHANNEL(CC_LOGOLED, "logoled")
 #endif
 #ifdef HAS_TASK_LIGHTBAR
 CONSOLE_CHANNEL(CC_LIGHTBAR, "lightbar")
-#endif
-#ifdef HAS_TASK_RGBKBD
-CONSOLE_CHANNEL(CC_RGBKBD, "rgbkbd")
 #endif
 /*
    Use CC_LPC for any host communication channels to x86,

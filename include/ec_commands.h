@@ -5,8 +5,8 @@
 
 /* Host communication command constants for Chrome EC */
 
-#ifndef __CROS_EC_EC_COMMANDS_H
-#define __CROS_EC_EC_COMMANDS_H
+#ifndef PLATFORM_EC_INCLUDE_EC_COMMANDS_H_
+#define PLATFORM_EC_INCLUDE_EC_COMMANDS_H_
 
 #if !defined(__ACPI__) && !defined(__KERNEL__)
 #include <stdint.h>
@@ -1758,9 +1758,7 @@ enum ec_feature_code {
 	 * The EC supports triggering an STB dump.
 	 */
 	EC_FEATURE_AMD_STB_DUMP = 50,
-	/*
-	 * The EC supports memory dump commands.
-	 */
+	/* Deprecated */
 	EC_FEATURE_MEMORY_DUMP = 51,
 	/*
 	 * The EC supports DP2.1 capability
@@ -1790,6 +1788,14 @@ enum ec_feature_code {
 	 * Support signaling new console logs via host event
 	 */
 	EC_FEATURE_CONSOLE_LOG_EVENT = 58,
+	/*
+	 * The EC supports power monitoring
+	 */
+	EC_FEATURE_PWRMON = 59,
+	/*
+	 * The EC supports Bluetooth passthrough
+	 */
+	EC_FEATURE_BT_PASSTHRU = 60,
 };
 
 #define EC_FEATURE_MASK_0(event_code) BIT(event_code % 32)
@@ -3744,6 +3750,13 @@ struct ec_params_vstore_write {
 	uint8_t data[EC_VSTORE_SLOT_SIZE];
 } __ec_align1;
 
+/* Write port80 / post code event */
+#define EC_CMD_PORT80_WRITE 0x004C
+
+struct ec_params_port80_write {
+	uint32_t code;
+} __ec_align4;
+
 /*****************************************************************************/
 /* Thermal engine commands. Note that there are two implementations. We'll
  * reuse the command number, but the data and behavior is incompatible.
@@ -4180,6 +4193,12 @@ enum ec_mkbp_event {
 	/* Peripheral device charger event */
 	EC_MKBP_EVENT_PCHG = 12,
 
+	/* Power monitor telemetry event */
+	EC_MKBP_EVENT_PWRMON = 13,
+
+	/* Bluetooth passthrough event */
+	EC_MKBP_EVENT_BLUETOOTH = 14,
+
 	/* Number of MKBP events */
 	EC_MKBP_EVENT_COUNT,
 };
@@ -4201,6 +4220,8 @@ BUILD_ASSERT(EC_MKBP_EVENT_COUNT <= EC_MKBP_EVENT_TYPE_MASK);
 		[EC_MKBP_EVENT_DP_ALT_MODE_ENTERED] = "DP_ALT_MODE_ENTERED",   \
 		[EC_MKBP_EVENT_ONLINE_CALIBRATION] = "ONLINE_CALIBRATION",     \
 		[EC_MKBP_EVENT_PCHG] = "PCHG",                                 \
+		[EC_MKBP_EVENT_PWRMON] = "PWRMON",                             \
+		[EC_MKBP_EVENT_BLUETOOTH] = "BLUETOOTH",                       \
 	}
 /* clang-format on */
 
@@ -4282,6 +4303,12 @@ union __ec_align_offset1 ec_response_get_next_data_v3 {
 	uint32_t cec_events;
 
 	uint8_t cec_message[16];
+
+	struct __ec_todo_packed {
+		int64_t value;
+		uint32_t samples;
+		uint8_t channel_id;
+	} pwrmon_data;
 };
 BUILD_ASSERT(sizeof(union ec_response_get_next_data_v3) == 18);
 
@@ -5947,7 +5974,7 @@ struct ec_params_get_panic_info_v2 {
 #define EC_CMD_VERSION0 0x00DC
 
 /*
- * Memory Dump Commands
+ * DEPRECATED: Memory Dump Commands
  *
  * Since the HOSTCMD response size is limited, depending on the
  * protocol, retrieving a memory dump is split into 3 commands.
@@ -5965,12 +5992,14 @@ struct ec_params_get_panic_info_v2 {
  * Memory entries may overlap and may be out of order.
  * The host should check for overlaps to optimize transfer rate.
  */
+/* Deprecated */
 #define EC_CMD_MEMORY_DUMP_GET_METADATA 0x00DD
 struct ec_response_memory_dump_get_metadata {
 	uint16_t memory_dump_entry_count;
 	uint32_t memory_dump_total_size;
 } __ec_align4;
 
+/* Deprecated */
 #define EC_CMD_MEMORY_DUMP_GET_ENTRY_INFO 0x00DE
 struct ec_params_memory_dump_get_entry_info {
 	uint16_t memory_dump_entry_index;
@@ -5981,6 +6010,7 @@ struct ec_response_memory_dump_get_entry_info {
 	uint32_t size;
 } __ec_align4;
 
+/* Deprecated */
 #define EC_CMD_MEMORY_DUMP_READ_MEMORY 0x00DF
 
 struct ec_params_memory_dump_read_memory {
@@ -6060,6 +6090,109 @@ struct ec_response_hostcmd_watchdog_info {
 	int64_t watchdog_reload_period_max_ts_ms;
 	uint32_t watchdog_reload_count;
 	int64_t watchdog_stats_elapsed_ms;
+} __ec_align4;
+
+#define EC_THREAD_INFO_MAX_COUNT 32
+#define EC_THREAD_INFO_NAME_SIZE 16
+
+#define EC_CMD_THREAD_INFO_LIST 0x00E4
+
+struct ec_response_thread_info_list {
+	/* Total number of threads found, or EC_THREAD_INFO_MAX_COUNT if it
+	 * exceeds the limit.
+	 */
+	uint32_t thread_count;
+	uint32_t thread_ids[EC_THREAD_INFO_MAX_COUNT];
+} __ec_align4;
+
+#define EC_CMD_THREAD_INFO_DETAIL 0x00E5
+
+#define EC_THREAD_INFO_DETAIL_STACK_VALID  \
+	BIT(0) /* CONFIG_THREAD_STACK_INFO \
+		*/
+#define EC_THREAD_INFO_DETAIL_RUNTIME_USAGE_VALID \
+	BIT(1) /* CONFIG_SCHED_THREAD_USAGE */
+#define EC_THREAD_INFO_DETAIL_USAGE_ANALYSIS_VALID \
+	BIT(2) /* CONFIG_SCHED_THREAD_USAGE_ANALYSIS */
+#define EC_THREAD_INFO_DETAIL_NAME_VALID BIT(3) /* CONFIG_THREAD_NAME */
+#define EC_THREAD_INFO_DETAIL_PC_VALID BIT(4)
+#define EC_THREAD_INFO_DETAIL_LR_VALID BIT(5)
+#define EC_THREAD_INFO_DETAIL_SP_VALID BIT(6)
+
+struct ec_params_thread_info_detail {
+	uint32_t thread_id;
+} __ec_align4;
+
+/*
+ * These commands are ONLY applicable to Zephyr threads.
+ */
+struct ec_response_thread_info_detail {
+	/* Metadata */
+	uint64_t timestamp_us; /* System uptime when stats were collected */
+	uint32_t valid_flags; /* See EC_THREAD_INFO_DETAIL_*_VALID flags */
+
+	/* Name (Only valid if EC_THREAD_INFO_DETAIL_NAME_VALID is set).
+	 * Guaranteed to be null-terminated.
+	 */
+	char name[EC_THREAD_INFO_NAME_SIZE];
+
+	/* Basic information */
+	uint32_t entry_point; /* Thread entry point function address */
+	uint32_t timeout_us;
+	/*
+	 * Remaining timeout in us, 0xffffffff if forever,
+	 * 0 if none
+	 */
+
+	uint16_t user_options; /* From k_thread->base.user_options */
+	int8_t prio; /* From k_thread->base.prio */
+	uint8_t thread_state; /* From k_thread->base.thread_state */
+	uint8_t is_idle; /* 1 if per-CPU idle thread, 0 otherwise */
+	uint8_t is_current; /* 1 if thread is current, 0 otherwise */
+	uint8_t reserved[2]; /* Padding for alignment */
+
+	/* Stack usage (Only valid if EC_THREAD_INFO_DETAIL_STACK_VALID is set)
+	 */
+	uint32_t stack_cur;
+	uint32_t stack_max;
+	uint32_t stack_size;
+
+	/* Timing (Only valid if EC_THREAD_INFO_DETAIL_RUNTIME_USAGE_VALID is
+	 * set)
+	 */
+	uint32_t execution_time_us;
+
+	/* Analysis (Only valid if EC_THREAD_INFO_DETAIL_USAGE_ANALYSIS_VALID is
+	 * set)
+	 */
+	uint32_t window_peak_us;
+	uint32_t window_avg_us;
+
+	/* CPU scheduling */
+	uint32_t pending_on; /* Address of object thread is blocked on */
+
+	/* CPU registers (Valid flags: EC_THREAD_INFO_DETAIL_PC_VALID, etc.) */
+	uint32_t pc;
+	uint32_t lr;
+	uint32_t sp;
+} __ec_align4;
+
+/**
+ * Simulate up to 2 consecutive delayed power button presses.
+ */
+#define EC_CMD_POWER_BUTTON_PRESS 0x00E6
+
+struct ec_params_power_button_press {
+	/* Delay before the first press. Can be 0. */
+	uint32_t first_press_delay_ms;
+	/* Optional delay before the second press.
+	 * If 0, second press is not scheduled.
+	 */
+	uint32_t second_press_delay_ms;
+	/* Duration of the first press. If 0, default 200ms is used. */
+	uint16_t first_press_duration_ms;
+	/* Duration of the second press. If 0, default 200ms is used. */
+	uint16_t second_press_duration_ms;
 } __ec_align4;
 
 /*****************************************************************************/
@@ -6776,8 +6909,7 @@ struct ec_params_get_cbi {
 /*
  * Flags to control write behavior.
  *
- * NO_SYNC: Makes EC update data in RAM but skip writing to EEPROM. It's
- *          useful when writing multiple fields in a row.
+ * NO_SYNC: Obsolete
  * INIT:    Need to be set when creating a new CBI from scratch. All fields
  *          will be initialized to zero first.
  */
@@ -6855,6 +6987,7 @@ struct ec_params_set_cbi_bin {
 #define EC_RESET_FLAG_EFS BIT(20) /* Jumped to this image by EFS */
 #define EC_RESET_FLAG_AP_IDLE BIT(21) /* Leave alone AP */
 #define EC_RESET_FLAG_INITIAL_PWR BIT(22) /* EC had power, then was reset */
+#define EC_RESET_FLAG_PDC BIT(23) /* EC is recovering a PDC chip */
 
 /*
  * Reason codes used by the AP after a shutdown to figure out why it was reset
@@ -6920,6 +7053,8 @@ enum chipset_shutdown_reason {
 	CHIPSET_SHUTDOWN_BUTTON,
 	/* Force a chipset shutdown, because the AP wants to. */
 	CHIPSET_SHUTDOWN_HOST_CMD,
+	/* Forcing a shutdown for battery cutoff. */
+	CHIPSET_SHUTDOWN_BATTERY_CUTOFF,
 
 	CHIPSET_SHUTDOWN_COUNT, /* End of shutdown reasons. */
 };
@@ -8403,6 +8538,13 @@ struct ec_params_switch_enable_poe {
 	uint8_t enabled;
 } __ec_align1;
 
+/* Scheduled AP reset */
+#define EC_CMD_AP_RESET_SCHEDULED 0x0146
+
+struct ec_params_ap_reset_scheduled {
+	uint32_t delay_ms;
+} __ec_align4;
+
 /*****************************************************************************/
 /* The command range 0x200-0x2FF is reserved for Rotor. */
 
@@ -8494,6 +8636,7 @@ struct ec_params_fp_passthru {
  * @FP_CAPTURE_PATTERN1: Self test pattern (e.g. inverted checkerboard)
  * @FP_CAPTURE_QUALITY_TEST: Capture for Quality test with fixed contrast
  * @FP_CAPTURE_RESET_TEST: Capture for pixel reset value test
+ * @FP_CAPTURE_PATTERN2: Capture for pattern2 test
  * @FP_CAPTURE_TYPE_MAX: End of enum
  *
  * @note This enum must remain ordered, if you add new values you must ensure
@@ -8511,6 +8654,7 @@ enum fp_capture_type {
 	FP_CAPTURE_PATTERN1 = 12,
 	FP_CAPTURE_QUALITY_TEST = 16,
 	FP_CAPTURE_RESET_TEST = 20,
+	FP_CAPTURE_PATTERN2 = 24,
 	FP_CAPTURE_TYPE_MAX,
 };
 /* LINT.ThenChange(/test/fpsensor_utils.cc,
@@ -8518,7 +8662,7 @@ enum fp_capture_type {
  */
 
 /* The maximum number of capture types in enum fp_capture_type */
-#define FP_MAX_CAPTURE_TYPES 9
+#define FP_MAX_CAPTURE_TYPES 10
 
 /* Extracts the capture type from the sensor 'mode' word */
 #define FP_CAPTURE_TYPE(mode)                                          \
@@ -8971,6 +9115,13 @@ struct ec_response_fp_sign_match {
 	uint8_t signature[FP_MAC_LENGTH];
 } __ec_align4;
 
+/* Unlock developer options via FingerGuard HMAC */
+#define EC_CMD_FP_UNLOCK_DEV_OPTIONS 0x0418
+
+struct ec_params_fp_unlock_dev_options {
+	uint8_t hmac[FP_MAC_LENGTH];
+} __ec_align4;
+
 /*
  * Fingerprint ASCP claim command.
  *
@@ -9275,6 +9426,91 @@ struct ec_response_get_boot_time {
  */
 #define EC_CMD_ENABLE_OFFMODE_HEARTBEAT 0x0606
 
+/* Get battery misc info */
+#define EC_CMD_BATTERY_GET_MISC_INFO 0x0607
+
+/**
+ * struct ec_params_battery_get_misc_info - Battery misc info parameters
+ * @index: Battery index.
+ */
+struct ec_params_battery_get_misc_info {
+	uint8_t index;
+} __ec_align1;
+
+/**
+ * struct ec_response_battery_get_misc_info - Battery misc info response
+ * @cfet_status: status of C-FET. 1: disabled, 0: enabled, -1: error.
+ * @battery_status: Battery status register.
+ * @dfet_status: status of D-FET. 0: disconnected, 1: not disconnected, -1:
+ * error.
+ */
+struct ec_response_battery_get_misc_info {
+	int32_t cfet_status;
+	uint32_t battery_status;
+	int32_t dfet_status;
+} __ec_align4;
+
+/**
+ * Power monitoring. Used to read power consumptions on rails
+ */
+#define EC_CMD_PWRMON 0x0608
+
+enum ec_pwrmon_cmd {
+	EC_PWRMON_GET_CHANNEL_COUNT = 0,
+	EC_PWRMON_DUMP_INFO = 1,
+	EC_PWRMON_SET_RATE = 2,
+	EC_PWRMON_GET_RATE = 3,
+	EC_PWRMON_START = 4,
+	EC_PWRMON_STOP = 5,
+	EC_PWRMON_LATCH = 6,
+};
+
+struct ec_params_pwrmon {
+	uint8_t cmd;
+	union {
+		uint16_t set_rate;
+		uint8_t channel_id;
+	} __ec_align2;
+
+	/*
+	 * The following commands have no args:
+	 *
+	 * start, stop, latch
+	 *
+	 */
+} __ec_align4;
+
+struct pwrmon_dump_info {
+	uint8_t channel_id;
+	char channel_name[32];
+} __ec_align4;
+
+struct ec_response_pwrmon {
+	union {
+		uint16_t sample_rate;
+		uint8_t channel_count;
+		struct pwrmon_dump_info dump_info;
+	} __ec_align4;
+} __ec_align4;
+
+/* BT Passthrough */
+#define EC_CMD_BT_COMMAND 0x0609
+
+/* ChromeOS Host Command limit is strictly <256 bytes */
+#define BT_MAX_COMMAND_SIZE 240
+struct ec_param_bt_command {
+	uint32_t size;
+	uint8_t data[BT_MAX_COMMAND_SIZE];
+} __ec_align4;
+
+#define EC_CMD_BT_READ_EVENT 0x060A
+
+#define BT_MAX_EVENT_SIZE 240
+struct ec_response_bt_read_event {
+	uint32_t num_events;
+	uint8_t events[BT_MAX_EVENT_SIZE];
+} __ec_align4;
+
 /*****************************************************************************/
 /*
  * Reserve a range of host commands for board-specific, experimental, or
@@ -9355,4 +9591,4 @@ struct ec_response_get_boot_time {
 }
 #endif
 
-#endif /* __CROS_EC_EC_COMMANDS_H */
+#endif /* PLATFORM_EC_INCLUDE_EC_COMMANDS_H_ */

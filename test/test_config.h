@@ -5,8 +5,8 @@
 
 /* Per-test config flags */
 
-#ifndef __TEST_TEST_CONFIG_H
-#define __TEST_TEST_CONFIG_H
+#ifndef PLATFORM_EC_TEST_TEST_CONFIG_H_
+#define PLATFORM_EC_TEST_TEST_CONFIG_H_
 
 #ifndef TEST_BUILD
 #error test_config.h should not be included in non-test build.
@@ -54,7 +54,6 @@ enum battery_type {
 
 #ifdef TEST_KB_8042
 #define CONFIG_KEYBOARD_PROTOCOL_8042
-#define CONFIG_8042_AUX
 #define CONFIG_KEYBOARD_DEBUG
 #endif
 
@@ -104,11 +103,6 @@ enum battery_type {
 #define CONFIG_ACCEL_FIFO
 #define CONFIG_ACCEL_FIFO_SIZE 256
 #define CONFIG_ACCEL_FIFO_THRES 10
-#endif
-
-#ifdef TEST_RGB_KEYBOARD
-#define CONFIG_RGB_KEYBOARD
-#define CONFIG_RGBKBD_DEMO_DOT
 #endif
 
 #if defined(TEST_BODY_DETECTION) || defined(TEST_MOTION_ANGLE) ||        \
@@ -234,8 +228,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #undef CONFIG_USB_PD_HOST_CMD
 #undef CONFIG_USB_DPM_SM
 #define CONFIG_USB_PRL_SM
-#define CONFIG_USB_PD_TCPC
-#define CONFIG_USB_PD_TCPM_STUB
 #define CONFIG_USB_POWER_DELIVERY
 #define CONFIG_SHA256_SW
 #define CONFIG_SW_CRC
@@ -334,8 +326,6 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_USB_PE_SM
 #define CONFIG_USB_PRL_SM
 #define CONFIG_USB_TYPEC_SM
-#define CONFIG_USB_PD_TCPC
-#define CONFIG_USB_PD_TCPM_STUB
 #define CONFIG_USB_POWER_DELIVERY
 #define CONFIG_SW_CRC
 #undef CONFIG_USB_PD_HOST_CMD
@@ -464,4 +454,4 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_CURVE25519
 #endif /* TEST_X25519 */
 
-#endif /* __TEST_TEST_CONFIG_H */
+#endif /* PLATFORM_EC_TEST_TEST_CONFIG_H_ */

@@ -49,34 +49,6 @@ ZTEST(tasks, test_interrupt_context)
 	zassert_false(in_interrupt_context());
 }
 
-ZTEST_F(tasks, test_timer_arm_before_now)
-{
-	timestamp_t deadline = {
-		.val = 5,
-	};
-
-	fixture->fake_time.val = 15;
-	get_time_mock = &fixture->fake_time;
-
-	zassert_ok(timer_arm(deadline, TASK_ID_MOTIONSENSE));
-	zassert_equal(*task_get_event_bitmap(TASK_ID_MOTIONSENSE) &
-			      TASK_EVENT_TIMER,
-		      TASK_EVENT_TIMER);
-}
-
-ZTEST_F(tasks, test_timer_arm_busy)
-{
-	timestamp_t deadline = {
-		.val = UINT64_C(5000000),
-	};
-
-	fixture->fake_time.val = 0;
-	get_time_mock = &fixture->fake_time;
-
-	zassert_ok(timer_arm(deadline, TASK_ID_MOTIONSENSE));
-	zassert_equal(EC_ERROR_BUSY, timer_arm(deadline, TASK_ID_MOTIONSENSE));
-}
-
 ZTEST(tasks, test_get_event_bitmap_invalid_tid)
 {
 	zassert_is_null(

@@ -7,8 +7,8 @@
  * @file drivers/cros_flash/cros_flash_mchp_wp.c
  * @brief Public APIs for microchip write protection.
  */
-#ifndef ZEPHYR_INCLUDE_DRIVERS_MICROCHIP_WP_H_
-#define ZEPHYR_INCLUDE_DRIVERS_MICROCHIP_WP_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_MICROCHIP_WP_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_MICROCHIP_WP_H_
 
 /**
  * Sync up mchp_wp_ex state with mchp_wp state. Update mchp_wp state according
@@ -32,4 +32,4 @@ void enable_mchp_wp(void);
  */
 int get_mchp_wp_gpio(void);
 
-#endif /* ZEPHYR_INCLUDE_DRIVERS_MICROCHIP_WP_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_MICROCHIP_WP_H_ */

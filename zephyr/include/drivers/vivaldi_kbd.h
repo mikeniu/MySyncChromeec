@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_VIVALDI_KBD_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_VIVALDI_KBD_H_
+
 #include <stdint.h>
 
 #include <zephyr/devicetree.h>
@@ -18,3 +21,5 @@ int8_t board_vivaldi_keybd_idx(void);
 bool vivaldi_kbd_is_vol_up(uint8_t row, uint8_t col);
 
 #define VIVALDI_CFG_IDX(nodelabel) DT_NODE_CHILD_IDX(DT_NODELABEL(nodelabel))
+
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_VIVALDI_KBD_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_APL6012_H
-#define __CROS_EC_APL6012_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_APL6012_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_APL6012_H_
 
 #include "i2c.h"
 #include "temp_sensor/thermistor.h"
@@ -100,4 +100,4 @@ void apl6012_update_temperature(int idx);
 }
 #endif
 
-#endif /* __CROS_EC_APL6012_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_TEMP_SENSOR_APL6012_H_ */

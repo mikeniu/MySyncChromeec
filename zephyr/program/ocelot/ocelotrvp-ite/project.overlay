@@ -81,6 +81,12 @@ tach_fan0: &tach0 {};
 		compatible = "cros-ec,cse-early-rec";
 		cse-early-rec-gpios = <&gpioj 3 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
 	};
+
+	ap-power-events {
+		compatible = "cros-ec,ap-power-events";
+		/* GPIO H0: Power down signal(C_EC_PDB_CTRL_R) for codec amplifier */
+		event-gpios = <&gpioh 0 GPIO_ACTIVE_HIGH>;
+	};
 };
 
 &espi0 {
@@ -136,3 +142,5 @@ tach_fan0: &tach0 {};
 &imvp_rt3645 {
 	enable-gpios = <&gpioi 7 GPIO_ACTIVE_HIGH>;
 };
+
+/delete-node/ &rvp_board_id;

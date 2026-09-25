@@ -9,8 +9,8 @@
  * @brief Backend API for ANX7452 retimer emulator
  */
 
-#ifndef __EMUL_ANX7452_H
-#define __EMUL_ANX7452_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ANX7452_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ANX7452_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c.h>
@@ -78,4 +78,4 @@ emul_anx7452_get_i2c_common_data(const struct emul *emul,
  * @}
  */
 
-#endif /* __EMUL_ANX7452 */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_ANX7452_H_ */

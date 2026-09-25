@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef TEST_SRC_POLICY_COMMON_H
-#define TEST_SRC_POLICY_COMMON_H
+#ifndef PLATFORM_EC_ZEPHYR_TEST_PDC_SRC_PDC_POLICY_SRC_POLICY_COMMON_H_
+#define PLATFORM_EC_ZEPHYR_TEST_PDC_SRC_PDC_POLICY_SRC_POLICY_COMMON_H_
 
 #include "chipset.h"
 #include "emul/emul_pdc.h"
@@ -20,6 +20,12 @@
 #endif
 
 #define PDC_TEST_TIMEOUT 2000
+/*
+ * Some state-machine syncs include multiple emulator command roundtrips.
+ * After the glibc and GCC uprev, native_sim hosts can need extra
+ * scheduling margin for these waits.
+ */
+#define TEST_EXTENDED_TIMEOUT 5000
 
 /* TODO: b/343760437 - Once the emulator can detect the PDC threads are idle,
  * remove the sleep delay to let the policy code run.
@@ -43,4 +49,4 @@ struct ec_response_usb_pd_power_info host_cmd_power_info(int port);
 int verify_lpm_source_pdo(struct src_policy_fixture *fixture, uint32_t port,
 			  int mv, int ma, int PDO_PEAK_OCP);
 
-#endif /* TEST_SRC_POLICY_COMMON_H */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_PDC_SRC_PDC_POLICY_SRC_POLICY_COMMON_H_ */

@@ -8,8 +8,8 @@
  * @brief Controls for the mock fpsensor private driver
  */
 
-#ifndef __MOCK_FPSENSOR_MOCK_H
-#define __MOCK_FPSENSOR_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_MOCK_H_
 
 #include "common.h"
 #include "fpsensor/fpsensor.h"
@@ -52,4 +52,4 @@ extern struct mock_ctrl_fp_sensor mock_ctrl_fp_sensor;
 }
 #endif
 
-#endif /* __MOCK_FP_SENSOR_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_MOCK_H_ */

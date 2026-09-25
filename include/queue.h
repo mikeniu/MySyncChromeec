@@ -4,8 +4,8 @@
  *
  * Queue data structure.
  */
-#ifndef __CROS_EC_QUEUE_H
-#define __CROS_EC_QUEUE_H
+#ifndef PLATFORM_EC_INCLUDE_QUEUE_H_
+#define PLATFORM_EC_INCLUDE_QUEUE_H_
 
 #include "common.h"
 #include "util.h"
@@ -123,7 +123,7 @@ void queue_init(struct queue const *q);
 void queue_enable_buffered_mode(struct queue const *q);
 
 /* Query whether this queue makes use of `queue_flush()`. */
-inline bool is_queue_buffered(struct queue const *q)
+static inline bool is_queue_buffered(struct queue const *q)
 {
 	return q->state->flags & QUEUE_BUFFERED_MODE;
 }
@@ -299,4 +299,4 @@ queue_peek_memcpy(struct queue const *q, void *dest, size_t i, size_t count,
 }
 #endif
 
-#endif /* __CROS_EC_QUEUE_H */
+#endif /* PLATFORM_EC_INCLUDE_QUEUE_H_ */

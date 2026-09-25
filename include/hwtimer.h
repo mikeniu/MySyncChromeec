@@ -5,8 +5,8 @@
 
 /* Hardware timer driver API */
 
-#ifndef __CROS_EC_HWTIMER_H
-#define __CROS_EC_HWTIMER_H
+#ifndef PLATFORM_EC_INCLUDE_HWTIMER_H_
+#define PLATFORM_EC_INCLUDE_HWTIMER_H_
 
 #include <stdint.h>
 
@@ -40,8 +40,7 @@ void __hw_clock_event_clear(void);
 #ifdef CONFIG_HWTIMER_64BIT
 __override_proto
 #endif
-	uint32_t
-	__hw_clock_source_read(void);
+	uint32_t __hw_clock_source_read(void);
 
 /**
  * Override the lower 32-bits of the hardware counter
@@ -126,4 +125,4 @@ void hwtimer_reset_watchdog(void);
 }
 #endif
 
-#endif /* __CROS_EC_HWTIMER_H */
+#endif /* PLATFORM_EC_INCLUDE_HWTIMER_H_ */

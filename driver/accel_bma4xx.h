@@ -5,8 +5,8 @@
 
 /* BMA4XX gsensor module for Chrome EC */
 
-#ifndef __CROS_EC_ACCEL_BMA4XX_H
-#define __CROS_EC_ACCEL_BMA4XX_H
+#ifndef PLATFORM_EC_DRIVER_ACCEL_BMA4XX_H_
+#define PLATFORM_EC_DRIVER_ACCEL_BMA4XX_H_
 
 #include "config.h"
 
@@ -209,4 +209,4 @@ void bma4xx_interrupt(enum gpio_signal signal);
 #endif /* DT_NODE_EXISTS */
 #endif /* CONFIG_ZEPHYR */
 
-#endif /* __CROS_EC_ACCEL_BMA4XX_H */
+#endif /* PLATFORM_EC_DRIVER_ACCEL_BMA4XX_H_ */

@@ -5,8 +5,8 @@
 
 /* BMI3XX gsensor module for Chrome EC */
 
-#ifndef __CROS_EC_ACCELGYRO_BMI3XX_H
-#define __CROS_EC_ACCELGYRO_BMI3XX_H
+#ifndef PLATFORM_EC_DRIVER_ACCELGYRO_BMI3XX_H_
+#define PLATFORM_EC_DRIVER_ACCELGYRO_BMI3XX_H_
 
 /* Sensor Specific macros */
 #define BMI3_ADDR_I2C_PRIM 0x68
@@ -292,4 +292,4 @@ void bmi3xx_interrupt(enum gpio_signal signal);
 #endif
 #endif /* CONFIG_ZEPHYR */
 
-#endif /* __CROS_EC_ACCELGYRO_BMI3XX_H */
+#endif /* PLATFORM_EC_DRIVER_ACCELGYRO_BMI3XX_H_ */

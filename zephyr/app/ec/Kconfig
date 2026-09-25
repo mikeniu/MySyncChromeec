@@ -23,7 +23,7 @@ orsource "chip/$(ARCH)/*/Kconfig.*"
 #
 # Override the maximum number of preemptive priority levels.
 #
-config NUM_PREEMPT_PRIORITIES
+configdefault NUM_PREEMPT_PRIORITIES
 	default 30
 
 #
@@ -31,7 +31,7 @@ config NUM_PREEMPT_PRIORITIES
 # cooperative priority. Override its priority to the second lowest preempt
 # priority. (i.e. NUM_PREEMPT_PRIORITIES - 1)
 #
-config SYSTEM_WORKQUEUE_PRIORITY
+configdefault SYSTEM_WORKQUEUE_PRIORITY
 	default 29
 
 # eSPI is chatty, so default to Error only
@@ -46,6 +46,7 @@ endchoice
 
 choice
 	prompt "Chromium OS EC firmware section"
+	default CROS_EC_RW
 
 config CROS_EC_RO
 	bool "This build is will be for the RO copy of the EC"
@@ -155,7 +156,7 @@ config SHIMMED_TASKS
 	default y if HAS_TASK_CHIPSET
 	default y if HAS_TASK_DPS
 	default y if HAS_TASK_FPSENSOR
-	default y if HAS_TASK_HOSTCMD
+	default y if HAS_TASK_HOSTCMD || HAS_HOSTCMD
 	default y if HAS_TASK_KEYSCAN
 	default y if HAS_TASK_KEYPROTO
 	default y if HAS_TASK_MOTIONSENSE
@@ -179,32 +180,32 @@ config SHIMMED_TASKS
 # These shell options are turned off by MINIMAL_SHELL, but are important to us;
 # override Zephyr's default to keep them on.
 #
-config SHELL_HISTORY
+configdefault SHELL_HISTORY
   default y
 
-config SHELL_TAB
+configdefault SHELL_TAB
   default y
 
-config SHELL_TAB_AUTOCOMPLETION
+configdefault SHELL_TAB_AUTOCOMPLETION
   default y if SHELL_TAB
 
-config SHELL_HELP
+configdefault SHELL_HELP
   default y
 
-config KERNEL_SHELL
+configdefault KERNEL_SHELL
   default y
 
-config EEPROM_SHELL
+configdefault EEPROM_SHELL
 	default y if EEPROM
 
-config PWM_SHELL
+configdefault PWM_SHELL
 	default y if PWM
 
-config WDT_SHELL
+configdefault WDT_SHELL
 	default y if WATCHDOG
 
 # Realtek ULPM support requires POWEROFF
-config POWEROFF
+configdefault POWEROFF
 	default y if SOC_RTS5912_ULPM
 
 endif # CROS_EC

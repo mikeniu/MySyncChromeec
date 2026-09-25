@@ -7,4 +7,9 @@ config TEST_SHA256
 	help
 	  SHA256 tests.
 
+config TEST_X25519
+	bool "X25519 tests"
+	help
+	  X25519 curve25519 tests.
+
 source "Kconfig.zephyr"

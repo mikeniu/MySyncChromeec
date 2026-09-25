@@ -16,6 +16,7 @@
 #include "lid_switch.h"
 #include "power_button.h"
 #include "system.h"
+#include "tablet_mode.h"
 #include "task.h"
 #include "timer.h"
 #include "util.h"
@@ -29,10 +30,28 @@
 #define CONFIG_POWER_BUTTON_FLAGS 0
 #endif
 
+#define POWER_BUTTON_SHORTPRESS 200
+
+#ifdef CONFIG_HOSTCMD_POWER_BUTTON_PRESS
+/* Structure for storing power button double press parameters. */
+static volatile struct press_config {
+	/* Delay from the the first press to start of second press. */
+	uint32_t second_press_delay_ms;
+	uint16_t first_press_duration_ms;
+	uint16_t second_press_duration_ms;
+} pbtn_press;
+#endif
+
 /* Debounced power button state */
 test_export_static int debounced_power_pressed;
 static int simulate_power_pressed;
 static volatile int power_button_is_stable = 1;
+
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+static bool pb_suppress_active;
+static bool eat_next_release;
+static void update_pb_suppress_state(void);
+#endif /* CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD */
 
 static const struct button_config power_button = {
 	.name = "power button",
@@ -125,6 +144,11 @@ static void power_button_init(void)
 	    (!(boot_keys & BIT(BOOT_KEY_POWER)) && debounced_power_pressed))
 		hook_notify(HOOK_POWER_BUTTON_CHANGE);
 
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+	CPRINTS("PB: keyboard power button configuration enabled");
+	update_pb_suppress_state();
+#endif
+
 	/* Enable interrupts, now that we've initialized */
 	gpio_enable_interrupt(power_button.gpio);
 }
@@ -202,11 +226,53 @@ static int btn_ign_in_get_remaining_time(int pressed)
 /**
  * Handle debounced power button changing state.
  */
-static void power_button_change_deferred(void);
+test_export_static void power_button_change_deferred(void);
 DECLARE_DEFERRED(power_button_change_deferred);
-static void power_button_change_deferred(void)
+test_export_static void power_button_change_deferred(void)
 {
-	const int new_pressed = raw_power_button_pressed();
+	int new_pressed = raw_power_button_pressed();
+
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+	if (pb_suppress_active) {
+		/*
+		 * S0 Tablet Mode active:
+		 * Power button presses are suppressed by forcing
+		 * new_pressed to 0.
+		 *
+		 * Power button releases:
+		 *   - If the corresponding press was suppressed (not
+		 *     forwarded), we keep new_pressed as 0. Since
+		 *     debounced_power_pressed is already 0, this results in
+		 *     no state change (suppressed).
+		 *   - If the press was forwarded, keeping new_pressed as 0
+		 *     will trigger a transition from 1 to 0 (forwarded).
+		 */
+		if (new_pressed) {
+			CPRINTS("PB suppressed: press");
+		} else if (!debounced_power_pressed) {
+			CPRINTS("PB suppressed: release");
+		}
+		new_pressed = 0;
+	}
+
+	/*
+	 * If the power button was held during suspend, eat the first
+	 * release event after resume to prevent waking the system
+	 * immediately.
+	 *
+	 * We must manually re-enable keyboard scanning (which was disabled
+	 * when the button was pressed) and return early to bypass forwarding
+	 * the release event to the AP.
+	 */
+	if (!new_pressed && eat_next_release) {
+		CPRINTS("PB suppressed: suspend release");
+		eat_next_release = false;
+		debounced_power_pressed = 0;
+		power_button_is_stable = 1;
+		keyboard_scan_enable(1, KB_SCAN_DISABLE_POWER_BUTTON);
+		return;
+	}
+#endif /* CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD */
 
 #ifdef CONFIG_PLATFORM_EC_BTN_IGN_IN
 	int ignore_us = btn_ign_in_get_remaining_time(new_pressed);
@@ -289,12 +355,19 @@ void power_button_simulate_press(unsigned int duration)
 			   duration * MSEC);
 }
 
+#ifdef CONFIG_POWER_BUTTON
+__overridable int power_button_is_eating_release(void)
+{
+	return 0;
+}
+#endif
+
 /*****************************************************************************/
 /* Console commands */
 
 static int command_powerbtn(int argc, const char **argv)
 {
-	int ms = 200; /* Press duration in ms */
+	int ms = POWER_BUTTON_SHORTPRESS; /* Press duration in ms */
 	char *e;
 
 	if (argc > 1) {
@@ -308,3 +381,129 @@ static int command_powerbtn(int argc, const char **argv)
 }
 DECLARE_CONSOLE_COMMAND(powerbtn, command_powerbtn, "[msec]",
 			"Simulate power button press");
+
+/*****************************************************************************/
+/* Host commands */
+
+#ifdef CONFIG_HOSTCMD_POWER_BUTTON_PRESS
+static void power_button_press_deferred(void);
+DECLARE_DEFERRED(power_button_press_deferred);
+static void power_button_press_deferred(void)
+{
+	unsigned int press_duration =
+		pbtn_press.second_press_delay_ms > 0 ?
+			pbtn_press.first_press_duration_ms :
+			pbtn_press.second_press_duration_ms;
+	/* Trigger button press. */
+	power_button_simulate_press(press_duration);
+	/* And if needed, defer the second press. */
+	if (pbtn_press.second_press_delay_ms > 0) {
+		hook_call_deferred(&power_button_press_deferred_data,
+				   pbtn_press.second_press_delay_ms * MSEC);
+		pbtn_press.second_press_delay_ms = 0;
+	}
+}
+
+/**
+ * Host command to schedule 2 delayed power button short presses.
+ */
+static enum ec_host_cmd_status
+hc_power_button_press(struct ec_host_cmd_handler_args *args)
+{
+	const struct ec_params_power_button_press *p = args->input_buf;
+
+	/* Arm the (double) press defaults */
+	pbtn_press.second_press_delay_ms = p->second_press_delay_ms;
+	pbtn_press.first_press_duration_ms = p->first_press_duration_ms;
+	pbtn_press.second_press_duration_ms = p->second_press_duration_ms;
+
+	/* Fixup parameters to match the deferred flow. */
+	if (pbtn_press.second_press_delay_ms > 0) {
+		pbtn_press.second_press_delay_ms =
+			p->second_press_delay_ms - p->first_press_delay_ms;
+	} else {
+		/* First press becomes the last. */
+		pbtn_press.second_press_duration_ms =
+			p->first_press_duration_ms;
+	}
+	/* Fixup default durations. */
+	if (pbtn_press.first_press_duration_ms == 0)
+		pbtn_press.first_press_duration_ms = POWER_BUTTON_SHORTPRESS;
+	if (pbtn_press.second_press_duration_ms == 0)
+		pbtn_press.second_press_duration_ms = POWER_BUTTON_SHORTPRESS;
+
+	/* Command is invalid if 2 presses are requested but:
+	 * - Second press is requested before first one.
+	 * - Duration of the first press overlaps with the second press.
+	 */
+	if (p->second_press_delay_ms != 0 &&
+	    (p->second_press_delay_ms <= p->first_press_delay_ms ||
+	     (p->first_press_delay_ms + pbtn_press.first_press_duration_ms >=
+	      p->second_press_delay_ms)))
+		return EC_HOST_CMD_INVALID_PARAM;
+
+	/* Schedule first press */
+	hook_call_deferred(&power_button_press_deferred_data,
+			   p->first_press_delay_ms * MSEC);
+
+	return EC_HOST_CMD_SUCCESS;
+}
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_POWER_BUTTON_PRESS, hc_power_button_press,
+			     EC_VER_MASK(0),
+			     struct ec_params_power_button_press);
+#endif
+
+#ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
+/*
+ * Monitor the power button state during suspend transition.
+ *
+ * If the button is physically held during suspend, we arm the
+ * eat_next_release flag so that the subsequent release event on resume
+ * is swallowed (preventing a wake loop).
+ *
+ * We check raw state via power_button_signal_asserted() because S0 tablet
+ * mode suppression overrides the debounced state to 0 (released).
+ */
+static void power_button_suspend(void)
+{
+	if (power_button_signal_asserted()) {
+		CPRINTS("PB held during suspend, eating next release");
+		eat_next_release = true;
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, power_button_suspend, HOOK_PRIO_DEFAULT);
+
+static void update_pb_suppress_state(void)
+{
+	bool new_state = chipset_in_state(CHIPSET_STATE_ON) &&
+			 tablet_get_mode();
+
+	if (eat_next_release && !power_button_signal_asserted()) {
+		CPRINTS("PB release missed during suspend, clearing eat_next_release");
+		eat_next_release = false;
+		debounced_power_pressed = 0;
+	}
+
+	if (new_state != pb_suppress_active) {
+		pb_suppress_active = new_state;
+		CPRINTS("PB suppress: %s",
+			pb_suppress_active ? "active" : "inactive");
+	}
+}
+DECLARE_HOOK(HOOK_TABLET_MODE_CHANGE, update_pb_suppress_state,
+	     HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_RESUME, update_pb_suppress_state, HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, update_pb_suppress_state, HOOK_PRIO_DEFAULT);
+
+static void pb_suppress_chipset_inactive(void)
+{
+	if (pb_suppress_active) {
+		pb_suppress_active = false;
+		CPRINTS("PB suppress: inactive");
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_SUSPEND, pb_suppress_chipset_inactive,
+	     HOOK_PRIO_DEFAULT);
+DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, pb_suppress_chipset_inactive,
+	     HOOK_PRIO_DEFAULT);
+#endif /* CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD */

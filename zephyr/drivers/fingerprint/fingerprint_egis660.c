@@ -32,8 +32,8 @@ int convert_fp_capture_type_to_egis_capture_type(
 		return EGIS_CAPTURE_PATTERN0;
 	case FINGERPRINT_CAPTURE_TYPE_PATTERN1:
 		return EGIS_CAPTURE_PATTERN1;
-	case FINGERPRINT_CAPTURE_TYPE_RESET_TEST:
-		return EGIS_CAPTURE_RESET_TEST;
+	case FINGERPRINT_CAPTURE_TYPE_PATTERN2:
+		return EGIS_CAPTURE_PATTERN2;
 	default:
 		return -EINVAL;
 	}
@@ -255,7 +255,7 @@ static int egis660_maintenance(const struct device *dev, uint8_t *buf,
 			       size_t size)
 {
 	struct egis660_data *data = dev->data;
-	struct fp_sensor_info sensor_info;
+	struct egis660_fp_sensor_info sensor_info;
 	uint64_t start;
 	int rc = 0;
 
@@ -387,12 +387,12 @@ static int egis660_init_driver(const struct device *dev)
 	int ret;
 
 	if (!spi_is_ready_dt(&cfg->spi)) {
-		LOG_ERR("SPI bus is not ready");
+		LOG_ERR_DEVICE_NOT_READY(cfg->spi.bus);
 		return -EINVAL;
 	}
 
 	if (!gpio_is_ready_dt(&cfg->reset_pin)) {
-		LOG_ERR("Port for sensor reset GPIO is not ready");
+		LOG_ERR_DEVICE_NOT_READY(cfg->reset_pin.port);
 		return -EINVAL;
 	}
 
@@ -403,7 +403,7 @@ static int egis660_init_driver(const struct device *dev)
 	}
 
 	if (!gpio_is_ready_dt(&cfg->interrupt)) {
-		LOG_ERR("Port for interrupt GPIO is not ready");
+		LOG_ERR_DEVICE_NOT_READY(cfg->interrupt.port);
 		return -EINVAL;
 	}
 
@@ -454,11 +454,12 @@ static int egis660_init_driver(const struct device *dev)
 			FINGERPRINT_SENSOR_FRAME_SIZE(idx, DT_DRV_INST(inst)), \
 		"FP image buffer size smaller than raw image size at index " #idx);
 
-#define EGIS660_ASSERT_FRAME_SIZE_CONSISTENT(idx, inst)                        \
-	BUILD_ASSERT((FINGERPRINT_SENSOR_FRAME_SIZE(idx, DT_DRV_INST(inst)) == \
-		      FINGERPRINT_SENSOR_FRAME_SIZE(0, DT_DRV_INST(inst))),    \
-		     "EGIS660: frame_size of config " #idx                     \
-		     " does not match config 0");
+#define EGIS660_ASSERT_IMAGE_REAL_SIZE_CONSISTENT(idx, inst)                   \
+	BUILD_ASSERT(                                                          \
+		(FINGERPRINT_SENSOR_REAL_IMAGE_SIZE(idx, DT_DRV_INST(inst)) == \
+		 FINGERPRINT_SENSOR_REAL_IMAGE_SIZE(0, DT_DRV_INST(inst))),    \
+		"EGIS660: real_image_size of config " #idx                     \
+		" does not match config 0");
 
 #define EGIS660_DEFINE(inst)                                                         \
 	static struct egis660_data egis660_data_##inst;                              \
@@ -476,7 +477,7 @@ static int egis660_init_driver(const struct device *dev)
 	LISTIFY(FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)),                   \
 		EGIS660_BUILD_ASSERT_IMAGE_SIZE, (;), inst)                          \
 	LISTIFY(FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)),                   \
-		EGIS660_ASSERT_FRAME_SIZE_CONSISTENT, (;), inst)                     \
+		EGIS660_ASSERT_IMAGE_REAL_SIZE_CONSISTENT, (;), inst)                \
 	BUILD_ASSERT(                                                                \
 		FINGERPRINT_SENSOR_NUM_CONFIGS(DT_DRV_INST(inst)) <=                 \
 			NUM_IMAGE_CAPTURE_TYPES,                                     \

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_CHROME_USBC_PPC_H
-#define ZEPHYR_CHROME_USBC_PPC_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_H_
 
 #include "usbc/ppc_aoz1380.h"
 #include "usbc/ppc_ktu1125.h"
@@ -117,4 +117,4 @@ extern struct ppc_config_t ppc_chips_alt[];
 }
 #endif
 
-#endif /* ZEPHYR_CHROME_USBC_PPC_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_USBC_PPC_H_ */

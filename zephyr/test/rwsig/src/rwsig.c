@@ -9,6 +9,7 @@
 #include "rollback.h"
 #include "rsa.h"
 #include "rwsig.h"
+#include "sha256.h"
 #include "system.h"
 #include "task.h"
 #include "vb21_struct.h"
@@ -175,7 +176,7 @@ const static unsigned char signature[] = {
 ZTEST(rwsig, test_invalid_key)
 {
 	/* fail if key incorrect */
-	crec_flash_write(CONFIG_RO_PUBKEY_STORAGE_OFF, 1, "\xff");
+	crec_flash_physical_write(CONFIG_RO_PUBKEY_STORAGE_OFF, 1, "\xff");
 	zassert_false(rwsig_check_signature());
 	zassert_equal(system_disable_jump_fake.call_count, 1);
 }
@@ -183,7 +184,8 @@ ZTEST(rwsig, test_invalid_key)
 ZTEST(rwsig, test_invalid_signature)
 {
 	/* erase the first byte of signature */
-	crec_flash_write(SIG_OFFSET + sig_header.sig_offset, 1, "\xff");
+	crec_flash_physical_write(SIG_OFFSET + sig_header.sig_offset, 1,
+				  "\xff");
 	zassert_false(rwsig_check_signature());
 	zassert_equal(system_disable_jump_fake.call_count, 1);
 }
@@ -191,8 +193,8 @@ ZTEST(rwsig, test_invalid_signature)
 ZTEST(rwsig, test_invalid_signature_header)
 {
 	/* fail if signature incorrect */
-	crec_flash_write(CONFIG_EC_WRITABLE_STORAGE_OFF + RW_SIG_OFFSET, 1,
-			 "\xff");
+	crec_flash_physical_write(
+		CONFIG_EC_WRITABLE_STORAGE_OFF + RW_SIG_OFFSET, 1, "\xff");
 	zassert_false(rwsig_check_signature());
 	zassert_equal(system_disable_jump_fake.call_count, 1);
 }
@@ -200,7 +202,8 @@ ZTEST(rwsig, test_invalid_signature_header)
 ZTEST(rwsig, test_bad_padding)
 {
 	/* fail if unused area is not filled with 0xFF */
-	crec_flash_write(CONFIG_EC_WRITABLE_STORAGE_OFF + 4096, 1, "\x00");
+	crec_flash_physical_write(CONFIG_EC_WRITABLE_STORAGE_OFF + 4096, 1,
+				  "\x00");
 	zassert_false(rwsig_check_signature());
 	zassert_equal(system_disable_jump_fake.call_count, 1);
 }
@@ -208,6 +211,125 @@ ZTEST(rwsig, test_bad_padding)
 ZTEST(rwsig, test_check_signature)
 {
 	zassert_true(rwsig_check_signature());
+}
+
+ZTEST(rwsig, test_vb21_is_packed_key_valid)
+{
+	struct vb21_packed_key key = public_key_header;
+
+	zassert_equal(vb21_is_packed_key_valid(&key), EC_SUCCESS);
+
+	/* Invalid magic */
+	key.c.magic = VB21_MAGIC_SIGNATURE;
+	zassert_equal(vb21_is_packed_key_valid(&key), EC_ERROR_VBOOT_KEY_MAGIC);
+
+	/* Invalid key size */
+	key.c.magic = VB21_MAGIC_PACKED_KEY;
+	key.key_size = sizeof(struct rsa_public_key) - 1;
+	zassert_equal(vb21_is_packed_key_valid(&key), EC_ERROR_VBOOT_KEY_SIZE);
+}
+
+ZTEST(rwsig, test_vb21_is_signature_valid)
+{
+	struct vb21_packed_key key = public_key_header;
+	struct vb21_signature sig = sig_header;
+
+	zassert_equal(vb21_is_signature_valid(&sig, &key), EC_SUCCESS);
+
+	/* Invalid magic */
+	sig.c.magic = VB21_MAGIC_PACKED_KEY;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_SIG_MAGIC);
+
+	/* Invalid sig size */
+	sig.c.magic = VB21_MAGIC_SIGNATURE;
+	sig.sig_size = RSANUMBYTES - 1;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_SIG_SIZE);
+
+	/* Sig algorithm mismatch */
+	sig.sig_size = RSANUMBYTES;
+	sig.sig_alg = key.sig_alg + 1;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_SIG_ALGORITHM);
+
+	/* Hash algorithm mismatch */
+	sig.sig_alg = key.sig_alg;
+	sig.hash_alg = key.hash_alg + 1;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_HASH_ALGORITHM);
+
+	/* Invalid sig offset */
+	sig.hash_alg = key.hash_alg;
+	sig.sig_offset = sizeof(sig) - 1;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_SIG_OFFSET);
+
+	sig.sig_offset = CONFIG_RW_SIG_SIZE;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_SIG_OFFSET);
+
+	/* Invalid data size */
+	sig.sig_offset = sizeof(sig);
+	sig.data_size = CONFIG_RW_SIZE;
+	zassert_equal(vb21_is_signature_valid(&sig, &key),
+		      EC_ERROR_VBOOT_DATA_SIZE);
+}
+
+ZTEST(rwsig, test_vboot_is_padding_valid)
+{
+	uint8_t data[64] __aligned(4);
+
+	memset(data, 0xff, sizeof(data));
+
+	/* Valid padding */
+	zassert_equal(vboot_is_padding_valid(data, 0, sizeof(data)),
+		      EC_SUCCESS);
+
+	/* start > end */
+	zassert_equal(vboot_is_padding_valid(data, 8, 4), EC_ERROR_INVAL);
+
+	/* Unaligned start or end */
+	zassert_equal(vboot_is_padding_valid(data, 1, 16), EC_ERROR_INVAL);
+	zassert_equal(vboot_is_padding_valid(data, 0, 15), EC_ERROR_INVAL);
+
+	/* Corrupted padding byte */
+	data[4] = 0x00;
+	zassert_equal(vboot_is_padding_valid(data, 0, sizeof(data)),
+		      EC_ERROR_INVAL);
+}
+
+ZTEST(rwsig, test_rsa_verify_direct)
+{
+	uint32_t workbuf[3 * RSANUMWORDS];
+	uint8_t sha[32];
+	uint8_t bad_sha[32];
+	const struct rsa_public_key *key =
+		(const struct rsa_public_key *)public_key;
+
+	/* Compute SHA256 of 4096 zeroes matching the signature test fixture */
+	struct sha256_ctx ctx;
+	uint8_t zeroes[128] = { 0 };
+
+	SHA256_init(&ctx);
+	for (int i = 0; i < 4096 / sizeof(zeroes); i++) {
+		SHA256_update(&ctx, zeroes, sizeof(zeroes));
+	}
+	memcpy(sha, SHA256_final(&ctx), sizeof(sha));
+	memcpy(bad_sha, sha, sizeof(bad_sha));
+	bad_sha[0] ^= 0xff;
+
+	/* 1. Good verification */
+	zassert_equal(rsa_verify(key, signature, sha, workbuf), 1);
+
+	/* 2. Bad digest mismatch branch */
+	zassert_equal(rsa_verify(key, signature, bad_sha, workbuf), 0);
+
+	/* 3. Corrupted signature / bad padding branch */
+	uint8_t bad_sig[RSANUMBYTES];
+	memcpy(bad_sig, signature, sizeof(bad_sig));
+	bad_sig[0] ^= 0xff;
+	zassert_equal(rsa_verify(key, bad_sig, sha, workbuf), 0);
 }
 
 ZTEST(rwsig, test_rollback_update)
@@ -287,6 +409,63 @@ ZTEST(rwsig, test_hostcmd_rwsig_action)
 	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
 }
 
+ZTEST(rwsig, test_rwsig_host_command_jump_rw)
+{
+	struct ec_params_reboot_ec reboot_params = {
+		.cmd = EC_REBOOT_JUMP_RW,
+	};
+	struct host_cmd_handler_args reboot_args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_REBOOT_EC, 0, reboot_params);
+
+	RESET_FAKE(system_run_image_copy)
+	system_is_locked_fake.return_val = 1;
+	/* Make sure sysjump is not allowed if system is locked. */
+	zassert_equal(host_command_process(&reboot_args), EC_RES_ACCESS_DENIED);
+}
+
+ZTEST(rwsig, test_rwsig_console_command_jump_rw)
+{
+	const struct shell *shell_zephyr = get_ec_shell();
+
+	RESET_FAKE(system_run_image_copy)
+	system_is_locked_fake.return_val = 1;
+	zassert_equal(shell_execute_cmd(shell_zephyr, "sysjump RW"),
+		      EC_ERROR_ACCESS_DENIED);
+}
+
+int system_run_image_copy_with_flags(enum ec_image copy,
+				     uint32_t add_reset_flags);
+ZTEST(rwsig, test_rwsig_sysjump_when_locked)
+{
+	system_is_locked_fake.return_val = 1;
+	/* RWSIG task is not started. Make sure it's not allowed to jump. */
+	zassert_equal(system_run_image_copy_with_flags(EC_IMAGE_RW, 0),
+		      EC_ERROR_ACCESS_DENIED);
+}
+
+ZTEST(rwsig, test_rwsig_denied_flash)
+{
+	int ret;
+	uint8_t tmp[CONFIG_FLASH_WRITE_SIZE] = { 0 };
+
+	system_is_locked_fake.return_val = 1;
+	/* RWSIG task is not started. Flash operations are not allowed. */
+	ret = crec_flash_erase(CONFIG_EC_WRITABLE_STORAGE_OFF,
+			       CONFIG_FLASH_ERASE_SIZE);
+	zassert_equal(ret, EC_RES_BUSY);
+	ret = crec_flash_erase(CONFIG_EC_WRITABLE_STORAGE_OFF + CONFIG_RW_SIZE -
+				       CONFIG_FLASH_ERASE_SIZE,
+			       CONFIG_FLASH_ERASE_SIZE);
+	zassert_equal(ret, EC_RES_BUSY);
+	ret = crec_flash_write(CONFIG_EC_WRITABLE_STORAGE_OFF,
+			       CONFIG_FLASH_WRITE_SIZE, tmp);
+	zassert_equal(ret, EC_RES_BUSY);
+	ret = crec_flash_write(CONFIG_EC_WRITABLE_STORAGE_OFF + CONFIG_RW_SIZE -
+				       CONFIG_FLASH_WRITE_SIZE,
+			       CONFIG_FLASH_WRITE_SIZE, tmp);
+	zassert_equal(ret, EC_RES_BUSY);
+}
+
 static void rwsig_before(void *f)
 {
 	const struct rollback_data initial_rollback = {
@@ -298,26 +477,29 @@ static void rwsig_before(void *f)
 	/* fake rw firmware, 4kB of zeroes */
 	const static char fake_rw[4096] = {};
 
-	crec_flash_erase(CONFIG_EC_WRITABLE_STORAGE_OFF, CONFIG_RW_SIZE);
+	/* Use crec_flash_physical_* instead of crec_flash_* to avoid RWSIG
+	 * check. */
+	crec_flash_physical_erase(CONFIG_EC_WRITABLE_STORAGE_OFF,
+				  CONFIG_RW_SIZE);
 
-	crec_flash_write(CONFIG_EC_WRITABLE_STORAGE_OFF, sizeof(fake_rw),
-			 fake_rw);
-	crec_flash_write(CONFIG_ROLLBACK_OFF, sizeof(initial_rollback),
-			 (const char *)&initial_rollback);
-	crec_flash_write(CONFIG_ROLLBACK_OFF + CONFIG_FLASH_ERASE_SIZE,
-			 sizeof(initial_rollback),
-			 (const char *)&initial_rollback);
+	crec_flash_physical_write(CONFIG_EC_WRITABLE_STORAGE_OFF,
+				  sizeof(fake_rw), fake_rw);
+	crec_flash_physical_write(CONFIG_ROLLBACK_OFF, sizeof(initial_rollback),
+				  (const char *)&initial_rollback);
+	crec_flash_physical_write(CONFIG_ROLLBACK_OFF + CONFIG_FLASH_ERASE_SIZE,
+				  sizeof(initial_rollback),
+				  (const char *)&initial_rollback);
 
-	crec_flash_write(CONFIG_RO_PUBKEY_STORAGE_OFF,
-			 sizeof(public_key_header),
-			 (const char *)&public_key_header);
-	crec_flash_write(CONFIG_RO_PUBKEY_STORAGE_OFF +
-				 public_key_header.key_offset,
-			 sizeof(public_key), public_key);
-	crec_flash_write(SIG_OFFSET, sizeof(sig_header),
-			 (const char *)&sig_header);
-	crec_flash_write(SIG_OFFSET + sig_header.sig_offset, sizeof(signature),
-			 signature);
+	crec_flash_physical_write(CONFIG_RO_PUBKEY_STORAGE_OFF,
+				  sizeof(public_key_header),
+				  (const char *)&public_key_header);
+	crec_flash_physical_write(CONFIG_RO_PUBKEY_STORAGE_OFF +
+					  public_key_header.key_offset,
+				  sizeof(public_key), public_key);
+	crec_flash_physical_write(SIG_OFFSET, sizeof(sig_header),
+				  (const char *)&sig_header);
+	crec_flash_physical_write(SIG_OFFSET + sig_header.sig_offset,
+				  sizeof(signature), signature);
 
 	FFF_FAKES_LIST(RESET_FAKE);
 	FFF_RESET_HISTORY();

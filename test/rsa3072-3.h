@@ -12,6 +12,10 @@
  * Then dump the key: sudo emerge vboot_reference
  * # /usr/bin/dumpRSAPublicKey -pub key.pub | xxd -i
  */
+
+#ifndef PLATFORM_EC_TEST_RSA3072_3_H_
+#define PLATFORM_EC_TEST_RSA3072_3_H_
+
 const uint8_t rsa_data[] = {
 	0x60, 0x00, 0x00, 0x00, 0xdd, 0x54, 0xe6, 0xe2, 0x8b, 0xdc, 0xea, 0xd2,
 	0x58, 0x10, 0x72, 0xf1, 0x39, 0x2d, 0x10, 0x6e, 0x37, 0x4b, 0x19, 0x0d,
@@ -136,3 +140,5 @@ const uint8_t sig[] = {
 	/* Padding */
 	0x00
 };
+
+#endif /* PLATFORM_EC_TEST_RSA3072_3_H_ */

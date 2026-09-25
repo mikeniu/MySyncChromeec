@@ -25,6 +25,14 @@ if("${TARGET_ARCH}" STREQUAL "arm")
   set(CROSS_COMPILE_QUALIFIER     "thumb/")
   if(CONFIG_ARM64)
     set(CROSS_COMPILE_TARGET      aarch64-elf)
+  elseif(CONFIG_ARMV8_M_MAINLINE OR CONFIG_CPU_CORTEX_M33)
+    set(CROSS_COMPILE_QUALIFIER   "thumb/v8-m.main/nofp/")
+  elseif(CONFIG_CPU_CORTEX_M4 OR CONFIG_ARMV7_M_ARMV8_M_MAINLINE)
+    set(CROSS_COMPILE_QUALIFIER   "thumb/v7e-m/nofp/")
+  elseif(CONFIG_CPU_CORTEX_M3)
+    set(CROSS_COMPILE_QUALIFIER   "thumb/v7-m/nofp/")
+  elseif(CONFIG_CPU_CORTEX_M0 OR CONFIG_CPU_CORTEX_M0PLUS)
+    set(CROSS_COMPILE_QUALIFIER   "thumb/v6-m/nofp/")
   endif()
 elseif("${TARGET_ARCH}" STREQUAL "x86" AND CONFIG_X86_64)
   set(CROSS_COMPILE_TARGET      x86_64-elf)
@@ -58,6 +66,16 @@ set(CMAKE_GCOV       "${TOOLCHAIN_HOME}/${CROSS_COMPILE}gcov")
 # Compiler version isn't set yet, infer it from the directory name
 file(GLOB GCC_DIR LIST_DIRECTORIES true "${COREBOOT_SDK_ROOT}/lib/gcc/${CROSS_COMPILE_TARGET}/[0-9][0-9].[0-9].[0-9]")
 get_filename_component(GCC_VERSION ${GCC_DIR} NAME)
+
+# Older coreboot-sdk toolchains lacked multilib support for libstd++ and libgcc.
+# Fallback to just using the libraries under thumb/ if the multilib layout
+# is not found.
+if("${TARGET_ARCH}" STREQUAL "arm" AND NOT CONFIG_ARM64)
+  if(NOT EXISTS "${COREBOOT_SDK_ROOT_LIBSTDCXX}/${CROSS_COMPILE_TARGET}/lib/${CROSS_COMPILE_QUALIFIER}libstdc++.a" OR
+     NOT EXISTS "${COREBOOT_SDK_ROOT}/lib/gcc/${CROSS_COMPILE_TARGET}/${GCC_VERSION}/${CROSS_COMPILE_QUALIFIER}libgcc.a")
+    set(CROSS_COMPILE_QUALIFIER "thumb/")
+  endif()
+endif()
 
 if(CONFIG_LTO)
   # Using 'ar' or 'ranlib' alone produces 'plugin needed to handle lto object',

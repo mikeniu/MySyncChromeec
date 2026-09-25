@@ -24,6 +24,26 @@
 
 #define X86_NON_DSX_MTL_FORCE_SHUTDOWN_TO_MS 50
 
+#if defined(CONFIG_AP_PWRSEQ_DRIVER) && !defined(CONFIG_X86_NON_DSX_PWRSEQ)
+/**
+ * Prototype declaration required by board power tests when AP power sequencing
+ * is enabled without legacy x86 non-DSX power sequencing.
+ */
+void board_ap_power_shutdown(void);
+
+/**
+ * Required board power interface implementation.
+ * Force shutdown behavior with AP power sequence driver has changed to
+ * post POWER_SHUTDOWN event and let each board power implementation
+ * to handle this event locally.
+ */
+void board_ap_power_force_shutdown(void)
+{
+	ap_pwrseq_post_event(ap_pwrseq_get_instance(),
+			     AP_PWRSEQ_EVENT_POWER_SHUTDOWN);
+}
+#endif
+
 int mock_power_signal_set_ap_force_shutdown(enum power_signal signal, int value)
 {
 	if (power_signal_set_fake.call_count == 1) {
@@ -208,6 +228,7 @@ ZTEST_USER(board_power, test_board_ap_power_force_shutdown)
 		mock_power_signal_get_ap_force_shutdown;
 	board_ap_power_force_shutdown();
 
+	k_msleep(100);
 #if CONFIG_TEST_AP_PWRSEQ_PP5500
 	zassert_equal(3, power_signal_set_fake.call_count);
 #else
@@ -225,7 +246,11 @@ ZTEST_USER(board_power, test_board_ap_power_force_shutdown_timeout)
 
 	const uint32_t start_ms = k_uptime_get();
 
+#if defined(CONFIG_AP_PWRSEQ_DRIVER) && !defined(CONFIG_X86_NON_DSX_PWRSEQ)
+	board_ap_power_shutdown();
+#else
 	board_ap_power_force_shutdown();
+#endif
 
 	const uint32_t end_ms = k_uptime_get();
 

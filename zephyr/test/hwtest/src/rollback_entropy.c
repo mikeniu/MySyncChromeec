@@ -133,7 +133,7 @@ ZTEST(rollback_entropy, test_add_entropy)
 	 * Add entropy. The result should end up being written to the unused
 	 * region (region 1).
 	 */
-	if (IS_ENABLED(SECTION_IS_RO)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RO)) {
 		rv = rollback_add_entropy(FAKE_ENTROPY, sizeof(FAKE_ENTROPY));
 		zassert_equal(rv, EC_SUCCESS);
 	}
@@ -152,7 +152,7 @@ ZTEST(rollback_entropy, test_add_entropy)
 	 * Add more entropy. The result should now end up being written to
 	 * region 0.
 	 */
-	if (IS_ENABLED(SECTION_IS_RO)) {
+	if (IS_ENABLED(CONFIG_CROS_EC_RO)) {
 		rv = rollback_add_entropy(FAKE_ENTROPY, sizeof(FAKE_ENTROPY));
 		zassert_equal(rv, EC_SUCCESS);
 	}

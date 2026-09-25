@@ -17,7 +17,7 @@ def register_rauru_project(project_name):
             here / "program.conf",
             here / project_name / "project.conf",
         ],
-        inherited_from=["rauru"],
+        boards=["rauru"],
     )
 
 

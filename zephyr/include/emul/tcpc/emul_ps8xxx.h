@@ -9,8 +9,8 @@
  * @brief Backend API for PS8xxx emulator
  */
 
-#ifndef __EMUL_PS8XXX_H
-#define __EMUL_PS8XXX_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_PS8XXX_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_PS8XXX_H_
 
 #include <zephyr/drivers/emul.h>
 #include <zephyr/drivers/i2c.h>
@@ -158,4 +158,4 @@ uint16_t ps8xxx_emul_get_product_id(const struct emul *emul);
  * @}
  */
 
-#endif /* __EMUL_PS8XXX */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_PS8XXX_H_ */

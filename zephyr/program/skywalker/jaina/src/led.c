@@ -80,7 +80,7 @@ static void led_pwm_set_duty(const struct board_led_pwm_dt_channel *ch,
 	int rv;
 
 	if (!device_is_ready(ch->dev)) {
-		LOG_ERR("device %s not ready", ch->dev->name);
+		LOG_ERR_DEVICE_NOT_READY(ch->dev);
 		return;
 	}
 
@@ -131,9 +131,12 @@ static void led_auto_set_battery_color(enum led_color color, int duty)
 	if (port == 1) {
 		led_set_right_battery_duty(color, duty);
 		led_set_left_battery_duty(LED_OFF, 0);
-	} else {
+	} else if (port == 0) {
 		led_set_left_battery_duty(color, duty);
 		led_set_right_battery_duty(LED_OFF, 0);
+	} else {
+		led_set_left_battery_duty(color, duty);
+		led_set_right_battery_duty(color, duty);
 	}
 }
 

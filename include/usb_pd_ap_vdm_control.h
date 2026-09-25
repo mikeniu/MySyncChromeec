@@ -8,8 +8,8 @@
  * Note: Stubs of APIs are implemented for linking if feature is not enabled
  */
 
-#ifndef __CROS_EC_USB_AP_VDM_CONTROL_H
-#define __CROS_EC_USB_AP_VDM_CONTROL_H
+#ifndef PLATFORM_EC_INCLUDE_USB_PD_AP_VDM_CONTROL_H_
+#define PLATFORM_EC_INCLUDE_USB_PD_AP_VDM_CONTROL_H_
 
 #include "ec_commands.h"
 #include "usb_pd_tcpm.h"
@@ -88,4 +88,4 @@ static inline void ap_vdm_naked(int port, enum tcpci_msg_type type,
 }
 #endif
 
-#endif /* __CROS_EC_USB_AP_VDM_H */
+#endif /* PLATFORM_EC_INCLUDE_USB_PD_AP_VDM_CONTROL_H_ */

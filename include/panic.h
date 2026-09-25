@@ -6,14 +6,15 @@
  * device, which is currently the UART.
  */
 
-#ifndef __CROS_EC_PANIC_H
-#define __CROS_EC_PANIC_H
+#ifndef PLATFORM_EC_INCLUDE_PANIC_H_
+#define PLATFORM_EC_INCLUDE_PANIC_H_
 
 #include "common.h"
 #include "panic_defs.h"
 #include "software_panic.h"
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -76,15 +77,13 @@ void panic_data_ccprint(const struct panic_data *pdata);
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	panic_assert_fail(const char *fname, int linenum);
+	void panic_assert_fail(const char *fname, int linenum);
 #else
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	panic_assert_fail(const char *msg, const char *func, const char *fname,
-			  int linenum);
+	void panic_assert_fail(const char *msg, const char *func,
+			       const char *fname, int linenum);
 #endif
 
 /**
@@ -95,8 +94,7 @@ __noreturn
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	panic(const char *msg);
+	void panic(const char *msg);
 
 #endif /* !CONFIG_ZEPHYR */
 
@@ -106,8 +104,7 @@ __noreturn
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	panic_reboot(void);
+	void panic_reboot(void);
 
 #if !(defined(CONFIG_ZEPHYR))
 /**
@@ -117,29 +114,116 @@ __noreturn
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	software_panic(uint32_t reason, uint32_t info);
+	void software_panic(uint32_t reason, uint32_t info);
 #endif /* !CONFIG_ZEPHYR */
 
-/**
- * Log a panic in the panic log, but don't halt the system. Normally
- * called on the subsequent reboot after panic detection.
- */
-void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
+struct arch_esf;
+struct k_thread;
 
 /**
- * Retrieve the currently stored panic reason + info.
+ * Write panic data for a hardware exception (ESF).
+ *
+ * @param esf Pointer to the architecture exception stack frame, or NULL.
  */
-void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
+void panic_data_write_esf(const struct arch_esf *esf);
 
-#ifdef CONFIG_ZEPHYR
 /**
- * Zephyr utility for architecture specific logic to run when setting panic
- * reason.
+ * Write panic data for an assertion failure.
+ *
+ * @param path File path where assertion failed, or NULL if stripped.
+ * @param line Line number where assertion failed.
  */
-__override_proto void arch_panic_set_reason(uint32_t reason, uint32_t info,
-					    uint8_t exception);
-#endif /* CONFIG_ZEPHYR */
+void panic_data_write_assert(const char *path, unsigned int line);
+
+/**
+ * Write panic data for a watchdog warning event.
+ *
+ * @param pc Program counter where execution was interrupted.
+ * @param thread Thread pointer of the interrupted thread.
+ */
+void panic_data_write_watchdog_warning(uintptr_t pc,
+				       const struct k_thread *thread);
+
+/**
+ * Write panic data for a Zephyr fatal error without an ESF.
+ *
+ * @param reason Zephyr fatal error reason code (e.g. K_ERR_KERNEL_PANIC).
+ * @param thread Thread pointer of the faulting thread.
+ */
+void panic_data_write_fatal(unsigned int reason, const struct k_thread *thread);
+
+/**
+ * Write a generic software panic reason, info, and exception.
+ *
+ * @param reason PANIC_SW_* constant.
+ * @param info Reason-specific 32-bit auxiliary info.
+ * @param exception Exception or truncated thread ID byte.
+ */
+void panic_data_write_sw(uint32_t reason, uint32_t info, uint8_t exception);
+
+/**
+ * Reset/prepare a panic_data structure for writing.
+ *
+ * Sets struct size/version, architecture, and default image flags
+ * (PANIC_DATA_FLAG_RW_IMAGE or PANIC_DATA_FLAG_RO_IMAGE).
+ * Note: magic is NOT set here; call panic_data_finalize() when writing
+ * completes.
+ *
+ * @param pdata Pointer to panic_data to reset, or NULL to reset and return
+ *              the system panic data buffer from get_panic_data_write().
+ * @return Pointer to the prepared panic_data structure.
+ */
+struct panic_data *panic_data_reset(struct panic_data *pdata);
+
+/**
+ * Finalize panic data by setting the valid magic number and flushing to RAM.
+ */
+void panic_data_finalize(struct panic_data *pdata);
+
+/**
+ * Get the panic reason field from a panic_data structure for the current
+ * architecture.
+ */
+uint32_t panic_get_reason_reg(const struct panic_data *pdata);
+
+/**
+ * Set the panic reason field in a panic_data structure for the current
+ * architecture.
+ */
+void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason);
+
+/**
+ * Get the panic info field from a panic_data structure for the current
+ * architecture.
+ */
+uint32_t panic_get_info_reg(const struct panic_data *pdata);
+
+/**
+ * Set the panic info field in a panic_data structure for the current
+ * architecture.
+ */
+void panic_set_info_reg(struct panic_data *pdata, uint32_t info);
+
+/**
+ * Get the panic exception/thread field from a panic_data structure for the
+ * current architecture.
+ */
+uint8_t panic_get_exception_reg(const struct panic_data *pdata);
+
+/**
+ * Set the panic exception/thread field in a panic_data structure for the
+ * current architecture.
+ */
+void panic_set_exception_reg(struct panic_data *pdata, uint8_t exception);
+
+/**
+ * Check if stored panic data represents a new panic.
+ *
+ * A panic is considered new if valid panic data is present in RAM and has not
+ * yet been read and acknowledged by the AP via host command (i.e. the
+ * PANIC_DATA_FLAG_OLD_HOSTCMD flag is not set).
+ */
+bool panic_data_is_new(void);
 
 /**
  * Enable/disable bus fault handler
@@ -233,4 +317,4 @@ int test_command_crash(int argc, const char **argv);
 }
 #endif
 
-#endif /* __CROS_EC_PANIC_H */
+#endif /* PLATFORM_EC_INCLUDE_PANIC_H_ */

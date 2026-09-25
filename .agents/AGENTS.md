@@ -66,6 +66,9 @@ See local `docs/` folder for detailed documentation on specific topics.
     Use `dut-control -i` to list all available commands.
 *   **`ectool`**: Host utility to send commands to the EC from userspace (run
     from the DUT host).
+*   **`flash_dut.py`**: Utility script (`util/flash_dut.py`) to flash EC RW/RO
+    firmware directly onto remote CrOS and ALOS DUTs over SSH or ADB without a
+    Servo connection.
 *   **`flash_ec`**: Utility script (`util/flash_ec`) to flash EC firmware via Servo.
 *   **`futility`**: Used to manage GBB flags (e.g., to disable Software Sync
     for development) (run inside `cros_sdk` or on the DUT).
@@ -156,11 +159,21 @@ The following provides an overview of the sub-directories found under
 # Building
 
 To build the EC for a single project, run `zmake build <project>` in the
-chroot:
+chroot.
 
-For example, to build the EC for `skyrim`, run:
-
+If the current directory path includes `btrfs/cros-tree`, use `cros-tree` to
+enter the environment and build:
+```bash
+cros-tree enter --run "cd ../platform/ec && zmake build <project>"
 ```
+
+Otherwise, use the standard `cros_sdk` command:
+```bash
+cros_sdk --working-dir . -- zmake build <project>
+```
+
+For example, to build the EC for `skyrim` (standard):
+```bash
 cros_sdk --working-dir . -- zmake build skyrim
 ```
 

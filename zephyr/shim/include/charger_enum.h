@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_SHIM_INCLUDE_CHARGER_ENUM_H_
-#define ZEPHYR_SHIM_INCLUDE_CHARGER_ENUM_H_
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CHARGER_ENUM_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CHARGER_ENUM_H_
 
 /*
  * Theoretically, this should enumerate all the chargers
@@ -19,4 +19,4 @@ enum chg_id {
 	CHARGER_NUM,
 };
 
-#endif /* ZEPHYR_SHIM_INCLUDE_CHARGER_ENUM_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_CHARGER_ENUM_H_ */

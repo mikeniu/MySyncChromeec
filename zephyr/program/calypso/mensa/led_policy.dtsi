@@ -1,0 +1,51 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <dt-bindings/battery.h>
+
+/ {
+	led-colors {
+		compatible = "cros-ec,led-policy";
+		led-pins = <&led_pins>;
+
+		chipset-state-s0 {
+			chipset-state = "POWER_S0";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+				color-0 {
+					led-color = <&power_led_white>;
+				};
+			};
+		};
+
+		chipset-state-s3 {
+			chipset-state = "POWER_S3";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+				color-0 {
+					led-color = <&power_led_white>;
+					period-ms = <1000>;
+				};
+				color-1 {
+					led-color = <&power_led_off>;
+					period-ms = <3000>;
+				};
+			};
+		};
+
+		chpset-state-s5 {
+			chipset-state = "POWER_S5";
+
+			power-led {
+				led-id = "EC_LED_ID_POWER_LED";
+				color-0 {
+					led-color = <&power_led_off>;
+				};
+			};
+		};
+	};
+};

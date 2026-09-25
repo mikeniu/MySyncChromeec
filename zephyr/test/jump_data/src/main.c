@@ -15,6 +15,7 @@
 extern char mock_end_of_ram_data[CONFIG_PLATFORM_EC_PRESERVED_END_OF_RAM_SIZE];
 
 struct jump_data *get_jump_data(void);
+int panic_data_init(void);
 
 /**
  * @brief Returns a pointer to an object (such as a struct jump_data) of type
@@ -357,7 +358,8 @@ ZTEST(jump_data, test_init_jump_data_out_of_space)
 
 ZTEST(jump_data, test_init_with_panic_data)
 {
-	struct panic_data *pdata = get_panic_data_write();
+	struct panic_data *pdata = panic_data_reset(NULL);
+	panic_data_finalize(pdata);
 
 	struct jump_data *expected_jdata =
 		(struct jump_data *)((uintptr_t)pdata -
@@ -429,6 +431,7 @@ ZTEST(jump_data, test_init_watchdog_reset)
 	jdata->jump_tag_total = 0;
 
 	system_common_pre_init();
+	panic_data_init();
 
 	/* Verify the watchdog flag was preserved and combined with sysjump */
 	zassert_equal(system_get_reset_flags(),
@@ -439,13 +442,17 @@ ZTEST(jump_data, test_init_watchdog_reset)
 	 * Verify that a watchdog panic was logged if in RW, or NOT logged
 	 * if in RO.
 	 */
-	uint32_t reason, info;
-	uint8_t exception;
-	panic_get_reason(&reason, &info, &exception);
-	if (IS_ENABLED(SECTION_IS_RW)) {
+	struct panic_data *pdata = panic_get_data();
+
+	if (IS_ENABLED(CONFIG_CROS_EC_RW)) {
+		zassert_not_null(pdata, "Panic data missing in RW");
+		uint32_t reason = panic_get_reason_reg(pdata);
+
 		zassert_equal(reason, PANIC_SW_WATCHDOG_HARD,
 			      "Panic reason: %d", reason);
 	} else {
+		uint32_t reason = panic_get_reason_reg(pdata);
+
 		zassert_not_equal(reason, PANIC_SW_WATCHDOG_HARD,
 				  "Panic reason should not be set in RO");
 	}

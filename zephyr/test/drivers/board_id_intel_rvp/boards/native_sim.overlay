@@ -1,0 +1,57 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <board-overlays/native_sim.dts>
+
+/ {
+	common-pwrseq {
+		compatible = "intel,ap-pwrseq";
+	};
+
+	/*
+	 * GPIO emulator that drives the RVP board ID straps. It is marked
+	 * zephyr,deferred-init so it starts NOT ready (mirroring a real I/O
+	 * expander that is only powered up when the AP leaves S5); the driver's
+	 * S5 exit callback then calls device_init() on it.
+	 */
+	rvp_id_gpio: gpio@9a00 {
+		status = "okay";
+		compatible = "zephyr,gpio-emul";
+		reg = <0x9a00 0x4>;
+		rising-edge;
+		falling-edge;
+		high-level;
+		low-level;
+		gpio-controller;
+		#gpio-cells = <2>;
+		ngpios = <16>;
+		zephyr,deferred-init;
+	};
+
+	rvp_board_id: rvp-board-id {
+		compatible = "intel,rvp-board-id";
+		zephyr,deferred-init;
+
+		/*
+		 * The GPIO pin assignments below must be kept in sync with the
+		 * test code that drives these straps.
+		 */
+
+		/* BOM ID [2:0] : pins 8, 9, 10 */
+		bom-gpios = <&rvp_id_gpio 8 0>, <&rvp_id_gpio 9 0>,
+			    <&rvp_id_gpio 10 0>;
+
+		/* FAB ID [1:0] : pins 6, 7 */
+		fab-gpios = <&rvp_id_gpio 6 0>, <&rvp_id_gpio 7 0>;
+
+		/* BOARD ID [5:0] : pins 0..5 */
+		board-gpios = <&rvp_id_gpio 0 0>, <&rvp_id_gpio 1 0>,
+			      <&rvp_id_gpio 2 0>, <&rvp_id_gpio 3 0>,
+			      <&rvp_id_gpio 4 0>, <&rvp_id_gpio 5 0>;
+
+		defer-until-s5 = <&rvp_id_gpio>;
+		handler = "rvp_id_handler";
+	};
+};

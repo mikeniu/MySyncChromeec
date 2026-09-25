@@ -18,7 +18,9 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/smf.h>
+#include <zephyr/sys/minmax.h>
 LOG_MODULE_REGISTER(tps6699x, CONFIG_USBC_LOG_LEVEL);
+#include "builtin/endian.h"
 #include "tps6699x_cmd.h"
 #include "tps6699x_reg.h"
 #include "usbc/pdc_utils.h"
@@ -41,8 +43,14 @@ LOG_MODULE_REGISTER(tps6699x, CONFIG_USBC_LOG_LEVEL);
 /** @brief Trigger thread to send command complete back to
  *         PDC Power Mgmt thread */
 #define PDC_CMD_COMPLETE_EVENT BIT(4)
-/** @brief Bit mask of all PDC events */
-#define PDC_ALL_EVENTS BIT_MASK(5)
+/** @brief Set when initial PDC chip info is fully populated. This event should
+ *         not be cleared until the driver is re-initialized.
+ */
+#define PDC_CHIP_INFO_AVAIL_EVENT BIT(5)
+/** @brief Bit mask of all PDC events that should wake the PDC thread */
+#define PDC_ALL_THREAD_WAKE_EVENTS                                       \
+	(PDC_IRQ_EVENT | PDC_CMD_EVENT | PDC_CMD_SUSPEND_REQUEST_EVENT | \
+	 PDC_INTERNAL_EVENT | PDC_CMD_COMPLETE_EVENT)
 
 /** @brief Time between checking TI CMDx register for data ready */
 #define PDC_TI_DATA_READY_TIME_MS (10)
@@ -183,6 +191,12 @@ enum cmd_t {
 	CMD_SET_BBR_CTS,
 	/** Get attention VDO */
 	CMD_GET_ATTENTION_VDO,
+	/** Set Max PDP */
+	CMD_SET_MAX_PDP,
+	/** CMD_SET_BATTERY_CAPABILITY */
+	CMD_SET_BATTERY_CAPABILITY,
+	/** CMD_SET_BATTERY_STATUS */
+	CMD_SET_BATTERY_STATUS,
 };
 
 /**
@@ -199,6 +213,8 @@ enum state_t {
 	ST_TASK_WAIT,
 	/** ST_SUSPENDED */
 	ST_SUSPENDED,
+	/** ST_DISABLE - permanent disable on init failure */
+	ST_DISABLE,
 };
 
 /**
@@ -245,6 +261,8 @@ struct pdc_data_t {
 	bool init_done;
 	/* Init attempt counter */
 	int init_attempt;
+	/** Cached error status */
+	union error_status_t error_status;
 	/** Callback data */
 	void *cb_data;
 	/** CCI Event */
@@ -335,6 +353,16 @@ struct pdc_data_t {
 	union reg_data raw_ucsi_cmd_data;
 	/* Current AP power state */
 	uint8_t sx_state;
+	/* Device Max PDP */
+	enum max_pdp_t max_pdp;
+	/* Battery status on device */
+	union battery_status_t battery_status;
+	/* Battery capability on device */
+	union battery_capability_t battery_capability;
+	/* Discovery state output for pdc_get_identity_discovery */
+	bool *user_disc_out;
+	/* Origin of identity discovery */
+	enum vdo_origin_t disc_origin;
 };
 
 /**
@@ -346,6 +374,7 @@ static const char *const state_names[] = {
 	[ST_ERROR_RECOVERY] = "ERROR RECOVERY",
 	[ST_TASK_WAIT] = "TASK_WAIT",
 	[ST_SUSPENDED] = "SUSPENDED",
+	[ST_DISABLE] = "PDC_DISABLED",
 };
 
 static const struct smf_state states[];
@@ -368,7 +397,11 @@ static void cmd_update_retimer(struct pdc_data_t *data);
 static void cmd_get_current_pdo(struct pdc_data_t *data);
 static void cmd_is_vconn_sourcing(struct pdc_data_t *data);
 static void cmd_set_sx_app_config(struct pdc_data_t *data);
-static void cmd_get_attention_vdo(struct pdc_data_t *data);
+static int write_task_cmd(struct pdc_config_t const *cfg,
+			  enum command_task task, union reg_data *cmd_data);
+static void cmd_set_max_pdp(struct pdc_data_t *data);
+static void cmd_set_battery_capability(struct pdc_data_t *data);
+static void cmd_set_battery_status(struct pdc_data_t *data);
 static void task_trig(struct pdc_data_t *data);
 static void task_gaid(struct pdc_data_t *data);
 static void task_srdy(struct pdc_data_t *data);
@@ -382,7 +415,6 @@ static void task_ucsi(struct pdc_data_t *data,
 		      enum ucsi_command_t ucsi_command);
 static void task_raw_ucsi(struct pdc_data_t *data);
 
-static int pdc_autonegotiate_sink_reset(struct pdc_data_t *data);
 static void tps_check_and_notify_irq(void);
 
 /**
@@ -572,37 +604,6 @@ static int pdc_port_control_init(struct pdc_data_t *data)
 	return tps_rw_port_control(&cfg->i2c, &pdc_port_control, I2C_MSG_WRITE);
 }
 
-static int pdc_autonegotiate_sink_reset(struct pdc_data_t *data)
-{
-	union reg_autonegotiate_sink an_snk;
-	struct pdc_config_t const *cfg = data->dev->config;
-	int rv;
-
-	rv = tps_rw_autonegotiate_sink(&cfg->i2c, &an_snk, I2C_MSG_READ);
-	if (rv) {
-		LOG_ERR("TI%d: Failed to read auto negotiate sink register.",
-			cfg->connector_number);
-		return rv;
-	}
-
-	an_snk.auto_compute_sink_min_power = 0;
-	an_snk.auto_compute_sink_min_voltage = 0;
-	an_snk.auto_compute_sink_max_voltage = 0;
-	an_snk.auto_neg_max_current = 3000 / 10;
-	an_snk.auto_neg_sink_min_required_power = 15000 / 250;
-	an_snk.auto_neg_max_voltage = 5000 / 50;
-	an_snk.auto_neg_min_voltage = 5000 / 50;
-
-	rv = tps_rw_autonegotiate_sink(&cfg->i2c, &an_snk, I2C_MSG_WRITE);
-	if (rv) {
-		LOG_ERR("TI%d: Failed to write auto negotiate sink register.",
-			cfg->connector_number);
-		return rv;
-	}
-
-	return 0;
-}
-
 static void set_all_ports_to_init(const int delay_ms)
 {
 	for (int port = 0; port < NUM_PDC_TPS6699X_PORTS; port++) {
@@ -767,10 +768,9 @@ static enum smf_state_result st_init_run(void *o)
 		return SMF_EVENT_HANDLED;
 	}
 
-	/* If we've attempted init too many times, suspend instead. */
+	/* If we've attempted init too many times, disable instead. */
 	if (data->init_attempt > PDC_INIT_RETRY_MAX) {
-		suspend_comms();
-		set_state(data, ST_SUSPENDED);
+		set_state(data, ST_DISABLE);
 		return SMF_EVENT_HANDLED;
 	}
 
@@ -790,6 +790,9 @@ static enum smf_state_result st_init_run(void *o)
 		goto error;
 	}
 
+	/* Cached chip info is now available */
+	k_event_post(&data->pdc_event, PDC_CHIP_INFO_AVAIL_EVENT);
+
 	LOG_INF("TI%d: FW Version %u.%u.%u, config='%s' (flash=%d)",
 		cfg->connector_number,
 		PDC_FWVER_GET_MAJOR(data->info.fw_version),
@@ -808,12 +811,6 @@ static enum smf_state_result st_init_run(void *o)
 	rv = pdc_interrupt_mask_init(data);
 	if (rv < 0) {
 		LOG_ERR("TI%d: Write interrupt mask failed (%d)",
-			cfg->connector_number, rv);
-		goto error;
-	}
-	rv = pdc_autonegotiate_sink_reset(data);
-	if (rv < 0) {
-		LOG_ERR("TI%d: Reset autonegotiate_sink reg failed (%d)",
 			cfg->connector_number, rv);
 		goto error;
 	}
@@ -1011,7 +1008,17 @@ static enum smf_state_result st_idle_run(void *o)
 			task_trig(data);
 			break;
 		case CMD_GET_ATTENTION_VDO:
-			cmd_get_attention_vdo(data);
+			task_ucsi(data, UCSI_GET_ATTENTION_VDO);
+			break;
+		case CMD_SET_MAX_PDP:
+			cmd_set_max_pdp(data);
+			break;
+		case CMD_SET_BATTERY_CAPABILITY:
+			cmd_set_battery_capability(data);
+			break;
+		case CMD_SET_BATTERY_STATUS:
+			cmd_set_battery_status(data);
+			break;
 		}
 	}
 
@@ -1073,9 +1080,10 @@ static enum smf_state_result st_suspended_run(void *o)
 {
 	struct pdc_data_t *data = (struct pdc_data_t *)o;
 
-	if (data->events & PDC_CMD_SUSPEND_REQUEST_EVENT) {
-		k_event_clear(&data->pdc_event, PDC_CMD_SUSPEND_REQUEST_EVENT);
-	}
+	/* Clear all events that might keep the thread busy, since the driver
+	 * will not be able to process them while suspended. This also includes
+	 * PDC_CMD_SUSPEND_REQUEST_EVENT. */
+	k_event_clear(&data->pdc_event, PDC_ALL_THREAD_WAKE_EVENTS);
 
 	/* Stay here while suspended */
 	if (check_comms_suspended()) {
@@ -1083,7 +1091,44 @@ static enum smf_state_result st_suspended_run(void *o)
 	}
 
 	data->init_attempt = 0;
+
+	/* Invalidate cached chip info data until it is re-read during the
+	 * INIT state. */
+	k_event_clear(&data->pdc_event, PDC_CHIP_INFO_AVAIL_EVENT);
+
 	set_state(data, ST_INIT);
+	return SMF_EVENT_HANDLED;
+}
+
+static void st_disable_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+	/* Mark init done so the upper-layer INIT_WAIT_FOR_READY state can
+	 * proceed past this port. Without this, the upper-layer state machine
+	 * would block forever waiting for a dead PDC.
+	 */
+	data->init_done = true;
+	/* Mark the port as permanently disabled so the upper-layer state
+	 * machine can react.
+	 */
+	data->error_status.port_disabled = 1;
+}
+
+static enum smf_state_result st_disable_run(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	/* Clear all events that might keep the thread busy, since the driver
+	 * will not be able to process them while disabled (mirrors
+	 * st_suspended_run). A stale event (e.g. a command posted just
+	 * before entering this state) would otherwise make the thread spin
+	 * forever.
+	 */
+	k_event_clear(&data->pdc_event, PDC_ALL_THREAD_WAKE_EVENTS);
+
+	/* Stay here until reset. */
 	return SMF_EVENT_HANDLED;
 }
 
@@ -1379,19 +1424,32 @@ static void cmd_update_retimer(struct pdc_data_t *data)
 {
 	struct pdc_config_t const *cfg = data->dev->config;
 	union reg_port_control pdc_port_control;
+	union reg_intel_vid_status pdc_intel_vid_status;
+	union reg_data cmd_data;
 	int rv;
 
-	/* Read PDC port control */
+	memset(cmd_data.data, 0, sizeof(cmd_data.data));
+	cmd_data.data[0] = data->retimer_feature_en ? RISING_EDGE :
+						      FALLING_EDGE;
+	cmd_data.data[1] = EVENT_RETIMER_SOC_OVR_FORCE_PWR;
+
+	rv = write_task_cmd(cfg, COMMAND_TASK_TRIG, &cmd_data);
+	if (rv) {
+		LOG_ERR("TI%d: Failed to write COMMAND_TASK_TRIG (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	/* Wait 100ms for retimers */
+	k_msleep(100);
+
 	rv = tps_rw_port_control(&cfg->i2c, &pdc_port_control, I2C_MSG_READ);
 	if (rv) {
 		LOG_ERR("TI%d: Read port control failed (%d)",
 			cfg->connector_number, rv);
 		goto error_recovery;
 	}
-
-	pdc_port_control.retimer_fw_update = data->retimer_feature_en;
-
-	/* Write PDC port control */
+	pdc_port_control.retimer_fw_update = data->retimer_feature_en ? 1 : 0;
 	rv = tps_rw_port_control(&cfg->i2c, &pdc_port_control, I2C_MSG_WRITE);
 	if (rv) {
 		LOG_ERR("TI%d: Write port control failed (%d)",
@@ -1399,13 +1457,24 @@ static void cmd_update_retimer(struct pdc_data_t *data)
 		goto error_recovery;
 	}
 
-	/* Command has completed */
-	data->cci_event.command_completed = 1;
-	/* Inform the system of the event */
-	call_cci_event_cb(data);
+	rv = tps_rw_intel_vid_status(&cfg->i2c, &pdc_intel_vid_status,
+				     I2C_MSG_READ);
+	if (rv) {
+		LOG_ERR("TI%d: Read Intel VID status failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+	pdc_intel_vid_status.forced_tbt_mode = data->retimer_feature_en ? 1 : 0;
+	rv = tps_rw_intel_vid_status(&cfg->i2c, &pdc_intel_vid_status,
+				     I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Write Intel VID status failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
 
-	/* Transition to idle state */
-	set_state(data, ST_IDLE);
+	/* Transition to wait state */
+	set_state(data, ST_TASK_WAIT);
 	return;
 
 error_recovery:
@@ -1580,34 +1649,54 @@ static void cmd_get_identity_discovery(struct pdc_data_t *data)
 {
 	struct pdc_config_t const *cfg = data->dev->config;
 	union reg_received_identity_data_object received_identity_data_object;
-	bool *disc_state = (bool *)data->user_buf;
 	int rv;
 
-	if (data->vdo_req.vdo_origin == VDO_ORIGIN_SOP) {
+	if (data->disc_origin == VDO_ORIGIN_SOP) {
 		rv = tps_rd_received_sop_identity_data_object(
 			&cfg->i2c, &received_identity_data_object);
 		if (rv) {
-			LOG_ERR("TI%d: Failed to read partner VDO (%d)",
+			LOG_ERR("TI%d: Failed to read partner identity (%d)",
 				cfg->connector_number, rv);
 			goto error_recovery;
 		}
-	} else if (data->vdo_req.vdo_origin == VDO_ORIGIN_SOP_PRIME) {
+	} else if (data->disc_origin == VDO_ORIGIN_SOP_PRIME) {
 		rv = tps_rd_received_sop_prime_identity_data_object(
 			&cfg->i2c, &received_identity_data_object);
 		if (rv) {
-			LOG_ERR("TI%d: Failed to read cable VDO (%d)",
+			LOG_ERR("TI%d: Failed to read cable identity (%d)",
 				cfg->connector_number, rv);
 			goto error_recovery;
 		}
 	} else {
-		/* Unsupported */
-		LOG_ERR("TI%d: Unsupported VDO origin", cfg->connector_number);
+		LOG_ERR("TI%d: Unsupported VDO origin (%d)",
+			cfg->connector_number, data->disc_origin);
 		goto error_recovery;
 	}
 
-	*disc_state = (received_identity_data_object.response_type == 1) ?
-			      true :
-			      false;
+	if (data->user_disc_out != NULL) {
+		*data->user_disc_out =
+			(received_identity_data_object.response_type == 1);
+	}
+
+	if (data->user_buf != NULL) {
+		uint32_t *msg_out = (uint32_t *)data->user_buf;
+
+		if (received_identity_data_object.response_type != 1) {
+			LOG_DBG("TI%d: Identity not discovered (response_type=%d)",
+				cfg->connector_number,
+				received_identity_data_object.response_type);
+			data->cci_event.error = 1;
+			data->cci_event.data_len = 0;
+			memset(msg_out, 0,
+			       sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT);
+		} else {
+			msg_out[0] = 0;
+			memcpy(&msg_out[1], received_identity_data_object.vdo,
+			       sizeof(uint32_t) * 6);
+			data->cci_event.data_len =
+				sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT;
+		}
+	}
 
 	data->cci_event.command_completed = 1;
 	/* Inform the system of the event */
@@ -1723,6 +1812,7 @@ static int cmd_get_ic_status_sync_internal(const struct pdc_config_t *cfg,
 
 	info->no_fw_update = cfg->no_fw_update;
 	info->frs_supported = cfg->frs_supported;
+	info->usb_comm_capable_as_device = false;
 
 	return 0;
 }
@@ -1858,41 +1948,134 @@ error_recovery:
 	set_state(data, ST_ERROR_RECOVERY);
 }
 
-static void cmd_get_attention_vdo(struct pdc_data_t *data)
+static void cmd_set_max_pdp(struct pdc_data_t *data)
 {
-	union reg_received_attention_vdm received_attention_vdm;
 	struct pdc_config_t const *cfg = data->dev->config;
-
+	union reg_source_cap_ext_data_block source_cap_ext;
+	union reg_source_info source_info;
 	int rv;
 
-	if (data->user_buf == NULL) {
-		LOG_ERR("TI%d: Null user buffer; can't read attention reg",
-			cfg->connector_number);
-		goto error_recovery;
-	}
-
-	rv = tps_rd_received_attention_vdm(&cfg->i2c, &received_attention_vdm);
+	/* Set Max PDP fields in SIDO1, SIDO2 and SCEDB */
+	rv = tps_rw_source_cap_ext_data_block(&cfg->i2c, &source_cap_ext,
+					      I2C_MSG_READ);
 	if (rv) {
-		LOG_ERR("TI%d: Failed to read received attention vdm (%d)",
+		LOG_ERR("TI%d: Read Source Cap Ext failed (%d)",
 			cfg->connector_number, rv);
 		goto error_recovery;
 	}
 
-	union get_attention_vdo_t get_attention_vdo = {
-		.alt_mode_index = 0,
-		.num_vdos = received_attention_vdm.number_valid_vdos,
-		.sequence_number = received_attention_vdm.sequence_number,
-		.vdm_heade = received_attention_vdm.vdm_header,
-		.vdo = received_attention_vdm.vdo,
-	};
-	memcpy(data->user_buf, &get_attention_vdo,
-	       sizeof(union get_attention_vdo_t));
+	rv = tps_rw_source_info(&cfg->i2c, &source_info, I2C_MSG_READ);
+	if (rv) {
+		LOG_ERR("TI%d: Read Source Info failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	if (data->max_pdp == MAX_PDP_7_5W) {
+		source_cap_ext.source_pdp = 7;
+		source_info.maximum_pdp = 7;
+		source_info.maximum_pdp_2 = 15;
+		source_info.port_managed_garunteed = 1;
+	} else if (data->max_pdp == MAX_PDP_15W) {
+		source_cap_ext.source_pdp = 15;
+		source_info.maximum_pdp = 15;
+		source_info.maximum_pdp_2 = 30;
+		source_info.port_managed_garunteed = 0;
+	} else {
+		LOG_ERR("TI%d: Invald Max PDP", cfg->connector_number);
+		goto error_recovery;
+	}
+
+	rv = tps_rw_source_cap_ext_data_block(&cfg->i2c, &source_cap_ext,
+					      I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Write Source Cap Ext failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	rv = tps_rw_source_info(&cfg->i2c, &source_info, I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Write Source Info failed (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
 
 	/* Command has completed */
 	data->cci_event.command_completed = 1;
 	/* Inform the system of the event */
 	call_cci_event_cb(data);
 
+	/* Transition to idle state */
+	set_state(data, ST_IDLE);
+	return;
+
+error_recovery:
+	set_state(data, ST_ERROR_RECOVERY);
+}
+
+static void cmd_set_battery_status(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	int rv;
+
+	union reg_battery_status battery_status = {
+		.reserved0 = data->battery_status.reserved,
+		.fixed_battery0_battery_info = data->battery_status.flags,
+		.fixed_battery0_present_capacity =
+			htobe16(data->battery_status.present_capacity),
+		.reserved1 = { 0 },
+	};
+
+	rv = tps_rw_battery_status(&cfg->i2c, &battery_status, I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Failed to write battery status (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	/* Command has completed */
+	data->cci_event.command_completed = 1;
+	/* Inform the system of the event */
+	call_cci_event_cb(data);
+
+	set_state(data, ST_IDLE);
+	return;
+
+error_recovery:
+	set_state(data, ST_ERROR_RECOVERY);
+}
+
+static void cmd_set_battery_capability(struct pdc_data_t *data)
+{
+	struct pdc_config_t const *cfg = data->dev->config;
+	int rv;
+
+	union reg_battery_capability battery_capability = {
+		.vid_0 = htobe16(data->battery_capability.vid),
+		.pid_0 = htobe16(data->battery_capability.pid),
+		.battery_design_capacity_0 =
+			htobe16(data->battery_capability.design_capacity),
+		.battery_last_full_charge_capacity_0 = htobe16(
+			data->battery_capability.last_full_charge_capacity),
+		.battery_type_0 = data->battery_capability.type,
+		.reserved = { 0 },
+	};
+
+	rv = tps_rw_battery_capability(&cfg->i2c, &battery_capability,
+				       I2C_MSG_WRITE);
+	if (rv) {
+		LOG_ERR("TI%d: Failed to write battery capability (%d)",
+			cfg->connector_number, rv);
+		goto error_recovery;
+	}
+
+	/* Command has completed */
+	data->cci_event.command_completed = 1;
+	/* Inform the system of the event */
+	call_cci_event_cb(data);
+
+	/* Transition to idle state */
 	set_state(data, ST_IDLE);
 	return;
 
@@ -1927,6 +2110,7 @@ static void task_trig(struct pdc_data_t *data)
 	union reg_data cmd_data;
 	int rv;
 
+	memset(cmd_data.data, 0, sizeof(cmd_data.data));
 	rv = tps_rw_thunderbolt_configuration(
 		&cfg->i2c, &pdc_thunderbolt_config, I2C_MSG_READ);
 	if (rv) {
@@ -2301,8 +2485,9 @@ static enum smf_state_result st_task_wait_run(void *o)
 	 *  2) command is set to "!CMD" for unknown command
 	 */
 	if (cmd.command && cmd.command != COMMAND_TASK_NO_COMMAND) {
-		LOG_INF("TI%d: Data not ready, check again in %d ms",
-			cfg->connector_number, PDC_TI_DATA_READY_TIME_MS);
+		LOG_INF("TI%d: Data not ready, check again in %d ms (0x%08x)",
+			cfg->connector_number, PDC_TI_DATA_READY_TIME_MS,
+			cmd.command);
 		k_work_reschedule(&data->data_ready,
 				  K_MSEC(PDC_TI_DATA_READY_TIME_MS));
 		return SMF_EVENT_HANDLED;
@@ -2325,10 +2510,10 @@ static enum smf_state_result st_task_wait_run(void *o)
 	if (cmd.command || cmd_data.data[0] != 0) {
 		/* Command has completed with error */
 		if (cmd.command == COMMAND_TASK_NO_COMMAND) {
-			LOG_DBG("TI%d: Command %d not supported",
+			LOG_ERR("TI%d: Command %d not supported",
 				cfg->connector_number, data->cmd);
 		} else {
-			LOG_DBG("TI%d: Command %d failed. Err : %d",
+			LOG_ERR("TI%d: Command %d failed. Err : %d",
 				cfg->connector_number, data->cmd,
 				cmd_data.data[0]);
 		}
@@ -2364,6 +2549,14 @@ static enum smf_state_result st_task_wait_run(void *o)
 		 * information.
 		 */
 		cp->bmOptionalFeatures.get_pd_message = 1;
+#ifdef CONFIG_USBC_PDC_DISABLE_AP_MODE_ENTRY
+		/*
+		 * TODO(b/503426083): Remove change to GET_CAPABILITY response
+		 * once AP Mode switching is ready. Clearing this bit will
+		 * prevent the kernel from exiting and entering alternate modes.
+		 */
+		cp->bmOptionalFeatures.alt_mode_override = 0;
+#endif
 		len = sizeof(struct capability_t);
 		break;
 	case UCSI_GET_CONNECTOR_CAPABILITY:
@@ -2396,8 +2589,6 @@ static enum smf_state_result st_task_wait_run(void *o)
 			 */
 			data->cached_conn_status = *cs;
 			data->use_cached_conn_status_change = true;
-			if (!cs->connect_status)
-				pdc_autonegotiate_sink_reset(data);
 		}
 		break;
 	}
@@ -2412,35 +2603,32 @@ static enum smf_state_result st_task_wait_run(void *o)
 	case UCSI_GET_ALTERNATE_MODES:
 	case UCSI_GET_ERROR_STATUS:
 		offset = 2;
-		len = cmd_data.data[1];
+		/*
+		 * Data length comes from the PDC chip, clamp it to smaller of
+		 * the source register and the destination
+		 */
+		len = min(cmd_data.data[1], sizeof(cmd_data.data) - offset);
 		break;
 	case UCSI_GET_PDOS: {
-		len = cmd_data.data[1];
 		offset = 2;
+		/*
+		 * Data length comes from the PDC chip, clamp it to smaller of
+		 * the source register and the destination
+		 */
+		len = min(cmd_data.data[1], sizeof(cmd_data.data) - offset);
+
+		/* Ensure we don't overrun the remaining space in cached_pdos */
+		len = min(len, sizeof(data->cached_pdos) -
+				       data->pdo_offset * sizeof(uint32_t));
 		if (data->cmd == CMD_GET_PDOS) {
 			memcpy(data->cached_pdos + data->pdo_offset,
 			       &cmd_data.data[offset], len);
 		}
 		break;
 	}
-	case UCSI_GET_PD_MESSAGE:
-		offset = 2;
-		union get_pd_message_t get_pd_message_cmd;
-		memcpy(&get_pd_message_cmd,
-		       &data->raw_ucsi_cmd_data.data[offset],
-		       sizeof(union get_pd_message_t));
-		switch (get_pd_message_cmd.response_message_type) {
-		case GET_PD_MESSAGE_DISC_ID:
-			len = sizeof(uint32_t) * PDC_DISC_IDENTITY_VDO_COUNT;
-			break;
-		case GET_PD_MESSAGE_REVISION:
-			len = sizeof(uint32_t);
-			break;
-		default:
-			/* Unsupported GET_PD_MESSAGE command */
-			offset = 0;
-			len = 0;
-		}
+	case UCSI_GET_ATTENTION_VDO:
+		offset = 1;
+		len = sizeof(union get_attention_vdo_t);
 		break;
 	default:
 		/* No data for this command */
@@ -2491,6 +2679,8 @@ static const struct smf_state states[] = {
 					  NULL, NULL, NULL),
 	[ST_SUSPENDED] = SMF_CREATE_STATE(st_suspended_entry, st_suspended_run,
 					  NULL, NULL, NULL),
+	[ST_DISABLE] = SMF_CREATE_STATE(st_disable_entry, st_disable_run, NULL,
+					NULL, NULL),
 };
 
 static int tps_post_command_with_callback(const struct device *dev,
@@ -2500,6 +2690,15 @@ static int tps_post_command_with_callback(const struct device *dev,
 					  struct pdc_callback *callback)
 {
 	struct pdc_data_t *data = dev->data;
+
+	/* Port is permanently disabled (PDC init failed). Return -ENOSYS so
+	 * the upper-layer state machine fast-fails instead of entering
+	 * PDC_SEND_CMD_WAIT (which would block for PDC_CMD_TIMEOUT_MS=2000ms
+	 * and exceed the watchdog's 1600ms limit).
+	 */
+	if (get_state(data) == ST_DISABLE) {
+		return -ENOSYS;
+	}
 
 	/* TODO(b/345783692): Double check this logic. */
 	if (get_state(data) != ST_IDLE) {
@@ -2699,15 +2898,47 @@ static int tps_get_connector_capability(const struct device *dev,
 static int tps_get_connector_status(const struct device *dev,
 				    union connector_status_t *cs)
 {
+	struct pdc_data_t *data = dev->data;
+
+	if (cs == NULL) {
+		return -EINVAL;
+	}
+
+	/* Port is permanently disabled (init failed). Synthesize a
+	 * "not-connected" connector status and notify the upper layer via
+	 * the CCI callback so the upper-layer state machine can transition
+	 * out of PDC_INIT (INIT_GET_CONNECTOR_STATUS) into PDC_UNATTACHED
+	 * instead of looping forever waiting for a dead PDC. This isolates
+	 * the port while letting the rest of the system proceed.
+	 */
+	if (get_state(data) == ST_DISABLE) {
+		memset(cs, 0, sizeof(*cs));
+		data->cci_event.raw_value = 0;
+		data->cci_event.command_completed = 1;
+		call_cci_event_cb(data);
+		return 0;
+	}
+
 	return tps_post_command(dev, CMD_GET_CONNECTOR_STATUS, cs);
 }
 
 static int tps_get_error_status(const struct device *dev,
 				union error_status_t *es)
 {
+	struct pdc_data_t *data = dev->data;
+
 	if (es == NULL) {
 		return -EINVAL;
 	}
+
+	/* Port is permanently disabled. Return the cached error_status so
+	 * the upper layer can react.
+	 */
+	if (get_state(data) == ST_DISABLE) {
+		es->raw_value = data->error_status.raw_value;
+		return 0;
+	}
+
 	return tps_post_command(dev, CMD_GET_ERROR_STATUS, es);
 }
 
@@ -2785,13 +3016,20 @@ static int tps_get_info(const struct device *dev, struct pdc_info_t *info,
 	if (live == false) {
 		k_mutex_lock(&data->mtx, K_FOREVER);
 
-		/* Check FW ver for valid value to ensure we have a resident
-		 * value.
+		/* Check for an event flag to ensure we have a cached value.
+		 * Callers expect non-live reads to return immediately, so do
+		 * not block by waiting.
+		 *
+		 * Do not clear PDC_CHIP_INFO_AVAIL_EVENT to permit further
+		 * cached reads.
 		 */
-		if (data->info.fw_version == PDC_FWVER_INVALID) {
+		uint32_t events = k_event_test(&data->pdc_event,
+					       PDC_CHIP_INFO_AVAIL_EVENT);
+		if (!events) {
 			k_mutex_unlock(&data->mtx);
 
-			/* No cached value. Caller should request a live read */
+			/* No cached value. Caller may try again later or
+			 * request a live read. */
 			return -EAGAIN;
 		}
 
@@ -2933,11 +3171,20 @@ static int tps_get_vdo(const struct device *dev, union get_vdo_t vdo_req,
 static int tps_get_identity_discovery(const struct device *dev,
 				      bool *disc_state)
 {
+	struct pdc_data_t *data = dev->data;
+
 	if (disc_state == NULL) {
 		return -EINVAL;
 	}
 
-	return tps_post_command(dev, CMD_GET_IDENTITY_DISCOVERY, disc_state);
+	/* Direct calls to the get_identity_discovery API populate a bool
+	 * signaling the discover process is complete. This is only checked
+	 * with get_identity_discovery for SOP.
+	 */
+	data->user_disc_out = disc_state;
+	data->disc_origin = VDO_ORIGIN_SOP;
+
+	return tps_post_command(dev, CMD_GET_IDENTITY_DISCOVERY, NULL);
 }
 
 static int tps_set_comms_state(const struct device *dev, bool comms_active)
@@ -3035,6 +3282,42 @@ static int tps_get_attention_vdo(const struct device *dev,
 	return tps_post_command(dev, CMD_GET_ATTENTION_VDO, vdo);
 }
 
+static int tps_set_max_pdp(const struct device *dev, enum max_pdp_t max_pdp)
+{
+	struct pdc_data_t *data = dev->data;
+	data->max_pdp = max_pdp;
+	return tps_post_command(dev, CMD_SET_MAX_PDP, NULL);
+}
+
+static int tps_set_battery_capability(const struct device *dev,
+				      union battery_capability_t *bcap)
+{
+	struct pdc_data_t *data = dev->data;
+
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	memcpy(&data->battery_capability, bcap,
+	       sizeof(union battery_capability_t));
+
+	return tps_post_command(dev, CMD_SET_BATTERY_CAPABILITY, bcap);
+}
+
+static int tps_set_battery_status(const struct device *dev,
+				  union battery_status_t *bstat)
+{
+	struct pdc_data_t *data = dev->data;
+
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
+	}
+
+	memcpy(&data->battery_status, bstat, sizeof(union battery_status_t));
+
+	return tps_post_command(dev, CMD_SET_BATTERY_STATUS, bstat);
+}
+
 static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 				uint8_t data_size, uint8_t *command_specific,
 				uint8_t *lpm_data_out,
@@ -3055,6 +3338,38 @@ static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 
 		memcpy(&uor, command_specific, sizeof(union uor_t));
 		return tps_set_uor(dev, uor);
+	}
+
+	/* The linux UCSI driver sends GET_PD_MESSAGE to request partner (SOP)
+	 * and cable (SOP') identity. Intercept these commands and read the
+	 * information directly from the TI PDC registers.
+	 *
+	 * The TI PDC does not support mapping other versions of GET_PD_MESSAGE,
+	 * so return an error if received.
+	 */
+	if (ucsi_command == UCSI_GET_PD_MESSAGE) {
+		union get_pd_message_t get_pd_message_cmd = { 0 };
+
+		if (command_specific == NULL) {
+			return -EINVAL;
+		}
+
+		memcpy(&get_pd_message_cmd, command_specific,
+		       sizeof(union get_pd_message_t));
+		if (get_pd_message_cmd.response_message_type ==
+			    GET_PD_MESSAGE_DISC_ID &&
+		    (get_pd_message_cmd.recipient == VDO_ORIGIN_SOP ||
+		     get_pd_message_cmd.recipient == VDO_ORIGIN_SOP_PRIME)) {
+			struct pdc_data_t *data = dev->data;
+
+			data->user_disc_out = NULL;
+			data->disc_origin = get_pd_message_cmd.recipient;
+			return tps_post_command_with_callback(
+				dev, CMD_GET_IDENTITY_DISCOVERY, NULL,
+				lpm_data_out, callback);
+		}
+
+		return -ENOSYS;
 	}
 
 	memset(cmd_data.data, 0, sizeof(cmd_data.data));
@@ -3132,6 +3447,9 @@ static DEVICE_API(pdc, pdc_driver_api) = {
 	.set_ap_power_state = tps_set_ap_power_state,
 	.set_bbr_cts = tps_set_bbr_cts,
 	.get_attention_vdo = tps_get_attention_vdo,
+	.set_max_pdp = tps_set_max_pdp,
+	.set_battery_capability = tps_set_battery_capability,
+	.set_battery_status = tps_set_battery_status,
 };
 
 static void pdc_interrupt_callback(const struct device *dev,
@@ -3150,15 +3468,13 @@ static int pdc_init(const struct device *dev)
 
 	rv = i2c_is_ready_dt(&cfg->i2c);
 	if (rv < 0) {
-		LOG_ERR("TI%d: device %s not ready", cfg->connector_number,
-			cfg->i2c.bus->name);
+		LOG_ERR_DEVICE_NOT_READY(cfg->i2c.bus);
 		return -ENODEV;
 	}
 
 	rv = gpio_is_ready_dt(&cfg->irq_gpios);
 	if (rv < 0) {
-		LOG_ERR("TI%d: device %s not ready", cfg->connector_number,
-			cfg->irq_gpios.port->name);
+		LOG_ERR_DEVICE_NOT_READY(cfg->irq_gpios.port);
 		return -ENODEV;
 	}
 
@@ -3255,8 +3571,9 @@ static void tps_thread(void *dev, void *unused1, void *unused2)
 		smf_run_state(SMF_CTX(data));
 
 		/* Wait for event to handle */
-		data->events = k_event_wait(&data->pdc_event, PDC_ALL_EVENTS,
-					    false, K_FOREVER);
+		data->events = k_event_wait(&data->pdc_event,
+					    PDC_ALL_THREAD_WAKE_EVENTS, false,
+					    K_FOREVER);
 		LOG_INF("TI%d: state=%s events=0x%X", cfg->connector_number,
 			state_names[get_state(data)], data->events);
 
@@ -3342,6 +3659,10 @@ BUILD_ASSERT(
 		.port_index_on_chip = DT_INST_PROP(inst, port_index_on_chip),  \
 	};                                                                     \
                                                                                \
+	BUILD_ASSERT(                                                          \
+		!DT_INST_PROP(inst, usb_comm_capable_as_device),               \
+		"usb-comm-capable-as-device is not supported by tps6699x");    \
+                                                                               \
 	DEVICE_DT_INST_DEFINE(inst, pdc_init, NULL,                            \
 			      &PDC_DATA_STRUCT_NAME(inst), &pdc_config##inst,  \
 			      POST_KERNEL, CONFIG_PDC_DRIVER_INIT_PRIORITY,    \
@@ -3401,6 +3722,19 @@ bool pdc_tps6699x_test_idle_wait(void)
 	}
 
 	return false;
+}
+
+/**
+ * @brief For testing only, wipe the cached chip info from the driver and clear
+ *        the flag that indicates cached data is available.
+ */
+void pdc_tps6699x_test_invalidate_chip_info(const struct device *dev)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)dev->data;
+
+	k_event_clear(&data->pdc_event, PDC_CHIP_INFO_AVAIL_EVENT);
+
+	memset(&data->info, 0, sizeof(data->info));
 }
 /* LCOV_EXCL_STOP */
 

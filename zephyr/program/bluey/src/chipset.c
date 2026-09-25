@@ -5,23 +5,16 @@
 
 /* Bluey chipset-specific configuration */
 
-#include "adsp_comms.h"
 #include "battery.h"
 #include "chipset.h"
 #include "common.h"
+#include "extpower.h"
 #include "gpio.h"
 #include "gpio/gpio_int.h"
 #include "hooks.h"
 #include "power/qcom.h"
 
 #define CPRINTS(format, args...) cprints(CC_CHIPSET, format, ##args)
-
-static void adsp_power_state_cb(uint8_t fid, uint8_t addr, uint16_t data)
-{
-	CPRINTS("ADSP Power State: 0x%04x", data);
-}
-ADSP_COMMS_REGISTER_CB(ADSP_FEATURE_DEFAULT, ADSP_POWER_STATE_REG_VAL,
-		       adsp_power_state_cb);
 
 static void enable_acok_passthru_interrupt(void)
 {
@@ -41,9 +34,8 @@ void passthru_lid_open_to_pmic(void)
 
 void passthru_ac_on_to_pmic(void)
 {
-	gpio_pin_set_dt(
-		GPIO_DT_FROM_NODELABEL(gpio_ec_pmic_acok),
-		gpio_pin_get_dt(GPIO_DT_FROM_NODELABEL(gpio_acok_od_z5)));
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_pmic_acok),
+			extpower_is_present());
 }
 
 void chipset_acok_passthru_interrupt(enum gpio_signal signal)

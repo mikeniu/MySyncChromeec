@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#include <board-overlays/native_sim.dts>
+#include <cros/binman.dtsi>
+
 #define EGIS660_COMMON_IMAGE_PROPS \
 	width = <96>; \
 	height = <100>; \
@@ -14,6 +17,39 @@
 / {
 	chosen {
 		cros-fp,fingerprint-sensor = &egis660;
+		cros-ec,flash-controller = &cros_flash;
+	};
+
+	aliases {
+		gpio-wp = &gpio_wp_l;
+	};
+
+	named-gpios {
+		gpio_wp_l: wp_l {
+			gpios = <&gpio0 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
+		};
+	};
+
+	cros_flash: cros-flash {
+		compatible = "cros-ec,flash-emul";
+	};
+};
+
+/* Configure existing simulated flash from native_sim.dts */
+&flash0 {
+	erase-block-size = <0x1000>;
+	write-block-size = <256>;
+	reg = <0x00000000 DT_SIZE_K(2048)>;
+
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		egis660_apns_data: partition@100000 {
+			label = "egis660_apns_data";
+			reg = <0x100000 DT_SIZE_K(64)>;
+		};
 	};
 };
 
@@ -42,6 +78,10 @@
 				capture-type = "FINGERPRINT_CAPTURE_TYPE_PATTERN1";
 			};
 			config4 {
+				EGIS660_COMMON_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_PATTERN2";
+			};
+			config5 {
 				EGIS660_COMMON_IMAGE_PROPS
 				capture-type = "FINGERPRINT_CAPTURE_TYPE_RESET_TEST";
 			};

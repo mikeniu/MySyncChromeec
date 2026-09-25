@@ -52,9 +52,9 @@ config PLATFORM_EC_PANIC_STRIP_GPR
 
 config PLATFORM_EC_PANIC_LOG
 	bool "Enable EC panic log"
-	default n
+	default y
 	select PLATFORM_EC_PRESERVED_RING_BUF
-	depends on !CROS_EC_RO || ZTEST
+	depends on PLATFORM_EC_NOINIT_END_OF_RAM_SECTION
 	help
 	  When enabled, a copy of the console log is kept in
 	  preserved uninitialized ram. The log can be dumped
@@ -75,5 +75,14 @@ config PLATFORM_EC_PANIC_LOG_DEBUG
 	help
 	  Enables panic log debug features, including
 	  the `paniclog` console command.
+
+config PLATFORM_EC_PANIC_HOST_EVENT
+	bool "Publish EC_HOST_EVENT_PANIC on HOOK_CHIPSET_STARTUP"
+	default y
+	depends on HAS_HOSTCMD
+	help
+	  Set EC_HOST_EVENT_PANIC inside HOOK_CHIPSET_STARTUP when an EC
+	  panic has occurred. This alerts the AP that a panic occurred on the
+	  previous boot.
 
 endif # PLATFORM_EC_PANIC

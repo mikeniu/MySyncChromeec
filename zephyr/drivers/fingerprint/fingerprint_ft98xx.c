@@ -147,6 +147,7 @@ static int ft98xx_init(const struct device *dev)
 	int rc = 0;
 	int attempt;
 	struct ft98xx_data *data = dev->data;
+	const struct ft98xx_cfg *cfg = dev->config;
 	data->errors = FINGERPRINT_ERROR_DEAD_PIXELS_UNKNOWN;
 
 	if (!IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)) {
@@ -187,8 +188,25 @@ static int ft98xx_init(const struct device *dev)
 		uint16_t cols = ft_sensor_query_cols();
 		uint16_t rows = ft_sensor_query_rows();
 		LOG_INF("sensor id: %x, cols:%d, rows:%d", chipid, cols, rows);
+		/* Image size is the same for all capture types */
+		if ((cfg->sensor_info.num_capture_types > 0) &&
+		    ((cols != cfg->sensor_image_configs[0].width) ||
+		     (rows != cfg->sensor_image_configs[0].height))) {
+			LOG_ERR("Probed sensor size doesn't match DTS: %dx%d",
+				cfg->sensor_image_configs[0].width,
+				cfg->sensor_image_configs[0].height);
+			data->errors |= FINGERPRINT_ERROR_INIT_FAIL;
+			return -EINVAL;
+		}
 	} else {
 		LOG_ERR("ft98xx sensor init fail, result:%d", rc);
+		data->errors |= FINGERPRINT_ERROR_INIT_FAIL;
+		return -EINVAL;
+	}
+
+	rc = ft98xx_set_mode(dev, FINGERPRINT_SENSOR_MODE_LOW_POWER);
+	if (rc != 0) {
+		LOG_ERR("ft98xx sensor enter low power fail, result:%d", rc);
 		data->errors |= FINGERPRINT_ERROR_INIT_FAIL;
 		return -EINVAL;
 	}
@@ -282,7 +300,8 @@ static int ft98xx_acquire_image(const struct device *dev,
 	}
 
 	memset(image_buf, 0, image_buf_size);
-	ret = ft_sensor_acquire_image_with_mode(image_buf, capture_type);
+	ret = ft_sensor_acquire_image_with_mode(image_buf, image_buf_size,
+						capture_type);
 	if (ret < 0) {
 		LOG_ERR("Failed to acquire image with capture_type %d: %d",
 			capture_type, ret);
@@ -337,12 +356,12 @@ static int ft98xx_init_driver(const struct device *dev)
 	int ret;
 
 	if (!spi_is_ready_dt(&cfg->spi)) {
-		LOG_ERR("SPI bus is not ready");
+		LOG_ERR_DEVICE_NOT_READY(cfg->spi.bus);
 		return -EINVAL;
 	}
 
 	if (!gpio_is_ready_dt(&cfg->reset_pin)) {
-		LOG_ERR("Port for sensor reset GPIO is not ready");
+		LOG_ERR_DEVICE_NOT_READY(cfg->reset_pin.port);
 		return -EINVAL;
 	}
 
@@ -353,7 +372,7 @@ static int ft98xx_init_driver(const struct device *dev)
 	}
 
 	if (!gpio_is_ready_dt(&cfg->interrupt)) {
-		LOG_ERR("Port for interrupt GPIO is not ready");
+		LOG_ERR_DEVICE_NOT_READY(cfg->interrupt.port);
 		return -EINVAL;
 	}
 

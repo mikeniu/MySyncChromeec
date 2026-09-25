@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef _RT1718S_TEST_COMMON_
-#define _RT1718S_TEST_COMMON_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_RT1718S_INCLUDE_TEST_COMMON_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_RT1718S_INCLUDE_TEST_COMMON_H_
 
 #include <zephyr/drivers/emul.h>
 
@@ -16,4 +16,4 @@ void rt1718s_clear_set_reg_history(void *f);
 void compare_reg_val_with_mask(const struct emul *emul, int reg,
 			       uint16_t expected, uint16_t mask);
 
-#endif /* _RT1718S_TEST_COMMON_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_RT1718S_INCLUDE_TEST_COMMON_H_ */

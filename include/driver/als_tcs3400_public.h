@@ -5,8 +5,8 @@
  * AMS TCS3400 light sensor driver
  */
 
-#ifndef __CROS_EC_DRIVER_ALS_TCS3400_PUBLIC_H
-#define __CROS_EC_DRIVER_ALS_TCS3400_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_ALS_TCS3400_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_ALS_TCS3400_PUBLIC_H_
 
 #include "accelgyro.h"
 
@@ -81,4 +81,4 @@ int tcs3400_get_integration_time(int atime);
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_ALS_TCS3400_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_ALS_TCS3400_PUBLIC_H_ */

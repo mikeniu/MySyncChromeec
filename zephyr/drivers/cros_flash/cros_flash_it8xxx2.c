@@ -304,7 +304,7 @@ static int cros_flash_it8xxx2_erase(const struct device *dev, int offset,
 	 * EC still need to handle AP's EC_CMD_GET_COMMS_STATUS command
 	 * during erasing.
 	 */
-	if (IS_ENABLED(HAS_TASK_HOSTCMD) &&
+	if (IS_ENABLED(CONFIG_HAS_HOSTCMD) &&
 	    IS_ENABLED(CONFIG_HOST_COMMAND_STATUS)) {
 		/*
 		 * Before the flash erasing, the interrupts should be disabled.
@@ -323,14 +323,13 @@ static int cros_flash_it8xxx2_erase(const struct device *dev, int offset,
 
 		offset += CONFIG_FLASH_ERASE_SIZE;
 		/*
-		 * If requested erase size is too large at one time on KGD
-		 * flash, we need to reload watchdog to prevent the reset.
+		 * We need to reload watchdog to prevent a reset.
 		 */
-		if (IS_ENABLED(CONFIG_WATCHDOG) && (size > 0x10000))
+		if (IS_ENABLED(CONFIG_WATCHDOG))
 			watchdog_reload();
 	}
 	/* Restore interrupts */
-	if (IS_ENABLED(HAS_TASK_HOSTCMD) &&
+	if (IS_ENABLED(CONFIG_HAS_HOSTCMD) &&
 	    IS_ENABLED(CONFIG_HOST_COMMAND_STATUS)) {
 		ite_intc_restore_interrupts();
 	}
@@ -455,7 +454,7 @@ static int flash_it8xxx2_init(const struct device *dev)
 	ARG_UNUSED(dev);
 
 	if (!device_is_ready(flash_controller)) {
-		LOG_ERR("device %s not ready", flash_controller->name);
+		LOG_ERR_DEVICE_NOT_READY(flash_controller);
 		return -ENODEV;
 	}
 

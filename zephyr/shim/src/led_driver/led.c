@@ -25,7 +25,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/spinlock.h>
 #include <zephyr/sys/util.h>
-LOG_MODULE_REGISTER(led, LOG_LEVEL_ERR);
+LOG_MODULE_REGISTER(led, LOG_LEVEL_INF);
 
 /* Extern the driver handles linked by 'led-pins' in the policies */
 #define DECLARE_DRIVER(inst)                        \
@@ -60,10 +60,10 @@ DT_INST_FOREACH_STATUS_OKAY(DECLARE_PINS_NODE_FOR_POLICY)
 		") must belong to the same led-id defined in the policy.");
 
 /* Generates the step-level pattern array for each rule */
-#define SET_PATTERN_COLOR_ARRAY(id)                                      \
-	{                                                                \
-		.led_color_node = &PINS_NODE(DT_PHANDLE(id, led_color)), \
-		.duration_ms = DT_PROP_OR(id, period_ms, 0),             \
+#define SET_PATTERN_COLOR_ARRAY(id)                                        \
+	{                                                                  \
+		.color_idx = DT_NODE_CHILD_IDX(DT_PHANDLE(id, led_color)), \
+		.duration_ms = DT_PROP_OR(id, period_ms, 0),               \
 	},
 
 #define PATTERN_COLOR_ARRAY(id) DT_CAT(PATTERN_COLOR_, id)
@@ -84,6 +84,7 @@ DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_COLOR_ARRAY_FOR_POLICY)
 
 #define LED_PATTERN_INIT(node_id, fn)                               \
 	{                                                           \
+		.led_id = DT_STRING_TOKEN(node_id, led_id),         \
 		.cur_color = 0,                                     \
 		.elapsed_ms = 0,                                    \
 		.transition = GET_PROP(node_id, transition),        \
@@ -93,16 +94,11 @@ DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_COLOR_ARRAY_FOR_POLICY)
 		.cycle_curr = 0,                                    \
 	},
 
-#define VALIDATE_CYCLE_COUNT(node_id, ...)                       \
-	BUILD_ASSERT(DT_PROP_OR(node_id, cycle_count, 0) <= 255, \
-		     "cycle-count exceeds uint8_t limit (255)");
-
 /* Generate the logic-level pattern array for each rule */
 #define PATTERN_NODE_ARRAY(id) DT_CAT(PATTERN_ARRAY_, id)
-#define GEN_PATTERN_NODE_ARRAY(id, fn1, fn2)                \
-	struct led_pattern_node_t PATTERN_NODE_ARRAY(       \
-		id)[] = { fn1(id, LED_PATTERN_INIT, fn2) }; \
-	fn1(id, VALIDATE_CYCLE_COUNT)
+#define GEN_PATTERN_NODE_ARRAY(id, fn1, fn2)          \
+	struct led_pattern_node_t PATTERN_NODE_ARRAY( \
+		id)[] = { fn1(id, LED_PATTERN_INIT, fn2) };
 
 #define GEN_PATTERN_NODE_ARRAY_FOR_POLICY(inst)                               \
 	DT_INST_FOREACH_CHILD_STATUS_OKAY_VARGS(inst, GEN_PATTERN_NODE_ARRAY, \
@@ -112,14 +108,14 @@ DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_COLOR_ARRAY_FOR_POLICY)
 DT_INST_FOREACH_STATUS_OKAY(GEN_PATTERN_NODE_ARRAY_FOR_POLICY)
 
 struct node_prop_t {
-	uint16_t pwr_state;
-	uint16_t chipset_state;
+	struct led_pattern_node_t *led_patterns;
 	int batt_state_mask;
 	int batt_state;
+	uint16_t pwr_state;
+	uint16_t chipset_state;
 	int8_t batt_lvl[2];
 	int8_t charge_port;
 	int8_t board_led_alt_policy_label;
-	struct led_pattern_node_t *led_patterns;
 	uint8_t num_patterns;
 };
 
@@ -138,14 +134,15 @@ struct node_prop_t {
  */
 #define SET_LED_VALUES(state_id, fn)                                          \
 	{                                                                     \
-		.pwr_state = GET_TOKEN_MASK(state_id, charge_state),          \
-		.chipset_state = GET_TOKEN_MASK(state_id, chipset_state),     \
+		.led_patterns = PATTERN_NODE_ARRAY(state_id),                 \
 		.batt_state_mask = COND_CODE_1(                               \
 			DT_NODE_HAS_PROP(state_id, batt_state_mask),          \
 			(DT_PROP(state_id, batt_state_mask)), (-1)),          \
 		.batt_state =                                                 \
 			COND_CODE_1(DT_NODE_HAS_PROP(state_id, batt_state),   \
 				    (DT_PROP(state_id, batt_state)), (-1)),   \
+		.pwr_state = GET_TOKEN_MASK(state_id, charge_state),          \
+		.chipset_state = GET_TOKEN_MASK(state_id, chipset_state),     \
 		.batt_lvl = COND_CODE_1(DT_NODE_HAS_PROP(state_id, batt_lvl), \
 					(DT_PROP(state_id, batt_lvl)),        \
 					({ -1, -1 })),                        \
@@ -157,7 +154,6 @@ struct node_prop_t {
 					 board_led_alt_policy_label),         \
 			(DT_PROP(state_id, board_led_alt_policy_label)),      \
 			(-1)),                                                \
-		.led_patterns = PATTERN_NODE_ARRAY(state_id),                 \
 		.num_patterns = 0 fn(state_id, PLUS_ONE),                     \
 	},
 
@@ -366,9 +362,7 @@ void reset_policy_patterns(enum ec_led_id led_id)
 			for (int k = 0; k < node->num_patterns; k++) {
 				struct led_pattern_node_t *pat =
 					&node->led_patterns[k];
-				enum ec_led_id id =
-					pat->pattern_color[0]
-						.led_color_node->led_id;
+				enum ec_led_id id = pat->led_id;
 
 				if (id == led_id) {
 					led_init_pattern_state(pat);
@@ -454,9 +448,7 @@ static void cancel_custom_if_conflict(const struct node_prop_t *node)
 	key = k_spin_lock(&led_custom_lock);
 	if (g_custom_patterns) {
 		for (i = 0; i < node->num_patterns; i++) {
-			enum ec_led_id id = node->led_patterns[i]
-						    .pattern_color[0]
-						    .led_color_node->led_id;
+			enum ec_led_id id = node->led_patterns[i].led_id;
 
 			if (g_custom_patterns->led_id == id) {
 				conflict = true;
@@ -481,8 +473,7 @@ update_policy_node(const struct policy_group *grp,
 
 	for (int i = 0; i < node->num_patterns; i++) {
 		struct led_pattern_node_t *pattern = &patterns[i];
-		enum ec_led_id led_id =
-			pattern->pattern_color[0].led_color_node->led_id;
+		enum ec_led_id led_id = pattern->led_id;
 
 		/* If a custom pattern is active, skip default policy. */
 		if (is_custom_pattern_active(custom, led_id)) {
@@ -519,7 +510,8 @@ static int match_node(const struct policy_group *grp, int node_idx)
 	const struct node_prop_t *node = &grp->nodes[node_idx];
 	bool *active = &grp->active[node_idx];
 
-#if (IS_ENABLED(CONFIG_PLATFORM_EC_CHARGE_MANAGER))
+#if (IS_ENABLED(CONFIG_PLATFORM_EC_CHARGE_MANAGER) || \
+     IS_ENABLED(CONFIG_PLATFORM_EC_ADSP_CHARGE_MANAGER))
 	/* Check if this node depends on power state */
 	if (node->pwr_state != 0) {
 		enum led_pwr_state pwr_state = led_pwr_get_state();
@@ -539,7 +531,9 @@ static int match_node(const struct policy_group *grp, int node_idx)
 			}
 		}
 	}
-#endif /* CONFIG_PLATFORM_EC_CHARGE_MANAGER */
+#endif /* CONFIG_PLATFORM_EC_CHARGE_MANAGER ||   \
+	* CONFIG_PLATFORM_EC_ADSP_CHARGE_MANAGER \
+	*/
 
 	/* Check if this node depends on chipset state */
 	if (node->chipset_state != 0) {
@@ -574,7 +568,8 @@ static int match_node(const struct policy_group *grp, int node_idx)
 	}
 #endif /* CONFIG_PLATFORM_EC_BATTERY */
 
-#if (IS_ENABLED(CONFIG_PLATFORM_EC_CHARGE_MANAGER))
+#if (IS_ENABLED(CONFIG_PLATFORM_EC_CHARGE_MANAGER) || \
+     IS_ENABLED(CONFIG_PLATFORM_EC_ADSP_CHARGE_MANAGER))
 	/* Check if this node depends on battery level */
 	if (node->batt_lvl[0] != -1) {
 		int curr_batt_lvl =
@@ -586,11 +581,18 @@ static int match_node(const struct policy_group *grp, int node_idx)
 			return -1;
 		}
 	}
-#endif /* CONFIG_PLATFORM_EC_CHARGE_MANAGER */
+#endif /* CONFIG_PLATFORM_EC_CHARGE_MANAGER ||   \
+	* CONFIG_PLATFORM_EC_ADSP_CHARGE_MANAGER \
+	*/
 
 	/* reset the color counter if pattern just activated */
 	if (!(*active)) {
 		*active = true;
+
+		if (node->num_patterns > 0) {
+			LOG_INF("Policy %d -> led %d", node_idx,
+				node->led_patterns[0].led_id);
+		}
 
 		/*
 		 * If a system state transition activates a policy for an LED

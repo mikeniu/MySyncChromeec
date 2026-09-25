@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_DRIVERS_INCLUDE_UTILS_H_
-#define ZEPHYR_TEST_DRIVERS_INCLUDE_UTILS_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_UTILS_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_UTILS_H_
 
 #include "charger.h"
 #include "emul/tcpc/emul_tcpci_partner_src.h"
@@ -786,4 +786,5 @@ void scan_console_line(const char *cmd, const int expected_rv,
  */
 #define CHECK_ARGS_RESULT(args) \
 	COND_CODE_0(CONFIG_EC_HOST_CMD, (zassert_ok(args.result, NULL);), ())
-#endif /* ZEPHYR_TEST_DRIVERS_INCLUDE_UTILS_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_COMMON_INCLUDE_TEST_DRIVERS_UTILS_H_ \
+	*/

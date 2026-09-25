@@ -175,6 +175,15 @@ void ap_pwrseq_task_start(void)
 {
 	const struct device *dev = ap_pwrseq_get_instance();
 
+	/*
+	 * Start the AP power sequencing state machine, seeding it with the
+	 * current hardware power state so it resumes from the correct state
+	 * rather than always starting from an assumed initial state.
+	 * If chipset_pwr_seq_get_state returns AP_POWER_STATE_G3, the AP
+	 * power sequence driver will fire <ARCH/CHIPSET/BOARD>_g3_entry
+	 * function where each implementation can set power signals to correct
+	 * state.
+	 */
 	ap_pwrseq_start(dev, chipset_pwr_seq_get_state());
 }
 #endif /* CONFIG_AP_PWRSEQ_DRIVER */

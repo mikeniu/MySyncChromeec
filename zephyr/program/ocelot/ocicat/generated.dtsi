@@ -177,10 +177,6 @@
 			gpios = <&gpioj 1 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
 			no-auto-init;
 		};
-        /* GPJ2: XXXXXXXXX              */
-		gpio_cse_early_rec_sw: cse_early_rec_sw {
-			gpios = <&gpioj 3 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_LOW)>;
-		};
         /* GPJ4: EC_AC_PRESENT_OD_R     */
 		gpio_sys_slp_s0ix_l: sys_slp_s0ix_l {
 			gpios = <&gpioj 5 (GPIO_INPUT)>;
@@ -189,7 +185,6 @@
         /* GPJ6: TS_WOT                 */
 		gpio_sys_rst_odl: sys_rst_odl {
 			gpios = <&gpioj 7 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_LOW | GPIO_OUTPUT_INIT_HIGH)>;
-			enum-name = "GPIO_SYS_RST_ODL";
 			no-auto-init;
 		};
 

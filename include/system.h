@@ -5,8 +5,8 @@
 
 /* System module for Chrome EC */
 
-#ifndef __CROS_EC_SYSTEM_H
-#define __CROS_EC_SYSTEM_H
+#ifndef PLATFORM_EC_INCLUDE_SYSTEM_H_
+#define PLATFORM_EC_INCLUDE_SYSTEM_H_
 
 #include "atomic.h"
 #include "common.h"
@@ -23,14 +23,16 @@ extern "C" {
 
 #include <drivers/cros_system.h>
 
-#ifdef CONFIG_CPU_CORTEX_M
+#if defined(CONFIG_ARCH_POSIX)
+/* Host unit test (Twister/native_sim) uses the fake in system_fake.c */
+void ztest_interrupt_disable_all(void);
+#define interrupt_disable_all() ztest_interrupt_disable_all()
+#elif defined(CONFIG_CPU_CORTEX_M)
 /*
  * For cortex-m we cannot use irq_lock() for disabling all the interrupts
  * because it leaves some (NMI and faults) still enabled.
  */
-#define interrupt_disable_all() __asm__("cpsid i")
-#elif CONFIG_ZTEST
-#define interrupt_disable_all()
+#define interrupt_disable_all() __asm__ volatile("cpsid i" ::: "memory")
 #else /* !CONFIG_CPU_CORTEX_M */
 #define interrupt_disable_all() irq_lock()
 #endif
@@ -397,8 +399,7 @@ const char *system_get_build_info(void);
 #if !(defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	system_reset(int flags);
+	void system_reset(int flags);
 
 /**
  * Set a scratchpad register to the specified value.
@@ -504,6 +505,11 @@ enum system_bbram_idx {
 	SYSTEM_BBRAM_IDX_PD1,
 	SYSTEM_BBRAM_IDX_PD2,
 	SYSTEM_BBRAM_IDX_TRY_SLOT,
+	/* Battery charge control sustainer limit settings (1 byte each) */
+	SYSTEM_BBRAM_IDX_CHG_LIMIT_LOWER,
+	SYSTEM_BBRAM_IDX_CHG_LIMIT_UPPER,
+	SYSTEM_BBRAM_IDX_CHG_LIMIT_FLAGS,
+	SYSTEM_BBRAM_IDX_MAX,
 };
 
 /* Maximum number of bbram indexes allotted for PD port state data */
@@ -782,6 +788,24 @@ enum ec_image system_get_shrspi_image_copy(void);
 uintptr_t system_get_fw_reset_vector(uintptr_t base);
 
 /**
+ * Chip-specific pre-system jump configuration.
+ *
+ * This callback is invoked during a system jump (e.g., from RO to RW or
+ * vice versa) immediately after interrupts have been globally disabled
+ * in jump_to_image().
+ *
+ * It allows the chip-specific shim to perform critical hardware cleanup or
+ * configurations (such as disabling memory mappings or caching) that must
+ * execute in a strictly synchronous, interrupt-free context just before
+ * the actual jump.
+ *
+ * Since interrupts are guaranteed to be disabled when this is called,
+ * implementations must not attempt to lock/unlock interrupts or rely on
+ * any asynchronous operations.
+ */
+void chip_pre_system_jump(void);
+
+/**
  * Check if the EC is warm booting.
  *
  * @return true if the EC is warm booting.
@@ -845,4 +869,4 @@ void system_compensate_rtc(void);
 }
 #endif
 
-#endif /* __CROS_EC_SYSTEM_H */
+#endif /* PLATFORM_EC_INCLUDE_SYSTEM_H_ */

@@ -9,7 +9,6 @@
 	named-gpios {
 		compatible = "named-gpios";
 
-		/* unimplemented GPIOs */
 		entering-rw {
 			enum-name = "GPIO_ENTERING_RW";
 		};

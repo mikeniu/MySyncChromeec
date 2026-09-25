@@ -325,6 +325,82 @@ ZTEST_USER(i2c_passthru, test_passthru_restricted)
 	zassert_equal(host_command_process(&ps8xxx_args), EC_RES_ACCESS_DENIED);
 }
 
+ZTEST_USER(i2c_passthru, test_passthru_restricted_virtual_battery)
+{
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_I2C_VIRTUAL_BATTERY) ||
+	    !IS_ENABLED(CONFIG_PLATFORM_EC_BATTERY_SMART)) {
+		ztest_test_skip();
+		return;
+	}
+	uint16_t vb_addr = VIRTUAL_BATTERY_ADDR_FLAGS;
+	uint8_t *out_data;
+	uint8_t vb_param_buf[sizeof(struct ec_params_i2c_passthru) +
+			     2 * sizeof(struct ec_params_i2c_passthru_msg) +
+			     3] = { 0 };
+	uint8_t vb_rsp_buf[sizeof(struct ec_response_i2c_passthru) + 4] = { 0 };
+	struct ec_params_i2c_passthru *vb_params =
+		(struct ec_params_i2c_passthru *)&vb_param_buf;
+	struct ec_response_i2c_passthru *vb_response =
+		(struct ec_response_i2c_passthru *)&vb_rsp_buf;
+	struct host_cmd_handler_args vb_args =
+		BUILD_HOST_COMMAND_SIMPLE(EC_CMD_I2C_PASSTHRU, 0);
+	/*
+	 * Setup passthru command to the TCPCI emulator - which is always
+	 * permitted by our board_allow_i2c_passthru() fake.
+	 */
+	vb_params->port = I2C_PORT_VIRTUAL_BATTERY;
+	vb_params->num_msgs = 1;
+	vb_params->msg[0].addr_flags = vb_addr;
+	vb_params->msg[0].len = 3;
+
+	out_data = (uint8_t *)&vb_params->msg[vb_params->num_msgs];
+
+	vb_args.params = &vb_param_buf;
+	vb_args.params_size = sizeof(vb_param_buf);
+	vb_args.response = &vb_rsp_buf;
+	vb_args.response_max = sizeof(vb_rsp_buf);
+
+	/* When the system is unlocked, restrictions do not apply */
+	system_is_locked_fake.return_val = false;
+
+	/* Prohibited SB_MANUFACTURER_ACCESS command. */
+	out_data[0] = 0x00; /* SB_MANUFACTURER_ACCESS 0x00 */
+	out_data[1] = 0x0F;
+	out_data[2] = 0x00;
+
+	zassert_equal(host_command_process(&vb_args), EC_RES_SUCCESS);
+	CHECK_ARGS_RESULT(vb_args)
+	zassert_ok(vb_response->i2c_status);
+	zassert_equal(vb_args.response_size,
+		      sizeof(struct ec_response_i2c_passthru), NULL);
+
+	/* When the system is locked, restrictions apply */
+	system_is_locked_fake.return_val = true;
+
+	/* Prohibited SB_MANUFACTURER_ACCESS command. */
+	out_data[0] = 0x00; /* SB_MANUFACTURER_ACCESS 0x00 */
+	out_data[1] = 0x0F;
+	out_data[2] = 0x00;
+
+	zassert_equal(host_command_process(&vb_args), EC_RES_ACCESS_DENIED);
+
+	/* Allowed SB_SPECIFICATION_INFO command */
+	vb_params->num_msgs = 2;
+	vb_params->msg[0].addr_flags = vb_addr;
+	vb_params->msg[0].len = 1;
+	vb_params->msg[1].addr_flags = vb_addr | EC_I2C_FLAG_READ;
+	vb_params->msg[1].len = 2;
+
+	out_data = (uint8_t *)&vb_params->msg[vb_params->num_msgs];
+	out_data[0] = 0x1a; /* SB_SPECIFICATION_INFO 0x1a */
+
+	zassert_equal(host_command_process(&vb_args), EC_RES_SUCCESS);
+	CHECK_ARGS_RESULT(vb_args)
+	zassert_ok(vb_response->i2c_status);
+	zassert_equal(vb_args.response_size,
+		      sizeof(struct ec_response_i2c_passthru) + 2, NULL);
+}
+
 static void i2c_passthru_before(void *state)
 {
 	ARG_UNUSED(state);

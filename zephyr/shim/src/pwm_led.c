@@ -55,7 +55,7 @@ static void pwm_led_set_duty(const struct pwm_dt_spec *pwm, int percent)
 	int rv;
 
 	if (!device_is_ready(pwm->dev)) {
-		LOG_ERR("device %s not ready", pwm->dev->name);
+		LOG_ERR_DEVICE_NOT_READY(pwm->dev);
 		return;
 	}
 
@@ -122,9 +122,6 @@ struct pwm_led_color_map led_color_map[EC_LED_COLOR_COUNT] = {
 	[EC_LED_COLOR_MAGENTA] =
 		DT_INST_PROP_OR(0, color_map_magenta, EC_LED_COLOR_BLANK),
 };
-
-BUILD_ASSERT(DT_INST_PROP_LEN(0, brightness_range) == EC_LED_COLOR_COUNT,
-	     "brightness_range must have exactly EC_LED_COLOR_COUNT values");
 
 static const uint8_t dt_brigthness_range[EC_LED_COLOR_COUNT] =
 	DT_INST_PROP(0, brightness_range);
@@ -194,7 +191,7 @@ static void led_set_charge_port_tick(void)
 	int port;
 	int side_select_duty;
 
-	port = charge_manager_get_active_charge_port();
+	port = charge_manager_get_active_charge_port_no_lock();
 	switch (port) {
 	case 0:
 		side_select_duty = 100;

@@ -3,10 +3,11 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_FINGERPRINT_FINGERPRINT_ALG_H_
-#define ZEPHYR_INCLUDE_FINGERPRINT_FINGERPRINT_ALG_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_FINGERPRINT_FINGERPRINT_ALG_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_FINGERPRINT_FINGERPRINT_ALG_H_
 
 #include <errno.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include <zephyr/sys/iterable_sections.h>
@@ -249,4 +250,4 @@ fingerprint_match(const struct fingerprint_algorithm *const alg, void *templ,
 			       match_index, update_bitmap);
 }
 
-#endif /* ZEPHYR_INCLUDE_FINGERPRINT_FINGERPRINT_ALG_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_FINGERPRINT_FINGERPRINT_ALG_H_ */

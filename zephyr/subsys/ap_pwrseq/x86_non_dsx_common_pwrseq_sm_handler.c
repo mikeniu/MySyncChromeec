@@ -271,8 +271,12 @@ void ap_power_force_shutdown(enum ap_power_shutdown_reason reason)
 #endif /* CONFIG_AP_PWRSEQ_DEBUG_MODE_COMMAND */
 
 	report_ap_reset((enum chipset_shutdown_reason)reason);
-
+#ifdef CONFIG_AP_PWRSEQ_DRIVER
+	ap_pwrseq_post_event(ap_pwrseq_get_instance(),
+			     AP_PWRSEQ_EVENT_POWER_SHUTDOWN);
+#else
 	board_ap_power_force_shutdown();
+#endif
 }
 
 void set_start_from_g3_delay_seconds(uint32_t d_time)
@@ -530,11 +534,14 @@ static int common_pwr_sm_run(int state)
 
 #if CONFIG_AP_PWRSEQ_S0IX
 	case SYS_POWER_STATE_S0ix:
+		if (power_signal_get(PWR_SYS_RST)) {
+			ap_power_reset_host_sleep_state();
+			return SYS_POWER_STATE_S0ixS0;
+		}
 		/* System in S0 only if SLP_S0 and SLP_S3 are de-asserted */
 		if ((power_signals_off(IN_PCH_SLP_S0) &&
 		     signals_valid_and_off(IN_PCH_SLP_S3) &&
-		     ap_power_sleep_get_notify() == AP_POWER_SLEEP_RESUME) ||
-		    power_signal_get(PWR_SYS_RST)) {
+		     ap_power_sleep_get_notify() == AP_POWER_SLEEP_RESUME)) {
 			return SYS_POWER_STATE_S0ixS0;
 		} else if (!chipset_is_all_power_good())
 			return SYS_POWER_STATE_S0;
@@ -860,6 +867,9 @@ static int x86_non_dsx_s5_entry(void *data)
 
 static int x86_non_dsx_s5_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
+	}
 	/*
 	 * At this point, lower level action handlers of state machine should
 	 * have already checked that required power rails are OK.
@@ -903,6 +913,9 @@ AP_POWER_ARCH_STATE_DEFINE(S5, x86_non_dsx_s5_entry, x86_non_dsx_s5_run,
 
 static int x86_non_dsx_s4_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
+	}
 	if (power_signal_get(PWR_RSMRST_PWRGD) == 0 ||
 	    signals_valid_and_on(IN_PCH_SLP_S5)) {
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S5);
@@ -926,6 +939,9 @@ AP_POWER_ARCH_STATE_DEFINE(S4, NULL, x86_non_dsx_s4_run, NULL);
 
 static int x86_non_dsx_s3_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
+	}
 	if (power_signal_get(PWR_RSMRST_PWRGD) == 0 ||
 	    signals_valid_and_on(IN_PCH_SLP_S4)) {
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S4);
@@ -954,6 +970,9 @@ static int x86_non_dsx_s0_entry(void *data)
 
 static int x86_non_dsx_s0_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
+	}
 	if (signals_valid_and_on(IN_PCH_SLP_S3)) {
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S3);
 	}
