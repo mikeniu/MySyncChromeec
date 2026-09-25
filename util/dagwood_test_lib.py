@@ -28,6 +28,7 @@ def add_common_args(parser: argparse.ArgumentParser):
     Args:
         parser: The ArgumentParser object to add arguments to.
     """
+    parser.epilog = "Other arguments, such as -T and -s, are passed to twister."
     parser.add_argument(
         "-p",
         "--platform",
@@ -36,21 +37,6 @@ def add_common_args(parser: argparse.ArgumentParser):
             "Platform type (e.g., npcx9/npcx9m7f, realtek/rts5912). "
             "Can be specified multiple times. Optional when --hardware-map is used."
         ),
-    )
-    parser.add_argument(
-        "-T",
-        "--test-dir",
-        action="append",
-        help=(
-            "Test directory to search (e.g., zephyr/test/ec-aic). "
-            "Can be specified multiple times."
-        ),
-    )
-    parser.add_argument(
-        "-s",
-        "--test-scenario",
-        action="append",
-        help="Specific test scenario to run. Can be specified multiple times.",
     )
     device_group = parser.add_mutually_exclusive_group()
     device_group.add_argument(
@@ -173,16 +159,6 @@ def get_twister_args(
 
     if getattr(args, "sram", False):
         twister_args.append("-x=SNIPPET=sram-only")
-
-    test_dir = getattr(args, "test_dir", None)
-    if test_dir:
-        for t_dir in test_dir:
-            twister_args.extend(["-T", t_dir])
-
-    test_scenario = getattr(args, "test_scenario", None)
-    if test_scenario:
-        for scenario in test_scenario:
-            twister_args.extend(["-s", scenario])
 
     if extra_args:
         cleaned_extra_args = []

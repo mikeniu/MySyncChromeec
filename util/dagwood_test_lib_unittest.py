@@ -156,6 +156,15 @@ class TestDagwoodTestLib(unittest.TestCase):
         self.assertNotIn("--device-serial", twister_args)
         self.assertNotIn("--hardware-map", twister_args)
 
+    def test_twister_args_passed_through(self):
+        """Test twister's -T and -s reach twister in command-line order."""
+        args, extra_args = self.parser.parse_known_args(
+            ["-p", "it8xxx2/it82002aw", "-s", "aic.fan", "-b", "-T", "test/a"]
+        )
+        twister_args = dagwood_test_lib.get_twister_args(args, extra_args)
+
+        self.assertEqual(twister_args[-4:], ["-s", "aic.fan", "-T", "test/a"])
+
     @mock.patch("dagwood_test_lib.dagwood_utils")
     def test_hardware_map_without_platform(self, mock_dagwood_utils):
         """Test --hardware-map works without specifying -p/--platform."""
