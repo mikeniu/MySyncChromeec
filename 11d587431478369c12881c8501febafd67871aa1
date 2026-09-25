@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8cbff21_f27a08ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T18:43:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Missing bounds check for V1 structure.\n\n### Review Summary\n\n*   **Functionality:** The migration to `EC_HOST_CMD_HANDLER` is generally correct, but there is a missing bounds check in `fp_command_template_v1` that allows an out-of-bounds read if a V1 packet is too small.\n*   **Architecture \u0026 Component Fit:** The migration of legacy `ec_status` return codes to `ec_host_cmd_status` in internal helpers is an isomorphic update corresponding to the framework migration, which aligns with the overall change.\n*   **Code Simplicity:** The changes are straightforward type and signature adaptations. No simpler rewrites are necessary.\n*   **Idiomaticity \u0026 Readability:** The modernized framework macro usage aligns well with upstream Zephyr idioms.\n*   **Testing \u0026 Test Coverage:** Tests are listed in the commit message (`TEST\u003d./twister ...`) and no new logic changes require regression tests beyond fixing the bounds check.\n*   **CL Size \u0026 Scope:** Size: M (+63, -56). The CL represents a cohesive, single logical change focused on migrating a specific group of host commands.\n*   **Commit Message:** The commit message accurately reflects the diff, explains the motivation, and uses the correct Chromium `BUG\u003d`/`TEST\u003d` footer formats.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8464410_49822016-13d9-4f58-9e86-1a7b5f08dbee.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "11d587431478369c12881c8501febafd67871aa1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a57e2b7_51cd07bb",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 1025,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T18:43:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Because `EC_CMD_FP_TEMPLATE` handles both V0 and V1 packets and registers using `SMALLEST_TYPE(struct ec_params_fp_template, struct ec_params_fp_template_v1)`, the framework only guarantees `args-\u003einput_buf_size \u003e\u003d 8`. \n\nHowever, `params-\u003ecmd` is at offset 8 (the 9th byte) in `struct ec_params_fp_template_v1`. If a V1 packet of size 8 is received, reading `params-\u003ecmd` here will result in an out-of-bounds read.\n\nPlease add an explicit size check for the V1 structure before accessing `params-\u003ecmd`:\n\n```cpp\nstatic enum ec_host_cmd_status\nfp_command_template_v1(struct ec_host_cmd_handler_args *args)\n{\n\tif (args-\u003einput_buf_size \u003c offsetof(struct ec_params_fp_template_v1, data)) {\n\t\treturn EC_HOST_CMD_INVALID_PARAM;\n\t}\n\n\tconst auto *params \u003d\n\t\tstatic_cast\u003cconst struct ec_params_fp_template_v1 *\u003e(\n\t\t\targs-\u003einput_buf);\n\tenum ec_status status;\n\n\tswitch (params-\u003ecmd) {\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8464410_49822016-13d9-4f58-9e86-1a7b5f08dbee.pb)",
+      "range": {
+        "startLine": 1014,
+        "startChar": 0,
+        "endLine": 1025,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "11d587431478369c12881c8501febafd67871aa1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
