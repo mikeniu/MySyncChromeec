@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3708ad20_d3ecde9b",
+        "filename": "Makefile",
+        "patchSetId": 15
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-09-25T10:56:16Z",
+      "side": 1,
+      "message": "same as the other PR, few strays?",
+      "range": {
+        "startLine": 430,
+        "startChar": 0,
+        "endLine": 432,
+        "endChar": 1
+      },
+      "revId": "aa7bc5353c90d437a4f6a919ac6c96950db6647b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
