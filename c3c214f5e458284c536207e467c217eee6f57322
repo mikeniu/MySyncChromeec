@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5262b19b_4089c4db",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T17:34:06Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5e35078d_9f6f6cd8",
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a4bcf74c_504f9357",
@@ -35,6 +53,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested** — Missing explicit padding, a minor commit message typo, and an unrelated bundled change require resolution.\n\n### Review Summary\n* **Functionality:** The newly introduced commands and telemetry event properly support power monitoring declarations.\n* **Architecture \u0026 Component Fit:** The structures are placed correctly in `ec_commands.h`. However, the CL inadvertently bundles the `EC_FEATURE_CONSOLE_LOG_EVENT` feature flag into `ec_features.c`, which is strictly unrelated to Power Monitoring.\n* **Code Simplicity:** Good, but explicit padding must be added.\n* **Idiomaticity \u0026 Readability:** Struct declarations violate the `__ec_todo_packed` rule. `__ec_todo_packed` is exclusively reserved for grandfathered structs, and MUST NOT be used in new code.\n* **Security:** Adding explicit padding is required to prevent the potential memory disclosure of uninitialized bytes sent over the wire.\n* **Testing \u0026 Test Coverage:** No dynamic logic is introduced in this CL since it is just interface declarations, so unit tests are not currently applicable here. Please ensure the follow-up implementation CL contains full automated test coverage.\n* **CL Size \u0026 Scope:** Size: M (+64, -0). The CL violates the Single Logical Change rule by bundling the unrelated `CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT`.\n* **Commit Message:** Includes minor typos (\"monitroing\" -\u003e \"monitoring\", \"subsystemm\" -\u003e \"subsystem\") but captures the core rationale well. `BUG\u003d` and `TEST\u003d` footers correctly match the Chromium convention.\n\nPlease see the inline comments for specific structural padding adjustments, formatting fixes, and the split request.\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8279638_3f0ef6c2-e2a6-4a4c-979f-30ed1ca3d9a2.pb)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e8bff39_f095e253",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T17:34:06Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a4bcf74c_504f9357",
       "revId": "c3c214f5e458284c536207e467c217eee6f57322",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -64,6 +100,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67004f5c_a7b414ac",
+        "filename": "common/ec_features.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T17:34:06Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4ded8d55_128a4834",
+      "range": {
+        "startLine": 205,
+        "startChar": 0,
+        "endLine": 207,
+        "endChar": 9999
+      },
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "68900425_4ee1d35c",
@@ -89,6 +149,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d8eeecf_fd7418b8",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 4297,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T17:34:06Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "68900425_4ee1d35c",
+      "range": {
+        "startLine": 4292,
+        "startChar": 0,
+        "endLine": 4297,
+        "endChar": 9999
+      },
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e33e348_9f5d5ccc",
@@ -110,6 +194,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5d866e0_6f6414e2",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 9463,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T17:34:06Z",
+      "side": 1,
+      "message": "Looks like this was fixed in https://crrev.com/c/8400459",
+      "parentUuid": "8e33e348_9f5d5ccc",
+      "range": {
+        "startLine": 9450,
+        "startChar": 0,
+        "endLine": 9463,
+        "endChar": 9999
+      },
       "revId": "c3c214f5e458284c536207e467c217eee6f57322",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
