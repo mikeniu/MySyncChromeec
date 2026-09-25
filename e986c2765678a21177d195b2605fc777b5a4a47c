@@ -1,0 +1,42 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc8f89ce_53cd23a6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T19:57:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe commit message is missing the required `BUG\u003d` and `TEST\u003d` footers for ChromiumOS. While `Original-BUG\u003d` and `Original-TEST\u003d` are present from the copybot import, the CQ still requires native `BUG\u003d` and `TEST\u003d` footers.\n\nPlease append the following footers to your commit message:\n```text\nBUG\u003db:556233130\nTEST\u003dCQ\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8347651_1e1fff11-cd6b-4409-96fe-3773d2e78397.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e986c2765678a21177d195b2605fc777b5a4a47c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b4f4f98_90c42fac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T19:57:25Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please update the commit message.**\n\n### Review Summary\n*   **Functionality:** Looks good.\n*   **Architecture \u0026 Component Fit:** The changes fit well with the existing test skipping infrastructure.\n*   **Code Simplicity:** The code is as simple as possible.\n*   **Idiomaticity \u0026 Readability:** Python list additions are standard and idiomatic.\n*   **Testing \u0026 Test Coverage:** N/A (Test runner configuration change).\n*   **CL Size \u0026 Scope:** `Size: XS (+4, -0)`. The CL is small and atomic.\n*   **Commit Message:** Missing required `BUG\u003d` and `TEST\u003d` footers for the ChromiumOS project. A suggested footer block has been provided in the commit message comments.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8347651_1e1fff11-cd6b-4409-96fe-3773d2e78397.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e986c2765678a21177d195b2605fc777b5a4a47c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
