@@ -154,16 +154,19 @@ setup_coreboot_sdk_env() {
     fi
 
     if [ -n "${sdk_script}" ]; then
-        eval "$(python3 -c '
+        # Assign before evaluating: eval of an empty string returns 0, so it
+        # would hide a failed command substitution.
+        local sdk_exports
+        sdk_exports="$(python3 -c '
 import json, subprocess, sys
 try:
-    script = sys.argv[1]
-    out = subprocess.check_output([sys.executable, script, "-j"]).decode()
-    for k, v in json.loads(out).items():
-        print(f"export {k}=\"{v}\"")
-except Exception as e:
-    sys.stderr.write(f"Warning: Failed to load Coreboot SDK: {e}\n")
+    out = subprocess.check_output([sys.executable, sys.argv[1], "-j"])
+except subprocess.CalledProcessError:
+    sys.exit("Error: Failed to load the Coreboot SDK.")
+for k, v in json.loads(out).items():
+    print(f"export {k}=\"{v}\"")
 ' "${sdk_script}")"
+        eval "${sdk_exports}"
     fi
 }
 
