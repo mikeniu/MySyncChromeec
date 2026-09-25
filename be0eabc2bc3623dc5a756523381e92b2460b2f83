@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23355570_98134a7f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 39
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T18:53:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The CL split inadvertently introduced a compilation error. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8008794_b2300db6-ad25-4580-b64f-dd119bcdc4ce.pb)]\n\n### Review Summary\n**Functionality:** The host command definitions for `EC_CMD_FP_INFO` and `EC_CMD_FP_FRAME` are functionally correct, and the parameter swaps for `input_buf` and `output_buf` are properly implemented. However, a compilation error was introduced when splitting the CL: `fp_commit_template`\u0027s forward declaration was changed to return `enum ec_host_cmd_status` but its definition (which is no longer migrated in this CL) still returns `enum ec_status`.\n**Architecture \u0026 Component Fit:** The changes properly adopt the upstream `EC_HOST_CMD` macros for the migrated commands.\n**Code Simplicity:** The changes are clean and minimal.\n**Idiomaticity \u0026 Readability:** The previous feedback regarding C-style casts has been fully addressed, using idiomatic `static_cast` for enums where appropriate.\n**Security:** Handling the input buffer size validation in a separate follow-up CL (CL:8434542) to keep this migration CL purely mechanical is an acceptable approach.\n**Testing:** The author has conducted manual on-device testing and executed twister tests. The compilation error must be fixed before the changes can compile successfully.\n**CL Size \u0026 Scope:** `Size: M (+58, -50)`. The CL has been properly split as requested in the previous patchset and represents a single, focused logical change.\n**Commit Message:** The commit message accurately reflects the changes, provides a clear rationale, and correctly uses Chromium ecosystem footers (`BUG\u003d`, `TEST\u003d`).",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "be0eabc2bc3623dc5a756523381e92b2460b2f83",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "acafa2cc_48820b69",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T18:53:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The forward declaration return type was changed to `enum ec_host_cmd_status`, but the function definition at line 904 still returns `enum ec_status`. This causes a C++ compilation error due to mismatched return types.\n\nSince `EC_CMD_FP_TEMPLATE` (and its helper `fp_commit_template`) appears to be migrated in a separate CL, this forward declaration (and the call site in `fp_task` below) should be reverted to return `enum ec_status` in this CL. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8008794_b2300db6-ad25-4580-b64f-dd119bcdc4ce.pb)",
+      "range": {
+        "startLine": 278,
+        "startChar": 0,
+        "endLine": 279,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "be0eabc2bc3623dc5a756523381e92b2460b2f83",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c78f0d0_9a6dc2cc",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 39
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T18:53:08Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Similar to the forward declaration above, `fp_commit_template` still returns `enum ec_status` in this CL because the template commands were split into a separate CL. \n\nThis variable should be reverted back to `enum ec_status` to match the function definition at line 904. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8008794_b2300db6-ad25-4580-b64f-dd119bcdc4ce.pb)",
+      "range": {
+        "startLine": 414,
+        "startChar": 0,
+        "endLine": 416,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "be0eabc2bc3623dc5a756523381e92b2460b2f83",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
