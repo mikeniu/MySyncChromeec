@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d3e1277_cf88be9d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T16:27:37Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n*   **Functionality:** Bypasses the failing `panic_data` test on Renode emulation for `bloonchipper` and `sanok` boards.\n*   **Architecture \u0026 Component Fit:** The test exclusion conforms to the existing pattern within `_skip_test_bloonchipper` and `_skip_test_sanok` of using simple lists for board-specific test skipping.\n*   **Code Simplicity:** The changes are as simple as possible, adding elements directly to the existing exclusionary lists.\n*   **Idiomaticity \u0026 Readability:** Adheres perfectly to the surrounding formatting and general Python list conventions.\n*   **Testing \u0026 Test Coverage:** Automated unit tests are not applicable to string insertions into a static configuration skip list within a test runner script.\n*   **CL Size \u0026 Scope:** Size: XS (+2, -0). The CL is extremely small and constitutes a single logical change. \n*   **Commit Message:** The subject accurately reflects the what and why. It correctly formats Chromium OS footers (`BUG\u003db:566195066`, `TEST\u003dCQ`). [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8462344_cdf8488a-a201-4c9e-a0f7-08f45f26cc95.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9229937298d682c4e59a9ddf2a01bceb6ef0d7be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
