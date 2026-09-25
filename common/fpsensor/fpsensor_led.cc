@@ -4,12 +4,14 @@
  */
 
 #include <zephyr/device.h>
+#include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/led.h>
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/pm/device.h>
 #include <zephyr/pm/policy.h>
+#include <zephyr/spinlock.h>
 #include <zephyr/sys/clock.h>
 
 #include <fpsensor/fpsensor_led.h>
@@ -96,6 +98,7 @@ enum class Mode {
 	OFF,
 	ENROLL,
 	MATCH,
+	MATCH_EXPIRED,
 	MATCH_OK,
 	MATCH_NOK,
 };
@@ -120,7 +123,11 @@ void led_update_handler(struct k_work *work)
 	k_sem_take(&led_lock, K_FOREVER);
 	bool is_timer_expired = k_uptime_ticks() >= timer_scheduled_at_ticks;
 	if (is_timer_expired) {
-		led_mode = Mode::OFF;
+		if (led_mode == Mode::MATCH) {
+			led_mode = Mode::MATCH_EXPIRED;
+		} else {
+			led_mode = Mode::OFF;
+		}
 		set_led_brightness(BRIGHTNESS_OFF);
 	}
 	k_sem_give(&led_lock);
@@ -153,6 +160,98 @@ void set_led_with_timeout(uint8_t brightness, int32_t delay_ms)
 	}
 }
 
+#define ZEPHYR_USER_NODE DT_PATH(zephyr_user)
+
+#if DT_NODE_HAS_PROP(ZEPHYR_USER_NODE, lid_open_gpios)
+constexpr int32_t LID_OPEN_DEBOUNCE_MS = 30;
+const struct gpio_dt_spec lid_open_gpio =
+	GPIO_DT_SPEC_GET(ZEPHYR_USER_NODE, lid_open_gpios);
+struct gpio_callback lid_open_cb;
+bool lid_gpio_ready;
+struct k_spinlock lid_debounce_lock;
+bool lid_debounce_pm_locked;
+
+bool is_lid_closed()
+{
+	/* Always called with led_lock taken */
+	return lid_gpio_ready && gpio_pin_get_dt(&lid_open_gpio) == 0;
+}
+
+void lid_open(struct k_work *);
+K_WORK_DELAYABLE_DEFINE(lid_open_dwork, lid_open);
+
+bool is_lid_open_work_pending()
+{
+	return (k_work_delayable_busy_get(&lid_open_dwork) &
+		(K_WORK_DELAYED | K_WORK_QUEUED)) != 0;
+}
+
+void lid_open(struct k_work *)
+{
+	k_sem_take(&led_lock, K_FOREVER);
+	if (!is_lid_open_work_pending()) {
+		if (is_lid_closed()) {
+			if (led_mode == Mode::MATCH) {
+				led_mode = Mode::MATCH_EXPIRED;
+				set_led(BRIGHTNESS_OFF);
+				LOG_INF("Fingerprint led match (lid closed).");
+			}
+		} else if (led_mode == Mode::MATCH ||
+			   led_mode == Mode::MATCH_EXPIRED) {
+			led_mode = Mode::MATCH;
+			set_led_with_timeout(
+				BRIGHTNESS_MATCH,
+				CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_MS);
+			LOG_INF("Fingerprint led match (lid open).");
+		}
+	}
+	k_sem_give(&led_lock);
+
+	k_spinlock_key_t key = k_spin_lock(&lid_debounce_lock);
+	if (lid_debounce_pm_locked && !is_lid_open_work_pending()) {
+		pm_policy_state_all_lock_put();
+		lid_debounce_pm_locked = false;
+	}
+	k_spin_unlock(&lid_debounce_lock, key);
+}
+
+void on_lid_open(const struct device *, struct gpio_callback *, uint32_t)
+{
+	k_spinlock_key_t key = k_spin_lock(&lid_debounce_lock);
+	/* Cannot fail with a non-zero delay. */
+	(void)k_work_reschedule(&lid_open_dwork, K_MSEC(LID_OPEN_DEBOUNCE_MS));
+	if (!lid_debounce_pm_locked) {
+		pm_policy_state_all_lock_get();
+		lid_debounce_pm_locked = true;
+	}
+	k_spin_unlock(&lid_debounce_lock, key);
+}
+
+int init_lid_gpio()
+{
+	int ret = -ENODEV;
+	k_sem_take(&led_lock, K_FOREVER);
+	gpio_init_callback(&lid_open_cb, on_lid_open, BIT(lid_open_gpio.pin));
+	if (!gpio_is_ready_dt(&lid_open_gpio) ||
+	    (ret = gpio_pin_configure_dt(&lid_open_gpio, GPIO_INPUT)) < 0 ||
+	    (ret = gpio_add_callback_dt(&lid_open_gpio, &lid_open_cb)) < 0 ||
+	    (ret = gpio_pin_interrupt_configure_dt(
+		     &lid_open_gpio, GPIO_INT_EDGE_TO_ACTIVE)) < 0) {
+		LOG_ERR("Failed to configure lid open GPIO: %d", ret);
+	} else {
+		lid_gpio_ready = true;
+	}
+	k_sem_give(&led_lock);
+	return ret;
+}
+SYS_INIT(init_lid_gpio, POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY);
+#else
+bool is_lid_closed()
+{
+	return false;
+}
+#endif /* DT_NODE_HAS_PROP(ZEPHYR_USER_NODE, lid_open_gpios) */
+
 void enroll()
 {
 	k_sem_take(&led_lock, K_FOREVER);
@@ -170,7 +269,16 @@ void enroll()
 void match()
 {
 	k_sem_take(&led_lock, K_FOREVER);
-	if (led_mode == Mode::MATCH) {
+	if (is_lid_closed()) {
+		if (led_mode != Mode::MATCH_EXPIRED) {
+			led_mode = Mode::MATCH_EXPIRED;
+			set_led(BRIGHTNESS_OFF);
+			LOG_INF("Fingerprint led match (lid closed).");
+		}
+		k_sem_give(&led_lock);
+		return;
+	}
+	if (led_mode == Mode::MATCH || led_mode == Mode::MATCH_EXPIRED) {
 		k_sem_give(&led_lock);
 		return;
 	}
