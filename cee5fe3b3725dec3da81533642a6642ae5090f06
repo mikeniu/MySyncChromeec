@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49b05010_50be99d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T18:46:31Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/dd8f3856-fe99-42c1-9c82-53f28f0d61e8)]\n\n### Review Summary\n\n**Functionality:**\nThe CL successfully and mechanically migrates the fingerprint authentication host commands to the upstream `EC_HOST_CMD_HANDLER` macros. The logic correctly maps `args-\u003eparams` to `args-\u003einput_buf`, `args-\u003eresponse` to `args-\u003eoutput_buf`, and updates status codes from `EC_RES_*` to `EC_HOST_CMD_*`.\n\n**Architecture \u0026 Component Fit:**\nThe changes align perfectly with the component\u0027s architecture, smoothly translating legacy host command macros to the standard pattern without introducing any layering mismatch.\n\n**Code Simplicity:**\nThe migration is implemented as directly and simply as possible. The updated code preserves the existing behavior exactly while fulfilling the new macro signature requirements.\n\n**Idiomaticity \u0026 Readability:**\nThe updated code conforms cleanly to the repository guidelines. The uniform use of the `struct` keyword in the macro invocations ensures local consistency across the CL.\n\n**Security:**\nNo new security boundaries or vulnerabilities are introduced; security contexts for sessions remain strictly intact.\n\n**Testing \u0026 Test Coverage:**\nSince this CL serves as a purely mechanical migration for existing host command bindings without altering inner behavioral logic, existing test suite coverage continues to provide correct validation.\n\n**CL Size \u0026 Scope:**\n`Size: M (+83, -71)`. The CL is appropriately sized and embodies a single, tightly-focused atomic change for migrating host command declarations.\n\n**Commit Message:**\nThe commit message accurately describes the migration, explains the rationale, and properly specifies the `BUG\u003d` and `TEST\u003d` footers following ChromiumOS development conventions.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8465042_dd8f3856-fe99-42c1-9c82-53f28f0d61e8.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cee5fe3b3725dec3da81533642a6642ae5090f06",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
