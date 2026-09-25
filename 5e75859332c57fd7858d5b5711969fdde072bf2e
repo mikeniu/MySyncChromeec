@@ -16,6 +16,24 @@
       "message": "Nit: Confirm if this feature interfears with a failed warm-reboot.",
       "revId": "5e75859332c57fd7858d5b5711969fdde072bf2e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a5b8f12_75cf490d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-09-25T07:23:42Z",
+      "side": 1,
+      "message": "\u003e Nit: Confirm if this feature interfears with a failed warm-reboot.\n\nif warm reboot would fail then cold reboot would have been triggered. isn\u0027t that is the flow?",
+      "parentUuid": "ca5c0e83_543cf92f",
+      "revId": "5e75859332c57fd7858d5b5711969fdde072bf2e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
