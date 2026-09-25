@@ -159,6 +159,24 @@
       "parentUuid": "bb54553d_181bd0d4",
       "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea1df49b_8cef9dea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-25T06:54:39Z",
+      "side": 1,
+      "message": "No, only the sensor rename + sensor test (and emul) rename and separate CL for algo rename",
+      "parentUuid": "684c15ea_c3722c5e",
+      "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
