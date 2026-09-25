@@ -134,7 +134,7 @@
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;PD Sink-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-    <vif:PD_Power_As_Sink value="65000">65000 mW</vif:PD_Power_As_Sink>
+    <vif:PD_Power_As_Sink value="100000">100000 mW</vif:PD_Power_As_Sink>
     <vif:EPR_Supported_As_Snk value="false" />
     <vif:Time_to_EPR_Ready value="0">0 ms</vif:Time_to_EPR_Ready>
     <vif:No_USB_Suspend_May_Be_Set value="true" />
@@ -200,7 +200,7 @@
     <vif:Modal_Operation_Supported_SOP value="false" />
     <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
     <vif:PID_SOP value="20581">5065</vif:PID_SOP>
-    <vif:bcdDevice_SOP value="37">0025</vif:bcdDevice_SOP>
+    <vif:bcdDevice_SOP value="4097">1001</vif:bcdDevice_SOP>
   </vif:Component>
   <vif:Component>
     <!--Component 1: Port 1-->
@@ -317,7 +317,7 @@
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
     <!--;PD Sink-->
     <!--;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-->
-    <vif:PD_Power_As_Sink value="65000">65000 mW</vif:PD_Power_As_Sink>
+    <vif:PD_Power_As_Sink value="100000">100000 mW</vif:PD_Power_As_Sink>
     <vif:EPR_Supported_As_Snk value="false" />
     <vif:Time_to_EPR_Ready value="0">0 ms</vif:Time_to_EPR_Ready>
     <vif:No_USB_Suspend_May_Be_Set value="true" />
@@ -383,6 +383,6 @@
     <vif:Modal_Operation_Supported_SOP value="false" />
     <vif:USB_VID_SOP value="6353">18D1</vif:USB_VID_SOP>
     <vif:PID_SOP value="20581">5065</vif:PID_SOP>
-    <vif:bcdDevice_SOP value="37">0025</vif:bcdDevice_SOP>
+    <vif:bcdDevice_SOP value="4097">1001</vif:bcdDevice_SOP>
   </vif:Component>
 </vif:VIF>
