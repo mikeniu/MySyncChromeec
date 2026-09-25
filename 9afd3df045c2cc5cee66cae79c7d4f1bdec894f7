@@ -43,6 +43,23 @@
       "isAi": true,
       "revId": "9afd3df045c2cc5cee66cae79c7d4f1bdec894f7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b969e679_a87f40b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T22:22:27Z",
+      "side": 1,
+      "message": "@fsammoura@google.com The renode CQ tests are failing on `ec-legacy` with this change.",
+      "revId": "9afd3df045c2cc5cee66cae79c7d4f1bdec894f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
