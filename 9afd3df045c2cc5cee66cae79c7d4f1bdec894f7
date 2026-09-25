@@ -102,6 +102,24 @@
       "parentUuid": "beece601_2e96e0f8",
       "revId": "9afd3df045c2cc5cee66cae79c7d4f1bdec894f7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d9d04f2_df5f3310",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-25T23:28:50Z",
+      "side": 1,
+      "message": "the fp_clear_buffer has not yet merged in ec-legacy\n\nhttps://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8237836\n\nit will not pass on dartmonkey without the change in the above CL",
+      "parentUuid": "b969e679_a87f40b9",
+      "revId": "9afd3df045c2cc5cee66cae79c7d4f1bdec894f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
