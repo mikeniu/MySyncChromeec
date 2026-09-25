@@ -174,6 +174,9 @@ RUN git clone --depth 1 \
     cd / && \
     rm -rf /tmp/vboot_reference
 
+# The entrypoint creates the build user with the workspace owner's UID. Free
+# UID 1000, which the base image assigns to an unused "ubuntu" user.
+RUN userdel -r ubuntu
 
 # Copy the entrypoint script
 COPY entrypoint.sh /entrypoint.sh
