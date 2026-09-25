@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e35078d_9f6f6cd8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T00:27:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Minor typos in the commit message body: \"monitroing\" should be \"monitoring\", and \"subsystemm\" should be \"subsystem\".\n\nSuggested replacement commit message:\n```text\nUPSTREAM: ec_commands: Introduce new Power Monitoring feature to EC\n\nThis new EC feature adds a new power monitoring subsystem\nwhich allows AP to read power consumption on rails.\n\nOriginal-BUG\u003db:502833553\nOriginal-TEST\u003dzmake build moonstone\nChange-Id: I7f117bd84a25e688734940774f0102d3abb33797\nOriginal-Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/7758509\nOriginal-Reviewed-by: Keith Short \u003ckeithshort@chromium.org\u003e\nOriginal-Reviewed-by: Boris Mittelberg \u003cbmbm@google.com\u003e\nOriginal-Reviewed-by: Daniel Balint \u003cdbalint@google.com\u003e\nOriginal-Reviewed-by: Fabio Baltieri \u003cfabiobaltieri@google.com\u003e\nOriginal-Code-Coverage: Zoss \u003czoss-cl-coverage@prod.google.com\u003e\nOriginal-Tested-by: Daniel Balint \u003cdbalint@google.com\u003e\nOriginal-Tested-by: Albert Jakieła \u003cjakiela@google.com\u003e\nOriginal-Commit-Queue: Albert Jakieła \u003cjakiela@google.com\u003e\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8279638_3f0ef6c2-e2a6-4a4c-979f-30ed1ca3d9a2.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4bcf74c_504f9357",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T00:27:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Missing explicit padding, a minor commit message typo, and an unrelated bundled change require resolution.\n\n### Review Summary\n* **Functionality:** The newly introduced commands and telemetry event properly support power monitoring declarations.\n* **Architecture \u0026 Component Fit:** The structures are placed correctly in `ec_commands.h`. However, the CL inadvertently bundles the `EC_FEATURE_CONSOLE_LOG_EVENT` feature flag into `ec_features.c`, which is strictly unrelated to Power Monitoring.\n* **Code Simplicity:** Good, but explicit padding must be added.\n* **Idiomaticity \u0026 Readability:** Struct declarations violate the `__ec_todo_packed` rule. `__ec_todo_packed` is exclusively reserved for grandfathered structs, and MUST NOT be used in new code.\n* **Security:** Adding explicit padding is required to prevent the potential memory disclosure of uninitialized bytes sent over the wire.\n* **Testing \u0026 Test Coverage:** No dynamic logic is introduced in this CL since it is just interface declarations, so unit tests are not currently applicable here. Please ensure the follow-up implementation CL contains full automated test coverage.\n* **CL Size \u0026 Scope:** Size: M (+64, -0). The CL violates the Single Logical Change rule by bundling the unrelated `CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT`.\n* **Commit Message:** Includes minor typos (\"monitroing\" -\u003e \"monitoring\", \"subsystemm\" -\u003e \"subsystem\") but captures the core rationale well. `BUG\u003d` and `TEST\u003d` footers correctly match the Chromium convention.\n\nPlease see the inline comments for specific structural padding adjustments, formatting fixes, and the split request.\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8279638_3f0ef6c2-e2a6-4a4c-979f-30ed1ca3d9a2.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ded8d55_128a4834",
+        "filename": "common/ec_features.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T00:27:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The inclusion of `CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE_EVENT` and `EC_FEATURE_CONSOLE_LOG_EVENT` appears unrelated to the Power Monitoring feature described in the CL subject and commit message. This violates the Single Logical Change rule.\n\nIf this is intended to be bundled, please document this addition in the commit message. Otherwise, please split this into a separate CL or remove it from this CL. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8279638_3f0ef6c2-e2a6-4a4c-979f-30ed1ca3d9a2.pb)",
+      "range": {
+        "startLine": 205,
+        "startChar": 0,
+        "endLine": 207,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68900425_4ee1d35c",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 4297,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T00:27:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — `__ec_todo_packed` is exclusively reserved for grandfathered-in structs that have not yet been evaluated for size and offset alignment. New structures MUST NOT use `__ec_todo_packed`.\n\nPlease use `__ec_align*` macros. To avoid implicit padding, explicitly pad the struct so that its size aligns properly.\n\nSuggestion:\n```c\n\tstruct __ec_align_offset1 {\n\t\tint64_t value;\n\t\tuint32_t samples;\n\t\tuint8_t channel_id;\n\t\tuint8_t reserved[3];\n\t} pwrmon_data;\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8279638_3f0ef6c2-e2a6-4a4c-979f-30ed1ca3d9a2.pb)",
+      "range": {
+        "startLine": 4292,
+        "startChar": 0,
+        "endLine": 4297,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e33e348_9f5d5ccc",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 9463,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T00:27:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — `cmd` is a 1-byte value followed by an `__ec_align2` union, which will introduce 1 byte of implicit unnamed padding to satisfy the 2-byte alignment boundary of the union. Since this struct is packed and sent over the interface, implicit padding can lead to uninitialized bytes being leaked over the wire.\n\nPlease add explicit padding (e.g., `uint8_t reserved;`) after `cmd`.\n\n```c\nstruct ec_params_pwrmon {\n\tuint8_t cmd;\n\tuint8_t reserved;\n\tunion {\n...\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8279638_3f0ef6c2-e2a6-4a4c-979f-30ed1ca3d9a2.pb)",
+      "range": {
+        "startLine": 9450,
+        "startChar": 0,
+        "endLine": 9463,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ed78232_389d029e",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 9468,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T00:27:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — `struct pwrmon_dump_info` has an unpadded size of 33 bytes (1 byte `channel_id` + 32 bytes `channel_name`). Because it is marked with `__ec_align4`, the compiler will implicitly pad its size to a multiple of 4 bytes (36 bytes).\n\nPlease add explicit padding to avoid implicit unnamed padding bytes in the structure when nested.\n\n```c\nstruct pwrmon_dump_info {\n\tuint8_t channel_id;\n\tchar channel_name[32];\n\tuint8_t reserved[3];\n} __ec_align4;\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8279638_3f0ef6c2-e2a6-4a4c-979f-30ed1ca3d9a2.pb)",
+      "range": {
+        "startLine": 9465,
+        "startChar": 0,
+        "endLine": 9468,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
