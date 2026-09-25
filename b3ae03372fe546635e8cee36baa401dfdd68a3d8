@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9eeea40_e6848d7a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T17:00:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/bc3ab7d6-05fc-4ca5-906b-50670ce96612)]\n\n### Review Summary\n\n**Functionality:**\nThe CL successfully migrates the host command declarations and handlers to the upstream `EC_HOST_CMD` framework. The changes correctly preserve the existing behavior inside the handlers while updating the signatures and return types.\n\n**Architecture \u0026 Component Fit:**\nThe changes align perfectly with the component architecture, standardizing the host command macros to `EC_HOST_CMD_HANDLER` without introducing architectural mismatches.\n\n**Code Simplicity:**\nThe migration maps `args-\u003eparams` and `args-\u003eresponse` to `args-\u003einput_buf` and `args-\u003eoutput_buf` straightforwardly without added complexity.\n\n**Idiomaticity \u0026 Readability:**\nA minor inconsistency regarding the use of the `struct` keyword in C++ macro invocations was noted in an inline comment. Otherwise, the logic cleanly embraces established structures.\n\n**Security:**\nThe CL is a mechanical refactoring of command handlers and does not alter the underlying authentication logic or security bounds.\n\n**Testing \u0026 Test Coverage:**\nAs an infrastructure migration for host commands, the pre-existing test suite adequately covers these structural shifts in bindings.\n\n**CL Size \u0026 Scope:**\n`Size: M (+83, -71)`. The CL targets a cohesive, logically self-contained migration step that doesn\u0027t bundle unrelated changes.\n\n**Commit Message:**\nThe commit message accurately describes the migration, states the correct motivation, and conforms to the Chromium/ChromiumOS `BUG\u003d` and `TEST\u003d` formatting guidelines.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3ae03372fe546635e8cee36baa401dfdd68a3d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac054fcb_b35af7cd",
+        "filename": "common/fpsensor/fpsensor_auth_handshake.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T17:00:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Minor inconsistency: The `struct` keyword is omitted here but included in all other `EC_HOST_CMD_HANDLER` macro invocations in this CL. In C++, the `struct` prefix is optional, so it is generally more idiomatic to omit it everywhere. \n\nConsider omitting the `struct` keyword from all macro invocations for idiomatic consistency, or adding it here for local consistency. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8465042_bc3ab7d6-05fc-4ca5-906b-50670ce96612.pb)",
+      "range": {
+        "startLine": 160,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3ae03372fe546635e8cee36baa401dfdd68a3d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
