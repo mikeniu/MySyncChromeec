@@ -269,6 +269,30 @@
       },
       "revId": "c3c214f5e458284c536207e467c217eee6f57322",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77fa88f4_5fb195f5",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 9468,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T18:17:32Z",
+      "side": 1,
+      "message": "http://b/566230946",
+      "parentUuid": "d3d0851e_6b997980",
+      "range": {
+        "startLine": 9465,
+        "startChar": 0,
+        "endLine": 9468,
+        "endChar": 9999
+      },
+      "revId": "c3c214f5e458284c536207e467c217eee6f57322",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ],
   "submitRequirementResults": [
