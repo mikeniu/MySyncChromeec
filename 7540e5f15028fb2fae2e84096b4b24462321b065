@@ -22,6 +22,30 @@
       },
       "revId": "7540e5f15028fb2fae2e84096b4b24462321b065",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "615d9f81_7906543c",
+        "filename": "zephyr/subsys/adsp_comms/adsp_comms.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-25T14:35:15Z",
+      "side": 1,
+      "message": "Updated",
+      "parentUuid": "1aaf7d15_e45635b9",
+      "range": {
+        "startLine": 92,
+        "startChar": 11,
+        "endLine": 92,
+        "endChar": 27
+      },
+      "revId": "7540e5f15028fb2fae2e84096b4b24462321b065",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
