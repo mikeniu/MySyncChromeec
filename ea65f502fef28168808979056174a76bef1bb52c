@@ -1,0 +1,42 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8d6dd6b_2a108000",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T19:51:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\nThe commit message is missing the required `BUG\u003d` and `TEST\u003d` footers for the `chromium` host. While `Original-BUG\u003d` and `Original-TEST\u003d` are present, explicit `BUG\u003d` and `TEST\u003d` footers are also required.\n\nPlease update the commit message to include them. For example:\n```text\nUPSTREAM: test/run_device_tests: Re-enable zephyr_kernel_poll test on helipilot\n\nThis is now passing with Renode version:\n\nRenode v1.16.1\n  build: 1.16.1+20260826notgit\n  build type: ReleaseHeadless\n  runtime: .NET 8.0.7\n\nBUG\u003db:485639561\nTEST\u003dCQ\nOriginal-BUG\u003db:485639561\nOriginal-TEST\u003dCQ\nChange-Id: If90ae95e4be41f4323e7e5205e9f74398adf118b\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8329793_e1164044-6025-4242-879e-0c4b6fd2a789.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ea65f502fef28168808979056174a76bef1bb52c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02590bee_14c30158",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T19:51:03Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please update the commit message.** [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8329793_e1164044-6025-4242-879e-0c4b6fd2a789.pb)]\n\n### Review Summary\n* **Functionality:** Re-enables the `zephyr_kernel_poll` test on the `helipilot` board by removing it from the test skip list.\n* **Architecture \u0026 Component Fit:** Fits perfectly; modifying the test skip list is the appropriate way to re-enable tests.\n* **Code Simplicity:** The change is as simple as possible (a 1-line removal).\n* **Idiomaticity \u0026 Readability:** Python list modification is clean and idiomatic.\n* **Security:** N/A\n* **Testing \u0026 Test Coverage:** This change itself is enabling a test, which improves overall test coverage. No additional tests are needed.\n* **CL Size \u0026 Scope:** Size: XS (+0, -1). Atomic, single logical change.\n* **Commit Message:** Accurately describes the change and provides the rationale. However, it is missing the explicitly required `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ea65f502fef28168808979056174a76bef1bb52c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
