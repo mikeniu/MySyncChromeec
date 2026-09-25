@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3053fceb_d7cec049",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T20:19:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8d6dd6b_2a108000",
+      "revId": "ea65f502fef28168808979056174a76bef1bb52c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02590bee_14c30158",
@@ -35,6 +53,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested — Please update the commit message.** [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8329793_e1164044-6025-4242-879e-0c4b6fd2a789.pb)]\n\n### Review Summary\n* **Functionality:** Re-enables the `zephyr_kernel_poll` test on the `helipilot` board by removing it from the test skip list.\n* **Architecture \u0026 Component Fit:** Fits perfectly; modifying the test skip list is the appropriate way to re-enable tests.\n* **Code Simplicity:** The change is as simple as possible (a 1-line removal).\n* **Idiomaticity \u0026 Readability:** Python list modification is clean and idiomatic.\n* **Security:** N/A\n* **Testing \u0026 Test Coverage:** This change itself is enabling a test, which improves overall test coverage. No additional tests are needed.\n* **CL Size \u0026 Scope:** Size: XS (+0, -1). Atomic, single logical change.\n* **Commit Message:** Accurately describes the change and provides the rationale. However, it is missing the explicitly required `BUG\u003d` and `TEST\u003d` footers.",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "ea65f502fef28168808979056174a76bef1bb52c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff37874d_5c253268",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T20:19:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02590bee_14c30158",
       "revId": "ea65f502fef28168808979056174a76bef1bb52c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
