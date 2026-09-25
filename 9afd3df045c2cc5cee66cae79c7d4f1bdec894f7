@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e849731c_bd46e6a4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T20:14:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe commit message is missing the required `BUG\u003d` and `TEST\u003d` footers for the ChromiumOS ecosystem. While `Original-BUG\u003d` and `Original-TEST\u003d` are present, strict guidelines require standard `BUG\u003d` and `TEST\u003d` footers to be present.\n\nPlease add `BUG\u003db:524097509` and an appropriate `TEST\u003d` footer (e.g., `TEST\u003dnone` or copy the original test commands).\n\nSuggested footer block:\n```text\nBUG\u003db:524097509\nTEST\u003d./test/run_device_tests.py -b sanok -f servo_micro\n\nOriginal-BUG\u003db:524097509\nOriginal-TEST\u003d./test/run_device_tests.py -b sanok -f servo_micro\nOriginal-TEST\u003d./test/run_device_tests.py -b bloonchipper -f servo_micro\nOriginal-TEST\u003d./test/run_device_tests.py -b helipilot -f servo_micro\nChange-Id: I9bb73501ccfe8d1ee4a489f9ba1e07ab6aed67ac\nOriginal-Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8281245\nOriginal-Code-Coverage: Zoss \u003czoss-cl-coverage@prod.google.com\u003e\nOriginal-Reviewed-by: Tom Hughes \u003ctomhughes@chromium.org\u003e\nOriginal-Commit-Queue: Firas Sammoura \u003cfsammoura@google.com\u003e\nOriginal-Tested-by: Firas Sammoura \u003cfsammoura@google.com\u003e\nGitOrigin-RevId: 0d6683e845a922443aa41ed5710211ca2e65f6aa\nCr-Build-Id: 8671702565883730289\nCr-Build-Url: https://cr-buildbucket.appspot.com/build/8671702565883730289\nCopybot-Job-Name: fingerprint-ec-legacy-copybot-downstream\n```\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8351643_555d6285-9e09-440b-99ed-89af2fc711cd.pb)",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9afd3df045c2cc5cee66cae79c7d4f1bdec894f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "beece601_2e96e0f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-25T20:14:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please update the commit message.\n\n### Review Summary\n\n*   **Functionality:** The change correctly registers the new `fp_buffer_clear` multistep test in the hardware test runner and adds it to the skip lists for boards (`chudow`, `helipilot`) where it currently fails or is not yet supported.\n*   **Architecture \u0026 Component Fit:** The test registration fits perfectly within the existing `run_device_tests.py` structures.\n*   **Code Simplicity:** The configuration addition is as simple and direct as possible.\n*   **Idiomaticity \u0026 Readability:** The Python code is idiomatic and matches the surrounding list structure.\n*   **Testing \u0026 Test Coverage:** The change itself adds a test to the test runner; no additional unit tests are required for this configuration script update.\n*   **CL Size \u0026 Scope:** Size: XS (+5, -0). The CL is atomic and complies with the Single Logical Change rule.\n*   **Commit Message Accuracy \u0026 Style:** ❌ **Changes Requested**. The commit message clearly explains the intent, but it uses `Original-BUG\u003d` and `Original-TEST\u003d` instead of the required `BUG\u003d` and `TEST\u003d` footers for the ChromiumOS ecosystem. Please add standard `BUG\u003d` and `TEST\u003d` footers (see inline comment on `/COMMIT_MSG`).\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8351643_555d6285-9e09-440b-99ed-89af2fc711cd.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9afd3df045c2cc5cee66cae79c7d4f1bdec894f7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
