@@ -188,127 +188,123 @@ compute_reqs_hash() {
 }
 
 # Install zmake package in editable mode inside virtualenv
-if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
-    HASH_FILE="${VENV_DIR}/.requirements.hash"
-    CURRENT_HASH="$(compute_reqs_hash)"
-    PAST_HASH=""
-    [ -f "${HASH_FILE}" ] && PAST_HASH="$(cat "${HASH_FILE}")"
+HASH_FILE="${VENV_DIR}/.requirements.hash"
+CURRENT_HASH="$(compute_reqs_hash)"
+PAST_HASH=""
+[ -f "${HASH_FILE}" ] && PAST_HASH="$(cat "${HASH_FILE}")"
 
-    if [ "${CURRENT_HASH}" != "none" ] && \
-       [ "${CURRENT_HASH}" = "${PAST_HASH}" ]; then
-        echo "Python dependencies up to date. Skipping pip install."
-    else
-        echo "Configuring zmake tool in virtualenv..."
-        python3 -m pip install -q --no-deps \
-            -e /workspace/src/platform/ec/zephyr/zmake
-
-        if [ -n "${UPDATE}" ]; then
-            # Install standard Zephyr dependencies to support twister executions
-            ZEPHYR_REQS_DIR="/workspace/src/third_party"
-            ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/zephyrproject/zephyr/scripts"
-            if [ -d "${ZEPHYR_REQS_DIR}" ]; then
-                python3 -m pip install -q --no-cache-dir \
-                    -r "${ZEPHYR_REQS_DIR}/requirements.txt"
-            fi
-
-            # Parse .vpython3 and install dependencies
-            VPYTHON_FILE="/workspace/src/platform/ec/zephyr/zmake/.vpython3"
-            if [ -f "${VPYTHON_FILE}" ]; then
-                packages=$(grep -o \
-                    'infra/python/wheels/[a-zA-Z0-9_-]*' \
-                    "${VPYTHON_FILE}" | \
-                    sed 's|infra/python/wheels/||g' | \
-                    sed 's|-py2_py3||g; s|-py3||g' | \
-                    sort -u)
-                to_install=""
-                for pkg in ${packages}; do
-                    case "${pkg}" in
-                        "pyyaml") pkg="PyYAML" ;;
-                        "python-dateutil") pkg="python-dateutil" ;;
-                        "ruamel_yaml") pkg="ruamel.yaml" ;;
-                        "ruamel_yaml_clib"|"coverage"|"pytest"| \
-                        "hypothesis"|"testfixtures") continue ;;
-                    esac
-                    to_install="${to_install} ${pkg}"
-                done
-                if [ -n "${to_install}" ]; then
-                    # shellcheck disable=SC2086
-                    python3 -m pip install -q --no-cache-dir ${to_install}
-                fi
-            fi
-        fi
-
-        echo "${CURRENT_HASH}" > "${HASH_FILE}"
-    fi
-
-    # Configure Coreboot SDK toolchain environment variables
-    setup_coreboot_sdk_env
-
-    # Set up Realtek monitor binary (rtk_flame)
-    MONITOR_CACHE="/workspace/.cache/rts5915_flash_upload.bin"
-    MONITOR_DEST_DIR="/usr/share/ec-devutils"
-    MONITOR_DEST="${MONITOR_DEST_DIR}/rts5915_flash_upload.bin"
-
-    if [ ! -f "${MONITOR_CACHE}" ]; then
-        if [ -f "${MONITOR_DEST}" ]; then
-            echo "Copying pre-installed Realtek monitor binary to cache..."
-            mkdir -p "$(dirname "${MONITOR_CACHE}")"
-            cp "${MONITOR_DEST}" "${MONITOR_CACHE}"
-        else
-            echo "Monitor binary not found in cache. Building rtk_flame..."
-            if zmake --checkout /workspace build rtk_flame; then
-                echo "Caching monitor binary..."
-                mkdir -p "$(dirname "${MONITOR_CACHE}")"
-                build_bin="/workspace/src/platform/ec/build/zephyr"
-                build_bin="${build_bin}/rtk_flame/build-singleimage"
-                build_bin="${build_bin}/rts5915_flash_upload.bin"
-                cp "${build_bin}" "${MONITOR_CACHE}"
-            else
-                echo "Warning: Failed to build rtk_flame." \
-                     "Realtek flashing may not work."
-            fi
-        fi
-    fi
-
-    if [ -f "${MONITOR_CACHE}" ] && [ ! -f "${MONITOR_DEST}" ]; then
-        echo "Installing monitor binary to ${MONITOR_DEST}..."
-        mkdir -p "${MONITOR_DEST_DIR}"
-        cp "${MONITOR_CACHE}" "${MONITOR_DEST}"
-    fi
-
-    # Set up NPCX monitor binary (npcx_monitor)
-    NPCX_MONITOR_CACHE="/workspace/.cache/npcx_monitor.bin"
-    NPCX_MONITOR_DEST_DIR="/usr/share/ec-devutils"
-    NPCX_MONITOR_DEST="${NPCX_MONITOR_DEST_DIR}/npcx_monitor.bin"
-
-    if [ ! -f "${NPCX_MONITOR_CACHE}" ]; then
-        if [ -f "${NPCX_MONITOR_DEST}" ]; then
-            echo "Copying pre-installed NPCX monitor binary to cache..."
-            mkdir -p "$(dirname "${NPCX_MONITOR_CACHE}")"
-            cp "${NPCX_MONITOR_DEST}" "${NPCX_MONITOR_CACHE}"
-        else
-            echo "Monitor binary not found in cache. Building npcx_monitor..."
-            if zmake --checkout /workspace build npcx_monitor; then
-                echo "Caching monitor binary..."
-                mkdir -p "$(dirname "${NPCX_MONITOR_CACHE}")"
-                build_bin="/workspace/src/platform/ec/build/zephyr"
-                build_bin="${build_bin}/npcx_monitor/build-singleimage"
-                build_bin="${build_bin}/npcx_monitor.bin"
-                cp "${build_bin}" "${NPCX_MONITOR_CACHE}"
-            else
-                echo "Warning: Failed to build npcx_monitor." \
-                     "NPCX flashing may not work."
-            fi
-        fi
-    fi
-
-    if [ -f "${NPCX_MONITOR_CACHE}" ] && [ ! -f "${NPCX_MONITOR_DEST}" ]; then
-        echo "Installing monitor binary to ${NPCX_MONITOR_DEST}..."
-        mkdir -p "${NPCX_MONITOR_DEST_DIR}"
-        cp "${NPCX_MONITOR_CACHE}" "${NPCX_MONITOR_DEST}"
-    fi
+if [ "${CURRENT_HASH}" != "none" ] && \
+   [ "${CURRENT_HASH}" = "${PAST_HASH}" ]; then
+    echo "Python dependencies up to date. Skipping pip install."
 else
-    echo "Warning: zmake directory not found. Skipping installation."
+    echo "Configuring zmake tool in virtualenv..."
+    python3 -m pip install -q --no-deps \
+        -e /workspace/src/platform/ec/zephyr/zmake
+
+    if [ -n "${UPDATE}" ]; then
+        # Install standard Zephyr dependencies to support twister executions
+        ZEPHYR_REQS_DIR="/workspace/src/third_party"
+        ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/zephyrproject/zephyr/scripts"
+        if [ -d "${ZEPHYR_REQS_DIR}" ]; then
+            python3 -m pip install -q --no-cache-dir \
+                -r "${ZEPHYR_REQS_DIR}/requirements.txt"
+        fi
+
+        # Parse .vpython3 and install dependencies
+        VPYTHON_FILE="/workspace/src/platform/ec/zephyr/zmake/.vpython3"
+        if [ -f "${VPYTHON_FILE}" ]; then
+            packages=$(grep -o \
+                'infra/python/wheels/[a-zA-Z0-9_-]*' \
+                "${VPYTHON_FILE}" | \
+                sed 's|infra/python/wheels/||g' | \
+                sed 's|-py2_py3||g; s|-py3||g' | \
+                sort -u)
+            to_install=""
+            for pkg in ${packages}; do
+                case "${pkg}" in
+                    "pyyaml") pkg="PyYAML" ;;
+                    "python-dateutil") pkg="python-dateutil" ;;
+                    "ruamel_yaml") pkg="ruamel.yaml" ;;
+                    "ruamel_yaml_clib"|"coverage"|"pytest"| \
+                    "hypothesis"|"testfixtures") continue ;;
+                esac
+                to_install="${to_install} ${pkg}"
+            done
+            if [ -n "${to_install}" ]; then
+                # shellcheck disable=SC2086
+                python3 -m pip install -q --no-cache-dir ${to_install}
+            fi
+        fi
+    fi
+
+    echo "${CURRENT_HASH}" > "${HASH_FILE}"
+fi
+
+# Configure Coreboot SDK toolchain environment variables
+setup_coreboot_sdk_env
+
+# Set up Realtek monitor binary (rtk_flame)
+MONITOR_CACHE="/workspace/.cache/rts5915_flash_upload.bin"
+MONITOR_DEST_DIR="/usr/share/ec-devutils"
+MONITOR_DEST="${MONITOR_DEST_DIR}/rts5915_flash_upload.bin"
+
+if [ ! -f "${MONITOR_CACHE}" ]; then
+    if [ -f "${MONITOR_DEST}" ]; then
+        echo "Copying pre-installed Realtek monitor binary to cache..."
+        mkdir -p "$(dirname "${MONITOR_CACHE}")"
+        cp "${MONITOR_DEST}" "${MONITOR_CACHE}"
+    else
+        echo "Monitor binary not found in cache. Building rtk_flame..."
+        if zmake --checkout /workspace build rtk_flame; then
+            echo "Caching monitor binary..."
+            mkdir -p "$(dirname "${MONITOR_CACHE}")"
+            build_bin="/workspace/src/platform/ec/build/zephyr"
+            build_bin="${build_bin}/rtk_flame/build-singleimage"
+            build_bin="${build_bin}/rts5915_flash_upload.bin"
+            cp "${build_bin}" "${MONITOR_CACHE}"
+        else
+            echo "Warning: Failed to build rtk_flame." \
+                 "Realtek flashing may not work."
+        fi
+    fi
+fi
+
+if [ -f "${MONITOR_CACHE}" ] && [ ! -f "${MONITOR_DEST}" ]; then
+    echo "Installing monitor binary to ${MONITOR_DEST}..."
+    mkdir -p "${MONITOR_DEST_DIR}"
+    cp "${MONITOR_CACHE}" "${MONITOR_DEST}"
+fi
+
+# Set up NPCX monitor binary (npcx_monitor)
+NPCX_MONITOR_CACHE="/workspace/.cache/npcx_monitor.bin"
+NPCX_MONITOR_DEST_DIR="/usr/share/ec-devutils"
+NPCX_MONITOR_DEST="${NPCX_MONITOR_DEST_DIR}/npcx_monitor.bin"
+
+if [ ! -f "${NPCX_MONITOR_CACHE}" ]; then
+    if [ -f "${NPCX_MONITOR_DEST}" ]; then
+        echo "Copying pre-installed NPCX monitor binary to cache..."
+        mkdir -p "$(dirname "${NPCX_MONITOR_CACHE}")"
+        cp "${NPCX_MONITOR_DEST}" "${NPCX_MONITOR_CACHE}"
+    else
+        echo "Monitor binary not found in cache. Building npcx_monitor..."
+        if zmake --checkout /workspace build npcx_monitor; then
+            echo "Caching monitor binary..."
+            mkdir -p "$(dirname "${NPCX_MONITOR_CACHE}")"
+            build_bin="/workspace/src/platform/ec/build/zephyr"
+            build_bin="${build_bin}/npcx_monitor/build-singleimage"
+            build_bin="${build_bin}/npcx_monitor.bin"
+            cp "${build_bin}" "${NPCX_MONITOR_CACHE}"
+        else
+            echo "Warning: Failed to build npcx_monitor." \
+                 "NPCX flashing may not work."
+        fi
+    fi
+fi
+
+if [ -f "${NPCX_MONITOR_CACHE}" ] && [ ! -f "${NPCX_MONITOR_DEST}" ]; then
+    echo "Installing monitor binary to ${NPCX_MONITOR_DEST}..."
+    mkdir -p "${NPCX_MONITOR_DEST_DIR}"
+    cp "${NPCX_MONITOR_CACHE}" "${NPCX_MONITOR_DEST}"
 fi
 
 # Run the requested command (if any), or drop to bash
