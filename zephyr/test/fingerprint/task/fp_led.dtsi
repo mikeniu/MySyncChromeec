@@ -22,6 +22,10 @@
 		};
 	};
 
+	zephyr,user {
+		lid-open-gpios = <&gpio0 3 (GPIO_PULL_UP | GPIO_ACTIVE_HIGH)>;
+	};
+
 	power-states {
 		suspend_to_idle: suspend_to_idle {
 			compatible = "zephyr,power-state";

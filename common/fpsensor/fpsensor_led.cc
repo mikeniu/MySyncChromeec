@@ -4,6 +4,7 @@
  */
 
 #include <zephyr/device.h>
+#include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/led.h>
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
@@ -96,6 +97,7 @@ enum class Mode {
 	OFF,
 	ENROLL,
 	MATCH,
+	MATCH_EXPIRED,
 	MATCH_OK,
 	MATCH_NOK,
 };
@@ -120,7 +122,11 @@ void led_update_handler(struct k_work *work)
 	k_sem_take(&led_lock, K_FOREVER);
 	bool is_timer_expired = k_uptime_ticks() >= timer_scheduled_at_ticks;
 	if (is_timer_expired) {
-		led_mode = Mode::OFF;
+		if (led_mode == Mode::MATCH) {
+			led_mode = Mode::MATCH_EXPIRED;
+		} else {
+			led_mode = Mode::OFF;
+		}
 		set_led_brightness(BRIGHTNESS_OFF);
 	}
 	k_sem_give(&led_lock);
@@ -167,10 +173,21 @@ void enroll()
 	LOG_INF("Fingerprint led enroll.");
 }
 
+bool is_lid_closed();
+
 void match()
 {
 	k_sem_take(&led_lock, K_FOREVER);
-	if (led_mode == Mode::MATCH) {
+	if (is_lid_closed()) {
+		if (led_mode != Mode::MATCH_EXPIRED) {
+			led_mode = Mode::MATCH_EXPIRED;
+			set_led(BRIGHTNESS_OFF);
+			LOG_INF("Fingerprint led match (lid closed).");
+		}
+		k_sem_give(&led_lock);
+		return;
+	}
+	if (led_mode == Mode::MATCH || led_mode == Mode::MATCH_EXPIRED) {
 		k_sem_give(&led_lock);
 		return;
 	}
@@ -217,6 +234,63 @@ void off()
 
 	LOG_INF("Fingerprint led off.");
 }
+
+#define ZEPHYR_USER_NODE DT_PATH(zephyr_user)
+
+#if DT_NODE_HAS_PROP(ZEPHYR_USER_NODE, lid_open_gpios)
+const struct gpio_dt_spec lid_open_gpio =
+	GPIO_DT_SPEC_GET(ZEPHYR_USER_NODE, lid_open_gpios);
+struct gpio_callback lid_open_cb;
+bool lid_gpio_ready;
+
+bool is_lid_closed()
+{
+	return lid_gpio_ready && gpio_pin_get_dt(&lid_open_gpio) == 0;
+}
+
+void lid_open(struct k_work *)
+{
+	k_sem_take(&led_lock, K_FOREVER);
+	if (led_mode != Mode::MATCH && led_mode != Mode::MATCH_EXPIRED) {
+		k_sem_give(&led_lock);
+		return;
+	}
+	led_mode = Mode::MATCH;
+	set_led_with_timeout(BRIGHTNESS_MATCH,
+			     CONFIG_PLATFORM_EC_FP_LED_DURATION_MATCH_MS);
+	k_sem_give(&led_lock);
+
+	LOG_INF("Fingerprint led match (lid open).");
+}
+K_WORK_DEFINE(lid_open_work, lid_open);
+
+void on_lid_open(const struct device *, struct gpio_callback *, uint32_t)
+{
+	k_work_submit(&lid_open_work);
+}
+
+int init_lid_gpio()
+{
+	int ret = -ENODEV;
+	gpio_init_callback(&lid_open_cb, on_lid_open, BIT(lid_open_gpio.pin));
+	if (!gpio_is_ready_dt(&lid_open_gpio) ||
+	    (ret = gpio_pin_configure_dt(&lid_open_gpio, GPIO_INPUT)) < 0 ||
+	    (ret = gpio_add_callback_dt(&lid_open_gpio, &lid_open_cb)) < 0 ||
+	    (ret = gpio_pin_interrupt_configure_dt(
+		     &lid_open_gpio, GPIO_INT_EDGE_TO_ACTIVE)) < 0) {
+		LOG_ERR("Failed to configure lid open GPIO: %d", ret);
+	} else {
+		lid_gpio_ready = true;
+	}
+	return ret;
+}
+SYS_INIT(init_lid_gpio, POST_KERNEL, CONFIG_APPLICATION_INIT_PRIORITY);
+#else
+bool is_lid_closed()
+{
+	return false;
+}
+#endif /* DT_NODE_HAS_PROP(ZEPHYR_USER_NODE, lid_open_gpios) */
 
 } /* namespace */
 
