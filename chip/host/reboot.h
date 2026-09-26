@@ -11,7 +11,6 @@
 #if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	emulator_reboot(void);
+	void emulator_reboot(void);
 
 #endif /* __CROS_EC_REBOOT_H */

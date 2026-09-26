@@ -116,6 +116,25 @@ fp_command_establish_pairing_key_wrap(struct host_cmd_handler_args *args)
 DECLARE_HOST_COMMAND(EC_CMD_FP_ESTABLISH_PAIRING_KEY_WRAP,
 		     fp_command_establish_pairing_key_wrap, EC_VER_MASK(0));
 
+/*
+ * DESIGN NOTE:
+ *
+ * Reloading the pairing key is intentionally permitted without preconditions
+ * to allow re-establishing a session (e.g., after a HAL restart).
+ *
+ * The primary purpose of the pairing key is to ensure the Trusted Application
+ * (TA) talks to the correct FPMCU via a shared session key derived during
+ * session establishment. Changing or reloading the pairing key while a session
+ * is active does not invalidate the existing session key or affect loaded
+ * templates.
+ *
+ * Isolation and security rely entirely on the session establishment flow:
+ * establishing a new session mandatorily clears existing templates and resets
+ * the TPM seed context via fp_reset_context(). Because a compromised host/HAL
+ * already possesses authority to assert Class 1/2 biometric results directly
+ * to the host OS, re-establishing a local session domain does not grant
+ * additional capabilities or alter the threat model boundary.
+ */
 static enum ec_status
 fp_command_load_pairing_key(struct host_cmd_handler_args *args)
 {

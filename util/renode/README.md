@@ -189,3 +189,24 @@ With Renode, we've found and prevented several bugs. Here are a few highlights:
 It is also
 [easier for non-firmware developers to debug issues](http://b/363082822#comment12),
 since they don't need hardware.
+
+## Finding a zephyr downstreaming cl that breaks renode
+
+See also: go/ec-downstreaming-guide
+
+If the downstreaming breaks the renode CQ, and you want to find the specific
+commit that is the problem, you can run this:
+
+```shell
+cd ~/chromiumos/src/third_party/zephyrproject/zephyr
+gerrit --raw deps 'hashtag:"zephyr-downstream" -hashtag:copybot-skip status:open' | sed -e 's/chromium://' >/tmp/zephyr_cls.txt
+for cl in $(cat /tmp/zephyr_cls.txt) ; do
+  echo Trying $cl
+  if ! ( repo download chromiumos/third_party/zephyrproject ${cl} && cros_sdk -- bash -c 'cd /mnt/host/source/src/platform/ec/util/renode && ./firmware_builder.py --metrics /dev/null test' && gerrit label-cr ${cl} 2 && gerrit label-cq ${cl} 2 ) ; then
+    break
+  fi
+done
+```
+
+It will submit all unaffected cls to the CQ, and stop when it reaches the one
+that breaks renode.

@@ -51,8 +51,7 @@
 
 /* Forward declarations */
 #if defined(CONFIG_FLASH_READOUT_PROTECTION_AS_PSTATE)
-	static enum flash_rdp_level
-	flash_physical_get_rdp_level(void);
+	static enum flash_rdp_level flash_physical_get_rdp_level(void);
 static int flash_physical_set_rdp_level(enum flash_rdp_level level);
 #endif /* CONFIG_FLASH_READOUT_PROTECTION_AS_PSTATE */
 

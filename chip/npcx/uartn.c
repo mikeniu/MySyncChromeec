@@ -252,7 +252,6 @@ static void uartn_config(uint8_t uart_num)
 	 * values of UPSR and UBAUD for baud rate 115200.
 	 */
 #if (NPCX_APB_CLOCK(2) != 15000000) && !defined(NPCX_UART_BAUDRATE_3M) && \
-	!(defined(NPCX_CORE_ABP2_ABP3_CLOCK_40M)) &&                      \
 	!(defined(NPCX_CORE_ABP2_ABP3_CLOCK_45M))
 #error "Unsupported apb2 clock for UART!"
 #endif
@@ -269,21 +268,11 @@ static void uartn_config(uint8_t uart_num)
 		NPCX_UPSR(uart_num) = 0x08;
 		NPCX_UBAUD(uart_num) = 0x19;
 	}
-#elif defined(NPCX_CORE_ABP2_ABP3_CLOCK_40M)
-#if NPCX_FAMILY_VERSION >= NPCX_FAMILY_NPCX9
-	/* Baudrate setting for the source clock (APB4) = 20MHz on NPCX9 */
-	NPCX_UPSR(uart_num) = 0x08;
-	NPCX_UBAUD(uart_num) = 0x0A;
 #elif defined(NPCX_CORE_ABP2_ABP3_CLOCK_45M) && \
 	(NPCX_FAMILY_VERSION < NPCX_FAMILY_NPCX9)
 	/* Baudrate setting for the source clock (APB2) = 45MHz on NPCX7/5 */
 	NPCX_UPSR(uart_num) = 0x30;
 	NPCX_UBAUD(uart_num) = 0x06;
-#else
-	/* Baudrate setting for the source clock (APB2) = 40MHz on NPCX7/5 */
-	NPCX_UPSR(uart_num) = 0x08;
-	NPCX_UBAUD(uart_num) = 0x15;
-#endif
 #else
 	NPCX_UPSR(uart_num) = 0x38;
 	NPCX_UBAUD(uart_num) = 0x1;
