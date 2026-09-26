@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8f2ecbc_305c6f32",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-26T02:11:49Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ℹ️ **N/A** — My review skills don\u0027t apply to the contents of this CL. [[trajectory](https://goto.corp.google.com/traj/66a9fba6-eca7-45ed-9bfe-07fc45fc4f73)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "25988f8ea2fc31f97a25ee76443c3b2cf139a012",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
