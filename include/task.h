@@ -72,6 +72,9 @@ extern "C" {
 /* Maximum time for task_wait_event() */
 #define TASK_MAX_WAIT_US 0x7fffffff
 
+/* Value to store in unused stack */
+#define STACK_UNUSED_VALUE 0xdeadd00d
+
 /**
  * Disable CPU interrupt bit.
  *
@@ -223,6 +226,13 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us);
  * Uses the command output channel.  May be called from interrupt level.
  */
 void task_print_list(void);
+
+/**
+ * Prints the task profiling information
+ *
+ * Uses the command output channel.  May be called from interrupt level.
+ */
+void task_print_profiling(void);
 
 /**
  * Returns the name of the task.

@@ -10,6 +10,7 @@
 #include "fpsensor/fpsensor_auth_crypto.h"
 #include "host_command.h"
 
+#include <array>
 #include <ascp/ascp.h>
 #include <span>
 

@@ -27,7 +27,6 @@ from chromite.api.gen_sdk.chromite.api import firmware_pb2
 
 
 EC_BOARDS = [
-    "bloonchipper",
     "dartmonkey",
     "helipilot",
 ]
@@ -188,7 +187,7 @@ def test(opts: argparse.Namespace) -> int:
     # https://chrome-infra-packages.appspot.com/p/chromiumos/infra/tools/renode.
     cipd_renode_version = (
         "ebuild_source:"
-        + "app-emulation/renode-1.16.0_p20260209,"
+        + "app-emulation/renode-1.16.1_p20260824-r2,"
         + "dev-libs/icu-70.1-r3,"
         + "dev-libs/openssl-3.2.1-r1,"
         + "dev-libs/userspace-rcu-0.13.2-r1,"
