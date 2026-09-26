@@ -14,7 +14,7 @@
 #include "baseboard.h"
 
 /* Configure the APB2 and APB3 CLK to 40MHz */
-#define NPCX_CORE_ABP2_ABP3_CLOCK_40M
+#define NPCX_CORE_ABP2_ABP3_CLOCK_45M
 
 /*
  * This will happen automatically on NPCX9 ES2 and later. Do not remove
@@ -149,6 +149,9 @@
 #define CONFIG_FANS FAN_CH_COUNT
 #define CONFIG_CUSTOM_FAN_CONTROL
 #define RPM_DEVIATION 1
+#define CONFIG_FAN_BYPASS_SLOW_RESPONSE
+#undef CONFIG_FAN_INIT_SPEED
+#define CONFIG_FAN_INIT_SPEED 0
 
 /* Charger defines */
 #define CONFIG_CHARGER_BQ25710

@@ -238,13 +238,16 @@ static int flash_set_status(uint8_t sr1, uint8_t sr2)
 	/* Disable tri-state */
 	TRISTATE_FLASH(0);
 	/* Enable write */
+	flash_wait_ready();
 	flash_write_enable();
+	flash_wait_ready();
 
 	NPCX_UMA_DB0 = sr1;
 	NPCX_UMA_DB1 = sr2;
 
 	/* Write status register 1/2 */
 	flash_execute_cmd(CMD_WRITE_STATUS_REG, MASK_CMD_WR_2BYTE);
+	flash_wait_ready();
 	/* Enable tri-state */
 	TRISTATE_FLASH(1);
 

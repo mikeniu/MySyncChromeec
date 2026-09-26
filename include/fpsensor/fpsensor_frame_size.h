@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_FRAME_SIZE_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_FRAME_SIZE_H
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_FRAME_SIZE_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_FRAME_SIZE_H_
 
 #include "ec_commands.h"
 
@@ -45,6 +45,10 @@ class FpFrameSizeCache {
 
     private:
 	std::array<uint32_t, FP_CAPTURE_TYPE_MAX> frame_sizes_ = {};
+
+#ifdef CONFIG_ZTEST
+	friend class FpFrameSizeCacheTestHelper;
+#endif
 };
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_FRAME_SIZE_H */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_FRAME_SIZE_H_ */

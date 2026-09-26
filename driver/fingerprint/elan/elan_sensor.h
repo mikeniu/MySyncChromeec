@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_DRIVER_FINGERPRINT_ELAN_ELAN_SENSOR_H_
-#define __CROS_EC_DRIVER_FINGERPRINT_ELAN_ELAN_SENSOR_H_
+#ifndef PLATFORM_EC_DRIVER_FINGERPRINT_ELAN_ELAN_SENSOR_H_
+#define PLATFORM_EC_DRIVER_FINGERPRINT_ELAN_ELAN_SENSOR_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -206,4 +206,4 @@ __staticlib int elan_fp_deinit(void);
 }
 #endif
 
-#endif /* __CROS_EC_DRIVER_FINGERPRINT_ELAN_ELAN_SENSOR_H_ */
+#endif /* PLATFORM_EC_DRIVER_FINGERPRINT_ELAN_ELAN_SENSOR_H_ */
