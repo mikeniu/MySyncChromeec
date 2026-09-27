@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ee2019d_ad74552d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1532003
+      },
+      "writtenOn": "2026-09-27T16:28:02Z",
+      "side": 1,
+      "message": "can you please add a note saying charging that on Calypso has been managed by SOCCP by leveraging the existing Kconfig which says ADSP.",
+      "revId": "58477788f8960b7a7bbbc4bc7b7292d513c62c0c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
