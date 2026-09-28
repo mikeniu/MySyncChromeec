@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e9a20369_88d414ff",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-28T23:17:55Z",
+      "side": 1,
+      "message": "This isn\u0027t board specific, and this should be static.  Don\u0027t add new board specific override functions.",
+      "range": {
+        "startLine": 386,
+        "startChar": 4,
+        "endLine": 386,
+        "endChar": 31
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "030f972c_8bf403d6",
         "filename": "common/battery_fuel_gauge.c",
         "patchSetId": 13
@@ -19,6 +42,144 @@
         "startChar": 0,
         "endLine": 491,
         "endChar": 0
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d73ccac4_05d0d16e",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-28T23:17:55Z",
+      "side": 1,
+      "message": "Use the Kconfig namespace `CONFIG_PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF`.  The legacy #define options in config.h are not needed.",
+      "range": {
+        "startLine": 515,
+        "startChar": 17,
+        "endLine": 515,
+        "endChar": 46
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7e134f0_3d8ee69f",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-28T23:17:55Z",
+      "side": 1,
+      "message": "Use Zephyr\u0027s `sys_timepoint_calc)` and `sys_timepoint_expired()` for timeout calculations.  This code no longer needs to support the legacy EC.",
+      "range": {
+        "startLine": 524,
+        "startChar": 8,
+        "endLine": 524,
+        "endChar": 25
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56725940_96957721",
+        "filename": "include/battery.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-28T23:17:55Z",
+      "side": 1,
+      "message": "Don\u0027t add hooks for board specific code unless absolutely necessary.",
+      "range": {
+        "startLine": 496,
+        "startChar": 0,
+        "endLine": 496,
+        "endChar": 38
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48fecb58_78fc007d",
+        "filename": "include/config.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-28T23:17:55Z",
+      "side": 1,
+      "message": "Don\u0027t add new #defines to this file.  This file is only here to support existing config options from the legacy EC.\n\nWhen you create new Kconfig options, you no longer need to update this file.",
+      "range": {
+        "startLine": 602,
+        "startChar": 0,
+        "endLine": 615,
+        "endChar": 56
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "835b8666_210b707e",
+        "filename": "zephyr/Kconfig.battery",
+        "patchSetId": 13
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-28T23:17:55Z",
+      "side": 1,
+      "message": "Nit - line lengths",
+      "range": {
+        "startLine": 181,
+        "startChar": 0,
+        "endLine": 185,
+        "endChar": 0
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6eaf7eb1_0508f210",
+        "filename": "zephyr/shim/include/config_chip.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-28T23:17:55Z",
+      "side": 1,
+      "message": "This mapping from Kconfig to config.h names is no longer needed.",
+      "range": {
+        "startLine": 301,
+        "startChar": 0,
+        "endLine": 310,
+        "endChar": 6
       },
       "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
