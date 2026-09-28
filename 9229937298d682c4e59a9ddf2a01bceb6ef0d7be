@@ -35,6 +35,24 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "9229937298d682c4e59a9ddf2a01bceb6ef0d7be",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7be5d47d_22afd13d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-28T16:49:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6d3e1277_cf88be9d",
+      "revId": "9229937298d682c4e59a9ddf2a01bceb6ef0d7be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
