@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1771692b_55fb2a41",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T16:01:18Z",
+      "side": 1,
+      "message": "Please explain *what* the failure is and *why* this fixes it.",
+      "range": {
+        "startLine": 7,
+        "startChar": 28,
+        "endLine": 7,
+        "endChar": 55
+      },
+      "revId": "a66c491dedd4050a8f1f60e423f51a2bc56c1c21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "304b8654_3fa4b836",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
