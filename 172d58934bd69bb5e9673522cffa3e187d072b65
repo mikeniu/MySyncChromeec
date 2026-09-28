@@ -37,6 +37,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cd3d3be_8152f252",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T05:52:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac2558da_94c937ce",
+      "revId": "172d58934bd69bb5e9673522cffa3e187d072b65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "020c6d99_e133b642",
@@ -55,6 +73,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a09e55c_ca203c19",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T05:52:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "020c6d99_e133b642",
+      "revId": "172d58934bd69bb5e9673522cffa3e187d072b65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f0e480b_aafbbd12",
@@ -69,6 +105,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Hardcoding a 3-second sleep for USB re-enumeration is prone to races (if the host OS takes longer to enumerate the device) and slows down the happy path.\n\nConsider polling for the device in a loop with a smaller sleep interval (e.g., 100ms) and a timeout (e.g., up to 5-10 seconds). This allows the tool to proceed immediately once the device re-enumerates. \n\n(Note: If you do this, you may want to extract the `libusb_open_device_with_vid_pid` call into a silent polling helper so it does not spam `fprintf` errors during the loop).",
       "isAi": true,
+      "revId": "172d58934bd69bb5e9673522cffa3e187d072b65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b88a1dd_d8139e28",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T05:52:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f0e480b_aafbbd12",
       "revId": "172d58934bd69bb5e9673522cffa3e187d072b65",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
