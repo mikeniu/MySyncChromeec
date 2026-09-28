@@ -37,6 +37,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eeca57fb_694d1653",
+        "filename": "zephyr/shim/chip/rtkfp/otp_key.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T05:47:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c8eda5a_6e3f149a",
+      "revId": "a1ad4f06339a74b7382265ac888ca9fa3ea49a73",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70d708a7_fbe7a675",
@@ -51,6 +69,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] `otp_key_buffer` is allocated on the stack as a byte array. If the underlying `otp_read` or `otp_program` driver implementations cast this to a `uint32_t *` internally for word-aligned accesses (which is common for OTP/Flash controllers), this may result in an unaligned memory access fault.\n\nConsider forcing 4-byte alignment here just to be safe, since you already enforce `BUILD_ASSERT(OTP_KEY_SIZE_BYTES % 4 \u003d\u003d 0)` above:\n\n```c\n\tuint8_t __aligned(4) otp_key_buffer[OTP_KEY_SIZE_BYTES] \u003d { 0 };\n```",
       "isAi": true,
+      "revId": "a1ad4f06339a74b7382265ac888ca9fa3ea49a73",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74c73ba1_74eab9ae",
+        "filename": "zephyr/shim/chip/rtkfp/otp_key.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T05:47:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70d708a7_fbe7a675",
       "revId": "a1ad4f06339a74b7382265ac888ca9fa3ea49a73",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
