@@ -87,6 +87,30 @@
       },
       "revId": "70695087e41a998b1ad2a93bfd3176b60125c9ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44afb11c_9388f7e9",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/ocelotrvp-ite_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-09-28T15:47:16Z",
+      "side": 1,
+      "message": "Done, are the values correct? I can see Ruby defines only 65W for operational and max.",
+      "parentUuid": "f74115e9_02f95700",
+      "range": {
+        "startLine": 358,
+        "startChar": 9,
+        "endLine": 358,
+        "endChar": 28
+      },
+      "revId": "70695087e41a998b1ad2a93bfd3176b60125c9ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
