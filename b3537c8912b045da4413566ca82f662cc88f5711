@@ -54,6 +54,50 @@
       "isAi": true,
       "revId": "b3537c8912b045da4413566ca82f662cc88f5711",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c43276ed_f802b836",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T23:49:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comment for a minor cleanup. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes/review_trajectories/cl8237836_d1e13135-bba3-4ec2-8679-d5c4ee01e525.pb)]\n\n### Review Summary\n*   **Functionality:** ✅ The memory clearing logic safely uses C-style `memset` with `uintptr_t` arithmetic. Linker boundaries are exposed correctly.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is properly placed in `chip/stm32/system.c` within `system_pre_init()`, respecting architectural boundaries.\n*   **Code Simplicity:** ❌ The test file introduces an unused macro `CANARY_WORD` that should be removed.\n*   **Idiomaticity \u0026 Readability:** ✅ The C code uses modern idioms and correctly avoids magic values.\n*   **Security:** ✅ No vulnerabilities introduced. Purging stale memory across resets is a good defense-in-depth practice against data leakage.\n*   **Testing \u0026 Test Coverage:** ✅ Comprehensive hardware test (`fp_buffer_clear`) was added to verify memory is zeroed after soft resets.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+139, -0). The CL is self-contained and focused on a single logical change.\n*   **Commit Message:** ✅ The commit message accurately describes the changes, provides the motivation, and includes the required `BUG\u003d` and `TEST\u003d` footers.\n\nTAG\u003dagy\nCONV\u003de93a10ad-b605-48b9-aebf-3252776949b8",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3537c8912b045da4413566ca82f662cc88f5711",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ec0b724_71a83d31",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T23:49:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `CANARY_WORD` is defined here but never used in the test. Please remove it to keep the code minimal and clean.\n\n```cpp\n#define CANARY_BYTE 0x5a\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes/review_trajectories/cl8237836_d1e13135-bba3-4ec2-8679-d5c4ee01e525.pb)",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3537c8912b045da4413566ca82f662cc88f5711",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
