@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb37f976_dd80e26a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T06:35:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/06c66b10-50dd-4e55-9e8a-5989ae52d2ee)]\n\n### Review Summary\n*   **Functionality:** The patch correctly configures the physical flash parameters for the RTS5817 SOC, allowing the `flash_physical` tests to run on this board.\n*   **Architecture \u0026 Component Fit:** The logic fits cleanly within the existing test component configuration, adding support for the new SOC without disrupting other architectures.\n*   **Code Simplicity:** The initialization is straightforward and as simple as possible. No over-engineering is present.\n*   **Idiomaticity \u0026 Readability:** The C struct initialization uses designated initializers, which is modern and idiomatic. The added comment explains the values clearly, resolving the previous suggestion.\n*   **Security:** No security issues introduced.\n*   **Testing \u0026 Test Coverage:** This CL modifies a test file itself, enabling physical flash testing for the RTS5817 SOC. The author has verified it via the provided `TEST\u003d` script.\n*   **CL Size \u0026 Scope:** Size: XS (+9, -0). The change is a single logical unit and perfectly scoped.\n*   **Commit Message:** The commit message accurately describes the change and includes the required `BUG\u003d` and `TEST\u003d` footers in the correct format for ChromiumOS.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1b345d10a65c7c11a35d0894934df907edd8b15b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
