@@ -18,6 +18,23 @@
       "isAi": true,
       "revId": "1b345d10a65c7c11a35d0894934df907edd8b15b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c21bb0f6_8a60d9a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T23:05:16Z",
+      "side": 1,
+      "message": "This looks good. I would like to verify the test passes on Renode.",
+      "revId": "1b345d10a65c7c11a35d0894934df907edd8b15b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
