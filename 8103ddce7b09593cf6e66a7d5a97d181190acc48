@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7a84fb3_f9183cb8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T23:25:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n*   **Functionality:** Replaces `CODE_UNREACHABLE` with `__builtin_trap()` under LTO to ensure a deterministic trap instruction is emitted, fixing a test failure under Clang. The change appears correct and safe.\n*   **Architecture \u0026 Component Fit:** The change is highly localized to the panic data hardware test and fits the intended architecture.\n*   **Code Simplicity:** The implementation is straightforward and as simple as possible.\n*   **Idiomaticity \u0026 Readability:** Uses standard `__builtin_trap()` appropriately in C.\n*   **Security:** No security implications.\n*   **Testing:** This change is itself a fix for a hardware test (`panic_data.c`), so the existing test infrastructure will exercise this change. No additional unit tests are required for this 1-line explicit trap fix.\n*   **CL Size \u0026 Scope:** `Size: XS (+1, -1)` - The CL is small, atomic, and adheres perfectly to the single logical change rule.\n*   **Commit Message:** The commit message is excellent. It provides detailed context, links the upstream Zephyr commit, explains the Clang/LTO interaction, and includes properly formatted `BUG\u003d` and `TEST\u003d` footers.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8478813_1b4e6a1b-5ad7-4f84-9a0b-5ca0d736edbb.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8103ddce7b09593cf6e66a7d5a97d181190acc48",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
