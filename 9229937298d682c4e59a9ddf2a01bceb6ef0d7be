@@ -53,6 +53,23 @@
       "parentUuid": "6d3e1277_cf88be9d",
       "revId": "9229937298d682c4e59a9ddf2a01bceb6ef0d7be",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dae1877_87a21c6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T17:04:53Z",
+      "side": 1,
+      "message": "Are we sure that this isn\u0027t a real issue? It\u0027s failing on both `sanok` and `bloonchipper`, which is suspicious.\n\nIs it flakey or a deterministic failure?",
+      "revId": "9229937298d682c4e59a9ddf2a01bceb6ef0d7be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
