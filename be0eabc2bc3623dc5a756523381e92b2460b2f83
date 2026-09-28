@@ -20,6 +20,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fadc0565_55db1e25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 39
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-28T17:17:47Z",
+      "side": 1,
+      "message": "Fixed in latest patchset: Reverted fp_commit_template forward declaration and local variable back to enum ec_status in this CL, and moved their migration to enum ec_host_cmd_status into CL:8464410.",
+      "parentUuid": "23355570_98134a7f",
+      "isAi": true,
+      "revId": "be0eabc2bc3623dc5a756523381e92b2460b2f83",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "acafa2cc_48820b69",
