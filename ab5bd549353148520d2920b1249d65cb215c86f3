@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "030f972c_8bf403d6",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-28T15:19:14Z",
+      "side": 1,
+      "message": "These static variables should be wrapped in #ifdef CONFIG_BATTERY_WAKEUP_CUT_OFF or similar to avoid wasting RAM (12 bytes) on platforms that don\u0027t enable this feature.",
+      "range": {
+        "startLine": 491,
+        "startChar": 0,
+        "endLine": 491,
+        "endChar": 0
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e71e654_3accc02a",
+        "filename": "zephyr/test/drivers/smart_battery/src/smart.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-28T15:19:14Z",
+      "side": 1,
+      "message": "Logic error: CONFIG_BATTERY_WAKEUP_CUT_OFF_TIMEOUT_MSEC is in milliseconds. To advance the clock past the window, you should multiply by USEC_PER_MSEC (1,000), not USEC_PER_SEC (1,000,000). Currently, this advances the clock by 10,000 seconds instead of 10 seconds. The test still passes because it\u0027s past the window, but the math is wrong.",
+      "range": {
+        "startLine": 807,
+        "startChar": 0,
+        "endLine": 807,
+        "endChar": 0
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
