@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86c6ee89_c361622b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T17:32:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n* **Functionality \u0026 Architecture \u0026 Component Fit:** The migration of ASCP claim is correct. The `fp_command_vendor` handler\u0027s registration macro remains correctly configured as `EC_HOST_CMD_HANDLER_UNBOUND` to support dynamic responses.\n* **Code Simplicity:** The old code was relocated mostly verbatim, which aligns with the Pure Move / Verbatim Relocation policy. A suggestion for a follow-up simplification was acknowledged from a previous patchset review.\n* **Idiomaticity \u0026 Readability:** Code matches C/C++ EC ecosystem standards as written.\n* **Testing \u0026 Test Coverage:** No new logic was introduced; automated testing matches the previous implementation state.\n* **CL Size \u0026 Scope:** Size: S (+24, -21). The CL is atomic, correctly scoped, and adheres to the Single Logical Change rule.\n* **Commit Message:** Highly accurate, properly formatted (`BUG\u003db:...`, `TEST\u003d...`), and clearly states the *what* and *why* for this CL. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8465043_71f31dbf-8a48-421d-a271-78e8fc372403.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d51cc9585c592a697a458a060df00de02ec3e1cb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
