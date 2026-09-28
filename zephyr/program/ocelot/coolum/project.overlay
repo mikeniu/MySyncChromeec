@@ -10,6 +10,7 @@
 /* coolum project DTS includes */
 
 #include "binman.dtsi"
+#include "fan.dtsi"
 #include "generated.dtsi"
 #include "interrupt.dtsi"
 #include "keyboard.dtsi"
@@ -28,7 +29,6 @@ i2c_port_charger: &i2c4 {};
  */
 gpio_temp_sensor_power_good: &gpio_en_s5_rails {};
 gpio_ec_pch_wake_odl: &gpio_smc_wake_sci_n_r {};
-tach_fan0: &tach0 {};
 
 #include "../ite_hibernate.dtsi"
 #include "../rvp_usba.dtsi"
