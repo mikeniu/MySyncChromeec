@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a358f3d0_bbf98631",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T17:23:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n**Functionality:**\nThe CL successfully and mechanically migrates the fingerprint authentication host commands to the upstream `EC_HOST_CMD_HANDLER` macros. The logic correctly maps `args-\u003eparams` to `args-\u003einput_buf`, `args-\u003eresponse` to `args-\u003eoutput_buf`, and updates status codes from `EC_RES_*` to `EC_HOST_CMD_*`.\n\n**Architecture \u0026 Component Fit:**\nThe changes align perfectly with the component architecture, smoothly translating legacy host command macros to the standard pattern without introducing any layering mismatch.\n\n**Code Simplicity:**\nThe migration is implemented as directly and simply as possible. The updated code preserves the existing behavior exactly while fulfilling the new macro signature requirements.\n\n**Idiomaticity \u0026 Readability:**\nThe updated code conforms cleanly to the repository guidelines. The uniform use of the `struct` keyword in the macro invocations ensures local consistency across the CL, addressing the minor inconsistency noted in a previous patchset.\n\n**Security:**\nNo new security boundaries or vulnerabilities are introduced; security contexts for sessions remain strictly intact.\n\n**Testing \u0026 Test Coverage:**\nSince this CL serves as a purely mechanical migration for existing host command bindings without altering inner behavioral logic, existing test suite coverage continues to provide correct validation.\n\n**CL Size \u0026 Scope:**\n`Size: M (+83, -71)`. The CL is appropriately sized and embodies a single, tightly-focused atomic change for migrating host command declarations.\n\n**Commit Message:**\nThe commit message accurately describes the migration, explains the rationale, and properly specifies the `BUG\u003d` and `TEST\u003d` footers following ChromiumOS development conventions.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8465042_1e2c4fa1-bc61-4221-965e-05f3a2c6f482.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "baac3da180039b59140bd9ad9ec37abd03f3f64e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
