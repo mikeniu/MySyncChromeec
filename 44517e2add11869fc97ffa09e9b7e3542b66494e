@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77ec9c28_2a647a62",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T06:04:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\nThe commit message is missing the required `TEST\u003d` footer for Chromium OS changes. Please document how this change was tested.\n\nExample replacement commit message:\n```text\nrts5817: Add low-level flashing tool\n\nAdd a self-contained USB DFU flashing tool for RTS5817 that\ncommunicates directly via libusb without external dfu-util. The tool\nparses VID:PID and firmware image path from command line, enables DFU\ndownload mode via vendor-specific control requests, and performs DFU\ndownload per the USB DFU Specification.\n\nBUG\u003db:494586772\nTEST\u003dFlashed firmware.bin to RTS5817 device and verified successful boot.\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl7911746_00cd36aa-3393-4c85-952b-07d647e59cb8.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "44517e2add11869fc97ffa09e9b7e3542b66494e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6184971f_0d34147c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T06:04:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**CL Size \u0026 Scope:**\n*   This CL is reported as `Size: L (+774, -0)`. Per `go/small-cls`, CLs of this size are too large to review effectively as a single atomic unit and must be split.\n*   **Proposed Split Plan:**\n    *   **CL 1:** Add the base `RtsUsbDevice` class structure and USB initialization/detachment/cleanup logic.\n    *   **CL 2:** Implement the core DFU download protocol and polling logic within `RtsUsbDevice`.\n    *   **CL 3:** Add the command-line utility entry point (`main`, `parse_args`, `read_file`) and build system integration.\n\n**Functionality \u0026 Robustness:**\n*   **Short Read Bug:** The `dfu_poll_idle` method checks `ret \u003c 0` for `libusb_control_transfer`, but a short read (e.g., `ret \u003d\u003d 0`) would lead to accessing uninitialized memory when reading the response bytes.\n*   **Previous Feedback Addressed:** The unused CRC32 dead code was removed, driver detachment was relocated to the correct DFU interface claim, and the fixed sleep was replaced with a polling wait loop.\n\n**Idiomaticity \u0026 Readability:**\n*   The code uses C headers (`\u003cstdio.h\u003e`, `\u003cstdint.h\u003e`) instead of their C++ equivalents (`\u003ccstdio\u003e`, `\u003ccstdint\u003e`).\n*   Constants are defined using preprocessor `#define` macros instead of type-safe `constexpr` values.\n*   Output parameters (e.g., `cfg` in `parse_args`) use pointers rather than idiomatic C++ non-const references, and include unnecessary `struct` keywords.\n\n**Commit Message:**\n*   The commit message accurately describes the changes but is missing the mandatory `TEST\u003d` footer required for Chromium OS CLs. (See inline comment on `/COMMIT_MSG`).\n\n**Testing \u0026 Test Coverage:**\n*   While this is a hardware-interacting host tool, the pure logic components (such as argument parsing and file reading) have no automated test coverage. When splitting this CL, please add a small suite of unit tests for these pure helpers to ensure regressions are caught.\n\nPlease address the issues above and split the CL into a stacked series.\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl7911746_00cd36aa-3393-4c85-952b-07d647e59cb8.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "44517e2add11869fc97ffa09e9b7e3542b66494e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc57afbb_eca5749d",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T06:04:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] For C++ code, prefer the C++ standard library headers over their C counterparts.\n\n```cpp\n#include \u003ccerrno\u003e\n#include \u003ccstdint\u003e\n#include \u003ccstdio\u003e\n#include \u003ccstdlib\u003e\n#include \u003ccstring\u003e\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl7911746_00cd36aa-3393-4c85-952b-07d647e59cb8.pb)",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "44517e2add11869fc97ffa09e9b7e3542b66494e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c1346f6_fc755d66",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T06:04:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] In C++, prefer `constexpr` over preprocessor macros for constants. This provides type safety and better debugging support.\n\n```cpp\n/* Default RTS5817 USB VID:PID */\nconstexpr uint16_t kRts5817Vid \u003d 0x0BDA;\nconstexpr uint16_t kRts5817Pid \u003d 0x5817;\nconstexpr uint16_t kRts5817DfuPid \u003d 0x5800;\n```\nPlease apply this to the other `#define` constants in this file as well.\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl7911746_00cd36aa-3393-4c85-952b-07d647e59cb8.pb)",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "44517e2add11869fc97ffa09e9b7e3542b66494e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0ebb80a_1ba9216e",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T06:04:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] `libusb_control_transfer` returns the number of bytes transferred on success. If the device returns a short packet, `ret` will be `\u003e\u003d 0` but less than `sizeof(response)` (6 bytes), which means accessing `response[1]` through `response[4]` below will read uninitialized memory.\n\nCheck for a short read as well:\n```cpp\n\t\tuint8_t response[6];\n\t\tint ret \u003d libusb_control_transfer(\n\t\t\tdev_handle_, BMREQ_D2H_CLS_IF, DFU_GETSTATUS, 0,\n\t\t\tstatic_cast\u003cuint16_t\u003e(dfu_interface_), response,\n\t\t\tsizeof(response), USB_DFU_TIMEOUT_MS);\n\n\t\tif (ret \u003c 6) {\n\t\t\tfprintf(stderr, \"DFU_GETSTATUS failed: %s\\n\",\n\t\t\t\tret \u003c 0 ? libusb_error_name(ret) : \"short read\");\n\t\t\treturn false;\n\t\t}\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl7911746_00cd36aa-3393-4c85-952b-07d647e59cb8.pb)",
+      "range": {
+        "startLine": 438,
+        "startChar": 0,
+        "endLine": 444,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "44517e2add11869fc97ffa09e9b7e3542b66494e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a8ca057_44677fbe",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T06:04:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] In C++, the `struct` keyword is not needed when referring to the type. Also, for output parameters, non-const references are preferred over pointers.\n\n```cpp\nstruct Config {\n\tstd::string dev_id; /* \"VID:PID\" string */\n\tstd::string img; /* firmware image path */\n};\n\nstatic bool parse_args(int argc, char **argv, Config\u0026 cfg)\n```\n(Be sure to update `cfg-\u003e...` to `cfg....` inside the function, and pass `cfg` directly in `main`).\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl7911746_00cd36aa-3393-4c85-952b-07d647e59cb8.pb)",
+      "range": {
+        "startLine": 659,
+        "startChar": 0,
+        "endLine": 664,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "44517e2add11869fc97ffa09e9b7e3542b66494e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
