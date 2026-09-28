@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5b2c009_f7e4a1dc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-28T15:31:43Z",
+      "side": 1,
+      "message": "What\u0027s the actual impact on CQ time?",
+      "revId": "25a9c34606050be38b8bae1a4f1fcfead30514d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfe5e579_3fdb873c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-28T15:31:43Z",
+      "side": 1,
+      "message": "Presumably this change still produces identical output? Could you compare the output files before and after this change as a TEST?",
+      "revId": "25a9c34606050be38b8bae1a4f1fcfead30514d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6eb4b7e6_b1730f04",
+        "filename": "util/lcov_stencil.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-28T15:31:43Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: The original code checked match.group(4) (the branch ID group in EXTRACT_BRDA), whereas this new logic checks parts[3] (the taken count field). This appears to fix a bug in the original implementation, but since it changes the behavior of branches_hit tracking, please verify that it does not break any assertions in tests that might have depended on the old behavior.",
+      "range": {
+        "startLine": 182,
+        "startChar": 0,
+        "endLine": 182,
+        "endChar": 0
+      },
+      "revId": "25a9c34606050be38b8bae1a4f1fcfead30514d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
