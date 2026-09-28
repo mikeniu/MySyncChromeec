@@ -529,8 +529,8 @@ enum dpm_msg_setup_status tbt_setup_next_vdm(int port, int *vdo_count,
 	case TBT_EXIT_SOP_PRIME_PRIME:
 		vdm[0] = VDO(USB_VID_INTEL, 1, CMD_EXIT_MODE) |
 			 VDO_OPOS(tbt_opos) | VDO_CMDT(CMDT_INIT) |
-			 VDO_SVDM_VERS(pd_get_vdo_ver(
-				 port, TCPCI_MSG_SOP_PRIME_PRIME));
+			 VDO_SVDM_VERS(
+				 pd_get_vdo_ver(port, TCPCI_MSG_SOP_PRIME));
 		vdo_count_ret = 1;
 		*tx_type = TCPCI_MSG_SOP_PRIME_PRIME;
 		break;
