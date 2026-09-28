@@ -30,6 +30,10 @@
 			enum-name = "ADC_TEMP_SENSOR_1_DDR_SOC";
 			io-channels = <&adc0 4>;
 		};
+		adc_temp_dboard: temp_dboard {
+			enum-name = "ADC_TEMP_SENSOR_5";
+			io-channels = <&adc0 6>;
+		};
 	};
 
 	named-gpios {
@@ -156,7 +160,8 @@
 		&adc0_ch2_gpi2_default
 		&adc0_ch3_gpi3_default
 		&adc0_ch4_gpi4_default
-		&adc0_ch5_gpi5_default>;
+		&adc0_ch5_gpi5_default
+		&adc0_ch6_gpi6_default>;
 	pinctrl-names = "default";
 };
 

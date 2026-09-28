@@ -15,6 +15,7 @@
 #include "interrupt.dtsi"
 #include "keyboard.dtsi"
 #include "power_signals.dtsi"
+#include "temp_sensor.dtsi"
 
 /*
  * Map I2C buses to common names
