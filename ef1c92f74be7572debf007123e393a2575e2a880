@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00c4990a_15ed39e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T06:14:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f772cef5_f1ac4223",
+      "revId": "ef1c92f74be7572debf007123e393a2575e2a880",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9606ca27_6054d999",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Consider adding a brief comment here explaining how the values for `num_flash_banks` and `write_protect_bank_count` were determined (e.g., total flash size and bank size), similar to the contextual comments provided for STM32 and NPCX.",
       "isAi": true,
+      "revId": "ef1c92f74be7572debf007123e393a2575e2a880",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2778b78a_1df7fc45",
+        "filename": "zephyr/test/hwtest/src/flash_physical.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T06:14:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9606ca27_6054d999",
       "revId": "ef1c92f74be7572debf007123e393a2575e2a880",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
