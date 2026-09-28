@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b3d3ac6_6c939a25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T04:13:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL and add automated tests. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl6904834_d80317be-be64-4c15-b291-98cd052e8179.pb)]\n\n### Review Summary\n**Functionality**: The core flash operations and protection flag mappings are logically sound.\n**Architecture \u0026 Component Fit**: The driver matches the existing `cros_flash` abstraction correctly and places logic in the expected layers.\n**Code Simplicity**: I left a few inline comments on `zephyr/drivers/cros_flash/cros_flash_rtkfp.c` to flatten conditionals, remove redundant error checking paths in `cros_flash_rtkfp_protect_at_boot`, and delete unused variables.\n**Idiomaticity \u0026 Readability**: Good use of Zephyr\u0027s API and idiomatic C macros.\n**Security**: Software write protection correctly enforces monotonic extending-only changes when the hardware WP pin is asserted.\n**Testing**: Missing automated test coverage. Even for hardware drivers, pure logic such as `cros_flash_rtkfp_get_protect_flags` and `flash_check_prot_reg`—or the driver as a whole using Zephyr\u0027s `emul` framework for SPI flashes—can and must be unit tested. Please add Zephyr tests under `zephyr/test/` to cover these behaviors.\n**CL Size \u0026 Scope**: `Size: L (+516, -7)`. This CL is too large and bundles the definitions with the entire driver implementation. It must be split into smaller, atomic CLs. Suggested split plan:\n- CL 1: Add the foundational definitions (`common/spi_flash_reg.c`) and configuration files (`Kconfig`, `prj.conf`, `flash_chip.h`).\n- CL 2: Introduce the `cros_flash_rtkfp` driver implementation along with its unit tests.\n**Commit Message**: The commit message is correctly formatted, but `TEST\u003dNone` should be updated with the actual `zmake test` or `twister` command once unit tests are added.\n\nTAG\u003dagy\nCONV\u003d2c043ed0-dea2-4715-a254-32a7c315004e",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "75e0f201a7b152158f75299b88f09119d67217c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "637b6713_dfa604fc",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T04:13:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review]\nThis nested conditional logic can be flattened using an early return for the unprotected case, which improves readability and avoids the need for the intermediate `ret` variable:\n\n```c\n\t/*\n\t * The physical_get_protect returns protection state until reboot,\n\t * so it is used to determine *_NOW flags.\n\t *\n\t * Make sure flash protection is enabled and software protection is\n\t * enabled.\n\t */\n\tif (!data-\u003esw_protected \u0026\u0026 (addr_start \u003e\u003d CONFIG_WP_STORAGE_OFF)) {\n\t\treturn 0;\n\t}\n\n\tif (flash_check_prot_reg(dev, addr_start, CONFIG_FLASH_BANK_SIZE) \u003d\u003d EC_ERROR_ACCESS_DENIED) {\n\t\treturn 1;\n\t}\n\n\treturn 0;\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl6904834_d80317be-be64-4c15-b291-98cd052e8179.pb)",
+      "range": {
+        "startLine": 312,
+        "startChar": 0,
+        "endLine": 333,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "75e0f201a7b152158f75299b88f09119d67217c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6afdbf4_2f8fa8e7",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T04:13:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review]\nThe error handling logic here duplicates the restoration of `cros_flash_rtkfp_sw_protect` in both the success and failure branches. Furthermore, the `if (!ret)` check at line 476 is always true, because if `ret` were non-zero earlier, the function would have already returned at line 451 or 471.\n\nThis entire block can be simplified significantly by unconditionally restoring the software protect if it was enabled, avoiding the duplicated error paths:\n\n```c\n\tret \u003d flash_write_prot_reg(dev, FLASH_PROTECTION_START, new_prot_end);\n\n\t/* Always re-enable SW protect if it was enabled before. */\n\tif (was_sw_protected) {\n\t\tint ret2 \u003d cros_flash_rtkfp_sw_protect(dev, true);\n\t\tif (ret2) {\n\t\t\tLOG_ERR(\"Failed to restore SW protect\");\n\t\t\t/* Panic due to security related issue. Flash protection\n\t\t\t * state is unknown. */\n\t\t\tk_panic();\n\t\t}\n\t\tdata-\u003esw_protected \u003d 1;\n\t}\n\n\tif (!ret) {\n\t\tLOG_DBG(\"set AT_BOOT\");\n\t}\n\treturn ret;\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl6904834_d80317be-be64-4c15-b291-98cd052e8179.pb)",
+      "range": {
+        "startLine": 476,
+        "startChar": 0,
+        "endLine": 510,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "75e0f201a7b152158f75299b88f09119d67217c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "683b47fd_83038d6e",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T04:13:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review]\nThe `sr` array is populated but never used, as `flash_set_status` below is called with `sr1` and `sr2` directly. This unused variable and assignment can be deleted to simplify the code:\n\n```c\n\tuint8_t sr1, sr2;\n\tint ret;\n\n\t/*\n\t * Make sure to clear SRP bits - only software protection.\n\t * Read current status, clear SRP0/SRP1, and write back.\n\t */\n\tflash_get_status(dev, \u0026sr1, \u0026sr2);\n\tsr1 \u0026\u003d ~SPI_FLASH_SR1_SRP0;\n\tsr2 \u0026\u003d ~SPI_FLASH_SR2_SRP1;\n\n\tflash_set_status(dev, sr1, sr2);\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl6904834_d80317be-be64-4c15-b291-98cd052e8179.pb)",
+      "range": {
+        "startLine": 551,
+        "startChar": 0,
+        "endLine": 565,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "75e0f201a7b152158f75299b88f09119d67217c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
