@@ -43,6 +43,31 @@
       "isAi": true,
       "revId": "11d587431478369c12881c8501febafd67871aa1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34945173_c5e21f20",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 1025,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-28T17:17:08Z",
+      "side": 1,
+      "message": "The input buffer size validation for versioned host commands was intentionally separated into dedicated follow-up CL:8434542 at the top of the stack per review request to keep migration CLs purely mechanical. The bounds check for fp_command_template_v1 (and others) is implemented and tested in CL:8434542.",
+      "parentUuid": "0a57e2b7_51cd07bb",
+      "range": {
+        "startLine": 1014,
+        "startChar": 0,
+        "endLine": 1025,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "11d587431478369c12881c8501febafd67871aa1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
