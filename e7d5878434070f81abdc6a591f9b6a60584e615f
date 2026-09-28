@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0036404_94a9556d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-28T22:23:43Z",
+      "side": 1,
+      "message": "Some of the following CLs turn silently suppressed errors in the docker process into failures, and one of those was a `useradd` failure. This facilitates that change, but it\u0027s a no-op by itself.",
+      "revId": "e7d5878434070f81abdc6a591f9b6a60584e615f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
