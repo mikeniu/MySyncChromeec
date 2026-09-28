@@ -120,6 +120,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8558ce2_3c86d2bc",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-28T23:55:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd697ab9_9a291be3",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 45
+      },
+      "revId": "a019b3ffbe19ad1dcfbc48490bf08072ed90f945",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b04a8f4_46a9dd55",
