@@ -18,6 +18,23 @@
       "isAi": true,
       "revId": "e5f9e5554430a9f3b26849672dc781a1105a8b57",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "165f667d_b4936ab3",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 40
+      },
+      "lineNbr": 705,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-28T18:32:31Z",
+      "side": 1,
+      "message": "Nit: In general, a cast between enums would be a good opportunity for error. These enums are intended to match exactly, but that\u0027s not obvious from this call site, and I expect that there will be numerous places where this needs to happen. In the general case, we might want a function that explicitly makes this conversion. It could just be a cast internally if we can statically check that the enums match, but at least that would only be in one place. Perhaps the subject of a future CL.",
+      "revId": "e5f9e5554430a9f3b26849672dc781a1105a8b57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
