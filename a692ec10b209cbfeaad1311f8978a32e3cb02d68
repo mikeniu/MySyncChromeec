@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b83eaa99_5bb2bdd2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T03:57:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01692609_496f5335",
+      "revId": "a692ec10b209cbfeaad1311f8978a32e3cb02d68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18bee8c3_f43da2c9",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Minor suggestion: The `all_protected` field is initialized to `0` and never set to `1` anywhere in this driver (even in `cros_flash_rtkfp_protect_now` when `all` is true). Since `cros_flash_rtkfp_get_protect_flags` and `flash_check_prot_range` calculate protection status accurately from `addr_prot_start`/`addr_prot_length` and the physical status registers, `all_protected` appears to be unused dead state and can safely be removed.",
       "isAi": true,
+      "revId": "a692ec10b209cbfeaad1311f8978a32e3cb02d68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa75f9e8_51993ea7",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T03:57:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18bee8c3_f43da2c9",
       "revId": "a692ec10b209cbfeaad1311f8978a32e3cb02d68",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e37b882a_70c4c55c",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T03:57:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab0f3b56_325d13c6",
+      "revId": "a692ec10b209cbfeaad1311f8978a32e3cb02d68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bfc3e354_c1bf14b4",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Minor suggestion: You can simplify this block by calling your helper function directly:\n```c\n\tflash_set_status(dev, sr1, sr2);\n```",
       "isAi": true,
+      "revId": "a692ec10b209cbfeaad1311f8978a32e3cb02d68",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8076390a_5261b47a",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T03:57:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bfc3e354_c1bf14b4",
       "revId": "a692ec10b209cbfeaad1311f8978a32e3cb02d68",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
