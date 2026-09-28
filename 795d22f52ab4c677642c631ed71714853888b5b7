@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0647af46_04afd328",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T17:20:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](https://goto.corp.google.com/traj/d9d266cf-ba11-4bf4-a3fe-a944414d30fc)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "795d22f52ab4c677642c631ed71714853888b5b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d6b55c4_f32595a6",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T17:20:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):**\n\nFollowing the principle of narrow lexical scoping, the `p_1` pointer is only valid and needed when `args-\u003eversion \u003d\u003d 1`. It should be declared inside the conditional branch where it is used, rather than unconditionally at the top of the function.\n\n```cpp\nstatic enum ec_host_cmd_status\nfp_command_mode(struct ec_host_cmd_handler_args *args)\n{\n\tconst auto *p \u003d static_cast\u003cconst ec_params_fp_mode *\u003e(args-\u003einput_buf);\n\tauto *r \u003d static_cast\u003cec_response_fp_mode *\u003e(args-\u003eoutput_buf);\n\tstd::optional\u003cstd::span\u003cconst uint8_t, FP_MAC_LENGTH\u003e\u003e mac \u003d std::nullopt;\n\tuint32_t mode_out;\n\n\tif (args-\u003eversion \u003d\u003d 1) {\n\t\tconst auto *p_1 \u003d static_cast\u003cconst ec_params_fp_mode_v1 *\u003e(args-\u003einput_buf);\n\t\tmac \u003d std::span{ p_1-\u003emac };\n\t}\n    // ...\n``` [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8464411_d9d266cf-ba11-4bf4-a3fe-a944414d30fc.pb)",
+      "range": {
+        "startLine": 338,
+        "startChar": 0,
+        "endLine": 342,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "795d22f52ab4c677642c631ed71714853888b5b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea59c4bd_c8b1592f",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T17:20:39Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):**\n\nBecause the framework now only guarantees that `input_buf_size` is at least the size of `SMALLEST_TYPE(..., ec_params_fp_mode)` (the v0 struct size), a v1 command could theoretically be sent with a size smaller than `sizeof(ec_params_fp_mode_v1)`. This would cause an out-of-bounds read when accessing `p_1-\u003emac`. \n\nConsider adding an explicit size check for `v1` to prevent this:\n\n```cpp\n\tif (args-\u003eversion \u003d\u003d 1) {\n\t\tif (args-\u003einput_buf_size \u003c sizeof(struct ec_params_fp_mode_v1)) {\n\t\t\treturn EC_HOST_CMD_INVALID_PARAM;\n\t\t}\n\t\tconst auto *p_1 \u003d static_cast\u003cconst ec_params_fp_mode_v1 *\u003e(args-\u003einput_buf);\n\t\tmac \u003d std::span{ p_1-\u003emac };\n\t}\n``` [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8464411_d9d266cf-ba11-4bf4-a3fe-a944414d30fc.pb)",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 350,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "795d22f52ab4c677642c631ed71714853888b5b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
