@@ -126,6 +126,50 @@ def test_version_string_default_static(fake_date, tmp_path):
     )
 
 
+@pytest.mark.parametrize(
+    ["supermanifest_contents", "expected"],
+    [
+        (
+            "chromeos/manifest-internal refs/heads/main "
+            "42422b14cba582801eeed182bf510a68bf69840c\n",
+            "prj-123.456.789-42422b1",
+        ),
+        (
+            "chromeos/manifest-internal refs/heads/main "
+            "42422b14cba582801eeed182bf510a68bf69840c extra\n",
+            "prj-123.456.789-42422b1",
+        ),
+        (
+            "chromeos/manifest-internal refs/heads/main\n",
+            "prj-123.456.789-unknown",
+        ),
+        ("", "prj-123.456.789-unknown"),
+    ],
+)
+def test_version_string_supermanifest(
+    tmp_path, supermanifest_contents, expected
+):
+    """Test developer build falls back to .supermanifest without .git."""
+    (tmp_path / ".supermanifest").write_text(
+        supermanifest_contents,
+        encoding="utf-8",
+    )
+    repo_path = tmp_path / "src" / "platform" / "ec"
+    repo_path.mkdir(parents=True)
+    assert (
+        version.get_version_string("prj", "123.456.789", git_path=repo_path)
+        == expected
+    )
+
+
+def test_version_string_no_git(tmp_path):
+    """Test developer build returns unknown without .git or .supermanifest."""
+    assert (
+        version.get_version_string("prj", "123.456.789", git_path=tmp_path)
+        == "prj-123.456.789-unknown"
+    )
+
+
 @pytest.fixture
 def fake_user_hostname():
     """Fixture to provide a fake user and hostname."""
