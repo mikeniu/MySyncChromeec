@@ -37,7 +37,7 @@ static void crash_system(void)
 	/* TODO(b/423904871): We should be able to use __ASSERT_NO_MSG when LTO
 	 * is enabled; we should prevent __ASSERT_NO_MSG from being outlined. */
 	if (IS_ENABLED(CONFIG_LTO)) {
-		CODE_UNREACHABLE;
+		__builtin_trap();
 	} else {
 		__ASSERT_NO_MSG(0);
 	}
