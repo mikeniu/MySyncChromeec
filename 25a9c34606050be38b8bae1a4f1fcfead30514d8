@@ -53,6 +53,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1d9edc6_477d9e64",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-28T16:38:09Z",
+      "side": 1,
+      "message": "Yes, verified by comparing output files before and after this optimization on both synthetic and real tracefiles (e.g. from the 245 driver test scenarios); all retained source files and line hits match identically. Added details to the TEST field in the commit message.",
+      "parentUuid": "cfe5e579_3fdb873c",
+      "revId": "25a9c34606050be38b8bae1a4f1fcfead30514d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6eb4b7e6_b1730f04",
@@ -66,6 +84,30 @@
       "writtenOn": "2026-09-28T15:31:43Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: The original code checked match.group(4) (the branch ID group in EXTRACT_BRDA), whereas this new logic checks parts[3] (the taken count field). This appears to fix a bug in the original implementation, but since it changes the behavior of branches_hit tracking, please verify that it does not break any assertions in tests that might have depended on the old behavior.",
+      "range": {
+        "startLine": 182,
+        "startChar": 0,
+        "endLine": 182,
+        "endChar": 0
+      },
+      "revId": "25a9c34606050be38b8bae1a4f1fcfead30514d8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62fe0eb6_7ae8005f",
+        "filename": "util/lcov_stencil.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-28T16:38:09Z",
+      "side": 1,
+      "message": "In LCOV format (`BRDA:\u003cline\u003e,\u003cblock\u003e,\u003cbranch\u003e,\u003ctaken\u003e`), the 4th field is the branch ID and the 5th field is the taken count. The original regex `^(BRDA):(\\d+),(\\d+),(\\d+),([-\\d]+)` captured `BRDA` as group 1, so group 4 was the branch ID and group 5 was the taken count; checking `match.group(4)` was a latent bug in the original implementation that checked the branch ID rather than whether the branch was taken. `taken` correctly inspects the taken field. Added an explicit unit test `test_filter_coverage_file_brda_taken_tracking`, documented this in the commit message, and cleaned up all offset magic numbers across the script.",
+      "parentUuid": "6eb4b7e6_b1730f04",
       "range": {
         "startLine": 182,
         "startChar": 0,
