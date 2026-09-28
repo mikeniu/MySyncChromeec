@@ -1,0 +1,92 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "565a91f6_02ec2ad5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T05:53:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n1. **Test Coverage**: Automated test coverage is mandatory for new device drivers to verify state transitions and error handling (even with mocks). `TEST\u003dNone` is not acceptable. Please add unit tests and update the `TEST\u003d` line with the verification command used (e.g., `TEST\u003dzmake test ...`).\n2. **Bug Tag**: The `BUG\u003d` tag format is incorrect (`BUG\u003d:478708415`). It should use the `BUG\u003db:\u003cid\u003e` prefix for Buganizer.\n\nSuggested replacement block:\n```\nBUG\u003db:478708415\nTEST\u003d\u003cverification command\u003e\n```\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8417147_34ae535c-54bc-4657-9350-d48ff378bfbb.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b59aefcb3cf941ae498ea2aa498e6a6f50772eea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ed2772c_54819ce1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T05:53:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL and add tests**\n\n### Review Summary\n\n*   **Functionality:** Found a silent failure masking issue in `convert_rts_snr_init_error_code`, where it maps unmapped initialization errors to `0` (success). See inline comments.\n*   **Architecture \u0026 Component Fit:** The driver correctly encapsulates sensor interactions and maps to standard Cros EC fingerprint APIs.\n*   **Code Simplicity:** The driver implementation is generally straightforward and makes good use of guard clauses.\n*   **Idiomaticity \u0026 Readability:** Global namespace pollution was identified. The private conversion functions (`convert_fp_capture_type_to_rts_capture_type`, `convert_rts_get_image_error_code`, `convert_rts_snr_init_error_code`) are missing `static` modifiers and are currently exported. \n*   **Security:** No obvious memory or resource leaks. GPIO callbacks and device config macros are safely structured.\n*   **Testing \u0026 Test Coverage:** Missing automated test coverage. A driver of this size must include unit tests using standard fakes/mocks, following the established conventions seen in `zephyr/test/fingerprint/drivers/`. Manual testing (`TEST\u003dNone`) is not an acceptable substitute.\n*   **CL Size \u0026 Scope:** Size: L (+977, -1). This CL is too large and bundles multiple logical additions together. It must be split to ensure smaller, reviewable changes.\n    *   **CL 1:** Device tree bindings (`realtek,rts5817maa.yaml`), Kconfig entries, and build files.\n    *   **CL 2:** Core sensor driver (`fingerprint_rts5817maa.c`) along with its unit tests in `zephyr/test/fingerprint/drivers/rts5817maa/`.\n    *   **CL 3:** Board integrations and shim updates (e.g. `fpsensor.c`, `realtekfp.dts`).\n*   **Commit Message:** The `BUG\u003d` tag format is incorrect (missing the Buganizer `b:` prefix) and `TEST\u003dNone` needs to be updated with automated test commands once they are added.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8417147_34ae535c-54bc-4657-9350-d48ff378bfbb.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b59aefcb3cf941ae498ea2aa498e6a6f50772eea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5cd90f3_7e23a489",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T05:53:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\nThis function should be `static` since it is only used in this file. The `IF_DISABLED` macro handles this for tests, but `convert_rts_get_image_error_code` and `convert_rts_snr_init_error_code` (below) have no `static` at all and are polluting the global namespace.\n\nPlease add `static` to all three conversion functions.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8417147_34ae535c-54bc-4657-9350-d48ff378bfbb.pb)",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b59aefcb3cf941ae498ea2aa498e6a6f50772eea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36f21995_fc478d50",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T05:53:52Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\nBy returning `0` in the `default` case, this function silently masks any unmapped error codes (such as `RTS_ERROR_TIMEOUT` or `RTS_ERROR_INVALID_PARAMETER`) as success. \n\nConsequently, in `rts5817maa_init`, `ret` becomes `0`, and the initialization failure is completely ignored (the error bit isn`t set).\n\nPlease explicitly handle `RTS_FP_SUCCESS` and ensure all other unmapped errors return an appropriate error flag (like `FINGERPRINT_ERROR_INIT_FAIL`):\n```c\nstatic int convert_rts_snr_init_error_code(rts_fp_return_t code)\n{\n\tswitch (code) {\n\tcase RTS_FP_SUCCESS:\n\t\treturn 0;\n\tcase RTS_ERROR_NOT_SUPPORT_SENSOR:\n\t\treturn FINGERPRINT_ERROR_BAD_HWID;\n\tcase RTS_ERROR_IO_EXCEPTION:\n\t\treturn FINGERPRINT_ERROR_SPI_COMM;\n\tdefault:\n\t\treturn FINGERPRINT_ERROR_INIT_FAIL;\n\t}\n}\n```\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8417147_34ae535c-54bc-4657-9350-d48ff378bfbb.pb)",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b59aefcb3cf941ae498ea2aa498e6a6f50772eea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
