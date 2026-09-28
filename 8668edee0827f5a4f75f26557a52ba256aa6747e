@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2d0b82d_4f5c4590",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T06:38:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — See inline comments for details. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8177334_eb7442e0-3c85-49b3-a0c1-790c6aa334c8.pb)\n\n### Review Summary\n*   **Functionality:** The logic to run RTS5817 after a power cycle passes the remote IP to `JLinkExe` but overlooks `args.jlink_port`, meaning custom remote ports may be ignored.\n*   **Architecture \u0026 Component Fit:** The board-specific power cycle and flash behaviors are placed directly into the main `run_device_tests.py` flow, which aligns with existing board-specific workarounds in the script.\n*   **Code Simplicity:** The context manager correctly scopes the temporary command file.\n*   **Idiomaticity \u0026 Readability:** Good use of the `with` statement for resource cleanup.\n*   **Testing \u0026 Test Coverage:** The patch adds configuration and support for a new board to the test runner infrastructure. No additional automated unit tests are required for this configuration change.\n*   **CL Size \u0026 Scope:** `Size: M (+94, -0)`. The CL is small, atomic, and focused on a single logical change.\n*   **Commit Message:** The commit message accurately describes the changes and includes the required `BUG\u003d` and `TEST\u003d` footers formatted correctly for the Chromium ecosystem.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8668edee0827f5a4f75f26557a52ba256aa6747e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faa0410b_d1e47a15",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2160,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T06:38:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The `args.jlink_port` is still not included here. If the user specifies a custom `--jlink_port`, `JLinkExe` will default to `19020` on the remote IP rather than the user-specified port.\n\nConsider formatting the remote address to include the port if it is provided:\n```python\n                        remote\u003df\"{args.remote}:{args.jlink_port}\" if (args.remote and args.jlink_port) else args.remote,\n``` [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8177334_eb7442e0-3c85-49b3-a0c1-790c6aa334c8.pb)",
+      "range": {
+        "startLine": 2153,
+        "startChar": 0,
+        "endLine": 2160,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8668edee0827f5a4f75f26557a52ba256aa6747e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
