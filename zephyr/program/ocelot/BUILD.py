@@ -7,6 +7,7 @@
 
 def register_npcx9_project(
     project_name,
+    zephyr_board="npcx9/npcx9m7f",
     extra_kconfig_base_files=(),
     extra_kconfig_proj_files=(),
     boards=None,
@@ -17,7 +18,7 @@ def register_npcx9_project(
 
     register_npcx_project(
         project_name=project_name,
-        zephyr_board="npcx9/npcx9m7f",
+        zephyr_board=zephyr_board,
         dts_overlays=[
             here / project_name / "project.overlay",
         ],
@@ -138,6 +139,7 @@ register_npcx9_project(
 
 register_npcx9_project(
     project_name="blanc",
+    zephyr_board="npcx9/npcx9m7fb",
 )
 
 # For use on RVP SKU3
@@ -248,7 +250,7 @@ register_rtk59_project(
 assert_rw_fwid_DO_NOT_EDIT(project_name="hekla", addr=0x80404)
 assert_rw_fwid_DO_NOT_EDIT(project_name="kodkod", addr=0x80404)
 assert_rw_fwid_DO_NOT_EDIT(project_name="matsu", addr=0x60098)
-assert_rw_fwid_DO_NOT_EDIT(project_name="blanc", addr=0x80144)
+assert_rw_fwid_DO_NOT_EDIT(project_name="blanc", addr=0x40144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="matsu_it82000", addr=0x60098)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ocelotrvp-npcx", addr=0x80144)
 assert_rw_fwid_DO_NOT_EDIT(project_name="ocelotrvp-ite", addr=0x60098)
