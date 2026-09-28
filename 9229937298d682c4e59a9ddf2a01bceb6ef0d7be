@@ -70,6 +70,24 @@
       "message": "Are we sure that this isn\u0027t a real issue? It\u0027s failing on both `sanok` and `bloonchipper`, which is suspicious.\n\nIs it flakey or a deterministic failure?",
       "revId": "9229937298d682c4e59a9ddf2a01bceb6ef0d7be",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b91e33f4_5b80c9f4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-28T20:56:29Z",
+      "side": 1,
+      "message": "This looks to be breakage caused by an upstream change.  See b/567198032",
+      "parentUuid": "9dae1877_87a21c6c",
+      "revId": "9229937298d682c4e59a9ddf2a01bceb6ef0d7be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
