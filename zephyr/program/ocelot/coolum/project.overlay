@@ -19,13 +19,14 @@
 #include "imvp.dtsi"
 #include "keyboard.dtsi"
 #include "power_signals.dtsi"
+#include "temp_sensor.dtsi"
 #include "usbc.dtsi"
 
 /*
  * Map GPIOs used for interrupts to common names
  */
-gpio_temp_sensor_power_good: &gpio_en_s5_rails {};
 gpio_ec_pch_wake_odl: &gpio_smc_wake_sci_n_r {};
+
 
 /* ocelotrvp-ite overrides follow... */
 / {
