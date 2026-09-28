@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb3e398e_e40a89d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T06:13:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dea29bef_9862e6f8",
+      "revId": "d5b28f2cb694c4d1114d4170a355823b25aba388",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35cb10d2_99aeb17e",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] The `remote` parameter is defined in the function signature but is never used in the function body. If remote execution is needed, you should add `cmd.extend([\"-ip\", remote])` when `remote` is not empty, similar to how it is handled in `util/flash_jlink.py`.",
       "isAi": true,
+      "revId": "d5b28f2cb694c4d1114d4170a355823b25aba388",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d820b938_bf12a099",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T06:13:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35cb10d2_99aeb17e",
       "revId": "d5b28f2cb694c4d1114d4170a355823b25aba388",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65e9617f_ef18cf1a",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T06:13:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2af53a9b_62488335",
+      "revId": "d5b28f2cb694c4d1114d4170a355823b25aba388",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "743172ab_999d8d1b",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] `remote` is hardcoded to `\"\"` here. If this script is run with the `--remote` flag (which populates `args.remote` and `args.jlink_port`), `JLinkExe` will attempt to connect to a local USB J-Link instead of the remote one. Consider passing the remote IP and port here if they are set. For example: `remote\u003df\"{args.remote}:{args.jlink_port}\" if args.remote else \"\"`",
       "isAi": true,
+      "revId": "d5b28f2cb694c4d1114d4170a355823b25aba388",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20dde1b8_bf3f3176",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2036,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T06:13:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "743172ab_999d8d1b",
       "revId": "d5b28f2cb694c4d1114d4170a355823b25aba388",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
