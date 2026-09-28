@@ -13,6 +13,7 @@
 #include "fan.dtsi"
 #include "generated.dtsi"
 #include "interrupt.dtsi"
+#include "keyboard.dtsi"
 #include "power_signals.dtsi"
 
 /*
@@ -39,7 +40,6 @@ gpio_ec_pch_wake_odl: &gpio_smc_wake_sci_n_r {};
 #include "../ite_hibernate.dtsi"
 #include "../rvp_usba.dtsi"
 #include "../rvp_battery.dtsi"
-#include "../rvp_keyboard.dtsi"
 #include "../rvp_temp_sensors.dtsi"
 
 
@@ -58,10 +58,6 @@ gpio_ec_pch_wake_odl: &gpio_smc_wake_sci_n_r {};
 		entering-rw {
 			enum-name = "GPIO_ENTERING_RW";
 		};
-	};
-
-	chosen {
-		cros-ec,keyboard = &kbd;
 	};
 
 	cse_early_recovery: cse-early-recovery {
@@ -84,21 +80,7 @@ gpio_ec_pch_wake_odl: &gpio_smc_wake_sci_n_r {};
 	status = "okay";
 };
 
-&pwm1 {
-	status = "okay";
-};
-&pwm2 {
-	status = "disabled";
-};
-&pwm3 {
-	status = "disabled";
-};
-
 /* Update board-specific references  */
-
-&kblight {
-	pwms = <&pwm1 PWM_CHANNEL_1 PWM_HZ(324) PWM_POLARITY_NORMAL>;
-};
 
 &imvp_rt3645 {
 	enable-gpios = <&gpioi 7 GPIO_ACTIVE_HIGH>;
