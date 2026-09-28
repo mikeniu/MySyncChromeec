@@ -8,7 +8,7 @@
 #include <zephyr/fff.h>
 
 /* FFF fake definitions for select functions in `usbc_power_contract.c` */
-DEFINE_FAKE_VALUE_FUNC(int, dpm_get_source_pdo, const uint32_t, const int);
+DEFINE_FAKE_VALUE_FUNC(int, dpm_get_source_pdo, const uint32_t **, const int);
 
 void helper_reset_usbc_power_contract_fakes(void)
 {
