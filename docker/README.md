@@ -145,9 +145,10 @@ To run host-based emulation tests using Zephyr's Twister inside the container:
 
 #### 2. Real Device Testing on Dagwood (using Helper Script)
 To run tests against a Dagwood board and EC Add-in-card (AIC) connected to the
-host, you can use the `run_dagwood_tests.py` helper script. It automatically
-handles device forwarding and configures twister with the required parameters
-(toolchain, flash command, etc.).
+host, run `./dagwood` through the `run_docker.sh` helper script, which starts
+the container with access to the host's USB devices and serial ports.
+`./dagwood` locates the Dagwood board and its EC serial port and invokes
+twister with the required parameters (toolchain, flash command, etc.).
 
 Test results are available on your host filesystem at
 `workspace/src/platform/ec/twister-out/`.
@@ -159,7 +160,7 @@ startup.
 
 To run all EC-AIC tests on `realtek/rts5912`:
 ```bash
-./run_dagwood_tests.py -p realtek/rts5912
+./run_docker.sh ./dagwood -p realtek/rts5912
 ```
 
 ##### Nuvoton (NPCX9) Example
@@ -169,28 +170,28 @@ startup.
 
 To run all EC-AIC tests on `npcx9/npcx9m7f`:
 ```bash
-./run_dagwood_tests.py -p npcx9/npcx9m7f
+./run_docker.sh ./dagwood -p npcx9/npcx9m7f
 ```
 
 ##### Customizing the Run
-You can override the defaults using the script options:
+You can override the defaults using the `./dagwood` options:
 
 *   **Specify one or more test directories**:
     ```bash
-    ./run_dagwood_tests.py -p realtek/rts5912 -T zephyr/test/ec-aic -T zephyr/test/another-test
+    ./run_docker.sh ./dagwood -p realtek/rts5912 -T zephyr/test/ec-aic -T zephyr/test/another-test
     ```
 *   **Run one or more specific test scenarios**:
     ```bash
-    ./run_dagwood_tests.py -p realtek/rts5912 -s aic.i2c -s another.scenario
+    ./run_docker.sh ./dagwood -p realtek/rts5912 -s aic.i2c -s another.scenario
     ```
 *   **Specify a different serial port**:
     ```bash
-    ./run_dagwood_tests.py -p realtek/rts5912 -d /dev/ttyACM0
+    ./run_docker.sh ./dagwood -p realtek/rts5912 -d /dev/ttyACM0
     ```
 
 For help on options:
 ```bash
-./run_dagwood_tests.py -h
+./run_docker.sh ./dagwood -h
 ```
 
 ### Direct Command Execution (Without Entering Container)
