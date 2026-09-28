@@ -7,4 +7,7 @@ common:
     - realtek/rts5912
   timeout: 120
 tests:
-  aic.espi: {}
+  aic.espi:
+    harness: pytest
+    harness_config:
+      pytest_dut_scope: session
