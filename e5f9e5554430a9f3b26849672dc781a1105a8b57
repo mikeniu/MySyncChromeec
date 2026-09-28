@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9d0e0c7_fd968112",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 40
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T17:28:59Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n**Functionality:** The host command definitions are functionally correct; macro changes properly map old return status enumerations to the new ones and correctly switch parameters out for `input_buf` and `output_buf`.\n\n**Architecture \u0026 Component Fit:** The change correctly updates host command registration to use the newly standardized upstream macros properly.\n\n**Code Simplicity:** The changes are mostly straightforward and simple parameter swaps.\n\n**Idiomaticity \u0026 Readability:** Excellent. The macro migration uses `static_cast\u003cenum ec_host_cmd_status\u003e(...)` where appropriate.\n\n**Testing:** Existing tests execute correctly, and as this is mainly a structural refactoring mapping legacy macro declarations to new ones, test coverage remains sufficient.\n\n**CL Size \u0026 Scope:** `Size: M (+53, -47)`. Thank you for splitting the CL! This is now a very manageable size and adheres well to the Single Logical Change rule. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8008794_44cb9df1-5753-46d0-a0c3-81c6f8255448.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "e5f9e5554430a9f3b26849672dc781a1105a8b57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
