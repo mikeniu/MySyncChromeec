@@ -1947,6 +1947,8 @@ tests:
   drivers.usbc_power_contract:
     extra_configs:
     - CONFIG_LINK_TEST_SUITE_USBC_POWER_CONTRACT=y
+    - CONFIG_PLATFORM_EC_POWER_BUTTON_X86=y
+    - CONFIG_PLATFORM_EC_USB_PD_DATA_RESET_MSG=y
   drivers.usbc_frs.ec_host_cmd:
     tags:
     - host_cmd

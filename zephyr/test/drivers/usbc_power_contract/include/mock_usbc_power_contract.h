@@ -11,7 +11,9 @@
 #include <zephyr/fff.h>
 
 /* FFF fake declarations for select functions in `usbc_power_contract.c` */
-DECLARE_FAKE_VALUE_FUNC(int, dpm_get_source_pdo, const uint32_t, const int);
+DECLARE_FAKE_VALUE_FUNC(int, dpm_get_source_pdo, const uint32_t **, const int);
+
+void helper_reset_usbc_power_contract_fakes(void);
 
 #endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_USBC_POWER_CONTRACT_INCLUDE_MOCK_USBC_POWER_CONTRACT_H_ \
 	*/

@@ -6,3 +6,4 @@ target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_sources(app PRIVATE src/usbc_power_contract.c)
 target_sources(app PRIVATE src/mock_usbc_power_contract.c)
+target_sources(app PRIVATE src/usbc_dpm_unit.c)
