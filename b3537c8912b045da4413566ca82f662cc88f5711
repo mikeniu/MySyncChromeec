@@ -35,6 +35,25 @@
       "isAi": true,
       "revId": "b3537c8912b045da4413566ca82f662cc88f5711",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c7e396d_a116b9fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T23:28:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ℹ️ **N/A** — My review skills don\u0027t apply to the contents of this CL. [🔗](http://go/tj/cns/gg-d/home/tomhughes/review_trajectories/cl8237836_886426f7-5122-4eed-af6a-07a126c4c02b.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3537c8912b045da4413566ca82f662cc88f5711",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
