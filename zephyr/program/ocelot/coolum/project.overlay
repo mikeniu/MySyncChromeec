@@ -15,6 +15,7 @@
 #include "interrupt.dtsi"
 #include "keyboard.dtsi"
 #include "power_signals.dtsi"
+#include "temp_sensor.dtsi"
 
 /*
  * Map I2C buses to common names
@@ -40,7 +41,6 @@ gpio_ec_pch_wake_odl: &gpio_smc_wake_sci_n_r {};
 #include "../ite_hibernate.dtsi"
 #include "../rvp_usba.dtsi"
 #include "../rvp_battery.dtsi"
-#include "../rvp_temp_sensors.dtsi"
 
 
 #include "i2c.dtsi"
