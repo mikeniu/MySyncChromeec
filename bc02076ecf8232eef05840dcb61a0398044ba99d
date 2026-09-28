@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c17fb626_73cbce34",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T06:14:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7097b23_b4e460fa",
+      "revId": "bc02076ecf8232eef05840dcb61a0398044ba99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9f83cc0_f1950a1d",
@@ -33,6 +51,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] The first part of this alternation (`Data access violation\\r\\n`) will match *any* data access violation, meaning it won\u0027t distinguish between region 0 and region 1 violations.\n\nConsider adding the `mfar` address like in the other regexes, e.g., `Data access violation, mfar \u003d 1840000\\r\\n`.",
       "isAi": true,
+      "revId": "bc02076ecf8232eef05840dcb61a0398044ba99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b8d5ed4_ae56c748",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T06:14:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9f83cc0_f1950a1d",
       "revId": "bc02076ecf8232eef05840dcb61a0398044ba99d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -55,6 +91,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37877349_7be99c12",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T06:14:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d076965_82ec258d",
+      "revId": "bc02076ecf8232eef05840dcb61a0398044ba99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e06b3b31_36de3221",
@@ -69,6 +123,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] Since this CL resolves `b/532643220` by configuring the rollback regexes, you should remove this TODO.",
       "isAi": true,
+      "revId": "bc02076ecf8232eef05840dcb61a0398044ba99d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "958fc7bb_e1bfbafb",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-28T06:14:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e06b3b31_36de3221",
       "revId": "bc02076ecf8232eef05840dcb61a0398044ba99d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
