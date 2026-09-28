@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59f74fe9_101a3e36",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T17:25:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\nAcknowledged on the input buffer size validation being handled in the follow-up CL:8434542 to keep this migration purely mechanical. This aligns perfectly with the Single Logical Change rule.\n\n### Review Summary\n\n*   **Functionality:** The migration to `EC_HOST_CMD_HANDLER` is purely mechanical, and the bounds check is correctly deferred to a follow-up CL.\n*   **Architecture \u0026 Component Fit:** The migration of legacy `ec_status` return codes to `ec_host_cmd_status` is correct.\n*   **Code Simplicity:** The changes are straightforward type and signature adaptations. No simpler rewrites are necessary.\n*   **Idiomaticity \u0026 Readability:** The modernized framework macro usage aligns well with upstream Zephyr idioms.\n*   **Testing \u0026 Test Coverage:** Tests are listed in the commit message (`TEST\u003d./twister ...`).\n*   **CL Size \u0026 Scope:** Size: M (+68, -59). The CL represents a cohesive, single logical change focused on migrating a specific group of host commands.\n*   **Commit Message:** The commit message accurately reflects the diff and uses the correct Chromium `BUG\u003d`/`TEST\u003d` footer formats.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8464410_f8c29dd7-3473-4e54-b0d8-0f7bcc76b04c.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9871760c4f4408d9cd37701d572b45867c8fe46c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
