@@ -6,6 +6,7 @@
 #include "common.h"
 #include "ec_tasks.h"
 #include "emul/emul_isl923x.h"
+#include "emul/tcpc/emul_tcpci.h"
 #include "emul/tcpc/emul_tcpci_partner_snk.h"
 #include "emul/tcpc/emul_tcpci_partner_src.h"
 #include "tcpm/tcpci.h"
@@ -13,6 +14,7 @@
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 #include "test/usb_pe.h"
+#include "test/usb_prl.h"
 #include "usb_emsg.h"
 #include "usb_pd.h"
 #include "usb_pd_tcpm.h"
@@ -127,6 +129,21 @@ ZTEST_SUITE(usb_prl_test_sink, drivers_predicate_post_main,
 ZTEST_SUITE(usb_prl_test_source, drivers_predicate_post_main,
 	    usb_prl_test_source_setup, usb_prl_test_before, usb_prl_test_after,
 	    NULL);
+
+static void send_raw_rx_msg(const struct emul *tcpci_emul,
+			    enum tcpci_msg_type sop_type, const uint8_t *buf,
+			    int cnt)
+{
+	struct tcpci_partner_msg *msg = calloc(1, sizeof(*msg));
+
+	zassert_not_null(msg, "Failed to allocate partner msg");
+	msg->msg.buf = calloc(1, cnt);
+	zassert_not_null(msg->msg.buf, "Failed to allocate msg buf");
+	memcpy(msg->msg.buf, buf, cnt);
+	msg->msg.cnt = cnt;
+	msg->msg.sop_type = sop_type;
+	zassert_ok(tcpci_emul_add_rx_msg(tcpci_emul, &msg->msg, true));
+}
 
 /* =========================================================================
  * Sink Tests
@@ -274,6 +291,279 @@ ZTEST_F(usb_prl_test_sink, test_prl_hard_reset_and_recovery)
 		      "Expected EC to remain SINK after recovery");
 }
 
+/**
+ * @brief Test PRL state queries, debug prints, and Hard Reset complete exit.
+ */
+ZTEST_F(usb_prl_test_sink, test_prl_state_queries_and_hard_reset_exit)
+{
+	int port = TEST_USB_PORT;
+
+	/* Enable maximum debug level to cover all state machine log prints */
+	prl_set_debug_level(DEBUG_LEVEL_3);
+
+	/* Check initial states */
+	zassert_equal(PRL_TX_WAIT_FOR_MESSAGE_REQUEST, prl_tx_get_state(port),
+		      "Expected PRL_TX_WAIT_FOR_MESSAGE_REQUEST");
+	zassert_equal(PRL_HR_WAIT_FOR_REQUEST, prl_hr_get_state(port),
+		      "Expected PRL_HR_WAIT_FOR_REQUEST");
+	zassert_equal(RCH_WAIT_FOR_MESSAGE_FROM_PROTOCOL_LAYER,
+		      rch_get_state(port),
+		      "Expected RCH_WAIT_FOR_MESSAGE_FROM_PROTOCOL_LAYER");
+	zassert_equal(TCH_WAIT_FOR_MESSAGE_REQUEST_FROM_PE, tch_get_state(port),
+		      "Expected TCH_WAIT_FOR_MESSAGE_REQUEST_FROM_PE");
+
+	/* Test hard reset execution and PE complete signal */
+	prl_execute_hard_reset(port);
+	k_sleep(K_MSEC(50));
+
+	/* Verify Hard Reset state machine reached wait for PE complete */
+	zassert_equal(PRL_HR_WAIT_FOR_PE_HARD_RESET_COMPLETE,
+		      prl_hr_get_state(port),
+		      "Expected PRL_HR_WAIT_FOR_PE_HARD_RESET_COMPLETE");
+
+	/* Signal hard reset complete to transition and hit exit handler */
+	prl_hard_reset_complete(port);
+	k_sleep(K_MSEC(50));
+
+	zassert_equal(PRL_HR_WAIT_FOR_REQUEST, prl_hr_get_state(port),
+		      "Expected PRL_HR_WAIT_FOR_REQUEST after reset complete");
+
+	/* Calling hard reset on unattached port 1 should early return */
+	if (CONFIG_USB_PD_PORT_MAX_COUNT > 1) {
+		prl_execute_hard_reset(1);
+	}
+
+	/* Test data role checking toggle */
+	prl_set_data_role_check(port, true);
+	prl_set_data_role_check(port, false);
+	prl_set_data_role_check(port, true);
+
+	prl_set_debug_level(DEBUG_DISABLE);
+}
+
+/**
+ * @brief Test PRL message reception filtering, duplicate discard, and count
+ * clamping.
+ */
+ZTEST_F(usb_prl_test_sink, test_prl_rx_filtering_and_edge_cases)
+{
+	struct usb_prl_test_fixture *super_fixture = &fixture->fixture;
+	uint8_t raw_buf[36];
+	uint16_t hdr;
+	int port = TEST_USB_PORT;
+	int rv;
+
+	prl_set_debug_level(DEBUG_LEVEL_3);
+
+	/* 1. Test duplicate message ID filtering (line 2265) */
+	rv = tcpci_partner_send_control_msg(&super_fixture->partner_emul,
+					    PD_CTRL_PING, 0);
+	zassert_ok(rv, "Failed to send Ping, rv=%d", rv);
+	k_sleep(K_MSEC(50));
+
+	/* Send a raw message with identical message ID */
+	hdr = PD_HEADER(PD_CTRL_PING, super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			(super_fixture->partner_emul.sop_msg_id - 1) & 0x7, 0,
+			PD_REV30, 0);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf, 2);
+	k_sleep(K_MSEC(50));
+
+	/* 2. Test dropping non-SOP message with prole == PD_PLUG_FROM_DFP_UFP
+	 * (lines 2213-2214) */
+	tcpm_sop_prime_enable(port, true);
+	hdr = PD_HEADER(PD_CTRL_PING, PD_PLUG_FROM_DFP_UFP, 0,
+			super_fixture->partner_emul.sop_prime_msg_id & 0x7, 0,
+			PD_REV30, 0);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP_PRIME, raw_buf,
+			2);
+	k_sleep(K_MSEC(50));
+	tcpm_sop_prime_enable(port, false);
+
+	/* 3. Test message count clamping when cnt > CHK_BUF_SIZE (line 2194) */
+	memset(raw_buf, 0, sizeof(raw_buf));
+	hdr = PD_HEADER(PD_DATA_VENDOR_DEF,
+			super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			super_fixture->partner_emul.sop_msg_id & 0x7, 8,
+			PD_REV30, 0);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf,
+			2 + 8 * 4);
+	k_sleep(K_MSEC(50));
+
+	prl_set_debug_level(DEBUG_DISABLE);
+}
+
+/**
+ * @brief Test Chunked Rx multi-chunk flow, chunk requesting, waiting, and
+ * error reporting.
+ */
+ZTEST_F(usb_prl_test_sink, test_prl_chunked_rx_multi_chunk_flow)
+{
+	struct usb_prl_test_fixture *super_fixture = &fixture->fixture;
+	uint8_t raw_buf[32];
+	uint16_t hdr;
+	uint16_t exthdr;
+	int port = TEST_USB_PORT;
+
+	prl_set_debug_level(DEBUG_LEVEL_3);
+
+	/* 1. Multi-chunk incoming message leading to chunk response timer
+	 * timeout:
+	 * Send Chunk 0 with total data size = 30 bytes (> 26 bytes chunk max).
+	 * Header: cnt = 7 (28 bytes: 2 bytes ext header + 26 bytes payload).
+	 */
+	memset(raw_buf, 0xa5, sizeof(raw_buf));
+	hdr = PD_HEADER(PD_EXT_SECURITY_REQUEST,
+			super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			super_fixture->partner_emul.sop_msg_id & 0x7, 7,
+			PD_REV30, 1);
+	exthdr = PD_EXT_HEADER(0, 0, 30);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	raw_buf[2] = exthdr & 0xff;
+	raw_buf[3] = (exthdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf,
+			2 + 28);
+
+	/* Allow EC to process chunk 0, transition to RCH_REQUESTING_CHUNK, send
+	 * Chunk Request, enter RCH_WAITING_CHUNK, and let
+	 * ChunkSenderResponseTimer expire.
+	 */
+	k_sleep(K_MSEC(80));
+
+	zassert_equal(RCH_WAIT_FOR_MESSAGE_FROM_PROTOCOL_LAYER,
+		      rch_get_state(port),
+		      "Expected RCH to return to wait state after timeout");
+
+	/* 2. Multi-chunk incoming message with successful chunk completion:
+	 * Send Chunk 0 (26 bytes of 30), then send Chunk 1 (remaining 4 bytes).
+	 */
+	memset(raw_buf, 0x5a, sizeof(raw_buf));
+	super_fixture->partner_emul.sop_msg_id++;
+	hdr = PD_HEADER(PD_EXT_SECURITY_REQUEST,
+			super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			super_fixture->partner_emul.sop_msg_id & 0x7, 7,
+			PD_REV30, 1);
+	exthdr = PD_EXT_HEADER(0, 0, 30);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	raw_buf[2] = exthdr & 0xff;
+	raw_buf[3] = (exthdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf,
+			2 + 28);
+	k_sleep(K_MSEC(10));
+
+	/* Send Chunk 1 (chunk_num = 1, cnt = 2 objects = 8 bytes) */
+	super_fixture->partner_emul.sop_msg_id++;
+	hdr = PD_HEADER(PD_EXT_SECURITY_REQUEST,
+			super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			super_fixture->partner_emul.sop_msg_id & 0x7, 2,
+			PD_REV30, 1);
+	exthdr = PD_EXT_HEADER(1, 0, 30);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	raw_buf[2] = exthdr & 0xff;
+	raw_buf[3] = (exthdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf,
+			2 + 8);
+	k_sleep(K_MSEC(50));
+
+	/* 3. Unexpected Chunk Number while processing extended message */
+	super_fixture->partner_emul.sop_msg_id++;
+	hdr = PD_HEADER(PD_EXT_SECURITY_REQUEST,
+			super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			super_fixture->partner_emul.sop_msg_id & 0x7, 7,
+			PD_REV30, 1);
+	exthdr = PD_EXT_HEADER(0, 0, 30);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	raw_buf[2] = exthdr & 0xff;
+	raw_buf[3] = (exthdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf,
+			2 + 28);
+	k_sleep(K_MSEC(10));
+
+	/* Send Chunk 5 instead of expected Chunk 1 */
+	super_fixture->partner_emul.sop_msg_id++;
+	hdr = PD_HEADER(PD_EXT_SECURITY_REQUEST,
+			super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			super_fixture->partner_emul.sop_msg_id & 0x7, 2,
+			PD_REV30, 1);
+	exthdr = PD_EXT_HEADER(5, 0, 30);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	raw_buf[2] = exthdr & 0xff;
+	raw_buf[3] = (exthdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf,
+			2 + 8);
+	k_sleep(K_MSEC(50));
+
+	/* 4. Receiving unexpected Chunk Request in RCH_WAITING_CHUNK */
+	super_fixture->partner_emul.sop_msg_id++;
+	hdr = PD_HEADER(PD_EXT_SECURITY_REQUEST,
+			super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			super_fixture->partner_emul.sop_msg_id & 0x7, 7,
+			PD_REV30, 1);
+	exthdr = PD_EXT_HEADER(0, 0, 30);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	raw_buf[2] = exthdr & 0xff;
+	raw_buf[3] = (exthdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf,
+			2 + 28);
+	k_sleep(K_MSEC(10));
+
+	/* Send Chunk Request while EC is in RCH_WAITING_CHUNK */
+	super_fixture->partner_emul.sop_msg_id++;
+	hdr = PD_HEADER(PD_EXT_SECURITY_REQUEST,
+			super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			super_fixture->partner_emul.sop_msg_id & 0x7, 1,
+			PD_REV30, 1);
+	exthdr = PD_EXT_HEADER(0, 1 /* req_chunk */, 0);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	raw_buf[2] = exthdr & 0xff;
+	raw_buf[3] = (exthdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf,
+			2 + 4);
+	k_sleep(K_MSEC(50));
+
+	/* 5. Extended message received while revision is lower than PD3.0 */
+	prl_set_rev(port, TCPCI_MSG_SOP, PD_REV20);
+	super_fixture->partner_emul.sop_msg_id++;
+	hdr = PD_HEADER(PD_EXT_SECURITY_REQUEST,
+			super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			super_fixture->partner_emul.sop_msg_id & 0x7, 1,
+			PD_REV20, 1);
+	exthdr = PD_EXT_HEADER(0, 0, 4);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	raw_buf[2] = exthdr & 0xff;
+	raw_buf[3] = (exthdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf,
+			2 + 4);
+	k_sleep(K_MSEC(50));
+
+	/* Restore revision */
+	prl_set_rev(port, TCPCI_MSG_SOP, PD_REV30);
+	prl_set_debug_level(DEBUG_DISABLE);
+}
+
 /* =========================================================================
  * Source Tests
  * ========================================================================= */
@@ -354,4 +644,77 @@ ZTEST_F(usb_prl_test_source, test_prl_source_tx_control_msg)
 	k_sleep(K_MSEC(100));
 
 	zassert_true(prl_is_running(port), "PRL should remain running");
+}
+
+/**
+ * @brief Test Chunked Tx multi-chunk transmission, chunk request response, and
+ * error reporting.
+ */
+ZTEST_F(usb_prl_test_source, test_prl_chunked_tx_multi_chunk_flow)
+{
+	struct usb_prl_test_fixture *super_fixture = &fixture->fixture;
+	uint8_t raw_buf[8];
+	uint16_t hdr;
+	uint16_t exthdr;
+	int port = TEST_USB_PORT;
+
+	/* Verify EC attached as Source */
+	zassert_equal(PD_ROLE_SOURCE, pd_get_power_role(port),
+		      "Expected EC to be SOURCE");
+	zassert_true(tc_is_attached_src(port),
+		     "Expected EC to be attached as SOURCE");
+
+	prl_set_debug_level(DEBUG_LEVEL_3);
+
+	/* 1. Transmit multi-chunk message and let ChunkSenderRequestTimer
+	 * expire:
+	 * Len = 30 bytes (> 26 bytes). First chunk will be 26 bytes.
+	 * EC enters TCH_WAIT_CHUNK_REQUEST.
+	 */
+	memset(tx_emsg[port].buf, 0x3c, sizeof(tx_emsg[port].buf));
+	tx_emsg[port].len = 30;
+
+	prl_send_ext_data_msg(port, TCPCI_MSG_SOP, PD_EXT_SINK_CAP);
+
+	/* Allow transmission of chunk 0, transition to TCH_WAIT_CHUNK_REQUEST,
+	 * and wait for ChunkSenderRequestTimer timeout.
+	 */
+	k_sleep(K_MSEC(60));
+
+	zassert_equal(
+		TCH_WAIT_FOR_MESSAGE_REQUEST_FROM_PE, tch_get_state(port),
+		"Expected TCH to return to wait state after message sent");
+
+	/* 2. Transmit multi-chunk message and reply with matching Chunk Request
+	 * (chunk 1) */
+	tx_emsg[port].len = 30;
+	prl_send_ext_data_msg(port, TCPCI_MSG_SOP, PD_EXT_SINK_CAP);
+	k_sleep(K_MSEC(10));
+
+	/* Send Chunk Request for chunk 1 */
+	super_fixture->partner_emul.sop_msg_id++;
+	hdr = PD_HEADER(PD_EXT_SINK_CAP, super_fixture->partner_emul.power_role,
+			super_fixture->partner_emul.data_role,
+			super_fixture->partner_emul.sop_msg_id & 0x7, 1,
+			PD_REV30, 1);
+	exthdr = PD_EXT_HEADER(1 /* chunk_num */, 1 /* req_chunk */, 0);
+	raw_buf[0] = hdr & 0xff;
+	raw_buf[1] = (hdr >> 8) & 0xff;
+	raw_buf[2] = exthdr & 0xff;
+	raw_buf[3] = (exthdr >> 8) & 0xff;
+	send_raw_rx_msg(super_fixture->tcpci_emul, TCPCI_MSG_SOP, raw_buf,
+			2 + 4);
+	k_sleep(K_MSEC(50));
+
+	zassert_equal(
+		TCH_WAIT_FOR_MESSAGE_REQUEST_FROM_PE, tch_get_state(port),
+		"Expected TCH to return to wait state after message sent");
+
+	/* 3. Test data message length clamping when tx_emsg len >
+	 * CHK_BUF_SIZE_BYTES (line 835) */
+	tx_emsg[port].len = 35;
+	prl_send_data_msg(port, TCPCI_MSG_SOP, PD_DATA_VENDOR_DEF);
+	k_sleep(K_MSEC(50));
+
+	prl_set_debug_level(DEBUG_DISABLE);
 }
