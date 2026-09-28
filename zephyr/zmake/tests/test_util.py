@@ -61,3 +61,29 @@ def test_read_kconfig_autoconf_value(value):
 def test_c_str(input_str, expected_result):
     """Test the util.c_str function."""
     assert util.c_str(input_str) == expected_result
+
+
+@pytest.mark.parametrize(
+    "marker",
+    [".repo", ".supermanifest", ".citc"],
+)
+def test_locate_cros_checkout(tmp_path, monkeypatch, marker):
+    """Test locate_cros_checkout with repo and Cog checkout markers."""
+    checkout = tmp_path / "chrome-internal"
+    subdir = checkout / "src" / "platform" / "ec"
+    subdir.mkdir(parents=True)
+
+    if marker == ".repo":
+        (checkout / ".repo").mkdir()
+    elif marker == ".supermanifest":
+        (checkout / ".supermanifest").write_text(
+            "chromeos/manifest-internal refs/heads/main 0000\n",
+            encoding="utf-8",
+        )
+    elif marker == ".citc":
+        (tmp_path / ".citc").mkdir()
+
+    monkeypatch.delenv("CROS_WORKON_SRCROOT", raising=False)
+    monkeypatch.chdir(subdir)
+
+    assert util.locate_cros_checkout() == checkout.resolve()
