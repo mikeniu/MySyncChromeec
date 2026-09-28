@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cfa4189_82f61985",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-28T06:07:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/730cb7fd-5687-4125-a5c8-9228a390432f)]\n\n### Review Summary\n* **Functionality**: The code properly implements the OTP key reading and provisioning logic using the Zephyr OTP API. The previous feedback (NULL checks, device readiness checks in init and read, and stack buffer alignment) has been fully incorporated. The implementation correctly cleans up sensitive key data from the stack on all return paths.\n* **Architecture \u0026 Component Fit**: The new logic fits well within the EC Zephyr shim layer for Realtek FP, correctly relying on the standard `otp_dev` zephyr device tree node (`ocotp`) and standard `trng` interfaces.\n* **Code Simplicity**: The implementation is straightforward and correctly handles the necessary read/provision/verify states without any unnecessary abstractions.\n* **Idiomaticity \u0026 Readability**: The code correctly uses modern Zephyr and EC idioms, such as `DEVICE_DT_GET` and the appropriate logging macros.\n* **Security**: Excellent use of `trng_rand_bytes` for key generation and `OPENSSL_cleanse` to sanitize the stack buffer before returning, ensuring no key material is leaked.\n* **Testing \u0026 Test Coverage**: The implementation correctly relies on the existing `otp_key` device test suite (`run_device_tests.py -b realtekfp -t otp_key --zephyr`), which covers the necessary flows.\n* **CL Size \u0026 Scope**: Size: M (+117, -1). The CL is appropriately sized, small, and tightly scoped to adding OTP support for `rtkfp`.\n* **Commit Message**: The commit message is accurate, provides the necessary motivation, and uses the correct `BUG\u003d`/`TEST\u003d` ChromiumOS formatting.\n\nTAG\u003dagy\nCONV\u003de4514170-9dfe-4cd5-bba3-d0d4393f02a0",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "52d6c540b525b3a77e38599603c35c86b84b8f07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
