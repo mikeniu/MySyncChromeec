@@ -20,6 +20,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef43fc7d_85a139f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-28T17:17:50Z",
+      "side": 1,
+      "message": "Acknowledged. The input buffer size validation is implemented and tested in dedicated follow-up CL:8434542 to keep this migration CL purely mechanical per review request.",
+      "parentUuid": "c8cbff21_f27a08ae",
+      "isAi": true,
+      "revId": "11d587431478369c12881c8501febafd67871aa1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a57e2b7_51cd07bb",
