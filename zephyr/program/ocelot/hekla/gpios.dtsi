@@ -193,7 +193,7 @@
 		};
 		/* EC_M3 CODEC_EC_MUTE_N_R */
 		gpio_ec_codec_mute_n_r: ec_codec_mute_n_r {
-			gpios = <RTS5912_GPIO030 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_HIGH)>;
+			gpios = <RTS5912_GPIO030 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		/* EC_CAMERA_FW_SHUT_CTRL */
 		gpio_ec_camera_fw_shut_ctrl: ec_camera_fw_shut_ctrl {
