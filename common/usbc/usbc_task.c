@@ -149,8 +149,7 @@ static bool pd_task_loop(int port)
 	pe_run(port, evt, tc_get_pd_enabled(port));
 
 	/* Run protocol state machine */
-	if (IS_ENABLED(CONFIG_USB_PRL_SM))
-		prl_run(port, evt, tc_get_pd_enabled(port));
+	prl_run(port, evt, tc_get_pd_enabled(port));
 
 	/* Run TypeC state machine */
 	if (IS_ENABLED(CONFIG_USB_TYPEC_SM))

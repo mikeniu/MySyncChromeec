@@ -13,9 +13,7 @@ common-usbc-$(CONFIG_USB_DRP_ACC_TRYSRC) += usb_tc_drp_acc_trysrc_sm.o
 endif # CONFIG_USB_TYPEC_SM
 
 # Protocol state machine
-ifneq ($(CONFIG_USB_PRL_SM),)
 common-usbc-$(CONFIG_USB_PD_TCPMV2) += usb_prl_sm.o
-endif # CONFIG_USB_PRL_SM
 
 # Policy Engine state machines
 common-usbc-$(CONFIG_USB_DRP_ACC_TRYSRC) += usbc_pd_policy.o
