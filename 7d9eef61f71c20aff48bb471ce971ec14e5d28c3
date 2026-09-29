@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c74e712a_1245e188",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T16:49:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8311950_04aff6e5-cb3d-456c-824c-42f6ef389886.pb)]\n\n### Review Summary\n*   **Functionality:** The addition of the ELANHV515RC fingerprint sensor configuration is correct. The Kconfig entries, device tree bindings, and hardware register definitions align perfectly with the existing ELAN sensor support infrastructure.\n*   **Architecture \u0026 Component Fit:** The changes seamlessly integrate with the existing ELAN series driver model, correctly expanding the sensor type detection and defining component-specific macros without layering violations.\n*   **Code Simplicity:** The configuration code is straightforward and properly scoped, utilizing `#define` constants over hardcoded literals.\n*   **Idiomaticity \u0026 Readability:** The use of hardware definition headers and Zephyr macros conforms to C and Zephyr ecosystem idioms, with all domain values properly extracted to named constants.\n*   **Testing \u0026 Test Coverage:** The hardware enablement changes are compile-time evaluations and definitions, which are inherently difficult to unit test without physical hardware or a full simulator framework. The CL was build-tested successfully.\n*   **CL Size \u0026 Scope:** `Size: M (+148, -1)`. The CL is well-scoped, self-contained, and follows the single logical change rule.\n*   **Commit Message:** The commit message accurately reflects the changes, providing clear rationale and correctly formatted `BUG\u003d` and `TEST\u003d` tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7d9eef61f71c20aff48bb471ce971ec14e5d28c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
