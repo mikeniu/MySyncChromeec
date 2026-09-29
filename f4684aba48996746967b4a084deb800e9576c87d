@@ -18,6 +18,30 @@
       "isAi": true,
       "revId": "f4684aba48996746967b4a084deb800e9576c87d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8f1c8d3_165f08eb",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T23:17:20Z",
+      "side": 1,
+      "message": "Since `cols` and `rows` are `uint16_t` (max `65535 * 65535 \u003d 4,294,836,225`, leaving `131,070` bytes of headroom before `UINT32_MAX`) and `FT_RAW_SIZE` is a compile-time constant (`20480 \u003c\u003d 131070`), `size_add_overflow` is unreachable at runtime and cannot be exercised by unit tests.\n\nConsider replacing the runtime overflow check with a compile-time `BUILD_ASSERT` (which also removes the need to `#include \u003czephyr/sys/math_extras.h\u003e`):\n\n```c\n\tBUILD_ASSERT(FT_RAW_SIZE \u003c\u003d\n\t\t     SIZE_MAX - (size_t)UINT16_MAX * (size_t)UINT16_MAX);\n\tsize_t required_size \u003d\n\t\t(size_t)FT_RAW_SIZE + (size_t)cols * (size_t)rows;\n```",
+      "range": {
+        "startLine": 307,
+        "startChar": 0,
+        "endLine": 315,
+        "endChar": 2
+      },
+      "isAi": true,
+      "revId": "f4684aba48996746967b4a084deb800e9576c87d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
