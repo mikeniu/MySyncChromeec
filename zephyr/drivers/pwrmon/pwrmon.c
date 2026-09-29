@@ -169,12 +169,15 @@ static int pwrmon_monitors_start(void)
 		if (device_is_ready(power_monitor)) {
 			continue;
 		}
+		power_monitor->state->initialized = false;
+		power_monitor->state->init_res = 0;
 		ret = device_init(power_monitor);
 		if (ret) {
 			LOG_ERR("Failed to initialize power monitor %d err: %d",
 				i, ret);
 			return ret;
 		}
+		k_msleep(2);
 	}
 	return 0;
 }
@@ -203,7 +206,13 @@ static enum ec_status pwrmon_channels_enable(bool start)
 			if (ret) {
 				enabled_channels--;
 				LOG_ERR("Unable to start channel %d %s err: %d",
-					i, channel->channel_name, ret);
+					i,
+					channel->channel_name ?
+						channel->channel_name :
+						"none",
+					ret);
+			} else {
+				k_msleep(2);
 			}
 		}
 	}
@@ -227,6 +236,7 @@ static enum ec_status pwrmon_set_rate(uint16_t sample_rate)
 		if (ret) {
 			return EC_RES_ERROR;
 		}
+		k_msleep(2);
 	}
 
 	pwrmon_data.sample_rate = sample_rate;
@@ -290,7 +300,8 @@ static enum ec_status pwrmon_sample_get(uint8_t channel_id, uint32_t *samples,
 	ret = sensor_channel_get(power_monitor, sensor_channel, &val);
 	if (ret) {
 		LOG_WRN("Failed to get sample count for channel %s err: %d",
-			channel->channel_name, ret);
+			channel->channel_name ? channel->channel_name : "none",
+			ret);
 		return EC_RES_ERROR;
 	}
 	*samples = val.val1;
@@ -381,7 +392,7 @@ hc_pwrmon_handler(struct ec_host_cmd_handler_args *args)
 		}
 
 		ret = gpio_pin_configure_dt(&pwrmon_config.pwrmon_gpio,
-					    GPIO_OUTPUT_HIGH);
+					    GPIO_OUTPUT_ACTIVE);
 		if (ret) {
 			LOG_ERR("Failed to initialize gpio err: %d", ret);
 			return EC_HOST_CMD_ERROR;
