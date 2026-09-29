@@ -37,7 +37,7 @@ static k_tid_t find_thread_by_name(const char *name)
 /* Utilities for checking asserts */
 static bool expect_assert;
 static int num_asserts;
-void assert_post_action(const char *file, unsigned int line)
+void zassert_post_action(const char *file, unsigned int line)
 {
 	num_asserts += 1;
 	if (!expect_assert) {

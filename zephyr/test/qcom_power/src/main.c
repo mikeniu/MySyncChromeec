@@ -588,7 +588,7 @@ ZTEST(qcom_power, test_chipset_power_on)
 static jmp_buf assert_jumpdata;
 static int num_asserts;
 
-void assert_post_action(const char *file, unsigned int line)
+void zassert_post_action(const char *file, unsigned int line)
 {
 	++num_asserts;
 	longjmp(assert_jumpdata, 1);

@@ -300,31 +300,27 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #endif /* CONFIG_ZTEST_FATAL_HOOK */
 
 #ifdef CONFIG_PLATFORM_EC_DEBUG_ASSERT
-#ifdef CONFIG_ASSERT_NO_FILE_INFO
-__override void assert_post_action(void)
-{
-	panic_data_write_assert(NULL, 0);
-
-	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
-		command_crash_nested_handler();
-
-	panic_reboot();
-}
-#else
-__override void assert_post_action(const char *path, unsigned int line)
+#ifndef CONFIG_ASSERT_TEST
+FUNC_NORETURN
+#endif
+__override void zassert_post_action(const char *path, unsigned int line)
 {
 	panic_data_write_assert(path, line);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
 
-	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT)) {
+	if (!IS_ENABLED(CONFIG_ASSERT_NO_FILE_INFO) &&
+	    IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT)) {
 		print_stack_trace(k_current_get());
 	}
 
 	panic_reboot();
+
+#ifndef CONFIG_ASSERT_TEST
+	CODE_UNREACHABLE;
+#endif
 }
-#endif /* CONFIG_ASSERT_NO_FILE_INFO */
 #endif /* CONFIG_PLATFORM_EC_DEBUG_ASSERT */
 
 uint32_t panic_get_reason_reg(const struct panic_data *pdata)

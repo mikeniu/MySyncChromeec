@@ -24,12 +24,12 @@ static const struct device fake_pdc = {
 };
 
 /* LCOV_EXCL_START - These tests expect an assertion and thus the test function
- * and `assert_post_action` do not exit naturally (we directly pass or fail the
+ * and `zassert_post_action` do not exit naturally (we directly pass or fail the
  * test). This leaves the final lines of these functions uncoverable.
  */
 
 /* Called by Zephyr when an __ASSERT() macro trips. */
-void assert_post_action(const char *file, unsigned int line)
+void zassert_post_action(const char *file, unsigned int line)
 {
 	if (!expect_assert) {
 		/* Asserted somewhere we should not have */

@@ -146,7 +146,7 @@ For example, an assertion failure in `charge_state.c` at line `124` would have `
 
 *   **Exception Field**: This field is populated with the thread ID (`k_tid_t` cast to `uint8_t`, which truncates it to 1 byte) of the thread that triggered the assertion.
 
-In Zephyr EC, asserts override Zephyr's `assert_post_action()` (see [zephyr/shim/src/panic.c](../zephyr/shim/src/panic.c#216)). It extracts the basename of the file path before encoding it, writes the panic data, and then reboots.
+In Zephyr EC, asserts override Zephyr's `zassert_post_action()` (see [zephyr/shim/src/panic.c](../zephyr/shim/src/panic.c#216)). It extracts the basename of the file path before encoding it, writes the panic data, and then reboots.
 
 ## Watchdog Handling
 
