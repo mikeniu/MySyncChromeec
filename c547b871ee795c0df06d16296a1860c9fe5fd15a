@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "284a30fb_8bf2b392",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T01:49:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8237836_b239ca5a-1d94-4c14-bb10-98399118917b.pb)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The memory clearing logic uses C-style `memset` with safe `uintptr_t` arithmetic. The linker script correctly defines the end boundaries. The test cleanly verifies behavior across soft resets by poisoning the buffer before reboot.\n*   **Architecture \u0026 Component Fit:** ✅ By placing the initialization logic in `system_pre_init()` specifically for the STM32H7 chip, the change respects architectural boundaries and avoids polluting the generic Cortex-M startup code.\n*   **Code Simplicity:** ✅ The solution is minimal and directly addresses the uninitialized memory issue.\n*   **Idiomaticity \u0026 Readability:** ✅ The C code matches the existing style and conventions. No magic values were introduced.\n*   **Testing:** ✅ A new automated multi-step test (`fp_buffer_clear`) was added that systematically poisons the `fp_buffer` across reboots, proving that the initialization successfully purges stale memory. This demonstrates an excellent approach to testing hardware state transitions.\n*   **CL Size \u0026 Scope:** `Size: M (+136, -0)` ✅ The CL is small, self-contained, and focused purely on this single logical change.\n*   **Commit Message:** ✅ The commit message provides an excellent explanation of the *Why* (NOLOAD region persisting across resets causing unexpected behavior) and accurately describes the *What*. The `BUG\u003d` and `TEST\u003d` footers correctly follow ChromiumOS conventions.\n\nTAG\u003dagy\nCONV\u003db08c4966-187c-481f-9681-df950053a5ea",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
