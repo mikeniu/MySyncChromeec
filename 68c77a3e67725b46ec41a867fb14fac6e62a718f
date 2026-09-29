@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1e0e7eb7_fe966402",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-29T17:14:40Z",
+      "side": 1,
+      "message": "This seems to be a duplicate of https://crrev.com/c/8084849",
+      "revId": "68c77a3e67725b46ec41a867fb14fac6e62a718f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8a04f892_bb2ff779",
         "filename": "common/charge_state.c",
         "patchSetId": 1
