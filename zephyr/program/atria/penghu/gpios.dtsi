@@ -37,6 +37,10 @@
 		gpio_en_pp5000_fan: en_pp5000_fan {
 			gpios = <&gpioc 4 (GPIO_OUTPUT | GPIO_ACTIVE_LOW)>;
 		};
+		gpio_tablet_mode_l: tablet_mode_l {
+			gpios = <&gpiod 1 (GPIO_INPUT)>;
+			enum-name = "GPIO_TABLET_MODE_L";
+		};
 		gpio_ec_soc_rtcrst: ec_soc_rtcrst {
 			gpios = <&gpioh 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
