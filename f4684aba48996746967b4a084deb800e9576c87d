@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6629dfac_dd1b082d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T22:28:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/79270b3b-7c36-4beb-9ade-db2e8ce2c0b3)]\n\n### Review Summary\n\n*   **Functionality:** **Good.** The bounds check correctly calculates the required frame size using dynamic sensor dimensions (`cols` and `rows`) and ensures it fits within `image_buf_size`. Placing the `IS_ENABLED(CONFIG_HAVE_FT98XX_PRIVATE_DRIVER)` check before private API calls safely avoids potential linker or execution errors.\n*   **Code Simplicity:** **Good.** The logic is straightforward and uses the Zephyr `size_add_overflow` utility to safely handle overflow conditions.\n*   **Idiomaticity \u0026 Readability:** **Good.** The code correctly adheres to language standards and uses explicit named constants/macros.\n*   **Security:** **Good.** Adding `size_add_overflow` to check `FT_RAW_SIZE + frame_pixels` ensures that a very large frame size cannot wrap around and bypass the bounds check. The `required_size \u003e image_buf_size` check strictly prevents buffer overflows.\n*   **Testing:** **Good.** The newly added unit tests `test_acquire_image_exceeds_runtime_frame_size` and `test_acquire_image_valid_runtime_frame_size` effectively exercise the boundary conditions of the runtime frame size check.\n*   **CL Size \u0026 Scope:** Size: M (+50, -0). **Good.** The CL focuses tightly on a single logical change: runtime dimension bounds checking.\n*   **Commit Message:** **Good.** The commit message concisely describes the motivation and methodology, and properly formats the `BUG\u003d` and `TEST\u003d` footers for the ChromiumOS ecosystem.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "f4684aba48996746967b4a084deb800e9576c87d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
