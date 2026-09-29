@@ -77,7 +77,10 @@ register_rtk59_project(
 
 register_it8xxx2_project(
     project_name="penghu",
-    extra_modules=["pigweed"],
+    extra_kconfig_files=[
+        here / "dsp_comms.conf",
+    ],
+    extra_modules=["pigweed", "nanopb"],
     snippets=["pw-tokenize"],
 )
 
