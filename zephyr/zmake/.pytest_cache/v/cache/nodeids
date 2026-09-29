@@ -1,0 +1,16 @@
+[
+  "tests/test_version.py::test_header_gen",
+  "tests/test_version.py::test_header_gen_exists_needs_changes",
+  "tests/test_version.py::test_header_gen_exists_not_changed",
+  "tests/test_version.py::test_header_gen_reproducible_build",
+  "tests/test_version.py::test_version_string",
+  "tests/test_version.py::test_version_string_default",
+  "tests/test_version.py::test_version_string_default_static",
+  "tests/test_version.py::test_version_string_no_git",
+  "tests/test_version.py::test_version_string_static",
+  "tests/test_version.py::test_version_string_supermanifest[-prj-123.456.789-unknown]",
+  "tests/test_version.py::test_version_string_supermanifest[chromiumos/manifest refs/heads/main 42422b14cba582801eeed182bf510a68bf69840c extra\\n-prj-123.456.789-42422b1]",
+  "tests/test_version.py::test_version_string_supermanifest[chromiumos/manifest refs/heads/main 42422b14cba582801eeed182bf510a68bf69840c\\n-prj-123.456.789-42422b1]",
+  "tests/test_version.py::test_version_string_supermanifest[chromiumos/manifest refs/heads/main\\n-prj-123.456.789-unknown]",
+  "tests/test_version.py::test_version_string_supermanifest_oserror"
+]
