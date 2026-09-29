@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15af18c8_5eaa07f2",
+        "filename": "common/usbc/usb_pd_console.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-29T22:25:07Z",
+      "side": 1,
+      "message": "Done. Moved IS_ENABLED(CONFIG_USB_PD_EPR) inside pe_snk_in_epr_mode()",
+      "parentUuid": "3f9149ce_7cd3842c",
+      "revId": "c273ca95bbabf526a65168314a1ccaa277938f64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a46570f_b0c64010",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-29T20:23:35Z",
       "side": 1,
       "message": "Nit: You can\u0027t have a PE without a PRL, so this technically tells you all you need to know. However, the more illuminating edit here would probably be \"or\" -\u003e \"and\".",
+      "revId": "c273ca95bbabf526a65168314a1ccaa277938f64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19b900ee_ac827cd3",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-29T22:25:07Z",
+      "side": 1,
+      "message": "Removed this whole stub block and comment in the follow-up CL removing CONFIG_USB_PRL_SM: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8486932",
+      "parentUuid": "0a46570f_b0c64010",
       "revId": "c273ca95bbabf526a65168314a1ccaa277938f64",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -69,6 +105,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b4fd436_5f757e69",
+        "filename": "common/usbc/usbc_task.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-29T22:25:07Z",
+      "side": 1,
+      "message": "Done in the follow-up CL: https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8486932",
+      "parentUuid": "e7adf04e_ea6e458c",
+      "revId": "c273ca95bbabf526a65168314a1ccaa277938f64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80190b03_f5dea1cb",
@@ -82,6 +136,24 @@
       "writtenOn": "2026-09-29T20:23:35Z",
       "side": 1,
       "message": "Are there still targets that use these fakes, as distinct from what would be defined if the PE was compiled in?",
+      "revId": "c273ca95bbabf526a65168314a1ccaa277938f64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c81c5b5e_f437d935",
+        "filename": "test/fake_usbc.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-29T22:25:07Z",
+      "side": 1,
+      "message": "No, test/fake_usbc.c is unused now. Rebased onto https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8274396 which deletes test/fake_usbc.c.",
+      "parentUuid": "80190b03_f5dea1cb",
       "revId": "c273ca95bbabf526a65168314a1ccaa277938f64",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
