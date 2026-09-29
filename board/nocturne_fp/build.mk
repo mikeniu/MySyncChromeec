@@ -36,6 +36,7 @@ test-list-y=\
        exit \
        flash_physical \
        flash_write_protect \
+       fp_buffer_clear \
        fp_transport \
        fpsensor_auth_crypto_stateful \
        fpsensor_auth_crypto_stateless \
