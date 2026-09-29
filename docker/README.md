@@ -21,8 +21,8 @@ The workspace directory structure matches standard expectations of ChromiumOS
 *   `Dockerfile`: Builds the optimized Ubuntu-based environment with compiler
     pre-requisites.
 *   `entrypoint.sh`: Runs on container startup to populate/update checkouts,
-    initialize python virtual environments, auto-install `.vpython3`
-    dependencies, and export Coreboot SDK environment variables dynamically.
+    initialize python virtual environments, and auto-install `.vpython3`
+    dependencies.
 *   `workspace/`: Bind mount source for the container. Tracked, but empty, so
     that a fresh checkout owns it; everything below it is ignored.
 *   `workspace/src/platform/ec/`: The Chromium OS EC firmware source.
