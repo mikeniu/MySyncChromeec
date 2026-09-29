@@ -18,6 +18,162 @@
       "isAi": true,
       "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c646b08_576eefe6",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T16:55:46Z",
+      "side": 1,
+      "message": "nit: Instead of hardcoding `__ahb4_start` / `__ahb4_end` under `#if defined(CHIP_FAMILY_STM32H7)`, note that `include/link_defs.h:133-144` and `common/main.c:113-120` already have a generic `REGION()` x-macro pattern using `CONFIG_CHIP_MEMORY_REGIONS` and `#include \"memory_regions.inc\"` to declare and zero `NOLOAD` regions (or `CHIP_VARIANT_STM32H7X3`, which is the guard around `REGION(ahb4, ...)` in `chip/stm32/memory_regions.inc:10`).",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1097ddf7_c242d7fe",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T16:55:46Z",
+      "side": 1,
+      "message": "nit: The commit message says: *\"Clear the `.ahb4` region in `system_pre_init()` immediately after enabling the AHB4 clock domain.\"*\n\nNote that `STM32_RCC_AHB4ENR |\u003d BIT(28);` on line 295 enables `BKPRAMEN` (the 4 KB Backup SRAM at `0x38800000`), not D3 SRAM4 (`0x38000000`, where `.ahb4` lives). D3 SRAM4 is controlled by `BIT(29)` (`SRAM4EN`), which is enabled by default out of reset (`RCC_AHB4ENR` reset value is `0x20000000`). Clearing `.ahb4` here in `system_pre_init()` is fine, but please update the commit message so it doesn\u0027t imply `BIT(28)` enables the `.ahb4` SRAM clock.",
+      "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0457dd1a_38a76b7f",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T16:55:46Z",
+      "side": 1,
+      "message": "Clearing `[__ahb4_start, __ahb4_end)` only in `system_pre_init()` does not fully address b/524097509:\n\n1. **Field devices with write-protected RO:** On deployed devices (`dartmonkey`, `nocturne_fp`, `nami_fp`), RO is hardware write-protected (`WP_ON`) and will not receive this update; only RW is updated. If the EC resets from RW and remains in RO (without jumping to RW), RW\u0027s `system_pre_init()` never runs after the reset, and factory RO will still see stale RW `.ahb4` contents. To protect field devices, RW also needs to clear `.ahb4` before resetting in `system_reset()` (e.g., right after `cpu_disable_caches()`).\n2. **RO vs. RW `.ahb4` size mismatch:** Even when RO is updated, `memset(__ahb4_start, 0, (uintptr_t)__ahb4_end - (uintptr_t)__ahb4_start)` only clears the `.ahb4` range of the *currently booting* image. In RO, `.ahb4` is only ~2.1 KB (`tx_buf` + `rx_buf`), whereas in RW `.ahb4` is \u003e40 KB (`fp_buffer`, `ctx`, `spi_buf`, `tx_buf`, `rx_buf`). When resetting from RW and staying in RO, ~95% of RW\u0027s `.ahb4` region remains uncleared in SRAM4.\n3. **`.ahb` (`NOLOAD`) region:** On `nocturne_fp`/`dartmonkey`, `fp_template` and `fp_enc_buffer` are placed in `.ahb` (`0x30000000`, D2 SRAM1-3 in `chip/stm32/memory_regions.inc`), which is also `NOLOAD` and persists across resets. Please check whether `.ahb` (`[__ahb_start, __ahb_end)`) should also be cleared (note that D2 SRAM1-3 clocks in `RCC_AHB2ENR` bits 29-31 must be enabled before accessing `0x30000000`, whereas D3 SRAM4 in `RCC_AHB4ENR` bit 29 is enabled by default out of reset).",
+      "range": {
+        "startLine": 306,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a442458_ae77236e",
+        "filename": "core/cortex-m/ec.lds.S",
+        "patchSetId": 11
+      },
+      "lineNbr": 679,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T16:55:46Z",
+      "side": 1,
+      "message": "In response to the PS 9 comment about splitting the linker script change into its own commit, https://crrev.com/c/8263903 (`cortex-m: Align chip memory regions and export end symbols`) was uploaded as a child of this CL rather than its parent, and `__##name##_end \u003d .;` remained in this CL while only `. \u003d ALIGN(4);` is in CL 8263903 (even though CL 8263903\u0027s commit message states that it defines `__\u003cname\u003e_end` symbols).\n\nAdditionally, `chip/stm32/system.c` declares `extern uint32_t __ahb4_start[];` and `extern uint32_t __ahb4_end[];`, which assumes 4-byte alignment that isn\u0027t guaranteed until CL 8263903.\n\nCan you move the `core/cortex-m/ec.lds.S` changes (`__##name##_end \u003d .;` + `. \u003d ALIGN(4);`) into https://crrev.com/c/8263903 and rebase this CL on top of it (and/or declare `__ahb4_start[]` and `__ahb4_end[]` as `uint8_t[]` like `include/link_defs.h:133-138`)?",
+      "range": {
+        "startLine": 668,
+        "startChar": 0,
+        "endLine": 679,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7583217f_d38e429f",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T16:55:46Z",
+      "side": 1,
+      "message": "On PS 7 (`chip/stm32/system.c:311`), the comment asked for a test that checks that `[__ahb4_start, __ahb4_end)` is all zero in both RO and RW (marked \"Done\"), but this test only runs in `SECTION_IS_RW` and only checks `fp_buffer` (not RO, and not the full `[__ahb4_start, __ahb4_end)` range). Can we also verify RO and the full `[__ahb4_start, __ahb4_end)` range on STM32H7?",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "445b0431_0dabb5d6",
+        "filename": "test/fp_buffer_clear.tasklist",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T16:55:46Z",
+      "side": 1,
+      "message": "nit: Update copyright year to 2026.",
+      "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd183783_b75b90f1",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 805,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T16:55:46Z",
+      "side": 1,
+      "message": "The Zephyr counterpart (https://crrev.com/c/8281245) already landed on `main` and updated `test/run_device_tests.py` with `TestConfig(test_name\u003d\"fp_buffer_clear\")` plus skip entries in `_skip_test_chudow` and `_skip_test_helipilot`. Copybot has already generated https://crrev.com/c/8351643 on `ec-legacy` to downstream that change.\n\nModifying `test/run_device_tests.py` here without the `_skip_test_chudow` / `_skip_test_helipilot` entries diverges from `main` and will cause a merge conflict for Copybot. Please either drop `test/run_device_tests.py` from this CL and land https://crrev.com/c/8351643 alongside it (`Cq-Depend: chromium:8237836`), or include the full `test/run_device_tests.py` diff from CL 8351643.",
+      "range": {
+        "startLine": 803,
+        "startChar": 0,
+        "endLine": 805,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
