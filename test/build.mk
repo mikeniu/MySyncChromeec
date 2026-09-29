@@ -209,6 +209,7 @@ entropy-y=entropy.o
 exception-y=exception.o
 exit-y=exit.o
 fan-y=fan.o
+fp_buffer_clear-y=fp_buffer_clear.o
 flash-y=flash.o
 flash_physical-y=flash_physical.o
 flash_write_protect-y=flash_write_protect.o
