@@ -18,6 +18,29 @@
       "isAi": true,
       "revId": "1ee3b0521e3642f821f394f9b678e526bc5ca38c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba8b90d8_3cdea651",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T21:07:42Z",
+      "side": 1,
+      "message": "Does the `if IS_ENABLED` syntax work here and below?",
+      "range": {
+        "startLine": 315,
+        "startChar": 7,
+        "endLine": 315,
+        "endChar": 29
+      },
+      "revId": "1ee3b0521e3642f821f394f9b678e526bc5ca38c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
