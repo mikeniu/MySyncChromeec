@@ -1054,6 +1054,20 @@ test_export_static void deep_charge_battery(int *need_static)
 	}
 }
 
+static void battery_fet_enable_deferred(void)
+{
+	const struct fuel_gauge_info *fuel_gauge = battery_get_fuel_gauge();
+	const struct fet_enable_info *fet = &fuel_gauge->fet_enable;
+	int rv;
+
+	rv = sb_write(fet->reg_addr, fet->reg_data[1]);
+	if (rv) {
+		CPRINTS("Battery FET enable deferred failed: rv=%d", rv);
+	}
+	battery_cutoff_set_state(BATTERY_CUTOFF_STATE_NORMAL);
+}
+DECLARE_DEFERRED(battery_fet_enable_deferred);
+
 test_export_static void revive_battery(int *need_static)
 {
 	if (IS_ENABLED(CONFIG_BATTERY_REQUESTS_NIL_WHEN_DEAD) &&
@@ -1069,6 +1083,29 @@ test_export_static void revive_battery(int *need_static)
 	} else if (IS_ENABLED(CONFIG_BATTERY_REVIVE_DISCONNECT) &&
 		   curr.requested_voltage == 0 && curr.requested_current == 0 &&
 		   battery_seems_disconnected) {
+		const struct fuel_gauge_info *fuel_gauge =
+			battery_get_fuel_gauge();
+		const struct fet_enable_info *fet = &fuel_gauge->fet_enable;
+		int rv;
+
+		if (battery_get_disconnect_state() == BATTERY_DISCONNECTED) {
+			if (fet->reg_addr && fet->reg_data[0]) {
+				battery_cutoff_set_state(
+					BATTERY_CUTOFF_STATE_IN_PROGRESS);
+				rv = sb_write(fet->reg_addr, fet->reg_data[0]);
+				if (rv) {
+					CPRINTS("Battery FET enable failed: rv=%d",
+						rv);
+					battery_cutoff_set_state(
+						BATTERY_CUTOFF_STATE_NORMAL);
+				} else {
+					hook_call_deferred(
+						&battery_fet_enable_deferred_data,
+						fet->delay_ms * MSEC);
+				}
+			}
+		}
+
 		/*
 		 * Battery is in disconnect state. Apply a
 		 * current to kick it out of this state.

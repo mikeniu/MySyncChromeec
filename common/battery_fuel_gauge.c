@@ -293,6 +293,11 @@ const struct battery_info *battery_get_info(void)
 	return &get_batt_params()->batt_info;
 }
 
+const struct fuel_gauge_info *battery_get_fuel_gauge(void)
+{
+	return &get_batt_params()->fuel_gauge;
+}
+
 #ifndef CONFIG_FUEL_GAUGE
 /**
  * Battery cut off command via SMBus write block.

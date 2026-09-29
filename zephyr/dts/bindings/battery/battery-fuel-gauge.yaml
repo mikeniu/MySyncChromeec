@@ -64,6 +64,22 @@ properties:
        Value that describes which bits must be set to determine that
        charge FET has disconnected the battery.
     type: int
+  fet_enable_reg_addr:
+    description: |
+       Register address to command the fuel gauge to enable/reconnect FETs.
+    type: int
+    required: false
+  fet_enable_reg_data:
+    description: |
+       Sequential array of values written to fet_enable_reg_addr to reconnect FETs.
+    type: array
+    required: false
+  fet_enable_delay_ms:
+    description: |
+       Delay in milliseconds between writes in fet_enable_reg_data (default: 1000).
+    type: int
+    default: 1000
+    required: false
   imbalance_mv:
     description: |
        This property is used only if

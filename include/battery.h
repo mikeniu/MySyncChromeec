@@ -197,6 +197,11 @@ int battery_get_avg_voltage(void); /* in mV */
 const struct battery_info *battery_get_info(void);
 
 /**
+ * Return vendor-provided fuel gauge constants.
+ */
+const struct fuel_gauge_info *battery_get_fuel_gauge(void);
+
+/**
  * Get current battery parameters.
  *
  * Error conditions are reported via batt.flags.
@@ -492,6 +497,13 @@ int board_cut_off_battery(void);
  * Return if the battery start cut off.
  */
 int battery_cutoff_in_progress(void);
+
+/**
+ * Set the battery cutoff state.
+ *
+ * @param state New cutoff state.
+ */
+void battery_cutoff_set_state(enum battery_cutoff_states state);
 
 /**
  * Return if the battery has been cut off.

@@ -25,6 +25,11 @@
 		.cfet_mask = DT_PROP_OR(node, fet_cfet_mask, 0), \
 		.cfet_off_val = DT_PROP_OR(node, fet_cfet_off_val, 0), \
 	}, \
+	.fet_enable = { \
+		.reg_addr = DT_PROP_OR(node, fet_enable_reg_addr, 0), \
+		.reg_data = DT_PROP_OR(node, fet_enable_reg_data, {0}), \
+		.delay_ms = DT_PROP_OR(node, fet_enable_delay_ms, 1000), \
+	}, \
 	COND_CODE_1(UTIL_AND(IS_ENABLED(CONFIG_BATTERY_MEASURE_IMBALANCE), \
 			     DT_NODE_HAS_PROP(node, imbalance_mv)), \
 		(.imbalance_mv = DT_STRING_TOKEN(node, imbalance_mv),), ()) \

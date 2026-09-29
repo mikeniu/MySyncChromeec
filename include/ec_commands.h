@@ -8261,6 +8261,7 @@ struct ec_response_typec_vdm_response {
 
 /* Number of writes needed to invoke battery cutoff command */
 #define SHIP_MODE_WRITES 2
+#define FET_ENABLE_WRITES 2
 
 struct ship_mode_info {
 	uint8_t reg_addr;
@@ -8281,6 +8282,13 @@ struct fet_info {
 	uint16_t disconnect_val;
 	uint16_t cfet_mask; /* CHG FET status mask */
 	uint16_t cfet_off_val;
+} __packed __aligned(2);
+
+struct fet_enable_info {
+	uint8_t reg_addr;
+	uint8_t reserved;
+	uint16_t reg_data[FET_ENABLE_WRITES];
+	uint16_t delay_ms;
 } __packed __aligned(2);
 
 enum fuel_gauge_flags {
@@ -8312,6 +8320,7 @@ struct fuel_gauge_info {
 	struct ship_mode_info ship_mode;
 	struct sleep_mode_info sleep_mode;
 	struct fet_info fet;
+	struct fet_enable_info fet_enable;
 } __packed __aligned(4);
 
 /* Battery constants */
