@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e6db2589_fd10ff43",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-09-29T06:47:00Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "d1eae2e9_48411547",
+      "revId": "4fe689f684c207173d0f0d4459363ab028e25af8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ca9f70b1_7db74664",
         "filename": "zephyr/program/calypso/mensa/src/chipset.c",
         "patchSetId": 1
@@ -31,6 +49,30 @@
       "writtenOn": "2026-09-28T12:30:14Z",
       "side": 1,
       "message": "Please clear the deferred call before resetting this pin.",
+      "range": {
+        "startLine": 64,
+        "startChar": 1,
+        "endLine": 64,
+        "endChar": 66
+      },
+      "revId": "4fe689f684c207173d0f0d4459363ab028e25af8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bd3295c_d11fce4b",
+        "filename": "zephyr/program/calypso/mensa/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-09-29T06:47:00Z",
+      "side": 1,
+      "message": "The deferred call is now cleared before setting the pin to 0.",
+      "parentUuid": "ca9f70b1_7db74664",
       "range": {
         "startLine": 64,
         "startChar": 1,
