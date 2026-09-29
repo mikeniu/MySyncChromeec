@@ -75,7 +75,7 @@ test: zmake_unit_tests
 test: test_host_utils
 ifdef COVERAGE
 # List all of the files expected by firmware_builder.py
-test: $(PLATFORM_EC)/twister-out-host/coverage.info # EC_ZEPHYR_TESTS_GCC
+test: $(PLATFORM_EC)/twister-out-llvm/coverage.info # EC_ZEPHYR_TESTS_LLVM
 test: $(BUILD)/zephyr/all_tests.info # ALL_TESTS
 test: $(BUILD)/zephyr/zephyr_merged.info # EC_ZEPHYR_MERGED
 test: $(BUILD)/zephyr/lcov.info # ALL_MERGED
@@ -115,7 +115,7 @@ twister_coreboot_sdk: TOOLCHAIN_PATH=coreboot-sdk
 twister_coreboot_sdk:
 	+$(TWISTER_COMMAND) -p it8xxx2/it82002aw -p npcx9/npcx9m7f -p realtek/rts5912
 
-$(BUILD)/zephyr/all_tests.info: $(PLATFORM_EC)/twister-out-host/coverage.info
+$(BUILD)/zephyr/all_tests.info: $(PLATFORM_EC)/twister-out-llvm/coverage.info
 	cp $< $@
 
 $(BUILD)/zephyr/zephyr_merged.info: $(BUILD)/zephyr/all_tests.info $(BUILD)/zephyr/all_builds.info

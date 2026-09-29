@@ -696,9 +696,12 @@ def test(opts):
         tasks = []
         if twister_out_dir.exists():
             tasks.append(("EC_ZEPHYR_TESTS", twister_out_dir / "coverage.info"))
+        if twister_out_dir_gcc.exists():
+            tasks.append(
+                ("EC_ZEPHYR_TESTS_GCC", twister_out_dir_gcc / "coverage.info")
+            )
         tasks.extend(
             [
-                ("EC_ZEPHYR_TESTS_GCC", twister_out_dir_gcc / "coverage.info"),
                 ("ALL_TESTS", build_dir / "all_tests.info"),
                 ("EC_ZEPHYR_MERGED", build_dir / "zephyr_merged.info"),
                 ("ALL_MERGED", build_dir / "lcov.info"),
