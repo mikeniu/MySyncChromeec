@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "631d69f3_bfef17c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T22:01:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/d0147955-8f16-4eba-8572-d9ffa03a051c)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The memory clearing logic uses C-style `memset` with safe `uintptr_t` arithmetic to purge stale data across resets.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly placed in `chip/stm32/system.c`, maintaining appropriate architectural boundaries.\n*   **Code Simplicity:** ✅ The code is as simple as possible. No unneeded abstractions were introduced. \n*   **Idiomaticity \u0026 Readability:** ✅ The C++ and C code adheres to readability standards and modern language idioms. No unexplained magic values exist.\n*   **Security:** ✅ No vulnerabilities introduced. This change implements defense-in-depth by purging memory that might leak sensitive data.\n*   **Testing \u0026 Test Coverage:** ✅ Excellent use of a multistep hardware test (`fp_buffer_clear.cc`) spanning soft reboots to verify the memory purging behavior across both RW and RO states.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+177, -0). The CL is well-scoped, atomic, and focuses strictly on this single issue.\n*   **Commit Message:** ✅ The CL description accurately reflects the diff and provides clear rationale (\"Why\") and a high-level summary (\"What\"), while using proper tags.\n\nTAG\u003dagy\nCONV\u003d9854a5b3-0052-49f3-8cc9-50411606cefb",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4af5af33c62e2ebed55042bfd45018cf4e6b48c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
