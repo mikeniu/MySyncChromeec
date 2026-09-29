@@ -13,6 +13,10 @@
 	named-gpios {
 		compatible = "named-gpios";
 
+		irq0_test_input: irq0-test-input {
+			gpios = <&gpioc 6 0>;
+		};
+
 		power_button_l: power_button_l {
 			gpios = <&gpioe 4 GPIO_INPUT_PULL_UP>;
 			enum-name = "GPIO_POWER_BUTTON_L";
@@ -67,7 +71,7 @@
 			<&gpioa 5 GPIO_INPUT_PULL_DOWN>,
 
 			/* gpiob2 */
-			<&gpiob 2 GPIO_INPUT_PULL_DOWN>,
+			<&gpiob 2 GPIO_OUTPUT>,
 			/* gpiob5 */
 			<&gpiob 5 GPIO_INPUT_PULL_DOWN>,
 
@@ -76,12 +80,10 @@
 			/* gpioc4 */
 			<&gpioc 4 GPIO_INPUT_PULL_DOWN>,
 			/* gpioc6 */
-			<&gpioc 6 GPIO_INPUT_PULL_DOWN>,
+
 			/* gpioc7 */
 			<&gpioc 7 GPIO_INPUT_PULL_DOWN>,
 
-			/* gpiod0 */
-			<&gpiod 0 GPIO_INPUT_PULL_DOWN>,
 			/* gpiod1 */
 			<&gpiod 1 GPIO_INPUT_PULL_DOWN>,
 			/* gpiod2 */
