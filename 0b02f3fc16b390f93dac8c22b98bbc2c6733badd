@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fe14fc8_a97a8163",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T19:08:48Z",
+      "side": 1,
+      "message": "Follow-up CL suggestion (non-blocking for this CL):\n\nTo make `fp_buffer_clear` more generic across both `main` (Zephyr) and `ec-legacy` in a follow-up CL:\n\n1. **Test all FP state buffers (`FP_FRAME_SECTION` and `FP_TEMPLATE_SECTION`), not just `fp_buffer`:**\n   In `common/fpsensor/fpsensor_state.cc` (and `include/fpsensor/fpsensor_state.h`), we have three sensitive buffers:\n   - `fp_buffer` (`FP_FRAME_SECTION` -\u003e `.ahb4` on STM32H7, `.bss` on STM32F4/NPCX9, `\u0026psram` on `ft9001`)\n   - `fp_template` (`FP_TEMPLATE_SECTION` -\u003e `.ahb` on STM32H7)\n   - `fp_enc_buffer` (`FP_TEMPLATE_SECTION` -\u003e `.ahb` on STM32H7)\n   Expanding `fp_buffer_clear` (on both `main` and `ec-legacy`) to poison and verify all three buffers (`fp_buffer`, `fp_template`, and `fp_enc_buffer`) will ensure both `FP_FRAME_SECTION` and `FP_TEMPLATE_SECTION` are verified across reboots on all boards.\n\n2. **Generalize `NOLOAD` region clearing and testing via `memory_regions.inc` X-macros:**\n   - Generalize STM32H7 `NOLOAD` region clearing to iterate over all `REGION()` entries in `chip/stm32/memory_regions.inc` (similar to `common/main.c:113-120` and `include/link_defs.h:133-144`), so `.ahb` (`[__ahb_start, __ahb_end)`) is also zeroed on boot/reset.\n   - In the test, we can also instantiate a small canary array per `REGION()` via `memory_regions.inc` in both RO and RW without touching live `__uncached` peripheral buffers like `tx_buf`/`rx_buf`:\n```cpp\n#ifdef CONFIG_CHIP_MEMORY_REGIONS\n#define REGION(name, attr, start, size) \\\n\tstatic uint8_t test_region_##name[64] __SECTION(name);\n#define REGION_LOAD(name, attr, start, size)\n#include \"memory_regions.inc\"\n#undef REGION\n#undef REGION_LOAD\n#endif\n```",
+      "isAi": true,
+      "revId": "0b02f3fc16b390f93dac8c22b98bbc2c6733badd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
