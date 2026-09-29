@@ -38,6 +38,60 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01ff5287_bebec931",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-29T18:53:31Z",
+      "side": 1,
+      "message": "Done. Guarded with CHIP_VARIANT_STM32H7X3 to match chip/stm32/memory_regions.inc.",
+      "parentUuid": "2c646b08_576eefe6",
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d87a849b_9beb2fd2",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-29T18:53:31Z",
+      "side": 1,
+      "message": "Done. Added clear_ahb4() in system_reset() (right after cpu_disable_caches()) in addition to system_pre_init(), added the board_config.variants loop in test/run_device_tests.py to test with replaced production RO images, and added a pre-main constructor check in test/fp_buffer_clear.cc to verify fp_buffer is already cleared across the reset before RW\u0027s system_pre_init() runs. Regarding (3) (.ahb), frozen production RO has no symbols in .ahb and no RO host commands access .ahb, while RW already wipes fp_template and fp_enc_buffer in .ahb via OPENSSL_cleanse() in fp_reset_and_clear_context() on init.",
+      "parentUuid": "54e2c8a4_9277e5ff",
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe2265d9_b9d988e4",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-29T18:53:31Z",
+      "side": 1,
+      "message": "Done. Updated the commit message to remove the reference to STM32_RCC_AHB4ENR and document clearing .ahb4 in both system_pre_init() and system_reset().",
+      "parentUuid": "1097ddf7_c242d7fe",
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c646b08_576eefe6",
@@ -128,6 +182,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ae0e852_6ba9aa03",
+        "filename": "core/cortex-m/ec.lds.S",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-29T18:53:31Z",
+      "side": 1,
+      "message": "Done. Moved __##name##_end \u003d .; into parent CL 8263903, reordered the stack so CL 8263903 is the parent of this CL, and changed __ahb4_start[] / __ahb4_end[] to uint8_t[].",
+      "parentUuid": "4a442458_ae77236e",
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a442458_ae77236e",
@@ -148,6 +220,24 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98e839a6_f2d3ce82",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-29T18:53:31Z",
+      "side": 1,
+      "message": "Done. Added a pre-main constructor check (check_canary_before_pre_init) and RO variant test configs in run_device_tests.py to verify that fp_buffer is cleared across resets through RO before RW\u0027s system_pre_init() executes. Note that we check fp_buffer rather than asserting the entire [__ahb4_start, __ahb4_end) range is zero in task_test because .ahb4 (__uncached) also holds the active UART buffers (tx_buf and rx_buf), which are written by the boot banner and console input before task_test runs.",
+      "parentUuid": "7583217f_d38e429f",
       "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -176,6 +266,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c73bc7c_69cc09fc",
+        "filename": "test/fp_buffer_clear.tasklist",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-29T18:53:31Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "445b0431_0dabb5d6",
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "445b0431_0dabb5d6",
@@ -190,6 +298,24 @@
       "side": 1,
       "message": "nit: Update copyright year to 2026.",
       "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f237e104_365cd5f3",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-29T18:53:31Z",
+      "side": 1,
+      "message": "Done. Included the skip entries from CL 8351643.",
+      "parentUuid": "fd183783_b75b90f1",
       "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
