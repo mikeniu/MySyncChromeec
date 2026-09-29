@@ -177,6 +177,24 @@
       "parentUuid": "684c15ea_c3722c5e",
       "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed2078d0_1772fb09",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-29T03:17:29Z",
+      "side": 1,
+      "message": "Got it, thanks! I\u0027ve merged the sensor driver, emulator, and test renames all into this CL.",
+      "parentUuid": "ea1df49b_8cef9dea",
+      "revId": "23bade375e7c9fd984ba28347298f3371cbc6e02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
