@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ac12298_42398079",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T23:38:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/75018167-cc39-4c5c-8ce6-ddb57a1a747c)]\n\n### Review Summary\n\n*   **Functionality:** **Good.** The `IS_ENABLED` check has been correctly moved above the sensor queries, preventing potential linker errors or undefined behavior when the private driver is disabled. The `BUILD_ASSERT` ensures that the integer multiplication for size calculation will never overflow at compile time.\n*   **Architecture \u0026 Component Fit:** **Good.** The changes correctly fit into the Zephyr driver component and validate preconditions before attempting to write into the output buffer.\n*   **Code Simplicity:** **Good.** The runtime frame size check is implemented directly and minimally. No simpler rewrite is necessary.\n*   **Idiomaticity \u0026 Readability:** **Good.** `FT_RAW_SIZE` has been relocated to `fingerprint_ft98xx_private.h` so it can be cleanly referenced in the calculation without relying on magic numbers.\n*   **Security:** **Good.** The change effectively hardens the memory copy by preventing out-of-bounds writes into `image_buf` based on dynamic sensor dimensions.\n*   **Testing:** **Good.** The author added a unit test (`test_acquire_image_exceeds_runtime_frame_size`) that mocks a larger horizontal resolution to successfully exercise the new `-EINVAL` boundary check. The `zassert_ok` suggestion was also implemented for the success path.\n*   **CL Size \u0026 Scope:** Size: S (+33, -1). The CL is atomic, correctly scoped, and focused on fixing a single logical bounds check.\n*   **Commit Message:** **Good.** The commit message accurately describes the changes, includes the motivation for the fix, and uses the correct ChromiumOS `BUG\u003d` and `TEST\u003d` footers.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "7048db974da5005d971eaef10bc5c39d48cede7c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
