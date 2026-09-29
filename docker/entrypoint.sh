@@ -142,31 +142,6 @@ mkdir -p /workspace/.cache/coreboot-sdk
 mkdir -p "${HOME}/.cache"
 ln -sfn /workspace/.cache/coreboot-sdk "${HOME}/.cache/coreboot-sdk"
 
-# Function to query and export Coreboot SDK toolchain paths into environment.
-# This ensures toolchain roots (e.g. COREBOOT_SDK_ROOT_arm) are available for
-# zmake builds and twister runs inside the container.
-setup_coreboot_sdk_env() {
-    local sdk_script=""
-    if [ -f "/workspace/src/platform/ec/util/coreboot_sdk.py" ]; then
-        sdk_script="/workspace/src/platform/ec/util/coreboot_sdk.py"
-    elif [ -f "/opt/repos/src/platform/ec/util/coreboot_sdk.py" ]; then
-        sdk_script="/opt/repos/src/platform/ec/util/coreboot_sdk.py"
-    fi
-
-    if [ -n "${sdk_script}" ]; then
-        eval "$(python3 -c '
-import json, subprocess, sys
-try:
-    script = sys.argv[1]
-    out = subprocess.check_output([sys.executable, script, "-j"]).decode()
-    for k, v in json.loads(out).items():
-        print(f"export {k}=\"{v}\"")
-except Exception as e:
-    sys.stderr.write(f"Warning: Failed to load Coreboot SDK: {e}\n")
-' "${sdk_script}")"
-    fi
-}
-
 # Function to compute sha256 hash of python requirement files
 compute_reqs_hash() {
     local files=()
@@ -239,9 +214,6 @@ else
 
     echo "${CURRENT_HASH}" > "${HASH_FILE}"
 fi
-
-# Configure Coreboot SDK toolchain environment variables
-setup_coreboot_sdk_env
 
 # Set up Realtek monitor binary (rtk_flame)
 MONITOR_CACHE="/workspace/.cache/rts5915_flash_upload.bin"
