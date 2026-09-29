@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d162921_2149ec6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T21:05:22Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/a603f55d-564b-4737-a026-cab0ba3e5557)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The `.ahb4` memory region is now safely zero-initialized in C during `system_pre_init()` and `system_reset()` using `memset` and `uintptr_t` arithmetic, avoiding alignment and linkage issues on other platforms. The test now includes a pre-main constructor check to verify the memory is cleared across RO resets before RW execution.\n*   **Security:** ✅ No security vulnerabilities introduced. Purging stale memory across resets is a good defense-in-depth practice against data leakage.\n*   **Style:** ✅ The C/C++ code matches the existing style and conventions.\n*   **Consistency:** ✅ The logic respects architectural boundaries by being implemented in chip-specific code (`chip/stm32/system.c`).\n*   **Testing:** ✅ The test has been improved to verify that `fp_buffer` is cleared across resets through RO before RW `system_pre_init()` executes. The test skips have been correctly propagated from the `main` branch.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+181, -0). The CL remains small, well-scoped, and focused on this single hardware initialization issue.\n*   **Commit Message:** ✅ The commit message is accurate, provides good rationale (Why), and properly describes the functional changes (What). The `BUG\u003d` and `TEST\u003d` tags follow Chromium formatting correctly.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1ee3b0521e3642f821f394f9b678e526bc5ca38c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
