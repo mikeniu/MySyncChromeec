@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2e28e882_4ae4c54b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-29T01:24:17Z",
+      "side": 1,
+      "message": "I think @fsammoura@google.com can confirm, but all these changes were originally part of https://crrev.com/c/8008794 when he tested it, before the AI agent suggested splitting up the CLs into smaller changes.",
+      "parentUuid": "0defef44_47d69765",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 71
+      },
+      "revId": "795d22f52ab4c677642c631ed71714853888b5b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0647af46_04afd328",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
