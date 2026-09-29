@@ -1,0 +1,344 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <zephyr/dt-bindings/sensor/pac194x.h>
+
+&i2c2_0 {
+	pac1: pac1954@10 {
+		compatible = "microchip,pac194x";
+		reg = <0x10>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PPVAR_BATT */
+		channel@1 {
+			reg = <0x1>;
+			microchip,shunt-resistor-micro-ohms = <5000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* BL_PWR */
+		channel@2 {
+			reg = <0x2>;
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3800_VPH_PWR_A_S5 */
+		channel@3 {
+			reg = <0x3>;
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3800_VPH_PWR_B_S5 */
+		channel@4 {
+			reg = <0x4>;
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac2: pac1954@11 {
+		compatible = "microchip,pac194x";
+		reg = <0x11>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PP3300_Z1 */
+		channel@1 {
+			reg = <0x1>;
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP5000_S5 */
+		channel@2 {
+			reg = <0x2>;
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_GSC_Z1 */
+		channel@3 {
+			reg = <0x3>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_EC_Z1 */
+		channel@4 {
+			reg = <0x4>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac3: pac1954@12 {
+		compatible = "microchip,pac194x";
+		reg = <0x12>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PP3300_TCHPAD_S3 */
+		channel@1 {
+			reg = <0x1>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_WLAN_X */
+		channel@2 {
+			reg = <0x2>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_NVME_X */
+		channel@3 {
+			reg = <0x3>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_TCHSCR_X */
+		channel@4 {
+			reg = <0x4>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac4: pac1954@13 {
+		compatible = "microchip,pac194x";
+		reg = <0x13>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PP3300_UCAM_X */
+		channel@1 {
+			reg = <0x1>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_FP_Z1_X */
+		channel@2 {
+			reg = <0x2>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP3300_DISP_X */
+		channel@3 {
+			reg = <0x3>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP0900_RT_X */
+		channel@4 {
+			reg = <0x4>;
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac5: pac1954@14 {
+		compatible = "microchip,pac194x";
+		reg = <0x14>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* GFX_VIN_V */
+		channel@2 {
+			reg = <0x2>;
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* APC0_VIN_V */
+		channel@3 {
+			reg = <0x3>;
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* APC1_VIN_V */
+		channel@4 {
+			reg = <0x4>;
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac6: pac1954@15 {
+		compatible = "microchip,pac194x";
+		reg = <0x15>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PP1200_L12B_S3 */
+		channel@1 {
+			reg = <0x1>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP1800_L15B_S3 */
+		channel@2 {
+			reg = <0x2>;
+			microchip,shunt-resistor-micro-ohms = <20000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP0730_S12C_S0 */
+		channel@3 {
+			reg = <0x3>;
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP0710_S78C_S0 */
+		channel@4 {
+			reg = <0x4>;
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac7: pac1954@16 {
+		compatible = "microchip,pac194x";
+		reg = <0x16>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PP1800_L1I_S3 */
+		channel@1 {
+			reg = <0x1>;
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP0900_VDD2L_MEM_S3 */
+		channel@2 {
+			reg = <0x2>;
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP1080_S23I_S3 */
+		channel@3 {
+			reg = <0x3>;
+			microchip,shunt-resistor-micro-ohms = <5000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP0800_S56I_S0 */
+		channel@4 {
+			reg = <0x4>;
+			microchip,shunt-resistor-micro-ohms = <5000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+
+	pac8: pac1954@17 {
+		compatible = "microchip,pac194x";
+		reg = <0x17>;
+		status = "okay";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		microchip,refresh-mode = <PAC_REFRESH_MANUAL>;
+		zephyr,deferred-init;
+
+		/* PP0500_VDDQ_MEM_S0 */
+		channel@1 {
+			reg = <0x1>;
+			microchip,shunt-resistor-micro-ohms = <10000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP0730_S12J_S3 */
+		channel@2 {
+			reg = <0x2>;
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP0800_S34J_S0 */
+		channel@3 {
+			reg = <0x3>;
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+		/* PP0730_S678J_S0 */
+		channel@4 {
+			reg = <0x4>;
+			microchip,shunt-resistor-micro-ohms = <2000>;
+			microchip,vbus-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,vsense-mode = <PAC_BIPOLAR_HALF_FSR>;
+			microchip,accumulation-mode = <PAC_ACCUM_VPOWER>;
+		};
+	};
+};

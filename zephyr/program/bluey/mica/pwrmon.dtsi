@@ -1,0 +1,15 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	pwrmon: pwrmon {
+		compatible = "cros,pwrmon";
+		power-monitors = <&pac1>, <&pac2>, <&pac3>, <&pac4>,
+				 <&pac5>, <&pac6>, <&pac7>, <&pac8>;
+		sample-rate = <1024>;
+		gpios = <&gpio6 2 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+		zephyr,deferred-init;
+	};
+};
