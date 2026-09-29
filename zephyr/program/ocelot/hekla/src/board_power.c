@@ -35,6 +35,8 @@ static void board_ap_power_shutdown(void)
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_edp_bl_ls_en), 0);
 	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_ssd_pln), 0);
 
+	gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_codec_mute_n_r), 0);
+	k_msleep(5);
 	power_signal_set(PWR_EN_PP5000_A, 0);
 	/* Wait RSMRST to be off. */
 	while (power_signal_get(PWR_RSMRST_PWRGD) && (timeout_ms > 0)) {
@@ -64,6 +66,9 @@ static int board_ap_power_action_g3_run(void *data)
 
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		power_signal_set(PWR_EN_PP5000_A, 1);
+		k_msleep(26);
+		gpio_pin_set_dt(GPIO_DT_FROM_NODELABEL(gpio_ec_codec_mute_n_r),
+				1);
 		update_ap_boot_time(ARAIL);
 	}
 
