@@ -129,9 +129,7 @@ echo "Activating virtual environment..."
 # shellcheck disable=SC1091
 source "${VENV_DIR}/bin/activate"
 
-# Configure PATH for U-Boot binman tools. Prioritize local workspace tools if
-# present, falling back to the container cache.
-export PATH="${PATH}:/opt/repos/src/third_party/u-boot/tools/binman"
+# Put U-Boot's binman tools on PATH.
 export PATH="/workspace/src/third_party/u-boot/tools/binman:${PATH}"
 
 # Set up Coreboot SDK cache directory symlink for the current user. The target
