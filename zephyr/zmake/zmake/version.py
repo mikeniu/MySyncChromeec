@@ -16,6 +16,7 @@ from zmake import util
 
 
 EC_BASE = pathlib.Path(__file__).parent.parent
+_REVISION_LEN = 7
 
 
 def _get_num_commits(repo):
@@ -50,8 +51,8 @@ def _get_revision(repo):
     """Get the current revision hash.
 
     If a Git repository is available, return the hash of the current index.
-    Otherwise return the hash of the VCSID environment variable provided by
-    the packaging system.
+    Otherwise fall back to the revision in the checkout's .supermanifest file
+    if available, or "unknown".
 
     Args:
         repo: The path to the git repo.
@@ -67,12 +68,20 @@ def _get_revision(repo):
             stderr=subprocess.DEVNULL,
             encoding="utf-8",
         )
+        return result.stdout[:_REVISION_LEN]
     except subprocess.CalledProcessError:
-        revision = "unknown"
-    else:
-        revision = result.stdout[:7]
-
-    return revision
+        repo_path = pathlib.Path(repo).resolve()
+        for path in (repo_path, *repo_path.parents):
+            supermanifest = path / ".supermanifest"
+            if supermanifest.is_file():
+                try:
+                    _, _, revision, *_ = supermanifest.read_text(
+                        encoding="utf-8"
+                    ).split()
+                    return revision[:_REVISION_LEN]
+                except (ValueError, OSError):
+                    return "unknown"
+        return "unknown"
 
 
 def _is_tree_dirty(repo):
