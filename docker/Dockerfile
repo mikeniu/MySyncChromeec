@@ -138,10 +138,6 @@ RUN VPYTHON_FILE="/opt/repos/src/platform/ec/zephyr/zmake/.vpython3" && \
         fi; \
     fi
 
-# Install zmake in system Python
-RUN python3 -m pip install --no-cache-dir --no-deps \
-    /opt/repos/src/platform/ec/zephyr/zmake
-
 # Build and install rtkupdate host utility
 RUN g++ -O2 -Wall -o /usr/bin/rtkupdate \
     /opt/repos/src/platform/ec/util/rtkupdate.cc \
