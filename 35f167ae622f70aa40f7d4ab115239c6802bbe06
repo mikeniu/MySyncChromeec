@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91dbe62f_81aeeba7",
+        "filename": "zephyr/program/bluey/pic/project.overlay",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-09-29T02:26:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fd62de9_aefbdffa",
+      "revId": "35f167ae622f70aa40f7d4ab115239c6802bbe06",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c9786bc9_e6574ee8",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-21T05:20:58Z",
       "side": 1,
       "message": "Please provide the context for the lock key handling implementation. Does the lock key work without customization?",
+      "revId": "35f167ae622f70aa40f7d4ab115239c6802bbe06",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c41feb39_0bdabd97",
+        "filename": "zephyr/program/bluey/pic/src/keyboard_customization.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-09-29T02:26:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9786bc9_e6574ee8",
       "revId": "35f167ae622f70aa40f7d4ab115239c6802bbe06",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
