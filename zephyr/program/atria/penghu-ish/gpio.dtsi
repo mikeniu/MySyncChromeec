@@ -8,8 +8,32 @@
 	named-gpios {
 		compatible = "named-gpios";
 
+		gpio_accel_db_int_l: accel_db_int_l {
+			gpios = <&gpio0 4 GPIO_INPUT>;
+		};
+
+		gpio_accel_mb_int_l: accel_mb_int_l {
+			gpios = <&gpio0 3 GPIO_INPUT>;
+		};
+
 		ec_entering_rw {
 			enum-name = "GPIO_ENTERING_RW";
+		};
+	};
+
+	gpio_interrupts: gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_lid_accel: int-lid-accel {
+			irq-pin = <&gpio_accel_db_int_l>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "bma4xx_interrupt";
+		};
+
+		int_base_accel: int-base-accel {
+			irq-pin = <&gpio_accel_mb_int_l>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "bmi260_interrupt";
 		};
 	};
 };
