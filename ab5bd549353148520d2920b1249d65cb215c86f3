@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dec21241_5fa9dfe2",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-29T02:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9a20369_88d414ff",
+      "range": {
+        "startLine": 386,
+        "startChar": 4,
+        "endLine": 386,
+        "endChar": 31
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "030f972c_8bf403d6",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-28T15:19:14Z",
       "side": 1,
       "message": "These static variables should be wrapped in #ifdef CONFIG_BATTERY_WAKEUP_CUT_OFF or similar to avoid wasting RAM (12 bytes) on platforms that don\u0027t enable this feature.",
+      "range": {
+        "startLine": 491,
+        "startChar": 0,
+        "endLine": 491,
+        "endChar": 0
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "632c095a_c71ded13",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-29T02:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "030f972c_8bf403d6",
       "range": {
         "startLine": 491,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03f3b43e_23a96daa",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-29T02:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d73ccac4_05d0d16e",
+      "range": {
+        "startLine": 515,
+        "startChar": 17,
+        "endLine": 515,
+        "endChar": 46
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7e134f0_3d8ee69f",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-09-28T23:17:55Z",
       "side": 1,
       "message": "Use Zephyr\u0027s `sys_timepoint_calc)` and `sys_timepoint_expired()` for timeout calculations.  This code no longer needs to support the legacy EC.",
+      "range": {
+        "startLine": 524,
+        "startChar": 8,
+        "endLine": 524,
+        "endChar": 25
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a26d293_1058681b",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-29T02:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7e134f0_3d8ee69f",
       "range": {
         "startLine": 524,
         "startChar": 8,
@@ -116,6 +212,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6756fa9_20fa60a8",
+        "filename": "include/battery.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-29T02:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56725940_96957721",
+      "range": {
+        "startLine": 496,
+        "startChar": 0,
+        "endLine": 496,
+        "endChar": 38
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "48fecb58_78fc007d",
@@ -129,6 +249,30 @@
       "writtenOn": "2026-09-28T23:17:55Z",
       "side": 1,
       "message": "Don\u0027t add new #defines to this file.  This file is only here to support existing config options from the legacy EC.\n\nWhen you create new Kconfig options, you no longer need to update this file.",
+      "range": {
+        "startLine": 602,
+        "startChar": 0,
+        "endLine": 615,
+        "endChar": 56
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea601d44_087bbe30",
+        "filename": "include/config.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-29T02:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "48fecb58_78fc007d",
       "range": {
         "startLine": 602,
         "startChar": 0,
@@ -162,6 +306,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27058e57_406140d7",
+        "filename": "zephyr/Kconfig.battery",
+        "patchSetId": 13
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-29T02:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "835b8666_210b707e",
+      "range": {
+        "startLine": 181,
+        "startChar": 0,
+        "endLine": 185,
+        "endChar": 0
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6eaf7eb1_0508f210",
@@ -185,6 +353,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "912c7e15_b0130b83",
+        "filename": "zephyr/shim/include/config_chip.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-29T02:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6eaf7eb1_0508f210",
+      "range": {
+        "startLine": 301,
+        "startChar": 0,
+        "endLine": 310,
+        "endChar": 6
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e71e654_3accc02a",
@@ -198,6 +390,30 @@
       "writtenOn": "2026-09-28T15:19:14Z",
       "side": 1,
       "message": "Logic error: CONFIG_BATTERY_WAKEUP_CUT_OFF_TIMEOUT_MSEC is in milliseconds. To advance the clock past the window, you should multiply by USEC_PER_MSEC (1,000), not USEC_PER_SEC (1,000,000). Currently, this advances the clock by 10,000 seconds instead of 10 seconds. The test still passes because it\u0027s past the window, but the math is wrong.",
+      "range": {
+        "startLine": 807,
+        "startChar": 0,
+        "endLine": 807,
+        "endChar": 0
+      },
+      "revId": "ab5bd549353148520d2920b1249d65cb215c86f3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "310ea5fa_e7289a50",
+        "filename": "zephyr/test/drivers/smart_battery/src/smart.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-09-29T02:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e71e654_3accc02a",
       "range": {
         "startLine": 807,
         "startChar": 0,
