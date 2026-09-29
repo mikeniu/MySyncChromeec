@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2af4880_fe7b2db9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T16:58:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "284a30fb_8bf2b392",
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c646b08_576eefe6",
@@ -82,6 +100,30 @@
         "endChar": 9999
       },
       "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54e2c8a4_9277e5ff",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T16:58:14Z",
+      "side": 1,
+      "message": "For (1), we should make sure that we test this scenario. The run_device_tests.py script supports replacing RO.",
+      "parentUuid": "0457dd1a_38a76b7f",
+      "range": {
+        "startLine": 306,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 9999
+      },
       "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
