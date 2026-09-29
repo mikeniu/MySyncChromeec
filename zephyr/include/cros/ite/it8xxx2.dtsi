@@ -78,6 +78,10 @@
 			offset = <0x11>;
 			size = <0x01>;
 		};
+		board-batt-keep {
+			offset = <0x12>;
+			size = <0x04>;
+		};
 	};
 
 	soc {

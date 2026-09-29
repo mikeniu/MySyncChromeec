@@ -8,6 +8,7 @@
 #include "battery.h"
 #include "battery_fuel_gauge.h"
 #include "battery_smart.h"
+#include "bbram.h"
 #include "builtin/assert.h"
 #include "charge_manager.h"
 #include "charge_state.h"
@@ -25,6 +26,7 @@
 #include "i2c.h"
 #include "math_util.h"
 #include "power.h"
+#include "power_button.h"
 #include "printf.h"
 #include "system.h"
 #include "task.h"
@@ -33,6 +35,8 @@
 #include "usb_common.h"
 #include "usb_pd.h"
 #include "util.h"
+
+#include <zephyr/drivers/bbram.h>
 
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_CHARGER, outstr)
@@ -1607,6 +1611,62 @@ int charge_want_shutdown(void)
 	       !(curr.batt.flags & BATT_FLAG_BAD_STATE_OF_CHARGE) &&
 	       (curr.batt.state_of_charge < battery_level_shutdown);
 }
+
+#ifdef CONFIG_PLATFORM_EC_FIRST_BOOT_POWER_ON_BLOCK
+BUILD_ASSERT(DT_HAS_CHOSEN(cros_ec_bbram),
+	     "cros_ec_bbram chosen node must be defined in devicetree");
+
+static const struct device *const bbram_dev =
+	COND_CODE_1(DT_HAS_CHOSEN(cros_ec_bbram),
+		    DEVICE_DT_GET(DT_CHOSEN(cros_ec_bbram)), NULL);
+
+#define BATT_KEEP_VALUE 0xA5A5A5A5
+static bool poweron_flag;
+
+test_export_static void check_first_boot(void)
+{
+	uint32_t board_batt_keep_val = 0;
+
+	bbram_read(bbram_dev, BBRAM_REGION_OFFSET(board_batt_keep),
+		   BBRAM_REGION_SIZE(board_batt_keep),
+		   (uint8_t *)&board_batt_keep_val);
+
+	if (board_batt_keep_val == BATT_KEEP_VALUE) {
+		poweron_flag = true;
+	} else {
+		board_batt_keep_val = BATT_KEEP_VALUE;
+		bbram_write(bbram_dev, BBRAM_REGION_OFFSET(board_batt_keep),
+			    BBRAM_REGION_SIZE(board_batt_keep),
+			    (uint8_t *)&board_batt_keep_val);
+		poweron_flag = false;
+	}
+}
+DECLARE_HOOK(HOOK_INIT, check_first_boot, HOOK_PRIO_DEFAULT + 1);
+
+static void first_power_on(void)
+{
+	/* Trigger power-on when AC is detected for the first time. */
+	if (!poweron_flag && extpower_is_present())
+		chipset_power_on();
+}
+DECLARE_HOOK(HOOK_AC_CHANGE, first_power_on, HOOK_PRIO_DEFAULT);
+
+static void update_poweron_flag(void)
+{
+	if (!poweron_flag)
+		poweron_flag = true;
+}
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, update_poweron_flag, HOOK_PRIO_LAST);
+
+int custom_prevent_power_on(void)
+{
+	/* Allow power on if power button pressed */
+	if (!poweron_flag && power_button_is_pressed())
+		poweron_flag = true;
+
+	return !poweron_flag;
+}
+#endif
 
 #ifdef CONFIG_CHARGER_MIN_BAT_PCT_FOR_POWER_ON
 test_export_static int charge_prevent_power_on_automatic_power_on = 1;

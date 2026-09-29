@@ -84,4 +84,15 @@ config PLATFORM_EC_CHARGER_CUSTOM_PREVENT_POWER_ON
 	  custom_prevent_power_on() which returns 0 to allow power-on or 1
 	  to prevent it.
 
+config PLATFORM_EC_FIRST_BOOT_POWER_ON_BLOCK
+	bool "first-boot power-on prevention logic"
+	select PLATFORM_EC_CHARGER_CUSTOM_PREVENT_POWER_ON
+	default n
+	help
+	  Enable board-specific custom power-on prevention logic. This allows
+	  a board to override the decision when charger power is below the
+	  minimum threshold. The board must implement
+	  custom_prevent_power_on() which returns 0 to allow power-on or 1
+	  to prevent it.
+
 endif # PLATFORM_EC_BOOT_AP_POWER_REQUIREMENTS

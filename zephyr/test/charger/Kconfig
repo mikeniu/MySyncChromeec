@@ -133,6 +133,11 @@ config TEST_CHARGE_RAMP
 config TEST_CHARGE_STATE
 	bool "Test charge_state.c"
 
+config TEST_CHARGE_STATE_FIRST_BOOT
+	bool "Test charge_state.c first-boot power-on block"
+	select AP_POWER_CONTROL
+	select PLATFORM_EC_FIRST_BOOT_POWER_ON_BLOCK
+
 config TEST_CHARGE_STATE_PREVENT_POWER_ON
 	bool "Test charge_state.c prevent power on"
 

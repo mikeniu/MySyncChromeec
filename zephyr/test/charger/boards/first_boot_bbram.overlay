@@ -1,0 +1,29 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/*
+ * BBRAM emulation for the charge_state first boot power-on block test
+ * (CONFIG_PLATFORM_EC_FIRST_BOOT_POWER_ON_BLOCK).
+ */
+
+/ {
+	chosen {
+		cros-ec,bbram = &first_boot_bbram;
+	};
+
+	first_boot_bbram: test-first-boot-bbram-dev {
+		compatible = "zephyr,bbram-emul";
+		size = <64>;
+	};
+
+	named-bbram-regions {
+		compatible = "named-bbram-regions";
+
+		board-batt-keep {
+			offset = <0x13>;
+			size = <0x04>;
+		};
+	};
+};

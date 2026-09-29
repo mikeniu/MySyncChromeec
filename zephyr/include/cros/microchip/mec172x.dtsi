@@ -60,6 +60,10 @@
 			offset = <0x12>;
 			size = <0x01>;
 		};
+		board-batt-keep {
+			offset = <0x13>;
+			size = <0x04>;
+		};
 		ramlog {
 			offset = <0x20>;
 			size = <0x01>;
