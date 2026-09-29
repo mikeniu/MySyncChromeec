@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "0b02f3fc16b390f93dac8c22b98bbc2c6733badd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "751295db_33f84e40",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 12
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-29T20:47:33Z",
+      "side": 1,
+      "message": "tracking with this bug: https://b.corp.google.com/issues/567625392",
+      "parentUuid": "1fe14fc8_a97a8163",
+      "revId": "0b02f3fc16b390f93dac8c22b98bbc2c6733badd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

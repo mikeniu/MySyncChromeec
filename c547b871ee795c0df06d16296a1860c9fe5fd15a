@@ -134,6 +134,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "deb2d583_d18b5154",
+        "filename": "chip/stm32/system.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-29T20:47:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1097ddf7_c242d7fe",
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0457dd1a_38a76b7f",
@@ -298,6 +316,24 @@
       "side": 1,
       "message": "nit: Update copyright year to 2026.",
       "isAi": true,
+      "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ba60f90_94fd9ae2",
+        "filename": "test/fp_buffer_clear.tasklist",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-29T20:47:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "445b0431_0dabb5d6",
       "revId": "c547b871ee795c0df06d16296a1860c9fe5fd15a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
