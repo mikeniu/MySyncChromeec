@@ -24,4 +24,10 @@ config PLATFORM_EC_MP2964
 	  enables reprogramming configuration registers when initial the
 	  factory settings need to be tuned in prototype devices.
 
+config PLATFORM_EC_PMIC_HANG_WORKAROUND
+	bool "Enable PMIC workaround"
+	help
+	 The PMIC sometimes will hang after EC reset, add the workaround
+	 to avoid the boot fail issue.
+
 endif # PLATFORM_EC_PMIC
