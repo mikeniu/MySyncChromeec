@@ -81,6 +81,30 @@
       },
       "revId": "4fe689f684c207173d0f0d4459363ab028e25af8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "516c1185_f6498504",
+        "filename": "zephyr/program/calypso/mensa/src/chipset.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-29T06:49:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2bd3295c_d11fce4b",
+      "range": {
+        "startLine": 64,
+        "startChar": 1,
+        "endLine": 64,
+        "endChar": 66
+      },
+      "revId": "4fe689f684c207173d0f0d4459363ab028e25af8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
