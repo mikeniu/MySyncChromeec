@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d86950a_49a519c3",
+        "filename": "zephyr/include/emul/emul_elan_series.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-29T06:07:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "695b7cc4_5bfcb10d",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 0
+      },
+      "revId": "1ce7887d7626269e6da820f92be7fe7f031a0c8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e7784b57_4e5dd4d0",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-29T05:36:44Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: Header guard does not match the file path or filename (missing `FINGERPRINT` and `PAL`). It should follow the convention (e.g. `PLATFORM_EC_ZEPHYR_TEST_FINGERPRINT_DRIVERS_ELAN_SERIES_SRC_ELAN_SERIES_PAL_TEST_HELPERS_H_`).",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 0
+      },
+      "revId": "1ce7887d7626269e6da820f92be7fe7f031a0c8b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "022034c9_2d0a6109",
+        "filename": "zephyr/test/fingerprint/drivers/elan_series/src/elan_series_pal_test_helpers.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-29T06:07:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7784b57_4e5dd4d0",
       "range": {
         "startLine": 6,
         "startChar": 0,
