@@ -499,35 +499,6 @@ __maybe_unused static bool is_try_src_enabled(int port)
  *       Functions prefixed with tc_ are defined int usb_tc_sm.h
  */
 
-/* The Zephyr shim does not currently support building TCPMv2 without the PRL,
- * i.e. a type-C-only TCPM. These stubs are therefore difficult to cover
- * with tests, and the value of doing so is low.
- * LCOV_EXCL_START
- */
-#if !defined(CONFIG_ZEPHYR) && !defined(CONFIG_USB_PRL_SM)
-
-/*
- * These pd_ functions are implemented in common/usb_prl_sm.c
- */
-
-void pd_transmit_complete(int port, int status, const timestamp_t *ts)
-{
-	/* DO NOTHING */
-}
-
-void pd_execute_hard_reset(int port)
-{
-	/* DO NOTHING */
-}
-
-__overridable void pd_set_vbus_discharge(int port, int enable)
-{
-	/* DO NOTHING */
-}
-
-#endif /* !CONFIG_ZEPHYR && !CONFIG_USB_PRL_SM */
-/* LCOV_EXCL_STOP */
-
 #ifndef CONFIG_AP_POWER_CONTROL
 __overridable enum pd_dual_role_states board_tc_get_initial_drp_mode(int port)
 {
@@ -704,8 +675,7 @@ static void tc_detached(int port)
 	tcpm_debug_accessory(port, 0);
 	set_ccd_mode(port, 0);
 	tc_set_modes_exit(port);
-	if (IS_ENABLED(CONFIG_USB_PRL_SM))
-		prl_set_default_pd_revision(port);
+	prl_set_default_pd_revision(port);
 
 	/* Clear any mux connection on detach */
 	if (IS_ENABLED(CONFIG_USBC_SS_MUX))
@@ -1508,8 +1478,7 @@ static void restart_tc_sm(int port, enum usb_tc_state start_state)
 	 * case when PD is suspended and resumed or when the state machine is
 	 * first initialized.
 	 */
-	if (IS_ENABLED(CONFIG_USB_PRL_SM))
-		prl_set_default_pd_revision(port);
+	prl_set_default_pd_revision(port);
 
 	tc_enable_pd(port, 0);
 	tc[port].ps_reset_state = PS_STATE0;

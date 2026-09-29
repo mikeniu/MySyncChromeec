@@ -312,16 +312,6 @@ config PLATFORM_EC_USB_TYPEC_SM
 	  You should normally define this unless you want to override it in your
 	  board code, which is not recommended.
 
-config PLATFORM_EC_USB_PRL_SM
-	bool "Protocol layer (PRL) state machine"
-	default y
-	help
-	  This enables the middle layer of the power-delivery (PD) protocol,
-	  which deals with the flow of power messages across the USB Type-C
-	  interface. You should normally define this unless you want to override
-	  it in your board code, which is not recommended.
-
-
 config PLATFORM_EC_USB_DPM_SM
 	bool "Device Policy Manager (DPM) state machine"
 	default y
