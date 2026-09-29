@@ -2,6 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+set(CMAKE_C_COMPILER "${CROSS_COMPILE}clang")
+set(CMAKE_CXX_COMPILER "${CROSS_COMPILE}clang++")
+
 include("${ZEPHYR_BASE}/cmake/compiler/clang/target.cmake")
 
 # TODO(b/407786163): Fix the path reported by "--print-libgcc-file-name" so that
@@ -26,6 +29,3 @@ if("${ARCH}" STREQUAL "riscv")
     set_linker_property(PROPERTY rt_library "-lclang_rt.builtins-riscv32")
   endfunction()
 endif()
-
-set(CMAKE_C_COMPILER "${CROSS_COMPILE}clang")
-set(CMAKE_CXX_COMPILER "${CROSS_COMPILE}clang++")
