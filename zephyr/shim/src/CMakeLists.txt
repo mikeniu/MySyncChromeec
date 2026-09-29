@@ -119,3 +119,5 @@ endif()
 if(CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
   zephyr_library_sources(pw_log_zephyr_tokenized.cc)
 endif()
+
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_REG_AUDIT   reg_audit.c)

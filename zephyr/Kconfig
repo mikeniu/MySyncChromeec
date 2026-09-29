@@ -1140,4 +1140,20 @@ config PLATFORM_EC_WP_EXTERNAL
 	  connected via GPIO, e.g. USB FPMCU modules with limited number of
 	  pins in the connector.
 
+config PLATFORM_EC_REG_AUDIT
+	bool "EC hardware register state audit crawler"
+	depends on SOC_FAMILY_NPCX || SOC_IT8XXX2 || SOC_FAMILY_REALTEK_EC || ZTEST
+	help
+	  Enable early-boot (PRE_KERNEL_1) and post-init (HOOK_INIT) hardware
+	  register snapshots and the 'regdump' console command to audit
+	  register state across cold boot vs. sysjump.
+
+config PLATFORM_EC_REG_AUDIT_MAX_REGS
+	int "Maximum scalar registers captured per snapshot"
+	depends on PLATFORM_EC_REG_AUDIT
+	default 1280
+	help
+	  Maximum number of register values stored in each pre-init and
+	  post-init RAM snapshot buffer.
+
 endif # PLATFORM_EC
