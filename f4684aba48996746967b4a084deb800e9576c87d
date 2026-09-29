@@ -22,6 +22,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "09810635_8be7a218",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T23:22:06Z",
+      "side": 1,
+      "message": "Including `\u003csubsys/fingerprint/alg/ft98xx_bio_alg.h\u003e` in `zephyr/drivers/fingerprint/` introduces an upward dependency from the driver layer into `subsys/fingerprint/alg/` solely for `FT_RAW_SIZE` (no other fingerprint driver includes `subsys/fingerprint/alg/` headers).\n\nSince both `fingerprint_ft98xx.c` and `ft98xx_bio_alg.c` already include `drivers/fingerprint/fingerprint_ft98xx_private.h` (and `FT_RAW_SIZE` is defined in the sensor header in the vendor library), consider moving `FT_RAW_SIZE` to `fingerprint_ft98xx_private.h`.",
+      "isAi": true,
+      "revId": "f4684aba48996746967b4a084deb800e9576c87d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c8f1c8d3_165f08eb",
         "filename": "zephyr/drivers/fingerprint/fingerprint_ft98xx.c",
         "patchSetId": 15
@@ -38,6 +56,54 @@
         "startChar": 0,
         "endLine": 315,
         "endChar": 2
+      },
+      "isAi": true,
+      "revId": "f4684aba48996746967b4a084deb800e9576c87d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d1a4f7c_ab531742",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T23:22:06Z",
+      "side": 1,
+      "message": "Consider also asserting `zassert_equal(ft_sensor_acquire_image_with_mode_fake.call_count, 0);` to verify the driver aborts before calling into the private library.\n\nAlso, incrementing only one dimension (e.g., `cols + 1` or `rows + 1`, rather than both) tests a tighter boundary condition.",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 245,
+        "endChar": 1
+      },
+      "isAi": true,
+      "revId": "f4684aba48996746967b4a084deb800e9576c87d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e728cc60_3785e56a",
+        "filename": "zephyr/test/fingerprint/drivers/ft98xx/src/ft98xx.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-29T23:22:06Z",
+      "side": 1,
+      "message": "This test duplicates `test_acquire_image_success` (lines 181-191), which already calls `fingerprint_acquire_image` with the default fixture `cols` and `rows` (`FINGERPRINT_SENSOR_RES_X/Y`) and also asserts `ft_sensor_acquire_image_with_mode_fake.call_count \u003d\u003d 1`. We can drop this duplicate test.",
+      "range": {
+        "startLine": 247,
+        "startChar": 0,
+        "endLine": 256,
+        "endChar": 1
       },
       "isAi": true,
       "revId": "f4684aba48996746967b4a084deb800e9576c87d",
