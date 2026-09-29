@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "915eed49_641086a0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-09-29T08:50:16Z",
+      "side": 1,
+      "message": "Please add the unit test to cover both valid and invalid cases defined in battery yaml.",
+      "revId": "68c77a3e67725b46ec41a867fb14fac6e62a718f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f7e0e49_256fecf2",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 8264,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-09-29T08:50:16Z",
+      "side": 1,
+      "message": "Could you add a comment for FET_ENABLE_WRITES prior an empty line ?",
+      "revId": "68c77a3e67725b46ec41a867fb14fac6e62a718f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
