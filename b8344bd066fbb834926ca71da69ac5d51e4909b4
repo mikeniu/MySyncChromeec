@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5613965e_8f517c40",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3391351
+      },
+      "writtenOn": "2026-09-29T06:53:34Z",
+      "side": 1,
+      "message": "This changes are now merged as part of https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8461866 this change.",
+      "revId": "b8344bd066fbb834926ca71da69ac5d51e4909b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
