@@ -9,3 +9,5 @@ project(it8xxx2_evb)
 
 # Include board specific header files
 zephyr_include_directories(include)
+
+target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/irq_lock_thread.c)
