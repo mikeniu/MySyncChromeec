@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b00d67cb_98325964",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-29T17:04:01Z",
+      "side": 1,
+      "message": "Add `/* CONFIG_PLATFORM_EC_BATTERY_WAKEUP_CUT_OFF */`",
+      "range": {
+        "startLine": 403,
+        "startChar": 1,
+        "endLine": 403,
+        "endChar": 6
+      },
+      "revId": "ab744e30f1effea0f24b527e2169ac530aad0cef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78030efb_84ff95c3",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-09-29T17:04:01Z",
+      "side": 1,
+      "message": "Use the `bool` type.",
+      "range": {
+        "startLine": 498,
+        "startChar": 7,
+        "endLine": 498,
+        "endChar": 10
+      },
+      "revId": "ab744e30f1effea0f24b527e2169ac530aad0cef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
