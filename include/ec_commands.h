@@ -8661,7 +8661,13 @@ enum fp_capture_type {
  * /zephyr/test/fingerprint/task/src/fpsensor_debug.cc)
  */
 
-/* The maximum number of capture types in enum fp_capture_type */
+/*
+ * Maximum number of capture types supported by a single sensor in
+ * EC_CMD_FP_INFO v2/v3 responses.
+ *
+ * NOTE: Do not change this value, as it defines the fixed response size for
+ * EC_CMD_FP_INFO v2/v3 and changing it breaks ABI compatibility with libec.
+ */
 #define FP_MAX_CAPTURE_TYPES 10
 
 /* Extracts the capture type from the sensor 'mode' word */
