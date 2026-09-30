@@ -23,8 +23,8 @@ The workspace directory structure matches standard expectations of ChromiumOS
 *   `entrypoint.sh`: Runs on container startup to populate/update checkouts,
     initialize python virtual environments, and auto-install `.vpython3`
     dependencies.
-*   `compose.yaml`: How the container runs: its workspace mount and hardware
-    access.
+*   `compose.yaml`: How the container runs: its workspace mount, hardware
+    access, and named task services.
 *   `run_docker.sh`: Starts the container with `docker compose run --rm`.
 *   `workspace/`: Bind mount source for the container. Tracked, but empty, so
     that a fresh checkout owns it; everything below it is ignored.
@@ -222,3 +222,19 @@ debugger:
    ```bash
    ./run_docker.sh bash -c "cd /workspace/src/platform/dagwood && ./build_from_chroot.py -f"
    ```
+
+---
+
+## Named Compose Services
+
+`compose.yaml` also defines named services for common tasks. They can be
+run directly with `docker compose run --rm <service>`:
+
+| Task | Command |
+|---|---|
+| Build EC firmware | `docker compose run --rm zmake build skyrim` |
+| Host-based emulation tests | `docker compose run --rm twister -ivc -s hibernate_z5.default` |
+| Test on Dagwood | `docker compose run --rm dagwood -p realtek/rts5912` |
+| Flash an EC image onto the AIC | `docker compose run --rm flash-dagwood-aic -b <project>` |
+| List Dagwood boards | `docker compose run --rm flash-dagwood-aic -l` |
+| Build and flash the Dagwood fixture firmware | `docker compose run --rm flash-dagwood-fixture` |
