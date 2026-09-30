@@ -8,9 +8,7 @@ ifneq ($(CONFIG_USB_PD_TCPMV2),)
 common-usbc-$(CONFIG_USB_PD_TCPMV2) += usb_pd_timer.o usb_sm.o usbc_task.o
 
 # Type-C state machines
-ifneq ($(CONFIG_USB_TYPEC_SM),)
 common-usbc-$(CONFIG_USB_DRP_ACC_TRYSRC) += usb_tc_drp_acc_trysrc_sm.o
-endif # CONFIG_USB_TYPEC_SM
 
 # Protocol state machine
 common-usbc-$(CONFIG_USB_PD_TCPMV2) += usb_prl_sm.o
