@@ -32,19 +32,15 @@ BUILD_ASSERT(EC_TASK_PRIORITY(EC_TASK_PRIO_LOWEST) < K_IDLE_PRIO,
 
 /* Forward declare all task entry point functions */
 #define CROS_EC_TASK(name, entry, ...) void entry(void *p);
-#define TASK_TEST(name, entry, ...) CROS_EC_TASK(name, entry)
 CROS_EC_TASK_LIST
 #undef CROS_EC_TASK
-#undef TASK_TEST
 
 /* Statically declare all threads here */
 #define CROS_EC_TASK(name, entry, parameter, stack_size, priority, options) \
 	K_THREAD_DEFINE(name, stack_size, entry, parameter, NULL, NULL,     \
 			EC_TASK_PRIORITY(priority), options, SYS_FOREVER_MS);
-#define TASK_TEST(name, e, p, size) CROS_EC_TASK(name, e, p, size)
 CROS_EC_TASK_LIST
 #undef CROS_EC_TASK
-#undef TASK_TEST
 
 struct task_ctx_base_data {
 	/** A wait-able event that is raised when a new task event is posted */
@@ -70,7 +66,6 @@ static struct task_ctx_base_data shimmed_tasks_data[TASK_ID_COUNT];
 static struct task_ctx_base_data extra_tasks_data[EXTRA_TASK_COUNT];
 static int tasks_started;
 #undef CROS_EC_TASK
-#undef TASK_TEST
 
 static struct task_ctx_base_data *task_get_base_data(task_id_t cros_task_id)
 {
@@ -356,14 +351,6 @@ int task_start_called(void)
 {
 	return tasks_started;
 }
-/*
- * TODO(b/190203712): Implement this
- * LCOV_EXCL_START
- */
-void task_disable_task(task_id_t tskid)
-{
-}
-/* LCOV_EXCL_STOP */
 
 /*
  * This function cannot be tested since it is architecture specific.

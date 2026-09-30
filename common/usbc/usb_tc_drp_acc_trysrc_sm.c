@@ -360,7 +360,6 @@ static struct bit_name event_bit_names[] = {
 	{ TASK_EVENT_ADC_DONE, "ADC_DONE" },
 	{ TASK_EVENT_RESET_DONE, "RESET_DONE" },
 	{ TASK_EVENT_WAKE, "WAKE" },
-	{ TASK_EVENT_MUTEX, "MUTEX" },
 	{ TASK_EVENT_TIMER, "TIMER" },
 	{ PD_EVENT_TX, "TX" },
 	{ PD_EVENT_CC, "CC" },
