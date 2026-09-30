@@ -142,6 +142,11 @@ def launch(
     # using a derivative board, like buccaneer which is based on helipilot.
     renode_execute.append(f'$name="{board}";')
     renode_execute.append(f'$bin="{bin_file}";')
+    if zephyr_bin and board == "chudow":
+        # Upstream ft9001_eval links the app partition at 0x10001000 without
+        # the 4KB config_page header used in chudow's ec.bin at 0x10080000.
+        renode_execute.append("$bin_addr=0x10001000;")
+        renode_execute.append("$vector_table_offset=0x10001000;")
     renode_execute.append(f'$elf_ro="{elf_ro_file}";')
     renode_execute.append(f'$elf_rw="{elf_rw_file}";')
     renode_execute.append(f"include @util/renode/{board}.resc;")
@@ -158,15 +163,17 @@ def launch(
         renode_execute.append(f"{GPIO_WP_MAP[board]} {wp_state};")
 
     if board in CONSOLE_MAP:
+        console = CONSOLE_MAP[board]
+        if zephyr_bin and board == "chudow":
+            # Upstream ft9001_eval uses usart2 as zephyr,console.
+            console = "sysbus.usart2"
         # Expose the console UART as a PTY on the given path (default:
         # /tmp/renode-uart). You can connect to the PTY with minicom, screen,
         # etc.
         renode_execute.append(
             f'emulation CreateUartPtyTerminal "term" "{uart}" True;'
         )
-        renode_execute.append(
-            "connector Connect " + CONSOLE_MAP[board] + " term;"
-        )
+        renode_execute.append("connector Connect " + console + " term;")
 
     renode_execute.append("start;")
 
