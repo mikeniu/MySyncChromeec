@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c606774_6e58f99c",
+        "filename": "zephyr/program/bluey/pic/cbi.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-09-30T03:26:28Z",
+      "side": 1,
+      "message": "Please use **UFSC** instead of FW config since it will be the standard AP and EC FW configuration mechanism for ALOS. You may use [EC_OEM_2BIT_FIELD0](https://crsrc.org/o/src/config/util/ufsc/unified_fw_config_schema.json;l\u003d273?q\u003dEC_OEM_2BIT_FIELD0\u0026ss\u003dchromiumos%2Fchromiumos%2Fcodesearch) field.\n\nFor more information, take a look at [Unified Firmware and Second Source Configuration(UFSC) Developer\u0027s Guide](https://chromium.googlesource.com/chromiumos/config/+/refs/heads/main/util/ufsc/ufsc_developer_guide.md)",
+      "revId": "01355170dc453dc7863fb9aabb689581ce615e07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
