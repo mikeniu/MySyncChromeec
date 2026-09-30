@@ -125,6 +125,24 @@
       "parentUuid": "3d8fdfee_61d2d9ff",
       "revId": "cef33b51a8afcce310ffa896e19d5aebba22b723",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1404b2b4_0d23f027",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:09:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76f79988_4f647818",
+      "revId": "cef33b51a8afcce310ffa896e19d5aebba22b723",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

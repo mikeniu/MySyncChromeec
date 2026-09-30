@@ -35,6 +35,24 @@
       "isAi": true,
       "revId": "0e3e96fb927339e51aa4751f5cf31b6c6983d961",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1d458cc_f72ac423",
+        "filename": "zephyr/shim/core/cortex-m/mpu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:09:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e765b3a6_7c2992a8",
+      "revId": "0e3e96fb927339e51aa4751f5cf31b6c6983d961",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

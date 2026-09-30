@@ -62,6 +62,30 @@
       "isAi": true,
       "revId": "0f6d69d2621adcbcaa2c3f764c72ebfcf7f706b6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5567e07_755305f7",
+        "filename": "zephyr/shim/chip/rtkfp/mpu_regions.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:09:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b2e3ac8_ced1cf62",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "revId": "0f6d69d2621adcbcaa2c3f764c72ebfcf7f706b6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
