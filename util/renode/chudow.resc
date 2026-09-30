@@ -9,6 +9,7 @@ mach create $name
 $repl?=@platforms/cpus/focaltech_ft9001.repl
 machine LoadPlatformDescription $repl
 machine LoadPlatformDescriptionFromString "romfuncs: Memory.MappedMemory @ sysbus 0x04006000 { size: 0x2000 }"
+machine LoadPlatformDescriptionFromString "psram: Memory.MappedMemory @ sysbus 0x18000000 { size: 0x200000 }"
 
 $bin?=$ORIGIN/chudow/ec.bin
 $elf_ro?=$ORIGIN/chudow/ec.RO.elf
