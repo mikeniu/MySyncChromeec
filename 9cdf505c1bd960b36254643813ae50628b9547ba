@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "9cdf505c1bd960b36254643813ae50628b9547ba",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82819d88_c18ba840",
+        "filename": "zephyr/program/fpmcu/ft9001/chudow.dts",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-30T06:18:05Z",
+      "side": 1,
+      "message": "double space",
+      "range": {
+        "startLine": 47,
+        "startChar": 66,
+        "endLine": 47,
+        "endChar": 67
+      },
+      "revId": "9cdf505c1bd960b36254643813ae50628b9547ba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
