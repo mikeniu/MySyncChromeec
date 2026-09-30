@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96b82bdf_071e4f0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-30T22:04:45Z",
+      "side": 1,
+      "message": "Am I right in thinking that this image is never going to be in Container Hub?",
+      "revId": "d282a9823f4741dea33f213f91dce08cef65ac6e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
