@@ -75,8 +75,7 @@ void tc_start_event_loop(int port)
 
 static void pd_task_init(int port)
 {
-	if (IS_ENABLED(CONFIG_USB_TYPEC_SM))
-		tc_state_init(port);
+	tc_state_init(port);
 	paused[port] = 0;
 
 	/*
@@ -131,8 +130,7 @@ static bool pd_task_loop(int port)
 		return false;
 
 	/* handle events that affect the state machine as a whole */
-	if (IS_ENABLED(CONFIG_USB_TYPEC_SM))
-		tc_event_check(port, evt);
+	tc_event_check(port, evt);
 
 	/*
 	 * run port controller task to check CC and/or read incoming
@@ -142,8 +140,7 @@ static bool pd_task_loop(int port)
 		tcpc_run(port, evt);
 
 	/* Run Device Policy Manager */
-	if (IS_ENABLED(CONFIG_USB_DPM_SM))
-		dpm_run(port, evt, tc_get_pd_enabled(port));
+	dpm_run(port, evt, tc_get_pd_enabled(port));
 
 	/* Run policy engine state machine */
 	pe_run(port, evt, tc_get_pd_enabled(port));
@@ -152,8 +149,7 @@ static bool pd_task_loop(int port)
 	prl_run(port, evt, tc_get_pd_enabled(port));
 
 	/* Run TypeC state machine */
-	if (IS_ENABLED(CONFIG_USB_TYPEC_SM))
-		tc_run(port);
+	tc_run(port);
 
 	return true;
 }
