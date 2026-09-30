@@ -7,6 +7,8 @@ zephyr_library_sources_ifdef(CONFIG_AP_POWER_EVENTS_MOCK ap_power_events.c)
 zephyr_library_sources_ifdef(CONFIG_POWER_SIGNALS_MOCK power_signals.c)
 zephyr_library_sources_ifdef(CONFIG_CHIPSET_API_MOCK chipset_api.c)
 zephyr_library_sources_ifdef(CONFIG_ISL923X_MOCK isl923x.c)
+zephyr_library_sources_ifdef(CONFIG_MOCK_ROLLBACK rollback_mock.c)
+zephyr_library_sources_ifdef(CONFIG_MOCK_OTP otpi_mock.c)
 
 if(CONFIG_PLATFORM_EC AND NOT CONFIG_USBC_SS_MUX)
   zephyr_library_sources(usb_mux.c)

@@ -29,3 +29,9 @@ config ISL923X_MOCK
 	bool "Use mocked ISL923X functions"
 	help
 	  Simple ISL923x function mocks
+
+config MOCK_ROLLBACK
+	bool "Mock rollback for tests"
+
+config MOCK_OTP
+	bool "Mock OTP for tests"

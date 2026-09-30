@@ -348,9 +348,3 @@ config HW_TEST_WATCHDOG
 	depends on ZTEST
 	help
 	  The test verifies that the watchdog fires on a busy loop.
-
-config MOCK_ROLLBACK
-	bool "Mock rollback for tests"
-
-config MOCK_OTP
-	bool "Mock OTP for tests"
