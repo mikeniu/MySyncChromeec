@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "8668edee0827f5a4f75f26557a52ba256aa6747e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c637a81_9dc577fc",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2160,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:46:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "faa0410b_d1e47a15",
+      "range": {
+        "startLine": 2153,
+        "startChar": 0,
+        "endLine": 2160,
+        "endChar": 9999
+      },
+      "revId": "8668edee0827f5a4f75f26557a52ba256aa6747e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
