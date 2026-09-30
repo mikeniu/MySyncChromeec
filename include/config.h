@@ -18,6 +18,8 @@
 #ifndef PLATFORM_EC_INCLUDE_CONFIG_H_
 #define PLATFORM_EC_INCLUDE_CONFIG_H_
 
+#ifndef HOST_TOOLS_BUILD
+
 /*
  * When building for Zephyr tests, a shimmed_tasks.h header is defined
  * to create all the HAS_TASK_* definitions.  Since those are used in
@@ -7400,5 +7402,7 @@
 #ifdef HAVE_PRIVATE
 #include "private_config.h"
 #endif /* HAVE_PRIVATE */
+
+#endif /* !HOST_TOOLS_BUILD */
 
 #endif /* PLATFORM_EC_INCLUDE_CONFIG_H_ */

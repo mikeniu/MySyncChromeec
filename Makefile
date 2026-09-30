@@ -15,12 +15,10 @@
 ARCH?=amd64
 BOARD ?= host
 
-# Directory where the board is configured (includes /$(BOARD) at the end)
-BDIR:=$(wildcard board/$(BOARD))
-
-# We need board directory,.
-ifeq (,$(BDIR))
-$(error unable to locate BOARD $(BOARD))
+# Only host utilities are built with this Makefile. EC firmware is built with
+# zmake.
+ifneq ($(BOARD),host)
+$(error Only BOARD=host is supported, use zmake to build EC firmware)
 endif
 
 PROJECT?=ec
@@ -32,9 +30,6 @@ EMPTY=
 
 # Output directory for build objects
 out?=build/$(BOARD)
-
-# File containing configuration information
-config=$(out)/.config
 
 include Makefile.toolchain
 
@@ -63,25 +58,12 @@ and_cfg = $(notdir $(filter $(strip $(1))_$(strip $(2))/%, \
 # Usage: $(call shell_echo,<shell-command>)
 shell_echo = $(if $(filter-out 0,$(V)),$(info $(1)))$(shell $(1))
 
-# The board makefile sets $CHIP and the chip makefile sets $CORE.
-# Include those now, since they must be defined for _flag_cfg below.
-include $(BDIR)/build.mk
-
-ifneq ($(ENV_VARS),)
-# Let's make sure $(out)/env_config.h changes if value any of the above
-# variables has changed since the prvious make invocation. This in turn will
-# make sure that relevant object files are re-built.
-current_set = $(foreach env_flag, $(ENV_VARS), $(env_flag)=$($(env_flag)))
-$(shell util/env_changed.sh "$(out)/env_config.h" "$(current_set)")
-endif
-
-include chip/$(CHIP)/build.mk
-
-# The toolchain must be set before referencing any toolchain-related variables
-# (CC, CPP, CXX, etc.) so that the correct toolchain is used. The CORE variable
-# is set in the CHIP build file, so this include must come after including the
-# CHIP build file.
-include core/$(CORE)/toolchain.mk
+CHIP:=host
+CORE:=host
+CROSS_COMPILE_HOST_DEFAULT:=x86_64-pc-linux-gnu-
+$(call set-option,CROSS_COMPILE,$(CROSS_COMPILE_host),\
+	$(CROSS_COMPILE_HOST_DEFAULT))
+CFLAGS_CPU=-fno-builtin
 
 -include build/Makefile.sdk
 
@@ -123,80 +105,8 @@ UC_CHIP_VARIANT:=$(call uppercase,$(CHIP_VARIANT))
 UC_CORE:=$(call uppercase,$(CORE))
 UC_PROJECT:=$(call uppercase,$(PROJECT))
 
-# Transform the configuration into make variables.  This must be done after
-# the board/project/chip/core variables are defined, since some of
-# the configs are dependent on particular configurations.
-includes=include core/$(CORE)/include include/driver $(dirs) $(out) \
-	third_party
-_tsk_lst_file:=$(PROJECT).tasklist
-_tsk_lst_flags:=
-
-_tsk_lst_flags+=-I$(BDIR) -DBOARD_$(UC_BOARD)=$(EMPTY) \
-		-D_MAKEFILE=$(EMPTY) -imacros $(_tsk_lst_file)
-
-_tsk_lst_ro:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -DCONFIG_CROS_EC_RO=1 \
-	$(_tsk_lst_flags) include/task_filter.h)
-_tsk_lst_rw:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -DCONFIG_CROS_EC_RW=1 \
-	$(_tsk_lst_flags) include/task_filter.h)
-
-_tsk_cfg_ro:=$(foreach t,$(_tsk_lst_ro) ,HAS_TASK_$(t))
-_tsk_cfg_rw:=$(foreach t,$(_tsk_lst_rw) ,HAS_TASK_$(t))
-
-_tsk_cfg:= $(filter $(_tsk_cfg_ro), $(_tsk_cfg_rw))
-_tsk_cfg_ro:= $(filter-out $(_tsk_cfg), $(_tsk_cfg_ro))
-_tsk_cfg_rw:= $(filter-out $(_tsk_cfg), $(_tsk_cfg_rw))
-
-CPPFLAGS_RO+=$(foreach t,$(_tsk_cfg_ro),-D$(t)=$(EMPTY)) \
-		$(foreach t,$(_tsk_cfg_rw),-D$(t)_RW=$(EMPTY))
-CPPFLAGS_RW+=$(foreach t,$(_tsk_cfg_rw),-D$(t)=$(EMPTY)) \
-		$(foreach t,$(_tsk_cfg_ro),-D$(t)_RO=$(EMPTY))
-CPPFLAGS+=$(foreach t,$(_tsk_cfg),-D$(t)=$(EMPTY))
-ifneq ($(ENV_VARS),)
-CPPFLAGS += -DINCLUDE_ENV_CONFIG=$(EMPTY)
-CFLAGS += -I$(realpath $(out))
-endif
-# Get the CONFIG_ and VARIANT_ options that are defined for this target and make
-# them into variables available to this build script
-# Usage: $(shell $(call cmd_get_configs,<RO|RW>))
-cmd_get_configs = $(CPP) $(foreach BLD,$(1),$(CPPFLAGS)) -P -dM \
-	-Ichip/$(CHIP) -I$(BDIR) \
-	include/config.h | \
-	grep -o "\#define \(CONFIG\|VARIANT\)_[A-Z0-9_]*" | cut -c9- | sort
-_flag_cfg_ro:=$(call shell_echo,$(call cmd_get_configs,RO))
-_flag_cfg_rw:=$(_tsk_cfg_rw) $(call shell_echo,$(call cmd_get_configs,RW))
-
-_flag_cfg:= $(filter $(_flag_cfg_ro), $(_flag_cfg_rw))
-_flag_cfg_ro:= $(filter-out $(_flag_cfg), $(_flag_cfg_ro))
-_flag_cfg_rw:= $(filter-out $(_flag_cfg), $(_flag_cfg_rw))
-
-$(foreach c,$(_tsk_cfg_rw) $(_flag_cfg_rw),$(eval $(c)=rw))
-$(foreach c,$(_tsk_cfg_ro) $(_flag_cfg_ro),$(eval $(c)=ro))
-$(foreach c,$(_tsk_cfg) $(_flag_cfg),$(eval $(c)=y))
-
-ifneq ($(CONFIG_COMMON_RUNTIME),y)
-ifneq ($(CONFIG_DFU_BOOTMANAGER_MAIN),ro)
-	_irq_list:=$(call shell_echo,$(CPP) $(CPPFLAGS) -P -Ichip/$(CHIP) \
-		-I$(BDIR) \
-		-D"ENABLE_IRQ(x)=EN_IRQ x" \
-		-imacros chip/$(CHIP)/registers.h \
-		- < $(BDIR)/ec.irqlist | grep "EN_IRQ .*" | cut -c8-)
-	CPPFLAGS+=$(foreach irq,$(_irq_list),\
-		    -D"irq_$(irq)_handler_optional=irq_$(irq)_handler")
-endif
-endif
-
-# Compute RW firmware size and offset
-# Usage: $(shell $(call cmd_config_eval,<CONFIG_*>))
-cmd_config_eval = echo "$(1)" | $(CPP) $(CPPFLAGS) -P \
-	-Ichip/$(CHIP) -I$(BDIR) \
-	-imacros include/config.h -
-_rw_off_str:=$(call shell_echo,$(call cmd_config_eval,CONFIG_RW_MEM_OFF))
-_rw_off:=$(shell echo "$$(($(_rw_off_str)))")
-_rw_size_str:=$(call shell_echo,$(call cmd_config_eval,CONFIG_RW_SIZE))
-_rw_size:=$(shell echo "$$(($(_rw_size_str)))")
-_program_memory_base_str:=\
-$(call shell_echo,$(call cmd_config_eval,CONFIG_PROGRAM_MEMORY_BASE))
-_program_memory_base=$(shell echo "$$(($(_program_memory_base_str)))")
+# Include paths.
+includes=include include/driver $(dirs) $(out) third_party
 
 $(eval BOARD_$(UC_BOARD)=y)
 $(eval CHIP_$(UC_CHIP)=y)
@@ -238,20 +148,6 @@ $(1)-dirs-y += $(addprefix $(2)/,$($(3)-dirs-y))
 endef
 
 # Get build configuration from sub-directories
-# Note that this re-includes the board and chip makefiles
-
-
-include $(BDIR)/build.mk
-ifneq ($(BOARD),host)
-ifeq ($(USE_BUILTIN_STDLIB), 1)
-include builtin/build.mk
-else
-include libc/build.mk
-endif
-endif
-include chip/$(CHIP)/build.mk
-include core/build.mk
-include core/$(CORE)/build.mk
 include common/build.mk
 include driver/build.mk
 include power/build.mk
@@ -274,9 +170,6 @@ includes+=$(includes-y)
 #   or "rw" indicating sources for rw segment.
 define get_sources =
 # Get sources to build for this target
-all-obj-$(1)+=$(call objs_from_dir_p,core/$(CORE),core,$(1))
-all-obj-$(1)+=$(call objs_from_dir_p,chip/$(CHIP),chip,$(1))
-all-obj-$(1)+=$(call objs_from_dir_p,$(BDIR),board,$(1))
 all-obj-$(1)+=$(call objs_from_dir_p,common,common,$(1))
 ifeq ($(USE_BUILTIN_STDLIB), 1)
 all-obj-$(1)+=$(call objs_from_dir_p,builtin,builtin,$(1))
@@ -307,10 +200,8 @@ $(eval $(call get_sources,ro))
 # from their optional <util_name>-objs make variable.
 #
 # See commit bc4c1b4 for more context.
-ifeq ($(BOARD),host)
 host-utils := $(call objs_from_dir,$(out)/util,host-util-bin)
 host-utils-cxx := $(call objs_from_dir,$(out)/util,host-util-bin-cxx)
-endif
 # Use the util_name with an added .c AND the special <util_name>-objs variable.
 build-srcs := $(foreach u,$(build-util-bin-y),$(sort $($(u)-objs:%.o=util/%.c) \
                 $(wildcard util/$(u).c)))
@@ -319,7 +210,7 @@ host-srcs := $(foreach u,$(host-util-bin-y),$(sort $($(u)-objs:%.o=util/%.c) \
 host-srcs-cxx := $(foreach u,$(host-util-bin-cxx-y), \
 	$(sort $($(u)-objs:%.o=util/%.cc) $(wildcard util/$(u).cc)))
 
-dirs=core/$(CORE) chip/$(CHIP) $(BDIR) common power
+dirs=common power
 dirs+=$(shell find common -type d)
 dirs+=$(shell find driver -type d)
 ifeq ($(USE_BUILTIN_STDLIB), 1)
@@ -355,9 +246,6 @@ host-deps := $(addsuffix .d, $(host-utils) $(host-utils-cxx))
 deps := $(ro-deps) $(rw-deps) $(host-deps) $(deps-y)
 
 .PHONY: ro rw
-$(config): $(out)/$(PROJECT).bin
-	@printf '%s=y\n' $(_tsk_cfg) $(_flag_cfg) > $@
-
 compile-only: $(ro-objs) $(rw-objs)
 
 ro: override BLD:=RO

@@ -5,19 +5,19 @@
  * Cros Board Info
  */
 
-#include "chipset.h"
 #include "common.h"
-#include "console.h"
 #include "crc8.h"
 #include "cros_board_info.h"
-#include "gpio.h"
-#include "host_command.h"
-#include "i2c.h"
-#include "timer.h"
 
 #ifdef HOST_TOOLS_BUILD
 #include <string.h>
 #else
+#include "chipset.h"
+#include "console.h"
+#include "gpio.h"
+#include "host_command.h"
+#include "i2c.h"
+#include "timer.h"
 #include "util.h"
 #endif
 

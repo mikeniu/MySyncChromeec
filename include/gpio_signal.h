@@ -33,7 +33,10 @@ extern "C" {
 
 enum gpio_signal {
 	GPIO_UNIMPLEMENTED = -1,
+/* Host tools have no board GPIO list. */
+#ifndef HOST_TOOLS_BUILD
 #include "gpio.wrap"
+#endif
 	GPIO_COUNT,
 	/* Ensure that sizeof gpio_signal is large enough for ioex_signal */
 	GPIO_LIMIT = 0x0FFF
@@ -48,7 +51,9 @@ enum ioex_signal {
 	IOEX_SIGNAL_START = GPIO_LIMIT + 1,
 	/* Used to ensure that the first IOEX signal is same as start */
 	__IOEX_PLACEHOLDER = GPIO_LIMIT,
+#ifndef HOST_TOOLS_BUILD
 #include "gpio.wrap"
+#endif
 	IOEX_SIGNAL_END,
 	IOEX_LIMIT = 0x1FFF
 };

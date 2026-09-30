@@ -27,11 +27,12 @@ endif
 #
 # Add libusb-1.0 required flags
 #
-INCLUDE=-I. -I../../ -I../../test -I../../include -I../../chip/host
+INCLUDE=-I. -I../../ -I../../test -I../../include -DHOST_TOOLS_BUILD
 LIBS    += -lcrypto -lssl
 CFLAGS  += ${INCLUDE}
 CFLAGS  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
-STANDALONE_FLAGS=${INCLUDE} -ffreestanding -fno-builtin \
+# CONFIG_RNG enables X25519_keypair(); trng_rand_bytes() is in rma_reset.c.
+STANDALONE_FLAGS=${INCLUDE} -DCONFIG_RNG -ffreestanding -fno-builtin \
                         -Ibuiltin/ -D"__keep= "
 
 $(PROGRAM): $(SOURCE) $(OBJS) Makefile

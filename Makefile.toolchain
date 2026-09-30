@@ -35,11 +35,9 @@ USE_CXX_COMPILER:=0
 
 CROSS_COMPILE_CC_NAME?=gcc
 
-ifeq ($(BOARD), host)
 USE_BUILTIN_STDLIB:=0
 ifeq ($(TEST_COVERAGE),)
 CROSS_COMPILE_CC_NAME=clang
-endif
 endif
 
 ifeq ($(USE_CXX_COMPILER), 1)
@@ -130,8 +128,7 @@ CFLAGS_DEBUG= -g
 CFLAGS_DEBUG+=$(CFLAGS_DEBUG_CHIP)
 CFLAGS_INCLUDE=$(foreach i,$(filter-out builtin, $(includes)),-I$(i) ) -I.
 CFLAGS_TEST=$(if $(TEST_BUILD),-DTEST_BUILD=$(EMPTY) \
-                               -DTEST_LEGACY_BUILD=$(EMPTY) \
-                               -DTEST_TASKFILE=$(PROJECT).tasklist,) \
+                               -DTEST_LEGACY_BUILD=$(EMPTY),) \
             $(if $(EMU_BUILD),-DEMU_BUILD=$(EMPTY)) \
             -DTEST_$(PROJECT)=$(EMPTY) -DTEST_$(UC_PROJECT)=$(EMPTY) \
             $(if $(TEST_ASAN),-fsanitize=address) \
@@ -140,7 +137,7 @@ CFLAGS_TEST=$(if $(TEST_BUILD),-DTEST_BUILD=$(EMPTY) \
 CFLAGS_COVERAGE=$(if $(TEST_COVERAGE),--coverage \
 				      -DTEST_COVERAGE=$(EMPTY),)
 CFLAGS_HOSTTEST=$(if $(TEST_HOSTTEST),-DTEST_HOSTTEST=$(EMPTY),) -Iinclude/driver
-CFLAGS_DEFINE=-DOUTDIR=$(out)/$(BLD) -DCHIP=$(CHIP) -DBOARD_TASKFILE=$(_tsk_lst_file) \
+CFLAGS_DEFINE=-DOUTDIR=$(out)/$(BLD) -DCHIP=$(CHIP) \
               -DBOARD=$(BOARD) -DCORE=$(CORE) -DPROJECT=$(PROJECT) \
               -DCHIP_VARIANT=$(CHIP_VARIANT) -DCHIP_FAMILY=$(UC_CHIP_FAMILY) \
               -DBOARD_$(UC_BOARD)=$(EMPTY) \
@@ -153,7 +150,7 @@ CFLAGS_DEFINE=-DOUTDIR=$(out)/$(BLD) -DCHIP=$(CHIP) -DBOARD_TASKFILE=$(_tsk_lst_
 CPPFLAGS=$(CFLAGS_DEFINE) $(CFLAGS_INCLUDE) $(CFLAGS_TEST) \
 	 $(EXTRA_CFLAGS) $(CFLAGS_COVERAGE) $(CFLAGS_HOSTTEST) $(LATE_CFLAGS_DEFINE) \
 	$(if $(BLD),-DCONFIG_CROS_EC_$(BLD)=1) $(CPPFLAGS_$(BLD))
-BUILD_CPPFLAGS=$(CFLAGS_DEFINE) -Icore/host $(CFLAGS_INCLUDE) $(CFLAGS_TEST) \
+BUILD_CPPFLAGS=$(CFLAGS_DEFINE) $(CFLAGS_INCLUDE) $(CFLAGS_TEST) \
 	 $(EXTRA_CFLAGS) $(CFLAGS_COVERAGE) $(CFLAGS_HOSTTEST) $(LATE_CFLAGS_DEFINE) \
 	 $(if $(BLD),-DCONFIG_CROS_EC_$(BLD)=1) $(CPPFLAGS_$(BLD))
 HOST_CPPFLAGS=-I$(out)/include $(CFLAGS_DEFINE) $(CFLAGS_INCLUDE) \
@@ -162,30 +159,12 @@ HOST_CPPFLAGS=-I$(out)/include $(CFLAGS_DEFINE) $(CFLAGS_INCLUDE) \
 	 $(CPPFLAGS_$(BLD)) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
 	 -D_LARGEFILE64_SOURCE
 
-ifneq ($(BOARD),host)
-CPPFLAGS+=-fno-PIC
-ifeq ($(USE_BUILTIN_STDLIB), 1)
-CPPFLAGS+=-ffreestanding -fno-builtin -nostdinc -nostdlib
-CPPFLAGS+=-Ibuiltin/
-endif
-else
 CPPFLAGS+=-Og
-endif
 CPPFLAGS+= -DCHROMIUM_EC=$(EMPTY)
 CFLAGS=$(CPPFLAGS) $(CFLAGS_CPU) $(CFLAGS_DEBUG) $(COMMON_WARN) $(COMMON_WARN-$(CROSS_COMPILE_CC_NAME)) $(CFLAGS_y)
 CFLAGS+= -ffunction-sections
 CFLAGS+= -fno-delete-null-pointer-checks
 CFLAGS+= -fno-PIC
-ifneq ($(CROSS_COMPILE_CC_NAME),clang)
-# GCC 11 and above may generate a warning when dereferencing a constant
-# address pointer whose address is below the value specified by the
-# `min-pagesize` parameter (defaults to 0x1000). The `min-pagesize` parameter
-# is set to 0 such that GCC never generates any warnings for the constant
-# address pointers. For more details, refer to the GCC PR99578.
-ifneq ($(BOARD), host)
-CFLAGS+= --param min-pagesize=0
-endif
-endif
 ifneq ($(CROSS_COMPILE_CC_NAME),clang)
 CFLAGS+= -ffat-lto-objects
 CFLAGS+= -fconserve-stack
@@ -258,12 +237,6 @@ BUILD_LDFLAGS=$(LIBFTDIUSB_BUILD_LDLIBS)
 ifneq (${HOST_SYSROOT},)
   HOST_LDFLAGS+=--sysroot=${HOST_SYSROOT}
 endif
-HOST_TEST_LDFLAGS=-Wl,-T core/host/host_exe.lds -lrt -pthread -rdynamic -lm\
-		  -no-pie -flto\
-		  $(if $(TEST_COVERAGE), --coverage,) \
-		  $(if $(TEST_ASAN), -fsanitize=address) \
-		  $(if $(TEST_MSAN), -fsanitize=memory) \
-		  $(if $(TEST_UBSAN), ${UBSAN_FLAGS})
 
 # utility function to provide overridable defaults
 # $1: name of variable to set

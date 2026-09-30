@@ -8,8 +8,6 @@ project(keyboard_factory_test)
 
 zephyr_include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-target_sources(app PRIVATE ../../../chip/host/lpc.c)
-
 target_sources(app PRIVATE src/main.c)
 
 add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
