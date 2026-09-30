@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e8a4f06_6fe42c7f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T07:05:13Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/4c14aa2f-0611-4c9f-bd12-b3439940fc51)]\n\n### Review Summary\n* **Architecture \u0026 Component Fit:** The change correctly integrates Zephyr OTP and TRNG drivers for the Realtek FP to read and provision the OTP key, cleanly fitting into the EC layer.\n* **Code Simplicity:** The implementation is as simple as possible, with straightforward read, generate, and program logic. \n* **Idiomaticity \u0026 Readability:** The code uses idiomatic constructs, enforces stack buffer alignment appropriately, securely cleanses sensitive stack variables, and properly uses a named constant (`RTKFP_OTP_KEY_ADDR`) instead of magic numbers.\n* **Testing:** The code relies on the existing `otp_key` automated device test suite (`run_device_tests.py -b realtekfp -t otp_key --zephyr`), providing adequate coverage for the hardware interaction.\n* **CL Size \u0026 Scope:** Size: M (+117, -1). The CL is appropriately sized and tightly focused on adding OTP support for `rtkfp`.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "9c69e555c6b8cb9384b6c9289be59e135221ca1b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
