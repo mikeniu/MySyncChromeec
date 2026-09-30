@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77b47278_79a27bbe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T07:17:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL and add tests**\n\n### Review Summary\n\n*   **Functionality:** The previous masking issue in `convert_rts_snr_init_error_code` was fixed.\n*   **Architecture \u0026 Component Fit:** The driver correctly encapsulates sensor interactions and maps to standard Cros EC APIs.\n*   **Code Simplicity:** The driver implementation is straightforward.\n*   **Idiomaticity \u0026 Readability:** Global namespace pollution issues were fixed by adding `static`.\n*   **Testing \u0026 Test Coverage:** Still missing automated test coverage. A driver of this size must include unit tests using standard fakes/mocks, following the established conventions seen in `zephyr/test/fingerprint/drivers/`. Updating the commit message to `TEST\u003dzmake build realtekfp` is not an acceptable substitute for automated test coverage.\n*   **CL Size \u0026 Scope:** Size: L (+979, -1). This CL remains too large and bundles multiple logical additions together. It must be split:\n    *   **CL 1:** Device tree bindings (`realtek,rts5817maa.yaml`), Kconfig entries, and build files.\n    *   **CL 2:** Core sensor driver (`fingerprint_rts5817maa.c`) along with its unit tests in `zephyr/test/fingerprint/drivers/rts5817maa/`.\n    *   **CL 3:** Board integrations and shim updates (e.g., `fpsensor.c`, `realtekfp.dts`).\n*   **Commit Message:** The `BUG\u003d` tag format was corrected.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8417147_fbb21edd-83c3-4441-bdaa-666d60230b73.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2eaa55d94d4bef1f52d0518ec28e99c87164a267",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
