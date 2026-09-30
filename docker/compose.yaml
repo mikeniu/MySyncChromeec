@@ -13,6 +13,7 @@ services:
   shell:
     build: .
     image: ec-builder
+    pull_policy: never
     # Hardware access is granted in two independent layers:
     #
     # 1. Bind-mounting /dev makes the host device nodes visible, including
