@@ -120,6 +120,17 @@ static inline void task_wake(task_id_t tskid)
 task_id_t task_get_current(void);
 
 /**
+ * Check whether the calling thread is the given task.
+ *
+ * Prefer this over comparing against task_get_current(), which needs a
+ * reverse thread-to-task lookup.
+ *
+ * @param tskid		Task to check
+ * @return		true if the caller is running as task tskid
+ */
+bool task_is_current(task_id_t tskid);
+
+/**
  * Check if this current task is running in deferred context
  */
 bool in_deferred_context(void);

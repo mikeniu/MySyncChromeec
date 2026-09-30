@@ -190,6 +190,29 @@ task_id_t task_get_current(void)
 	return thread_id_to_task_id(k_current_get());
 }
 
+bool task_is_current(task_id_t cros_task_id)
+{
+	/* k_current_get() is not valid pre kernel */
+	if (k_is_pre_kernel() || cros_task_id == TASK_ID_INVALID) {
+		return false;
+	}
+
+#if defined(CONFIG_HAS_HOSTCMD) || \
+	(!defined(CONFIG_SHIMMED_TASKS) && !defined(CONFIG_HAS_TEST_TASKS))
+	/* The host command task may run on the main or a dedicated thread */
+	if (cros_task_id == TASK_ID_HOSTCMD) {
+		return get_hostcmd_thread() == k_current_get();
+	}
+#endif
+
+	if (cros_task_id < TASK_ID_COUNT) {
+		return task_to_k_tid[cros_task_id] == k_current_get();
+	}
+
+	/* Extra tasks run on non-shimmed threads */
+	return task_get_current() == cros_task_id;
+}
+
 atomic_t *task_get_event_bitmap(task_id_t cros_task_id)
 {
 	struct task_ctx_base_data *data;

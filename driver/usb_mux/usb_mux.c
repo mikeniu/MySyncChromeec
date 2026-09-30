@@ -414,16 +414,15 @@ static int configure_mux(int port, int index, enum mux_config_type config,
 			 * mux task
 			 */
 			if (IS_ENABLED(HAS_TASK_USB_MUX)) {
-				assert(task_get_current() == TASK_ID_USB_MUX);
+				assert(task_is_current(TASK_ID_USB_MUX));
 			} else {
 #ifdef TEST_BUILD
-				assert(port == TASK_ID_TO_PD_PORT(
-						       task_get_current()) ||
-				       task_get_current() ==
-					       TASK_ID_TEST_RUNNER);
+				assert(task_is_current(
+					       PD_PORT_TO_TASK_ID(port)) ||
+				       task_is_current(TASK_ID_TEST_RUNNER));
 #else
-				assert(port ==
-				       TASK_ID_TO_PD_PORT(task_get_current()));
+				assert(task_is_current(
+					PD_PORT_TO_TASK_ID(port)));
 #endif /* TEST_BUILD */
 			}
 

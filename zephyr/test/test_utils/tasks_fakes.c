@@ -15,6 +15,7 @@
  */
 /* LCOV_EXCL_START */
 FAKE_VALUE_FUNC(task_id_t, task_get_current);
+FAKE_VALUE_FUNC(bool, task_is_current, task_id_t);
 FAKE_VALUE_FUNC(atomic_t *, task_get_event_bitmap, task_id_t);
 FAKE_VOID_FUNC(task_set_event, task_id_t, uint32_t);
 FAKE_VALUE_FUNC(int, task_start_called);

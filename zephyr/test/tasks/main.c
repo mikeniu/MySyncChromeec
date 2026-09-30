@@ -114,6 +114,25 @@ ZTEST(test_task_shim, test_task_get_current)
 	run_test(&task_get_current1, &task_get_current2);
 }
 
+static void task_is_current1(void)
+{
+	zassert_true(task_is_current(TASK_ID_TASK_1));
+	zassert_false(task_is_current(TASK_ID_TASK_2));
+	zassert_false(task_is_current(TASK_ID_INVALID));
+}
+
+static void task_is_current2(void)
+{
+	zassert_true(task_is_current(TASK_ID_TASK_2));
+	zassert_false(task_is_current(TASK_ID_TASK_1));
+	zassert_false(task_is_current(TASK_ID_INVALID));
+}
+
+ZTEST(test_task_shim, test_task_is_current)
+{
+	run_test(&task_is_current1, &task_is_current2);
+}
+
 static void timeout1(void)
 {
 	const uint32_t start_ms = k_uptime_get();
@@ -239,6 +258,7 @@ static int pre_kernel(void)
 	zassert_false(pre_kernel_ran);
 	zassert_true(k_is_pre_kernel());
 	zassert_equal(TASK_ID_INVALID, task_get_current());
+	zassert_false(task_is_current(TASK_ID_MAIN));
 	zassert_false(in_deferred_context());
 	pre_kernel_ran = true;
 	return 0;
@@ -256,6 +276,8 @@ static int post_kernel(void)
 	zassert_false(post_kernel_ran);
 	zassert_false(k_is_pre_kernel());
 	zassert_equal(TASK_ID_MAIN, task_get_current());
+	zassert_true(task_is_current(TASK_ID_MAIN));
+	zassert_false(task_is_current(TASK_ID_TASK_1));
 	post_kernel_ran = true;
 	return 0;
 }
