@@ -8,8 +8,8 @@
  * @brief Controls for the mock OTP key library
  */
 
-#ifndef PLATFORM_EC_INCLUDE_MOCK_OTPI_MOCK_H_
-#define PLATFORM_EC_INCLUDE_MOCK_OTPI_MOCK_H_
+#ifndef PLATFORM_EC_ZEPHYR_MOCK_INCLUDE_MOCK_OTPI_MOCK_H_
+#define PLATFORM_EC_ZEPHYR_MOCK_INCLUDE_MOCK_OTPI_MOCK_H_
 
 #include "otp_key.h"
 
@@ -42,4 +42,4 @@ extern struct mock_otp mock_otp;
 }
 #endif
 
-#endif /* PLATFORM_EC_INCLUDE_MOCK_OTPI_MOCK_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_MOCK_INCLUDE_MOCK_OTPI_MOCK_H_ */
