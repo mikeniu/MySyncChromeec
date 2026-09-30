@@ -5,7 +5,6 @@
 
 /* One-Time Programmable (OTP) Key */
 
-#include "chip/npcx/rom_chip.h"
 #include "common.h"
 #include "console.h"
 #include "openssl/mem.h"
@@ -13,6 +12,7 @@
 #include "panic.h"
 #include "printf.h"
 #include "registers.h"
+#include "rom_chip.h"
 #include "system.h"
 #include "task.h"
 #include "trng.h"
