@@ -25,19 +25,28 @@
 			};
 		};
 
-		/* Battery/Charge LED - amber, on gpio_ec_led1_odl (GPIOC3) */
 		battery_led: battery-led {
 			led-id = "EC_LED_ID_BATTERY_LED";
-			led-pins = <&gpio_ec_led1_odl>;
+			led-pins = <&gpio_ec_led1_odl &gpio_ec_led3_odl>;
 
 			battery_led_off: color-off {
 				led-color = "LED_OFF";
-				led-values = <0>;
+				led-values = <0 0>;
+			};
+
+			battery_led_red: color-red {
+				led-color = "LED_RED";
+				led-values = <1 0>;
+			};
+
+			battery_led_green: color-green {
+				led-color = "LED_GREEN";
+				led-values = <0 1>;
 			};
 
 			battery_led_amber: color-amber {
 				led-color = "LED_AMBER";
-				led-values = <1>;
+				led-values = <1 1>;
 			};
 		};
 	};
@@ -88,18 +97,51 @@
 				};
 			};
 		};
+		charge-state-low {
+			charge-state = "LED_PWRS_CHARGE", "LED_PWRS_IDLE",
+				"LED_PWRS_FORCED_IDLE";
+			batt-lvl = <BATTERY_LEVEL_EMPTY 4>;
 
-		/* ========== Battery/Charge LED Policies ========== */
+			battery-led {
+				led-id = "EC_LED_ID_BATTERY_LED";
+				color-0 {
+					led-color = <&battery_led_red>;
+				};
+			};
+		};
 
-		/* Charger connected - solid amber */
-		charge-state-connected {
-			charge-state = "LED_PWRS_CHARGE", "LED_PWRS_CHARGE_NEAR_FULL",
-				"LED_PWRS_IDLE", "LED_PWRS_FORCED_IDLE";
+		charge-state-mid {
+			charge-state = "LED_PWRS_CHARGE", "LED_PWRS_IDLE",
+				"LED_PWRS_FORCED_IDLE";
+			batt-lvl = <BATTERY_LEVEL_CRITICAL 97>;
 
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
 					led-color = <&battery_led_amber>;
+				};
+			};
+		};
+
+		charge-state-high {
+			charge-state = "LED_PWRS_CHARGE", "LED_PWRS_IDLE",
+				"LED_PWRS_FORCED_IDLE";
+			batt-lvl = <98 BATTERY_LEVEL_FULL>;
+
+			battery-led {
+				led-id = "EC_LED_ID_BATTERY_LED";
+				color-0 {
+					led-color = <&battery_led_green>;
+				};
+			};
+		};
+		charge-state-near-full {
+			charge-state = "LED_PWRS_CHARGE_NEAR_FULL";
+
+			battery-led {
+				led-id = "EC_LED_ID_BATTERY_LED";
+				color-0 {
+					led-color = <&battery_led_green>;
 				};
 			};
 		};
@@ -123,7 +165,12 @@
 			battery-led {
 				led-id = "EC_LED_ID_BATTERY_LED";
 				color-0 {
-					led-color = <&battery_led_amber>;
+					led-color = <&battery_led_red>;
+					period-ms = <1000>;
+				};
+				color-1 {
+					led-color = <&battery_led_off>;
+					period-ms = <1000>;
 				};
 			};
 		};

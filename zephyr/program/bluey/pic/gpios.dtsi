@@ -139,6 +139,10 @@
 		gpio_ec_close_lcd_n: ec_close_lcd_n {
 			gpios = <&gpiob 5 (GPIO_INPUT)>;
 		};
+		/* GPIOB6/PWM4: charge LED green (EC_LED3). */
+		gpio_ec_led3_odl: ec_led3_odl {
+			gpios = <&gpiob 6 (GPIO_OUTPUT)>;
+		};
 		gpio_ec_en_vph_pwr_1a: ec_en_vph_pwr_1a {
 			gpios = <&gpioc 0 (GPIO_OUTPUT)>;
 		};
