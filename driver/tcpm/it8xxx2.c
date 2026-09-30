@@ -22,6 +22,8 @@
 #include "usb_pd_tcpm.h"
 #include "util.h"
 
+#include <zephyr/irq.h>
+
 #include <soc.h>
 
 #ifdef CONFIG_USB_PD_TCPMV2
@@ -885,12 +887,14 @@ static void it8xxx2_init(enum usbpd_port port, int role)
 	/* Set cc1/cc2 pins alternate mode */
 	*usbpd_ctrl_regs[port].cc1 = cc_config;
 	*usbpd_ctrl_regs[port].cc2 = cc_config;
-	task_clear_pending_irq(usbpd_ctrl_regs[port].irq);
-	task_disable_irq(usbpd_ctrl_regs[port].irq);
+#ifdef CONFIG_HAS_ITE_INTC
+	ite_intc_isr_clear(usbpd_ctrl_regs[port].irq);
+#endif
+	irq_disable(usbpd_ctrl_regs[port].irq);
 	irq_connect_dynamic(usbpd_ctrl_regs[port].irq, 0,
 			    (void (*)(const void *))chip_pd_irq, (void *)port,
 			    0);
-	task_enable_irq(usbpd_ctrl_regs[port].irq);
+	irq_enable(usbpd_ctrl_regs[port].irq);
 	USBPD_START(port);
 	/*
 	 * Disconnect CCs Rd_DB from GND

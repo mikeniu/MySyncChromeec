@@ -11,11 +11,15 @@
 #include "timer.h"
 #include "usb_pd.h"
 
+#include <soc.h>
+
 void chip_pd_irq(enum usbpd_port port)
 {
 	timestamp_t irq_ts = get_time();
 
-	task_clear_pending_irq(usbpd_ctrl_regs[port].irq);
+#ifdef CONFIG_HAS_ITE_INTC
+	ite_intc_isr_clear(usbpd_ctrl_regs[port].irq);
+#endif
 
 	/* check status */
 	if (IS_ENABLED(IT83XX_INTC_FAST_SWAP_SUPPORT) &&
