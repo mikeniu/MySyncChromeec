@@ -3,37 +3,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Thin wrapper around "docker run" for the EC firmware container, adding the
-# workspace mount and hardware device forwarding (CCD/Servo and Serial TTYs).
+# Run a command in the EC firmware container, or a shell if none is given.
+# compose.yaml configures the container; this script adds --rm, which a
+# Compose file cannot express.
 
-set -e
-
-# Resolve the workspace against this script's location, not the caller's
-# working directory.
-WORKSPACE_DIR="$(realpath "$(dirname "${BASH_SOURCE[0]}")/workspace")"
-
-# Hardware access is granted in two independent layers:
-#
-# 1. Bind-mounting /dev makes the host device nodes visible, including any
-#    device hotplugged or re-enumerated after the container starts. A device
-#    that resets into a bootloader and comes back as a different ttyACM
-#    number stays usable.
-# 2. The device cgroup controller still denies open() on anything outside
-#    Docker's small default allowlist, so a rule is needed as well.
-#    "c *:* rmw" grants character devices only: serial ports and usbfs work,
-#    while block devices (disks) stay inaccessible and the default seccomp,
-#    AppArmor and capability restrictions remain in place.
-
-# Only allocate a TTY when attached to an interactive terminal, so that the
-# wrapper stays usable from scripts and CI.
-TTY_ARGS=()
-if [ -t 0 ] && [ -t 1 ]; then
-  TTY_ARGS=( -it )
-fi
-
-exec docker run --rm \
-  "${TTY_ARGS[@]}" \
-  --device-cgroup-rule="c *:* rmw" \
-  -v "${WORKSPACE_DIR}:/workspace" \
-  -v /dev:/dev \
-  ec-builder "$@"
+exec docker compose -f "$(dirname "${BASH_SOURCE[0]}")/compose.yaml" \
+  run --rm shell "$@"

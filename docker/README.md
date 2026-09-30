@@ -23,6 +23,9 @@ The workspace directory structure matches standard expectations of ChromiumOS
 *   `entrypoint.sh`: Runs on container startup to populate/update checkouts,
     initialize python virtual environments, and auto-install `.vpython3`
     dependencies.
+*   `compose.yaml`: How the container runs: its workspace mount and hardware
+    access.
+*   `run_docker.sh`: Starts the container with `docker compose run --rm`.
 *   `workspace/`: Bind mount source for the container. Tracked, but empty, so
     that a fresh checkout owns it; everything below it is ignored.
 *   `workspace/src/platform/ec/`: The Chromium OS EC firmware source.
@@ -49,7 +52,7 @@ Ensure you have **Docker** installed and running on your workstation.
 Run the following command inside this directory to build the image:
 
 ```bash
-docker build -t ec-builder .
+docker compose build
 ```
 
 ### 2. Run the Container (Interactive Development)
@@ -57,15 +60,16 @@ To spin up the container, map your persistent local workspace, and drop into a
 bash shell with all dependencies ready:
 
 ```bash
-docker run -it --rm \
-  -v $(pwd)/workspace:/workspace \
-  ec-builder
+docker compose run --rm shell
 ```
 
 Or using the helper script:
 ```bash
 ./run_docker.sh
 ```
+
+`run_docker.sh` runs `docker compose run --rm shell` with the configuration in
+`compose.yaml`, and passes its arguments on as the command to run.
 
 > **The container runs as the owner of `workspace/`.** That directory is part
 > of the checkout, so it belongs to whoever cloned the tree, and build
@@ -77,7 +81,9 @@ Or using the helper script:
 > **Only `--rm` containers are supported.** `run_docker.sh` always passes
 > `--rm`. Each time a container starts, the entrypoint creates a user for the
 > owner of `workspace/`, so a stopped container cannot be started again: it
-> exits with `useradd: user 'hostuser' already exists`.
+> exits with `useradd: user 'hostuser' already exists`. For the same reason,
+> do not start the container with `docker compose up` or `docker compose
+> start`.
 
 > **Updating Repositories**: Container startup skips remote git checks by
 > default so existing checkouts launch immediately and local state is left
@@ -88,25 +94,10 @@ Or using the helper script:
 > ```
 
 ### 3. Hardware Access (Flashing and Device Testing)
-The plain `docker run` above is enough for building. Flashing and device
-testing additionally need the host's USB devices and serial ports, which
-`run_docker.sh` configures automatically. To do the same from a raw
-`docker run`, add:
-
-```bash
-docker run -it --rm \
-  --device-cgroup-rule="c *:* rmw" \
-  -v $(pwd)/workspace:/workspace \
-  -v /dev:/dev \
-  ec-builder
-```
-
-Bind mounting `/dev` keeps devices visible across hotplug and
-re-enumeration, so a board that resets into its bootloader and returns
-under a different `ttyACM` number stays usable. The cgroup rule is
-required because Docker denies `open()` on devices outside a small
-default allowlist; limiting it to character devices leaves block devices
-(disks) inaccessible. `--privileged` is not needed.
+The container, as configured by `compose.yaml`, can access the host's USB
+devices and serial ports, including devices that appear or re-enumerate after
+the container starts. A board that resets into its bootloader and returns
+under a different `ttyACM` number remains usable.
 
 ---
 
@@ -199,16 +190,18 @@ You can trigger builds or run tests directly from your host machine:
 
 **For builds:**
 ```bash
-docker run --rm \
-  -v $(pwd)/workspace:/workspace \
-  ec-builder zmake --checkout /workspace build skyrim
+docker compose run --rm shell zmake --checkout /workspace build skyrim
 ```
 
 **For Twister tests:**
 ```bash
-docker run --rm \
-  -v $(pwd)/workspace:/workspace \
-  ec-builder ./twister -ivc -s hibernate_z5.default
+docker compose run --rm shell ./twister -ivc -s hibernate_z5.default
+```
+
+Or using `run_docker.sh`:
+```bash
+./run_docker.sh zmake --checkout /workspace build skyrim
+./run_docker.sh ./twister -ivc -s hibernate_z5.default
 ```
 
 ### Building and Flashing Dagwood Firmware (OpenOCD & ST-Link)
