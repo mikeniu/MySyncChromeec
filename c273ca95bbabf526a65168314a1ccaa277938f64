@@ -90,6 +90,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "f3a44d7d_3c074c6d",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1086,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-30T15:50:01Z",
+      "side": 1,
+      "message": "See b:251240682 and b:180465870.",
+      "parentUuid": "0a1fcfac_18591012",
+      "revId": "c273ca95bbabf526a65168314a1ccaa277938f64",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e7adf04e_ea6e458c",
         "filename": "common/usbc/usbc_task.c",
         "patchSetId": 10
