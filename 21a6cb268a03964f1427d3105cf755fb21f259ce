@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1524800_a2d2034e",
+        "filename": "zephyr/program/bluey/pic/led.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-09-30T09:05:21Z",
+      "side": 1,
+      "message": "Update this comment to reflect the changes.",
+      "revId": "21a6cb268a03964f1427d3105cf755fb21f259ce",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
