@@ -501,32 +501,33 @@ def bundle_coverage(opts):
     meta.lcov_info.type = (
         firmware_pb2.FirmwareArtifactInfo.LcovTarballInfo.LcovType.LCOV  # pylint: disable=no-member
     )
-    (bundle_dir / "html").mkdir(exist_ok=True)
-    # Build HTML coverage reports when bundling artifacts
-    make_cmd = [
-        "make",
-        "-f",
-        "Makefile.cq",
-        f"-j{opts.cpus}",
-        "lcov_rpt",
-        "special_boards_rpt",
-    ]
-    if SPECIAL_BOARDS:
-        make_cmd.append(f"SPECIAL_BOARDS={' '.join(SPECIAL_BOARDS)}")
-    log_cmd(make_cmd)
-    subprocess.run(
-        make_cmd, check=True, cwd=ZEPHYR_DIR, stdin=subprocess.DEVNULL
-    )
+    if getattr(opts, "html", False) or opts.bcs_version:
+        (bundle_dir / "html").mkdir(exist_ok=True)
+        # Build HTML coverage reports when bundling artifacts
+        make_cmd = [
+            "make",
+            "-f",
+            "Makefile.cq",
+            f"-j{opts.cpus}",
+            "lcov_rpt",
+            "special_boards_rpt",
+        ]
+        if SPECIAL_BOARDS:
+            make_cmd.append(f"SPECIAL_BOARDS={' '.join(SPECIAL_BOARDS)}")
+        log_cmd(make_cmd)
+        subprocess.run(
+            make_cmd, check=True, cwd=ZEPHYR_DIR, stdin=subprocess.DEVNULL
+        )
 
-    cmd = ["mv", "lcov_rpt"]
-    for board in SPECIAL_BOARDS:
-        cmd.append(board + "_rpt")
-    cmd.append(bundle_dir / "html/")
-    log_cmd(cmd)
-    subprocess.run(cmd, cwd=build_dir, check=True, stdin=subprocess.DEVNULL)
-    meta = info.objects.add()
-    meta.file_name = "html"
-    meta.coverage_html.SetInParent()
+        cmd = ["mv", "lcov_rpt"]
+        for board in SPECIAL_BOARDS:
+            cmd.append(board + "_rpt")
+        cmd.append(bundle_dir / "html/")
+        log_cmd(cmd)
+        subprocess.run(cmd, cwd=build_dir, check=True, stdin=subprocess.DEVNULL)
+        meta = info.objects.add()
+        meta.file_name = "html"
+        meta.coverage_html.SetInParent()
 
     write_metadata(opts, info)
     return 0

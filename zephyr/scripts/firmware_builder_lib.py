@@ -280,6 +280,13 @@ def create_arg_parser(build, bundle, test):
     )
 
     parser.add_argument(
+        "--html",
+        action="store_true",
+        default=False,
+        help="Generate HTML coverage reports during bundle.",
+    )
+
+    parser.add_argument(
         "--patches-dir",
         default=str(
             find_checkout() / "src" / "platform" / "ec-private" / "patches"
