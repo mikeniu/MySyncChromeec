@@ -9,9 +9,7 @@
 #include "common.h"
 #include "ec_commands.h"
 
-#ifdef CONFIG_ZEPHYR
 #include <zephyr/linker/iterable_sections.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -189,12 +187,8 @@ bool host_command_in_process_ended(void);
  */
 uint8_t host_command_get_saved_result(void);
 
-#ifndef CONFIG_ZEPHYR
-__error("This function should only be called from Zephyr OS code")
-#endif
-	struct host_command *zephyr_find_host_command(int command);
+struct host_command *zephyr_find_host_command(int command);
 
-#ifdef CONFIG_ZEPHYR
 #define DECLARE_HOST_COMMAND(_command, _routine, _version_mask)         \
 	static const STRUCT_SECTION_ITERABLE(host_command,              \
 					     _cros_hcmd_##_command) = { \
@@ -202,43 +196,6 @@ __error("This function should only be called from Zephyr OS code")
 		.command = _command,                                    \
 		.version_mask = _version_mask,                          \
 	}
-#elif defined(HAS_TASK_HOSTCMD)
-#define EXPAND(off, cmd) __host_cmd_(off, cmd)
-#define __host_cmd_(off, cmd) __host_cmd_##off##cmd
-#define EXPANDSTR(off, cmd) "__host_cmd_" #off #cmd
-
-/*
- * Register a host command handler with
- * commands starting at offset 0x0000
- */
-#define DECLARE_HOST_COMMAND(command, routine, version_mask)                   \
-	const struct host_command __keep __no_sanitize_address EXPAND(0x0000,  \
-								      command) \
-		__attribute__((section(                                        \
-			".rodata.hcmds." EXPANDSTR(0x0000, command)))) = {     \
-			(ec_host_cmd_handler_cb)routine, command, version_mask \
-		}
-
-/*
- * Register a private host command handler with
- * commands starting at offset EC_CMD_BOARD_SPECIFIC_BASE,
- */
-#define DECLARE_PRIVATE_HOST_COMMAND(command, routine, version_mask)         \
-	const struct host_command __keep __no_sanitize_address EXPAND(       \
-		EC_CMD_BOARD_SPECIFIC_BASE, command)                         \
-		__attribute__((section(".rodata.hcmds." EXPANDSTR(           \
-			EC_CMD_BOARD_SPECIFIC_BASE, command)))) = {          \
-			(ec_host_cmd_handler_cb)routine,                     \
-			EC_PRIVATE_HOST_COMMAND_VALUE(command), version_mask \
-		}
-#else /* !CONFIG_ZEPHYR && !HAS_TASK_HOSTCMD */
-#define DECLARE_HOST_COMMAND(command, routine, version_mask)                \
-	static enum ec_status(routine)(struct host_cmd_handler_args * args) \
-		__attribute__((unused))
-
-#define DECLARE_PRIVATE_HOST_COMMAND(command, routine, version_mask) \
-	DECLARE_HOST_COMMAND(command, routine, version_mask)
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 }

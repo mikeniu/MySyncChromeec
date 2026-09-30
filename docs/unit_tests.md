@@ -74,9 +74,7 @@ static bool some_function(void)
 }
 ```
 
-[`test_util.h`] includes `ztest.h` if `CONFIG_ZEPHYR` is defined, or defines a
-mapping from the `zassert` macros to the EC `TEST_ASSERT` macros if
-`CONFIG_ZEPHYR` is not defined.
+[`test_util.h`] includes `ztest.h` and defines helper macros for writing tests.
 
 ### Test cases
 
@@ -118,31 +116,18 @@ assertion: `c zassert_true(condition);` versus `c TEST_EQ(condition, true,
 
 ### Specify the test cases to run
 
-The EC test API enumerates the test cases using `RUN_TEST` in the `run_test`
-function, while the Ztest API enumerates the test cases using `ztest_unit_test`
+The Ztest API enumerates the test cases using `ztest_unit_test`
 inside another macro for the test suite, inside of `test_main`.
 
 `test/my_test.c`:
 
 ```c
-#ifdef CONFIG_ZEPHYR
 void test_main(void)
 {
     ztest_test_suite(test_my_unit,
              ztest_unit_test(test_my_function));
     ztest_run_test_suite(test_my_unit);
 }
-#else
-/* The test framework will call the function named "run_test" */
-void run_test(int argc, char **argv)
-{
-    /* Each unit test can be run using the RUN_TEST macro: */
-    RUN_TEST(test_my_function);
-
-    /* Report the results of all the tests at the end. */
-    test_print_result();
-}
-#endif /* CONFIG_ZEPHYR */
 ```
 
 ### Task List

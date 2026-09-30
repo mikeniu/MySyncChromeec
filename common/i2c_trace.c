@@ -57,21 +57,14 @@ trace_enabled:
 static int command_i2ctrace_list(void)
 {
 	size_t i;
-	const struct i2c_port_t *i2c_port;
 
 	ccprintf("id port       address\n");
 	ccprintf("-- ----       -------\n");
 
 	for (i = 0; i < ARRAY_SIZE(trace_entries); i++) {
 		if (trace_entries[i].enabled) {
-			i2c_port = get_i2c_port(trace_entries[i].port);
 			ccprintf("%-2zd %d %-8s 0x%X", i, trace_entries[i].port,
-#ifndef CONFIG_ZEPHYR
-				 i2c_port ? i2c_port->name : "invalid",
-#else
-				 "",
-#endif /* CONFIG_ZEPHYR */
-				 trace_entries[i].addr_lo);
+				 "", trace_entries[i].addr_lo);
 			if (trace_entries[i].addr_hi !=
 			    trace_entries[i].addr_lo)
 				ccprintf(" to 0x%X", trace_entries[i].addr_hi);

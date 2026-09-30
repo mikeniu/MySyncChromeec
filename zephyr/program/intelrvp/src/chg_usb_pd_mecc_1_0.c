@@ -11,13 +11,10 @@
 #include "driver/ppc/sn5s330.h"
 #include "gpio.h"
 #include "hooks.h"
+#include "intelrvp.h"
 #include "system.h"
 #include "tcpm/tcpci.h"
 #include "usbc_ppc.h"
-
-#ifdef CONFIG_ZEPHYR
-#include "intelrvp.h"
-#endif /* CONFIG_ZEPHYR */
 
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
@@ -49,24 +46,6 @@ static void baseboard_tcpc_init(void)
 	}
 }
 DECLARE_HOOK(HOOK_INIT, baseboard_tcpc_init, HOOK_PRIO_INIT_CHIPSET);
-
-#ifndef CONFIG_ZEPHYR
-void tcpc_alert_event(enum gpio_signal signal)
-{
-	int i;
-
-	for (i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
-		/* No alerts for embdeded TCPC */
-		if (tcpc_config[i].bus_type == EC_BUS_TYPE_EMBEDDED)
-			continue;
-
-		if (signal == mecc_1_0_tcpc_aic_gpios[i].tcpc_alert) {
-			schedule_deferred_pd_interrupt(i);
-			break;
-		}
-	}
-}
-#endif
 
 uint16_t tcpc_get_alert_status(void)
 {
