@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "521fcd7f_59a13f2a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:10:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "565a91f6_02ec2ad5",
+      "revId": "b59aefcb3cf941ae498ea2aa498e6a6f50772eea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ed2772c_54819ce1",
@@ -64,6 +82,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aaf4d35a_867875bc",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:10:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5cd90f3_7e23a489",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "revId": "b59aefcb3cf941ae498ea2aa498e6a6f50772eea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36f21995_fc478d50",
@@ -85,6 +127,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "b59aefcb3cf941ae498ea2aa498e6a6f50772eea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b135360_f5a21930",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_rts5817maa.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:10:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36f21995_fc478d50",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 9999
+      },
       "revId": "b59aefcb3cf941ae498ea2aa498e6a6f50772eea",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
