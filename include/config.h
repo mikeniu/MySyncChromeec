@@ -4683,19 +4683,6 @@
 #undef CONFIG_USB_CTVPD
 #undef CONFIG_USB_DRP_ACC_TRYSRC
 
-/*
- * TCPMv2 statemachine layers
- *
- * All layers are defined by default. To opt-out, you must undef in your board.
- * Also these defines don't take effect unless CONFIG_USB_PD_TCPMV2 is also
- * defined.
- *
- * TYPEC_SM - Type-C deals with CC lines voltage level connections
- * DPM - Device Policy Manager layer is used to determine port policy
- */
-#define CONFIG_USB_TYPEC_SM
-#define CONFIG_USB_DPM_SM
-
 /* Enables PD Console commands */
 #define CONFIG_USB_PD_CONSOLE_CMD
 
