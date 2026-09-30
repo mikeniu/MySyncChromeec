@@ -6,14 +6,11 @@
 #include "charge_manager.h"
 #include "console.h"
 #include "gpio.h"
+#include "intelrvp.h"
 #include "system.h"
 #include "usb_mux.h"
 #include "usb_pd.h"
 #include "usbc_ppc.h"
-
-#ifdef CONFIG_ZEPHYR
-#include "intelrvp.h"
-#endif /* CONFIG_ZEPHYR */
 
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)

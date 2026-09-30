@@ -135,7 +135,6 @@ static const char *_text_error(uint32_t error)
 
 	return "UNDEF";
 }
-#ifdef CONFIG_ZEPHYR
 static int init_pchg_mutex(void)
 {
 	for (int i = 0; i < board_get_pchg_count(); i++) {
@@ -144,7 +143,6 @@ static int init_pchg_mutex(void)
 	return 0;
 }
 SYS_INIT(init_pchg_mutex, POST_KERNEL, 50);
-#endif /* CONFIG_ZEPHYR */
 
 static void pchg_queue_event(struct pchg *ctx, enum pchg_event event)
 {

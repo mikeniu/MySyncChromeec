@@ -11,11 +11,8 @@
 #include "i2c.h"
 #include "math_util.h"
 #include "temp_sensor/pct2075.h"
-#include "util.h"
-
-#ifdef CONFIG_ZEPHYR
 #include "temp_sensor/temp_sensor.h"
-#endif
+#include "util.h"
 
 #define PCT2075_RESOLUTION 11
 #define PCT2075_SHIFT1 (16 - PCT2075_RESOLUTION)
@@ -76,19 +73,6 @@ int pct2075_get_val_mk(int idx, int *temp_mk_ptr)
 	return EC_SUCCESS;
 }
 
-#ifndef CONFIG_ZEPHYR
-static void pct2075_poll(void)
-{
-	int s;
-	int temp_reg = 0;
-
-	for (s = 0; s < PCT2075_COUNT; s++) {
-		if (get_reg_temp(s, &temp_reg) == EC_SUCCESS)
-			temp_mk_local[s] = pct2075_reg_to_mk(temp_reg);
-	}
-}
-DECLARE_HOOK(HOOK_SECOND, pct2075_poll, HOOK_PRIO_TEMP_SENSOR);
-#else
 void pct2075_update_temperature(int idx)
 {
 	int temp_reg = 0;
@@ -99,7 +83,6 @@ void pct2075_update_temperature(int idx)
 	if (get_reg_temp(idx, &temp_reg) == EC_SUCCESS)
 		temp_mk_local[idx] = pct2075_reg_to_mk(temp_reg);
 }
-#endif /* CONFIG_ZEPHYR */
 
 void pct2075_init(void)
 {

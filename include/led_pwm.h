@@ -8,15 +8,12 @@
 
 #include "ec_commands.h"
 
-#ifdef CONFIG_ZEPHYR
 #include <zephyr/drivers/pwm.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifdef CONFIG_ZEPHYR
 #define PWM_LED_NO_CHANNEL NULL
 
 struct pwm_led {
@@ -26,18 +23,6 @@ struct pwm_led {
 
 	void (*set_duty)(const struct pwm_dt_spec *pwm, int percent);
 };
-#else
-#define PWM_LED_NO_CHANNEL ((enum pwm_channel)(-1))
-
-struct pwm_led {
-	enum pwm_channel ch0;
-	enum pwm_channel ch1;
-	enum pwm_channel ch2;
-
-	void (*enable)(enum pwm_channel ch, int enabled);
-	void (*set_duty)(enum pwm_channel ch, int percent);
-};
-#endif
 
 struct pwm_led_color_map {
 	uint8_t ch0;

@@ -18,7 +18,7 @@
 #include <string.h>
 
 #include <strings.h>
-#ifdef CONFIG_ZEPHYR
+#ifndef HOST_TOOLS_BUILD
 #include <zephyr/sys/minmax.h>
 #include <zephyr/sys/util.h>
 /**
@@ -72,7 +72,7 @@ extern "C" {
  * than `low`, `high` if `v` was bigger than `high`.
  */
 #ifndef __cplusplus
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #define clamp(v, low, high) min(high, max(v, low))
 #endif
 #endif
@@ -89,7 +89,7 @@ extern "C" {
 #define POWER_OF_TWO(x) ((x) && !((x) & ((x) - 1)))
 
 /* Macro to check if the value is in range */
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #define IN_RANGE(x, min, max) ((x) >= (min) && (x) <= (max))
 #endif
 

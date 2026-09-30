@@ -12,6 +12,7 @@
 #include "clock.h"
 #include "common.h"
 #include "console.h"
+#include "drivers/one_wire_uart.h"
 #include "ec_commands.h"
 #include "hooks.h"
 #include "host_command.h"
@@ -32,10 +33,6 @@
 #include "util.h"
 
 #include <string.h>
-
-#ifdef CONFIG_ZEPHYR
-#include "drivers/one_wire_uart.h"
-#endif
 
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_KEYSCAN, outstr)
@@ -1277,9 +1274,8 @@ int keyboard_factory_test_scan(void)
 	keyboard_scan_enable(0, KB_SCAN_DISABLE_LID_CLOSED);
 	flags = gpio_get_default_flags(GPIO_KBD_KSO2);
 
-	if (IS_ENABLED(CONFIG_ZEPHYR))
-		/* set all KSI/KSO pins to GPIO_ALT_FUNC_NONE */
-		keybaord_raw_config_alt(0);
+	/* set all KSI/KSO pins to GPIO_ALT_FUNC_NONE */
+	keybaord_raw_config_alt(0);
 
 	/* Set all of KSO/KSI pins to internal pull-up and input */
 	for (i = 0; i < keyboard_factory_scan_pins_used; i++) {
@@ -1289,9 +1285,6 @@ int keyboard_factory_test_scan(void)
 		port = keyboard_factory_scan_pins[i][0];
 		id = keyboard_factory_scan_pins[i][1];
 
-		if (!IS_ENABLED(CONFIG_ZEPHYR))
-			gpio_set_alternate_function(port, 1 << id,
-						    GPIO_ALT_FUNC_NONE);
 		gpio_set_flags_by_mask(port, 1 << id,
 				       GPIO_INPUT | GPIO_PULL_UP);
 	}
@@ -1324,10 +1317,7 @@ int keyboard_factory_test_scan(void)
 				       GPIO_INPUT | GPIO_PULL_UP);
 	}
 done:
-	if (IS_ENABLED(CONFIG_ZEPHYR))
-		keybaord_raw_config_alt(1);
-	else
-		gpio_config_module(MODULE_KEYBOARD_SCAN, 1);
+	keybaord_raw_config_alt(1);
 	gpio_set_flags(GPIO_KBD_KSO2, flags);
 	keyboard_scan_enable(1, KB_SCAN_DISABLE_LID_CLOSED);
 

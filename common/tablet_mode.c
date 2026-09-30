@@ -5,6 +5,7 @@
 
 #include "acpi.h"
 #include "console.h"
+#include "drivers/dsp_service.h"
 #include "gpio.h"
 #include "hooks.h"
 #include "host_command.h"
@@ -12,10 +13,6 @@
 #include "lid_switch.h"
 #include "tablet_mode.h"
 #include "timer.h"
-
-#ifdef CONFIG_ZEPHYR
-#include "drivers/dsp_service.h"
-#endif
 
 #include <stdbool.h>
 #include <string.h>
