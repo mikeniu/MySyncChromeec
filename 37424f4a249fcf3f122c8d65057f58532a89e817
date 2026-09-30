@@ -16,6 +16,24 @@
       "message": "Please include a low-coverage justification and create/add(if already exist) a bug tracker to monitor code coverage.",
       "revId": "37424f4a249fcf3f122c8d65057f58532a89e817",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6862345a_9b538c7d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1564347
+      },
+      "writtenOn": "2026-09-30T09:29:18Z",
+      "side": 1,
+      "message": "Add LOW_COVERAGE_REASON",
+      "parentUuid": "f9e35525_7150fac1",
+      "revId": "37424f4a249fcf3f122c8d65057f58532a89e817",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
