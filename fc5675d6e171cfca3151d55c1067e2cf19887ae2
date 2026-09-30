@@ -22,6 +22,30 @@
       },
       "revId": "fc5675d6e171cfca3151d55c1067e2cf19887ae2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a10d2c7a_d652052a",
+        "filename": "zephyr/Makefile.cq",
+        "patchSetId": 7
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-09-30T14:30:50Z",
+      "side": 1,
+      "message": "Done. Updated the target to simply copy %_stenciled.info to %_final.info (cp $\u003c ) since patterns are already excluded.",
+      "parentUuid": "8b77cc06_ff741cdf",
+      "range": {
+        "startLine": 186,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 0
+      },
+      "revId": "fc5675d6e171cfca3151d55c1067e2cf19887ae2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
