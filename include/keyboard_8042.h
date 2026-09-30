@@ -32,20 +32,6 @@ void button_state_changed(enum keyboard_button_type button, int is_pressed);
  */
 void keyboard_host_write(int data, int is_cmd);
 
-/**
- * Send aux data to host from interrupt context.
- *
- * @param data	Aux response to send to host.
- */
-void send_aux_data_to_host_interrupt(uint8_t data);
-
-/**
- * Send aux data to device.
- *
- * @param data	Aux data to send to device.
- */
-void send_aux_data_to_device(uint8_t data);
-
 #ifdef TEST_BUILD
 
 /**

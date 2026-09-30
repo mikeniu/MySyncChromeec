@@ -220,7 +220,7 @@ ZTEST(cbi_flash, test_cbi_flash_host_write_overflow)
 	struct host_cmd_handler_args set_args = BUILD_HOST_COMMAND_PARAMS(
 		EC_CMD_CBI_BIN_WRITE, 0, hc_set_params);
 
-	zassert_equal(host_command_process(&set_args), EC_RES_ERROR);
+	zassert_equal(host_command_process(&set_args), EC_RES_INVALID_PARAM);
 
 	hc_set_params.params.offset = CBI_IMAGE_SIZE - 1;
 
@@ -228,7 +228,8 @@ ZTEST(cbi_flash, test_cbi_flash_host_write_overflow)
 
 	set_args.params_size = 0;
 
-	zassert_equal(host_command_process(&set_args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_command_process(&set_args),
+		      EC_HOST_CMD_REQUEST_TRUNCATED);
 }
 
 static void cbi_flash_before(void *fixture)

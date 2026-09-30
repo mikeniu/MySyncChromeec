@@ -194,6 +194,7 @@ ZTEST(usb_tc, test_tc_state_queries)
 	zassert_false(tc_is_attached_src(TEST_PORT));
 	zassert_equal(PD_PLUG_FROM_DFP_UFP, tc_get_cable_plug(TEST_PORT));
 	zassert_false(tc_get_pd_enabled(TEST_PORT));
+	zassert_false(pd_alt_mode_capable(TEST_PORT));
 }
 
 /* =========================================================================
@@ -215,11 +216,15 @@ ZTEST_F(usb_tc, test_tc_attach_as_sink)
 	zassert_true(tc_is_attached_snk(TEST_PORT));
 	zassert_false(tc_is_attached_src(TEST_PORT));
 	zassert_equal(PD_ROLE_SINK, pd_get_power_role(TEST_PORT));
+	zassert_true(tc_get_pd_enabled(TEST_PORT));
+	zassert_true(pd_alt_mode_capable(TEST_PORT));
 
 	zassert_ok(tcpci_emul_disconnect_partner(fixture->tcpci_emul));
 	isl923x_emul_set_adc_vbus(fixture->charger_emul, 0);
 	k_sleep(K_SECONDS(1));
 	zassert_false(tc_is_attached_snk(TEST_PORT));
+	zassert_false(tc_get_pd_enabled(TEST_PORT));
+	zassert_false(pd_alt_mode_capable(TEST_PORT));
 }
 
 ZTEST_F(usb_tc, test_tc_dts_debug_accessory_cc1)

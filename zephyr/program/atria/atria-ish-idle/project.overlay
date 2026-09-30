@@ -1,0 +1,48 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	chosen {
+		/*
+		 * intel_ish_5_8_0.dts already chooses zephyr,sram,
+		 * zephyr,console and zephyr,shell-uart. Only zephyr,flash is
+		 * missing, and zephyr/shim/include/config_chip.h requires it.
+		 */
+		zephyr,flash = &sram;
+	};
+
+	/*
+	 * common/system.c references GPIO_ENTERING_RW unconditionally. A
+	 * named-gpios child with no "gpios" property resolves it to
+	 * GPIO_UNIMPLEMENTED, which is what an idle image wants.
+	 */
+	named-gpios {
+		compatible = "named-gpios";
+
+		ec_entering_rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+	};
+
+	/*
+	 * The idle image drives no sensors, but a named-i2c-ports node is
+	 * still required: it selects CONFIG_PLATFORM_EC_I2C, which is what
+	 * gates component manifest generation in zephyr/CMakeLists.txt.
+	 * IshBinPacker unconditionally packs component_manifest.json, and
+	 * cros-ish-utils.eclass unconditionally installs it.
+	 */
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+
+		i2c_ec_i2c_sensor: sensor {
+			i2c-port = <&i2c2>;
+			enum-names = "I2C_PORT_SENSOR";
+		};
+	};
+};
+
+&i2c2 {
+	status = "okay";
+};

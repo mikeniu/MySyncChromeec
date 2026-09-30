@@ -4,34 +4,40 @@
 # found in the LICENSE file.
 set -e
 
-# If running as root and host UID/GID are provided, set up host user and re-exec
-if [ "$(id -u)" = "0" ] && [ -n "${HOST_UID}" ] && \
-   [ -n "${HOST_GID}" ] && [ "${HOST_UID}" != "0" ]; then
-    groupadd -g "${HOST_GID}" hostuser 2>/dev/null || true
-    useradd -u "${HOST_UID}" -g "${HOST_GID}" -m -s /bin/bash \
-        hostuser 2>/dev/null || true
-    # Grant access to serial TTYs and USB devices for flashing/debug
-    usermod -aG dialout,plugdev hostuser 2>/dev/null || true
-    # Prepare devutils directory for monitor binary installation
-    mkdir -p /usr/share/ec-devutils
-    chown -R "${HOST_UID}:${HOST_GID}" /usr/share/ec-devutils
-    # First run: Bind-mounted directory does not exist; implicitly created by
-    # root. Transfer to the unprivileged user.
-    # Subsequent runs: Unprivileged user already owns it. chown is a no-op.
-    # Not recursive: The user created and owns the contents.
-    chown "${HOST_UID}:${HOST_GID}" /workspace
-    chmod 755 /entrypoint.sh
-    exec gosu hostuser /bin/bash /entrypoint.sh "$@"
+# Adopt the owner of /workspace as the build user, then re-exec as that
+# user. A bind mount exposes the host inode, so this recovers the UID and
+# GID of whoever created the workspace directory, and build artifacts land
+# on the host owned by that user.
+#
+# The gosu below re-enters this same script as hostuser, so the root test is
+# also what stops the second pass from repeating the setup.
+if [ "$(id -u)" = "0" ]; then
+    HOST_UID="$(stat -c '%u' /workspace)"
+    HOST_GID="$(stat -c '%g' /workspace)"
+    if [ "${HOST_UID}" != "0" ]; then
+        groupadd -g "${HOST_GID}" hostuser 2>/dev/null || true
+        useradd -u "${HOST_UID}" -g "${HOST_GID}" -m -s /bin/bash \
+            hostuser 2>/dev/null || true
+        # Grant access to serial TTYs and USB devices for flashing/debug
+        usermod -aG dialout,plugdev hostuser 2>/dev/null || true
+        # Prepare devutils directory for monitor binary installation
+        mkdir -p /usr/share/ec-devutils
+        chown -R "${HOST_UID}:${HOST_GID}" /usr/share/ec-devutils
+        chmod 755 /entrypoint.sh
+        exec gosu hostuser /bin/bash /entrypoint.sh "$@"
+    fi
 fi
 
 REPO_BASE="https://chromium.googlesource.com/chromiumos"
 
-# Parse --fast flag from positional arguments
+# Default to skipping remote git pulls and pip checks; pass --update to
+# pull the latest upstream changes.
+UPDATE=""
 ARGS=()
 for arg in "$@"; do
     case "${arg}" in
-        --fast)
-            SKIP_UPDATE=1
+        --update)
+            UPDATE=1
             ;;
         *)
             ARGS+=("${arg}")
@@ -219,8 +225,8 @@ populate_if_missing() {
 }
 
 # Clone or update repositories (parallelized for speed)
-if [ -n "${SKIP_UPDATE}" ]; then
-    echo "Skipping repository updates (fast startup enabled)..."
+if [ -z "${UPDATE}" ]; then
+    echo "Skipping repository updates (pass --update to sync)..."
     populate_if_missing "/workspace/src/platform/ec" "EC firmware"
     populate_if_missing "/workspace/src/platform/dagwood" "Dagwood"
     populate_if_missing \
@@ -327,7 +333,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
         python3 -m pip install -q --no-deps \
             -e /workspace/src/platform/ec/zephyr/zmake
 
-        if [ -z "${SKIP_UPDATE}" ]; then
+        if [ -n "${UPDATE}" ]; then
             # Install standard Zephyr dependencies to support twister executions
             ZEPHYR_REQS_DIR="/workspace/src/third_party"
             ZEPHYR_REQS_DIR="${ZEPHYR_REQS_DIR}/zephyrproject/zephyr/scripts"
@@ -379,7 +385,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
             echo "Copying pre-installed Realtek monitor binary to cache..."
             mkdir -p "$(dirname "${MONITOR_CACHE}")"
             cp "${MONITOR_DEST}" "${MONITOR_CACHE}"
-        elif [ -z "${SKIP_UPDATE}" ]; then
+        else
             echo "Monitor binary not found in cache. Building rtk_flame..."
             if zmake --checkout /workspace build rtk_flame; then
                 echo "Caching monitor binary..."
@@ -411,7 +417,7 @@ if [ -d "/workspace/src/platform/ec/zephyr/zmake" ]; then
             echo "Copying pre-installed NPCX monitor binary to cache..."
             mkdir -p "$(dirname "${NPCX_MONITOR_CACHE}")"
             cp "${NPCX_MONITOR_DEST}" "${NPCX_MONITOR_CACHE}"
-        elif [ -z "${SKIP_UPDATE}" ]; then
+        else
             echo "Monitor binary not found in cache. Building npcx_monitor..."
             if zmake --checkout /workspace build npcx_monitor; then
                 echo "Caching monitor binary..."

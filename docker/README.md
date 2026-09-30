@@ -7,9 +7,10 @@ firmware and running tests on the Dagwood test fixture.
 The docker build is set up to clone all repositories needed to build EC
 firmware images and run the twister based tests.
 
-When entering the container, the entrypoint.sh script pulls the latest
-changes from all cloned repositories, so that EC firmware repos are
-always up to date.
+When entering the container, `entrypoint.sh` populates `/workspace` from the
+repositories cached in the image on first run and leaves existing checkouts
+untouched on subsequent entries. Pass `--update` to pull the latest upstream
+changes.
 
 ---
 
@@ -19,9 +20,11 @@ The workspace directory structure matches standard expectations of ChromiumOS
 `zmake` module lookups, using a `src/` nested repository layout:
 *   `Dockerfile`: Builds the optimized Ubuntu-based environment with compiler
     pre-requisites.
-*   `entrypoint.sh`: Runs on container startup to fetch/update checkouts,
+*   `entrypoint.sh`: Runs on container startup to populate/update checkouts,
     initialize python virtual environments, auto-install `.vpython3`
     dependencies, and export Coreboot SDK environment variables dynamically.
+*   `workspace/`: Bind mount source for the container. Tracked, but empty, so
+    that a fresh checkout owns it; everything below it is ignored.
 *   `workspace/src/platform/ec/`: The Chromium OS EC firmware source.
 *   `workspace/src/platform/dagwood/`: The Dagwood test/verification tool.
 *   `workspace/src/third_party/zephyrproject/`: Zephyr RTOS project
@@ -64,10 +67,19 @@ Or using the helper script:
 ./run_docker.sh
 ```
 
-> **Fast Startup**: Pass `--fast` (or set `SKIP_UPDATE=1`) to bypass remote
-> repository git checks for sub-second container launch:
+> **The container runs as the owner of `workspace/`.** That directory is part
+> of the checkout, so it belongs to whoever cloned the tree, and build
+> artifacts land on the host owned by them. Do not delete it: Docker recreates
+> a missing bind mount source as `root:root`, leaving the container no way to
+> tell who started it, so it runs everything as root instead. To recover, run
+> `sudo chown -R "$(id -u):$(id -g)" workspace`.
+
+> **Updating Repositories**: Container startup skips remote git checks by
+> default so existing checkouts launch immediately and local state is left
+> untouched. Pass `--update` to pull the latest upstream changes across all
+> workspace repositories:
 > ```bash
-> ./run_docker.sh --fast
+> ./run_docker.sh --update
 > ```
 
 ### 3. Hardware Access (Flashing and Device Testing)

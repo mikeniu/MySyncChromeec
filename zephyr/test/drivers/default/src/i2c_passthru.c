@@ -81,23 +81,24 @@ ZTEST_USER(i2c_passthru, test_passthru_invalid_params)
 
 	/* Set the params_size to smaller than struct ec_params_i2c_passthru */
 	args.params_size = 1;
-	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_command_process(&args),
+		      EC_HOST_CMD_REQUEST_TRUNCATED);
 
 	/* Set the params_size so it truncates the 2nd I2C message */
 	args.params_size = sizeof(struct ec_params_i2c_passthru) +
 			   sizeof(struct ec_params_i2c_passthru_msg);
-	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_command_process(&args), EC_HOST_CMD_INVALID_PARAM);
 
 	/* Don't provide enough room for the response */
 	args.params_size = sizeof(param_buf);
 	args.response_max = sizeof(struct ec_response_i2c_passthru) + 1;
-	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_command_process(&args), EC_HOST_CMD_INVALID_PARAM);
 
 	/* Don't provide the write data */
 	args.response_max = sizeof(response_buf);
 	args.params_size = sizeof(struct ec_params_i2c_passthru) +
 			   2 * sizeof(struct ec_params_i2c_passthru_msg);
-	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
+	zassert_equal(host_command_process(&args), EC_HOST_CMD_INVALID_PARAM);
 }
 
 ZTEST_USER(i2c_passthru, test_passthru_protect)
@@ -150,14 +151,17 @@ ZTEST_USER(i2c_passthru, test_passthru_protect)
 
 	/* Error case: response size not enough */
 	status_args.response_max = 0;
-	zassert_equal(host_command_process(&status_args), EC_RES_INVALID_PARAM,
+	zassert_equal(host_command_process(&status_args),
+		      IS_ENABLED(CONFIG_EC_HOST_CMD) ?
+			      EC_HOST_CMD_INVALID_RESPONSE :
+			      EC_HOST_CMD_RESPONSE_TOO_BIG,
 		      NULL);
 	status_args.response_max = sizeof(response);
 
 	/* Error case: params size not enough */
 	status_args.params_size = 0;
-	zassert_equal(host_command_process(&status_args), EC_RES_INVALID_PARAM,
-		      NULL);
+	zassert_equal(host_command_process(&status_args),
+		      EC_HOST_CMD_REQUEST_TRUNCATED, NULL);
 	status_args.params_size = sizeof(status_params);
 }
 

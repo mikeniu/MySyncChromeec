@@ -99,4 +99,7 @@ config EC_HOST_CMD
 	default y if AP && !HECI
 	select EC_HOST_CMD_DEDICATED_THREAD if ZTEST
 
+config TACH_RTS5912_ASYNC_FETCH
+	default y
+
 orsource "Kconfig.defaults-$(ARCH)"

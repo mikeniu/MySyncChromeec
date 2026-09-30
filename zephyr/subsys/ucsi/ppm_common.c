@@ -765,7 +765,7 @@ static void ppm_common_task(void *context)
 		ppm_common_taskloop(dev);
 	} while (true);
 
-	__ASSERT_UNREACHABLE;
+	CODE_UNREACHABLE;
 }
 
 K_THREAD_STACK_DEFINE(ppm_stack, CONFIG_UCSI_PPM_STACK_SIZE);

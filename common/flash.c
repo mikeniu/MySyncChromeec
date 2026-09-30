@@ -1515,12 +1515,21 @@ DECLARE_CONSOLE_COMMAND(flashwp, command_flash_wp,
 #define EC_FLASH_REGION_START \
 	min(CONFIG_EC_PROTECTED_STORAGE_OFF, CONFIG_EC_WRITABLE_STORAGE_OFF)
 
-static enum ec_status flash_command_get_info(struct host_cmd_handler_args *args)
+static inline int crec_flash_banks_to_copy(int num_banks_desc)
 {
-	const struct ec_params_flash_info_2 *p_2 = args->params;
-	struct ec_response_flash_info_2 *r_2 = args->response;
+	if (IS_ENABLED(CONFIG_FLASH_MULTIPLE_REGION)) {
+		return min(crec_flash_bank_total_count(), num_banks_desc);
+	}
+	return (num_banks_desc >= 1) ? 1 : 0;
+}
+
+static enum ec_host_cmd_status
+flash_command_get_info(struct ec_host_cmd_handler_args *args)
+{
+	const struct ec_params_flash_info_2 *p_2 = args->input_buf;
+	struct ec_response_flash_info_2 *r_2 = args->output_buf;
 #ifndef CONFIG_FLASH_MULTIPLE_REGION
-	struct ec_response_flash_info_1 *r_1 = args->response;
+	struct ec_response_flash_info_1 *r_1 = args->output_buf;
 #endif
 	int res;
 
@@ -1529,19 +1538,32 @@ static enum ec_status flash_command_get_info(struct host_cmd_handler_args *args)
 	 * based on the maximum response size and the ideal write size.
 	 */
 	int ideal_size =
-		(args->response_max - sizeof(struct ec_params_flash_write)) &
+		(args->output_buf_max - sizeof(struct ec_params_flash_write)) &
 		~(CONFIG_FLASH_WRITE_IDEAL_SIZE - 1);
 	/*
 	 * If we can't get at least one ideal block, then just want
 	 * as high a multiple of the minimum write size as possible.
 	 */
 	if (!ideal_size)
-		ideal_size = (args->response_max -
+		ideal_size = (args->output_buf_max -
 			      sizeof(struct ec_params_flash_write)) &
 			     ~(CONFIG_FLASH_WRITE_SIZE - 1);
 
 	if (args->version >= 2) {
-		args->response_size = sizeof(struct ec_response_flash_info_2);
+		int banks_to_copy;
+
+		if (args->input_buf_size <
+		    sizeof(struct ec_params_flash_info_2))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
+
+		banks_to_copy = crec_flash_banks_to_copy(p_2->num_banks_desc);
+
+		if (args->output_buf_max <
+		    sizeof(struct ec_response_flash_info_2) +
+			    banks_to_copy * sizeof(struct ec_flash_bank))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+
+		args->output_buf_size = sizeof(struct ec_response_flash_info_2);
 		r_2->flash_size =
 			CONFIG_FLASH_SIZE_BYTES - EC_FLASH_REGION_START;
 #if (CONFIG_FLASH_ERASED_VALUE32 == 0)
@@ -1559,25 +1581,35 @@ static enum ec_status flash_command_get_info(struct host_cmd_handler_args *args)
 		 */
 		res = crec_flash_response_fill_banks(r_2, p_2->num_banks_desc);
 		if (res != EC_RES_SUCCESS)
-			return res;
+			return EC_HOST_CMD_INVALID_PARAM;
 
-		args->response_size +=
-			r_2->num_banks_desc * sizeof(struct ec_flash_bank);
-		return EC_RES_SUCCESS;
+		args->output_buf_size +=
+			banks_to_copy * sizeof(struct ec_flash_bank);
+		return EC_HOST_CMD_SUCCESS;
 	}
 #ifdef CONFIG_FLASH_MULTIPLE_REGION
-	return EC_RES_INVALID_PARAM;
+	return EC_HOST_CMD_INVALID_PARAM;
 #else
+	if (args->version == 0) {
+		/* Only version 0 fields returned */
+		if (args->output_buf_max <
+		    sizeof(struct ec_response_flash_info))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+		args->output_buf_size = sizeof(struct ec_response_flash_info);
+	} else {
+		if (args->output_buf_max <
+		    sizeof(struct ec_response_flash_info_1))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+		args->output_buf_size = sizeof(struct ec_response_flash_info_1);
+	}
+
 	r_1->flash_size = CONFIG_FLASH_SIZE_BYTES - EC_FLASH_REGION_START;
 	r_1->flags = 0;
 	r_1->write_block_size = CONFIG_FLASH_WRITE_SIZE;
 	r_1->erase_block_size = CONFIG_FLASH_ERASE_SIZE;
 	r_1->protect_block_size = CONFIG_FLASH_BANK_SIZE;
-	if (args->version == 0) {
-		/* Only version 0 fields returned */
-		args->response_size = sizeof(struct ec_response_flash_info);
-	} else {
-		args->response_size = sizeof(struct ec_response_flash_info_1);
+
+	if (args->version > 0) {
 		/* Fill in full version 1 struct */
 		r_1->write_ideal_size = ideal_size;
 #if (CONFIG_FLASH_ERASED_VALUE32 == 0)
@@ -1587,7 +1619,7 @@ static enum ec_status flash_command_get_info(struct host_cmd_handler_args *args)
 		r_1->flags |= EC_FLASH_INFO_SELECT_REQUIRED;
 #endif
 	}
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 #endif /* CONFIG_FLASH_MULTIPLE_REGION */
 }
 #ifdef CONFIG_FLASH_MULTIPLE_REGION
@@ -1595,20 +1627,25 @@ static enum ec_status flash_command_get_info(struct host_cmd_handler_args *args)
 #else
 #define FLASH_INFO_VER (EC_VER_MASK(0) | EC_VER_MASK(1) | EC_VER_MASK(2))
 #endif
-DECLARE_HOST_COMMAND(EC_CMD_FLASH_INFO, flash_command_get_info, FLASH_INFO_VER);
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_FLASH_INFO, flash_command_get_info,
+			      FLASH_INFO_VER,
+			      SMALLEST_TYPE(struct ec_response_flash_info,
+					    struct ec_response_flash_info_1,
+					    struct ec_response_flash_info_2));
 
-static enum ec_status flash_command_read(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+flash_command_read(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_flash_read *p = args->params;
+	const struct ec_params_flash_read *p = args->input_buf;
 	uint32_t offset = p->offset + EC_FLASH_REGION_START;
 	uint32_t end;
 
-	if (p->size > args->response_max)
-		return EC_RES_OVERFLOW;
+	if (p->size > args->output_buf_max)
+		return EC_HOST_CMD_OVERFLOW;
 
 	/* Make sure that offset + p->size does not overflow. */
 	if (check_add_overflow(offset, p->size, &end))
-		return EC_RES_OVERFLOW;
+		return EC_HOST_CMD_OVERFLOW;
 
 #ifdef CONFIG_ROLLBACK
 	/* Prevent reading rollback regions via host commands to avoid leaking
@@ -1616,17 +1653,18 @@ static enum ec_status flash_command_read(struct host_cmd_handler_args *args)
 	 */
 	if (offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
 	    end > CONFIG_ROLLBACK_OFF)
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 #endif
 
-	if (crec_flash_read(offset, p->size, args->response))
-		return EC_RES_ERROR;
+	if (crec_flash_read(offset, p->size, args->output_buf))
+		return EC_HOST_CMD_ERROR;
 
-	args->response_size = p->size;
+	args->output_buf_size = p->size;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FLASH_READ, flash_command_read, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FLASH_READ, flash_command_read,
+			     EC_VER_MASK(0), struct ec_params_flash_read);
 
 #ifdef CONFIG_EC_HOST_CMD
 BUILD_ASSERT(!((sizeof(struct ec_params_flash_write) +
@@ -1642,41 +1680,43 @@ BUILD_ASSERT(!(CONFIG_EC_HOST_CMD_HANDLER_BUFFER_ALIGN % sizeof(void *)),
  * Version 0 and 1 are equivalent from the EC-side; the only difference is
  * that the host can only send 64 bytes of data at a time in version 0.
  */
-static enum ec_status flash_command_write(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+flash_command_write(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_flash_write *p = args->params;
+	const struct ec_params_flash_write *p = args->input_buf;
 	uint32_t offset = p->offset + EC_FLASH_REGION_START;
 	uint32_t end;
 
 	if (crec_flash_get_protect() & EC_FLASH_PROTECT_ALL_NOW)
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 
-	/* Make sure that p->size is within args->params. */
-	if (p->size + sizeof(*p) > args->params_size)
-		return EC_RES_INVALID_PARAM;
+	/* Make sure that p->size is within args->input_buf. */
+	if (p->size + sizeof(*p) > args->input_buf_size)
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	/* Make sure that offset + p->size does not overflow. */
 	if (check_add_overflow(offset, p->size, &end))
-		return EC_RES_OVERFLOW;
+		return EC_HOST_CMD_OVERFLOW;
 
 #ifdef CONFIG_INTERNAL_STORAGE
 	if (system_unsafe_to_overwrite(offset, p->size))
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 #endif
 
 #ifdef CONFIG_ROLLBACK
 	if (offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
 	    end > CONFIG_ROLLBACK_OFF)
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 #endif
 
 	if (crec_flash_write(offset, p->size, (const uint8_t *)(p + 1)))
-		return EC_RES_ERROR;
+		return EC_HOST_CMD_ERROR;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FLASH_WRITE, flash_command_write,
-		     EC_VER_MASK(0) | EC_VER_MASK(EC_VER_FLASH_WRITE));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FLASH_WRITE, flash_command_write,
+			     EC_VER_MASK(0) | EC_VER_MASK(EC_VER_FLASH_WRITE),
+			     struct ec_params_flash_write);
 
 #ifndef CONFIG_FLASH_MULTIPLE_REGION
 /*
@@ -1707,16 +1747,19 @@ static enum ec_host_cmd_status erase_continue(void *user_data)
 #endif /* CONFIG_EC_HOST_CMD */
 #endif /* CONFIG_HAS_HOSTCMD && CONFIG_HOST_COMMAND_STATUS */
 
-static enum ec_status flash_command_erase(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+flash_command_erase(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_flash_erase *p = args->params;
+	const struct ec_params_flash_erase *p = args->input_buf;
 	int rc = EC_RES_SUCCESS, cmd = FLASH_ERASE_SECTOR;
 	uint32_t offset;
 	uint32_t end;
 #ifdef CONFIG_FLASH_DEFERRED_ERASE
-	const struct ec_params_flash_erase_v1 *p_1 = args->params;
+	const struct ec_params_flash_erase_v1 *p_1 = args->input_buf;
 
 	if (args->version > 0) {
+		if (args->input_buf_size < sizeof(*p_1))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
 		cmd = p_1->cmd;
 		p = &p_1->params;
 	}
@@ -1724,21 +1767,21 @@ static enum ec_status flash_command_erase(struct host_cmd_handler_args *args)
 	offset = p->offset + EC_FLASH_REGION_START;
 
 	if (crec_flash_get_protect() & EC_FLASH_PROTECT_ALL_NOW)
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 
 	/* Make sure that offset + p->size does not overflow. */
 	if (check_add_overflow(offset, p->size, &end))
-		return EC_RES_OVERFLOW;
+		return EC_HOST_CMD_OVERFLOW;
 
 #ifdef CONFIG_INTERNAL_STORAGE
 	if (system_unsafe_to_overwrite(offset, p->size))
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 #endif
 
 #ifdef CONFIG_ROLLBACK
 	if (offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
 	    end > CONFIG_ROLLBACK_OFF)
-		return EC_RES_ACCESS_DENIED;
+		return EC_HOST_CMD_ACCESS_DENIED;
 #endif
 
 	switch (cmd) {
@@ -1752,11 +1795,11 @@ static enum ec_status flash_command_erase(struct host_cmd_handler_args *args)
 		erase_continue_data.size = p->size;
 		ec_host_cmd_send_in_progress_continue(erase_continue, NULL);
 
-		return EC_RES_IN_PROGRESS;
+		return EC_HOST_CMD_IN_PROGRESS;
 #endif
 #endif
 		if (crec_flash_erase(offset, p->size))
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 
 		break;
 #ifdef CONFIG_FLASH_DEFERRED_ERASE
@@ -1786,15 +1829,26 @@ static enum ec_status flash_command_erase(struct host_cmd_handler_args *args)
 	default:
 		rc = EC_RES_INVALID_PARAM;
 	}
-	return rc;
+
+	switch (rc) {
+	case EC_RES_SUCCESS:
+		return EC_HOST_CMD_SUCCESS;
+	case EC_RES_BUSY:
+		return EC_HOST_CMD_BUSY;
+	case EC_RES_IN_PROGRESS:
+		return EC_HOST_CMD_IN_PROGRESS;
+	default:
+		return EC_HOST_CMD_INVALID_PARAM;
+	}
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_FLASH_ERASE, flash_command_erase,
-		     EC_VER_MASK(0)
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FLASH_ERASE, flash_command_erase,
+			     EC_VER_MASK(0)
 #ifdef CONFIG_FLASH_DEFERRED_ERASE
-			     | EC_VER_MASK(1)
+				     | EC_VER_MASK(1)
 #endif
-);
+				     ,
+			     struct ec_params_flash_erase);
 
 #ifdef CONFIG_FLASH_PROTECT_DEFERRED
 struct flash_protect_async {
@@ -1817,12 +1871,14 @@ static void crec_flash_set_protect_deferred(void)
 		flash_protect_async_data.rc = EC_RES_SUCCESS;
 }
 DECLARE_DEFERRED(crec_flash_set_protect_deferred);
+#endif
 
-static enum ec_status
-flash_command_protect_v2(struct host_cmd_handler_args *args)
+#ifdef CONFIG_FLASH_PROTECT_DEFERRED
+static enum ec_host_cmd_status
+flash_command_protect_v2(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_flash_protect_v2 *p = args->params;
-	struct ec_response_flash_protect *r = args->response;
+	const struct ec_params_flash_protect_v2 *p = args->input_buf;
+	struct ec_response_flash_protect *r = args->output_buf;
 	int rc;
 
 	/*
@@ -1831,12 +1887,17 @@ flash_command_protect_v2(struct host_cmd_handler_args *args)
 	 * via the flags in the response.  (If we returned error, the caller
 	 * wouldn't get the response.)
 	 */
+	if (args->input_buf_size < sizeof(struct ec_params_flash_protect_v2))
+		return EC_HOST_CMD_REQUEST_TRUNCATED;
+
+	if (args->output_buf_max < sizeof(*r))
+		return EC_HOST_CMD_RESPONSE_TOO_BIG;
 
 	switch (p->action) {
 	case FLASH_PROTECT_ASYNC:
 		rc = flash_protect_async_data.rc;
 		if (rc == EC_RES_BUSY) {
-			return rc;
+			return EC_HOST_CMD_BUSY;
 		}
 
 		flash_protect_async_data.mask = p->mask;
@@ -1851,7 +1912,7 @@ flash_command_protect_v2(struct host_cmd_handler_args *args)
 			 */
 			flash_protect_async_data.rc = EC_RES_BUSY;
 		}
-		return EC_RES_SUCCESS;
+		return EC_HOST_CMD_SUCCESS;
 
 	case FLASH_PROTECT_GET_RESULT:
 		/*
@@ -1865,12 +1926,15 @@ flash_command_protect_v2(struct host_cmd_handler_args *args)
 		if (rc == EC_RES_ERROR) {
 			/* Ready for another command */
 			flash_protect_async_data.rc = EC_RES_SUCCESS;
-			break;
+			return EC_HOST_CMD_ERROR;
 		}
 
 		if (rc == EC_RES_BUSY) {
-			break;
+			return EC_HOST_CMD_BUSY;
 		}
+
+		if (args->output_buf_max < sizeof(*r))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
 
 		r->flags = crec_flash_get_protect();
 
@@ -1883,19 +1947,18 @@ flash_command_protect_v2(struct host_cmd_handler_args *args)
 		r->writable_flags =
 			crec_flash_physical_get_writable_flags(r->flags);
 
-		args->response_size = sizeof(*r);
+		args->output_buf_size = sizeof(*r);
 
-		break;
+		return EC_HOST_CMD_SUCCESS;
 
 	default:
-		rc = EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
-
-	return rc;
 }
 #endif
 
-static enum ec_status flash_command_protect(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+flash_command_protect(struct ec_host_cmd_handler_args *args)
 {
 #if defined(CONFIG_FLASH_PROTECT_DEFERRED)
 	if (args->version == 2) {
@@ -1903,8 +1966,11 @@ static enum ec_status flash_command_protect(struct host_cmd_handler_args *args)
 	}
 #endif
 
-	const struct ec_params_flash_protect *p = args->params;
-	struct ec_response_flash_protect *r = args->response;
+	const struct ec_params_flash_protect *p = args->input_buf;
+	struct ec_response_flash_protect *r = args->output_buf;
+
+	if (args->output_buf_max < sizeof(*r))
+		return EC_HOST_CMD_RESPONSE_TOO_BIG;
 
 	/*
 	 * Handle requesting new flags.  Note that we ignore the return code
@@ -1931,23 +1997,25 @@ static enum ec_status flash_command_protect(struct host_cmd_handler_args *args)
 			 crec_flash_physical_get_valid_flags();
 	r->writable_flags = crec_flash_physical_get_writable_flags(r->flags);
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_FLASH_PROTECT, flash_command_protect,
-		     EC_VER_MASK(1)
+EC_HOST_CMD_HANDLER(EC_CMD_FLASH_PROTECT, flash_command_protect,
+		    EC_VER_MASK(1)
 #ifdef CONFIG_FLASH_PROTECT_DEFERRED
-			     | EC_VER_MASK(2)
+			    | EC_VER_MASK(2)
 #endif
-);
+			    ,
+		    struct ec_params_flash_protect,
+		    struct ec_response_flash_protect);
 
-static enum ec_status
-flash_command_region_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+flash_command_region_info(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_flash_region_info *p = args->params;
-	struct ec_response_flash_region_info *r = args->response;
+	const struct ec_params_flash_region_info *p = args->input_buf;
+	struct ec_response_flash_region_info *r = args->output_buf;
 
 	switch (p->region) {
 	case EC_FLASH_REGION_RO:
@@ -1970,23 +2038,29 @@ flash_command_region_info(struct host_cmd_handler_args *args)
 		r->size = CONFIG_EC_WRITABLE_STORAGE_SIZE;
 		break;
 	default:
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
-	args->response_size = sizeof(*r);
-	return EC_RES_SUCCESS;
+	args->output_buf_size = sizeof(*r);
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FLASH_REGION_INFO, flash_command_region_info,
-		     EC_VER_MASK(EC_VER_FLASH_REGION_INFO));
+EC_HOST_CMD_HANDLER(EC_CMD_FLASH_REGION_INFO, flash_command_region_info,
+		    EC_VER_MASK(EC_VER_FLASH_REGION_INFO),
+		    struct ec_params_flash_region_info,
+		    struct ec_response_flash_region_info);
 
 #ifdef CONFIG_FLASH_SELECT_REQUIRED
 
-static enum ec_status flash_command_select(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+flash_command_select(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_flash_select *p = args->params;
+	const struct ec_params_flash_select *p = args->input_buf;
 
-	return crec_board_flash_select(p->select);
+	return crec_board_flash_select(p->select) == EC_SUCCESS ?
+		       EC_HOST_CMD_SUCCESS :
+		       EC_HOST_CMD_ERROR;
 }
-DECLARE_HOST_COMMAND(EC_CMD_FLASH_SELECT, flash_command_select, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_REQ_ONLY(EC_CMD_FLASH_SELECT, flash_command_select,
+			     EC_VER_MASK(0), struct ec_params_flash_select);
 
 #endif /* CONFIG_FLASH_SELECT_REQUIRED */

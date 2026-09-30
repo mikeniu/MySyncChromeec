@@ -8,6 +8,7 @@
 import argparse
 import os
 from pathlib import Path
+import shlex
 import sys
 
 
@@ -38,19 +39,20 @@ def main():
 
     twister_args = dagwood_test_lib.get_twister_args(args, extra_args)
 
-    if not args.update:
-        os.environ["SKIP_UPDATE"] = "1"
-
     run_docker_sh = str(SCRIPT_DIR / "run_docker.sh")
 
-    # Join twister args into a space-separated string for bash -c
-    twister_cmd = " ".join(twister_args)
-    cmd = [
-        run_docker_sh,
-        "bash",
-        "-c",
-        f"cd /workspace/src/platform/ec && python3 ./twister {twister_cmd}",
-    ]
+    # Quote twister args into a single command string for bash -c
+    twister_cmd = shlex.join(twister_args)
+    cmd = [run_docker_sh]
+    if args.update:
+        cmd.append("--update")
+    cmd.extend(
+        [
+            "bash",
+            "-c",
+            f"cd /workspace/src/platform/ec && python3 ./twister {twister_cmd}",
+        ]
+    )
 
     print(f"Running command: {' '.join(cmd)}")
 

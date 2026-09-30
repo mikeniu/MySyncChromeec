@@ -42,10 +42,10 @@ def locate_cros_checkout():
     """Find the path to the ChromiumOS checkout.
 
     Returns:
-        The first directory found with a .repo directory in it,
-        starting by checking the CROS_WORKON_SRCROOT environment
-        variable, then scanning upwards from the current directory,
-        and finally from a known set of common paths.
+        The first directory found with a .repo directory or .supermanifest
+        file in it, starting by checking the CROS_WORKON_SRCROOT environment
+        variable, then scanning upwards from the current directory, and
+        finally from a known set of common paths.
     """
 
     def propose_checkouts():
@@ -64,7 +64,7 @@ def locate_cros_checkout():
         if not path:
             continue
         path = pathlib.Path(path)
-        if (path / ".repo").is_dir():
+        if (path / ".repo").is_dir() or (path / ".supermanifest").is_file():
             return path.resolve()
 
     raise FileNotFoundError("Unable to locate a ChromiumOS checkout")

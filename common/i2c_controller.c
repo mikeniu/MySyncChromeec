@@ -812,18 +812,20 @@ enum i2c_freq i2c_get_freq(int port)
 
 #ifdef CONFIG_HOSTCMD_I2C_CONTROL
 
-static enum ec_status i2c_command_control(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+i2c_command_control(struct ec_host_cmd_handler_args *args)
 {
 #ifdef CONFIG_ZEPHYR
 	/* For Zephyr, convert the received remote port number to a port number
 	 * used in EC.
 	 */
-	((struct ec_params_i2c_control *)(args->params))->port =
-		i2c_get_port_from_remote_port(
-			((struct ec_params_i2c_control *)(args->params))->port);
+	((struct ec_params_i2c_control *)(uintptr_t)(args->input_buf))
+		->port = i2c_get_port_from_remote_port(
+		((struct ec_params_i2c_control *)(uintptr_t)(args->input_buf))
+			->port);
 #endif
-	const struct ec_params_i2c_control *params = args->params;
-	struct ec_response_i2c_control *resp = args->response;
+	const struct ec_params_i2c_control *params = args->input_buf;
+	struct ec_response_i2c_control *resp = args->output_buf;
 	enum i2c_freq old_i2c_freq;
 	enum i2c_freq new_i2c_freq;
 	const struct i2c_port_t *cfg;
@@ -834,7 +836,7 @@ static enum ec_status i2c_command_control(struct host_cmd_handler_args *args)
 
 	cfg = get_i2c_port(params->port);
 	if (!cfg)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	switch (params->cmd) {
 	case EC_I2C_CONTROL_GET_SPEED:
@@ -848,30 +850,32 @@ static enum ec_status i2c_command_control(struct host_cmd_handler_args *args)
 		new_i2c_speed_khz = params->cmd_params.speed_khz;
 		new_i2c_freq = i2c_khz_to_freq(new_i2c_speed_khz);
 		if (new_i2c_freq == I2C_FREQ_COUNT)
-			return EC_RES_INVALID_PARAM;
+			return EC_HOST_CMD_INVALID_PARAM;
 
 		old_i2c_freq = i2c_get_freq(cfg->port);
 		old_i2c_speed_khz = i2c_freq_to_khz(old_i2c_freq);
 
 		rv = i2c_set_freq(cfg->port, new_i2c_freq);
 		if (rv != EC_SUCCESS)
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 
 		CPRINTS("I2C%d speed changed from %d kHz to %d kHz",
 			params->port, old_i2c_speed_khz, new_i2c_speed_khz);
 		break;
 
 	default:
-		return EC_RES_INVALID_COMMAND;
+		return EC_HOST_CMD_INVALID_COMMAND;
 	}
 
 	resp->cmd_response.speed_khz = old_i2c_speed_khz;
-	args->response_size = sizeof(*resp);
+	args->output_buf_size = sizeof(*resp);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
 
-DECLARE_HOST_COMMAND(EC_CMD_I2C_CONTROL, i2c_command_control, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_I2C_CONTROL, i2c_command_control, EC_VER_MASK(0),
+		    struct ec_params_i2c_control,
+		    struct ec_response_i2c_control);
 
 #endif /* CONFIG_HOSTCMD_I2C_CONTROL */
 

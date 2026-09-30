@@ -15,4 +15,9 @@
 
 &i2c2 {
 	status = "okay";
+	dsp_client: dsp-client@20 {
+		compatible = "cros,dsp-client";
+		reg = <0x20>;
+		int-gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
+	};
 };
