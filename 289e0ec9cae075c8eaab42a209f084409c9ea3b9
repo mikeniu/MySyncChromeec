@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "389759a9_c26a3df9",
+        "filename": "zephyr/drivers/fingerprint/Kconfig.elan",
+        "patchSetId": 13
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-30T06:06:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6017aca8_80fc7f00",
+      "revId": "289e0ec9cae075c8eaab42a209f084409c9ea3b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44b440dd_818183b1",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-30T05:47:25Z",
       "side": 1,
       "message": "Are these two indeed used or maybe it\u0027s a copy-paste error?",
+      "revId": "289e0ec9cae075c8eaab42a209f084409c9ea3b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82b6feaf_e670ff23",
+        "filename": "zephyr/dts/bindings/fingerprint/elan.elanhv515rc.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1119700
+      },
+      "writtenOn": "2026-09-30T06:06:33Z",
+      "side": 1,
+      "message": "These two parameters(base-image and ft-info) are required for elanhv515rc. Thanks!",
+      "parentUuid": "44b440dd_818183b1",
       "revId": "289e0ec9cae075c8eaab42a209f084409c9ea3b9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
