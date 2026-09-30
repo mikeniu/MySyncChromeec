@@ -70,7 +70,7 @@
 			gpios = <&gpiod 7 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH)>;
 		};
 		gpio_ec_i2c_pdc_sm_int_odl: ec_i2c_pdc_sm_int_odl {
-			gpios = <&gpiof 5 (GPIO_INPUT)>;
+			gpios = <&gpiof 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 			enum-name = "GPIO_USB_C0_PD_INT_ODL";
 		};
 		gpio_ec_l18b_pwr_detect: ec_l18b_pwr_detect {

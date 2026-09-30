@@ -9,7 +9,18 @@
 #include "../generated.dtsi"
 #include "../dougie.dtsi"
 #include "../keyboard.dtsi"
+#include "../usbc.dtsi"
+#include "../interrupts.dtsi"
+#include "../i2c.dtsi"
 
 /* Bandit project DTS includes*/
 
 /* Bandit overrides follow... */
+
+/ {
+	batteries {
+		default_battery: wf36_0821br {
+			compatible = "todo,wf36-0821br", "battery-smart";
+		};
+	};
+};

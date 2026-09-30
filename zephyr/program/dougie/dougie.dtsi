@@ -66,23 +66,3 @@
 &pwm4 {
 	prescaler-cx = <PWM_PRESCALER_C6>;
 };
-
-&i2c_ec_bat_chg_vr_smb {
-	enum-names = "I2C_PORT_CHARGER";
-};
-
-&i2c_ec_smb_batt_scl_3v3 {
-	enum-names = "I2C_PORT_BATTERY";
-};
-
-&i2c_ec_i2c_dbg_scl_3v3 {
-	enum-names = "I2C_PORT_DBG";
-};
-
-&i2c_ec_i2c_pdc_sm_scl_3v3 {
-	enum-names = "I2C_PORT_SUB_C0";
-};
-
-&i2c_ec_i2c_sensor_scl_1v8 {
-	enum-names = "I2C_PORT_SENSORS";
-};
