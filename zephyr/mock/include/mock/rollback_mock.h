@@ -8,8 +8,8 @@
  * @brief Controls for the mock rollback block library
  */
 
-#ifndef PLATFORM_EC_INCLUDE_MOCK_ROLLBACK_MOCK_H_
-#define PLATFORM_EC_INCLUDE_MOCK_ROLLBACK_MOCK_H_
+#ifndef PLATFORM_EC_ZEPHYR_MOCK_INCLUDE_MOCK_ROLLBACK_MOCK_H_
+#define PLATFORM_EC_ZEPHYR_MOCK_INCLUDE_MOCK_ROLLBACK_MOCK_H_
 
 #include <stdbool.h>
 
@@ -33,4 +33,4 @@ extern struct mock_ctrl_rollback mock_ctrl_rollback;
 }
 #endif
 
-#endif /* PLATFORM_EC_INCLUDE_MOCK_ROLLBACK_MOCK_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_MOCK_INCLUDE_MOCK_ROLLBACK_MOCK_H_ */

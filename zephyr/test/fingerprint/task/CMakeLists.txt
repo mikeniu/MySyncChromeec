@@ -28,7 +28,7 @@ target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_STATE app PRIVATE
 	src/fpsensor_state.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_TEMPLATE app PRIVATE
 	src/fpsensor_template.cc
-	${PLATFORM_EC}/test/mock/fpsensor_crypto_mock.cc)
+	${PLATFORM_EC}/zephyr/mock/fpsensor_crypto_mock.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_UTILS app PRIVATE
 	src/fpsensor_utils.cc)
 target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_DEBUG app PRIVATE
@@ -47,7 +47,7 @@ target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS app PRIVAT
 	src/fpsensor_auth_commands.cc)
 target_sources_ifdef(CONFIG_NPCX_OTP_KEY app PRIVATE
 	${PLATFORM_EC}/zephyr/shim/chip/npcx/otp_key.c
-	${PLATFORM_EC}/test/mock/otpi_mock.c)
+	${PLATFORM_EC}/zephyr/mock/otpi_mock.c)
 zephyr_include_directories_ifdef(CONFIG_NPCX_OTP_KEY
 	"${PLATFORM_EC}/zephyr/shim/chip/npcx/include")
 

@@ -206,23 +206,11 @@ allows running unit tests in parallel. You can use the
 
 ## Mocks
 
-We do not yet support mocks for Zephyr Ztest-based tests. [Mocks][`mock`] enable
-you to simulate behavior for parts of the system that you're not directly
-testing. They can also be useful for testing specific edge cases that are hard
-to exercise during normal use (e.g., error conditions).
+[Mocks][`mock`] enable you to simulate behavior for parts of the system that
+you're not directly testing. They can also be useful for testing specific edge
+cases that are hard to exercise during normal use (e.g., error conditions).
 
-See the [Mock README] for details.
-
-### Mock Time
-
-When writing unit tests that rely on a clock, it's best not to rely on a real
-hardware clock. It's very difficult to enforce exact timing with a real clock,
-which leads to test flakiness (and developers ignoring tests since they're flaky
-). Instead, use the [Mock Timer] to adjust the time during the test.
-
-[`mock`]: /include/mock
-[Mock Timer]: /include/mock/timer_mock.h
+[`mock`]: /zephyr/mock
 [`test`]: /test
 [`host` board]: /board/host/
 [`test_util.h`]: /include/test_util.h
-[Mock README]: /test/mock/README.md
