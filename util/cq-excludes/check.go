@@ -31,11 +31,8 @@ var expectedCQPatterns = []string{
 	//   include/compile_time_macros.h util/misc_util.h include/update_fw.h include/usb_descriptor.h include/vb21_struct.h include/2id.h extra/usb_updater/usb_updater2.c
 	//   extra/touchpad_updater/touchpad_updater.c
 	//   util/flash_ec util/uart_stress_tester.py util/openocd/*
-	"src/platform/ec/core/build.mk",
 	"src/platform/ec/extra/touchpad_updater/**",
 	"src/platform/ec/Makefile*",
-	"src/platform/ec/third_party/build.mk",
-	"src/platform/ec/third_party/rules.mk",
 	"src/platform/ec/util/build.mk",
 	"src/platform/ec/util/lock/build.mk",
 	// chromeos-base/ec-utils-test (Optional, uses pupr): util/battery_temp util/inject-keys.py util/flash_fp_mcu util/fptool.py
