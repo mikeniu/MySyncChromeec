@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b64d0768_06c47252",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-30T17:58:23Z",
+      "side": 1,
+      "message": "I\u0027m concerned that we should build the tests and the boards with the same compiler.\n\nThat should be doable, even if llvm doesn\u0027t produce as tight of code, since we don\u0027t actually do the final link step when building for coverage, because there is never enough flash space for the coverage instrumentation.",
+      "range": {
+        "startLine": 14,
+        "startChar": 19,
+        "endLine": 14,
+        "endChar": 50
+      },
+      "revId": "313054485f167b9e73d7fdf542686e719eca6f3c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60442e61_35883b83",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-09-30T17:58:23Z",
+      "side": 1,
+      "message": "I.e. set the toolchain to llvm here.",
+      "range": {
+        "startLine": 346,
+        "startChar": 8,
+        "endLine": 346,
+        "endChar": 32
+      },
+      "revId": "313054485f167b9e73d7fdf542686e719eca6f3c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
