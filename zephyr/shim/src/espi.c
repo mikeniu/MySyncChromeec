@@ -527,10 +527,10 @@ static void handle_host_write(uint32_t data)
 	return;
 }
 
-/* Get protocol information */
-static enum ec_status lpc_get_protocol_info(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+lpc_get_protocol_info(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_get_protocol_info *r = args->response;
+	struct ec_response_get_protocol_info *r = args->output_buf;
 
 	memset(r, 0, sizeof(*r));
 	r->protocol_versions = BIT(3);
@@ -538,12 +538,13 @@ static enum ec_status lpc_get_protocol_info(struct host_cmd_handler_args *args)
 	r->max_response_packet_size = EC_LPC_HOST_PACKET_SIZE;
 	r->flags = 0;
 
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_GET_PROTOCOL_INFO, lpc_get_protocol_info,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_GET_PROTOCOL_INFO, lpc_get_protocol_info,
+			      EC_VER_MASK(0),
+			      struct ec_response_get_protocol_info);
 #endif /* !CONFIG_EC_HOST_CMD */
 
 void lpc_set_acpi_status_mask(uint8_t mask)
@@ -625,39 +626,13 @@ test_mockable void lpc_keyboard_put_char(uint8_t chr, int send_irq)
 	LOG_INF("KB put %02x", kb_char);
 }
 
-/* Put an aux char to host buffer by HIMDO and assert status bit 5. */
-void lpc_aux_put_char(uint8_t chr, int send_irq)
-{
-	uint32_t kb_char = chr;
-	uint32_t status = I8042_AUX_DATA;
-	int rv;
-
-	rv = espi_write_lpc_request(espi_dev, E8042_SET_FLAG, &status);
-	if (rv) {
-		LOG_ERR("ESPI write failed: E8042_SET_FLAG = %d", rv);
-	}
-	rv = espi_write_lpc_request(espi_dev, E8042_WRITE_KB_CHAR, &kb_char);
-	if (rv) {
-		LOG_ERR("ESPI write failed: E8042_WRITE_KB_CHAR = %d", rv);
-	}
-	LOG_INF("AUX put %02x", kb_char);
-}
-
 static void kbc_ibf_obe_handler(uint32_t data)
 {
 #ifdef HAS_TASK_KEYPROTO
 	uint8_t is_ibf = is_8042_ibf(data);
-	uint32_t status = I8042_AUX_DATA;
-	int rv;
 
 	if (is_ibf) {
 		keyboard_host_write(get_8042_data(data), get_8042_type(data));
-	} else if (IS_ENABLED(CONFIG_8042_AUX)) {
-		rv = espi_write_lpc_request(espi_dev, E8042_CLEAR_FLAG,
-					    &status);
-		if (rv) {
-			LOG_ERR("ESPI write failed: E8042_CLEAR_FLAG = %d", rv);
-		}
 	}
 	task_wake(TASK_ID_KEYPROTO);
 #endif

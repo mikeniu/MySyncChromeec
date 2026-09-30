@@ -1,0 +1,138 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "../../../../program/ec-aic/rtk-aic/project.overlay"
+#include <dt-bindings/gpio_defines.h>
+#include <zephyr/dt-bindings/gpio/realtek-gpio.h>
+
+/ {
+	chosen {
+		/delete-property/ intel-ap-pwrseq,espi;
+	};
+
+	common-pwrseq {
+		compatible = "intel,ap-pwrseq";
+		sys-pwrok-delay = <10>;
+		all-sys-pwrgd-timeout = <100>;
+		wait-signal-timeout = <2000>;
+		s5-inactivity-timeout = <10>;
+		rsmrst-delay = <10>;
+		vccst-pwrgd-delay = <2>;
+		pch-pwrok-delay = <2>;
+		sys-reset-delay = <32>;
+	};
+
+	/* Power button input to EC (from Dagwood PE02) */
+	named-gpios {
+		gpio_ec_pwrbtn_l: ec_pwrbtn_l {
+			gpios = <RTS5912_GPIO115 GPIO_ACTIVE_LOW>;
+			enum-name = "GPIO_POWER_BUTTON_L";
+		};
+		gpio_pch_pwrbtn_l: pch_pwrbtn_l {
+			gpios = <RTS5912_GPIO124 GPIO_OUTPUT>;
+			enum-name = "GPIO_PCH_PWRBTN_L";
+		};
+	};
+
+	gpio_interrupts: gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_power_button: power_button {
+			irq-pin = <&gpio_ec_pwrbtn_l>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "power_button_interrupt";
+		};
+	};
+
+	/* EC Outputs */
+	pwr_en_pp5000: pwr-en-pp5000-s5 {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "PP5000_S5 enable output";
+		enum-name = "PWR_EN_PP5000_A";
+		gpios = <RTS5912_GPIO060 0>;
+		output;
+	};
+
+	pwr_ec_pch_rsmrst: pwr-ec-pch-rsmrst-odl {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "RSMRST output to PCH";
+		enum-name = "PWR_EC_PCH_RSMRST";
+		gpios = <RTS5912_GPIO111 GPIO_ACTIVE_LOW>;
+		reset-val = <1>;
+		output;
+	};
+
+	pwr_pch_pwrok: pwr-pch-pwrok {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "PCH_PWROK output to PCH";
+		enum-name = "PWR_PCH_PWROK";
+		gpios = <RTS5912_GPIO127 0>;
+		output;
+	};
+
+	pwr_ec_pch_sys_pwrok: pwr-ec-pch-sys-pwrok {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SYS_PWROK output to PCH";
+		enum-name = "PWR_EC_PCH_SYS_PWROK";
+		gpios = <RTS5912_GPIO109 0>;
+		output;
+	};
+
+	/* EC Inputs from AP (Dagwood) */
+	pwr_rsmrst_pwrgd: pwr-rsmrst-pwrgd {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "RSMRST_PWRGD input from regulator";
+		enum-name = "PWR_RSMRST_PWRGD";
+		gpios = <RTS5912_GPIO104 0>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+
+	pwr_all_sys_pwrgd: pwr-all-sys-pwrgd {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "ALL_SYS_PWRGD input";
+		enum-name = "PWR_ALL_SYS_PWRGD";
+		gpios = <RTS5912_GPIO099 0>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+
+	pwr_slp_s5: pwr-slp-s5-l {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SLP_S5_L input from PCH";
+		enum-name = "PWR_SLP_S5";
+		gpios = <RTS5912_GPIO015 GPIO_ACTIVE_LOW>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+
+	pwr_slp_s4: pwr-slp-s4-l {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SLP_S4_L input from PCH";
+		enum-name = "PWR_SLP_S4";
+		gpios = <RTS5912_GPIO089 GPIO_ACTIVE_LOW>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+
+	pwr_slp_s3: pwr-slp-s3-l {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SLP_S3_L input from PCH";
+		enum-name = "PWR_SLP_S3";
+		gpios = <RTS5912_GPIO079 GPIO_ACTIVE_LOW>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+
+	pwr_slp_s0: pwr-slp-s0-l {
+		compatible = "intel,ap-pwrseq-gpio";
+		dbg-label = "SLP_S0_L input from PCH";
+		enum-name = "PWR_SLP_S0";
+		gpios = <RTS5912_GPIO125 GPIO_ACTIVE_LOW>;
+		interrupt-flags = <GPIO_INT_EDGE_BOTH>;
+	};
+
+	/* External signals for MTL state machine */
+	pwr_sys_rst: pwr-sys-rst {
+		compatible = "intel,ap-pwrseq-external";
+		dbg-label = "SYS_RST";
+		enum-name = "PWR_SYS_RST";
+	};
+};

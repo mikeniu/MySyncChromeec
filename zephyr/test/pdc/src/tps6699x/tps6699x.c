@@ -10,6 +10,8 @@
 #include "pdc_trace_msg.h"
 #include "tps6699x_cmd.h"
 
+#include <string.h>
+
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/emul.h>
@@ -42,6 +44,7 @@ test_mockable_static int tps_xfer_reg(const struct i2c_dt_spec *i2c,
 				      uint8_t len, int flag);
 
 static const struct emul *emul = EMUL_DT_GET(TPS6699X_NODE);
+static const struct emul *emul2 = EMUL_DT_GET(TPS6699X_NODE2);
 static const struct device *dev = DEVICE_DT_GET(TPS6699X_NODE);
 static const struct device *dev2 = DEVICE_DT_GET(TPS6699X_NODE2);
 static enum port_control_access access;
@@ -218,16 +221,102 @@ ZTEST_USER(tps6699x, test_set_uor_tps)
 }
 
 #define INIT_SLEEP_MS 1000
-/* ST_INIT is being used to initialize critical registers and needs to recover
- * from a failed SET_NOTIFICATION. Test both the INIT_DONE + retry mechanisms.
+
+/* Poll interval/timeout when waiting for the driver to enter ST_DISABLE. */
+#define ST_DISABLE_POLL_MS 100
+#define ST_DISABLE_POLL_TIMEOUT_US (5 * USEC_PER_SEC)
+
+/*
+ * Wait until the port under test enters ST_DISABLE.
+ *
+ * A port in ST_DISABLE reports its cached error status synchronously with
+ * port_disabled set. In every other state pdc_get_error_status() either
+ * fails with -EBUSY or returns an emulator-provided status with
+ * port_disabled clear, making this a race-free indicator.
+ */
+static void wait_for_st_disable(void)
+{
+	union error_status_t es;
+
+	zassert_true(WAIT_FOR((memset(&es, 0, sizeof(es)),
+			       pdc_get_error_status(dev, &es) == 0 &&
+				       es.port_disabled),
+			      ST_DISABLE_POLL_TIMEOUT_US,
+			      k_sleep(K_MSEC(ST_DISABLE_POLL_MS))),
+		     "PDC did not enter ST_DISABLE");
+}
+
+/* Verify the externally visible behavior of a port in ST_DISABLE. */
+static void verify_st_disable_behavior(void)
+{
+	union error_status_t es = { 0 };
+	union connector_status_t cs;
+	struct pdc_callback callback;
+
+	/* Cached error status is returned with the port marked disabled. */
+	zassert_ok(pdc_get_error_status(dev, &es));
+	zassert_true(es.port_disabled);
+
+	/* Commands fast-fail with -ENOSYS so the upper layer never blocks
+	 * on a dead port.
+	 */
+	zassert_equal(-ENOSYS, pdc_set_rdo(dev, 0));
+
+	/* A synthesized "not connected" status is returned and the CCI
+	 * callback fires so the upper layer can move to PDC_UNATTACHED.
+	 */
+	callback.handler = test_cc_cb;
+	pdc_set_cc_callback(dev, &callback);
+	test_cc_cb_called = false;
+	test_cc_cb_cci.raw_value = 0;
+
+	memset(&cs, 0xff, sizeof(cs));
+	zassert_ok(pdc_get_connector_status(dev, &cs));
+	zassert_false(cs.connect_status);
+	zassert_true(test_cc_cb_called);
+	zassert_true(test_cc_cb_cci.command_completed);
+	zassert_false(test_cc_cb_cci.error);
+
+	pdc_set_cc_callback(dev, NULL);
+}
+
+/*
+ * Restart init on all ports by pulsing a patch_loaded IRQ on the second
+ * (healthy) emulator. Its driver's IRQ handling restarts init on all
+ * ports, including a port stuck in ST_DISABLE.
+ */
+static void restart_init_all_ports(void)
+{
+	zassert_ok(emul_pdc_set_interrupt_patch_loaded(emul2));
+	zassert_ok(emul_pdc_pulse_irq(emul2));
+	k_sleep(K_MSEC(INIT_SLEEP_MS));
+}
+
+/*
+ * A disabled port never leaves ST_DISABLE on its own. Restart init on all
+ * ports and verify that both come back up.
+ */
+static void recover_from_st_disable(void)
+{
+	restart_init_all_ports();
+
+	zassert_true(pdc_is_init_done(dev));
+	zassert_true(pdc_is_init_done(dev2));
+}
+
+/* ST_INIT is being used to initialize critical registers. A port that
+ * exhausts its SET_NOTIFICATION retries (or fails another init step)
+ * transitions to ST_DISABLE until the next patch_loaded IRQ restarts init
+ * on all ports. Test the retry, disable and recovery mechanisms.
  */
 ZTEST_USER(tps6699x, test_init_state_sequence)
 {
 	/* Make sure we started in an initialized state. */
 	zassert_true(pdc_is_init_done(dev));
 
-	/* Fail all SET_NOTIFICATION attempts as part of init. One failure will
-	 * be due to attempting to read REG_VERSION. */
+	/* Fail all SET_NOTIFICATION attempts as part of init so that the
+	 * retry limit is exceeded and the port enters ST_DISABLE.
+	 */
 	emul_pdc_fail_next_ucsi_command(emul, UCSI_SET_NOTIFICATION_ENABLE,
 					TASK_REJECTED, TPS6699X_INIT_RETRY_MAX);
 
@@ -237,52 +326,68 @@ ZTEST_USER(tps6699x, test_init_state_sequence)
 	zassert_ok(pdc_reset(dev));
 	k_sleep(K_MSEC(INIT_SLEEP_MS * 2));
 
-	/* PDC should not be init because SET_NOTIFICATION failed. */
-	zassert_false(pdc_is_init_done(dev));
-
-	/* Reset will fail because it's in suspended state. Restore from
-	 * suspended and it should be ok again. */
-	zassert_not_ok(pdc_reset(dev));
-	zassert_ok(pdc_set_comms_state(dev, true));
-	k_sleep(K_MSEC(INIT_SLEEP_MS));
-
-	zassert_true(pdc_is_init_done(dev));
-
-	/* Fail register read/writes for some init tasks at least once for
-	 * coverage. These all will cause error handling to trigger.
+	/* Init retries are exhausted: the port is now in ST_DISABLE, which
+	 * still reports init done so the upper layer can proceed past it.
 	 */
-	emul_pdc_fail_reg_write(emul, REG_INTERRUPT_MASK_FOR_I2C1);
-	emul_pdc_fail_reg_write(emul, REG_AUTONEGOTIATE_SINK);
-	emul_pdc_fail_reg_write(emul, REG_PORT_CONTROL);
-	emul_pdc_fail_reg_read(emul, REG_BOOT_FLAG);
-	emul_pdc_fail_reg_read(emul, REG_VERSION);
+	wait_for_st_disable();
+	verify_st_disable_behavior();
 
-	/* No error handling triggered by this failure. Only useful for
-	 * coverage.
+	/* A disabled port fast-fails further commands with -ENOSYS. */
+	zassert_equal(-ENOSYS, pdc_reset(dev));
+
+	/* Recover both ports by re-initializing all of them. */
+	recover_from_st_disable();
+
+	/* Fail register read/writes for the init tasks below. Each injected
+	 * failure is one-shot and sends the port to ST_DISABLE; restart init
+	 * to consume it, then recover before exercising the next one. (The
+	 * REG_VERSION init failure is covered by
+	 * test_st_disable_on_init_failure.)
 	 */
-	emul_pdc_fail_reg_write(emul, REG_INTERRUPT_CLEAR_FOR_I2C1);
 
-	/* Number of registers fails above / number of retries is how many loop
-	 * iterations it will take to recover to init state.
+	/* A REG_INTERRUPT_CLEAR_FOR_I2C1 write failure only logs an error,
+	 * so init continues and fails on the interrupt mask write instead.
+	 * Use persistent failures so init exhausts TPS6699X_INIT_RETRY_MAX.
 	 */
-	const int num_loops = 5 / TPS6699X_INIT_RETRY_MAX + 1;
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul),
+		REG_INTERRUPT_CLEAR_FOR_I2C1);
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul),
+		REG_INTERRUPT_MASK_FOR_I2C1);
+	restart_init_all_ports();
+	wait_for_st_disable();
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	recover_from_st_disable();
 
-	/* Do a reset which will trigger GAID and restart init. */
-	zassert_ok(pdc_reset(dev));
-	k_sleep(K_MSEC(INIT_SLEEP_MS));
+	/* Fail the REG_PORT_CONTROL write in pdc_port_control_init(). Route
+	 * the port control access through to the emulator so the injected
+	 * failure is seen by the driver. Use a persistent failure so init
+	 * exhausts TPS6699X_INIT_RETRY_MAX.
+	 */
+	tps_rw_port_control_fake.custom_fake = custom_fake_tps_rw_port_control;
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul), REG_PORT_CONTROL);
+	restart_init_all_ports();
+	wait_for_st_disable();
+	i2c_common_emul_set_write_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	recover_from_st_disable();
 
-	int i;
-	for (i = 0; i < num_loops && !pdc_is_init_done(dev); ++i) {
-		/* PDC won't be init because register read/writes failed. */
-		zassert_false(pdc_is_init_done(dev));
-
-		/* Restore from suspended to trigger the init retries. */
-		zassert_ok(pdc_set_comms_state(dev, true));
-		k_sleep(K_MSEC(INIT_SLEEP_MS));
-	}
-
-	zassert_equal(i, num_loops, "I = %d vs num_loops = %d", i, num_loops);
-	zassert_true(pdc_is_init_done(dev));
+	/* Fail the REG_BOOT_FLAG read in pdc_exit_dead_battery(). Use a
+	 * persistent failure so init exhausts TPS6699X_INIT_RETRY_MAX.
+	 */
+	i2c_common_emul_set_read_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul), REG_BOOT_FLAG);
+	restart_init_all_ports();
+	wait_for_st_disable();
+	i2c_common_emul_set_read_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	recover_from_st_disable();
 }
 
 /* Cover various branches of handle irq including failures. */
@@ -306,21 +411,12 @@ ZTEST_USER(tps6699x, test_handle_irq)
 
 	emul_pdc_set_interrupt_patch_loaded(emul);
 	zassert_ok(emul_pdc_pulse_irq(emul));
-	k_sleep(K_MSEC(SLEEP_MS));
-	/* We should have reset into suspend state due to failing init. */
-	zassert_false(pdc_is_init_done(dev));
 
-	/* Recover to idle. */
-	zassert_ok(pdc_set_comms_state(dev, true));
-	k_sleep(K_MSEC(SLEEP_MS));
-	zassert_true(pdc_is_init_done(dev));
+	/* Init retries are exhausted: the port is now in ST_DISABLE. */
+	wait_for_st_disable();
 
-	/* Second dev may also be in a stuck state so recover it. */
-	if (!pdc_is_init_done(dev2)) {
-		zassert_ok(pdc_set_comms_state(dev2, true));
-		k_sleep(K_MSEC(SLEEP_MS));
-		zassert_true(pdc_is_init_done(dev2));
-	}
+	/* Recover both ports to idle by re-initializing all of them. */
+	recover_from_st_disable();
 }
 
 ZTEST_USER(tps6699x, test_set_rdo)
@@ -741,4 +837,133 @@ ZTEST_USER(tps6699x, test_update_retimer_fail)
 	zassert_true(test_cc_cb_cci.error);
 
 	pdc_set_cc_callback(dev, NULL);
+}
+
+ZTEST_USER(tps6699x, test_st_disable_on_init_failure)
+{
+	/* NULL argument checks. */
+	zassert_equal(-EINVAL, pdc_get_connector_status(dev, NULL));
+	zassert_equal(-EINVAL, pdc_get_error_status(dev, NULL));
+
+	zassert_true(pdc_is_init_done(dev));
+
+	/* Fail the next REG_VERSION read so the next init attempt fails in
+	 * st_init_run() and the port transitions to ST_DISABLE. Use a
+	 * persistent failure so init exhausts TPS6699X_INIT_RETRY_MAX.
+	 */
+	i2c_common_emul_set_read_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul), REG_VERSION);
+
+	/* Restart init on all ports via the patch_loaded IRQ. */
+	zassert_ok(emul_pdc_set_interrupt_patch_loaded(emul));
+	zassert_ok(emul_pdc_pulse_irq(emul));
+
+	wait_for_st_disable();
+	verify_st_disable_behavior();
+	i2c_common_emul_set_read_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	recover_from_st_disable();
+}
+
+/* Cover NULL / range / state validation paths and simple success paths for
+ * API wrapper functions that are not exercised by other test cases.
+ */
+ZTEST_USER(tps6699x, test_api_validation)
+{
+	uint16_t ucsi_ver;
+	union connector_status_t cs = { 0 };
+	struct pdc_info_t info;
+	struct pdc_hw_config_t hw_cfg;
+
+	/* --- tps_read_power_level with power_direction == 0 --- */
+	cs.power_direction = 0;
+	zassert_ok(emul_pdc_set_connector_status(emul, &cs));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_equal(-ENOSYS, pdc_read_power_level(dev));
+
+	/* --- tps_get_info live=false cached read --- */
+	zassert_ok(pdc_get_info(dev, &info, false));
+
+	/* --- tps_get_info live=false with no cached value --- */
+	/* Force a fresh init to clear the cached event by failing one init
+	 * step, entering ST_DISABLE. In ST_DISABLE, PDC_CHIP_INFO_AVAIL_EVENT
+	 * is still set (it is not in PDC_ALL_THREAD_WAKE_EVENTS), so
+	 * live=false still returns cached info successfully. Use a persistent
+	 * failure so init exhausts TPS6699X_INIT_RETRY_MAX.
+	 */
+	i2c_common_emul_set_read_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul), REG_VERSION);
+	zassert_ok(emul_pdc_set_interrupt_patch_loaded(emul));
+	zassert_ok(emul_pdc_pulse_irq(emul));
+	wait_for_st_disable();
+	zassert_ok(pdc_get_info(dev, &info, false));
+	i2c_common_emul_set_read_fail_reg(
+		emul_tps6699x_get_i2c_common_data(emul),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	recover_from_st_disable();
+
+	/* --- tps_set_comms_state(false) suspend path --- */
+	zassert_ok(pdc_set_comms_state(dev, false));
+	/* Driver is now suspended. Verify suspend then resume. */
+	zassert_ok(pdc_set_comms_state(dev, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(pdc_is_init_done(dev));
+
+	/* --- Simple success paths for API wrappers --- */
+	/* Set connector status to power_direction=1 for read_power_level. */
+	cs.power_direction = 1;
+	cs.connect_status = 1;
+	zassert_ok(emul_pdc_set_connector_status(emul, &cs));
+	k_sleep(K_MSEC(SLEEP_MS));
+	emul_pdc_pulse_irq(emul);
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Synchronous API wrappers */
+	zassert_ok(pdc_get_ucsi_version(dev, &ucsi_ver));
+	zassert_equal(ucsi_ver, UCSI_VERSION);
+	zassert_ok(pdc_get_hw_config(dev, &hw_cfg));
+	zassert_equal(hw_cfg.bus_type, PDC_BUS_TYPE_I2C);
+}
+
+/* Cover tps_ack_cc_ci and tps_set_battery_capability/status when not in
+ * ST_IDLE (driver is suspended).
+ */
+ZTEST_USER(tps6699x, test_busy_state_rejections)
+{
+	union conn_status_change_bits_t ci = { 0 };
+	union battery_capability_t bc = { 0 };
+	union battery_status_t bs = { 0 };
+
+	/* Suspend the driver so it's not in ST_IDLE */
+	zassert_ok(pdc_set_comms_state(dev, false));
+
+	/* These should all return -EBUSY because state != ST_IDLE */
+	zassert_equal(-EBUSY, pdc_ack_cc_ci(dev, ci, false, 0));
+	zassert_equal(-EBUSY, pdc_set_battery_capability(dev, &bc));
+	zassert_equal(-EBUSY, pdc_set_battery_status(dev, &bs));
+
+	/* Resume */
+	zassert_ok(pdc_set_comms_state(dev, true));
+	k_sleep(K_MSEC(SLEEP_MS));
+	zassert_true(pdc_is_init_done(dev));
+}
+
+/* Cover tps_check_data_ready by setting a response delay so the driver
+ * polls the command register while the emulator hasn't completed it yet.
+ */
+ZTEST_USER(tps6699x, test_delayed_response)
+{
+	union error_status_t es;
+
+	/* Set a small response delay so the command isn't immediately complete
+	 */
+	emul_pdc_set_response_delay(emul, 50);
+
+	zassert_ok(pdc_get_error_status(dev, &es));
+	k_sleep(K_MSEC(SLEEP_MS));
+
+	/* Reset delay for subsequent tests */
+	emul_pdc_set_response_delay(emul, 0);
+	zassert_true(pdc_is_init_done(dev));
 }

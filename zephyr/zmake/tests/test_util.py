@@ -61,3 +61,25 @@ def test_read_kconfig_autoconf_value(value):
 def test_c_str(input_str, expected_result):
     """Test the util.c_str function."""
     assert util.c_str(input_str) == expected_result
+
+
+@pytest.mark.parametrize(
+    ["marker", "is_dir"],
+    [
+        (".repo", True),
+        (".supermanifest", False),
+    ],
+)
+def test_locate_cros_checkout(tmp_path, monkeypatch, marker, is_dir):
+    """Test locate_cros_checkout with .repo and .supermanifest checkouts."""
+    subdir = tmp_path / "src" / "platform" / "ec"
+    subdir.mkdir(parents=True)
+    if is_dir:
+        (tmp_path / marker).mkdir()
+    else:
+        (tmp_path / marker).touch()
+
+    monkeypatch.delenv("CROS_WORKON_SRCROOT", raising=False)
+    monkeypatch.chdir(subdir)
+
+    assert util.locate_cros_checkout() == tmp_path.resolve()

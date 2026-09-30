@@ -3328,12 +3328,6 @@
 #undef CONFIG_KEYBOARD_STRAUSS
 
 /*
- * Enable the 8042 AUX port. This is typically used for PS/2 mouse devices.
- * You will need to implement send_aux_data_to_device and lpc_aux_put_char.
- */
-#undef CONFIG_8042_AUX
-
-/*
  * Invert the IRQ1/IRQ12 interrupts that come from the NPCX keyboard controller
  * such that they are active low.
  */

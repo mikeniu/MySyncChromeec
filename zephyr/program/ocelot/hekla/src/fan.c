@@ -13,8 +13,8 @@
 
 #define CPRINTS(format, args...) cprints(CC_THERMAL, format, ##args)
 
-#define TEMP_CHG_THER TEMP_SENSOR_ID(DT_NODELABEL(temp_chg_ther))
-#define TEMP_DDR TEMP_SENSOR_ID(DT_NODELABEL(temp_ddr))
+#define TEMP_PCORE TEMP_SENSOR_ID(DT_NODELABEL(temp_pcore))
+#define TEMP_VCCGT TEMP_SENSOR_ID(DT_NODELABEL(temp_vccgt))
 
 struct fan_step {
 	int on[TEMP_SENSOR_COUNT];
@@ -52,19 +52,19 @@ int fan_table_to_rpm(int fan, int *temp)
 	 *  2. decreasing path. (check the release point)
 	 *  3. invariant path. (return the current RPM)
 	 */
-	if ((temp[TEMP_CHG_THER] > prev_tmp[TEMP_CHG_THER]) ||
-	    (temp[TEMP_DDR] > prev_tmp[TEMP_DDR])) {
-		if ((temp[TEMP_CHG_THER] >=
-		     fan_step_table[current_level].on[TEMP_CHG_THER]) ||
-		    (temp[TEMP_DDR] >=
-		     fan_step_table[current_level].on[TEMP_DDR]))
+	if ((temp[TEMP_PCORE] > prev_tmp[TEMP_PCORE]) ||
+	    (temp[TEMP_VCCGT] > prev_tmp[TEMP_VCCGT])) {
+		if ((temp[TEMP_PCORE] >=
+		     fan_step_table[current_level].on[TEMP_PCORE]) ||
+		    (temp[TEMP_VCCGT] >=
+		     fan_step_table[current_level].on[TEMP_VCCGT]))
 			current_level++;
-	} else if ((temp[TEMP_CHG_THER] < prev_tmp[TEMP_CHG_THER]) ||
-		   (temp[TEMP_DDR] < prev_tmp[TEMP_DDR])) {
-		if ((temp[TEMP_CHG_THER] <=
-		     fan_step_table[current_level].off[TEMP_CHG_THER]) &&
-		    (temp[TEMP_DDR] <=
-		     fan_step_table[current_level].off[TEMP_DDR]))
+	} else if ((temp[TEMP_PCORE] < prev_tmp[TEMP_PCORE]) ||
+		   (temp[TEMP_VCCGT] < prev_tmp[TEMP_VCCGT])) {
+		if ((temp[TEMP_PCORE] <=
+		     fan_step_table[current_level].off[TEMP_PCORE]) &&
+		    (temp[TEMP_VCCGT] <=
+		     fan_step_table[current_level].off[TEMP_VCCGT]))
 			current_level--;
 	}
 

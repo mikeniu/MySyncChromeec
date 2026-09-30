@@ -213,6 +213,8 @@ enum state_t {
 	ST_TASK_WAIT,
 	/** ST_SUSPENDED */
 	ST_SUSPENDED,
+	/** ST_DISABLE - permanent disable on init failure */
+	ST_DISABLE,
 };
 
 /**
@@ -259,6 +261,8 @@ struct pdc_data_t {
 	bool init_done;
 	/* Init attempt counter */
 	int init_attempt;
+	/** Cached error status */
+	union error_status_t error_status;
 	/** Callback data */
 	void *cb_data;
 	/** CCI Event */
@@ -370,6 +374,7 @@ static const char *const state_names[] = {
 	[ST_ERROR_RECOVERY] = "ERROR RECOVERY",
 	[ST_TASK_WAIT] = "TASK_WAIT",
 	[ST_SUSPENDED] = "SUSPENDED",
+	[ST_DISABLE] = "PDC_DISABLED",
 };
 
 static const struct smf_state states[];
@@ -763,10 +768,9 @@ static enum smf_state_result st_init_run(void *o)
 		return SMF_EVENT_HANDLED;
 	}
 
-	/* If we've attempted init too many times, suspend instead. */
+	/* If we've attempted init too many times, disable instead. */
 	if (data->init_attempt > PDC_INIT_RETRY_MAX) {
-		suspend_comms();
-		set_state(data, ST_SUSPENDED);
+		set_state(data, ST_DISABLE);
 		return SMF_EVENT_HANDLED;
 	}
 
@@ -1093,6 +1097,38 @@ static enum smf_state_result st_suspended_run(void *o)
 	k_event_clear(&data->pdc_event, PDC_CHIP_INFO_AVAIL_EVENT);
 
 	set_state(data, ST_INIT);
+	return SMF_EVENT_HANDLED;
+}
+
+static void st_disable_entry(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	print_current_state(data);
+	/* Mark init done so the upper-layer INIT_WAIT_FOR_READY state can
+	 * proceed past this port. Without this, the upper-layer state machine
+	 * would block forever waiting for a dead PDC.
+	 */
+	data->init_done = true;
+	/* Mark the port as permanently disabled so the upper-layer state
+	 * machine can react.
+	 */
+	data->error_status.port_disabled = 1;
+}
+
+static enum smf_state_result st_disable_run(void *o)
+{
+	struct pdc_data_t *data = (struct pdc_data_t *)o;
+
+	/* Clear all events that might keep the thread busy, since the driver
+	 * will not be able to process them while disabled (mirrors
+	 * st_suspended_run). A stale event (e.g. a command posted just
+	 * before entering this state) would otherwise make the thread spin
+	 * forever.
+	 */
+	k_event_clear(&data->pdc_event, PDC_ALL_THREAD_WAKE_EVENTS);
+
+	/* Stay here until reset. */
 	return SMF_EVENT_HANDLED;
 }
 
@@ -2643,6 +2679,8 @@ static const struct smf_state states[] = {
 					  NULL, NULL, NULL),
 	[ST_SUSPENDED] = SMF_CREATE_STATE(st_suspended_entry, st_suspended_run,
 					  NULL, NULL, NULL),
+	[ST_DISABLE] = SMF_CREATE_STATE(st_disable_entry, st_disable_run, NULL,
+					NULL, NULL),
 };
 
 static int tps_post_command_with_callback(const struct device *dev,
@@ -2652,6 +2690,15 @@ static int tps_post_command_with_callback(const struct device *dev,
 					  struct pdc_callback *callback)
 {
 	struct pdc_data_t *data = dev->data;
+
+	/* Port is permanently disabled (PDC init failed). Return -ENOSYS so
+	 * the upper-layer state machine fast-fails instead of entering
+	 * PDC_SEND_CMD_WAIT (which would block for PDC_CMD_TIMEOUT_MS=2000ms
+	 * and exceed the watchdog's 1600ms limit).
+	 */
+	if (get_state(data) == ST_DISABLE) {
+		return -ENOSYS;
+	}
 
 	/* TODO(b/345783692): Double check this logic. */
 	if (get_state(data) != ST_IDLE) {
@@ -2851,15 +2898,47 @@ static int tps_get_connector_capability(const struct device *dev,
 static int tps_get_connector_status(const struct device *dev,
 				    union connector_status_t *cs)
 {
+	struct pdc_data_t *data = dev->data;
+
+	if (cs == NULL) {
+		return -EINVAL;
+	}
+
+	/* Port is permanently disabled (init failed). Synthesize a
+	 * "not-connected" connector status and notify the upper layer via
+	 * the CCI callback so the upper-layer state machine can transition
+	 * out of PDC_INIT (INIT_GET_CONNECTOR_STATUS) into PDC_UNATTACHED
+	 * instead of looping forever waiting for a dead PDC. This isolates
+	 * the port while letting the rest of the system proceed.
+	 */
+	if (get_state(data) == ST_DISABLE) {
+		memset(cs, 0, sizeof(*cs));
+		data->cci_event.raw_value = 0;
+		data->cci_event.command_completed = 1;
+		call_cci_event_cb(data);
+		return 0;
+	}
+
 	return tps_post_command(dev, CMD_GET_CONNECTOR_STATUS, cs);
 }
 
 static int tps_get_error_status(const struct device *dev,
 				union error_status_t *es)
 {
+	struct pdc_data_t *data = dev->data;
+
 	if (es == NULL) {
 		return -EINVAL;
 	}
+
+	/* Port is permanently disabled. Return the cached error_status so
+	 * the upper layer can react.
+	 */
+	if (get_state(data) == ST_DISABLE) {
+		es->raw_value = data->error_status.raw_value;
+		return 0;
+	}
+
 	return tps_post_command(dev, CMD_GET_ERROR_STATUS, es);
 }
 
@@ -3153,11 +3232,12 @@ static void tps_start_thread(const struct device *dev)
 	k_thread_start(data->thread);
 }
 
-static bool tps_is_init_done(const struct device *dev)
+static enum pdc_driver_init_state_t tps_is_init_done(const struct device *dev)
 {
 	struct pdc_data_t *data = dev->data;
 
-	return data->init_done;
+	return data->init_done ? PDC_DRIVER_INIT_STATE_SUCCESS :
+				 PDC_DRIVER_INIT_STATE_WAIT;
 }
 
 static int tps_get_pch_data_status(const struct device *dev, uint8_t port_num,

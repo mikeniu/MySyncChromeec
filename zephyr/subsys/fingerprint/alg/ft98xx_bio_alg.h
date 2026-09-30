@@ -14,7 +14,6 @@
 #define MAX_SUBTEMPLATE_COUNT_PER_FINGER 20
 #define FT_TPL_SUBTPL_SIZE 4096
 #define FT_ALGO_SIZE (140 * 1024)
-#define FT_RAW_SIZE (20 * 1024)
 
 typedef enum {
 	MSG_LVL_ALL = 0,

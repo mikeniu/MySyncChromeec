@@ -219,21 +219,21 @@ DECLARE_SAFE_CONSOLE_COMMAND(chan, command_ch,
 			     "Save, restore, get or set console channel mask");
 
 #ifdef CONFIG_HOSTCMD_CONSOLE_PRINT
-static enum ec_status
-host_command_console_print(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_console_print(struct ec_host_cmd_handler_args *args)
 {
-	char *msg = (char *)args->params;
+	char *msg = (char *)(uintptr_t)args->input_buf;
 
-	if (args->params_size <= 0)
-		return EC_RES_INVALID_PARAM;
+	if (args->input_buf_size <= 0)
+		return EC_HOST_CMD_INVALID_PARAM;
 	/* Ensure message is null terminated */
-	msg[args->params_size - 1] = '\0';
+	msg[args->input_buf_size - 1] = '\0';
 	/* No response */
-	args->response_size = 0;
+	args->output_buf_size = 0;
 	/* Print message to console */
 	ccprints("Host: %s", msg);
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_CONSOLE_PRINT, host_command_console_print,
-		     EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_CONSOLE_PRINT, host_command_console_print,
+			    EC_VER_MASK(0));
 #endif

@@ -150,7 +150,7 @@ host_command_get_cmd_versions(struct ec_host_cmd_handler_args *args)
 	}
 
 	if (args->output_buf_max < sizeof(*r))
-		return EC_HOST_CMD_INVALID_RESPONSE;
+		return EC_HOST_CMD_RESPONSE_TOO_BIG;
 
 	const struct host_command *cmd = (args->version == 1) ?
 						 find_host_command(p_v1->cmd) :

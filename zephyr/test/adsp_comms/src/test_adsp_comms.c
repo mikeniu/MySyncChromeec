@@ -10,9 +10,11 @@
 #include "charge_state.h"
 #include "chipset.h"
 #include "console.h"
+#include "ec_commands.h"
 #include "extpower.h"
 #include "hooks.h"
 #include "stubs.h"
+#include "system.h"
 
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/kernel.h>
@@ -237,6 +239,61 @@ ZTEST_USER(adsp_comms, test_command_chgstate)
 	send_adsp_msg(ADSP_FEATURE_OEM_CUSTOM, ADSP_OEM_CUSTOM_REG_CHARGE_STATE,
 		      ADSP_OEM_CUSTOM_CHARGE_STATE_FORCED_IDLE);
 	zassert_ok(shell_execute_cmd(sh, "chgstate"));
+}
+
+/* Test 'chgstate sustain' console command and BBRAM persistence */
+ZTEST_USER(adsp_comms, test_command_chgstate_sustain)
+{
+	const struct shell *sh = get_ec_shell();
+	int8_t lower, upper;
+	uint8_t flags;
+
+	/* Set valid sustain limits (lower < upper sets NO_IDLE flag) */
+	zassert_ok(shell_execute_cmd(sh, "chgstate sustain 80 85"));
+	zassert_ok(charge_control_load_from_bbram(&lower, &upper, &flags));
+	zassert_equal(80, lower);
+	zassert_equal(85, upper);
+	zassert_equal(EC_CHARGE_CONTROL_FLAG_NO_IDLE, flags);
+	zassert_ok(shell_execute_cmd(sh, "chgstate"));
+
+	/* Set equal sustain limits (lower == upper does not set NO_IDLE) */
+	zassert_ok(shell_execute_cmd(sh, "chgstate sustain 80 80"));
+	zassert_ok(charge_control_load_from_bbram(&lower, &upper, &flags));
+	zassert_equal(80, lower);
+	zassert_equal(80, upper);
+	zassert_equal(0, flags);
+	zassert_ok(shell_execute_cmd(sh, "chgstate"));
+
+	/* Disable sustain limits with -1 -1 */
+	zassert_ok(shell_execute_cmd(sh, "chgstate sustain -1 -1"));
+	zassert_ok(charge_control_load_from_bbram(&lower, &upper, &flags));
+	zassert_equal(CHARGE_CONTROL_SUSTAINER_DISABLED, lower);
+	zassert_equal(CHARGE_CONTROL_SUSTAINER_DISABLED, upper);
+	zassert_equal(0, flags);
+	zassert_ok(shell_execute_cmd(sh, "chgstate"));
+
+	/* Missing arguments */
+	zassert_equal(EC_ERROR_PARAM_COUNT,
+		      shell_execute_cmd(sh, "chgstate sustain"));
+	zassert_equal(EC_ERROR_PARAM_COUNT,
+		      shell_execute_cmd(sh, "chgstate sustain 80"));
+
+	/* Invalid number format */
+	zassert_equal(EC_ERROR_PARAM2,
+		      shell_execute_cmd(sh, "chgstate sustain abc 80"));
+	zassert_equal(EC_ERROR_PARAM3,
+		      shell_execute_cmd(sh, "chgstate sustain 80 def"));
+
+	/* Invalid range (lower > upper, upper > 100, lower < -1) */
+	zassert_equal(EC_ERROR_INVAL,
+		      shell_execute_cmd(sh, "chgstate sustain 85 80"));
+	zassert_equal(EC_ERROR_INVAL,
+		      shell_execute_cmd(sh, "chgstate sustain -2 80"));
+	zassert_equal(EC_ERROR_INVAL,
+		      shell_execute_cmd(sh, "chgstate sustain 80 101"));
+
+	/* Unknown sub-command */
+	zassert_equal(EC_ERROR_PARAM1, shell_execute_cmd(sh, "chgstate foo"));
 }
 
 /* Test reset of ADSP comms state on HOOK_CHIPSET_SHUTDOWN_COMPLETE */

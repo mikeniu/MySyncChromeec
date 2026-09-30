@@ -226,6 +226,23 @@ ZTEST_F(ft98xx, test_acquire_image_small_buffer_size)
 		      -EINVAL);
 }
 
+ZTEST_F(ft98xx, test_acquire_image_exceeds_runtime_frame_size)
+{
+	uint8_t buffer[FP_SENSOR_IMAGE_SIZE];
+	enum fingerprint_capture_type capture_type =
+		FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT;
+
+	ft_sensor_query_cols_fake.return_val =
+		FINGERPRINT_SENSOR_RES_X(0, DT_NODELABEL(ft98xx)) + 1;
+
+	zassert_equal(
+		fingerprint_acquire_image(fixture->dev, capture_type, buffer,
+					  sizeof(buffer)),
+		-EINVAL,
+		"Expected -EINVAL when runtime frame size exceeds buffer");
+	zassert_equal(ft_sensor_acquire_image_with_mode_fake.call_count, 0);
+}
+
 ZTEST_F(ft98xx, test_periphery_spi_write_read_success)
 {
 	uint8_t tx_buf[1] = { 0xFD };

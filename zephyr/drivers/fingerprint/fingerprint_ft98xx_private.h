@@ -11,6 +11,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define FT_RAW_SIZE (20 * 1024)
+
 /**
  * @brief Sensor operation mode enumeration
  *

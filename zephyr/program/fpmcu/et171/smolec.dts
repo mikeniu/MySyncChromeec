@@ -46,6 +46,10 @@
 				EGIS660_REAL_IMAGE_PROPS
 				capture-type = "FINGERPRINT_CAPTURE_TYPE_PATTERN1";
 			};
+			config4 {
+				EGIS660_REAL_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_PATTERN2";
+			};
 		};
 
 		irq-gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
