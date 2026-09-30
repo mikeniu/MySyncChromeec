@@ -76,7 +76,7 @@
 			enum-name = "GPIO_PACKET_MODE_EN";
 		};
 		gpio_ec_i2c_pdc_sm_int_odl: ec_i2c_pdc_sm_int_odl {
-			gpios = <&gpiof 5 (GPIO_INPUT)>;
+			gpios = <&gpiof 5 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 			enum-name = "GPIO_USB_C0_PD_INT_ODL";
 		};
 		gpio_ec_kso_02_inv: ec_kso_02_inv {
