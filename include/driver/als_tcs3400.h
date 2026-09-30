@@ -122,7 +122,6 @@ enum crbg_index {
 	CRGB_COUNT,
 };
 
-#if defined(CONFIG_ZEPHYR)
 #if DT_NODE_EXISTS(DT_ALIAS(tcs3400_int))
 /*
  * Get the mostion sensor ID of the TCS3400 sensor that
@@ -140,7 +139,6 @@ enum crbg_index {
 #define CONFIG_ALS_TCS3400_INT_EVENT \
 	TASK_EVENT_MOTION_SENSOR_INTERRUPT(SENSOR_ID(DT_ALIAS(tcs3400_int)))
 #endif
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 }

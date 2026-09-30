@@ -7,5 +7,3 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(aic_flash_tests)
 
 target_sources(app PRIVATE src/main.c)
-
-zephyr_compile_definitions("CONFIG_ZEPHYR")

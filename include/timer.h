@@ -8,7 +8,7 @@
 #ifndef PLATFORM_EC_INCLUDE_TIMER_H_
 #define PLATFORM_EC_INCLUDE_TIMER_H_
 
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #include <time.h>
 
 #include <sys/types.h>

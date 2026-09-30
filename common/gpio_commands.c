@@ -90,10 +90,6 @@ __maybe_unused static const struct gpio_flag_description gpio_descriptions[] = {
 #ifdef GPIO_SEL_1P8V
 	{ GPIO_SEL_1P8V, "1P8" },
 #endif
-#ifndef CONFIG_ZEPHYR
-	{ GPIO_ANALOG, "A" },	    { GPIO_ALTERNATE, "ALT" },
-	{ GPIO_LOCKED, "LCK" }
-#endif
 };
 
 static void print_gpio_info(int gpio)
@@ -157,7 +153,6 @@ static int command_gpio_set(int argc, const char **argv)
 #ifdef CONFIG_CMD_GPIO_EXTENDED
 	int gpio;
 	int flags = 0;
-	int af = -1;
 
 #ifdef CONFIG_BOARD_FINGERPRINT
 	if (system_is_locked())
@@ -177,28 +172,9 @@ static int command_gpio_set(int argc, const char **argv)
 		flags = GPIO_OUT_HIGH;
 	else if (strcasecmp(argv[2], "0") == 0)
 		flags = GPIO_OUT_LOW;
-#ifndef CONFIG_ZEPHYR
-	else if (strcasecmp(argv[2], "A") == 0)
-		flags = GPIO_ANALOG;
-	else if (strcasecmp(argv[2], "ALT") == 0) {
-		char *e;
-		if (argc >= 4) {
-			af = strtoi(argv[3], &e, 0);
-			if (*e || af < 0 || af > 5)
-				return EC_ERROR_PARAM2;
-		}
-		flags = GPIO_ALTERNATE;
-	}
-#endif
 	else
 		return EC_ERROR_PARAM2;
 
-	/* Update alt function if requested. */
-	if (af >= 0) {
-		const struct gpio_info *g = gpio_list + gpio;
-
-		gpio_set_alternate_function(g->port, g->mask, af);
-	}
 	/* Update GPIO flags. */
 	gpio_set_flags(gpio, flags);
 #else
@@ -219,7 +195,7 @@ static int command_gpio_set(int argc, const char **argv)
 }
 DECLARE_CONSOLE_COMMAND_FLAGS(gpioset, command_gpio_set,
 #ifdef CONFIG_CMD_GPIO_EXTENDED
-			      "name <0 | 1 | IN | A | ALT [func]>",
+			      "name <0 | 1 | IN>",
 #else
 			      "name <0 | 1>",
 #endif

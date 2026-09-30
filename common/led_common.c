@@ -99,17 +99,6 @@ EC_HOST_CMD_HANDLER(EC_CMD_LED_CONTROL, led_command_control, EC_VER_MASK(1),
 		    struct ec_params_led_control,
 		    struct ec_response_led_control);
 
-#ifndef CONFIG_ZEPHYR
-__attribute__((weak)) void led_control(enum ec_led_id led_id,
-				       enum ec_led_state state)
-{
-	/*
-	 * Default weak implementation that does not affect the state of
-	 * LED. Boards can provide their own implementation.
-	 */
-}
-#endif
-
 /* Trigger board-specific LED diagnostics for a power-on sequence failure.
  *
  * Boards that support power rail failure diagnostics should override this

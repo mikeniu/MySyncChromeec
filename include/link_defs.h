@@ -15,9 +15,7 @@
 #include "task.h"
 #include "test_util.h"
 
-#ifdef CONFIG_ZEPHYR
 #include <linker.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -105,7 +103,7 @@ extern uint64_t __deferred_until_end[];
 extern const struct test_i2c_xfer __test_i2c_xfer[];
 extern const struct test_i2c_xfer __test_i2c_xfer_end[];
 
-#if defined(CONFIG_PLATFORM_EC_HOSTCMD) || !defined(CONFIG_ZEPHYR)
+#ifdef CONFIG_PLATFORM_EC_HOSTCMD
 /* Host commands */
 extern const struct host_command __hcmds[];
 extern const struct host_command __hcmds_end[];

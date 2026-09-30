@@ -13,7 +13,7 @@
 #include <inttypes.h>
 #include <stdint.h>
 
-#ifdef CONFIG_ZEPHYR
+#ifndef HOST_TOOLS_BUILD
 #include "fpu.h"
 
 #include <zephyr/sys/util.h>
@@ -21,7 +21,7 @@
 #ifdef CONFIG_TEST
 #define TEST_BUILD
 #endif /* CONFIG_ZTEST */
-#endif /* CONFIG_ZEPHYR */
+#endif /* !HOST_TOOLS_BUILD */
 
 #ifndef __THROW
 #define __THROW
@@ -33,7 +33,7 @@
  * way of ensuring that the given section is in the same relative location in
  * both the RO/RW images.
  */
-#if defined(CONFIG_ZEPHYR) && !defined(CONFIG_SOC_FAMILY_INTEL_ISH)
+#ifndef CONFIG_SOC_FAMILY_INTEL_ISH
 #define FIXED_SECTION(name) __attribute__((section(".fixed." name)))
 #else
 #define FIXED_SECTION(name) __attribute__((section(".rodata." name)))
@@ -62,10 +62,10 @@
  * Compared to directly using the preprocessor # operator, this 2-stage macro
  * is safe with regards to using nested macros and defined arguments.
  */
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #define STRINGIFY0(name) #name
 #define STRINGIFY(name) STRINGIFY0(name)
-#endif /* CONFIG_ZEPHYR */
+#endif /* HOST_TOOLS_BUILD */
 
 /* Macros to access registers */
 #define REG64_ADDR(addr) ((volatile uint64_t *)(addr))
@@ -140,11 +140,7 @@
  * linked into the .rodata section.
  */
 #ifndef __init_rom
-#ifndef CONFIG_ZEPHYR
-#define __init_rom __attribute__((section(".init.rom")))
-#else
 #define __init_rom
-#endif
 #endif
 
 /* gcc does not support __has_feature */
@@ -526,7 +522,7 @@ enum ec_error_list {
  * Note: This macro will only function inside a code block due to the way
  * it checks for unknown values.
  */
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #define IS_ENABLED(option) __config_enabled(#option, option, _##option)
 #else
 /* IS_ENABLED previously defined in sys/util.h */
@@ -543,7 +539,7 @@ enum ec_error_list {
  * if the config option is enabled by Zephyr's definition.
  */
 #define IS_ENABLED(option) __cfg_select(option, 1, Z_IS_ENABLED1(option))
-#endif /* CONFIG_ZEPHYR */
+#endif /* HOST_TOOLS_BUILD */
 
 /**
  * Makes a global variable static when a config option is enabled,
@@ -554,7 +550,7 @@ enum ec_error_list {
  * This follows the same constraints as IS_ENABLED, the config option
  * should be defined to nothing or undefined.
  */
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #define STATIC_IF(option) \
 	__cfg_select_build_assert(#option, option, static, extern)
 #else
@@ -566,7 +562,7 @@ enum ec_error_list {
  */
 #define STATIC_IF(option) \
 	__cfg_select(option, static, COND_CODE_1(option, (static), (extern)))
-#endif /* CONFIG_ZEPHYR */
+#endif /* HOST_TOOLS_BUILD */
 
 /**
  * STATIC_IF_NOT is just like STATIC_IF, but makes the variable static
@@ -575,7 +571,7 @@ enum ec_error_list {
  * This is to assert that a variable will go unused with a certain
  * config option.
  */
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #define STATIC_IF_NOT(option) \
 	__cfg_select_build_assert(#option, option, extern, static)
 #else
@@ -585,7 +581,7 @@ enum ec_error_list {
  */
 #define STATIC_IF_NOT(option) \
 	__cfg_select(option, extern, COND_CODE_1(option, (extern), (static)))
-#endif /* CONFIG_ZEPHYR */
+#endif /* HOST_TOOLS_BUILD */
 
 #ifdef __cplusplus
 }
