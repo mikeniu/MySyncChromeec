@@ -8,8 +8,6 @@ project(hostcmd_console)
 
 zephyr_include_directories(include)
 
-target_sources(app PRIVATE ../../../chip/host/lpc.c)
-
 target_sources(app PRIVATE src/hostcmd_console.c)
 target_sources(app PRIVATE src/main.c)
 

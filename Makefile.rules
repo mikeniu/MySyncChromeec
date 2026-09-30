@@ -9,11 +9,6 @@
 
 BUILD_DIR := $(firstword $(subst /, ,$(out)))
 
-# Don't do a build test on the following boards:
-skip_boards = OWNERS cr50 host
-boards := $(filter-out $(skip_boards), \
-	$(notdir $(wildcard board/* ../private*/board/*)))
-
 # Create output directories if necessary
 _common_dir_create := $(foreach d,$(common_dirs) $(common-dirs-y),\
 	$(shell [ -d $(out)/$(d) ] || mkdir -p $(out)/$(d)))
@@ -92,28 +87,8 @@ cmd_pretty_print_cmd = @$(1) \
 				    && column || cat ; }
 cmd_pretty_print_list = $(call cmd_pretty_print_cmd,echo $(1) | tr ' ' '\n')
 
-# By default, the "build_boards" and "try_build_boards" targets will build all
-# of the boards listed in $(boards). However, the invoker can provide a
-# different list via the BOARDS variable. Providing an empty value for BOARDS
-# is not allowed.
-BOARDS ?= $(boards)
-ifeq ($(BOARDS),)
-$(error BOARDS must be non-empty)
-endif
-
-FAILED_BOARDS_DIR = .failedboards
-
-tests-%:
-	@echo "======= building $* tests"
-	$(MAKE) BOARD=$* V=$(V) tests
-
 .PHONY: utils-host
-ifeq ($(BOARD),host)
 utils-host: $(host-utils) $(host-utils-cxx)
-else
-utils-host:
-	$(error Building utils-host not supported when BOARD is not "host")
-endif
 
 # Top-level target for host utility unit tests.
 #
@@ -133,35 +108,8 @@ endif
 #
 #   utils-test: run-my_utility_test
 .PHONY: utils-test
-ifeq ($(BOARD),host)
 utils-test: utils-host
 	@echo "======= running host utility unit tests"
-else
-utils-test:
-	$(error Running utils-test not supported when BOARD is not "host")
-endif
-
-
-# On board test binaries
-test-targets=$(foreach t,$(test-list-y),test-$(t))
-.PHONY: $(test-targets)
-
-ifeq "$(CONFIG_COMMON_RUNTIME)" "y"
-$(test-targets): test-%:
-	@set -e ; \
-	$(call echo,"  BUILD   $(out)/$*") \
-	$(MAKE) BOARD=$(BOARD) PROJECT=$* \
-	        V=$(V) out=$(out)/$* TEST_BUILD=y; \
-	cp $(out)/$*/$*.bin $(out)/test-$*.bin
-endif
-
-.PHONY: tests
-tests: $(test-targets)
-
-.PHONY: print-tests
-print-tests:
-	$(call cmd_pretty_print_list, \
-		$(sort $(test-targets)))
 
 $(out)/%.bin: $(out)/%.obj
 	$(call quiet,obj_to_bin,OBJCOPY)
@@ -262,23 +210,13 @@ help:
 	@echo "Google Chromium EC build"
 	@echo ""
 	@echo "Common Targets:"
-	@echo "  clean [BOARD=]       - Clean a single board"
-	@echo "  buildall             - Build all boards and build/run host unit tests"
-	@echo "  buildall_only        - Build all boards and host unit tests"
-	@echo "  build_boards         - Build all boards"
-	@echo "  clobber              - Clean all boards"
-	@echo "  proj-<boardname>     - Build a single board (similar to 'all BOARD=boardname')"
-	@echo ""
-	@echo "  tests [BOARD=]       - Build all on-device unit tests for a specific board"
-	@echo ""
-	@echo "  BOARD=host utils-host        - Build EC host utilities"
-	@echo "  BOARD=host utils-test        - Build and run EC host utility unit tests"
-	@echo ""
-	@echo "  print-tests     [BOARD=]     - Print on-device test targets"
+	@echo "  clean                - Clean build output"
+	@echo "  clobber              - Clean all build output"
+	@echo "  utils-host           - Build EC host utilities"
+	@echo "  utils-test           - Build and run EC host utility unit tests"
 	@echo ""
 	@echo "Common Variables:"
 	@echo "  V=1                  - Show make output"
-	@echo "  BOARD=               - Set the board name to build (Default is $(BOARD))"
 	@echo "  STATIC_VERSION=1     - Force a constant version string for reproducable builds"
 	@echo "  BUILDCC_PREFIX=      - Set the compiler prefix for the system doing "
 	@echo "     the build (defaults to 'x86_64-pc-linux-gnu-')."
@@ -291,7 +229,7 @@ help:
 	@echo "     64-bit x86 linux ('x86_64-pc-linux-gnu-'), or maybe 64-bit ARM linux"
 	@echo "     ('aarch64-cros-linux-gnu-')."
 	@echo "Example:"
-	@echo "  make BOARD=reef CROSS_COMPILE_arm='arm-eabi-'"
+	@echo "  make utils-host"
 
 out_cros_ec_commands=build/kernel/include/linux/mfd/cros_ec_commands.h
 .PHONY: build_cros_ec_commands
