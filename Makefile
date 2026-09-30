@@ -15,12 +15,14 @@
 ARCH?=amd64
 BOARD ?= host
 
+ifneq ($(BOARD),host)
 # Directory where the board is configured (includes /$(BOARD) at the end)
 BDIR:=$(wildcard board/$(BOARD))
 
 # We need board directory,.
 ifeq (,$(BDIR))
 $(error unable to locate BOARD $(BOARD))
+endif
 endif
 
 PROJECT?=ec
@@ -63,6 +65,17 @@ and_cfg = $(notdir $(filter $(strip $(1))_$(strip $(2))/%, \
 # Usage: $(call shell_echo,<shell-command>)
 shell_echo = $(if $(filter-out 0,$(V)),$(info $(1)))$(shell $(1))
 
+ifeq ($(BOARD),host)
+CHIP:=host
+CORE:=host
+CROSS_COMPILE_HOST_DEFAULT:=x86_64-pc-linux-gnu-
+CROSS_COMPILE_CC_NAME?=clang
+CMAKE_SYSTEM_PROCESSOR ?= x86_64
+OPENSSL_NO_ASM ?= 0
+$(call set-option,CROSS_COMPILE,$(CROSS_COMPILE_host),\
+	$(CROSS_COMPILE_HOST_DEFAULT))
+CFLAGS_CPU=-fno-builtin
+else
 # The board makefile sets $CHIP and the chip makefile sets $CORE.
 # Include those now, since they must be defined for _flag_cfg below.
 include $(BDIR)/build.mk
@@ -82,6 +95,7 @@ include chip/$(CHIP)/build.mk
 # is set in the CHIP build file, so this include must come after including the
 # CHIP build file.
 include core/$(CORE)/toolchain.mk
+endif
 
 -include build/Makefile.sdk
 
@@ -128,6 +142,7 @@ UC_PROJECT:=$(call uppercase,$(PROJECT))
 # the configs are dependent on particular configurations.
 includes=include core/$(CORE)/include include/driver $(dirs) $(out) \
 	third_party
+ifneq ($(BOARD),host)
 _tsk_lst_file:=$(PROJECT).tasklist
 _tsk_lst_flags:=
 
@@ -197,6 +212,7 @@ _rw_size:=$(shell echo "$$(($(_rw_size_str)))")
 _program_memory_base_str:=\
 $(call shell_echo,$(call cmd_config_eval,CONFIG_PROGRAM_MEMORY_BASE))
 _program_memory_base=$(shell echo "$$(($(_program_memory_base_str)))")
+endif
 
 $(eval BOARD_$(UC_BOARD)=y)
 $(eval CHIP_$(UC_CHIP)=y)
@@ -241,17 +257,17 @@ endef
 # Note that this re-includes the board and chip makefiles
 
 
-include $(BDIR)/build.mk
 ifneq ($(BOARD),host)
+include $(BDIR)/build.mk
 ifeq ($(USE_BUILTIN_STDLIB), 1)
 include builtin/build.mk
 else
 include libc/build.mk
 endif
-endif
 include chip/$(CHIP)/build.mk
 include core/build.mk
 include core/$(CORE)/build.mk
+endif
 include common/build.mk
 include driver/build.mk
 include power/build.mk

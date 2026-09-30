@@ -153,7 +153,7 @@ CFLAGS_DEFINE=-DOUTDIR=$(out)/$(BLD) -DCHIP=$(CHIP) -DBOARD_TASKFILE=$(_tsk_lst_
 CPPFLAGS=$(CFLAGS_DEFINE) $(CFLAGS_INCLUDE) $(CFLAGS_TEST) \
 	 $(EXTRA_CFLAGS) $(CFLAGS_COVERAGE) $(CFLAGS_HOSTTEST) $(LATE_CFLAGS_DEFINE) \
 	$(if $(BLD),-DCONFIG_CROS_EC_$(BLD)=1) $(CPPFLAGS_$(BLD))
-BUILD_CPPFLAGS=$(CFLAGS_DEFINE) -Icore/host $(CFLAGS_INCLUDE) $(CFLAGS_TEST) \
+BUILD_CPPFLAGS=$(CFLAGS_DEFINE) $(CFLAGS_INCLUDE) $(CFLAGS_TEST) \
 	 $(EXTRA_CFLAGS) $(CFLAGS_COVERAGE) $(CFLAGS_HOSTTEST) $(LATE_CFLAGS_DEFINE) \
 	 $(if $(BLD),-DCONFIG_CROS_EC_$(BLD)=1) $(CPPFLAGS_$(BLD))
 HOST_CPPFLAGS=-I$(out)/include $(CFLAGS_DEFINE) $(CFLAGS_INCLUDE) \
@@ -258,12 +258,6 @@ BUILD_LDFLAGS=$(LIBFTDIUSB_BUILD_LDLIBS)
 ifneq (${HOST_SYSROOT},)
   HOST_LDFLAGS+=--sysroot=${HOST_SYSROOT}
 endif
-HOST_TEST_LDFLAGS=-Wl,-T core/host/host_exe.lds -lrt -pthread -rdynamic -lm\
-		  -no-pie -flto\
-		  $(if $(TEST_COVERAGE), --coverage,) \
-		  $(if $(TEST_ASAN), -fsanitize=address) \
-		  $(if $(TEST_MSAN), -fsanitize=memory) \
-		  $(if $(TEST_UBSAN), ${UBSAN_FLAGS})
 
 # utility function to provide overridable defaults
 # $1: name of variable to set

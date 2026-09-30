@@ -40,10 +40,7 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 	'**/*_test.c' \
 	'**/*_test.cc' \
 	'**/*_test.h' \
-	'$(PLATFORM_EC)/board/host/**' \
-	'$(PLATFORM_EC)/chip/host/**' \
 	'$(PLATFORM_EC)/test/mock/**' \
-	'$(PLATFORM_EC)/core/host/**' \
 	'$(PLATFORM_EC)/include/mock/**' \
 	'$(PLATFORM_EC)/include/test_util.h' \
 	'$(PLATFORM_EC)/include/tests/**' \
