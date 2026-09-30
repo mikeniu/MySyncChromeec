@@ -9,6 +9,7 @@
 
 #include "i2c.h"
 #include "i2c/i2c.h"
+#include "task_id.h"
 #include "usb_mux.h"
 #include "usb_pd.h"
 #include "usbc/utils.h"

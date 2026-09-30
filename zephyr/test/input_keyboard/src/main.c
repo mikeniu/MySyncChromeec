@@ -6,6 +6,7 @@
 #include "host_command.h"
 #include "keyboard_scan.h"
 #include "system.h"
+#include "task_id.h"
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio.h>

@@ -8,6 +8,7 @@
 #include "keyboard_protocol.h"
 #include "keyboard_scan.h"
 #include "system.h"
+#include "task_id.h"
 
 #include <stdio.h>
 

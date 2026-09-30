@@ -3,13 +3,6 @@
  * found in the LICENSE file.
  */
 
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/devicetree.h>
-#include <zephyr/sys/byteorder.h>
-#else
-#include "byteorder.h"
-#endif
-
 #include "common.h"
 #include "console.h"
 #include "driver/touchpad_elan.h"
@@ -30,6 +23,9 @@
 #include "util.h"
 #include "watchdog.h"
 
+#include <zephyr/devicetree.h>
+#include <zephyr/sys/byteorder.h>
+
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_TOUCHPAD, outstr)
 #define CPRINTF(format, args...) cprintf(CC_TOUCHPAD, format, ##args)
@@ -44,7 +40,6 @@
 #define FW_SIZE 65536
 #endif
 
-#ifdef CONFIG_ZEPHYR
 #if DT_HAS_COMPAT_STATUS_OKAY(elan_ekth3000)
 
 #define TP_NODE DT_INST(0, elan_ekth3000)
@@ -57,7 +52,6 @@
 #define CONFIG_USB_HID_TOUCHPAD_PHYSICAL_MAX_Y DT_PROP(TP_NODE, physical_max_y)
 
 #endif /* DT_HAS_COMPAT_STATUS_OKAY(elan_ekth3000) */
-#endif /* CONFIG_ZEPHYR */
 
 struct {
 	/* Max X/Y position */
@@ -324,11 +318,7 @@ static int elan_query_product(void)
 		if (rv) {
 			return rv;
 		}
-#ifdef CONFIG_ZEPHYR
 		elan_tp_params.ic_type = sys_be16_to_cpu(*(uint16_t *)val);
-#else
-		elan_tp_params.ic_type = be16toh(*(uint16_t *)val);
-#endif
 	} else {
 		rv = elan_tp_read_cmd(ETP_I2C_IC_TYPE_P0_CMD, (uint16_t *)val);
 		if (rv) {
@@ -570,11 +560,7 @@ static int touchpad_update_page(const uint8_t *data)
 	for (i = 0; i < elan_tp_params.page_size; i += 2)
 		checksum += ((uint16_t)(data[i + 1]) << 8) | (data[i]);
 
-#ifdef CONFIG_ZEPHYR
 	checksum = sys_cpu_to_le16(checksum);
-#else
-	checksum = htole16(checksum);
-#endif
 
 	i2c_lock(CONFIG_TOUCHPAD_I2C_PORT, 1);
 

@@ -11,26 +11,10 @@
 #include "host_command.h"
 #include "task.h"
 #include "temp_sensor.h"
+#include "temp_sensor/temp_sensor.h"
 #include "thermal.h"
 #include "timer.h"
 #include "util.h"
-
-#ifdef CONFIG_ZEPHYR
-#include "temp_sensor/temp_sensor.h"
-#endif
-
-#ifndef CONFIG_ZEPHYR
-int temp_sensor_read(enum temp_sensor_id id, int *temp_ptr)
-{
-	const struct temp_sensor_t *sensor;
-
-	if (id < 0 || id >= TEMP_SENSOR_COUNT)
-		return EC_ERROR_INVAL;
-	sensor = temp_sensors + id;
-
-	return sensor->read(sensor->idx, temp_ptr);
-}
-#endif
 
 static void update_mapped_memory(void)
 {
