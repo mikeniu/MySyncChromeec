@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a58b8d69_2143cf72",
+        "filename": "zephyr/program/bluey/pic/src/keyboard_customization.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-09-30T01:37:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5541b720_3f7e8dce",
+      "revId": "fe00babf1b60856f2e212c686d5bab07f9a13f25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0630c8fc_4bd61204",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-09-29T06:27:49Z",
       "side": 1,
       "message": "**col** is printed twice.",
+      "range": {
+        "startLine": 128,
+        "startChar": 40,
+        "endLine": 128,
+        "endChar": 43
+      },
+      "revId": "fe00babf1b60856f2e212c686d5bab07f9a13f25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fda21cf2_6f756c64",
+        "filename": "zephyr/program/bluey/pic/src/keyboard_customization.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-09-30T01:37:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0630c8fc_4bd61204",
       "range": {
         "startLine": 128,
         "startChar": 40,
