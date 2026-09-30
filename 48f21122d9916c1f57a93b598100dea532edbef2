@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2e69e97_9d3f4d50",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1413497
+      },
+      "writtenOn": "2026-09-30T11:14:28Z",
+      "side": 1,
+      "message": "Eddy, thank you for the patch. Can you please split it to two, i.e. changes to the driver and mica description? In current form we\u0027re mixing configuration with the generic platform driver changes.",
+      "revId": "48f21122d9916c1f57a93b598100dea532edbef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cb6fd200_310bed4c",
