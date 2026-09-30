@@ -11,6 +11,8 @@
 
 #include <stdint.h>
 
+#include <soc.h>
+
 /* USBPD Controller */
 #if defined(CONFIG_USB_PD_TCPM_DRIVER_IT83XX)
 #define IT83XX_USBPD_BASE(port) (0x00F03700 + (0x100 * (port)))
@@ -446,6 +448,19 @@ struct cc_para_t {
 };
 
 extern const struct usbpd_ctrl_t usbpd_ctrl_regs[];
+
+/*
+ * Clear a pending USBPD interrupt in the ITE interrupt controller.
+ * LCOV_EXCL_START
+ */
+static inline void it83xx_pd_clear_pending_irq(int irq)
+{
+#ifdef CONFIG_HAS_ITE_INTC
+	ite_intc_isr_clear(irq);
+#endif
+}
+/* LCOV_EXCL_STOP */
+
 void it8xxx2_clear_tx_error_status(enum usbpd_port port);
 void it8xxx2_get_tx_error_status(enum usbpd_port port);
 void it83xx_Rd_5_1K_only_for_hibernate(int port);

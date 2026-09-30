@@ -166,32 +166,6 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us);
  */
 int task_start_called(void);
 
-/**
- * Enable an interrupt.
- */
-void task_enable_irq(int irq);
-
-/**
- * Disable an interrupt.
- */
-void task_disable_irq(int irq);
-
-/**
- * Software-trigger an interrupt.
- */
-void task_trigger_irq(int irq);
-
-/**
- * Clear a pending interrupt.
- *
- * Note that most interrupts can be removed from the pending state simply by
- * handling whatever caused the interrupt in the first place.  This only needs
- * to be called if an interrupt handler disables itself without clearing the
- * reason for the interrupt, and then the interrupt is re-enabled from a
- * different context.
- */
-void task_clear_pending_irq(int irq);
-
 typedef struct k_mutex mutex_t;
 
 #define mutex_lock(mtx) (k_mutex_lock(mtx, K_FOREVER))

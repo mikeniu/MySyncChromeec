@@ -15,7 +15,7 @@ void chip_pd_irq(enum usbpd_port port)
 {
 	timestamp_t irq_ts = get_time();
 
-	task_clear_pending_irq(usbpd_ctrl_regs[port].irq);
+	it83xx_pd_clear_pending_irq(usbpd_ctrl_regs[port].irq);
 
 	/* check status */
 	if (IS_ENABLED(IT83XX_INTC_FAST_SWAP_SUPPORT) &&
