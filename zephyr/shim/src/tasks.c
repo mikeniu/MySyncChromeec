@@ -19,8 +19,6 @@
 
 LOG_MODULE_REGISTER(task_shim, LOG_LEVEL_INF);
 
-#include <soc.h>
-
 #define SAFE_THREAD_NAME(tid)                                           \
 	((tid) && k_thread_name_get((tid)) ? k_thread_name_get((tid)) : \
 					     "(unknown)")
@@ -350,28 +348,6 @@ SYS_INIT(init_signals, POST_KERNEL, 50);
 int task_start_called(void)
 {
 	return tasks_started;
-}
-
-/*
- * This function cannot be tested since it is architecture specific.
- * LCOV_EXCL_START
- */
-void task_clear_pending_irq(int irq)
-{
-#if CONFIG_HAS_ITE_INTC
-	ite_intc_isr_clear(irq);
-#endif
-}
-/* LCOV_EXCL_STOP */
-
-void task_enable_irq(int irq)
-{
-	arch_irq_enable(irq);
-}
-
-void task_disable_irq(int irq)
-{
-	arch_irq_disable(irq);
 }
 
 inline bool in_interrupt_context(void)
