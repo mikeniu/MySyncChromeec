@@ -1,0 +1,35 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# The EC firmware container. Start it with run_docker.sh, which runs
+# "docker compose run --rm shell"; a stopped container cannot be started
+# again.
+
+# Name the containers after the image rather than after this directory.
+name: ec-builder
+
+services:
+  shell:
+    build: .
+    image: ec-builder
+    # Hardware access is granted in two independent layers:
+    #
+    # 1. Bind-mounting /dev makes the host device nodes visible, including
+    #    any device hotplugged or re-enumerated after the container starts.
+    #    A device that resets into a bootloader and comes back as a
+    #    different ttyACM number stays usable.
+    # 2. The device cgroup controller still denies open() on anything
+    #    outside Docker's small default allowlist, so a rule is needed as
+    #    well. "c *:* rmw" grants character devices only: serial ports and
+    #    usbfs work, while block devices (disks) stay inaccessible and the
+    #    default seccomp, AppArmor and capability restrictions remain in
+    #    place.
+    volumes:
+      - ./workspace:/workspace
+      - /dev:/dev
+    device_cgroup_rules:
+      - "c *:* rmw"
+    # Use Docker's default network, as docker run does, rather than a
+    # project network that outlives "docker compose run --rm".
+    network_mode: bridge
