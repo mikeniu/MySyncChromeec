@@ -16,6 +16,25 @@
       "message": "why this appear here\n\n/PATCHSET_LEVEL as unmodified file??",
       "revId": "82e79acf3c56bc5c53a19127e428ff15444f905a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef31f9de_c2f769f1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T22:58:17Z",
+      "side": 1,
+      "message": "This is a Gerrit UI / AI review tool quirk: an internal check result (finding) was attached to `/PATCHSET_LEVEL`, and PolyGerrit\u0027s `files-model.ts` (`addUnmodified()`) only filters out `/PATCHSET_LEVEL` (`SpecialFilePath.PATCHSET_LEVEL_COMMENTS`) for comments, not for check result `codePointers`, causing it to show up under \"Unmodified Files\".\n\nFiled b/568077325, b/568077146, and b/568076926 to fix the tool and PolyGerrit UI.",
+      "parentUuid": "3619b9ef_f98a5699",
+      "isAi": true,
+      "revId": "82e79acf3c56bc5c53a19127e428ff15444f905a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
