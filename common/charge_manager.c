@@ -29,9 +29,7 @@
 #include "usbc_ppc.h"
 #include "util.h"
 #include "zephyr/include/usbc/pdc_dpm.h"
-#ifdef CONFIG_ZEPHYR
 #include "zephyr/include/usbc/pdc_power_mgmt.h"
-#endif
 
 #ifdef HAS_MOCK_CHARGE_MANAGER
 #error Mock defined HAS_MOCK_CHARGE_MANAGER
@@ -118,7 +116,6 @@ static int save_log[CHARGE_PORT_COUNT];
 #endif
 
 /* Use mutexing to sync charge_manager_refresh and pdc_power_mgmt */
-#ifdef CONFIG_ZEPHYR
 K_MUTEX_DEFINE(cm_refresh);
 
 // #define CM_MUTEX_DEBUG
@@ -151,12 +148,6 @@ void charge_manager_dump_mutex_history()
 #define CM_MUTEX_LOCK(m) mutex_lock(m)
 #define CM_MUTEX_UNLOCK(m) mutex_unlock(m)
 #endif /* CM_MUTEX_DEBUG */
-
-#else /* CONFIG_ZEPHYR */
-/* TODO(b/427504021) - Legacy EC mutexes are not recursive */
-#define CM_MUTEX_LOCK(m)
-#define CM_MUTEX_UNLOCK(m)
-#endif /* CONFIG_ZEPHYR */
 
 /* Store current state of port enable / charge current. */
 /* During charge_manager_refresh, the following data is considered stale. Make

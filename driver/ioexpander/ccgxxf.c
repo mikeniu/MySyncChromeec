@@ -90,10 +90,6 @@ static int ccgxxf_set_flags_by_mask(int ioex, int port, int mask, int flags)
 		} else {
 			pin_mode = CCGXXF_GPIO_MODE_HIZ_DIGITAL;
 		}
-#ifndef CONFIG_ZEPHYR
-	} else if (flags & GPIO_ANALOG) {
-		pin_mode = CCGXXF_GPIO_MODE_HIZ_ANALOG;
-#endif
 	} else {
 		return EC_ERROR_INVAL;
 	}

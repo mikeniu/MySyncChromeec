@@ -78,9 +78,6 @@ static void it8801_muxed_kbd_gpio_intr_enable(void)
 	 * IOEX init code whichever gets called first.
 	 */
 	if (!intr_enabled) {
-#ifndef CONFIG_ZEPHYR
-		gpio_clear_pending_interrupt(GPIO_KB_DISCRETE_INT);
-#endif
 		gpio_enable_interrupt(GPIO_KB_DISCRETE_INT);
 		intr_enabled = true;
 	}
@@ -465,37 +462,10 @@ static int it8801_ioex_enable_interrupt(int ioex, int port, int mask,
 				  enable ? MASK_SET : MASK_CLR);
 }
 
-#ifdef CONFIG_ZEPHYR
 static void it8801_ioex_irq(int ioex, int port)
 {
 	/* TODO (b/230008245): Handle interrupts in Zephyr Shim */
 }
-#else
-static void it8801_ioex_irq(int ioex, int port)
-{
-	int rv, data, i;
-	const struct ioex_info *g;
-
-	rv = it8801_ioex_read(ioex, IT8801_REG_GPIO_ISR(port), &data);
-	if (rv || !data)
-		return;
-
-	/* Trigger the intended interrupt from the IOEX IRQ pins */
-	for (i = 0, g = ioex_list; i < ioex_ih_count; i++, g++) {
-		if (ioex == g->ioex && port == g->port && data & g->mask) {
-			ioex_irq_handlers[i](i + IOEX_SIGNAL_START);
-			data &= ~g->mask;
-
-			/* Clear pending interrupt */
-			it8801_ioex_update(ioex, IT8801_REG_GPIO_ISR(port),
-					   g->mask, MASK_SET);
-
-			if (!data)
-				break;
-		}
-	}
-}
-#endif /* CONFIG_ZEPHYR */
 
 static void it8801_ioex_event_handler(void)
 {

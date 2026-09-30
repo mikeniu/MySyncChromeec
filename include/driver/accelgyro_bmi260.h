@@ -332,7 +332,6 @@ extern "C" {
 /* Root mean square noise of 100Hz accelerometer, units: ug */
 #define BMI260_ACCEL_RMS_NOISE_100HZ 1060
 
-#if defined(CONFIG_ZEPHYR)
 #if DT_NODE_EXISTS(DT_ALIAS(bmi260_int))
 /*
  * Get the motion sensor ID of the BMI260 sensor that
@@ -350,7 +349,6 @@ extern "C" {
 #define CONFIG_ACCELGYRO_BMI260_INT_EVENT \
 	TASK_EVENT_MOTION_SENSOR_INTERRUPT(SENSOR_ID(DT_ALIAS(bmi260_int)))
 #endif
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 }
