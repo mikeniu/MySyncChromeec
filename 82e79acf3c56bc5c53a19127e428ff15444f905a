@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3619b9ef_f98a5699",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-09-30T21:30:17Z",
+      "side": 1,
+      "message": "why this appear here\n\n/PATCHSET_LEVEL as unmodified file??",
+      "revId": "82e79acf3c56bc5c53a19127e428ff15444f905a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
