@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b77cc06_ff741cdf",
+        "filename": "zephyr/Makefile.cq",
+        "patchSetId": 7
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-09-30T00:33:50Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Since `lcov_stencil.py` already evaluates and strips `$(BOARD_EXCLUDE_PATTERNS)` during the creation of `%_stenciled.info`, running `lcov -r` with the same exact patterns here is completely redundant.\n\nConsider either changing this target to simply copy `%_stenciled.info` to `%_final.info` (`cp $\u003c $@`), or removing this target entirely and updating downstream targets (like `%_rpt`) to depend directly on `%_stenciled.info`.",
+      "range": {
+        "startLine": 186,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 0
+      },
+      "revId": "fc5675d6e171cfca3151d55c1067e2cf19887ae2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
