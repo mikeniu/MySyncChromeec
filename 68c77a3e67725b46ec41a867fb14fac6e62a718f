@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4286896f_9e1eb784",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-09-30T05:52:07Z",
+      "side": 1,
+      "message": "After verification, we confirmed that CL:8084849 works as expected. Since this change duplicates its functionality, we’ll cancel this upload on our side. Thanks.",
+      "parentUuid": "915eed49_641086a0",
+      "revId": "68c77a3e67725b46ec41a867fb14fac6e62a718f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1e0e7eb7_fe966402",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-09-29T17:14:40Z",
       "side": 1,
       "message": "This seems to be a duplicate of https://crrev.com/c/8084849",
+      "revId": "68c77a3e67725b46ec41a867fb14fac6e62a718f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d49bcbf8_bdc0e0c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-09-30T05:52:07Z",
+      "side": 1,
+      "message": "After verification, we confirmed that CL:8084849 works as expected. Since this change duplicates its functionality, we’ll cancel this upload on our side. Thanks.",
+      "parentUuid": "1e0e7eb7_fe966402",
       "revId": "68c77a3e67725b46ec41a867fb14fac6e62a718f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -58,6 +94,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb40779e_f9b5455c",
+        "filename": "common/charge_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1107,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-09-30T05:52:07Z",
+      "side": 1,
+      "message": "After verification, we confirmed that CL:8084849 works as expected. Since this change duplicates its functionality, we’ll cancel this upload on our side. Thanks.",
+      "parentUuid": "8a04f892_bb2ff779",
+      "range": {
+        "startLine": 1086,
+        "startChar": 0,
+        "endLine": 1107,
+        "endChar": 3
+      },
+      "revId": "68c77a3e67725b46ec41a867fb14fac6e62a718f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f7e0e49_256fecf2",
@@ -75,6 +135,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "300caf96_f17cf47e",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 8264,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-09-30T05:52:07Z",
+      "side": 1,
+      "message": "After verification, we confirmed that CL:8084849 works as expected. Since this change duplicates its functionality, we’ll cancel this upload on our side. Thanks.",
+      "parentUuid": "9f7e0e49_256fecf2",
+      "revId": "68c77a3e67725b46ec41a867fb14fac6e62a718f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57363dec_2b65b1e5",
@@ -88,6 +166,24 @@
       "writtenOn": "2026-09-29T14:01:49Z",
       "side": 1,
       "message": "This will affect the offsets of host command `EC_CMD_BATTERY_CONFIG` handling.  We\u0027ll need updates to `ectool.cc` with this change with possibly a version bump.",
+      "revId": "68c77a3e67725b46ec41a867fb14fac6e62a718f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b89ed730_fb6d933f",
+        "filename": "include/ec_commands.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 8323,
+      "author": {
+        "id": 4684390
+      },
+      "writtenOn": "2026-09-30T05:52:07Z",
+      "side": 1,
+      "message": "After verification, we confirmed that CL:8084849 works as expected. Since this change duplicates its functionality, we’ll cancel this upload on our side. Thanks.",
+      "parentUuid": "57363dec_2b65b1e5",
       "revId": "68c77a3e67725b46ec41a867fb14fac6e62a718f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
