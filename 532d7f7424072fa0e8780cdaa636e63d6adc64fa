@@ -52,6 +52,24 @@
       "parentUuid": "201806e1_0e0bc3dd",
       "revId": "532d7f7424072fa0e8780cdaa636e63d6adc64fa",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "938ddb4a_d786694b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3879739
+      },
+      "writtenOn": "2026-09-30T10:10:51Z",
+      "side": 1,
+      "message": "If there is any device that uses Zephyr EC and has the CONFIG_PLATFORM_EC_EEPROM_CBI_WP parameter enabled, is this cherry-pick required?",
+      "parentUuid": "4c536e26_a2181b49",
+      "revId": "532d7f7424072fa0e8780cdaa636e63d6adc64fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ],
   "submitRequirementResults": [
