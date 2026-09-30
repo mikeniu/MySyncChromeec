@@ -8,7 +8,33 @@
 /* Dougie program common DTS includes */
 #include "generated.dtsi"
 #include "../dougie.dtsi"
+#include "../usbc.dtsi"
+#include "../interrupts.dtsi"
+#include "../i2c.dtsi"
 
 /* Bandit project DTS includes*/
 
 /* Bandit overrides follow... */
+
+/ {
+	batteries {
+		default_battery: utl_q25u3s1p5c {
+			compatible = "utl,q25u3s1p5c", "battery-smart";
+		};
+		atl_l25n3pg1 {
+			compatible = "atl,l25n3pg1", "battery-smart";
+		};
+		byd_l25b3pg1 {
+			compatible = "byd,l25b3pg1", "battery-smart";
+		};
+		cosmx_l25x3pg1 {
+			compatible = "cosmx,l25x3pg1", "battery-smart";
+		};
+		sunwoda_l25d3pg1 {
+			compatible = "sunwoda,l25d3pg1", "battery-smart";
+		};
+		smp_l25m3pg1 {
+			compatible = "smp,l25m3pg1", "battery-smart";
+		};
+	};
+};

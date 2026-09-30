@@ -1,0 +1,61 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+&pinctrl {
+	/* I2C property setting */
+	i2c5_clk_gpe1_default {
+		gpio-voltage = "1v8";
+	};
+	i2c5_data_gpe2_default {
+		gpio-voltage = "1v8";
+	};
+};
+
+&i2c0 {
+	clock-frequency = <I2C_BITRATE_FAST>;
+	prescale-scl-low = <8>;
+};
+
+&i2c1 {
+	/* i2c1 uses 100kHz SMBus which needs data-hold-time */
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	data-hold-time = <10>;
+	prescale-scl-low = <8>;
+};
+
+&i2c2 {
+	clock-frequency = <I2C_BITRATE_FAST>;
+	prescale-scl-low = <8>;
+};
+
+&i2c4 {
+	clock-frequency = <I2C_BITRATE_FAST>;
+	prescale-scl-low = <8>;
+};
+
+&i2c5 {
+	clock-frequency = <I2C_BITRATE_FAST>;
+	prescale-scl-low = <8>;
+};
+
+&i2c_ec_bat_chg_vr_smb {
+	enum-names = "I2C_PORT_CHARGER";
+};
+
+&i2c_ec_smb_batt_scl_3v3 {
+	enum-names = "I2C_PORT_BATTERY";
+};
+
+&i2c_ec_i2c_dbg_scl_3v3 {
+	enum-names = "I2C_PORT_DBG";
+};
+
+&i2c_ec_i2c_pdc_sm_scl_3v3 {
+	enum-names = "I2C_PORT_SUB_C0";
+};
+
+&i2c_ec_i2c_sensor_scl_1v8 {
+	enum-names = "I2C_PORT_SENSORS";
+};
