@@ -32,6 +32,7 @@ LIBS    += $(shell $(PKG_CONFIG) --libs   libusb-1.0)
 CFLAGS  += $(shell $(PKG_CONFIG) --cflags libusb-1.0)
 CFLAGS  += -I../../include -I../../util -I../../test
 CFLAGS  += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+CFLAGS  += -DHOST_TOOLS_BUILD
 
 VPATH = ../../util
 

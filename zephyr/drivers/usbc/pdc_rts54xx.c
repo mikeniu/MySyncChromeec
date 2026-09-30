@@ -8,6 +8,7 @@
  */
 #include "drivers/ucsi_v3.h"
 #include "pdc_rts54xx.h"
+#include "task_id.h"
 
 #include <assert.h>
 #include <string.h>

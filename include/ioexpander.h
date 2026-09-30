@@ -7,12 +7,8 @@
 #ifndef PLATFORM_EC_INCLUDE_IOEXPANDER_H_
 #define PLATFORM_EC_INCLUDE_IOEXPANDER_H_
 
-#ifdef CONFIG_ZEPHYR
 #define ioex_signal gpio_signal
 #include "gpio.h"
-#else
-enum ioex_signal; /* from gpio_signal.h */
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,8 +86,6 @@ struct ioexpander_config_t {
 
 extern struct ioexpander_config_t ioex_config[];
 
-#ifdef CONFIG_ZEPHYR
-
 #define ioex_enable_interrupt gpio_enable_interrupt
 #define ioex_disable_interrupt gpio_disable_interrupt
 
@@ -127,128 +121,6 @@ static inline const char *ioex_get_name(enum ioex_signal signal)
 {
 	return gpio_get_name(signal);
 }
-
-#else
-
-/*
- * Enable the interrupt for the IOEX signal
- *
- * @param signal	IOEX signal to enable the interrupt
- * @return			EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_enable_interrupt(enum ioex_signal signal);
-
-/*
- * Disable the interrupt for the IOEX signal
- *
- * @param signal	IOEX signal to disable the interrupt
- * @return			EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_disable_interrupt(enum ioex_signal signal);
-
-/*
- * Get io expander flags (IOEX_FLAGS_*) for chip that specified IOEX signal
- * belongs to. They contain information if port was disabled or initialized.
- *
- * @param signal IOEX signal that belongs to chip which flags will be returned
- * @param val	 Pointer to memory where flags will be stored
- * @return	 EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_get_ioex_flags(enum ioex_signal signal, int *val);
-
-/*
- * Get flags for the IOEX signal
- *
- * @param signal	IOEX signal to get flags for
- * @param flags		Pointer to the keep the flags read
- * @return			EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_get_flags(enum ioex_signal signal, int *flags);
-
-/*
- * Set flags for the IOEX signal
- *
- * @param signal	IOEX signal to set flags for
- * @param flags		New flags for the IOEX signal
- * @return			EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_set_flags(enum ioex_signal signal, int flags);
-
-/*
- * Get the current level of the IOEX signal
- *
- * @param signal	IOEX signal to get the level
- * @param val		Pointer to the keep the level read
- * @return			EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_get_level(enum ioex_signal signal, int *val);
-
-/*
- * Set the level of the IOEX signal
- *
- * @param signal	IOEX signal to set the level
- * @param value		New level for the IOEX signal
- * @return			EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_set_level(enum ioex_signal signal, int value);
-
-#ifdef CONFIG_IO_EXPANDER_SUPPORT_GET_PORT
-/*
- * Get the current levels on the IOEX port
- *
- * @param ioex		Number of I/O expander
- * @param port		Number of port in ioex
- * @param val		Pointer to variable where port will be read
- * @return			EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_get_port(int ioex, int port, int *val);
-#endif
-
-/*
- * Initialize IO expander chip/driver
- *
- * @param ioex		IO expander chip's port number
- * @return			EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_init(int ioex);
-
-/*
- * Get the name for the IOEX signal
- *
- * @param signal	IOEX signal to get the name
- * @returns name of the given IOEX signal
- */
-const char *ioex_get_name(enum ioex_signal signal);
-
-/*
- * Check if signal is an IO expander signal or GPIO signal.
- *
- * @param signal	GPIO or IOEX signal
- * @return		1 if signal is IOEX else return 0
- */
-int signal_is_ioex(int signal);
-
-/*
- * Save gpio state of IO expander
- *
- * @param ioex		IO expander chip's port number
- * @param state		Buffer to hold gpio state
- * @param state_len	Length of state buffer, IOEX_COUNT is recommended
- * @return		EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_save_gpio_state(int ioex, int *state, int state_len);
-
-/*
- * Restore gpio state of IO expander
- *
- * @param ioex		IO expander chip's port number
- * @param state		Buffer with gpio state saved by ioex_save_gpio_state
- * @param state_len	Length of state buffer, IOEX_COUNT is recommended
- * @return		EC_SUCCESS if successful, non-zero if error.
- */
-int ioex_restore_gpio_state(int ioex, const int *state, int state_len);
-
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 }
