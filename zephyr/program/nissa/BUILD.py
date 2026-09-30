@@ -39,7 +39,10 @@ def register_nissa_project(
     return register_func(
         project_name=project_name,
         zephyr_board=chip,
-        dts_overlays=[here / project_name / "project.overlay"],
+        dts_overlays=[
+            here / "common.overlay",
+            here / project_name / "project.overlay",
+        ],
         kconfig_files=kconfig_files,
         boards=["nissa"],
         supported_toolchains=["coreboot-sdk", "zephyr"],
