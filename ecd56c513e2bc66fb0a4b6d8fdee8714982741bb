@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46cf3237_6a251291",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T07:52:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/51bbb043-58fd-4624-a1c9-cbe83a696fe6)]\n\n### Review Summary\n*   **Functionality:** The patch correctly adds `__attribute__((noinline))` to `crash_system()` to prevent it from being inlined into `test_crash()`. When LTO is enabled on `realtekfp`, inlining removes the call boundary, causing the trapped Link Register to hold a return address into `test_crash`\u0027s caller instead of the expected range inside `test_crash`. Forcing `noinline` preserves the call boundary and fixes the test assertion `(crash_addr \u003c\u003d lr) \u0026\u0026 (crash_end \u003e\u003d lr)`.\n*   **Architecture \u0026 Component Fit:** The change is appropriate for a hardware panic test that relies on specific stack frame structures.\n*   **Code Simplicity:** This is as simple as possible. No simpler rewrite exists.\n*   **Idiomaticity \u0026 Readability:** `__attribute__((noinline))` is standard usage in C for preventing compiler optimizations that interfere with hardware-level or stack-frame testing.\n*   **Security:** N/A.\n*   **Testing \u0026 Test Coverage:** This CL is a fix for an existing test (`panic_data` on `realtekfp`). It directly modifies the test behavior to pass correctly under LTO. No new automated tests are required.\n*   **CL Size \u0026 Scope:** Size: XS (+1, -1). The CL is atomic and correctly scoped to a single fix.\n*   **Commit Message:** The commit message excellently explains the problem and the mechanism of the fix. It accurately matches the code diff, properly describes the effect of LTO on the `crash_addr`, and contains properly formatted `BUG\u003db:478708357` and `TEST\u003d./test/run_device_tests.py...` tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ecd56c513e2bc66fb0a4b6d8fdee8714982741bb",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
