@@ -21,6 +21,10 @@
 #include "usb_pd_tcpm.h"
 #include "util.h"
 
+#include <zephyr/irq.h>
+
+#include <soc.h>
+
 #ifdef CONFIG_USB_PD_TCPMV2
 #if defined(CONFIG_USB_PD_VBUS_DETECT_TCPC) || \
 	defined(CONFIG_USB_PD_DISCHARGE_TCPC)
@@ -367,8 +371,10 @@ static void it83xx_init(enum usbpd_port port, int role)
 	/* enable cc1/cc2 */
 	*usbpd_ctrl_regs[port].cc1 = IT83XX_USBPD_CC_PIN_CONFIG;
 	*usbpd_ctrl_regs[port].cc2 = IT83XX_USBPD_CC_PIN_CONFIG;
-	task_clear_pending_irq(usbpd_ctrl_regs[port].irq);
-	task_enable_irq(usbpd_ctrl_regs[port].irq);
+#ifdef CONFIG_HAS_ITE_INTC
+	ite_intc_isr_clear(usbpd_ctrl_regs[port].irq);
+#endif
+	irq_enable(usbpd_ctrl_regs[port].irq);
 	USBPD_START(port);
 	/*
 	 * Disconnect CCs Rd_DB from GND
