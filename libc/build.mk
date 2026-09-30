@@ -2,4 +2,4 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-libc-y=recursive_mutex.o sbrk.o
+libc-y=sbrk.o
