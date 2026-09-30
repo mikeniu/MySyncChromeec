@@ -45,6 +45,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b4c1dcf_124ea3fd",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:04:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "637b6713_dfa604fc",
+      "range": {
+        "startLine": 312,
+        "startChar": 0,
+        "endLine": 333,
+        "endChar": 9999
+      },
+      "revId": "75e0f201a7b152158f75299b88f09119d67217c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6afdbf4_2f8fa8e7",
@@ -70,6 +94,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c339ab4_90aa0afc",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:04:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6afdbf4_2f8fa8e7",
+      "range": {
+        "startLine": 476,
+        "startChar": 0,
+        "endLine": 510,
+        "endChar": 9999
+      },
+      "revId": "75e0f201a7b152158f75299b88f09119d67217c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "683b47fd_83038d6e",
@@ -91,6 +139,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "75e0f201a7b152158f75299b88f09119d67217c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2ea5e27_b98270db",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:04:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "683b47fd_83038d6e",
+      "range": {
+        "startLine": 551,
+        "startChar": 0,
+        "endLine": 565,
+        "endChar": 9999
+      },
       "revId": "75e0f201a7b152158f75299b88f09119d67217c1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
