@@ -69,9 +69,9 @@ enum {
 #define EC_TASK_PRIORITY(prio) K_PRIO_PREEMPT(EC_TASK_PRIO_COUNT - prio - 1)
 
 /*
- * List of CROS_EC_TASK items. See CONFIG_TASK_LIST in platform/ec's config.h
- * for more information.  For tests that want their own custom tasks, use
- * CONFIG_HAS_TEST_TASKS and not CONFIG_SHIMMED_TASKS.
+ * List of CROS_EC_TASK(name, entry, param, stack_size, prio) items. For
+ * tests that want their own custom tasks, use CONFIG_HAS_TEST_TASKS and not
+ * CONFIG_SHIMMED_TASKS.
  */
 #ifdef CONFIG_SHIMMED_TASKS
 #define CROS_EC_TASK_LIST                                                  \
