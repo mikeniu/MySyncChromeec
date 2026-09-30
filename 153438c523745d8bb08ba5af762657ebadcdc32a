@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "007f0de8_26136c7a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T07:29:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please split this CL and add automated tests. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl6904834_6442cde5-226b-4a2a-b911-40abfa7e1a86.pb)]\n\n### Review Summary\n**Functionality**: The core flash operations and protection flag mappings are logically sound. Thank you for addressing the feedback on `cros_flash_rtkfp_init`, `physical_get_protect`, and the error handling in `cros_flash_rtkfp_protect_at_boot`.\n**Architecture \u0026 Component Fit**: The driver matches the existing `cros_flash` abstraction correctly and places logic in the expected layers.\n**Code Simplicity**: Addressed previous feedback. I have left one inline comment regarding a duplicated comment block in `cros_flash_rtkfp_get_protect`.\n**Idiomaticity \u0026 Readability**: Good use of Zephyr\u0027s API and idiomatic C macros.\n**Security**: Software write protection correctly enforces monotonic extending-only changes when the hardware WP pin is asserted.\n**Testing**: Missing automated test coverage. As previously noted, even for hardware drivers, pure logic such as `cros_flash_rtkfp_get_protect_flags` and `flash_check_prot_reg`—or the driver as a whole using Zephyr\u0027s `emul` framework for SPI flashes—can and must be unit tested. Please add Zephyr tests under `zephyr/test/` to cover these behaviors.\n**CL Size \u0026 Scope**: `Size: L (+497, -6)`. This CL remains too large and bundles the definitions with the entire driver implementation. It must be split into smaller, atomic CLs. Suggested split plan:\n- CL 1: Add the foundational definitions (`common/spi_flash_reg.c`) and configuration files (`Kconfig`, `prj.conf`, `flash_chip.h`).\n- CL 2: Introduce the `cros_flash_rtkfp` driver implementation along with its unit tests.\n**Commit Message**: The commit message uses `TEST\u003dNone`. Please update this with the actual `zmake test` or `twister` command once unit tests are added.\n\nTAG\u003dagy\nCONV\u003d3091e5e0-2419-4e03-8761-ea9900521261",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "153438c523745d8bb08ba5af762657ebadcdc32a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98f909ef_dd6df76d",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T07:29:17Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] This comment block is duplicated. Please remove the second instance.\n\n```c\n\t/*\n\t * The physical_get_protect returns protection state until reboot,\n\t * so it is used to determine *_NOW flags.\n\t *\n\t * Make sure flash protection is enabled and software protection is\n\t * enabled.\n\t */\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl6904834_6442cde5-226b-4a2a-b911-40abfa7e1a86.pb)",
+      "range": {
+        "startLine": 313,
+        "startChar": 0,
+        "endLine": 326,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "153438c523745d8bb08ba5af762657ebadcdc32a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
