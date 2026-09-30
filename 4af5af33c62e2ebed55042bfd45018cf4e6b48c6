@@ -18,6 +18,25 @@
       "isAi": true,
       "revId": "4af5af33c62e2ebed55042bfd45018cf4e6b48c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cf566f6_547bf4cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T21:42:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/adafe50b-7e6d-4f63-bf0c-d2579fa9aebd)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The `clear_ahb4` function safely computes the region size using `uintptr_t` arithmetic and clears it via `memset`.\n*   **Architecture \u0026 Component Fit:** ✅ Handled correctly within the chip-specific C initialization sequence (`system_pre_init` and `system_reset`).\n*   **Code Simplicity:** ✅ Very clean. The `memset` replaces hand-rolled assembly, and the tests avoid unnecessary abstractions.\n*   **Idiomaticity \u0026 Readability:** ✅ Weak pointer symbols and `memset` are idiomatic for embedded C startup routines. \n*   **Security:** ✅ Purging `NOLOAD` SRAM across resets safely mitigates stale data leakage.\n*   **Testing:** ✅ The test effectively handles cross-reset state using a canary pattern and verifies both RO and RW execution. The `check_canary_before_pre_init` constructor approach is an elegant solution to avoiding clobbered active UART buffers.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+177, -0). This CL is well-scoped and represents a single atomic logical change.\n*   **Commit Message:** ✅ The description accurately explains the motivation and what is changing.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4af5af33c62e2ebed55042bfd45018cf4e6b48c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
