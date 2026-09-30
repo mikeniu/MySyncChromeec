@@ -2,35 +2,59 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# The EC firmware container. Start it with run_docker.sh, which runs
-# "docker compose run --rm shell"; a stopped container cannot be started
-# again.
+# The EC firmware container and named task services. Start them with
+# run_docker.sh or "docker compose run --rm <service>"; a stopped
+# container cannot be started again.
 
 # Name the containers after the image rather than after this directory.
 name: ec-builder
 
+x-ec: &ec
+  build: .
+  image: ec-builder
+  pull_policy: never
+  # Hardware access is granted in two independent layers:
+  #
+  # 1. Bind-mounting /dev makes the host device nodes visible, including
+  #    any device hotplugged or re-enumerated after the container starts.
+  #    A device that resets into a bootloader and comes back as a
+  #    different ttyACM number stays usable.
+  # 2. The device cgroup controller still denies open() on anything
+  #    outside Docker's small default allowlist, so a rule is needed as
+  #    well. "c *:* rmw" grants character devices only: serial ports and
+  #    usbfs work, while block devices (disks) stay inaccessible and the
+  #    default seccomp, AppArmor and capability restrictions remain in
+  #    place.
+  volumes:
+    - ./workspace:/workspace
+    - /dev:/dev
+  device_cgroup_rules:
+    - "c *:* rmw"
+  # Use Docker's default network, as docker run does, rather than a
+  # project network that outlives "docker compose run --rm".
+  network_mode: bridge
+
+# The profile keeps "docker compose up" from starting every task at once;
+# "docker compose run <service>" still starts the service it names.
+x-task: &task
+  <<: *ec
+  profiles: [tools]
+
 services:
   shell:
-    build: .
-    image: ec-builder
-    pull_policy: never
-    # Hardware access is granted in two independent layers:
-    #
-    # 1. Bind-mounting /dev makes the host device nodes visible, including
-    #    any device hotplugged or re-enumerated after the container starts.
-    #    A device that resets into a bootloader and comes back as a
-    #    different ttyACM number stays usable.
-    # 2. The device cgroup controller still denies open() on anything
-    #    outside Docker's small default allowlist, so a rule is needed as
-    #    well. "c *:* rmw" grants character devices only: serial ports and
-    #    usbfs work, while block devices (disks) stay inaccessible and the
-    #    default seccomp, AppArmor and capability restrictions remain in
-    #    place.
-    volumes:
-      - ./workspace:/workspace
-      - /dev:/dev
-    device_cgroup_rules:
-      - "c *:* rmw"
-    # Use Docker's default network, as docker run does, rather than a
-    # project network that outlives "docker compose run --rm".
-    network_mode: bridge
+    <<: *ec
+  zmake:
+    <<: *task
+    entrypoint: ["/entrypoint.sh", "zmake", "--checkout", "/workspace"]
+  twister:
+    <<: *task
+    entrypoint: ["/entrypoint.sh", "./twister"]
+  dagwood:
+    <<: *task
+    entrypoint: ["/entrypoint.sh", "./dagwood"]
+  flash-dagwood-aic:
+    <<: *task
+    entrypoint: ["/entrypoint.sh", "../dagwood/flash.py"]
+  flash-dagwood-fixture:
+    <<: *task
+    entrypoint: ["/entrypoint.sh", "../dagwood/build_from_chroot.py", "-f"]
