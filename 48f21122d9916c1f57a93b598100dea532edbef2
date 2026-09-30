@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb6fd200_310bed4c",
+        "filename": "zephyr/drivers/pwrmon/pwrmon.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 3692199
+      },
+      "writtenOn": "2026-09-30T07:04:31Z",
+      "side": 1,
+      "message": "pwrmon.c is a generic driver, not specific to Mica, so changes to it should be broken out to a separate CL.",
+      "revId": "48f21122d9916c1f57a93b598100dea532edbef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0ddefde_db3aff6d",
+        "filename": "zephyr/program/bluey/mica/i2c_pac.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3692199
+      },
+      "writtenOn": "2026-09-30T07:04:31Z",
+      "side": 1,
+      "message": "We don\u0027t store schematic rail names in the EC. Mapping from IDs to rail names happens at the OS level. friendly-names should be removed.",
+      "range": {
+        "startLine": 21,
+        "startChar": 3,
+        "endLine": 21,
+        "endChar": 32
+      },
+      "revId": "48f21122d9916c1f57a93b598100dea532edbef2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
