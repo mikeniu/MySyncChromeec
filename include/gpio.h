@@ -19,7 +19,6 @@
  * If compiling with Zephyr, include the GPIO_ definitions to deal with name
  * conflicts
  */
-#ifdef CONFIG_ZEPHYR
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/dt-bindings/gpio/ite-it8xxx2-gpio.h>
 #include <zephyr/dt-bindings/gpio/nuvoton-npcx-gpio.h>
@@ -110,45 +109,6 @@
 /* GPIO_HIB_WAKE_RISING    not supported by Zephyr */
 /* GPIO_HIB_WAKE_FALLING   not supported by Zephyr */
 /* GPIO_POWER_DOWN         not supported by Zephyr */
-
-#else /* !CONFIG_ZEPHYR */
-/*
- * All flags supported by gpio_info expect GPIO_ANALOG
- *
- * Only 4 flags are supported by gpio_alt_func:
- *   GPIO_OPEN_DRAIN
- *   GPIO_PULL_UP
- *   GPIO_PULL_DOWN
- *   GPIO_PULL_ANALOG
- */
-#define GPIO_FLAG_NONE 0 /* No flag needed, default setting */
-#define GPIO_ANALOG BIT(0) /* Set pin to analog-mode */
-#define GPIO_OPEN_DRAIN (BIT(1) | BIT(2)) /* Output type is open-drain  */
-#define GPIO_DEFAULT BIT(3) /* Don't set up on boot */
-#define GPIO_PULL_UP BIT(4) /* Enable on-chip pullup */
-#define GPIO_PULL_DOWN BIT(5) /* Enable on-chip pulldown */
-#define GPIO_LOW BIT(6) /* If GPIO_OUTPUT, set level low */
-#define GPIO_HIGH BIT(7) /* If GPIO_OUTPUT, set level high */
-#define GPIO_INPUT BIT(8) /* Input */
-#define GPIO_OUTPUT BIT(9) /* Output */
-#define GPIO_INT_F_RISING BIT(10) /* Interrupt on rising edge */
-#define GPIO_INT_F_FALLING BIT(11) /* Interrupt on falling edge */
-#define GPIO_INT_F_LOW BIT(12) /* Interrupt on low level */
-#define GPIO_INT_F_HIGH BIT(13) /* Interrupt on high level */
-#define GPIO_INT_DSLEEP BIT(14) /* Interrupt in deep sleep */
-#define GPIO_INT_SHARED BIT(15) /* Shared among multiple pins */
-#define GPIO_SEL_1P8V BIT(16) /* Support 1.8v */
-#define GPIO_ALTERNATE BIT(17) /* GPIO used for alternate function. */
-#define GPIO_LOCKED BIT(18) /* Lock GPIO output and configuration */
-#define GPIO_HIB_WAKE_HIGH BIT(19) /* Hibernate wake on high level */
-#define GPIO_HIB_WAKE_LOW BIT(20) /* Hibernate wake on low level */
-#define GPIO_HIB_WAKE_RISING BIT(21) /* Hibernate wake on rising edge */
-#define GPIO_HIB_WAKE_FALLING BIT(22) /* Hibernate wake on falling edge */
-#ifdef CONFIG_GPIO_POWER_DOWN
-#define GPIO_POWER_DOWN BIT(23) /* Pin and pad is powered off */
-#endif
-
-#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 extern "C" {
@@ -327,8 +287,6 @@ int gpio_get_flags(enum gpio_signal signal);
  */
 int gpio_get_flags_by_mask(uint32_t port, uint32_t mask);
 
-#ifdef CONFIG_ZEPHYR
-
 /**
  * Convert flags from Zephyr to CrOS EC format
  *
@@ -344,8 +302,6 @@ int convert_from_zephyr_flags(const gpio_flags_t zephyr);
  * @returns		flags in Zephyr format
  */
 gpio_flags_t convert_to_zephyr_flags(int ec_flags);
-
-#endif
 
 /**
  * Get the default flags for a signal.
@@ -403,8 +359,6 @@ int gpio_or_ioex_get_level(int signal, int *value);
  */
 void gpio_reset(enum gpio_signal signal);
 
-#ifdef CONFIG_ZEPHYR
-
 /**
  * @brief Save state of a GPIO controller port
  *
@@ -436,8 +390,6 @@ int gpio_restore_port_config(const struct device *port, gpio_flags_t *flags,
  * @param port	Port to reset
  */
 void gpio_reset_port(const struct device *port);
-
-#endif /* CONFIG_ZEPHYR */
 
 /**
  * Enable interrupts for the signal.

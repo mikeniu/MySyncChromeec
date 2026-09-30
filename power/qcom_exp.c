@@ -371,7 +371,6 @@ DECLARE_HOOK(HOOK_AC_CHANGE, power_ac_changed, HOOK_PRIO_DEFAULT);
 /* 1 if the system is currently in the off-mode charging heartbeat state. */
 static char heartbeat_mode;
 
-#ifdef CONFIG_ZEPHYR
 static void qcom_rtc_set_host_event(void)
 {
 	host_set_single_event(EC_HOST_EVENT_RTC);
@@ -389,7 +388,6 @@ void rtc_callback(const struct device *dev)
 		task_wake(TASK_ID_CHIPSET);
 	}
 }
-#endif
 
 static enum ec_host_cmd_status
 host_command_offmode_charing_active(struct ec_host_cmd_handler_args *args)

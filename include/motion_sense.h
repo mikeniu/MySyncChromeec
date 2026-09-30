@@ -395,8 +395,6 @@ enum sensor_config motion_sense_get_ec_config(void);
 }
 #endif
 
-#ifdef CONFIG_ZEPHYR
 #include "motionsense_sensors.h"
-#endif
 
 #endif /* PLATFORM_EC_INCLUDE_MOTION_SENSE_H_ */
