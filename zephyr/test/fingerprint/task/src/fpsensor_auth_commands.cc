@@ -12,7 +12,6 @@
 #include "fpsensor/fpsensor_auth_commands.h"
 #include "fpsensor/fpsensor_auth_crypto.h"
 #include "fpsensor/fpsensor_state.h"
-#include "mock/fpsensor_state_mock.h"
 #include "mock/otpi_mock.h"
 #include "openssl/aes.h"
 #include "openssl/bn.h"
