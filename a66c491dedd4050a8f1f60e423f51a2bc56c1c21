@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1d550542_f50541a2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4225464
+      },
+      "writtenOn": "2026-09-30T07:44:43Z",
+      "side": 1,
+      "message": "I have updated the commit message, please check it.",
+      "parentUuid": "1771692b_55fb2a41",
+      "range": {
+        "startLine": 7,
+        "startChar": 28,
+        "endLine": 7,
+        "endChar": 55
+      },
+      "revId": "a66c491dedd4050a8f1f60e423f51a2bc56c1c21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "304b8654_3fa4b836",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
