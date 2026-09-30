@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ae84b4f_803a1ef9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T07:26:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/394ff49c-ce15-4c02-87b2-b13b92bdf92e)]\n\n### Review Summary\n* **Functionality**: The code properly implements the OTP key reading and provisioning logic using the Zephyr OTP API. The previous feedback (NULL checks, device readiness checks in init and read, and stack buffer alignment) has been fully incorporated. The implementation correctly cleans up sensitive key data from the stack on all return paths.\n* **Architecture \u0026 Component Fit**: The new logic fits well within the EC Zephyr shim layer for Realtek FP, correctly relying on the standard `otp_dev` zephyr device tree node (`ocotp`) and standard `trng` interfaces.\n* **Code Simplicity**: The implementation is straightforward and correctly handles the necessary read/provision/verify states without any unnecessary abstractions. It is as simple as possible.\n* **Idiomaticity \u0026 Readability**: The code correctly uses modern Zephyr and EC idioms, such as `DEVICE_DT_GET` and the appropriate logging macros. Magic numbers are avoided by using `RTKFP_OTP_KEY_ADDR`.\n* **Security**: Excellent use of `trng_rand_bytes` for key generation and `OPENSSL_cleanse` to sanitize the stack buffer before returning, ensuring no key material is leaked.\n* **Testing \u0026 Test Coverage**: The implementation relies on the existing `otp_key` device test suite (`./test/run_device_tests.py -b realtekfp -t otp_key --zephyr`), which covers the necessary hardware flows.\n* **CL Size \u0026 Scope**: Size: M (+117, -1). The CL is appropriately sized and tightly scoped to adding OTP support for `rtkfp`.\n* **Commit Message**: The commit message is accurate, provides the necessary motivation, and uses the correct `BUG\u003d`/`TEST\u003d` ChromiumOS formatting.\n\nTAG\u003dagy\nCONV\u003d22e24fef-3cff-4b17-926e-94f41af03646",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3ea7500c359fda17ab7b4aba48e51a3ea23d1fc8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
