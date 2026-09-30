@@ -23,9 +23,20 @@
 
 #include <chip_chipregs.h>
 #endif
+#include <soc.h>
 
 #define CPRINTF(format, args...) cprintf(CC_CEC, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_CEC, format, ##args)
+
+/* Clear a pending CEC interrupt in the ITE interrupt controller. */
+static inline void cec_clear_pending_irq(void)
+{
+#ifdef CONFIG_HAS_ITE_INTC
+	/* LCOV_EXCL_START */
+	ite_intc_isr_clear(IT83XX_IRQ_CEC);
+	/* LCOV_EXCL_STOP */
+#endif
+}
 
 #ifdef CONFIG_CEC_DEBUG
 #define DEBUG_CPRINTF(format, args...) cprintf(CC_CEC, format, ##args)
@@ -476,7 +487,7 @@ void cec_interrupt(void)
 	/* Write 1 to clear */
 	IT83XX_CEC_CECSTS = status;
 
-	task_clear_pending_irq(IT83XX_IRQ_CEC);
+	cec_clear_pending_irq();
 }
 
 #ifndef CONFIG_TEST
@@ -524,17 +535,17 @@ static int it83xx_cec_set_enable(int port, uint8_t enable)
 		IT83XX_CEC_CECIE |= CEC_ALL_INTERRUPTS;
 
 		/* Enable CEC interrupt */
-		task_clear_pending_irq(IT83XX_IRQ_CEC);
+		cec_clear_pending_irq();
 #ifndef CONFIG_TEST
 		IRQ_CONNECT(IT83XX_IRQ_CEC, 0, it83xx_cec_isr, 0, 0);
 #endif
-		task_enable_irq(IT83XX_IRQ_CEC);
+		irq_enable(IT83XX_IRQ_CEC);
 
 		CPRINTS("CEC%d enabled", port);
 	} else {
 		/* Disable CEC interrupt */
-		task_disable_irq(IT83XX_IRQ_CEC);
-		task_clear_pending_irq(IT83XX_IRQ_CEC);
+		irq_disable(IT83XX_IRQ_CEC);
+		cec_clear_pending_irq();
 
 		/* Disable all interrupts in interrupt enable register */
 		IT83XX_CEC_CECIE &= ~CEC_ALL_INTERRUPTS;
