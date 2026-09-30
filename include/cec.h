@@ -9,9 +9,7 @@
 #include "ec_commands.h"
 #include "task.h"
 
-#ifdef CONFIG_ZEPHYR
 #include <zephyr_cec.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {

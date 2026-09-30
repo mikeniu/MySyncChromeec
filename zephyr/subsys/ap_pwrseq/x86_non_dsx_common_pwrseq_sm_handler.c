@@ -5,6 +5,7 @@
 
 #include "ap_reset_log.h"
 #include "system_boot_time.h"
+#include "task_id.h"
 #include "zephyr_console_shim.h"
 
 #include <zephyr/init.h>

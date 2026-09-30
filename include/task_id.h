@@ -3,18 +3,15 @@
  * found in the LICENSE file.
  */
 
-/* define the task identifier of all compiled tasks */
-
 #ifndef PLATFORM_EC_INCLUDE_TASK_ID_H_
 #define PLATFORM_EC_INCLUDE_TASK_ID_H_
 
-#ifdef CONFIG_ZEPHYR
+#ifndef HOST_TOOLS_BUILD
 #include "shimmed_task_id.h"
 #else
 
 /*
- * Non-Zephyr builds are host tools only. They include headers that reference
- * task IDs but have no tasks.
+ * Host tools include headers that reference task IDs but have no tasks.
  */
 #include <stdint.h>
 
@@ -36,5 +33,6 @@ enum {
 #ifdef __cplusplus
 }
 #endif
-#endif /* CONFIG_ZEPHYR */
+#endif /* !HOST_TOOLS_BUILD */
+
 #endif /* PLATFORM_EC_INCLUDE_TASK_ID_H_ */

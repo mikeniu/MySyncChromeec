@@ -573,8 +573,6 @@ update in your CL:
         """
         kconfigs = set(self.scan_kconfigs(srcdir=srcdir, replace_list=None))
 
-        if_re = re.compile(r"^\s*#\s*if(ndef CONFIG_ZEPHYR)?")
-        endif_re = re.compile(r"^\s*#\s*endif")
         modify_config_re = re.compile(r"^\s*#\s*(define|undef)\s+CONFIG_(\S*)")
         exit_code = 0
         files_to_check = glob.glob(
@@ -588,33 +586,17 @@ update in your CL:
         )
         for filename in files_to_check:
             with open(filename, "r", encoding="utf-8") as config_h:
-                depth = 0
-                ignore_depth = 0
-                line_count = 0
-                for line in config_h.readlines():
-                    line_count += 1
-                    line = line.strip("\n")
-                    match = if_re.match(line)
-                    if match:
-                        depth += 1
-                        if match[1] or ignore_depth > 0:
-                            ignore_depth += 1
-                    if endif_re.match(line):
-                        if depth > 0:
-                            depth -= 1
-                        if ignore_depth > 0:
-                            ignore_depth -= 1
-                    if ignore_depth == 0:
-                        match = modify_config_re.match(line)
-                        if match:
-                            if match[2] in kconfigs:
-                                print(
-                                    f"ERROR: Modifying CONFIG_{match[2]} "
-                                    "outside of #ifndef CONFIG_ZEPHYR not "
-                                    f"allowed at {filename}:{line_count}",
-                                    file=sys.stderr,
-                                )
-                                exit_code = 1
+                for line_count, line in enumerate(
+                    config_h.readlines(), start=1
+                ):
+                    match = modify_config_re.match(line.strip("\n"))
+                    if match and match[2] in kconfigs:
+                        print(
+                            f"ERROR: Modifying CONFIG_{match[2]} not "
+                            f"allowed at {filename}:{line_count}",
+                            file=sys.stderr,
+                        )
+                        exit_code = 1
         return exit_code
 
 

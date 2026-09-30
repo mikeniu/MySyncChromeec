@@ -14,14 +14,11 @@
 #include "hooks.h"
 #include "host_command.h"
 #include "temp_sensor.h"
+#include "temp_sensor/temp_sensor.h"
 #include "thermal.h"
 #include "throttle_ap.h"
 #include "timer.h"
 #include "util.h"
-
-#ifdef CONFIG_ZEPHYR
-#include "temp_sensor/temp_sensor.h"
-#endif
 
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_THERMAL, outstr)

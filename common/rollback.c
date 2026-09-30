@@ -78,11 +78,7 @@ static void check_mpu_rv(int rv, const char *func_name)
 	if (rv != EC_SUCCESS) {
 		ccprints("ERROR! %s failed to lock/unlock MPU, rv=%d",
 			 func_name, rv);
-#if defined(CONFIG_ZEPHYR)
 		k_panic();
-#else
-		software_panic(PANIC_SW_ASSERT, task_get_current());
-#endif
 	}
 }
 #endif /* CONFIG_ROLLBACK_MPU_PROTECT */

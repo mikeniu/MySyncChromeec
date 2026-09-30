@@ -6,11 +6,8 @@
 #ifndef PLATFORM_EC_INCLUDE_POWER_AMD_X86_H_
 #define PLATFORM_EC_INCLUDE_POWER_AMD_X86_H_
 
-/*
- * In legacy EC-OS, the power signals are defined as part of
- * the board include headers, but with Zephyr, this is common.
- */
-#if defined(CONFIG_ZEPHYR) && defined(CONFIG_AP_X86_AMD)
+/* Common power signals for AMD x86 AP */
+#ifdef CONFIG_AP_X86_AMD
 
 /* Power input signals */
 enum power_signal {

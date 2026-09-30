@@ -6,10 +6,10 @@
 #ifndef PLATFORM_EC_INCLUDE_COMPILER_H_
 #define PLATFORM_EC_INCLUDE_COMPILER_H_
 
-#ifdef CONFIG_ZEPHYR
+#ifndef HOST_TOOLS_BUILD
 /* Get the TOOLCHAIN_GCC_VERSION define. */
 #include <zephyr/toolchain.h>
-#endif /* CONFIG_ZEPHYR */
+#endif /* !HOST_TOOLS_BUILD */
 
 /*
  * See https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html

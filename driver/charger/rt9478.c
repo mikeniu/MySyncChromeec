@@ -49,11 +49,6 @@
 #define CONFIG_CHARGER_RT9478_IDCHG_TH2 1
 #endif
 
-#if !defined(CONFIG_ZEPHYR) && \
-	!defined(CONFIG_CHARGER_RT9478_PKPWR_TOVLD_DEG_CUSTOM)
-#define CONFIG_CHARGER_RT9478_PKPWR_TOVLD_DEG 0
-#endif
-
 #ifndef CONFIG_CHARGER_RT9478_IAICR2_CUSTOM
 /* Reduce IAICR2 from default of 150% to 110% */
 #define CONFIG_CHARGER_RT9478_IAICR2 RT9478_PROCHOT_OPTION_0_IAICR2__1P10
@@ -125,11 +120,7 @@
  * power is connected or when the EN_LPWR bit in ChargeOption0 is clear.
  */
 static uint32_t rt9478_perf_mode_req;
-#ifdef CONFIG_ZEPHYR
-static mutex_t rt9478_perf_mode_mutex;
-#else
 static K_MUTEX_DEFINE(rt9478_perf_mode_mutex);
-#endif /* CONFIG_ZEPHYR */
 
 /*
  * 10mOhm sense resistor, there is 100mA offset at code 0.
@@ -903,14 +894,6 @@ static int rt9478_ramp_get_current_limit(int chgnum)
 	return iaicr_reg_to_current(reg >> RT9478_AICR_CURRENT_SHIFT);
 }
 #endif /* CONFIG_CHARGE_RAMP_HW */
-
-#ifdef CONFIG_ZEPHYR
-static void init_mutex(void)
-{
-	k_mutex_init(&rt9478_perf_mode_mutex);
-}
-DECLARE_HOOK(HOOK_INIT, init_mutex, HOOK_PRIO_FIRST);
-#endif
 
 #ifdef CONFIG_CHARGER_RT9478_IDCHG_LIMIT_MA
 /* Called on AP S5 -> S3  and S3/S0iX -> S0 transition */
