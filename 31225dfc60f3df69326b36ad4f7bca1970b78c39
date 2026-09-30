@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3db2a1f7_4dd4b2a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-09-30T22:14:08Z",
+      "side": 1,
+      "message": "This CL wraps some common build and dagwood operations in named docker services. This is a somewhat more general form of what `docker compose` could do for us, and whether this is valuable has some bearing on whether the preceding CL to use `docker compose` is valuable.\n\nI don\u0027t know whether the services named here are the ones that we really want. This format would make it easy to change the service definitions, though.",
+      "revId": "31225dfc60f3df69326b36ad4f7bca1970b78c39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
