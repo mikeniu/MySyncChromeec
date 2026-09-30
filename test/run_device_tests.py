@@ -889,6 +889,7 @@ class AllTests:
             ),
             TestConfig(
                 test_name="fp_buffer_clear",
+                skip_for_ec_legacy=True,
             ),
             TestConfig(
                 config_name="fp_transport_spi_ro",
