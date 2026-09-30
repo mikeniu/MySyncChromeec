@@ -440,62 +440,6 @@ test_mockable void system_disable_jump(void)
 
 #ifdef CONFIG_MPU
 	if (system_is_locked()) {
-#ifndef CONFIG_ZEPHYR
-		int ret;
-		enum ec_image __attribute__((unused)) copy;
-
-		CPRINTS("MPU type: %08x", mpu_get_type());
-		/*
-		 * Protect data RAM from code execution
-		 */
-		ret = mpu_protect_data_ram();
-		if (ret == EC_SUCCESS) {
-			CPRINTS("data RAM locked. Exclusion %p-%p",
-				&__iram_text_start, &__iram_text_end);
-		} else {
-			CPRINTS("Failed to lock data RAM (%d)", ret);
-			return;
-		}
-
-#if defined(CONFIG_EXTERNAL_STORAGE) || !defined(CONFIG_FLASH_PHYSICAL)
-		/*
-		 * Protect code RAM from being overwritten
-		 */
-		ret = mpu_protect_code_ram();
-		if (ret == EC_SUCCESS) {
-			CPRINTS("code RAM locked.");
-		} else {
-			CPRINTS("Failed to lock code RAM (%d)", ret);
-			return;
-		}
-#else
-		/*
-		 * Protect inactive image (ie. RO if running RW, vice versa)
-		 * from code execution.
-		 */
-		switch (system_get_image_copy()) {
-		case EC_IMAGE_RO:
-			ret = mpu_lock_rw_flash();
-			copy = EC_IMAGE_RW;
-			break;
-		case EC_IMAGE_RW:
-			ret = mpu_lock_ro_flash();
-			copy = EC_IMAGE_RO;
-			break;
-		default:
-			copy = EC_IMAGE_UNKNOWN;
-			ret = !EC_SUCCESS;
-		}
-		if (ret == EC_SUCCESS) {
-			CPRINTS("%s image locked", ec_image_to_string(copy));
-		} else {
-			CPRINTS("Failed to lock %s image (%d)",
-				ec_image_to_string(copy), ret);
-			return;
-		}
-#endif /* !CONFIG_EXTERNAL_STORAGE */
-#endif /* !CONFIG_ZEPHYR */
-
 		/* All regions were configured successfully, enable MPU */
 		mpu_enable();
 	} else {

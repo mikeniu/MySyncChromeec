@@ -6,45 +6,5 @@
 #ifndef PLATFORM_EC_INCLUDE_WRITE_PROTECT_H_
 #define PLATFORM_EC_INCLUDE_WRITE_PROTECT_H_
 
-#ifdef CONFIG_ZEPHYR
 #include "zephyr_write_protect.h"
-#else
-#include "gpio.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-static inline bool write_protect_is_asserted(void)
-{
-#ifdef CONFIG_WP_ALWAYS
-	return true;
-#elif defined(CONFIG_WP_ACTIVE_HIGH)
-	return gpio_get_level(GPIO_WP);
-#else
-	return !gpio_get_level(GPIO_WP_L);
-#endif
-}
-
-#ifdef TEST_BUILD
-/**
- * Set the WP state.
- *
- * @param value		Logical level of the WP pin
- */
-static inline void write_protect_set(int value)
-{
-#ifdef CONFIG_WP_ACTIVE_HIGH
-	gpio_set_level(GPIO_WP, value);
-#else
-	gpio_set_level(GPIO_WP_L, !value);
-#endif /* CONFIG_WP_ACTIVE_HIGH */
-}
-#endif /* TEST_BUILD */
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* !CONFIG_ZEPHYR */
 #endif /* PLATFORM_EC_INCLUDE_WRITE_PROTECT_H_ */

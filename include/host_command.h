@@ -18,7 +18,7 @@
 #include <zephyr/mgmt/ec_host_cmd/ec_host_cmd.h>
 #define DECLARE_HOST_COMMAND(id, handler, ver) \
 	EC_HOST_CMD_HANDLER_UNBOUND(id, (ec_host_cmd_handler_cb)handler, ver)
-#elif defined(CONFIG_PLATFORM_EC_HOSTCMD) || !defined(CONFIG_ZEPHYR)
+#elif defined(CONFIG_PLATFORM_EC_HOSTCMD)
 #include "host_command_legacy.h"
 #else
 #include "host_command_stub.h"
@@ -232,7 +232,7 @@ void host_command_received(struct host_cmd_handler_args *args);
  */
 int host_request_expected_size(const struct ec_host_request *r);
 
-#if defined(CONFIG_ZEPHYR)
+#ifndef HOST_TOOLS_BUILD
 #include "zephyr_host_command.h"
 #endif
 
