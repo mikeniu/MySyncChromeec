@@ -479,7 +479,6 @@ static void init_status_retrieve(void)
 }
 DECLARE_HOOK(HOOK_INIT, init_status_retrieve, HOOK_PRIO_FIRST);
 
-#ifdef CONFIG_ZEPHYR
 static void init_mutexes(void)
 {
 	int i;
@@ -490,7 +489,6 @@ static void init_mutexes(void)
 	}
 }
 DECLARE_HOOK(HOOK_INIT, init_mutexes, HOOK_PRIO_FIRST);
-#endif
 
 enum ec_error_list sm5803_set_phot_duration(int chgnum,
 					    enum sm5803_phot1_duration duration)

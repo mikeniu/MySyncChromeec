@@ -8,12 +8,12 @@
 #ifndef PLATFORM_EC_INCLUDE_COMPILE_TIME_MACROS_H_
 #define PLATFORM_EC_INCLUDE_COMPILE_TIME_MACROS_H_
 
-#if defined(__cplusplus) && !defined(CONFIG_ZEPHYR)
+#if defined(__cplusplus) && defined(HOST_TOOLS_BUILD)
 #include <type_traits>
 #endif
 
 /* sys/util.h in zephyr provides equivalents to most of these macros */
-#ifdef CONFIG_ZEPHYR
+#ifndef HOST_TOOLS_BUILD
 #include <zephyr/sys/util.h>
 #endif
 
@@ -29,7 +29,7 @@
 #define _BA0_(c, f, l, msg) _BA1_(c, f, l, msg)
 /* Pass in an option message to display after condition */
 
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #define BUILD_ASSERT(cond, ...) _BA0_(cond, __FILE__, __LINE__, __VA_ARGS__)
 #endif
 
@@ -53,7 +53,7 @@
  * This version is type-safe and will not allow pointers, causing a
  * compile-time divide by zero error if a pointer is passed.
  */
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #define ARRAY_SIZE(arr) \
 	BUILD_CHECK_INLINE(sizeof(arr) / sizeof((arr)[0]), _IS_ARRAY(arr))
 #endif
@@ -77,7 +77,7 @@
 /*
  * Bit operation macros.
  */
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #define BIT(nr) (1U << (nr))
 /* Set <mask> for <var> if <set> is true or clear <mask> if <set> is false. */
 #define WRITE_MASK(var, mask, set) \
@@ -105,7 +105,7 @@
  * Note that we shift after using BIT() to avoid compiler
  * warnings for BIT(31+1).
  */
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #define GENMASK(h, l) (((BIT(h) << 1) - 1) ^ (BIT(l) - 1))
 #define GENMASK_ULL(h, l) (((BIT_ULL(h) << 1) - 1) ^ (BIT_ULL(l) - 1))
 #endif

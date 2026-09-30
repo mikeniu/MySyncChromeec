@@ -8,7 +8,7 @@
 #ifndef PLATFORM_EC_INCLUDE_TIMER_H_
 #define PLATFORM_EC_INCLUDE_TIMER_H_
 
-#ifndef CONFIG_ZEPHYR
+#ifdef HOST_TOOLS_BUILD
 #include <time.h>
 
 #include <sys/types.h>
@@ -21,7 +21,6 @@ typedef long unsigned int clock_t;
 #endif
 
 #include "common.h"
-#include "task_id.h"
 
 /* Time units in microseconds */
 #define MSEC 1000

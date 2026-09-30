@@ -10,16 +10,13 @@
 #include "console.h"
 #include "host_command.h"
 #include "i2c.h"
+#include "i2c/i2c.h"
 #include "i2c_battery_parser.h"
 #include "system.h"
 #include "usb_pd.h"
 #include "usb_pd_tcpm.h"
 #include "util.h"
 #include "virtual_battery.h"
-
-#ifdef CONFIG_ZEPHYR
-#include "i2c/i2c.h"
-#endif
 
 #define CPUTS(outstr) cputs(CC_I2C, outstr)
 #define CPRINTS(format, args...) cprints(CC_I2C, format, ##args)
@@ -105,15 +102,11 @@ static void msg_queue_pop_front(struct msg_queue_t *q,
 	(defined(CONFIG_I2C_PASSTHRU_RESTRICTED) && defined(CONFIG_BATTERY))
 static inline bool is_same_i2c_port(int port, int other_port)
 {
-#ifdef CONFIG_ZEPHYR
 	/* For Zephyr compare the actual device, which will be used in
 	 * i2c_transfer function.
 	 */
 	return (i2c_get_device_for_port(port) ==
 		i2c_get_device_for_port(other_port));
-#else
-	return (port == other_port);
-#endif
 }
 
 static inline bool is_i2c_battery(int port, uint16_t address, bool virtual_only)
@@ -240,12 +233,10 @@ i2c_command_passthru(struct ec_host_cmd_handler_args *args)
 	const struct ec_params_i2c_passthru *params =
 		(struct ec_params_i2c_passthru *)args->input_buf;
 	uint8_t port = params->port;
-#ifdef CONFIG_ZEPHYR
 	/* For Zephyr, convert the received remote port number to a port number
 	 * used in EC.
 	 */
 	port = i2c_get_port_from_remote_port(params->port);
-#endif
 #ifdef CONFIG_I2C_VIRTUAL_BATTERY
 	struct i2c_battery_parser_state parser_state = { .initialized = 0 };
 #endif
@@ -399,12 +390,10 @@ i2c_command_passthru_protect(struct ec_host_cmd_handler_args *args)
 	const struct ec_params_i2c_passthru_protect *params =
 		(struct ec_params_i2c_passthru_protect *)args->input_buf;
 	uint8_t port = params->port;
-#ifdef CONFIG_ZEPHYR
 	/* For Zephyr, convert the received remote port number to a port number
 	 * used in EC.
 	 */
 	port = i2c_get_port_from_remote_port(params->port);
-#endif
 	struct ec_response_i2c_passthru_protect *resp = args->output_buf;
 
 	if (args->input_buf_size < sizeof(*params)) {
