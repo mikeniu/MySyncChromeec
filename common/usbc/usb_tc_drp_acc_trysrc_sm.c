@@ -1402,6 +1402,47 @@ static bool tc_perform_src_hard_reset(int port)
 }
 
 /*
+ * Some sink ports have neither a load nor a bleed path on VBUS while the
+ * system is off, so the rail can take far longer than tSafe0V to decay once
+ * the source removes it during a Hard Reset.  When that happens we never
+ * observe vSafe0V, fall through the PS_STATE1 timeout as if the partner were
+ * non-PD, and then declare the power supply reset complete on a rail that is
+ * merely coasting down - which tears the connection down right before the
+ * source restores VBUS.
+ *
+ * Boards may opt in to actively discharging VBUS for the duration of the
+ * VBUS-drop window so that vSafe0V is reached in time.  This is off by default
+ * because a partner that has stopped responding to PD may keep VBUS asserted,
+ * and we do not want to discharge a live rail on ports that do not need it.
+ */
+__overridable bool board_discharge_vbus_on_snk_hard_reset(int port)
+{
+	return false;
+}
+
+/* Enable/disable the opt-in Hard Reset VBUS discharge for this port. */
+static void tc_set_snk_hard_reset_discharge(int port, int enable)
+{
+	if (!IS_ENABLED(CONFIG_USB_PD_DISCHARGE))
+		return;
+
+	if (!board_discharge_vbus_on_snk_hard_reset(port))
+		return;
+
+	/*
+	 * While AutoDischargeDisconnect is set the TCPC owns the discharge
+	 * path and an explicit ForceDischarge request may be ignored, so drop
+	 * AutoDischargeDisconnect first.  We do not want disconnect detection
+	 * during the Hard Reset anyway - the caller re-enables it once VBUS is
+	 * back.
+	 */
+	if (enable)
+		tcpm_enable_auto_discharge_disconnect(port, 0);
+
+	pd_set_vbus_discharge(port, enable);
+}
+
+/*
  * Wait for recovery after a hard reset.  Call repeatedly until true is
  * returned, signaling that the hard reset is complete.
  */
@@ -1429,6 +1470,7 @@ static bool tc_perform_snk_hard_reset(int port)
 			set_vconn(port, 0);
 
 		/* Wait up to tVSafe0V for Vbus to disappear */
+		tc_set_snk_hard_reset_discharge(port, 1);
 		tc[port].ps_reset_state = PS_STATE1;
 		pd_timer_enable(port, TC_TIMER_TIMEOUT, PD_T_SAFE_0V);
 		return false;
@@ -1438,6 +1480,12 @@ static bool tc_perform_snk_hard_reset(int port)
 			 * Partner dropped Vbus, reduce our current consumption
 			 * and await its return.
 			 */
+			/*
+			 * Vbus is down; stop discharging before the source
+			 * brings it back.
+			 */
+			tc_set_snk_hard_reset_discharge(port, 0);
+
 			sink_stop_drawing_current(port);
 
 			tcpm_enable_auto_discharge_disconnect(port, 0);
@@ -1454,6 +1502,8 @@ static bool tc_perform_snk_hard_reset(int port)
 			 * No Vbus drop likely indicates a non-PD port partner,
 			 * move to the next stage anyway.
 			 */
+			tc_set_snk_hard_reset_discharge(port, 0);
+
 			tc[port].ps_reset_state = PS_STATE2;
 			pd_timer_enable(port, TC_TIMER_TIMEOUT,
 					PD_T_SRC_RECOVER_MAX +
@@ -2868,6 +2918,10 @@ static void tc_attached_snk_exit(const int port)
 
 	/* Clear flags after checking Vconn status */
 	TC_CLR_FLAG(port, TC_FLAGS_REQUEST_PR_SWAP | TC_FLAGS_POWER_OFF_SNK);
+
+#ifdef CONFIG_USB_PE_SM
+	tc_set_snk_hard_reset_discharge(port, 0);
+#endif
 
 	pd_timer_disable(port, TC_TIMER_CC_DEBOUNCE);
 	pd_timer_disable(port, TC_TIMER_TIMEOUT);

@@ -15,6 +15,7 @@
 #include "driver/bc12/pi3usb9201.h"
 #include "driver/charger/isl923x_public.h"
 #include "driver/charger/isl9241.h"
+#include "driver/ppc/aoz1380_public.h"
 #include "driver/ppc/nx20p348x.h"
 #include "driver/retimer/anx7483_public.h"
 #include "driver/retimer/ps8811.h"
@@ -26,6 +27,7 @@
 #include "ioexpander.h"
 #include "power.h"
 #include "usb_mux.h"
+#include "usb_pd.h"
 #include "usb_pd_tcpm.h"
 #include "usbc/usb_muxes.h"
 #include "usbc_config.h"
@@ -77,6 +79,26 @@ test_export_static void usb_fault_interrupt_disable(void)
 }
 DECLARE_HOOK(HOOK_CHIPSET_SHUTDOWN, usb_fault_interrupt_disable,
 	     HOOK_PRIO_DEFAULT);
+
+/*
+ * b/562610837: the AOZ1380 port has no bleed path on VBUS and, with the system
+ * off, no load either.  After a Hard Reset the source's VBUS removal takes
+ * ~750 ms to decay past vbusPresent on this port, so vSafe0V is never seen
+ * within tSafe0V and the Type-C state machine mistakes the decaying rail for a
+ * restored one.  Actively discharge VBUS for the duration of the Hard Reset on
+ * this port only; the NX20P348x port does not need it.
+ */
+__override bool board_discharge_vbus_on_snk_hard_reset(int port)
+{
+#ifdef CONFIG_PLATFORM_EC_USBC_PPC_AOZ1380
+	if (port < 0 || port >= ppc_cnt)
+		return false;
+
+	return ppc_chips[port].drv == &aoz1380_drv;
+#else
+	return false;
+#endif
+}
 
 int board_set_active_charge_port(int port)
 {

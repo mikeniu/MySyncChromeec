@@ -1775,6 +1775,21 @@ void pd_power_supply_reset(int port);
 void pd_set_vbus_discharge(int port, int enable);
 
 /**
+ * Should this sink port actively discharge VBUS for the duration of a Hard
+ * Reset?
+ *
+ * Ports with no load and no bleed path on VBUS may not reach vSafe0V within
+ * tSafe0V after the source removes VBUS, which makes the Type-C state machine
+ * mistake the still-decaying rail for a restored one.  Such ports can override
+ * this to opt in to an active discharge during the Hard Reset VBUS-drop
+ * window.
+ *
+ * @param port USB-C port number
+ * @return true to discharge VBUS during a sink Hard Reset
+ */
+__override_proto bool board_discharge_vbus_on_snk_hard_reset(int port);
+
+/**
  * Enable the power supply output after the ready delay.
  *
  * @param port USB-C port number
