@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44b440dd_818183b1",
+        "filename": "zephyr/dts/bindings/fingerprint/elan.elanhv515rc.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-09-30T05:47:25Z",
+      "side": 1,
+      "message": "Are these two indeed used or maybe it\u0027s a copy-paste error?",
+      "revId": "289e0ec9cae075c8eaab42a209f084409c9ea3b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
