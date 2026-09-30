@@ -889,6 +889,8 @@ class AllTests:
             ),
             TestConfig(
                 test_name="fp_buffer_clear",
+                # TODO(b/524097509): Enable on ec-legacy once test is added.
+                skip_for_ec_legacy=True,
             ),
             TestConfig(
                 config_name="fp_transport_spi_ro",
