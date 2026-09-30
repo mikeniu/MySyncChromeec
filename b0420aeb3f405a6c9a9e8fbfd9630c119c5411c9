@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "817eb633_ddcc9678",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T08:05:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8177334_0a3049dc-8158-41c1-877c-8c49fceea8f3.pb)\n\n### Review Summary\n*   **Functionality:** The patch correctly configures and introduces RTS5817 testing logic, with `JLinkExe` receiving the expected arguments.\n*   **Architecture \u0026 Component Fit:** The board-specific power cycle and flash behaviors are placed directly into the main `run_device_tests.py` flow, which aligns with existing board-specific workarounds in the script.\n*   **Code Simplicity:** The previous blocking issue has been resolved by utilizing context managers. A minor suggestion is provided to simplify creating the temp file via writing string literals rather than encoding to bytes.\n*   **Idiomaticity \u0026 Readability:** Good use of the `with` statement for resource cleanup. A minor suggestion is provided to use the `REALTEKFP` constant instead of string literals.\n*   **Testing \u0026 Test Coverage:** The patch adds configuration and support for a new board to the test runner infrastructure. No additional automated unit tests are required for this configuration change.\n*   **CL Size \u0026 Scope:** `Size: M (+96, -0)`. The CL is small, atomic, and focused on a single logical change.\n*   **Commit Message:** The commit message accurately describes the changes and includes the required `BUG\u003d` and `TEST\u003d` footers formatted correctly for the Chromium ecosystem.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b0420aeb3f405a6c9a9e8fbfd9630c119c5411c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b980b94_3ffd33e2",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T08:05:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider writing this script as text instead of bytes to simplify the code, and avoid reading the file back just to log it. Since you know what you just wrote, you can log the string directly:\n\n```python\n    script_content \u003d (\n        \"exitonerror 1\\n\"\n        \"r\\n\"\n        \"go\\n\"\n        \"exit\\n\"\n    )\n    with tempfile.NamedTemporaryFile(mode\u003d\"w\") as tmp:\n        tmp.write(script_content)\n        tmp.flush()\n        logging.debug(\u0027JLink command file: \"%s\"\u0027, script_content)\n        cmd.extend(\n            [\n                \"-device\",\n                device,\n                \"-if\",\n                interface,\n                \"-speed\",\n                speed,\n                \"-autoconnect\",\n                \"1\",\n                \"-NoGui\",\n                \"1\",\n                \"-CommandFile\",\n                tmp.name,\n            ]\n        )\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8177334_0a3049dc-8158-41c1-877c-8c49fceea8f3.pb)",
+      "range": {
+        "startLine": 206,
+        "startChar": 0,
+        "endLine": 218,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b0420aeb3f405a6c9a9e8fbfd9630c119c5411c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44e08000_e034cb05",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2114,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T08:05:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider using the `REALTEKFP` constant defined at the top of the file instead of the string literal `\"realtekfp\"`.\n\n```python\n        if board_config.name \u003d\u003d REALTEKFP:\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8177334_0a3049dc-8158-41c1-877c-8c49fceea8f3.pb)",
+      "range": {
+        "startLine": 2114,
+        "startChar": 0,
+        "endLine": 2114,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b0420aeb3f405a6c9a9e8fbfd9630c119c5411c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b292abbd_3f5f7c89",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2153,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-09-30T08:05:55Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Consider using the `REALTEKFP` constant defined at the top of the file instead of the string literal `\"realtekfp\"`.\n\n```python\n                if board_config.name \u003d\u003d REALTEKFP:\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8177334_0a3049dc-8158-41c1-877c-8c49fceea8f3.pb)",
+      "range": {
+        "startLine": 2153,
+        "startChar": 0,
+        "endLine": 2153,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b0420aeb3f405a6c9a9e8fbfd9630c119c5411c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
