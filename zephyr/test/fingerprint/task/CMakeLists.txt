@@ -48,5 +48,7 @@ target_sources_ifdef(CONFIG_LINK_TEST_SUITE_FINGERPRINT_AUTH_COMMANDS app PRIVAT
 target_sources_ifdef(CONFIG_NPCX_OTP_KEY app PRIVATE
 	${PLATFORM_EC}/zephyr/shim/chip/npcx/otp_key.c
 	${PLATFORM_EC}/test/mock/otpi_mock.c)
+zephyr_include_directories_ifdef(CONFIG_NPCX_OTP_KEY
+	"${PLATFORM_EC}/zephyr/shim/chip/npcx/include")
 
 add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
