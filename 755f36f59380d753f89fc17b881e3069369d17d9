@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf9a32f5_274e4181",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T18:15:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n*   **Functionality:** The logic correctly queries, caches, and validates the dynamic `image_data_offset_bytes`. However, a crucial bounds validation (`offset \u003c\u003d size`) is missing.\n*   **Architecture \u0026 Component Fit:** The caching implementation aligns well with the existing `FpImageFrameParamsCache` pattern. Preconditions and cache validation are correctly co-located.\n*   **Code Simplicity:** The code is direct and avoids unnecessary abstractions.\n*   **Idiomaticity \u0026 Readability:** Code adheres to C++ and Chromium OS EC standards. The migration to `CPRINTS` improves log readability.\n*   **Security:** Checks prevent reading past `max_image_buffer_bytes`, but the missing `offset \u003c\u003d size` check could permit an invalid internal offset.\n*   **Testing:** Thorough Zephyr unit tests cover the new cache behavior, boundaries, and overrides.\n*   **Commit Message:** The message clearly explains the *What* and *Why* for both changes, but exposes the bundling of multiple logical changes.\n*   **CL Size \u0026 Scope:** `Size: M (+190, -34)`. This CL violates the Single Logical Change rule by bundling a behavior-preserving refactoring/modernization (migrating existing `CPRINTF` calls to `CPRINTS` for better formatting) with a new behavioral feature (caching dynamic image offsets). The commit message explicitly highlights this with \"Also switch console error logging...\". Per `go/small-cls`, even if they touch the same file, independent refactorings must be separated from functional changes to keep diffs atomic.\n\n**Proposed Split Plan:**\n1. **CL 1 (Refactoring):** Switch existing console error logging in `FpImageFrameParamsCache` from `CPRINTF` to `CPRINTS`.\n2. **CL 2 (Feature):** Extend `FpImageFrameParamsCache` to query, validate, and store image data offsets, including the corresponding unit tests.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372808_8405f958-a188-4dc1-865d-7063f2d0c48b.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "755f36f59380d753f89fc17b881e3069369d17d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dda3d935_b7298370",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T18:15:07Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Validation Hole:** The validation checks that `offset` does not exceed `max_image_buffer_bytes`, but it does not verify that `offset` is bounded by the `size` of the frame itself. Since `offset` represents where the image data starts within the frame, an offset greater than the frame size is structurally invalid and could cause logic errors when consumers slice the buffer.\n\nPlease add an invariant check to enforce `offset \u003c\u003d size`:\n```cpp\n\t\tif (offset \u003e size) {\n\t\t\tCPRINTS(\"Error: Type %u image offset (%u) exceeds frame size (%u).\",\n\t\t\t\ttype, offset, size);\n\t\t\tgoto error_exit;\n\t\t}\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372808_8405f958-a188-4dc1-865d-7063f2d0c48b.pb)",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "755f36f59380d753f89fc17b881e3069369d17d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
