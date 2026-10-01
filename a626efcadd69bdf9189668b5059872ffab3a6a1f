@@ -18,6 +18,29 @@
       "isAi": true,
       "revId": "a626efcadd69bdf9189668b5059872ffab3a6a1f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4daeee8_abff7f40",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:13:25Z",
+      "side": 1,
+      "message": "nit: technically unrelated",
+      "range": {
+        "startLine": 204,
+        "startChar": 4,
+        "endLine": 204,
+        "endChar": 9
+      },
+      "revId": "a626efcadd69bdf9189668b5059872ffab3a6a1f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
