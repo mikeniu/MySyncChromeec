@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fcb9e1b_ed6fc8a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T01:19:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL** [[trajectory](https://goto.corp.google.com/traj/ff0e089f-c6f7-433e-9ad3-7e0ffca29699)]\n\n### Review Summary\n* **Functionality**: The refactoring correctly maintains existing behavior by caching `FpImageFrameParam`.\n* **Architecture \u0026 Component Fit**: Fits nicely with the existing architecture.\n* **Code Simplicity**: The change is a straightforward pure move / refactoring.\n* **Idiomaticity \u0026 Readability**: Follows local conventions.\n* **Security**: Buffer boundary checks are correctly carried over.\n* **Testing \u0026 Test Coverage**: Tests are comprehensively relocated and updated. See inline comments for optional test suggestions.\n* **CL Size \u0026 Scope**: `Size: L (+149, -137)` - Too large (STRICTLY BLOCKING — NO EXCEPTIONS). While this is a clean refactoring, the total CL size exceeds the maximum limit for a single logical change. Please split this CL.\n    * CL 1: Add the new `FpImageFrameParam` struct, `FpImageFrameParamsCache` class, and corresponding unit tests.\n    * CL 2: Update callers (e.g. `fpsensor.cc`, `fpsensor_state.h`) to use the new cache and delete the old `FpFrameSizeCache`.\n* **Commit Message**: The commit message clearly explains the *What* and *Why* with good altitude.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "56e088bad803d30678c1eefa3f4789e1a3f76a9a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a401b38_2a239924",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T01:19:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):**\n\nSince `capture_type` is cast to `size_t` on the left side of the `\u003e\u003d`, any negative value will wrap around to a very large positive number and inherently trigger the bounds condition. Thus, the `capture_type \u003c 0` check here is dead code and can safely be removed (similar to the cleanup done in `fpsensor_image_frame_params.cc`).\n\n```cpp\n\t\tif (static_cast\u003csize_t\u003e(capture_type) \u003e\u003d\n\t\t\t\tcache.frame_params_.size()) {\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372821_ff0e089f-c6f7-433e-9ad3-7e0ffca29699.pb)",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "56e088bad803d30678c1eefa3f4789e1a3f76a9a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5849ad26_8160a610",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T01:19:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):**\n\nPer the ROR mutation check requirement, boundary tests must verify both the exact boundary ($N$) and the adjacent off-by-one value ($N + 1$). Since `FP_CAPTURE_TYPE_MAX` is the exact boundary here, please add a test for `FP_CAPTURE_TYPE_MAX + 1` to ensure off-by-one values are also handled safely.\n\n```cpp\nZTEST(fpsensor_image_frame_params, test_cache_boundary_above_max_index)\n{\n\tFpImageFrameParamsCache *cache \u003d cache_fixture.get();\n\n\tzassert_equal(\n\t\tcache-\u003eget_frame_size(static_cast\u003cenum fp_capture_type\u003e(FP_CAPTURE_TYPE_MAX + 1)), 0,\n\t\t\"Expected zero size for invalid capture type (FP_CAPTURE_TYPE_MAX + 1).\");\n}\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372821_ff0e089f-c6f7-433e-9ad3-7e0ffca29699.pb)",
+      "range": {
+        "startLine": 140,
+        "startChar": 0,
+        "endLine": 147,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "56e088bad803d30678c1eefa3f4789e1a3f76a9a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
