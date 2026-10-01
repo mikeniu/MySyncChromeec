@@ -29,6 +29,23 @@ macro reset
     # Set the image type of currently loaded image to RO by default. Software will
     # update the flag while jumping between image types.
     image_type WriteByte 0x0 0x40
+
+    # Feed FPC1025 hardware ID (0x021a) for initial driver probe, frame size
+    # cache population, and fpsensor_hw test check (both Zephyr and legacy EC).
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x02
+    spip.fpsensor FeedSample 0x1a
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x02
+    spip.fpsensor FeedSample 0x1a
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x02
+    spip.fpsensor FeedSample 0x1a
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x02
+    spip.fpsensor FeedSample 0x1a
 """
 
 runMacro $reset

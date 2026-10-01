@@ -598,6 +598,7 @@ class Renode(Platform):
             "fpsensor_auth_crypto_stateful",  # TODO(b/485316342)
             "fpsensor_auth_crypto_stateless",  # TODO(b/556233130)
             "fpsensor_crypto",  # TODO(b/556233130)
+            "fpsensor_hw",  # TODO(b/384743080)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
             "flash_write_protect",  # TODO(b/485316223)
@@ -615,8 +616,18 @@ class Renode(Platform):
         return False
 
     def _skip_test_helipilot(
-        self, test_config: TestConfig, zephyr: bool
+        self,
+        test_config: TestConfig,
+        board_config: BoardConfig,
+        zephyr: bool,
     ) -> bool:
+        if (
+            board_config.name == BUCCANEER
+            and test_config.test_name == "fpsensor_hw"
+        ):
+            # TODO(b/384743080): Elan sensor is not emulated in Renode.
+            return True
+
         if test_config.test_name in [
             "ram_lock",  # TODO(b/385216805)
             "rtc_npcx9",  # TODO(b/385217282)
@@ -671,6 +682,7 @@ class Renode(Platform):
             "exception",  # TODO(b/483118965)
             "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
             "fpsensor_debug",  # TODO(b/474439863)
+            "fpsensor_hw",  # TODO(b/384743080)
             "otp_key",  # TODO(b/483121090)
             "restricted_console",  # TODO(b/474439863)
             "tpm_seed_clear",  # TODO(b/556233130)
@@ -690,7 +702,6 @@ class Renode(Platform):
 
         # Tests failures that are independent of the board.
         if test_name in [
-            "fpsensor_hw",  # TODO(b/384743080)
             "power_utilization",  # Can't measure power on Renode.
             "watchdog",  # TODO(b/390021699)
         ]:
@@ -703,7 +714,7 @@ class Renode(Platform):
             return self._skip_test_chudow(test_config)
 
         if board_config.name in [HELIPILOT, BUCCANEER]:
-            return self._skip_test_helipilot(test_config, zephyr)
+            return self._skip_test_helipilot(test_config, board_config, zephyr)
 
         if board_config.name == SANOK and zephyr:
             return self._skip_test_sanok(test_config)
@@ -1549,6 +1560,8 @@ def fp_sensor_sel(
     older development boards. This should not result in any failures but also
     may have not actually changed the selected sensor.
     """
+    if isinstance(platform, Renode):
+        return True
 
     if sensor_type is None:
         sensor_type = board_config.sensor_type
