@@ -15,8 +15,9 @@ $elf_rw?=$ORIGIN/sanok/ec.RW.elf
 
 showAnalyzer uart0
 
-# Mock of bootrom, reads entry point from flash header and jumps there
-cpu0 AssembleBlock 0x70000000 "li t0, 0x80000000; lw t1, 24(t0); jalr zero, t1, 0"
+# Mock of bootrom, reads entry point from flash header (offset 24 for EC images,
+# or offset 12 for standalone upstream Zephyr images) and jumps there
+cpu0 AssembleBlock 0x70000000 "li t0, 0x80000000; lw t1, 24(t0); bnez t1, 1f; lw t1, 12(t0); 1: jalr zero, t1, 0"
 
 macro reset
 """
