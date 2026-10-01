@@ -46,8 +46,10 @@ static void test_verify_system_is_locked(void)
  */
 static void test_ensure_no_debugger_detected(void)
 {
+#ifdef CONFIG_CPU_CORTEX_M
 	zassert_false(debugger_is_connected());
 	zassert_false(debugger_was_connected());
+#endif
 }
 
 static void test_ro_protection_enabled(void)
@@ -107,6 +109,9 @@ ZTEST(system_is_locked_wp_off, test_system_is_locked)
 			 "running this test\n");
 		zassert_unreachable();
 	}
+#ifdef CONFIG_PLATFORM_EC_WP_EXTERNAL
+	disable_write_protect_external();
+#endif
 	test_pre_check();
 	write_protect_enabled = false;
 
