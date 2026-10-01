@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "694bb37b_1626b6c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T02:53:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](https://goto.corp.google.com/traj/388b782e-c72e-4c3a-af62-17bdf0c07335)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The memory clearing logic executes safely during boot and reset for `STM32H7X3` and uses weak symbols appropriately.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly placed in `chip/stm32/system.c`, maintaining the intended abstraction boundaries.\n*   **Code Simplicity:** ❌ **Blocking:** The unit test body uses manual `for` loops and boilerplate counters instead of the built-in `TEST_ASSERT_MEMSET` test macro and `std::count`. Test code should have minimal control flow.\n*   **Idiomaticity \u0026 Readability:** ✅ The core C code is readable and idiomatic.\n*   **Security:** ✅ No security vulnerabilities introduced. Purging stale `.ahb4` memory across resets is a good defense-in-depth practice to prevent sensitive data leakage.\n*   **Testing:** ✅ The test adequately verifies the behavior across a system reboot.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+177, -0). This CL adheres to the Single Logical Change rule and is appropriately focused on this initialization sequence.\n*   **Commit Message:** ✅ The commit message accurately describes the purpose and mechanism of the change.\n\nTAG\u003dagy\nCONV\u003d482ce80e-c703-48cb-beb4-f0123c271ca8",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "624f6a1ac1c8180a154ef91b45c47f83b35a7d92",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "982437fc_12bbaff3",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T02:53:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] Please `#include \u003calgorithm\u003e` for `std::count`.\n\n```cpp\n#include \u003calgorithm\u003e\n#include \u003ccstdint\u003e\n#include \u003ccstring\u003e\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8237836_388b782e-c72e-4c3a-af62-17bdf0c07335.pb)",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "624f6a1ac1c8180a154ef91b45c47f83b35a7d92",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe156de8_ac08d2b2",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T02:53:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity:** Please use `std::count` from `\u003calgorithm\u003e` instead of a manual `for` loop to avoid control flow in test code.\n\n```cpp\n\tsize_t canary_count \u003d std::count(std::begin(fp_buffer), std::end(fp_buffer), CANARY_BYTE);\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8237836_388b782e-c72e-4c3a-af62-17bdf0c07335.pb)",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "624f6a1ac1c8180a154ef91b45c47f83b35a7d92",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3110297_a68df9e8",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 17
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T02:53:02Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Code Simplicity:** Please use the existing `TEST_ASSERT_MEMSET` macro from `test_util.h` rather than a manual loop with `TEST_ASSERT`. It is safer, more declarative, and avoids control flow in tests.\n\n```cpp\n\t/* Ensure fp_buffer begins zeroed. */\n\tTEST_ASSERT_MEMSET(fp_buffer, 0, sizeof(fp_buffer));\n```\n\nOther locations where manual assertions should be replaced:\n* **Line 57-59**: Verify write succeeded\n* **Line 69-71**: Verify fp_buffer is zeroed and canary didn\u0027t survive\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8237836_388b782e-c72e-4c3a-af62-17bdf0c07335.pb)",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "624f6a1ac1c8180a154ef91b45c47f83b35a7d92",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
