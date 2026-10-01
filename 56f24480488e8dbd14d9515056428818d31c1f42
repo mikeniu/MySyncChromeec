@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e40dec69_7fc826ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T19:49:44Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/70548db6-daad-4daf-854e-d3a4c4501c5f)]\n\n**Review Summary:**\n*   **Functionality:** ✅ Zero-initializes AHB4 correctly using `uintptr_t` arithmetic. The use of weak symbols and `uintptr_t` casts avoids potential undefined behavior in pointer arithmetic if symbols are not defined.\n*   **Security:** ✅ Purges stale data across resets, improving defense-in-depth against sensitive data exposure in NOLOAD regions.\n*   **Architecture \u0026 Component Fit:** ✅ The initialization logic is appropriately placed in `system_pre_init` and `system_reset`.\n*   **Code Simplicity:** ✅ Uses `memset` instead of manual loops. Test code cleanly leverages C++20 `std::ranges` and `TEST_ASSERT_MEMSET`.\n*   **Idiomaticity \u0026 Readability:** ✅ C and C++ idioms are respected. No magic values.\n*   **Testing \u0026 Test Coverage:** ✅ Adds a comprehensive multistep test that covers both the RO to RW reset boundary (via `__attribute__((constructor))` check) and the RW reset behavior.\n*   **CL Size \u0026 Scope:** ✅ Size is `Size: M (+164, -0)`. The CL is atomic and focused exclusively on zero-initializing AHB4 and its corresponding tests.\n*   **Commit Message Accuracy \u0026 Style:** ✅ Accurately describes the changes, provides motivation (purging stale data to avoid exposure via RO), and contains valid `TEST\u003d` directives.\n\nTAG\u003dagy\nCONV\u003dff6f0f09-1ca3-4429-8a57-8216520c6ab5",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "56f24480488e8dbd14d9515056428818d31c1f42",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
