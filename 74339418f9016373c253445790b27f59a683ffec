@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e09611f8_cb8ad80f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 18
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T03:39:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66e04f55_d4b1ae46",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 9999
+      },
+      "revId": "74339418f9016373c253445790b27f59a683ffec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5a96dd7_beb22940",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes requested** — See inline comments for details. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8237836_18db27fb-f3e2-4fe7-a429-f30eb780ceb9.pb)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The memory clearing logic safely calculates the size using `uintptr_t` arithmetic and is conditionally gated.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly placed in `chip/stm32/system.c`.\n*   **Code Simplicity:** ✅ The code is minimal and straightforward.\n*   **Idiomaticity \u0026 Readability:** ✅ The C/C++ code matches the existing style and conventions.\n*   **Security:** ✅ No security vulnerabilities introduced. Purging stale memory across resets is a good defense-in-depth practice.\n*   **Testing:** ✅ Added multi-step `fp_buffer_clear` hardware tests that verify the canary is wiped across resets.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+167, -0). The CL remains small, self-contained, and focused on this single logical change.\n*   **Commit Message:** ❌ The commit message is missing the explanation (requested in a prior review pass) of why this change is safe when pairing a frozen production RO image with a new RW image.\n\nTAG\u003dagy\nCONV\u003d5faa50e3-28b6-485a-ae35-70424a338bea",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "74339418f9016373c253445790b27f59a683ffec",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f7974a0_2f7c1a92",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T03:39:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5a96dd7_beb22940",
       "revId": "74339418f9016373c253445790b27f59a683ffec",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
