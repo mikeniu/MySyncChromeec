@@ -46,8 +46,10 @@ static void test_verify_system_is_locked(void)
  */
 static void test_ensure_no_debugger_detected(void)
 {
+#if IS_ENABLED(CONFIG_CPU_CORTEX_M)
 	zassert_false(debugger_is_connected());
 	zassert_false(debugger_was_connected());
+#endif
 }
 
 static void test_ro_protection_enabled(void)
