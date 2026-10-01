@@ -22,6 +22,31 @@
       },
       "revId": "77285eeb65a44fb984d2c35e3f430132756e5726",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbe500c0_63ab61c0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T20:50:24Z",
+      "side": 1,
+      "message": "Done in PS 5: added b:355044350 to BUG\u003d.",
+      "parentUuid": "df0273f4_d13ab4dc",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 28
+      },
+      "isAi": true,
+      "revId": "77285eeb65a44fb984d2c35e3f430132756e5726",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
