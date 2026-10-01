@@ -56,7 +56,6 @@
 #include <libec/fingerprint/fp_frame_command.h>
 #include <libec/fingerprint/fp_mode_command.h>
 #include <libec/mkbp_event.h>
-#include <libec/rand_num_command.h>
 #include <libec/versions_command.h>
 #include <map>
 #include <memory>
@@ -495,160 +494,6 @@ static int get_latest_cmd_version(uint8_t cmd, int *version)
 	return rv;
 }
 
-int cmd_hostsleepstate(int argc, char *argv[])
-{
-	struct ec_params_host_sleep_event p;
-	struct ec_params_host_sleep_event_v1 p1;
-	struct ec_response_host_sleep_event_v1 r;
-	void *pp = &p;
-	size_t psize = sizeof(p), rsize = 0;
-	char *afterscan;
-	int rv;
-	int version = 0, max_version = 0;
-	uint32_t timeout, transitions;
-
-	if (argc < 2) {
-		fprintf(stderr,
-			"Usage: %s "
-			"[suspend|wsuspend|resume|freeze|thaw] [timeout]\n",
-			argv[0]);
-		return -1;
-	}
-
-	rv = get_latest_cmd_version(EC_CMD_HOST_SLEEP_EVENT, &max_version);
-	if (rv < 0)
-		return rv;
-
-	if (!strcmp(argv[1], "suspend"))
-		p.sleep_event = HOST_SLEEP_EVENT_S3_SUSPEND;
-	else if (!strcmp(argv[1], "wsuspend"))
-		p.sleep_event = HOST_SLEEP_EVENT_S3_WAKEABLE_SUSPEND;
-	else if (!strcmp(argv[1], "resume"))
-		p.sleep_event = HOST_SLEEP_EVENT_S3_RESUME;
-	else if (!strcmp(argv[1], "freeze")) {
-		p.sleep_event = HOST_SLEEP_EVENT_S0IX_SUSPEND;
-		if (max_version >= 1) {
-			p1.sleep_event = p.sleep_event;
-			p1.reserved = 0;
-			p1.suspend_params.sleep_timeout_ms =
-				EC_HOST_SLEEP_TIMEOUT_DEFAULT;
-
-			if (argc > 2) {
-				p1.suspend_params.sleep_timeout_ms =
-					strtoull(argv[2], &afterscan, 0);
-
-				if ((*afterscan != '\0') ||
-				    (afterscan == argv[2])) {
-					fprintf(stderr, "Invalid value: %s\n",
-						argv[2]);
-
-					return -1;
-				}
-			}
-
-			pp = &p1;
-			psize = sizeof(p1);
-			version = 1;
-		}
-
-	} else if (!strcmp(argv[1], "thaw")) {
-		p.sleep_event = HOST_SLEEP_EVENT_S0IX_RESUME;
-		if (max_version >= 1) {
-			version = 1;
-			rsize = sizeof(r);
-		}
-	} else {
-		fprintf(stderr, "Unknown command: %s\n", argv[1]);
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_HOST_SLEEP_EVENT, version, pp, psize, &r, rsize);
-	if (rv < 0) {
-		fprintf(stderr, "EC host sleep command failed: %d\n", rv);
-		return rv;
-	}
-
-	if (rsize) {
-		timeout = r.resume_response.sleep_transitions &
-			  EC_HOST_RESUME_SLEEP_TIMEOUT;
-
-		transitions = r.resume_response.sleep_transitions &
-			      EC_HOST_RESUME_SLEEP_TRANSITIONS_MASK;
-
-		printf("%s%d sleep line transitions.\n",
-		       timeout ? "Timeout: " : "", transitions);
-	}
-
-	return 0;
-}
-
-int cmd_test(int argc, char *argv[])
-{
-	struct ec_params_test_protocol p = {
-		.buf = { 1,  2,	 3,  4,	 5,  6,	 7,  8,	 9,  10, 11,
-			 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-			 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 }
-	};
-	struct ec_response_test_protocol r;
-	int rv, version = 0;
-	char *e;
-
-	if (argc < 3) {
-		fprintf(stderr, "Usage: %s result length [version]\n", argv[0]);
-		return -1;
-	}
-
-	p.ec_result = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "invalid param (result)\n");
-		return -1;
-	}
-	p.ret_len = strtol(argv[2], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "invalid param (length)\n");
-		return -1;
-	}
-
-	if (argc > 3) {
-		version = strtol(argv[3], &e, 0);
-		if (e && *e) {
-			fprintf(stderr, "invalid param (version)\n");
-			return -1;
-		}
-	}
-
-	rv = ec_command(EC_CMD_TEST_PROTOCOL, version, &p, sizeof(p), &r,
-			sizeof(r));
-	printf("rv = %d\n", rv);
-
-	return rv;
-}
-
-int cmd_s5(int argc, char *argv[])
-{
-	struct ec_params_get_set_value p;
-	struct ec_response_get_set_value r;
-	int rv, param;
-
-	p.flags = 0;
-
-	if (argc > 1) {
-		p.flags |= EC_GSV_SET;
-		if (!parse_bool(argv[1], &param)) {
-			fprintf(stderr, "invalid arg \"%s\"\n", argv[1]);
-			return -1;
-		}
-		p.value = param;
-	}
-
-	rv = ec_command(EC_CMD_GSV_PAUSE_IN_S5, 0, &p, sizeof(p), &r,
-			sizeof(r));
-	if (rv > 0)
-		printf("%s\n", r.value ? "on" : "off");
-
-	return rv < 0;
-}
-
 static const char *const ec_feature_names[] = {
 	[EC_FEATURE_LIMITED] = "Limited image, load RW for more",
 	[EC_FEATURE_FLASH] = "Flash",
@@ -737,78 +582,6 @@ int cmd_inventory(int argc, char *argv[])
 			}
 		}
 	}
-	return 0;
-}
-
-static int get_cmdversions_v0(uint8_t cmd, uint32_t *version_mask)
-{
-	struct ec_params_get_cmd_versions p;
-	struct ec_response_get_cmd_versions r;
-	int rv;
-
-	p.cmd = cmd;
-	rv = ec_command(EC_CMD_GET_CMD_VERSIONS, 0, &p, sizeof(p), &r,
-			sizeof(r));
-	if (rv < 0) {
-		if (rv == -EC_RES_INVALID_PARAM)
-			printf("Command 0x%02x not supported by EC.\n", cmd);
-
-		return rv;
-	}
-
-	*version_mask = r.version_mask;
-	return 0;
-}
-
-int cmd_cmdversions(int argc, char *argv[])
-{
-	struct ec_params_get_cmd_versions_v1 p;
-	struct ec_response_get_cmd_versions r;
-	char *e;
-	int cmd;
-	int rv;
-
-	if (argc < 2) {
-		fprintf(stderr, "Usage: %s <cmd>\n", argv[0]);
-		return -1;
-	}
-	cmd = strtol(argv[1], &e, 0);
-	if ((e && *e) || cmd < 0 || cmd > 0xffff) {
-		fprintf(stderr, "Bad command number.\n");
-		return -1;
-	}
-
-	if (cmd > 0xff) {
-		/* Ensure the EC support GET_CMD_VERSIONS v1. */
-		rv = get_cmdversions_v0(EC_CMD_GET_CMD_VERSIONS,
-					&r.version_mask);
-		if (rv < 0)
-			return rv;
-
-		if (!(r.version_mask & EC_VER_MASK(1))) {
-			printf("16 bits cmdversions not supported by EC.\n");
-			return -1;
-		}
-
-		/* Use GET_CMD_VERSIONS v1. */
-		p.cmd = cmd;
-		rv = ec_command(EC_CMD_GET_CMD_VERSIONS, 1, &p, sizeof(p), &r,
-				sizeof(r));
-		if (rv < 0) {
-			if (rv == -EC_RES_INVALID_PARAM)
-				printf("Command 0x%02x not supported by EC.\n",
-				       cmd);
-
-			return rv;
-		}
-	} else {
-		rv = get_cmdversions_v0(cmd, &r.version_mask);
-		if (rv < 0)
-			return rv;
-	}
-
-	printf("Command 0x%02x supports version mask 0x%08x\n", cmd,
-	       r.version_mask);
 	return 0;
 }
 
@@ -1232,58 +1005,6 @@ static int cmd_rgbkbd(int argc, char *argv[])
 	return (rv < 0 ? rv : 0);
 }
 
-int cmd_button(int argc, char *argv[])
-{
-	struct ec_params_button p;
-	char *e;
-	int argv_idx;
-	int button = KEYBOARD_BUTTON_COUNT;
-	int rv;
-
-	if (argc < 2) {
-		fprintf(stderr, "Invalid num param %d.\n", argc);
-		return -1;
-	}
-
-	p.press_ms = 50;
-	p.btn_mask = 0;
-
-	for (argv_idx = 1; argv_idx < argc; argv_idx++) {
-		if (!strcasecmp(argv[argv_idx], "vup"))
-			button = KEYBOARD_BUTTON_VOLUME_UP;
-		else if (!strcasecmp(argv[argv_idx], "vdown"))
-			button = KEYBOARD_BUTTON_VOLUME_DOWN;
-		else if (!strcasecmp(argv[argv_idx], "rec"))
-			button = KEYBOARD_BUTTON_RECOVERY;
-		else {
-			/* If last parameter check if it is an integer. */
-			if (argv_idx == argc - 1) {
-				p.press_ms = strtol(argv[argv_idx], &e, 0);
-				/* If integer, break out of the loop. */
-				if (!*e)
-					break;
-			}
-			button = KEYBOARD_BUTTON_COUNT;
-		}
-
-		if (button == KEYBOARD_BUTTON_COUNT) {
-			fprintf(stderr, "Invalid button input.\n");
-			return -1;
-		}
-
-		p.btn_mask |= (1 << button);
-	}
-	if (!p.btn_mask)
-		return 0;
-
-	rv = ec_command(EC_CMD_BUTTON, 0, &p, sizeof(p), NULL, 0);
-	if (rv < 0)
-		return rv;
-
-	printf("Button(s) %d set to %d ms\n", p.btn_mask, p.press_ms);
-	return 0;
-}
-
 int cmd_flash_info(int argc, char *argv[])
 {
 	struct ec_response_flash_info_1 r;
@@ -1311,49 +1032,6 @@ int cmd_flash_info(int argc, char *argv[])
 		/* Fields added in ver.1 available */
 		printf("WriteIdealSize %d\nFlags 0x%x\n", r.write_ideal_size,
 		       r.flags);
-	}
-
-	return 0;
-}
-
-int cmd_rand(int argc, char *argv[])
-{
-	int64_t num_bytes;
-	int64_t i;
-	char *e;
-	int rv = 0;
-
-	if (argc < 2) {
-		fprintf(stderr, "Usage: %s <num_bytes>\n", argv[0]);
-		return -1;
-	}
-
-	num_bytes = strtol(argv[1], &e, 0);
-	if ((e && *e) || (errno == ERANGE)) {
-		fprintf(stderr, "Invalid num_bytes argument\n");
-		return -1;
-	}
-
-	for (i = 0; i < num_bytes; i += ec_max_insize) {
-		uint16_t num_rand_bytes = ec_max_insize;
-		if (num_bytes - i < num_rand_bytes)
-			num_rand_bytes = num_bytes - i;
-
-		ec::RandNumCommand rand_num_command(num_rand_bytes);
-		if (!rand_num_command.Run(comm_get_fd())) {
-			int rv = -EECRESULT - rand_num_command.Result();
-			fprintf(stderr, "Rand Num returned with errors: %d\n",
-				rv);
-			return rv;
-		}
-
-		rv = write(STDOUT_FILENO,
-			   rand_num_command.GetRandNumData().data(),
-			   num_rand_bytes);
-		if (rv != num_rand_bytes) {
-			fprintf(stderr, "Failed to write stdout\n");
-			return -1;
-		}
 	}
 
 	return 0;
@@ -1474,15 +1152,11 @@ int cmd_flash_erase(int argc, char *argv[])
 	int offset, size;
 	char *e;
 	int rv;
-	bool async = false;
 
 	if (argc < 3) {
 		fprintf(stderr, "Usage: %s <offset> <size>\n", argv[0]);
 		return -1;
 	}
-
-	if (strcmp(argv[0], "flasheraseasync") == 0)
-		async = true;
 
 	offset = strtol(argv[1], &e, 0);
 	if ((e && *e) || offset < 0 || offset > MAX_FLASH_SIZE) {
@@ -1497,10 +1171,7 @@ int cmd_flash_erase(int argc, char *argv[])
 	}
 
 	printf("Erasing %d bytes at offset %d...\n", size, offset);
-	if (async)
-		rv = ec_flash_erase_async(offset, size);
-	else
-		rv = ec_flash_erase(offset, size);
+	rv = ec_flash_erase(offset, size);
 	if (rv < 0)
 		return rv;
 
@@ -1580,45 +1251,6 @@ int cmd_flash_protect(int argc, char *argv[])
 	}
 
 	return 0;
-}
-
-int cmd_rw_hash_pd(int argc, char *argv[])
-{
-	struct ec_params_usb_pd_rw_hash_entry *p =
-		(struct ec_params_usb_pd_rw_hash_entry *)ec_outbuf;
-	int i, rv;
-	char *e;
-	uint32_t val;
-	uint8_t *rwp;
-
-	if (argc < 7) {
-		fprintf(stderr, "Usage: %s <dev_id> <HASH[0]> ... <HASH[4]>\n",
-			argv[0]);
-		return -1;
-	}
-
-	p->dev_id = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad device ID\n");
-		return -1;
-	}
-
-	rwp = p->dev_rw_hash;
-	for (i = 2; i < 7; i++) {
-		val = strtol(argv[i], &e, 0);
-		if (e && *e) {
-			fprintf(stderr, "Bad RW hash\n");
-			return -1;
-		}
-		rwp[0] = (uint8_t)(val >> 0) & 0xff;
-		rwp[1] = (uint8_t)(val >> 8) & 0xff;
-		rwp[2] = (uint8_t)(val >> 16) & 0xff;
-		rwp[3] = (uint8_t)(val >> 24) & 0xff;
-		rwp += 4;
-	}
-	rv = ec_command(EC_CMD_USB_PD_RW_HASH_ENTRY, 0, p, sizeof(*p), NULL, 0);
-
-	return rv;
 }
 
 int cmd_rwsig_status(int argc, char *argv[])
@@ -1918,12 +1550,6 @@ int cmd_rollback_info(int argc, char *argv[])
 	return 0;
 }
 
-int cmd_apreset(int argc, char *argv[])
-{
-	sync();
-	return ec_command(EC_CMD_AP_RESET, 0, NULL, 0, NULL, 0);
-}
-
 #define FP_FRAME_INDEX_SIMPLE_IMAGE -1
 
 /*
@@ -2084,28 +1710,6 @@ int cmd_fp_mode(int argc, char *argv[])
 	return 0;
 }
 
-int cmd_fp_seed(int argc, char *argv[])
-{
-	struct ec_params_fp_seed p;
-	char *seed;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <seed>\n", argv[0]);
-		return 1;
-	}
-	seed = argv[1];
-	if (strlen(seed) != FP_CONTEXT_TPM_BYTES) {
-		printf("Invalid seed '%s' is %zd bytes long instead of %d.\n",
-		       seed, strlen(seed), FP_CONTEXT_TPM_BYTES);
-		return 1;
-	}
-	printf("Setting seed '%s'\n", seed);
-	p.struct_version = FP_TEMPLATE_FORMAT_VERSION;
-	memcpy(p.seed, seed, FP_CONTEXT_TPM_BYTES);
-
-	return ec_command(EC_CMD_FP_SEED, 0, &p, sizeof(p), NULL, 0);
-}
-
 int cmd_fp_stats(int argc, char *argv[])
 {
 	struct ec_response_fp_stats r;
@@ -2162,58 +1766,6 @@ int cmd_fp_info(int argc, char *argv[])
 	printf("%s", fp_info_command->ParseSensorInfo().c_str());
 
 	return 0;
-}
-
-static int cmd_fp_context(int argc, char *argv[])
-{
-	struct ec_params_fp_context_v1 p;
-	int rv;
-	int tries = 20; /* Wait at most two seconds */
-
-	if (argc < 2) {
-		fprintf(stderr, "Usage: %s <context>\n", argv[0]);
-		return -1;
-	}
-
-	/*
-	 * Note that we treat the resulting "userid" as raw byte array, so we
-	 * don't want to copy the NUL from the end of the string.
-	 */
-	if (strlen(argv[1]) != sizeof(p.userid)) {
-		fprintf(stderr, "Context must be exactly %zu bytes\n",
-			sizeof(p.userid));
-		return -1;
-	}
-
-	p.action = FP_CONTEXT_ASYNC;
-	memcpy(p.userid, argv[1], sizeof(p.userid));
-
-	rv = ec_command(EC_CMD_FP_CONTEXT, 1, &p, sizeof(p), NULL, 0);
-
-	if (rv != EC_RES_SUCCESS)
-		goto out;
-
-	while (tries--) {
-		usleep(100000);
-
-		p.action = FP_CONTEXT_GET_RESULT;
-		rv = ec_command(EC_CMD_FP_CONTEXT, 1, &p, sizeof(p), NULL, 0);
-
-		if (rv == EC_RES_SUCCESS) {
-			printf("Set context successfully\n");
-			return EC_RES_SUCCESS;
-		}
-
-		/* Abort if EC returns an error other than EC_RES_BUSY. */
-		if (rv <= -EECRESULT && rv != -EECRESULT - EC_RES_BUSY)
-			goto out;
-	}
-
-	rv = -EECRESULT - EC_RES_TIMEOUT;
-
-out:
-	fprintf(stderr, "Failed to reset context: %d\n", rv);
-	return rv;
 }
 
 int cmd_fp_enc_status(int argc, char *argv[])
@@ -2313,71 +1865,6 @@ int cmd_fp_frame(int argc, char *argv[])
 	}
 	fprintf(stdout, "%s", frame_to_pgm->c_str());
 	return 0;
-}
-
-int cmd_fp_template(int argc, char *argv[])
-{
-	struct SensorImage sensor_image{};
-	struct TemplateInfo template_info{};
-	struct ec_params_fp_template *p =
-		(struct ec_params_fp_template *)(ec_outbuf);
-	/* TODO(b/78544921): removing 32 bits is a workaround for the MCU bug */
-	int max_chunk = ec_max_outsize -
-			offsetof(struct ec_params_fp_template, data) - 4;
-	int idx = -1;
-	char *e;
-	int size;
-	char *buffer = NULL;
-	uint32_t offset = 0;
-	int rv = 0;
-
-	if (argc < 2) {
-		fprintf(stderr, "Usage: %s [<infile>|<index>]\n", argv[0]);
-		return -1;
-	}
-
-	idx = strtol(argv[1], &e, 0);
-	if (!(e && *e)) {
-		auto fp_frame =
-			fp_download_frame(sensor_image, template_info, idx + 1);
-		if (!fp_frame) {
-			fprintf(stderr, "Failed to get FP template %d\n", idx);
-			return -1;
-		}
-		assert(fp_frame->size() == template_info.size);
-		fwrite(fp_frame->data(), template_info.size, 1, stdout);
-		return 0;
-	}
-	/* not an index, is it a filename ? */
-	buffer = read_file(argv[1], &size);
-	if (!buffer) {
-		fprintf(stderr, "Invalid parameter: %s\n", argv[1]);
-		return -1;
-	}
-	printf("sending template from: %s (%d bytes)\n", argv[1], size);
-	while (size) {
-		uint32_t tlen = MIN(max_chunk, size);
-
-		p->offset = offset;
-		p->size = tlen;
-		size -= tlen;
-		if (!size)
-			p->size |= FP_TEMPLATE_COMMIT;
-		memcpy(p->data, buffer + offset, tlen);
-		rv = ec_command(EC_CMD_FP_TEMPLATE, 0, p,
-				tlen + offsetof(struct ec_params_fp_template,
-						data),
-				NULL, 0);
-		if (rv < 0)
-			break;
-		offset += tlen;
-	}
-	if (rv < 0)
-		fprintf(stderr, "Failed with %d\n", rv);
-	else
-		rv = 0;
-	free(buffer);
-	return rv;
 }
 
 /**
@@ -2724,124 +2211,6 @@ int cmd_pd_get_amode(int argc, char *argv[])
 		p->svid_idx++;
 	} while (p->svid_idx < SVID_DISCOVERY_MAX);
 	return -1;
-}
-
-/* The I/O asm funcs exist only on x86. */
-#if defined(__i386__) || defined(__x86_64__)
-#include <sys/io.h>
-
-int cmd_serial_test(int argc, char *argv[])
-{
-	const char *c = "COM2 sample serial output from host!\r\n";
-
-	printf("Writing sample serial output to COM2\n");
-
-	while (*c) {
-		/* Wait for space in transmit FIFO */
-		while (!(inb(0x2fd) & 0x20))
-			;
-
-		/* Put the next character */
-		outb(*c++, 0x2f8);
-	}
-
-	printf("done.\n");
-	return 0;
-}
-
-int cmd_port_80_flood(int argc, char *argv[])
-{
-	int i;
-
-	for (i = 0; i < 256; i++)
-		outb(i, 0x80);
-	return 0;
-}
-#else
-int cmd_serial_test(int argc, char *argv[])
-{
-	printf("x86 specific command\n");
-	return -1;
-}
-
-int cmd_port_80_flood(int argc, char *argv[])
-{
-	printf("x86 specific command\n");
-	return -1;
-}
-#endif
-
-static void cmd_smart_discharge_usage(const char *command)
-{
-	printf("Usage: %s [hours_to_zero [hibern] [cutoff]]\n", command);
-	printf("\n");
-	printf("Set/Get smart discharge parameters\n");
-	printf("hours_to_zero: Desired hours for state of charge to zero\n");
-	printf("hibern: Discharge rate in hibernation (uA)\n");
-	printf("cutoff: Discharge rate in battery cutoff (uA)\n");
-}
-
-int cmd_smart_discharge(int argc, char *argv[])
-{
-	struct ec_params_smart_discharge *p =
-		(struct ec_params_smart_discharge *)(ec_outbuf);
-	struct ec_response_smart_discharge *r =
-		(struct ec_response_smart_discharge *)(ec_inbuf);
-	uint32_t cap;
-	char *e;
-	int rv;
-
-	if (argc > 1) {
-		if (strcmp(argv[1], "help") == 0) {
-			cmd_smart_discharge_usage(argv[0]);
-			return 0;
-		}
-		p->flags = EC_SMART_DISCHARGE_FLAGS_SET;
-		p->hours_to_zero = strtol(argv[1], &e, 0);
-		if (p->hours_to_zero < 0 || (e && *e)) {
-			perror("Bad value for [hours_to_zero]");
-			return -1;
-		}
-		if (argc == 4) {
-			p->drate.hibern = strtol(argv[2], &e, 0);
-			if (p->drate.hibern < 0 || (e && *e)) {
-				perror("Bad value for [hibern]");
-				return -1;
-			}
-			p->drate.cutoff = strtol(argv[3], &e, 0);
-			if (p->drate.cutoff < 0 || (e && *e)) {
-				perror("Bad value for [cutoff]");
-				return -1;
-			}
-		} else if (argc != 2) {
-			/* If argc != 4, it has to be 2. */
-			perror("Invalid number of parameters");
-			return -1;
-		}
-	}
-
-	rv = ec_command(EC_CMD_SMART_DISCHARGE, 0, p, sizeof(*p), r,
-			sizeof(*r));
-	if (rv < 0) {
-		perror("ERROR: EC_CMD_SMART_DISCHARGE failed");
-		return rv;
-	}
-
-	cap = read_mapped_mem32(EC_MEMMAP_BATT_LFCC);
-	if (!is_battery_range(cap)) {
-		perror("WARN: Failed to read battery capacity");
-		cap = 0;
-	}
-
-	printf("%-27s %5d h\n", "Hours to zero capacity:", r->hours_to_zero);
-	printf("%-27s %5d mAh (%d %%)\n", "Stay-up threshold:", r->dzone.stayup,
-	       cap > 0 ? r->dzone.stayup * 100 / cap : -1);
-	printf("%-27s %5d mAh (%d %%)\n", "Cutoff threshold:", r->dzone.cutoff,
-	       cap > 0 ? r->dzone.cutoff * 100 / cap : -1);
-	printf("%-27s %5d uA\n", "Hibernate discharge rate:", r->drate.hibern);
-	printf("%-27s %5d uA\n", "Cutoff discharge rate:", r->drate.cutoff);
-
-	return 0;
 }
 
 /*
@@ -3624,41 +2993,6 @@ int cmd_pwm_set_keyboard_backlight(int argc, char *argv[])
 		return rv;
 
 	printf("Keyboard backlight set.\n");
-	return 0;
-}
-
-int cmd_pwm_get_duty(int argc, char *argv[])
-{
-	struct ec_params_pwm_get_duty p;
-	struct ec_response_pwm_get_duty r;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <pwm_idx> | kb | disp\n", argv[0]);
-		return -1;
-	}
-
-	if (!strcmp(argv[1], "kb")) {
-		p.pwm_type = EC_PWM_TYPE_KB_LIGHT;
-		p.index = 0;
-	} else if (!strcmp(argv[1], "disp")) {
-		p.pwm_type = EC_PWM_TYPE_DISPLAY_LIGHT;
-		p.index = 0;
-	} else {
-		p.pwm_type = EC_PWM_TYPE_GENERIC;
-		p.index = strtol(argv[1], &e, 0);
-		if (e && *e) {
-			fprintf(stderr, "Bad pwm_idx\n");
-			return -1;
-		}
-	}
-
-	rv = ec_command(EC_CMD_PWM_GET_DUTY, 0, &p, sizeof(p), &r, sizeof(r));
-	if (rv < 0)
-		return rv;
-
-	printf("Current PWM duty: %d\n", r.duty);
 	return 0;
 }
 
@@ -6049,31 +5383,6 @@ usage:
 	return -1;
 }
 
-int cmd_next_event(int argc, char *argv[])
-{
-	uint8_t *rdata = (uint8_t *)ec_inbuf;
-	int rv;
-	int i;
-
-	rv = ec_command(EC_CMD_GET_NEXT_EVENT, 0, NULL, 0, rdata,
-			ec_max_insize);
-	if (rv < 0)
-		return rv;
-
-	printf("Next event is 0x%02x\n", rdata[0]);
-	if (rv > 1) {
-		printf("Event data:\n");
-		for (i = 1; i < rv; ++i) {
-			printf("%02x ", rdata[i]);
-			if (!(i & 0xf))
-				printf("\n");
-		}
-		printf("\n");
-	}
-
-	return 0;
-}
-
 static int find_led_color_by_name(const char *color)
 {
 	int i;
@@ -6215,32 +5524,6 @@ int cmd_usb_charge_set_mode(int argc, char *argv[])
 		return rv;
 
 	printf("USB charging mode set.\n");
-	return 0;
-}
-
-int cmd_usb_mux(int argc, char *argv[])
-{
-	struct ec_params_usb_mux p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <mux>\n", argv[0]);
-		return -1;
-	}
-
-	p.mux = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad mux value.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_USB_MUX, 0, &p, sizeof(p), NULL, 0);
-	if (rv < 0)
-		return rv;
-
-	printf("Set USB mux to 0x%x.\n", p.mux);
-
 	return 0;
 }
 
@@ -6691,149 +5974,6 @@ int cmd_usb_pd_mux_info(int argc, char *argv[])
 			printf("\n");
 		}
 	}
-
-	return 0;
-}
-
-static void print_usb_pd_port_caps(int port_num,
-				   const struct ec_response_get_pd_port_caps *r)
-{
-	printf("Port %02d: ", port_num);
-
-	printf("power_role_cap=");
-	switch (r->pd_power_role_cap) {
-	case EC_PD_POWER_ROLE_SOURCE:
-		printf("source-only ");
-		break;
-	case EC_PD_POWER_ROLE_SINK:
-		printf("sink-only ");
-		break;
-	case EC_PD_POWER_ROLE_DUAL:
-		printf("dual-role ");
-		break;
-	default:
-		printf("unknown(%u) ", r->pd_power_role_cap);
-		break;
-	}
-
-	printf("try_power_role_cap=");
-	switch (r->pd_try_power_role_cap) {
-	case EC_PD_TRY_POWER_ROLE_NONE:
-		printf("none ");
-		break;
-	case EC_PD_TRY_POWER_ROLE_SINK:
-		printf("trysink ");
-		break;
-	case EC_PD_TRY_POWER_ROLE_SOURCE:
-		printf("trysrc ");
-		break;
-	default:
-		printf("unknown(%u) ", r->pd_try_power_role_cap);
-		break;
-	}
-
-	printf("data_role_cap=");
-	switch (r->pd_data_role_cap) {
-	case EC_PD_DATA_ROLE_DFP:
-		printf("dfp-only ");
-		break;
-	case EC_PD_DATA_ROLE_UFP:
-		printf("ufp-only ");
-		break;
-	case EC_PD_DATA_ROLE_DUAL:
-		printf("dual-role ");
-		break;
-	default:
-		printf("unknown(%u) ", r->pd_data_role_cap);
-		break;
-	}
-
-	printf("port_location=");
-	switch (r->pd_port_location) {
-	case EC_PD_PORT_LOCATION_UNKNOWN:
-		printf("unknown ");
-		break;
-	case EC_PD_PORT_LOCATION_LEFT:
-		printf("left ");
-		break;
-	case EC_PD_PORT_LOCATION_RIGHT:
-		printf("right ");
-		break;
-	case EC_PD_PORT_LOCATION_BACK:
-		printf("back ");
-		break;
-	case EC_PD_PORT_LOCATION_FRONT:
-		printf("front ");
-		break;
-	case EC_PD_PORT_LOCATION_LEFT_FRONT:
-		printf("left-front ");
-		break;
-	case EC_PD_PORT_LOCATION_LEFT_BACK:
-		printf("left-back ");
-		break;
-	case EC_PD_PORT_LOCATION_RIGHT_FRONT:
-		printf("right-front ");
-		break;
-	case EC_PD_PORT_LOCATION_RIGHT_BACK:
-		printf("right-back ");
-		break;
-	case EC_PD_PORT_LOCATION_BACK_LEFT:
-		printf("back-left ");
-		break;
-	case EC_PD_PORT_LOCATION_BACK_RIGHT:
-		printf("back-right ");
-		break;
-	default:
-		printf("other(%u) ", r->pd_port_location);
-		break;
-	}
-
-	printf("\n");
-}
-
-int cmd_usb_pd_port_caps(int argc, char *argv[])
-{
-	struct ec_params_get_pd_port_caps p;
-	struct ec_response_get_pd_port_caps *r =
-		(struct ec_response_get_pd_port_caps *)ec_inbuf;
-	int num_ports, rv;
-	char *e;
-
-	if (argc < 2) {
-		/* Print all ports' capabilities */
-		rv = get_num_pd_ports(&num_ports);
-		if (rv < 0)
-			return rv;
-
-		for (int i = 0; i < num_ports; i++) {
-			p.port = i;
-
-			rv = ec_command(EC_CMD_GET_PD_PORT_CAPS, 0, &p,
-					sizeof(p), ec_inbuf, ec_max_insize);
-			if (rv < 0) {
-				return rv;
-			}
-
-			print_usb_pd_port_caps(i, r);
-		}
-
-		return 0;
-	}
-
-	/* Print a specific port's capabilities */
-	p.port = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad port number\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_GET_PD_PORT_CAPS, 0, &p, sizeof(p), ec_inbuf,
-			ec_max_insize);
-	if (rv < 0) {
-		return rv;
-	}
-
-	print_usb_pd_port_caps(p.port, r);
 
 	return 0;
 }
@@ -7299,333 +6439,6 @@ int cmd_pse(int argc, char *argv[])
 	return 0;
 }
 
-int cmd_pstore_info(int argc, char *argv[])
-{
-	struct ec_response_pstore_info r;
-	int rv;
-
-	rv = ec_command(EC_CMD_PSTORE_INFO, 0, NULL, 0, &r, sizeof(r));
-	if (rv < 0)
-		return rv;
-
-	printf("PstoreSize %d\nAccessSize %d\n", r.pstore_size, r.access_size);
-	return 0;
-}
-
-int cmd_pstore_read(int argc, char *argv[])
-{
-	struct ec_params_pstore_read p;
-	uint8_t rdata[EC_PSTORE_SIZE_MAX];
-	int offset, size;
-	int rv;
-	int i;
-	char *e;
-	char *buf;
-
-	if (argc < 4) {
-		fprintf(stderr, "Usage: %s <offset> <size> <filename>\n",
-			argv[0]);
-		return -1;
-	}
-	offset = strtol(argv[1], &e, 0);
-	if ((e && *e) || offset < 0 || offset > 0x10000) {
-		fprintf(stderr, "Bad offset.\n");
-		return -1;
-	}
-	size = strtol(argv[2], &e, 0);
-	if ((e && *e) || size <= 0 || size > 0x10000) {
-		fprintf(stderr, "Bad size.\n");
-		return -1;
-	}
-	printf("Reading %d bytes at offset %d...\n", size, offset);
-
-	buf = (char *)malloc(size);
-	if (!buf) {
-		fprintf(stderr, "Unable to allocate buffer.\n");
-		return -1;
-	}
-
-	/* Read data in chunks */
-	for (i = 0; i < size; i += EC_PSTORE_SIZE_MAX) {
-		p.offset = offset + i;
-		p.size = MIN(size - i, EC_PSTORE_SIZE_MAX);
-		rv = ec_command(EC_CMD_PSTORE_READ, 0, &p, sizeof(p), rdata,
-				sizeof(rdata));
-		if (rv < 0) {
-			fprintf(stderr, "Read error at offset %d\n", i);
-			free(buf);
-			return rv;
-		}
-		memcpy(buf + i, rdata, p.size);
-	}
-
-	rv = write_file(argv[3], buf, size);
-	free(buf);
-	if (rv)
-		return rv;
-
-	printf("done.\n");
-	return 0;
-}
-
-int cmd_pstore_write(int argc, char *argv[])
-{
-	struct ec_params_pstore_write p;
-	int offset, size;
-	int rv;
-	int i;
-	char *e;
-	char *buf;
-
-	if (argc < 3) {
-		fprintf(stderr, "Usage: %s <offset> <filename>\n", argv[0]);
-		return -1;
-	}
-	offset = strtol(argv[1], &e, 0);
-	if ((e && *e) || offset < 0 || offset > 0x10000) {
-		fprintf(stderr, "Bad offset.\n");
-		return -1;
-	}
-
-	/* Read the input file */
-	buf = read_file(argv[2], &size);
-	if (!buf)
-		return -1;
-
-	printf("Writing to offset %d...\n", offset);
-
-	/* Write data in chunks */
-	for (i = 0; i < size; i += EC_PSTORE_SIZE_MAX) {
-		p.offset = offset + i;
-		p.size = MIN(size - i, EC_PSTORE_SIZE_MAX);
-		memcpy(p.data, buf + i, p.size);
-		rv = ec_command(EC_CMD_PSTORE_WRITE, 0, &p, sizeof(p), NULL, 0);
-		if (rv < 0) {
-			fprintf(stderr, "Write error at offset %d\n", i);
-			free(buf);
-			return rv;
-		}
-	}
-
-	free(buf);
-	printf("done.\n");
-	return 0;
-}
-
-int cmd_host_event_get_raw(int argc, char *argv[])
-{
-	uint32_t events = read_mapped_mem32(EC_MEMMAP_HOST_EVENTS);
-
-	if (events & EC_HOST_EVENT_MASK(EC_HOST_EVENT_INVALID)) {
-		printf("Current host events: invalid\n");
-		return -1;
-	}
-
-	printf("Current host events: 0x%08x\n", events);
-	return 0;
-}
-
-int cmd_host_event_get_b(int argc, char *argv[])
-{
-	struct ec_response_host_event_mask r;
-	int rv;
-
-	rv = ec_command(EC_CMD_HOST_EVENT_GET_B, 0, NULL, 0, &r, sizeof(r));
-	if (rv < 0)
-		return rv;
-	if (rv < sizeof(r)) {
-		fprintf(stderr, "Insufficient data received.\n");
-		return -1;
-	}
-
-	if (r.mask & EC_HOST_EVENT_MASK(EC_HOST_EVENT_INVALID)) {
-		printf("Current host events-B: invalid\n");
-		return -1;
-	}
-
-	printf("Current host events-B: 0x%08x\n", r.mask);
-	return 0;
-}
-
-int cmd_host_event_get_smi_mask(int argc, char *argv[])
-{
-	struct ec_response_host_event_mask r;
-	int rv;
-
-	rv = ec_command(EC_CMD_HOST_EVENT_GET_SMI_MASK, 0, NULL, 0, &r,
-			sizeof(r));
-	if (rv < 0)
-		return rv;
-
-	printf("Current host event SMI mask: 0x%08x\n", r.mask);
-	return 0;
-}
-
-int cmd_host_event_get_sci_mask(int argc, char *argv[])
-{
-	struct ec_response_host_event_mask r;
-	int rv;
-
-	rv = ec_command(EC_CMD_HOST_EVENT_GET_SCI_MASK, 0, NULL, 0, &r,
-			sizeof(r));
-	if (rv < 0)
-		return rv;
-
-	printf("Current host event SCI mask: 0x%08x\n", r.mask);
-	return 0;
-}
-
-int cmd_host_event_get_wake_mask(int argc, char *argv[])
-{
-	struct ec_response_host_event_mask r;
-	int rv;
-
-	rv = ec_command(EC_CMD_HOST_EVENT_GET_WAKE_MASK, 0, NULL, 0, &r,
-			sizeof(r));
-	if (rv < 0)
-		return rv;
-
-	printf("Current host event wake mask: 0x%08x\n", r.mask);
-	return 0;
-}
-
-int cmd_host_event_set_smi_mask(int argc, char *argv[])
-{
-	struct ec_params_host_event_mask p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <mask>\n", argv[0]);
-		return -1;
-	}
-	p.mask = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad mask.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_HOST_EVENT_SET_SMI_MASK, 0, &p, sizeof(p), NULL,
-			0);
-	if (rv < 0)
-		return rv;
-
-	printf("Mask set.\n");
-	return 0;
-}
-
-int cmd_host_event_set_sci_mask(int argc, char *argv[])
-{
-	struct ec_params_host_event_mask p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <mask>\n", argv[0]);
-		return -1;
-	}
-	p.mask = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad mask.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_HOST_EVENT_SET_SCI_MASK, 0, &p, sizeof(p), NULL,
-			0);
-	if (rv < 0)
-		return rv;
-
-	printf("Mask set.\n");
-	return 0;
-}
-
-int cmd_host_event_set_wake_mask(int argc, char *argv[])
-{
-	struct ec_params_host_event_mask p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <mask>\n", argv[0]);
-		return -1;
-	}
-	p.mask = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad mask.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_HOST_EVENT_SET_WAKE_MASK, 0, &p, sizeof(p), NULL,
-			0);
-	if (rv < 0)
-		return rv;
-
-	printf("Mask set.\n");
-	return 0;
-}
-
-int cmd_host_event_clear(int argc, char *argv[])
-{
-	struct ec_params_host_event_mask p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <mask>\n", argv[0]);
-		return -1;
-	}
-	p.mask = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad mask.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_HOST_EVENT_CLEAR, 0, &p, sizeof(p), NULL, 0);
-	if (rv < 0)
-		return rv;
-
-	printf("Host events cleared.\n");
-	return 0;
-}
-
-int cmd_host_event_clear_b(int argc, char *argv[])
-{
-	struct ec_params_host_event_mask p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <mask>\n", argv[0]);
-		return -1;
-	}
-	p.mask = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad mask.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_HOST_EVENT_CLEAR_B, 0, &p, sizeof(p), NULL, 0);
-	if (rv < 0)
-		return rv;
-
-	printf("Host events-B cleared.\n");
-	return 0;
-}
-
-int cmd_switches(int argc, char *argv[])
-{
-	uint8_t s = read_mapped_mem8(EC_MEMMAP_SWITCHES);
-	printf("Current switches:   0x%02x\n", s);
-	printf("Lid switch:         %s\n",
-	       (s & EC_SWITCH_LID_OPEN ? "OPEN" : "CLOSED"));
-	printf("Power button:       %s\n",
-	       (s & EC_SWITCH_POWER_BUTTON_PRESSED ? "DOWN" : "UP"));
-	printf("Dedicated recovery: %sABLED\n",
-	       (s & EC_SWITCH_DEDICATED_RECOVERY ? "EN" : "DIS"));
-
-	return 0;
-}
-
 int cmd_tabletmode(int argc, char *argv[])
 {
 	struct ec_params_set_tablet_mode p;
@@ -7656,82 +6469,6 @@ int cmd_tabletmode(int argc, char *argv[])
 		printf("SUCCESS. The tablet mode has been set.\n");
 	}
 	return rv;
-}
-
-int cmd_wireless(int argc, char *argv[])
-{
-	char *e;
-	int rv;
-	int now_flags;
-
-	if (argc < 2) {
-		fprintf(stderr,
-			"Usage: %s <flags> [<mask> [<susflags> <susmask>]]\n",
-			argv[0]);
-		fprintf(stderr, "  0x1 = WLAN radio\n"
-				"  0x2 = Bluetooth radio\n"
-				"  0x4 = WWAN power\n"
-				"  0x8 = WLAN power\n");
-		return -1;
-	}
-
-	now_flags = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad flags.\n");
-		return -1;
-	}
-
-	if (argc < 3) {
-		/* Old-style - current flags only */
-		struct ec_params_switch_enable_wireless_v0 p;
-
-		p.enabled = now_flags;
-		rv = ec_command(EC_CMD_SWITCH_ENABLE_WIRELESS, 0, &p, sizeof(p),
-				NULL, 0);
-		if (rv < 0)
-			return rv;
-
-		printf("Success.\n");
-	} else {
-		/* New-style - masks and suspend flags */
-		struct ec_params_switch_enable_wireless_v1 p;
-		struct ec_response_switch_enable_wireless_v1 r;
-
-		memset(&p, 0, sizeof(p));
-
-		p.now_flags = now_flags;
-
-		p.now_mask = strtol(argv[2], &e, 0);
-		if (e && *e) {
-			fprintf(stderr, "Bad mask.\n");
-			return -1;
-		}
-
-		if (argc > 4) {
-			p.suspend_flags = strtol(argv[3], &e, 0);
-			if (e && *e) {
-				fprintf(stderr, "Bad suspend flags.\n");
-				return -1;
-			}
-
-			p.suspend_mask = strtol(argv[4], &e, 0);
-			if (e && *e) {
-				fprintf(stderr, "Bad suspend mask.\n");
-				return -1;
-			}
-		}
-
-		rv = ec_command(EC_CMD_SWITCH_ENABLE_WIRELESS,
-				EC_VER_SWITCH_ENABLE_WIRELESS, &p, sizeof(p),
-				&r, sizeof(r));
-		if (rv < 0)
-			return rv;
-
-		printf("Now=0x%x, suspend=0x%x\n", r.now_flags,
-		       r.suspend_flags);
-	}
-
-	return 0;
 }
 
 static void cmd_locate_chip_help(const char *const cmd)
@@ -7810,55 +6547,6 @@ int cmd_locate_chip(int argc, char *argv[])
 	return 0;
 }
 
-int cmd_lcd_backlight(int argc, char *argv[])
-{
-	struct ec_params_switch_enable_backlight p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <0|1>\n", argv[0]);
-		return -1;
-	}
-	p.enabled = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad value.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_SWITCH_ENABLE_BKLIGHT, 0, &p, sizeof(p), NULL,
-			0);
-	if (rv < 0)
-		return rv;
-
-	printf("Success.\n");
-	return 0;
-}
-
-int cmd_poe(int argc, char *argv[])
-{
-	struct ec_params_switch_enable_poe p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <0|1>\n", argv[0]);
-		return -1;
-	}
-	p.enabled = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad value.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_SWITCH_ENABLE_POE, 0, &p, sizeof(p), NULL, 0);
-	if (rv < 0)
-		return rv;
-
-	printf("Success.\n");
-	return 0;
-}
-
 static void cmd_basestate_help(void)
 {
 	fprintf(stderr, "Usage: ectool basestate [attach | detach | reset]\n");
@@ -7885,35 +6573,6 @@ int cmd_basestate(int argc, char *argv[])
 	}
 
 	return ec_command(EC_CMD_SET_BASE_STATE, 0, &p, sizeof(p), NULL, 0);
-}
-
-int cmd_ext_power_limit(int argc, char *argv[])
-{
-	/* Version 1 is used, no support for obsolete version 0 */
-	struct ec_params_external_power_limit_v1 p;
-	char *e;
-
-	if (argc != 3) {
-		fprintf(stderr, "Usage: %s <max_current_mA> <max_voltage_mV>\n",
-			argv[0]);
-		return -1;
-	}
-
-	p.current_lim = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad param1.\n");
-		return -1;
-	}
-
-	p.voltage_lim = strtol(argv[2], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad param2.\n");
-		return -1;
-	}
-
-	/* Send version 1 of command */
-	return ec_command(EC_CMD_EXTERNAL_POWER_LIMIT, 1, &p, sizeof(p), NULL,
-			  0);
 }
 
 static void cmd_charge_current_limit_help(const char *cmd)
@@ -8122,52 +6781,6 @@ int cmd_charge_control(int argc, char *argv[])
 		break;
 	}
 	return 0;
-}
-
-static void print_bool(const char *name, bool value)
-{
-	printf("%s = %s\n", name, value ? "true" : "false");
-}
-
-static int cmd_chargesplash(int argc, char **argv)
-{
-	static struct {
-		const char *name;
-		enum ec_chargesplash_cmd cmd;
-	} actions[] = {
-		{ "state", EC_CHARGESPLASH_GET_STATE },
-		{ "request", EC_CHARGESPLASH_REQUEST },
-		{ "lockout", EC_CHARGESPLASH_LOCKOUT },
-		{ "reset", EC_CHARGESPLASH_RESET },
-	};
-	struct ec_params_chargesplash params;
-	struct ec_response_chargesplash resp;
-
-	if (argc != 2) {
-		goto usage;
-	}
-
-	for (int i = 0; i < ARRAY_SIZE(actions); i++) {
-		if (!strcasecmp(actions[i].name, argv[1])) {
-			params.cmd = actions[i].cmd;
-			if (ec_command(EC_CMD_CHARGESPLASH, 0, &params,
-				       sizeof(params), &resp,
-				       sizeof(resp)) < 0) {
-				fprintf(stderr, "Host command failed\n");
-				return -1;
-			}
-
-			print_bool("requested", resp.requested);
-			print_bool("display_initialized",
-				   resp.display_initialized);
-			print_bool("locked_out", resp.locked_out);
-			return 0;
-		}
-	}
-
-usage:
-	fprintf(stderr, "Usage: %s <state|request|lockout|reset>", argv[0]);
-	return -1;
 }
 
 #define ST_CMD_SIZE ST_FLD_SIZE(ec_params_charge_state, cmd)
@@ -9442,26 +8055,6 @@ int cmd_board_version(int argc, char *argv[])
 	return rv;
 }
 
-int cmd_boottime(int argc, char *argv[])
-{
-	struct ec_response_get_boot_time response;
-	int rv;
-
-	rv = ec_command(EC_CMD_GET_BOOT_TIME, 0, NULL, 0, &response,
-			sizeof(response));
-	if (rv < 0)
-		return rv;
-
-	printf("arail: %" PRIu64 "\n", response.timestamp[ARAIL]);
-	printf("rsmrst: %" PRIu64 "\n", response.timestamp[RSMRST]);
-	printf("espirst: %" PRIu64 "\n", response.timestamp[ESPIRST]);
-	printf("pltrst_low: %" PRIu64 "\n", response.timestamp[PLTRST_LOW]);
-	printf("pltrst_high: %" PRIu64 "\n", response.timestamp[PLTRST_HIGH]);
-	printf("cnt: %" PRIu16 "\n", response.cnt);
-	printf("ec_cur_time: %" PRIu64 "\n", response.timestamp[EC_CUR_TIME]);
-	return rv;
-}
-
 #define CBI_FIELD_NAME_ENTRY(tag) [CBI_TAG_##tag] = STRINGIFY(tag)
 
 static const char *const cbi_field_name[] = {
@@ -10072,86 +8665,6 @@ int cmd_ec_hash(int argc, char *argv[])
 	return ec_hash_print(&r);
 }
 
-int cmd_rtc_get(int argc, char *argv[])
-{
-	struct ec_response_rtc r;
-	int rv;
-
-	rv = ec_command(EC_CMD_RTC_GET_VALUE, 0, NULL, 0, &r, sizeof(r));
-	if (rv < 0)
-		return rv;
-
-	printf("Current time: 0x%08x (%d)\n", r.time, r.time);
-	return 0;
-}
-
-int cmd_rtc_set(int argc, char *argv[])
-{
-	struct ec_params_rtc p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <time>\n", argv[0]);
-		return -1;
-	}
-	p.time = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad time.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_RTC_SET_VALUE, 0, &p, sizeof(p), NULL, 0);
-	if (rv < 0)
-		return rv;
-
-	printf("Time set.\n");
-	return 0;
-}
-
-int cmd_rtc_set_alarm(int argc, char *argv[])
-{
-	struct ec_params_rtc p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <sec>\n", argv[0]);
-		return -1;
-	}
-	p.time = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad time.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_RTC_SET_ALARM, 0, &p, sizeof(p), NULL, 0);
-	if (rv < 0)
-		return rv;
-
-	if (p.time == 0)
-		printf("Disabling alarm.\n");
-	else
-		printf("Alarm set to go off in %d secs.\n", p.time);
-	return 0;
-}
-
-int cmd_rtc_get_alarm(int argc, char *argv[])
-{
-	struct ec_response_rtc r;
-	int rv;
-
-	rv = ec_command(EC_CMD_RTC_GET_ALARM, 0, NULL, 0, &r, sizeof(r));
-	if (rv < 0)
-		return rv;
-
-	if (r.time == 0)
-		printf("Alarm not set\n");
-	else
-		printf("Alarm to go off in %d secs\n", r.time);
-	return 0;
-}
-
 int cmd_console(int argc, char *argv[])
 {
 	char *out = (char *)ec_inbuf;
@@ -10203,33 +8716,6 @@ static int cmd_console_print(int argc, char *argv[])
 	return ec_command(EC_CMD_CONSOLE_PRINT, 0, msg, msg_len + 1, NULL, 0);
 }
 
-int cmd_set_alarm_slp_s0_dbg(int argc, char *argv[])
-{
-	struct ec_params_set_alarm_slp_s0_dbg p;
-	char *e;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <sec>\n", argv[0]);
-		return -1;
-	}
-	p.time = strtol(argv[1], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad time.\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_SET_ALARM_SLP_S0_DBG, 0, &p, sizeof(p), NULL, 0);
-	if (rv < 0)
-		return rv;
-
-	if (p.time == 0)
-		printf("Disabling alarm for SLP S0 Debug.\n");
-	else
-		printf("Wake host in %d secs for SLP_S0 Debug.\n", p.time);
-	return 0;
-}
-
 int cmd_sleep_signal_transitions(int argc, char *argv[])
 {
 	struct ec_response_host_sleep_signal_transitions resp;
@@ -10241,432 +8727,6 @@ int cmd_sleep_signal_transitions(int argc, char *argv[])
 	printf("0x%x\n", resp.sleep_signal_transitions);
 
 	return 0;
-}
-
-struct param_info {
-	const char *name; /* name of this parameter */
-	const char *help; /* help message */
-	int size; /* size in bytes */
-	int offset; /* offset within structure */
-};
-
-#define FIELD(fname, field, help_str)                                       \
-	{                                                                   \
-		.name = fname,                                              \
-		.help = help_str,                                           \
-		.size = sizeof(((struct ec_mkbp_config *)NULL)->field),     \
-		.offset = __builtin_offsetof(struct ec_mkbp_config, field), \
-	}
-
-static const struct param_info keyconfig_params[] = {
-	FIELD("scan_period", scan_period_us, "period between scans"),
-	FIELD("poll_timeout", poll_timeout_us,
-	      "revert to irq mode after no activity for this long"),
-	FIELD("min_post_scan_delay", min_post_scan_delay_us,
-	      "minimum post-scan delay before starting a new scan"),
-	FIELD("output_settle", output_settle_us,
-	      "delay to wait for output to settle"),
-	FIELD("debounce_down", debounce_down_us,
-	      "time for debounce on key down"),
-	FIELD("debounce_up", debounce_up_us, "time for debounce on key up"),
-	FIELD("fifo_max_depth", fifo_max_depth,
-	      "maximum depth to allow for fifo (0 = disable)"),
-	FIELD("flags", flags, "0 to disable scanning, 1 to enable"),
-};
-
-static const struct param_info *find_field(const struct param_info *params,
-					   int count, const char *name,
-					   unsigned int *nump)
-{
-	const struct param_info *param;
-	int i;
-
-	for (i = 0, param = params; i < count; i++, param++) {
-		if (0 == strcmp(param->name, name)) {
-			if (nump)
-				*nump = i;
-			return param;
-		}
-	}
-
-	fprintf(stderr, "Unknown parameter '%s'\n", name);
-	return NULL;
-}
-
-static int get_value(const struct param_info *param, const char *config)
-{
-	const char *field;
-
-	field = config + param->offset;
-	switch (param->size) {
-	case 1:
-		return *(uint8_t *)field;
-	case 2:
-		return *(uint16_t *)field;
-	case 4:
-		return *(uint32_t *)field;
-	default:
-		fprintf(stderr, "Internal error: unknown size %d\n",
-			param->size);
-	}
-
-	return -1;
-}
-
-static int show_fields(struct ec_mkbp_config *config, int argc, char *argv[])
-{
-	const struct param_info *param;
-	uint32_t mask;
-	int i;
-
-	if (!argc) {
-		mask = -1U; /* show all fields */
-	} else {
-		mask = 0;
-		while (argc > 0) {
-			unsigned int num;
-
-			param = find_field(keyconfig_params,
-					   ARRAY_SIZE(keyconfig_params),
-					   argv[0], &num);
-			if (!param)
-				return -1;
-			mask |= 1 << num;
-			argc--;
-			argv++;
-		}
-	}
-
-	param = keyconfig_params;
-	for (i = 0; i < ARRAY_SIZE(keyconfig_params); i++, param++) {
-		if (mask & BIT(i)) {
-			fprintf(stderr, "%-12s   %u\n", param->name,
-				get_value(param, (char *)config));
-		}
-	}
-
-	return 0;
-}
-
-static int cmd_kbinfo(int argc, char *argv[])
-{
-	struct ec_params_mkbp_info info = {
-		.info_type = EC_MKBP_INFO_KBD,
-	};
-	struct ec_response_mkbp_info resp;
-	int rv;
-
-	if (argc > 1) {
-		fprintf(stderr, "Too many args\n");
-		return -1;
-	}
-	rv = ec_command(EC_CMD_MKBP_INFO, 0, &info, sizeof(info), &resp,
-			sizeof(resp));
-	if (rv < 0)
-		return rv;
-
-	printf("Matrix rows: %d\n", resp.rows);
-	printf("Matrix columns: %d\n", resp.cols);
-
-	return 0;
-}
-
-static int cmd_keyconfig(int argc, char *argv[])
-{
-	struct ec_params_mkbp_set_config req;
-	int cmd;
-	int rv;
-
-	if (argc < 2) {
-		const struct param_info *param;
-		int i;
-
-		fprintf(stderr,
-			"Usage: %s get [<param>] - print params\n"
-			"\t%s set [<param>> <value>]\n"
-			"   Available params are: (all time values are in us)",
-			argv[0], argv[0]);
-
-		param = keyconfig_params;
-		for (i = 0; i < ARRAY_SIZE(keyconfig_params); i++, param++) {
-			fprintf(stderr, "%-12s   %s\n", param->name,
-				param->name);
-		}
-		return -1;
-	}
-
-	/* Get the command */
-	if (0 == strcmp(argv[1], "get")) {
-		cmd = EC_CMD_MKBP_GET_CONFIG;
-	} else if (0 == strcmp(argv[1], "set")) {
-		cmd = EC_CMD_MKBP_SET_CONFIG;
-	} else {
-		fprintf(stderr, "Invalid command '%s\n", argv[1]);
-		return -1;
-	}
-
-	switch (cmd) {
-	case EC_CMD_MKBP_GET_CONFIG:
-		/* Read the existing config */
-		rv = ec_command(cmd, 0, NULL, 0, &req, sizeof(req));
-		if (rv < 0)
-			return rv;
-		show_fields(&req.config, argc - 2, argv + 2);
-		break;
-	}
-
-	return 0;
-}
-
-static void cmd_memory_dump_usage(const char *command_name)
-{
-	fprintf(stderr,
-		"Usage: %s [<address> [<size>]]\n"
-		"  Prints the memory available for dumping in hexdump canonical format.\n"
-		"  <address> is a 32-bit address offset. Defaults to 0x0.\n"
-		"  <size> is the number of bytes to print after <address>."
-		" Defaults to end of RAM.\n"
-		"Usage: %s info\n"
-		"  Prints metadata about the memory available for dumping\n",
-		command_name, command_name);
-}
-
-static int cmd_memory_dump(int argc, char *argv[])
-{
-	int rv;
-	char *e;
-	bool just_info;
-	int response_max;
-	const char *command_name = argv[0];
-	void *read_mem_response = NULL;
-	uint32_t requested_address_start = 0;
-	uint32_t requested_address_end = UINT32_MAX;
-	/* Simple local structs for storing a memory dump */
-	struct mem_segment {
-		uint32_t addr_start;
-		uint32_t addr_end;
-		uint32_t size;
-		uint8_t *mem;
-		struct mem_segment *next;
-	};
-	uint16_t entry_count;
-	struct mem_segment *segments = NULL;
-	/* The real root is root.next, all other root fields are unused */
-	struct mem_segment root;
-	struct mem_segment *seg;
-	struct ec_response_memory_dump_get_metadata metadata_response;
-	struct ec_response_get_protocol_info protocol_info_response;
-
-	if (argc > 3 || (argc == 2 && strcmp(argv[1], "help") == 0)) {
-		cmd_memory_dump_usage(command_name);
-		return -1;
-	}
-	if (argc == 2 && strcmp(argv[1], "info") == 0) {
-		just_info = true;
-	}
-	if (argc >= 2 && !just_info) {
-		/* Parse requested address argument */
-		requested_address_start = strtoul(argv[1], &e, 0);
-		if (e && *e) {
-			fprintf(stderr, "Bad argument '%s'\n", argv[1]);
-			cmd_memory_dump_usage(command_name);
-			return -1;
-		}
-	}
-	if (argc == 3 && !just_info) {
-		/* Parse requested size argument */
-		uint32_t requested_size = strtoul(argv[2], &e, 0);
-		if (e && *e) {
-			fprintf(stderr, "Bad argument '%s'\n", argv[2]);
-			cmd_memory_dump_usage(command_name);
-			return -1;
-		}
-		/* Cap max address at UINT32_MAX */
-		requested_address_end =
-			MIN((uint64_t)requested_address_start + requested_size,
-			    (uint64_t)UINT32_MAX);
-	}
-
-	rv = ec_command(EC_CMD_GET_PROTOCOL_INFO, 0, NULL, 0,
-			&protocol_info_response,
-			sizeof(protocol_info_response));
-	if (rv < 0) {
-		fprintf(stderr, "Protocol info unavailable.\n");
-		goto cmd_memory_dump_cleanup;
-	}
-	response_max = protocol_info_response.max_response_packet_size;
-	read_mem_response = malloc(response_max);
-
-	/* Fetch memory dump metadata */
-	rv = ec_command(EC_CMD_MEMORY_DUMP_GET_METADATA, 0, NULL, 0,
-			&metadata_response, sizeof(metadata_response));
-	if (rv < 0) {
-		fprintf(stderr, "Failed to get memory dump metadata.\n");
-		goto cmd_memory_dump_cleanup;
-	}
-	entry_count = metadata_response.memory_dump_entry_count;
-	if (entry_count == 0) {
-		fprintf(stderr, "Memory dump is empty.\n");
-		rv = -1;
-		goto cmd_memory_dump_cleanup;
-	}
-	segments = (struct mem_segment *)calloc(entry_count,
-						sizeof(struct mem_segment));
-	if (segments == NULL) {
-		fprintf(stderr, "calloc failed\n");
-		rv = -1;
-		goto cmd_memory_dump_cleanup;
-	}
-
-	/* Fetch all memory segments */
-	for (uint16_t entry_index = 0; entry_index < entry_count;
-	     entry_index++) {
-		seg = &segments[entry_index];
-		struct ec_params_memory_dump_get_entry_info entry_info_params = {
-			.memory_dump_entry_index = entry_index
-		};
-		struct ec_response_memory_dump_get_entry_info
-			entry_info_response;
-
-		rv = ec_command(EC_CMD_MEMORY_DUMP_GET_ENTRY_INFO, 0,
-				&entry_info_params, sizeof(entry_info_params),
-				&entry_info_response,
-				sizeof(entry_info_response));
-		if (rv < 0) {
-			fprintf(stderr,
-				"Failed to get memory dump info for entry %d.\n",
-				entry_index);
-			goto cmd_memory_dump_cleanup;
-		}
-
-		uint32_t entry_address_end =
-			entry_info_response.address + entry_info_response.size;
-
-		/* Check if entry is even in bounds of the requested range */
-		if (entry_info_response.address >= requested_address_end ||
-		    entry_address_end <= requested_address_start)
-			continue;
-
-		/* Clip memory segment boundaries based on requested range */
-		seg->addr_start = MAX(entry_info_response.address,
-				      requested_address_start);
-		seg->addr_end = MIN(entry_address_end, requested_address_end);
-		if (seg->addr_end - seg->addr_start <= 0)
-			continue;
-		seg->size = seg->addr_end - seg->addr_start;
-
-		if (just_info) {
-			printf("%-3d: %x-%x (%d bytes)\n", entry_index,
-			       seg->addr_start, seg->addr_end, seg->size);
-			continue;
-		}
-
-		seg->mem = (uint8_t *)malloc(seg->size);
-		if (seg->mem == NULL) {
-			fprintf(stderr, "malloc failed\n");
-			rv = -1;
-			goto cmd_memory_dump_cleanup;
-		}
-
-		/* Keep fetching until entire segment is copied */
-		uint32_t offset = 0;
-		while (offset < seg->size) {
-			struct ec_params_memory_dump_read_memory
-				read_mem_params = {
-					.memory_dump_entry_index = entry_index,
-					.address = seg->addr_start + offset,
-					.size = seg->size - offset,
-				};
-
-			rv = ec_command(EC_CMD_MEMORY_DUMP_READ_MEMORY, 0,
-					&read_mem_params,
-					sizeof(read_mem_params),
-					read_mem_response, response_max);
-			if (rv <= 0) {
-				fprintf(stderr,
-					"Failed to read memory at %x.\n",
-					read_mem_params.address);
-				rv = -1;
-				goto cmd_memory_dump_cleanup;
-			}
-
-			if (!memcpy(seg->mem + offset, read_mem_response, rv)) {
-				fprintf(stderr, "memcpy failed\n");
-				rv = -1;
-				goto cmd_memory_dump_cleanup;
-			}
-
-			offset += rv;
-		};
-
-		/* Sort segments in ascending order of starting address */
-		struct mem_segment *current = &root;
-		for (int i = 0; current->next && i < entry_count; i++) {
-			if (seg->addr_start < current->next->addr_start) {
-				/* Insert segment before current->next */
-				seg->next = current->next;
-				current->next = seg;
-				break;
-			}
-			current = current->next;
-		}
-		current->next = seg;
-	}
-
-	if (just_info) {
-		rv = 0;
-		goto cmd_memory_dump_cleanup;
-	}
-
-	/* Merge overlapping or touching segments */
-	seg = root.next;
-	for (int i = 0; seg && seg->next && i < entry_count; i++) {
-		if (seg->addr_end < seg->next->addr_start) {
-			/* No overlap */
-			seg = seg->next;
-			continue;
-		}
-		uint32_t overlap = seg->addr_end - seg->next->addr_start;
-		uint32_t new_size = seg->size + seg->next->size - overlap;
-		if (new_size != seg->next->addr_end - seg->addr_start) {
-			fprintf(stderr, "Segment size is not aligned\n");
-			rv = -1;
-			goto cmd_memory_dump_cleanup;
-		}
-		seg->mem = (uint8_t *)realloc(seg->mem, new_size);
-		if (seg->mem == NULL) {
-			fprintf(stderr, "realloc failed\n");
-			rv = -1;
-			goto cmd_memory_dump_cleanup;
-		}
-		if (!memcpy(seg->mem + seg->size, seg->next->mem + overlap,
-			    seg->next->size - overlap)) {
-			fprintf(stderr, "Merging segments failed\n");
-			rv = -1;
-			goto cmd_memory_dump_cleanup;
-		}
-		seg->addr_end = seg->next->addr_end;
-		seg->size = new_size;
-		seg->next = seg->next->next;
-	}
-
-	/* Print dump in hexdump cononical format */
-	seg = root.next;
-	for (int i = 0; seg && i < entry_count; i++) {
-		hexdump_canonical(seg->mem, seg->size, seg->addr_start);
-		/* Extra newline to delinate segments */
-		printf("\n");
-		seg = seg->next;
-	}
-	rv = 0;
-cmd_memory_dump_cleanup:
-	free(read_mem_response);
-	if (segments) {
-		for (int i = 0; i < entry_count; i++)
-			free(segments[i].mem);
-		free(segments);
-	}
-	return rv;
 }
 
 static const char *const mkbp_button_strings[] = {
@@ -10817,357 +8877,6 @@ static int cmd_mkbp_wake_mask(int argc, char *argv[])
 	else if (p.action == SET_WAKE_MASK)
 		printf("MKBP %s wake mask set.\n", argv[2]);
 
-	return 0;
-}
-
-/* Index is already checked. argv[0] is first param value */
-static int cmd_tmp006cal_v0(int idx, int argc, char *argv[])
-{
-	struct ec_params_tmp006_get_calibration pg;
-	struct ec_response_tmp006_get_calibration_v0 rg;
-	struct ec_params_tmp006_set_calibration_v0 ps;
-	float val;
-	char *e;
-	int i, rv;
-
-	/* Get current values */
-	pg.index = idx;
-	rv = ec_command(EC_CMD_TMP006_GET_CALIBRATION, 0, &pg, sizeof(pg), &rg,
-			sizeof(rg));
-	if (rv < 0)
-		return rv;
-
-	if (!argc) {
-		/* If no new values are given, just print what we have */
-		printf("S0: %e\n", rg.s0);
-		printf("b0: %e\n", rg.b0);
-		printf("b1: %e\n", rg.b1);
-		printf("b2: %e\n", rg.b2);
-		return EC_SUCCESS;
-	}
-
-	/* Prepare to reuse the current values */
-	memset(&ps, 0, sizeof(ps));
-	ps.index = idx;
-	ps.s0 = rg.s0;
-	ps.b0 = rg.b0;
-	ps.b1 = rg.b1;
-	ps.b2 = rg.b2;
-
-	/* Parse up to four args, skipping any that are just "-" */
-	for (i = 0; i < argc && i < 4; i++) {
-		if (!strcmp(argv[i], "-"))
-			continue;
-		val = strtod(argv[i], &e);
-		if (e && *e) {
-			fprintf(stderr,
-				"Bad arg \"%s\". Use \"-\" to skip a param.\n",
-				argv[i]);
-			return -1;
-		}
-		switch (i) {
-		case 0:
-			ps.s0 = val;
-			break;
-		case 1:
-			ps.b0 = val;
-			break;
-		case 2:
-			ps.b1 = val;
-			break;
-		case 3:
-			ps.b2 = val;
-			break;
-		}
-	}
-
-	/* Set 'em */
-	return ec_command(EC_CMD_TMP006_SET_CALIBRATION, 0, &ps, sizeof(ps),
-			  NULL, 0);
-}
-
-/* Index is already checked. argv[0] is first param value */
-static int cmd_tmp006cal_v1(int idx, int argc, char *argv[])
-{
-	struct ec_params_tmp006_get_calibration pg;
-	struct ec_response_tmp006_get_calibration_v1 *rg =
-		(struct ec_response_tmp006_get_calibration_v1 *)(ec_inbuf);
-	struct ec_params_tmp006_set_calibration_v1 *ps =
-		(struct ec_params_tmp006_set_calibration_v1 *)(ec_outbuf);
-	float val;
-	char *e;
-	int i, rv, cmdsize;
-
-	/* Algorithm 1 parameter names */
-	static const char *const alg1_pname[] = {
-		"s0", "a1", "a2", "b0", "b1", "b2",
-		"c2", "d0", "d1", "ds", "e0", "e1",
-	};
-
-	/* Get current values */
-	pg.index = idx;
-	rv = ec_command(EC_CMD_TMP006_GET_CALIBRATION, 1, &pg, sizeof(pg), rg,
-			ec_max_insize);
-	if (rv < 0)
-		return rv;
-
-	if (!argc) {
-		/* If no new values are given, just print what we have */
-		printf("algorithm:  %d\n", rg->algorithm);
-		printf("params:\n");
-		/* We only know about alg 1 at the moment */
-		if (rg->algorithm == 1)
-			for (i = 0; i < rg->num_params; i++)
-				printf("  %s  %e\n", alg1_pname[i], rg->val[i]);
-		else
-			for (i = 0; i < rg->num_params; i++)
-				printf("  param%d  %e\n", i, rg->val[i]);
-		return EC_SUCCESS;
-	}
-
-	/* Prepare to reuse the current values */
-	memset(ps, 0, ec_max_outsize);
-	ps->index = idx;
-	ps->algorithm = rg->algorithm;
-	ps->num_params = rg->num_params;
-	for (i = 0; i < rg->num_params; i++)
-		ps->val[i] = rg->val[i];
-
-	/* Parse the args, skipping any that are just "-" */
-	for (i = 0; i < argc && i < rg->num_params; i++) {
-		if (!strcmp(argv[i], "-"))
-			continue;
-		val = strtod(argv[i], &e);
-		if (e && *e) {
-			fprintf(stderr,
-				"Bad arg \"%s\". Use \"-\" to skip a param.\n",
-				argv[i]);
-			return -1;
-		}
-		ps->val[i] = val;
-	}
-
-	/* Set 'em */
-	cmdsize = sizeof(*ps) + ps->num_params * sizeof(ps->val[0]);
-	return ec_command(EC_CMD_TMP006_SET_CALIBRATION, 1, ps, cmdsize, NULL,
-			  0);
-}
-
-int cmd_tmp006cal(int argc, char *argv[])
-{
-	char *e;
-	int idx;
-
-	if (argc < 2) {
-		fprintf(stderr, "Must specify tmp006 index.\n");
-		return -1;
-	}
-
-	idx = strtol(argv[1], &e, 0);
-	if ((e && *e) || idx < 0 || idx > 255) {
-		fprintf(stderr, "Bad index.\n");
-		return -1;
-	}
-
-	/* Pass just the params (if any) to the helper function */
-	argc -= 2;
-	argv += 2;
-
-	if (ec_cmd_version_supported(EC_CMD_TMP006_GET_CALIBRATION, 1))
-		return cmd_tmp006cal_v1(idx, argc, argv);
-
-	if (ec_cmd_version_supported(EC_CMD_TMP006_GET_CALIBRATION, 0))
-		return cmd_tmp006cal_v0(idx, argc, argv);
-
-	printf("The EC is being stupid\n");
-	return -1;
-}
-
-int cmd_tmp006raw(int argc, char *argv[])
-{
-	struct ec_params_tmp006_get_raw p;
-	struct ec_response_tmp006_get_raw r;
-	char *e;
-	int idx;
-	int rv;
-
-	if (argc != 2) {
-		fprintf(stderr, "Must specify tmp006 index.\n");
-		return -1;
-	}
-
-	idx = strtol(argv[1], &e, 0);
-	if ((e && *e) || idx < 0 || idx > 255) {
-		fprintf(stderr, "Bad index.\n");
-		return -1;
-	}
-
-	p.index = idx;
-
-	rv = ec_command(EC_CMD_TMP006_GET_RAW, 0, &p, sizeof(p), &r, sizeof(r));
-	if (rv < 0)
-		return rv;
-
-	printf("T: %d.%02d K\n", r.t / 100, r.t % 100);
-	printf("V: %d nV\n", r.v);
-	return EC_SUCCESS;
-}
-
-static int cmd_hang_detect(int argc, char *argv[])
-{
-	struct ec_params_hang_detect req;
-	struct ec_response_hang_detect resp;
-	int rv;
-	char *e;
-
-	memset(&req, 0, sizeof(req));
-
-	if (argc == 2 && !strcasecmp(argv[1], "reload")) {
-		req.command = EC_HANG_DETECT_CMD_RELOAD;
-		return ec_command(EC_CMD_HANG_DETECT, 0, &req, sizeof(req),
-				  NULL, 0);
-	}
-
-	if (argc == 2 && !strcasecmp(argv[1], "cancel")) {
-		req.command = EC_HANG_DETECT_CMD_CANCEL;
-		return ec_command(EC_CMD_HANG_DETECT, 0, &req, sizeof(req),
-				  NULL, 0);
-	}
-
-	if (argc == 3 && !strcasecmp(argv[1], "set_timeout")) {
-		req.command = EC_HANG_DETECT_CMD_SET_TIMEOUT;
-
-		req.reboot_timeout_sec = strtol(argv[2], &e, 0);
-		if (e && *e) {
-			fprintf(stderr, "Bad reboot timeout.\n");
-			return -1;
-		}
-
-		rv = ec_command(EC_CMD_HANG_DETECT, 0, &req, sizeof(req), NULL,
-				0);
-		if (rv < 0)
-			printf("Couldn't set reboot timeout (rv=%d)\n", rv);
-		else
-			printf("reboot_timeout=%d s\n", req.reboot_timeout_sec);
-		return rv;
-	}
-
-	if (argc == 2 && !strcasecmp(argv[1], "get_status")) {
-		req.command = EC_HANG_DETECT_CMD_GET_STATUS;
-		rv = ec_command(EC_CMD_HANG_DETECT, 0, &req, sizeof(req), &resp,
-				sizeof(resp));
-
-		if (rv < 0)
-			printf("Couldn't get boot status (rv=%d)\n", rv);
-		else
-			printf("boot status=%d\n", resp.status);
-		return rv;
-	}
-
-	if (argc == 2 && !strcasecmp(argv[1], "clear_status")) {
-		req.command = EC_HANG_DETECT_CMD_CLEAR_STATUS;
-		return ec_command(EC_CMD_HANG_DETECT, 0, &req, sizeof(req),
-				  NULL, 0);
-	}
-
-	fprintf(stderr,
-		"args: reload|cancel|set_timeout <reboot_sec>|get_status|clear_status\n");
-	return -1;
-}
-
-enum port_80_event {
-	PORT_80_EVENT_RESUME = 0x1001, /* S3->S0 transition */
-	PORT_80_EVENT_RESET = 0x1002, /* RESET transition */
-};
-
-int cmd_port80_read(int argc, char *argv[])
-{
-	struct ec_params_port80_read p;
-	int cmdver = 1, rv;
-	int i, head, tail;
-	uint16_t *history;
-	uint32_t writes, history_size;
-	struct ec_response_port80_read rsp;
-	int printed = 0;
-
-	if (!ec_cmd_version_supported(EC_CMD_PORT80_READ, cmdver)) {
-		/* fall back to last boot */
-		struct ec_response_port80_last_boot r;
-		rv = ec_command(EC_CMD_PORT80_LAST_BOOT, 0, NULL, 0, &r,
-				sizeof(r));
-		fprintf(stderr, "Last boot %2x\n", r.code);
-		printf("done.\n");
-		return 0;
-	}
-
-	/* read writes and history_size */
-	p.subcmd = EC_PORT80_GET_INFO;
-	rv = ec_command(EC_CMD_PORT80_READ, cmdver, &p, sizeof(p), &rsp,
-			sizeof(rsp));
-	if (rv < 0) {
-		fprintf(stderr, "Read error at writes\n");
-		return rv;
-	}
-	writes = rsp.get_info.writes;
-	history_size = rsp.get_info.history_size;
-
-	history = (uint16_t *)(malloc(history_size * sizeof(uint16_t)));
-	if (!history) {
-		fprintf(stderr, "Unable to allocate buffer.\n");
-		return -1;
-	}
-	/* As the history buffer is quite large, we read data in chunks, with
-	    size in bytes of EC_PORT80_SIZE_MAX in each chunk.
-	    Incrementing offset until all history buffer has been read. To
-	    simplify the design, chose HISTORY_LEN is always multiple of
-	    EC_PORT80_SIZE_MAX.
-
-	    offset: entry offset from the beginning of history buffer.
-	    num_entries: number of entries requested.
-	*/
-	p.subcmd = EC_PORT80_READ_BUFFER;
-	for (i = 0; i < history_size; i += EC_PORT80_SIZE_MAX) {
-		p.read_buffer.offset = i;
-		p.read_buffer.num_entries = EC_PORT80_SIZE_MAX;
-		rv = ec_command(EC_CMD_PORT80_READ, cmdver, &p, sizeof(p), &rsp,
-				sizeof(rsp));
-		if (rv < 0) {
-			fprintf(stderr, "Read error at offset %d\n", i);
-			free(history);
-			return rv;
-		}
-		memcpy((void *)(history + i), rsp.data.codes,
-		       EC_PORT80_SIZE_MAX * sizeof(uint16_t));
-	}
-
-	head = writes;
-	if (head > history_size)
-		tail = head - history_size;
-	else
-		tail = 0;
-
-	fprintf(stderr, "Port 80 writes");
-	for (i = tail; i < head; i++) {
-		int e = history[i % history_size];
-		switch (e) {
-		case PORT_80_EVENT_RESUME:
-			fprintf(stderr, "\n(S3->S0)");
-			printed = 0;
-			break;
-		case PORT_80_EVENT_RESET:
-			fprintf(stderr, "\n(RESET)");
-			printed = 0;
-			break;
-		default:
-			if (!(printed++ % 20))
-				fprintf(stderr, "\n ");
-			fprintf(stderr, " %02x", e);
-		}
-	}
-	fprintf(stderr, " <--new\n");
-
-	free(history);
-	printf("done.\n");
 	return 0;
 }
 
@@ -11853,35 +9562,6 @@ int cmd_pd_chip_info(int argc, char *argv[])
 	return 0;
 }
 
-int cmd_pd_write_log(int argc, char *argv[])
-{
-	struct ec_params_pd_write_log_entry p;
-	char *e;
-
-	if (argc < 3) {
-		fprintf(stderr, "Usage: %s <log_type> <port>\n", argv[0]);
-		return -1;
-	}
-
-	if (!strcasecmp(argv[1], "charge"))
-		p.type = PD_EVENT_MCU_CHARGE;
-	else {
-		p.type = strtol(argv[1], &e, 0);
-		if (e && *e) {
-			fprintf(stderr, "Bad log_type parameter.\n");
-			return -1;
-		}
-	}
-
-	p.port = strtol(argv[2], &e, 0);
-	if (e && *e) {
-		fprintf(stderr, "Bad port parameter.\n");
-		return -1;
-	}
-
-	return ec_command(EC_CMD_PD_WRITE_LOG_ENTRY, 0, &p, sizeof(p), NULL, 0);
-}
-
 int cmd_typec_control(int argc, char *argv[])
 {
 	struct ec_params_typec_control p;
@@ -12314,71 +9994,6 @@ int cmd_typec_status(int argc, char *argv[])
 	}
 
 	return 0;
-}
-
-int cmd_typec_vdm_response(int argc, char *argv[])
-{
-	struct ec_params_typec_vdm_response p;
-	struct ec_response_typec_vdm_response *r =
-		(ec_response_typec_vdm_response *)ec_inbuf;
-	char *endptr;
-	int rv, i;
-
-	if (argc != 2) {
-		fprintf(stderr,
-			"Usage: %s <port>\n"
-			"  <port> is the type-c port to query\n",
-			argv[0]);
-		return -1;
-	}
-
-	p.port = strtol(argv[1], &endptr, 0);
-	if (endptr && *endptr) {
-		fprintf(stderr, "Bad port\n");
-		return -1;
-	}
-
-	rv = ec_command(EC_CMD_TYPEC_VDM_RESPONSE, 0, &p, sizeof(p), ec_inbuf,
-			ec_max_insize);
-	if (rv < 0)
-		return -1;
-
-	if (r->vdm_data_objects > 0 && r->vdm_response_err == EC_RES_SUCCESS) {
-		printf("VDM response from partner: %d", r->partner_type);
-		for (i = 0; i < r->vdm_data_objects; i++)
-			printf("\n  0x%08x", r->vdm_response[i]);
-		printf("\n");
-	} else {
-		printf("No VDM response found (err: %d)\n",
-		       r->vdm_response_err);
-	}
-
-	if (r->vdm_attention_objects > 0) {
-		printf("VDM Attention:");
-		for (i = 0; i < r->vdm_attention_objects; i++)
-			printf("\n  0x%08x", r->vdm_attention[i]);
-		printf("\n");
-		printf("%d Attention messages remaining\n",
-		       r->vdm_attention_left);
-	} else {
-		printf("No VDM Attention found");
-	}
-
-	return 0;
-}
-
-int cmd_tp_self_test(int argc, char *argv[])
-{
-	int rv;
-
-	rv = ec_command(EC_CMD_TP_SELF_TEST, 0, NULL, 0, NULL, 0);
-	if (rv < 0)
-		return rv;
-
-	printf("Touchpad self test: %s\n",
-	       rv == EC_RES_SUCCESS ? "passed" : "failed");
-
-	return rv;
 }
 
 int cmd_tp_frame_get(int argc, char *argv[])
@@ -13047,11 +10662,8 @@ const struct command commands[] = {
 	{ "adcread", cmd_adc_read, "<channel>\n\tRead an ADC channel." },
 	{ "addentropy", cmd_add_entropy,
 	  "[reset]\n\tAdd entropy to device secret." },
-	{ "apreset", cmd_apreset, "\n\tIssue AP reset." },
 	{ "autofanctrl", cmd_thermal_auto_fan_ctrl,
 	  "<on>\n\tTurn on automatic fan speed control." },
-	{ "backlight", cmd_lcd_backlight,
-	  "<enabled>\n\tEnable/disable LCD backlight." },
 	{ "basestate", cmd_basestate,
 	  "[attach | detach | reset]\n"
 	  "\tManually force base state to attached, detached or reset." },
@@ -13062,9 +10674,6 @@ const struct command commands[] = {
 	  "\n\tRead or write board-specific battery parameter." },
 	{ "bcfg", cmd_battery_config, "\n\tPrint an active battery config." },
 	{ "boardversion", cmd_board_version, "\n\tPrints the board version." },
-	{ "boottime", cmd_boottime, "\n\tGet boot time." },
-	{ "button", cmd_button,
-	  "[vup|vdown|rec] <Delay-ms>\n\tSimulates button press." },
 	{ "cbi", cmd_cbi, "\n\tGet/Set/Remove Cros Board Info." },
 	{ "cbibin", cmd_cbi_bin, "\n\tRead/Write Cros Board Info into file." },
 	{ "cec", cmd_cec, "\n\tRead or write CEC messages and settings." },
@@ -13075,50 +10684,19 @@ const struct command commands[] = {
 	  "\tSoC at which it will apply." },
 	{ "chargeoverride", cmd_charge_port_override,
 	  "\n\tOverrides charge port selection logic." },
-	{ "chargesplash", cmd_chargesplash,
-	  "\n\tShow and manipulate chargesplash variables." },
 	{ "chargestate", cmd_charge_state,
 	  "\n\tHandle commands related to charge state v2 (and later)." },
 	{ "chipinfo", cmd_chipinfo, "\n\tPrints chip info." },
-	{ "cmdversions", cmd_cmdversions,
-	  "<cmd>\n\tPrints supported version mask for a command number." },
 	{ "console", cmd_console,
 	  "\n\tPrints the last output to the EC debug console." },
 	{ "console_print", cmd_console_print,
 	  "<message>\n"
 	  "\tPrints a message to the EC console." },
 	{ "echash", cmd_ec_hash, "[CMDS]\n\tVarious EC hash commands." },
-	{ "eventclear", cmd_host_event_clear,
-	  "<mask>\n"
-	  "\tClears EC host events flags where mask has bits set." },
-	{ "eventclearb", cmd_host_event_clear_b,
-	  "<mask>\n"
-	  "\tClears EC host events flags copy B where mask has bits set." },
-	{ "eventget", cmd_host_event_get_raw,
-	  "\n\tPrints raw EC host event flags." },
-	{ "eventgetb", cmd_host_event_get_b,
-	  "\n\tPrints raw EC host event flags copy B." },
-	{ "eventgetscimask", cmd_host_event_get_sci_mask,
-	  "\n\tPrints SCI mask for EC host events." },
-	{ "eventgetsmimask", cmd_host_event_get_smi_mask,
-	  "\n\tPrints SMI mask for EC host events." },
-	{ "eventgetwakemask", cmd_host_event_get_wake_mask,
-	  "\n\tPrints wake mask for EC host events." },
-	{ "eventsetscimask", cmd_host_event_set_sci_mask,
-	  "<mask>\n\tSets the SCI mask for EC host events." },
-	{ "eventsetsmimask", cmd_host_event_set_smi_mask,
-	  "<mask>\n\tSets the SMI mask for EC host events." },
-	{ "eventsetwakemask", cmd_host_event_set_wake_mask,
-	  "<mask>\n\tSets the wake mask for EC host events" },
-	{ "extpwrlimit", cmd_ext_power_limit,
-	  "\n\tSet the maximum external power limit." },
 	{ "fanduty", cmd_fanduty,
 	  "<percent>\n\tForces the fan PWM to a constant duty cycle." },
 	{ "flasherase", cmd_flash_erase,
 	  "<offset> <size>\n\tErases EC flash." },
-	{ "flasheraseasync", cmd_flash_erase,
-	  "<offset> <size>\n"
-	  "\tErases EC flash asynchronously." },
 	{ "flashinfo", cmd_flash_info,
 	  "\n\tPrints information on the EC flash." },
 	{ "flashpd", cmd_flash_pd,
@@ -13138,8 +10716,6 @@ const struct command commands[] = {
 	{ "forcelidopen", cmd_force_lid_open,
 	  "<enable>\n"
 	  "\tForces the lid switch to open position." },
-	{ "fpcontext", cmd_fp_context,
-	  "\n\tSets the fingerprint sensor context." },
 	{ "fpencstatus", cmd_fp_enc_status,
 	  "\n\tPrints status of Fingerprint sensor encryption engine." },
 	{ "fpframe", cmd_fp_frame,
@@ -13152,31 +10728,19 @@ const struct command commands[] = {
 	  "\tmode: capture|deepsleep|fingerdown|fingerup|enroll|match|\n"
 	  "\t\treset|reset_sensor|maintenance\n"
 	  "\tcapture_type: vendor|pattern0|pattern1|qual|test_reset" },
-	{ "fpseed", cmd_fp_seed, "\n\tSets the value of the TPM seed." },
 	{ "fpstats", cmd_fp_stats,
 	  "\n\tPrints timing statisitcs relating to capture and matching." },
-	{ "fptemplate", cmd_fp_template,
-	  "[<infile>|<index 0..2>]\n"
-	  "\tAdd a template if <infile> is provided, else dump it." },
 	{ "gpioget", cmd_gpio_get,
 	  "<GPIO name>\n"
 	  "\tGet the value of GPIO signal." },
 	{ "gpioset", cmd_gpio_set,
 	  "<GPIO name>\n"
 	  "\tSet the value of GPIO signal." },
-	{ "hangdetect", cmd_hang_detect,
-	  "reload|cancel|set_timeout <reboot_sec>|get_status|clear_status\n"
-	  "\tConfigure the ap hang detect mechanism." },
 	{ "hello", cmd_hello, "\n\tChecks for basic communication with EC." },
 	{ "hibdelay", cmd_hibdelay,
 	  "[sec]\n"
 	  "\tSet the delay before going into hibernation." },
 	{ "hostevent", cmd_hostevent, "\n\tGet & set host event masks." },
-	{ "hostsleepstate", cmd_hostsleepstate,
-	  "\n\tReport host sleep state to the EC." },
-	{ "i2cprotect", cmd_i2c_protect,
-	  "<port> [status]\n"
-	  "\tProtect EC's I2C bus." },
 	{ "i2cread", cmd_i2c_read, "\n\tRead I2C bus." },
 	{ "i2cspeed", cmd_i2c_speed,
 	  "<port> [speed]\n"
@@ -13194,14 +10758,7 @@ const struct command commands[] = {
 	  "\n\tScan out keyboard if any pins are shorted." },
 	{ "kbgetconfig", cmd_keyboard_get_config,
 	  "\n\tGet keyboard Vivaldi configuration." },
-	{ "kbinfo", cmd_kbinfo, "\n\tDump keyboard matrix dimensions." },
 	{ "kbpress", cmd_kbpress, "\n\tSimulate key press." },
-	{ "keyconfig", cmd_keyconfig,
-	  "get [<param>] | set [<param>> <value>]\n"
-	  "\tConfigure keyboard scanning." },
-	{ "keyscan", cmd_keyscan,
-	  "<beat_us> <filename>\n"
-	  "\tTest low-level key scanning." },
 	{ "led", cmd_led,
 	  "<name> <query | auto | off | <color> | <color>=<value>...>\n"
 	  "\tSet the color of an LED or query brightness range." },
@@ -13211,9 +10768,6 @@ const struct command commands[] = {
 	{ "locatechip", cmd_locate_chip,
 	  "<type> <index>\n"
 	  "\tGet the addresses and ports of i2c connected and embedded chips." },
-	{ "memory_dump", cmd_memory_dump,
-	  "[<address> [<size>]]\n"
-	  "\tOutputs the memory dump in hexdump canonical format." },
 	{ "mkbpget", cmd_mkbp_get,
 	  "<buttons|switches>\n"
 	  "\tGet MKBP buttons/switches supported mask and current state." },
@@ -13223,12 +10777,8 @@ const struct command commands[] = {
 	{ "motionsense", cmd_motionsense,
 	  "[CMDS]\n"
 	  "\tVarious motion sense control commands." },
-	{ "nextevent", cmd_next_event, "\n\tGet the next pending MKBP event." },
 	{ "paniclog", cmd_panic_log, "\n\tPrints saved panic log." },
 	{ "panicinfo", cmd_panic_info, "\n\tPrints saved panic info." },
-	{ "pause_in_s5", cmd_s5,
-	  "[on|off]\n"
-	  "\tWhether or not the AP should pause in S5 on shutdown." },
 	{ "pchg", cmd_pchg,
 	  "[<port>]\n"
 	  "\tGet peripheral charge port count and status." },
@@ -13238,7 +10788,6 @@ const struct command commands[] = {
 	{ "pdcontrol", cmd_pd_control,
 	  "[suspend|resume|reset|disable|on]\n"
 	  "\tControls the PD chip." },
-	{ "pdctrace", cmd_pdc_trace, cmd_pdc_trace_usage },
 	{ "pdgetmode", cmd_pd_get_amode,
 	  "<port>\n"
 	  "\tGet All USB-PD alternate SVIDs and modes on <port>." },
@@ -13246,13 +10795,6 @@ const struct command commands[] = {
 	{ "pdsetmode", cmd_pd_set_amode,
 	  "<port> <svid> <opos>\n"
 	  "\tSet USB-PD alternate SVID and mode on <port>." },
-	{ "pdwritelog", cmd_pd_write_log,
-	  "<type> <port>\n"
-	  "\tWrites a PD event log of the given <type>." },
-	{ "port80flood", cmd_port_80_flood,
-	  "\n\tRapidly write bytes to port 80." },
-	{ "port80read", cmd_port80_read,
-	  "\n\tPrint history of port 80 write." },
 	{ "powerbtn_press", cmd_powerbtn_press,
 	  "[<1st_del_ms>] [<1st_dur_ms>] [<2nd_del_ms>] [<2nd_dur_ms>]\n"
 	  "\tSimulate up to 2 consecutive delayed power button presses." },
@@ -13261,16 +10803,6 @@ const struct command commands[] = {
 	{ "protoinfo", cmd_proto_info,
 	  "\n\tPrints EC host protocol information." },
 	{ "pse", cmd_pse, "\n\tGet and set PoE PSE port power status." },
-	{ "pstoreinfo", cmd_pstore_info,
-	  "\n\tPrints information on the EC host persistent storage." },
-	{ "pstoreread", cmd_pstore_read,
-	  "<offset> <size> <outfile>\n"
-	  "\tReads from EC host persistent storage to a file." },
-	{ "pstorewrite", cmd_pstore_write,
-	  "<offset> <infile>\n"
-	  "\tWrites to EC host persistent storage from a file." },
-	{ "pwmgetduty", cmd_pwm_get_duty,
-	  "\n\tPrints the current 16 bit duty cycle for given PWM." },
 	{ "pwmgetfanrpm", cmd_pwm_get_fan_rpm,
 	  "[<index> | all]\n"
 	  "\tPrints current fan RPM." },
@@ -13286,9 +10818,6 @@ const struct command commands[] = {
 	{ "pwmsetkblight", cmd_pwm_set_keyboard_backlight,
 	  "<percent>\n"
 	  "\tSet keyboard backlight in percent." },
-	{ "rand", cmd_rand,
-	  "<num_bytes>\n"
-	  "\tgenerate <num_bytes> of random numbers." },
 	{ "reboot_ap_on_g3", cmd_reboot_ap_on_g3,
 	  " [<delay>]\n"
 	  "\tRequests that the EC will automatically reboot the AP after a\n"
@@ -13303,18 +10832,6 @@ const struct command commands[] = {
 	  "\tSet/get RGB keyboard status, config, etc.." },
 	{ "rollbackinfo", cmd_rollback_info,
 	  "\n\tPrint rollback block information." },
-	{ "rtcget", cmd_rtc_get, "\n\tPrint real-time clock." },
-	{ "rtcgetalarm", cmd_rtc_get_alarm,
-	  "\n\tPrint # of seconds before real-time clock alarm goes off." },
-	{ "rtcset", cmd_rtc_set,
-	  "<time>\n"
-	  "\tSet real-time clock." },
-	{ "rtcsetalarm", cmd_rtc_set_alarm,
-	  "<sec>\n"
-	  "\tSet real-time clock alarm to go off in <sec> seconds." },
-	{ "rwhashpd", cmd_rw_hash_pd,
-	  "<dev_id> <HASH[0] ... <HASH[4]>\n"
-	  "\tSet entry in PD MCU's device rw_hash table." },
 	{ "rwsig", cmd_rwsig,
 	  "<info|dump|action|status> ...\n"
 	  "\tinfo: Get all info about rwsig.\n"
@@ -13324,23 +10841,12 @@ const struct command commands[] = {
 	{ "rwsigaction", cmd_rwsig_action_legacy,
 	  "(DEPRECATED; use \"rwsig action\")\n"
 	  "\tControl the behavior of RWSIG task." },
-	{ "rwsigstatus", cmd_rwsig_status,
-	  "(DEPRECATED; use \"rwsig status\"\n"
-	  "\tRun RW signature verification and get status." },
 	{ "s0ix_counter", cmd_s0ix_counter,
 	  "get|set\n"
 	  "\tGet or reset s0ix counter." },
-	{ "sertest", cmd_serial_test, "\n\tSerial output test for COM2." },
-	{ "smartdischarge", cmd_smart_discharge,
-	  "\n\tSet/Get smart discharge parameters." },
 	{ "stress", cmd_stress_test,
 	  "[reboot] [help]\n"
 	  "\tStress test the ec host command interface." },
-	{ "switches", cmd_switches, "\n\tPrints current EC switch positions" },
-	{ "slps0dbgsetalarm", cmd_set_alarm_slp_s0_dbg,
-	  "<sec>\n"
-	  "\tSet alarm to wake host in <sec> seconds, "
-	  "PS: EC won't wake host if SLP_S0 is not asserted" },
 	{ "sleepsignaltransitions", cmd_sleep_signal_transitions,
 	  "\n\tPrints current EC sleep_signal_transitions value" },
 	{ "sysinfo", cmd_sysinfo,
@@ -13357,9 +10863,6 @@ const struct command commands[] = {
 	{ "tempsinfo", cmd_temp_sensor_info,
 	  "<sensorid>\n"
 	  "\tPrint temperature sensor info." },
-	{ "test", cmd_test,
-	  "result length [version]\n"
-	  "\tFake a variety of responses, purely for testing purposes." },
 	{ "threadinfo", cmd_thread_info,
 	  "\n\tDumps Zephyr thread tracking and info." },
 	{ "thermalget", cmd_thermal_get_threshold,
@@ -13368,14 +10871,7 @@ const struct command commands[] = {
 	{ "thermalset", cmd_thermal_set_threshold,
 	  "<platform-specific args>\n"
 	  "\tSet the threshold temperature values for the thermal engine." },
-	{ "tmp006cal", cmd_tmp006cal,
-	  "<tmp006_index> [params...]\n"
-	  "\tGet/set TMP006 calibration." },
-	{ "tmp006raw", cmd_tmp006raw,
-	  "<tmp006_index>\n"
-	  "\tGet raw TMP006 data." },
 	{ "tpframeget", cmd_tp_frame_get, "\n\tGet touchpad frame data." },
-	{ "tpselftest", cmd_tp_self_test, "\n\tRun touchpad self test." },
 	{ "typeccontrol", cmd_typec_control,
 	  "<port> <command>\n"
 	  "\tControl USB PD policy." },
@@ -13385,18 +10881,12 @@ const struct command commands[] = {
 	{ "typecstatus", cmd_typec_status,
 	  "<port>\n"
 	  "\tGet status information for port." },
-	{ "typecvdmresponse", cmd_typec_vdm_response,
-	  "<port>\n"
-	  "\tGet last VDM response for AP-requested VDM." },
 	{ "uptimeinfo", cmd_uptimeinfo,
 	  "\n\tGet info about how long the EC has been running and the most\n"
 	  "\trecent AP resets." },
 	{ "usbchargemode", cmd_usb_charge_set_mode,
 	  "<port> <mode> [<inhibit_charge>]\n"
 	  "\tSet USB charging mode." },
-	{ "usbmux", cmd_usb_mux,
-	  "<mux>\n"
-	  "\tSet USB mux switch state." },
 	{ "usbpd", cmd_usb_pd,
 	  "<port> <auto | "
 	  "[toggle|toggle-off|sink|source] [none|usb|dp|dock]\n"
@@ -13412,9 +10902,6 @@ const struct command commands[] = {
 	  "as:\n"
 	  "\t\t   Port, USB enabled, DP enabled, Polarity, HPD IRQ, "
 	  "HPD LVL." },
-	{ "usbpdportcaps", cmd_usb_pd_port_caps,
-	  "[port]\n"
-	  "\tGet port capabilities for a specified USB-C port." },
 	{ "usbpdpower", cmd_usb_pd_power,
 	  "[port]\n"
 	  "\tGet USB PD power information." },
@@ -13427,10 +10914,6 @@ const struct command commands[] = {
 	{ "watchdoginfo", cmd_watchdog_info,
 	  "[reset_stats]\n"
 	  "\tGet watchdog info." },
-	{ "wireless", cmd_wireless,
-	  "<flags> [<mask> [<suspend_flags> <suspend_mask>]]\n"
-	  "\tEnable/disable WLAN/Bluetooth radio." },
-	{ "poe", cmd_poe, "<enabled>\n\tEnable/disable Power over Ethernet." },
 	{ NULL, NULL }
 };
 
