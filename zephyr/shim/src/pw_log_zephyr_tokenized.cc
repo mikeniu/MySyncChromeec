@@ -7,9 +7,11 @@
 #include "panic_log.h"
 
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log_ctrl.h>
 #include <zephyr/spinlock.h>
 #include <zephyr/sys/printk.h>
 
+#include <pw_log/levels.h>
 #include <pw_log_tokenized/base64.h>
 #include <pw_log_tokenized/config.h>
 #include <pw_log_tokenized/handler.h>
@@ -39,6 +41,13 @@ namespace
 	// (~270B).
 	pw::InlineString<log_tokenized::kBase64EncodedBufferSizeBytes + 1>
 		base64_string;
+
+	[[noreturn]] void handle_fatal_log(void)
+	{
+		LOG_PANIC();
+		k_panic();
+		CODE_UNREACHABLE;
+	}
 } // namespace
 } // namespace pw::log_zephyr
 
@@ -89,6 +98,9 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 	if (meta.flags() > 0) {
 		if (console_channel_is_disabled(
 			    PW_FLAG_TO_EC_CHANNEL(meta.flags()))) {
+			if (meta.level() == PW_LOG_LEVEL_FATAL) {
+				handle_fatal_log();
+			}
 			return;
 		}
 	}
@@ -102,6 +114,9 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 
 	if (base64_string.size() <= 1) {
 		k_spin_unlock(&lock, key);
+		if (meta.level() == PW_LOG_LEVEL_FATAL) {
+			handle_fatal_log();
+		}
 		return;
 	}
 
@@ -131,6 +146,10 @@ extern "C" void pw_log_tokenized_HandleLog(uint32_t metadata,
 		printk("%s", base64_string.c_str());
 	}
 	k_spin_unlock(&lock, key);
+
+	if (meta.level() == PW_LOG_LEVEL_FATAL) {
+		handle_fatal_log();
+	}
 }
 
 } // namespace pw::log_zephyr
