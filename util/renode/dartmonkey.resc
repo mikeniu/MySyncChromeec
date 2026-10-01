@@ -28,6 +28,44 @@ macro reset
     sysbus LoadSymbolsFrom $elf_ro
     sysbus LoadSymbolsFrom $elf_rw
     cpu VectorTableOffset 0x8000000
+
+    # Sensors.GenericSPISensor is a byte-FIFO SPI peripheral that pops one queued
+    # byte per full-duplex SPI clock byte (1 dummy byte during the command byte
+    # write followed by the response bytes). Queue the FPC1145 hardware ID
+    # (0x140a) for 5 fpc_pulse_hw_reset() attempts (3-byte HWID + 2-byte
+    # interrupt clear each), frame size cache population (3 bytes), and
+    # fpsensor_hw test check (3 bytes).
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
 """
 
 runMacro $reset
