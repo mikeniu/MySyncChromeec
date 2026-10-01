@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53741852_81485066",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T19:19:14Z",
+      "side": 1,
+      "message": "Addressed comments: clarified in code comments why size and offset are validated individually in populate_cache() (raw capture modes report frame_size \u003d\u003d max_image_buffer_bytes inclusive of the header at image_data_offset_bytes, whereas shifted bounds for image-only captures are validated in get_frame()).",
+      "parentUuid": "942f861d_3d23a911",
+      "revId": "d6091d3b0accac175e9a24e62957abf3a8ff7b8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "834d7e81_42aa3d29",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "d6091d3b0accac175e9a24e62957abf3a8ff7b8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "630fc3c9_1ab3d699",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T19:19:14Z",
+      "side": 1,
+      "message": "In C++, replacing these early returns with \u0027goto error_exit;\u0027 fails to compile because the jump crosses the initialization of local variables (\u0027num_types\u0027 and \u0027params\u0027) in the same scope. Additionally, these lines are unchanged in this CL.",
+      "parentUuid": "834d7e81_42aa3d29",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
       "revId": "d6091d3b0accac175e9a24e62957abf3a8ff7b8e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6911c8dc_5df2c0cd",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T19:19:14Z",
+      "side": 1,
+      "message": "For raw capture modes (e.g. FP_CAPTURE_VENDOR_FORMAT), \u0027frame_size\u0027 represents the total raw buffer size (inclusive of the header at \u0027image_data_offset_bytes\u0027, so frame_size \u003d\u003d max_image_buffer_bytes and image_data_offset_bytes \u003e 0). Enforcing \u0027offset + size \u003c\u003d max_image_buffer_bytes\u0027 unconditionally in populate_cache() would reject valid raw capture configurations across all boards. Shifted bounds (\u0027adjusted_offset + size \u003c\u003d sizeof(fp_buffer)\u0027) for image-only captures are validated in get_frame(). Added a code comment clarifying this.",
+      "parentUuid": "2fb4344c_caa96e7f",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 9999
+      },
+      "revId": "d6091d3b0accac175e9a24e62957abf3a8ff7b8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "763892a5_0cb24cae",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "d6091d3b0accac175e9a24e62957abf3a8ff7b8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a44d909a_29ae5d4d",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T19:19:14Z",
+      "side": 1,
+      "message": "See reply on fpsensor_image_frame_params.cc: raw capture modes report frame_size \u003d\u003d sizeof(fp_buffer) with non-zero image_data_offset_bytes, so size and offset are validated individually in populate_cache() while shifted range bounds are validated in get_frame().",
+      "parentUuid": "763892a5_0cb24cae",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 9999
+      },
       "revId": "d6091d3b0accac175e9a24e62957abf3a8ff7b8e",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
