@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adb35781_79b76961",
+        "filename": "zephyr/test/hwtest/src/system_is_locked.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T22:12:55Z",
+      "side": 1,
+      "message": "Can we use the C syntax instead of preprocessor: `if IS_ENABLED(CONFIG_PLATFORM_EC_WP_EXTERNAL) {...`?",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 118,
+        "endChar": 6
+      },
+      "revId": "b1d5dfe9a3a55266015b391253eb7d9452e13430",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
