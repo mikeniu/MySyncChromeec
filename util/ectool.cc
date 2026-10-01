@@ -12406,6 +12406,16 @@ int cmd_tp_frame_get(int argc, char *argv[])
 		goto err;
 	}
 
+	if (r->n_frames > ec_max_insize / sizeof(r->frame_sizes[0]) ||
+	    (size_t)rv != sizeof(r->n_frames) +
+				  r->n_frames * sizeof(r->frame_sizes[0])) {
+		fprintf(stderr,
+			"Malformed touchpad frame info (n_frames=%u, %d bytes).\n",
+			r->n_frames, rv);
+		rv = -1;
+		goto err;
+	}
+
 	rv = ec_command(EC_CMD_TP_FRAME_SNAPSHOT, 0, NULL, 0, NULL, 0);
 	if (rv < 0) {
 		fprintf(stderr, "Failed to snapshot frame.\n");
