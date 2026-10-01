@@ -26,12 +26,19 @@ sysbus LoadBinary $bin 0x64000000
 twd AddAfterWriteWordHook 0xA "if value == 0x5c and (self.ReadWord(0x6) & 0x20) == 0: self.WriteWord(0xa, 0x00)"
 twd AddAfterReadWordHook 0x10 "globals()['_wdcp'] = globals().get('_wdcp', 0) + 1; value = 12 if globals()['_wdcp'] > 5 else 0"
 
+# Report 4 comparators (NUMCOMP=4 in bits [31:28]) from DWT->CTRL (0xE0001000) so
+# z_arm_debug_enable_null_pointer_detection() does not hit an assertion failure
+# when CONFIG_ASSERT=y is enabled.
+dwt AddAfterReadDoubleWordHook 0x0 "value |= 0x40000000"
+
 macro reset
 """
     sysbus LoadSymbolsFrom $elf_ro
     # sysbus LoadSymbolsFrom $elf_rw
     cpu FpuEnabled true
     cpu PC 0x0
+    # TODO(b/567998100): Remove once NVIC SystemReset resets BASEPRI in Renode.
+    cpu BasePri 0
     # Set the image type of currently loaded image to RO by default. Software will
     # update the flag while jumping between image types.
     image_type WriteByte 0x0 0x40
