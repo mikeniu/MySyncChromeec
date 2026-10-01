@@ -6,8 +6,9 @@ using sysbus
 $name?="sanok"
 mach create $name
 
-$repl?=@platforms/cpus/egis_et171.repl
-machine LoadPlatformDescription $repl
+# TODO(b/567998001): Remove once egis_et171.repl unifies flash0 and
+# p25q16_flash_mem upstream.
+machine LoadPlatformDescriptionFromString "using \"platforms/cpus/egis_et171.repl\"; flash0: { size: 0x200000 }; p25q16: { underlyingMemory: flash0 }"
 
 $bin?=$ORIGIN/sanok/ec.bin
 $elf_ro?=$ORIGIN/sanok/ec.RO.elf
