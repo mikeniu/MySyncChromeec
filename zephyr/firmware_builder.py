@@ -537,6 +537,26 @@ def bundle_coverage(opts):
     return 0
 
 
+def _run_compress(cmd, cwd=None):
+    """Worker function to run tar compression."""
+    log_cmd(cmd, cwd=cwd)
+    try:
+        subprocess.run(
+            cmd,
+            cwd=cwd,
+            check=True,
+            capture_output=True,
+            stdin=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Compression failed for command {' '.join(cmd)}: {e}")
+        if e.stdout:
+            print(f"Stdout: {e.stdout.decode('utf-8')}")
+        if e.stderr:
+            print(f"Stderr: {e.stderr.decode('utf-8')}")
+        raise
+
+
 def bundle_firmware(opts):
     """Bundles the artifacts from each target into its own tarball."""
     info = firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
@@ -545,7 +565,7 @@ def bundle_firmware(opts):
 
     bundle_dir = get_bundle_dir(opts)
     platform_ec = ZEPHYR_DIR.parent
-    subprocesses = []
+    tasks = []
     ec_to_boxter_boards = read_boxter()
     per_board_targets = collections.defaultdict(list)
     for project in get_projects():
@@ -582,12 +602,8 @@ def bundle_firmware(opts):
         cmd.extend(
             [x.relative_to(artifacts_dir) for x in artifacts_dir.glob("*")]
         )
-        log_cmd(cmd, cwd=artifacts_dir)
-        subprocesses.append(
-            subprocess.Popen(  # pylint: disable=consider-using-with
-                cmd, cwd=artifacts_dir, stdin=subprocess.DEVNULL
-            )
-        )
+        tasks.append((cmd, artifacts_dir))
+
         meta = info.objects.add()
         meta.tarball_info.board.extend(boards)
         meta.file_name = tarball_name
@@ -606,12 +622,8 @@ def bundle_firmware(opts):
         cmd.extend(
             [x.relative_to(artifacts_dir) for x in artifacts_dir.glob("*")]
         )
-        log_cmd(cmd, cwd=artifacts_dir)
-        subprocesses.append(
-            subprocess.Popen(  # pylint: disable=consider-using-with
-                cmd, cwd=artifacts_dir, stdin=subprocess.DEVNULL
-            )
-        )
+        tasks.append((cmd, artifacts_dir))
+
         meta = info.objects.add()
         meta.tarball_info.board.extend(boards)
         meta.file_name = elf_tarball_name
@@ -633,22 +645,30 @@ def bundle_firmware(opts):
             "--transform",
             "s,/output,,",
         ] + dirs
-        log_cmd(cmd)
-        subprocesses.append(
-            subprocess.Popen(  # pylint: disable=consider-using-with
-                cmd, stdin=subprocess.DEVNULL
-            )
-        )
+        tasks.append((cmd, None))
+
         meta = info.objects.add()
         meta.tarball_info.board.append(board)
         meta.file_name = tarball_name
         meta.tarball_info.type = (
             firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
         )
-    for proc in subprocesses:
-        proc.wait()
-        if proc.returncode != 0:
-            raise subprocess.CalledProcessError(proc.returncode, proc.args)
+
+    # Run compression tasks in a controlled thread pool
+    max_workers = opts.cpus or 4
+    with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_cmd = {
+            executor.submit(_run_compress, cmd, cwd): cmd for cmd, cwd in tasks
+        }
+        for future in futures.as_completed(future_to_cmd):
+            try:
+                future.result()
+            except Exception as e:
+                # If one fails, cancel pending futures and raise immediately.
+                executor.shutdown(wait=False, cancel_futures=True)
+                raise RuntimeError(
+                    f"Bundle failed during compression: {e}"
+                ) from e
 
     tokens_file = "tokens.bin"
     tokens_path = platform_ec / "build" / tokens_file
