@@ -109,6 +109,9 @@ ZTEST(system_is_locked_wp_off, test_system_is_locked)
 			 "running this test\n");
 		zassert_unreachable();
 	}
+#if IS_ENABLED(CONFIG_PLATFORM_EC_WP_EXTERNAL)
+	disable_write_protect_external();
+#endif
 	test_pre_check();
 	write_protect_enabled = false;
 
