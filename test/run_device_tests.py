@@ -558,7 +558,7 @@ class Renode(Platform):
         # bloonchipper Zephyr tests to skip on Renode.
         if zephyr and test_name in [
             "benchmark",  # TODO(b/390253975)
-            "fp_transport",  # TODO(b/384094788)
+            "fp_transport",  # TODO(b/398038192)
             "zephyr_flash_stm32f4",  # TODO(b/384974228)
             # TODO(b/384975384)
             "zephyr_counter_basic_api_stm32_subsec",
@@ -641,7 +641,7 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.config_name in [
-            "flash_physical_ro",  # TODO(b/448407366)
+            "flash_physical_ro",  # TODO(b/485668836)
             "system_is_locked_wp_on",  # TODO(b/485669841)
             "system_is_locked_wp_on_helipilot_v2.0.24337",  # TODO(b/485669841)
             "system_is_locked_wp_on_helipilot_v2.0.27609",  # TODO(b/485669841)
@@ -655,9 +655,9 @@ class Renode(Platform):
         if test_config.test_name in [
             "benchmark",  # TODO(b/537717577)
             "flash_physical",  # TODO(b/468410778)
-            "flash_protection",  # TODO(b/487848806)
-            "flash_protection_rw",  # TODO(b/487848806)
-            "flash_write_protect",  # TODO(b/406944986)
+            "flash_protection",  # TODO(b/567678305)
+            "flash_protection_rw",  # TODO(b/567678305)
+            "flash_write_protect",  # TODO(b/567678305)
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
