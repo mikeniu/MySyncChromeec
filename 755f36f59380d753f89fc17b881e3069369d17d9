@@ -20,6 +20,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e351bf4_29d0d704",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T18:38:40Z",
+      "side": 1,
+      "message": "Done. Split CPRINTS logging change into its own parent CL.",
+      "parentUuid": "cf9a32f5_274e4181",
+      "isAi": true,
+      "revId": "755f36f59380d753f89fc17b881e3069369d17d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dda3d935_b7298370",
@@ -40,6 +59,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "755f36f59380d753f89fc17b881e3069369d17d9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5376e480_6879c8c3",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 8
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T18:38:40Z",
+      "side": 1,
+      "message": "This check does not apply here: image_data_offset_bytes is the byte offset in the raw buffer where the frame_size-byte image payload starts (i.e. the image resides at [offset, offset + size) within the buffer), so offset and size are independent parameters and there is no requirement that offset \u003c\u003d size. Bounds against the physical buffer capacity are already validated.",
+      "parentUuid": "dda3d935_b7298370",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "755f36f59380d753f89fc17b881e3069369d17d9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
