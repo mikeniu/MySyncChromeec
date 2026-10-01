@@ -192,6 +192,9 @@ def register_em32f967_project(
 niedzica = register_em32f967_project("niedzica", boards=["bluey"])
 assert_rw_fwid_DO_NOT_EDIT(project_name="niedzica", addr=0x24144)
 
+nysa = register_em32f967_project("nysa", boards=[])
+assert_rw_fwid_DO_NOT_EDIT(project_name="nysa", addr=0x24144)
+
 
 def register_ft9001_project(
     project_name,
