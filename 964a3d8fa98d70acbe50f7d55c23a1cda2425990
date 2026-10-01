@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b462f02_38a04e09",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T22:33:47Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/490fbfbf-2e2d-43db-8669-c1a9325802d3)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly addresses the bug by wrapping the byte-by-byte OTP key programming sequence with `irq_lock()` and `irq_unlock()`. This ensures the programming loop will not be interrupted. The error handling paths correctly release the lock.\n*   **Architecture \u0026 Component Fit:** The lock is placed at the appropriate layer, directly wrapping the low-level hardware write loop.\n*   **Code Simplicity:** The fix is minimal and direct, reusing existing `irq_lock` and `irq_unlock` primitives appropriately.\n*   **Idiomaticity \u0026 Readability:** The code conforms nicely to standard EC/Zephyr coding conventions. Local file consistency is maintained.\n*   **Security:** No security vulnerabilities are introduced. The use of interrupt locking during sensitive timing-critical cryptographic or key provisioning operations is a standard and secure practice.\n*   **Testing \u0026 Test Coverage:** Excellent. The mock `otpi_write` asserts that interrupts are locked (when compiling under Zephyr), validating the fix directly. Furthermore, the hardware test validates that the interrupt state is properly restored after `otp_key_provision()` completes. Zephyr-specific headers and assertions are correctly guarded to maintain legacy EC test compatibility.\n*   **CL Size \u0026 Scope:** Size: S (+30, -3). The CL is atomic and focuses strictly on a single logical change.\n*   **Commit Message:** The commit message clearly and accurately explains the changes and their motivation.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "964a3d8fa98d70acbe50f7d55c23a1cda2425990",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
