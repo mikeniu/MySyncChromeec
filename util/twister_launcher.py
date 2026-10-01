@@ -481,6 +481,7 @@ def main():
             "ZEPHYR_TOOLCHAIN_VARIANT": intercepted_args.toolchain,
             "PARSETAB_DIR": parsetab_dir,
             "PW_ROOT": str(pigweed_dir),
+            "CROSTC_USER_ACKNOWLEDGES_THAT_RISCV_IS_EXPERIMENTAL": "1",
         }
         protoc_path = shutil.which("protoc")
         if protoc_path:
