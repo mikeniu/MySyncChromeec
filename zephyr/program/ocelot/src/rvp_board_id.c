@@ -27,6 +27,9 @@ __override int board_get_version(void)
 		}
 
 		switch (sku_id) {
+		case 0:
+			rvp_model_id = 35;
+			break;
 		case 1:
 		case 2:
 		case 3:
