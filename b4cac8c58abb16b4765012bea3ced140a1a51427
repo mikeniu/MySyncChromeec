@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b8fce93_b5e0e89a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T19:30:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/32032951-f6a9-4ba3-9218-34d6c4351da2)]\n\n### Review Summary\n\n*   **Functionality:** The dynamic fetching, caching, and validation of `image_data_offset_bytes` are well implemented.\n*   **Security:** Bounds validations correctly check against `max_image_buffer_bytes`.\n*   **Architecture \u0026 Component Fit:** The caching implementation aligns well with the existing `FpImageFrameParamsCache` pattern.\n*   **Code Simplicity:** The code is direct and avoids unnecessary abstractions.\n*   **Idiomaticity \u0026 Readability:** Code adheres to C++ and Chromium OS EC standards. `CPRINTS` log formatting is clean.\n*   **Testing:** Thorough boundary and mutation testing is present in the Zephyr test suite.\n*   **CL Size \u0026 Scope:** Size: M (+190, -27). The CL is appropriately sized and focused entirely on the cache infrastructure.\n*   **Commit Message:** The commit message clearly explains the changes and includes required tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
