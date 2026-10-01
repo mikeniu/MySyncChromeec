@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf556e49_529ed267",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 25
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T17:29:20Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/20032107-fdd4-47a2-bf6e-f55ccbf89602)]\n\n### Review Summary\n* **Functionality**: The refactoring correctly maintains existing behavior by caching `FpImageFrameParam`.\n* **Architecture \u0026 Component Fit**: Fits nicely with the existing architecture.\n* **Code Simplicity**: The change is a straightforward pure move / refactoring.\n* **Idiomaticity \u0026 Readability**: Follows local conventions.\n* **Security**: Buffer boundary checks are correctly implemented.\n* **Testing \u0026 Test Coverage**: Tests are comprehensively updated and previous off-by-one boundary tests have been added.\n* **CL Size \u0026 Scope**: Size: M (+137, -102) - The author successfully split the CL, making it a single logical change focused on the parameter cache.\n* **Commit Message**: The commit message accurately reflects the changes and clearly explains the rationale.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a10f20995b53c5bebe5fa3e13c098680162f976a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
