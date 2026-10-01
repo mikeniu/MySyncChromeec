@@ -28,6 +28,8 @@ macro reset
     sysbus LoadSymbolsFrom $elf_ro
     sysbus LoadSymbolsFrom $elf_rw
     cpu VectorTableOffset 0x8000000
+    # TODO(b/567998100): Remove once NVIC SystemReset resets BASEPRI in Renode.
+    cpu BasePri 0
 """
 
 runMacro $reset
