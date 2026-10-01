@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a243872_cefbfa20",
+        "filename": "zephyr/program/bluey/pic/led.dtsi",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-10-01T03:05:44Z",
+      "side": 1,
+      "message": "The comment should also reflect the change for dual color. Or just delete it since the code is self-explanatory.",
+      "revId": "fcbc569304d7236f8eecbd1d19d719316efa6718",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
