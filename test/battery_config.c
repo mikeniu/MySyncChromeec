@@ -10,6 +10,7 @@
 #include "console.h"
 #include "cros_board_info.h"
 #include "ec_commands.h"
+#include "host_command.h"
 #include "test_util.h"
 #include "util.h"
 #include "write_protect.h"
@@ -295,6 +296,18 @@ DECLARE_EC_TEST(test_batt_conf_main_invalid)
 	return EC_SUCCESS;
 }
 
+DECLARE_EC_TEST(test_buffer_too_small)
+{
+	uint8_t buf[sizeof(struct batt_conf_header)];
+	int rv;
+
+	rv = test_send_host_command(EC_CMD_BATTERY_CONFIG, 0, NULL, 0, buf,
+				    sizeof(buf));
+	zassert_equal(rv, EC_RES_OVERFLOW);
+
+	return EC_SUCCESS;
+}
+
 TEST_SUITE(test_suite_battery_config)
 {
 	ztest_test_suite(
@@ -318,6 +331,8 @@ TEST_SUITE(test_suite_battery_config)
 		ztest_unit_test_setup_teardown(test_device_name_not_found,
 					       test_setup, test_teardown),
 		ztest_unit_test_setup_teardown(test_batt_conf_main_invalid,
+					       test_setup, test_teardown),
+		ztest_unit_test_setup_teardown(test_buffer_too_small,
 					       test_setup, test_teardown));
 	ztest_run_test_suite(test_battery_config);
 }

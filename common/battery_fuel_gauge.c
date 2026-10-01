@@ -465,20 +465,28 @@ static enum ec_status hc_battery_config(struct host_cmd_handler_args *args)
 {
 	struct batt_conf_header *r = args->response;
 	const struct batt_conf_embed *batt = get_batt_conf();
+	size_t manuf_name_size = strlen(batt->manuf_name);
+	size_t device_name_size =
+		batt->device_name ? strlen(batt->device_name) : 0;
+	size_t resp_size = sizeof(*r) + manuf_name_size + device_name_size +
+			   sizeof(batt->config);
 	uint8_t *p = (void *)r;
 
+	if (resp_size > args->response_max)
+		return EC_RES_OVERFLOW;
+
 	r->struct_version = EC_BATTERY_CONFIG_STRUCT_VERSION;
-	r->manuf_name_size = strlen(batt->manuf_name);
-	r->device_name_size = batt->device_name ? strlen(batt->device_name) : 0;
+	r->manuf_name_size = manuf_name_size;
+	r->device_name_size = device_name_size;
 	p += sizeof(*r);
-	memcpy(p, batt->manuf_name, r->manuf_name_size);
-	p += r->manuf_name_size;
-	memcpy(p, batt->device_name, r->device_name_size);
-	p += r->device_name_size;
+	memcpy(p, batt->manuf_name, manuf_name_size);
+	p += manuf_name_size;
+	if (device_name_size > 0)
+		memcpy(p, batt->device_name, device_name_size);
+	p += device_name_size;
 	memcpy(p, &batt->config, sizeof(batt->config));
 
-	args->response_size = sizeof(*r) + r->manuf_name_size +
-			      r->device_name_size + sizeof(batt->config);
+	args->response_size = resp_size;
 
 	return EC_RES_SUCCESS;
 }
