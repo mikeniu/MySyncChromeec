@@ -695,7 +695,6 @@ class Renode(Platform):
         if test_name in [
             "fpsensor_hw",  # TODO(b/384743080)
             "power_utilization",  # Can't measure power on Renode.
-            "production_app_test",  # TODO(b/384740370)
             "watchdog",  # TODO(b/390021699)
         ]:
             return True
@@ -820,6 +819,7 @@ class AllTests:
             TestConfig(
                 test_name="production_app_test",
                 finish_regexes=[RW_IMAGE_BOOTED_REGEX],
+                fail_regexes=[ASSERTION_FAILURE_REGEX],
                 imagetype_to_use=ImageType.RW,
                 apptype_to_use=ApplicationType.PRODUCTION,
             ),
