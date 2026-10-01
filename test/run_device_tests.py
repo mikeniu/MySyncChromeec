@@ -309,6 +309,7 @@ class Platform(ABC):
         test_name: str,
         enable_hw_write_protect: bool,
         zephyr: bool,
+        app_type: ApplicationType = ApplicationType.TEST,
     ) -> bool:
         """Flash specified test to specified board."""
 
@@ -384,6 +385,7 @@ class Hardware(Platform):
         test_name: str,
         enable_hw_write_protect: bool,
         zephyr: bool,
+        app_type: ApplicationType = ApplicationType.TEST,
     ) -> bool:
         logging.info("Flashing test")
 
@@ -458,6 +460,7 @@ class Renode(Platform):
         test_name: str,
         enable_hw_write_protect: bool,
         zephyr: bool,
+        app_type: ApplicationType = ApplicationType.TEST,
     ) -> bool:
         if self.process:
             self.cleanup()
@@ -482,7 +485,7 @@ class Renode(Platform):
                 cmd.extend(["--zephyr-bin", image_path])
             else:
                 cmd.append("--zephyr")
-        else:
+        elif app_type == ApplicationType.TEST:
             cmd.extend(["--ec", test_name])
 
         if enable_hw_write_protect:
@@ -1641,43 +1644,48 @@ def build_zephyr(
 
     cmd = ["zmake"] + ["build"]
     cmd = cmd + [board_name] + ["--clobber"]
-    if app_type != ApplicationType.TEST:
+    if app_type != ApplicationType.TEST and not zephyr_extra_configs:
         return cmd
 
     # Create tmp file to pass needed configs
     test_conf = os.path.join(tempfile.gettempdir(), "test.conf")
     with open(test_conf, "w", encoding="utf-8") as f_test_config:
         cmd = cmd + ["-DOVERLAY_CONFIG=" + test_conf]
-        # Get list of supported tests
-        testcase = os.path.join(ZEPHYR_FPMCU_DIR, "testcase.yaml")
-        with open(testcase, encoding="utf-8") as testcase:
-            lines = testcase.read()
-        testcase_data = yaml.load(lines, Loader=yaml.SafeLoader)
-        if "tests" not in testcase_data:
-            raise ValueError(
-                'testcase.yaml file doesn\'t contain "tests" section'
-            )
-        # Make sure the current test is supported
-        if test_name not in testcase_data["tests"]:
-            raise ValueError(test_name + " not present in testcase.yaml")
-        # Add configs needed for a specific test from "extra_conf_files"
-        # and "extra_configs" sections
-        if "extra_conf_files" in testcase_data["tests"][test_name]:
-            for config_file in testcase_data["tests"][test_name][
-                "extra_conf_files"
-            ]:
-                config_file_path = os.path.join(ZEPHYR_FPMCU_DIR, config_file)
-                with open(
-                    config_file_path, "r", encoding="utf-8"
-                ) as f_config_file:
-                    f_test_config.write(f_config_file.read())
-        if "extra_configs" in testcase_data["tests"][test_name]:
-            for config in testcase_data["tests"][test_name]["extra_configs"]:
-                f_test_config.write(config + "\n")
-        # Include tests also in RO part. It is not done by default
-        # because of lack of space
-        if img_type == ImageType.RO:
-            f_test_config.write("CONFIG_HW_TEST_RW_ONLY=n\n")
+        if app_type == ApplicationType.TEST:
+            # Get list of supported tests
+            testcase = os.path.join(ZEPHYR_FPMCU_DIR, "testcase.yaml")
+            with open(testcase, encoding="utf-8") as testcase:
+                lines = testcase.read()
+            testcase_data = yaml.load(lines, Loader=yaml.SafeLoader)
+            if "tests" not in testcase_data:
+                raise ValueError(
+                    'testcase.yaml file doesn\'t contain "tests" section'
+                )
+            # Make sure the current test is supported
+            if test_name not in testcase_data["tests"]:
+                raise ValueError(test_name + " not present in testcase.yaml")
+            # Add configs needed for a specific test from "extra_conf_files"
+            # and "extra_configs" sections
+            if "extra_conf_files" in testcase_data["tests"][test_name]:
+                for config_file in testcase_data["tests"][test_name][
+                    "extra_conf_files"
+                ]:
+                    config_file_path = os.path.join(
+                        ZEPHYR_FPMCU_DIR, config_file
+                    )
+                    with open(
+                        config_file_path, "r", encoding="utf-8"
+                    ) as f_config_file:
+                        f_test_config.write(f_config_file.read())
+            if "extra_configs" in testcase_data["tests"][test_name]:
+                for config in testcase_data["tests"][test_name][
+                    "extra_configs"
+                ]:
+                    f_test_config.write(config + "\n")
+            # Include tests also in RO part. It is not done by default
+            # because of lack of space
+            if img_type == ImageType.RO:
+                f_test_config.write("CONFIG_HW_TEST_RW_ONLY=n\n")
 
         for config in zephyr_extra_configs:
             f_test_config.write(f"{config}\n")
@@ -2059,6 +2067,7 @@ def flash_and_run_test(
             test.test_name,
             test.enable_hw_write_protect,
             args.zephyr,
+            test.apptype_to_use,
         ):
             logging.debug("Flashing failed")
             return False
