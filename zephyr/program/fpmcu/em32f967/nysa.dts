@@ -1,0 +1,56 @@
+/* Copyright 2026 The ChromiumOS Authors.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include "common.dtsi"
+
+#define ELANHV515RC_COMMON_IMAGE_PROPS \
+	width = <52>; \
+	height = <150>; \
+	bits-per-pixel = <8>; \
+	frame-size = <15600>; \
+	image-data-offset-bytes = <7800>; \
+	v4l2-pixel-format = "V4L2_PIX_FMT_GREY";
+
+
+&spi2 {
+	fp_sensor: elanhv515rc@0 {
+		compatible = "elan,elanhv515rc";
+		reg = <0>;
+		spi-max-frequency = <8000000>;
+
+		configs {
+			compatible = "fingerprint-image-frame-params";
+			config0 {
+				ELANHV515RC_COMMON_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT";
+			};
+			config1 {
+				ELANHV515RC_COMMON_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE";
+			};
+			config2 {
+				ELANHV515RC_COMMON_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_PATTERN0";
+			};
+			config3 {
+				ELANHV515RC_COMMON_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_PATTERN1";
+			};
+			config4 {
+				ELANHV515RC_COMMON_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST";
+			};
+			config5 {
+				ELANHV515RC_COMMON_IMAGE_PROPS
+				capture-type = "FINGERPRINT_CAPTURE_TYPE_RESET_TEST";
+			};
+		};
+
+		irq-gpios = <&gpioa 15 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpioa 14 GPIO_ACTIVE_LOW>;
+		base-image = <&base_image>;
+		ft-info = <&ft_info>;
+	};
+};
