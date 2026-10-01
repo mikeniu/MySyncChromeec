@@ -70,6 +70,7 @@ def launch(
     ec_project: str,
     uart: str,
     gdb_port: int = 3333,
+    pause: bool = False,
 ) -> int:
     """Launches an EC image in Renode.
 
@@ -83,6 +84,7 @@ def launch(
         ec_project: The name of the EC project.
         uart: Path to the UART PTY.
         gdb_port: Port number to start GDB server on (0 to disable).
+        pause: Whether to start the emulation paused.
 
     Returns:
         Non-zero on error. Does not return on success.
@@ -168,7 +170,8 @@ def launch(
             "connector Connect " + CONSOLE_MAP[board] + " term;"
         )
 
-    renode_execute.append("start;")
+    if not pause:
+        renode_execute.append("start;")
 
     # Build the Renode command with script execution.
     renode_cmd: List[str] = ["renode"]
@@ -253,6 +256,12 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         help="Port number to start GDB server on (0 to disable).",
     )
 
+    parser.add_argument(
+        "--pause",
+        action="store_true",
+        help="Do not start the emulation immediately.",
+    )
+
     opts = parser.parse_args(argv)
     return launch(
         board=opts.board,
@@ -262,6 +271,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         ec_project=opts.ec,
         uart=opts.uart,
         gdb_port=opts.gdb_port,
+        pause=opts.pause,
     )
 
 
