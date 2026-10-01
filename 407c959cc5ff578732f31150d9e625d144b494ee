@@ -34,6 +34,24 @@
       "parentUuid": "882e6427_b07c2ea0",
       "revId": "407c959cc5ff578732f31150d9e625d144b494ee",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd01e348_e04a0a53",
+        "filename": "zephyr/program/fpmcu/em32f967/niedzica.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1441652
+      },
+      "writtenOn": "2026-10-01T08:54:47Z",
+      "side": 1,
+      "message": "Ah, ok.",
+      "parentUuid": "04f5c542_ce9e2b09",
+      "revId": "407c959cc5ff578732f31150d9e625d144b494ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
