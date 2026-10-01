@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b69f953e_c8a854db",
+        "filename": "zephyr/test/hwtest/src/system_is_locked.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T16:52:57Z",
+      "side": 1,
+      "message": "Why are we disabling it? Shouldn\u0027t we modify the Renode launcher to start with the correct write protect?",
+      "range": {
+        "startLine": 112,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 6
+      },
+      "revId": "15bc8c6cd8dd47d0fbc49514eb00a1871d7bc6c9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
