@@ -28,4 +28,7 @@ GPIO_WP: Miscellaneous.Button @ gpioa 4
     init:
         ReleaseOnReset false
 
+gpio9:
+    3 -> gpio4@3
+
 fpsensor: Sensors.GenericSPISensor @ spip
