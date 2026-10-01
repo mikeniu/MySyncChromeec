@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1efe28f3_a798d194",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T01:09:08Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "99ef8fce_f7915fed",
+      "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bbaaf01_5805b52a",
@@ -51,6 +69,24 @@
       "side": 1,
       "message": "I do not believe so. If we need to do this, we should validate `validate_fp_buffer_offset(current_frame_size + current_image_offset, adjusted_offset, size)`",
       "parentUuid": "3bbaaf01_5805b52a",
+      "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14aa431a_b21cd143",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 679,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T01:09:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef669522_ccfda427",
       "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -91,6 +127,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53bfcafd_9acb7008",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T01:09:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b02590b_66f2f16a",
+      "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a7aed28_b0c9ab3d",
@@ -105,6 +159,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] **Testing Edge Case:** If `image_offset` evaluates to `0` based on the simulated board configuration, the calculation `UINT32_MAX - image_offset + 1` overflows to `0`. Consequently, `(uint64_t)offset + image_offset` will equal `0`, meaning it will **not** overflow 32 bits, causing the `zassert_true` on line 210 to fail and break the test. \n\nTo make this test robust across environments, consider enforcing a non-zero offset at the beginning of the test:\n```cpp\nFpImageFrameParamsCacheTestHelper::set_image_offset(\n    global_context.fp_image_frame_params_cache,\n    FP_CAPTURE_SIMPLE_IMAGE, 100);\n```",
       "isAi": true,
+      "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de1f03bf_9ab86a88",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T01:09:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a7aed28_b0c9ab3d",
       "revId": "f41b5e23175c0077bf001387d8f846ef3385155f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
