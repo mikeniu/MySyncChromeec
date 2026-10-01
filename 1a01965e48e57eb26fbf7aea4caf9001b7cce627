@@ -52,6 +52,25 @@
       "parentUuid": "003252c0_c16a2d01",
       "revId": "1a01965e48e57eb26fbf7aea4caf9001b7cce627",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53643444_8dfaea9c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T20:27:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/d0f2ea70-f29b-4b7d-9338-c887c4f161cb)]\n\n### Review Summary\n\n*   **Functionality:** The patch correctly addresses the bug by wrapping the byte-by-byte OTP key programming sequence with `irq_lock()` and `irq_unlock()`. This ensures the programming loop won\u0027t be interrupted, resolving the likely cause of flakiness. The error handling paths correctly release the lock.\n*   **Security:** No security vulnerabilities are introduced. The use of interrupt locking during sensitive timing-critical cryptographic operations is a standard and secure practice.\n*   **Code Simplicity:** The code is as simple and direct as possible, appropriately reusing existing `irq_lock` / `irq_unlock` primitives.\n*   **Idiomaticity \u0026 Readability:** The code conforms nicely to standard EC/Zephyr coding conventions.\n*   **Architecture \u0026 Component Fit:** The lock is placed at the appropriate layer directly wrapping the low-level hardware loop.\n*   **Testing \u0026 Test Coverage:** Excellent. The mock `otpi_write` asserts that interrupts are locked (when compiling under Zephyr), validating the fix directly. Furthermore, the hardware test validates that the interrupt state is properly restored after `otp_key_provision()` completes. Zephyr-specific headers and assertions are properly guarded for legacy EC test compatibility.\n*   **CL Size \u0026 Scope:** Size: S (+36, -4). The CL is perfectly scoped, addressing a single specific issue with appropriate test modifications.\n*   **Commit Message:** The commit message is concise and accurately reflects the changes and the intent.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "1a01965e48e57eb26fbf7aea4caf9001b7cce627",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
