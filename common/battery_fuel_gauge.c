@@ -465,20 +465,36 @@ static enum ec_status hc_battery_config(struct host_cmd_handler_args *args)
 {
 	struct batt_conf_header *r = args->response;
 	const struct batt_conf_embed *batt = get_batt_conf();
+	size_t manuf_name_size = strlen(batt->manuf_name);
+	size_t device_name_size =
+		batt->device_name ? strlen(batt->device_name) : 0;
+	size_t resp_size = sizeof(*r) + manuf_name_size + device_name_size +
+			   sizeof(batt->config);
 	uint8_t *p = (void *)r;
 
+	if (resp_size > args->output_buf_max)
+		return EC_HOST_CMD_OVERFLOW;
+
 	r->struct_version = EC_BATTERY_CONFIG_STRUCT_VERSION;
-	r->manuf_name_size = strlen(batt->manuf_name);
-	r->device_name_size = batt->device_name ? strlen(batt->device_name) : 0;
+	r->manuf_name_size = manuf_name_size;
+	r->device_name_size = device_name_size;
 	p += sizeof(*r);
-	memcpy(p, batt->manuf_name, r->manuf_name_size);
-	p += r->manuf_name_size;
-	memcpy(p, batt->device_name, r->device_name_size);
-	p += r->device_name_size;
+	memcpy(p, batt->manuf_name, manuf_name_size);
+	p += manuf_name_size;
+	if (device_name_size > 0)
+		memcpy(p, batt->device_name, device_name_size);
+	p += device_name_size;
 	memcpy(p, &batt->config, sizeof(batt->config));
 
+<<<<<<< HEAD   (06d697de6146d1743e05fead4671d2e94950f195 Revert "common: host_command: Reject overlapping commands wi)
 	args->response_size = sizeof(*r) + r->manuf_name_size +
 			      r->device_name_size + sizeof(batt->config);
+||||||| BASE   (2a0ae872653c2d6d84672ff58e8678322b2ea225 hekla: Change GPIO definition for next phase)
+	args->output_buf_size = sizeof(*r) + r->manuf_name_size +
+				r->device_name_size + sizeof(batt->config);
+=======
+	args->output_buf_size = resp_size;
+>>>>>>> CHANGE (5e348512e5eb4283cd776f616460c225d2382686 battery_fuel_gauge: prevent OOB write in hc_battery_config)
 
 	return EC_RES_SUCCESS;
 }
