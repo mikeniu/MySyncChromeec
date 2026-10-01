@@ -28,6 +28,41 @@ macro reset
     sysbus LoadSymbolsFrom $elf_ro
     sysbus LoadSymbolsFrom $elf_rw
     cpu VectorTableOffset 0x8000000
+
+    # Feed FPC1145 hardware ID (0x140a) for 5 fpc_pulse_hw_reset() attempts
+    # (3-byte HWID + 2-byte interrupt clear each), frame size cache population
+    # (3 bytes), and fpsensor_hw test check (3 bytes).
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
+    spi4.fpsensor FeedSample 0x00
+    spi4.fpsensor FeedSample 0x14
+    spi4.fpsensor FeedSample 0x0a
 """
 
 runMacro $reset
