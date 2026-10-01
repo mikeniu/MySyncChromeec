@@ -227,3 +227,19 @@ debugger:
    ```bash
    ./run_docker.sh bash -c "cd /workspace/src/platform/dagwood && ./build_from_chroot.py -f"
    ```
+
+---
+
+## Local Development vs. CI
+
+For local development, build the Docker image locally and run it without
+passing `--update`. Because the container mounts the persistent local
+`workspace/` directory rather than the outer checkout, incremental development
+via Docker requires making (or syncing) code changes in `workspace/` and
+copying build outputs out of `workspace/`. Skipping `--update` keeps existing
+checkouts and local edits untouched for fast, offline startup.
+
+CI workflows can download a prebuilt Docker image independently of the host
+SDK checkout and always pass `--update`. On initial run, this populates the
+workspace checkouts from the image cache and then fetches the latest upstream
+changes before running builds or tests.
