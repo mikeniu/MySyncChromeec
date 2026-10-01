@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bbf7d25_5b548459",
+        "filename": "util/ectool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 12411,
+      "author": {
+        "id": 1523797
+      },
+      "writtenOn": "2026-10-01T19:47:07Z",
+      "side": 1,
+      "message": "Can this be re-written like this?\n```c\nif (rv !\u003d (sizeof(r-\u003en_frames) + r-\u003en_frames * sizeof(r-\u003eframe_sizes[0])) ) {\n    /* unexpected size */\n}\n```",
+      "range": {
+        "startLine": 12409,
+        "startChar": 1,
+        "endLine": 12411,
+        "endChar": 63
+      },
+      "revId": "1e079e2f35e9ac387d7e30bd513cce6840758e49",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
