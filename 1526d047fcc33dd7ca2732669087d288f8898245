@@ -46,6 +46,31 @@
       },
       "revId": "1526d047fcc33dd7ca2732669087d288f8898245",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73cb184d_66e0cfdd",
+        "filename": "zephyr/test/hwtest/src/system_is_locked.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T20:37:21Z",
+      "side": 1,
+      "message": "Done in PS 8: restored common/debug.c with default __overridable implementations of debugger_is_connected() and debugger_was_connected() returning false so system_is_locked.c calls them unconditionally.",
+      "parentUuid": "857b4e35_55c42f49",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 6
+      },
+      "isAi": true,
+      "revId": "1526d047fcc33dd7ca2732669087d288f8898245",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
