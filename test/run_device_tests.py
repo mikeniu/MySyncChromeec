@@ -605,6 +605,11 @@ class Renode(Platform):
         ]:
             return True
 
+        if test_config.config_name in [
+            "system_is_locked_wp_on",  # TODO(b/483118063)
+        ]:
+            return True
+
         return False
 
     def _skip_test_helipilot(
@@ -659,7 +664,6 @@ class Renode(Platform):
             "flash_write_protect",  # TODO(b/406944986)
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
-            "system_is_locked",  # TODO(b/483118063)
             "exception",  # TODO(b/483118965)
             "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
             "fpsensor_debug",  # TODO(b/474439863)
