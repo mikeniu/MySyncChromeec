@@ -284,6 +284,24 @@
       "parentUuid": "08d045f7_6651d05c",
       "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d884b1e_33801082",
+        "filename": "zephyr/shim/chip/npcx/otp_key.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T20:47:26Z",
+      "side": 1,
+      "message": "@chlin56@nuvoton.com\n@CHChang19@nuvoton.com\n\nHello Nuvoton Team,\n\nCan you please confirm. Thanks!",
+      "parentUuid": "9f646bf2_36fbb2d8",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
