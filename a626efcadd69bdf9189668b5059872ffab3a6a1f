@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17325fcb_cfc74fe6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T17:37:11Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/f7628acd-37c6-4182-a80a-fca99d32f12e)]\n\n### Review Summary\n* **Functionality:** Looks good. Pure refactoring replacing the `FpFrameSizeCache` alias with the target `FpImageFrameParamsCache` type.\n* **Architecture \u0026 Component Fit:** Removing the transitional alias simplifies the codebase.\n* **Code Simplicity:** Direct usage is simpler and reduces indirection.\n* **Idiomaticity \u0026 Readability:** Compliant with Google C++ style.\n* **Security:** No concerns.\n* **Testing:** Test fixtures and calls updated appropriately; behavior is preserved.\n* **CL Size \u0026 Scope:** Size: M (+28, -40). This is a focused, single logical change.\n* **Commit Message:** Complies with Chromium OS style guidelines (`BUG\u003d` and `TEST\u003d` formatting is correct).",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a626efcadd69bdf9189668b5059872ffab3a6a1f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
