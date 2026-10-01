@@ -117,28 +117,47 @@ helipilot = register_fpmcu_variant(
 assert_rw_fwid_DO_NOT_EDIT(project_name="helipilot", addr=0x40144)
 
 
-def register_et171_project(
+def register_mcu_project(
     project_name,
+    zephyr_board,
+    mcu,
+    variant_modules,
+    variant_optional_modules,
     boards=(),
 ):
-    """Register an fpmcu variant"""
+    """Register an fpmcu project based on MCU"""
     dts_path = project_name + ".dts"
     conf_path = project_name + ".conf"
     return register_fpmcu_variant(
         project_name=project_name,
         boards=boards,
-        zephyr_board="egis_et171",
+        zephyr_board=zephyr_board,
         register_func=register_binman_project,
-        variant_modules=["hal_egis", "egis_module"],
-        variant_optional_modules=["egis_fp"],
-        variant_dts_overlays=[here / "et171" / dts_path],
+        variant_modules=variant_modules,
+        variant_optional_modules=variant_optional_modules,
+        variant_dts_overlays=[here / mcu / dts_path],
         variant_kconfig_files=[
-            here / "et171" / "prj.conf",
-            here / "et171" / conf_path,
+            here / mcu / "prj.conf",
+            here / mcu / conf_path,
         ],
         signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
-            here / "et171" / "dev_key.pem",
+            here / mcu / "dev_key.pem",
         ),
+    )
+
+
+def register_et171_project(
+    project_name,
+    boards=(),
+):
+    """Register an fpmcu project based on ET171 MCU"""
+    return register_mcu_project(
+        project_name=project_name,
+        zephyr_board="egis_et171",
+        mcu="et171",
+        variant_modules=["hal_egis", "egis_module"],
+        variant_optional_modules=["egis_fp"],
+        boards=boards,
     )
 
 
@@ -154,26 +173,23 @@ assert_rw_fwid_DO_NOT_EDIT(project_name="stobnica", addr=0x42104)
 smolec = register_et171_project("smolec", boards=["calypso"])
 assert_rw_fwid_DO_NOT_EDIT(project_name="smolec", addr=0x42104)
 
-niedzica = register_fpmcu_variant(
-    project_name="niedzica",
-    boards=["bluey"],
-    zephyr_board="32f967_dv",
-    register_func=register_binman_project,
-    variant_modules=["cmsis_6", "elan_module"],
-    variant_optional_modules=["elan_fp"],
-    variant_dts_overlays=[
-        here / "em32f967" / "niedzica.dts",
-    ],
-    variant_kconfig_files=[
-        here / "em32f967" / "prj.conf",
-    ],
-    signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
-        here / "em32f967" / "dev_key.pem",
-    ),
-)
 
-# The address of RW_FWID is hardcoded in RO. You need to have REALLY
-# good reason to change it.
+def register_em32f967_project(
+    project_name,
+    boards=(),
+):
+    """Register an fpmcu project based on EM32F967 MCU"""
+    return register_mcu_project(
+        project_name=project_name,
+        zephyr_board="32f967_dv",
+        mcu="em32f967",
+        variant_modules=["cmsis_6", "elan_module"],
+        variant_optional_modules=["elan_fp"],
+        boards=boards,
+    )
+
+
+niedzica = register_em32f967_project("niedzica", boards=["bluey"])
 assert_rw_fwid_DO_NOT_EDIT(project_name="niedzica", addr=0x24144)
 
 
@@ -181,26 +197,14 @@ def register_ft9001_project(
     project_name,
     boards=(),
 ):
-    """Register an fpmcu variant"""
-    dts_path = project_name + ".dts"
-    conf_path = project_name + ".conf"
-    return register_fpmcu_variant(
+    """Register an fpmcu project based on FT9001 MCU"""
+    return register_mcu_project(
         project_name=project_name,
-        boards=boards,
         zephyr_board="ft9001_eval",
-        register_func=register_binman_project,
+        mcu="ft9001",
         variant_modules=["cmsis_6", "focaltech_module"],
         variant_optional_modules=["focaltech_fp"],
-        variant_dts_overlays=[
-            here / "ft9001" / dts_path,
-        ],
-        variant_kconfig_files=[
-            here / "ft9001" / "prj.conf",
-            here / "ft9001" / conf_path,
-        ],
-        signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
-            here / "ft9001" / "dev_key.pem",
-        ),
+        boards=boards,
     )
 
 
