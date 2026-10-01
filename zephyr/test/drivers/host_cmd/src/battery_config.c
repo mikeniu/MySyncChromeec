@@ -46,5 +46,16 @@ ZTEST_USER(battery_config, test_get)
 	zassert_equal(conf.batt_info.precharge_current, 256);
 }
 
+ZTEST_USER(battery_config, test_buffer_too_small)
+{
+	uint8_t buf[sizeof(struct batt_conf_header)];
+	struct host_cmd_handler_args args;
+
+	/* Buffer smaller than required response size should be rejected */
+	zassert_equal(CROS_EC_COMMAND(&args, EC_CMD_BATTERY_CONFIG, 0, NULL, 0,
+				      buf, sizeof(buf)),
+		      EC_RES_INVALID_RESPONSE);
+}
+
 ZTEST_SUITE(battery_config, drivers_predicate_post_main, NULL, NULL, NULL,
 	    NULL);
