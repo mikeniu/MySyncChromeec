@@ -19,6 +19,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "db3bc37c_f29fb9d2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T01:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6587640a_50b1ceff",
+      "revId": "38762f78f48c703dc1adf4a35d11469c2a3dbff7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e4723fd_0a816b4c",
@@ -37,6 +55,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05ae0b2e_bddd360c",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 22
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T01:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e4723fd_0a816b4c",
+      "revId": "38762f78f48c703dc1adf4a35d11469c2a3dbff7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3b9ab93_d6993e4e",
@@ -51,6 +87,24 @@
       "side": 1,
       "message": "[Gerrit AI Review] The comment mentions `(size and offset)`, but `FpImageFrameParam` currently only contains `frame_size_bytes`. If you plan to add the offset in a subsequent CL, this is perfectly fine. Otherwise, consider updating the comment or adding `offset` to the struct to match.",
       "isAi": true,
+      "revId": "38762f78f48c703dc1adf4a35d11469c2a3dbff7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9217083d_fa948ef3",
+        "filename": "include/fpsensor/fpsensor_state.h",
+        "patchSetId": 22
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T01:10:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3b9ab93_d6993e4e",
       "revId": "38762f78f48c703dc1adf4a35d11469c2a3dbff7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
