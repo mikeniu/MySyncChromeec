@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c35bef58_e3efce94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T20:51:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8254756_1ba4c51e-fcc2-48a5-82db-31172823bfa0.pb)]\n\n### Review Summary\n\n* **Functionality:** The patch correctly addresses the bug by wrapping the byte-by-byte OTP key programming loop with `irq_lock()` and `irq_unlock()`. Error paths are handled properly to ensure the lock is released if `otpi_write` fails.\n* **Architecture \u0026 Component Fit:** The logic fits cleanly inside the existing API layers.\n* **Code Simplicity:** The fix is minimal and straightforward.\n* **Idiomaticity \u0026 Readability:** Local file consistency is maintained.\n* **Security:** Enforcing uninterrupted execution during sensitive cryptographic or key-provisioning operations is secure and recommended.\n* **Testing \u0026 Test Coverage:** Strong test coverage. The mock accurately enforces that `otpi_write` is called with interrupts disabled. The hardware test validates the success path and ensures IRQs are properly restored.\n* **CL Size \u0026 Scope:** Size: S (+36, -4). The CL is atomic and focuses strictly on a single logical change.\n* **Commit Message:** The commit message clearly and accurately explains the changes and their motivation.\n\nTAG\u003dagy\nCONV\u003d008e77fb-16e8-46ae-8dd1-e2294fa208f6",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "da57aea1d11ee6e9345ab49cdeb871e93ab42cbd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
