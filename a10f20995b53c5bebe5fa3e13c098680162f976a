@@ -18,6 +18,29 @@
       "isAi": true,
       "revId": "a10f20995b53c5bebe5fa3e13c098680162f976a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c05549ad_a33af2c9",
+        "filename": "include/fpsensor/fpsensor_frame_size.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T20:31:23Z",
+      "side": 1,
+      "message": "Why? This isn\u0027t still being used, is it?",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 49
+      },
+      "revId": "a10f20995b53c5bebe5fa3e13c098680162f976a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
