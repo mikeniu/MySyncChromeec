@@ -20,6 +20,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+import tempfile
 
 from google.protobuf import json_format  # pylint: disable=import-error
 
@@ -150,7 +151,31 @@ def get_version():
     return None
 
 
-def get_projects():
+def _save_or_load_shard_info(opts, save=False):
+    """Persist or load shard_count and shard_index across build/test/bundle."""
+    shard_file = ZEPHYR_DIR.parent / "build" / "zephyr" / ".shard_info.json"
+    if opts.shard_count and opts.shard_index:
+        if save:
+            shard_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(shard_file, "w", encoding="utf-8") as file:
+                json.dump(
+                    {
+                        "shard_count": opts.shard_count,
+                        "shard_index": opts.shard_index,
+                    },
+                    file,
+                )
+    elif shard_file.is_file():
+        try:
+            with open(shard_file, "r", encoding="utf-8") as file:
+                data = json.load(file)
+            opts.shard_count = data.get("shard_count")
+            opts.shard_index = data.get("shard_index")
+        except (OSError, ValueError):
+            pass
+
+
+def get_projects(opts=None):
     """Get the filtered list of all projects."""
     projects = []
     platform_ec = ZEPHYR_DIR.parent
@@ -180,6 +205,23 @@ def get_projects():
         ):
             continue
         projects.append(project)
+
+    projects.sort(key=lambda x: x.config.project_name)
+
+    if opts and opts.shard_count and opts.shard_index:
+        if opts.shard_index < 1 or opts.shard_index > opts.shard_count:
+            raise ValueError(
+                f"Invalid shard_index {opts.shard_index} for shard_count {opts.shard_count}"
+            )
+        total = len(projects)
+        chunk_size = total // opts.shard_count
+        remainder = total % opts.shard_count
+        start = (opts.shard_index - 1) * chunk_size + min(
+            opts.shard_index - 1, remainder
+        )
+        end = start + chunk_size + (1 if opts.shard_index <= remainder else 0)
+        projects = projects[start:end]
+
     return projects
 
 
@@ -341,6 +383,7 @@ def build(opts):
         stdin=subprocess.DEVNULL,
         env=env,
     )
+    _save_or_load_shard_info(opts, save=True)
 
     cmd = ["zmake", "-D", "build", "--static"]
     if opts.code_coverage:
@@ -352,7 +395,7 @@ def build(opts):
         if version:
             cmd.extend(["-v", version])
 
-    projects = get_projects()
+    projects = get_projects(opts)
     for project in projects:
         cmd.append(project.config.project_name)
 
@@ -456,6 +499,7 @@ def parse_buildlog(filename, metric, variant, track_on_gerrit):
 
 def bundle(opts):
     """Bundle the artifacts for either firmware or code coverage."""
+    _save_or_load_shard_info(opts)
     if opts.code_coverage:
         return bundle_coverage(opts)
     return bundle_firmware(opts)
@@ -535,6 +579,7 @@ def _get_safe_lcov_workers(requested_cpus):
 
 def bundle_coverage(opts):
     """Bundles the artifacts from code coverage into its own tarball."""
+    _save_or_load_shard_info(opts)
     info = firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
     info.bcs_version_info.version_string = opts.bcs_version
     bundle_dir = get_bundle_dir(opts)
@@ -554,7 +599,9 @@ def bundle_coverage(opts):
     # postsubmit release builds. Postsubmit builders pass --bcs-version to
     # version artifacts, whereas presubmit CQ runs without --bcs-version and
     # only needs coverage.tbz2 (lcov.info) for Gerrit/Zoss coverage display.
-    if opts.html or opts.bcs_version:
+    if (opts.html or opts.bcs_version) and not (
+        opts.shard_count and opts.shard_index
+    ):
         (bundle_dir / "html").mkdir(exist_ok=True)
         # Build HTML coverage reports when bundling artifacts
         max_lcov_workers = _get_safe_lcov_workers(opts.cpus)
@@ -589,6 +636,127 @@ def bundle_coverage(opts):
     return 0
 
 
+def merge_shards(opts):
+    """Merges coverage artifacts from multiple build shards into a single report."""
+    merge_dir = pathlib.Path(opts.merge_dir)
+    if not merge_dir.is_dir() and (ZEPHYR_DIR / opts.merge_dir).is_dir():
+        merge_dir = ZEPHYR_DIR / opts.merge_dir
+    if not merge_dir.is_dir():
+        print(f"Error: Merge directory {opts.merge_dir} does not exist.")
+        return 1
+
+    tbz_files = sorted(merge_dir.glob("*.tbz2"))
+    extracted_infos = []
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = pathlib.Path(tmpdir)
+        for idx, tbz_path in enumerate(tbz_files):
+            shard_tmp = tmp_path / f"shard_{idx}_{tbz_path.stem}"
+            shard_tmp.mkdir(parents=True, exist_ok=True)
+            cmd = ["tar", "xvfj", str(tbz_path.resolve())]
+            log_cmd(cmd, cwd=shard_tmp)
+            subprocess.run(
+                cmd, cwd=shard_tmp, check=True, stdin=subprocess.DEVNULL
+            )
+            extracted_infos.extend(sorted(shard_tmp.rglob("*.info")))
+
+        # Also support any raw .info files placed directly in merge_dir
+        extracted_infos.extend(sorted(merge_dir.glob("*.info")))
+
+        if not extracted_infos:
+            print(f"Error: No .info files found to merge in {merge_dir}")
+            return 1
+
+        platform_ec = ZEPHYR_DIR.parent
+        out_dir = platform_ec / "build" / "zephyr"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        merged_info = out_dir / "lcov.info"
+
+        max_lcov_workers = _get_safe_lcov_workers(opts.cpus)
+        lcov_cmd = [
+            "/usr/bin/lcov",
+            "--parallel",
+            str(max_lcov_workers),
+            "--rc",
+            "branch_coverage=1",
+            "--rc",
+            "no_exception_branch=1",
+            "--ignore-errors",
+            "inconsistent,inconsistent",
+            "--ignore-errors",
+            "unused,unused",
+            "--ignore-errors",
+            "gcov,gcov",
+            "-o",
+            str(merged_info),
+        ]
+        for info_file in extracted_infos:
+            lcov_cmd.extend(["-a", str(info_file)])
+
+        log_cmd(lcov_cmd)
+        subprocess.run(
+            lcov_cmd, cwd=ZEPHYR_DIR, check=True, stdin=subprocess.DEVNULL
+        )
+
+        # Generate the HTML report from the merged lcov.info
+        html_dir = out_dir / "html"
+        if html_dir.exists():
+            shutil.rmtree(html_dir)
+        html_dir.mkdir(parents=True, exist_ok=True)
+        genhtml_cmd = [
+            "/usr/bin/genhtml",
+            "--parallel",
+            str(max_lcov_workers),
+            "--branch-coverage",
+            "-q",
+            "-o",
+            str(html_dir),
+            "--ignore-errors",
+            "inconsistent,inconsistent",
+            "--ignore-errors",
+            "unused",
+            "-t",
+            "All boards and tests merged",
+            "-s",
+            str(merged_info),
+        ]
+        log_cmd(genhtml_cmd)
+        subprocess.run(
+            genhtml_cmd, cwd=ZEPHYR_DIR, check=True, stdin=subprocess.DEVNULL
+        )
+
+        # Package merged lcov.info and html/ into build/zephyr/coverage.tbz2
+        tarball_name = "coverage.tbz2"
+        tarball_path = out_dir / tarball_name
+        tar_cmd = ["tar", "cvfj", str(tarball_path), "lcov.info", "html/"]
+        log_cmd(tar_cmd, cwd=out_dir)
+        subprocess.run(
+            tar_cmd, cwd=out_dir, check=True, stdin=subprocess.DEVNULL
+        )
+
+        if opts.output_dir:
+            bundle_dir = get_bundle_dir(opts)
+            if bundle_dir.resolve() != out_dir.resolve():
+                shutil.copyfile(tarball_path, bundle_dir / tarball_name)
+
+        if opts.metadata or opts.output_dir:
+            info = (
+                firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
+            )
+            info.bcs_version_info.version_string = opts.bcs_version
+            meta = info.objects.add()
+            meta.file_name = tarball_name
+            meta.lcov_info.type = (
+                firmware_pb2.FirmwareArtifactInfo.LcovTarballInfo.LcovType.LCOV  # pylint: disable=no-member
+            )
+            meta = info.objects.add()
+            meta.file_name = "html"
+            meta.coverage_html.SetInParent()
+            write_metadata(opts, info)
+
+    return 0
+
+
 def _run_compress(cmd, cwd=None):
     """Worker function to run tar compression."""
     log_cmd(cmd, cwd=cwd)
@@ -611,6 +779,7 @@ def _run_compress(cmd, cwd=None):
 
 def bundle_firmware(opts):
     """Bundles the artifacts from each target into its own tarball."""
+    _save_or_load_shard_info(opts)
     info = firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
     info.bcs_version_info.version_string = opts.bcs_version
     version = opts.bcs_version or get_version()
@@ -620,7 +789,7 @@ def bundle_firmware(opts):
     tasks = []
     ec_to_boxter_boards = read_boxter()
     per_board_targets = collections.defaultdict(list)
-    for project in get_projects():
+    for project in get_projects(opts):
         build_dir = (
             platform_ec / "build" / "zephyr" / project.config.project_name
         )
@@ -741,7 +910,10 @@ def bundle_firmware(opts):
 
 def test(opts):
     """Runs all of the unit tests for Zephyr firmware"""
+    _save_or_load_shard_info(opts, save=True)
     metrics = firmware_pb2.FwTestMetricList()  # pylint: disable=no-member
+    projects = get_projects(opts)
+    project_names = {p.config.project_name for p in projects}
 
     # Run tests from Makefile.cq because make knows how to run things
     # in parallel.
@@ -767,6 +939,10 @@ def test(opts):
             cmd.append(f"TWISTER_SUBSET={opts.firmware_targets}")
         else:
             boards.extend(opts.firmware_targets.split(","))
+
+    if opts.shard_count and opts.shard_index:
+        cmd.append(f"TWISTER_SUBSET={opts.shard_index}/{opts.shard_count}")
+        boards = [b for b in boards if b in project_names]
 
     if boards:
         cmd.append(f"SPECIAL_BOARDS={' '.join(boards)}")
@@ -806,7 +982,7 @@ def test(opts):
             ]
         )
 
-        for project in get_projects():
+        for project in projects:
             if project.config.project_name in SPECIAL_BOARDS:
                 tasks.append(
                     (
@@ -984,7 +1160,7 @@ def _extract_lcov_summary_worker(name, filename):
 def main(args):
     """Builds and tests all of the Zephyr targets and reports build metrics"""
     parser, sub_cmds = scripts.firmware_builder_lib.create_arg_parser(
-        build, bundle, test
+        build, bundle, test, merge_shards
     )
 
     check_boards_cmd = sub_cmds.add_parser(
