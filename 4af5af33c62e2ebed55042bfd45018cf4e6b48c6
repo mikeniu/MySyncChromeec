@@ -109,6 +109,24 @@
       "isAi": true,
       "revId": "4af5af33c62e2ebed55042bfd45018cf4e6b48c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95c0eff7_95cfaab6",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T18:42:42Z",
+      "side": 1,
+      "message": "Done. Added the comment explaining the `__attribute__((constructor))` / `.init_array` execution order in `core/cortex-m/init.S` prior to `main()` and RW\u0027s `system_pre_init()`, updated the comment, and tightened the check to `canary_count \u003e 0`.\n\nTo answer your questions:\n1. Yes, that\u0027s right—since `fp_buffer` is only compiled into `SECTION_IS_RW`, RO\u0027s `[__ahb4_start, __ahb4_end)` only spans the SPI host-command and UART buffers (`0x38000000..0x38000cc8`), while RW\u0027s `fp_buffer` starts at `0x38000cc8`. Across a reboot on STM32H7, `fp_buffer` is cleared by RW\u0027s `system_reset()` before resetting into RO (and by `.bss` zeroing in `init.S` on boards where `fp_buffer` lives in `.bss`). Removed the mention of RO\u0027s `system_pre_init()` from the comment.\n2. Correct—since both RO and RW place the SPI host-command buffers (`in_msg`/`out_msg`) and UART buffers (`tx_buf`/`rx_buf`) at `0x38000000..0x38000cc5` ahead of `fp_buffer` (`0x38000cc8`), RO\u0027s UART buffers do not overlap `fp_buffer`, so `fp_buffer` is completely zeroed at this point and we can check `canary_count \u003e 0`.",
+      "parentUuid": "86d8193e_caaf3094",
+      "revId": "4af5af33c62e2ebed55042bfd45018cf4e6b48c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
