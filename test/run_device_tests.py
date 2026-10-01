@@ -599,10 +599,7 @@ class Renode(Platform):
             "fpsensor_debug",  # TODO(b/485315321)
             "restricted_console",  # TODO(b/485315829)
             "system_is_locked",  # TODO(b/485316683)
-            "zephyr_cpp_newlib",  # TODO(b/485316816)
-            "zephyr_cpp_std20",  # TODO(b/485316816)
             "zephyr_drivers_entropy",  # TODO(b/485898244)
-            "zephyr_kernel_poll",  # TODO(b/485316816)
         ]:
             return True
 
@@ -668,10 +665,7 @@ class Renode(Platform):
             "otp_key",  # TODO(b/483121090)
             "restricted_console",  # TODO(b/474439863)
             "tpm_seed_clear",  # TODO(b/556233130)
-            "zephyr_cpp_newlib",  # TODO(b/484366615)
-            "zephyr_cpp_std20",  # TODO(b/484366615)
-            "zephyr_drivers_entropy",  # TODO(b/484366615)
-            "zephyr_kernel_poll",  # TODO(b/484366615)
+            "zephyr_drivers_entropy",  # TODO(b/485898244)
         ]:
             return True
 
