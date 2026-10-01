@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "87b27b93aab3118168970a5f4f993410c36cb22b",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac8a67d7_12561709",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T18:56:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e093a78a_572cd3d7",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "revId": "87b27b93aab3118168970a5f4f993410c36cb22b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
