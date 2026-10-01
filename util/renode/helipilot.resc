@@ -22,6 +22,10 @@ showAnalyzer cr_uart1
 # TODO(b/567997351): Keep outside macro reset so flash writes persist across resets.
 sysbus LoadBinary $bin 0x64000000
 
+# TODO(b/567996957): Remove once NPCX_TWD supports Too Early Service reset and WDCP readback in Renode.
+twd AddAfterWriteWordHook 0xA "if value == 0x5c and (self.ReadWord(0x6) & 0x20) == 0: self.WriteWord(0xa, 0x00)"
+twd AddAfterReadWordHook 0x10 "value = 5"
+
 macro reset
 """
     sysbus LoadSymbolsFrom $elf_ro
