@@ -1,4 +1,4 @@
-/* Copyright 2025 The ChromiumOS Authors
+/* Copyright 2026 The ChromiumOS Authors
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
@@ -67,20 +67,69 @@ ZTEST(fpsensor_image_frame_params,
 	zassert_true(ARRAY_SIZE(image_frame_params_arr) > 0,
 		     "image_frame_params_arr must not be empty for this test.");
 
-	uint32_t max_frame_size_bytes =
-		image_frame_params_arr[0].frame_size - 1;
+	uint32_t max_configured_frame_size = 0;
+	for (const auto &params : image_frame_params_arr) {
+		max_configured_frame_size =
+			MAX(max_configured_frame_size, params.frame_size);
+	}
 
-	FpImageFrameParamsCache failing_cache{};
-	failing_cache.populate_cache(max_frame_size_bytes);
+	if (max_configured_frame_size > 0) {
+		FpImageFrameParamsCache failing_cache{};
+		failing_cache.populate_cache(max_configured_frame_size - 1);
 
-	for (int i = 0; i < FP_CAPTURE_TYPE_MAX; ++i) {
-		enum fp_capture_type type =
-			static_cast<enum fp_capture_type>(i);
-		uint32_t actual_size = failing_cache.get_frame_size(type);
+		for (int i = 0; i < FP_CAPTURE_TYPE_MAX; ++i) {
+			enum fp_capture_type type =
+				static_cast<enum fp_capture_type>(i);
+			uint32_t actual_size =
+				failing_cache.get_frame_size(type);
+			uint32_t actual_offset =
+				failing_cache.get_image_offset(type);
 
-		zassert_equal(0, actual_size,
-			      "Unconfigured Type %d should return zero size.",
-			      i);
+			zassert_equal(
+				0, actual_size,
+				"Type %d should return zero size after size validation failure.",
+				i);
+			zassert_equal(
+				0, actual_offset,
+				"Type %d should return zero offset after size validation failure.",
+				i);
+		}
+	}
+}
+
+ZTEST(fpsensor_image_frame_params,
+      test_cache_initialization_on_offset_constraint_failure)
+{
+	zassert_true(ARRAY_SIZE(image_frame_params_arr) > 0,
+		     "image_frame_params_arr must not be empty for this test.");
+
+	uint32_t max_configured_offset = 0;
+	for (const auto &params : image_frame_params_arr) {
+		max_configured_offset = MAX(max_configured_offset,
+					    params.image_data_offset_bytes);
+	}
+
+	if (max_configured_offset > 0) {
+		FpImageFrameParamsCache failing_cache{};
+		failing_cache.populate_cache(max_configured_offset - 1);
+
+		for (int i = 0; i < FP_CAPTURE_TYPE_MAX; ++i) {
+			enum fp_capture_type type =
+				static_cast<enum fp_capture_type>(i);
+			uint32_t actual_size =
+				failing_cache.get_frame_size(type);
+			uint32_t actual_offset =
+				failing_cache.get_image_offset(type);
+
+			zassert_equal(
+				0, actual_size,
+				"Type %d should return zero size after offset validation failure.",
+				i);
+			zassert_equal(
+				0, actual_offset,
+				"Type %d should return zero offset after offset validation failure.",
+				i);
+		}
 	}
 }
 
@@ -91,6 +140,7 @@ ZTEST(fpsensor_image_frame_params,
 
 	for (const auto &params : image_frame_params_arr) {
 		const uint32_t expected_size = params.frame_size;
+		const uint32_t expected_offset = params.image_data_offset_bytes;
 		const enum fp_capture_type type =
 			static_cast<enum fp_capture_type>(
 				params.fp_capture_type);
@@ -103,8 +153,14 @@ ZTEST(fpsensor_image_frame_params,
 		uint32_t actual_size = cache->get_frame_size(type);
 		zassert_equal(
 			expected_size, actual_size,
-			"Mismatch for configured type %d. Expected: %u, Actual: %u",
+			"Size mismatch for configured type %d. Expected: %u, Actual: %u",
 			static_cast<int>(type), expected_size, actual_size);
+
+		uint32_t actual_offset = cache->get_image_offset(type);
+		zassert_equal(
+			expected_offset, actual_offset,
+			"Offset mismatch for configured type %d. Expected: %u, Actual: %u",
+			static_cast<int>(type), expected_offset, actual_offset);
 	}
 }
 
@@ -122,6 +178,7 @@ ZTEST(fpsensor_image_frame_params, test_cache_invalid_type_lookup)
 		enum fp_capture_type type =
 			static_cast<enum fp_capture_type>(i);
 		uint32_t actual_size = cache->get_frame_size(type);
+		uint32_t actual_offset = cache->get_image_offset(type);
 
 		if (is_type_present[i]) {
 			zassert_true(
@@ -132,6 +189,10 @@ ZTEST(fpsensor_image_frame_params, test_cache_invalid_type_lookup)
 			zassert_equal(
 				0, actual_size,
 				"Unconfigured Type %d should return zero size.",
+				i);
+			zassert_equal(
+				0, actual_offset,
+				"Unconfigured Type %d should return zero offset.",
 				i);
 		}
 	}
@@ -144,6 +205,23 @@ ZTEST(fpsensor_image_frame_params, test_cache_boundary_max_index)
 	zassert_equal(
 		cache->get_frame_size(FP_CAPTURE_TYPE_MAX), 0,
 		"Expected zero size for invalid capture type (FP_CAPTURE_TYPE_MAX).");
+	zassert_equal(
+		cache->get_image_offset(FP_CAPTURE_TYPE_MAX), 0,
+		"Expected zero offset for invalid capture type (FP_CAPTURE_TYPE_MAX).");
+}
+
+ZTEST(fpsensor_image_frame_params, test_cache_boundary_above_max_index)
+{
+	FpImageFrameParamsCache *cache = cache_fixture.get();
+	const enum fp_capture_type above_max_type =
+		static_cast<enum fp_capture_type>(FP_CAPTURE_TYPE_MAX + 1);
+
+	zassert_equal(
+		cache->get_frame_size(above_max_type), 0,
+		"Expected zero size for invalid capture type (FP_CAPTURE_TYPE_MAX + 1).");
+	zassert_equal(
+		cache->get_image_offset(above_max_type), 0,
+		"Expected zero offset for invalid capture type (FP_CAPTURE_TYPE_MAX + 1).");
 }
 
 ZTEST(fpsensor_image_frame_params, test_cache_boundary_negative_index)
@@ -153,6 +231,9 @@ ZTEST(fpsensor_image_frame_params, test_cache_boundary_negative_index)
 	zassert_equal(
 		cache->get_frame_size(static_cast<enum fp_capture_type>(-1)), 0,
 		"Expected zero size for negative capture type (-1).");
+	zassert_equal(
+		cache->get_image_offset(static_cast<enum fp_capture_type>(-1)),
+		0, "Expected zero offset for negative capture type (-1).");
 }
 
 ZTEST(fpsensor_image_frame_params, test_set_frame_size)
@@ -178,6 +259,23 @@ ZTEST(fpsensor_image_frame_params, test_set_frame_size)
 		updated_size, new_size,
 		"Cache failed to update with set_frame_size. Expected: %u, Actual: %u",
 		new_size, updated_size);
+}
+
+ZTEST(fpsensor_image_frame_params, test_set_image_offset)
+{
+	FpImageFrameParamsCache *cache = cache_fixture.get();
+	const enum fp_capture_type test_type = FP_CAPTURE_VENDOR_FORMAT;
+	const uint32_t new_offset = 64;
+
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_image_offset(
+			     *cache, test_type, new_offset),
+		     "Failed to set image offset for test type %d", test_type);
+
+	uint32_t updated_offset = cache->get_image_offset(test_type);
+	zassert_equal(
+		updated_offset, new_offset,
+		"Cache failed to update with set_image_offset. Expected: %u, Actual: %u",
+		new_offset, updated_offset);
 }
 
 ZTEST(fpsensor_image_frame_params, test_set_frame_size_boundary_max_index)
@@ -206,4 +304,30 @@ ZTEST(fpsensor_image_frame_params, test_set_frame_size_boundary_negative_index)
 	zassert_equal(
 		cache->get_frame_size(static_cast<enum fp_capture_type>(-1)), 0,
 		"set_frame_size should ignore the negative out-of-bounds index -1.");
+}
+
+ZTEST(fpsensor_image_frame_params, test_set_image_offset_boundary_max_index)
+{
+	FpImageFrameParamsCache *cache = cache_fixture.get();
+	const uint32_t new_offset = 32;
+
+	zassert_false(FpImageFrameParamsCacheTestHelper::set_image_offset(
+		*cache, FP_CAPTURE_TYPE_MAX, new_offset));
+	zassert_equal(
+		cache->get_image_offset(FP_CAPTURE_TYPE_MAX), 0,
+		"set_image_offset should ignore out-of-bounds FP_CAPTURE_TYPE_MAX.");
+}
+
+ZTEST(fpsensor_image_frame_params,
+      test_set_image_offset_boundary_negative_index)
+{
+	FpImageFrameParamsCache *cache = cache_fixture.get();
+	const uint32_t new_offset = 32;
+
+	zassert_false(FpImageFrameParamsCacheTestHelper::set_image_offset(
+		*cache, static_cast<enum fp_capture_type>(-1), new_offset));
+	zassert_equal(
+		cache->get_image_offset(static_cast<enum fp_capture_type>(-1)),
+		0,
+		"set_image_offset should ignore negative out-of-bounds index -1.");
 }
