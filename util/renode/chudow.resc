@@ -9,6 +9,12 @@ mach create $name
 $repl?=@platforms/cpus/focaltech_ft9001.repl
 machine LoadPlatformDescription $repl
 machine LoadPlatformDescriptionFromString "romfuncs: Memory.MappedMemory @ sysbus 0x04006000 { size: 0x2000 }"
+# Upstream focaltech_ft9001.repl does not map the 2 MB PSRAM region at
+# 0x18000000 (defined in ft9001.dtsi), where chudow places fp_buffer via
+# FP_FRAME_SECTION. Map psram so fingerprint frame reads and writes are backed
+# by memory.
+# TODO(b/567997557): Remove once psram is added to upstream focaltech_ft9001.repl.
+machine LoadPlatformDescriptionFromString "psram: Memory.MappedMemory @ sysbus 0x18000000 { size: 0x200000 }"
 
 $bin?=$ORIGIN/chudow/ec.bin
 $elf_ro?=$ORIGIN/chudow/ec.RO.elf
