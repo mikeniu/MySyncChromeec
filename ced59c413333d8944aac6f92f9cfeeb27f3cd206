@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac1fb32a_1fcf1b9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T19:02:18Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/5fbee60f-d471-46e1-9dbe-585e17a30d38)]\n\n### Review Summary\n\n*   **Functionality:** ✅ The memory clearing logic safely zeroes the `__ahb4` region using `memset` when the region has a non-zero size, correctly placed in `system_pre_init()` and `system_reset()`. The weak symbols prevent build failures on platforms that do not define them.\n*   **Architecture \u0026 Component Fit:** ✅ The clearing logic is conditionally compiled for `CHIP_VARIANT_STM32H7X3` within the `stm32` chip system module (`chip/stm32/system.c`), preserving architectural layering by keeping chip-specific logic out of the generic Cortex-M initialization.\n*   **Code Simplicity:** ✅ The added code uses straightforward `uintptr_t` arithmetic and standard memory operations.\n*   **Idiomaticity \u0026 Readability:** ✅ The C++ test correctly employs idiomatic `std::begin()`, `std::end()`, and `std::count()` from the standard library. The C code correctly uses `IS_ENABLED()` macros for configuration checks.\n*   **Security:** ✅ Purging stale data from the `.ahb4` NOLOAD SRAM region across resets is a solid defense-in-depth security measure.\n*   **Testing:** ✅ Test coverage is excellent. The new multistep device test `fp_buffer_clear` correctly verifies that the memory is cleared across reboots by employing a pre-main `__attribute__((constructor))` canary check, validating both before and after the reset.\n*   **CL Size \u0026 Scope:** ✅ Size: M (+171, -0). The CL is well-scoped, focusing purely on zero-initializing the AHB4 memory region and adding its corresponding unit test.\n*   **Commit Message:** ✅ The commit message clearly details the rationale (preventing sensitive data exposure across resets) and the changes, meeting all styling guidelines.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
