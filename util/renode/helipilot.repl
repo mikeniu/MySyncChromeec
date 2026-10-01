@@ -35,3 +35,14 @@ gpio9:
     3 -> gpio4@3
 
 fpsensor: Sensors.GenericSPISensor @ spip
+
+// Upstream nuvoton_npcx9.repl maps battery_backed_ram at 0x400AF000 with size
+// > 0x100, covering the Write-1-To-Clear BKUP_STS register at 0x400AF100 with
+// ordinary RAM. When bbram_npcx_init() writes 0x80 (IBBR) to 0x400AF100 to
+// clear the status bit, RAM retains 0x80 and causes subsequent boots across
+// resets to treat BBRAM as corrupted. Unregister battery_backed_ram and replace
+// it with a 0x100-byte memory so 0x400AF100 is not backed by RAM.
+// TODO(b/567997307): Remove once battery_backed_ram size is fixed in upstream nuvoton_npcx9.repl.
+battery_backed_ram: @ none
+bbram: Memory.ArrayMemory @ sysbus 0x400AF000
+    size: 0x100
