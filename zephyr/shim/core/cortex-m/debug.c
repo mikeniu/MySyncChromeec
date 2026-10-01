@@ -4,15 +4,11 @@
  */
 
 #include "common.h"
+#include "debug.h"
 
 #include <cmsis_core.h>
 
 __override bool debugger_is_connected(void)
 {
 	return CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk;
-}
-
-__overridable bool debugger_was_connected(void)
-{
-	return false;
 }
