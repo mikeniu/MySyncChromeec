@@ -28,6 +28,18 @@ class FpImageFrameParamsCacheTestHelper {
 			.frame_size_bytes = size;
 		return true;
 	}
+
+	static FpImageFrameParam *params(FpImageFrameParamsCache &cache,
+					 enum fp_capture_type capture_type)
+	{
+		if (static_cast<size_t>(capture_type) >=
+		    cache.frame_params_.size()) {
+			printk("Error: Invalid capture type %d\n",
+			       capture_type);
+			return nullptr;
+		}
+		return &cache.frame_params_[static_cast<size_t>(capture_type)];
+	}
 };
 
 #endif /* PLATFORM_EC_ZEPHYR_TEST_FINGERPRINT_TASK_INCLUDE_FPSENSOR_TEST_UTILS_H_ \
