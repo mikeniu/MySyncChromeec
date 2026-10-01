@@ -98,7 +98,7 @@ struct fpsensor_context {
 	 * most recent successful capture.
 	 */
 	enum fp_capture_type current_capture_type;
-	/** Map of the capture type to frame parameters. */
+	/** Map of the capture type to frame parameters (size and offset). */
 	FpImageFrameParamsCache fp_image_frame_params_cache;
 	/** Part of the IKM used to derive encryption keys received from the
 	 * TPM.
