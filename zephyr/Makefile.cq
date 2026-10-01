@@ -22,7 +22,8 @@ THIRD_PARTY=$(abspath ../../../third_party)
 BUILD=$(PLATFORM_EC)/build
 
 CPUS?=1
-LCOV_PARALLEL=--parallel $(CPUS)
+LCOV_CPUS?=$(CPUS)
+LCOV_PARALLEL=--parallel $(LCOV_CPUS)
 
 # test/mock is not a generator or system path. However, listing it here
 # removes it from consideration in CQ coverage math, which is the intent.

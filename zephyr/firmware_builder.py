@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=too-many-lines
 # Copyright 2021 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
@@ -484,6 +485,54 @@ def write_metadata(opts, info):
         file.write(json_format.MessageToJson(info))
 
 
+def _get_safe_lcov_workers(requested_cpus):
+    """Dynamically calculate the number of safe lcov/genhtml workers to avoid OOM.
+
+    Queries /proc/meminfo and bounds to 60% of available memory, assuming 2GB max per worker.
+    """
+    requested = requested_cpus or 4
+    try:
+        with open("/proc/meminfo", "r", encoding="utf-8") as f:
+            meminfo = f.read()
+
+        available_kb = None
+        for line in meminfo.splitlines():
+            if line.startswith("MemAvailable:"):
+                available_kb = int(line.split()[1])
+                break
+
+        if available_kb is None:
+            # Fallback to MemFree if MemAvailable is missing
+            for line in meminfo.splitlines():
+                if line.startswith("MemFree:"):
+                    available_kb = int(line.split()[1])
+                    break
+
+        if available_kb:
+            # Target CPU count based on memory pool
+            available_gb = available_kb / (1024 * 1024)
+            allowed_by_mem = int((available_gb * 0.6) / 2.0)
+            safe_workers = max(1, min(requested, allowed_by_mem))
+
+            print(
+                f"INFO: Parallel test bound - Requested CPUs: {requested}, "
+                f"Available system memory: {available_gb:.1f}GB, "
+                f"Allowed by memory (60% at 2GB/worker): {allowed_by_mem}, "
+                f"Decided workers: {safe_workers}"
+            )
+            return safe_workers
+
+    except (OSError, ValueError, IndexError) as e:
+        print(f"WARNING: Failed to dynamically read system memory - {e}")
+
+    safe_workers = min(requested, 8)
+    print(
+        f"INFO: Parallel test bound (fallback) - Requested CPUs: {requested}, "
+        f"Decided workers: {safe_workers}"
+    )
+    return safe_workers
+
+
 def bundle_coverage(opts):
     """Bundles the artifacts from code coverage into its own tarball."""
     info = firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
@@ -508,12 +557,14 @@ def bundle_coverage(opts):
     if opts.html or opts.bcs_version:
         (bundle_dir / "html").mkdir(exist_ok=True)
         # Build HTML coverage reports when bundling artifacts
+        max_lcov_workers = _get_safe_lcov_workers(opts.cpus)
         make_cmd = [
             "make",
             "-f",
             "Makefile.cq",
             f"-j{opts.cpus}",
             f"CPUS={opts.cpus}",
+            f"LCOV_CPUS={max_lcov_workers}",
             "lcov_rpt",
             "special_boards_rpt",
         ]
@@ -694,12 +745,14 @@ def test(opts):
 
     # Run tests from Makefile.cq because make knows how to run things
     # in parallel.
+    max_lcov_workers = _get_safe_lcov_workers(opts.cpus)
     cmd = [
         "make",
         "-f",
         "Makefile.cq",
         f"-j{opts.cpus}",
         f"CPUS={opts.cpus}",
+        f"LCOV_CPUS={max_lcov_workers}",
         "test",
     ]
     env = os.environ.copy()
