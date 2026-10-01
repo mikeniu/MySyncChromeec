@@ -26,6 +26,11 @@ sysbus LoadBinary $bin 0x64000000
 twd AddAfterWriteWordHook 0xA "if value == 0x5c and (self.ReadWord(0x6) & 0x20) == 0: self.WriteWord(0xa, 0x00)"
 twd AddAfterReadWordHook 0x10 "value = 5"
 
+# Report 4 comparators (NUMCOMP=4 in bits [31:28]) from DWT->CTRL (0xE0001000) so
+# z_arm_debug_enable_null_pointer_detection() does not hit an assertion failure
+# when CONFIG_ASSERT=y is enabled.
+dwt AddAfterReadDoubleWordHook 0x0 "value |= 0x40000000"
+
 macro reset
 """
     sysbus LoadSymbolsFrom $elf_ro
