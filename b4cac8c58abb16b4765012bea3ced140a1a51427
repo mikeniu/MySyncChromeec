@@ -22,6 +22,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b588b822_6d030061",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:29:28Z",
+      "side": 1,
+      "message": "Pre-existing / follow-up CL only, not blocking: this heap-allocates a fixed-size buffer on the FPMCU and then reinterpret_casts it. A stack buffer (alignas(struct ec_response_fp_info_v3) uint8_t buf[N]) or a local struct with a trailing fixed-size fp_image_frame_params_v2[FP_CAPTURE_TYPE_MAX] array would avoid the allocation and the cast.",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "111b0dc9_6741319b",
         "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
         "patchSetId": 10
@@ -33,6 +57,54 @@
       "writtenOn": "2026-10-01T21:24:37Z",
       "side": 1,
       "message": "Off-by-one: this accepts offset \u003d\u003d max_image_buffer_bytes, which places the image data at the very end of the buffer with zero bytes available. Since size \u003d\u003d 0 is already rejected below, offset \u003e\u003d max_image_buffer_bytes seems like the right bound. (This doesn\u0027t conflict with the raw-capture argument above — that\u0027s about offset + size, not offset alone.)",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d916e79_2d4a7fad",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:29:28Z",
+      "side": 1,
+      "message": "Optional (could be a follow-up CL, since the goto structure comes from the parent CL — but this CL adds another goto site, so it would be reasonable to do here too): the goto exists only because C++ forbids jumping over initializations, and it leaves the failure semantics inconsistent — the first two errors (fp_sensor_get_info() fails, num_types too large) return *without* invalidating, while the per-type errors do. Building into a local array and committing atomically removes the goto and makes every failure path yield an empty cache:\n\n  void FpImageFrameParamsCache::populate_cache(uint32_t max_image_buffer_bytes)\n  {\n  \tframe_params_.fill({}); /* Invalid until fully repopulated. */\n  \t...\n  \tstd::array\u003cFpImageFrameParam, FP_CAPTURE_TYPE_MAX\u003e params{};\n  \tfor (uint8_t i \u003d 0; i \u003c num_types; ++i) {\n  \t\tif (!validate(info-\u003eimage_frame_params[i], max_image_buffer_bytes))\n  \t\t\treturn;\n  \t\tparams[type] \u003d { .frame_size_bytes \u003d size,\n  \t\t\t\t .image_data_offset_bytes \u003d offset };\n  \t}\n  \tframe_params_ \u003d params;\n  }\n\nA small static bool validate(const fp_image_frame_params_v2 \u0026, uint32_t max) keeps the loop body short.",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49383ecc_e493bad7",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:29:28Z",
+      "side": 1,
+      "message": "Optional (fine as a follow-up CL, since it also reshapes get_frame_size() from the parent CL): get_frame_size() and get_image_offset() now duplicate the bounds check + log, and crrev.com/c/8495692 will need both values together in get_frame() anyway. A single accessor is simpler and also removes the \"0 offset is ambiguous\" problem:\n\n  std::optional\u003cFpImageFrameParam\u003e\n  FpImageFrameParamsCache::get(enum fp_capture_type type) const\n  {\n  \tif (static_cast\u003csize_t\u003e(type) \u003e\u003d frame_params_.size() ||\n  \t    frame_params_[type].frame_size_bytes \u003d\u003d 0) {\n  \t\tCPRINTS(\"Error: invalid/unconfigured fp_capture_type %d\", type);\n  \t\treturn std::nullopt;\n  \t}\n  \treturn frame_params_[type];\n  }\n\nCallers: if (auto p \u003d cache.get(type)) { p-\u003eframe_size_bytes; p-\u003eimage_data_offset_bytes; }\n\nIf you\u0027d rather keep the two getters for now, at least have both delegate to a private lookup() so the check lives in one place.",
+      "range": {
+        "startLine": 109,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
@@ -88,6 +160,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "182e85b3_89e1b0d4",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:29:28Z",
+      "side": 1,
+      "message": "Suggest doing in this CL: rather than a second setter with a copy-pasted bounds check (and a third if another field is ever added), expose one accessor that hands back the slot:\n\n  static FpImageFrameParam *params(FpImageFrameParamsCache \u0026cache,\n  \t\t\t\t  enum fp_capture_type type)\n  {\n  \tif (static_cast\u003csize_t\u003e(type) \u003e\u003d cache.frame_params_.size())\n  \t\treturn nullptr;\n  \treturn \u0026cache.frame_params_[type];\n  }\n\nTests then write helper::params(*cache, t)-\u003eimage_data_offset_bytes \u003d 64, and the three near-identical set_*_boundary_* tests can become a single loop over {FP_CAPTURE_TYPE_MAX, FP_CAPTURE_TYPE_MAX + 1, (enum fp_capture_type)-1} asserting nullptr. Fine to keep set_frame_size() as-is if you\u0027d prefer to leave the parent CL\u0027s helper untouched.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "18f6774e_8e95b2b9",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
         "patchSetId": 10
@@ -106,6 +202,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ca60be73_ebc2a1d8",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:29:28Z",
+      "side": 1,
+      "message": "nit (this CL): rather than hand-rolling a MAX reduction loop here and again at :106, consider std::max_element with a projection or a tiny helper, e.g.\n\n  static uint32_t max_of(uint32_t fingerprint_image_frame_params::*field)\n  {\n  \tuint32_t m \u003d 0;\n  \tfor (const auto \u0026p : image_frame_params_arr)\n  \t\tm \u003d MAX(m, p.*field);\n  \treturn m;\n  }\n\n  const uint32_t max_size \u003d max_of(\u0026fingerprint_image_frame_params::frame_size);",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d81f5720_6fe03e7f",
         "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
         "patchSetId": 10
@@ -117,6 +237,30 @@
       "writtenOn": "2026-10-01T21:24:37Z",
       "side": 1,
       "message": "If this condition is false the test silently passes without asserting anything. Please make it a precondition (zassert_true(max_configured_frame_size \u003e 0, ...)) or ztest_test_skip() instead of an if. The previous version of this test had no such guard.",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38624758_10174221",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:29:28Z",
+      "side": 1,
+      "message": "Suggest doing in this CL (the duplication is new here): this same loop asserting size \u003d\u003d 0 \u0026\u0026 offset \u003d\u003d 0 for every type now appears three times (size-failure, offset-failure, and the unconfigured branch in test_cache_unconfigured_types_return_zero). A helper like\n\n  static void assert_cache_empty(const FpImageFrameParamsCache \u0026cache)\n  {\n  \tfor (int i \u003d 0; i \u003c FP_CAPTURE_TYPE_MAX; ++i) {\n  \t\tauto type \u003d static_cast\u003cenum fp_capture_type\u003e(i);\n  \t\tzassert_equal(0, cache.get_frame_size(type), \"Type %d size\", i);\n  \t\tzassert_equal(0, cache.get_image_offset(type), \"Type %d offset\", i);\n  \t}\n  }\n\ncollapses both failure tests to ~5 lines and makes the only real difference between them (the value passed to populate_cache) obvious.",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
