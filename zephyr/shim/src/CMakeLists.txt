@@ -18,6 +18,11 @@ if (DEFINED CONFIG_SOC_FAMILY_INTEL_ISH)
   zephyr_library_sources(ish_system.c)
 elseif (DEFINED CONFIG_ARCH_POSIX)
   zephyr_library_sources(ztest_system.c)
+  if (DEFINED CONFIG_TEST AND NOT DEFINED CONFIG_ZTEST)
+    # Wrap main() so non-ztest binaries call posix_exit() on return; see
+    # __wrap_main() in ztest_system.c.
+    zephyr_link_libraries(-Wl,--wrap=main)
+  endif()
 else()
   zephyr_library_sources(system.c)
 endif()
