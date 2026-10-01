@@ -583,6 +583,7 @@ class Renode(Platform):
 
     def _skip_test_chudow(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
+            "benchmark",  # TODO(b/567670801)
             "boringssl_crypto",  # TODO(b/556233130)
             "flash_physical",  # TODO(b/485314159)
             "flash_protection",  # TODO(b/508240888)
