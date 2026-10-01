@@ -18,6 +18,144 @@
       "isAi": true,
       "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "111b0dc9_6741319b",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:24:37Z",
+      "side": 1,
+      "message": "Off-by-one: this accepts offset \u003d\u003d max_image_buffer_bytes, which places the image data at the very end of the buffer with zero bytes available. Since size \u003d\u003d 0 is already rejected below, offset \u003e\u003d max_image_buffer_bytes seems like the right bound. (This doesn\u0027t conflict with the raw-capture argument above — that\u0027s about offset + size, not offset alone.)",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49371d03_e007008a",
+        "filename": "include/fpsensor/fpsensor_image_frame_params.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:24:37Z",
+      "side": 1,
+      "message": "The old doc said \"On failure, this method invalidates the entire array by filling it with zeros.\" That\u0027s the most important contract of this function (and what the failure tests verify) — please keep it in the new doc.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b2b74b4_038996c5",
+        "filename": "include/fpsensor/fpsensor_image_frame_params.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:24:37Z",
+      "side": 1,
+      "message": "Unlike get_frame_size(), 0 is a legitimate offset, so callers can\u0027t distinguish \"offset is 0\" from \"invalid type / uninitialized cache\". Worth documenting that callers must gate on get_frame_size() !\u003d 0 first (or consider returning std::optional\u003cuint32_t\u003e), since crrev.com/c/8495692 will consume this in get_frame().",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18f6774e_8e95b2b9",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:24:37Z",
+      "side": 1,
+      "message": "nit: ChromiumOS policy is to not update the copyright year on existing files; please drop this hunk.",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d81f5720_6fe03e7f",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:24:37Z",
+      "side": 1,
+      "message": "If this condition is false the test silently passes without asserting anything. Please make it a precondition (zassert_true(max_configured_frame_size \u003e 0, ...)) or ztest_test_skip() instead of an if. The previous version of this test had no such guard.",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b891a1f_78c3d8d7",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:24:37Z",
+      "side": 1,
+      "message": "Same here: this should be a zassert_true precondition (or ztest_test_skip()), not a silent if.",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e356a8f_90e76059",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T21:24:37Z",
+      "side": 1,
+      "message": "This never exercises the offset check. In the native_sim overlay every config has image-data-offset-bytes \u003d 400 and frame-size \u003e\u003d 25600, so populate_cache(399) fails the *size* check on config0 (fpsensor_image_frame_params.cc:51) before reaching the offset check at :57. The test passes, but it is effectively a duplicate of the size test and the offset-check branch has zero coverage.\n\nOptions: (a) move the offset check ahead of the size check so populate_cache(max_offset - 1) really trips on the offset (offset \u003c size in every sim config), or (b) more robustly, fake fp_sensor_get_info() with fff here and feed a param with offset \u003e buffer but size \u003c\u003d buffer, independent of the sim DTS.",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
