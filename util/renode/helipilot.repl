@@ -32,3 +32,8 @@ gpio9:
     3 -> gpio4@3
 
 fpsensor: Sensors.GenericSPISensor @ spip
+
+// TODO(b/567997307): Remove once battery_backed_ram size is fixed in upstream nuvoton_npcx9.repl.
+battery_backed_ram: @ none
+bbram: Memory.ArrayMemory @ sysbus 0x400AF000
+    size: 0x100
