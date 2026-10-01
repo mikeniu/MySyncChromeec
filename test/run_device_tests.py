@@ -566,12 +566,6 @@ class Renode(Platform):
         ]:
             return True
 
-        if zephyr and test_config.config_name in [
-            "panic_data_bloonchipper_v2.0.4277",  # TODO(b/484099558)
-            "panic_data_bloonchipper_v2.0.5938",  # TODO(b/484099558)
-        ]:
-            return True
-
         # bloonchipper EC tests to skip on Renode.
         if test_name in [
             "rtc_stm32f4",  # TODO(b/384991107)

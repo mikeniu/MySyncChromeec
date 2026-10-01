@@ -28,6 +28,14 @@ macro reset
     sysbus LoadSymbolsFrom $elf_ro
     sysbus LoadSymbolsFrom $elf_rw
     cpu VectorTableOffset 0x8000000
+    # Zephyr RW sets BASEPRI=0x10 via arch_irq_lock() before rebooting. In
+    # Renode, CortexM.Reset() clears the CPU BasePri register without notifying
+    # NVIC, and NVIC.Reset() does not clear nvic.basepri, leaving interrupts
+    # with priority >= 0x10 masked when Legacy EC RO boots and only clears
+    # PRIMASK. Explicitly write BasePri=0 via the CPU property so it propagates
+    # to NVIC.
+    # TODO(b/567998100): Remove once CortexM/NVIC Reset() clears BASEPRI in Renode.
+    cpu BasePri 0
 """
 
 runMacro $reset
