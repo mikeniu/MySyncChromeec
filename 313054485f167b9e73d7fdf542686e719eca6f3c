@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d362fbf5_730e1c8f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-01T15:58:12Z",
+      "side": 1,
+      "message": "In zmake, host/llvm is an x86_64 host toolchain used for native_sim unit tests (zephyr/test/), whereas the 170+ physical boards (rex, geralt, etc.) are cross-compiled target builds (ARM/RISC-V) that configure against coreboot-sdk (arm-eabi-gcc, riscv64-elf-gcc).\n\nWhen building for coverage (opts.code_coverage), zmake builds the board libraries with coreboot-sdk to generate baseline zero-count tracefiles (all_builds.info), while Twister runs unit tests natively on host/llvm to generate execution hit counts (all_tests.info). Because lcov -a merges tracefiles at the text level by matching source file paths (SF:...) and line numbers (DA:...), the two combine cleanly regardless of target vs host compiler. (Verified in our CQ dry run which passed with Code-Coverage +1 and reduced runtime from 138m to 88m).\n\nI updated the commit message to document this distinction.",
+      "parentUuid": "b64d0768_06c47252",
+      "range": {
+        "startLine": 14,
+        "startChar": 19,
+        "endLine": 14,
+        "endChar": 50
+      },
+      "revId": "313054485f167b9e73d7fdf542686e719eca6f3c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "60442e61_35883b83",
         "filename": "zephyr/firmware_builder.py",
         "patchSetId": 4
@@ -37,6 +61,30 @@
       "writtenOn": "2026-09-30T17:58:23Z",
       "side": 1,
       "message": "I.e. set the toolchain to llvm here.",
+      "range": {
+        "startLine": 346,
+        "startChar": 8,
+        "endLine": 346,
+        "endChar": 32
+      },
+      "revId": "313054485f167b9e73d7fdf542686e719eca6f3c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7c6fbe7_67b0b812",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-01T15:58:12Z",
+      "side": 1,
+      "message": "As noted above, host/llvm is an x86_64 host toolchain (used for native_sim tests). Passing host/llvm to zmake build for target boards causes zmake to warn and fail because target boards require target cross-compilers (coreboot-sdk arm-eabi / riscv64-elf).",
+      "parentUuid": "60442e61_35883b83",
       "range": {
         "startLine": 346,
         "startChar": 8,
