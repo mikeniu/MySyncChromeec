@@ -16,6 +16,24 @@
       "message": "I think it should not be included in this CL",
       "revId": "407c959cc5ff578732f31150d9e625d144b494ee",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04f5c542_ce9e2b09",
+        "filename": "zephyr/program/fpmcu/em32f967/niedzica.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-01T08:47:34Z",
+      "side": 1,
+      "message": "It is needed with this change to match this [part](https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8494892/2/zephyr/program/fpmcu/BUILD.py#141).",
+      "parentUuid": "882e6427_b07c2ea0",
+      "revId": "407c959cc5ff578732f31150d9e625d144b494ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
