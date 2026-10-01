@@ -623,20 +623,13 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.test_name in [
-            "flash_protection",  # TODO(b/485668014)
-            "flash_protection_rw",  # TODO(b/485668836)
-            "flash_write_protect",  # TODO(b/485668014)
             "null_pointer",  # TODO(b/485624833)
-            "panic",  # TODO(b/485668836)
             "panic_data",  # TODO(b/485667679)
-            "panic_strip_gpr",  # TODO(b/485668836)
-            "reboot",  # TODO(b/488128262)
             "rollback_entropy",  # TODO(b/485670085)
         ]:
             return True
 
         if zephyr and test_config.config_name in [
-            "flash_physical_ro",  # TODO(b/485668836)
             "system_is_locked_wp_on",  # TODO(b/485669841)
             "system_is_locked_wp_on_helipilot_v2.0.24337",  # TODO(b/485669841)
             "system_is_locked_wp_on_helipilot_v2.0.27609",  # TODO(b/485669841)
