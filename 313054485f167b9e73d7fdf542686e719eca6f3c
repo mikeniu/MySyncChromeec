@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1d177854_8f8d7f3e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-01T16:00:19Z",
+      "side": 1,
+      "message": "We have cross compiling llvm also, but sure. If it\u0027s not causing coverage problems, then I suppose it\u0027s fine.",
+      "parentUuid": "d362fbf5_730e1c8f",
+      "range": {
+        "startLine": 14,
+        "startChar": 19,
+        "endLine": 14,
+        "endChar": 50
+      },
+      "revId": "313054485f167b9e73d7fdf542686e719eca6f3c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "60442e61_35883b83",
         "filename": "zephyr/firmware_builder.py",
         "patchSetId": 4
