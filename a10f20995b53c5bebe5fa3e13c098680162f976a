@@ -41,6 +41,31 @@
       },
       "revId": "a10f20995b53c5bebe5fa3e13c098680162f976a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7d9a9bd_e88d2403",
+        "filename": "include/fpsensor/fpsensor_frame_size.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T20:42:29Z",
+      "side": 1,
+      "message": "This transitional alias is only kept in this CL so existing callers still compile after splitting out the caller updates per the AI review\u0027s CL-size request on PS24. The follow-up CL in the chain (https://crrev.com/c/8502979) migrates the remaining callers and deletes fpsensor_frame_size.h. Happy to squash CL 8502979 back into this CL if you prefer having it all in one change.",
+      "parentUuid": "c05549ad_a33af2c9",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 49
+      },
+      "isAi": true,
+      "revId": "a10f20995b53c5bebe5fa3e13c098680162f976a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
