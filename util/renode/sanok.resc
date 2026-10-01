@@ -15,8 +15,24 @@ $elf_rw?=$ORIGIN/sanok/ec.RW.elf
 
 showAnalyzer uart0
 
-# Mock of bootrom, reads entry point from flash header and jumps there
-cpu0 AssembleBlock 0x70000000 "li t0, 0x80000000; lw t1, 24(t0); jalr zero, t1, 0"
+# Mock of bootrom, reads entry point from flash header and jumps there.
+# EC ec.bin images start with a 4KB ETU905 bootrom header that stores the RO
+# entry address (0x80001000) at byte offset 24. Standalone upstream Zephyr
+# egis_et171 images omit the ETU905 header and start directly with
+# soc/egis/et171/start.S, which defines a fixed 28-byte "EGIS" header where
+# byte offset 24 is hardcoded to `.word 0 /* unused */` and byte offset 12
+# holds `CONFIG_FLASH_BASE_ADDRESS + CONFIG_FLASH_LOAD_OFFSET` (0x80000000).
+# (Renode's monitor parser does not expand $variables inside AssembleBlock
+# string literals.)
+cpu0 AssembleBlock 0x70000000
+"""
+li t0, 0x80000000
+lw t1, 24(t0)
+bnez t1, 1f
+lw t1, 12(t0)
+1:
+jalr zero, t1, 0
+"""
 
 macro reset
 """
