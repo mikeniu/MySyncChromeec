@@ -148,7 +148,6 @@
 		};
 		gpio_en_s5_rails: en_s5_rails {
 			gpios = <&gpiob 6 (GPIO_OUTPUT | GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH | GPIO_OUTPUT_INIT_HIGH)>;
-			enum-name = "GPIO_TEMP_SENSOR_POWER";
 		};
 		gpio_en_z1_rails: en_z1_rails {
 			gpios = <&gpio8 5 (GPIO_OUTPUT | GPIO_ACTIVE_HIGH)>;
@@ -174,6 +173,7 @@
 		};
 		gpio_seq_ec_all_sys_pg_od: seq_ec_all_sys_pg_od {
 			gpios = <&gpiof 4 (GPIO_INPUT)>;
+			enum-name = "GPIO_TEMP_SENSOR_POWER";
 		};
 		gpio_seq_ec_rsmrst_odl: seq_ec_rsmrst_odl {
 			gpios = <&gpioe 2 (GPIO_INPUT)>;
