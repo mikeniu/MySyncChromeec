@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00fd62ec_9b116ac6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T18:51:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n**Review Summary:**\n*   **Functionality:** ✅ The `.ahb4` memory region is now correctly cleared in both `system_pre_init()` and `system_reset()`, safely calculating the size using `uintptr_t` arithmetic.\n*   **Architecture \u0026 Component Fit:** ✅ Placing the hardware-specific `.ahb4` clearing in the `chip/stm32` initialization sequence is appropriate and preserves architecture boundaries.\n*   **Code Simplicity:** ✅ The changes are straightforward and minimally invasive.\n*   **Idiomaticity \u0026 Readability:** ℹ️ A minor suggestion was made inline to replace a C-style macro with a `constexpr` variable for the test canary. Otherwise, the code is idiomatic.\n*   **Security:** ✅ No security vulnerabilities introduced. Purging stale memory across resets is a good defense-in-depth measure to protect sensitive data in NOLOAD regions.\n*   **Testing:** ✅ Excellent automated test coverage. A multistep test (`fp_buffer_clear`) was added to verify the clearing behavior across reboots.\n*   **CL Size \u0026 Scope:** ✅ `Size: M (+171, -0)` — The CL is appropriately sized and focused on a single logical change.\n*   **Commit Message:** ✅ The description accurately explains the rationale and the functional impact without narrating workspace mechanics. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8237836_d73e73d0-66e9-4eb3-9df4-a685ebb86d8d.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "87b27b93aab3118168970a5f4f993410c36cb22b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e093a78a_572cd3d7",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 20
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T18:51:33Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomatic C++:** Please replace this macro with a `constexpr` variable to improve type safety and adhere to the C++ style guide for constants.\n\n```cpp\nconstexpr uint8_t kCanaryByte \u003d 0x5a;\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8237836_d73e73d0-66e9-4eb3-9df4-a685ebb86d8d.pb)",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "87b27b93aab3118168970a5f4f993410c36cb22b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
