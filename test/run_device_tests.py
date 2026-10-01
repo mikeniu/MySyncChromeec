@@ -421,6 +421,9 @@ class Hardware(Platform):
 class Renode(Platform):
     """Platform implementation for running on Renode emulator."""
 
+    RENODE_CMD_START = b"start\n"
+    RENODE_CMD_PAUSE = b"pause\n"
+
     def __init__(self):
         self.process = None
         self.temp_dir = None
@@ -440,7 +443,10 @@ class Renode(Platform):
         pass
 
     def power(self, board_config: BoardConfig, power_on: bool) -> None:
-        pass
+        if self.process and self.process.stdin:
+            cmd = self.RENODE_CMD_START if power_on else self.RENODE_CMD_PAUSE
+            self.process.stdin.write(cmd)
+            self.process.stdin.flush()
 
     def flash(
         self,
@@ -467,6 +473,7 @@ class Renode(Platform):
             str(uart_pty),
             "--gdb-port",
             "0",
+            "--pause",
         ]
         if zephyr:
             # We've adopted the convention that we prefix upstream Zephyr test
