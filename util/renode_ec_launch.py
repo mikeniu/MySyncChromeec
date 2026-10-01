@@ -49,6 +49,9 @@ GPIO_WP_MAP: dict[str, str] = {
 GPIO_WP_ENABLE = "Release"
 GPIO_WP_DISABLE = "Press"
 
+CHUDOW_UPSTREAM_ZEPHYR_ADDR = "0x10001000"
+CHUDOW_UPSTREAM_ZEPHYR_CONSOLE = "sysbus.usart2"
+
 
 def msg_run(cmd: List[str]) -> NoReturn:
     """Prints a command and executes it, replacing the current process.
@@ -142,6 +145,13 @@ def launch(
     # using a derivative board, like buccaneer which is based on helipilot.
     renode_execute.append(f'$name="{board}";')
     renode_execute.append(f'$bin="{bin_file}";')
+    if zephyr_bin and board == "chudow":
+        # Upstream ft9001_eval links the app partition at 0x10001000 without
+        # the 4KB config_page header used in chudow's ec.bin at 0x10080000.
+        renode_execute.append(f"$bin_addr={CHUDOW_UPSTREAM_ZEPHYR_ADDR};")
+        renode_execute.append(
+            f"$vector_table_offset={CHUDOW_UPSTREAM_ZEPHYR_ADDR};"
+        )
     renode_execute.append(f'$elf_ro="{elf_ro_file}";')
     renode_execute.append(f'$elf_rw="{elf_rw_file}";')
     renode_execute.append(f"include @util/renode/{board}.resc;")
@@ -158,15 +168,18 @@ def launch(
         renode_execute.append(f"{GPIO_WP_MAP[board]} {wp_state};")
 
     if board in CONSOLE_MAP:
+        console = (
+            CHUDOW_UPSTREAM_ZEPHYR_CONSOLE
+            if zephyr_bin and board == "chudow"
+            else CONSOLE_MAP[board]
+        )
         # Expose the console UART as a PTY on the given path (default:
         # /tmp/renode-uart). You can connect to the PTY with minicom, screen,
         # etc.
         renode_execute.append(
             f'emulation CreateUartPtyTerminal "term" "{uart}" True;'
         )
-        renode_execute.append(
-            "connector Connect " + CONSOLE_MAP[board] + " term;"
-        )
+        renode_execute.append(f"connector Connect {console} term;")
 
     renode_execute.append("start;")
 
