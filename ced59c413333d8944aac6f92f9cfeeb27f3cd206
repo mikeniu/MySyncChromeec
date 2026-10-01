@@ -22,6 +22,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d6c8e7e0_3b59938e",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T19:16:05Z",
+      "side": 1,
+      "message": "Nit: `#include \"system.h\"` is unused, and `#include \u003ccstring\u003e` can also be dropped if `std::ranges::fill` is used below.",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 18
+      },
+      "isAi": true,
+      "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "34a9f470_c4faf0ee",
         "filename": "test/fp_buffer_clear.cc",
         "patchSetId": 21
@@ -37,6 +61,54 @@
         "startLine": 35,
         "startChar": 0,
         "endLine": 41,
+        "endChar": 1
+      },
+      "isAi": true,
+      "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "133519f1_f14bf880",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T19:16:05Z",
+      "side": 1,
+      "message": "Nit: Since this is C++20 and `fp_buffer` is an array (`uint8_t fp_buffer[FP_SENSOR_IMAGE_SIZE]`), you can also use `std::ranges::all_of(fp_buffer, [](uint8_t b) { return b \u003d\u003d 0; })` directly without `std::begin`/`std::end`:\n```cpp\nstatic bool fp_buffer_zeroed_before_pre_init;\n...\n__attribute__((constructor)) static void check_fp_buffer_before_pre_init()\n{\n\tfp_buffer_zeroed_before_pre_init \u003d\n\t\tstd::ranges::all_of(fp_buffer, [](uint8_t b) { return b \u003d\u003d 0; });\n}\n```\nAlso nit: prefer `()` over `(void)` for parameterless functions in C++ throughout this file.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 1
+      },
+      "isAi": true,
+      "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5413e3e7_219e0943",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T19:16:05Z",
+      "side": 1,
+      "message": "A few small simplifications here and in `run_test_step1`/`run_test_step2`:\n1. Once `check_fp_buffer_before_pre_init()` checks for `0`, `kCanaryByte` is only used in this function and can be declared locally here.\n2. Prefer `std::ranges::fill(fp_buffer, kCanaryByte);` over `std::memset(fp_buffer, kCanaryByte, sizeof(fp_buffer));`.\n3. The explicit `cflush()` calls (lines 50, 73, 87) are unnecessary since `test_reboot_to_next_step()` already calls `cflush()` before `system_reset()`.",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 58,
         "endChar": 1
       },
       "isAi": true,
