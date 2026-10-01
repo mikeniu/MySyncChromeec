@@ -13,6 +13,10 @@ rtc:
 timer2:
     frequency: 96000000
 
+// TODO(b/567997308): Remove once DWT is added to upstream stm32f4.repl.
+dwt: Miscellaneous.DWT @ sysbus 0xE0001000
+    frequency: 48000000
+
 GPIO_WP: Miscellaneous.Button @ gpioPortB 7
     invert: true
     -> gpioPortB@7
