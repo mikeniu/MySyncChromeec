@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa8f8254_5291fd26",
+        "filename": "util/renode/helipilot.repl",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T23:38:15Z",
+      "side": 1,
+      "message": "@chlin56@nuvoton.corp-partner.google.com @chchang19@nuvoton.corp-partner.google.com\n\nCan you confirm that this AI analysis of the expected behavior is correct?",
+      "range": {
+        "startLine": 39,
+        "startChar": 1,
+        "endLine": 48,
+        "endChar": 15
+      },
+      "revId": "234b28e15fd466f005ffd2c70dac130fe035fef9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
