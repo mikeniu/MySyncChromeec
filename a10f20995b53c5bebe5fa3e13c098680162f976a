@@ -90,6 +90,30 @@
       },
       "revId": "a10f20995b53c5bebe5fa3e13c098680162f976a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cda48fc3_fffe52c9",
+        "filename": "include/fpsensor/fpsensor_frame_size.h",
+        "patchSetId": 25
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T20:48:24Z",
+      "side": 1,
+      "message": "Marked as unresolved.",
+      "parentUuid": "e7e8438d_79a5de96",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 49
+      },
+      "revId": "a10f20995b53c5bebe5fa3e13c098680162f976a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
