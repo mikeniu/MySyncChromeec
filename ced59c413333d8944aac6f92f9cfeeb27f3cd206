@@ -44,6 +44,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b0da08c_59e9e546",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T19:41:20Z",
+      "side": 1,
+      "message": "Done. Replaced `#include \"system.h\"` with `#include \"timer.h\"` (for `crec_msleep`) and dropped `#include \u003ccstring\u003e`.",
+      "parentUuid": "d6c8e7e0_3b59938e",
+      "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34a9f470_c4faf0ee",
@@ -92,6 +110,42 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "32e97306_32355ee6",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T19:41:20Z",
+      "side": 1,
+      "message": "Done. Updated to check that all bytes in `fp_buffer` are `0` via `std::ranges::all_of` and renamed to `fp_buffer_zeroed_before_pre_init` / `check_fp_buffer_before_pre_init()`.",
+      "parentUuid": "34a9f470_c4faf0ee",
+      "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8edf6963_bb3976f1",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T19:41:20Z",
+      "side": 1,
+      "message": "Done. Switched to `std::ranges::all_of` and changed `(void)` to `()` throughout the file.",
+      "parentUuid": "133519f1_f14bf880",
+      "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5413e3e7_219e0943",
@@ -112,6 +166,24 @@
         "endChar": 1
       },
       "isAi": true,
+      "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "687b889c_9154a7b7",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T19:41:20Z",
+      "side": 1,
+      "message": "Done. Moved `kCanaryByte` into `test_fp_buffer_before_reboot()`, switched to `std::ranges::fill`, and removed the redundant `cflush()` calls.",
+      "parentUuid": "5413e3e7_219e0943",
       "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
