@@ -233,7 +233,7 @@ def restore_codebase(applied_patches, copied_files):
     revert_patches(applied_patches)
 
 
-def create_arg_parser(build, bundle, test):
+def create_arg_parser(build, bundle, test, merge=None):
     """Parse all command line args and return opts dict."""
     parser = argparse.ArgumentParser(description=__doc__)
 
@@ -302,6 +302,49 @@ def create_arg_parser(build, bundle, test):
         help="Comma-separated list of build/test target shards",
     )
 
+    shard_count_default = os.environ.get("FIRMWARE_SHARD_COUNT")
+    shard_index_default = os.environ.get("FIRMWARE_SHARD_INDEX")
+    for flag in os.environ.get("USE", "").split():
+        if flag.startswith("firmware_shard_count_"):
+            shard_count_default = flag.split("_")[-1]
+        elif flag.startswith("shard_count_"):
+            shard_count_default = flag.split("_")[-1]
+        elif flag.startswith("firmware_shard_index_"):
+            shard_index_default = flag.split("_")[-1]
+        elif flag.startswith("shard_index_"):
+            shard_index_default = flag.split("_")[-1]
+
+    shard_count_default = (
+        int(shard_count_default)
+        if shard_count_default
+        and shard_count_default.isdigit()
+        and int(shard_count_default) > 0
+        else None
+    )
+    shard_index_default = (
+        int(shard_index_default)
+        if shard_index_default
+        and shard_index_default.isdigit()
+        and int(shard_index_default) > 0
+        else None
+    )
+
+    parser.add_argument(
+        "--shard-count",
+        type=int,
+        required=False,
+        default=shard_count_default,
+        help="Total number of build shards to divide projects/tests into.",
+    )
+
+    parser.add_argument(
+        "--shard-index",
+        type=int,
+        required=False,
+        default=shard_index_default,
+        help="1-based index of the current shard to execute.",
+    )
+
     # Would make this required=True, but not available until 3.7
     sub_cmds = parser.add_subparsers()
 
@@ -316,5 +359,17 @@ def create_arg_parser(build, bundle, test):
 
     test_cmd = sub_cmds.add_parser("test", help="Runs all firmware unit tests")
     test_cmd.set_defaults(func=test)
+
+    if merge:
+        merge_cmd = sub_cmds.add_parser(
+            "merge-shards",
+            help="Merges coverage artifacts from multiple build shards",
+        )
+        merge_cmd.add_argument(
+            "--merge-dir",
+            required=True,
+            help="Directory containing shard coverage.tbz2 files to merge.",
+        )
+        merge_cmd.set_defaults(func=merge)
 
     return parser, sub_cmds
