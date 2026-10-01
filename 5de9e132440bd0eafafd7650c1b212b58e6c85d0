@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c1eedef_f8564e5f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T03:42:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372808_c6059a6a-f420-45f5-9f14-287fa533cb55.pb)\n\n### Review Summary\n\n*   **Functionality:** The dynamic fetching, caching, and validation of `image_data_offset_bytes` are well implemented.\n*   **Security:** Bounds validation and fallback to zero invalidation are correct.\n*   **Architecture \u0026 Component Fit:** The caching implementation aligns well with the existing `FpImageFrameParamsCache` pattern.\n*   **Code Simplicity:** The code is direct and minimalistic.\n*   **Idiomaticity \u0026 Readability:** Code adheres to C++ and Chromium OS EC standards. `CPRINTS` is correctly used.\n*   **Testing:** Thorough boundary and mutation testing is present for the new offset cache, including bounds and overrides.\n*   **CL Size \u0026 Scope:** `Size: M (+203, -36)`. The CL has been successfully split to isolate the cache infrastructure, making it atomic and easy to review.\n*   **Commit Message:** The commit message clearly explains the changes and includes required bug and test tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5de9e132440bd0eafafd7650c1b212b58e6c85d0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
