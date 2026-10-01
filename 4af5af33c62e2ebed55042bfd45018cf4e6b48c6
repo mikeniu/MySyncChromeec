@@ -85,6 +85,30 @@
       "isAi": true,
       "revId": "4af5af33c62e2ebed55042bfd45018cf4e6b48c6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86d8193e_caaf3094",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 14
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T16:29:23Z",
+      "side": 1,
+      "message": "Could you add a comment explaining why `__attribute__((constructor))` is used here and when it runs in the boot sequence? Specifically:\n- In `core/cortex-m/init.S`, `reset` zeroes `.bss` and then calls `__libc_init_array` before jumping to `main()`.\n- Running this check in `.init_array` lets RW inspect `fp_buffer` before `main()` calls RW\u0027s `system_pre_init()` (which would otherwise clear `.ahb4` during RW boot and mask a failure of `system_reset()` to clear `fp_buffer` before resetting into RO).\n\nAlso, a couple of questions on the comment/check on lines 32-40:\n1. Since `fp_buffer` is only compiled into RW (`SECTION_IS_RW`), RO\u0027s `.ahb4` section only covers the host-command and UART buffers (`0x38000000..0x38000cc8`), while RW\u0027s `fp_buffer` starts at `0x38000cc8`. Doesn\u0027t that mean RO\u0027s `system_pre_init()` never clears `fp_buffer`, and only RW\u0027s `system_reset()` clears it across the reboot?\n2. Since both RO and RW place the host-command and UART buffers at `0x38000000..0x38000cc5` ahead of `fp_buffer` (`0x38000cc8`), do RO\u0027s UART buffers actually overlap `fp_buffer`, or should `fp_buffer` be completely zeroed here (`canary_count \u003e 0`)?",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 1
+      },
+      "isAi": true,
+      "revId": "4af5af33c62e2ebed55042bfd45018cf4e6b48c6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
