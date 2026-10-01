@@ -11,7 +11,6 @@
 
 #include <zephyr/ztest.h>
 
-#include <cmsis_core.h>
 #include <strings.h>
 
 ZTEST_SUITE(system_is_locked_wp_off, NULL, NULL, NULL, NULL, NULL);
