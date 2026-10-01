@@ -4,7 +4,7 @@
  */
 
 #include "assert.h"
-#include "atomic_bit.h"
+#include "atomic.h"
 #include "clock.h"
 #include "common.h"
 #include "compile_time_macros.h"
