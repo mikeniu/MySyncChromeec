@@ -20,6 +20,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0af22ee6_bc414948",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T17:25:33Z",
+      "side": 1,
+      "message": "Done. Split caller updates into https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8502979",
+      "parentUuid": "7fcb9e1b_ed6fc8a3",
+      "isAi": true,
+      "revId": "56e088bad803d30678c1eefa3f4789e1a3f76a9a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a401b38_2a239924",
@@ -45,6 +64,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8c169d1_74ff98bd",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T17:25:33Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "2a401b38_2a239924",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "56e088bad803d30678c1eefa3f4789e1a3f76a9a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5849ad26_8160a610",
@@ -65,6 +109,31 @@
         "endChar": 9999
       },
       "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "56e088bad803d30678c1eefa3f4789e1a3f76a9a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63cccb15_ee32dde1",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 24
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-01T17:25:33Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "5849ad26_8160a610",
+      "range": {
+        "startLine": 140,
+        "startChar": 0,
+        "endLine": 147,
+        "endChar": 9999
+      },
       "isAi": true,
       "revId": "56e088bad803d30678c1eefa3f4789e1a3f76a9a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
