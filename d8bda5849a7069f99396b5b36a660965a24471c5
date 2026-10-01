@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05004a23_c3157e0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T01:15:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n*   **Functionality:** The logic works as intended. The dynamic fetching and caching of `image_data_offset_bytes` are well implemented, and bounds validations in `get_frame` correctly prevent overflow and out-of-bounds reads.\n*   **Security:** Boundary tests and overflow checks prevent memory-related issues.\n*   **Architecture \u0026 Component Fit:** The caching implementation aligns well with the existing `FpImageFrameParamsCache` pattern.\n*   **Code Simplicity:** The code is direct and avoids unnecessary abstractions.\n*   **Idiomaticity \u0026 Readability:** Code adheres to C++ and Zephyr test readability standards. I left a minor suggestion regarding `CPRINTF` newline formatting.\n*   **Testing:** Thorough boundary and mutation testing is present, including the edge cases for integer overflows with shifted offsets.\n*   **Commit Message:** The commit message clearly explains the *What* and *Why* at an appropriate altitude and respects the required tags.\n*   **CL Size \u0026 Scope:** `Size: L` (+260, -46). Per `go/small-cls`, this CL is too large and must be split to ensure atomic, easily reviewable changes. Please separate the caching infrastructure from the runtime logic changes.\n\n**Proposed Split Plan:**\n1. **CL 1 (Cache Infrastructure):** Add `image_data_offset_bytes` parsing to `FpImageFrameParamsCache` (`fpsensor_image_frame_params.cc`, `.h`) and its associated Zephyr unit tests (`zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc`).\n2. **CL 2 (Runtime Adoption):** Update `get_frame()` in `fpsensor.cc` to use the cached offset and bounds validations, along with the corresponding tests in `zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc`. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372808_2a0d49bc-98c2-4256-9ab4-76e9a4cbd8b9.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d8bda5849a7069f99396b5b36a660965a24471c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "660da0ee_7413b8f1",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T01:15:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion:** Several `CPRINTF` calls in this block and in the getters below (e.g., lines 45, 57, 64, 88, 94) are missing a trailing `\\n`. Unlike `CPRINTS`, `CPRINTF` does not automatically append a newline, which can cause log messages to run together on the console. Consider adding `\\n` to these strings or switching to `CPRINTS`. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372808_2a0d49bc-98c2-4256-9ab4-76e9a4cbd8b9.pb)",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d8bda5849a7069f99396b5b36a660965a24471c5",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
