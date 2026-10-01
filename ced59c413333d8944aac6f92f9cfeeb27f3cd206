@@ -18,6 +18,30 @@
       "isAi": true,
       "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34a9f470_c4faf0ee",
+        "filename": "test/fp_buffer_clear.cc",
+        "patchSetId": 21
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T19:06:43Z",
+      "side": 1,
+      "message": "Since RO\u0027s UART buffers don\u0027t overlap `fp_buffer` and nothing in RO touches `fp_buffer`\u0027s address range after RW\u0027s `system_reset()` zeroes `.ahb4` (or after `init.S` zeroes `.bss` on other boards), `fp_buffer` should be all zeros at this point in Step 2.\n\nCould we check that all bytes in `fp_buffer` are `0` (e.g. using `std::all_of(std::begin(fp_buffer), std::end(fp_buffer), [](uint8_t b) { return b \u003d\u003d 0; })` and renaming `canary_found_before_pre_init` / `check_canary_before_pre_init` accordingly) rather than only checking for `kCanaryByte`? That way we verify the entire buffer is zeroed and nothing in RO wrote non-zero data to it before jumping to RW.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 1
+      },
+      "isAi": true,
+      "revId": "ced59c413333d8944aac6f92f9cfeeb27f3cd206",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
