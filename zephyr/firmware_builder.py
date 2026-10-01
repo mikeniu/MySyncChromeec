@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# pylint: disable=too-many-lines
 # Copyright 2021 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
@@ -26,6 +25,9 @@ from google.protobuf import json_format  # pylint: disable=import-error
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
 from chromite.lib.chromeos_version import VersionInfo
 import scripts.firmware_builder_lib
+from scripts.firmware_builder_lib import (
+    get_safe_lcov_workers as _get_safe_lcov_workers,
+)
 from scripts.firmware_builder_lib import find_checkout
 from scripts.firmware_builder_lib import prepare_codebase
 from scripts.firmware_builder_lib import restore_codebase
@@ -485,54 +487,6 @@ def write_metadata(opts, info):
         file.write(json_format.MessageToJson(info))
 
 
-def _get_safe_lcov_workers(requested_cpus):
-    """Dynamically calculate the number of safe lcov/genhtml workers to avoid OOM.
-
-    Queries /proc/meminfo and bounds to 60% of available memory, assuming 2GB max per worker.
-    """
-    requested = requested_cpus or 4
-    try:
-        with open("/proc/meminfo", "r", encoding="utf-8") as f:
-            meminfo = f.read()
-
-        available_kb = None
-        for line in meminfo.splitlines():
-            if line.startswith("MemAvailable:"):
-                available_kb = int(line.split()[1])
-                break
-
-        if available_kb is None:
-            # Fallback to MemFree if MemAvailable is missing
-            for line in meminfo.splitlines():
-                if line.startswith("MemFree:"):
-                    available_kb = int(line.split()[1])
-                    break
-
-        if available_kb:
-            # Target CPU count based on memory pool
-            available_gb = available_kb / (1024 * 1024)
-            allowed_by_mem = int((available_gb * 0.6) / 2.0)
-            safe_workers = max(1, min(requested, allowed_by_mem))
-
-            print(
-                f"INFO: Parallel test bound - Requested CPUs: {requested}, "
-                f"Available system memory: {available_gb:.1f}GB, "
-                f"Allowed by memory (60% at 2GB/worker): {allowed_by_mem}, "
-                f"Decided workers: {safe_workers}"
-            )
-            return safe_workers
-
-    except (OSError, ValueError, IndexError) as e:
-        print(f"WARNING: Failed to dynamically read system memory - {e}")
-
-    safe_workers = min(requested, 8)
-    print(
-        f"INFO: Parallel test bound (fallback) - Requested CPUs: {requested}, "
-        f"Decided workers: {safe_workers}"
-    )
-    return safe_workers
-
-
 def bundle_coverage(opts):
     """Bundles the artifacts from code coverage into its own tarball."""
     info = firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
@@ -753,14 +707,27 @@ def test(opts):
         f"-j{opts.cpus}",
         f"CPUS={opts.cpus}",
         f"LCOV_CPUS={max_lcov_workers}",
-        "test",
     ]
     env = os.environ.copy()
     env.update(init_toolchain())
     if opts.code_coverage:
         cmd.append("COVERAGE=1")
-    if SPECIAL_BOARDS:
-        cmd.append(f"SPECIAL_BOARDS={' '.join(SPECIAL_BOARDS)}")
+
+    # If firmware_targets contains a '/', it's a shard (e.g. 1/3)
+    # Otherwise it's a specific board or comma-separated list of boards
+    boards = SPECIAL_BOARDS.copy() if SPECIAL_BOARDS else []
+    if opts.firmware_targets:
+        if "/" in opts.firmware_targets:
+            cmd.append(f"TWISTER_SUBSET={opts.firmware_targets}")
+        else:
+            boards = [
+                t.strip() for t in opts.firmware_targets.split(",") if t.strip()
+            ]
+
+    if boards:
+        cmd.append(f"SPECIAL_BOARDS={' '.join(boards)}")
+
+    cmd.append("test")
     log_cmd(cmd)
     subprocess.run(
         cmd,
@@ -796,7 +763,7 @@ def test(opts):
         )
 
         for project in get_projects():
-            if project.config.project_name in SPECIAL_BOARDS:
+            if project.config.project_name in boards:
                 tasks.append(
                     (
                         f"BOARD_{project.config.project_name}".upper(),

@@ -233,12 +233,65 @@ def restore_codebase(applied_patches, copied_files):
     revert_patches(applied_patches)
 
 
+def get_safe_lcov_workers(requested_cpus):
+    """Dynamically calculate the number of safe lcov/genhtml workers to avoid OOM.
+
+    Queries /proc/meminfo and bounds to 60% of available memory, assuming 2GB max per worker.
+    """
+    try:
+        requested = max(1, int(requested_cpus)) if requested_cpus else 4
+    except (TypeError, ValueError):
+        requested = 4
+
+    try:
+        with open("/proc/meminfo", "r", encoding="utf-8") as f:
+            meminfo = f.read()
+
+        available_kb = None
+        for line in meminfo.splitlines():
+            if line.startswith("MemAvailable:"):
+                available_kb = int(line.split()[1])
+                break
+
+        if available_kb is None:
+            # Fallback to MemFree if MemAvailable is missing
+            for line in meminfo.splitlines():
+                if line.startswith("MemFree:"):
+                    available_kb = int(line.split()[1])
+                    break
+
+        if available_kb is not None:
+            # Target CPU count based on memory pool
+            available_gb = available_kb / (1024 * 1024)
+            allowed_by_mem = int((available_gb * 0.6) / 2.0)
+            safe_workers = max(1, min(requested, allowed_by_mem))
+
+            print(
+                f"INFO: Parallel test bound - Requested CPUs: {requested}, "
+                f"Available system memory: {available_gb:.1f}GB, "
+                f"Allowed by memory (60% at 2GB/worker): {allowed_by_mem}, "
+                f"Decided workers: {safe_workers}"
+            )
+            return safe_workers
+
+    except (OSError, ValueError, IndexError) as e:
+        print(f"WARNING: Failed to dynamically read system memory - {e}")
+
+    safe_workers = max(1, min(requested, 8))
+    print(
+        f"INFO: Parallel test bound (fallback) - Requested CPUs: {requested}, "
+        f"Decided workers: {safe_workers}"
+    )
+    return safe_workers
+
+
 def create_arg_parser(build, bundle, test):
     """Parse all command line args and return opts dict."""
     parser = argparse.ArgumentParser(description=__doc__)
 
     parser.add_argument(
         "--cpus",
+        type=int,
         default=multiprocessing.cpu_count(),
         help="The number of cores to use.",
     )
@@ -300,6 +353,13 @@ def create_arg_parser(build, bundle, test):
             find_checkout() / "src" / "platform" / "ec-private" / "src-override"
         ),
         help="Path to the directory for source file overrides",
+    )
+
+    parser.add_argument(
+        "--firmware-targets",
+        required=False,
+        default="",
+        help="Comma-separated list of build/test target shards",
     )
 
     # Would make this required=True, but not available until 3.7
