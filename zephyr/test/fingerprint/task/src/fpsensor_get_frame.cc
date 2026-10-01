@@ -147,6 +147,39 @@ ZTEST(fpsensor_get_frame, test_get_frame_cache_size_exceeds_buffer)
 			  "Output buffer modified during failure path");
 }
 
+ZTEST(fpsensor_get_frame, test_get_frame_cache_offset_exceeds_buffer)
+{
+	uint8_t output_buffer[kMaxReadSize];
+	memset(output_buffer, 0xA5, sizeof(output_buffer));
+
+	uint32_t size = kMaxReadSize;
+	uint32_t offset = 0;
+
+	/* Initialize the cache normally so it allocates its internal states. */
+	global_context.fp_image_frame_params_cache.populate_cache(
+		FP_SENSOR_IMAGE_SIZE);
+
+	/*
+	 * Cache Pollution: Use the test-only setter to override the cached
+	 * image offset to exceed the physical buffer capacity.
+	 */
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_image_offset(
+			     global_context.fp_image_frame_params_cache,
+			     FP_CAPTURE_VENDOR_FORMAT,
+			     FP_SENSOR_IMAGE_SIZE + 1),
+		     "Failed to set image offset for capture type %d",
+		     FP_CAPTURE_VENDOR_FORMAT);
+
+	enum ec_status status = get_frame(offset, size, output_buffer);
+
+	zassert_equal(status, EC_RES_INVALID_PARAM,
+		      "Expected cache offset overflow failure");
+
+	/* Verify buffer integrity remains intact */
+	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
+			  "Output buffer modified during failure path");
+}
+
 ZTEST(fpsensor_get_frame, test_get_frame_linear_overflow)
 {
 	uint8_t output_buffer[kMaxReadSize];
@@ -196,15 +229,21 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_integer_overflow)
 
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
 
+	const uint32_t image_offset = 100;
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_image_offset(
+			     global_context.fp_image_frame_params_cache,
+			     FP_CAPTURE_SIMPLE_IMAGE, image_offset),
+		     "Failed to set non-zero image offset for test");
+
 	uint32_t size = kMaxReadSize;
-	uint32_t offset = UINT32_MAX - FP_SENSOR_IMAGE_OFFSET + 1;
+	uint32_t offset = UINT32_MAX - image_offset + 1;
 
 	/*
 	 * Verify that the offset + image_offset will definitely overflow 32
 	 * bits.
 	 */
 	zassert_true(
-		(uint64_t)offset + FP_SENSOR_IMAGE_OFFSET > UINT32_MAX,
+		(uint64_t)offset + image_offset > UINT32_MAX,
 		"Test setup: Expected overflow condition, but calculation is safe.");
 
 	enum ec_status status = get_frame(offset, size, output_buffer);
@@ -231,11 +270,15 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_layout_success)
 	/* Set capture type to true for skip_image_offset() evaluation. */
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
 
+	uint32_t image_offset =
+		global_context.fp_image_frame_params_cache.get_image_offset(
+			FP_CAPTURE_SIMPLE_IMAGE);
+
 	/*
 	 * Simulate production buffer data layout: Shifting offset forward
-	 * by the hardware-defined FP_SENSOR_IMAGE_OFFSET.
+	 * by the sensor capture type image offset.
 	 */
-	uint32_t absolute_destination = FP_SENSOR_IMAGE_OFFSET + offset;
+	uint32_t absolute_destination = image_offset + offset;
 
 	zassert_true(
 		absolute_destination + size <= FP_SENSOR_IMAGE_SIZE,
@@ -268,9 +311,13 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_success)
 
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
 
-	/* Get the active real frame size limit dynamically from the cache. */
+	/* Get the active real frame size and offset dynamically from the cache.
+	 */
 	uint32_t active_frame_size =
 		global_context.fp_image_frame_params_cache.get_frame_size(
+			FP_CAPTURE_SIMPLE_IMAGE);
+	uint32_t image_offset =
+		global_context.fp_image_frame_params_cache.get_image_offset(
 			FP_CAPTURE_SIMPLE_IMAGE);
 
 	/*
@@ -279,7 +326,7 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_success)
 	 */
 	uint32_t offset = active_frame_size - size;
 
-	uint32_t absolute_destination = FP_SENSOR_IMAGE_OFFSET + offset;
+	uint32_t absolute_destination = image_offset + offset;
 
 	zassert_true(
 		absolute_destination + size <= FP_SENSOR_IMAGE_SIZE,
@@ -337,20 +384,22 @@ ZTEST(fpsensor_get_frame, test_get_frame_physical_hardware_buffer_overflow)
 
 	uint32_t size = kMaxReadSize;
 
+	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+
+	uint32_t image_offset =
+		global_context.fp_image_frame_params_cache.get_image_offset(
+			FP_CAPTURE_SIMPLE_IMAGE);
+
 	/*
 	 * Land exactly 1 byte past the absolute array limit after the shift:
-	 * (offset + FP_SENSOR_IMAGE_OFFSET + size) == sizeof(fp_buffer) + 1
+	 * (offset + image_offset + size) == sizeof(fp_buffer) + 1
 	 */
-	uint32_t offset =
-		(sizeof(fp_buffer) + 1) - FP_SENSOR_IMAGE_OFFSET - size;
+	uint32_t offset = (sizeof(fp_buffer) + 1) - image_offset - size;
 
 	/* Verify that the offset calculation did not underflow. */
-	zassert_true(
-		(sizeof(fp_buffer) + 1) >= (FP_SENSOR_IMAGE_OFFSET + size),
-		"Test setup: Offset calculation wrapped. "
-		"FP_SENSOR_IMAGE_OFFSET + size must be <= sizeof(fp_buffer) + 1.");
-
-	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
+	zassert_true((sizeof(fp_buffer) + 1) >= (image_offset + size),
+		     "Test setup: Offset calculation wrapped. "
+		     "image_offset + size must be <= sizeof(fp_buffer) + 1.");
 
 	/*
 	 * Cache Pollution: Use the test-only setter to override the cache value
