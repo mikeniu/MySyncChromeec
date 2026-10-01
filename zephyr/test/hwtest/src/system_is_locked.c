@@ -107,6 +107,15 @@ ZTEST(system_is_locked_wp_off, test_system_is_locked)
 			 "running this test\n");
 		zassert_unreachable();
 	}
+#if IS_ENABLED(CONFIG_PLATFORM_EC_WP_EXTERNAL)
+	/*
+	 * Boards with CONFIG_PLATFORM_EC_WP_EXTERNAL (such as USB FPMCU
+	 * modules) do not have a hardware WP GPIO pin; WP state is tracked in
+	 * RAM (zephyr/drivers/wp/wp_external.c) and defaults to asserted on
+	 * boot until unlocked via disable_write_protect_external().
+	 */
+	disable_write_protect_external();
+#endif
 	test_pre_check();
 	write_protect_enabled = false;
 
