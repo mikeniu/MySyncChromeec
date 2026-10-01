@@ -15,7 +15,7 @@ config PLATFORM_EC_FT90_ENTER_BOOTLOADER
 config FOCALTECH_OTP_KEY
 	bool "Enable Focaltech OTP Key functionality"
 	depends on BORINGSSL_CRYPTO
-	select OTP
+	depends on OTP
 	select OTP_PROGRAM
 	help
 	  Enable support for reading and provisioning the OTP KEY for
