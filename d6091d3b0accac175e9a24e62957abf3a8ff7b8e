@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "942f861d_3d23a911",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T18:46:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Missing bounds validation for image footprint. [[trajectory](https://goto.corp.google.com/traj/05396d31-ec1e-40de-9b4b-e9be47d4713c)]\n\n### Review Summary\n\n*   **Functionality:** The logic correctly queries and caches the dynamic `image_data_offset_bytes`. However, the bounds validation has a hole where `offset + size` can exceed the physical buffer capacity.\n*   **Architecture \u0026 Component Fit:** The caching implementation aligns well with the existing `FpImageFrameParamsCache` pattern.\n*   **Code Simplicity:** The code is direct and minimalistic.\n*   **Idiomaticity \u0026 Readability:** Code adheres to C++ and Chromium OS EC standards. I left a minor suggestion to make error handling more consistent by using `goto error_exit` instead of early returns.\n*   **Security:** Missing footprint bounds check (`offset + size \u003c\u003d max_image_buffer_bytes`) and integer overflow protection.\n*   **Testing:** Thorough Zephyr unit tests cover the new cache behavior and boundaries. I requested an additional mutation test for the footprint boundary condition.\n*   **Commit Message:** The commit message clearly explains the changes and includes required bug and test tags.\n*   **CL Size \u0026 Scope:** `Size: M (+183, -27)`. The CL is appropriately sized and focused solely on the dynamic image offset cache and its immediate usage.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d6091d3b0accac175e9a24e62957abf3a8ff7b8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "834d7e81_42aa3d29",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T18:46:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Idiomaticity \u0026 Readability:** If `fp_sensor_get_info` fails or `num_types` is out of bounds, this function currently executes an early `return;` instead of `goto error_exit;`. \n\nWhile this might be harmless if `populate_cache` is only ever called once at startup, it\u0027s safer and more consistent to invalidate the cache (fill with zeros) on *any* failure to prevent the cache from containing stale or partially uninitialized data. \n\nConsider changing these early returns to `goto error_exit;`:\n```cpp\n\tif (fp_sensor_get_info(info, buffer.size()) \u003c 0) {\n\t\tCPRINTS(\"Error: Failed to get fingerprint sensor info.\");\n\t\tgoto error_exit;\n\t}\n\n\tconst uint8_t num_types \u003d info-\u003esensor_info.num_capture_types;\n\n\tif (num_types \u003e frame_params_.size()) {\n\t\tCPRINTS(\"ERROR - EC returned %u types, max supported is %zu.\",\n\t\t\tnum_types, frame_params_.size());\n\t\tgoto error_exit;\n\t}\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372808_05396d31-ec1e-40de-9b4b-e9be47d4713c.pb)",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d6091d3b0accac175e9a24e62957abf3a8ff7b8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fb4344c_caa96e7f",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T18:46:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Security / Bounds Validation (Blocking):** The validation checks that `size` and `offset` individually do not exceed `max_image_buffer_bytes`. However, as established in the previous CL review, the image payload resides at `[offset, offset + size)`. This means the combined footprint (`offset + size`) must not exceed the physical buffer capacity.\n\nFor example, if `max_image_buffer_bytes` is 1500, `offset` is 1000, and `size` is 1000, both individual checks pass, but the total required capacity is 2000, which risks an out-of-bounds read later. Furthermore, if `offset + size` wraps around (integer overflow), it could bypass a simple addition check.\n\nPlease replace both checks with a unified footprint check that also prevents overflow:\n```cpp\n\t\tif (offset \u003e max_image_buffer_bytes ||\n\t\t    max_image_buffer_bytes - offset \u003c size) {\n\t\t\tCPRINTS(\"Error: Type %u payload [offset %u, size %u] exceeds max buffer (%u).\",\n\t\t\t\ttype, offset, size, max_image_buffer_bytes);\n\t\t\tgoto error_exit;\n\t\t}\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372808_05396d31-ec1e-40de-9b4b-e9be47d4713c.pb)",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d6091d3b0accac175e9a24e62957abf3a8ff7b8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "763892a5_0cb24cae",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 9
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T18:46:09Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing (Blocking):** To verify the footprint validation requested in `fpsensor_image_frame_params.cc`, please add a mutation test that checks the cache invalidation when the combined `offset + size` exceeds `max_image_buffer_bytes` (even if `size` and `offset` individually fit).\n\n```cpp\nZTEST(fpsensor_image_frame_params,\n      test_cache_initialization_on_footprint_constraint_failure)\n{\n\tzassert_true(ARRAY_SIZE(image_frame_params_arr) \u003e 0,\n\t\t     \"image_frame_params_arr must not be empty for this test.\");\n\n\tuint32_t max_configured_footprint \u003d 0;\n\tfor (const auto \u0026params : image_frame_params_arr) {\n\t\tuint32_t footprint \u003d params.image_data_offset_bytes + params.frame_size;\n\t\tmax_configured_footprint \u003d MAX(max_configured_footprint, footprint);\n\t}\n\n\tif (max_configured_footprint \u003e 0) {\n\t\tFpImageFrameParamsCache failing_cache{};\n\t\t/* Provide a max_buffer_size that is 1 byte too small for the max footprint */\n\t\tfailing_cache.populate_cache(max_configured_footprint - 1);\n\n\t\tfor (int i \u003d 0; i \u003c FP_CAPTURE_TYPE_MAX; ++i) {\n\t\t\tenum fp_capture_type type \u003d static_cast\u003cenum fp_capture_type\u003e(i);\n\t\t\tuint32_t actual_size \u003d failing_cache.get_frame_size(type);\n\t\t\tuint32_t actual_offset \u003d failing_cache.get_image_offset(type);\n\n\t\t\tzassert_equal(0, actual_size,\n\t\t\t\t      \"Type %d should return zero size after footprint validation failure.\", i);\n\t\t\tzassert_equal(0, actual_offset,\n\t\t\t\t      \"Type %d should return zero offset after footprint validation failure.\", i);\n\t\t}\n\t}\n}\n```\n\n*(Note: Because the `IMAGE_SIZE` macro on line 21 is calculated only from `FINGERPRINT_SENSOR_FRAME_SIZE`, if any simulated capture type has a non-zero `FINGERPRINT_SENSOR_IMAGE_OFFSET`, you will also need to update the `IMAGE_SIZE` macro to include the offset so that `cache_fixture-\u003epopulate_cache(sizeof(image_buffer));` does not fail during test setup.)*\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372808_05396d31-ec1e-40de-9b4b-e9be47d4713c.pb)",
+      "range": {
+        "startLine": 100,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d6091d3b0accac175e9a24e62957abf3a8ff7b8e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
