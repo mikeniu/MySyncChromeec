@@ -30,7 +30,5 @@ class FpImageFrameParamsCacheTestHelper {
 	}
 };
 
-using FpFrameSizeCacheTestHelper = FpImageFrameParamsCacheTestHelper;
-
 #endif /* PLATFORM_EC_ZEPHYR_TEST_FINGERPRINT_TASK_INCLUDE_FPSENSOR_TEST_UTILS_H_ \
 	*/

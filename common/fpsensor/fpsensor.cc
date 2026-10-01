@@ -291,7 +291,8 @@ extern "C" void fp_task(void)
 	/* Reset and initialize the sensor IC */
 	fp_sensor_init();
 
-	global_context.fp_frame_size_cache.populate_cache(sizeof(fp_buffer));
+	global_context.fp_image_frame_params_cache.populate_cache(
+		sizeof(fp_buffer));
 
 	while (1) {
 		enum finger_state st = FINGER_NONE;
@@ -644,7 +645,7 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 	}
 
 	uint32_t current_frame_size =
-		global_context.fp_frame_size_cache.get_frame_size(
+		global_context.fp_image_frame_params_cache.get_frame_size(
 			global_context.current_capture_type);
 
 	if (current_frame_size > sizeof(fp_buffer)) {
