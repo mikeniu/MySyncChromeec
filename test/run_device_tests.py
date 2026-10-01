@@ -626,18 +626,12 @@ class Renode(Platform):
             "flash_protection",  # TODO(b/485668014)
             "flash_protection_rw",  # TODO(b/485668836)
             "flash_write_protect",  # TODO(b/485668014)
-            "fp_buffer_clear",  # TODO(b/485669018)
-            "fp_transport",  # TODO(b/485668240)
-            "malloc",  # TODO(b/485669070)
             "null_pointer",  # TODO(b/485624833)
             "panic",  # TODO(b/485668836)
             "panic_data",  # TODO(b/485667679)
             "panic_strip_gpr",  # TODO(b/485668836)
             "reboot",  # TODO(b/488128262)
             "rollback_entropy",  # TODO(b/485670085)
-            "sbrk",  # TODO(b/485669288)
-            "tpm_seed_clear",  # TODO(b/485669018)
-            "utils",  # TODO(b/485624824)
         ]:
             return True
 

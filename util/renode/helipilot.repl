@@ -28,4 +28,10 @@ GPIO_WP: Miscellaneous.Button @ gpioa 4
     init:
         ReleaseOnReset false
 
+// Connect gpio9 pin 3 (div_highside) to gpio4 pin 3 (transport_sel) to model
+// the board's resistor divider strap so get_fp_transport_type() detects SPI
+// when div_highside is driven high.
+gpio9:
+    3 -> gpio4@3
+
 fpsensor: Sensors.GenericSPISensor @ spip
