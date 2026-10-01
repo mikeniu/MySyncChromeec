@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "609973f9_e1c4e905",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-01T03:46:35Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8237836_97bf7e80-3609-4b65-8762-15afc73459a4.pb)]\n\n**Review Summary:**\n*   **Functionality:** ✅ The `.ahb4` memory region is zero-initialized in C during `system_pre_init()` and `system_reset()` using `memset` and safe `uintptr_t` arithmetic. The constructor check correctly verifies the state across reboots.\n*   **Architecture \u0026 Component Fit:** ✅ The logic is correctly placed in `chip/stm32/system.c`, maintaining appropriate architectural boundaries instead of polluting generic architecture startup code.\n*   **Code Simplicity:** ✅ The code is minimal and straightforward. `TEST_ASSERT_MEMSET` and `std::count` are properly utilized in the test suite, minimizing manual control flow.\n*   **Idiomaticity \u0026 Readability:** ✅ Code adheres to modern language idioms. No unexplained magic values exist.\n*   **Security:** ✅ No vulnerabilities introduced. This change implements defense-in-depth by purging NOLOAD memory that could otherwise leak sensitive data to a write-protected RO image.\n*   **Testing \u0026 Test Coverage:** ✅ Excellent use of a multistep hardware test (`fp_buffer_clear.cc`) spanning soft reboots to verify the memory purging behavior, correctly enabled for all target platforms to prevent regressions.\n*   **CL Size \u0026 Scope:** `Size: M (+167, -0)` ✅ The CL is well-scoped, atomic, and focuses strictly on this single logical change.\n*   **Commit Message:** ✅ The CL description accurately reflects the diff, provides clear rationale (including the explanation on why pairing with frozen production RO is safe), and utilizes proper formatting and footers.\n\nTAG\u003dagy\nCONV\u003d4b4d893b-951f-4adf-909b-7f3176093eb6",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "6624cee4b8a51aa6fc95f297874ea52b6ef03a90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
