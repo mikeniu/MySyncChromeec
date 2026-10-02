@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0c28402_c07ea22e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T19:43:27Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8281008_6ae48ed9-52e8-47d8-957b-6f911e5e63e4.pb)]\n\n### Review Summary\n*   **Functionality:** The code works as intended. Wrapping the OTP key programming loop with `irq_lock()` and `irq_unlock()` correctly prevents interruptions during the byte-by-byte write sequence.\n*   **Architecture \u0026 Component Fit:** The logic fits cleanly into the NPCX OTP driver and the assertion checks are co-located appropriately inside the write functions.\n*   **Code Simplicity:** The changes are simple, minimalistic, and use the standard `irq_lock`/`irq_unlock` idioms.\n*   **Idiomaticity \u0026 Readability:** The use of assertions (`ASSERT(!arch_cpu_irqs_are_enabled());`) inside the hardware layer and mock is idiomatic for verifying execution context.\n*   **Security:** Disabling interrupts during security-critical operations like OTP key programming prevents side-channel interruptions or partial writes.\n*   **Testing:** The CL includes excellent test coverage. It asserts that interrupts are locked inside the mock `otpi_write` and also verifies that interrupts are properly restored at the end of the `test_otp_key` run.\n*   **CL Size \u0026 Scope:** Size: S (+23, -1). The CL is atomic and focuses on a single logical change.\n*   **Commit Message:** The commit message clearly explains the \"Why\" and \"What\" of the changes, and includes correct Chromium OS formatting.\n\nTAG\u003dagy\nCONV\u003dd4ad5e43-21bd-4d9f-b6de-d2c733cae43c",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "c2c4193cd3dac97290b03695ba86d85aa7f27339",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
