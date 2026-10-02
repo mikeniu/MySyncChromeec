@@ -24,7 +24,16 @@ extern "C" {
 #ifdef CONFIG_ZTEST
 #include "ec_tasks.h"
 
+#include <zephyr/linker/linker-defs.h>
+#ifdef __cplusplus
+}
+#endif
+
 #include <zephyr/ztest.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #endif /* CONFIG_ZTEST */
 
 /* This allows tests to be easily commented out in run_test for debugging */
