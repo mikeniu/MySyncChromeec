@@ -6,6 +6,7 @@
 #include "common.h"
 #include "console.h"
 #include "ec_app_main.h"
+#include "uart.h"
 #include "zephyr/kernel.h"
 
 #include <zephyr/drivers/serial/uart_emul.h>
@@ -438,6 +439,48 @@ ZTEST_F(console_output, test_isr_output)
 	} else {
 		zassert_true(tx_bytes == 0);
 	}
+}
+
+struct cflush_work_ctx {
+	struct k_work work;
+	const struct device *dev;
+	bool ran;
+};
+
+static void cflush_drain_work_handler(struct k_work *item)
+{
+	struct cflush_work_ctx *ctx =
+		CONTAINER_OF(item, struct cflush_work_ctx, work);
+
+	uart_emul_flush_tx_data(ctx->dev);
+	ctx->ran = true;
+}
+
+ZTEST_F(console_output, test_cflush_yields)
+{
+	struct cflush_work_ctx ctx = {
+		.dev = fixture->dev,
+		.ran = false,
+	};
+
+	if (!IS_ENABLED(CONFIG_UART_INTERRUPT_DRIVEN)) {
+		ztest_test_skip();
+	}
+
+	k_work_init(&ctx.work, cflush_drain_work_handler);
+
+	/* Queue TX data so uart_irq_tx_complete() returns false until drained.
+	 * Submit a work item to the lower-priority system workqueue to drain
+	 * the emulated TX FIFO, then verify cflush() yields and completes.
+	 */
+	uart_write_char('X');
+	zassert_equal(uart_irq_tx_complete(fixture->dev), 0);
+
+	k_work_submit(&ctx.work);
+	cflush();
+
+	zassert_true(ctx.ran);
+	zassert_true(uart_irq_tx_complete(fixture->dev) > 0);
 }
 
 void test_main(void)
