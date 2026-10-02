@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "954b6d0d_78abcdee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T22:52:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — The CL is missing automated tests for the bug fixes. See inline comments for details.\n\n### Review Summary\n**Functionality:** ✅ The cache is now correctly cleared unconditionally at the start, ensuring consistency on early failure returns. Out-of-bounds checks and size validations in the extracted `validate` helper are correct.\n**Architecture \u0026 Component Fit:** ✅ The transactional assignment `frame_params_ \u003d params;` and isolated `validate()` function cleanly separate validation from mutation.\n**Code Simplicity:** ✅ Replaced `goto` control flow with early returns and a local accumulator array, which simplifies the function logic.\n**Idiomaticity \u0026 Readability:** ✅ The use of `std::array` initialization and `auto` for the iterator reference aligns with modern C++ readability standards.\n**Security:** ✅ Bounds checking for `fp_capture_type` correctly protects `params` indexing, and offset/size bounds guard against buffer overflow.\n**Testing:** ❌ The bug fixes for the failure paths (`fp_sensor_get_info()` failing and `num_types \u003e frame_params_.size()`) lack corresponding automated test coverage.\n**CL Size \u0026 Scope:** ✅ Size: M (+51, -44). Single logical change that addresses `populate_cache` atomicity and error path bugs.\n**Commit Message:** ✅ Accurately explains the issue and the fix, and follows proper tag formatting.\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499506_83f4d355-f554-470d-b700-304e7ab1f867.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "085e880fc8597e6f89941ba5bd66293f2c9775fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "621e867b_09fdd8ca",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T22:52:40Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\nThe commit message states that this CL fixes a bug where `populate_cache()` returns early without invalidating the cache when `fp_sensor_get_info()` fails or `num_types` exceeds `frame_params_.size()`. However, there are no tests in `zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc` covering these two error paths.\n\n**Testing \u0026 Test Coverage (Blocking)**: Automated test coverage is mandatory for bug fixes and error handling paths. Please add test cases for both `fp_sensor_get_info()` failing and `num_types \u003e frame_params_.size()`.\n\nFor the `fp_sensor_get_info()` failure, you can simulate it using the simulator state:\n\n```cpp\nZTEST(fpsensor_image_frame_params, test_cache_initialization_on_get_info_failure)\n{\n\tconst struct device *fp_sim \u003d DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor));\n\tstruct fingerprint_sensor_state state;\n\tfingerprint_get_state(fp_sim, \u0026state);\n\tstate.get_info_result \u003d -EINVAL;\n\tfingerprint_set_state(fp_sim, \u0026state);\n\n\tFpImageFrameParamsCache failing_cache{};\n\t// Set fake previous state to ensure it gets cleared\n\tFpImageFrameParamsCacheTestHelper::set_frame_size(failing_cache, FP_CAPTURE_VENDOR_FORMAT, 1024);\n\n\tconst uint32_t max_configured_frame_size \u003d\n\t\tmax_of(\u0026fingerprint_image_frame_params::frame_size);\n\tfailing_cache.populate_cache(max_configured_frame_size);\n\n\tassert_cache_empty(failing_cache);\n}\n```\n\nIf `num_types` cannot be easily manipulated via `fingerprint_sim`, consider extracting the buffer parsing into a testable helper or adding a seam.\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499506_83f4d355-f554-470d-b700-304e7ab1f867.pb)",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "085e880fc8597e6f89941ba5bd66293f2c9775fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
