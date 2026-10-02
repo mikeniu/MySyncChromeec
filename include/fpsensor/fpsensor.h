@@ -188,6 +188,17 @@ int fp_maintenance(void);
  */
 int fp_vendor_command(uint32_t param, uint8_t *buf, size_t buf_size);
 
+/**
+ * Put the sensor into idle state
+ *
+ * This function is useful if it's necessary e.g. to leave 'detect' mode
+ * due to timeout or user cancel.
+ *
+ * @return 0 on success
+ * @return negative value on error
+ */
+int fp_idle(void);
+
 #ifdef __cplusplus
 }
 #endif

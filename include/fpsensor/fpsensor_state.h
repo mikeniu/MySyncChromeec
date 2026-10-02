@@ -21,12 +21,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <zephyr/linker/devicetree_regions.h>
+
 #include <array>
 #include <optional>
 #include <span>
-
-#ifdef CONFIG_ZEPHYR
-#include <zephyr/linker/devicetree_regions.h>
 
 #if DT_NODE_EXISTS(DT_CHOSEN(cros_fp_fingerprint_memory_frame))
 #define FP_FRAME_SECTION                                       \
@@ -39,7 +38,6 @@
 	__attribute__((__section__(LINKER_DT_NODE_REGION_NAME( \
 		DT_CHOSEN(cros_fp_fingerprint_memory_template)))))
 #endif
-#endif /* CONFIG_ZEPHYR */
 
 /* if no special memory regions are defined, fallback on regular SRAM */
 #ifndef FP_FRAME_SECTION

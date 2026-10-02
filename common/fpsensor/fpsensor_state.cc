@@ -21,6 +21,8 @@
 #include "task.h"
 #include "util.h"
 
+#include <zephyr/shell/shell.h>
+
 #include <algorithm>
 #include <array>
 #include <bit>
