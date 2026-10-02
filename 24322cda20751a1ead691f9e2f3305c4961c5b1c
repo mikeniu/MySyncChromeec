@@ -22,6 +22,30 @@
       },
       "revId": "24322cda20751a1ead691f9e2f3305c4961c5b1c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c248f2e_6e549519",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-02T17:03:26Z",
+      "side": 1,
+      "message": "This file is not sync\u0027d to ec-legacy.\n\nYou could rebase on cl:8495044 or add it as cq-depends then remove this CONFIG_ZEPHYR. Or I can raise another cleanup cl later for any lingering references. Either way is fine.",
+      "parentUuid": "91ac5169_b05563d3",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 26
+      },
+      "revId": "24322cda20751a1ead691f9e2f3305c4961c5b1c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
