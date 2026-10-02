@@ -19,4 +19,9 @@ config BOARD_FINGERPRINT
 	help
 	  Simulate Fingerprint board for testing purposes.
 
+config TEST_PW_LOG_TOKENIZED
+	bool "Pigweed log tokenized tests"
+	help
+	  Tests for pw_log_zephyr_tokenized.cc.
+
 source "Kconfig.zephyr"

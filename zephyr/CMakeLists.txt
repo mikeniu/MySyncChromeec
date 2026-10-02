@@ -804,7 +804,9 @@ add_dependencies(app ec_version_header)
 # Include the directory containing the generated header.
 zephyr_include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
 
-if (DEFINED CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
+if (DEFINED CONFIG_PIGWEED_LOG_TOKENIZED_LIB AND
+    NOT DEFINED CONFIG_BOARD_NATIVE_POSIX AND
+    NOT DEFINED CONFIG_BOARD_NATIVE_SIM)
   # Using -m pw_tokenizer.database generates a runpy warning
   # https://pwbug.dev/269622559
   set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
