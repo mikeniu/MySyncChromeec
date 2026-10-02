@@ -71,6 +71,31 @@
       },
       "revId": "428cce9038af995c136fea48439f530d714b3cd7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e312ebe9_361bd332",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T19:39:43Z",
+      "side": 0,
+      "message": "Uploaded the rebased patchset (PS 4).",
+      "parentUuid": "dc57bbfe_9460128b",
+      "range": {
+        "startLine": 527,
+        "startChar": 12,
+        "endLine": 527,
+        "endChar": 43
+      },
+      "isAi": true,
+      "revId": "428cce9038af995c136fea48439f530d714b3cd7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
