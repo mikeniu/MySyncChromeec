@@ -67,6 +67,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c76095b2_71d3aaa1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T17:42:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8464411_951c8981-16d6-4c6d-bda4-dab6a2b31ce3.pb)]\n\n### Review Summary\n* **Functionality:** The patch correctly migrates the fingerprint sensor host commands from the `DECLARE_HOST_COMMAND` macros to the new `EC_HOST_CMD` framework. Behavior is correctly preserved.\n* **Architecture \u0026 Component Fit:** Aligns with the upstream EC codebase migration towards the `EC_HOST_CMD` framework.\n* **Code Simplicity:** The changes are straightforward and mechanically align the signatures.\n* **Idiomaticity \u0026 Readability:** Uses correct `static_cast` for C++ enum conversions (`ec_status` to `ec_host_cmd_status`). The use of `_REQ_ONLY`, `_RESP_ONLY`, and full `HANDLER` macros appropriately matches the payloads.\n* **Security:** No security impact; the cryptographic handlers (seed and sign match) are unchanged in behavior and validation. \n* **Testing:** No new logic is introduced; covered by the existing test suite (`fingerprint.task.commands` in `native_sim`).\n* **CL Size \u0026 Scope:** Size: M (+64, -52). The CL is well-scoped strictly to the `fpsensor_state.cc` migration.\n* **Commit Message:** Accurately reflects the changes, contains the correct `BUG\u003d` and `TEST\u003d` footers, and is well-formatted.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "795d22f52ab4c677642c631ed71714853888b5b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d6b55c4_f32595a6",
@@ -109,6 +128,31 @@
         "startLine": 348,
         "startChar": 0,
         "endLine": 350,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "795d22f52ab4c677642c631ed71714853888b5b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b084fce5_4cf1880d",
+        "filename": "common/fpsensor/fpsensor_state.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T17:42:53Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL (to keep this move CL pure):**\n\nBecause the framework now only guarantees that `input_buf_size` is at least the size of `SMALLEST_TYPE(..., ec_params_fp_mode)` (the v0 struct size), a v1 command could theoretically be sent with a size smaller than `sizeof(ec_params_fp_mode_v1)`. This would cause an out-of-bounds read when accessing `p_1-\u003emac`. \n\nAlso, following the principle of narrow lexical scoping, the `p_1` pointer is only valid and needed when `args-\u003eversion \u003d\u003d 1`. It should be declared inside the conditional branch where it is used.\n\nConsider adding an explicit size check for `v1` and narrowing the scope of `p_1` to prevent these issues:\n\n```cpp\n\tif (args-\u003eversion \u003d\u003d 1) {\n\t\tif (args-\u003einput_buf_size \u003c sizeof(struct ec_params_fp_mode_v1)) {\n\t\t\treturn EC_HOST_CMD_INVALID_PARAM;\n\t\t}\n\t\tconst auto *p_1 \u003d static_cast\u003cconst ec_params_fp_mode_v1 *\u003e(args-\u003einput_buf);\n\t\tmac \u003d std::span{ p_1-\u003emac };\n\t}\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8464411_951c8981-16d6-4c6d-bda4-dab6a2b31ce3.pb)",
+      "range": {
+        "startLine": 341,
+        "startChar": 0,
+        "endLine": 351,
         "endChar": 9999
       },
       "tag": "cl_review_agent",
