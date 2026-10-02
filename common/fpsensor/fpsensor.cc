@@ -38,6 +38,7 @@
 
 #include <algorithm>
 #include <array>
+#include <optional>
 #include <variant>
 
 #ifdef CONFIG_ZEPHYR
@@ -644,15 +645,17 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 		return EC_RES_INVALID_PARAM;
 	}
 
-	uint32_t current_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
+	const std::optional<FpImageFrameParam> frame_params =
+		global_context.fp_image_frame_params_cache.get(
 			global_context.current_capture_type);
 
-	if (current_frame_size > sizeof(fp_buffer)) {
+	if (!frame_params.has_value() ||
+	    frame_params->frame_size_bytes > sizeof(fp_buffer)) {
 		return EC_RES_INVALID_PARAM;
 	}
 
-	ret = validate_fp_buffer_offset(current_frame_size, offset, size);
+	ret = validate_fp_buffer_offset(frame_params->frame_size_bytes, offset,
+					size);
 	if (ret != EC_SUCCESS)
 		return EC_RES_INVALID_PARAM;
 
@@ -662,18 +665,15 @@ test_export_static enum ec_status get_frame(uint32_t offset, uint32_t size,
 	 * pattern1, and reset_test.
 	 */
 	if (skip_image_offset(global_context.current_capture_type)) {
-		uint32_t current_image_offset =
-			global_context.fp_image_frame_params_cache
-				.get_image_offset(
-					global_context.current_capture_type);
-
 		/*
 		 * Logical frame bounds (offset + size <= current_frame_size)
 		 * were already validated above. Here we verify that the
 		 * shifted range does not overflow or exceed the physical
 		 * fp_buffer capacity.
 		 */
-		if (check_add_overflow(offset, current_image_offset, &offset) ||
+		if (check_add_overflow(offset,
+				       frame_params->image_data_offset_bytes,
+				       &offset) ||
 		    validate_fp_buffer_offset(sizeof(fp_buffer), offset,
 					      size) != EC_SUCCESS) {
 			return EC_RES_INVALID_PARAM;

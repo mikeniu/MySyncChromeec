@@ -62,6 +62,8 @@ static void assert_cache_empty(const FpImageFrameParamsCache &cache)
 	for (int i = 0; i < FP_CAPTURE_TYPE_MAX; ++i) {
 		auto type = static_cast<enum fp_capture_type>(i);
 
+		zassert_false(cache.get(type).has_value(),
+			      "Type %d should not have cached params", i);
 		zassert_equal(0, cache.get_frame_size(type), "Type %d size", i);
 		zassert_equal(0, cache.get_image_offset(type), "Type %d offset",
 			      i);
@@ -251,6 +253,14 @@ ZTEST(fpsensor_image_frame_params,
 			"Configured type %d is out of expected range [0, %d).",
 			type, FP_CAPTURE_TYPE_MAX);
 
+		const std::optional<FpImageFrameParam> actual =
+			cache->get(type);
+		zassert_true(actual.has_value(),
+			     "Expected cached params for configured type %d.",
+			     static_cast<int>(type));
+		zassert_equal(expected_size, actual->frame_size_bytes);
+		zassert_equal(expected_offset, actual->image_data_offset_bytes);
+
 		uint32_t actual_size = cache->get_frame_size(type);
 		zassert_equal(
 			expected_size, actual_size,
@@ -282,11 +292,13 @@ ZTEST(fpsensor_image_frame_params, test_cache_invalid_type_lookup)
 		uint32_t actual_offset = cache->get_image_offset(type);
 
 		if (is_type_present[i]) {
+			zassert_true(cache->get(type).has_value());
 			zassert_true(
 				actual_size > 0,
 				"Configured Type %d should return non-zero size.",
 				i);
 		} else {
+			zassert_false(cache->get(type).has_value());
 			zassert_equal(
 				0, actual_size,
 				"Unconfigured Type %d should return zero size.",
@@ -303,6 +315,7 @@ ZTEST(fpsensor_image_frame_params, test_cache_boundary_max_index)
 {
 	FpImageFrameParamsCache *cache = cache_fixture.get();
 
+	zassert_false(cache->get(FP_CAPTURE_TYPE_MAX).has_value());
 	zassert_equal(
 		cache->get_frame_size(FP_CAPTURE_TYPE_MAX), 0,
 		"Expected zero size for invalid capture type (FP_CAPTURE_TYPE_MAX).");
@@ -317,6 +330,7 @@ ZTEST(fpsensor_image_frame_params, test_cache_boundary_above_max_index)
 	const enum fp_capture_type above_max_type =
 		static_cast<enum fp_capture_type>(FP_CAPTURE_TYPE_MAX + 1);
 
+	zassert_false(cache->get(above_max_type).has_value());
 	zassert_equal(
 		cache->get_frame_size(above_max_type), 0,
 		"Expected zero size for invalid capture type (FP_CAPTURE_TYPE_MAX + 1).");
@@ -329,6 +343,8 @@ ZTEST(fpsensor_image_frame_params, test_cache_boundary_negative_index)
 {
 	FpImageFrameParamsCache *cache = cache_fixture.get();
 
+	zassert_false(
+		cache->get(static_cast<enum fp_capture_type>(-1)).has_value());
 	zassert_equal(
 		cache->get_frame_size(static_cast<enum fp_capture_type>(-1)), 0,
 		"Expected zero size for negative capture type (-1).");
