@@ -52,27 +52,6 @@ class FpImageFrameParamsCache {
 	std::optional<FpImageFrameParam>
 	get(enum fp_capture_type capture_type) const;
 
-	/**
-	 * @brief Looks up the frame size for a given capture type.
-	 *
-	 * @param capture_type The enum fp_capture_type to look up.
-	 * @return Frame size in bytes if valid and configured, 0 otherwise.
-	 */
-	uint32_t get_frame_size(enum fp_capture_type capture_type) const;
-
-	/**
-	 * @brief Looks up the image data offset for a given capture type.
-	 *
-	 * Because 0 is a valid offset, callers cannot distinguish a 0 offset
-	 * from an invalid capture type or uninitialized cache. Callers must
-	 * gate on get_frame_size(capture_type) != 0 (or use get()) first.
-	 *
-	 * @param capture_type The enum fp_capture_type to look up.
-	 * @return Image data offset in bytes if valid and configured, 0
-	 * otherwise.
-	 */
-	uint32_t get_image_offset(enum fp_capture_type capture_type) const;
-
     private:
 	void populate_from_info(const struct fp_image_frame_params_v2 *params,
 				uint8_t num_types,

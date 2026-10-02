@@ -199,9 +199,11 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_layout_success)
 	/* Set capture type to true for skip_image_offset() evaluation. */
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
 
-	uint32_t image_offset =
-		global_context.fp_image_frame_params_cache.get_image_offset(
+	const std::optional<FpImageFrameParam> cached =
+		global_context.fp_image_frame_params_cache.get(
 			FP_CAPTURE_SIMPLE_IMAGE);
+	zassert_true(cached.has_value());
+	uint32_t image_offset = cached->image_data_offset_bytes;
 
 	/*
 	 * Simulate production buffer data layout: Shifting offset forward
@@ -233,12 +235,12 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_success)
 
 	/* Get the active real frame size and offset dynamically from the cache.
 	 */
-	uint32_t active_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
+	const std::optional<FpImageFrameParam> cached =
+		global_context.fp_image_frame_params_cache.get(
 			FP_CAPTURE_SIMPLE_IMAGE);
-	uint32_t image_offset =
-		global_context.fp_image_frame_params_cache.get_image_offset(
-			FP_CAPTURE_SIMPLE_IMAGE);
+	zassert_true(cached.has_value());
+	uint32_t active_frame_size = cached->frame_size_bytes;
+	uint32_t image_offset = cached->image_data_offset_bytes;
 
 	/*
 	 * Align the final byte perfectly against the active image frame
@@ -268,9 +270,11 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_overflow)
 
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
 
-	uint32_t active_frame_size =
-		global_context.fp_image_frame_params_cache.get_frame_size(
+	const std::optional<FpImageFrameParam> cached =
+		global_context.fp_image_frame_params_cache.get(
 			FP_CAPTURE_SIMPLE_IMAGE);
+	zassert_true(cached.has_value());
+	uint32_t active_frame_size = cached->frame_size_bytes;
 
 	/*
 	 * Push the chunk request exactly 1 byte past the active frame
@@ -287,9 +291,11 @@ ZTEST(fpsensor_get_frame, test_get_frame_physical_hardware_buffer_overflow)
 
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
 
-	uint32_t image_offset =
-		global_context.fp_image_frame_params_cache.get_image_offset(
+	const std::optional<FpImageFrameParam> cached =
+		global_context.fp_image_frame_params_cache.get(
 			FP_CAPTURE_SIMPLE_IMAGE);
+	zassert_true(cached.has_value());
+	uint32_t image_offset = cached->image_data_offset_bytes;
 
 	/*
 	 * Land exactly 1 byte past the absolute array limit after the shift:
