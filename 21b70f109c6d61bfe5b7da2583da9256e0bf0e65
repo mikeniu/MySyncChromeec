@@ -302,6 +302,24 @@
       "parentUuid": "9f646bf2_36fbb2d8",
       "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49b4410d_a07e225b",
+        "filename": "zephyr/shim/chip/npcx/otp_key.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1132339
+      },
+      "writtenOn": "2026-10-02T07:20:08Z",
+      "side": 1,
+      "message": "Hi,  \n`otpi_write` ROM API doesn\u0027t use interrupt.",
+      "parentUuid": "8d884b1e_33801082",
+      "revId": "21b70f109c6d61bfe5b7da2583da9256e0bf0e65",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
