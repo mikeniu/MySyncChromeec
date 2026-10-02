@@ -1156,6 +1156,22 @@ test_static int test_battery_sustainer_with_idle(void)
 	return EC_SUCCESS;
 }
 
+test_static int test_clamp_requested_voltage(void)
+{
+	const struct battery_info *bat_info = battery_get_info();
+	const struct charge_state_data *curr = charge_get_status();
+
+	test_setup(1);
+
+	/* Request a voltage significantly higher than battery voltage_max */
+	sb_write(SB_CHARGING_VOLTAGE, bat_info->voltage_max + 5000);
+	wait_charging_state();
+
+	TEST_ASSERT(curr->requested_voltage <= bat_info->voltage_max);
+
+	return EC_SUCCESS;
+}
+
 void run_test(int argc, const char **argv)
 {
 	RUN_TEST(test_charge_state);
@@ -1173,6 +1189,7 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_battery_sustainer_without_idle);
 	RUN_TEST(test_battery_sustainer_with_idle);
 	RUN_TEST(test_deep_charge_battery);
+	RUN_TEST(test_clamp_requested_voltage);
 
 	test_print_result();
 }
