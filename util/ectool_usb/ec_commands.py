@@ -471,8 +471,12 @@ class FpVendorCmd0(ECCommand):
 class EnterBootloaderCmd0(ECCommand):
     """Enters the bootloader."""
 
-    def __init__(self):
-        super().__init__(ECCommandsIds.ENTER_BOOTLOADER, 0)
+    def __init__(self, mode: int = 0):
+        # 1 byte of mode
+        request_msg = [(mode, "B")]
+        super().__init__(
+            ECCommandsIds.ENTER_BOOTLOADER, 0, request_msg=request_msg
+        )
 
 
 class FlashReadCmd0(ECCommand):
