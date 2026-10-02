@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91ac5169_b05563d3",
+        "filename": "test/mock/otpi_mock.c",
+        "patchSetId": 22
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T16:46:36Z",
+      "side": 1,
+      "message": "@robbarnes@google.com\n\nShall I remove the reference to zephyr here? I saw your other CL that removes those. Can you confirm that this file will not sync to ec-legacy. Thanks",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 26
+      },
+      "revId": "24322cda20751a1ead691f9e2f3305c4961c5b1c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
