@@ -5,17 +5,17 @@
 
 #include "fpsensor/fpsensor.h"
 #include "fpsensor/fpsensor_console.h"
-#include "fpsensor/fpsensor_frame_size.h"
+#include "fpsensor/fpsensor_image_frame_params.h"
 
 #include <stddef.h>
 
 #include <vector>
 
-void FpFrameSizeCache::populate_cache(uint32_t max_frame_size_bytes)
+void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 {
 	const size_t buffer_size =
 		sizeof(struct ec_response_fp_info_v3) +
-		sizeof(struct fp_image_frame_params_v2) * frame_sizes_.size();
+		sizeof(struct fp_image_frame_params_v2) * frame_params_.size();
 
 	std::vector<uint8_t> buffer(buffer_size);
 	auto *info = reinterpret_cast<struct ec_response_fp_info_v3 *>(
@@ -28,9 +28,9 @@ void FpFrameSizeCache::populate_cache(uint32_t max_frame_size_bytes)
 
 	const uint8_t num_types = info->sensor_info.num_capture_types;
 
-	if (num_types > frame_sizes_.size()) {
+	if (num_types > frame_params_.size()) {
 		CPRINTF("ERROR - EC returned %u types, max supported is %zu.",
-			num_types, frame_sizes_.size());
+			num_types, frame_params_.size());
 		return;
 	}
 
@@ -46,10 +46,10 @@ void FpFrameSizeCache::populate_cache(uint32_t max_frame_size_bytes)
 			goto error_exit;
 		}
 
-		if (type >= frame_sizes_.size()) {
+		if (type >= frame_params_.size()) {
 			CPRINTF("ERROR: Invalid fp_capture_type %u received from EC, max "
 				"supported is %zu.",
-				type, frame_sizes_.size());
+				type, frame_params_.size());
 			goto error_exit;
 		}
 
@@ -59,33 +59,34 @@ void FpFrameSizeCache::populate_cache(uint32_t max_frame_size_bytes)
 			goto error_exit;
 		}
 
-		frame_sizes_[type] = size;
+		frame_params_[type] = {
+			.frame_size_bytes = size,
+		};
 	}
 
 	return;
 
 error_exit:
 	/* Invalidate cache. */
-	frame_sizes_.fill(0);
+	frame_params_.fill({});
 	return;
 }
 
 uint32_t
-FpFrameSizeCache::get_frame_size(enum fp_capture_type capture_type) const
+FpImageFrameParamsCache::get_frame_size(enum fp_capture_type capture_type) const
 {
-	if (static_cast<size_t>(capture_type) >= frame_sizes_.size() ||
-	    capture_type < 0) {
+	if (static_cast<size_t>(capture_type) >= frame_params_.size()) {
 		CPRINTF("Error: Invalid fp_capture_type %d requested (max: %zu), "
 			"returning size 0.",
-			capture_type, frame_sizes_.size());
+			capture_type, frame_params_.size());
 		return 0;
 	}
 
-	if (frame_sizes_[capture_type] == 0) {
-		CPRINTF("Error: FpFrameSizeCache is uninitialized or capture type %u"
+	if (frame_params_[capture_type].frame_size_bytes == 0) {
+		CPRINTF("Error: FpImageFrameParamsCache is uninitialized or capture type %u"
 			" is invalid, returning size 0.",
 			capture_type);
 	}
 
-	return frame_sizes_[capture_type];
+	return frame_params_[capture_type].frame_size_bytes;
 }
