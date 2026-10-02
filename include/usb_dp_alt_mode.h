@@ -12,7 +12,7 @@
 #ifndef PLATFORM_EC_INCLUDE_USB_DP_ALT_MODE_H_
 #define PLATFORM_EC_INCLUDE_USB_DP_ALT_MODE_H_
 
-#include "config.h"
+#include "common.h"
 #include "tcpm/tcpm.h"
 #include "usb_pd_dpm_sm.h"
 #include "usb_pd_vdo.h"

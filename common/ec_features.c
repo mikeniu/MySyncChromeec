@@ -7,7 +7,6 @@
 
 #include "board_config.h"
 #include "common.h"
-#include "config.h"
 #include "console.h"
 #include "ec_commands.h"
 #include "motion_sense.h"

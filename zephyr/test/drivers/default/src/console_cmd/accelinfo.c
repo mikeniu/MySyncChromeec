@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "config.h"
+#include "common.h"
 #include "console.h"
 #include "ec_commands.h"
 #include "test/drivers/test_state.h"

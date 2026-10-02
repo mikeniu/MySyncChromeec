@@ -8,7 +8,7 @@
 #ifndef PLATFORM_EC_INCLUDE_DRIVER_TCPM_TCPCI_H_
 #define PLATFORM_EC_INCLUDE_DRIVER_TCPM_TCPCI_H_
 
-#include "config.h"
+#include "common.h"
 #include "ec_commands.h"
 #include "tcpm/tcpm.h"
 #include "usb_mux.h"

@@ -12,7 +12,6 @@
 #include "charge_manager.h"
 #include "charger.h"
 #include "common.h"
-#include "config.h"
 #include "console.h"
 #include "hooks.h"
 #include "i2c.h"

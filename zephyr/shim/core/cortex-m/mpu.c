@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "config.h"
+#include "common.h"
 #include "mpu.h"
 #if defined(CONFIG_NPCX_RAM_LOCK)
 #include "ram_lock.h"

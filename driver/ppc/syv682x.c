@@ -6,7 +6,6 @@
 /* Silergy SYV682x USB-C Power Path Controller */
 #include "atomic.h"
 #include "common.h"
-#include "config.h"
 #include "console.h"
 #include "gpio.h"
 #include "hooks.h"

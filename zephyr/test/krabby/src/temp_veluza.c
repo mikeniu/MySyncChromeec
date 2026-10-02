@@ -7,7 +7,6 @@
 #include "charger.h"
 #include "charger_profile_override.h"
 #include "common.h"
-#include "config.h"
 #include "extpower.h"
 #include "hooks.h"
 #include "temp_sensor.h"

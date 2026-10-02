@@ -8,7 +8,7 @@
 #ifndef PLATFORM_EC_INCLUDE_MATH_UTIL_H_
 #define PLATFORM_EC_INCLUDE_MATH_UTIL_H_
 
-#include "config.h"
+#include "common.h"
 #include "limits.h"
 
 #include <stdint.h>

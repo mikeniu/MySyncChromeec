@@ -7,7 +7,6 @@
 #include "atomic.h"
 #include "battery.h"
 #include "common.h"
-#include "config.h"
 #include "console.h"
 #include "driver/ppc/rt1739.h"
 #include "driver/tcpm/tcpci.h"

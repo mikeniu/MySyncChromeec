@@ -6,7 +6,6 @@
 /* Richtek RT1718S USB-C Power Path Controller */
 #include "atomic.h"
 #include "common.h"
-#include "config.h"
 #include "console.h"
 #include "driver/ppc/rt1718s.h"
 #include "driver/tcpm/tcpci.h"

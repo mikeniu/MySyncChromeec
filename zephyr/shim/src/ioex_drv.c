@@ -7,7 +7,6 @@
 #undef __REQUIRE_ZEPHYR_GPIOS__
 #endif
 #include "common.h"
-#include "config.h"
 /* Include drivers if enabled */
 #ifdef CONFIG_PLATFORM_EC_IOEX_IT8801
 #include "driver/ioexpander/it8801.h"

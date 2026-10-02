@@ -7,7 +7,6 @@
 
 #include "builtin/assert.h"
 #include "common.h"
-#include "config.h"
 #include "console.h"
 #include "hooks.h"
 #include "it83xx_pd.h"

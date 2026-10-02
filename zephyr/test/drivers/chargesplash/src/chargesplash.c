@@ -4,7 +4,7 @@
  */
 
 #include "chipset.h"
-#include "config.h"
+#include "common.h"
 #include "ec_commands.h"
 #include "extpower.h"
 #include "hooks.h"

@@ -9,7 +9,6 @@
 #define PLATFORM_EC_INCLUDE_CONSOLE_H_
 
 #include "common.h"
-#include "config.h"
 #include "console_channel.h"
 #include "zephyr_console_shim.h"
 

@@ -9,7 +9,6 @@
 #include "charge_manager.h"
 #include "chipset.h"
 #include "common.h"
-#include "config.h"
 #include "cros_board_info.h"
 #include "cros_cbi.h"
 #include "driver/accel_bma4xx.h"

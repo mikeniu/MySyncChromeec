@@ -10,7 +10,7 @@
 #include "ap_power/ap_power.h"
 #include "charger.h"
 #include "chipset.h"
-#include "config.h"
+#include "common.h"
 #include "driver/amd_stb.h"
 #include "gpio/gpio_int.h"
 #include "gpio_signal.h"

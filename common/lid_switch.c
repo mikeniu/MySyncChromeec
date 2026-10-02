@@ -6,7 +6,6 @@
 /* Lid switch module for Chrome EC */
 
 #include "common.h"
-#include "config.h"
 #include "console.h"
 #include "gpio.h"
 #include "hooks.h"

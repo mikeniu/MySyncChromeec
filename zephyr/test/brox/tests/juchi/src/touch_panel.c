@@ -4,7 +4,7 @@
  */
 
 #include "ap_power/ap_power_events.h"
-#include "config.h"
+#include "common.h"
 #include "cros_cbi.h"
 #include "gpio/gpio_int.h"
 #include "gpio_signal.h"

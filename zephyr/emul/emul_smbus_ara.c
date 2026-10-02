@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "config.h"
+#include "common.h"
 #include "emul/emul_common_i2c.h"
 
 #include <zephyr/device.h>

@@ -12,7 +12,7 @@
 #ifndef PLATFORM_EC_COMMON_ROLLBACK_PRIVATE_H_
 #define PLATFORM_EC_COMMON_ROLLBACK_PRIVATE_H_
 
-#include "config.h"
+#include "common.h"
 
 /*
  * Note: Do not change this structure without also updating

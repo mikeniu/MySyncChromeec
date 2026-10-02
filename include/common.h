@@ -314,6 +314,12 @@
 #define test_overridable_const const
 #endif
 
+#ifndef HOST_TOOLS_BUILD
+#include "config_chip.h"
+#include "shimmed_tasks.h"
+#include "zephyr_shim.h"
+#endif
+
 /* Include top-level configuration file */
 #include "config.h"
 

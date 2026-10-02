@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "config.h"
+#include "common.h"
 #include "cros_cbi.h"
 #include "gpio/gpio_int.h"
 #include "gpio_signal.h"

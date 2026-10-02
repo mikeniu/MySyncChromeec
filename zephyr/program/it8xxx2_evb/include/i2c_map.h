@@ -6,7 +6,7 @@
 #ifndef PLATFORM_EC_ZEPHYR_PROGRAM_IT8XXX2_EVB_INCLUDE_I2C_MAP_H_
 #define PLATFORM_EC_ZEPHYR_PROGRAM_IT8XXX2_EVB_INCLUDE_I2C_MAP_H_
 
-#include "config.h"
+#include "common.h"
 
 #include <zephyr/devicetree.h>
 

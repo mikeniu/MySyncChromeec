@@ -6,7 +6,7 @@
 #ifndef PLATFORM_EC_INCLUDE_RWSIG_H_
 #define PLATFORM_EC_INCLUDE_RWSIG_H_
 
-#include "config.h"
+#include "common.h"
 #include "rsa.h"
 
 #ifdef __cplusplus

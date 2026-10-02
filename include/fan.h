@@ -8,7 +8,7 @@
 #ifndef PLATFORM_EC_INCLUDE_FAN_H_
 #define PLATFORM_EC_INCLUDE_FAN_H_
 
-#include "config.h"
+#include "common.h"
 
 #include <stdbool.h>
 #include <stdint.h>

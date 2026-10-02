@@ -4,7 +4,6 @@
  */
 
 #include "common.h"
-#include "config.h"
 #include "console.h"
 #include "hooks.h"
 #include "task.h"

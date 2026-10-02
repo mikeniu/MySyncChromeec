@@ -3,7 +3,7 @@
  * found in the LICENSE file.
  */
 
-#include "config.h"
+#include "common.h"
 #include "usbc/tcpc_nct38xx.h"
 #include "usbc/utils.h"
 

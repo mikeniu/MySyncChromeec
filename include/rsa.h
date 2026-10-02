@@ -6,8 +6,6 @@
 #ifndef PLATFORM_EC_INCLUDE_RSA_H_
 #define PLATFORM_EC_INCLUDE_RSA_H_
 
-#include "config.h"
-
 #ifndef CONFIG_RSA_KEY_SIZE
 #define CONFIG_RSA_KEY_SIZE 2048 /* default to 2048-bit key length */
 #endif

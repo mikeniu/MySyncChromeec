@@ -8,7 +8,7 @@
 #ifndef PLATFORM_EC_DRIVER_ACCEL_BMA4XX_H_
 #define PLATFORM_EC_DRIVER_ACCEL_BMA4XX_H_
 
-#include "config.h"
+#include "common.h"
 
 #define BMA4_I2C_ADDR_PRIMARY 0x18
 #define BMA4_I2C_ADDR_SECONDARY 0x19

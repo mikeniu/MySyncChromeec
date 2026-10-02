@@ -4,7 +4,6 @@
  */
 
 #include "common.h"
-#include "config.h"
 #include "ec_commands.h"
 #include "host_command.h"
 #include "uart.h"

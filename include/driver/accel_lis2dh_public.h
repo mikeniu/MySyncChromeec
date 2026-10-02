@@ -8,7 +8,7 @@
 #ifndef PLATFORM_EC_INCLUDE_DRIVER_ACCEL_LIS2DH_PUBLIC_H_
 #define PLATFORM_EC_INCLUDE_DRIVER_ACCEL_LIS2DH_PUBLIC_H_
 
-#include "config.h"
+#include "common.h"
 #include "gpio_signal.h"
 
 #ifdef __cplusplus
