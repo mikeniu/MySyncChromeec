@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8310f66d_342317d4",
+        "filename": "include/task.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-02T18:34:41Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Since `task_enable_task()` was removed as dead code, double-check if `task_disable_task()` is also dead code and can be removed.",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 176,
+        "endChar": 0
+      },
+      "revId": "ec554f31eae2c01dc7c602ed91b5c15b750f1a1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec5bc04d_01d543a2",
+        "filename": "include/task.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-02T18:34:41Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Since `DECLARE_IRQ` is dropped for Zephyr, check if `struct irq_def` and `struct irq_priority` (defined just above this) are also dead code and can be removed.",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 0
+      },
+      "revId": "ec554f31eae2c01dc7c602ed91b5c15b750f1a1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
