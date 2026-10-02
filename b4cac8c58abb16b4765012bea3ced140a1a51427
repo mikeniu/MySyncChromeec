@@ -44,6 +44,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "218f3f6e_281b7e02",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done in follow-up CL https://crrev.com/c/8499505.",
+      "parentUuid": "b588b822_6d030061",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "111b0dc9_6741319b",
@@ -62,6 +87,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "da142ed6_7c081be4",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done. Changed condition to offset \u003e\u003d max_image_buffer_bytes.",
+      "parentUuid": "111b0dc9_6741319b",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d916e79_2d4a7fad",
@@ -75,6 +119,31 @@
       "writtenOn": "2026-10-01T21:29:28Z",
       "side": 1,
       "message": "Optional (could be a follow-up CL, since the goto structure comes from the parent CL — but this CL adds another goto site, so it would be reasonable to do here too): the goto exists only because C++ forbids jumping over initializations, and it leaves the failure semantics inconsistent — the first two errors (fp_sensor_get_info() fails, num_types too large) return *without* invalidating, while the per-type errors do. Building into a local array and committing atomically removes the goto and makes every failure path yield an empty cache:\n\n  void FpImageFrameParamsCache::populate_cache(uint32_t max_image_buffer_bytes)\n  {\n  \tframe_params_.fill({}); /* Invalid until fully repopulated. */\n  \t...\n  \tstd::array\u003cFpImageFrameParam, FP_CAPTURE_TYPE_MAX\u003e params{};\n  \tfor (uint8_t i \u003d 0; i \u003c num_types; ++i) {\n  \t\tif (!validate(info-\u003eimage_frame_params[i], max_image_buffer_bytes))\n  \t\t\treturn;\n  \t\tparams[type] \u003d { .frame_size_bytes \u003d size,\n  \t\t\t\t .image_data_offset_bytes \u003d offset };\n  \t}\n  \tframe_params_ \u003d params;\n  }\n\nA small static bool validate(const fp_image_frame_params_v2 \u0026, uint32_t max) keeps the loop body short.",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "220e94e3_d3b621f8",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done in follow-up CL https://crrev.com/c/8499506.",
+      "parentUuid": "2d916e79_2d4a7fad",
       "range": {
         "startLine": 84,
         "startChar": 0,
@@ -110,6 +179,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d618b2f5_7dfe4da6",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done in follow-up CL https://crrev.com/c/8499507.",
+      "parentUuid": "49383ecc_e493bad7",
+      "range": {
+        "startLine": 109,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "49371d03_e007008a",
@@ -123,6 +217,31 @@
       "writtenOn": "2026-10-01T21:24:37Z",
       "side": 1,
       "message": "The old doc said \"On failure, this method invalidates the entire array by filling it with zeros.\" That\u0027s the most important contract of this function (and what the failure tests verify) — please keep it in the new doc.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c020f449_e68c53af",
+        "filename": "include/fpsensor/fpsensor_image_frame_params.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done. Restored the cache invalidation contract in the docstring.",
+      "parentUuid": "49371d03_e007008a",
       "range": {
         "startLine": 30,
         "startChar": 0,
@@ -158,6 +277,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b79b8f9d_6360595a",
+        "filename": "include/fpsensor/fpsensor_image_frame_params.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done. Documented that callers should check get_frame_size() !\u003d 0 first, and added std::optional\u003cFpImageFrameParam\u003e get() in follow-up CL https://crrev.com/c/8499507.",
+      "parentUuid": "9b2b74b4_038996c5",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "182e85b3_89e1b0d4",
@@ -171,6 +315,31 @@
       "writtenOn": "2026-10-01T21:29:28Z",
       "side": 1,
       "message": "Suggest doing in this CL: rather than a second setter with a copy-pasted bounds check (and a third if another field is ever added), expose one accessor that hands back the slot:\n\n  static FpImageFrameParam *params(FpImageFrameParamsCache \u0026cache,\n  \t\t\t\t  enum fp_capture_type type)\n  {\n  \tif (static_cast\u003csize_t\u003e(type) \u003e\u003d cache.frame_params_.size())\n  \t\treturn nullptr;\n  \treturn \u0026cache.frame_params_[type];\n  }\n\nTests then write helper::params(*cache, t)-\u003eimage_data_offset_bytes \u003d 64, and the three near-identical set_*_boundary_* tests can become a single loop over {FP_CAPTURE_TYPE_MAX, FP_CAPTURE_TYPE_MAX + 1, (enum fp_capture_type)-1} asserting nullptr. Fine to keep set_frame_size() as-is if you\u0027d prefer to leave the parent CL\u0027s helper untouched.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bbfd503_39736557",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done. Replaced set_image_offset() with FpImageFrameParamsCacheTestHelper::params() and consolidated the out-of-bounds tests.",
+      "parentUuid": "182e85b3_89e1b0d4",
       "range": {
         "startLine": 32,
         "startChar": 0,
@@ -200,6 +369,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02a6af09_7753d085",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "18f6774e_8e95b2b9",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ca60be73_ebc2a1d8",
@@ -213,6 +401,31 @@
       "writtenOn": "2026-10-01T21:29:28Z",
       "side": 1,
       "message": "nit (this CL): rather than hand-rolling a MAX reduction loop here and again at :106, consider std::max_element with a projection or a tiny helper, e.g.\n\n  static uint32_t max_of(uint32_t fingerprint_image_frame_params::*field)\n  {\n  \tuint32_t m \u003d 0;\n  \tfor (const auto \u0026p : image_frame_params_arr)\n  \t\tm \u003d MAX(m, p.*field);\n  \treturn m;\n  }\n\n  const uint32_t max_size \u003d max_of(\u0026fingerprint_image_frame_params::frame_size);",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78e8bfeb_3a1e075f",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done. Extracted max_of() helper.",
+      "parentUuid": "ca60be73_ebc2a1d8",
       "range": {
         "startLine": 70,
         "startChar": 0,
@@ -242,6 +455,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "12be30ce_37331157",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done. Replaced the if guard with a zassert_true precondition.",
+      "parentUuid": "d81f5720_6fe03e7f",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38624758_10174221",
@@ -255,6 +487,31 @@
       "writtenOn": "2026-10-01T21:29:28Z",
       "side": 1,
       "message": "Suggest doing in this CL (the duplication is new here): this same loop asserting size \u003d\u003d 0 \u0026\u0026 offset \u003d\u003d 0 for every type now appears three times (size-failure, offset-failure, and the unconfigured branch in test_cache_unconfigured_types_return_zero). A helper like\n\n  static void assert_cache_empty(const FpImageFrameParamsCache \u0026cache)\n  {\n  \tfor (int i \u003d 0; i \u003c FP_CAPTURE_TYPE_MAX; ++i) {\n  \t\tauto type \u003d static_cast\u003cenum fp_capture_type\u003e(i);\n  \t\tzassert_equal(0, cache.get_frame_size(type), \"Type %d size\", i);\n  \t\tzassert_equal(0, cache.get_image_offset(type), \"Type %d offset\", i);\n  \t}\n  }\n\ncollapses both failure tests to ~5 lines and makes the only real difference between them (the value passed to populate_cache) obvious.",
+      "range": {
+        "startLine": 80,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e664bd6f_47d23e45",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done. Extracted assert_cache_empty() helper.",
+      "parentUuid": "38624758_10174221",
       "range": {
         "startLine": 80,
         "startChar": 0,
@@ -284,6 +541,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27671fdc_6c82d787",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done. Replaced the if guard with a zassert_true precondition.",
+      "parentUuid": "9b891a1f_78c3d8d7",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1e356a8f_90e76059",
@@ -297,6 +573,25 @@
       "writtenOn": "2026-10-01T21:24:37Z",
       "side": 1,
       "message": "This never exercises the offset check. In the native_sim overlay every config has image-data-offset-bytes \u003d 400 and frame-size \u003e\u003d 25600, so populate_cache(399) fails the *size* check on config0 (fpsensor_image_frame_params.cc:51) before reaching the offset check at :57. The test passes, but it is effectively a duplicate of the size test and the offset-check branch has zero coverage.\n\nOptions: (a) move the offset check ahead of the size check so populate_cache(max_offset - 1) really trips on the offset (offset \u003c size in every sim config), or (b) more robustly, fake fp_sensor_get_info() with fff here and feed a param with offset \u003e buffer but size \u003c\u003d buffer, independent of the sim DTS.",
+      "isAi": true,
+      "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fc03d1e_cd9483c2",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 10
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T21:24:48Z",
+      "side": 1,
+      "message": "Done. Moved the offset check ahead of the size check in populate_cache() and passed max_configured_offset so the offset failure branch is exercised.",
+      "parentUuid": "1e356a8f_90e76059",
       "isAi": true,
       "revId": "b4cac8c58abb16b4765012bea3ced140a1a51427",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
