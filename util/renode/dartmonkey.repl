@@ -10,4 +10,10 @@ GPIO_WP: Miscellaneous.Button @ gpioPortB 7
     init:
         ReleaseOnReset false
 
+GPIO_TRANSPORT_SEL: Miscellaneous.Button @ gpioPortB 1
+    invert: true
+    -> gpioPortB@1
+    init:
+        ReleaseOnReset false
+
 fpsensor: Sensors.GenericSPISensor @ spi4
