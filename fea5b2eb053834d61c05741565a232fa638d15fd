@@ -16,6 +16,24 @@
       "message": "Is this change made directly to generated.dtsi, or this generated from the csv change? If this is generated, please add the command used to generate to the commit message.",
       "revId": "fea5b2eb053834d61c05741565a232fa638d15fd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c8040d2_bdea2f84",
+        "filename": "zephyr/program/rex/generated.dtsi",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-10-02T18:47:20Z",
+      "side": 1,
+      "message": "this is changed directly in the \"generated\" file. To properly generate it one needs to use arbitrage which is not easy.",
+      "parentUuid": "0b2753e9_f3cd3551",
+      "revId": "fea5b2eb053834d61c05741565a232fa638d15fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
