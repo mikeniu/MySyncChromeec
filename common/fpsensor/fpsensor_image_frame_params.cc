@@ -100,34 +100,35 @@ void FpImageFrameParamsCache::populate_from_info(
 	frame_params_ = params;
 }
 
-uint32_t
-FpImageFrameParamsCache::get_frame_size(enum fp_capture_type capture_type) const
+std::optional<FpImageFrameParam>
+FpImageFrameParamsCache::get(enum fp_capture_type capture_type) const
 {
 	if (static_cast<size_t>(capture_type) >= frame_params_.size()) {
-		CPRINTS("Error: Invalid fp_capture_type %d requested (max: %zu), "
-			"returning size 0.",
+		CPRINTS("Error: Invalid fp_capture_type %d requested (max: %zu).",
 			capture_type, frame_params_.size());
-		return 0;
+		return std::nullopt;
 	}
 
 	if (frame_params_[capture_type].frame_size_bytes == 0) {
 		CPRINTS("Error: FpImageFrameParamsCache is uninitialized or capture type %u"
-			" is invalid, returning size 0.",
+			" is invalid.",
 			capture_type);
+		return std::nullopt;
 	}
 
-	return frame_params_[capture_type].frame_size_bytes;
+	return frame_params_[capture_type];
+}
+
+uint32_t
+FpImageFrameParamsCache::get_frame_size(enum fp_capture_type capture_type) const
+{
+	const std::optional<FpImageFrameParam> param = get(capture_type);
+	return param.has_value() ? param->frame_size_bytes : 0;
 }
 
 uint32_t FpImageFrameParamsCache::get_image_offset(
 	enum fp_capture_type capture_type) const
 {
-	if (static_cast<size_t>(capture_type) >= frame_params_.size()) {
-		CPRINTS("Error: Invalid fp_capture_type %d requested (max: %zu), "
-			"returning offset 0.",
-			capture_type, frame_params_.size());
-		return 0;
-	}
-
-	return frame_params_[capture_type].image_data_offset_bytes;
+	const std::optional<FpImageFrameParam> param = get(capture_type);
+	return param.has_value() ? param->image_data_offset_bytes : 0;
 }
