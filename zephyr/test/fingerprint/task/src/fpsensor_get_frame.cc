@@ -53,79 +53,52 @@ static void get_frame_before(void *f)
 	memset(expected_canary, 0xA5, sizeof(expected_canary));
 }
 
-ZTEST(fpsensor_get_frame, test_get_frame_system_locked)
+static void assert_get_frame_fails(uint32_t offset, uint32_t size,
+				   ec_status expected = EC_RES_INVALID_PARAM)
 {
 	uint8_t output_buffer[kMaxReadSize];
 	memset(output_buffer, 0xA5, sizeof(output_buffer));
 
-	uint32_t size = kMaxReadSize;
-	uint32_t offset = 0;
-
-	system_is_locked_fake.return_val = 1;
-
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(status, EC_RES_ACCESS_DENIED,
-		      "Expected EC_RES_ACCESS_DENIED when system is locked");
-	zassert_equal(system_is_locked_fake.call_count, 1,
-		      "System lock state should be queried exactly once");
-
-	/* Verify buffer integrity remains intact */
+	zassert_equal(get_frame(offset, size, output_buffer), expected);
 	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
 			  "Output buffer modified during failure path");
+}
+
+static void assert_get_frame_succeeds(uint32_t offset, uint32_t size,
+				      const uint8_t *expected_output)
+{
+	uint8_t output_buffer[kMaxReadSize];
+	memset(output_buffer, 0xA5, sizeof(output_buffer));
+
+	zassert_equal(get_frame(offset, size, output_buffer), EC_RES_SUCCESS);
+	zassert_mem_equal(output_buffer, expected_output, sizeof(output_buffer),
+			  "Full output buffer content mismatch");
+}
+
+ZTEST(fpsensor_get_frame, test_get_frame_system_locked)
+{
+	system_is_locked_fake.return_val = 1;
+
+	assert_get_frame_fails(0, kMaxReadSize, EC_RES_ACCESS_DENIED);
+	zassert_equal(system_is_locked_fake.call_count, 1,
+		      "System lock state should be queried exactly once");
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_invalid_capture_type)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
-	uint32_t size = kMaxReadSize;
-	uint32_t offset = 0;
-
 	global_context.current_capture_type = FP_CAPTURE_TYPE_INVALID;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(status, EC_RES_INVALID_PARAM,
-		      "Expected EC_RES_INVALID_PARAM for invalid capture type");
-
-	/* Verify buffer integrity remains intact */
-	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
-			  "Output buffer modified during failure path");
+	assert_get_frame_fails(0, kMaxReadSize);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_size_zero)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
-	uint32_t size = 0;
-	uint32_t offset = 0;
-
 	/* A size of 0 is a valid request that safely copies zero bytes. */
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(status, EC_RES_SUCCESS,
-		      "Zero-length request should return EC_RES_SUCCESS");
-
-	/* Verify buffer integrity remains intact */
-	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
-			  "Output buffer modified during failure path");
+	assert_get_frame_succeeds(0, 0, expected_canary);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_cache_size_exceeds_buffer)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
-	uint32_t size = kMaxReadSize;
-	uint32_t offset = 0;
-
-	/* Initialize the cache normally so it allocates its internal states. */
-	global_context.fp_image_frame_params_cache.populate_cache(
-		FP_SENSOR_IMAGE_SIZE);
-
 	/*
 	 * Cache Pollution: Use the test-only setter to override the cache value
 	 * without violating strict aliasing rules.
@@ -137,24 +110,11 @@ ZTEST(fpsensor_get_frame, test_get_frame_cache_size_exceeds_buffer)
 		     "Failed to set valid frame size for capture type %d",
 		     FP_CAPTURE_VENDOR_FORMAT);
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(status, EC_RES_INVALID_PARAM,
-		      "Expected cache size overflow failure");
-
-	/* Verify buffer integrity remains intact */
-	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
-			  "Output buffer modified during failure path");
+	assert_get_frame_fails(0, kMaxReadSize);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_cache_offset_exceeds_buffer)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
-	uint32_t size = 0;
-	uint32_t offset = 0;
-
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
 
 	/*
@@ -168,25 +128,11 @@ ZTEST(fpsensor_get_frame, test_get_frame_cache_offset_exceeds_buffer)
 			 FP_CAPTURE_SIMPLE_IMAGE);
 	param->image_data_offset_bytes = sizeof(fp_buffer) + 1;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(status, EC_RES_INVALID_PARAM,
-		      "Expected cache offset overflow failure");
-
-	/* Verify buffer integrity remains intact */
-	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
-			  "Output buffer modified during failure path");
+	assert_get_frame_fails(0, 0);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_cache_offset_exact_boundary)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
-	/* Use size=0 so validate_fp_buffer_offset passes */
-	uint32_t size = 0;
-	uint32_t offset = 0;
-
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
 
 	FpImageFrameParam *param = FpImageFrameParamsCacheTestHelper::params(
@@ -196,21 +142,12 @@ ZTEST(fpsensor_get_frame, test_get_frame_cache_offset_exact_boundary)
 			 FP_CAPTURE_SIMPLE_IMAGE);
 	param->image_data_offset_bytes = sizeof(fp_buffer);
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(status, EC_RES_SUCCESS,
-		      "Expected success at exact cache offset boundary");
-
-	/* Verify buffer integrity remains intact */
-	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
-			  "Output buffer modified during zero-length read");
+	/* Use size=0 so validate_fp_buffer_offset passes */
+	assert_get_frame_succeeds(0, 0, expected_canary);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_linear_overflow)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
 	/*
 	 * Calculate the offset to force the final read position
 	 * (offset + size) to equal exactly (FP_SENSOR_IMAGE_SIZE + 1).
@@ -218,41 +155,16 @@ ZTEST(fpsensor_get_frame, test_get_frame_linear_overflow)
 	uint32_t size = kMaxReadSize;
 	uint32_t offset = (FP_SENSOR_IMAGE_SIZE - size) + 1;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(
-		status, EC_RES_INVALID_PARAM,
-		"Expected EC_RES_INVALID_PARAM for tail-end linear buffer overflow");
-
-	/* Verify buffer integrity remains intact */
-	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
-			  "Output buffer modified during failure path");
+	assert_get_frame_fails(offset, size);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_integer_overflow)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
-	uint32_t size = kMaxReadSize;
-	uint32_t offset = UINT32_MAX;
-
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(
-		status, EC_RES_INVALID_PARAM,
-		"Expected EC_RES_INVALID_PARAM for wrapped integer overflows");
-
-	/* Verify buffer integrity remains intact */
-	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
-			  "Output buffer modified during failure path");
+	assert_get_frame_fails(UINT32_MAX, kMaxReadSize);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_shifted_integer_overflow)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
 
 	FpImageFrameParam *param = FpImageFrameParamsCacheTestHelper::params(
@@ -274,23 +186,12 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_integer_overflow)
 			UINT32_MAX,
 		"Test setup: Expected overflow condition, but calculation is safe.");
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(
-		status, EC_RES_INVALID_PARAM,
-		"Expected rejection of offset causing integer wrap-around");
-
-	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
-			  "Output buffer modified during overflow attack");
+	assert_get_frame_fails(offset, size);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_shifted_layout_success)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
-	uint8_t expected_output[kMaxReadSize];
-	memset(expected_output, 0, sizeof(expected_output));
+	uint8_t expected_output[kMaxReadSize] = {};
 
 	uint32_t size = kMaxReadSize;
 	uint32_t offset = 0;
@@ -319,21 +220,12 @@ ZTEST(fpsensor_get_frame, test_get_frame_shifted_layout_success)
 	expected_output[0] = 0xDE;
 	expected_output[1] = 0xAD;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(status, EC_RES_SUCCESS,
-		      "Frame copy should succeed within shifted layout bounds");
-	zassert_mem_equal(output_buffer, expected_output, sizeof(output_buffer),
-			  "Full output buffer content mismatch");
+	assert_get_frame_succeeds(offset, size, expected_output);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_success)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
-	uint8_t expected_output[kMaxReadSize];
-	memset(expected_output, 0, sizeof(expected_output));
+	uint8_t expected_output[kMaxReadSize] = {};
 
 	uint32_t size = kMaxReadSize;
 
@@ -367,20 +259,11 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_success)
 	expected_output[0] = 0xBE;
 	expected_output[1] = 0xEF;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(
-		status, EC_RES_SUCCESS,
-		"Frame copy should succeed at the exact maximum boundary ceiling");
-	zassert_mem_equal(output_buffer, expected_output, sizeof(output_buffer),
-			  "Full output buffer content mismatch");
+	assert_get_frame_succeeds(offset, size, expected_output);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_overflow)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
 	uint32_t size = kMaxReadSize;
 
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
@@ -395,21 +278,11 @@ ZTEST(fpsensor_get_frame, test_get_frame_cached_frame_boundary_overflow)
 	 */
 	uint32_t offset = (active_frame_size - size) + 1;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(status, EC_RES_INVALID_PARAM,
-		      "Expected skipped offset overflow failure");
-
-	/* Verify buffer integrity remains intact */
-	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
-			  "Output buffer modified during failure path");
+	assert_get_frame_fails(offset, size);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_physical_hardware_buffer_overflow)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
 	uint32_t size = kMaxReadSize;
 
 	global_context.current_capture_type = FP_CAPTURE_SIMPLE_IMAGE;
@@ -439,23 +312,12 @@ ZTEST(fpsensor_get_frame, test_get_frame_physical_hardware_buffer_overflow)
 		     "Failed to set valid frame size for capture type %d",
 		     FP_CAPTURE_SIMPLE_IMAGE);
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(status, EC_RES_INVALID_PARAM,
-		      "Expected skipped offset overflow failure");
-
-	/* Verify buffer integrity remains intact */
-	zassert_mem_equal(output_buffer, expected_canary, sizeof(output_buffer),
-			  "Output buffer modified during failure path");
+	assert_get_frame_fails(offset, size);
 }
 
 ZTEST(fpsensor_get_frame, test_get_frame_absolute_success)
 {
-	uint8_t output_buffer[kMaxReadSize];
-	memset(output_buffer, 0xA5, sizeof(output_buffer));
-
-	uint8_t expected_output[kMaxReadSize];
-	memset(expected_output, 0, sizeof(expected_output));
+	uint8_t expected_output[kMaxReadSize] = {};
 
 	uint32_t size = kMaxReadSize;
 	uint32_t offset = 0;
@@ -467,13 +329,7 @@ ZTEST(fpsensor_get_frame, test_get_frame_absolute_success)
 	expected_output[1] = 0xBB;
 	expected_output[2] = 0xCC;
 
-	enum ec_status status = get_frame(offset, size, output_buffer);
-
-	zassert_equal(
-		status, EC_RES_SUCCESS,
-		"Standard clean requests should read directly from raw buffer ranges");
-	zassert_mem_equal(output_buffer, expected_output, sizeof(output_buffer),
-			  "Full output buffer content mismatch");
+	assert_get_frame_succeeds(offset, size, expected_output);
 }
 
 ZTEST_SUITE(fpsensor_get_frame, NULL, NULL, get_frame_before, NULL, NULL);
