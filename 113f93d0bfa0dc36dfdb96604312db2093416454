@@ -16,6 +16,24 @@
       "message": "This is probably a terrible idea.",
       "revId": "113f93d0bfa0dc36dfdb96604312db2093416454",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62700ab2_9ba702e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-02T15:02:08Z",
+      "side": 1,
+      "message": "If we are effectively deleting the C++ version eventually, why clean-up unused commands? Can we just start using the rust version and add any missing commands instead?",
+      "parentUuid": "55113940_8183de91",
+      "revId": "113f93d0bfa0dc36dfdb96604312db2093416454",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
