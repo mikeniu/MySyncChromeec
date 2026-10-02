@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a84e351e_cd69b22e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T12:34:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] There is a typo in the subject line (`ec_respone_pwrmon` instead of `ec_response_pwrmon`). Also, consider explicitly mentioning `pwrmon_dump_info` in the subject, since that is the struct being modified.\n\nSuggestion:\n```\nec_commands: Fix alignment of ec_params_pwrmon and pwrmon_dump_info\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8500180_85f6e01b-24f3-4385-84c2-6e7c555263e0.pb)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "32c8d21655e82313653c0b859782f58cdc1b6d3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c451aa8_6bbf0299",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T12:34:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n\n**Functionality:** The padding updates for `ec_params_pwrmon` and `pwrmon_dump_info` correctly align the structures to their required memory boundaries (`__ec_align2` and `__ec_align4`).\n**Architecture \u0026 Component Fit:** The change is appropriate. Adding explicit padding bytes is the established convention for EC host commands to prevent uninitialized memory leaks and ensure cross-compiler consistency.\n**Code Simplicity:** The changes are as simple as possible.\n**Idiomaticity \u0026 Readability:** The use of `reserved` fields for padding is idiomatic. \n**Security:** The explicit padding helps mitigate potential information leaks by preventing the transmission of uninitialized bytes over IPC.\n**Testing:** The changes do not introduce new logic and are covered by existing compilation checks and manual verification. \n**CL Size \u0026 Scope:** Size: XS (+2, -0). The change represents a single logical change focused on aligning the structures.\n**Commit Message:** Contains a typo in the subject line (`ec_respone_pwrmon`). See inline comment for a minor suggestion to fix the typo and clarify the modified struct.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8500180_85f6e01b-24f3-4385-84c2-6e7c555263e0.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "32c8d21655e82313653c0b859782f58cdc1b6d3b",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
