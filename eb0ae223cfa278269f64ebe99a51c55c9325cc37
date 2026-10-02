@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a574b34_65994e5f",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-02T16:48:45Z",
+      "side": 1,
+      "message": "Done. Updated to return EC_HOST_CMD_OVERFLOW and updated the expected return value in battery_config.c.",
+      "parentUuid": "a0a594cc_a860787a",
+      "range": {
+        "startLine": 499,
+        "startChar": 0,
+        "endLine": 499,
+        "endChar": 0
+      },
+      "revId": "eb0ae223cfa278269f64ebe99a51c55c9325cc37",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d7f6c3f0_6f20efe5",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-01T20:58:22Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: Passing a `NULL` pointer as the source to `memcpy` is undefined behavior in C, even if the length is `0`. \n\nSince `batt-\u003edevice_name` can be `NULL` (as handled on line 493), this should be guarded to avoid UB.\n\n```c\nif (device_name_size \u003e 0) {\n\tmemcpy(p, batt-\u003edevice_name, device_name_size);\n}\n```",
+      "range": {
+        "startLine": 507,
+        "startChar": 0,
+        "endLine": 507,
+        "endChar": 0
+      },
+      "revId": "eb0ae223cfa278269f64ebe99a51c55c9325cc37",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fce61b8_bb208101",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-02T16:48:45Z",
+      "side": 1,
+      "message": "Done. Guarded memcpy with if (device_name_size \u003e 0).",
+      "parentUuid": "d7f6c3f0_6f20efe5",
       "range": {
         "startLine": 507,
         "startChar": 0,
