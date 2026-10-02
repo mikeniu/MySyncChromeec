@@ -35,6 +35,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2d48e28_26bf0022",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-02T15:33:10Z",
+      "side": 1,
+      "message": "Done. Added a detailed comment in ztest_system.c and a pointer comment in CMakeLists.txt.",
+      "parentUuid": "14e388e1_f14eec52",
+      "isAi": true,
+      "revId": "9a41c8779c8e116b4f61def0a7b92eae0586298c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a1d1d9ee_63d1dc90",
@@ -48,6 +67,25 @@
       "writtenOn": "2026-10-01T20:16:47Z",
       "side": 1,
       "message": "Should this be `extern`? Or does that miss the point of `--wrap`?",
+      "revId": "9a41c8779c8e116b4f61def0a7b92eae0586298c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "146dc48b_e341ea86",
+        "filename": "zephyr/shim/src/ztest_system.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-02T15:33:10Z",
+      "side": 1,
+      "message": "Done. Function declarations have extern linkage by default in C, and adding explicit extern works with --wrap\u003dmain (the linker resolves undefined references to __real_main to the unwrapped main).",
+      "parentUuid": "a1d1d9ee_63d1dc90",
+      "isAi": true,
       "revId": "9a41c8779c8e116b4f61def0a7b92eae0586298c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
