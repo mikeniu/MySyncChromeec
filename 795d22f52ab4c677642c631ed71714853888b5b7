@@ -88,6 +88,41 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c7e81b5c_72600862",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T17:58:24Z",
+      "side": 1,
+      "message": "One other thought (also applies to the already merged CL): All of this code gets cherry-picked to the `ec-legacy` branch because we have to keep the two in sync. I\u0027m assuming these Zephyr-only changes are going to cause compilation failures?",
+      "revId": "795d22f52ab4c677642c631ed71714853888b5b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52cabdad_a5fc1254",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T17:58:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0647af46_04afd328",
+      "revId": "795d22f52ab4c677642c631ed71714853888b5b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4d6b55c4_f32595a6",
         "filename": "common/fpsensor/fpsensor_state.cc",
         "patchSetId": 2
