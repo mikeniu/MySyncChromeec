@@ -75,4 +75,9 @@ endif # RISCV_PMP
 configdefault SOC_IT8XXX2_UART_TX_STRATPPING_PIN
 	default y if SOC_IT8XXX2_REG_SET_V2 && CROS_EC_RO
 
+if I2C_ITE_ENHANCE
+configdefault I2C_CQ_MODE_MAX_PAYLOAD_SIZE
+	default 128
+endif # I2C_ITE_ENHANCE
+
 endif # BOARD_IT8XXX2
