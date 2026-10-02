@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d401db3_68e1f206",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T23:00:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n\n* **Functionality:** Looks good. The helper function `assert_get_frame_fails` correctly encapsulates the test logic and preserves the original assertions.\n* **Architecture \u0026 Component Fit:** The refactoring cleanly extracts repeated setup and verification logic into a test helper.\n* **Code Simplicity:** The extraction of `assert_get_frame_fails` significantly reduces boilerplate in the negative tests. (See inline suggestion for extending this to positive tests).\n* **Idiomaticity \u0026 Readability:** The use of value initialization `\u003d {}` for arrays is a good modern C++ improvement over `memset`.\n* **Security:** N/A. (Test code only).\n* **Testing:** Test coverage is preserved verbatim; the CL purely refactors test structure without changing test behavior.\n* **CL Size \u0026 Scope:** Size: M (+24, -127). The CL is well-scoped to a single logical change (deduplicating test assertions).\n* **Commit Message:** Accurately explains the what and why of the refactoring and correctly follows the subsystem formatting.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499508_d72d96a8-9946-40fb-9c3e-1ade887de63c.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "49934deea480d7b21ca1e209b907ce3bdf41cbe0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa1a7271_2705543d",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_get_frame.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T23:00:57Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion:** Since you extracted the boilerplate for the negative tests into `assert_get_frame_fails()`, consider doing the same for the positive tests.\n\nYou could introduce a similar helper:\n```cpp\nstatic void assert_get_frame_succeeds(uint32_t offset, uint32_t size,\n                                      const uint8_t* expected_output)\n{\n\tuint8_t output_buffer[kMaxReadSize];\n\tmemset(output_buffer, 0xA5, sizeof(output_buffer));\n\n\tzassert_equal(get_frame(offset, size, output_buffer), EC_RES_SUCCESS);\n\tzassert_mem_equal(output_buffer, expected_output, sizeof(output_buffer),\n\t\t\t  \"Full output buffer content mismatch\");\n}\n```\n\nThis would allow you to remove the `output_buffer` initialization and the two `zassert_*` calls from `test_get_frame_shifted_layout_success`, `test_get_frame_cached_frame_boundary_success`, and `test_get_frame_absolute_success`.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499508_d72d96a8-9946-40fb-9c3e-1ade887de63c.pb)",
+      "range": {
+        "startLine": 209,
+        "startChar": 0,
+        "endLine": 212,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "49934deea480d7b21ca1e209b907ce3bdf41cbe0",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
