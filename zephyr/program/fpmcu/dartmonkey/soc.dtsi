@@ -118,6 +118,11 @@
 	div-p = <2>;
 	clocks = <&clk_hsi>;
 	status = "okay";
+	no-auto-enable;
+};
+
+&pwr {
+	voltage-scale=<3>;
 };
 
 &usart1 {
