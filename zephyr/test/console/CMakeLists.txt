@@ -12,4 +12,7 @@ target_sources_ifdef(CONFIG_TEST_CONSOLE_OUTPUT app PRIVATE
 target_sources_ifdef(CONFIG_TEST_CONSOLE_RESTRICTED app PRIVATE
   src/console_restricted.c)
 
+target_sources_ifdef(CONFIG_TEST_PW_LOG_TOKENIZED app PRIVATE
+  src/test_pw_log_tokenized.cc)
+
 add_subdirectory(${PLATFORM_EC}/zephyr/test/test_utils test_utils)
