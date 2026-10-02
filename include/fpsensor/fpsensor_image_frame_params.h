@@ -10,6 +10,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 
 struct FpImageFrameParam {
 	uint32_t frame_size_bytes = 0;
@@ -42,6 +43,16 @@ class FpImageFrameParamsCache {
 	void populate_cache(uint32_t max_image_buffer_bytes);
 
 	/**
+	 * @brief Looks up the frame parameters for a given capture type.
+	 *
+	 * @param capture_type The enum fp_capture_type to look up.
+	 * @return FpImageFrameParam if valid and configured, std::nullopt
+	 * otherwise.
+	 */
+	std::optional<FpImageFrameParam>
+	get(enum fp_capture_type capture_type) const;
+
+	/**
 	 * @brief Looks up the frame size for a given capture type.
 	 *
 	 * @param capture_type The enum fp_capture_type to look up.
@@ -54,7 +65,7 @@ class FpImageFrameParamsCache {
 	 *
 	 * Because 0 is a valid offset, callers cannot distinguish a 0 offset
 	 * from an invalid capture type or uninitialized cache. Callers must
-	 * gate on get_frame_size(capture_type) != 0 first.
+	 * gate on get_frame_size(capture_type) != 0 (or use get()) first.
 	 *
 	 * @param capture_type The enum fp_capture_type to look up.
 	 * @return Image data offset in bytes if valid and configured, 0
