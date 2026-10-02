@@ -22,6 +22,31 @@
       },
       "revId": "2225abe4feaf98cf2356613af4bdce2c19bc8cff",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb76e09e_509c207d",
+        "filename": "zephyr/cmake/toolchain/host/llvm/Kconfig",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T19:57:03Z",
+      "side": 1,
+      "message": "Done. Updated to b/234507656 (from CL 3700723 and CL 3849201).",
+      "parentUuid": "47fc9dd0_8299c5fc",
+      "range": {
+        "startLine": 12,
+        "startChar": 24,
+        "endLine": 12,
+        "endChar": 35
+      },
+      "isAi": true,
+      "revId": "2225abe4feaf98cf2356613af4bdce2c19bc8cff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
