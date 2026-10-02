@@ -75,7 +75,7 @@ def run_device_tests(
 ) -> subprocess.CompletedProcess:
     """Run device tests on Renode emulator."""
     cmd = [
-        "test/run_device_tests.py",
+        "zephyr/test/hwtest/run_device_tests.py",
         "-b",
         board,
         "--renode",

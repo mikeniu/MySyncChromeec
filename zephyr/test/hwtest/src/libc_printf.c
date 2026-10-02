@@ -15,8 +15,9 @@ ZTEST(libc_printf, test_libc_printf)
 	 * The test itself is not verifying that printing works (according to
 	 * the test framework, this will always pass).
 	 *
-	 * Instead, the test runner (test/run_device_tests.py) looks for the
-	 * printed string in the test output to determine if the test passed.
+	 * Instead, the test runner (zephyr/test/hwtest/run_device_tests.py)
+	 * looks for the printed string in the test output to determine if the
+	 * test passed.
 	 */
 	printf("printf called\n");
 }

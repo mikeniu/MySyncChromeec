@@ -17,7 +17,7 @@ with Zephyr FPMCU firmware.
 ## Background
 
 There is a dedicated
-[run\_device\_tests.py](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/test/run_device_tests.py)
+[run\_device\_tests.py](https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/platform/ec/zephyr/test/hwtest/run_device_tests.py)
 script that runs tests on FPMCU. The tests are run on a dev board like
 dragonclaw, with the servod connected. The script builds full firmware with a
 test, flashes it, runs with a console command and checks results. For some

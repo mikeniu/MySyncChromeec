@@ -31,7 +31,7 @@ Forward all the ports to the remote machine:
 
 Run the script on the remote machine:
 
-(remote chroot) ./test/run_device_tests.py --remote 127.0.0.1 \
+(remote chroot) ./zephyr/test/hwtest/run_device_tests.py --remote 127.0.0.1 \
                 --jlink_port 19020 --console_port 10000
 """
 
@@ -75,7 +75,7 @@ import yaml
 
 # pylint: enable=import-error
 
-EC_DIR = Path(os.path.dirname(os.path.realpath(__file__))).parent
+EC_DIR = Path(os.path.dirname(os.path.realpath(__file__))).parent.parent.parent
 JTRACE_FLASH_SCRIPT = os.path.join(EC_DIR, "util/flash_jlink.py")
 SERVO_MICRO_FLASH_SCRIPT = os.path.join(EC_DIR, "util/flash_ec")
 ZEPHYR_FPMCU_DIR = os.path.join(EC_DIR, "zephyr/program/fpmcu")
