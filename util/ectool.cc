@@ -13485,7 +13485,7 @@ int main(int argc, char *argv[])
 {
 	const struct command *cmd;
 	int dev = 0;
-	int interfaces = COMM_ALL;
+	enum comm_interface interface = COMM_NONE;
 	int i2c_bus = -1;
 	char device_name[41] = CROS_EC_DEV_NAME;
 	uint16_t vid = USB_VID_GOOGLE, pid = USB_PID_HAMMER;
@@ -13513,13 +13513,13 @@ int main(int argc, char *argv[])
 
 		case OPT_INTERFACE:
 			if (!strcasecmp(optarg, "dev")) {
-				interfaces = COMM_DEV;
+				interface = COMM_DEV;
 			} else if (!strcasecmp(optarg, "lpc")) {
-				interfaces = COMM_LPC;
+				interface = COMM_LPC;
 			} else if (!strcasecmp(optarg, "i2c")) {
-				interfaces = COMM_I2C;
+				interface = COMM_I2C;
 			} else if (!strcasecmp(optarg, "servo")) {
-				interfaces = COMM_SERVO;
+				interface = COMM_SERVO;
 			} else {
 				fprintf(stderr, "Invalid --interface\n");
 				parse_error = 1;
@@ -13527,7 +13527,7 @@ int main(int argc, char *argv[])
 			break;
 		case OPT_DEVICE:
 			if (parse_vidpid(optarg, &vid, &pid)) {
-				interfaces = COMM_USB;
+				interface = COMM_USB;
 			} else {
 				fprintf(stderr, "Invalid --device\n");
 				parse_error = 1;
@@ -13556,14 +13556,17 @@ int main(int argc, char *argv[])
 	}
 
 	if (i2c_bus != -1) {
-		if (!(interfaces & COMM_I2C)) {
+		if (interface != COMM_NONE && interface != COMM_I2C) {
 			fprintf(stderr,
 				"--i2c_bus is specified, but --interface is set to something other than I2C\n");
 			parse_error = 1;
 		} else {
-			interfaces = COMM_I2C;
+			interface = COMM_I2C;
 		}
 	}
+
+	if (interface == COMM_NONE)
+		interface = COMM_DEV;
 
 	/* Must specify a command */
 	if (!parse_error && optind == argc)
@@ -13591,22 +13594,22 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	/* Prefer /dev method, which supports built-in mutex */
-	if (!(interfaces & COMM_DEV) || comm_init_dev(device_name)) {
-		/* If dev is excluded or isn't supported, find alternative */
-
-		/* Lock is not needed for COMM_USB */
-		if (!(interfaces & COMM_USB) &&
-		    acquire_gec_lock(GEC_LOCK_TIMEOUT_SECS) < 0) {
+	if (interface == COMM_DEV) {
+		if (comm_init_dev(device_name)) {
+			fprintf(stderr, "Couldn't find EC\n");
+			goto out;
+		}
+	} else if (interface == COMM_USB) {
+		if (comm_init_usb(vid, pid)) {
+			fprintf(stderr, "Couldn't find EC on USB.\n");
+			goto out;
+		}
+	} else {
+		if (acquire_gec_lock(GEC_LOCK_TIMEOUT_SECS) < 0) {
 			fprintf(stderr, "Could not acquire GEC lock.\n");
 			exit(1);
 		}
-		if (interfaces == COMM_USB) {
-			if (comm_init_usb(vid, pid)) {
-				fprintf(stderr, "Couldn't find EC on USB.\n");
-				goto out;
-			}
-		} else if (comm_init_alt(interfaces, device_name, i2c_bus)) {
+		if (comm_init_alt(interface, device_name, i2c_bus)) {
 			fprintf(stderr, "Couldn't find EC\n");
 			goto out;
 		}
@@ -13629,7 +13632,7 @@ int main(int argc, char *argv[])
 out:
 	release_gec_lock();
 
-	if (interfaces == COMM_USB)
+	if (interface == COMM_USB)
 		comm_usb_exit();
 
 	/* Negative values from the command handler should be treated as errors

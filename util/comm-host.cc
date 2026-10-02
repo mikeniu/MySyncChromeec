@@ -79,30 +79,33 @@ int ec_command(int command, int version, const void *outdata, int outsize,
 				outsize, indata, insize);
 }
 
-int comm_init_alt(int interfaces, const char *device_name, int i2c_bus)
+int comm_init_alt(enum comm_interface interface, const char *device_name,
+		  int i2c_bus)
 {
-	bool dev_is_cros_ec;
+	bool dev_is_cros_ec = !strcmp(CROS_EC_DEV_NAME, device_name);
 
 	/* Default memmap access */
 	ec_readmem = fake_readmem;
 
-	if ((interfaces & COMM_SERVO) && comm_init_servo_spi &&
-	    !comm_init_servo_spi(device_name))
-		return 0;
-
-	/* Do not fallback to other communication methods if target is not a
-	 * cros_ec device */
-	dev_is_cros_ec = !strcmp(CROS_EC_DEV_NAME, device_name);
-
-	/* Fallback to direct LPC on x86 */
-	if (dev_is_cros_ec && (interfaces & COMM_LPC) && comm_init_lpc &&
-	    !comm_init_lpc())
-		return 0;
-
-	/* Fallback to direct I2C */
-	if ((dev_is_cros_ec || i2c_bus != -1) && (interfaces & COMM_I2C) &&
-	    comm_init_i2c && !comm_init_i2c(i2c_bus))
-		return 0;
+	switch (interface) {
+	case COMM_SERVO:
+		if (comm_init_servo_spi && !comm_init_servo_spi(device_name))
+			return 0;
+		break;
+	case COMM_LPC:
+		/* Direct LPC on x86 */
+		if (dev_is_cros_ec && comm_init_lpc && !comm_init_lpc())
+			return 0;
+		break;
+	case COMM_I2C:
+		/* Direct I2C */
+		if ((dev_is_cros_ec || i2c_bus != -1) && comm_init_i2c &&
+		    !comm_init_i2c(i2c_bus))
+			return 0;
+		break;
+	default:
+		break;
+	}
 
 	/* Give up */
 	fprintf(stderr, "Unable to establish host communication\n");

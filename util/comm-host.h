@@ -27,25 +27,26 @@ extern int ec_max_outsize, ec_max_insize;
 extern void *ec_outbuf;
 extern void *ec_inbuf;
 
-/* Interfaces to allow for comm_init() */
+/* Interface to use for EC communication */
 enum comm_interface {
-	COMM_DEV = BIT(0),
-	COMM_LPC = BIT(1),
-	COMM_I2C = BIT(2),
-	COMM_SERVO = BIT(3),
-	COMM_USB = BIT(4),
-	COMM_ALL = -1
+	COMM_NONE = 0,
+	COMM_DEV,
+	COMM_LPC,
+	COMM_I2C,
+	COMM_SERVO,
+	COMM_USB,
 };
 
 /**
- * Initialize alternative interfaces
+ * Initialize alternative interface
  *
- * @param interfaces	Interfaces to try; use COMM_ALL to try all of them.
+ * @param interface	Interface to initialize.
  * @param device_name For DEV option, the device file to use.
  * @param i2c_bus For I2C option, the bus number to use (or -1 to autodetect).
  * @return 0 in case of success, or error code.
  */
-int comm_init_alt(int interfaces, const char *device_name, int i2c_bus);
+int comm_init_alt(enum comm_interface interface, const char *device_name,
+		  int i2c_bus);
 
 /**
  * Initialize dev interface
