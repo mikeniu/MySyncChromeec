@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c74f6ca_d02fd625",
+        "filename": "include/task.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-02T19:54:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8310f66d_342317d4",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 176,
+        "endChar": 0
+      },
+      "revId": "ec554f31eae2c01dc7c602ed91b5c15b750f1a1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec5bc04d_01d543a2",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-02T18:34:41Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: Since `DECLARE_IRQ` is dropped for Zephyr, check if `struct irq_def` and `struct irq_priority` (defined just above this) are also dead code and can be removed.",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 0
+      },
+      "revId": "ec554f31eae2c01dc7c602ed91b5c15b750f1a1e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46a80cd9_c53cfdc4",
+        "filename": "include/task.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-02T19:54:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ec5bc04d_01d543a2",
       "range": {
         "startLine": 229,
         "startChar": 0,
