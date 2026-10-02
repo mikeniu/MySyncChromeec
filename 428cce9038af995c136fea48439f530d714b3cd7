@@ -47,6 +47,30 @@
       "isAi": true,
       "revId": "428cce9038af995c136fea48439f530d714b3cd7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc57bbfe_9460128b",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T19:04:20Z",
+      "side": 0,
+      "message": "I don\u0027t see a rebase.",
+      "parentUuid": "6b9ae754_93d77988",
+      "range": {
+        "startLine": 527,
+        "startChar": 12,
+        "endLine": 527,
+        "endChar": 43
+      },
+      "revId": "428cce9038af995c136fea48439f530d714b3cd7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
