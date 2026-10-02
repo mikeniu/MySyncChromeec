@@ -72,6 +72,14 @@ static void fpsensor_image_frame_params_setup(void *fixture)
 {
 	ARG_UNUSED(fixture);
 
+	const struct device *fp_sim =
+		DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor));
+	struct fingerprint_sensor_state state = {};
+
+	fingerprint_get_state(fp_sim, &state);
+	state.get_info_result = 0;
+	fingerprint_set_state(fp_sim, &state);
+
 	cache_fixture = std::make_unique<FpImageFrameParamsCache>();
 	zassert_not_null(cache_fixture.get(),
 			 "Memory allocation failed for cache.");
@@ -81,6 +89,103 @@ static void fpsensor_image_frame_params_setup(void *fixture)
 
 ZTEST_SUITE(fpsensor_image_frame_params, NULL, NULL,
 	    fpsensor_image_frame_params_setup, NULL, NULL);
+
+ZTEST(fpsensor_image_frame_params,
+      test_cache_initialization_on_get_info_failure)
+{
+	const struct device *fp_sim =
+		DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor));
+	struct fingerprint_sensor_state state;
+
+	fingerprint_get_state(fp_sim, &state);
+	state.get_info_result = -EINVAL;
+	fingerprint_set_state(fp_sim, &state);
+
+	FpImageFrameParamsCache failing_cache{};
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
+		failing_cache, FP_CAPTURE_VENDOR_FORMAT, 1024));
+
+	const uint32_t max_configured_frame_size =
+		max_of(&fingerprint_image_frame_params::frame_size);
+	failing_cache.populate_cache(max_configured_frame_size);
+
+	assert_cache_empty(failing_cache);
+}
+
+ZTEST(fpsensor_image_frame_params, test_cache_initialization_on_max_num_types)
+{
+	FpImageFrameParamsCache cache{};
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
+		cache, FP_CAPTURE_VENDOR_FORMAT, 1024));
+
+	struct fp_image_frame_params_v2 params[FP_CAPTURE_TYPE_MAX] = {};
+	for (int i = 0; i < FP_CAPTURE_TYPE_MAX; ++i) {
+		params[i].fp_capture_type =
+			static_cast<enum fp_capture_type>(i);
+		params[i].frame_size = 1024;
+		params[i].image_data_offset_bytes = 0;
+	}
+
+	FpImageFrameParamsCacheTestHelper::populate_from_info(
+		cache, params, FP_CAPTURE_TYPE_MAX, 2048);
+
+	for (int i = 0; i < FP_CAPTURE_TYPE_MAX; ++i) {
+		zassert_equal(1024,
+			      cache.get_frame_size(
+				      static_cast<enum fp_capture_type>(i)));
+	}
+}
+
+ZTEST(fpsensor_image_frame_params,
+      test_cache_initialization_on_num_types_exceeded)
+{
+	FpImageFrameParamsCache failing_cache{};
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
+		failing_cache, FP_CAPTURE_VENDOR_FORMAT, 1024));
+
+	FpImageFrameParamsCacheTestHelper::populate_from_info(
+		failing_cache, nullptr, FP_CAPTURE_TYPE_MAX + 1,
+		sizeof(image_buffer));
+
+	assert_cache_empty(failing_cache);
+}
+
+ZTEST(fpsensor_image_frame_params,
+      test_cache_initialization_on_invalid_capture_type)
+{
+	FpImageFrameParamsCache failing_cache{};
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
+		failing_cache, FP_CAPTURE_VENDOR_FORMAT, 1024));
+
+	struct fp_image_frame_params_v2 param = {
+		.frame_size = 1024,
+		.image_data_offset_bytes = 0,
+		.fp_capture_type = FP_CAPTURE_TYPE_MAX,
+	};
+
+	FpImageFrameParamsCacheTestHelper::populate_from_info(
+		failing_cache, &param, 1, sizeof(image_buffer));
+
+	assert_cache_empty(failing_cache);
+}
+
+ZTEST(fpsensor_image_frame_params, test_cache_initialization_on_zero_frame_size)
+{
+	FpImageFrameParamsCache failing_cache{};
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
+		failing_cache, FP_CAPTURE_VENDOR_FORMAT, 1024));
+
+	struct fp_image_frame_params_v2 param = {
+		.frame_size = 0,
+		.image_data_offset_bytes = 0,
+		.fp_capture_type = FP_CAPTURE_VENDOR_FORMAT,
+	};
+
+	FpImageFrameParamsCacheTestHelper::populate_from_info(
+		failing_cache, &param, 1, sizeof(image_buffer));
+
+	assert_cache_empty(failing_cache);
+}
 
 ZTEST(fpsensor_image_frame_params,
       test_cache_initialization_on_size_constraint_failure)
@@ -94,6 +199,8 @@ ZTEST(fpsensor_image_frame_params,
 		     "Expected non-zero max configured frame size.");
 
 	FpImageFrameParamsCache failing_cache{};
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
+		failing_cache, FP_CAPTURE_VENDOR_FORMAT, 1024));
 	failing_cache.populate_cache(max_configured_frame_size - 1);
 
 	assert_cache_empty(failing_cache);
@@ -111,6 +218,8 @@ ZTEST(fpsensor_image_frame_params,
 		     "Expected non-zero max configured image offset.");
 
 	FpImageFrameParamsCache failing_cache{};
+	zassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(
+		failing_cache, FP_CAPTURE_VENDOR_FORMAT, 1024));
 	/*
 	 * offset == max_image_buffer_bytes is rejected (leaves zero bytes for
 	 * image data).
