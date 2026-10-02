@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7c94b8a_e21ff73c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T21:35:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8372808_1278c070-b19d-402f-b3dd-1880df622d49.pb)\n\n### Review Summary\n\n*   **Functionality:** The logic correctly fetches, caches, and validates the dynamic `image_data_offset_bytes`. The code comment clarifying why `offset` and `size` must be validated individually against `max_image_buffer_bytes` (due to raw capture modes reporting inclusive total buffer size) resolves the previous footprint check concerns perfectly.\n*   **Security:** Bounds validation and fallback to cache invalidation (filling with zeros) correctly prevent unsafe parameters.\n*   **Architecture \u0026 Component Fit:** The offset caching integrates seamlessly into the existing `FpImageFrameParamsCache` pattern.\n*   **Code Simplicity:** The implementation is direct and minimal.\n*   **Idiomaticity \u0026 Readability:** Code adheres to C++ and Chromium OS EC standards, making good use of `static_cast` for safe boundary checks.\n*   **Testing:** Thorough boundary and mutation testing is present, and the previous test duplication was cleanly collapsed into the `assert_cache_empty` helper.\n*   **CL Size \u0026 Scope:** `Size: M (+172, -25)`. The CL is scoped strictly to the cache infrastructure and remains atomic.\n*   **Commit Message:** The commit message clearly outlines the purpose of the caching change and includes the required bug and test tags.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a74c2ed98c92f5d5357c18b9e05a4d0eabbfa100",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
