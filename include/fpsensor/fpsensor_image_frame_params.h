@@ -63,6 +63,9 @@ class FpImageFrameParamsCache {
 	uint32_t get_image_offset(enum fp_capture_type capture_type) const;
 
     private:
+	void populate_from_info(const struct ec_response_fp_info_v3 &info,
+				uint32_t max_image_buffer_bytes);
+
 	std::array<FpImageFrameParam, FP_CAPTURE_TYPE_MAX> frame_params_ = {};
 
 #ifdef CONFIG_ZTEST

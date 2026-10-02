@@ -40,6 +40,14 @@ class FpImageFrameParamsCacheTestHelper {
 		}
 		return &cache.frame_params_[static_cast<size_t>(capture_type)];
 	}
+
+	static void
+	populate_from_info(FpImageFrameParamsCache &cache,
+			   const struct ec_response_fp_info_v3 &info,
+			   uint32_t max_image_buffer_bytes)
+	{
+		cache.populate_from_info(info, max_image_buffer_bytes);
+	}
 };
 
 #endif /* PLATFORM_EC_ZEPHYR_TEST_FINGERPRINT_TASK_INCLUDE_FPSENSOR_TEST_UTILS_H_ \

@@ -9,8 +9,51 @@
 
 #include <stddef.h>
 
+static bool validate(const struct fp_image_frame_params_v2 &param,
+		     uint32_t max_image_buffer_bytes)
+{
+	const uint8_t type = param.fp_capture_type;
+	const uint32_t size = param.frame_size;
+	const uint32_t offset = param.image_data_offset_bytes;
+
+	/*
+	 * Validate size and offset individually against the buffer
+	 * size. Raw capture modes (e.g. FP_CAPTURE_VENDOR_FORMAT)
+	 * report frame_size as the total buffer size inclusive of the
+	 * header at image_data_offset_bytes, while shifted bounds for
+	 * image-only captures are validated in get_frame().
+	 */
+	if (offset >= max_image_buffer_bytes) {
+		CPRINTS("Error: Type %u image offset (%u) exceeds max buffer (%u).",
+			type, offset, max_image_buffer_bytes);
+		return false;
+	}
+
+	if (size > max_image_buffer_bytes) {
+		CPRINTS("Error: Type %u frame size (%u) exceeds max allowed (%u).",
+			type, size, max_image_buffer_bytes);
+		return false;
+	}
+
+	if (type >= FP_CAPTURE_TYPE_MAX) {
+		CPRINTS("ERROR: Invalid fp_capture_type %u received from EC, max "
+			"supported is %d.",
+			type, FP_CAPTURE_TYPE_MAX);
+		return false;
+	}
+
+	if (size == 0) {
+		CPRINTS("ERROR: Invalid 0 size for capture type %u.", type);
+		return false;
+	}
+
+	return true;
+}
+
 void FpImageFrameParamsCache::populate_cache(uint32_t max_image_buffer_bytes)
 {
+	frame_params_.fill({});
+
 	constexpr size_t buffer_size =
 		sizeof(struct ec_response_fp_info_v3) +
 		sizeof(struct fp_image_frame_params_v2) * FP_CAPTURE_TYPE_MAX;
@@ -23,7 +66,16 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_image_buffer_bytes)
 		return;
 	}
 
-	const uint8_t num_types = info->sensor_info.num_capture_types;
+	populate_from_info(*info, max_image_buffer_bytes);
+}
+
+void FpImageFrameParamsCache::populate_from_info(
+	const struct ec_response_fp_info_v3 &info,
+	uint32_t max_image_buffer_bytes)
+{
+	frame_params_.fill({});
+
+	const uint8_t num_types = info.sensor_info.num_capture_types;
 
 	if (num_types > frame_params_.size()) {
 		CPRINTS("ERROR - EC returned %u types, max supported is %zu.",
@@ -31,57 +83,21 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_image_buffer_bytes)
 		return;
 	}
 
-	auto *params = info->image_frame_params;
-
+	std::array<FpImageFrameParam, FP_CAPTURE_TYPE_MAX> params{};
 	for (uint8_t i = 0; i < num_types; ++i) {
-		const uint8_t type = params[i].fp_capture_type;
-		const uint32_t size = params[i].frame_size;
-		const uint32_t offset = params[i].image_data_offset_bytes;
+		const auto &raw = info.image_frame_params[i];
 
-		/*
-		 * Validate size and offset individually against the buffer
-		 * size. Raw capture modes (e.g. FP_CAPTURE_VENDOR_FORMAT)
-		 * report frame_size as the total buffer size inclusive of the
-		 * header at image_data_offset_bytes, while shifted bounds for
-		 * image-only captures are validated in get_frame().
-		 */
-		if (offset >= max_image_buffer_bytes) {
-			CPRINTS("Error: Type %u image offset (%u) exceeds max buffer (%u).",
-				type, offset, max_image_buffer_bytes);
-			goto error_exit;
+		if (!validate(raw, max_image_buffer_bytes)) {
+			return;
 		}
 
-		if (size > max_image_buffer_bytes) {
-			CPRINTS("Error: Type %u frame size (%u) exceeds max allowed (%u).",
-				type, size, max_image_buffer_bytes);
-			goto error_exit;
-		}
-
-		if (type >= frame_params_.size()) {
-			CPRINTS("ERROR: Invalid fp_capture_type %u received from EC, max "
-				"supported is %zu.",
-				type, frame_params_.size());
-			goto error_exit;
-		}
-
-		if (size == 0) {
-			CPRINTS("ERROR: Invalid 0 size for capture type %u.",
-				type);
-			goto error_exit;
-		}
-
-		frame_params_[type] = {
-			.frame_size_bytes = size,
-			.image_data_offset_bytes = offset,
+		params[raw.fp_capture_type] = {
+			.frame_size_bytes = raw.frame_size,
+			.image_data_offset_bytes = raw.image_data_offset_bytes,
 		};
 	}
 
-	return;
-
-error_exit:
-	/* Invalidate cache. */
-	frame_params_.fill({});
-	return;
+	frame_params_ = params;
 }
 
 uint32_t
