@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "driver/ppc/aoz1380_public.h"
 #include "usbc/ppc.h"
 
 #include <zephyr/logging/log.h>
@@ -14,6 +15,13 @@ LOG_MODULE_REGISTER(test_drivers_ppc, LOG_LEVEL_DBG);
 
 static struct ppc_config_t ppc_chips_saved[] = { DT_FOREACH_STATUS_OKAY(
 	named_usbc_port, PPC_CHIP_STUB) };
+
+/* LCOV_EXCL_START */
+int board_aoz1380_set_vbus_source_current_limit(int port, enum tcpc_rp_value rp)
+{
+	return EC_SUCCESS;
+}
+/* LCOV_EXCL_STOP */
 
 ZTEST(ppc_shim, test_ppc_alts_exist)
 {

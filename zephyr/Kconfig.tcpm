@@ -267,6 +267,7 @@ endif # PLATFORM_EC_USB_PD_TCPM_PS8815
 
 config PLATFORM_EC_USB_PD_TCPM_RAA489000
 	bool "Renesas RAA489000 Type-C port controller and battery charger"
+	default y if DT_HAS_RENESAS_RAA489000_ENABLED
 	select PLATFORM_EC_USB_PD_TCPM_TCPCI
 	select PLATFORM_EC_USB_PD_PPC
 	help
