@@ -22,14 +22,14 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 		buffer.data());
 
 	if (fp_sensor_get_info(info, buffer.size()) < 0) {
-		CPRINTF("Error: Failed to get fingerprint sensor info.");
+		CPRINTS("Error: Failed to get fingerprint sensor info.");
 		return;
 	}
 
 	const uint8_t num_types = info->sensor_info.num_capture_types;
 
 	if (num_types > frame_params_.size()) {
-		CPRINTF("ERROR - EC returned %u types, max supported is %zu.",
+		CPRINTS("ERROR - EC returned %u types, max supported is %zu.",
 			num_types, frame_params_.size());
 		return;
 	}
@@ -41,20 +41,20 @@ void FpImageFrameParamsCache::populate_cache(uint32_t max_frame_size_bytes)
 		const uint32_t size = params[i].frame_size;
 
 		if (size > max_frame_size_bytes) {
-			CPRINTF("Error: Type %u frame size (%u) exceeds max allowed (%u).",
+			CPRINTS("Error: Type %u frame size (%u) exceeds max allowed (%u).",
 				type, size, max_frame_size_bytes);
 			goto error_exit;
 		}
 
 		if (type >= frame_params_.size()) {
-			CPRINTF("ERROR: Invalid fp_capture_type %u received from EC, max "
+			CPRINTS("ERROR: Invalid fp_capture_type %u received from EC, max "
 				"supported is %zu.",
 				type, frame_params_.size());
 			goto error_exit;
 		}
 
 		if (size == 0) {
-			CPRINTF("ERROR: Invalid 0 size for capture type %u.",
+			CPRINTS("ERROR: Invalid 0 size for capture type %u.",
 				type);
 			goto error_exit;
 		}
@@ -76,14 +76,14 @@ uint32_t
 FpImageFrameParamsCache::get_frame_size(enum fp_capture_type capture_type) const
 {
 	if (static_cast<size_t>(capture_type) >= frame_params_.size()) {
-		CPRINTF("Error: Invalid fp_capture_type %d requested (max: %zu), "
+		CPRINTS("Error: Invalid fp_capture_type %d requested (max: %zu), "
 			"returning size 0.",
 			capture_type, frame_params_.size());
 		return 0;
 	}
 
 	if (frame_params_[capture_type].frame_size_bytes == 0) {
-		CPRINTF("Error: FpImageFrameParamsCache is uninitialized or capture type %u"
+		CPRINTS("Error: FpImageFrameParamsCache is uninitialized or capture type %u"
 			" is invalid, returning size 0.",
 			capture_type);
 	}
