@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d37773c1_b660be57",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T22:28:10Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8281008_40647a3b-4643-4142-a1d0-64f84be98665.pb)\n\n### Review Summary\n*   **Functionality:** The logic correctly wraps the OTP key programming loop with `irq_lock()` and `irq_unlock()` to prevent interruptions. The assertion accurately verifies that interrupts are disabled before writing.\n*   **Architecture \u0026 Component Fit:** The logic fits cleanly into the OTP driver and the assertions are correctly placed in the write functions.\n*   **Code Simplicity:** The changes are simple, minimalistic, and use standard `irq_lock`/`irq_unlock` idioms without adding unnecessary state.\n*   **Idiomaticity \u0026 Readability:** The use of `ASSERT(!is_interrupt_enabled());` inside the hardware layer and mock is the idiomatic way to verify execution context in this codebase.\n*   **Security:** Disabling interrupts during security-critical operations like OTP key programming correctly prevents side-channel interruptions or partial writes.\n*   **Testing:** Test coverage is good. It verifies that interrupts are locked inside the mock and properly restored in `test_otp_key`.\n*   **CL Size \u0026 Scope:** Size: S (+23, -1). The CL is atomic and focuses on a single logical change.\n*   **Commit Message:** The commit message clearly explains the \"Why\" and \"What\" of the changes, and includes correct Chromium OS formatting.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5233b8f27adfd82e26920586dee3252f1fac5759",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
