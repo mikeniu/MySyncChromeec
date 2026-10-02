@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6dbf2392_882b5f26",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T22:56:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [[trajectory](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499507_c0f7696e-1e8b-4cb5-b3c3-dbd367cc200b.pb)]\n\n### Review Summary\n\n*   **Functionality:** Cleanly centralizes validation and eliminates redundant cache lookups in `get_frame()`. Fixing the silent success path for invalid capture types (by checking the optional value) is a great improvement.\n*   **Architecture \u0026 Component Fit:** The introduction of `std::optional\u003cFpImageFrameParam\u003e get()` is an excellent application of Edge-Case Elimination via Structural Elegance. Returning both parameters together cleanly models the domain constraints. (See inline comment about potentially deprecating the old wrappers).\n*   **Code Simplicity:** Good. Replaced two separate lookups with a single operation.\n*   **Idiomaticity \u0026 Readability:** Excellent use of C++17 `std::optional` to communicate absent values instead of using sentinel `0` values. `auto` usage in tests is appropriate.\n*   **Security:** N/A\n*   **Testing:** Excellent test coverage. The explicit boundary test cases for `FP_CAPTURE_TYPE_MAX`, `FP_CAPTURE_TYPE_MAX + 1`, and `-1` perfectly satisfy rigorous boundary value analysis (BVA).\n*   **CL Size \u0026 Scope:** Size: M (+53, -26). This is a well-scoped, single logical change.\n*   **Commit Message:** The commit message clearly explains the rationale (ambiguity of 0 offset) and the chosen solution.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499507_c0f7696e-1e8b-4cb5-b3c3-dbd367cc200b.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "914d68ced0cce0c9ec6728e39b5c18bf8e0da12c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "813dead4_17269312",
+        "filename": "include/fpsensor/fpsensor_image_frame_params.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-02T22:56:54Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion for a follow-up CL:** Since `get_frame_size()` and `get_image_offset()` are now pass-through wrappers that discard the `std::optional` validation context (falling back to 0), consider migrating the remaining callers (e.g. in `fpsensor_get_frame.cc`, `fpsensor_capture.cc`) to use `get()` directly in a future CL. \n\nOnce migrated, these two methods can be deleted entirely to reduce API surface area and enforce the safer `std::optional` return type for all callers.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499507_c0f7696e-1e8b-4cb5-b3c3-dbd367cc200b.pb)",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 74,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "914d68ced0cce0c9ec6728e39b5c18bf8e0da12c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
