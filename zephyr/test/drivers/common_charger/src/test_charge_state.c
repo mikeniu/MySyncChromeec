@@ -628,6 +628,26 @@ ZTEST(charge_state, test_current_limit_battery_soc)
 	zassert_equal(-1U, user_current_limit);
 }
 
+ZTEST(charge_state, test_clamp_requested_voltage)
+{
+	struct charge_state_data *curr = charge_get_status();
+	const struct charger_info *info = charger_get_info();
+	const struct battery_info *bi = battery_get_info();
+
+	curr->ac = 1;
+	curr->state = ST_CHARGE;
+	curr->requested_current = 2000;
+
+	/* Request a voltage significantly higher than battery voltage_max */
+	curr->requested_voltage = bi->voltage_max + 5000;
+	adjust_requested_vi(info, false);
+
+	/* Requested voltage must be clamped to battery chemistry voltage_max */
+	zassert_true(curr->requested_voltage <= bi->voltage_max,
+		     "Expected requested_voltage <= %d, got %d",
+		     bi->voltage_max, curr->requested_voltage);
+}
+
 /* ---------------- Host Command: EC_CMD_CHARGE_CURRENT_LIMIT ----------------
  */
 
