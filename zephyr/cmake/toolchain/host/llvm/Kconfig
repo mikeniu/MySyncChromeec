@@ -9,12 +9,12 @@ choice LLVM_LINKER
 	default LLVM_USE_LLD
 endchoice
 
-# The armv7m-cros-eabi compiler-rt was compiled with assumption that it will
-# run on Cortex-M4 MCU with enabled FPU. It means that even with '-mfpu=none'
-# option the floating point instructions will be used (because they are used in
-# compiler-rt). Let's enable FPU always when compiling for ARMv7-M with FPU.
+# The armv7m-cros-eabi (b/234507656) and riscv32-cros-elf (b/416568282)
+# toolchain libraries were compiled with the assumption that they will run on
+# an MCU with an enabled FPU. Let's enable FPU always when compiling for
+# ARMv7-M or RISC-V with FPU.
 configdefault FPU
-	default y if ARMV7_M_ARMV8_M_FP
+	default y if ARMV7_M_ARMV8_M_FP || RISCV_ISA_EXT_F
 
 # LLVM toolchains for ARM and RISC-V use newlib as libc, indicate that it's
 # supported. Original config (definied in 'lib/libc/Kconfig') depends on
