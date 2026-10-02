@@ -22,6 +22,31 @@
       },
       "revId": "428cce9038af995c136fea48439f530d714b3cd7",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b9ae754_93d77988",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-02T19:01:04Z",
+      "side": 0,
+      "message": "Done. This was submitted on `main` (https://crrev.com/c/8270829) and cherry-picked by `copybot` (https://crrev.com/c/8329791); rebased and dropped from this CL.",
+      "parentUuid": "cfad444b_307a281d",
+      "range": {
+        "startLine": 527,
+        "startChar": 12,
+        "endLine": 527,
+        "endChar": 43
+      },
+      "isAi": true,
+      "revId": "428cce9038af995c136fea48439f530d714b3cd7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
