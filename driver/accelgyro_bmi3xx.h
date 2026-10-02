@@ -179,7 +179,14 @@
 /* 1LSB = 61 milli-dps*/
 #define BMI3_OFFSET_GYR_MDPS (61 * 1000)
 
-#define BMI3_FIFO_BUFFER 32
+/*
+ * 10 frames * 3 words/frame = 30 uint16_t words (60 bytes).
+ * Including the 1-word (2-byte) I2C sync word in struct bmi3_fifo_frame,
+ * the maximum I2C read transfer is 31 words (62 bytes), which fits within
+ * the 64-byte I2C command queue limit (CONFIG_I2C_CQ_MODE_MAX_PAYLOAD_SIZE)
+ * and avoids reading truncated partial frames.
+ */
+#define BMI3_FIFO_BUFFER (10 * BMI3_FIFO_ENTRY)
 
 /* General Macro Definitions */
 /* LSB and MSB mask definitions */
