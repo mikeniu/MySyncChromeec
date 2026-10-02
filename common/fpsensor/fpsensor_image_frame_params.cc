@@ -9,19 +9,16 @@
 
 #include <stddef.h>
 
-#include <vector>
-
 void FpImageFrameParamsCache::populate_cache(uint32_t max_image_buffer_bytes)
 {
-	const size_t buffer_size =
+	constexpr size_t buffer_size =
 		sizeof(struct ec_response_fp_info_v3) +
-		sizeof(struct fp_image_frame_params_v2) * frame_params_.size();
+		sizeof(struct fp_image_frame_params_v2) * FP_CAPTURE_TYPE_MAX;
 
-	std::vector<uint8_t> buffer(buffer_size);
-	auto *info = reinterpret_cast<struct ec_response_fp_info_v3 *>(
-		buffer.data());
+	alignas(struct ec_response_fp_info_v3) uint8_t buffer[buffer_size]{};
+	auto *info = reinterpret_cast<struct ec_response_fp_info_v3 *>(buffer);
 
-	if (fp_sensor_get_info(info, buffer.size()) < 0) {
+	if (fp_sensor_get_info(info, sizeof(buffer)) < 0) {
 		CPRINTS("Error: Failed to get fingerprint sensor info.");
 		return;
 	}
