@@ -22,6 +22,30 @@
       },
       "revId": "1e079e2f35e9ac387d7e30bd513cce6840758e49",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "badbbe22_97c4f77d",
+        "filename": "util/ectool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 12411,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-02T17:03:08Z",
+      "side": 1,
+      "message": "Done. Updated to check that (size_t)rv \u003d\u003d sizeof(r-\u003en_frames) + r-\u003en_frames * sizeof(r-\u003eframe_sizes[0]) along with a check against ec_max_insize to protect against integer multiplication overflow if r-\u003en_frames is maliciously large.",
+      "parentUuid": "8bbf7d25_5b548459",
+      "range": {
+        "startLine": 12409,
+        "startChar": 1,
+        "endLine": 12411,
+        "endChar": 63
+      },
+      "revId": "1e079e2f35e9ac387d7e30bd513cce6840758e49",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
