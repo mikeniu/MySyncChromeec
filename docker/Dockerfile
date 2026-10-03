@@ -155,7 +155,7 @@ RUN g++ -O2 -Wall -o /usr/bin/itecomdbgr \
     -I/opt/repos/src/platform/ec/util
 
 # Build and install uartupdatetool host utility
-RUN g++ -O2 -Wall -o /usr/bin/uartupdatetool \
+RUN g++ -O2 -Wall -DHOST_TOOLS_BUILD -o /usr/bin/uartupdatetool \
     /opt/repos/src/platform/ec/util/uut/main.cc \
     /opt/repos/src/platform/ec/util/uut/cmd.cc \
     /opt/repos/src/platform/ec/util/uut/opr.cc \
