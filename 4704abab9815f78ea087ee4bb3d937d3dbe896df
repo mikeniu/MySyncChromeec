@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "591d4957_ce8094a6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T02:03:00Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/3f9e4362-aa56-4c86-b414-01ca299405c4)]\n\n### Review Summary\n\n*   **Functionality:** The CL successfully removes the `get_frame_size` and `get_image_offset` wrapper functions from `FpImageFrameParamsCache` and migrates all remaining test callers to directly use `get()`. The tests assert `has_value()` before dereferencing, ensuring correctness.\n*   **Architecture \u0026 Component Fit:** This is an excellent cleanup that removes shallow wrapper methods in favor of directly returning `std::optional\u003cFpImageFrameParam\u003e`, reducing API surface area and making the cache interface cleaner.\n*   **Code Simplicity:** Boilerplate methods are deleted, and the resulting call sites cleanly unwrap the `std::optional` using idiomatic check-then-dereference constructs.\n*   **Idiomaticity \u0026 Readability:** The test migrations are highly idiomatic, explicitly typing `const std::optional\u003cFpImageFrameParam\u003e` rather than using `auto`, aligning well with Google C++ style guidelines.\n*   **Security:** N/A\n*   **Testing:** Test coverage is successfully migrated to cover `get()` boundary behavior (asserting `!has_value()`) instead of checking for zero-valued sizes/offsets.\n*   **CL Size \u0026 Scope:** `Size: M (+49, -111)`. This CL strictly adheres to the Single Logical Change rule, focusing exclusively on the removal of these two wrappers and updating their test callers.\n*   **Commit Message:** The commit message provides a clear rationale for the change and includes the required `BUG\u003d` and `TEST\u003d` footers per Chromium OS conventions.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4704abab9815f78ea087ee4bb3d937d3dbe896df",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
