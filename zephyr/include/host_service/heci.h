@@ -102,6 +102,8 @@ struct heci_client_t {
  */
 int heci_register(struct heci_client_t *client);
 
+#define HECI_NO_WAIT 0
+
 /*
  * @brief
  * send HECI message to HOST client with certain connection
@@ -110,6 +112,31 @@ int heci_register(struct heci_client_t *client);
  * @retval true If successful.
  */
 bool heci_send(uint32_t conn_id, struct mrd_t *msg);
+
+/*
+ * @brief
+ * send HECI message to HOST client with timeout
+ * @param conn_id connection id for sending.
+ * @param msg message content pointer to send.
+ * @param timeout_ms wait timeout in milliseconds (<=0 or HECI_NO_WAIT for
+ * non-blocking).
+ * @retval true If successful.
+ */
+bool heci_send_timeout(uint32_t conn_id, struct mrd_t *msg, int timeout_ms);
+
+/*
+ * @brief
+ * non-blocking HECI send: sends message only if flow control credit is
+ * immediately available, otherwise returns false without waiting
+ * @param conn_id connection id for sending.
+ * @param msg message content pointer to send.
+ * @retval true If message was successfully transmitted.
+ * @retval false If transmission failed or no flow control credit was available.
+ */
+static inline bool heci_send_nowait(uint32_t conn_id, struct mrd_t *msg)
+{
+	return heci_send_timeout(conn_id, msg, HECI_NO_WAIT);
+}
 
 /*
  * @brief
