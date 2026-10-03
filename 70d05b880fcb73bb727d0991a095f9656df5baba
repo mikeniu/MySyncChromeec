@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e178696b_ca59f9f6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T00:15:49Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/4523d91b-d5d9-4e4c-8527-9a5f9b4d1091)]\n\n### Review Summary\n\n*   **Functionality:** The CL correctly removes the `get_frame_size` and `get_image_offset` wrappers from `FpImageFrameParamsCache` and successfully updates all remaining test callers to use `get()` directly.\n*   **Architecture \u0026 Component Fit:** Removing these shallow wrappers improves the abstraction depth of the cache API, eliminating redundant pass-through methods in favor of a single source of truth (`get()`).\n*   **Code Simplicity:** Simplifies the codebase by deleting boilerplate wrappers and cleanly replacing them with explicit `std::optional` handling at the call sites.\n*   **Idiomaticity \u0026 Readability:** The test migrations are highly idiomatic, properly using `zassert_true(cached.has_value())` before extracting the `frame_size_bytes` or `image_data_offset_bytes`.\n*   **Security:** N/A\n*   **Testing:** Test coverage is properly updated. The tests for the removed wrapper functions were correctly removed, and the boundary conditions for invalid indices correctly assert `has_value()` is false.\n*   **CL Size \u0026 Scope:** `Size: M (+45, -108)`. The CL is a great atomic refactoring step that adheres strictly to the Single Logical Change rule by focusing solely on removing these specific wrappers and migrating their test callers.\n*   **Commit Message:** Accurate, well-formatted, and clearly explains the rationale behind the cleanup.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "70d05b880fcb73bb727d0991a095f9656df5baba",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
