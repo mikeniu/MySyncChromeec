@@ -89,8 +89,17 @@ int heci_send_mkbp_event(uint32_t *timestamp)
 	m.len = sizeof(evt);
 
 	*timestamp = __hw_clock_source_read();
-	return heci_send(heci_cros_ec_conn_id, &m) ? EC_SUCCESS :
-						     EC_ERROR_UNKNOWN;
+
+	/*
+	 * Non-blocking send: if host flow control credit is 0, do not block or
+	 * starve host commands. Return EC_ERROR_BUSY so common/mkbp_event.c
+	 * defers and retries cleanly via its 1-second timer.
+	 */
+	if (!heci_send_nowait(heci_cros_ec_conn_id, &m)) {
+		return EC_ERROR_BUSY;
+	}
+
+	return EC_SUCCESS;
 }
 
 static void heci_send_hostcmd_response(struct host_packet *pkt)
