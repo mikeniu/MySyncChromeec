@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac7a3254_977e77a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T00:09:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality**: The change correctly substitutes dynamic heap allocation with a stack buffer of the exact same size (`buffer_size`) while correctly passing `sizeof(buffer)` to `fp_sensor_get_info`.\n* **Architecture \u0026 Component Fit**: Using a stack allocation for a small, statically sized buffer is an excellent fit for the FPMCU environment, reducing heap fragmentation and allocation overhead.\n* **Code Simplicity**: Removing `std::vector` simplifies the method and avoids the need for the `\u003cvector\u003e` include.\n* **Idiomaticity \u0026 Readability**: The use of `alignas` and `{}` for zero-initialization is idiomatic modern C++ for ensuring properly aligned byte buffers without resorting to raw `memset`.\n* **Security**: The stack size is bounded by `FP_CAPTURE_TYPE_MAX` which is a small compile-time constant, so there is no risk of stack overflow.\n* **Testing**: The existing `ZTEST` unit tests in `fpsensor_image_frame_params.cc` already provide robust coverage for `populate_cache` including boundary checks.\n* **CL Size \u0026 Scope**: Size: S (+5, -8). The CL adheres to the Single Logical Change rule.\n* **Commit Message**: The commit message accurately reflects the changes, details the FPMCU context (\"why\"), and contains proper `BUG\u003d` and `TEST\u003d` directives.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499505_a47a45d2-3a21-4e22-bbdb-de679051bdcf.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "278d5a8a309abf7f74cce463abc5d421791812b9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
