@@ -29,6 +29,27 @@ macro reset
     # Set the image type of currently loaded image to RO by default. Software will
     # update the flag while jumping between image types.
     image_type WriteByte 0x0 0x40
+
+    # Sensors.GenericSPISensor is a byte-FIFO SPI peripheral that pops one queued
+    # byte per full-duplex SPI clock byte (1 dummy byte during the command byte
+    # write followed by the response bytes). Queue the FPC1025 hardware ID
+    # (0x021a, 3 bytes per read) and interrupt status clear reads (0x00, 2 bytes
+    # per read) for the initial driver probe, frame size cache population, and
+    # fpsensor_hw test check (covering both Zephyr and legacy EC).
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x02
+    spip.fpsensor FeedSample 0x1a
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x02
+    spip.fpsensor FeedSample 0x1a
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x02
+    spip.fpsensor FeedSample 0x1a
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x00
+    spip.fpsensor FeedSample 0x02
+    spip.fpsensor FeedSample 0x1a
 """
 
 runMacro $reset
