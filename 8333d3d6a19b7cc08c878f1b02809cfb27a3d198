@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "320b4495_1bba041d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T00:20:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements. [🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499507_925ea6eb-17ad-4e09-a621-0f96340583e1.pb)\n\n### Review Summary\n\n*   **Functionality:** Correctly fixes the ambiguity of a `0` offset by returning `std::optional` to distinguish unconfigured types from valid 0-offset captures.\n*   **Architecture \u0026 Component Fit:** The introduction of `std::optional\u003cFpImageFrameParam\u003e get()` is an excellent application of Edge-Case Elimination via Structural Elegance. It safely encapsulates the bounds validation logic.\n*   **Code Simplicity:** Good. Replaces duplicate cache lookups in `get_frame()` with a single unified call.\n*   **Idiomaticity \u0026 Readability:** Excellent use of C++17 `std::optional` instead of relying on C-style output parameters or sentinel values. \n*   **Security:** N/A\n*   **Testing:** BVA (Boundary Value Analysis) is perfectly covered in the tests, correctly probing `FP_CAPTURE_TYPE_MAX`, `FP_CAPTURE_TYPE_MAX + 1`, and `-1`.\n*   **CL Size \u0026 Scope:** Size: M (+53, -26). This is an atomic, single logical change.\n*   **Commit Message:** The commit message clearly and accurately explains the problem and the rationale for the change.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8333d3d6a19b7cc08c878f1b02809cfb27a3d198",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98a265a5_aaaf9683",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T00:20:19Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Minor Suggestion:** This file uses `std::optional` but does not directly `#include \u003coptional\u003e`. Although it compiles because the header is included transitively, it is good practice to include it directly for IWYU (Include What You Use) compliance.\n\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499507_925ea6eb-17ad-4e09-a621-0f96340583e1.pb)",
+      "range": {
+        "startLine": 647,
+        "startChar": 0,
+        "endLine": 649,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8333d3d6a19b7cc08c878f1b02809cfb27a3d198",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
