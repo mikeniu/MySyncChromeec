@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75c597f9_6d3c00d6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T00:11:46Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/40fc1771-de39-4219-8a61-143f981a5e37)]\n\n### Review Summary\n\n* **Functionality:** Looks good. The test assertions have been cleanly deduplicated into helpers without altering test behavior.\n* **Architecture \u0026 Component Fit:** The helpers cleanly fit the file\u0027s unit testing architecture.\n* **Code Simplicity:** The extraction of `assert_get_frame_fails()` and `assert_get_frame_succeeds()` significantly reduces boilerplate and duplicate logic across both failure and success tests.\n* **Idiomaticity \u0026 Readability:** Good. The use of zero-initialization `\u003d{}` for `expected_output` arrays is a clean improvement over `memset`.\n* **Security:** N/A. (Test code only).\n* **Testing:** Test coverage is preserved verbatim.\n* **CL Size \u0026 Scope:** Size: M (+40, -184). The CL is well-scoped to a single logical change (deduplicating test assertions) and qualifies as an atomic refactoring.\n* **Commit Message:** Accurately explains the rationale and what was changed.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "d5fc3552a71b037a91cd765d384c283fd8b01148",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
