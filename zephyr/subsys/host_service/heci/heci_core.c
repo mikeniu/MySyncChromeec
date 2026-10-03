@@ -164,34 +164,6 @@ static bool send_client_msg(struct heci_conn_t *conn, struct mrd_t *msg)
 	return true;
 }
 
-/*
- * wait host to send flow control to unblock sending task
- * called with dev_lock locked
- */
-static bool heci_wait_for_flow_control(struct heci_conn_t *conn)
-{
-	int ret = 0;
-
-	while (true) {
-		ret = k_sem_take(conn->flow_ctrl_sem,
-				 K_MSEC(CONFIG_HECI_FC_WAIT_TIMEOUT));
-
-		heci_lock();
-		if (ret) {
-			LOG_WRN("heci send timed out");
-			conn->wait_thread_count--;
-			heci_unlock();
-			return false;
-		}
-		if (conn->host_buffers) {
-			conn->wait_thread_count--;
-			heci_unlock();
-			return true;
-		}
-		heci_unlock();
-	}
-}
-
 static inline void heci_wakeup_sender(struct heci_conn_t *conn,
 				      uint8_t num_of_thread)
 {
@@ -243,29 +215,51 @@ static int32_t cal_send_msg_len(uint32_t conn_id, struct mrd_t *msg)
 	return total_len;
 }
 
-bool heci_send(uint32_t conn_id, struct mrd_t *msg)
+bool heci_send_timeout(uint32_t conn_id, struct mrd_t *msg, k_timeout_t timeout)
 {
 	int32_t total_len;
 	bool sent = false;
+	struct heci_conn_t *conn;
+
+	if (conn_id >= HECI_MAX_NUM_OF_CONNECTIONS) {
+		return false;
+	}
 
 	total_len = cal_send_msg_len(conn_id, msg);
-
 	if (total_len < 0) {
 		return false;
 	}
+
 	heci_lock();
+	conn = &heci_dev.connections[conn_id];
+	if (!(conn->state & HECI_CONN_STATE_OPEN)) {
+		heci_unlock();
+		return false;
+	}
 
-	struct heci_conn_t *conn = &heci_dev.connections[conn_id];
-
-	LOG_DBG("heci send message to connection: %d(%d<->%d)", conn_id,
-		conn->host_addr, conn->fw_addr);
-
+	/* Wait for flow control if no credit is available */
 	if (conn->host_buffers == 0) {
-		LOG_DBG("wait for flow control\n");
+		if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+			/* Non-blocking caller: abort immediately under lock */
+			heci_unlock();
+			return false;
+		}
+
 		conn->wait_thread_count++;
 		heci_unlock();
-		heci_wait_for_flow_control(conn);
+
+		int ret = k_sem_take(conn->flow_ctrl_sem, timeout);
+
 		heci_lock();
+		conn->wait_thread_count--;
+
+		if (ret != 0 || conn->host_buffers == 0 ||
+		    !(conn->state & HECI_CONN_STATE_OPEN)) {
+			LOG_WRN("heci send: FC wait failed on conn=%u (ret=%d, cred=%u)",
+				conn_id, ret, conn->host_buffers);
+			heci_unlock();
+			return false;
+		}
 	}
 
 #ifdef CONFIG_HECI_USE_DMA
@@ -274,12 +268,8 @@ bool heci_send(uint32_t conn_id, struct mrd_t *msg)
 		/* TODO: add dma support */
 	}
 #endif
-	if (!sent) {
-		sent = send_client_msg(conn, msg);
-	}
-
+	sent = send_client_msg(conn, msg);
 	if (sent) {
-		/* decrease FC credit */
 		conn->host_buffers--;
 	} else {
 		LOG_ERR("heci send fail!");
@@ -287,6 +277,12 @@ bool heci_send(uint32_t conn_id, struct mrd_t *msg)
 
 	heci_unlock();
 	return sent;
+}
+
+bool heci_send(uint32_t conn_id, struct mrd_t *msg)
+{
+	return heci_send_timeout(conn_id, msg,
+				 K_MSEC(CONFIG_HECI_FC_WAIT_TIMEOUT));
 }
 
 bool heci_send_flow_control(uint32_t conn_id)
