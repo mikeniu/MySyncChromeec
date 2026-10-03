@@ -558,7 +558,6 @@ class Renode(Platform):
         # bloonchipper Zephyr tests to skip on Renode.
         if zephyr and test_name in [
             "benchmark",  # TODO(b/390253975)
-            "fp_transport",  # TODO(b/398038192)
             "zephyr_flash_stm32f4",  # TODO(b/384974228)
             # TODO(b/384975384)
             "zephyr_counter_basic_api_stm32_subsec",
@@ -623,7 +622,6 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.test_name in [
-            "fp_transport",  # TODO(b/485668240)
             "null_pointer",  # TODO(b/485624833)
             "panic_data",  # TODO(b/485667679)
             "rollback_entropy",  # TODO(b/485670085)
