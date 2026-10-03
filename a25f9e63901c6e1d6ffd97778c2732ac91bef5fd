@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6054e64_775f6cca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T02:07:06Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [🔗](http://go/tj/d6fa49e7-9e12-4701-8962-99b90ca82cb1)\n\n### Review Summary\n\n*   **Functionality:** Correctly fixes the ambiguity of a `0` offset by returning `std::optional` to distinguish unconfigured types from valid 0-offset captures.\n*   **Architecture \u0026 Component Fit:** The introduction of `std::optional\u003cFpImageFrameParam\u003e get()` is an excellent application of Edge-Case Elimination via Structural Elegance. It safely encapsulates the bounds validation logic.\n*   **Code Simplicity:** Replaces duplicate cache lookups in `get_frame()` with a single unified call.\n*   **Idiomaticity \u0026 Readability:** Excellent use of C++17 `std::optional` instead of relying on C-style output parameters or sentinel values.\n*   **Security:** N/A\n*   **Testing:** BVA (Boundary Value Analysis) is perfectly covered in the tests, correctly probing `FP_CAPTURE_TYPE_MAX`, `FP_CAPTURE_TYPE_MAX + 1`, and `-1`.\n*   **CL Size \u0026 Scope:** Size: M (+54, -26). This is an atomic, single logical change.\n*   **Commit Message:** The commit message clearly and accurately explains the problem and the rationale for the change.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a25f9e63901c6e1d6ffd97778c2732ac91bef5fd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
