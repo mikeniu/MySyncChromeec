@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee3605e0_23147a3d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T01:59:36Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](https://goto.corp.google.com/traj/e70c915a-7775-4786-aa2d-9aea03f11e8b)]\n\n### Review Summary\n\n* **Functionality:** The refactoring correctly maintains all original testing behavior. By abstracting the repetitive test setup and verification steps into helpers, the integrity of the test suite is fully preserved.\n* **Architecture \u0026 Component Fit:** This change aligns well with standard unit testing practices by pulling out common boilerplate into file-scoped static helper functions.\n* **Code Simplicity:** The introduction of `assert_get_frame_fails()` and `assert_get_frame_succeeds()` eliminates redundant variable declarations, function calls, and assertions across every test case in the file.\n* **Idiomaticity \u0026 Readability:** Moving from `memset` to value-initialization (`\u003d {}`) for the `expected_output` arrays is a more idiomatic and concise approach in C++.\n* **Security:** No security impact; the changes are confined to test code.\n* **Testing:** The CL improves the maintainability of the test file without modifying the logic under test or reducing coverage.\n* **CL Size \u0026 Scope:** Size: M (+40, -184). This patch strictly adheres to the Single Logical Change rule by focusing exclusively on deduplicating assertions in a single test file.\n* **Commit Message:** The description clearly details the motivation behind the change and accurately reflects the modifications made to both the failure and success paths.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "2afae782726d86ed8d55d5c403e0903ab6df1fbd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
