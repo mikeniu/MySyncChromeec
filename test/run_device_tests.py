@@ -329,6 +329,15 @@ class Platform(ABC):
     ) -> bool:
         """Returns true if the given test should be skipped."""
 
+    def fp_sensor_sel(
+        self,
+        board_config: BoardConfig,
+        sensor_type: Optional[FPSensorType] = None,
+    ) -> bool:
+        """Explicitly select the appropriate fingerprint sensor."""
+        del board_config, sensor_type
+        return True
+
 
 class Hardware(Platform):
     """Platform implementation for running on development boards."""
@@ -415,6 +424,36 @@ class Hardware(Platform):
     def skip_test(
         self, test_config: TestConfig, board_config: BoardConfig, zephyr: bool
     ) -> bool:
+        return False
+
+    def fp_sensor_sel(
+        self,
+        board_config: BoardConfig,
+        sensor_type: Optional[FPSensorType] = None,
+    ) -> bool:
+        """Explicitly select the appropriate fingerprint sensor.
+
+        This method assumes that the fp_sensor_sel servo control is connected to
+        the proper gpio on the development board. This is not the case on some
+        older development boards. This should not result in any failures but
+        also may have not actually changed the selected sensor.
+        """
+        if sensor_type is None:
+            sensor_type = board_config.sensor_type
+
+        cmd = [
+            "dut-control",
+            "fp_sensor_sel:" + str(sensor_type.value),
+        ]
+
+        logging.debug('Running command: "%s"', " ".join(cmd))
+        proc = subprocess.run(cmd, check=False)
+
+        if proc.returncode == 0:
+            # power cycle after setting sensor type to ensure detection
+            power_cycle(self, board_config)
+            return True
+
         return False
 
 
@@ -589,6 +628,7 @@ class Renode(Platform):
             "fpsensor_auth_crypto_stateful",  # TODO(b/485316342)
             "fpsensor_auth_crypto_stateless",  # TODO(b/556233130)
             "fpsensor_crypto",  # TODO(b/556233130)
+            "fpsensor_hw",  # TODO(b/384743080)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
             "flash_write_protect",  # TODO(b/485316223)
@@ -662,6 +702,7 @@ class Renode(Platform):
             "exception",  # TODO(b/483118965)
             "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
             "fpsensor_debug",  # TODO(b/474439863)
+            "fpsensor_hw",  # TODO(b/384743080)
             "otp_key",  # TODO(b/483121090)
             "restricted_console",  # TODO(b/474439863)
             "tpm_seed_clear",  # TODO(b/556233130)
@@ -681,7 +722,6 @@ class Renode(Platform):
 
         # Tests failures that are independent of the board.
         if test_name in [
-            "fpsensor_hw",  # TODO(b/384743080)
             "power_utilization",  # Can't measure power on Renode.
             "watchdog",  # TODO(b/390021699)
         ]:
@@ -921,9 +961,7 @@ class AllTests:
             TestConfig(test_name="fpsensor_debug"),
             TestConfig(
                 test_name="fpsensor_hw",
-                pre_test_callback=lambda config: fp_sensor_sel(
-                    platform=platform, board_config=config
-                ),
+                pre_test_callback=platform.fp_sensor_sel,
             ),
             TestConfig(test_name="fpsensor_utils"),
             TestConfig(test_name="ftrapv"),
@@ -1529,38 +1567,6 @@ def power_cycle(platform: Platform, board_config: BoardConfig) -> None:
     time.sleep(board_config.reboot_timeout)
 
 
-def fp_sensor_sel(
-    platform: Platform,
-    board_config: BoardConfig,
-    sensor_type: Optional[FPSensorType] = None,
-) -> bool:
-    """
-    Explicitly select the appropriate fingerprint sensor.
-    This function assumes that the fp_sensor_sel servo control is connected to
-    the proper gpio on the development board. This is not the case on some
-    older development boards. This should not result in any failures but also
-    may have not actually changed the selected sensor.
-    """
-
-    if sensor_type is None:
-        sensor_type = board_config.sensor_type
-
-    cmd = [
-        "dut-control",
-        "fp_sensor_sel" + ":" + str(sensor_type.value),
-    ]
-
-    logging.debug('Running command: "%s"', " ".join(cmd))
-    proc = subprocess.run(cmd, check=False)
-
-    if proc.returncode == 0:
-        # power cycle after setting sensor type to ensure detection
-        power_cycle(platform, board_config)
-        return True
-
-    return False
-
-
 def power_pre_test(
     platform: Platform, board_config: BoardConfig, enter_sleep: bool
 ) -> bool:
@@ -1571,7 +1577,7 @@ def power_pre_test(
     if not set_sleep_mode(enter_sleep):
         return False
 
-    return fp_sensor_sel(platform, board_config)
+    return platform.fp_sensor_sel(board_config)
 
 
 def build_ec(
