@@ -1,0 +1,98 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b17485e0_b8fcd8af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T00:25:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested** — Please see the inline comments for a missing exact-boundary test and an architectural simplification that fixes a C++ flexible array UB issue.\n\n### Review Summary\n**Functionality:** ✅ Out-of-bounds checks and size validations in the extracted `validate` helper are correct.\n**Architecture \u0026 Component Fit:** ✅ The isolated `validate()` function cleanly separates validation from mutation.\n**Code Simplicity:** ❌ The current `populate_from_info` API takes a `ec_response_fp_info_v3` reference, which forces test fixtures to wrap it in an anonymous struct. Passing the raw params array directly makes it much simpler.\n**Idiomaticity \u0026 Readability:** ❌ Passing a struct with a flexible array member by C++ reference can lead to UB.\n**Security:** ✅ Bounds checking for `fp_capture_type` correctly protects `params` indexing, and offset/size bounds guard against buffer overflow.\n**Testing:** ❌ Missing exact-boundary test for `num_types \u003d\u003d FP_CAPTURE_TYPE_MAX` (a BVA requirement).\n**CL Size \u0026 Scope:** ✅ Size: M (+167, -45). Single logical change that addresses `populate_cache` atomicity and error paths.\n**Commit Message:** ✅ Accurately explains the issue and the fix, and follows proper tag formatting.\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499506_108095cf-d069-4cd8-be24-23fb65d5ccb6.pb)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a7923aa6c5d6b115ca201728cfecce1a3cafc439",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "489da830_df9fed9f",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T00:25:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n**Code Simplicity \u0026 Idiomaticity**: Passing a struct with a flexible array member by C++ reference (`const struct ec_response_fp_info_v3 \u0026info`) invokes undefined behavior when accessing the array elements (`info.image_frame_params[i]`), as the compiler may assume the reference spans only `sizeof(ec_response_fp_info_v3)` bytes. \n\nYou can eliminate this UB and significantly simplify the test code by decoupling `populate_from_info` from the `ec_response_fp_info_v3` wrapper struct. If you pass the params array and `num_types` directly, the test cases no longer need the dummy `struct { info; params[N]; } packet` wrappers.\n\n```cpp\nvoid FpImageFrameParamsCache::populate_from_info(\n\tconst struct fp_image_frame_params_v2 *params,\n\tuint8_t num_types,\n\tuint32_t max_image_buffer_bytes)\n{\n\tframe_params_.fill({});\n\n\tif (num_types \u003e frame_params_.size()) {\n\t\tCPRINTS(\"ERROR - EC returned %u types, max supported is %zu.\",\n\t\t\tnum_types, frame_params_.size());\n\t\treturn;\n\t}\n\n\tstd::array\u003cFpImageFrameParam, FP_CAPTURE_TYPE_MAX\u003e new_params{};\n\tfor (uint8_t i \u003d 0; i \u003c num_types; ++i) {\n\t\tconst auto \u0026raw \u003d params[i];\n\n\t\tif (!validate(raw, max_image_buffer_bytes)) {\n\t\t\treturn;\n\t\t}\n\n\t\tnew_params[raw.fp_capture_type] \u003d {\n\t\t\t.frame_size_bytes \u003d raw.frame_size,\n\t\t\t.image_data_offset_bytes \u003d raw.image_data_offset_bytes,\n\t\t};\n\t}\n\n\tframe_params_ \u003d new_params;\n}\n```\n\nThen `populate_cache` can just call:\n```cpp\n\tpopulate_from_info(info-\u003eimage_frame_params, info-\u003esensor_info.num_capture_types, max_image_buffer_bytes);\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499506_108095cf-d069-4cd8-be24-23fb65d5ccb6.pb)",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a7923aa6c5d6b115ca201728cfecce1a3cafc439",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57cbb41e_27150e93",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T00:25:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion:** If you update `populate_from_info` to take the array pointer directly, you can update this helper to match and vastly simplify all test case setups:\n\n```cpp\n\tstatic void\n\tpopulate_from_info(FpImageFrameParamsCache \u0026cache,\n\t\t\t   const struct fp_image_frame_params_v2 *params,\n\t\t\t   uint8_t num_types,\n\t\t\t   uint32_t max_image_buffer_bytes)\n\t{\n\t\tcache.populate_from_info(params, num_types, max_image_buffer_bytes);\n\t}\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499506_108095cf-d069-4cd8-be24-23fb65d5ccb6.pb)",
+      "range": {
+        "startLine": 196,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a7923aa6c5d6b115ca201728cfecce1a3cafc439",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa8f7311_f2101a42",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T00:25:28Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n**Testing \u0026 Test Coverage:** This test effectively covers the failure boundary `num_types \u003e FP_CAPTURE_TYPE_MAX` (`N+1`). However, to fully satisfy Boundary Value Analysis, please also add a test for the exact passing boundary `num_types \u003d\u003d FP_CAPTURE_TYPE_MAX` (`N`).\n\nHere is a ready-to-use snippet you can add to test the maximum valid number of types (assuming you adopt the array pointer decoupling suggestion):\n\n```cpp\nZTEST(fpsensor_image_frame_params,\n      test_cache_initialization_on_max_num_types)\n{\n\tFpImageFrameParamsCache cache{};\n\tzassert_true(FpImageFrameParamsCacheTestHelper::set_frame_size(\n\t\tcache, FP_CAPTURE_VENDOR_FORMAT, 1024));\n\n\tstruct fp_image_frame_params_v2 params[FP_CAPTURE_TYPE_MAX] \u003d {};\n\tfor (int i \u003d 0; i \u003c FP_CAPTURE_TYPE_MAX; ++i) {\n\t\tparams[i].fp_capture_type \u003d static_cast\u003cenum fp_capture_type\u003e(i);\n\t\tparams[i].frame_size \u003d 1024;\n\t\tparams[i].image_data_offset_bytes \u003d 0;\n\t}\n\n\tFpImageFrameParamsCacheTestHelper::populate_from_info(\n\t\tcache, params, FP_CAPTURE_TYPE_MAX, 2048);\n\n\tfor (int i \u003d 0; i \u003c FP_CAPTURE_TYPE_MAX; ++i) {\n\t\tzassert_equal(1024, cache.get_frame_size(static_cast\u003cenum fp_capture_type\u003e(i)));\n\t}\n}\n```\n[🔗](http://go/tj/cns/gg-d/home/tomhughes@google.com/review_trajectories/cl8499506_108095cf-d069-4cd8-be24-23fb65d5ccb6.pb)",
+      "range": {
+        "startLine": 250,
+        "startChar": 0,
+        "endLine": 264,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "a7923aa6c5d6b115ca201728cfecce1a3cafc439",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
