@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 target_include_directories(app PRIVATE "include")
+target_compile_definitions(app PRIVATE CONFIG_SOC_SERIES_STM32F4X)
 
 target_sources_ifdef(CONFIG_TEST_BOARD_TRANSPORT_SPI app PRIVATE
 	src/transport_spi.c
