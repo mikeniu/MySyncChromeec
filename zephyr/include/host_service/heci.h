@@ -113,6 +113,31 @@ bool heci_send(uint32_t conn_id, struct mrd_t *msg);
 
 /*
  * @brief
+ * send HECI message to HOST client with timeout
+ * @param conn_id connection id for sending.
+ * @param msg message content pointer to send.
+ * @param timeout wait timeout (e.g. K_NO_WAIT for non-blocking).
+ * @retval true If successful.
+ */
+bool heci_send_timeout(uint32_t conn_id, struct mrd_t *msg,
+		       k_timeout_t timeout);
+
+/*
+ * @brief
+ * non-blocking HECI send: sends message only if flow control credit is
+ * immediately available, otherwise returns false without waiting
+ * @param conn_id connection id for sending.
+ * @param msg message content pointer to send.
+ * @retval true If message was successfully transmitted.
+ * @retval false If transmission failed or no flow control credit was available.
+ */
+static inline bool heci_send_nowait(uint32_t conn_id, struct mrd_t *msg)
+{
+	return heci_send_timeout(conn_id, msg, K_NO_WAIT);
+}
+
+/*
+ * @brief
  * send HECI flow control message to HOST client, indicating that local client
  * is ready for receiving a new HECI message
  * @param conn_id connection id for sending.
