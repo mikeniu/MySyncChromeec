@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3de25f9_d603ef72",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T02:01:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n\n* **CL Size \u0026 Scope:** ✅ Size: S (+34, -12). Clean and atomic logical change.\n* **Functionality:** ❌ `renode-ec-launch` currently does not accept a `--transport` argument, which will crash the test execution script. Additionally, the SPI `ztest` suite will fail when booted in UART mode due to an unhandled transport type mismatch. See inline comments.\n* **Idiomaticity \u0026 Readability:** ❌ Provided a minor Python simplification for checking `host_interfaces` inline.\n\nPlease address the inline comments.\n\n[🔗](http://go/tj/671d0796-cc5c-4876-b67a-d2eab39769c1)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "83fe823ee415890714a1e5c0682e35ff09d88e79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78c6bfb8_580ab8c8",
+        "filename": "test/run_device_tests.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T02:01:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Defect:** `renode-ec-launch` does not currently accept a `--transport` argument. Because it uses `argparse.ArgumentParser` without `parse_known_args`, passing `--transport spi` will cause it to crash with an `unrecognized arguments: --transport spi` error, breaking the test execution.\n\nIf `renode-ec-launch` is meant to support this, the update to that script must be included in this CL.\n\n**Idiomatic Python Suggestion:**\nRather than iterating over a tuple of enumerations to find the first match, you can express this more declaratively without a `break`:\n\n```python\n        if host_interfaces:\n            if HostInterface.SPI in host_interfaces:\n                cmd.extend([\"--transport\", HostInterface.SPI.value])\n            elif HostInterface.UART in host_interfaces:\n                cmd.extend([\"--transport\", HostInterface.UART.value])\n```\n\n[🔗](http://go/tj/671d0796-cc5c-4876-b67a-d2eab39769c1)",
+      "range": {
+        "startLine": 487,
+        "startChar": 0,
+        "endLine": 492,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "83fe823ee415890714a1e5c0682e35ff09d88e79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "524aabfc_2b4e79f1",
+        "filename": "zephyr/test/hwtest/src/fp_transport.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-03T02:01:04Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Defect:** Since Zephyr\u0027s `ztest` framework runs all test suites in the binary by default, this test will fail if the binary boots with the UART transport (e.g., when running the `fp_transport_uart_rw` test configuration). \n\nWhen booted with UART, `get_fp_transport_type()` will return `FP_TRANSPORT_TYPE_UART`, causing the `zassert_equal` check inside `check_protocol_info(FP_TRANSPORT_TYPE_SPI)` to fail. \n\nYou should skip the test or return early if it\u0027s booted with UART:\n\n```c\nZTEST(fp_transport_spi, test_fp_transport_spi)\n{\n\tif (get_fp_transport_type() \u003d\u003d FP_TRANSPORT_TYPE_UART) {\n\t\tztest_test_skip();\n\t\treturn;\n\t}\n\n\tcheck_protocol_info(FP_TRANSPORT_TYPE_SPI);\n}\n```\n\n[🔗](http://go/tj/671d0796-cc5c-4876-b67a-d2eab39769c1)",
+      "range": {
+        "startLine": 112,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "83fe823ee415890714a1e5c0682e35ff09d88e79",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
