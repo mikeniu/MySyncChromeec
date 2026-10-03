@@ -49,6 +49,17 @@ GPIO_WP_MAP: dict[str, str] = {
 GPIO_WP_ENABLE = "Release"
 GPIO_WP_DISABLE = "Press"
 
+ZEPHYR_UPSTREAM_ADDR_MAP: dict[str, str] = {
+    # Upstream ft9001_eval and egis_et171 link the app partition at +0x1000
+    # without the 4KB flash header used in ec.bin.
+    "chudow": "0x10001000",
+    "sanok": "0x80001000",
+}
+
+ZEPHYR_UPSTREAM_CONSOLE_MAP: dict[str, str] = {
+    "chudow": "sysbus.usart2",
+}
+
 
 def msg_run(cmd: List[str]) -> NoReturn:
     """Prints a command and executes it, replacing the current process.
@@ -142,6 +153,10 @@ def launch(
     # using a derivative board, like buccaneer which is based on helipilot.
     renode_execute.append(f'$name="{board}";')
     renode_execute.append(f'$bin="{bin_file}";')
+    if zephyr_bin and board in ZEPHYR_UPSTREAM_ADDR_MAP:
+        upstream_addr = ZEPHYR_UPSTREAM_ADDR_MAP[board]
+        renode_execute.append(f"$bin_addr={upstream_addr};")
+        renode_execute.append(f"$vector_table_offset={upstream_addr};")
     renode_execute.append(f'$elf_ro="{elf_ro_file}";')
     renode_execute.append(f'$elf_rw="{elf_rw_file}";')
     renode_execute.append(f"include @util/renode/{board}.resc;")
@@ -158,15 +173,16 @@ def launch(
         renode_execute.append(f"{GPIO_WP_MAP[board]} {wp_state};")
 
     if board in CONSOLE_MAP:
+        console = CONSOLE_MAP[board]
+        if zephyr_bin:
+            console = ZEPHYR_UPSTREAM_CONSOLE_MAP.get(board, console)
         # Expose the console UART as a PTY on the given path (default:
         # /tmp/renode-uart). You can connect to the PTY with minicom, screen,
         # etc.
         renode_execute.append(
             f'emulation CreateUartPtyTerminal "term" "{uart}" True;'
         )
-        renode_execute.append(
-            "connector Connect " + CONSOLE_MAP[board] + " term;"
-        )
+        renode_execute.append(f"connector Connect {console} term;")
 
     renode_execute.append("start;")
 
