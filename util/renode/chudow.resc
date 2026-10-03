@@ -11,6 +11,8 @@ machine LoadPlatformDescription $repl
 machine LoadPlatformDescriptionFromString "romfuncs: Memory.MappedMemory @ sysbus 0x04006000 { size: 0x2000 }"
 
 $bin?=$ORIGIN/chudow/ec.bin
+$bin_addr?=0x10080000
+$vector_table_offset?=0x10081000
 $elf_ro?=$ORIGIN/chudow/ec.RO.elf
 $elf_rw?=$ORIGIN/chudow/ec.RW.elf
 
@@ -36,10 +38,10 @@ macro reset
     cpu0 AddHook 0x400665C $mock_rom_func  # `ssi_close_xip`
 
     cpu0 FpuEnabled true
-    sysbus LoadBinary $bin 0x10080000
+    sysbus LoadBinary $bin $bin_addr
     sysbus LoadSymbolsFrom $elf_ro
     sysbus LoadSymbolsFrom $elf_rw
-    cpu0 VectorTableOffset 0x10081000  # Vector table of RO image
+    cpu0 VectorTableOffset $vector_table_offset  # Vector table of RO image
 """
 
 runMacro $reset
