@@ -73,10 +73,11 @@ config HECI_PAGE_SIZE
 
 config HECI_FC_WAIT_TIMEOUT
 	int "timeout in ms to wait flow control when send heci message"
-	default 5000
+	default 2500
 	help
 	  The max time in ms that the heci client message sending will
-	  wait for the flow control from peer client.
+	  wait for the flow control from peer client. Must be less than
+	  the AP kernel ISHTP_SEND_TIMEOUT (3000 ms).
 
 config HECI_USE_DMA
 	bool "if HECI use dma to transfer dma, as an extension of ipc"
