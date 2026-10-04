@@ -302,6 +302,7 @@ def main():
         f"-x=ZEPHYR_MODULES={';'.join([str(p) for p in zephyr_modules])}",
         f"-x=Python3_EXECUTABLE={sys.executable}",
         f"-x=PW_ROOT={str(pigweed_dir)}",
+        "-x=CONFIG_DEPRECATED_KCONFIGS_AS_ERRORS=n",
     ]
 
     # `-T` flags (used for specifying test directories to build and run)
