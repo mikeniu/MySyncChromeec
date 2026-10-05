@@ -27,7 +27,38 @@ static void lis2dh_before(void *state)
 
 ZTEST_USER(lis2dh, test_init)
 {
+	struct stprivate_data *drvdata = acc->drv_data;
+
 	zassert_ok(lis2dh_drv.init(acc));
+	zassert_equal(drvdata->resol, 12,
+		      "expected 12-bit resolution for LIS2DH");
+}
+
+static int emul_read_ctrl4_lis2de(const struct emul *target, int reg,
+				  uint8_t *val, int bytes, void *data)
+{
+	ARG_UNUSED(target);
+	ARG_UNUSED(bytes);
+	ARG_UNUSED(data);
+
+	if (reg == LIS2DH_CTRL4_ADDR) {
+		*val = LIS2DH_BDU_MASK; /* HR bit (0x08) not supported */
+		return 0;
+	}
+	return 1;
+}
+
+ZTEST(lis2dh, test_init_lis2de_8bit)
+{
+	struct i2c_common_emul_data *common_data =
+		emul_lis2dh_get_i2c_common_data(emul);
+	struct stprivate_data *drvdata = acc->drv_data;
+
+	i2c_common_emul_set_read_func(common_data, emul_read_ctrl4_lis2de,
+				      NULL);
+	zassert_ok(lis2dh_drv.init(acc));
+	zassert_equal(drvdata->resol, 8,
+		      "expected 8-bit resolution for LIS2DE");
 }
 
 ZTEST(lis2dh, test_lis2dh_init__fail_read_who_am_i)
