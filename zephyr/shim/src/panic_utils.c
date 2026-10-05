@@ -93,6 +93,42 @@ uint32_t get_stack_ptr(const struct k_thread *thread)
 	return thread->callee_saved.esp;
 #endif
 #elif defined(CONFIG_RISCV)
+	if (thread == k_current_get()) {
+		if (k_is_in_isr()) {
+			/*
+			 * In Zephyr RISC-V (arch/riscv/core/thread.c),
+			 * _current_cpu->irq_stack is initialized to the
+			 * initial top-of-stack (high address).
+			 *
+			 * On entering an interrupt (arch/riscv/core/isr.S),
+			 * _isr_wrapper pushes struct arch_esf onto the
+			 * interrupted thread's stack, switches to the IRQ
+			 * stack by loading sp from _current_cpu->irq_stack,
+			 * decrements sp by 16, and stores the interrupted
+			 * thread's SP at 0(sp):
+			 *   addi sp, sp, -16
+			 *   sr   t0, 0(sp)
+			 *
+			 * Therefore, the interrupted thread's SP is stored at
+			 * (_current_cpu->irq_stack - 16).
+			 */
+			const uintptr_t *saved_thread_sp =
+				(const uintptr_t *)(_current_cpu->irq_stack -
+						    16);
+
+			return (uint32_t)*saved_thread_sp;
+		}
+		uint32_t sp;
+
+		__asm__ volatile("mv %0, sp" : "=r"(sp));
+		return sp;
+	}
+	/*
+	 * For threads that are not currently running, callee_saved.sp holds the
+	 * stack pointer saved during the last cooperative context switch in
+	 * z_riscv_switch (arch/riscv/core/switch.S:49) or initial thread setup
+	 * in arch_new_thread (arch/riscv/core/thread.c:129).
+	 */
 	return thread->callee_saved.sp;
 #elif defined(CONFIG_ARCH_POSIX)
 	return (uint32_t)thread->callee_saved.thread_status;
