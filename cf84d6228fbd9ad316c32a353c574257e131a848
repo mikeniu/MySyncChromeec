@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "faaf3d75_c70c3d00",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-05T17:32:16Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [[trajectory](http://go/tj/e0a9c62a-5f2a-44fe-aba6-8d78c288bf10)]\n\n### Review Summary\n\n*   **Functionality:** The CL successfully removes the `get_frame_size` and `get_image_offset` wrapper functions from `FpImageFrameParamsCache` and updates all remaining test callers to directly use `get()`. The tests correctly assert `has_value()` before dereferencing, ensuring safe and predictable execution.\n*   **Architecture \u0026 Component Fit:** Excellent cleanup. Removing these shallow wrapper methods simplifies the cache API by reducing its surface area and forcing callers to interact directly with the single source of truth (`std::optional\u003cFpImageFrameParam\u003e`). This eliminates the implicit `0` fallback that could mask underlying configuration errors.\n*   **Code Simplicity:** Deletes boilerplate passthrough wrappers and unifies the return type at the call sites using standard check-then-dereference constructs.\n*   **Idiomaticity \u0026 Readability:** The test migrations are highly idiomatic, explicitly typing `const std::optional\u003cFpImageFrameParam\u003e` (avoiding `auto` where the return type would not be immediately obvious on the LHS alone) and using `-\u003e` for member access after the `zassert_true(has_value())` check.\n*   **Security:** N/A\n*   **Testing:** Test coverage is successfully migrated to verify `get()` boundary behavior, properly asserting `!has_value()` instead of relying on zero-valued offsets.\n*   **CL Size \u0026 Scope:** `Size: M (+49, -111)`. The CL strictly adheres to the Single Logical Change rule by focusing exclusively on removing these two redundant wrappers and updating their test callers.\n*   **Commit Message:** The commit message clearly explains the rationale for the change and includes the required `BUG\u003d` and `TEST\u003d` footers for the Chromium OS ecosystem.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "cf84d6228fbd9ad316c32a353c574257e131a848",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
