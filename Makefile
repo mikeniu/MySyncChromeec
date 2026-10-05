@@ -147,19 +147,9 @@ $(1)-incs-y += $(addprefix $(2)/,$($(3)-incs-y))
 $(1)-dirs-y += $(addprefix $(2)/,$($(3)-dirs-y))
 endef
 
-# Get build configuration from sub-directories
-include common/build.mk
-include driver/build.mk
-include power/build.mk
-include third_party/build.mk
+# Get build configuration for host tools
 include util/build.mk
 include util/lock/build.mk
-
-
-ifeq ($(CONFIG_BORINGSSL_CRYPTO), y)
-include third_party/boringssl/common/build.mk
-include crypto/build.mk
-endif
 
 # Collect all includes.
 includes+=$(includes-y)
