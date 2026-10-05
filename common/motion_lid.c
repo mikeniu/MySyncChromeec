@@ -282,6 +282,26 @@ static void motion_lid_set_dptf_profile(int reliable)
 
 #endif /* MOTION_LID_SET_DPTF_PROFILE */
 
+#ifdef CONFIG_TABLET_MODE
+/**
+ * Check if the current angle reading is boundary noise across 0 <-> 360:
+ * - When in tablet mode (physically near 360), a small reading near 0
+ *   is noise wrapping past 360 -> correct it by reflecting to a large angle.
+ * - When in clamshell mode (physically near 0), a large reading near 360
+ *   is noise wrapping below 0 -> correct it by reflecting to a small angle.
+ */
+static bool is_boundary_noise(fp_t last_angle, fp_t current_angle)
+{
+	if (tablet_get_mode()) {
+		return LID_ANGLE_ALMOST_360(last_angle) &&
+		       LID_ANGLE_ALMOST_0(current_angle);
+	}
+
+	return LID_ANGLE_ALMOST_0(last_angle) &&
+	       LID_ANGLE_ALMOST_360(current_angle);
+}
+#endif /* CONFIG_TABLET_MODE */
+
 /**
  * Calculate the lid angle using two acceleration vectors, one recorded in
  * the base and one in the lid.
@@ -442,8 +462,14 @@ static int calculate_lid_angle(const intv3_t base, const intv3_t lid,
 	}
 
 	/* Seed the lid angle now that we have a reliable measurement. */
-	if (last_lid_angle_fp == FLOAT_TO_FP(-1))
-		last_lid_angle_fp = lid_to_base_fp;
+	if (last_lid_angle_fp == FLOAT_TO_FP(-1)) {
+		if (!tablet_get_mode() &&
+		    LID_ANGLE_ALMOST_360(lid_to_base_fp)) {
+			last_lid_angle_fp = FLOAT_TO_FP(360) - lid_to_base_fp;
+		} else {
+			last_lid_angle_fp = lid_to_base_fp;
+		}
+	}
 
 	/*
 	 * If the angle crosses the 0 <-> 360 boundary due to noise while
@@ -451,13 +477,12 @@ static int calculate_lid_angle(const intv3_t base, const intv3_t lid,
 	 * But in case that the lid switch is closed, we can prove the small
 	 * angle we see is correct so we take the angle as is.
 	 */
-	if (lid_is_open() && ((LID_ANGLE_ALMOST_360(last_lid_angle_fp) &&
-			       LID_ANGLE_ALMOST_0(lid_to_base_fp)) ||
-			      (LID_ANGLE_ALMOST_0(last_lid_angle_fp) &&
-			       LID_ANGLE_ALMOST_360(lid_to_base_fp))))
+	if (lid_is_open() &&
+	    is_boundary_noise(last_lid_angle_fp, lid_to_base_fp)) {
 		last_lid_angle_fp = FLOAT_TO_FP(360) - lid_to_base_fp;
-	else
+	} else {
 		last_lid_angle_fp = lid_to_base_fp;
+	}
 
 end_calculate_lid_angle:
 	/*

@@ -149,19 +149,54 @@ ZTEST(lid_angle, test_symmetric_debounce)
 	set_mock_sensors_angle(180.0);
 	motion_lid_calc();
 
-	/* Large-to-small: initial angle 340 deg, noisy reading 25 deg */
+	/* Large-to-small: enter tablet mode at 340 deg */
 	set_mock_sensors_angle(340.0);
-	motion_lid_calc();
+	for (int i = 0; i < (TABLET_MODE_DEBOUNCE_COUNT + 1); i++)
+		motion_lid_calc();
+	zassert_equal(tablet_get_mode(), 1, "Should be in tablet mode");
 	zassert_within(motion_lid_get_angle(), 340, 2,
 		       "Initial angle should be ~340, got %d",
 		       motion_lid_get_angle());
 
-	/* With symmetric debounce, it should correct 25 to 335 (360 - 25) */
+	/* In tablet mode, it should correct noisy 25 to 335 (360 - 25) */
 	set_mock_sensors_angle(25.0);
 	motion_lid_calc();
 	zassert_within(motion_lid_get_angle(), 335, 2,
 		       "Noisy 25 should be debounced to ~335, got %d",
 		       motion_lid_get_angle());
+
+	/*
+	 * Transition back to clamshell through 90 deg (< 160 deg threshold)
+	 * so that tablet mode is exited before testing clamshell latch-up
+	 * prevention.
+	 */
+	set_mock_sensors_angle(90.0);
+	for (int i = 0; i < (TABLET_MODE_DEBOUNCE_COUNT + 1); i++)
+		motion_lid_calc();
+	zassert_equal(tablet_get_mode(), 0, "Must return to clamshell mode");
+
+	/* Set angle to 20 deg in clamshell */
+	set_mock_sensors_angle(20.0);
+	motion_lid_calc();
+	zassert_within(motion_lid_get_angle(), 20, 2,
+		       "Angle must stay ~20 deg in clamshell, got %d",
+		       motion_lid_get_angle());
+
+	/* Noisy reading at 335 deg in clamshell should be debounced to 25 deg
+	 */
+	set_mock_sensors_angle(335.0);
+	motion_lid_calc();
+	zassert_within(motion_lid_get_angle(), 25, 2,
+		       "Noisy 335 should be debounced to ~25, got %d",
+		       motion_lid_get_angle());
+
+	/* Next clean reading at 20 deg must stay 20 deg */
+	set_mock_sensors_angle(20.0);
+	motion_lid_calc();
+	zassert_within(motion_lid_get_angle(), 20, 2,
+		       "Angle must stay ~20 deg in clamshell, got %d",
+		       motion_lid_get_angle());
+	zassert_equal(tablet_get_mode(), 0, "Must stay in clamshell mode");
 }
 
 ZTEST(lid_angle, test_lid_angle_cycle_and_tablet_mode)
