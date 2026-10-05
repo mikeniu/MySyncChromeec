@@ -51,7 +51,7 @@ static timestamp_t ts_begin_task;
 static bool motion_sense_task_status;
 
 /* Minimum time in between running motion sense task loop. */
-unsigned int motion_min_interval = CONFIG_MOTION_MIN_SENSE_WAIT_TIME * MSEC;
+int motion_min_interval = CONFIG_MOTION_MIN_SENSE_WAIT_TIME * MSEC;
 STATIC_IF(CONFIG_CMD_ACCEL_INFO) int accel_disp;
 
 #define SENSOR_ACTIVE(_sensor) (sensor_active & (_sensor)->active_mask)
@@ -174,7 +174,7 @@ motion_sensor_time_to_read(const timestamp_t *ts,
 		return 0;
 
 	/*
-	 * If the time is within the min motion interval (3 ms) go ahead and
+	 * If the time is within the min motion interval go ahead and
 	 * read from the sensor
 	 */
 	return time_after(ts->le.lo,
@@ -1080,6 +1080,16 @@ void motion_sense_task(void *u)
 			pm_policy_state_lock_get_all();
 		}
 		event = task_wait_event(wait_us);
+		int motion_min_interval_remaining =
+			motion_min_interval - time_since32(ts_end_task);
+		if (motion_min_interval_remaining > 0) {
+			k_usleep(motion_min_interval_remaining);
+			/*
+			 * Collect any events that arrived during the minimum
+			 * interval sleep so they are processed in this loop.
+			 */
+			event |= task_wait_event(0);
+		}
 		if (DISABLE_PM_POLICY_WHILE_WAITING(wait_us,
 						    fastest_collection_rate)) {
 			pm_policy_state_lock_put_all();

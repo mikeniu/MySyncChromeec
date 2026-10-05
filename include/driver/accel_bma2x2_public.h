@@ -43,7 +43,7 @@ extern const struct accelgyro_drv bma2x2_accel_drv;
 /*
  * Min and Max sampling frequency in mHz.
  * Given BMA255 is polled, we limit max frequency to 125Hz.
- * If set to 250Hz, given we can read up to 3ms before the due time
+ * If set to 250Hz, given we can read before the due time
  * (see CONFIG_MOTION_MIN_SENSE_WAIT_TIME), we may read too early when
  * other sensors are active.
  */
