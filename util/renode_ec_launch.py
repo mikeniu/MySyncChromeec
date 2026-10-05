@@ -49,6 +49,18 @@ GPIO_WP_MAP: dict[str, str] = {
 GPIO_WP_ENABLE = "Release"
 GPIO_WP_DISABLE = "Press"
 
+HELIPILOT_GPIO_TRANSPORT_SEL = "sysbus.gpio4.GPIO_TRANSPORT_SEL"
+
+GPIO_TRANSPORT_SEL_MAP: dict[str, str] = {
+    "bloonchipper": "sysbus.gpioPortB.GPIO_TRANSPORT_SEL",
+    "buccaneer": HELIPILOT_GPIO_TRANSPORT_SEL,
+    "helipilot": HELIPILOT_GPIO_TRANSPORT_SEL,
+    "rosalia": HELIPILOT_GPIO_TRANSPORT_SEL,
+}
+
+GPIO_TRANSPORT_SEL_SPI = "Release"
+GPIO_TRANSPORT_SEL_UART = "Press"
+
 
 def msg_run(cmd: List[str]) -> NoReturn:
     """Prints a command and executes it, replacing the current process.
@@ -70,6 +82,7 @@ def launch(
     ec_project: str,
     uart: str,
     gdb_port: int = 3333,
+    transport: str = "spi",
 ) -> int:
     """Launches an EC image in Renode.
 
@@ -83,6 +96,7 @@ def launch(
         ec_project: The name of the EC project.
         uart: Path to the UART PTY.
         gdb_port: Port number to start GDB server on (0 to disable).
+        transport: Host transport type to select on startup ("spi" or "uart").
 
     Returns:
         Non-zero on error. Does not return on success.
@@ -156,6 +170,16 @@ def launch(
     if board in GPIO_WP_MAP:
         wp_state = GPIO_WP_ENABLE if enable_write_protect else GPIO_WP_DISABLE
         renode_execute.append(f"{GPIO_WP_MAP[board]} {wp_state};")
+
+    if board in GPIO_TRANSPORT_SEL_MAP:
+        transport_state = (
+            GPIO_TRANSPORT_SEL_SPI
+            if transport == "spi"
+            else GPIO_TRANSPORT_SEL_UART
+        )
+        renode_execute.append(
+            f"{GPIO_TRANSPORT_SEL_MAP[board]} {transport_state};"
+        )
 
     if board in CONSOLE_MAP:
         # Expose the console UART as a PTY on the given path (default:
@@ -240,6 +264,13 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
     )
 
     parser.add_argument(
+        "--transport",
+        choices=["spi", "uart"],
+        default="spi",
+        help="Configure the host transport select GPIO on startup.",
+    )
+
+    parser.add_argument(
         "--uart",
         type=str,
         default="/tmp/renode-uart",
@@ -262,6 +293,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
         ec_project=opts.ec,
         uart=opts.uart,
         gdb_port=opts.gdb_port,
+        transport=opts.transport,
     )
 
 

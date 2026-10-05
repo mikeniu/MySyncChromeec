@@ -25,6 +25,12 @@ GPIO_SLP: Miscellaneous.Button @ gpioPortA 8
     init:
         ReleaseOnReset false
 
+GPIO_TRANSPORT_SEL: Miscellaneous.Button @ gpioPortB 1
+    invert: true
+    -> gpioPortB@1
+    init:
+        ReleaseOnReset false
+
 fpsensor: Sensors.GenericSPISensor @ spi2
 
 // TODO(b/562172237): Remove this override once upstream stm32f4.repl stops
