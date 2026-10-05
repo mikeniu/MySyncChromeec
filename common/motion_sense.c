@@ -1069,17 +1069,17 @@ void motion_sense_task(void *u)
 				wait_us = time_diff;
 		}
 
-		if (wait_us >= 0 && wait_us < motion_min_interval) {
-			/*
-			 * Guarantee some minimum delay to allow other lower
-			 * priority tasks to run.
-			 */
-			wait_us = motion_min_interval;
-		}
-
 		if (DISABLE_PM_POLICY_WHILE_WAITING(wait_us,
 						    fastest_collection_rate)) {
 			pm_policy_state_lock_get_all();
+		}
+		/*
+		 * Guarantee some minimum delay to allow other lower
+		 * priority tasks to run.
+		 */
+		k_usleep(motion_min_interval);
+		if (wait_us >= 0) {
+			wait_us = MAX(0, wait_us - (int)motion_min_interval);
 		}
 		event = task_wait_event(wait_us);
 		if (DISABLE_PM_POLICY_WHILE_WAITING(wait_us,
