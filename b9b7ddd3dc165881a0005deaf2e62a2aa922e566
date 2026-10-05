@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a25388d_cea40ec6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-05T17:21:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved with minor suggestions** — See inline comments for optional improvements.\n\n### Review Summary\n**Functionality:** ✅ The cache is now correctly and consistently invalidated on all failure paths.\n**Architecture \u0026 Component Fit:** ✅ The refactored `validate()` helper cleanly separates validation from state mutation, making the logic much easier to follow.\n**Code Simplicity:** ✅ Extracting `populate_from_info` to take the params array directly eliminates the need for flexible-array struct wrappers in test fixtures. A minor suggestion is provided inline to remove a redundant cache clear.\n**Idiomaticity \u0026 Readability:** ✅ Using `std::array` for transactional updates before committing to `frame_params_` is safe and idiomatic.\n**Security:** ✅ Buffer bounds and array indices are strictly validated against `max_image_buffer_bytes` and `FP_CAPTURE_TYPE_MAX` before access.\n**Testing:** ✅ Excellent work adding the missing boundary test and the failure path tests for `get_info` and `num_types`. Boundary coverage is now comprehensive.\n**CL Size \u0026 Scope:** ✅ Size: M (+188, -45). Single logical change fixing atomicity and error paths in cache population, alongside accompanying unit tests.\n**Commit Message:** ✅ Accurately explains the issue and the applied fixes with proper formatting.\n\n[🔗](http://go/tj/ce9181fd-6564-4eb4-91ec-b9d6d52511b2)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b9b7ddd3dc165881a0005deaf2e62a2aa922e566",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "608aea30_be2cc65e",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-05T17:21:45Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Suggestion:** Since `populate_from_info()` also calls `frame_params_.fill({})` at the beginning, the cache is cleared twice on the happy path. You can safely remove this initial clear and just call it inside the `fp_sensor_get_info` failure block instead:\n\n```cpp\n\tif (fp_sensor_get_info(info) \u003c 0) {\n\t\tframe_params_.fill({});\n\t\tCPRINTS(\"ERROR - fp_sensor_get_info failed.\");\n\t\treturn;\n\t}\n```\n\n[🔗](http://go/tj/ce9181fd-6564-4eb4-91ec-b9d6d52511b2)",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b9b7ddd3dc165881a0005deaf2e62a2aa922e566",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
