@@ -46,7 +46,7 @@ static const struct ec_response_get_protocol_info expected_info[] = {
 	}
 };
 
-static void *fpsensor_setup_spi(void)
+static void *fpsensor_setup(void)
 {
 	hc = (struct ec_host_cmd *)ec_host_cmd_get_hc();
 
@@ -68,15 +68,10 @@ static uint8_t cal_checksum(const uint8_t *const buffer, const uint16_t size)
 	return (uint8_t)(-checksum);
 }
 
-ZTEST_SUITE(fp_transport_spi, NULL, fpsensor_setup_spi, NULL, NULL, NULL);
-
-/* SPI is a default HC backend. Issue a EC_CMD_GET_PROTOCOL_INFO command via
- * test backend to get protocol_info for SPI.
- */
-ZTEST(fp_transport_spi, test_fp_transport_spi)
+static void check_protocol_info(enum fp_transport_type transport_type)
 {
 	const struct ec_response_get_protocol_info *expected =
-		&expected_info[FP_TRANSPORT_TYPE_SPI];
+		&expected_info[transport_type];
 	struct ec_response_get_protocol_info *info;
 	struct ec_host_cmd_request_header header = {
 		.prtcl_ver = 3,
@@ -87,6 +82,8 @@ ZTEST(fp_transport_spi, test_fp_transport_spi)
 		.data_len = 0,
 	};
 	struct ec_host_cmd_response_header *response;
+
+	zassert_equal(get_fp_transport_type(), transport_type);
 
 	/* Prepare header to send. */
 	header.checksum = cal_checksum((uint8_t *)&header, sizeof(header));
@@ -110,14 +107,36 @@ ZTEST(fp_transport_spi, test_fp_transport_spi)
 	zassert_equal(info->protocol_versions, expected->protocol_versions);
 }
 
-ZTEST_SUITE(fp_transport_uart, NULL, NULL, NULL, NULL, NULL);
+ZTEST_SUITE(fp_transport_spi, NULL, fpsensor_setup, NULL, NULL, NULL);
 
-/* UART uses the same EC_CMD_GET_PROTOCOL_INFO HC handler as SPI. If the
- * output from the command if correct for SPI, it should be correct for UART as
- * well. It would be hard to replace already initialized HC backed (SPI).
+/* Issue an EC_CMD_GET_PROTOCOL_INFO command via test backend to get
+ * protocol_info for SPI.
+ */
+ZTEST(fp_transport_spi, test_fp_transport_spi)
+{
+	if (get_fp_transport_type() == FP_TRANSPORT_TYPE_UART) {
+		ztest_test_skip();
+		return;
+	}
+
+	check_protocol_info(FP_TRANSPORT_TYPE_SPI);
+}
+
+ZTEST_SUITE(fp_transport_uart, NULL, fpsensor_setup, NULL, NULL, NULL);
+
+/* When TRANSPORT_SEL is configured for UART prior to boot (e.g. in Renode),
+ * issue EC_CMD_GET_PROTOCOL_INFO via the test backend. When TRANSPORT_SEL is
+ * not toggled by the test runner (e.g. on hardware), SPI is initialized at
+ * boot, so the pre-existing fallback below verifies that UART backend init
+ * adjusts max packet sizes.
  */
 ZTEST(fp_transport_uart, test_fp_transport_uart)
 {
+	if (get_fp_transport_type() == FP_TRANSPORT_TYPE_UART) {
+		check_protocol_info(FP_TRANSPORT_TYPE_UART);
+		return;
+	}
+
 	const struct ec_response_get_protocol_info *expected =
 		&expected_info[FP_TRANSPORT_TYPE_UART];
 	struct ec_host_cmd_backend *backend_uart;
