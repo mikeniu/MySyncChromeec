@@ -51,7 +51,7 @@ static timestamp_t ts_begin_task;
 static bool motion_sense_task_status;
 
 /* Minimum time in between running motion sense task loop. */
-unsigned int motion_min_interval = CONFIG_MOTION_MIN_SENSE_WAIT_TIME * MSEC;
+int motion_min_interval = CONFIG_MOTION_MIN_SENSE_WAIT_TIME * MSEC;
 STATIC_IF(CONFIG_CMD_ACCEL_INFO) int accel_disp;
 
 #define SENSOR_ACTIVE(_sensor) (sensor_active & (_sensor)->active_mask)
@@ -1069,17 +1069,17 @@ void motion_sense_task(void *u)
 				wait_us = time_diff;
 		}
 
-		if (wait_us >= 0 && wait_us < motion_min_interval) {
-			/*
-			 * Guarantee some minimum delay to allow other lower
-			 * priority tasks to run.
-			 */
-			wait_us = motion_min_interval;
-		}
-
 		if (DISABLE_PM_POLICY_WHILE_WAITING(wait_us,
 						    fastest_collection_rate)) {
 			pm_policy_state_lock_get_all();
+		}
+		/*
+		 * Guarantee some minimum delay to allow other lower
+		 * priority tasks to run.
+		 */
+		k_usleep(motion_min_interval);
+		if (wait_us >= 0) {
+			wait_us = MAX(0, wait_us - motion_min_interval);
 		}
 		event = task_wait_event(wait_us);
 		if (DISABLE_PM_POLICY_WHILE_WAITING(wait_us,
