@@ -43,12 +43,6 @@ extern const struct host_command __hcmds_end[];
 extern const struct mkbp_event_source __mkbp_evt_srcs[];
 extern const struct mkbp_event_source __mkbp_evt_srcs_end[];
 
-/* IRQs (interrupt handlers) */
-extern const struct irq_priority __irqprio[];
-extern const struct irq_priority __irqprio_end[];
-extern const void *__irqhandler[];
-extern const struct irq_def __irq_data[], __irq_data_end[];
-
 /* Shared memory buffer.  Use via shared_mem.h interface. */
 extern char __shared_mem_buf[];
 
