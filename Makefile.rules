@@ -12,9 +12,6 @@ BUILD_DIR := $(firstword $(subst /, ,$(out)))
 # Create output directories if necessary
 _common_dir_create := $(foreach d,$(common_dirs) $(common-dirs-y),\
 	$(shell [ -d $(out)/$(d) ] || mkdir -p $(out)/$(d)))
-_dir_create := $(foreach d,$(dirs) $(dirs-y),\
-	$(shell [ -d $(out)/$(BLD)/$(d) ] || mkdir -p $(out)/RO/$(d); \
-	    mkdir -p $(out)/RW/$(d)))
 
 # V unset for normal output, V=1 for verbose output, V=0 for silent build
 # (warnings/errors only). Use echo thus: $(call echo,"stuff  to  echo")
@@ -56,26 +53,15 @@ export STATIC_VERSION
 # -MT explicitly sets target file name in generated .d files to work around
 #    a ccache issue.
 
-# commands to build all targets
-cmd_c_to_o = $(CC) -std=gnu11 $(C_WARN) $(C_WARN-$(CROSS_COMPILE_CC_NAME)) \
-		$(CFLAGS) -MMD -MP -MF $@.d -c $< \
-		-MT $(@D)/$(@F) -o $(@D)/$(@F)
-cmd_c_to_s = $(CC) -S $(C_WARN) $(CFLAGS) $(C_WARN-$(CROSS_COMPILE_CC_NAME)) \
-		-fno-lto -MMD -MP -MF $@.d -c $< \
-		-MT $(@D)/$(@F) -o $(@D)/$(@F)
-cmd_cxx_to_o = $(CXX) $(CFLAGS) $(CXXFLAGS) -MMD -MP -MF $@.d \
-		      -c $< -MT $(@D)/$(@F) -o $(@D)/$(@F)
+# commands to build host targets
 cmd_c_to_host = $(HOSTCC) $(HOST_CFLAGS) -MMD -MP -MF $@.d -MT $@ -o $@ \
-	         $(sort $(foreach c,$($(*F)-objs),util/$(c:%.o=%.c)) $(wildcard $*.c)) $(HOST_LDFLAGS)
+		$($(*F)-srcs) $(HOST_LDFLAGS)
 cmd_cxx_to_host = $(HOSTCXX) $(HOST_CXXFLAGS) \
 		-MMD -MP -MF $@.d -MT $@ -o $@ \
-		$(sort $(foreach c,$($(*F)-objs),util/$(c:%.o=%.cc)) $(wildcard $*.cc)) $(HOST_LDFLAGS)
-cmd_o_to_a = $(AR) rcs $@ $^
+		$($(*F)-srcs) $(HOST_LDFLAGS)
 # generate new version.h, compare if it changed and replace if so
 cmd_version = ./util/getversion.sh > $@.tmp && \
 	cmp -s $@.tmp $@ && rm -f $@.tmp || mv $@.tmp $@
-cmd_mv_from_tmp = mv $(out)/$*.bin.tmp $(out)/$*.bin
-cmd_copyrw-y = cd $(out) && cp RW/$(PROJECT).RW.flat RW/$(PROJECT).RW.bin
 
 cmd_cp_script = cp "$<" "$@" && chmod +x "$@"
 cmd_symlink_hdr = mkdir -p $(@D) && ln -srf $< $@
@@ -111,44 +97,6 @@ utils-host: $(host-utils) $(host-utils-cxx)
 utils-test: utils-host
 	@echo "======= running host utility unit tests"
 
-$(out)/%.bin: $(out)/%.obj
-	$(call quiet,obj_to_bin,OBJCOPY)
-	$(call quiet,copyrw-y,COPY_RW)
-	$(call quiet,mv_from_tmp,MV     )
-
-flat-y := $(out)/RW/$(PROJECT).RW.flat
-flat-$(CONFIG_FW_INCLUDE_RO) += $(out)/RO/$(PROJECT).RO.flat
-
-flat-$(CONFIG_DRAM_BASE) += $(out)/RW/$(PROJECT).RW.flat.dram
-
-$(out)/RO/%.o.cmd:%.c
-	$(file > $@,$(subst .o.cmd,.o,$(cmd_c_to_o)))
-$(out)/RO/%.o:%.c
-	$(call quiet,c_to_o,CC     )
-$(out)/RW/%.o:%.c
-	$(call quiet,c_to_o,CC     )
-
-$(out)/RO/%.s:%.c
-	$(call quiet,c_to_s,CC     )
-$(out)/RW/%.s:%.c
-	$(call quiet,c_to_s,CC     )
-
-$(out)/RO/%.o:%.cc
-	$(call quiet,cxx_to_o,CXX    )
-$(out)/RW/%.o:%.cc
-	$(call quiet,cxx_to_o,CXX    )
-
-$(out)/RO/%.o:%.S
-	$(call quiet,c_to_o,AS     )
-$(out)/RW/%.o:%.S
-	$(call quiet,c_to_o,AS     )
-
-# Default rules for archives, dependencies need to be fixes in build.mk
-$(out)/RO/%.a:
-	$(call quiet,o_to_a,AR     )
-$(out)/RW/%.a:
-	$(call quiet,o_to_a,AR     )
-
 # Conditionally force the rebuilding of ec_version.h only if it would be
 # changed.
 old_version_hash := $(shell cat $(out)/ec_version.h 2> /dev/null | md5sum -)
@@ -157,18 +105,6 @@ new_version_hash := $(shell BOARD=$(BOARD) ./util/getversion.sh | md5sum -)
 ifneq ($(old_version_hash),$(new_version_hash))
 .PHONY: $(out)/ec_version.h
 endif
-
-# All of the objects have an order only dependency on the ec_version header.
-# This ensures that if ec_version.h needs to be built (because it was marked
-# PHONY above) then it will be rebuilt before any objects.  This is important
-# because some source files will include ec_version.h and fail to compile if
-# it doesn't already exist.  This dependency shouldn't be a normal dependency
-# because that would cause every object to be rebuilt when ec_version.h
-# changes, instead of just the ones that actually depend on it.  The objects
-# that truly depend on ec_version.h will have that information encoded in their
-# .d file.
-$(ro-objs): | $(out)/ec_version.h
-$(rw-objs): | $(out)/ec_version.h
 
 $(out)/ec_version.h:
 	$(call quiet,version,VERSION)
@@ -188,10 +124,12 @@ $(out)/include/chromeos/ec/%: include/%
 $(out)/include/chromeos/ec/cros_ec_dev.h: util/cros_ec_dev.h
 	$(call quiet,symlink_hdr,SYMLINK)
 
-$(host-utils): $(out)/%:$(host-srcs) | $(chromeos-ec-headers)
+$(foreach u,$(host-util-bin-y),$(eval $(out)/util/$(u): $($(u)-srcs)))
+$(host-utils): $(out)/%: | $(chromeos-ec-headers) $(out)/ec_version.h
 	$(call quiet,c_to_host,HOSTCC )
 
-$(host-utils-cxx): $(out)/%:$(host-srcs-cxx) | $(chromeos-ec-headers)
+$(foreach u,$(host-util-bin-cxx-y),$(eval $(out)/util/$(u): $($(u)-srcs)))
+$(host-utils-cxx): $(out)/%: | $(chromeos-ec-headers) $(out)/ec_version.h
 	$(call quiet,cxx_to_host,HOSTCXX )
 
 .PHONY: clean
@@ -238,9 +176,6 @@ build_cros_ec_commands: $(out_cros_ec_commands)
 
 $(out_cros_ec_commands): include/ec_commands.h util/make_linux_ec_commands_h.sh
 	util/make_linux_ec_commands_h.sh $< $@
-
-# Pull in special rules/targets for third_party software
--include third_party/rules.mk
 
 .SECONDARY:
 
