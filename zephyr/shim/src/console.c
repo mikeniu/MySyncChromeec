@@ -427,8 +427,11 @@ void uart_flush_output(void)
 void uart_tx_flush(void)
 {
 #if defined(CONFIG_UART_INTERRUPT_DRIVEN)
-	while (!uart_irq_tx_complete(uart_shell_dev))
-		;
+	while (!uart_irq_tx_complete(uart_shell_dev)) {
+		if (k_can_yield()) {
+			k_msleep(1);
+		}
+	}
 #endif
 }
 
