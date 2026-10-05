@@ -59,6 +59,7 @@
 
 #define LIS2DH_CTRL4_ADDR 0x23
 #define LIS2DH_BDU_MASK 0x80
+#define LIS2DH_HR_MASK 0x08
 
 #define LIS2DH_CTRL5_ADDR 0x24
 #define LIS2DH_CTRL5_RESET_VAL 0x00
@@ -153,17 +154,23 @@ enum lis2dh_odr {
 #define LIS2DH_FS_TO_REG(_fs) (__fls(_fs) - 1)
 
 /*
- * Sensor resolution in number of bits
+ * Sensor resolution in number of bits.
  *
- * lis2dh has variable precision (8/10/12 bits) depending Power Mode
- * selected, here Only Normal Power mode supported (10 bits).
+ * At runtime, init() dynamically probes the HR bit (bit 3) of CTRL_REG4 to
+ * detect the sensor and set drvdata->resol:
+ * - LIS2DH supports 12-bit High Resolution mode (HR bit writable).
+ * - LIS2DE and LNG2DM only support 8-bit mode (HR bit read-only 0).
  *
- * lis2de/lng2dm only support 8bit resolution.
+ * LIS2DH_RESOLUTION provides the compile-time default / fallback used in
+ * unit tests.
  */
-#if defined(CONFIG_ACCEL_LIS2DE) || defined(CONFIG_ACCEL_LNG2DM)
-#define LIS2DH_RESOLUTION 8
-#elif defined(CONFIG_ACCEL_LIS2DH)
-#define LIS2DH_RESOLUTION 10
+#define LIS2DH_RESOLUTION_12 12
+#define LIS2DH_RESOLUTION_8 8
+
+#if defined(CONFIG_ACCEL_LIS2DH)
+#define LIS2DH_RESOLUTION LIS2DH_RESOLUTION_12
+#else
+#define LIS2DH_RESOLUTION LIS2DH_RESOLUTION_8
 #endif
 
 /** Maximum possible sample */
