@@ -19,6 +19,7 @@
 #include "cros/dsp/client.h"
 #include "cros_board_info.h"
 #include "hooks.h"
+#include "lid_switch.h"
 #include "proto/ec_dsp.pb.h"
 #include "pw_assert/check.h"
 #include "pw_transport/proto/transport.pb.h"
@@ -206,6 +207,8 @@ class DspComms : public ::testing::Test {
 
   void TearDown() override {
     gpio_remove_callback_dt(&kServiceInterruptSpec, &gpio_callbacks_);
+    tablet_reset();
+    k_msleep(DSP_SERVICE_MODE_HANDLE_DELAY_MS * 5);
   }
 
   void ClearTransport() {
@@ -512,6 +515,66 @@ TEST_F(DspComms, DspServiceTabletMode) {
 
   // Verify that mode_val is set to 1
   ASSERT_EQ(1, cros::dsp::service::driver.get_mode_val());
+}
+
+TEST_F(DspComms, DspServiceNotebookModeWhileLidClosed) {
+  // Remove the GPIO callbacks to prevent spontaneous client interrupt
+  // processing from colliding with manual service requests over the shared I2C
+  // bus.
+  gpio_remove_callback_dt(&kServiceInterruptSpec, &gpio_callbacks_);
+  ClearTransport();
+
+  // Ensure lid is initially open
+  gpio_emul_input_set(kLidOpenInterruptSpec.port, kLidOpenInterruptSpec.pin, 1);
+  k_msleep(100);
+  hook_notify(HOOK_LID_CHANGE);
+  ASSERT_TRUE(lid_is_open());
+
+  // Enter tablet mode first
+  cros_dsp_comms_EcService tablet_service = {
+      .which_request = cros_dsp_comms_EcService_notify_notebook_mode_change_tag,
+      .request =
+          {
+              .notify_notebook_mode_change =
+                  {
+                      .new_mode =
+                          cros_dsp_comms_NotebookMode_NOTEBOOK_MODE_TABLET,
+                  },
+          },
+  };
+  ASSERT_EQ(0, SendServiceRequest(tablet_service));
+  ASSERT_EQ(1, cros::dsp::service::driver.get_mode_val());
+  k_msleep(DSP_SERVICE_MODE_HANDLE_DELAY_MS * 5);
+  ASSERT_EQ(1, tablet_get_mode());
+
+  // Simulate lid closing rapidly
+  gpio_emul_input_set(kLidOpenInterruptSpec.port, kLidOpenInterruptSpec.pin, 0);
+  k_msleep(100);
+  hook_notify(HOOK_LID_CHANGE);
+  ASSERT_FALSE(lid_is_open());
+
+  // Send notebook mode change while lid is closed
+  cros_dsp_comms_EcService notebook_service = {
+      .which_request = cros_dsp_comms_EcService_notify_notebook_mode_change_tag,
+      .request =
+          {
+              .notify_notebook_mode_change =
+                  {
+                      .new_mode =
+                          cros_dsp_comms_NotebookMode_NOTEBOOK_MODE_NOTEBOOK,
+                  },
+          },
+  };
+  ASSERT_EQ(0, SendServiceRequest(notebook_service));
+  ASSERT_EQ(0, cros::dsp::service::driver.get_mode_val());
+
+  k_msleep(DSP_SERVICE_MODE_HANDLE_DELAY_MS * 5);
+  ASSERT_EQ(0, tablet_get_mode());
+
+  // Restore lid open state
+  gpio_emul_input_set(kLidOpenInterruptSpec.port, kLidOpenInterruptSpec.pin, 1);
+  k_msleep(100);
+  hook_notify(HOOK_LID_CHANGE);
 }
 
 }  // namespace
