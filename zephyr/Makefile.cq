@@ -83,6 +83,7 @@ test: $(BUILD)/zephyr/lcov_no_tests.info # ALL_FILTERED
 test: special_boards_info # BOARD_ metric info files only
 else
 test: twister_host twister_llvm twister_coreboot_sdk zephyr_check_compliance_unittest
+test: run_device_tests_unittest
 endif
 
 ifdef COVERAGE
@@ -99,6 +100,10 @@ test_host_utils:
 
 zephyr_check_compliance_unittest:
 	$(PLATFORM_EC)/util/zephyr_check_compliance_unittest.py
+
+.PHONY: run_device_tests_unittest
+run_device_tests_unittest:
+	$(PLATFORM_EC)/test/run_device_tests_unittest.py
 
 twister_host $(PLATFORM_EC)/twister-out-host/coverage.info: TOOLCHAIN=host/gnu
 twister_host $(PLATFORM_EC)/twister-out-host/coverage.info: TOOLCHAIN_PATH=host
