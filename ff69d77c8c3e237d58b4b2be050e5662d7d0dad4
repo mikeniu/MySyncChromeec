@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c186fa3_bd0aadab",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 769,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-05T19:35:12Z",
+      "side": 1,
+      "message": "Do you want to add to the special boards or replace them?",
+      "range": {
+        "startLine": 769,
+        "startChar": 12,
+        "endLine": 769,
+        "endChar": 25
+      },
+      "revId": "ff69d77c8c3e237d58b4b2be050e5662d7d0dad4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
