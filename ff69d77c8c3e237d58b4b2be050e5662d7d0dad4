@@ -22,6 +22,31 @@
       },
       "revId": "ff69d77c8c3e237d58b4b2be050e5662d7d0dad4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80b1d653_01a5d78d",
+        "filename": "zephyr/firmware_builder.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 769,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-05T20:05:07Z",
+      "side": 1,
+      "message": "Replaced SPECIAL_BOARDS with the specified --firmware-targets boards in PS 5 so make only requires coverage info for the targeted boards.",
+      "parentUuid": "7c186fa3_bd0aadab",
+      "range": {
+        "startLine": 769,
+        "startChar": 12,
+        "endLine": 769,
+        "endChar": 25
+      },
+      "isAi": true,
+      "revId": "ff69d77c8c3e237d58b4b2be050e5662d7d0dad4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
