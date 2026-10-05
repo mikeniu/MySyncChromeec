@@ -244,8 +244,17 @@ bool cros::dsp::service::Driver::AttemptToDecode() {
 
 void cros::dsp::service::Driver::SetNotebookMode(
     cros_dsp_comms_NotebookMode mode) {
-  // Bail if tablet mode is not enabled or if the lid isn't open.
-  if (!IS_ENABLED(CONFIG_PLATFORM_EC_TABLET_MODE) || !lid_is_open()) {
+  if (!IS_ENABLED(CONFIG_PLATFORM_EC_TABLET_MODE)) {
+    return;
+  }
+  /*
+   * Only bail if attempting to enter tablet mode while the lid is closed.
+   * Transitioning to clamshell mode must always be allowed, even if the lid
+   * is closed, so the EC and ISH stay in sync if the lid was closed rapidly
+   * from tablet mode.
+   */
+  if (mode == cros_dsp_comms_NotebookMode_NOTEBOOK_MODE_TABLET &&
+      !lid_is_open()) {
     return;
   }
   switch (mode) {
