@@ -558,7 +558,6 @@ class Renode(Platform):
         # bloonchipper Zephyr tests to skip on Renode.
         if zephyr and test_name in [
             "benchmark",  # TODO(b/390253975)
-            "fp_transport",  # TODO(b/398038192)
             "zephyr_flash_stm32f4",  # TODO(b/384974228)
             # TODO(b/384975384)
             "zephyr_counter_basic_api_stm32_subsec",
@@ -1394,7 +1393,8 @@ SANOK_CONFIG = BoardConfig(
     architecture=Architecture.RISCV,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
-    reboot_timeout=3.0,
+    # TODO(b/410057326): use polling instead of hardcoded timeout
+    reboot_timeout=5.0,
     # TODO(b/468406461): configure rollback regex.
     rollback_region0_regex=NEVER_MATCH_REGEX,
     rollback_region1_regex=NEVER_MATCH_REGEX,
