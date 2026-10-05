@@ -1057,7 +1057,8 @@ void motion_sense_task(void *u)
 
 			time_diff = max(time_until(ts_end_task.le.lo,
 						   sensor->next_collection),
-					ec_rate);
+					ec_rate) -
+				    motion_min_interval;
 
 			/* We missed our collection time so wake soon */
 			if (time_diff <= 0) {
@@ -1069,18 +1070,15 @@ void motion_sense_task(void *u)
 				wait_us = time_diff;
 		}
 
-		if (wait_us >= 0 && wait_us < motion_min_interval) {
-			/*
-			 * Guarantee some minimum delay to allow other lower
-			 * priority tasks to run.
-			 */
-			wait_us = motion_min_interval;
-		}
-
 		if (DISABLE_PM_POLICY_WHILE_WAITING(wait_us,
 						    fastest_collection_rate)) {
 			pm_policy_state_lock_get_all();
 		}
+		/*
+		 * Guarantee some minimum delay to allow other lower
+		 * priority tasks to run.
+		 */
+		k_usleep(motion_min_interval);
 		event = task_wait_event(wait_us);
 		if (DISABLE_PM_POLICY_WHILE_WAITING(wait_us,
 						    fastest_collection_rate)) {
