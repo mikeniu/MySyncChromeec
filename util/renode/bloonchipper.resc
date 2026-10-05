@@ -30,4 +30,7 @@ macro reset
     cpu VectorTableOffset 0x8000000
 """
 
+include $ORIGIN/fpsensor.py
+RegisterFpSensor spi2 $name
+
 runMacro $reset
