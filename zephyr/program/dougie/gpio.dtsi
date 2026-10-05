@@ -1,0 +1,191 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/ {
+	aliases {
+		gpio-wp = &gpio_ec_wp_od;
+	};
+
+	named-gpios {
+		compatible = "named-gpios";
+
+		/* The legacy system code requires GPIO_ENTERING_RW symbol */
+		gpio_ec_entering_rw: ec_entering_rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+
+		gpio_ec_ap_dp_hpd: ec_ap_dp_hpd {
+			gpios = <&gpiof 3 (GPIO_OUTPUT_LOW | GPIO_VOLTAGE_1P8)>;
+			enum-name = "GPIO_USB_C0_DP_HPD";
+		};
+
+		gpio_ec_kso_02_inv: ec_kso_02_inv {
+			gpios = <&gpioksol 2 GPIO_OUTPUT_HIGH>;
+		};
+	};
+
+	unused-pins {
+		compatible = "unused-gpios";
+		unused-gpios =
+			/* EC_VOLDN_BTN_ODL (R8241 ns) */
+			<&gpioa 0 GPIO_INPUT_PULL_DOWN>,
+			/* KB_BL_PWM */
+			<&gpioa 1 GPIO_OUTPUT_LOW>,
+			/* EC_FAN_PWM */
+			<&gpioa 5 GPIO_INPUT_PULL_DOWN>,
+			/* NC */
+			<&gpioa 6 GPIO_INPUT_PULL_DOWN>,
+			/* EC_VOLUP_BTN_ODL (R8226 ns) */
+			<&gpioa 7 GPIO_INPUT_PULL_DOWN>,
+			/* NC */
+			<&gpiob 2 GPIO_INPUT_PULL_DOWN>,
+			/* TABLET_MODE_L */
+			<&gpiod 1 GPIO_INPUT_PULL_DOWN>,
+			/* EC_FAN_TACH_OD */
+			<&gpiod 6 GPIO_INPUT_PULL_DOWN>,
+			/* EC_PMIC_ACOK (external 100k PD) */
+			<&gpioe 3 (GPIO_INPUT_PULL_DOWN | GPIO_VOLTAGE_1P8)>,
+			/* NC */
+			<&gpiof 4 GPIO_INPUT_PULL_DOWN>,
+			/* NC */
+			<&gpiof 7 GPIO_INPUT_PULL_DOWN>,
+			/* EC_KB_BL_EN */
+			<&gpiog 1 GPIO_OUTPUT_LOW>,
+			/* NC */
+			<&gpiog 4 GPIO_INPUT_PULL_DOWN>,
+			/* EN_PP5000_USBA_VBUS */
+			<&gpiog 5 GPIO_OUTPUT_LOW>,
+			/* EN_PP5000_FAN */
+			<&gpiog 7 GPIO_OUTPUT_LOW>,
+			/* NC */
+			<&gpioh 0 (GPIO_INPUT_PULL_DOWN | GPIO_VOLTAGE_1P8)>,
+			/* NC */
+			<&gpioh 1 GPIO_INPUT_PULL_DOWN>,
+			/* NC */
+			<&gpioh 2 GPIO_INPUT_PULL_DOWN>,
+			/* NC */
+			<&gpioh 5 GPIO_INPUT_PULL_DOWN>,
+			/* NC */
+			<&gpioh 6 GPIO_INPUT_PULL_DOWN>,
+			/* AP_EC_RSVD_M2 */
+			<&gpiom 2 (GPIO_INPUT_PULL_DOWN | GPIO_VOLTAGE_1P8)>,
+			/* EC_GPM3 */
+			<&gpiom 3 (GPIO_INPUT_PULL_DOWN | GPIO_VOLTAGE_1P8)>;
+	};
+};
+
+/* 1.8V Sensor, Power Sequencing & SoC status inputs */
+&gpio_imu_int_ec_l {
+	gpios = <&gpiod 2 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_lid_accel_int_l {
+	gpios = <&gpiod 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_ec_l18b_pwr_detect {
+	gpios = <&gpiof 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_sys_in_suspend_l {
+	gpios = <&gpiof 1 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_ec_s1b_pwr_detect {
+	gpios = <&gpiof 2 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+	enum-name = "GPIO_POWER_GOOD";
+};
+
+&gpio_ap_ec_sysrst_l {
+	gpios = <&gpioh 3 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_sm_ps_hold {
+	gpios = <&gpioh 4 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_ec_pmic_fault_l {
+	gpios = <&gpioj 3 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_sys_rst_odl {
+	gpios = <&gpioj 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+	enum-name = "GPIO_WARM_RESET_L";
+};
+
+/* Power sequencing & system outputs with explicit initial levels */
+&gpio_ec_pmf1010h_en_r {
+	gpios = <&gpiob 6 GPIO_OUTPUT_LOW>;
+};
+
+/* Alias used by board_set_switchcap_power() in src/switchcap.c */
+gpio_ec_en_vph_pwr_1a: &gpio_ec_pmf1010h_en_r {};
+
+&gpio_ec_bl_en_od {
+	gpios = <&gpioc 6 GPIO_ODR_HIGH>;
+	enum-name = "GPIO_ENABLE_BACKLIGHT";
+};
+
+&gpio_en_slp_z {
+	gpios = <&gpiod 4 GPIO_OUTPUT_LOW>;
+};
+
+&gpio_ec_gsc_packet_mode_en {
+	gpios = <&gpiod 7 GPIO_OUTPUT_LOW>;
+	enum-name = "GPIO_PACKET_MODE_EN";
+};
+
+&gpio_ec_en_pp3300_s3 {
+	gpios = <&gpioe 6 GPIO_OUTPUT_LOW>;
+};
+
+&gpio_ec_en_pwrmon_odl {
+	gpios = <&gpiof 6 GPIO_ODR_HIGH>;
+};
+
+&gpio_en_pp5000_z1 {
+	gpios = <&gpiog 3 GPIO_OUTPUT_LOW>;
+};
+
+&gpio_ec_pmic_kpd_pwr {
+	gpios = <&gpioj 0 GPIO_OUTPUT_LOW>;
+};
+
+&gpio_ec_pmic_resin {
+	gpios = <&gpioj 1 GPIO_OUTPUT_LOW>;
+};
+
+&gpio_ec_edl_en_odl {
+	gpios = <&gpioj 4 GPIO_ODR_HIGH>;
+};
+
+&gpio_en_pp5000_hdmi_s0 {
+	gpios = <&gpioj 6 GPIO_OUTPUT_LOW>;
+};
+
+&gpio_dp_aux_path_sel {
+	gpios = <&gpioj 7 GPIO_OUTPUT_HIGH>;
+};
+
+/* AP SPI & interrupt pins (1.8V VCC domain) */
+&gpio_spi_ap_do_ec_di {
+	gpios = <&gpiom 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_spi_ap_di_ec_do {
+	gpios = <&gpiom 1 (GPIO_OUTPUT_LOW | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_spi_ap_ec_sck {
+	gpios = <&gpiom 4 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_spi_ap_ec_cs_l {
+	gpios = <&gpiom 5 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
+};
+
+&gpio_ec_ap_int_odl {
+	gpios = <&gpiom 6 (GPIO_ODR_HIGH | GPIO_VOLTAGE_1P8)>;
+};
