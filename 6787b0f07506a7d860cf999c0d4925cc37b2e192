@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d28f890d_f81b7b97",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-10-05T07:39:02Z",
+      "side": 1,
+      "message": "It has been discussed in b/403467505#comment48",
+      "parentUuid": "3bf83fb0_3cd4f343",
+      "range": {
+        "startLine": 10,
+        "startChar": 59,
+        "endLine": 12,
+        "endChar": 18
+      },
+      "revId": "6787b0f07506a7d860cf999c0d4925cc37b2e192",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d1d3bc10_dff5126f",
         "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
         "patchSetId": 2
@@ -37,6 +61,30 @@
       "writtenOn": "2026-08-21T17:49:30Z",
       "side": 1,
       "message": "Include `rv` in the log message and then return `rv` (and below)",
+      "range": {
+        "startLine": 655,
+        "startChar": 2,
+        "endLine": 656,
+        "endChar": 14
+      },
+      "revId": "6787b0f07506a7d860cf999c0d4925cc37b2e192",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e207011e_117693cb",
+        "filename": "zephyr/drivers/usbc/pdc_tps6699x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 1529538
+      },
+      "writtenOn": "2026-10-05T07:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1d3bc10_dff5126f",
       "range": {
         "startLine": 655,
         "startChar": 2,
