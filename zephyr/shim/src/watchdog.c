@@ -238,9 +238,11 @@ __maybe_unused static void wdt_warning_handler(const struct device *wdt_dev,
 	struct k_thread *thread = k_current_get();
 
 #ifdef CONFIG_RISCV
-	exception_address = csr_read(mepc);
-	printk("WDT pre-warning MEPC:%p THREAD:%p THREAD_NAME:%s\n",
-	       (void *)exception_address, (void *)thread, thread_name);
+	struct arch_esf *esf = (struct arch_esf *)get_stack_ptr(thread);
+
+	exception_address = esf->mepc;
+	printk("WDT pre-warning MEPC:%p RA:%p THREAD:%p THREAD_NAME:%s\n",
+	       (void *)esf->mepc, (void *)esf->ra, (void *)thread, thread_name);
 #elif CONFIG_CPU_CORTEX_M
 	struct arch_esf *esf;
 	/*
