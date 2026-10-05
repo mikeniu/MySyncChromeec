@@ -7066,7 +7066,7 @@ int cmd_panic_log(int argc, char *argv[])
 	} else if (!strcmp(argv[1], "dump")) {
 		char *response = (char *)ec_inbuf;
 		int response_max;
-		struct ec_params_panic_log_read read_params;
+		struct ec_params_panic_log_read read_params = {};
 		struct ec_response_get_protocol_info protocol_info_response;
 
 		/* Determine the max response packet size */
@@ -7078,6 +7078,12 @@ int cmd_panic_log(int argc, char *argv[])
 			return rv;
 		}
 		response_max = protocol_info_response.max_response_packet_size;
+		/*
+		 * ec_inbuf was sized from an earlier GET_PROTOCOL_INFO query;
+		 * never let the EC's second answer exceed that allocation.
+		 */
+		if (response_max > ec_max_insize)
+			response_max = ec_max_insize;
 
 		info_params.freeze = 1;
 		rv = ec_command(EC_CMD_PANIC_LOG_INFO, 0, &info_params,
@@ -7098,7 +7104,7 @@ int cmd_panic_log(int argc, char *argv[])
 				fprintf(stderr, "Error reading panic log\n");
 				return rv;
 			}
-			if (response_size == 0)
+			if (response_size == 0 || response_size >= response_max)
 				break;
 			/* Ensure null terminated */
 			response[response_size] = '\0';
