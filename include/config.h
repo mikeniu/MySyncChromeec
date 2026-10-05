@@ -2748,11 +2748,6 @@
 		EC_CMD_GET_UPTIME_INFO
 
 /*****************************************************************************/
-
-/* Enable debugging and profiling statistics for hook functions */
-#undef CONFIG_HOOK_DEBUG
-
-/*****************************************************************************/
 /* CRC configuration */
 
 /* Enable the hardware accelerator for CRC computation */
