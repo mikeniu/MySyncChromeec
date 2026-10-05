@@ -20,11 +20,6 @@ host-util-bin-cxx-y += itecomdbgr
 host-util-bin-cxx-y += cbi-util
 
 host-util-bin-cxx-y += rtkupdate
-build-util-art-y += util/export_taskinfo.so
-
-build-util-bin-$(CHIP_NPCX) += ecst
-host-util-bin-cxx-$(BOARD_NOCTURNE_FP) += ectool_servo
-
 host-util-bin-cxx-y += uartupdatetool
 uartupdatetool-objs=uut/main.o uut/cmd.o uut/opr.o uut/l_com_port.o \
 	uut/lib_crc.o
@@ -43,8 +38,6 @@ endif
 
 include util/egis/build.mk
 include util/focaltech/build.mk
-
-
 include util/elan/build.mk
 
 comm-objs=$(util-lock-objs:%=lock/%) comm-host.o comm-dev.o
@@ -62,40 +55,9 @@ ectool-objs+=../common/crc.o
 lbplay-objs=lbplay.o $(comm-objs)
 $(out)/util/lbplay: HOST_LDFLAGS+=$(LIBFTDIUSB_HOST_LDLIBS)
 
-util/ectool.cc: $(out)/ec_version.h
 $(out)/util/ectool: HOST_LDFLAGS+=$(LIBEC_HOST_LDLIBS)
 
 ec_parse_panicinfo-objs=ec_parse_panicinfo.o
 $(out)/util/ec_parse_panicinfo: HOST_LDFLAGS+=$(LIBEC_HOST_LDLIBS)
-
-# USB type-C Vendor Information File generation
-ifeq ($(CONFIG_USB_POWER_DELIVERY),y)
-
-STANDALONE_FLAGS=-ffreestanding -fno-builtin -nostdinc \
-			-Ibuiltin/ -D"__keep= " -DVIF_BUILD=$(EMPTY)
-$(out)/util/%/usb_pd_policy.o: %/usb_pd_policy.c
-	-@ mkdir -p $(@D)
-$(out)/util/%/usb_pd_pdo.o: %/usb_pd_pdo.c
-	-@ mkdir -p $(@D)
-$(out)/common/usb_common.o: common/usb_common.c
-	-@ mkdir -p $(@D)
-$(out)/common/usb_pd_pdo.o: common/usb_pd_pdo.c
-	-@ mkdir -p $(@D)
-endif # CONFIG_USB_POWER_DELIVERY
-
-ifneq ($(CONFIG_BOOTBLOCK),)
-build-util-bin-y += gen_emmc_transfer_data
-
-# Bootblock is only packed in RO image.
-$(out)/util/gen_emmc_transfer_data: BUILD_LDFLAGS += -DCONFIG_CROS_EC_RO=1
-endif # CONFIG_BOOTBLOCK
-
-ifneq ($(CONFIG_IPI),)
-build-util-bin-y += gen_ipi_table
-
-$(out)/util/gen_ipi_table: board/$(BOARD)/board.h
-$(out)/ipi_table_gen.inc: $(out)/util/gen_ipi_table
-	$(call quiet,ipi_table,IPITBL )
-endif
 
 cbi-util-objs=../common/crc8.o ../common/cbi.o
