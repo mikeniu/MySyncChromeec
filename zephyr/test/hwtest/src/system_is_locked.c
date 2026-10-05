@@ -7,6 +7,7 @@
 #include "flash.h"
 #include "multistep_test.h"
 #include "system.h"
+#include "wp_external.h"
 #include "write_protect.h"
 
 #include <zephyr/ztest.h>
@@ -106,6 +107,23 @@ ZTEST(system_is_locked_wp_off, test_system_is_locked)
 			 "Please disable CONFIG_WP_ALWAYS before "
 			 "running this test\n");
 		zassert_unreachable();
+	}
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_WP_EXTERNAL)) {
+		/*
+		 * Boards with CONFIG_PLATFORM_EC_WP_EXTERNAL (such as USB FPMCU
+		 * modules) do not have a hardware WP GPIO pin; WP state is
+		 * tracked in RAM (zephyr/drivers/wp/wp_external.c) and defaults
+		 * to asserted on boot until unlocked via
+		 * disable_write_protect_external().
+		 *
+		 * Because system_is_locked_wp_off and system_is_locked_wp_on
+		 * require opposite board-level WP states, run_device_tests.py
+		 * always flashes/boots the MCU separately for each TestConfig
+		 * and invokes a single suite per boot via 'ztest run-testcase
+		 * system_is_locked_wp_off' or 'ztest run-testcase
+		 * system_is_locked_wp_on' (never 'ztest run-all').
+		 */
+		disable_write_protect_external();
 	}
 	test_pre_check();
 	write_protect_enabled = false;
