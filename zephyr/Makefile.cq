@@ -84,6 +84,7 @@ test: special_boards_info # BOARD_ metric info files only
 else
 test: twister_host twister_llvm twister_coreboot_sdk zephyr_check_compliance_unittest
 test: run_device_tests_unittest
+test: fpsensor_unittest
 endif
 
 ifdef COVERAGE
@@ -104,6 +105,10 @@ zephyr_check_compliance_unittest:
 .PHONY: run_device_tests_unittest
 run_device_tests_unittest:
 	$(PLATFORM_EC)/test/run_device_tests_unittest.py
+
+.PHONY: fpsensor_unittest
+fpsensor_unittest:
+	$(PLATFORM_EC)/util/renode/fpsensor_unittest.py
 
 twister_host $(PLATFORM_EC)/twister-out-host/coverage.info: TOOLCHAIN=host/gnu
 twister_host $(PLATFORM_EC)/twister-out-host/coverage.info: TOOLCHAIN_PATH=host
