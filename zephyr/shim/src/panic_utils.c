@@ -93,6 +93,18 @@ uint32_t get_stack_ptr(const struct k_thread *thread)
 	return thread->callee_saved.esp;
 #endif
 #elif defined(CONFIG_RISCV)
+	if (thread == k_current_get() && k_is_in_isr()) {
+		/*
+		 * On RISC-V, _isr_wrapper pushes struct arch_esf onto the
+		 * interrupted thread's stack, switches to the CPU interrupt
+		 * stack, and stores the interrupted thread's SP at the top
+		 * of the interrupt stack (irq_stack - 16).
+		 */
+		uintptr_t *irq_sp =
+			(uintptr_t *)(_kernel.cpus[0].irq_stack - 16);
+
+		return (uint32_t)*irq_sp;
+	}
 	return thread->callee_saved.sp;
 #elif defined(CONFIG_ARCH_POSIX)
 	return (uint32_t)thread->callee_saved.thread_status;
