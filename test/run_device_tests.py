@@ -309,6 +309,7 @@ class Platform(ABC):
         test_name: str,
         enable_hw_write_protect: bool,
         zephyr: bool,
+        host_interfaces: Optional[set[HostInterface]] = None,
     ) -> bool:
         """Flash specified test to specified board."""
 
@@ -384,6 +385,7 @@ class Hardware(Platform):
         test_name: str,
         enable_hw_write_protect: bool,
         zephyr: bool,
+        host_interfaces: Optional[set[HostInterface]] = None,
     ) -> bool:
         logging.info("Flashing test")
 
@@ -452,6 +454,7 @@ class Renode(Platform):
         test_name: str,
         enable_hw_write_protect: bool,
         zephyr: bool,
+        host_interfaces: Optional[set[HostInterface]] = None,
     ) -> bool:
         if self.process:
             self.cleanup()
@@ -480,6 +483,12 @@ class Renode(Platform):
 
         if enable_hw_write_protect:
             cmd.append("--enable-write-protect")
+
+        if host_interfaces:
+            if HostInterface.SPI in host_interfaces:
+                cmd.extend(["--transport", HostInterface.SPI.value])
+            elif HostInterface.UART in host_interfaces:
+                cmd.extend(["--transport", HostInterface.UART.value])
 
         env = os.environ.copy()
         env["XDG_CONFIG_HOME"] = self._env_dir
@@ -2039,6 +2048,7 @@ def flash_and_run_test(
             test.test_name,
             test.enable_hw_write_protect,
             args.zephyr,
+            test.host_interfaces,
         ):
             logging.debug("Flashing failed")
             return False
