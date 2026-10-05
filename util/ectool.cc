@@ -9534,10 +9534,49 @@ static void cmd_cbi_help(char *cmd)
 		"    <value/string> is an integer or a string to be set\n"
 		"    <*> is unused but must be present (e.g. '0')\n"
 		"    <hex> is a hex string\n"
-		"    [get_flag] is combination of:\n"
-		"      01b: Invalidate cache and reload data from EEPROM\n"
-		"    [set_flag] is combination of:\n"
-		"      10b: Set all fields to defaults first\n");
+		"    [get_flag] is one of (or numeric value):\n"
+		"      none (0): Do not reload from EEPROM\n"
+		"      reload (01b): Invalidate cache and reload data from EEPROM\n"
+		"    [set_flag] is one of (or numeric value):\n"
+		"      none (0): Default\n"
+		"      nosync (01b): Obsolete no-sync flag\n"
+		"      init (10b): Set all fields to defaults first\n");
+}
+
+static int parse_cbi_get_flag(const char *arg, uint32_t *flag)
+{
+	char *e;
+
+	if (!strcasecmp(arg, "none")) {
+		*flag = 0;
+		return 0;
+	}
+	if (!strcasecmp(arg, "reload")) {
+		*flag = CBI_GET_RELOAD;
+		return 0;
+	}
+	*flag = strtol(arg, &e, 0);
+	return (e && *e) ? -1 : 0;
+}
+
+static int parse_cbi_set_flag(const char *arg, uint32_t *flag)
+{
+	char *e;
+
+	if (!strcasecmp(arg, "none")) {
+		*flag = 0;
+		return 0;
+	}
+	if (!strcasecmp(arg, "nosync")) {
+		*flag = CBI_SET_NO_SYNC;
+		return 0;
+	}
+	if (!strcasecmp(arg, "init")) {
+		*flag = CBI_SET_INIT;
+		return 0;
+	}
+	*flag = strtol(arg, &e, 0);
+	return (e && *e) ? -1 : 0;
 }
 
 /*
@@ -9569,12 +9608,9 @@ static int cmd_cbi(int argc, char *argv[])
 		struct ec_params_get_cbi p = { 0 };
 
 		p.tag = tag;
-		if (argc > 3) {
-			p.flag = strtol(argv[3], &e, 0);
-			if (e && *e) {
-				fprintf(stderr, "Bad flag\n");
-				return -1;
-			}
+		if (argc > 3 && parse_cbi_get_flag(argv[3], &p.flag)) {
+			fprintf(stderr, "Bad flag\n");
+			return -1;
 		}
 		rv = ec_command(EC_CMD_GET_CROS_BOARD_INFO, 0, &p, sizeof(p),
 				ec_inbuf, ec_max_insize);
@@ -9702,12 +9738,9 @@ static int cmd_cbi(int argc, char *argv[])
 		free(buf);
 		val_ptr = NULL;
 		p->size = size;
-		if (argc > 5) {
-			p->flag = strtol(argv[5], &e, 0);
-			if (e && *e) {
-				fprintf(stderr, "Bad flag\n");
-				return -1;
-			}
+		if (argc > 5 && parse_cbi_set_flag(argv[5], &p->flag)) {
+			fprintf(stderr, "Bad flag\n");
+			return -1;
 		}
 		rv = ec_command(EC_CMD_SET_CROS_BOARD_INFO, 0, p,
 				sizeof(*p) + size, NULL, 0);
@@ -9727,12 +9760,9 @@ static int cmd_cbi(int argc, char *argv[])
 
 		p.tag = tag;
 		p.size = 0;
-		if (argc > 3) {
-			p.flag = strtol(argv[3], &e, 0);
-			if (e && *e) {
-				fprintf(stderr, "Bad flag\n");
-				return -1;
-			}
+		if (argc > 3 && parse_cbi_set_flag(argv[3], &p.flag)) {
+			fprintf(stderr, "Bad flag\n");
+			return -1;
 		}
 		rv = ec_command(EC_CMD_SET_CROS_BOARD_INFO, 0, &p, sizeof(p),
 				NULL, 0);
