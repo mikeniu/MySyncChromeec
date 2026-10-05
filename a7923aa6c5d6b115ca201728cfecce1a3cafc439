@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "234b968a_9ffe007d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-05T16:30:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b17485e0_b8fcd8af",
+      "revId": "a7923aa6c5d6b115ca201728cfecce1a3cafc439",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "489da830_df9fed9f",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a7923aa6c5d6b115ca201728cfecce1a3cafc439",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e95d566_c5294273",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-05T16:30:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "489da830_df9fed9f",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 100,
+        "endChar": 9999
+      },
       "revId": "a7923aa6c5d6b115ca201728cfecce1a3cafc439",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -70,6 +112,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79dc2044_c69e8448",
+        "filename": "zephyr/test/fingerprint/task/include/fpsensor_test_utils.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-05T16:30:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57cbb41e_27150e93",
+      "range": {
+        "startLine": 196,
+        "startChar": 0,
+        "endLine": 203,
+        "endChar": 9999
+      },
+      "revId": "a7923aa6c5d6b115ca201728cfecce1a3cafc439",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa8f7311_f2101a42",
@@ -91,6 +157,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "a7923aa6c5d6b115ca201728cfecce1a3cafc439",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2c4a90b_dd016c0a",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_image_frame_params.cc",
+        "patchSetId": 2
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-05T16:30:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa8f7311_f2101a42",
+      "range": {
+        "startLine": 250,
+        "startChar": 0,
+        "endLine": 264,
+        "endChar": 9999
+      },
       "revId": "a7923aa6c5d6b115ca201728cfecce1a3cafc439",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
