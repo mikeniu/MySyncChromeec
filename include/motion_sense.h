@@ -292,7 +292,7 @@ extern const unsigned int motion_sensor_count;
 extern const struct motion_sensor_t *motion_als_sensors[];
 
 /* optionally defined at board level */
-extern unsigned int motion_min_interval;
+extern int motion_min_interval;
 
 /*
  * Priority of the motion sense resume/suspend hooks, to be sure associated
