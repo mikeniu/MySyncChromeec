@@ -29,8 +29,11 @@ from scripts.firmware_builder_lib import (
     get_safe_lcov_workers as _get_safe_lcov_workers,
 )
 from scripts.firmware_builder_lib import find_checkout
+from scripts.firmware_builder_lib import merge_shard_coverage_reports
 from scripts.firmware_builder_lib import prepare_codebase
 from scripts.firmware_builder_lib import restore_codebase
+from scripts.firmware_builder_lib import save_or_load_shard_info
+from scripts.firmware_builder_lib import shard_projects
 
 
 # Add the zmake dir early in the python search path
@@ -152,7 +155,7 @@ def get_version():
     return None
 
 
-def get_projects():
+def get_projects(opts=None):
     """Get the filtered list of all projects."""
     projects = []
     platform_ec = ZEPHYR_DIR.parent
@@ -182,7 +185,7 @@ def get_projects():
         ):
             continue
         projects.append(project)
-    return projects
+    return shard_projects(projects, opts)
 
 
 def build_host_utils(opts, platform_ec, env, extra_env):
@@ -343,6 +346,7 @@ def build(opts):
         stdin=subprocess.DEVNULL,
         env=env,
     )
+    save_or_load_shard_info(opts, ZEPHYR_DIR, save=True)
 
     cmd = ["zmake", "-D", "build", "--static"]
     if opts.code_coverage:
@@ -354,7 +358,7 @@ def build(opts):
         if version:
             cmd.extend(["-v", version])
 
-    projects = get_projects()
+    projects = get_projects(opts)
     for project in projects:
         cmd.append(project.config.project_name)
 
@@ -464,15 +468,8 @@ def bundle(opts):
 
 
 def get_bundle_dir(opts):
-    """Get the directory for the bundle from opts or use the default.
-
-    Also create the directory if it doesn't exist.
-    """
-    if opts.output_dir:
-        bundle_dir = opts.output_dir
-    else:
-        bundle_dir = DEFAULT_BUNDLE_DIRECTORY
-    bundle_dir = pathlib.Path(bundle_dir)
+    """Get the directory for the bundle from opts or use the default."""
+    bundle_dir = pathlib.Path(opts.output_dir or DEFAULT_BUNDLE_DIRECTORY)
     if not bundle_dir.is_dir():
         bundle_dir.mkdir()
     return bundle_dir
@@ -480,15 +477,14 @@ def get_bundle_dir(opts):
 
 def write_metadata(opts, info):
     """Write the metadata about the bundle."""
-    bundle_metadata_file = (
-        opts.metadata if opts.metadata else DEFAULT_BUNDLE_METADATA_FILE
-    )
+    bundle_metadata_file = opts.metadata or DEFAULT_BUNDLE_METADATA_FILE
     with open(bundle_metadata_file, "w", encoding="utf-8") as file:
         file.write(json_format.MessageToJson(info))
 
 
 def bundle_coverage(opts):
     """Bundles the artifacts from code coverage into its own tarball."""
+    save_or_load_shard_info(opts, ZEPHYR_DIR)
     info = firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
     info.bcs_version_info.version_string = opts.bcs_version
     bundle_dir = get_bundle_dir(opts)
@@ -508,7 +504,9 @@ def bundle_coverage(opts):
     # postsubmit release builds. Postsubmit builders pass --bcs-version to
     # version artifacts, whereas presubmit CQ runs without --bcs-version and
     # only needs coverage.tbz2 (lcov.info) for Gerrit/Zoss coverage display.
-    if opts.html or opts.bcs_version:
+    if (opts.html or opts.bcs_version) and not (
+        opts.shard_count and opts.shard_index
+    ):
         (bundle_dir / "html").mkdir(exist_ok=True)
         # Build HTML coverage reports when bundling artifacts
         max_lcov_workers = _get_safe_lcov_workers(opts.cpus)
@@ -543,6 +541,13 @@ def bundle_coverage(opts):
     return 0
 
 
+def merge_shards(opts):
+    """Merges coverage artifacts from multiple build shards into a single report."""
+    return merge_shard_coverage_reports(
+        opts, ZEPHYR_DIR, log_cmd, get_bundle_dir, write_metadata, firmware_pb2
+    )
+
+
 def _run_compress(cmd, cwd=None):
     """Worker function to run tar compression."""
     log_cmd(cmd, cwd=cwd)
@@ -565,6 +570,7 @@ def _run_compress(cmd, cwd=None):
 
 def bundle_firmware(opts):
     """Bundles the artifacts from each target into its own tarball."""
+    save_or_load_shard_info(opts, ZEPHYR_DIR)
     info = firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
     info.bcs_version_info.version_string = opts.bcs_version
     version = opts.bcs_version or get_version()
@@ -574,7 +580,7 @@ def bundle_firmware(opts):
     tasks = []
     ec_to_boxter_boards = read_boxter()
     per_board_targets = collections.defaultdict(list)
-    for project in get_projects():
+    for project in get_projects(opts):
         build_dir = (
             platform_ec / "build" / "zephyr" / project.config.project_name
         )
@@ -695,7 +701,10 @@ def bundle_firmware(opts):
 
 def test(opts):
     """Runs all of the unit tests for Zephyr firmware"""
+    save_or_load_shard_info(opts, ZEPHYR_DIR, save=True)
     metrics = firmware_pb2.FwTestMetricList()  # pylint: disable=no-member
+    projects = get_projects(opts)
+    project_names = {p.config.project_name for p in projects}
 
     # Run tests from Makefile.cq because make knows how to run things
     # in parallel.
@@ -716,13 +725,16 @@ def test(opts):
     # If firmware_targets contains a '/', it's a shard (e.g. 1/3)
     # Otherwise it's a specific board or comma-separated list of boards
     boards = SPECIAL_BOARDS.copy() if SPECIAL_BOARDS else []
-    if opts.firmware_targets:
-        if "/" in opts.firmware_targets:
-            cmd.append(f"TWISTER_SUBSET={opts.firmware_targets}")
-        else:
-            boards = [
-                t.strip() for t in opts.firmware_targets.split(",") if t.strip()
-            ]
+    if opts.firmware_targets and "/" not in opts.firmware_targets:
+        boards = [
+            t.strip() for t in opts.firmware_targets.split(",") if t.strip()
+        ]
+
+    if opts.shard_count and opts.shard_index:
+        cmd.append(f"TWISTER_SUBSET={opts.shard_index}/{opts.shard_count}")
+        boards = [b for b in boards if b in project_names]
+    elif opts.firmware_targets and "/" in opts.firmware_targets:
+        cmd.append(f"TWISTER_SUBSET={opts.firmware_targets}")
 
     if boards:
         cmd.append(f"SPECIAL_BOARDS={' '.join(boards)}")
@@ -762,7 +774,7 @@ def test(opts):
             ]
         )
 
-        for project in get_projects():
+        for project in projects:
             if project.config.project_name in boards:
                 tasks.append(
                     (
@@ -940,7 +952,7 @@ def _extract_lcov_summary_worker(name, filename):
 def main(args):
     """Builds and tests all of the Zephyr targets and reports build metrics"""
     parser, sub_cmds = scripts.firmware_builder_lib.create_arg_parser(
-        build, bundle, test
+        build, bundle, test, merge_shards
     )
 
     check_boards_cmd = sub_cmds.add_parser(

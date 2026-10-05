@@ -5,12 +5,14 @@
 """Helper functions shared across firmware builder scripts."""
 
 import argparse
+import json
 import multiprocessing
 import os
 import pathlib
 import shutil
 import subprocess
 import sys
+import tempfile
 
 
 def find_checkout():
@@ -285,7 +287,210 @@ def get_safe_lcov_workers(requested_cpus):
     return safe_workers
 
 
-def create_arg_parser(build, bundle, test):
+def save_or_load_shard_info(opts, zephyr_dir=None, save=False):
+    """Persist or load shard_count and shard_index across build/test/bundle."""
+    if zephyr_dir is None:
+        zephyr_dir = pathlib.Path(__file__).resolve().parent.parent
+    shard_file = zephyr_dir.parent / "build" / "zephyr" / ".shard_info.json"
+    if opts.shard_count is not None or opts.shard_index is not None:
+        if (
+            save
+            and opts.shard_count
+            and opts.shard_index
+            and 1 <= opts.shard_index <= opts.shard_count
+        ):
+            shard_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(shard_file, "w", encoding="utf-8") as file:
+                json.dump(
+                    {
+                        "shard_count": opts.shard_count,
+                        "shard_index": opts.shard_index,
+                    },
+                    file,
+                )
+    elif shard_file.is_file():
+        try:
+            with open(shard_file, "r", encoding="utf-8") as file:
+                data = json.load(file)
+            opts.shard_count = data.get("shard_count")
+            opts.shard_index = data.get("shard_index")
+        except (OSError, ValueError):
+            pass
+
+
+def shard_projects(projects, opts=None):
+    """Sort projects and return the subset for the configured shard."""
+    projects.sort(key=lambda x: x.config.project_name)
+    if opts and (opts.shard_count is not None or opts.shard_index is not None):
+        if (
+            not opts.shard_count
+            or not opts.shard_index
+            or opts.shard_count < 1
+            or opts.shard_index < 1
+            or opts.shard_index > opts.shard_count
+        ):
+            raise ValueError(
+                f"Invalid shard_index {opts.shard_index} for shard_count {opts.shard_count}"
+            )
+        total = len(projects)
+        chunk_size = total // opts.shard_count
+        remainder = total % opts.shard_count
+        start = (opts.shard_index - 1) * chunk_size + min(
+            opts.shard_index - 1, remainder
+        )
+        end = start + chunk_size + (1 if opts.shard_index <= remainder else 0)
+        return projects[start:end]
+    return projects
+
+
+def merge_shard_coverage_reports(
+    opts,
+    zephyr_dir,
+    log_cmd_fn,
+    get_bundle_dir_fn,
+    write_metadata_fn,
+    firmware_pb2_mod,
+):
+    """Extract shard coverage archives, merge lcov.info, and generate HTML/tbz2."""
+    merge_dir = pathlib.Path(opts.merge_dir)
+    if not merge_dir.is_dir() and (zephyr_dir / opts.merge_dir).is_dir():
+        merge_dir = zephyr_dir / opts.merge_dir
+    if not merge_dir.is_dir():
+        print(f"Error: Merge directory {opts.merge_dir} does not exist.")
+        return 1
+
+    platform_ec = zephyr_dir.parent
+    out_dir = platform_ec / "build" / "zephyr"
+    tarball_name = "coverage.tbz2"
+    tarball_path = out_dir / tarball_name
+    merged_info = out_dir / "lcov.info"
+
+    tbz_files = [
+        p
+        for p in sorted(merge_dir.rglob("*.tbz2"))
+        if p.resolve() != tarball_path.resolve()
+    ]
+    extracted_infos = []
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = pathlib.Path(tmpdir)
+        for idx, tbz_path in enumerate(tbz_files):
+            shard_tmp = tmp_path / f"shard_{idx}_{tbz_path.stem}"
+            shard_tmp.mkdir(parents=True, exist_ok=True)
+            cmd = ["tar", "xvjf", str(tbz_path.resolve())]
+            log_cmd_fn(cmd, cwd=shard_tmp)
+            subprocess.run(
+                cmd, cwd=shard_tmp, check=True, stdin=subprocess.DEVNULL
+            )
+            extracted_infos.extend(sorted(shard_tmp.rglob("*.info")))
+
+        # Also support any raw .info files placed in merge_dir
+        extracted_infos.extend(
+            p
+            for p in sorted(merge_dir.rglob("*.info"))
+            if p.resolve() != merged_info.resolve()
+        )
+
+        if not extracted_infos:
+            print(f"Error: No .info files found to merge in {merge_dir}")
+            return 1
+
+        out_dir.mkdir(parents=True, exist_ok=True)
+        max_lcov_workers = get_safe_lcov_workers(opts.cpus)
+        # Note: LCOV 2.0+ requires repeating error tokens (e.g. "gcov,gcov")
+        # to suppress both the initial error and subsequent occurrences,
+        # matching zephyr/Makefile.cq.
+        lcov_cmd = [
+            "/usr/bin/lcov",
+            "--parallel",
+            str(max_lcov_workers),
+            "--rc",
+            "branch_coverage=1",
+            "--rc",
+            "no_exception_branch=1",
+            "--ignore-errors",
+            "inconsistent,inconsistent",
+            "--ignore-errors",
+            "unused,unused",
+            "--ignore-errors",
+            "gcov,gcov",
+            "-o",
+            str(merged_info),
+        ]
+        for info_file in extracted_infos:
+            lcov_cmd.extend(["-a", str(info_file)])
+
+        log_cmd_fn(lcov_cmd)
+        subprocess.run(
+            lcov_cmd, cwd=zephyr_dir, check=True, stdin=subprocess.DEVNULL
+        )
+
+        html_dir = out_dir / "html"
+        if html_dir.exists():
+            shutil.rmtree(html_dir)
+        html_dir.mkdir(parents=True, exist_ok=True)
+        genhtml_cmd = [
+            "/usr/bin/genhtml",
+            "--parallel",
+            str(max_lcov_workers),
+            "--branch-coverage",
+            "-q",
+            "-o",
+            str(html_dir),
+            "--ignore-errors",
+            "inconsistent,inconsistent",
+            "--ignore-errors",
+            "unused,unused",
+            "-t",
+            "All boards and tests merged",
+            "-s",
+            str(merged_info),
+        ]
+        log_cmd_fn(genhtml_cmd)
+        subprocess.run(
+            genhtml_cmd, cwd=zephyr_dir, check=True, stdin=subprocess.DEVNULL
+        )
+
+        # The parent recipe orchestrator (recipes/build_firmware.py) uploads
+        # build/zephyr/coverage.tbz2 directly to GCS after merge-shards, so
+        # both lcov.info and html/ are intentionally archived together here.
+        tar_cmd = ["tar", "cvjf", str(tarball_path), "lcov.info", "html/"]
+        log_cmd_fn(tar_cmd, cwd=out_dir)
+        subprocess.run(
+            tar_cmd, cwd=out_dir, check=True, stdin=subprocess.DEVNULL
+        )
+
+        bundle_dir = get_bundle_dir_fn(opts)
+        if bundle_dir.resolve() != out_dir.resolve():
+            shutil.copyfile(tarball_path, bundle_dir / tarball_name)
+            bundle_html_dir = bundle_dir / "html"
+            if bundle_html_dir.exists():
+                shutil.rmtree(bundle_html_dir)
+            shutil.copytree(html_dir, bundle_html_dir)
+
+        info = (
+            firmware_pb2_mod.FirmwareArtifactInfo()  # pylint: disable=no-member
+        )
+        info.bcs_version_info.version_string = opts.bcs_version
+        meta = info.objects.add()
+        meta.file_name = tarball_name
+        meta.lcov_info.type = (
+            firmware_pb2_mod.FirmwareArtifactInfo.LcovTarballInfo.LcovType.LCOV  # pylint: disable=no-member
+        )
+        meta = info.objects.add()
+        meta.file_name = "html"
+        meta.coverage_html.SetInParent()
+        write_metadata_fn(opts, info)
+
+    return 0
+
+
+def _parse_pos_int(val):
+    """Parse a positive integer string, or return None."""
+    return int(val) if val and str(val).isdigit() and int(val) > 0 else None
+
+
+def create_arg_parser(build, bundle, test, merge=None):
     """Parse all command line args and return opts dict."""
     parser = argparse.ArgumentParser(description=__doc__)
 
@@ -362,6 +567,38 @@ def create_arg_parser(build, bundle, test):
         help="Comma-separated list of build/test target shards",
     )
 
+    shard_count_default = _parse_pos_int(os.environ.get("FIRMWARE_SHARD_COUNT"))
+    shard_index_default = _parse_pos_int(os.environ.get("FIRMWARE_SHARD_INDEX"))
+    for flag in os.environ.get("USE", "").split():
+        for prefix in ("firmware_shard_count_", "shard_count_"):
+            if flag.startswith(prefix):
+                parsed = _parse_pos_int(flag[len(prefix) :])
+                if parsed is not None:
+                    shard_count_default = parsed
+                break
+        for prefix in ("firmware_shard_index_", "shard_index_"):
+            if flag.startswith(prefix):
+                parsed = _parse_pos_int(flag[len(prefix) :])
+                if parsed is not None:
+                    shard_index_default = parsed
+                break
+
+    parser.add_argument(
+        "--shard-count",
+        type=int,
+        required=False,
+        default=shard_count_default,
+        help="Total number of build shards to divide projects/tests into.",
+    )
+
+    parser.add_argument(
+        "--shard-index",
+        type=int,
+        required=False,
+        default=shard_index_default,
+        help="1-based index of the current shard to execute.",
+    )
+
     # Would make this required=True, but not available until 3.7
     sub_cmds = parser.add_subparsers()
 
@@ -376,5 +613,17 @@ def create_arg_parser(build, bundle, test):
 
     test_cmd = sub_cmds.add_parser("test", help="Runs all firmware unit tests")
     test_cmd.set_defaults(func=test)
+
+    if merge:
+        merge_cmd = sub_cmds.add_parser(
+            "merge-shards",
+            help="Merges coverage artifacts from multiple build shards",
+        )
+        merge_cmd.add_argument(
+            "--merge-dir",
+            required=True,
+            help="Directory containing shard coverage.tbz2 files to merge.",
+        )
+        merge_cmd.set_defaults(func=merge)
 
     return parser, sub_cmds
