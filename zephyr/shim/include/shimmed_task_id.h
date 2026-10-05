@@ -69,9 +69,9 @@ enum {
 #define EC_TASK_PRIORITY(prio) K_PRIO_PREEMPT(EC_TASK_PRIO_COUNT - prio - 1)
 
 /*
- * List of CROS_EC_TASK items. See CONFIG_TASK_LIST in platform/ec's config.h
- * for more information.  For tests that want their own custom tasks, use
- * CONFIG_HAS_TEST_TASKS and not CONFIG_SHIMMED_TASKS.
+ * List of CROS_EC_TASK(name, entry, param, stack_size, prio, options) items.
+ * For tests that want their own custom tasks, use CONFIG_HAS_TEST_TASKS and
+ * not CONFIG_SHIMMED_TASKS.
  */
 #ifdef CONFIG_SHIMMED_TASKS
 #define CROS_EC_TASK_LIST                                                  \
@@ -201,16 +201,6 @@ enum {
 		    ())
 #elif defined(CONFIG_HAS_TEST_TASKS)
 #include "shimmed_test_tasks.h"
-/*
- * There are two different ways to define a task list (because historical
- * reasons). Applications use CROS_EC_TASK_LIST to define their tasks, while
- * unit tests that need additional tasks use CONFIG_TEST_TASK_LIST. For
- * shimming a unit test, define CROS_EC_TASK_LIST as whatever
- * CONFIG_TEST_TASK_LIST expands to.
- */
-#if defined(CONFIG_TEST_TASK_LIST) && !defined(CROS_EC_TASK_LIST)
-#define CROS_EC_TASK_LIST CONFIG_TEST_TASK_LIST
-#endif /* CONFIG_TEST_TASK_LIST && !CROS_EC_TASK_LIST */
 
 /*
  * Tests often must link in files that reference task IDs, even when the
@@ -251,11 +241,8 @@ enum {
 
 /*
  * Define the task_ids globally for all shimmed platform/ec code to use.
- * Note that unit test task lists use TASK_TEST, which we can just alias
- * into a regular CROS_EC_TASK.
  */
 #define CROS_EC_TASK(name, ...) TASK_ID_##name,
-#define TASK_TEST(name, ...) CROS_EC_TASK(name)
 /* clang-format off */
 enum {
 	CROS_EC_TASK_LIST
@@ -267,7 +254,6 @@ enum {
 };
 /* clang-format on */
 #undef CROS_EC_TASK
-#undef TASK_TEST
 
 /*
  * Additional task IDs for features that runs on non shimmed threads,

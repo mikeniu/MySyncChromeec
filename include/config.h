@@ -4204,65 +4204,6 @@
 #undef CONFIG_MCHP_TFDP
 
 /*****************************************************************************/
-/* Task config */
-
-/*
- * List of enabled tasks in ascending priority order. This is normally
- * defined in each board's ec.tasklist file.
- *
- * For each task, use the macro TASK_ALWAYS(n, r, d, s) for base tasks and
- * TASK_NOTEST(n, r, d, s) for tasks that can be excluded in test binaries,
- * where:
- * 'n' is the name of the task
- * 'r' is the main routine of the task
- * 'd' is an opaque parameter passed to the routine at startup
- * 's' is the stack size in bytes; must be a multiple of 8
- *
- * Some cores use TASK_ALWAYS(n, r, d, s, f), where:
- * 'f' is the bit flags for the platform specific information
- *    - MIA_TASK_FLAG_USE_FPU : bit 0, task uses FPU H/W
- *
- * For USB PD tasks, IDs must be in consecutive order and correspond to
- * the port which they are for. See TASK_ID_TO_PD_PORT() macro.
- */
-#undef CONFIG_TASK_LIST
-
-/*
- * List of test tasks.  Same format as CONFIG_TASK_LIST, but used to define
- * additional tasks for a unit test.  Normally defined in
- * test/{testname}.tasklist.
- */
-#undef CONFIG_TEST_TASK_LIST
-
-/*
- * List of tasks that support reset. Tasks listed here must also be included in
- * CONFIG_TASK_LIST.
- *
- * For each task, use macro ENABLE_RESET(n) to enable resets. The parameter n
- * must match the value passed to TASK_{ALWAYS,NOTEST} in CONFIG_TASK_LIST.
- *
- * Tasks that enable resets *must* call task_reset_cleanup() once at the
- * beginning of their main function, and perform task-specific cleanup if
- * necessary.
- *
- * By default, tasks can be reset at any time. To change this behavior, call
- * task_disable_resets() immediately after task_reset_cleanup(), and then enable
- * resets where appropriate.
- *
- * Tasks that predominantly have resets disabled are expected to periodically
- * enable resets, and should always ensure to do so before waiting for long
- * periods (eg when waiting for an event to process).
- */
-#undef CONFIG_TASK_RESET_LIST
-
-/*
- * Enable task profiling.
- *
- * Boards may #undef this to reduce image size and RAM usage.
- */
-#define CONFIG_TASK_PROFILING
-
-/*****************************************************************************/
 /* Mock config */
 
 /*
