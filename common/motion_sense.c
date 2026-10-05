@@ -1070,10 +1070,6 @@ void motion_sense_task(void *u)
 		}
 
 		if (wait_us >= 0 && wait_us < motion_min_interval) {
-			/*
-			 * Guarantee some minimum delay to allow other lower
-			 * priority tasks to run.
-			 */
 			wait_us = motion_min_interval;
 		}
 
@@ -1081,7 +1077,13 @@ void motion_sense_task(void *u)
 						    fastest_collection_rate)) {
 			pm_policy_state_lock_get_all();
 		}
-		event = task_wait_event(wait_us);
+		/*
+		 * Guarantee some minimum delay to allow other lower
+		 * priority tasks to run.
+		 */
+		crec_usleep(motion_min_interval);
+		event = task_wait_event(
+			wait_us >= 0 ? wait_us - motion_min_interval : -1);
 		if (DISABLE_PM_POLICY_WHILE_WAITING(wait_us,
 						    fastest_collection_rate)) {
 			pm_policy_state_lock_put_all();
