@@ -43,6 +43,30 @@
       "isAi": true,
       "revId": "b9b7ddd3dc165881a0005deaf2e62a2aa922e566",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b023301_1b22f7c8",
+        "filename": "common/fpsensor/fpsensor_image_frame_params.cc",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-05T17:35:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "608aea30_be2cc65e",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 9999
+      },
+      "revId": "b9b7ddd3dc165881a0005deaf2e62a2aa922e566",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
