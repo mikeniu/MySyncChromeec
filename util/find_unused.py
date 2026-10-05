@@ -463,7 +463,6 @@ def main():
         ec_root / "driver",
         ec_root / "extra",
         ec_root / "include",
-        ec_root / "libc",
         ec_root / "power",
         ec_root / "fuzz",
         ec_zephyr_root / "app",

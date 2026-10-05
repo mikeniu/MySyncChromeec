@@ -61,8 +61,6 @@ extern "C" {
 #define TASK_EVENT_RESET_DONE BIT(28)
 /* task_wake() called on task */
 #define TASK_EVENT_WAKE BIT(29)
-/* Mutex unlocking */
-#define TASK_EVENT_MUTEX BIT(30)
 /*
  * Timer expired.  For example, task_wait_event() timed out before receiving
  * another event.
