@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc8ee57b_f9ce3c09",
+        "filename": "zephyr/include/host_service/heci.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-05T19:08:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be67a1d1_419483db",
+      "revId": "0887d288c4abc29f3818fbc89b6a0688c46dd93e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df4f4d3e_9a6166bc",
@@ -31,6 +49,30 @@
       "writtenOn": "2026-10-05T15:29:10Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: The `conn_id` bounds check is performed here, but `cal_send_msg_len(conn_id, msg)` is invoked at the very beginning of the function (around line 225) without validation. If `cal_send_msg_len` accesses `heci_dev.connections[conn_id]` internally, this may lead to an out-of-bounds read. Consider moving this check to the top of `heci_send_timeout()`.",
+      "range": {
+        "startLine": 230,
+        "startChar": 0,
+        "endLine": 230,
+        "endChar": 0
+      },
+      "revId": "0887d288c4abc29f3818fbc89b6a0688c46dd93e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84f7bbc3_9727852b",
+        "filename": "zephyr/subsys/host_service/heci/heci_core.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-05T19:08:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df4f4d3e_9a6166bc",
       "range": {
         "startLine": 230,
         "startChar": 0,
