@@ -10,19 +10,6 @@
 	status = "okay";
 };
 
-/ {
-	aliases {
-		gpio-wp = &gpio_ec_wp_od;
-	};
-
-	named-gpios {
-		/* The legacy system code requires GPIO_ENTERING_RW symbol */
-		gpio_ec_entering_rw: ec_entering_rw {
-			enum-name = "GPIO_ENTERING_RW";
-		};
-	};
-};
-
 &adc_charger_pmon_q {
 	enum-name = "ADC_PMON";
 };
@@ -85,4 +72,14 @@
 
 &i2c_ec_i2c_sensor_scl_1v8 {
 	enum-names = "I2C_PORT_SENSORS";
+};
+
+&i2c2 {
+	scl-gpios = <&gpioc 7 0>;
+	sda-gpios = <&gpiod 0 0>;
+};
+
+&i2c5 {
+	scl-gpios = <&gpioe 1 0>;
+	sda-gpios = <&gpioe 2 0>;
 };
