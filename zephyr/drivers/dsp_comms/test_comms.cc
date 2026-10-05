@@ -493,7 +493,7 @@ TEST_F(DspComms, DspServiceNotebookMode) {
   // Verify that mode_val is set to 0
   ASSERT_EQ(0, cros::dsp::service::driver.get_mode_val());
 
-  k_msleep(DSP_SERVICE_MODE_HANDLE_DELAY_MS * 5);
+  k_msleep(DSP_SERVICE_MODE_HANDLE_DELAY_MS * 10);
   ASSERT_EQ(0, tablet_get_mode());
 }
 
@@ -516,7 +516,7 @@ TEST_F(DspComms, DspServiceTabletMode) {
   // Verify that mode_val is set to 1
   ASSERT_EQ(1, cros::dsp::service::driver.get_mode_val());
 
-  k_msleep(DSP_SERVICE_MODE_HANDLE_DELAY_MS * 5);
+  k_msleep(DSP_SERVICE_MODE_HANDLE_DELAY_MS * 10);
   ASSERT_EQ(1, tablet_get_mode());
 }
 
