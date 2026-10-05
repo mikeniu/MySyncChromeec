@@ -93,6 +93,29 @@ uint32_t get_stack_ptr(const struct k_thread *thread)
 	return thread->callee_saved.esp;
 #endif
 #elif defined(CONFIG_RISCV)
+	if (thread == k_current_get()) {
+		uint32_t sp;
+
+		if (k_is_in_isr()) {
+			/*
+			 * On RISC-V, _isr_wrapper allocates struct arch_esf on
+			 * the interrupted thread's stack, switches to the CPU
+			 * interrupt stack (_current_cpu->irq_stack, initialized
+			 * to the top of the buffer), and saves the interrupted
+			 * thread's stack pointer at (irq_stack - 16).
+			 */
+			sp = (uintptr_t)_current_cpu->irq_stack - 16;
+
+			return *(const uint32_t *)sp;
+		}
+		/* Outside an ISR, read the live SP register directly. */
+		__asm__ volatile("mv %0, sp" : "=r"(sp));
+		return sp;
+	}
+	/*
+	 * For inactive threads, return the stack pointer saved during the last
+	 * context switch.
+	 */
 	return thread->callee_saved.sp;
 #elif defined(CONFIG_ARCH_POSIX)
 	return (uint32_t)thread->callee_saved.thread_status;
