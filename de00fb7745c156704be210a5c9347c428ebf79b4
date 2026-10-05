@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b89f65fc_084190b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-05T17:46:29Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass. [🔗](http://go/tj/742c709e-bb58-4cc3-81a3-ed1c3a5e530a)\n\n### Review Summary\n\n*   **Functionality:** Correctly fixes the ambiguity of a `0` offset by returning `std::optional` to distinguish unconfigured types from valid 0-offset captures. Encapsulates bounds checking securely.\n*   **Architecture \u0026 Component Fit:** The introduction of `std::optional\u003cFpImageFrameParam\u003e get()` is an excellent application of Edge-Case Elimination via Structural Elegance. It safely encapsulates the bounds validation logic and prevents invalid accesses.\n*   **Code Simplicity:** Good. Replaces duplicate cache lookups in `get_frame()` with a single unified call, reducing state and conditional boilerplate.\n*   **Idiomaticity \u0026 Readability:** Excellent use of C++17 `std::optional` instead of relying on sentinel values. Explicit typing `const std::optional\u003c...\u003e` is used as recommended by C++ readability standards.\n*   **Security:** N/A\n*   **Testing:** BVA (Boundary Value Analysis) is perfectly covered in the tests, correctly probing boundaries like `FP_CAPTURE_TYPE_MAX`, `FP_CAPTURE_TYPE_MAX + 1`, and `-1`.\n*   **CL Size \u0026 Scope:** Size: M (+54, -26). This represents a single, atomic logical change. The scope is tight and appropriate.\n*   **Commit Message:** The commit message clearly and accurately explains the problem and the rationale for the change, adhering to the imperative mood and altitude guidelines.",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "de00fb7745c156704be210a5c9347c428ebf79b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
