@@ -449,11 +449,26 @@ static int init(struct motion_sensor_t *s)
 	if (ret != EC_SUCCESS)
 		goto err_unlock;
 
-	/* Enable BDU */
+	/*
+	 * Enable BDU and attempt to enable High-Resolution (HR) mode.
+	 * On LIS2DH, bit 3 (HR) is writable and enables 12-bit resolution.
+	 * On LIS2DE/LNG2DM, bit 3 is read-only 0 (8-bit only).
+	 */
 	ret = st_raw_write8(s->port, s->i2c_spi_addr_flags, LIS2DH_CTRL4_ADDR,
-			    LIS2DH_BDU_MASK);
+			    LIS2DH_BDU_MASK | LIS2DH_HR_MASK);
 	if (ret != EC_SUCCESS)
 		goto err_unlock;
+
+	ret = st_raw_read8(s->port, s->i2c_spi_addr_flags, LIS2DH_CTRL4_ADDR,
+			   &tmp);
+	if (ret != EC_SUCCESS)
+		goto err_unlock;
+
+	if (tmp & LIS2DH_HR_MASK) {
+		data->resol = LIS2DH_RESOLUTION_12;
+	} else {
+		data->resol = LIS2DH_RESOLUTION_8;
+	}
 
 	ret = st_raw_write8(s->port, s->i2c_spi_addr_flags, LIS2DH_CTRL5_ADDR,
 			    LIS2DH_CTRL5_RESET_VAL);
@@ -473,9 +488,6 @@ static int init(struct motion_sensor_t *s)
 	}
 
 	mutex_unlock(s->mutex);
-
-	/* Set default resolution */
-	data->resol = LIS2DH_RESOLUTION;
 
 	return sensor_init_done(s);
 
