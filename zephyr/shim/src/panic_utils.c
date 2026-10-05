@@ -93,6 +93,32 @@ uint32_t get_stack_ptr(const struct k_thread *thread)
 	return thread->callee_saved.esp;
 #endif
 #elif defined(CONFIG_RISCV)
+	if (thread == k_current_get()) {
+		if (k_is_in_isr()) {
+			/*
+			 * _current_cpu->irq_stack is initialized to the top
+			 * (high address) of the interrupt stack buffer.
+			 * _isr_wrapper pushes struct arch_esf onto the thread
+			 * stack, loads sp from _current_cpu->irq_stack, and
+			 * saves the interrupted thread's SP at (irq_stack -
+			 * 16).
+			 */
+			const uintptr_t *saved_thread_sp =
+				(const uintptr_t *)(_current_cpu->irq_stack -
+						    16);
+
+			return (uint32_t)*saved_thread_sp;
+		}
+		/*
+		 * For the running thread in thread context, callee_saved.sp is
+		 * stale; read the live sp register directly.
+		 */
+		uint32_t sp;
+
+		__asm__ volatile("mv %0, sp" : "=r"(sp));
+		return sp;
+	}
+	/* Inactive thread: SP saved during last context switch. */
 	return thread->callee_saved.sp;
 #elif defined(CONFIG_ARCH_POSIX)
 	return (uint32_t)thread->callee_saved.thread_status;
