@@ -1,0 +1,28 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30c7b3f8_3bd61ba8",
+        "filename": "test/run_device_tests_unittest.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-06T16:37:11Z",
+      "side": 1,
+      "message": "nit: `process_console_output_line()` uses `regex.match(line_str)` (which anchors at the start of the string and relies on the leading `.*` in `SINGLE_CHECK_FAILED_REGEX`), whereas `self.assertRegex()` uses `regex.search()`. Also, `TEST_ASSERT` in `include/test_util.h` prefixes `ASSERTION failed:` with `%s:%d: ` (e.g., `\"test/foo.c:42: ASSERTION failed: x \u003d\u003d y\"`).\n\nIf the leading `.*` were ever accidentally removed from `SINGLE_CHECK_FAILED_REGEX`, `self.assertRegex()` would still pass while `regex.match()` in `process_console_output_line()` would fail to match lines with prefixes. Consider testing `SINGLE_CHECK_FAILED_REGEX.match(...)` (or `process_console_output_line()` directly) and including a prefix like `\"test/foo.c:42: \"` on the `ASSERTION failed:` test string.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "3b10034d692d81090482a58f12963034fd4b0c0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
