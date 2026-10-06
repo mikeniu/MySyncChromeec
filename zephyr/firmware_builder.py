@@ -739,7 +739,12 @@ def test(opts):
     if boards:
         cmd.append(f"SPECIAL_BOARDS={' '.join(boards)}")
 
-    cmd.append("test")
+    toolchain_targets = {"host/gnu": "test_host", "host/llvm": "test_llvm"}
+    cmd.append(
+        "test"
+        if opts.code_coverage
+        else toolchain_targets.get(getattr(opts, "toolchain", "all"), "test")
+    )
     log_cmd(cmd)
     subprocess.run(
         cmd,

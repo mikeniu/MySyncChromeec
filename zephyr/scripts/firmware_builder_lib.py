@@ -599,6 +599,13 @@ def create_arg_parser(build, bundle, test, merge=None):
         help="1-based index of the current shard to execute.",
     )
 
+    parser.add_argument(
+        "--toolchain",
+        choices=("all", "host/gnu", "host/llvm"),
+        default="all",
+        help="Toolchain to use for running unit tests.",
+    )
+
     # Would make this required=True, but not available until 3.7
     sub_cmds = parser.add_subparsers()
 
@@ -612,6 +619,12 @@ def create_arg_parser(build, bundle, test, merge=None):
     build_cmd.set_defaults(func=bundle)
 
     test_cmd = sub_cmds.add_parser("test", help="Runs all firmware unit tests")
+    test_cmd.add_argument(
+        "--toolchain",
+        choices=("all", "host/gnu", "host/llvm"),
+        default=argparse.SUPPRESS,
+        help="Toolchain to use for running unit tests.",
+    )
     test_cmd.set_defaults(func=test)
 
     if merge:

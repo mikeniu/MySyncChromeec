@@ -71,7 +71,12 @@ TEST_PATTERNS='**/*_benchmark.cc' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/subsys/emul/**' \
 	'$(THIRD_PARTY)/zephyrproject/zephyr/subsys/testsuite/**'
 
-.PHONY: test twister_host twister_llvm test_host_utils
+.PHONY: test test_host test_llvm twister_host twister_llvm test_host_utils
+
+test_host: zmake_unit_tests test_host_utils twister_host twister_coreboot_sdk \
+	zephyr_check_compliance_unittest run_device_tests_unittest
+
+test_llvm: zmake_unit_tests test_host_utils twister_llvm
 
 test: zmake_unit_tests
 test: test_host_utils
@@ -84,8 +89,7 @@ test: $(BUILD)/zephyr/lcov.info # ALL_MERGED
 test: $(BUILD)/zephyr/lcov_no_tests.info # ALL_FILTERED
 test: special_boards_info # BOARD_ metric info files only
 else
-test: twister_host twister_llvm twister_coreboot_sdk zephyr_check_compliance_unittest
-test: run_device_tests_unittest
+test: test_host test_llvm
 endif
 
 ifdef COVERAGE
