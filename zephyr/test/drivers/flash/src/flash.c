@@ -145,6 +145,48 @@ ZTEST_USER(flash, test_hostcmd_flash_read__overflow)
 		BUILD_HOST_COMMAND_PARAMS(EC_CMD_FLASH_READ, 0, params);
 
 	zassert_equal(EC_RES_OVERFLOW, host_command_process(&args));
+
+	uint32_t output;
+	struct ec_params_flash_read offset_overflow_params = {
+		.offset = UINT32_MAX - sizeof(output) + 2,
+		.size = sizeof(output),
+	};
+	struct host_cmd_handler_args offset_overflow_args = BUILD_HOST_COMMAND(
+		EC_CMD_FLASH_READ, 0, output, offset_overflow_params);
+
+	zassert_equal(EC_RES_OVERFLOW,
+		      host_command_process(&offset_overflow_args));
+}
+
+ZTEST_USER(flash, test_hostcmd_flash_write__overflow)
+{
+	uint32_t dummy_data;
+	uint8_t out_buf[sizeof(struct ec_params_flash_write) +
+			sizeof(dummy_data)];
+	struct ec_params_flash_write *write_params =
+		(struct ec_params_flash_write *)out_buf;
+	struct host_cmd_handler_args write_args =
+		BUILD_HOST_COMMAND_SIMPLE(EC_CMD_FLASH_WRITE, 0);
+
+	write_params->offset = UINT32_MAX - sizeof(dummy_data) + 2;
+	write_params->size = sizeof(dummy_data);
+	write_args.params = write_params;
+	write_args.params_size = sizeof(*write_params) + sizeof(dummy_data);
+	memset(write_params + 1, 0xec, sizeof(dummy_data));
+
+	zassert_equal(EC_RES_OVERFLOW, host_command_process(&write_args));
+}
+
+ZTEST_USER(flash, test_hostcmd_flash_erase__overflow)
+{
+	struct ec_params_flash_erase erase_params = {
+		.offset = UINT32_MAX - CONFIG_FLASH_ERASE_SIZE + 2,
+		.size = CONFIG_FLASH_ERASE_SIZE,
+	};
+	struct host_cmd_handler_args erase_args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_FLASH_ERASE, 0, erase_params);
+
+	zassert_equal(EC_RES_OVERFLOW, host_command_process(&erase_args));
 }
 
 #define TEST_BUF_SIZE 0x100
@@ -514,6 +556,13 @@ ZTEST_USER(flash, test_console_cmd_flash_erase__bad_args)
 	/* Check for alpha arg instead of number*/
 	CHECK_CONSOLE_CMD("flasherase xyz 100", NULL, EC_ERROR_PARAM1);
 	CHECK_CONSOLE_CMD("flasherase 100 xyz", NULL, EC_ERROR_PARAM2);
+}
+
+ZTEST_USER(flash, test_console_cmd_flash_erase__overflow)
+{
+	/* Test exact INT_MAX + 1 signed integer overflow boundary. */
+	CHECK_CONSOLE_CMD("flasherase 1 " STRINGIFY(INT_MAX), NULL,
+			  EC_ERROR_OVERFLOW);
 }
 
 /**
