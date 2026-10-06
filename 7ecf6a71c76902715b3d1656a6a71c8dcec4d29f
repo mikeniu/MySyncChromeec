@@ -16,6 +16,23 @@
       "message": "Will we run two versions of the test for Renode? With GPIO set to SPI and UART transport interface?",
       "revId": "7ecf6a71c76902715b3d1656a6a71c8dcec4d29f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06111ba0_9501e597",
+        "filename": "zephyr/test/hwtest/src/fp_transport.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-06T08:46:02Z",
+      "side": 1,
+      "message": "Now the test looks a bit confusing. There is the following part that can be executed if the transport_type is not FP_TRANSPORT_TYPE_UART. However, there is no corresponding part for SPI. I think the test should be reconstructed a bit to have two parts - one for active interface and the second for not active. Or just remove the later part.",
+      "revId": "7ecf6a71c76902715b3d1656a6a71c8dcec4d29f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
