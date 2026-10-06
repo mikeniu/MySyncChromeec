@@ -111,6 +111,7 @@ static void after(void *f)
 	struct charge_state_fixture *fixture = f;
 
 	*charge_get_status() = fixture->charge_state_data;
+	mock_chg_drv.post_init = fixture->saved_driver_ptr->post_init;
 	set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL);
 	battery_sustainer_disable();
 	reset_current_limit();
@@ -1048,6 +1049,21 @@ ZTEST(charge_state, test_calculate_sleep_dur)
 	/* Battery critical with long sleep */
 	dur = calculate_sleep_dur(1, 100 * USEC_PER_SEC);
 	zassert_true(dur >= CHARGE_MIN_SLEEP_USEC);
+}
+
+ZTEST(charge_state, test_ac_change_without_post_init)
+{
+	set_ac_enabled(false);
+	mock_chg_drv.post_init = NULL;
+
+	/*
+	 * A charger without post_init must not be treated as failing,
+	 * which would raise a charge problem on every loop.
+	 */
+	set_ac_enabled(true);
+	problems_exist = 0;
+	k_sleep(K_SECONDS(1));
+	zassert_equal(0, problems_exist);
 }
 
 ZTEST(charge_state, test_battery_level_transitions)

@@ -307,8 +307,9 @@ enum ec_error_list charger_post_init(void)
 		return EC_ERROR_INVAL;
 	}
 
+	/* post_init is optional; without it there is nothing to redo. */
 	if (!chg_chips[chgnum].drv->post_init)
-		return EC_ERROR_UNIMPLEMENTED;
+		return EC_SUCCESS;
 
 	return chg_chips[chgnum].drv->post_init(chgnum);
 }
