@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1e4f123_d5ace25b",
+        "filename": "zephyr/drivers/dsp_comms/test_comms.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-06T19:17:46Z",
+      "side": 1,
+      "message": "Should this be in a setup or teardown function?",
+      "range": {
+        "startLine": 524,
+        "startChar": 0,
+        "endLine": 525,
+        "endChar": 49
+      },
+      "revId": "6565ebc639c3d2c0567b0ff97b6f5b8379520319",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
