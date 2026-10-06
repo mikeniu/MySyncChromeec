@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88835cf5_46ce9478",
+        "filename": "zephyr/Makefile.cq",
+        "patchSetId": 16
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-06T20:20:00Z",
+      "side": 1,
+      "message": "Let\u0027s call it `renode_fpsensor_unittest` since it\u0027s a top-level target and `fpsensor_unittest` is very generic.",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 18
+      },
+      "revId": "8b3f6d5adf822901cfec7aa864052b3bce48eeff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
