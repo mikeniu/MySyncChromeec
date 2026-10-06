@@ -136,15 +136,16 @@ ZTEST_USER(flash, test_hostcmd_flash_protect_wp_deasserted)
 		      response.flags);
 }
 
-ZTEST_USER(flash, test_hostcmd_flash_read__overflow)
+ZTEST_USER(flash, test_hostcmd_flash_erase__overflow)
 {
-	struct ec_params_flash_read params = {
-		.size = 32,
+	struct ec_params_flash_erase erase_params = {
+		.offset = UINT32_MAX - CONFIG_FLASH_ERASE_SIZE + 1,
+		.size = CONFIG_FLASH_ERASE_SIZE,
 	};
-	struct host_cmd_handler_args args =
-		BUILD_HOST_COMMAND_PARAMS(EC_CMD_FLASH_READ, 0, params);
+	struct host_cmd_handler_args erase_args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_FLASH_ERASE, 0, erase_params);
 
-	zassert_equal(EC_RES_OVERFLOW, host_command_process(&args));
+	zassert_equal(EC_RES_OVERFLOW, host_command_process(&erase_args));
 }
 
 #define TEST_BUF_SIZE 0x100
@@ -516,6 +517,13 @@ ZTEST_USER(flash, test_console_cmd_flash_erase__bad_args)
 	CHECK_CONSOLE_CMD("flasherase 100 xyz", NULL, EC_ERROR_PARAM2);
 }
 
+ZTEST_USER(flash, test_console_cmd_flash_erase__overflow)
+{
+	/* Test exact INT_MAX + 1 signed integer overflow boundary. */
+	CHECK_CONSOLE_CMD("flasherase 1 " STRINGIFY(INT_MAX), NULL,
+			  EC_ERROR_OVERFLOW);
+}
+
 /**
  * @brief Writes a 32-bit word at a specific location in flash memory. Uses Host
  *        Command interface to communicate with flash driver.
@@ -567,6 +575,30 @@ static uint16_t read_flash_helper32(uint32_t offset, uint32_t *output)
 		zassert_equal(read_args.response_size, sizeof(*output));
 	}
 	return ret;
+}
+
+ZTEST_USER(flash, test_hostcmd_flash_read__overflow)
+{
+	struct ec_params_flash_read params = {
+		.size = 32,
+	};
+	struct host_cmd_handler_args args =
+		BUILD_HOST_COMMAND_PARAMS(EC_CMD_FLASH_READ, 0, params);
+
+	zassert_equal(EC_RES_OVERFLOW, host_command_process(&args));
+
+	uint32_t output;
+
+	zassert_equal(EC_RES_OVERFLOW,
+		      read_flash_helper32(UINT32_MAX - sizeof(output) + 1,
+					  &output));
+}
+
+ZTEST_USER(flash, test_hostcmd_flash_write__overflow)
+{
+	zassert_equal(EC_RES_OVERFLOW,
+		      write_flash_helper32(UINT32_MAX - sizeof(uint32_t) + 1,
+					   0xecececec));
 }
 
 ZTEST_USER(flash, test_console_cmd_flash_erase__happy)
