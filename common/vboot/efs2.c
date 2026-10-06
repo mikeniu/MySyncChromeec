@@ -10,6 +10,7 @@
  */
 
 #include "battery.h"
+#include "builtin/assert.h"
 #include "chipset.h"
 #include "clock.h"
 #include "compile_time_macros.h"
@@ -70,6 +71,13 @@ static enum cr50_comm_err send_to_cr50(const uint8_t *data, size_t size)
 	int i, timeout = 0;
 	uint32_t lock_key;
 	struct cr50_comm_response res = {};
+
+	/*
+	 * EFS2 UART packet-mode communication hijacks the EC console UART and
+	 * stops the shell thread, so it is only safe during early boot before
+	 * EC tasks are started.
+	 */
+	ASSERT(!task_start_called());
 
 	/* This will wake up (if it's sleeping) and interrupt Cr50. */
 	board_enable_packet_mode(true);

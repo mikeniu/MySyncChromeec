@@ -44,6 +44,14 @@
 #error Must select only one shell backend
 #endif
 
+/*
+ * Numerically lower priorities take precedence, so verify the shell thread
+ * has the lowest priority and cannot preempt the system workqueue or any
+ * shimmed EC tasks.
+ */
+BUILD_ASSERT(
+	CONFIG_SHELL_THREAD_PRIORITY >= (EC_TASK_PRIO_COUNT - 1),
+	"Shell thread priority must be lower than system workqueue and EC tasks");
 BUILD_ASSERT(EC_TASK_PRIORITY(EC_SHELL_PRIO) == CONFIG_SHELL_THREAD_PRIORITY,
 	     "EC_SHELL_PRIO does not match CONFIG_SHELL_THREAD_PRIORITY.");
 
@@ -174,8 +182,15 @@ int uart_shell_stop(void)
 	/* Stop the shell */
 	shell_uninit(shell_zephyr, shell_uninit_callback);
 
-	/* Wait for the shell to be turned off, the signal will wake us */
+	/*
+	 * Wait for the shell to be turned off, the signal will wake us.
+	 * Because the shell thread runs at a lower priority than the system
+	 * workqueue, also join the shell thread to ensure it finishes clearing
+	 * shell->ctx->tid and aborting before a subsequent uart_shell_start()
+	 * runs shell_init() on the system workqueue.
+	 */
 	k_poll(&event, 1, K_FOREVER);
+	k_thread_join(shell_zephyr->thread, K_FOREVER);
 
 	/* Event was signaled, return the result */
 	return event.signal->result;
@@ -209,6 +224,12 @@ static void shell_init_from_work(struct k_work *work)
 	k_poll_signal_raise(&shell_init_signal, 0);
 }
 
+static bool shell_is_active(void)
+{
+	return shell_zephyr != NULL &&
+	       shell_zephyr->ctx->state == SHELL_STATE_ACTIVE;
+}
+
 void uart_shell_start(void)
 {
 	static struct k_work shell_init_work;
@@ -231,8 +252,14 @@ void uart_shell_start(void)
 	/* Submit the work to be run by the kernel */
 	k_work_submit(&shell_init_work);
 
-	/* Wait for initialization to be run, the signal will wake us */
+	/*
+	 * Wait for initialization to be run on the system workqueue, then wait
+	 * for the lower-priority shell thread to reach SHELL_STATE_ACTIVE.
+	 */
 	k_poll(&event, 1, K_FOREVER);
+	while (!shell_is_active()) {
+		k_msleep(1);
+	}
 	shell_stopped = false;
 }
 
@@ -487,12 +514,6 @@ static void handle_sprintf_rv(int rv, size_t *len)
 	} else {
 		*len += rv;
 	}
-}
-
-static bool shell_is_active(void)
-{
-	return shell_zephyr != NULL &&
-	       shell_zephyr->ctx->state == SHELL_STATE_ACTIVE;
 }
 
 static void zephyr_print(const char *buff, size_t size)
