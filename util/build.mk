@@ -18,7 +18,6 @@ host-util-bin-cxx-y += lbcc
 host-util-bin-cxx-y += iteflash
 host-util-bin-cxx-y += itecomdbgr
 host-util-bin-cxx-y += cbi-util
-host-util-bin-cxx-y += ec_coredump
 
 host-util-bin-cxx-y += rtkupdate
 build-util-art-y += util/export_taskinfo.so
@@ -68,9 +67,6 @@ $(out)/util/ectool: HOST_LDFLAGS+=$(LIBEC_HOST_LDLIBS)
 
 ec_parse_panicinfo-objs=ec_parse_panicinfo.o
 $(out)/util/ec_parse_panicinfo: HOST_LDFLAGS+=$(LIBEC_HOST_LDLIBS)
-
-ec_coredump-objs=ec_coredump.o $(comm-objs)
-$(out)/util/ec_coredump: HOST_LDFLAGS+=$(LIBEC_HOST_LDLIBS)
 
 # USB type-C Vendor Information File generation
 ifeq ($(CONFIG_USB_POWER_DELIVERY),y)
