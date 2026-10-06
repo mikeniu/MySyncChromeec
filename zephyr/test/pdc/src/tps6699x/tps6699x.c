@@ -671,6 +671,11 @@ ZTEST_USER(tps6699x, test_ppm_set_uor)
 	RESET_FAKE(tps_rw_port_control);
 	tps_rw_port_control_fake.custom_fake = custom_fake_tps_rw_port_control;
 
+	/* Verify command_specific == NULL returns -EINVAL */
+	zassert_equal(pdc_execute_ucsi_cmd(dev, UCSI_SET_UOR, sizeof(uint32_t),
+					   NULL, ucsi_data.message_in, NULL),
+		      -EINVAL);
+
 	/* Send SET_UOR to UFP through pdc_execute_ucsi_cmd() */
 	in.swap_to_ufp = 1;
 	in.swap_to_dfp = 0;

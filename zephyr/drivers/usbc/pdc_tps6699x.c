@@ -3332,13 +3332,17 @@ static int tps_execute_ucsi_cmd(const struct device *dev, uint8_t ucsi_command,
 	/* The OS will send SET_UOR to request a data role swap. Sending SET_UOR
 	 * to the PDC will not clear the "initiate swap to DFP" bit, causing the
 	 * data role swap to immediately reverse. Intercept SET_UOR here and
-	 * call tps_set_uor() to issue a data role swap based on CMD_SET_DRS.
+	 * issue a data role swap based on CMD_SET_DRS.
 	 */
 	if (ucsi_command == UCSI_SET_UOR) {
-		union uor_t uor;
+		struct pdc_data_t *data = dev->data;
 
-		memcpy(&uor, command_specific, sizeof(union uor_t));
-		return tps_set_uor(dev, uor);
+		if (command_specific == NULL)
+			return -EINVAL;
+
+		memcpy(&data->uor, command_specific, sizeof(union uor_t));
+		return tps_post_command_with_callback(dev, CMD_SET_DRS, NULL,
+						      lpm_data_out, callback);
 	}
 
 	/* The linux UCSI driver sends GET_PD_MESSAGE to request partner (SOP)
