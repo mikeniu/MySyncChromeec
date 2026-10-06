@@ -30,11 +30,16 @@ configdefault SHELL_PROMPT_UART
 configdefault SHELL_VT100_COLORS
 	default n
 
+#
+# Run the shell thread at the lowest preemptive priority
+# (i.e. NUM_PREEMPT_PRIORITIES - 1) below the system workqueue so that
+# console activity cannot starve deferred hooks or watchdog reloads.
+#
 configdefault SHELL_THREAD_PRIORITY_OVERRIDE
 	default y
 
 configdefault SHELL_THREAD_PRIORITY
-	default 28
+	default 29
 
 configdefault EXTRA_EXCEPTION_INFO
 	default y if ARCH_HAS_EXTRA_EXCEPTION_INFO
