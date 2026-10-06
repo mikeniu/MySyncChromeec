@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c220202_61edacb3",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_stm32_backend.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-06T12:50:08Z",
+      "side": 1,
+      "message": "Can it be fixed in upstream?",
+      "range": {
+        "startLine": 56,
+        "startChar": 2,
+        "endLine": 56,
+        "endChar": 65
+      },
+      "revId": "c070b2eca0d85fb13224cd98c6dbed88341b7c57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
