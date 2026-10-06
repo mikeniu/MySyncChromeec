@@ -306,8 +306,7 @@ class Platform(ABC):
         flasher: str,
         remote_ip: str,
         remote_port: int,
-        test_name: str,
-        enable_hw_write_protect: bool,
+        test_config: TestConfig,
         zephyr: bool,
     ) -> bool:
         """Flash specified test to specified board."""
@@ -381,8 +380,7 @@ class Hardware(Platform):
         flasher: str,
         remote_ip: str,
         remote_port: int,
-        test_name: str,
-        enable_hw_write_protect: bool,
+        test_config: TestConfig,
         zephyr: bool,
     ) -> bool:
         logging.info("Flashing test")
@@ -449,8 +447,7 @@ class Renode(Platform):
         flasher: str,
         remote_ip: str,
         remote_port: int,
-        test_name: str,
-        enable_hw_write_protect: bool,
+        test_config: TestConfig,
         zephyr: bool,
     ) -> bool:
         if self.process:
@@ -469,16 +466,14 @@ class Renode(Platform):
             "0",
         ]
         if zephyr:
-            # We've adopted the convention that we prefix upstream Zephyr test
-            # names with "zephyr_".
-            if test_name.startswith("zephyr_"):
+            if test_config.zephyr_name is not None:
                 cmd.extend(["--zephyr-bin", image_path])
             else:
                 cmd.append("--zephyr")
-        else:
-            cmd.extend(["--ec", test_name])
+        elif test_config.apptype_to_use == ApplicationType.TEST:
+            cmd.extend(["--ec", test_config.test_name])
 
-        if enable_hw_write_protect:
+        if test_config.enable_hw_write_protect:
             cmd.append("--enable-write-protect")
 
         env = os.environ.copy()
@@ -1635,6 +1630,8 @@ def build_zephyr(
 
     cmd = ["zmake"] + ["build"]
     cmd = cmd + [board_name] + ["--clobber"]
+    for config in zephyr_extra_configs:
+        cmd.extend(["-D", config])
     if app_type != ApplicationType.TEST:
         return cmd
 
@@ -1672,9 +1669,6 @@ def build_zephyr(
         # because of lack of space
         if img_type == ImageType.RO:
             f_test_config.write("CONFIG_HW_TEST_RW_ONLY=n\n")
-
-        for config in zephyr_extra_configs:
-            f_test_config.write(f"{config}\n")
 
     with open(test_conf, "r", encoding="utf-8") as f:
         logging.info("test_conf content:\n%s", f.read())
@@ -2050,8 +2044,7 @@ def flash_and_run_test(
             args.flasher,
             args.remote,
             args.jlink_port,
-            test.test_name,
-            test.enable_hw_write_protect,
+            test,
             args.zephyr,
         ):
             logging.debug("Flashing failed")
