@@ -23,6 +23,30 @@
       "isAi": true,
       "revId": "3b10034d692d81090482a58f12963034fd4b0c0d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fa03197_73d6798f",
+        "filename": "test/run_device_tests_unittest.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-06T16:53:06Z",
+      "side": 1,
+      "message": "Done. Updated the unit tests to call SINGLE_CHECK_FAILED_REGEX.match() directly and included the \u0027test/foo.c:42: \u0027 prefix matching TEST_ASSERT in include/test_util.h.",
+      "parentUuid": "30c7b3f8_3bd61ba8",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 9999
+      },
+      "revId": "3b10034d692d81090482a58f12963034fd4b0c0d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
