@@ -25,7 +25,7 @@ enum ec_error_list validate_fp_buffer_offset(const uint32_t buffer_size,
 {
 	uint32_t bytes_requested;
 
-	if (check_add_overflow(size, offset, &bytes_requested))
+	if (u32_add_overflow(size, offset, &bytes_requested))
 		return EC_ERROR_OVERFLOW;
 
 	if (bytes_requested > buffer_size)
