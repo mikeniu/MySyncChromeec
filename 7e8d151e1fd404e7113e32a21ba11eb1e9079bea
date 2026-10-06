@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56ba63f0_2cbdb58a",
+        "filename": "common/motion_lid.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-06T19:14:28Z",
+      "side": 1,
+      "message": "nit: `#endif /* CONFIG_TABLET_MODE */`",
+      "revId": "7e8d151e1fd404e7113e32a21ba11eb1e9079bea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f246300_873d60f8",
+        "filename": "zephyr/test/drivers/default/src/lid_angle.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-06T19:14:28Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: It would be more robust to use `TABLET_MODE_DEBOUNCE_COUNT + 1` here rather than a hardcoded value of 4. If the debounce count is ever changed in configuration, this test will break.",
+      "range": {
+        "startLine": 154,
+        "startChar": 0,
+        "endLine": 154,
+        "endChar": 0
+      },
+      "revId": "7e8d151e1fd404e7113e32a21ba11eb1e9079bea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87c6d22e_abf9f40c",
+        "filename": "zephyr/test/drivers/default/src/lid_angle.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-06T19:14:28Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Same here, prefer `TABLET_MODE_DEBOUNCE_COUNT + 1` over a hardcoded value to avoid flakiness if the configuration changes.",
+      "range": {
+        "startLine": 174,
+        "startChar": 0,
+        "endLine": 174,
+        "endChar": 0
+      },
+      "revId": "7e8d151e1fd404e7113e32a21ba11eb1e9079bea",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
