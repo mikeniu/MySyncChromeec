@@ -657,7 +657,12 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 {
 	uint32_t irq_timestamp = last_irq_timestamp;
 	bool read_any_data = false;
-	int interrupt_status_reg, fifo_depth;
+	/*
+	 * Burst read from INT_STATUS_1 through FIFO_LENGTH_1 so the interrupt
+	 * status and the FIFO length come back in a single I2C transfer.
+	 */
+	uint8_t regs[BMA4_FIFO_LENGTH_0_ADDR + 2 - BMA4_INT_STATUS_1];
+	int interrupt_status_reg = 0, fifo_depth;
 
 	if ((!(*event & CONFIG_ACCEL_BMA4XX_INT_EVENT)) ||
 	    motion_sensor_in_forced_mode(s)) {
@@ -677,8 +682,10 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	 */
 	for (int i = 0; i < 200; i++) {
 		/* Read interrupt status, also clears pending IRQs */
-		RETURN_ERROR(bma4_read8(s, BMA4_INT_STATUS_1,
-					&interrupt_status_reg));
+		RETURN_ERROR(i2c_read_block(s->port, s->i2c_spi_addr_flags,
+					    BMA4_INT_STATUS_1, regs,
+					    sizeof(regs)));
+		interrupt_status_reg = regs[0];
 		if ((interrupt_status_reg & (BMA4_FFULL_INT | BMA4_FWM_INT |
 					     BMA4_ACC_DRDY_INT)) == 0) {
 			if (!read_any_data)
@@ -688,8 +695,10 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 			return EC_SUCCESS;
 		}
 
-		RETURN_ERROR(
-			bma4_read16(s, BMA4_FIFO_LENGTH_0_ADDR, &fifo_depth));
+		fifo_depth =
+			regs[BMA4_FIFO_LENGTH_0_ADDR - BMA4_INT_STATUS_1] |
+			(regs[BMA4_FIFO_LENGTH_0_ADDR + 1 - BMA4_INT_STATUS_1]
+			 << 8);
 		while (fifo_depth > 0) {
 			uint8_t fifo_data[FIFO_BUFFER_SIZE];
 			int fifo_read = min(ARRAY_SIZE(fifo_data), fifo_depth);

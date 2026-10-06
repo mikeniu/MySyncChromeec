@@ -312,6 +312,14 @@ static int bma4xx_emul_read_byte(const struct emul *target, int reg,
 	case BMA4_POWER_CTRL_ADDR:
 		*val = data->accel_enabled ? BMA4_ACCEL_ENABLE_MSK : 0;
 		return 0;
+	case BMA4_STEP_CNT_OUT_0_ADDR ... BMA4_FIFO_LENGTH_0_ADDR - 1:
+		/*
+		 * Step counter, high-g, temperature and reserved registers sit
+		 * between INT_STATUS_1 and FIFO_LENGTH_0 and are read as part
+		 * of the IRQ status burst. Not modeled.
+		 */
+		*val = 0;
+		return 0;
 	}
 
 	LOG_WRN("unhandled I2C read from register %#x", reg);
