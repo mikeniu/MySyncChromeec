@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "3693102392e8a6d59844d8809e50c96ca80d0b80",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ccc36765_513b91fb",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-06T22:26:25Z",
+      "side": 1,
+      "message": "The comment on this #endif refers to CONFIG_ZEPHYR, but the block is for #ifndef CONFIG_ZEPHYR. In other parts of this file, #endif for CONFIG_ZEPHYR guards do not have comments. It would be better to be consistent—either remove the comment or use `/* !CONFIG_ZEPHYR */`.",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 0
+      },
+      "revId": "3693102392e8a6d59844d8809e50c96ca80d0b80",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
