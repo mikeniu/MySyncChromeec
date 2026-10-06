@@ -10,4 +10,7 @@ third_party {
   version: "786262be6048deab760f68c8acc2c85607165894"
   last_upgrade_date { year: 2026 month: 9 day: 1 }
   license_type: NOTICE
+  security {
+    tag: "OSV:disable"
+  }
 }
