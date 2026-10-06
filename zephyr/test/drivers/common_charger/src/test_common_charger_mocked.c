@@ -469,7 +469,8 @@ ZTEST(common_charger_mocked_driver, test_charger_post_init__invalid)
 
 ZTEST(common_charger_mocked_driver, test_charger_post_init__unimpl)
 {
-	zassert_equal(EC_ERROR_UNIMPLEMENTED, charger_post_init());
+	/* Returns EC_SUCCESS if post_init not implemented */
+	zassert_ok(charger_post_init());
 }
 
 ZTEST(common_charger_mocked_driver, test_charger_get_info__invalid)
