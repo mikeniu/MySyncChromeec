@@ -86,6 +86,10 @@ if(DEFINED CONFIG_PLATFORM_EC)
   # by another third-party C codebase.
   zephyr_compile_definitions("CHROMIUM_EC")
 
+  # Add CONFIG_ZEPHYR, which is commonly used to guard code for use
+  # with Zephyr builds only.
+  zephyr_compile_definitions("CONFIG_ZEPHYR")
+
 
   include(fpu.cmake)
 
