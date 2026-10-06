@@ -70,6 +70,24 @@
       "parentUuid": "4c536e26_a2181b49",
       "revId": "532d7f7424072fa0e8780cdaa636e63d6adc64fa",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bc87a59_219be224",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1350966
+      },
+      "writtenOn": "2026-10-06T05:04:16Z",
+      "side": 1,
+      "message": "There are branch still using legacy EC so we may want to check if they are affected by the bug or not and fix those if there are affected.",
+      "parentUuid": "938ddb4a_d786694b",
+      "revId": "532d7f7424072fa0e8780cdaa636e63d6adc64fa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ],
   "submitRequirementResults": [
