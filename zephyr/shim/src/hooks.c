@@ -97,8 +97,11 @@ static void hook_tick_work(struct k_work *work)
 /*
  * Numerically lower priorities take precedence, so verify the hook
  * related threads cannot preempt any of the shimmed tasks.
+ * EC_TASK_PRIO_COUNT - 1 is the lowest priority (reserved for the shell
+ * thread), and EC_TASK_PRIO_COUNT - 2 is the second lowest priority
+ * (reserved for the system workqueue).
  */
-BUILD_ASSERT(CONFIG_SYSTEM_WORKQUEUE_PRIORITY >= (EC_TASK_PRIO_COUNT - 1),
+BUILD_ASSERT(CONFIG_SYSTEM_WORKQUEUE_PRIORITY >= (EC_TASK_PRIO_COUNT - 2),
 	     "System workqueue priority must be lower than all EC tasks");
 BUILD_ASSERT(
 	CONFIG_SYSTEM_WORKQUEUE_PRIORITY == EC_TASK_PRIORITY(EC_SYSWORKQ_PRIO),
