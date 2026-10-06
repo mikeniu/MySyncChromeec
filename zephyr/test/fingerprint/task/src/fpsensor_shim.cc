@@ -196,6 +196,27 @@ ZTEST_USER(fpsensor_shim, test_shim_finger_status_error)
 	zassert_equal(fp_finger_status(), FINGER_NONE);
 }
 
+ZTEST_USER(fpsensor_shim, test_shim_acquire_image_small_buffer_size)
+{
+	/*
+	 * Entry 1 (config1 in native_sim.overlay) corresponds to
+	 * FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE, which applies both
+	 * image_data_offset_bytes and frame_size.
+	 */
+	const struct fingerprint_image_frame_params *params =
+		&expected_image_frame_params_array[1];
+	const size_t req_size =
+		params->image_data_offset_bytes + params->frame_size;
+	uint8_t dummy_buf[1] = { 0 };
+
+	zassert_equal(params->fp_capture_type,
+		      FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE);
+	zassert_equal(fingerprint_acquire_image(
+			      fp_sim, FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE,
+			      dummy_buf, req_size - 1),
+		      -EINVAL);
+}
+
 static void fpsensor_before(void *f)
 {
 	struct fingerprint_sensor_state state = {
