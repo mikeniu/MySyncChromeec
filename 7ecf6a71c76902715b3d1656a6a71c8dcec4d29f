@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a75a7021_80314a72",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-06T08:40:13Z",
+      "side": 1,
+      "message": "Will we run two versions of the test for Renode? With GPIO set to SPI and UART transport interface?",
+      "revId": "7ecf6a71c76902715b3d1656a6a71c8dcec4d29f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
