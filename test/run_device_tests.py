@@ -93,7 +93,9 @@ ALL_TESTS_PASSED_REGEX_ZEPHYR = re.compile(r"PROJECT EXECUTION SUCCESSFUL")
 ALL_TESTS_FAILED_REGEX_ZEPHYR = re.compile(r"PROJECT EXECUTION FAILED")
 
 SINGLE_CHECK_PASSED_REGEX = re.compile(r"(Pass: .*)|(.* PASS - )")
-SINGLE_CHECK_FAILED_REGEX = re.compile(r"(.*failed:.*)|(.* FAIL - )")
+SINGLE_CHECK_FAILED_REGEX = re.compile(
+    r".*(?:ASSERTION failed:|assertion .* failed:| FAIL - )"
+)
 
 RW_IMAGE_BOOTED_REGEX = re.compile(r".*\[Image: RW.*")
 
