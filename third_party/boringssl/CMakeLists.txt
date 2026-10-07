@@ -121,4 +121,12 @@ set_property(TARGET crypto PROPERTY INTERPROCEDURAL_OPTIMIZATION
 set_property(TARGET fipsmodule PROPERTY INTERPROCEDURAL_OPTIMIZATION
 	${APP_LTO_PROPERTY})
 
+# Ensure OPENSSL_cleanse in crypto/mem.c retains its inline assembly memory
+# barrier even when OPENSSL_NO_ASM is set so that LTO does not eliminate
+# OPENSSL_cleanse calls as dead stores.
+set_source_files_properties(${BORINGSSL_SOURCES}/crypto/mem.c
+	TARGET_DIRECTORY crypto
+	PROPERTIES COMPILE_OPTIONS "-UOPENSSL_NO_ASM"
+)
+
 endif()
