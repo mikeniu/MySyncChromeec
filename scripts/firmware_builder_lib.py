@@ -53,6 +53,27 @@ def create_arg_parser(build, bundle, test):
         help="BCS version to include in metadata.",
     )
 
+    parser.add_argument(
+        "--patches-dir",
+        action="append",
+        dest="patches_dirs",
+        help="Path to a patches directory. Can be repeated.",
+    )
+
+    parser.add_argument(
+        "--src-override-dir",
+        action="append",
+        dest="src_override_dirs",
+        help="Path to a source override directory. Can be repeated.",
+    )
+
+    parser.add_argument(
+        "--no-shadow",
+        action="store_true",
+        default=False,
+        help="Do not use a shadow workspace; apply changes in-place.",
+    )
+
     # Would make this required=True, but not available until 3.7
     sub_cmds = parser.add_subparsers()
 
