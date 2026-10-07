@@ -22,6 +22,31 @@
       },
       "revId": "6988495d7b9eb97e6b30686d41fb2ea6dfcc2e9f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54f8f97c_24de290f",
+        "filename": "zephyr/test/hwtest/src/exception_lib.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T19:02:41Z",
+      "side": 1,
+      "message": "Done! The root cause was in chromiumos-overlay\u0027s sys-libs/libcxx/libcxx-9999.ebuild, where -DLIBCXXABI_ENABLE_EXCEPTIONS\u003dOFF and -DLIBCXX_ENABLE_EXCEPTIONS\u003dOFF were passed for riscv* targets as a temporary workaround for b/409825194 until Zephyr\u0027s cplusplus-rom.ld handled .eh_frame when CONFIG_CPP_EXCEPTIONS\u003dn. Since cplusplus-rom.ld now discards .eh_frame and provides the __eh_frame_* symbols when !defined(CONFIG_CPP_EXCEPTIONS), I uploaded https://crrev.com/c/8529994 to enable exceptions in libcxx/libcxxabi for RISC-V baremetal (matching armv7m-cros-eabi), removed the exception_lib.cc workaround from this CL, and added Cq-Depend: chromium:8529994.",
+      "parentUuid": "45121145_f9c240a4",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "6988495d7b9eb97e6b30686d41fb2ea6dfcc2e9f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
