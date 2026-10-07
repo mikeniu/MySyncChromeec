@@ -218,6 +218,15 @@ config HW_TEST_REBOOT
 	help
 	  The test verifies basic reboot functionality.
 
+config HW_TEST_RISCV_FPU
+	bool "RISC-V FPU test"
+	depends on ZTEST
+	depends on RISCV
+	depends on FPU
+	depends on BOARD_FINGERPRINT
+	help
+	  The test verifies RISC-V FPU operations and accrued exception flags.
+
 config HW_TEST_RNG_BENCHMARK
 	bool "RNG benchmark test"
 	depends on ZTEST
