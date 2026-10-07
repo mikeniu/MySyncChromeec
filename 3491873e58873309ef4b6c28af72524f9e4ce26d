@@ -18,6 +18,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a29e579a_e54019ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-07T14:17:47Z",
+      "side": 1,
+      "message": "To eliminate the copybot risk, I restored the build.mk files under common/fpsensor/ and driver/fingerprint/ (and kept them in util/dedede-relevant-paths.txt) in PS8. This CL no longer touches any files synced by config/fingerprint/ec-legacy.ini.",
+      "parentUuid": "2f96d010_50b7ed55",
+      "isAi": true,
+      "revId": "3491873e58873309ef4b6c28af72524f9e4ce26d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "617f0097_529396ef",
@@ -37,6 +56,31 @@
         "endLine": 157,
         "endChar": 0
       },
+      "revId": "3491873e58873309ef4b6c28af72524f9e4ce26d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6dfbcdde_b515e206",
+        "filename": "Makefile",
+        "patchSetId": 6
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-07T14:17:47Z",
+      "side": 1,
+      "message": "Done. Removed get_sources, the dirs assignments/find traversals, and the unused firmware ro/rw targets, compilation commands, and dependencies from Makefile and Makefile.rules.",
+      "parentUuid": "617f0097_529396ef",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 0
+      },
+      "isAi": true,
       "revId": "3491873e58873309ef4b6c28af72524f9e4ce26d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
