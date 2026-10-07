@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b11aaa5b_aa3aaa27",
+        "filename": "zephyr/test/hwtest/src/mpu.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T17:06:01Z",
+      "side": 1,
+      "message": "Should we just make this a generic ARM check since the MPU code is shared?",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 27
+      },
+      "revId": "85fd872e56c843d08133b5f70f578ede8702a57e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
