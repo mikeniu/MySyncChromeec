@@ -6,8 +6,24 @@ using sysbus
 $name?="sanok"
 mach create $name
 
-$repl?=@platforms/cpus/egis_et171.repl
-machine LoadPlatformDescription $repl
+# Upstream egis_et171.repl defines separate MappedMemory instances for the
+# memory-mapped XIP aperture at 0x80000000 (flash0, size 0x80000) and the SPI
+# flash model backing memory (p25q16_flash_mem, size 0x200000), so SPI flash
+# erases and writes via p25q16 are not visible when reading from the XIP
+# window. Resize flash0 to 2 MB and bind p25q16.underlyingMemory to flash0 so
+# both share a single backing memory.
+# TODO(b/567998001): Remove once egis_et171.repl unifies flash0 and
+# p25q16_flash_mem upstream.
+machine LoadPlatformDescriptionFromString
+"""
+using "platforms/cpus/egis_et171.repl"
+
+flash0:
+    size: 0x200000
+
+p25q16:
+    underlyingMemory: flash0
+"""
 
 $bin?=$ORIGIN/sanok/ec.bin
 $elf_ro?=$ORIGIN/sanok/ec.RO.elf
