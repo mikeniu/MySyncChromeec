@@ -27,6 +27,9 @@ configdefault THREAD_MAX_NAME_LEN
 configdefault SHELL_PROMPT_UART
 	default "ec:~> "
 
+configdefault SHELL_VT100_COMMANDS
+	default n
+
 configdefault SHELL_VT100_COLORS
 	default n
 
