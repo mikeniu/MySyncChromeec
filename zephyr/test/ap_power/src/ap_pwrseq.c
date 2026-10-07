@@ -632,6 +632,16 @@ ZTEST(ap_pwrseq, test_get_ap_pwrseq_thread)
 	zassert_equal(pwrseq_thread, get_ap_pwrseq_thread());
 }
 
+#ifdef CONFIG_AP_PWRSEQ_DRIVER
+ZTEST(ap_pwrseq, test_get_current_state_unlocked)
+{
+	const struct device *dev = ap_pwrseq_get_instance();
+
+	zassert_equal(ap_pwrseq_get_current_state_unlocked(dev),
+		      ap_pwrseq_get_current_state(dev));
+}
+#endif
+
 void ap_pwrseq_after_test(void *data)
 {
 	system_exit_manual_recovery();

@@ -239,6 +239,14 @@ enum ap_pwrseq_state ap_pwrseq_get_current_state(const struct device *dev)
 	return ret_state;
 }
 
+enum ap_pwrseq_state
+ap_pwrseq_get_current_state_unlocked(const struct device *dev)
+{
+	struct ap_pwrseq_data *const data = dev->data;
+
+	return ap_pwrseq_sm_get_cur_state(data->sm_data);
+}
+
 const char *const ap_pwrseq_get_state_str(enum ap_pwrseq_state state)
 {
 	if (state >= AP_POWER_STATE_COUNT) {
