@@ -1,10 +1,6 @@
 #include <dt-bindings/motionsense/utils.h>
 
 / {
-	aliases {
-		tcs3400-int = &als_clear;
-	};
-
 	named-gpios {
 		compatible = "named-gpios";
 
@@ -20,116 +16,5 @@
 			i2c-port = <&i2c0>;
 			enum-names = "I2C_PORT_SENSOR";
 		};
-	};
-
-	motionsense-mutex {
-		compatible = "cros-ec,motionsense-mutex";
-	};
-
-	motionsense-sensor-data {
-		tcs_clear_data: tcs3400-clear-drv-data {
-			compatible = "cros-ec,drvdata-tcs3400-clear";
-			status = "okay";
-
-			als-drv-data {
-				compatible = "cros-ec,accelgyro-als-drv-data";
-				als-cal {
-					scale = <1>;
-					uscale = <0>;
-					offset = <0>;
-					als-channel-scale {
-						compatible = "cros-ec,accelgyro-als-channel-scale";
-						k-channel-scale = <1>;
-						cover-scale = "1.0f";
-					};
-				};
-			};
-		};
-
-		tcs_rgb_data: tcs3400-rgb-drv-data {
-			compatible = "cros-ec,drvdata-tcs3400-rgb";
-			status = "okay";
-
-			/* node for rgb_calibration_t defined in accelgyro.h */
-			rgb_calibration {
-				compatible = "cros-ec,accelgyro-rgb-calibration";
-
-				irt = <1>;
-
-				rgb-cal-x {
-					offset = <0>;
-					coeff = "0", "0", "0", "1";
-					als-channel-scale {
-						compatible = "cros-ec,accelgyro-als-channel-scale";
-						k-channel-scale = <1>;
-						cover-scale = "1.0f";
-					};
-				};
-				rgb-cal-y {
-					offset = <0>;
-					coeff = "0", "0", "0", "1";
-					als-channel-scale {
-						compatible = "cros-ec,accelgyro-als-channel-scale";
-						k-channel-scale = <1>;
-						cover-scale = "1.0f";
-					};
-				};
-				rgb-cal-z {
-					offset = <0>;
-					coeff = "0", "0", "0", "1";
-					als-channel-scale {
-						compatible = "cros-ec,accelgyro-als-channel-scale";
-						k-channel-scale = <1>;
-						cover-scale = "1.0f";
-					};
-				};
-			};
-		};
-	};
-
-	motionsense-sensor {
-		als_clear: base-als-clear {
-			compatible = "cros-ec,tcs3400-clear";
-			status = "okay";
-
-			active-mask = "SENSOR_ACTIVE_S0_S3_S5";
-			location = "MOTIONSENSE_LOC_LID";
-			port = <&i2c_sensor>;
-			default-range = <0x10000>;
-			drv-data = <&tcs_clear_data>;
-			i2c-spi-addr-flags = "TCS3400_I2C_ADDR_FLAGS";
-			configs {
-				compatible = "cros-ec,motionsense-sensor-config";
-				ec-s0 {
-					/* Run ALS sensor in S0 */
-					odr = <1000>;
-				};
-				ec-s3 {
-					odr = <1000>;
-				};
-				ec-s5 {
-					odr = <1000>;
-				};
-			};
-		};
-
-		als_rgb: base-als-rgb {
-			compatible = "cros-ec,tcs3400-rgb";
-			status = "okay";
-
-			active-mask = "SENSOR_ACTIVE_S0_S3_S5";
-			location = "MOTIONSENSE_LOC_LID";
-			default-range = <0x10000>; /* scale = 1x, uscale = 0 */
-			drv-data = <&tcs_rgb_data>;
-		};
-	};
-
-	motionsense-sensor-info {
-		compatible = "cros-ec,motionsense-sensor-info";
-
-		/* list of entries for motion_als_sensors */
-		als-sensors = <&als_clear>;
-		/* list of sensors in force mode */
-		accel-force-mode-sensors = <&als_clear>;
 	};
 };

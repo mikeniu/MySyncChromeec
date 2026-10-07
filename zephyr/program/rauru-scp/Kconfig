@@ -7,4 +7,9 @@ config BOARD_NAVI_SCP_ZEPHYR
 	help
 	  Build mt8196 SCP for zephyr OS.
 
+config BOARD_HYLIA_SCP_ZEPHYR
+	bool "Google Hylia SCP ZEPHYR Reference Board"
+	help
+	  Build mt8196 SCP for zephyr OS.
+
 source "Kconfig.zephyr"
