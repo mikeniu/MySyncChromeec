@@ -14,12 +14,12 @@ LOG_MODULE_DECLARE(rvp_model_id, LOG_LEVEL_DBG);
 #define BOARD_ID_MASK (BIT(BOARD_GPIOS_COUNT) - 1)
 
 /** Cache RVP model ID for future reads */
-static int rvp_model_id = -1;
+test_export_static int rvp_model_id = -1;
 
 __override int board_get_version(void)
 {
 	if (rvp_model_id == -1) {
-		int sku_id;
+		uint32_t sku_id;
 
 		if (cbi_get_sku_id(&sku_id) != EC_SUCCESS) {
 			LOG_ERR("RVP_ID: SKU ID not available");
@@ -30,7 +30,15 @@ __override int board_get_version(void)
 		case 1:
 		case 2:
 		case 3:
-			/* SKU IDs 1, 2, and 3 are LP5x */
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+			/* SKU IDs 1-3 and 5-12 are LP5x */
 			rvp_model_id = 33;
 			break;
 		case 4:
