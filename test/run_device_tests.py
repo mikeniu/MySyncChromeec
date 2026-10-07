@@ -229,6 +229,7 @@ class FPSensorType(Enum):
     # To fix this, we would need to add the additional control line to servod
     # config.
     EGIS = 0
+    FOCALTECH = 0
     UNKNOWN = -1
 
 
@@ -1410,8 +1411,7 @@ SANOK_CONFIG = BoardConfig(
 
 CHUDOW_CONFIG = BoardConfig(
     name=CHUDOW,
-    # TODO(b/485658538): support Focaltech sensor.
-    sensor_type=FPSensorType.UNKNOWN,
+    sensor_type=FPSensorType.FOCALTECH,
     architecture=Architecture.ARM,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
