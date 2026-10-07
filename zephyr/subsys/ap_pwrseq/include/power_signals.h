@@ -224,6 +224,17 @@ typedef uint32_t power_signal_mask_t;
 power_signal_mask_t power_get_signals(void);
 
 /**
+ * @brief Get the power signal mask without polling
+ *
+ * Same as power_get_signals(), but polled signals (e.g. ADC) are not
+ * re-read; their last polled values are returned. Safe to call from ISR
+ * context.
+ *
+ * @return Power signals as a mask.
+ */
+power_signal_mask_t power_get_signals_cached(void);
+
+/**
  * @brief Set the signal debug mask
  *
  * Sets a debug mask of signals.

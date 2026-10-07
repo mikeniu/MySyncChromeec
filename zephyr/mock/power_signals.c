@@ -16,6 +16,7 @@ DEFINE_FAKE_VALUE_FUNC(int, power_wait_mask_signals_timeout,
 DEFINE_FAKE_VOID_FUNC(power_set_debug, power_signal_mask_t);
 DEFINE_FAKE_VALUE_FUNC(power_signal_mask_t, power_get_debug);
 DEFINE_FAKE_VALUE_FUNC(power_signal_mask_t, power_get_signals);
+DEFINE_FAKE_VALUE_FUNC(power_signal_mask_t, power_get_signals_cached);
 DEFINE_FAKE_VOID_FUNC(power_signal_interrupt, enum power_signal, int);
 DEFINE_FAKE_VALUE_FUNC(int, power_signal_enable, enum power_signal);
 DEFINE_FAKE_VALUE_FUNC(int, power_signal_disable, enum power_signal);
