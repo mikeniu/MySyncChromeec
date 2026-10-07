@@ -221,6 +221,75 @@ ZTEST_F(usb_hard_reset_source, test_vbus_present_late)
 	zassert_equal(state, PE_SNK_READY, "Got %d", state);
 }
 
+/**
+ * @brief Stop sinking when a hard reset starts, before the Source drops
+ *        VBUS.
+ */
+ZTEST_F(usb_hard_reset_source, test_sink_path_off_before_vbus_drop)
+{
+	zassert_equal(charge_manager_get_active_charge_port(), TEST_USB_PORT);
+
+	/* Partner sends the Hard Reset. */
+	tcpci_partner_common_send_hard_reset(&fixture->partner_emul);
+	/* Check before the partner may drop VBUS (tPSHardReset min, 25 ms). */
+	k_sleep(K_MSEC(20));
+
+	zassert_equal(charge_manager_get_active_charge_port(),
+		      CHARGE_PORT_NONE);
+}
+
+struct usb_hard_reset_non_pd_source_fixture {
+	struct tcpci_partner_data partner_emul;
+	const struct emul *tcpci_emul;
+	const struct emul *charger_emul;
+};
+
+static void *usb_hard_reset_non_pd_source_setup(void)
+{
+	static struct usb_hard_reset_non_pd_source_fixture fixture;
+
+	fixture.tcpci_emul = EMUL_GET_USBC_BINDING(TEST_USB_PORT, tcpc);
+	fixture.charger_emul = EMUL_GET_USBC_BINDING(TEST_USB_PORT, chg);
+
+	return &fixture;
+}
+
+static void usb_hard_reset_non_pd_source_before(void *data)
+{
+	struct usb_hard_reset_non_pd_source_fixture *fixture = data;
+
+	/* A Type-C-only source: Rp 3.0 A and VBUS, but no PD. */
+	tcpci_partner_init(&fixture->partner_emul, PD_REV20);
+	fixture->partner_emul.extensions = NULL;
+	fixture->partner_emul.send_goodcrc = false;
+	fixture->partner_emul.power_role = PD_ROLE_SOURCE;
+	fixture->partner_emul.cc1 = TYPEC_CC_VOLT_RP_3_0;
+	fixture->partner_emul.cc2 = TYPEC_CC_VOLT_OPEN;
+	fixture->partner_emul.polarity = POLARITY_CC1;
+
+	set_ac_enabled(true);
+	isl923x_emul_set_adc_vbus(fixture->charger_emul, 5000);
+	zassert_ok(
+		tcpci_emul_set_vbus_level(fixture->tcpci_emul, VBUS_PRESENT));
+	zassert_ok(tcpci_partner_connect_to_tcpci(&fixture->partner_emul,
+						  fixture->tcpci_emul));
+	tcpci_partner_common_enable_pd_logging(&fixture->partner_emul, true);
+}
+
+static void usb_hard_reset_non_pd_source_after(void *data)
+{
+	struct usb_hard_reset_non_pd_source_fixture *fixture = data;
+
+	tcpci_partner_common_enable_pd_logging(&fixture->partner_emul, false);
+	tcpci_partner_common_clear_logged_msgs(&fixture->partner_emul);
+	disconnect_source_from_port(fixture->tcpci_emul, fixture->charger_emul);
+}
+
+ZTEST_SUITE(usb_hard_reset_non_pd_source, drivers_predicate_post_main,
+	    usb_hard_reset_non_pd_source_setup,
+	    usb_hard_reset_non_pd_source_before,
+	    usb_hard_reset_non_pd_source_after, NULL);
+
 struct usb_hard_reset_no_ps_rdy_fixture {
 	struct tcpci_partner_data partner_emul;
 	struct tcpci_partner_extension no_ps_rdy_ext;
@@ -322,6 +391,30 @@ ZTEST_F(usb_hard_reset_no_ps_rdy, test_no_contract_current)
 		zassert_not_equal(charge_manager_get_supplier(),
 				  CHARGE_SUPPLIER_PD,
 				  "Sinking PD current at +%d ms", ms);
+	}
+
+	zassert_true(hard_reset_sent(&fixture->partner_emul));
+}
+
+/**
+ * @brief Keep sinking from a non-PD source through a Hard Reset, since it
+ *        will not remove VBUS.
+ */
+ZTEST_F(usb_hard_reset_non_pd_source, test_keep_sinking)
+{
+	/* Let the attach select this port, before SinkWaitCapTimer expires. */
+	k_sleep(K_MSEC(1200));
+	zassert_equal(charge_manager_get_active_charge_port(), TEST_USB_PORT);
+	zassert_false(hard_reset_sent(&fixture->partner_emul));
+
+	/*
+	 * Cover SinkWaitCapTimer expiry, the DUT's Hard Resets, and the
+	 * tSafe0V waits for a VBUS drop that never comes.
+	 */
+	for (int ms = 0; ms < 4000; ms += 5) {
+		k_sleep(K_MSEC(5));
+		zassert_equal(charge_manager_get_active_charge_port(),
+			      TEST_USB_PORT, "Lost charge port at +%d ms", ms);
 	}
 
 	zassert_true(hard_reset_sent(&fixture->partner_emul));
