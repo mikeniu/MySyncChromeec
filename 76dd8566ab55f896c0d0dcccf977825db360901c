@@ -21,6 +21,25 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "fc723c70_bcee1df4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T19:53:08Z",
+      "side": 1,
+      "message": "Done — updated TEST\u003d in both CL 8518965 and CL 8518964 to use -s with the drivers.flash* scenarios.",
+      "parentUuid": "58c0a695_46d3c7d9",
+      "isAi": true,
+      "revId": "76dd8566ab55f896c0d0dcccf977825db360901c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "948f5f7c_ac95dcb8",
         "filename": "zephyr/test/drivers/flash/src/flash.c",
         "patchSetId": 6
@@ -67,6 +86,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1af0e79_f5fb16b0",
+        "filename": "zephyr/test/drivers/flash/src/flash.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T19:53:08Z",
+      "side": 1,
+      "message": "Done — switched to ec_cmd_flash_erase(NULL, \u0026...).",
+      "parentUuid": "4e4d5782_d41d0573",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 170,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "76dd8566ab55f896c0d0dcccf977825db360901c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ac0ab59_13dc8eb1",
@@ -80,6 +124,31 @@
       "writtenOn": "2026-10-07T19:05:53Z",
       "side": 1,
       "message": "This assertion fails under `drivers.flash.page_layout` and `drivers.flash.page_layout.ec_host_cmd` (`CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT\u003dy`).\n\nWhen `CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT` is enabled, `CONFIG_FLASH_MULTIPLE_REGION` is defined (`zephyr/shim/include/config_chip.h:764`), so `crec_flash_erase()` skips `flash_range_ok()` and calls `cros_flash_emul_erase()`. In `zephyr/emul/emul_flash.c:109`, `if (flash_check_writable_range(offset, size))` converts the `EC_ERROR_INVAL` from `offset + size \u003e CONFIG_FLASH_SIZE_BYTES` into `EC_ERROR_ACCESS_DENIED` (4).\n\nConsider either checking `IS_ENABLED(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT) ? EC_ERROR_ACCESS_DENIED : EC_ERROR_INVAL` here, or propagating the return value of `flash_check_writable_range()` in `cros_flash_emul_erase()`.",
+      "range": {
+        "startLine": 543,
+        "startChar": 0,
+        "endLine": 545,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "76dd8566ab55f896c0d0dcccf977825db360901c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6ef55a2_8e34a2a6",
+        "filename": "zephyr/test/drivers/flash/src/flash.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T19:53:08Z",
+      "side": 1,
+      "message": "Done — updated test_console_cmd_flash_erase__overflow to expect EC_ERROR_ACCESS_DENIED when CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT is enabled.",
+      "parentUuid": "6ac0ab59_13dc8eb1",
       "range": {
         "startLine": 543,
         "startChar": 0,
