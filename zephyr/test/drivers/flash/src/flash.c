@@ -20,6 +20,8 @@
 #include <zephyr/ztest.h>
 
 #define WP_L_GPIO_PATH NAMED_GPIOS_GPIO_NODE(wp_l)
+#define EC_FLASH_REGION_START \
+	MIN(CONFIG_EC_PROTECTED_STORAGE_OFF, CONFIG_EC_WRITABLE_STORAGE_OFF)
 
 static int gpio_wp_l_set(int value)
 {
@@ -147,6 +149,38 @@ ZTEST_USER(flash, test_hostcmd_flash_read__overflow)
 	zassert_equal(EC_RES_OVERFLOW, host_command_process(&args));
 }
 
+ZTEST_USER(flash, test_hostcmd_flash_erase__overflow)
+{
+	/*
+	 * Adjacent non-overflowing boundary (offset + size == UINT32_MAX)
+	 * passes the overflow and rollback checks in flash_command_erase() and
+	 * fails flash bounds validation in crec_flash_erase() with
+	 * EC_RES_ERROR.
+	 */
+	BUILD_ASSERT(EC_FLASH_REGION_START == 0);
+	BUILD_ASSERT(UINT32_MAX - CONFIG_FLASH_ERASE_SIZE >
+		     CONFIG_FLASH_SIZE_BYTES);
+#ifdef CONFIG_ROLLBACK
+	BUILD_ASSERT(UINT32_MAX - CONFIG_FLASH_ERASE_SIZE >=
+		     CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE);
+#endif
+	struct ec_params_flash_erase max_valid_sum_params = {
+		.offset = UINT32_MAX - CONFIG_FLASH_ERASE_SIZE,
+		.size = CONFIG_FLASH_ERASE_SIZE,
+	};
+
+	zassert_equal(EC_RES_ERROR,
+		      ec_cmd_flash_erase(NULL, &max_valid_sum_params));
+
+	/* Exact UINT32_MAX + 1 unsigned integer overflow boundary. */
+	struct ec_params_flash_erase erase_params = {
+		.offset = UINT32_MAX - CONFIG_FLASH_ERASE_SIZE + 1,
+		.size = CONFIG_FLASH_ERASE_SIZE,
+	};
+
+	zassert_equal(EC_RES_OVERFLOW, ec_cmd_flash_erase(NULL, &erase_params));
+}
+
 #define TEST_BUF_SIZE 0x100
 
 ZTEST_USER(flash, test_hostcmd_flash_write_and_erase)
@@ -199,9 +233,6 @@ ZTEST_USER(flash, test_hostcmd_flash_write_and_erase)
 	zassert_equal(in_buf[TEST_BUF_SIZE - 1], 0xff,
 		      "readback data not expected: 0x%x", in_buf[0]);
 }
-
-#define EC_FLASH_REGION_START \
-	MIN(CONFIG_EC_PROTECTED_STORAGE_OFF, CONFIG_EC_WRITABLE_STORAGE_OFF)
 
 static void test_region_info(uint32_t region, uint32_t expected_offset,
 			     uint32_t expected_size)
@@ -516,6 +547,31 @@ ZTEST_USER(flash, test_console_cmd_flash_erase__bad_args)
 	CHECK_CONSOLE_CMD("flasherase 100 xyz", NULL, EC_ERROR_PARAM2);
 }
 
+ZTEST_USER(flash, test_console_cmd_flash_erase__overflow)
+{
+	/*
+	 * Adjacent non-overflowing boundary (offset + size == INT_MAX) passes
+	 * the overflow and rollback checks in command_flash_erase() and fails
+	 * flash bounds validation in crec_flash_erase(). When
+	 * CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT is enabled,
+	 * crec_flash_erase() delegates to cros_flash_emul_erase(), which maps
+	 * flash_check_writable_range() failures to EC_ERROR_ACCESS_DENIED.
+	 */
+	BUILD_ASSERT(INT_MAX > CONFIG_FLASH_SIZE_BYTES);
+#ifdef CONFIG_ROLLBACK
+	BUILD_ASSERT(INT_MAX >= CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE);
+#endif
+	CHECK_CONSOLE_CMD(
+		"flasherase " STRINGIFY(INT_MAX) " 0", NULL,
+		IS_ENABLED(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT) ?
+			EC_ERROR_ACCESS_DENIED :
+			EC_ERROR_INVAL);
+
+	/* Exact INT_MAX + 1 signed integer overflow boundary. */
+	CHECK_CONSOLE_CMD("flasherase " STRINGIFY(INT_MAX) " 1", NULL,
+			  EC_ERROR_OVERFLOW);
+}
+
 /**
  * @brief Writes a 32-bit word at a specific location in flash memory. Uses Host
  *        Command interface to communicate with flash driver.
@@ -567,6 +623,55 @@ static uint16_t read_flash_helper32(uint32_t offset, uint32_t *output)
 		zassert_equal(read_args.response_size, sizeof(*output));
 	}
 	return ret;
+}
+
+ZTEST_USER(flash, test_hostcmd_flash_read__integer_overflow)
+{
+	uint32_t output;
+
+	/*
+	 * Adjacent non-overflowing boundary (offset + size == UINT32_MAX)
+	 * passes the overflow and rollback checks in flash_command_read() and
+	 * fails flash bounds validation in crec_flash_read() with EC_RES_ERROR.
+	 */
+	BUILD_ASSERT(EC_FLASH_REGION_START == 0);
+	BUILD_ASSERT(UINT32_MAX - sizeof(output) > CONFIG_FLASH_SIZE_BYTES);
+#ifdef CONFIG_ROLLBACK
+	BUILD_ASSERT(UINT32_MAX - sizeof(output) >=
+		     CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE);
+#endif
+	zassert_equal(EC_RES_ERROR,
+		      read_flash_helper32(UINT32_MAX - sizeof(output),
+					  &output));
+
+	/* Exact UINT32_MAX + 1 unsigned integer overflow boundary. */
+	zassert_equal(EC_RES_OVERFLOW,
+		      read_flash_helper32(UINT32_MAX - sizeof(output) + 1,
+					  &output));
+}
+
+ZTEST_USER(flash, test_hostcmd_flash_write__overflow)
+{
+	/*
+	 * Adjacent non-overflowing boundary (offset + size == UINT32_MAX)
+	 * passes the overflow and rollback checks in flash_command_write() and
+	 * fails flash bounds validation in crec_flash_write() with
+	 * EC_RES_ERROR.
+	 */
+	BUILD_ASSERT(EC_FLASH_REGION_START == 0);
+	BUILD_ASSERT(UINT32_MAX - sizeof(uint32_t) > CONFIG_FLASH_SIZE_BYTES);
+#ifdef CONFIG_ROLLBACK
+	BUILD_ASSERT(UINT32_MAX - sizeof(uint32_t) >=
+		     CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE);
+#endif
+	zassert_equal(EC_RES_ERROR,
+		      write_flash_helper32(UINT32_MAX - sizeof(uint32_t),
+					   0xecececec));
+
+	/* Exact UINT32_MAX + 1 unsigned integer overflow boundary. */
+	zassert_equal(EC_RES_OVERFLOW,
+		      write_flash_helper32(UINT32_MAX - sizeof(uint32_t) + 1,
+					   0xecececec));
 }
 
 ZTEST_USER(flash, test_console_cmd_flash_erase__happy)
