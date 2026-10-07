@@ -64,6 +64,56 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ad175d8_9e868d85",
+        "filename": "common/charge_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-07T20:33:28Z",
+      "side": 1,
+      "message": "Done. Clamped to v_max before calling charger_closest_voltage() in PS2.",
+      "parentUuid": "6213bc3b_2958b8b2",
+      "range": {
+        "startLine": 422,
+        "startChar": 0,
+        "endLine": 422,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "e26e9238405f7e170706538aed26c7d1bdde23be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab4e5348_cdf95fdb",
+        "filename": "common/charge_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-07T20:33:28Z",
+      "side": 1,
+      "message": "Done. Clamped to v_max before calling charger_closest_voltage() in PS2.",
+      "parentUuid": "bc301289_64c7b471",
+      "range": {
+        "startLine": 422,
+        "startChar": 0,
+        "endLine": 422,
+        "endChar": 0
+      },
+      "isAi": true,
+      "revId": "e26e9238405f7e170706538aed26c7d1bdde23be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6548a6c_65659302",
@@ -77,6 +127,25 @@
       "writtenOn": "2026-10-07T20:26:00Z",
       "side": 1,
       "message": "Should this be clamped too?",
+      "revId": "e26e9238405f7e170706538aed26c7d1bdde23be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7db9e6c1_81914b42",
+        "filename": "common/charge_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1411,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-07T20:33:28Z",
+      "side": 1,
+      "message": "Done, clamped here as well in PS2.",
+      "parentUuid": "d6548a6c_65659302",
+      "isAi": true,
       "revId": "e26e9238405f7e170706538aed26c7d1bdde23be",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
