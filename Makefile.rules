@@ -748,6 +748,12 @@ ifneq ($(CCACHE),)
 	$(CCACHE) -c
 endif
 
+.PHONY: prepare
+prepare:
+	$(Q)python3 util/repository_prep.py --allow-dirty \
+		$(foreach d,$(PATCHES_DIRS),--patches-dir "$(d)") \
+		$(foreach d,$(SRC_OVERRIDE_DIRS),--src-override-dir "$(d)")
+
 .PHONY: help
 help:
 	@echo "Google Chromium EC build"
@@ -759,6 +765,7 @@ help:
 	@echo "  buildall_only        - Build all boards and host unit tests"
 	@echo "  build_boards         - Build all boards"
 	@echo "  clobber              - Clean all boards"
+	@echo "  prepare              - Apply source overrides and patches"
 	@echo "  proj-<boardname>     - Build a single board (similar to 'all BOARD=boardname')"
 	@echo "  savesizes            - Save the filesizes of currently built boards for comparison"
 	@echo "  newsizes             - Compare previously saved filesizes against new sizes"

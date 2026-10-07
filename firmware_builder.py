@@ -11,6 +11,7 @@ gets invoked by chromite/api/controller/firmware.py.
 """
 
 import json
+import logging
 import os
 import pathlib
 import shutil
@@ -20,6 +21,8 @@ import sys
 # pylint: disable=import-error
 from google.protobuf import json_format
 from util.coreboot_sdk import init_toolchain
+from util.repository_prep import find_checkout
+from util.repository_prep import prepared_workspace
 
 # cros format puts this here
 import yaml  # pylint: disable=wrong-import-order
@@ -32,6 +35,8 @@ import scripts.firmware_builder_lib
 
 DEFAULT_BUNDLE_DIRECTORY = "/tmp/artifact_bundles"
 DEFAULT_BUNDLE_METADATA_FILE = "/tmp/artifact_bundle_metadata"
+
+EC_DIR = pathlib.Path(__file__).resolve().parent
 
 # The the list of boards whose on-device unit tests we will verify compilation.
 # TODO(b/172501728) On-device unit tests should build for all boards, but
@@ -145,18 +150,18 @@ def build(opts):
 
     cmd = ["make", "clobber"]
     print(f"# Running {' '.join(cmd)}.")
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+    subprocess.run(cmd, cwd=str(EC_DIR), check=True, env=env)
 
     cmd = ["make", "buildall_only", f"-j{opts.cpus}"]
     print(f"# Running {' '.join(cmd)}.")
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+    subprocess.run(cmd, cwd=str(EC_DIR), check=True, env=env)
 
     cmd = ["make", "print-all-baseboards", f"-j{opts.cpus}"]
     print(f"# Running {' '.join(cmd)}.")
     baseboards = {}
     for line in subprocess.run(
         cmd,
-        cwd=os.path.dirname(__file__),
+        cwd=str(EC_DIR),
         check=True,
         universal_newlines=True,
         stdout=subprocess.PIPE,
@@ -166,7 +171,7 @@ def build(opts):
         if len(parts) > 1:
             baseboards[parts[0]] = parts[1]
 
-    ec_dir = os.path.dirname(__file__)
+    ec_dir = str(EC_DIR)
     build_dir = os.path.join(ec_dir, "build")
     for build_target in sorted(os.listdir(build_dir)):
         metric = metric_list.value.add()
@@ -204,7 +209,7 @@ def build(opts):
         # successfully with clang: b/172020503.
         cmd = ["./util/build_with_clang.py", f"-j{opts.cpus}"]
         print(f'# Running {" ".join(cmd)}.')
-        subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+        subprocess.run(cmd, cwd=str(EC_DIR), check=True, env=env)
     finally:
         shutil.rmtree(build_dir)
         os.rename(gcc_build_dir, build_dir)
@@ -271,7 +276,7 @@ def bundle_coverage(opts):
     info = firmware_pb2.FirmwareArtifactInfo()  # pylint: disable=no-member
     info.bcs_version_info.version_string = opts.bcs_version
     bundle_dir = get_bundle_dir(opts)
-    ec_dir = os.path.dirname(__file__)
+    ec_dir = str(EC_DIR)
     tarball_name = "coverage.tbz2"
     tarball_path = os.path.join(bundle_dir, tarball_name)
     cmd = ["tar", "cvfj", tarball_path, "lcov.info"]
@@ -299,7 +304,7 @@ def bundle_firmware(opts):
     info.bcs_version_info.version_string = opts.bcs_version
     version = opts.bcs_version or get_version()
     bundle_dir = get_bundle_dir(opts)
-    ec_dir = os.path.dirname(__file__)
+    ec_dir = str(EC_DIR)
     cmd = ["make", "print-all-baseboards", f"-j{opts.cpus}"]
     print(f"# Running {' '.join(cmd)}.")
     baseboards = {}
@@ -307,7 +312,7 @@ def bundle_firmware(opts):
     env.update(init_toolchain())
     for line in subprocess.run(
         cmd,
-        cwd=os.path.dirname(__file__),
+        cwd=str(EC_DIR),
         check=True,
         universal_newlines=True,
         stdout=subprocess.PIPE,
@@ -407,7 +412,7 @@ def test(opts):
     # Run python unit tests.
     subprocess.run(
         ["extra/stack_analyzer/run_tests.sh"],
-        cwd=os.path.dirname(__file__),
+        cwd=str(EC_DIR),
         check=True,
     )
 
@@ -422,7 +427,7 @@ def test(opts):
     target = "coverage" if opts.code_coverage else "runtests"
     cmd = ["make", target, f"-j{opts.cpus}"]
     print(f"# Running {' '.join(cmd)}.")
-    subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+    subprocess.run(cmd, cwd=str(EC_DIR), check=True, env=env)
 
     if not opts.code_coverage:
         # Verify compilation of the on-device unit test binaries.
@@ -431,10 +436,10 @@ def test(opts):
         cmd = ["make", f"-j{opts.cpus}"]
         cmd.extend(["tests-" + b for b in BOARDS_UNIT_TEST])
         print(f"# Running {' '.join(cmd)}.")
-        subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+        subprocess.run(cmd, cwd=str(EC_DIR), check=True, env=env)
 
         # Verify the tests pass with ASan also
-        ec_dir = os.path.dirname(__file__)
+        ec_dir = str(EC_DIR)
         build_dir = os.path.join(ec_dir, "build")
         host_dir = os.path.join(build_dir, "host")
         print(f"# Deleting {host_dir}")
@@ -442,7 +447,7 @@ def test(opts):
 
         cmd = ["make", "TEST_ASAN=y", target, f"-j{opts.cpus}", "BOARD=host"]
         print(f"# Running {' '.join(cmd)}.")
-        subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
+        subprocess.run(cmd, cwd=str(EC_DIR), check=True, env=env)
 
         print(f"# Deleting {host_dir}")
         shutil.rmtree(host_dir)
@@ -457,15 +462,7 @@ def test(opts):
             f"-j{opts.cpus}",
         ]
         print(f"# Running {' '.join(cmd)}.")
-        subprocess.run(cmd, cwd=os.path.dirname(__file__), check=True, env=env)
-
-
-def find_checkout():
-    """Find the path to the base of the checkout (e.g., ~/chromiumos)."""
-    for path in pathlib.Path(__file__).resolve().parents:
-        if (path / ".repo").is_dir():
-            return path
-    raise FileNotFoundError("Unable to locate the root of the checkout")
+        subprocess.run(cmd, cwd=str(EC_DIR), check=True, env=env)
 
 
 def check_inherits(opts):
@@ -481,7 +478,7 @@ def check_inherits(opts):
     used_ec_boards = set()
     for line in subprocess.run(
         cmd,
-        cwd=os.path.dirname(__file__),
+        cwd=str(EC_DIR),
         check=True,
         universal_newlines=True,
         stdout=subprocess.PIPE,
@@ -669,6 +666,21 @@ def check_inherits(opts):
     return retcode
 
 
+def _run_subcommand(opts):
+    """Run selected subcommand and report any failed boards."""
+    try:
+        ret = opts.func(opts)
+    except subprocess.CalledProcessError:
+        ec_dir = str(EC_DIR)
+        failed_dir = os.path.join(ec_dir, ".failedboards")
+        if os.path.isdir(failed_dir):
+            print("Failed boards/tests:")
+            for fail in os.listdir(failed_dir):
+                print(f"\t{fail}")
+        return 1
+    return ret if ret is not None else 0
+
+
 def main(args):
     """Builds, bundles, or tests all of the EC targets.
 
@@ -689,18 +701,21 @@ def main(args):
         print("Must select a valid sub command!")
         return -1
 
-    # Run selected sub command function
     try:
-        opts.func(opts)
-    except subprocess.CalledProcessError:
-        ec_dir = os.path.dirname(__file__)
-        failed_dir = os.path.join(ec_dir, ".failedboards")
-        if os.path.isdir(failed_dir):
-            print("Failed boards/tests:")
-            for fail in os.listdir(failed_dir):
-                print(f"\t{fail}")
-        return 1
-    return 0
+        if not opts.bcs_version:
+            opts.bcs_version = get_version()
+        find_checkout()
+    except FileNotFoundError:
+        return _run_subcommand(opts)
+
+    logging.basicConfig(level=logging.INFO)
+    orig_dir = EC_DIR
+    try:
+        with prepared_workspace(opts, ec_dir=orig_dir) as shadow_ec:
+            globals()["EC_DIR"] = shadow_ec if shadow_ec else orig_dir
+            return _run_subcommand(opts)
+    finally:
+        globals()["EC_DIR"] = orig_dir
 
 
 if __name__ == "__main__":

@@ -9,9 +9,12 @@ This is the entry point for the custom firmware builder workflow recipe.  It
 gets invoked by chromite/api/controller/firmware.py.
 """
 
+from __future__ import annotations
+
 import argparse
 import getpass
 import json
+import logging
 import os
 from pathlib import Path
 import subprocess
@@ -22,8 +25,13 @@ import firmware_builder_lib
 
 # pylint: disable=import-error
 from google.protobuf import json_format
+import repository_prep
 
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
+
+
+EC_DIR = Path(__file__).parents[2].resolve()
+_REAL_EC_DIR = EC_DIR
 
 
 EC_BOARDS = [
@@ -46,13 +54,14 @@ class RenodeRunResult(NamedTuple):
 def build(opts: argparse.Namespace) -> int:
     """Build all the EC unit tests."""
 
-    working_dir = Path(__file__).parents[2].resolve()
+    working_dir = EC_DIR
     cmd = [
         "make",
         f"-j{opts.cpus}",
     ]
     cmd.extend(["tests-" + b for b in EC_BOARDS])
     subprocess.run(cmd, cwd=working_dir, check=True)
+    return 0
 
 
 def bundle(opts: argparse.Namespace) -> int:
@@ -180,8 +189,8 @@ def _write_results(final_results: Dict[str, Any], output_path: Path) -> None:
 def test(opts: argparse.Namespace) -> int:
     """Runs EC unit tests with Renode."""
 
-    working_dir = Path(__file__).parents[2].resolve()
-    renode_install_dir = working_dir.joinpath("renode")
+    working_dir = EC_DIR
+    renode_install_dir = _REAL_EC_DIR.joinpath("renode")
 
     # Renode is built as a subtool and available versions can be found here:
     # https://chrome-infra-packages.appspot.com/p/chromiumos/infra/tools/renode.
@@ -235,7 +244,7 @@ def test(opts: argparse.Namespace) -> int:
     # this up. Right now the EC coverage builders take longer than this,
     # so it doesn't affect overall CQ time.
     output_dir_val = getattr(opts, "output_dir", None)
-    output_dir = Path(output_dir_val) if output_dir_val else working_dir
+    output_dir = Path(output_dir_val) if output_dir_val else _REAL_EC_DIR
     output_dir.mkdir(parents=True, exist_ok=True)
 
     run_result = _run_renode_tests(output_dir, working_dir, EC_BOARDS)
@@ -248,6 +257,20 @@ def test(opts: argparse.Namespace) -> int:
         raise RuntimeError("One or more renode tests failed")
 
     return 0
+
+
+def _run_subcommand(opts: argparse.Namespace) -> int:
+    """Run opts.func and print any failed boards on failure."""
+    try:
+        ret = opts.func(opts)
+    except (subprocess.CalledProcessError, RuntimeError):
+        failed_dir = EC_DIR / ".failedboards"
+        if failed_dir.is_dir():
+            print("Failed boards/tests:")
+            for fail in failed_dir.iterdir():
+                print(f"\t{fail.name}")
+        return 1
+    return ret if ret is not None else 0
 
 
 def main(args: list[str]) -> int:
@@ -263,18 +286,25 @@ def main(args: list[str]) -> int:
         print("Must select a valid sub command!")
         return -1
 
-    # Run selected sub command function
+    if getattr(opts.func, "__name__", "") == "bundle":
+        return _run_subcommand(opts)
+
     try:
-        opts.func(opts)
-    except (subprocess.CalledProcessError, RuntimeError):
-        ec_dir = os.path.dirname(__file__)
-        failed_dir = os.path.join(ec_dir, ".failedboards")
-        if os.path.isdir(failed_dir):
-            print("Failed boards/tests:")
-            for fail in os.listdir(failed_dir):
-                print(f"\t{fail}")
-        return 1
-    return 0
+        repository_prep.find_checkout()
+    except FileNotFoundError:
+        return _run_subcommand(opts)
+
+    logging.basicConfig(level=logging.INFO)
+    original_ec_dir = EC_DIR
+    try:
+        with repository_prep.prepared_workspace(
+            opts, ec_dir=original_ec_dir
+        ) as shadow_ec:
+            if shadow_ec is not None:
+                globals()["EC_DIR"] = shadow_ec
+            return _run_subcommand(opts)
+    finally:
+        globals()["EC_DIR"] = original_ec_dir
 
 
 if __name__ == "__main__":
