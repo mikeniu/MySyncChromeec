@@ -1,0 +1,70 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58c0a695_46d3c7d9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-07T19:05:53Z",
+      "side": 1,
+      "message": "`zephyr/test/drivers/flash` does not contain a `testcase.yaml` (the `drivers.flash*` scenarios are defined in `zephyr/test/drivers/testcase.yaml`), so `./twister -T zephyr/test/drivers/flash` logs `WARNING - No testsuites found at the specified location...` and runs 0 tests.\n\nUse `-s` with the scenario names instead (also in parent CL 8518964):\n`TEST\u003d./twister -s drivers.flash -s drivers.flash.ec_host_cmd -s drivers.flash.page_layout -s drivers.flash.page_layout.ec_host_cmd -s drivers.flash.rollback -s drivers.flash.rollback.ec_host_cmd`",
+      "isAi": true,
+      "revId": "76dd8566ab55f896c0d0dcccf977825db360901c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "948f5f7c_ac95dcb8",
+        "filename": "zephyr/test/drivers/flash/src/flash.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-07T19:05:53Z",
+      "side": 1,
+      "message": "Nit (optional): You can use the `ec_cmd_flash_erase(NULL, \u0026...)` helper (used at lines 193 and 1007) instead of `BUILD_HOST_COMMAND_PARAMS` + `host_command_process` to make this as concise as the read/write overflow tests below.",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 170,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "76dd8566ab55f896c0d0dcccf977825db360901c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ac0ab59_13dc8eb1",
+        "filename": "zephyr/test/drivers/flash/src/flash.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-07T19:05:53Z",
+      "side": 1,
+      "message": "This assertion fails under `drivers.flash.page_layout` and `drivers.flash.page_layout.ec_host_cmd` (`CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT\u003dy`).\n\nWhen `CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT` is enabled, `CONFIG_FLASH_MULTIPLE_REGION` is defined (`zephyr/shim/include/config_chip.h:764`), so `crec_flash_erase()` skips `flash_range_ok()` and calls `cros_flash_emul_erase()`. In `zephyr/emul/emul_flash.c:109`, `if (flash_check_writable_range(offset, size))` converts the `EC_ERROR_INVAL` from `offset + size \u003e CONFIG_FLASH_SIZE_BYTES` into `EC_ERROR_ACCESS_DENIED` (4).\n\nConsider either checking `IS_ENABLED(CONFIG_PLATFORM_EC_USE_ZEPHYR_FLASH_PAGE_LAYOUT) ? EC_ERROR_ACCESS_DENIED : EC_ERROR_INVAL` here, or propagating the return value of `flash_check_writable_range()` in `cros_flash_emul_erase()`.",
+      "range": {
+        "startLine": 543,
+        "startChar": 0,
+        "endLine": 545,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "76dd8566ab55f896c0d0dcccf977825db360901c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
