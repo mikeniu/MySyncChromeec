@@ -22,6 +22,30 @@
       },
       "revId": "234b28e15fd466f005ffd2c70dac130fe035fef9",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecd2cd77_761812f1",
+        "filename": "util/renode/helipilot.repl",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1132339
+      },
+      "writtenOn": "2026-10-07T08:45:44Z",
+      "side": 1,
+      "message": "The battery-backed RAM is located at address range 400A F000h – 400A F07Fh.\nThe size is only 128 (0x80) bytes, not `\u003e\u003d 0x100`.\nThe offset `0x400AF100` is indeed the offset of `BKUP_STS` register.\nThe BBRAM size should be fixed to prevent the overlap.",
+      "parentUuid": "aa8f8254_5291fd26",
+      "range": {
+        "startLine": 39,
+        "startChar": 1,
+        "endLine": 48,
+        "endChar": 15
+      },
+      "revId": "234b28e15fd466f005ffd2c70dac130fe035fef9",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
