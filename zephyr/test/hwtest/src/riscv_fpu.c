@@ -1,0 +1,114 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <math.h>
+
+#include <zephyr/arch/riscv/csr.h>
+#include <zephyr/kernel.h>
+#include <zephyr/ztest.h>
+
+/* RISC-V Floating-Point Accrued Exception Flags (fflags CSR, bits 4:0). */
+#define FFLAGS_NX BIT(0) /* Inexact */
+#define FFLAGS_UF BIT(1) /* Underflow */
+#define FFLAGS_OF BIT(2) /* Overflow */
+#define FFLAGS_DZ BIT(3) /* Divide by zero */
+#define FFLAGS_NV BIT(4) /* Invalid operation */
+#define FFLAGS_EXC_FLAGS \
+	(FFLAGS_NX | FFLAGS_UF | FFLAGS_OF | FFLAGS_DZ | FFLAGS_NV)
+
+ZTEST_SUITE(riscv_fpu, NULL, NULL, NULL, NULL, NULL);
+
+static void reset_fflags(void)
+{
+	csr_clear(fflags, FFLAGS_EXC_FLAGS);
+}
+
+/* Performs division without casting to double. */
+static float divf(float a, float b)
+{
+	float result;
+
+	__asm__ volatile("fdiv.s %0, %1, %2" : "=f"(result) : "f"(a), "f"(b));
+
+	return result;
+}
+
+/* Make sure to use FPU instead of a hardcoded value computed in the build time.
+ */
+static inline float _sqrtf(float v)
+{
+	float root;
+
+	__asm__ volatile("fsqrt.s %0, %1" : "=f"(root) : "f"(v));
+
+	return root;
+}
+
+/*
+ * Expect underflow when dividing the smallest number that can be represented
+ * using floats.
+ */
+ZTEST(riscv_fpu, test_underflow)
+{
+	float result;
+
+	reset_fflags();
+	result = divf(1.40130e-45f, 2.0f);
+
+	zassert_equal(result, 0.0f);
+	zassert_true(csr_read(fflags) & FFLAGS_UF);
+}
+
+/*
+ * Expect overflow when dividing the highest number that can be represented
+ * using floats by number smaller than < 1.0f.
+ */
+ZTEST(riscv_fpu, test_overflow)
+{
+	float result;
+
+	reset_fflags();
+	result = divf(3.40282e38f, 0.5f);
+
+	zassert_true(isinf(result));
+	zassert_true(csr_read(fflags) & FFLAGS_OF);
+}
+
+/* Expect Division By Zero exception when 1.0f/0.0f. */
+ZTEST(riscv_fpu, test_division_by_zero)
+{
+	float result;
+
+	reset_fflags();
+	result = divf(1.0f, 0.0f);
+
+	zassert_true(isinf(result));
+	zassert_true(csr_read(fflags) & FFLAGS_DZ);
+}
+
+/* Expect Invalid Operation when trying to get square root of -1.0f. */
+ZTEST(riscv_fpu, test_invalid_operation)
+{
+	float result;
+
+	reset_fflags();
+	result = _sqrtf(-1.0f);
+
+	zassert_true(isnan(result));
+	zassert_true(csr_read(fflags) & FFLAGS_NV);
+}
+
+/* Expect Inexact bit to be set when performing 2.0f/3.0f. */
+ZTEST(riscv_fpu, test_inexact)
+{
+	float result;
+
+	reset_fflags();
+	result = divf(2.0f, 3.0f);
+
+	/* Check if result is not NaN nor infinity. */
+	zassert_true(!isnan(result) && !isinf(result));
+	zassert_true(csr_read(fflags) & FFLAGS_NX);
+}
