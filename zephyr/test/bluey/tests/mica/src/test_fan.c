@@ -114,14 +114,27 @@ ZTEST(mica_fan, test_board_override_fan_control)
 	zassert_equal(chipset_force_shutdown_fake.arg0_val,
 		      CHIPSET_SHUTDOWN_THERMAL);
 
-	/* Test chipset off resets fail count */
+	/* Test good sensor read resets fail count */
 	RESET_FAKE(chipset_force_shutdown);
-	chipset_in_state_fake.return_val = 0;
+	adc_read_channel_fake.return_val = 1500;
 	board_override_fan_control(0, temp);
 
-	/* Turn chipset back on and verify single failure does not trigger
-	 * shutdown */
+	/* Turn chipset back on and verify less than 10 failures does not
+	 * trigger shutdown
+	 */
 	chipset_in_state_fake.return_val = 1;
+
+	/* Test sensor read failure -> 9 failures */
+	adc_read_channel_fake.return_val = ADC_READ_ERROR;
+	for (int i = 0; i < 9; i++) {
+		board_override_fan_control(0, temp);
+		zassert_equal(chipset_force_shutdown_fake.call_count, 0);
+	}
+
+	/* Sensor reads valid value on 10th iteration */
+	adc_read_channel_fake.return_val = 1500;
+
+	/* Fail count reset, no thermal shutdown */
 	board_override_fan_control(0, temp);
 	zassert_equal(chipset_force_shutdown_fake.call_count, 0);
 }
