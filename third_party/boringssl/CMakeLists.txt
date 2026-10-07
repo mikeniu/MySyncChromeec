@@ -80,10 +80,16 @@ add_dependencies(crypto zephyr_generated_headers)
 # -fno-common disables merging tentative definitions (uninitialized global
 # variables) into pre-existing definition (initialized global variable).
 # Recommended by BoringSSL.
+#
+# -Wno-deprecated-volatile is needed for C++ sources because BoringSSL targets
+# C++17 (where volatile increment is valid, e.g. in jitter.cc.inc on
+# native_sim), whereas zephyr_interface appends -std=c++20 when C++20 is
+# enabled.
 set(BORINGSSL_COMPILE_OPTIONS
 	-D_POSIX_C_SOURCE=200809L
 	-Wno-implicit-function-declaration
 	-fno-common
+	$<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-volatile>
 )
 
 # Create interface library that specifies compile options required by
