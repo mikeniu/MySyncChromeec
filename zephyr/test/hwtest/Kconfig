@@ -29,6 +29,13 @@ config HW_TEST_ASSERT_BUILTIN
 	  The test verifies if ASSERT() call works correctly and validates
 	  panic data.
 
+config HW_TEST_ASSERT_STDLIB
+	bool "Stdlib assert test"
+	depends on ZTEST
+	depends on PLATFORM_EC_PANIC
+	help
+	  The test verifies if stdlib assert() call works correctly.
+
 config HW_TEST_BBRAM_RETAINED_MEM
 	bool "BBRAM retained memory test"
 	depends on ZTEST
