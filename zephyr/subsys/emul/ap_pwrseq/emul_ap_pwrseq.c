@@ -95,3 +95,9 @@ enum ap_pwrseq_state ap_pwrseq_get_current_state(const struct device *dev)
 
 	return ret_state;
 }
+
+enum ap_pwrseq_state
+ap_pwrseq_get_current_state_unlocked(const struct device *dev)
+{
+	return ap_pwrseq_get_current_state(dev);
+}

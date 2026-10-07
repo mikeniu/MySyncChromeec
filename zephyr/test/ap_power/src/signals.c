@@ -287,6 +287,32 @@ ZTEST(signals, test_signal_mask)
 }
 
 /**
+ * @brief TestPurpose: Verify cached signal mask
+ *
+ * Expected Results
+ *  - power_get_signals_cached() reflects signal updates and matches
+ *    power_get_signals() once polled.
+ */
+ZTEST(signals, test_signal_mask_cached)
+{
+	power_signal_mask_t bm = POWER_SIGNAL_MASK(PWR_ALL_SYS_PWRGD);
+	power_signal_mask_t polled;
+	power_signal_mask_t cached;
+
+	power_signal_set(PWR_ALL_SYS_PWRGD, 1);
+	zassert_equal(bm, power_get_signals_cached() & bm);
+	power_signal_set(PWR_ALL_SYS_PWRGD, 0);
+	zassert_equal(0, power_get_signals_cached() & bm);
+
+	/* Keep the pwrseq thread from changing signals between reads. */
+	k_sched_lock();
+	polled = power_get_signals();
+	cached = power_get_signals_cached();
+	k_sched_unlock();
+	zassert_equal(polled, cached);
+}
+
+/**
  * @brief TestPurpose: Verify set/get of debug mask
  *
  * @details

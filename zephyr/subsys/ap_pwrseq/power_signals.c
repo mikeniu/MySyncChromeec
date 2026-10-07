@@ -140,6 +140,11 @@ test_mockable power_signal_mask_t power_get_signals(void)
 	return atomic_get(&power_signals);
 }
 
+test_mockable power_signal_mask_t power_get_signals_cached(void)
+{
+	return atomic_get(&power_signals);
+}
+
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
 test_mockable void power_signal_interrupt(enum power_signal signal, int value)
 {

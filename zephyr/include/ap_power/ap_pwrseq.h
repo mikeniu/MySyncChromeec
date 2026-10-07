@@ -150,6 +150,22 @@ void ap_pwrseq_post_event(const struct device *dev, enum ap_pwrseq_event event);
 enum ap_pwrseq_state ap_pwrseq_get_current_state(const struct device *dev);
 
 /**
+ * @brief Get current state without taking the state lock.
+ *
+ * Same as ap_pwrseq_get_current_state(), but does not take the state lock,
+ * so it is safe to call from ISR context. The caller does not need to hold
+ * the lock; the result is best-effort and may be stale if a transition is
+ * in progress.
+ *
+ * @param dev Pointer of AP power sequence device driver.
+ *
+ * @retval Valid state enumeration value.
+ * @retval AP_POWER_STATE_UNDEF if error.
+ **/
+enum ap_pwrseq_state
+ap_pwrseq_get_current_state_unlocked(const struct device *dev);
+
+/**
  * @brief Get null terminated string of selected state.
  *
  * @param state AP power sequence valid state.

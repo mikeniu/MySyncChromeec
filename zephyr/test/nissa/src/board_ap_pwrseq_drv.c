@@ -87,6 +87,8 @@ ZTEST(nissa_board_power, test_board_ap_power_g3_run_1)
 		      "Unable to load test platform `tp_power_up_ok`");
 
 	zassert_equal(ap_pwrseq_get_current_state(dev), AP_POWER_STATE_G3);
+	zassert_equal(ap_pwrseq_get_current_state_unlocked(dev),
+		      AP_POWER_STATE_G3);
 	zassert_equal(0, power_signal_get(PWR_EN_PP3300_A));
 	zassert_equal(0, power_signal_get(PWR_EN_PP5000_A));
 	zassert_equal(0, power_signal_get(PWR_DSW_PWROK));
