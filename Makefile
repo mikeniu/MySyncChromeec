@@ -15,6 +15,18 @@
 ARCH?=amd64
 BOARD ?= elm
 
+ifneq ($(PREPARE_WORKSPACE),)
+ifeq ($(MAKELEVEL),0)
+_prep_cmd := python3 util/repository_prep.py --allow-dirty \
+	$(foreach d,$(PATCHES_DIRS),--patches-dir $(d)) \
+	$(foreach d,$(SRC_OVERRIDE_DIRS),--src-override-dir $(d))
+_prep_status := $(shell $(_prep_cmd) >&2; echo $$?)
+ifneq ($(_prep_status),0)
+$(error Codebase preparation failed)
+endif
+endif
+endif
+
 # Directory where the board is configured (includes /$(BOARD) at the end)
 BDIR:=$(wildcard board/$(BOARD))
 # Private board directory
@@ -27,8 +39,10 @@ BDIR:=$(wildcard board/$(BOARD))
 PBDIR:=$(wildcard ../private-*/board/$(BOARD))
 
 # We need either public, or private board directory, or both.
+ifneq ($(MAKECMDGOALS),prepare)
 ifeq (,$(BDIR)$(PBDIR))
 $(error unable to locate BOARD $(BOARD))
+endif
 endif
 
 # Setup PDIR (private directory root).
