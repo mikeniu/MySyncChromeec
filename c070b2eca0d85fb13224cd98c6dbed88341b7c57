@@ -46,6 +46,30 @@
       },
       "revId": "c070b2eca0d85fb13224cd98c6dbed88341b7c57",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c24dd7fb_8485c5df",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_stm32_backend.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-07T06:14:24Z",
+      "side": 1,
+      "message": "Great, thanks. Feel free to add me to review in upstream.",
+      "parentUuid": "c49c3bc7_f65c4fdc",
+      "range": {
+        "startLine": 56,
+        "startChar": 2,
+        "endLine": 56,
+        "endChar": 65
+      },
+      "revId": "c070b2eca0d85fb13224cd98c6dbed88341b7c57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
