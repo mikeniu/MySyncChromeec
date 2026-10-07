@@ -49,6 +49,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9be423a_f993dd28",
+        "filename": "third_party/boringssl/CMakeLists.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T20:36:30Z",
+      "side": 1,
+      "message": "Created precursor CLs to uprev BoringSSL to 6f420a5259f0 (which includes upstream commit c70aca774064):\n- https://chrome-internal-review.googlesource.com/c/chromeos/manifest-internal/+/9934495\n- https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8521352\n- https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8521353\n- https://chromium-review.googlesource.com/c/chromiumos/overlays/chromiumos-overlay/+/8528631\n\nRemoved the -UOPENSSL_NO_ASM workaround from this CL and added Cq-Depend on the BoringSSL uprev.",
+      "parentUuid": "3e139457_02b6132d",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 39
+      },
+      "isAi": true,
+      "revId": "6a19570856956f808ab8782fc51d3ee8c296e0e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "09d094e4_f064a20a",
