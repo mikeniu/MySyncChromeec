@@ -1,0 +1,25 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <dt-bindings/motionsense/utils.h>
+
+/ {
+	named-gpios {
+		compatible = "named-gpios";
+
+		entering_rw: entering_rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+	};
+
+	named-i2c-ports {
+		compatible = "named-i2c-ports";
+
+		i2c_sensor: sensor {
+			i2c-port = <&i2c0>;
+			enum-names = "I2C_PORT_SENSOR";
+		};
+	};
+};
