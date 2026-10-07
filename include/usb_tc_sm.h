@@ -203,6 +203,14 @@ __override_proto void tc_update_pd_sleep_mask(int port);
 void tc_snk_power_off(int port);
 
 /**
+ * Stop sinking for a Hard Reset, as TCPCI requires. Called from the Policy
+ * Engine. Only has effect in Attached.SNK.
+ *
+ * @param port USB-C port number
+ */
+void tc_snk_prepare_hard_reset(int port);
+
+/**
  * Instructs the Attached.SRC to stop supplying power. The function has
  * no effect if the current Type-C state is not Attached.SRC.
  *
