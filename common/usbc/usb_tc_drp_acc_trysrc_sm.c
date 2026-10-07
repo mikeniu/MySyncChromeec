@@ -1389,6 +1389,22 @@ static bool tc_perform_snk_hard_reset(int port)
 		    TC_CHK_FLAG(port, TC_FLAGS_VCONN_ON))
 			set_vconn(port, 0);
 
+		/*
+		 * TCPCI requires the Sink to remove its sink connection upon
+		 * reception of or prior to transmitting a Hard Reset.
+		 * Invalidate every supplier, including those that only track
+		 * VBUS presence, so charge_manager opens the sink path.
+		 *
+		 * Skip this if the partner has not indicated PD support. A
+		 * non-PD partner will keep VBUS up. Suppliers that only update
+		 * on a VBUS edge would not come back until replug.
+		 */
+		if (pd_capable(port)) {
+			sink_stop_drawing_current(port);
+			if (IS_ENABLED(CONFIG_CHARGE_MANAGER))
+				charge_manager_invalidate_suppliers(port);
+		}
+
 		/* Wait up to tVSafe0V for Vbus to disappear */
 		tc[port].ps_reset_state = PS_STATE1;
 		pd_timer_enable(port, TC_TIMER_TIMEOUT, PD_T_SAFE_0V);
@@ -1398,6 +1414,11 @@ static bool tc_perform_snk_hard_reset(int port)
 			/*
 			 * Partner dropped Vbus, reduce our current consumption
 			 * and await its return.
+			 *
+			 * Only relevant for a PD source that never sent Source
+			 * Capabilities. A PD source that already sent a message
+			 * would have stopped sinking earlier. A non-PD source
+			 * would never have reached vSafe0V.
 			 */
 			sink_stop_drawing_current(port);
 
