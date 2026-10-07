@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "016b8460_b297d6ba",
+        "filename": "third_party/boringssl/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T21:16:38Z",
+      "side": 1,
+      "message": "Can we build boringssl with C++20 instead?",
+      "range": {
+        "startLine": 84,
+        "startChar": 61,
+        "endLine": 85,
+        "endChar": 8
+      },
+      "revId": "315dcd937975db6555175ac859c3f91020d2b0fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
