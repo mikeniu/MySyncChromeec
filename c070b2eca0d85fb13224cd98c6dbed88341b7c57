@@ -70,6 +70,30 @@
       },
       "revId": "c070b2eca0d85fb13224cd98c6dbed88341b7c57",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe8463bf_b744ce72",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_stm32_backend.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-07T06:26:34Z",
+      "side": 1,
+      "message": "Upstream PR: https://github.com/zephyrproject-rtos/zephyr/pull/121484\n\nI added you to review but left the PR in draft to allow CI checks to complete first, in case the change breaks something. The current behavior is unaligned with the documentation but there still might be users that depend on this incorrect behavior anyway.",
+      "parentUuid": "c24dd7fb_8485c5df",
+      "range": {
+        "startLine": 56,
+        "startChar": 2,
+        "endLine": 56,
+        "endChar": 65
+      },
+      "revId": "c070b2eca0d85fb13224cd98c6dbed88341b7c57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
