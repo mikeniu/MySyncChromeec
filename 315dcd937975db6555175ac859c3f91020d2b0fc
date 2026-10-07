@@ -22,6 +22,31 @@
       },
       "revId": "315dcd937975db6555175ac859c3f91020d2b0fc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1897b89_da589362",
+        "filename": "third_party/boringssl/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T21:42:46Z",
+      "side": 1,
+      "message": "Clarified the comment: zephyr_interface already appends -std\u003dc++20 (so BoringSSL C++ sources are compiled as C++20), which is what triggers -Wdeprecated-volatile on array_[0]++ in jitter.cc.inc. Also prepared upstream BoringSSL CL https://boringssl-review.googlesource.com/c/boringssl/+/103828 to fix it and added a TODO to remove -Wno-deprecated-volatile once it rolls in.",
+      "parentUuid": "016b8460_b297d6ba",
+      "range": {
+        "startLine": 84,
+        "startChar": 61,
+        "endLine": 85,
+        "endChar": 8
+      },
+      "isAi": true,
+      "revId": "315dcd937975db6555175ac859c3f91020d2b0fc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
