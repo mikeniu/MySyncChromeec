@@ -272,9 +272,35 @@ adb shell du -b /vendor/etc/cros_ec/tokens.bin
 
 ## Recovering from failures
 
-A failure can occur when an outdated database is used with an EC image. Pigweed
-provides a [Detokenizing CLI tool](https://pigweed.dev/pw_tokenizer/detokenization.html#detokenizing-cli-tool)
-to help with debugging detokenizing failures.
+A failure can occur when an outdated database is used with an EC image. The
+helper script `util/decode_tokenized_logs.py` makes it easy to detokenize log
+files, console dumps, or standalone token strings without needing to manually
+configure Pigweed paths or manage database files:
+
+```bash
+# Decode a log file:
+./util/decode_tokenized_logs.py failed_log.txt
+./util/decode_tokenized_logs.py -i failed_log.txt
+
+# Detokenize logs from a pipe:
+cat failed_log.txt | ./util/decode_tokenized_logs.py
+
+# Detokenize a single token or string:
+./util/decode_tokenized_logs.py "vO2VnwAMQXR0YWNoZWQuU05LClJEX1BXUl9MVkw="
+
+# Specify a custom database or ELF file:
+./util/decode_tokenized_logs.py -d build/tokens.bin -i failed_log.txt
+./util/decode_tokenized_logs.py -b skyrim -i failed_log.txt
+
+# Force update to the latest historical database:
+./util/decode_tokenized_logs.py --update-db -i failed_log.txt
+```
+
+The script automatically searches for local build databases (`build/tokens.bin`),
+system databases, local user cache (`~/.cache/cros_ec/tokens/`), and automatically
+downloads the latest historical database from Google Cloud Storage if needed.
+
+Alternatively, you can manually use Pigweed's [Detokenizing CLI tool](https://pigweed.dev/pw_tokenizer/detokenization.html#detokenizing-cli-tool):
 
 First, you'll need to setup your pigweed root directory. This typically lives
 in the following location.
