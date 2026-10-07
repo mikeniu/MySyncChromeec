@@ -145,7 +145,7 @@ $(BUILD)/zephyr/lcov_no_tests.info: $(BUILD)/zephyr/lcov.info
 	-o $@ $<
 
 $(BUILD)/zephyr/lcov_rpt: $(BUILD)/zephyr/lcov.info
-	/usr/bin/genhtml $(LCOV_PARALLEL) --branch-coverage -q -o $@ \
+	/usr/bin/genhtml --branch-coverage -q -o $@ \
 	--ignore-errors inconsistent,inconsistent --ignore-errors unused \
 	-t 'All boards and tests merged' -s $^
 
