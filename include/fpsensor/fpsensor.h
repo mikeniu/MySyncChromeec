@@ -188,6 +188,7 @@ int fp_maintenance(void);
  */
 int fp_vendor_command(uint32_t param, uint8_t *buf, size_t buf_size);
 
+#ifdef CONFIG_ZEPHYR
 /**
  * Put the sensor into idle state
  *
@@ -198,6 +199,8 @@ int fp_vendor_command(uint32_t param, uint8_t *buf, size_t buf_size);
  * @return negative value on error
  */
 int fp_idle(void);
+
+#endif /* CONFIG_ZEPHYR */
 
 #ifdef __cplusplus
 }
