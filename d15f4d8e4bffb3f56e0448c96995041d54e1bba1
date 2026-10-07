@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d60f9b87_bc7ca6f2",
+        "filename": "zephyr/test/hwtest/src/assert_stdlib.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T17:27:27Z",
+      "side": 1,
+      "message": "Is there a better way to do this that is more robust?",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 68
+      },
+      "revId": "d15f4d8e4bffb3f56e0448c96995041d54e1bba1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
