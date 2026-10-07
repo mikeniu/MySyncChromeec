@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "883a67a6_f83bd391",
+        "filename": "zephyr/program/trulo/trulo.dtsi",
+        "patchSetId": 57
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-07T21:49:51Z",
+      "side": 1,
+      "message": "Note that only `trulo`, `trulo-ti`, and `uldrenite` include `trulo.dtsi` (`pujjocento`, `pujjolo`, and `kaladin` do not). Without `zephyr,host-cmd-espi-backend \u003d \u0026espi0` in `/chosen`, `CONFIG_EC_HOST_CMD_BACKEND_ESPI` defaults to `n` on those three variants, so they build with `CONFIG_EC_HOST_CMD\u003dy` but without a host command backend enabled.\n\nConsider moving this into a `zephyr/program/trulo/common.overlay` and adding it to both `dts_overlays` lists in `register_trulo_project()` in `BUILD.py` (like the other boards in this stack).",
+      "isAi": true,
+      "revId": "f031d4facaa9ead12b3dae981d7a27db8ba8f515",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
