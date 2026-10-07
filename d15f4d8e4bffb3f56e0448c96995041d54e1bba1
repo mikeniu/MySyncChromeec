@@ -22,6 +22,31 @@
       },
       "revId": "d15f4d8e4bffb3f56e0448c96995041d54e1bba1",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1792fed_11cc7be7",
+        "filename": "zephyr/test/hwtest/src/assert_stdlib.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T18:53:05Z",
+      "side": 1,
+      "message": "Done. Wrapped abort() via -Wl,--wrap\u003dabort in CMakeLists.txt so __wrap_abort() records abort_called \u003d true before calling __real_abort(), and ztest_post_fatal_error_hook() verifies abort_called directly without estimating function size or inspecting architecture-specific PC registers.",
+      "parentUuid": "d60f9b87_bc7ca6f2",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 68
+      },
+      "isAi": true,
+      "revId": "d15f4d8e4bffb3f56e0448c96995041d54e1bba1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
