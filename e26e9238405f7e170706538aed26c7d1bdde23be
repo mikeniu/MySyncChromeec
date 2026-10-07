@@ -16,6 +16,69 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "e26e9238405f7e170706538aed26c7d1bdde23be",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6213bc3b_2958b8b2",
+        "filename": "common/charge_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-07T20:26:00Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: If `v_max` is not an exact multiple of the charger\u0027s voltage step, clamping *after* rounding can return an unaligned voltage. This contradicts the comment at line 1380 which states \"round to valid value\".\n\nConsider doing the clamping before calling `charger_closest_voltage` to ensure the final result is always rounded down to a valid charger step:\n```c\n\tint v_max \u003d battery_get_info()-\u003evoltage_max;\n\n\tif (voltage \u003e v_max) {\n\t\tvoltage \u003d v_max;\n\t}\n\n\treturn charger_closest_voltage(voltage);\n```",
+      "range": {
+        "startLine": 422,
+        "startChar": 0,
+        "endLine": 422,
+        "endChar": 0
+      },
+      "revId": "e26e9238405f7e170706538aed26c7d1bdde23be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc301289_64c7b471",
+        "filename": "common/charge_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-07T20:26:00Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: If `voltage` is clamped to `v_max` *after* calling `charger_closest_voltage()`, the resulting voltage might not be a multiple of the charger\u0027s voltage step (if `v_max` itself isn\u0027t a multiple).\n\nTo adhere to the comment \"Clamp to battery chemistry maximum voltage and round to valid value\", you should clamp to `v_max` first, and then call `charger_closest_voltage()` so that the final returned value is properly aligned to the charger\u0027s step size.\n\n```c\n\tif (voltage \u003e v_max) {\n\t\tvoltage \u003d v_max;\n\t}\n\treturn charger_closest_voltage(voltage);\n```",
+      "range": {
+        "startLine": 422,
+        "startChar": 0,
+        "endLine": 422,
+        "endChar": 0
+      },
+      "revId": "e26e9238405f7e170706538aed26c7d1bdde23be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6548a6c_65659302",
+        "filename": "common/charge_state.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1411,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-07T20:26:00Z",
+      "side": 1,
+      "message": "Should this be clamped too?",
+      "revId": "e26e9238405f7e170706538aed26c7d1bdde23be",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
