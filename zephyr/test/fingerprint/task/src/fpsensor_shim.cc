@@ -20,6 +20,7 @@
 #include <fpsensor/fpsensor.h>
 #include <fpsensor/fpsensor_detect.h>
 #include <mkbp_event.h>
+#include <vector>
 
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
@@ -194,6 +195,52 @@ ZTEST_USER(fpsensor_shim, test_shim_finger_status_error)
 	fingerprint_set_state(fp_sim, &state);
 
 	zassert_equal(fp_finger_status(), FINGER_NONE);
+}
+
+static const struct fingerprint_image_frame_params *
+get_frame_params(enum fingerprint_capture_type capture_type)
+{
+	for (const auto &p : expected_image_frame_params_array) {
+		if (p.fp_capture_type == capture_type) {
+			return &p;
+		}
+	}
+	return nullptr;
+}
+
+static void assert_acquire_image_with_size_modifier(ssize_t size_modifier,
+						    int expected_result)
+{
+	const struct fingerprint_image_frame_params *params =
+		get_frame_params(FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE);
+	zassert_not_null(params);
+
+	const size_t req_size =
+		params->image_data_offset_bytes + params->frame_size;
+	const size_t test_size = req_size + size_modifier;
+	std::vector<uint8_t> image_buf(MAX(req_size, test_size));
+
+	zassert_equal(fingerprint_acquire_image(
+			      fp_sim, FINGERPRINT_CAPTURE_TYPE_SIMPLE_IMAGE,
+			      image_buf.data(), test_size),
+		      expected_result);
+}
+
+ZTEST_USER(fpsensor_shim, test_shim_acquire_image_small_buffer_size)
+{
+	assert_acquire_image_with_size_modifier(-1, -EINVAL);
+}
+
+ZTEST_USER(fpsensor_shim, test_shim_acquire_image_exact_buffer_size)
+{
+	assert_acquire_image_with_size_modifier(0,
+						FINGERPRINT_SENSOR_SCAN_GOOD);
+}
+
+ZTEST_USER(fpsensor_shim, test_shim_acquire_image_large_buffer_size)
+{
+	assert_acquire_image_with_size_modifier(1,
+						FINGERPRINT_SENSOR_SCAN_GOOD);
 }
 
 static void fpsensor_before(void *f)
