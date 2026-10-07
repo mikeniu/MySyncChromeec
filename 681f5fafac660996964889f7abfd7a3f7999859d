@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "294fefdd_75cfdf8b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1369019
+      },
+      "writtenOn": "2026-10-07T22:19:34Z",
+      "side": 1,
+      "message": "I tested this from an image Caveh provided and was able to boot successfully a ITE card with SKU 10 to the OS login prompt on the RVP.",
+      "revId": "681f5fafac660996964889f7abfd7a3f7999859d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
