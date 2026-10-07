@@ -937,10 +937,16 @@ void pe_got_hard_reset(int port)
 	/* Exit BIST Test mode, in case the TCPC entered it. */
 	tcpc_set_bist_test_mode(port, false);
 
-	if (pe[port].power_role == PD_ROLE_SOURCE)
+	if (pe[port].power_role == PD_ROLE_SOURCE) {
 		set_state_pe(port, PE_SRC_HARD_RESET_RECEIVED);
-	else
+	} else {
+		/*
+		 * The partner indicated PD support by sending Hard Reset, so
+		 * prepare for it to drop VBUS.
+		 */
+		tc_snk_prepare_hard_reset(port);
 		set_state_pe(port, PE_SNK_TRANSITION_TO_DEFAULT);
+	}
 }
 
 #ifdef CONFIG_USB_PD_REV30
@@ -4054,6 +4060,14 @@ static void pe_snk_hard_reset_entry(int port)
 
 	PE_CLR_MASK(port, BIT(PE_FLAGS_SNK_WAIT_CAP_TIMEOUT_FN) |
 				  BIT(PE_FLAGS_PROTOCOL_ERROR_FN));
+
+	/*
+	 * Stop sinking VBUS before sending Hard Reset, if the partner
+	 * previously indicated PD support. If the partner does not support PD,
+	 * the Hard Reset will ultimately be a no-op.
+	 */
+	if (pd_capable(port))
+		tc_snk_prepare_hard_reset(port);
 
 	/* Request the generation of Hard Reset Signaling by the PHY Layer */
 	prl_execute_hard_reset(port);
