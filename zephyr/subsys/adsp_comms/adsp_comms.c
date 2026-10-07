@@ -134,7 +134,7 @@ DECLARE_CONSOLE_COMMAND(chgstate, command_chgstate, "[sustain <lower> <upper>]",
 #ifdef CONFIG_BATTERY_STATUS_CUSTOM
 test_mockable int battery_status(int *status)
 {
-	if (chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
+	if (chipset_in_state(CHIPSET_STATE_HARD_OFF)) {
 		return sb_read(SB_BATTERY_STATUS, status);
 	}
 
