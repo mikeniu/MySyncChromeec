@@ -24,6 +24,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e139457_02b6132d",
+        "filename": "third_party/boringssl/CMakeLists.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T17:20:52Z",
+      "side": 1,
+      "message": "Yes — upstream BoringSSL removed the #if !defined(OPENSSL_NO_ASM) gate around the inline assembly memory barrier in OPENSSL_cleanse() in https://boringssl-review.googlesource.com/c/boringssl/+/93970 (commit c70aca774064). Updated the comment here to reference that upstream fix and note that -UOPENSSL_NO_ASM can be dropped once third_party/boringssl rolls past that commit.",
+      "parentUuid": "e0a973cc_1dbd87db",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 39
+      },
+      "isAi": true,
+      "revId": "6a19570856956f808ab8782fc51d3ee8c296e0e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "09d094e4_f064a20a",
@@ -43,6 +68,31 @@
         "endLine": 165,
         "endChar": 23
       },
+      "revId": "6a19570856956f808ab8782fc51d3ee8c296e0e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afb76832_d60fec73",
+        "filename": "zephyr/program/fpmcu/testcase.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T17:20:52Z",
+      "side": 1,
+      "message": "Yes, go/keep-sorted works for testcase.yaml, CMakeLists.txt, and Kconfig (with newline_separated\u003dyes). Split out the go/keep-sorted directives and sorting into a separate parent CL (https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8519969) and rebased this CL onto it.",
+      "parentUuid": "09d094e4_f064a20a",
+      "range": {
+        "startLine": 161,
+        "startChar": 1,
+        "endLine": 165,
+        "endChar": 23
+      },
+      "isAi": true,
       "revId": "6a19570856956f808ab8782fc51d3ee8c296e0e4",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
