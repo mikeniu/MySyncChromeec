@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0a973cc_1dbd87db",
+        "filename": "third_party/boringssl/CMakeLists.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T17:03:32Z",
+      "side": 1,
+      "message": "This seems like a bug in boringssl. Has it been fixed upstream?",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 39
+      },
+      "revId": "6a19570856956f808ab8782fc51d3ee8c296e0e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09d094e4_f064a20a",
+        "filename": "zephyr/program/fpmcu/testcase.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-07T17:03:32Z",
+      "side": 1,
+      "message": "Does go/keep-sorted work for these files? Let\u0027s do the sorting in a separate CL.",
+      "range": {
+        "startLine": 161,
+        "startChar": 1,
+        "endLine": 165,
+        "endChar": 23
+      },
+      "revId": "6a19570856956f808ab8782fc51d3ee8c296e0e4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
