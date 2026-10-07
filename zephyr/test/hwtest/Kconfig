@@ -143,6 +143,14 @@ config HW_TEST_MALLOC
 	help
 	  The test verifies basic malloc operations.
 
+config HW_TEST_MPU
+	bool "MPU test"
+	depends on ZTEST
+	depends on ARM_MPU
+	depends on MPU
+	help
+	  The test verifies ARM MPU configuration and protection.
+
 config HW_TEST_OTP_KEY
 	bool "OTP key test"
 	depends on ZTEST
