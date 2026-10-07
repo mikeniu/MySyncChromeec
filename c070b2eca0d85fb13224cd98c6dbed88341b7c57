@@ -94,6 +94,30 @@
       },
       "revId": "c070b2eca0d85fb13224cd98c6dbed88341b7c57",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58db2b29_ef464665",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_stm32_backend.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-07T07:16:13Z",
+      "side": 1,
+      "message": "JFYI: marked the upstream PR as ready for review.",
+      "parentUuid": "fe8463bf_b744ce72",
+      "range": {
+        "startLine": 56,
+        "startChar": 2,
+        "endLine": 56,
+        "endChar": 65
+      },
+      "revId": "c070b2eca0d85fb13224cd98c6dbed88341b7c57",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
