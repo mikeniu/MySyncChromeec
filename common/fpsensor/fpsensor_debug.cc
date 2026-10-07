@@ -16,9 +16,11 @@
 #include "util.h"
 #include "watchdog.h"
 
-#include <zephyr/shell/shell.h>
-
 #include <vector>
+
+#ifdef CONFIG_ZEPHYR
+#include <zephyr/shell/shell.h>
+#endif
 
 #ifdef CONFIG_CMD_FPSENSOR_DEBUG
 /* --- Debug console commands --- */

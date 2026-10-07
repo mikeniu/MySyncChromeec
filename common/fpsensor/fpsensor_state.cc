@@ -21,7 +21,9 @@
 #include "task.h"
 #include "util.h"
 
+#ifdef CONFIG_ZEPHYR
 #include <zephyr/shell/shell.h>
+#endif
 
 #include <algorithm>
 #include <array>
