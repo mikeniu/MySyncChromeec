@@ -121,4 +121,15 @@ set_property(TARGET crypto PROPERTY INTERPROCEDURAL_OPTIMIZATION
 set_property(TARGET fipsmodule PROPERTY INTERPROCEDURAL_OPTIMIZATION
 	${APP_LTO_PROPERTY})
 
+# Ensure OPENSSL_cleanse in crypto/mem.c retains its inline assembly memory
+# barrier even when OPENSSL_NO_ASM is set so that LTO does not eliminate
+# OPENSSL_cleanse calls as dead stores. Upstream BoringSSL removed the
+# OPENSSL_NO_ASM gate in https://boringssl-review.googlesource.com/c/boringssl/+/93970
+# (commit c70aca774064), so this workaround can be dropped once
+# third_party/boringssl rolls past that commit.
+set_source_files_properties(${BORINGSSL_SOURCES}/crypto/mem.c
+	TARGET_DIRECTORY crypto
+	PROPERTIES COMPILE_OPTIONS "-UOPENSSL_NO_ASM"
+)
+
 endif()
