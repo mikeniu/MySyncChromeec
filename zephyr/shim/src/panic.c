@@ -447,5 +447,13 @@ static void panic_host_event_init(void)
 		pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTEVENT;
 	}
 }
+#if IS_ENABLED(CONFIG_PLATFORM_EC_HOST_INTERFACE_HECI)
+/* On ISH, the AP is already powered on (S0) when ISH boots, so notify on
+ * HOOK_INIT */
+DECLARE_HOOK(HOOK_INIT, panic_host_event_init, HOOK_PRIO_LAST);
+#else
+/* On main EC, wait for the AP chipset to power on from G3/S5 before notifying
+ */
 DECLARE_HOOK(HOOK_CHIPSET_STARTUP, panic_host_event_init, HOOK_PRIO_LAST);
+#endif
 #endif
