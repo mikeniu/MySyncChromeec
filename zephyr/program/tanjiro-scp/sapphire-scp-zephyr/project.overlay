@@ -1,0 +1,180 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#include <dt-bindings/motionsense/utils.h>
+
+/ {
+	aliases {
+		tcs3400-int = &als_clear;
+	};
+
+	/* Rotation matrix used by drivers. */
+	motionsense-rotation-ref {
+		compatible = "cros-ec,motionsense-rotation-ref";
+		lid_rot_ref: lid-rotation-ref-bmi {
+			mat33 = <(-1) 0 0
+				 0 (-1) 0
+				 0 0 1>;
+		};
+	};
+
+	motionsense-sensor-data {
+		bmi323_data: bmi323-drv-data {
+			compatible = "cros-ec,drvdata-bmi3xx";
+			status = "okay";
+		};
+
+		tcs_clear_data: tcs3400-clear-drv-data {
+			compatible = "cros-ec,drvdata-tcs3400-clear";
+			status = "okay";
+
+			als-drv-data {
+				compatible = "cros-ec,accelgyro-als-drv-data";
+				als-cal {
+					scale = <1>;
+					uscale = <0>;
+					offset = <0>;
+					als-channel-scale {
+						compatible = "cros-ec,accelgyro-als-channel-scale";
+						k-channel-scale = <1>;
+						cover-scale = "1.0f";
+					};
+				};
+			};
+		};
+
+		tcs_rgb_data: tcs3400-rgb-drv-data {
+			compatible = "cros-ec,drvdata-tcs3400-rgb";
+			status = "okay";
+
+			/* node for rgb_calibration_t defined in accelgyro.h */
+			rgb_calibration {
+				compatible = "cros-ec,accelgyro-rgb-calibration";
+
+				irt = <1>;
+
+				rgb-cal-x {
+					offset = <0>;
+					coeff = "0.464318099", "-0.374639473", "0.059786474", "-0.749608515";
+					als-channel-scale {
+						compatible = "cros-ec,accelgyro-als-channel-scale";
+						k-channel-scale = <1>;
+						cover-scale = "1.0f";
+					};
+				};
+				rgb-cal-y {
+					offset = <0>;
+					coeff = "0.462807275", "-0.400565821", "-0.100519369", "-0.510790024";
+					als-channel-scale {
+						compatible = "cros-ec,accelgyro-als-channel-scale";
+						k-channel-scale = <1>;
+						cover-scale = "1.0f";
+					};
+				};
+				rgb-cal-z {
+					offset = <0>;
+					coeff = "-0.062110042", "-0.02692167", "0.359548949", "0.383362422";
+					als-channel-scale {
+						compatible = "cros-ec,accelgyro-als-channel-scale";
+						k-channel-scale = <1>;
+						cover-scale = "1.0f";
+					};
+				};
+			};
+		};
+	};
+
+	motionsense-mutex {
+		compatible = "cros-ec,motionsense-mutex";
+		lid_mutex: lid-mutex {
+		};
+	};
+
+	motionsense-sensor {
+		lid_accel: lid-accel {
+			compatible = "cros-ec,bmi3xx-accel";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0_S3_S5";
+			location = "MOTIONSENSE_LOC_LID";
+			mutex = <&lid_mutex>;
+			port = <&i2c_sensor>;
+			rot-standard-ref = <&lid_rot_ref>;
+			drv-data = <&bmi323_data>;
+			configs {
+				compatible = "cros-ec,motionsense-sensor-config";
+				ec-s0 {
+					odr = <(10000 | ROUND_UP_FLAG)>;
+					ec-rate = <(100 * USEC_PER_MSEC)>;
+				};
+				ec-s3 {
+					odr = <(10000 | ROUND_UP_FLAG)>;
+					ec-rate = <(100 * USEC_PER_MSEC)>;
+				};
+				ec-s5 {
+					odr = <(10000 | ROUND_UP_FLAG)>;
+					ec-rate = <(100 * USEC_PER_MSEC)>;
+				};
+			};
+		};
+
+		lid_gyro: lid-gyro {
+			compatible = "cros-ec,bmi3xx-gyro";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0_S3_S5";
+			location = "MOTIONSENSE_LOC_LID";
+			mutex = <&lid_mutex>;
+			port = <&i2c_sensor>;
+			rot-standard-ref = <&lid_rot_ref>;
+			drv-data = <&bmi323_data>;
+		};
+
+		als_clear: lid-als-clear {
+			compatible = "cros-ec,tcs3400-clear";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0_S3_S5";
+			location = "MOTIONSENSE_LOC_LID";
+			port = <&i2c_sensor>;
+			default-range = <0x10000>;
+			drv-data = <&tcs_clear_data>;
+			i2c-spi-addr-flags = "TCS3400_I2C_ADDR_FLAGS";
+			configs {
+				compatible = "cros-ec,motionsense-sensor-config";
+				ec-s0 {
+					/* Run ALS sensor in S0 */
+					odr = <1000>;
+				};
+				ec-s3 {
+					odr = <1000>;
+				};
+				ec-s5 {
+					odr = <1000>;
+				};
+			};
+		};
+
+		lid-als-rgb {
+			compatible = "cros-ec,tcs3400-rgb";
+			status = "okay";
+
+			active-mask = "SENSOR_ACTIVE_S0_S3_S5";
+			location = "MOTIONSENSE_LOC_LID";
+			port = <&i2c_sensor>;
+			default-range = <0x10000>; /* scale = 1x, uscale = 0 */
+			drv-data = <&tcs_rgb_data>;
+		};
+	};
+
+	motionsense-sensor-info {
+		compatible = "cros-ec,motionsense-sensor-info";
+
+		/* list of entries for motion_als_sensors */
+		als-sensors = <&als_clear>;
+		/* list of sensors in force mode */
+		accel-force-mode-sensors = <&lid_accel &lid_gyro &als_clear>;
+	};
+};
