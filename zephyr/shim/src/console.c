@@ -495,6 +495,42 @@ static bool shell_is_active(void)
 	       shell_zephyr->ctx->state == SHELL_STATE_ACTIVE;
 }
 
+static void shell_write_str(const struct shell *sh, const char *buff,
+			    size_t size)
+{
+	const struct shell_fprintf *sh_fprintf = sh->fprintf_ctx;
+	bool crlf = (sh->shell_flag == SHELL_FLAG_OLF_CRLF);
+
+	k_sem_take(&sh->ctx->lock_sem, K_FOREVER);
+
+	for (size_t i = 0; i < size && buff[i] != '\0'; i++) {
+		char c = buff[i];
+
+		if (crlf && c == '\n') {
+			sh_fprintf->buffer[sh_fprintf->ctrl_blk->buffer_cnt++] =
+				'\r';
+			if (sh_fprintf->ctrl_blk->buffer_cnt ==
+			    sh_fprintf->buffer_size) {
+				z_shell_fprintf_buffer_flush(sh_fprintf);
+			}
+		}
+
+		sh_fprintf->buffer[sh_fprintf->ctrl_blk->buffer_cnt++] =
+			(uint8_t)c;
+		if (sh_fprintf->ctrl_blk->buffer_cnt ==
+		    sh_fprintf->buffer_size) {
+			z_shell_fprintf_buffer_flush(sh_fprintf);
+		}
+	}
+
+	if (sh_fprintf->ctrl_blk->buffer_cnt > 0 &&
+	    sh_fprintf->ctrl_blk->autoflush) {
+		z_shell_fprintf_buffer_flush(sh_fprintf);
+	}
+
+	k_sem_give(&sh->ctx->lock_sem);
+}
+
 static void zephyr_print(const char *buff, size_t size)
 {
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_LOG)) {
@@ -521,11 +557,11 @@ static void zephyr_print(const char *buff, size_t size)
 		return;
 	}
 
-	/* Send all legacy output directly to the shell.  The shell UART
-	 * backend uses uart_fifo_fill(), while LOG_MODE_MINIMAL uses
-	 * printk() and calls uart_poll_out().
+	/* Write pre-formatted output directly to the shell fprintf buffer
+	 * to avoid a second cbvprintf("%s", buff) pass and VT100 prompt
+	 * erase/redraw overhead on background prints.
 	 */
-	shell_fprintf(shell_zephyr, SHELL_NORMAL, "%s", buff);
+	shell_write_str(shell_zephyr, buff, size);
 
 	/* Capture legacy output into the console buffer read by the AP.
 	 */
@@ -601,21 +637,21 @@ int cvprints(enum console_channel channel, const char *format, va_list args)
 	rv = snprintf_timestamp_now(buff + len, sizeof(buff) - len);
 	handle_sprintf_rv(rv, &len);
 
-	rv = crec_snprintf(buff + len, CONFIG_SHELL_PRINTF_BUFF_SIZE - len,
-			   " ");
-	handle_sprintf_rv(rv, &len);
+	buff[len++] = ' ';
 
-	rv = crec_vsnprintf(buff + len, CONFIG_SHELL_PRINTF_BUFF_SIZE - len,
+	rv = crec_vsnprintf(buff + len, CONFIG_SHELL_PRINTF_BUFF_SIZE - len - 2,
 			    format, args);
 	handle_sprintf_rv(rv, &len);
 
-	rv = crec_snprintf(buff + len, CONFIG_SHELL_PRINTF_BUFF_SIZE - len,
-			   "]\n");
-	handle_sprintf_rv(rv, &len);
+	if (rv >= 0) {
+		buff[len++] = ']';
+		buff[len++] = '\n';
+		buff[len] = '\0';
+	}
 
 	zephyr_print(buff, len);
 
-	return rv > 0 ? EC_SUCCESS : rv;
+	return rv >= 0 ? EC_SUCCESS : rv;
 }
 
 int cprints(enum console_channel channel, const char *format, ...)
