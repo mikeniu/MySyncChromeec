@@ -18,6 +18,9 @@ configdefault LOG
 configdefault LOG_DEFAULT_MINIMAL
 	default y if LOG
 
+configdefault LOG_DEFAULT_LEVEL
+	default 2 if LOG
+
 configdefault GPIO
 	default y if ARCH_POSIX
 
