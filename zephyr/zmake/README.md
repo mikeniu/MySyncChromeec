@@ -6,7 +6,7 @@
 
 ## Usage
 
-**Usage:** `zmake [-h] [--checkout CHECKOUT] [-j JOBS] [-l {DEBUG,INFO,WARNING,ERROR,CRITICAL} | -D] [-L] [--log-label] [--modules-dir MODULES_DIR] [--projects-dir PROJECTS_DIR] [--zephyr-base ZEPHYR_BASE] subcommand ...`
+**Usage:** `zmake [-h] [--checkout CHECKOUT] [-j JOBS] [-l {DEBUG,INFO,WARNING,ERROR,CRITICAL} | -D] [-L] [--log-label] [--modules-dir MODULES_DIR] [--projects-dir PROJECTS_DIR] [--zephyr-base ZEPHYR_BASE] [--patches-dir PATCHES_DIR] [--src-override-dir SRC_OVERRIDE_DIR] subcommand ...`
 
 Chromium OS's meta-build tool for Zephyr
 
@@ -30,6 +30,8 @@ Chromium OS's meta-build tool for Zephyr
 | `--modules-dir MODULES_DIR` | The path to a directory containing all modules needed.  If unspecified, zmake will assume you have a Chrome OS checkout and try locating them in the checkout. |
 | `--projects-dir PROJECTS_DIR` | Base directory to search for BUILD.py files. Can be repeated. |
 | `--zephyr-base ZEPHYR_BASE` | Path to Zephyr OS repository |
+| `--patches-dir PATCHES_DIR` | Path to a patches directory. |
+| `--src-override-dir SRC_OVERRIDE_DIR` | Path to a source override directory. |
 
 ## Subcommands
 
