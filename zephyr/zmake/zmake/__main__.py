@@ -13,12 +13,20 @@ import os
 import pathlib
 import subprocess
 import sys
+import tempfile
 
 from zmake import jobserver
+from zmake import modules
 from zmake import multiproc
+from zmake.repository_prep import _has_files
+from zmake.repository_prep import _has_patch_files
 from zmake.repository_prep import CodebasePreparer
+from zmake.repository_prep import copy_outputs_back
+from zmake.repository_prep import create_shadow_checkout
+from zmake.repository_prep import find_target_repos
 from zmake.repository_prep import get_default_patches_dirs
 from zmake.repository_prep import get_default_src_override_dirs
+from zmake.repository_prep import get_dirty_files
 import zmake.zmake as zm
 
 
@@ -186,6 +194,11 @@ def get_argparser():
         dest="src_override_dirs",
         type=pathlib.Path,
         help="Path to a source override directory. Can be repeated.",
+    )
+    parser.add_argument(
+        "--no-shadow",
+        action="store_true",
+        help="Do not use a shadow workspace; apply changes in-place.",
     )
 
     sub = parser.add_subparsers(
@@ -512,49 +525,230 @@ def main(argv=None):
     jobserver_client = jobserver.GNUMakeJobClient.from_environ(jobs=opts.jobs)
     multiproc.LogWriter.reset()
 
-    with contextlib.ExitStack() as stack:
-        workspace_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED") == "1"
-        prep_subcommands = {"configure", "build", "compare-builds"}
-        need_prep = (
-            opts.subcommand in prep_subcommands and not workspace_prepared
+    zmake = None
+    mod_dir = opts.modules_dir.resolve() if opts.modules_dir else None
+    workspace_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED") == "1" or (
+        mod_dir is not None
+        and any(
+            (d / ".workspace_prepared").exists()
+            for d in (mod_dir.parent.parent, mod_dir.parent, mod_dir / "ec")
         )
+    )
+    prep_subcommands = {"configure", "build", "compare-builds"}
+    need_prep = opts.subcommand in prep_subcommands and not workspace_prepared
+
+    def _set_workspace_prepared(exit_stack):
+        prev_val = os.environ.get("ZMAKE_WORKSPACE_PREPARED")
+        os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
+        if prev_val is None:
+            exit_stack.callback(
+                os.environ.pop, "ZMAKE_WORKSPACE_PREPARED", None
+            )
+        else:
+            exit_stack.callback(
+                os.environ.__setitem__, "ZMAKE_WORKSPACE_PREPARED", prev_val
+            )
+
+    def _remap_to_shadow(path, real_root, shadow_root, default_rel=None):
+        resolved = pathlib.Path(path).resolve()
+        try:
+            return shadow_root / resolved.relative_to(real_root)
+        except ValueError:
+            return shadow_root / default_rel if default_rel else path
+
+    with contextlib.ExitStack() as stack:
+        use_shadow = False
+        shadow_ready = False
+        real_checkout = None
+        shadow_checkout = None
 
         if need_prep:
-            checkout = opts.checkout
-            if not checkout:
-                try:
-                    checkout = zm.util.locate_cros_checkout().resolve()
-                except FileNotFoundError:
-                    checkout = None
+            prep_checkout = (
+                pathlib.Path(opts.checkout).resolve() if opts.checkout else None
+            )
+            if prep_checkout is None and (
+                not opts.zephyr_base or not opts.modules_dir
+            ):
+                with contextlib.suppress(FileNotFoundError):
+                    prep_checkout = zm.util.locate_cros_checkout().resolve()
 
-            if checkout:
+            if prep_checkout is not None:
                 patches_dirs = (
                     opts.patches_dirs
                     if opts.patches_dirs
-                    else get_default_patches_dirs(checkout)
+                    else get_default_patches_dirs(prep_checkout)
                 )
                 src_override_dirs = (
                     opts.src_override_dirs
                     if opts.src_override_dirs
-                    else get_default_src_override_dirs(checkout)
+                    else get_default_src_override_dirs(prep_checkout)
                 )
-                stack.enter_context(
-                    CodebasePreparer(checkout, patches_dirs, src_override_dirs)
+
+                has_overrides = any(_has_files(d) for d in src_override_dirs)
+                has_patches = any(_has_patch_files(d) for d in patches_dirs)
+                use_shadow = (
+                    (has_overrides or has_patches)
+                    and not opts.no_shadow
+                    and opts.subcommand != "compare-builds"
                 )
-                prev_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED")
-                os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
-                if prev_prepared is None:
-                    stack.callback(
-                        os.environ.pop, "ZMAKE_WORKSPACE_PREPARED", None
+
+                if use_shadow:
+                    logging.info(
+                        "Using shadow workspace for zmake execution..."
                     )
-                else:
-                    stack.callback(
-                        os.environ.__setitem__,
-                        "ZMAKE_WORKSPACE_PREPARED",
-                        prev_prepared,
+                    zp_rel = pathlib.Path(
+                        "src/third_party/zephyrproject/zephyr"
+                    )
+                    zephyr_base = opts.zephyr_base or (prep_checkout / zp_rel)
+                    resolved_zb = pathlib.Path(zephyr_base).resolve()
+                    ext_mappings = (
+                        {zp_rel: resolved_zb}
+                        if not resolved_zb.is_relative_to(prep_checkout)
+                        else None
+                    )
+                    target_repos = find_target_repos(
+                        prep_checkout,
+                        src_override_dirs,
+                        patches_dirs,
+                        ext_mappings,
+                    )
+                    user_dirty_files = {
+                        f
+                        for repo in target_repos
+                        for f in get_dirty_files(
+                            repo, prep_checkout, ext_mappings
+                        )
+                    }
+                    shadow_dir_ctx = stack.enter_context(
+                        tempfile.TemporaryDirectory()
+                    )
+                    shadow_checkout = pathlib.Path(shadow_dir_ctx) / "shadow"
+                    shadow_checkout.mkdir()
+
+                    located_modules = modules.locate_from_checkout(
+                        prep_checkout
+                    )
+                    create_shadow_checkout(
+                        prep_checkout,
+                        shadow_checkout,
+                        located_modules,
+                        zephyr_base,
+                        src_override_dirs,
+                        patches_dirs,
                     )
 
-        zmake = None
+                    real_checkout = prep_checkout
+                    opts.checkout = shadow_checkout
+                    if opts.zephyr_base:
+                        opts.zephyr_base = _remap_to_shadow(
+                            opts.zephyr_base,
+                            real_checkout,
+                            shadow_checkout,
+                            zp_rel,
+                        )
+                    if opts.projects_dirs:
+                        opts.projects_dirs = [
+                            _remap_to_shadow(p, real_checkout, shadow_checkout)
+                            for p in opts.projects_dirs
+                        ]
+                    if opts.modules_dir:
+                        opts.modules_dir = _remap_to_shadow(
+                            opts.modules_dir, real_checkout, shadow_checkout
+                        )
+
+                    stack.enter_context(
+                        CodebasePreparer(
+                            shadow_checkout,
+                            patches_dirs,
+                            src_override_dirs,
+                            user_dirty_files=user_dirty_files,
+                            commit=True,
+                        )
+                    )
+                    shadow_ready = True
+                elif (
+                    opts.subcommand == "compare-builds"
+                    and (has_overrides or has_patches)
+                    and not opts.no_shadow
+                ):
+                    opts.worktree_patches_dirs = patches_dirs
+                    opts.worktree_src_override_dirs = src_override_dirs
+                else:
+                    stack.enter_context(
+                        CodebasePreparer(
+                            prep_checkout,
+                            patches_dirs,
+                            src_override_dirs,
+                            commit=False,
+                        )
+                    )
+                _set_workspace_prepared(stack)
+            elif opts.zephyr_base and opts.modules_dir:
+                located_modules = modules.locate_from_directory(
+                    opts.modules_dir
+                )
+                path_mappings = {
+                    pathlib.Path("src/third_party/zephyrproject/zephyr"): (
+                        opts.zephyr_base.resolve()
+                    ),
+                    pathlib.Path("src/third_party/zephyrproject"): (
+                        opts.zephyr_base.resolve().parent
+                    ),
+                }
+                for mod_name, mod_path in located_modules.items():
+                    if mod_name in modules.known_modules:
+                        rel_mod = modules.known_modules[mod_name](
+                            mod_name, pathlib.Path("")
+                        )
+                        path_mappings[rel_mod] = mod_path.resolve()
+
+                ec_mod = located_modules.get("ec")
+                sysroot = pathlib.Path(os.environ.get("SYSROOT", "/"))
+                default_priv = (
+                    opts.modules_dir.resolve().parent.parent / "ec-private"
+                )
+                if not default_priv.exists():
+                    default_priv = (
+                        sysroot
+                        / "firmware"
+                        / "private-directories"
+                        / "zephyr-ec-private"
+                    )
+                if not default_priv.exists():
+                    default_priv = (
+                        sysroot
+                        / "firmware"
+                        / "private-directories"
+                        / "ec-private"
+                    )
+                patches_dirs = opts.patches_dirs or [
+                    *(
+                        [ec_mod / "upstream_overrides" / "patches"]
+                        if ec_mod
+                        else []
+                    ),
+                    default_priv / "patches",
+                ]
+                src_override_dirs = opts.src_override_dirs or [
+                    *(
+                        [ec_mod / "upstream_overrides" / "src-override"]
+                        if ec_mod
+                        else []
+                    ),
+                    default_priv / "src-override",
+                ]
+                stack.enter_context(
+                    CodebasePreparer(
+                        opts.modules_dir.resolve().parent,
+                        patches_dirs,
+                        src_override_dirs,
+                        commit=False,
+                        path_mappings=path_mappings,
+                        allow_dirty=True,
+                    )
+                )
+                _set_workspace_prepared(stack)
+
         try:
             zmake = call_with_namespace(
                 zm.Zmake, opts, jobserver=jobserver_client
@@ -564,22 +758,40 @@ def main(argv=None):
             )
             result = call_with_namespace(subcommand_method, opts)
             wait_rv = zmake.executor.wait()
-            return result or wait_rv
+            ret = result or wait_rv
         finally:
-            multiproc.LogWriter.wait_for_log_end()
-            if zmake:
-                for file, failed_projects in zmake.cmp_failed_projects.items():
-                    if failed_projects:
-                        logging.error(
-                            "Failed projects by diff in %s: %s",
-                            file,
-                            ", ".join(sorted(failed_projects)),
-                        )
-                if zmake.failed_projects:
-                    logging.error(
-                        "All failed projects: %s",
-                        " ".join(sorted(zmake.failed_projects)),
+            if shadow_ready and shadow_checkout and real_checkout:
+                try:
+                    located_modules = modules.locate_from_checkout(
+                        real_checkout
                     )
+                    ec_rel_path = (
+                        located_modules["ec"]
+                        .resolve()
+                        .relative_to(real_checkout)
+                    )
+                    logging.info("Copying outputs back to real checkout...")
+                    copy_outputs_back(
+                        shadow_checkout, real_checkout, ec_rel_path
+                    )
+                except OSError as e:
+                    logging.error("Failed to copy outputs back: %s", e)
+
+        multiproc.LogWriter.wait_for_log_end()
+        if zmake:
+            for file, failed_projects in zmake.cmp_failed_projects.items():
+                if failed_projects:
+                    logging.error(
+                        "Failed projects by diff in %s: %s",
+                        file,
+                        ", ".join(sorted(failed_projects)),
+                    )
+            if zmake.failed_projects:
+                logging.error(
+                    "All failed projects: %s",
+                    " ".join(sorted(zmake.failed_projects)),
+                )
+        return ret
 
 
 if __name__ == "__main__":
