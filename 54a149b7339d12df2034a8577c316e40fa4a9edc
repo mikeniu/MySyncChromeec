@@ -16,6 +16,24 @@
       "message": "It is no longer needed",
       "revId": "54a149b7339d12df2034a8577c316e40fa4a9edc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9bcca41_b43d6fb9",
+        "filename": "zephyr/program/dougie/bandit/project.overlay",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1511343
+      },
+      "writtenOn": "2026-10-08T15:57:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78b12c55_7e5610fe",
+      "revId": "54a149b7339d12df2034a8577c316e40fa4a9edc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
