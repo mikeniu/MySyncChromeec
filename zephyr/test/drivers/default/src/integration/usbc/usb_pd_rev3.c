@@ -204,6 +204,20 @@ ZTEST_F(usb_attach_5v_3a_pd_source_rev3, test_alert_msg)
 	zassert_true(fixture->src_ext.alert_received);
 }
 
+ZTEST_F(usb_attach_5v_3a_pd_source_rev3, test_alert_msg_disconnected)
+{
+	/* Port 1 is disconnected; direct Alert must fail with EC_ERROR_INVAL */
+	zassert_false(pd_is_connected(1));
+	zassert_equal(pd_send_alert_msg(1, ADO_OTP_EVENT), EC_ERROR_INVAL);
+
+	/* Disconnect Port 0 and verify direct and broadcast Alert behavior */
+	disconnect_source_from_port(fixture->tcpci_emul, fixture->charger_emul);
+	zassert_false(pd_is_connected(TEST_PORT));
+	zassert_equal(pd_send_alert_msg(TEST_PORT, ADO_OTP_EVENT),
+		      EC_ERROR_INVAL);
+	zassert_equal(pd_broadcast_alert_msg(ADO_OTP_EVENT), EC_SUCCESS);
+}
+
 ZTEST_F(usb_attach_5v_3a_pd_source_rev3, test_alert_on_power_state_change)
 {
 	/* Suspend and check partner received Alert and Status messages */
