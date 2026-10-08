@@ -351,6 +351,9 @@ ZTEST_USER(console, test_cprint_too_big)
 
 	zassert_equal(cprintf(CC_COMMAND, "%s", large_string),
 		      -EC_ERROR_OVERFLOW, NULL);
+	zassert_equal(cputs(CC_COMMAND, large_string), EC_SUCCESS, NULL);
+	zassert_equal(cputs(CC_COMMAND, "01234567890123456789012345678\n"),
+		      EC_SUCCESS, NULL);
 }
 
 ZTEST_USER(console, test_cmd_chan_invalid_mask)
