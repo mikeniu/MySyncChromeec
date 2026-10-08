@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5891512f_cfba0d5e",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-08T07:40:37Z",
+      "side": 1,
+      "message": "Use `true/false` for bool assignment",
+      "range": {
+        "startLine": 525,
+        "startChar": 0,
+        "endLine": 525,
+        "endChar": 28
+      },
+      "revId": "fdbff176b50ae57aceae6e16147414ecce5e1ac7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
