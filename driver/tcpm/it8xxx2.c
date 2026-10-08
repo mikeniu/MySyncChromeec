@@ -363,6 +363,12 @@ static int it8xxx2_set_cc(enum usbpd_port port, int pull)
 	}
 
 	it8xxx2_enable_cc(port, enable_cc);
+	if (IS_ENABLED(IT83XX_INTC_PLUG_IN_OUT_SUPPORT) && enable_cc &&
+	    !pd_is_connected(port)) {
+		IT83XX_USBPD_TCDCR(port) &=
+			~(USBPD_REG_PLUG_OUT_SELECT |
+			  USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE);
+	}
 	return EC_SUCCESS;
 }
 
