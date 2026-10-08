@@ -198,10 +198,28 @@ ZTEST_F(usb_attach_5v_3a_pd_source_rev3, test_typec_status_using_rmdo)
 
 ZTEST_F(usb_attach_5v_3a_pd_source_rev3, test_alert_msg)
 {
-	zassert_equal(pd_broadcast_alert_msg(ADO_OTP_EVENT), EC_SUCCESS);
+	zassert_equal(pd_send_alert_msg(TEST_PORT, ADO_OTP_EVENT), EC_SUCCESS);
 
 	k_sleep(K_SECONDS(2));
 	zassert_true(fixture->src_ext.alert_received);
+}
+
+ZTEST_F(usb_attach_5v_3a_pd_source_rev3, test_alert_msg_disconnected)
+{
+	/* Port 1 is disconnected; Alert must fail with EC_ERROR_UNAVAILABLE */
+	zassert_false(pd_is_connected(1));
+	zassert_equal(pd_send_alert_msg(1, ADO_OTP_EVENT),
+		      EC_ERROR_UNAVAILABLE);
+	zassert_equal(pd_send_alert_msg(1, ADO_OTP_EVENT),
+		      EC_ERROR_UNAVAILABLE);
+
+	/* Disconnect Port 0 and verify Alert fails while disconnected */
+	disconnect_source_from_port(fixture->tcpci_emul, fixture->charger_emul);
+	zassert_false(pd_is_connected(TEST_PORT));
+	zassert_equal(pd_send_alert_msg(TEST_PORT, ADO_OTP_EVENT),
+		      EC_ERROR_UNAVAILABLE);
+	zassert_equal(pd_send_alert_msg(TEST_PORT, ADO_OTP_EVENT),
+		      EC_ERROR_UNAVAILABLE);
 }
 
 ZTEST_F(usb_attach_5v_3a_pd_source_rev3, test_alert_on_power_state_change)
@@ -250,7 +268,7 @@ ZTEST_F(usb_attach_5v_3a_pd_source_rev3,
 	zassert_false(fixture->src_ext.status_received);
 
 	tcpci_partner_common_enable_pd_logging(&fixture->source_5v_3a, true);
-	zassert_equal(pd_broadcast_alert_msg(ADO_OTP_EVENT), EC_SUCCESS);
+	zassert_equal(pd_send_alert_msg(TEST_PORT, ADO_OTP_EVENT), EC_SUCCESS);
 	tcpci_partner_send_control_msg(&fixture->source_5v_3a,
 				       PD_CTRL_GET_STATUS, 0);
 	k_sleep(K_SECONDS(2));
