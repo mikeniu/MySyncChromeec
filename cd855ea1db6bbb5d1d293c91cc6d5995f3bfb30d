@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "cd855ea1db6bbb5d1d293c91cc6d5995f3bfb30d",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57daa49a_ecdc1a1f",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/ocelotrvp-ite_vif.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-10-08T17:29:23Z",
+      "side": 1,
+      "message": "Change to 1.5A.",
+      "range": {
+        "startLine": 114,
+        "startChar": 69,
+        "endLine": 114,
+        "endChar": 77
+      },
+      "revId": "cd855ea1db6bbb5d1d293c91cc6d5995f3bfb30d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
