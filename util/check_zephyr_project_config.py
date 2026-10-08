@@ -5,6 +5,7 @@
 
 """Validate Zephyr project configuration files."""
 
+import collections
 import logging
 import os
 import pathlib
@@ -112,6 +113,66 @@ def _default_y_if_ztest(defaults):
     return False
 
 
+ShadowedDefault = collections.namedtuple(
+    "ShadowedDefault",
+    [
+        "sym_name",
+        "shadowing_path",
+        "shadowing_line",
+        "shadowing_val",
+        "shadowing_cond",
+        "shadowed_path",
+        "shadowed_line",
+        "shadowed_val",
+        "shadowed_cond",
+    ],
+)
+
+
+def _expr_conjuncts(kconf, expr):
+    """Return top-level AND conjunct strings for a Kconfig expression."""
+    if isinstance(expr, tuple) and expr[0] == kconfiglib.AND:
+        return _expr_conjuncts(kconf, expr[1]) | _expr_conjuncts(kconf, expr[2])
+    if expr is kconf.y:
+        return set()
+    return {kconfiglib.expr_str(expr)}
+
+
+def _find_sym_shadows(kconf, sym, ec_base, prog_base):
+    """Return ShadowedDefault entries for a single symbol."""
+    defs = sym.defaults
+    if len(defs) < 2:
+        return []
+
+    shadows = []
+    for i, def_i in enumerate(defs):
+        path_i = pathlib.Path(ZEPHYR_BASE, def_i[2][0]).resolve()
+        conj_i = _expr_conjuncts(kconf, def_i[1])
+
+        for def_j in defs[i + 1 :]:
+            path_j = pathlib.Path(ZEPHYR_BASE, def_j[2][0]).resolve()
+            if ec_base not in path_j.parents:
+                continue
+            if prog_base in path_i.parents and prog_base not in path_j.parents:
+                continue
+
+            if conj_i.issubset(_expr_conjuncts(kconf, def_j[1])):
+                shadows.append(
+                    ShadowedDefault(
+                        sym.name,
+                        path_i,
+                        def_i[2][1],
+                        kconfiglib.expr_str(def_i[0]),
+                        kconfiglib.expr_str(def_i[1]),
+                        path_j,
+                        def_j[2][1],
+                        kconfiglib.expr_str(def_j[0]),
+                        kconfiglib.expr_str(def_j[1]),
+                    )
+                )
+    return shadows
+
+
 class KconfigCheck:
     """Validate Zephyr project configuration files.
 
@@ -122,6 +183,8 @@ class KconfigCheck:
     def __init__(self, verbose):
         self.log = _init_log(verbose)
         self.fail_count = 0
+        self.kconf_shadows = {}
+        self.reported_shadows = set()
 
         # Preload the upstream Kconfig.
         self.program_kconf = {None: self._init_kconfig(None)}
@@ -244,6 +307,70 @@ class KconfigCheck:
 
             yield file
 
+    def _filter_kconfig_files(self, files):
+        """Yield Kconfig files from the command line."""
+        for file in files:
+            if not file.exists():
+                self.log.info("Ignoring %s: file has been removed", file)
+                continue
+
+            if file.name != "Kconfig" and not file.name.startswith("Kconfig."):
+                self.log.info("Ignoring %s: not a Kconfig file", file)
+                continue
+
+            yield file
+
+    def _get_shadowed_defaults(self, kconf):
+        """Return all ShadowedDefault entries in kconf."""
+        kconf_id = id(kconf)
+        if kconf_id in self.kconf_shadows:
+            return self.kconf_shadows[kconf_id]
+
+        ec_base = EC_BASE.resolve()
+        prog_base = (ec_base / "zephyr" / "program").resolve()
+        shadows = []
+
+        for sym in kconf.syms.values():
+            shadows.extend(_find_sym_shadows(kconf, sym, ec_base, prog_base))
+
+        self.kconf_shadows[kconf_id] = shadows
+        return shadows
+
+    def _check_kconfig_defaults(self, file_name):
+        """Check file_name for shadowed Kconfig default statements."""
+        target_path = pathlib.Path(file_name).resolve()
+        kconf = self._kconf_from_path(file_name)
+
+        self.log.info("Checking Kconfig defaults in %s", file_name)
+
+        for shadow in self._get_shadowed_defaults(kconf):
+            if target_path not in (shadow.shadowing_path, shadow.shadowed_path):
+                continue
+
+            shadow_key = (
+                shadow.sym_name,
+                shadow.shadowing_path,
+                shadow.shadowing_line,
+                shadow.shadowed_path,
+                shadow.shadowed_line,
+            )
+            if shadow_key in self.reported_shadows:
+                continue
+            self.reported_shadows.add(shadow_key)
+
+            self._fail(
+                "%s:%d: %s default '%s' (if %s) is shadowed by %s:%d default '%s' (if %s)",
+                shadow.shadowed_path,
+                shadow.shadowed_line,
+                shadow.sym_name,
+                shadow.shadowed_val,
+                shadow.shadowed_cond,
+                shadow.shadowing_path,
+                shadow.shadowing_line,
+                shadow.shadowing_val,
+                shadow.shadowing_cond,
+            )
+
     def _check_dt_has(self, file_name):
         """Check file_name for known automatic config options.
 
@@ -284,6 +411,11 @@ class KconfigCheck:
         for file in config_files:
             if dt_has:
                 self._check_dt_has(file)
+
+        kconfig_files = self._filter_kconfig_files(files)
+
+        for file in kconfig_files:
+            self._check_kconfig_defaults(file)
 
         return self.fail_count
 

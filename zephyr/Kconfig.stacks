@@ -13,6 +13,7 @@ configdefault MAIN_STACK_SIZE
 	default 1536 if SOC_SERIES_IT8XXX2
 	default 1200 if SOC_SERIES_NPCX7
 	default 1200 if SOC_SERIES_NPCX9
+	default 1280 if SOC_SERIES_RTS5912
 
 configdefault IDLE_STACK_SIZE
 	default 500 if SOC_SERIES_IT8XXX2

@@ -302,6 +302,141 @@ CONFIG_DT_BUT_EMUL=y
             check_dt_has_mock.call_args_list, [mock.call("a"), mock.call("b")]
         )
 
+    def test_filter_kconfig_files(self):
+        """Test the Kconfig file filter."""
+        file_no_exist = mock.Mock()
+        file_no_exist.exists.return_value = False
+
+        file_conf = mock.Mock()
+        file_conf.exists.return_value = True
+        file_conf.name = "blah.conf"
+
+        file_kconfig = mock.Mock()
+        file_kconfig.exists.return_value = True
+        file_kconfig.name = "Kconfig"
+
+        file_kconfig_ext = mock.Mock()
+        file_kconfig_ext.exists.return_value = True
+        file_kconfig_ext.name = "Kconfig.tcpm"
+
+        files = [file_no_exist, file_conf, file_kconfig, file_kconfig_ext]
+
+        out = list(self.kcheck._filter_kconfig_files(files))
+
+        self.assertEqual(out, [file_kconfig, file_kconfig_ext])
+
+    @mock.patch("check_zephyr_project_config._find_sym_shadows")
+    def test_get_shadowed_defaults_cached(self, find_sym_shadows_mock):
+        """Test caching in _get_shadowed_defaults."""
+        fake_sym = mock.Mock()
+        fake_kconf = mock.Mock()
+        fake_kconf.syms = {"FOO": fake_sym}
+        fake_shadow = check_zephyr_project_config.ShadowedDefault(
+            "FOO",
+            pathlib.Path("/ec/zephyr/Kconfig"),
+            10,
+            "1",
+            "y",
+            pathlib.Path("/ec/zephyr/Kconfig"),
+            11,
+            "2",
+            "BAR",
+        )
+        find_sym_shadows_mock.return_value = [fake_shadow]
+
+        out1 = self.kcheck._get_shadowed_defaults(fake_kconf)
+        out2 = self.kcheck._get_shadowed_defaults(fake_kconf)
+
+        self.assertEqual(out1, [fake_shadow])
+        self.assertEqual(out2, [fake_shadow])
+        find_sym_shadows_mock.assert_called_once()
+
+    @mock.patch(
+        "check_zephyr_project_config.KconfigCheck._get_shadowed_defaults"
+    )
+    @mock.patch("check_zephyr_project_config.KconfigCheck._kconf_from_path")
+    def test_check_kconfig_defaults(
+        self, kconf_from_path_mock, get_shadows_mock
+    ):
+        """Test _check_kconfig_defaults reporting and deduplication."""
+        target_path = (
+            check_zephyr_project_config.EC_BASE.resolve()
+            / "zephyr"
+            / "Kconfig.i2c"
+        )
+        other_path = (
+            check_zephyr_project_config.EC_BASE.resolve()
+            / "zephyr"
+            / "Kconfig.tcpm"
+        )
+        shadow_match = check_zephyr_project_config.ShadowedDefault(
+            "FOO",
+            target_path,
+            10,
+            "1",
+            "A",
+            target_path,
+            11,
+            "32",
+            "A && B",
+        )
+        shadow_unrelated = check_zephyr_project_config.ShadowedDefault(
+            "BAR",
+            other_path,
+            20,
+            "y",
+            "y",
+            other_path,
+            21,
+            "y",
+            "C",
+        )
+        get_shadows_mock.return_value = [shadow_match, shadow_unrelated]
+        kconf_from_path_mock.return_value = mock.Mock()
+
+        with mock.patch.object(self.kcheck, "log") as log_mock:
+            self.kcheck._check_kconfig_defaults(target_path)
+            # Calling a second time should deduplicate via reported_shadows.
+            self.kcheck._check_kconfig_defaults(target_path)
+
+            self.assertEqual(self.kcheck.fail_count, 1)
+            log_mock.error.assert_called_once_with(
+                "%s:%d: %s default '%s' (if %s) is shadowed by %s:%d default '%s' (if %s)",
+                target_path,
+                11,
+                "FOO",
+                "32",
+                "A && B",
+                target_path,
+                10,
+                "1",
+                "A",
+            )
+
+    @mock.patch(
+        "check_zephyr_project_config.KconfigCheck._check_kconfig_defaults"
+    )
+    @mock.patch(
+        "check_zephyr_project_config.KconfigCheck._filter_kconfig_files"
+    )
+    @mock.patch("check_zephyr_project_config.KconfigCheck._filter_config_files")
+    def test_run_checks_kconfig(
+        self,
+        filter_config_files_mock,
+        filter_kconfig_files_mock,
+        check_kconfig_defaults_mock,
+    ):
+        """Test run_checks invokes _check_kconfig_defaults on Kconfig files."""
+        filter_config_files_mock.return_value = []
+        filter_kconfig_files_mock.return_value = ["Kconfig", "Kconfig.tcpm"]
+
+        self.kcheck.run_checks([], False)
+
+        self.assertListEqual(
+            check_kconfig_defaults_mock.call_args_list,
+            [mock.call("Kconfig"), mock.call("Kconfig.tcpm")],
+        )
+
 
 class TestKconfigSymbolChecks(unittest.TestCase):
     """Tests for symbol checks."""
@@ -317,6 +452,7 @@ class TestKconfigSymbolChecks(unittest.TestCase):
 
         self.sym_ztest = kconfiglib.Symbol()
         self.sym_ztest.name = "ZTEST"
+        self.sym_ztest.is_constant = False
 
         self.sym_not_ztest = (kconfiglib.NOT, self.sym_ztest)
 
@@ -360,6 +496,115 @@ class TestKconfigSymbolChecks(unittest.TestCase):
             check_zephyr_project_config._default_y_if_ztest(
                 [[self.sym_n, self.sym_n]]
             )
+        )
+
+    def test_expr_conjuncts(self):
+        """Test the _expr_conjuncts function."""
+        fake_kconf = mock.Mock()
+        fake_kconf.y = self.sym_y
+
+        sym_a = kconfiglib.Symbol()
+        sym_a.name = "A"
+        sym_a.is_constant = False
+        sym_b = kconfiglib.Symbol()
+        sym_b.name = "B"
+        sym_b.is_constant = False
+
+        self.assertEqual(
+            check_zephyr_project_config._expr_conjuncts(fake_kconf, self.sym_y),
+            set(),
+        )
+        self.assertEqual(
+            check_zephyr_project_config._expr_conjuncts(
+                fake_kconf, self.sym_ztest
+            ),
+            {"ZTEST"},
+        )
+        expr_and = (
+            kconfiglib.AND,
+            sym_a,
+            (kconfiglib.AND, sym_b, self.sym_ztest),
+        )
+        self.assertEqual(
+            check_zephyr_project_config._expr_conjuncts(fake_kconf, expr_and),
+            {"A", "B", "ZTEST"},
+        )
+
+    def test_find_sym_shadows(self):
+        """Test _find_sym_shadows logic for EC, upstream, and program overrides."""
+        fake_kconf = mock.Mock()
+        fake_kconf.y = self.sym_y
+
+        ec_base = check_zephyr_project_config.EC_BASE.resolve()
+        prog_base = (ec_base / "zephyr" / "program").resolve()
+        ec_file = ec_base / "zephyr" / "Kconfig.i2c"
+        prog_file = prog_base / "fpmcu" / "Kconfig"
+        upstream_file = (
+            check_zephyr_project_config.ZEPHYR_BASE.resolve()
+            / "kernel"
+            / "Kconfig"
+        )
+
+        sym_a = kconfiglib.Symbol()
+        sym_a.name = "A"
+        sym_a.is_constant = False
+        sym_b = kconfiglib.Symbol()
+        sym_b.name = "B"
+        sym_b.is_constant = False
+        cond_ab = (kconfiglib.AND, sym_a, sym_b)
+
+        # 1. Single default -> no shadows.
+        sym_single = mock.Mock()
+        sym_single.name = "SINGLE"
+        sym_single.defaults = [(self.sym_y, self.sym_y, (str(ec_file), 10))]
+        self.assertEqual(
+            check_zephyr_project_config._find_sym_shadows(
+                fake_kconf, sym_single, ec_base, prog_base
+            ),
+            [],
+        )
+
+        # 2. Shadowed default inside EC_BASE -> reported.
+        sym_shadow = mock.Mock()
+        sym_shadow.name = "SHADOWED"
+        sym_shadow.defaults = [
+            (self.sym_n, sym_a, (str(ec_file), 20)),
+            (self.sym_y, cond_ab, (str(ec_file), 21)),
+        ]
+        shadows = check_zephyr_project_config._find_sym_shadows(
+            fake_kconf, sym_shadow, ec_base, prog_base
+        )
+        self.assertEqual(len(shadows), 1)
+        self.assertEqual(shadows[0].sym_name, "SHADOWED")
+        self.assertEqual(shadows[0].shadowing_line, 20)
+        self.assertEqual(shadows[0].shadowed_line, 21)
+
+        # 3. EC_BASE overriding upstream ZEPHYR_BASE -> ignored.
+        sym_upstream = mock.Mock()
+        sym_upstream.name = "UPSTREAM_OVERRIDE"
+        sym_upstream.defaults = [
+            (self.sym_y, self.sym_y, (str(ec_file), 30)),
+            (self.sym_n, self.sym_y, (str(upstream_file), 40)),
+        ]
+        self.assertEqual(
+            check_zephyr_project_config._find_sym_shadows(
+                fake_kconf, sym_upstream, ec_base, prog_base
+            ),
+            [],
+        )
+
+        # 4. Program Kconfig overriding common EC_BASE Kconfig -> ignored.
+        sym_prog = mock.Mock()
+        sym_prog.name = "PROG_OVERRIDE"
+        sym_prog.defaults = [
+            (self.sym_y, self.sym_y, (str(prog_file), 50)),
+            (self.sym_n, sym_a, (str(ec_file), 60)),
+        ]
+        self.assertEqual(
+            check_zephyr_project_config._find_sym_shadows(
+                fake_kconf, sym_prog, ec_base, prog_base
+            ),
+            [],
         )
 
 

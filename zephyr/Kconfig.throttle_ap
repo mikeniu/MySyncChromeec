@@ -2,6 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+config PLATFORM_EC_THROTTLE_AP
+	bool "CPU throttling"
+	help
+	  Enable throttling the CPU. When triggered this reduces the CPU's
+	  power output and eventually results in a lower temperature.
+
 if PLATFORM_EC_THROTTLE_AP
 
 config PLATFORM_EC_CHIPSET_CAN_THROTTLE
@@ -26,6 +32,20 @@ config PLATFORM_EC_CONSOLE_CMD_APTHROTTLE
 
 	     AP throttling type 0 is off (0x00000000)
 	     AP throttling type 1 is off (0x00000000)
+
+config PLATFORM_EC_THROTTLE_AP_SINGLE_PIN
+	bool "CPU throttling and interrupt detection on a single pin"
+	help
+	  Enable detection of throttling interrupts on the same pin used to
+	  trigger throttling. The GPIO should be configured as an output by
+	  default. throttle_ap_config_prochot will configure the GPIO as
+	  an interrupt. Chipset specific functions are responsible for
+	  handling any subsequent changes.
+
+config PLATFORM_EC_THROTTLE_AP_NO_FAN
+	bool "No automatic fan control for AP throttling"
+	help
+	  Disable automatic fan control when an AP throttling interrupt occurs.
 
 config PLATFORM_EC_THROTTLE_AP_ON_BAT_DISCHG_CURRENT
 	bool "Throttle AP based on battery discharge current"
