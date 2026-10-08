@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdef5ee5_1ba488e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5169401
+      },
+      "writtenOn": "2026-10-08T02:28:34Z",
+      "side": 1,
+      "message": "We are waiting for our EE engineer to measure the UART timing",
+      "revId": "ed1478f60c0596ebda4dc5a9729b5591cecde7dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
