@@ -805,7 +805,7 @@ int pd_broadcast_alert_msg(uint32_t ado)
 	int ret = EC_SUCCESS;
 
 	for (int i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
-		if (pd_send_alert_msg(i, ado) != EC_SUCCESS)
+		if (pd_send_alert_msg(i, ado) == EC_ERROR_BUSY)
 			ret = EC_ERROR_BUSY;
 	}
 
@@ -820,6 +820,9 @@ int pd_send_alert_msg(int port, uint32_t ado)
 #if defined(CONFIG_USB_PD_TCPMV2) && !defined(CONFIG_USB_VPD) && \
 	!defined(CONFIG_USB_CTVPD)
 	struct rmdo partner_rmdo;
+
+	if (!pd_is_connected(port))
+		return EC_ERROR_INVAL;
 
 	/*
 	 * The Alert Data Object (ADO) definition changed between USB PD
