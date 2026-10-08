@@ -443,6 +443,7 @@ def test_find_projects(zmake_factory_from_dir):
 def test_failed_builds_sorting(monkeypatch):
     """Test that failed projects are sorted alphabetically when logged."""
     monkeypatch.delenv("MAKEFLAGS", raising=False)
+    monkeypatch.setenv("ZMAKE_WORKSPACE_PREPARED", "1")
     # Mock maybe_reexec and find_toolchains to do nothing
     monkeypatch.setattr(main, "maybe_reexec", lambda argv: None)
     monkeypatch.setattr(main, "find_toolchains", lambda: None)

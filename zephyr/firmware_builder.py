@@ -37,12 +37,12 @@ sys.path.append(str(ZEPHYR_DIR / "../util"))
 from coreboot_sdk import init_toolchain
 import zmake.modules
 import zmake.project
+from zmake.repository_prep import find_checkout
 
 from scripts.firmware_builder_lib import (
     get_safe_lcov_workers as _get_safe_lcov_workers,
 )
 from scripts.firmware_builder_lib import create_arg_parser
-from scripts.firmware_builder_lib import find_checkout
 from scripts.firmware_builder_lib import merge_shard_coverage_reports
 from scripts.firmware_builder_lib import prepared_workspace
 from scripts.firmware_builder_lib import save_or_load_shard_info
