@@ -30,8 +30,8 @@ Chromium OS's meta-build tool for Zephyr
 | `--modules-dir MODULES_DIR` | The path to a directory containing all modules needed.  If unspecified, zmake will assume you have a Chrome OS checkout and try locating them in the checkout. |
 | `--projects-dir PROJECTS_DIR` | Base directory to search for BUILD.py files. Can be repeated. |
 | `--zephyr-base ZEPHYR_BASE` | Path to Zephyr OS repository |
-| `--patches-dir PATCHES_DIR` | Path to a patches directory. |
-| `--src-override-dir SRC_OVERRIDE_DIR` | Path to a source override directory. |
+| `--patches-dir PATCHES_DIR` | Path to a patches directory. Can be repeated. |
+| `--src-override-dir SRC_OVERRIDE_DIR` | Path to a source override directory. Can be repeated. |
 
 ## Subcommands
 

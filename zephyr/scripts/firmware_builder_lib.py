@@ -24,6 +24,8 @@ _repository_prep = importlib.import_module("zmake.repository_prep")
 CodebasePreparer = _repository_prep.CodebasePreparer
 find_checkout = _repository_prep.find_checkout
 find_target_repos = _repository_prep.find_target_repos
+get_default_patches_dirs = _repository_prep.get_default_patches_dirs
+get_default_src_override_dirs = _repository_prep.get_default_src_override_dirs
 get_dirty_files = _repository_prep.get_dirty_files
 set_checkout = _repository_prep.set_checkout
 
@@ -93,30 +95,48 @@ def copy_outputs_back(shadow_checkout, real_checkout, ec_rel_path):
         fix_symlinks(real_path, shadow_checkout, real_checkout)
 
 
+def _needs_copy_for_overrides(rel_path, src_override_dirs):
+    """Check if the path has files in overrides."""
+    for override_dir in src_override_dirs:
+        override_path = pathlib.Path(override_dir).resolve()
+        if override_path.exists():
+            sub_dir = override_path / rel_path
+            if sub_dir.exists() and any(_find_override_files(sub_dir)):
+                return True
+    return False
+
+
+def _needs_copy_for_patches(rel_path, patches_dirs):
+    """Check if the path has patches."""
+    for patches_dir in patches_dirs:
+        patches_path = pathlib.Path(patches_dir).resolve()
+        if patches_path.exists():
+            sub_dir = patches_path / rel_path
+            if sub_dir.exists() and any(_find_patch_files(sub_dir)):
+                return True
+    return False
+
+
 def create_shadow_checkout(
     real_checkout,
     shadow_root,
     modules,
     zephyr_base,
-    src_override_dir=None,
-    patches_dir=None,
+    src_override_dirs,
+    patches_dirs,
 ):
     """Create a shadow checkout with copies of target repos and symlinks."""
     real_root = pathlib.Path(real_checkout).resolve()
     shadow_path = pathlib.Path(shadow_root).resolve()
     (shadow_path / ".repo").mkdir(parents=True, exist_ok=True)
-    override_root = (
-        pathlib.Path(src_override_dir).resolve() if src_override_dir else None
-    )
-    patch_root = pathlib.Path(patches_dir).resolve() if patches_dir else None
 
     paths_to_handle = {
         "zephyr_base": zephyr_base,
         "ec_private": real_root / "src" / "platform" / "ec-private",
+        "project": real_root / "src" / "project",
         "chromiumos_overlay": (
             real_root / "src" / "third_party" / "chromiumos-overlay"
         ),
-        "project": real_root / "src" / "project",
     }
 
     for name, path in modules.items():
@@ -132,17 +152,11 @@ def create_shadow_checkout(
             continue
         dst_path = shadow_path / rel_path
 
-        need_copy = key == "module:ec"
-        if not need_copy and override_root and override_root.exists():
-            override_sub = override_root / rel_path
-            if override_sub.exists() and any(
-                _find_override_files(override_sub)
-            ):
-                need_copy = True
-        if not need_copy and patch_root and patch_root.exists():
-            patch_sub = patch_root / rel_path
-            if patch_sub.exists() and any(_find_patch_files(patch_sub)):
-                need_copy = True
+        need_copy = (
+            key == "module:ec"
+            or _needs_copy_for_overrides(rel_path, src_override_dirs)
+            or _needs_copy_for_patches(rel_path, patches_dirs)
+        )
 
         if need_copy:
             copied_rel_paths.add(rel_path)
@@ -195,23 +209,39 @@ def create_shadow_checkout(
         )
 
 
+def _has_override_files(path):
+    """Check if a path exists and contains non-ignored override files."""
+    if not path:
+        return False
+    p = pathlib.Path(path)
+    return p.exists() and any(_find_override_files(p))
+
+
+def _has_patch_files(path):
+    """Check if a path exists and contains patch files."""
+    if not path:
+        return False
+    p = pathlib.Path(path)
+    return p.exists() and any(_find_patch_files(p))
+
+
 @contextlib.contextmanager
 def prepared_workspace(opts, modules):
     """Context manager to prepare a shadow or in-place workspace."""
     real_checkout = find_checkout()
+    patches_dirs = (
+        opts.patches_dirs
+        if getattr(opts, "patches_dirs", None)
+        else get_default_patches_dirs(real_checkout)
+    )
+    src_override_dirs = (
+        opts.src_override_dirs
+        if getattr(opts, "src_override_dirs", None)
+        else get_default_src_override_dirs(real_checkout)
+    )
 
-    src_override_dir = getattr(opts, "src_override_dir", None)
-    patches_dir = getattr(opts, "patches_dir", None)
-    has_overrides = bool(
-        src_override_dir
-        and pathlib.Path(src_override_dir).exists()
-        and any(_find_override_files(pathlib.Path(src_override_dir)))
-    )
-    has_patches = bool(
-        patches_dir
-        and pathlib.Path(patches_dir).exists()
-        and any(_find_patch_files(pathlib.Path(patches_dir)))
-    )
+    has_overrides = any(_has_override_files(d) for d in src_override_dirs)
+    has_patches = any(_has_patch_files(d) for d in patches_dirs)
 
     prev_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED")
 
@@ -224,7 +254,7 @@ def prepared_workspace(opts, modules):
     if has_overrides or has_patches:
         print("Using shadow workspace for build...")
         target_repos = find_target_repos(
-            real_checkout, src_override_dir, patches_dir
+            real_checkout, src_override_dirs, patches_dirs
         )
         user_dirty_files = set()
         for repo in target_repos:
@@ -247,13 +277,13 @@ def prepared_workspace(opts, modules):
                     shadow_checkout,
                     modules,
                     zephyr_base,
-                    src_override_dir,
-                    patches_dir,
+                    src_override_dirs,
+                    patches_dirs,
                 )
                 with CodebasePreparer(
                     shadow_checkout,
-                    patches_dir,
-                    src_override_dir,
+                    patches_dirs,
+                    src_override_dirs,
                     user_dirty_files,
                 ):
                     os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
@@ -268,7 +298,9 @@ def prepared_workspace(opts, modules):
                 _restore_env()
     else:
         try:
-            with CodebasePreparer(real_checkout, patches_dir, src_override_dir):
+            with CodebasePreparer(
+                real_checkout, patches_dirs, src_override_dirs
+            ):
                 os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
                 yield None
         finally:
@@ -586,18 +618,18 @@ def create_arg_parser(build, bundle, test, merge=None):
 
     parser.add_argument(
         "--patches-dir",
-        default=str(
-            find_checkout() / "src" / "platform" / "ec-private" / "patches"
-        ),
-        help="Path to the patches directory",
+        action="append",
+        dest="patches_dirs",
+        metavar="PATCHES_DIR",
+        help="Path to a patches directory. Can be repeated.",
     )
 
     parser.add_argument(
         "--src-override-dir",
-        default=str(
-            find_checkout() / "src" / "platform" / "ec-private" / "src-override"
-        ),
-        help="Path to the directory for source file overrides",
+        action="append",
+        dest="src_override_dirs",
+        metavar="SRC_OVERRIDE_DIR",
+        help="Path to a source override directory. Can be repeated.",
     )
 
     parser.add_argument(

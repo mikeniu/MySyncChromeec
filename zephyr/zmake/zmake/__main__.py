@@ -17,8 +17,8 @@ import sys
 from zmake import jobserver
 from zmake import multiproc
 from zmake.repository_prep import CodebasePreparer
-from zmake.repository_prep import get_default_patches_dir
-from zmake.repository_prep import get_default_src_override_dir
+from zmake.repository_prep import get_default_patches_dirs
+from zmake.repository_prep import get_default_src_override_dirs
 import zmake.zmake as zm
 
 
@@ -175,13 +175,19 @@ def get_argparser():
     )
     parser.add_argument(
         "--patches-dir",
+        action="append",
+        dest="patches_dirs",
+        metavar="PATCHES_DIR",
         type=pathlib.Path,
-        help="Path to a patches directory.",
+        help="Path to a patches directory. Can be repeated.",
     )
     parser.add_argument(
         "--src-override-dir",
+        action="append",
+        dest="src_override_dirs",
+        metavar="SRC_OVERRIDE_DIR",
         type=pathlib.Path,
-        help="Path to a source override directory.",
+        help="Path to a source override directory. Can be repeated.",
     )
 
     sub = parser.add_subparsers(
@@ -524,18 +530,18 @@ def main(argv=None):
                     checkout = None
 
             if checkout:
-                patches_dir = (
-                    opts.patches_dir
-                    if opts.patches_dir
-                    else get_default_patches_dir(checkout)
+                patches_dirs = (
+                    opts.patches_dirs
+                    if opts.patches_dirs
+                    else get_default_patches_dirs(checkout)
                 )
-                src_override_dir = (
-                    opts.src_override_dir
-                    if opts.src_override_dir
-                    else get_default_src_override_dir(checkout)
+                src_override_dirs = (
+                    opts.src_override_dirs
+                    if opts.src_override_dirs
+                    else get_default_src_override_dirs(checkout)
                 )
                 stack.enter_context(
-                    CodebasePreparer(checkout, patches_dir, src_override_dir)
+                    CodebasePreparer(checkout, patches_dirs, src_override_dirs)
                 )
                 prev_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED")
                 os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
@@ -549,7 +555,7 @@ def main(argv=None):
                         "ZMAKE_WORKSPACE_PREPARED",
                         prev_prepared,
                     )
-            elif opts.patches_dir or opts.src_override_dir:
+            elif opts.patches_dirs or opts.src_override_dirs:
                 logging.warning(
                     "Cannot apply patches or source overrides without a "
                     "checkout directory."
