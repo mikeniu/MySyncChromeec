@@ -57,6 +57,11 @@ LOG_MODULE_REGISTER(pdc_rts54, CONFIG_USBC_LOG_LEVEL);
 #define N_MAX_ERROR_RECOVERY_COUNT 4
 
 /**
+ * @brief Max number of init attempts before disabling the port
+ */
+#define PDC_INIT_RETRY_MAX 3
+
+/**
  * @brief Number of times to try an I2C transaction
  */
 #define N_I2C_TRANSACTION_COUNT 10
@@ -437,6 +442,8 @@ struct pdc_data_t {
 	uint16_t error_recovery_delay_counter;
 	/** Error recovery counter */
 	uint16_t error_recovery_counter;
+	/** Init attempt counter */
+	uint8_t init_attempt_count;
 	/** Error Status used during initialization */
 	union error_status_t es;
 	/* Driver specific events to handle. */
@@ -632,8 +639,20 @@ static int get_ara(const struct device *dev, uint8_t *ara)
 
 static void perform_pdc_init(struct pdc_data_t *data)
 {
+	const struct pdc_config_t *cfg = data->dev->config;
+
 	data->init_retry_counter = 0;
 	data->error_status.raw_value = 0;
+
+	/* Count init attempts. If exceeded, disable the port. */
+	data->init_attempt_count++;
+	if (data->init_attempt_count > PDC_INIT_RETRY_MAX) {
+		LOG_INF("C%d: Init failed %d times, disabling",
+			cfg->connector_number, data->init_attempt_count - 1);
+		set_state(data, ST_DISABLE);
+		return;
+	}
+
 	/* Set initial local state of Init */
 	data->init_local_state = INIT_PDC_ENABLE;
 	set_state(data, ST_INIT);
@@ -869,6 +888,8 @@ static enum smf_state_result st_init_run(void *o)
 		return SMF_EVENT_HANDLED;
 	case INIT_PDC_COMPLETE:
 		data->es.pdc_init_failed = 0;
+		/* Init succeeded, reset the attempt counter */
+		data->init_attempt_count = 0;
 		/* Init is complete, so transition to Idle state */
 		set_state(data, ST_IDLE);
 		data->init_done = true;
@@ -1645,6 +1666,13 @@ static int rts54_post_command_with_callback(const struct device *dev,
 {
 	struct pdc_data_t *data = dev->data;
 
+	/* Port is permanently disabled (PDC init failed). Return -ENOSYS so
+	 * the upper-layer state machine fast-fails instead of retrying.
+	 */
+	if (get_state(data) == ST_DISABLE) {
+		return -ENOSYS;
+	}
+
 	/* Return an error if chip communication is suspended */
 	if (check_comms_suspended()) {
 		return -ECONNREFUSED;
@@ -1937,6 +1965,8 @@ static int rts54_pdc_reset(const struct device *dev)
 	struct pdc_data_t *data = dev->data;
 
 	if (get_state(data) == ST_DISABLE) {
+		/* Reset counter for manual recovery from disabled state */
+		data->init_attempt_count = 0;
 		perform_pdc_init(data);
 		return 0;
 	}
@@ -2139,12 +2169,25 @@ static int rts54_get_connector_status(const struct device *dev,
 {
 	struct pdc_data_t *data = dev->data;
 
-	if (get_state(data) != ST_IDLE) {
-		return -EBUSY;
-	}
-
 	if (cs == NULL) {
 		return -EINVAL;
+	}
+
+	/* Port is permanently disabled (init failed). Synthesize a
+	 * "not-connected" connector status and notify the upper layer via
+	 * the CCI callback so the upper-layer state machine can transition
+	 * out of PDC_INIT into PDC_UNATTACHED instead of looping forever.
+	 */
+	if (get_state(data) == ST_DISABLE) {
+		memset(cs, 0, sizeof(*cs));
+		data->cci_event.raw_value = 0;
+		data->cci_event.command_completed = 1;
+		call_cci_event_cb(data);
+		return 0;
+	}
+
+	if (get_state(data) != ST_IDLE) {
+		return -EBUSY;
 	}
 
 	uint8_t payload[] = {
@@ -3246,6 +3289,7 @@ static int pdc_init(const struct device *dev)
 	data->cmd = CMD_NONE;
 	data->error_recovery_counter = 0;
 	data->init_retry_counter = 0;
+	data->init_attempt_count = 0;
 	data->info.fw_version = PDC_FWVER_INVALID;
 
 	/* Set initial state */
