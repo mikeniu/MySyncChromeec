@@ -21,3 +21,6 @@ disable=
 
 reports=no
 score=no
+
+[TYPECHECK]
+ignored-modules=pytest
