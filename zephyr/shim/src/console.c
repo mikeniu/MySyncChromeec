@@ -630,33 +630,34 @@ int cvprints(enum console_channel channel, const char *format, va_list args)
 {
 	int rv;
 	char buff[CONFIG_SHELL_PRINTF_BUFF_SIZE];
-	size_t len = 0;
+	size_t len = 1;
 
 	/* Filter out inactive channels */
 	if (console_channel_is_disabled(channel))
 		return EC_SUCCESS;
 
 	buff[0] = '[';
-	len = 1;
 
 	rv = snprintf_timestamp_now(buff + len, sizeof(buff) - len);
 	handle_sprintf_rv(rv, &len);
 
-	rv = crec_snprintf(buff + len, CONFIG_SHELL_PRINTF_BUFF_SIZE - len,
-			   " ");
-	handle_sprintf_rv(rv, &len);
+	buff[len++] = ' ';
 
-	rv = crec_vsnprintf(buff + len, CONFIG_SHELL_PRINTF_BUFF_SIZE - len,
+	rv = crec_vsnprintf(buff + len, CONFIG_SHELL_PRINTF_BUFF_SIZE - len - 2,
 			    format, args);
-	handle_sprintf_rv(rv, &len);
-
-	rv = crec_snprintf(buff + len, CONFIG_SHELL_PRINTF_BUFF_SIZE - len,
-			   "]\n");
-	handle_sprintf_rv(rv, &len);
+	if (rv >= 0) {
+		len += rv;
+		buff[len++] = ']';
+		buff[len++] = '\n';
+		buff[len] = '\0';
+		rv = EC_SUCCESS;
+	} else {
+		handle_sprintf_rv(rv, &len);
+	}
 
 	zephyr_print(buff, len);
 
-	return rv > 0 ? EC_SUCCESS : rv;
+	return rv;
 }
 
 int cprints(enum console_channel channel, const char *format, ...)
