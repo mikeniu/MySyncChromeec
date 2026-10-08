@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98352d2c_3f8fde33",
+        "filename": "zephyr/scripts/firmware_builder_lib.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-08T23:13:42Z",
+      "side": 1,
+      "message": "Library code should avoid calling logging.basicConfig as it affects the global logging configuration for the entire process. zmake already configures logging in its __main__ entry point.",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36aa1f97_17501fbd",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-08T23:13:42Z",
+      "side": 1,
+      "message": "Avoid calling sys.exit(1) in library code. Consider raising a custom Exception instead, and let the caller handle the process exit.",
+      "range": {
+        "startLine": 222,
+        "startChar": 0,
+        "endLine": 222,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa91d7cf_f3982bff",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-08T23:13:42Z",
+      "side": 1,
+      "message": "The original code caught CalledProcessError here to ensure that if one file fails to restore, the rest of the overrides are still processed. Consider wrapping this in a try/except block to maintain robustness during cleanup.",
+      "range": {
+        "startLine": 311,
+        "startChar": 0,
+        "endLine": 311,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0df91341_eeada703",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-08T23:13:42Z",
+      "side": 1,
+      "message": "The original code used \u0027git restore\u0027. Is there a specific reason to switch to the older \u0027git checkout\u0027 command here?",
+      "range": {
+        "startLine": 312,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c53aaaf7_d0652a7d",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-08T23:13:42Z",
+      "side": 1,
+      "message": "Similar to revert_overrides, consider catching exceptions here so that one failed patch revert doesn\u0027t block the rest of the codebase restoration.",
+      "range": {
+        "startLine": 427,
+        "startChar": 0,
+        "endLine": 427,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
