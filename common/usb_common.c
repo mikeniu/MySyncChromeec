@@ -798,28 +798,15 @@ void pd_srccaps_dump(int port)
 	}
 }
 
-int pd_broadcast_alert_msg(uint32_t ado)
-{
-#if defined(CONFIG_USB_PD_TCPMV2) && !defined(CONFIG_USB_VPD) && \
-	!defined(CONFIG_USB_CTVPD)
-	int ret = EC_SUCCESS;
-
-	for (int i = 0; i < CONFIG_USB_PD_PORT_MAX_COUNT; i++) {
-		if (pd_send_alert_msg(i, ado) != EC_SUCCESS)
-			ret = EC_ERROR_BUSY;
-	}
-
-	return ret;
-#else
-	return EC_ERROR_INVALID_CONFIG;
-#endif
-}
-
 int pd_send_alert_msg(int port, uint32_t ado)
 {
 #if defined(CONFIG_USB_PD_TCPMV2) && !defined(CONFIG_USB_VPD) && \
 	!defined(CONFIG_USB_CTVPD)
 	struct rmdo partner_rmdo;
+	int rv;
+
+	if (!pd_is_connected(port))
+		return EC_ERROR_UNAVAILABLE;
 
 	/*
 	 * The Alert Data Object (ADO) definition changed between USB PD
@@ -836,8 +823,9 @@ int pd_send_alert_msg(int port, uint32_t ado)
 	if (!ado)
 		return EC_ERROR_INVAL;
 
-	if (pe_set_ado(port, ado) != EC_SUCCESS)
-		return EC_ERROR_BUSY;
+	rv = pe_set_ado(port, ado);
+	if (rv != EC_SUCCESS)
+		return rv;
 
 	pd_dpm_request(port, DPM_REQUEST_SEND_ALERT);
 	return EC_SUCCESS;
