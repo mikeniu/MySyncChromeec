@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "caa2a733_b58c327c",
+        "filename": "zephyr/subsys/bt_passthru/cros_hostcmd_transport.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-08T20:37:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6418350d_aa13cef7",
+      "range": {
+        "startLine": 171,
+        "startChar": 0,
+        "endLine": 171,
+        "endChar": 0
+      },
+      "revId": "e82bb5790549682591871dee49d2275f7365d772",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f31c54a_09f99512",
@@ -54,6 +78,24 @@
       "writtenOn": "2026-09-16T16:23:43Z",
       "side": 1,
       "message": "I\u0027m in progress of migrating to using upstream host commands definitions. Please use `EC_HOST_CMD_HANDLER_UNBOUND` here.",
+      "revId": "e82bb5790549682591871dee49d2275f7365d772",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4b4ba05_7b32172e",
+        "filename": "zephyr/subsys/bt_passthru/cros_hostcmd_transport.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1000407
+      },
+      "writtenOn": "2026-10-08T20:37:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f31c54a_09f99512",
       "revId": "e82bb5790549682591871dee49d2275f7365d772",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
