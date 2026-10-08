@@ -111,6 +111,30 @@
       },
       "revId": "70695087e41a998b1ad2a93bfd3176b60125c9ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c189883a_bd86661b",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/ocelotrvp-ite_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 1527433
+      },
+      "writtenOn": "2026-10-08T15:59:54Z",
+      "side": 1,
+      "message": "I\u0027d reference the EC config as source of truth for how much the device can sink (looks like 100W). The comment about the Ruby VIF was mainly about how to work around the VIF tool issue",
+      "parentUuid": "44afb11c_9388f7e9",
+      "range": {
+        "startLine": 358,
+        "startChar": 9,
+        "endLine": 358,
+        "endChar": 28
+      },
+      "revId": "70695087e41a998b1ad2a93bfd3176b60125c9ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
