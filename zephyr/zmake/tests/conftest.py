@@ -6,6 +6,7 @@
 
 import os
 import pathlib
+import subprocess
 
 # pylint: disable=import-error
 import hypothesis
@@ -19,6 +20,59 @@ hypothesis.settings.register_profile(
 hypothesis.settings.load_profile("cq")
 
 # pylint: disable=redefined-outer-name,unused-argument
+
+
+@pytest.fixture
+def setup_git_repo():
+    """Returns a helper function to initialize a git repo and make commits."""
+
+    def _setup(repo_dir, files_contents=None):
+        if files_contents is None:
+            files_contents = [
+                {
+                    "file_to_override.c": "original content\n",
+                    "file_to_patch.c": "original patch content\n",
+                }
+            ]
+        repo_path = pathlib.Path(repo_dir)
+        subprocess.run(
+            ["git", "init", "--initial-branch=main"], cwd=repo_path, check=True
+        )
+        subprocess.run(
+            ["git", "config", "user.name", "Test User"],
+            cwd=repo_path,
+            check=True,
+        )
+        subprocess.run(
+            ["git", "config", "user.email", "test@user.com"],
+            cwd=repo_path,
+            check=True,
+        )
+
+        commits = []
+        for i, commit_files in enumerate(files_contents):
+            for fname, content in commit_files.items():
+                fpath = repo_path / fname
+                fpath.parent.mkdir(parents=True, exist_ok=True)
+                fpath.write_text(content, encoding="utf-8")
+            subprocess.run(["git", "add", "."], cwd=repo_path, check=True)
+            subprocess.run(
+                ["git", "commit", "-m", f"commit {i}"],
+                cwd=repo_path,
+                check=True,
+            )
+            hash_res = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=repo_path,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            commits.append(hash_res.stdout.strip())
+
+        return commits
+
+    return _setup
 
 
 @pytest.fixture
