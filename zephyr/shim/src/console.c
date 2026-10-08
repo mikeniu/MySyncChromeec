@@ -34,6 +34,8 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/sys/ring_buffer.h>
 
+#include <subsys/shell/shell_ops.h>
+
 #if !defined(CONFIG_SHELL_BACKEND_SERIAL) && \
 	!defined(CONFIG_SHELL_BACKEND_DUMMY) /* nocheck */
 #error Must select either CONFIG_SHELL_BACKEND_SERIAL or \
@@ -513,7 +515,7 @@ static void shell_write_str(const struct shell *sh, const char *buff,
 {
 	const char *end = buff + size;
 
-	k_sem_take(&sh->ctx->lock_sem, K_FOREVER);
+	z_shell_lock(sh);
 
 	while (buff < end && *buff != '\0') {
 		const char *p = buff;
@@ -536,7 +538,7 @@ static void shell_write_str(const struct shell *sh, const char *buff,
 		buff = p;
 	}
 
-	k_sem_give(&sh->ctx->lock_sem);
+	z_shell_unlock(sh);
 }
 
 static void zephyr_print(const char *buff, size_t size)
