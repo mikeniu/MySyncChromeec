@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cd2fd00_95148727",
+        "filename": "zephyr/program/bluey/pic/src/fan.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1547258
+      },
+      "writtenOn": "2026-10-08T06:15:08Z",
+      "side": 1,
+      "message": "CQ failure:\n\n```\n[FAILED] chromiumos/platform/ec: check_zephyr_for_ec_symbols\n    Hook script \"util/check_zephyr_for_ec_symbols.py --commit ${PRESUBMIT_COMMIT}\" failed with code 1:\n      error: Macro \u0027SECOND\u0027 should not be used in Zephyr code. Use \u0027USEC_PER_SEC\u0027.\n      zephyr/program/bluey/pic/src/fan.c:186: \tnext_duty_adjust.val \u003d get_time().val + SECOND;\n```",
+      "revId": "c539709040253dcf73a14645d03232ebd983a148",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
