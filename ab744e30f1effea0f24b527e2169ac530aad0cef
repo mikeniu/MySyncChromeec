@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "937c103a_adadc387",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-10-08T02:24:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b00d67cb_98325964",
+      "range": {
+        "startLine": 403,
+        "startChar": 1,
+        "endLine": 403,
+        "endChar": 6
+      },
+      "revId": "ab744e30f1effea0f24b527e2169ac530aad0cef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "78030efb_84ff95c3",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19e3bccd_bee52c44",
+        "filename": "common/battery_fuel_gauge.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-10-08T02:24:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78030efb_84ff95c3",
+      "range": {
+        "startLine": 498,
+        "startChar": 7,
+        "endLine": 498,
+        "endChar": 10
+      },
+      "revId": "ab744e30f1effea0f24b527e2169ac530aad0cef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ad78be4_aa37c9ea",
@@ -60,6 +108,24 @@
       "writtenOn": "2026-09-30T06:10:26Z",
       "side": 1,
       "message": "undeclared function \u0027board_wakeup_cutoff_battery\u0027",
+      "revId": "ab744e30f1effea0f24b527e2169ac530aad0cef",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e961e32_cc1219c9",
+        "filename": "zephyr/test/drivers/smart_battery/src/smart.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 705,
+      "author": {
+        "id": 1442438
+      },
+      "writtenOn": "2026-10-08T02:24:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ad78be4_aa37c9ea",
       "revId": "ab744e30f1effea0f24b527e2169ac530aad0cef",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
