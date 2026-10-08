@@ -17,6 +17,25 @@
       "isAi": true,
       "revId": "f031d4facaa9ead12b3dae981d7a27db8ba8f515",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35982210_29fa42c1",
+        "filename": "zephyr/program/trulo/trulo.dtsi",
+        "patchSetId": 57
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1530058
+      },
+      "writtenOn": "2026-10-08T02:02:56Z",
+      "side": 1,
+      "message": "Done. Moved zephyr,host-cmd-espi-backend to common.overlay and added it to dts_overlays in BUILD.py.",
+      "parentUuid": "883a67a6_f83bd391",
+      "isAi": true,
+      "revId": "f031d4facaa9ead12b3dae981d7a27db8ba8f515",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
