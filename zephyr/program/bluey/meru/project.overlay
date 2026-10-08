@@ -11,6 +11,7 @@
 #include "../interrupts.dtsi"
 #include "../adc.dtsi"
 #include "../common.dtsi"
+#include <meru/overlay.dtsi>
 
 /* meru project DTS includes */
 
@@ -118,25 +119,24 @@
 
 &uart4 {
 	status = "okay";
-
-	current-speed = <4166667>;
+	current-speed = <3333333>;
 	pinctrl-0 = <&uart4_sout_gp35>;
 	pinctrl-names = "default";
-	data-bits = <8>;
+	data-bits = <7>;
 	tx-invert;
 
 	uart4_dev0: uart4_dev0 {
 		status = "okay";
 		chain-length = <4>;
-		reset-delay = <205>;
-		bits-per-symbol = <5>;
-		one-symbol = <BINARY(1,1,1,1,0)>;
-		zero-symbol = <BINARY(1,0,0,0,0)>;
+		reset-delay = <80>;
+		bits-per-symbol = <3>;
+		one-symbol = <BINARY(1,1,0)>;
+		zero-symbol = <BINARY(1,0,0)>;
 	};
 };
 
 &pcc {
-	clock-frequency = <DT_FREQ_M(100)>;
+	clock-frequency = <DT_FREQ_M(80)>;
 	core-prescaler = <1>;
 	apb1-prescaler = <4>;
 	apb2-prescaler = <4>;

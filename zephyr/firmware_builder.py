@@ -174,6 +174,7 @@ def get_projects():
                 "c1nv",
                 "aneto",
                 "pic",
+                "meru",
             ]
             and not platform_ec_private.exists()
         ):
