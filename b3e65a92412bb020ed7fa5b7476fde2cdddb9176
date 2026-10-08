@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f251f681_ae6327ac",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 577,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-08T17:48:50Z",
+      "side": 1,
+      "message": "Two potential edge cases here:\n1. If PD_V_SINK_DISCONNECT_MAX \u003c vbus_mv \u003c PD_V_SAFE5V_MIN (3670..4750 mV), none of the branches match, leaving rv uninitialized and thresholds unconfigured. Consider using \u0027if (vbus_mv \u003e PD_V_SINK_DISCONNECT_MAX)\u0027 for the first branch.\n2. In the vbus_mv \u003c\u003d PD_V_SINK_DISCONNECT_MAX branch (line 591), SM5803_REG_VBUS_HIGH_TH is set to SM5803_VBUS_MAX_LEVEL (0xFF). If VBUS rises back to 5V before discharging below vSafe0V, the high-threshold interrupt won\u0027t fire. Consider setting HIGH_TH to SM5803_VBUS_PRESENT_LEVEL in this band as well.",
+      "isAi": true,
+      "revId": "b3e65a92412bb020ed7fa5b7476fde2cdddb9176",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e63b796_b7f54662",
+        "filename": "driver/charger/sm5803.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 881,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-08T17:48:50Z",
+      "side": 1,
+      "message": "When jumping from shipping RO to RW, sm5803_init() returns early at \u0027if (chip_inited[chgnum])\u0027 (line 635). Because shipping RO only enables SM5803_INT2_TINT in SM5803_REG_INT2_EN, SM5803_INT2_VBUS is never enabled after a sysjump and vbus_voltage_cache remains stale on disconnect. Consider ensuring SM5803_INT2_VBUS and the initial VBUS thresholds/cache are configured in the chip_inited path as well.",
+      "isAi": true,
+      "revId": "b3e65a92412bb020ed7fa5b7476fde2cdddb9176",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "878393a8_042baa7d",
+        "filename": "driver/charger/sm5803.h",
+        "patchSetId": 21
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-08T17:48:50Z",
+      "side": 1,
+      "message": "SM5803_REG_VBUS_LOW_TH compares the upper 8 bits of the 10-bit ADC (mv \u003d ((msb \u003c\u003c 2) | lsb) * 234 / 10). With 0x08 and 0x27, non-zero LSB bits (1..3) read back as 819 mV \u003e PD_V_SAFE0V_MAX (800 mV) and 3673..3720 mV \u003e PD_V_SINK_DISCONNECT_MAX (3670 mV), so sm5803_check_vbus_level() can still evaluate false when the low-threshold interrupt fires. Consider using 0x07 (\u003c\u003d 725 mV) and 0x26 (\u003c\u003d 3627 mV) so all LSB values satisfy the check.",
+      "isAi": true,
+      "revId": "b3e65a92412bb020ed7fa5b7476fde2cdddb9176",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
