@@ -80,8 +80,8 @@ config PLATFORM_EC_SMBUS_PEC
 
 config PLATFORM_EC_I2C_READ_SIZE_BUFFER
 	int "Buffer size for i2c_read_sized_block"
-	default 1
 	default 32 if PLATFORM_EC_SMBUS_PEC
+	default 1
 	help
 	  The buffer size for i2c_read_sized_block. Set this to 256 could ensure
 	  that i2c_read_sized_block only call i2c_xfer_unlocked twice each try.
