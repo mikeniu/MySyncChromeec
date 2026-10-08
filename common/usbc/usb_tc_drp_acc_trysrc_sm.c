@@ -128,9 +128,11 @@ void print_flag(int port, int set_or_clear, int flag);
 #define TC_FLAGS_USB_RETIMER_FW_UPDATE_LTD_RUN BIT(21)
 /* Flag for asynchronous call to request Error Recovery */
 #define TC_FLAGS_REQUEST_ERROR_RECOVERY BIT(22)
+/* Flag to note a partner was attached since the last detach */
+#define TC_FLAGS_PARTNER_ATTACHED BIT(23)
 
 /* For checking flag_bit_names[] array */
-#define TC_FLAGS_COUNT 23
+#define TC_FLAGS_COUNT 24
 
 /* On disconnect, clear most of the flags. */
 #define CLR_FLAGS_ON_DISCONNECT(port)                                         \
@@ -344,6 +346,7 @@ static struct bit_name flag_bit_names[] = {
 	{ TC_FLAGS_USB_RETIMER_FW_UPDATE_LTD_RUN,
 	  "USB_RETIMER_FW_UPDATE_LTD_RUN" },
 	{ TC_FLAGS_REQUEST_ERROR_RECOVERY, "REQUEST_ERROR_RECOCVERY" },
+	{ TC_FLAGS_PARTNER_ATTACHED, "PARTNER_ATTACHED" },
 };
 BUILD_ASSERT(ARRAY_SIZE(flag_bit_names) == TC_FLAGS_COUNT);
 
@@ -667,7 +670,7 @@ static void tc_set_modes_exit(int port)
 
 static void tc_detached(int port)
 {
-	TC_CLR_FLAG(port, TC_FLAGS_TS_DTS_PARTNER);
+	TC_CLR_FLAG(port, TC_FLAGS_TS_DTS_PARTNER | TC_FLAGS_PARTNER_ATTACHED);
 	hook_notify(HOOK_USB_PD_DISCONNECT);
 	tc_enable_pd(port, 0);
 	tc_pd_connection(port, 0);
@@ -1650,7 +1653,11 @@ test_export_static enum usb_tc_state get_state_tc(const int port)
 /* Get the previous TypeC state. */
 static enum usb_tc_state get_last_state_tc(const int port)
 {
-	return tc[port].ctx.previous - &tc_states[0];
+	/* Default to returning TC_STATE_COUNT if no state has been set */
+	if (tc[port].ctx.previous == NULL)
+		return TC_STATE_COUNT;
+	else
+		return tc[port].ctx.previous - &tc_states[0];
 }
 
 static void print_current_state(const int port)
@@ -2166,7 +2173,13 @@ static void tc_unattached_snk_entry(const int port)
 	tc[port].cc_state = PD_CC_UNSET;
 
 	if (get_last_state_tc(port) != TC_UNATTACHED_SRC) {
-		tc_detached(port);
+		/*
+		 * Only run detach cleanup on initial entry or if a partner was
+		 * previously attached.
+		 */
+		if (get_last_state_tc(port) == TC_STATE_COUNT ||
+		    TC_CHK_FLAG(port, TC_FLAGS_PARTNER_ATTACHED))
+			tc_detached(port);
 		print_current_state(port);
 	}
 
@@ -2429,6 +2442,7 @@ static void tc_attached_snk_entry(const int port)
 	enum tcpc_cc_voltage_status cc1, cc2;
 
 	print_current_state(port);
+	TC_SET_FLAG(port, TC_FLAGS_PARTNER_ATTACHED);
 
 	/*
 	 * Known state of attach is SNK.  We need to apply this pull value
@@ -2762,7 +2776,13 @@ static void tc_unattached_src_entry(const int port)
 	tc[port].cc_state = PD_CC_UNSET;
 
 	if (get_last_state_tc(port) != TC_UNATTACHED_SNK) {
-		tc_detached(port);
+		/*
+		 * Only run detach cleanup on initial entry or if a partner was
+		 * previously attached.
+		 */
+		if (get_last_state_tc(port) == TC_STATE_COUNT ||
+		    TC_CHK_FLAG(port, TC_FLAGS_PARTNER_ATTACHED))
+			tc_detached(port);
 		print_current_state(port);
 	}
 
@@ -2997,6 +3017,7 @@ static void tc_attached_src_entry(const int port)
 	enum tcpc_cc_voltage_status cc1, cc2;
 
 	print_current_state(port);
+	TC_SET_FLAG(port, TC_FLAGS_PARTNER_ATTACHED);
 
 	pd_timer_disable(port, TC_TIMER_TIMEOUT);
 
@@ -3724,6 +3745,7 @@ __maybe_unused static void tc_ct_unattached_snk_exit(int port)
 __maybe_unused static void tc_ct_attached_snk_entry(int port)
 {
 	print_current_state(port);
+	TC_SET_FLAG(port, TC_FLAGS_PARTNER_ATTACHED);
 
 	/* The port shall reject a VCONN swap request. */
 	TC_SET_FLAG(port, TC_FLAGS_REJECT_VCONN_SWAP);
