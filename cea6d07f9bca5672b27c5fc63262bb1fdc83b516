@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2066ccea_213fd6b7",
+        "filename": "zephyr/scripts/firmware_builder_lib.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-08T23:21:22Z",
+      "side": 1,
+      "message": "Consider adding metavar\u003d\"PATCHES_DIR\" so the help text shows --patches-dir PATCHES_DIR rather than PATCHES_DIRS, which clarifies that the flag can be repeated but each instance takes one path.",
+      "range": {
+        "startLine": 621,
+        "startChar": 0,
+        "endLine": 621,
+        "endChar": 0
+      },
+      "revId": "cea6d07f9bca5672b27c5fc63262bb1fdc83b516",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d120e82_f7a28a7c",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-08T23:21:22Z",
+      "side": 1,
+      "message": "Consider adding metavar\u003d\"PATCHES_DIR\" here as well.",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 177,
+        "endChar": 0
+      },
+      "revId": "cea6d07f9bca5672b27c5fc63262bb1fdc83b516",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8df2807e_a0ef2695",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-08T23:21:22Z",
+      "side": 1,
+      "message": "It would be helpful to log the output of the git status command here (can_apply.stdout) so the user can see exactly why the check failed.",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 0
+      },
+      "revId": "cea6d07f9bca5672b27c5fc63262bb1fdc83b516",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
