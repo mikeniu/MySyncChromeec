@@ -30,6 +30,7 @@ Usage:
 """
 
 import argparse
+import base64
 import os
 import pathlib
 import re
@@ -75,53 +76,59 @@ def download_historical_db(dest_path: pathlib.Path) -> None:
     print("Download complete.", file=sys.stderr)
 
 
-def find_token_database(
+def find_token_databases(
     explicit_db: str | None = None,
     board: str | None = None,
     force_update: bool = False,
-) -> pathlib.Path:
-    """Finds the most suitable token database or downloads the historical database."""
+) -> list[pathlib.Path]:
+    """Finds suitable token databases or downloads the historical database."""
     if explicit_db:
         p = pathlib.Path(explicit_db)
         if not p.exists():
             sys.exit(f"Error: Specified database does not exist: {explicit_db}")
-        return p
+        return [p]
 
     if force_update:
         download_historical_db(CACHE_HISTORICAL_DB)
-        return CACHE_HISTORICAL_DB
+        return [CACHE_HISTORICAL_DB]
 
-    candidates: list[pathlib.Path] = []
     if board:
-        candidates.extend(
-            [
-                EC_DIR / "build" / "zephyr" / board / "output" / "database.bin",
-                EC_DIR
-                / "build"
-                / "zephyr"
-                / board
-                / "output"
-                / "zephyr.ro.elf",
-            ]
+        board_db = (
+            EC_DIR / "build" / "zephyr" / board / "output" / "database.bin"
         )
+        if board_db.exists():
+            return [board_db]
+        board_elf = (
+            EC_DIR / "build" / "zephyr" / board / "output" / "zephyr.ro.elf"
+        )
+        if board_elf.exists():
+            return [board_elf]
 
-    candidates.extend(
-        [
-            EC_DIR / "build" / "tokens.bin",
-            pathlib.Path("/usr/share/cros_ec/tokens/historical.bin"),
-            pathlib.Path("/usr/share/cros_ec/tokens.bin"),
-            pathlib.Path("/usr/local/cros_ec/tokens.bin"),
-            pathlib.Path("/tmp/chromeos-ec-token-historical.bin"),
-            CACHE_HISTORICAL_DB,
-        ]
-    )
+    databases: list[pathlib.Path] = []
 
-    for path in candidates:
-        if path.exists():
-            return path
+    # Local unified build DB
+    local_unified = EC_DIR / "build" / "tokens.bin"
+    if local_unified.exists():
+        databases.append(local_unified)
 
-    download_historical_db(CACHE_HISTORICAL_DB)
-    return CACHE_HISTORICAL_DB
+    # Historical / System DBs (prefer cached updated DB, then system paths)
+    historical_candidates = [
+        CACHE_HISTORICAL_DB,
+        pathlib.Path("/usr/share/cros_ec/tokens/historical.bin"),
+        pathlib.Path("/usr/share/cros_ec/tokens.bin"),
+        pathlib.Path("/usr/local/cros_ec/tokens.bin"),
+        pathlib.Path("/tmp/chromeos-ec-token-historical.bin"),
+    ]
+    for sp in historical_candidates:
+        if sp.exists() and sp not in databases:
+            databases.append(sp)
+            break
+
+    if not databases:
+        download_historical_db(CACHE_HISTORICAL_DB)
+        databases.append(CACHE_HISTORICAL_DB)
+
+    return databases
 
 
 def detokenize_content(
@@ -146,6 +153,30 @@ def detokenize_content(
     result_bytes = detok._detokenize_nested(  # pylint: disable=protected-access
         content_bytes, detokenize.DEFAULT_RECURSION
     )
+
+    # Fallback for tokens merged directly with adjacent alphanumeric text
+    # (e.g. `tokenRTK0:`) where greedy Base64 matching swallowed trailing characters.
+    def fallback_replace(match: re.Match[bytes]) -> bytes:
+        raw_b64 = match.group(1)
+        cur = raw_b64
+        suffix = b""
+        while len(cur) >= 4:
+            pad_needed = (4 - (len(cur) % 4)) % 4
+            test_b64 = cur + (b"=" * pad_needed)
+            try:
+                raw_bytes = base64.b64decode(test_b64)
+                r = detok.detokenize(raw_bytes)
+                if r.ok():
+                    return str(r).encode("utf-8") + suffix
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+            suffix = cur[-1:] + suffix
+            cur = cur[:-1]
+        return match.group(0)
+
+    pattern = re.compile(rf"{re.escape(prefix)}([A-Za-z0-9+/=]{{4,}})".encode())
+    result_bytes = pattern.sub(fallback_replace, result_bytes)
+
     result_str = result_bytes.decode("utf-8", errors="replace")
 
     if strip_end_delimiter:
@@ -218,6 +249,12 @@ def main() -> None:
         help="Force download/update of the latest historical token database.",
     )
     parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help="Suppress informational stderr messages.",
+    )
+    parser.add_argument(
         "--no-strip-delimiter",
         action="store_false",
         dest="strip_delimiter",
@@ -226,13 +263,19 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    db_path = find_token_database(
+    db_paths = find_token_databases(
         explicit_db=args.database,
         board=args.board,
         force_update=args.update_db,
     )
 
-    detok = detokenize.Detokenizer(str(db_path), prefix=args.prefix)
+    if not args.quiet:
+        for p in db_paths:
+            print(f"Using token database: {p}", file=sys.stderr)
+
+    detok = detokenize.Detokenizer(
+        *(str(p) for p in db_paths), prefix=args.prefix
+    )
 
     # Determine input content
     if args.inline_string:
