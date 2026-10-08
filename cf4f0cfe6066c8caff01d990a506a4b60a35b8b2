@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efa7b3fb_e1ec8fc2",
+        "filename": "zephyr/shim/src/console.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1479762
+      },
+      "writtenOn": "2026-10-08T16:58:28Z",
+      "side": 1,
+      "message": "could you please add the `size` here as an upper bound (`size` from the zephyr_print function) to prevent any possibility of a buffer overflow?",
+      "range": {
+        "startLine": 515,
+        "startChar": 1,
+        "endLine": 515,
+        "endChar": 24
+      },
+      "revId": "cf4f0cfe6066c8caff01d990a506a4b60a35b8b2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
