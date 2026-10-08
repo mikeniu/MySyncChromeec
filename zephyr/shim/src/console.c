@@ -507,6 +507,15 @@ static bool shell_is_active(void)
  *      z_shell_print_prompt_and_cmd() after the message when
  *      CONFIG_SHELL_VT100_COMMANDS is enabled, turning one print into four
  *      formatting and UART write operations.
+ *   3. Blocks background EC tasks in shell_pend_on_txdone() while holding
+ *      lock_sem whenever the UART TX ring buffer is full.
+ *
+ * When called from a shell command handler (cmd_ctx), use
+ * z_shell_print_stream() so multi-line command output waits for the TX ring
+ * buffer to drain and is never truncated. For background prints from other
+ * threads, write directly via the transport write API without blocking if the
+ * UART TX ring buffer is full (the AP console buffer and panic log still
+ * capture the full message).
  */
 static void shell_write_str(const struct shell *sh, const char *buff)
 {
@@ -515,7 +524,7 @@ static void shell_write_str(const struct shell *sh, const char *buff)
 	while (*buff != '\0') {
 		const char *p = buff;
 		const char *out = buff;
-		size_t len;
+		size_t len, cnt;
 
 		/* Scan up to the next newline so each non-newline span is
 		 * written in a single stream call.
@@ -529,7 +538,14 @@ static void shell_write_str(const struct shell *sh, const char *buff)
 			len = 2;
 			p++;
 		}
-		z_shell_print_stream(sh, out, len);
+		if (sh->ctx->ctx.flags.cmd_ctx) {
+			z_shell_print_stream(sh, out, len);
+		} else {
+			(void)sh->iface->api->write(sh->iface, out, len, &cnt);
+			if (cnt < len) {
+				break;
+			}
+		}
 		buff = p;
 	}
 
