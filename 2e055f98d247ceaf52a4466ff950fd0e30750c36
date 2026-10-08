@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "46484bf6_a25d02ce",
+        "filename": "Makefile",
+        "patchSetId": 8
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-08T19:33:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22e8ef2d_cd6e1bc9",
+      "range": {
+        "startLine": 122,
+        "startChar": 0,
+        "endLine": 122,
+        "endChar": 0
+      },
+      "revId": "2e055f98d247ceaf52a4466ff950fd0e30750c36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1baea92a_5e18a784",
@@ -60,6 +84,54 @@
       "writtenOn": "2026-10-07T19:11:49Z",
       "side": 1,
       "message": "With the removal of the firmware object rules, the order-only dependency on ec_version.h (previously at lines 170-171) is gone. Host tools like ectool include ec_version.h, and in a clean parallel build, the compilation might start before ec_version.h is generated, leading to a build failure.\n\nConsider adding an order-only dependency here:\n$(host-utils) $(host-utils-cxx): | $(out)/ec_version.h",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 0
+      },
+      "revId": "2e055f98d247ceaf52a4466ff950fd0e30750c36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d724b922_87be325a",
+        "filename": "Makefile.rules",
+        "patchSetId": 8
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-08T19:33:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "787d177b_ba85a7c0",
+      "range": {
+        "startLine": 127,
+        "startChar": 0,
+        "endLine": 127,
+        "endChar": 0
+      },
+      "revId": "2e055f98d247ceaf52a4466ff950fd0e30750c36",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecbad7e2_708f775d",
+        "filename": "Makefile.rules",
+        "patchSetId": 8
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-08T19:33:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1baea92a_5e18a784",
       "range": {
         "startLine": 127,
         "startChar": 0,
