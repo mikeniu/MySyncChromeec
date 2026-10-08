@@ -4,14 +4,19 @@
 
 """Tests for codebase preparation (patches and overrides)."""
 
+import os
 import pathlib
 import subprocess
+from unittest import mock
 
 import pytest
 from zmake.repository_prep import _find_override_files
 from zmake.repository_prep import _find_patch_files
 from zmake.repository_prep import CodebasePreparer
+from zmake.repository_prep import find_git_repo
 from zmake.repository_prep import get_dirty_files
+from zmake.repository_prep import get_patch_modified_files
+from zmake.repository_prep import main as prep_main
 from zmake.repository_prep import RepositoryPrepError
 
 
@@ -226,3 +231,258 @@ def test_get_dirty_files_untracked_subdir_and_rename(tmp_path, setup_git_repo):
     assert pathlib.Path("src/platform/ec/new_dir/nested/untracked.c") in dirty
     assert pathlib.Path("src/platform/ec/file_to_override.c") in dirty
     assert pathlib.Path("src/platform/ec/renamed.c") in dirty
+
+
+@pytest.fixture(name="cros_checkout")
+def fixture_cros_checkout(tmp_path, setup_git_repo):
+    """Create a mock ChromeOS checkout with initialized EC repo and Zephyr base."""
+    real_co = tmp_path / "cros"
+    (real_co / ".repo").mkdir(parents=True)
+    ec_path = real_co / "src" / "platform" / "ec"
+    ec_path.mkdir(parents=True)
+    setup_git_repo(ec_path)
+    zephyr_base = real_co / "src" / "third_party" / "zephyrproject" / "zephyr"
+    zephyr_base.mkdir(parents=True)
+    (zephyr_base / "Kconfig").write_text("mainmenu\n", encoding="utf-8")
+    return real_co, ec_path, zephyr_base
+
+
+def test_codebase_preparer_commit(cros_checkout, tmp_path):
+    """Test that commit=True commits changes and skips restore."""
+    real_co, ec_path, _ = cros_checkout
+    override_root = tmp_path / "overrides"
+    override_ec = override_root / "src" / "platform" / "ec"
+    override_ec.mkdir(parents=True)
+    (override_ec / "file_to_override.c").write_text(
+        "overridden content\n", encoding="utf-8"
+    )
+
+    preparer = CodebasePreparer(
+        real_co,
+        patches_dirs=[],
+        src_override_dirs=[override_root],
+        commit=True,
+    )
+    preparer.prepare()
+
+    assert (ec_path / "file_to_override.c").read_text(
+        encoding="utf-8"
+    ) == "overridden content\n"
+    status = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=ec_path,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert status.stdout.strip() == ""
+    log = subprocess.run(
+        ["git", "log", "-n", "1", "--format=%s"],
+        cwd=ec_path,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert log.stdout.strip() == "applied patches and overrides"
+
+    preparer.restore()
+    assert (ec_path / "file_to_override.c").read_text(
+        encoding="utf-8"
+    ) == "overridden content\n"
+
+
+def test_codebase_preparer_path_mappings_and_cli(tmp_path):
+    """Test path_mappings in non-git ebuild layout and standalone CLI main()."""
+    ec_mod = tmp_path / "zephyrproject" / "modules" / "ec"
+    ec_mod.mkdir(parents=True)
+    (ec_mod / "foo.c").write_text("base\n", encoding="utf-8")
+
+    override_root = tmp_path / "overrides"
+    (override_root / "src" / "platform" / "ec").mkdir(parents=True)
+    (override_root / "src" / "platform" / "ec" / "foo.c").write_text(
+        "mapped override\n", encoding="utf-8"
+    )
+
+    CodebasePreparer(
+        tmp_path,
+        patches_dirs=[],
+        src_override_dirs=[override_root],
+        path_mappings={"src/platform/ec": ec_mod},
+        allow_dirty=True,
+    ).prepare()
+    assert (ec_mod / "foo.c").read_text(encoding="utf-8") == "mapped override\n"
+
+    checkout_dir = tmp_path / "direct_checkout"
+    (checkout_dir / "src" / "platform" / "ec").mkdir(parents=True)
+    ret = prep_main(
+        [
+            "--checkout",
+            str(checkout_dir),
+            "--src-override-dir",
+            str(override_root),
+            "--allow-dirty",
+        ]
+    )
+    assert ret == 0
+    assert (checkout_dir / "src" / "platform" / "ec" / "foo.c").read_text(
+        encoding="utf-8"
+    ) == "mapped override\n"
+    assert (checkout_dir / ".workspace_prepared").exists()
+
+
+def test_rollback_on_partial_failure_and_duplicate_override(
+    cros_checkout, tmp_path
+):
+    """Test __enter__ rollback on partial failure and duplicate override deduplication."""
+    real_co, ec_path, _ = cros_checkout
+    ovr1, ovr2 = tmp_path / "ovr1", tmp_path / "ovr2"
+    for idx, ovr in enumerate((ovr1, ovr2), 1):
+        (ovr / "src" / "platform" / "ec").mkdir(parents=True)
+        (ovr / "src" / "platform" / "ec" / "new_file.c").write_text(
+            f"new content {idx}\n", encoding="utf-8"
+        )
+        (ovr / "src" / "platform" / "ec" / "file_to_override.c").write_text(
+            f"override {idx}\n", encoding="utf-8"
+        )
+
+    with CodebasePreparer(real_co, [], [ovr1, ovr2]) as preparer:
+        assert len(preparer.copied_files) == 2
+        assert (ec_path / "new_file.c").read_text(
+            encoding="utf-8"
+        ) == "new content 2\n"
+    assert not (ec_path / "new_file.c").exists()
+    assert (ec_path / "file_to_override.c").read_text(
+        encoding="utf-8"
+    ) == "original content\n"
+
+    bad_patches = tmp_path / "bad_patches"
+    (bad_patches / "src" / "platform" / "ec").mkdir(parents=True)
+    (bad_patches / "src" / "platform" / "ec" / "0001-bad.patch").write_text(
+        "--- a/file_to_patch.c\n+++ b/file_to_patch.c\n@@ -1 +1 @@\n-nope\n+bad\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(RepositoryPrepError):
+        with CodebasePreparer(real_co, [bad_patches], [ovr1]):
+            pass
+    assert not (ec_path / "new_file.c").exists()
+    assert (ec_path / "file_to_override.c").read_text(
+        encoding="utf-8"
+    ) == "original content\n"
+
+
+def test_symlink_override_safety(cros_checkout, tmp_path):
+    """Test overriding a symlink replaces link without corrupting target."""
+    real_co, ec_path, _ = cros_checkout
+    shared_hdr = ec_path / "shared.h"
+    shared_hdr.write_text("shared content\n", encoding="utf-8")
+    link_hdr = ec_path / "board_link.h"
+    os.symlink("shared.h", link_hdr)
+    subprocess.run(
+        ["git", "add", "shared.h", "board_link.h"], cwd=ec_path, check=True
+    )
+    subprocess.run(
+        ["git", "commit", "-m", "add symlink"], cwd=ec_path, check=True
+    )
+
+    override_root = tmp_path / "overrides"
+    override_ec = override_root / "src" / "platform" / "ec"
+    override_ec.mkdir(parents=True)
+    (override_ec / "board_link.h").write_text(
+        "overridden link\n", encoding="utf-8"
+    )
+
+    with CodebasePreparer(real_co, [], [override_root]):
+        assert not link_hdr.is_symlink()
+        assert link_hdr.read_text(encoding="utf-8") == "overridden link\n"
+        assert shared_hdr.read_text(encoding="utf-8") == "shared content\n"
+
+    assert link_hdr.is_symlink()
+    assert shared_hdr.read_text(encoding="utf-8") == "shared content\n"
+
+
+def test_preparer_edge_cases(cros_checkout, tmp_path, setup_git_repo):
+    """Test symlinks in get_dirty_files, numstat -z/renames/subdir, and bounds."""
+    real_co, ec_path, _ = cros_checkout
+
+    # 1. get_dirty_files preserves symlink names and find_git_repo follows dir symlinks
+    (ec_path / "target.h").write_text("hdr\n", encoding="utf-8")
+    os.symlink("target.h", ec_path / "sym.h")
+    subprocess.run(["git", "add", "target.h", "sym.h"], cwd=ec_path, check=True)
+    subprocess.run(["git", "commit", "-m", "sym"], cwd=ec_path, check=True)
+    (ec_path / "sym.h").unlink()
+    os.symlink("other.h", ec_path / "sym.h")
+    dirty = get_dirty_files(ec_path, real_co)
+    assert pathlib.Path("src/platform/ec/sym.h") in dirty
+
+    symlinked_ec = tmp_path / "symlinked_ec"
+    os.symlink(ec_path, symlinked_ec)
+    assert find_git_repo(symlinked_ec / "target.h") == ec_path.resolve()
+
+    ext_zephyr = tmp_path / "ext_zephyr"
+    ext_zephyr.mkdir()
+    setup_git_repo(ext_zephyr)
+    (ext_zephyr / "file_to_patch.c").write_text("dirty ext\n", encoding="utf-8")
+    zp_rel = pathlib.Path("src/third_party/zephyrproject/zephyr")
+    ext_dirty = get_dirty_files(ext_zephyr, real_co, {zp_rel: ext_zephyr})
+    assert zp_rel / "file_to_patch.c" in ext_dirty
+
+    # 2. get_patch_modified_files handles renames (-z) and subdirectories
+    rename_patch = tmp_path / "rename.patch"
+    rename_patch.write_text(
+        "diff --git a/dir/file_to_patch.c b/dir/renamed.c\n"
+        "similarity index 100%\n"
+        "rename from dir/file_to_patch.c\n"
+        "rename to dir/renamed.c\n",
+        encoding="utf-8",
+    )
+    mod_files = get_patch_modified_files(rename_patch, ec_path)
+    assert mod_files == [pathlib.Path("dir/renamed.c")]
+
+    sub_dir = ec_path / "sub" / "kernel"
+    sub_dir.mkdir(parents=True)
+    sub_patch = tmp_path / "sub.patch"
+    sub_patch.write_text(
+        "--- a/kernel/version.c\n"
+        "+++ b/kernel/version.c\n"
+        "@@ -1,1 +1,2 @@\n"
+        " int v = 1;\n"
+        "+int v2 = 2;\n",
+        encoding="utf-8",
+    )
+    assert get_patch_modified_files(sub_patch, ec_path / "sub") == [
+        pathlib.Path("kernel/version.c")
+    ]
+
+    # 3. revert_source_overrides bounds parent directory cleanup via path_mappings
+    ext_mod = tmp_path / "ext_mod"
+    ext_mod.mkdir()
+    mod_ovr = tmp_path / "mod_ovr"
+    (mod_ovr / "src" / "platform" / "ec" / "nested").mkdir(parents=True)
+    (mod_ovr / "src" / "platform" / "ec" / "nested" / "new.c").write_text(
+        "x\n", encoding="utf-8"
+    )
+    with CodebasePreparer(
+        real_co,
+        [],
+        [mod_ovr],
+        path_mappings={pathlib.Path("src/platform/ec"): ext_mod},
+    ):
+        assert (ext_mod / "nested" / "new.c").exists()
+    assert ext_mod.exists()
+    assert not (ext_mod / "nested").exists()
+
+    # 4. commit_changes raises RepositoryPrepError on git failure and skips symlinked .git
+    ovr_dir = tmp_path / "ovr"
+    (ovr_dir / "src" / "platform" / "ec").mkdir(parents=True)
+    (ovr_dir / "src" / "platform" / "ec" / "ext.c").write_text(
+        "ext ovr\n", encoding="utf-8"
+    )
+    prep = CodebasePreparer(real_co, [], [ovr_dir], commit=True)
+    with mock.patch(
+        "subprocess.run",
+        side_effect=subprocess.CalledProcessError(
+            1, ["git", "add"], stderr="mock err"
+        ),
+    ):
+        with pytest.raises(RepositoryPrepError):
+            prep.commit_changes()

@@ -143,6 +143,12 @@ ifneq ($(CCACHE),)
 	$(CCACHE) -C
 endif
 
+.PHONY: prepare
+prepare:
+	$(Q)python3 zephyr/zmake/zmake/repository_prep.py --allow-dirty \
+		$(foreach d,$(PATCHES_DIRS),--patches-dir "$(d)") \
+		$(foreach d,$(SRC_OVERRIDE_DIRS),--src-override-dir "$(d)")
+
 .PHONY: help
 help:
 	@echo "Google Chromium EC build"
@@ -150,6 +156,7 @@ help:
 	@echo "Common Targets:"
 	@echo "  clean                - Clean build output"
 	@echo "  clobber              - Clean all build output"
+	@echo "  prepare              - Apply source overrides and patches"
 	@echo "  utils-host           - Build EC host utilities"
 	@echo "  utils-test           - Build and run EC host utility unit tests"
 	@echo ""

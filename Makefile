@@ -23,6 +23,18 @@ endif
 
 PROJECT?=ec
 
+ifneq ($(PREPARE_WORKSPACE),)
+ifeq ($(MAKELEVEL),0)
+_prep_cmd := python3 zephyr/zmake/zmake/repository_prep.py --allow-dirty \
+	$(foreach d,$(PATCHES_DIRS),--patches-dir "$(d)") \
+	$(foreach d,$(SRC_OVERRIDE_DIRS),--src-override-dir "$(d)")
+_prep_status := $(shell $(_prep_cmd) >&2; echo $$?)
+ifneq ($(_prep_status),0)
+$(error Codebase preparation failed)
+endif
+endif
+endif
+
 # An empty string.
 # "-DMACRO" leads to MACRO=1.  Define an empty string "-DMACRO=" to take
 # advantage of IS_ENABLED magic macro, which only allows an empty string.
