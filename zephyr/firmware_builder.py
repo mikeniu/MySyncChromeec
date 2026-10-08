@@ -12,6 +12,7 @@ This is the entry point for the custom firmware builder workflow recipe.
 import collections
 from concurrent import futures
 import json
+import logging
 import os
 import pathlib
 import re
@@ -37,12 +38,12 @@ sys.path.append(str(ZEPHYR_DIR / "../util"))
 from coreboot_sdk import init_toolchain
 import zmake.modules
 import zmake.project
+from zmake.repository_prep import find_checkout
 
 from scripts.firmware_builder_lib import (
     get_safe_lcov_workers as _get_safe_lcov_workers,
 )
 from scripts.firmware_builder_lib import create_arg_parser
-from scripts.firmware_builder_lib import find_checkout
 from scripts.firmware_builder_lib import merge_shard_coverage_reports
 from scripts.firmware_builder_lib import prepared_workspace
 from scripts.firmware_builder_lib import save_or_load_shard_info
@@ -979,6 +980,7 @@ def main(args):
     if not opts.bcs_version:
         opts.bcs_version = get_version()
 
+    logging.basicConfig(level=logging.INFO)
     orig_dir = ZEPHYR_DIR
     try:
         with prepared_workspace(
