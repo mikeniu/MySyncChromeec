@@ -495,6 +495,31 @@ static bool shell_is_active(void)
 	       shell_zephyr->ctx->state == SHELL_STATE_ACTIVE;
 }
 
+static void shell_write_str(const struct shell *sh, const char *buff)
+{
+	k_sem_take(&sh->ctx->lock_sem, K_FOREVER);
+
+	while (*buff != '\0') {
+		const char *p = buff;
+		const char *out = buff;
+		size_t len;
+
+		while (*p != '\0' && *p != '\n') {
+			p++;
+		}
+		len = p - buff;
+		if (len == 0) {
+			out = "\r\n";
+			len = 2;
+			p++;
+		}
+		z_shell_print_stream(sh, out, len);
+		buff = p;
+	}
+
+	k_sem_give(&sh->ctx->lock_sem);
+}
+
 static void zephyr_print(const char *buff, size_t size)
 {
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_LOG)) {
@@ -521,11 +546,11 @@ static void zephyr_print(const char *buff, size_t size)
 		return;
 	}
 
-	/* Send all legacy output directly to the shell.  The shell UART
-	 * backend uses uart_fifo_fill(), while LOG_MODE_MINIMAL uses
-	 * printk() and calls uart_poll_out().
+	/* Write pre-formatted output directly to the shell stream to avoid a
+	 * second cbvprintf("%s", buff) pass and VT100 prompt erase/redraw
+	 * overhead on background prints.
 	 */
-	shell_fprintf(shell_zephyr, SHELL_NORMAL, "%s", buff);
+	shell_write_str(shell_zephyr, buff);
 
 	/* Capture legacy output into the console buffer read by the AP.
 	 */
