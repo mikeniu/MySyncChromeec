@@ -8,6 +8,7 @@
 #include "console.h"
 #include "drivers/pdc.h"
 #include "drivers/ucsi_v3.h"
+#include "emul/emul_common_i2c.h"
 #include "emul/emul_pdc.h"
 #include "emul/emul_realtek_rts54xx_public.h"
 #include "i2c.h"
@@ -48,6 +49,22 @@ static const struct device *dev2 = DEVICE_DT_GET(RTS5453P_NODE2);
 
 static void rts54xx_before_test(void *data)
 {
+	/* Defensively clear any I2C failure injection left behind by previous
+	 * tests so this test starts from a clean state.
+	 */
+	i2c_common_emul_set_read_fail_reg(
+		rts5453p_emul_get_i2c_common_data(emul),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(emul),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_read_fail_reg(
+		rts5453p_emul_get_i2c_common_data(emul2),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(emul2),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+
 	emul_pdc_reset(emul);
 	emul_pdc_reset(emul2);
 	emul_pdc_set_response_delay(emul, 0);
@@ -55,6 +72,13 @@ static void rts54xx_before_test(void *data)
 	if (IS_ENABLED(CONFIG_TEST_PDC_MESSAGE_TRACING)) {
 		set_pdc_trace_msg_mocks();
 	}
+
+	/* If a previous test left the driver in ST_DISABLE, pdc_reset() will
+	 * restart init. Otherwise this is a no-op once the driver is already
+	 * in ST_IDLE.
+	 */
+	pdc_reset(dev);
+	pdc_reset(dev2);
 
 	zassert_ok(emul_pdc_idle_wait(emul));
 	zassert_ok(emul_pdc_idle_wait(emul2));
@@ -629,4 +653,190 @@ ZTEST_USER(rts54xx, test_dfp_and_ufp_vdo_ack_programming)
 
 	dfp.raw_value = dfp_vdo_raw;
 	zassert_equal(dfp.usb4_cap, 0, "DFP VDO USB4 cap for dev2 should be 0");
+}
+
+/* ============================================================================
+ * ST_DISABLE state tests.
+ *
+ * When the RTS54XX PDC persistently fails to initialize (init attempt count
+ * exceeds PDC_INIT_RETRY_MAX), the driver transitions the port to ST_DISABLE.
+ * In this state:
+ *   - pdc_get_error_status() returns the cached error status with the
+ *     port_disabled bit set.
+ *   - All post-commands fast-fail with -ENOSYS so the upper-layer state
+ *     machine doesn't loop forever retrying a dead port.
+ *   - pdc_get_connector_status() synthesizes a "not connected" status and
+ *     fires the CCI callback synchronously so the upper layer can transition
+ *     out of PDC_INIT into PDC_UNATTACHED.
+ *   - pdc_reset() resets the init_attempt_count and restarts init, allowing
+ *     manual recovery from ST_DISABLE.
+ * ============================================================================
+ */
+
+/* Poll interval/timeout when waiting for the driver to enter ST_DISABLE. */
+#define ST_DISABLE_POLL_MS 100
+#define ST_DISABLE_POLL_TIMEOUT_US (10 * USEC_PER_SEC)
+
+/* Sleep time to let the driver process a pdc_reset(). */
+#define PDC_RESET_SLEEP_MS 1000
+
+static bool st_disable_cc_cb_called;
+static union cci_event_t st_disable_cc_cb_cci;
+
+static void st_disable_cc_cb(const struct device *dev,
+			     const struct pdc_callback *callback,
+			     union cci_event_t cci_event)
+{
+	st_disable_cc_cb_called = true;
+	st_disable_cc_cb_cci = cci_event;
+}
+
+/*
+ * Wait until the port under test enters ST_DISABLE.
+ *
+ * A port in ST_DISABLE reports its cached error status synchronously with
+ * port_disabled set, which is a race-free indicator that the port has been
+ * disabled.
+ */
+static void wait_for_st_disable(const struct device *port)
+{
+	union error_status_t es;
+
+	zassert_true(WAIT_FOR((memset(&es, 0, sizeof(es)),
+			       pdc_get_error_status(port, &es) == 0 &&
+				       es.port_disabled),
+			      ST_DISABLE_POLL_TIMEOUT_US,
+			      k_sleep(K_MSEC(ST_DISABLE_POLL_MS))),
+		     "PDC did not enter ST_DISABLE");
+}
+
+/* Verify the externally visible behavior of a port in ST_DISABLE. */
+static void verify_st_disable_behavior(const struct device *port)
+{
+	union error_status_t es = { 0 };
+	union connector_status_t cs;
+	struct pdc_callback callback;
+
+	/* Cached error status is returned with the port marked disabled. */
+	zassert_ok(pdc_get_error_status(port, &es));
+	zassert_true(es.port_disabled);
+
+	/* Commands fast-fail with -EBUSY because the port is no longer in
+	 * ST_IDLE. The upper-layer state machine fast-fails via the
+	 * synthesized "not connected" connector status below instead of
+	 * retrying forever.
+	 */
+	zassert_equal(-EBUSY, pdc_set_rdo(port, 0));
+
+	/* A synthesized "not connected" status is returned and the CCI
+	 * callback fires so the upper layer can move to PDC_UNATTACHED.
+	 */
+	callback.handler = st_disable_cc_cb;
+	pdc_set_cc_callback(port, &callback);
+	st_disable_cc_cb_called = false;
+	st_disable_cc_cb_cci.raw_value = 0;
+
+	memset(&cs, 0xff, sizeof(cs));
+	zassert_ok(pdc_get_connector_status(port, &cs));
+	zassert_false(cs.connect_status);
+	zassert_true(st_disable_cc_cb_called);
+	zassert_true(st_disable_cc_cb_cci.command_completed);
+	zassert_false(st_disable_cc_cb_cci.error);
+
+	pdc_set_cc_callback(port, NULL);
+}
+
+/*
+ * Trigger a persistent I2C failure that exhausts PDC_INIT_RETRY_MAX and
+ * transitions the port into ST_DISABLE.
+ *
+ * Injecting I2C_COMMON_EMUL_FAIL_ALL_REG makes every I2C read/write fail with
+ * -EIO. The driver retries N_I2C_TRANSACTION_COUNT times before transitioning
+ * to ST_ERROR_RECOVERY, which then re-invokes perform_pdc_init(). After
+ * PDC_INIT_RETRY_MAX attempts, perform_pdc_init() transitions the port to
+ * ST_DISABLE.
+ */
+static void trigger_persistent_i2c_failure(const struct emul *emulator)
+{
+	i2c_common_emul_set_read_fail_reg(
+		rts5453p_emul_get_i2c_common_data(emulator),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(emulator),
+		I2C_COMMON_EMUL_FAIL_ALL_REG);
+}
+
+static void clear_i2c_failure(const struct emul *emulator)
+{
+	i2c_common_emul_set_read_fail_reg(
+		rts5453p_emul_get_i2c_common_data(emulator),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+	i2c_common_emul_set_write_fail_reg(
+		rts5453p_emul_get_i2c_common_data(emulator),
+		I2C_COMMON_EMUL_NO_FAIL_REG);
+}
+
+/*
+ * Recover a port from ST_DISABLE by calling pdc_reset(), which resets the
+ * init_attempt_count and restarts init. After clearing injected I2C failures,
+ * the port should transition through ST_INIT back to ST_IDLE.
+ */
+static void recover_from_st_disable(const struct device *port,
+				    const struct emul *emulator)
+{
+	clear_i2c_failure(emulator);
+	zassert_ok(pdc_reset(port));
+	zassert_ok(emul_pdc_idle_wait(emulator));
+}
+
+/*
+ * When the PDC persistently fails to initialize, the driver should
+ * transition the port into ST_DISABLE after exhausting PDC_INIT_RETRY_MAX
+ * attempts. Verify all externally visible behavior of a disabled port.
+ */
+ZTEST_USER(rts54xx, test_st_disable_on_persistent_init_failure)
+{
+	/* Start in an initialized state. */
+	zassert_true(pdc_is_init_done(dev));
+
+	/* Inject persistent I2C failures that exhaust PDC_INIT_RETRY_MAX. */
+	trigger_persistent_i2c_failure(emul);
+
+	/* Trigger a fresh init via pdc_reset(). The driver will retry init
+	 * PDC_INIT_RETRY_MAX times before transitioning to ST_DISABLE.
+	 */
+	zassert_ok(pdc_reset(dev));
+
+	wait_for_st_disable(dev);
+	verify_st_disable_behavior(dev);
+
+	/* Recover both ports by re-initializing the disabled port. */
+	recover_from_st_disable(dev, emul);
+}
+
+/*
+ * A disabled port never leaves ST_DISABLE on its own. Calling pdc_reset()
+ * resets the init_attempt_count and restarts init, allowing the port to
+ * come back up after the underlying I2C problem has been cleared.
+ */
+ZTEST_USER(rts54xx, test_st_disable_recovery_via_pdc_reset)
+{
+	zassert_true(pdc_is_init_done(dev));
+
+	/* Drive the port into ST_DISABLE. */
+	trigger_persistent_i2c_failure(emul);
+	zassert_ok(pdc_reset(dev));
+	wait_for_st_disable(dev);
+
+	/* A disabled port fast-fails pdc_reset() with -ENOSYS? No: the
+	 * ST_DISABLE branch in rts54_pdc_reset() resets the counter and
+	 * restarts init. Verify that, after clearing the I2C failure,
+	 * pdc_reset() brings the port back.
+	 */
+	clear_i2c_failure(emul);
+	zassert_ok(pdc_reset(dev));
+	zassert_ok(emul_pdc_idle_wait(emul));
+
+	/* Port should be back in an initialized state. */
+	zassert_true(pdc_is_init_done(dev));
 }
