@@ -22,6 +22,30 @@
       },
       "revId": "20ffc74d7a1f048088262b5bd7d0f18ff7492ed2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42cb98ec_d042f948",
+        "filename": "zephyr/shim/include/shimmed_task_id.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T23:46:28Z",
+      "side": 1,
+      "message": "Checked: the order (name, entry, param, stack_size, prio, options) matches all CROS_EC_TASK definitions in zephyr/shim/src/tasks.c and shimmed_test_tasks.h.",
+      "parentUuid": "964d8e9c_e16177a3",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 0
+      },
+      "revId": "20ffc74d7a1f048088262b5bd7d0f18ff7492ed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
