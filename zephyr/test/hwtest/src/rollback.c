@@ -29,6 +29,12 @@ struct rollback_info rollback_info = {
 	.region_1_offset = 0x40000,
 	.region_size_bytes = 128 * 1024,
 };
+#elif defined(CONFIG_SOC_STM32H743XX)
+struct rollback_info rollback_info = {
+	.region_0_offset = 0xc0000,
+	.region_1_offset = 0xe0000,
+	.region_size_bytes = 128 * 1024,
+};
 #elif defined(CONFIG_SOC_NPCX9MFP)
 struct rollback_info rollback_info = {
 	.region_0_offset = 0x20000,
