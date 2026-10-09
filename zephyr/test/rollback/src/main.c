@@ -514,7 +514,7 @@ void *rollback_setup(void)
 {
 	/* Wait for the shell to start. */
 	k_sleep(K_MSEC(1));
-	zassert_equal(get_ec_shell()->ctx->state, SHELL_STATE_ACTIVE, NULL);
+	zassert_true(shell_ready(get_ec_shell()), NULL);
 
 	return NULL;
 }
