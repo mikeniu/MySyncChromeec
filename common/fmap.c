@@ -67,7 +67,7 @@ struct fmap_area_header {
 } __packed;
 
 #ifdef CONFIG_RWSIG_TYPE_RWSIG
-#define NUM_EC_FMAP_AREAS_RWSIG 2
+#define NUM_EC_FMAP_AREAS_RWSIG 3
 #else
 #define NUM_EC_FMAP_AREAS_RWSIG 0
 #endif
@@ -231,6 +231,19 @@ const struct _ec_fmap {
 		},
 #endif
 #ifdef CONFIG_RWSIG_TYPE_RWSIG
+		{
+			/*
+			 * RW image as packed into AP CBFS (ecrw) and hashed
+			 * by software sync: the full RW slot including
+			 * padding and SIG_RW.
+			 */
+			.area_name = "RW_FW",
+			.area_offset = CONFIG_EC_WRITABLE_STORAGE_OFF -
+				       FMAP_REGION_START +
+				       CONFIG_RW_STORAGE_OFF,
+			.area_size = CONFIG_RW_SIZE,
+			.area_flags = FMAP_AREA_STATIC | FMAP_AREA_RO,
+		},
 		{
 			/* RW image signature */
 			.area_name = "SIG_RW",
