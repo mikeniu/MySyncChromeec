@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bffbf230_090ef1e0",
+        "filename": "zephyr/ish.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-09T18:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a0cd7ff_e269c3db",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 47
+      },
+      "revId": "5ab3e7ef06b245e7eecb5814622b28af33629e74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f64db3ef_c00db190",
@@ -59,6 +83,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bd1fe53_838f6d11",
+        "filename": "zephyr/shim/src/log_backend_console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-09T18:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a8d328f_4c41ffc1",
+      "revId": "5ab3e7ef06b245e7eecb5814622b28af33629e74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40ab9405_aafc8bd7",
@@ -72,6 +114,24 @@
       "writtenOn": "2026-10-09T18:04:36Z",
       "side": 1,
       "message": "Consider gating this on !IS_ENABLED(CONFIG_AP_PWRSEQ) \u0026\u0026 !IS_ENABLED(CONFIG_PLATFORM_EC_POWERSEQ) rather than CONFIG_PLATFORM_EC_HOST_INTERFACE_HECI, since the distinction is whether the target runs AP power sequencing (HOOK_CHIPSET_STARTUP).",
+      "revId": "5ab3e7ef06b245e7eecb5814622b28af33629e74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26e18da0_3565ceee",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-09T18:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40ab9405_aafc8bd7",
       "revId": "5ab3e7ef06b245e7eecb5814622b28af33629e74",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -113,6 +173,30 @@
       "side": 1,
       "message": "The host event transport may not be connected at SYS_INIT, however the event should be queued and retried every second until it succeeds (see force_mkbp_if_events). This needs to be tested and verified.",
       "parentUuid": "7a3c1202_b6dd7ae0",
+      "range": {
+        "startLine": 453,
+        "startChar": 0,
+        "endLine": 453,
+        "endChar": 63
+      },
+      "revId": "5ab3e7ef06b245e7eecb5814622b28af33629e74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57e5919c_19d9e746",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-09T18:28:10Z",
+      "side": 1,
+      "message": "We can\u0027t use SYS_INIT here as it\u0027s too early because host_set_single_event() triggers the MKBP subsystem, which relies on mutex locks and hook_call_deferred() for retry if the host transport is not yet connected",
+      "parentUuid": "af3adfea_3163013b",
       "range": {
         "startLine": 453,
         "startChar": 0,
