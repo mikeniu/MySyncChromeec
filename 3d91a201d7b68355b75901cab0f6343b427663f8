@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6b6a8b0_f8944a7a",
+        "filename": "zephyr/scripts/firmware_builder_lib.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:22Z",
+      "side": 1,
+      "message": "Done: removed duplicate find_checkout() and imported it from zmake.repository_prep.",
+      "parentUuid": "98352d2c_3f8fde33",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b58da6d_0df9a1fa",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-09T17:00:17Z",
       "side": 1,
       "message": "Please fix this WARNING reported by autoreview issue finding: If `checkout` is `None` (e.g., outside a CrOS checkout when `--checkout` isn\u0027t provided), explicitly provided `--patches-dir` or `--src-override-dir` options will be silently skipped here. Consider logging a warning or raising an error if `not checkout` and either of these explicitly requested overrides are set.",
+      "range": {
+        "startLine": 526,
+        "startChar": 0,
+        "endLine": 526,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c68d2d0_33dbfefd",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:22Z",
+      "side": 1,
+      "message": "Done: handled missing checkout in zmake main() by logging a warning and continuing without repository preparation.",
+      "parentUuid": "0b58da6d_0df9a1fa",
       "range": {
         "startLine": 526,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "62c04628_4341429a",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:22Z",
+      "side": 1,
+      "message": "Done: added -- before rel_in_repo in git status --porcelain.",
+      "parentUuid": "36aa1f97_17501fbd",
+      "range": {
+        "startLine": 222,
+        "startChar": 0,
+        "endLine": 222,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa91d7cf_f3982bff",
@@ -83,6 +155,30 @@
       "writtenOn": "2026-10-08T23:13:42Z",
       "side": 1,
       "message": "The original code caught CalledProcessError here to ensure that if one file fails to restore, the rest of the overrides are still processed. Consider wrapping this in a try/except block to maintain robustness during cleanup.",
+      "range": {
+        "startLine": 311,
+        "startChar": 0,
+        "endLine": 311,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14608962_c1c648ea",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:22Z",
+      "side": 1,
+      "message": "Done: replaced sys.exit(1) with RepositoryPrepError.",
+      "parentUuid": "aa91d7cf_f3982bff",
       "range": {
         "startLine": 311,
         "startChar": 0,
@@ -139,6 +235,54 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6da3f27d_079fad1c",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:22Z",
+      "side": 1,
+      "message": "Done: replaced sys.exit(1) with RepositoryPrepError.",
+      "parentUuid": "0df91341_eeada703",
+      "range": {
+        "startLine": 312,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0986302_399130af",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:22Z",
+      "side": 1,
+      "message": "Done: replaced sys.exit(1) with RepositoryPrepError.",
+      "parentUuid": "883b88e2_92618d74",
+      "range": {
+        "startLine": 312,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c53aaaf7_d0652a7d",
@@ -152,6 +296,30 @@
       "writtenOn": "2026-10-08T23:13:42Z",
       "side": 1,
       "message": "Similar to revert_overrides, consider catching exceptions here so that one failed patch revert doesn\u0027t block the rest of the codebase restoration.",
+      "range": {
+        "startLine": 427,
+        "startChar": 0,
+        "endLine": 427,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ea93cc1_bf0d3a75",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:22Z",
+      "side": 1,
+      "message": "Done: replaced sys.exit(1) with RepositoryPrepError.",
+      "parentUuid": "c53aaaf7_d0652a7d",
       "range": {
         "startLine": 427,
         "startChar": 0,
