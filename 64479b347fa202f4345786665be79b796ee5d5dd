@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e3dc122_ae2dbfbd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T23:13:24Z",
+      "side": 1,
+      "message": "Consider dropping \u0027/ it83xx_tcpm_hook_disconnect\u0027 here, since CL:8543936 only modifies driver/tcpm/it8xxx2.c (driver/tcpm/it83xx.c is unused in Zephyr builds).",
+      "isAi": true,
+      "revId": "64479b347fa202f4345786665be79b796ee5d5dd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
