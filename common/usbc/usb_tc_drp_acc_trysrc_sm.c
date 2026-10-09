@@ -1663,6 +1663,25 @@ void tc_state_init(int port)
 		first_state = TC_UNATTACHED_SNK;
 	}
 
+#if !defined(CONFIG_BATTERY) && defined(CONFIG_CHARGE_MANAGER) && \
+	CONFIG_DEDICATED_CHARGE_PORT_COUNT > 0
+	/*
+	 * A battery-less board with a dedicated charge port (e.g. a barrel
+	 * jack) may be running from Type-C power alone. Applying CC open would
+	 * make the Type-C source remove VBUS and cut system power.
+	 *
+	 * The charge manager may not have selected a supplier yet, so check
+	 * the current the dedicated supplier has reported instead. Board code
+	 * reports it from HOOK_INIT, which runs before the PD task starts. If
+	 * it reports no current or hasn't reported yet, assume Type-C power
+	 * and skip ErrorRecovery.
+	 */
+	if (charge_manager_get_available_current(CHARGE_SUPPLIER_DEDICATED,
+						 DEDICATED_CHARGE_PORT) <= 0) {
+		first_state = TC_UNATTACHED_SNK;
+	}
+#endif
+
 	if (first_state == TC_UNATTACHED_SNK) {
 		/* Turn off any previous sourcing */
 		tc_src_power_off(port);
