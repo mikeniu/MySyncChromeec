@@ -29,7 +29,7 @@ static void shi_enable(void)
 	const struct device *cros_shi_dev = DEVICE_DT_GET(SHI_NODE);
 
 	if (!device_is_ready(cros_shi_dev)) {
-		LOG_ERR("device %s not ready", cros_shi_dev->name);
+		LOG_ERR_DEVICE_NOT_READY(cros_shi_dev);
 		return;
 	}
 
@@ -46,7 +46,7 @@ static void shi_disable(void)
 	const struct device *cros_shi_dev = DEVICE_DT_GET(SHI_NODE);
 
 	if (!device_is_ready(cros_shi_dev)) {
-		LOG_ERR("device %s not ready", cros_shi_dev->name);
+		LOG_ERR_DEVICE_NOT_READY(cros_shi_dev);
 		return;
 	}
 
@@ -66,6 +66,20 @@ static void shi_power_change(struct ap_power_ev_callback *cb,
 	default:
 		return;
 
+	case AP_POWER_STARTUP:
+#if !CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
+	case AP_POWER_RESUME:
+#endif
+		shi_enable();
+		break;
+
+	case AP_POWER_SHUTDOWN:
+#if !CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
+	case AP_POWER_SUSPEND:
+#endif
+		shi_disable();
+		break;
+
 #if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
 	case AP_POWER_RESUME_INIT:
 		shi_enable();
@@ -74,34 +88,23 @@ static void shi_power_change(struct ap_power_ev_callback *cb,
 	case AP_POWER_SUSPEND_COMPLETE:
 		shi_disable();
 		break;
-#else
-	case AP_POWER_RESUME:
-		shi_enable();
-		break;
-
-	case AP_POWER_SUSPEND:
-		shi_disable();
-		break;
 #endif
 	}
 }
+AP_POWER_EVENT_CALLBACK_DEFINE(shi_power_change, AP_POWER_STARTUP,
+			       AP_POWER_SHUTDOWN,
+#if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
+			       AP_POWER_RESUME_INIT, AP_POWER_SUSPEND_COMPLETE
+#else
+			       AP_POWER_RESUME, AP_POWER_SUSPEND
+#endif
+);
 
 static int shi_init(void)
 {
-	static struct ap_power_ev_callback cb;
 #ifdef CONFIG_EC_HOST_CMD
 	const struct device *cros_shi_dev = DEVICE_DT_GET(SHI_NODE);
 #endif
-
-	ap_power_ev_init_callback(&cb, shi_power_change,
-#if CONFIG_PLATFORM_EC_CHIPSET_RESUME_INIT_HOOK
-				  AP_POWER_RESUME_INIT |
-					  AP_POWER_SUSPEND_COMPLETE
-#else
-				  AP_POWER_RESUME | AP_POWER_SUSPEND
-#endif
-	);
-	ap_power_ev_add_callback(&cb);
 
 #ifdef CONFIG_EC_HOST_CMD
 	pm_device_runtime_enable(cros_shi_dev);

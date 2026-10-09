@@ -799,6 +799,12 @@ int pd_comm_is_enabled(int port)
 	return tc_get_pd_enabled(port);
 }
 
+void tc_set_msg_header_data_role(int port, enum pd_data_role data_role)
+{
+	/* Notify TCPC of role update */
+	tcpm_set_msg_header(port, tc[port].power_role, data_role);
+}
+
 void pd_request_data_swap(int port)
 {
 	/*
@@ -1870,7 +1876,12 @@ void tc_set_data_role(int port, enum pd_data_role role)
 	 */
 	bc12_role_change_handler(port, prev_data_role, tc[port].data_role);
 
-	/* Notify TCPC of role update */
+	/*
+	 * Final TCPC message-header synchronization after the TC data-role
+	 * state is committed. TCPC header update is also handled earlier from
+	 * PE_DRS_Evaluate_Swap for DR_Swap to reduce latency and ensure GoodCRC
+	 * uses the correct data role.
+	 */
 	tcpm_set_msg_header(port, tc[port].power_role, tc[port].data_role);
 }
 
@@ -4006,6 +4017,7 @@ static void tc_cc_rp_entry(const int port)
  */
 static void tc_cc_open_entry(const int port)
 {
+	enum battery_present bp = battery_is_present();
 	/* Ensure we are not sourcing Vbus */
 	tc_src_power_off(port);
 
@@ -4022,7 +4034,7 @@ static void tc_cc_open_entry(const int port)
 	 * sure the TCPC has managed its internal states for disconnecting
 	 * the only source of power it has.
 	 */
-	if (battery_is_present())
+	if (bp == BP_YES)
 		tcpm_enable_auto_discharge_disconnect(port, 0);
 
 	/*
@@ -4032,7 +4044,7 @@ static void tc_cc_open_entry(const int port)
 	 * requirements.
 	 */
 	CPRINTS_L2("C%d: Applying CC Open!", port);
-	if (!battery_is_present())
+	if (bp != BP_YES)
 		cflush();
 
 	/* Remove terminations from CC */

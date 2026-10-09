@@ -3,7 +3,8 @@
  * found in the LICENSE file.
  */
 
-#pragma once
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_DSP_COMMS_SERVICE_INCLUDE_CROS_DSP_SERVICE_DRIVER_HH_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_DSP_COMMS_SERVICE_INCLUDE_CROS_DSP_SERVICE_DRIVER_HH_
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio.h>
@@ -138,3 +139,6 @@ class Driver {
 extern Driver driver;
 
 }  // namespace cros::dsp::service
+
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_DSP_COMMS_SERVICE_INCLUDE_CROS_DSP_SERVICE_DRIVER_HH_ \
+        */

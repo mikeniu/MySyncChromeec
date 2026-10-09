@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __ZEPHYR_SHIM_PANIC_UTILS_H
-#define __ZEPHYR_SHIM_PANIC_UTILS_H
+#ifndef PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_PANIC_UTILS_H_
+#define PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_PANIC_UTILS_H_
 
 #include <zephyr/kernel.h>
 
@@ -21,7 +21,7 @@ void print_stack_trace(const struct k_thread *thread);
  * @brief Format the thread name for printing.  This is safe to call
  * regardless of the CONFIG_THREAD_NAME setting.
  *
- * If CONFIG_THREAD_NAME=n, this formats the thread name as a TASK_<id>.
+ * If CONFIG_THREAD_NAME=n, this formats the thread name as a pointer address.
  *
  * @param thread Kernel thread to format the name.
  * @param name Output buffer where this function writes the formatted named.
@@ -37,4 +37,4 @@ void get_thread_name(const struct k_thread *thread, char *name, size_t size);
  */
 uint32_t get_stack_ptr(const struct k_thread *thread);
 
-#endif /* __ZEPHYR_SHIM_PANIC_UTILS_H */
+#endif /* PLATFORM_EC_ZEPHYR_SHIM_INCLUDE_PANIC_UTILS_H_ */

@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_FPC1145_H_
-#define ZEPHYR_INCLUDE_EMUL_EMUL_FPC1145_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_FPC1145_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_FPC1145_H_
 
 /* FPC1145 example hardware id */
 #define FPC1145_HWID 0x140B
@@ -45,4 +45,4 @@ void fpc1145_stop_spi(const struct emul *target);
  */
 void fpc1145_start_spi(const struct emul *target);
 
-#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_FPC1145_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_FPC1145_H_ */

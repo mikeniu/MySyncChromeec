@@ -5,8 +5,8 @@
 
 /* Private sensor interface */
 
-#ifndef ZEPHYR_DRIVERS_FINGERPRINT_EGIS660_PRIVATE_H_
-#define ZEPHYR_DRIVERS_FINGERPRINT_EGIS660_PRIVATE_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS660_PRIVATE_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS660_PRIVATE_H_
 
 #include <stdint.h>
 
@@ -18,6 +18,7 @@ enum egis_capture_type {
 	EGIS_CAPTURE_PATTERN1 = 3,
 	EGIS_CAPTURE_QUALITY_TEST = 4,
 	EGIS_CAPTURE_RESET_TEST = 5,
+	EGIS_CAPTURE_PATTERN2 = 6,
 };
 
 /** @brief Common results returned by BEP functions.
@@ -137,7 +138,7 @@ const char *fp_sensor_get_version(void);
 /* Get EGIS library build info.*/
 const char *fp_sensor_get_build_info(void);
 
-struct fp_sensor_info {
+struct egis660_fp_sensor_info {
 	uint32_t num_defective_pixels;
 };
 
@@ -160,7 +161,7 @@ struct fp_sensor_info {
  * - negative value on error
  */
 int fp_sensor_maintenance(uint8_t *image_data,
-			  struct fp_sensor_info *fp_sensor_info);
+			  struct egis660_fp_sensor_info *fp_sensor_info);
 
 /** Image captured. */
 #define EGIS_SENSOR_GOOD_IMAGE_QUALITY 0
@@ -230,4 +231,5 @@ void fp_sensor_lock(const struct device *dev);
  */
 void fp_sensor_unlock(const struct device *dev);
 
-#endif /* ZEPHYR_DRIVERS_FINGERPRINT_EGIS660_PRIVATE_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_FINGERPRINT_FINGERPRINT_EGIS660_PRIVATE_H_ \
+	*/

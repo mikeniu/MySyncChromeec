@@ -11,8 +11,6 @@
 #include <mkbp_event.h>
 #include <rollback.h>
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
 ZTEST_SUITE(fpsensor_utils, NULL, NULL, NULL, NULL, NULL);
@@ -70,6 +68,9 @@ ZTEST(fpsensor_utils, test_is_finger_needed)
 	zassert_false(is_finger_needed(FP_MODE_CAPTURE |
 				       FP_CAPTURE_RESET_TEST
 					       << FP_MODE_CAPTURE_TYPE_SHIFT));
+	zassert_false(is_finger_needed(FP_MODE_CAPTURE |
+				       FP_CAPTURE_PATTERN2
+					       << FP_MODE_CAPTURE_TYPE_SHIFT));
 
 	/* Check the case where FP_MODE_CAPTURE is not set. */
 	zassert_true(is_finger_needed(FP_CAPTURE_PATTERN0
@@ -88,5 +89,6 @@ ZTEST(fpsensor_utils, test_skip_image_offset)
 	zassert_true(skip_image_offset(FP_CAPTURE_PATTERN1));
 	zassert_false(skip_image_offset(FP_CAPTURE_QUALITY_TEST));
 	zassert_true(skip_image_offset(FP_CAPTURE_RESET_TEST));
+	zassert_true(skip_image_offset(FP_CAPTURE_PATTERN2));
 	zassert_true(skip_image_offset(FP_CAPTURE_TYPE_MAX));
 }

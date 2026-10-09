@@ -50,6 +50,10 @@ static void host_cmd_battery_cut_off_after(void *f)
 
 	i2c_common_emul_set_write_fail_reg(fixture->i2c_emul,
 					   I2C_COMMON_EMUL_NO_FAIL_REG);
+	/* Apply external power again to clear battery cutoff between tests. */
+	set_ac_enabled(true);
+	hook_notify(HOOK_AC_CHANGE);
+	k_msleep(500);
 }
 
 static void host_cmd_battery_cut_off_teardown(void *f)
@@ -80,7 +84,15 @@ ZTEST_USER(host_cmd_battery_cut_off, test_cutoff_battery)
 	int rv;
 
 	rv = ec_cmd_battery_cut_off(NULL);
-	zassert_equal(EC_RES_SUCCESS, rv, "Expected 0, but got %d", rv);
+
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN)) {
+		zassert_equal(EC_RES_ERROR, rv, "Expected %d, but got %d",
+			      EC_RES_ERROR, rv);
+		return;
+	}
+
+	zassert_equal(EC_RES_SUCCESS, rv, "Expected %d, but got %d",
+		      EC_RES_SUCCESS, rv);
 	zassert_true(battery_cutoff_in_progress());
 	/* CONFIG_BATTERY_CUTOFF_TIMEOUT_MSEC is set to 500 in prj.conf. */
 	zassert_true(WAIT_FOR(battery_is_cut_off(), 510000, k_msleep(250)));
@@ -94,7 +106,15 @@ ZTEST_USER(host_cmd_battery_cut_off, test_cutoff_v1)
 	};
 
 	rv = ec_cmd_battery_cut_off_v1(NULL, &params);
-	zassert_equal(EC_RES_SUCCESS, rv, "Expected 0, but got %d", rv);
+
+	if (IS_ENABLED(CONFIG_BATTERY_FORCE_CUTOFF_AT_SHUTDOWN)) {
+		zassert_equal(EC_RES_ERROR, rv, "Expected %d, but got %d",
+			      EC_RES_ERROR, rv);
+		return;
+	}
+
+	zassert_equal(EC_RES_SUCCESS, rv, "Expected %d, but got %d",
+		      EC_RES_SUCCESS, rv);
 	zassert_true(battery_cutoff_in_progress());
 	k_msleep(500);
 	zassert_true(battery_is_cut_off());
@@ -110,7 +130,7 @@ ZTEST_USER(host_cmd_battery_cut_off, test_cutoff_at_shutdown)
 	rv = ec_cmd_battery_cut_off_v1(NULL, &params);
 	zassert_equal(EC_RES_SUCCESS, rv, "Expected 0, but got %d", rv);
 	zassert_false(battery_is_cut_off(), NULL);
-	test_set_chipset_to_g3();
+	hook_notify(HOOK_CHIPSET_SHUTDOWN_COMPLETE);
 	zassert_true(WAIT_FOR(battery_is_cut_off(), 2105000, k_msleep(250)));
 }
 
@@ -185,7 +205,7 @@ static void host_cmd_battery_cut_off_before_ac_off(void *f)
 	ARG_UNUSED(f);
 	test_set_battery_level(75);
 
-	/* Tests assume AC is initially connected. */
+	/* Tests assume AC is initially disconnected. */
 	set_ac_enabled(false);
 	hook_notify(HOOK_AC_CHANGE);
 	k_msleep(1000);

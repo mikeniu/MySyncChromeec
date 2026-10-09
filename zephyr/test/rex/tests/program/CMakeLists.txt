@@ -6,8 +6,6 @@ zephyr_include_directories(src)
 target_sources_ifdef(CONFIG_TEST_PROGRAM_USB_PD_POLICY app PRIVATE src/usb_pd_policy.c)
 target_sources_ifdef(CONFIG_TEST_PROGRAM_USB_PD_POLICY app PRIVATE ${PLATFORM_EC_PROGRAM_DIR}/rex/src/usb_pd_policy.c)
 
-target_sources_ifdef(CONFIG_TEST_PROGRAM_USBC_TBT_COMPAT app PRIVATE src/usbc_tbt_compat.c)
-target_sources_ifdef(CONFIG_TEST_PROGRAM_USBC_TBT_COMPAT app PRIVATE ${PLATFORM_EC_PROGRAM_DIR}/rex/src/usbc_tbt_compat.c)
 target_sources_ifdef(CONFIG_TEST_PROGRAM_USBC_TBT_COMPAT app PRIVATE ${PLATFORM_EC_PROGRAM_DIR}/rex/src/usb_pd_policy.c)
 
 target_sources_ifdef(CONFIG_TEST_PROGRAM_BOARD_POWER app PRIVATE src/board_power.c)

@@ -147,7 +147,7 @@
  * maintenance effort.
  */
 
-#ifdef SECTION_IS_RO
+#ifdef CONFIG_CROS_EC_RO
 #define GPIO_RO(name, pin, flags) GPIO(name, pin, flags)
 #define GPIO_RW(name, pin, flags)
 #define GPIO_INT_RO(name, pin, flags, signal) GPIO_INT(name, pin, flags, signal)
@@ -159,7 +159,7 @@
 #define UNIMPLEMENTED_RW(name)
 #define UNUSED_RO(name) UNUSED(name)
 #define UNUSED_RW(name)
-#elif defined(SECTION_IS_RW)
+#elif defined(CONFIG_CROS_EC_RW)
 #define GPIO_RO(name, pin, flags)
 #define GPIO_RW(name, pin, flags) GPIO(name, pin, flags)
 #define GPIO_INT_RO(name, pin, flags, signal)

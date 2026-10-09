@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_CHARGE_MANAGER_H
-#define __CROS_EC_CHARGE_MANAGER_H
+#ifndef PLATFORM_EC_INCLUDE_CHARGE_MANAGER_H_
+#define PLATFORM_EC_INCLUDE_CHARGE_MANAGER_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -49,6 +49,16 @@ enum charge_supplier {
 #if CONFIG_DEDICATED_CHARGE_PORT_COUNT > 0
 	CHARGE_SUPPLIER_DEDICATED,
 #endif
+#if defined(CONFIG_TEST_CHARGE_RAMP)
+	CHARGE_SUPPLIER_TEST1,
+	CHARGE_SUPPLIER_TEST2,
+	CHARGE_SUPPLIER_TEST3,
+	CHARGE_SUPPLIER_TEST4,
+	CHARGE_SUPPLIER_TEST5,
+	CHARGE_SUPPLIER_TEST6,
+	CHARGE_SUPPLIER_TEST7,
+	CHARGE_SUPPLIER_TEST8,
+#endif
 	CHARGE_SUPPLIER_COUNT
 };
 
@@ -71,11 +81,21 @@ enum charge_supplier {
 #endif
 #define CHARGE_SUPPLIER_NAME_QI
 
+#if defined(CONFIG_TEST_CHARGE_RAMP)
+#define CHARGE_SUPPLIER_NAME_TEST                                             \
+	[CHARGE_SUPPLIER_TEST1] = "TEST1", [CHARGE_SUPPLIER_TEST2] = "TEST2", \
+	[CHARGE_SUPPLIER_TEST3] = "TEST3", [CHARGE_SUPPLIER_TEST4] = "TEST4", \
+	[CHARGE_SUPPLIER_TEST5] = "TEST5", [CHARGE_SUPPLIER_TEST6] = "TEST6", \
+	[CHARGE_SUPPLIER_TEST7] = "TEST7", [CHARGE_SUPPLIER_TEST8] = "TEST8",
+#else
+#define CHARGE_SUPPLIER_NAME_TEST
+#endif
+
 #define CHARGE_SUPPLIER_NAME                                           \
 	[CHARGE_SUPPLIER_PD] = "PD", [CHARGE_SUPPLIER_TYPEC] = "USBC", \
 	[CHARGE_SUPPLIER_TYPEC_DTS] = "USBC_DTS",                      \
 	CHARGE_SUPPLIER_NAME_BC12 CHARGE_SUPPLIER_NAME_DEDICATED       \
-		CHARGE_SUPPLIER_NAME_QI
+		CHARGE_SUPPLIER_NAME_QI CHARGE_SUPPLIER_NAME_TEST
 
 /*
  * Charge supplier priority: lower number indicates higher priority.
@@ -338,15 +358,6 @@ void charge_manager_save_log(int port);
 void charge_manager_source_port(int port, int enable);
 
 /**
- * Get PD source power data objects.
- *
- * @param src_pdo	Pointer to the data to return.
- * @param port		Current port to evaluate against.
- * @return number of PDOs returned.
- */
-int charge_manager_get_source_pdo(const uint32_t **src_pdo, const int port);
-
-/**
  * @brief  Set ACOK REF of charger IC
  *
  * @param pdo_mv Requested voltage in mV
@@ -441,8 +452,17 @@ int is_pd_port(int port);
  */
 __override_proto int board_get_leave_safe_mode_delay_ms(void);
 
+/**
+ * @brief Board-provided function to determine whether a DC jack (dedicated)
+ *        charge provider is attached.
+ *
+ * @return 1 if DC barrel jack is present
+ * @return 0 if no DC barrel jack
+ */
+__override_proto int board_is_dc_jack_present(void);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CROS_EC_CHARGE_MANAGER_H */
+#endif /* PLATFORM_EC_INCLUDE_CHARGE_MANAGER_H_ */

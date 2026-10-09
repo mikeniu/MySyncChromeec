@@ -9,6 +9,7 @@
 #include "include/power.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
+#include "thermal.h"
 
 #include <zephyr/ztest.h>
 
@@ -472,4 +473,68 @@ ZTEST(fan_common, test_fan_set_percent_needed)
 	/* Verify GPIO remains on for mid-range RPM */
 	zassert_equal(gpio_emul_output_get(gp->port, gp->pin), 1,
 		      "GPIO should be on when RPM is non-zero");
+}
+
+static const struct fan_step_1_1 temp_fan_table[] = {
+	{ .increasing_temp_ratio_threshold = 41,
+	  .decreasing_temp_ratio_threshold = 35,
+	  .rpm = 2500 },
+	{ .increasing_temp_ratio_threshold = 43,
+	  .decreasing_temp_ratio_threshold = 41,
+	  .rpm = 3200 },
+	{ .increasing_temp_ratio_threshold = 45,
+	  .decreasing_temp_ratio_threshold = 43,
+	  .rpm = 3500 },
+	{ .increasing_temp_ratio_threshold = 47,
+	  .decreasing_temp_ratio_threshold = 45,
+	  .rpm = 3900 },
+	{ .increasing_temp_ratio_threshold = 49,
+	  .decreasing_temp_ratio_threshold = 47,
+	  .rpm = 4500 },
+	{ .increasing_temp_ratio_threshold = 52,
+	  .decreasing_temp_ratio_threshold = 48,
+	  .rpm = 5100 },
+	{ .increasing_temp_ratio_threshold = 55,
+	  .decreasing_temp_ratio_threshold = 50,
+	  .rpm = 5400 },
+};
+
+static int temp_to_rpm(int temp)
+{
+	int rpm = temp_ratio_to_rpm_hysteresis(
+		temp_fan_table, ARRAY_SIZE(temp_fan_table), 0, temp, NULL);
+	fan_set_rpm_target(0, rpm);
+	return rpm;
+}
+
+ZTEST(fan_common, test_temp_ratio_to_rpm_hysteresis)
+{
+	fan_set_rpm_target(0, 0);
+
+	zassert_equal(temp_to_rpm(30), 0);
+	zassert_equal(temp_to_rpm(35), 0);
+	zassert_equal(temp_to_rpm(40), 0);
+	zassert_equal(temp_to_rpm(41), 2500);
+	zassert_equal(temp_to_rpm(36), 2500);
+	zassert_equal(temp_to_rpm(42), 2500);
+	zassert_equal(temp_to_rpm(43), 3200);
+	zassert_equal(temp_to_rpm(38), 2500);
+	zassert_equal(temp_to_rpm(45), 3500);
+	zassert_equal(temp_to_rpm(47), 3900);
+	zassert_equal(temp_to_rpm(49), 4500);
+	zassert_equal(temp_to_rpm(52), 5100);
+	zassert_equal(temp_to_rpm(55), 5400);
+	zassert_equal(temp_to_rpm(60), 5400);
+
+	/* Cool-down hysteresis */
+	zassert_equal(temp_to_rpm(55), 5400);
+	zassert_equal(temp_to_rpm(52), 5400);
+	zassert_equal(temp_to_rpm(51), 5400);
+	zassert_equal(temp_to_rpm(49), 5100);
+	zassert_equal(temp_to_rpm(48), 4500);
+	zassert_equal(temp_to_rpm(46), 3900);
+	zassert_equal(temp_to_rpm(44), 3500);
+	zassert_equal(temp_to_rpm(42), 3200);
+	zassert_equal(temp_to_rpm(37), 2500);
+	zassert_equal(temp_to_rpm(35), 0);
 }

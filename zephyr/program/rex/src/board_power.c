@@ -27,7 +27,7 @@ LOG_MODULE_DECLARE(ap_pwrseq, LOG_LEVEL_INF);
 	defined(CONFIG_TEST_X86_NON_DSX_PWRSEQ_MTL)
 #define X86_NON_DSX_MTL_FORCE_SHUTDOWN_TO_MS 50
 
-void board_ap_power_force_shutdown(void)
+test_export_static void board_ap_power_shutdown(void)
 {
 	int timeout_ms = X86_NON_DSX_MTL_FORCE_SHUTDOWN_TO_MS;
 
@@ -49,6 +49,11 @@ void board_ap_power_force_shutdown(void)
 }
 
 #ifndef CONFIG_AP_PWRSEQ_DRIVER
+void board_ap_power_force_shutdown(void)
+{
+	board_ap_power_shutdown();
+}
+
 void board_ap_power_action_g3_s5(void)
 {
 	/* Turn on the PP3300_PRIM rail. */
@@ -70,13 +75,18 @@ bool board_ap_power_check_power_rails_enabled(void)
 #else
 int board_ap_power_action_g3_entry(void *data)
 {
-	board_ap_power_force_shutdown();
+	board_ap_power_shutdown();
 
 	return 0;
 }
 
 static int board_ap_power_action_g3_run(void *data)
 {
+	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
+		board_ap_power_shutdown();
+		return 1;
+	}
+
 	if (ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_STARTUP)) {
 		/* Turn on the PP3300_PRIM rail. */
 		power_signal_set(PWR_EN_PP3300_A, 1);

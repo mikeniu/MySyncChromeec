@@ -13,16 +13,23 @@
 
 char mock_end_of_ram_data[CONFIG_PLATFORM_EC_PRESERVED_END_OF_RAM_SIZE];
 
+__attribute__((weak)) void ztest_interrupt_disable_all(void)
+{
+	/*
+	 * Default no-op for tests not explicitly verifying interrupt disabling.
+	 */
+}
+
 __attribute__((weak)) void system_reset(int flags)
 {
 	__builtin_unreachable();
 }
 
-static uint8_t bbram[SYSTEM_BBRAM_IDX_TRY_SLOT + 1];
+static uint8_t bbram[SYSTEM_BBRAM_IDX_MAX];
 
 test_mockable int system_get_bbram(enum system_bbram_idx idx, uint8_t *value)
 {
-	if (idx <= SYSTEM_BBRAM_IDX_TRY_SLOT) {
+	if (idx < SYSTEM_BBRAM_IDX_MAX) {
 		*value = bbram[idx];
 		return EC_SUCCESS;
 	}
@@ -31,7 +38,7 @@ test_mockable int system_get_bbram(enum system_bbram_idx idx, uint8_t *value)
 
 test_mockable int system_set_bbram(enum system_bbram_idx idx, uint8_t value)
 {
-	if (idx <= SYSTEM_BBRAM_IDX_TRY_SLOT) {
+	if (idx < SYSTEM_BBRAM_IDX_MAX) {
 		bbram[idx] = value;
 		return EC_SUCCESS;
 	}

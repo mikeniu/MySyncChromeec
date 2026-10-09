@@ -6,6 +6,7 @@
 / {
 	aliases {
 		gpio-wp = &gpio_ec_flash_wp_odl;
+		gpio-btn-ign-in = &gpio_fp_apm;
 	};
 
 	/*
@@ -37,6 +38,9 @@
 		gpio_pp1800_l1i_s3_ec: pp1800_l1i_s3_ec {
 			gpios = <&gpio5 0 (GPIO_INPUT | GPIO_VOLTAGE_1P8)>;
 		};
+		gpio_sys_throttle_mira: sys_throttle_mira {
+			gpios = <&gpio5 1 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
+		};
 		gpio_dock_vdm_pwr_on: dock_vdm_pwr_on {
 			gpios = <&gpio5 4 (GPIO_INPUT)>;
 		};
@@ -53,7 +57,7 @@
 			gpios = <&gpio6 7 (GPIO_OUTPUT | GPIO_OUTPUT_INIT_LOW)>;
 		};
 		gpio_ec_flash_wp_odl: ec_flash_wp_odl {
-			gpios = <&gpio7 0 (GPIO_INPUT)>;
+			gpios = <&gpio7 0 (GPIO_INPUT | GPIO_ACTIVE_LOW)>;
 		};
 		gpio_ec_fan_tach_od: ec_fan_tach_od {
 			gpios = <&gpio7 3 (GPIO_INPUT | GPIO_PULL_UP)>;
@@ -186,10 +190,9 @@
 
 		unused-gpios =
 			<&gpio0 2 0>,
-			<&gpio3 4 0>,
-			<&gpio3 7 0>,
-			<&gpio4 1 0>,
-			<&gpio5 1 0>,
+			<&gpio3 4 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpio3 7 (GPIO_INPUT | GPIO_PULL_DOWN)>,
+			<&gpio4 1 (GPIO_INPUT | GPIO_PULL_DOWN)>,
 			<&gpio5 2 0>,
 			<&gpio5 6 0>,
 			<&gpio6 1 0>,

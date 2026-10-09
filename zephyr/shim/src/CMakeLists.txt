@@ -8,6 +8,7 @@ zephyr_library_sources(gpio.c)
 zephyr_library_sources(gpio_int.c)
 zephyr_library_sources(panic_utils.c)
 zephyr_library_sources_ifdef(CONFIG_PM pm_state.c)
+zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_THREAD_INFO threadinfo.c)
 
 add_subdirectory("buttons")
 add_subdirectory("cbi")
@@ -55,15 +56,19 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_FLASH_CROS  flash.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_GPIO_ID
 							    gpio_id.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOOKS       hooks.c)
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD     host_command.c)
+if(CONFIG_EC_HOST_CMD)
+    zephyr_library_sources(host_command.c)
+elseif(CONFIG_PLATFORM_EC_HOSTCMD)
+    zephyr_library_sources(host_command_legacy.c)
+endif()
+
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOSTCMD_CONSOLE
                                                             console_buffer.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_IOEX_CROS_DRV
                                                             ioex.c
                                                             ioex_drv.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_KB8010 kb8010_usb_mux.c)
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_KEYBOARD_CROS_EC_RAW_KB
-                                                            keyboard_raw.c)
+
 zephyr_library_sources_ifdef(CONFIG_CROS_EC_KEYSCAN         keyscan.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER
                              log_backend_console_buffer.c)
@@ -103,8 +108,6 @@ zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_RETIMER_INTEL_HB
                                                             bb_retimer_usb_mux.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_SHA256_HW_ZEPHYR
 	                                                    sha256_hw.c)
-zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_HOST_COMMAND_MEMORY_DUMP
-	                                                    register_memory_dump.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_USBC_STUB   usbc_stub.c)
 zephyr_library_sources_ifdef(CONFIG_PLATFORM_EC_PERIPHERAL_CHARGER   pchg.c)
 
@@ -114,39 +117,5 @@ zephyr_library_sources_ifdef(CONFIG_HECI
 endif()
 
 if(CONFIG_PIGWEED_LOG_TOKENIZED_LIB)
-  if (DEFINED CONFIG_SOC_FAMILY_NPCX)
-    set(CHIP "npcx")
-  elseif (DEFINED CONFIG_SOC_FAMILY_ITE_EC)
-    set(CHIP "it8xxx2")
-  elseif (DEFINED CONFIG_SOC_FAMILY_MICROCHIP_MEC)
-    set(CHIP "mchp")
-  elseif (DEFINED CONFIG_SOC_FAMILY_STM32)
-    set(CHIP "stm32")
-  else ()
-    set(CHIP "stub")
-  endif()
-
-  pw_add_library(platform_ec_log.tokenized_handler STATIC
-    HEADERS
-      ${PLATFORM_EC}/zephyr/shim/include/zephyr_console_shim.h
-    SOURCES
-      pw_log_zephyr_tokenized.cc
-    PUBLIC_INCLUDES
-      ${PLATFORM_EC}/include
-      ${PLATFORM_EC}/zephyr/shim/chip/${CHIP}/include
-      ${PLATFORM_EC}/zephyr/shim/include
-    PUBLIC_DEPS
-      pw_log_tokenized.handler
-      pw_log_zephyr.tokenized_lib
-  )
-  zephyr_link_libraries(pw_log)
-  pw_zephyrize_libraries_ifdef(CONFIG_PIGWEED_LOG_TOKENIZED_LIB
-                              platform_ec_log.tokenized_handler
-  )
-
-  include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log_tokenized/backend.cmake")
-  pw_set_backend(pw_log_tokenized.handler platform_ec_log.tokenized_handler)
-  include("${ZEPHYR_PIGWEED_MODULE_DIR}/pw_log/backend.cmake")
-  pw_set_backend(pw_log pw_log_tokenized)
-
+  zephyr_library_sources(pw_log_zephyr_tokenized.cc)
 endif()

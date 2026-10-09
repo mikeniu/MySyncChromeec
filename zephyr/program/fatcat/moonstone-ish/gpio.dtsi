@@ -1,0 +1,40 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+#include <dt-bindings/gpio_defines.h>
+
+/ {
+	named-gpios {
+		compatible = "named-gpios";
+
+		gpio_acc_db_int_l: acc_db_int_l {
+			gpios = <&gpio0 5 GPIO_INPUT>;
+		};
+
+		gpio_acc_mb_int_l: acc_mb_int_l {
+			gpios = <&gpio0 6 GPIO_INPUT>;
+		};
+
+		ec_entering_rw {
+			enum-name = "GPIO_ENTERING_RW";
+		};
+	};
+
+	gpio_interrupts: gpio-interrupts {
+		compatible = "cros-ec,gpio-interrupts";
+
+		int_base_accel: ec_base_accel  {
+			irq-pin = <&gpio_acc_mb_int_l>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "motion_base_interrupt";
+		};
+
+		int_lid_accel: ec_lid_accel  {
+			irq-pin = <&gpio_acc_db_int_l>;
+			flags = <GPIO_INT_EDGE_FALLING>;
+			handler = "lis2dh_interrupt";
+		};
+
+	};
+};

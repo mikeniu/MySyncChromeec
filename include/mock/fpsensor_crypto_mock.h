@@ -8,13 +8,14 @@
  * @brief Controls for the mock fpsensor_crypto library
  */
 
-#ifndef __MOCK_FPSENSOR_CRYPTO_MOCK_H
-#define __MOCK_FPSENSOR_CRYPTO_MOCK_H
+#ifndef PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_CRYPTO_MOCK_H_
+#define PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_CRYPTO_MOCK_H_
 
 enum mock_ctrl_fpsensor_crypto_sha256_type {
 	MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_REAL,
 	MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_ZEROS,
 	MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FF,
+	MOCK_CTRL_FPSENSOR_CRYPTO_HKDF_SHA256_TYPE_FAIL,
 };
 
 struct mock_ctrl_fpsensor_crypto {
@@ -28,4 +29,4 @@ struct mock_ctrl_fpsensor_crypto {
 
 extern struct mock_ctrl_fpsensor_crypto mock_ctrl_fpsensor_crypto;
 
-#endif /* __MOCK_FPSENSOR_CRYPTO_MOCK_H */
+#endif /* PLATFORM_EC_INCLUDE_MOCK_FPSENSOR_CRYPTO_MOCK_H_ */

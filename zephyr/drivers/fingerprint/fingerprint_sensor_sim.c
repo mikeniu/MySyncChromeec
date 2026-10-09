@@ -6,8 +6,10 @@
 #define DT_DRV_COMPAT cros_ec_fingerprint_sensor_sim
 
 #include "fingerprint_sensor_sim.h"
+#include "overflow.h"
 
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/minmax.h>
 
 #include <drivers/fingerprint.h>
 #include <fingerprint/v4l2_types.h>
@@ -129,20 +131,47 @@ static int fp_simulator_acquire_image(const struct device *dev,
 	const struct fp_simulator_cfg *config = dev->config;
 	struct fp_simulator_data *data = dev->data;
 	uint32_t frame_size = 0;
+	uint32_t offset = 0;
 
+	bool apply_image_offset =
+		(mode != FINGERPRINT_CAPTURE_TYPE_VENDOR_FORMAT &&
+		 mode != FINGERPRINT_CAPTURE_TYPE_QUALITY_TEST);
+
+	bool mode_found = false;
 	for (uint8_t i = 0; i < config->sensor_info.num_capture_types; ++i) {
 		if (config->sensor_image_configs[i].fp_capture_type == mode) {
 			frame_size = config->sensor_image_configs[i].frame_size;
+			if (apply_image_offset) {
+				offset = config->sensor_image_configs[i]
+						 .image_data_offset_bytes;
+			}
+			mode_found = true;
 			break;
 		}
 	}
 
-	size_t size = min(frame_size, image_buf_size);
+	if (!mode_found) {
+		return -ENOTSUP;
+	}
 
 	data->state.last_acquire_image_mode = mode;
 
-	if (data->state.acquire_image_result == FINGERPRINT_SENSOR_SCAN_GOOD)
-		memcpy(image_buf, config->image_buffer, size);
+	if (data->state.acquire_image_result == FINGERPRINT_SENSOR_SCAN_GOOD) {
+		uint32_t total_required_size;
+
+		/*
+		 * Safely calculate required buffer size, rejecting if the
+		 * offset + frame_size calculation overflows or exceeds the
+		 * buffer.
+		 */
+		if (check_add_overflow(offset, frame_size,
+				       &total_required_size) ||
+		    total_required_size > image_buf_size) {
+			return -EINVAL;
+		}
+
+		memcpy(image_buf + offset, config->image_buffer, frame_size);
+	}
 
 	return data->state.acquire_image_result;
 }

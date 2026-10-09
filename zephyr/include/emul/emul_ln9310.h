@@ -9,8 +9,8 @@
  * @brief Backend API for LN9310 emulator
  */
 
-#ifndef ZEPHYR_INCLUDE_EMUL_EMUL_LN9310_H_
-#define ZEPHYR_INCLUDE_EMUL_EMUL_LN9310_H_
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LN9310_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LN9310_H_
 
 #include "driver/ln9310.h"
 
@@ -91,4 +91,4 @@ struct i2c_emul *ln9310_emul_get_i2c_emul(const struct emul *emulator);
 struct i2c_common_emul_data *
 emul_ln9310_get_i2c_common_data(const struct emul *emul);
 
-#endif /* ZEPHYR_INCLUDE_EMUL_EMUL_LN9310_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_EMUL_LN9310_H_ */

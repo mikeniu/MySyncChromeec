@@ -1,0 +1,129 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+#include <cros/thermistor/thermistor.dtsi>
+
+/ {
+	named-temp-sensors {
+		compatible = "cros-ec,temp-sensors";
+
+		temp_chg_ther: chg_ther {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch3>;
+		};
+		temp_ssd: ssd {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch4>;
+		};
+		temp_ambient: ambient {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch9>;
+		};
+		temp_pcore: pcore {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch12>;
+		};
+		temp_vccgt: vccgt {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch13>;
+		};
+		temp_ddr: ddr {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch14>;
+		};
+		temp_5v: 5v {
+			temp-host-high = <70>;
+			temp-host-halt = <73>;
+			temp-host-release-high = <67>;
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch15>;
+		};
+		temp_chg: chg {
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch1>;
+		};
+		temp_bat_conn: bat_conn {
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch2>;
+		};
+		temp_tc_mb: tc_mb {
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch5>;
+		};
+		temp_tc_db: tc_db {
+			power-good-pin = <&gpio_all_sys_pwrgd>;
+			sensor = <&apl6012_ch7>;
+		};
+	};
+};
+
+&i2c_2 {
+	apl6012: apl6012@3f {
+		compatible = "cros-ec,temp-sensor-apl6012";
+		reg = <0x3f>;
+
+		apl6012_ch1: chg {
+			temperature-type = "APL6012_IDX_CH1";
+			thermistor = <&NTC_5V15_12K_100K>;
+		};
+		apl6012_ch2: bat_conn {
+			temperature-type = "APL6012_IDX_CH2";
+			thermistor = <&NTC_5V15_12K_100K>;
+		};
+		apl6012_ch3: chg_ther {
+			temperature-type = "APL6012_IDX_CH3";
+			thermistor = <&NTC_5V15_12K_47K>;
+		};
+		apl6012_ch4: ssd {
+			temperature-type = "APL6012_IDX_CH4";
+			thermistor = <&NTC_5V15_12K_47K>;
+		};
+		apl6012_ch5: tc_mb {
+			temperature-type = "APL6012_IDX_CH5";
+			thermistor = <&NTC_5V15_12K_100K>;
+		};
+		apl6012_ch7: tc_db {
+			temperature-type = "APL6012_IDX_CH7";
+			thermistor = <&NTC_5V15_12K_100K>;
+		};
+		apl6012_ch9: ambient {
+			temperature-type = "APL6012_IDX_CH9";
+			thermistor = <&NTC_5V15_8K2_10K>;
+		};
+		apl6012_ch12: pcore {
+			temperature-type = "APL6012_IDX_CH12";
+			thermistor = <&NTC_5V15_12K_47K>;
+		};
+		apl6012_ch13: vccgt {
+			temperature-type = "APL6012_IDX_CH13";
+			thermistor = <&NTC_5V15_12K_47K>;
+		};
+		apl6012_ch14: ddr {
+			temperature-type = "APL6012_IDX_CH14";
+			thermistor = <&NTC_5V15_12K_47K>;
+		};
+		apl6012_ch15: 5v {
+			temperature-type = "APL6012_IDX_CH15";
+			thermistor = <&NTC_5V15_12K_47K>;
+		};
+	};
+};

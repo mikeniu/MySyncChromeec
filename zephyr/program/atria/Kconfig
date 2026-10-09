@@ -8,6 +8,13 @@ config BOARD_ATRIARVP_RTK
 	  Build Realtek RTK5915-based add-in card for Google Atria.
 	  This board is for use with the Intel RVP using the MECC 2.1 connector.
 
+config BOARD_PENGHU
+	bool "Google Penghu"
+	help
+	  Build Google penghu board. Penghu has Intel NVL SoC
+	  with it82002aw EC.
+
+
 module = Atria
 module-str = Atria board-specific code
 source "subsys/logging/Kconfig.template.log_config"

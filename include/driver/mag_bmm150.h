@@ -5,8 +5,8 @@
 
 /* BMM150 magnetometer definition */
 
-#ifndef __CROS_EC_MAG_BMM150_H
-#define __CROS_EC_MAG_BMM150_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_MAG_BMM150_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_MAG_BMM150_H_
 
 #include "accelgyro.h"
 #include "mag_cal.h"
@@ -151,4 +151,4 @@ int bmm150_get_offset(const struct motion_sensor_t *s, intv3_t offset);
 }
 #endif
 
-#endif /* __CROS_EC_MAG_BMM150_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_MAG_BMM150_H_ */

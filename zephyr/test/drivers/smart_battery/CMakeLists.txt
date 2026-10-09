@@ -15,3 +15,10 @@ target_sources_ifdef(
   PRIVATE
   src/battery_present.c
 )
+
+target_sources_ifdef(
+  CONFIG_LINK_TEST_SUITE_SMART_BATTERY_DEADBAND
+  app
+  PRIVATE
+  src/deadband.c
+)

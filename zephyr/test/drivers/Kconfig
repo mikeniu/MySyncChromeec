@@ -16,6 +16,9 @@ config LINK_TEST_SUITE_DEFAULT
 config LINK_TEST_SUITE_DEFAULT_CONSOLE_CMDS
 	bool "Link and test the default console commands test suite"
 
+config LINK_TEST_SUITE_CONSOLE_BUFFER
+	bool "Link and test the console buffer test suite"
+
 config LINK_TEST_SUITE_CONSOLE_CMD_CRASH
 	bool "Link and test the console command crash test suite"
 
@@ -34,14 +37,22 @@ config LINK_TEST_SUITE_ANX7447
 config LINK_TEST_SUITE_AP_MUX_CONTROL
 	bool "Link and test the ap_mux_control tests"
 
-config LINK_TEST_SUITE_AP_VDM_CONTROL
-	bool "Link and test the ap_vdm_control tests"
+config LINK_TEST_SUITE_AP_POWER_EVENTS
+	bool "Link and test the ap_power_events driver tests"
+	help
+	  Verifies the AP power events driver which controls GPIOs
+	  based on AP power state transitions.
 
 config LINK_TEST_SUITE_BMI3XX
 	bool "Link and test the bmi3xx tests"
 	help
 	  Include the BMI3XX driver test suite in the
 	  binary.
+
+config LINK_TEST_SUITE_BATTERY_CONFIG
+	bool "Link and run battery_config CBI tests"
+	help
+	  Include tests for battery info in CBI.
 
 config LINK_TEST_SUITE_BUTTON
 	bool "Link tests for common/button.c"
@@ -152,6 +163,9 @@ config LINK_TEST_SUITE_LOCATE_CHIP_ALTS
 	  Compile a binary that allows the non herobrine paths of the locate
 	  chip command to execute
 
+config LINK_TEST_SUITE_LIS2DH
+	bool "Link tests for lis2dh driver"
+
 config LINK_TEST_SUITE_LSM6DSM
 	bool "Link tests for lsm6dsm driver"
 
@@ -172,6 +186,9 @@ config LINK_TEST_SUITE_NX20P348X
 	bool "Link and test the nx20p348x tests"
 	select PLATFORM_EC_CONSOLE_CMD_PPC_DUMP
 	select PLATFORM_EC_USB_PD_LOGGING
+
+config LINK_TEST_SUITE_PANIC
+	bool "Link and test the panic tests"
 
 config LINK_TEST_SUITE_PANIC_OUTPUT
 	bool "Link and test the panic_output tests"
@@ -236,6 +253,11 @@ config LINK_TEST_SUITE_KTU1125
 
 config LINK_TEST_SUITE_RT9490
 	bool "Link and test the rt9490 tests"
+
+config LINK_TEST_SUITE_WATCHDOG
+	bool "Link and test the watchdog tests"
+	select PLATFORM_EC_CONSOLE_CMD_WATCHDOG_INFO
+	select PLATFORM_EC_HOSTCMD_WATCHDOG_INFO
 
 config LINK_TEST_SUITE_WATCHDOG_HELPER
 	bool "Link and run watchdog helper tests"
@@ -328,6 +350,12 @@ config LINK_TEST_SUITE_USBC_TCPC
 	  Include the USBC TCPC test suite in the
 	  binary.
 
+config LINK_TEST_SUITE_USBC_SM
+	bool "Link tests for common USBC state machine code"
+	help
+	  Include the USBC SM test suite in the
+	  binary.
+
 config LINK_TEST_SUITE_USBC_SVDM_DFP_ONLY
 	bool "Link and test the usbc_svdm_dfp_only tests"
 
@@ -402,9 +430,6 @@ config LINK_TEST_SUITE_LED_COMMON
 	depends on !PLATFORM_EC_LED_DT
 	select PLATFORM_EC_LED_COMMON
 
-config LINK_TEST_SUITE_HOST_COMMAND_MEMORY_DUMP
-	bool "Link and test memory dump host commands tests"
-
 config LINK_TEST_SUITE_ANX7452
 	bool "Link and test the anx7452 tests"
 	help
@@ -437,16 +462,19 @@ config LINK_TEST_SUITE_SMART_BATTERY
 config LINK_TEST_SUITE_SMART_BATTERY_PRESENT
 	bool "Link and test the smart battery present driver tests"
 
+config LINK_TEST_SUITE_SMART_BATTERY_DEADBAND
+	bool "Link and test the smart battery deadband driver tests"
+
 config LINK_TEST_SUITE_TABLETMODE_INTERRUPT
 	bool "Link and test the tabletmode interrupt driver tests"
 	help
 	  Verifies a singleton driver which handles an external interrupt
 	  signaling to the EC when to switch in or out of tablet mode.
 
-config LINK_TEST_SUITE_WRITE_PROTECTION_CUSTOM
+config LINK_TEST_SUITE_WRITE_PROTECTION_EXTERNAL
 	bool "Link and test the write protection tests"
 	help
-	  Verifies functionality of custom write protection
+	  Verifies functionality of external write protection
 
 config LINK_TEST_SUITE_RT3645
 	bool "Link and test rt3645 tests"

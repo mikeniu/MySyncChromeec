@@ -2,13 +2,14 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
+
+#ifndef PLATFORM_EC_DRIVER_TCPM_PS8XXX_H_
+#define PLATFORM_EC_DRIVER_TCPM_PS8XXX_H_
+
 #include "driver/tcpm/ps8xxx_public.h"
 #include "usb_mux.h"
 
 /* Parade Tech Type-C port controller */
-
-#ifndef __CROS_EC_USB_PD_TCPM_PS8XXX_H
-#define __CROS_EC_USB_PD_TCPM_PS8XXX_H
 
 #define PS8751_P3_TO_P0_FLAGS(p3_flags) ((p3_flags) - 3)
 #define PS8751_P3_TO_P1_FLAGS(p3_flags) ((p3_flags) - 2)
@@ -158,4 +159,4 @@ bool check_ps8755_chip(int port);
  */
 __override_proto void board_ps8xxx_tcpc_init(int port);
 
-#endif /* defined(__CROS_EC_USB_PD_TCPM_PS8XXX_H) */
+#endif /* PLATFORM_EC_DRIVER_TCPM_PS8XXX_H_ */

@@ -12,20 +12,15 @@ choice SVDM_RSP_CHOICE
 	  Select how USB-PD Structured Vendor Defined Messages (SVDM) will be
 	  handled.
 
-config SVDM_RSP_DFP_ONLY
-	bool "DFP-only"
-	# USB4 and TBT modes require more support
-	depends on !PLATFORM_EC_USB_PD_USB4
-	depends on !PLATFORM_EC_USB_PD_TBT_COMPAT_MODE
-	# DRDs are not DFP-only
-	depends on !PLATFORM_EC_USB_PD_USB32_DRD
+config PLATFORM_EC_SVDM_RSP
+	bool "SVDM Response Support"
 	help
-	  Respond to Discover Identity requests only, reporting DFP-only
-	  operation on all ports. The Identity response indicates the device has
-	  Type-C receptacles and supports USB 3.2, operating as a USB-PD host.
+	  Respond to Structured VDM requests using the common
+	  SVDM response implementation.
 
-	  This is appropriate for systems that only ever operate as USB hosts
-	  and do not require support for more complex modes like USB4 or TBT.
+	  The SVDM response indicates the device has
+	  Type-C receptacles and supports USB 3.2 including USB4 and
+	  Thunderbolt(TBT) support when enabled by platform configuration.
 
 config SVDM_RSP_CUSTOM
 	bool "Custom"

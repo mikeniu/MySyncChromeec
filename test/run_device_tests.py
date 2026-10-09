@@ -45,19 +45,21 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import argparse
 from collections import namedtuple
-import concurrent
-from concurrent.futures.thread import ThreadPoolExecutor
 from contextlib import ExitStack
+from contextlib import suppress
 import copy
 from dataclasses import dataclass
 from dataclasses import field
 from enum import Enum
+import errno
 import io
 import json
 import logging
 import os
 from pathlib import Path
 import re
+import select
+import signal
 import socket
 import subprocess
 import sys
@@ -314,6 +316,12 @@ class Platform(ABC):
     def cleanup(self) -> None:
         """Clean up after a test run."""
 
+    def __enter__(self) -> Platform:
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        self.cleanup()
+
     @abstractmethod
     def skip_test(
         self, test_config: TestConfig, board_config: BoardConfig, zephyr: bool
@@ -415,9 +423,18 @@ class Renode(Platform):
 
     def __init__(self):
         self.process = None
+        self.temp_dir = None
+
+    @property
+    def _env_dir(self) -> str:
+        """Lazily initialize the isolated environment and return its path."""
+        if not self.temp_dir:
+            # pylint: disable-next=consider-using-with
+            self.temp_dir = tempfile.TemporaryDirectory(prefix="ec-renode-")
+        return self.temp_dir.name
 
     def get_console(self, board_config: BoardConfig) -> Optional[str]:
-        return "/tmp/renode-uart"
+        return os.path.join(self._env_dir, "renode-uart")
 
     def hw_write_protect(self, enable: bool) -> None:
         pass
@@ -436,10 +453,20 @@ class Renode(Platform):
         enable_hw_write_protect: bool,
         zephyr: bool,
     ) -> bool:
+        if self.process:
+            self.cleanup()
+
+        uart_pty = Path(self._env_dir) / "renode-uart"
+        log_path = Path(self._env_dir) / "renode.log"
+
         cmd = [
             "./util/renode-ec-launch",
             "--board",
             board_config.name,
+            "--uart",
+            str(uart_pty),
+            "--gdb-port",
+            "0",
         ]
         if zephyr:
             # We've adopted the convention that we prefix upstream Zephyr test
@@ -454,15 +481,74 @@ class Renode(Platform):
         if enable_hw_write_protect:
             cmd.append("--enable-write-protect")
 
-        # pylint: disable-next=consider-using-with
-        self.process = subprocess.Popen(
-            cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE
+        env = os.environ.copy()
+        env["XDG_CONFIG_HOME"] = self._env_dir
+        # Open within a context manager; Popen inherits the duplicated
+        # underlying OS file descriptor, so closing the parent's Python
+        # file object immediately is safe.
+        with open(log_path, "wb") as renode_log_file:
+            # pylint: disable-next=consider-using-with
+            self.process = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=renode_log_file,
+                stderr=subprocess.STDOUT,
+                start_new_session=True,
+                env=env,
+            )
+
+        return self._wait_for_console(uart_pty, log_path)
+
+    def _wait_for_console(
+        self, console_path: Path, log_path: Path, timeout: float = 60.0
+    ) -> bool:
+        """Waits for the Renode process to create the UART PTY."""
+        end_time = time.monotonic() + timeout
+
+        while time.monotonic() < end_time:
+            if self.process.poll() is not None:
+                try:
+                    log_out = log_path.read_text(
+                        encoding="utf-8", errors="replace"
+                    )
+                except OSError:
+                    log_out = ""
+                logging.error(
+                    "Renode exited prematurely with returncode %d:\n%s",
+                    self.process.returncode,
+                    log_out,
+                )
+                self.cleanup()
+                return False
+
+            if console_path.is_char_device():
+                # Allow emulation startup and UART connection to settle before
+                # tests send commands to the PTY.
+                time.sleep(1)
+                return True
+
+            time.sleep(0.1)
+
+        logging.error(
+            "Timed out waiting for Renode console PTY: %s", console_path
         )
-        time.sleep(10)
-        return True
+        self.cleanup()
+        return False
 
     def cleanup(self) -> None:
-        self.process.kill()
+        if self.process:
+            if self.process.stdin:
+                with suppress(OSError):
+                    self.process.stdin.close()
+            with suppress(ProcessLookupError, PermissionError):
+                os.killpg(self.process.pid, signal.SIGKILL)
+            with suppress(subprocess.TimeoutExpired, ProcessLookupError):
+                self.process.wait(timeout=5)
+            self.process = None
+        if self.temp_dir:
+            with suppress(OSError):
+                self.temp_dir.cleanup()
+            self.temp_dir = None
 
     def _skip_test_bloonchipper(
         self, test_config: TestConfig, zephyr: bool
@@ -472,10 +558,7 @@ class Renode(Platform):
         # bloonchipper Zephyr tests to skip on Renode.
         if zephyr and test_name in [
             "benchmark",  # TODO(b/390253975)
-            # TODO(b/382705460): We have seen this flake in the CQ.
-            # Re-enable when missing character bug is fixed.
             "fp_transport",  # TODO(b/384094788)
-            "fpsensor_debug",  # TODO(b/384110894)
             "zephyr_flash_stm32f4",  # TODO(b/384974228)
             # TODO(b/384975384)
             "zephyr_counter_basic_api_stm32_subsec",
@@ -500,26 +583,25 @@ class Renode(Platform):
 
     def _skip_test_chudow(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
+            "boringssl_crypto",  # TODO(b/556233130)
             "flash_physical",  # TODO(b/485314159)
+            "flash_protection",  # TODO(b/508240888)
+            "flash_protection_rw",  # TODO(b/508240888)
+            "fp_buffer_clear",  # TODO(b/556401798)
+            "fpsensor_auth_crypto_stateful",  # TODO(b/485316342)
+            "fpsensor_auth_crypto_stateless",  # TODO(b/556233130)
+            "fpsensor_crypto",  # TODO(b/556233130)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
             "flash_write_protect",  # TODO(b/485316223)
-            "panic",  # TODO(b/485316364)
-            "panic_data",  # TODO(b/485315924)
             "rollback_entropy",  # TODO(b/485315625)
-            "tpm_seed_clear",  # TODO(b/485316761)
-            "utils",  # TODO(b/485316718)
             "fpsensor_debug",  # TODO(b/485315321)
             "restricted_console",  # TODO(b/485315829)
+            "system_is_locked",  # TODO(b/485316683)
             "zephyr_cpp_newlib",  # TODO(b/485316816)
             "zephyr_cpp_std20",  # TODO(b/485316816)
             "zephyr_drivers_entropy",  # TODO(b/485898244)
             "zephyr_kernel_poll",  # TODO(b/485316816)
-        ]:
-            return True
-
-        if test_config.config_name in [
-            "system_is_locked_wp_on",  # TODO(b/485316683)
         ]:
             return True
 
@@ -529,7 +611,6 @@ class Renode(Platform):
         self, test_config: TestConfig, zephyr: bool
     ) -> bool:
         if test_config.test_name in [
-            "otp_key",  # TODO(b/385216796)
             "ram_lock",  # TODO(b/385216805)
             "rtc_npcx9",  # TODO(b/385217282)
         ]:
@@ -541,19 +622,21 @@ class Renode(Platform):
             return True
 
         if zephyr and test_config.test_name in [
-            "flash_protection_rw",  # TODO(b/485668014)
+            "flash_protection",  # TODO(b/485668014)
+            "flash_protection_rw",  # TODO(b/485668836)
             "flash_write_protect",  # TODO(b/485668014)
+            "fp_buffer_clear",  # TODO(b/485669018)
             "fp_transport",  # TODO(b/485668240)
             "malloc",  # TODO(b/485669070)
             "null_pointer",  # TODO(b/485624833)
             "panic",  # TODO(b/485668836)
             "panic_data",  # TODO(b/485667679)
+            "panic_strip_gpr",  # TODO(b/485668836)
             "reboot",  # TODO(b/488128262)
             "rollback_entropy",  # TODO(b/485670085)
             "sbrk",  # TODO(b/485669288)
             "tpm_seed_clear",  # TODO(b/485669018)
             "utils",  # TODO(b/485624824)
-            "zephyr_kernel_poll",  # TODO(b/485639561)
         ]:
             return True
 
@@ -570,20 +653,20 @@ class Renode(Platform):
 
     def _skip_test_sanok(self, test_config: TestConfig) -> bool:
         if test_config.test_name in [
+            "benchmark",  # TODO(b/537717577)
             "flash_physical",  # TODO(b/468410778)
+            "flash_protection",  # TODO(b/487848806)
             "flash_protection_rw",  # TODO(b/487848806)
             "flash_write_protect",  # TODO(b/406944986)
-            "panic_data",  # TODO(b/468407068)
             "rollback",  # TODO(b/468406461)
             "rollback_entropy",  # TODO(b/468406461)
             "system_is_locked",  # TODO(b/483118063)
-            "unaligned_access",  # TODO(b/483118717)
             "exception",  # TODO(b/483118965)
             "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
             "fpsensor_debug",  # TODO(b/474439863)
             "otp_key",  # TODO(b/483121090)
             "restricted_console",  # TODO(b/474439863)
-            "utils",  # TODO(b/483126917)
+            "tpm_seed_clear",  # TODO(b/556233130)
             "zephyr_cpp_newlib",  # TODO(b/484366615)
             "zephyr_cpp_std20",  # TODO(b/484366615)
             "zephyr_drivers_entropy",  # TODO(b/484366615)
@@ -788,8 +871,13 @@ class AllTests:
                 toggle_power=True,
             ),
             TestConfig(
-                test_name="flash_protection_rw",
+                test_name="flash_protection",
                 imagetype_to_use=ImageType.RO,
+                enable_hw_write_protect=True,
+                skip_for_ec_legacy=True,
+            ),
+            TestConfig(
+                test_name="flash_protection_rw",
                 enable_hw_write_protect=True,
                 skip_for_ec_legacy=True,
             ),
@@ -798,6 +886,9 @@ class AllTests:
                 imagetype_to_use=ImageType.RO,
                 toggle_power=True,
                 enable_hw_write_protect=True,
+            ),
+            TestConfig(
+                test_name="fp_buffer_clear",
             ),
             TestConfig(
                 config_name="fp_transport_spi_ro",
@@ -873,6 +964,10 @@ class AllTests:
                 exclude_boards=[BLOONCHIPPER, DARTMONKEY],
             ),
             TestConfig(test_name="panic"),
+            TestConfig(
+                test_name="panic_strip_gpr",
+                skip_for_ec_legacy=True,
+            ),
             TestConfig(
                 config_name="panic_data",
                 test_name="panic_data",
@@ -1067,6 +1162,19 @@ class AllTests:
                     test_args=["wp_on"],
                     toggle_power=True,
                     enable_hw_write_protect=True,
+                    ro_image=variant_info.get("ro_image_path"),
+                    build_board=variant_info.get("build_board"),
+                )
+            )
+
+        # Run flash_protection_rw test for all boards and RO versions.
+        for variant_name, variant_info in board_config.variants.items():
+            tests.append(
+                TestConfig(
+                    config_name=f"flash_protection_rw_{variant_name}",
+                    test_name="flash_protection_rw",
+                    enable_hw_write_protect=True,
+                    skip_for_ec_legacy=True,
                     ro_image=variant_info.get("ro_image_path"),
                     build_board=variant_info.get("build_board"),
                 )
@@ -1283,7 +1391,7 @@ SANOK_CONFIG = BoardConfig(
     architecture=Architecture.RISCV,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
-    reboot_timeout=1.0,
+    reboot_timeout=3.0,
     # TODO(b/468406461): configure rollback regex.
     rollback_region0_regex=NEVER_MATCH_REGEX,
     rollback_region1_regex=NEVER_MATCH_REGEX,
@@ -1564,6 +1672,9 @@ def build_zephyr(
         for config in zephyr_extra_configs:
             f_test_config.write(f"{config}\n")
 
+    with open(test_conf, "r", encoding="utf-8") as f:
+        logging.info("test_conf content:\n%s", f.read())
+
     return cmd
 
 
@@ -1616,33 +1727,52 @@ def erase_rw(image_path: str):
         image_file.truncate()
 
 
-def readline(
-    executor: ThreadPoolExecutor, file: BinaryIO, timeout_secs: float
-) -> Optional[bytes]:
+def readline(file: BinaryIO, timeout_secs: float) -> Optional[bytes]:
     """Read a line with timeout."""
-    future = executor.submit(file.readline)
-    try:
-        return future.result(timeout_secs)
-    except concurrent.futures.TimeoutError:
-        return None
+    line = bytearray()
+    end_time = time.monotonic() + timeout_secs
+
+    while (remaining := end_time - time.monotonic()) > 0:
+        if not select.select([file], [], [], remaining)[0]:
+            break
+
+        try:
+            ch = file.read(1)
+        except OSError as e:
+            if e.errno in (errno.EAGAIN, errno.EWOULDBLOCK, errno.EINTR):
+                continue
+            ch = b""
+
+        if ch is None:
+            continue
+
+        if not ch:
+            if not line:
+                raise EOFError("Console disconnected")
+            break
+
+        line.extend(ch)
+        if ch == b"\n":
+            return bytes(line)
+
+    return bytes(line) if line else None
 
 
-def readlines_until_timeout(
-    executor, file: BinaryIO, timeout_secs: float
-) -> list[bytes]:
+def readlines_until_timeout(file: BinaryIO, timeout_secs: float) -> list[bytes]:
     """Continuously read lines for timeout_secs."""
     lines: list[bytes] = []
     end_time = time.monotonic() + timeout_secs
-    remaining = timeout_secs
-    while True:
-        if remaining <= 0:
-            return lines
 
-        line = readline(executor, file, remaining)
-        if not line:
-            return lines
-        lines.append(line)
-        remaining = end_time - time.monotonic()
+    while (remaining := end_time - time.monotonic()) > 0:
+        try:
+            line = readline(file, remaining)
+            if not line:
+                break
+            lines.append(line)
+        except EOFError:
+            break
+
+    return lines
 
 
 def process_console_output_line(line: bytes, test: TestConfig):
@@ -1679,18 +1809,13 @@ def run_test_zephyr(test: TestConfig) -> str:
     if test.zephyr_name:
         return []
 
-    # TODO(b/382705460): This extra command is to work around an issue where
-    # sometimes there is a missing character in the test command: "zest"
-    # instead of "ztest".
-    test_cmd = "\n\n\n\n\n\n"
-
     if len(test.test_args) == 0:
         # If there are no args just run-all not to be limited by suite name
-        test_cmd += "ztest run-all\n"
+        test_cmd = "ztest run-all\n"
     else:
         # ZTEST console doesn't support passing test arguments
         # Assume a testsuite for every test + arg combination
-        test_cmd += "ztest run-testcase " + test.test_name
+        test_cmd = "ztest run-testcase " + test.test_name
         for test_arg in test.test_args:
             test_cmd = test_cmd + "_" + test_arg
         test_cmd = test_cmd + "\n"
@@ -1702,7 +1827,6 @@ def run_test(
     test: TestConfig,
     board_config: BoardConfig,
     console: io.FileIO,
-    executor: ThreadPoolExecutor,
     zephyr: bool,
 ) -> bool:
     """Run specified test."""
@@ -1743,7 +1867,11 @@ def run_test(
             logging.debug("Test timed out")
             return False
 
-        line = readline(executor, console, remaining_secs)
+        try:
+            line = readline(console, remaining_secs)
+        except EOFError:
+            logging.error("Console disconnected")
+            return False
         if not line:
             continue
 
@@ -1762,7 +1890,7 @@ def run_test(
         for finish_re in test.finish_regexes:
             if finish_re.match(line_str):
                 # flush read the remaining
-                lines = readlines_until_timeout(executor, console, 1)
+                lines = readlines_until_timeout(console, 1)
                 logging.debug(lines)
                 test.logs.extend(lines)
 
@@ -1853,7 +1981,6 @@ def flash_and_run_test(
     platform: Platform,
     board_config: BoardConfig,
     args: argparse.Namespace,
-    executor,
 ) -> bool:
     """Run a single test using the test and board configuration specified"""
     build_board = board_config.name
@@ -1904,57 +2031,61 @@ def flash_and_run_test(
             )
             return False
 
-    # Get the console file before flashing to listen ASAP after flashing.
-    console_pty = platform.get_console(board_config)
+    if args.build_only:
+        logging.info("Build complete. Skipping execution due to --build-only.")
+        return True
 
-    # flash test binary
-    if not platform.flash(
-        board_config,
-        image_path,
-        args.flasher,
-        args.remote,
-        args.jlink_port,
-        test.test_name,
-        test.enable_hw_write_protect,
-        args.zephyr,
-    ):
-        logging.debug("Flashing failed")
-        return False
+    with platform:
+        # Get the console file before flashing to listen ASAP after flashing.
+        console_pty = platform.get_console(board_config)
 
-    with ExitStack() as stack:
-        if args.remote and args.console_port:
-            console_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            console_socket.connect((args.remote, args.console_port))
-            console = stack.enter_context(
-                console_socket.makefile(mode="rwb", buffering=0)
-            )
-        else:
-            # pylint: disable-next=consider-using-with
-            console_file = open(console_pty, "wb+", buffering=0)
-            console = stack.enter_context(console_file)
-
-        platform.hw_write_protect(test.enable_hw_write_protect)
-
-        if test.toggle_power:
-            power_cycle(platform, board_config)
-        else:
-            # In some cases flash_ec leaves the board off, so just ensure it is on
-            platform.power(board_config, power_on=True)
-
-        # run the test
-        logging.info('Running test: "%s"', test.config_name)
-
-        ret = run_test(
-            test,
+        # flash test binary
+        if not platform.flash(
             board_config,
-            console,
-            executor=executor,
-            zephyr=args.zephyr,
-        )
+            image_path,
+            args.flasher,
+            args.remote,
+            args.jlink_port,
+            test.test_name,
+            test.enable_hw_write_protect,
+            args.zephyr,
+        ):
+            logging.debug("Flashing failed")
+            return False
 
-        platform.cleanup()
+        with ExitStack() as stack:
+            if args.remote and args.console_port:
+                console_socket = stack.enter_context(
+                    socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                )
+                console_socket.connect((args.remote, args.console_port))
+                console_socket.setblocking(False)
+                console = stack.enter_context(
+                    console_socket.makefile(mode="rwb", buffering=0)
+                )
+            else:
+                # pylint: disable-next=consider-using-with
+                console_file = open(console_pty, "r+b", buffering=0)
+                console = stack.enter_context(console_file)
+                os.set_blocking(console.fileno(), False)
 
-        return ret
+            platform.hw_write_protect(test.enable_hw_write_protect)
+
+            if test.toggle_power:
+                power_cycle(platform, board_config)
+            else:
+                # In some cases flash_ec leaves the board off, so just ensure it is on
+                platform.power(board_config, power_on=True)
+
+            # run the test
+            logging.info('Running test: "%s"', test.config_name)
+
+            return run_test(
+                test,
+                board_config,
+                console,
+                zephyr=args.zephyr,
+            )
 
 
 def write_json_results(
@@ -2102,6 +2233,12 @@ def main():
     )
 
     parser.add_argument(
+        "--build-only",
+        help="Only build test binaries without flashing or running them",
+        action="store_true",
+    )
+
+    parser.add_argument(
         "--json",
         help="Output file for test results in JSON format",
     )
@@ -2128,47 +2265,44 @@ def main():
     )
     logging.debug("Running tests: %s", [test.config_name for test in test_list])
 
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        for test in test_list:
-            if (
-                (test.skip_for_zephyr and args.zephyr)
-                or (test.skip_for_ec_legacy and not args.zephyr)
-                or platform.skip_test(test, board_config, args.zephyr)
-            ):
-                test.status = TestStatus.SKIP
-                continue
-            if flash_and_run_test(test, platform, board_config, args, executor):
-                test.status = TestStatus.PASS
-            else:
-                test.status = TestStatus.FAIL
+    for test in test_list:
+        if (
+            (test.skip_for_zephyr and args.zephyr)
+            or (test.skip_for_ec_legacy and not args.zephyr)
+            or platform.skip_test(test, board_config, args.zephyr)
+        ):
+            test.status = TestStatus.SKIP
+            continue
+        if flash_and_run_test(test, platform, board_config, args):
+            test.status = TestStatus.PASS
+        else:
+            test.status = TestStatus.FAIL
 
-        colorama.init()
-        exit_code = 0
-        for test in test_list:
-            # print results
-            print('Test "' + test.config_name + '": ', end="")
-            if test.status == TestStatus.SKIP:
-                print(colorama.Fore.YELLOW + "SKIPPED")
-            elif test.status == TestStatus.PASS:
-                print(colorama.Fore.GREEN + "PASSED")
-            else:
-                print(colorama.Fore.RED + "FAILED")
-                exit_code = 1
+    colorama.init()
+    exit_code = 0
+    for test in test_list:
+        # print results
+        print('Test "' + test.config_name + '": ', end="")
+        if test.status == TestStatus.SKIP:
+            print(colorama.Fore.YELLOW + "SKIPPED")
+        elif test.status == TestStatus.PASS:
+            print(colorama.Fore.GREEN + "PASSED")
+        else:
+            print(colorama.Fore.RED + "FAILED")
+            exit_code = 1
 
-            print(colorama.Style.RESET_ALL)
+        print(colorama.Style.RESET_ALL)
 
-        if args.json:
-            write_json_results(test_list, args.json)
+    if args.json:
+        write_json_results(test_list, args.json)
 
-        if exit_code != 0:
-            print(
-                f"Tests failed for {args.board}"
-                f'{" Zephyr" if args.zephyr else ""}'
-                f'{" Renode" if args.renode else ""}'
-            )
-        # TODO(b/368684364): Fix the underlying issue that prevents sys.exit()
-        # from working correctly.
-        os._exit(exit_code)  # pylint: disable=protected-access
+    if exit_code != 0:
+        print(
+            f"Tests failed for {args.board}"
+            f'{" Zephyr" if args.zephyr else ""}'
+            f'{" Renode" if args.renode else ""}'
+        )
+    sys.exit(exit_code)
 
 
 def get_power_utilization(

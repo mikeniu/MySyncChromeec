@@ -5,8 +5,8 @@
 
 /* Internal header with RTS54xx interface constants and types */
 
-#ifndef __CROS_EC_PDC_RTS54XX_H
-#define __CROS_EC_PDC_RTS54XX_H
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_USBC_PDC_RTS54XX_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_USBC_PDC_RTS54XX_H_
 
 #include "drivers/pdc.h"
 
@@ -115,6 +115,14 @@ BUILD_ASSERT(RTS54XX_GET_IC_STATUS_PROG_NAME_STR_LEN <=
 #define RTS54XX_GET_IC_STATUS_SBU_MUX_MODE_NORMAL 0
 #define RTS54XX_GET_IC_STATUS_SBU_MUX_MODE_FORCE_DBG 1
 
+// Used for SET_VDO command
+#define RTS54XX_PDC_ORIGIN 0
+#define RTS54XX_SET_VDO_MAX_VDOS 5
+#define RTS54XX_VDO_TYPE_AND_VALUE_SIZE 5
+#define RTS54XX_SET_VDO_HEADER_SIZE 5
+#define RTS54XX_SET_VDO_MSG_SIZE(x) \
+	RTS54XX_SET_VDO_HEADER_SIZE + (x * RTS54XX_VDO_TYPE_AND_VALUE_SIZE)
+
 /**
  * @brief PDC Command states
  */
@@ -143,6 +151,21 @@ union ping_status_t {
 };
 
 /**
+ * @brief VDO configuration
+ *
+ * This union is used to configure the VDO
+ */
+typedef union {
+	struct {
+		uint8_t num_vdos : 3; // Bits [2:0]
+		uint8_t origin : 1; // Bit  [3]
+		uint8_t reserved : 4; // Bits [7:4]
+	} __attribute__((packed)) fields;
+
+	uint8_t raw;
+} vdo_config_t;
+
+/**
  * @brief Sx sleep state values
  *
  * The value used to indicate to the PDC the current AP power state
@@ -157,4 +180,4 @@ enum sx_sleep_state {
 
 };
 
-#endif /* __CROS_EC_PDC_RTS54XX_H */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_USBC_PDC_RTS54XX_H_ */

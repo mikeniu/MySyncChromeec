@@ -5,8 +5,8 @@
  * Panic handling macros and structures.
  */
 
-#ifndef __CROS_EC_PANIC_DEFS_H
-#define __CROS_EC_PANIC_DEFS_H
+#ifndef PLATFORM_EC_INCLUDE_PANIC_DEFS_H_
+#define PLATFORM_EC_INCLUDE_PANIC_DEFS_H_
 
 #include <stdint.h>
 
@@ -126,6 +126,15 @@ struct x86_panic_data {
 	uint8_t task_id;
 };
 
+/* POSIX architecture panic data */
+struct posix_panic_data {
+	uint32_t esf_placeholder;
+	uint32_t reason;
+	uint32_t info;
+	uint8_t exception;
+	uint8_t reserved[3];
+};
+
 /* Data saved across reboots */
 struct panic_data {
 	uint8_t arch; /* Architecture (PANIC_ARCH_*) */
@@ -142,6 +151,7 @@ struct panic_data {
 #ifndef CONFIG_DO_NOT_INCLUDE_RV32I_PANIC_DATA
 		struct rv32i_panic_data riscv; /* RISC-V RV32I */
 #endif
+		struct posix_panic_data posix; /* POSIX (native_sim) */
 	};
 
 	/*
@@ -153,6 +163,7 @@ struct panic_data {
 };
 
 #define PANIC_DATA_MAGIC 0x21636e50 /* "Pnc!" */
+#define PANIC_DATA_VERSION 2
 enum panic_arch {
 	PANIC_ARCH_UNSUPPORTED = 0,
 	PANIC_ARCH_CORTEX_M = 1, /* Cortex-M architecture */
@@ -161,6 +172,7 @@ enum panic_arch {
 #ifndef CONFIG_DO_NOT_INCLUDE_RV32I_PANIC_DATA
 	PANIC_ARCH_RISCV_RV32I = 4, /* RISC-V RV32I */
 #endif
+	PANIC_ARCH_POSIX = 5, /* POSIX (native_sim) */
 };
 
 #define PANIC_ZEPHYR_FATAL_ERROR 0xDEAD6800
@@ -186,4 +198,4 @@ enum panic_arch {
 }
 #endif
 
-#endif /* __CROS_EC_PANIC_DEFS_H */
+#endif /* PLATFORM_EC_INCLUDE_PANIC_DEFS_H_ */

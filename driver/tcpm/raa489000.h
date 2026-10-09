@@ -5,11 +5,11 @@
  * TCPC driver for Renesas RAA489000 Buck-boost charger with TCPC
  */
 
+#ifndef PLATFORM_EC_DRIVER_TCPM_RAA489000_H_
+#define PLATFORM_EC_DRIVER_TCPM_RAA489000_H_
+
 #include "compile_time_macros.h"
 #include "usb_pd_tcpm.h"
-
-#ifndef __CROS_EC_USB_PD_TCPM_RAA489000_H
-#define __CROS_EC_USB_PD_TCPM_RAA489000_H
 
 #define RAA489000_TCPC0_I2C_FLAGS 0x22
 #define RAA489000_TCPC1_I2C_FLAGS 0x23
@@ -88,4 +88,4 @@ int raa489000_set_output_current(int port, enum tcpc_rp_value rp);
 
 extern const struct tcpm_drv raa489000_tcpm_drv;
 
-#endif
+#endif /* PLATFORM_EC_DRIVER_TCPM_RAA489000_H_ */

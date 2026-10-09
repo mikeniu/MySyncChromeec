@@ -14,7 +14,7 @@ zephyr_compile_options(-ftrapv)
 # not necessary.
 zephyr_include_directories(${ZEPHYR_BASE}/include/zephyr/posix)
 
-set(EXPECTED_ROLLBACK_VERSION 1)
+set(EXPECTED_ROLLBACK_VERSION 2)
 
 if (DEFINED CONFIG_BOARD_BLOONCHIPPER)
 	# Expected rollback version is 0 on bloonchipper.
@@ -38,6 +38,11 @@ endif()
 if (DEFINED CONFIG_BOARD_EM32F967)
 	add_subdirectory(em32f967)
 	project(em32f967)
+endif()
+
+if (DEFINED CONFIG_BOARD_FT9001)
+	add_subdirectory(ft9001)
+	project(ft9001)
 endif()
 
 if(NOT CONFIG_PLATFORM_EC_ROLLBACK_VERSION EQUAL EXPECTED_ROLLBACK_VERSION)

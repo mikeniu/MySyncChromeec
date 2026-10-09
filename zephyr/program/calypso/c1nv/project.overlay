@@ -1,0 +1,76 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* c1nv program common DTS includes */
+
+#include <cros/integrated_fwid.dtsi>
+#include <dt-bindings/macros.h>
+
+/* Include the standard and OEM schema templates */
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+
+/* Include the generated file that defines the values for this project */
+#include "c1nv_ec_ufsc.dtsi"
+
+#include "../psl.dtsi"
+#include "../adc.dtsi"
+#include "../common.dtsi"
+#include "battery.dtsi"
+#include <c1nv/overlay.dtsi>
+
+/* c1nv project DTS includes */
+
+#include <cros/cbi_flash.dtsi>
+#include "gpios.dtsi"
+#include "i2c.dtsi"
+#include "interrupts.dtsi"
+#include "keyboard.dtsi"
+#include "temp_sensors.dtsi"
+
+/* c1nv overrides follow... */
+
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x3e000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 */
+			offset = <0x3e000>;
+			size = <0x1000>;
+		};
+	};
+};
+
+&uart4 {
+	status = "okay";
+	current-speed = <3333333>;
+	pinctrl-0 = <&uart4_sout_gp35>;
+	pinctrl-names = "default";
+	data-bits = <7>;
+	tx-invert;
+
+	uart4_dev0: uart4_dev0 {
+		status = "okay";
+		chain-length = <8>;
+		reset-delay = <80>;
+		bits-per-symbol = <3>;
+		one-symbol = <BINARY(1,1,0)>;
+		zero-symbol = <BINARY(1,0,0)>;
+	};
+};
+
+&pcc {
+	clock-frequency = <DT_FREQ_M(80)>;
+	core-prescaler = <1>;
+	apb1-prescaler = <4>;
+	apb2-prescaler = <4>;
+	apb3-prescaler = <4>;
+	apb4-prescaler = <1>;
+};

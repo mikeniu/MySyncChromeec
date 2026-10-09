@@ -9,8 +9,10 @@
 #include "common.h"
 #include "console.h"
 #include "ec_commands.h"
+#include "hooks.h"
 #include "host_command.h"
 #include "system.h"
+#include "timer.h"
 
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_CHIPSET, outstr)
@@ -78,5 +80,39 @@ static enum ec_status host_command_apreset(struct host_cmd_handler_args *args)
 	return EC_RES_SUCCESS;
 }
 DECLARE_HOST_COMMAND(EC_CMD_AP_RESET, host_command_apreset, EC_VER_MASK(0));
-
 #endif
+
+#if defined(CONFIG_HOSTCMD_AP_RESET_SCHEDULED) && \
+	!defined(CONFIG_CHIPSET_QC_EXP)
+static void ap_reset_deferred(void)
+{
+	chipset_reset(CHIPSET_RESET_HOST_CMD);
+}
+DECLARE_DEFERRED(ap_reset_deferred);
+
+static enum ec_status
+host_command_apreset_scheduled(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_ap_reset_scheduled *p = args->params;
+
+	if (p->delay_ms == 0) {
+		/* Reset immediately */
+		chipset_reset(CHIPSET_RESET_HOST_CMD);
+		return EC_RES_SUCCESS;
+	}
+
+	/* Schedule reset */
+	if (hook_call_deferred(&ap_reset_deferred_data, p->delay_ms * MSEC) !=
+	    EC_SUCCESS)
+		return EC_RES_ERROR;
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_AP_RESET_SCHEDULED, host_command_apreset_scheduled,
+		     EC_VER_MASK(0));
+#endif
+
+__attribute__((weak)) int chipset_is_offmode_charging_wake(void)
+{
+	return 0;
+}

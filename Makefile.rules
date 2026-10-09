@@ -17,8 +17,6 @@ boards := $(filter-out $(skip_boards), \
 # Create output directories if necessary
 _common_dir_create := $(foreach d,$(common_dirs) $(common-dirs-y),\
 	$(shell [ -d $(out)/$(d) ] || mkdir -p $(out)/$(d)))
-_sharedlib_dir_create := $(foreach d,$(dirs),$(shell \
-	[ -d $(out)/$(SHOBJLIB)/$(d) ] || mkdir -p $(out)/$(SHOBJLIB)/$(d)))
 _dir_create := $(foreach d,$(dirs) $(dirs-y),\
 	$(shell [ -d $(out)/$(BLD)/$(d) ] || mkdir -p $(out)/RO/$(d); \
 	    mkdir -p $(out)/RW/$(d)))
@@ -73,10 +71,10 @@ cmd_c_to_s = $(CC) -S $(C_WARN) $(CFLAGS) $(C_WARN-$(CROSS_COMPILE_CC_NAME)) \
 		-MT $(@D)/$(@F) -o $(@D)/$(@F)
 cmd_cxx_to_o = $(CXX) $(CFLAGS) $(CXXFLAGS) -MMD -MP -MF $@.d \
 		      -c $< -MT $(@D)/$(@F) -o $(@D)/$(@F)
-cmd_c_to_host = $(HOSTCC) $(HOST_CFLAGS) -MMD -MF $@.d -MT $@ -o $@ \
+cmd_c_to_host = $(HOSTCC) $(HOST_CFLAGS) -MMD -MP -MF $@.d -MT $@ -o $@ \
 	         $(sort $(foreach c,$($(*F)-objs),util/$(c:%.o=%.c)) $(wildcard $*.c)) $(HOST_LDFLAGS)
 cmd_cxx_to_host = $(HOSTCXX) $(HOST_CXXFLAGS) \
-		-MMD -MF $@.d -MT $@ -o $@ \
+		-MMD -MP -MF $@.d -MT $@ -o $@ \
 		$(sort $(foreach c,$($(*F)-objs),util/$(c:%.o=%.cc)) $(wildcard $*.cc)) $(HOST_LDFLAGS)
 cmd_o_to_a = $(AR) rcs $@ $^
 cmd_host_test = $(MAKE) BOARD=host PROJECT=$* \
@@ -93,6 +91,7 @@ cmd_mv_from_tmp = mv $(out)/$*.bin.tmp $(out)/$*.bin
 cmd_copyrw-y = cd $(out) && cp RW/$(PROJECT).RW.flat RW/$(PROJECT).RW.bin
 
 cmd_cp_script = cp "$<" "$@" && chmod +x "$@"
+cmd_symlink_hdr = mkdir -p $(@D) && ln -srf $< $@
 
 # If outputing to tty and column command exists, pipe into column.
 # Otherwise, print in newline format.
@@ -124,6 +123,33 @@ else
 utils-host:
 	$(error Building utils-host not supported when BOARD is not "host")
 endif
+
+# Top-level target for host utility unit tests.
+#
+# This target serves as the entry point for running host-side utility unit tests
+# during ebuilds and CQ runs.
+#
+# By default, `utils-test` depends on `utils-host` to ensure all necessary host
+# binaries are compiled, but it does not execute any tests directly.
+#
+# To hook a new utility unit test into this flow, define a custom execution
+# target in your utility's `build.mk` file and add it as a prerequisite
+# dependency to `utils-test`. For example:
+#
+#   .PHONY: run-my_utility_test
+#   run-my_utility_test: $(out)/util/my_utility_test
+#   	@$(out)/util/my_utility_test
+#
+#   utils-test: run-my_utility_test
+.PHONY: utils-test
+ifeq ($(BOARD),host)
+utils-test: utils-host
+	@echo "======= running host utility unit tests"
+else
+utils-test:
+	$(error Running utils-test not supported when BOARD is not "host")
+endif
+
 
 # On board test binaries
 test-targets=$(foreach t,$(test-list-y),test-$(t))
@@ -185,10 +211,13 @@ bldversion=$(shell (./util/getversion.sh ; echo VERSION) | $(CPP) -P -)
 cmd_lcov=lcov --rc branch_coverage=1 --gcov-tool \
 	$(HOSTGCOV) -q -o $@ -c -d build/coverage/$* -t $* \
 	--exclude '*/ec/test/*' --exclude '*/ec/include/tests/*' \
-	--exclude '*/ec/common/mock/*' \
-	--ignore-errors unused,unused,inconsistent,inconsistent \
-	--ignore-errors negative,negative
-cmd_merge_cov=lcov --rc branch_coverage=1 -o build/coverage/lcov.info \
+	--exclude '*/ec/board/host/*' --exclude '*/ec/chip/host/*' \
+	--exclude '*/ec/core/host/*' --exclude '*/ec/include/mock/*' \
+	--exclude '*/ec/include/test_util.h' --exclude '*_test.c' \
+	--exclude '*_test.cc' --exclude '*_test.h' \
+	--ignore-errors gcov,inconsistent,empty,mismatch,unused,negative,count
+cmd_merge_cov=lcov --ignore-errors missing,empty \
+	--rc branch_coverage=1 -o build/coverage/lcov.info \
 	$(foreach info,$^,-a ${info})
 
 .DELETE_ON_ERROR: build/coverage/%.info
@@ -209,8 +238,6 @@ flat-y := $(out)/RW/$(PROJECT).RW.flat
 flat-$(CONFIG_FW_INCLUDE_RO) += $(out)/RO/$(PROJECT).RO.flat
 
 flat-$(CONFIG_DRAM_BASE) += $(out)/RW/$(PROJECT).RW.flat.dram
-
-flat-$(CONFIG_SHAREDLIB) += $(libsharedobjs-y)
 
 ifneq ($(TEST_SCRIPT),)
 $(out)/$(PROJECT).exe: test/$(TEST_SCRIPT) | $(ro-objs)
@@ -236,10 +263,6 @@ $(out)/RO/%.o:%.cc
 	$(call quiet,cxx_to_o,CXX    )
 $(out)/RW/%.o:%.cc
 	$(call quiet,cxx_to_o,CXX    )
-
-$(out)/$(SHOBJLIB)/%.o: override LATE_CFLAGS_DEFINE:=-DSHAREDLIB_IMAGE=$(EMPTY)
-$(out)/$(SHOBJLIB)/%.o:%.c
-	$(call quiet,c_to_o,CC     )
 
 $(out)/RO/%.o:%.S
 	$(call quiet,c_to_o,AS     )
@@ -272,15 +295,29 @@ endif
 # .d file.
 $(ro-objs): | $(out)/ec_version.h
 $(rw-objs): | $(out)/ec_version.h
-$(sharedlib-objs): | $(out)/ec_version.h
 
 $(out)/ec_version.h:
 	$(call quiet,version,VERSION)
 
-$(host-utils): $(out)/%:$(host-srcs)
+# Symlink exported headers into $(out)/include/chromeos/ec/ so that host tools
+# compiling against system libraries (e.g. libec) resolve <chromeos/ec/...>
+# headers to the local checkout instead of /usr/include/chromeos/ec/.
+chromeos-ec-headers := \
+	$(out)/include/chromeos/ec/ec_commands.h \
+	$(out)/include/chromeos/ec/ec_cmd_api.h \
+	$(out)/include/chromeos/ec/panic_defs.h \
+	$(out)/include/chromeos/ec/cros_ec_dev.h
+
+$(out)/include/chromeos/ec/%: include/%
+	$(call quiet,symlink_hdr,SYMLINK)
+
+$(out)/include/chromeos/ec/cros_ec_dev.h: util/cros_ec_dev.h
+	$(call quiet,symlink_hdr,SYMLINK)
+
+$(host-utils): $(out)/%:$(host-srcs) | $(chromeos-ec-headers)
 	$(call quiet,c_to_host,HOSTCC )
 
-$(host-utils-cxx): $(out)/%:$(host-srcs-cxx)
+$(host-utils-cxx): $(out)/%:$(host-srcs-cxx) | $(chromeos-ec-headers)
 	$(call quiet,cxx_to_host,HOSTCXX )
 
 .PHONY: clean
@@ -310,6 +347,7 @@ help:
 	@echo "  test-coverage        - Build and run all host unit tests for code coverage"
 	@echo ""
 	@echo "  BOARD=host utils-host        - Build EC host utilities"
+	@echo "  BOARD=host utils-test        - Build and run EC host utility unit tests"
 	@echo ""
 	@echo "  print-tests     [BOARD=]     - Print on-device test targets"
 	@echo "  print-host-tests             - Print all host unit test targets"

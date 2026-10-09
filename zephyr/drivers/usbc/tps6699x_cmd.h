@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_DRIVERS_USBC_TPS6699X_H_
-#define ZEPHYR_DRIVERS_USBC_TPS6699X_H_
+#ifndef PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_CMD_H_
+#define PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_CMD_H_
 
 #include "tps6699x_reg.h"
 
@@ -351,6 +351,42 @@ int tps_rw_thunderbolt_configuration(const struct i2c_dt_spec *i2c,
 				     int flag);
 
 /**
+ * @brief Read or Write Intel VID Status (Offset = 0x59)
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_intel_vid_status(const struct i2c_dt_spec *i2c,
+			    union reg_intel_vid_status *buf, int flag);
+
+/**
+ * @brief Read or Write Tx Battery Capabilities
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_battery_capability(const struct i2c_dt_spec *i2c,
+			      union reg_battery_capability *buf, int flag);
+
+/**
+ * @brief Read or Write Transmitted Battery Status Data Objects
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_battery_status(const struct i2c_dt_spec *i2c,
+			  union reg_battery_status *buf, int flag);
+
+/**
  * @brief Read ADC Results
  *
  * @param i2c device pointer to i2c device
@@ -453,6 +489,31 @@ int tps_rd_data_status_reg(const struct i2c_dt_spec *i2c,
  */
 int tps_rd_status_reg(const struct i2c_dt_spec *i2c, union reg_status *status);
 
+/**
+ * @brief Read or Write Source Cap Extended Data Block
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_source_cap_ext_data_block(const struct i2c_dt_spec *i2c,
+				     union reg_source_cap_ext_data_block *buf,
+				     int flag);
+
+/**
+ * @brief Read or Write Source Info
+ *
+ * @param i2c device pointer to i2c device
+ * @param buf pointer where data is stored
+ * @param int flag set to I2C_MSG_READ for read and I2C_MSG_WRITE for write
+ *
+ * @return 0 on success, else -EIO
+ */
+int tps_rw_source_info(const struct i2c_dt_spec *i2c,
+		       union reg_source_info *buf, int flag);
+
 #ifdef CONFIG_USBC_PDC_TPS6699X_CONSOLE_FW_UPDATER
 /**
  * @brief Perform bulk transfers to the PDC
@@ -468,16 +529,4 @@ int tps_stream_data(const struct i2c_dt_spec *i2c,
 		    const uint8_t broadcast_address, const uint8_t *buf,
 		    size_t buf_len);
 #endif
-
-/**
- * @brief Read the received attention VDM register (0x4E)
- *
- * @param i2c device pointer to i2c device
- * @param received_attention_vdm pointer where data is stored
- *
- * @return 0 on success, else -EIO
- */
-int tps_rd_received_attention_vdm(
-	const struct i2c_dt_spec *i2c,
-	union reg_received_attention_vdm *received_attention_vdm);
-#endif /* ZEPHYR_DRIVERS_USBC_TPS6699X_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_DRIVERS_USBC_TPS6699X_CMD_H_ */

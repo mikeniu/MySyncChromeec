@@ -1,0 +1,53 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* Hekla program common DTS includes */
+#include <cros/integrated_fwid.dtsi>
+
+/* Include the standard and OEM schema templates */
+#include <cros/cbi_ufsc_std_schema.dtsi>
+#include <cros/cbi_ufsc_oem_schema.dtsi>
+
+/* Include the generated file that defines the values for this project */
+#include "hekla_ec_ufsc.dtsi"
+
+/* hekla project DTS includes */
+#include "battery.dtsi"
+#include "console.dtsi"
+#include "fan.dtsi"
+#include "gpios.dtsi"
+#include "i2c.dtsi"
+#include "interrupts.dtsi"
+#include "keyboard.dtsi"
+#include "power_signals.dtsi"
+#include "pwm.dtsi"
+#include "temp_sensors.dtsi"
+#include "spi.dtsi"
+#include "thermistor.dtsi"
+#include "usb_typec.dtsi"
+#include "usba.dtsi"
+#include "rtk_ulpm.dtsi"
+#include <hekla/overlay.dtsi>
+
+/*
+ * Aliases to common names
+ */
+gpio_ec_pch_wake_odl: &gpio_soc_wake_odl {};
+
+/ {
+	cse_early_recovery: cse-early-recovery {
+		compatible = "cros-ec,cse-early-rec";
+		cse-early-rec-gpios = <RTS5912_GPIO085 (GPIO_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
+	};
+};
+
+/* AP interface */
+&espi0 {
+	status = "okay";
+};
+
+&sha0 {
+	status = "okay";
+};

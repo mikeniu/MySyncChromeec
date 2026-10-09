@@ -84,11 +84,6 @@ static bool check_async_is_pending(struct ppm_test_fixture *fixture)
 	return ppm_test_is_async_pending(fixture->ppm_dev);
 }
 
-static bool check_cmd_is_pending(struct ppm_test_fixture *fixture)
-{
-	return ppm_test_is_cmd_pending(fixture->ppm_dev);
-}
-
 static bool check_cci_matches(struct ppm_test_fixture *fixture,
 			      const union cci_event_t *cci)
 {
@@ -254,30 +249,6 @@ static bool wait_for_async_event_to_process(struct ppm_test_fixture *fixture)
 	return !is_async_pending;
 }
 
-static bool wait_for_cmd_to_process(struct ppm_test_fixture *fixture)
-{
-	bool is_cmd_pending = false;
-
-	/*
-	 * After calling write, the command will be pending and will trigger the
-	 * main loop. Try reading the pending state a few times to see if it
-	 * clears.
-	 */
-	for (int i = 0; i < PDC_WAIT_FOR_ITERATIONS; ++i) {
-		is_cmd_pending = check_cmd_is_pending(fixture);
-
-		LOG_DBG("[%d]: Command is %s", i,
-			(is_cmd_pending ? "pending" : "not pending"));
-		if (is_cmd_pending) {
-			k_msleep(1);
-		} else {
-			break;
-		}
-	}
-
-	return !is_cmd_pending;
-}
-
 static bool wait_for_notification(struct ppm_test_fixture *fixture,
 				  int expected_count)
 {
@@ -299,7 +270,7 @@ static void enable_notifications_from_idle(struct ppm_test_fixture *fixture)
 	memcpy(&control, &enable_all_notifications, sizeof(control));
 
 	zassert_false(write_command(fixture, &control) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_WAITING_CC_ACK);
 
 	queue_command_for_fake_driver(fixture, UCSI_ACK_CC_CI,
@@ -307,15 +278,15 @@ static void enable_notifications_from_idle(struct ppm_test_fixture *fixture)
 	zassert_false(write_ack_command(fixture,
 					/*connector_change_ack*/ false,
 					/*command_complete_ack*/ true) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_IDLE_NOTIFY);
 }
 
 static bool initialize_fake(struct ppm_test_fixture *fixture)
 {
-	wait_for_cmd_to_process(fixture);
+	ppm_wait_for_cmd_to_process(fixture->ppm_dev);
 	write_ppm_reset(fixture);
-	return wait_for_cmd_to_process(fixture);
+	return ppm_wait_for_cmd_to_process(fixture->ppm_dev);
 }
 
 static void initialize_fake_to_idle_notify(struct ppm_test_fixture *fixture)
@@ -521,7 +492,7 @@ ZTEST_USER_F(ppm_test, test_IDLE_drops_unexpected_commands)
 		 */
 		zassert_false(write_command(fixture, &control) < 0,
 			      "Failed to write command: 0x%x", cmd);
-		zassert_true(wait_for_cmd_to_process(fixture),
+		zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev),
 			     "Failed waiting for cmd to process: 0x%x", cmd);
 		zassert_equal(get_ppm_state(fixture), PPM_STATE_IDLE,
 			      "Not in idle state after running cmd: 0x%x", cmd);
@@ -532,7 +503,7 @@ ZTEST_USER_F(ppm_test, test_IDLE_drops_unexpected_commands)
 	memcpy(&control, &enable_all_notifications, sizeof(control));
 
 	zassert_false(write_command(fixture, &control) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_WAITING_CC_ACK);
 }
 
@@ -583,7 +554,7 @@ ZTEST_USER_F(ppm_test, test_IDLENOTIFY_full_command_loop)
 	 */
 	unblock_fake_driver_with_command(fixture, UCSI_GET_ALTERNATE_MODES,
 					 /*result=*/0, /*lpm_data=*/NULL);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_true(wait_for_notification(fixture, ++notified_count));
 	zassert_true(check_cci_matches(fixture, &cci_cmd_complete));
 
@@ -628,7 +599,7 @@ ZTEST_USER_F(ppm_test, test_IDLENOTIFY_send_invalid_ucsi_command)
 					  .data_length = 0 };
 
 	zassert_false(write_command(fixture, &control) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_true(check_cci_matches(fixture, &cci_not_supported_command));
 
 	/* Not supported commands also require Ack. */
@@ -636,7 +607,7 @@ ZTEST_USER_F(ppm_test, test_IDLENOTIFY_send_invalid_ucsi_command)
 				      /*result=*/0, /*lpm_data=*/NULL);
 	zassert_false(write_ack_command(fixture, /*connector_change_ack=*/false,
 					/*command_complete_ack=*/true) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_true(check_cci_matches(fixture, &cci_ack_command));
 }
 
@@ -677,7 +648,7 @@ ZTEST_USER_F(ppm_test, test_PROCESSING_busy_allows_cancel_command)
 	zassert_false(write_command(fixture, &cancel) < 0);
 
 	/* Once command completes, we should see cancel_completed in CCI. */
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_true(check_cci_matches(fixture, &cci_cancel_complete));
 
 	/* Trying to cancel while not busy should also result in an error. */
@@ -699,7 +670,7 @@ ZTEST_USER_F(ppm_test, test_CCACK_error_if_not_command_complete)
 	memcpy(&control, &enable_all_notifications, sizeof(control));
 
 	zassert_false(write_command(fixture, &control) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_WAITING_CC_ACK);
 
 	/* one notification command complete. */
@@ -786,7 +757,7 @@ ZTEST_USER_F(ppm_test, test_CCACK_ignore_async_event_processing)
 	memcpy(&control, &enable_all_notifications, sizeof(control));
 
 	zassert_false(write_command(fixture, &control) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_WAITING_CC_ACK);
 	notified_count++;
 	zassert_true(wait_for_notification(fixture, notified_count));
@@ -809,7 +780,7 @@ ZTEST_USER_F(ppm_test, test_CCACK_ignore_async_event_processing)
 	zassert_false(write_ack_command(fixture,
 					/*connector_change_ack=*/false,
 					/*command_complete_ack=*/true) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 
 	/* After handling the command loop, we will see the pending command and
 	 * go into the WAITING_ASYNC_EV_ACK state.
@@ -955,7 +926,7 @@ ZTEST_USER_F(ppm_test, test_CIACK_pass_if_no_active_connector_indication)
 					/*connector_change_ack=*/true,
 					/*command_complete_ack=*/false) < 0);
 	zassert_true(check_cci_matches(fixture, &cci_ack_command));
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_IDLE_NOTIFY);
 }
 
@@ -1009,7 +980,7 @@ ZTEST_USER_F(ppm_test, test_ppm_reset_works_in_all_states)
 	/* Test at IDLE_NOTIFY. */
 	initialize_fake_to_idle_notify(fixture);
 	zassert_false(write_ppm_reset(fixture) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_IDLE);
 
 	/* Test at WAITING_CC_ACK. */
@@ -1022,11 +993,11 @@ ZTEST_USER_F(ppm_test, test_ppm_reset_works_in_all_states)
 				      /*lpm_data=*/NULL);
 
 	zassert_false(write_command(fixture, &control) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_WAITING_CC_ACK);
 
 	zassert_false(write_ppm_reset(fixture) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_IDLE);
 
 	/* Test at WAITING_ASYNC_EV_ACK. */
@@ -1039,7 +1010,7 @@ ZTEST_USER_F(ppm_test, test_ppm_reset_works_in_all_states)
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_WAITING_ASYNC_EV_ACK);
 
 	zassert_false(write_ppm_reset(fixture) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_equal(get_ppm_state(fixture), PPM_STATE_IDLE);
 }
 
@@ -1143,16 +1114,16 @@ ZTEST_USER_F(ppm_test, test_driver_to_ppm_error_map)
 					      /*result=*/0, /*lpm_data=*/NULL);
 
 		zassert_false(write_command(fixture, &cmd) < 0);
-		zassert_true(wait_for_cmd_to_process(fixture));
+		zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 		zassert_true(check_cci_matches(fixture, &cci_error));
 		zassert_false(write_ack_command(fixture,
 						/*ci_ack*/ false,
 						/*cc_ack*/ true) < 0);
-		zassert_true(wait_for_cmd_to_process(fixture));
+		zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 
 		/* Get the error and verify it matches the expected value. */
 		zassert_false(write_command(fixture, &get_error) < 0);
-		zassert_true(wait_for_cmd_to_process(fixture));
+		zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 		zassert_true(check_cci_matches(fixture, &complete_with_size));
 
 		zassert_false(read_command_result(fixture, (uint8_t *)&data,
@@ -1165,7 +1136,7 @@ ZTEST_USER_F(ppm_test, test_driver_to_ppm_error_map)
 		zassert_false(write_ack_command(fixture,
 						/*ci_ack*/ false,
 						/*cc_ack*/ true) < 0);
-		zassert_true(wait_for_cmd_to_process(fixture));
+		zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	}
 }
 
@@ -1211,7 +1182,7 @@ ZTEST_USER_F(ppm_test, test_simultaneous_lpm_alerts)
 	zassert_false(write_ack_command(fixture,
 					/*connector_change_ack*/ true,
 					/*command_complete_ack*/ false) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_true(wait_for_async_event_to_process(fixture));
 	zassert_true(wait_for_notification(fixture, ++notified_count));
 
@@ -1224,7 +1195,7 @@ ZTEST_USER_F(ppm_test, test_simultaneous_lpm_alerts)
 	zassert_false(write_ack_command(fixture,
 					/*connector_change_ack*/ true,
 					/*command_complete_ack*/ false) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	zassert_true(wait_for_async_event_to_process(fixture));
 
 	/* Invalid connector should not be seen after acking
@@ -1247,13 +1218,13 @@ ZTEST_USER_F(ppm_test, test_simultaneous_lpm_alerts)
 				      0x0, 0x0, 0x0 },
 	};
 	zassert_false(write_command(fixture, &control) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 	queue_command_for_fake_driver(fixture, UCSI_ACK_CC_CI,
 				      /*result=*/0, /*lpm_data=*/NULL);
 	zassert_false(write_ack_command(fixture,
 					/*connector_change_ack*/ false,
 					/*command_complete_ack*/ true) < 0);
-	zassert_true(wait_for_cmd_to_process(fixture));
+	zassert_true(ppm_wait_for_cmd_to_process(fixture->ppm_dev));
 
 	memset(&status_bits, 0, sizeof(status_bits));
 	status_bits.connect_change = 1;

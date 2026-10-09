@@ -11,10 +11,14 @@ charger_i2c: &i2c_smb_0 {
 	scl-gpios = <MCHP_GPIO_DECODE_004 GPIO_OPEN_DRAIN>;
 	sda-gpios = <MCHP_GPIO_DECODE_003 GPIO_OPEN_DRAIN>;
 
-
+	/*
+	 * Disabled due to memory (flash) overflow. This node is only
+	 * required for factory enablement; re-enable (status = "okay")
+	 * when the image size budget allows.
+	 */
 	cros_imvp: richtek-imvp@20 {
 		compatible = "richtek,rt3645";
-		status = "okay";
+		status = "disabled";
 		reg = <0x20>;
 	};
 };

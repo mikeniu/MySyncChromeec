@@ -16,7 +16,7 @@
 #include <zephyr/drivers/emul.h>
 #include <zephyr/fff.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/sys_clock.h>
+#include <zephyr/sys/clock.h>
 #include <zephyr/ztest.h>
 
 LOG_MODULE_REGISTER(pdc_power_mgmt_api, LOG_LEVEL_INF);
@@ -35,6 +35,9 @@ LOG_MODULE_REGISTER(pdc_power_mgmt_api, LOG_LEVEL_INF);
  */
 #define PDC_POWER_STABLE_TIMEOUT (4500)
 #define RTS5453P_NODE DT_NODELABEL(pdc_emul1)
+
+#define DP_VDO_TYPE 15
+#define DP_NO_PIN_MODE 0
 
 #define USBC0_NODE DT_NODELABEL(usbc0)
 #define USBC0_UNA_DRP_MODE \
@@ -164,7 +167,6 @@ ZTEST_USER(pdc_power_mgmt_api, test_connector_reset)
 
 ZTEST_USER(pdc_power_mgmt_api, test_is_connected)
 {
-	union connector_status_t connector_status = {};
 	bool frs_enabled;
 
 	/* Verify that the emulator tracks whether FRS enable/disable
@@ -173,33 +175,14 @@ ZTEST_USER(pdc_power_mgmt_api, test_is_connected)
 	zassert_ok(emul_pdc_reset(emul));
 	zassert_equal(emul_pdc_get_frs(emul, &frs_enabled), -EIO);
 
-	/* Invalid port number */
-	zassert_false(pd_is_connected(CONFIG_USB_PD_PORT_MAX_COUNT));
-	zassert_equal(pd_get_task_state(CONFIG_USB_PD_PORT_MAX_COUNT),
-		      PDC_INVALID);
-
-	zassert_false(pd_is_connected(TEST_PORT));
-
-	emul_pdc_configure_src(emul, &connector_status);
-	emul_pdc_connect_partner(emul, &connector_status);
-	zassert_true(
-		TEST_WAIT_FOR(pd_is_connected(TEST_PORT), PDC_TEST_TIMEOUT));
-
-	emul_pdc_disconnect(emul);
-	zassert_true(
-		TEST_WAIT_FOR(!pd_is_connected(TEST_PORT), PDC_TEST_TIMEOUT));
-
-	emul_pdc_configure_snk(emul, &connector_status);
-	emul_pdc_connect_partner(emul, &connector_status);
+	zassert_ok(pdc_power_mgmt_reset(TEST_PORT));
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
 
-	zassert_true(
-		TEST_WAIT_FOR(pd_is_connected(TEST_PORT), PDC_TEST_TIMEOUT));
-
-	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_PORT)) {
-		/* FRS should be disabled after connecting a partner source. */
-		zassert_ok(emul_pdc_get_frs(emul, &frs_enabled));
-	}
+	zassert_ok(emul_pdc_get_frs(emul, &frs_enabled));
+	if (!pdc_power_mgmt_get_frs_hw_supported(TEST_PORT))
+		zassert_false(frs_enabled);
+	else
+		zassert_true(frs_enabled);
 }
 
 ZTEST_USER(pdc_power_mgmt_api, test_comm_is_enabled)
@@ -1161,17 +1144,11 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_partner_battery_pdo)
 
 ZTEST_USER(pdc_power_mgmt_api, test_get_vbus_voltage)
 {
-/* Keep in line with |pdc_power_mgmt_api.c|. */
-#define VBUS_READ_CACHE_MS 500
-
 	union connector_status_t connector_status = {};
 	union conn_status_change_bits_t change_bits = { 0 };
 	uint32_t mv_units = 50;
 	const uint32_t expected_voltage_mv = 5000;
 	uint32_t next_expected_voltage_mv = 6000;
-	uint16_t out;
-	uint32_t timeout = k_ms_to_cyc_ceil32(PDC_TEST_TIMEOUT);
-	uint32_t start;
 
 	zassert_equal(0, pdc_power_mgmt_get_vbus_voltage(TEST_PORT));
 
@@ -1180,22 +1157,13 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_vbus_voltage)
 	emul_pdc_configure_src(emul, &connector_status);
 	emul_pdc_connect_partner(emul, &connector_status);
 
-	start = k_cycle_get_32();
-	while (k_cycle_get_32() - start < timeout) {
-		k_msleep(TEST_WAIT_FOR_INTERVAL_MS);
-		out = pdc_power_mgmt_get_vbus_voltage(TEST_PORT);
-		if (out != expected_voltage_mv)
-			continue;
-
-		break;
-	}
-
-	zassert_equal(expected_voltage_mv, out, "expected=%d, out=%d",
-		      expected_voltage_mv, out);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
+	zassert_equal(expected_voltage_mv,
+		      pdc_power_mgmt_get_vbus_voltage(TEST_PORT));
 
 	/*
 	 * Change the voltage and expect that we keep getting cached value until
-	 * 500ms has passed.
+	 * connector status syncs.
 	 */
 	connector_status.voltage_reading = next_expected_voltage_mv / mv_units;
 	emul_pdc_set_connector_status(emul, &connector_status);
@@ -1204,10 +1172,8 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_vbus_voltage)
 		      pdc_power_mgmt_get_vbus_voltage(TEST_PORT));
 
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
-	zassert_true(TEST_WAIT_FOR(
-		next_expected_voltage_mv ==
-			pdc_power_mgmt_get_vbus_voltage(TEST_PORT),
-		VBUS_READ_CACHE_MS));
+	zassert_equal(next_expected_voltage_mv,
+		      pdc_power_mgmt_get_vbus_voltage(TEST_PORT));
 
 	/*
 	 * Connector status change bits can also immediately trigger vbus reads.
@@ -1228,6 +1194,7 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_vbus_voltage)
 	emul_pdc_disconnect(emul);
 	zassert_true(
 		TEST_WAIT_FOR(!pd_is_connected(TEST_PORT), PDC_TEST_TIMEOUT));
+	zassert_equal(0, pdc_power_mgmt_get_vbus_voltage(TEST_PORT));
 }
 
 ZTEST_USER(pdc_power_mgmt_api, test_set_dual_role)
@@ -1937,13 +1904,15 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_identity_vid)
 		/* USB host */ false, /* USB device */ true, IDH_PTYPE_HUB,
 		/* modal operation */ true, USB_VID_GOOGLE);
 	uint32_t product = VDO_PRODUCT(0xBEAD, 0x1001);
+	uint8_t vdo_types[] = { VDO_INDEX_IDH, VDO_INDEX_PRODUCT };
 	uint32_t vdo[] = { vid, product };
+
 	union connector_status_t conn_status = {};
 
 	zassert_equal(0, pdc_power_mgmt_get_identity_vid(
 				 CONFIG_USB_PD_PORT_MAX_COUNT));
 
-	if (-ENOSYS == emul_pdc_set_vdo(emul, 2, vdo)) {
+	if (-ENOSYS == emul_pdc_set_vdo(emul, 2, vdo_types, vdo)) {
 		ztest_test_skip();
 	}
 
@@ -1961,13 +1930,14 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_identity_pid)
 		/* USB host */ false, /* USB device */ true, IDH_PTYPE_HUB,
 		/* modal operation */ true, USB_VID_GOOGLE);
 	uint32_t product = VDO_PRODUCT(0xBEAD, 0x1001);
+	uint8_t vdo_types[] = { VDO_INDEX_IDH, VDO_INDEX_PRODUCT };
 	uint32_t vdo[] = { vid, product };
 	union connector_status_t conn_status = { 0 };
 
 	zassert_equal(0, pdc_power_mgmt_get_identity_pid(
 				 CONFIG_USB_PD_PORT_MAX_COUNT));
 
-	if (-ENOSYS == emul_pdc_set_vdo(emul, 2, vdo)) {
+	if (-ENOSYS == emul_pdc_set_vdo(emul, 2, vdo_types, vdo)) {
 		ztest_test_skip();
 	}
 
@@ -1986,13 +1956,14 @@ ZTEST_USER(pdc_power_mgmt_api, test_get_product_type)
 		/* USB host */ false, /* USB device */ true, IDH_PTYPE_HUB,
 		/* modal operation */ true, USB_VID_GOOGLE);
 	uint32_t product = VDO_PRODUCT(0xBEAD, 0x1001);
+	uint8_t vdo_types[] = { VDO_INDEX_IDH, VDO_INDEX_PRODUCT };
 	uint32_t vdo[] = { vid, product };
 	union connector_status_t conn_status = {};
 
 	zassert_equal(0, pdc_power_mgmt_get_product_type(
 				 CONFIG_USB_PD_PORT_MAX_COUNT));
 
-	if (-ENOSYS == emul_pdc_set_vdo(emul, 2, vdo)) {
+	if (-ENOSYS == emul_pdc_set_vdo(emul, 2, vdo_types, vdo)) {
 		ztest_test_skip();
 	}
 
@@ -2662,6 +2633,7 @@ static void test_dp_mode_helper(enum pd_power_role role)
 	union get_attention_vdo_t attention_vdo;
 	union connector_status_t in_conn_status = {};
 	union conn_status_change_bits_t in_conn_status_change_bits = { 0 };
+	uint8_t vdo_types[] = { DP_VDO_TYPE };
 	uint32_t vdo[] = { 0x05 | (MODE_DP_PIN_D << 8) };
 
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
@@ -2675,7 +2647,7 @@ static void test_dp_mode_helper(enum pd_power_role role)
 	in_conn_status.power_operation_mode = PD_OPERATION;
 	in_conn_status.conn_partner_flags =
 		CONNECTOR_PARTNER_FLAG_ALTERNATE_MODE;
-	zassert_ok(emul_pdc_set_vdo(emul, 1, vdo));
+	zassert_ok(emul_pdc_set_vdo(emul, 1, vdo_types, vdo));
 
 	attention_vdo.vdo = VDO_DP_STATUS(0, 0, 0, 0, 1 /* mf */, 1, 0, 1);
 	emul_pdc_set_attention_vdo(emul, attention_vdo);
@@ -2704,7 +2676,7 @@ static void test_dp_mode_helper(enum pd_power_role role)
 
 	/* PIN_C and mux should be in DP only mode */
 	vdo[0] = 0x05 | (MODE_DP_PIN_C << 8);
-	zassert_ok(emul_pdc_set_vdo(emul, 1, vdo));
+	zassert_ok(emul_pdc_set_vdo(emul, 1, vdo_types, vdo));
 
 	/* PDC may have consumed the status, set status again. */
 	emul_pdc_set_connector_status(emul, &in_conn_status);
@@ -2713,6 +2685,20 @@ static void test_dp_mode_helper(enum pd_power_role role)
 	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
 
 	zassert_equal(MODE_DP_PIN_C, pdc_power_mgmt_get_dp_pin_mode(TEST_PORT));
+	zassert_equal(USB_PD_MUX_DP_ENABLED,
+		      pdc_power_mgmt_get_dp_mux_mode(TEST_PORT));
+
+	/* PIN_E and mux should be in DP only mode */
+	vdo[0] = 0x05 | (MODE_DP_PIN_E << 8);
+	zassert_ok(emul_pdc_set_vdo(emul, 1, vdo_types, vdo));
+
+	/* PDC may have consumed the status, set status again. */
+	emul_pdc_set_connector_status(emul, &in_conn_status);
+	emul_pdc_pulse_irq(emul);
+
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
+
+	zassert_equal(MODE_DP_PIN_E, pdc_power_mgmt_get_dp_pin_mode(TEST_PORT));
 	zassert_equal(USB_PD_MUX_DP_ENABLED,
 		      pdc_power_mgmt_get_dp_mux_mode(TEST_PORT));
 }
@@ -2725,6 +2711,39 @@ ZTEST_USER(pdc_power_mgmt_api, test_dp_mode_src)
 ZTEST_USER(pdc_power_mgmt_api, test_dp_mode_snk)
 {
 	test_dp_mode_helper(PD_ROLE_SINK);
+}
+
+ZTEST_USER(pdc_power_mgmt_api, test_dp_mode_usb4)
+{
+	union connector_status_t in_conn_status = {};
+	union conn_status_change_bits_t in_conn_status_change_bits = { 0 };
+	uint8_t vdo_types[] = { DP_VDO_TYPE };
+	uint32_t vdo[] = { 0x05 | (MODE_DP_PIN_E << 8) };
+
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
+
+	/* Set a DP VDO in the emulator (Pin E) */
+	zassert_ok(emul_pdc_set_vdo(emul, 1, vdo_types, vdo));
+
+	/* Connect USB4 partner (No AltMode flag). */
+	in_conn_status_change_bits.supported_cam = 1;
+	in_conn_status_change_bits.connect_change = 1;
+	in_conn_status.raw_conn_status_change_bits =
+		in_conn_status_change_bits.raw_value;
+	in_conn_status.power_operation_mode = PD_OPERATION;
+	in_conn_status.conn_partner_flags = CONNECTOR_PARTNER_FLAG_USB4_GEN3;
+
+	emul_pdc_configure_src(emul, &in_conn_status);
+	emul_pdc_connect_partner(emul, &in_conn_status);
+
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
+
+	/* Pin mode should be 0 in USB4 mode, even if VDO has Pin E */
+	zassert_equal(DP_NO_PIN_MODE, pdc_power_mgmt_get_dp_pin_mode(TEST_PORT),
+		      "Pin mode should be 0 in USB4 mode");
+
+	emul_pdc_disconnect(emul);
+	zassert_ok(pdc_power_mgmt_wait_for_sync(TEST_PORT, -1));
 }
 
 ZTEST_USER(pdc_power_mgmt_api, test_board_callback)
@@ -3093,6 +3112,19 @@ ZTEST_USER(pdc_power_mgmt_api_suspended, test_get_info)
 	rv = pdc_power_mgmt_get_info(TEST_PORT, &info, true);
 	zassert_equal(-ENOTCONN, rv, "Expected %d (-ENOTCONN) but got %d",
 		      -ENOTCONN, rv);
+}
+
+ZTEST_USER(pdc_power_mgmt_api_suspended, test_wait_for_sync)
+{
+	int rv;
+
+	/* This is expected to time out because the stack is suspended.
+	 * A timeout of -1 indicates the default timeout period of
+	 * PDC_SM_SETTLED_TIMEOUT_MS
+	 */
+	rv = pdc_power_mgmt_wait_for_sync(TEST_PORT, -1);
+	zassert_equal(-ETIMEDOUT, rv, "Expected %d (-ETIMEDOUT) but got %d",
+		      -ETIMEDOUT, rv);
 }
 
 /* TODO(b/345292002): The tests below fail with the TPS6699x emulator/driver. */

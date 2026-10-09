@@ -5,8 +5,8 @@
  * Keyboard protocol interface
  */
 
-#ifndef __CROS_EC_KEYBOARD_PROTOCOL_H
-#define __CROS_EC_KEYBOARD_PROTOCOL_H
+#ifndef PLATFORM_EC_INCLUDE_KEYBOARD_PROTOCOL_H_
+#define PLATFORM_EC_INCLUDE_KEYBOARD_PROTOCOL_H_
 
 #include "button.h"
 #include "common.h"
@@ -90,4 +90,4 @@ board_vivaldi_keybd_config(void);
 }
 #endif
 
-#endif /* __CROS_EC_KEYBOARD_PROTOCOL_H */
+#endif /* PLATFORM_EC_INCLUDE_KEYBOARD_PROTOCOL_H_ */

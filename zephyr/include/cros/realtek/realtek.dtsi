@@ -7,7 +7,6 @@
 
 / {
 	chosen {
-		cros-ec,cros-system = &cros_system;
 		cros-ec,bbram = &bbram;
 		cros-ec,espi = &espi0;
 		cros-ec,flash = &eflash;
@@ -16,11 +15,6 @@
 		cros-ec,watchdog-helper = &wdt_counter;
 		cros-ec,sha= &sha0;
     };
-
-	cros_system: cros-system {
-		compatible = "cros-ec,cros-system";
-	};
-
 	soc {
 		fiu0: cros-flash {
 			compatible = "realtek,rtk-cros-flash";
@@ -37,11 +31,11 @@
 		compatible = "named-bbram-regions";
 
 		scratchpad {
-			offset = <0x08>;
+			offset = <0x00>;
 			size = <0x04>;
 		};
 		saved-reset-flags {
-			offset = <0x00>;
+			offset = <0x04>;
 			size = <0x04>;
 		};
 		wake {
@@ -49,11 +43,11 @@
 			size = <0x04>;
 		};
 		pd0 {
-			offset = <0x04>;
+			offset = <0x0c>;
 			size = <0x01>;
 		};
 		pd1 {
-			offset = <0x05>;
+			offset = <0x0d>;
 			size = <0x01>;
 		};
 		try_slot {
@@ -61,16 +55,36 @@
 			size = <0x01>;
 		};
 		pd2 {
-			offset = <0x06>;
+			offset = <0x0f>;
 			size = <0x01>;
 		};
 		wp-at-boot {
-			offset = <0x07>;
+			offset = <0x10>;
+			size = <0x04>;
+		};
+		chg_limit_lower: chg-limit-lower {
+			offset = <0x14>;
+			size = <0x01>;
+		};
+		chg_limit_upper: chg-limit-upper {
+			offset = <0x15>;
+			size = <0x01>;
+		};
+		chg_limit_flags: chg-limit-flags {
+			offset = <0x16>;
 			size = <0x01>;
 		};
 		key {
 			offset = <0x80>;
-			size = <0x01>;
+			size = <0x04>;
+		};
+		key-rev {
+			offset = <0x84>;
+			size = <0x04>;
+		};
+		board-batt-keep {
+			offset = <0x88>;
+			size = <0x04>;
 		};
 	};
 };

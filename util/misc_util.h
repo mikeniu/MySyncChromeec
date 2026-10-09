@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __UTIL_MISC_UTIL_H
-#define __UTIL_MISC_UTIL_H
+#ifndef PLATFORM_EC_UTIL_MISC_UTIL_H_
+#define PLATFORM_EC_UTIL_MISC_UTIL_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -107,4 +107,4 @@ int kernel_version_ge(int major, int minor, int sublevel);
  */
 void hexdump_canonical(const uint8_t *data, size_t len, uint32_t offset_start);
 
-#endif
+#endif /* PLATFORM_EC_UTIL_MISC_UTIL_H_ */

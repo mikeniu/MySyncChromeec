@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef ZEPHYR_TEST_NISSA_INCLUDE_CRAASK_H_
-#define ZEPHYR_TEST_NISSA_INCLUDE_CRAASK_H_
+#ifndef PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_CRAASK_H_
+#define PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_CRAASK_H_
 
 #include "ec_commands.h"
 
@@ -22,4 +22,4 @@ void alt_sensor_init(void);
 void fan_init(void);
 void thermal_init(void);
 
-#endif /* ZEPHYR_TEST_NISSA_INCLUDE_CRAASK_H_ */
+#endif /* PLATFORM_EC_ZEPHYR_TEST_NISSA_INCLUDE_CRAASK_H_ */

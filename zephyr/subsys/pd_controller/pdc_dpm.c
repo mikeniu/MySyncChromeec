@@ -3,11 +3,18 @@
  * found in the LICENSE file.
  */
 
+#include "battery.h"
+#include "charge_state.h"
+#include "extpower.h"
+#include "hooks.h"
 #include "usb_pd.h"
+#include "usbc/pdc_dpm.h"
 #include "usbc/pdc_power_mgmt.h"
 
 #include <zephyr/device.h>
+#include <zephyr/init.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/atomic.h>
 
 #include <drivers/pdc.h>
 #include <usbc/utils.h>
@@ -38,12 +45,23 @@ static atomic_t source_frs_max_requested;
 /* Ports with non-PD sinks, so current requirements are unknown */
 static atomic_t non_pd_sink_max_requested;
 
+int pdc_dpm_get_source_current(const int port);
+
 static void pdc_dpm_balance_source_ports(struct k_work *work);
 static K_WORK_DELAYABLE_DEFINE(dpm_work, pdc_dpm_balance_source_ports);
 
 static K_MUTEX_DEFINE(max_current_claimed_mtx);
 
 #define LOWEST_PORT(p) __builtin_ctz(p) /* Undefined behavior if p == 0 */
+
+#ifdef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING
+#define OVERLOAD_DEBOUNCE_SECONDS 3
+#define OVERLOAD_CURRENT_THRESHOLD_MA 3000
+#define BATTERY_IS_GOOD 0
+#define BATTERY_IS_OVERLOADED 1
+static atomic_t overload_status = ATOMIC_INIT(BATTERY_IS_GOOD);
+static atomic_t overload_counter = ATOMIC_INIT(0);
+#endif
 
 static int count_port_bits(uint32_t bitmask)
 {
@@ -98,6 +116,12 @@ static void pdc_dpm_balance_source_ports(struct k_work *work)
 		removed_ports &= ~BIT(removed_port);
 	}
 
+#ifdef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING
+	if (atomic_get(&overload_status) == BATTERY_IS_OVERLOADED) {
+		goto unlock;
+	}
+#endif
+
 	/* Allocate 3.0 A to new PD sink ports that need it */
 	new_ports = sink_max_pdo_requested & ~max_current_claimed;
 
@@ -109,6 +133,9 @@ static void pdc_dpm_balance_source_ports(struct k_work *work)
 			max_current_claimed |= BIT(new_max_port);
 			pdc_power_mgmt_set_current_limit(new_max_port,
 							 TC_CURRENT_3_0A);
+			if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED))
+				pdc_dpm_tbt_check_reset(new_max_port);
+
 		} else if (non_pd_sink_max_requested & max_current_claimed) {
 			/* Always downgrade non-PD ports first */
 			int rem_non_pd = LOWEST_PORT(non_pd_sink_max_requested &
@@ -127,7 +154,6 @@ static void pdc_dpm_balance_source_ports(struct k_work *work)
 			int rem_frs = LOWEST_PORT(source_frs_max_requested &
 						  max_current_claimed);
 
-			pdc_power_mgmt_frs_enable(rem_frs, false);
 			rp = pdc_power_mgmt_get_default_current_limit(rem_frs);
 			pdc_power_mgmt_set_current_limit(rem_frs, rp);
 			max_current_claimed &= ~BIT(rem_frs);
@@ -150,8 +176,7 @@ static void pdc_dpm_balance_source_ports(struct k_work *work)
 		if (count_port_bits(max_current_claimed) <
 		    pd_get_usb_pd_3a_ports()) {
 			max_current_claimed |= BIT(new_frs_port);
-			/* Enable FRS for this port */
-			pdc_power_mgmt_frs_enable(new_frs_port, true);
+			/* Allocate 3A for this port */
 			pdc_power_mgmt_set_current_limit(new_frs_port,
 							 TC_CURRENT_3_0A);
 		} else if (non_pd_sink_max_requested & max_current_claimed) {
@@ -212,6 +237,8 @@ void pdc_dpm_eval_sink_fixed_pdo(int port, uint32_t vsafe5v_pdo)
 			return;
 
 		atomic_set_bit(&sink_max_pdo_requested, port);
+		if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED))
+			pdc_dpm_tbt_eval_sink_pdo(port, vsafe5v_pdo);
 	} else {
 		int frs_current = vsafe5v_pdo & PDO_FIXED_FRS_CURR_MASK;
 
@@ -227,17 +254,15 @@ void pdc_dpm_eval_sink_fixed_pdo(int port, uint32_t vsafe5v_pdo)
 		/* FRS is only supported in PD 3.0 and higher */
 		if (pdc_power_mgmt_get_rev(port, TCPCI_MSG_SOP) == PD_REV20) {
 			atomic_clear_bit(&source_frs_max_requested, port);
-			pdc_power_mgmt_frs_enable(port, false);
 			goto balance;
 		}
 
 		if ((vsafe5v_pdo & PDO_FIXED_DUAL_ROLE) && frs_current) {
-			/* Always enable FRS when 3.0 A is not needed */
+			/* Clear FRS request when 3.0 A is not needed */
 			if (frs_current == PDO_FIXED_FRS_CURR_DFLT_USB_POWER ||
 			    frs_current == PDO_FIXED_FRS_CURR_1A5_AT_5V) {
 				atomic_clear_bit(&source_frs_max_requested,
 						 port);
-				pdc_power_mgmt_frs_enable(port, true);
 				goto balance;
 			}
 
@@ -247,25 +272,10 @@ void pdc_dpm_eval_sink_fixed_pdo(int port, uint32_t vsafe5v_pdo)
 			atomic_set_bit(&source_frs_max_requested, port);
 		} else {
 			atomic_clear_bit(&source_frs_max_requested, port);
-			pdc_power_mgmt_frs_enable(port, false);
 		}
 	}
 
 balance:
-	pdc_dpm_balance_source_ports(&dpm_work.work);
-}
-
-void pdc_dpm_add_pd_source(int port)
-{
-	/* The PDC DPM will attempt to enable FRS early while evaluating Snk
-	 * Caps. If 3A is not available, the DPM will not enable FRS until it
-	 * can confirm 3A is not required. It can take longer to enable FRS on
-	 * platforms which don't source 3A.
-	 */
-	if (pd_get_usb_pd_3a_ports() == 0)
-		return;
-
-	atomic_set_bit(&source_frs_max_requested, port);
 	pdc_dpm_balance_source_ports(&dpm_work.work);
 }
 
@@ -278,9 +288,63 @@ void pdc_dpm_add_non_pd_sink(int port)
 	pdc_dpm_balance_source_ports(&dpm_work.work);
 }
 
+#ifdef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING
+
+/*
+ * Latching behavior: Once an overload is detected, Type-C source limits are
+ * throttled to 1.5A and latched. To prevent ping-pong oscillation, the 3A
+ * capacity is ONLY restored upon physical sink removal or connection of AC
+ * power.
+ */
+
+static void pdc_dpm_restore_work_handler(struct k_work *work);
+static K_WORK_DEFINE(restore_work, pdc_dpm_restore_work_handler);
+
+static void pdc_dpm_throttle_work_handler(struct k_work *work);
+static K_WORK_DEFINE(throttle_work, pdc_dpm_throttle_work_handler);
+
+static void pdc_dpm_restore_work_handler(struct k_work *work)
+{
+	int i;
+
+	pdc_dpm_balance_source_ports(&dpm_work.work);
+	for (i = 0; i < pdc_power_mgmt_get_usb_pd_port_count(); i++) {
+		pdc_power_mgmt_set_new_power_request(i);
+	}
+}
+
+static void pdc_dpm_throttle_work_handler(struct k_work *work)
+{
+	int i;
+
+	k_mutex_lock(&max_current_claimed_mtx, K_FOREVER);
+	max_current_claimed = 0;
+	k_mutex_unlock(&max_current_claimed_mtx);
+	for (i = 0; i < pdc_power_mgmt_get_usb_pd_port_count(); i++) {
+		pdc_power_mgmt_set_current_limit(i, TC_CURRENT_1_5A);
+		pdc_power_mgmt_set_new_power_request(i);
+	}
+}
+
+static void pdc_dpm_clear_battery_overload(int port)
+{
+	if (atomic_cas(&overload_status, BATTERY_IS_OVERLOADED,
+		       BATTERY_IS_GOOD)) {
+		atomic_set(&overload_counter, 0);
+		LOG_INF("Battery overload resolved: Port %d removed, restoring 3A capacity.",
+			port);
+		k_work_submit(&restore_work);
+	}
+}
+#endif
+
 void pdc_dpm_remove_sink(int port)
 {
 	enum usb_typec_current_t rp;
+
+#ifdef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING
+	pdc_dpm_clear_battery_overload(port);
+#endif
 
 	if (pd_get_usb_pd_3a_ports() == 0)
 		return;
@@ -291,6 +355,8 @@ void pdc_dpm_remove_sink(int port)
 
 	atomic_clear_bit(&sink_max_pdo_requested, port);
 	atomic_clear_bit(&non_pd_sink_max_requested, port);
+	if (IS_ENABLED(CONFIG_USBC_PDC_TBT_SUPPORTED))
+		pdc_dpm_tbt_clear_port(port);
 
 	/* Restore selected default Rp on the port */
 	rp = pdc_power_mgmt_get_default_current_limit(port);
@@ -325,6 +391,10 @@ int pdc_dpm_get_source_current(const int port)
 		return 0;
 	}
 
+	if (pd_get_usb_pd_3a_ports() == 0) {
+		return 1500;
+	}
+
 	if (max_current_claimed & BIT(port)) {
 		return 3000;
 	}
@@ -334,3 +404,86 @@ int pdc_dpm_get_source_current(const int port)
 	 */
 	return 1500;
 }
+
+#ifdef CONFIG_PDC_POWER_MGMT_SRC_THROTTLING
+
+BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(usbc_port_policy) == 1,
+	     "Exactly one instance of usbc-port-policy should be defined");
+
+static const int sys_max_i =
+	DT_PROP_OR(DT_COMPAT_GET_ANY_STATUS_OKAY(usbc_port_policy),
+		   max_discharge_current_ma, 0);
+
+static const int sys_max_p =
+	DT_PROP_OR(DT_COMPAT_GET_ANY_STATUS_OKAY(usbc_port_policy),
+		   max_discharge_power_mw, 0);
+
+static void pdc_dpm_unattached_cb(int port)
+{
+	pdc_dpm_clear_battery_overload(port);
+}
+
+static int pdc_battery_overload_init(void)
+{
+	/*
+	 * Register UNATTACH callback to handle devices that fail PD
+	 * negotiation. Without this, failed-PD detachments bypass the DPM's
+	 * remove_sink/source paths, causing the port to remain locked at 1.5A.
+	 */
+	pdc_power_mgmt_register_board_callback(
+		PDC_BOARD_CB_UNATTACH, (const void *)pdc_dpm_unattached_cb);
+	return 0;
+}
+SYS_INIT(pdc_battery_overload_init, APPLICATION,
+	 CONFIG_APPLICATION_INIT_PRIORITY);
+
+static void pdc_monitor_battery_overload(void)
+{
+	const struct batt_params *batt;
+	int discharging_current_ma = 0;
+	int discharging_power_mw = 0;
+
+	if (sys_max_i == 0 && sys_max_p == 0) {
+		return;
+	}
+
+	if (extpower_is_present()) {
+		atomic_set(&overload_counter, 0);
+		if (atomic_cas(&overload_status, BATTERY_IS_OVERLOADED,
+			       BATTERY_IS_GOOD)) {
+			LOG_INF("AC power connected, restoring 3A capacity.");
+			k_work_submit(&restore_work);
+		}
+		return;
+	}
+
+	batt = charger_current_battery_params();
+	if (batt->flags & (BATT_FLAG_BAD_CURRENT | BATT_FLAG_BAD_VOLTAGE)) {
+		return;
+	}
+
+	discharging_current_ma = batt->current < 0 ? -batt->current :
+						     batt->current;
+	discharging_power_mw =
+		(int)(((int64_t)discharging_current_ma * batt->voltage) / 1000);
+
+	if ((sys_max_i > 0 && discharging_current_ma > sys_max_i) ||
+	    (sys_max_p > 0 && discharging_power_mw > sys_max_p)) {
+		if (atomic_get(&overload_counter) < OVERLOAD_DEBOUNCE_SECONDS) {
+			atomic_inc(&overload_counter);
+		}
+		if (atomic_get(&overload_counter) >=
+		    OVERLOAD_DEBOUNCE_SECONDS) {
+			if (atomic_cas(&overload_status, BATTERY_IS_GOOD,
+				       BATTERY_IS_OVERLOADED)) {
+				LOG_WRN("Battery overload detected! Throttling source capacity.");
+				k_work_submit(&throttle_work);
+			}
+		}
+	} else {
+		atomic_set(&overload_counter, 0);
+	}
+}
+DECLARE_HOOK(HOOK_SECOND, pdc_monitor_battery_overload, HOOK_PRIO_DEFAULT);
+
+#endif /* CONFIG_PDC_POWER_MGMT_SRC_THROTTLING */

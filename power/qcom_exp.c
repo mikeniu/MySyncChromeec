@@ -26,6 +26,7 @@
 #include "builtin/assert.h"
 #include "chipset.h"
 #include "common.h"
+#include "ec_commands.h"
 #include "extpower.h"
 #include "gpio.h"
 #include "hooks.h"
@@ -115,7 +116,7 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 #define SWITCHCAP_PG_CHECK_WAIT (6 * MSEC)
 
 /* The timeout of the check if the switchcap outputs reset voltage */
-#define SWITCHCAP_RESET_TIMEOUT (2000 * MSEC)
+#define SWITCHCAP_RESET_TIMEOUT (200 * MSEC)
 
 /* Wait for polling if the switchcap outputs reset voltage */
 #define SWITCHCAP_RESET_CHECK_WAIT (6 * MSEC)
@@ -152,11 +153,23 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 #define AP_RST_TRANSITION_TIMEOUT (450 * MSEC)
 
 /*
+ * The timeout of waiting for PMIC to assert AP_RST_L during warm reset.
+ * Observed that the worst case is ~1.1s. Pick a safe value.
+ */
+#define PMIC_WARM_RESET_AP_RST_TIMEOUT (1500 * MSEC)
+
+/*
  * Duration to disable the AC_PRESENT interrupt to ignore the
  * spurious toggle from the switchcap turning on/off.
  * Based on o-scope measurements showing a ~500ms event.
  */
 #define AC_IRQ_DISABLE_DURATION (2000 * MSEC)
+
+/*
+ * Delay after POWER_GOOD drops during a PSCI hard reset to allow POWER_GOOD
+ * to recover before treating it as a PSCI shutdown.
+ */
+#define HARD_RESET_POWER_GOOD_LOST_DELAY (200 * MSEC)
 
 /* Heartbeat wake interval (45 minutes) */
 #define HEARTBEAT_WAKE_INTERVAL_SEC (45 * 60)
@@ -177,6 +190,25 @@ BUILD_ASSERT(ARRAY_SIZE(power_signal_list) == POWER_SIGNAL_COUNT);
 /* 1 if the power button was pressed last time we checked */
 static char power_button_was_pressed;
 
+#ifdef CONFIG_POWER_BUTTON
+/* 1 if we should ignore the first power button release */
+static char power_button_eat_release;
+#endif
+
+#ifdef CONFIG_POWER_BUTTON
+/**
+ * Check if the power button release should be ignored.
+ */
+int power_button_is_eating_release(void)
+{
+	int ret = power_button_eat_release;
+
+	if (ret)
+		power_button_eat_release = 0;
+
+	return ret;
+}
+#endif
 /* 1 if lid-open event has been detected */
 static char lid_opened;
 
@@ -189,6 +221,12 @@ static char rtc_wake;
 /* Time where we will power off, if power button still held down */
 static timestamp_t power_off_deadline;
 
+static void power_button_timer_deferred(void)
+{
+	task_wake(TASK_ID_CHIPSET);
+}
+DECLARE_DEFERRED(power_button_timer_deferred);
+
 /* Force AP power on (used for recovery keypress) */
 static int auto_power_on;
 
@@ -200,6 +238,9 @@ static char long_warm_reset;
  *  This variable is initialized to 0 i.e. POWER_G3
  */
 static enum power_state power_state_before_warm_reset;
+
+/* Deadline to check if POWER_GOOD is lost or just transient drop */
+static timestamp_t power_good_lost_deadline;
 
 enum power_request_t {
 	POWER_REQ_NONE,
@@ -226,6 +267,12 @@ static enum power_on_event_t power_on_reason;
 enum power_on_event_t chipset_get_power_on_reason(void)
 {
 	return power_on_reason;
+}
+
+int chipset_is_offmode_charging_wake(void)
+{
+	return (power_on_reason == POWER_ON_BY_AC_ON ||
+		power_on_reason == POWER_ON_BY_RTC_ALARM);
 }
 
 /**
@@ -293,7 +340,6 @@ void chipset_ap_rst_interrupt(enum gpio_signal signal)
 static void lid_event(void)
 {
 #ifdef CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
-	/* TODO: b/429110767 Add unit test to check for race condition */
 	if (!chipset_in_state(CHIPSET_STATE_HARD_OFF))
 		passthru_lid_open_to_pmic();
 #endif
@@ -314,10 +360,6 @@ DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, powerbtn_changed, HOOK_PRIO_DEFAULT);
 
 static void power_ac_changed(void)
 {
-	/* Power task only cares when the external power is connected */
-	if (!extpower_is_present())
-		return;
-
 	ac_on = 1;
 
 	task_wake(TASK_ID_CHIPSET);
@@ -349,18 +391,19 @@ void rtc_callback(const struct device *dev)
 }
 #endif
 
-static enum ec_status
-host_command_offmode_charing_active(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+host_command_offmode_charing_active(struct ec_host_cmd_handler_args *args)
 {
 	/*
 	 * Set the flag to indicate we are entering the off-mode charging state.
 	 */
 	heartbeat_mode = 1;
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_ENABLE_OFFMODE_HEARTBEAT,
-		     host_command_offmode_charing_active, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_UNBOUND(EC_CMD_ENABLE_OFFMODE_HEARTBEAT,
+			    host_command_offmode_charing_active,
+			    EC_VER_MASK(0));
 
 /*
  * On chipset shutdown complete, determine the next wake-up event.
@@ -537,6 +580,12 @@ static void sys_rst_timer_expired(void)
 }
 DECLARE_DEFERRED(sys_rst_timer_expired);
 
+static void power_good_lost_expired(void)
+{
+	task_wake(TASK_ID_CHIPSET);
+}
+DECLARE_DEFERRED(power_good_lost_expired);
+
 void chipset_sys_rst_interrupt(enum gpio_signal signal)
 {
 	/*
@@ -669,6 +718,21 @@ static int set_system_power(int enable)
  *
  * @return EC_SUCCESS or error
  */
+static void apply_ac_pon_trigger(void)
+{
+#ifdef CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
+	passthru_ac_on_to_pmic();
+#endif
+}
+
+static void clear_ac_pon_trigger(void)
+{
+#ifdef CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET))
+		reset_ac_passthru_pmic_signal();
+#endif
+}
+
 static int set_pmic_pwron(int enable, uint8_t event)
 {
 	int ret;
@@ -705,8 +769,9 @@ static int set_pmic_pwron(int enable, uint8_t event)
 
 	if (enable &&
 	    (event == POWER_ON_BY_AC_ON || event == POWER_ON_BY_RTC_ALARM)) {
-		passthru_ac_on_to_pmic();
+		apply_ac_pon_trigger();
 		ret = wait_pmic_pwron(enable, PMIC_POWER_AP_RESPONSE_TIMEOUT);
+		clear_ac_pon_trigger();
 	} else {
 		gpio_set_level(GPIO_PMIC_KPD_PWR, 1);
 		if (!enable)
@@ -769,26 +834,6 @@ enum power_state power_chipset_init(void)
 	} else if (!(reset_flags & EC_RESET_FLAG_EFS) &&
 		   (reset_flags & EC_RESET_FLAG_SYSJUMP)) {
 		auto_power_on = 0;
-	} else if ((reset_flags & EC_RESET_FLAG_HIBERNATE)) {
-		/*
-		 * When exiting from hibernate, check the wake source. If it
-		 * was AC, we need to set ac_on = 1 so that the subsequent
-		 * power-on sequence uses POWER_ON_BY_AC_ON. This informs the
-		 * AP firmware that it was powered on by a cable insertion
-		 * (CBLPWR).
-		 */
-
-		/* b:431715716: Justification for using CONFIG_ZEPHYR in legacy
-		 * ec code, this power sequence flow will be ported to zephyr
-		 * ap-pwrseq driver.
-		 */
-		enum hibernate_wake_source wake_source;
-
-		if (system_get_hibernate_wake_source(&wake_source) == 0 &&
-		    wake_source == WAKE_SOURCE_ACOK) {
-			ac_on = 1;
-			auto_power_on = 0;
-		}
 	}
 
 	if (auto_power_on) {
@@ -796,6 +841,15 @@ enum power_state power_chipset_init(void)
 	} else {
 		CPRINTS("auto_power_on disabled");
 	}
+
+#ifdef CONFIG_POWER_BUTTON
+	/*
+	 * Since we can't detect if a power button was already pressed before
+	 * the EC booted, we assume the first release event should be ignored
+	 * if the button is still pressed when we initialize.
+	 */
+	power_button_eat_release = 1;
+#endif
 
 	return init_power_state;
 }
@@ -845,6 +899,11 @@ static void power_off_seq(uint8_t shutdown_event)
 
 	lid_opened = 0;
 	ac_on = 0;
+
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET)) {
+		power_good_lost_deadline.val = 0;
+		hook_call_deferred(&power_good_lost_expired_data, -1);
+	}
 }
 
 /**
@@ -876,9 +935,16 @@ static int power_on_seq(uint8_t poweron_event)
 	}
 
 	CPRINTS("POWER_GOOD seen");
-	/* if power-on is a success passthru the signals again */
-	passthru_ac_on_to_pmic();
+#ifdef CONFIG_PLATFORM_EC_PMIC_PASSTHRU_POWER_SIGNALS
+	/*
+	 * If power-on is a success, pass through lid open. When
+	 * SUPPORT_HARD_RESET is enabled, do not re-assert AC passthru to
+	 * avoid a persistent PON trigger state during S0.
+	 */
+	if (!IS_ENABLED(CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET))
+		passthru_ac_on_to_pmic();
 	passthru_lid_open_to_pmic();
+#endif
 
 	return EC_SUCCESS;
 }
@@ -904,6 +970,9 @@ static uint8_t check_for_power_on_event(void)
 	} else if (auto_power_on) {
 		/* power on requested at EC startup for recovery */
 		ret = POWER_ON_BY_AUTO_POWER_ON;
+	} else if (power_button_is_pressed()) {
+		/* check for power button press */
+		ret = POWER_ON_BY_POWER_BUTTON_PRESSED;
 	} else if (lid_opened) {
 		/* check lid open */
 		ret = POWER_ON_BY_LID_OPEN;
@@ -913,12 +982,17 @@ static uint8_t check_for_power_on_event(void)
 	} else if (rtc_wake) {
 		/* check for RTC alarm wake */
 		ret = POWER_ON_BY_RTC_ALARM;
-	} else if (power_button_is_pressed()) {
-		/* check for power button press */
-		ret = POWER_ON_BY_POWER_BUTTON_PRESSED;
 	} else {
 		ret = POWER_ON_CANCEL;
 	}
+#ifdef CONFIG_POWER_BUTTON
+	/*
+	 * If the power button is not pressed at this point, we can
+	 * stop trying to ignore the next release event.
+	 */
+	if (!power_button_is_pressed())
+		power_button_eat_release = 0;
+#endif
 
 	/* The flags are handled above. Clear them all. */
 	power_request = POWER_REQ_NONE;
@@ -943,6 +1017,15 @@ static uint8_t check_for_power_off_event(void)
 {
 	timestamp_t now;
 	int pressed = 0;
+
+#ifdef CONFIG_POWER_BUTTON
+	/*
+	 * If the power button is not pressed at this point, we can
+	 * stop trying to ignore the next release event.
+	 */
+	if (!power_button_is_pressed())
+		power_button_eat_release = 0;
+#endif
 
 	if (power_request == POWER_REQ_OFF) {
 		power_request = POWER_REQ_NONE;
@@ -976,7 +1059,8 @@ static uint8_t check_for_power_off_event(void)
 			CPRINTS("power waiting for long press %u",
 				power_off_deadline.le.lo);
 			/* Ensure we will wake up to check the power key */
-			timer_arm(power_off_deadline, TASK_ID_CHIPSET);
+			hook_call_deferred(&power_button_timer_deferred_data,
+					   DELAY_FORCE_SHUTDOWN);
 		} else if (timestamp_expired(power_off_deadline, &now)) {
 			power_off_deadline.val = 0;
 			CPRINTS("power off after long press now=%u, %u",
@@ -985,15 +1069,47 @@ static uint8_t check_for_power_off_event(void)
 		}
 	} else if (power_button_was_pressed) {
 		CPRINTS("power off cancel");
-		timer_cancel(TASK_ID_CHIPSET);
+		hook_call_deferred(&power_button_timer_deferred_data, -1);
 	}
 
 	power_button_was_pressed = pressed;
 
-	/* POWER_GOOD released by AP : shutdown immediately */
-	if (!power_has_signals(IN_POWER_GOOD)) {
-		CPRINTS("POWER_GOOD is lost");
-		return POWER_OFF_BY_POWER_GOOD_LOST;
+	if (IS_ENABLED(CONFIG_PLATFORM_EC_SUPPORT_HARD_RESET)) {
+		/*
+		 * POWER_GOOD released by AP: wait to distinguish between
+		 * a PSCI shutdown and a PSCI hard reset.
+		 */
+		if (!power_has_signals(IN_POWER_GOOD)) {
+			if (power_good_lost_deadline.val == 0) {
+				power_good_lost_deadline.val =
+					now.val +
+					HARD_RESET_POWER_GOOD_LOST_DELAY;
+				CPRINTS("POWER_GOOD lost, waiting %dms",
+					HARD_RESET_POWER_GOOD_LOST_DELAY /
+						MSEC);
+				hook_call_deferred(
+					&power_good_lost_expired_data,
+					HARD_RESET_POWER_GOOD_LOST_DELAY);
+			} else if (timestamp_expired(power_good_lost_deadline,
+						     &now)) {
+				power_good_lost_deadline.val = 0;
+				CPRINTS("POWER_GOOD is lost (timeout)");
+				return POWER_OFF_BY_POWER_GOOD_LOST;
+			}
+		} else {
+			if (power_good_lost_deadline.val != 0) {
+				CPRINTS("POWER_GOOD recovered");
+				power_good_lost_deadline.val = 0;
+				hook_call_deferred(
+					&power_good_lost_expired_data, -1);
+			}
+		}
+	} else {
+		/* POWER_GOOD released by AP : shutdown immediately */
+		if (!power_has_signals(IN_POWER_GOOD)) {
+			CPRINTS("POWER_GOOD is lost");
+			return POWER_OFF_BY_POWER_GOOD_LOST;
+		}
 	}
 
 	return POWER_OFF_CANCEL;
@@ -1009,7 +1125,7 @@ static uint8_t check_for_power_off_event(void)
 static inline void cancel_power_button_timer(void)
 {
 	if (power_button_was_pressed)
-		timer_cancel(TASK_ID_CHIPSET);
+		hook_call_deferred(&power_button_timer_deferred_data, -1);
 }
 
 /*****************************************************************************/
@@ -1040,6 +1156,7 @@ test_mockable void chipset_power_on(void)
  */
 static int warm_reset_seq(void)
 {
+#ifdef CONFIG_PLATFORM_EC_POWERSEQ_QC_EXP_WARM_RESET
 	int rv;
 
 	/*
@@ -1061,7 +1178,7 @@ static int warm_reset_seq(void)
 
 	/* Check that the PMIC asserts PON_RESET_N*/
 	rv = power_wait_signals_timeout(IN_AP_RST_ASSERTED,
-					PMIC_POWER_AP_RESPONSE_TIMEOUT);
+					PMIC_WARM_RESET_AP_RST_TIMEOUT);
 
 	/* Exception case: PMIC not work as expected, request a cold reset */
 	if (rv != EC_SUCCESS)
@@ -1076,6 +1193,10 @@ static int warm_reset_seq(void)
 		return rv;
 
 	return EC_SUCCESS;
+#else
+	CPRINTS("Warm reset is disabled, falling back to cold reset");
+	return EC_ERROR_UNKNOWN;
+#endif
 }
 
 /**
@@ -1197,13 +1318,6 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 	 * is performed during the G3 to S5 transition.
 	 */
 	case POWER_G3S5:
-		/*
-		 * The boot process is delayed until the power button is
-		 * released. This prevents the application processor from
-		 * powering on during a long-hold of the power and volume
-		 * buttons, which is often used to trigger recovery mode.
-		 */
-		power_button_wait_for_release(-1);
 
 		/* Initialize components to ready state before AP is up. */
 		hook_notify(HOOK_CHIPSET_PRE_INIT);
@@ -1223,6 +1337,12 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		 * path to S0 to handle any reset conditions.
 		 */
 		power_reset_host_sleep_state();
+
+		if (chipset_is_offmode_charging_wake()) {
+			power_set_s5_inactivity_timer_enable(0);
+		} else {
+			power_set_s5_inactivity_timer_enable(1);
+		}
 		return POWER_S5;
 
 	case POWER_S5:
@@ -1232,6 +1352,15 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		if (shutdown_from_on) {
 			CPRINTS("power off %d", shutdown_from_on);
 			return POWER_S5G3;
+		}
+
+		/*
+		 * Gate the transition to S3/S0 if we are in off-mode charging,
+		 * maintaining the logical S5 state to avoid running normal S0
+		 * indicators.
+		 */
+		if (chipset_is_offmode_charging_wake()) {
+			break;
 		}
 
 		return POWER_S5S3;
@@ -1331,6 +1460,7 @@ test_mockable enum power_state power_handle_state(enum power_state state)
 		return POWER_S5;
 
 	case POWER_S5G3:
+		power_set_s5_inactivity_timer_enable(1);
 		cancel_power_button_timer();
 
 		/* Call hooks before we drop power rails */
@@ -1383,6 +1513,39 @@ static const char *const state_name[] = {
 	"off",
 	"on",
 };
+
+#ifdef CONFIG_HOSTCMD_AP_RESET_SCHEDULED
+static void ap_reset_deferred(void)
+{
+	CPRINTS("Scheduled AP reset: cold reset");
+	power_request = POWER_REQ_COLD_RESET;
+	task_wake(TASK_ID_CHIPSET);
+}
+DECLARE_DEFERRED(ap_reset_deferred);
+
+static enum ec_status
+host_command_apreset_scheduled(struct host_cmd_handler_args *args)
+{
+	const struct ec_params_ap_reset_scheduled *p = args->params;
+
+	if (p->delay_ms == 0) {
+		/* Reset immediately */
+		CPRINTS("AP reset immediate: cold reset");
+		power_request = POWER_REQ_COLD_RESET;
+		task_wake(TASK_ID_CHIPSET);
+		return EC_RES_SUCCESS;
+	}
+
+	/* Schedule reset */
+	if (hook_call_deferred(&ap_reset_deferred_data, p->delay_ms * MSEC) !=
+	    EC_SUCCESS)
+		return EC_RES_ERROR;
+
+	return EC_RES_SUCCESS;
+}
+DECLARE_HOST_COMMAND(EC_CMD_AP_RESET_SCHEDULED, host_command_apreset_scheduled,
+		     EC_VER_MASK(0));
+#endif
 
 test_mockable_static int command_power(int argc, const char **argv)
 {

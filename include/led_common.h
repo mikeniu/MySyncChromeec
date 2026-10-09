@@ -5,8 +5,8 @@
  * Common functions for blinking LEDs.
  */
 
-#ifndef __CROS_EC_LED_COMMON_H
-#define __CROS_EC_LED_COMMON_H
+#ifndef PLATFORM_EC_INCLUDE_LED_COMMON_H_
+#define PLATFORM_EC_INCLUDE_LED_COMMON_H_
 
 #include "ec_commands.h"
 
@@ -103,8 +103,13 @@ void board_led_auto_control(void);
  */
 void led_control(enum ec_led_id id, enum ec_led_state state);
 
+/**
+ * Trigger board LED diagnostics for a power-on sequence failure.
+ */
+void board_diag_led_power_fail(void);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CROS_EC_LED_COMMON_H */
+#endif /* PLATFORM_EC_INCLUDE_LED_COMMON_H_ */

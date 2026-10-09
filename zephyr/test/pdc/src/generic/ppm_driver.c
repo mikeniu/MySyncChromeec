@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "chipset.h"
 #include "drivers/intel_altmode.h"
 #include "drivers/ucsi_v3.h"
 #include "ec_commands.h"
@@ -14,6 +15,8 @@
 
 #include <drivers/pdc.h>
 #include <usbc/ppm.h>
+
+FAKE_VALUE_FUNC(int, chipset_in_state, int);
 
 #define DT_PPM_DRV DT_INST(0, ucsi_ppm)
 #define NUM_PORTS DT_NUM_INST_STATUS_OKAY(named_usbc_port)
@@ -219,12 +222,55 @@ ZTEST_USER(ppm_driver, test_ppm_ci_cb)
 	zassert_equal(ucsi_ppm_lpm_alert_fake.call_count, 0);
 }
 
+ZTEST_USER(ppm_driver, test_ppm_ci_cb_suspended)
+{
+	const struct device *ppm_dev = DT_PPM_DEV;
+	struct ppm_data *ppm_data = ppm_dev->data;
+	union cci_event_t cci_event = {};
+
+	/*
+	 * Test CI call back suppresses events when chipset is suspended.
+	 */
+	chipset_in_state_fake.return_val = 1;
+	cci_event.connector_change = 1; /* Valid connector */
+	ppm_data->ci_cb.handler(ppm_dev, &ppm_data->ci_cb, cci_event);
+	zassert_equal(ucsi_ppm_lpm_alert_fake.call_count, 0,
+		      "Alert should be suppressed during suspend");
+	zassert_equal(chipset_in_state_fake.call_count, 1);
+	zassert_equal(chipset_in_state_fake.arg0_val,
+		      CHIPSET_STATE_ANY_SUSPEND);
+}
+
+ZTEST_USER(ppm_driver, test_ppm_ci_cb_not_suspended)
+{
+	const struct device *ppm_dev = DT_PPM_DEV;
+	struct ppm_data *ppm_data = ppm_dev->data;
+	union cci_event_t cci_event = {};
+	struct ucsi_ppm_device fake_ppm_dev;
+
+	/*
+	 * Test CI call back forwards events when chipset is not suspended.
+	 */
+	ppm_data->ppm_dev = &fake_ppm_dev;
+	chipset_in_state_fake.return_val = 0;
+	cci_event.connector_change = 1; /* Valid connector */
+	ppm_data->ci_cb.handler(ppm_dev, &ppm_data->ci_cb, cci_event);
+	zassert_equal(ucsi_ppm_lpm_alert_fake.call_count, 1,
+		      "Alert should not be suppressed when not suspended");
+	zassert_equal(chipset_in_state_fake.call_count, 1);
+	zassert_equal(chipset_in_state_fake.arg0_val,
+		      CHIPSET_STATE_ANY_SUSPEND);
+	zassert_equal(ucsi_ppm_lpm_alert_fake.arg0_val, &fake_ppm_dev);
+	zassert_equal(ucsi_ppm_lpm_alert_fake.arg1_val, 1);
+}
+
 static void ppm_driver_before(void *fixture)
 {
 	RESET_FAKE(ppm_data_init);
 	RESET_FAKE(ucsi_ppm_init_and_wait);
 	RESET_FAKE(ucsi_ppm_get_next_connector_status);
 	RESET_FAKE(ucsi_ppm_lpm_alert);
+	RESET_FAKE(chipset_in_state);
 }
 
 ZTEST_SUITE(ppm_driver, NULL, NULL, ppm_driver_before, NULL, NULL);

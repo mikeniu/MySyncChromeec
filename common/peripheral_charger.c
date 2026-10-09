@@ -963,32 +963,49 @@ void pchg_task(void *u)
 	}
 }
 
-static enum ec_status hc_pchg_count(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status
+hc_pchg_count(struct ec_host_cmd_handler_args *args)
 {
-	struct ec_response_pchg_count *r = args->response;
+	struct ec_response_pchg_count *r = args->output_buf;
 
 	r->port_count = pchg_count;
-	args->response_size = sizeof(*r);
+	args->output_buf_size = sizeof(*r);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PCHG_COUNT, hc_pchg_count, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER_RESP_ONLY(EC_CMD_PCHG_COUNT, hc_pchg_count, EC_VER_MASK(0),
+			      struct ec_response_pchg_count);
 
 #define HCPRINTS(fmt, args...) cprints(CC_PCHG, "HC:PCHG: " fmt, ##args)
 
-static enum ec_status hc_pchg(struct host_cmd_handler_args *args)
+static enum ec_host_cmd_status hc_pchg(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_pchg_v3 *p = args->params;
-	struct ec_response_pchg_v2 *r = args->response;
+	const struct ec_params_pchg_v3 *p = args->input_buf;
+	struct ec_response_pchg_v2 *r = args->output_buf;
 	int port = p->port;
 	struct pchg *ctx;
 
 	/* Version 0 shouldn't exist. */
 	if (args->version == 0)
-		return EC_RES_INVALID_VERSION;
+		return EC_HOST_CMD_INVALID_VERSION;
+
+	if (args->version == 3) {
+		if (args->input_buf_size < sizeof(struct ec_params_pchg_v3))
+			return EC_HOST_CMD_REQUEST_TRUNCATED;
+	}
 
 	if (port >= pchg_count)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
+
+	if (args->version == 1) {
+		if (args->output_buf_max < sizeof(struct ec_response_pchg))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+		args->output_buf_size = sizeof(struct ec_response_pchg);
+	} else {
+		if (args->output_buf_max < sizeof(struct ec_response_pchg_v2))
+			return EC_HOST_CMD_RESPONSE_TOO_BIG;
+		args->output_buf_size = sizeof(struct ec_response_pchg_v2);
+	}
 
 	ctx = &pchgs[port];
 	mutex_lock(&ctx->mtx);
@@ -1009,17 +1026,13 @@ static enum ec_status hc_pchg(struct host_cmd_handler_args *args)
 	if (args->version > 2)
 		ctx->error &= ~p->error;
 
-	/* v2 and v3 have the same response struct. */
-	args->response_size = args->version == 1 ?
-				      sizeof(struct ec_response_pchg) :
-				      sizeof(*r);
-
 	mutex_unlock(&ctx->mtx);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PCHG, hc_pchg,
-		     EC_VER_MASK(1) | EC_VER_MASK(2) | EC_VER_MASK(3));
+EC_HOST_CMD_HANDLER(EC_CMD_PCHG, hc_pchg,
+		    EC_VER_MASK(1) | EC_VER_MASK(2) | EC_VER_MASK(3),
+		    struct ec_params_pchg, struct ec_response_pchg);
 
 int pchg_get_next_event(uint8_t *out)
 {
@@ -1042,15 +1055,17 @@ int pchg_get_next_event(uint8_t *out)
 }
 DECLARE_EVENT_SOURCE(EC_MKBP_EVENT_PCHG, pchg_get_next_event);
 
-static enum ec_status hc_pchg_update(struct host_cmd_handler_args *args)
+#ifdef CONFIG_PLATFORM_EC_PERIPHERAL_CHARGER_UPDATE
+static enum ec_host_cmd_status
+hc_pchg_update(struct ec_host_cmd_handler_args *args)
 {
-	const struct ec_params_pchg_update *p = args->params;
-	struct ec_response_pchg_update *r = args->response;
+	const struct ec_params_pchg_update *p = args->input_buf;
+	struct ec_response_pchg_update *r = args->output_buf;
 	int port = p->port;
 	struct pchg *ctx;
 
 	if (port >= pchg_count)
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 
 	ctx = &pchgs[port];
 
@@ -1083,16 +1098,16 @@ static enum ec_status hc_pchg_update(struct host_cmd_handler_args *args)
 		}
 		ctx->update.version = p->version;
 		r->block_size = ctx->cfg->block_size;
-		args->response_size = sizeof(*r);
+		args->output_buf_size = sizeof(*r);
 		break;
 
 	case EC_PCHG_UPDATE_CMD_WRITE:
 		if (ctx->state != PCHG_STATE_DOWNLOADING)
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 		if (p->size > sizeof(ctx->update.data))
-			return EC_RES_OVERFLOW;
+			return EC_HOST_CMD_OVERFLOW;
 		if (ctx->update.data_ready)
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 
 		HCPRINTS("Writing %u bytes to 0x%x", p->size, p->addr);
 		ctx->update.addr = p->addr;
@@ -1104,9 +1119,9 @@ static enum ec_status hc_pchg_update(struct host_cmd_handler_args *args)
 
 	case EC_PCHG_UPDATE_CMD_CLOSE:
 		if (ctx->state != PCHG_STATE_DOWNLOADING)
-			return EC_RES_ERROR;
+			return EC_HOST_CMD_ERROR;
 		if (ctx->update.data_ready)
-			return EC_RES_BUSY;
+			return EC_HOST_CMD_BUSY;
 
 		HCPRINTS("Closing update session (crc=0x%x)", p->crc32);
 		ctx->update.crc32 = p->crc32;
@@ -1133,14 +1148,17 @@ static enum ec_status hc_pchg_update(struct host_cmd_handler_args *args)
 		break;
 
 	default:
-		return EC_RES_INVALID_PARAM;
+		return EC_HOST_CMD_INVALID_PARAM;
 	}
 
 	task_wake(TASK_ID_PCHG);
 
-	return EC_RES_SUCCESS;
+	return EC_HOST_CMD_SUCCESS;
 }
-DECLARE_HOST_COMMAND(EC_CMD_PCHG_UPDATE, hc_pchg_update, EC_VER_MASK(0));
+EC_HOST_CMD_HANDLER(EC_CMD_PCHG_UPDATE, hc_pchg_update, EC_VER_MASK(0),
+		    struct ec_params_pchg_update,
+		    struct ec_response_pchg_update);
+#endif /* CONFIG_PLATFORM_EC_PERIPHERAL_CHARGER_UPDATE */
 
 static int cc_pchg(int argc, const char **argv)
 {

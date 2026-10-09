@@ -5,8 +5,8 @@
 
 /* PI3USB9201 USB BC 1.2 Charger Detector public definitions */
 
-#ifndef __CROS_EC_DRIVER_BC12_PI3USB9201_PUBLIC_H
-#define __CROS_EC_DRIVER_BC12_PI3USB9201_PUBLIC_H
+#ifndef PLATFORM_EC_INCLUDE_DRIVER_BC12_PI3USB9201_PUBLIC_H_
+#define PLATFORM_EC_INCLUDE_DRIVER_BC12_PI3USB9201_PUBLIC_H_
 
 /* I2C address */
 #define PI3USB9201_I2C_ADDR_0_FLAGS 0x5C
@@ -25,4 +25,4 @@ extern const struct pi3usb9201_config_t pi3usb9201_bc12_chips[];
 
 extern const struct bc12_drv pi3usb9201_drv;
 
-#endif /* __CROS_EC_DRIVER_BC12_PI3USB9201_PUBLIC_H */
+#endif /* PLATFORM_EC_INCLUDE_DRIVER_BC12_PI3USB9201_PUBLIC_H_ */

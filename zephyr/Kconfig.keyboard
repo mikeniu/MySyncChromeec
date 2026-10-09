@@ -2,13 +2,23 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-CHOSEN_CROS_EC_RAW_KB := cros-ec,raw-kb
 CHOSEN_CROS_EC_KEYBOARD := cros-ec,keyboard
+
+config HAS_CROS_KB_RAW
+	bool
+	help
+	  Helper symbol that indicates the platform provides a legacy
+	  raw keyboard driver implementation.
 
 menuconfig PLATFORM_EC_KEYBOARD
 	bool "Keyboard support"
 	default y
-	depends on ($(dt_chosen_enabled,$(CHOSEN_CROS_EC_RAW_KB)) || $(dt_chosen_enabled,$(CHOSEN_CROS_EC_KEYBOARD)) || $(dt_nodelabel_enabled,kb_discrete))
+	depends on (DT_HAS_NUVOTON_NPCX_CROS_KB_RAW_ENABLED || \
+		    DT_HAS_ITE_IT8XXX2_CROS_KB_RAW_ENABLED || \
+		    DT_HAS_MICROCHIP_XEC_CROS_KB_RAW_ENABLED || \
+		    DT_HAS_CROS_EC_KB_RAW_EMUL_ENABLED || \
+		    $(dt_chosen_enabled,$(CHOSEN_CROS_EC_KEYBOARD)) || \
+		    $(dt_nodelabel_enabled,kb_discrete))
 	help
 	  Enable keyboard support.
 
@@ -23,7 +33,7 @@ choice PLATFORM_EC_KEYBOARD_DRIVER
 config PLATFORM_EC_KEYBOARD_CROS_EC_RAW_KB
 	prompt "Shimmed raw keyboard driver"
 	select HAS_TASK_KEYSCAN
-	depends on $(dt_chosen_enabled,$(CHOSEN_CROS_EC_RAW_KB))
+	depends on HAS_CROS_KB_RAW
 	help
 	  Enable compilation of support for scanning a keyboard and providing
 	  the resulting input to the AP over the host interface. This consists
@@ -226,29 +236,6 @@ config PLATFORM_EC_KEYBOARD_SCAN_ADC
 	  connected to adc channels to identify key presses by reading adc
 	  voltage.
 
-config PLATFORM_EC_VOLUME_BUTTONS
-	bool "Board has volume-up and volume-down buttons"
-	select PLATFORM_EC_BUTTON
-	help
-	  Enable this if the board has physical buttons for the volume controls.
-	  These are buttons controlled by GPIOs and are not part of the keyboard
-	  matrix.
-
-	  Your board must define GPIO_VOLUME_UP_L and GPIO_VOLUME_DOWN_L as
-	  GPIOs names or as aliases in the GPIO devicetree configuration.
-
-config PLATFORM_EC_BUTTONS_RUNTIME_CONFIG
-	bool "Enable buttons runtime configuration"
-	help
-	  This command allow the runtime configuration of the buttons[]
-	  array.
-
-config PLATFORM_EC_CMD_BUTTON
-	bool "Console command: button"
-	help
-	  This command simulates button press. The buttons are like volume-up,
-	  volume-down, and recovery buttons.
-
 config PLATFORM_EC_CONSOLE_CMD_KEYBOARD
 	bool "Console command: ksstate, kbpress, 8042"
 	default y if PLATFORM_EC_KEYBOARD
@@ -338,51 +325,3 @@ config KEYBOARD_FN_KEYS
 	depends on DT_HAS_CROS_EC_FN_KEYS_ENABLED
 	help
 	  Enable support for Fn key processing.
-
-menuconfig PLATFORM_EC_RGB_KEYBOARD
-	bool "RGB keyboard support"
-	select HAS_TASK_RGBKBD
-	help
-	  Enable RGB keyboard backlight control. This consists of a RGB matrix
-	  control task. Note this feature does not include key scanning.
-
-if PLATFORM_EC_RGB_KEYBOARD
-
-config PLATFORM_EC_RGB_KEYBOARD_DEBUG
-	bool "RGB Keyboard Debug"
-	default n
-	help
-	  Enable debug messages from a RGB keyboard task.
-
-choice PLATFORM_EC_RGBKBD_DEMO
-	prompt "RGB Keyboard demo to run on reset"
-	optional
-	help
-	  Enable demo of RGB keyboard to run on reset.
-
-config PLATFORM_EC_RGBKBD_DEMO_FLOW
-	bool "Flow"
-	help
-	  In each iteration, a new color is placed in (0,0) and the rest of
-	  LEDs copy colors from adjacent LEDs.
-
-config PLATFORM_EC_RGBKBD_DEMO_DOT
-	bool "Dot"
-	help
-	  A red dot is placed on (0,0) and traverses the grid from top to buttom
-	  left to right. After the entire matrix is traversed, it's repeated with
-	  a new color.
-
-endchoice # PLATFORM_EC_RGBKBD_DEMO
-
-config PLATFORM_EC_LED_DRIVER_IS31FL3743B
-	bool "Driver for IS31FL3743B LED controller"
-	help
-	  Enable driver for IS31FL3743B LED controller.
-
-config PLATFORM_EC_LED_DRIVER_AW20198
-	bool "Driver for AW20198 LED controller"
-	help
-	  Enable driver for AW20198 LED controller.
-
-endif # PLATFORM_EC_RGB_KEYBOARD

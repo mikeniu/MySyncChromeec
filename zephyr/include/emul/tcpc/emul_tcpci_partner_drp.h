@@ -9,8 +9,8 @@
  * @brief Backend API for USB-C dual role device emulator
  */
 
-#ifndef __EMUL_TCPCI_PARTNER_DRP_H
-#define __EMUL_TCPCI_PARTNER_DRP_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_DRP_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_DRP_H_
 
 #include "emul/tcpc/emul_tcpci.h"
 #include "emul/tcpc/emul_tcpci_partner_common.h"
@@ -81,4 +81,4 @@ void tcpci_drp_emul_signal_frs(struct tcpci_partner_data *data);
  * @}
  */
 
-#endif /* __EMUL_TCPCI_PARTNER_DRP_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_EMUL_TCPC_EMUL_TCPCI_PARTNER_DRP_H_ */

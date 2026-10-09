@@ -5,8 +5,8 @@
 
 /* Charger functions related to a connected keyboard called a 'base' */
 
-#ifndef __CROS_EC_CHARGER_BASE_H
-#define __CROS_EC_CHARGER_BASE_H
+#ifndef PLATFORM_EC_INCLUDE_CHARGER_BASE_H_
+#define PLATFORM_EC_INCLUDE_CHARGER_BASE_H_
 
 #include <stdbool.h>
 
@@ -69,4 +69,4 @@ void charger_base_set_input_voltage(struct charge_state_data *curr,
 }
 #endif
 
-#endif /* __CROS_EC_CHARGER_BASE_H */
+#endif /* PLATFORM_EC_INCLUDE_CHARGER_BASE_H_ */

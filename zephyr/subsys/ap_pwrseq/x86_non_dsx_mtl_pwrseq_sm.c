@@ -3,6 +3,8 @@
  * found in the LICENSE file.
  */
 
+#include "signal_vw.h"
+
 #include <x86_non_dsx_common_pwrseq_sm_handler.h>
 #ifdef CONFIG_AP_PWRSEQ_DRIVER
 #include "ap_power/ap_pwrseq_sm.h"
@@ -90,6 +92,8 @@ static int x86_non_dsx_mtl_g3_run(void *data)
 	if (power_wait_signals_on_timeout(
 		    POWER_SIGNAL_MASK(PWR_RSMRST_PWRGD),
 		    AP_PWRSEQ_DT_VALUE(wait_signal_timeout))) {
+		ap_pwrseq_post_event(ap_pwrseq_get_instance(),
+				     AP_PWRSEQ_EVENT_POWER_SHUTDOWN);
 		return 1;
 	}
 
@@ -98,19 +102,12 @@ static int x86_non_dsx_mtl_g3_run(void *data)
 
 AP_POWER_CHIPSET_STATE_DEFINE(G3, NULL, x86_non_dsx_mtl_g3_run, NULL);
 
-static int x86_non_dsx_mtl_s3_entry(void *data)
-{
-	power_signal_set(PWR_PCH_PWROK, 0);
-	power_signal_set(PWR_EC_PCH_SYS_PWROK, 0);
-
-	return 0;
-}
-
 static int x86_non_dsx_mtl_s3_run(void *data)
 {
 	int all_sys_pwrgd_in = power_signal_get(PWR_ALL_SYS_PWRGD);
 
-	if (power_signal_get(PWR_RSMRST_PWRGD) == 0) {
+	if (power_signal_get(PWR_RSMRST_PWRGD) == 0 ||
+	    ap_pwrseq_sm_is_event_set(data, AP_PWRSEQ_EVENT_POWER_SHUTDOWN)) {
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
 	}
 
@@ -137,8 +134,20 @@ static int x86_non_dsx_mtl_s3_run(void *data)
 	return 0;
 }
 
-AP_POWER_CHIPSET_STATE_DEFINE(S3, x86_non_dsx_mtl_s3_entry,
-			      x86_non_dsx_mtl_s3_run, NULL);
+static int x86_non_dsx_mtl_s3_exit(void *data)
+{
+	enum ap_pwrseq_state new_state = ap_pwrseq_sm_get_entry_state(data);
+
+	if (new_state < AP_POWER_STATE_S3) {
+		power_signal_set(PWR_PCH_PWROK, 0);
+		power_signal_set(PWR_EC_PCH_SYS_PWROK, 0);
+	}
+
+	return 0;
+}
+
+AP_POWER_CHIPSET_STATE_DEFINE(S3, NULL, x86_non_dsx_mtl_s3_run,
+			      x86_non_dsx_mtl_s3_exit);
 
 static int x86_non_dsx_mtl_s0_run(void *data)
 {
@@ -171,7 +180,16 @@ static int x86_non_dsx_mtl_s0ix_run(void *data)
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_G3);
 	}
 
-	if (power_signal_get(PWR_SYS_RST)) {
+	/* System enters S5 if PWR_SYS_RST or PLTRST is de-asserted
+	 * TODO(b/517072313): Remove SYSRST check once all platforms have
+	 * transitioned to defining PLTRST signal
+	 */
+	if (power_signal_get(PWR_SYS_RST)
+#if ANY_INST_HAS_INTEL_AP_PWRSEQ_PLTRST
+	    || power_signal_get(PWR_PLTRST)
+#endif
+	) {
+		ap_power_reset_host_sleep_state();
 		return ap_pwrseq_sm_set_state(data, AP_POWER_STATE_S5);
 	}
 

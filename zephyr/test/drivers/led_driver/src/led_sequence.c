@@ -154,7 +154,8 @@ ZTEST(led_driver_sequence, test_auto_off_then_on)
 	int ret;
 	struct ec_response_led_control response;
 	struct ec_params_led_control params = {
-		.led_id = EC_LED_ID_BATTERY_LED, .flags = 0x00,
+		.led_id = EC_LED_ID_BATTERY_LED,
+		.flags = 0x00,
 		/* All color channels off */
 	};
 

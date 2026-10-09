@@ -21,6 +21,14 @@ if(CONFIG_PICOLIBC AND NOT CONFIG_PICOLIBC_USE_MODULE)
   # TODO(b/384559486) Fix this block
   # Add picolibc
   message(INFO "Setting c_library to picolibc install path")
-  set_linker_property(PROPERTY c_library "${COREBOOT_SDK_ROOT_PICOLIBC}/picolibc/coreboot-${CROSS_COMPILE_TARGET}/lib/libc.a")
+  set(picolibc_dir "${COREBOOT_SDK_ROOT_PICOLIBC}/picolibc/coreboot-${CROSS_COMPILE_TARGET}/lib")
+  set(multilib_libc "${picolibc_dir}/${CROSS_COMPILE_QUALIFIER}libc.a")
+  set(default_libc "${picolibc_dir}/libc.a")
+
+  if(EXISTS "${multilib_libc}")
+    set_linker_property(PROPERTY c_library "${multilib_libc}")
+  else()
+    set_linker_property(PROPERTY c_library "${default_libc}")
+  endif()
   set_linker_property(PROPERTY c_library "${COREBOOT_SDK_ROOT}/lib/gcc/${CROSS_COMPILE_TARGET}/${GCC_VERSION}/${CROSS_COMPILE_QUALIFIER}libgcc.a" APPEND)
 endif()

@@ -2,8 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#ifndef __CROS_EC_CHARGE_STATE_H
-#define __CROS_EC_CHARGE_STATE_H
+#ifndef PLATFORM_EC_INCLUDE_CHARGE_STATE_H_
+#define PLATFORM_EC_INCLUDE_CHARGE_STATE_H_
 
 #include "battery.h"
 #include "battery_smart.h"
@@ -117,6 +117,61 @@ struct sustain_soc {
 	uint8_t flags; /* enum ec_charge_control_flag */
 };
 
+#define CHARGE_CONTROL_SUSTAINER_DISABLED -1
+
+/**
+ * Save charge control sustainer settings to BBRAM.
+ *
+ * @param lower Lower battery SoC threshold (percentage, -1 for disabled).
+ * @param upper Upper battery SoC threshold (percentage, -1 for disabled).
+ * @param flags Flags (enum ec_charge_control_flag).
+ * @return EC_SUCCESS or non-zero error.
+ */
+int charge_control_save_to_bbram(int8_t lower, int8_t upper, uint8_t flags);
+
+/**
+ * Load and validate charge control sustainer settings from BBRAM.
+ *
+ * @param lower Pointer to store lower battery SoC threshold.
+ * @param upper Pointer to store upper battery SoC threshold.
+ * @param flags Pointer to store flags.
+ * @return EC_SUCCESS or non-zero error.
+ */
+int charge_control_load_from_bbram(int8_t *lower, int8_t *upper,
+				   uint8_t *flags);
+
+/**
+ * Enable or update battery sustainer SoC limits and flags.
+ *
+ * @param lower Lower battery SoC threshold (percentage, -1 for disabled).
+ * @param upper Upper battery SoC threshold (percentage, -1 for disabled).
+ * @param flags Flags (enum ec_charge_control_flag).
+ * @return EC_SUCCESS, EC_RES_UNAVAILABLE if discharge on AC unavailable, or
+ *         EC_ERROR_INVAL.
+ */
+int battery_sustainer_set(int8_t lower, int8_t upper, uint8_t flags);
+
+/**
+ * Get current battery sustainer SoC limits and flags.
+ *
+ * @param lower Pointer to store lower threshold.
+ * @param upper Pointer to store upper threshold.
+ * @param flags Pointer to store flags.
+ */
+void battery_sustainer_get(int8_t *lower, int8_t *upper, uint8_t *flags);
+
+/**
+ * Disable battery sustainer.
+ */
+void battery_sustainer_disable(void);
+
+/**
+ * Check if battery sustainer is currently enabled.
+ *
+ * @return true if enabled, false otherwise.
+ */
+bool battery_sustainer_enabled(void);
+
 #define BAT_MAX_DISCHG_CURRENT 5000 /* mA */
 #define BAT_LOW_VOLTAGE_THRESH 3200 /* mV */
 
@@ -220,6 +275,11 @@ static inline bool charge_prevent_power_on(bool power_button_pressed)
 	return false;
 }
 #endif
+
+/**
+ * Returns 0 to allow power-on, return 1 to prevent power-on.
+ */
+int custom_prevent_power_on(void);
 
 /**
  * Get the last polled battery/charger temperature.
@@ -356,6 +416,14 @@ struct charge_state_data *charge_get_status(void);
 
 enum ec_charge_control_mode get_chg_ctrl_mode(void);
 
+/**
+ * Set charge control mode.
+ *
+ * @param mode Charge control mode (enum ec_charge_control_mode).
+ * @return EC_SUCCESS or non-zero error.
+ */
+int set_chg_ctrl_mode(enum ec_charge_control_mode mode);
+
 __test_only void reset_prev_disp_charge(void);
 
 /**
@@ -380,4 +448,4 @@ int board_should_charger_bypass(void);
 /* Config Charger */
 #include "charge_state.h"
 
-#endif /* __CROS_EC_CHARGE_STATE_H */
+#endif /* PLATFORM_EC_INCLUDE_CHARGE_STATE_H_ */

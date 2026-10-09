@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_LED_H__
-#define __CROS_EC_LED_H__
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_LED_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_LED_H_
 
 #include "ec_commands.h"
 
@@ -59,6 +59,11 @@ enum led_transition {
 
 	LED_TRANSITION_COUNT
 };
+
+BUILD_ASSERT(EC_LED_ID_COUNT <= UINT8_MAX,
+	     "EC LED ID count exceeds uint8_t capacity");
+BUILD_ASSERT(LED_TRANSITION_COUNT <= UINT8_MAX,
+	     "LED transition count exceeds uint8_t capacity");
 
 /*
  * Board specific override that allows the board to define its own alt
@@ -179,42 +184,49 @@ struct led_pins_node_t {
 
 	/* 1-byte members following */
 	/*
-	 * The color ID this node represents. Only used to support
-	 * ectool functionality.
+	 * The color ID this node represents (values from enum led_color).
+	 * Only used to support ectool functionality.
 	 */
 	uint8_t led_color;
 
 	/*
-	 * The logical LED ID this node belongs to. Only used to support
-	 * ectool functionality.
+	 * The logical LED ID this node belongs to (values from enum ec_led_id).
+	 * Only used to support ectool functionality.
 	 */
-	enum ec_led_id led_id;
+	uint8_t led_id;
+
+	/*
+	 * 0-based devicetree child index of the color.
+	 * Must be matched with led_id to resolve the actual pins_node.
+	 */
+	uint8_t color_idx;
 
 	/* Number of pins per color */
 	uint8_t pins_count;
-};
+} __packed;
 
 struct pattern_color_node_t {
-	const struct led_pins_node_t *led_color_node;
-	int32_t duration_ms;
-};
+	uint16_t duration_ms;
+	uint8_t color_idx;
+} __packed;
 
 struct led_pattern_node_t {
 	/* 4-byte members first */
-	int32_t elapsed_ms;
+	uint32_t elapsed_ms;
 	const struct pattern_color_node_t *pattern_color;
 
 	/* 1-byte members following */
+	uint8_t led_id;
 	uint8_t cur_color;
 	uint8_t pattern_len;
 	uint8_t cycle_limit;
 	uint8_t cycle_curr;
-	enum led_transition transition;
+	uint8_t transition;
 	bool needs_update;
-};
+} __packed;
 
-static inline int32_t get_step_duration(const struct led_pattern_node_t *cfg,
-					uint8_t step_idx)
+static inline uint32_t get_step_duration(const struct led_pattern_node_t *cfg,
+					 uint8_t step_idx)
 {
 	return cfg->pattern_color[step_idx].duration_ms;
 }
@@ -232,7 +244,7 @@ void led_set_color(enum led_color color, enum ec_led_id led_id,
 struct custom_led_patterns_t {
 	struct led_pattern_node_t *led_patterns;
 	uint8_t num_patterns;
-	enum ec_led_id led_id;
+	uint8_t led_id;
 };
 
 /**
@@ -256,4 +268,4 @@ const struct led_pins_node_t *led_get_node(enum led_color color,
 enum power_state get_chipset_state(void);
 #endif /* TEST_BUILD */
 
-#endif /* __CROS_EC_LED_H__ */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_DRIVERS_LED_H_ */

@@ -2,9 +2,8 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
- * This test exercises the SVDM_RSP_DFP_ONLY option, causing the device to
- * respond appropriately to SVDM Discover Identity requests when operating as
- * DFP.
+ * This test exercises the CONFIG_PLATFORM_EC_SVDM_RSP option,
+ * verifying that the device responds appropriately to SVDM requests.
  *
  * The tests correspond to TEST.PD.PVDM.SRC.1 Discovery Process and Enter Mode
  * as defined by the USB Power Delivery Compliance Test Specification.
@@ -132,7 +131,7 @@ ZTEST_F(usbc_svdm_dfp_only, test_identity)
 		      (CONFIG_USB_PID << 16) | CONFIG_USB_BCD_DEV,
 		      "Product VDO value unexpected: %#x", response.vdos[3]);
 	/* DFP Product Type VDO: version 1.1, USB3.2 capable, receptacle */
-	zassert_equal(response.vdos[4], 0x22800000,
+	zassert_equal(response.vdos[4], 0x23800000,
 		      "DFP VDO had unexpected value %#x", response.vdos[4]);
 }
 

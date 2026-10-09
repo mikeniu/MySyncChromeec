@@ -3,8 +3,8 @@
  * found in the LICENSE file.
  */
 
-#ifndef __CROS_EC_STRING_H__
-#define __CROS_EC_STRING_H__
+#ifndef PLATFORM_EC_BUILTIN_STRING_H_
+#define PLATFORM_EC_BUILTIN_STRING_H_
 
 #include <stddef.h>
 
@@ -42,4 +42,4 @@ char *strstr(const char *s1, const char *s2);
 }
 #endif
 
-#endif /* __CROS_EC_STRING_H__ */
+#endif /* PLATFORM_EC_BUILTIN_STRING_H_ */

@@ -1,0 +1,167 @@
+/* Copyright 2026 The ChromiumOS Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+/* bluey program common DTS includes */
+
+#include <cros/integrated_fwid.dtsi>
+#include <dt-bindings/macros.h>
+
+#include "../interrupts.dtsi"
+#include "../adc.dtsi"
+#include "../common.dtsi"
+
+/* meru project DTS includes */
+
+#include "gpios.dtsi"
+#include "battery.dtsi"
+#include "temp_sensors.dtsi"
+#include "i2c.dtsi"
+#include "led_pins.dtsi"
+#include "led_policy.dtsi"
+#include "psl.dtsi"
+
+/* meru overrides follow... */
+&int_ac_present {
+	status = "disabled";
+};
+
+/ {
+	named-usbc-port {
+		usbc_port0: port0 {
+			compatible = "named-usbc-port";
+		};
+	};
+
+	named-adc-channels {
+
+		adc_temp_cpu: cpu {
+			enum-name = "ADC_TEMP_SENSOR_1";
+			io-channels = <&adc0 0>;
+		};
+		adc_temp_core: core {
+			enum-name = "ADC_TEMP_SENSOR_2";
+			io-channels = <&adc0 1>;
+		};
+		adc_temp_charger: charger {
+			enum-name = "ADC_TEMP_SENSOR_3";
+			io-channels = <&adc0 2>;
+		};
+		adc_temp_ambient: ambient {
+			enum-name = "ADC_TEMP_SENSOR_4";
+			io-channels = <&adc0 3>;
+		};
+		adc_temp_hw_shutdown: hw_shutdown {
+			enum-name = "ADC_TEMP_SENSOR_5";
+			io-channels = <&adc0 4>;
+		};
+		adc_temp_typec: typec {
+			enum-name = "ADC_TEMP_SENSOR_6";
+			io-channels = <&adc0 7>;
+		};
+		adc_usb_keyboard_det: usb_keyboard_det {
+			enum-name = "ADC_BASE_DET";
+			io-channels = <&adc0 6>;
+		};
+	};
+
+	gpio-interrupts {
+		int_extpower_a: extpower_a {
+			irq-pin = <&gpio_pgood_acok_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "extpower_interrupt";
+		};
+		int_volume_up: volume-up {
+			irq-pin = <&gpio_gsc_ec_volup_btn_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "button_interrupt";
+		};
+		int_volume_down: volume-down {
+			irq-pin = <&gpio_gsc_ec_voldn_btn_odl>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "button_interrupt";
+		};
+		int_lid_360: lid_360 {
+			irq-pin = <&gpio_lid_360_l>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "tablet_interrupt";
+		};
+		int_wpc: wpc{
+			irq-pin = <&gpio_pen_int_odl>;
+			flags = <GPIO_INT_EDGE_RISING>;
+			handler = "pchg_irq";
+		};
+		wpc_lid_irq: wpc_lid_irq{
+			irq-pin = <&gpio_pen_eject_od>;
+			flags = <GPIO_INT_EDGE_BOTH>;
+			handler = "wpc_hall_interrupt";
+		};
+	};
+};
+
+&binman {
+	wp-ro {
+		ec-ro {
+			size = <0x3e000>;
+		};
+		cbi_flash: cbi {
+			/*
+			 * CBI section size is 0x1000 bytes, the
+			 * CBI portion lies at the end of EC_RO section.
+			 */
+			offset = <0x3e000>;
+			size = <0x1000>;
+		};
+	};
+};
+
+&uart4 {
+	status = "okay";
+
+	current-speed = <4166667>;
+	pinctrl-0 = <&uart4_sout_gp35>;
+	pinctrl-names = "default";
+	data-bits = <8>;
+	tx-invert;
+
+	uart4_dev0: uart4_dev0 {
+		status = "okay";
+		chain-length = <4>;
+		reset-delay = <205>;
+		bits-per-symbol = <5>;
+		one-symbol = <BINARY(1,1,1,1,0)>;
+		zero-symbol = <BINARY(1,0,0,0,0)>;
+	};
+};
+
+&pcc {
+	clock-frequency = <DT_FREQ_M(100)>;
+	core-prescaler = <1>;
+	apb1-prescaler = <4>;
+	apb2-prescaler = <4>;
+	apb3-prescaler = <4>;
+	apb4-prescaler = <1>;
+};
+
+&adc0 {
+	pinctrl-0 = <&adc0_chan0_gp45
+		&adc0_chan1_gp44
+		&adc0_chan2_gp43
+		&adc0_chan3_gp42
+		&adc0_chan4_gp41
+		&adc0_chan6_gp34
+		&adc0_chan7_gpe1
+		&adc0_chan11_gpc7>;
+	pinctrl-names = "default";
+};
+
+&i2c3_0 {
+	ctn730@28 {
+		compatible = "nxp,ctn730";
+		reg = <0x28>;
+		irq-gpios=<&gpio7 5 GPIO_INPUT>;
+		rf-charge-msec = <1000>;
+		full-percent = <100>;
+	};
+};

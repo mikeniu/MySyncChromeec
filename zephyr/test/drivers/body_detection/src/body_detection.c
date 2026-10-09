@@ -6,6 +6,7 @@
 #include "accelgyro.h"
 #include "body_detection.h"
 #include "console.h"
+#include "math_util.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
 
@@ -20,8 +21,13 @@ FAKE_VALUE_FUNC(int, get_data_rate, const struct motion_sensor_t *);
 FAKE_VALUE_FUNC(int, get_rms_noise, const struct motion_sensor_t *);
 
 extern struct motion_sensor_t *body_sensor;
+#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
 extern float var_threshold;
 extern float confidence_delta;
+#else
+extern uint64_t var_threshold_scaled;
+extern uint64_t confidence_delta_scaled;
+#endif
 
 /*
  * In order to be independent from a motion sensor driver changes mock
@@ -188,6 +194,31 @@ static void body_detect_init_after(void *state)
 #define DEFAULT_CONFIDENCE_DELTA CONFIG_BODY_DETECTION_CONFIDENCE_DELTA
 #define DEFAULT_VAR_THRESHOLD CONFIG_BODY_DETECTION_VAR_THRESHOLD
 
+#if !defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+static uint64_t calculate_expected_confidence_delta(int range,
+						    int confidence_delta)
+{
+	const int data_1g = MOTION_SCALING_FACTOR / range;
+	const int multiplier = POW2(data_1g);
+	const int divisor = POW2(9800);
+
+	return (uint64_t)confidence_delta * multiplier / divisor;
+}
+
+static uint64_t calculate_expected_var_threshold(int range, int rms_noise,
+						 int var_noise_factor,
+						 int var_threshold)
+{
+	const int data_1g = MOTION_SCALING_FACTOR / range;
+	const int multiplier = POW2(data_1g);
+	const int divisor = POW2(9800);
+	const int var_noise = POW2((uint64_t)rms_noise) * var_noise_factor *
+			      POW2(98) / 100 / POW2(10000);
+
+	return (uint64_t)(var_threshold + var_noise) * multiplier / divisor;
+}
+#endif
+
 /**
  * @brief TestPurpose: check variance properties with default input parameters
  */
@@ -197,9 +228,27 @@ ZTEST_USER(bodydetectinit, test_defaultparams)
 	 * body_detect_reset was already called in body_detect_init_before.
 	 * No need to invoke it here.
 	 */
+#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
 	zassert_equal(confidence_delta, DEFAULT_CONFIDENCE_DELTA);
 	zassert_equal(var_threshold, DEFAULT_VAR_THRESHOLD);
+#else
+	zassert_equal(
+		confidence_delta_scaled,
+		calculate_expected_confidence_delta(body_sensor->current_range,
+						    DEFAULT_CONFIDENCE_DELTA));
+	zassert_equal(var_threshold_scaled,
+		      calculate_expected_var_threshold(
+			      body_sensor->current_range,
+			      get_rms_noise_fake.return_val,
+			      CONFIG_BODY_DETECTION_VAR_NOISE_FACTOR,
+			      DEFAULT_VAR_THRESHOLD));
+#endif
 	zassert_equal(1, get_data_rate_fake.call_count);
+
+	/* Test ODR exceeding max window size */
+	get_data_rate_fake.return_val = 200 * 1000;
+	body_detect_reset();
+	zassert_equal(2, get_data_rate_fake.call_count);
 }
 
 /**
@@ -216,16 +265,40 @@ ZTEST_USER(bodydetectinit, test_customparams)
 	memset(&params, 0, sizeof(params));
 
 	body_detect_reset();
+#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
 	zassert_equal(confidence_delta, DEFAULT_CONFIDENCE_DELTA);
 	zassert_equal(var_threshold, DEFAULT_VAR_THRESHOLD);
+#else
+	zassert_equal(
+		confidence_delta_scaled,
+		calculate_expected_confidence_delta(body_sensor->current_range,
+						    DEFAULT_CONFIDENCE_DELTA));
+	zassert_equal(var_threshold_scaled,
+		      calculate_expected_var_threshold(
+			      body_sensor->current_range,
+			      get_rms_noise_fake.return_val,
+			      CONFIG_BODY_DETECTION_VAR_NOISE_FACTOR,
+			      DEFAULT_VAR_THRESHOLD));
+#endif
 	zassert_equal(2, get_data_rate_fake.call_count);
 
 	params.confidence_delta = 2900;
 	params.var_threshold = 3000;
 
 	body_detect_reset();
+#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
 	zassert_equal(confidence_delta, 2900);
 	zassert_equal(var_threshold, 3000);
+#else
+	zassert_equal(confidence_delta_scaled,
+		      calculate_expected_confidence_delta(
+			      body_sensor->current_range, 2900));
+	zassert_equal(var_threshold_scaled,
+		      calculate_expected_var_threshold(
+			      body_sensor->current_range,
+			      get_rms_noise_fake.return_val,
+			      CONFIG_BODY_DETECTION_VAR_NOISE_FACTOR, 3000));
+#endif
 	zassert_equal(3, get_data_rate_fake.call_count);
 }
 
@@ -280,8 +353,19 @@ static void body_detect_sample_before(void *state)
 	params.var_threshold = 4000;
 
 	body_detect_reset();
+#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
 	zassert_equal(confidence_delta, 3000);
 	zassert_equal(var_threshold, 4000);
+#else
+	zassert_equal(confidence_delta_scaled,
+		      calculate_expected_confidence_delta(
+			      body_sensor->current_range, 3000));
+	zassert_equal(var_threshold_scaled,
+		      calculate_expected_var_threshold(
+			      body_sensor->current_range,
+			      get_rms_noise_fake.return_val,
+			      CONFIG_BODY_DETECTION_VAR_NOISE_FACTOR, 4000));
+#endif
 }
 
 static void body_detect_sample_after(void *state)
@@ -329,6 +413,7 @@ ZTEST_USER(bodydetectsample, test_reallife_data)
 		      "expected state %d at %d[s]", BODY_DETECTION_OFF_BODY,
 		      cnt);
 
+#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
 	/*
 	 * Run body_detect with small noise and 0.25Hz "breathing" signal
 	 * in Z-axis, should detect ON_BODY.
@@ -372,6 +457,56 @@ ZTEST_USER(bodydetectsample, test_reallife_data)
 	zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state(),
 		      "expected state %d at %d[s]", BODY_DETECTION_OFF_BODY,
 		      cnt);
+#else
+	/*
+	 * Run body_detect with motion in X-axis (variance > threshold),
+	 * should detect ON_BODY.
+	 */
+	srand(0);
+	vib_freq = 0.25f;
+	for (i = 0; i < cnt; i++) {
+		noise1 = WHITE_NOISE(noise_range);
+		noise2 = WHITE_NOISE(noise_range);
+		time_fake_value = (1000000 / fs * i);
+		body_sensor->xyz[X] = noise1 + sin(vib_freq * 2 * 3.14f / fs *
+						   i) * (G_1 / 50);
+		body_sensor->xyz[Y] = noise2;
+		body_sensor->xyz[Z] = G_1 - noise1 - noise2;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_ON_BODY, body_detect_get_state(),
+		      "expected state %d at %d[s]", BODY_DETECTION_ON_BODY,
+		      cnt);
+
+	/*
+	 * Return to low noise stationary state, should transition to OFF_BODY.
+	 */
+	srand(0);
+	for (i = 0; i < cnt; i++) {
+		noise1 = WHITE_NOISE(noise_range);
+		noise2 = WHITE_NOISE(noise_range);
+		time_fake_value = (1000000 / fs * i);
+		body_sensor->xyz[X] = noise1;
+		body_sensor->xyz[Y] = noise2;
+		body_sensor->xyz[Z] = G_1 - noise1 - noise2;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state(),
+		      "expected state %d at %d[s]", BODY_DETECTION_OFF_BODY,
+		      cnt);
+
+	/*
+	 * Run body_detect with large motion in X-axis (var > threshold +
+	 * delta), should saturate confidence to 100 and detect ON_BODY.
+	 */
+	body_sensor->xyz[X] = G_1;
+	body_sensor->xyz[Y] = 0;
+	for (i = 0; i < 50; i++) {
+		body_sensor->xyz[X] = (i % 2 == 0) ? G_1 : -G_1;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_ON_BODY, body_detect_get_state());
+#endif
 }
 
 ZTEST_SUITE(bodydetectsample, drivers_predicate_post_main, NULL,
@@ -390,6 +525,8 @@ ZTEST_USER(bodydetectonoff, test_setenable)
 	body_detect_set_enable(0);
 	enabled = body_detect_get_enable();
 	zassert_equal(enabled, 0, "unexpected state, enabled = %d", enabled);
+	/* Calling body_detect when disabled should return immediately */
+	body_detect();
 
 	body_detect_set_enable(1);
 	enabled = body_detect_get_enable();

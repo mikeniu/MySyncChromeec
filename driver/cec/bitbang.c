@@ -235,6 +235,25 @@ __test_only int cec_get_state(int port)
 	return cec_port_data[port].state;
 }
 
+__soc_ram_code static void bitbang_memset(void *dest, int c, size_t n)
+{
+	volatile uint8_t *d = dest;
+
+	for (size_t i = 0; i < n; i++) {
+		d[i] = (uint8_t)c;
+	}
+}
+
+__soc_ram_code static void bitbang_memcpy(void *dest, const void *src, size_t n)
+{
+	volatile uint8_t *d = dest;
+	const volatile uint8_t *s = src;
+
+	for (size_t i = 0; i < n; i++) {
+		d[i] = s[i];
+	}
+}
+
 __soc_ram_code static void enter_state(int port, enum cec_state new_state)
 {
 	const struct bitbang_cec_config *drv_config =
@@ -248,8 +267,8 @@ __soc_ram_code static void enter_state(int port, enum cec_state new_state)
 	switch (new_state) {
 	case CEC_STATE_DISABLED:
 		gpio = 1;
-		memset(&port_data->rx, 0, sizeof(struct cec_rx));
-		memset(&port_data->tx, 0, sizeof(struct cec_tx));
+		bitbang_memset(&port_data->rx, 0, sizeof(struct cec_rx));
+		bitbang_memset(&port_data->tx, 0, sizeof(struct cec_tx));
 		break;
 	case CEC_STATE_IDLE:
 		port_data->tx.transfer.bit = 0;
@@ -413,19 +432,10 @@ __soc_ram_code static void enter_state(int port, enum cec_state new_state)
 			addr = port_data->rx.transfer.buf[0] & 0x0f;
 			if (addr == port_data->addr ||
 			    addr == CEC_BROADCAST_ADDR) {
-				/*
-				 * If common code has not read the previous
-				 * message yet, discard it and keep the most
-				 * recent one.
-				 */
-				if (port_data->rx.received_message_available)
-					DEBUG_CPRINTS(
-						"CEC%d: received message not "
-						"read out, discarding",
-						port);
-				memcpy(&port_data->rx.received_message,
-				       &port_data->rx.transfer,
-				       sizeof(port_data->rx.received_message));
+				bitbang_memcpy(
+					&port_data->rx.received_message,
+					&port_data->rx.transfer,
+					sizeof(port_data->rx.received_message));
 				port_data->rx.received_message_available = 1;
 				cec_task_set_event(
 					port, CEC_TASK_EVENT_RECEIVED_DATA);
@@ -802,8 +812,6 @@ __soc_ram_code static int bitbang_cec_set_logical_addr(int port,
 __soc_ram_code static int bitbang_cec_send(int port, const uint8_t *msg,
 					   uint8_t len)
 {
-	char str_buf[hex_str_buf_size(len)];
-
 	if (cec_port_data[port].state == CEC_STATE_DISABLED)
 		return EC_ERROR_BUSY;
 
@@ -812,10 +820,15 @@ __soc_ram_code static int bitbang_cec_send(int port, const uint8_t *msg,
 
 	cec_port_data[port].tx.len = len;
 
-	snprintf_hex_buffer(str_buf, sizeof(str_buf), HEX_BUF(msg, len));
-	DEBUG_CPRINTS("CEC%d send: 0x%s", port, str_buf);
+	if (IS_ENABLED(CONFIG_CEC_DEBUG)) {
+		char str_buf[hex_str_buf_size(len)];
 
-	memcpy(cec_port_data[port].tx.transfer.buf, msg, len);
+		snprintf_hex_buffer(str_buf, sizeof(str_buf),
+				    HEX_BUF(msg, len));
+		DEBUG_CPRINTS("CEC%d send: 0x%s", port, str_buf);
+	}
+
+	bitbang_memcpy(cec_port_data[port].tx.transfer.buf, msg, len);
 
 	cec_trigger_send(port);
 

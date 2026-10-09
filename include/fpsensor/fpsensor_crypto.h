@@ -5,14 +5,15 @@
 
 /* Fingerprint sensor crypto operations */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_CRYPTO_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_CRYPTO_H
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_CRYPTO_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_CRYPTO_H_
 
 #include "common.h"
 #include "crypto/cleanse_wrapper.h"
 #include "ec_commands.h"
 #include "openssl/sha.h"
 
+#include <array>
 #include <cstdint>
 #include <span>
 
@@ -129,4 +130,4 @@ enum ec_error_list aes_128_gcm_decrypt(std::span<const uint8_t> key,
 				       std::span<const uint8_t> nonce,
 				       std::span<const uint8_t> tag);
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_CRYPTO_H */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_CRYPTO_H_ */

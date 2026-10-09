@@ -5,8 +5,8 @@
 
 /* Various utility functions and macros */
 
-#ifndef __CROS_EC_UTIL_H
-#define __CROS_EC_UTIL_H
+#ifndef PLATFORM_EC_INCLUDE_UTIL_H_
+#define PLATFORM_EC_INCLUDE_UTIL_H_
 
 #include "common.h"
 #include "compile_time_macros.h"
@@ -19,6 +19,7 @@
 
 #include <strings.h>
 #ifdef CONFIG_ZEPHYR
+#include <zephyr/sys/minmax.h>
 #include <zephyr/sys/util.h>
 /**
  * TODO(b/237712836): Remove once Zephyr's libc has strcasecmp.
@@ -376,4 +377,4 @@ int ternary_from_bits(int *bits, int nbits);
 }
 #endif
 
-#endif /* __CROS_EC_UTIL_H */
+#endif /* PLATFORM_EC_INCLUDE_UTIL_H_ */

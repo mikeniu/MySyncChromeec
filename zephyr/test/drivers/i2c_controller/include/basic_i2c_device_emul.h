@@ -3,6 +3,9 @@
  * found in the LICENSE file.
  */
 
+#ifndef PLATFORM_EC_ZEPHYR_TEST_DRIVERS_I2C_CONTROLLER_INCLUDE_BASIC_I2C_DEVICE_EMUL_H_
+#define PLATFORM_EC_ZEPHYR_TEST_DRIVERS_I2C_CONTROLLER_INCLUDE_BASIC_I2C_DEVICE_EMUL_H_
+
 #include "emul/emul_common_i2c.h"
 
 #include <stdint.h>
@@ -25,3 +28,6 @@ struct basic_i2c_device_data {
  * @param emul Pointer to the emulator object
  */
 void basic_i2c_device_reset(const struct emul *emul);
+
+#endif /* PLATFORM_EC_ZEPHYR_TEST_DRIVERS_I2C_CONTROLLER_INCLUDE_BASIC_I2C_DEVICE_EMUL_H_ \
+	*/

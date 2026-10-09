@@ -20,8 +20,6 @@
 #include <fpsensor/fpsensor_state.h>
 #include <host_command.h>
 
-DEFINE_FFF_GLOBALS;
-
 FAKE_VALUE_FUNC(int, mkbp_send_event, uint8_t);
 
 #define fp_sim DEVICE_DT_GET(DT_CHOSEN(cros_fp_fingerprint_sensor))
@@ -200,10 +198,97 @@ ZTEST_USER(fpsensor_capture, test_finger_capture_simple_image_scan_too_fast)
 	/* Give opportunity for fpsensor task process event. */
 	k_msleep(1);
 
+	/* Confirm MKBP event was sent once (FINGER_DOWN). */
+	zassert_equal(mkbp_send_event_fake.call_count, 1);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+
+	uint32_t fp_events;
+	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
+
 	/* Confirm that capture mode is still enabled. */
 	params.mode = FP_MODE_DONT_CHANGE;
 	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
 	zassert_true(response.mode & FP_MODE_CAPTURE);
+
+	/* Ping fpsensor task the second time. */
+	fingerprint_run_callback(fp_sim);
+
+	/* Give opportunity for fpsensor task process event. */
+	k_msleep(1);
+
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
+
+	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
+}
+
+ZTEST_USER(fpsensor_capture, test_finger_capture_simple_image_scan_good)
+{
+	struct ec_params_fp_mode params = {
+		.mode = FP_MODE_CAPTURE |
+			(FP_CAPTURE_SIMPLE_IMAGE << FP_MODE_CAPTURE_TYPE_SHIFT),
+	};
+	struct ec_response_fp_mode response;
+	struct fingerprint_sensor_state state;
+	uint32_t fp_events;
+
+	/* Switch mode to capture. */
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+	zassert_true(response.mode & FP_MODE_CAPTURE);
+	zassert_equal(FP_CAPTURE_TYPE(response.mode), FP_CAPTURE_SIMPLE_IMAGE);
+
+	/* Give opportunity for fpsensor task to change mode. */
+	k_msleep(1);
+
+	/* Put finger on the sensor. */
+	fingerprint_get_state(fp_sim, &state);
+	state.finger_state = FINGERPRINT_FINGER_STATE_PRESENT;
+	state.acquire_image_result = FINGERPRINT_SENSOR_SCAN_GOOD;
+	fingerprint_set_state(fp_sim, &state);
+
+	/* Ping fpsensor task for the first time. */
+	fingerprint_run_callback(fp_sim);
+
+	/* Give opportunity for fpsensor task process event. */
+	k_msleep(1);
+
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
+
+	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
+	zassert_true(fp_events & EC_MKBP_FP_IMAGE_READY);
+
+	/* Ping fpsensor task the second time. */
+	fingerprint_run_callback(fp_sim);
+
+	/* Give opportunity for fpsensor task process event. */
+	k_msleep(1);
+
+	/* Confirm capture mode was deactivated. */
+	params.mode = FP_MODE_DONT_CHANGE;
+	zassert_ok(ec_cmd_fp_mode(NULL, &params, &response));
+
+	/* Check that the FP_MODE_CAPTURE bit is turned off */
+	zassert_false(response.mode & FP_MODE_CAPTURE,
+		      "Capture mode should be deactivated (got mode 0x%08x)",
+		      response.mode);
+
+	/* Assert no secondary FINGER_DOWN event was dispatched. */
+	zassert_equal(
+		mkbp_send_event_fake.call_count, 2,
+		"No additional MKBP event should be sent after capture mode is deactivated");
 }
 
 ZTEST_USER(fpsensor_capture,
@@ -271,12 +356,19 @@ ZTEST_USER(fpsensor_capture,
 	/* Give opportunity for fpsensor task to process event. */
 	k_msleep(1);
 
-	/* Confirm MKBP event was sent. */
-	zassert_equal(mkbp_send_event_fake.call_count, 1);
-	zassert_equal(mkbp_send_event_fake.arg0_val, EC_MKBP_EVENT_FINGERPRINT);
+	/* Confirm MKBP events were sent twice. */
+	zassert_equal(mkbp_send_event_fake.call_count, 2);
+	zassert_equal(mkbp_send_event_fake.arg0_history[0],
+		      EC_MKBP_EVENT_FINGERPRINT);
+	zassert_equal(mkbp_send_event_fake.arg0_history[1],
+		      EC_MKBP_EVENT_FINGERPRINT);
 
-	/* Confirm that FP_IMAGE_READY MKBP event is sent. */
+	/*
+	 * Confirm that both EC_MKBP_FP_FINGER_DOWN and FP_IMAGE_READY MKBP
+	 * events were sent.
+	 */
 	fp_get_next_event((uint8_t *)&fp_events);
+	zassert_true(fp_events & EC_MKBP_FP_FINGER_DOWN);
 	zassert_true(fp_events & EC_MKBP_FP_IMAGE_READY);
 }
 

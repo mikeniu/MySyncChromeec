@@ -135,8 +135,8 @@ ZTEST_USER(usb_pd_host_cmd, test_typec_control_invalid_args)
 		.command = TYPEC_CONTROL_COMMAND_TBT_UFP_REPLY,
 	};
 
-	/* Setting the TBT UFP responses is not supported by default. */
-	zassert_equal(ec_cmd_typec_control(NULL, &params), EC_RES_UNAVAILABLE);
+	/* Verify that setting the TBT UFP response succeeds. */
+	zassert_equal(ec_cmd_typec_control(NULL, &params), EC_RES_SUCCESS);
 
 	/* Neither is mux setting. */
 	params.command = TYPEC_CONTROL_COMMAND_USB_MUX_SET;
@@ -164,7 +164,20 @@ ZTEST_USER(usb_pd_host_cmd, test_typec_status_invalid_args)
 
 	params.port = 0;
 	args.response_max = sizeof(struct ec_response_typec_status) - 1;
-	zassert_equal(host_command_process(&args), EC_RES_RESPONSE_TOO_BIG);
+	zassert_equal(host_command_process(&args),
+		      IS_ENABLED(CONFIG_EC_HOST_CMD) ? EC_RES_INVALID_RESPONSE :
+						       EC_RES_RESPONSE_TOO_BIG);
+
+	/* For version 1, the response size is larger. Specifying a response
+	 * max size that is larger than version 0 but smaller than version 1
+	 * will bypass the framework's min_rsp_size validation (which is version
+	 * 0) and return EC_HOST_CMD_RESPONSE_TOO_BIG from the handler itself.
+	 */
+	struct ec_response_typec_status_v1 response_v1;
+	struct host_cmd_handler_args args_v1 =
+		BUILD_HOST_COMMAND(EC_CMD_TYPEC_STATUS, 1, response_v1, params);
+	args_v1.response_max = sizeof(struct ec_response_typec_status_v1) - 1;
+	zassert_equal(host_command_process(&args_v1), EC_RES_RESPONSE_TOO_BIG);
 }
 
 ZTEST_SUITE(usb_pd_host_cmd, drivers_predicate_post_main, NULL, NULL, NULL,

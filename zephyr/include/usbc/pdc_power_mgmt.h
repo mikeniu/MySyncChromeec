@@ -7,8 +7,8 @@
  * @file
  * @brief PDC API for USB-C Power Management.
  */
-#ifndef __CROS_EC_PDC_POWER_MGMT_H
-#define __CROS_EC_PDC_POWER_MGMT_H
+#ifndef PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_POWER_MGMT_H_
+#define PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_POWER_MGMT_H_
 
 #include "usb_mux.h"
 #include "usb_pd.h"
@@ -584,15 +584,6 @@ enum usb_typec_current_t pdc_power_mgmt_get_default_current_limit(int port);
 bool pdc_power_mgmt_get_frs_hw_supported(int port);
 
 /**
- * @brief Enable/Disable FRS for a given port
- *
- * @param port USB-C port number
- *
- * @retval 0 if successful or error code
- */
-int pdc_power_mgmt_frs_enable(int port_num, bool enable);
-
-/**
  * @brief Enable/Disable PDC TrySRC on a port
  *
  * @param port USB-C port number
@@ -808,10 +799,17 @@ bool pdc_power_mgmt_is_pdc_port_valid(int port);
 int pdc_power_mgmt_set_ap_power_state(enum power_state state);
 
 /**
+ * @brief Request a TBT3/USB4 hard reset in PDC power manager
+ *
+ * @param port USBC port number
+ */
+void pdc_power_mgmt_request_tbt_reset(int port);
+
+/**
  * @brief Simulate a power button press from the PDC power manager
  *
  * @param ms simulated power button press length in milliseconds
  */
 void pdc_power_mgmt_simulate_power_button_press(int ms);
 
-#endif /* __CROS_EC_PDC_POWER_MGMT_H */
+#endif /* PLATFORM_EC_ZEPHYR_INCLUDE_USBC_PDC_POWER_MGMT_H_ */

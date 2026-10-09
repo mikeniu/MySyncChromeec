@@ -5,16 +5,22 @@
 
 #include "builtin/assert.h"
 #include "common.h"
+#include "hooks.h"
+#include "host_command.h"
 #include "panic.h"
 #include "panic_utils.h"
+#include "system.h"
 #include "task.h"
 
 #include <zephyr/arch/cpu.h>
 #include <zephyr/cache.h>
 #include <zephyr/fatal.h>
+#include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
+
+LOG_MODULE_REGISTER(panic, LOG_LEVEL_INF);
 
 /*
  * Arch-specific configuration
@@ -64,9 +70,9 @@
 	M(basic.pc, cm.frame[6], pc)      \
 	M(basic.xpsr, cm.frame[7], xpsr)  \
 	EXTRA_PANIC_REG_LIST(M, M_GPR)
-#define PANIC_REG_EXCEPTION(pdata) pdata->cm.regs[1]
-#define PANIC_REG_REASON(pdata) pdata->cm.regs[3]
-#define PANIC_REG_INFO(pdata) pdata->cm.regs[4]
+#define PANIC_REG_EXCEPTION(pdata) ((pdata)->cm.regs[1])
+#define PANIC_REG_REASON(pdata) ((pdata)->cm.regs[3])
+#define PANIC_REG_INFO(pdata) ((pdata)->cm.regs[4])
 #elif defined(CONFIG_RISCV) && !defined(CONFIG_64BIT)
 /*
  * Not all registers are passed in the context from Zephyr
@@ -75,28 +81,28 @@
  * The assignments must match include/panic_defs.h
  */
 #define PANIC_ARCH PANIC_ARCH_RISCV_RV32I
-#define PANIC_REG_LIST(M, M_GPR)  \
-	M(ra, riscv.regs[29], ra) \
-	M(a0, riscv.regs[26], a0) \
-	M(a1, riscv.regs[25], a1) \
-	M(a2, riscv.regs[24], a2) \
-	M(a3, riscv.regs[23], a3) \
-	M(a4, riscv.regs[22], a4) \
-	M(a5, riscv.regs[21], a5) \
-	M(a6, riscv.regs[20], a6) \
-	M(a7, riscv.regs[19], a7) \
-	M(t0, riscv.regs[18], t0) \
-	M(t1, riscv.regs[17], t1) \
-	M(t2, riscv.regs[16], t2) \
-	M(t3, riscv.regs[15], t3) \
-	M(t4, riscv.regs[14], t4) \
-	M(t5, riscv.regs[13], t5) \
-	M(t6, riscv.regs[12], t6) \
-	M(mepc, riscv.mepc, mepc) \
+#define PANIC_REG_LIST(M, M_GPR)      \
+	M(ra, riscv.regs[29], ra)     \
+	M_GPR(a0, riscv.regs[26], a0) \
+	M_GPR(a1, riscv.regs[25], a1) \
+	M_GPR(a2, riscv.regs[24], a2) \
+	M_GPR(a3, riscv.regs[23], a3) \
+	M_GPR(a4, riscv.regs[22], a4) \
+	M_GPR(a5, riscv.regs[21], a5) \
+	M_GPR(a6, riscv.regs[20], a6) \
+	M_GPR(a7, riscv.regs[19], a7) \
+	M_GPR(t0, riscv.regs[18], t0) \
+	M_GPR(t1, riscv.regs[17], t1) \
+	M_GPR(t2, riscv.regs[16], t2) \
+	M_GPR(t3, riscv.regs[15], t3) \
+	M_GPR(t4, riscv.regs[14], t4) \
+	M_GPR(t5, riscv.regs[13], t5) \
+	M_GPR(t6, riscv.regs[12], t6) \
+	M(mepc, riscv.mepc, mepc)     \
 	M(mstatus, riscv.mcause, mstatus)
-#define PANIC_REG_EXCEPTION(pdata) (pdata->riscv.mcause)
-#define PANIC_REG_REASON(pdata) (pdata->riscv.regs[11])
-#define PANIC_REG_INFO(pdata) (pdata->riscv.regs[10])
+#define PANIC_REG_EXCEPTION(pdata) ((pdata)->riscv.mcause)
+#define PANIC_REG_REASON(pdata) ((pdata)->riscv.regs[11])
+#define PANIC_REG_INFO(pdata) ((pdata)->riscv.regs[10])
 #elif defined(CONFIG_X86)
 #define PANIC_ARCH PANIC_ARCH_X86
 #define PANIC_REG_LIST(M, M_GPR) \
@@ -108,19 +114,19 @@
 	M(edi, x86.edi, edi)     \
 	M(cs, x86.cs, cs)        \
 	M(eip, x86.eip, eip)
-#define PANIC_REG_EXCEPTION(pdata) (pdata->x86.eflags)
-#define PANIC_REG_REASON(pdata) (pdata->x86.vector)
-#define PANIC_REG_INFO(pdata) (pdata->x86.error_code)
+#define PANIC_REG_EXCEPTION(pdata) ((pdata)->x86.eflags)
+#define PANIC_REG_REASON(pdata) ((pdata)->x86.vector)
+#define PANIC_REG_INFO(pdata) ((pdata)->x86.error_code)
+#elif defined(CONFIG_ARCH_POSIX)
+#define PANIC_ARCH PANIC_ARCH_POSIX
+#define PANIC_REG_LIST(M, M_GPR) \
+	M(dummy, posix.esf_placeholder, placeholder) /* nocheck */
+#define PANIC_REG_EXCEPTION(pdata) ((pdata)->posix.exception)
+#define PANIC_REG_REASON(pdata) ((pdata)->posix.reason)
+#define PANIC_REG_INFO(pdata) ((pdata)->posix.info)
 #else
 /* Not implemented for this arch */
-#define PANIC_ARCH PANIC_ARCH_UNSUPPORTED
-#define PANIC_REG_LIST(M, M_GPR)
-static uint8_t placeholder_exception_reg;
-static uint32_t placeholder_reason_reg;
-static uint32_t placeholder_info_reg;
-#define PANIC_REG_EXCEPTION(unused) placeholder_exception_reg
-#define PANIC_REG_REASON(unused) placeholder_reason_reg
-#define PANIC_REG_INFO(unused) placeholder_info_reg
+#error "Unsupported architecture for PANIC_ARCH"
 #endif
 
 /* Macros to be applied to PANIC_REG_LIST as M */
@@ -142,32 +148,122 @@ void panic_data_print(const struct panic_data *pdata)
 #endif
 }
 
-#if !defined(CONFIG_ZTEST_FATAL_HOOK)
-static void copy_esf_to_panic_data(const struct arch_esf *esf,
-				   struct panic_data *pdata)
+/**
+ * Reset/prepare a panic_data structure for writing.
+ *
+ * Sets struct size/version, architecture, and default image flags
+ * (PANIC_DATA_FLAG_RW_IMAGE or PANIC_DATA_FLAG_RO_IMAGE).
+ * Note: magic is NOT set here; call panic_data_finalize() when writing
+ * completes.
+ */
+struct panic_data *panic_data_reset(struct panic_data *pdata)
 {
+	if (!pdata) {
+		pdata = get_panic_data_write();
+	}
+
 	memset(pdata, 0, CONFIG_PANIC_DATA_SIZE);
+	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
+	pdata->struct_version = PANIC_DATA_VERSION;
 	pdata->arch = PANIC_ARCH;
-	pdata->struct_version = 2;
-	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
-						   PANIC_DATA_FLAG_RO_IMAGE;
-	pdata->flags |= (PANIC_ARCH == PANIC_ARCH_CORTEX_M) ?
-				PANIC_DATA_FLAG_FRAME_VALID :
-				0;
-	pdata->reserved = 0;
-	pdata->struct_size = sizeof(*pdata);
-	pdata->magic = PANIC_DATA_MAGIC;
+	pdata->flags = IS_ENABLED(CONFIG_CROS_EC_RW) ?
+			       PANIC_DATA_FLAG_RW_IMAGE :
+			       PANIC_DATA_FLAG_RO_IMAGE;
+	/* Note: magic remains 0 (uncommitted) until panic_data_finalize() */
 
-	PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
-
-	/* Flush the panic data to RAM before coming reboot. */
-	sys_cache_data_flush_range(pdata, sizeof(*pdata));
+	return pdata;
 }
 
+/**
+ * Finalize panic data by setting the valid magic number and flushing to RAM.
+ */
+void panic_data_finalize(struct panic_data *pdata)
+{
+	if (pdata) {
+		pdata->magic = PANIC_DATA_MAGIC;
+		sys_cache_data_flush_range((void *)pdata, pdata->struct_size);
+	}
+}
+
+void panic_data_write_esf(const struct arch_esf *esf)
+{
+	struct panic_data *pdata = panic_data_reset(NULL);
+
+	if (esf) {
+		if (PANIC_ARCH == PANIC_ARCH_CORTEX_M) {
+			pdata->flags |= PANIC_DATA_FLAG_FRAME_VALID;
+		}
+
+		PANIC_REG_LIST(PANIC_COPY_REGS, PANIC_COPY_REGS_GPR);
+	}
+
+	/* Finalize and flush the panic data to RAM before reboot. */
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_assert(const char *path, unsigned int line)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+	uint32_t info;
+
+	if (path) {
+		const char *last_slash = strrchr(path, '/');
+		const char *filename = last_slash ? last_slash + 1 : path;
+
+		/*
+		 * Encode the first two characters of the filename and 16-bit
+		 * line number into the 32-bit panic info register.
+		 */
+		info = (filename[0] << 24) | (filename[1] << 16) |
+		       (line & 0xffff);
+	} else {
+		info = (uint32_t)-1;
+	}
+
+	panic_set_reason_reg(pdata, PANIC_SW_ASSERT);
+	panic_set_info_reg(pdata, info);
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)k_current_get());
+
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_watchdog_warning(uintptr_t pc,
+				       const struct k_thread *thread)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_WARN);
+	panic_set_info_reg(pdata, (uint32_t)pc);
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_fatal(unsigned int reason, const struct k_thread *thread)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, PANIC_ZEPHYR_FATAL_ERROR);
+	panic_set_info_reg(pdata, (uint32_t)reason);
+	panic_set_exception_reg(pdata, (uint8_t)(uintptr_t)thread);
+
+	panic_data_finalize(pdata);
+}
+
+void panic_data_write_sw(uint32_t reason, uint32_t info, uint8_t exception)
+{
+	struct panic_data *const pdata = panic_data_reset(NULL);
+
+	panic_set_reason_reg(pdata, reason);
+	panic_set_info_reg(pdata, info);
+	panic_set_exception_reg(pdata, exception);
+
+	panic_data_finalize(pdata);
+}
+
+#if !defined(CONFIG_ZTEST_FATAL_HOOK)
 void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 {
-	struct panic_data *pdata = get_panic_data_write();
-
 	/*
 	 * If CONFIG_LOG is on, the exception details
 	 * have already been logged to the console.
@@ -177,19 +273,15 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 	}
 
 	if ((PANIC_ARCH != PANIC_ARCH_UNSUPPORTED) && esf) {
-		copy_esf_to_panic_data(esf, pdata);
+		panic_data_write_esf(esf);
 		if (!IS_ENABLED(CONFIG_LOG)) {
 			panic_data_print(panic_get_data());
 		}
 	} else {
-		/* If a esf structure is empty, store just the reason provided
+		/* If an esf structure is empty, store just the reason provided
 		 * by Zephyr. It can be caused e.g. by a spurious interrupt.
 		 */
-		uint8_t flags = pdata->flags;
-		panic_set_reason(PANIC_ZEPHYR_FATAL_ERROR, (uint32_t)reason,
-				 task_get_current());
-		/* Keep panic flags */
-		pdata->flags = flags;
+		panic_data_write_fatal(reason, k_current_get());
 	}
 
 	LOG_PANIC();
@@ -204,7 +296,6 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 	 * the watchdog will overwrite this panic.
 	 */
 	panic_reboot();
-	__ASSERT_UNREACHABLE;
 }
 #endif /* CONFIG_ZTEST_FATAL_HOOK */
 
@@ -212,83 +303,147 @@ void k_sys_fatal_error_handler(unsigned int reason, const struct arch_esf *esf)
 #ifdef CONFIG_ASSERT_NO_FILE_INFO
 __override void assert_post_action(void)
 {
-	panic_set_reason(PANIC_SW_ASSERT, -1, task_get_current());
+	panic_data_write_assert(NULL, 0);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
 
 	panic_reboot();
-	__ASSERT_UNREACHABLE;
 }
 #else
 __override void assert_post_action(const char *path, unsigned int line)
 {
-	const k_tid_t thread = k_current_get();
-
-	/* Extract filename from path */
-	const char *last_slash = strrchr(path, '/');
-	const char *filename = last_slash ? last_slash + 1 : path;
-	/* Top two bytes of info register is first two characters of filename.
-	 * Bottom two bytes of info register is line number.
-	 */
-	panic_set_reason(PANIC_SW_ASSERT,
-			 (filename[0] << 24) | (filename[1] << 16) |
-				 (line & 0xffff),
-			 task_get_current());
+	panic_data_write_assert(path, line);
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_CONSOLE_CMD_CRASH_NESTED))
 		command_crash_nested_handler();
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_PRINT_STACK_ON_ASSERT)) {
-		print_stack_trace(thread);
+		print_stack_trace(k_current_get());
 	}
 
 	panic_reboot();
-	__ASSERT_UNREACHABLE;
 }
 #endif /* CONFIG_ASSERT_NO_FILE_INFO */
 #endif /* CONFIG_PLATFORM_EC_DEBUG_ASSERT */
 
-void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception)
+uint32_t panic_get_reason_reg(const struct panic_data *pdata)
 {
-	struct panic_data *const pdata = get_panic_data_write();
-
-	/* Setup panic data structure */
-	memset(pdata, 0, CONFIG_PANIC_DATA_SIZE);
-	pdata->magic = PANIC_DATA_MAGIC;
-	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
-	pdata->struct_version = 2;
-	pdata->arch = PANIC_ARCH;
-	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
-						   PANIC_DATA_FLAG_RO_IMAGE;
-
-	/* Log panic cause */
-	PANIC_REG_EXCEPTION(pdata) = exception;
-	PANIC_REG_REASON(pdata) = reason;
-	PANIC_REG_INFO(pdata) = info;
-
-	/* Flush the panic data to RAM before potential reboot. */
-	sys_cache_data_flush_range(pdata, sizeof(*pdata));
-
-	/* Allow architecture specific logic */
-	arch_panic_set_reason(reason, info, exception);
+	return pdata ? PANIC_REG_REASON(pdata) : 0;
 }
 
-void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception)
+void panic_set_reason_reg(struct panic_data *pdata, uint32_t reason)
 {
-	struct panic_data *const pdata = panic_get_data();
-
-	if (pdata && pdata->struct_version == 2) {
-		*exception = PANIC_REG_EXCEPTION(pdata);
-		*reason = PANIC_REG_REASON(pdata);
-		*info = PANIC_REG_INFO(pdata);
-	} else {
-		*exception = *reason = *info = 0;
+	if (pdata) {
+		PANIC_REG_REASON(pdata) = reason;
 	}
 }
 
-__overridable void arch_panic_set_reason(uint32_t reason, uint32_t info,
-					 uint8_t exception)
+uint32_t panic_get_info_reg(const struct panic_data *pdata)
 {
-	/* Default implementation, do nothing. */
+	return pdata ? PANIC_REG_INFO(pdata) : 0;
 }
+
+void panic_set_info_reg(struct panic_data *pdata, uint32_t info)
+{
+	if (pdata) {
+		PANIC_REG_INFO(pdata) = info;
+	}
+}
+
+uint8_t panic_get_exception_reg(const struct panic_data *pdata)
+{
+	return pdata ? (uint8_t)PANIC_REG_EXCEPTION(pdata) : 0;
+}
+
+void panic_set_exception_reg(struct panic_data *pdata, uint8_t exception)
+{
+	if (pdata) {
+		PANIC_REG_EXCEPTION(pdata) = exception;
+	}
+}
+
+test_export_static int panic_data_init(void)
+{
+	bool is_panic_new;
+	bool is_watchdog_reset;
+	struct panic_data *pdata = panic_get_data();
+	uint32_t reason = panic_get_reason_reg(pdata);
+
+	is_watchdog_reset =
+		!!(system_get_reset_flags() & EC_RESET_FLAG_WATCHDOG);
+
+	if (is_watchdog_reset) {
+		LOG_WRN("Watchdog Reset Detected");
+	}
+
+	is_panic_new = panic_data_is_new();
+
+	if (is_panic_new) {
+		LOG_WRN("New Panic Detected: %s",
+			panic_sw_reason_is_valid(reason) ?
+				panic_sw_reasons[reason - PANIC_SW_BASE] :
+				"");
+	}
+
+	/*
+	 * Only update the panic reason in RW since RO may have an older panic
+	 * data version and updating the panic reason will cause new fields to
+	 * be overwritten.
+	 */
+	if (IS_ENABLED(CONFIG_CROS_EC_RO)) {
+		return 0;
+	}
+
+	/*
+	 * Log panic cause if watchdog caused reset and panic cause
+	 * was not already logged. This must happen after parsing jump_data
+	 * to ensure we have restored the reset flags passed from the previous
+	 * image.
+	 */
+	if (is_watchdog_reset) {
+		/* If the panic reason is a watchdog warning, then change
+		 * the reason to a regular watchdog reason while preserving
+		 * the info and exception from the watchdog warning.
+		 */
+		if (is_panic_new && reason == PANIC_SW_WATCHDOG_WARN) {
+			LOG_INF("Promoting watchdog warning to watchdog panic");
+			panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG);
+			panic_data_finalize(pdata);
+		} else if ((reason != PANIC_SW_WATCHDOG &&
+			    reason != PANIC_SW_WATCHDOG_HARD) ||
+			   !is_panic_new) {
+			/* The watchdog panic info may have already been
+			 * initialized by the watchdog handler, so only set it
+			 * here if the panic reason is not a watchdog or the
+			 * panic info has already been read, i.e. an old
+			 * watchdog panic. Both RO and RW flags are unset
+			 * because source image is not known.
+			 */
+			LOG_INF("Setting hard watchdog panic");
+			pdata = panic_data_reset(NULL);
+			pdata->flags &= ~(PANIC_DATA_FLAG_RW_IMAGE |
+					  PANIC_DATA_FLAG_RO_IMAGE);
+			panic_set_reason_reg(pdata, PANIC_SW_WATCHDOG_HARD);
+			panic_data_finalize(pdata);
+		}
+	}
+
+	return 0;
+}
+
+/* Initialize panic data after reset flags and console are ready. */
+SYS_INIT(panic_data_init, PRE_KERNEL_2, 0);
+
+#if defined(CONFIG_PLATFORM_EC_PANIC_HOST_EVENT)
+static void panic_host_event_init(void)
+{
+	struct panic_data *pdata = panic_get_data();
+
+	if (pdata && !(pdata->flags & PANIC_DATA_FLAG_OLD_HOSTEVENT)) {
+		host_set_single_event(EC_HOST_EVENT_PANIC);
+		pdata->flags |= PANIC_DATA_FLAG_OLD_HOSTEVENT;
+	}
+}
+DECLARE_HOOK(HOOK_CHIPSET_STARTUP, panic_host_event_init, HOOK_PRIO_LAST);
+#endif
