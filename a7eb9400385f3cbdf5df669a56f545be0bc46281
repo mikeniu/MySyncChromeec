@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dc9cdb7_15a0cbe9",
+        "filename": "util/renode/firmware_builder.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T16:22:27Z",
+      "side": 1,
+      "message": "These imports might fail if the environment hasn\u0027t already set up the PYTHONPATH to include zephyr/zmake. It is standard practice in EC scripts that depend on zmake to explicitly add it to the path at the top of the file:\n\n```python\nsys.path.append(str(Path(__file__).resolve().parents[2] / \u0027zephyr\u0027 / \u0027zmake\u0027))\n```\n(Note: EC_DIR is defined below, so you\u0027d need to define it or the path calculation before the imports).",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 0
+      },
+      "revId": "a7eb9400385f3cbdf5df669a56f545be0bc46281",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
