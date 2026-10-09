@@ -16,6 +16,29 @@
       "message": "Automatically set CQ+1 by AutoRunner. See go/chromeos-cqw:auto-runner-doc for details. \nReport Bugs/Feedback: go/cros-auto-runner-bug. \n",
       "revId": "5178018fdee1b7169d57e51585d986245bc7d80f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5821b2d_3d4d3871",
+        "filename": "zephyr/shim/src/CMakeLists.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T23:14:17Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Using `zephyr_include_directories` adds `${ZEPHYR_BASE}` to the global include path for all Zephyr targets, which can pollute the include path and cause unintended header conflicts across the build.\n\nConsider using `zephyr_library_include_directories(\"${ZEPHYR_BASE}\")` instead to restrict this include path to only this library.",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 0
+      },
+      "revId": "5178018fdee1b7169d57e51585d986245bc7d80f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
