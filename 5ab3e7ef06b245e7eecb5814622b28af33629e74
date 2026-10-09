@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a0cd7ff_e269c3db",
+        "filename": "zephyr/ish.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-09T11:42:36Z",
+      "side": 1,
+      "message": "Move this into a separate CL.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 47
+      },
+      "revId": "5ab3e7ef06b245e7eecb5814622b28af33629e74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f64db3ef_c00db190",
+        "filename": "zephyr/shim/src/log_backend_console_buffer.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-09T11:42:36Z",
+      "side": 1,
+      "message": "This also should be in a separate CL.",
+      "revId": "5ab3e7ef06b245e7eecb5814622b28af33629e74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a3c1202_b6dd7ae0",
+        "filename": "zephyr/shim/src/panic.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-09T11:42:36Z",
+      "side": 1,
+      "message": "Should this use `SYS_INIT`?  `HOOK_INIT` runs pretty late and will eventually be deprecated.",
+      "range": {
+        "startLine": 453,
+        "startChar": 0,
+        "endLine": 453,
+        "endChar": 63
+      },
+      "revId": "5ab3e7ef06b245e7eecb5814622b28af33629e74",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
