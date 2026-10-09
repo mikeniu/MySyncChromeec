@@ -11,6 +11,23 @@
 	status = "okay";
 };
 
+&timers16 {
+	/*
+	 * 16-bit counter clocked at 64 MHz (HSI) by default.
+	 * Setting prescaler to 16384 gives ~16.8s maximum timeout.
+	 */
+	st,prescaler = <0x4000>;
+	status = "okay";
+	wdg_helper_counter: counter {
+		status = "okay";
+	};
+};
+
+&wdg_helper {
+	counter = <&wdg_helper_counter>;
+	status = "okay";
+};
+
 /* RNG module uses hsi48 clock as a source by default. */
 /* TODO: Enable only to get random number. Connect it to RNG and device suspend and resume?. */
 &clk_hsi48 {
