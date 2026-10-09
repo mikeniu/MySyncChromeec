@@ -22,6 +22,30 @@
       },
       "revId": "0b008ccb8de051c97409ad09e327d17580241fa2",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a95fa94_9c4ec457",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:45Z",
+      "side": 1,
+      "message": "Done: removed the extra (not opts.zephyr_base or not opts.modules_dir) condition and kept the missing-checkout warning when find_checkout() raises FileNotFoundError.",
+      "parentUuid": "bcfa062f_f08e1b8c",
+      "range": {
+        "startLine": 535,
+        "startChar": 0,
+        "endLine": 535,
+        "endChar": 0
+      },
+      "revId": "0b008ccb8de051c97409ad09e327d17580241fa2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
