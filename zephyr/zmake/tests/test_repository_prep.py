@@ -4,6 +4,7 @@
 
 """Tests for codebase preparation (patches and overrides)."""
 
+import argparse
 import os
 import pathlib
 import subprocess
@@ -12,12 +13,19 @@ from unittest import mock
 import pytest
 from zmake.repository_prep import _find_override_files
 from zmake.repository_prep import _find_patch_files
+from zmake.repository_prep import _has_files
 from zmake.repository_prep import CodebasePreparer
+from zmake.repository_prep import copy_outputs_back
+from zmake.repository_prep import create_shadow_checkout
 from zmake.repository_prep import find_git_repo
+from zmake.repository_prep import fix_symlinks
 from zmake.repository_prep import get_dirty_files
 from zmake.repository_prep import get_patch_modified_files
 from zmake.repository_prep import main as prep_main
+from zmake.repository_prep import needs_copy_for_patches
+from zmake.repository_prep import prepared_workspace
 from zmake.repository_prep import RepositoryPrepError
+from zmake.repository_prep import set_checkout
 
 
 def test_find_override_files(tmp_path):
@@ -291,6 +299,24 @@ def test_codebase_preparer_commit(cros_checkout, tmp_path):
     ) == "overridden content\n"
 
 
+def test_has_files_ignores_metadata(tmp_path):
+    """Test that _has_files ignores .gitkeep, .keep, README.md, OWNERS, etc."""
+    assert not _has_files(tmp_path)
+    for name in (
+        ".gitkeep",
+        ".keep",
+        "README.md",
+        "OWNERS",
+        "DIR_METADATA",
+        "LICENSE",
+    ):
+        (tmp_path / name).touch()
+    assert not _has_files(tmp_path)
+
+    (tmp_path / "real_patch.patch").touch()
+    assert _has_files(tmp_path)
+
+
 def test_codebase_preparer_path_mappings_and_cli(tmp_path):
     """Test path_mappings in non-git ebuild layout and standalone CLI main()."""
     ec_mod = tmp_path / "zephyrproject" / "modules" / "ec"
@@ -486,3 +512,277 @@ def test_preparer_edge_cases(cros_checkout, tmp_path, setup_git_repo):
     ):
         with pytest.raises(RepositoryPrepError):
             prep.commit_changes()
+
+
+def test_copy_outputs_back_merges_and_fixes_lcov_paths(tmp_path):
+    """Test copy_outputs_back merges build dirs and fixes lcov paths cleanly."""
+    real_co, shadow_co = tmp_path / "real", tmp_path / "shadow"
+    ec_rel = pathlib.Path("src/platform/ec")
+
+    real_build = real_co / ec_rel / "build"
+    (real_build / "board_a").mkdir(parents=True)
+    (real_build / "board_a" / "ec.bin").write_text("bin_a\n", encoding="utf-8")
+    (real_build / "sym_dir").mkdir(parents=True)
+    (real_build / "sym_dir" / "old.txt").write_text("old\n", encoding="utf-8")
+
+    shadow_build = shadow_co / ec_rel / "build"
+    (shadow_build / "board_b").mkdir(parents=True)
+    (shadow_build / "board_b" / "ec.bin").write_text(
+        "bin_b\n", encoding="utf-8"
+    )
+    os.symlink(real_build / "board_a", shadow_build / "sym_dir")
+    (shadow_build / "lcov.info").write_text(
+        f"SF:{shadow_co}/src/platform/ec/main.c\n"
+        f"SF:{shadow_co}_other/src/platform/ec/main.c\n"
+        "end_of_record\n",
+        encoding="utf-8",
+    )
+    (shadow_co / ec_rel / "twister-out.json").write_text(
+        "{}\n", encoding="utf-8"
+    )
+
+    copy_outputs_back(shadow_co, real_co, ec_rel)
+
+    assert (real_build / "board_a" / "ec.bin").read_text(
+        encoding="utf-8"
+    ) == "bin_a\n"
+    assert (real_build / "board_b" / "ec.bin").read_text(
+        encoding="utf-8"
+    ) == "bin_b\n"
+    assert (real_build / "sym_dir").is_symlink()
+    assert (real_co / ec_rel / "twister-out.json").read_text(
+        encoding="utf-8"
+    ) == "{}\n"
+    assert (real_build / "lcov.info").read_text(encoding="utf-8") == (
+        f"SF:{real_co}/src/platform/ec/main.c\n"
+        f"SF:{shadow_co}_other/src/platform/ec/main.c\n"
+        "end_of_record\n"
+    )
+
+
+def test_create_shadow_checkout_and_fix_symlinks(cros_checkout, tmp_path):
+    """Test create_shadow_checkout deduplicates, expands fingerprint, and fix_symlinks."""
+    real_co, ec_dir, zephyr_base = cros_checkout
+    shadow_co = tmp_path / "shadow"
+
+    (ec_dir / "build").mkdir()
+    (ec_dir / "build" / "old.o").write_text("ignored\n", encoding="utf-8")
+    (ec_dir / "scripts" / "build").mkdir(parents=True)
+    (ec_dir / "scripts" / "build" / "helper.py").write_text(
+        "kept\n", encoding="utf-8"
+    )
+    (ec_dir / "twister-out-host.2").mkdir()
+    (ec_dir / "twister-out-host.2" / "log.txt").write_text(
+        "ignored\n", encoding="utf-8"
+    )
+
+    boringssl = real_co / "src" / "third_party" / "boringssl"
+    boringssl.mkdir(parents=True)
+    egis_fp = real_co / "src" / "platform" / "fingerprint" / "egis"
+    egis_fp.mkdir(parents=True)
+    (real_co / "src" / "platform" / "fingerprint" / "google-fpalg").mkdir(
+        parents=True
+    )
+
+    modules = {"ec": ec_dir, "boringssl": boringssl, "egis_fp": egis_fp}
+    create_shadow_checkout(real_co, shadow_co, modules, zephyr_base, [], [])
+
+    shadow_ec = shadow_co / "src" / "platform" / "ec"
+    assert shadow_ec.is_dir() and not shadow_ec.is_symlink()
+    assert not (shadow_ec / "build").exists()
+    assert (shadow_ec / "scripts" / "build" / "helper.py").is_file()
+    assert not (shadow_ec / "twister-out-host.2").exists()
+    short_hash = subprocess.run(
+        ["git", "rev-parse", "--short", "--verify", "HEAD"],
+        cwd=shadow_ec,
+        capture_output=True,
+        check=True,
+        text=True,
+    ).stdout.strip()
+    assert len(short_hash) >= 8
+    assert (shadow_co / "src" / "third_party" / "boringssl").is_symlink()
+    assert (
+        shadow_co / "src" / "platform" / "fingerprint" / "egis"
+    ).is_symlink()
+    assert (
+        shadow_co / "src" / "platform" / "fingerprint" / "google-fpalg"
+    ).is_symlink()
+
+    # External zephyr_base with overrides is copied into shadow_co / zp_rel
+    ext_zephyr = tmp_path / "external_zephyr"
+    ext_zephyr.mkdir()
+    (ext_zephyr / "Kconfig").touch()
+    zp_rel = pathlib.Path("src/third_party/zephyrproject/zephyr")
+    ovr_dir = tmp_path / "ovr"
+    (ovr_dir / zp_rel).mkdir(parents=True)
+    (ovr_dir / zp_rel / "ext.c").write_text("ext ovr\n", encoding="utf-8")
+    shadow_co_ext = tmp_path / "shadow_ext"
+    create_shadow_checkout(
+        real_co, shadow_co_ext, modules, ext_zephyr, [ovr_dir], []
+    )
+    assert (shadow_co_ext / zp_rel).is_dir() and not (
+        shadow_co_ext / zp_rel
+    ).is_symlink()
+
+    # fix_symlinks path-boundary safety
+    sym_dir = tmp_path / "sym_test"
+    sym_dir.mkdir()
+    os.symlink("/tmp/shadow/file.c", sym_dir / "match_link")
+    os.symlink("/tmp/shadow_other/file.c", sym_dir / "non_match_link")
+    fix_symlinks(sym_dir, "/tmp/shadow", "/tmp/real")
+    assert os.readlink(sym_dir / "match_link") == "/tmp/real/file.c"
+    assert os.readlink(sym_dir / "non_match_link") == "/tmp/shadow_other/file.c"
+
+
+def test_ancestor_patches_and_symlinked_git_guard(
+    cros_checkout, tmp_path, setup_git_repo
+):
+    """Test ancestor patches and symlinked .git guard in shadow checkout."""
+    real_co, ec_dir, real_zephyr = cros_checkout
+    shadow_co = tmp_path / "shadow"
+    real_zp = real_zephyr.parent
+    (real_zephyr / "kernel").mkdir(parents=True)
+    (real_zephyr / "kernel" / "version.c").write_text(
+        "int v = 1;\n", encoding="utf-8"
+    )
+    setup_git_repo(real_zp)
+    real_head_before = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=real_zp,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+
+    patches_dir = tmp_path / "patches"
+    zp_patch_dir = patches_dir / "src" / "third_party" / "zephyrproject"
+    zp_patch_dir.mkdir(parents=True)
+    (zp_patch_dir / "0001-ver.patch").write_text(
+        "--- a/zephyr/kernel/version.c\n"
+        "+++ b/zephyr/kernel/version.c\n"
+        "@@ -1,1 +1,2 @@\n"
+        " int v = 1;\n"
+        "+int v2 = 2;\n",
+        encoding="utf-8",
+    )
+
+    assert needs_copy_for_patches(
+        pathlib.Path("src/third_party/zephyrproject/zephyr"), [patches_dir]
+    )
+    assert not needs_copy_for_patches(
+        pathlib.Path("src/third_party/zephyrproject/modules/hal/stm32"),
+        [patches_dir],
+    )
+
+    create_shadow_checkout(
+        real_co, shadow_co, {"ec": ec_dir}, real_zephyr, [], [patches_dir]
+    )
+
+    shadow_zp = shadow_co / "src" / "third_party" / "zephyrproject"
+    shadow_zephyr = shadow_zp / "zephyr"
+    assert not (shadow_zp / ".git").exists()
+    assert shadow_zephyr.is_dir() and not shadow_zephyr.is_symlink()
+
+    os.symlink(real_zp / ".git", shadow_zp / ".git")
+    with CodebasePreparer(shadow_co, [patches_dir], [], commit=True):
+        assert "int v2 = 2;" in (
+            shadow_zephyr / "kernel" / "version.c"
+        ).read_text(encoding="utf-8")
+
+    real_head_after = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=real_zp,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    assert real_head_after == real_head_before
+    assert (real_zephyr / "kernel" / "version.c").read_text(
+        encoding="utf-8"
+    ) == "int v = 1;\n"
+    assert os.path.exists(shadow_zephyr / ".git")
+
+
+def test_prepared_workspace_shadow_and_partial_failure(
+    cros_checkout, tmp_path, monkeypatch
+):
+    """Test prepared_workspace shadow execution, CLI option remapping, and partial failure."""
+    real_co, ec_path, zephyr_base = cros_checkout
+    override_root = tmp_path / "overrides"
+    override_ec = override_root / "src" / "platform" / "ec"
+    override_ec.mkdir(parents=True)
+    (override_ec / "file_to_override.c").write_text(
+        "shadow override\n", encoding="utf-8"
+    )
+
+    old_co = set_checkout(real_co)
+    monkeypatch.delenv("ZMAKE_WORKSPACE_PREPARED", raising=False)
+    try:
+        opts = argparse.Namespace(
+            checkout=real_co,
+            patches_dirs=[],
+            src_override_dirs=[override_root],
+            no_shadow=False,
+            zephyr_base=zephyr_base,
+            projects_dirs=[ec_path / "zephyr"],
+            modules_dir=None,
+            func=lambda _o: 0,
+        )
+        with prepared_workspace(
+            opts, modules={"ec": ec_path}, checkout=real_co
+        ) as shadow_ec:
+            assert shadow_ec is not None
+            assert os.environ.get("ZMAKE_WORKSPACE_PREPARED") == "1"
+            assert opts.checkout == shadow_ec.parents[2]
+            assert opts.zephyr_base.is_relative_to(opts.checkout)
+            assert opts.projects_dirs[0] == shadow_ec / "zephyr"
+            assert (shadow_ec / "file_to_override.c").read_text(
+                encoding="utf-8"
+            ) == "shadow override\n"
+            (shadow_ec / "build").mkdir()
+            (shadow_ec / "build" / "out.bin").write_text(
+                "artifact\n", encoding="utf-8"
+            )
+            (shadow_ec / "twister-out-llvm").mkdir()
+            (shadow_ec / "twister-out-llvm" / "coverage.info").write_text(
+                "cov\n", encoding="utf-8"
+            )
+
+        assert os.environ.get("ZMAKE_WORKSPACE_PREPARED") is None
+        assert (ec_path / "build" / "out.bin").read_text(
+            encoding="utf-8"
+        ) == "artifact\n"
+        assert (ec_path / "twister-out-llvm" / "coverage.info").read_text(
+            encoding="utf-8"
+        ) == "cov\n"
+
+        # bundle and merge_shards prepare real_co in-place so genhtml sees
+        # patched/overridden files at canonical real_co paths.
+        def bundle(_o):
+            return 0
+
+        def merge_shards(_o):
+            return 0
+
+        for fn in (bundle, merge_shards):
+            opts.func = fn
+            with prepared_workspace(opts, modules={"ec": ec_path}) as shadow_ec:
+                assert shadow_ec is None
+                assert os.environ.get("ZMAKE_WORKSPACE_PREPARED") == "1"
+                assert (ec_path / "file_to_override.c").read_text(
+                    encoding="utf-8"
+                ) == "shadow override\n"
+            assert (ec_path / "file_to_override.c").read_text(
+                encoding="utf-8"
+            ) == "original content\n"
+
+        # Dirty file aborts before shadow_ready=True; copy_outputs_back is not called
+        opts.func = lambda _o: 0
+        (ec_path / "file_to_override.c").write_text(
+            "local dirty\n", encoding="utf-8"
+        )
+        with pytest.raises(RepositoryPrepError):
+            with prepared_workspace(opts, modules={"ec": ec_path}):
+                pass
+    finally:
+        set_checkout(old_co)
