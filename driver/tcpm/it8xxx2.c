@@ -721,6 +721,26 @@ it8xxx2_tcpm_get_chip_info(int port, int live,
 #ifdef CONFIG_USB_PD_TCPC_LOW_POWER
 static int it8xxx2_tcpm_enter_low_power_mode(int port)
 {
+	enum tcpc_cc_voltage_status cc1, cc2;
+
+	/*
+	 * The TC state machine stops polling CC in low power mode, so the
+	 * plug in interrupt is the only way to detect a new partner.
+	 * it8xxx2_tcpm_switch_plug_out_type() disables the interrupt (sink)
+	 * or switches to plug out detection (source) when it sees partner
+	 * terminations. If that partner went away without the port
+	 * attaching (e.g. a CC glitch or AttachWait bounce), detection is
+	 * left disabled. Re-arm plug in detection if no partner termination
+	 * is present.
+	 */
+	if (IS_ENABLED(IT83XX_INTC_PLUG_IN_OUT_SUPPORT)) {
+		it8xxx2_tcpm_get_cc(port, &cc1, &cc2);
+		if (cc1 == TYPEC_CC_VOLT_OPEN && cc2 == TYPEC_CC_VOLT_OPEN)
+			IT83XX_USBPD_TCDCR(port) &=
+				~(USBPD_REG_PLUG_OUT_SELECT |
+				  USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE);
+	}
+
 	/*
 	 * ITE embedded TCPC SLEEP_MASK_USB_PD flag is only controlled by
 	 * it8xxx2 driver in tc_update_pd_sleep_mask(), and do low power
