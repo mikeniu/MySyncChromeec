@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9effd6a6_9e625630",
+        "filename": "zephyr/zmake/zmake/zmake.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T16:20:27Z",
+      "side": 1,
+      "message": "If `worktree_patches_dirs` or `worktree_src_override_dirs` is provided, `projects` is initialized to an empty set at line 476. If the user provided a specific project name that DOES exist in the base checkout but is NOT found after applying patches (unlikely but possible), the check at line 482 will pass (because `project_names` is not empty), but the build will fail later.\n\nMore importantly, if `project_names` is empty and `all_projects` is false, this returns early correctly. But if the user provides projects that ONLY exist in the patched worktree, the initial check at line 482 is correct to use the raw names. \n\nHowever, there is no check for `projects` being empty after the deferred discovery at line 520. If discovery fails there, you might proceed with an empty `projects` set.",
+      "range": {
+        "startLine": 520,
+        "startChar": 0,
+        "endLine": 520,
+        "endChar": 0
+      },
+      "revId": "5868d30ebe9f3bdfabcf23ebbd89756b1d6a3390",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61e00f89_7c289015",
+        "filename": "zephyr/zmake/zmake/zmake.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T16:20:27Z",
+      "side": 1,
+      "message": "This logic for enabling job name logging is only applied when worktree patches/overrides are present. If a user runs compare-builds on multiple projects without overrides, they won\u0027t get the job name in the logs. Consider moving this logic so it applies to both cases.",
+      "range": {
+        "startLine": 526,
+        "startChar": 0,
+        "endLine": 526,
+        "endChar": 0
+      },
+      "revId": "5868d30ebe9f3bdfabcf23ebbd89756b1d6a3390",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
