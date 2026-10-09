@@ -94,6 +94,7 @@ menuconfig PLATFORM_EC_CONSOLE_DEBUG
 
 config PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER
 	bool "Logging backend for the console buffer"
+	default y if PLATFORM_EC_HOST_INTERFACE_HECI
 	depends on PLATFORM_EC_HOSTCMD_CONSOLE
 	depends on !LOG_MODE_MINIMAL
 	select LOG_OUTPUT
