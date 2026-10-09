@@ -16,6 +16,23 @@
       "message": "Need to look at the json file output after the CQ finishes.",
       "revId": "a5fb078b2b44c718502eab7ef279c84c93faa968",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52a4bf70_cb7bf04d",
+        "filename": "firmware_builder.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 542,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:46:17Z",
+      "side": 1,
+      "message": "software_config comes from the previous loop, so this would be the last found config, is that right?",
+      "revId": "a5fb078b2b44c718502eab7ef279c84c93faa968",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
