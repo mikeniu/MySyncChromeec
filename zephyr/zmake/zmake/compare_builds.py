@@ -16,6 +16,7 @@ from typing import List
 
 import zmake.modules
 from zmake.output_packers import packer_registry
+from zmake.repository_prep import CodebasePreparer
 
 
 def get_git_hash(ref, repo_dir):
@@ -314,12 +315,73 @@ class CompareBuilds:
                     module_tuples.append(module_tuple)
         return module_tuples
 
-    def do_checkouts(self, zephyr_base, module_paths):
+    def _prepare_checkout(
+        self,
+        checkout,
+        module_paths,
+        flattened_module_list,
+        patches_dirs,
+        src_override_dirs,
+    ):
+        """Apply source overrides and patches to a checked-out ref worktree."""
+        path_mappings = {
+            pathlib.Path("src/third_party/zephyrproject/zephyr"): (
+                checkout.zephyr_dir.resolve()
+            ),
+        }
+        zephyrproject_dir = checkout.work_dir / "zephyrproject"
+        if zephyrproject_dir.exists():
+            path_mappings[pathlib.Path("src/third_party/zephyrproject")] = (
+                zephyrproject_dir.resolve()
+            )
+        for mod_name in module_paths:
+            if (
+                mod_name not in flattened_module_list
+                and mod_name in zmake.modules.known_modules
+            ):
+                rel_mod = zmake.modules.known_modules[mod_name](
+                    mod_name, pathlib.Path("")
+                )
+                path_mappings[rel_mod] = (
+                    checkout.modules_dir / mod_name
+                ).resolve()
+
+        ec_src = (
+            pathlib.Path(module_paths["ec"]).resolve()
+            if "ec" in module_paths
+            else None
+        )
+        ec_dst = (checkout.modules_dir / "ec").resolve()
+
+        def _remap_ec(dir_path):
+            resolved = pathlib.Path(dir_path).resolve()
+            if ec_src and (resolved == ec_src or ec_src in resolved.parents):
+                return ec_dst / resolved.relative_to(ec_src)
+            return resolved
+
+        CodebasePreparer(
+            checkout.work_dir,
+            [_remap_ec(d) for d in (patches_dirs or [])],
+            [_remap_ec(d) for d in (src_override_dirs or [])],
+            user_dirty_files=set(),
+            commit=True,
+            path_mappings=path_mappings,
+        ).prepare()
+
+    def do_checkouts(
+        self,
+        zephyr_base,
+        module_paths,
+        patches_dirs=None,
+        src_override_dirs=None,
+    ):
         """Checkout all EC sources at a specific commit.
 
         Args:
             zephyr_base: The location of the zephyr sources.
             module_paths: The location of the module sources.
+            patches_dirs: Optional list of patch directories to apply per ref.
+            src_override_dirs: Optional list of override directories per ref.
         """
         self.logger.info("Clone all repos")
         for checkout in self.checkouts:
@@ -444,6 +506,16 @@ class CompareBuilds:
             )
             if is_flattened_module:
                 flattened_module_list.append(module_name)
+
+        if patches_dirs or src_override_dirs:
+            for checkout in self.checkouts:
+                self._prepare_checkout(
+                    checkout,
+                    module_paths,
+                    flattened_module_list,
+                    patches_dirs,
+                    src_override_dirs,
+                )
 
         # Upstream zephyr modules are all included in the "zephyrproject"
         # repository.  These need to be copied from "./zephyrproject/modules"
