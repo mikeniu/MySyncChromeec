@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dce831e_eadf6454",
+        "filename": "zephyr/scripts/firmware_builder_lib.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T17:06:46Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: It seems `\"src/project\"` is missing from `paths_to_handle`.\n\nThe `read_boxter()` function in `firmware_builder.py` searches for Boxster configs in `find_checkout() / \"src\" / \"project\"`. Since `find_checkout()` returns the shadow checkout during a build, and `src/project` is not copied or symlinked to the shadow checkout here, `read_boxter()` will silently return an empty dictionary. This will cause the build to silently skip metrics and firmware artifacts for Boxster boards.\n\nYou can fix this by adding a mapping for it here:\n```python\n\"project\": real_root / \"src\" / \"project\",\n```",
+      "range": {
+        "startLine": 420,
+        "startChar": 0,
+        "endLine": 420,
+        "endChar": 0
+      },
+      "revId": "0624ebed9884fb6928fd0de372e5bac584d31777",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9a24df0_9ebc886d",
+        "filename": "zephyr/scripts/firmware_builder_lib.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T17:06:46Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: The pattern `\"twister-out.*\"` will match directories like `twister-out.1` but it will **not** match `twister-out-llvm` or `twister-out-host` (which are created by the `test()` function in `firmware_builder.py`).\n\nBecause of this, if these directories already exist in the real checkout, they will be unnecessarily copied into the shadow checkout, taking up time and space.\n\nConsider using `\"twister-out*\"` or explicitly adding `\"twister-out-*\"` to correctly exclude these directories.",
+      "range": {
+        "startLine": 453,
+        "startChar": 0,
+        "endLine": 453,
+        "endChar": 0
+      },
+      "revId": "0624ebed9884fb6928fd0de372e5bac584d31777",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
