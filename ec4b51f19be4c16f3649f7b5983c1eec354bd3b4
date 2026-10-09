@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98a5eb9b_baa22a8d",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T19:43:46Z",
+      "side": 1,
+      "message": "These variables should be quoted to handle paths with spaces correctly. For example: `--patches-dir \"$(d)\"`.",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 0
+      },
+      "revId": "ec4b51f19be4c16f3649f7b5983c1eec354bd3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59e444a1_b592d92e",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T19:43:46Z",
+      "side": 1,
+      "message": "Changing from .resolve() to .absolute() here is risky. If the path provided is a symlink to a directory in a git repository, absolute().parents will follow the lexical path of the symlink rather than the actual directory structure. This will fail to find the git repository if it resides in a parent of the target directory but not in a lexical parent of the symlink.",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 0
+      },
+      "revId": "ec4b51f19be4c16f3649f7b5983c1eec354bd3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d929990_799710b9",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T19:43:46Z",
+      "side": 1,
+      "message": "git apply --numstat output for renames uses the format `added\\tdeleted\\tpath/to/{old \u003d\u003e new}.c`. Simply calling Path() on the third column will result in an invalid path like `{old \u003d\u003e new}.c`. You need to parse the `\u003d\u003e` syntax or use git apply --summary to get renames in a more parsable way.",
+      "range": {
+        "startLine": 269,
+        "startChar": 0,
+        "endLine": 269,
+        "endChar": 0
+      },
+      "revId": "ec4b51f19be4c16f3649f7b5983c1eec354bd3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
