@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7899e6f_c0a44363",
+        "filename": "zephyr/zmake/zmake/zmake.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:49Z",
+      "side": 1,
+      "message": "Done: removed the unused local modules_dir assignment.",
+      "parentUuid": "9effd6a6_9e625630",
+      "range": {
+        "startLine": 520,
+        "startChar": 0,
+        "endLine": 520,
+        "endChar": 0
+      },
+      "revId": "5868d30ebe9f3bdfabcf23ebbd89756b1d6a3390",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61e00f89_7c289015",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-09T16:20:27Z",
       "side": 1,
       "message": "This logic for enabling job name logging is only applied when worktree patches/overrides are present. If a user runs compare-builds on multiple projects without overrides, they won\u0027t get the job name in the logs. Consider moving this logic so it applies to both cases.",
+      "range": {
+        "startLine": 526,
+        "startChar": 0,
+        "endLine": 526,
+        "endChar": 0
+      },
+      "revId": "5868d30ebe9f3bdfabcf23ebbd89756b1d6a3390",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5f92e46_9728f627",
+        "filename": "zephyr/zmake/zmake/zmake.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:49Z",
+      "side": 1,
+      "message": "Done: simplified find_checkout() fallback to except FileNotFoundError: checkout_root \u003d None.",
+      "parentUuid": "61e00f89_7c289015",
       "range": {
         "startLine": 526,
         "startChar": 0,
