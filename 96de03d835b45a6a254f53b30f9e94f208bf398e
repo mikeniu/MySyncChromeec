@@ -41,6 +41,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f028924_cb3257ae",
+        "filename": "zephyr/program/dougie/bandit/project.overlay",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1511343
+      },
+      "writtenOn": "2026-10-09T17:44:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "462b76fc_4ce5a5d2",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 28
+      },
+      "revId": "96de03d835b45a6a254f53b30f9e94f208bf398e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cb9687dd_48d3c687",
@@ -54,6 +78,30 @@
       "writtenOn": "2026-10-09T11:38:01Z",
       "side": 1,
       "message": "Note - once you add the power sequencing driver, be sure to delete the corresponding GPIOS from this file.  Generally, only one driver should reference each GPIO.  Longer term, the named-gpios node will be deprecated.",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 4
+      },
+      "revId": "96de03d835b45a6a254f53b30f9e94f208bf398e",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb5325b0_b1d0a806",
+        "filename": "zephyr/program/dougie/generated.dtsi",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1511343
+      },
+      "writtenOn": "2026-10-09T17:44:25Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "cb9687dd_48d3c687",
       "range": {
         "startLine": 63,
         "startChar": 0,
