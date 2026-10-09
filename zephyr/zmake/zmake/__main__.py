@@ -16,9 +16,7 @@ import sys
 
 from zmake import jobserver
 from zmake import multiproc
-from zmake.repository_prep import CodebasePreparer
-from zmake.repository_prep import get_default_patches_dirs
-from zmake.repository_prep import get_default_src_override_dirs
+from zmake.repository_prep import prepared_workspace
 import zmake.zmake as zm
 
 
@@ -186,6 +184,12 @@ def get_argparser():
         dest="src_override_dirs",
         type=pathlib.Path,
         help="Path to a source override directory. Can be repeated.",
+    )
+    parser.add_argument(
+        "--no-shadow",
+        action="store_true",
+        default=False,
+        help="Do not use a shadow workspace; apply changes in-place.",
     )
 
     sub = parser.add_subparsers(
@@ -512,50 +516,36 @@ def main(argv=None):
     jobserver_client = jobserver.GNUMakeJobClient.from_environ(jobs=opts.jobs)
     multiproc.LogWriter.reset()
 
-    with contextlib.ExitStack() as stack:
-        workspace_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED") == "1"
-        prep_subcommands = {"configure", "build", "compare-builds"}
-        need_prep = (
-            opts.subcommand in prep_subcommands and not workspace_prepared
+    zmake = None
+    mod_dir = opts.modules_dir.resolve() if opts.modules_dir else None
+    workspace_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED") == "1" or (
+        mod_dir is not None
+        and any(
+            (d / ".workspace_prepared").exists()
+            for d in (mod_dir.parent.parent, mod_dir.parent, mod_dir / "ec")
         )
+    )
+    prep_subcommands = {"configure", "build", "compare-builds"}
+    need_prep = opts.subcommand in prep_subcommands and not workspace_prepared
 
-        if need_prep:
-            checkout = opts.checkout
-            if not checkout:
-                try:
-                    checkout = zm.util.locate_cros_checkout().resolve()
-                except FileNotFoundError:
-                    checkout = None
-
-            if checkout:
-                patches_dirs = (
-                    opts.patches_dirs
-                    if opts.patches_dirs
-                    else get_default_patches_dirs(checkout)
+    try:
+        with contextlib.ExitStack() as stack:
+            if need_prep:
+                prep_checkout = (
+                    pathlib.Path(opts.checkout).resolve()
+                    if opts.checkout
+                    else None
                 )
-                src_override_dirs = (
-                    opts.src_override_dirs
-                    if opts.src_override_dirs
-                    else get_default_src_override_dirs(checkout)
-                )
-                stack.enter_context(
-                    CodebasePreparer(checkout, patches_dirs, src_override_dirs)
-                )
-                prev_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED")
-                os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
-                if prev_prepared is None:
-                    stack.callback(
-                        os.environ.pop, "ZMAKE_WORKSPACE_PREPARED", None
-                    )
-                else:
-                    stack.callback(
-                        os.environ.__setitem__,
-                        "ZMAKE_WORKSPACE_PREPARED",
-                        prev_prepared,
+                if prep_checkout is None and (
+                    not opts.zephyr_base or not opts.modules_dir
+                ):
+                    with contextlib.suppress(FileNotFoundError):
+                        prep_checkout = zm.util.locate_cros_checkout().resolve()
+                if prep_checkout is not None:
+                    stack.enter_context(
+                        prepared_workspace(opts, checkout=prep_checkout)
                     )
 
-        zmake = None
-        try:
             zmake = call_with_namespace(
                 zm.Zmake, opts, jobserver=jobserver_client
             )
@@ -565,21 +555,21 @@ def main(argv=None):
             result = call_with_namespace(subcommand_method, opts)
             wait_rv = zmake.executor.wait()
             return result or wait_rv
-        finally:
-            multiproc.LogWriter.wait_for_log_end()
-            if zmake:
-                for file, failed_projects in zmake.cmp_failed_projects.items():
-                    if failed_projects:
-                        logging.error(
-                            "Failed projects by diff in %s: %s",
-                            file,
-                            ", ".join(sorted(failed_projects)),
-                        )
-                if zmake.failed_projects:
+    finally:
+        multiproc.LogWriter.wait_for_log_end()
+        if zmake:
+            for file, failed_projects in zmake.cmp_failed_projects.items():
+                if failed_projects:
                     logging.error(
-                        "All failed projects: %s",
-                        " ".join(sorted(zmake.failed_projects)),
+                        "Failed projects by diff in %s: %s",
+                        file,
+                        ", ".join(sorted(failed_projects)),
                     )
+            if zmake.failed_projects:
+                logging.error(
+                    "All failed projects: %s",
+                    " ".join(sorted(zmake.failed_projects)),
+                )
 
 
 if __name__ == "__main__":
