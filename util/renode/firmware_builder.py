@@ -9,9 +9,12 @@ This is the entry point for the custom firmware builder workflow recipe.  It
 gets invoked by chromite/api/controller/firmware.py.
 """
 
+from __future__ import annotations
+
 import argparse
 import getpass
 import json
+import logging
 import os
 from pathlib import Path
 import subprocess
@@ -23,7 +26,17 @@ import firmware_builder_lib
 # pylint: disable=import-error
 from google.protobuf import json_format
 
+# firmware_builder_lib inserts zephyr/zmake into sys.path on import.
+from zmake.repository_prep import find_checkout
+from zmake.repository_prep import prepared_workspace
+
 from chromite.api.gen_sdk.chromite.api import firmware_pb2
+
+
+# pylint: enable=import-error
+
+
+EC_DIR = Path(__file__).parents[2].resolve()
 
 
 ZEPHYR_BOARDS = [
@@ -89,10 +102,20 @@ def run_device_tests(
     if output_file:
         cmd.extend(["--json", str(output_file)])
 
+    env = os.environ.copy()
+    zmake_dir = str(working_dir / "zephyr" / "zmake")
+    existing_pythonpath = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (
+        f"{zmake_dir}:{existing_pythonpath}"
+        if existing_pythonpath
+        else zmake_dir
+    )
+
     return subprocess.run(
         cmd,
         cwd=working_dir,
         check=check,
+        env=env,
     )
 
 
@@ -181,8 +204,8 @@ def _write_results(final_results: Dict[str, Any], output_path: Path) -> None:
 def test(opts: argparse.Namespace) -> int:
     """Runs EC unit tests with Renode."""
 
-    working_dir = Path(__file__).parents[2].resolve()
-    renode_install_dir = working_dir.joinpath("renode")
+    working_dir = getattr(opts, "ec_dir", None) or EC_DIR
+    renode_install_dir = EC_DIR.joinpath("renode")
 
     # Renode is built as a subtool and available versions can be found here:
     # https://chrome-infra-packages.appspot.com/p/chromiumos/infra/tools/renode.
@@ -236,7 +259,7 @@ def test(opts: argparse.Namespace) -> int:
     # this up. Right now the EC/Zephyr coverage builders take longer than this,
     # so it doesn't affect overall CQ time.
     output_dir_val = getattr(opts, "output_dir", None)
-    output_dir = Path(output_dir_val) if output_dir_val else working_dir
+    output_dir = Path(output_dir_val) if output_dir_val else EC_DIR
     output_dir.mkdir(parents=True, exist_ok=True)
 
     run_result = _run_renode_tests(output_dir, working_dir, ZEPHYR_BOARDS)
@@ -249,6 +272,22 @@ def test(opts: argparse.Namespace) -> int:
         raise RuntimeError("One or more renode tests failed")
 
     return 0
+
+
+def _run_subcommand(opts: argparse.Namespace) -> int:
+    """Run opts.func and print any failed boards on failure."""
+    try:
+        ret = opts.func(opts)
+    except (subprocess.CalledProcessError, RuntimeError):
+        # .failedboards is created in the EC repository root (working_dir)
+        ec_dir = getattr(opts, "ec_dir", None) or EC_DIR
+        failed_dir = ec_dir / ".failedboards"
+        if failed_dir.is_dir():
+            print("Failed boards/tests:")
+            for fail in failed_dir.iterdir():
+                print(f"\t{fail.name}")
+        return 1
+    return ret if ret is not None else 0
 
 
 def main(args: list[str]) -> int:
@@ -264,18 +303,18 @@ def main(args: list[str]) -> int:
         print("Must select a valid sub command!")
         return -1
 
-    # Run selected sub command function
+    if getattr(opts.func, "__name__", "") != "test":
+        return _run_subcommand(opts)
+
     try:
-        opts.func(opts)
-    except (subprocess.CalledProcessError, RuntimeError):
-        ec_dir = os.path.dirname(__file__)
-        failed_dir = os.path.join(ec_dir, ".failedboards")
-        if os.path.isdir(failed_dir):
-            print("Failed boards/tests:")
-            for fail in os.listdir(failed_dir):
-                print(f"\t{fail}")
-        return 1
-    return 0
+        find_checkout()
+    except FileNotFoundError:
+        return _run_subcommand(opts)
+
+    logging.basicConfig(level=logging.INFO)
+    with prepared_workspace(opts) as shadow_ec:
+        opts.ec_dir = shadow_ec or EC_DIR
+        return _run_subcommand(opts)
 
 
 if __name__ == "__main__":
