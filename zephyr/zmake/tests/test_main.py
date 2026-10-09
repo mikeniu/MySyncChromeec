@@ -26,7 +26,9 @@ def fixture_mock_zmake_class():
 @pytest.fixture(name="mock_preparer")
 def fixture_mock_preparer():
     """Mock the CodebasePreparer class."""
-    with mock.patch("zmake.__main__.CodebasePreparer", autospec=True) as mocked:
+    with mock.patch(
+        "zmake.repository_prep.CodebasePreparer", autospec=True
+    ) as mocked:
         yield mocked
 
 
@@ -55,10 +57,10 @@ def fixture_clean_env(monkeypatch):
 def test_main_build_triggers_prep(mock_preparer):
     """Test that 'zmake build' triggers codebase preparation."""
     with mock.patch(
-        "zmake.__main__.get_default_patches_dirs",
+        "zmake.repository_prep.get_default_patches_dirs",
         return_value=[pathlib.Path("/fake/patches")],
     ), mock.patch(
-        "zmake.__main__.get_default_src_override_dirs",
+        "zmake.repository_prep.get_default_src_override_dirs",
         return_value=[pathlib.Path("/fake/overrides")],
     ):
         main.main(["build", "project1"])
@@ -123,10 +125,10 @@ def test_main_skip_if_already_prepared(mock_preparer, monkeypatch):
 def test_main_compare_builds_triggers_prep(mock_preparer):
     """Test that 'zmake compare-builds' triggers codebase preparation."""
     with mock.patch(
-        "zmake.__main__.get_default_patches_dirs",
+        "zmake.repository_prep.get_default_patches_dirs",
         return_value=[pathlib.Path("/fake/patches")],
     ), mock.patch(
-        "zmake.__main__.get_default_src_override_dirs",
+        "zmake.repository_prep.get_default_src_override_dirs",
         return_value=[pathlib.Path("/fake/overrides")],
     ):
         with mock.patch("tempfile.mkdtemp", return_value="/fake/tempdir"):
@@ -137,3 +139,132 @@ def test_main_compare_builds_triggers_prep(mock_preparer):
         [pathlib.Path("/fake/patches")],
         [pathlib.Path("/fake/overrides")],
     )
+
+
+@pytest.mark.usefixtures("clean_env")
+@mock.patch("zmake.repository_prep._has_files", return_value=True)
+@mock.patch("zmake.repository_prep.create_shadow_checkout")
+@mock.patch("zmake.repository_prep.copy_outputs_back")
+def test_main_build_shadow_and_remaps_cli_opts(
+    mock_copy, mock_create, _mock_has_files, mock_preparer, mock_zmake_class
+):
+    """Test shadow prep is used by default and remaps CLI paths into shadow."""
+    mock_ec_module = mock.Mock()
+    mock_ec_module.resolve.return_value = pathlib.Path(
+        "/fake/checkout/src/platform/ec"
+    )
+    zp_rel = pathlib.Path("src/third_party/zephyrproject/zephyr")
+
+    with mock.patch(
+        "zmake.modules.locate_from_checkout",
+        return_value={"ec": mock_ec_module},
+    ), mock.patch(
+        "zmake.repository_prep.get_default_patches_dirs",
+        return_value=[pathlib.Path("/fake/patches")],
+    ), mock.patch(
+        "zmake.repository_prep.get_default_src_override_dirs",
+        return_value=[pathlib.Path("/fake/overrides")],
+    ), mock.patch(
+        "zmake.repository_prep.find_target_repos",
+        return_value=set(),
+    ):
+        main.main(
+            [
+                "--checkout",
+                "/fake/checkout",
+                "--zephyr-base",
+                "/external/zephyr",
+                "--projects-dir",
+                "/fake/checkout/src/platform/ec/zephyr/program",
+                "build",
+                "project1",
+            ]
+        )
+
+    shadow_path = mock_create.call_args[0][1]
+    mock_preparer.assert_called_once_with(
+        shadow_path,
+        [pathlib.Path("/fake/patches")],
+        [pathlib.Path("/fake/overrides")],
+        set(),
+        commit=True,
+    )
+    _, zmake_kwargs = mock_zmake_class.call_args
+    assert zmake_kwargs["checkout"] == shadow_path
+    assert zmake_kwargs["zephyr_base"] == shadow_path / zp_rel
+    assert zmake_kwargs["projects_dirs"] == [
+        shadow_path / "src" / "platform" / "ec" / "zephyr" / "program"
+    ]
+    mock_copy.assert_called_once_with(
+        shadow_path,
+        pathlib.Path("/fake/checkout"),
+        pathlib.Path("src/platform/ec"),
+    )
+
+
+@pytest.mark.usefixtures(
+    "mock_zmake_class", "mock_locate_checkout", "clean_env"
+)
+@mock.patch("zmake.repository_prep._has_files", return_value=True)
+@mock.patch("zmake.repository_prep.create_shadow_checkout")
+def test_main_build_no_shadow_forced(
+    mock_create, _mock_has_files, mock_preparer
+):
+    """Test that --no-shadow forces in-place preparation even if files exist."""
+    with mock.patch(
+        "zmake.repository_prep.get_default_patches_dirs",
+        return_value=[pathlib.Path("/fake/patches")],
+    ), mock.patch(
+        "zmake.repository_prep.get_default_src_override_dirs",
+        return_value=[pathlib.Path("/fake/overrides")],
+    ):
+        main.main(["--no-shadow", "build", "project1"])
+
+    mock_create.assert_not_called()
+    mock_preparer.assert_called_once_with(
+        pathlib.Path("/fake/checkout"),
+        [pathlib.Path("/fake/patches")],
+        [pathlib.Path("/fake/overrides")],
+    )
+
+
+@pytest.mark.usefixtures("mock_zmake_class", "clean_env")
+def test_main_modules_dir_workspace_prepared_markers(
+    mock_preparer, mock_locate_checkout, tmp_path
+):
+    """Test --modules-dir skips checkout lookup and detects .workspace_prepared."""
+    unprepared = tmp_path / "unprepared" / "modules"
+    (unprepared / "ec").mkdir(parents=True)
+    main.main(
+        [
+            "--modules-dir",
+            str(unprepared),
+            "--zephyr-base",
+            str(tmp_path / "unprepared" / "zephyr"),
+            "build",
+            "project1",
+        ]
+    )
+    mock_locate_checkout.assert_not_called()
+
+    for marker_rel in (
+        "work/.workspace_prepared",
+        "work/modules/ec/.workspace_prepared",
+    ):
+        base = tmp_path / marker_rel.replace("/", "_")
+        mod_dir = base / "work" / "modules"
+        (mod_dir / "ec").mkdir(parents=True)
+        (base / marker_rel).touch()
+        main.main(
+            [
+                "--checkout",
+                str(base / "work"),
+                "--modules-dir",
+                str(mod_dir),
+                "--zephyr-base",
+                str(base / "work" / "zephyr"),
+                "build",
+                "project1",
+            ]
+        )
+    mock_preparer.assert_not_called()
