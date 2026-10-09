@@ -10,6 +10,7 @@ This is the entry point for the custom firmware builder workflow recipe.  It
 gets invoked by chromite/api/controller/firmware.py.
 """
 
+import collections
 import json
 import logging
 import os
@@ -106,7 +107,6 @@ EXPECTED_UNUSED_BOARDS = {
     # Fingerprint development
     "bloonchipper-druid",
     "hatch_fp",
-    "nocturne_fp",
     "nucleo-dartmonkey",
     "nucleo-f412zg",
     "nucleo-h743zi",
@@ -322,6 +322,7 @@ def bundle_firmware(opts):
         if len(parts) > 1:
             baseboards[parts[0]] = parts[1]
 
+    ec_to_boards, _ = read_cros_config()
     for build_target in sorted(os.listdir(os.path.join(ec_dir, "build"))):
         if build_target in ["host"]:
             continue
@@ -362,9 +363,11 @@ def bundle_firmware(opts):
             check=True,
             stdin=subprocess.DEVNULL,
         )
-        meta = info.objects.add()
+        boards = set(ec_to_boards[build_target])
         if build_target in baseboards and baseboards[build_target]:
-            meta.tarball_info.board.append(baseboards[build_target])
+            boards.add(baseboards[build_target])
+        meta = info.objects.add()
+        meta.tarball_info.board.extend(sorted(boards))
         meta.file_name = tarball_name
         meta.tarball_info.type = (
             firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
@@ -390,8 +393,7 @@ def bundle_firmware(opts):
             stdin=subprocess.DEVNULL,
         )
         meta = info.objects.add()
-        if build_target in baseboards and baseboards[build_target]:
-            meta.tarball_info.board.append(baseboards[build_target])
+        meta.tarball_info.board.extend(sorted(boards))
         meta.file_name = elf_tarball_name
         meta.tarball_info.type = (
             firmware_pb2.FirmwareArtifactInfo.TarballInfo.FirmwareType.EC  # pylint: disable=no-member
@@ -465,30 +467,27 @@ def test(opts):
         subprocess.run(cmd, cwd=str(EC_DIR), check=True, env=env)
 
 
-def check_inherits(opts):
-    """Reads the src/project/*/*/sw_build_config json files and compares
-    the boards and ec targets.
-    """
-
-    env = os.environ.copy()
-    env.update(init_toolchain())
-    cmd = ["make", "print-boards", f"-j{opts.cpus}"]
-    print(f"# Running {' '.join(cmd)}.")
-    ec_boards = set()
-    used_ec_boards = set()
-    for line in subprocess.run(
-        cmd,
-        cwd=str(EC_DIR),
-        check=True,
-        universal_newlines=True,
-        stdout=subprocess.PIPE,
-        env=env,
-    ).stdout.splitlines():
-        ec_boards.add(line)
-
+def read_cros_config(ec_boards=None):
+    """Reads cros_config files and maps EC build targets to board names."""
+    ec_to_boards = collections.defaultdict(set)
     retcode = 0
+
+    def record_ec(cros_ec, board_name, label, cfg_path):
+        nonlocal retcode
+        if not cros_ec:
+            return
+        if (
+            ec_boards is not None
+            and cros_ec not in ec_boards
+            and cros_ec not in EXPECTED_MISSING_BOARDS
+        ):
+            print(f"ERROR: Unknown EC target{label} {cros_ec} in {cfg_path}")
+            retcode = 1
+        ec_to_boards[cros_ec].add(board_name)
+
     board_dirs = (find_checkout() / "src" / "project").glob("*")
     for board_dir in board_dirs:
+        board_name = board_dir.name
         # Check the boxter sw_build_config files
         for cfg_path in board_dir.glob(
             "*/sw_build_config/platform/chromeos-config/generated/project-config.json"
@@ -499,125 +498,60 @@ def check_inherits(opts):
                 for software_config in cfg.get("chromeos", {}).get(
                     "configs", []
                 ):
-                    cros_ec = (
-                        software_config.get("firmware", {})
-                        .get("build-targets", {})
-                        .get("ec", None)
+                    build_targets = software_config.get("firmware", {}).get(
+                        "build-targets", {}
                     )
-                    if cros_ec:
-                        if (
-                            cros_ec not in ec_boards
-                            and cros_ec not in EXPECTED_MISSING_BOARDS
-                        ):
-                            print(
-                                f"ERROR: Unknown EC target {cros_ec} in {cfg_path}"
-                            )
-                            retcode = 1
-                        used_ec_boards.add(cros_ec)
-                    for cros_ec in (
-                        software_config.get("firmware", {})
-                        .get("build-targets", {})
-                        .get("ec_extras", [])
-                    ):
-                        if cros_ec:
-                            if (
-                                cros_ec not in ec_boards
-                                and cros_ec not in EXPECTED_MISSING_BOARDS
-                            ):
-                                print(
-                                    f"ERROR: Unknown EC target (ec_extras) {cros_ec} in {cfg_path}"
-                                )
-                                retcode = 1
-                            used_ec_boards.add(cros_ec)
+                    record_ec(
+                        build_targets.get("ec", None), board_name, "", cfg_path
+                    )
+                    for cros_ec in build_targets.get("ec_extras", []):
+                        record_ec(cros_ec, board_name, " (ec_extras)", cfg_path)
         # Check the boxter joined.jsonproto files
         for cfg_path in board_dir.glob("*/generated/joined.jsonproto"):
             with open(cfg_path, "r", encoding="utf-8") as file:
                 cfg = json.load(file)
 
                 for software_config in cfg.get("softwareConfigs", []):
-                    cros_ec = (
-                        software_config.get("firmwareBuildConfig", {})
-                        .get("buildTargets", {})
-                        .get("ec", None)
+                    build_targets = software_config.get(
+                        "firmwareBuildConfig", {}
+                    ).get("buildTargets", {})
+                    record_ec(
+                        build_targets.get("ec", None), board_name, "", cfg_path
                     )
-                    if cros_ec:
-                        if (
-                            cros_ec not in ec_boards
-                            and cros_ec not in EXPECTED_MISSING_BOARDS
-                        ):
-                            print(
-                                f"ERROR: Unknown EC target {cros_ec} in {cfg_path}"
-                            )
-                            retcode = 1
-                        used_ec_boards.add(cros_ec)
-                    cros_ec = (
-                        software_config.get("firmwareBuildConfig", {})
-                        .get("buildTargets", {})
-                        .get("ish", None)
+                    record_ec(
+                        build_targets.get("ish", None),
+                        board_name,
+                        " (ISH)",
+                        cfg_path,
                     )
-                    if cros_ec:
-                        if (
-                            cros_ec not in ec_boards
-                            and cros_ec not in EXPECTED_MISSING_BOARDS
-                        ):
-                            print(
-                                f"ERROR: Unknown EC target (ISH) {cros_ec} in {cfg_path}"
-                            )
-                            retcode = 1
-                        used_ec_boards.add(cros_ec)
-                    cros_ec = (
-                        software_config.get("firmwareBuildConfig", {})
-                        .get("buildTargets", {})
-                        .get("base", None)
+                    record_ec(
+                        build_targets.get("base", None),
+                        board_name,
+                        " (base)",
+                        cfg_path,
                     )
-                    if cros_ec:
-                        if (
-                            cros_ec not in ec_boards
-                            and cros_ec not in EXPECTED_MISSING_BOARDS
-                        ):
-                            print(
-                                f"ERROR: Unknown EC target (base) {cros_ec} in {cfg_path}"
-                            )
-                            retcode = 1
-                        used_ec_boards.add(cros_ec)
-                    for cros_ec in (
-                        software_config.get("firmwareBuildConfig", {})
-                        .get("buildTargets", {})
-                        .get("ecExtras", [])
-                    ):
-                        if cros_ec:
-                            if (
-                                cros_ec not in ec_boards
-                                and cros_ec not in EXPECTED_MISSING_BOARDS
-                            ):
-                                print(
-                                    f"ERROR: Unknown EC target (ecExtras) {cros_ec} in {cfg_path}"
-                                )
-                                retcode = 1
-                            used_ec_boards.add(cros_ec)
+                    for cros_ec in build_targets.get("ecExtras", []):
+                        record_ec(cros_ec, board_name, " (ecExtras)", cfg_path)
                 for design in cfg.get("designList", []):
                     for config in design.get("configs", []):
                         cros_ec = (
-                            software_config.get("hardwareFeatures", {})
+                            config.get("hardwareFeatures", {})
                             .get("fingerprint", {})
                             .get("board", None)
                         )
-                        if cros_ec:
-                            if (
-                                cros_ec not in ec_boards
-                                and cros_ec not in EXPECTED_MISSING_BOARDS
-                            ):
-                                print(
-                                    f"ERROR: Unknown EC target (FP) {cros_ec} in {cfg_path}"
-                                )
-                                retcode = 1
-                            used_ec_boards.add(cros_ec)
+                        record_ec(cros_ec, board_name, " (FP)", cfg_path)
     # Check the old yaml files
     # src/overlays/overlay-trogdor/chromeos-base/chromeos-config-bsp/files/model.yaml
     yamls = (find_checkout() / "src").glob(
         "*overlays/*/chromeos-base/chromeos-config-bsp*/files/model.yaml"
     )
     for yaml_path in yamls:
+        board_name = (
+            yaml_path.parents[3]
+            .name.removeprefix("overlay-")
+            .removeprefix("baseboard-")
+            .removesuffix("-private")
+        )
         with open(yaml_path, "r", encoding="utf-8") as file:
             try:
                 for cfg in yaml.safe_load_all(file):
@@ -643,18 +577,34 @@ def check_inherits(opts):
                                         f" {sku} in {yaml_path}"
                                     )
                                     cros_ec = None
-                            if cros_ec:
-                                if (
-                                    cros_ec not in ec_boards
-                                    and cros_ec not in EXPECTED_MISSING_BOARDS
-                                ):
-                                    print(
-                                        f"ERROR: Unknown EC target {cros_ec} in {yaml_path}"
-                                    )
-                                    retcode = 1
-                                used_ec_boards.add(cros_ec)
+                            record_ec(cros_ec, board_name, "", yaml_path)
             except yaml.composer.ComposerError:
                 print(f"Ignoring {yaml_path}")
+    return ec_to_boards, retcode
+
+
+def check_inherits(opts):
+    """Reads the src/project/*/*/sw_build_config json files and compares
+    the boards and ec targets.
+    """
+
+    env = os.environ.copy()
+    env.update(init_toolchain())
+    cmd = ["make", "print-boards", f"-j{opts.cpus}"]
+    print(f"# Running {' '.join(cmd)}.")
+    ec_boards = set()
+    for line in subprocess.run(
+        cmd,
+        cwd=str(EC_DIR),
+        check=True,
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        env=env,
+    ).stdout.splitlines():
+        ec_boards.add(line)
+
+    ec_to_boards, retcode = read_cros_config(ec_boards)
+    used_ec_boards = set(ec_to_boards.keys())
     for cros_ec in ec_boards:
         if (
             cros_ec not in used_ec_boards
