@@ -16,9 +16,7 @@ import sys
 
 from zmake import jobserver
 from zmake import multiproc
-from zmake.repository_prep import CodebasePreparer
-from zmake.repository_prep import get_default_patches_dirs
-from zmake.repository_prep import get_default_src_override_dirs
+from zmake.repository_prep import prepared_workspace
 import zmake.zmake as zm
 
 
@@ -188,6 +186,12 @@ def get_argparser():
         metavar="SRC_OVERRIDE_DIR",
         type=pathlib.Path,
         help="Path to a source override directory. Can be repeated.",
+    )
+    parser.add_argument(
+        "--no-shadow",
+        action="store_true",
+        default=False,
+        help="Do not use a shadow workspace; apply changes in-place.",
     )
 
     sub = parser.add_subparsers(
@@ -514,51 +518,34 @@ def main(argv=None):
     jobserver_client = jobserver.GNUMakeJobClient.from_environ(jobs=opts.jobs)
     multiproc.LogWriter.reset()
 
-    with contextlib.ExitStack() as stack:
-        workspace_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED") == "1"
-        prep_subcommands = {"configure", "build", "compare-builds"}
-        need_prep = (
-            opts.subcommand in prep_subcommands and not workspace_prepared
+    mod_dir = opts.modules_dir.resolve() if opts.modules_dir else None
+    workspace_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED") == "1" or (
+        mod_dir is not None
+        and any(
+            (d / ".workspace_prepared").exists()
+            for d in (mod_dir.parent.parent, mod_dir.parent, mod_dir / "ec")
         )
+    )
+    prep_subcommands = {"configure", "build", "compare-builds"}
+    need_prep = opts.subcommand in prep_subcommands and not workspace_prepared
 
+    with contextlib.ExitStack() as stack:
         if need_prep:
-            checkout = opts.checkout
-            if not checkout:
-                try:
-                    checkout = zm.util.locate_cros_checkout().resolve()
-                except FileNotFoundError:
-                    checkout = None
-
-            if checkout:
-                patches_dirs = (
-                    opts.patches_dirs
-                    if opts.patches_dirs
-                    else get_default_patches_dirs(checkout)
-                )
-                src_override_dirs = (
-                    opts.src_override_dirs
-                    if opts.src_override_dirs
-                    else get_default_src_override_dirs(checkout)
-                )
+            prep_checkout = (
+                pathlib.Path(opts.checkout).resolve() if opts.checkout else None
+            )
+            if prep_checkout is None and (
+                not opts.zephyr_base or not opts.modules_dir
+            ):
+                with contextlib.suppress(FileNotFoundError):
+                    prep_checkout = zm.util.locate_cros_checkout().resolve()
+            if prep_checkout is not None:
                 stack.enter_context(
-                    CodebasePreparer(checkout, patches_dirs, src_override_dirs)
+                    prepared_workspace(opts, checkout=prep_checkout)
                 )
-                prev_prepared = os.environ.get("ZMAKE_WORKSPACE_PREPARED")
-                os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
-                if prev_prepared is None:
-                    stack.callback(
-                        os.environ.pop, "ZMAKE_WORKSPACE_PREPARED", None
-                    )
-                else:
-                    stack.callback(
-                        os.environ.__setitem__,
-                        "ZMAKE_WORKSPACE_PREPARED",
-                        prev_prepared,
-                    )
             elif opts.patches_dirs or opts.src_override_dirs:
                 logging.warning(
-                    "Cannot apply patches or source overrides without a "
-                    "checkout directory."
+                    "Unable to locate checkout; skipping patches/overrides."
                 )
 
         zmake = None
