@@ -393,6 +393,31 @@ class Hardware(Platform):
             if remote_ip:
                 cmd.extend(["--remote", remote_ip + ":" + str(remote_port)])
         elif flasher == SERVO_MICRO:
+            if remote_ip:
+                flash_port = remote_port or 10001
+                logging.info(
+                    "Sending %s to remote flash_ec listener at %s:%d",
+                    image_path,
+                    remote_ip,
+                    flash_port,
+                )
+                try:
+                    with socket.create_connection(
+                        (remote_ip, flash_port), timeout=10
+                    ) as sock:
+                        sock.settimeout(300)
+                        with open(image_path, "rb") as img_file:
+                            sock.sendall(img_file.read())
+                        sock.shutdown(socket.SHUT_WR)
+                        response = bytearray()
+                        while chunk := sock.recv(4096):
+                            sys.stdout.buffer.write(chunk)
+                            sys.stdout.buffer.flush()
+                            response.extend(chunk)
+                    return b"REMOTE_FLASH_OK" in response
+                except OSError as err:
+                    logging.error("Remote flash failed: %s", err)
+                    return False
             cmd.append(SERVO_MICRO_FLASH_SCRIPT)
         else:
             logging.error('Unknown flasher: "%s"', flasher)
@@ -2127,7 +2152,7 @@ def validate_args_combination(args: argparse.Namespace):
     Not all combinations of command line arguments are valid or currently
     supported. If tests can't be executed, print and error message and exit.
     """
-    if args.jlink_port and not args.flasher == JTRACE:
+    if args.jlink_port and args.flasher not in (JTRACE, SERVO_MICRO):
         logging.error("jlink_port specified, but flasher is not set to J-Link.")
         sys.exit(1)
 
@@ -2142,13 +2167,6 @@ def validate_args_combination(args: argparse.Namespace):
         logging.error(
             "The remote option must be specified when using the "
             "jlink_port or console_port options."
-        )
-        sys.exit(1)
-
-    if args.remote and args.flasher == SERVO_MICRO:
-        logging.error(
-            "The remote option is not supported when flashing with servo "
-            "micro. Use J-Link instead or flash with a local servo micro."
         )
         sys.exit(1)
 
