@@ -19,6 +19,25 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6e357c5_498a2cbd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T23:58:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88e8c13a_c6cecbd0",
+      "isAi": true,
+      "revId": "22128b96c85da1cc62d1d5c146284b1d795144e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6003f8a5_9a63f4ba",
@@ -38,6 +57,31 @@
         "endLine": 738,
         "endChar": 0
       },
+      "revId": "22128b96c85da1cc62d1d5c146284b1d795144e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "163c8679_1b430619",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T23:58:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6003f8a5_9a63f4ba",
+      "range": {
+        "startLine": 738,
+        "startChar": 0,
+        "endLine": 738,
+        "endChar": 0
+      },
+      "isAi": true,
       "revId": "22128b96c85da1cc62d1d5c146284b1d795144e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -66,6 +110,31 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9ec0eb3_f5f348eb",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 742,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T23:58:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e54378d3_5ba633e5",
+      "range": {
+        "startLine": 736,
+        "startChar": 0,
+        "endLine": 742,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "22128b96c85da1cc62d1d5c146284b1d795144e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f5b60541_602ebeb1",
@@ -79,6 +148,31 @@
       "writtenOn": "2026-10-09T23:13:18Z",
       "side": 1,
       "message": "Consider updating or trimming this comment: the second sentence describes the 5 ms DRP polling wakeup in Unattached.*, which contradicts the comment above explaining that the TC state machine stops polling CC in TC_LOW_POWER_MODE.",
+      "range": {
+        "startLine": 744,
+        "startChar": 0,
+        "endLine": 751,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "22128b96c85da1cc62d1d5c146284b1d795144e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8559592_0501aa9e",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T23:58:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5b60541_602ebeb1",
       "range": {
         "startLine": 744,
         "startChar": 0,
