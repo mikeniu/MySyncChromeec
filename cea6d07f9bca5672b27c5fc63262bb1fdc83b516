@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3aa866d7_a0b82892",
+        "filename": "zephyr/scripts/firmware_builder_lib.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:27Z",
+      "side": 1,
+      "message": "Done: updated needs_copy_for_patches to check ancestor directories up to 3-part repo roots.",
+      "parentUuid": "2066ccea_213fd6b7",
+      "range": {
+        "startLine": 621,
+        "startChar": 0,
+        "endLine": 621,
+        "endChar": 0
+      },
+      "revId": "cea6d07f9bca5672b27c5fc63262bb1fdc83b516",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d120e82_f7a28a7c",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "592acbd1_47243fcf",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:27Z",
+      "side": 1,
+      "message": "Done: regenerated zephyr/zmake/README.md.",
+      "parentUuid": "3d120e82_f7a28a7c",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 177,
+        "endChar": 0
+      },
+      "revId": "cea6d07f9bca5672b27c5fc63262bb1fdc83b516",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8df2807e_a0ef2695",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-10-08T23:21:22Z",
       "side": 1,
       "message": "It would be helpful to log the output of the git status command here (can_apply.stdout) so the user can see exactly why the check failed.",
+      "range": {
+        "startLine": 242,
+        "startChar": 0,
+        "endLine": 242,
+        "endChar": 0
+      },
+      "revId": "cea6d07f9bca5672b27c5fc63262bb1fdc83b516",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "088b26d4_2d37f2b4",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:27Z",
+      "side": 1,
+      "message": "Done: added rollback of already-copied overrides and applied patches if prepare() fails midway.",
+      "parentUuid": "8df2807e_a0ef2695",
       "range": {
         "startLine": 242,
         "startChar": 0,
