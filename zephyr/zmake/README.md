@@ -6,7 +6,7 @@
 
 ## Usage
 
-**Usage:** `zmake [-h] [--checkout CHECKOUT] [-j JOBS] [-l {DEBUG,INFO,WARNING,ERROR,CRITICAL} | -D] [-L] [--log-label] [--modules-dir MODULES_DIR] [--projects-dir PROJECTS_DIR] [--zephyr-base ZEPHYR_BASE] [--patches-dir PATCHES_DIR] [--src-override-dir SRC_OVERRIDE_DIR] subcommand ...`
+**Usage:** `zmake [-h] [--checkout CHECKOUT] [-j JOBS] [-l {DEBUG,INFO,WARNING,ERROR,CRITICAL} | -D] [-L] [--log-label] [--modules-dir MODULES_DIR] [--projects-dir PROJECTS_DIR] [--zephyr-base ZEPHYR_BASE] [--patches-dir PATCHES_DIR] [--src-override-dir SRC_OVERRIDE_DIR] [--no-shadow] subcommand ...`
 
 Chromium OS's meta-build tool for Zephyr
 
@@ -32,6 +32,7 @@ Chromium OS's meta-build tool for Zephyr
 | `--zephyr-base ZEPHYR_BASE` | Path to Zephyr OS repository |
 | `--patches-dir PATCHES_DIR` | Path to a patches directory. Can be repeated. |
 | `--src-override-dir SRC_OVERRIDE_DIR` | Path to a source override directory. Can be repeated. |
+| `--no-shadow` | Do not use a shadow workspace; apply changes in-place. |
 
 ## Subcommands
 
