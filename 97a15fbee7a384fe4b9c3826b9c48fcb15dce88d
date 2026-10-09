@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7789991f_657a51bc",
+        "filename": "zephyr/zmake/tests/test_compare_builds.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T20:01:09Z",
+      "side": 1,
+      "message": "Even though `sequential\u003dTrue` is used below, it\u0027s generally better to use a `mock.Mock()` for the executor here to ensure no real process/thread pools are initialized during unit tests.",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 0
+      },
+      "revId": "97a15fbee7a384fe4b9c3826b9c48fcb15dce88d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb7620e8_17fae7a7",
+        "filename": "zephyr/zmake/tests/test_repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T20:01:09Z",
+      "side": 1,
+      "message": "This helper function is nearly identical to the one in `test_compare_builds.py`. Consider moving it to a shared utility or a pytest fixture if you plan to add more tests that require a mock git repository.",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 0
+      },
+      "revId": "97a15fbee7a384fe4b9c3826b9c48fcb15dce88d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0762983d_26bcacc7",
+        "filename": "zephyr/zmake/tests/test_repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T20:01:09Z",
+      "side": 1,
+      "message": "Catching `SystemExit` confirms the process exits, but it doesn\u0027t verify why. If `preparer.prepare()` raises a specific exception before exiting, catching that exception instead would make the test more precise.",
+      "range": {
+        "startLine": 146,
+        "startChar": 0,
+        "endLine": 146,
+        "endChar": 0
+      },
+      "revId": "97a15fbee7a384fe4b9c3826b9c48fcb15dce88d",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
