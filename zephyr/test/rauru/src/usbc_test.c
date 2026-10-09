@@ -15,8 +15,11 @@
 #include "hooks.h"
 #include "i2c/i2c.h"
 #include "power.h"
+#include "system.h"
+#include "task.h"
 #include "test_state.h"
 #include "usb_pd.h"
+#include "usb_tc_sm.h"
 #include "usbc_ppc.h"
 
 #include <zephyr/devicetree.h>
@@ -245,6 +248,40 @@ ZTEST(usbc_test, test_pd_snk_is_vbus_provided)
 
 	set_vbus_adc(PD_V_SAFE5V_MIN - 500);
 	zassert_false(pd_snk_is_vbus_provided(0));
+}
+
+ZTEST(usbc_test, test_tc_state_init_dedicated_charge_port)
+{
+	struct charge_port_info info = {
+		.current = 0,
+		.voltage = 20000,
+	};
+
+	system_clear_reset_flags(EC_RESET_FLAG_POWER_ON |
+				 EC_RESET_FLAG_BROWNOUT);
+
+	/*
+	 * With no dedicated charge port current available, a battery-less
+	 * board should skip ErrorRecovery and start in Unattached.SNK.
+	 */
+	charge_manager_update_charge(CHARGE_SUPPLIER_DEDICATED,
+				     DEDICATED_CHARGE_PORT, &info);
+	task_set_event(TASK_ID_PD_C0, TASK_EVENT_RESET_DONE);
+	k_msleep(1);
+	zassert_mem_equal(tc_get_current_state(0), "Unattached.SNK",
+			  sizeof("Unattached.SNK"));
+
+	/*
+	 * When the dedicated charge port supplies current, ErrorRecovery is
+	 * safe to enter.
+	 */
+	info.current = 3000;
+	charge_manager_update_charge(CHARGE_SUPPLIER_DEDICATED,
+				     DEDICATED_CHARGE_PORT, &info);
+	task_set_event(TASK_ID_PD_C0, TASK_EVENT_RESET_DONE);
+	k_msleep(1);
+	zassert_mem_equal(tc_get_current_state(0), "ErrorRecovery",
+			  sizeof("ErrorRecovery"));
 }
 
 static void before(void *data)
