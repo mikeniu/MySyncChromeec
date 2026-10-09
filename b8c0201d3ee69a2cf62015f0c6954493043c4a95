@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d99a06d7_e7dc1305",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-10-09T08:55:08Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8668478028758902513) is being automatically retried for the following reasons:\n- Some child builders are now retryable:amd64-generic-bazel-lite-cq, tael-cq, tatl-cq\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "b8c0201d3ee69a2cf62015f0c6954493043c4a95",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
