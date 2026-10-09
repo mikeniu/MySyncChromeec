@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0b58da6d_0df9a1fa",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T17:00:17Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: If `checkout` is `None` (e.g., outside a CrOS checkout when `--checkout` isn\u0027t provided), explicitly provided `--patches-dir` or `--src-override-dir` options will be silently skipped here. Consider logging a warning or raising an error if `not checkout` and either of these explicitly requested overrides are set.",
+      "range": {
+        "startLine": 526,
+        "startChar": 0,
+        "endLine": 526,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "36aa1f97_17501fbd",
         "filename": "zephyr/zmake/zmake/repository_prep.py",
         "patchSetId": 5
@@ -83,6 +106,29 @@
       "writtenOn": "2026-10-08T23:13:42Z",
       "side": 1,
       "message": "The original code used \u0027git restore\u0027. Is there a specific reason to switch to the older \u0027git checkout\u0027 command here?",
+      "range": {
+        "startLine": 312,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 0
+      },
+      "revId": "3d91a201d7b68355b75901cab0f6343b427663f8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "883b88e2_92618d74",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T17:00:17Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: Consider adding `\"--\"` before `target_file.name` to prevent issues if a filename happens to start with a hyphen, e.g., `[\"git\", \"checkout\", \"--quiet\", \"--\", target_file.name]`.",
       "range": {
         "startLine": 312,
         "startChar": 0,
