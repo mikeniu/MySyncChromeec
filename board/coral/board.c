@@ -64,7 +64,9 @@
 #define USB_PD_PORT_ANX74XX 0
 #define USB_PD_PORT_PS8751 1
 
-static int sku_id;
+static int sku_id = BOARD_VERSION_UNKNOWN;
+/* Set by the sku_id_init() HOOK_INIT, which runs after adc_init(). */
+static int adc_initialized;
 
 static void tcpc_alert_event(enum gpio_signal signal)
 {
@@ -915,6 +917,8 @@ static void sku_id_init(void)
 	int sku_id_lower;
 	int sku_id_higher;
 
+	adc_initialized = 1;
+
 	if (sku_id == BOARD_VERSION_UNKNOWN) {
 		sku_id_lower = board_read_version(ADC_BOARD_SKU_0);
 		sku_id_higher = board_read_version(ADC_BOARD_SKU_1);
@@ -1000,7 +1004,7 @@ DECLARE_CONSOLE_COMMAND(sku, command_sku, "<board|line0|line1|form [low high]>",
 
 __override uint32_t board_get_sku_id(void)
 {
-	if (sku_id == BOARD_VERSION_UNKNOWN)
+	if (sku_id == BOARD_VERSION_UNKNOWN && adc_initialized)
 		sku_id_init();
 
 	return (uint32_t)sku_id;
