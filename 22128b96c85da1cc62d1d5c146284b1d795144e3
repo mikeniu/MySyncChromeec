@@ -3,6 +3,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "88e8c13a_c6cecbd0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T23:13:18Z",
+      "side": 1,
+      "message": "Consider adding \u0027LOW_COVERAGE_REASON\u003db:370072796 No test coverage for memory mapped devices\u0027 to the commit message so the Zoss coverage check does not flag the new lines in driver/tcpm/it8xxx2.c (which is compiled into all_builds.info without a unit-test emulator).",
+      "isAi": true,
+      "revId": "22128b96c85da1cc62d1d5c146284b1d795144e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6003f8a5_9a63f4ba",
         "filename": "driver/tcpm/it8xxx2.c",
         "patchSetId": 4
@@ -20,6 +38,54 @@
         "endLine": 738,
         "endChar": 0
       },
+      "revId": "22128b96c85da1cc62d1d5c146284b1d795144e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e54378d3_5ba633e5",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 742,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T23:13:18Z",
+      "side": 1,
+      "message": "If an earlier AttachWait bounce left USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE set and a partner attaches during the TC_TIMER_LOW_POWER_TIME debounce window (where tc_low_power_mode_run() does not poll CC), no CC interrupt fires and cc1/cc2 will be non-open here. Consider adding an else branch that calls task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_CC) so the port wakes to check the connection instead of pausing the event loop with plug-in detection still disabled.",
+      "range": {
+        "startLine": 736,
+        "startChar": 0,
+        "endLine": 742,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "22128b96c85da1cc62d1d5c146284b1d795144e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5b60541_602ebeb1",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T23:13:18Z",
+      "side": 1,
+      "message": "Consider updating or trimming this comment: the second sentence describes the 5 ms DRP polling wakeup in Unattached.*, which contradicts the comment above explaining that the TC state machine stops polling CC in TC_LOW_POWER_MODE.",
+      "range": {
+        "startLine": 744,
+        "startChar": 0,
+        "endLine": 751,
+        "endChar": 9999
+      },
+      "isAi": true,
       "revId": "22128b96c85da1cc62d1d5c146284b1d795144e3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
