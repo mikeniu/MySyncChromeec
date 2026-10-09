@@ -110,10 +110,10 @@ DATA_ACCESS_VIOLATION_8040000_REGEX = re.compile(
     r"(Data access violation, mfar = 8040000\r\n)|(.*MMFAR Address: 0x8040000\r\n)"
 )
 DATA_ACCESS_VIOLATION_80C0000_REGEX = re.compile(
-    r"Data access violation, mfar = 80c0000\r\n"
+    r"(Data access violation, mfar = 80c0000\r\n)|(.*MMFAR Address: 0x80c0000\r\n)"
 )
 DATA_ACCESS_VIOLATION_80E0000_REGEX = re.compile(
-    r"Data access violation, mfar = 80e0000\r\n"
+    r"(Data access violation, mfar = 80e0000\r\n)|(.*MMFAR Address: 0x80e0000\r\n)"
 )
 DATA_ACCESS_VIOLATION_20000000_REGEX = re.compile(
     r"Data access violation, mfar = 20000000\r\n"
@@ -1323,7 +1323,7 @@ DARTMONKEY_CONFIG = BoardConfig(
     architecture=Architecture.ARM,
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
-    reboot_timeout=1.0,
+    reboot_timeout=3.0,
     rollback_region0_regex=DATA_ACCESS_VIOLATION_80C0000_REGEX,
     rollback_region1_regex=DATA_ACCESS_VIOLATION_80E0000_REGEX,
     mpu_regex=DATA_ACCESS_VIOLATION_24000000_REGEX,
@@ -1334,6 +1334,12 @@ DARTMONKEY_CONFIG = BoardConfig(
     ),
     expected_mcu_power=PowerUtilization(
         idle=RangedValue(42.67, 0.35 * 2), sleep=RangedValue(4.46, 0.23 * 2)
+    ),
+    expected_fp_power_zephyr=PowerUtilization(
+        idle=RangedValue(0.03, 0.05), sleep=RangedValue(0.03, 0.05)
+    ),
+    expected_mcu_power_zephyr=PowerUtilization(
+        idle=RangedValue(41.5, 0.5 * 2), sleep=RangedValue(4.4, 0.2 * 2)
     ),
     # For dartmonkey board, run panic data test also on nocturne_fp and
     # nami_fp boards with appropriate RO image.
@@ -1349,7 +1355,7 @@ DARTMONKEY_CONFIG = BoardConfig(
         },
     },
     zephyr_board_name="google_icetower",
-    host_interfaces={HostInterface.UART, HostInterface.SPI},
+    host_interfaces={HostInterface.SPI},
 )
 
 HELIPILOT_CONFIG = BoardConfig(

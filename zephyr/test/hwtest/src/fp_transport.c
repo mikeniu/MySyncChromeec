@@ -110,6 +110,7 @@ ZTEST(fp_transport_spi, test_fp_transport_spi)
 	zassert_equal(info->protocol_versions, expected->protocol_versions);
 }
 
+#ifdef CONFIG_EC_HOST_CMD_BACKEND_UART
 ZTEST_SUITE(fp_transport_uart, NULL, NULL, NULL, NULL, NULL);
 
 /* UART uses the same EC_CMD_GET_PROTOCOL_INFO HC handler as SPI. If the
@@ -140,3 +141,4 @@ ZTEST(fp_transport_uart, test_fp_transport_uart)
 	zassert_equal(expected->max_request_packet_size, rx_ctx.len_max);
 	zassert_equal(expected->max_response_packet_size, tx.len_max);
 }
+#endif /* CONFIG_EC_HOST_CMD_BACKEND_UART */
