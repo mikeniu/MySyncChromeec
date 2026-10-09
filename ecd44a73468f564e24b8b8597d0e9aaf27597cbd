@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdd7b4af_08417b7f",
+        "filename": "util/repository_prep.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T20:19:47Z",
+      "side": 1,
+      "message": "Using sys.exit(1) in a helper function can be problematic as it prevents finally blocks in the calling context managers (like prepared_workspace) from executing. Consider raising a specific Exception that the caller can catch and handle.",
+      "range": {
+        "startLine": 359,
+        "startChar": 0,
+        "endLine": 359,
+        "endChar": 0
+      },
+      "revId": "ecd44a73468f564e24b8b8597d0e9aaf27597cbd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "678f52d1_f3c509c7",
+        "filename": "util/repository_prep.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T20:19:47Z",
+      "side": 1,
+      "message": "Similar to the check at line 359, raising an exception instead of sys.exit(1) would allow context managers to clean up properly.",
+      "range": {
+        "startLine": 375,
+        "startChar": 0,
+        "endLine": 375,
+        "endChar": 0
+      },
+      "revId": "ecd44a73468f564e24b8b8597d0e9aaf27597cbd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
