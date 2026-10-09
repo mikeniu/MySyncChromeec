@@ -10,9 +10,13 @@ import contextlib
 import logging
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
+import tempfile
+
+import zmake.modules
 
 
 logger = logging.getLogger("zmake.repository_prep")
@@ -604,6 +608,344 @@ class CodebasePreparer:
                 )
             except subprocess.CalledProcessError as e:
                 logger.error("Failed to revert patch %s: %s", patch_file, e)
+
+
+def fix_symlinks(directory, old_prefix, new_prefix):
+    """Find and fix symlinks pointing to old_prefix to point to new_prefix."""
+    old_str = str(old_prefix).rstrip(os.sep)
+    new_str = str(new_prefix).rstrip(os.sep)
+    for root, dirs, files in os.walk(directory):
+        for d in dirs + files:
+            path = pathlib.Path(root) / d
+            if path.is_symlink():
+                target = os.readlink(path)
+                if target == old_str or target.startswith(old_str + os.sep):
+                    new_target = new_str + target[len(old_str) :]
+                    path.unlink()
+                    os.symlink(new_target, path)
+
+
+def _copytree_overwrite(src, dst):
+    """Copy directory tree src to dst, overwriting existing files/symlinks."""
+    dst.mkdir(parents=True, exist_ok=True)
+    for item in src.iterdir():
+        target = dst / item.name
+        if target.is_symlink() or target.is_file():
+            target.unlink()
+        elif target.is_dir() and not item.is_dir():
+            shutil.rmtree(target)
+        if item.is_symlink():
+            os.symlink(os.readlink(item), target)
+        elif item.is_dir():
+            _copytree_overwrite(item, target)
+        else:
+            shutil.copy2(item, target)
+
+
+def fix_lcov_info_paths(directory, old_prefix, new_prefix):
+    """Replace old_prefix with new_prefix in *.info files under directory."""
+    old_str = str(old_prefix).rstrip(os.sep)
+    new_str = str(new_prefix).rstrip(os.sep)
+    if not directory.exists() or old_str == new_str:
+        return
+    pattern = re.compile(
+        re.escape(old_str) + r"(?=" + re.escape(os.sep) + r"|$)", re.MULTILINE
+    )
+    for info_file in directory.rglob("*.info"):
+        if info_file.is_symlink() or not info_file.is_file():
+            continue
+        try:
+            stat = info_file.stat()
+            content = info_file.read_text(encoding="utf-8", errors="ignore")
+            new_content = pattern.sub(lambda _: new_str, content)
+            if new_content != content:
+                info_file.write_text(new_content, encoding="utf-8")
+                os.utime(info_file, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+        except OSError as e:
+            logger.warning("Failed to update paths in %s: %s", info_file, e)
+
+
+def _copy_build_metadata_to_shadow(real_co, shadow_co, ec_rel):
+    """Copy .shard_info.json and *.info from real build dir to shadow build dir."""
+    real_build = real_co / ec_rel / "build"
+    shadow_build = shadow_co / ec_rel / "build"
+    if not real_build.exists():
+        return
+    for f in [
+        real_build / "zephyr" / ".shard_info.json",
+        *real_build.rglob("*.info"),
+    ]:
+        if f.is_file() and not f.is_symlink():
+            dst = shadow_build / f.relative_to(real_build)
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(f, dst)
+    fix_lcov_info_paths(shadow_build, real_co, shadow_co)
+
+
+def copy_outputs_back(shadow_co, real_co, ec_rel):
+    """Copy build and twister outputs back to real checkout and fix symlinks."""
+    shadow_ec, real_ec = shadow_co / ec_rel, real_co / ec_rel
+    for shadow_path in [shadow_ec / "build", *shadow_ec.glob("twister-out*")]:
+        if not shadow_path.exists() or shadow_path.is_symlink():
+            continue
+        real_path = real_ec / shadow_path.name
+        logger.info("Copying %s back to real checkout...", shadow_path.name)
+        if shadow_path.is_dir():
+            _copytree_overwrite(shadow_path, real_path)
+            fix_symlinks(real_path, shadow_co, real_co)
+            fix_lcov_info_paths(real_path, shadow_co, real_co)
+        else:
+            shutil.copy2(shadow_path, real_path)
+
+
+def _needs_copy_for_overrides(rel_path, src_override_dirs):
+    """Check if the path has files in overrides."""
+    return any(
+        _has_files(pathlib.Path(d) / rel_path) for d in src_override_dirs
+    )
+
+
+def needs_copy_for_patches(rel_path, patches_dirs):
+    """Check if the path (or an ancestor git repo) has patches targeting it."""
+    rel = pathlib.Path(rel_path)
+    for p_dir in (
+        pathlib.Path(d) for d in patches_dirs if pathlib.Path(d).exists()
+    ):
+        if _has_patch_files(p_dir / rel):
+            return True
+        for ancestor in (a for a in rel.parents if len(a.parts) >= 3):
+            anc_dir = p_dir / ancestor
+            sub_prefix = f"{rel.relative_to(ancestor).as_posix()}/"
+            for pf in anc_dir.glob("*.patch") if anc_dir.is_dir() else ():
+                try:
+                    content = pf.read_text(encoding="utf-8", errors="ignore")
+                except OSError:
+                    return True
+                if f"a/{sub_prefix}" in content or f"b/{sub_prefix}" in content:
+                    return True
+    return False
+
+
+def _shadow_copy_ignore(repo_root):
+    """Return copytree ignore function skipping .git and root build dirs."""
+    root_str = str(repo_root)
+
+    def _ignore(cur_dir, names):
+        ignored = {".git"} if ".git" in names else set()
+        if cur_dir == root_str:
+            ignored.update(
+                n for n in names if n == "build" or n.startswith("twister-out")
+            )
+        return ignored
+
+    return _ignore
+
+
+def create_shadow_checkout(
+    real_checkout,
+    shadow_root,
+    modules,
+    zephyr_base,
+    src_override_dirs,
+    patches_dirs,
+):
+    """Create a shadow checkout with copies of targets and symlinks."""
+    real_root = pathlib.Path(real_checkout).resolve()
+    shadow_path = pathlib.Path(shadow_root).resolve()
+    (shadow_path / ".repo").mkdir(parents=True, exist_ok=True)
+    git_env = {**os.environ, **_SHADOW_GIT_ENV}
+
+    tp_dir = real_root / "src" / "third_party"
+    paths_to_handle = {
+        "zephyr_base": pathlib.Path(zephyr_base),
+        "ec_private": real_root / "src" / "platform" / "ec-private",
+        "chromiumos_overlay": tp_dir / "chromiumos-overlay",
+        **{f"module:{k}": pathlib.Path(v) for k, v in modules.items()},
+        **{
+            n: tp_dir / n
+            for n in ("boringssl", "cryptoc", "eigen3", "googletest", "tpm2")
+        },
+        **{
+            n: real_root / "src" / n
+            for n in ("project", "overlays", "private-overlays")
+        },
+    }
+    fp_dir = real_root / "src" / "platform" / "fingerprint"
+    if fp_dir.is_dir():
+        paths_to_handle.update(
+            (f"fp:{s.name}", s)
+            for s in sorted(fp_dir.iterdir())
+            if s.is_dir() and not s.name.startswith(".")
+        )
+
+    seen_rel_paths, copied_rel_paths = set(), set()
+    for key, path in paths_to_handle.items():
+        if not path.exists():
+            continue
+        try:
+            rel_path = path.resolve().relative_to(real_root)
+        except ValueError:
+            if key != "zephyr_base":
+                continue
+            rel_path = pathlib.Path("src/third_party/zephyrproject/zephyr")
+        if rel_path in seen_rel_paths:
+            continue
+        seen_rel_paths.add(rel_path)
+        dst_path = shadow_path / rel_path
+        dst_path.parent.mkdir(parents=True, exist_ok=True)
+        if (
+            key == "module:ec"
+            or _needs_copy_for_overrides(rel_path, src_override_dirs)
+            or needs_copy_for_patches(rel_path, patches_dirs)
+        ):
+            copied_rel_paths.add(rel_path)
+            logger.info("Copying %s to shadow checkout...", rel_path)
+            shutil.copytree(
+                path, dst_path, ignore=_shadow_copy_ignore(path), symlinks=True
+            )
+            for cmd in (
+                ["git", "init"],
+                ["git", "config", "core.abbrev", "10"],
+                ["git", "add", "-A"],
+                ["git", "commit", "-m", "initial"],
+            ):
+                subprocess.run(
+                    cmd,
+                    cwd=dst_path,
+                    capture_output=True,
+                    check=True,
+                    env=git_env,
+                )
+        else:
+            logger.debug("Symlinking %s to shadow checkout...", rel_path)
+            os.symlink(path, dst_path)
+
+    zp_rel = pathlib.Path("src/third_party/zephyrproject")
+    zp_touched = (
+        not pathlib.Path(zephyr_base).resolve().is_relative_to(real_root)
+        or any(rel.is_relative_to(zp_rel) for rel in copied_rel_paths)
+        or _needs_copy_for_overrides(zp_rel, src_override_dirs)
+        or needs_copy_for_patches(zp_rel, patches_dirs)
+    )
+    real_zp_git, shadow_zp = real_root / zp_rel / ".git", shadow_path / zp_rel
+    if (
+        not zp_touched
+        and real_zp_git.exists()
+        and shadow_zp.is_dir()
+        and not (shadow_zp / ".git").exists()
+    ):
+        os.symlink(real_zp_git.resolve(), shadow_zp / ".git")
+
+
+def resolve_prep_dirs(checkout_root, opts):
+    """Return (patches_dirs, src_override_dirs, has_work) for checkout_root."""
+    p_dirs = getattr(opts, "patches_dirs", None) or get_default_patches_dirs(
+        checkout_root
+    )
+    o_dirs = getattr(
+        opts, "src_override_dirs", None
+    ) or get_default_src_override_dirs(checkout_root)
+    has_work = any(_has_files(d) for d in o_dirs) or any(
+        _has_patch_files(d) for d in p_dirs
+    )
+    return p_dirs, o_dirs, has_work
+
+
+def _remap_to_shadow(path, real_co, shadow_co, default_rel=None):
+    """Remap a path under real_co to shadow_co, or fallback to default_rel."""
+    try:
+        return shadow_co / pathlib.Path(path).resolve().relative_to(real_co)
+    except ValueError:
+        return shadow_co / default_rel if default_rel else path
+
+
+def _remap_shadow_opts(opts, real_co, shadow_co, zp_rel):
+    """Remap CLI path options on opts into shadow_co."""
+    opts.checkout = shadow_co
+    if getattr(opts, "zephyr_base", None):
+        opts.zephyr_base = _remap_to_shadow(
+            opts.zephyr_base, real_co, shadow_co, zp_rel
+        )
+    if getattr(opts, "projects_dirs", None):
+        opts.projects_dirs = [
+            _remap_to_shadow(p, real_co, shadow_co) for p in opts.projects_dirs
+        ]
+    if getattr(opts, "modules_dir", None):
+        opts.modules_dir = _remap_to_shadow(
+            opts.modules_dir, real_co, shadow_co
+        )
+
+
+@contextlib.contextmanager
+def prepared_workspace(opts, modules=None, checkout=None):
+    """Context manager to prepare a shadow or in-place workspace."""
+    real_co = pathlib.Path(checkout or find_checkout()).resolve()
+    p_dirs, o_dirs, has_work = resolve_prep_dirs(real_co, opts)
+    func_name = getattr(getattr(opts, "func", None), "__name__", "")
+    use_shadow = (
+        has_work
+        and not getattr(opts, "no_shadow", False)
+        and func_name not in ("bundle", "merge_shards")
+        and getattr(opts, "subcommand", None) != "compare-builds"
+    )
+    env_keys = ("ZMAKE_WORKSPACE_PREPARED", "CROS_WORKON_SRCROOT")
+    saved_env = {k: os.environ.get(k) for k in env_keys}
+    try:
+        if not use_shadow:
+            with CodebasePreparer(real_co, p_dirs, o_dirs):
+                os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
+                yield None
+            return
+
+        logger.info("Using shadow workspace for build...")
+        zp_rel = pathlib.Path("src/third_party/zephyrproject/zephyr")
+        zb = pathlib.Path(
+            getattr(opts, "zephyr_base", None) or (real_co / zp_rel)
+        )
+        res_zb = zb.resolve()
+        ext_map = (
+            {zp_rel: res_zb} if not res_zb.is_relative_to(real_co) else None
+        )
+        repos = find_target_repos(real_co, o_dirs, p_dirs, ext_map)
+        dirty = {
+            f for repo in repos for f in get_dirty_files(repo, real_co, ext_map)
+        }
+        modules = modules or zmake.modules.locate_from_checkout(real_co)
+        ec_rel = modules["ec"].resolve().relative_to(real_co)
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            shadow_co = pathlib.Path(tmp_dir) / "shadow"
+            shadow_co.mkdir()
+            prev_co = set_checkout(shadow_co)
+            shadow_ready = False
+            try:
+                create_shadow_checkout(
+                    real_co, shadow_co, modules, zb, o_dirs, p_dirs
+                )
+                if func_name == "test":
+                    _copy_build_metadata_to_shadow(real_co, shadow_co, ec_rel)
+                if checkout is not None:
+                    _remap_shadow_opts(opts, real_co, shadow_co, zp_rel)
+                with CodebasePreparer(
+                    shadow_co, p_dirs, o_dirs, dirty, commit=True
+                ):
+                    os.environ["ZMAKE_WORKSPACE_PREPARED"] = "1"
+                    os.environ["CROS_WORKON_SRCROOT"] = str(shadow_co)
+                    shadow_ready = True
+                    yield shadow_co / ec_rel
+            finally:
+                if shadow_ready:
+                    try:
+                        copy_outputs_back(shadow_co, real_co, ec_rel)
+                    except OSError as e:
+                        logger.error("Failed to copy outputs back: %s", e)
+                set_checkout(prev_co)
+    finally:
+        for k, v in saved_env.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
 
 
 def main(argv=None):
