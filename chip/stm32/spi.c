@@ -83,7 +83,9 @@ static const struct dma_option dma_rx_option = {
  * 32-bit aligned.
  */
 static const uint8_t out_preamble[4] = {
-	EC_SPI_PROCESSING, EC_SPI_PROCESSING, EC_SPI_PROCESSING,
+	EC_SPI_PROCESSING,
+	EC_SPI_PROCESSING,
+	EC_SPI_PROCESSING,
 	EC_SPI_FRAME_START, /* This is the byte which matters */
 };
 

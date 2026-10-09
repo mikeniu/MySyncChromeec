@@ -173,6 +173,9 @@
 /* Support for BMIxxx hardware orientation sensor */
 #undef CONFIG_BMI_ORIENTATION_SENSOR
 
+/* Size of the BMI sensor software FIFO buffer */
+#undef CONFIG_BMI_FIFO_BUFFER
+
 /* Support for KIONIX KX022 hardware orientation sensor */
 #undef CONFIG_KX022_ORIENTATION_SENSOR
 
@@ -783,6 +786,9 @@
  * but probably shouldn't be enabled for production for performance reasons.
  */
 #undef CONFIG_DEBUG_BRINGUP
+
+/* Enable printing task PCs in taskinfo command */
+#define CONFIG_TASKINFO_CONTEXT_REGS
 
 /*****************************************************************************/
 
@@ -1787,6 +1793,9 @@
  * including the `paniclog` console command.
  */
 #undef CONFIG_PANIC_LOG_DEBUG
+
+/* Enable generic SVDM response support */
+#undef CONFIG_SVDM_RSP
 
 /*
  * noinit_end_of_ram is a memory section placed at the very end
@@ -2884,6 +2893,12 @@
  * This option also enables error checking function on smart batteries.
  */
 #undef CONFIG_SMBUS_PEC
+
+/*
+ * The buffer size for i2c_read_sized_block. Set this to 256 could ensure
+ * that i2c_read_sized_block only call i2c_xfer_unlocked twice each try.
+ */
+#define CONFIG_I2C_READ_SIZE_BUFFER 32
 
 /*
  * Add hosts-side support for entering programming mode for I2C ITE ECs.
@@ -5274,9 +5289,6 @@
 /* SYV682 does not pass through CC, instead it bypasses to the TCPC */
 #undef CONFIG_USBC_PPC_SYV682X_NO_CC
 
-/* Define to enable SYV682X VBUS smart discharge. */
-#undef CONFIG_USBC_PPC_SYV682X_SMART_DISCHARGE
-
 /* PPC is capable of gating the SBU lines. */
 #undef CONFIG_USBC_PPC_SBU
 
@@ -5309,9 +5321,6 @@
 
 /* Support VCONN swap */
 #undef CONFIG_USBC_VCONN_SWAP
-
-#undef CONFIG_USBC_PD3_T_SENDER_RESPONSE_OVERRIDE
-#undef CONFIG_USBC_PD3_T_SENDER_RESPONSE_MS
 
 /*
  * The amount of time in microseconds that the board takes to turn VCONN on or
@@ -5536,9 +5545,12 @@
 /*
  * Maximum number of interrupts in a second. Exceeding this limit
  * will cause the TCPM to break the PD connection to avoid a
- * watchdog timeout crash
+ * watchdog timeout crash.
+ *
+ * The default of 500 (one every 2ms) is chosen to cover normal PD
+ * behavior while mitigating interrupt storms.
  */
-#define CONFIG_USB_PD_INT_STORM_MAX 1800
+#define CONFIG_USB_PD_INT_STORM_MAX 500
 
 /******************************************************************************/
 /* stm32f4 dwc usb configs. */
@@ -6890,6 +6902,10 @@
 	CONFIG_EC_MAX_SENSOR_FREQ_DEFAULT_MILLIHZ
 #endif
 
+#ifndef CONFIG_BMI_FIFO_BUFFER
+#define CONFIG_BMI_FIFO_BUFFER 64
+#endif
+
 /* Enable BMI secondary port if needed. */
 #if defined(CONFIG_MAG_BMI_BMM150) || defined(CONFIG_MAG_BMI_LIS2MDL)
 #define CONFIG_BMI_SEC_I2C
@@ -7164,22 +7180,14 @@
 #define ALS_COUNT 0
 #endif /* CONFIG_ALS */
 
-/*
- * If the EC has exclusive control over CBI EEPROM WP, don't consult the main
- * flash WP.
- */
-#ifdef CONFIG_EEPROM_CBI_WP
-#define CONFIG_BYPASS_CBI_EEPROM_WP_CHECK
-#endif
-
 #if defined(CONFIG_EEPROM_CBI_WP) && !defined(CONFIG_CBI_EEPROM)
 #error "CONFIG_EEPROM_CBI_WP requires CONFIG_CBI_EEPROM to be defined!"
 #endif
 
 #if defined(CONFIG_BYPASS_CBI_EEPROM_WP_CHECK) && \
-	!defined(CONFIG_SYSTEM_UNLOCKED) && !defined(CONFIG_EEPROM_CBI_WP)
+	!defined(CONFIG_SYSTEM_UNLOCKED)
 #error "CONFIG_BYPASS_CBI_EEPROM_WP_CHECK is only permitted " \
-	"when CONFIG_SYSTEM_UNLOCK or CONFIG_EEPROM_CBI_WP is also enabled."
+	"when CONFIG_SYSTEM_UNLOCK is also enabled."
 #endif /* CONFIG_BYPASS_CBI_EEPROM_WP_CHECK && !CONFIG_SYSTEM_UNLOCK */
 
 #if defined(CONFIG_BOARD_VERSION_CBI) && defined(CONFIG_BOARD_VERSION_GPIO)

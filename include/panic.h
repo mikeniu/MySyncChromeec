@@ -75,15 +75,13 @@ void panic_data_ccprint(const struct panic_data *pdata);
 #if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	panic_assert_fail(const char *fname, int linenum);
+	void panic_assert_fail(const char *fname, int linenum);
 #else
 #if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	panic_assert_fail(const char *msg, const char *func, const char *fname,
-			  int linenum);
+	void panic_assert_fail(const char *msg, const char *func,
+			       const char *fname, int linenum);
 #endif
 
 /**
@@ -94,8 +92,7 @@ __noreturn
 #if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	panic(const char *msg);
+	void panic(const char *msg);
 
 /**
  * Display a default message and reset
@@ -103,8 +100,7 @@ __noreturn
 #if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	panic_reboot(void);
+	void panic_reboot(void);
 
 /**
  * Store a panic log and halt the system for a software-related reason, such as
@@ -113,8 +109,7 @@ __noreturn
 #if !(defined(TEST_FUZZ) || defined(CONFIG_ZTEST))
 __noreturn
 #endif
-	void
-	software_panic(uint32_t reason, uint32_t info);
+	void software_panic(uint32_t reason, uint32_t info);
 
 /**
  * Log a panic in the panic log, but don't halt the system. Normally
@@ -126,6 +121,14 @@ void panic_set_reason(uint32_t reason, uint32_t info, uint8_t exception);
  * Retrieve the currently stored panic reason + info.
  */
 void panic_get_reason(uint32_t *reason, uint32_t *info, uint8_t *exception);
+
+/**
+ * Print stack contents.
+ *
+ * @param stack	Pointer to the beginning of the stack
+ * @param depth	Number of 32-bit words to print
+ */
+void panic_print_stack(const uint32_t *stack, int depth);
 
 /**
  * Enable/disable bus fault handler

@@ -5,8 +5,8 @@
 
 /* Fingerprint sensor interface */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_H
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_H_
 
 #include "common.h"
 #include "ec_commands.h"
@@ -192,4 +192,4 @@ int fp_vendor_command(uint32_t param, uint8_t *buf, size_t buf_size);
 }
 #endif
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_H */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_H_ */

@@ -181,7 +181,8 @@ void report_panic(uint32_t *regs, uint32_t itype)
 	pdata->struct_size = CONFIG_PANIC_DATA_SIZE;
 	pdata->struct_version = 2;
 	pdata->arch = PANIC_ARCH_NDS32_N8;
-	pdata->flags = 0;
+	pdata->flags = IS_ENABLED(SECTION_IS_RW) ? PANIC_DATA_FLAG_RW_IMAGE :
+						   PANIC_DATA_FLAG_RO_IMAGE;
 	pdata->reserved = 0;
 
 	pdata->nds_n8.itype = itype;
@@ -191,6 +192,10 @@ void report_panic(uint32_t *regs, uint32_t itype)
 	pdata->nds_n8.ipsw = regs[17];
 
 	print_panic_information(regs, itype, regs[16], regs[17]);
+
+	if (IS_ENABLED(CONFIG_DEBUG_EXCEPTIONS)) {
+		panic_print_stack((const uint32_t *)regs[15], 64);
+	}
 
 	if (IS_ENABLED(CONFIG_CMD_CRASH_NESTED))
 		command_crash_nested_handler();

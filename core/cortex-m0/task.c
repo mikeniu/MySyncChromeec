@@ -29,9 +29,6 @@ typedef union {
 	};
 } task_;
 
-/* Value to store in unused stack */
-#define STACK_UNUSED_VALUE 0xdeadd00d
-
 /* declare task routine prototypes */
 #define TASK(n, r, d, s) void r(void *);
 void __idle(void);
@@ -555,38 +552,57 @@ void task_print_list(void)
 {
 	int i;
 
-	ccputs("Task Ready Name         Events      Time (s)  StkUsed\n");
+	ccputs("Task Ready Name         Events      Time (s)  StkUsed");
+	if (IS_ENABLED(CONFIG_TASKINFO_CONTEXT_REGS))
+		ccputs("      PC       LR");
 
 	for (i = 0; i < TASK_ID_COUNT; i++) {
-		char is_ready = ((uint32_t)tasks_ready & BIT(i)) ? 'R' : ' ';
 		uint32_t *sp;
-
-		int stackused = tasks_init[i].stack_size;
 
 		for (sp = tasks[i].stack;
 		     sp < (uint32_t *)tasks[i].sp && *sp == STACK_UNUSED_VALUE;
 		     sp++)
-			stackused -= sizeof(uint32_t);
+			;
 
-		ccprintf("%4d %c %-16s %08x %11.6lld  %3d/%3d\n", i, is_ready,
+		ccprintf("\n%c%3d %c %-16s %08x %11.6lld  %3d/%3d/%3d",
+			 (tasks + i == current_task) ? '*' : ' ', i,
+			 ((uint32_t)tasks_ready & BIT(i)) ? 'R' : ' ',
 			 task_names[i], (int)tasks[i].events, tasks[i].runtime,
-			 stackused, tasks_init[i].stack_size);
+			 (int)(tasks_init[i].stack_size -
+			       ((tasks[i].sp & ~1) - (uint32_t)tasks[i].stack)),
+			 (int)(tasks_init[i].stack_size -
+			       ((uint32_t)sp - (uint32_t)tasks[i].stack)),
+			 tasks_init[i].stack_size);
+
+		if (!IS_ENABLED(CONFIG_TASKINFO_CONTEXT_REGS))
+			continue;
+
+		sp = (uint32_t *)tasks[i].sp;
+		/* Don't print context regs for the current task if not
+		 * in interrupt context, since the stack pointer is not
+		 * valid in this case.
+		 */
+		if ((tasks + i == current_task) && !in_interrupt_context())
+			continue;
+
+		/* Make sure sp address is valid before printing */
+		if ((uintptr_t)(sp + 16) < CONFIG_RAM_BASE + CONFIG_RAM_SIZE &&
+		    (uintptr_t)(sp) >= CONFIG_RAM_BASE) {
+			ccprintf(" %08x %08x", sp[14], sp[13]);
+		}
 		cflush();
 	}
+	ccputs("\n");
+	cflush();
 }
 
-static int command_task_info(int argc, const char **argv)
+void task_print_profiling(void)
 {
 #ifdef CONFIG_TASK_PROFILING
 	int total = 0;
 	int i;
-#endif
 
-	task_print_list();
-
-#ifdef CONFIG_TASK_PROFILING
 	ccputs("IRQ counts by type:\n");
-	cflush();
 	for (i = 0; i < ARRAY_SIZE(irq_dist); i++) {
 		if (irq_dist[i]) {
 			ccprintf("%4d %8d\n", i, irq_dist[i]);
@@ -600,7 +616,15 @@ static int command_task_info(int argc, const char **argv)
 	ccprintf("Time in tasks:          %11.6lld s\n",
 		 get_time().val - task_start_time);
 	ccprintf("Time in exceptions:     %11.6lld s\n", exc_total_time);
+	cflush();
 #endif
+}
+
+static int command_task_info(int argc, const char **argv)
+{
+	task_print_list();
+
+	task_print_profiling();
 
 	return EC_SUCCESS;
 }

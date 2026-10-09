@@ -5,8 +5,8 @@
 
 /* Fingerprint sensor type identifiers */
 
-#ifndef __CROS_EC_FPSENSOR_FPSENSOR_TYPES_H
-#define __CROS_EC_FPSENSOR_FPSENSOR_TYPES_H
+#ifndef PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_TYPES_H_
+#define PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_TYPES_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,4 +49,4 @@ enum finger_state {
 }
 #endif
 
-#endif /* __CROS_EC_FPSENSOR_FPSENSOR_TYPES_H */
+#endif /* PLATFORM_EC_INCLUDE_FPSENSOR_FPSENSOR_TYPES_H_ */
