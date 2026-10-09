@@ -17,6 +17,7 @@ import sys
 from zmake import jobserver
 from zmake import multiproc
 from zmake.repository_prep import prepared_workspace
+from zmake.repository_prep import resolve_prep_dirs
 import zmake.zmake as zm
 
 
@@ -540,9 +541,20 @@ def main(argv=None):
                 with contextlib.suppress(FileNotFoundError):
                     prep_checkout = zm.util.locate_cros_checkout().resolve()
             if prep_checkout is not None:
-                stack.enter_context(
-                    prepared_workspace(opts, checkout=prep_checkout)
+                p_dirs, o_dirs, has_work = resolve_prep_dirs(
+                    prep_checkout, opts
                 )
+                if (
+                    opts.subcommand == "compare-builds"
+                    and has_work
+                    and not opts.no_shadow
+                ):
+                    opts.worktree_patches_dirs = p_dirs
+                    opts.worktree_src_override_dirs = o_dirs
+                else:
+                    stack.enter_context(
+                        prepared_workspace(opts, checkout=prep_checkout)
+                    )
             elif opts.patches_dirs or opts.src_override_dirs:
                 logging.warning(
                     "Unable to locate checkout; skipping patches/overrides."
