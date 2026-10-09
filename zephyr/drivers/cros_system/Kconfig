@@ -12,6 +12,7 @@ choice CROS_SYSTEM_CHIP_SELECTION
 	default CROS_SYSTEM_NATIVE_POSIX if (SOC_POSIX || SOC_NSIM)
 	default CROS_SYSTEM_STM32 if SOC_FAMILY_STM32
 	default CROS_SYSTEM_REALTEK if SOC_FAMILY_REALTEK_EC
+	default CROS_SYSTEM_REALTEKFP if SOC_RTS5817
 	default CROS_SYSTEM_ET171 if SOC_EGIS_ET171
 	default CROS_SYSTEM_ELAN_EM32 if SOC_EM32F967
 	default CROS_SYSTEM_FT90 if SOC_SERIES_FT90
@@ -71,6 +72,14 @@ config CROS_SYSTEM_REALTEK
 	help
 	  This option enables the cros system driver for the realtek family of
 	  processors.
+
+config CROS_SYSTEM_REALTEKFP
+	bool "REALTEK RTS5817 cros system driver"
+	depends on SOC_RTS5817 || ((SOC_POSIX || SOC_NSIM) && ZTEST)
+	help
+	  This option enables the cros system driver for the realtek rts5817
+	  soc. It can also be selected on a native_sim ztest build to unit
+	  test the driver, where the RTS5817 registers are backed by RAM.
 
 config CROS_SYSTEM_ET171
 	bool "Egis ET171 cros system driver"
