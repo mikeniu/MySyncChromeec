@@ -62,6 +62,26 @@ bloonchipper = register_fpmcu_variant(
 # good reason to change it.
 assert_rw_fwid_DO_NOT_EDIT(project_name="bloonchipper", addr=0x601C8)
 
+realtekfp = register_fpmcu_variant(
+    project_name="realtekfp",
+    zephyr_board="rts5817_maa_evb",
+    register_func=register_binman_project,
+    variant_modules=["cmsis_6"],
+    variant_dts_overlays=[
+        here / "realtekfp" / "realtekfp.dts",
+    ],
+    variant_kconfig_files=[
+        here / "realtekfp" / "prj.conf",
+    ],
+    signer=signers.RwsigSigner(  # pylint: disable=undefined-variable
+        here / "realtekfp" / "dev_key.pem",
+    ),
+)
+
+# The address of RW_FWID is hardcoded in RO. You need to have REALLY
+# good reason to change it.
+assert_rw_fwid_DO_NOT_EDIT(project_name="realtekfp", addr=0x420c4)
+
 buccaneer = register_fpmcu_variant(
     project_name="buccaneer",
     zephyr_board="google_quincy",
