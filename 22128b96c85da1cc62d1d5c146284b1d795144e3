@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6003f8a5_9a63f4ba",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-09T22:44:39Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: `IT83XX_USBPD_TCDCR` bit 0 (`USBPD_REG_PLUG_IN_OUT_DETECT_STAT`) is a Write-1-to-Clear (W1C) bit, as noted by the comment in `it8xxx2_init()`. Doing a standard read-modify-write here (`\u0026\u003d ~MASK`) will write back a `1` to the status bit if it was already set, which will unintentionally clear a pending interrupt. This could cause the device to miss a plug-in event that occurred just as it was entering low power mode.\n\nTo preserve any pending interrupts so they can wake the system once `DETECT_DISABLE` is cleared, you should mask out the `STAT` bit in the complement so that a `0` is written back to it:\n\n```c\n\t\t\tIT83XX_USBPD_TCDCR(port) \u0026\u003d\n\t\t\t\t~(USBPD_REG_PLUG_OUT_SELECT |\n\t\t\t\t  USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE |\n\t\t\t\t  USBPD_REG_PLUG_IN_OUT_DETECT_STAT);\n```\n\n*(Note: The same W1C read-modify-write pattern exists in `it8xxx2_tcpm_switch_plug_out_type` and `it8xxx2_tcpm_hook_disconnect`. You might want to address those as well, either in this patch or a follow-up.)*",
+      "range": {
+        "startLine": 738,
+        "startChar": 0,
+        "endLine": 738,
+        "endChar": 0
+      },
+      "revId": "22128b96c85da1cc62d1d5c146284b1d795144e3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
