@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6db8cbde_e730389c",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:36Z",
+      "side": 1,
+      "message": "Done: quoted \"$(d)\" in --patches-dir and --src-override-dir in Makefile and Makefile.rules.",
+      "parentUuid": "98a5eb9b_baa22a8d",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 0
+      },
+      "revId": "ec4b51f19be4c16f3649f7b5983c1eec354bd3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59e444a1_b592d92e",
@@ -47,6 +71,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "39c18bc0_03834c36",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:36Z",
+      "side": 1,
+      "message": "Done: preserved symlink component in find_git_repo when path is a symlink to a file.",
+      "parentUuid": "59e444a1_b592d92e",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 0
+      },
+      "revId": "ec4b51f19be4c16f3649f7b5983c1eec354bd3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d929990_799710b9",
@@ -60,6 +108,30 @@
       "writtenOn": "2026-10-09T19:43:46Z",
       "side": 1,
       "message": "git apply --numstat output for renames uses the format `added\\tdeleted\\tpath/to/{old \u003d\u003e new}.c`. Simply calling Path() on the third column will result in an invalid path like `{old \u003d\u003e new}.c`. You need to parse the `\u003d\u003e` syntax or use git apply --summary to get renames in a more parsable way.",
+      "range": {
+        "startLine": 269,
+        "startChar": 0,
+        "endLine": 269,
+        "endChar": 0
+      },
+      "revId": "ec4b51f19be4c16f3649f7b5983c1eec354bd3b4",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2d48251_4a7b6845",
+        "filename": "zephyr/zmake/zmake/repository_prep.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:36Z",
+      "side": 1,
+      "message": "Done: simplified get_patch_modified_files to a single git apply --numstat -z pass.",
+      "parentUuid": "2d929990_799710b9",
       "range": {
         "startLine": 269,
         "startChar": 0,
