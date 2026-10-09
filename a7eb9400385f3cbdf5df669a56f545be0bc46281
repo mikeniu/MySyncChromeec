@@ -22,6 +22,30 @@
       },
       "revId": "a7eb9400385f3cbdf5df669a56f545be0bc46281",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df9e51b5_a58ff2ce",
+        "filename": "util/renode/firmware_builder.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-09T21:51:54Z",
+      "side": 1,
+      "message": "Done: firmware_builder_lib (imported on line 24 via the symlink to ../../zephyr/scripts/firmware_builder_lib.py) inserts zephyr/zmake into sys.path on import; added an explicit comment above the zmake.repository_prep imports.",
+      "parentUuid": "0dc9cdb7_15a0cbe9",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 0
+      },
+      "revId": "a7eb9400385f3cbdf5df669a56f545be0bc46281",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
