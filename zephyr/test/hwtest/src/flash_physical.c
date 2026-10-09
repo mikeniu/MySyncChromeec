@@ -24,7 +24,7 @@ struct flash_info {
  * flash_config coverage only; see Zephyr "flash_stm32" for upstream STM32 flash
  * tests.
  */
-#if defined(CONFIG_SOC_FAMILY_STM32)
+#if defined(CONFIG_SOC_SERIES_STM32F4X)
 struct flash_info flash_info = {
 	/*
 	 * 12 sectors listed in STM32F412CG (Bloonchipper) layout:
@@ -33,6 +33,12 @@ struct flash_info flash_info = {
 	.num_flash_banks = 12,
 	.write_protect_bank_offset = 0,
 	.write_protect_bank_count = 5,
+};
+#elif defined(CONFIG_SOC_SERIES_STM32H7X)
+struct flash_info flash_info = {
+	.num_flash_banks = 16,
+	.write_protect_bank_offset = 0,
+	.write_protect_bank_count = 6,
 };
 #elif defined(CONFIG_SOC_FAMILY_NPCX)
 struct flash_info flash_info = {
