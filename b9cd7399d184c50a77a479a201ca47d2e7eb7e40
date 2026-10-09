@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e6b2af6_1ee4b899",
+        "filename": "zephyr/program/dougie/BUILD.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-09T09:41:59Z",
+      "side": 1,
+      "message": "Add support for snippets so you can turn on tokenizing and save flash space.\n```suggestion\n    project_name,\n    snippets\u003dNone,\n```",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 17
+      },
+      "revId": "b9cd7399d184c50a77a479a201ca47d2e7eb7e40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30131260_30a3d204",
+        "filename": "zephyr/program/dougie/BUILD.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-09T09:41:59Z",
+      "side": 1,
+      "message": "```suggestion\n        inherited_from\u003d[\"dougie\"],\n        snippets\u003dsnippets,\n```",
+      "revId": "b9cd7399d184c50a77a479a201ca47d2e7eb7e40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed7f5fa8_d286025f",
+        "filename": "zephyr/program/dougie/BUILD.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-09T09:41:59Z",
+      "side": 1,
+      "message": "To enable tokenizing, you would add:\n```suggestion\n    project_name\u003d\"bandit\",\n    snippets\u003d[\"pw-tokenize\"],\n```",
+      "revId": "b9cd7399d184c50a77a479a201ca47d2e7eb7e40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4802a321_d256f318",
+        "filename": "zephyr/program/dougie/dougie_stub.dts",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-09T09:41:59Z",
+      "side": 1,
+      "message": "Nit - line length",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 87
+      },
+      "revId": "b9cd7399d184c50a77a479a201ca47d2e7eb7e40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78583f10_05d40777",
+        "filename": "zephyr/program/dougie/program.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1308749
+      },
+      "writtenOn": "2026-10-09T09:41:59Z",
+      "side": 1,
+      "message": "Enable this by default.  Only turn this off for debugging if needed.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 12
+      },
+      "revId": "b9cd7399d184c50a77a479a201ca47d2e7eb7e40",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
