@@ -39,13 +39,13 @@ from coreboot_sdk import init_toolchain
 import zmake.modules
 import zmake.project
 from zmake.repository_prep import find_checkout
+from zmake.repository_prep import prepared_workspace
 
 from scripts.firmware_builder_lib import (
     get_safe_lcov_workers as _get_safe_lcov_workers,
 )
 from scripts.firmware_builder_lib import create_arg_parser
 from scripts.firmware_builder_lib import merge_shard_coverage_reports
-from scripts.firmware_builder_lib import prepared_workspace
 from scripts.firmware_builder_lib import save_or_load_shard_info
 from scripts.firmware_builder_lib import shard_projects
 
@@ -965,6 +965,11 @@ def main(args):
     opts = parser.parse_args(args)
 
     # Convert the full version strings (R130-16032.8.0-1) to the short form (16032.8.0).
+    # Leave opts.bcs_version unset when --bcs-version is omitted so
+    # bundle_coverage() only builds HTML reports when --html or --bcs-version is
+    # explicitly passed; build() and bundle_firmware() call get_version(), which
+    # resolves chromeos_version.sh via the shadow checkout's chromiumos-overlay
+    # symlink.
     if opts.bcs_version:
         match = re.compile(r"R\d+-(\d+\.\d+\.\d+)(-\d+)?").fullmatch(
             opts.bcs_version
@@ -976,16 +981,10 @@ def main(args):
         print("Must select a valid sub command!")
         return -1
 
-    # Populate version before entering shadow checkout
-    if not opts.bcs_version:
-        opts.bcs_version = get_version()
-
     logging.basicConfig(level=logging.INFO)
     orig_dir = ZEPHYR_DIR
     try:
-        with prepared_workspace(
-            opts, zmake.modules.locate_from_checkout(find_checkout())
-        ) as shadow_ec:
+        with prepared_workspace(opts) as shadow_ec:
             globals()["ZEPHYR_DIR"] = (
                 shadow_ec / "zephyr" if shadow_ec else orig_dir
             )
