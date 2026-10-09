@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcfa062f_f08e1b8c",
+        "filename": "zephyr/zmake/zmake/__main__.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T20:07:34Z",
+      "side": 1,
+      "message": "This condition introduces a regression. If a user provides both `--zephyr-base` and `--modules-dir` but still expects their default patches/overrides to be applied to their ChromiumOS checkout, `zmake` will now skip the preparation because `prep_checkout` will be `None`.\n\nI recommend removing the `(not opts.zephyr_base or not opts.modules_dir)` check and always attempting to locate the checkout if `prep_checkout` is not explicitly provided.",
+      "range": {
+        "startLine": 535,
+        "startChar": 0,
+        "endLine": 535,
+        "endChar": 0
+      },
+      "revId": "0b008ccb8de051c97409ad09e327d17580241fa2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
