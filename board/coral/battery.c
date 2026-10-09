@@ -18,12 +18,17 @@
 #include "gpio.h"
 #include "hooks.h"
 #include "i2c.h"
+#include "sku.h"
+#include "system.h"
 #include "util.h"
 
 #define CPRINTS(format, args...) cprints(CC_CHARGER, format, ##args)
 
 /* Number of writes needed to invoke battery cutoff command */
 #define SHIP_MODE_WRITES 2
+
+/* Board-specific fuel gauge flags */
+#define BATTERY_OVERRIDE_NIL BIT(0)
 
 enum battery_type {
 	BATTERY_LGC15,
@@ -37,10 +42,28 @@ enum battery_type {
 	BATTERY_LGC,
 	BATTERY_BYD,
 	BATTERY_SIMPLO,
+	BATTERY_GF,
+	BATTERY_POWTECH,
+	BATTERY_SMP_LI9,
+	BATTERY_SMP_NZD_2S2P,
+	BATTERY_SMP_OAD_2S2P,
+	BATTERY_SMP223_2S1P,
+	BATTERY_SMP523_2S1P,
+	BATTERY_SMP_AP13J7K,
+	BATTERY_SMP423_2S1P,
+	BATTERY_SMP523_PROTO_2S1P,
+	BATTERY_SMP423_PROTO_2S1P,
+	BATTERY_SMP223_2S1P_COS,
+	BATTERY_SMP403_2S1P_PROTO,
+	BATTERY_SMP403_2S1P,
+	BATTERY_SIMPLO_BYD,
+	BATTERY_LGC_AP19A8K,
+	BATTERY_LGC_G023,
 	BATTERY_TYPE_COUNT,
 };
 
-#define DEFAULT_BATTERY_TYPE BATTERY_SANYO
+#define DEFAULT_3S_BATTERY_TYPE BATTERY_SANYO
+#define DEFAULT_2S_BATTERY_TYPE BATTERY_SMP_NZD_2S2P
 static enum battery_present batt_pres_prev = BP_NOT_SURE;
 static enum battery_type board_battery_type = BATTERY_TYPE_COUNT;
 
@@ -90,7 +113,7 @@ const struct batt_conf_embed info[] = {
 				.flags = FUEL_GAUGE_FLAG_MFGACC,
 			},
 			.batt_info = {
-				.voltage_max = TARGET_WITH_MARGIN(13200, 5),
+				.voltage_max		= 13200,
 				.voltage_normal		= 11520, /* mV */
 				.voltage_min		= 9000, /* mV */
 				.precharge_current	= 256,	/* mA */
@@ -151,7 +174,7 @@ const struct batt_conf_embed info[] = {
 				},
 			},
 			.batt_info = {
-				.voltage_max = TARGET_WITH_MARGIN(13200, 5),
+				.voltage_max		= 13200,
 				.voltage_normal		= 11550, /* mV */
 				.voltage_min		= 9000, /* mV */
 				.precharge_current	= 256,	/* mA */
@@ -181,7 +204,7 @@ const struct batt_conf_embed info[] = {
 				},
 			},
 			.batt_info = {
-				.voltage_max = TARGET_WITH_MARGIN(13200, 5),
+				.voltage_max		= 13200,
 				.voltage_normal		= 11400, /* mV */
 				.voltage_min		= 9000, /* mV */
 				.precharge_current	= 256,	/* mA */
@@ -211,7 +234,7 @@ const struct batt_conf_embed info[] = {
 				},
 			},
 			.batt_info = {
-				.voltage_max = TARGET_WITH_MARGIN(13200, 5),
+				.voltage_max		= 13200,
 				.voltage_normal		= 11550, /* mV */
 				.voltage_min		= 9000, /* mV */
 				.precharge_current	= 256,	/* mA */
@@ -320,6 +343,7 @@ const struct batt_conf_embed info[] = {
 		.manuf_name = "LGC-LGC3.553",
 		.config = {
 			.fuel_gauge = {
+				.board_flags = BATTERY_OVERRIDE_NIL,
 				.ship_mode = {
 					.reg_addr = 0x0,
 					.reg_data = { 0x10, 0x10 },
@@ -350,6 +374,7 @@ const struct batt_conf_embed info[] = {
 		.manuf_name = "BYD",
 		.config = {
 			.fuel_gauge = {
+				.board_flags = BATTERY_OVERRIDE_NIL,
 				.ship_mode = {
 					.reg_addr = 0x0,
 					.reg_data = { 0x10, 0x10 },
@@ -405,13 +430,557 @@ const struct batt_conf_embed info[] = {
 		},
 	},
 
+	/*
+	 * Entries below are synced verbatim from firmware-coral-10068.B
+	 * (f98d0d3936 only dropped TARGET_WITH_MARGIN on LGC15/SANYO/SONY/
+	 * PANASONIC above).
+	 */
+	/* GF () Battery Information */
+	[BATTERY_GF] = {
+		.manuf_name = "GF",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x2000,
+					.disconnect_val = 0x2000,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(13050, 5),
+				.voltage_normal		= 11400, /* mV */
+				.voltage_min		= 9000, /* mV */
+				.precharge_current	= 200,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 45,
+				.charging_min_c		= 0,
+				.charging_max_c		= 45,
+				.discharging_min_c	= -20,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* POW-TECH () Battery Information */
+	[BATTERY_POWTECH] = {
+		.manuf_name = "POW-TECH",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x2000,
+					.disconnect_val = 0x2000,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(13050, 5),
+				.voltage_normal		= 11400, /* mV */
+				.voltage_min		= 9000, /* mV */
+				.precharge_current	= 200,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 45,
+				.charging_min_c		= 0,
+				.charging_max_c		= 45,
+				.discharging_min_c	= -20,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* SMP AC15A3J Battery Information */
+	[BATTERY_SMP_LI9] = {
+		.manuf_name = "SMP-SDI3320",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x0002,
+					.disconnect_val = 0x0,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(13050, 5),
+				.voltage_normal		= 11460, /* mV */
+				.voltage_min		= 9000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 45,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= -20,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* Simplo AS1FNZD3KD 2S2P Battery Information */
+	[BATTERY_SMP_NZD_2S2P] = {
+		.manuf_name = "AS1FNZD3KD",
+		.device_name = "C213-60",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x43,
+					.reg_mask = 0x0003,
+					.disconnect_val = 0x0000,
+				},
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(8800, 5),
+				.voltage_normal		= 7700, /* mV */
+				.voltage_min		= 6000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 46,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* Simplo AS1FOAD3KD 2S2P Battery Information */
+	[BATTERY_SMP_OAD_2S2P] = {
+		.manuf_name = "AS1FOAD3KD",
+		.device_name = "C213-60",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x43,
+					.reg_mask = 0x0003,
+					.disconnect_val = 0x0000,
+				},
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(8800, 5),
+				.voltage_normal		= 7700, /* mV */
+				.voltage_min		= 6000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 46,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* Simplo AS1GTBE3KA 2S1P Battery Information */
+	[BATTERY_SMP223_2S1P] = {
+		.manuf_name = "AS1GTBE3KA",
+		.device_name = "C223-50",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x0006,
+					.disconnect_val = 0x0000,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(8800, 5),
+				.voltage_normal		= 7700, /* mV */
+				.voltage_min		= 6000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 50,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* Simplo AS1GTGE3KA 2S1P Battery Information */
+	[BATTERY_SMP523_2S1P] = {
+		.manuf_name = "AS1GTGE3KA",
+		.device_name = "C523-50",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x0006,
+					.disconnect_val = 0x0000,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(8800, 5),
+				.voltage_normal		= 7700, /* mV */
+				.voltage_min		= 6000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 50,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* Simplo AP13J7K Battery Information */
+	[BATTERY_SMP_AP13J7K] = {
+		.manuf_name = "SIMPLO",
+		.device_name = "AP13J7K",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x3A,
+					.reg_data = { 0xC574, 0xC574 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x0002,
+					.disconnect_val = 0x0000,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max		= 13050,
+				.voltage_normal		= 11400, /* mV */
+				.voltage_min		= 9000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 45,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* Simplo AS1GTFE3KA 2S1P Battery Information */
+	[BATTERY_SMP423_2S1P] = {
+		.manuf_name = "AS1GTFE3KA",
+		.device_name = "C423-50",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x0006,
+					.disconnect_val = 0x0000,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(8800, 5),
+				.voltage_normal		= 7700, /* mV */
+				.voltage_min		= 6000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 50,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* Simplo AS19XXE3KA C523-50 2S1P Battery Information */
+	[BATTERY_SMP523_PROTO_2S1P] = {
+		.manuf_name = "AS19XXE3KA",
+		.device_name = "C523-50",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x0006,
+					.disconnect_val = 0x0000,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(8800, 5),
+				.voltage_normal		= 7700, /* mV */
+				.voltage_min		= 6000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 50,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* Simplo AS19XXE3KA C423-50 2S1P Battery Information */
+	[BATTERY_SMP423_PROTO_2S1P] = {
+		.manuf_name = "AS19XXE3KA",
+		.device_name = "C423-50",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x0006,
+					.disconnect_val = 0x0000,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(8800, 5),
+				.voltage_normal		= 7700, /* mV */
+				.voltage_min		= 6000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 50,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* Simplo AS1GTQE3KA 2S1P Battery Information */
+	[BATTERY_SMP223_2S1P_COS] = {
+		.manuf_name = "AS1GTQE3KA",
+		.device_name = "C223-50",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x0006,
+					.disconnect_val = 0x0000,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(8800, 5),
+				.voltage_normal		= 7700, /* mV */
+				.voltage_min		= 6000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 50,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/*
+	 * Early C403 (BabyMako) protos reused the AS1FOAD3KD / C213-60 pack
+	 * (with reg_mask 0x0001); EVT switched to BATTERY_SMP403_2S1P below.
+	 */
+	[BATTERY_SMP403_2S1P_PROTO] = {
+		.manuf_name = "AS1FOAD3KD",
+		.device_name = "C213-60",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x43,
+					.reg_mask = 0x0001,
+					.disconnect_val = 0x0000,
+				},
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(8800, 5),
+				.voltage_normal		= 7700, /* mV */
+				.voltage_min		= 6000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 45,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	[BATTERY_SMP403_2S1P] = {
+		.manuf_name = "AS19XXE3KA",
+		.device_name = "C403-60",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x0,
+					.reg_data = { 0x10, 0x10 },
+				},
+				.fet = {
+					.reg_addr = 0x43,
+					.reg_mask = 0x0001,
+					.disconnect_val = 0x0000,
+				},
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(8800, 5),
+				.voltage_normal		= 7700, /* mV */
+				.voltage_min		= 6000, /* mV */
+				.precharge_current	= 256,	/* mA */
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 45,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= 0,
+				.discharging_max_c	= 60,
+			},
+		},
+	},
+
+	/* Simplo BYD 916Q2294H battery information */
+	[BATTERY_SIMPLO_BYD] = {
+		.manuf_name = "SMP-LP485780",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x00,
+					.reg_data = { 0x0010, 0x0010 },
+				},
+				.fet = {
+					.reg_addr = 0x0,
+					.reg_mask = 0x0002,
+					.disconnect_val = 0x0,
+				},
+				.flags = FUEL_GAUGE_FLAG_MFGACC,
+			},
+			.batt_info = {
+				.voltage_max = TARGET_WITH_MARGIN(13200, 5),
+				.voltage_normal = 11550,
+				.voltage_min = 9000,
+				.precharge_current = 256,	/* mA */
+				.start_charging_min_c = 0,
+				.start_charging_max_c = 45,
+				.charging_min_c = 0,
+				.charging_max_c = 45,
+				.discharging_min_c = -20,
+				.discharging_max_c = 60,
+			},
+		},
+	},
+
+	/*
+	 * Early Lava LGC AP19A8K packs report the literal string
+	 * "LGC KTxxxxGxxx"; MP packs use BATTERY_LGC_G023 below.
+	 */
+	[BATTERY_LGC_AP19A8K] = {
+		.manuf_name = "LGC KTxxxxGxxx",
+		.device_name = "AP19A8K",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x3A,
+					.reg_data = { 0xC574, 0xC574 },
+				},
+				.fet = {
+					.reg_addr = 0x43,
+					.reg_mask = 0x0001,
+					.disconnect_val = 0x0,
+				},
+			},
+			.batt_info = {
+				.voltage_max		= 13200,
+				.voltage_normal		= 11550,
+				.voltage_min		= 9000,
+				.precharge_current	= 256,
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 50,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= -20,
+				.discharging_max_c	= 75,
+			},
+		},
+	},
+
+	[BATTERY_LGC_G023] = {
+		.manuf_name = "LGC KT0030G023",
+		.device_name = "AP19A8K",
+		.config = {
+			.fuel_gauge = {
+				.ship_mode = {
+					.reg_addr = 0x3A,
+					.reg_data = { 0xC574, 0xC574 },
+				},
+				.fet = {
+					.reg_addr = 0x43,
+					.reg_mask = 0x0001,
+					.disconnect_val = 0x0,
+				},
+			},
+			.batt_info = {
+				.voltage_max		= 13200,
+				.voltage_normal		= 11550,
+				.voltage_min		= 9000,
+				.precharge_current	= 256,
+				.start_charging_min_c	= 0,
+				.start_charging_max_c	= 50,
+				.charging_min_c		= 0,
+				.charging_max_c		= 60,
+				.discharging_min_c	= -20,
+				.discharging_max_c	= 75,
+			},
+		},
+	},
 };
 BUILD_ASSERT(ARRAY_SIZE(info) == BATTERY_TYPE_COUNT);
 
 static inline const struct board_batt_params *board_get_batt_params(void)
 {
 	return &info[board_battery_type == BATTERY_TYPE_COUNT ?
-			     DEFAULT_BATTERY_TYPE :
+			     (SKU_IS_2S_BATTERY(system_get_sku_id()) ?
+				      DEFAULT_2S_BATTERY_TYPE :
+				      DEFAULT_3S_BATTERY_TYPE) :
 			     board_battery_type]
 			.config;
 }
@@ -537,6 +1106,36 @@ int charger_profile_override(struct charge_state_data *curr)
 	if (disch_on_ac) {
 		curr->state = ST_DISCHARGE;
 		return 0;
+	}
+
+	/*
+	 * Some batteries, when fully discharged, may request 0 voltage/current
+	 * which can then inadvertently disable the charger leading to the
+	 * battery not waking up. For this type of battery, marked by
+	 * BATTERY_OVERRIDE_NIL being set, if SOC is 0 and requested
+	 * voltage/current is 0, then use precharge current and max voltage
+	 * instead. Check board_battery_type directly rather than
+	 * board_get_batt_params() so the override only applies when a known
+	 * battery was identified over I2C (neither default profile sets
+	 * BATTERY_OVERRIDE_NIL).
+	 */
+	if (board_battery_type != BATTERY_TYPE_COUNT &&
+	    (info[board_battery_type].config.fuel_gauge.board_flags &
+	     BATTERY_OVERRIDE_NIL)) {
+		int v = info[board_battery_type].config.batt_info.voltage_max;
+		int i = info[board_battery_type]
+				.config.batt_info.precharge_current;
+
+		if (curr->requested_voltage == 0 &&
+		    curr->requested_current == 0 &&
+		    curr->batt.state_of_charge == 0) {
+			/*
+			 * Battery is dead, override with precharge current and
+			 * max voltage setting for the battery.
+			 */
+			curr->requested_voltage = v;
+			curr->requested_current = i;
+		}
 	}
 
 	return 0;
