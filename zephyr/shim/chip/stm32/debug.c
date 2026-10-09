@@ -16,7 +16,7 @@
 	(DBGMCU_CR_DBG_SLEEPD1 | DBGMCU_CR_DBG_STOPD1 | DBGMCU_CR_DBG_STANDBYD1)
 #endif
 
-#ifdef STM32_DBGMCU_CR_LOW_PWR_FRIENDLY
+#if defined(STM32_DBGMCU_CR_LOW_PWR_FRIENDLY) && !defined(CONFIG_STM32_ENABLE_DEBUG_SLEEP_STOP)
 /*
  * This function looks for signs that a debugger was attached. If we
  * see that a debugger was attached, we know that the chip's security features
@@ -48,4 +48,4 @@ __override bool debugger_was_connected(void)
 	 */
 	return READ_BIT(DBGMCU->CR, STM32_DBGMCU_CR_LOW_PWR_FRIENDLY);
 }
-#endif /* STM32_DBGMCU_CR_LOW_PWR_FRIENDLY */
+#endif /* defined(STM32_DBGMCU_CR_LOW_PWR_FRIENDLY) && !defined(CONFIG_STM32_ENABLE_DEBUG_SLEEP_STOP) */

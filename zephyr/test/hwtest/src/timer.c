@@ -20,14 +20,23 @@ ZTEST(timer, test_crec_usleep)
 {
 	const int expected_duration = 12345;
 
+#if defined(CONFIG_TIMER_HAS_64BIT_CYCLE_COUNTER)
 	uint64_t start_time = sys_clock_cycle_get_64();
+#else
+	uint64_t start_time = (uint64_t)sys_clock_cycle_get_32();
+#endif
 	/* This test is trying to test the functionality of crec_usleep, so we
 	 * allow the usage even though it's in Zephyr code.
 	 */
 	crec_usleep(expected_duration); /* NOLINT_EC_SYMBOL */
-	uint64_t sleep_duration =
-		((sys_clock_cycle_get_64() - start_time) * USEC_PER_SEC) /
+#if defined(CONFIG_TIMER_HAS_64BIT_CYCLE_COUNTER)
+	uint64_t now = sys_clock_cycle_get_64();
+#else
+	uint64_t now = (uint64_t)sys_clock_cycle_get_32();
+#endif
+	uint64_t sleep_duration = ((now - start_time) * USEC_PER_SEC) /
 		sys_clock_hw_cycles_per_sec();
+
 	/* The sleep duration is adjusted to the system tick boundaries. */
 	/* The maximum error threshold is two ticks. */
 	int error_threshold =
