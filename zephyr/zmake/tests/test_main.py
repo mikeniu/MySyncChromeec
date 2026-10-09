@@ -268,3 +268,78 @@ def test_main_modules_dir_workspace_prepared_markers(
             ]
         )
     mock_preparer.assert_not_called()
+
+
+@pytest.mark.usefixtures("mock_locate_checkout", "clean_env")
+@mock.patch("zmake.repository_prep._has_files", return_value=True)
+@mock.patch("zmake.repository_prep.create_shadow_checkout")
+def test_main_compare_builds_defers_prep_to_per_ref_worktrees(
+    mock_create, _mock_has_files, mock_preparer, mock_zmake_class
+):
+    """Test compare-builds forwards overrides/patches to per-ref worktrees."""
+    with mock.patch(
+        "zmake.repository_prep.get_default_patches_dirs",
+        return_value=[pathlib.Path("/fake/patches")],
+    ), mock.patch(
+        "zmake.repository_prep.get_default_src_override_dirs",
+        return_value=[pathlib.Path("/fake/overrides")],
+    ), mock.patch(
+        "tempfile.mkdtemp", return_value="/fake/tempdir"
+    ):
+        main.main(
+            [
+                "compare-builds",
+                "--ref1",
+                "HEAD",
+                "--ref2",
+                "HEAD~",
+                "project1",
+            ]
+        )
+
+    mock_create.assert_not_called()
+    mock_preparer.assert_not_called()
+    zmake_instance = mock_zmake_class.return_value
+    _, cmp_kwargs = zmake_instance.compare_builds.call_args
+    assert cmp_kwargs["worktree_patches_dirs"] == [
+        pathlib.Path("/fake/patches")
+    ]
+    assert cmp_kwargs["worktree_src_override_dirs"] == [
+        pathlib.Path("/fake/overrides")
+    ]
+
+
+@pytest.mark.usefixtures("mock_locate_checkout", "clean_env")
+@mock.patch("zmake.repository_prep._has_files", return_value=True)
+@mock.patch("zmake.repository_prep.create_shadow_checkout")
+def test_main_compare_builds_no_shadow_uses_in_place_prep(
+    mock_create, _mock_has_files, mock_preparer, mock_zmake_class
+):
+    """Test compare-builds with --no-shadow uses in-place preparation."""
+    with mock.patch("tempfile.mkdtemp", return_value="/fake/tempdir"):
+        main.main(
+            [
+                "--no-shadow",
+                "--patches-dir",
+                "/fake/patches",
+                "--src-override-dir",
+                "/fake/overrides",
+                "compare-builds",
+                "--ref1",
+                "HEAD",
+                "--ref2",
+                "HEAD~",
+                "project1",
+            ]
+        )
+
+    mock_create.assert_not_called()
+    mock_preparer.assert_called_once_with(
+        pathlib.Path("/fake/checkout"),
+        [pathlib.Path("/fake/patches")],
+        [pathlib.Path("/fake/overrides")],
+    )
+    zmake_instance = mock_zmake_class.return_value
+    _, cmp_kwargs = zmake_instance.compare_builds.call_args
+    assert cmp_kwargs.get("worktree_patches_dirs") is None
+    assert cmp_kwargs.get("worktree_src_override_dirs") is None

@@ -448,6 +448,8 @@ class Zmake:
         compare_configs=False,
         compare_binaries_disable=False,
         compare_devicetrees=False,
+        worktree_patches_dirs=None,
+        worktree_src_override_dirs=None,
     ):
         """Compare EC builds at two commits."""
         if module in ("zephyr", "zephyrproject", "zephyr-base"):
@@ -469,18 +471,16 @@ class Zmake:
         else:
             self.logger.info("Temporary dir %s will be retained", temp_dir)
 
-        projects, project_names, all_projects = self._filter_projects(
-            project_names, all_projects
-        )
-
-        if (len(project_names)) == 0 and not all_projects:
-            self.logger.info("No projects to compare, exiting.")
-            return 0
-
-        if len(project_names) > 1:
-            # Turn on job names for multi-project comparisons so build logs
-            # can be clearly distinguished.
-            zmake.multiproc.LogWriter.set_job_name_logging(True)
+        raw_project_names = list(project_names)
+        raw_all_projects = all_projects
+        projects = set()
+        if not worktree_patches_dirs and not worktree_src_override_dirs:
+            projects, project_names, all_projects = self._filter_projects(
+                project_names, all_projects
+            )
+            if not projects:
+                self.logger.info("No projects to compare, exiting.")
+                return 0
 
         self.logger.info("Compare zephyr builds")
 
@@ -500,7 +500,28 @@ class Zmake:
                 checkout,
             )
 
-        cmp_builds.do_checkouts(self.zephyr_base, self.module_paths)
+        cmp_builds.do_checkouts(
+            self.zephyr_base,
+            self.module_paths,
+            patches_dirs=worktree_patches_dirs,
+            src_override_dirs=worktree_src_override_dirs,
+        )
+
+        if (
+            worktree_patches_dirs or worktree_src_override_dirs
+        ) and cmp_builds.checkouts:
+            self.projects_dirs = cmp_builds.checkouts[0].projects_dirs
+            projects, project_names, all_projects = self._filter_projects(
+                raw_project_names, raw_all_projects
+            )
+            if not projects:
+                self.logger.info("No projects to compare, exiting.")
+                return 0
+
+        if len(projects) > 1:
+            # Turn on job names for multi-project comparisons so build logs
+            # can be clearly distinguished.
+            zmake.multiproc.LogWriter.set_job_name_logging(True)
 
         for checkout in cmp_builds.checkouts:
             # Now that the sources have been checked out, transform the
