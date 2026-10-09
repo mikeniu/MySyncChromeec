@@ -370,7 +370,7 @@ void board_reset_pd_mcu(void)
 	board_set_tcpc_power_mode(USB_PD_PORT_ANX74XX, 1);
 }
 
-static void board_tcpc_init(void)
+void board_tcpc_init(void)
 {
 	int reg;
 	int count = 0;
@@ -417,7 +417,6 @@ static void board_tcpc_init(void)
 		usb_mux_hpd_update(port, USB_PD_MUX_HPD_LVL_DEASSERTED |
 						 USB_PD_MUX_HPD_IRQ_DEASSERTED);
 }
-DECLARE_HOOK(HOOK_INIT, board_tcpc_init, HOOK_PRIO_DEFAULT);
 
 const struct temp_sensor_t temp_sensors[] = {
 	[TEMP_SENSOR_BATTERY] = { .name = "Battery",
