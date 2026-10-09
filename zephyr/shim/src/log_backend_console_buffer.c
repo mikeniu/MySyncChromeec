@@ -18,7 +18,11 @@ static int char_out(uint8_t *data, size_t length, void *ctx)
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_PANIC_LOG))
 		panic_log_write_str(data, length);
 
-	return console_buf_notify_chars(data, length);
+	size_t written = console_buf_notify_chars(data, length);
+
+	/* If dropped (e.g. in ISR or lock contention), report length as
+	 * consumed so log_output_write does not loop indefinitely. */
+	return (written > 0) ? written : length;
 }
 LOG_OUTPUT_DEFINE(log_output_console_buffer, char_out, char_out_buf,
 		  sizeof(char_out_buf));
