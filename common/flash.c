@@ -14,6 +14,7 @@
 #include "hooks.h"
 #include "host_command.h"
 #include "otp.h"
+#include "overflow.h"
 #include "rwsig.h"
 #include "shared_mem.h"
 #include "system.h"
@@ -28,6 +29,9 @@
 #ifndef CONFIG_FLASH_ERASED_VALUE32
 #define CONFIG_FLASH_ERASED_VALUE32 (-1U)
 #endif
+
+#define RWSIG_ABORT_TIMEOUT_MS 50
+#define RWSIG_ABORT_POLL_MS 5
 
 #ifdef CONFIG_FLASH_PSTATE
 
@@ -740,13 +744,13 @@ int crec_flash_read(int offset, int size, char *data)
 	return EC_SUCCESS;
 }
 
-static void flash_abort_or_invalidate_hash(int offset, int size)
+static int flash_abort_or_invalidate_hash(int offset, int size)
 {
 #ifdef CONFIG_VBOOT_HASH
 	if (vboot_hash_in_progress()) {
 		/* Abort hash calculation when flash update is in progress. */
 		vboot_hash_abort();
-		return;
+		return EC_SUCCESS;
 	}
 
 #ifdef CONFIG_EXTERNAL_STORAGE
@@ -756,7 +760,7 @@ static void flash_abort_or_invalidate_hash(int offset, int size)
 	 * flash copy and the RAM copy, then take necessary actions.
 	 */
 	if (system_is_in_rw())
-		return;
+		return EC_SUCCESS;
 #endif
 
 	/* If EC executes in place, we need to invalidate the cached hash. */
@@ -775,28 +779,62 @@ static void flash_abort_or_invalidate_hash(int offset, int size)
 		     (CONFIG_EC_WRITABLE_STORAGE_OFF + CONFIG_RW_SIZE)) ||
 	    (offset < CONFIG_EC_WRITABLE_STORAGE_OFF &&
 	     (offset + size) >
-		     (CONFIG_EC_WRITABLE_STORAGE_OFF + CONFIG_RW_SIZE)))
+		     (CONFIG_EC_WRITABLE_STORAGE_OFF + CONFIG_RW_SIZE))) {
+		enum rwsig_status rwsig_status = rwsig_get_status();
+		/* Make sure to modify flash only when the RWSIG is already
+		 * finished.
+		 */
+		if ((rwsig_status == RWSIG_ABORTED) ||
+		    (rwsig_status == RWSIG_INVALID)) {
+			return EC_SUCCESS;
+		}
 		rwsig_abort();
+		/* Sleep within host command is an unusual approach, but this is
+		 * the only way to let the RWSIG task update the status in
+		 * current architecture.
+		 */
+		for (int i = 0;
+		     i < RWSIG_ABORT_TIMEOUT_MS / RWSIG_ABORT_POLL_MS; i++) {
+			crec_msleep(RWSIG_ABORT_POLL_MS);
+			rwsig_status = rwsig_get_status();
+			if ((rwsig_status == RWSIG_ABORTED) ||
+			    (rwsig_status == RWSIG_INVALID)) {
+				return EC_SUCCESS;
+			}
+		}
+		return EC_RES_BUSY;
+	}
 #endif
+	return EC_SUCCESS;
 }
 
 int crec_flash_write(int offset, int size, const char *data)
 {
+	int ret;
+
 	if (!flash_range_ok(offset, size, CONFIG_FLASH_WRITE_SIZE))
 		return EC_ERROR_INVAL; /* Invalid range */
 
-	flash_abort_or_invalidate_hash(offset, size);
+	ret = flash_abort_or_invalidate_hash(offset, size);
+	if (ret) {
+		return ret;
+	}
 	return crec_flash_physical_write(offset, size, data);
 }
 
 int crec_flash_erase(int offset, int size)
 {
+	int ret;
+
 #ifndef CONFIG_FLASH_MULTIPLE_REGION
 	if (!flash_range_ok(offset, size, CONFIG_FLASH_ERASE_SIZE))
 		return EC_ERROR_INVAL; /* Invalid range */
 #endif
 
-	flash_abort_or_invalidate_hash(offset, size);
+	ret = flash_abort_or_invalidate_hash(offset, size);
+	if (ret) {
+		return ret;
+	}
 	return crec_flash_physical_erase(offset, size);
 }
 
@@ -1180,6 +1218,7 @@ static int command_flash_erase(int argc, const char **argv)
 {
 	int offset = -1;
 	int size = -1;
+	int end;
 	int rv;
 
 	if (crec_flash_get_protect() & EC_FLASH_PROTECT_ALL_NOW)
@@ -1188,6 +1227,16 @@ static int command_flash_erase(int argc, const char **argv)
 	rv = parse_offset_size(argc, argv, 1, &offset, &size);
 	if (rv)
 		return rv;
+
+	/* Make sure that offset + size does not overflow. */
+	if (check_add_overflow(offset, size, &end))
+		return EC_ERROR_OVERFLOW;
+
+#ifdef CONFIG_ROLLBACK
+	if ((uint32_t)offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
+	    (uint32_t)end > CONFIG_ROLLBACK_OFF)
+		return EC_ERROR_ACCESS_DENIED;
+#endif
 
 	ccprintf("Erasing %d bytes at 0x%x...\n", size, offset);
 	return crec_flash_erase(offset, size);
@@ -1199,6 +1248,7 @@ static int command_flash_write(int argc, const char **argv)
 {
 	int offset = -1;
 	int size = -1;
+	int end;
 	int rv;
 	char *data;
 	int i;
@@ -1209,6 +1259,17 @@ static int command_flash_write(int argc, const char **argv)
 	rv = parse_offset_size(argc, argv, 1, &offset, &size);
 	if (rv)
 		return rv;
+
+	/* Make sure that offset + size does not overflow. */
+	if (check_add_overflow(offset, size, &end))
+		return EC_ERROR_OVERFLOW;
+
+#ifdef CONFIG_ROLLBACK
+	if ((uint32_t)offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
+	    (uint32_t)end > CONFIG_ROLLBACK_OFF) {
+		return EC_ERROR_ACCESS_DENIED;
+	}
+#endif
 
 	if (size > shared_mem_size())
 		size = shared_mem_size();
@@ -1239,6 +1300,7 @@ static int command_flash_read(int argc, const char **argv)
 {
 	int offset = -1;
 	int size = 256;
+	int end;
 	int rv;
 	uint8_t *data;
 	int i;
@@ -1246,6 +1308,20 @@ static int command_flash_read(int argc, const char **argv)
 	rv = parse_offset_size(argc, argv, 1, &offset, &size);
 	if (rv)
 		return rv;
+
+	/* Make sure that offset + size does not overflow. */
+	if (check_add_overflow(offset, size, &end))
+		return EC_ERROR_OVERFLOW;
+
+#ifdef CONFIG_ROLLBACK
+	/* Prevent reading rollback regions via console commands to avoid
+	 * leaking the rollback secret.
+	 */
+	if ((uint32_t)offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
+	    (uint32_t)end > CONFIG_ROLLBACK_OFF) {
+		return EC_ERROR_ACCESS_DENIED;
+	}
+#endif
 
 	if (size > shared_mem_size())
 		size = shared_mem_size();
@@ -1439,9 +1515,23 @@ static enum ec_status flash_command_read(struct host_cmd_handler_args *args)
 {
 	const struct ec_params_flash_read *p = args->params;
 	uint32_t offset = p->offset + EC_FLASH_REGION_START;
+	uint32_t end;
 
 	if (p->size > args->response_max)
 		return EC_RES_OVERFLOW;
+
+	/* Make sure that offset + p->size does not overflow. */
+	if (check_add_overflow(offset, p->size, &end))
+		return EC_RES_OVERFLOW;
+
+#ifdef CONFIG_ROLLBACK
+	/* Prevent reading rollback regions via host commands to avoid leaking
+	 * the rollback secret.
+	 */
+	if (offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
+	    end > CONFIG_ROLLBACK_OFF)
+		return EC_RES_ACCESS_DENIED;
+#endif
 
 	if (crec_flash_read(offset, p->size, args->response))
 		return EC_RES_ERROR;
@@ -1462,15 +1552,27 @@ static enum ec_status flash_command_write(struct host_cmd_handler_args *args)
 {
 	const struct ec_params_flash_write *p = args->params;
 	uint32_t offset = p->offset + EC_FLASH_REGION_START;
+	uint32_t end;
 
 	if (crec_flash_get_protect() & EC_FLASH_PROTECT_ALL_NOW)
 		return EC_RES_ACCESS_DENIED;
 
+	/* Make sure that p->size is within args->params. */
 	if (p->size + sizeof(*p) > args->params_size)
 		return EC_RES_INVALID_PARAM;
 
+	/* Make sure that offset + p->size does not overflow. */
+	if (check_add_overflow(offset, p->size, &end))
+		return EC_RES_OVERFLOW;
+
 #ifdef CONFIG_INTERNAL_STORAGE
 	if (system_unsafe_to_overwrite(offset, p->size))
+		return EC_RES_ACCESS_DENIED;
+#endif
+
+#ifdef CONFIG_ROLLBACK
+	if (offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
+	    end > CONFIG_ROLLBACK_OFF)
 		return EC_RES_ACCESS_DENIED;
 #endif
 
@@ -1516,6 +1618,7 @@ static enum ec_status flash_command_erase(struct host_cmd_handler_args *args)
 	const struct ec_params_flash_erase *p = args->params;
 	int rc = EC_RES_SUCCESS, cmd = FLASH_ERASE_SECTOR;
 	uint32_t offset;
+	uint32_t end;
 #ifdef CONFIG_FLASH_DEFERRED_ERASE
 	const struct ec_params_flash_erase_v1 *p_1 = args->params;
 
@@ -1529,8 +1632,18 @@ static enum ec_status flash_command_erase(struct host_cmd_handler_args *args)
 	if (crec_flash_get_protect() & EC_FLASH_PROTECT_ALL_NOW)
 		return EC_RES_ACCESS_DENIED;
 
+	/* Make sure that offset + p->size does not overflow. */
+	if (check_add_overflow(offset, p->size, &end))
+		return EC_RES_OVERFLOW;
+
 #ifdef CONFIG_INTERNAL_STORAGE
 	if (system_unsafe_to_overwrite(offset, p->size))
+		return EC_RES_ACCESS_DENIED;
+#endif
+
+#ifdef CONFIG_ROLLBACK
+	if (offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
+	    end > CONFIG_ROLLBACK_OFF)
 		return EC_RES_ACCESS_DENIED;
 #endif
 
