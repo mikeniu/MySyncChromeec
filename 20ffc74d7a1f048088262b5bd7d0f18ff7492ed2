@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "964d8e9c_e16177a3",
+        "filename": "zephyr/shim/include/shimmed_task_id.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-09T20:31:59Z",
+      "side": 1,
+      "message": "Minor typo in the comment here (pre-existing): \u0027options\u0027 is usually the last argument. Your update to the comment description is good, but check if \u0027prio\u0027 and \u0027options\u0027 are correctly mapped in the shim\u0027s CROS_EC_TASK macro usage.",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 0
+      },
+      "revId": "20ffc74d7a1f048088262b5bd7d0f18ff7492ed2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
