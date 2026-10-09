@@ -16,6 +16,24 @@
       "message": "If this is needed to compile, either squash into the previous CL or add a CqDepend link to the parent CL.",
       "revId": "f542221bc6e0c8cbd15439eea40e65cf711f50d6",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c421690c_5dbb6de7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1511343
+      },
+      "writtenOn": "2026-10-09T17:45:26Z",
+      "side": 1,
+      "message": "Added Cq-Depend in previous CL.",
+      "parentUuid": "189cb495_7a646a9f",
+      "revId": "f542221bc6e0c8cbd15439eea40e65cf711f50d6",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
