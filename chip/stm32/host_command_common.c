@@ -22,20 +22,23 @@ host_command_protocol_info(struct host_cmd_handler_args *args)
 {
 	enum ec_status ret_status = EC_RES_INVALID_COMMAND;
 
-	/*
-	 * Read transport type from TRANSPORT_SEL bootstrap pin the first
-	 * time this function is called.
-	 */
-	if (IS_ENABLED(CONFIG_FINGERPRINT_MCU) &&
-	    (curr_transport_type == FP_TRANSPORT_TYPE_UNKNOWN))
-		curr_transport_type = get_fp_transport_type();
+	if (IS_ENABLED(CONFIG_FINGERPRINT_MCU)) {
+		/*
+		 * Read transport type from TRANSPORT_SEL bootstrap pin the
+		 * first time this function is called.
+		 */
+		if (curr_transport_type == FP_TRANSPORT_TYPE_UNKNOWN)
+			curr_transport_type = get_fp_transport_type();
 
-	if (IS_ENABLED(CONFIG_USART_HOST_COMMAND) &&
-	    curr_transport_type == FP_TRANSPORT_TYPE_UART)
-		ret_status = usart_get_protocol_info(args);
-	else if (IS_ENABLED(CONFIG_SPI) &&
-		 curr_transport_type == FP_TRANSPORT_TYPE_SPI)
+		if (IS_ENABLED(CONFIG_USART_HOST_COMMAND) &&
+		    curr_transport_type == FP_TRANSPORT_TYPE_UART)
+			ret_status = usart_get_protocol_info(args);
+		else if (IS_ENABLED(CONFIG_SPI) &&
+			 curr_transport_type == FP_TRANSPORT_TYPE_SPI)
+			ret_status = spi_get_protocol_info(args);
+	} else if (IS_ENABLED(CONFIG_SPI)) {
 		ret_status = spi_get_protocol_info(args);
+	}
 
 	return ret_status;
 }
