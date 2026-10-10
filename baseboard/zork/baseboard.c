@@ -95,6 +95,27 @@ static void baseboard_chipset_resume(void)
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, baseboard_chipset_resume, HOOK_PRIO_DEFAULT);
 
+__override void board_set_charge_limit(int port, int supplier, int charge_ma,
+				       int max_ma, int charge_mv)
+{
+	/*
+	 * Derate by 5% for charger margin (here rather than via
+	 * CONFIG_CHARGER_INPUT_CURRENT_DERATE_PCT so it applies before the
+	 * floor), then never go below 512 mA: lower limits during PD
+	 * transitions have caused S0 brownouts (b/572021884). This
+	 * intentionally exceeds pSnkStdby and iSnkStdby.
+	 *
+	 * CONFIG_CHARGER_MIN_INPUT_CURRENT_LIMIT can't be used because its
+	 * BUILD_ASSERT requires the floor to supply
+	 * CONFIG_CHARGER_MIN_POWER_MW_FOR_POWER_ON at
+	 * CONFIG_USB_PD_MAX_VOLTAGE_MV, and 512 mA at 20 V is only 10.24 W.
+	 */
+	charge_ma = charge_ma * 95 / 100;
+	charge_set_input_current_limit(
+		max(charge_ma, CONFIG_CHARGER_DEFAULT_CURRENT_LIMIT),
+		charge_mv);
+}
+
 /* Keyboard scan setting */
 __override struct keyboard_scan_config keyscan_config = {
 	.output_settle_us = 50,
