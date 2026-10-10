@@ -526,6 +526,11 @@ ZTEST(motion_sense, test_motion_sense_power_and_init)
 	motion_sensors[0].current_range = 2;
 	zassert_ok(sensor_init_done(&motion_sensors[0]));
 	zassert_equal(sensor_board_is_lid_angle_available(), 1);
+
+	motion_sensors[0].current_range = 0;
+	zassert_ok(sensor_init_done(&motion_sensors[0]));
+	zassert_equal(motion_sensors[0].current_range,
+		      motion_sensors[0].default_range);
 }
 
 ZTEST(motion_sense, test_motion_sense_push_raw_and_spoof)
