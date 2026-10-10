@@ -158,6 +158,11 @@ static int test_initialization(void)
 			charge_manager_update_charge(i, j, &charge);
 		}
 
+	/* The skipped pair hasn't reported in, so its current is unknown. */
+	TEST_ASSERT(charge_manager_get_available_current(CHARGE_SUPPLIER_TYPEC,
+							 0) ==
+		    CHARGE_CURRENT_UNINITIALIZED);
+
 	/* Verify no active charge port, since all pairs haven't updated */
 	wait_for_charge_manager_refresh();
 	TEST_ASSERT(active_charge_port == CHARGE_PORT_NONE);
@@ -817,6 +822,36 @@ static int test_invalidate_suppliers_port(void)
 	return EC_SUCCESS;
 }
 
+static int test_available_current(void)
+{
+	struct charge_port_info charge;
+
+	initialize_charge_table(0, 5000, 1000);
+	TEST_ASSERT(charge_manager_get_available_current(CHARGE_SUPPLIER_TEST2,
+							 1) == 0);
+
+	/* The reported current is readable without waiting for a refresh. */
+	charge.current = 500;
+	charge.voltage = 5000;
+	charge_manager_update_charge(CHARGE_SUPPLIER_TEST2, 1, &charge);
+	TEST_ASSERT(charge_manager_get_available_current(CHARGE_SUPPLIER_TEST2,
+							 1) == 500);
+	TEST_ASSERT(charge_manager_get_available_current(CHARGE_SUPPLIER_TEST2,
+							 0) == 0);
+
+	/* An invalid supplier or port has no current. */
+	TEST_ASSERT(charge_manager_get_available_current(CHARGE_SUPPLIER_NONE,
+							 1) == 0);
+	TEST_ASSERT(charge_manager_get_available_current(CHARGE_SUPPLIER_COUNT,
+							 1) == 0);
+	TEST_ASSERT(charge_manager_get_available_current(CHARGE_SUPPLIER_TEST2,
+							 -1) == 0);
+	TEST_ASSERT(charge_manager_get_available_current(
+			    CHARGE_SUPPLIER_TEST2, CHARGE_PORT_COUNT) == 0);
+
+	return EC_SUCCESS;
+}
+
 void run_test(int argc, const char **argv)
 {
 	test_reset();
@@ -831,6 +866,7 @@ void run_test(int argc, const char **argv)
 	RUN_TEST(test_rejected_port);
 	RUN_TEST(test_unknown_dualrole_capability);
 	RUN_TEST(test_invalidate_suppliers_port);
+	RUN_TEST(test_available_current);
 
 	/* Some handlers are still running after the test ends. */
 	crec_sleep(2);
