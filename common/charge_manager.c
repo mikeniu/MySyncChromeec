@@ -1641,6 +1641,21 @@ enum charge_supplier charge_manager_get_supplier(void)
 	return retval;
 }
 
+int charge_manager_get_available_current(int supplier, int port)
+{
+	int retval;
+
+	if (supplier < 0 || supplier >= CHARGE_SUPPLIER_COUNT ||
+	    !is_valid_port(port))
+		return 0;
+
+	CM_MUTEX_LOCK(&cm_refresh);
+	retval = available_charge[supplier][port].current;
+	CM_MUTEX_UNLOCK(&cm_refresh);
+
+	return retval;
+}
+
 void charge_manager_set_supplier(int port, enum charge_supplier supplier)
 {
 	CM_MUTEX_LOCK(&cm_refresh);
