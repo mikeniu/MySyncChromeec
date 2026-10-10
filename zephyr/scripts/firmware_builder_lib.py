@@ -320,7 +320,9 @@ def save_or_load_shard_info(opts, zephyr_dir=None, save=False):
 
 def shard_projects(projects, opts=None):
     """Sort projects and return the subset for the configured shard."""
-    projects.sort(key=lambda x: x.config.project_name)
+    projects.sort(
+        key=lambda x: x.config.project_name if hasattr(x, "config") else str(x)
+    )
     if opts and (opts.shard_count is not None or opts.shard_index is not None):
         if (
             not opts.shard_count

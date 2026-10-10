@@ -239,7 +239,12 @@ def test(opts: argparse.Namespace) -> int:
     output_dir = Path(output_dir_val) if output_dir_val else working_dir
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    run_result = _run_renode_tests(output_dir, working_dir, ZEPHYR_BOARDS)
+    boards_to_test = firmware_builder_lib.shard_projects(
+        list(ZEPHYR_BOARDS), opts
+    )
+    print(f"Running Renode tests for boards: {boards_to_test}")
+
+    run_result = _run_renode_tests(output_dir, working_dir, boards_to_test)
     final_results = _aggregate_results(run_result.results)
 
     output_path = output_dir / "test_results.json"
