@@ -88,11 +88,36 @@ static int test_lid_angle_less180(void)
 	return EC_SUCCESS;
 }
 
+/*
+ * A board can replace a motion_sensors[] entry after motion_sense_startup(),
+ * which leaves current_range at 0. Init must fall back to default_range.
+ */
+static int test_init_zero_current_range(void)
+{
+	struct motion_sensor_t *lid =
+		&motion_sensors[CONFIG_LID_ANGLE_SENSOR_LID];
+
+	hook_notify(HOOK_CHIPSET_SHUTDOWN);
+	lid->current_range = 0;
+
+	/* Go to S0 state, which initializes the lid sensor again. */
+	hook_notify(HOOK_CHIPSET_SUSPEND);
+	hook_notify(HOOK_CHIPSET_RESUME);
+	crec_msleep(1000);
+	TEST_ASSERT(sensor_active == SENSOR_ACTIVE_S0);
+
+	/* accel_set_range() stores the range it was given. */
+	TEST_ASSERT(lid->current_range == lid->default_range);
+
+	return EC_SUCCESS;
+}
+
 void run_test(int argc, const char **argv)
 {
 	test_reset();
 
 	RUN_TEST(test_lid_angle_less180);
+	RUN_TEST(test_init_zero_current_range);
 
 	test_print_result();
 }
