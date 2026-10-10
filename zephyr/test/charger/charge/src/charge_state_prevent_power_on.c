@@ -188,3 +188,35 @@ ZTEST(charge_state_prevent_power_on,
 	zassert_false(charge_prevent_power_on(true));
 }
 #endif
+
+#ifdef CONFIG_PLATFORM_EC_CHARGER_DISCHARGE_ON_AC_CUSTOM
+static int custom_discharge_on_ac_enabled = -1;
+static int custom_discharge_on_ac_rv = EC_SUCCESS;
+
+int board_discharge_on_ac(int enable)
+{
+	custom_discharge_on_ac_enabled = enable;
+	return custom_discharge_on_ac_rv;
+}
+
+ZTEST(charge_state_prevent_power_on, test_custom_discharge_on_ac)
+{
+	charge_get_status()->ac = 1;
+
+	custom_discharge_on_ac_rv = EC_SUCCESS;
+	zassert_equal(EC_SUCCESS, set_chg_ctrl_mode(CHARGE_CONTROL_DISCHARGE));
+	zassert_equal(1, custom_discharge_on_ac_enabled);
+	zassert_equal(CHARGE_CONTROL_DISCHARGE, get_chg_ctrl_mode());
+
+	custom_discharge_on_ac_rv = EC_ERROR_UNIMPLEMENTED;
+	zassert_equal(EC_ERROR_UNIMPLEMENTED,
+		      set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL));
+	zassert_equal(0, custom_discharge_on_ac_enabled);
+	zassert_equal(CHARGE_CONTROL_DISCHARGE, get_chg_ctrl_mode());
+
+	custom_discharge_on_ac_rv = EC_SUCCESS;
+	zassert_equal(EC_SUCCESS, set_chg_ctrl_mode(CHARGE_CONTROL_NORMAL));
+	zassert_equal(0, custom_discharge_on_ac_enabled);
+	zassert_equal(CHARGE_CONTROL_NORMAL, get_chg_ctrl_mode());
+}
+#endif

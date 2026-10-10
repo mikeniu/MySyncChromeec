@@ -577,7 +577,10 @@ int set_chg_ctrl_mode(enum ec_charge_control_mode mode)
 	}
 
 	if (IS_ENABLED(CONFIG_CHARGER_DISCHARGE_ON_AC)) {
-		rv = charger_discharge_on_ac(discharge_on_ac);
+		if (IS_ENABLED(CONFIG_CHARGER_DISCHARGE_ON_AC_CUSTOM))
+			rv = board_discharge_on_ac(discharge_on_ac);
+		else
+			rv = charger_discharge_on_ac(discharge_on_ac);
 		if (rv != EC_SUCCESS)
 			return rv;
 	}
