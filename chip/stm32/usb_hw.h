@@ -77,6 +77,9 @@ enum usb_desc_patch_type {
 #ifdef CONFIG_USB_HID_KEYBOARD_BACKLIGHT
 	USB_DESC_KEYBOARD_BACKLIGHT,
 #endif
+#ifdef SECTION_IS_RO
+	USB_DESC_BRIDGE,
+#endif
 	USB_DESC_PATCH_COUNT,
 };
 

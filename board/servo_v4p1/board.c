@@ -29,9 +29,10 @@
 #include "tusb1064.h"
 #include "update_fw.h"
 #include "usart-stm32f0.h"
-#include "usart_rx_dma.h"
-#include "usart_tx_dma.h"
 #include "usb-stream.h"
+#ifdef SECTION_IS_RO
+#include "usb_bridge.h"
+#endif
 #include "usb_gpio.h"
 #include "usb_i2c.h"
 #include "usb_mux.h"
@@ -432,6 +433,46 @@ USB_STREAM_CONFIG(usart3_usb, USB_IFACE_USART3_STREAM,
  * Forward USART4 as a simple USB serial interface.
  */
 
+#ifdef SECTION_IS_RO
+/*
+ * In RO, usart4 connects to the ATmega32U4 over 1.000 Mbps UART (8N1).
+ * Shared queues are non-static so usb_bridge.c can bind consumers/producers
+ * and dequeue/enqueue data directly.
+ * Keyboard queues use 16 bytes (matching USB_STREAM_RX/TX_SIZE = 16) to
+ * save 96 bytes of RO SRAM, while UART queues use 128 bytes (holding a
+ * 68-byte FRAME_DATA plus SERVO_CTRL_TX_HEADROOM per Target 2).
+ */
+static struct usart_config const usart4;
+struct usb_stream_config const usart4_usb;
+
+struct queue const usart4_to_bridge =
+	QUEUE_DIRECT(128, uint8_t, usart4.producer, usb_bridge_uart_consumer);
+struct queue const bridge_to_usart4 =
+	QUEUE_DIRECT(128, uint8_t, usb_bridge_uart_producer, usart4.consumer);
+
+struct queue const usb_to_bridge_kbd =
+	QUEUE_DIRECT(16, uint8_t, usart4_usb.producer, usb_bridge_kbd_consumer);
+struct queue const bridge_kbd_to_usb =
+	QUEUE_DIRECT(16, uint8_t, usb_bridge_kbd_producer, usart4_usb.consumer);
+
+static struct usart_config const usart4 =
+	USART_CONFIG(usart4_hw, usart_rx_interrupt, usart_tx_interrupt, 1000000,
+		     0, usart4_to_bridge, bridge_to_usart4);
+
+/*
+ * Expand usart4_usb using USB_STREAM_CONFIG instead of
+ * USB_STREAM_CONFIG_USART_IFACE. USB_STREAM_CONFIG expands to
+ * USB_STREAM_CONFIG_FULL without binding the default usb_usart_interface,
+ * allowing usart4_iface_request to absorb baud changes.
+ */
+USB_STREAM_CONFIG(usart4_usb, USB_IFACE_USART4_STREAM,
+		  USB_STR_USART4_STREAM_NAME, USB_EP_USART4_STREAM,
+		  USB_STREAM_RX_SIZE, USB_STREAM_TX_SIZE, usb_to_bridge_kbd,
+		  bridge_kbd_to_usb)
+
+/* usart4_iface_request is registered via USB_DECLARE_IFACE in usb_bridge.c */
+#else /* !SECTION_IS_RO */
+/* Stock 9600-baud direct UART-to-USB wiring for RW fallback image */
 static struct usart_config const usart4;
 struct usb_stream_config const usart4_usb;
 
@@ -448,6 +489,7 @@ USB_STREAM_CONFIG_USART_IFACE(usart4_usb, USB_IFACE_USART4_STREAM,
 			      USB_STR_USART4_STREAM_NAME, USB_EP_USART4_STREAM,
 			      USB_STREAM_RX_SIZE, USB_STREAM_TX_SIZE,
 			      usb_to_usart4, usart4_to_usb, usart4)
+#endif /* SECTION_IS_RO */
 
 /*
  * Define usb interface descriptor for the `EMPTY` usb interface, to satisfy
@@ -480,6 +522,9 @@ const void *const usb_strings[] = {
 	[USB_STR_USART3_STREAM_NAME] = USB_STRING_DESC("DUT UART"),
 	[USB_STR_USART4_STREAM_NAME] = USB_STRING_DESC("Atmega UART"),
 	[USB_STR_UPDATE_NAME] = USB_STRING_DESC("Firmware update"),
+#ifdef SECTION_IS_RO
+	[USB_STR_BRIDGE_NAME] = USB_STRING_DESC("Android ADB/Fastboot"),
+#endif
 };
 
 BUILD_ASSERT(ARRAY_SIZE(usb_strings) == USB_STR_COUNT);
@@ -546,12 +591,22 @@ static void board_init(void)
 	/* USB to serial queues */
 	queue_init(&usart3_to_usb);
 	queue_init(&usb_to_usart3);
+#ifdef SECTION_IS_RO
+	queue_init(&usart4_to_bridge);
+	queue_init(&bridge_to_usart4);
+	queue_init(&usb_to_bridge_kbd);
+	queue_init(&bridge_kbd_to_usb);
+#else
 	queue_init(&usart4_to_usb);
 	queue_init(&usb_to_usart4);
+#endif
 
 	/* UART init */
 	usart_init(&usart3);
 	usart_init(&usart4);
+#ifdef SECTION_IS_RO
+	usb_bridge_init();
+#endif
 
 	/* Delay DUT hub to avoid brownout. */
 	crec_usleep(MSEC);

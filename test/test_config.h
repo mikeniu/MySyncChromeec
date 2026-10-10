@@ -651,6 +651,11 @@ int ncp15wb_calculate_temp(uint16_t adc);
 #define CONFIG_CONSOLE_CMD_WATCHDOG_INFO
 #endif
 
+#ifdef TEST_SERVO_USB_BRIDGE
+#define CONFIG_STREAM_USART4
+#define CONFIG_USB_RAM_ACCESS_TYPE uint16_t
+#endif
+
 #ifdef HAVE_PRIVATE
 #include "private_test_config.h"
 #endif /* HAVE_PRIVATE */

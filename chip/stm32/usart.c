@@ -272,6 +272,13 @@ void usart_clear_fifos(struct usart_config const *config,
 
 void usart_interrupt(struct usart_config const *config)
 {
-	config->tx->interrupt(config);
+	/*
+	 * Service RX before TX: on high-speed interrupt-driven UARTs (such as
+	 * 1.000 Mbps USART4 on servo_v4p1), the hardware RDR is single-byte
+	 * buffered with a 10 us overrun deadline, whereas TX queue removal
+	 * invokes consumer callbacks and can tolerate microsecond delays
+	 * without data loss.
+	 */
 	config->rx->interrupt(config);
+	config->tx->interrupt(config);
 }

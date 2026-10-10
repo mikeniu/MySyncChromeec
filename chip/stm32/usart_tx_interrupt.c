@@ -87,6 +87,12 @@ static size_t queue_remove(struct usart_config const *config, uint8_t *dest)
 
 static void usart_tx_interrupt_handler(struct usart_config const *config)
 {
+	intptr_t base = config->hw->base;
+
+	if (!(STM32_USART_CR1(base) & STM32_USART_CR1_TXEIE) &&
+	    queue_is_empty(config->consumer.queue))
+		return;
+
 	usart_tx_interrupt_handler_common(config, &queue_remove);
 }
 

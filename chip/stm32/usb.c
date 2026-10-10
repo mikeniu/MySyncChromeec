@@ -18,6 +18,9 @@
 #include "usb_api.h"
 #include "usb_descriptor.h"
 #include "usb_hw.h"
+#if defined(SECTION_IS_RO) && defined(USB_EP_BRIDGE)
+#include "usb_bridge.h"
+#endif
 #include "util.h"
 
 /* Console output macro */
@@ -224,6 +227,16 @@ static void ep0_rx(void)
 	desc_ptr = NULL;
 	iface_next = USB_IFACE_COUNT;
 
+#if defined(SECTION_IS_RO) && defined(USB_EP_BRIDGE)
+	if (req == (USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_ENDPOINT |
+		    (USB_REQ_CLEAR_FEATURE << 8)) &&
+	    ep0_buf_rx[1] == 0 && (ep0_buf_rx[2] & 0x7f) == USB_EP_BRIDGE) {
+		if (usb_bridge_clear_halt(ep0_buf_rx[2] & 0xff) == 0)
+			return;
+		goto unknown_req;
+	}
+#endif
+
 	/* interface specific requests */
 	if ((req & USB_RECIP_MASK) == USB_RECIP_INTERFACE) {
 		uint8_t iface = ep0_buf_rx[2] & 0xff;
@@ -389,7 +402,11 @@ static void ep0_tx(void)
 	if (desc_ptr) {
 		/* we have an on-going descriptor transfer */
 		int len = min(desc_left, EP0_MAX_PACKET_SIZE);
+#ifdef SECTION_IS_RO
+		memcpy_to_usbram_ep0_patch(desc_ptr, len);
+#else
 		memcpy_to_usbram(EP0_BUF_TX_SRAM_ADDR, desc_ptr, len);
+#endif
 		btable_ep[0].tx_count = len;
 		desc_left -= len;
 		desc_ptr += len;
