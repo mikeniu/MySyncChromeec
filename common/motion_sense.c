@@ -327,6 +327,9 @@ int sensor_init_done(struct motion_sensor_t *s)
 {
 	int ret;
 
+	if (!s->current_range)
+		s->current_range = s->default_range;
+
 	ret = s->drv->set_range(s, BASE_RANGE(s->current_range),
 				!!(s->current_range & ROUND_UP_FLAG));
 	if (ret == EC_RES_SUCCESS) {
