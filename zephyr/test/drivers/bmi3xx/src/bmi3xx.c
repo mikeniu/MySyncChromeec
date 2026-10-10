@@ -777,6 +777,147 @@ ZTEST_USER(bmi3xx, test_read_fifo)
 	zassert_ok(acc->drv->irq_handler(acc, &event));
 }
 
+/** Count read transfers by start register */
+struct read_count_data {
+	struct fifo_func_data fifo;
+	int int_status_reads;
+	int fill_lvl_reads;
+	int fifo_data_reads;
+};
+
+static int emul_count_func(const struct emul *emul, int reg, uint8_t *val,
+			   int byte, void *data)
+{
+	struct read_count_data *d = data;
+
+	if (byte == 0) {
+		if (reg == BMI3_REG_INT_STATUS_INT1)
+			d->int_status_reads++;
+		else if (reg == BMI3_REG_FIFO_FILL_LVL)
+			d->fill_lvl_reads++;
+		else if (reg == BMI3_REG_FIFO_DATA)
+			d->fifo_data_reads++;
+	}
+
+	return emul_fifo_func(emul, reg, val, byte, &d->fifo);
+}
+
+ZTEST_USER(bmi3xx, test_irq_reads_status_and_fill_level_together)
+{
+	struct i2c_common_emul_data *common_data =
+		emul_bmi_get_i2c_common_data(emul);
+	struct read_count_data count = { 0 };
+	uint32_t event = CONFIG_ACCELGYRO_BMI3XX_INT_EVENT;
+	struct bmi_emul_frame f = { 0 };
+
+	zassert_ok(acc->drv->init(acc));
+	acc->oversampling_ratio = 1;
+	zassert_ok(acc->drv->set_data_rate(acc, 50000, 0));
+
+	f.type = BMI_EMUL_FRAME_ACC;
+	f.acc_x = BMI_EMUL_1G / 10;
+	f.next = NULL;
+	bmi_emul_append_frame(emul, &f);
+
+	count.fifo.interrupts = BMI3_INT_STATUS_FWM;
+	i2c_common_emul_set_read_func(common_data, emul_count_func, &count);
+	zassert_ok(acc->drv->irq_handler(acc, &event));
+	i2c_common_emul_set_read_func(common_data, NULL, NULL);
+
+	/* One FIFO drain, then one status re-check that reads 0. */
+	zassert_equal(count.int_status_reads, 2);
+	zassert_equal(count.fifo_data_reads, 1);
+	/* The fill level comes from the status burst. */
+	zassert_equal(count.fill_lvl_reads, 0);
+}
+
+/** Report a FIFO watermark interrupt on the first n status reads */
+struct pending_status_data {
+	struct read_count_data count;
+	int pending_reads;
+	bool fail_fill_lvl_read;
+};
+
+static int emul_pending_status_func(const struct emul *emul, int reg,
+				    uint8_t *val, int byte, void *data)
+{
+	struct pending_status_data *d = data;
+
+	if (reg == BMI3_REG_INT_STATUS_INT1 && byte == 0 &&
+	    d->pending_reads > 0) {
+		d->count.fifo.interrupts = BMI3_INT_STATUS_FWM;
+		d->pending_reads--;
+	}
+
+	/*
+	 * Fail only reads that start at FIFO_FILL_LVL, not the status burst
+	 * that also covers it.
+	 */
+	if (reg == BMI3_REG_FIFO_FILL_LVL && d->fail_fill_lvl_read)
+		return -EIO;
+
+	return emul_count_func(emul, reg, val, byte, &d->count);
+}
+
+ZTEST_USER(bmi3xx, test_irq_recheck_reads_fill_level)
+{
+	struct i2c_common_emul_data *common_data =
+		emul_bmi_get_i2c_common_data(emul);
+	struct pending_status_data pending = { .pending_reads = 2 };
+	uint32_t event = CONFIG_ACCELGYRO_BMI3XX_INT_EVENT;
+	struct bmi_emul_frame f = { 0 };
+
+	zassert_ok(acc->drv->init(acc));
+	acc->oversampling_ratio = 1;
+	zassert_ok(acc->drv->set_data_rate(acc, 50000, 0));
+
+	f.type = BMI_EMUL_FRAME_ACC;
+	f.acc_x = BMI_EMUL_1G / 10;
+	f.next = NULL;
+	bmi_emul_append_frame(emul, &f);
+
+	i2c_common_emul_set_read_func(common_data, emul_pending_status_func,
+				      &pending);
+	zassert_ok(acc->drv->irq_handler(acc, &event));
+	i2c_common_emul_set_read_func(common_data, NULL, NULL);
+
+	/* Two FIFO drains, then a status re-check that reads 0. */
+	zassert_equal(pending.count.int_status_reads, 3);
+	zassert_equal(pending.count.fifo_data_reads, 2);
+	/* Only the re-check that found the FIFO still pending reads it. */
+	zassert_equal(pending.count.fill_lvl_reads, 1);
+}
+
+ZTEST_USER(bmi3xx, test_irq_recheck_fill_level_read_fail)
+{
+	struct i2c_common_emul_data *common_data =
+		emul_bmi_get_i2c_common_data(emul);
+	struct pending_status_data pending = {
+		.pending_reads = 2,
+		.fail_fill_lvl_read = true,
+	};
+	uint32_t event = CONFIG_ACCELGYRO_BMI3XX_INT_EVENT;
+	struct bmi_emul_frame f = { 0 };
+
+	zassert_ok(acc->drv->init(acc));
+	acc->oversampling_ratio = 1;
+	zassert_ok(acc->drv->set_data_rate(acc, 50000, 0));
+
+	f.type = BMI_EMUL_FRAME_ACC;
+	f.acc_x = BMI_EMUL_1G / 10;
+	f.next = NULL;
+	bmi_emul_append_frame(emul, &f);
+
+	i2c_common_emul_set_read_func(common_data, emul_pending_status_func,
+				      &pending);
+	/* Data from the first pass is still reported. */
+	zassert_ok(acc->drv->irq_handler(acc, &event));
+	i2c_common_emul_set_read_func(common_data, NULL, NULL);
+
+	zassert_equal(pending.count.int_status_reads, 2);
+	zassert_equal(pending.count.fifo_data_reads, 1);
+}
+
 ZTEST_USER(bmi3xx, test_perform_calib)
 {
 	zassert_ok(acc->drv->init(acc));

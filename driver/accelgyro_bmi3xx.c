@@ -326,7 +326,13 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 {
 	uint32_t interrupt_timestamp = last_interrupt_timestamp;
 	bool has_read_fifo = false;
-	uint16_t int_status[2];
+	/*
+	 * INT_STATUS_INT1 through FIFO_FILL_LVL, preceded by the BMI3 I2C
+	 * sync word.
+	 */
+	uint16_t regs[BMI3_REG_FIFO_FILL_LVL - BMI3_REG_INT_STATUS_INT1 + 2];
+	uint16_t int_status = 0;
+	uint16_t fill_lvl;
 	uint16_t reg_data[2];
 	struct bmi3_fifo_frame fifo_frame;
 	int rv;
@@ -349,30 +355,43 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	 * pending.
 	 */
 	for (i = 0; i < 200; i++) {
-		rv = bmi3_read_n(s, BMI3_REG_INT_STATUS_INT1,
-				 (uint8_t *)int_status, 4);
+		/*
+		 * The first pass follows an interrupt, so a FIFO interrupt is
+		 * almost always pending: read the fill level in the same
+		 * transfer as the status. Later passes usually find the status
+		 * clear and end the loop, so keep that read short.
+		 */
+		rv = bmi3_read_n(s, BMI3_REG_INT_STATUS_INT1, (uint8_t *)regs,
+				 i == 0 ? sizeof(regs) : 2 * sizeof(regs[0]));
 		if (rv)
 			break;
 
+		int_status = regs[1];
+
 		if (IS_ENABLED(CONFIG_BMI_ORIENTATION_SENSOR) &&
-		    (BMI3_INT_STATUS_ORIENTATION & int_status[1]))
+		    (BMI3_INT_STATUS_ORIENTATION & int_status))
 			irq_set_orientation(s);
 
-		if ((int_status[1] &
+		if ((int_status &
 		     (BMI3_INT_STATUS_FWM | BMI3_INT_STATUS_FFULL)) == 0)
 			break;
 
-		/* Get the FIFO fill level in words */
-		rv = bmi3_read_n(s, BMI3_REG_FIFO_FILL_LVL, (uint8_t *)reg_data,
-				 4);
-		if (rv)
-			break;
+		if (i == 0) {
+			fill_lvl = regs[ARRAY_SIZE(regs) - 1];
+		} else {
+			rv = bmi3_read_n(s, BMI3_REG_FIFO_FILL_LVL,
+					 (uint8_t *)reg_data, 4);
+			if (rv)
+				break;
+			fill_lvl = reg_data[1];
+		}
 
-		reg_data[1] =
-			BMI3_GET_BIT_POS0(reg_data[1], BMI3_FIFO_FILL_LVL);
-
-		/* Add space for the initial 16bit read. */
-		fifo_frame.available_fifo_len = reg_data[1] + 1;
+		/*
+		 * FIFO fill level in words, plus space for the initial 16bit
+		 * read.
+		 */
+		fifo_frame.available_fifo_len =
+			BMI3_GET_BIT_POS0(fill_lvl, BMI3_FIFO_FILL_LVL) + 1;
 
 		/*
 		 * If fill level is greater than buffer size then wrap it to
@@ -397,7 +416,7 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	}
 
 	if (i == 200) {
-		CPRINTF("irq 0x%04x stuck (%d loops)\n", int_status[1], i);
+		CPRINTF("irq 0x%04x stuck (%d loops)\n", int_status, i);
 
 		/* Clear the FIFO using Flush command */
 		reg_data[0] = BMI3_ENABLE;

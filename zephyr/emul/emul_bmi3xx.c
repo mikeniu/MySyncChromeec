@@ -388,7 +388,11 @@ static int bmi3xx_emul_handle_read(uint8_t *regs, const struct emul *emul,
 		}
 		break;
 	case BMI3_REG_FIFO_FILL_LVL:
-		if (byte == 0) {
+		/*
+		 * Refresh on the low byte so that burst reads starting at a
+		 * lower register also see the current fill level.
+		 */
+		if (shift_reg == REG16TO8(BMI3_REG_FIFO_FILL_LVL)) {
 			fifo_len = bmi_emul_fifo_len(emul, tag_time, false);
 			/*
 			 * The len is 2-bytes-len, and add an extra redundant
