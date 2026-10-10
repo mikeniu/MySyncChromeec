@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "041ad951_d7aef241",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-10T06:15:49Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Commit Message Narration**\n\nThe commit message uses a numbered list to transcribe the diff statement-by-statement (e.g., detailing the `hasattr` check and the exact function calls).\n\nPlease replace the multi-bullet diff narration with 1–2 concise prose paragraphs that explain the *Why* and a high-level *What*.\n\n**Suggested Replacement:**\n```text\nutil: renode: Support sharded test execution\n\nCurrently, the Renode firmware builder runs all tests on a single worker,\nwhich is unscalable.\n\nEnable test sharding across workers by filtering `ZEPHYR_BOARDS` through\nthe existing `shard_projects` utility. The sharding utility is updated\nto support plain string sequences in addition to configured project objects.\n\nBUG\u003db:525500133\nTEST\u003dcros format --check zephyr/scripts/firmware_builder_lib.py util/renode/firmware_builder.py\nTEST\u003dcros lint zephyr/scripts/firmware_builder_lib.py util/renode/firmware_builder.py\nTEST\u003dVerified sharding with mock project objects and string board names\n```\n[🔗](http://go/tj/08c00674-f749-4154-b235-e2fa609e485f)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3d0c5e60c0d5d6cc858b8dfb861b9b5b7c53177",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40804cda_ce5495ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-10T06:15:49Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n**Functionality:** ✅ Looks good. The use of `list()` correctly prevents mutating the global `ZEPHYR_BOARDS` constant.\n**Architecture \u0026 Component Fit:** ✅ Reuses the existing `shard_projects` utility effectively.\n**Code Simplicity:** ✅ The lambda correctly handles duck-typing with `hasattr(x, \"config\")` as a fallback.\n**Idiomaticity \u0026 Readability:** ✅\n**Security:** ✅\n**Testing:** ❌ **Missing Unit Tests.** Added branch logic (`hasattr(...)`) requires automated test coverage. See inline comment.\n**CL Size \u0026 Scope:** ✅ Size: S (+9, -2). A focused, single logical change.\n**Commit Message:** ❌ **Diff Narration.** The commit message transcribes the diff statement-by-statement. See inline comment for a prose replacement.\n\n[🔗](http://go/tj/08c00674-f749-4154-b235-e2fa609e485f)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3d0c5e60c0d5d6cc858b8dfb861b9b5b7c53177",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26fc0c56_38113d6c",
+        "filename": "zephyr/scripts/firmware_builder_lib.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-10T06:15:49Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Missing Automated Test**\n\nThis change introduces new branch logic (`if hasattr(...) else ...`) for sorting projects, but the commit message indicates only manual testing was performed (`TEST\u003dVerified sharding with mock project objects and string board names`).\n\nAutomated test coverage is mandatory for all modified logic and branch paths. Please add unit tests for `shard_projects` covering both object and string inputs.\n\nIf a test file for `firmware_builder_lib.py` doesn\u0027t exist, please create one (e.g., `firmware_builder_lib_test.py` or similar).\n\n**Example test cases:**\n```python\nimport unittest\nimport argparse\nimport firmware_builder_lib\n\nclass MockProject:\n    class Config:\n        def __init__(self, name):\n            self.project_name \u003d name\n    def __init__(self, name):\n        self.config \u003d self.Config(name)\n\nclass TestShardProjects(unittest.TestCase):\n    def test_sorts_project_objects(self):\n        projects \u003d [MockProject(\"z\"), MockProject(\"a\")]\n        result \u003d firmware_builder_lib.shard_projects(projects)\n        self.assertEqual(result[0].config.project_name, \"a\")\n        self.assertEqual(result[1].config.project_name, \"z\")\n\n    def test_sorts_strings(self):\n        boards \u003d [\"z\", \"a\"]\n        result \u003d firmware_builder_lib.shard_projects(boards)\n        self.assertEqual(result, [\"a\", \"z\"])\n```\n[🔗](http://go/tj/08c00674-f749-4154-b235-e2fa609e485f)",
+      "range": {
+        "startLine": 322,
+        "startChar": 0,
+        "endLine": 325,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "b3d0c5e60c0d5d6cc858b8dfb861b9b5b7c53177",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
