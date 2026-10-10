@@ -269,6 +269,10 @@ static int set_range(struct motion_sensor_t *s, int range, int rnd)
 	uint8_t reg_val;
 	int newrange = range;
 
+	/* Clamp first: the FS macros use __builtin_clz(), undefined for 0. */
+	if (newrange < LIS2DW12_ACCEL_FS_MIN_VAL)
+		newrange = LIS2DW12_ACCEL_FS_MIN_VAL;
+
 	/* Adjust and check rounded value. */
 	if (rnd && (newrange < LIS2DW12_NORMALIZE_FS(newrange)))
 		newrange <<= 1;
