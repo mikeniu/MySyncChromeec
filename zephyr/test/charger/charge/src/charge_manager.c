@@ -79,3 +79,37 @@ ZTEST_USER(charge_manager, test_has_no_active_charge_port)
 	pdc_power_mgmt_wait_for_sync(0, -1);
 	zassert_false(charge_manager_has_active_charge_port());
 }
+
+ZTEST_USER(charge_manager, test_available_current)
+{
+	struct charge_port_info charge = {
+		.current = 500,
+		.voltage = 5000,
+	};
+
+	charge_manager_update_charge(CHARGE_SUPPLIER_TYPEC, 0, &charge);
+	zassert_equal(
+		charge_manager_get_available_current(CHARGE_SUPPLIER_TYPEC, 0),
+		500);
+
+	charge.current = 0;
+	charge.voltage = 0;
+	charge_manager_update_charge(CHARGE_SUPPLIER_TYPEC, 0, &charge);
+	zassert_equal(
+		charge_manager_get_available_current(CHARGE_SUPPLIER_TYPEC, 0),
+		0);
+
+	/* An invalid supplier or port has no current. */
+	zassert_equal(charge_manager_get_available_current(CHARGE_SUPPLIER_NONE,
+							   0),
+		      0);
+	zassert_equal(
+		charge_manager_get_available_current(CHARGE_SUPPLIER_COUNT, 0),
+		0);
+	zassert_equal(
+		charge_manager_get_available_current(CHARGE_SUPPLIER_TYPEC, -1),
+		0);
+	zassert_equal(charge_manager_get_available_current(
+			      CHARGE_SUPPLIER_TYPEC, CHARGE_PORT_COUNT),
+		      0);
+}
