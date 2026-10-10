@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51dc2efd_a2c7c3c0",
+        "filename": "zephyr/ish.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-10T00:28:30Z",
+      "side": 1,
+      "message": "Since PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER depends on !LOG_MODE_MINIMAL, setting this in ish.conf may cause a Kconfig warning/error on ISH targets that use CONFIG_LOG_MODE_MINIMAL\u003dy (e.g. brox-ish, rex-ish). Consider setting \u0027default y if SOC_FAMILY_INTEL_ISH\u0027 in zephyr/Kconfig.console (or in zephyr/app/Kconfig.ish) instead.",
+      "isAi": true,
+      "revId": "7f601ee9104c50a5453520a57cfc1fe74d25d43f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

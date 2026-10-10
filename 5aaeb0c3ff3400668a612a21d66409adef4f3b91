@@ -35,6 +35,25 @@
       "parentUuid": "be78c48b_ef22c72a",
       "revId": "5aaeb0c3ff3400668a612a21d66409adef4f3b91",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b058f27_42cb7726",
+        "filename": "zephyr/ish.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-10T00:28:30Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "be78c48b_ef22c72a",
+      "isAi": true,
+      "revId": "5aaeb0c3ff3400668a612a21d66409adef4f3b91",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
