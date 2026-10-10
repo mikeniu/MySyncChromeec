@@ -292,6 +292,20 @@ int charge_manager_get_charger_voltage(void);
 enum charge_supplier charge_manager_get_supplier(void);
 
 /**
+ * Get the current a supplier has reported as available on a port.
+ *
+ * Unlike charge_manager_get_supplier(), this is valid before the charge
+ * manager has selected a charge port.
+ *
+ * @param supplier	Charge supplier.
+ * @param port		Charge port.
+ * @return		Available current (mA), CHARGE_CURRENT_UNINITIALIZED if
+ *			the supplier hasn't reported yet, or 0 if supplier or
+ *			port is invalid.
+ */
+int charge_manager_get_available_current(int supplier, int port);
+
+/**
  * Set the initial charge port and supplier during initialization.
  *
  * This is used by the PDC support to indicate which port is currently
