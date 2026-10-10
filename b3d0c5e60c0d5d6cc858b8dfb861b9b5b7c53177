@@ -26,6 +26,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cacacfa7_b7ab026c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-10T06:21:31Z",
+      "side": 1,
+      "message": "Done. Replaced diff narration with concise prose in Patchset 2.",
+      "parentUuid": "041ad951_d7aef241",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 9999
+      },
+      "revId": "b3d0c5e60c0d5d6cc858b8dfb861b9b5b7c53177",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40804cda_ce5495ae",
@@ -41,6 +65,24 @@
       "message": "[Gerrit AI Review] ❌ **Changes Requested**\n\n### Review Summary\n**Functionality:** ✅ Looks good. The use of `list()` correctly prevents mutating the global `ZEPHYR_BOARDS` constant.\n**Architecture \u0026 Component Fit:** ✅ Reuses the existing `shard_projects` utility effectively.\n**Code Simplicity:** ✅ The lambda correctly handles duck-typing with `hasattr(x, \"config\")` as a fallback.\n**Idiomaticity \u0026 Readability:** ✅\n**Security:** ✅\n**Testing:** ❌ **Missing Unit Tests.** Added branch logic (`hasattr(...)`) requires automated test coverage. See inline comment.\n**CL Size \u0026 Scope:** ✅ Size: S (+9, -2). A focused, single logical change.\n**Commit Message:** ❌ **Diff Narration.** The commit message transcribes the diff statement-by-statement. See inline comment for a prose replacement.\n\n[🔗](http://go/tj/08c00674-f749-4154-b235-e2fa609e485f)",
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "b3d0c5e60c0d5d6cc858b8dfb861b9b5b7c53177",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71266ba6_d78f9350",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-10T06:21:31Z",
+      "side": 1,
+      "message": "Done. Addressed in Patchset 2 with automated unit tests in `zephyr/scripts/firmware_builder_lib_test.py` and prose commit description.",
+      "parentUuid": "40804cda_ce5495ae",
       "revId": "b3d0c5e60c0d5d6cc858b8dfb861b9b5b7c53177",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -66,6 +108,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "b3d0c5e60c0d5d6cc858b8dfb861b9b5b7c53177",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "544c5c8a_9b100b29",
+        "filename": "zephyr/scripts/firmware_builder_lib.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-10T06:21:31Z",
+      "side": 1,
+      "message": "Done. Added automated unit tests in `zephyr/scripts/firmware_builder_lib_test.py` testing both object and string inputs, unsharded mode, and boundary handling.",
+      "parentUuid": "26fc0c56_38113d6c",
+      "range": {
+        "startLine": 322,
+        "startChar": 0,
+        "endLine": 325,
+        "endChar": 9999
+      },
       "revId": "b3d0c5e60c0d5d6cc858b8dfb861b9b5b7c53177",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
