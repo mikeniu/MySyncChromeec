@@ -634,6 +634,28 @@ static void test_ps8xxx_get_chip_info(uint16_t current_product_id)
 	zassert_equal(device_id, info.device_id);
 	zassert_equal(fw_rev, info.fw_version_number);
 
+	/*
+	 * Reset cached product_id[USBC_PORT_C1] to 0 via init() with board
+	 * product_id set to 0, then verify get_chip_info() fails when
+	 * board_get_ps8xxx_product_id() returns 0 and succeeds via lazy
+	 * product_id initialization once the board product_id is restored.
+	 */
+	board_set_ps8xxx_product_id(0);
+	zassert_equal(EC_ERROR_TIMEOUT, ps8xxx_tcpm_drv.init(USBC_PORT_C1),
+		      NULL);
+	zassert_equal(EC_ERROR_UNKNOWN,
+		      ps8xxx_tcpm_drv.get_chip_info(USBC_PORT_C1, 1, &info),
+		      NULL);
+
+	board_set_ps8xxx_product_id(current_product_id);
+	fw_rev = 0x32;
+	tcpci_emul_set_reg(ps8xxx_emul, PS8XXX_REG_FW_REV, fw_rev);
+	zassert_equal(EC_SUCCESS,
+		      ps8xxx_tcpm_drv.get_chip_info(USBC_PORT_C1, 0, &info),
+		      NULL);
+	zassert_equal(current_product_id, info.product_id);
+	zassert_equal(fw_rev, info.fw_version_number);
+
 	zassert_equal(false, check_ps8755_chip(USBC_PORT_C1));
 }
 
