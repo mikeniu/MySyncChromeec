@@ -21,21 +21,21 @@
 
 LOG_MODULE_REGISTER(hekla_board, LOG_LEVEL_INF);
 
-// static void kb_layout_init(void)
-// {
-// 	if (cros_cbi_ufsc_check_match(
-// 		    CBI_UFSC_VALUE_ID(DT_NODELABEL(ufsc_kb_canada)))) {
-// 		/*
-// 		 * Canadian French keyboard (US layout),
-// 		 *   \| (key 45):     0x0061->0x61->0x56
-// 		 *   r-ctrl (key 64): 0xe014->0x14->0x1d
-// 		 * move key45 (row:2,col:7) to key64 (row:3,col:14)
-// 		 */
-// 		set_scancode_set2(3, 14, get_scancode_set2(2, 7));
-// 		LOG_INF("CBI USFC: FW_KB_LAYOUT_US2");
-// 	}
-// }
-// DECLARE_HOOK(HOOK_INIT, kb_layout_init, HOOK_PRIO_POST_FIRST);
+static void kb_layout_init(void)
+{
+	if (cros_cbi_ufsc_check_match(
+		    CBI_UFSC_VALUE_ID(DT_NODELABEL(ufsc_kb_ca_fr)))) {
+		/*
+		 * Canadian French keyboard (US layout),
+		 *   \| (key 45):     0x0061->0x61->0x56
+		 *   r-ctrl (key 64): 0xe014->0x14->0x1d
+		 * move key45 (row:2,col:7) to key64 (row:3,col:14)
+		 */
+		set_scancode_set2(3, 14, get_scancode_set2(2, 7));
+		LOG_INF("CBI USFC: FW_KB_LAYOUT_US2");
+	}
+}
+DECLARE_HOOK(HOOK_INIT, kb_layout_init, HOOK_PRIO_POST_FIRST);
 
 static void bl_enable(void)
 {
