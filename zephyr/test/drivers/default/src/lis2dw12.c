@@ -247,6 +247,12 @@ ZTEST(lis2dw12, test_lis2dw12_set_range)
 	 * clamped.
 	 */
 
+	rv = ms->drv->set_range(ms, LIS2DW12_ACCEL_FS_MIN_VAL - 1, 0);
+	zassert_equal(rv, EC_SUCCESS, "Expected %d but got %d", EC_SUCCESS, rv);
+	zassert_equal(ms->current_range, LIS2DW12_ACCEL_FS_MIN_VAL,
+		      "Expected %d but got %d", LIS2DW12_ACCEL_FS_MIN_VAL,
+		      ms->current_range);
+
 	rv = ms->drv->set_range(ms, LIS2DW12_ACCEL_FS_MAX_VAL + 1, 0);
 	zassert_equal(rv, EC_SUCCESS, "Expected %d but got %d", EC_SUCCESS, rv);
 	zassert_equal(ms->current_range, LIS2DW12_ACCEL_FS_MAX_VAL,
