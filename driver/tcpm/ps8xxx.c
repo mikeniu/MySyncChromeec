@@ -677,35 +677,25 @@ static int
 ps8xxx_fill_chip_info(int port, bool live,
 		      struct ec_response_pd_chip_info_v1 *const cache)
 {
-	/* Populate chip firmware version. */
-	int fw_ver_reg = get_reg_by_product(port, REG_FW_VER);
+	int fw_ver_reg;
 	int fw_version;
-	int rv = tcpc_read(port, fw_ver_reg, &fw_version);
+	int rv;
 
-	if (rv != EC_SUCCESS)
-		return rv;
-	cache->fw_version_number = fw_version;
-
-#if defined(CONFIG_USB_PD_TCPM_PS8751) && \
-	defined(CONFIG_USB_PD_VBUS_DETECT_TCPC)
-	/*
-	 * Min firmware version of PS8751 to ensure that it can detect Vbus
-	 * properly. See b/109769787#comment7
-	 */
-	cache->min_req_fw_version_number = 0x39;
-#endif
+	if (!product_id[port]) {
+		/*
+		 * ps8xxx_tcpm_init() may not have run yet (e.g. an early host
+		 * command).
+		 */
+		product_id[port] = board_get_ps8xxx_product_id(port);
+		if (product_id[port] == 0)
+			return EC_ERROR_UNKNOWN;
+	}
 
 	/*
 	 * Unless live data is requested, override whatever vendor and product
 	 * IDs are reported with the ones that board configuration assumes.
 	 */
 	if (!live) {
-		uint16_t pid;
-
-		pid = board_get_ps8xxx_product_id(port);
-		if (pid == 0)
-			return EC_ERROR_UNKNOWN;
-		product_id[port] = pid;
 		cache->vendor_id = PS8XXX_VENDOR_ID;
 		cache->product_id = product_id[port];
 	}
@@ -751,6 +741,25 @@ ps8xxx_fill_chip_info(int port, bool live,
 			return rv;
 		cache->device_id = val;
 	}
+#endif
+
+	/*
+	 * Populate chip firmware version. This must follow the
+	 * product_id[port] init above, since get_reg_by_product() uses it.
+	 */
+	fw_ver_reg = get_reg_by_product(port, REG_FW_VER);
+	rv = tcpc_read(port, fw_ver_reg, &fw_version);
+	if (rv != EC_SUCCESS)
+		return rv;
+	cache->fw_version_number = fw_version;
+
+#if defined(CONFIG_USB_PD_TCPM_PS8751) && \
+	defined(CONFIG_USB_PD_VBUS_DETECT_TCPC)
+	/*
+	 * Min firmware version of PS8751 to ensure that it can detect Vbus
+	 * properly. See b/109769787#comment7
+	 */
+	cache->min_req_fw_version_number = 0x39;
 #endif
 
 	/* Treat unexpected values as error (FW not initiated from reset) */
