@@ -9,7 +9,6 @@
 
 #include <cros/cbi_flash.dtsi>
 #include <cros/thermistor/thermistor.dtsi>
-#include <dt-bindings/motionsense/utils.h>
 
 #include "../arbitrage.dtsi"
 #include "../common.dtsi"
@@ -25,233 +24,7 @@
 
 / {
 	aliases {
-		bmi3xx-int = &lid_accel;
-		lsm6dsm-int = &lid_accel;
-		tcs3400-int = &als_clear;
 		gpio-btn-ign-in = &gpio_usb_fp_btn_ign;
-	};
-
-	/* Rotation matrix used by drivers. */
-	motionsense-rotation-ref {
-		compatible = "cros-ec,motionsense-rotation-ref";
-		lid_rot_ref: lid-rotation-ref-bmi {
-			mat33 = <(-1) 0 0
-				 0 (-1) 0
-				 0 0 1>;
-		};
-		lid_rot_ref_lsm6dsm: lid-rotation-ref-lsm6dsm {
-			mat33 = <0 1 0
-				 (-1) 0 0
-				 0 0 1>;
-		};
-	};
-
-	motionsense-sensor-data {
-		bmi323_data: bmi323-drv-data {
-			compatible = "cros-ec,drvdata-bmi3xx";
-			status = "okay";
-		};
-		lsm6dsm_data_accel: lsm6dsm-accel-drv-data {
-			compatible = "cros-ec,drvdata-lsm6dsm";
-			status = "okay";
-		};
-		lsm6dsm_data_gyro: lsm6dsm-gyro-drv-data {
-			compatible = "cros-ec,drvdata-lsm6dsm";
-			status = "okay";
-		};
-
-		tcs_clear_data: tcs3400-clear-drv-data {
-			compatible = "cros-ec,drvdata-tcs3400-clear";
-			status = "okay";
-
-			als-drv-data {
-				compatible = "cros-ec,accelgyro-als-drv-data";
-				als-cal {
-					scale = <1>;
-					uscale = <0>;
-					offset = <0>;
-					als-channel-scale {
-					compatible =
-					"cros-ec,accelgyro-als-channel-scale";
-						k-channel-scale = <1>;
-						cover-scale = "1.0f";
-					};
-				};
-			};
-		};
-
-		tcs_rgb_data: tcs3400-rgb-drv-data {
-			compatible = "cros-ec,drvdata-tcs3400-rgb";
-			status = "okay";
-
-			/* node for rgb_calibration_t defined in accelgyro.h */
-			rgb_calibration {
-				compatible =
-					"cros-ec,accelgyro-rgb-calibration";
-
-				irt = <1>;
-
-				rgb-cal-x {
-					offset = <0>;
-					coeff = "0.464318099", "-0.374639473", "0.059786474", "-0.749608515";
-					als-channel-scale {
-					compatible =
-					"cros-ec,accelgyro-als-channel-scale";
-						k-channel-scale = <1>;
-						cover-scale = "1.0f";
-					};
-				};
-				rgb-cal-y {
-					offset = <0>;
-					coeff = "0.462807275", "-0.400565821", "-0.100519369", "-0.510790024";
-					als-channel-scale {
-					compatible =
-					"cros-ec,accelgyro-als-channel-scale";
-						k-channel-scale = <1>;
-						cover-scale = "1.0f";
-					};
-				};
-				rgb-cal-z {
-					offset = <0>;
-					coeff = "-0.062110042", "-0.02692167", "0.359548949", "0.383362422";
-					als-channel-scale {
-					compatible =
-					"cros-ec,accelgyro-als-channel-scale";
-						k-channel-scale = <1>;
-						cover-scale = "1.0f";
-					};
-				};
-			};
-		};
-	};
-	/*
-	 * Declare mutexes used by sensor drivers.
-	 * A mutex node is used to create an instance of mutex_t.
-	 * A mutex node is referenced by a sensor node if the
-	 * corresponding sensor driver needs to use the
-	 * instance of the mutex.
-	 */
-	motionsense-mutex {
-		compatible = "cros-ec,motionsense-mutex";
-		lid_mutex: lid-mutex {
-		};
-	};
-
-	motionsense-sensor {
-		lid_accel: lid-accel {
-			compatible = "cros-ec,bmi3xx-accel";
-			status = "okay";
-
-			active-mask = "SENSOR_ACTIVE_S0";
-			location = "MOTIONSENSE_LOC_LID";
-			mutex = <&lid_mutex>;
-			port = <&i2c_ec_i2c_sensor_scl_1v8>;
-			rot-standard-ref = <&lid_rot_ref>;
-			drv-data = <&bmi323_data>;
-			configs {
-				compatible =
-					"cros-ec,motionsense-sensor-config";
-				ec-s0 {
-					odr = <(10000 | ROUND_UP_FLAG)>;
-				};
-			};
-		};
-
-		lid_gyro: lid-gyro {
-			compatible = "cros-ec,bmi3xx-gyro";
-			status = "okay";
-
-			active-mask = "SENSOR_ACTIVE_S0";
-			location = "MOTIONSENSE_LOC_LID";
-			mutex = <&lid_mutex>;
-			port = <&i2c_ec_i2c_sensor_scl_1v8>;
-			rot-standard-ref = <&lid_rot_ref>;
-			drv-data = <&bmi323_data>;
-		};
-
-		als_clear: lid-als-clear {
-			compatible = "cros-ec,tcs3400-clear";
-			status = "okay";
-
-			active-mask = "SENSOR_ACTIVE_S0";
-			location = "MOTIONSENSE_LOC_LID";
-			port = <&i2c_ec_i2c_sensor_scl_1v8>;
-			default-range = <0x10000>;
-			drv-data = <&tcs_clear_data>;
-			i2c-spi-addr-flags = "TCS3400_I2C_ADDR_FLAGS";
-			configs {
-				compatible =
-					"cros-ec,motionsense-sensor-config";
-				ec-s0 {
-					/* Run ALS sensor in S0 */
-					odr = <1000>;
-				};
-			};
-		};
-
-		lid-als-rgb {
-			compatible = "cros-ec,tcs3400-rgb";
-			status = "okay";
-
-			active-mask = "SENSOR_ACTIVE_S0";
-			location = "MOTIONSENSE_LOC_LID";
-			port = <&i2c_ec_i2c_sensor_scl_1v8>;
-			default-range = <0x10000>; /* scale = 1x, uscale = 0 */
-			drv-data = <&tcs_rgb_data>;
-		};
-	};
-
-	motionsense-sensor-alt {
-		alt_lid_accel: alt-lid-accel {
-			compatible = "cros-ec,lsm6dsm-accel";
-			status = "okay";
-
-			active-mask = "SENSOR_ACTIVE_S0";
-			location = "MOTIONSENSE_LOC_LID";
-			mutex = <&lid_mutex>;
-			port = <&i2c_ec_i2c_sensor_scl_1v8>;
-			rot-standard-ref = <&lid_rot_ref_lsm6dsm>;
-			drv-data = <&lsm6dsm_data_accel>;
-			alternate-for = <&lid_accel>;
-			alternate-ufsc-indicator = <&ufsc_lid_sensor_lsm6dsm>;
-			configs {
-				compatible =
-					"cros-ec,motionsense-sensor-config";
-				ec-s0 {
-					odr = <(12500 | ROUND_UP_FLAG)>;
-					ec-rate = <(100 * USEC_PER_MSEC)>;
-				};
-			};
-		};
-
-		alt_lid_gyro: alt-lid-gyro {
-			compatible = "cros-ec,lsm6dsm-gyro";
-			status = "okay";
-
-			active-mask = "SENSOR_ACTIVE_S0";
-			location = "MOTIONSENSE_LOC_LID";
-			mutex = <&lid_mutex>;
-			port = <&i2c_ec_i2c_sensor_scl_1v8>;
-			rot-standard-ref = <&lid_rot_ref_lsm6dsm>;
-			default-range = <(1000 | ROUND_UP_FLAG)>; /* dps */
-			drv-data = <&lsm6dsm_data_gyro>;
-			alternate-for = <&lid_gyro>;
-			alternate-ufsc-indicator = <&ufsc_lid_sensor_lsm6dsm>;
-		};
-	};
-
-	motionsense-sensor-info {
-		compatible = "cros-ec,motionsense-sensor-info";
-
-		/* list of entries for motion_als_sensors */
-		als-sensors = <&als_clear>;
-		/*
-		 * list of GPIO interrupts that have to
-		 * be enabled at initial stage
-		 */
-		sensor-irqs = <&int_imu &int_als_rgb>;
-		/* list of sensors in force mode */
-		accel-force-mode-sensors = <&als_clear>;
 	};
 
 	batteries {
@@ -366,13 +139,13 @@
 	};
 
 	gpio-interrupts {
+		/delete-node/ ec-imu;
+		/delete-node/ ec_als_rgb;
+
 		int_ap_bl_en: int_ap_bl_en{
 			irq-pin = <&gpio_ap_bl_en_odl>;
 			flags = <GPIO_INT_EDGE_BOTH>;
 			handler = "ap_bl_en_interrupt";
-		};
-		int_imu: ec-imu {
-			handler = "motion_interrupt";
 		};
 		int_wpc: wpc{
 			irq-pin = <&gpio_pen_int_odl>;
