@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af3dc8ed_4a36fd28",
+        "filename": "common/usb_common.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 801,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-12T20:43:24Z",
+      "side": 1,
+      "message": "Incidentally, from what I can see, this function was never actually called outside of tests. It\u0027s supposed to support cases when we need to send out an Alert on every connected port, e.g. a power state change. However, in the power hooks, we don\u0027t use it, because we need to do some other kind of filtering on the ports, e.g. data role. If you wanted to remove it, I\u0027d be OK with that.",
+      "revId": "d77f18241658e8f03aea7d69b55156c05cec0ffa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "377edcfd_910d91a0",
+        "filename": "common/usb_common.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-12T20:43:24Z",
+      "side": 1,
+      "message": "This is supposed to be for \"invalid argument.\" Maybe `EC_ERROR_UNAVAILABLE` would make more sense? Not that any of the callers will care.",
+      "revId": "d77f18241658e8f03aea7d69b55156c05cec0ffa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}

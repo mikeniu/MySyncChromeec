@@ -52,6 +52,24 @@
       "parentUuid": "ee924333_20ba1c0c",
       "revId": "c95b7c46c0cf9d5b28c304af2d4516aef30e4f23",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "508872f2_13f286b0",
+        "filename": "common/usb_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 845,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-12T20:43:24Z",
+      "side": 1,
+      "message": "\u003e In this scenario, `pd_get_partner_rmdo` and `pd_dpm_request` would still run when the port is disconnected. Or am I missing something in your suggestion?\n\nYou\u0027re correct. Technically, this would be OK. `pd_get_partner_rmdo` would return 0-valued RMDO. `pd_dpm_request` would set a flag that would never be checked and then would be cleared upon a subsequent connection. IMO, neither of those calls would break the semantics of those functions, but see how it looks weird.\n\n\u003e If `pd_send_alert_msg` were changed to return `EC_SUCCESS` at the top when the port is not connected, the check in `pd_broadcast_alert_msg` could be removed, but returning success when the port is not connected seems wrong.\n\nAs noted above, if `pd_broadcast_alert_msg` makes the return semantics weird, we could just get rid of it.\n\nAlso, the only callers of `pd_send_alert_msg` either compare the return value to success (`pd_broadcast_alert_msg`) or ignore it (everywhere else). Semantically, this kind of makes sense. Alert has no protocol defined response, and the contents are just informative.\n\nI think you could return essentially whatever seems right, and it wouldn\u0027t make a difference in how the TCPM runs. A more extreme option would be to make it return `void`.\n\nI lean toward\n* Get rid of `pd_broadcast_alert_msg`.\n* `pd_send_alert_msg` returns unavailable if not connected, just for clarity.\n* `pd_send_alert_msg` returns any error that `pe_set_ado` returns.\n* I think everything else could stay as-is.\n\nHow does that sound?",
+      "parentUuid": "ee924333_20ba1c0c",
+      "revId": "c95b7c46c0cf9d5b28c304af2d4516aef30e4f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
