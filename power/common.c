@@ -76,6 +76,21 @@ static const uint64_t uninitialized_time = -1;
 static uint64_t first_S0_time = uninitialized_time; /* When did we enter S0? */
 static uint64_t first_S5_time = uninitialized_time; /* When did we enter S5? */
 
+/* Wakes the power sequencing thread; repeated wakes are merged. */
+static K_SEM_DEFINE(power_wake_sem, 0, 1);
+
+void power_thread_wake(void)
+{
+	k_sem_give(&power_wake_sem);
+}
+
+bool power_thread_wait(int timeout_us)
+{
+	k_timeout_t timeout = timeout_us == -1 ? K_FOREVER : K_USEC(timeout_us);
+
+	return k_sem_take(&power_wake_sem, timeout) != 0;
+}
+
 #ifdef CONFIG_HIBERNATE
 /* Delay before hibernating, in seconds */
 static uint32_t hibernate_delay = CONFIG_HIBERNATE_DELAY_SEC;
@@ -224,7 +239,7 @@ int power_wait_mask_signals_timeout(uint32_t want, uint32_t mask, int timeout)
 		return EC_SUCCESS;
 
 	while ((in_signals & mask) != in_want) {
-		if (task_wait_event(timeout) == TASK_EVENT_TIMER) {
+		if (power_thread_wait(timeout)) {
 			power_update_signals();
 			return EC_ERROR_TIMEOUT;
 		}
@@ -474,7 +489,7 @@ static enum power_state power_common_state(void)
 		{
 			uint64_t target, now, wait;
 			if (extpower_is_present()) {
-				task_wait_event(-1);
+				power_thread_wait(-1);
 				break;
 			}
 
@@ -501,10 +516,10 @@ static enum power_state power_common_state(void)
 			}
 
 			wait = min(target - now, TASK_MAX_WAIT_US);
-			task_wait_event(wait);
+			power_thread_wait(wait);
 		}
 #else /* !CONFIG_HIBERNATE */
-		task_wait_event(-1);
+		power_thread_wait(-1);
 #endif
 		break;
 
@@ -525,13 +540,12 @@ static enum power_state power_common_state(void)
 
 		/* Wait for inactivity timeout, if desired */
 		if (!s5_inactivity_timer_enabled) {
-			task_wait_event(-1);
+			power_thread_wait(-1);
 		} else if (s5_inactivity_timeout == 0) {
 			return POWER_S5G3;
 		} else if (s5_inactivity_timeout < 0) {
-			task_wait_event(-1);
-		} else if (task_wait_event(s5_inactivity_timeout * SECOND) ==
-			   TASK_EVENT_TIMER) {
+			power_thread_wait(-1);
+		} else if (power_thread_wait(s5_inactivity_timeout * SECOND)) {
 			/* Prepare to drop to G3; wake not requested yet */
 			return POWER_S5G3;
 		}
@@ -548,7 +562,7 @@ static enum power_state power_common_state(void)
 #endif
 		/* Wait for a message */
 		power_wait_signals(0);
-		task_wait_event(-1);
+		power_thread_wait(-1);
 		break;
 
 	default:
@@ -681,7 +695,7 @@ void chipset_exit_hard_off(void)
 	 * pressed. For other states here, to wake the chipset task to trigger
 	 * the event for leaving G3 is necessary.
 	 */
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 
 #ifdef CONFIG_ZTEST
@@ -689,7 +703,7 @@ void test_power_common_state(void)
 {
 	enum power_state new_state;
 
-	task_wake(task_get_current());
+	power_thread_wake();
 	new_state = power_common_state();
 	if (new_state != state)
 		power_set_state(new_state);
@@ -806,7 +820,7 @@ DECLARE_HOOK(HOOK_INIT, power_common_init, HOOK_PRIO_INIT_CHIPSET);
 static void power_lid_change(void)
 {
 	/* Wake up the task to update power state */
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, power_lid_change, HOOK_PRIO_DEFAULT);
 
@@ -820,7 +834,7 @@ static void power_ac_change(void)
 
 		if (state == POWER_G3) {
 			last_shutdown_time = get_time().val;
-			task_wake(TASK_ID_CHIPSET);
+			power_thread_wake();
 		}
 	}
 }
@@ -946,7 +960,7 @@ void power_signal_interrupt(enum gpio_signal signal)
 	power_update_signals();
 
 	/* Wake up the task */
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 
 #ifdef CONFIG_POWER_SHUTDOWN_PAUSE_IN_S5

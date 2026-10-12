@@ -99,7 +99,7 @@ static void do_chipset_ap_rst_interrupt_in_s3(int times)
 	power_signal_enable_interrupt(GPIO_AP_SUSPEND);
 	zassert_ok(gpio_emul_input_set(gpio_dev, AP_SUSPEND_PIN, 1));
 	power_set_state(POWER_S3);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_MSEC(10));
 	zassert_equal(power_get_state(), POWER_S3);
 
@@ -499,7 +499,7 @@ ZTEST(qcom_power, test_host_sleep_event_resume)
 	power_signal_enable_interrupt(GPIO_AP_SUSPEND);
 	zassert_ok(gpio_emul_input_set(gpio_dev, AP_SUSPEND_PIN, 1));
 	power_set_state(POWER_S3);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_MSEC(10));
 	zassert_equal(power_get_state(), POWER_S3);
 
@@ -631,7 +631,7 @@ ZTEST(qcom_power, test_power_chipset_init_sysjump_power_good)
 	zassert_equal(power_chipset_init(), POWER_S0);
 	power_set_state(POWER_S0);
 
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_S0, "power_state=%d",
 		      power_get_state());
@@ -647,7 +647,7 @@ ZTEST(qcom_power, test_power_chipset_init_sysjump_power_off)
 	zassert_equal(power_chipset_init(), POWER_G3);
 	power_set_state(POWER_G3);
 
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_G3, "power_state=%d",
 		      power_get_state());
@@ -659,7 +659,7 @@ ZTEST(qcom_power, test_power_chipset_init_ap_off)
 	zassert_equal(power_chipset_init(), POWER_G3);
 	power_set_state(POWER_G3);
 
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_G3, "power_state=%d",
 		      power_get_state());
@@ -683,7 +683,7 @@ void start_in_s0(void *fixture)
 	zassert_ok(gpio_emul_input_set(gpio_dev, LID_OPEN_EC_PIN, 1));
 	power_set_state(POWER_S0);
 	power_signal_interrupt(GPIO_AP_SUSPEND);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	/* Wait for timeout AP_RST_TRANSITION_TIMEOUT. */
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_S0, "power_state=%d",

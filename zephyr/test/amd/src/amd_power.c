@@ -215,7 +215,7 @@ void amd_power_before(void *fixture)
 	zassert_ok(gpio_emul_input_set(gpio_dev, PGOOD_S5_PIN, 0));
 	zassert_ok(gpio_emul_input_set(gpio_dev, LID_PIN, 1));
 	power_set_state(POWER_G3);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_G3, "power_state=%d",
 		      power_get_state());
@@ -247,7 +247,7 @@ ZTEST(amd_power, test_power_chipset_init_ap_off)
 	zassert_equal(power_chipset_init(), POWER_G3);
 	power_set_state(POWER_G3);
 
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_G3, "power_state=%d",
 		      power_get_state());

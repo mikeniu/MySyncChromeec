@@ -223,7 +223,7 @@ static timestamp_t power_off_deadline;
 
 static void power_button_timer_deferred(void)
 {
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 DECLARE_DEFERRED(power_button_timer_deferred);
 
@@ -348,13 +348,13 @@ static void lid_event(void)
 		return;
 
 	lid_opened = 1;
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, lid_event, HOOK_PRIO_DEFAULT);
 
 static void powerbtn_changed(void)
 {
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 DECLARE_HOOK(HOOK_POWER_BUTTON_CHANGE, powerbtn_changed, HOOK_PRIO_DEFAULT);
 
@@ -362,7 +362,7 @@ static void power_ac_changed(void)
 {
 	ac_on = 1;
 
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 DECLARE_HOOK(HOOK_AC_CHANGE, power_ac_changed, HOOK_PRIO_DEFAULT);
 
@@ -385,7 +385,7 @@ void rtc_callback(const struct device *dev)
 
 	if (chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
 		rtc_wake = 1;
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 	}
 }
 
@@ -574,13 +574,13 @@ static void sys_rst_timer_expired(void)
 	 * long warm reset sequence is complete.
 	 */
 	power_state_before_warm_reset = power_get_state();
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 DECLARE_DEFERRED(sys_rst_timer_expired);
 
 static void power_good_lost_expired(void)
 {
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 DECLARE_DEFERRED(power_good_lost_expired);
 
@@ -608,7 +608,7 @@ void chipset_sys_rst_interrupt(enum gpio_signal signal)
 			if (power_state_before_warm_reset == POWER_S0) {
 				power_request = POWER_REQ_ON_LONG_WARM_RESET;
 				power_state_before_warm_reset = POWER_G3;
-				task_wake(TASK_ID_CHIPSET);
+				power_thread_wake();
 			}
 		} else {
 			/*
@@ -617,7 +617,7 @@ void chipset_sys_rst_interrupt(enum gpio_signal signal)
 			 */
 			hook_call_deferred(&sys_rst_timer_expired_data, -1);
 			power_request = POWER_REQ_WARM_RESET;
-			task_wake(TASK_ID_CHIPSET);
+			power_thread_wake();
 		}
 	}
 }
@@ -1136,14 +1136,14 @@ test_mockable void chipset_force_shutdown(enum chipset_shutdown_reason reason)
 
 	/* Issue a request to initiate a power-off sequence */
 	power_request = POWER_REQ_OFF;
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 
 test_mockable void chipset_power_on(void)
 {
 	if (chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
 		power_request = POWER_REQ_ON;
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 	}
 }
 
@@ -1222,7 +1222,7 @@ test_mockable void chipset_reset(enum chipset_shutdown_reason reason)
 	report_ap_reset(reason);
 
 	power_request = POWER_REQ_WARM_RESET;
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 
 /* Get system sleep state through GPIOs */
@@ -1250,7 +1250,7 @@ static void handle_chipset_reset(void)
 	if (chipset_in_state(CHIPSET_STATE_SUSPEND)) {
 		CPRINTS("Chipset reset: exit s3");
 		power_reset_host_sleep_state();
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 	}
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESET, handle_chipset_reset, HOOK_PRIO_FIRST);
@@ -1282,7 +1282,7 @@ power_chipset_handle_host_sleep_event(enum host_sleep_event state,
 		 * listeners need to be notified of chipset resume.
 		 */
 		sleep_set_notify(SLEEP_NOTIFY_RESUME);
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 		power_signal_disable_interrupt(GPIO_AP_SUSPEND);
 		sleep_complete_resume(ctx);
 
@@ -1517,7 +1517,7 @@ static void ap_reset_deferred(void)
 {
 	CPRINTS("Scheduled AP reset: cold reset");
 	power_request = POWER_REQ_COLD_RESET;
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 DECLARE_DEFERRED(ap_reset_deferred);
 
@@ -1530,7 +1530,7 @@ host_command_apreset_scheduled(struct host_cmd_handler_args *args)
 		/* Reset immediately */
 		CPRINTS("AP reset immediate: cold reset");
 		power_request = POWER_REQ_COLD_RESET;
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 		return EC_RES_SUCCESS;
 	}
 
@@ -1567,7 +1567,7 @@ test_mockable_static int command_power(int argc, const char **argv)
 
 	power_request = v ? POWER_REQ_ON : POWER_REQ_OFF;
 	ccprintf("Requesting power %s\n", power_req_name[power_request]);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 
 	return EC_SUCCESS;
 }

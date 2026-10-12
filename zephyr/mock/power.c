@@ -76,7 +76,7 @@ static void handle_power_request(enum power_request_t req)
 void mock_power_request(enum power_request_t req)
 {
 	handle_power_request(req);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_SECONDS(1));
 }
 
@@ -90,14 +90,14 @@ void chipset_force_shutdown_custom_fake(enum chipset_shutdown_reason reason)
 {
 	LOG_INF("MOCK %s(%d)", __func__, reason);
 	handle_power_request(POWER_REQ_OFF);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 
 void chipset_power_on_custom_fake(void)
 {
 	if (chipset_in_state(CHIPSET_STATE_ANY_OFF)) {
 		handle_power_request(POWER_REQ_ON);
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 	}
 }
 
@@ -138,7 +138,7 @@ int command_power_custom_fake(int argc, const char **argv)
 	req = v ? POWER_REQ_ON : POWER_REQ_OFF;
 	handle_power_request(req);
 	LOG_INF("MOCK: Requesting power %s\n", power_req_name[req]);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 
 	return EC_SUCCESS;
 }
@@ -152,7 +152,7 @@ static void mock_lid_event(void)
 
 	LOG_INF("MOCK: lid opened %s\n", power_req_name[POWER_REQ_ON]);
 	handle_power_request(POWER_REQ_ON);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 DECLARE_HOOK(HOOK_LID_CHANGE, mock_lid_event, HOOK_PRIO_DEFAULT);
 

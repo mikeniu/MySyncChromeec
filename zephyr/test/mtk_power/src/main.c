@@ -79,7 +79,7 @@ void mtk_set_power_state(enum power_state target)
 		/* preconditions */
 		power_signal_enable_interrupt(GPIO_AP_IN_SLEEP_L);
 		zassert_ok(gpio_emul_input_set(gpio_dev, AP_IN_SLEEP, 1));
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 		/* wait for S3 processing */
 		k_sleep(K_MSEC(10));
 	} else {
@@ -122,7 +122,7 @@ void start_in_s0(void *fixture)
 	zassert_ok(gpio_emul_input_set(gpio_dev, LID_OPEN_EC_PIN, 1));
 	power_signal_interrupt(GPIO_AP_IN_SLEEP_L);
 
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	/* Wait for power state transition. */
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_S0, "power_state=%d",
