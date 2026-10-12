@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d443b80d_b8e6f61a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1408870
+      },
+      "writtenOn": "2026-10-12T09:32:21Z",
+      "side": 1,
+      "message": "/usr/x86_64-pc-linux-gnu/binutils-bin/2.45/ld.bfd.real: ... in function `board_override_fan_control_duty\u0027:\n/mnt/host/source/src/platform/ec/zephyr/program/bluey/pic/src/fan.c:179: undefined reference to `fan_data\u0027\n/mnt/host/source/src/platform/ec/zephyr/program/bluey/pic/src/fan.c:180: undefined reference to `fan_data\u0027\n/mnt/host/source/src/platform/ec/zephyr/program/bluey/pic/src/fan.c:181: undefined reference to `fan_get_duty\u0027\ncollect2: error: ld returned 1 exit status",
+      "revId": "34742d44e6ec5401d976414e505be03b25c3c9ee",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
