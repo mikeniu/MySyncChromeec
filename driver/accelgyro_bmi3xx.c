@@ -316,6 +316,23 @@ static void bmi3_parse_fifo_data(struct motion_sensor_t *s,
 }
 
 /*
+ * Burst read from INT_STATUS_INT1 (0x0D) to FIFO_DATA (0x16):
+ * 1 I2C sync word, registers 0x0D..0x15, then one accel and one gyro
+ * frame from FIFO_DATA (which does not auto-increment).
+ */
+struct bmi3_irq_burst {
+	uint16_t sync_word;
+	uint16_t int_status;
+	uint16_t unused[BMI3_REG_FIFO_FILL_LVL - BMI3_REG_INT_STATUS_INT1 - 1];
+	uint16_t fill_lvl;
+	uint16_t fifo[2 * BMI3_FIFO_ENTRY];
+};
+BUILD_ASSERT(BMI3_FIFO_BUFFER % BMI3_FIFO_ENTRY == 0);
+BUILD_ASSERT(ARRAY_SIZE(((struct bmi3_irq_burst *)0)->fifo) % BMI3_FIFO_ENTRY ==
+	     0);
+BUILD_ASSERT(sizeof(struct bmi3_irq_burst) <= 64);
+
+/*
  * irq_handler - bottom half of the interrupt stack.
  * Ran from the motion_sense task, finds the events that raised the interrupt.
  *
@@ -326,7 +343,8 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 {
 	uint32_t interrupt_timestamp = last_interrupt_timestamp;
 	bool has_read_fifo = false;
-	uint16_t int_status[2];
+	struct bmi3_irq_burst burst = { 0 };
+	int fill_lvl;
 	uint16_t reg_data[2];
 	struct bmi3_fifo_frame fifo_frame;
 	int rv;
@@ -349,55 +367,63 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	 * pending.
 	 */
 	for (i = 0; i < 200; i++) {
-		rv = bmi3_read_n(s, BMI3_REG_INT_STATUS_INT1,
-				 (uint8_t *)int_status, 4);
+		rv = bmi3_read_n(s, BMI3_REG_INT_STATUS_INT1, (uint8_t *)&burst,
+				 sizeof(burst));
 		if (rv)
 			break;
 
 		if (IS_ENABLED(CONFIG_BMI_ORIENTATION_SENSOR) &&
-		    (BMI3_INT_STATUS_ORIENTATION & int_status[1]))
+		    (BMI3_INT_STATUS_ORIENTATION & burst.int_status))
 			irq_set_orientation(s);
 
-		if ((int_status[1] &
+		if ((burst.int_status &
 		     (BMI3_INT_STATUS_FWM | BMI3_INT_STATUS_FFULL)) == 0)
 			break;
 
-		/* Get the FIFO fill level in words */
-		rv = bmi3_read_n(s, BMI3_REG_FIFO_FILL_LVL, (uint8_t *)reg_data,
-				 4);
-		if (rv)
-			break;
-
-		reg_data[1] =
-			BMI3_GET_BIT_POS0(reg_data[1], BMI3_FIFO_FILL_LVL);
-
-		/* Add space for the initial 16bit read. */
-		fifo_frame.available_fifo_len = reg_data[1] + 1;
+		fill_lvl =
+			BMI3_GET_BIT_POS0(burst.fill_lvl, BMI3_FIFO_FILL_LVL);
 
 		/*
-		 * If fill level is greater than buffer size then wrap it to
-		 * buffer size.
+		 * Parse the FIFO words from the burst. If fewer were pending,
+		 * the rest read as 0x8000, which ends the parse.
 		 */
-		if (fifo_frame.available_fifo_len > ARRAY_SIZE(fifo_frame.data))
-			CPRINTS("unexpected large FIFO: %d",
-				fifo_frame.available_fifo_len);
-
-		fifo_frame.available_fifo_len =
-			min(fifo_frame.available_fifo_len,
-			    ARRAY_SIZE(fifo_frame.data));
-		/* Read FIFO data */
-		rv = bmi3_read_n(
-			s, BMI3_REG_FIFO_DATA, (uint8_t *)fifo_frame.data,
-			fifo_frame.available_fifo_len * sizeof(uint16_t));
-		if (rv)
-			break;
-
+		memcpy(&fifo_frame.data[1], burst.fifo, sizeof(burst.fifo));
+		fifo_frame.available_fifo_len = 1 + ARRAY_SIZE(burst.fifo);
 		bmi3_parse_fifo_data(s, &fifo_frame, interrupt_timestamp);
 		has_read_fifo = true;
+
+		/* Read whatever did not fit in the burst. */
+		if (fill_lvl > ARRAY_SIZE(burst.fifo)) {
+			/* Add space for the initial 16bit read. */
+			fifo_frame.available_fifo_len =
+				fill_lvl - ARRAY_SIZE(burst.fifo) + 1;
+
+			/*
+			 * If fill level is greater than buffer size then wrap
+			 * it to buffer size.
+			 */
+			if (fifo_frame.available_fifo_len >
+			    ARRAY_SIZE(fifo_frame.data))
+				CPRINTS("unexpected large FIFO: %d",
+					fifo_frame.available_fifo_len);
+
+			fifo_frame.available_fifo_len =
+				min(fifo_frame.available_fifo_len,
+				    ARRAY_SIZE(fifo_frame.data));
+			rv = bmi3_read_n(s, BMI3_REG_FIFO_DATA,
+					 (uint8_t *)fifo_frame.data,
+					 fifo_frame.available_fifo_len *
+						 sizeof(uint16_t));
+			if (rv)
+				break;
+
+			bmi3_parse_fifo_data(s, &fifo_frame,
+					     interrupt_timestamp);
+		}
 	}
 
 	if (i == 200) {
-		CPRINTF("irq 0x%04x stuck (%d loops)\n", int_status[1], i);
+		CPRINTF("irq 0x%04x stuck (%d loops)\n", burst.int_status, i);
 
 		/* Clear the FIFO using Flush command */
 		reg_data[0] = BMI3_ENABLE;
