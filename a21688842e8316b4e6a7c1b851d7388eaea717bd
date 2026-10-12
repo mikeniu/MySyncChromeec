@@ -16,6 +16,24 @@
       "message": "Why are you preventing the low-power mode here?",
       "revId": "a21688842e8316b4e6a7c1b851d7388eaea717bd",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "438d920a_8b4a786f",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "If the idle thread was allowed to enter Stop mode while the fast CPU is enabled, the MCU would wake up running at 64 MHz HSI + VOS3 instead of 400 MHz PLL1 + VOS1.",
+      "parentUuid": "33dba8d6_450ef2b4",
+      "revId": "a21688842e8316b4e6a7c1b851d7388eaea717bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

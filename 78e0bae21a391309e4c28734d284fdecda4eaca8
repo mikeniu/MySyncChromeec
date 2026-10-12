@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3f26eafc_0429d07d",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "No, thanks for catching this. I\u0027ll remove it.",
+      "parentUuid": "c553ce5a_e344d6d1",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "992fadac_80cc105a",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-12T08:58:06Z",
       "side": 1,
       "message": "There should be probably a more complex synchronization method e.g.\n```\nT1:\n-\u003e enable fast CPU\n-\u003e run calculations\n  -\u003e Interrupt\n  -\u003e re-schedule to T2:\n  -\u003e enable fast CPU (already done\n  -\u003e calculations \n  -\u003e disable fast CPU\n  -\u003e reschedule to T1 again\n-\u003e continues calculations without fast CPU\n-\u003e disable fast CPU (already done)\n```",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fece2388_16f8e0f9",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "Yes, the scenario you described is possible. The atomic flag was meant to be more of an optimization than a synchronization primitive and prevent from repeating the operations if the state would not change.\n\nTo make it thread-safe, we could use a reference counter instead of a flag, and lock interrupts with `irq_lock()` and `irq_unlock()` around the register accesses to prevent inconsistent hardware states.",
+      "parentUuid": "992fadac_80cc105a",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fdecdc9e_f1186d1d",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "\u003e Please add a comment that the PLL1 is already configured via dts.\n\nAck, will do.\n\n\u003e Additional question - where is it disabled at the beginning of boot?\n\nIt should not be necessary to disable it at boot, provided that its devicetree node defines `no-auto-enable` property. Then, as long as the application does not explicitly enable it, the clock control driver keeps it disabled.",
+      "parentUuid": "3700500b_33a80ce5",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f7d1805d_d5607b1b",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -65,6 +119,24 @@
       "writtenOn": "2026-10-12T08:58:06Z",
       "side": 1,
       "message": "Side question - does this all changes impact lptim?",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4e1752b_3b9a7e83",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "No. APB clock is derived from sys_ck, while LPTIM runs off of LSI. It\u0027s a separate clock tree.",
+      "parentUuid": "f7d1805d_d5607b1b",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -88,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c57691a6_219e5c1e",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "Not sure what you mean. Is the following sufficient?\n\n```c\n/*\n * Set the flash latency first to avoid introducing a time window when the clock is already\n * faster but the flash latency is configured to fewer wait states than required for\n * the new clock.\n */\n```",
+      "parentUuid": "852b4248_6f547421",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "27bd79fe_e63e45f4",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -99,6 +189,24 @@
       "writtenOn": "2026-10-12T08:58:06Z",
       "side": 1,
       "message": "Actually, is this needed. Is LPTIM impacted with all this changes? `z_sys_clock_hw_cycles_per_sec_update` is used to update clock freq used by the system (Zephyr) timer, which is LPTIM",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3888c2fb_095b3e91",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "It\u0027s a leftover, the Kconfig option checked here is disabled. I can remove those lines.",
+      "parentUuid": "27bd79fe_e63e45f4",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -122,6 +230,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b129f770_c9a2ae0d",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "It updates a global variable of the STM32 CMSIS HAL, which is used by various functions there.",
+      "parentUuid": "f177787a_29656939",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bf6e4475_1df7ec99",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -133,6 +259,24 @@
       "writtenOn": "2026-10-12T08:58:06Z",
       "side": 1,
       "message": "Shouldn\u0027t this actions be do in reverse order? E.g. not to exceed the maximum allowed frequency as specified in the comment in Line 73? We are reducing the rescalers while the system clock is still PLL.",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7eb0e57b_abb862d7",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "\u003e We are reducing the rescalers while the system clock is still PLL.\n\nTake a look at line 112:\n```c\n\t\tLL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI);\n\t\twhile (LL_RCC_GetSysClkSource() !\u003d\n                       LL_RCC_SYS_CLKSOURCE_STATUS_HSI) {\n\t\t}\n```",
+      "parentUuid": "bf6e4475_1df7ec99",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
@@ -179,6 +323,48 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "050120af_c525830b",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "Yes, it should be done first. Good catch, thanks. I\u0027ll fix the code.",
+      "parentUuid": "7ca91b4d_1b10a535",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1c0cb6e_2eb30ad3",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "It seems you\u0027re correct and it is missing. For Icetower the divisor is set to \u003c1\u003e (64 MHz HSI) and that\u0027s why it works.\n\nI\u0027ll add explicit division.",
+      "parentUuid": "1216b9ff_fc813737",
+      "range": {
+        "startLine": 124,
+        "startChar": 21,
+        "endLine": 124,
+        "endChar": 35
+      },
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d38d0010_f1d1e3db",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -190,6 +376,30 @@
       "writtenOn": "2026-10-12T08:58:06Z",
       "side": 1,
       "message": "No `STM32_HSI_DIVISOR` here?",
+      "range": {
+        "startLine": 136,
+        "startChar": 24,
+        "endLine": 136,
+        "endChar": 38
+      },
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54aef045_d566c1a7",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T12:05:21Z",
+      "side": 1,
+      "message": "Same as above, I\u0027ll add explicit division (although it doesn\u0027t change anything functionally for Dartmonkey, where the divisor is set to 1).",
+      "parentUuid": "d38d0010_f1d1e3db",
       "range": {
         "startLine": 136,
         "startChar": 24,
