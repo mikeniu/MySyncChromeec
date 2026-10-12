@@ -1270,6 +1270,18 @@ ZTEST_F(sm5803, test_explicit_lpm_connected)
 		      sm5803_emul_get_phot1(SM5803_EMUL));
 }
 
+ZTEST(sm5803, test_runtime_lpm_hooks_outside_pd_thread)
+{
+	int cc_conf1 = sm5803_emul_get_cc_config(SM5803_EMUL);
+
+	/* The hooks run on the test thread, not a PD thread, so do nothing */
+	hook_notify(HOOK_USB_PD_DISCONNECT);
+	zassert_equal(sm5803_emul_get_cc_config(SM5803_EMUL), cc_conf1);
+
+	hook_notify(HOOK_USB_PD_CONNECT);
+	zassert_equal(sm5803_emul_get_cc_config(SM5803_EMUL), cc_conf1);
+}
+
 FAKE_VOID_FUNC(chipset_throttle_cpu, int);
 
 ZTEST(sm5803, test_thermal_throttle)

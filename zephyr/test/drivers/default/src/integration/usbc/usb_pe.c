@@ -8,6 +8,7 @@
 #include "emul/emul_isl923x.h"
 #include "emul/tcpc/emul_tcpci_partner_snk.h"
 #include "emul/tcpc/emul_tcpci_partner_src.h"
+#include "hooks.h"
 #include "tcpm/tcpci.h"
 #include "test/drivers/stubs.h"
 #include "test/drivers/test_state.h"
@@ -157,6 +158,26 @@ ZTEST_F(usb_pe_test_sink, test_pe_status_and_debug_levels)
 
 	/* Verify PE state */
 	zassert_true(get_state_pe(port) >= 0, "PE state should be valid");
+}
+
+/**
+ * @brief Test HOOK_USB_PD_DISCONNECT from a non-PD thread leaves PE intact.
+ */
+ZTEST_F(usb_pe_test_sink, test_pd_disconnect_hook_outside_pd_thread)
+{
+	int port = TEST_USB_PORT;
+
+	zassert_true(pe_is_explicit_contract(port),
+		     "Expected an explicit contract");
+	pd_clear_events(port, PD_STATUS_EVENT_DISCONNECTED);
+
+	/* Runs pe_handle_detach() on the test thread, not a PD thread */
+	hook_notify(HOOK_USB_PD_DISCONNECT);
+
+	zassert_true(pe_is_explicit_contract(port),
+		     "Explicit contract should not be cleared");
+	zassert_false(pd_get_events(port) & PD_STATUS_EVENT_DISCONNECTED,
+		      "Disconnect event should not be set");
 }
 
 /**
