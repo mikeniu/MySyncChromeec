@@ -1015,7 +1015,7 @@ void pd_set_suspend(int port, int suspend)
 		 * Avoid deadlock when running from task
 		 * which we are going to suspend
 		 */
-		if (PD_PORT_TO_TASK_ID(port) == task_get_current())
+		if (port == pd_get_current_thread_port())
 			return;
 
 		task_wake(PD_PORT_TO_TASK_ID(port));
@@ -1409,7 +1409,7 @@ static bool tc_perform_snk_hard_reset(int port)
 
 void tc_start_error_recovery(int port)
 {
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	assert(port == pd_get_current_thread_port());
 
 	/*
 	 *   The port should transition to the ErrorRecovery state
@@ -1632,7 +1632,7 @@ static void set_ccd_mode(const int port, const bool enable)
 /* Set the TypeC state machine to a new state. */
 static void set_state_tc(const int port, const enum usb_tc_state new_state)
 {
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	assert(port == pd_get_current_thread_port());
 
 	set_state(port, &tc[port].ctx, &tc_states[new_state]);
 }
@@ -1913,7 +1913,7 @@ static __maybe_unused int reset_device_and_notify(int port)
 	int task, waiting_tasks;
 
 	/* This should only be called from the PD task */
-	assert(port == TASK_ID_TO_PD_PORT(task_get_current()));
+	assert(port == pd_get_current_thread_port());
 
 	TC_SET_FLAG(port, TC_FLAGS_LPM_TRANSITION);
 	rv = tcpm_init(port);
@@ -1955,7 +1955,7 @@ void pd_wait_exit_low_power(int port)
 	if (!TC_CHK_FLAG(port, TC_FLAGS_LPM_ENGAGED))
 		return;
 
-	if (port == TASK_ID_TO_PD_PORT(task_get_current())) {
+	if (port == pd_get_current_thread_port()) {
 		if (!TC_CHK_FLAG(port, TC_FLAGS_LPM_TRANSITION))
 			reset_device_and_notify(port);
 	} else {
@@ -1981,7 +1981,7 @@ void pd_wait_exit_low_power(int port)
  */
 void pd_device_accessed(int port)
 {
-	if (port == TASK_ID_TO_PD_PORT(task_get_current()))
+	if (port == pd_get_current_thread_port())
 		handle_device_access(port);
 	else
 		task_set_event(PD_PORT_TO_TASK_ID(port),
