@@ -16,6 +16,24 @@
       "message": "Needs to be fixed in main too.",
       "revId": "5261f7cf3b22e5219fefaae24343905bb3989192",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb010566_3d5677f0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-12T17:17:11Z",
+      "side": 1,
+      "message": "Done — cherry-picked to main in https://chromium-review.googlesource.com/c/chromiumos/platform/ec/+/8562218",
+      "parentUuid": "14a7e33b_94afb817",
+      "revId": "5261f7cf3b22e5219fefaae24343905bb3989192",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
