@@ -626,6 +626,7 @@ class Renode(Platform):
             "fpsensor_auth_crypto_stateful",  # TODO(b/485316342)
             "fpsensor_auth_crypto_stateless",  # TODO(b/556233130)
             "fpsensor_crypto",  # TODO(b/556233130)
+            "fpsensor_hw",  # TODO(b/384743080)
             "otp_key",  # TODO(b/485316342)
             "rollback",  # TODO(b/485315275)
             "flash_write_protect",  # TODO(b/485316223)
@@ -698,6 +699,7 @@ class Renode(Platform):
             "exception",  # TODO(b/483118965)
             "fpsensor_auth_crypto_stateful",  # TODO(b/483119679)
             "fpsensor_debug",  # TODO(b/474439863)
+            "fpsensor_hw",  # TODO(b/384743080)
             "otp_key",  # TODO(b/483121090)
             "restricted_console",  # TODO(b/474439863)
             "tpm_seed_clear",  # TODO(b/556233130)
@@ -717,7 +719,6 @@ class Renode(Platform):
 
         # Tests failures that are independent of the board.
         if test_name in [
-            "fpsensor_hw",  # TODO(b/384743080)
             "power_utilization",  # Can't measure power on Renode.
             "watchdog",  # TODO(b/390021699)
         ]:
