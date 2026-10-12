@@ -15,6 +15,8 @@
 #include "task.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
+
 #ifdef CONFIG_SOC_IT8XXX2
 #include <ilm.h>
 #else
@@ -48,6 +50,7 @@ static atomic_t cec_mkbp_events[CEC_PORT_COUNT];
 
 /* Task events for each port (CEC_TASK_EVENT_*) */
 static atomic_t cec_task_events[CEC_PORT_COUNT];
+static K_SEM_DEFINE(cec_wake_sem, 0, 1);
 
 __soc_ram_code int cec_transfer_get_bit(const struct cec_msg_transfer *transfer)
 {
@@ -230,7 +233,7 @@ int cec_rx_queue_pop(struct cec_rx_queue *queue, uint8_t *msg, uint8_t *msg_len)
 void cec_task_set_event(int port, uint32_t event)
 {
 	atomic_or(&cec_task_events[port], event);
-	task_wake(TASK_ID_CEC);
+	k_sem_give(&cec_wake_sem);
 }
 
 test_export_static void send_mkbp_event(int port, uint32_t event)
@@ -495,7 +498,7 @@ void cec_task(void *unused)
 	CPRINTS("CEC task starting");
 
 	while (1) {
-		task_wait_event(-1);
+		k_sem_take(&cec_wake_sem, K_FOREVER);
 		for (port = 0; port < CEC_PORT_COUNT; port++) {
 			events = atomic_clear(&cec_task_events[port]);
 			if (events & CEC_TASK_EVENT_RECEIVED_DATA) {
