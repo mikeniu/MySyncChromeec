@@ -6,6 +6,11 @@
 #include <dt-bindings/motionsense/utils.h>
 
 / {
+	ec-console {
+		compatible = "ec-console";
+		disabled = "motionsense";
+	};
+
 	named-gpios {
 		compatible = "named-gpios";
 

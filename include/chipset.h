@@ -140,7 +140,8 @@ int chipset_is_offmode_charging_wake(void);
 #else /* !CONFIG_AP_POWER_CONTROL */
 
 #if defined(CONFIG_TEST_DISABLE_INLINE_CHIPSET_IN_STATE) || \
-	defined(CONFIG_SOC_FAMILY_INTEL_ISH)
+	defined(CONFIG_SOC_FAMILY_INTEL_ISH) ||             \
+	defined(CONFIG_SOC_SERIES_MT81XX_SCP)
 int chipset_in_state(int state_mask);
 
 #else
