@@ -13,6 +13,7 @@
 #include "accelgyro_bmi_common.h"
 #include "builtin/assert.h"
 #include "console.h"
+#include "gpio.h"
 #include "hwtimer.h"
 #include "i2c.h"
 #include "init_rom.h"
@@ -99,6 +100,9 @@ static void irq_set_orientation(struct motion_sensor_t *s)
 
 #endif /* CONFIG_BMI_ORIENTATION_SENSOR */
 
+/* GPIO that raised the interrupt, GPIO_COUNT until the first interrupt. */
+test_export_static volatile enum gpio_signal bmi3xx_int_signal = GPIO_COUNT;
+
 /*
  * bmi3xx_interrupt - called when the sensor activates the interrupt line.
  *
@@ -108,8 +112,20 @@ static void irq_set_orientation(struct motion_sensor_t *s)
 test_mockable void bmi3xx_interrupt(enum gpio_signal signal)
 {
 	last_interrupt_timestamp = __hw_clock_source_read();
+	bmi3xx_int_signal = signal;
 
 	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ACCELGYRO_BMI3XX_INT_EVENT);
+}
+
+/*
+ * INT1 is active low and stays asserted while an interrupt source is
+ * pending. Return false only if the pin shows nothing pending.
+ */
+static bool irq_pin_asserted(void)
+{
+	if (bmi3xx_int_signal == GPIO_COUNT)
+		return true;
+	return gpio_get_level(bmi3xx_int_signal) == 0;
 }
 
 static int enable_fifo(const struct motion_sensor_t *s, int enable)
@@ -420,6 +436,13 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 			bmi3_parse_fifo_data(s, &fifo_frame,
 					     interrupt_timestamp);
 		}
+
+		/*
+		 * Skip the status re-read if INT1 shows nothing is pending.
+		 * Any new interrupt after this point raises a new edge.
+		 */
+		if (!irq_pin_asserted())
+			break;
 	}
 
 	if (i == 200) {
