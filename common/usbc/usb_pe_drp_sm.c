@@ -1584,6 +1584,11 @@ static void pe_handle_detach(void)
 {
 	const int port = pd_get_current_thread_port();
 
+	/* Only a PD thread knows which port was disconnected */
+	if (port < 0) {
+		return;
+	}
+
 	pe_clear_port_data(port);
 }
 DECLARE_HOOK(HOOK_USB_PD_DISCONNECT, pe_handle_detach, HOOK_PRIO_DEFAULT);

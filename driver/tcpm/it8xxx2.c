@@ -958,7 +958,7 @@ static void it8xxx2_tcpm_hook_connect(void)
 	 *       need to start from port0 to use the ITE pd port. If we
 	 *       start from port1, then port1 HOOK function never works.
 	 */
-	if (port > (CONFIG_USB_PD_ITE_ACTIVE_PORT_COUNT - 1))
+	if (port < 0 || port > (CONFIG_USB_PD_ITE_ACTIVE_PORT_COUNT - 1))
 		return;
 
 	/*
@@ -1005,7 +1005,7 @@ static void it8xxx2_tcpm_hook_disconnect(void)
 	 *       need to start from port0 to use the ITE pd port. If we
 	 *       start from port1, then port1 HOOK function never works.
 	 */
-	if (port > (CONFIG_USB_PD_ITE_ACTIVE_PORT_COUNT - 1))
+	if (port < 0 || port > (CONFIG_USB_PD_ITE_ACTIVE_PORT_COUNT - 1))
 		return;
 
 	if (IS_ENABLED(IT83XX_INTC_PLUG_IN_OUT_SUPPORT))
