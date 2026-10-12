@@ -69,6 +69,24 @@
       "parentUuid": "3a368a6b_b317e461",
       "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49fdbc51_3778329c",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T21:02:18Z",
+      "side": 1,
+      "message": "Correction: `it83xx_tcpm_switch_plug_out_type()` and `it8xxx2_tcpm_switch_plug_out_type()` are identical, but `driver/tcpm/it83xx.c` is unused in Zephyr builds.",
+      "parentUuid": "fe5ea1be_c6736247",
+      "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
