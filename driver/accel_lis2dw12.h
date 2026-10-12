@@ -203,7 +203,7 @@ enum lis2dw12_fs {
 #define LIS2DW12_FS_REG(_fs) (30 - __builtin_clz(_fs))
 
 /* Normalized FS value from Full Scale. */
-#define LIS2DW12_NORMALIZE_FS(_fs) (1 << (30 - __builtin_clz(_fs)))
+#define LIS2DW12_NORMALIZE_FS(_fs) (1 << (31 - __builtin_clz(_fs)))
 
 /*
  * Sensor resolution in number of bits.
