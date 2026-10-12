@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43dafc69_e9fbaac6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T15:50:22Z",
+      "side": 1,
+      "message": "Opened b/572773759 to fix this ADC init issue generally.",
+      "revId": "b25fcdcea400c10f8b3828deeb31edbb0c8bb447",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
