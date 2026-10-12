@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "670485c5_c1154ce7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T15:42:33Z",
+      "side": 1,
+      "message": "Opened b/572768571 and b/572768477 to fix this class of bugs generally.",
+      "revId": "52db6396862de0eec11507dd36ff50cab02b25c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
