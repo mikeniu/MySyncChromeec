@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5141870c_c05eb8cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-12T22:12:23Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n*   **Functionality:** ✅ Looks good. The `FpSensor` model dynamically responds to hardware ID and interrupt commands correctly, and properly returns dummy `0` bytes when no responses are pending.\n*   **Architecture \u0026 Component Fit:** ✅ Looks good. The logic hooks cleanly into Renode\u0027s `ISPIPeripheral` interface and correctly delegates to IronPython\u0027s `Machine` context.\n*   **Code Simplicity:** ✅ Looks good. Using dictionaries for command responses is clear and concise.\n*   **Idiomaticity \u0026 Readability:** ✅ Looks good. The code cleanly navigates the constraints of Renode\u0027s Python 2.7 runtime while providing a modern Python 3 unittest suite.\n*   **Security:** ✅ Looks good.\n*   **Testing:** ✅ Looks good. The `fpsensor_unittest.py` file uses `unittest.mock` effectively to verify SPI transmission behavior and state resets.\n*   **CL Size \u0026 Scope:** ❌ `Size: L (+250, -1)` — This CL exceeds the size limit for a single review. Please split it into smaller, atomic CLs.\n    *   **CL 1:** Add the base `FpSensor` class and `Fpc` sensor definitions to `util/renode/fpsensor.py`, along with their unit tests in `fpsensor_unittest.py` and the Makefile test hook.\n    *   **CL 2:** Add the `Elan` sensor definitions to `util/renode/fpsensor.py` and its corresponding tests in `fpsensor_unittest.py`.\n*   **Commit Message:** ✅ Looks good.\n\n[🔗](http://go/tj/7ac218af-d179-4e1e-867a-3dfb0510044c)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "8efbb36f512ba0295fe5cf870f1a7bd4e38a43b7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
