@@ -22,6 +22,30 @@
       },
       "revId": "0228894c1f1669ad8132117423ff35ee366d9fff",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09abf3b9_fe7a3125",
+        "filename": "common/charge_manager.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1652,
+      "author": {
+        "id": 1531147
+      },
+      "writtenOn": "2026-10-12T17:31:14Z",
+      "side": 1,
+      "message": "Done — removed CM_MUTEX_LOCK(\u0026cm_refresh) / CM_MUTEX_UNLOCK(\u0026cm_refresh) in PS2 (and on ec-legacy CL 8543925 PS2).",
+      "parentUuid": "b1ff669d_7ec9f12b",
+      "range": {
+        "startLine": 1652,
+        "startChar": 0,
+        "endLine": 1652,
+        "endChar": 0
+      },
+      "revId": "0228894c1f1669ad8132117423ff35ee366d9fff",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
