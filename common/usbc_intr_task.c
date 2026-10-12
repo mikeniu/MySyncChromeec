@@ -18,25 +18,22 @@
 
 #include <stdint.h>
 
+#include <zephyr/kernel.h>
+
 #define CPRINTF(format, args...) cprintf(CC_USBPD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_USBPD, format, ##args)
 
-/* Events for pd_interrupt_handler_task */
-#define PD_PROCESS_INTERRUPT BIT(0)
-
 #define ALERT_STORM_INTERVAL SECOND
 
-static uint8_t pd_int_task_id[CONFIG_USB_PD_PORT_MAX_COUNT];
+static struct k_sem *pd_int_sem[CONFIG_USB_PD_PORT_MAX_COUNT];
 
 test_mockable void schedule_deferred_pd_interrupt(const int port)
 {
 	/*
-	 * Don't set event to idle task if task id is 0. This happens when
-	 * not all the port have pd int task, the pd_int_task_id of port
-	 * that doesn't have pd int task is 0.
+	 * Only signal if the port has a PD interrupt thread.
 	 */
-	if (pd_int_task_id[port] != 0)
-		task_set_event(pd_int_task_id[port], PD_PROCESS_INTERRUPT);
+	if (pd_int_sem[port] != NULL)
+		k_sem_give(pd_int_sem[port]);
 }
 
 static struct {
@@ -84,6 +81,7 @@ __overridable void board_process_pd_alert(int port)
  */
 void pd_interrupt_handler_task(void *p)
 {
+	static struct k_sem pd_port_intr_sem[CONFIG_USB_PD_PORT_MAX_COUNT];
 	const int port = (int)((intptr_t)p);
 	const int port_mask = (PD_STATUS_TCPC_ALERT_0 << port);
 
@@ -95,14 +93,14 @@ void pd_interrupt_handler_task(void *p)
 	if (port >= board_get_usb_pd_port_count())
 		return;
 
-	pd_int_task_id[port] = task_get_current();
+	k_sem_init(&pd_port_intr_sem[port], 0, 1);
+	pd_int_sem[port] = &pd_port_intr_sem[port];
 
 	while (1) {
 		bool have_alerts;
-		const int evt = task_wait_event(-1);
 
-		if ((evt & PD_PROCESS_INTERRUPT) == 0)
-			continue;
+		k_sem_take(&pd_port_intr_sem[port], K_FOREVER);
+
 		/*
 		 * While the interrupt signal is asserted; we have more
 		 * work to do. This effectively makes the interrupt a
@@ -111,8 +109,8 @@ void pd_interrupt_handler_task(void *p)
 		 * multiple locations.
 		 *
 		 * Also, if the port is disabled do not process
-		 * interrupts. Upon existing suspend, we schedule a
-		 * PD_PROCESS_INTERRUPT to check if we missed anything.
+		 * interrupts. Upon exiting suspend, we schedule an
+		 * interrupt check to see if we missed anything.
 		 */
 		do {
 			have_alerts = (tcpc_get_alert_status() & port_mask) &&
@@ -142,6 +140,7 @@ BUILD_ASSERT(PD_STATUS_TCPC_ALERT_3 == (PD_STATUS_TCPC_ALERT_0 << 3));
 #ifdef CONFIG_HAS_TASK_PD_INT_SHARED
 void pd_shared_alert_task(void *p)
 {
+	static K_SEM_DEFINE(pd_shared_intr_sem, 0, 1);
 	const int sources_mask = (int)((intptr_t)p);
 	int want_alerts = 0;
 	int port;
@@ -157,7 +156,7 @@ void pd_shared_alert_task(void *p)
 
 		port_mask = PD_STATUS_TCPC_ALERT_0 << port;
 		want_alerts |= port_mask;
-		pd_int_task_id[port] = task_get_current();
+		pd_int_sem[port] = &pd_shared_intr_sem;
 	}
 
 	if (want_alerts == 0) {
@@ -168,11 +167,9 @@ void pd_shared_alert_task(void *p)
 	}
 
 	while (1) {
-		const int evt = task_wait_event(-1);
 		int have_alerts;
 
-		if ((evt & PD_PROCESS_INTERRUPT) == 0)
-			continue;
+		k_sem_take(&pd_shared_intr_sem, K_FOREVER);
 
 		/*
 		 * While the interrupt signal is asserted; we have more
@@ -182,8 +179,8 @@ void pd_shared_alert_task(void *p)
 		 * multiple locations.
 		 *
 		 * Also, if the port is disabled do not process
-		 * interrupts. Upon existing suspend, we schedule a
-		 * PD_PROCESS_INTERRUPT to check if we missed anything.
+		 * interrupts. Upon exiting suspend, we schedule an
+		 * interrupt check to see if we missed anything.
 		 */
 		do {
 			have_alerts = tcpc_get_alert_status();
