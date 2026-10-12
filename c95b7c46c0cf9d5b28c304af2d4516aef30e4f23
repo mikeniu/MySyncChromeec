@@ -16,6 +16,24 @@
       "message": "An alternate formulation that I think might be simpler but have the same benefit:\n* `pe_set_ado` returns `EC_SUCCESS` if the port is not connected.\n* `pd_send_alert_msg` only returns `EC_ERROR_BUSY` if `pe_set_ado` returned that.\n* Neither `pd_send_alert_msg` nor `pd_broadcast_alert_msg` needs to check explicitly if the port is connected.",
       "revId": "c95b7c46c0cf9d5b28c304af2d4516aef30e4f23",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee924333_20ba1c0c",
+        "filename": "common/usb_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 845,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T18:59:03Z",
+      "side": 1,
+      "message": "In this scenario, `pd_get_partner_rmdo` and `pd_dpm_request` would still run when the port is disconnected. Or am I missing something in your suggestion?\n\nIf `pd_send_alert_msg` were changed to return `EC_SUCCESS` at the top when the port is not connected, the check in `pd_broadcast_alert_msg` could be removed, but returning success when the port is not connected seems wrong.",
+      "parentUuid": "9b04e95b_d6834659",
+      "revId": "c95b7c46c0cf9d5b28c304af2d4516aef30e4f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
