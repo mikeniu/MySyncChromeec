@@ -39,6 +39,30 @@
       },
       "revId": "c27a77ce121ae84d1f651707c0f7c510ea61438a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ddeaff0_d0e8603a",
+        "filename": "common/motion_sense.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 1080,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T23:24:36Z",
+      "side": 1,
+      "message": "Ran cheets_CTS_T.internal.x86.CtsSensor on pujjogatwin (208 Hz lsm6dsm + lis2dw12) against PS7 caught occasional 2T timestamp gaps when an asynchronous lid accel interrupt triggered back-to-back 3 ms sleeps across a 4.8 ms gyro sample boundary. PS8 moves the minimum-interval sleep after task_wait_event() (measured from ts_end_task), coalesces events that arrive during the sleeep.\n\nStill, CONFIG_MOTION_MIN_SENSE_WAIT_TIME had to be reduced from 3 ms to 2 ms to pass CTS on pujjogatwin and craask.",
+      "parentUuid": "9c986839_3a551989",
+      "range": {
+        "startLine": 1080,
+        "startChar": 0,
+        "endLine": 1080,
+        "endChar": 32
+      },
+      "revId": "c27a77ce121ae84d1f651707c0f7c510ea61438a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
