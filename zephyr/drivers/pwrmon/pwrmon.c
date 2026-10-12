@@ -380,7 +380,7 @@ static enum ec_status hc_pwrmon_handler(struct host_cmd_handler_args *args)
 		}
 
 		ret = gpio_pin_configure_dt(&pwrmon_config.pwrmon_gpio,
-					    GPIO_OUTPUT_HIGH);
+					    GPIO_OUTPUT_ACTIVE);
 		if (ret) {
 			LOG_ERR("Failed to initialize gpio err: %d", ret);
 			return EC_RES_ERROR;
