@@ -23,6 +23,42 @@ showAnalyzer cr_uart1
 # will be copied to Code RAM by the bootloader on each reset.
 sysbus LoadBinary $bin 0x64000000
 
+# On NPCX9, the watchdog triggers a reset either when WDSDM (offset 0xA) is
+# written more than once within three watchdog clock cycles with T0CSR.TESDIS
+# (bit 5 at offset 0x6, "Too Early Service" disable) set to 0, or when a value
+# other than 0x5C or the stop sequence is written to WDSDM while running.
+# cros_system_soc_reset() uses the first mechanism (clearing TESDIS and writing
+# 0x5C twice to WDSDM), whereas Renode's NPCX_TWD model only implements the
+# second mechanism and treats 0x5C writes as normal watchdog pets. Intercept
+# 0x5C writes when TESDIS is 0 and write 0x00 to WDSDM to trigger the watchdog
+# reset. Also return WDCP=12 (offset 0x10) so wdt_npcx_disable() waits 1 ms
+# instead of 3072 ms when called with interrupts disabled before reset.
+# TODO(b/567996957): Remove once NPCX_TWD supports Too Early Service reset and WDCP readback in Renode.
+twd AddAfterWriteWordHook 0xA
+"""
+if value == 0x5c and (self.ReadWord(0x6) & 0x20) == 0:
+    self.WriteWord(0xa, 0x00)
+"""
+twd AddAfterReadWordHook 0x10 "value = 12"
+
+# On NPCX9, the APB2 source clock of itim64 stops when entering deep sleep
+# (PMC.PMCSR at 0x4000D000 set non-zero before WFI), while the 32 kHz LFCLK
+# reference timer (itim32) continues counting so
+# npcx_clock_compensate_system_timer() can compensate elapsed sleep time on
+# wake. Pause sysbus.itim64's internal LimitTimer while PMCSR != 0 so itim64
+# ticks are not double-counted across deep sleep.
+# TODO(b/568364437): Remove once NPCX_PMC gates sysbus.itim64 during system sleep in Renode.
+sysbus AddWatchpointHook 0x4000D000 1 Write
+"""
+from System.Reflection import BindingFlags
+
+i = self.Machine['sysbus.itim64']
+timer_field = i.GetType().GetField(
+    'timer', BindingFlags.NonPublic | BindingFlags.Instance
+)
+timer_field.GetValue(i).Enabled = value == 0
+"""
+
 macro reset
 """
     sysbus LoadSymbolsFrom $elf_ro
