@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74b516f2_94d74044",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1594262
+      },
+      "writtenOn": "2026-10-12T12:42:40Z",
+      "side": 1,
+      "message": "The previous build (https://cr-buildbucket.appspot.com/build/8668266807511114161) is being automatically retried for the following reasons:\n- Some child builders are now retryable:amd64-generic-cq, amd64-generic-sdknext-cq, arm-generic-cq, arm64-generic-cq, arm64-generic-sdknext-cq,...\n\nDid you notice a bug or UX issue with this retry? Please provide feedback: go/cros-auto-retry-bug.\n",
+      "revId": "c6de22d35d2a8463fd240e78a3df96d7fe4e1145",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
