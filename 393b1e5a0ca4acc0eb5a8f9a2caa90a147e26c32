@@ -33,6 +33,23 @@
       "message": "We need to modify src/third_party/zephyr/google-private/include/meru/project.conf \nto accommodate the config name changing \n\n1. \nPLATFORM_EC_LIGHTBAR_ANIMATION_HOLD_MS -\u003e PLATFORM_EC_LIGHTBAR_ANIMATION_EXTRA_HOLD_MS\n\n2. add `CONFIG_PLATFORM_EC_LIGHTBAR_HOST_CMD_ON_OFF\u003dy` in include/meru/project.conf to reflect https://chrome-internal-review.git.corp.google.com/c/chromeos/third_party/zephyr/google-private/+/9803876/2/Kconfig\n\nReference: https://chrome-internal-review.git.corp.google.com/c/chromeos/third_party/zephyr/google-private/+/9803876/2/include/quartz/project.conf",
       "revId": "393b1e5a0ca4acc0eb5a8f9a2caa90a147e26c32",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5e54b66_310c49fa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-10-12T14:04:35Z",
+      "side": 1,
+      "message": "Upload CL - crrev.com/i/9953035 in google-private to address the CQ failure",
+      "revId": "393b1e5a0ca4acc0eb5a8f9a2caa90a147e26c32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
