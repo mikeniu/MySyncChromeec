@@ -33,5 +33,3 @@ GPIO_TRANSPORT_SEL: Miscellaneous.Button @ gpio4 3
     -> gpio4@3
     init:
         ReleaseOnReset false
-
-fpsensor: Sensors.GenericSPISensor @ spip
