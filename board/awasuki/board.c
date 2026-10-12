@@ -178,11 +178,6 @@ const struct adc_t adc_channels[] = {
 };
 BUILD_ASSERT(ARRAY_SIZE(adc_channels) == ADC_CH_COUNT);
 
-int pd_snk_is_vbus_provided(int port)
-{
-	return pd_check_vbus_level(port, VBUS_PRESENT);
-}
-
 /* Charger chips */
 const struct charger_config_t chg_chips[] = {
 	{
