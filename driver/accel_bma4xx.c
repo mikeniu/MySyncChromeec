@@ -14,6 +14,7 @@
 #include "builtin/assert.h"
 #include "common.h"
 #include "console.h"
+#include "gpio.h"
 #include "hwtimer.h"
 #include "i2c.h"
 #include "math_util.h"
@@ -578,6 +579,8 @@ out:
 
 #ifdef BMA4XX_USE_INTERRUPTS
 static uint32_t last_irq_timestamp;
+/* GPIO that raised the interrupt, GPIO_COUNT until the first interrupt. */
+test_export_static volatile enum gpio_signal bma4xx_int_signal = GPIO_COUNT;
 
 static int bma4xx_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 {
@@ -608,7 +611,19 @@ out:
 test_mockable void bma4xx_interrupt(enum gpio_signal signal)
 {
 	last_irq_timestamp = __hw_clock_source_read();
+	bma4xx_int_signal = signal;
 	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ACCEL_BMA4XX_INT_EVENT);
+}
+
+/*
+ * INT1 is active low and latched until INT_STATUS is read. Return false
+ * only if the pin shows nothing pending.
+ */
+static bool irq_pin_asserted(void)
+{
+	if (bma4xx_int_signal == GPIO_COUNT)
+		return true;
+	return gpio_get_level(bma4xx_int_signal) == 0;
 }
 
 /* Process FIFO data read from accel and push data to host */
@@ -735,6 +750,17 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 			process_fifo_data(s, fifo_data, fifo_read,
 					  irq_timestamp);
 			read_any_data = true;
+		}
+
+		/*
+		 * Skip the status re-read if INT1 shows nothing is pending.
+		 * The status read above cleared the latch, so any new
+		 * interrupt raises the pin again.
+		 */
+		if (read_any_data && !irq_pin_asserted()) {
+			if (IS_ENABLED(CONFIG_ACCEL_FIFO))
+				motion_sense_fifo_commit_data();
+			return EC_SUCCESS;
 		}
 	}
 	CPRINTF("BMA4xx: irq 0x%04x stuck\n", interrupt_status_reg);
