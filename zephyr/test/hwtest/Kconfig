@@ -146,7 +146,7 @@ config HW_TEST_MALLOC
 config HW_TEST_OTP_KEY
 	bool "OTP key test"
 	depends on ZTEST
-	select MOCK_OTP
+	select MOCK_OTP if NPCX_OTP_KEY
 	help
 		The test verifies basic OTP key functionality
 
