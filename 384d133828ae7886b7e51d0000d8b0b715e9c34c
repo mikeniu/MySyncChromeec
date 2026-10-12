@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b537fe04_704e4122",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-12T17:25:10Z",
+      "side": 1,
+      "message": "Nit, out of scope: It looks like this macro is always defined when the built-in TCPC is enabled, which appears to be a precondition of building this driver. I don\u0027t see how one could reasonably use this component with this feature disabled. IMO, it would make more sense to drop this macro and do this unconditionally.",
+      "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a368a6b_b317e461",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-12T17:25:10Z",
+      "side": 1,
+      "message": "I think these cases are effectively missing from `it83xx_tcpm_switch_plug_out_type`, which treats CC open the same as Rp detected and I think does nothing in the powered-cable-only case. Would it be sufficient to add these cases to that function?\n\nAs far as the LPM debounce window goes, I think the TCPM should be actively checking in `check_drp_connection` before entering LPM. Is there a race window right as this detection setting changes?",
+      "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
