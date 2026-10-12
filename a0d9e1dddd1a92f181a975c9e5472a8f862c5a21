@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a00ce602_76d5821c",
+        "filename": "zephyr/shim/src/tasks.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T21:38:47Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: If `timeout_us` is `-1` (meaning `K_FOREVER`), `tick_deadline` may be calculated with a very large or wrapped-around value. Consequently, `ticks_left` could be `\u003c\u003d 0`, leading to a premature return of `TASK_EVENT_TIMER`.\n\nAdditionally, if `ticks_left \u003e 0`, `timeout` would be overwritten with `K_TICKS(ticks_left)`, meaning the task is no longer waiting forever.\n\nTo fix this, you should check `if (timeout_us !\u003d -1)` before evaluating the timeout deadline or overwriting the `timeout` variable, similar to how it is handled in `task_wait_event_mask()`:\n\n```c\n\t\tif (timeout_us !\u003d -1 \u0026\u0026 ticks_left \u003c\u003d 0) {\n\t\t\tevents |\u003d TASK_EVENT_TIMER;\n\t\t\tbreak;\n\t\t}\n\n\t\tif (timeout_us !\u003d -1) {\n\t\t\ttimeout \u003d K_TICKS(ticks_left);\n\t\t}\n```",
+      "range": {
+        "startLine": 252,
+        "startChar": 0,
+        "endLine": 252,
+        "endChar": 0
+      },
+      "revId": "a0d9e1dddd1a92f181a975c9e5472a8f862c5a21",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
