@@ -7,6 +7,7 @@
 
 #include "ec_tasks.h"
 #include "keyboard_raw.h"
+#include "keyboard_scan.h"
 #include "task.h"
 
 #include <assert.h>
@@ -138,8 +139,8 @@ static void cros_kb_raw_xec_ksi_isr(const void *arg)
 {
 	ARG_UNUSED(arg);
 	kb_raw_xec_clr_src();
-	/* Wake-up keyboard scan task */
-	task_wake(TASK_ID_KEYSCAN);
+	/* Wake-up keyboard scan thread */
+	keyboard_scan_thread_wake();
 }
 
 void keyboard_raw_init(void)

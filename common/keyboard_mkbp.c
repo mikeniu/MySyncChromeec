@@ -122,12 +122,12 @@ static void set_keyscan_config(const struct ec_mkbp_config *src,
 		ksc->debounce_up_us = src->debounce_up_us;
 
 	/*
-	 * If we just enabled key scanning, kick the task so that it will
-	 * fall out of the task_wait_event() in keyboard_scan_task().
+	 * If we just enabled key scanning, kick the thread so that it will
+	 * fall out of waiting in keyboard_scan_task().
 	 */
 	if ((new_flags & EC_MKBP_FLAGS_ENABLE) &&
 	    !(dst->flags & EC_MKBP_FLAGS_ENABLE))
-		task_wake(TASK_ID_KEYSCAN);
+		keyboard_scan_thread_wake();
 #endif
 }
 

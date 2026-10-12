@@ -8,6 +8,7 @@
 #include "ec_tasks.h"
 #include "gpio_it8xxx2.h"
 #include "keyboard_raw.h"
+#include "keyboard_scan.h"
 #include "task.h"
 
 #include <assert.h>
@@ -223,8 +224,8 @@ static void cros_kb_raw_ite_ksi_isr(void)
 	it8xxx2_wuc_clear_status(config->wuc_map_list[0].wucs,
 				 data->ksi_pin_mask);
 
-	/* Wake-up keyboard scan task */
-	task_wake(TASK_ID_KEYSCAN);
+	/* Wake-up keyboard scan thread */
+	keyboard_scan_thread_wake();
 }
 
 void keyboard_raw_init(void)

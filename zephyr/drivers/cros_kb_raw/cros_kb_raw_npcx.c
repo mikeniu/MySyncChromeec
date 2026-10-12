@@ -7,6 +7,7 @@
 
 #include "ec_tasks.h"
 #include "keyboard_raw.h"
+#include "keyboard_scan.h"
 #include "soc_miwu.h"
 #include "task.h"
 
@@ -152,8 +153,8 @@ static void cros_kb_raw_npcx_ksi_isr(const struct device *dev,
 	ARG_UNUSED(wui);
 
 	LOG_DBG("%s: KSI%d is changed", __func__, wui->bit);
-	/* Wake-up keyboard scan task */
-	task_wake(TASK_ID_KEYSCAN);
+	/* Wake-up keyboard scan thread */
+	keyboard_scan_thread_wake();
 }
 
 void keyboard_raw_init(void)

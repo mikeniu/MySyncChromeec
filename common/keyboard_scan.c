@@ -34,6 +34,8 @@
 
 #include <string.h>
 
+#include <zephyr/kernel.h>
+
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_KEYSCAN, outstr)
 #define CPRINTF(format, args...) cprintf(CC_KEYSCAN, format, ##args)
@@ -142,6 +144,13 @@ static volatile int force_poll;
 /* Indicates keyboard_scan_task has started. */
 test_export_static uint8_t keyboard_scan_task_started;
 
+static K_SEM_DEFINE(keyboard_scan_wake_sem, 0, 1);
+
+void keyboard_scan_thread_wake(void)
+{
+	k_sem_give(&keyboard_scan_wake_sem);
+}
+
 uint8_t keyboard_get_cols(void)
 {
 	return keyboard_cols;
@@ -173,7 +182,7 @@ void keyboard_scan_enable(int enable, enum kb_scan_disable_masks mask)
 	/* Using atomic_get() causes build errors on some archs */
 	if (old != disable_scanning_mask) {
 		/* If the mask has changed, let the task figure things out */
-		task_wake(TASK_ID_KEYSCAN);
+		keyboard_scan_thread_wake();
 	}
 }
 
@@ -293,7 +302,7 @@ static void simulate_key(int row, int col, int pressed)
 	force_poll = 1;
 
 	/* Wake the task to handle changes in simulated keys */
-	task_wake(TASK_ID_KEYSCAN);
+	keyboard_scan_thread_wake();
 
 	/*
 	 * Make sure that the keyboard task sees the key for long enough.
@@ -1169,7 +1178,7 @@ void keyboard_scan_task(void *u)
 				 */
 				boot_key_value &= BIT(BOOT_KEY_POWER);
 #endif /* CONFIG_KEYBOARD_BOOT_KEYS */
-				task_wait_event(-1);
+				k_sem_take(&keyboard_scan_wake_sem, K_FOREVER);
 			}
 		}
 
