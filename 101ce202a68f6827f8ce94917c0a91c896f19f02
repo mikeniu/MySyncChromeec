@@ -1,0 +1,48 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f16b4eed_d58927f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-12T08:50:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL** [[trajectory](http://go/tj/dde2f645-0bc0-48cb-a014-c9e6a15d11b3)]\n\n### Review Summary\n**Functionality**: Found one issue where the return value of `spi_flash_reg_to_protect` is ignored in `flash_set_status_for_prot`, which could lead to uninitialized state.\n**Style \u0026 Consistency**: Addressed in previous iterations.\n**Testing**: The CL still lacks automated tests for the new driver. As noted previously, even for hardware drivers, pure logic such as `flash_check_prot_reg` and `cros_flash_rtkfp_get_protect_flags` can and must be unit tested. Please add Zephyr tests under `zephyr/test/`.\n**CL Size \u0026 Scope**: `Size: L (+656, -0)`. This CL remains too large and bundles the hardware definitions with the driver implementation. It must be split into smaller, atomic CLs. Suggested split plan:\n- CL 1: Add the foundational definitions (`common/spi_flash_reg.c`) and configuration files (`Kconfig`, `prj.conf`, `flash_chip.h`).\n- CL 2: Introduce the `cros_flash_rtkfp` driver implementation along with its unit tests.\n\nTAG\u003dagy\nCONV\u003d91c1b594-50d0-4059-aad5-81a7ade94bbd",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "101ce202a68f6827f8ce94917c0a91c896f19f02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ff6ccff_739a69a8",
+        "filename": "zephyr/drivers/cros_flash/cros_flash_rtkfp.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-12T08:50:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] The return value of `spi_flash_reg_to_protect` is ignored here. If it returns an error (e.g., `EC_ERROR_INVAL`), `addr_prot_start` and `addr_prot_length` may remain uninitialized or hold stale values. Please propagate the error up to the caller.\n\n```c\n\trv \u003d spi_flash_reg_to_protect(sr1, sr2, \u0026data-\u003eaddr_prot_start,\n\t\t\t\t      \u0026data-\u003eaddr_prot_length);\n\tif (rv !\u003d EC_SUCCESS) {\n\t\treturn rv;\n\t}\n\treturn EC_SUCCESS;\n```\n[🔗](http://go/tj/dde2f645-0bc0-48cb-a014-c9e6a15d11b3)",
+      "range": {
+        "startLine": 142,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "101ce202a68f6827f8ce94917c0a91c896f19f02",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
