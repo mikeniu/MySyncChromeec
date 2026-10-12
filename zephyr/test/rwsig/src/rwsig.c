@@ -24,15 +24,18 @@ FAKE_VALUE_FUNC(int, system_is_locked);
 FAKE_VOID_FUNC(system_disable_jump);
 FAKE_VALUE_FUNC(int, system_run_image_copy, enum ec_image);
 FAKE_VALUE_FUNC(int, power_button_is_pressed);
+FAKE_VALUE_FUNC(enum ec_image, system_get_image_copy);
 
 #define FFF_FAKES_LIST(FAKE)              \
 	FAKE(system_get_rollback_version) \
 	FAKE(system_is_locked)            \
 	FAKE(system_disable_jump)         \
 	FAKE(system_run_image_copy)       \
-	FAKE(power_button_is_pressed)
+	FAKE(power_button_is_pressed)     \
+	FAKE(system_get_image_copy)
 
 int rwsig_check_signature(void);
+void rwsig_task(void *u);
 
 /*
  * Test data, generated from this key.
@@ -386,24 +389,28 @@ ZTEST(rwsig, test_rwsig_jump_now)
 	zassert_equal(system_run_image_copy_fake.call_count, 1);
 }
 
-#define TASK_EVENT_ABORT TASK_EVENT_CUSTOM_BIT(0)
-#define TASK_EVENT_CONTINUE TASK_EVENT_CUSTOM_BIT(1)
+#define RWSIG_EVENT_ABORT BIT(0)
+#define RWSIG_EVENT_CONTINUE BIT(1)
+
+extern struct k_event rwsig_event;
+extern enum rwsig_status rwsig_status;
 
 ZTEST(rwsig, test_hostcmd_rwsig_action)
 {
 	struct ec_params_rwsig_action param = { .action = RWSIG_ACTION_ABORT };
 	struct host_cmd_handler_args args =
 		BUILD_HOST_COMMAND_PARAMS(EC_CMD_RWSIG_ACTION, 0, param);
-	atomic_t *events = task_get_event_bitmap(TASK_ID_RWSIG);
 
-	*events = 0;
+	k_event_set(&rwsig_event, 0);
 	zassert_ok(host_command_process(&args));
-	zassert_equal(*events, TASK_EVENT_ABORT);
+	zassert_equal(k_event_test(&rwsig_event, UINT32_MAX),
+		      RWSIG_EVENT_ABORT);
 
-	*events = 0;
+	k_event_set(&rwsig_event, 0);
 	param.action = RWSIG_ACTION_CONTINUE;
 	zassert_ok(host_command_process(&args));
-	zassert_equal(*events, TASK_EVENT_CONTINUE);
+	zassert_equal(k_event_test(&rwsig_event, UINT32_MAX),
+		      RWSIG_EVENT_CONTINUE);
 
 	param.action = 99;
 	zassert_equal(host_command_process(&args), EC_RES_INVALID_PARAM);
@@ -503,8 +510,136 @@ static void rwsig_before(void *f)
 
 	FFF_FAKES_LIST(RESET_FAKE);
 	FFF_RESET_HISTORY();
+	cros_flash_emul_protect_reset();
+	rwsig_status = RWSIG_UNKNOWN;
 	system_get_rollback_version_fake.return_val = 1;
 	system_is_locked_fake.return_val = 1;
+	system_get_image_copy_fake.return_val = EC_IMAGE_RO;
+	system_clear_reset_flags(UINT32_MAX);
+	k_event_set(&rwsig_event, 0);
 }
 
-ZTEST_SUITE(rwsig, NULL, NULL, rwsig_before, NULL, NULL);
+static K_THREAD_STACK_DEFINE(rwsig_thread_stack, 2048);
+static struct k_thread rwsig_thread_data;
+static k_tid_t rwsig_tid;
+
+static void rwsig_after(void *f)
+{
+	if (rwsig_tid != NULL) {
+		k_thread_abort(rwsig_tid);
+		rwsig_tid = NULL;
+	}
+	cros_flash_emul_protect_reset();
+}
+
+ZTEST(rwsig, test_rwsig_task_continue)
+{
+	RESET_FAKE(system_run_image_copy);
+	cros_flash_emul_enable_protect();
+
+	rwsig_tid = k_thread_create(&rwsig_thread_data, rwsig_thread_stack,
+				    K_THREAD_STACK_SIZEOF(rwsig_thread_stack),
+				    (k_thread_entry_t)rwsig_task, NULL, NULL,
+				    NULL, K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
+
+	/* Allow rwsig_task to check signature and reach event wait */
+	k_sleep(K_MSEC(10));
+	zassert_equal(rwsig_get_status(), RWSIG_VALID);
+	zassert_equal(system_run_image_copy_fake.call_count, 0);
+
+	rwsig_continue();
+
+	/* Allow rwsig_task to wake, call rwsig_jump_now, and sleep */
+	k_sleep(K_MSEC(10));
+	zassert_equal(system_run_image_copy_fake.call_count, 1);
+	zassert_equal(rwsig_get_status(), RWSIG_VALID);
+}
+
+ZTEST(rwsig, test_rwsig_task_abort)
+{
+	RESET_FAKE(system_run_image_copy);
+
+	rwsig_tid = k_thread_create(&rwsig_thread_data, rwsig_thread_stack,
+				    K_THREAD_STACK_SIZEOF(rwsig_thread_stack),
+				    (k_thread_entry_t)rwsig_task, NULL, NULL,
+				    NULL, K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
+
+	/* Allow rwsig_task to check signature and reach event wait */
+	k_sleep(K_MSEC(10));
+	zassert_equal(rwsig_get_status(), RWSIG_VALID);
+	zassert_equal(system_run_image_copy_fake.call_count, 0);
+
+	rwsig_abort();
+
+	/* Allow rwsig_task to wake, abort, and sleep */
+	k_sleep(K_MSEC(10));
+	zassert_equal(system_run_image_copy_fake.call_count, 0);
+	zassert_equal(rwsig_get_status(), RWSIG_ABORTED);
+}
+
+ZTEST(rwsig, test_rwsig_task_timeout)
+{
+	RESET_FAKE(system_run_image_copy);
+	cros_flash_emul_enable_protect();
+
+	rwsig_tid = k_thread_create(&rwsig_thread_data, rwsig_thread_stack,
+				    K_THREAD_STACK_SIZEOF(rwsig_thread_stack),
+				    (k_thread_entry_t)rwsig_task, NULL, NULL,
+				    NULL, K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
+
+	/* Wait for jump timeout (1000ms) plus margin */
+	k_sleep(K_USEC(CONFIG_RWSIG_JUMP_TIMEOUT + 50 * USEC_PER_MSEC));
+
+	/* Verify jump now on timeout */
+	zassert_equal(system_run_image_copy_fake.call_count, 1);
+	zassert_equal(rwsig_get_status(), RWSIG_VALID);
+}
+
+ZTEST(rwsig, test_rwsig_task_not_ro)
+{
+	RESET_FAKE(system_run_image_copy);
+	system_get_image_copy_fake.return_val = EC_IMAGE_RW;
+
+	rwsig_tid = k_thread_create(&rwsig_thread_data, rwsig_thread_stack,
+				    K_THREAD_STACK_SIZEOF(rwsig_thread_stack),
+				    (k_thread_entry_t)rwsig_task, NULL, NULL,
+				    NULL, K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
+
+	k_sleep(K_MSEC(10));
+	zassert_equal(system_run_image_copy_fake.call_count, 0);
+	zassert_equal(rwsig_get_status(), RWSIG_UNKNOWN);
+}
+
+ZTEST(rwsig, test_rwsig_task_stay_in_ro)
+{
+	RESET_FAKE(system_run_image_copy);
+	system_set_reset_flags(EC_RESET_FLAG_STAY_IN_RO);
+
+	rwsig_tid = k_thread_create(&rwsig_thread_data, rwsig_thread_stack,
+				    K_THREAD_STACK_SIZEOF(rwsig_thread_stack),
+				    (k_thread_entry_t)rwsig_task, NULL, NULL,
+				    NULL, K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
+
+	k_sleep(K_MSEC(10));
+	zassert_equal(system_run_image_copy_fake.call_count, 0);
+	zassert_equal(rwsig_get_status(), RWSIG_ABORTED);
+}
+
+ZTEST(rwsig, test_rwsig_task_invalid_signature)
+{
+	RESET_FAKE(system_run_image_copy);
+	/* Corrupt signature */
+	crec_flash_physical_write(
+		CONFIG_EC_WRITABLE_STORAGE_OFF + RW_SIG_OFFSET, 1, "\xff");
+
+	rwsig_tid = k_thread_create(&rwsig_thread_data, rwsig_thread_stack,
+				    K_THREAD_STACK_SIZEOF(rwsig_thread_stack),
+				    (k_thread_entry_t)rwsig_task, NULL, NULL,
+				    NULL, K_PRIO_PREEMPT(1), 0, K_NO_WAIT);
+
+	k_sleep(K_MSEC(10));
+	zassert_equal(system_run_image_copy_fake.call_count, 0);
+	zassert_equal(rwsig_get_status(), RWSIG_INVALID);
+}
+
+ZTEST_SUITE(rwsig, NULL, NULL, rwsig_before, rwsig_after, NULL);

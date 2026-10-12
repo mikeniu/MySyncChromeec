@@ -24,6 +24,8 @@
 #include "vb21_struct.h"
 #include "vboot.h"
 
+#include <zephyr/kernel.h>
+
 /* Console output macros */
 #define CPRINTF(format, args...) cprintf(CC_SYSTEM, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_SYSTEM, format, ##args)
@@ -254,10 +256,11 @@ out:
 }
 
 #ifdef HAS_TASK_RWSIG
-#define TASK_EVENT_ABORT TASK_EVENT_CUSTOM_BIT(0)
-#define TASK_EVENT_CONTINUE TASK_EVENT_CUSTOM_BIT(1)
+#define RWSIG_EVENT_ABORT BIT(0)
+#define RWSIG_EVENT_CONTINUE BIT(1)
 
-static enum rwsig_status rwsig_status;
+test_export_static K_EVENT_DEFINE(rwsig_event);
+test_export_static enum rwsig_status rwsig_status;
 
 test_mockable enum rwsig_status rwsig_get_status(void)
 {
@@ -266,12 +269,12 @@ test_mockable enum rwsig_status rwsig_get_status(void)
 
 void rwsig_abort(void)
 {
-	task_set_event(TASK_ID_RWSIG, TASK_EVENT_ABORT);
+	k_event_post(&rwsig_event, RWSIG_EVENT_ABORT);
 }
 
 void rwsig_continue(void)
 {
-	task_set_event(TASK_ID_RWSIG, TASK_EVENT_CONTINUE);
+	k_event_post(&rwsig_event, RWSIG_EVENT_CONTINUE);
 }
 
 void rwsig_task(void *u)
@@ -295,18 +298,19 @@ void rwsig_task(void *u)
 	rwsig_status = RWSIG_VALID;
 
 	/* Jump to RW after a timeout */
-	evt = task_wait_event(CONFIG_RWSIG_JUMP_TIMEOUT);
+	evt = k_event_wait_safe(&rwsig_event,
+				RWSIG_EVENT_ABORT | RWSIG_EVENT_CONTINUE, false,
+				K_USEC(CONFIG_RWSIG_JUMP_TIMEOUT));
 
 	/* Jump now if we timed out, or were told to continue. */
-	if (evt == TASK_EVENT_TIMER || evt == TASK_EVENT_CONTINUE)
+	if (evt == 0 || evt == RWSIG_EVENT_CONTINUE)
 		rwsig_jump_now();
 	else
 		rwsig_status = RWSIG_ABORTED;
 
 exit:
 	/* We're done, yield forever. */
-	while (1)
-		task_wait_event(-1);
+	k_sleep(K_FOREVER);
 }
 
 static enum ec_host_cmd_status
