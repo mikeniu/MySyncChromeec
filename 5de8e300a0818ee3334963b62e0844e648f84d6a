@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7186e8b9_29fd34a5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-12T10:53:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n* **Functionality:** ✅ The state transition logic now correctly keeps the sensor active when waiting for a finger-up event, resolving the early low-power state issue.\n* **Architecture \u0026 Component Fit:** ✅ The logic is correctly encapsulated within the existing task event loop and properly leverages the sensor modes.\n* **Code Simplicity:** ✅ The changes are minimal and use straightforward control flow.\n* **Idiomaticity \u0026 Readability:** ✅ The C/C++ idioms are standard and match the existing codebase.\n* **Security:** ✅ No security vulnerabilities introduced.\n* **Testing:** ✅ The test suite was comprehensively updated to assert `low_power_mode` transitions on all relevant boundary paths, confirming the bug fix works as expected.\n* **CL Size \u0026 Scope:** ✅ Size: M (+60, -12). The CL is focused strictly on fixing the finger-up sensor mode issue and passes the Single Logical Change rule.\n* **Commit Message:** ✅ The description clearly explains the prior flawed behavior and the conceptual solution.\n\n[🔗](http://go/tj/ba4e6da8-4fda-4e2c-87e7-480bca5265dc)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
