@@ -16,6 +16,23 @@
       "message": "All failed projects: meru\n * ERROR: chromeos-base/chromeos-zephyr-4.5.0-r16120::chromiumos failed (compile phase):\n *   Failed to build aneto annite bluey meru mica pic quartz quenbi.\n * \n * Call stack:\n *               ebuild.sh, line  125:  Called src_compile\n *             environment, line 4985:  Called cros-zephyr-compile \u0027zephyr-ec\u0027\n *             environment, line 2234:  Called die\n * The specific snippet of code:\n *       run_zmake build -B \"build\" --version \"$(cros-version)\" --static \"${projects[@]}\" || die \"Failed to build ${projects[*]}.\"\n * \n * Build log: /build/bluey/tmp/portage/logs/chromeos-base:chromeos-zephyr-4.5.0-r16120:20261012-061749.log\n * Stable log symlink: /build/bluey/tmp/portage/chromeos-base/chromeos-zephyr-4.5.0-r16120/temp/build.log\n * CWD: /build/bluey/tmp/portage/chromeos-base/chromeos-zephyr-4.5.0-r16120/work/chromeos-zephyr-4.5.0\n * S:   /build/bluey/tmp/portage/chromeos-base/chromeos-zephyr-4.5.0-r16120/work/chromeos-zephyr-4.5.0",
       "revId": "393b1e5a0ca4acc0eb5a8f9a2caa90a147e26c32",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b76b358_e753cb48",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-10-12T11:56:25Z",
+      "side": 1,
+      "message": "We need to modify src/third_party/zephyr/google-private/include/meru/project.conf \nto accommodate the config name changing \n\n1. \nPLATFORM_EC_LIGHTBAR_ANIMATION_HOLD_MS -\u003e PLATFORM_EC_LIGHTBAR_ANIMATION_EXTRA_HOLD_MS\n\n2. add `CONFIG_PLATFORM_EC_LIGHTBAR_HOST_CMD_ON_OFF\u003dy` in include/meru/project.conf to reflect https://chrome-internal-review.git.corp.google.com/c/chromeos/third_party/zephyr/google-private/+/9803876/2/Kconfig\n\nReference: https://chrome-internal-review.git.corp.google.com/c/chromeos/third_party/zephyr/google-private/+/9803876/2/include/quartz/project.conf",
+      "revId": "393b1e5a0ca4acc0eb5a8f9a2caa90a147e26c32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
