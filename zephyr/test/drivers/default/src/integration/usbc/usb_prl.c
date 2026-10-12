@@ -21,13 +21,21 @@
 #include "util.h"
 
 #include <stdint.h>
+#include <stdlib.h>
 
+#include <zephyr/sys/byteorder.h>
 #include <zephyr/ztest.h>
 
 #define TEST_USB_PORT 0
 BUILD_ASSERT(TEST_USB_PORT == USBC_PORT_C0);
 
 #define TEST_ADDED_PDO PDO_FIXED(5000, 3000, PDO_FIXED_UNCONSTRAINED)
+
+/* Sizes of the PD message header and the extended message header, in bytes */
+#define MSG_HEADER_LEN 2
+#define MSG_EXT_HEADER_LEN 2
+/* Most data objects a PD message can carry */
+#define MSG_MAX_DATA_OBJECTS 7
 
 struct usb_prl_test_fixture {
 	struct tcpci_partner_data partner_emul;
@@ -111,6 +119,9 @@ static void usb_prl_test_before(void *data)
 static void usb_prl_test_after(void *data)
 {
 	struct usb_prl_test_fixture *fixture = data;
+
+	tcpci_partner_common_enable_pd_logging(&fixture->partner_emul, false);
+	tcpci_partner_common_clear_logged_msgs(&fixture->partner_emul);
 
 	if (fixture->partner_pd_role == PD_ROLE_SOURCE) {
 		disconnect_source_from_port(fixture->tcpci_emul,
@@ -277,6 +288,115 @@ ZTEST_F(usb_prl_test_sink, test_prl_hard_reset_and_recovery)
 /* =========================================================================
  * Source Tests
  * ========================================================================= */
+
+/**
+ * @brief Send chunk 0 of a chunked extended message of @p data_size bytes.
+ *
+ * The partner emulator only builds single-chunk extended messages, so build
+ * this one by hand. Allocate it the way the emulator does, because the
+ * emulator frees it after the TCPM consumes it.
+ */
+static void partner_send_first_chunk(struct tcpci_partner_data *partner,
+				     enum pd_ext_msg_type type,
+				     uint16_t data_size)
+{
+	const size_t size =
+		MSG_HEADER_LEN + MSG_MAX_DATA_OBJECTS * sizeof(uint32_t);
+	struct tcpci_partner_msg *msg;
+
+	msg = calloc(1, sizeof(*msg));
+	zassert_not_null(msg);
+	msg->msg.buf = calloc(1, size);
+	zassert_not_null(msg->msg.buf);
+
+	msg->msg.cnt = size;
+	msg->msg.sop_type = TCPCI_MSG_SOP;
+	msg->type = type;
+	msg->extended = true;
+	msg->data_objects = MSG_MAX_DATA_OBJECTS;
+	sys_put_le16(PD_EXT_HEADER(0, 0, data_size),
+		     &msg->msg.buf[MSG_HEADER_LEN]);
+
+	zassert_ok(tcpci_partner_send_msg(partner, msg, 0));
+}
+
+/** @brief Whether the partner's log holds a chunk request from the TCPM. */
+static bool tcpm_sent_chunk_request(struct tcpci_partner_data *partner)
+{
+	struct tcpci_partner_log_msg *msg;
+
+	SYS_SLIST_FOR_EACH_CONTAINER(&partner->msg_log, msg, node)
+	{
+		uint16_t header = sys_get_le16(msg->buf);
+		uint16_t ext_header;
+
+		if (msg->sender != TCPCI_PARTNER_SENDER_TCPM ||
+		    !PD_HEADER_EXT(header)) {
+			continue;
+		}
+
+		ext_header = sys_get_le16(msg->buf + MSG_HEADER_LEN);
+		if (PD_EXT_HEADER_REQ_CHUNK(ext_header)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/** @brief Whether the partner's log holds a control message from the TCPM. */
+static bool tcpm_sent_ctrl_msg(struct tcpci_partner_data *partner,
+			       enum pd_ctrl_msg_type type)
+{
+	struct tcpci_partner_log_msg *msg;
+
+	SYS_SLIST_FOR_EACH_CONTAINER(&partner->msg_log, msg, node)
+	{
+		uint16_t header = sys_get_le16(msg->buf);
+
+		if (msg->sender == TCPCI_PARTNER_SENDER_TCPM &&
+		    PD_HEADER_GET_SOP(header) == TCPCI_MSG_SOP &&
+		    PD_HEADER_CNT(header) == 0 && !PD_HEADER_EXT(header) &&
+		    PD_HEADER_TYPE(header) == type) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * @brief A non-extended message that arrives while the TCPM waits for the next
+ * chunk of an extended message is an "other message". The TCPM must abandon
+ * the chunked message, report a protocol error (so the PE sends Soft_Reset),
+ * and keep receiving.
+ *
+ * Ordering this test depends on: the non-extended message must reach the TCPM
+ * in RCH_WAITING_CHUNK. The partner emulator provides that without any timing
+ * in the test. It answers every message it does not implement with Reject, and
+ * the TCPM's request for chunk 1 of an unimplemented extended message type is
+ * such a message. The Reject is queued in the TCPC while the TCPM is still
+ * transmitting the chunk request, so it is the first message the TCPM dequeues
+ * after entering RCH_WAITING_CHUNK.
+ */
+ZTEST_F(usb_prl_test_source, test_prl_non_ext_msg_while_waiting_for_chunk)
+{
+	struct tcpci_partner_data *partner = &fixture->fixture.partner_emul;
+	int port = TEST_USB_PORT;
+
+	zassert_true(tc_is_attached_src(port));
+	tcpci_partner_common_enable_pd_logging(partner, true);
+
+	/* Chunk 0 of a two-chunk message: the TCPM must ask for chunk 1. */
+	partner_send_first_chunk(partner, PD_EXT_MANUFACTURER_INFO,
+				 2 * PD_MAX_EXTENDED_MSG_CHUNK_LEN);
+	k_sleep(K_MSEC(100));
+
+	zassert_true(tcpm_sent_chunk_request(partner));
+	zassert_false(prl_is_busy(port));
+	zassert_true(tcpm_sent_ctrl_msg(partner, PD_CTRL_SOFT_RESET));
+	zassert_true(prl_is_running(port));
+}
 
 /**
  * @brief Test sending chunked extended messages and chunk request handling.

@@ -1762,6 +1762,15 @@ static void rch_waiting_chunk_run(const int port)
 					      RCH_PROCESSING_EXTENDED_MESSAGE);
 			}
 		}
+		/*
+		 * Other (non-extended) Message Received from Protocol Layer.
+		 * PRL_FLAGS_MSG_RECEIVED stays set so that RCH_REPORT_ERROR
+		 * passes the message to the Policy Engine.
+		 */
+		else {
+			rch[port].error = ERR_RCH_CHUNKED;
+			set_state_rch(port, RCH_REPORT_ERROR);
+		}
 	}
 	/*
 	 * ChunkSenderResponseTimer Timeout
