@@ -133,13 +133,13 @@ enum {
 		   (CROS_EC_TASK(PD_C0, pd_task, 0, CONFIG_TASK_PD_STACK_SIZE, \
 				 EC_TASK_PD_C0_PRIO, 0)))                      \
 	IF_ENABLED(HAS_TASK_PD_C1,                                             \
-		   (CROS_EC_TASK(PD_C1, pd_task, 0, CONFIG_TASK_PD_STACK_SIZE, \
+		   (CROS_EC_TASK(PD_C1, pd_task, 1, CONFIG_TASK_PD_STACK_SIZE, \
 				 EC_TASK_PD_C1_PRIO, 0)))                      \
 	IF_ENABLED(HAS_TASK_PD_C2,                                             \
-		   (CROS_EC_TASK(PD_C2, pd_task, 0, CONFIG_TASK_PD_STACK_SIZE, \
+		   (CROS_EC_TASK(PD_C2, pd_task, 2, CONFIG_TASK_PD_STACK_SIZE, \
 				 EC_TASK_PD_C2_PRIO, 0)))                      \
 	IF_ENABLED(HAS_TASK_PD_C3,                                             \
-		   (CROS_EC_TASK(PD_C3, pd_task, 0, CONFIG_TASK_PD_STACK_SIZE, \
+		   (CROS_EC_TASK(PD_C3, pd_task, 3, CONFIG_TASK_PD_STACK_SIZE, \
 				 EC_TASK_PD_C3_PRIO, 0)))                      \
 	IF_ENABLED(CONFIG_HAS_TASK_PD_INT_SHARED,                              \
 		   (CROS_EC_TASK(PD_INT_SHARED, pd_shared_alert_task,          \

@@ -17,4 +17,5 @@ FAKE_VALUE_FUNC(task_id_t, task_get_current);
 FAKE_VOID_FUNC(task_set_event, task_id_t, uint32_t);
 FAKE_VALUE_FUNC(uint32_t, task_wait_event, int);
 FAKE_VALUE_FUNC(uint32_t, task_wait_event_mask, uint32_t, int);
+FAKE_VALUE_FUNC(int, pd_get_current_thread_port);
 /* LCOV_EXCL_STOP */
