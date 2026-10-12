@@ -212,39 +212,49 @@ uint32_t task_wait_event(int timeout_us)
 
 	__ASSERT_NO_MSG(data != NULL);
 
-	const k_timeout_t timeout = (timeout_us == -1) ? K_FOREVER :
-							 K_USEC(timeout_us);
+	k_timeout_t timeout = (timeout_us == -1) ? K_FOREVER :
+						   K_USEC(timeout_us);
 	const int64_t tick_deadline =
 		k_uptime_ticks() + k_us_to_ticks_near64(timeout_us);
+	uint32_t events;
 
-	struct k_poll_event poll_events[1] = {
-		K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL,
-					 K_POLL_MODE_NOTIFY_ONLY,
-					 &data->new_event),
-	};
+	while (true) {
+		struct k_poll_event poll_events[1] = {
+			K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_SIGNAL,
+						 K_POLL_MODE_NOTIFY_ONLY,
+						 &data->new_event),
+		};
 
-	/* Wait for signal, then clear it before reading events */
-	const int rv = k_poll(poll_events, ARRAY_SIZE(poll_events), timeout);
+		/* Wait for signal, then clear it before reading events */
+		const int rv =
+			k_poll(poll_events, ARRAY_SIZE(poll_events), timeout);
 
-	k_poll_signal_reset(&data->new_event);
-	uint32_t events = atomic_set(&data->event_mask, 0);
+		k_poll_signal_reset(&data->new_event);
+		events = atomic_set(&data->event_mask, 0);
 
-	if (rv == -EAGAIN) {
-		events |= TASK_EVENT_TIMER;
-	}
+		if (rv == -EAGAIN) {
+			events |= TASK_EVENT_TIMER;
+		}
 
-	/* If we didn't get an event, we need to wait again. There is a very
-	 * small chance of us reading the event_mask one signaled event too
-	 * early. In that case, just wait again for the remaining timeout
-	 */
-	if (events == 0) {
-		const int64_t ticks_left = tick_deadline - k_uptime_ticks();
+		if (events) {
+			break;
+		}
 
-		events |= TASK_EVENT_TIMER;
+		/* If we didn't get an event, we need to wait again. There is a
+		 * very small chance of us reading the event_mask one signaled
+		 * event too early. In that case, just wait again for the
+		 * remaining timeout
+		 */
+		if (!K_TIMEOUT_EQ(timeout, K_FOREVER)) {
+			const int64_t ticks_left =
+				tick_deadline - k_uptime_ticks();
 
-		if (ticks_left > 0) {
-			return task_wait_event(
-				k_ticks_to_us_near64(ticks_left));
+			if (ticks_left <= 0) {
+				events |= TASK_EVENT_TIMER;
+				break;
+			}
+
+			timeout = K_TICKS(ticks_left);
 		}
 	}
 

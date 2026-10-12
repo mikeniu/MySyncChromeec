@@ -208,24 +208,26 @@ ZTEST(test_task_shim, test_event_mask_extra)
 
 static void empty_set_mask1(void)
 {
-	k_sleep(K_SECONDS(1));
-	/*
-	 * It is generally invalid to set a 0 event, but this simulates a race
-	 * condition and exercises fallback code in task_wait_event
-	 */
-	task_set_event(TASK_ID_TASK_2, 0);
-	k_sleep(K_SECONDS(1));
-	task_set_event(TASK_ID_TASK_2, 0x1234);
-}
-
-static void empty_set_mask2(void)
-{
 	const uint32_t start_ms = k_uptime_get();
 	const uint32_t events = task_wait_event_mask(0x1234, TASK_SEC(10));
 	const uint32_t end_ms = k_uptime_get();
 
 	zassert_equal(events, 0x1234, "Verify only waited for event");
 	zassert_within(end_ms - start_ms, 2000, 100, "Timeout for 2 seconds");
+}
+
+static void empty_set_mask2(void)
+{
+	k_sleep(K_SECONDS(1));
+	/*
+	 * It is generally invalid to set a 0 event, but this simulates a race
+	 * condition and exercises fallback code in task_wait_event
+	 */
+	for (int i = 0; i < 100000; i++) {
+		task_set_event(TASK_ID_TASK_1, 0);
+	}
+	k_sleep(K_SECONDS(1));
+	task_set_event(TASK_ID_TASK_1, 0x1234);
 }
 
 ZTEST(test_task_shim, test_empty_set_mask)
@@ -239,6 +241,41 @@ ZTEST(test_task_shim, test_event_mask_zero_timeout)
 	zassert_equal(task_wait_event_mask(0x0001, 0), 0x0001);
 	zassert_equal(task_wait_event_mask(0x0001, 0), TASK_EVENT_TIMER);
 	zassert_equal(task_wait_event_mask(0x0002, 0), 0x0002);
+}
+
+static void empty_set_event1(void)
+{
+	const uint32_t start_ms = k_uptime_get();
+	const uint32_t events = task_wait_event(TASK_SEC(10));
+	const uint32_t end_ms = k_uptime_get();
+
+	zassert_equal(events, 0x1234, "Verify only waited for event");
+	zassert_within(end_ms - start_ms, 2000, 100, "Timeout for 2 seconds");
+
+	/* Exercise empty event wakeup when deadline has already expired */
+	task_set_event(TASK_ID_TASK_1, 0);
+	zassert_equal(task_wait_event(0), TASK_EVENT_TIMER,
+		      "Should return timer event on expired deadline");
+}
+
+ZTEST(test_task_shim, test_empty_set_event)
+{
+	run_test(&empty_set_event1, &empty_set_mask2);
+}
+
+static void empty_set_event_forever1(void)
+{
+	const uint32_t start_ms = k_uptime_get();
+	const uint32_t events = task_wait_event(-1);
+	const uint32_t end_ms = k_uptime_get();
+
+	zassert_equal(events, 0x1234, "Verify only waited for event");
+	zassert_within(end_ms - start_ms, 2000, 100, "Timeout for 2 seconds");
+}
+
+ZTEST(test_task_shim, test_empty_set_event_forever)
+{
+	run_test(&empty_set_event_forever1, &empty_set_mask2);
 }
 
 static bool pre_kernel_ran = false;
