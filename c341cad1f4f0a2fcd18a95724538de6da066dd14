@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b94238d_8284ba2e",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1578,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-12T21:35:57Z",
+      "side": 1,
+      "message": "This seems correct, but I might have thought that this would be caught by the above check for sufficient battery or at least the one above that for brownout. The way we enumerate these cases seems a little haphazard. Maybe we\u0027re missing another one.",
+      "revId": "c341cad1f4f0a2fcd18a95724538de6da066dd14",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
