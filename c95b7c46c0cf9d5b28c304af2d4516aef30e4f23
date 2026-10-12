@@ -70,6 +70,24 @@
       "parentUuid": "ee924333_20ba1c0c",
       "revId": "c95b7c46c0cf9d5b28c304af2d4516aef30e4f23",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4651d64_720b8977",
+        "filename": "common/usb_common.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 845,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T22:53:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "508872f2_13f286b0",
+      "revId": "c95b7c46c0cf9d5b28c304af2d4516aef30e4f23",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }

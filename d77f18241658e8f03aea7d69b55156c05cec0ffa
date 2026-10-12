@@ -33,6 +33,24 @@
       "message": "This is supposed to be for \"invalid argument.\" Maybe `EC_ERROR_UNAVAILABLE` would make more sense? Not that any of the callers will care.",
       "revId": "d77f18241658e8f03aea7d69b55156c05cec0ffa",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a82b81d9_f02653bd",
+        "filename": "common/usb_common.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T22:53:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "377edcfd_910d91a0",
+      "revId": "d77f18241658e8f03aea7d69b55156c05cec0ffa",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
