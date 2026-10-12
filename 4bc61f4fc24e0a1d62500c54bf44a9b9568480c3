@@ -16,6 +16,24 @@
       "message": "Maybe remove this CL from this CL chain so we can reduce the number of CLs?",
       "revId": "4bc61f4fc24e0a1d62500c54bf44a9b9568480c3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef4bfa92_57e50bed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-12T08:27:48Z",
+      "side": 1,
+      "message": "If I remove the CL now, I\u0027ll break flash readout protection. This CL can be removed once https://github.com/zephyrproject-rtos/zephyr/pull/121484 is merged, flows downstream and the zephyrproject CL chain is rebased on top of that.",
+      "parentUuid": "0fbe766a_ecae1c75",
+      "revId": "4bc61f4fc24e0a1d62500c54bf44a9b9568480c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
