@@ -20,12 +20,12 @@
 #include "timer.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
+
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_HOSTCMD, outstr)
 #define CPRINTF(format, args...) cprintf(CC_HOSTCMD, format, ##args)
 #define CPRINTS(format, args...) cprints(CC_HOSTCMD, format, ##args)
-
-#define TASK_EVENT_CMD_PENDING TASK_EVENT_CUSTOM_BIT(0)
 
 /* Maximum delay to skip printing repeated host command debug output */
 #define HCDEBUG_MAX_REPEAT_DELAY (50 * MSEC)
@@ -34,6 +34,7 @@
 #define HCDEBUG_MAX_REPEAT_COUNT 5
 
 static struct host_cmd_handler_args *pending_args;
+static K_SEM_DEFINE(host_command_wake_sem, 0, 1);
 
 static enum {
 	HCDEBUG_OFF, /* No host command debug output */
@@ -163,8 +164,8 @@ void host_command_received(struct host_cmd_handler_args *args)
 		/* Save the command */
 		pending_args = args;
 
-		/* Wake up the task to handle the command */
-		task_set_event(TASK_ID_HOSTCMD, TASK_EVENT_CMD_PENDING);
+		/* Wake up the thread to handle the command */
+		k_sem_give(&host_command_wake_sem);
 		return;
 	}
 
@@ -353,12 +354,12 @@ void host_command_task(void *u)
 
 	while (1) {
 		/* Wait for the next command event */
-		int evt = task_wait_event(-1);
+		k_sem_take(&host_command_wake_sem, K_FOREVER);
 
 		t0 = get_time();
 
 		/* Process it */
-		if ((evt & TASK_EVENT_CMD_PENDING) && pending_args) {
+		if (pending_args) {
 			pending_args->result =
 				host_command_process(pending_args);
 			host_send_response(pending_args);
