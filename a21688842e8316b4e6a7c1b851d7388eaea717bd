@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33dba8d6_450ef2b4",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-12T08:58:06Z",
+      "side": 1,
+      "message": "Why are you preventing the low-power mode here?",
+      "revId": "a21688842e8316b4e6a7c1b851d7388eaea717bd",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
