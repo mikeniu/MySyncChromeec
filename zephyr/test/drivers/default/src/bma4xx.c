@@ -8,6 +8,8 @@
 #include "driver/accel_bma4xx.h"
 #include "emul/emul_bma4xx.h"
 #include "emul/emul_common_i2c.h"
+#include "gpio.h"
+#include "gpio/gpio.h"
 #include "i2c.h"
 #include "motion_sense.h"
 #include "motion_sense_fifo.h"
@@ -23,7 +25,18 @@
 
 LOG_MODULE_REGISTER(test_bma4xx, LOG_LEVEL_INF);
 
-ZTEST_SUITE(bma4xx, drivers_predicate_post_main, NULL, NULL, NULL, NULL);
+extern volatile enum gpio_signal bma4xx_int_signal;
+
+static void bma4xx_before(void *fixture)
+{
+	ARG_UNUSED(fixture);
+
+	/* Unknown INT1 pin: always re-read the status. */
+	bma4xx_int_signal = GPIO_COUNT;
+}
+
+ZTEST_SUITE(bma4xx, drivers_predicate_post_main, NULL, bma4xx_before, NULL,
+	    NULL);
 
 static int read_wrong_chip_id(const struct emul *target, int reg, uint8_t *val,
 			      int bytes, void *data)
@@ -276,6 +289,152 @@ ZTEST_USER(bma4xx, test_interrupt)
 		      host_data[3].data[1]);
 	zassert_equal(host_data[3].data[2], 1 << 4, "Z accel was %d",
 		      host_data[3].data[2]);
+}
+
+/** Count read transfers by start register */
+struct irq_read_count {
+	int int_status_reads;
+	int fifo_length_reads;
+	int fifo_data_reads;
+};
+
+static int count_read_byte(const struct emul *emul, int reg, uint8_t *val,
+			   int bytes, void *ctx)
+{
+	struct irq_read_count *c = ctx;
+
+	if (bytes == 0) {
+		if (reg == BMA4_INT_STATUS_1)
+			c->int_status_reads++;
+		else if (reg == BMA4_FIFO_LENGTH_0_ADDR)
+			c->fifo_length_reads++;
+		else if (reg == BMA4_FIFO_DATA_ADDR)
+			c->fifo_data_reads++;
+	}
+	/* Fall through to the default emulator handling. */
+	return 1;
+}
+
+ZTEST_USER(bma4xx, test_irq_reads_status_and_fifo_length_together)
+{
+	const uint8_t one_frame_data[6] = { 4 << 4, 0, 0, 0, 0, 0 };
+	uint32_t evt = CONFIG_ACCEL_BMA4XX_INT_EVENT;
+	struct irq_read_count count = { 0 };
+
+	zassert_ok(bma4_accel_drv.init(SENSOR));
+	SENSOR->oversampling_ratio = 1;
+
+	bma4xx_emul_set_fifo_data(EMUL, one_frame_data, sizeof(one_frame_data));
+	i2c_common_emul_set_read_func(bma4xx_emul_get_i2c(EMUL),
+				      count_read_byte, &count);
+	zassert_ok(bma4_accel_drv.irq_handler(SENSOR, &evt));
+	i2c_common_emul_set_read_func(bma4xx_emul_get_i2c(EMUL), NULL, NULL);
+
+	/*
+	 * The frame comes with the status burst, then one status re-check
+	 * reads 0.
+	 */
+	zassert_equal(count.int_status_reads, 2);
+	zassert_equal(count.fifo_data_reads, 0);
+	/* The FIFO length comes from the status burst. */
+	zassert_equal(count.fifo_length_reads, 0);
+}
+
+/*
+ * Report one frame in the FIFO length of the status burst, so that a frame
+ * is still pending at the status re-check.
+ */
+static int short_burst_read_byte(const struct emul *emul, int reg, uint8_t *val,
+				 int bytes, void *ctx)
+{
+	count_read_byte(emul, reg, val, bytes, ctx);
+
+	if (reg == BMA4_INT_STATUS_1 &&
+	    bytes == BMA4_FIFO_LENGTH_0_ADDR - BMA4_INT_STATUS_1) {
+		*val = 6;
+		return 0;
+	}
+	if (reg == BMA4_INT_STATUS_1 &&
+	    bytes == BMA4_FIFO_LENGTH_0_ADDR + 1 - BMA4_INT_STATUS_1) {
+		*val = 0;
+		return 0;
+	}
+	return 1;
+}
+
+static const uint8_t two_zero_frames_data[12] = { 4 << 4, 0, 0, 0, 0, 0,
+						  4 << 4, 0, 0, 0, 0, 0 };
+
+ZTEST_USER(bma4xx, test_irq_recheck_still_pending)
+{
+	uint32_t evt = CONFIG_ACCEL_BMA4XX_INT_EVENT;
+	struct irq_read_count count = { 0 };
+
+	zassert_ok(bma4_accel_drv.init(SENSOR));
+	SENSOR->oversampling_ratio = 1;
+
+	bma4xx_emul_set_fifo_data(EMUL, two_zero_frames_data,
+				  sizeof(two_zero_frames_data));
+	i2c_common_emul_set_read_func(bma4xx_emul_get_i2c(EMUL),
+				      short_burst_read_byte, &count);
+	zassert_ok(bma4_accel_drv.irq_handler(SENSOR, &evt));
+	i2c_common_emul_set_read_func(bma4xx_emul_get_i2c(EMUL), NULL, NULL);
+
+	/*
+	 * Each frame comes with a status burst, then a status re-check reads
+	 * 0.
+	 */
+	zassert_equal(count.int_status_reads, 3);
+	zassert_equal(count.fifo_data_reads, 0);
+	/* Every FIFO length comes from a status burst. */
+	zassert_equal(count.fifo_length_reads, 0);
+}
+
+/* Use GPIO_TEST as the INT1 pin and drive it to a raw level. */
+static void set_int1_pin(int level)
+{
+	const struct gpio_dt_spec *gp = GPIO_DT_FROM_NODELABEL(gpio_test);
+
+	bma4xx_int_signal = GPIO_SIGNAL(DT_NODELABEL(gpio_test));
+	zassert_ok(gpio_pin_set_dt(gp, level));
+}
+
+static void run_irq_with_int1_level(struct irq_read_count *count, int level)
+{
+	const uint8_t one_frame_data[6] = { 4 << 4, 0, 0, 0, 0, 0 };
+	uint32_t evt = CONFIG_ACCEL_BMA4XX_INT_EVENT;
+
+	zassert_ok(bma4_accel_drv.init(SENSOR));
+	SENSOR->oversampling_ratio = 1;
+
+	bma4xx_emul_set_fifo_data(EMUL, one_frame_data, sizeof(one_frame_data));
+	set_int1_pin(level);
+	i2c_common_emul_set_read_func(bma4xx_emul_get_i2c(EMUL),
+				      count_read_byte, count);
+	zassert_ok(bma4_accel_drv.irq_handler(SENSOR, &evt));
+	i2c_common_emul_set_read_func(bma4xx_emul_get_i2c(EMUL), NULL, NULL);
+}
+
+ZTEST_USER(bma4xx, test_irq_int1_deasserted_skips_recheck)
+{
+	struct irq_read_count count = { 0 };
+
+	/* INT1 is active low: high means nothing is pending. */
+	run_irq_with_int1_level(&count, 1);
+
+	zassert_equal(count.int_status_reads, 1);
+	zassert_equal(count.fifo_data_reads, 0);
+}
+
+ZTEST_USER(bma4xx, test_irq_int1_asserted_rechecks)
+{
+	struct irq_read_count count = { 0 };
+
+	run_irq_with_int1_level(&count, 0);
+
+	/* The re-check reads the status, which is now 0. */
+	zassert_equal(count.int_status_reads, 2);
+	zassert_equal(count.fifo_data_reads, 0);
 }
 
 /**

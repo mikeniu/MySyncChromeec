@@ -14,6 +14,7 @@
 #include "builtin/assert.h"
 #include "common.h"
 #include "console.h"
+#include "gpio.h"
 #include "hwtimer.h"
 #include "i2c.h"
 #include "math_util.h"
@@ -584,6 +585,8 @@ out:
 
 #ifdef BMA4XX_USE_INTERRUPTS
 static uint32_t last_irq_timestamp;
+/* GPIO that raised the interrupt, GPIO_COUNT until the first interrupt. */
+test_export_static volatile enum gpio_signal bma4xx_int_signal = GPIO_COUNT;
 
 static int bma4xx_enable_interrupt(const struct motion_sensor_t *s, bool enable)
 {
@@ -614,7 +617,19 @@ out:
 test_mockable void bma4xx_interrupt(enum gpio_signal signal)
 {
 	last_irq_timestamp = __hw_clock_source_read();
+	bma4xx_int_signal = signal;
 	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ACCEL_BMA4XX_INT_EVENT);
+}
+
+/*
+ * INT1 is active low and latched until INT_STATUS is read. Return false
+ * only if the pin shows nothing pending.
+ */
+static bool irq_pin_asserted(void)
+{
+	if (bma4xx_int_signal == GPIO_COUNT)
+		return true;
+	return gpio_get_level(bma4xx_int_signal) == 0;
 }
 
 /* Process FIFO data read from accel and push data to host */
@@ -652,12 +667,24 @@ static void process_fifo_data(struct motion_sensor_t *s, uint8_t *data,
 	}
 }
 
+/* Status bytes read by irq_handler(): INT_STATUS_1 .. FIFO_LENGTH_1. */
+#define BMA4_IRQ_STATUS_BYTES (BMA4_FIFO_DATA_ADDR - BMA4_INT_STATUS_1)
+/* FIFO bytes read in the same burst: one headerless accel frame. */
+#define BMA4_IRQ_FIFO_BYTES 6
+
 /* Handle interrupt in task context */
 static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 {
 	uint32_t irq_timestamp = last_irq_timestamp;
 	bool read_any_data = false;
-	int interrupt_status_reg, fifo_depth;
+	/*
+	 * Burst read from INT_STATUS_1 into FIFO_DATA. The registers up to
+	 * FIFO_LENGTH_1 come back first. FIFO_DATA does not auto-increment,
+	 * so the rest of the burst reads the first FIFO frame, which is
+	 * usually all that is pending.
+	 */
+	uint8_t regs[BMA4_IRQ_STATUS_BYTES + BMA4_IRQ_FIFO_BYTES];
+	int interrupt_status_reg = 0, fifo_depth;
 
 	if ((!(*event & CONFIG_ACCEL_BMA4XX_INT_EVENT)) ||
 	    motion_sensor_in_forced_mode(s)) {
@@ -676,9 +703,16 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 	 * pending.
 	 */
 	for (int i = 0; i < 200; i++) {
+		int ret;
+
 		/* Read interrupt status, also clears pending IRQs */
-		RETURN_ERROR(bma4_read8(s, BMA4_INT_STATUS_1,
-					&interrupt_status_reg));
+		mutex_lock(s->mutex);
+		ret = i2c_read_block(s->port, s->i2c_spi_addr_flags,
+				     BMA4_INT_STATUS_1, regs, sizeof(regs));
+		mutex_unlock(s->mutex);
+		if (ret)
+			return ret;
+		interrupt_status_reg = regs[0];
 		if ((interrupt_status_reg & (BMA4_FFULL_INT | BMA4_FWM_INT |
 					     BMA4_ACC_DRDY_INT)) == 0) {
 			if (!read_any_data)
@@ -688,12 +722,26 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 			return EC_SUCCESS;
 		}
 
-		RETURN_ERROR(
-			bma4_read16(s, BMA4_FIFO_LENGTH_0_ADDR, &fifo_depth));
+		fifo_depth =
+			regs[BMA4_FIFO_LENGTH_0_ADDR - BMA4_INT_STATUS_1] |
+			(regs[BMA4_FIFO_LENGTH_0_ADDR + 1 - BMA4_INT_STATUS_1]
+			 << 8);
+
+		/*
+		 * Process the frame from the burst. If the FIFO was empty, it
+		 * reads as 0x8000, which process_fifo_data() skips.
+		 */
+		if (fifo_depth > 0) {
+			process_fifo_data(s, &regs[BMA4_IRQ_STATUS_BYTES],
+					  BMA4_IRQ_FIFO_BYTES, irq_timestamp);
+			fifo_depth -= BMA4_IRQ_FIFO_BYTES;
+			read_any_data = true;
+		}
+
+		/* Read whatever did not fit in the burst. */
 		while (fifo_depth > 0) {
 			uint8_t fifo_data[FIFO_BUFFER_SIZE];
 			int fifo_read = min(ARRAY_SIZE(fifo_data), fifo_depth);
-			int ret;
 
 			mutex_lock(s->mutex);
 			ret = i2c_read_block(s->port, s->i2c_spi_addr_flags,
@@ -707,6 +755,17 @@ static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 			process_fifo_data(s, fifo_data, fifo_read,
 					  irq_timestamp);
 			read_any_data = true;
+		}
+
+		/*
+		 * Skip the status re-read if INT1 shows nothing is pending.
+		 * The status read above cleared the latch, so any new
+		 * interrupt raises the pin again.
+		 */
+		if (read_any_data && !irq_pin_asserted()) {
+			if (IS_ENABLED(CONFIG_ACCEL_FIFO))
+				motion_sense_fifo_commit_data();
+			return EC_SUCCESS;
 		}
 	}
 	CPRINTF("BMA4xx: irq 0x%04x stuck\n", interrupt_status_reg);
