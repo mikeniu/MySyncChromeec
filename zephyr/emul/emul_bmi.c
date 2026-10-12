@@ -1101,7 +1101,15 @@ uint8_t bmi_emul_get_fifo_data(const struct emul *emul, int byte, bool tag_time,
 					   header, acc_shift, gyr_shift);
 	}
 
-	return data->fifo[data->fifo_frame_byte++];
+	ret = data->fifo[data->fifo_frame_byte++];
+	if (data->fifo_frame != NULL &&
+	    data->fifo_frame_byte >= data->fifo_frame_len) {
+		data->fifo_frame = data->fifo_frame->next;
+		bmi_emul_set_current_frame(emul, data->fifo_frame, tag_time,
+					   header, acc_shift, gyr_shift);
+	}
+
+	return ret;
 }
 
 /**
