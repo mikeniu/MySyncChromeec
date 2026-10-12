@@ -24,6 +24,8 @@
 
 #include <stdint.h>
 
+#include <zephyr/kernel.h>
+
 #define K_MORE_PWR 96
 #define K_LESS_PWR 93
 #define K_SAMPLE 1
@@ -41,6 +43,7 @@ BUILD_ASSERT(K_MORE_PWR > K_LESS_PWR && 100 >= K_MORE_PWR && 100 >= K_LESS_PWR);
 
 /* lock for updating timeout value */
 static K_MUTEX_DEFINE(dps_lock);
+static K_SEM_DEFINE(dps_wake_sem, 0, 1);
 static timestamp_t timeout;
 static bool is_enabled = true;
 static int debug_level;
@@ -83,6 +86,11 @@ bool dps_is_enabled(void)
 	return is_enabled;
 }
 
+void dps_thread_wake(void)
+{
+	k_sem_give(&dps_wake_sem);
+}
+
 test_export_static void dps_enable(bool en)
 {
 	bool prev_en = is_enabled;
@@ -90,7 +98,7 @@ test_export_static void dps_enable(bool en)
 	is_enabled = en;
 
 	if (is_enabled && !prev_en) {
-		task_wake(TASK_ID_DPS);
+		dps_thread_wake();
 	}
 
 	if (!is_enabled) {
@@ -498,14 +506,15 @@ void dps_task(void *u)
 		now = get_time();
 		if (flag & DPS_FLAG_STOP_EVENTS) {
 			dps_reset();
-			task_wait_event(-1);
+			k_sem_take(&dps_wake_sem, K_FOREVER);
 			/* clear flags after wake up. */
 			atomic_clear(&flag);
 			update_timeout(dps_config.t_check);
 			continue;
 		} else if (now.val < timeout.val) {
 			atomic_or(&flag, DPS_FLAG_WAITING);
-			task_wait_event(timeout.val - now.val);
+			k_sem_take(&dps_wake_sem,
+				   K_USEC(timeout.val - now.val));
 			atomic_clear_bits(&flag, DPS_FLAG_WAITING);
 			continue;
 		}
@@ -560,7 +569,7 @@ void check_battery_present(void)
 
 	if (batt->is_present == BP_YES && (flag & DPS_FLAG_NO_BATTERY)) {
 		atomic_clear_bits(&flag, DPS_FLAG_NO_BATTERY);
-		task_wake(TASK_ID_DPS);
+		dps_thread_wake();
 	}
 }
 DECLARE_HOOK(HOOK_BATTERY_SOC_CHANGE, check_battery_present, HOOK_PRIO_DEFAULT);

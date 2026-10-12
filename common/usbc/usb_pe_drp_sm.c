@@ -3571,8 +3571,8 @@ static void pe_snk_evaluate_capability_entry(int port)
 	set_state_pe(port, PE_SNK_SELECT_CAPABILITY);
 
 #ifdef HAS_TASK_DPS
-	/* Wake DPS task to evaluate the SrcCaps */
-	task_wake(TASK_ID_DPS);
+	/* Wake DPS thread to evaluate the SrcCaps */
+	dps_thread_wake();
 #endif
 }
 

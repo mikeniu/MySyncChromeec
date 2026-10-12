@@ -79,6 +79,11 @@ bool dps_is_enabled(void);
  */
 void dps_update_stabilized_time(int port);
 
+/*
+ * Wake the DPS thread.
+ */
+void dps_thread_wake(void);
+
 #ifdef TEST_BUILD
 __test_only void dps_enable(bool en);
 __test_only int dps_init(void);
