@@ -11,12 +11,15 @@
 #include "common.h"
 #include "console.h"
 #include "ec_commands.h"
-#include "task.h"
 #include "timer.h"
 #include "usb_pd.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
+
 #define CPRINTS(format, args...) cprints(CC_USBCHARGE, format, ##args)
+
+static K_SEM_DEFINE(chg_ramp_wake_sem, 0, 1);
 
 /* Number of times to ramp current searching for limit before stable charging */
 #define RAMP_COUNT 3
@@ -113,7 +116,7 @@ void chg_ramp_charge_supplier_change(int port, int supplier, int current,
 				  CHG_RAMP_DISCONNECTED :
 				  CHG_RAMP_CHARGE_DETECT_DELAY;
 		CPRINTS("Ramp reset: st%d", ramp_st);
-		task_wake(TASK_ID_CHG_RAMP);
+		k_sem_give(&chg_ramp_wake_sem);
 	}
 }
 
@@ -167,7 +170,7 @@ void chg_ramp_task(void *u)
 	 * board_set_charge_limit by itself (if there is no chg_ramp_task).
 	 */
 	if (!IS_ENABLED(TEST_BUILD))
-		task_wait_event(-1);
+		k_sem_take(&chg_ramp_wake_sem, K_FOREVER);
 
 	while (1) {
 		ramp_st_new = ramp_st;
@@ -352,7 +355,9 @@ void chg_ramp_task(void *u)
 			 */
 			crec_usleep(task_wait_time);
 		else
-			task_wait_event(task_wait_time);
+			k_sem_take(&chg_ramp_wake_sem,
+				   task_wait_time < 0 ? K_FOREVER :
+							K_USEC(task_wait_time));
 	}
 }
 
