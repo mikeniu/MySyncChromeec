@@ -16,6 +16,29 @@
       "message": "Fix also applies to main.",
       "revId": "7d0efa64d17b15d87bfaa60f2d98f6ace4433f90",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2255060_863f2743",
+        "filename": "driver/accel_lis2dw12.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T16:32:55Z",
+      "side": 1,
+      "message": "Please fix this WARNING reported by autoreview issue finding: While you are touching this code, it appears that the rounding logic here is broken and has never worked correctly.\n\n`LIS2DW12_NORMALIZE_FS(fs)` is defined as `(1 \u003c\u003c (30 - __builtin_clz(_fs)))`. For `newrange` values 2, 4, 8, 16 it evaluates to 1, 2, 4, 8 respectively.\nSince `newrange` is always strictly greater than `newrange / 2`, the condition `newrange \u003c LIS2DW12_NORMALIZE_FS(newrange)` will always evaluate to false for any valid clamped range.\nAs a result, `newrange \u003c\u003c\u003d 1` never executes and the driver fails to round up to the next full scale range when `rnd` is set.\n\nYou might want to fix this (either in this patch or a follow-up) by fixing `LIS2DW12_NORMALIZE_FS` and changing the logic to:\n```c\n\tint normalized \u003d LIS2DW12_NORMALIZE_FS(newrange);\n\n\t/* Adjust and check rounded value. */\n\tif (rnd \u0026\u0026 (normalized \u003c range))\n\t\tnormalized \u003c\u003c\u003d 1;\n\t\n\tnewrange \u003d normalized;\n```\n(The clamp added in this patch is perfectly correct and successfully fixes the undefined behavior and division by zero issues).",
+      "range": {
+        "startLine": 277,
+        "startChar": 0,
+        "endLine": 277,
+        "endChar": 0
+      },
+      "revId": "7d0efa64d17b15d87bfaa60f2d98f6ace4433f90",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
