@@ -87,6 +87,24 @@
       "parentUuid": "fe5ea1be_c6736247",
       "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2755f746_0ea36ade",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-12T21:05:59Z",
+      "side": 1,
+      "message": "I don\u0027t think I get the difference between `it83xx_tcpm_switch_plug_out_type` and `it8xxx2_tcpm_switch_plug_out_type`. At first glance, their contents and the circumstances under which they are called appear identical to me. That being said, the rest of what you said about those functions makes sense to me.\n\nWRT the debounce not having interrupts enabled, that makes sense to me, although it seems unfortunate. I could imagine the TCPM driver interface having a hook that the TC could call to rearm the interrupt right as it leaves Attached.*. But if this is the only driver with this issue, an awkward transition encapsulated inside the driver seems pragmatic.",
+      "parentUuid": "fe5ea1be_c6736247",
+      "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
