@@ -388,7 +388,11 @@ static int bmi3xx_emul_handle_read(uint8_t *regs, const struct emul *emul,
 		}
 		break;
 	case BMI3_REG_FIFO_FILL_LVL:
-		if (byte == 0) {
+		/*
+		 * Refresh on the low byte so that burst reads starting at a
+		 * lower register also see the current fill level.
+		 */
+		if (shift_reg == REG16TO8(BMI3_REG_FIFO_FILL_LVL)) {
 			fifo_len = bmi_emul_fifo_len(emul, tag_time, false);
 			/*
 			 * The len is 2-bytes-len, and add an extra redundant
@@ -398,14 +402,20 @@ static int bmi3xx_emul_handle_read(uint8_t *regs, const struct emul *emul,
 			regs16[BMI3_REG_FIFO_FILL_LVL] = fifo_len & 0x7ff;
 		}
 		break;
-	case BMI3_REG_FIFO_DATA:
-		if (byte <= 1)
-			break;
-		regs[shift_reg] = bmi_emul_get_fifo_data(
-			emul,
-			byte - 2 /* byte 2 read from the start of the FIFO */,
-			tag_time, false, acc_shift, gyr_shift);
+	case BMI3_REG_FIFO_DATA: {
+		/*
+		 * FIFO data starts after the 2-byte sync word and, for a burst
+		 * starting below FIFO_DATA, after the registers before it.
+		 */
+		int fifo_byte = byte - 2 - REG16TO8(BMI3_REG_FIFO_DATA - reg);
+
+		if (fifo_byte >= 0) {
+			regs[shift_reg] = bmi_emul_get_fifo_data(
+				emul, fifo_byte, tag_time, false, acc_shift,
+				gyr_shift);
+		}
 		break;
+	}
 	}
 
 	*buf = regs[shift_reg];
