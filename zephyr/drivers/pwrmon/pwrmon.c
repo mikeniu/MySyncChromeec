@@ -20,6 +20,8 @@
 
 LOG_MODULE_REGISTER(pwrmon, LOG_LEVEL_INF);
 
+#define PWRMON_REFRESH_DELAY_MS 2
+
 #define GET_POWER_MONITOR_DEV(node_id, prop, idx) \
 	DEVICE_DT_GET(DT_PHANDLE_BY_IDX(node_id, prop, idx))
 
@@ -202,9 +204,15 @@ static enum ec_status pwrmon_channels_enable(bool start)
 					      channel_enable_attr, &val);
 			if (ret) {
 				enabled_channels--;
-				LOG_ERR("Unable to start channel %d %s err: %d",
-					i, channel->channel_name, ret);
+				LOG_ERR("Unable to start channel %d err: %d", i,
+					ret);
 			}
+			/*
+			 * Power monitors require at least 1 ms after a REFRESH
+			 * command (triggered by channel enable/disable or
+			 * latch) before the next command.
+			 */
+			k_msleep(PWRMON_REFRESH_DELAY_MS);
 		}
 	}
 
@@ -254,7 +262,7 @@ static enum ec_status pwrmon_latch(void)
 			}
 
 			/* Give power monitor time to capture accumulators */
-			k_msleep(2);
+			k_msleep(PWRMON_REFRESH_DELAY_MS);
 			ret = sensor_sample_fetch_chan(
 				pwrmon_config.power_monitors[i],
 				sample_count_channel);
@@ -289,8 +297,8 @@ static enum ec_status pwrmon_sample_get(uint8_t channel_id, uint32_t *samples,
 		pwrmon_config.power_monitors[channel->power_monitor_idx];
 	ret = sensor_channel_get(power_monitor, sensor_channel, &val);
 	if (ret) {
-		LOG_WRN("Failed to get sample count for channel %s err: %d",
-			channel->channel_name, ret);
+		LOG_WRN("Failed to get sample count for channel %d err: %d",
+			channel_id, ret);
 		return EC_RES_ERROR;
 	}
 	*samples = val.val1;
@@ -380,7 +388,7 @@ static enum ec_status hc_pwrmon_handler(struct host_cmd_handler_args *args)
 		}
 
 		ret = gpio_pin_configure_dt(&pwrmon_config.pwrmon_gpio,
-					    GPIO_OUTPUT_HIGH);
+					    GPIO_OUTPUT_ACTIVE);
 		if (ret) {
 			LOG_ERR("Failed to initialize gpio err: %d", ret);
 			return EC_RES_ERROR;
