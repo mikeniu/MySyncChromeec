@@ -36,6 +36,10 @@
 		if (ret)            \
 			goto label; \
 	} while (0)
+
+/* large enough buffer for 10 samples */
+#define FIFO_BUFFER_SIZE (6 * 10)
+
 /**
  * Read 8bit register from accelerometer.
  */
@@ -43,12 +47,6 @@ static inline int bma4_read8(const struct motion_sensor_t *s, const int reg,
 			     int *data_ptr)
 {
 	return i2c_read8(s->port, s->i2c_spi_addr_flags, reg, data_ptr);
-}
-
-__maybe_unused static inline int bma4_read16(const struct motion_sensor_t *s,
-					     const int reg, int *data_ptr)
-{
-	return i2c_read16(s->port, s->i2c_spi_addr_flags, reg, data_ptr);
 }
 
 /**
@@ -643,45 +641,97 @@ static void process_fifo_data(struct motion_sensor_t *s, uint8_t *data,
 	}
 }
 
+/*
+ * Burst read from INT_STATUS_1 (0x1D) to FIFO_DATA (0x26):
+ * registers 0x1D..0x25, then one 6-byte headerless accel frame from
+ * FIFO_DATA (which does not auto-increment).
+ */
+struct bma4_irq_burst {
+	uint8_t int_status;
+	uint8_t unused[BMA4_FIFO_LENGTH_0_ADDR - BMA4_INT_STATUS_1 - 1];
+	uint8_t fifo_len[2];
+	uint8_t fifo[6];
+};
+BUILD_ASSERT(FIFO_BUFFER_SIZE % sizeof(((struct bma4_irq_burst *)0)->fifo) ==
+	     0);
+BUILD_ASSERT(sizeof(struct bma4_irq_burst) <= 64);
+
 /* Handle interrupt in task context */
 static int irq_handler(struct motion_sensor_t *s, uint32_t *event)
 {
 	uint32_t irq_timestamp =
 		__atomic_load_n(&last_irq_timestamp, __ATOMIC_RELAXED);
 	bool read_any_data = false;
-	int interrupt_status_reg, fifo_depth;
+	struct bma4_irq_burst burst;
+	int fifo_depth;
 
-	/* Read interrupt status, also clears pending IRQs */
-	RETURN_ERROR(bma4_read8(s, BMA4_INT_STATUS_1, &interrupt_status_reg));
-	if ((interrupt_status_reg &
-	     (BMA4_FFULL_INT | BMA4_FWM_INT | BMA4_ACC_DRDY_INT)) == 0) {
+	if ((s->type != MOTIONSENSE_TYPE_ACCEL) ||
+	    (!(*event & CONFIG_ACCEL_BMA4XX_INT_EVENT))) {
 		return EC_ERROR_NOT_HANDLED;
 	}
 
-	RETURN_ERROR(bma4_read16(s, BMA4_FIFO_LENGTH_0_ADDR, &fifo_depth));
-	while (fifo_depth > 0) {
-		/* large enough buffer for 4 samples */
-		uint8_t fifo_data[24];
-		int fifo_read = MIN(ARRAY_SIZE(fifo_data), fifo_depth);
-		int ret;
+	/*
+	 * We have to loop until we see the interrupt status as 0 to avoid
+	 * getting stuck. We use edge triggered interrupts and, once one
+	 * triggers, our irq apparently won't necessarily trigger again until
+	 * we've cleared all interrupt sources and then a new interrupt happens.
+	 *
+	 * However, despite needing to loop, we also don't want to get stuck
+	 * in an infinite loop if there's a bug in the driver or the hardware.
+	 * We'll loop 200 times and then give up if an interrupt is still
+	 * pending.
+	 */
+	for (int i = 0; i < 200; i++) {
+		/* Read interrupt status, also clears pending IRQs */
+		RETURN_ERROR(i2c_read_block(s->port, s->i2c_spi_addr_flags,
+					    BMA4_INT_STATUS_1,
+					    (uint8_t *)&burst, sizeof(burst)));
+		if ((burst.int_status & (BMA4_FFULL_INT | BMA4_FWM_INT |
+					 BMA4_ACC_DRDY_INT)) == 0) {
+			if (!read_any_data)
+				return EC_ERROR_NOT_HANDLED;
+			if (IS_ENABLED(CONFIG_ACCEL_FIFO))
+				motion_sense_fifo_commit_data();
+			return EC_SUCCESS;
+		}
 
-		mutex_lock(s->mutex);
-		ret = i2c_read_block(s->port, s->i2c_spi_addr_flags,
-				     BMA4_FIFO_DATA_ADDR, fifo_data, fifo_read);
-		fifo_depth -= fifo_read;
-		mutex_unlock(s->mutex);
-		if (ret)
-			return ret;
+		fifo_depth =
+			burst.fifo_len[0] |
+			((burst.fifo_len[1] & BMA4_FIFO_LENGTH_MSB_MSK) << 8);
 
-		process_fifo_data(s, fifo_data, fifo_read, irq_timestamp);
-		read_any_data = true;
+		/*
+		 * Process the frame from the burst. If the FIFO was empty, it
+		 * reads as 0x8000, which process_fifo_data() skips.
+		 */
+		if (fifo_depth > 0) {
+			process_fifo_data(s, burst.fifo, sizeof(burst.fifo),
+					  irq_timestamp);
+			fifo_depth -= sizeof(burst.fifo);
+			read_any_data = true;
+		}
+
+		/* Read whatever did not fit in the burst. */
+		while (fifo_depth > 0) {
+			uint8_t fifo_data[FIFO_BUFFER_SIZE];
+			int fifo_read = MIN(ARRAY_SIZE(fifo_data), fifo_depth);
+			int ret;
+
+			mutex_lock(s->mutex);
+			ret = i2c_read_block(s->port, s->i2c_spi_addr_flags,
+					     BMA4_FIFO_DATA_ADDR, fifo_data,
+					     fifo_read);
+			fifo_depth -= fifo_read;
+			mutex_unlock(s->mutex);
+			if (ret)
+				return ret;
+
+			process_fifo_data(s, fifo_data, fifo_read,
+					  irq_timestamp);
+			read_any_data = true;
+		}
 	}
-
-	if (IS_ENABLED(CONFIG_ACCEL_FIFO) && read_any_data) {
-		motion_sense_fifo_commit_data();
-	}
-
-	return EC_SUCCESS;
+	CPRINTF("BMA4xx: irq 0x%04x stuck\n", burst.int_status);
+	return EC_ERROR_HW_INTERNAL;
 }
 #endif /* BMA4XX_USE_INTERRUPTS */
 
