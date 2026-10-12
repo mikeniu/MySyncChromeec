@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01f4119c_be21bdcf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1293716
+      },
+      "writtenOn": "2026-10-12T11:24:43Z",
+      "side": 1,
+      "message": "All failed projects: meru\n * ERROR: chromeos-base/chromeos-zephyr-4.5.0-r16120::chromiumos failed (compile phase):\n *   Failed to build aneto annite bluey meru mica pic quartz quenbi.\n * \n * Call stack:\n *               ebuild.sh, line  125:  Called src_compile\n *             environment, line 4985:  Called cros-zephyr-compile \u0027zephyr-ec\u0027\n *             environment, line 2234:  Called die\n * The specific snippet of code:\n *       run_zmake build -B \"build\" --version \"$(cros-version)\" --static \"${projects[@]}\" || die \"Failed to build ${projects[*]}.\"\n * \n * Build log: /build/bluey/tmp/portage/logs/chromeos-base:chromeos-zephyr-4.5.0-r16120:20261012-061749.log\n * Stable log symlink: /build/bluey/tmp/portage/chromeos-base/chromeos-zephyr-4.5.0-r16120/temp/build.log\n * CWD: /build/bluey/tmp/portage/chromeos-base/chromeos-zephyr-4.5.0-r16120/work/chromeos-zephyr-4.5.0\n * S:   /build/bluey/tmp/portage/chromeos-base/chromeos-zephyr-4.5.0-r16120/work/chromeos-zephyr-4.5.0",
+      "revId": "393b1e5a0ca4acc0eb5a8f9a2caa90a147e26c32",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
