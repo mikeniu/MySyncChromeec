@@ -17,6 +17,24 @@
       "isAi": true,
       "revId": "7f601ee9104c50a5453520a57cfc1fe74d25d43f",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9373616_b3cc3343",
+        "filename": "zephyr/ish.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1123814
+      },
+      "writtenOn": "2026-10-12T18:26:05Z",
+      "side": 1,
+      "message": "I made this default to Y as you suggested, but based it on PLATFORM_EC_HOST_INTERFACE_HECI which is also ISH specific and I think better aligned for the functionality involved.",
+      "parentUuid": "51dc2efd_a2c7c3c0",
+      "revId": "7f601ee9104c50a5453520a57cfc1fe74d25d43f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
