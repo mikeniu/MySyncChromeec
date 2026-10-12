@@ -26,17 +26,22 @@ extern "C" {
 #define PD_HOST_COMMAND_TIMEOUT_US SECOND
 
 /*
- * Define PD_PORT_TO_TASK_ID() and TASK_ID_TO_PD_PORT() macros to
- * go between PD port number and task ID. Assume that TASK_ID_PD_C0 is the
- * lowest task ID and IDs are on a continuous range.
+ * Define PD_PORT_TO_TASK_ID() macro to go from PD port number to task ID.
+ * Assume that TASK_ID_PD_C0 is the lowest task ID and IDs are on a continuous
+ * range.
  */
 #if defined(HAS_TASK_PD_C0) && defined(CONFIG_USB_PD_PORT_MAX_COUNT)
 #define PD_PORT_TO_TASK_ID(port) (TASK_ID_PD_C0 + (port))
-#define TASK_ID_TO_PD_PORT(id) ((id) - TASK_ID_PD_C0)
 #else
 #define PD_PORT_TO_TASK_ID(port) -1 /* stub task ID */
-#define TASK_ID_TO_PD_PORT(id) 0
 #endif /* CONFIG_USB_PD_PORT_MAX_COUNT && HAS_TASK_PD_C0 */
+
+/**
+ * Get the USB-C port whose PD thread is the calling thread.
+ *
+ * @return Port number, or -1 if the caller is not a PD thread.
+ */
+int pd_get_current_thread_port(void);
 
 enum pd_rx_errors {
 	PD_RX_ERR_INVAL = -1, /* Invalid packet */

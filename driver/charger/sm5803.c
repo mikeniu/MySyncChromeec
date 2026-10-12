@@ -981,7 +981,7 @@ static void sm5803_disable_runtime_low_power_mode(void)
 {
 	enum ec_error_list rv;
 	int reg;
-	int chgnum = TASK_ID_TO_PD_PORT(task_get_current());
+	int chgnum = pd_get_current_thread_port();
 
 	CPRINTS("%s %d: disable runtime low power mode", CHARGER_NAME, chgnum);
 	rv = main_read8(chgnum, SM5803_REG_REFERENCE, &reg);
@@ -1061,7 +1061,7 @@ static void sm5803_enable_runtime_low_power_mode(void)
 {
 	enum ec_error_list rv;
 	int reg;
-	int chgnum = TASK_ID_TO_PD_PORT(task_get_current());
+	int chgnum = pd_get_current_thread_port();
 
 	CPRINTS("%s %d: enable runtime low power mode", CHARGER_NAME, chgnum);
 	rv = main_read8(chgnum, SM5803_REG_REFERENCE, &reg);

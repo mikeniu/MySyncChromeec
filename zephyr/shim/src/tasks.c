@@ -9,6 +9,7 @@
 #include "host_command.h"
 #include "task.h"
 #include "timer.h"
+#include "usb_pd.h"
 #include "zephyr_console_shim.h"
 
 #include <zephyr/init.h>
@@ -183,6 +184,26 @@ task_id_t task_get_current(void)
 	}
 
 	return thread_id_to_task_id(k_current_get());
+}
+
+int pd_get_current_thread_port(void)
+{
+#if defined(HAS_TASK_PD_C0) && defined(CONFIG_USB_PD_PORT_MAX_COUNT)
+	k_tid_t current;
+
+	/* k_current_get() is not valid pre kernel */
+	if (k_is_pre_kernel()) {
+		return -1;
+	}
+
+	current = k_current_get();
+	for (int port = 0; port < CONFIG_USB_PD_PORT_MAX_COUNT; port++) {
+		if (task_to_k_tid[PD_PORT_TO_TASK_ID(port)] == current) {
+			return port;
+		}
+	}
+#endif
+	return -1;
 }
 
 atomic_t *task_get_event_bitmap(task_id_t cros_task_id)
