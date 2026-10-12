@@ -5,6 +5,7 @@
 configdefault ZTEST
 	default y
 
+# go/keep-sorted start newline_separated=yes
 config HW_TEST_ABORT
 	bool "Abort test"
 	depends on ZTEST
@@ -79,18 +80,6 @@ config HW_TEST_FLASH_WRITE_PROTECT
 	depends on ZTEST
 	depends on PLATFORM_EC_FLASH_CROS
 
-config HW_TEST_FP_BUFFER_CLEAR
-	bool "fp_buffer clear test"
-	select ZTEST
-	depends on BOARD_FINGERPRINT
-	help
-	  The test verifies if the fp_buffer is cleared after reboot.
-
-config HW_TEST_FP_TRANSPORT
-	bool "FP transport layer test"
-	depends on ZTEST
-	depends on EC_HOST_CMD
-
 config HW_TEST_FPSENSOR_AUTH_CRYPTO_STATEFUL
 	bool "FP sensor auth crypto stateful test"
 	depends on ZTEST
@@ -117,18 +106,24 @@ config HW_TEST_FPSENSOR_UTILS
 	bool "FP sensor utils test"
 	depends on ZTEST
 
+config HW_TEST_FP_BUFFER_CLEAR
+	bool "fp_buffer clear test"
+	select ZTEST
+	depends on BOARD_FINGERPRINT
+	help
+	  The test verifies if the fp_buffer is cleared after reboot.
+
+config HW_TEST_FP_TRANSPORT
+	bool "FP transport layer test"
+	depends on ZTEST
+	depends on EC_HOST_CMD
+
 config HW_TEST_FTRAPV
 	bool "ftrapv test"
 	depends on ZTEST
 	depends on BOARD_FINGERPRINT
 	help
 	  The test verify if int overflow causes a crash.
-
-config HW_TEST_LIBC_PRINTF
-	bool "libc printf test"
-	depends on ZTEST
-	help
-	  Prints a hardcoded string to check by a test runner.
 
 config HW_TEST_LIBCXX
 	bool "libcxx test"
@@ -137,11 +132,23 @@ config HW_TEST_LIBCXX
 	help
 	  The test verifies time measurement system_clock vs udelay.
 
+config HW_TEST_LIBC_PRINTF
+	bool "libc printf test"
+	depends on ZTEST
+	help
+	  Prints a hardcoded string to check by a test runner.
+
 config HW_TEST_MALLOC
 	bool "malloc test"
 	depends on ZTEST
 	help
 	  The test verifies basic malloc operations.
+
+config HW_TEST_NULL_POINTER
+	bool "null pointer test"
+	depends on ZTEST
+	help
+	  The test verifies null pointer dereference crashes.
 
 config HW_TEST_OTP_KEY
 	bool "OTP key test"
@@ -150,26 +157,12 @@ config HW_TEST_OTP_KEY
 	help
 		The test verifies basic OTP key functionality
 
-config HW_TEST_NULL_POINTER
-	bool "null pointer test"
-	depends on ZTEST
-	help
-	  The test verifies null pointer dereference crashes.
-
 config HW_TEST_PANIC
 	bool "Panic test"
 	depends on ZTEST
 	depends on ARM || RISCV
 	help
 	  The test verifies panic data.
-
-config HW_TEST_PANIC_STRIP_GPR
-	bool "Panic strip GPR test"
-	depends on ZTEST
-	depends on ARM || RISCV
-	help
-	  The test verifies that general purpose registers are
-	  stripped during panic.
 
 config HW_TEST_PANIC_DATA
 	bool "Panic data test"
@@ -178,6 +171,14 @@ config HW_TEST_PANIC_DATA
 	select PLATFORM_EC_DEBUG_ASSERT
 	help
 	  It verifies panic data across different reboots.
+
+config HW_TEST_PANIC_STRIP_GPR
+	bool "Panic strip GPR test"
+	depends on ZTEST
+	depends on ARM || RISCV
+	help
+	  The test verifies that general purpose registers are
+	  stripped during panic.
 
 config HW_TEST_PMP_ENTRIES
 	bool "pmp entries test"
@@ -205,18 +206,18 @@ config HW_TEST_RAM_LOCK
 	help
 	  The test verifies ram lock function of NPCX chip.
 
+config HW_TEST_REBOOT
+	bool "Reboot test"
+	depends on ZTEST
+	help
+	  The test verifies basic reboot functionality.
+
 config HW_TEST_RESTRICTED_CONSOLE
 	bool "Restricted console test"
 	depends on ZTEST
 	depends on BOARD_FINGERPRINT
 	help
 	  The test verifies restricted console.
-
-config HW_TEST_REBOOT
-	bool "Reboot test"
-	depends on ZTEST
-	help
-	  The test verifies basic reboot functionality.
 
 config HW_TEST_RNG_BENCHMARK
 	bool "RNG benchmark test"
@@ -233,14 +234,13 @@ config HW_TEST_ROLLBACK
 	help
 	  The test verifies rollback regions functionality.
 
-config HW_TEST_ROLLBACK_MINIMAL_VERSION
-	bool "Rollback minimal version test"
+config HW_TEST_ROLLBACK_ENTROPY
+	bool "Rollback entropy test"
 	depends on ZTEST
-	depends on BOARD_FINGERPRINT
+	select MOCK_OTP if NPCX_OTP_KEY
 	depends on PLATFORM_EC_ROLLBACK
 	help
-	  The test verifies that the rollback minimal version matches the
-	  expected value.
+	  The test verifies rollback entropy functionality.
 
 config HW_TEST_ROLLBACK_LOCK_PANIC
 	bool "Rollback lock panic test"
@@ -249,13 +249,14 @@ config HW_TEST_ROLLBACK_LOCK_PANIC
 	help
 	  The test verifies that panic occurs if function mpu_lock_rollback fails.
 
-config HW_TEST_ROLLBACK_ENTROPY
-	bool "Rollback entropy test"
+config HW_TEST_ROLLBACK_MINIMAL_VERSION
+	bool "Rollback minimal version test"
 	depends on ZTEST
-	select MOCK_OTP if NPCX_OTP_KEY
+	depends on BOARD_FINGERPRINT
 	depends on PLATFORM_EC_ROLLBACK
 	help
-	  The test verifies rollback entropy functionality.
+	  The test verifies that the rollback minimal version matches the
+	  expected value.
 
 config HW_TEST_RTC_NPCX9
 	bool "RTC NPCX9 test"
@@ -289,17 +290,23 @@ config HW_TEST_STATIC_IF
 	help
 	  The test verifies SHA256 functions with forced unrolled config.
 
+config HW_TEST_STDLIB
+	bool "stdlib test"
+	depends on ZTEST
+	help
+	  The test builtin stdlib functions used by Zephyr.
+
 config HW_TEST_STD_VECTOR
 	bool "std_vector test"
 	depends on ZTEST
 	help
 	  The test verifies std::vector and dynamic memory allocation.
 
-config HW_TEST_STDLIB
-	bool "stdlib test"
+config HW_TEST_SYSTEM_IS_LOCKED
+	bool "system_is_locked test"
 	depends on ZTEST
 	help
-	  The test builtin stdlib functions used by Zephyr.
+	  The test verifies system_is_locked function with wp on/off.
 
 config HW_TEST_TIMER
 	bool "timer test"
@@ -312,12 +319,6 @@ config HW_TEST_TPM_SEED_CLEAR
 	depends on ZTEST
 	help
 	  The test verifies if the tpm seed is cleared after reboot.
-
-config HW_TEST_SYSTEM_IS_LOCKED
-	bool "system_is_locked test"
-	depends on ZTEST
-	help
-	  The test verifies system_is_locked function with wp on/off.
 
 config HW_TEST_UNALIGNED_ACCESS
 	bool "Unaligned access test"
@@ -348,3 +349,4 @@ config HW_TEST_WATCHDOG
 	depends on ZTEST
 	help
 	  The test verifies that the watchdog fires on a busy loop.
+# go/keep-sorted end
