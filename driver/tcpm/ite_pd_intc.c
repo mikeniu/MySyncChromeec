@@ -66,29 +66,25 @@ void chip_pd_irq(enum usbpd_port port)
 			       TASK_EVENT_PHY_TX_DONE);
 	}
 
-	if (IS_ENABLED(IT83XX_INTC_PLUG_IN_OUT_SUPPORT)) {
-		if (USBPD_IS_PLUG_IN_OUT_DETECT(port)) {
-			if (USBPD_IS_PLUG_IN(port))
-				/*
-				 * When tcpc detect type-c plug in:
-				 * 1)If we are sink, disable detect interrupt,
-				 * messages on cc line won't trigger interrupt.
-				 * 2)If we are source, then set plug out
-				 * detection.
-				 */
-				switch_plug_out_type(port);
-			else
-				/*
-				 * When tcpc detect type-c plug out:
-				 * switch to detect plug in.
-				 */
-				IT83XX_USBPD_TCDCR(port) &=
-					~USBPD_REG_PLUG_OUT_SELECT;
+	if (USBPD_IS_PLUG_IN_OUT_DETECT(port)) {
+		if (USBPD_IS_PLUG_IN(port))
+			/*
+			 * When tcpc detect type-c plug in:
+			 * 1)If we are sink, disable detect interrupt,
+			 * messages on cc line won't trigger interrupt.
+			 * 2)If we are source, then set plug out
+			 * detection.
+			 */
+			switch_plug_out_type(port);
+		else
+			/*
+			 * When tcpc detect type-c plug out:
+			 * switch to detect plug in.
+			 */
+			IT83XX_USBPD_TCDCR(port) &= ~USBPD_REG_PLUG_OUT_SELECT;
 
-			/* clear type-c device plug in/out detect interrupt */
-			IT83XX_USBPD_TCDCR(port) |=
-				USBPD_REG_PLUG_IN_OUT_DETECT_STAT;
-			task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_CC);
-		}
+		/* clear type-c device plug in/out detect interrupt */
+		IT83XX_USBPD_TCDCR(port) |= USBPD_REG_PLUG_IN_OUT_DETECT_STAT;
+		task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_CC);
 	}
 }

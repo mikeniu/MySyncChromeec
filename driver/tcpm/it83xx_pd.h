@@ -381,7 +381,6 @@
 
 /* ITE chip supports PD features */
 #define IT83XX_INTC_FAST_SWAP_SUPPORT
-#define IT83XX_INTC_PLUG_IN_OUT_SUPPORT
 #endif
 
 enum usbpd_port {
