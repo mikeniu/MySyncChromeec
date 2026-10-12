@@ -278,6 +278,106 @@ ZTEST_USER(bma4xx, test_interrupt)
 		      host_data[3].data[2]);
 }
 
+/** Count read transfers by start register */
+struct irq_read_count {
+	int int_status_reads;
+	int fifo_length_reads;
+	int fifo_data_reads;
+};
+
+static int count_read_byte(const struct emul *emul, int reg, uint8_t *val,
+			   int bytes, void *ctx)
+{
+	struct irq_read_count *c = ctx;
+
+	if (bytes == 0) {
+		if (reg == BMA4_INT_STATUS_1)
+			c->int_status_reads++;
+		else if (reg == BMA4_FIFO_LENGTH_0_ADDR)
+			c->fifo_length_reads++;
+		else if (reg == BMA4_FIFO_DATA_ADDR)
+			c->fifo_data_reads++;
+	}
+	/* Fall through to the default emulator handling. */
+	return 1;
+}
+
+ZTEST_USER(bma4xx, test_irq_burst_reads_first_frame)
+{
+	const uint8_t one_frame_data[6] = { 4 << 4, 0, 0, 0, 0, 0 };
+	uint32_t evt = CONFIG_ACCEL_BMA4XX_INT_EVENT;
+	struct irq_read_count count = { 0 };
+
+	zassert_ok(bma4_accel_drv.init(SENSOR));
+	SENSOR->oversampling_ratio = 1;
+
+	bma4xx_emul_set_fifo_data(EMUL, one_frame_data, sizeof(one_frame_data));
+	i2c_common_emul_set_read_func(bma4xx_emul_get_i2c(EMUL),
+				      count_read_byte, &count);
+	zassert_ok(bma4_accel_drv.irq_handler(SENSOR, &evt));
+	i2c_common_emul_set_read_func(bma4xx_emul_get_i2c(EMUL), NULL, NULL);
+
+	/*
+	 * The frame comes with the status burst, then one status re-check
+	 * reads 0.
+	 */
+	zassert_equal(count.int_status_reads, 2);
+	zassert_equal(count.fifo_data_reads, 0);
+	/* The FIFO length comes from the status burst. */
+	zassert_equal(count.fifo_length_reads, 0);
+}
+
+/*
+ * Report fifo_length = 6 (1 frame) in the status burst so the 2nd frame in
+ * the FIFO is left for the status re-check loop rather than drained immediately
+ * via BMA4_FIFO_DATA_ADDR.
+ */
+static int short_burst_read_byte(const struct emul *emul, int reg, uint8_t *val,
+				 int bytes, void *ctx)
+{
+	int cur_reg = reg + bytes;
+
+	count_read_byte(emul, reg, val, bytes, ctx);
+
+	if (cur_reg == BMA4_FIFO_LENGTH_0_ADDR) {
+		*val = 6;
+		return 0;
+	}
+	if (cur_reg == BMA4_FIFO_LENGTH_0_ADDR + 1) {
+		*val = 0;
+		return 0;
+	}
+	return 1;
+}
+
+static const uint8_t two_zero_frames_data[12] = { 4 << 4, 0, 0, 0, 0, 0,
+						  4 << 4, 0, 0, 0, 0, 0 };
+
+ZTEST_USER(bma4xx, test_irq_recheck_still_pending)
+{
+	uint32_t evt = CONFIG_ACCEL_BMA4XX_INT_EVENT;
+	struct irq_read_count count = { 0 };
+
+	zassert_ok(bma4_accel_drv.init(SENSOR));
+	SENSOR->oversampling_ratio = 1;
+
+	bma4xx_emul_set_fifo_data(EMUL, two_zero_frames_data,
+				  sizeof(two_zero_frames_data));
+	i2c_common_emul_set_read_func(bma4xx_emul_get_i2c(EMUL),
+				      short_burst_read_byte, &count);
+	zassert_ok(bma4_accel_drv.irq_handler(SENSOR, &evt));
+	i2c_common_emul_set_read_func(bma4xx_emul_get_i2c(EMUL), NULL, NULL);
+
+	/*
+	 * Each frame comes with a status burst, then a status re-check reads
+	 * 0.
+	 */
+	zassert_equal(count.int_status_reads, 3);
+	zassert_equal(count.fifo_data_reads, 0);
+	/* Every FIFO length comes from a status burst. */
+	zassert_equal(count.fifo_length_reads, 0);
+}
+
 /**
  * This struct captures I2C transactions during the calibration test.
  *
