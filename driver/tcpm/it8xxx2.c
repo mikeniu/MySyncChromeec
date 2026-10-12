@@ -720,16 +720,44 @@ it8xxx2_tcpm_get_chip_info(int port, int live,
 	return EC_SUCCESS;
 }
 
+static void it8xxx2_tcpm_enable_plug_in_detect(int port)
+{
+	/*
+	 * Clear plug-out select and detect-disable to arm plug-in detection.
+	 * Mask out the W1C detect status bit so a pending plug-in interrupt
+	 * is not inadvertently cleared by the read-modify-write.
+	 */
+	IT83XX_USBPD_TCDCR(port) &= ~(USBPD_REG_PLUG_OUT_SELECT |
+				      USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE |
+				      USBPD_REG_PLUG_IN_OUT_DETECT_STAT);
+}
+
 #ifdef CONFIG_USB_PD_TCPC_LOW_POWER
 static int it8xxx2_tcpm_enter_low_power_mode(int port)
 {
+	enum tcpc_cc_voltage_status cc1, cc2;
+
+	/*
+	 * The TC state machine stops polling CC in low power mode, so the
+	 * plug in interrupt is the only way to detect a new partner.
+	 * it8xxx2_tcpm_switch_plug_out_type() disables the interrupt (sink)
+	 * or switches to plug out detection (source) when it sees partner
+	 * terminations. If that partner went away without the port
+	 * attaching (e.g. a CC glitch or AttachWait bounce), detection is
+	 * left disabled. Re-arm plug in detection and then check CC to wake
+	 * the PD task if a partner attached during the low power debounce
+	 * window.
+	 */
+	it8xxx2_tcpm_enable_plug_in_detect(port);
+
+	it8xxx2_tcpm_get_cc(port, &cc1, &cc2);
+	if (!cc_is_open(cc1, cc2) && !cc_is_pwred_cbl_without_snk(cc1, cc2))
+		task_set_event(PD_PORT_TO_TASK_ID(port), PD_EVENT_CC);
+
 	/*
 	 * ITE embedded TCPC SLEEP_MASK_USB_PD flag is only controlled by
 	 * it8xxx2 driver in tc_update_pd_sleep_mask(), and do low power
 	 * mode in idle_task().
-	 * In deep sleep mode, ITE TCPC clock is turned off, and the
-	 * timer every 5ms to exit the mode and wakeup PD task to run
-	 * (ex. change the CC lines termination).
 	 */
 	return EC_SUCCESS;
 }
@@ -1017,8 +1045,7 @@ static void it8xxx2_tcpm_hook_disconnect(void)
 	 * Switch to detect plug in and enable detect plug in interrupt,
 	 * since pd task has detected a type-c physical disconnected.
 	 */
-	IT83XX_USBPD_TCDCR(port) &= ~(USBPD_REG_PLUG_OUT_SELECT |
-				      USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE);
+	it8xxx2_tcpm_enable_plug_in_detect(port);
 
 	/* Exit BIST test data mode */
 	USBPD_SW_RESET(port);
