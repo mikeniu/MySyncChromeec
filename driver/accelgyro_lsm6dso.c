@@ -233,7 +233,7 @@ test_mockable void lsm6dso_interrupt(enum gpio_signal signal)
 {
 	last_interrupt_timestamp = __hw_clock_source_read();
 
-	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ACCEL_LSM6DSO_INT_EVENT);
+	motion_sense_post_event(CONFIG_ACCEL_LSM6DSO_INT_EVENT);
 }
 
 /**

@@ -2159,21 +2159,14 @@ ZTEST_USER(bmi160, test_bmi_interrupt_handler)
 	 * motion sensing task. Make sure that flag starts cleared, fire the
 	 * interrupt, and ensure the flag is set.
 	 */
-
-	atomic_t *mask;
-
-	mask = task_get_event_bitmap(TASK_ID_MOTIONSENSE);
-	zassert_true(mask != NULL,
-		     "Got a null pointer when getting event bitmap.");
-	zassert_true((*mask & CONFIG_ACCELGYRO_BMI160_INT_EVENT) == 0,
-		     "Event flag is set before firing interrupt");
+	zassert_equal(k_event_test(&motion_sense_event,
+				   CONFIG_ACCELGYRO_BMI160_INT_EVENT),
+		      0, "Event flag is set before firing interrupt");
 
 	bmi160_interrupt(0);
 
-	mask = task_get_event_bitmap(TASK_ID_MOTIONSENSE);
-	zassert_true(mask != NULL,
-		     "Got a null pointer when getting event bitmap.");
-	zassert_true(*mask & CONFIG_ACCELGYRO_BMI160_INT_EVENT,
+	zassert_true(k_event_test(&motion_sense_event,
+				  CONFIG_ACCELGYRO_BMI160_INT_EVENT),
 		     "Event flag is not set after firing interrupt");
 }
 

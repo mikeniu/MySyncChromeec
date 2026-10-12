@@ -398,8 +398,7 @@ test_mockable void icm42607_interrupt(enum gpio_signal signal)
 {
 	last_interrupt_timestamp = __hw_clock_source_read();
 
-	task_set_event(TASK_ID_MOTIONSENSE,
-		       CONFIG_ACCELGYRO_ICM42607_INT_EVENT);
+	motion_sense_post_event(CONFIG_ACCELGYRO_ICM42607_INT_EVENT);
 }
 
 /**

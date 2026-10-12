@@ -33,6 +33,15 @@
 #include "timer.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
+
+test_export_static K_EVENT_DEFINE(motion_sense_event);
+
+void motion_sense_post_event(uint32_t events)
+{
+	k_event_post(&motion_sense_event, events);
+}
+
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_MOTION_SENSE, outstr)
 #define CPRINTS(format, args...) cprints(CC_MOTION_SENSE, format, ##args)
@@ -413,8 +422,7 @@ static void motion_sense_switch_sensor_rate(void)
 	}
 	if (sensor_setup_mask) {
 		atomic_or(&odr_event_required, sensor_setup_mask);
-		task_set_event(TASK_ID_MOTIONSENSE,
-			       TASK_EVENT_MOTION_ODR_CHANGE);
+		motion_sense_post_event(TASK_EVENT_MOTION_ODR_CHANGE);
 	}
 
 	/* disable the body detection since AP is suspended */
@@ -1079,7 +1087,9 @@ void motion_sense_task(void *u)
 						    fastest_collection_rate)) {
 			pm_policy_state_lock_get_all();
 		}
-		event = task_wait_event(wait_us);
+		event = k_event_wait_safe(
+			&motion_sense_event, UINT32_MAX, false,
+			wait_us < 0 ? K_FOREVER : K_USEC(wait_us));
 		if (DISABLE_PM_POLICY_WHILE_WAITING(wait_us,
 						    fastest_collection_rate)) {
 			pm_policy_state_lock_put_all();
@@ -1450,8 +1460,7 @@ host_cmd_motion_sense(struct ec_host_cmd_handler_args *args)
 			sensor->config[SENSOR_CONFIG_AP].ec_rate = new_ec_rate;
 
 			/* Force a collection to purge old events.  */
-			task_set_event(TASK_ID_MOTIONSENSE,
-				       TASK_EVENT_MOTION_ODR_CHANGE);
+			motion_sense_post_event(TASK_EVENT_MOTION_ODR_CHANGE);
 		}
 
 		out->ec_rate.ret =
@@ -1479,8 +1488,7 @@ host_cmd_motion_sense(struct ec_host_cmd_handler_args *args)
 			 */
 			atomic_or(&odr_event_required,
 				  BIT(sensor - motion_sensors));
-			task_set_event(TASK_ID_MOTIONSENSE,
-				       TASK_EVENT_MOTION_ODR_CHANGE);
+			motion_sense_post_event(TASK_EVENT_MOTION_ODR_CHANGE);
 		}
 
 		out->sensor_odr.ret = sensor->drv->get_data_rate(sensor);
@@ -1608,8 +1616,7 @@ host_cmd_motion_sense(struct ec_host_cmd_handler_args *args)
 
 		atomic_add(&sensor->flush_pending, 1);
 
-		task_set_event(TASK_ID_MOTIONSENSE,
-			       TASK_EVENT_MOTION_FLUSH_PENDING);
+		motion_sense_post_event(TASK_EVENT_MOTION_FLUSH_PENDING);
 		__fallthrough;
 #endif
 	case MOTIONSENSE_CMD_FIFO_INFO:
@@ -1986,8 +1993,7 @@ static int command_accel_data_rate(int argc, const char **argv)
 						(round ? ROUND_UP_FLAG : 0);
 
 		atomic_or(&odr_event_required, 1 << (sensor - motion_sensors));
-		task_set_event(TASK_ID_MOTIONSENSE,
-			       TASK_EVENT_MOTION_ODR_CHANGE);
+		motion_sense_post_event(TASK_EVENT_MOTION_ODR_CHANGE);
 	} else {
 		ccprintf("Data rate for sensor %d: %d\n", id,
 			 sensor->drv->get_data_rate(sensor));
@@ -2031,7 +2037,7 @@ static int command_accel_read_xyz(int argc, const char **argv)
 			ccprintf("vector not ready\n");
 		ccprintf("Last calib. data %d: %-5d %-5d %-5d\n", id,
 			 sensor->xyz[X], sensor->xyz[Y], sensor->xyz[Z]);
-		task_wait_event(motion_min_interval);
+		crec_usleep(motion_min_interval);
 	}
 	return EC_SUCCESS;
 }
@@ -2063,8 +2069,7 @@ static int command_accel_init(int argc, const char **argv)
 		 * the ODR has been changed.
 		 */
 		atomic_or(&odr_event_required, BIT(id));
-		task_set_event(TASK_ID_MOTIONSENSE,
-			       TASK_EVENT_MOTION_ODR_CHANGE);
+		motion_sense_post_event(TASK_EVENT_MOTION_ODR_CHANGE);
 	}
 
 	ccprintf("%s: state %d - %d\n", sensor->name, sensor->state, ret);

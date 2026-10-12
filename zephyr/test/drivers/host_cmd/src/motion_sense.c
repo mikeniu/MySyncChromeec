@@ -91,7 +91,6 @@ static void host_cmd_motion_sense_before(void *fixture)
 	motion_sensors[0].config[SENSOR_CONFIG_AP].ec_rate =
 		1000 * USEC_PER_MSEC;
 	zassert_ok(shell_execute_cmd(get_ec_shell(), "accelinit 0"));
-	task_wake(TASK_ID_MOTIONSENSE);
 	k_sleep(K_MSEC(100));
 
 	atomic_clear(&motion_sensors[0].flush_pending);

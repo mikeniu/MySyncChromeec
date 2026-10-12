@@ -57,7 +57,7 @@ void tcs3400_interrupt(enum gpio_signal signal)
 {
 	last_interrupt_timestamp = __hw_clock_source_read();
 
-	task_set_event(TASK_ID_MOTIONSENSE, CONFIG_ALS_TCS3400_INT_EVENT);
+	motion_sense_post_event(CONFIG_ALS_TCS3400_INT_EVENT);
 }
 #ifdef CONFIG_ALS_TCS3400_EMULATED_IRQ_EVENT
 DECLARE_DEFERRED(tcs3400_read_deferred);

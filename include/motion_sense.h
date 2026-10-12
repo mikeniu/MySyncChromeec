@@ -74,24 +74,35 @@ enum sensor_config {
 #define TASK_EVENT_MOTION_INTERRUPT_NUM 8
 #define TASK_EVENT_MOTION_INTERRUPT_MASK \
 	((1 << TASK_EVENT_MOTION_INTERRUPT_NUM) - 1)
-#define TASK_EVENT_MOTION_SENSOR_INTERRUPT(_sensor_id)        \
-	BUILD_CHECK_INLINE(TASK_EVENT_CUSTOM_BIT(_sensor_id), \
+#define TASK_EVENT_MOTION_SENSOR_INTERRUPT(_sensor_id) \
+	BUILD_CHECK_INLINE(BIT(_sensor_id),            \
 			   _sensor_id < TASK_EVENT_MOTION_INTERRUPT_NUM)
 
 /* Internal events to motion sense task.*/
 #define TASK_EVENT_MOTION_FIRST_INTERNAL_EVENT TASK_EVENT_MOTION_INTERRUPT_NUM
 #define TASK_EVENT_MOTION_INTERNAL_EVENT_NUM 2
 #define TASK_EVENT_MOTION_FLUSH_PENDING \
-	TASK_EVENT_CUSTOM_BIT(TASK_EVENT_MOTION_FIRST_INTERNAL_EVENT)
+	BIT(TASK_EVENT_MOTION_FIRST_INTERNAL_EVENT)
 #define TASK_EVENT_MOTION_ODR_CHANGE \
-	TASK_EVENT_CUSTOM_BIT(TASK_EVENT_MOTION_FIRST_INTERNAL_EVENT + 1)
+	BIT(TASK_EVENT_MOTION_FIRST_INTERNAL_EVENT + 1)
 
 /* Activity events */
 #define TASK_EVENT_MOTION_FIRST_SW_EVENT \
 	(TASK_EVENT_MOTION_INTERRUPT_NUM + TASK_EVENT_MOTION_INTERNAL_EVENT_NUM)
-#define TASK_EVENT_MOTION_ACTIVITY_INTERRUPT(_activity_id)        \
-	(TASK_EVENT_CUSTOM_BIT(TASK_EVENT_MOTION_FIRST_SW_EVENT + \
-			       (_activity_id)))
+#define TASK_EVENT_MOTION_ACTIVITY_INTERRUPT(_activity_id) \
+	(BIT(TASK_EVENT_MOTION_FIRST_SW_EVENT + (_activity_id)))
+
+/**
+ * Post event(s) to the motion sense thread.
+ *
+ * @param events Event bitmask (TASK_EVENT_MOTION_*).
+ */
+void motion_sense_post_event(uint32_t events);
+
+#if defined(CONFIG_ZEPHYR) && defined(TEST_BUILD)
+#include <zephyr/kernel.h>
+extern struct k_event motion_sense_event;
+#endif
 
 #define ROUND_UP_FLAG ((uint32_t)BIT(31))
 #define BASE_ODR(_odr) ((_odr) & ~ROUND_UP_FLAG)
