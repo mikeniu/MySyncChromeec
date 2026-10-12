@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "chipset.h"
 #include "panic.h"
 #include "system.h"
 #include "tinysys_reg.h"
@@ -16,6 +17,11 @@
 #define DISABLE_WDT 0x000FFFFF
 #define KICK_WDT 0x1
 #define WDT_INSTANT_TRIGGER 0x0
+
+int chipset_in_state(int state_mask)
+{
+	return state_mask & CHIPSET_STATE_ON;
+}
 
 const char *system_get_chip_vendor(void)
 {
