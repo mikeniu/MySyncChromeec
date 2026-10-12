@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "24570f4d_56fb8288",
+        "filename": "zephyr/program/bluey/pic/cbi.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-10-12T06:19:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c606774_6e58f99c",
+      "revId": "01355170dc453dc7863fb9aabb689581ce615e07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "997fde0e_75c2d617",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-09T07:34:48Z",
       "side": 1,
       "message": "keyboard layout belongs in VPD + OS， should not CBI-driven matrix changes.",
+      "revId": "01355170dc453dc7863fb9aabb689581ce615e07",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b5e6f96_b891f188",
+        "filename": "zephyr/program/bluey/pic/cbi.dtsi",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4974201
+      },
+      "writtenOn": "2026-10-12T06:19:01Z",
+      "side": 1,
+      "message": "There are some different masks for these keyboards, we still need UFSC to distinguish keybaords.",
+      "parentUuid": "997fde0e_75c2d617",
       "revId": "01355170dc453dc7863fb9aabb689581ce615e07",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
