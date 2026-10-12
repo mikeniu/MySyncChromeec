@@ -18,6 +18,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c135001b_93f39709",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T20:30:40Z",
+      "side": 1,
+      "message": "Moved this clean up to https://chromium-review.git.corp.google.com/c/chromiumos/platform/ec/+/8562524",
+      "parentUuid": "b537fe04_704e4122",
+      "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a368a6b_b317e461",
@@ -31,6 +49,24 @@
       "writtenOn": "2026-10-12T17:25:10Z",
       "side": 1,
       "message": "I think these cases are effectively missing from `it83xx_tcpm_switch_plug_out_type`, which treats CC open the same as Rp detected and I think does nothing in the powered-cable-only case. Would it be sufficient to add these cases to that function?\n\nAs far as the LPM debounce window goes, I think the TCPM should be actively checking in `check_drp_connection` before entering LPM. Is there a race window right as this detection setting changes?",
+      "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe5ea1be_c6736247",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T20:30:40Z",
+      "side": 1,
+      "message": "Unlike `it83xx_tcpm_switch_plug_out_type()`, `it8xxx2_tcpm_switch_plug_out_type()` checks `cc1 \u003e\u003d TYPEC_CC_VOLT_RP_DEF` while `TYPEC_CC_VOLT_OPEN` is `0`, so CC open is a no-op rather than matching Rp. `it8xxx2_tcpm_switch_plug_out_type()` is only called from `chip_pd_irq()` when the hardware plug-in/out interrupt fires. Once Rp is seen on a sink port, `it8xxx2_tcpm_switch_plug_out_type()` sets `USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE`, disabling the interrupt. When the partner is removed before attaching (so `it8xxx2_tcpm_hook_disconnect()` does not run), no interrupt fires when CC returns to open, so `it8xxx2_tcpm_switch_plug_out_type()` is never called.\n\nFor the LPM debounce window: `tc_low_power_mode_entry()` waits 10 ms (`TC_TIMER_LOW_POWER_TIME`) before calling `tcpm_enter_low_power_mode()`. During that 10 ms in `tc_low_power_mode_run()`, `check_drp_connection()` is only called when `TC_FLAGS_CHECK_CONNECTION` is set by `PD_EVENT_CC`. If `USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE` was left set when entering `TC_LOW_POWER_MODE` and a partner attaches during that 10 ms window, no CC interrupt fires to set `PD_EVENT_CC`, so `tcpm_enter_low_power_mode()` is reached with partner termination already present on CC. Re-enabling plug-in detection after CC has already changed does not trigger an interrupt for the earlier transition, so the `else` branch explicitly sets `PD_EVENT_CC`.",
+      "parentUuid": "3a368a6b_b317e461",
       "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
