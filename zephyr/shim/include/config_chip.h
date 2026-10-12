@@ -2476,6 +2476,12 @@ extern char mock_end_of_ram_data[CONFIG_PRESERVED_END_OF_RAM_SIZE];
 #define CHIP_ISH
 #endif
 
+/* MediaTek System Control Processor: to set EC_FEATURE_SCP */
+#undef CONFIG_IPI
+#ifdef CONFIG_IPM_MTK_SCP
+#define CONFIG_IPI
+#endif
+
 /* motion sense */
 #undef CONFIG_MOTIONSENSE
 #ifdef CONFIG_PLATFORM_EC_MOTIONSENSE
