@@ -34,6 +34,24 @@
       "parentUuid": "c48a4f89_93f4c338",
       "revId": "5447716b38cd848f9b2981099481b64ca9ac0943",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58dd8a07_66bb69c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T17:30:13Z",
+      "side": 1,
+      "message": "Opened b/572805350 for improving stack_analyzer use.",
+      "parentUuid": "c48a4f89_93f4c338",
+      "revId": "5447716b38cd848f9b2981099481b64ca9ac0943",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
