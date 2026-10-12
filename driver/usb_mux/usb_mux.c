@@ -11,6 +11,7 @@
 #include "common.h"
 #include "console.h"
 #include "ec_commands.h"
+#include "ec_tasks.h"
 #include "hooks.h"
 #include "host_command.h"
 #include "queue.h"
@@ -414,12 +415,12 @@ static int configure_mux(int port, int index, enum mux_config_type config,
 			 * mux task
 			 */
 			if (IS_ENABLED(HAS_TASK_USB_MUX)) {
-				assert(task_get_current() == TASK_ID_USB_MUX);
+				assert(k_current_get() == get_usb_mux_thread());
 			} else {
 #ifdef TEST_BUILD
 				assert(port == pd_get_current_thread_port() ||
-				       task_get_current() ==
-					       TASK_ID_TEST_RUNNER);
+				       k_current_get() ==
+					       get_test_runner_thread());
 #else
 				assert(port == pd_get_current_thread_port());
 #endif /* TEST_BUILD */

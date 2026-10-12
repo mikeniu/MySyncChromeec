@@ -6,6 +6,7 @@
 #include "task_id.h"
 
 #include <zephyr/fff.h>
+#include <zephyr/kernel.h>
 #include <zephyr/sys/atomic.h>
 
 /*
@@ -20,6 +21,9 @@ FAKE_VOID_FUNC(task_set_event, task_id_t, uint32_t);
 FAKE_VALUE_FUNC(int, task_start_called);
 FAKE_VALUE_FUNC(uint32_t, task_wait_event, int);
 FAKE_VALUE_FUNC(uint32_t, task_wait_event_mask, uint32_t, int);
+FAKE_VALUE_FUNC(k_tid_t, get_motionsense_thread);
+FAKE_VALUE_FUNC(k_tid_t, get_usb_mux_thread);
+FAKE_VALUE_FUNC(k_tid_t, get_test_runner_thread);
 FAKE_VALUE_FUNC(int, pd_get_current_thread_port);
 
 /*

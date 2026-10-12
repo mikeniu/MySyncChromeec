@@ -122,6 +122,18 @@ test_mockable k_tid_t get_hostcmd_thread(void)
 #endif
 }
 
+k_tid_t get_motionsense_thread(void)
+{
+	return COND_CODE_1(HAS_TASK_MOTIONSENSE,
+			   (task_to_k_tid[TASK_ID_MOTIONSENSE]), (NULL));
+}
+
+k_tid_t get_usb_mux_thread(void)
+{
+	return COND_CODE_1(HAS_TASK_USB_MUX, (task_to_k_tid[TASK_ID_USB_MUX]),
+			   (NULL));
+}
+
 static task_id_t thread_id_to_task_id(k_tid_t thread_id)
 {
 	if (thread_id == NULL) {
@@ -320,6 +332,11 @@ uint32_t task_wait_event_mask(uint32_t event_mask, int timeout_us)
 void set_test_runner_tid(void)
 {
 	task_to_k_tid[TASK_ID_TEST_RUNNER] = k_current_get();
+}
+
+k_tid_t get_test_runner_thread(void)
+{
+	return task_to_k_tid[TASK_ID_TEST_RUNNER];
 }
 
 #ifdef CONFIG_TASKS_SET_TEST_RUNNER_TID_RULE
