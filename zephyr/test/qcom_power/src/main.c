@@ -386,6 +386,28 @@ ZTEST(qcom_power, test_power_button_input_event)
 	zassert_equal(power_button_is_pressed(), 0);
 }
 
+void handle_power_button(int8_t new_pin_state);
+
+static void release_power_button(struct k_work *work)
+{
+	handle_power_button(0);
+}
+static K_WORK_DELAYABLE_DEFINE(release_power_button_work, release_power_button);
+
+ZTEST(qcom_power, test_power_button_wait_for_release_wakes_on_release)
+{
+	int64_t start;
+
+	handle_power_button(1);
+	k_work_schedule(&release_power_button_work, K_MSEC(5));
+
+	start = k_uptime_get();
+	zassert_ok(power_button_wait_for_release(SECOND));
+	/* Woken by the release, not by the 30 ms polling fallback. */
+	zassert_true(k_uptime_get() - start < 30);
+	zassert_equal(power_button_is_pressed(), 0);
+}
+
 #endif
 
 ZTEST(qcom_power, test_power_button_no_power_good)

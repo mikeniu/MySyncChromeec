@@ -21,6 +21,8 @@
 #include "timer.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
+
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_SWITCH, outstr)
 #define CPRINTS(format, args...) cprints(CC_SWITCH, format, ##args)
@@ -46,6 +48,16 @@ static volatile struct press_config {
 test_export_static int debounced_power_pressed;
 static int simulate_power_pressed;
 static volatile int power_button_is_stable = 1;
+
+/* Given when the debounced state settles; wakes power_button_wait_for_release
+ */
+static K_SEM_DEFINE(power_button_stable_sem, 0, 1);
+
+static void power_button_set_stable(void)
+{
+	power_button_is_stable = 1;
+	k_sem_give(&power_button_stable_sem);
+}
 
 #ifdef CONFIG_PLATFORM_EC_POWER_BUTTON_KEYBOARD
 static bool pb_suppress_active;
@@ -115,14 +127,12 @@ int power_button_wait_for_release(int timeout_us)
 			return EC_ERROR_TIMEOUT;
 		}
 		/*
-		 * We use task_wait_event() instead of crec_usleep() here. It
-		 * will be woken up immediately if the power button is debouned
-		 * and changed. However, it is not guaranteed, like the cases
-		 * that the power button is debounced but not changed, or the
-		 * power button has not been debounced.
+		 * Wait for the debounced state to settle, but wake up at least
+		 * every debounce period in case it never does.
 		 */
-		task_wait_event(
-			min(power_button.debounce_us, deadline.val - now.val));
+		k_sem_take(&power_button_stable_sem,
+			   K_USEC(min(power_button.debounce_us,
+				      deadline.val - now.val)));
 	}
 
 	CPRINTS("%s released in time", power_button.name);
@@ -268,7 +278,7 @@ test_export_static void power_button_change_deferred(void)
 		CPRINTS("PB suppressed: suspend release");
 		eat_next_release = false;
 		debounced_power_pressed = 0;
-		power_button_is_stable = 1;
+		power_button_set_stable();
 		keyboard_scan_enable(1, KB_SCAN_DISABLE_POWER_BUTTON);
 		return;
 	}
@@ -291,12 +301,12 @@ test_export_static void power_button_change_deferred(void)
 
 	/* If power button hasn't changed state, nothing to do */
 	if (new_pressed == debounced_power_pressed) {
-		power_button_is_stable = 1;
+		power_button_set_stable();
 		return;
 	}
 
 	debounced_power_pressed = new_pressed;
-	power_button_is_stable = 1;
+	power_button_set_stable();
 
 	CPRINTS("%s %s", power_button.name,
 		new_pressed ? "pressed" : "released");

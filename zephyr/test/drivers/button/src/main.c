@@ -757,6 +757,30 @@ ZTEST(button, test_keyboard_pb_suspend_missed_release)
 }
 #endif
 
+static void release_power_button(struct k_work *work)
+{
+	extern void power_button_change_deferred(void);
+
+	/* The power button GPIO reads released, so this debounces a release */
+	power_button_change_deferred();
+}
+static K_WORK_DELAYABLE_DEFINE(release_power_button_work, release_power_button);
+
+ZTEST(button, test_power_button_wait_for_release_wakes_on_release)
+{
+	extern int debounced_power_pressed;
+	int64_t start;
+
+	debounced_power_pressed = 1;
+	k_work_schedule(&release_power_button_work, K_MSEC(5));
+
+	start = k_uptime_get();
+	zassert_ok(power_button_wait_for_release(SECOND));
+	/* Woken by the release, not by the debounce-period fallback. */
+	zassert_true(k_uptime_get() - start < BUTTON_DEBOUNCE_US / MSEC);
+	zassert_false(power_button_is_pressed());
+}
+
 /* Test power_button_is_eating_release and MKBP power button event filtering */
 ZTEST(button, test_power_button_is_eating_release)
 {
