@@ -1497,66 +1497,50 @@ static void rch_wait_for_message_from_protocol_layer_entry(const int port)
 
 static void rch_wait_for_message_from_protocol_layer_run(const int port)
 {
-	if (RCH_CHK_FLAG(port, PRL_FLAGS_MSG_RECEIVED)) {
-		RCH_CLR_FLAG(port, PRL_FLAGS_MSG_RECEIVED);
-		/*
-		 * Are we communicating with a PD3.0 device and is
-		 * this an extended message?
-		 */
-		if (pdmsg_xmit_type_is_rev30(port) &&
-		    PD_HEADER_EXT(rx_emsg[port].header)) {
-			uint16_t exhdr =
-				GET_EXT_HEADER(*pdmsg[port].rx_chk_buf);
-			uint8_t chunked = PD_EXT_HEADER_CHUNKED(exhdr);
+	bool ext;
 
-			/*
-			 * Received Extended Message & Chunked = 1
-			 *
-			 * Chunking is always 1 here: unchunked extended
-			 * messages are not supported. Refer to b/573313604.
-			 */
-			if (chunked) {
-				/*
-				 * RCH_Processing_Extended_Message first chunk
-				 * entry processing embedded here
-				 *
-				 * This is the first chunk:
-				 * Set Chunk_number_expected = 0 and
-				 * Num_Bytes_Received = 0
-				 */
-				pdmsg[port].chunk_number_expected = 0;
-				pdmsg[port].num_bytes_received = 0;
-				pdmsg[port].msg_type =
-					PD_HEADER_TYPE(rx_emsg[port].header);
+	if (!RCH_CHK_FLAG(port, PRL_FLAGS_MSG_RECEIVED))
+		return;
+	RCH_CLR_FLAG(port, PRL_FLAGS_MSG_RECEIVED);
 
-				set_state_rch(port,
-					      RCH_PROCESSING_EXTENDED_MESSAGE);
-			}
-			/*
-			 * Chunked = 0 (Chunked != Chunking)
-			 */
-			else {
-				rch[port].error = ERR_RCH_CHUNKED;
-				set_state_rch(port, RCH_REPORT_ERROR);
-			}
-		}
+	/* Extended messages are only valid from a PD3.0 partner. */
+	ext = pdmsg_xmit_type_is_rev30(port) &&
+	      PD_HEADER_EXT(rx_emsg[port].header);
+
+	/*
+	 * Received Extended Message & Chunked = 1: the first chunk.
+	 *
+	 * Chunking is always 1 here: unchunked extended messages are not
+	 * supported. Refer to b/573313604.
+	 */
+	if (ext &&
+	    PD_EXT_HEADER_CHUNKED(GET_EXT_HEADER(pdmsg[port].rx_chk_buf[0]))) {
 		/*
-		 * Received Non-Extended Message
+		 * RCH_Processing_Extended_Message first chunk entry processing
+		 * embedded here: Set Chunk_number_expected = 0 and
+		 * Num_Bytes_Received = 0
 		 */
-		else if (!PD_HEADER_EXT(rx_emsg[port].header)) {
-			/* Copy chunk to extended buffer */
-			copy_chunk_to_ext(port);
-			set_state_rch(port, RCH_PASS_UP_MESSAGE);
-		}
-		/*
-		 * Received an Extended Message while communicating at a
-		 * revision lower than PD3.0
-		 */
-		else {
-			rch[port].error = ERR_RCH_CHUNKED;
-			set_state_rch(port, RCH_REPORT_ERROR);
-		}
+		pdmsg[port].chunk_number_expected = 0;
+		pdmsg[port].num_bytes_received = 0;
+		pdmsg[port].msg_type = PD_HEADER_TYPE(rx_emsg[port].header);
+
+		set_state_rch(port, RCH_PROCESSING_EXTENDED_MESSAGE);
+		return;
 	}
+
+	/* Received Non-Extended Message */
+	if (!PD_HEADER_EXT(rx_emsg[port].header)) {
+		copy_chunk_to_ext(port);
+		set_state_rch(port, RCH_PASS_UP_MESSAGE);
+		return;
+	}
+
+	/*
+	 * Extended Message that cannot be received: Chunked = 0 (Chunked !=
+	 * Chunking), or any extended message from a partner below PD3.0.
+	 */
+	rch[port].error = ERR_RCH_CHUNKED;
+	set_state_rch(port, RCH_REPORT_ERROR);
 }
 
 /*
@@ -1706,6 +1690,23 @@ static void rch_waiting_chunk_entry(const int port)
 			PD_T_CHUNK_SENDER_RESPONSE);
 }
 
+/*
+ * Is the message in rx_chk_buf a chunk of an extended message, as opposed to
+ * a chunk request or a non-extended message? The extended header in
+ * rx_chk_buf[0] only exists when the message header's Extended bit is set,
+ * so test that before interpreting it.
+ */
+static bool rx_msg_is_chunk_response(const int port)
+{
+	uint16_t exhdr;
+
+	if (!PD_HEADER_EXT(rx_emsg[port].header))
+		return false;
+
+	exhdr = GET_EXT_HEADER(pdmsg[port].rx_chk_buf[0]);
+	return PD_EXT_HEADER_CHUNKED(exhdr) && !PD_EXT_HEADER_REQ_CHUNK(exhdr);
+}
+
 static void rch_waiting_chunk_run(const int port)
 {
 	if (RCH_CHK_FLAG(port, PRL_FLAGS_MSG_RECEIVED)) {
@@ -1720,39 +1721,21 @@ static void rch_waiting_chunk_run(const int port)
 			PDMSG_CLR_FLAG(port, PRL_FLAGS_TX_COMPLETE);
 
 		/*
-		 * Leave PRL_FLAGS_MSG_RECEIVED flag set just in case an error
-		 * is detected. If an error is detected, PRL_FLAGS_MSG_RECEIVED
-		 * will be cleared in rch_report_error state.
+		 * Chunk response Received from Protocol Layer
 		 */
-
-		if (PD_HEADER_EXT(rx_emsg[port].header)) {
-			uint16_t exhdr =
-				GET_EXT_HEADER(pdmsg[port].rx_chk_buf[0]);
+		if (rx_msg_is_chunk_response(port)) {
 			/*
-			 * Other Message Received from Protocol Layer
+			 * No error was detected, so clear
+			 * PRL_FLAGS_MSG_RECEIVED flag.
 			 */
-			if (PD_EXT_HEADER_REQ_CHUNK(exhdr) ||
-			    !PD_EXT_HEADER_CHUNKED(exhdr)) {
-				rch[port].error = ERR_RCH_CHUNKED;
-				set_state_rch(port, RCH_REPORT_ERROR);
-			}
-			/*
-			 * Chunk response Received from Protocol Layer
-			 */
-			else {
-				/*
-				 * No error was detected, so clear
-				 * PRL_FLAGS_MSG_RECEIVED flag.
-				 */
-				RCH_CLR_FLAG(port, PRL_FLAGS_MSG_RECEIVED);
-				set_state_rch(port,
-					      RCH_PROCESSING_EXTENDED_MESSAGE);
-			}
+			RCH_CLR_FLAG(port, PRL_FLAGS_MSG_RECEIVED);
+			set_state_rch(port, RCH_PROCESSING_EXTENDED_MESSAGE);
 		}
 		/*
-		 * Other (non-extended) Message Received from Protocol Layer.
-		 * PRL_FLAGS_MSG_RECEIVED stays set so that RCH_REPORT_ERROR
-		 * passes the message to the Policy Engine.
+		 * Other Message Received from Protocol Layer, including a
+		 * non-extended message. PRL_FLAGS_MSG_RECEIVED stays set so
+		 * that RCH_REPORT_ERROR passes the message to the Policy
+		 * Engine.
 		 */
 		else {
 			rch[port].error = ERR_RCH_CHUNKED;
