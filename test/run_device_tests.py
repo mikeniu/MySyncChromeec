@@ -115,6 +115,12 @@ DATA_ACCESS_VIOLATION_80C0000_REGEX = re.compile(
 DATA_ACCESS_VIOLATION_80E0000_REGEX = re.compile(
     r"Data access violation, mfar = 80e0000\r\n"
 )
+DATA_ACCESS_VIOLATION_10100000_REGEX = re.compile(
+    r"(Data access violation, mfar = 10100000\r\n)|(.*MMFAR Address: 0x10100000\r\n)"
+)
+DATA_ACCESS_VIOLATION_10101000_REGEX = re.compile(
+    r"(Data access violation, mfar = 10101000\r\n)|(.*MMFAR Address: 0x10101000\r\n)"
+)
 DATA_ACCESS_VIOLATION_20000000_REGEX = re.compile(
     r"Data access violation, mfar = 20000000\r\n"
 )
@@ -1420,9 +1426,8 @@ CHUDOW_CONFIG = BoardConfig(
     servo_uart_name="raw_fpmcu_console_uart_pty",
     servo_power_enable="fpmcu_pp3300",
     reboot_timeout=2.0,
-    # TODO(b/485656019): configure rollback regex.
-    rollback_region0_regex=NEVER_MATCH_REGEX,
-    rollback_region1_regex=NEVER_MATCH_REGEX,
+    rollback_region0_regex=DATA_ACCESS_VIOLATION_10100000_REGEX,
+    rollback_region1_regex=DATA_ACCESS_VIOLATION_10101000_REGEX,
     # TODO(b/363277530): create Zephyr MPU tests.
     mpu_regex=NEVER_MATCH_REGEX,
     fp_power_supply="pp3300_fp_mw",
