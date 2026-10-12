@@ -6,10 +6,10 @@
 #include "hooks.h"
 #include "host_command.h"
 #include "power_button.h"
-#include "task.h"
 #include "util.h"
 
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/shell/shell.h>
 
@@ -22,6 +22,9 @@ static const struct gpio_dt_spec power_button =
 static struct power_button_data_s {
 	int8_t state;
 } power_button_data;
+
+/* Given on every state change; wakes power_button_wait_for_release() */
+static K_SEM_DEFINE(power_button_change_sem, 0, 1);
 
 int power_button_is_pressed(void)
 {
@@ -38,9 +41,9 @@ int power_button_wait_for_release(int timeout_us)
 	int check_interval_us = 30000;
 	bool released;
 
-	released =
-		WAIT_FOR(!(power_button_data.state), timeout_us,
-			 task_wait_event(min(timeout_us, check_interval_us)));
+	released = WAIT_FOR(!(power_button_data.state), timeout_us,
+			    k_sem_take(&power_button_change_sem,
+				       K_USEC(check_interval_us)));
 
 	return released ? 0 : -ETIMEDOUT;
 }
@@ -50,6 +53,7 @@ void handle_power_button(int8_t new_pin_state)
 	LOG_DBG("Handling power button state=%d", new_pin_state);
 
 	power_button_data.state = new_pin_state;
+	k_sem_give(&power_button_change_sem);
 
 	hook_notify(HOOK_POWER_BUTTON_CHANGE);
 	host_set_single_event(EC_HOST_EVENT_POWER_BUTTON);
