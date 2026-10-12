@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47d7e0fc_d901adae",
+        "filename": "driver/battery/smart.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-12T23:32:05Z",
+      "side": 1,
+      "message": "For boards using `CONFIG_BATTERY_PRESENT_CUSTOM`, the `battery_set_cached_presence` update based on battery responsiveness at the bottom of this function is compiled out.\n\nSince `init_battery_type()` sets the cached presence to `BP_YES` (or `BP_NO`) on initialization, and custom `battery_is_present()` implementations (like in lapis/hekla) now return the cached value unconditionally if it\u0027s not `BP_NOT_SURE`, the cached presence will never revert to `BP_NOT_SURE` upon a battery disconnect. This locks the battery presence state permanently to its initial value.\n\nYou should consider moving the `battery_set_cached_presence` update outside the `#if` block or rethinking how custom boards clear the cache on disconnect.",
+      "range": {
+        "startLine": 552,
+        "startChar": 0,
+        "endLine": 552,
+        "endChar": 0
+      },
+      "revId": "2fcc3f37d9e2a0387710b6dec1444fc412338e8c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
