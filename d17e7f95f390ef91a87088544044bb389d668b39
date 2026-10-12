@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e37bb919_3157cdb9",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1658,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-12T17:46:29Z",
+      "side": 1,
+      "message": "It might be simpler to unconditionally set `ctx.previous` to Error Recovery in `restart_tc_sm`. At first glance, I don\u0027t think that would break anything.",
+      "revId": "d17e7f95f390ef91a87088544044bb389d668b39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e924cf40_113fca76",
+        "filename": "common/usbc/usb_tc_drp_acc_trysrc_sm.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 2177,
+      "author": {
+        "id": 1305927
+      },
+      "writtenOn": "2026-10-12T17:46:29Z",
+      "side": 1,
+      "message": "I think that the state machine probably already has all of the information needed to do this at the right time. What if we moved the `tc_detached` calls to the non-PRS cases in `attached_snk_exit` and `attached_src_exit`, `ct_attached_snk_exit`, and `restart_tc_sm`?",
+      "revId": "d17e7f95f390ef91a87088544044bb389d668b39",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
