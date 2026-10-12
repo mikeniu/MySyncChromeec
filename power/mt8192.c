@@ -143,7 +143,7 @@ void chipset_force_shutdown(enum chipset_shutdown_reason reason)
 	 * transitions to G3.
 	 */
 	forcing_shutdown = 1;
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 
 void chipset_force_shutdown_button(void)
@@ -184,7 +184,7 @@ static void handle_chipset_reset(void)
 	if (chipset_in_state(CHIPSET_STATE_SUSPEND)) {
 		CPRINTS("Chipset reset: exit s3");
 		power_reset_host_sleep_state();
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 	}
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESET, handle_chipset_reset, HOOK_PRIO_FIRST);
@@ -525,7 +525,7 @@ power_chipset_handle_host_sleep_event(enum host_sleep_event state,
 		 * listeners need to be notified of chipset resume.
 		 */
 		sleep_set_notify(SLEEP_NOTIFY_RESUME);
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 		sleep_complete_resume(ctx);
 	}
 }

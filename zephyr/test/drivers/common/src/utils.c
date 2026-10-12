@@ -61,7 +61,7 @@ void test_set_chipset_to_s0(void)
 {
 	printk("%s: Forcing power on\n", __func__);
 
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_SECONDS(1));
 
 	/*
@@ -96,7 +96,7 @@ void test_set_chipset_to_power_level(enum power_state new_state)
 		     ,
 		     "Power state must be one of the steady states");
 	enum power_state old_state = power_get_state();
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_SECONDS(1));
 
 	if (new_state == POWER_G3) {
@@ -126,7 +126,7 @@ void test_set_chipset_to_power_level(enum power_state new_state)
 void test_set_chipset_to_g3(void)
 {
 	/* Let power code to settle on a particular state first. */
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_SECONDS(1));
 
 	printk("%s: Forcing shutdown\n", __func__);

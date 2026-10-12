@@ -106,8 +106,7 @@ static enum power_state power_wait_s5_rtc_reset(void)
 	while ((power_get_signals() & IN_PCH_SLP_S4_DEASSERTED) == 0) {
 		/* Handle RSMRST passthru event while waiting */
 		common_intel_x86_handle_rsmrst(POWER_S5);
-		if (task_wait_event(SECOND * CONFIG_S5_EXIT_WAIT) ==
-		    TASK_EVENT_TIMER) {
+		if (power_thread_wait(SECOND * CONFIG_S5_EXIT_WAIT)) {
 			CPRINTS("timeout waiting for S5 exit");
 			chipset_force_g3();
 
@@ -192,7 +191,7 @@ static void handle_chipset_reset(void)
 	if (chipset_in_state(CHIPSET_STATE_STANDBY)) {
 		CPRINTS("chipset reset: exit s0ix");
 		power_reset_host_sleep_state();
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 	}
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESET, handle_chipset_reset, HOOK_PRIO_FIRST);
@@ -636,7 +635,7 @@ power_chipset_handle_host_sleep_event(enum host_sleep_event state,
 		 * listeners need to be notified of chipset resume.
 		 */
 		sleep_set_notify(SLEEP_NOTIFY_RESUME);
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 		lpc_s0ix_resume_restore_masks();
 		power_signal_disable_interrupt(sleep_sig[SYS_SLEEP_S0IX]);
 		sleep_complete_resume(ctx);

@@ -207,7 +207,7 @@ static void start_in_s0(void *fixture)
 
 	power_set_state(POWER_S0);
 	power_signal_interrupt(GPIO_AP_SUSPEND);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_S0,
 		      "Failed to initialize to S0: %d", power_get_state());
@@ -400,7 +400,7 @@ ZTEST(qcom_exp_power, test_no_power_good)
 	zassert_equal(power_get_state(), POWER_S0);
 	shell_backend_dummy_clear_output(get_ec_shell());
 	gpio_emul_input_set(gpio_dev, PIN_POWER_GOOD, 0);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_SECONDS(11));
 	zassert_equal(power_get_state(), POWER_G3, "power_state=%d",
 		      power_get_state());
@@ -421,7 +421,7 @@ ZTEST(qcom_exp_power, test_no_power_good_then_good)
 	shell_backend_dummy_clear_output(get_ec_shell());
 	gpio_emul_input_set(gpio_dev, PIN_POWER_GOOD, 0);
 	set_power_good_on_reset = true;
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_SECONDS(11));
 	zassert_equal(power_get_state(), POWER_G3, "power_state=%d",
 		      power_get_state());
@@ -451,7 +451,7 @@ ZTEST(qcom_exp_power, test_request_sleep_and_resume)
 	zassert_ok(ec_cmd_host_sleep_event(NULL, &params));
 	gpio_emul_input_set(gpio_dev, PIN_AP_SUSPEND, 0);
 	power_signal_interrupt(GPIO_AP_SUSPEND);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_S0);
 }
@@ -497,7 +497,7 @@ ZTEST(qcom_exp_power, test_ap_rst_interrupt_s3)
 	power_signal_enable_interrupt(GPIO_AP_SUSPEND);
 	gpio_emul_input_set(gpio_dev, PIN_AP_SUSPEND, 1);
 	power_set_state(POWER_S3);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_MSEC(500));
 	zassert_equal(power_get_state(), POWER_S3);
 

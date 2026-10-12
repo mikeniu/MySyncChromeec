@@ -142,6 +142,24 @@ int power_wait_signals_timeout(uint32_t want, int timeout);
 int power_wait_mask_signals_timeout(uint32_t want, uint32_t mask, int timeout);
 
 /**
+ * Wake the power sequencing (chipset) thread.
+ *
+ * Multiple wakes before the thread runs are merged into one. Safe to call
+ * from interrupt context.
+ */
+void power_thread_wake(void);
+
+/**
+ * Block the power sequencing thread until it is woken or a timeout expires.
+ *
+ * Must only be called from the power sequencing thread.
+ *
+ * @param timeout_us	Timeout in usec, or -1 to wait forever.
+ * @return true if the timeout expired, false if the thread was woken.
+ */
+bool power_thread_wait(int timeout_us);
+
+/**
  * Set the low-level power chipset state.
  *
  * @param new_state New chipset state.

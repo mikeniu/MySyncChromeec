@@ -223,7 +223,7 @@ void chipset_force_shutdown(enum chipset_shutdown_reason reason)
 
 	is_shutdown = true;
 
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 
 void chipset_force_shutdown_button(void)
@@ -255,7 +255,7 @@ static void reset_flag_deferred(void)
 
 	CPRINTS("chipset_reset failed");
 	is_resetting = false;
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 }
 DECLARE_DEFERRED(reset_flag_deferred);
 
@@ -636,7 +636,7 @@ power_chipset_handle_host_sleep_event(enum host_sleep_event state,
 		 * listeners need to be notified of chipset resume.
 		 */
 		sleep_set_notify(SLEEP_NOTIFY_RESUME);
-		task_wake(TASK_ID_CHIPSET);
+		power_thread_wake();
 		sleep_complete_resume(ctx);
 	}
 	board_handle_host_sleep_event(state);

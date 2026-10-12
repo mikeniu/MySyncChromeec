@@ -691,7 +691,7 @@ ZTEST(power_common_hibernation, test_power_hc_hibernation_delay)
 		      response.hibernate_delay);
 
 	/* Kick chipset task to process new hibernation delay */
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	/* Wait some arbitrary time less than hibernate delay */
 	sleep_time = 6;
 	k_msleep(sleep_time * 1000);
@@ -751,7 +751,7 @@ ZTEST(power_common_hibernation, test_power_hc_hibernation_delay)
 	/* Reset system_hibernate fake to check that it is not called on AC */
 	RESET_FAKE(system_hibernate);
 	/* Allow chipset task to spin with enabled AC */
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_msleep(1);
 
 	/* Get hibernate delay */
@@ -808,7 +808,7 @@ ZTEST(power_common_hibernation, test_power_cmd_hibernation_delay)
 		      shell_execute_cmd(get_ec_shell(), "hibdelay 3"), NULL);
 
 	/* Kick chipset task to process new hibernation delay */
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	/* Wait some arbitrary time less than hibernate delay */
 	sleep_time = 2;
 	k_msleep(sleep_time * 1000);

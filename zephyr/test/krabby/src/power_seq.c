@@ -67,7 +67,7 @@ static void set_signal_state(enum power_state state)
 
 	/* reset is_held flag */
 	is_held = false;
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_SECONDS(1));
 }
 
@@ -425,7 +425,7 @@ static void power_chipset_init_subtest(enum power_state signal_state,
 	power_set_state(power_chipset_init());
 
 	RESET_FAKE(chipset_pre_init_hook);
-	task_wake(TASK_ID_CHIPSET);
+	power_thread_wake();
 	k_sleep(K_SECONDS(1));
 
 	if (signal_state == expected_state) {
