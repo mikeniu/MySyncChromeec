@@ -870,7 +870,6 @@ static void it8xxx2_init(enum usbpd_port port, int role)
 	/* Enable tx done and hard reset detect interrupt */
 	IT83XX_USBPD_IMR(port) &= ~(USBPD_REG_MASK_MSG_TX_DONE |
 				    USBPD_REG_MASK_HARD_RESET_DETECT);
-#ifdef IT83XX_INTC_PLUG_IN_OUT_SUPPORT
 	/*
 	 * When tcpc detect type-c plug in (cc lines voltage change), it will
 	 * interrupt fw to wake pd task, so task can react immediately.
@@ -881,7 +880,6 @@ static void it8xxx2_init(enum usbpd_port port, int role)
 				    ~(USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE |
 				      USBPD_REG_PLUG_OUT_SELECT)) |
 				   USBPD_REG_PLUG_IN_OUT_DETECT_STAT;
-#endif
 	/* Set cc1/cc2 pins alternate mode */
 	*usbpd_ctrl_regs[port].cc1 = cc_config;
 	*usbpd_ctrl_regs[port].cc2 = cc_config;
@@ -1008,14 +1006,12 @@ static void it8xxx2_tcpm_hook_disconnect(void)
 	if (port > (CONFIG_USB_PD_ITE_ACTIVE_PORT_COUNT - 1))
 		return;
 
-	if (IS_ENABLED(IT83XX_INTC_PLUG_IN_OUT_SUPPORT))
-		/*
-		 * Switch to detect plug in and enable detect plug in interrupt,
-		 * since pd task has detected a type-c physical disconnected.
-		 */
-		IT83XX_USBPD_TCDCR(port) &=
-			~(USBPD_REG_PLUG_OUT_SELECT |
-			  USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE);
+	/*
+	 * Switch to detect plug in and enable detect plug in interrupt,
+	 * since pd task has detected a type-c physical disconnected.
+	 */
+	IT83XX_USBPD_TCDCR(port) &= ~(USBPD_REG_PLUG_OUT_SELECT |
+				      USBPD_REG_PLUG_IN_OUT_DETECT_DISABLE);
 
 	/* Exit BIST test data mode */
 	USBPD_SW_RESET(port);
