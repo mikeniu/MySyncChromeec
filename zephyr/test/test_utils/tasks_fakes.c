@@ -20,6 +20,7 @@ FAKE_VOID_FUNC(task_set_event, task_id_t, uint32_t);
 FAKE_VALUE_FUNC(int, task_start_called);
 FAKE_VALUE_FUNC(uint32_t, task_wait_event, int);
 FAKE_VALUE_FUNC(uint32_t, task_wait_event_mask, uint32_t, int);
+FAKE_VALUE_FUNC(int, pd_get_current_task_port);
 
 /*
  * If cros-ec tasks aren't enabled, always indicate we are in a deferred

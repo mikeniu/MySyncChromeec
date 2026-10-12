@@ -156,7 +156,7 @@ static bool pd_task_loop(int port)
 
 void pd_task(void *u)
 {
-	int port = TASK_ID_TO_PD_PORT(task_get_current());
+	int port = (int)((intptr_t)u);
 
 	/*
 	 * If port does not exist, return
