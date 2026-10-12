@@ -31,8 +31,6 @@ GPIO_TRANSPORT_SEL: Miscellaneous.Button @ gpioPortB 1
     init:
         ReleaseOnReset false
 
-fpsensor: Sensors.GenericSPISensor @ spi2
-
 // TODO(b/562172237): Remove this override once upstream stm32f4.repl stops
 // performing external ApplySVD network downloads at startup.
 // Override sysbus init from platforms/cpus/stm32f4.repl to copy its Tag
