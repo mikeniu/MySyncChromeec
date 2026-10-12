@@ -34,6 +34,8 @@
 #include "usb_pd.h"
 #include "util.h"
 
+#include <zephyr/kernel.h>
+
 /* Console output macros */
 #define CPUTS(outstr) cputs(CC_CHARGER, outstr)
 #define CPRINTS(format, args...) cprints(CC_CHARGER, format, ##args)
@@ -984,9 +986,12 @@ void charger_init(void)
 }
 DECLARE_HOOK(HOOK_INIT, charger_init, HOOK_PRIO_DEFAULT);
 
+/* Wakes the charger thread; repeated wakes are merged. */
+static K_SEM_DEFINE(charger_wake_sem, 0, 1);
+
 void charge_wakeup(void)
 {
-	task_wake(TASK_ID_CHARGER);
+	k_sem_give(&charger_wake_sem);
 }
 DECLARE_HOOK(HOOK_CHIPSET_RESUME, charge_wakeup, HOOK_PRIO_DEFAULT);
 DECLARE_HOOK(HOOK_AC_CHANGE, charge_wakeup, HOOK_PRIO_DEFAULT);
@@ -1594,7 +1599,7 @@ void charger_task(void *u)
 		local_state.is_full = is_full;
 
 		sleep_usec = calculate_sleep_dur(battery_critical, sleep_usec);
-		task_wait_event(sleep_usec);
+		k_sem_take(&charger_wake_sem, K_USEC(sleep_usec));
 	}
 }
 
