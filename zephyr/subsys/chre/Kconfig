@@ -1,0 +1,11 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config ISH_CHRE
+	bool "Use CHRE on ISH"
+	help
+	  Enable the Context Hub Runtime Environment (CHRE) on Intel ISH.
+	  CHRE is an event-driven runtime architecture designed for low-power,
+	  always-on contextual computing such as sensor fusion, activity
+	  recognition, and nanoapps.
