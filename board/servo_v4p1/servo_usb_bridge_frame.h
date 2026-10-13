@@ -41,6 +41,69 @@ extern "C" {
 	0x50U /* | (epoch & 0x03); arg = (boot ? 0x80 : 0) | proto */
 #define SERVO_FRAME_KEY_CMD 0x60U /* arg = keycode ch */
 #define SERVO_FRAME_KEY_ACK 0x70U /* arg = ~keycode & 0xFF */
+#define SERVO_FRAME_MSC_REQ \
+	0x80U /* ATmega -> STM32 -> EP2 IN (fixed 8B payload) */
+#define SERVO_FRAME_MSC_DATA \
+	0x90U /* EP2 OUT -> STM32 -> ATmega (1..64B payload)  */
+
+#define SERVO_MSC_CMD_CAP 0x43U /* 'C': Query capacity & media_gen */
+#define SERVO_MSC_CMD_READ 0x52U /* 'R': Read 512B sector at lba_be */
+#define SERVO_MSC_RSP_CAP 0x43U /* 'C': Capacity response (8B)     */
+#define SERVO_MSC_RSP_ERR 0x45U /* 'E': Error response (8B)        */
+#define SERVO_MSC_RSP_SERIAL 0x53U /* 'S': STM32 PSTATE serial sync   */
+#define SERVO_MSC_RSP_ZERO 0x5AU /* 'Z': All-zero 512B sector response (8B) */
+
+#define SERVO_MSC_CHUNK_HDR_MASK 0xF0U
+#define SERVO_MSC_CHUNK_DATA_TAG 0x80U /* 0x80 | chunk_idx (0..7), 62B data */
+#define SERVO_MSC_CHUNK_EOF_TAG 0x90U /* 0x90 | 8 (0x98), 16B data         */
+#define SERVO_MSC_CHUNK_IDX_MASK 0x0FU
+
+#define SERVO_MSC_ERR_NO_MEDIUM 0x3AU /* ASC 0x3A: MEDIUM NOT PRESENT */
+#define SERVO_MSC_ERR_UNIT_ATTN 0x28U /* ASC 0x28: NOT READY TO READY */
+#define SERVO_MSC_ERR_LBA_RANGE 0x21U /* ASC 0x21: LBA OUT OF RANGE */
+
+struct servo_msc_req {
+	uint8_t cmd; /* 'C' (0x43) or 'R' (0x52) */
+	uint8_t req_tag; /* Monotonic 8-bit request tag */
+	uint8_t media_gen; /* ATmega's known media_gen (0 = no media) */
+	uint8_t rsvd; /* 0x00 */
+	uint32_t lba_be; /* Big-endian 32-bit LBA (0 for 'C') */
+} __attribute__((packed));
+
+struct servo_msc_rsp_hdr {
+	uint8_t rsp; /* 'C' (0x43), 'E' (0x45), or 'S' (0x53) */
+	uint8_t req_tag; /* Echoed from servo_msc_req.req_tag */
+	uint8_t media_gen; /* Current servod media_gen */
+} __attribute__((packed));
+
+struct servo_msc_cap_reply {
+	uint8_t rsp; /* 'C' (0x43) */
+	uint8_t req_tag; /* Echoed from servo_msc_req.req_tag */
+	uint8_t media_gen; /* Current servod media_gen (1..255) */
+	uint8_t flags; /* Bit 0: write_protected (1) */
+	uint32_t blocks_be; /* Big-endian total 512B blocks */
+} __attribute__((packed));
+
+struct servo_msc_err_reply {
+	uint8_t rsp; /* 'E' (0x45) */
+	uint8_t req_tag; /* Echoed from servo_msc_req.req_tag */
+	uint8_t media_gen; /* Current servod media_gen (0 or 1..255) */
+	uint8_t err_code; /* 0x3A, 0x28, or 0x21 */
+	uint32_t blocks_be; /* Big-endian current total 512B blocks */
+} __attribute__((packed));
+
+#if (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)) || \
+	(defined(__GNUC__) &&                                       \
+	 ((__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)))
+_Static_assert(sizeof(struct servo_msc_req) == 8,
+	       "servo_msc_req must be 8 bytes");
+_Static_assert(sizeof(struct servo_msc_rsp_hdr) == 3,
+	       "servo_msc_rsp_hdr must be 3 bytes");
+_Static_assert(sizeof(struct servo_msc_cap_reply) == 8,
+	       "servo_msc_cap_reply must be 8 bytes");
+_Static_assert(sizeof(struct servo_msc_err_reply) == 8,
+	       "servo_msc_err_reply must be 8 bytes");
+#endif
 
 #define SERVO_OPCODE_MASK 0xF0U
 #define SERVO_TYPE_RESERVED_BIT 0x08U
@@ -143,9 +206,11 @@ servo_frame_encode(uint8_t type, uint8_t arg_len, const uint8_t *payload,
 {
 	uint8_t crc = 0U;
 	uint8_t i;
+	uint8_t op = type & SERVO_OPCODE_MASK;
 
 	servo_frame_encode_header(type, arg_len, out_frame, &crc);
-	if ((type & SERVO_OPCODE_MASK) == SERVO_FRAME_DATA) {
+	if (op == SERVO_FRAME_DATA || op == SERVO_FRAME_MSC_REQ ||
+	    op == SERVO_FRAME_MSC_DATA) {
 		uint8_t len = (arg_len <= SERVO_MAX_DATA_LEN) ?
 				      arg_len :
 				      SERVO_MAX_DATA_LEN;
@@ -272,6 +337,8 @@ static inline bool servo_frame_is_valid_type(uint8_t type)
 		return (type & SERVO_CTRL_SEQ_MASK) == 0U;
 	case SERVO_FRAME_KEY_CMD:
 	case SERVO_FRAME_KEY_ACK:
+	case SERVO_FRAME_MSC_REQ:
+	case SERVO_FRAME_MSC_DATA:
 		return (type & 0x0FU) == 0U;
 	default:
 		return false;
@@ -297,6 +364,10 @@ static inline bool servo_frame_is_valid_arg(uint8_t type, uint8_t arg_len)
 	case SERVO_FRAME_KEY_CMD:
 	case SERVO_FRAME_KEY_ACK:
 		return true;
+	case SERVO_FRAME_MSC_REQ:
+		return arg_len == 8U;
+	case SERVO_FRAME_MSC_DATA:
+		return arg_len >= 1U && arg_len <= SERVO_MAX_DATA_LEN;
 	default:
 		return false;
 	}
@@ -306,6 +377,21 @@ static inline bool servo_frame_is_valid_header(uint8_t type, uint8_t arg_len)
 {
 	return servo_frame_is_valid_type(type) &&
 	       servo_frame_is_valid_arg(type, arg_len);
+}
+
+static inline bool servo_frame_is_valid_type_and_arg(uint8_t type, uint8_t arg)
+{
+	return servo_frame_is_valid_header(type, arg);
+}
+
+static inline uint8_t servo_frame_payload_len(uint8_t type, uint8_t arg)
+{
+	uint8_t op = type & SERVO_OPCODE_MASK;
+
+	if (op == SERVO_FRAME_DATA || op == SERVO_FRAME_MSC_REQ ||
+	    op == SERVO_FRAME_MSC_DATA)
+		return (arg <= SERVO_MAX_DATA_LEN) ? arg : SERVO_MAX_DATA_LEN;
+	return 0U;
 }
 
 static inline enum servo_rx_event
@@ -387,8 +473,7 @@ servo_frame_rx_step(struct servo_rx_parser *p, uint8_t byte, uint32_t now_us)
 		p->arg_len = byte;
 		p->running_crc = servo_crc8_ccitt(p->running_crc, byte);
 		p->bytes_read = 0U;
-		if ((p->type & SERVO_OPCODE_MASK) == SERVO_FRAME_DATA &&
-		    byte > 0U) {
+		if (servo_frame_payload_len(p->type, byte) > 0U) {
 			p->state = SERVO_RX_WAIT_PAYLOAD;
 		} else {
 			p->state = SERVO_RX_WAIT_CRC;
@@ -440,6 +525,11 @@ struct servo_bridge_rx_effects {
 	 * firmware) */
 	bool epoch_history_cleared;
 	uint8_t cleared_epoch;
+	/* MSC frame received effects */
+	bool msc_frame_received;
+	uint8_t msc_frame_type;
+	uint8_t msc_frame_len;
+	const uint8_t *msc_frame_payload;
 };
 
 struct servo_bridge_node {
@@ -500,6 +590,12 @@ struct servo_bridge_node {
 
 	bool pending_data_tx;
 
+	/* MSC TX staging buffer and Priority 3A/3B fairness */
+	uint8_t pending_msc_len;
+	uint8_t pending_msc_type;
+	uint8_t pending_msc_buf[SERVO_MAX_DATA_LEN];
+	bool last_bulk_was_msc;
+
 	/* Microsecond retransmission timestamps & byte-stream RX parser */
 	uint32_t last_tx_us;
 	uint32_t last_reset_tx_us;
@@ -527,6 +623,8 @@ static inline void servo_bridge_clear_tx_buf(struct servo_bridge_node *n)
 static inline void servo_bridge_init(struct servo_bridge_node *n,
 				     bool is_epoch_leader, uint32_t now_us)
 {
+	uint8_t i;
+
 	n->is_epoch_leader = is_epoch_leader;
 	n->state = SERVO_STATE_RESETTING;
 	n->epoch = 0U;
@@ -565,10 +663,18 @@ static inline void servo_bridge_init(struct servo_bridge_node *n,
 	n->pending_key_ack = false;
 	n->pending_key_ack_ch = 0U;
 
+	n->pending_msc_len = 0U;
+	n->pending_msc_type = 0U;
+	for (i = 0U; i < SERVO_MAX_DATA_LEN; ++i)
+		n->pending_msc_buf[i] = 0U;
+	n->last_bulk_was_msc = false;
+
 	n->last_tx_us = now_us;
 	n->last_reset_tx_us = now_us;
 	servo_frame_rx_init(&n->rx);
 }
+
+#define servo_bridge_node_init servo_bridge_init
 
 /*
  * TLA+ Action: TriggerReset(n)
@@ -866,6 +972,31 @@ static inline bool servo_bridge_send_key_cmd(struct servo_bridge_node *n,
 	return true;
 }
 
+static inline bool servo_bridge_send_msc_req(struct servo_bridge_node *n,
+					     const uint8_t *buf, uint8_t len)
+{
+	if (buf == NULL || n->pending_msc_len != 0U || len != 8U)
+		return false;
+	for (uint8_t i = 0; i < len; ++i)
+		n->pending_msc_buf[i] = buf[i];
+	n->pending_msc_type = SERVO_FRAME_MSC_REQ;
+	n->pending_msc_len = len;
+	return true;
+}
+
+static inline bool servo_bridge_send_msc_data(struct servo_bridge_node *n,
+					      const uint8_t *buf, uint8_t len)
+{
+	if (buf == NULL || n->pending_msc_len != 0U || len == 0U ||
+	    len > SERVO_MAX_DATA_LEN)
+		return false;
+	for (uint8_t i = 0; i < len; ++i)
+		n->pending_msc_buf[i] = buf[i];
+	n->pending_msc_type = SERVO_FRAME_MSC_DATA;
+	n->pending_msc_len = len;
+	return true;
+}
+
 /*
  * TLA+ Action: RecvCorrupt(n)
  * Schedules FRAME_NAK(epoch, rx_seq) when in STATE_ACTIVE.
@@ -905,6 +1036,10 @@ static inline void servo_bridge_on_rx_frame(struct servo_bridge_node *n,
 		fx->new_active_proto = n->active_proto;
 		fx->epoch_history_cleared = false;
 		fx->cleared_epoch = 0U;
+		fx->msc_frame_received = false;
+		fx->msc_frame_type = 0U;
+		fx->msc_frame_len = 0U;
+		fx->msc_frame_payload = NULL;
 	}
 
 	switch (op) {
@@ -992,6 +1127,8 @@ static inline void servo_bridge_on_rx_frame(struct servo_bridge_node *n,
 							 n->active_proto;
 
 		if (req_boot) {
+			n->pending_msc_len = 0U;
+			n->pending_msc_type = 0U;
 			if (n->booted) {
 				if (n->is_epoch_leader ||
 				    req_proto == n->active_proto) {
@@ -1165,6 +1302,10 @@ static inline void servo_bridge_on_rx_frame(struct servo_bridge_node *n,
 		if (n->state == SERVO_STATE_RESETTING &&
 		    ack_boot == n->booted &&
 		    (n->booted || ack_epoch == n->epoch)) {
+			if (ack_boot) {
+				n->pending_msc_len = 0U;
+				n->pending_msc_type = 0U;
+			}
 			if (!n->is_epoch_leader) {
 				if (ack_proto == n->active_proto) {
 					n->state = SERVO_STATE_ACTIVE;
@@ -1247,6 +1388,16 @@ static inline void servo_bridge_on_rx_frame(struct servo_bridge_node *n,
 		}
 		break;
 
+	case SERVO_FRAME_MSC_REQ:
+	case SERVO_FRAME_MSC_DATA:
+		if (fx != NULL) {
+			fx->msc_frame_received = true;
+			fx->msc_frame_type = type;
+			fx->msc_frame_len = arg_len;
+			fx->msc_frame_payload = payload;
+		}
+		break;
+
 	default:
 		break;
 	}
@@ -1277,6 +1428,10 @@ static inline void servo_bridge_on_rx_event(struct servo_bridge_node *n,
 		fx->new_active_proto = n->active_proto;
 		fx->epoch_history_cleared = false;
 		fx->cleared_epoch = 0U;
+		fx->msc_frame_received = false;
+		fx->msc_frame_type = 0U;
+		fx->msc_frame_len = 0U;
+		fx->msc_frame_payload = NULL;
 	}
 
 	if (n->rx.timeout_occurred) {
@@ -1434,10 +1589,26 @@ servo_bridge_pop_tx_frame(struct servo_bridge_node *n, size_t tx_ring_free,
 		return 0U;
 	}
 
-	/* Priority 3: Bulk Data (4B + len + 16B headroom <= 84B required) */
-	if (n->state == SERVO_STATE_ACTIVE && n->pending_data_tx &&
-	    n->has_tx_data) {
-		if (tx_ring_free >= SERVO_DATA_TX_MIN_FREE(n->tx_data_len)) {
+	/* Priority 3: Bulk Data Arbiter (3A: ADB/Fastboot, 3B: MSC) with
+	 * 1-for-1 round-robin fairness */
+	bool adb_ready =
+		(n->state == SERVO_STATE_ACTIVE && n->pending_data_tx &&
+		 n->has_tx_data &&
+		 tx_ring_free >= SERVO_DATA_TX_MIN_FREE(n->tx_data_len));
+	bool msc_ready =
+		(n->pending_msc_len > 0U &&
+		 tx_ring_free >= (size_t)(4U + (size_t)n->pending_msc_len +
+					  SERVO_CTRL_TX_HEADROOM));
+
+	if (adb_ready && msc_ready) {
+		if (!n->last_bulk_was_msc) {
+			uint8_t type = n->pending_msc_type;
+			uint8_t len = n->pending_msc_len;
+			n->pending_msc_len = 0U;
+			n->last_bulk_was_msc = true;
+			return servo_frame_encode(type, len, n->pending_msc_buf,
+						  out_frame);
+		} else {
 			uint8_t type = (uint8_t)(SERVO_FRAME_DATA |
 						 ((n->tx_data_seq & 0x01U)
 						  << SERVO_DATA_SEQ_SHIFT) |
@@ -1445,9 +1616,27 @@ servo_bridge_pop_tx_frame(struct servo_bridge_node *n, size_t tx_ring_free,
 						  SERVO_EPOCH_MASK));
 			n->pending_data_tx = false;
 			n->last_tx_us = now_us;
+			n->last_bulk_was_msc = false;
 			return servo_frame_encode(type, n->tx_data_len,
 						  n->tx_data_buf, out_frame);
 		}
+	} else if (msc_ready) {
+		uint8_t type = n->pending_msc_type;
+		uint8_t len = n->pending_msc_len;
+		n->pending_msc_len = 0U;
+		n->last_bulk_was_msc = true;
+		return servo_frame_encode(type, len, n->pending_msc_buf,
+					  out_frame);
+	} else if (adb_ready) {
+		uint8_t type = (uint8_t)(SERVO_FRAME_DATA |
+					 ((n->tx_data_seq & 0x01U)
+					  << SERVO_DATA_SEQ_SHIFT) |
+					 (n->tx_data_epoch & SERVO_EPOCH_MASK));
+		n->pending_data_tx = false;
+		n->last_tx_us = now_us;
+		n->last_bulk_was_msc = false;
+		return servo_frame_encode(type, n->tx_data_len, n->tx_data_buf,
+					  out_frame);
 	}
 
 	return 0U;

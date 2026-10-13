@@ -495,6 +495,7 @@ USB_STREAM_CONFIG_USART_IFACE(usart4_usb, USB_IFACE_USART4_STREAM,
  * Define usb interface descriptor for the `EMPTY` usb interface, to satisfy
  * UEFI and kernel requirements (see b/183857501).
  */
+#ifndef SECTION_IS_RO
 const struct usb_interface_descriptor USB_IFACE_DESC(USB_IFACE_EMPTY) = {
 	.bLength = USB_DT_INTERFACE_SIZE,
 	.bDescriptorType = USB_DT_INTERFACE,
@@ -506,6 +507,7 @@ const struct usb_interface_descriptor USB_IFACE_DESC(USB_IFACE_EMPTY) = {
 	.bInterfaceProtocol = 0,
 	.iInterface = 0,
 };
+#endif
 
 /******************************************************************************
  * Define the strings used in our USB descriptors.

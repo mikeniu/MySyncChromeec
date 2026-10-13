@@ -230,7 +230,9 @@ static void ep0_rx(void)
 #if defined(SECTION_IS_RO) && defined(USB_EP_BRIDGE)
 	if (req == (USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_ENDPOINT |
 		    (USB_REQ_CLEAR_FEATURE << 8)) &&
-	    ep0_buf_rx[1] == 0 && (ep0_buf_rx[2] & 0x7f) == USB_EP_BRIDGE) {
+	    ep0_buf_rx[1] == 0 &&
+	    ((ep0_buf_rx[2] & 0x7f) == USB_EP_BRIDGE ||
+	     (ep0_buf_rx[2] & 0x7f) == USB_EP_MSC)) {
 		if (usb_bridge_clear_halt(ep0_buf_rx[2] & 0xff) == 0)
 			return;
 		goto unknown_req;
