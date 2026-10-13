@@ -59,12 +59,27 @@ timer_field = i.GetType().GetField(
 timer_field.GetValue(i).Enabled = value == 0
 """
 
+# Renode's Miscellaneous.DWT model returns 0 for NUMCOMP (bits [31:28]) when
+# reading DWT->CTRL (0xE0001000). Report 4 comparators (NUMCOMP=4) so
+# z_arm_debug_enable_null_pointer_detection() does not hit an assertion failure
+# when CONFIG_ASSERT=y is enabled.
+# TODO(b/568364359): Remove once Miscellaneous.DWT models NUMCOMP and comparators in Renode.
+dwt AddAfterReadDoubleWordHook 0x0 "value |= 0x40000000"
+
 macro reset
 """
     sysbus LoadSymbolsFrom $elf_ro
     # sysbus LoadSymbolsFrom $elf_rw
     cpu FpuEnabled true
     cpu PC 0x0
+    # Zephyr RW sets BASEPRI=0x10 via arch_irq_lock() before rebooting. In
+    # Renode, CortexM.Reset() clears the CPU BasePri register without notifying
+    # NVIC, and NVIC.Reset() does not clear nvic.basepri, leaving interrupts
+    # with priority >= 0x10 masked when Legacy EC RO boots and only clears
+    # PRIMASK. Explicitly write BasePri=0 via the CPU property so it propagates
+    # to NVIC.
+    # TODO(b/567998100): Remove once CortexM/NVIC Reset() clears BASEPRI in Renode.
+    cpu BasePri 0
     # Set the image type of currently loaded image to RO by default. Software will
     # update the flag while jumping between image types.
     image_type WriteByte 0x0 0x40
