@@ -5,10 +5,13 @@
 """Unit tests for firmware_builder_lib."""
 
 import argparse
+import pathlib
 import re
+import subprocess
 import tempfile
 import types
 import unittest
+from unittest import mock
 
 from scripts import firmware_builder_lib
 
@@ -167,6 +170,63 @@ class TestSummarizeMergedLcov(unittest.TestCase):
         """Test that a board that is not in the tracefile raises ValueError."""
         with self.assertRaisesRegex(ValueError, "BOARD_BOARD-Z"):
             self._summarize(["board-z"])
+
+
+class TestExtractLcovSummaryWorker(unittest.TestCase):
+    """Tests for extract_lcov_summary_worker function."""
+
+    @mock.patch.object(subprocess, "run")
+    def test_extracts_summary(self, mock_run):
+        """Test parsing valid lcov --summary output."""
+        mock_run.return_value = types.SimpleNamespace(
+            stdout=(
+                "Reading tracefile /tmp/lcov.info\n"
+                "Summary coverage rate:\n"
+                "  lines......: 84.5% (4225 of 5000 lines)\n"
+                "  functions..: 91.2% (310 of 340 functions)\n"
+            )
+        )
+        logged_cmds = []
+        zephyr_dir = pathlib.Path("/tmp/zephyr")
+
+        result = firmware_builder_lib.extract_lcov_summary_worker(
+            "ALL_MERGED",
+            pathlib.Path("/tmp/lcov.info"),
+            zephyr_dir=zephyr_dir,
+            log_cmd_fn=logged_cmds.append,
+        )
+
+        self.assertEqual(result, ("ALL_MERGED", 84.5, 4225, 5000))
+        self.assertEqual(len(logged_cmds), 1)
+        mock_run.assert_called_once_with(
+            [
+                "/usr/bin/lcov",
+                "--ignore-errors",
+                "inconsistent",
+                "--summary",
+                pathlib.Path("/tmp/lcov.info"),
+            ],
+            cwd=zephyr_dir,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+            stdin=subprocess.DEVNULL,
+        )
+
+    @mock.patch.object(subprocess, "run")
+    def test_invalid_output_raises(self, mock_run):
+        """Test that unparsable lcov output raises ValueError."""
+        mock_run.return_value = types.SimpleNamespace(
+            stdout="Summary coverage rate:\n  functions..: 91.2%\n"
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, "Failed to parse LCOV summary output for ALL_MERGED"
+        ):
+            firmware_builder_lib.extract_lcov_summary_worker(
+                "ALL_MERGED", pathlib.Path("/tmp/lcov.info")
+            )
 
 
 if __name__ == "__main__":

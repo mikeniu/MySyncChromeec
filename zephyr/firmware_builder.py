@@ -42,6 +42,9 @@ from zmake.repository_prep import find_checkout
 from zmake.repository_prep import prepared_workspace
 
 from scripts.firmware_builder_lib import (
+    extract_lcov_summary_worker as _extract_lcov_summary_worker,
+)
+from scripts.firmware_builder_lib import (
     get_safe_lcov_workers as _get_safe_lcov_workers,
 )
 from scripts.firmware_builder_lib import create_arg_parser
@@ -793,7 +796,11 @@ def test(opts):
         with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_name = {
                 executor.submit(
-                    _extract_lcov_summary_worker, name, filename
+                    _extract_lcov_summary_worker,
+                    name,
+                    filename,
+                    ZEPHYR_DIR,
+                    log_cmd,
                 ): name
                 for name, filename in tasks
             }
@@ -914,43 +921,6 @@ def check_boards(_opts):
             retcode = 1
 
     return retcode
-
-
-COVERAGE_RE = re.compile(
-    r"lines\.*: *([0-9\.]+)% \(([0-9]+) of ([0-9]+) lines\)"
-)
-
-
-def _extract_lcov_summary_worker(name, filename):
-    """Worker function to run lcov summary in a thread."""
-    cmd = [
-        "/usr/bin/lcov",
-        "--ignore-errors",
-        "inconsistent",
-        "--summary",
-        filename,
-    ]
-    log_cmd(cmd)
-    output = subprocess.run(
-        cmd,
-        cwd=ZEPHYR_DIR,
-        check=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True,
-        stdin=subprocess.DEVNULL,
-    ).stdout
-    re_match = COVERAGE_RE.search(output)
-    if re_match:
-        return (
-            name,
-            float(re_match.group(1)),
-            int(re_match.group(2)),
-            int(re_match.group(3)),
-        )
-    raise ValueError(
-        f"Failed to parse LCOV summary output for {name}: {output}"
-    )
 
 
 def main(args):

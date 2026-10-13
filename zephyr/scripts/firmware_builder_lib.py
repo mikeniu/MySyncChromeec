@@ -357,6 +357,48 @@ def summarize_merged_lcov(lcov_info, boards, test_exclude, board_exclude):
     return metrics
 
 
+COVERAGE_RE = re.compile(
+    r"lines\.*: *([0-9\.]+)% \(([0-9]+) of ([0-9]+) lines\)"
+)
+
+
+def extract_lcov_summary_worker(
+    name, filename, zephyr_dir=None, log_cmd_fn=None
+):
+    """Worker function to run lcov summary in a thread."""
+    if zephyr_dir is None:
+        zephyr_dir = pathlib.Path(__file__).resolve().parent.parent
+    cmd = [
+        "/usr/bin/lcov",
+        "--ignore-errors",
+        "inconsistent",
+        "--summary",
+        filename,
+    ]
+    if log_cmd_fn:
+        log_cmd_fn(cmd)
+    output = subprocess.run(
+        cmd,
+        cwd=zephyr_dir,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+        stdin=subprocess.DEVNULL,
+    ).stdout
+    re_match = COVERAGE_RE.search(output)
+    if re_match:
+        return (
+            name,
+            float(re_match.group(1)),
+            int(re_match.group(2)),
+            int(re_match.group(3)),
+        )
+    raise ValueError(
+        f"Failed to parse LCOV summary output for {name}: {output}"
+    )
+
+
 def _parse_pos_int(val):
     """Parse a positive integer string, or return None."""
     return int(val) if val and str(val).isdigit() and int(val) > 0 else None
