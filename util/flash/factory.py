@@ -10,6 +10,7 @@ import os
 import re
 from typing import Optional
 
+from flash.board_map import get_chip_from_board
 from flash.flasher_base import BaseEcFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
@@ -84,6 +85,15 @@ class FlasherFactory:
             if chip:
                 logger.info(
                     "Deduced EC chip '%s' for board '%s' via EC source tree.",
+                    chip,
+                    args.board,
+                )
+
+        if (not chip or "unknown" in chip.lower()) and args.board:
+            chip = get_chip_from_board(args.board)
+            if chip:
+                logger.info(
+                    "Deduced legacy EC chip '%s' from board '%s'",
                     chip,
                     args.board,
                 )
