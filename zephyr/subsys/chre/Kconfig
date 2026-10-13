@@ -9,3 +9,25 @@ config ISH_CHRE
 	  CHRE is an event-driven runtime architecture designed for low-power,
 	  always-on contextual computing such as sensor fusion, activity
 	  recognition, and nanoapps.
+
+if ISH_CHRE
+
+config CHRE_DYNAMIC_MEMORY_SIZE
+	int "CHRE memory pool size"
+	default 16384
+	help
+	  Size of the CHRE dynamic memory pool in bytes.
+
+config ISH_CHRE_STACK_SIZE
+	int "CHRE thread stack size"
+	default 4096
+	help
+	  Stack size for the CHRE event loop thread in bytes.
+
+config ISH_CHRE_PRIORITY
+	int "CHRE thread priority"
+	default 5
+	help
+	  Preemptible priority for the CHRE event loop thread.
+
+endif # ISH_CHRE
