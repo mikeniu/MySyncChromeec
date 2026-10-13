@@ -7200,6 +7200,54 @@ int cmd_panic_info(int argc, char *argv[])
 	return 0;
 }
 
+int cmd_crash(int argc, char *argv[])
+{
+	static const struct {
+		const char *name;
+		enum ec_crash_type type;
+	} crash_types[] = {
+		{ "assert", EC_CRASH_ASSERT },
+		{ "divzero", EC_CRASH_DIVZERO },
+		{ "udivzero", EC_CRASH_UDIVZERO },
+		{ "stack", EC_CRASH_STACK },
+		{ "unaligned", EC_CRASH_UNALIGNED },
+		{ "watchdog", EC_CRASH_WATCHDOG },
+		{ "hang", EC_CRASH_HANG },
+		{ "null", EC_CRASH_NULL },
+		{ "oops", EC_CRASH_OOPS },
+	};
+	struct ec_params_crash p = { 0 };
+	bool found = false;
+	int rv;
+
+	if (argc != 2) {
+		fprintf(stderr,
+			"Usage: %s <assert | divzero | udivzero | stack | "
+			"unaligned | watchdog | hang | null | oops>\n",
+			argv[0]);
+		return -1;
+	}
+
+	for (size_t i = 0; i < ARRAY_SIZE(crash_types); i++) {
+		if (!strcasecmp(argv[1], crash_types[i].name)) {
+			p.type = crash_types[i].type;
+			found = true;
+			break;
+		}
+	}
+
+	if (!found) {
+		fprintf(stderr, "Unknown crash type: %s\n", argv[1]);
+		return -1;
+	}
+
+	rv = ec_command(EC_CMD_CRASH, 0, &p, sizeof(p), NULL, 0);
+	if (rv < 0)
+		return rv;
+
+	return 0;
+}
+
 int cmd_power_info(int argc, char *argv[])
 {
 	struct ec_response_power_info_v1 r;
@@ -12936,6 +12984,10 @@ const struct command commands[] = {
 	{ "console_print", cmd_console_print,
 	  "<message>\n"
 	  "\tPrints a message to the EC console." },
+	{ "crash", cmd_crash,
+	  "<assert | divzero | udivzero | stack | unaligned | watchdog | "
+	  "hang | null | oops>\n"
+	  "\tTrigger an EC/ISH crash (for testing)." },
 	{ "echash", cmd_ec_hash, "[CMDS]\n\tVarious EC hash commands." },
 	{ "eventclear", cmd_host_event_clear,
 	  "<mask>\n"
