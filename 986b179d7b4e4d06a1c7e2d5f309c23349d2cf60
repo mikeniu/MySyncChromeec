@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b502821_afa95744",
+        "filename": "zephyr/program/ocelot/BUILD.py",
+        "patchSetId": 38
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-10-13T09:17:06Z",
+      "side": 1,
+      "message": "The order can be adjusted.",
+      "revId": "986b179d7b4e4d06a1c7e2d5f309c23349d2cf60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1536f8a_3d22252b",
+        "filename": "zephyr/program/ocelot/blanc/project.conf",
+        "patchSetId": 38
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-10-13T09:17:06Z",
+      "side": 1,
+      "message": "Use default `y` in new project.",
+      "revId": "986b179d7b4e4d06a1c7e2d5f309c23349d2cf60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83437edf_0faabfe6",
+        "filename": "zephyr/program/ocelot/blanc/project.conf",
+        "patchSetId": 38
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-10-13T09:17:06Z",
+      "side": 1,
+      "message": "Based on schematic, should it use `CONFIG_PLATFORM_EC_BATTERY_PRESENT_GPIO\u003dy` and `CONFIG_PLATFORM_EC_BATTERY_PRESENT_NONE\u003dn`?",
+      "revId": "986b179d7b4e4d06a1c7e2d5f309c23349d2cf60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63407172_daf17ce7",
+        "filename": "zephyr/program/ocelot/blanc/project.conf",
+        "patchSetId": 38
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-10-13T09:17:06Z",
+      "side": 1,
+      "message": "Check the keyboard colum is 16 or 18.",
+      "revId": "986b179d7b4e4d06a1c7e2d5f309c23349d2cf60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b904008_9bdd39f7",
+        "filename": "zephyr/program/ocelot/blanc/src/battery.c",
+        "patchSetId": 38
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-10-13T09:17:06Z",
+      "side": 1,
+      "message": "Based on schematic, could we directly use a hardware GPIO to detect battery presence instead of an I2C command?",
+      "revId": "986b179d7b4e4d06a1c7e2d5f309c23349d2cf60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e66005ff_240d0971",
+        "filename": "zephyr/program/ocelot/blanc/usb_typec.dtsi",
+        "patchSetId": 38
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1512583
+      },
+      "writtenOn": "2026-10-13T09:17:06Z",
+      "side": 1,
+      "message": "Confirm whether the project supports USB4, and whether this property needs to be enabled.",
+      "revId": "986b179d7b4e4d06a1c7e2d5f309c23349d2cf60",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
