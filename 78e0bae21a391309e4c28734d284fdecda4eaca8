@@ -178,6 +178,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de879bc4_0de55c86",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:54:47Z",
+      "side": 1,
+      "message": "Oh, thanks. It\u0027s a brand new feature, that\u0027s why I couldn\u0027t find it.",
+      "parentUuid": "bcb6817d_c22d727e",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7d1805d_d5607b1b",
@@ -304,6 +322,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d66c1644_332e805d",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:54:47Z",
+      "side": 1,
+      "message": "That\u0027s exactly why I meant, thanks.",
+      "parentUuid": "b40a769a_18ef71b4",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "27bd79fe_e63e45f4",
         "filename": "zephyr/shim/chip/stm32/clock.c",
         "patchSetId": 13
@@ -404,6 +440,24 @@
       "side": 1,
       "message": "Thanks.",
       "parentUuid": "b129f770_c9a2ae0d",
+      "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fbc3637_d5ac88d6",
+        "filename": "zephyr/shim/chip/stm32/clock.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1438457
+      },
+      "writtenOn": "2026-10-13T07:54:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02ba5583_f536dd3d",
       "revId": "78e0bae21a391309e4c28734d284fdecda4eaca8",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
