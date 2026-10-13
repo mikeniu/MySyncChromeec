@@ -24,6 +24,30 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00f745b7_50bb8feb",
+        "filename": "driver/accel_bma4xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 583,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T22:31:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "96baccf6_1d7e6d46",
+      "range": {
+        "startLine": 583,
+        "startChar": 0,
+        "endLine": 583,
+        "endChar": 0
+      },
+      "revId": "cf55c5a5acd14f42dcff7c769a5f8b1716d0aef7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "017e758d_71dee233",
@@ -37,6 +61,30 @@
       "writtenOn": "2026-10-13T20:03:44Z",
       "side": 1,
       "message": "Using a single global variable to store the interrupt GPIO causes a race condition on boards with multiple BMI3xx sensors on different GPIOs (like Veluza).\n\nIf Sensor A and Sensor B interrupt simultaneously:\n1. Both top halves run. `bmi3xx_int_signal` ends up storing Sensor B\u0027s pin (`PIN_B`).\n2. The motion task processes Sensor B first. It reads INT_STATUS (clearing the latch, `PIN_B` goes HIGH), processes the FIFO, and checks `irq_pin_asserted()`. It checks `PIN_B`, sees it is HIGH, and safely skips the re-read.\n3. The motion task processes Sensor A. It reads INT_STATUS (clearing the latch, `PIN_A` goes HIGH) and begins reading the FIFO.\n4. If a new interrupt for Sensor A arrives during its FIFO read, `PIN_A` goes LOW again.\n5. Sensor A checks `irq_pin_asserted()`. However, it checks `bmi3xx_int_signal` (which is still `PIN_B`).\n6. Since `PIN_B` is HIGH, Sensor A incorrectly assumes its own pin is HIGH and skips the re-read!\n\nSensor A\u0027s pin remains LOW. Since the EC GPIO interrupt is edge-triggered, Sensor A will not fire another interrupt and its data will be stuck until the motion task is woken up again (e.g., by Sensor B\u0027s next interrupt).\n\nTo safely skip the re-read, the driver must check the specific GPIO pin associated with the sensor being processed. If the driver cannot determine its own pin (e.g., by storing it in `drv_data`), it is safer to always re-read the status or disable this optimization for multi-sensor configurations.",
+      "range": {
+        "startLine": 104,
+        "startChar": 0,
+        "endLine": 104,
+        "endChar": 0
+      },
+      "revId": "cf55c5a5acd14f42dcff7c769a5f8b1716d0aef7",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc458067_6deb924d",
+        "filename": "driver/accelgyro_bmi3xx.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T22:31:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "017e758d_71dee233",
       "range": {
         "startLine": 104,
         "startChar": 0,
