@@ -12,6 +12,7 @@ from typing import Optional
 
 from flash.board_map import get_chip_from_board
 from flash.flasher_base import BaseEcFlasher
+from flash.flashrom_flasher import FlashromFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
 
@@ -106,6 +107,24 @@ class FlasherFactory:
 
         chip = chip.lower()
         args.chip = chip
+
+        if interface == "spi" and not chip.startswith("npcx"):
+            return FlashromFlasher(servo, args)
+
+        if chip in (
+            "ite_spi",
+            "npcx_int_spi",
+            "npcx_spi",
+            "stm32_spi",
+            "mchp_int_spi",
+        ):
+            return FlashromFlasher(servo, args)
+
+        if chip in ("it8xxx2", "ite_spi_ccd_i2c", "ite_spi_ccd_uart"):
+            servo_type = servo.get("servo_type", default="") if servo else ""
+            if "servo_micro" in servo_type or "c2d2" in servo_type:
+                return FlashromFlasher(servo, args)
+
         raise NotImplementedError(
             f"Flasher for chip '{chip}' (interface='{interface}') "
             "is not yet implemented."
