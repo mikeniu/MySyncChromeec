@@ -1,0 +1,23 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cec23808_471e6899",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T21:47:56Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ✅ **Approved** — All checks pass.\n\n### Review Summary\n\n**Functionality:** ✅ The functionality correctly preserves the setting of the FPMCU GPIO pins for ocelot while removing the unused model query.\n**Architecture \u0026 Component Fit:** ✅ The removal of the `case` statement perfectly aligns with the component design given that all models share the same pins.\n**Code Simplicity:** ✅ Removing the unused `cros_config` query and unnecessary switch block cleanly simplifies the control flow.\n**Idiomaticity \u0026 Readability:** ✅ The function logic is now more declarative and minimal.\n**Security:** ✅ No security issues.\n**Testing:** ✅ This hardware flasher script lacks automated test coverage, but it falls under the narrow physical/hardware exception. The manual test in the commit message (`TEST\u003dRun flash_fp_mcu on ocelot`) is appropriate here.\n**CL Size \u0026 Scope:** ✅ `Size: S (+6, -13)`. The CL successfully represents a single, atomic logical change that removes the unused query in `config_ocelot`.\n**Commit Message:** ✅ The commit message concisely describes the *What* and *Why* with no diff-narration, and correctly uses `BUG\u003d` and `TEST\u003d` tags for the Chromium host.\n\n[[trajectory](https://goto.corp.google.com/traj/54698957-d936-482a-b75e-557f591eda48)]",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "4e59d6ed4065b1ad23ef870045f364d3e86f2af2",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
