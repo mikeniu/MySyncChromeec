@@ -23,6 +23,8 @@
 #include "vboot_hash.h"
 #include "write_protect.h"
 
+#include <limits.h>
+
 /*
  * Contents of erased flash, as a 32-bit value.  Most platforms erase flash
  * bits to 1.
@@ -1298,7 +1300,7 @@ static int command_flash_erase(int argc, const char **argv)
 {
 	int offset = -1;
 	int size = -1;
-	int end;
+	uint32_t end;
 	int rv;
 
 	if (crec_flash_get_protect() & EC_FLASH_PROTECT_ALL_NOW)
@@ -1309,12 +1311,12 @@ static int command_flash_erase(int argc, const char **argv)
 		return rv;
 
 	/* Make sure that offset + size does not overflow. */
-	if (check_add_overflow(offset, size, &end))
+	if (u32_add_overflow(offset, size, &end) || end > INT_MAX)
 		return EC_ERROR_OVERFLOW;
 
 #ifdef CONFIG_ROLLBACK
 	if ((uint32_t)offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
-	    (uint32_t)end > CONFIG_ROLLBACK_OFF)
+	    end > CONFIG_ROLLBACK_OFF)
 		return EC_ERROR_ACCESS_DENIED;
 #endif
 
@@ -1328,7 +1330,7 @@ static int command_flash_write(int argc, const char **argv)
 {
 	int offset = -1;
 	int size = -1;
-	int end;
+	uint32_t end;
 	int rv;
 	char *data;
 	int i;
@@ -1341,12 +1343,12 @@ static int command_flash_write(int argc, const char **argv)
 		return rv;
 
 	/* Make sure that offset + size does not overflow. */
-	if (check_add_overflow(offset, size, &end))
+	if (u32_add_overflow(offset, size, &end) || end > INT_MAX)
 		return EC_ERROR_OVERFLOW;
 
 #ifdef CONFIG_ROLLBACK
 	if ((uint32_t)offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
-	    (uint32_t)end > CONFIG_ROLLBACK_OFF) {
+	    end > CONFIG_ROLLBACK_OFF) {
 		return EC_ERROR_ACCESS_DENIED;
 	}
 #endif
@@ -1380,7 +1382,7 @@ static int command_flash_read(int argc, const char **argv)
 {
 	int offset = -1;
 	int size = 256;
-	int end;
+	uint32_t end;
 	int rv;
 	uint8_t *data;
 	int i;
@@ -1390,7 +1392,7 @@ static int command_flash_read(int argc, const char **argv)
 		return rv;
 
 	/* Make sure that offset + size does not overflow. */
-	if (check_add_overflow(offset, size, &end))
+	if (u32_add_overflow(offset, size, &end) || end > INT_MAX)
 		return EC_ERROR_OVERFLOW;
 
 #ifdef CONFIG_ROLLBACK
@@ -1398,7 +1400,7 @@ static int command_flash_read(int argc, const char **argv)
 	 * leaking the rollback secret.
 	 */
 	if ((uint32_t)offset < CONFIG_ROLLBACK_OFF + CONFIG_ROLLBACK_SIZE &&
-	    (uint32_t)end > CONFIG_ROLLBACK_OFF) {
+	    end > CONFIG_ROLLBACK_OFF) {
 		return EC_ERROR_ACCESS_DENIED;
 	}
 #endif
@@ -1638,7 +1640,7 @@ flash_command_read(struct ec_host_cmd_handler_args *args)
 		return EC_HOST_CMD_OVERFLOW;
 
 	/* Make sure that offset + p->size does not overflow. */
-	if (check_add_overflow(offset, p->size, &end))
+	if (u32_add_overflow(offset, p->size, &end))
 		return EC_HOST_CMD_OVERFLOW;
 
 #ifdef CONFIG_ROLLBACK
@@ -1689,7 +1691,7 @@ flash_command_write(struct ec_host_cmd_handler_args *args)
 		return EC_HOST_CMD_INVALID_PARAM;
 
 	/* Make sure that offset + p->size does not overflow. */
-	if (check_add_overflow(offset, p->size, &end))
+	if (u32_add_overflow(offset, p->size, &end))
 		return EC_HOST_CMD_OVERFLOW;
 
 #ifdef CONFIG_INTERNAL_STORAGE
@@ -1764,7 +1766,7 @@ flash_command_erase(struct ec_host_cmd_handler_args *args)
 		return EC_HOST_CMD_ACCESS_DENIED;
 
 	/* Make sure that offset + p->size does not overflow. */
-	if (check_add_overflow(offset, p->size, &end))
+	if (u32_add_overflow(offset, p->size, &end))
 		return EC_HOST_CMD_OVERFLOW;
 
 #ifdef CONFIG_INTERNAL_STORAGE
