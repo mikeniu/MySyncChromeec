@@ -1040,21 +1040,6 @@ void fusb302_tcpc_alert(int port)
 	}
 }
 
-/* For BIST receiving */
-void tcpm_set_bist_test_data(int port)
-{
-	int reg;
-
-	/* Read control3 register */
-	tcpc_read(port, TCPC_REG_CONTROL3, &reg);
-
-	/* Set the BIST_TMODE bit (Clears on Hard Reset) */
-	reg |= TCPC_REG_CONTROL3_BIST_TMODE;
-
-	/* Write the updated value */
-	tcpc_write(port, TCPC_REG_CONTROL3, reg);
-}
-
 #ifdef CONFIG_USB_PD_TCPC_LOW_POWER
 static int fusb302_set_toggle_mode(int port, int mode)
 {

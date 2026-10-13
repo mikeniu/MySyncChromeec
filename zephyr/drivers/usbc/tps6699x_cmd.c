@@ -187,24 +187,6 @@ int tps_rd_boot_flags(const struct i2c_dt_spec *i2c, union reg_boot_flags *buf)
 			    sizeof(union reg_boot_flags), I2C_MSG_READ);
 }
 
-int tps_rw_transmit_source_capabilities(
-	const struct i2c_dt_spec *i2c,
-	union reg_transmit_source_capabilities *buf, int flag)
-{
-	return tps_xfer_reg(i2c, REG_TRANSMIT_SOURCE_CAPABILITES,
-			    buf->raw_value,
-			    sizeof(union reg_transmit_source_capabilities),
-			    flag);
-}
-
-int tps_rw_transmit_sink_capabilities(const struct i2c_dt_spec *i2c,
-				      union reg_transmit_sink_capabilities *buf,
-				      int flag)
-{
-	return tps_xfer_reg(i2c, REG_TRANSMIT_SINK_CAPABILITES, buf->raw_value,
-			    sizeof(union reg_transmit_sink_capabilities), flag);
-}
-
 int tps_rw_sx_app_config(const struct i2c_dt_spec *i2c,
 			 union reg_sx_app_config *buf, int flag)
 {
@@ -226,13 +208,6 @@ int tps_rd_active_pdo_contract(const struct i2c_dt_spec *i2c,
 	return tps_xfer_reg(i2c, REG_ACTIVE_PDO_CONTRACT, buf->raw_value,
 			    sizeof(union reg_active_pdo_contract),
 			    I2C_MSG_READ);
-}
-
-int tps_rd_adc_results(const struct i2c_dt_spec *i2c,
-		       union reg_adc_results *buf)
-{
-	return tps_xfer_reg(i2c, REG_ADC_RESULTS, buf->raw_value,
-			    sizeof(union reg_adc_results), I2C_MSG_READ);
 }
 
 int tps_rw_autonegotiate_sink(const struct i2c_dt_spec *i2c,
