@@ -68,7 +68,7 @@
 
 &spi0 {
 	status = "okay";
-	clock-frequency = <100000000>;
+	clock-frequency = <200000000>;
 };
 
 &spi1 {
@@ -88,6 +88,6 @@
 };
 
 &clock {
-	ahb-divide = <2>;
-	apb-divide = <1>;
+	ahb-divide = <1>;
+	apb-divide = <2>;
 };
