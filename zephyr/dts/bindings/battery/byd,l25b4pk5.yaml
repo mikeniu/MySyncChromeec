@@ -23,6 +23,10 @@ properties:
     default: 0x34
   ship_mode_reg_data:
     default: [0x0000, 0x1000]
+  wakeup_ship_mode_reg_addr:
+    default: 0x34
+  wakeup_ship_mode_reg_data:
+    default: [0x2000, 0x4000]
   flags:
     default: 0
   fet_reg_addr:
