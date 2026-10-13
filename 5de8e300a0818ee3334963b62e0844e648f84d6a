@@ -18,6 +18,126 @@
       "isAi": true,
       "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6da06cd5_a5ecb784",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T22:51:36Z",
+      "side": 1,
+      "message": "Note a subtle behavioral difference between Zephyr and legacy EC here when `mode` is `FP_MODE_FINGER_UP` (without `FP_MODE_ANY_WAIT_IRQ`):\n\n1. In non-Zephyr builds (`#ifndef CONFIG_ZEPHYR`), `GPIO_FPS_INT` is only enabled for `FP_MODE_ANY_WAIT_IRQ`, so `FP_MODE_FINGER_UP` is purely timer-polled (`FINGER_POLLING_DELAY \u003d 100ms`) with interrupts disabled.\n2. In Zephyr builds, `fp_configure_detect()` sets `FINGERPRINT_SENSOR_MODE_DETECT`, which enables the sensor GPIO IRQ in all Zephyr drivers (`fpc1025`, `fpc1145`, `egis630`, `egis660`, `elan_series`, `ft98xx`). Previously, calling `fp_sensor_low_power()` right after `fp_configure_detect()` happened to disable that IRQ again (except on `fpc1145`). With this change, the IRQ stays enabled when entering `FP_MODE_FINGER_UP`. On sensors where detect mode asserts the IRQ immediately when a finger is present, this will trigger an immediate `TASK_EVENT_SENSOR_IRQ` while the finger is still down (after which the ISR disables the IRQ and subsequent checks fall back to the 100ms timer).",
+      "range": {
+        "startLine": 375,
+        "startChar": 0,
+        "endLine": 388,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5960447c_b8272e22",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T22:51:36Z",
+      "side": 1,
+      "message": "Two questions on the sensor state after `fp_finger_status()` / `fp_process_finger()` when `FP_MODE_FINGER_UP` remains set (`st !\u003d FINGER_NONE`):\n\n1. Does `fp_configure_detect()` need to be called again when `FP_MODE_FINGER_UP` is still active after a poll (or if `FP_MODE_ANY_CAPTURE | FP_MODE_FINGER_UP` were set together and `fp_process_finger()` just captured an image and cleared `FP_MODE_ANY_CAPTURE`)? Several sensor libraries either state that `fp_sensor_finger_status()` assumes `fp_sensor_configure_detect()` was called before each check (e.g. `fingerprint_fpc1025_private.h`, `fingerprint_egis660_private.h`), or stop detect mode inside `fp_finger_status()` (e.g. `isensor_read_interrupt_type_ec630()` calls `ec630_stop_detect_mode()` when reading an FOD interrupt).\n2. For b/560263098 and b/565886719 (`egis630`), `egis630_finger_status()` -\u003e `egis_check_int_status()` -\u003e `convert_sensor_interrupt_type_to_result()` maps both `SENSOR_INTERRUPT_THL` and `SENSOR_INTERRUPT_NONE` (`0x80`) to `EGIS_API_FINGER_LOST` (`FINGER_NONE`). If the user holds their finger on the sensor for \u003e\u003d 100ms so `THL` hasn\u0027t triggered when `TASK_EVENT_TIMER` fires, won\u0027t `fp_finger_status()` still read `SENSOR_INTERRUPT_NONE` and report `FINGER_NONE` prematurely unless the Egis driver/library is also updated?",
+      "range": {
+        "startLine": 471,
+        "startChar": 0,
+        "endLine": 483,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08ffbd7b_86184ce2",
+        "filename": "common/fpsensor/fpsensor.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T22:51:36Z",
+      "side": 1,
+      "message": "Why call `fp_idle()` (`FINGERPRINT_SENSOR_MODE_IDLE`) immediately before `fp_sensor_low_power()` (`FINGERPRINT_SENSOR_MODE_LOW_POWER`)?\n\nAs noted in the commit message, `FINGERPRINT_SENSOR_MODE_IDLE` is defined as \"The sensor is waiting for requests\", so transitioning to `IDLE` and immediately to `LOW_POWER` on the next line seems contradictory:\n- In 5 of the 6 Zephyr drivers (`fpc1025`, `egis630`, `egis660`, `elan_series`, `ft98xx`), `FINGERPRINT_SENSOR_MODE_LOW_POWER` already disables the GPIO IRQ.\n- On `ft98xx`, `FOCAL_SENSOR_MODE_IDLE` and `FOCAL_SENSOR_MODE_LOW_POWER` both allocate a 20KB buffer and send SPI commands to enter `FF_POWER_MODE_DEEP_SLEEP`, so calling `fp_idle()` followed by `fp_sensor_low_power()` runs that sequence twice back-to-back.\n- The only driver where `FINGERPRINT_SENSOR_MODE_LOW_POWER` doesn\u0027t disable the IRQ is `fpc1145` (where `LOW_POWER` is a `break;` stub). Should `fpc1145_set_mode()` disable the IRQ in `FINGERPRINT_SENSOR_MODE_LOW_POWER` like the other drivers instead of calling `fp_idle()` before `fp_sensor_low_power()` here?",
+      "range": {
+        "startLine": 488,
+        "startChar": 0,
+        "endLine": 496,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a18877f7_0f71b634",
+        "filename": "zephyr/drivers/fingerprint/fingerprint_sensor_sim.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T22:51:36Z",
+      "side": 1,
+      "message": "Nit: Should `FINGERPRINT_SENSOR_MODE_IDLE` also set `data-\u003estate.low_power_mode \u003d false;` (or if it intentionally preserves `low_power_mode`, maybe add a brief comment)? Otherwise transitioning `LOW_POWER` -\u003e `IDLE` (e.g. on `TASK_EVENT_UPDATE_CONFIG` before `FP_MODE_SENSOR_MAINTENANCE`) leaves `state.low_power_mode \u003d true` in the simulator.",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 120,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42800bc4_96aafb4e",
+        "filename": "zephyr/test/fingerprint/task/src/fpsensor_finger_presence.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T22:51:36Z",
+      "side": 1,
+      "message": "Nit: For consistency with `test_finger_down_partial` above, also assert `state.detect_mode` and `state.low_power_mode` here:\n```c\nfingerprint_get_state(fp_sim, \u0026state);\nzassert_true(state.detect_mode);\nzassert_false(state.low_power_mode);\n```",
+      "range": {
+        "startLine": 175,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 9999
+      },
+      "isAi": true,
+      "revId": "5de8e300a0818ee3334963b62e0844e648f84d6a",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
