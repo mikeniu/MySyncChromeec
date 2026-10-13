@@ -8535,6 +8535,34 @@ struct ec_params_ap_reset_scheduled {
 	uint32_t delay_ms;
 } __ec_align4;
 
+/* CHRE dynamic nanoapp load and unload */
+#define EC_CMD_CHRE_LOAD_NANOAPP 0x0150
+
+#define EC_CHRE_LOAD_FLAG_START BIT(0)
+#define EC_CHRE_LOAD_FLAG_FINISH BIT(1)
+#define EC_CHRE_LOAD_FLAG_ABORT BIT(2)
+
+struct ec_params_chre_load_nanoapp {
+	uint64_t app_id;
+	uint32_t total_binary_size;
+	uint32_t offset;
+	uint32_t chunk_size;
+	uint32_t flags;
+	uint8_t data[FLEXIBLE_ARRAY_MEMBER_SIZE];
+} __ec_align4;
+
+struct ec_response_chre_load_nanoapp {
+	uint32_t instance_id;
+	uint32_t reserved;
+	uint64_t app_id;
+} __ec_align4;
+
+#define EC_CMD_CHRE_UNLOAD_NANOAPP 0x0151
+
+struct ec_params_chre_unload_nanoapp {
+	uint64_t app_id;
+} __ec_align4;
+
 /*****************************************************************************/
 /* The command range 0x200-0x2FF is reserved for Rotor. */
 

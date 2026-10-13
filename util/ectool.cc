@@ -12210,6 +12210,147 @@ int cmd_typec_vdm_response(int argc, char *argv[])
 	return 0;
 }
 
+int cmd_chre_load_nanoapp(int argc, char *argv[])
+{
+	if (argc < 2) {
+		fprintf(stderr, "Usage: %s <nanoapp_path> [app_id]\n", argv[0]);
+		return -1;
+	}
+
+	const char *filepath = argv[1];
+	FILE *f = fopen(filepath, "rb");
+	if (!f) {
+		perror("fopen");
+		return -1;
+	}
+
+	fseek(f, 0, SEEK_END);
+	long file_size = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	if (file_size <= 0) {
+		fprintf(stderr, "Invalid or empty file\n");
+		fclose(f);
+		return -1;
+	}
+
+	uint8_t *buffer = (uint8_t *)malloc(file_size);
+	if (!buffer) {
+		fprintf(stderr, "Failed to allocate memory for nanoapp\n");
+		fclose(f);
+		return -1;
+	}
+
+	if (fread(buffer, 1, file_size, f) != (size_t)file_size) {
+		fprintf(stderr, "Failed to read file\n");
+		free(buffer);
+		fclose(f);
+		return -1;
+	}
+	fclose(f);
+
+	uint64_t app_id = 0;
+	if (argc >= 3) {
+		char *endptr;
+		app_id = strtoull(argv[2], &endptr, 0);
+		if (endptr && *endptr) {
+			fprintf(stderr, "Invalid app_id: %s\n", argv[2]);
+			free(buffer);
+			return -1;
+		}
+	}
+
+	struct ec_params_chre_load_nanoapp *p =
+		(struct ec_params_chre_load_nanoapp *)ec_outbuf;
+	int header_size = offsetof(struct ec_params_chre_load_nanoapp, data);
+	int max_chunk = ec_max_outsize - header_size;
+	if (max_chunk <= 0) {
+		fprintf(stderr, "Host command buffer too small\n");
+		free(buffer);
+		return -1;
+	}
+
+	struct ec_response_chre_load_nanoapp r;
+	uint32_t offset = 0;
+	int rv = 0;
+
+	printf("Loading nanoapp (%ld bytes) in chunks up to %d bytes...\n",
+	       file_size, max_chunk);
+
+	while (offset < (uint32_t)file_size) {
+		uint32_t chunk = MIN((uint32_t)(file_size - offset),
+				     (uint32_t)max_chunk);
+		uint32_t flags = 0;
+		if (offset == 0) {
+			flags |= EC_CHRE_LOAD_FLAG_START;
+		}
+		if (offset + chunk == (uint32_t)file_size) {
+			flags |= EC_CHRE_LOAD_FLAG_FINISH;
+		}
+
+		memset(p, 0, header_size);
+		p->app_id = app_id;
+		p->total_binary_size = file_size;
+		p->offset = offset;
+		p->chunk_size = chunk;
+		p->flags = flags;
+		memcpy(p->data, buffer + offset, chunk);
+
+		int is_finish = (flags & EC_CHRE_LOAD_FLAG_FINISH);
+		rv = ec_command(EC_CMD_CHRE_LOAD_NANOAPP, 0, p,
+				header_size + chunk, is_finish ? &r : NULL,
+				is_finish ? sizeof(r) : 0);
+		if (rv < 0) {
+			fprintf(stderr,
+				"Failed to send chunk at offset %u (rv=%d)\n",
+				offset, rv);
+			/* Best-effort abort to release reserved buffer on EC */
+			memset(p, 0, header_size);
+			p->flags = EC_CHRE_LOAD_FLAG_ABORT;
+			ec_command(EC_CMD_CHRE_LOAD_NANOAPP, 0, p, header_size,
+				   NULL, 0);
+			free(buffer);
+			return rv;
+		}
+
+		offset += chunk;
+	}
+
+	free(buffer);
+	printf("Successfully loaded nanoapp! App ID: 0x%016" PRIx64
+	       ", Instance ID: %u\n",
+	       r.app_id ? r.app_id : app_id, r.instance_id);
+	return 0;
+}
+
+int cmd_chre_unload_nanoapp(int argc, char *argv[])
+{
+	if (argc < 2) {
+		fprintf(stderr, "Usage: %s <app_id>\n", argv[0]);
+		return -1;
+	}
+
+	char *endptr;
+	uint64_t app_id = strtoull(argv[1], &endptr, 0);
+	if (endptr && *endptr) {
+		fprintf(stderr, "Invalid app_id: %s\n", argv[1]);
+		return -1;
+	}
+
+	struct ec_params_chre_unload_nanoapp p;
+	p.app_id = app_id;
+
+	int rv = ec_command(EC_CMD_CHRE_UNLOAD_NANOAPP, 0, &p, sizeof(p), NULL,
+			    0);
+	if (rv < 0) {
+		fprintf(stderr, "Failed to unload nanoapp (rv=%d)\n", rv);
+		return rv;
+	}
+
+	printf("Successfully unloaded nanoapp 0x%016" PRIx64 "\n", app_id);
+	return 0;
+}
+
 int cmd_tp_self_test(int argc, char *argv[])
 {
 	int rv;
@@ -12928,6 +13069,10 @@ const struct command commands[] = {
 	  "\tSoC at which it will apply." },
 	{ "chargeoverride", cmd_charge_port_override,
 	  "\n\tOverrides charge port selection logic." },
+	{ "chreload", cmd_chre_load_nanoapp,
+	  "<nanoapp_path> [app_id]\n\tLoad a dynamic CHRE nanoapp." },
+	{ "chreunload", cmd_chre_unload_nanoapp,
+	  "<app_id>\n\tUnload a dynamic CHRE nanoapp." },
 	{ "chargesplash", cmd_chargesplash,
 	  "\n\tShow and manipulate chargesplash variables." },
 	{ "chargestate", cmd_charge_state,

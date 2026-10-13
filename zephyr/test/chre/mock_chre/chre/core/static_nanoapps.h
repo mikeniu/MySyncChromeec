@@ -6,52 +6,13 @@
 #ifndef ZEPHYR_TEST_CHRE_MOCK_CHRE_CORE_STATIC_NANOAPPS_H_
 #define ZEPHYR_TEST_CHRE_MOCK_CHRE_CORE_STATIC_NANOAPPS_H_
 
+#include "chre/core/nanoapp.h"
+#include "chre/util/unique_ptr.h"
+
 #include <stddef.h>
 
 namespace chre
 {
-
-class Nanoapp {};
-
-template <typename T> class UniquePtr {
-    public:
-	constexpr UniquePtr()
-		: ptr_(nullptr)
-	{
-	}
-	explicit UniquePtr(T *ptr)
-		: ptr_(ptr)
-	{
-	}
-	~UniquePtr() = default;
-	UniquePtr(const UniquePtr &) = delete;
-	UniquePtr &operator=(const UniquePtr &) = delete;
-	UniquePtr(UniquePtr &&other) noexcept : ptr_(other.ptr_)
-	{
-		other.ptr_ = nullptr;
-	}
-	UniquePtr &operator=(UniquePtr &&other) noexcept
-	{
-		ptr_ = other.ptr_;
-		other.ptr_ = nullptr;
-		return *this;
-	}
-	T *get() const
-	{
-		return ptr_;
-	}
-	T *operator->() const
-	{
-		return ptr_;
-	}
-	bool isNull() const
-	{
-		return ptr_ == nullptr;
-	}
-
-    private:
-	T *ptr_ = nullptr;
-};
 
 typedef UniquePtr<Nanoapp> (*StaticNanoappInitFunction)();
 

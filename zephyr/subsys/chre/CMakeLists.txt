@@ -22,9 +22,10 @@ if(CONFIG_ISH_CHRE)
   target_sources(app PRIVATE
     chre.cc
     chre_log.cc
+    chre_host_cmd.cc
   )
 
-  if(NOT CONFIG_ZTEST)
+  if(DEFINED CHRE_ROOT)
     set(CHRE_PLATFORM_PIGWEED ON CACHE BOOL "" FORCE)
     zephyr_compile_options(-include zephyr/sys/util_macro.h)
     add_compile_definitions(CHRE_ATOMIC_UINT32_REF_ENABLED=1)

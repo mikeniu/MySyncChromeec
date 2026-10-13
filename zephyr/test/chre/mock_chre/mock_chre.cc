@@ -98,23 +98,54 @@ void loadStaticNanoapps()
 	}
 }
 
-#ifdef CONFIG_CHRE_TIMER_WORLD
-static Nanoapp s_timer_world_nanoapp;
+bool EventLoop::startNanoapp(UniquePtr<Nanoapp> nanoapp)
+{
+	return true;
+}
 
+bool EventLoop::unloadNanoapp(uint16_t /*instanceId*/,
+			      bool /*allowSystemNanoappUnload*/)
+{
+	return true;
+}
+
+bool EventLoop::findNanoappInstanceIdByAppId(uint64_t /*appId*/,
+					     uint16_t *instanceId)
+{
+	if (instanceId) {
+		*instanceId = 1;
+	}
+	return true;
+}
+
+Nanoapp *EventLoop::findNanoappByInstanceId(uint16_t /*instanceId*/)
+{
+	static Nanoapp s_mock_nanoapp;
+	return &s_mock_nanoapp;
+}
+
+bool EventLoopManager::deferCallback(SystemCallbackType /*type*/, void *data,
+				     EventCallbackFunction *callback)
+{
+	if (callback) {
+		callback(0, data, nullptr);
+	}
+	return true;
+}
+
+#ifdef CONFIG_CHRE_TIMER_WORLD
 UniquePtr<Nanoapp> initializeStaticNanoappTimerWorld()
 {
 	mock_chre::getState().nanoapp_init_count++;
-	return UniquePtr<Nanoapp>(&s_timer_world_nanoapp);
+	return UniquePtr<Nanoapp>(new Nanoapp());
 }
 #endif
 
 #ifdef CONFIG_CHRE_HELLO_WORLD
-static Nanoapp s_hello_world_nanoapp;
-
 UniquePtr<Nanoapp> initializeStaticNanoappHelloWorld()
 {
 	mock_chre::getState().nanoapp_init_count++;
-	return UniquePtr<Nanoapp>(&s_hello_world_nanoapp);
+	return UniquePtr<Nanoapp>(new Nanoapp());
 }
 #endif
 
