@@ -14,5 +14,12 @@ register_mtkscp_project(
     kconfig_files=[
         here / "program.conf",
         here / "sapphire-scp-zephyr" / "project.conf",
+        here / "chre.conf",
     ],
+    modules=[
+        "ec",
+        "chre",
+        "pigweed",
+    ],
+    skip_build_all=not has_internal_chre(),  # pylint: disable=undefined-variable
 )

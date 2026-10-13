@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-if(CONFIG_ISH_CHRE)
+if(CONFIG_ISH_CHRE OR CONFIG_SCP_CHRE)
   pw_add_library(chre.platform.ec.log INTERFACE
     HEADERS
       shim/include/chre/target_platform/log.h
@@ -10,6 +10,9 @@ if(CONFIG_ISH_CHRE)
       shim/include
   )
   pw_zephyrize_libraries_ifdef(CONFIG_ISH_CHRE
+    chre.platform.ec.log
+  )
+  pw_zephyrize_libraries_ifdef(CONFIG_SCP_CHRE
     chre.platform.ec.log
   )
   if(DEFINED chre.platform.log_BACKEND)
@@ -20,7 +23,7 @@ if(CONFIG_ISH_CHRE)
   if(NOT CONFIG_ZTEST)
     set(CHRE_PLATFORM_PIGWEED ON CACHE BOOL "" FORCE)
     zephyr_compile_options(-include zephyr/sys/util_macro.h)
-    add_subdirectory(${CHRE_ROOT} chre)
+    add_subdirectory(${CHRE_ROOT} chre EXCLUDE_FROM_ALL)
     target_link_libraries(app PRIVATE
       chre
       pw_allocator_zephyr.synchronized_heap_allocator
