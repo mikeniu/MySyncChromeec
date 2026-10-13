@@ -1953,6 +1953,8 @@ static void tch_construct_chunked_message_entry(const int port)
 	if (num > PD_MAX_EXTENDED_MSG_CHUNK_LEN)
 		num = PD_MAX_EXTENDED_MSG_CHUNK_LEN;
 
+	memset(pdmsg[port].tx_chk_buf, 0, sizeof(pdmsg[port].tx_chk_buf));
+
 	/* Set the chunks extended header */
 	*ext_hdr = PD_EXT_HEADER(pdmsg[port].chunk_number_to_send, 0, /* Chunk
 									 Request
@@ -1960,7 +1962,6 @@ static void tch_construct_chunked_message_entry(const int port)
 				 tx_emsg[port].len);
 
 	/* Copy the message chunk into chk_buf */
-	memset(data, 0, 28);
 	memcpy(data, tx_emsg[port].buf + pdmsg[port].send_offset, num);
 	pdmsg[port].send_offset += num;
 
