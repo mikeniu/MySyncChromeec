@@ -2987,72 +2987,6 @@
 /* Number of IRQs supported on the EC chip */
 #undef CONFIG_IRQ_COUNT
 
-/* Enable LDN for KBC mouse */
-#undef CONFIG_IT83XX_ENABLE_MOUSE_DEVICE
-
-/*
- * Enable more ILM to cache chip's drivers to reduce latency in fetching
- * instructions from internal flash.
- */
-#undef CONFIG_IT83XX_EXTENDED_ILM
-/* IT8320 hardware timer driver runs from ILM */
-#undef CONFIG_IT83XX_EXTENDED_ILM_HWTIMER_DRIVER
-/* I2C controller runs from ILM */
-#undef CONFIG_IT83XX_EXTENDED_ILM_I2C_CONTROLLER
-/* IT8320 I2C driver runs from ILM */
-#undef CONFIG_IT83XX_EXTENDED_ILM_I2C_DRIVER
-/* IT8320 IRQ driver runs from ILM */
-#undef CONFIG_IT83XX_EXTENDED_ILM_IRQ_DRIVER
-/* IT8320 UART driver runs from ILM */
-#undef CONFIG_IT83XX_EXTENDED_ILM_UART_DRIVER
-/* USBC PD timer runs from ILM */
-#undef CONFIG_IT83XX_EXTENDED_ILM_USBC_PD_TIMER
-/* TCPCI driver runs from ILM */
-#undef CONFIG_IT83XX_EXTENDED_ILM_TCPCI_DRIVER
-/* Timer runs from ILM */
-#undef CONFIG_IT83XX_EXTENDED_ILM_TIMER
-/* RAA489000 driver runs from ILM */
-#undef CONFIG_IT83XX_EXTENDED_ILM_RAA489000_DRIVER
-
-/*
- * The IT8320 supports e-flash clock up to 48 MHz (IT8390 maximum is 32 MHz).
- * Enable it if we want better performance of fetching instruction from e-flash.
- *
- * This is valid with PLL frequency equal to 48/96MHz only.
- */
-#undef CONFIG_IT83XX_FLASH_CLOCK_48MHZ
-
-/*
- * If this option is enabled, EC will assert GPG1 pin to reset itself instead of
- * triggering an internal reset while receiving a reset request.
- *
- * IMPORTANT:
- * - Don't enable this option if board doesn't support the mechanism.
- * - If this option is enabled, please don't declare GPG1 signal in gpio.inc to
- *   keep its output level is low after reset.
- */
-#undef CONFIG_IT83XX_HARD_RESET_BY_GPG1
-
-/*
- * Use i2c command queue mode for a single i2c transaction.
- * (Applied to port D, E, and F)
- */
-#undef CONFIG_IT83XX_I2C_CMD_QUEUE
-
-/*
- * Enable it if EC's VBAT won't go low when system's power isn't
- * presented (no battery and no AC)
- * If EC's VSTBY and VBAT(power source of BRAM) aren't connected to the same
- * power rail and VBAT doesn't go low immediately (eg: there is a larger
- * capacitance on the rail) after all power off: PD contract recorded in BRAM
- * won't get cleared (But actually we have unplugged type-c adaptor, so the
- * contract should be cleared).
- */
-#undef CONFIG_IT83XX_RESET_PD_CONTRACT_IN_BRAM
-
-/* To define it, if I2C channel C and PECI used at the same time. */
-#undef CONFIG_IT83XX_SMCLK2_ON_GPC7
-
 /*
  * Enable board to tune cc physical parameters (ex.rising, falling time).
  * NOTE: board must define board_get_cc_tuning_parameter(enum usbpd_port port)
@@ -3061,30 +2995,10 @@
 #undef CONFIG_IT83XX_TUNE_CC_PHY
 
 /*
- * Enable the corresponding config option, according to EC's VCC is connected
- * to 1.8V or 3.3V
- */
-#undef CONFIG_IT83XX_VCC_1P8V
-#undef CONFIG_IT83XX_VCC_3P3V
-
-/*
  * Overwrite integer multiplication and division arithmetic library routines
  * with using hardware multiplication and division and nop instructions.
  */
 #undef CONFIG_IT8XXX2_MUL_WORKAROUND
-
-/*
- * Allows pre-watchdog timer interrupt to be unmasked even when all interrupts
- * are disabled.
- * NOTE: this config is only relevant for non-zephyr boards with NDS32 arch
- */
-#undef CONFIG_IT83XX_PREWDT_ALWAYS_ENABLED
-
-/*
- * For IT83xx boards shipped with Watchdog timer locked in RO this config
- * allows to extend the duration of Watchdog timer by resetting it once.
- */
-#undef CONFIG_IT83XX_LOCKED_WATCHDOG_EXTENSION
 
 /*
  * Support the standard integer multiplication and division instruction
@@ -4924,10 +4838,8 @@
 /*
  * Defined automatically by chip and depends on chip. This guards the onboard
  * TCPM driver, but CONFIG_USB_PD_TCPM_ITE_ON_CHIP needs to be defined in
- * board.h for either of these driver to actually be included in the final
- * image.
+ * board.h for the driver to actually be included in the final image.
  */
-#undef CONFIG_USB_PD_TCPM_DRIVER_IT83XX
 #undef CONFIG_USB_PD_TCPM_DRIVER_IT8XXX2
 
 /*
@@ -6314,8 +6226,7 @@
  */
 #ifdef CONFIG_USB_PD_TCPM_ITE_ON_CHIP
 #define CONFIG_USB_PD_TCPC_ON_CHIP
-#if !defined(CONFIG_USB_PD_TCPM_DRIVER_IT8XXX2) && \
-	!defined(CONFIG_USB_PD_TCPM_DRIVER_IT83XX)
+#if !defined(CONFIG_USB_PD_TCPM_DRIVER_IT8XXX2)
 #error "No drivers for ITE ON CHIP"
 #endif
 #endif
@@ -7071,19 +6982,6 @@
 /* Default to 1024 for end of ram data (panic and jump data) */
 #ifndef CONFIG_PRESERVED_END_OF_RAM_SIZE
 #define CONFIG_PRESERVED_END_OF_RAM_SIZE 1024
-#endif
-
-/* Select CONFIG_IT83XX_EXTENDED_ILM automatically */
-#if defined(CONFIG_IT83XX_EXTENDED_ILM_HWTIMER_DRIVER) ||     \
-	defined(CONFIG_IT83XX_EXTENDED_ILM_I2C_CONTROLLER) || \
-	defined(CONFIG_IT83XX_EXTENDED_ILM_I2C_DRIVER) ||     \
-	defined(CONFIG_IT83XX_EXTENDED_ILM_IRQ_DRIVER) ||     \
-	defined(CONFIG_IT83XX_EXTENDED_ILM_UART_DRIVER) ||    \
-	defined(CONFIG_IT83XX_EXTENDED_ILM_USBC_PD_TIMER) ||  \
-	defined(CONFIG_IT83XX_EXTENDED_ILM_TCPCI_DRIVER) ||   \
-	defined(CONFIG_IT83XX_EXTENDED_ILM_TIMER) ||          \
-	defined(CONFIG_IT83XX_EXTENDED_ILM_RAA489000_DRIVER)
-#define CONFIG_IT83XX_EXTENDED_ILM
 #endif
 
 #ifdef HAVE_PRIVATE

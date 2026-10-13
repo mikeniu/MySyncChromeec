@@ -34,15 +34,6 @@ config PLATFORM_EC_USB_PD_TCPM_ITE_ON_CHIP
 	  This is automatically selected by the ITE USB Type-C drivers. It
 	  cannot be set otherwise, even in prj.conf
 
-config PLATFORM_EC_USB_PD_TCPM_DRIVER_IT83XX
-	bool "Enable IT83XX driver"
-	select PLATFORM_EC_USB_PD_TCPM_ITE_ON_CHIP
-	select PLATFORM_EC_USB_PD_TCPM_TCPCI
-	help
-	  Enable a driver for the ITE IT83XX on-chip UBB Type-C Port Manager.
-	  This supports up to two USB Type-C ports with Dual Role function
-	  (provider and consumer) and Fast Role Swap detection.
-
 config PLATFORM_EC_USB_PD_TCPM_DRIVER_IT8XXX2
 	bool "Enable IT8XXX2 driver"
 	default y
