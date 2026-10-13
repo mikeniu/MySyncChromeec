@@ -311,4 +311,20 @@ ZTEST(test_task_shim, test_task_get_current_post_kernel)
 	zassert_true(post_kernel_ran);
 }
 
+ZTEST(test_task_shim, test_thread_events)
+{
+	k_tid_t self = k_current_get();
+
+	zassert_is_null(get_thread_event(NULL));
+	zassert_is_null(task_get_event(TASK_ID_INVALID));
+	zassert_not_null(task_get_event(TASK_ID_SYSWORKQ));
+
+	thread_set_event(NULL, 0x1);
+	thread_set_event(self, 0x10);
+	thread_wake(self);
+	zassert_equal(k_event_test(get_thread_event(self), UINT32_MAX),
+		      0x10 | TASK_EVENT_WAKE);
+	zassert_equal(task_wait_event(0), 0x10 | TASK_EVENT_WAKE);
+}
+
 ZTEST_SUITE(test_task_shim, NULL, tasks_setup, NULL, NULL, NULL);
