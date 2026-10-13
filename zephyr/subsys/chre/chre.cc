@@ -11,8 +11,10 @@
 
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
-#include <zephyr/sys/printk.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
+
+LOG_MODULE_DECLARE(chre, LOG_LEVEL_INF);
 
 namespace chre
 {
@@ -65,7 +67,7 @@ static void chre_thread_entry(void *arg1, void *arg2, void *arg3)
 	ARG_UNUSED(arg2);
 	ARG_UNUSED(arg3);
 
-	printk("Starting CHRE runtime\n");
+	LOG_INF("Starting CHRE runtime");
 
 #ifndef CONFIG_ZTEST
 	chre::setPlatformPigweedAllocator(chre_allocator);
@@ -79,7 +81,7 @@ static void chre_thread_entry(void *arg1, void *arg2, void *arg3)
 	chre::EventLoopManagerSingleton::get()->getEventLoop().run();
 
 	chre::deinitCommon();
-	printk("CHRE runtime exited\n");
+	LOG_INF("CHRE runtime exited");
 }
 
 static int chre_init(void)
