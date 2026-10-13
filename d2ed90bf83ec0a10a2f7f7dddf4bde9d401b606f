@@ -64,6 +64,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f6dcfa3e_745c0304",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T23:10:58Z",
+      "side": 1,
+      "message": "This CL doesn\u0027t depend on the others in the stack, so if you rebase on `main` we can go ahead and submit it once you address the comments.",
+      "revId": "d2ed90bf83ec0a10a2f7f7dddf4bde9d401b606f",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1b8d3b50_d1e9a7c0",
         "filename": "zephyr/test/hwtest/src/panic_data.c",
         "patchSetId": 5
