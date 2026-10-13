@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from typing import Iterable
 
 
 def find_checkout():
@@ -341,6 +342,46 @@ def shard_projects(projects, opts=None):
         end = start + chunk_size + (1 if opts.shard_index <= remainder else 0)
         return projects[start:end]
     return projects
+
+
+def export_configs(
+    project_name: str,
+    variants: Iterable[str],
+    build_dir: pathlib.Path,
+    bundle_dir: pathlib.Path,
+) -> list[tuple[str, str]]:
+    """Copies the config files of the builds of a project into the bundle.
+
+    The files are copied as they are, so that they can be read without
+    unpacking the firmware tarballs.
+
+    Args:
+        project_name: The name of the zmake project.
+        variants: The names of the builds of the project, e.g. ("ro", "rw").
+        build_dir: The directory that zmake built the project in.
+        bundle_dir: The directory of the bundle.
+
+    Returns:
+        A list of (file name relative to bundle_dir, kind) tuples.
+    """
+    exports = []
+    for variant in variants:
+        zephyr_dir = pathlib.Path(build_dir) / f"build-{variant}" / "zephyr"
+        # A project with a single image has one config for both of the regions.
+        config_kind = "ec" if variant == "singleimage" else f"ec-{variant}"
+        candidates = [(".config", config_kind, "config")]
+        if variant != "ro":
+            # The packers only use the manifest of the RW or single build.
+            candidates.append(("component_manifest.json", "components", "json"))
+        for src_name, kind, ext in candidates:
+            src = zephyr_dir / src_name
+            if src.is_file():
+                file_name = f"configs/{project_name}/{kind}.{ext}"
+                dest = pathlib.Path(bundle_dir) / file_name
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(src, dest)
+                exports.append((file_name, kind))
+    return exports
 
 
 def merge_shard_coverage_reports(
