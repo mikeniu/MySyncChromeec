@@ -4,6 +4,10 @@
 
 rsource "ec/Kconfig"
 
+if !ZTEST
+rsource "Kconfig.chre"
+endif
+
 if SOC_FAMILY_INTEL_ISH
 rsource "Kconfig.ish"
 endif
