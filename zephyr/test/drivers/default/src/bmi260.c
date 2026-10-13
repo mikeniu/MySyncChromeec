@@ -6,6 +6,7 @@
 #include "common.h"
 #include "driver/accelgyro_bmi260.h"
 #include "driver/accelgyro_bmi_common.h"
+#include "ec_tasks.h"
 #include "emul/emul_bmi.h"
 #include "emul/emul_common_i2c.h"
 #include "i2c.h"
@@ -2007,20 +2008,14 @@ ZTEST_USER(bmi260, test_interrupt_handler)
 	 * interrupt, and ensure the flag is set.
 	 */
 
-	atomic_t *mask;
+	struct k_event *ev = task_get_event(TASK_ID_MOTIONSENSE);
 
-	mask = task_get_event_bitmap(TASK_ID_MOTIONSENSE);
-	zassert_true(mask != NULL,
-		     "Got a null pointer when getting event bitmap.");
-	zassert_true((*mask & CONFIG_ACCELGYRO_BMI260_INT_EVENT) == 0,
-		     "Event flag is set before firing interrupt");
+	zassert_equal(k_event_test(ev, CONFIG_ACCELGYRO_BMI260_INT_EVENT), 0,
+		      "Event flag is set before firing interrupt");
 
 	bmi260_interrupt(0);
 
-	mask = task_get_event_bitmap(TASK_ID_MOTIONSENSE);
-	zassert_true(mask != NULL,
-		     "Got a null pointer when getting event bitmap.");
-	zassert_true(*mask & CONFIG_ACCELGYRO_BMI260_INT_EVENT,
+	zassert_true(k_event_test(ev, CONFIG_ACCELGYRO_BMI260_INT_EVENT),
 		     "Event flag is not set after firing interrupt");
 }
 
