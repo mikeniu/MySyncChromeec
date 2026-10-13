@@ -43,11 +43,6 @@ typedef union {
 } timestamp_t;
 
 /**
- * Initialize the timer module.
- */
-void timer_init(void);
-
-/**
  * Check if a timestamp has passed / expired
  *
  * @param deadline	deadline timer value to check
@@ -59,8 +54,7 @@ int timestamp_expired(timestamp_t deadline, const timestamp_t *now);
 /**
  * Busy-wait.
  *
- * This may be called with interrupts disabled, at any time after timer_init()
- * has been called.
+ * This may be called with interrupts disabled.
  *
  * Note that calling this with us>1000 may impact system performance; use
  * crec_usleep() for longer delays.
@@ -114,16 +108,6 @@ static inline unsigned int crec_sleep(unsigned int sec)
  * Get the current timestamp from the system timer.
  */
 timestamp_t get_time(void);
-
-/**
- * Force the current value of the system timer.
- *
- * This function is for the power management implementation which wants to fix
- * the system time when waking up from a mode with clocks turned off.
- *
- * Note: must be called with interrupts disabled.
- */
-void force_time(timestamp_t ts);
 
 /**
  * Print the current timer information using the command output channel.

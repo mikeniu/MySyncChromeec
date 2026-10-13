@@ -166,7 +166,6 @@ prj.conf file to disable the console command.
 | x | CONFIG_CMD_FLASHINFO | `flashinfo` | Used by TAST `firmware.ECSize` |
 | | CONFIG_CMD_FLASH_TRISTATE | `fpcapture`<br>`flash_tristate` | |
 | | CONFIG_CMD_FLASH_WP | `flashwp` | |
-| | CONFIG_CMD_FORCETIME | `forcetime` | |
 | | CONFIG_CMD_FPSENSOR_DEBUG | `fpcapture`<br>`fpenroll`<br>`fpmatch`<br>`fpclear`<br>`fpmaintenance` | |
 | | CONFIG_CMD_GETTIME | `gettime` | Used by Cr50 tests, not by FAFT EC |
 | | CONFIG_CMD_GL3590 | `gl3590` | |
