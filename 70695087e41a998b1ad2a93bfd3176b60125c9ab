@@ -135,6 +135,30 @@
       },
       "revId": "70695087e41a998b1ad2a93bfd3176b60125c9ab",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "798e4a72_bbd1b2d2",
+        "filename": "zephyr/program/ocelot/ocelotrvp-ite/ocelotrvp-ite_vif.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 3773521
+      },
+      "writtenOn": "2026-10-13T09:06:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c189883a_bd86661b",
+      "range": {
+        "startLine": 358,
+        "startChar": 9,
+        "endLine": 358,
+        "endChar": 28
+      },
+      "revId": "70695087e41a998b1ad2a93bfd3176b60125c9ab",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
