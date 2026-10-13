@@ -30,4 +30,18 @@ config ISH_CHRE_PRIORITY
 	help
 	  Preemptible priority for the CHRE event loop thread.
 
+config CHRE_TIMER_WORLD
+	bool "Load TimerWorld static nanoapp"
+	default y
+	help
+	  Statically link and run the CHRE TimerWorld example nanoapp
+	  at boot to verify the CHRE event loop, timers, and nanoapp runtime.
+
+config CHRE_HELLO_WORLD
+	bool "Load HelloWorld static nanoapp"
+	default n
+	help
+	  Statically link and run the CHRE HelloWorld example nanoapp
+	  at boot to verify the CHRE event loop and nanoapp runtime.
+
 endif # ISH_CHRE
