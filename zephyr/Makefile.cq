@@ -215,3 +215,7 @@ clobber:
 	else \
 		echo "ccache not found, skipping ccache clear."; \
 	fi
+
+# Prints the value of a variable, e.g. make -s -f Makefile.cq print-TEST_PATTERNS
+print-%:
+	@printf '%s\n' $(or $($*),$(error $* is empty))
