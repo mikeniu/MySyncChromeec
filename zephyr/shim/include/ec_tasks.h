@@ -17,12 +17,21 @@ extern "C" {
 /** Starts all of the shimmed EC tasks. Requires CONFIG_SHIMMED_TASKS=y. */
 void start_ec_tasks(void);
 
+struct task_ctx_base_data {
+	/** A wait-able event that is raised when a new task event is posted */
+	struct k_poll_signal new_event;
+	/** The current platform/ec events set for this task/thread */
+	atomic_t event_mask;
+};
+
 #ifdef TEST_BUILD
 /**
  * Set TASK_ID_TEST_RUNNER to current thread tid. Some functions that are tested
  * require to run in any task context.
  */
 void set_test_runner_tid(void);
+
+struct task_ctx_base_data *task_get_base_data(task_id_t cros_task_id);
 #endif
 
 #ifdef __cplusplus

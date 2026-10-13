@@ -3,6 +3,7 @@
  * found in the LICENSE file.
  */
 
+#include "ec_tasks.h"
 #include "task.h"
 #include "test/drivers/test_state.h"
 #include "test/drivers/utils.h"
@@ -49,8 +50,7 @@ ZTEST(tasks, test_interrupt_context)
 	zassert_false(in_interrupt_context());
 }
 
-ZTEST(tasks, test_get_event_bitmap_invalid_tid)
+ZTEST(tasks, test_get_base_data_invalid_tid)
 {
-	zassert_is_null(
-		task_get_event_bitmap(TASK_ID_COUNT + EXTRA_TASK_COUNT));
+	zassert_is_null(task_get_base_data(TASK_ID_COUNT + EXTRA_TASK_COUNT));
 }

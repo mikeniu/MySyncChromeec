@@ -42,13 +42,6 @@ CROS_EC_TASK_LIST
 CROS_EC_TASK_LIST
 #undef CROS_EC_TASK
 
-struct task_ctx_base_data {
-	/** A wait-able event that is raised when a new task event is posted */
-	struct k_poll_signal new_event;
-	/** The current platform/ec events set for this task/thread */
-	atomic_t event_mask;
-};
-
 /*
  * Create a mapping from the cros-ec task ID to the Zephyr thread.
  */
@@ -67,7 +60,8 @@ static struct task_ctx_base_data extra_tasks_data[EXTRA_TASK_COUNT];
 static int tasks_started;
 #undef CROS_EC_TASK
 
-static struct task_ctx_base_data *task_get_base_data(task_id_t cros_task_id)
+test_export_static struct task_ctx_base_data *
+task_get_base_data(task_id_t cros_task_id)
 {
 	if (cros_task_id >= TASK_ID_COUNT + EXTRA_TASK_COUNT) {
 		return NULL;
@@ -183,15 +177,6 @@ task_id_t task_get_current(void)
 	}
 
 	return thread_id_to_task_id(k_current_get());
-}
-
-atomic_t *task_get_event_bitmap(task_id_t cros_task_id)
-{
-	struct task_ctx_base_data *data;
-
-	data = task_get_base_data(cros_task_id);
-
-	return data == NULL ? NULL : &data->event_mask;
 }
 
 void task_set_event(task_id_t cros_task_id, uint32_t event)
