@@ -87,12 +87,14 @@ static uint64_t get_motion_variance(void)
 
 static int calculate_motion_confidence(uint64_t var)
 {
-	if (var < var_threshold_scaled - confidence_delta_scaled)
+	const uint64_t delta =
+		min(confidence_delta_scaled, var_threshold_scaled);
+
+	if (var <= var_threshold_scaled - delta)
 		return 0;
-	if (var > var_threshold_scaled + confidence_delta_scaled)
+	if (var >= var_threshold_scaled + delta)
 		return 100;
-	return 100 * (var - var_threshold_scaled + confidence_delta_scaled) /
-	       (2 * confidence_delta_scaled);
+	return 100 * (var - (var_threshold_scaled - delta)) / (2 * delta);
 }
 
 /* Determine window size for 1 second by sensor data rate. */

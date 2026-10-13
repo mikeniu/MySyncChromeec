@@ -14,6 +14,8 @@
 #include "test_util.h"
 #include "util.h"
 
+extern uint64_t var_threshold_scaled, confidence_delta_scaled;
+
 static struct motion_sensor_t *sensor = &motion_sensors[BASE];
 static const int window_size = 50; /* sensor data rate (Hz) */
 
@@ -30,6 +32,43 @@ static void feed_body_detect_data(const struct body_detect_test_data *array,
 	sensor->xyz[X] = filler(sensor, array[idx].x);
 	sensor->xyz[Y] = filler(sensor, array[idx].y);
 	sensor->xyz[Z] = filler(sensor, array[idx].z);
+}
+
+static int test_confidence_delta_underflow(void)
+{
+	static const struct body_detect_params params = {
+		.var_threshold = 1000,
+		.confidence_delta = 3000,
+	};
+	int i;
+	int ret;
+
+	ret = sensor->drv->set_data_rate(sensor, window_size * 1000, 0);
+	TEST_ASSERT(ret == EC_SUCCESS);
+	body_detect_set_enable(true);
+
+	sensor->bd_params = &params;
+	body_detect_reset();
+	TEST_ASSERT(confidence_delta_scaled > var_threshold_scaled);
+
+	body_detect_change_state(BODY_DETECTION_OFF_BODY, false);
+	for (i = 0; i < window_size; ++i) {
+		sensor->xyz[X] = 0;
+		sensor->xyz[Y] = 0;
+		sensor->xyz[Z] = filler(sensor, 9.8f);
+		body_detect();
+	}
+	TEST_ASSERT(body_detect_get_state() == BODY_DETECTION_OFF_BODY);
+
+	for (i = 0; i < window_size; ++i) {
+		sensor->xyz[X] = filler(sensor, (i % 2 == 0) ? 9.8f : -9.8f);
+		body_detect();
+	}
+	TEST_ASSERT(body_detect_get_state() == BODY_DETECTION_ON_BODY);
+
+	sensor->bd_params = NULL;
+	body_detect_reset();
+	return EC_SUCCESS;
 }
 
 static int get_trigger_time(const struct body_detect_test_data *data,
@@ -108,6 +147,7 @@ void run_test(int argc, const char **argv)
 {
 	test_reset();
 
+	RUN_TEST(test_confidence_delta_underflow);
 	RUN_TEST(test_body_detect);
 
 	test_print_result();
