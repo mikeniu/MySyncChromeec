@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f948908_ac819069",
+        "filename": "driver/accelgyro_bmi3xx.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-13T19:14:23Z",
+      "side": 1,
+      "message": "do you need to zero initialize this? I think it\u0027s only used if written entirely in `bmi3_read_n`",
+      "revId": "baee9a263cd8028b51f483bbf6c26fd59725aeac",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f56a7792_4cbf3e8d",
+        "filename": "driver/accelgyro_bmi3xx.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 1478788
+      },
+      "writtenOn": "2026-10-13T19:14:23Z",
+      "side": 1,
+      "message": "can you reverse the logic and `continue`, keep the rest uninlined? The indentation is making this hard to read",
+      "revId": "baee9a263cd8028b51f483bbf6c26fd59725aeac",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
