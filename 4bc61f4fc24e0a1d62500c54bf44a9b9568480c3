@@ -34,6 +34,24 @@
       "parentUuid": "0fbe766a_ecae1c75",
       "revId": "4bc61f4fc24e0a1d62500c54bf44a9b9568480c3",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ac61ac3_76683358",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3498113
+      },
+      "writtenOn": "2026-10-13T08:03:21Z",
+      "side": 1,
+      "message": "Let me rewrite the chain\u0027s history and put this CL on top. Then this temporary change will not block us from merging other CLs that are currently after it in the chain.",
+      "parentUuid": "ef4bfa92_57e50bed",
+      "revId": "4bc61f4fc24e0a1d62500c54bf44a9b9568480c3",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
