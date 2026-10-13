@@ -1,0 +1,67 @@
+# Copyright 2026 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+config ISH_CHRE
+	bool "Use CHRE on ISH"
+	select PIGWEED_CHRONO_SYSTEM_TIMER
+	select PIGWEED_SYNC_INTERRUPT_SPIN_LOCK
+	select PIGWEED_SYNC_THREAD_NOTIFICATION
+	select PIGWEED_SYNC_TIMED_THREAD_NOTIFICATION
+	select PIGWEED_SYS_IO
+	select PIGWEED_THREAD
+	help
+	  Enable the Context Hub Runtime Environment (CHRE) on Intel ISH.
+	  CHRE is an event-driven runtime architecture designed for low-power,
+	  always-on contextual computing such as sensor fusion, activity
+	  recognition, and nanoapps.
+
+config SCP_CHRE
+	bool "Use CHRE on SCP"
+	select PIGWEED_CHRONO_SYSTEM_TIMER
+	select PIGWEED_SYNC_INTERRUPT_SPIN_LOCK
+	select PIGWEED_SYNC_THREAD_NOTIFICATION
+	select PIGWEED_SYNC_TIMED_THREAD_NOTIFICATION
+	select PIGWEED_SYS_IO
+	select PIGWEED_THREAD
+	help
+	  Enable the Context Hub Runtime Environment (CHRE) on MediaTek SCP.
+	  CHRE is an event-driven runtime architecture designed for low-power,
+	  always-on contextual computing such as sensor fusion, activity
+	  recognition, and nanoapps.
+
+if ISH_CHRE || SCP_CHRE
+
+config CHRE_DYNAMIC_MEMORY_SIZE
+	int "CHRE memory pool size"
+	default 16384
+	help
+	  Size of the CHRE dynamic memory pool in bytes.
+
+config ISH_CHRE_STACK_SIZE
+	int "CHRE thread stack size"
+	default 4096
+	help
+	  Stack size for the CHRE event loop thread in bytes.
+
+config ISH_CHRE_PRIORITY
+	int "CHRE thread priority"
+	default 5
+	help
+	  Preemptible priority for the CHRE event loop thread.
+
+config CHRE_TIMER_WORLD
+	bool "Load TimerWorld static nanoapp"
+	default y
+	help
+	  Statically link and run the CHRE TimerWorld example nanoapp
+	  at boot to verify the CHRE event loop, timers, and nanoapp runtime.
+
+config CHRE_HELLO_WORLD
+	bool "Load HelloWorld static nanoapp"
+	default n
+	help
+	  Statically link and run the CHRE HelloWorld example nanoapp
+	  at boot to verify the CHRE event loop and nanoapp runtime.
+
+endif # ISH_CHRE || SCP_CHRE
