@@ -30,7 +30,7 @@ LOG_OUTPUT_DEFINE(log_output_console_buffer, char_out, char_out_buf,
 static void process(const struct log_backend *const backend,
 		    union log_msg_generic *msg)
 {
-	uint32_t flags = log_backend_std_get_flags();
+	uint32_t flags = log_backend_std_get_flags() & ~LOG_OUTPUT_FLAG_COLORS;
 
 	if (IS_ENABLED(CONFIG_PLATFORM_EC_LOG_BACKEND_CONSOLE_BUFFER_REDUCED)) {
 		flags = (flags & ~LOG_OUTPUT_FLAG_LEVEL) |
