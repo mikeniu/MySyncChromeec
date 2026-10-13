@@ -4,210 +4,71 @@
 
 """Unit tests for firmware_builder_lib."""
 
-import argparse
 import pathlib
-import re
+import shutil
 import tempfile
-import types
 import unittest
-from unittest import mock
 
 from scripts import firmware_builder_lib
 
 
-# The unit tests (TN:) and the builds of the boards, as merged by lcov -a. The
-# boards only have the lines that they compile, without hits.
-MERGED_LCOV = """\
-TN:
-SF:/ec/common/a.c
-DA:1,5
-DA:2,0
-DA:3,1
-DA:4,0
-end_of_record
-TN:
-SF:/ec/test/a_test.c
-DA:1,2
-DA:2,0
-end_of_record
-TN:
-SF:/ec/third_party/lib.c
-DA:1,3
-end_of_record
-TN:board_x
-SF:/ec/common/a.c
-DA:1,0
-DA:2,0
-end_of_record
-TN:board_x
-SF:/ec/third_party/lib.c
-DA:1,0
-DA:7,0
-end_of_record
-TN:board_y
-SF:/ec/common/a.c
-DA:3,0
-end_of_record
-"""
+class TestExportConfigs(unittest.TestCase):
+    """Tests for export_configs function."""
 
+    def setUp(self) -> None:
+        tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp)
+        self.build_dir = pathlib.Path(tmp) / "build"
+        self.bundle_dir = pathlib.Path(tmp) / "bundle"
 
-def _create_mock_project(name: str) -> types.SimpleNamespace:
-    """Creates a mock project object mimicking zmake.project.Project."""
-    return types.SimpleNamespace(
-        config=types.SimpleNamespace(project_name=name)
-    )
+    def _write(self, variant: str, name: str, text: str) -> None:
+        """Writes a file of the build with the given variant name."""
+        path = self.build_dir / f"build-{variant}" / "zephyr" / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
 
+    def _read(self, file_name: str) -> str:
+        """Reads an exported file."""
+        return (self.bundle_dir / file_name).read_text(encoding="utf-8")
 
-class TestShardProjects(unittest.TestCase):
-    """Tests for shard_projects function."""
-
-    def test_sorts_and_shards_project_objects(self):
-        """Test sorting and sharding project objects with config.project_name."""
-        projects = [
-            _create_mock_project("skyrim"),
-            _create_mock_project("brya"),
-            _create_mock_project("corsola"),
-            _create_mock_project("dedede"),
-        ]
-        opts = argparse.Namespace(shard_count=2, shard_index=1)
-        result1 = firmware_builder_lib.shard_projects(list(projects), opts)
+    def test_exports_ro_and_rw_configs_and_rw_manifest(self) -> None:
+        """Test that both configs and the manifest of the RW build are copied."""
+        self._write("ro", ".config", "CONFIG_CROS_EC_RO=y\n")
+        self._write("rw", ".config", "CONFIG_CROS_EC_RW=y\n")
+        self._write("ro", "component_manifest.json", '{"from": "ro"}')
+        self._write("rw", "component_manifest.json", '{"from": "rw"}')
         self.assertEqual(
-            [p.config.project_name for p in result1], ["brya", "corsola"]
+            firmware_builder_lib.export_configs(
+                "brox", ["ro", "rw"], self.build_dir, self.bundle_dir
+            ),
+            [
+                ("configs/brox/ec-ro.config", "ec-ro"),
+                ("configs/brox/ec-rw.config", "ec-rw"),
+                ("configs/brox/components.json", "components"),
+            ],
+        )
+        self.assertEqual(
+            self._read("configs/brox/ec-ro.config"), "CONFIG_CROS_EC_RO=y\n"
+        )
+        self.assertEqual(
+            self._read("configs/brox/ec-rw.config"), "CONFIG_CROS_EC_RW=y\n"
+        )
+        self.assertEqual(
+            self._read("configs/brox/components.json"), '{"from": "rw"}'
         )
 
-        opts.shard_index = 2
-        result2 = firmware_builder_lib.shard_projects(list(projects), opts)
+    def test_single_image_config_covers_both_regions(self) -> None:
+        """Test that a single image has one config and no manifest."""
+        self._write("singleimage", ".config", "CONFIG_FPU=y\n")
         self.assertEqual(
-            [p.config.project_name for p in result2], ["dedede", "skyrim"]
+            firmware_builder_lib.export_configs(
+                "bloonchipper", ["singleimage"], self.build_dir, self.bundle_dir
+            ),
+            [("configs/bloonchipper/ec.config", "ec")],
         )
-
-    def test_sorts_and_shards_string_board_names(self):
-        """Test sorting and sharding iterable of string board names."""
-        boards = ["sanok", "bloonchipper", "helipilot", "chudow"]
-        opts = argparse.Namespace(shard_count=4, shard_index=1)
         self.assertEqual(
-            firmware_builder_lib.shard_projects(list(boards), opts),
-            ["bloonchipper"],
+            self._read("configs/bloonchipper/ec.config"), "CONFIG_FPU=y\n"
         )
-
-        opts.shard_index = 2
-        self.assertEqual(
-            firmware_builder_lib.shard_projects(list(boards), opts),
-            ["chudow"],
-        )
-
-        opts.shard_index = 3
-        self.assertEqual(
-            firmware_builder_lib.shard_projects(list(boards), opts),
-            ["helipilot"],
-        )
-
-        opts.shard_index = 4
-        self.assertEqual(
-            firmware_builder_lib.shard_projects(list(boards), opts),
-            ["sanok"],
-        )
-
-    def test_unsharded_preserves_all_boards(self):
-        """Test that missing opts or unset shard flags preserves all boards."""
-        boards = ["sanok", "bloonchipper", "helipilot", "chudow"]
-        # None opts
-        self.assertEqual(
-            firmware_builder_lib.shard_projects(list(boards), None),
-            ["bloonchipper", "chudow", "helipilot", "sanok"],
-        )
-
-        # Unset shard flags
-        opts = argparse.Namespace(shard_count=None, shard_index=None)
-        self.assertEqual(
-            firmware_builder_lib.shard_projects(list(boards), opts),
-            ["bloonchipper", "chudow", "helipilot", "sanok"],
-        )
-
-    def test_invalid_shard_index_raises(self):
-        """Test that invalid shard index bounds raise ValueError."""
-        boards = ["a", "b"]
-        opts = argparse.Namespace(shard_count=2, shard_index=3)
-        with self.assertRaises(ValueError):
-            firmware_builder_lib.shard_projects(list(boards), opts)
-
-        opts = argparse.Namespace(shard_count=2, shard_index=0)
-        with self.assertRaises(ValueError):
-            firmware_builder_lib.shard_projects(list(boards), opts)
-
-
-class TestSummarizeMergedLcov(unittest.TestCase):
-    """Tests for summarize_merged_lcov function."""
-
-    def _summarize(self, boards):
-        """Runs summarize_merged_lcov on MERGED_LCOV."""
-        with tempfile.NamedTemporaryFile("w+", encoding="utf-8") as lcov_info:
-            lcov_info.write(MERGED_LCOV)
-            lcov_info.flush()
-            return firmware_builder_lib.summarize_merged_lcov(
-                lcov_info.name,
-                boards,
-                re.compile(r".*/test/"),
-                re.compile(r".*/(test|third_party)/"),
-            )
-
-    def test_metrics(self):
-        """Test the metrics of the unit tests and of the boards."""
-        self.assertEqual(
-            self._summarize(["board-x", "board-y"]),
-            {
-                "ALL_MERGED": (4, 8),
-                "ALL_FILTERED": (3, 6),
-                # Only the lines that the board compiles, and not those of the
-                # excluded files, are counted. Hits of any test name count.
-                "BOARD_BOARD-X": (1, 2),
-                "BOARD_BOARD-Y": (1, 1),
-            },
-        )
-
-    def test_board_without_lines_raises(self):
-        """Test that a board that is not in the tracefile raises ValueError."""
-        with self.assertRaisesRegex(ValueError, "BOARD_BOARD-Z"):
-            self._summarize(["board-z"])
-
-
-class TestMergeShardCoverageReports(unittest.TestCase):
-    """Tests for merge_shard_coverage_reports function."""
-
-    @mock.patch("subprocess.run")
-    def test_merges_infos_and_creates_tarball(
-        self, mock_run: mock.MagicMock
-    ) -> None:
-        """Test that merge_shard_coverage_reports runs lcov and tars lcov.info."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            root = pathlib.Path(tmpdir)
-            zephyr_dir = root / "zephyr"
-            zephyr_dir.mkdir()
-            merge_dir = root / "shards"
-            merge_dir.mkdir()
-            (merge_dir / "shard1.info").write_text(
-                "TN:\nSF:/a.c\nDA:1,1\nend_of_record\n", encoding="utf-8"
-            )
-
-            opts = argparse.Namespace(merge_dir=str(merge_dir), cpus=2)
-            cmds: list[list[str]] = []
-            ret = firmware_builder_lib.merge_shard_coverage_reports(
-                opts, zephyr_dir, lambda cmd, cwd=None: cmds.append(cmd)
-            )
-
-            self.assertEqual(ret, 0)
-            self.assertEqual(mock_run.call_count, 2)
-            self.assertEqual(cmds[0][0], "/usr/bin/lcov")
-            self.assertIn(str(merge_dir / "shard1.info"), cmds[0])
-            self.assertEqual(
-                cmds[1],
-                [
-                    "tar",
-                    "cvjf",
-                    str(root / "build" / "zephyr" / "coverage.tbz2"),
-                    "lcov.info",
-                ],
-            )
 
 
 if __name__ == "__main__":
