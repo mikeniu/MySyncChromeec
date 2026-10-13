@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "822eaaf1_1f26ce67",
+        "filename": "zephyr/program/ocelot/src/rvp_board_id.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1190764
+      },
+      "writtenOn": "2026-10-13T17:58:39Z",
+      "side": 1,
+      "message": "do we need to update src/project/ocelot/ocelot/config.star?",
+      "range": {
+        "startLine": 30,
+        "startChar": 7,
+        "endLine": 30,
+        "endChar": 8
+      },
+      "revId": "74cf8d0961dd05b610b99334c06fb3b2ac306b25",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
