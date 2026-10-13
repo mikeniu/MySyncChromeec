@@ -1,0 +1,148 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff4aa9e7_6eaf05de",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T01:25:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Commit Message Style:** The subject line must end with a period per Chromium OS guidelines (e.g., `rts5817: Add low-level flashing tool.`).\n[🔗](http://go/tj/5213bd81-d1c0-4dda-ae7d-88393b98a74e)",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b53a5da_8b5f052d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T01:25:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Testing Verification:** The `TEST\u003d` footer should document the *outcome* of the testing (e.g., `TEST\u003dFlashed ec_rts5817.bin to RTS5817 device and verified successful boot and operation.`), rather than just pasting the command invocation.\n[🔗](http://go/tj/5213bd81-d1c0-4dda-ae7d-88393b98a74e)",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03f3b0c1_f00df259",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T01:25:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] ❌ **Changes Requested — Please split this CL**\n\n### Review Summary\n\n**CL Size \u0026 Scope:**\n*   This CL is reported as `Size: L (+761, -0)`. Per `go/small-cls`, CLs of this size are too large to review effectively as a single atomic unit and must be split. The previous review requested a split, which was marked as \"Done\", but the CL remains a single monolithic commit.\n*   **Proposed Split Plan:**\n    *   **CL 1:** Add the base `RtsUsbDevice` class structure and USB initialization/detachment/cleanup logic.\n    *   **CL 2:** Implement the core DFU download protocol and polling logic within `RtsUsbDevice`.\n    *   **CL 3:** Add the command-line utility entry point (`main`, `parse_args`, `read_file`) and build system integration.\n\n**Testing \u0026 Test Coverage:**\n*   **Missing Tests:** Despite previous feedback, there are still no automated unit tests for the pure logic components (such as `parse_args` and `read_file`). When splitting this CL, please add a small suite of unit tests for these pure helpers.\n\n**Functionality \u0026 Robustness:**\n*   **Resource Leaks (Rule of Three):** `RtsUsbDevice` lacks deleted copy/assignment operators, making it vulnerable to double-frees of the libusb context if copied. See inline comment.\n\n**Idiomaticity \u0026 Readability:**\n*   A few remaining magic numbers (`1000`, `10000`, `60000`) should be extracted into `constexpr` constants.\n\n**Commit Message:**\n*   The first line should end with a period.\n*   The `TEST\u003d` footer still just lists the command run rather than the outcome.\n\nPlease split the CL into a stacked series and address the inline comments.\n[🔗](http://go/tj/5213bd81-d1c0-4dda-ae7d-88393b98a74e)",
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12bcdbec_b1ef07f4",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T01:25:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **Resource Encapsulation \u0026 The Rule of Three:** `RtsUsbDevice` manually manages `libusb` resources (`ctx_`, `dev_handle_`) and frees them in its destructor. However, it implicitly allows copying, which would lead to a double-free of the libusb context if a copy is destroyed.\n\nPlease explicitly delete the copy constructor and copy assignment operator to ensure move-only or single-ownership semantics:\n```cpp\n\tRtsUsbDevice(const RtsUsbDevice\u0026) \u003d delete;\n\tRtsUsbDevice\u0026 operator\u003d(const RtsUsbDevice\u0026) \u003d delete;\n```\n[🔗](http://go/tj/5213bd81-d1c0-4dda-ae7d-88393b98a74e)",
+      "range": {
+        "startLine": 123,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d1c57e5_18af2552",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T01:25:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **No Magic Values:** Rather than hardcoding `60000` here, consider reusing your existing `kUsbDfuTimeoutMs` constant.\n```cpp\n\tint timeout \u003d kUsbDfuTimeoutMs;\n```\n[🔗](http://go/tj/5213bd81-d1c0-4dda-ae7d-88393b98a74e)",
+      "range": {
+        "startLine": 416,
+        "startChar": 0,
+        "endLine": 417,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d12e96cd_393801c0",
+        "filename": "util/rts5817_flash.cc",
+        "patchSetId": 3
+      },
+      "lineNbr": 744,
+      "author": {
+        "id": 1314845
+      },
+      "writtenOn": "2026-10-13T01:25:01Z",
+      "side": 1,
+      "message": "[Gerrit AI Review] **No Magic Values:** The timeout and polling interval values (`1000`, `10000`, `100`) are currently hardcoded magic numbers.\n\nPlease extract these into descriptive `constexpr unsigned int` constants at the top of the file (e.g., `kDetachTimeoutMs`, `kReEnumTimeoutMs`, `kReEnumPollIntervalMs`) to match the style of `kUsbCtrlTimeoutMs`.\n[🔗](http://go/tj/5213bd81-d1c0-4dda-ae7d-88393b98a74e)",
+      "range": {
+        "startLine": 734,
+        "startChar": 0,
+        "endLine": 744,
+        "endChar": 9999
+      },
+      "tag": "cl_review_agent",
+      "isAi": true,
+      "revId": "3ce58188936c05841a2f453c994b3f826a17ca67",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
