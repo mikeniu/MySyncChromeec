@@ -263,12 +263,6 @@ static inline int tcpc_read_alert_no_lpm_exit(int port, int *val)
 		val);
 }
 
-/* Map Type-C port to IOEX port */
-__overridable int board_map_nct38xx_tcpc_port_to_ioex(int port)
-{
-	return port;
-}
-
 static inline void nct38xx_tcpc_vendor_defined_alert(int port)
 {
 	const struct device *dev = nct38xx_get_gpio_device_from_port(port);

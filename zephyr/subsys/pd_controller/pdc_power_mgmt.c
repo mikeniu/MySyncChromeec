@@ -6332,41 +6332,6 @@ bool test_pdc_power_mgmt_is_src_typec_attached_run(int port)
 }
 
 /*
- * Reset the state machine for each port to its unattached state. This ensures
- * that tests start from the same state and prevents commands from a previous
- * test from impacting subsequently run tests.
- */
-/* LCOV_EXCL_START */
-bool pdc_power_mgmt_test_wait_unattached(void)
-{
-	int num_unattached;
-
-	for (int port = 0; port < ARRAY_SIZE(pdc_data); port++) {
-		set_pdc_state(&pdc_data[port]->port, PDC_UNATTACHED);
-	}
-
-	/* Wait for up to 20 * 100ms for all ports to become unattached. */
-	for (int i = 0; i < 20; i++) {
-		k_msleep(100);
-		num_unattached = 0;
-
-		for (int port = 0; port < ARRAY_SIZE(pdc_data); port++) {
-			if (pdc_data[port]->port.unattached_local_state ==
-			    UNATTACHED_RUN) {
-				num_unattached++;
-			}
-		}
-
-		if (num_unattached == ARRAY_SIZE(pdc_data)) {
-			return true;
-		}
-	}
-
-	return false;
-}
-/* LCOV_EXCL_STOP */
-
-/*
  * Ensure that the PDC attached state is either SRC_ATTACHED or SNK_ATTACHED and
  * that the substate has reached the stead state for the attached state.
  */

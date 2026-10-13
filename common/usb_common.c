@@ -465,11 +465,6 @@ __maybe_unused void pd_handle_cc_overvoltage(int port)
 	pd_send_hard_reset(port);
 }
 
-__overridable int pd_board_checks(void)
-{
-	return EC_SUCCESS;
-}
-
 __overridable int pd_check_data_swap(int port, enum pd_data_role data_role)
 {
 	/* Allow data swap if we are a UFP, otherwise don't allow. */
@@ -515,17 +510,6 @@ __overridable enum pd_dual_role_states pd_get_drp_state_in_s0(void)
 {
 	/* Enable dual role when chipset on */
 	return PD_DRP_TOGGLE_ON;
-}
-
-__overridable void pd_try_execute_vconn_swap(int port, int flags)
-{
-	/*
-	 * If partner is dual-role power and vconn swap is enabled, consider
-	 * if vconn swapping is necessary.
-	 */
-	if (IS_ENABLED(CONFIG_USB_PD_DUAL_ROLE) &&
-	    IS_ENABLED(CONFIG_USBC_VCONN_SWAP))
-		pd_try_vconn_src(port);
 }
 
 __overridable void pd_transition_voltage(int idx)
