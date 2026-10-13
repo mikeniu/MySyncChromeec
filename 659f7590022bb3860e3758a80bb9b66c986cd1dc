@@ -20,6 +20,24 @@
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6793930f_24b3e319",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-13T21:31:43Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9202e8e8_6eac054c",
+      "revId": "659f7590022bb3860e3758a80bb9b66c986cd1dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f36d5299_cf86e59e",
@@ -41,6 +59,30 @@
       },
       "tag": "cl_review_agent",
       "isAi": true,
+      "revId": "659f7590022bb3860e3758a80bb9b66c986cd1dc",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07398a09_43689c05",
+        "filename": "util/flash_fp_mcu",
+        "patchSetId": 1
+      },
+      "lineNbr": 1326,
+      "author": {
+        "id": 1541085
+      },
+      "writtenOn": "2026-10-13T21:31:43Z",
+      "side": 1,
+      "message": "this is how it done for `config_brya`. Can you confirm?",
+      "parentUuid": "f36d5299_cf86e59e",
+      "range": {
+        "startLine": 1321,
+        "startChar": 0,
+        "endLine": 1326,
+        "endChar": 9999
+      },
       "revId": "659f7590022bb3860e3758a80bb9b66c986cd1dc",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
