@@ -105,6 +105,24 @@
       "parentUuid": "fe5ea1be_c6736247",
       "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
       "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4849f5e0_fd2223d5",
+        "filename": "driver/tcpm/it8xxx2.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1390635
+      },
+      "writtenOn": "2026-10-13T18:39:11Z",
+      "side": 1,
+      "message": "it83xx_tcpm is deprecated, crrev/c/8569938 removes it.\n\nSee b/573180344 for details on reproduction.\n\nLatest patch adds it8xxx2_tcpm_enable_plug_in_detect() so it8xxx2_tcpm_enter_low_power_mode() and it8xxx2_tcpm_hook_disconnect() share the same re-arm helper",
+      "parentUuid": "2755f746_0ea36ade",
+      "revId": "384d133828ae7886b7e51d0000d8b0b715e9c34c",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
     }
   ]
 }
