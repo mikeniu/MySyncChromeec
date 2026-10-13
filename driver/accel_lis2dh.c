@@ -76,12 +76,11 @@ lis2dh_config_interrupt(const struct motion_sensor_t *s)
  * @s: Motion sensor pointer
  */
 static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
-			    uint32_t timestamp)
+			    uint32_t timestamp, int *total_read_count)
 {
 	int ret, left, length, i;
 	int *axis = s->raw_xyz;
 	uint8_t fifo[FIFO_READ_LEN];
-	int read_count;
 	uint32_t ts;
 
 	/* Each sample are OUT_XYZ_SIZE bytes. */
@@ -102,7 +101,6 @@ static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
 		if (ret != EC_SUCCESS)
 			return ret;
 
-		read_count = 0;
 		for (i = 0; i < length; i += OUT_XYZ_SIZE) {
 			/* Apply precision, sensitivity and rotation vector. */
 			st_normalize(s, axis, &fifo[i]);
@@ -128,20 +126,22 @@ static int lis2dh_load_fifo(struct motion_sensor_t *s, int nsamples,
 				 * pair each sample with a unique timestamp,
 				 * generate a timestamp for the 1st sample from
 				 * the timestamp that was latched in the
-				 * interrupt handler for the 2nd sample.
+				 * interrupt handler for the 2nd sample, and
+				 * step forward for any 3rd+ samples that
+				 * arrived before the fifo was drained.
 				 */
-				read_count++;
-				ts = nsamples > 1 ?
-					     timestamp - s->collection_rate *
-								 (nsamples -
-								  read_count) :
-					     timestamp;
+				(*total_read_count)++;
+				ts = (*total_read_count == 1 && nsamples == 1) ?
+					     timestamp :
+					     timestamp +
+						     (*total_read_count - 2) *
+							     s->collection_rate;
 				motion_sense_fifo_stage_data(&vect, s, 3, ts);
 			} else {
 				motion_sense_push_raw_xyz(s);
 			}
-			left -= length;
 		}
+		left -= length;
 	} while (left > 0);
 
 	return EC_SUCCESS;
@@ -183,6 +183,7 @@ static int lis2dh_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 {
 	uint32_t interrupt_timestamp = last_interrupt_timestamp;
 	bool commit_needed = false;
+	int total_read_count = 0;
 	int nsamples;
 
 	if ((!(*event & ACCEL_LIS2DH_INT_EVENT)) ||
@@ -196,7 +197,8 @@ static int lis2dh_irq_handler(struct motion_sensor_t *s, uint32_t *event)
 		if (nsamples != 0) {
 			commit_needed = true;
 			RETURN_ERROR(lis2dh_load_fifo(s, nsamples,
-						      interrupt_timestamp));
+						      interrupt_timestamp,
+						      &total_read_count));
 		}
 	} while (nsamples != 0);
 

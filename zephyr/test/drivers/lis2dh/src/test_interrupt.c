@@ -95,6 +95,59 @@ ZTEST_USER(lis2dh, test_lis2dh__samples_fifo_read)
 	}
 }
 
+ZTEST_USER(lis2dh, test_lis2dh__samples_fifo_timestamps_three_samples)
+{
+	struct stprivate_data *drvdata = acc->drv_data;
+	int16_t fake_sample[] = { 10, 20, 30, 40, 50, 60, 70, 80, 90 };
+	uint32_t evt = ACCEL_LIS2DH_INT_EVENT;
+	static struct ec_response_motion_sensor_data
+		fifo_data[ARRAY_SIZE(fake_sample) / 3 * 2];
+	int count;
+	uint16_t read_byte_count;
+	uint32_t irq_ts;
+	int i;
+
+	zassert_ok(lis2dh_drv.init(acc));
+	motion_sense_fifo_reset();
+
+	acc->config[SENSOR_CONFIG_AP].odr = 200000;
+	acc->drv->set_data_rate(acc, 200000, 1);
+	acc->collection_rate = 5000;
+	acc->oversampling_ratio = 1;
+	acc->spreading_threshold = 2;
+
+	lis2dh_drv.set_range(acc, 1, 0);
+	drvdata->resol = LIS2DH_RESOLUTION;
+
+	for (i = 0; i < ARRAY_SIZE(fake_sample); i++) {
+		fake_sample[i] <<= (15 - LIS2DH_RESOLUTION);
+	}
+
+	/*
+	 * Add 3 samples to the emulated FIFO. In hardware, WTM = 1 triggers the
+	 * interrupt when the 2nd sample enters the FIFO, and a 3rd sample can
+	 * enter before the bottom-half handler drains the FIFO.
+	 */
+	k_msleep(20);
+	lis2dh_emul_set_fifo_data(emul, fake_sample, sizeof(fake_sample));
+	irq_ts = last_interrupt_timestamp;
+
+	zassert_ok(lis2dh_drv.irq_handler(acc, &evt));
+
+	count = motion_sense_fifo_read(sizeof(fifo_data),
+				       ARRAY_SIZE(fake_sample) / 3 * 2,
+				       fifo_data, &read_byte_count);
+	zassert_equal(count, ARRAY_SIZE(fake_sample) / 3 * 2);
+
+	/*
+	 * Verify the 2nd sample is anchored at irq_ts, the 1st sample is
+	 * 1 period earlier, and the 3rd sample is 1 period later.
+	 */
+	zassert_equal(fifo_data[0].timestamp, irq_ts - acc->collection_rate);
+	zassert_equal(fifo_data[2].timestamp, irq_ts);
+	zassert_equal(fifo_data[4].timestamp, irq_ts + acc->collection_rate);
+}
+
 ZTEST_USER(lis2dh, test_lis2dh__samples_fifo_read_long)
 {
 	struct stprivate_data *drvdata = acc->drv_data;
