@@ -19,6 +19,7 @@ from flash.mchp_flasher import MchpFlasher
 from flash.npcx_flasher import NpcxJtagFlasher
 from flash.npcx_flasher import NpcxSpiFlasher
 from flash.npcx_flasher import NpcxUutFlasher
+from flash.openocd_flasher import OpenOcdFlasher
 from flash.rtk_flasher import RtkFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
@@ -159,11 +160,13 @@ class FlasherFactory:
             flasher_cls = MchpFlasher
         elif chip.startswith("rtk") or chip.startswith("realtek"):
             flasher_cls = RtkFlasher
+        elif chip == "openocd":
+            flasher_cls = OpenOcdFlasher
 
         if flasher_cls is not None:
             return flasher_cls(servo, args)
 
-        raise NotImplementedError(
-            f"Flasher for chip '{chip}' (interface='{interface}') "
-            "is not yet implemented."
+        raise ValueError(
+            f"Unsupported EC chip/interface combination: chip='{chip}', "
+            f"interface='{interface}'"
         )
