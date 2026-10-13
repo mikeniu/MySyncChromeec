@@ -24,6 +24,7 @@ void start_ec_tasks(void);
  */
 void set_test_runner_tid(void);
 
+struct k_event *get_thread_event(k_tid_t thread);
 struct k_event *task_get_event(task_id_t cros_task_id);
 #endif
 
