@@ -48,9 +48,3 @@ ZTEST(tasks, test_interrupt_context)
 {
 	zassert_false(in_interrupt_context());
 }
-
-ZTEST(tasks, test_get_event_bitmap_invalid_tid)
-{
-	zassert_is_null(
-		task_get_event_bitmap(TASK_ID_COUNT + EXTRA_TASK_COUNT));
-}

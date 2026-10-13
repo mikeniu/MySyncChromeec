@@ -185,15 +185,6 @@ task_id_t task_get_current(void)
 	return thread_id_to_task_id(k_current_get());
 }
 
-atomic_t *task_get_event_bitmap(task_id_t cros_task_id)
-{
-	struct task_ctx_base_data *data;
-
-	data = task_get_base_data(cros_task_id);
-
-	return data == NULL ? NULL : &data->event_mask;
-}
-
 void task_set_event(task_id_t cros_task_id, uint32_t event)
 {
 	struct task_ctx_base_data *data;
