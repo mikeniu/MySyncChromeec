@@ -12,12 +12,13 @@
 extern "C" {
 #endif
 
-#include "atomic_t.h"
 #include "common.h"
 #include "compile_time_macros.h"
 #include "task_id.h"
 
 #include <stdbool.h>
+
+#include <zephyr/kernel.h>
 
 /* Task event bitmasks */
 /* Tasks may use the bits in TASK_EVENT_CUSTOM_BIT for their own events */
@@ -121,11 +122,6 @@ task_id_t task_get_current(void);
  * Check if this current task is running in deferred context
  */
 bool in_deferred_context(void);
-
-/**
- * Return a pointer to the bitmap of events of the task.
- */
-atomic_t *task_get_event_bitmap(task_id_t tskid);
 
 /**
  * Wait for the next event.

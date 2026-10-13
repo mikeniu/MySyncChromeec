@@ -43,6 +43,7 @@ endif # ZTEST
 menuconfig PLATFORM_EC
 	bool "Chromium OS EC shim"
 	imply CRC
+	imply EVENTS
 	imply PRINTK
 	imply SHELL
     imply POLL # k_poll used in shim/src/console.c
