@@ -21,6 +21,8 @@ from flash.npcx_flasher import NpcxSpiFlasher
 from flash.npcx_flasher import NpcxUutFlasher
 from flash.servo_utils import ServoDriver
 from flash.servo_utils import ServoError
+from flash.stm32_flasher import Stm32DfuFlasher
+from flash.stm32_flasher import Stm32UartFlasher
 
 
 class TestQueryEcSourceTree(unittest.TestCase):
@@ -171,6 +173,21 @@ class TestFactory(unittest.TestCase):
         self.args.chip = "npcx9"
         self.assertIsInstance(
             FlasherFactory.create(self.servo, self.args), NpcxSpiFlasher
+        )
+
+    def test_stm32_dispatch(self) -> None:
+        """Route stm32_dfu, stm32, and google_fp to STM32 flashers."""
+        self.args.chip = "stm32_dfu"
+        dfu_flasher = FlasherFactory.create(self.servo, self.args)
+        self.assertIsInstance(dfu_flasher, Stm32DfuFlasher)
+        self.assertIsNone(dfu_flasher.servo)
+        self.args.chip = "stm32"
+        self.assertIsInstance(
+            FlasherFactory.create(self.servo, self.args), Stm32UartFlasher
+        )
+        self.args.chip = "google_dragonclaw"
+        self.assertIsInstance(
+            FlasherFactory.create(self.servo, self.args), Stm32UartFlasher
         )
 
     def test_board_map_lookup(self) -> None:
