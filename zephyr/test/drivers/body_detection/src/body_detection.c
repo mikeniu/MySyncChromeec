@@ -513,7 +513,50 @@ ZTEST_USER(bodydetectsample, test_reallife_data)
 #endif
 }
 
-#if !defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+#if defined(CONFIG_BODY_DETECTION_ALOGIRTHM_V2)
+/**
+ * @brief TestPurpose: verify ON_BODY hysteresis uses OFF_BODY_CON (10%) rather
+ * than ON_BODY_CON (90%), so moderate motion (~35% confidence) keeps the
+ * device ON_BODY, and verify body_detect_reset() clears filter state.
+ */
+ZTEST_USER(bodydetectsample, test_on_body_hysteresis)
+{
+	int i, cnt;
+	float fs = 50.0f;
+	int G_1 = 16384;
+
+	cnt = 2 * 60 * fs;
+
+	/*
+	 * 0.25Hz signal with amplitude G_1 / 250 (~4 mG) yields peak
+	 * var ~= 3100 uG (motion_confidence ~= 35%, which is >= OFF_BODY_CON
+	 * (10%) but < ON_BODY_CON (90%)). While already ON_BODY, this must
+	 * keep the state in BODY_DETECTION_ON_BODY.
+	 */
+	for (i = 0; i < cnt; i++) {
+		time_fake_value = (1000000 / fs * i);
+		body_sensor->xyz[X] = 0;
+		body_sensor->xyz[Y] = 0;
+		body_sensor->xyz[Z] =
+			G_1 + sin(0.25f * 2 * 3.14f / fs * i) * (G_1 / 250);
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_ON_BODY, body_detect_get_state(),
+		      "expected ON_BODY to be maintained by hysteresis");
+
+	/* Resetting after motion must reinitialize filters cleanly */
+	time_fake_value = 0;
+	body_detect_reset();
+	for (i = 0; i < cnt; i++) {
+		time_fake_value = (1000000 / fs * i);
+		body_sensor->xyz[X] = 0;
+		body_sensor->xyz[Y] = 0;
+		body_sensor->xyz[Z] = G_1;
+		body_detect();
+	}
+	zassert_equal(BODY_DETECTION_OFF_BODY, body_detect_get_state());
+}
+#else
 /**
  * @brief TestPurpose: verify calculate_motion_confidence does not underflow
  * uint64_t when confidence_delta_scaled > var_threshold_scaled.
