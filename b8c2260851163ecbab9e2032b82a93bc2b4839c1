@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e8da813_78bc572f",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-13T23:13:56Z",
+      "side": 1,
+      "message": "For generic SPI chips, this asserts cold_reset but never releases it, and the state is not saved for restoration. This will leave the DUT in reset after flashing. It should probably save_state(\u0027cold_reset\u0027) or ensure it is toggled off.",
+      "range": {
+        "startLine": 107,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 0
+      },
+      "revId": "b8c2260851163ecbab9e2032b82a93bc2b4839c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5dbe2b91_f3d4b8f8",
+        "filename": "util/flash/flashrom_flasher.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1483403
+      },
+      "writtenOn": "2026-10-13T23:13:56Z",
+      "side": 1,
+      "message": "This parsing is a bit brittle as it assumes the last line is exactly the integer. If flashrom prints a trailing warning or banner, this will fail. Consider iterating through the lines or using a regex to find the size.",
+      "range": {
+        "startLine": 161,
+        "startChar": 0,
+        "endLine": 161,
+        "endChar": 0
+      },
+      "revId": "b8c2260851163ecbab9e2032b82a93bc2b4839c1",
+      "serverId": "3ce6091f-6c88-37e8-8c75-72f92ae8dfba"
+    }
+  ]
+}
