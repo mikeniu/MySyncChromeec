@@ -10,6 +10,7 @@ from unittest.mock import MagicMock
 from unittest.mock import mock_open
 from unittest.mock import patch
 
+from flash.board_map import get_chip_from_board
 from flash.factory import FlasherFactory
 from flash.factory import query_ec_source_tree
 from flash.servo_utils import ServoDriver
@@ -132,6 +133,16 @@ class TestFactory(unittest.TestCase):
         self.servo.get.return_value = "it8320"
         with self.assertRaises(NotImplementedError):
             FlasherFactory.create(self.servo, self.args)
+        self.assertEqual(self.args.chip, "it8320")
+
+    def test_board_map_lookup(self) -> None:
+        """Verify legacy board_map lookup returns expected chip types."""
+        self.assertEqual(get_chip_from_board("veluza"), "it83xx")
+        self.assertEqual(get_chip_from_board("corsola"), "it83xx")
+        self.assertEqual(get_chip_from_board("brya"), "npcx_uut")
+        self.assertEqual(get_chip_from_board("buccaneer"), "npcx_spi")
+        self.assertEqual(get_chip_from_board("servo_v4p1"), "stm32_dfu")
+        self.assertIsNone(get_chip_from_board("nonexistent_board"))
 
 
 if __name__ == "__main__":
